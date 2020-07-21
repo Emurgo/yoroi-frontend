@@ -24,6 +24,7 @@ export type GeneratedData = typeof YoroiPlatePage.prototype.generated;
 
 type Props = {|
   ...InjectedOrGenerated<GeneratedData>,
+  +accountIndex: number,
   +onNext: void => PossiblyAsync<void>,
   +onCancel: void => void,
 |};
@@ -36,13 +37,14 @@ type WalletRestoreDialogContainerState = {|
 export default class YoroiPlatePage extends Component<Props> {
 
   async componentDidMount() {
-    const { yoroiTransfer } = this.generated.stores.substores.ada;
+    const { yoroiTransfer } = this.generated.stores;
 
     const rootPk = yoroiTransfer.transferKind === TransferKind.LEDGER
       ? generateLedgerWalletRootKey(yoroiTransfer.recoveryPhrase)
       : generateWalletRootKey(yoroiTransfer.recoveryPhrase);
     const { byronPlate, jormungandrPlate } = generatePlates(
       rootPk,
+      this.props.accountIndex,
       yoroiTransfer.transferKind === TransferKind.PAPER
         ? RestoreMode.PAPER
         : RestoreMode.REGULAR,
@@ -121,13 +123,9 @@ export default class YoroiPlatePage extends Component<Props> {
       profile: {|
         selectedNetwork: void | $ReadOnly<NetworkRow>,
       |},
-      substores: {|
-        ada: {|
-          yoroiTransfer: {|
-            recoveryPhrase: string,
-            transferKind: TransferKindType
-          |}
-        |}
+      yoroiTransfer: {|
+        recoveryPhrase: string,
+        transferKind: TransferKindType
       |},
       uiNotifications: {|
         getTooltipActiveNotification: string => ?Notification,
@@ -142,7 +140,6 @@ export default class YoroiPlatePage extends Component<Props> {
       throw new Error(`${nameof(YoroiPlatePage)} no way to generated props`);
     }
     const { stores, actions } = this.props;
-    const adaStores = stores.substores.ada;
     return Object.freeze({
       stores: {
         explorers: {
@@ -155,13 +152,9 @@ export default class YoroiPlatePage extends Component<Props> {
         profile: {
           selectedNetwork: stores.profile.selectedNetwork,
         },
-        substores: {
-          ada: {
-            yoroiTransfer: {
-              transferKind: adaStores.yoroiTransfer.transferKind,
-              recoveryPhrase: adaStores.yoroiTransfer.recoveryPhrase,
-            },
-          },
+        yoroiTransfer: {
+          transferKind: stores.yoroiTransfer.transferKind,
+          recoveryPhrase: stores.yoroiTransfer.recoveryPhrase,
         },
       },
       actions: {

@@ -32,7 +32,6 @@ export default class JormungandrWalletRestoreStore extends Store {
   setup(): void {
     super.setup();
     this.reset();
-    const { jormungandr } = this.actions;
     const actions = this.actions.walletRestore;
     const { syncCheck, asyncCheck } = buildCheckAndCall(
       ApiOptions.jormungandr,
@@ -41,7 +40,7 @@ export default class JormungandrWalletRestoreStore extends Store {
         return getApiForNetwork(this.stores.profile.selectedNetwork);
       }
     );
-    jormungandr.walletRestore.transferFromLegacy.listen(this._transferFromLegacy);
+    actions.transferFromLegacy.listen(asyncCheck(this._transferFromLegacy));
     actions.startRestore.listen(asyncCheck(this._restoreToDb));
     actions.reset.listen(syncCheck(this.reset));
   }
@@ -51,7 +50,7 @@ export default class JormungandrWalletRestoreStore extends Store {
     if (phrase == null) {
       throw new Error(`${nameof(this._transferFromLegacy)} no recovery phrase set. Should never happen`);
     }
-    await this.actions.jormungandr.yoroiTransfer.transferFunds.trigger({
+    await this.actions.yoroiTransfer.transferFunds.trigger({
       next: async () => { await this._restoreToDb(); },
       getDestinationAddress: () => Promise.resolve(this._getFirstCip1852InternalAddr()),
       // funds in genesis block should be either entirely claimed or not claimed
@@ -97,16 +96,16 @@ export default class JormungandrWalletRestoreStore extends Store {
       throw new Error(`${nameof(this._startCheck)} no recovery phrase set. Should never happen`);
     }
 
-    this.actions.jormungandr.yoroiTransfer.startTransferFunds.trigger({
+    this.actions.yoroiTransfer.startTransferFunds.trigger({
       source: TransferSource.BYRON,
     });
-    this.actions.jormungandr.yoroiTransfer.setupTransferFundsWithMnemonic.trigger({
+    this.actions.yoroiTransfer.setupTransferFundsWithMnemonic.trigger({
       recoveryPhrase: phrase
     });
     runInAction(() => { this.stores.walletRestore.step = RestoreSteps.TRANSFER_TX_GEN; });
 
     const internalAddrHash = this._getFirstCip1852InternalAddr();
-    await this.actions.jormungandr.yoroiTransfer.checkAddresses.trigger({
+    await this.actions.yoroiTransfer.checkAddresses.trigger({
       getDestinationAddress: () => Promise.resolve(internalAddrHash),
     });
   }
@@ -131,7 +130,11 @@ export default class JormungandrWalletRestoreStore extends Store {
     await this.stores.wallets.restoreRequest.execute(async () => {
       const wallet = await this.api.jormungandr.restoreWallet({
         db: persistentDb,
-        ...{ recoveryPhrase: phrase, walletName, walletPassword, network: selectedNetwork },
+        recoveryPhrase: phrase,
+        walletName,
+        walletPassword,
+        network: selectedNetwork,
+        accountIndex: this.stores.walletRestore.selectedAccount,
       });
       return wallet;
     }).promise;

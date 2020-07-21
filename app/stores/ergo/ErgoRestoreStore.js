@@ -63,7 +63,11 @@ export default class ErgoRestoreStore extends Store {
     await this.stores.wallets.restoreRequest.execute(async () => {
       const wallet = await this.api.ergo.restoreWallet({
         db: persistentDb,
-        ...{ recoveryPhrase: phrase, walletName, walletPassword, network: selectedNetwork  },
+        recoveryPhrase: phrase,
+        walletName,
+        walletPassword,
+        network: selectedNetwork,
+        accountIndex: this.stores.walletRestore.selectedAccount,
       });
       return wallet;
     }).promise;

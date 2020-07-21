@@ -130,10 +130,8 @@ export const mockTransferProps: {
             },
             open: { trigger: action('open'), },
           },
-          ada: {
-            yoroiTransfer: {
-              startTransferFunds: { trigger: action('startTransferFunds') },
-            },
+          yoroiTransfer: {
+            startTransferFunds: { trigger: action('startTransferFunds') },
           },
         },
         ByronEraOptionDialogContainerProps: {
@@ -148,19 +146,17 @@ export const mockTransferProps: {
               },
             },
             actions: {
-              ada: {
-                daedalusTransfer: {
-                  startTransferFunds: { trigger: action('startTransferFunds') },
-                  startTransferPaperFunds: { trigger: action('startTransferPaperFunds') },
-                  startTransferMasterKey: { trigger: action('startTransferMasterKey') },
+              daedalusTransfer: {
+                startTransferFunds: { trigger: action('startTransferFunds') },
+                startTransferPaperFunds: { trigger: action('startTransferPaperFunds') },
+                startTransferMasterKey: { trigger: action('startTransferMasterKey') },
+              },
+              yoroiTransfer: {
+                startTransferLegacyHardwareFunds: {
+                  trigger: action('startTransferLegacyHardwareFunds')
                 },
-                yoroiTransfer: {
-                  startTransferLegacyHardwareFunds: {
-                    trigger: action('startTransferLegacyHardwareFunds')
-                  },
-                  startTransferPaperFunds: { trigger: action('startTransferPaperFunds') },
-                  startTransferFunds: { trigger: action('startTransferFunds') },
-                },
+                startTransferPaperFunds: { trigger: action('startTransferPaperFunds') },
+                startTransferFunds: { trigger: action('startTransferFunds') },
               },
             },
           },

@@ -8,7 +8,7 @@ import { observer } from 'mobx-react';
 import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 import { intlShape, } from 'react-intl';
 import DelegationTxDialog from '../../../components/wallet/staking/DelegationTxDialog';
-import { getJormungandrTxFee } from '../../../api/ada/transactions/jormungandr/utils';
+import { getJormungandrTxFee } from '../../../api/jormungandr/lib/transactions/JormungandrTxSignRequest';
 import AnnotatedLoader from '../../../components/transfer/AnnotatedLoader';
 import ErrorBlock from '../../../components/widgets/ErrorBlock';
 import Dialog from '../../../components/widgets/Dialog';
@@ -59,7 +59,7 @@ export default class SeizaFetcher extends Component<Props> {
     if (selectedWallet == null) {
       return;
     }
-    const delegationTxActions = this.generated.actions.ada.delegationTransaction;
+    const delegationTxActions = this.generated.actions.jormungandr.delegationTransaction;
     await delegationTxActions.createTransaction.trigger({
       poolRequest: { id: pools[0].poolHash },
       publicDeriver: selectedWallet,
@@ -91,8 +91,8 @@ export default class SeizaFetcher extends Component<Props> {
   };
 
   cancel: void => void = () => {
-    this.generated.actions.ada.delegationTransaction.setPools.trigger([]);
-    this.generated.actions.ada.delegationTransaction.reset.trigger();
+    this.generated.actions.jormungandr.delegationTransaction.setPools.trigger([]);
+    this.generated.actions.jormungandr.delegationTransaction.reset.trigger();
   }
 
   render(): Node {
@@ -121,8 +121,8 @@ export default class SeizaFetcher extends Component<Props> {
     const { actions, stores } = this.generated;
     const { intl } = this.context;
     const { profile } = stores;
-    const delegationTxStore = stores.substores.ada.delegationTransaction;
-    const delegationTxActions = actions.ada.delegationTransaction;
+    const delegationTxStore = stores.substores.jormungandr.delegationTransaction;
+    const delegationTxActions = actions.jormungandr.delegationTransaction;
 
     const delegationTx = delegationTxStore.createDelegationTx.result;
 
@@ -250,7 +250,7 @@ export default class SeizaFetcher extends Component<Props> {
 
   @computed get generated(): {|
     actions: {|
-      ada: {|
+      jormungandr: {|
         delegationTransaction: {|
           complete: {|
             trigger: void => void
@@ -282,7 +282,7 @@ export default class SeizaFetcher extends Component<Props> {
         isClassicTheme: boolean,
       |},
       substores: {|
-        ada: {|
+        jormungandr: {|
           delegationTransaction: {|
             createDelegationTx: {|
               error: ?LocalizableError,
@@ -309,7 +309,7 @@ export default class SeizaFetcher extends Component<Props> {
       throw new Error(`${nameof(SeizaFetcher)} no way to generated props`);
     }
     const { stores, actions } = this.props;
-    const delegationTxStore = stores.substores.ada.delegationTransaction;
+    const delegationTxStore = stores.substores.jormungandr.delegationTransaction;
     return Object.freeze({
       stores: {
         explorers: {
@@ -322,7 +322,7 @@ export default class SeizaFetcher extends Component<Props> {
           selected: stores.wallets.selected,
         },
         substores: {
-          ada: {
+          jormungandr: {
             delegationTransaction: {
               selectedPools: delegationTxStore.selectedPools,
               isStale: delegationTxStore.isStale,
@@ -341,22 +341,22 @@ export default class SeizaFetcher extends Component<Props> {
         },
       },
       actions: {
-        ada: {
+        jormungandr: {
           delegationTransaction: {
             createTransaction: {
-              trigger: actions.ada.delegationTransaction.createTransaction.trigger,
+              trigger: actions.jormungandr.delegationTransaction.createTransaction.trigger,
             },
             signTransaction: {
-              trigger: actions.ada.delegationTransaction.signTransaction.trigger,
+              trigger: actions.jormungandr.delegationTransaction.signTransaction.trigger,
             },
             reset: {
-              trigger: actions.ada.delegationTransaction.reset.trigger,
+              trigger: actions.jormungandr.delegationTransaction.reset.trigger,
             },
             complete: {
-              trigger: actions.ada.delegationTransaction.complete.trigger,
+              trigger: actions.jormungandr.delegationTransaction.complete.trigger,
             },
             setPools: {
-              trigger: actions.ada.delegationTransaction.setPools.trigger,
+              trigger: actions.jormungandr.delegationTransaction.setPools.trigger,
             },
           },
         },

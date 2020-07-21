@@ -102,7 +102,7 @@ export default class ChangeWalletPasswordDialogContainer extends Component<Props
       throw new Error(`${nameof(ChangeWalletPasswordDialogContainer)} no way to generated props`);
     }
     const { stores, actions } = this.props;
-    const settingActions = actions.ada.walletSettings;
+    const settingActions = actions.walletSettings;
     const settingStores = this.props.stores.walletSettings;
     return Object.freeze({
       stores: {

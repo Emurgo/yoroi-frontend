@@ -56,7 +56,7 @@ export default class AdaTransactionBuilderStore extends Store {
   setup(): void {
     super.setup();
     this._reset();
-    const actions = this.actions.ada.txBuilderActions;
+    const actions = this.actions.txBuilderActions;
     actions.updateReceiver.listen(this._updateReceiver);
     actions.setFilter.listen(this._setFilter);
     actions.updateAmount.listen(this._updateAmount);

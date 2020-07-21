@@ -95,7 +95,7 @@ export default class WalletSettingsStore extends Store {
 
   setup(): void {
     super.setup();
-    const a = this.actions.ada.walletSettings;
+    const a = this.actions.walletSettings;
     a.startEditingWalletField.listen(this._startEditingWalletField);
     a.stopEditingWalletField.listen(this._stopEditingWalletField);
     a.cancelEditingWalletField.listen(this._cancelEditingWalletField);

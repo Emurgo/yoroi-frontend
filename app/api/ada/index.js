@@ -74,6 +74,9 @@ import {
   generateAdaMnemonic,
 } from './lib/cardanoCrypto/cryptoWallet';
 import {
+  v4PublicToV2,
+} from './lib/cardanoCrypto/utils';
+import {
   isValidBip39Mnemonic,
 } from '../common/lib/crypto/wallet';
 import { generateByronPlate } from './lib/cardanoCrypto/plate';
@@ -103,7 +106,6 @@ import {
 import LocalizableError from '../../i18n/LocalizableError';
 import { scanBip44Account, } from '../common/lib/restoration/bip44';
 import { v2genAddressBatchFunc, } from './restoration/byron/scan';
-import { scanCip1852Account, } from './restoration/jormungandr/scan';
 import type {
   BaseSignRequest,
 } from './transactions/types';
@@ -837,9 +839,11 @@ export default class AdaApi {
     Logger.debug(`${nameof(AdaApi)}::${nameof(this.restoreWallet)} called`);
     const { recoveryPhrase, walletName, walletPassword, } = request;
 
+    if (request.accountIndex < HARD_DERIVATION_START) {
+      throw new Error(`${nameof(this.restoreWallet)} needs hardened index`);
+    }
     try {
       // Note: we only restore for 0th account
-      const accountIndex = HARD_DERIVATION_START + 0;
       const rootPk = generateWalletRootKey(recoveryPhrase);
       const newPubDerivers = [];
 
@@ -855,7 +859,7 @@ export default class AdaApi {
           RustModule.WalletV2.DerivationScheme.v2()
         ),
         password: walletPassword,
-        accountIndex,
+        accountIndex: request.accountIndex,
         walletName,
         accountName: '', // set account name empty now
       });
@@ -936,7 +940,7 @@ export default class AdaApi {
       let insertTree;
       if (request.transferSource === TransferSource.BYRON) {
         const key = RustModule.WalletV2.Bip44AccountPublic.new(
-          v3PublicToV2(accountKey.to_public()),
+          v4PublicToV2(accountKey.to_public()),
           RustModule.WalletV2.DerivationScheme.v2(),
         );
         insertTree = await scanBip44Account({
@@ -952,33 +956,6 @@ export default class AdaApi {
           addByHash,
           type: CoreAddressTypes.CARDANO_LEGACY,
         });
-      } else if (sourceIsJormungandrWallet) {
-        const stakingKey = accountKey
-          .derive(ChainDerivations.CHIMERIC_ACCOUNT)
-          .derive(STAKING_KEY_INDEX)
-          .to_public()
-          .to_raw_key();
-
-        const cip1852InsertTree = await scanCip1852Account({
-          accountPublicKey: Buffer.from(accountKey.to_public().as_bytes()).toString('hex'),
-          lastUsedInternal: -1,
-          lastUsedExternal: -1,
-          checkAddressesInUse,
-          addByHash,
-          stakingKey,
-        });
-
-        if (request.transferSource === TransferSource.JORMUNGANDR_UTXO) {
-          insertTree = cip1852InsertTree.filter(child => (
-            child.index === ChainDerivations.EXTERNAL || child.index === ChainDerivations.INTERNAL
-          ));
-        } else if (request.transferSource === TransferSource.JORMUNGANDR_CHIMERIC_ACCOUNT) {
-          insertTree = cip1852InsertTree.filter(child => (
-            child.index === ChainDerivations.CHIMERIC_ACCOUNT
-          ));
-        } else {
-          throw new Error(`${nameof(this.restoreWalletForTransfer)} unexpected shelley type ${request.transferSource}`);
-        }
       } else {
         throw new Error(`${nameof(this.restoreWalletForTransfer)} unexpected wallet type ${request.transferSource}`);
       }

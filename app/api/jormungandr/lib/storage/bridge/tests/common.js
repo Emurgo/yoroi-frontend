@@ -9,7 +9,7 @@ import {
 } from '../../../../../ada/lib/storage/models/PublicDeriver/index';
 import {
   createStandardCip1852Wallet
-} from '../../../../../ada/lib/storage/bridge/walletBuilder/jormungandr';
+} from '../walletBuilder/jormungandr';
 import {
   setupBip44
 } from '../../../../../ada/lib/storage/bridge/tests/common';

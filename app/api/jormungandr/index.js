@@ -22,7 +22,7 @@ import {
 } from '../../types/TransferTypes';
 import {
   createStandardCip1852Wallet,
-} from '../ada/lib/storage/bridge/walletBuilder/jormungandr';
+} from './lib/storage/bridge/walletBuilder/jormungandr';
 import {
   getAllTransactions,
   updateTransactions,
@@ -87,7 +87,7 @@ import {
 import LocalizableError from '../../i18n/LocalizableError';
 import { scanBip44Account, } from '../common/lib/restoration/bip44';
 import { v2genAddressBatchFunc, } from '../ada/restoration/byron/scan';
-import { scanCip1852Account, } from '../ada/restoration/jormungandr/scan';
+import { scanCip1852Account, } from './lib/restoration/scan';
 import type {
   BaseSignRequest,
   V3UnsignedTxAddressedUtxoResponse,

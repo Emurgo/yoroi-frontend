@@ -34,6 +34,7 @@ export type RestoreWalletRequest = {|
   recoveryPhrase: string,
   walletName: string,
   walletPassword: string,
+  accountIndex: number,
 |};
 export type RestoreWalletResponse = {|
   publicDerivers: Array<PublicDeriver<>>,

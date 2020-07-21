@@ -16,16 +16,16 @@ import {
 } from '../../../../config/numbersConfig';
 import environment from '../../../../environment';
 
-import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
+import { RustModule } from '../../../ada/lib/cardanoCrypto/rustLoader';
 
 import type {
   TreeInsert, InsertRequest,
-} from '../../lib/storage/database/walletTypes/common/utils';
+} from '../../../ada/lib/storage/database/walletTypes/common/utils';
 import type { AddByHashFunc, } from '../../../common/lib/storage/bridge/hashMapper';
 import type { AddressDiscriminationType } from '@emurgo/js-chain-libs/js_chain_libs';
-import type { CanonicalAddressInsert } from '../../lib/storage/database/primitives/tables';
-import { CoreAddressTypes } from '../../lib/storage/database/primitives/enums';
-import type { Bip44ChainInsert } from '../../lib/storage/database/walletTypes/common/tables';
+import type { CanonicalAddressInsert } from '../../../ada/lib/storage/database/primitives/tables';
+import { CoreAddressTypes } from '../../../ada/lib/storage/database/primitives/enums';
+import type { Bip44ChainInsert } from '../../../ada/lib/storage/database/walletTypes/common/tables';
 
 declare var CONFIG: ConfigType;
 const addressRequestSize = CONFIG.app.addressRequestSize;

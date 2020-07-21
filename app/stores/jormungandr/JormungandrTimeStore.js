@@ -23,7 +23,7 @@ import type {
   CurrentSlotLengthFunc,
   TimeSinceGenesisRequestFunc,
   ToRealTimeFunc,
-} from '../../api/ada/lib/storage/bridge/timeUtils';
+} from '../../api/jormungandr/lib/storage/bridge/timeUtils';
 import {
   buildCheckAndCall,
 } from '../lib/check';

@@ -22,7 +22,7 @@ import { ConceptualWallet } from '../../../api/ada/lib/storage/models/Conceptual
 import type { ConceptualWalletSettingsCache } from '../../../stores/toplevel/WalletSettingsStore';
 import type { SigningKeyCache } from '../../../stores/toplevel/WalletStore';
 import LocalizableError from '../../../i18n/LocalizableError';
-import type { RenameModelFunc } from '../../../api/ada/index';
+import type { RenameModelFunc } from '../../../api/common/index';
 import type { IGetSigningKey } from '../../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 
 type GeneratedData = typeof WalletSettingsPage.prototype.generated;
@@ -205,7 +205,7 @@ export default class WalletSettingsPage extends Component<InjectedOrGenerated<Ge
       throw new Error(`${nameof(WalletSettingsPage)} no way to generated props`);
     }
     const { actions, stores, } = this.props;
-    const settingActions = actions.ada.walletSettings;
+    const settingActions = actions.walletSettings;
     const settingStore = this.props.stores.walletSettings;
     return Object.freeze({
       stores: {

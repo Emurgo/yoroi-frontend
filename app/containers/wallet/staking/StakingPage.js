@@ -49,7 +49,7 @@ export default class StakingPage extends Component<Props> {
   };
 
   componentWillUnmount() {
-    this.generated.actions.ada.delegationTransaction.reset.trigger();
+    this.generated.actions.jormungandr.delegationTransaction.reset.trigger();
   }
 
   getBrowserReplacement(): string {
@@ -101,7 +101,7 @@ export default class StakingPage extends Component<Props> {
     }
 
     finalURL += `&locale=${this.generated.stores.profile.currentLocale}`;
-    const delegationStore = this.generated.stores.substores.ada.delegation;
+    const delegationStore = this.generated.stores.substores.jormungandr.delegation;
     const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
     if (delegationRequests == null) {
       throw new Error(`${nameof(StakingPage)} opened for non-reward wallet`);
@@ -121,7 +121,7 @@ export default class StakingPage extends Component<Props> {
     const { stores } = this.generated;
     const { intl } = this.context;
 
-    const delegationTxStore = stores.substores.ada.delegationTransaction;
+    const delegationTxStore = stores.substores.jormungandr.delegationTransaction;
 
     if (
       !delegationTxStore.signAndBroadcastDelegationTx.isExecuting &&
@@ -155,7 +155,7 @@ export default class StakingPage extends Component<Props> {
   @computed get generated(): {|
     SeizaFetcherProps: InjectedOrGenerated<SeizaFetcherData>,
     actions: {|
-      ada: {|
+      jormungandr: {|
         delegationTransaction: {|
           reset: {| trigger: (params: void) => void |}
         |}
@@ -164,7 +164,7 @@ export default class StakingPage extends Component<Props> {
     stores: {|
       profile: {| currentLocale: string |},
       substores: {|
-        ada: {|
+        jormungandr: {|
           delegation: {|
             getDelegationRequests: (
               PublicDeriver<>
@@ -192,7 +192,7 @@ export default class StakingPage extends Component<Props> {
       throw new Error(`${nameof(StakingPage)} no way to generated props`);
     }
     const { stores, actions } = this.props;
-    const adaStores = stores.substores.ada;
+    const jormungandrStores = stores.substores.jormungandr;
     return Object.freeze({
       stores: {
         profile: {
@@ -206,26 +206,26 @@ export default class StakingPage extends Component<Props> {
           hasAnyPending: stores.transactions.hasAnyPending,
         },
         substores: {
-          ada: {
+          jormungandr: {
             delegation: {
-              getDelegationRequests: adaStores.delegation.getDelegationRequests,
+              getDelegationRequests: jormungandrStores.delegation.getDelegationRequests,
             },
             delegationTransaction: {
               signAndBroadcastDelegationTx: {
                 isExecuting:
-                  adaStores.delegationTransaction.signAndBroadcastDelegationTx.isExecuting,
+                  jormungandrStores.delegationTransaction.signAndBroadcastDelegationTx.isExecuting,
                 wasExecuted:
-                  adaStores.delegationTransaction.signAndBroadcastDelegationTx.wasExecuted,
+                  jormungandrStores.delegationTransaction.signAndBroadcastDelegationTx.wasExecuted,
               },
             },
           },
         },
       },
       actions: {
-        ada: {
+        jormungandr: {
           delegationTransaction: {
             reset: {
-              trigger: actions.ada.delegationTransaction.reset.trigger,
+              trigger: actions.jormungandr.delegationTransaction.reset.trigger,
             },
           },
         },

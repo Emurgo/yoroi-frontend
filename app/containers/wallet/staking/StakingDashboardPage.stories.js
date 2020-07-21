@@ -120,7 +120,7 @@ const genBaseProps: {|
         ]]),
       },
       substores: {
-        ada: {
+        jormungandr: {
           time: {
             getTimeCalcRequests: request.lookup.getTimeCalcRequests,
             getCurrentTimeRequests: request.lookup.getCurrentTimeRequests,
@@ -160,7 +160,7 @@ const genBaseProps: {|
           trigger: action('closeActiveDialog'),
         },
       },
-      ada: {
+      jormungandr: {
         delegationTransaction: {
           reset: {
             trigger: action('closeActiveDialog'),
@@ -178,7 +178,7 @@ const genBaseProps: {|
       generated: {
         stores: {
           substores: {
-            ada: {
+            jormungandr: {
               time: {
                 getTimeCalcRequests: request.lookup.getTimeCalcRequests,
                 getCurrentTimeRequests: request.lookup.getCurrentTimeRequests,
@@ -200,6 +200,22 @@ const genBaseProps: {|
           },
           wallets: {
             selected: request.wallet.publicDeriver,
+            sendMoneyRequest: (
+              request.transactionBuilderStore == null
+              || request.transactionBuilderStore.tentativeTx == null
+            )
+              ? {
+                reset: action('reset'),
+                error: undefined,
+                isExecuting: false,
+              }
+              : {
+                reset: action('reset'),
+                error: sendErrorValue() === sendErrorCases.None
+                  ? undefined
+                  : sendErrorValue(),
+                isExecuting: boolean('isExecuting', false),
+              },
           },
           coinPriceStore: {
             getCurrentPrice: (_from, _to) => 5,
@@ -213,44 +229,20 @@ const genBaseProps: {|
               },
             ]]),
           },
-          substores: {
-            ada: {
-              wallets: {
-                sendMoneyRequest: (
-                  request.transactionBuilderStore == null
-                  || request.transactionBuilderStore.tentativeTx == null
-                )
-                  ? {
-                    reset: action('reset'),
-                    error: undefined,
-                    isExecuting: false,
-                  }
-                  : {
-                    reset: action('reset'),
-                    error: sendErrorValue() === sendErrorCases.None
-                      ? undefined
-                      : sendErrorValue(),
-                    isExecuting: boolean('isExecuting', false),
-                  },
-              },
-              transactionBuilderStore: request.transactionBuilderStore || (null: any),
-            },
-          },
+          transactionBuilderStore: request.transactionBuilderStore || (null: any),
         },
         actions: {
-          ada: {
-            txBuilderActions: {
-              initialize: {
-                trigger: async (req) => action('initialize')(req),
-              },
-              reset: {
-                trigger: action('reset'),
-              },
+          txBuilderActions: {
+            initialize: {
+              trigger: async (req) => action('initialize')(req),
             },
-            wallets: {
-              sendMoney: {
-                trigger: async (req) => action('sendMoney')(req),
-              },
+            reset: {
+              trigger: action('reset'),
+            },
+          },
+          wallets: {
+            sendMoney: {
+              trigger: async (req) => action('sendMoney')(req),
             },
           },
         },

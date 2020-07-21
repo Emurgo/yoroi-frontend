@@ -19,15 +19,9 @@ import type {
 } from './dialogs/WalletSendConfirmationDialogContainer';
 import WalletSendConfirmationDialog from '../../components/wallet/send/WalletSendConfirmationDialog';
 import MemoNoExternalStorageDialog from '../../components/wallet/memos/MemoNoExternalStorageDialog';
-import {
-  copySignRequest,
-  IGetFee,
-  IReceivers,
-  ITotalInput,
-} from '../../api/ada/transactions/utils';
 import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import { isLedgerNanoWallet, isTrezorTWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
-import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
+import { ByronTxSignRequest } from '../../api/ada/transactions/byron/ByronTxSignRequest';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { SendUsingLedgerParams } from '../../actions/ada/ledger-send-actions';
 import type { SendUsingTrezorParams } from '../../actions/ada/trezor-send-actions';
@@ -36,7 +30,7 @@ import type { UriParams } from '../../utils/URIHandling';
 import { SelectedExplorer } from '../../domain/SelectedExplorer';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import LocalizableError from '../../i18n/LocalizableError';
-import type { BaseSignRequest } from '../../api/ada/transactions/types';
+import type { ISignRequest } from '../../api/common/lib/transactions/ISignRequest';
 import { ApiOptions, getApiForNetwork, getApiMeta } from '../../api/common/utils';
 import { isWithinSupply } from '../../utils/validations';
 import { formattedWalletAmount } from '../../utils/formatters';
@@ -122,14 +116,12 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
     const apiMeta = getApiMeta(selectedApiType)?.meta;
     if (apiMeta == null) throw new Error(`${nameof(WalletSendPage)} no API selected`);
 
-    const { transactionBuilderStore } = this.generated.stores.substores[
-      selectedApiType
-    ];
+    const { transactionBuilderStore } = this.generated.stores;
 
     const { uiDialogs, profile, } = this.generated.stores;
     const { actions } = this.generated;
     const { hasAnyPending } = this.generated.stores.transactions;
-    const { txBuilderActions } = this.generated.actions[selectedApiType];
+    const { txBuilderActions } = this.generated.actions;
 
     // disallow sending when pending tx exists
     if (uiDialogs.isOpen && hasAnyPending) {
@@ -223,9 +215,9 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
     const apiMeta = getApiMeta(selectedApiType)?.meta;
     if (apiMeta == null) throw new Error(`${nameof(this.hardwareWalletDoConfirmation)} no API selected`);
 
-    const { transactionBuilderStore } = this.generated.stores.substores[selectedApiType];
+    const { transactionBuilderStore } = this.generated.stores;
     if (!transactionBuilderStore.tentativeTx) {
-      throw new Error('webWalletDoConfirmation::should never happen');
+      throw new Error(`${nameof(this.webWalletDoConfirmation)}::should never happen`);
     }
     const signRequest = transactionBuilderStore.tentativeTx;
 
@@ -264,18 +256,18 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
     const adaApi = ApiOptions.ada;
 
     const { intl } = this.context;
-    const { transactionBuilderStore } = this.generated.stores.substores[adaApi];
+    const { transactionBuilderStore } = this.generated.stores;
     // Guard against potential null values
     if (!publicDeriver) throw new Error('Active wallet required for hardwareWalletDoConfirmation.');
 
     if (!transactionBuilderStore.tentativeTx) {
-      throw new Error('hardwareWalletDoConfirmation::should never happen');
+      throw new Error(`${nameof(this.hardwareWalletDoConfirmation)}::should never happen`);
     }
     const signRequest = transactionBuilderStore.tentativeTx;
 
-    const totalInput = ITotalInput(signRequest, true);
-    const fee = IGetFee(signRequest, true);
-    const receivers = IReceivers(signRequest, false);
+    const totalInput = signRequest.totalInput(true);
+    const fee = signRequest.fee(true);
+    const receivers = signRequest.receivers(false);
 
     const coinPrice: ?number = this.generated.stores.profile.unitOfAccount.enabled
       ? (
@@ -289,14 +281,9 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
     const conceptualWallet = publicDeriver.getParent();
     let hwSendConfirmationDialog: Node = null;
 
-    const unsignedTx = signRequest.unsignedTx;
-    if (!(unsignedTx instanceof RustModule.WalletV2.Transaction)) {
-      throw new Error('hardwareWalletDoConfirmation hw wallets only supported for Byron');
+    if (!(signRequest instanceof ByronTxSignRequest)) {
+      throw new Error(`${nameof(this.hardwareWalletDoConfirmation)} hw wallets only supported for Byron`);
     }
-    const v2Request = {
-      ...signRequest,
-      unsignedTx,
-    };
     const selectedExplorerForNetwork = this.generated.stores.explorers.selectedExplorer
       .get(publicDeriver.getParent().getNetworkInfo().NetworkId)
       ?? (() => { throw new Error('No explorer for wallet network'); })();
@@ -319,7 +306,7 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
           error={ledgerSendStore.error}
           onSubmit={
             () => ledgerSendAction.sendUsingLedger.trigger({
-              params: { signRequest: copySignRequest(v2Request) },
+              params: { signRequest: signRequest.copy().self() },
               publicDeriver,
             })
           }
@@ -348,7 +335,7 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
           error={trezorSendStore.error}
           onSubmit={
             () => trezorSendAction.sendUsingTrezor.trigger({
-              params: { signRequest: copySignRequest(v2Request) },
+              params: { signRequest: signRequest.copy().self() },
               publicDeriver,
             })
           }
@@ -422,23 +409,23 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
             |}) => Promise<void>
           |}
         |},
-        txBuilderActions: {|
+      |},
+      txBuilderActions: {|
           reset: {| trigger: (params: void) => void |},
-          toggleSendAll: {|
-            trigger: (params: void) => void
-          |},
-          updateAmount: {|
-            trigger: (params: void | number) => void
-          |},
-          updateMemo: {|
-            trigger: (params: void | string) => void
-          |},
-          updateReceiver: {|
-            trigger: (params: void | string) => void
-          |},
-          updateTentativeTx: {|
-            trigger: (params: void) => void
-          |}
+        toggleSendAll: {|
+          trigger: (params: void) => void
+        |},
+        updateAmount: {|
+          trigger: (params: void | number) => void
+        |},
+        updateMemo: {|
+          trigger: (params: void | string) => void
+        |},
+        updateReceiver: {|
+          trigger: (params: void | string) => void
+        |},
+        updateTentativeTx: {|
+          trigger: (params: void) => void
         |}
       |},
       dialogs: {|
@@ -484,24 +471,22 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
         isClassicTheme: boolean,
         unitOfAccount: UnitOfAccountSettingType
       |},
+      transactionBuilderStore: {|
+        createUnsignedTx: {|
+          error: ?LocalizableError,
+          isExecuting: boolean
+        |},
+        fee: ?BigNumber,
+        shouldSendAll: boolean,
+        tentativeTx: null | ISignRequest<any>,
+        totalInput: ?BigNumber,
+        txMismatch: boolean
+      |},
       substores: {|
         ada: {|
           ledgerSend: {|
             error: ?LocalizableError,
             isActionProcessing: boolean
-          |},
-          transactionBuilderStore: {|
-            createUnsignedTx: {|
-              error: ?LocalizableError,
-              isExecuting: boolean
-            |},
-            fee: ?BigNumber,
-            shouldSendAll: boolean,
-            tentativeTx: null | BaseSignRequest<
-              RustModule.WalletV2.Transaction | RustModule.WalletV3.InputOutput
-            >,
-            totalInput: ?BigNumber,
-            txMismatch: boolean
           |},
           trezorSend: {|
             error: ?LocalizableError,
@@ -554,6 +539,17 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
         transactions: {
           hasAnyPending: stores.transactions.hasAnyPending,
         },
+        transactionBuilderStore: {
+          totalInput: stores.transactionBuilderStore.totalInput,
+          fee: stores.transactionBuilderStore.fee,
+          shouldSendAll: stores.transactionBuilderStore.shouldSendAll,
+          tentativeTx: stores.transactionBuilderStore.tentativeTx,
+          txMismatch: stores.transactionBuilderStore.txMismatch,
+          createUnsignedTx: {
+            isExecuting: stores.transactionBuilderStore.createUnsignedTx.isExecuting,
+            error: stores.transactionBuilderStore.createUnsignedTx.error,
+          },
+        },
         substores: {
           ada: {
             ledgerSend: {
@@ -563,17 +559,6 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
             trezorSend: {
               isActionProcessing: adaStore.trezorSend.isActionProcessing,
               error: adaStore.trezorSend.error,
-            },
-            transactionBuilderStore: {
-              totalInput: adaStore.transactionBuilderStore.totalInput,
-              fee: adaStore.transactionBuilderStore.fee,
-              shouldSendAll: adaStore.transactionBuilderStore.shouldSendAll,
-              tentativeTx: adaStore.transactionBuilderStore.tentativeTx,
-              txMismatch: adaStore.transactionBuilderStore.txMismatch,
-              createUnsignedTx: {
-                isExecuting: adaStore.transactionBuilderStore.createUnsignedTx.isExecuting,
-                error: adaStore.transactionBuilderStore.createUnsignedTx.error,
-              },
             },
           },
         },
@@ -591,6 +576,14 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
             trigger: actions.memos.closeMemoDialog.trigger
           },
         },
+        txBuilderActions: {
+          updateTentativeTx: { trigger: actions.txBuilderActions.updateTentativeTx.trigger },
+          updateReceiver: { trigger: actions.txBuilderActions.updateReceiver.trigger },
+          updateAmount: { trigger: actions.txBuilderActions.updateAmount.trigger },
+          toggleSendAll: { trigger: actions.txBuilderActions.toggleSendAll.trigger },
+          reset: { trigger: actions.txBuilderActions.reset.trigger },
+          updateMemo: { trigger: actions.txBuilderActions.updateMemo.trigger },
+        },
         ada: {
           ledgerSend: {
             init: { trigger: actions.ada.ledgerSend.init.trigger },
@@ -600,14 +593,6 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
           trezorSend: {
             cancel: { trigger: actions.ada.trezorSend.cancel.trigger },
             sendUsingTrezor: { trigger: actions.ada.trezorSend.sendUsingTrezor.trigger },
-          },
-          txBuilderActions: {
-            updateTentativeTx: { trigger: actions.ada.txBuilderActions.updateTentativeTx.trigger },
-            updateReceiver: { trigger: actions.ada.txBuilderActions.updateReceiver.trigger },
-            updateAmount: { trigger: actions.ada.txBuilderActions.updateAmount.trigger },
-            toggleSendAll: { trigger: actions.ada.txBuilderActions.toggleSendAll.trigger },
-            reset: { trigger: actions.ada.txBuilderActions.reset.trigger },
-            updateMemo: { trigger: actions.ada.txBuilderActions.updateMemo.trigger },
           },
         },
       },

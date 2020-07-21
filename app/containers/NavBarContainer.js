@@ -332,7 +332,7 @@ export default class NavBarContainer extends Component<Props> {
           shouldHideBalance: stores.profile.shouldHideBalance,
         },
         delegation: {
-          getDelegationRequests: stores.substores.ada.delegation.getDelegationRequests,
+          getDelegationRequests: stores.substores.jormungandr.delegation.getDelegationRequests,
         },
         transactions: {
           getTxRequests: stores.transactions.getTxRequests,

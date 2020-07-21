@@ -49,7 +49,7 @@ export type CurrentTimeRequests = {|
 /**
  * Different wallets can be on different networks and therefore have different measures of time
 */
-export default class BaseTimeStore extends Store {
+export default class BaseCardanoTimeStore extends Store {
   @observable time: Date = new Date();
 
   /**
@@ -68,7 +68,7 @@ export default class BaseTimeStore extends Store {
     const foundRequest = find(this.timeCalcRequests, { publicDeriver });
     if (foundRequest) return foundRequest;
 
-    throw new Error(`${nameof(BaseTimeStore)}::${nameof(this.getTimeCalcRequests)} missing for public deriver`);
+    throw new Error(`${nameof(BaseCardanoTimeStore)}::${nameof(this.getTimeCalcRequests)} missing for public deriver`);
   }
 
   getCurrentTimeRequests: PublicDeriver<> => CurrentTimeRequests = (
@@ -77,7 +77,7 @@ export default class BaseTimeStore extends Store {
     const foundRequest = find(this.currentTimeRequests, { publicDeriver });
     if (foundRequest) return foundRequest;
 
-    throw new Error(`${nameof(BaseTimeStore)}::${nameof(this.getCurrentTimeRequests)} missing for public deriver`);
+    throw new Error(`${nameof(BaseCardanoTimeStore)}::${nameof(this.getCurrentTimeRequests)} missing for public deriver`);
   }
 
   @action _updateTime: void => Promise<void> = async () => {

@@ -55,7 +55,7 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
     if (publicDeriver == null) {
       throw new Error(`${nameof(this.setupTransferFundsWithMnemonic)} no wallet selected`);
     }
-    await this.generated.actions.ada.daedalusTransfer.setupTransferFundsWithMnemonic.trigger({
+    await this.generated.actions.daedalusTransfer.setupTransferFundsWithMnemonic.trigger({
       ...payload,
       publicDeriver
     });
@@ -69,7 +69,7 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
     if (publicDeriver == null) {
       throw new Error(`${nameof(this.setupTransferFundsWithMasterKey)} no wallet selected`);
     }
-    await this.generated.actions.ada.daedalusTransfer.setupTransferFundsWithMasterKey.trigger({
+    await this.generated.actions.daedalusTransfer.setupTransferFundsWithMasterKey.trigger({
       ...payload,
       publicDeriver
     });
@@ -83,7 +83,7 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
       throw new Error(`${nameof(this.transferFunds)} no wallet selected`);
     }
     // broadcast transfer transaction then call continuation
-    await this.generated.actions.ada.daedalusTransfer.transferFunds.trigger({
+    await this.generated.actions.daedalusTransfer.transferFunds.trigger({
       next: async () => {
         try {
           await walletsStore.refreshWalletFromRemote(publicDeriver);
@@ -101,16 +101,16 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
   }
 
   backToUninitialized: (() => void) = () => {
-    this.generated.actions.ada.daedalusTransfer.backToUninitialized.trigger();
+    this.generated.actions.daedalusTransfer.backToUninitialized.trigger();
   }
 
   cancelTransferFunds: (() => void) = () => {
-    this.generated.actions.ada.daedalusTransfer.cancelTransferFunds.trigger();
+    this.generated.actions.daedalusTransfer.cancelTransferFunds.trigger();
   }
 
   render(): null | Node {
     const { profile } = this.generated.stores;
-    const daedalusTransfer = this.generated.stores.substores.ada.daedalusTransfer;
+    const daedalusTransfer = this.generated.stores.daedalusTransfer;
     const publicDeriver = this.generated.stores.wallets.selected;
     if (publicDeriver == null) {
       throw new Error(`${nameof(this.setupTransferFundsWithMnemonic)} no wallet selected`);
@@ -219,32 +219,30 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
 
   @computed get generated(): {|
     actions: {|
-      ada: {|
-        daedalusTransfer: {|
-          backToUninitialized: {|
-            trigger: (params: void) => void
-          |},
-          cancelTransferFunds: {|
-            trigger: (params: void) => void
-          |},
-          setupTransferFundsWithMasterKey: {|
-            trigger: (params: {|
-              masterKey: string,
-              publicDeriver: PublicDeriver<>
-            |}) => Promise<void>
-          |},
-          setupTransferFundsWithMnemonic: {|
-            trigger: (params: {|
-              publicDeriver: PublicDeriver<>,
-              recoveryPhrase: string
-            |}) => Promise<void>
-          |},
-          transferFunds: {|
-            trigger: (params: {|
-              next: () => Promise<void>,
-              publicDeriver: PublicDeriver<>
-            |}) => Promise<void>
-          |}
+      daedalusTransfer: {|
+        backToUninitialized: {|
+          trigger: (params: void) => void
+        |},
+        cancelTransferFunds: {|
+          trigger: (params: void) => void
+        |},
+        setupTransferFundsWithMasterKey: {|
+          trigger: (params: {|
+            masterKey: string,
+            publicDeriver: PublicDeriver<>
+          |}) => Promise<void>
+        |},
+        setupTransferFundsWithMnemonic: {|
+          trigger: (params: {|
+            publicDeriver: PublicDeriver<>,
+            recoveryPhrase: string
+          |}) => Promise<void>
+        |},
+        transferFunds: {|
+          trigger: (params: {|
+            next: () => Promise<void>,
+            publicDeriver: PublicDeriver<>
+          |}) => Promise<void>
         |}
       |},
       router: {|
@@ -275,15 +273,11 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
           mode: $PropertyType<typeof RestoreMode, 'REGULAR'> | $PropertyType<typeof RestoreMode, 'PAPER'>,
         |}) => boolean,
       |},
-      substores: {|
-        ada: {|
-          daedalusTransfer: {|
-            error: ?LocalizableError,
-            status: TransferStatusT,
-            transferFundsRequest: {| isExecuting: boolean |},
-            transferTx: ?TransferTx
-          |},
-        |}
+      daedalusTransfer: {|
+        error: ?LocalizableError,
+        status: TransferStatusT,
+        transferFundsRequest: {| isExecuting: boolean |},
+        transferTx: ?TransferTx
       |},
       wallets: {|
         refreshWalletFromRemote: (
@@ -300,8 +294,6 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
       throw new Error(`${nameof(DaedalusTransferPage)} no way to generated props`);
     }
     const { stores, actions } = this.props;
-    const adaStores = stores.substores.ada;
-    const { daedalusTransfer } = actions.ada;
     return Object.freeze({
       stores: {
         explorers: {
@@ -321,34 +313,28 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
         coinPriceStore: {
           getCurrentPrice: stores.coinPriceStore.getCurrentPrice,
         },
-        substores: {
-          ada: {
-            daedalusTransfer: {
-              status: adaStores.daedalusTransfer.status,
-              error: adaStores.daedalusTransfer.error,
-              transferTx: adaStores.daedalusTransfer.transferTx,
-              transferFundsRequest: {
-                isExecuting: adaStores.daedalusTransfer.transferFundsRequest.isExecuting,
-              },
-            },
+        daedalusTransfer: {
+          status: stores.daedalusTransfer.status,
+          error: stores.daedalusTransfer.error,
+          transferTx: stores.daedalusTransfer.transferTx,
+          transferFundsRequest: {
+            isExecuting: stores.daedalusTransfer.transferFundsRequest.isExecuting,
           },
-        },
+        }
       },
       actions: {
         router: {
           goToRoute: { trigger: actions.router.goToRoute.trigger },
         },
-        ada: {
-          daedalusTransfer: {
-            backToUninitialized: { trigger: daedalusTransfer.backToUninitialized.trigger },
-            cancelTransferFunds: { trigger: daedalusTransfer.cancelTransferFunds.trigger },
-            transferFunds: { trigger: daedalusTransfer.transferFunds.trigger },
-            setupTransferFundsWithMasterKey: {
-              trigger: daedalusTransfer.setupTransferFundsWithMasterKey.trigger
-            },
-            setupTransferFundsWithMnemonic: {
-              trigger: daedalusTransfer.setupTransferFundsWithMnemonic.trigger
-            },
+        daedalusTransfer: {
+          backToUninitialized: { trigger: actions.daedalusTransfer.backToUninitialized.trigger },
+          cancelTransferFunds: { trigger: actions.daedalusTransfer.cancelTransferFunds.trigger },
+          transferFunds: { trigger: actions.daedalusTransfer.transferFunds.trigger },
+          setupTransferFundsWithMasterKey: {
+            trigger: actions.daedalusTransfer.setupTransferFundsWithMasterKey.trigger
+          },
+          setupTransferFundsWithMnemonic: {
+            trigger: actions.daedalusTransfer.setupTransferFundsWithMnemonic.trigger
           },
         },
       },

@@ -95,6 +95,19 @@ const genBaseProps: {|
         ? boolean('hasAnyPending', false)
         : false,
     },
+    transactionBuilderStore: request.dialogInfo == null
+      ? {
+        totalInput: undefined,
+        fee: undefined,
+        shouldSendAll: boolean('shouldSendAll', false),
+        tentativeTx: null,
+        txMismatch: false,
+        createUnsignedTx: {
+          isExecuting: boolean('isExecuting', false),
+          error: undefined,
+        },
+      }
+      : request.dialogInfo.transactionBuilderStore,
     substores: {
       ada: {
         ledgerSend: request.hwSend || {
@@ -105,19 +118,6 @@ const genBaseProps: {|
           isActionProcessing: false,
           error: undefined,
         },
-        transactionBuilderStore: request.dialogInfo == null
-          ? {
-            totalInput: undefined,
-            fee: undefined,
-            shouldSendAll: boolean('shouldSendAll', false),
-            tentativeTx: null,
-            txMismatch: false,
-            createUnsignedTx: {
-              isExecuting: boolean('isExecuting', false),
-              error: undefined,
-            },
-          }
-          : request.dialogInfo.transactionBuilderStore,
       },
     },
   },
@@ -132,6 +132,14 @@ const genBaseProps: {|
     memos: {
       closeMemoDialog: { trigger: action('closeMemoDialog') },
     },
+    txBuilderActions: {
+      updateTentativeTx: { trigger: action('updateTentativeTx') },
+      updateReceiver: { trigger: action('updateReceiver') },
+      updateAmount: { trigger: action('updateAmount') },
+      toggleSendAll: { trigger: action('toggleSendAll') },
+      reset: { trigger: action('reset') },
+      updateMemo: { trigger: action('updateMemo') },
+    },
     ada: {
       ledgerSend: {
         init: { trigger: action('init') },
@@ -141,14 +149,6 @@ const genBaseProps: {|
       trezorSend: {
         cancel: { trigger: action('cancel') },
         sendUsingTrezor: { trigger: async (req) => action('sendUsingTrezor')(req) },
-      },
-      txBuilderActions: {
-        updateTentativeTx: { trigger: action('updateTentativeTx') },
-        updateReceiver: { trigger: action('updateReceiver') },
-        updateAmount: { trigger: action('updateAmount') },
-        toggleSendAll: { trigger: action('toggleSendAll') },
-        reset: { trigger: action('reset') },
-        updateMemo: { trigger: action('updateMemo') },
       },
     },
   },

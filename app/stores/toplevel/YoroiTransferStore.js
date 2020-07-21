@@ -76,7 +76,7 @@ export default class YoroiTransferStore extends Store {
 
   setup(): void {
     super.setup();
-    const actions = this.actions.ada.yoroiTransfer;
+    const actions = this.actions.yoroiTransfer;
     actions.startTransferFunds.listen(this._startTransferFunds);
     actions.startTransferLegacyHardwareFunds.listen(this._startTransferLegacyHardwareFunds);
     actions.startTransferPaperFunds.listen(this._startTransferPaperFunds);

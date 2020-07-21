@@ -72,13 +72,17 @@ export class ByronTxSignRequest implements ISignRequest<RustModule.WalletV2.Tran
     return receivers;
   }
 
-  copy(): BaseSignRequest<RustModule.WalletV2.Transaction> {
-    return {
+  uniqueSenderAddresses(): Array<string> {
+    return Array.from(new Set(this.signRequest.senderUtxos.map(utxo => utxo.receiver)));
+  }
+
+  copy(): ByronTxSignRequest {
+    return new ByronTxSignRequest({
       changeAddr: this.signRequest.changeAddr,
       senderUtxos: this.signRequest.senderUtxos,
       unsignedTx: this.signRequest.unsignedTx.clone(),
       certificate: undefined,
-    };
+    });
   }
 
   isEqual(tx: ?(mixed| RustModule.WalletV2.Transaction)): boolean {

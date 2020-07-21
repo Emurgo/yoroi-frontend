@@ -24,4 +24,5 @@ export default class WalletRestoreActions {
   setMode: Action<RestoreModeType> = new Action();
   reset: Action<void> = new Action();
   back: Action<void> = new Action();
+  transferFromLegacy: AsyncAction<void> = new AsyncAction();
 }

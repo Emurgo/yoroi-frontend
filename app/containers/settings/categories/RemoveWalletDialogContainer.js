@@ -107,7 +107,7 @@ export default class RemoveWalletDialogContainer extends Component<Props> {
       throw new Error(`${nameof(RemoveWalletDialogContainer)} no way to generated props`);
     }
     const { actions, stores } = this.props;
-    const settingActions = actions.ada.walletSettings;
+    const settingActions = actions.walletSettings;
     const settingStore = stores.walletSettings;
     return Object.freeze({
       stores: {

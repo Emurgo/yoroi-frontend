@@ -4,30 +4,23 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { computed } from 'mobx';
 import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
-import type { BaseSignRequest } from '../../../api/ada/transactions/types';
-import {
-  copySignRequest,
-  IGetFee,
-  IReceivers,
-  ITotalInput,
-} from '../../../api/ada/transactions/utils';
 import WalletSendConfirmationDialog from '../../../components/wallet/send/WalletSendConfirmationDialog';
 import {
   formattedAmountToNaturalUnits,
   formattedWalletAmount,
 } from '../../../utils/formatters';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
-import { RustModule } from '../../../api/ada/lib/cardanoCrypto/rustLoader';
 import LocalizableError from '../../../i18n/LocalizableError';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import { ApiOptions, getApiForNetwork, getApiMeta } from '../../../api/common/utils';
 import { addressToDisplayString } from '../../../api/ada/lib/storage/bridge/utils';
+import type { ISignRequest } from '../../../api/common/lib/transactions/ISignRequest';
 
 export type GeneratedData = typeof WalletSendConfirmationDialogContainer.prototype.generated;
 
 type DialogProps = {|
-  +signRequest: BaseSignRequest<RustModule.WalletV2.Transaction | RustModule.WalletV3.InputOutput>,
+  +signRequest: ISignRequest<any>,
   +currencyUnit: string,
   +staleTx: boolean,
   +unitOfAccountSetting: UnitOfAccountSettingType,
@@ -72,9 +65,9 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
     const { wallets } = stores.substores[selectedApiType];
     const { sendMoneyRequest } = wallets;
 
-    const totalInput = ITotalInput(signRequest, true);
-    const fee = IGetFee(signRequest, true);
-    const receivers = IReceivers(signRequest, false);
+    const totalInput = signRequest.totalInput(true);
+    const fee = signRequest.fee(true);
+    const receivers = signRequest.receivers(false);
     return (
       <WalletSendConfirmationDialog
         staleTx={this.props.staleTx}
@@ -96,7 +89,7 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
           apiMeta.decimalPlaces.toNumber()
         )}
         onSubmit={async ({ password }) => {
-          const copyRequest = copySignRequest(signRequest);
+          const copyRequest = signRequest.copy();
           await sendMoney.trigger({
             signRequest: copyRequest,
             password,
@@ -128,9 +121,7 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
             trigger: (params: {|
               password: string,
               publicDeriver: PublicDeriver<>,
-              signRequest: BaseSignRequest<
-                RustModule.WalletV2.Transaction | RustModule.WalletV3.InputOutput
-              >
+              signRequest: ISignRequest<any>,
             |}) => Promise<void>
           |}
         |}
@@ -184,9 +175,9 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
           ada: {
             wallets: {
               sendMoneyRequest: {
-                isExecuting: stores.substores.ada.wallets.sendMoneyRequest.isExecuting,
-                reset: stores.substores.ada.wallets.sendMoneyRequest.reset,
-                error: stores.substores.ada.wallets.sendMoneyRequest.error,
+                isExecuting: stores.wallets.sendMoneyRequest.isExecuting,
+                reset: stores.wallets.sendMoneyRequest.reset,
+                error: stores.wallets.sendMoneyRequest.error,
               },
             },
           },
@@ -201,7 +192,7 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
         ada: {
           wallets: {
             sendMoney: {
-              trigger: actions.ada.wallets.sendMoney.trigger,
+              trigger: actions.wallets.sendMoney.trigger,
             },
           },
         },

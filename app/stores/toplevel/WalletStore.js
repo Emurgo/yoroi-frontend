@@ -128,6 +128,9 @@ export default class WalletStore extends Store {
     });
   @observable isImportActive: boolean = false;
 
+  @observable sendMoneyRequest: Request<typeof WalletStore.prototype.sendAndRefresh>
+    = new Request<typeof WalletStore.prototype.sendAndRefresh>(this.sendAndRefresh);
+
   @observable signingKeyCache: Array<SigningKeyCache> = [];
   getSigningKeyCache: IGetSigningKey => SigningKeyCache = (
     publicDeriver
@@ -482,6 +485,20 @@ export default class WalletStore extends Store {
         ));
       }
     }
+  }
+
+  sendAndRefresh: {|
+    broadcastRequest: void => Promise<{| txId: string |}>,
+    refreshWallet: () => Promise<void>,
+  |} => Promise<{| txId: string |}> = async (request) => {
+    const result = await request.broadcastRequest();
+    try {
+      await request.refreshWallet();
+    } catch (_e) {
+      // even if refreshing the wallet fails, we don't want to fail the tx
+      // otherwise user may try and re-send the tx
+    }
+    return result;
   }
 }
 

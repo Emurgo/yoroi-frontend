@@ -15,33 +15,33 @@ import {
 
 import type {
   TreeInsert,
-} from '../../database/walletTypes/common/utils';
-import type { Bip44ChainInsert } from '../../database/walletTypes/common/tables';
+} from '../../../../../ada/lib/storage/database/walletTypes/common/utils';
+import type { Bip44ChainInsert } from '../../../../../ada/lib/storage/database/walletTypes/common/tables';
 
-import { WalletBuilder } from './builder';
+import { WalletBuilder } from '../../../../../ada/lib/storage/bridge/walletBuilder/builder';
 
-import { RustModule } from '../../../cardanoCrypto/rustLoader';
+import { RustModule } from '../../../../../ada/lib/cardanoCrypto/rustLoader';
 import { encryptWithPassword } from '../../../../../../utils/passwordCipher';
 import type { AddressDiscriminationType } from '@emurgo/js-chain-libs/js_chain_libs';
 
 import {
   Bip44DerivationLevels,
   Bip44TableMap,
-} from '../../database/walletTypes/bip44/api/utils';
+} from '../../../../../ada/lib/storage/database/walletTypes/bip44/api/utils';
 import type {
   HasConceptualWallet,
   HasCip1852Wrapper,
   HasPublicDeriver,
   HasRoot,
-} from './builder';
+} from '../../../../../ada/lib/storage/bridge/walletBuilder/builder';
 import type { AddByHashFunc } from '../../../../../common/lib/storage/bridge/hashMapper';
 import { rawGenAddByHash } from '../../../../../common/lib/storage/bridge/hashMapper';
 import {
   addJormungandrUtxoAddress,
   addJormungandrChimericAccountAddress,
-} from '../../../../restoration/jormungandr/scan';
+} from '../../../restoration/scan';
 import { KeyKind } from '../../../../../common/lib/crypto/keys/types';
-import { networks } from '../../database/prepackaged/networks';
+import { networks } from '../../../../../ada/lib/storage/database/prepackaged/networks';
 
 // TODO: maybe move this inside walletBuilder somehow so it's all done in the same transaction
 /**

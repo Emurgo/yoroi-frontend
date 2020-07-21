@@ -8,24 +8,21 @@ import {
 } from '../../utils/logging';
 import Request from '../lib/LocalizedRequest';
 import type {
-  SignAndBroadcastRequest, SignAndBroadcastResponse,
   GenerateWalletRecoveryPhraseFunc
 } from '../../api/jormungandr/index';
-import type { BaseSignRequest } from '../../api/ada/transactions/types';
 import {
   asGetSigningKey,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
-import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
+import { JormungandrTxSignRequest } from '../../api/jormungandr/lib/transactions/JormungandrTxSignRequest';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import { ROUTES } from '../../routes-config';
 import { buildCheckAndCall } from '../lib/check';
 import { getApiForNetwork, ApiOptions } from '../../api/common/utils';
+import type { ISignRequest } from '../../api/common/lib/transactions/ISignRequest';
 
 export default class JormungandrWalletsStore extends Store {
 
   // REQUESTS
-  @observable sendMoneyRequest: Request<typeof JormungandrWalletsStore.prototype.sendAndRefresh>
-    = new Request<typeof JormungandrWalletsStore.prototype.sendAndRefresh>(this.sendAndRefresh);
 
   @observable generateWalletRecoveryPhraseRequest: Request<GenerateWalletRecoveryPhraseFunc>
     = new Request<GenerateWalletRecoveryPhraseFunc>(
@@ -34,7 +31,7 @@ export default class JormungandrWalletsStore extends Store {
 
   setup(): void {
     super.setup();
-    const { jormungandr, walletBackup } = this.actions;
+    const { jormungandr, wallets, walletBackup } = this.actions;
     const { asyncCheck } = buildCheckAndCall(
       ApiOptions.jormungandr,
       () => {
@@ -44,14 +41,15 @@ export default class JormungandrWalletsStore extends Store {
     );
     walletBackup.finishWalletBackup.listen(asyncCheck(this._createInDb));
     jormungandr.wallets.createWallet.listen(this._startWalletCreation);
-    jormungandr.wallets.sendMoney.listen(this._sendMoney);
+    wallets.sendMoney.listen(asyncCheck(this._sendMoney));
   }
 
   // =================== SEND MONEY ==================== //
 
   /** Send money and then return to transaction screen */
   _sendMoney:  {|
-    signRequest: BaseSignRequest<RustModule.WalletV3.InputOutput>,
+    signRequest: ISignRequest<any>,
+    // signRequest: BaseSignRequest<RustModule.WalletV3.InputOutput>,
     password: string,
     publicDeriver: PublicDeriver<>,
   |} => Promise<void> = async (transactionDetails) => {
@@ -59,13 +57,17 @@ export default class JormungandrWalletsStore extends Store {
     if (withSigning == null) {
       throw new Error(`${nameof(this._sendMoney)} public deriver missing signing functionality.`);
     }
-    await this.sendMoneyRequest.execute({
-      broadcastRequest: {
+    const { signRequest } = transactionDetails;
+    if (!(signRequest instanceof JormungandrTxSignRequest)) {
+      throw new Error(`${nameof(this._sendMoney)} wrong tx sign request`);
+    }
+    await this.stores.wallets.sendMoneyRequest.execute({
+      broadcastRequest: async () => await this.api.jormungandr.signAndBroadcast({
         publicDeriver: withSigning,
         password: transactionDetails.password,
-        signRequest: transactionDetails.signRequest,
+        signRequest: signRequest.self(),
         sendTx: this.stores.substores.jormungandr.stateFetchStore.fetcher.sendTx,
-      },
+      }),
       refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(
         transactionDetails.publicDeriver
       ),
@@ -91,7 +93,7 @@ export default class JormungandrWalletsStore extends Store {
       });
 
     this.actions.dialogs.closeActiveDialog.trigger();
-    this.sendMoneyRequest.reset();
+    this.stores.wallets.sendMoneyRequest.reset();
     this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ROOT });
   };
 
@@ -129,22 +131,9 @@ export default class JormungandrWalletsStore extends Store {
         walletPassword: this.stores.walletBackup.password,
         recoveryPhrase: this.stores.walletBackup.recoveryPhrase.join(' '),
         network: selectedNetwork,
+        accountIndex: this.stores.walletBackup.selectedAccount,
       });
       return wallet;
     }).promise;
   };
-
-  sendAndRefresh: {|
-    broadcastRequest: SignAndBroadcastRequest,
-    refreshWallet: () => Promise<void>,
-  |} => Promise<SignAndBroadcastResponse> = async (request) => {
-    const result = await this.api.jormungandr.signAndBroadcast(request.broadcastRequest);
-    try {
-      await request.refreshWallet();
-    } catch (_e) {
-      // even if refreshing the wallet fails, we don't want to fail the tx
-      // otherwise user may try and re-send the tx
-    }
-    return result;
-  }
 }

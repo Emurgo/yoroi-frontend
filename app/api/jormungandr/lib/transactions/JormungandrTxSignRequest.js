@@ -26,6 +26,10 @@ export class JormungandrTxSignRequest implements ISignRequest<RustModule.WalletV
     return getJormungandrTxFee(this.signRequest.unsignedTx, shift);
   }
 
+  uniqueSenderAddresses(): Array<string> {
+    return Array.from(new Set(this.signRequest.senderUtxos.map(utxo => utxo.receiver)));
+  }
+
   receivers(includeChange: boolean): Array<string> {
     const receivers: Array<string> = [];
 
@@ -44,8 +48,8 @@ export class JormungandrTxSignRequest implements ISignRequest<RustModule.WalletV
     return receivers;
   }
 
-  copy(): BaseSignRequest<RustModule.WalletV3.InputOutput> {
-    return this.signRequest; // no need to copy for V3
+  copy(): JormungandrTxSignRequest {
+    return this; // no need to copy for V3
   }
 
   isEqual(tx: ?(mixed| RustModule.WalletV3.InputOutput)): boolean {

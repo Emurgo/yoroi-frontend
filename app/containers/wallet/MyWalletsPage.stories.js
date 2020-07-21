@@ -95,7 +95,7 @@ export const Wallets = (): Node => {
           getConceptualWalletSettingsCache: lookup.getConceptualWalletSettingsCache,
         },
         substores: {
-          ada: {
+          jormungandr: {
             delegation: {
               getDelegationRequests: lookup.getDelegation
             },

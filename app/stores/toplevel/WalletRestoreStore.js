@@ -155,6 +155,7 @@ export default class AdaWalletRestoreStore extends Store {
     this.step = RestoreSteps.START;
     this.walletRestoreMeta = undefined;
     this.recoveryResult = undefined;
+    this.selectedAccount = 0 + HARD_DERIVATION_START;
   }
 
   isValidMnemonic: {|

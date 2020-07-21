@@ -31,6 +31,9 @@ import {
 } from '../../stores/toplevel/YoroiTransferStore';
 import AdaApi from '../../api/ada/index';
 import { RestoreMode } from '../../actions/common/wallet-restore-actions';
+import {
+  HARD_DERIVATION_START,
+} from '../../config/numbersConfig';
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -55,6 +58,7 @@ const genBaseProps: {|
       unitOfAccount: genUnitOfAccount(),
     },
     walletRestore: {
+      selectedAccount: 0 + HARD_DERIVATION_START,
       isValidMnemonic: (isValidRequest) => {
         const { mnemonic, numberOfWords } = isValidRequest;
         if (isValidRequest.mode === RestoreMode.REGULAR) {
@@ -70,36 +74,30 @@ const genBaseProps: {|
     coinPriceStore: {
       getCurrentPrice: (_from, _to) => 5,
     },
-    substores: {
-      ada: {
-        yoroiTransfer: {
-          status: TransferStatus.UNINITIALIZED,
-          error: undefined,
-          transferTx: undefined,
-          transferFundsRequest: Object.freeze({
-            isExecuting: false,
-          }),
-          nextInternalAddress: (_publicDeriver) => (async () => 'Ae2tdPwUPEZ5PxKxoyZDgjsKgMWMpTRa4PH3sVgARSGBsWwNBH3qg7cMFsP'),
-          recoveryPhrase: '',
-          ...request.yoroiTransfer,
-        },
-      },
+    yoroiTransfer: {
+      status: TransferStatus.UNINITIALIZED,
+      error: undefined,
+      transferTx: undefined,
+      transferFundsRequest: Object.freeze({
+        isExecuting: false,
+      }),
+      nextInternalAddress: (_publicDeriver) => (async () => 'Ae2tdPwUPEZ5PxKxoyZDgjsKgMWMpTRa4PH3sVgARSGBsWwNBH3qg7cMFsP'),
+      recoveryPhrase: '',
+      ...request.yoroiTransfer,
     },
   },
   actions: {
     router: {
       goToRoute: { trigger: action('goToRoute') },
     },
-    ada: {
-      yoroiTransfer: {
-        backToUninitialized: { trigger: action('backToUninitialized') },
-        cancelTransferFunds: { trigger: action('cancelTransferFunds') },
-        startHardwareMnemonic: { trigger: action('startHardwareMnemonic') },
-        transferFunds: { trigger: async (req) => action('transferFunds')(req) },
-        checkAddresses: { trigger: async (req) => action('checkAddresses')(req) },
-        setupTransferFundsWithPaperMnemonic: { trigger: action('setupTransferFundsWithPaperMnemonic') },
-        setupTransferFundsWithMnemonic: { trigger: action('setupTransferFundsWithMnemonic') },
-      },
+    yoroiTransfer: {
+      backToUninitialized: { trigger: action('backToUninitialized') },
+      cancelTransferFunds: { trigger: action('cancelTransferFunds') },
+      startHardwareMnemonic: { trigger: action('startHardwareMnemonic') },
+      transferFunds: { trigger: async (req) => action('transferFunds')(req) },
+      checkAddresses: { trigger: async (req) => action('checkAddresses')(req) },
+      setupTransferFundsWithPaperMnemonic: { trigger: action('setupTransferFundsWithPaperMnemonic') },
+      setupTransferFundsWithMnemonic: { trigger: action('setupTransferFundsWithMnemonic') },
     },
   },
   YoroiPlateProps: {
@@ -117,17 +115,13 @@ const genBaseProps: {|
           isOpen: (_request) => request.openDialog === true,
           getTooltipActiveNotification: () => null,
         },
-        substores: {
-          ada: {
-            yoroiTransfer: {
-              transferKind: request.transferKind == null
-                ? TransferKind.NORMAL
-                : request.transferKind,
-              recoveryPhrase: request.yoroiTransfer.recoveryPhrase == null
-                ? ''
-                : request.yoroiTransfer.recoveryPhrase,
-            },
-          },
+        yoroiTransfer: {
+          transferKind: request.transferKind == null
+            ? TransferKind.NORMAL
+            : request.transferKind,
+          recoveryPhrase: request.yoroiTransfer.recoveryPhrase == null
+            ? ''
+            : request.yoroiTransfer.recoveryPhrase,
         },
       },
       actions: {

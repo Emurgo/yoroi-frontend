@@ -39,9 +39,8 @@ import type { AddressSubgroupMeta, IAddressTypeUiSubset, IAddressTypeStore } fro
 import { routeForStore, allAddressSubgroups, applyAddressFilter, } from '../../stores/stateless/addressStores';
 import { getUnmangleAmounts, } from '../../stores/stateless/mangledAddresses';
 import {
-  CardanoForks,
+  isCardanoHaskell,
 } from '../../api/ada/lib/storage/database/prepackaged/networks';
-import { CoinTypes, } from '../../config/numbersConfig';
 
 export type GeneratedData = typeof WalletReceivePage.prototype.generated;
 
@@ -205,10 +204,6 @@ export default class WalletReceivePage extends Component<Props> {
       ];
     };
 
-    const isCardanoMainnet = (
-      publicDeriver.getParent().getNetworkInfo().CoinType === CoinTypes.CARDANO &&
-      publicDeriver.getParent().getNetworkInfo().Fork === CardanoForks.Haskell
-    );
     return (
       <VerticalFlexContainer>
         <WalletReceive
@@ -229,7 +224,7 @@ export default class WalletReceivePage extends Component<Props> {
             this.openVerifyAddressDialog();
           }}
           onGeneratePaymentURI={
-            !isCardanoMainnet || (
+            !isCardanoHaskell(publicDeriver.getParent().getNetworkInfo()) || (
               addressTypeStore.meta.name.subgroup !== AddressSubgroup.external &&
               addressTypeStore.meta.name.subgroup !== AddressSubgroup.all
             )

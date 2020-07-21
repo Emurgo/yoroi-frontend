@@ -65,32 +65,26 @@ const genBaseProps: {|
         return AdaApi.prototype.isValidPaperMnemonic({ mnemonic, numberOfWords });
       },
     },
-    substores: {
-      ada: {
-        daedalusTransfer: {
-          status: TransferStatus.UNINITIALIZED,
-          error: undefined,
-          transferTx: undefined,
-          transferFundsRequest: {
-            isExecuting: false,
-          },
-          ...request.daedalusTransfer,
-        },
+    daedalusTransfer: {
+      status: TransferStatus.UNINITIALIZED,
+      error: undefined,
+      transferTx: undefined,
+      transferFundsRequest: {
+        isExecuting: false,
       },
+      ...request.daedalusTransfer,
     },
   },
   actions: {
     router: {
       goToRoute: { trigger: action('goToRoute') },
     },
-    ada: {
-      daedalusTransfer: {
-        backToUninitialized: { trigger: action('backToUninitialized') },
-        cancelTransferFunds: { trigger: action('cancelTransferFunds') },
-        transferFunds: { trigger: async (req) => action('transferFunds')(req) },
-        setupTransferFundsWithMasterKey: { trigger: async (req) => action('setupTransferFundsWithMasterKey')(req) },
-        setupTransferFundsWithMnemonic: { trigger: async (req) => action('setupTransferFundsWithMnemonic')(req) },
-      },
+    daedalusTransfer: {
+      backToUninitialized: { trigger: action('backToUninitialized') },
+      cancelTransferFunds: { trigger: action('cancelTransferFunds') },
+      transferFunds: { trigger: async (req) => action('transferFunds')(req) },
+      setupTransferFundsWithMasterKey: { trigger: async (req) => action('setupTransferFundsWithMasterKey')(req) },
+      setupTransferFundsWithMnemonic: { trigger: async (req) => action('setupTransferFundsWithMnemonic')(req) },
     },
   },
 });

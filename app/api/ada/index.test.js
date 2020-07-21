@@ -40,6 +40,7 @@ test('Restore wallet', async () => {
     walletName: 'mywallet',
     walletPassword: '123',
     network: networks.ByronMainnet,
+    accountIndex: HARD_DERIVATION_START + 0,
   };
 
   const response = await AdaApi.prototype.restoreWallet(restoreRequest);
