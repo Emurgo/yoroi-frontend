@@ -51,7 +51,7 @@ import {
   updateTransactions,
 } from '../updateTransactions';
 
-jest.mock('../../database/initialSeed');
+jest.mock('../../../../../ada/lib/storage/database/initialSeed');
 
 const firstTx: void => Array<RemoteTransaction> = () => [{
   hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed545',

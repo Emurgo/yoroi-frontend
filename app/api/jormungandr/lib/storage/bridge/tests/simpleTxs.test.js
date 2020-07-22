@@ -4,7 +4,7 @@ import BigNumber from 'bignumber.js';
 import {
   schema,
 } from 'lovefield';
-import '../../../test-config';
+import '../../../../../ada/lib/test-config';
 import type { RemoteTransaction } from '../../../state-fetch/types';
 import {
   setup,
@@ -29,22 +29,22 @@ import {
   ChainDerivations,
 } from '../../../../../../config/numbersConfig';
 import type { WalletTypePurposeT } from '../../../../../../config/numbersConfig';
-import { loadLovefieldDB } from '../../database/index';
+import { loadLovefieldDB } from '../../../../../ada/lib/storage/database/index';
 
 import {
   asGetAllUtxos,
   asDisplayCutoff,
   asGetUtxoBalance,
-} from '../../models/PublicDeriver/traits';
+} from '../../../../../ada/lib/storage/models/PublicDeriver/traits';
 
 import {
   updateTransactions,
 } from '../updateTransactions';
 import {
   networks,
-} from '../../database/prepackaged/networks';
+} from '../../../../../ada/lib/storage/database/prepackaged/networks';
 
-jest.mock('../../database/initialSeed');
+jest.mock('../../../../../ada/lib/storage/database/initialSeed');
 
 const networkTransactions: number => Array<RemoteTransaction> = (purpose) => [{
   hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed545',
@@ -271,7 +271,7 @@ async function syncingSimpleTransaction(
   const db = await loadLovefieldDB(schema.DataStoreType.MEMORY);
   const publicDeriver = await setup(db, TX_TEST_MNEMONIC_1, purposeForTest);
 
-  const network = networks.ByronMainnet;
+  const network = networks.JormungandrMainnet;
   const txHistory = networkTransactions(purposeForTest);
   const checkAddressesInUse = genCheckAddressesInUse(txHistory, network);
   const getTransactionsHistoryForAddresses = genGetTransactionsHistoryForAddresses(
@@ -334,7 +334,9 @@ async function syncingSimpleTransaction(
             TransactionId: 1
           },
           UtxoTransactionOutput: {
-            AddressId: 5,
+            AddressId: purposeForTest === WalletTypePurpose.CIP1852
+              ? 9
+              : 5,
             Amount: '2100000',
             IsUnspent: true,
             OutputIndex: 0,
@@ -441,7 +443,9 @@ async function syncingSimpleTransaction(
             TransactionId: 2
           },
           UtxoTransactionOutput: {
-            AddressId: 21,
+            AddressId: purposeForTest === WalletTypePurpose.CIP1852
+              ? 41
+              : 21,
             Amount: '1100000',
             IsUnspent: true,
             OutputIndex: 0,
@@ -472,7 +476,9 @@ async function syncingSimpleTransaction(
             TransactionId: 2
           },
           UtxoTransactionOutput: {
-            AddressId: 20,
+            AddressId: purposeForTest === WalletTypePurpose.CIP1852
+              ? 39
+              : 20,
             Amount: '900000',
             IsUnspent: true,
             OutputIndex: 1,
@@ -605,6 +611,11 @@ test('Syncing simple transaction bip44', async (done) => {
   done();
 });
 
+test('Syncing simple transaction cip1852', async (done) => {
+  await syncingSimpleTransaction(WalletTypePurpose.CIP1852);
+  done();
+});
+
 async function utxoCreatedAndUsed(
   purposeForTest: WalletTypePurposeT,
 ): Promise<void> {
@@ -612,7 +623,7 @@ async function utxoCreatedAndUsed(
   const publicDeriver = await setup(db, TX_TEST_MNEMONIC_1, purposeForTest);
 
   const txHistory = networkTransactions(purposeForTest);
-  const network = networks.ByronMainnet;
+  const network = networks.JormungandrMainnet;
   const checkAddressesInUse = genCheckAddressesInUse(txHistory, network);
   const getTransactionsHistoryForAddresses = genGetTransactionsHistoryForAddresses(
     txHistory,
@@ -683,7 +694,9 @@ async function utxoCreatedAndUsed(
             TransactionId: 2
           },
           UtxoTransactionOutput: {
-            AddressId: 21,
+            AddressId: purposeForTest === WalletTypePurpose.CIP1852
+              ? 41
+              : 21,
             Amount: '1100000',
             IsUnspent: true,
             OutputIndex: 0,
@@ -714,7 +727,9 @@ async function utxoCreatedAndUsed(
             TransactionId: 2
           },
           UtxoTransactionOutput: {
-            AddressId: 20,
+            AddressId: purposeForTest === WalletTypePurpose.CIP1852
+              ? 39
+              : 20,
             Amount: '900000',
             IsUnspent: true,
             OutputIndex: 1,
@@ -740,5 +755,10 @@ async function utxoCreatedAndUsed(
 
 test('Utxo created and used in same sync bip44', async (done) => {
   await utxoCreatedAndUsed(WalletTypePurpose.BIP44);
+  done();
+});
+
+test('Utxo created and used in same sync cip1852', async (done) => {
+  await utxoCreatedAndUsed(WalletTypePurpose.CIP1852);
   done();
 });

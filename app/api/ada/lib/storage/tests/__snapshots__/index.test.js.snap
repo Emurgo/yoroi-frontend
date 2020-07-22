@@ -1150,19 +1150,27 @@ Object {
       "CoinType": 2147485463,
       "Fork": 0,
       "NetworkId": 100,
-      "NetworkMagic": "764824073",
+      "StaticConfig": Object {
+        "ByronNetworkId": 764824073,
+        "NetworkId": "1",
+      },
     },
     Object {
       "CoinType": 2147485463,
       "Fork": 1,
       "NetworkId": 200,
-      "NetworkMagic": "8e4d2a343f3dcf9330ad9035b3e8d168e6728904262f2c434a4f8f934ec7b676",
+      "StaticConfig": Object {
+        "ByronNetworkId": 764824073,
+        "NetworkId": "8e4d2a343f3dcf9330ad9035b3e8d168e6728904262f2c434a4f8f934ec7b676",
+      },
     },
     Object {
       "CoinType": 2147484077,
       "Fork": 0,
       "NetworkId": 300,
-      "NetworkMagic": "0",
+      "StaticConfig": Object {
+        "NetworkId": "0",
+      },
     },
   ],
   "PreferredExplorer": Array [],

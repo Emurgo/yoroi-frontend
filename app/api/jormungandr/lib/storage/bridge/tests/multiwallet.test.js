@@ -4,7 +4,7 @@ import BigNumber from 'bignumber.js';
 import {
   schema,
 } from 'lovefield';
-import '../../../test-config';
+import '../../../../../ada/lib/test-config';
 import type { RemoteTransaction } from '../../../state-fetch/types';
 import {
   setup,
@@ -28,26 +28,28 @@ import {
   genGetBestBlock,
   getSingleAddressString,
 } from '../../../state-fetch/mockNetwork';
-import { loadLovefieldDB } from '../../database/index';
+import { loadLovefieldDB } from '../../../../../ada/lib/storage/database/index';
 
 import {
   PublicDeriver,
-} from '../../models/PublicDeriver/index';
+} from '../../../../../ada/lib/storage/models/PublicDeriver/index';
 import {
   asGetAllUtxos,
   asDisplayCutoff,
   asGetUtxoBalance,
-} from '../../models/PublicDeriver/traits';
+} from '../../../../../ada/lib/storage/models/PublicDeriver/traits';
 
 import {
   updateTransactions,
-  removeAllTransactions,
 } from '../updateTransactions';
 import {
+  removeAllTransactions,
+} from '../../../../../ada/lib/storage/bridge/updateTransactions';
+import {
   networks,
-} from '../../database/prepackaged/networks';
+} from '../../../../../ada/lib/storage/database/prepackaged/networks';
 
-jest.mock('../../database/initialSeed');
+jest.mock('../../../../../ada/lib/storage/database/initialSeed');
 
 const TX_TEST_MNEMONIC_2 = 'eight country switch draw meat scout mystery blade tip drift useless good keep usage title';
 
@@ -210,7 +212,9 @@ async function checkPub1HasTx(
           TransactionId: 1
         },
         UtxoTransactionOutput: {
-          AddressId: 5,
+          AddressId: purposeForTest === WalletTypePurpose.CIP1852
+            ? 9
+            : 5,
           Amount: '2100000',
           IsUnspent: true,
           OutputIndex: 0,
@@ -316,7 +320,9 @@ async function checkPub2HasTx(
           TransactionId: 2
         },
         UtxoTransactionOutput: {
-          AddressId: 41,
+          AddressId: purposeForTest === WalletTypePurpose.CIP1852
+            ? 82
+            : 41,
           Amount: '2700000',
           IsUnspent: true,
           OutputIndex: 1,
@@ -351,7 +357,7 @@ async function syncingSimpleTransaction(
   const publicDeriver2 = await setup(db, TX_TEST_MNEMONIC_2, purposeForTest);
 
   const txHistory = networkTransactions(purposeForTest);
-  const network = networks.ByronMainnet;
+  const network = networks.JormungandrMainnet;
   const checkAddressesInUse = genCheckAddressesInUse(txHistory, network);
   const getTransactionsHistoryForAddresses = genGetTransactionsHistoryForAddresses(
     txHistory,
@@ -501,4 +507,7 @@ test('Syncing simple transaction bip44', async (done) => {
   await syncingSimpleTransaction(WalletTypePurpose.BIP44);
   done();
 });
-
+test('Syncing simple transaction cip1852', async (done) => {
+  await syncingSimpleTransaction(WalletTypePurpose.CIP1852);
+  done();
+});
