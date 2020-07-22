@@ -10,12 +10,10 @@ import config from '../../config';
 import globalMessages from '../../i18n/global-messages';
 import type { Notification } from '../../types/notificationType';
 import type {
-  CreateWalletResponse,
-} from '../../api/ada';
-import type {
   GetWalletsFunc,
 } from '../../api/common/index';
 import type {
+  CreateWalletResponse,
   RestoreWalletResponse,
 } from '../../api/common/types';
 import {

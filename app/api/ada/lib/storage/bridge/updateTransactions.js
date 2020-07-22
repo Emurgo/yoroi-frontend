@@ -1455,6 +1455,7 @@ export function networkTxHeaderToDb(
 }
 
 async function certificateToDb(
+  /* eslint-disable no-unused-vars */
   db: lf$Database,
   dbTx: lf$Transaction,
   request: {|
@@ -1463,6 +1464,7 @@ async function certificateToDb(
     derivationTables: Map<number, string>,
     firstInput: RemoteTransactionInput,
   |},
+  /* eslint-enable no-unused-vars */
 ): Promise<number => AddCertificateRequest> {
   throw new Error(`Not implemented yet`);
 }

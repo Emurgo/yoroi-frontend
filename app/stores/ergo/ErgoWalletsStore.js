@@ -82,7 +82,10 @@ export default class ErgoWalletsStore extends Store {
     //           },
     //         });
     //       } catch (error) {
-    //         Logger.error(`${nameof(ErgoWalletsStore)}::${nameof(this._sendMoney)} error: ` + stringifyError(error));
+    //         Logger.error(
+    //           `${nameof(ErgoWalletsStore)}::${nameof(this._sendMoney)} error: `
+    //             + stringifyError(error)
+    //         );
     //         throw new Error('An error has ocurred when saving the transaction memo.');
     //       }
     //     }

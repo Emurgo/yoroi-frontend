@@ -1,6 +1,6 @@
 // @flow
 
-import { action, computed, observable, runInAction, } from 'mobx';
+import { action, observable, runInAction, } from 'mobx';
 import { find } from 'lodash';
 import {
   PublicDeriver,
@@ -16,9 +16,6 @@ import type {
   TimeSinceGenesisRequestFunc,
   ToRealTimeFunc,
 } from '../../api/ada/lib/storage/bridge/timeUtils';
-import {
-  CoinTypes,
-} from '../../config/numbersConfig';
 
 export type TimeCalcRequests = {|
   // although time is network-specific
