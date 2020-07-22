@@ -5,12 +5,8 @@ import type {
   AddressUtxoRequest, AddressUtxoResponse,
   UtxoSumRequest, UtxoSumResponse,
   HistoryRequest, HistoryResponse,
-  RewardHistoryRequest, RewardHistoryResponse,
   BestBlockRequest, BestBlockResponse,
   SignedResponse,
-  AccountStateRequest, AccountStateResponse,
-  PoolInfoRequest, PoolInfoResponse,
-  ReputationRequest, ReputationResponse,
   TxBodiesRequest, TxBodiesResponse,
   SignedRequestInternal,
 } from '../../app/api/ada/lib/state-fetch/types';
@@ -21,7 +17,7 @@ import type {
   ServerStatusResponse,
 } from '../../app/api/common/lib/state-fetch/types';
 import chai from 'chai';
-import mockImporter from './mockImporter';
+import mockImporter from './mockCardanoImporter';
 import { installCoinPriceRequestHandlers } from './coinPriceRequestHandler';
 
 import { Ports } from '../../scripts/connections';
@@ -102,16 +98,6 @@ export function getMockServer(
       res.send(history.slice(0, txsLimit));
     });
 
-    server.post('/api/v2/account/rewards', async (
-      req: { body: RewardHistoryRequest, ... },
-      res: { send(arg: RewardHistoryResponse): any, ... }
-    ): Promise<void> => {
-      chai.assert.isTrue(_validateAddressesReq(req.body));
-
-      const history = await mockImporter.getRewardHistory(req.body);
-      res.send(history);
-    });
-
     server.get('/api/v2/bestblock', async (
       req: { body: BestBlockRequest, ... },
       res: { send(arg: BestBlockResponse): any, ... }
@@ -140,30 +126,6 @@ export function getMockServer(
       res: { send(arg: FilterUsedResponse): any, ... }
     ): Promise<void> => {
       const response = await mockImporter.usedAddresses(req.body);
-      res.send(response);
-    });
-
-    server.post('/api/v2/account/state', async (
-      req: { body: AccountStateRequest, ... },
-      res: { send(arg: AccountStateResponse): any, ... }
-    ): Promise<void> => {
-      const response = await mockImporter.getAccountState(req.body);
-      res.send(response);
-    });
-
-    server.post('/api/v2/pool/info', async (
-      req: { body: PoolInfoRequest, ... },
-      res: { send(arg: PoolInfoResponse): any, ... }
-    ): Promise<void> => {
-      const response = await mockImporter.getPoolInfo(req.body);
-      res.send(response);
-    });
-
-    server.get('/api/v2/pool/reputation', async (
-      req: { body: ReputationRequest, ... },
-      res: { send(arg: ReputationResponse): any, ... }
-    ): Promise<void> => {
-      const response = await mockImporter.getReputation(req.body);
       res.send(response);
     });
 

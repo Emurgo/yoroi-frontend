@@ -53,6 +53,7 @@ Then(/^I should see my latest address "([^"]*)" at the top$/, async function (ad
   await this.waitUntilText('.StandardHeader_copyableHash', address);
 });
 Then(/^I should see ([^"]*) addresses with address "([^"]*)" at the top$/, async function (numAddresses, address) {
+  await this.waitForElement(`.generatedAddressasdasd`);
   const rows = await this.driver.findElements(By.css('.WalletReceive_walletAddress'));
   expect(rows.length).to.equal(Number.parseInt(numAddresses, 10));
 

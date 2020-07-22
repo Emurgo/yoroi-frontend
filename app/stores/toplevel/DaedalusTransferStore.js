@@ -71,6 +71,8 @@ export default class DaedalusTransferStore extends Store {
     actions.setupTransferFundsWithMnemonic.listen(this._setupTransferFundsWithMnemonic);
     actions.setupTransferFundsWithMasterKey.listen(this._setupTransferFundsWithMasterKey);
     actions.backToUninitialized.listen(this._backToUninitialized);
+    actions.transferFunds.listen(this._transferFunds);
+    actions.cancelTransferFunds.listen(this._reset);
   }
 
   teardown(): void {

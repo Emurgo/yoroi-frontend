@@ -42,3 +42,11 @@ export type RestoreWalletResponse = {|
 export type RestoreWalletFunc = (
   request: RestoreWalletRequest
 ) => Promise<RestoreWalletResponse>;
+
+// createWallet
+
+export type CreateWalletRequest = RestoreWalletRequest;
+export type CreateWalletResponse = RestoreWalletResponse;
+export type CreateWalletFunc = (
+  request: CreateWalletRequest
+) => Promise<CreateWalletResponse>;

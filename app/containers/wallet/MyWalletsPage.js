@@ -284,9 +284,11 @@ export default class MyWalletsPage extends Component<Props> {
   getRewardBalance: PublicDeriver<> => null | void | BigNumber = (
     publicDeriver
   ) => {
-    const delegationRequest = this.generated.stores.substores.jormungandr.delegation.getDelegationRequests(
-      publicDeriver
-    );
+    const delegationRequest = this.generated.stores.substores.jormungandr
+      .delegation
+      .getDelegationRequests(
+        publicDeriver
+      );
     if (delegationRequest == null) return undefined;
 
     const balanceResult = delegationRequest.getDelegatedBalance.result;

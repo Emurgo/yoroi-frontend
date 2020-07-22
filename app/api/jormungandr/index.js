@@ -24,8 +24,10 @@ import {
   createStandardCip1852Wallet,
 } from './lib/storage/bridge/walletBuilder/jormungandr';
 import {
-  getAllTransactions,
   updateTransactions,
+} from './lib/storage/bridge/updateTransactions';
+import {
+  getAllTransactions,
 } from '../ada/lib/storage/bridge/updateTransactions';
 import {
   filterAddressesByStakingKey,

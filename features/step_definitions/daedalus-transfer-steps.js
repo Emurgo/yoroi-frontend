@@ -5,7 +5,7 @@ import { By } from 'selenium-webdriver';
 import {
   getMockServer,
   closeMockServer
-} from '../mock-chain/mockServer';
+} from '../mock-chain/mockCardanoServer';
 import {
   getMockWebSocketServer,
   closeMockWebSocketServer,

@@ -11,8 +11,6 @@ import {
   HARD_DERIVATION_START,
   WalletTypePurpose,
   CoinTypes,
-  ChainDerivations,
-  STAKING_KEY_INDEX,
 } from '../../config/numbersConfig';
 import type {
   TransferSourceType,
@@ -143,6 +141,7 @@ import type {
   IsValidMnemonicRequest,
   IsValidMnemonicResponse,
   RestoreWalletRequest, RestoreWalletResponse,
+  CreateWalletRequest, CreateWalletResponse,
 } from '../common/types';
 import { getApiForNetwork } from '../common/utils';
 import { CoreAddressTypes } from './lib/storage/database/primitives/enums';
@@ -227,14 +226,6 @@ export type GetNoticesResponse = {|
 export type GetNoticesFunc = (
   request: GetNoticesRequestOptions
 ) => Promise<GetNoticesResponse>;
-
-// createWallet
-
-export type CreateWalletRequest = RestoreWalletRequest;
-export type CreateWalletResponse = RestoreWalletResponse;
-export type CreateWalletFunc = (
-  request: CreateWalletRequest
-) => Promise<CreateWalletResponse>;
 
 // signAndBroadcast
 

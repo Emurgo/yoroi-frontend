@@ -9,6 +9,7 @@ import type {
   IsValidMnemonicRequest,
   IsValidMnemonicResponse,
   RestoreWalletRequest, RestoreWalletResponse,
+  CreateWalletRequest, CreateWalletResponse,
 } from '../common/types';
 import type {
   BaseGetTransactionsRequest,
@@ -52,6 +53,9 @@ import {
   PublicDeriver,
 } from '../ada/lib/storage/models/PublicDeriver/index';
 import { createStandardBip44Wallet } from './lib/walletBuilder/builder';
+import {
+  generateAdaMnemonic,
+} from '../ada/lib/cardanoCrypto/cryptoWallet';
 
 // getTransactionRowsToExport
 
@@ -95,6 +99,13 @@ export type GetAllAddressesForDisplayFunc = (
   request: GetAllAddressesForDisplayRequest
 ) => Promise<GetAllAddressesForDisplayResponse>;
 
+// generateWalletRecoveryPhrase
+
+export type GenerateWalletRecoveryPhraseRequest = {||};
+export type GenerateWalletRecoveryPhraseResponse = Array<string>;
+export type GenerateWalletRecoveryPhraseFunc = (
+  request: GenerateWalletRecoveryPhraseRequest
+) => Promise<GenerateWalletRecoveryPhraseResponse>;
 
 export default class ErgoApi {
 
@@ -175,6 +186,13 @@ export default class ErgoApi {
     }
   }
 
+  async createWallet(
+    request: CreateWalletRequest
+  ): Promise<CreateWalletResponse> {
+    // creating a wallet is the same as restoring a wallet
+    return await this.restoreWallet(request);
+  }
+
   /**
    * Creates wallet and saves result to DB
   */
@@ -229,6 +247,22 @@ export default class ErgoApi {
         // We don't know what the problem was so throw a generic error
         throw new GenericApiError();
       }
+    }
+  }
+
+  generateWalletRecoveryPhrase(): Promise<GenerateWalletRecoveryPhraseResponse> {
+    Logger.debug(`${nameof(ErgoApi)}::${nameof(this.generateWalletRecoveryPhrase)} called`);
+    try {
+      const response = new Promise(
+        resolve => resolve(generateAdaMnemonic())
+      );
+      Logger.debug(`${nameof(ErgoApi)}::${nameof(this.generateWalletRecoveryPhrase)} success`);
+      return response;
+    } catch (error) {
+      Logger.error(
+        `${nameof(ErgoApi)}::${nameof(this.generateWalletRecoveryPhrase)} error: ` + stringifyError(error)
+      );
+      throw new GenericApiError();
     }
   }
 }

@@ -108,8 +108,11 @@ export type RemoteTxInfo = {|
   +tx_state: RemoteTxState,
   +inputs: Array<RemoteTransactionInput>,
   +outputs: Array<RemoteTransactionOutput>,
+  +certificates?: Array<RemoteCertificate>,
+  +withdrawals?: Array<RemoteWithdrawal>,
 |};
 export type RemoteTransaction = {|
+  // TODO: some flag to differentiate Byron txs from Shelley txs
   ...WithNullableFields<RemoteTxBlockMeta>,
   ...RemoteTxInfo,
 |};
@@ -120,4 +123,13 @@ export type RemoteUnspentOutput = {|
   +tx_index: number,
   +receiver: string,
   +amount: string
+|};
+
+export type RemoteWithdrawal = {|
+  address: string,
+  amount: string,
+|};
+
+export type RemoteCertificate = {|
+  payloadHex: string,
 |};

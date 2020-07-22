@@ -133,7 +133,7 @@ export default class MemosStore extends Store {
     // note: only need to care about persistent storage
     // since this is called only once when the app launches
     // so there should be no transient storage when the app loads anyway
-    const db = this.stores.loading.loadPersitentDbRequest.result;
+    const db = this.stores.loading.loadPersistentDbRequest.result;
     if (db == null) throw new Error(`${nameof(MemosStore)}::${nameof(this.loadFromStorage)} called before storage was initialized`);
     const allTxMemos = await this.getAllTxMemos.execute({
       db,

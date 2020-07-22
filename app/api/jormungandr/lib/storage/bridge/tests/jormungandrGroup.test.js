@@ -45,8 +45,10 @@ import {
 import { getCertificates } from '../../../../../ada/lib/storage/models/utils';
 
 import {
-  updateTransactions,
   removeAllTransactions,
+} from '../../../../../ada/lib/storage/bridge/updateTransactions';
+import {
+  updateTransactions,
 } from '../updateTransactions';
 
 jest.mock('../../database/initialSeed');

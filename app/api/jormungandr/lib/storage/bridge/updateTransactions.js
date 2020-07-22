@@ -9,15 +9,15 @@ import {
   getAllSchemaTables,
   raii,
   mapToTables,
-} from '../database/utils';
+} from '../../../../ada/lib/storage/database/utils';
 import type {
-  BlockInsert, BlockRow,
+  BlockInsert,
   TransactionInsert, TransactionRow,
   NetworkRow,
-} from '../database/primitives/tables';
+} from '../../../../ada/lib/storage/database/primitives/tables';
 import type {
   TxStatusCodesType,
-} from '../database/primitives/enums';
+} from '../../../../ada/lib/storage/database/primitives/enums';
 import {
   GetAddress,
   GetBlock,
@@ -26,28 +26,24 @@ import {
   GetDerivationsByPath,
   GetTransaction,
   GetTxAndBlock,
-} from '../database/primitives/api/read';
+} from '../../../../ada/lib/storage/database/primitives/api/read';
 import {
   ModifyAddress,
   ModifyTransaction,
-  FreeBlocks,
-} from '../database/primitives/api/write';
-import type { AddCertificateRequest } from '../database/primitives/api/write';
-import { ModifyMultipartTx } from  '../database/transactionModels/multipart/api/write';
-import { digestForHash, } from '../database/primitives/api/utils';
+} from '../../../../ada/lib/storage/database/primitives/api/write';
+import type { AddCertificateRequest } from '../../../../ada/lib/storage/database/primitives/api/write';
+import { ModifyMultipartTx } from  '../../../../ada/lib/storage/database/transactionModels/multipart/api/write';
+import { digestForHash, } from '../../../../ada/lib/storage/database/primitives/api/utils';
 import {
   MarkUtxo,
-} from '../database/transactionModels/utxo/api/write';
+} from '../../../../ada/lib/storage/database/transactionModels/utxo/api/write';
 import {
   GetUtxoTxOutputsWithTx,
   GetUtxoInputs,
-} from '../database/transactionModels/utxo/api/read';
+} from '../../../../ada/lib/storage/database/transactionModels/utxo/api/read';
 import {
   AssociateTxWithIOs
-} from '../database/transactionModels/multipart/api/read';
-import type {
-  AnnotatedTransaction,
-} from '../../../transactions/types';
+} from '../../../../ada/lib/storage/database/transactionModels/multipart/api/read';
 import {
   InputTypes,
 } from '../../state-fetch/types';
@@ -56,39 +52,38 @@ import type {
 } from './timeUtils';
 import type {
   UtxoTransactionInputInsert, UtxoTransactionOutputInsert,
-} from '../database/transactionModels/utxo/tables';
+} from '../../../../ada/lib/storage/database/transactionModels/utxo/tables';
 import type {
   AccountingTransactionInputInsert, AccountingTransactionOutputInsert,
-} from '../database/transactionModels/account/tables';
+} from '../../../../ada/lib/storage/database/transactionModels/account/tables';
 import {
   TxStatusCodes,
   CoreAddressTypes,
-} from '../database/primitives/enums';
+  CertificateRelation,
+} from '../../../../ada/lib/storage/database/primitives/enums';
 import {
-  asScanAddresses, asHasLevels, asGetAllUtxos, asGetAllAccounting,
-} from '../models/PublicDeriver/traits';
-import type { IHasLevels } from '../models/ConceptualWallet/interfaces';
-import { ConceptualWallet } from '../models/ConceptualWallet/index';
+  asScanAddresses, asHasLevels,
+} from '../../../../ada/lib/storage/models/PublicDeriver/traits';
+import { ConceptualWallet } from '../../../../ada/lib/storage/models/ConceptualWallet/index';
 import type {
   IPublicDeriver,
-} from '../models/PublicDeriver/interfaces';
+} from '../../../../ada/lib/storage/models/PublicDeriver/interfaces';
 import {
   GetLastSyncForPublicDeriver,
   GetPublicDeriver,
   GetKeyForPublicDeriver,
-} from '../database/walletTypes/core/api/read';
-import { ModifyDisplayCutoff, } from '../database/walletTypes/bip44/api/write';
-import { AddDerivationTree, } from '../database/walletTypes/common/api/write';
-import { GetDerivationSpecific, } from '../database/walletTypes/common/api/read';
+} from '../../../../ada/lib/storage/database/walletTypes/core/api/read';
+import { ModifyDisplayCutoff, } from '../../../../ada/lib/storage/database/walletTypes/bip44/api/write';
+import { AddDerivationTree, } from '../../../../ada/lib/storage/database/walletTypes/common/api/write';
+import { GetDerivationSpecific, } from '../../../../ada/lib/storage/database/walletTypes/common/api/read';
 import {
   ModifyLastSyncInfo,
-  DeleteAllTransactions,
-} from '../database/walletTypes/core/api/write';
-import type { LastSyncInfoRow, } from '../database/walletTypes/core/tables';
-import type { DbTxIO, DbTxInChain } from '../database/transactionModels/multipart/tables';
+} from '../../../../ada/lib/storage/database/walletTypes/core/api/write';
+import type { LastSyncInfoRow, } from '../../../../ada/lib/storage/database/walletTypes/core/tables';
+import type { DbTxIO, DbTxInChain } from '../../../../ada/lib/storage/database/transactionModels/multipart/tables';
 import {
   rawGetAddressRowsForWallet,
-} from  './traitUtils';
+} from  '../../../../ada/lib/storage/bridge/traitUtils';
 import {
   genToAbsoluteSlotNumber,
 } from './timeUtils';
@@ -100,7 +95,7 @@ import type {
 } from '../../../../common/lib/storage/bridge/hashMapper';
 import { STABLE_SIZE } from '../../../../../config/numbersConfig';
 import { RollbackApiError } from '../../../../common/errors';
-import { getFromUserPerspective, } from '../../../transactions/utils';
+import { RustModule } from '../../../../ada/lib/cardanoCrypto/rustLoader';
 
 import type {
   HistoryFunc, BestBlockFunc,
@@ -112,467 +107,9 @@ import type {
 import type {
   FilterFunc,
 } from '../../../../common/lib/state-fetch/currencySpecificTypes';
-import { addressToKind } from './utils';
+import { addressToKind } from '../../../../ada/lib/storage/bridge/utils';
 
-async function rawGetAllTxIds(
-  db: lf$Database,
-  dbTx: lf$Transaction,
-  deps: {|
-    GetPathWithSpecific: Class<GetPathWithSpecific>,
-    GetAddress: Class<GetAddress>,
-    AssociateTxWithIOs: Class<AssociateTxWithIOs>,
-    GetDerivationSpecific: Class<GetDerivationSpecific>,
-  |},
-  request: {| publicDeriver: IPublicDeriver<ConceptualWallet>, |},
-  derivationTables: Map<number, string>,
-): Promise<{|
-  txIds: Array<number>,
-  addressIds: {|
-    utxoAddressIds: Array<number>,
-    accountingAddressIds: Array<number>,
-  |}
-|}> {
-  const utxoAddressIds = [];
-  const withUtxos = asGetAllUtxos(request.publicDeriver);
-  if (withUtxos != null) {
-    const foundAddresses = await withUtxos.rawGetAllUtxoAddresses(
-      dbTx,
-      {
-        GetPathWithSpecific: deps.GetPathWithSpecific,
-        GetAddress: deps.GetAddress,
-        GetDerivationSpecific: deps.GetDerivationSpecific,
-      },
-      undefined,
-      derivationTables,
-    );
-    const ids = foundAddresses.flatMap(address => address.addrs.map(addr => addr.AddressId));
-    utxoAddressIds.push(...ids);
-  }
-  const accountingAddressIds = [];
-  const withAccounting = asGetAllAccounting(request.publicDeriver);
-  if (withAccounting != null) {
-    const foundAddresses = await withAccounting.rawGetAllAccountingAddresses(
-      dbTx,
-      {
-        GetPathWithSpecific: deps.GetPathWithSpecific,
-        GetAddress: deps.GetAddress,
-        GetDerivationSpecific: deps.GetDerivationSpecific,
-      },
-      undefined,
-      derivationTables,
-    );
-    const ids = foundAddresses.flatMap(address => address.addrs.map(addr => addr.AddressId));
-    accountingAddressIds.push(...ids);
-  }
-  const txIds = await deps.AssociateTxWithIOs.getTxIdsForAddresses(
-    db, dbTx,
-    {
-      utxoAddressIds,
-      accountingAddressIds,
-    }
-  );
-  return {
-    txIds,
-    addressIds: {
-      utxoAddressIds,
-      accountingAddressIds,
-    },
-  };
-}
-
-export async function rawGetTransactions(
-  db: lf$Database,
-  dbTx: lf$Transaction,
-  deps: {|
-    GetPathWithSpecific: Class<GetPathWithSpecific>,
-    GetAddress: Class<GetAddress>,
-    AssociateTxWithIOs: Class<AssociateTxWithIOs>,
-    GetTxAndBlock: Class<GetTxAndBlock>,
-    GetDerivationSpecific: Class<GetDerivationSpecific>,
-  |},
-  request: {|
-    publicDeriver: IPublicDeriver<ConceptualWallet>,
-    getTxAndBlock: (txIds: Array<number>) => Promise<$ReadOnlyArray<{|
-      Block: null | $ReadOnly<BlockRow>,
-      Transaction: $ReadOnly<TransactionRow>,
-    |}>>,
-    skip?: number,
-    limit?: number,
-  |},
-  derivationTables: Map<number, string>,
-): Promise<{|
-  addressLookupMap: Map<number, string>,
-  txs: Array<AnnotatedTransaction>,
-|}> {
-  const {
-    addressIds,
-    txIds,
-  } = await rawGetAllTxIds(
-    db, dbTx,
-    {
-      GetPathWithSpecific: deps.GetPathWithSpecific,
-      GetAddress: deps.GetAddress,
-      AssociateTxWithIOs: deps.AssociateTxWithIOs,
-      GetDerivationSpecific: deps.GetDerivationSpecific,
-    },
-    { publicDeriver: request.publicDeriver },
-    derivationTables,
-  );
-  const blockMap = new Map<number, null | $ReadOnly<BlockRow>>();
-  const txs = await request.getTxAndBlock(txIds);
-  for (const tx of txs) {
-    blockMap.set(tx.Transaction.TransactionId, tx.Block);
-  }
-  const txsWithIOs = await deps.AssociateTxWithIOs.getIOsForTx(
-    db, dbTx,
-    { txs: txs.map(txWithBlock => txWithBlock.Transaction) }
-  );
-
-  // we need to build a lookup map of AddressId => Hash
-  // note: some inputs or outputs may not belong to us
-  // so we can't build this map from previously calculated information
-  const addressLookupMap = new Map<number, string>();
-  {
-    const allAddressIds = txsWithIOs.flatMap(txWithIO => [
-      ...txWithIO.utxoInputs.map(input => input.AddressId),
-      ...txWithIO.utxoOutputs.map(output => output.AddressId),
-      ...txWithIO.accountingInputs.map(input => input.AddressId),
-      ...txWithIO.accountingOutputs.map(output => output.AddressId),
-    ]);
-    const addressRows = await GetAddress.getById(
-      db, dbTx,
-      // get rid of duplications (some tx can have multiple inputs of same address)
-      Array.from(new Set(allAddressIds))
-    );
-    for (const row of addressRows) {
-      addressLookupMap.set(row.AddressId, row.Hash);
-    }
-  }
-
-  const result = txsWithIOs.map(tx => ({
-    ...tx,
-    block: blockMap.get(tx.transaction.TransactionId) || null,
-    ...getFromUserPerspective({
-      utxoInputs: tx.utxoInputs,
-      utxoOutputs: tx.utxoOutputs,
-      accountingInputs: tx.accountingInputs,
-      accountingOutputs: tx.accountingOutputs,
-      allOwnedAddressIds: new Set(
-        Object.keys(addressIds).flatMap(key => addressIds[key])
-      ),
-    })
-  }));
-
-  return {
-    addressLookupMap,
-    txs: result,
-  };
-}
-
-export async function getAllTransactions(
-  request: {|
-    publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels>,
-    skip?: number,
-    limit?: number,
-  |},
-): Promise<{|
-  addressLookupMap: Map<number, string>,
-  txs: Array<AnnotatedTransaction>,
-|}> {
-  const derivationTables = request.publicDeriver.getParent().getDerivationTables();
-  const deps = Object.freeze({
-    GetPathWithSpecific,
-    GetAddress,
-    AssociateTxWithIOs,
-    GetTxAndBlock,
-    GetDerivationSpecific,
-  });
-  const depTables = Object
-    .keys(deps)
-    .map(key => deps[key])
-    .flatMap(table => getAllSchemaTables(request.publicDeriver.getDb(), table));
-
-  return await raii(
-    request.publicDeriver.getDb(),
-    [
-      ...depTables,
-      ...mapToTables(request.publicDeriver.getDb(), derivationTables),
-    ],
-    async dbTx => {
-      return await rawGetTransactions(
-        request.publicDeriver.getDb(), dbTx,
-        {
-          GetPathWithSpecific: deps.GetPathWithSpecific,
-          GetAddress: deps.GetAddress,
-          AssociateTxWithIOs: deps.AssociateTxWithIOs,
-          GetTxAndBlock: deps.GetTxAndBlock,
-          GetDerivationSpecific: deps.GetDerivationSpecific,
-        },
-        {
-          ...request,
-          getTxAndBlock: async (txIds) => await deps.GetTxAndBlock.byTime(
-            request.publicDeriver.getDb(), dbTx,
-            {
-              txIds,
-              skip: request.skip,
-              limit: request.limit,
-            }
-          )
-        },
-        derivationTables,
-      );
-    }
-  );
-}
-
-export async function getPendingTransactions(
-  request: {| publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels>, |},
-): Promise<{|
-  addressLookupMap: Map<number, string>,
-  txs: Array<AnnotatedTransaction>,
-|}> {
-  const derivationTables = request.publicDeriver.getParent().getDerivationTables();
-  const deps = Object.freeze({
-    GetPathWithSpecific,
-    GetAddress,
-    AssociateTxWithIOs,
-    GetTxAndBlock,
-    GetDerivationSpecific,
-  });
-  const depTables = Object
-    .keys(deps)
-    .map(key => deps[key])
-    .flatMap(table => getAllSchemaTables(request.publicDeriver.getDb(), table));
-
-  return await raii(
-    request.publicDeriver.getDb(),
-    [
-      ...depTables,
-      ...mapToTables(request.publicDeriver.getDb(), derivationTables),
-    ],
-    async dbTx => {
-      return await rawGetTransactions(
-        request.publicDeriver.getDb(), dbTx,
-        {
-          GetPathWithSpecific: deps.GetPathWithSpecific,
-          GetAddress: deps.GetAddress,
-          AssociateTxWithIOs: deps.AssociateTxWithIOs,
-          GetTxAndBlock: deps.GetTxAndBlock,
-          GetDerivationSpecific: deps.GetDerivationSpecific,
-        },
-        {
-          ...request,
-          getTxAndBlock: async (txIds) => await deps.GetTxAndBlock.withStatus(
-            request.publicDeriver.getDb(), dbTx,
-            {
-              txIds,
-              status: [TxStatusCodes.PENDING],
-            }
-          )
-        },
-        derivationTables,
-      );
-    }
-  );
-}
-
-export async function rawGetForeignAddresses(
-  db: lf$Database,
-  dbTx: lf$Transaction,
-  deps: {|
-    GetPathWithSpecific: Class<GetPathWithSpecific>,
-    GetAddress: Class<GetAddress>,
-    AssociateTxWithIOs: Class<AssociateTxWithIOs>,
-    GetDerivationSpecific: Class<GetDerivationSpecific>,
-    GetTransaction: Class<GetTransaction>,
-  |},
-  derivationTables: Map<number, string>,
-  request: {|
-    publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels>,
-  |},
-): Promise<Array<number>> {
-  const relatedIds = await rawGetAllTxIds(
-    db, dbTx,
-    {
-      GetPathWithSpecific: deps.GetPathWithSpecific,
-      GetAddress: deps.GetAddress,
-      AssociateTxWithIOs: deps.AssociateTxWithIOs,
-      GetDerivationSpecific: deps.GetDerivationSpecific,
-    },
-    { publicDeriver: request.publicDeriver },
-    derivationTables,
-  );
-
-  const fullTxs = await deps.GetTransaction.fromIds(
-    db, dbTx,
-    { ids: relatedIds.txIds }
-  );
-
-  const txsWithIOs = await deps.AssociateTxWithIOs.getIOsForTx(
-    db, dbTx,
-    { txs: fullTxs }
-  );
-
-  const allAddressIds = txsWithIOs.flatMap(txWithIO => [
-    ...txWithIO.utxoInputs.map(input => input.AddressId),
-    ...txWithIO.utxoOutputs.map(output => output.AddressId),
-    ...txWithIO.accountingInputs.map(input => input.AddressId),
-    ...txWithIO.accountingOutputs.map(output => output.AddressId),
-  ]);
-
-  const ourIds = new Set(
-    Object.keys(relatedIds.addressIds)
-      .flatMap(key => relatedIds.addressIds[key])
-  );
-  // recall: we store addresses that don't belong to our wallet in the DB
-  // if they're in a tx that belongs to us
-  const unownedAddresses = allAddressIds.filter(address => !ourIds.has(address));
-
-  // get rid of duplications (some tx can have multiple inputs of same address)
-  return Array.from(new Set(unownedAddresses));
-}
-export async function getForeignAddresses(
-  request: {| publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels>, |},
-): Promise<Array<string>> {
-  const derivationTables = request.publicDeriver.getParent().getDerivationTables();
-  const deps = Object.freeze({
-    GetPathWithSpecific,
-    GetAddress,
-    AssociateTxWithIOs,
-    GetDerivationSpecific,
-    GetTransaction,
-  });
-  const db = request.publicDeriver.getDb();
-  const depTables = Object
-    .keys(deps)
-    .map(key => deps[key])
-    .flatMap(table => getAllSchemaTables(db, table));
-
-  return await raii(
-    db,
-    [
-      // need a lock on all tables to delete
-      ...db.getSchema().tables(),
-      ...depTables,
-      ...mapToTables(db, derivationTables),
-    ],
-    async dbTx => {
-      const addressIds = await rawGetForeignAddresses(
-        db, dbTx,
-        deps,
-        request.publicDeriver.getParent().getDerivationTables(),
-        { publicDeriver: request.publicDeriver },
-      );
-      const addressRows = await GetAddress.getById(
-        db, dbTx,
-        addressIds
-      );
-      const result = addressRows.map(row => row.Hash);
-      // remove duplicates
-      return Array.from(new Set(result));
-    }
-  );
-}
-
-export async function rawRemoveAllTransactions(
-  db: lf$Database,
-  dbTx: lf$Transaction,
-  deps: {|
-    GetPathWithSpecific: Class<GetPathWithSpecific>,
-    GetAddress: Class<GetAddress>,
-    AssociateTxWithIOs: Class<AssociateTxWithIOs>,
-    GetDerivationSpecific: Class<GetDerivationSpecific>,
-    DeleteAllTransactions: Class<DeleteAllTransactions>,
-    GetTransaction: Class<GetTransaction>,
-    ModifyAddress: Class<ModifyAddress>,
-    FreeBlocks: Class<FreeBlocks>,
-  |},
-  derivationTables: Map<number, string>,
-  request: {|
-    publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels>,
-  |},
-): ReturnType<typeof rawGetAllTxIds> {
-  const unownedAddresses = await rawGetForeignAddresses(
-    db, dbTx,
-    {
-      GetPathWithSpecific: deps.GetPathWithSpecific,
-      GetAddress: deps.GetAddress,
-      AssociateTxWithIOs: deps.AssociateTxWithIOs,
-      GetDerivationSpecific: deps.GetDerivationSpecific,
-      GetTransaction: deps.GetTransaction,
-    },
-    derivationTables,
-    request,
-  );
-  const relatedIds = await rawGetAllTxIds(
-    db, dbTx,
-    {
-      GetPathWithSpecific: deps.GetPathWithSpecific,
-      GetAddress: deps.GetAddress,
-      AssociateTxWithIOs: deps.AssociateTxWithIOs,
-      GetDerivationSpecific: deps.GetDerivationSpecific,
-    },
-    { publicDeriver: request.publicDeriver },
-    derivationTables,
-  );
-
-  // 1) remove txs themselves
-  await deps.DeleteAllTransactions.delete(
-    db, dbTx,
-    {
-      publicDeriverId: request.publicDeriver.getPublicDeriverId(),
-      txIds: relatedIds.txIds,
-    }
-  );
-
-  // 2) remove addresses who only existed as metadata for txs that were removed
-  await deps.ModifyAddress.remove(
-    db, dbTx,
-    unownedAddresses
-  );
-
-  // 3) remove blocks no longer needed
-  await deps.FreeBlocks.free(db, dbTx);
-
-  return relatedIds;
-}
-
-export async function removeAllTransactions(
-  request: {| publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels>, |},
-): ReturnType<typeof rawGetAllTxIds> {
-  const derivationTables = request.publicDeriver.getParent().getDerivationTables();
-  const deps = Object.freeze({
-    GetPathWithSpecific,
-    GetAddress,
-    AssociateTxWithIOs,
-    GetDerivationSpecific,
-    DeleteAllTransactions,
-    ModifyAddress,
-    GetTransaction,
-    FreeBlocks,
-  });
-  const db = request.publicDeriver.getDb();
-  const depTables = Object
-    .keys(deps)
-    .map(key => deps[key])
-    .flatMap(table => getAllSchemaTables(db, table));
-
-  return await raii(
-    db,
-    [
-      // need a lock on all tables to delete
-      ...db.getSchema().tables(),
-      ...depTables,
-      ...mapToTables(db, derivationTables),
-    ],
-    async dbTx => rawRemoveAllTransactions(
-      db, dbTx,
-      deps,
-      request.publicDeriver.getParent().getDerivationTables(),
-      { publicDeriver: request.publicDeriver },
-    )
-  );
-}
+import environment from '../../../../../environment';
 
 export async function updateTransactions(
   db: lf$Database,
@@ -1266,12 +803,12 @@ async function networkTxToDbTx(
       BlockSeed,
     );
 
-    const certificate: number => (void | AddCertificateRequest) = networkTx.certificates == null
+    const certificate: number => (void | AddCertificateRequest) = networkTx.certificate == null
       ? (_txId) => {}
       : await certificateToDb(
         db, dbTx,
         {
-          certificates: networkTx.certificates,
+          certificate: networkTx.certificate,
           hashToIds,
           derivationTables,
           firstInput: networkTx.inputs[0],
@@ -1297,6 +834,14 @@ async function networkTxToDbTx(
               IndexInOwnTx: i,
               Amount: input.amount,
             });
+          } else if (input.type === InputTypes.account) {
+            accountingInputs.push({
+              TransactionId: txRowId,
+              AddressId: getIdOrThrow(input.address),
+              SpendingCounter: input.spendingCounter,
+              IndexInOwnTx: i,
+              Amount: input.amount,
+            });
           } else {
             throw new Error(`${nameof(networkTxToDbTx)} Unhandled input type`);
           }
@@ -1308,9 +853,8 @@ async function networkTxToDbTx(
           // since the payment (UTXO) key is the one that signs
           if (
             txType === CoreAddressTypes.CARDANO_LEGACY ||
-            txType === CoreAddressTypes.CARDANO_ENTERPRISE ||
-            txType === CoreAddressTypes.CARDANO_BASE ||
-            txType === CoreAddressTypes.CARDANO_PTR
+            txType === CoreAddressTypes.JORMUNGANDR_SINGLE ||
+            txType === CoreAddressTypes.JORMUNGANDR_GROUP
           ) {
             utxoOutputs.push({
               TransactionId: txRowId,
@@ -1325,9 +869,14 @@ async function networkTxToDbTx(
               IsUnspent: true,
             });
           } else if (
-            txType === CoreAddressTypes.CARDANO_REWARD
+            txType === CoreAddressTypes.JORMUNGANDR_ACCOUNT
           ) {
-            throw new Error(`${nameof(networkTxToDbTx)} cannot send to a reward address`);
+            accountingOutputs.push({
+              TransactionId: txRowId,
+              AddressId: getIdOrThrow(output.address),
+              OutputIndex: i,
+              Amount: output.amount,
+            });
           } else {
             // TODO: handle multisig
             throw new Error(`${nameof(networkTxToDbTx)} Unhandled output type`);
@@ -1410,7 +959,7 @@ export function statusStringToCode(
   if (state === 'Failed') {
     return TxStatusCodes.FAIL_RESPONSE;
   }
-  throw new Error('statusStringToCode unexpected status ' + state);
+  throw new Error(`${nameof(statusStringToCode)} unexpected status ` + state);
 }
 
 export function networkTxHeaderToDb(
@@ -1458,11 +1007,130 @@ async function certificateToDb(
   db: lf$Database,
   dbTx: lf$Transaction,
   request: {|
-    certificates: Array<RemoteCertificate>,
+    certificate: RemoteCertificate,
     hashToIds: HashToIdsFunc,
     derivationTables: Map<number, string>,
     firstInput: RemoteTransactionInput,
   |},
 ): Promise<number => AddCertificateRequest> {
-  throw new Error(`Not implemented yet`);
+  const accountToId = async (account: RustModule.WalletV3.Account): Promise<number> => {
+    const address = account.to_address(
+      // TODO: should come from the public deriver, not environment
+      environment.getDiscriminant(),
+    );
+    const hash = Buffer.from(address.as_bytes()).toString('hex');
+    const idMap = await request.hashToIds({
+      db,
+      tx: dbTx,
+      lockedTables: Array.from(request.derivationTables.values()),
+      hashes: [hash]
+    });
+    const id = idMap.get(hash);
+    if (id === undefined) {
+      throw new Error(`${nameof(certificateToDb)} should never happen id === undefined`);
+    }
+    return id;
+  };
+
+  const kind = request.certificate.payloadKindId;
+  switch (kind) {
+    case RustModule.WalletV3.CertificateKind.StakeDelegation: {
+      const cert = RustModule.WalletV3.StakeDelegation.from_bytes(
+        Buffer.from(request.certificate.payloadHex, 'hex')
+      );
+      const accountIdentifier = cert.account();
+      // TODO: this could be a multi sig instead of a single account
+      // you can differentiate by looking at the witness type
+      // but we don't have access to the witness right now
+      const account = accountIdentifier.to_account_single();
+      const addressId = await accountToId(account);
+
+      return (txId: number) => ({
+        certificate: {
+          Kind: kind,
+          Payload: request.certificate.payloadHex,
+          TransactionId: txId,
+        },
+        relatedAddresses: (certId: number) => [{
+          CertificateId: certId,
+          AddressId: addressId,
+          Relation: CertificateRelation.SIGNER,
+        }]
+      });
+    }
+    case RustModule.WalletV3.CertificateKind.OwnerStakeDelegation: {
+      const idMap = await request.hashToIds({
+        db,
+        tx: dbTx,
+        lockedTables: Array.from(request.derivationTables.values()),
+        hashes: [request.firstInput.address]
+      });
+      const addressId = idMap.get(request.firstInput.address);
+      if (addressId === undefined) {
+        throw new Error(`${nameof(certificateToDb)} should never happen id === undefined`);
+      }
+      return (txId: number) => ({
+        certificate: {
+          Kind: kind,
+          Payload: request.certificate.payloadHex,
+          TransactionId: txId,
+        },
+        relatedAddresses: (certId: number) => [{
+          CertificateId: certId,
+          AddressId: addressId,
+          Relation: CertificateRelation.SIGNER,
+        }]
+      });
+    }
+    case RustModule.WalletV3.CertificateKind.PoolRegistration: {
+      const cert = RustModule.WalletV3.PoolRegistration.from_bytes(
+        Buffer.from(request.certificate.payloadHex, 'hex')
+      );
+      const accountIdentifier = cert.reward_account();
+      const rewardAccountId = accountIdentifier == null
+        ? null
+        : await accountToId(accountIdentifier);
+
+      return (txId: number) => ({
+        certificate: {
+          Kind: kind,
+          Payload: request.certificate.payloadHex,
+          TransactionId: txId,
+        },
+        // TODO - can't know signer
+        relatedAddresses: (certId: number) => [
+          ...(rewardAccountId != null
+            ? [{
+              CertificateId: certId,
+              AddressId: rewardAccountId,
+              Relation: CertificateRelation.REWARD_ADDRESS,
+            }]
+            : [])
+        ]
+      });
+    }
+    case RustModule.WalletV3.CertificateKind.PoolRetirement: {
+      return (txId: number) => ({
+        certificate: {
+          Kind: kind,
+          Payload: request.certificate.payloadHex,
+          TransactionId: txId,
+        },
+        // TODO - can't know signer
+        relatedAddresses: (_certId: number) => []
+      });
+    }
+    case RustModule.WalletV3.CertificateKind.PoolUpdate: {
+      return (txId: number) => ({
+        certificate: {
+          Kind: kind,
+          Payload: request.certificate.payloadHex,
+          TransactionId: txId,
+        },
+        // TODO - can't know signer
+        relatedAddresses: (_certId: number) => []
+      });
+    }
+    default: throw new Error('unknown cert type ' + kind);
+  }
 }

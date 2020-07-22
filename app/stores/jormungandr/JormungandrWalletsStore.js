@@ -118,7 +118,7 @@ export default class JormungandrWalletsStore extends Store {
 
   /** Create the wallet and go to wallet summary screen */
   _createInDb: void => Promise<void> = async () => {
-    const persistentDb = this.stores.loading.loadPersitentDbRequest.result;
+    const persistentDb = this.stores.loading.loadPersistentDbRequest.result;
     if (persistentDb == null) {
       throw new Error(`${nameof(this._createInDb)} db not loaded. Should never happen`);
     }

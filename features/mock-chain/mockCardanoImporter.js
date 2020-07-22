@@ -5,11 +5,7 @@ import type {
   SignedRequestInternal, SignedResponse,
   RemoteTransaction,
   TxBodiesFunc,
-  AccountStateFunc,
-  ReputationFunc,
-  RewardHistoryFunc,
   UtxoSumFunc,
-  PoolInfoFunc,
   AddressUtxoFunc,
   HistoryFunc,
   BestBlockFunc,
@@ -22,23 +18,16 @@ import type {
 } from '../../app/api/common/lib/state-fetch/types';
 import {
   genGetTransactionsHistoryForAddresses,
-  genGetRewardHistory,
   genGetBestBlock,
   genCheckAddressesInUse,
   genUtxoForAddresses,
   genUtxoSumForAddresses,
-  genGetAccountState,
-  genGetPoolInfo,
-  genGetReputation,
-  getAddressForType,
   getSingleAddressString,
-  toRemoteJormungandrTx,
   toRemoteByronTx,
-} from '../../app/api/ada/lib/storage/bridge/tests/mockNetwork';
+} from '../../app/api/ada/lib/state-fetch/mockNetwork';
 import {
   networks,
 } from '../../app/api/ada/lib/storage/database/prepackaged/networks';
-import { CoreAddressTypes } from '../../app/api/ada/lib/storage/database/primitives/enums';
 import {
   HARD_DERIVATION_START,
   WalletTypePurpose,
@@ -46,10 +35,8 @@ import {
   ChainDerivations,
 } from '../../app/config/numbersConfig';
 import { testWallets } from './TestWallets';
-import { RustModule } from '../../app/api/ada/lib/cardanoCrypto/rustLoader';
 
-const isJormungandr = false;
-const isShelley = isJormungandr;
+const isShelley = false;
 
 // based on abandon x 14 + share
 const genesisTransaction = '52929ce6f1ab83b439e65f6613bad9590bd264c0d6c4f910e36e2369bb987b35';
@@ -81,7 +68,6 @@ export const generateTransaction = (): {|
   postLaunchSuccessfulTx: RemoteTransaction,
   postLaunchPendingTx: RemoteTransaction,
   failedTx: RemoteTransaction,
-  certificateTx: RemoteTransaction,
   ledgerTx1: RemoteTransaction,
   trezorTx1: RemoteTransaction,
   trezorTx2: RemoteTransaction,
@@ -257,23 +243,6 @@ export const generateTransaction = (): {|
       { address: 'DdzFFzCqrht74dr7DYmiyCobGFQcfLCsHJCCM6nEBTztrsEk5kwv48EWKVMFU9pswAkLX9CUs4yVhVxqZ7xCVDX1TdatFwX5W39cohvm', amount: '500000' },
       // paper wallet
       { address: 'Ae2tdPwUPEZ7TQpzbJZCbA5BjW4zWYFn47jKo43ouvfe4EABoCfvEjwYvJr', amount: '500000' },
-      // abandon/address
-      {
-        // eslint-disable-next-line max-len
-        // addr1sjag9rgwe04haycr283datdrjv3mlttalc2waz34xcct0g4uvf6gdg3dpwrsne4uqng3y47ugp2pp5dvuq0jqlperwj83r4pwxvwuxsghptz42
-        address: getAddressForType(
-          testWallets['jormungandr-test'].mnemonic,
-          [
-            WalletTypePurpose.CIP1852,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.EXTERNAL,
-            0
-          ],
-          CoreAddressTypes.JORMUNGANDR_GROUP
-        ),
-        amount: '2100000'
-      },
       // dump-wallet
       {
         // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
@@ -904,65 +873,6 @@ export const generateTransaction = (): {|
     tx_state: 'Failed'
   };
 
-  // ================
-  //   jormungandr-test
-  // ================
-
-  const certificateTx = {
-    hash: cryptoRandomString({ length: 64 }),
-    inputs: [
-      {
-        // eslint-disable-next-line max-len
-        // addr1sjag9rgwe04haycr283datdrjv3mlttalc2waz34xcct0g4uvf6gdg3dpwrsne4uqng3y47ugp2pp5dvuq0jqlperwj83r4pwxvwuxsghptz42
-        address: getAddressForType(
-          testWallets['jormungandr-test'].mnemonic,
-          [
-            WalletTypePurpose.CIP1852,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.EXTERNAL,
-            0
-          ],
-          CoreAddressTypes.JORMUNGANDR_GROUP
-        ),
-        txHash: distributorTx.hash,
-        id: distributorTx.hash + '12',
-        index: 12,
-        amount: '2100000'
-      }
-    ],
-    outputs: [
-      {
-        address: getAddressForType(
-          testWallets['jormungandr-test'].mnemonic,
-          [
-            WalletTypePurpose.CIP1852,
-            CoinTypes.CARDANO,
-            0 + HARD_DERIVATION_START,
-            ChainDerivations.INTERNAL,
-            0
-          ],
-          CoreAddressTypes.JORMUNGANDR_GROUP
-        ),
-        amount: '2099990'
-      },
-    ],
-    certificate: {
-      payloadKind: 'StakeDelegation',
-      payloadKindId: RustModule.WalletV3.CertificateKind.StakeDelegation,
-      // delegates all ADA to pool 312e3d449038372ba2fc3300cfedf1b152ae739201b3e5da47ab3f933a421b62
-      payloadHex: 'a22d0b8709e6bc04d11257dc405410d1ace01f207c391ba4788ea17198ee1a0801312e3d449038372ba2fc3300cfedf1b152ae739201b3e5da47ab3f933a421b62',
-    },
-    height: 100,
-    block_hash: '100',
-    tx_ordinal: 3,
-    time: '2019-04-20T15:15:33.000Z',
-    epoch: 0,
-    slot: 100,
-    last_update: '2019-05-20T23:16:51.899Z',
-    tx_state: 'Successful'
-  };
-
   // =================
   //   ledger-wallet
   // =================
@@ -1199,7 +1109,6 @@ export const generateTransaction = (): {|
     postLaunchSuccessfulTx,
     postLaunchPendingTx,
     failedTx,
-    certificateTx,
     ledgerTx1,
     trezorTx1,
     trezorTx2,
@@ -1246,10 +1155,6 @@ export function resetChain(
     addTransaction(txs.useChange);
     // failed-single-tx
     addTransaction(txs.failedTx);
-    // jormungandr-test
-    if (isJormungandr) {
-      addTransaction(txs.certificateTx);
-    }
     // ledger-wallet
     addTransaction(txs.ledgerTx1);
     // trezor-wallet
@@ -1318,15 +1223,11 @@ function getApiStatus(): ServerStatusResponse {
 
 const usedAddresses: FilterFunc = genCheckAddressesInUse(
   transactions,
-  isJormungandr
-    ? networks.JormungandrMainnet
-    : networks.ByronMainnet,
+  networks.ByronMainnet,
 );
 const history: HistoryFunc = genGetTransactionsHistoryForAddresses(
   transactions,
-  isJormungandr
-    ? networks.JormungandrMainnet
-    : networks.ByronMainnet,
+  networks.ByronMainnet,
 );
 const getBestBlock: BestBlockFunc = genGetBestBlock(transactions);
 const utxoForAddresses: AddressUtxoFunc = genUtxoForAddresses(
@@ -1335,17 +1236,11 @@ const utxoForAddresses: AddressUtxoFunc = genUtxoForAddresses(
 );
 const utxoSumForAddresses: UtxoSumFunc = genUtxoSumForAddresses(utxoForAddresses);
 const sendTx = (request: SignedRequestInternal): SignedResponse => {
-  const remoteTx = isJormungandr
-    ? toRemoteJormungandrTx(transactions, request)
-    : toRemoteByronTx(transactions, request);
+  const remoteTx = toRemoteByronTx(transactions, request);
 
   addTransaction(remoteTx);
   return { txId: remoteTx.hash };
 };
-const getAccountState: AccountStateFunc = genGetAccountState(transactions);
-const getPoolInfo: PoolInfoFunc = genGetPoolInfo(transactions);
-const getReputation: ReputationFunc = genGetReputation();
-const getRewardHistory: RewardHistoryFunc = genGetRewardHistory();
 const getTxsBodiesForUTXOs: TxBodiesFunc = async req => {
   const result = {};
   for (const hash of req.txsHashes) {
@@ -1370,11 +1265,7 @@ export default {
   usedAddresses,
   getApiStatus,
   history,
-  getRewardHistory,
   getTxsBodiesForUTXOs,
   getBestBlock,
-  getAccountState,
-  getPoolInfo,
-  getReputation,
   sendTx,
 };

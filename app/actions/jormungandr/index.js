@@ -1,4 +1,5 @@
 // @flow
+
 import JormungandrWalletsActions from './jormungandr-wallets-actions';
 import DelegationTransactionActions from './delegation-transaction-actions';
 import DelegationActions from './delegation-actions';

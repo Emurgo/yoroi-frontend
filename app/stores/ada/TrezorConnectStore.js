@@ -391,7 +391,7 @@ export default class TrezorConnectStore
       throw new Error('Trezor device hardware info not valid');
     }
 
-    const persistentDb = this.stores.loading.loadPersitentDbRequest.result;
+    const persistentDb = this.stores.loading.loadPersistentDbRequest.result;
     if (persistentDb == null) {
       throw new Error(`${nameof(this._prepareCreateHWReqParams)} db not loaded. Should never happen`);
     }

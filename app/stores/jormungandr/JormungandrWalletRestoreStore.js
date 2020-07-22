@@ -121,7 +121,7 @@ export default class JormungandrWalletRestoreStore extends Store {
     }
     const { phrase } = this.stores.walletRestore.recoveryResult;
     const { walletName, walletPassword } = this.stores.walletRestore.walletRestoreMeta;
-    const persistentDb = this.stores.loading.loadPersitentDbRequest.result;
+    const persistentDb = this.stores.loading.loadPersistentDbRequest.result;
     if (persistentDb == null) {
       throw new Error(`${nameof(this._restoreToDb)} db not loaded. Should never happen`);
     }
