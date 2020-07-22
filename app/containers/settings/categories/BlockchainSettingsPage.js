@@ -19,8 +19,7 @@ import {
   PublicDeriver,
 } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 import NoWalletMessage from '../../wallet/NoWalletMessage';
-import { CoinTypes, } from '../../../config/numbersConfig';
-import { CardanoForks } from '../../../api/ada/lib/storage/database/prepackaged/networks';
+import { isCardanoHaskell } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import type {
   ExplorerRow,
 } from '../../../api/ada/lib/storage/database/explorers/tables';
@@ -90,8 +89,7 @@ export default class BlockchainSettingsPage extends Component<InjectedOrGenerate
       || stores.coinPriceStore.refreshCurrentUnit.isExecuting;
 
     const uriSettings = (
-      networkInfo.CoinType === CoinTypes.CARDANO &&
-      networkInfo.Fork === CardanoForks.Haskell &&
+      isCardanoHaskell(networkInfo) &&
       this.generated.canRegisterProtocol()
     )
       ? (

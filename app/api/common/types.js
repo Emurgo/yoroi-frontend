@@ -34,6 +34,7 @@ export type RestoreWalletRequest = {|
   recoveryPhrase: string,
   walletName: string,
   walletPassword: string,
+  accountIndex: number,
 |};
 export type RestoreWalletResponse = {|
   publicDerivers: Array<PublicDeriver<>>,
@@ -41,3 +42,11 @@ export type RestoreWalletResponse = {|
 export type RestoreWalletFunc = (
   request: RestoreWalletRequest
 ) => Promise<RestoreWalletResponse>;
+
+// createWallet
+
+export type CreateWalletRequest = RestoreWalletRequest;
+export type CreateWalletResponse = RestoreWalletResponse;
+export type CreateWalletFunc = (
+  request: CreateWalletRequest
+) => Promise<CreateWalletResponse>;

@@ -7,24 +7,20 @@ import {
 } from '../../../../utils/logging';
 import {
   NoInputsError,
-} from '../../errors';
+} from '../../../common/errors';
 import type { AddressedUtxo } from '../types';
 import type {
   AddressUtxoFunc,
 } from '../../lib/state-fetch/types';
-import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 import type {
   Address, Addressing
 } from '../../lib/storage/models/PublicDeriver/interfaces';
 
 /**
- * Generate transaction including all addresses with no change.
+ * merge in remote UTXO information into an address list
 */
 export async function toSenderUtxos(payload: {|
   addresses: Array<{| ...Address, ...Addressing |}>,
-  outputAddr: string,
-  keyLevel: number,
-  signingKey: RustModule.WalletV3.Bip32PrivateKey,
   getUTXOsForAddresses: AddressUtxoFunc,
 |}): Promise<Array<AddressedUtxo>> {
   // fetch UTXO

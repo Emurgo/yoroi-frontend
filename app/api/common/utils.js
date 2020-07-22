@@ -3,17 +3,23 @@
 import { CoinTypes } from '../../config/numbersConfig';
 import { getAdaCurrencyMeta } from '../ada/currencyInfo';
 import { getErgoCurrencyMeta } from '../ergo/currencyInfo';
+import { getJormungandrCurrencyMeta } from '../jormungandr/currencyInfo';
 import type { NetworkRow } from '../ada/lib/storage/database/primitives/tables';
+import { isCardanoHaskell, isJormungandr } from '../ada/lib/storage/database/prepackaged/networks';
 
 export const ApiOptions = Object.freeze({
   ada: 'ada',
+  jormungandr: 'jormungandr',
   ergo: 'ergo',
 });
 export type ApiOptionType = $Values<typeof ApiOptions>;
 
 export const getApiForNetwork: $ReadOnly<NetworkRow> => ApiOptionType = (type) => {
-  if (type.CoinType === CoinTypes.CARDANO) {
+  if (isCardanoHaskell(type)) {
     return ApiOptions.ada;
+  }
+  if (isJormungandr(type)) {
+    return ApiOptions.jormungandr;
   }
   if (type.CoinType === CoinTypes.ERGO) {
     return ApiOptions.ergo;
@@ -22,6 +28,9 @@ export const getApiForNetwork: $ReadOnly<NetworkRow> => ApiOptionType = (type) =
 };
 
 export type SelectedApiType = {|
+  type: 'jormungandr',
+  meta: ReturnType<typeof getJormungandrCurrencyMeta>,
+|} | {|
   type: 'ada',
   meta: ReturnType<typeof getAdaCurrencyMeta>,
 |} | {|
@@ -40,6 +49,12 @@ export function getApiMeta(
       return {
         type: 'ada',
         meta: getAdaCurrencyMeta(),
+      };
+    }
+    case ApiOptions.jormungandr: {
+      return {
+        type: 'jormungandr',
+        meta: getJormungandrCurrencyMeta(),
       };
     }
     case ApiOptions.ergo: {

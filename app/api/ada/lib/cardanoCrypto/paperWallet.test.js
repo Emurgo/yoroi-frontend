@@ -16,14 +16,13 @@ import {
   getAddressesKeys,
 } from '../../transactions/transfer/legacyDaedalus';
 import { RustModule } from './rustLoader';
-import { generateStandardPlate } from './plate';
+import { generateByronPlate } from './plate';
 import {
   silenceLogsForTesting,
 } from '../../../../utils/logging';
 import {
   loadLovefieldDB,
 } from '../storage/database/index';
-import environment from '../../../../environment';
 import config from '../../../../config';
 
 const VALID_DD_PAPER = {
@@ -144,7 +143,11 @@ test('Unscramble Yoroi paper matches expected address', async () => {
   if (words != null) {
     const rootPk = generateWalletRootKey(words);
     expect(Buffer.from(rootPk.as_bytes()).toString('hex')).toEqual(VALID_YOROI_PAPER.privateKey);
-    const plate = generateStandardPlate(rootPk, 0, 1, environment.getDiscriminant(), true);
+    const plate = generateByronPlate(
+      rootPk,
+      0, // account index
+      1, // address count
+    );
     expect(plate.addresses[0]).toEqual(VALID_YOROI_PAPER.byronAddress);
   }
 });

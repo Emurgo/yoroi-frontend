@@ -12,7 +12,7 @@ import type {
 import type { RemoteUnspentOutput, } from '../../lib/state-fetch/types';
 import {
   NotEnoughMoneyToSendError,
-} from '../../errors';
+} from '../../../common/errors';
 
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 

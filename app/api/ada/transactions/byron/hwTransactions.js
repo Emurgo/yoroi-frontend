@@ -17,7 +17,7 @@ import type {
 import {
   SendTransactionError,
   InvalidWitnessError,
-} from '../../errors';
+} from '../../../common/errors';
 import type {
   BroadcastTrezorSignedTxResponse,
   PrepareAndBroadcastLedgerSignedTxResponse

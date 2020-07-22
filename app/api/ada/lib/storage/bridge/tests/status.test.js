@@ -8,17 +8,19 @@ import '../../../test-config';
 import type { RemoteTransaction, RemoteTxBlockMeta, } from '../../../state-fetch/types';
 import {
   setup,
-  mockDate,
-  filterDbSnapshot,
+} from './common';
+import {
   ABANDON_SHARE,
   TX_TEST_MNEMONIC_1,
-} from './common';
+  mockDate,
+  filterDbSnapshot,
+} from '../../../../../jestUtils';
 import {
   genCheckAddressesInUse,
   genGetTransactionsHistoryForAddresses,
   genGetBestBlock,
   getSingleAddressString,
-} from './mockNetwork';
+} from '../../../state-fetch/mockNetwork';
 import { loadLovefieldDB } from '../../database/index';
 import {
   HARD_DERIVATION_START,
@@ -276,9 +278,7 @@ async function baseTest(
   const db = await loadLovefieldDB(schema.DataStoreType.MEMORY);
   const publicDeriver = await setup(db, TX_TEST_MNEMONIC_1, purposeForTest);
 
-  const network = purposeForTest === WalletTypePurpose.BIP44
-    ? networks.ByronMainnet
-    : networks.JormungandrMainnet;
+  const network = networks.ByronMainnet;
   const networkTransactions: Array<RemoteTransaction> = [initialPendingTx(type, purposeForTest)];
   const checkAddressesInUse = genCheckAddressesInUse(networkTransactions, network);
   const getTransactionsHistoryForAddresses = genGetTransactionsHistoryForAddresses(
@@ -380,9 +380,7 @@ async function baseTest(
             TransactionId: 2
           },
           UtxoTransactionOutput: {
-            AddressId: purposeForTest === WalletTypePurpose.CIP1852
-              ? 9
-              : 5,
+            AddressId: 5,
             Amount: '2100000',
             IsUnspent: true,
             OutputIndex: 0,
@@ -477,9 +475,7 @@ async function baseTest(
             TransactionId: 1
           },
           UtxoTransactionOutput: {
-            AddressId: purposeForTest === WalletTypePurpose.CIP1852
-              ? 9
-              : 5,
+            AddressId: 5,
             Amount: '2100000',
             IsUnspent: true,
             OutputIndex: 0,
@@ -516,9 +512,7 @@ async function baseTest(
             TransactionId: 2
           },
           UtxoTransactionOutput: {
-            AddressId: purposeForTest === WalletTypePurpose.CIP1852
-              ? 9
-              : 5,
+            AddressId: 5,
             Amount: '2100000',
             IsUnspent: true,
             OutputIndex: 0,
@@ -601,9 +595,7 @@ async function baseTest(
             TransactionId: 1
           },
           UtxoTransactionOutput: {
-            AddressId: purposeForTest === WalletTypePurpose.CIP1852
-              ? 9
-              : 5,
+            AddressId: 5,
             Amount: '2100000',
             IsUnspent: true,
             OutputIndex: 0,
@@ -640,9 +632,7 @@ async function baseTest(
             TransactionId: 2
           },
           UtxoTransactionOutput: {
-            AddressId: purposeForTest === WalletTypePurpose.CIP1852
-              ? 9
-              : 5,
+            AddressId: 5,
             Amount: '2100000',
             IsUnspent: true,
             OutputIndex: 0,
@@ -752,14 +742,6 @@ test('Syncing with failed bip44', async (done) => {
   done();
 });
 
-test('Syncing with pending cip1852', async (done) => {
-  await baseTest('Pending', WalletTypePurpose.CIP1852);
-  done();
-});
-test('Syncing with failed cip1852', async (done) => {
-  await baseTest('Failed', WalletTypePurpose.CIP1852);
-  done();
-});
 
 async function pendingDropped(
   purposeForTest: WalletTypePurposeT,
@@ -772,9 +754,7 @@ async function pendingDropped(
     pointlessTx(purposeForTest),
     initialPendingTx('Pending', purposeForTest)
   ];
-  const network = purposeForTest === WalletTypePurpose.BIP44
-    ? networks.ByronMainnet
-    : networks.JormungandrMainnet;
+  const network = networks.ByronMainnet;
   const checkAddressesInUse = genCheckAddressesInUse(networkTransactions, network);
   const getTransactionsHistoryForAddresses = genGetTransactionsHistoryForAddresses(
     networkTransactions,
@@ -826,9 +806,5 @@ async function pendingDropped(
 
 test('Pending dropped from backend without rollback bip44', async (done) => {
   await pendingDropped(WalletTypePurpose.BIP44);
-  done();
-});
-test('Pending dropped from backend without rollback cip1852', async (done) => {
-  await pendingDropped(WalletTypePurpose.CIP1852);
   done();
 });

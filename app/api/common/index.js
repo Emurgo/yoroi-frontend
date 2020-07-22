@@ -13,7 +13,7 @@ import {
   PublicDeriver,
 } from '../ada/lib/storage/models/PublicDeriver/index';
 import {
-  GenericApiError, UnusedAddressesError,
+  GenericApiError, UnusedAddressesError, IncorrectWalletPasswordError,
 } from './errors';
 import type {
   IPublicDeriver,
@@ -22,6 +22,7 @@ import type {
   IDisplayCutoffPopFunc,
   IDisplayCutoffPopResponse,
 } from '../ada/lib/storage/models/PublicDeriver/interfaces';
+import { migrateToLatest } from '../ada/lib/storage/adaMigration';
 import { ConceptualWallet } from '../ada/lib/storage/models/ConceptualWallet/index';
 import type { IHasLevels } from '../ada/lib/storage/models/ConceptualWallet/interfaces';
 import WalletTransaction from '../../domain/WalletTransaction';
@@ -39,6 +40,13 @@ import { getApiForNetwork } from './utils';
 import type {
   GetBalanceRequest, GetBalanceResponse,
 } from './types';
+import LocalStorageApi from '../localStorage/index';
+import { clear } from '../ada/lib/storage/database/index';
+import type {
+  IRenameFunc, IRenameRequest, IRenameResponse,
+  IChangePasswordRequestFunc, IChangePasswordRequest, IChangePasswordResponse,
+} from '../ada/lib/storage/models/common/interfaces';
+import { WrongPassphraseError } from '../ada/lib/cardanoCrypto/cryptoErrors';
 
 // getWallets
 
@@ -143,6 +151,28 @@ export type CreateAddressFunc = (
   request: CreateAddressRequest
 ) => Promise<CreateAddressResponse>;
 
+// renameModel
+
+export type RenameModelRequest = {|
+  func: IRenameFunc,
+  request: IRenameRequest,
+|};
+export type RenameModelResponse = IRenameResponse;
+export type RenameModelFunc = (
+  request: RenameModelRequest
+) => Promise<RenameModelResponse>;
+
+// changeModelPassword
+
+export type ChangeModelPasswordRequest = {|
+  func: IChangePasswordRequestFunc,
+  request: IChangePasswordRequest,
+|};
+export type ChangeModelPasswordResponse = IChangePasswordResponse;
+export type ChangeModelPasswordFunc = (
+  request: ChangeModelPasswordRequest
+) => Promise<ChangeModelPasswordResponse>;
+
 
 export default class CommonApi {
   async getTxLastUpdatedDate(
@@ -236,6 +266,64 @@ export default class CommonApi {
       return mappedTransactions;
     } catch (error) {
       Logger.error(`${nameof(CommonApi)}::${nameof(this.refreshPendingTransactions)} error: ` + stringifyError(error));
+      throw new GenericApiError();
+    }
+  }
+
+  async migrate(
+    localstorageApi: LocalStorageApi,
+    persistentDb: lf$Database,
+  ): Promise<boolean> {
+    return await migrateToLatest(
+      localstorageApi,
+      persistentDb,
+    );
+  }
+
+  async importLocalDatabase(
+    db: lf$Database,
+    data: {...},
+  ): Promise<void> {
+    await clear(db);
+    await db.import(data);
+  }
+
+  async exportLocalDatabase(
+    db: lf$Database,
+  ): Promise<string> {
+    const data = await db.export();
+    return JSON.stringify(data);
+  }
+
+  async renameModel(
+    request: RenameModelRequest
+  ): Promise<RenameModelResponse> {
+    Logger.debug(`${nameof(CommonApi)}::${nameof(this.renameModel)} called: ` + stringifyData(request));
+    try {
+      const result = await request.func(request.request);
+      Logger.debug(`${nameof(CommonApi)}::${nameof(this.renameModel)} success: ` + stringifyData(result));
+      return result;
+    } catch (error) {
+      Logger.error(`${nameof(CommonApi)}::${nameof(this.renameModel)} error: ` + stringifyError(error));
+      throw new GenericApiError();
+    }
+  }
+
+  async changeModelPassword(
+    request: ChangeModelPasswordRequest
+  ): Promise<ChangeModelPasswordResponse> {
+    Logger.debug(`${nameof(CommonApi)}::${nameof(this.changeModelPassword)} called`);
+    try {
+      const result = await request.func(request.request);
+      Logger.debug(`${nameof(CommonApi)}::${nameof(this.changeModelPassword)} success`);
+      return result;
+    } catch (error) {
+      Logger.error(
+        `${nameof(CommonApi)}::${nameof(this.changeModelPassword)} error: ` + stringifyError(error)
+      );
+      if (error instanceof WrongPassphraseError) {
+        throw new IncorrectWalletPasswordError();
+      }
       throw new GenericApiError();
     }
   }

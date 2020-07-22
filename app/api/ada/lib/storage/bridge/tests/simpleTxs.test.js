@@ -8,18 +8,20 @@ import '../../../test-config';
 import type { RemoteTransaction } from '../../../state-fetch/types';
 import {
   setup,
-  filterDbSnapshot,
-  mockDate,
+} from './common';
+import {
   ABANDON_SHARE,
   TX_TEST_MNEMONIC_1,
+  mockDate,
+  filterDbSnapshot,
   compareObject,
-} from './common';
+} from '../../../../../jestUtils';
 import {
   genCheckAddressesInUse,
   genGetTransactionsHistoryForAddresses,
   genGetBestBlock,
   getSingleAddressString,
-} from './mockNetwork';
+} from '../../../state-fetch/mockNetwork';
 import {
   HARD_DERIVATION_START,
   WalletTypePurpose,
@@ -269,9 +271,7 @@ async function syncingSimpleTransaction(
   const db = await loadLovefieldDB(schema.DataStoreType.MEMORY);
   const publicDeriver = await setup(db, TX_TEST_MNEMONIC_1, purposeForTest);
 
-  const network = purposeForTest === WalletTypePurpose.BIP44
-    ? networks.ByronMainnet
-    : networks.JormungandrMainnet;
+  const network = networks.ByronMainnet;
   const txHistory = networkTransactions(purposeForTest);
   const checkAddressesInUse = genCheckAddressesInUse(txHistory, network);
   const getTransactionsHistoryForAddresses = genGetTransactionsHistoryForAddresses(
@@ -334,9 +334,7 @@ async function syncingSimpleTransaction(
             TransactionId: 1
           },
           UtxoTransactionOutput: {
-            AddressId: purposeForTest === WalletTypePurpose.CIP1852
-              ? 9
-              : 5,
+            AddressId: 5,
             Amount: '2100000',
             IsUnspent: true,
             OutputIndex: 0,
@@ -443,9 +441,7 @@ async function syncingSimpleTransaction(
             TransactionId: 2
           },
           UtxoTransactionOutput: {
-            AddressId: purposeForTest === WalletTypePurpose.CIP1852
-              ? 41
-              : 21,
+            AddressId: 21,
             Amount: '1100000',
             IsUnspent: true,
             OutputIndex: 0,
@@ -476,9 +472,7 @@ async function syncingSimpleTransaction(
             TransactionId: 2
           },
           UtxoTransactionOutput: {
-            AddressId: purposeForTest === WalletTypePurpose.CIP1852
-              ? 39
-              : 20,
+            AddressId: 20,
             Amount: '900000',
             IsUnspent: true,
             OutputIndex: 1,
@@ -611,11 +605,6 @@ test('Syncing simple transaction bip44', async (done) => {
   done();
 });
 
-test('Syncing simple transaction cip1852', async (done) => {
-  await syncingSimpleTransaction(WalletTypePurpose.CIP1852);
-  done();
-});
-
 async function utxoCreatedAndUsed(
   purposeForTest: WalletTypePurposeT,
 ): Promise<void> {
@@ -623,9 +612,7 @@ async function utxoCreatedAndUsed(
   const publicDeriver = await setup(db, TX_TEST_MNEMONIC_1, purposeForTest);
 
   const txHistory = networkTransactions(purposeForTest);
-  const network = purposeForTest === WalletTypePurpose.BIP44
-    ? networks.ByronMainnet
-    : networks.JormungandrMainnet;
+  const network = networks.ByronMainnet;
   const checkAddressesInUse = genCheckAddressesInUse(txHistory, network);
   const getTransactionsHistoryForAddresses = genGetTransactionsHistoryForAddresses(
     txHistory,
@@ -696,9 +683,7 @@ async function utxoCreatedAndUsed(
             TransactionId: 2
           },
           UtxoTransactionOutput: {
-            AddressId: purposeForTest === WalletTypePurpose.CIP1852
-              ? 41
-              : 21,
+            AddressId: 21,
             Amount: '1100000',
             IsUnspent: true,
             OutputIndex: 0,
@@ -729,9 +714,7 @@ async function utxoCreatedAndUsed(
             TransactionId: 2
           },
           UtxoTransactionOutput: {
-            AddressId: purposeForTest === WalletTypePurpose.CIP1852
-              ? 39
-              : 20,
+            AddressId: 20,
             Amount: '900000',
             IsUnspent: true,
             OutputIndex: 1,
@@ -757,10 +740,5 @@ async function utxoCreatedAndUsed(
 
 test('Utxo created and used in same sync bip44', async (done) => {
   await utxoCreatedAndUsed(WalletTypePurpose.BIP44);
-  done();
-});
-
-test('Utxo created and used in same sync cip1852', async (done) => {
-  await utxoCreatedAndUsed(WalletTypePurpose.CIP1852);
   done();
 });

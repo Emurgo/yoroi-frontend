@@ -102,7 +102,7 @@ import { ModifyKey, ModifyAddress, } from '../../database/primitives/api/write';
 import { v2genAddressBatchFunc, } from '../../../../restoration/byron/scan';
 import { ergoGenAddressBatchFunc, } from '../../../../../ergo/lib/restoration/scan';
 import { scanBip44Account, } from '../../../../../common/lib/restoration/bip44';
-import { scanCip1852Account } from '../../../../restoration/jormungandr/scan';
+import { scanCip1852Account } from '../../../../../jormungandr/lib/restoration/scan';
 
 import {
   UnusedAddressesError,

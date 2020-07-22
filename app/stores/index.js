@@ -14,9 +14,14 @@ import TransactionsStore from './toplevel/TransactionsStore';
 import AddressesStore from './toplevel/AddressesStore';
 import TimeStore from './toplevel/TimeStore';
 import WalletRestoreStore from './toplevel/WalletRestoreStore';
+import DaedalusTransferStore from './toplevel/DaedalusTransferStore';
+import YoroiTransferStore from './toplevel/YoroiTransferStore';
+import TransactionBuilderStore from './toplevel/TransactionBuilderStore';
 import setupAdaStores from './ada/index';
 import setupErgoStores from './ergo/index';
+import setupJormungandrStores from './jormungandr/index';
 import type { AdaStoresMap } from './ada/index';
+import type { JormungandrStoresMap } from './jormungandr/index';
 import type { ErgoStoresMap } from './ergo/index';
 import { RouterStore } from 'mobx-react-router';
 import type { ActionsMap } from '../actions/index';
@@ -46,6 +51,9 @@ const storeClasses = Object.freeze({
   transactions: TransactionsStore,
   walletRestore: WalletRestoreStore,
   walletSettings: WalletSettingsStore,
+  transactionBuilderStore: TransactionBuilderStore,
+  daedalusTransfer: DaedalusTransferStore,
+  yoroiTransfer: YoroiTransferStore,
   explorers: ExplorerStore,
   // note: purposely exclude substores and router
 });
@@ -68,8 +76,15 @@ export type StoresMap = {|
   transactions: TransactionsStore,
   walletRestore: WalletRestoreStore,
   walletSettings: WalletSettingsStore,
+  transactionBuilderStore: TransactionBuilderStore,
+  daedalusTransfer: DaedalusTransferStore,
+  yoroiTransfer: YoroiTransferStore,
   explorers: ExplorerStore,
-  substores: {| ada: AdaStoresMap, ergo: ErgoStoresMap, |},
+  substores: {|
+    ada: AdaStoresMap,
+    jormungandr: JormungandrStoresMap,
+    ergo: ErgoStoresMap,
+  |},
   router: RouterStore,
 |};
 
@@ -93,6 +108,9 @@ const stores: WithNullableFields<StoresMap> = observable({
   transactions: null,
   walletRestore: null,
   walletSettings: null,
+  transactionBuilderStore: null,
+  daedalusTransfer: null,
+  yoroiTransfer: null,
   explorers: null,
   substores: null,
   router: null,
@@ -142,12 +160,14 @@ export default (action(
      * But we only want to actually initialize it if it is the currency in use */
     stores.substores = {
       ada: setupAdaStores((stores: any), api, actions),
+      jormungandr: setupJormungandrStores((stores: any), api, actions),
       ergo: setupErgoStores((stores: any), api, actions),
     };
 
     const loadedStores: StoresMap = (stores: any);
     initializeSubstore<ErgoStoresMap>(loadedStores.substores[ApiOptions.ergo]);
     initializeSubstore<AdaStoresMap>(loadedStores.substores[ApiOptions.ada]);
+    initializeSubstore<JormungandrStoresMap>(loadedStores.substores[ApiOptions.jormungandr]);
 
     // Perform load after all setup is done to ensure migration can modify store state
     loadedStores.loading.load();

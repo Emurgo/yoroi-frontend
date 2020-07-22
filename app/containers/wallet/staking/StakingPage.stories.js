@@ -27,11 +27,11 @@ import { wrapWallet } from '../../../Routes';
 import type {
   GetDelegatedBalanceFunc,
   GetCurrentDelegationFunc,
-} from '../../../api/ada/lib/storage/bridge/delegationUtils';
+} from '../../../api/jormungandr/lib/storage/bridge/delegationUtils';
 import type {
   RewardHistoryForWallet,
   DelegationRequests,
-} from '../../../stores/ada/DelegationStore';
+} from '../../../stores/jormungandr/DelegationStore';
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -65,7 +65,7 @@ const genBaseProps: {|
         hasAnyPending: request.hasPending || false,
       },
       substores: {
-        ada: {
+        jormungandr: {
           delegation: {
             getDelegationRequests: request.lookup.getDelegation,
           },
@@ -84,7 +84,7 @@ const genBaseProps: {|
       },
     },
     actions: {
-      ada: {
+      jormungandr: {
         delegationTransaction: {
           reset: { trigger: action('reset'), },
         },
@@ -103,7 +103,7 @@ const genBaseProps: {|
             selected: request.wallet.publicDeriver,
           },
           substores: {
-            ada: {
+            jormungandr: {
               delegationTransaction: {
                 selectedPools: request.selectedPools != null ? request.selectedPools : [],
                 isStale: request.createDelegationTx == null
@@ -130,7 +130,7 @@ const genBaseProps: {|
           },
         },
         actions: {
-          ada: {
+          jormungandr: {
             delegationTransaction: {
               createTransaction: {
                 trigger: async (req) => action('createTransaction')(req),

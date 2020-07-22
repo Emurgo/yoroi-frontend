@@ -3,6 +3,9 @@ import { observable, action, computed } from 'mobx';
 import Store from '../base/Store';
 import environment from '../../environment';
 import WalletBackupDialog from '../../components/wallet/WalletBackupDialog';
+import {
+  HARD_DERIVATION_START,
+} from '../../config/numbersConfig';
 
 export type WalletBackupSteps = 'privacyWarning' | 'recoveryPhraseDisplay' | 'recoveryPhraseEntry' | null;
 
@@ -29,6 +32,7 @@ class WalletBackupStore extends Store {
     word: string,
     index: number,
   |}>;
+  @observable selectedAccount: number;
   @observable isPrivacyNoticeAccepted: boolean;
   @observable isEntering: boolean;
   @observable isTermDeviceAccepted: boolean;
@@ -63,6 +67,7 @@ class WalletBackupStore extends Store {
     this.recoveryPhrase = params.recoveryPhrase;
     this.name = params.name;
     this.password = params.password;
+    this.selectedAccount = 0 + HARD_DERIVATION_START;
     this.inProgress = true;
     this.currentStep = 'privacyWarning';
     this.recoveryPhraseWords = this.recoveryPhrase.map(word => ({ word }));
@@ -164,6 +169,7 @@ class WalletBackupStore extends Store {
     this.inProgress = false;
     this.name = '';
     this.password = '';
+    this.selectedAccount = 0 + HARD_DERIVATION_START;
     this.currentStep = null;
     this.recoveryPhrase = [];
     this.recoveryPhraseWords = [];

@@ -10,12 +10,10 @@ import config from '../../config';
 import globalMessages from '../../i18n/global-messages';
 import type { Notification } from '../../types/notificationType';
 import type {
-  CreateWalletResponse,
-} from '../../api/ada';
-import type {
   GetWalletsFunc,
 } from '../../api/common/index';
 import type {
+  CreateWalletResponse,
   RestoreWalletResponse,
 } from '../../api/common/types';
 import {
@@ -127,6 +125,9 @@ export default class WalletStore extends Store {
       return restoredWallet;
     });
   @observable isImportActive: boolean = false;
+
+  @observable sendMoneyRequest: Request<typeof WalletStore.prototype.sendAndRefresh>
+    = new Request<typeof WalletStore.prototype.sendAndRefresh>(this.sendAndRefresh);
 
   @observable signingKeyCache: Array<SigningKeyCache> = [];
   getSigningKeyCache: IGetSigningKey => SigningKeyCache = (
@@ -289,7 +290,7 @@ export default class WalletStore extends Store {
 
   /** Make all API calls required to setup/update wallet */
   @action restoreWalletsFromStorage: void => Promise<void> = async () => {
-    const persistentDb = this.stores.loading.loadPersitentDbRequest.result;
+    const persistentDb = this.stores.loading.loadPersistentDbRequest.result;
     if (persistentDb == null) {
       throw new Error(`${nameof(this.restoreWalletsFromStorage)} db not loaded. Should never happen`);
     }
@@ -482,6 +483,20 @@ export default class WalletStore extends Store {
         ));
       }
     }
+  }
+
+  sendAndRefresh: {|
+    broadcastRequest: void => Promise<{| txId: string |}>,
+    refreshWallet: () => Promise<void>,
+  |} => Promise<{| txId: string |}> = async (request) => {
+    const result = await request.broadcastRequest();
+    try {
+      await request.refreshWallet();
+    } catch (_e) {
+      // even if refreshing the wallet fails, we don't want to fail the tx
+      // otherwise user may try and re-send the tx
+    }
+    return result;
   }
 }
 

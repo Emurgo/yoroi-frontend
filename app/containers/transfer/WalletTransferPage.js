@@ -70,7 +70,7 @@ export default class WalletTransferPage extends Component<Props> {
       <>
         <TransferTypeSelect
           onByron={() => actions.dialogs.open.trigger({ dialog: ByronEraOptionDialogContainer })}
-          onShelleyItn={() => this.generated.actions.ada.yoroiTransfer
+          onShelleyItn={() => this.generated.actions.yoroiTransfer
             .startTransferFunds.trigger({
               source: TransferSource.JORMUNGANDR_UTXO
             })
@@ -89,13 +89,11 @@ export default class WalletTransferPage extends Component<Props> {
     DaedalusTransferPageProps: ?InjectedOrGenerated<DaedalusTransferPageData>,
     YoroiTransferPageProps: ?InjectedOrGenerated<YoroiTransferPageData>,
     actions: {|
-      ada: {|
-        yoroiTransfer: {|
-          startTransferFunds: {|
-            trigger: (params: {|
-              source: TransferSourceType
-            |}) => void
-          |}
+      yoroiTransfer: {|
+        startTransferFunds: {|
+          trigger: (params: {|
+            source: TransferSourceType
+          |}) => void
         |}
       |},
       dialogs: {|
@@ -124,7 +122,6 @@ export default class WalletTransferPage extends Component<Props> {
       throw new Error(`${nameof(WalletTransferPage)} no way to generated props`);
     }
     const { stores, actions } = this.props;
-    const { yoroiTransfer } = actions.ada;
     return Object.freeze({
       stores: {
         uiDialogs: {
@@ -133,10 +130,8 @@ export default class WalletTransferPage extends Component<Props> {
         },
       },
       actions: {
-        ada: {
-          yoroiTransfer: {
-            startTransferFunds: { trigger: yoroiTransfer.startTransferFunds.trigger },
-          },
+        yoroiTransfer: {
+          startTransferFunds: { trigger: actions.yoroiTransfer.startTransferFunds.trigger },
         },
         dialogs: {
           closeActiveDialog: {

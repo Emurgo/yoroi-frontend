@@ -21,37 +21,37 @@ type Props = {|
 export default class ByronEraOptionDialogContainer extends Component<Props> {
 
   startTransferDaedalusFunds: void => void = () => {
-    this.generated.actions.ada.daedalusTransfer.startTransferFunds.trigger();
+    this.generated.actions.daedalusTransfer.startTransferFunds.trigger();
   }
 
   startTransferDaedalusPaperFunds: void => void = () => {
-    this.generated.actions.ada.daedalusTransfer.startTransferPaperFunds.trigger();
+    this.generated.actions.daedalusTransfer.startTransferPaperFunds.trigger();
   }
 
   startTransferDaedalusMasterKe: void => void = () => {
-    this.generated.actions.ada.daedalusTransfer.startTransferMasterKey.trigger();
+    this.generated.actions.daedalusTransfer.startTransferMasterKey.trigger();
   }
 
   startTransferIcarusFunds: void => void = () => {
-    this.generated.actions.ada.yoroiTransfer.startTransferFunds.trigger({
+    this.generated.actions.yoroiTransfer.startTransferFunds.trigger({
       source: TransferSource.BYRON
     });
   }
 
   startTransferYoroiPaperFunds: void => void = () => {
-    this.generated.actions.ada.yoroiTransfer.startTransferPaperFunds.trigger({
+    this.generated.actions.yoroiTransfer.startTransferPaperFunds.trigger({
       source: TransferSource.BYRON
     });
   }
 
   startTransferTrezorFunds: void => void = () => {
-    this.generated.actions.ada.yoroiTransfer.startTransferLegacyHardwareFunds.trigger(
+    this.generated.actions.yoroiTransfer.startTransferLegacyHardwareFunds.trigger(
       TransferKind.TREZOR
     );
   }
 
   startTransferLedgerFunds: void => void = () => {
-    this.generated.actions.ada.yoroiTransfer.startTransferLegacyHardwareFunds.trigger(
+    this.generated.actions.yoroiTransfer.startTransferLegacyHardwareFunds.trigger(
       TransferKind.LEDGER
     );
   }
@@ -85,32 +85,30 @@ export default class ByronEraOptionDialogContainer extends Component<Props> {
       |},
     |},
     actions: {|
-      ada: {|
-        daedalusTransfer: {|
-          startTransferFunds: {|
-            trigger: (params: void) => void
-          |},
-          startTransferMasterKey: {|
-            trigger: (params: void) => void
-          |},
-          startTransferPaperFunds: {|
-            trigger: (params: void) => void
-          |}
+      daedalusTransfer: {|
+        startTransferFunds: {|
+          trigger: (params: void) => void
         |},
-        yoroiTransfer: {|
-          startTransferFunds: {|
-            trigger: (params: {|
-              source: TransferSourceType
-            |}) => void
-          |},
-          startTransferLegacyHardwareFunds: {|
-            trigger: (params: TransferKindType) => void
-          |},
-          startTransferPaperFunds: {|
-            trigger: (params: {|
-              source: TransferSourceType
-            |}) => void
-          |}
+        startTransferMasterKey: {|
+          trigger: (params: void) => void
+        |},
+        startTransferPaperFunds: {|
+          trigger: (params: void) => void
+        |}
+      |},
+      yoroiTransfer: {|
+        startTransferFunds: {|
+          trigger: (params: {|
+            source: TransferSourceType
+          |}) => void
+        |},
+        startTransferLegacyHardwareFunds: {|
+          trigger: (params: TransferKindType) => void
+        |},
+        startTransferPaperFunds: {|
+          trigger: (params: {|
+            source: TransferSourceType
+          |}) => void
         |}
       |}
     |}
@@ -122,8 +120,8 @@ export default class ByronEraOptionDialogContainer extends Component<Props> {
       throw new Error(`${nameof(ByronEraOptionDialogContainer)} no way to generated props`);
     }
     const { actions, stores, } = this.props;
-    const { daedalusTransfer } = actions.ada;
-    const { yoroiTransfer } = actions.ada;
+    const { daedalusTransfer } = actions;
+    const { yoroiTransfer } = actions;
     return Object.freeze({
       stores: {
         profile: {
@@ -131,19 +129,17 @@ export default class ByronEraOptionDialogContainer extends Component<Props> {
         },
       },
       actions: {
-        ada: {
-          daedalusTransfer: {
-            startTransferFunds: { trigger: daedalusTransfer.startTransferFunds.trigger },
-            startTransferPaperFunds: { trigger: daedalusTransfer.startTransferPaperFunds.trigger },
-            startTransferMasterKey: { trigger: daedalusTransfer.startTransferMasterKey.trigger },
+        daedalusTransfer: {
+          startTransferFunds: { trigger: daedalusTransfer.startTransferFunds.trigger },
+          startTransferPaperFunds: { trigger: daedalusTransfer.startTransferPaperFunds.trigger },
+          startTransferMasterKey: { trigger: daedalusTransfer.startTransferMasterKey.trigger },
+        },
+        yoroiTransfer: {
+          startTransferLegacyHardwareFunds: {
+            trigger: yoroiTransfer.startTransferLegacyHardwareFunds.trigger
           },
-          yoroiTransfer: {
-            startTransferLegacyHardwareFunds: {
-              trigger: yoroiTransfer.startTransferLegacyHardwareFunds.trigger
-            },
-            startTransferPaperFunds: { trigger: yoroiTransfer.startTransferPaperFunds.trigger },
-            startTransferFunds: { trigger: yoroiTransfer.startTransferFunds.trigger },
-          },
+          startTransferPaperFunds: { trigger: yoroiTransfer.startTransferPaperFunds.trigger },
+          startTransferFunds: { trigger: yoroiTransfer.startTransferFunds.trigger },
         },
       },
     });

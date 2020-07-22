@@ -35,7 +35,7 @@ import {
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import type { ConceptualWalletSettingsCache } from '../../stores/toplevel/WalletSettingsStore';
-import type { DelegationRequests } from '../../stores/ada/DelegationStore';
+import type { DelegationRequests } from '../../stores/jormungandr/DelegationStore';
 import type { PublicKeyCache } from '../../stores/toplevel/WalletStore';
 import type { TxRequests } from '../../stores/toplevel/TransactionsStore';
 import type { IGetPublic } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
@@ -284,9 +284,11 @@ export default class MyWalletsPage extends Component<Props> {
   getRewardBalance: PublicDeriver<> => null | void | BigNumber = (
     publicDeriver
   ) => {
-    const delegationRequest = this.generated.stores.substores.ada.delegation.getDelegationRequests(
-      publicDeriver
-    );
+    const delegationRequest = this.generated.stores.substores.jormungandr
+      .delegation
+      .getDelegationRequests(
+        publicDeriver
+      );
     if (delegationRequest == null) return undefined;
 
     const balanceResult = delegationRequest.getDelegatedBalance.result;
@@ -324,7 +326,7 @@ export default class MyWalletsPage extends Component<Props> {
     stores: {|
       profile: {| shouldHideBalance: boolean |},
       substores: {|
-        ada: {|
+        jormungandr: {|
           delegation: {|
             getDelegationRequests: (
               PublicDeriver<>
@@ -368,9 +370,9 @@ export default class MyWalletsPage extends Component<Props> {
             stores.walletSettings.getConceptualWalletSettingsCache,
         },
         substores: {
-          ada: {
+          jormungandr: {
             delegation: {
-              getDelegationRequests: stores.substores.ada.delegation.getDelegationRequests,
+              getDelegationRequests: stores.substores.jormungandr.delegation.getDelegationRequests,
             },
           },
         },

@@ -4,7 +4,6 @@ import BigNumber from 'bignumber.js';
 import type {
   AnnotatedTransaction,
   UserAnnotation,
-  BaseSignRequest,
 } from './types';
 import type {
   RemoteUnspentOutput,
@@ -24,24 +23,12 @@ import type { TransactionExportRow } from '../../export';
 import {
   HARD_DERIVATION_START,
 } from '../../../config/numbersConfig';
-import { RustModule } from '../lib/cardanoCrypto/rustLoader';
 import type {
   Addressing,
 } from '../lib/storage/models/PublicDeriver/interfaces';
 import {
   Bip44DerivationLevels,
 } from '../lib/storage/database/walletTypes/bip44/api/utils';
-import {
-  signRequestReceivers,
-  signRequestFee,
-  signRequestTotalInput,
-  byronTxEqual,
-} from './byron/utils';
-import {
-  getJormungandrTxFee,
-  getJormungandrTxReceivers,
-  jormungandrTxEqual,
-} from './jormungandr/utils';
 import { getAdaCurrencyMeta } from '../currencyInfo';
 
 export function getFromUserPerspective(data: {|
@@ -194,172 +181,4 @@ export function verifyFromBip44Root(
   if (lastLevelSpecified !== Bip44DerivationLevels.ADDRESS.level) {
     throw new Error(`${nameof(verifyFromBip44Root)} incorrect addressing size`);
   }
-}
-
-export function v3SecretToV2(
-  v3Key: RustModule.WalletV3.Bip32PrivateKey,
-): RustModule.WalletV2.PrivateKey {
-  return RustModule.WalletV2.PrivateKey.from_hex(
-    Buffer.from(v3Key.as_bytes()).toString('hex')
-  );
-}
-export function v3PublicToV2(
-  v3Key: RustModule.WalletV3.Bip32PublicKey,
-): RustModule.WalletV2.PublicKey {
-  return RustModule.WalletV2.PublicKey.from_hex(
-    Buffer.from(v3Key.as_bytes()).toString('hex')
-  );
-}
-
-/**
- * Will return undefined for Daedalus addresses (can't be represented by v3 WASM)
- */
-export function v2SecretToV3(
-  v2Key: RustModule.WalletV2.PrivateKey,
-): RustModule.WalletV3.Bip32PrivateKey | void {
-  try {
-    return RustModule.WalletV3.Bip32PrivateKey.from_bytes(
-      Buffer.from(v2Key.to_hex(), 'hex')
-    );
-  } catch (_e) {
-    return undefined;
-  }
-}
-/**
- * Will return undefined for Daedalus addresses (can't be represented by v3 WASM)
- */
-export function v2PublicToV3(
-  v2Key: RustModule.WalletV2.PublicKey,
-): RustModule.WalletV3.Bip32PublicKey | void {
-  try {
-    return RustModule.WalletV3.Bip32PublicKey.from_bytes(
-      Buffer.from(v2Key.to_hex(), 'hex')
-    );
-  } catch (_e) {
-    return undefined;
-  }
-}
-
-
-export function IGetFee(
-  signRequest: BaseSignRequest<RustModule.WalletV2.Transaction | RustModule.WalletV3.InputOutput>,
-  shift: boolean
-): BigNumber {
-  /**
-   * Note: input-output != estimated fee
-   *
-   * Imagine you send a transaction with 1000 ADA input, 1 ADA output (no change)
-   * Your fee is very small, but the difference between the input & output is high
-   *
-   * Therefore we instead display input - output as the fee in Yoroi
-   * This is safer and gives a more consistent UI
-   */
-  const unsignedTx = signRequest.unsignedTx;
-  if (unsignedTx instanceof RustModule.WalletV2.Transaction) {
-    return signRequestFee(
-      {
-        ...signRequest,
-        unsignedTx,
-      },
-      shift,
-    );
-  }
-  if (unsignedTx instanceof RustModule.WalletV3.InputOutput) {
-    return getJormungandrTxFee(unsignedTx, shift);
-  }
-  throw new Error('IGetFee Unimplemented');
-}
-
-export function ITotalInput(
-  signRequest: BaseSignRequest<RustModule.WalletV2.Transaction | RustModule.WalletV3.InputOutput>,
-  shift: boolean
-): BigNumber {
-  const unsignedTx = signRequest.unsignedTx;
-  return signRequestTotalInput(
-    {
-      ...signRequest,
-      unsignedTx,
-    },
-    shift,
-  );
-}
-
-export function IReceivers(
-  signRequest: BaseSignRequest<RustModule.WalletV2.Transaction | RustModule.WalletV3.InputOutput>,
-  includeChange: boolean
-): Array<string> {
-  const unsignedTx = signRequest.unsignedTx;
-  if (unsignedTx instanceof RustModule.WalletV2.Transaction) {
-    return signRequestReceivers(
-      {
-        ...signRequest,
-        unsignedTx,
-      },
-      includeChange,
-    );
-  }
-  if (unsignedTx instanceof RustModule.WalletV3.InputOutput) {
-    return getJormungandrTxReceivers(
-      {
-        ...signRequest,
-        unsignedTx,
-      },
-      includeChange
-    );
-  }
-  throw new Error('IReceivers Unimplemented');
-}
-
-export function copySignRequest<
-  T: RustModule.WalletV2.Transaction | RustModule.WalletV3.InputOutput
->(
-  signRequest: BaseSignRequest<T>
-): BaseSignRequest<T> {
-  const unsignedTx = signRequest.unsignedTx;
-  if (unsignedTx instanceof RustModule.WalletV2.Transaction) {
-    /**
-     * Signing a tx is a destructive operation in Rust
-     * We create a copy of the tx so the user can retry if they get the password wrong
-     */
-    return {
-      changeAddr: signRequest.changeAddr,
-      senderUtxos: signRequest.senderUtxos,
-      certificate: signRequest.certificate,
-      unsignedTx: unsignedTx.clone(),
-    };
-  }
-  if (unsignedTx instanceof RustModule.WalletV3.InputOutput) {
-    return signRequest;
-  }
-  throw new Error('copySignRequest Unimplemented');
-}
-
-export function ITxEqual(
-  req1: ?BaseSignRequest<RustModule.WalletV2.Transaction | RustModule.WalletV3.InputOutput>,
-  req2: ?BaseSignRequest<RustModule.WalletV2.Transaction | RustModule.WalletV3.InputOutput>,
-): boolean {
-  if (req1 == null) {
-    if (req2 == null) {
-      return true;
-    }
-    return false;
-  }
-  const unsignedTx1 = req1.unsignedTx;
-  if (req2 == null) {
-    return false;
-  }
-  const unsignedTx2 = req2.unsignedTx;
-  if (
-    unsignedTx1 instanceof RustModule.WalletV2.Transaction &&
-    unsignedTx2 instanceof RustModule.WalletV2.Transaction
-  ) {
-    return byronTxEqual(unsignedTx1, unsignedTx2);
-  }
-  if (
-    unsignedTx1 instanceof RustModule.WalletV3.InputOutput &&
-    unsignedTx2 instanceof RustModule.WalletV3.InputOutput
-  ) {
-    return jormungandrTxEqual(unsignedTx1, unsignedTx2);
-  }
-  return false;
 }

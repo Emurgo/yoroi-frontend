@@ -5,12 +5,8 @@ import type {
   TxBodiesRequest, TxBodiesResponse,
   UtxoSumRequest, UtxoSumResponse,
   HistoryRequest, HistoryResponse,
-  RewardHistoryRequest, RewardHistoryResponse,
   BestBlockRequest, BestBlockResponse,
   SignedRequest, SignedResponse,
-  ReputationRequest, ReputationResponse,
-  AccountStateRequest, AccountStateResponse,
-  PoolInfoRequest, PoolInfoResponse,
   SignedRequestInternal,
   RemoteTransaction,
 } from './types';
@@ -30,16 +26,12 @@ import {
   GetUtxosForAddressesApiError,
   GetUtxosSumsForAddressesApiError,
   GetTxHistoryForAddressesApiError,
-  GetRewardHistoryApiError,
   GetBestBlockError,
   SendTransactionApiError,
   CheckAddressesInUseApiError,
   InvalidWitnessError,
-  GetAccountStateApiError,
-  GetPoolInfoApiError,
-  GetReputationError,
   RollbackApiError,
-} from '../../errors';
+} from '../../../common/errors';
 
 import type { ConfigType } from '../../../../../config/config-types';
 
@@ -48,7 +40,7 @@ const backendUrl = CONFIG.network.backendUrl;
 
 /**
  * Makes calls to Yoroi backend service
- * https://github.com/Emurgo/yoroi-backend-service/
+ * https://github.com/Emurgo/yoroi-graphql-migration-backend
  */
 export class RemoteFetcher implements IFetcher {
 
@@ -147,13 +139,6 @@ export class RemoteFetcher implements IFetcher {
         if (resp.height != null) {
           return resp;
         }
-        // There can only ever be one certificate per tx but our backend returns an array
-        // $FlowExpectedError[prop-missing] remove this if we ever fix this
-        if (resp.certificates != null && resp.certificates.length > 0) {
-          resp.certificate = resp.certificates[0];
-          // $FlowExpectedError[prop-missing] remove this if we ever fix this
-          delete resp.certificates;
-        }
         // $FlowExpectedError[prop-missing] remove if we rename the field in the backend-service
         const height = resp.block_num;
         // $FlowExpectedError[prop-missing] remove if we rename the field in the backend-service
@@ -174,24 +159,6 @@ export class RemoteFetcher implements IFetcher {
           throw new RollbackApiError();
         }
         throw new GetTxHistoryForAddressesApiError();
-      })
-  )
-
-  getRewardHistory: RewardHistoryRequest => Promise<RewardHistoryResponse> = (body) => (
-    axios(
-      `${backendUrl}/api/v2/account/rewards`,
-      {
-        method: 'post',
-        data: body,
-        headers: {
-          'yoroi-version': this.getLastLaunchVersion(),
-          'yoroi-locale': this.getCurrentLocale()
-        }
-      }
-    ).then(response => response.data)
-      .catch((error) => {
-        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getRewardHistory)} error: ` + stringifyError(error));
-        throw new GetRewardHistoryApiError();
       })
   )
 
@@ -255,79 +222,6 @@ export class RemoteFetcher implements IFetcher {
       .catch((error) => {
         Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.checkAddressesInUse)} error: ` + stringifyError(error));
         throw new CheckAddressesInUseApiError();
-      })
-  )
-
-  getAccountState: AccountStateRequest => Promise<AccountStateResponse> = (body) => (
-    axios(
-      `${backendUrl}/api/v2/account/state`,
-      {
-        method: 'post',
-        data: {
-          addresses: body.addresses
-        },
-        headers: {
-          'yoroi-version': this.getLastLaunchVersion(),
-          'yoroi-locale': this.getCurrentLocale()
-        }
-      }
-    ).then(response => {
-      const mapped = {};
-      for (const key of Object.keys(response.data)) {
-        // Jormungandr returns '' when the address is valid but it hasn't appeared in the blockchain
-        // edit: Jormungandr can now also return a description error whe not in the blockchain
-        if (response.data[key] === '' || response.data[key] === 'Account does not exist') {
-          mapped[key] = {
-            delegation: { pools: [], },
-            value: 0,
-            counter: 0,
-          };
-        } else {
-          mapped[key] = response.data[key];
-        }
-      }
-      return mapped;
-    })
-      .catch((error) => {
-        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getAccountState)} error: ` + stringifyError(error));
-        throw new GetAccountStateApiError();
-      })
-  )
-
-  getPoolInfo: PoolInfoRequest => Promise<PoolInfoResponse> = (body) => (
-    axios(
-      `${backendUrl}/api/v2/pool/info`,
-      {
-        method: 'post',
-        data: {
-          ids: body.ids
-        },
-        headers: {
-          'yoroi-version': this.getLastLaunchVersion(),
-          'yoroi-locale': this.getCurrentLocale()
-        }
-      }
-    ).then(response => response.data)
-      .catch((error) => {
-        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getPoolInfo)} error: ` + stringifyError(error));
-        throw new GetPoolInfoApiError();
-      })
-  )
-
-  getReputation: ReputationRequest => Promise<ReputationResponse> = (_body) => (
-    axios(
-      `${backendUrl}/api/v2/pool/reputation`,
-      {
-        method: 'get',
-        headers: {
-          'yoroi-version': this.getLastLaunchVersion(),
-          'yoroi-locale': this.getCurrentLocale()
-        }
-      }
-    ).then(response => response.data)
-      .catch((error) => {
-        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getReputation)} error: ` + stringifyError(error));
-        throw new GetReputationError();
       })
   )
 }

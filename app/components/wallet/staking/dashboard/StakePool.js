@@ -17,7 +17,7 @@ import RawHash from '../../../widgets/hashWrappers/RawHash';
 import ExplorableHashContainer from '../../../../containers/widgets/ExplorableHashContainer';
 import styles from './StakePool.scss';
 import { SelectedExplorer } from '../../../../domain/SelectedExplorer';
-import type { ReputationObject } from '../../../../api/ada/lib/state-fetch/types';
+import type { ReputationObject } from '../../../../api/jormungandr/lib/state-fetch/types';
 import globalMessages from '../../../../i18n/global-messages';
 import WarningIcon from '../../../../assets/images/attention-modern.inline.svg';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';

@@ -9,13 +9,22 @@ import type {
   RestoreModeType,
 } from '../../actions/common/wallet-restore-actions';
 import { RestoreMode } from '../../actions/common/wallet-restore-actions';
-import type { PlateResponse } from '../../api/ada/lib/cardanoCrypto/plate';
+import type { PlateResponse } from '../../api/common/lib/crypto/plate';
 import {
   unscramblePaperAdaMnemonic,
 } from '../../api/ada/lib/cardanoCrypto/paperWallet';
 import {
-  generateStandardPlate,
+  generateByronPlate,
 } from '../../api/ada/lib/cardanoCrypto/plate';
+import {
+  generateJormungandrPlate,
+} from '../../api/jormungandr/lib/crypto/plate';
+import {
+  HARD_DERIVATION_START,
+} from '../../config/numbersConfig';
+import {
+  v4Bip32PrivateToV3,
+} from '../../api/jormungandr/lib/crypto/utils';
 import config from '../../config';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import {
@@ -23,7 +32,7 @@ import {
 } from '../../api/ada/lib/cardanoCrypto/cryptoWallet';
 import { getApiForNetwork } from '../../api/common/utils';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
-import { networks, isJormungandr } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { isJormungandr } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 export const NUMBER_OF_VERIFIED_ADDRESSES = 1;
 export const NUMBER_OF_VERIFIED_ADDRESSES_PAPER = 5;
@@ -36,7 +45,9 @@ export const RestoreSteps = Object.freeze({
 });
 export type RestoreStepsType = $Values<typeof RestoreSteps>;
 
-export default class WalletRestoreStore extends Store {
+export default class AdaWalletRestoreStore extends Store {
+
+  @observable selectedAccount: number = 0 + HARD_DERIVATION_START;
 
   @observable step: RestoreStepsType;
 
@@ -66,7 +77,7 @@ export default class WalletRestoreStore extends Store {
   _verifyMnemonic: void => Promise<void> = async () => {
     const { selectedNetwork } = this.stores.profile;
     if (selectedNetwork == null) throw new Error(`${nameof(this._processRestoreMeta)} no network selected`);
-    if (selectedNetwork.NetworkId === networks.JormungandrMainnet.NetworkId) {
+    if (isJormungandr(selectedNetwork)) {
       runInAction(() => { this.step = RestoreSteps.LEGACY_EXPLANATION; });
     } else {
       await this.actions.walletRestore.startRestore.trigger();
@@ -107,8 +118,9 @@ export default class WalletRestoreStore extends Store {
     if (selectedNetwork == null) throw new Error(`${nameof(this._processRestoreMeta)} no network selected`);
     const { byronPlate, jormungandrPlate } = generatePlates(
       rootPk,
+      this.selectedAccount,
       this.mode,
-      selectedNetwork
+      selectedNetwork,
     );
 
     runInAction(() => {
@@ -143,6 +155,7 @@ export default class WalletRestoreStore extends Store {
     this.step = RestoreSteps.START;
     this.walletRestoreMeta = undefined;
     this.recoveryResult = undefined;
+    this.selectedAccount = 0 + HARD_DERIVATION_START;
   }
 
   isValidMnemonic: {|
@@ -158,35 +171,33 @@ export default class WalletRestoreStore extends Store {
 }
 
 export function generatePlates(
-  rootPk: RustModule.WalletV3.Bip32PrivateKey,
+  rootPk: RustModule.WalletV4.Bip32PrivateKey,
+  accountIndex: number,
   mode: RestoreModeType,
   network: $ReadOnly<NetworkRow>,
 ): {|
   byronPlate: PlateResponse,
   jormungandrPlate: void | PlateResponse,
 |} {
-  const byronPlate = generateStandardPlate(
+  const addressCount = mode === RestoreMode.PAPER
+    ? NUMBER_OF_VERIFIED_ADDRESSES_PAPER
+    : NUMBER_OF_VERIFIED_ADDRESSES;
+
+  const byronPlate = generateByronPlate(
     rootPk,
-    0, // show addresses for account #0
-    mode === RestoreMode.PAPER
-      ? NUMBER_OF_VERIFIED_ADDRESSES_PAPER
-      : NUMBER_OF_VERIFIED_ADDRESSES,
-    environment.getDiscriminant(),
-    true,
+    accountIndex - HARD_DERIVATION_START, // show addresses for account #0
+    addressCount
   );
   // TODO: we disable shelley restoration information for paper wallet restoration
   // this is because we've temporarily disabled paper wallet creation for Shelley
   // so no point in showing the Shelley checksum
   const jormungandrPlate = !isJormungandr(network) || mode === RestoreMode.PAPER
     ? undefined
-    : generateStandardPlate(
-      rootPk,
-      0, // show addresses for account #0
-      mode === RestoreMode.PAPER
-        ? NUMBER_OF_VERIFIED_ADDRESSES_PAPER
-        : NUMBER_OF_VERIFIED_ADDRESSES,
+    : generateJormungandrPlate(
+      v4Bip32PrivateToV3(rootPk),
+      accountIndex - HARD_DERIVATION_START, // show addresses for account #0
+      addressCount,
       environment.getDiscriminant(),
-      false,
     );
 
   return {

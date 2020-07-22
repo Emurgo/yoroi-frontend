@@ -26,8 +26,7 @@ import AdaApi from '../../api/ada/index';
 import {
   generateWalletRootKey,
 } from '../../api/ada/lib/cardanoCrypto/cryptoWallet';
-import { GenericApiError, } from '../../api/common/errors';
-import { NoInputsError } from '../../api/ada/errors';
+import { NoInputsError, GenericApiError, } from '../../api/common/errors';
 import { withScreenshot } from 'storycap';
 import { defaultToSelectedExplorer } from '../../domain/SelectedExplorer';
 import { StepState } from '../../components/widgets/ProgressSteps';
@@ -486,25 +485,21 @@ const restoreWalletProps: {|
         return AdaApi.prototype.isValidPaperMnemonic({ mnemonic, numberOfWords });
       },
     },
-    substores: {
-      ada: {
-        yoroiTransfer: {
-          status: request.yoroiTransferStep || TransferStatus.UNINITIALIZED,
-          error: request.yoroiTransferError,
-          transferTx: {
-            encodedTx: new Uint8Array([]),
-            fee: new BigNumber(1),
-            id: 'b65ae37bcc560e323ea8922de6573004299b6646e69ab9fac305f62f0c94c3ab',
-            receiver: 'Ae2tdPwUPEZ5PxKxoyZDgjsKgMWMpTRa4PH3sVgARSGBsWwNBH3qg7cMFsP',
-            recoveredBalance: new BigNumber(1000),
-            senders: ['Ae2tdPwUPEZE9RAm3d3zuuh22YjqDxhR1JF6G93uJsRrk51QGHzRUzLvDjL'],
-          },
-          transferFundsRequest: {
-            isExecuting: request.yoroiTransferStep === TransferStatus.READY_TO_TRANSFER
-              ? boolean('isExecuting', false)
-              : false,
-          },
-        },
+    yoroiTransfer: {
+      status: request.yoroiTransferStep || TransferStatus.UNINITIALIZED,
+      error: request.yoroiTransferError,
+      transferTx: {
+        encodedTx: new Uint8Array([]),
+        fee: new BigNumber(1),
+        id: 'b65ae37bcc560e323ea8922de6573004299b6646e69ab9fac305f62f0c94c3ab',
+        receiver: 'Ae2tdPwUPEZ5PxKxoyZDgjsKgMWMpTRa4PH3sVgARSGBsWwNBH3qg7cMFsP',
+        recoveredBalance: new BigNumber(1000),
+        senders: ['Ae2tdPwUPEZE9RAm3d3zuuh22YjqDxhR1JF6G93uJsRrk51QGHzRUzLvDjL'],
+      },
+      transferFundsRequest: {
+        isExecuting: request.yoroiTransferStep === TransferStatus.READY_TO_TRANSFER
+          ? boolean('isExecuting', false)
+          : false,
       },
     },
   },
@@ -623,6 +618,7 @@ export const RestoreVerify = (): Node => {
   const selectedNetwork = networks.ByronMainnet;
   const { byronPlate, jormungandrPlate } = generatePlates(
     rootPk,
+    0, // 0th account
     getRestoreMode(),
     selectedNetwork,
   );

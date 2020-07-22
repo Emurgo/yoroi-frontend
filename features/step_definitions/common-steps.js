@@ -1,7 +1,7 @@
 // @flow
 
 import { Before, BeforeAll, Given, Then, After, AfterAll, setDefinitionFunctionWrapper, setDefaultTimeout } from 'cucumber';
-import { getMockServer, closeMockServer } from '../mock-chain/mockServer';
+import { getMockServer, closeMockServer } from '../mock-chain/mockCardanoServer';
 import { By } from 'selenium-webdriver';
 import { enterRecoveryPhrase, assertPlate } from './wallet-restoration-steps';
 import { testWallets } from '../mock-chain/TestWallets';
@@ -9,7 +9,7 @@ import {
   resetChain, MockChain,
   serverIssue, serverFixed,
   appMaintenance, appMaintenanceFinish,
-} from '../mock-chain/mockImporter';
+} from '../mock-chain/mockCardanoImporter';
 import { expect } from 'chai';
 import {
   satisfies,
@@ -272,8 +272,8 @@ async function exportLocalStorage(client, exportDir: string) {
 async function exportIndexedDB(client, exportDir: string) {
   const indexedDBPath = `${exportDir}/indexedDB.json`;
   const indexedDB = await client.driver.executeAsyncScript((done) => {
-    window.yoroi.api.ada.exportLocalDatabase(
-      window.yoroi.stores.loading.loadPersitentDbRequest.result,
+    window.yoroi.api.common.exportLocalDatabase(
+      window.yoroi.stores.loading.loadPersistentDbRequest.result,
     )
       .then(done)
       .catch(err => done(err));
@@ -326,8 +326,8 @@ async function importIndexedDB(client, importDir: string) {
   try {
     const indexedDBData = fs.readFileSync(indexedDBPath).toString();
     await client.driver.executeAsyncScript((data, done) => {
-      window.yoroi.api.ada.importLocalDatabase(
-        window.yoroi.stores.loading.loadPersitentDbRequest.result,
+      window.yoroi.api.common.importLocalDatabase(
+        window.yoroi.stores.loading.loadPersistentDbRequest.result,
         data
       )
         .then(done)
@@ -339,8 +339,8 @@ async function importIndexedDB(client, importDir: string) {
 let capturedDbState = undefined;
 async function captureDbStae(client) {
   const rawDb = await client.driver.executeAsyncScript((done) => {
-    window.yoroi.api.ada.exportLocalDatabase(
-      window.yoroi.stores.loading.loadPersitentDbRequest.result,
+    window.yoroi.api.common.exportLocalDatabase(
+      window.yoroi.stores.loading.loadPersistentDbRequest.result,
     )
       .then(done)
       .catch(err => done(err));
@@ -350,8 +350,8 @@ async function captureDbStae(client) {
 async function compareToCapturedDbState(client, excludeSyncTime) {
   if (capturedDbState == null) throw new Error('Db state was never captured');
   const rawDb = await client.driver.executeAsyncScript((done) => {
-    window.yoroi.api.ada.exportLocalDatabase(
-      window.yoroi.stores.loading.loadPersitentDbRequest.result,
+    window.yoroi.api.common.exportLocalDatabase(
+      window.yoroi.stores.loading.loadPersistentDbRequest.result,
     )
       .then(done)
       .catch(err => done(err));

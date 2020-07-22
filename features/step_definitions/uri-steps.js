@@ -5,7 +5,7 @@ import { By } from 'selenium-webdriver';
 import { expect } from 'chai';
 
 When(/^I click on "generate payment URL" button$/, async function () {
-  await this.click('.WalletReceive_btnGenerateURI');
+  await this.click('.WalletReceive_generateURIIcon');
   await this.waitForElement('.URIGenerateDialog');
 });
 

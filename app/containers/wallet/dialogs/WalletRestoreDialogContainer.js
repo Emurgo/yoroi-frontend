@@ -14,7 +14,7 @@ import globalMessages from '../../../i18n/global-messages';
 import {
   CheckAddressesInUseApiError,
   NoInputsError,
-} from '../../../api/ada/errors';
+} from '../../../api/common/errors';
 import type { RestoreModeType, WalletRestoreMeta } from '../../../actions/common/wallet-restore-actions';
 import { RestoreMode } from '../../../actions/common/wallet-restore-actions';
 import { RestoreSteps } from '../../../stores/toplevel/WalletRestoreStore';
@@ -28,7 +28,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { ApiOptions, getApiForNetwork, getApiMeta } from '../../../api/common/utils';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
-import type { PlateResponse } from '../../../api/ada/lib/cardanoCrypto/plate';
+import type { PlateResponse } from '../../../api/common/lib/crypto/plate';
 import type { RestoreStepsType } from '../../../stores/toplevel/WalletRestoreStore';
 import LocalizableError from '../../../i18n/LocalizableError';
 import type { TransferStatusT, TransferTx } from '../../../types/TransferTypes';
@@ -211,7 +211,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
     (selectedAPI: typeof ApiOptions.ada);
     const apiMeta = getApiMeta(selectedAPI);
     if (apiMeta == null) throw new Error(`${nameof(this._transferDialogContent)} no API selected`);
-    const { yoroiTransfer } = this.generated.stores.substores[ApiOptions.ada];
+    const { yoroiTransfer } = this.generated.stores;
     const adaWalletRestoreActions = this.generated.actions[ApiOptions.ada].walletRestore;
     const walletRestoreActions = this.generated.actions.walletRestore;
     const { profile, } = this.generated.stores;
@@ -351,15 +351,11 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
           mode: $PropertyType<typeof RestoreMode, 'REGULAR'> | $PropertyType<typeof RestoreMode, 'PAPER'>,
         |}) => boolean,
       |},
-      substores: {|
-        ada: {|
-          yoroiTransfer: {|
-            error: ?LocalizableError,
-            status: TransferStatusT,
-            transferFundsRequest: {| isExecuting: boolean |},
-            transferTx: ?TransferTx
-          |}
-        |}
+      yoroiTransfer: {|
+        error: ?LocalizableError,
+        status: TransferStatusT,
+        transferFundsRequest: {| isExecuting: boolean |},
+        transferTx: ?TransferTx
       |},
       uiNotifications: {|
         getTooltipActiveNotification: string => ?Notification,
@@ -411,16 +407,12 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
           walletRestoreMeta: stores.walletRestore.walletRestoreMeta,
           isValidMnemonic: stores.walletRestore.isValidMnemonic,
         },
-        substores: {
-          ada: {
-            yoroiTransfer: {
-              status: stores.substores.ada.yoroiTransfer.status,
-              error: stores.substores.ada.yoroiTransfer.error,
-              transferTx: stores.substores.ada.yoroiTransfer.transferTx,
-              transferFundsRequest: {
-                isExecuting: stores.substores.ada.yoroiTransfer.transferFundsRequest.isExecuting,
-              },
-            },
+        yoroiTransfer: {
+          status: stores.yoroiTransfer.status,
+          error: stores.yoroiTransfer.error,
+          transferTx: stores.yoroiTransfer.transferTx,
+          transferFundsRequest: {
+            isExecuting: stores.yoroiTransfer.transferFundsRequest.isExecuting,
           },
         },
       },
@@ -456,7 +448,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
         ada: {
           walletRestore: {
             transferFromLegacy: {
-              trigger: actions.ada.walletRestore.transferFromLegacy.trigger,
+              trigger: actions.walletRestore.transferFromLegacy.trigger,
             },
           },
         },

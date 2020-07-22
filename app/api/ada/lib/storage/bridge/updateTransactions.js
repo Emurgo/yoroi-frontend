@@ -63,7 +63,6 @@ import type {
 import {
   TxStatusCodes,
   CoreAddressTypes,
-  CertificateRelation,
 } from '../database/primitives/enums';
 import {
   asScanAddresses, asHasLevels, asGetAllUtxos, asGetAllAccounting,
@@ -100,9 +99,8 @@ import type {
   HashToIdsFunc,
 } from '../../../../common/lib/storage/bridge/hashMapper';
 import { STABLE_SIZE } from '../../../../../config/numbersConfig';
-import { RollbackApiError } from '../../../errors';
+import { RollbackApiError } from '../../../../common/errors';
 import { getFromUserPerspective, } from '../../../transactions/utils';
-import { RustModule } from '../../cardanoCrypto/rustLoader';
 
 import type {
   HistoryFunc, BestBlockFunc,
@@ -115,8 +113,6 @@ import type {
   FilterFunc,
 } from '../../../../common/lib/state-fetch/currencySpecificTypes';
 import { addressToKind } from './utils';
-
-import environment from '../../../../../environment';
 
 async function rawGetAllTxIds(
   db: lf$Database,
@@ -153,9 +149,9 @@ async function rawGetAllTxIds(
     utxoAddressIds.push(...ids);
   }
   const accountingAddressIds = [];
-  const withAccounuting = asGetAllAccounting(request.publicDeriver);
-  if (withAccounuting != null) {
-    const foundAddresses = await withAccounuting.rawGetAllAccountingAddresses(
+  const withAccounting = asGetAllAccounting(request.publicDeriver);
+  if (withAccounting != null) {
+    const foundAddresses = await withAccounting.rawGetAllAccountingAddresses(
       dbTx,
       {
         GetPathWithSpecific: deps.GetPathWithSpecific,
@@ -1256,7 +1252,7 @@ async function networkTxToDbTx(
     // For group addresses, they are added dynamically so it's okay
     const id = idMapping.get(hash);
     if (id === undefined) {
-      throw new Error('networkTxToDbTx should never happen id === undefined');
+      throw new Error(`${nameof(networkTxToDbTx)} should never happen id === undefined`);
     }
     return id;
   };
@@ -1270,12 +1266,12 @@ async function networkTxToDbTx(
       BlockSeed,
     );
 
-    const certificate: number => (void | AddCertificateRequest) = networkTx.certificate == null
+    const certificate: number => (void | AddCertificateRequest) = networkTx.certificates == null
       ? (_txId) => {}
       : await certificateToDb(
         db, dbTx,
         {
-          certificate: networkTx.certificate,
+          certificates: networkTx.certificates,
           hashToIds,
           derivationTables,
           firstInput: networkTx.inputs[0],
@@ -1301,16 +1297,8 @@ async function networkTxToDbTx(
               IndexInOwnTx: i,
               Amount: input.amount,
             });
-          } else if (input.type === InputTypes.account) {
-            accountingInputs.push({
-              TransactionId: txRowId,
-              AddressId: getIdOrThrow(input.address),
-              SpendingCounter: input.spendingCounter,
-              IndexInOwnTx: i,
-              Amount: input.amount,
-            });
           } else {
-            throw new Error('networkTxToDbTx Unhandled input type');
+            throw new Error(`${nameof(networkTxToDbTx)} Unhandled input type`);
           }
         }
         for (let i = 0; i < networkTx.outputs.length; i++) {
@@ -1320,8 +1308,9 @@ async function networkTxToDbTx(
           // since the payment (UTXO) key is the one that signs
           if (
             txType === CoreAddressTypes.CARDANO_LEGACY ||
-            txType === CoreAddressTypes.JORMUNGANDR_SINGLE ||
-            txType === CoreAddressTypes.JORMUNGANDR_GROUP
+            txType === CoreAddressTypes.CARDANO_ENTERPRISE ||
+            txType === CoreAddressTypes.CARDANO_BASE ||
+            txType === CoreAddressTypes.CARDANO_PTR
           ) {
             utxoOutputs.push({
               TransactionId: txRowId,
@@ -1336,17 +1325,12 @@ async function networkTxToDbTx(
               IsUnspent: true,
             });
           } else if (
-            txType === CoreAddressTypes.JORMUNGANDR_ACCOUNT
+            txType === CoreAddressTypes.CARDANO_REWARD
           ) {
-            accountingOutputs.push({
-              TransactionId: txRowId,
-              AddressId: getIdOrThrow(output.address),
-              OutputIndex: i,
-              Amount: output.amount,
-            });
+            throw new Error(`${nameof(networkTxToDbTx)} cannot send to a reward address`);
           } else {
             // TODO: handle multisig
-            throw new Error('networkTxToDbTx Unhandled output type');
+            throw new Error(`${nameof(networkTxToDbTx)} Unhandled output type`);
           }
         }
 
@@ -1471,133 +1455,16 @@ export function networkTxHeaderToDb(
 }
 
 async function certificateToDb(
+  /* eslint-disable no-unused-vars */
   db: lf$Database,
   dbTx: lf$Transaction,
   request: {|
-    certificate: RemoteCertificate,
+    certificates: Array<RemoteCertificate>,
     hashToIds: HashToIdsFunc,
     derivationTables: Map<number, string>,
     firstInput: RemoteTransactionInput,
   |},
+  /* eslint-enable no-unused-vars */
 ): Promise<number => AddCertificateRequest> {
-  const accountToId = async (account: RustModule.WalletV3.Account): Promise<number> => {
-    const address = account.to_address(
-      // TODO: should come from the public deriver, not environment
-      environment.getDiscriminant(),
-    );
-    const hash = Buffer.from(address.as_bytes()).toString('hex');
-    const idMap = await request.hashToIds({
-      db,
-      tx: dbTx,
-      lockedTables: Array.from(request.derivationTables.values()),
-      hashes: [hash]
-    });
-    const id = idMap.get(hash);
-    if (id === undefined) {
-      throw new Error('certificateToDb should never happen id === undefined');
-    }
-    return id;
-  };
-
-  const kind = request.certificate.payloadKindId;
-  switch (kind) {
-    case RustModule.WalletV3.CertificateKind.StakeDelegation: {
-      const cert = RustModule.WalletV3.StakeDelegation.from_bytes(
-        Buffer.from(request.certificate.payloadHex, 'hex')
-      );
-      const accountIdentifier = cert.account();
-      // TODO: this could be a multi sig instead of a single account
-      // you can differntiate by looking at the witness type
-      // but we don't have access to the witness right now
-      const account = accountIdentifier.to_account_single();
-      const addressId = await accountToId(account);
-
-      return (txId: number) => ({
-        certificate: {
-          Kind: kind,
-          Payload: request.certificate.payloadHex,
-          TransactionId: txId,
-        },
-        relatedAddresses: (certId: number) => [{
-          CertificateId: certId,
-          AddressId: addressId,
-          Relation: CertificateRelation.SIGNER,
-        }]
-      });
-    }
-    case RustModule.WalletV3.CertificateKind.OwnerStakeDelegation: {
-      const idMap = await request.hashToIds({
-        db,
-        tx: dbTx,
-        lockedTables: Array.from(request.derivationTables.values()),
-        hashes: [request.firstInput.address]
-      });
-      const addressId = idMap.get(request.firstInput.address);
-      if (addressId === undefined) {
-        throw new Error('certificateToDb should never happen id === undefined');
-      }
-      return (txId: number) => ({
-        certificate: {
-          Kind: kind,
-          Payload: request.certificate.payloadHex,
-          TransactionId: txId,
-        },
-        relatedAddresses: (certId: number) => [{
-          CertificateId: certId,
-          AddressId: addressId,
-          Relation: CertificateRelation.SIGNER,
-        }]
-      });
-    }
-    case RustModule.WalletV3.CertificateKind.PoolRegistration: {
-      const cert = RustModule.WalletV3.PoolRegistration.from_bytes(
-        Buffer.from(request.certificate.payloadHex, 'hex')
-      );
-      const accountIdentifier = cert.reward_account();
-      const rewardAccountId = accountIdentifier == null
-        ? null
-        : await accountToId(accountIdentifier);
-
-      return (txId: number) => ({
-        certificate: {
-          Kind: kind,
-          Payload: request.certificate.payloadHex,
-          TransactionId: txId,
-        },
-        // TODO - can't know signer
-        relatedAddresses: (certId: number) => [
-          ...(rewardAccountId != null
-            ? [{
-              CertificateId: certId,
-              AddressId: rewardAccountId,
-              Relation: CertificateRelation.REWARD_ADDRESS,
-            }]
-            : [])
-        ]
-      });
-    }
-    case RustModule.WalletV3.CertificateKind.PoolRetirement: {
-      return (txId: number) => ({
-        certificate: {
-          Kind: kind,
-          Payload: request.certificate.payloadHex,
-          TransactionId: txId,
-        },
-        // TODO - can't know signer
-        relatedAddresses: (_certId: number) => []
-      });
-    }
-    case RustModule.WalletV3.CertificateKind.PoolUpdate: {
-      return (txId: number) => ({
-        certificate: {
-          Kind: kind,
-          Payload: request.certificate.payloadHex,
-          TransactionId: txId,
-        },
-        // TODO - can't know signer
-        relatedAddresses: (_certId: number) => []
-      });
-    }
-    default: throw new Error('uknown cert type ' + kind);
-  }
+  throw new Error(`Not implemented yet`);
 }

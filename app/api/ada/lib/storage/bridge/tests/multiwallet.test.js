@@ -8,11 +8,13 @@ import '../../../test-config';
 import type { RemoteTransaction } from '../../../state-fetch/types';
 import {
   setup,
-  mockDate,
-  filterDbSnapshot,
+} from './common';
+import {
   ABANDON_SHARE,
   TX_TEST_MNEMONIC_1,
-} from './common';
+  mockDate,
+  filterDbSnapshot,
+} from '../../../../../jestUtils';
 import {
   HARD_DERIVATION_START,
   WalletTypePurpose,
@@ -25,7 +27,7 @@ import {
   genGetTransactionsHistoryForAddresses,
   genGetBestBlock,
   getSingleAddressString,
-} from './mockNetwork';
+} from '../../../state-fetch/mockNetwork';
 import { loadLovefieldDB } from '../../database/index';
 
 import {
@@ -208,9 +210,7 @@ async function checkPub1HasTx(
           TransactionId: 1
         },
         UtxoTransactionOutput: {
-          AddressId: purposeForTest === WalletTypePurpose.CIP1852
-            ? 9
-            : 5,
+          AddressId: 5,
           Amount: '2100000',
           IsUnspent: true,
           OutputIndex: 0,
@@ -316,9 +316,7 @@ async function checkPub2HasTx(
           TransactionId: 2
         },
         UtxoTransactionOutput: {
-          AddressId: purposeForTest === WalletTypePurpose.CIP1852
-            ? 82
-            : 41,
+          AddressId: 41,
           Amount: '2700000',
           IsUnspent: true,
           OutputIndex: 1,
@@ -353,9 +351,7 @@ async function syncingSimpleTransaction(
   const publicDeriver2 = await setup(db, TX_TEST_MNEMONIC_2, purposeForTest);
 
   const txHistory = networkTransactions(purposeForTest);
-  const network = purposeForTest === WalletTypePurpose.BIP44
-    ? networks.ByronMainnet
-    : networks.JormungandrMainnet;
+  const network = networks.ByronMainnet;
   const checkAddressesInUse = genCheckAddressesInUse(txHistory, network);
   const getTransactionsHistoryForAddresses = genGetTransactionsHistoryForAddresses(
     txHistory,
@@ -503,9 +499,5 @@ async function syncingSimpleTransaction(
 
 test('Syncing simple transaction bip44', async (done) => {
   await syncingSimpleTransaction(WalletTypePurpose.BIP44);
-  done();
-});
-test('Syncing simple transaction cip1852', async (done) => {
-  await syncingSimpleTransaction(WalletTypePurpose.CIP1852);
   done();
 });

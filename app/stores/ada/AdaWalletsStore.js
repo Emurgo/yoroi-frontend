@@ -8,40 +8,45 @@ import {
 } from '../../utils/logging';
 import Request from '../lib/LocalizedRequest';
 import type {
-  SignAndBroadcastRequest, SignAndBroadcastResponse,
   GenerateWalletRecoveryPhraseFunc
 } from '../../api/ada/index';
-import type { BaseSignRequest } from '../../api/ada/transactions/types';
 import {
   asGetSigningKey,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
-import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
+import { ByronTxSignRequest } from '../../api/ada/transactions/byron/ByronTxSignRequest';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import { ROUTES } from '../../routes-config';
+import { buildCheckAndCall } from '../lib/check';
+import { getApiForNetwork, ApiOptions } from '../../api/common/utils';
+import type { ISignRequest } from '../../api/common/lib/transactions/ISignRequest';
 
 export default class AdaWalletsStore extends Store {
 
   // REQUESTS
-  @observable sendMoneyRequest: Request<typeof AdaWalletsStore.prototype.sendAndRefresh>
-    = new Request<typeof AdaWalletsStore.prototype.sendAndRefresh>(this.sendAndRefresh);
 
   @observable generateWalletRecoveryPhraseRequest: Request<GenerateWalletRecoveryPhraseFunc>
     = new Request<GenerateWalletRecoveryPhraseFunc>(this.api.ada.generateWalletRecoveryPhrase);
 
   setup(): void {
     super.setup();
-    const { ada, walletBackup } = this.actions;
-    const { wallets } = ada;
-    walletBackup.finishWalletBackup.listen(this._createInDb);
-    wallets.createWallet.listen(this._startWalletCreation);
-    wallets.sendMoney.listen(this._sendMoney);
+    const { ada, wallets, walletBackup } = this.actions;
+    const { asyncCheck } = buildCheckAndCall(
+      ApiOptions.ada,
+      () => {
+        if (this.stores.profile.selectedNetwork == null) return undefined;
+        return getApiForNetwork(this.stores.profile.selectedNetwork);
+      }
+    );
+    walletBackup.finishWalletBackup.listen(asyncCheck(this._createInDb));
+    ada.wallets.createWallet.listen(this._startWalletCreation);
+    wallets.sendMoney.listen(asyncCheck(this._sendMoney));
   }
 
   // =================== SEND MONEY ==================== //
 
   /** Send money and then return to transaction screen */
   _sendMoney:  {|
-    signRequest: BaseSignRequest<RustModule.WalletV2.Transaction | RustModule.WalletV3.InputOutput>,
+    signRequest: ISignRequest<any>,
     password: string,
     publicDeriver: PublicDeriver<>,
   |} => Promise<void> = async (transactionDetails) => {
@@ -49,19 +54,23 @@ export default class AdaWalletsStore extends Store {
     if (withSigning == null) {
       throw new Error(`${nameof(this._sendMoney)} public deriver missing signing functionality.`);
     }
-    await this.sendMoneyRequest.execute({
-      broadcastRequest: {
+    const { signRequest } = transactionDetails;
+    if (!(signRequest instanceof ByronTxSignRequest)) {
+      throw new Error(`${nameof(this._sendMoney)} wrong tx sign request`);
+    }
+    await this.stores.wallets.sendMoneyRequest.execute({
+      broadcastRequest: async () => await this.api.ada.signAndBroadcast({
         publicDeriver: withSigning,
         password: transactionDetails.password,
-        signRequest: transactionDetails.signRequest,
+        signRequest: signRequest.self(),
         sendTx: this.stores.substores.ada.stateFetchStore.fetcher.sendTx,
-      },
+      }),
       refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(
         transactionDetails.publicDeriver
       ),
     })
       .then(async (response) => {
-        const memo = this.stores.substores.ada.transactionBuilderStore.memo;
+        const memo = this.stores.transactionBuilderStore.memo;
         if (memo !== '' && memo !== undefined) {
           try {
             await this.actions.memos.saveTxMemo.trigger({
@@ -81,7 +90,7 @@ export default class AdaWalletsStore extends Store {
       });
 
     this.actions.dialogs.closeActiveDialog.trigger();
-    this.sendMoneyRequest.reset();
+    this.stores.wallets.sendMoneyRequest.reset();
     this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ROOT });
   };
 
@@ -106,7 +115,7 @@ export default class AdaWalletsStore extends Store {
 
   /** Create the wallet and go to wallet summary screen */
   _createInDb: void => Promise<void> = async () => {
-    const persistentDb = this.stores.loading.loadPersitentDbRequest.result;
+    const persistentDb = this.stores.loading.loadPersistentDbRequest.result;
     if (persistentDb == null) {
       throw new Error(`${nameof(this._createInDb)} db not loaded. Should never happen`);
     }
@@ -119,22 +128,9 @@ export default class AdaWalletsStore extends Store {
         walletPassword: this.stores.walletBackup.password,
         recoveryPhrase: this.stores.walletBackup.recoveryPhrase.join(' '),
         network: selectedNetwork,
+        accountIndex: this.stores.walletBackup.selectedAccount,
       });
       return wallet;
     }).promise;
   };
-
-  sendAndRefresh: {|
-    broadcastRequest: SignAndBroadcastRequest,
-    refreshWallet: () => Promise<void>,
-  |} => Promise<SignAndBroadcastResponse> = async (request) => {
-    const result = await this.api.ada.signAndBroadcast(request.broadcastRequest);
-    try {
-      await request.refreshWallet();
-    } catch (_e) {
-      // even if refreshing the wallet fails, we don't want to fail the tx
-      // otherwise user may try and re-send the tx
-    }
-    return result;
-  }
 }

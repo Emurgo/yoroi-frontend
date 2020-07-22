@@ -53,13 +53,7 @@ export type UnsignedTxResponse = {|
   txBuilder: RustModule.WalletV2.TransactionBuilder,
   changeAddr: Array<{| ...Address, ...Value, ...Addressing |}>,
 |};
-export type BaseSignRequest<
-  T: (
-    RustModule.WalletV4.TransactionBody |
-    RustModule.WalletV2.Transaction |
-    RustModule.WalletV3.InputOutput
-  )
-> = {|
+export type BaseSignRequest<T> = {|
   senderUtxos: Array<AddressedUtxo>,
   unsignedTx: T,
   changeAddr: Array<{| ...Address, ...Value, ...Addressing |}>,

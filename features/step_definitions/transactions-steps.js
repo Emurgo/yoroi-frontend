@@ -4,7 +4,7 @@ import { Given, When, Then } from 'cucumber';
 import { By } from 'selenium-webdriver';
 import { expect } from 'chai';
 import i18n from '../support/helpers/i18n-helpers';
-import { addTransaction, generateTransaction, } from '../mock-chain/mockImporter';
+import { addTransaction, generateTransaction, } from '../mock-chain/mockCardanoImporter';
 
 Given(/^I have a wallet with funds$/, async function () {
   const amountWithCurrency = await this.driver.findElements(By.xpath("//div[@class='WalletTopbarTitle_walletAmount']"));

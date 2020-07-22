@@ -14,7 +14,7 @@ import LocalizedRequest from '../lib/LocalizedRequest';
 
 import globalMessages from '../../i18n/global-messages';
 import LocalizableError, { UnexpectedError } from '../../i18n/LocalizableError';
-import { CheckAddressesInUseApiError } from '../../api/ada/errors';
+import { CheckAddressesInUseApiError } from '../../api/common/errors';
 import { derivePathPrefix } from '../../api/ada/transactions/utils';
 import { getTrezorManifest, wrapWithFrame, wrapWithoutFrame } from '../lib/TrezorWrapper';
 
@@ -391,7 +391,7 @@ export default class TrezorConnectStore
       throw new Error('Trezor device hardware info not valid');
     }
 
-    const persistentDb = this.stores.loading.loadPersitentDbRequest.result;
+    const persistentDb = this.stores.loading.loadPersistentDbRequest.result;
     if (persistentDb == null) {
       throw new Error(`${nameof(this._prepareCreateHWReqParams)} db not loaded. Should never happen`);
     }

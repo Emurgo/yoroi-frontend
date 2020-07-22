@@ -13,9 +13,6 @@ import VerticallyCenteredLayout from '../../components/layout/VerticallyCentered
 import Dialog from '../../components/widgets/Dialog';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import { formattedWalletAmount } from '../../utils/formatters';
-import { IGetFee, IReceivers, ITotalInput } from '../../api/ada/transactions/utils';
-import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
-import type { BaseSignRequest } from '../../api/ada/transactions/types';
 import {
   asHasUtxoChains,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
@@ -28,10 +25,11 @@ import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/in
 import { SelectedExplorer } from '../../domain/SelectedExplorer';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import LocalizableError from '../../i18n/LocalizableError';
-import type { SetupSelfTxRequest } from '../../stores/ada/AdaTransactionBuilderStore';
+import type { SetupSelfTxRequest } from '../../stores/toplevel/TransactionBuilderStore';
 import { ApiOptions, getApiForNetwork, getApiMeta } from '../../api/common/utils';
 import { GROUP_MANGLED } from '../../stores/stateless/addressStores';
 import type { IAddressTypeStore, IAddressTypeUiSubset } from '../../stores/stateless/addressStores';
+import type { ISignRequest } from '../../api/common/lib/transactions/ISignRequest';
 
 declare var CONFIG: ConfigType;
 
@@ -77,7 +75,7 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
     );
 
     // note: don't await
-    this.generated.actions.ada.txBuilderActions.initialize.trigger({
+    this.generated.actions.txBuilderActions.initialize.trigger({
       publicDeriver: withChains,
       /**
        * We filter to only UTXOs of mangled addresses
@@ -88,9 +86,9 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
   }
 
   componentWillUnmount() {
-    const builderActions = this.generated.actions.ada.txBuilderActions;
+    const builderActions = this.generated.actions.txBuilderActions;
     builderActions.reset.trigger();
-    this.generated.stores.substores.ada.wallets.sendMoneyRequest.reset();
+    this.generated.stores.wallets.sendMoneyRequest.reset();
   }
 
   submit: void => Promise<void> = async () => {
@@ -105,9 +103,9 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
       onSuccess: async (form) => {
         const { walletPassword } = form.values();
 
-        const txBuilderStore = this.generated.stores.substores.ada.transactionBuilderStore;
+        const txBuilderStore = this.generated.stores.transactionBuilderStore;
         if (txBuilderStore.tentativeTx == null) return;
-        await this.generated.actions.ada.wallets.sendMoney.trigger({
+        await this.generated.actions.wallets.sendMoney.trigger({
           signRequest: txBuilderStore.tentativeTx,
           password: walletPassword,
           publicDeriver: selected,
@@ -118,7 +116,7 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
   };
 
   render(): Node {
-    const txBuilder = this.generated.stores.substores.ada.transactionBuilderStore;
+    const txBuilder = this.generated.stores.transactionBuilderStore;
 
     if (txBuilder.setupSelfTx.error != null) {
       return (
@@ -153,9 +151,7 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
     );
   }
 
-  getContent: BaseSignRequest<
-    RustModule.WalletV2.Transaction | RustModule.WalletV3.InputOutput
-  > => Node = (
+  getContent:  ISignRequest<any> => Node = (
     tentativeTx
   ) => {
     const selected = this.generated.stores.wallets.selected;
@@ -179,18 +175,20 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
       : null;
 
     const transferTx = {
-      recoveredBalance: ITotalInput(tentativeTx, true),
-      fee: IGetFee(tentativeTx, true),
-      senders: Array.from(new Set(tentativeTx.senderUtxos.map(utxo => utxo.receiver)))
+      recoveredBalance: tentativeTx.totalInput(true),
+      fee: tentativeTx.fee(true),
+      senders: tentativeTx
+        .uniqueSenderAddresses()
         .map(addr => addressToDisplayString(addr, selected.getParent.getNetworkInfo())),
-      receiver: IReceivers(tentativeTx, false)
+      receiver: tentativeTx
+        .receivers(false)
         .map(addr => addressToDisplayString(addr, selected.getParent.getNetworkInfo()))[0],
     };
 
     const spendingPasswordForm = (<SpendingPasswordInput
       setForm={(form) => this.setSpendingPasswordForm(form)}
       classicTheme={this.generated.stores.profile.isClassicTheme}
-      isSubmitting={this.generated.stores.substores.ada.wallets.sendMoneyRequest.isExecuting}
+      isSubmitting={this.generated.stores.wallets.sendMoneyRequest.isExecuting}
     />);
 
     const { intl } = this.context;
@@ -207,9 +205,9 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
         }
         transferTx={transferTx}
         onSubmit={this.submit}
-        isSubmitting={this.generated.stores.substores.ada.wallets.sendMoneyRequest.isExecuting}
+        isSubmitting={this.generated.stores.wallets.sendMoneyRequest.isExecuting}
         onCancel={this.props.onClose}
-        error={this.generated.stores.substores.ada.wallets.sendMoneyRequest.error}
+        error={this.generated.stores.wallets.sendMoneyRequest.error}
         dialogTitle={intl.formatMessage(globalMessages.walletSendConfirmationDialogTitle)}
         coinPrice={coinPrice}
         unitOfAccountSetting={this.generated.stores.profile.unitOfAccount}
@@ -219,23 +217,19 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
 
   @computed get generated(): {|
     actions: {|
-      ada: {|
-        txBuilderActions: {|
-          reset: {| trigger: (params: void) => void |},
-          initialize: {| trigger: (params: SetupSelfTxRequest) => Promise<void> |},
-        |},
-        wallets: {|
-          sendMoney: {|
-            trigger: (params: {|
-              password: string,
-              publicDeriver: PublicDeriver<>,
-              signRequest: BaseSignRequest<
-                RustModule.WalletV2.Transaction | RustModule.WalletV3.InputOutput
-              >
-            |}) => Promise<void>
-          |}
+      txBuilderActions: {|
+        reset: {| trigger: (params: void) => void |},
+        initialize: {| trigger: (params: SetupSelfTxRequest) => Promise<void> |},
+      |},
+      wallets: {|
+        sendMoney: {|
+          trigger: (params: {|
+            password: string,
+            publicDeriver: PublicDeriver<>,
+            signRequest: ISignRequest<any>,
+          |}) => Promise<void>
         |}
-      |}
+      |},
     |},
     stores: {|
       coinPriceStore: {|
@@ -251,26 +245,20 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
       addresses: {|
         addressSubgroupMap: $ReadOnlyMap<Class<IAddressTypeStore>, IAddressTypeUiSubset>,
       |},
-      substores: {|
-        ada: {|
-          transactionBuilderStore: {|
-            setupSelfTx: {|
-              error: ?LocalizableError,
-            |},
-            tentativeTx: null | BaseSignRequest<
-            RustModule.WalletV2.Transaction | RustModule.WalletV3.InputOutput
-            >
-          |},
-          wallets: {|
-            sendMoneyRequest: {|
-              error: ?LocalizableError,
-              isExecuting: boolean,
-              reset: () => void
-            |}
-          |}
-        |}
+      transactionBuilderStore: {|
+        setupSelfTx: {|
+          error: ?LocalizableError,
+        |},
+        tentativeTx: null | ISignRequest<any>,
       |},
-      wallets: {| selected: null | PublicDeriver<> |}
+      wallets: {|
+        selected: null | PublicDeriver<>,
+        sendMoneyRequest: {|
+          error: ?LocalizableError,
+          isExecuting: boolean,
+          reset: () => void
+        |},
+      |}
     |}
     |} {
     if (this.props.generated !== undefined) {
@@ -291,6 +279,11 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
         },
         wallets: {
           selected: stores.wallets.selected,
+          sendMoneyRequest: {
+            reset: stores.wallets.sendMoneyRequest.reset,
+            error: stores.wallets.sendMoneyRequest.error,
+            isExecuting: stores.wallets.sendMoneyRequest.isExecuting,
+          },
         },
         coinPriceStore: {
           getCurrentPrice: stores.coinPriceStore.getCurrentPrice,
@@ -298,38 +291,25 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
         addresses: {
           addressSubgroupMap: stores.addresses.addressSubgroupMap,
         },
-        substores: {
-          ada: {
-            wallets: {
-              sendMoneyRequest: {
-                reset: stores.substores.ada.wallets.sendMoneyRequest.reset,
-                error: stores.substores.ada.wallets.sendMoneyRequest.error,
-                isExecuting: stores.substores.ada.wallets.sendMoneyRequest.isExecuting,
-              },
-            },
-            transactionBuilderStore: {
-              tentativeTx: stores.substores.ada.transactionBuilderStore.tentativeTx,
-              setupSelfTx: {
-                error: stores.substores.ada.transactionBuilderStore.setupSelfTx.error,
-              },
-            },
+        transactionBuilderStore: {
+          tentativeTx: stores.transactionBuilderStore.tentativeTx,
+          setupSelfTx: {
+            error: stores.transactionBuilderStore.setupSelfTx.error,
           },
         },
       },
       actions: {
-        ada: {
-          txBuilderActions: {
-            initialize: {
-              trigger: actions.ada.txBuilderActions.initialize.trigger,
-            },
-            reset: {
-              trigger: actions.ada.txBuilderActions.reset.trigger
-            },
+        txBuilderActions: {
+          initialize: {
+            trigger: actions.txBuilderActions.initialize.trigger,
           },
-          wallets: {
-            sendMoney: {
-              trigger: actions.ada.wallets.sendMoney.trigger
-            },
+          reset: {
+            trigger: actions.txBuilderActions.reset.trigger
+          },
+        },
+        wallets: {
+          sendMoney: {
+            trigger: actions.wallets.sendMoney.trigger
           },
         },
       },

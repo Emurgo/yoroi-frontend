@@ -15,7 +15,7 @@ import {
 } from './transactions';
 import {
   NotEnoughMoneyToSendError,
-} from '../../errors';
+} from '../../../common/errors';
 
 import {
   loadLovefieldDB,

@@ -26,18 +26,17 @@ import { defaultToSelectedExplorer } from '../../../domain/SelectedExplorer';
 import { buildRoute } from '../../../utils/routing';
 import { ROUTES } from '../../../routes-config';
 import { THEMES } from '../../../themes';
-import { GenericApiError, } from '../../../api/common/errors';
 import { wrapWallet } from '../../../Routes';
 import type {
   GetDelegatedBalanceFunc,
   CertificateForEpoch,
   GetCurrentDelegationFunc,
-} from '../../../api/ada/lib/storage/bridge/delegationUtils';
+} from '../../../api/jormungandr/lib/storage/bridge/delegationUtils';
 import type {
   RewardHistoryForWallet,
   DelegationRequests,
-} from '../../../stores/ada/DelegationStore';
-import { GetAccountStateApiError, GetPoolInfoApiError } from '../../../api/ada/errors';
+} from '../../../stores/jormungandr/DelegationStore';
+import { GenericApiError, GetAccountStateApiError, GetPoolInfoApiError } from '../../../api/common/errors';
 import LessThanExpectedDialog from '../../../components/wallet/staking/dashboard/LessThanExpectedDialog';
 import UnmangleTxDialogContainer from '../../transfer/UnmangleTxDialogContainer';
 import PoolWarningDialog from '../../../components/wallet/staking/dashboard/PoolWarningDialog';
@@ -121,7 +120,7 @@ const genBaseProps: {|
         ]]),
       },
       substores: {
-        ada: {
+        jormungandr: {
           time: {
             getTimeCalcRequests: request.lookup.getTimeCalcRequests,
             getCurrentTimeRequests: request.lookup.getCurrentTimeRequests,
@@ -161,7 +160,7 @@ const genBaseProps: {|
           trigger: action('closeActiveDialog'),
         },
       },
-      ada: {
+      jormungandr: {
         delegationTransaction: {
           reset: {
             trigger: action('closeActiveDialog'),
@@ -179,7 +178,7 @@ const genBaseProps: {|
       generated: {
         stores: {
           substores: {
-            ada: {
+            jormungandr: {
               time: {
                 getTimeCalcRequests: request.lookup.getTimeCalcRequests,
                 getCurrentTimeRequests: request.lookup.getCurrentTimeRequests,
@@ -201,6 +200,22 @@ const genBaseProps: {|
           },
           wallets: {
             selected: request.wallet.publicDeriver,
+            sendMoneyRequest: (
+              request.transactionBuilderStore == null
+              || request.transactionBuilderStore.tentativeTx == null
+            )
+              ? {
+                reset: action('reset'),
+                error: undefined,
+                isExecuting: false,
+              }
+              : {
+                reset: action('reset'),
+                error: sendErrorValue() === sendErrorCases.None
+                  ? undefined
+                  : sendErrorValue(),
+                isExecuting: boolean('isExecuting', false),
+              },
           },
           coinPriceStore: {
             getCurrentPrice: (_from, _to) => 5,
@@ -214,44 +229,20 @@ const genBaseProps: {|
               },
             ]]),
           },
-          substores: {
-            ada: {
-              wallets: {
-                sendMoneyRequest: (
-                  request.transactionBuilderStore == null
-                  || request.transactionBuilderStore.tentativeTx == null
-                )
-                  ? {
-                    reset: action('reset'),
-                    error: undefined,
-                    isExecuting: false,
-                  }
-                  : {
-                    reset: action('reset'),
-                    error: sendErrorValue() === sendErrorCases.None
-                      ? undefined
-                      : sendErrorValue(),
-                    isExecuting: boolean('isExecuting', false),
-                  },
-              },
-              transactionBuilderStore: request.transactionBuilderStore || (null: any),
-            },
-          },
+          transactionBuilderStore: request.transactionBuilderStore || (null: any),
         },
         actions: {
-          ada: {
-            txBuilderActions: {
-              initialize: {
-                trigger: async (req) => action('initialize')(req),
-              },
-              reset: {
-                trigger: action('reset'),
-              },
+          txBuilderActions: {
+            initialize: {
+              trigger: async (req) => action('initialize')(req),
             },
-            wallets: {
-              sendMoney: {
-                trigger: async (req) => action('sendMoney')(req),
-              },
+            reset: {
+              trigger: action('reset'),
+            },
+          },
+          wallets: {
+            sendMoney: {
+              trigger: async (req) => action('sendMoney')(req),
             },
           },
         },

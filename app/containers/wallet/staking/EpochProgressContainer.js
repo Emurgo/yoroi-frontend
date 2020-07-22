@@ -8,7 +8,7 @@ import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 import EpochProgress from '../../../components/wallet/staking/dashboard/EpochProgress';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import type { CurrentTimeRequests, TimeCalcRequests } from '../../../stores/ada/AdaTimeStore';
+import type { CurrentTimeRequests, TimeCalcRequests } from '../../../stores/base/BaseCardanoTimeStore';
 
 export type GeneratedData = typeof EpochProgressContainer.prototype.generated;
 
@@ -25,7 +25,7 @@ export default class EpochProgressContainer extends Component<Props> {
   };
 
   async componentDidMount() {
-    const timeStore = this.generated.stores.substores.ada.time;
+    const timeStore = this.generated.stores.substores.jormungandr.time;
     if (this.props.publicDeriver == null) {
       throw new Error(`${nameof(EpochProgressContainer)} no public deriver. Should never happen`);
     }
@@ -41,7 +41,7 @@ export default class EpochProgressContainer extends Component<Props> {
   };
 
   render(): Node {
-    const timeStore = this.generated.stores.substores.ada.time;
+    const timeStore = this.generated.stores.substores.jormungandr.time;
     const timeCalcRequests = timeStore.getTimeCalcRequests(this.props.publicDeriver);
     const currTimeRequests = timeStore.getCurrentTimeRequests(this.props.publicDeriver);
 
@@ -74,7 +74,7 @@ export default class EpochProgressContainer extends Component<Props> {
   @computed get generated(): {|
     stores: {|
       substores: {|
-        ada: {|
+        jormungandr: {|
           time: {|
             getCurrentTimeRequests: (
               PublicDeriver<>
@@ -97,10 +97,10 @@ export default class EpochProgressContainer extends Component<Props> {
     return Object.freeze({
       stores: {
         substores: {
-          ada: {
+          jormungandr: {
             time: {
-              getTimeCalcRequests: stores.substores.ada.time.getTimeCalcRequests,
-              getCurrentTimeRequests: stores.substores.ada.time.getCurrentTimeRequests,
+              getTimeCalcRequests: stores.substores.jormungandr.time.getTimeCalcRequests,
+              getCurrentTimeRequests: stores.substores.jormungandr.time.getCurrentTimeRequests,
             },
           },
         },

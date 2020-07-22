@@ -37,8 +37,8 @@ RustModule._wasmv2 = wasmv2;
 RustModule._wasmv3 = wasmv3;
 RustModule._wasmv4 = wasmv4;
 
-const { getMockServer } = require('../features/mock-chain/mockServer');
-const { MockChain, resetChain } = require('../features/mock-chain/mockImporter');
+const { getMockServer } = require('../features/mock-chain/mockCardanoServer');
+const { MockChain, resetChain } = require('../features/mock-chain/mockCardanoImporter');
 
 getMockServer({ outputLog: true });
 resetChain(MockChain.Standard);

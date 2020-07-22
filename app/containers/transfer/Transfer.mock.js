@@ -12,7 +12,7 @@ import type { GeneratedData as DaedalusTransferPageData } from './DaedalusTransf
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 import WalletSettingsStore from '../../stores/toplevel/WalletSettingsStore';
 import TransactionsStore from '../../stores/toplevel/TransactionsStore';
-import DelegationStore from '../../stores/ada/DelegationStore';
+import DelegationStore from '../../stores/jormungandr/DelegationStore';
 import WalletStore from '../../stores/toplevel/WalletStore';
 import type { GeneratedData } from './Transfer';
 import Transfer from './Transfer';
@@ -130,10 +130,8 @@ export const mockTransferProps: {
             },
             open: { trigger: action('open'), },
           },
-          ada: {
-            yoroiTransfer: {
-              startTransferFunds: { trigger: action('startTransferFunds') },
-            },
+          yoroiTransfer: {
+            startTransferFunds: { trigger: action('startTransferFunds') },
           },
         },
         ByronEraOptionDialogContainerProps: {
@@ -148,19 +146,17 @@ export const mockTransferProps: {
               },
             },
             actions: {
-              ada: {
-                daedalusTransfer: {
-                  startTransferFunds: { trigger: action('startTransferFunds') },
-                  startTransferPaperFunds: { trigger: action('startTransferPaperFunds') },
-                  startTransferMasterKey: { trigger: action('startTransferMasterKey') },
+              daedalusTransfer: {
+                startTransferFunds: { trigger: action('startTransferFunds') },
+                startTransferPaperFunds: { trigger: action('startTransferPaperFunds') },
+                startTransferMasterKey: { trigger: action('startTransferMasterKey') },
+              },
+              yoroiTransfer: {
+                startTransferLegacyHardwareFunds: {
+                  trigger: action('startTransferLegacyHardwareFunds')
                 },
-                yoroiTransfer: {
-                  startTransferLegacyHardwareFunds: {
-                    trigger: action('startTransferLegacyHardwareFunds')
-                  },
-                  startTransferPaperFunds: { trigger: action('startTransferPaperFunds') },
-                  startTransferFunds: { trigger: action('startTransferFunds') },
-                },
+                startTransferPaperFunds: { trigger: action('startTransferPaperFunds') },
+                startTransferFunds: { trigger: action('startTransferFunds') },
               },
             },
           },

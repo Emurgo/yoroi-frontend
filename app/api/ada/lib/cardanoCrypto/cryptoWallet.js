@@ -37,7 +37,7 @@ export const hashRepeatedly = (seed: Buffer): [Buffer, Buffer] => {
   */
 export const generateLedgerWalletRootKey = (
   mnemonic: string
-): RustModule.WalletV3.Bip32PrivateKey => {
+): RustModule.WalletV4.Bip32PrivateKey => {
   // Generate a seed byte sequence S of 512 bits according to BIP-0039.
   const seed = mnemonicToSeedSync(mnemonic);
 
@@ -60,12 +60,12 @@ export const generateLedgerWalletRootKey = (
     [IL, IR, chainCode],
     IL.length + IR.length + chainCode.length
   );
-  return RustModule.WalletV3.Bip32PrivateKey.from_bytes(buffer);
+  return RustModule.WalletV4.Bip32PrivateKey.from_bytes(buffer);
 };
 
 export function generateWalletRootKey(
   mnemonic: string
-): RustModule.WalletV3.Bip32PrivateKey {
+): RustModule.WalletV4.Bip32PrivateKey {
   const bip39entropy = mnemonicToEntropy(mnemonic);
   /**
  * there is no wallet entropy password in yoroi
@@ -74,7 +74,7 @@ export function generateWalletRootKey(
  * it is NOT the spending PASSWORD
  */
   const EMPTY_PASSWORD = Buffer.from('');
-  const rootKey = RustModule.WalletV3.Bip32PrivateKey.from_bip39_entropy(
+  const rootKey = RustModule.WalletV4.Bip32PrivateKey.from_bip39_entropy(
     Buffer.from(bip39entropy, 'hex'),
     EMPTY_PASSWORD
   );

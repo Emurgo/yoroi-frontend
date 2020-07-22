@@ -218,6 +218,19 @@ const genBaseProps: {|
           },
           wallets: {
             selected: request.wallet.publicDeriver,
+            sendMoneyRequest: request.transactionBuilderStore == null
+              ? {
+                reset: action('reset'),
+                error: undefined,
+                isExecuting: false,
+              }
+              : {
+                reset: action('reset'),
+                error: sendErrorValue() === sendErrorCases.None
+                  ? undefined
+                  : sendErrorValue(),
+                isExecuting: boolean('isExecuting', false),
+              },
           },
           coinPriceStore: {
             getCurrentPrice: (_from, _to) => 5,
@@ -225,39 +238,18 @@ const genBaseProps: {|
           addresses: {
             addressSubgroupMap: request.addressSubgroupMap,
           },
-          substores: {
-            ada: {
-              wallets: {
-                sendMoneyRequest: request.transactionBuilderStore == null
-                  ? {
-                    reset: action('reset'),
-                    error: undefined,
-                    isExecuting: false,
-                  }
-                  : {
-                    reset: action('reset'),
-                    error: sendErrorValue() === sendErrorCases.None
-                      ? undefined
-                      : sendErrorValue(),
-                    isExecuting: boolean('isExecuting', false),
-                  },
-              },
-              transactionBuilderStore: request.transactionBuilderStore || (null: any),
-            },
-          },
+          transactionBuilderStore: request.transactionBuilderStore || (null: any),
         },
         actions: {
-          ada: {
-            txBuilderActions: {
-              initialize: { trigger: async (req) => action('initialize')(req), },
-              reset: {
-                trigger: action('reset'),
-              },
+          txBuilderActions: {
+            initialize: { trigger: async (req) => action('initialize')(req), },
+            reset: {
+              trigger: action('reset'),
             },
-            wallets: {
-              sendMoney: {
-                trigger: async (req) => action('sendMoney')(req),
-              },
+          },
+          wallets: {
+            sendMoney: {
+              trigger: async (req) => action('sendMoney')(req),
             },
           },
         },

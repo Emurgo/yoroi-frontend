@@ -6,19 +6,16 @@ import { observable, action } from 'mobx';
 import AdaWalletsStore from './AdaWalletsStore';
 import AdaTransactionsStore from './AdaTransactionsStore';
 import AddressesStore from './AdaAddressesStore';
-import DaedalusTransferStore from './DaedalusTransferStore';
-import YoroiTransferStore from './YoroiTransferStore';
+import AdaDaedalusTransferStore from './AdaDaedalusTransferStore';
+import AdaYoroiTransferStore from './AdaYoroiTransferStore';
 import TrezorConnectStore from './TrezorConnectStore';
 import TrezorSendStore from './TrezorSendStore';
-import AdaTransactionBuilderStore from './AdaTransactionBuilderStore';
 import LedgerConnectStore from './LedgerConnectStore';
 import LedgerSendStore from './LedgerSendStore';
 import HWVerifyAddressStore from './HWVerifyAddressStore';
 import PaperWalletCreateStore from './PaperWalletCreateStore';
 import AdaStateFetchStore from './AdaStateFetchStore';
-import WalletRestoreStore from './WalletRestoreStore';
-import DelegationTransactionStore from './DelegationTransactionStore';
-import DelegationStore from './DelegationStore';
+import AdaWalletRestoreStore from './AdaWalletRestoreStore';
 import AdaTimeStore from './AdaTimeStore';
 import type { ActionsMap } from '../../actions/index';
 import type { Api } from '../../api/index';
@@ -29,18 +26,15 @@ export const adaStoreClasses = Object.freeze({
   paperWallets: PaperWalletCreateStore,
   transactions: AdaTransactionsStore,
   addresses: AddressesStore,
-  daedalusTransfer: DaedalusTransferStore,
-  yoroiTransfer: YoroiTransferStore,
+  daedalusTransfer: AdaDaedalusTransferStore,
+  yoroiTransfer: AdaYoroiTransferStore,
   trezorConnect: TrezorConnectStore,
   trezorSend: TrezorSendStore,
   ledgerConnect: LedgerConnectStore,
   ledgerSend: LedgerSendStore,
   hwVerifyAddress: HWVerifyAddressStore,
   stateFetchStore: AdaStateFetchStore,
-  transactionBuilderStore: AdaTransactionBuilderStore,
-  walletRestore: WalletRestoreStore,
-  delegationTransaction: DelegationTransactionStore,
-  delegation: DelegationStore,
+  walletRestore: AdaWalletRestoreStore,
   time: AdaTimeStore,
 });
 
@@ -49,18 +43,15 @@ export type AdaStoresMap = {|
   paperWallets: PaperWalletCreateStore,
   transactions: AdaTransactionsStore,
   addresses: AddressesStore,
-  daedalusTransfer: DaedalusTransferStore,
-  yoroiTransfer: YoroiTransferStore,
+  daedalusTransfer: AdaDaedalusTransferStore,
+  yoroiTransfer: AdaYoroiTransferStore,
   trezorConnect: TrezorConnectStore,
   trezorSend: TrezorSendStore,
   ledgerConnect: LedgerConnectStore,
   ledgerSend: LedgerSendStore,
   hwVerifyAddress: HWVerifyAddressStore,
   stateFetchStore: AdaStateFetchStore,
-  transactionBuilderStore: AdaTransactionBuilderStore,
-  walletRestore: WalletRestoreStore,
-  delegationTransaction: DelegationTransactionStore,
-  delegation: DelegationStore,
+  walletRestore: AdaWalletRestoreStore,
   time: AdaTimeStore,
 |};
 
@@ -77,10 +68,7 @@ const adaStores: WithNullableFields<AdaStoresMap> = observable({
   ledgerSend: null,
   hwVerifyAddress: null,
   stateFetchStore: null,
-  transactionBuilderStore: null,
   walletRestore: null,
-  delegationTransaction: null,
-  delegation: null,
   time: null,
 });
 

@@ -7,6 +7,8 @@ import {
 import {
   filterAddressesByStakingKey,
   unwrapStakingKey,
+} from '../../api/jormungandr/lib/storage/bridge/utils';
+import {
   addressToDisplayString,
 } from '../../api/ada/lib/storage/bridge/utils';
 import {
@@ -31,7 +33,7 @@ export async function filterMangledAddresses(request: {|
       ...info,
       address: addressToDisplayString(
         info.address,
-        request.publicDeriver.getParent.getNetworkInfo()
+        request.publicDeriver.getParent().getNetworkInfo()
       ),
     }));
   }
@@ -53,7 +55,10 @@ export async function filterMangledAddresses(request: {|
 
   return result.map(info => ({
     ...info,
-    address: addressToDisplayString(info.address, request.publicDeriver.getParent.getNetworkInfo()),
+    address: addressToDisplayString(
+      info.address,
+      request.publicDeriver.getParent().getNetworkInfo()
+    ),
   }));
 }
 

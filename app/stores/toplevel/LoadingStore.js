@@ -51,7 +51,7 @@ export default class LoadingStore extends Store {
   @observable migrationRequest: Request<MigrationRequest => Promise<void>>
     = new Request<MigrationRequest => Promise<void>>(migrate);
 
-  @observable loadPersitentDbRequest: Request<void => Promise<lf$Database>>
+  @observable loadPersistentDbRequest: Request<void => Promise<lf$Database>>
     = new Request<void => Promise<lf$Database>>(
       async () => await loadLovefieldDB(schema.DataStoreType.INDEXED_DB)
     );
@@ -65,11 +65,11 @@ export default class LoadingStore extends Store {
     Promise
       .all([
         this.loadRustRequest.execute().promise,
-        this.loadPersitentDbRequest.execute().promise
+        this.loadPersistentDbRequest.execute().promise
       ])
       .then(async () => {
         await closeOtherInstances();
-        const persistentDb = this.loadPersitentDbRequest.result;
+        const persistentDb = this.loadPersistentDbRequest.result;
         if (persistentDb == null) throw new Error(`${nameof(LoadingStore)}::${nameof(this.load)} load db was not loaded. Should never happen`);
         await this.migrationRequest.execute({
           api: this.api,
@@ -84,7 +84,7 @@ export default class LoadingStore extends Store {
         return undefined;
       }).catch((error) => {
         Logger.error(`${nameof(LoadingStore)}::${nameof(this.load)} Unable to load libraries ` + stringifyError(error));
-        if (this.loadPersitentDbRequest.error != null) {
+        if (this.loadPersistentDbRequest.error != null) {
           runInAction(() => {
             this.error = new StorageLoadError();
           });

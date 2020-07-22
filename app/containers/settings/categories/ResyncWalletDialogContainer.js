@@ -105,7 +105,7 @@ export default class ResyncWalletDialogContainer extends Component<Props> {
       throw new Error(`${nameof(ResyncWalletDialogContainer)} no way to generated props`);
     }
     const { actions, stores } = this.props;
-    const settingActions = actions.ada.walletSettings;
+    const settingActions = actions.walletSettings;
     const settingStore = stores.walletSettings;
     return Object.freeze({
       stores: {

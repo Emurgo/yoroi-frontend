@@ -10,8 +10,7 @@ import {
   ConceptualWallet,
 } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import Store from '../base/Store';
-import type { ChangeModelPasswordFunc, RenameModelFunc } from '../../api/ada';
-import type { RemoveAllTransactionsFunc } from '../../api/common';
+import type { ChangeModelPasswordFunc, RenameModelFunc, RemoveAllTransactionsFunc } from '../../api/common';
 import Request from '../lib/LocalizedRequest';
 import {
   asGetSigningKey,
@@ -50,10 +49,10 @@ export type WarningList = {|
 export default class WalletSettingsStore extends Store {
 
   @observable renameModelRequest: Request<RenameModelFunc>
-    = new Request<RenameModelFunc>(this.api.ada.renameModel);
+    = new Request<RenameModelFunc>(this.api.common.renameModel);
 
   @observable changeSigningKeyRequest: Request<ChangeModelPasswordFunc>
-    = new Request<ChangeModelPasswordFunc>(this.api.ada.changeModelPassword);
+    = new Request<ChangeModelPasswordFunc>(this.api.common.changeModelPassword);
 
   @observable clearHistory: Request<RemoveAllTransactionsFunc>
     = new Request<RemoveAllTransactionsFunc>(this.api.common.removeAllTransactions);
@@ -96,7 +95,7 @@ export default class WalletSettingsStore extends Store {
 
   setup(): void {
     super.setup();
-    const a = this.actions.ada.walletSettings;
+    const a = this.actions.walletSettings;
     a.startEditingWalletField.listen(this._startEditingWalletField);
     a.stopEditingWalletField.listen(this._stopEditingWalletField);
     a.cancelEditingWalletField.listen(this._cancelEditingWalletField);

@@ -6,7 +6,7 @@ import { observer } from 'mobx-react';
 import jdenticon from 'jdenticon';
 import { defineMessages, intlShape } from 'react-intl';
 import globalMessages from '../../../../i18n/global-messages';
-import type { PoolTuples } from '../../../../api/ada/lib/state-fetch/types';
+import type { PoolTuples } from '../../../../api/jormungandr/lib/state-fetch/types';
 import Timer from '../../../widgets/Timer';
 import CustomTooltip from '../../../widgets/CustomTooltip';
 import LoadingSpinner from '../../../widgets/LoadingSpinner';

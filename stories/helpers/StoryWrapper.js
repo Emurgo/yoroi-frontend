@@ -19,7 +19,8 @@ import es from 'react-intl/locale-data/es';
 import it from 'react-intl/locale-data/it';
 import '../../app/themes/index.global.scss';
 import type { UnitOfAccountSettingType } from '../../app/types/unitOfAccountType';
-import type { BaseSignRequest, V3UnsignedTxAddressedUtxoResponse } from '../../app/api/ada/transactions/types';
+import type { V3UnsignedTxAddressedUtxoResponse } from '../../app/api/ada/transactions/types';
+import type { ISignRequest } from '../../app/api/common/lib/transactions/ISignRequest';
 import {
   genToAbsoluteSlotNumber,
   genToRelativeSlotNumber,
@@ -28,7 +29,7 @@ import {
   genCurrentSlotLength,
   genTimeSinceGenesis,
   genToRealTime,
-} from '../../app/api/ada/lib/storage/bridge/timeUtils';
+} from '../../app/api/jormungandr/lib/storage/bridge/timeUtils';
 import { yoroiPolymorphTheme } from '../../app/themes/PolymorphThemes';
 import { themeOverrides } from '../../app/themes/overrides';
 import { translations, LANGUAGES } from '../../app/i18n/translations';
@@ -67,7 +68,7 @@ import {
 import type { ConceptualWalletSettingsCache } from '../../app/stores/toplevel/WalletSettingsStore';
 import WalletSettingsStore from '../../app/stores/toplevel/WalletSettingsStore';
 import TransactionsStore from '../../app/stores/toplevel/TransactionsStore';
-import DelegationStore from '../../app/stores/ada/DelegationStore';
+import DelegationStore from '../../app/stores/jormungandr/DelegationStore';
 import WalletStore from '../../app/stores/toplevel/WalletStore';
 import AdaTimeStore from '../../app/stores/ada/AdaTimeStore';
 import CachedRequest from '../../app/stores/lib/LocalizedCachedRequest';
@@ -75,10 +76,11 @@ import LocalizableError from '../../app/i18n/LocalizableError';
 import globalMessages from '../../app/i18n/global-messages';
 import { ledgerErrors } from '../../app/domain/LedgerLocalizedError';
 import BigNumber from 'bignumber.js';
-import { utxoToTxInput } from '../../app/api/ada/transactions/jormungandr/inputSelection';
+import { utxoToTxInput } from '../../app/api/jormungandr/lib/transactions/inputSelection';
 import { RustModule } from '../../app/api/ada/lib/cardanoCrypto/rustLoader';
-import { networks, CardanoForks } from '../../app/api/ada/lib/storage/database/prepackaged/networks';
-import { CoinTypes } from '../../app/config/numbersConfig';
+import { networks, isCardanoHaskell, isJormungandr } from '../../app/api/ada/lib/storage/database/prepackaged/networks';
+import { ByronTxSignRequest } from '../../app/api/ada/transactions/byron/ByronTxSignRequest';
+import { JormungandrTxSignRequest } from '../../app/api/jormungandr/lib/transactions/JormungandrTxSignRequest';
 
 /**
  * This whole file is meant to mirror code in App.js
@@ -629,9 +631,7 @@ export function walletLookup(wallets: Array<CacheValue>): {|
 export const genTentativeTx = (
   publicDeriver: PublicDeriver<>,
 ): {|
-  tentativeTx: null | BaseSignRequest<
-    RustModule.WalletV2.Transaction | RustModule.WalletV3.InputOutput
-  >,
+  tentativeTx: null | ISignRequest<any>,
   inputAmount: string,
   fee: BigNumber,
 |} => {
@@ -640,7 +640,7 @@ export const genTentativeTx = (
   const fee = new BigNumber(inputAmount).minus(new BigNumber(ouputAmount));
 
   const networkInfo = publicDeriver.getParent().getNetworkInfo();
-  if (networkInfo.CoinType === CoinTypes.CARDANO && networkInfo.Fork === CardanoForks.Jormungandr) {
+  if (isJormungandr(networkInfo)) {
     const remoteUnspentUtxo = {
       amount: inputAmount,
       receiver: 'Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4',
@@ -657,7 +657,7 @@ export const genTentativeTx = (
     );
     const unsignedTx = builder.build();
     return {
-      tentativeTx: {
+      tentativeTx: new JormungandrTxSignRequest({
         senderUtxos: [{
           ...remoteUnspentUtxo,
           addressing: {
@@ -668,12 +668,12 @@ export const genTentativeTx = (
         unsignedTx,
         changeAddr: [],
         certificate: undefined,
-      },
+      }),
       inputAmount,
       fee,
     };
   }
-  {
+  if (isCardanoHaskell(networkInfo)) {
     const remoteUnspentUtxo = {
       amount: inputAmount,
       receiver: 'Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4',
@@ -692,7 +692,7 @@ export const genTentativeTx = (
       }]
     });
     return {
-      tentativeTx: {
+      tentativeTx: new ByronTxSignRequest({
         senderUtxos: [{
           ...remoteUnspentUtxo,
           addressing: {
@@ -703,11 +703,12 @@ export const genTentativeTx = (
         unsignedTx,
         changeAddr: [],
         certificate: undefined,
-      },
+      }),
       inputAmount,
       fee,
     };
   }
+  throw new Error(`Unknown network ${JSON.stringify(networkInfo)}`);
 };
 
 export const genUndelegateTx = (
@@ -715,11 +716,7 @@ export const genUndelegateTx = (
 ): V3UnsignedTxAddressedUtxoResponse => {
   const inputAmount = '1000001';
 
-  const networkInfo = publicDeriver.getParent().getNetworkInfo();
-  if (networkInfo.CoinType !== CoinTypes.CARDANO) {
-    throw new Error('Delegation only supported for Cardano');
-  }
-  if (networkInfo.Fork !== CardanoForks.Jormungandr) {
+  if (!isJormungandr(publicDeriver.getParent().getNetworkInfo())) {
     throw new Error('Delegation only supported for Jormungandr');
   }
   const remoteUnspentUtxo = {

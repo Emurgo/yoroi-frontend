@@ -10,14 +10,34 @@ import type { CertificateKindType } from '@emurgo/js-chain-libs/js_chain_libs';
 import type { KeyKindType } from '../../../../../common/lib/crypto/keys/types';
 import type { CoinTypesT } from '../../../../../../config/numbersConfig';
 
-export type NetworkInsert = {|
-  NetworkId: number,
-  CoinType: CoinTypesT,
+export type CommonStaticConfig = {|
   /**
     many blockchains require a different kind of magic number or string to identify a network
     ex: hash of the genesis block or 0=mainnet,1=testnet, etc.
   */
-  NetworkMagic: string,
+  NetworkId: string,
+|};
+export type CardanoHaskellStaticConfig = {|
+  ...CommonStaticConfig,
+  /*
+  * Legacy byron addresses contained a network id inside of its attributes
+  * This network id was a 32-bit number, but the bech32 ID is smaller
+  * Therefore, the Byron network ID is only used to generate legacy addresses
+  */
+  ByronNetworkId: number,
+|};
+export type JormungandrStaticConfig = CardanoHaskellStaticConfig;
+export type ErgoStaticConfig = {|
+  ...CommonStaticConfig,
+|};
+export type NetworkInsert = {|
+  NetworkId: number,
+  CoinType: CoinTypesT,
+  /**
+   * This is meant for static configs and not protocol parameters that change over time.
+   * Protocol parameters should be queries from a server
+   */
+  StaticConfig: CardanoHaskellStaticConfig | JormungandrStaticConfig | ErgoStaticConfig,
   /**
    * Some currencies have totally different implementations that use the same coin type
    * To differentiate these, we need some identifier of the fork
@@ -35,7 +55,7 @@ export const NetworkSchema: {|
   properties: {
     NetworkId: 'NetworkId',
     CoinType: 'CoinType',
-    NetworkMagic: 'NetworkMagic',
+    StaticConfig: 'StaticConfig',
     Fork: 'Fork',
   }
 };
@@ -324,7 +344,7 @@ export const populatePrimitivesDb = (schemaBuilder: lf$schema$Builder) => {
   schemaBuilder.createTable(NetworkSchema.name)
     .addColumn(NetworkSchema.properties.NetworkId, Type.INTEGER)
     .addColumn(NetworkSchema.properties.CoinType, Type.NUMBER)
-    .addColumn(NetworkSchema.properties.NetworkMagic, Type.STRING)
+    .addColumn(NetworkSchema.properties.StaticConfig, Type.OBJECT)
     .addColumn(NetworkSchema.properties.Fork, Type.INTEGER)
     .addPrimaryKey(
       /* note: doesn't auto-increment

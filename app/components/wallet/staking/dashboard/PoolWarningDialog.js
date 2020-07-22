@@ -6,7 +6,7 @@ import globalMessages from '../../../../i18n/global-messages';
 import { observer } from 'mobx-react';
 import Dialog from '../../../widgets/Dialog';
 import DialogCloseButton from '../../../widgets/DialogCloseButton';
-import type { ReputationObject } from '../../../../api/ada/lib/state-fetch/types';
+import type { ReputationObject } from '../../../../api/jormungandr/lib/state-fetch/types';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 import styles from './PoolWarningDialog.scss';

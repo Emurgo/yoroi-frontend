@@ -54,7 +54,7 @@ export default class ErgoRestoreStore extends Store {
     }
     const { phrase } = this.stores.walletRestore.recoveryResult;
     const { walletName, walletPassword } = this.stores.walletRestore.walletRestoreMeta;
-    const persistentDb = this.stores.loading.loadPersitentDbRequest.result;
+    const persistentDb = this.stores.loading.loadPersistentDbRequest.result;
     if (persistentDb == null) {
       throw new Error(`${nameof(this._restoreToDb)} db not loaded. Should never happen`);
     }
@@ -63,7 +63,11 @@ export default class ErgoRestoreStore extends Store {
     await this.stores.wallets.restoreRequest.execute(async () => {
       const wallet = await this.api.ergo.restoreWallet({
         db: persistentDb,
-        ...{ recoveryPhrase: phrase, walletName, walletPassword, network: selectedNetwork  },
+        recoveryPhrase: phrase,
+        walletName,
+        walletPassword,
+        network: selectedNetwork,
+        accountIndex: this.stores.walletRestore.selectedAccount,
       });
       return wallet;
     }).promise;
