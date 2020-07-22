@@ -501,4 +501,3 @@ test('Syncing simple transaction bip44', async (done) => {
   await syncingSimpleTransaction(WalletTypePurpose.BIP44);
   done();
 });
-
