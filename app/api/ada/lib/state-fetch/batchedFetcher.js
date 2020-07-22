@@ -308,7 +308,7 @@ function getLatestTransaction(
     return undefined;
   }
   let best = blockInfo[0];
-  for (let i = 1; i < txs.length; i++) {
+  for (let i = 1; i < blockInfo.length; i++) {
     if (blockInfo[i].height > best.height) {
       best = blockInfo[i];
       continue;
