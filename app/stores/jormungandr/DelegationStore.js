@@ -274,6 +274,11 @@ export default class DelegationStore extends Store {
   }
 
   _loadPoolReputation: void => Promise<void> = async () => {
-    await this.poolReputation.execute();
+    const { selected } = this.stores.wallets;
+    if (selected == null) return undefined;
+    if (!isJormungandr(selected.getParent().getNetworkInfo())) return undefined;
+    if (!this.poolReputation.wasExecuted && !this.poolReputation.isExecuting) {
+      await this.poolReputation.execute();
+    }
   }
 }

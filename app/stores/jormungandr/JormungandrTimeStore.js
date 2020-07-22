@@ -1,6 +1,6 @@
 // @flow
 
-import { action, } from 'mobx';
+import { action, computed, } from 'mobx';
 import {
   PublicDeriver,
 } from '../../api/ada/lib/storage/models/PublicDeriver/index';
@@ -28,6 +28,8 @@ import {
   buildCheckAndCall,
 } from '../lib/check';
 import { getApiForNetwork, ApiOptions } from '../../api/common/utils';
+import type { CurrentTimeRequests } from '../base/BaseCardanoTimeStore';
+import { isJormungandr, } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 /**
  * Different wallets can be on different networks and therefore have different measures of time
@@ -83,5 +85,13 @@ export default class JormungandrTimeStore extends BaseCardanoTimeStore {
       currentSlot: 0,
       msIntoSlot: 0,
     });
+  }
+
+  @computed get currentTime(): ?CurrentTimeRequests {
+    const publicDeriver = this.stores.wallets.selected;
+    if (!publicDeriver) return undefined;
+    if (!isJormungandr(publicDeriver.getParent().getNetworkInfo())) return undefined;
+
+    return this.getCurrentTimeRequests(publicDeriver);
   }
 }

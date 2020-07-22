@@ -50,6 +50,7 @@ export type CurrentTimeRequests = {|
  * Different wallets can be on different networks and therefore have different measures of time
 */
 export default class BaseCardanoTimeStore extends Store {
+
   @observable time: Date = new Date();
 
   /**
@@ -86,9 +87,6 @@ export default class BaseCardanoTimeStore extends Store {
 
     const selected = this.stores.wallets.selected;
     if (selected == null) return;
-    if (selected.getParent().getNetworkInfo().CoinType !== CoinTypes.CARDANO) {
-      return;
-    }
 
     const timeCalcRequests = this.getTimeCalcRequests(selected);
     const currTimeRequests = this.getCurrentTimeRequests(selected);
@@ -110,16 +108,5 @@ export default class BaseCardanoTimeStore extends Store {
       currTimeRequests.currentSlot = currentRelativeTime.slot;
       currTimeRequests.msIntoSlot = currentAbsoluteSlot.msIntoSlot;
     });
-  }
-
-  @computed get currentTime(): ?CurrentTimeRequests {
-    // Get current public deriver
-    const publicDeriver = this.stores.wallets.selected;
-    if (!publicDeriver) return undefined;
-    if (publicDeriver.getParent().getNetworkInfo().CoinType !== CoinTypes.CARDANO) {
-      return;
-    }
-
-    return this.getCurrentTimeRequests(publicDeriver);
   }
 }

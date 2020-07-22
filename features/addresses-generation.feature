@@ -72,5 +72,5 @@ Feature: Generate Addresses
   @it-122
   Scenario: Ensure user can see address book in "Receive tab" (IT-122)
     When I click on the address book tab
-    Then I should see 13 addresses with address "Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj" at the top
+    Then I should see 12 addresses with address "Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj" at the top
 
