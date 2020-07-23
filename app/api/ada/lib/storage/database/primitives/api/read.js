@@ -1013,7 +1013,7 @@ export class GetCertificates {
     request: {|
       txIds: Array<number>,
     |},
-  ): Promise<Map<number, void | CertificatePart>> {
+  ): Promise<Map<number, Array<CertificatePart>>> {
     const certAddrSchema = GetCertificates.ownTables[Tables.CertificateAddressSchema.name];
     const certSchema = GetCertificates.ownTables[Tables.CertificateSchema.name];
     const certAddrTable = db.getSchema().table(certAddrSchema.name);
@@ -1036,15 +1036,15 @@ export class GetCertificates {
       Certificate: $ReadOnly<CertificateRow>,
     |}> = await dbTx.attach(query);
 
-    // group relations together
-    const tempMap = new Map<number, {|
+    // group by relation
+    const relationsForCert = new Map<number /* cert id */, {|
       relatedAddresses: Array<$ReadOnly<CertificateAddressRow>>,
       certificate: $ReadOnly<CertificateRow>,
-  |}>();
+    |}>();
     for (const result of queryResult) {
-      const entry = tempMap.get(result.Certificate.CertificateId);
+      const entry = relationsForCert.get(result.Certificate.CertificateId);
       if (entry == null) {
-        tempMap.set(
+        relationsForCert.set(
           result.Certificate.CertificateId,
           {
             relatedAddresses: [result.CertificateAddress],
@@ -1055,15 +1055,20 @@ export class GetCertificates {
         entry.relatedAddresses.push(result.CertificateAddress);
       }
     }
-    // note: there can only be a single certificate per transaction so this is safe
-    const certByTxId = new Map<number, _>(
-      Array.from(tempMap.values())
-        .map((cert: $ReadOnly<CertificatePart>) => [
-          cert.certificate.TransactionId,
-          { ...cert, } // turn to read-only through shallow-copy
-        ])
-    );
-    return certByTxId;
+
+    const groupByTxId = new Map<number /* txid */, Array<CertificatePart>>();
+    for (const groupedCert of relationsForCert.values()) {
+      const groupforTx = groupByTxId.get(groupedCert.certificate.TransactionId);
+      if (groupforTx == null) {
+        groupByTxId.set(
+          groupedCert.certificate.TransactionId,
+          [{ ...groupedCert }]
+        );
+      } else {
+        groupforTx.push({ ...groupedCert });
+      }
+    }
+    return groupByTxId;
   }
 }
 

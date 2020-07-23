@@ -70,7 +70,7 @@ export class AssociateTxWithIOs {
     );
     const fullTx = request.txs.map(transaction  => ({
       transaction,
-      certificate: certsForTxs.get(transaction.TransactionId),
+      certificates: certsForTxs.get(transaction.TransactionId) ?? [],
       ...getOrThrow(utxo.get(transaction)),
       ...getOrThrow(accounting.get(transaction)),
     }));

@@ -44,7 +44,7 @@ export default class WalletTransaction {
   @observable fee: BigNumber;
   @observable date: Date; // TODO: remove?
   @observable addresses: TransactionAddresses = { from: [], to: [] };
-  @observable certificate: void | CertificatePart;
+  @observable certificates: Array<CertificatePart>;
 
   // TODO: remove and turn it into a map
   @observable state: TxStatusCodesType;
@@ -58,7 +58,7 @@ export default class WalletTransaction {
     fee: BigNumber,
     date: Date,
     addresses: TransactionAddresses,
-    certificate: void | CertificatePart,
+    certificates: Array<CertificatePart>,
     state: TxStatusCodesType,
     errorMsg: null | string,
   |}) {
@@ -147,7 +147,7 @@ export default class WalletTransaction {
           ...toAddr(tx.accountingOutputs),
         ]
       },
-      certificate: tx.certificate,
+      certificates: tx.certificates,
       state: tx.transaction.Status,
       errorMsg: tx.transaction.ErrorMessage,
     });

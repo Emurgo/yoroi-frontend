@@ -194,7 +194,7 @@ const _tx = (
       Hash: '1',
       BlockTime: new Date(date),
     },
-    certificate: undefined,
+    certificates: [],
     utxoInputs,
     utxoOutputs,
     accountingInputs,

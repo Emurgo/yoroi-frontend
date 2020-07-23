@@ -45,7 +45,7 @@ export class ModifyMultipartTx {
     request: {|
       block: null | BlockInsert,
       transaction: (blockId: null | number) => TransactionInsert,
-      certificate: number => (void | AddCertificateRequest),
+      certificates: $ReadOnlyArray<number => (void | AddCertificateRequest)>,
       ioGen: (txRowId: number) => {|
         utxoInputs: Array<UtxoTransactionInputInsert>,
         utxoOutputs: Array<UtxoTransactionOutputInsert>,
@@ -57,7 +57,7 @@ export class ModifyMultipartTx {
     ...WithNullableFields<DbBlock>, ...DbTransaction,
     ...DbUtxoInputs, ...DbUtxoOutputs,
     ...DbAccountingInputs, ...DbAccountingOutputs,
-    certificate: void | CertificatePart,
+    certificates: Array<CertificatePart>,
     |}> {
     const {
       block, transaction,
@@ -84,17 +84,20 @@ export class ModifyMultipartTx {
       }
     );
 
-    const certRequest = request.certificate(newTx.transaction.TransactionId);
-    const certificate = certRequest == null
-      ? undefined
-      : await ModifyMultipartTx.depTables.ModifyCertificate.addNew(
-        db, tx,
-        certRequest,
-      );
+    const certificates = [];
+    for (const certGen of request.certificates) {
+      const certRequest = certGen(newTx.transaction.TransactionId);
+      if (certRequest != null) {
+        certificates.push(await ModifyMultipartTx.depTables.ModifyCertificate.addNew(
+          db, tx,
+          certRequest,
+        ));
+      }
+    }
 
     return {
       ...newTx,
-      certificate,
+      certificates,
       ...utxo,
       ...accounting,
     };

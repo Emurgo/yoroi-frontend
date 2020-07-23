@@ -420,7 +420,7 @@ async function baseTest(
 
   // pending becomes successful
   {
-    const previouslyPending = networkTransactions.shift();
+    const previouslyPending: RemoteTransaction = networkTransactions.shift();
     const newTx = {
       ...previouslyPending,
       ...({
@@ -432,7 +432,7 @@ async function baseTest(
         slot: 3651,
       }: RemoteTxBlockMeta),
       last_update: '2019-09-13T16:37:36.000Z',
-      tx_state: 'Successful'
+      tx_state: 'Successful',
     };
     networkTransactions.push(newTx);
 

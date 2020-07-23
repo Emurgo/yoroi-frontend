@@ -666,10 +666,11 @@ export default class Transaction extends Component<Props, State> {
 
   getCertificate: WalletTransaction => Node = (data) => {
     const { intl } = this.context;
-    if (data.certificate == null) {
+    if (data.certificates.length === 0) {
       return (null);
     }
-    const certificateText = this.certificateToText(data.certificate.certificate);
+    // TODO: deicide what to show in multi-certificate case of Haskell Shelley
+    const certificateText = this.certificateToText(data.certificates[0].certificate);
     return (
       <>
         <h2>

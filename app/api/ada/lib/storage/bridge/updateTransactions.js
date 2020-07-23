@@ -17,6 +17,7 @@ import type {
 } from '../database/primitives/tables';
 import type {
   TxStatusCodesType,
+  CertificateRelationType,
 } from '../database/primitives/enums';
 import {
   GetAddress,
@@ -48,9 +49,6 @@ import {
 import type {
   AnnotatedTransaction,
 } from '../../../transactions/types';
-import {
-  InputTypes,
-} from '../../state-fetch/types';
 import type {
   ToAbsoluteSlotNumberFunc,
 } from './timeUtils';
@@ -63,6 +61,7 @@ import type {
 import {
   TxStatusCodes,
   CoreAddressTypes,
+  CertificateRelation,
 } from '../database/primitives/enums';
 import {
   asScanAddresses, asHasLevels, asGetAllUtxos, asGetAllAccounting,
@@ -106,13 +105,16 @@ import type {
   HistoryFunc, BestBlockFunc,
   RemoteTxState,
   RemoteTransaction,
-  RemoteTransactionInput,
   RemoteCertificate,
+} from '../../state-fetch/types';
+import {
+  ShelleyCertificateTypes,
 } from '../../state-fetch/types';
 import type {
   FilterFunc,
 } from '../../../../common/lib/state-fetch/currencySpecificTypes';
 import { addressToKind } from './utils';
+import { RustModule } from '../../cardanoCrypto/rustLoader';
 
 async function rawGetAllTxIds(
   db: lf$Database,
@@ -1147,7 +1149,7 @@ export async function updateTransactionBatch(
       txsAddedToBlock.push({
         block: result.block,
         transaction: result.transaction,
-        certificate: result.certificate,
+        certificates: result.certificates,
         utxoInputs: result.utxoInputs,
         utxoOutputs: result.utxoOutputs,
         accountingInputs: result.accountingInputs,
@@ -1224,7 +1226,7 @@ async function networkTxToDbTx(
 ): Promise<Array<{|
   block: null | BlockInsert,
   transaction: (blockId: null | number) => TransactionInsert,
-  certificate: number => (void | AddCertificateRequest),
+  certificates: $ReadOnlyArray<number => (void | AddCertificateRequest)>,
   ioGen: number => {|
     utxoInputs: Array<UtxoTransactionInputInsert>,
     utxoOutputs: Array<UtxoTransactionOutputInsert>,
@@ -1236,6 +1238,10 @@ async function networkTxToDbTx(
     newTxs.flatMap(tx => [
       ...tx.inputs.map(input => input.address),
       ...tx.outputs.map(output => output.address),
+      ...(tx.withdrawals
+        ? tx.withdrawals.map(withdrawal => withdrawal.address)
+        : []
+      ),
     ]),
   ));
   const idMapping = await hashToIds({
@@ -1266,21 +1272,23 @@ async function networkTxToDbTx(
       BlockSeed,
     );
 
-    const certificate: number => (void | AddCertificateRequest) = networkTx.certificates == null
-      ? (_txId) => {}
+    const certificates: $ReadOnlyArray<
+      number => (void | AddCertificateRequest)
+    > = networkTx.certificates == null
+      ? [(_txId) => undefined]
       : await certificateToDb(
         db, dbTx,
         {
           certificates: networkTx.certificates,
           hashToIds,
           derivationTables,
-          firstInput: networkTx.inputs[0],
+          network: Number.parseInt(network.StaticConfig.NetworkId, 10)
         }
       );
     result.push({
       block,
       transaction,
-      certificate,
+      certificates,
       ioGen: (txRowId) => {
         const utxoInputs = [];
         const utxoOutputs = [];
@@ -1288,18 +1296,14 @@ async function networkTxToDbTx(
         const accountingOutputs = [];
         for (let i = 0; i < networkTx.inputs.length; i++) {
           const input = networkTx.inputs[i];
-          if (input.type === InputTypes.utxo || input.type === InputTypes.legacyUtxo) {
-            utxoInputs.push({
-              TransactionId: txRowId,
-              AddressId: getIdOrThrow(input.address),
-              ParentTxHash: input.txHash,
-              IndexInParentTx: input.index,
-              IndexInOwnTx: i,
-              Amount: input.amount,
-            });
-          } else {
-            throw new Error(`${nameof(networkTxToDbTx)} Unhandled input type`);
-          }
+          utxoInputs.push({
+            TransactionId: txRowId,
+            AddressId: getIdOrThrow(input.address),
+            ParentTxHash: input.txHash,
+            IndexInParentTx: input.index,
+            IndexInOwnTx: i,
+            Amount: input.amount,
+          });
         }
         for (let i = 0; i < networkTx.outputs.length; i++) {
           const output = networkTx.outputs[i];
@@ -1410,7 +1414,7 @@ export function statusStringToCode(
   if (state === 'Failed') {
     return TxStatusCodes.FAIL_RESPONSE;
   }
-  throw new Error('statusStringToCode unexpected status ' + state);
+  throw new Error(`${nameof(statusStringToCode)} unexpected status ` + state);
 }
 
 export function networkTxHeaderToDb(
@@ -1455,16 +1459,381 @@ export function networkTxHeaderToDb(
 }
 
 async function certificateToDb(
-  /* eslint-disable no-unused-vars */
   db: lf$Database,
   dbTx: lf$Transaction,
   request: {|
+    network: number,
     certificates: Array<RemoteCertificate>,
     hashToIds: HashToIdsFunc,
     derivationTables: Map<number, string>,
-    firstInput: RemoteTransactionInput,
   |},
-  /* eslint-enable no-unused-vars */
-): Promise<number => AddCertificateRequest> {
-  throw new Error(`Not implemented yet`);
+): Promise<$ReadOnlyArray<number => AddCertificateRequest>> {
+  const existingAddressesMap = await request.hashToIds({
+    db,
+    tx: dbTx,
+    lockedTables: Array.from(request.derivationTables.values()),
+    hashes: []
+  });
+  const addressToId = async (bytes: string): Promise<number> => {
+    const idMap = await request.hashToIds({
+      db,
+      tx: dbTx,
+      lockedTables: Array.from(request.derivationTables.values()),
+      hashes: [bytes]
+    });
+    const id = idMap.get(bytes);
+    if (id === undefined) {
+      throw new Error(`${nameof(certificateToDb)} should never happen id === undefined`);
+    }
+    return id;
+  };
+  const tryGetKey = (stakeCredentials: RustModule.WalletV4.StakeCredential): void | number => {
+    // an operator/owner key might belong to the wallet
+    // however, these keys are plain ED25519 hashes
+    // there there is no way of knowing what address it corresponds to
+    // so we just try both and see if one of them matches
+    // note: if there is no match, we don't add these addresses to the DB
+    // since we don't know what address it would be
+    // and in most cases, people generate these addresses through the CLI anyway
+    {
+      const rewardAddress = RustModule.WalletV4.RewardAddress.new(
+        request.network,
+        stakeCredentials
+      );
+      const addressId = existingAddressesMap.get(
+        Buffer.from(rewardAddress.to_address().to_bytes()).toString('hex')
+      );
+      if (addressId != null) return addressId;
+    }
+    {
+      const enterpriseAddress = RustModule.WalletV4.EnterpriseAddress.new(
+        request.network,
+        stakeCredentials
+      );
+      const addressId = existingAddressesMap.get(
+        Buffer.from(enterpriseAddress.to_address().to_bytes()).toString('hex')
+      );
+      if (addressId != null) return addressId;
+    }
+    return undefined;
+  };
+
+  const result = [];
+  for (let i = 0; i < request.certificates.length; i++) {
+    const cert = request.certificates[i];
+    switch (cert.type) {
+      case ShelleyCertificateTypes.StakeRegistration: {
+        const stakeCredentials = RustModule.WalletV4.StakeCredential.from_bytes(
+          Buffer.from(cert.stake_credential, 'hex')
+        );
+        const certificate = RustModule.WalletV4.StakeRegistration.new(
+          stakeCredentials
+        );
+        const address = RustModule.WalletV4.RewardAddress.new(
+          request.network,
+          stakeCredentials
+        );
+        const addrBytes = Buffer.from(address.to_address().to_bytes()).toString('hex');
+        const addressId = await addressToId(addrBytes);
+        result.push((txId: number) => ({
+          certificate: {
+            Kind: RustModule.WalletV4.CertificateKind.StakeRegistration,
+            Payload: Buffer.from(certificate.to_bytes()).toString('hex'),
+            TransactionId: txId,
+          },
+          relatedAddresses: (certId: number) => [{
+            CertificateId: certId,
+            AddressId: addressId,
+            Relation: CertificateRelation.SIGNER,
+          }]
+        }));
+        break;
+      }
+      case ShelleyCertificateTypes.StakeDeregistration: {
+        const stakeCredentials = RustModule.WalletV4.StakeCredential.from_bytes(
+          Buffer.from(cert.stake_credential, 'hex')
+        );
+        const certificate = RustModule.WalletV4.StakeRegistration.new(
+          stakeCredentials
+        );
+        const address = RustModule.WalletV4.RewardAddress.new(
+          request.network,
+          stakeCredentials
+        );
+        const addrBytes = Buffer.from(address.to_address().to_bytes()).toString('hex');
+        const addressId = await addressToId(addrBytes);
+        result.push((txId: number) => ({
+          certificate: {
+            Kind: RustModule.WalletV4.CertificateKind.StakeDeregistration,
+            Payload: Buffer.from(certificate.to_bytes()).toString('hex'),
+            TransactionId: txId,
+          },
+          relatedAddresses: (certId: number) => [{
+            CertificateId: certId,
+            AddressId: addressId,
+            Relation: CertificateRelation.SIGNER,
+          }]
+        }));
+        break;
+      }
+      case ShelleyCertificateTypes.StakeDelegation: {
+        const relatedAddressesInfo: Array<{|
+          AddressId: number,
+          Relation: CertificateRelationType,
+        |}> = [];
+
+        const stakeCredentials = RustModule.WalletV4.StakeCredential.from_bytes(
+          Buffer.from(cert.stake_credential, 'hex')
+        );
+        const poolKeyHash = RustModule.WalletV4.Ed25519KeyHash.from_bytes(
+          Buffer.from(cert.pool_keyhash, 'hex')
+        );
+        const certificate = RustModule.WalletV4.StakeDelegation.new(
+          stakeCredentials,
+          poolKeyHash
+        );
+
+        { // pool key
+          const poolKeyId = tryGetKey(
+            RustModule.WalletV4.StakeCredential.from_keyhash(poolKeyHash)
+          );
+          if (poolKeyId != null) {
+            relatedAddressesInfo.push({
+              AddressId: poolKeyId,
+              Relation: CertificateRelation.POOL_KEY
+            });
+          }
+        }
+
+        { // delegator
+          const address = RustModule.WalletV4.RewardAddress.new(
+            request.network,
+            stakeCredentials
+          );
+
+          const addrBytes = Buffer.from(address.to_address().to_bytes()).toString('hex');
+          const addressId = await addressToId(addrBytes);
+          relatedAddressesInfo.push({
+            AddressId: addressId,
+            Relation: CertificateRelation.SIGNER
+          });
+        }
+
+        result.push((txId: number) => ({
+          certificate: {
+            Kind: RustModule.WalletV4.CertificateKind.StakeDelegation,
+            Payload: Buffer.from(certificate.to_bytes()).toString('hex'),
+            TransactionId: txId,
+          },
+          relatedAddresses: (certId: number) => relatedAddressesInfo.map(info => ({
+            ...info,
+            CertificateId: certId,
+          }))
+        }));
+        break;
+      }
+      case ShelleyCertificateTypes.PoolRegistration: {
+        const relatedAddressesInfo: Array<{|
+          AddressId: number,
+          Relation: CertificateRelationType,
+        |}> = [];
+
+        const operatorKey = RustModule.WalletV4.Ed25519KeyHash.from_bytes(
+          Buffer.from(cert.pool_params.operator, 'hex')
+        );
+        { // operator
+          const operatorId = tryGetKey(
+            RustModule.WalletV4.StakeCredential.from_keyhash(operatorKey)
+          );
+          if (operatorId != null) {
+            relatedAddressesInfo.push({
+              AddressId: operatorId,
+              Relation: CertificateRelation.OPERATOR
+            });
+          }
+        }
+
+        // reward_account
+        const rewardAddress = RustModule.WalletV4.Address.from_bytes(
+          Buffer.from(cert.pool_params.reward_account, 'hex')
+        );
+        {
+          const addressId = await addressToId(cert.pool_params.reward_account);
+          relatedAddressesInfo.push({
+            AddressId: addressId,
+            Relation: CertificateRelation.REWARD_ADDRESS
+          });
+        }
+        const wasmRewardAddress = RustModule.WalletV4.RewardAddress.from_address(rewardAddress);
+        if (wasmRewardAddress == null) throw new Error(`${nameof(certificateToDb)} registration address not a reward address`);
+
+        // pool owners
+        const owners = RustModule.WalletV4.Ed25519KeyHashes.new();
+        for (let j = 0; j < cert.pool_params.pool_owners.length; j++) {
+          const owner = cert.pool_params.pool_owners[j];
+          const ownerKey = RustModule.WalletV4.Ed25519KeyHash.from_bytes(
+            Buffer.from(owner, 'hex')
+          );
+          owners.add(ownerKey);
+          const ownerId = tryGetKey(
+            RustModule.WalletV4.StakeCredential.from_keyhash(ownerKey)
+          );
+          if (ownerId != null) {
+            relatedAddressesInfo.push({
+              AddressId: ownerId,
+              Relation: CertificateRelation.OWNER
+            });
+          }
+        }
+
+        const relays = RustModule.WalletV4.Relays.new();
+        for (let j = 0; j < cert.pool_params.relays.length; j++) {
+          relays.add(RustModule.WalletV4.Relay.from_bytes(
+            Buffer.from(cert.pool_params.relays[i], 'hex')
+          ));
+        }
+
+        const certificate = RustModule.WalletV4.PoolRegistration.new(
+          RustModule.WalletV4.PoolParams.new(
+            operatorKey,
+            RustModule.WalletV4.VRFKeyHash.from_bytes(
+              Buffer.from(cert.pool_params.vrf_keyhash, 'hex')
+            ),
+            RustModule.WalletV4.BigNum.from_str(cert.pool_params.pledge),
+            RustModule.WalletV4.BigNum.from_str(cert.pool_params.cost),
+            RustModule.WalletV4.UnitInterval.new(
+              RustModule.WalletV4.BigNum.from_str(cert.pool_params.margin.numerator),
+              RustModule.WalletV4.BigNum.from_str(cert.pool_params.margin.denominator),
+            ),
+            wasmRewardAddress,
+            owners,
+            relays,
+            cert.pool_params.pool_metadata == null
+              ? undefined
+              : RustModule.WalletV4.PoolMetadata.new(
+                cert.pool_params.pool_metadata.url,
+                RustModule.WalletV4.MetadataHash.from_bytes(
+                  Buffer.from(cert.pool_params.pool_metadata.metadata_hash, 'hex')
+                )
+              )
+          )
+        );
+
+        result.push((txId: number) => ({
+          certificate: {
+            Kind: RustModule.WalletV4.CertificateKind.PoolRegistration,
+            Payload: Buffer.from(certificate.to_bytes()).toString('hex'),
+            TransactionId: txId,
+          },
+          relatedAddresses: (certId: number) => relatedAddressesInfo.map(info => ({
+            ...info,
+            CertificateId: certId,
+          }))
+        }));
+        break;
+      }
+      case ShelleyCertificateTypes.PoolRetirement: {
+        const relatedAddressesInfo: Array<{|
+          AddressId: number,
+          Relation: CertificateRelationType,
+        |}> = [];
+
+        const poolKeyHash = RustModule.WalletV4.Ed25519KeyHash.from_bytes(
+          Buffer.from(cert.pool_keyhash, 'hex')
+        );
+        const certificate = RustModule.WalletV4.PoolRetirement.new(
+          poolKeyHash,
+          cert.epoch
+        );
+
+        const poolKeyId = tryGetKey(
+          RustModule.WalletV4.StakeCredential.from_keyhash(poolKeyHash)
+        );
+        if (poolKeyId != null) {
+          relatedAddressesInfo.push({
+            AddressId: poolKeyId,
+            Relation: CertificateRelation.POOL_KEY
+          });
+        }
+
+        result.push((txId: number) => ({
+          certificate: {
+            Kind: RustModule.WalletV4.CertificateKind.PoolRetirement,
+            Payload: Buffer.from(certificate.to_bytes()).toString('hex'),
+            TransactionId: txId,
+          },
+          relatedAddresses: (certId: number) => relatedAddressesInfo.map(info => ({
+            ...info,
+            CertificateId: certId,
+          }))
+        }));
+        break;
+      }
+      case ShelleyCertificateTypes.GenesisKeyDelegation: {
+        const genesisKeyHash = RustModule.WalletV4.GenesisDelegateHash.from_bytes(
+          Buffer.from(cert.genesis_delegate_hash, 'hex')
+        );
+        const certificate = RustModule.WalletV4.GenesisKeyDelegation.new(
+          RustModule.WalletV4.GenesisHash.from_bytes(
+            Buffer.from(cert.genesishash, 'hex')
+          ),
+          genesisKeyHash,
+          RustModule.WalletV4.VRFKeyHash.from_bytes(
+            Buffer.from(cert.vrf_keyhash, 'hex')
+          ),
+        );
+
+        result.push((txId: number) => ({
+          certificate: {
+            Kind: RustModule.WalletV4.CertificateKind.GenesisKeyDelegation,
+            Payload: Buffer.from(certificate.to_bytes()).toString('hex'),
+            TransactionId: txId,
+          },
+          relatedAddresses: (_certId: number) => []
+        }));
+        break;
+      }
+      case ShelleyCertificateTypes.MoveInstantaneousRewardsCert: {
+        const relatedAddressesInfo: Array<{|
+          AddressId: number,
+          Relation: CertificateRelationType,
+        |}> = [];
+
+        const certPot = RustModule.WalletV4.MoveInstantaneousReward.new(
+          cert.pot
+        );
+        for (const key of Object.keys(cert.rewards)) {
+          const stakeCredentials = RustModule.WalletV4.StakeCredential.from_bytes(
+            Buffer.from(key, 'hex')
+          );
+          certPot.insert(
+            stakeCredentials,
+            RustModule.WalletV4.BigNum.from_str(cert.rewards[key])
+          );
+          const rewardAddrKey = tryGetKey(stakeCredentials);
+          if (rewardAddrKey != null) {
+            relatedAddressesInfo.push({
+              AddressId: rewardAddrKey,
+              Relation: CertificateRelation.REWARD_ADDRESS
+            });
+          }
+        }
+        const certificate = RustModule.WalletV4.MoveInstantaneousRewardsCert.new(certPot);
+        result.push((txId: number) => ({
+          certificate: {
+            Kind: RustModule.WalletV4.CertificateKind.MoveInstantaneousRewardsCert,
+            Payload: Buffer.from(certificate.to_bytes()).toString('hex'),
+            TransactionId: txId,
+          },
+          relatedAddresses: (certId: number) => relatedAddressesInfo.map(info => ({
+            ...info,
+            CertificateId: certId,
+          }))
+        }));
+        break;
+      }
+      default: throw new Error(`${nameof(certificateToDb)} unknown cert type ` + cert.type);
+    }
+  }
+  return result;
 }

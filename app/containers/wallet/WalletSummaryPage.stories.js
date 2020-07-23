@@ -334,9 +334,9 @@ export const Transaction = (): Node => {
     certificateCases,
     certificateCases.None
   );
-  const certificate = certificateSelect === certificateCases.None
-    ? undefined
-    : {
+  const certificates = certificateSelect === certificateCases.None
+    ? []
+    : [{
       relatedAddresses: [],
       certificate: {
         CertificateId: 0,
@@ -344,7 +344,7 @@ export const Transaction = (): Node => {
         Kind: certificateSelect,
         Payload: ''
       },
-    };
+    }];
   const walletTransaction = new WalletTransaction({
     txid: '915f2e6865fb31cc93410efb6c0e580ca74862374b3da461e20135c01f312e7c',
     block: {
@@ -379,7 +379,7 @@ export const Transaction = (): Node => {
         },
       ],
     },
-    certificate,
+    certificates,
     state,
     errorMsg: null,
   });
@@ -466,7 +466,7 @@ export const TransactionWithMemo = (): Node => {
         value: new BigNumber(1000),
       }],
     },
-    certificate: undefined,
+    certificates: [],
     state: TxStatusCodes.IN_BLOCK,
     errorMsg: null,
   });
@@ -546,7 +546,7 @@ export const MemoDialog = (): Node => {
         value: new BigNumber(1000),
       }],
     },
-    certificate: undefined,
+    certificates: [],
     state: TxStatusCodes.IN_BLOCK,
     errorMsg: null,
   });
@@ -674,7 +674,7 @@ export const ManyTransactions = (): Node => {
           value: new BigNumber(1000),
         }],
       },
-      certificate: undefined,
+      certificates: [],
       state: TxStatusCodes.IN_BLOCK,
       errorMsg: null,
     }));
@@ -739,7 +739,7 @@ export const TxHistoryExport = (): Node => {
         value: new BigNumber(1000),
       }],
     },
-    certificate: undefined,
+    certificates: [],
     state: TxStatusCodes.IN_BLOCK,
     errorMsg: null,
   })];

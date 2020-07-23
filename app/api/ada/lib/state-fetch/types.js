@@ -1,5 +1,7 @@
 // @flow
 
+import { MIRPot } from '@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib';
+
 // getUTXOsForAddresses
 
 export type AddressUtxoRequest = {| addresses: Array<string>, |};
@@ -60,31 +62,35 @@ export type SendFunc = (body: SignedRequest) => Promise<SignedResponse>;
 
 export type RemoteTxState = 'Successful' | 'Failed' | 'Pending';
 
-export type RemoteTransactionUtxoInput = {|
-  +id: string, // concatenation of txHash || index
-  +index: number,
-  +txHash: string,
+export type RemoteTransactionShelley = {|
+  +ttl: string,
+  +fee: string,
+  +certificates: Array<RemoteCertificate>,
+  +withdrawals: Array<RemoteWithdrawal>,
+  +metadata: void | string,
 |};
-export type RemoteTransactionInputBase = {|
-  +address: string,
-  +amount: string,
+export type RemoteTransactionBase = {|
+  ...WithNullableFields<RemoteTxBlockMeta>,
+  +hash: string,
+  +last_update: string, // timestamp with timezone
+  +tx_state: RemoteTxState,
+  +inputs: Array<RemoteTransactionInput>,
+  +outputs: Array<RemoteTransactionOutput>,
 |};
-type InputTypesT = {|
-  legacyUtxo: void,
-  utxo: 'utxo',
+type TransactionTypeT = {|
+  byron: void | 'byron',
+  shelley: 'shelley',
 |};
-export const InputTypes: InputTypesT = Object.freeze({
-  legacyUtxo: undefined,
-  utxo: 'utxo',
+export const TransactionTypesTypes: TransactionTypeT = Object.freeze({
+  byron: undefined,
+  shelley: 'shelley',
 });
 export type RemoteTransactionInput = {|
-  +type?: $PropertyType<InputTypesT, 'legacyUtxo'>,
-  ...RemoteTransactionInputBase,
-  ...RemoteTransactionUtxoInput,
-|} | {|
-  +type: $PropertyType<InputTypesT, 'utxo'>,
-  ...RemoteTransactionInputBase,
-  ...RemoteTransactionUtxoInput,
+  +id: string,
+  +index: number,
+  +txHash: string,
+  +address: string,
+  +amount: string,
 |};
 export type RemoteTransactionOutput = {|
   +address: string,
@@ -108,13 +114,14 @@ export type RemoteTxInfo = {|
   +tx_state: RemoteTxState,
   +inputs: Array<RemoteTransactionInput>,
   +outputs: Array<RemoteTransactionOutput>,
-  +certificates?: Array<RemoteCertificate>,
-  +withdrawals?: Array<RemoteWithdrawal>,
 |};
 export type RemoteTransaction = {|
-  // TODO: some flag to differentiate Byron txs from Shelley txs
-  ...WithNullableFields<RemoteTxBlockMeta>,
-  ...RemoteTxInfo,
+  +type?: $PropertyType<TransactionTypeT, 'byron'>,
+  ...RemoteTransactionBase,
+|} | {|
+  +type: $PropertyType<TransactionTypeT, 'shelley'>,
+  ...RemoteTransactionBase,
+  ...RemoteTransactionShelley,
 |};
 
 export type RemoteUnspentOutput = {|
@@ -130,6 +137,77 @@ export type RemoteWithdrawal = {|
   amount: string,
 |};
 
+export const ShelleyCertificateTypes = Object.freeze({
+  StakeRegistration: 'StakeRegistration',
+  StakeDeregistration: 'StakeDeregistration',
+  StakeDelegation: 'StakeDelegation',
+  PoolRegistration: 'PoolRegistration',
+  PoolRetirement: 'PoolRetirement',
+  GenesisKeyDelegation: 'GenesisKeyDelegation',
+  MoveInstantaneousRewardsCert: 'MoveInstantaneousRewardsCert',
+});
+
+export type RemoteStakeRegistrationCert = {|
+  stake_credential: string,
+|};
+export type RemoteStakeDeregistrationCert = {|
+  stake_credential: string,
+|};
+export type RemoteStakeDelegationCert = {|
+  stake_credential: string,
+  pool_keyhash: string,
+|};
+export type RemotePoolRegistrationCert = {|
+  pool_params: {|
+    operator: string,
+    vrf_keyhash: string,
+    pledge: string,
+    cost: string,
+    margin: {|
+      numerator: string,
+      denominator: string
+    |},
+    reward_account: string,
+    pool_owners: Array<string>,
+    relays: Array<string>,
+    pool_metadata: void | {|
+      url: string,
+      metadata_hash: string,
+    |},
+  |},
+|};
+export type RemotePoolRetirementCert = {|
+  pool_keyhash: string,
+  epoch: number,
+|};
+export type RemoteGenesisKeyDelegationCert = {|
+  genesishash: string,
+  genesis_delegate_hash: string,
+  vrf_keyhash: string,
+|};
+export type RemoteMoveInstantaneousRewardsCert = {|
+  pot: $Values<typeof MIRPot>,
+  rewards: {| [stake_credential: string]: string /* coin */ |},
+|};
 export type RemoteCertificate = {|
-  payloadHex: string,
+  type: typeof ShelleyCertificateTypes.StakeRegistration,
+  ...RemoteStakeRegistrationCert,
+|} | {|
+  type: typeof ShelleyCertificateTypes.StakeDeregistration,
+  ...RemoteStakeDeregistrationCert,
+|} | {|
+  type: typeof ShelleyCertificateTypes.StakeDelegation,
+  ...RemoteStakeDelegationCert,
+|} | {|
+  type: typeof ShelleyCertificateTypes.PoolRegistration,
+  ...RemotePoolRegistrationCert,
+|} | {|
+  type: typeof ShelleyCertificateTypes.PoolRetirement,
+  ...RemotePoolRetirementCert,
+|} | {|
+  type: typeof ShelleyCertificateTypes.GenesisKeyDelegation,
+  ...RemoteGenesisKeyDelegationCert,
+|} | {|
+  type: typeof ShelleyCertificateTypes.MoveInstantaneousRewardsCert,
+  ...RemoteMoveInstantaneousRewardsCert,
 |};

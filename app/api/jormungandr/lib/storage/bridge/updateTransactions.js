@@ -684,7 +684,7 @@ export async function updateTransactionBatch(
       txsAddedToBlock.push({
         block: result.block,
         transaction: result.transaction,
-        certificate: result.certificate,
+        certificates: result.certificates,
         utxoInputs: result.utxoInputs,
         utxoOutputs: result.utxoOutputs,
         accountingInputs: result.accountingInputs,
@@ -761,7 +761,7 @@ async function networkTxToDbTx(
 ): Promise<Array<{|
   block: null | BlockInsert,
   transaction: (blockId: null | number) => TransactionInsert,
-  certificate: number => (void | AddCertificateRequest),
+  certificates: $ReadOnlyArray<number => (void | AddCertificateRequest)>,
   ioGen: number => {|
     utxoInputs: Array<UtxoTransactionInputInsert>,
     utxoOutputs: Array<UtxoTransactionOutputInsert>,
@@ -803,9 +803,11 @@ async function networkTxToDbTx(
       BlockSeed,
     );
 
-    const certificate: number => (void | AddCertificateRequest) = networkTx.certificate == null
-      ? (_txId) => {}
-      : await certificateToDb(
+    const certificates: Array<
+      number => (void | AddCertificateRequest)
+    > = networkTx.certificate == null
+      ? [(_txId) => undefined]
+      : [await certificateToDb(
         db, dbTx,
         {
           certificate: networkTx.certificate,
@@ -813,11 +815,11 @@ async function networkTxToDbTx(
           derivationTables,
           firstInput: networkTx.inputs[0],
         }
-      );
+      )];
     result.push({
       block,
       transaction,
-      certificate,
+      certificates,
       ioGen: (txRowId) => {
         const utxoInputs = [];
         const utxoOutputs = [];

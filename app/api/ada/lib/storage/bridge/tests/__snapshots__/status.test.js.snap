@@ -14,7 +14,7 @@ Object {
       "accountingOutputs": Array [],
       "amount": "-1900000",
       "block": null,
-      "certificate": undefined,
+      "certificates": Array [],
       "fee": "-200000",
       "transaction": Object {
         "BlockId": null,
@@ -61,7 +61,7 @@ Object {
         "Height": 218609,
         "SlotNum": 219651,
       },
-      "certificate": undefined,
+      "certificates": Array [],
       "fee": "0",
       "transaction": Object {
         "BlockId": 2,
@@ -116,7 +116,7 @@ Object {
         "Height": 218608,
         "SlotNum": 219650,
       },
-      "certificate": undefined,
+      "certificates": Array [],
       "fee": "0",
       "transaction": Object {
         "BlockId": 1,
@@ -614,7 +614,7 @@ Object {
       "accountingOutputs": Array [],
       "amount": "-1900000",
       "block": null,
-      "certificate": undefined,
+      "certificates": Array [],
       "fee": "-200000",
       "transaction": Object {
         "BlockId": null,
@@ -661,7 +661,7 @@ Object {
         "Height": 218609,
         "SlotNum": 219651,
       },
-      "certificate": undefined,
+      "certificates": Array [],
       "fee": "0",
       "transaction": Object {
         "BlockId": 2,
@@ -716,7 +716,7 @@ Object {
         "Height": 218608,
         "SlotNum": 219650,
       },
-      "certificate": undefined,
+      "certificates": Array [],
       "fee": "0",
       "transaction": Object {
         "BlockId": 1,

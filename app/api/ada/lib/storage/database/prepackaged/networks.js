@@ -21,7 +21,7 @@ export const ErgoForks = Object.freeze({
 
 export const networks = Object.freeze({
   ByronMainnet: ({
-    NetworkId: 1_00,
+    NetworkId: 0,
     StaticConfig: Object.freeze({
       NetworkId: '1',
       ByronNetworkId: 764824073,
@@ -30,7 +30,7 @@ export const networks = Object.freeze({
     Fork: CardanoForks.Haskell,
   }: NetworkRow),
   JormungandrMainnet: ({
-    NetworkId: 2_00,
+    NetworkId: 1_00,
     StaticConfig: Object.freeze({
       NetworkId: '8e4d2a343f3dcf9330ad9035b3e8d168e6728904262f2c434a4f8f934ec7b676',
       ByronNetworkId: 764824073,
@@ -39,7 +39,7 @@ export const networks = Object.freeze({
     Fork: CardanoForks.Jormungandr,
   }: NetworkRow),
   ErgoMainnet: ({
-    NetworkId: 3_00,
+    NetworkId: 2_00,
     StaticConfig: Object.freeze({
       NetworkId: (Network.Mainnet.toString(): string),
     }),

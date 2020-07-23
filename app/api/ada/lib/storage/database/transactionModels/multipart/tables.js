@@ -8,7 +8,7 @@ import type { DbAccountingInputs, DbAccountingOutputs, } from '../account/tables
 
 export type DbTxIO = {|
   ...DbTransaction,
-  certificate: void | CertificatePart,
+  certificates: Array<CertificatePart>,
   ...DbUtxoInputs, ...DbUtxoOutputs,
   ...DbAccountingInputs, ...DbAccountingOutputs,
 |};

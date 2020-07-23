@@ -1,7 +1,6 @@
 // @flow
 
 import BigNumber from 'bignumber.js';
-import { InputTypes } from './types';
 import type {
   HistoryRequest, HistoryResponse, HistoryFunc,
   BestBlockRequest, BestBlockResponse, BestBlockFunc,
@@ -240,16 +239,11 @@ export function genUtxoForAddresses(
     for (const tx of inBlockHistory) {
       for (let j = 0; j < tx.inputs.length; j++) {
         const input = tx.inputs[j];
-        if (
-          input.type === InputTypes.utxo ||
-          input.type === InputTypes.legacyUtxo
-        ) {
-          const key = JSON.stringify({
-            id: input.txHash,
-            index: input.index,
-          });
-          utxoMap.delete(key);
-        }
+        const key = JSON.stringify({
+          id: input.txHash,
+          index: input.index,
+        });
+        utxoMap.delete(key);
       }
     }
     const result = Array.from(utxoMap.values());

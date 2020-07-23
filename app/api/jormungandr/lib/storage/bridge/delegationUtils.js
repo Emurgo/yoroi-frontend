@@ -26,9 +26,9 @@ import type {
   AccountStateSuccess,
 } from '../../state-fetch/types';
 import { TxStatusCodes } from '../../../../ada/lib/storage/database/primitives/enums';
+import type { CertificateInsert } from '../../../../ada/lib/storage/database/primitives/tables';
 import type { CertificateForKey } from '../../../../ada/lib/storage/database/primitives/api/read';
 import type { ToRelativeSlotNumberFunc } from './timeUtils';
-import type { CertificateKindType } from '@emurgo/js-chain-libs/js_chain_libs';
 
 export type GetDelegatedBalanceRequest = {|
   publicDeriver: PublicDeriver<> & IGetStakingKey,
@@ -175,7 +175,7 @@ export async function getCurrentDelegation(
 
 export function certificateToPoolList(
   certificateHex: string,
-  kind: CertificateKindType,
+  kind: $PropertyType<CertificateInsert, 'Kind'>,
 ): AccountStateDelegation {
   switch (kind) {
     case RustModule.WalletV3.CertificateKind.StakeDelegation: {
