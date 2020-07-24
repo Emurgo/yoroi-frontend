@@ -666,7 +666,7 @@ Object {
     Object {
       "ConceptualWalletId": 1,
       "Name": "My Test Wallet",
-      "NetworkId": 100,
+      "NetworkId": 0,
     },
   ],
   "EncryptionMeta": Array [
@@ -687,7 +687,7 @@ Object {
       "ExplorerId": 100,
       "IsBackup": false,
       "Name": "ADAex.org",
-      "NetworkId": 100,
+      "NetworkId": 0,
     },
     Object {
       "Endpoints": Object {
@@ -697,7 +697,7 @@ Object {
       "ExplorerId": 101,
       "IsBackup": false,
       "Name": "AdaScan",
-      "NetworkId": 100,
+      "NetworkId": 0,
     },
     Object {
       "Endpoints": Object {
@@ -707,7 +707,7 @@ Object {
       "ExplorerId": 102,
       "IsBackup": false,
       "Name": "Blockchair",
-      "NetworkId": 100,
+      "NetworkId": 0,
     },
     Object {
       "Endpoints": Object {
@@ -716,7 +716,7 @@ Object {
       "ExplorerId": 103,
       "IsBackup": false,
       "Name": "Clio.1",
-      "NetworkId": 100,
+      "NetworkId": 0,
     },
     Object {
       "Endpoints": Object {
@@ -726,7 +726,7 @@ Object {
       "ExplorerId": 104,
       "IsBackup": true,
       "Name": "CardanoExplorer",
-      "NetworkId": 100,
+      "NetworkId": 0,
     },
     Object {
       "Endpoints": Object {
@@ -737,7 +737,7 @@ Object {
       "ExplorerId": 200,
       "IsBackup": false,
       "Name": "AdaStat",
-      "NetworkId": 200,
+      "NetworkId": 100,
     },
     Object {
       "Endpoints": Object {
@@ -747,7 +747,7 @@ Object {
       "ExplorerId": 201,
       "IsBackup": true,
       "Name": "CardanoExplorer",
-      "NetworkId": 200,
+      "NetworkId": 100,
     },
     Object {
       "Endpoints": Object {
@@ -757,7 +757,7 @@ Object {
       "ExplorerId": 300,
       "IsBackup": true,
       "Name": "ErgoPlatform",
-      "NetworkId": 300,
+      "NetworkId": 200,
     },
   ],
   "HwWalletMeta": Array [],
@@ -1149,7 +1149,7 @@ Object {
     Object {
       "CoinType": 2147485463,
       "Fork": 0,
-      "NetworkId": 100,
+      "NetworkId": 0,
       "StaticConfig": Object {
         "ByronNetworkId": 764824073,
         "NetworkId": "1",
@@ -1158,7 +1158,7 @@ Object {
     Object {
       "CoinType": 2147485463,
       "Fork": 1,
-      "NetworkId": 200,
+      "NetworkId": 100,
       "StaticConfig": Object {
         "ByronNetworkId": 764824073,
         "NetworkId": "8e4d2a343f3dcf9330ad9035b3e8d168e6728904262f2c434a4f8f934ec7b676",
@@ -1167,7 +1167,7 @@ Object {
     Object {
       "CoinType": 2147484077,
       "Fork": 0,
-      "NetworkId": 300,
+      "NetworkId": 200,
       "StaticConfig": Object {
         "NetworkId": "0",
       },

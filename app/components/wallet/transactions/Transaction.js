@@ -15,6 +15,7 @@ import AdaSymbol from '../../../assets/images/ada-symbol.inline.svg';
 import AddMemoSvg from '../../../assets/images/add-memo.inline.svg';
 import EditSvg from '../../../assets/images/edit.inline.svg';
 import WalletTransaction from '../../../domain/WalletTransaction';
+import JormungandrTransaction from '../../../domain/JormungandrTransaction';
 import globalMessages, { memoMessages, } from '../../../i18n/global-messages';
 import type { TransactionDirectionType, } from '../../../api/ada/transactions/types';
 import { transactionTypes } from '../../../api/ada/transactions/types';
@@ -666,10 +667,14 @@ export default class Transaction extends Component<Props, State> {
 
   getCertificate: WalletTransaction => Node = (data) => {
     const { intl } = this.context;
-    if (data.certificate == null) {
-      return (null);
+    if (!(data instanceof JormungandrTransaction)) {
+      return null;
     }
-    const certificateText = this.certificateToText(data.certificate.certificate);
+    if (data.certificates.length === 0) {
+      return null;
+    }
+    // TODO: deicide what to show in multi-certificate case of Haskell Shelley
+    const certificateText = this.certificateToText(data.certificates[0].certificate);
     return (
       <>
         <h2>

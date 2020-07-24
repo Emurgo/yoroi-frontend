@@ -160,8 +160,9 @@ export default class AddressesStore extends Store {
     if (withLevels == null) {
       throw new Error(`${nameof(this._wrapForeign)} missing levels`);
     }
+    const apiType = getApiForNetwork(request.publicDeriver.getParent().getNetworkInfo());
 
-    const allAddresses = await this.api.common.getForeignAddresses({
+    const allAddresses = await this.api[apiType].getForeignAddresses({
       publicDeriver: withLevels,
     });
 

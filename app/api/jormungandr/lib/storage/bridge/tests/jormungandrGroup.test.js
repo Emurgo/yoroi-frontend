@@ -45,11 +45,10 @@ import {
 import { getCertificates } from '../../../../../ada/lib/storage/models/utils';
 
 import {
-  removeAllTransactions,
-} from '../../../../../ada/lib/storage/bridge/updateTransactions';
-import {
   updateTransactions,
+  removeAllTransactions,
 } from '../updateTransactions';
+import { TransactionType } from '../../../../../ada/lib/storage/database/primitives/tables';
 
 jest.mock('../../../../../ada/lib/storage/database/initialSeed');
 
@@ -431,6 +430,7 @@ async function syncingSimpleTransaction(): Promise<void> {
         },
         output: {
           Transaction: {
+            Type: TransactionType.Jormungandr,
             ErrorMessage: null,
             Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed545',
             Digest: 8.191593645542673e-27,
@@ -521,6 +521,7 @@ async function syncingSimpleTransaction(): Promise<void> {
         },
         output: {
           Transaction: {
+            Type: TransactionType.Jormungandr,
             ErrorMessage: null,
             Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546',
             Digest: 1.249559827714551e-31,
@@ -553,6 +554,7 @@ async function syncingSimpleTransaction(): Promise<void> {
         },
         output: {
           Transaction: {
+            Type: TransactionType.Jormungandr,
             ErrorMessage: null,
             Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546',
             Digest: 1.249559827714551e-31,
@@ -667,6 +669,7 @@ async function syncWithSwappedGroup(): Promise<void> {
         },
         output: {
           Transaction: {
+            Type: TransactionType.Jormungandr,
             ErrorMessage: null,
             Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed545',
             Digest: 8.191593645542673e-27,
@@ -785,6 +788,7 @@ async function syncWithCertificate(): Promise<void> {
       Relation: 0,
     }],
     transaction: {
+      Type: TransactionType.Jormungandr,
       BlockId: 1,
       Digest: 8.191593645542673e-27,
       ErrorMessage: null,
@@ -836,6 +840,7 @@ async function syncWithCertificate(): Promise<void> {
       Relation: 0,
     }],
     transaction: {
+      Type: TransactionType.Jormungandr,
       BlockId: null,
       Digest: 1.249559827714551e-31,
       ErrorMessage: null,

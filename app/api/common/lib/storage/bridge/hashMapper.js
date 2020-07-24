@@ -82,6 +82,43 @@ export function rawGenAddByHash(
   };
 }
 
+async function addFromCanonical(
+  db: lf$Database,
+  tx: lf$Transaction,
+  deps: {|
+    GetAddress: Class<GetAddress>,
+    ModifyAddress: Class<ModifyAddress>,
+  |},
+  notFoundWithoutCanonical: Array<{| data: string, type: CoreAddressT |}>,
+  ownAddressIds: Set<number>,
+  address: {| data: string, type: CoreAddressT |},
+  finalMapping: Map<string, number>,
+  hash: string,
+): Promise<void> {
+  // TODO: make this batched
+  const addressRows = (await deps.GetAddress.getByHash(db, tx, [hash]))
+    .filter(addressRow => ownAddressIds.has(addressRow.AddressId));
+
+  if (addressRows.length > 1) {
+    throw new Error(`${nameof(addFromCanonical)} Should never happen multi-match`);
+  } else if (addressRows.length === 0) {
+    notFoundWithoutCanonical.push(address);
+  } else { // addressRows.length === 1
+    const keyDerivationId = await deps.GetAddress.getKeyForFamily(
+      db, tx,
+      addressRows[0].AddressId
+    );
+    if (keyDerivationId == null) throw new Error(`${nameof(addFromCanonical)} Should never happen no mapping`);
+    const newAddr = await deps.ModifyAddress.addFromCanonicalByHash(db, tx, [{
+      keyDerivationId,
+      data: address.data,
+      type: CoreAddressTypes.JORMUNGANDR_GROUP,
+    }]);
+    finalMapping.set(address.data, newAddr[0].AddressId);
+    ownAddressIds.add(newAddr[0].AddressId);
+  }
+}
+
 export type HashToIdsRequest = {|
   db: lf$Database,
   tx: lf$Transaction,
@@ -158,9 +195,53 @@ export function rawGenHashToIdsFunc(
       type: addressToKind(addr, 'bytes', network),
     }));
     for (const address of addressWithType) {
-      if (address.type !== CoreAddressTypes.JORMUNGANDR_GROUP) {
-        notFoundWithoutCanonical.push(address);
-      } else {
+      if (address.type === CoreAddressTypes.CARDANO_BASE) {
+        // for group addresses we have to look at the payment key
+        // to see if there exists a canonical address
+        const wasmAddress = RustModule.WalletV4.Address.from_bytes(
+          Buffer.from(address.data, 'hex')
+        );
+        const baseAddress = RustModule.WalletV4.BaseAddress.from_address(wasmAddress);
+        if (baseAddress == null) throw new Error(`${nameof(rawGenHashToIdsFunc)} not base address Should never happen`);
+        const canonical = RustModule.WalletV4.EnterpriseAddress.new(
+          wasmAddress.network_id(),
+          baseAddress.payment_cred()
+        );
+        const hash = Buffer.from(canonical.to_address().to_bytes()).toString('hex');
+        await addFromCanonical(
+          request.db,
+          request.tx,
+          deps,
+          notFoundWithoutCanonical,
+          ownAddressIds,
+          address,
+          finalMapping,
+          hash
+        );
+      } else if (address.type === CoreAddressTypes.CARDANO_PTR) {
+        // for group addresses we have to look at the payment key
+        // to see if there exists a canonical address
+        const wasmAddress = RustModule.WalletV4.Address.from_bytes(
+          Buffer.from(address.data, 'hex')
+        );
+        const ptrAddress = RustModule.WalletV4.PointerAddress.from_address(wasmAddress);
+        if (ptrAddress == null) throw new Error(`${nameof(rawGenHashToIdsFunc)} not ptr address Should never happen`);
+        const canonical = RustModule.WalletV4.EnterpriseAddress.new(
+          wasmAddress.network_id(),
+          ptrAddress.payment_cred()
+        );
+        const hash = Buffer.from(canonical.to_address().to_bytes()).toString('hex');
+        await addFromCanonical(
+          request.db,
+          request.tx,
+          deps,
+          notFoundWithoutCanonical,
+          ownAddressIds,
+          address,
+          finalMapping,
+          hash
+        );
+      } else if (address.type === CoreAddressTypes.JORMUNGANDR_GROUP) {
         // for group addresses we have to look at the payment key
         // to see if there exists a canonical address
         const wasmAddress = RustModule.WalletV3.Address.from_bytes(
@@ -173,28 +254,18 @@ export function rawGenHashToIdsFunc(
           wasmAddress.get_discrimination()
         );
         const hash = Buffer.from(canonical.as_bytes()).toString('hex');
-        // TODO: make this batched
-        const addressRows = (await deps.GetAddress.getByHash(request.db, request.tx, [hash]))
-          .filter(addressRow => ownAddressIds.has(addressRow.AddressId));
-
-        if (addressRows.length > 1) {
-          throw new Error(`${nameof(rawGenHashToIdsFunc)} Should never happen multi-match`);
-        } else if (addressRows.length === 0) {
-          notFoundWithoutCanonical.push(address);
-        } else { // addressRows.length === 1
-          const keyDerivationId = await deps.GetAddress.getKeyForFamily(
-            request.db, request.tx,
-            addressRows[0].AddressId
-          );
-          if (keyDerivationId == null) throw new Error(`${nameof(rawGenHashToIdsFunc)} Should never happen no mapping`);
-          const newAddr = await deps.ModifyAddress.addFromCanonicalByHash(request.db, request.tx, [{
-            keyDerivationId,
-            data: address.data,
-            type: CoreAddressTypes.JORMUNGANDR_GROUP,
-          }]);
-          finalMapping.set(address.data, newAddr[0].AddressId);
-          ownAddressIds.add(newAddr[0].AddressId);
-        }
+        await addFromCanonical(
+          request.db,
+          request.tx,
+          deps,
+          notFoundWithoutCanonical,
+          ownAddressIds,
+          address,
+          finalMapping,
+          hash
+        );
+      } else {
+        notFoundWithoutCanonical.push(address);
       }
     }
     // note: must be foreign

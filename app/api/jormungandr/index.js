@@ -6,7 +6,7 @@ import {
   stringifyError,
   stringifyData
 } from '../../utils/logging';
-import WalletTransaction from '../../domain/WalletTransaction';
+import JormungandrTransaction from '../../domain/JormungandrTransaction';
 import {
   HARD_DERIVATION_START,
   WalletTypePurpose,
@@ -24,11 +24,12 @@ import {
   createStandardCip1852Wallet,
 } from './lib/storage/bridge/walletBuilder/jormungandr';
 import {
-  updateTransactions,
-} from './lib/storage/bridge/updateTransactions';
-import {
+  getPendingTransactions,
   getAllTransactions,
-} from '../ada/lib/storage/bridge/updateTransactions';
+  updateTransactions,
+  removeAllTransactions,
+  getForeignAddresses,
+} from './lib/storage/bridge/updateTransactions';
 import {
   filterAddressesByStakingKey,
   groupAddrContainsAccountKey,
@@ -62,6 +63,9 @@ import type {
 import type {
   BaseGetTransactionsRequest,
   GetTransactionsResponse,
+  RefreshPendingTransactionsRequest, RefreshPendingTransactionsResponse,
+  RemoveAllTransactionsRequest, RemoveAllTransactionsResponse,
+  GetForeignAddressesRequest, GetForeignAddressesResponse,
 } from '../common/index';
 import {
   sendAllUnsignedTx as jormungandrSendAllUnsignedTx,
@@ -342,7 +346,7 @@ export default class JormungandrApi {
       Logger.debug(`${nameof(JormungandrApi)}::${nameof(this.refreshTransactions)} success: ` + stringifyData(fetchedTxs));
 
       const mappedTransactions = fetchedTxs.txs.map(tx => {
-        return WalletTransaction.fromAnnotatedTx({
+        return JormungandrTransaction.fromAnnotatedTx({
           tx,
           addressLookupMap: fetchedTxs.addressLookupMap,
           api: getApiForNetwork(request.publicDeriver.getParent().getNetworkInfo()),
@@ -354,6 +358,60 @@ export default class JormungandrApi {
       };
     } catch (error) {
       Logger.error(`${nameof(JormungandrApi)}::${nameof(this.refreshTransactions)} error: ` + stringifyError(error));
+      throw new GenericApiError();
+    }
+  }
+
+  async refreshPendingTransactions(
+    request: RefreshPendingTransactionsRequest
+  ): Promise<RefreshPendingTransactionsResponse> {
+    Logger.debug(`${nameof(JormungandrApi)}::${nameof(this.refreshPendingTransactions)} called`);
+    try {
+      const fetchedTxs = await getPendingTransactions({
+        publicDeriver: request.publicDeriver,
+      });
+      Logger.debug(`${nameof(JormungandrApi)}::${nameof(this.refreshPendingTransactions)} success: ` + stringifyData(fetchedTxs));
+
+      const mappedTransactions = fetchedTxs.txs.map(tx => {
+        return JormungandrTransaction.fromAnnotatedTx({
+          tx,
+          addressLookupMap: fetchedTxs.addressLookupMap,
+          api: getApiForNetwork(request.publicDeriver.getParent().getNetworkInfo()),
+        });
+      });
+      return mappedTransactions;
+    } catch (error) {
+      Logger.error(`${nameof(JormungandrApi)}::${nameof(this.refreshPendingTransactions)} error: ` + stringifyError(error));
+      throw new GenericApiError();
+    }
+  }
+
+  async removeAllTransactions(
+    request: RemoveAllTransactionsRequest
+  ): Promise<RemoveAllTransactionsResponse> {
+    try {
+      // 1) clear existing history
+      await removeAllTransactions({ publicDeriver: request.publicDeriver });
+
+      // 2) trigger a history sync
+      try {
+        await request.refreshWallet();
+      } catch (_e) {
+        Logger.warn(`${nameof(this.removeAllTransactions)} failed to connect to remote to resync. Data was still cleared locally`);
+      }
+    } catch (error) {
+      Logger.error(`${nameof(JormungandrApi)}::${nameof(this.removeAllTransactions)} error: ` + stringifyError(error));
+      throw new GenericApiError();
+    }
+  }
+
+  async getForeignAddresses(
+    request: GetForeignAddressesRequest
+  ): Promise<GetForeignAddressesResponse> {
+    try {
+      return await getForeignAddresses({ publicDeriver: request.publicDeriver });
+    } catch (error) {
+      Logger.error(`${nameof(JormungandrApi)}::${nameof(this.getForeignAddresses)} error: ` + stringifyError(error));
       throw new GenericApiError();
     }
   }

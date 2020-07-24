@@ -16,7 +16,7 @@ import {
 import { GetEncryptionMeta, } from './primitives/api/read';
 import { ModifyEncryptionMeta, ModifyNetworks, } from './primitives/api/write';
 import { ModifyExplorers, } from './explorers/api/write';
-import { populatePrimitivesDb } from './primitives/tables';
+import { populatePrimitivesDb, TransactionType } from './primitives/tables';
 import { populateCommonDb } from './walletTypes/common/tables';
 import { populateBip44Db } from './walletTypes/bip44/tables';
 import { populateCip1852Db } from './walletTypes/cip1852/tables';
@@ -134,7 +134,7 @@ const populateAndCreate = async (
   storeType: $Values<typeof schema.DataStoreType>
 ): Promise<lf$Database> => {
   const schemaName = 'yoroi-schema';
-  const schemaVersion = 12;
+  const schemaVersion = 13;
   const schemaBuilder = schema.create(schemaName, schemaVersion);
 
   populatePrimitivesDb(schemaBuilder);
@@ -263,6 +263,14 @@ async function onUpgrade(
       'NetworkId',
       // recall: at the time we only supported 1 currency per Yoroi install
       networks.ByronMainnet.NetworkId
+    );
+  }
+  if (version >= 3 && version <= 12) {
+    await rawDb.addTableColumn(
+      'Transaction',
+      'Type',
+      // recall: at the time we only supported Byron at this time
+      TransactionType.CardanoByron
     );
   }
 }

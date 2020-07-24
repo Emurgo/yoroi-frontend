@@ -42,6 +42,7 @@ import {
 import {
   updateTransactions, getAllTransactions
 } from '../updateTransactions';
+import { TransactionType } from '../../database/primitives/tables';
 
 jest.mock('../../database/initialSeed');
 
@@ -370,6 +371,7 @@ async function baseTest(
         },
         output: {
           Transaction: {
+            Type: TransactionType.CardanoByron,
             ErrorMessage: null,
             Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546',
             Digest: 1.249559827714551e-31,
@@ -420,7 +422,7 @@ async function baseTest(
 
   // pending becomes successful
   {
-    const previouslyPending = networkTransactions.shift();
+    const previouslyPending: RemoteTransaction = networkTransactions.shift();
     const newTx = {
       ...previouslyPending,
       ...({
@@ -432,7 +434,7 @@ async function baseTest(
         slot: 3651,
       }: RemoteTxBlockMeta),
       last_update: '2019-09-13T16:37:36.000Z',
-      tx_state: 'Successful'
+      tx_state: 'Successful',
     };
     networkTransactions.push(newTx);
 
@@ -465,6 +467,7 @@ async function baseTest(
         },
         output: {
           Transaction: {
+            Type: TransactionType.CardanoByron,
             ErrorMessage: null,
             Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed545',
             Digest: 8.191593645542673e-27,
@@ -502,6 +505,7 @@ async function baseTest(
         },
         output: {
           Transaction: {
+            Type: TransactionType.CardanoByron,
             ErrorMessage: null,
             Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546',
             Digest: 1.249559827714551e-31,
@@ -585,6 +589,7 @@ async function baseTest(
         },
         output: {
           Transaction: {
+            Type: TransactionType.CardanoByron,
             ErrorMessage: null,
             Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed545',
             Digest: 8.191593645542673e-27,
@@ -622,6 +627,7 @@ async function baseTest(
         },
         output: {
           Transaction: {
+            Type: TransactionType.CardanoByron,
             ErrorMessage: null,
             Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546',
             Digest: 1.249559827714551e-31,
@@ -674,6 +680,7 @@ async function baseTest(
     );
 
     expect((await db.export()).tables.Transaction).toEqual([{
+      Type: TransactionType.CardanoByron,
       Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed545',
       Digest: 8.191593645542673e-27,
       BlockId: 2,
@@ -684,6 +691,7 @@ async function baseTest(
       TransactionId: 1
     },
     {
+      Type: TransactionType.CardanoByron,
       Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546',
       Digest: 1.249559827714551e-31,
       BlockId: 1,
@@ -694,6 +702,7 @@ async function baseTest(
       TransactionId: 2
     },
     {
+      Type: TransactionType.CardanoByron,
       Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed547',
       Digest: 1.9060984568373646e-36,
       BlockId: null,
@@ -791,6 +800,7 @@ async function pendingDropped(
 
   expect((await db.export()).tables.Transaction).toEqual([
     {
+      Type: TransactionType.CardanoByron,
       // pending tx that is now failed as expected
       Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed545',
       Digest: 8.191593645542673e-27,

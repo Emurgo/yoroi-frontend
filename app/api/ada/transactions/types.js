@@ -6,10 +6,6 @@ import {
 import { RustModule } from '../lib/cardanoCrypto/rustLoader';
 
 import type {
-  DbTxIO,
-} from '../lib/storage/database/transactionModels/multipart/tables';
-import type { DbBlock, } from '../lib/storage/database/primitives/tables';
-import type {
   Address, Value, Addressing,
 } from '../lib/storage/models/PublicDeriver/interfaces';
 
@@ -30,12 +26,6 @@ export type UserAnnotation = {|
   +type: TransactionDirectionType,
   +amount: BigNumber,
   +fee: BigNumber,
-|};
-
-export type AnnotatedTransaction = {|
-  ...DbTxIO,
-  ...WithNullableFields<DbBlock>,
-  ...UserAnnotation,
 |};
 
 export type AddressedUtxo = {|

@@ -398,7 +398,7 @@ export default class TransactionsStore extends Store {
         ),
         getBalanceRequest: new CachedRequest<GetBalanceFunc>(this.api.common.getBalance),
         pendingRequest: new CachedRequest<RefreshPendingTransactionsFunc>(
-          this.api.common.refreshPendingTransactions
+          this.stores.substores[apiType].transactions.refreshPendingTransactions
         ),
       },
     });

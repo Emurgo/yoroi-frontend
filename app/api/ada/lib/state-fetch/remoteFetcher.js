@@ -134,6 +134,7 @@ export class RemoteFetcher implements IFetcher {
         for (const input of resp.inputs) {
           // backend stores inputs as numbers but outputs as strings
           // we solve this mismatch locally
+          // $FlowExpectedError[cannot-write]
           input.amount = input.amount.toString();
         }
         if (resp.height != null) {

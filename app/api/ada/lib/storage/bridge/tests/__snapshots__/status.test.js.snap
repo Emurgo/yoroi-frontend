@@ -10,11 +10,8 @@ Object {
   },
   "txs": Array [
     Object {
-      "accountingInputs": Array [],
-      "accountingOutputs": Array [],
       "amount": "-1900000",
       "block": null,
-      "certificate": undefined,
       "fee": "-200000",
       "transaction": Object {
         "BlockId": null,
@@ -25,7 +22,9 @@ Object {
         "Ordinal": null,
         "Status": -1,
         "TransactionId": 3,
+        "Type": 0,
       },
+      "txType": 0,
       "type": "expend",
       "utxoInputs": Array [
         Object {
@@ -50,8 +49,6 @@ Object {
       ],
     },
     Object {
-      "accountingInputs": Array [],
-      "accountingOutputs": Array [],
       "amount": "2100000",
       "block": Object {
         "BlockId": 2,
@@ -61,7 +58,6 @@ Object {
         "Height": 218609,
         "SlotNum": 219651,
       },
-      "certificate": undefined,
       "fee": "0",
       "transaction": Object {
         "BlockId": 2,
@@ -72,7 +68,9 @@ Object {
         "Ordinal": 0,
         "Status": -2,
         "TransactionId": 1,
+        "Type": 0,
       },
+      "txType": 0,
       "type": "income",
       "utxoInputs": Array [
         Object {
@@ -105,8 +103,6 @@ Object {
       ],
     },
     Object {
-      "accountingInputs": Array [],
-      "accountingOutputs": Array [],
       "amount": "2100000",
       "block": Object {
         "BlockId": 1,
@@ -116,7 +112,6 @@ Object {
         "Height": 218608,
         "SlotNum": 219650,
       },
-      "certificate": undefined,
       "fee": "0",
       "transaction": Object {
         "BlockId": 1,
@@ -127,7 +122,9 @@ Object {
         "Ordinal": 0,
         "Status": -2,
         "TransactionId": 2,
+        "Type": 0,
       },
+      "txType": 0,
       "type": "income",
       "utxoInputs": Array [
         Object {
@@ -499,6 +496,7 @@ Array [
         "Ordinal": 0,
         "Status": -2,
         "TransactionId": 1,
+        "Type": 0,
       },
       Object {
         "BlockId": 1,
@@ -509,6 +507,7 @@ Array [
         "Ordinal": 0,
         "Status": -2,
         "TransactionId": 2,
+        "Type": 0,
       },
       Object {
         "BlockId": null,
@@ -519,6 +518,7 @@ Array [
         "Ordinal": null,
         "Status": -1,
         "TransactionId": 3,
+        "Type": 0,
       },
     ],
   },
@@ -610,11 +610,8 @@ Object {
   },
   "txs": Array [
     Object {
-      "accountingInputs": Array [],
-      "accountingOutputs": Array [],
       "amount": "-1900000",
       "block": null,
-      "certificate": undefined,
       "fee": "-200000",
       "transaction": Object {
         "BlockId": null,
@@ -625,7 +622,9 @@ Object {
         "Ordinal": null,
         "Status": -2,
         "TransactionId": 3,
+        "Type": 0,
       },
+      "txType": 0,
       "type": "expend",
       "utxoInputs": Array [
         Object {
@@ -650,8 +649,6 @@ Object {
       ],
     },
     Object {
-      "accountingInputs": Array [],
-      "accountingOutputs": Array [],
       "amount": "2100000",
       "block": Object {
         "BlockId": 2,
@@ -661,7 +658,6 @@ Object {
         "Height": 218609,
         "SlotNum": 219651,
       },
-      "certificate": undefined,
       "fee": "0",
       "transaction": Object {
         "BlockId": 2,
@@ -672,7 +668,9 @@ Object {
         "Ordinal": 0,
         "Status": -2,
         "TransactionId": 1,
+        "Type": 0,
       },
+      "txType": 0,
       "type": "income",
       "utxoInputs": Array [
         Object {
@@ -705,8 +703,6 @@ Object {
       ],
     },
     Object {
-      "accountingInputs": Array [],
-      "accountingOutputs": Array [],
       "amount": "2100000",
       "block": Object {
         "BlockId": 1,
@@ -716,7 +712,6 @@ Object {
         "Height": 218608,
         "SlotNum": 219650,
       },
-      "certificate": undefined,
       "fee": "0",
       "transaction": Object {
         "BlockId": 1,
@@ -727,7 +722,9 @@ Object {
         "Ordinal": 0,
         "Status": -2,
         "TransactionId": 2,
+        "Type": 0,
       },
+      "txType": 0,
       "type": "income",
       "utxoInputs": Array [
         Object {
@@ -1099,6 +1096,7 @@ Array [
         "Ordinal": 0,
         "Status": -2,
         "TransactionId": 1,
+        "Type": 0,
       },
       Object {
         "BlockId": 1,
@@ -1109,6 +1107,7 @@ Array [
         "Ordinal": 0,
         "Status": -2,
         "TransactionId": 2,
+        "Type": 0,
       },
       Object {
         "BlockId": null,
@@ -1119,6 +1118,7 @@ Array [
         "Ordinal": null,
         "Status": -2,
         "TransactionId": 3,
+        "Type": 0,
       },
     ],
   },

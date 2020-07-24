@@ -7,6 +7,7 @@ import type {
   CertificateRelationType,
 } from './enums';
 import type { CertificateKindType } from '@emurgo/js-chain-libs/js_chain_libs';
+import typeof { CertificateKind } from '@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib';
 import type { KeyKindType } from '../../../../../common/lib/crypto/keys/types';
 import type { CoinTypesT } from '../../../../../../config/numbersConfig';
 
@@ -197,11 +198,19 @@ export type DbBlock = {|
   +block: $ReadOnly<BlockRow>;
 |};
 
+export const TransactionType = Object.freeze({
+  CardanoByron: 0,
+  CardanoShelley: 1,
+  Jormungandr: 1_00,
+  Ergo: 2_00,
+});
+
 export type TransactionInsert = {|
   Digest: number,
+  Type: $Values<typeof TransactionType>,
   Hash: string,
   BlockId: null | number,
-  Ordinal: null | number,
+  Ordinal: null | number, // index within the block
   /**
    * Need this otherwise we wouldn't be able to sort transactions by time
    * Can't only use slot+epoch as these aren't available for pending/failed txs
@@ -221,6 +230,7 @@ export const TransactionSchema: {|
   name: 'Transaction',
   properties: {
     TransactionId: 'TransactionId',
+    Type: 'Type',
     Digest: 'Digest',
     Hash: 'Hash',
     BlockId: 'BlockId',
@@ -231,6 +241,28 @@ export const TransactionSchema: {|
   }
 };
 
+export type ShelleyTransactionInsert = {|
+  Fee: string,
+  Ttl: number,
+  Metadata: null | string,
+|};
+export type ShelleyTransactionRow = {|
+  ShelleyTransactionId: number,
+  ...ShelleyTransactionInsert,
+|};
+export const ShelleyTransactionSchema: {|
+  +name: 'ShelleyTransaction',
+  properties: $ObjMapi<ShelleyTransactionRow, ToSchemaProp>,
+|} = {
+  name: 'ShelleyTransaction',
+  properties: {
+    ShelleyTransactionId: 'ShelleyTransactionId',
+    Fee: 'Fee',
+    Ttl: 'Ttl',
+    Metadata: 'Metadata',
+  }
+};
+
 export type CertificatePart = {|
   relatedAddresses: $ReadOnlyArray<$ReadOnly<CertificateAddressRow>>,
   certificate: $ReadOnly<CertificateRow>,
@@ -238,7 +270,7 @@ export type CertificatePart = {|
 
 export type CertificateInsert = {|
   TransactionId: number,
-  Kind: CertificateKindType,
+  Kind: CertificateKindType | $Values<CertificateKind>,
   Payload: string,
 |};
 export type CertificateRow = {|
@@ -455,6 +487,7 @@ export const populatePrimitivesDb = (schemaBuilder: lf$schema$Builder) => {
   // Transaction table
   schemaBuilder.createTable(TransactionSchema.name)
     .addColumn(TransactionSchema.properties.TransactionId, Type.INTEGER)
+    .addColumn(TransactionSchema.properties.Type, Type.INTEGER)
     .addColumn(TransactionSchema.properties.Digest, Type.NUMBER)
     .addColumn(TransactionSchema.properties.Hash, Type.STRING)
     .addColumn(TransactionSchema.properties.BlockId, Type.INTEGER)
