@@ -6,4 +6,4 @@
 
 12.3 **Şirket Ödül-Havuzları.** Şirket, Yoroi veya Seiza'da görülebilecek çeşitli bahis havuzları işletecek. Bu tür ödül havuzlarını güvenilir bir şekilde işletmek için maliyet ve ağ ve sunucu gereklilikleri Şirket tarafından tamamen kendi takdirine bağlı olarak belirlenir. Bu tür ödül havuzlarını güvenilir bir şekilde işletmek için maliyet ve ağ ve sunucu gereklilikleri Şirket tarafından tamamen kendi takdirine bağlı olarak belirlenir. Ödüller her dönemin sonunda gerçekleşecek ve otomatik olarak Kullanıcının Yoroi cüzdanında görülecektir. Şirket, Kullanıcıya bahis performansını gösteren bir gösterge tablosu sağlayacaktır.
 
-12.4 **Redeeming Rewards.** User shall be responsible for payment of all applicable taxes, if any, to which the Rewards might be subject and any and all other taxes which may apply to User once Rewards are redeemed.
+12.4 ** Ödül Kazanma. ** Kullanıcı ödüllerin tabi olabileceği tüm geçerli vergilerin ve Ödüller kullanıldıktan sonra Kullanıcıya uygulanabilecek tüm diğer vergilerin ödenmesinden sorumludur.
