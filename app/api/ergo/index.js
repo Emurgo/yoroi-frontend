@@ -14,6 +14,8 @@ import type {
 import type {
   BaseGetTransactionsRequest,
   GetTransactionsResponse,
+  RefreshPendingTransactionsRequest,
+  RefreshPendingTransactionsResponse,
 } from '../common/index';
 import {
   isValidBip39Mnemonic,
@@ -28,7 +30,7 @@ import type {
 import { ConceptualWallet } from '../ada/lib/storage/models/ConceptualWallet/index';
 import type { IHasLevels } from '../ada/lib/storage/models/ConceptualWallet/interfaces';
 import type { TransactionExportRow } from '../export';
-import WalletTransaction from '../../domain/WalletTransaction';
+import ErgoTransaction from '../../domain/ErgoTransaction';
 import { getApiForNetwork } from '../common/utils';
 import {
   GenericApiError,
@@ -133,13 +135,13 @@ export default class ErgoApi {
         // TODO: implement tx syncing
       }
       const fetchedTxs = {
-        txs: [],
+        txs: [], // not implemented yet
         addressLookupMap: new Map(),
       };
       Logger.debug(`${nameof(ErgoApi)}::${nameof(this.refreshTransactions)} success: ` + stringifyData(fetchedTxs));
 
       const mappedTransactions = fetchedTxs.txs.map(tx => {
-        return WalletTransaction.fromAnnotatedTx({
+        return ErgoTransaction.fromAnnotatedTx({
           tx,
           addressLookupMap: fetchedTxs.addressLookupMap,
           api: getApiForNetwork(request.publicDeriver.getParent().getNetworkInfo()),
@@ -153,6 +155,31 @@ export default class ErgoApi {
       Logger.error(`${nameof(ErgoApi)}::${nameof(this.refreshTransactions)} error: ` + stringifyError(error));
       throw new GenericApiError();
     }
+  }
+
+  async refreshPendingTransactions(
+    _request: RefreshPendingTransactionsRequest
+  ): Promise<RefreshPendingTransactionsResponse> {
+    return []; // not implemented yet
+    // Logger.debug(`${nameof(ErgoApi)}::${nameof(this.refreshPendingTransactions)} called`);
+    // try {
+    //   const fetchedTxs = await getPendingTransactions({
+    //     publicDeriver: request.publicDeriver,
+    //   });
+    //   Logger.debug(`${nameof(ErgoApi)}::${nameof(this.refreshPendingTransactions)} success: ` + stringifyData(fetchedTxs));
+
+    //   const mappedTransactions = fetchedTxs.txs.map(tx => {
+    //     return ErgoTransaction.fromAnnotatedTx({
+    //       tx,
+    //       addressLookupMap: fetchedTxs.addressLookupMap,
+    //       api: getApiForNetwork(request.publicDeriver.getParent().getNetworkInfo()),
+    //     });
+    //   });
+    //   return mappedTransactions;
+    // } catch (error) {
+    //   Logger.error(`${nameof(ErgoApi)}::${nameof(this.refreshPendingTransactions)} error: ` + stringifyError(error));
+    //   throw new GenericApiError();
+    // }
   }
 
   /**

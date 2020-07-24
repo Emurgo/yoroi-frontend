@@ -3,6 +3,7 @@
 import Store from '../base/Store';
 import type {
   GetTransactionsFunc,
+  RefreshPendingTransactionsFunc,
 } from '../../api/common';
 
 export default class AdaTransactionsStore extends Store {
@@ -16,5 +17,9 @@ export default class AdaTransactionsStore extends Store {
       checkAddressesInUse: stateFetcher.checkAddressesInUse,
       getBestBlock: stateFetcher.getBestBlock,
     });
+  }
+
+  refreshPendingTransactions: RefreshPendingTransactionsFunc = (request) => {
+    return this.api.ada.refreshPendingTransactions(request);
   }
 }

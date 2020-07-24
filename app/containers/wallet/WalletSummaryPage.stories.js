@@ -32,6 +32,8 @@ import {
 } from '../../stores/toplevel/TransactionsStore';
 import ExportTransactionDialog from '../../components/wallet/export/ExportTransactionDialog';
 import WalletTransaction, { calculateUnconfirmedAmount } from '../../domain/WalletTransaction';
+import CardanoByronTransaction from '../../domain/CardanoByronTransaction';
+import JormungandrTransaction from '../../domain/JormungandrTransaction';
 import { transactionTypes } from '../../api/ada/transactions/types';
 import type { LastSyncInfoRow, } from '../../api/ada/lib/storage/database/walletTypes/core/tables';
 import { TxStatusCodes } from '../../api/ada/lib/storage/database/primitives/enums';
@@ -345,7 +347,8 @@ export const Transaction = (): Node => {
         Payload: ''
       },
     }];
-  const walletTransaction = new WalletTransaction({
+
+  const baseTxProps = {
     txid: '915f2e6865fb31cc93410efb6c0e580ca74862374b3da461e20135c01f312e7c',
     block: {
       BlockId: 1,
@@ -379,10 +382,15 @@ export const Transaction = (): Node => {
         },
       ],
     },
-    certificates,
     state,
     errorMsg: null,
-  });
+  };
+  const walletTransaction = certificates.length === 0
+    ? new CardanoByronTransaction(baseTxProps)
+    : new JormungandrTransaction({
+      ...baseTxProps,
+      certificates,
+    });
   const transactions = [walletTransaction];
 
   const numConfirmations = state === TxStatusCodes.IN_BLOCK
@@ -438,7 +446,7 @@ export const TransactionWithMemo = (): Node => {
   const wallet = genWallet();
   const lookup = walletLookup([wallet]);
 
-  const walletTransaction = new WalletTransaction({
+  const walletTransaction = new CardanoByronTransaction({
     txid: '915f2e6865fb31cc93410efb6c0e580ca74862374b3da461e20135c01f312e7c',
     block: {
       BlockId: 1,
@@ -466,7 +474,6 @@ export const TransactionWithMemo = (): Node => {
         value: new BigNumber(1000),
       }],
     },
-    certificates: [],
     state: TxStatusCodes.IN_BLOCK,
     errorMsg: null,
   });
@@ -518,7 +525,7 @@ export const MemoDialog = (): Node => {
   const wallet = genWallet();
   const lookup = walletLookup([wallet]);
 
-  const walletTransaction = new WalletTransaction({
+  const walletTransaction = new CardanoByronTransaction({
     txid: '915f2e6865fb31cc93410efb6c0e580ca74862374b3da461e20135c01f312e7c',
     block: {
       BlockId: 1,
@@ -546,7 +553,6 @@ export const MemoDialog = (): Node => {
         value: new BigNumber(1000),
       }],
     },
-    certificates: [],
     state: TxStatusCodes.IN_BLOCK,
     errorMsg: null,
   });
@@ -649,7 +655,7 @@ export const ManyTransactions = (): Node => {
 
   const transactions = [];
   for (let i = INITIAL_SEARCH_LIMIT; i >= 0; i--) {
-    transactions.push(new WalletTransaction({
+    transactions.push(new CardanoByronTransaction({
       txid: `915f2e6865fb31cc93410efb6c0e580ca74862374b3da461e20135c01f312e7${i}`,
       block: {
         BlockId: i + 1,
@@ -674,7 +680,6 @@ export const ManyTransactions = (): Node => {
           value: new BigNumber(1000),
         }],
       },
-      certificates: [],
       state: TxStatusCodes.IN_BLOCK,
       errorMsg: null,
     }));
@@ -715,7 +720,7 @@ export const TxHistoryExport = (): Node => {
   const wallet = genWallet();
   const lookup = walletLookup([wallet]);
 
-  const transactions = [new WalletTransaction({
+  const transactions = [new CardanoByronTransaction({
     txid: '915f2e6865fb31cc93410efb6c0e580ca74862374b3da461e20135c01f312e7c',
     block: {
       BlockId: 1,
@@ -739,7 +744,6 @@ export const TxHistoryExport = (): Node => {
         value: new BigNumber(1000),
       }],
     },
-    certificates: [],
     state: TxStatusCodes.IN_BLOCK,
     errorMsg: null,
   })];

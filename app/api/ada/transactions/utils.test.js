@@ -14,18 +14,21 @@ import type {
   UtxoTransactionInputRow,
   UtxoTransactionOutputRow,
 } from '../lib/storage/database/transactionModels/utxo/tables';
-import type {
-  AccountingTransactionInputRow,
-  AccountingTransactionOutputRow,
-} from '../lib/storage/database/transactionModels/account/tables';
 import {
   TxStatusCodes,
 } from '../lib/storage/database/primitives/enums';
-import type {
-  AnnotatedTransaction,
-} from './types';
 import {
   transactionTypes,
+} from './types';
+import {
+  TransactionType,
+} from '../lib/storage/database/primitives/tables';
+import type { CardanoByronTxIO } from '../lib/storage/database/transactionModels/multipart/tables';
+import type {
+  DbBlock,
+} from '../lib/storage/database/primitives/tables';
+import type {
+  UserAnnotation,
 } from './types';
 
 const _input = (
@@ -78,24 +81,18 @@ test('convertAdaTransactionsToExportRows', () => {
     _tx(
       [testInputs[0]],
       [testOutputs[0], testOutputs[1]],
-      [],
-      [],
       new Set([4]),
       '2010-01-01 22:12:22',
     ),
     _tx(
       [testInputs[1]],
       [testOutputs[2], testOutputs[3]],
-      [],
-      [],
       new Set([6]),
       '2012-05-12 11:22:33'
     ),
     _tx(
       [testInputs[2], testInputs[3]],
       [testOutputs[4], testOutputs[5]],
-      [],
-      [],
       new Set([2, 3, 9]),
       '2015-12-13 10:20:30'
     ),
@@ -111,8 +108,6 @@ test('self tx', () => {
   const selfTx = _tx(
     [testInputs[0]],
     [testOutputs[0]],
-    [],
-    [],
     new Set([0, 4]),
     '2015-12-13 10:20:30'
   );
@@ -125,8 +120,6 @@ test('multi tx', () => {
   const selfTx = _tx(
     [testInputs[0], testInputs[1]],
     [testOutputs[0], testOutputs[1]],
-    [],
-    [],
     new Set([0, 4]),
     '2015-12-13 10:20:30'
   );
@@ -162,21 +155,22 @@ test('formatBigNumberToFloatString', () => {
 const _tx = (
   utxoInputs: Array<UtxoTransactionInputRow>,
   utxoOutputs: Array<UtxoTransactionOutputRow>,
-  accountingInputs: Array<AccountingTransactionInputRow>,
-  accountingOutputs: Array<AccountingTransactionOutputRow>,
   ownedAddresses: Set<number>,
   date: string,
-): AnnotatedTransaction => {
+): {|
+  ...CardanoByronTxIO,
+  ...WithNullableFields<DbBlock>,
+  ...UserAnnotation,
+|} => {
   const annotation = getFromUserPerspective({
     utxoInputs,
     utxoOutputs,
-    accountingInputs,
-    accountingOutputs,
     allOwnedAddressIds: ownedAddresses,
   });
 
   return {
     transaction: {
+      Type: TransactionType.CardanoByron,
       TransactionId: 0,
       Digest: 0,
       Hash: 'a',
@@ -194,11 +188,8 @@ const _tx = (
       Hash: '1',
       BlockTime: new Date(date),
     },
-    certificates: [],
     utxoInputs,
     utxoOutputs,
-    accountingInputs,
-    accountingOutputs,
     ...annotation,
   };
 };

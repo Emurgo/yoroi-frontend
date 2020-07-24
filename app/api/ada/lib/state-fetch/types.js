@@ -77,12 +77,12 @@ export type RemoteTransactionBase = {|
   +inputs: Array<RemoteTransactionInput>,
   +outputs: Array<RemoteTransactionOutput>,
 |};
-type TransactionTypeT = {|
+type RemoteTransactionTypeT = {|
   byron: void | 'byron',
   shelley: 'shelley',
 |};
-export const TransactionTypesTypes: TransactionTypeT = Object.freeze({
-  byron: undefined,
+export const RemoteTransactionTypes: RemoteTransactionTypeT = Object.freeze({
+  byron: 'byron',
   shelley: 'shelley',
 });
 export type RemoteTransactionInput = {|
@@ -116,10 +116,10 @@ export type RemoteTxInfo = {|
   +outputs: Array<RemoteTransactionOutput>,
 |};
 export type RemoteTransaction = {|
-  +type?: $PropertyType<TransactionTypeT, 'byron'>,
+  +type?: $PropertyType<RemoteTransactionTypeT, 'byron'>,
   ...RemoteTransactionBase,
 |} | {|
-  +type: $PropertyType<TransactionTypeT, 'shelley'>,
+  +type: $PropertyType<RemoteTransactionTypeT, 'shelley'>,
   ...RemoteTransactionBase,
   ...RemoteTransactionShelley,
 |};

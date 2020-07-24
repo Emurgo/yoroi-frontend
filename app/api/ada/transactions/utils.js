@@ -2,7 +2,6 @@
 import { groupBy, keyBy, mapValues } from 'lodash';
 import BigNumber from 'bignumber.js';
 import type {
-  AnnotatedTransaction,
   UserAnnotation,
 } from './types';
 import type {
@@ -15,6 +14,10 @@ import type {
   UtxoTransactionInputRow,
   UtxoTransactionOutputRow,
 } from '../lib/storage/database/transactionModels/utxo/tables';
+import type {
+  DbTransaction,
+  DbBlock,
+} from '../lib/storage/database/primitives/tables';
 import type {
   AccountingTransactionInputRow,
   AccountingTransactionOutputRow,
@@ -34,8 +37,8 @@ import { getAdaCurrencyMeta } from '../currencyInfo';
 export function getFromUserPerspective(data: {|
   utxoInputs: $ReadOnlyArray<$ReadOnly<UtxoTransactionInputRow>>,
   utxoOutputs: $ReadOnlyArray<$ReadOnly<UtxoTransactionOutputRow>>,
-  accountingInputs: $ReadOnlyArray<$ReadOnly<AccountingTransactionInputRow>>,
-  accountingOutputs: $ReadOnlyArray<$ReadOnly<AccountingTransactionOutputRow>>,
+  accountingInputs?: $ReadOnlyArray<$ReadOnly<AccountingTransactionInputRow>>,
+  accountingOutputs?: $ReadOnlyArray<$ReadOnly<AccountingTransactionOutputRow>>,
   allOwnedAddressIds: Set<number>,
 |}): UserAnnotation {
   // Note: logic taken from the mobile version of Yoroi
@@ -43,11 +46,11 @@ export function getFromUserPerspective(data: {|
 
   const unifiedInputs = [
     ...data.utxoInputs,
-    ...data.accountingInputs,
+    ...(data.accountingInputs ?? []),
   ];
   const unifiedOutputs = [
     ...data.utxoOutputs,
-    ...data.accountingOutputs,
+    ...(data.accountingOutputs ?? []),
   ];
   const ownInputs = unifiedInputs.filter(input => (
     data.allOwnedAddressIds.has(input.AddressId)
@@ -103,7 +106,12 @@ export function getFromUserPerspective(data: {|
 }
 
 export function convertAdaTransactionsToExportRows(
-  transactions: $ReadOnlyArray<$ReadOnly<AnnotatedTransaction>>
+  transactions: $ReadOnlyArray<$ReadOnly<{
+  ...DbTransaction,
+  ...WithNullableFields<DbBlock>,
+  ...UserAnnotation,
+  ...,
+}>>
 ): Array<TransactionExportRow> {
   const result = [];
   const lovelacesPerAda = new BigNumber(10).pow(getAdaCurrencyMeta().decimalPlaces);

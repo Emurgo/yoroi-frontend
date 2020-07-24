@@ -6,7 +6,7 @@ import {
   stringifyError,
   stringifyData
 } from '../../utils/logging';
-import WalletTransaction from '../../domain/WalletTransaction';
+import JormungandrTransaction from '../../domain/JormungandrTransaction';
 import {
   HARD_DERIVATION_START,
   WalletTypePurpose,
@@ -24,11 +24,10 @@ import {
   createStandardCip1852Wallet,
 } from './lib/storage/bridge/walletBuilder/jormungandr';
 import {
+  getPendingTransactions,
+  getAllTransactions,
   updateTransactions,
 } from './lib/storage/bridge/updateTransactions';
-import {
-  getAllTransactions,
-} from '../ada/lib/storage/bridge/updateTransactions';
 import {
   filterAddressesByStakingKey,
   groupAddrContainsAccountKey,
@@ -62,6 +61,8 @@ import type {
 import type {
   BaseGetTransactionsRequest,
   GetTransactionsResponse,
+  RefreshPendingTransactionsRequest,
+  RefreshPendingTransactionsResponse,
 } from '../common/index';
 import {
   sendAllUnsignedTx as jormungandrSendAllUnsignedTx,
@@ -342,7 +343,7 @@ export default class JormungandrApi {
       Logger.debug(`${nameof(JormungandrApi)}::${nameof(this.refreshTransactions)} success: ` + stringifyData(fetchedTxs));
 
       const mappedTransactions = fetchedTxs.txs.map(tx => {
-        return WalletTransaction.fromAnnotatedTx({
+        return JormungandrTransaction.fromAnnotatedTx({
           tx,
           addressLookupMap: fetchedTxs.addressLookupMap,
           api: getApiForNetwork(request.publicDeriver.getParent().getNetworkInfo()),
@@ -354,6 +355,30 @@ export default class JormungandrApi {
       };
     } catch (error) {
       Logger.error(`${nameof(JormungandrApi)}::${nameof(this.refreshTransactions)} error: ` + stringifyError(error));
+      throw new GenericApiError();
+    }
+  }
+
+  async refreshPendingTransactions(
+    request: RefreshPendingTransactionsRequest
+  ): Promise<RefreshPendingTransactionsResponse> {
+    Logger.debug(`${nameof(JormungandrApi)}::${nameof(this.refreshPendingTransactions)} called`);
+    try {
+      const fetchedTxs = await getPendingTransactions({
+        publicDeriver: request.publicDeriver,
+      });
+      Logger.debug(`${nameof(JormungandrApi)}::${nameof(this.refreshPendingTransactions)} success: ` + stringifyData(fetchedTxs));
+
+      const mappedTransactions = fetchedTxs.txs.map(tx => {
+        return JormungandrTransaction.fromAnnotatedTx({
+          tx,
+          addressLookupMap: fetchedTxs.addressLookupMap,
+          api: getApiForNetwork(request.publicDeriver.getParent().getNetworkInfo()),
+        });
+      });
+      return mappedTransactions;
+    } catch (error) {
+      Logger.error(`${nameof(JormungandrApi)}::${nameof(this.refreshPendingTransactions)} error: ` + stringifyError(error));
       throw new GenericApiError();
     }
   }

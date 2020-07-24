@@ -27,7 +27,6 @@ import { ConceptualWallet } from '../ada/lib/storage/models/ConceptualWallet/ind
 import type { IHasLevels } from '../ada/lib/storage/models/ConceptualWallet/interfaces';
 import WalletTransaction from '../../domain/WalletTransaction';
 import {
-  getPendingTransactions,
   removeAllTransactions,
   getForeignAddresses,
 } from '../ada/lib/storage/bridge/updateTransactions';
@@ -36,7 +35,6 @@ import type {
   TransactionExportDataFormat,
   TransactionExportFileType
 } from '../export';
-import { getApiForNetwork } from './utils';
 import type {
   GetBalanceRequest, GetBalanceResponse,
 } from './types';
@@ -242,30 +240,6 @@ export default class CommonApi {
       return await getForeignAddresses({ publicDeriver: request.publicDeriver });
     } catch (error) {
       Logger.error(`${nameof(CommonApi)}::${nameof(this.getForeignAddresses)} error: ` + stringifyError(error));
-      throw new GenericApiError();
-    }
-  }
-
-  async refreshPendingTransactions(
-    request: RefreshPendingTransactionsRequest
-  ): Promise<RefreshPendingTransactionsResponse> {
-    Logger.debug(`${nameof(CommonApi)}::${nameof(this.refreshPendingTransactions)} called`);
-    try {
-      const fetchedTxs = await getPendingTransactions({
-        publicDeriver: request.publicDeriver,
-      });
-      Logger.debug(`${nameof(CommonApi)}::${nameof(this.refreshPendingTransactions)} success: ` + stringifyData(fetchedTxs));
-
-      const mappedTransactions = fetchedTxs.txs.map(tx => {
-        return WalletTransaction.fromAnnotatedTx({
-          tx,
-          addressLookupMap: fetchedTxs.addressLookupMap,
-          api: getApiForNetwork(request.publicDeriver.getParent().getNetworkInfo()),
-        });
-      });
-      return mappedTransactions;
-    } catch (error) {
-      Logger.error(`${nameof(CommonApi)}::${nameof(this.refreshPendingTransactions)} error: ` + stringifyError(error));
       throw new GenericApiError();
     }
   }

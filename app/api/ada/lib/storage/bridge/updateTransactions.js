@@ -14,6 +14,10 @@ import type {
   BlockInsert, BlockRow,
   TransactionInsert, TransactionRow,
   NetworkRow,
+  DbBlock,
+} from '../database/primitives/tables';
+import {
+  TransactionType,
 } from '../database/primitives/tables';
 import type {
   TxStatusCodesType,
@@ -34,7 +38,7 @@ import {
   FreeBlocks,
 } from '../database/primitives/api/write';
 import type { AddCertificateRequest } from '../database/primitives/api/write';
-import { ModifyMultipartTx } from  '../database/transactionModels/multipart/api/write';
+import { ModifyCardanoByronTx, ModifyCardanoShelleyTx } from  '../database/transactionModels/multipart/api/write';
 import { digestForHash, } from '../database/primitives/api/utils';
 import {
   MarkUtxo,
@@ -42,12 +46,13 @@ import {
 import {
   GetUtxoTxOutputsWithTx,
   GetUtxoInputs,
+  AssociateTxWithUtxoIOs,
 } from '../database/transactionModels/utxo/api/read';
 import {
-  AssociateTxWithIOs
+  CardanoByronAssociateTxWithIOs
 } from '../database/transactionModels/multipart/api/read';
 import type {
-  AnnotatedTransaction,
+  UserAnnotation,
 } from '../../../transactions/types';
 import type {
   ToAbsoluteSlotNumberFunc,
@@ -55,9 +60,6 @@ import type {
 import type {
   UtxoTransactionInputInsert, UtxoTransactionOutputInsert,
 } from '../database/transactionModels/utxo/tables';
-import type {
-  AccountingTransactionInputInsert, AccountingTransactionOutputInsert,
-} from '../database/transactionModels/account/tables';
 import {
   TxStatusCodes,
   CoreAddressTypes,
@@ -84,7 +86,7 @@ import {
   DeleteAllTransactions,
 } from '../database/walletTypes/core/api/write';
 import type { LastSyncInfoRow, } from '../database/walletTypes/core/tables';
-import type { DbTxIO, DbTxInChain } from '../database/transactionModels/multipart/tables';
+import type { CardanoByronTxIO, CardanoShelleyTxIO } from '../database/transactionModels/multipart/tables';
 import {
   rawGetAddressRowsForWallet,
 } from  './traitUtils';
@@ -109,6 +111,7 @@ import type {
 } from '../../state-fetch/types';
 import {
   ShelleyCertificateTypes,
+  RemoteTransactionTypes,
 } from '../../state-fetch/types';
 import type {
   FilterFunc,
@@ -122,7 +125,8 @@ async function rawGetAllTxIds(
   deps: {|
     GetPathWithSpecific: Class<GetPathWithSpecific>,
     GetAddress: Class<GetAddress>,
-    AssociateTxWithIOs: Class<AssociateTxWithIOs>,
+    CardanoByronAssociateTxWithIOs: Class<CardanoByronAssociateTxWithIOs>,
+    AssociateTxWithUtxoIOs: Class<AssociateTxWithUtxoIOs>,
     GetDerivationSpecific: Class<GetDerivationSpecific>,
   |},
   request: {| publicDeriver: IPublicDeriver<ConceptualWallet>, |},
@@ -166,13 +170,12 @@ async function rawGetAllTxIds(
     const ids = foundAddresses.flatMap(address => address.addrs.map(addr => addr.AddressId));
     accountingAddressIds.push(...ids);
   }
-  const txIds = await deps.AssociateTxWithIOs.getTxIdsForAddresses(
-    db, dbTx,
-    {
-      utxoAddressIds,
-      accountingAddressIds,
-    }
-  );
+
+  const txIds = Array.from(new Set([
+    ...(await deps.AssociateTxWithUtxoIOs.getTxIdsForAddresses(
+      db, dbTx, { addressIds: utxoAddressIds },
+    )),
+  ]));
   return {
     txIds,
     addressIds: {
@@ -188,7 +191,8 @@ export async function rawGetTransactions(
   deps: {|
     GetPathWithSpecific: Class<GetPathWithSpecific>,
     GetAddress: Class<GetAddress>,
-    AssociateTxWithIOs: Class<AssociateTxWithIOs>,
+    CardanoByronAssociateTxWithIOs: Class<CardanoByronAssociateTxWithIOs>,
+    AssociateTxWithUtxoIOs: Class<AssociateTxWithUtxoIOs>,
     GetTxAndBlock: Class<GetTxAndBlock>,
     GetDerivationSpecific: Class<GetDerivationSpecific>,
   |},
@@ -204,7 +208,11 @@ export async function rawGetTransactions(
   derivationTables: Map<number, string>,
 ): Promise<{|
   addressLookupMap: Map<number, string>,
-  txs: Array<AnnotatedTransaction>,
+  txs: Array<{|
+  ...(CardanoByronTxIO | CardanoShelleyTxIO),
+  ...WithNullableFields<DbBlock>,
+  ...UserAnnotation,
+|}>,
 |}> {
   const {
     addressIds,
@@ -214,7 +222,8 @@ export async function rawGetTransactions(
     {
       GetPathWithSpecific: deps.GetPathWithSpecific,
       GetAddress: deps.GetAddress,
-      AssociateTxWithIOs: deps.AssociateTxWithIOs,
+      CardanoByronAssociateTxWithIOs: deps.CardanoByronAssociateTxWithIOs,
+      AssociateTxWithUtxoIOs: deps.AssociateTxWithUtxoIOs,
       GetDerivationSpecific: deps.GetDerivationSpecific,
     },
     { publicDeriver: request.publicDeriver },
@@ -225,7 +234,7 @@ export async function rawGetTransactions(
   for (const tx of txs) {
     blockMap.set(tx.Transaction.TransactionId, tx.Block);
   }
-  const txsWithIOs = await deps.AssociateTxWithIOs.getIOsForTx(
+  const txsWithIOs = await deps.CardanoByronAssociateTxWithIOs.getIOsForTx(
     db, dbTx,
     { txs: txs.map(txWithBlock => txWithBlock.Transaction) }
   );
@@ -238,8 +247,6 @@ export async function rawGetTransactions(
     const allAddressIds = txsWithIOs.flatMap(txWithIO => [
       ...txWithIO.utxoInputs.map(input => input.AddressId),
       ...txWithIO.utxoOutputs.map(output => output.AddressId),
-      ...txWithIO.accountingInputs.map(input => input.AddressId),
-      ...txWithIO.accountingOutputs.map(output => output.AddressId),
     ]);
     const addressRows = await GetAddress.getById(
       db, dbTx,
@@ -257,8 +264,6 @@ export async function rawGetTransactions(
     ...getFromUserPerspective({
       utxoInputs: tx.utxoInputs,
       utxoOutputs: tx.utxoOutputs,
-      accountingInputs: tx.accountingInputs,
-      accountingOutputs: tx.accountingOutputs,
       allOwnedAddressIds: new Set(
         Object.keys(addressIds).flatMap(key => addressIds[key])
       ),
@@ -279,13 +284,18 @@ export async function getAllTransactions(
   |},
 ): Promise<{|
   addressLookupMap: Map<number, string>,
-  txs: Array<AnnotatedTransaction>,
+  txs: Array<{|
+  ...(CardanoByronTxIO | CardanoShelleyTxIO),
+  ...WithNullableFields<DbBlock>,
+  ...UserAnnotation,
+|}>,
 |}> {
   const derivationTables = request.publicDeriver.getParent().getDerivationTables();
   const deps = Object.freeze({
     GetPathWithSpecific,
     GetAddress,
-    AssociateTxWithIOs,
+    CardanoByronAssociateTxWithIOs,
+    AssociateTxWithUtxoIOs,
     GetTxAndBlock,
     GetDerivationSpecific,
   });
@@ -306,7 +316,8 @@ export async function getAllTransactions(
         {
           GetPathWithSpecific: deps.GetPathWithSpecific,
           GetAddress: deps.GetAddress,
-          AssociateTxWithIOs: deps.AssociateTxWithIOs,
+          CardanoByronAssociateTxWithIOs: deps.CardanoByronAssociateTxWithIOs,
+          AssociateTxWithUtxoIOs: deps.AssociateTxWithUtxoIOs,
           GetTxAndBlock: deps.GetTxAndBlock,
           GetDerivationSpecific: deps.GetDerivationSpecific,
         },
@@ -331,13 +342,18 @@ export async function getPendingTransactions(
   request: {| publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels>, |},
 ): Promise<{|
   addressLookupMap: Map<number, string>,
-  txs: Array<AnnotatedTransaction>,
+  txs: Array<{|
+  ...(CardanoByronTxIO | CardanoShelleyTxIO),
+  ...WithNullableFields<DbBlock>,
+  ...UserAnnotation,
+|}>,
 |}> {
   const derivationTables = request.publicDeriver.getParent().getDerivationTables();
   const deps = Object.freeze({
     GetPathWithSpecific,
     GetAddress,
-    AssociateTxWithIOs,
+    CardanoByronAssociateTxWithIOs,
+    AssociateTxWithUtxoIOs,
     GetTxAndBlock,
     GetDerivationSpecific,
   });
@@ -358,7 +374,8 @@ export async function getPendingTransactions(
         {
           GetPathWithSpecific: deps.GetPathWithSpecific,
           GetAddress: deps.GetAddress,
-          AssociateTxWithIOs: deps.AssociateTxWithIOs,
+          CardanoByronAssociateTxWithIOs: deps.CardanoByronAssociateTxWithIOs,
+          AssociateTxWithUtxoIOs: deps.AssociateTxWithUtxoIOs,
           GetTxAndBlock: deps.GetTxAndBlock,
           GetDerivationSpecific: deps.GetDerivationSpecific,
         },
@@ -384,7 +401,8 @@ export async function rawGetForeignAddresses(
   deps: {|
     GetPathWithSpecific: Class<GetPathWithSpecific>,
     GetAddress: Class<GetAddress>,
-    AssociateTxWithIOs: Class<AssociateTxWithIOs>,
+    CardanoByronAssociateTxWithIOs: Class<CardanoByronAssociateTxWithIOs>,
+    AssociateTxWithUtxoIOs: Class<AssociateTxWithUtxoIOs>,
     GetDerivationSpecific: Class<GetDerivationSpecific>,
     GetTransaction: Class<GetTransaction>,
   |},
@@ -398,7 +416,8 @@ export async function rawGetForeignAddresses(
     {
       GetPathWithSpecific: deps.GetPathWithSpecific,
       GetAddress: deps.GetAddress,
-      AssociateTxWithIOs: deps.AssociateTxWithIOs,
+      CardanoByronAssociateTxWithIOs: deps.CardanoByronAssociateTxWithIOs,
+      AssociateTxWithUtxoIOs: deps.AssociateTxWithUtxoIOs,
       GetDerivationSpecific: deps.GetDerivationSpecific,
     },
     { publicDeriver: request.publicDeriver },
@@ -410,7 +429,7 @@ export async function rawGetForeignAddresses(
     { ids: relatedIds.txIds }
   );
 
-  const txsWithIOs = await deps.AssociateTxWithIOs.getIOsForTx(
+  const txsWithIOs = await deps.CardanoByronAssociateTxWithIOs.getIOsForTx(
     db, dbTx,
     { txs: fullTxs }
   );
@@ -418,8 +437,6 @@ export async function rawGetForeignAddresses(
   const allAddressIds = txsWithIOs.flatMap(txWithIO => [
     ...txWithIO.utxoInputs.map(input => input.AddressId),
     ...txWithIO.utxoOutputs.map(output => output.AddressId),
-    ...txWithIO.accountingInputs.map(input => input.AddressId),
-    ...txWithIO.accountingOutputs.map(output => output.AddressId),
   ]);
 
   const ourIds = new Set(
@@ -440,7 +457,8 @@ export async function getForeignAddresses(
   const deps = Object.freeze({
     GetPathWithSpecific,
     GetAddress,
-    AssociateTxWithIOs,
+    CardanoByronAssociateTxWithIOs,
+    AssociateTxWithUtxoIOs,
     GetDerivationSpecific,
     GetTransaction,
   });
@@ -482,7 +500,8 @@ export async function rawRemoveAllTransactions(
   deps: {|
     GetPathWithSpecific: Class<GetPathWithSpecific>,
     GetAddress: Class<GetAddress>,
-    AssociateTxWithIOs: Class<AssociateTxWithIOs>,
+    CardanoByronAssociateTxWithIOs: Class<CardanoByronAssociateTxWithIOs>,
+    AssociateTxWithUtxoIOs: Class<AssociateTxWithUtxoIOs>,
     GetDerivationSpecific: Class<GetDerivationSpecific>,
     DeleteAllTransactions: Class<DeleteAllTransactions>,
     GetTransaction: Class<GetTransaction>,
@@ -499,7 +518,8 @@ export async function rawRemoveAllTransactions(
     {
       GetPathWithSpecific: deps.GetPathWithSpecific,
       GetAddress: deps.GetAddress,
-      AssociateTxWithIOs: deps.AssociateTxWithIOs,
+      CardanoByronAssociateTxWithIOs: deps.CardanoByronAssociateTxWithIOs,
+      AssociateTxWithUtxoIOs: deps.AssociateTxWithUtxoIOs,
       GetDerivationSpecific: deps.GetDerivationSpecific,
       GetTransaction: deps.GetTransaction,
     },
@@ -511,7 +531,8 @@ export async function rawRemoveAllTransactions(
     {
       GetPathWithSpecific: deps.GetPathWithSpecific,
       GetAddress: deps.GetAddress,
-      AssociateTxWithIOs: deps.AssociateTxWithIOs,
+      CardanoByronAssociateTxWithIOs: deps.CardanoByronAssociateTxWithIOs,
+      AssociateTxWithUtxoIOs: deps.AssociateTxWithUtxoIOs,
       GetDerivationSpecific: deps.GetDerivationSpecific,
     },
     { publicDeriver: request.publicDeriver },
@@ -546,7 +567,8 @@ export async function removeAllTransactions(
   const deps = Object.freeze({
     GetPathWithSpecific,
     GetAddress,
-    AssociateTxWithIOs,
+    CardanoByronAssociateTxWithIOs,
+    AssociateTxWithUtxoIOs,
     GetDerivationSpecific,
     DeleteAllTransactions,
     ModifyAddress,
@@ -608,8 +630,10 @@ export async function updateTransactions(
       GetTxAndBlock,
       GetDerivationSpecific,
       ModifyTransaction,
-      ModifyMultipartTx,
-      AssociateTxWithIOs,
+      ModifyCardanoByronTx,
+      ModifyCardanoShelleyTx,
+      CardanoByronAssociateTxWithIOs,
+      AssociateTxWithUtxoIOs,
     });
     const updateTables = Object
       .keys(updateDepTables)
@@ -665,7 +689,8 @@ export async function updateTransactions(
       GetUtxoInputs,
       GetEncryptionMeta,
       GetDerivationSpecific,
-      AssociateTxWithIOs,
+      CardanoByronAssociateTxWithIOs,
+      AssociateTxWithUtxoIOs,
     });
     const rollbackTables = Object
       .keys(rollbackDepTables)
@@ -709,7 +734,8 @@ async function rollback(
   deps: {|
     GetPathWithSpecific: Class<GetPathWithSpecific>,
     GetAddress: Class<GetAddress>,
-    AssociateTxWithIOs: Class<AssociateTxWithIOs>,
+    CardanoByronAssociateTxWithIOs: Class<CardanoByronAssociateTxWithIOs>,
+    AssociateTxWithUtxoIOs: Class<AssociateTxWithUtxoIOs>,
     GetLastSyncForPublicDeriver: Class<GetLastSyncForPublicDeriver>,
     ModifyLastSyncInfo: Class<ModifyLastSyncInfo>,
     GetBlock: Class<GetBlock>,
@@ -738,7 +764,6 @@ async function rollback(
   // 1) Get all transactions
   const {
     utxoAddresses,
-    accountingAddresses,
   } = await rawGetAddressRowsForWallet(
     dbTx,
     {
@@ -750,14 +775,11 @@ async function rollback(
     derivationTables,
   );
   const utxoAddressIds = utxoAddresses.map(address => address.AddressId);
-  const accountingAddressIds = accountingAddresses.map(address => address.AddressId);
-  const txIds = await deps.AssociateTxWithIOs.getTxIdsForAddresses(
-    db, dbTx,
-    {
-      utxoAddressIds,
-      accountingAddressIds,
-    }
-  );
+  const txIds = Array.from(new Set([
+    ...(await deps.AssociateTxWithUtxoIOs.getTxIdsForAddresses(
+      db, dbTx, { addressIds: utxoAddressIds },
+    )),
+  ]));
 
   // 2) get best tx in block
   const bestInStorage = await deps.GetTxAndBlock.firstSuccessTxBefore(
@@ -871,8 +893,10 @@ async function rawUpdateTransactions(
     GetTxAndBlock: Class<GetTxAndBlock>,
     GetDerivationSpecific: Class<GetDerivationSpecific>,
     ModifyTransaction: Class<ModifyTransaction>,
-    ModifyMultipartTx: Class<ModifyMultipartTx>,
-    AssociateTxWithIOs: Class<AssociateTxWithIOs>,
+    ModifyCardanoByronTx: Class<ModifyCardanoByronTx>,
+    ModifyCardanoShelleyTx: Class<ModifyCardanoShelleyTx>,
+    CardanoByronAssociateTxWithIOs: Class<CardanoByronAssociateTxWithIOs>,
+    AssociateTxWithUtxoIOs: Class<AssociateTxWithUtxoIOs>,
   |},
   publicDeriver: IPublicDeriver<>,
   lastSyncInfo: $ReadOnly<LastSyncInfoRow>,
@@ -945,13 +969,11 @@ async function rawUpdateTransactions(
     );
     const utxoAddressIds = utxoAddresses.map(address => address.AddressId);
     const accountingAddressIds = accountingAddresses.map(address => address.AddressId);
-    const txIds = await deps.AssociateTxWithIOs.getTxIdsForAddresses(
-      db, dbTx,
-      {
-        utxoAddressIds,
-        accountingAddressIds,
-      }
-    );
+    const txIds = Array.from(new Set([
+      ...(await deps.AssociateTxWithUtxoIOs.getTxIdsForAddresses(
+        db, dbTx, { addressIds: utxoAddressIds },
+      )),
+    ]));
     const bestInStorage = await deps.GetTxAndBlock.firstSuccessTxBefore(
       db, dbTx,
       {
@@ -972,9 +994,12 @@ async function rawUpdateTransactions(
       ...requestKind,
       addresses: [
         ...utxoAddresses
-          // Note: don't send group keys
-          // Okay to filter them because the payment key is duplicated inside the single addresses
-          .filter(address => address.Type !== CoreAddressTypes.JORMUNGANDR_GROUP)
+          // Note: don't send base/ptr keys
+          // Since the payment key is duplicated inside the enterprise addresses
+          .filter(address => (
+            address.Type !== CoreAddressTypes.CARDANO_BASE &&
+            address.Type !== CoreAddressTypes.CARDANO_PTR
+          ))
           .map(address => address.Hash),
         ...accountingAddresses.map(address => address.Hash),
       ],
@@ -989,12 +1014,13 @@ async function rawUpdateTransactions(
       dbTx,
       {
         MarkUtxo: deps.MarkUtxo,
-        AssociateTxWithIOs: deps.AssociateTxWithIOs,
+        CardanoByronAssociateTxWithIOs: deps.CardanoByronAssociateTxWithIOs,
         GetEncryptionMeta: deps.GetEncryptionMeta,
         GetTransaction: deps.GetTransaction,
         GetUtxoInputs: deps.GetUtxoInputs,
         ModifyTransaction: deps.ModifyTransaction,
-        ModifyMultipartTx: deps.ModifyMultipartTx,
+        ModifyCardanoByronTx: deps.ModifyCardanoByronTx,
+        ModifyCardanoShelleyTx: deps.ModifyCardanoShelleyTx,
       },
       {
         network: publicDeriver.getParent().getNetworkInfo(),
@@ -1035,12 +1061,13 @@ export async function updateTransactionBatch(
   dbTx: lf$Transaction,
   deps: {|
     MarkUtxo: Class<MarkUtxo>,
-    AssociateTxWithIOs: Class<AssociateTxWithIOs>,
+    CardanoByronAssociateTxWithIOs: Class<CardanoByronAssociateTxWithIOs>,
     GetEncryptionMeta: Class<GetEncryptionMeta>,
     GetTransaction: Class<GetTransaction>,
     GetUtxoInputs: Class<GetUtxoInputs>,
     ModifyTransaction: Class<ModifyTransaction>,
-    ModifyMultipartTx: Class<ModifyMultipartTx>,
+    ModifyCardanoByronTx: Class<ModifyCardanoByronTx>,
+    ModifyCardanoShelleyTx: Class<ModifyCardanoShelleyTx>,
   |},
   request: {|
     network: $ReadOnly<NetworkRow>,
@@ -1050,10 +1077,13 @@ export async function updateTransactionBatch(
     hashToIds: HashToIdsFunc,
     derivationTables: Map<number, string>,
   |}
-): Promise<Array<DbTxInChain>> {
+): Promise<Array<{|
+  ...(CardanoByronTxIO | CardanoShelleyTxIO),
+  ...DbBlock,
+|}>> {
   const { TransactionSeed, BlockSeed } = await deps.GetEncryptionMeta.get(db, dbTx);
 
-  const matchesInDb = new Map<string, DbTxIO>();
+  const matchesInDb = new Map<string, CardanoByronTxIO | CardanoShelleyTxIO>();
   {
     const digestsForNew = request.txsFromNetwork.map(tx => digestForHash(tx.hash, TransactionSeed));
     const matchByDigest = await deps.GetTransaction.byDigest(db, dbTx, {
@@ -1061,7 +1091,7 @@ export async function updateTransactionBatch(
       txIds: request.txIds,
     });
     const txs: Array<$ReadOnly<TransactionRow>> = Array.from(matchByDigest.values());
-    const txsWithIOs = await deps.AssociateTxWithIOs.getIOsForTx(
+    const txsWithIOs = await deps.CardanoByronAssociateTxWithIOs.getIOsForTx(
       db, dbTx,
       { txs }
     );
@@ -1071,7 +1101,10 @@ export async function updateTransactionBatch(
   }
 
   const unseenNewTxs: Array<RemoteTransaction> = [];
-  const txsAddedToBlock: Array<DbTxInChain> = [];
+  const txsAddedToBlock: Array<{|
+    ...(CardanoByronTxIO | CardanoShelleyTxIO),
+    ...DbBlock,
+  |}> = [];
   const modifiedTxIds = new Set<number>();
   for (const txFromNetwork of request.txsFromNetwork) {
     const matchInDb = matchesInDb.get(txFromNetwork.hash);
@@ -1117,7 +1150,7 @@ export async function updateTransactionBatch(
     }
     if (result.block !== null) {
       txsAddedToBlock.push({
-        ...matchInDb,
+        ...(matchInDb: (CardanoByronTxIO | CardanoShelleyTxIO)),
         // override with updated
         block: result.block,
         transaction: result.transaction,
@@ -1126,7 +1159,7 @@ export async function updateTransactionBatch(
   }
 
   // 2) Add new transactions
-  const newTxsForDb = await networkTxToDbTx(
+  const { byronTxs, shelleyTxs, } = await networkTxToDbTx(
     db,
     dbTx,
     request.network,
@@ -1138,8 +1171,24 @@ export async function updateTransactionBatch(
     BlockSeed,
   );
   const newsTxsIdSet = new Set();
-  for (const newTx of newTxsForDb) {
-    const result = await deps.ModifyMultipartTx.addTxWithIOs(
+  for (const newTx of byronTxs) {
+    const result = await deps.ModifyCardanoByronTx.addTxWithIOs(
+      db,
+      dbTx,
+      newTx,
+    );
+    newsTxsIdSet.add(result.transaction.TransactionId);
+    if (result.block !== null) {
+      txsAddedToBlock.push({
+        block: result.block,
+        transaction: result.transaction,
+        utxoInputs: result.utxoInputs,
+        utxoOutputs: result.utxoOutputs,
+      });
+    }
+  }
+  for (const newTx of shelleyTxs) {
+    const result = await deps.ModifyCardanoShelleyTx.addTxWithIOs(
       db,
       dbTx,
       newTx,
@@ -1152,8 +1201,6 @@ export async function updateTransactionBatch(
         certificates: result.certificates,
         utxoInputs: result.utxoInputs,
         utxoOutputs: result.utxoOutputs,
-        accountingInputs: result.accountingInputs,
-        accountingOutputs: result.accountingOutputs,
       });
     }
   }
@@ -1223,17 +1270,25 @@ async function networkTxToDbTx(
   toAbsoluteSlotNumber: ToAbsoluteSlotNumberFunc,
   TransactionSeed: number,
   BlockSeed: number,
-): Promise<Array<{|
-  block: null | BlockInsert,
-  transaction: (blockId: null | number) => TransactionInsert,
-  certificates: $ReadOnlyArray<number => (void | AddCertificateRequest)>,
-  ioGen: number => {|
-    utxoInputs: Array<UtxoTransactionInputInsert>,
-    utxoOutputs: Array<UtxoTransactionOutputInsert>,
-    accountingInputs: Array<AccountingTransactionInputInsert>,
-    accountingOutputs: Array<AccountingTransactionOutputInsert>,
-  |},
-|}>> {
+): Promise<{|
+  byronTxs: Array<{|
+    block: null | BlockInsert,
+    transaction: (blockId: null | number) => TransactionInsert,
+    ioGen: number => {|
+      utxoInputs: Array<UtxoTransactionInputInsert>,
+      utxoOutputs: Array<UtxoTransactionOutputInsert>,
+    |},
+  |}>,
+  shelleyTxs: Array<{|
+    block: null | BlockInsert,
+    transaction: (blockId: null | number) => TransactionInsert,
+    certificates: $ReadOnlyArray<number => (void | AddCertificateRequest)>,
+    ioGen: number => {|
+      utxoInputs: Array<UtxoTransactionInputInsert>,
+      utxoOutputs: Array<UtxoTransactionOutputInsert>,
+    |},
+  |}>,
+|}> {
   const allAddresses = Array.from(new Set(
     newTxs.flatMap(tx => [
       ...tx.inputs.map(input => input.address),
@@ -1263,7 +1318,8 @@ async function networkTxToDbTx(
     return id;
   };
 
-  const result = [];
+  const byronTxs = [];
+  const shelleyTxs = [];
   for (const networkTx of newTxs) {
     const { block, transaction } = networkTxHeaderToDb(
       networkTx,
@@ -1272,83 +1328,94 @@ async function networkTxToDbTx(
       BlockSeed,
     );
 
-    const certificates: $ReadOnlyArray<
-      number => (void | AddCertificateRequest)
-    > = networkTx.certificates == null
-      ? [(_txId) => undefined]
-      : await certificateToDb(
-        db, dbTx,
-        {
-          certificates: networkTx.certificates,
-          hashToIds,
-          derivationTables,
-          network: Number.parseInt(network.StaticConfig.NetworkId, 10)
-        }
-      );
-    result.push({
-      block,
-      transaction,
-      certificates,
-      ioGen: (txRowId) => {
-        const utxoInputs = [];
-        const utxoOutputs = [];
-        const accountingInputs = [];
-        const accountingOutputs = [];
-        for (let i = 0; i < networkTx.inputs.length; i++) {
-          const input = networkTx.inputs[i];
-          utxoInputs.push({
+    const ioGen = (txRowId) => {
+      const utxoInputs = [];
+      const utxoOutputs = [];
+      for (let i = 0; i < networkTx.inputs.length; i++) {
+        const input = networkTx.inputs[i];
+        utxoInputs.push({
+          TransactionId: txRowId,
+          AddressId: getIdOrThrow(input.address),
+          ParentTxHash: input.txHash,
+          IndexInParentTx: input.index,
+          IndexInOwnTx: i,
+          Amount: input.amount,
+        });
+      }
+      for (let i = 0; i < networkTx.outputs.length; i++) {
+        const output = networkTx.outputs[i];
+        const txType = addressToKind(output.address, 'bytes', network);
+        // consider a group address as a UTXO output
+        // since the payment (UTXO) key is the one that signs
+        if (
+          txType === CoreAddressTypes.CARDANO_LEGACY ||
+          txType === CoreAddressTypes.CARDANO_ENTERPRISE ||
+          txType === CoreAddressTypes.CARDANO_BASE ||
+          txType === CoreAddressTypes.CARDANO_PTR
+        ) {
+          utxoOutputs.push({
             TransactionId: txRowId,
-            AddressId: getIdOrThrow(input.address),
-            ParentTxHash: input.txHash,
-            IndexInParentTx: input.index,
-            IndexInOwnTx: i,
-            Amount: input.amount,
+            AddressId: getIdOrThrow(output.address),
+            OutputIndex: i,
+            Amount: output.amount,
+            /**
+              * we assume unspent for now but it will be updated after if necessary
+              * Note: if this output doesn't belong to you, it will be true forever
+              * This is slightly misleading, but using null would require null-checks everywhere
+              */
+            IsUnspent: true,
           });
+        } else if (
+          txType === CoreAddressTypes.CARDANO_REWARD
+        ) {
+          throw new Error(`${nameof(networkTxToDbTx)} cannot send to a reward address`);
+        } else {
+          // TODO: handle multisig
+          throw new Error(`${nameof(networkTxToDbTx)} Unhandled output type`);
         }
-        for (let i = 0; i < networkTx.outputs.length; i++) {
-          const output = networkTx.outputs[i];
-          const txType = addressToKind(output.address, 'bytes', network);
-          // consider a group address as a UTXO output
-          // since the payment (UTXO) key is the one that signs
-          if (
-            txType === CoreAddressTypes.CARDANO_LEGACY ||
-            txType === CoreAddressTypes.CARDANO_ENTERPRISE ||
-            txType === CoreAddressTypes.CARDANO_BASE ||
-            txType === CoreAddressTypes.CARDANO_PTR
-          ) {
-            utxoOutputs.push({
-              TransactionId: txRowId,
-              AddressId: getIdOrThrow(output.address),
-              OutputIndex: i,
-              Amount: output.amount,
-              /**
-               * we assume unspent for now but it will be updated after if necessary
-               * Note: if this output doesn't belong to you, it will be true forever
-               * This is slightly misleading, but using null would require null-checks everywhere
-               */
-              IsUnspent: true,
-            });
-          } else if (
-            txType === CoreAddressTypes.CARDANO_REWARD
-          ) {
-            throw new Error(`${nameof(networkTxToDbTx)} cannot send to a reward address`);
-          } else {
-            // TODO: handle multisig
-            throw new Error(`${nameof(networkTxToDbTx)} Unhandled output type`);
-          }
-        }
+      }
 
-        return {
-          utxoInputs,
-          utxoOutputs,
-          accountingInputs,
-          accountingOutputs,
-        };
-      },
-    });
+      return {
+        utxoInputs,
+        utxoOutputs,
+      };
+    };
+
+    if (networkTx.type == null || networkTx.type === RemoteTransactionTypes.byron) {
+      byronTxs.push({
+        block,
+        transaction,
+        ioGen,
+      });
+    } else if (networkTx.type === RemoteTransactionTypes.shelley) {
+      const certificates: $ReadOnlyArray<
+        number => (void | AddCertificateRequest)
+      > = networkTx.certificates == null
+        ? [(_txId) => undefined]
+        : await certificateToDb(
+          db, dbTx,
+          {
+            certificates: networkTx.certificates,
+            hashToIds,
+            derivationTables,
+            network: Number.parseInt(network.StaticConfig.NetworkId, 10)
+          }
+        );
+      shelleyTxs.push({
+        block,
+        transaction,
+        certificates,
+        ioGen,
+      });
+    } else {
+      throw new Error(`${nameof(networkTxToDbTx)} Unhandled tx type ${networkTx.type ?? ''}`);
+    }
   }
 
-  return result;
+  return {
+    byronTxs,
+    shelleyTxs,
+  };
 }
 
 async function markAllInputs(
@@ -1445,6 +1512,7 @@ export function networkTxHeaderToDb(
   return {
     block,
     transaction: (blockId) => ({
+      Type: TransactionType.CardanoByron,
       Hash: tx.hash,
       Digest: digest,
       BlockId: blockId,

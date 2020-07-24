@@ -6,7 +6,7 @@ import {
   stringifyError,
   stringifyData
 } from '../../utils/logging';
-import WalletTransaction from '../../domain/WalletTransaction';
+import CardanoByronTransaction from '../../domain/CardanoByronTransaction';
 import {
   HARD_DERIVATION_START,
   WalletTypePurpose,
@@ -26,6 +26,7 @@ import {
   createStandardBip44Wallet, createHardwareWallet,
 } from './lib/storage/bridge/walletBuilder/byron';
 import {
+  getPendingTransactions,
   getAllTransactions,
   updateTransactions,
 } from './lib/storage/bridge/updateTransactions';
@@ -38,6 +39,7 @@ import {
   Bip44DerivationLevels,
 } from './lib/storage/database/walletTypes/bip44/api/utils';
 import type { CoreAddressT } from './lib/storage/database/primitives/enums';
+import { TransactionType } from './lib/storage/database/primitives/tables';
 import {
   PublicDeriver,
 } from './lib/storage/models/PublicDeriver/index';
@@ -59,7 +61,9 @@ import type {
 import type {
   BaseGetTransactionsRequest,
   GetTransactionsResponse,
-  GetTransactionsRequestOptions
+  GetTransactionsRequestOptions,
+  RefreshPendingTransactionsRequest,
+  RefreshPendingTransactionsResponse,
 } from '../common/index';
 import {
   sendAllUnsignedTx as byronSendAllUnsignedTx,
@@ -497,11 +501,13 @@ export default class AdaApi {
       Logger.debug(`${nameof(AdaApi)}::${nameof(this.refreshTransactions)} success: ` + stringifyData(fetchedTxs));
 
       const mappedTransactions = fetchedTxs.txs.map(tx => {
-        return WalletTransaction.fromAnnotatedTx({
-          tx,
-          addressLookupMap: fetchedTxs.addressLookupMap,
-          api: getApiForNetwork(request.publicDeriver.getParent().getNetworkInfo()),
-        });
+        if (tx.transaction.Type === TransactionType.CardanoByron) {
+          return CardanoByronTransaction.fromAnnotatedTx({
+            tx,
+            addressLookupMap: fetchedTxs.addressLookupMap,
+            api: getApiForNetwork(request.publicDeriver.getParent().getNetworkInfo()),
+          });
+        }
       });
       return {
         transactions: mappedTransactions,
@@ -509,6 +515,30 @@ export default class AdaApi {
       };
     } catch (error) {
       Logger.error(`${nameof(AdaApi)}::${nameof(this.refreshTransactions)} error: ` + stringifyError(error));
+      throw new GenericApiError();
+    }
+  }
+
+  async refreshPendingTransactions(
+    request: RefreshPendingTransactionsRequest
+  ): Promise<RefreshPendingTransactionsResponse> {
+    Logger.debug(`${nameof(AdaApi)}::${nameof(this.refreshPendingTransactions)} called`);
+    try {
+      const fetchedTxs = await getPendingTransactions({
+        publicDeriver: request.publicDeriver,
+      });
+      Logger.debug(`${nameof(AdaApi)}::${nameof(this.refreshPendingTransactions)} success: ` + stringifyData(fetchedTxs));
+
+      const mappedTransactions = fetchedTxs.txs.map(tx => {
+        return CardanoByronTransaction.fromAnnotatedTx({
+          tx,
+          addressLookupMap: fetchedTxs.addressLookupMap,
+          api: getApiForNetwork(request.publicDeriver.getParent().getNetworkInfo()),
+        });
+      });
+      return mappedTransactions;
+    } catch (error) {
+      Logger.error(`${nameof(AdaApi)}::${nameof(this.refreshPendingTransactions)} error: ` + stringifyError(error));
       throw new GenericApiError();
     }
   }

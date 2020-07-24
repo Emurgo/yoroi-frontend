@@ -1,26 +1,20 @@
 // @flow
-import { action, computed, observable } from 'mobx';
+import { computed, observable } from 'mobx';
 import BigNumber from 'bignumber.js';
 import type { PriceDataRow } from '../api/ada/lib/storage/database/prices/tables';
 import type { AssuranceMode, AssuranceLevel } from '../types/transactionAssuranceTypes';
 import { assuranceLevels } from '../config/transactionAssuranceConfig';
 import type {
   TransactionDirectionType,
-  UserAnnotation,
 } from '../api/ada/transactions/types';
 import type {
-  DbTxIO,
-} from '../api/ada/lib/storage/database/transactionModels/multipart/tables';
-import type {
-  DbBlock, CertificatePart, BlockRow,
+  BlockRow,
 } from '../api/ada/lib/storage/database/primitives/tables';
 import type {
   TxStatusCodesType,
 } from '../api/ada/lib/storage/database/primitives/enums';
 import { transactionTypes } from '../api/ada/transactions/types';
 import type { UnconfirmedAmount } from '../types/unconfirmedAmountType';
-import type { ApiOptionType } from '../api/common/utils';
-import { getApiMeta } from '../api/common/utils';
 
 export type TransactionAddresses = {|
   from: Array<{|
@@ -31,6 +25,18 @@ export type TransactionAddresses = {|
     address: string,
     value: BigNumber,
   |}>,
+|};
+
+export type WalletTransactionCtorData = {|
+  txid: string,
+  block: ?$ReadOnly<BlockRow>,
+  type: TransactionDirectionType,
+  amount: BigNumber,
+  fee: BigNumber,
+  date: Date,
+  addresses: TransactionAddresses,
+  state: TxStatusCodesType,
+  errorMsg: null | string,
 |};
 
 export default class WalletTransaction {
@@ -44,24 +50,12 @@ export default class WalletTransaction {
   @observable fee: BigNumber;
   @observable date: Date; // TODO: remove?
   @observable addresses: TransactionAddresses = { from: [], to: [] };
-  @observable certificates: Array<CertificatePart>;
 
   // TODO: remove and turn it into a map
   @observable state: TxStatusCodesType;
   @observable errorMsg: null | string;
 
-  constructor(data: {|
-    txid: string,
-    block: ?$ReadOnly<BlockRow>,
-    type: TransactionDirectionType,
-    amount: BigNumber,
-    fee: BigNumber,
-    date: Date,
-    addresses: TransactionAddresses,
-    certificates: Array<CertificatePart>,
-    state: TxStatusCodesType,
-    errorMsg: null | string,
-  |}) {
+  constructor(data: WalletTransactionCtorData) {
     Object.assign(this, data);
   }
 
@@ -92,65 +86,6 @@ export default class WalletTransaction {
       return assuranceLevels.MEDIUM;
     }
     return assuranceLevels.HIGH;
-  }
-
-  @action
-  static fromAnnotatedTx(request: {|
-    tx: {|
-      ...DbTxIO,
-      ...WithNullableFields<DbBlock>,
-      ...UserAnnotation,
-    |},
-    addressLookupMap: Map<number, string>,
-    api: ApiOptionType,
-  |}): WalletTransaction {
-    const apiMeta = getApiMeta(request.api)?.meta;
-    if (apiMeta == null) throw new Error(`${nameof(WalletTransaction)} no API selected`);
-    const amountPerUnit = new BigNumber(10).pow(apiMeta.decimalPlaces);
-
-    const { addressLookupMap, tx } = request;
-
-    const toAddr = rows => {
-      const result: Array<{|
-        address: string,
-        value: BigNumber,
-      |}> = [];
-      for (const row of rows) {
-        const val = addressLookupMap.get(row.AddressId);
-        if (val == null) {
-          throw new Error(`${nameof(WalletTransaction.fromAnnotatedTx)} address not in map`);
-        }
-        result.push({
-          address: val,
-          value: new BigNumber(row.Amount).dividedBy(amountPerUnit),
-        });
-      }
-      return result;
-    };
-
-    return new WalletTransaction({
-      txid: tx.transaction.Hash,
-      block: tx.block,
-      type: tx.type,
-      amount: tx.amount.dividedBy(amountPerUnit).plus(tx.fee.dividedBy(amountPerUnit)),
-      fee: tx.fee.dividedBy(amountPerUnit),
-      date: tx.block != null
-        ? tx.block.BlockTime
-        : new Date(tx.transaction.LastUpdateTime),
-      addresses: {
-        from: [
-          ...toAddr(tx.utxoInputs),
-          ...toAddr(tx.accountingInputs),
-        ],
-        to: [
-          ...toAddr(tx.utxoOutputs),
-          ...toAddr(tx.accountingOutputs),
-        ]
-      },
-      certificates: tx.certificates,
-      state: tx.transaction.Status,
-      errorMsg: tx.transaction.ErrorMessage,
-    });
   }
 }
 
@@ -220,3 +155,29 @@ export function calculateUnconfirmedAmount(
 
   return unconfirmedAmount;
 }
+
+export const toAddr: {|
+  rows: $ReadOnlyArray<$ReadOnly<{
+    +AddressId: number,
+    +Amount: string,
+    ...,
+  }>>,
+  amountPerUnit: BigNumber,
+  addressLookupMap: Map<number, string>,
+|} => Array<{|
+  address: string,
+  value: BigNumber,
+|}> = request => {
+  const result = [];
+  for (const row of request.rows) {
+    const val = request.addressLookupMap.get(row.AddressId);
+    if (val == null) {
+      throw new Error(`${nameof(toAddr)} address not in map`);
+    }
+    result.push({
+      address: val,
+      value: new BigNumber(row.Amount).dividedBy(request.amountPerUnit),
+    });
+  }
+  return result;
+};
