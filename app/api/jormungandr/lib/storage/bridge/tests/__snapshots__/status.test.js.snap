@@ -25,7 +25,9 @@ Object {
         "Ordinal": null,
         "Status": -1,
         "TransactionId": 3,
+        "Type": 100,
       },
+      "txType": 100,
       "type": "expend",
       "utxoInputs": Array [
         Object {
@@ -72,7 +74,9 @@ Object {
         "Ordinal": 0,
         "Status": -2,
         "TransactionId": 1,
+        "Type": 100,
       },
+      "txType": 100,
       "type": "income",
       "utxoInputs": Array [
         Object {
@@ -127,7 +131,9 @@ Object {
         "Ordinal": 0,
         "Status": -2,
         "TransactionId": 2,
+        "Type": 100,
       },
+      "txType": 100,
       "type": "income",
       "utxoInputs": Array [
         Object {
@@ -499,6 +505,7 @@ Array [
         "Ordinal": 0,
         "Status": -2,
         "TransactionId": 1,
+        "Type": 100,
       },
       Object {
         "BlockId": 1,
@@ -509,6 +516,7 @@ Array [
         "Ordinal": 0,
         "Status": -2,
         "TransactionId": 2,
+        "Type": 100,
       },
       Object {
         "BlockId": null,
@@ -519,6 +527,7 @@ Array [
         "Ordinal": null,
         "Status": -1,
         "TransactionId": 3,
+        "Type": 100,
       },
     ],
   },
@@ -625,7 +634,9 @@ Object {
         "Ordinal": null,
         "Status": -1,
         "TransactionId": 3,
+        "Type": 100,
       },
+      "txType": 100,
       "type": "expend",
       "utxoInputs": Array [
         Object {
@@ -672,7 +683,9 @@ Object {
         "Ordinal": 0,
         "Status": -2,
         "TransactionId": 1,
+        "Type": 100,
       },
+      "txType": 100,
       "type": "income",
       "utxoInputs": Array [
         Object {
@@ -727,7 +740,9 @@ Object {
         "Ordinal": 0,
         "Status": -2,
         "TransactionId": 2,
+        "Type": 100,
       },
+      "txType": 100,
       "type": "income",
       "utxoInputs": Array [
         Object {
@@ -1375,6 +1390,7 @@ Array [
         "Ordinal": 0,
         "Status": -2,
         "TransactionId": 1,
+        "Type": 100,
       },
       Object {
         "BlockId": 1,
@@ -1385,6 +1401,7 @@ Array [
         "Ordinal": 0,
         "Status": -2,
         "TransactionId": 2,
+        "Type": 100,
       },
       Object {
         "BlockId": null,
@@ -1395,6 +1412,7 @@ Array [
         "Ordinal": null,
         "Status": -1,
         "TransactionId": 3,
+        "Type": 100,
       },
     ],
   },
@@ -1501,7 +1519,9 @@ Object {
         "Ordinal": null,
         "Status": -2,
         "TransactionId": 3,
+        "Type": 100,
       },
+      "txType": 100,
       "type": "expend",
       "utxoInputs": Array [
         Object {
@@ -1548,7 +1568,9 @@ Object {
         "Ordinal": 0,
         "Status": -2,
         "TransactionId": 1,
+        "Type": 100,
       },
+      "txType": 100,
       "type": "income",
       "utxoInputs": Array [
         Object {
@@ -1603,7 +1625,9 @@ Object {
         "Ordinal": 0,
         "Status": -2,
         "TransactionId": 2,
+        "Type": 100,
       },
+      "txType": 100,
       "type": "income",
       "utxoInputs": Array [
         Object {
@@ -1975,6 +1999,7 @@ Array [
         "Ordinal": 0,
         "Status": -2,
         "TransactionId": 1,
+        "Type": 100,
       },
       Object {
         "BlockId": 1,
@@ -1985,6 +2010,7 @@ Array [
         "Ordinal": 0,
         "Status": -2,
         "TransactionId": 2,
+        "Type": 100,
       },
       Object {
         "BlockId": null,
@@ -1995,6 +2021,7 @@ Array [
         "Ordinal": null,
         "Status": -2,
         "TransactionId": 3,
+        "Type": 100,
       },
     ],
   },
@@ -2101,7 +2128,9 @@ Object {
         "Ordinal": null,
         "Status": -2,
         "TransactionId": 3,
+        "Type": 100,
       },
+      "txType": 100,
       "type": "expend",
       "utxoInputs": Array [
         Object {
@@ -2148,7 +2177,9 @@ Object {
         "Ordinal": 0,
         "Status": -2,
         "TransactionId": 1,
+        "Type": 100,
       },
+      "txType": 100,
       "type": "income",
       "utxoInputs": Array [
         Object {
@@ -2203,7 +2234,9 @@ Object {
         "Ordinal": 0,
         "Status": -2,
         "TransactionId": 2,
+        "Type": 100,
       },
+      "txType": 100,
       "type": "income",
       "utxoInputs": Array [
         Object {
@@ -2851,6 +2884,7 @@ Array [
         "Ordinal": 0,
         "Status": -2,
         "TransactionId": 1,
+        "Type": 100,
       },
       Object {
         "BlockId": 1,
@@ -2861,6 +2895,7 @@ Array [
         "Ordinal": 0,
         "Status": -2,
         "TransactionId": 2,
+        "Type": 100,
       },
       Object {
         "BlockId": null,
@@ -2871,6 +2906,7 @@ Array [
         "Ordinal": null,
         "Status": -2,
         "TransactionId": 3,
+        "Type": 100,
       },
     ],
   },

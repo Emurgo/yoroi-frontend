@@ -7,6 +7,7 @@ import type {
 import type {
   TransactionRow,
 } from '../../../primitives/tables';
+import { TransactionType } from '../../../primitives/tables';
 import { GetCertificates, } from '../../../primitives/api/read';
 import type { CardanoByronTxIO, JormungandrTxIO } from '../tables';
 
@@ -40,6 +41,7 @@ export class CardanoByronAssociateTxWithIOs {
     );
 
     const fullTx = request.txs.map(transaction  => ({
+      txType: TransactionType.CardanoByron,
       transaction,
       ...getOrThrow(utxo.get(transaction)),
     }));
@@ -64,18 +66,20 @@ export class JormungandrAssociateTxWithIOs {
     tx: lf$Transaction,
     request: {| txs: $ReadOnlyArray<$ReadOnly<TransactionRow>>, |},
   ): Promise<Array<JormungandrTxIO>> {
-    const accounting = await JormungandrAssociateTxWithIOs.depTables.AssociateTxWithAccountingIOs.getIOsForTx(
+    const { depTables } = JormungandrAssociateTxWithIOs;
+    const accounting = await depTables.AssociateTxWithAccountingIOs.getIOsForTx(
       db, tx, request
     );
-    const utxo = await JormungandrAssociateTxWithIOs.depTables.AssociateTxWithUtxoIOs.getIOsForTx(
+    const utxo = await depTables.AssociateTxWithUtxoIOs.getIOsForTx(
       db, tx, request
     );
 
-    const certsForTxs = await JormungandrAssociateTxWithIOs.depTables.GetCertificates.forTransactions(
+    const certsForTxs = await depTables.GetCertificates.forTransactions(
       db, tx,
       { txIds: request.txs.map(transaction => transaction.TransactionId) },
     );
     const fullTx = request.txs.map(transaction  => ({
+      txType: TransactionType.Jormungandr,
       transaction,
       certificates: certsForTxs.get(transaction.TransactionId) ?? [],
       ...getOrThrow(utxo.get(transaction)),

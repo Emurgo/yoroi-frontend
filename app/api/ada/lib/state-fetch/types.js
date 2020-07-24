@@ -1,6 +1,6 @@
 // @flow
 
-import { MIRPot } from '@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib';
+import typeof { MIRPot } from '@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib';
 
 // getUTXOsForAddresses
 
@@ -186,7 +186,7 @@ export type RemoteGenesisKeyDelegationCert = {|
   vrf_keyhash: string,
 |};
 export type RemoteMoveInstantaneousRewardsCert = {|
-  pot: $Values<typeof MIRPot>,
+  pot: $Values<MIRPot>,
   rewards: {| [stake_credential: string]: string /* coin */ |},
 |};
 export type RemoteCertificate = {|

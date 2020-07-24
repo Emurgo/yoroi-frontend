@@ -37,6 +37,9 @@ import { KeyKind } from '../../../common/lib/crypto/keys/types';
 import {
   removeLocalItem,
 } from '../../../localStorage/primitives';
+import {
+  isCardanoHaskell,
+} from './database/prepackaged/networks';
 
 declare var CONFIG: ConfigType;
 const protocolMagic = CONFIG.network.protocolMagic;
@@ -79,8 +82,8 @@ export async function migrateToLatest(
     }],
     ['<1.4.0', async () => await bip44Migration()],
     ['<1.10.0', async () => await storagev2Migation(persistentDb)],
-    ['=1.10.0', async () => await txHistoryReset(persistentDb)],
-    ['>=2.0.0 <2.4.0', async () => await txHistoryReset(persistentDb)],
+    ['=1.10.0', async () => await cardanoTxHistoryReset(persistentDb)],
+    ['>=2.0.0 <2.4.0', async () => await cardanoTxHistoryReset(persistentDb)],
     ['<3.0.0', async () => await removeLocalItem(legacyStorageKeys.SELECTED_EXPLORER_KEY)],
   ];
 
@@ -232,7 +235,7 @@ export async function storagev2Migation(
  * clear the transaction history for all wallets
  * useful if there was a bug in transaction processing
  */
-export async function txHistoryReset(
+export async function cardanoTxHistoryReset(
   persistentDb: lf$Database,
 ): Promise<boolean> {
   const wallets = await loadWalletsFromStorage(persistentDb);
@@ -242,8 +245,11 @@ export async function txHistoryReset(
 
   for (const publicDeriver of wallets) {
     const withLevels = asHasLevels<ConceptualWallet>(publicDeriver);
+    if (!isCardanoHaskell(publicDeriver.getParent().getNetworkInfo())) {
+      continue;
+    }
     if (withLevels == null) {
-      throw new Error(`${nameof(txHistoryReset)} missing levels`);
+      throw new Error(`${nameof(cardanoTxHistoryReset)} missing levels`);
     }
     await removeAllTransactions({ publicDeriver: withLevels });
   }

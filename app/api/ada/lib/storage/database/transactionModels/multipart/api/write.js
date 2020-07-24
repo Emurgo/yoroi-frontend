@@ -9,6 +9,7 @@ import type {
   TransactionInsert,
   DbBlock,
 } from '../../../primitives/tables';
+import { TransactionType } from '../../../primitives/tables';
 import type {
   JormungandrTxIO,
   CardanoByronTxIO,
@@ -96,6 +97,7 @@ export class ModifyJormungandrTx {
     }
 
     return {
+      txType: TransactionType.Jormungandr,
       ...newTx,
       certificates,
       ...utxo,
@@ -148,6 +150,7 @@ export class ModifyCardanoByronTx {
       }
     );
     return {
+      txType: TransactionType.CardanoByron,
       ...newTx,
       ...utxo,
     };
@@ -213,6 +216,7 @@ export class ModifyCardanoShelleyTx {
     }
 
     return {
+      txType: TransactionType.CardanoShelley,
       ...newTx,
       certificates,
       ...utxo,

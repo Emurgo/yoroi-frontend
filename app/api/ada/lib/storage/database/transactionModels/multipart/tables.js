@@ -8,6 +8,7 @@ import type { DbUtxoInputs, DbUtxoOutputs, } from '../utxo/tables';
 import type { DbAccountingInputs, DbAccountingOutputs, } from '../account/tables';
 
 export type CardanoByronTxIO = {|
+  +txType: $PropertyType<typeof TransactionType, "CardanoByron">,
   +transaction: $ReadOnly<{|
     ...$PropertyType<DbTransaction, 'transaction'>,
     +Type: $PropertyType<typeof TransactionType, "CardanoByron">,
@@ -15,6 +16,7 @@ export type CardanoByronTxIO = {|
   ...DbUtxoInputs, ...DbUtxoOutputs,
 |};
 export type CardanoShelleyTxIO = {|
+  +txType: $PropertyType<typeof TransactionType, "CardanoShelley">,
   +transaction: $ReadOnly<{|
     ...$PropertyType<DbTransaction, 'transaction'>,
     +Type: $PropertyType<typeof TransactionType, "CardanoShelley">,
@@ -23,6 +25,7 @@ export type CardanoShelleyTxIO = {|
   +certificates: Array<CertificatePart>,
 |};
 export type ErgoTxIO = {|
+  +txType: $PropertyType<typeof TransactionType, "Ergo">,
   +transaction: $ReadOnly<{|
     ...$PropertyType<DbTransaction, 'transaction'>,
     +Type: $PropertyType<typeof TransactionType, "Ergo">,
@@ -30,6 +33,7 @@ export type ErgoTxIO = {|
   ...DbUtxoInputs, ...DbUtxoOutputs,
 |};
 export type JormungandrTxIO = {|
+  +txType: $PropertyType<typeof TransactionType, "Jormungandr">,
   +transaction: $ReadOnly<{|
     ...$PropertyType<DbTransaction, 'transaction'>,
     +Type: $PropertyType<typeof TransactionType, "Jormungandr">,

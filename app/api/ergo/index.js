@@ -16,6 +16,8 @@ import type {
   GetTransactionsResponse,
   RefreshPendingTransactionsRequest,
   RefreshPendingTransactionsResponse,
+  RemoveAllTransactionsRequest, RemoveAllTransactionsResponse,
+  GetForeignAddressesRequest, GetForeignAddressesResponse,
 } from '../common/index';
 import {
   isValidBip39Mnemonic,
@@ -180,6 +182,18 @@ export default class ErgoApi {
     //   Logger.error(`${nameof(ErgoApi)}::${nameof(this.refreshPendingTransactions)} error: ` + stringifyError(error));
     //   throw new GenericApiError();
     // }
+  }
+
+  async removeAllTransactions(
+    _request: RemoveAllTransactionsRequest
+  ): Promise<RemoveAllTransactionsResponse> {
+    throw new Error(`${nameof(ErgoApi)}::${nameof(this.getForeignAddresses)} not implemented yet`);
+  }
+
+  async getForeignAddresses(
+    _request: GetForeignAddressesRequest
+  ): Promise<GetForeignAddressesResponse> {
+    throw new Error(`${nameof(ErgoApi)}::${nameof(this.getForeignAddresses)} not implemented yet`);
   }
 
   /**

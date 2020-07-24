@@ -122,7 +122,7 @@ import type {
   FilterFunc,
 } from '../../../../common/lib/state-fetch/currencySpecificTypes';
 import { addressToKind } from '../../../../ada/lib/storage/bridge/utils';
-
+import { getFromUserPerspective, } from '../../../../ada/transactions/utils';
 import environment from '../../../../../environment';
 
 
@@ -1210,6 +1210,7 @@ export async function updateTransactionBatch(
     newsTxsIdSet.add(result.transaction.TransactionId);
     if (result.block !== null) {
       txsAddedToBlock.push({
+        txType: result.txType,
         block: result.block,
         transaction: result.transaction,
         certificates: result.certificates,

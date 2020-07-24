@@ -43,6 +43,7 @@ import {
 import {
   networks,
 } from '../../../../../ada/lib/storage/database/prepackaged/networks';
+import { TransactionType } from '../../../../../ada/lib/storage/database/primitives/tables';
 
 jest.mock('../../../../../ada/lib/storage/database/initialSeed');
 
@@ -324,6 +325,7 @@ async function syncingSimpleTransaction(
         },
         output: {
           Transaction: {
+            Type: TransactionType.Jormungandr,
             ErrorMessage: null,
             Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed545',
             Digest: 8.191593645542673e-27,
@@ -433,6 +435,7 @@ async function syncingSimpleTransaction(
         },
         output: {
           Transaction: {
+            Type: TransactionType.Jormungandr,
             ErrorMessage: null,
             Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546',
             Digest: 1.249559827714551e-31,
@@ -466,6 +469,7 @@ async function syncingSimpleTransaction(
         },
         output: {
           Transaction: {
+            Type: TransactionType.Jormungandr,
             ErrorMessage: null,
             Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546',
             Digest: 1.249559827714551e-31,
@@ -684,6 +688,7 @@ async function utxoCreatedAndUsed(
         },
         output: {
           Transaction: {
+            Type: TransactionType.Jormungandr,
             ErrorMessage: null,
             Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546',
             Digest: 1.249559827714551e-31,
@@ -717,6 +722,7 @@ async function utxoCreatedAndUsed(
         },
         output: {
           Transaction: {
+            Type: TransactionType.Jormungandr,
             ErrorMessage: null,
             Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546',
             Digest: 1.249559827714551e-31,

@@ -1180,6 +1180,7 @@ export async function updateTransactionBatch(
     newsTxsIdSet.add(result.transaction.TransactionId);
     if (result.block !== null) {
       txsAddedToBlock.push({
+        txType: result.txType,
         block: result.block,
         transaction: result.transaction,
         utxoInputs: result.utxoInputs,
@@ -1196,6 +1197,7 @@ export async function updateTransactionBatch(
     newsTxsIdSet.add(result.transaction.TransactionId);
     if (result.block !== null) {
       txsAddedToBlock.push({
+        txType: result.txType,
         block: result.block,
         transaction: result.transaction,
         certificates: result.certificates,

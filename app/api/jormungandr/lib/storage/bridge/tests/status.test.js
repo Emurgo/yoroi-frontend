@@ -41,10 +41,9 @@ import {
 
 import {
   updateTransactions,
+  getAllTransactions
 } from '../updateTransactions';
-import {
-  getAllTransactions,
-} from '../../../../../ada/lib/storage/bridge/updateTransactions';
+import { TransactionType } from '../../../../../ada/lib/storage/database/primitives/tables';
 
 jest.mock('../../../../../ada/lib/storage/database/initialSeed');
 
@@ -373,6 +372,7 @@ async function baseTest(
         },
         output: {
           Transaction: {
+            Type: TransactionType.Jormungandr,
             ErrorMessage: null,
             Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546',
             Digest: 1.249559827714551e-31,
@@ -470,6 +470,7 @@ async function baseTest(
         },
         output: {
           Transaction: {
+            Type: TransactionType.Jormungandr,
             ErrorMessage: null,
             Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed545',
             Digest: 8.191593645542673e-27,
@@ -509,6 +510,7 @@ async function baseTest(
         },
         output: {
           Transaction: {
+            Type: TransactionType.Jormungandr,
             ErrorMessage: null,
             Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546',
             Digest: 1.249559827714551e-31,
@@ -594,6 +596,7 @@ async function baseTest(
         },
         output: {
           Transaction: {
+            Type: TransactionType.Jormungandr,
             ErrorMessage: null,
             Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed545',
             Digest: 8.191593645542673e-27,
@@ -633,6 +636,7 @@ async function baseTest(
         },
         output: {
           Transaction: {
+            Type: TransactionType.Jormungandr,
             ErrorMessage: null,
             Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546',
             Digest: 1.249559827714551e-31,
@@ -687,6 +691,7 @@ async function baseTest(
     );
 
     expect((await db.export()).tables.Transaction).toEqual([{
+      Type: TransactionType.Jormungandr,
       Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed545',
       Digest: 8.191593645542673e-27,
       BlockId: 2,
@@ -697,6 +702,7 @@ async function baseTest(
       TransactionId: 1
     },
     {
+      Type: TransactionType.Jormungandr,
       Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546',
       Digest: 1.249559827714551e-31,
       BlockId: 1,
@@ -707,6 +713,7 @@ async function baseTest(
       TransactionId: 2
     },
     {
+      Type: TransactionType.Jormungandr,
       Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed547',
       Digest: 1.9060984568373646e-36,
       BlockId: null,
@@ -813,6 +820,7 @@ async function pendingDropped(
   expect((await db.export()).tables.Transaction).toEqual([
     {
       // pending tx that is now failed as expected
+      Type: TransactionType.Jormungandr,
       Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed545',
       Digest: 8.191593645542673e-27,
       BlockId: null,

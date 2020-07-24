@@ -448,6 +448,7 @@ Array [
         "Ordinal": 0,
         "Status": -2,
         "TransactionId": 1,
+        "Type": 0,
       },
       Object {
         "BlockId": 2,
@@ -458,6 +459,7 @@ Array [
         "Ordinal": 0,
         "Status": -2,
         "TransactionId": 2,
+        "Type": 0,
       },
       Object {
         "BlockId": 3,
@@ -468,6 +470,7 @@ Array [
         "Ordinal": 0,
         "Status": -2,
         "TransactionId": 3,
+        "Type": 0,
       },
       Object {
         "BlockId": 4,
@@ -478,6 +481,7 @@ Array [
         "Ordinal": 1,
         "Status": -2,
         "TransactionId": 4,
+        "Type": 0,
       },
     ],
   },

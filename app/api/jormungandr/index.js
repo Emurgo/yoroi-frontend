@@ -27,6 +27,8 @@ import {
   getPendingTransactions,
   getAllTransactions,
   updateTransactions,
+  removeAllTransactions,
+  getForeignAddresses,
 } from './lib/storage/bridge/updateTransactions';
 import {
   filterAddressesByStakingKey,
@@ -61,8 +63,9 @@ import type {
 import type {
   BaseGetTransactionsRequest,
   GetTransactionsResponse,
-  RefreshPendingTransactionsRequest,
-  RefreshPendingTransactionsResponse,
+  RefreshPendingTransactionsRequest, RefreshPendingTransactionsResponse,
+  RemoveAllTransactionsRequest, RemoveAllTransactionsResponse,
+  GetForeignAddressesRequest, GetForeignAddressesResponse,
 } from '../common/index';
 import {
   sendAllUnsignedTx as jormungandrSendAllUnsignedTx,
@@ -379,6 +382,36 @@ export default class JormungandrApi {
       return mappedTransactions;
     } catch (error) {
       Logger.error(`${nameof(JormungandrApi)}::${nameof(this.refreshPendingTransactions)} error: ` + stringifyError(error));
+      throw new GenericApiError();
+    }
+  }
+
+  async removeAllTransactions(
+    request: RemoveAllTransactionsRequest
+  ): Promise<RemoveAllTransactionsResponse> {
+    try {
+      // 1) clear existing history
+      await removeAllTransactions({ publicDeriver: request.publicDeriver });
+
+      // 2) trigger a history sync
+      try {
+        await request.refreshWallet();
+      } catch (_e) {
+        Logger.warn(`${nameof(this.removeAllTransactions)} failed to connect to remote to resync. Data was still cleared locally`);
+      }
+    } catch (error) {
+      Logger.error(`${nameof(JormungandrApi)}::${nameof(this.removeAllTransactions)} error: ` + stringifyError(error));
+      throw new GenericApiError();
+    }
+  }
+
+  async getForeignAddresses(
+    request: GetForeignAddressesRequest
+  ): Promise<GetForeignAddressesResponse> {
+    try {
+      return await getForeignAddresses({ publicDeriver: request.publicDeriver });
+    } catch (error) {
+      Logger.error(`${nameof(JormungandrApi)}::${nameof(this.getForeignAddresses)} error: ` + stringifyError(error));
       throw new GenericApiError();
     }
   }

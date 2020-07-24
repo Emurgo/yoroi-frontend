@@ -7,6 +7,7 @@ import {
   stringifyData
 } from '../../utils/logging';
 import CardanoByronTransaction from '../../domain/CardanoByronTransaction';
+import CardanoShelleyTransaction from '../../domain/CardanoShelleyTransaction';
 import {
   HARD_DERIVATION_START,
   WalletTypePurpose,
@@ -29,6 +30,8 @@ import {
   getPendingTransactions,
   getAllTransactions,
   updateTransactions,
+  removeAllTransactions,
+  getForeignAddresses,
 } from './lib/storage/bridge/updateTransactions';
 import {
   Bip44Wallet,
@@ -62,8 +65,9 @@ import type {
   BaseGetTransactionsRequest,
   GetTransactionsResponse,
   GetTransactionsRequestOptions,
-  RefreshPendingTransactionsRequest,
-  RefreshPendingTransactionsResponse,
+  RefreshPendingTransactionsRequest, RefreshPendingTransactionsResponse,
+  RemoveAllTransactionsRequest, RemoveAllTransactionsResponse,
+  GetForeignAddressesRequest, GetForeignAddressesResponse,
 } from '../common/index';
 import {
   sendAllUnsignedTx as byronSendAllUnsignedTx,
@@ -501,13 +505,21 @@ export default class AdaApi {
       Logger.debug(`${nameof(AdaApi)}::${nameof(this.refreshTransactions)} success: ` + stringifyData(fetchedTxs));
 
       const mappedTransactions = fetchedTxs.txs.map(tx => {
-        if (tx.transaction.Type === TransactionType.CardanoByron) {
+        if (tx.txType === TransactionType.CardanoByron) {
           return CardanoByronTransaction.fromAnnotatedTx({
             tx,
             addressLookupMap: fetchedTxs.addressLookupMap,
             api: getApiForNetwork(request.publicDeriver.getParent().getNetworkInfo()),
           });
         }
+        if (tx.txType === TransactionType.CardanoShelley) {
+          return CardanoShelleyTransaction.fromAnnotatedTx({
+            tx,
+            addressLookupMap: fetchedTxs.addressLookupMap,
+            api: getApiForNetwork(request.publicDeriver.getParent().getNetworkInfo()),
+          });
+        }
+        throw new Error(`${nameof(this.refreshTransactions)} unknown tx type ${tx.type}`);
       });
       return {
         transactions: mappedTransactions,
@@ -530,15 +542,55 @@ export default class AdaApi {
       Logger.debug(`${nameof(AdaApi)}::${nameof(this.refreshPendingTransactions)} success: ` + stringifyData(fetchedTxs));
 
       const mappedTransactions = fetchedTxs.txs.map(tx => {
-        return CardanoByronTransaction.fromAnnotatedTx({
-          tx,
-          addressLookupMap: fetchedTxs.addressLookupMap,
-          api: getApiForNetwork(request.publicDeriver.getParent().getNetworkInfo()),
-        });
+        if (tx.txType === TransactionType.CardanoByron) {
+          return CardanoByronTransaction.fromAnnotatedTx({
+            tx,
+            addressLookupMap: fetchedTxs.addressLookupMap,
+            api: getApiForNetwork(request.publicDeriver.getParent().getNetworkInfo()),
+          });
+        }
+        if (tx.txType === TransactionType.CardanoShelley) {
+          return CardanoShelleyTransaction.fromAnnotatedTx({
+            tx,
+            addressLookupMap: fetchedTxs.addressLookupMap,
+            api: getApiForNetwork(request.publicDeriver.getParent().getNetworkInfo()),
+          });
+        }
+        throw new Error(`${nameof(this.refreshPendingTransactions)} unknown tx type ${tx.type}`);
       });
       return mappedTransactions;
     } catch (error) {
       Logger.error(`${nameof(AdaApi)}::${nameof(this.refreshPendingTransactions)} error: ` + stringifyError(error));
+      throw new GenericApiError();
+    }
+  }
+
+  async removeAllTransactions(
+    request: RemoveAllTransactionsRequest
+  ): Promise<RemoveAllTransactionsResponse> {
+    try {
+      // 1) clear existing history
+      await removeAllTransactions({ publicDeriver: request.publicDeriver });
+
+      // 2) trigger a history sync
+      try {
+        await request.refreshWallet();
+      } catch (_e) {
+        Logger.warn(`${nameof(this.removeAllTransactions)} failed to connect to remote to resync. Data was still cleared locally`);
+      }
+    } catch (error) {
+      Logger.error(`${nameof(AdaApi)}::${nameof(this.removeAllTransactions)} error: ` + stringifyError(error));
+      throw new GenericApiError();
+    }
+  }
+
+  async getForeignAddresses(
+    request: GetForeignAddressesRequest
+  ): Promise<GetForeignAddressesResponse> {
+    try {
+      return await getForeignAddresses({ publicDeriver: request.publicDeriver });
+    } catch (error) {
+      Logger.error(`${nameof(AdaApi)}::${nameof(this.getForeignAddresses)} error: ` + stringifyError(error));
       throw new GenericApiError();
     }
   }

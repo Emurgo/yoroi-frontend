@@ -7,7 +7,7 @@ import type {
   CertificateRelationType,
 } from './enums';
 import type { CertificateKindType } from '@emurgo/js-chain-libs/js_chain_libs';
-import { CertificateKind } from '@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib';
+import typeof { CertificateKind } from '@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib';
 import type { KeyKindType } from '../../../../../common/lib/crypto/keys/types';
 import type { CoinTypesT } from '../../../../../../config/numbersConfig';
 
@@ -270,7 +270,7 @@ export type CertificatePart = {|
 
 export type CertificateInsert = {|
   TransactionId: number,
-  Kind: CertificateKindType | $Values<typeof CertificateKind>,
+  Kind: CertificateKindType | $Values<CertificateKind>,
   Payload: string,
 |};
 export type CertificateRow = {|

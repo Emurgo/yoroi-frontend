@@ -587,6 +587,7 @@ Array [
         "Ordinal": 0,
         "Status": 1,
         "TransactionId": 1,
+        "Type": 0,
       },
       Object {
         "BlockId": 1,
@@ -597,6 +598,7 @@ Array [
         "Ordinal": 0,
         "Status": -2,
         "TransactionId": 2,
+        "Type": 0,
       },
     ],
   },

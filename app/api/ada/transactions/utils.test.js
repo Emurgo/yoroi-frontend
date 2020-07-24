@@ -169,6 +169,7 @@ const _tx = (
   });
 
   return {
+    txType: TransactionType.CardanoByron,
     transaction: {
       Type: TransactionType.CardanoByron,
       TransactionId: 0,

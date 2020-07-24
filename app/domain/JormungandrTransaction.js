@@ -1,5 +1,5 @@
 // @flow
-import { observable } from 'mobx';
+import { action, observable } from 'mobx';
 import BigNumber from 'bignumber.js';
 import type {
   UserAnnotation,
@@ -29,6 +29,7 @@ export default class JormungandrTransaction extends WalletTransaction {
     this.certificates = certificates;
   }
 
+  @action
   static fromAnnotatedTx(request: {|
     tx: {|
       ...JormungandrTxIO,

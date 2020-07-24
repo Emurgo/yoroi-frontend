@@ -11,6 +11,7 @@ import {
 } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import Store from '../base/Store';
 import type { ChangeModelPasswordFunc, RenameModelFunc, RemoveAllTransactionsFunc } from '../../api/common';
+import { getApiForNetwork } from '../../api/common/utils';
 import Request from '../lib/LocalizedRequest';
 import {
   asGetSigningKey,
@@ -55,7 +56,10 @@ export default class WalletSettingsStore extends Store {
     = new Request<ChangeModelPasswordFunc>(this.api.common.changeModelPassword);
 
   @observable clearHistory: Request<RemoveAllTransactionsFunc>
-    = new Request<RemoveAllTransactionsFunc>(this.api.common.removeAllTransactions);
+    = new Request<RemoveAllTransactionsFunc>(req => {
+      const apiType = getApiForNetwork(req.publicDeriver.getParent().getNetworkInfo());
+      return this.api[apiType].removeAllTransactions(req);
+    });
 
   @observable removeWalletRequest: Request<typeof _removeWalletFromDb>
     = new Request<typeof _removeWalletFromDb>(_removeWalletFromDb);
