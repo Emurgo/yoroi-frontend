@@ -5,7 +5,7 @@
   "api.errors.NotEnoughMoneyToSendError": "Bu işlemi yapmak için yeterli ADA yok.",
   "api.errors.PromiseNotCalledYetError": "Uygulama tamamlanmadan sonuca erişildi.",
   "api.errors.ReportRequestError": "Yardım talebi gönderilirken bir sorun oluştu.",
-  "api.errors.WalletAlreadyImportedError": "İndirmeye çalıştığınız cüzdan zaten var.",
+  "api.errors.WalletAlreadyImportedError": "İçeri aktarmaya çalıştığınız cüzdan zaten var.",
   "api.errors.WalletAlreadyRestoredError": "Yeniden yüklemeye çalıştığınız cüzdan zaten var.",
   "api.errors.WalletFileImportError": "Cüzdan indirilemedi. Lütfen doğru dosyayı girdiğinizden emin olun.",
   "api.errors.checkAdressesInUseApiError": "Kullanılan adresler kontrol edilirken sunucudan hata alındı.",
