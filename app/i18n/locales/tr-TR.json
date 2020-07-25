@@ -7,7 +7,7 @@
   "api.errors.ReportRequestError": "Yardım talebi gönderilirken bir sorun oluştu.",
   "api.errors.WalletAlreadyImportedError": "İçeri aktarmaya çalıştığınız cüzdan zaten var.",
   "api.errors.WalletAlreadyRestoredError": "Yeniden yüklemeye çalıştığınız cüzdan zaten var.",
-  "api.errors.WalletFileImportError": "Cüzdan indirilemedi. Lütfen doğru dosyayı girdiğinizden emin olun.",
+  "api.errors.WalletFileImportError": "Cüzdan içeri aktarılamadı. Lütfen doğru dosyayı girdiğinizden emin olun.",
   "api.errors.checkAdressesInUseApiError": "Kullanılan adresler kontrol edilirken sunucudan hata alındı.",
   "api.errors.currentCoinPriceError": "Geçerli kripto para fiyat verileri şu anda mevcut değil.",
   "api.errors.discoverAddressesError": "Adresler keşfedilirken API çağrı yönteminden hata alındı.",
