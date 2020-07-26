@@ -1,4 +1,4 @@
-## 12. Delegation and Staking
+## 12. 委托和质押
 
 12.1 **Rewards.** The amount of Rewards a User may earn from delegation depends on various factors including, but not limited to, user participation, stakepool profit margins and the volume of ada being delegated. It is possible that delegation generates no Reward for a User due to the above-mentioned factors. Rewards are earned as of the start of the 3rd epoch on the Cardano blockchain.
 
