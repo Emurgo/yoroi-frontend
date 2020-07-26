@@ -1,8 +1,8 @@
 ## 12. 委托和质押
 
-12.1 **Rewards.** The amount of Rewards a User may earn from delegation depends on various factors including, but not limited to, user participation, stakepool profit margins and the volume of ada being delegated. It is possible that delegation generates no Reward for a User due to the above-mentioned factors. Rewards are earned as of the start of the 3rd epoch on the Cardano blockchain.
+12.1 **奖励。** 用户可以从委托中获得的奖励金额取决于多种因素，包括但不限于用户参与度，权益池利润率和被委托的ADA数量。基于上述因素，委托可能不会为用户产生任何奖励。奖励是从在Cardano区块链授权后第三个纪元开始时开始计算。
 
-12.2 **Delegation.** Users may delegate their stake to one of the various stake pools of the Company or to a third party stake pool. User will have the sole right to determine the volume to be delegated to a stake pool and may increase or decrease its level of participation at any time. Any information Company shares regarding stakepools, including performance metrics and Rewards, will be for indicative purposes only and may not be accurate. Users may only delegate their stake to a stake pool if their ada is in an updated Daedalus or an updated Yoroi wallet at the time of the setup process. User does not acquire any automatic right to Rewards as a result of delegating its stake.
+12.2 **委托。** 用户可以将其权益委托给公司的某一权益池或第三方权益池。用户拥有的唯一的权力是能够把握要委托给权益池的数量，并且可以随时增加或减少其参与程度。公司分享的有关权益池的任何信息，包括绩效指标和奖励，仅用于指导目的，可能不准确。如果其ADA存在于最新的Daedalus或Yoroi钱包中，用户就能将其权益委托给一个权益池。用户由于委托其权益并不会产生额外的权利。
 
 12.3 **Company Stake-Pools.** The Company will operate various stake pools which will be visible in Yoroi or Seiza. The cost and network and server requirements to reliably operate such stake pools shall be determined by the Company in its sole discretion. Company will communicate the percentage amount of Reward to be shared with Users through the User’s Yoroi wallet. Rewards will accrue at the end of each epoch and will automatically appear in the User’s Yoroi wallet.
 
