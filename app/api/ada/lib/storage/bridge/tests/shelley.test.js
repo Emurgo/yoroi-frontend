@@ -14,7 +14,6 @@ import {
   TX_TEST_MNEMONIC_1,
   mockDate,
   filterDbSnapshot,
-  compareObject,
 } from '../../../../../jestUtils';
 import {
   genCheckAddressesInUse,
@@ -105,7 +104,7 @@ const networkTransactions: number => Array<RemoteTransaction> = (purpose) => [{
       ),
       amount: '1731391'
     }
-  ]
+  ],
 }];
 
 const nextRegularSpend: number => RemoteTransaction = (purpose) => ({
@@ -165,102 +164,32 @@ const nextRegularSpend: number => RemoteTransaction = (purpose) => ({
         ]
       ),
       amount: '900000'
-    }
-  ]
-});
-
-const twoTxsRegularSpend: number => Array<RemoteTransaction> = (purpose) => [{
-  hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed547',
-  height: 218611,
-  block_hash: 'a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba27',
-  time: '2019-09-13T16:38:26.000Z',
-  last_update: '2019-09-13T16:38:26.000Z',
-  tx_state: 'Successful',
-  tx_ordinal: 0,
-  epoch: 10,
-  slot: 3653,
-  inputs: [
-    {
-      // 'Ae2tdPwUPEZ3Kt2BJnDMQggxEA4c9MTagByH41rJkv2k82dBch2nqMAdyHJ'
-      address: getSingleAddressString(
-        TX_TEST_MNEMONIC_1,
-        [
-          purpose,
-          CoinTypes.CARDANO,
-          0 + HARD_DERIVATION_START,
-          ChainDerivations.INTERNAL,
-          0
-        ]
-      ),
-      amount: '1100000',
-      id: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed5460',
-      index: 0,
-      txHash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546'
-    }
-  ],
-  outputs: [
-    {
-      // 'Ae2tdPwUPEZ5PxKxoyZDgjsKgMWMpTRa4PH3sVgARSGBsWwNBH3qg7cMFsP'
-      address: getSingleAddressString(
-        ABANDON_SHARE,
-        [
-          purpose,
-          CoinTypes.CARDANO,
-          0 + HARD_DERIVATION_START,
-          ChainDerivations.EXTERNAL,
-          7
-        ]
-      ),
-      amount: '900000'
     },
-  ]
-},
-{
-  hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed548',
-  height: 218611,
-  block_hash: 'a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba27',
-  time: '2019-09-13T16:38:26.000Z',
-  last_update: '2019-09-13T16:38:26.000Z',
-  tx_state: 'Successful',
-  tx_ordinal: 1,
-  epoch: 10,
-  slot: 3653,
-  inputs: [
     {
       // Ae2tdPwUPEYxsngJhnW49jrmGuaCvQK34Hqrnx5w5SWxgfjDkSDcnrRdT5G
       address: getSingleAddressString(
         TX_TEST_MNEMONIC_1,
         [
-          purpose,
+          WalletTypePurpose.CIP1852,
           CoinTypes.CARDANO,
           0 + HARD_DERIVATION_START,
           ChainDerivations.EXTERNAL,
           19
         ]
       ),
-      amount: '900000',
-      id: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed5461',
-      index: 1,
-      txHash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546'
+      amount: '900000'
     }
   ],
-  outputs: [
-    {
-      // 'Ae2tdPwUPEZ5PxKxoyZDgjsKgMWMpTRa4PH3sVgARSGBsWwNBH3qg7cMFsP'
-      address: getSingleAddressString(
-        ABANDON_SHARE,
-        [
-          purpose,
-          CoinTypes.CARDANO,
-          0 + HARD_DERIVATION_START,
-          ChainDerivations.EXTERNAL,
-          7
-        ]
-      ),
-      amount: '700000'
-    },
-  ]
-}];
+  type: 'shelley',
+  ttl: '1000000',
+  fee: '100000',
+  certificates: [],
+  withdrawals: [{
+    address: '619a57f784ef8f9a9d3d25a905e4df27d46843d7a0b93d162cdfae6cdc',
+    amount: '1000',
+  }],
+  metadata: null,
+});
 
 beforeEach(() => {
   mockDate();
@@ -294,7 +223,6 @@ async function syncingSimpleTransaction(
     throw new Error('basePubDeriver missing a functionality');
   }
 
-  // test Public Deriver functionality
   {
     await updateTransactions(
       db,
@@ -375,25 +303,6 @@ async function syncingSimpleTransaction(
     }
   }
 
-  // test: calling update TX again when nothing changed results in no change in DB
-  {
-    const dbDump1 = (await db.export()).tables;
-
-    await updateTransactions(
-      db,
-      basePubDeriver,
-      checkAddressesInUse,
-      getTransactionsHistoryForAddresses,
-      getBestBlock,
-    );
-
-    const dbDump2 = (await db.export()).tables;
-    // note: last sync time updates every sync even if nothing changes
-    delete dbDump1.LastSyncInfo[0].Time;
-    delete dbDump2.LastSyncInfo[0].Time;
-    compareObject(dbDump1, dbDump2);
-  }
-
   // test: add a 2nd transaction
   {
     txHistory.push(nextRegularSpend(purposeForTest));
@@ -434,7 +343,7 @@ async function syncingSimpleTransaction(
         },
         output: {
           Transaction: {
-            Type: TransactionType.CardanoByron,
+            Type: TransactionType.CardanoShelley,
             ErrorMessage: null,
             Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546',
             Digest: 1.249559827714551e-31,
@@ -443,7 +352,11 @@ async function syncingSimpleTransaction(
             LastUpdateTime: 1568392656000,
             Status: 1,
             TransactionId: 2,
-            Extra: null,
+            Extra: {
+              Ttl: '1000000',
+              Fee: '100000',
+              Metadata: null,
+            },
           },
           UtxoTransactionOutput: {
             AddressId: 21,
@@ -467,7 +380,7 @@ async function syncingSimpleTransaction(
         },
         output: {
           Transaction: {
-            Type: TransactionType.CardanoByron,
+            Type: TransactionType.CardanoShelley,
             ErrorMessage: null,
             Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546',
             Digest: 1.249559827714551e-31,
@@ -476,7 +389,11 @@ async function syncingSimpleTransaction(
             LastUpdateTime: 1568392656000,
             Status: 1,
             TransactionId: 2,
-            Extra: null,
+            Extra: {
+              Ttl: '1000000',
+              Fee: '100000',
+              Metadata: null,
+            },
           },
           UtxoTransactionOutput: {
             AddressId: 20,
@@ -513,85 +430,7 @@ async function syncingSimpleTransaction(
         LastSyncInfoId: 1,
         SlotNum: 219651,
         Height: 218609,
-        Time: new Date(2),
-      });
-    }
-  }
-
-  // test: two txs in the same block
-  {
-    txHistory.push(...twoTxsRegularSpend(purposeForTest));
-
-    await updateTransactions(
-      db,
-      basePubDeriver,
-      checkAddressesInUse,
-      getTransactionsHistoryForAddresses,
-      getBestBlock,
-    );
-
-    {
-      const response = await basePubDeriver.getAllUtxos();
-      expect(response).toEqual([]);
-    }
-
-    {
-      const response = await basePubDeriver.getUtxoBalance();
-      expect(response).toEqual(new BigNumber('0'));
-    }
-
-    {
-      const response = await basePubDeriver.getUtxoBalance();
-      expect(response).toEqual(new BigNumber('0'));
-    }
-
-    {
-      const response = await basePubDeriver.getCutoff();
-      expect(response).toEqual(19);
-    }
-  }
-
-  // test rollback
-  {
-    txHistory.pop();
-    txHistory.pop();
-
-    await updateTransactions(
-      db,
-      basePubDeriver,
-      checkAddressesInUse,
-      getTransactionsHistoryForAddresses,
-      getBestBlock,
-    );
-
-    {
-      const response = await basePubDeriver.getAllUtxos();
-      expect(response).toEqual([]);
-    }
-
-    {
-      const response = await basePubDeriver.getUtxoBalance();
-      expect(response).toEqual(new BigNumber('0'));
-    }
-
-    {
-      const response = await basePubDeriver.getUtxoBalance();
-      expect(response).toEqual(new BigNumber('0'));
-    }
-
-    {
-      const response = await basePubDeriver.getCutoff();
-      expect(response).toEqual(19);
-    }
-
-    {
-      const response = await publicDeriver.getLastSyncInfo();
-      expect(response).toEqual({
-        BlockHash: null,
-        LastSyncInfoId: 1,
-        SlotNum: null,
-        Height: 0,
-        Time: new Date(4),
+        Time: new Date(1),
       });
     }
   }
@@ -600,6 +439,7 @@ async function syncingSimpleTransaction(
     'Address',
     'Transaction',
     'UtxoTransactionInput',
+    'AccountingTransactionInput',
     'UtxoTransactionOutput',
     'LastSyncInfo',
     'Block'
@@ -609,147 +449,5 @@ async function syncingSimpleTransaction(
 }
 test('Syncing simple transaction bip44', async (done) => {
   await syncingSimpleTransaction(WalletTypePurpose.BIP44);
-  done();
-});
-
-async function utxoCreatedAndUsed(
-  purposeForTest: WalletTypePurposeT,
-): Promise<void> {
-  const db = await loadLovefieldDB(schema.DataStoreType.MEMORY);
-  const publicDeriver = await setup(db, TX_TEST_MNEMONIC_1, purposeForTest);
-
-  const txHistory = networkTransactions(purposeForTest);
-  const network = networks.ByronMainnet;
-  const checkAddressesInUse = genCheckAddressesInUse(txHistory, network);
-  const getTransactionsHistoryForAddresses = genGetTransactionsHistoryForAddresses(
-    txHistory,
-    network
-  );
-  const getBestBlock = genGetBestBlock(txHistory);
-
-  const withDisplayCutoff = asDisplayCutoff(publicDeriver);
-  if (!withDisplayCutoff) throw new Error('missing display cutoff functionality');
-  const withUtxos = asGetAllUtxos(withDisplayCutoff);
-  if (!withUtxos) throw new Error('missing get all utxos functionality');
-  const withUtxoBalance = asGetUtxoBalance(withUtxos);
-  if (!withUtxoBalance) throw new Error('missing utxo balance functionality');
-  const basePubDeriver = withUtxoBalance;
-
-  expect(basePubDeriver != null).toEqual(true);
-  if (basePubDeriver == null) {
-    throw new Error('basePubDeriver missing a functionality');
-  }
-
-  {
-    // add tx so that we  both created and used a utxo in the same sync
-    txHistory.push(nextRegularSpend(purposeForTest));
-
-    await updateTransactions(
-      db,
-      basePubDeriver,
-      checkAddressesInUse,
-      getTransactionsHistoryForAddresses,
-      getBestBlock,
-    );
-
-    {
-      const expectedAddressing1 = [
-        purposeForTest,
-        CoinTypes.CARDANO,
-        0 + HARD_DERIVATION_START,
-        ChainDerivations.INTERNAL,
-        0
-      ];
-      const expectedAddressing2 = [
-        purposeForTest,
-        CoinTypes.CARDANO,
-        0 + HARD_DERIVATION_START,
-        ChainDerivations.EXTERNAL,
-        19
-      ];
-      const response = await basePubDeriver.getAllUtxos();
-      expect(response).toEqual([{
-        // 'Ae2tdPwUPEZ3Kt2BJnDMQggxEA4c9MTagByH41rJkv2k82dBch2nqMAdyHJ'
-        address: getSingleAddressString(
-          TX_TEST_MNEMONIC_1,
-          expectedAddressing1
-        ),
-        addressing: {
-          path: expectedAddressing1,
-          startLevel: 1,
-        },
-        output: {
-          Transaction: {
-            Type: TransactionType.CardanoByron,
-            ErrorMessage: null,
-            Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546',
-            Digest: 1.249559827714551e-31,
-            Ordinal: 0,
-            BlockId: 2,
-            LastUpdateTime: 1568392656000,
-            Status: 1,
-            TransactionId: 2,
-            Extra: null,
-          },
-          UtxoTransactionOutput: {
-            AddressId: 21,
-            Amount: '1100000',
-            IsUnspent: true,
-            OutputIndex: 0,
-            TransactionId: 2,
-            UtxoTransactionOutputId: 3
-          }
-        }
-      },
-      {
-        // Ae2tdPwUPEYxsngJhnW49jrmGuaCvQK34Hqrnx5w5SWxgfjDkSDcnrRdT5G
-        address: getSingleAddressString(
-          TX_TEST_MNEMONIC_1,
-          expectedAddressing2
-        ),
-        addressing: {
-          path: expectedAddressing2,
-          startLevel: 1,
-        },
-        output: {
-          Transaction: {
-            Type: TransactionType.CardanoByron,
-            ErrorMessage: null,
-            Hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546',
-            Digest: 1.249559827714551e-31,
-            Ordinal: 0,
-            BlockId: 2,
-            LastUpdateTime: 1568392656000,
-            Status: 1,
-            TransactionId: 2,
-            Extra: null,
-          },
-          UtxoTransactionOutput: {
-            AddressId: 20,
-            Amount: '900000',
-            IsUnspent: true,
-            OutputIndex: 1,
-            TransactionId: 2,
-            UtxoTransactionOutputId: 4
-          }
-        }
-      },
-      ]);
-    }
-
-    {
-      const response = await basePubDeriver.getUtxoBalance();
-      expect(response).toEqual(new BigNumber('2000000'));
-    }
-
-    {
-      const response = await basePubDeriver.getUtxoBalance();
-      expect(response).toEqual(new BigNumber('2000000'));
-    }
-  }
-}
-
-test('Utxo created and used in same sync bip44', async (done) => {
-  await utxoCreatedAndUsed(WalletTypePurpose.BIP44);
   done();
 });

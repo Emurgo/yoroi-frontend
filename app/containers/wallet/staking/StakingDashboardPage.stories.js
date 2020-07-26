@@ -46,6 +46,9 @@ import type { StandardAddress } from '../../../types/AddressFilterTypes';
 import {
   TransactionType,
 } from '../../../api/ada/lib/storage/database/primitives/tables';
+import type {
+  JormungandrTransactionInsert,
+} from '../../../api/ada/lib/storage/database/primitives/tables';
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -268,15 +271,18 @@ const delegateCert1 = {
     Payload: 'a22d0b8709e6bc04d11257dc405410d1ace01f207c391ba4788ea17198ee1a0801f989090208512a2d56aed13b81c98407b10ba04fde3b8d4a3442b8b25368f512',
   },
   transaction: {
-    Type: TransactionType.Jormungandr,
     TransactionId: 14,
-    Digest: -5.739375206419183e+296,
-    Hash: 'b5b44d983bfcd2ca9e28a9a00924d0262c9decfbee34dab07af30b6acd23ff97',
-    BlockId: 14,
-    Ordinal: 0,
-    LastUpdateTime: 1580812939000,
-    Status: 1,
-    ErrorMessage: null,
+    ...({
+      Type: TransactionType.Jormungandr,
+      Digest: -5.739375206419183e+296,
+      Hash: 'b5b44d983bfcd2ca9e28a9a00924d0262c9decfbee34dab07af30b6acd23ff97',
+      BlockId: 14,
+      Ordinal: 0,
+      LastUpdateTime: 1580812939000,
+      Status: 1,
+      ErrorMessage: null,
+      Extra: null,
+    }: JormungandrTransactionInsert)
   },
   block: {
     BlockId: 14,

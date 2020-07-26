@@ -13,6 +13,7 @@ import {
 import type {
   BlockInsert, BlockRow,
   TransactionInsert, TransactionRow,
+  JormungandrTransactionInsert,
   NetworkRow,
   DbBlock,
 } from '../../../../ada/lib/storage/database/primitives/tables';
@@ -259,6 +260,9 @@ export async function rawGetTransactions(
       ...txWithIO.utxoOutputs.map(output => output.AddressId),
       ...txWithIO.accountingInputs.map(input => input.AddressId),
       ...txWithIO.accountingOutputs.map(output => output.AddressId),
+      ...txWithIO.certificates.flatMap(
+        cert => cert.relatedAddresses.map(relation => relation.AddressId)
+      )
     ]);
     const addressRows = await GetAddress.getById(
       db, dbTx,
@@ -458,6 +462,7 @@ export async function rawGetForeignAddresses(
     ...txWithIO.utxoOutputs.map(output => output.AddressId),
     ...txWithIO.accountingInputs.map(input => input.AddressId),
     ...txWithIO.accountingOutputs.map(output => output.AddressId),
+    // note: we don't show other addresses in a certificate as unknown addresses
   ]);
 
   const ourIds = new Set(
@@ -1531,7 +1536,8 @@ export function networkTxHeaderToDb(
         : new Date(tx.time).getTime(),
       Status: statusStringToCode(tx.tx_state),
       ErrorMessage: null, // TODO: add error message from backend if present
-    }),
+      Extra: null,
+    }: JormungandrTransactionInsert),
   };
 }
 

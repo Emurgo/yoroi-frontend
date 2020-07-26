@@ -1,5 +1,6 @@
 // @flow
 
+import BigNumber from 'bignumber.js';
 import { isEqual } from 'lodash';
 import type {
   lf$Database, lf$Transaction,
@@ -13,6 +14,8 @@ import {
 import type {
   BlockInsert, BlockRow,
   TransactionInsert, TransactionRow,
+  CardanoByronTransactionInsert,
+  CardanoShelleyTransactionInsert,
   NetworkRow,
   DbBlock,
 } from '../database/primitives/tables';
@@ -49,7 +52,10 @@ import {
   AssociateTxWithUtxoIOs,
 } from '../database/transactionModels/utxo/api/read';
 import {
-  CardanoByronAssociateTxWithIOs
+  AssociateTxWithAccountingIOs,
+} from '../database/transactionModels/account/api/read';
+import {
+  CardanoByronAssociateTxWithIOs, CardanoShelleyAssociateTxWithIOs,
 } from '../database/transactionModels/multipart/api/read';
 import type {
   UserAnnotation,
@@ -60,6 +66,9 @@ import type {
 import type {
   UtxoTransactionInputInsert, UtxoTransactionOutputInsert,
 } from '../database/transactionModels/utxo/tables';
+import type {
+  AccountingTransactionInputInsert,
+} from '../database/transactionModels/account/tables';
 import {
   TxStatusCodes,
   CoreAddressTypes,
@@ -127,6 +136,7 @@ async function rawGetAllTxIds(
     GetAddress: Class<GetAddress>,
     CardanoByronAssociateTxWithIOs: Class<CardanoByronAssociateTxWithIOs>,
     AssociateTxWithUtxoIOs: Class<AssociateTxWithUtxoIOs>,
+    AssociateTxWithAccountingIOs: Class<AssociateTxWithAccountingIOs>,
     GetDerivationSpecific: Class<GetDerivationSpecific>,
   |},
   request: {| publicDeriver: IPublicDeriver<ConceptualWallet>, |},
@@ -172,6 +182,9 @@ async function rawGetAllTxIds(
   }
 
   const txIds = Array.from(new Set([
+    ...(await deps.AssociateTxWithAccountingIOs.getTxIdsForAddresses(
+      db, dbTx, { addressIds: accountingAddressIds },
+    )),
     ...(await deps.AssociateTxWithUtxoIOs.getTxIdsForAddresses(
       db, dbTx, { addressIds: utxoAddressIds },
     )),
@@ -192,7 +205,9 @@ export async function rawGetTransactions(
     GetPathWithSpecific: Class<GetPathWithSpecific>,
     GetAddress: Class<GetAddress>,
     CardanoByronAssociateTxWithIOs: Class<CardanoByronAssociateTxWithIOs>,
+    CardanoShelleyAssociateTxWithIOs: Class<CardanoShelleyAssociateTxWithIOs>,
     AssociateTxWithUtxoIOs: Class<AssociateTxWithUtxoIOs>,
+    AssociateTxWithAccountingIOs: Class<AssociateTxWithAccountingIOs>,
     GetTxAndBlock: Class<GetTxAndBlock>,
     GetDerivationSpecific: Class<GetDerivationSpecific>,
   |},
@@ -224,6 +239,7 @@ export async function rawGetTransactions(
       GetAddress: deps.GetAddress,
       CardanoByronAssociateTxWithIOs: deps.CardanoByronAssociateTxWithIOs,
       AssociateTxWithUtxoIOs: deps.AssociateTxWithUtxoIOs,
+      AssociateTxWithAccountingIOs: deps.AssociateTxWithAccountingIOs,
       GetDerivationSpecific: deps.GetDerivationSpecific,
     },
     { publicDeriver: request.publicDeriver },
@@ -234,10 +250,24 @@ export async function rawGetTransactions(
   for (const tx of txs) {
     blockMap.set(tx.Transaction.TransactionId, tx.Block);
   }
-  const txsWithIOs = await deps.CardanoByronAssociateTxWithIOs.getIOsForTx(
+  const byronWithIOs = await deps.CardanoByronAssociateTxWithIOs.getIOsForTx(
     db, dbTx,
-    { txs: txs.map(txWithBlock => txWithBlock.Transaction) }
+    { txs: txs
+      .map(txWithBlock => txWithBlock.Transaction)
+      .filter(tx => tx.Type === TransactionType.CardanoByron)
+    }
   );
+  const shelleyWithIOs = await deps.CardanoShelleyAssociateTxWithIOs.getIOsForTx(
+    db, dbTx,
+    { txs: txs
+      .map(txWithBlock => txWithBlock.Transaction)
+      .filter(tx => tx.Type === TransactionType.CardanoShelley)
+    }
+  );
+  const txsWithIOs = [
+    ...byronWithIOs,
+    ...shelleyWithIOs,
+  ];
 
   // we need to build a lookup map of AddressId => Hash
   // note: some inputs or outputs may not belong to us
@@ -247,6 +277,16 @@ export async function rawGetTransactions(
     const allAddressIds = txsWithIOs.flatMap(txWithIO => [
       ...txWithIO.utxoInputs.map(input => input.AddressId),
       ...txWithIO.utxoOutputs.map(output => output.AddressId),
+      ...(txWithIO.accountingInputs == null
+        ? []
+        : txWithIO.accountingInputs.map(output => output.AddressId)
+      ),
+      ...(txWithIO.certificates == null
+        ? []
+        : txWithIO.certificates.flatMap(
+          cert => cert.relatedAddresses.map(relation => relation.AddressId)
+        )
+      ),
     ]);
     const addressRows = await GetAddress.getById(
       db, dbTx,
@@ -258,15 +298,29 @@ export async function rawGetTransactions(
     }
   }
 
-  const result = txsWithIOs.map(tx => ({
+  const result = txsWithIOs.map((tx: CardanoByronTxIO | CardanoShelleyTxIO) => ({
     ...tx,
     block: blockMap.get(tx.transaction.TransactionId) || null,
     ...getFromUserPerspective({
       utxoInputs: tx.utxoInputs,
       utxoOutputs: tx.utxoOutputs,
+      accountingInputs: tx.accountingInputs == null ? undefined : tx.accountingInputs,
       allOwnedAddressIds: new Set(
         Object.keys(addressIds).flatMap(key => addressIds[key])
       ),
+      /**
+        * Note: we don't consider certificate refunds as belonging to you.
+        * Rationale:
+        * 1) It's very unclear who the refund "belongs to" in the case of a pool registration.
+        *    Does it belong to the owner? Operators? Some weird split?
+        *    Better to just say it's just bonus ADA to whoever gets it in the tx outputs
+        * 2) For stake deregistration, it's tempting to say it belongs to the owner of the stake key
+        *    But the protocol allows other people to pay to register your staking key
+        *    (no staking key witness required for registration)
+        *    So that wouldn't be quite accurate either.
+        *    Again, it's easier to say it's just whoever gets it
+      */
+      ownImplicitInput: new BigNumber(0),
     })
   }));
 
@@ -295,7 +349,9 @@ export async function getAllTransactions(
     GetPathWithSpecific,
     GetAddress,
     CardanoByronAssociateTxWithIOs,
+    CardanoShelleyAssociateTxWithIOs,
     AssociateTxWithUtxoIOs,
+    AssociateTxWithAccountingIOs,
     GetTxAndBlock,
     GetDerivationSpecific,
   });
@@ -317,7 +373,9 @@ export async function getAllTransactions(
           GetPathWithSpecific: deps.GetPathWithSpecific,
           GetAddress: deps.GetAddress,
           CardanoByronAssociateTxWithIOs: deps.CardanoByronAssociateTxWithIOs,
+          CardanoShelleyAssociateTxWithIOs: deps.CardanoShelleyAssociateTxWithIOs,
           AssociateTxWithUtxoIOs: deps.AssociateTxWithUtxoIOs,
+          AssociateTxWithAccountingIOs: deps.AssociateTxWithAccountingIOs,
           GetTxAndBlock: deps.GetTxAndBlock,
           GetDerivationSpecific: deps.GetDerivationSpecific,
         },
@@ -353,7 +411,9 @@ export async function getPendingTransactions(
     GetPathWithSpecific,
     GetAddress,
     CardanoByronAssociateTxWithIOs,
+    CardanoShelleyAssociateTxWithIOs,
     AssociateTxWithUtxoIOs,
+    AssociateTxWithAccountingIOs,
     GetTxAndBlock,
     GetDerivationSpecific,
   });
@@ -375,7 +435,9 @@ export async function getPendingTransactions(
           GetPathWithSpecific: deps.GetPathWithSpecific,
           GetAddress: deps.GetAddress,
           CardanoByronAssociateTxWithIOs: deps.CardanoByronAssociateTxWithIOs,
+          CardanoShelleyAssociateTxWithIOs: deps.CardanoShelleyAssociateTxWithIOs,
           AssociateTxWithUtxoIOs: deps.AssociateTxWithUtxoIOs,
+          AssociateTxWithAccountingIOs: deps.AssociateTxWithAccountingIOs,
           GetTxAndBlock: deps.GetTxAndBlock,
           GetDerivationSpecific: deps.GetDerivationSpecific,
         },
@@ -402,7 +464,9 @@ export async function rawGetForeignAddresses(
     GetPathWithSpecific: Class<GetPathWithSpecific>,
     GetAddress: Class<GetAddress>,
     CardanoByronAssociateTxWithIOs: Class<CardanoByronAssociateTxWithIOs>,
+    CardanoShelleyAssociateTxWithIOs: Class<CardanoShelleyAssociateTxWithIOs>,
     AssociateTxWithUtxoIOs: Class<AssociateTxWithUtxoIOs>,
+    AssociateTxWithAccountingIOs: Class<AssociateTxWithAccountingIOs>,
     GetDerivationSpecific: Class<GetDerivationSpecific>,
     GetTransaction: Class<GetTransaction>,
   |},
@@ -418,6 +482,7 @@ export async function rawGetForeignAddresses(
       GetAddress: deps.GetAddress,
       CardanoByronAssociateTxWithIOs: deps.CardanoByronAssociateTxWithIOs,
       AssociateTxWithUtxoIOs: deps.AssociateTxWithUtxoIOs,
+      AssociateTxWithAccountingIOs: deps.AssociateTxWithAccountingIOs,
       GetDerivationSpecific: deps.GetDerivationSpecific,
     },
     { publicDeriver: request.publicDeriver },
@@ -429,14 +494,27 @@ export async function rawGetForeignAddresses(
     { ids: relatedIds.txIds }
   );
 
-  const txsWithIOs = await deps.CardanoByronAssociateTxWithIOs.getIOsForTx(
+  const byronWithIOs = await deps.CardanoByronAssociateTxWithIOs.getIOsForTx(
     db, dbTx,
-    { txs: fullTxs }
+    { txs: fullTxs.filter(tx => tx.Type === TransactionType.CardanoByron) }
   );
+  const shelleyWithIOs = await deps.CardanoShelleyAssociateTxWithIOs.getIOsForTx(
+    db, dbTx,
+    { txs: fullTxs.filter(tx => tx.Type === TransactionType.CardanoShelley) }
+  );
+  const txsWithIOs = [
+    ...byronWithIOs,
+    ...shelleyWithIOs,
+  ];
 
   const allAddressIds = txsWithIOs.flatMap(txWithIO => [
     ...txWithIO.utxoInputs.map(input => input.AddressId),
     ...txWithIO.utxoOutputs.map(output => output.AddressId),
+    ...(txWithIO.accountingInputs == null
+      ? []
+      : txWithIO.accountingInputs.map(input => input.AddressId)
+    ),
+    // note: we don't show other addresses in a certificate as unknown addresses
   ]);
 
   const ourIds = new Set(
@@ -458,7 +536,9 @@ export async function getForeignAddresses(
     GetPathWithSpecific,
     GetAddress,
     CardanoByronAssociateTxWithIOs,
+    CardanoShelleyAssociateTxWithIOs,
     AssociateTxWithUtxoIOs,
+    AssociateTxWithAccountingIOs,
     GetDerivationSpecific,
     GetTransaction,
   });
@@ -501,7 +581,9 @@ export async function rawRemoveAllTransactions(
     GetPathWithSpecific: Class<GetPathWithSpecific>,
     GetAddress: Class<GetAddress>,
     CardanoByronAssociateTxWithIOs: Class<CardanoByronAssociateTxWithIOs>,
+    CardanoShelleyAssociateTxWithIOs: Class<CardanoShelleyAssociateTxWithIOs>,
     AssociateTxWithUtxoIOs: Class<AssociateTxWithUtxoIOs>,
+    AssociateTxWithAccountingIOs: Class<AssociateTxWithAccountingIOs>,
     GetDerivationSpecific: Class<GetDerivationSpecific>,
     DeleteAllTransactions: Class<DeleteAllTransactions>,
     GetTransaction: Class<GetTransaction>,
@@ -519,7 +601,9 @@ export async function rawRemoveAllTransactions(
       GetPathWithSpecific: deps.GetPathWithSpecific,
       GetAddress: deps.GetAddress,
       CardanoByronAssociateTxWithIOs: deps.CardanoByronAssociateTxWithIOs,
+      CardanoShelleyAssociateTxWithIOs: deps.CardanoShelleyAssociateTxWithIOs,
       AssociateTxWithUtxoIOs: deps.AssociateTxWithUtxoIOs,
+      AssociateTxWithAccountingIOs: deps.AssociateTxWithAccountingIOs,
       GetDerivationSpecific: deps.GetDerivationSpecific,
       GetTransaction: deps.GetTransaction,
     },
@@ -533,6 +617,7 @@ export async function rawRemoveAllTransactions(
       GetAddress: deps.GetAddress,
       CardanoByronAssociateTxWithIOs: deps.CardanoByronAssociateTxWithIOs,
       AssociateTxWithUtxoIOs: deps.AssociateTxWithUtxoIOs,
+      AssociateTxWithAccountingIOs: deps.AssociateTxWithAccountingIOs,
       GetDerivationSpecific: deps.GetDerivationSpecific,
     },
     { publicDeriver: request.publicDeriver },
@@ -568,7 +653,9 @@ export async function removeAllTransactions(
     GetPathWithSpecific,
     GetAddress,
     CardanoByronAssociateTxWithIOs,
+    CardanoShelleyAssociateTxWithIOs,
     AssociateTxWithUtxoIOs,
+    AssociateTxWithAccountingIOs,
     GetDerivationSpecific,
     DeleteAllTransactions,
     ModifyAddress,
@@ -633,7 +720,9 @@ export async function updateTransactions(
       ModifyCardanoByronTx,
       ModifyCardanoShelleyTx,
       CardanoByronAssociateTxWithIOs,
+      CardanoShelleyAssociateTxWithIOs,
       AssociateTxWithUtxoIOs,
+      AssociateTxWithAccountingIOs,
     });
     const updateTables = Object
       .keys(updateDepTables)
@@ -691,6 +780,7 @@ export async function updateTransactions(
       GetDerivationSpecific,
       CardanoByronAssociateTxWithIOs,
       AssociateTxWithUtxoIOs,
+      AssociateTxWithAccountingIOs,
     });
     const rollbackTables = Object
       .keys(rollbackDepTables)
@@ -736,6 +826,7 @@ async function rollback(
     GetAddress: Class<GetAddress>,
     CardanoByronAssociateTxWithIOs: Class<CardanoByronAssociateTxWithIOs>,
     AssociateTxWithUtxoIOs: Class<AssociateTxWithUtxoIOs>,
+    AssociateTxWithAccountingIOs: Class<AssociateTxWithAccountingIOs>,
     GetLastSyncForPublicDeriver: Class<GetLastSyncForPublicDeriver>,
     ModifyLastSyncInfo: Class<ModifyLastSyncInfo>,
     GetBlock: Class<GetBlock>,
@@ -764,6 +855,7 @@ async function rollback(
   // 1) Get all transactions
   const {
     utxoAddresses,
+    accountingAddresses,
   } = await rawGetAddressRowsForWallet(
     dbTx,
     {
@@ -775,7 +867,11 @@ async function rollback(
     derivationTables,
   );
   const utxoAddressIds = utxoAddresses.map(address => address.AddressId);
+  const accountingAddressIds = accountingAddresses.map(address => address.AddressId);
   const txIds = Array.from(new Set([
+    ...(await deps.AssociateTxWithAccountingIOs.getTxIdsForAddresses(
+      db, dbTx, { addressIds: accountingAddressIds },
+    )),
     ...(await deps.AssociateTxWithUtxoIOs.getTxIdsForAddresses(
       db, dbTx, { addressIds: utxoAddressIds },
     )),
@@ -896,7 +992,9 @@ async function rawUpdateTransactions(
     ModifyCardanoByronTx: Class<ModifyCardanoByronTx>,
     ModifyCardanoShelleyTx: Class<ModifyCardanoShelleyTx>,
     CardanoByronAssociateTxWithIOs: Class<CardanoByronAssociateTxWithIOs>,
+    CardanoShelleyAssociateTxWithIOs: Class<CardanoShelleyAssociateTxWithIOs>,
     AssociateTxWithUtxoIOs: Class<AssociateTxWithUtxoIOs>,
+    AssociateTxWithAccountingIOs: Class<AssociateTxWithAccountingIOs>,
   |},
   publicDeriver: IPublicDeriver<>,
   lastSyncInfo: $ReadOnly<LastSyncInfoRow>,
@@ -970,6 +1068,9 @@ async function rawUpdateTransactions(
     const utxoAddressIds = utxoAddresses.map(address => address.AddressId);
     const accountingAddressIds = accountingAddresses.map(address => address.AddressId);
     const txIds = Array.from(new Set([
+      ...(await deps.AssociateTxWithAccountingIOs.getTxIdsForAddresses(
+        db, dbTx, { addressIds: accountingAddressIds },
+      )),
       ...(await deps.AssociateTxWithUtxoIOs.getTxIdsForAddresses(
         db, dbTx, { addressIds: utxoAddressIds },
       )),
@@ -1015,6 +1116,7 @@ async function rawUpdateTransactions(
       {
         MarkUtxo: deps.MarkUtxo,
         CardanoByronAssociateTxWithIOs: deps.CardanoByronAssociateTxWithIOs,
+        CardanoShelleyAssociateTxWithIOs: deps.CardanoShelleyAssociateTxWithIOs,
         GetEncryptionMeta: deps.GetEncryptionMeta,
         GetTransaction: deps.GetTransaction,
         GetUtxoInputs: deps.GetUtxoInputs,
@@ -1062,6 +1164,7 @@ export async function updateTransactionBatch(
   deps: {|
     MarkUtxo: Class<MarkUtxo>,
     CardanoByronAssociateTxWithIOs: Class<CardanoByronAssociateTxWithIOs>,
+    CardanoShelleyAssociateTxWithIOs: Class<CardanoShelleyAssociateTxWithIOs>,
     GetEncryptionMeta: Class<GetEncryptionMeta>,
     GetTransaction: Class<GetTransaction>,
     GetUtxoInputs: Class<GetUtxoInputs>,
@@ -1091,10 +1194,18 @@ export async function updateTransactionBatch(
       txIds: request.txIds,
     });
     const txs: Array<$ReadOnly<TransactionRow>> = Array.from(matchByDigest.values());
-    const txsWithIOs = await deps.CardanoByronAssociateTxWithIOs.getIOsForTx(
+    const byronWithIOs = await deps.CardanoByronAssociateTxWithIOs.getIOsForTx(
       db, dbTx,
-      { txs }
+      { txs: txs.filter(tx => tx.Type === TransactionType.CardanoByron) }
     );
+    const shelleyWithIOs = await deps.CardanoShelleyAssociateTxWithIOs.getIOsForTx(
+      db, dbTx,
+      { txs: txs.filter(tx => tx.Type === TransactionType.CardanoShelley) }
+    );
+    const txsWithIOs = [
+      ...byronWithIOs,
+      ...shelleyWithIOs,
+    ];
     for (const tx of txsWithIOs) {
       matchesInDb.set(tx.transaction.Hash, tx);
     }
@@ -1203,6 +1314,7 @@ export async function updateTransactionBatch(
         certificates: result.certificates,
         utxoInputs: result.utxoInputs,
         utxoOutputs: result.utxoOutputs,
+        accountingInputs: result.accountingInputs,
       });
     }
   }
@@ -1262,6 +1374,138 @@ export async function updateTransactionBatch(
   return txsAddedToBlock;
 }
 
+function genByronIOGen(
+  byronTx: RemoteTransaction,
+  getIdOrThrow: string => number,
+): (number => {|
+  utxoInputs: Array<UtxoTransactionInputInsert>,
+  utxoOutputs: Array<UtxoTransactionOutputInsert>,
+|}) {
+  if (!(byronTx.type == null || byronTx.type === RemoteTransactionTypes.byron)) {
+    throw new Error(`${nameof(genShelleyIOGen)} not a byron transaction`);
+  }
+  return (txRowId) => {
+    const utxoInputs = [];
+    const utxoOutputs = [];
+    for (let i = 0; i < byronTx.inputs.length; i++) {
+      const input = byronTx.inputs[i];
+      utxoInputs.push({
+        TransactionId: txRowId,
+        AddressId: getIdOrThrow(input.address),
+        ParentTxHash: input.txHash,
+        IndexInParentTx: input.index,
+        IndexInOwnTx: i,
+        Amount: input.amount,
+      });
+    }
+    for (let i = 0; i < byronTx.outputs.length; i++) {
+      const output = byronTx.outputs[i];
+      utxoOutputs.push({
+        TransactionId: txRowId,
+        AddressId: getIdOrThrow(output.address),
+        OutputIndex: i,
+        Amount: output.amount,
+        /**
+          * we assume unspent for now but it will be updated after if necessary
+          * Note: if this output doesn't belong to you, it will be true forever
+          * This is slightly misleading, but using null would require null-checks everywhere
+          */
+        IsUnspent: true,
+      });
+    }
+
+    return {
+      utxoInputs,
+      utxoOutputs,
+    };
+  };
+}
+function genShelleyIOGen(
+  shelleyTx: RemoteTransaction,
+  getIdOrThrow: string => number,
+  network: $ReadOnly<NetworkRow>,
+): (number => {|
+  utxoInputs: Array<UtxoTransactionInputInsert>,
+  utxoOutputs: Array<UtxoTransactionOutputInsert>,
+  accountingInputs: Array<AccountingTransactionInputInsert>,
+|}) {
+  if (shelleyTx.type !== RemoteTransactionTypes.shelley) {
+    throw new Error(`${nameof(genShelleyIOGen)} not a shelley transaction`);
+  }
+  return (txRowId) => {
+    const utxoInputs = [];
+    const utxoOutputs = [];
+    const accountingInputs = [];
+    for (let i = 0; i < shelleyTx.inputs.length; i++) {
+      const input = shelleyTx.inputs[i];
+      utxoInputs.push({
+        TransactionId: txRowId,
+        AddressId: getIdOrThrow(input.address),
+        ParentTxHash: input.txHash,
+        IndexInParentTx: input.index,
+        IndexInOwnTx: i,
+        Amount: input.amount,
+      });
+    }
+    for (let i = 0; i < shelleyTx.withdrawals.length; i++) {
+      accountingInputs.push({
+        TransactionId: txRowId,
+        AddressId: getIdOrThrow(shelleyTx.withdrawals[i].address),
+        /**
+         * Withdrawal transactions don't increase the spending counter
+         * Replay protection is achieved by forcing all transactions to also include a UTXO input
+         * And requiring that the full balance is transferred in a withdrawal
+         */
+        SpendingCounter: 0,
+        /**
+         * Note: the index for a withdrawal starts at 0 (independent of UTXO inputs)
+         */
+        IndexInOwnTx: i,
+        Amount: shelleyTx.withdrawals[i].amount,
+      });
+    }
+    for (let i = 0; i < shelleyTx.outputs.length; i++) {
+      const output = shelleyTx.outputs[i];
+      const txType = addressToKind(output.address, 'bytes', network);
+      // consider a group address as a UTXO output
+      // since the payment (UTXO) key is the one that signs
+      if (
+        txType === CoreAddressTypes.CARDANO_LEGACY ||
+        txType === CoreAddressTypes.CARDANO_ENTERPRISE ||
+        txType === CoreAddressTypes.CARDANO_BASE ||
+        txType === CoreAddressTypes.CARDANO_PTR
+      ) {
+        utxoOutputs.push({
+          TransactionId: txRowId,
+          AddressId: getIdOrThrow(output.address),
+          OutputIndex: i,
+          Amount: output.amount,
+          /**
+            * we assume unspent for now but it will be updated after if necessary
+            * Note: if this output doesn't belong to you, it will be true forever
+            * This is slightly misleading, but using null would require null-checks everywhere
+            */
+          IsUnspent: true,
+        });
+      } else if (
+        txType === CoreAddressTypes.CARDANO_REWARD
+      ) {
+        throw new Error(`${nameof(networkTxToDbTx)} cannot send to a reward address`);
+      } else {
+        // TODO: handle multisig
+        throw new Error(`${nameof(networkTxToDbTx)} Unhandled output type`);
+      }
+    }
+
+    return {
+      utxoInputs,
+      utxoOutputs,
+      accountingInputs,
+    };
+  };
+}
+
+
 async function networkTxToDbTx(
   db: lf$Database,
   dbTx: lf$Transaction,
@@ -1276,19 +1520,13 @@ async function networkTxToDbTx(
   byronTxs: Array<{|
     block: null | BlockInsert,
     transaction: (blockId: null | number) => TransactionInsert,
-    ioGen: number => {|
-      utxoInputs: Array<UtxoTransactionInputInsert>,
-      utxoOutputs: Array<UtxoTransactionOutputInsert>,
-    |},
+    ioGen: ReturnType<typeof genByronIOGen>,
   |}>,
   shelleyTxs: Array<{|
     block: null | BlockInsert,
     transaction: (blockId: null | number) => TransactionInsert,
     certificates: $ReadOnlyArray<number => (void | AddCertificateRequest)>,
-    ioGen: number => {|
-      utxoInputs: Array<UtxoTransactionInputInsert>,
-      utxoOutputs: Array<UtxoTransactionOutputInsert>,
-    |},
+    ioGen: ReturnType<typeof genShelleyIOGen>,
   |}>,
 |}> {
   const allAddresses = Array.from(new Set(
@@ -1322,6 +1560,7 @@ async function networkTxToDbTx(
 
   const byronTxs = [];
   const shelleyTxs = [];
+
   for (const networkTx of newTxs) {
     const { block, transaction } = networkTxHeaderToDb(
       networkTx,
@@ -1330,64 +1569,11 @@ async function networkTxToDbTx(
       BlockSeed,
     );
 
-    const ioGen = (txRowId) => {
-      const utxoInputs = [];
-      const utxoOutputs = [];
-      for (let i = 0; i < networkTx.inputs.length; i++) {
-        const input = networkTx.inputs[i];
-        utxoInputs.push({
-          TransactionId: txRowId,
-          AddressId: getIdOrThrow(input.address),
-          ParentTxHash: input.txHash,
-          IndexInParentTx: input.index,
-          IndexInOwnTx: i,
-          Amount: input.amount,
-        });
-      }
-      for (let i = 0; i < networkTx.outputs.length; i++) {
-        const output = networkTx.outputs[i];
-        const txType = addressToKind(output.address, 'bytes', network);
-        // consider a group address as a UTXO output
-        // since the payment (UTXO) key is the one that signs
-        if (
-          txType === CoreAddressTypes.CARDANO_LEGACY ||
-          txType === CoreAddressTypes.CARDANO_ENTERPRISE ||
-          txType === CoreAddressTypes.CARDANO_BASE ||
-          txType === CoreAddressTypes.CARDANO_PTR
-        ) {
-          utxoOutputs.push({
-            TransactionId: txRowId,
-            AddressId: getIdOrThrow(output.address),
-            OutputIndex: i,
-            Amount: output.amount,
-            /**
-              * we assume unspent for now but it will be updated after if necessary
-              * Note: if this output doesn't belong to you, it will be true forever
-              * This is slightly misleading, but using null would require null-checks everywhere
-              */
-            IsUnspent: true,
-          });
-        } else if (
-          txType === CoreAddressTypes.CARDANO_REWARD
-        ) {
-          throw new Error(`${nameof(networkTxToDbTx)} cannot send to a reward address`);
-        } else {
-          // TODO: handle multisig
-          throw new Error(`${nameof(networkTxToDbTx)} Unhandled output type`);
-        }
-      }
-
-      return {
-        utxoInputs,
-        utxoOutputs,
-      };
-    };
-
     if (networkTx.type == null || networkTx.type === RemoteTransactionTypes.byron) {
       byronTxs.push({
         block,
         transaction,
-        ioGen,
+        ioGen: genByronIOGen(networkTx, getIdOrThrow),
       });
     } else if (networkTx.type === RemoteTransactionTypes.shelley) {
       const certificates: $ReadOnlyArray<
@@ -1407,7 +1593,7 @@ async function networkTxToDbTx(
         block,
         transaction,
         certificates,
-        ioGen,
+        ioGen: genShelleyIOGen(networkTx, getIdOrThrow, network),
       });
     } else {
       throw new Error(`${nameof(networkTxToDbTx)} Unhandled tx type ${networkTx.type ?? ''}`);
@@ -1511,21 +1697,45 @@ export function networkTxHeaderToDb(
       }
       : null;
   const digest = digestForHash(tx.hash, TransactionSeed);
-  return {
-    block,
-    transaction: (blockId) => ({
-      Type: TransactionType.CardanoByron,
-      Hash: tx.hash,
-      Digest: digest,
-      BlockId: blockId,
-      Ordinal: tx.tx_ordinal,
-      LastUpdateTime: block == null || tx.time == null
-        ? new Date(tx.last_update).getTime() // this is out best guess for txs not in a block
-        : new Date(tx.time).getTime(),
-      Status: statusStringToCode(tx.tx_state),
-      ErrorMessage: null, // TODO: add error message from backend if present
-    }),
+
+  const baseTx = {
+    Hash: tx.hash,
+    Digest: digest,
+    Ordinal: tx.tx_ordinal,
+    LastUpdateTime: block == null || tx.time == null
+      ? new Date(tx.last_update).getTime() // this is out best guess for txs not in a block
+      : new Date(tx.time).getTime(),
+    Status: statusStringToCode(tx.tx_state),
+    ErrorMessage: null, // TODO: add error message from backend if present
   };
+
+  if (tx.type == null || tx.type === RemoteTransactionTypes.byron) {
+    return {
+      block,
+      transaction: (blockId) => ({
+        Type: TransactionType.CardanoByron,
+        Extra: null,
+        BlockId: blockId,
+        ...baseTx,
+      }: CardanoByronTransactionInsert),
+    };
+  }
+  if (tx.type === RemoteTransactionTypes.shelley) {
+    return {
+      block,
+      transaction: (blockId) => ({
+        Type: TransactionType.CardanoShelley,
+        Extra: {
+          Fee: tx.fee,
+          Ttl: tx.ttl,
+          Metadata: tx.metadata,
+        },
+        BlockId: blockId,
+        ...baseTx,
+      }: CardanoShelleyTransactionInsert),
+    };
+  }
+  throw new Error(`${nameof(networkTxHeaderToDb)} Unhandled tx type ${tx.type ?? ''}`);
 }
 
 async function certificateToDb(
@@ -1880,7 +2090,14 @@ async function certificateToDb(
             stakeCredentials,
             RustModule.WalletV4.BigNum.from_str(cert.rewards[key])
           );
-          const rewardAddrKey = tryGetKey(stakeCredentials);
+
+          const rewardAddress = RustModule.WalletV4.RewardAddress.new(
+            request.network,
+            stakeCredentials
+          );
+          const rewardAddrKey = existingAddressesMap.get(
+            Buffer.from(rewardAddress.to_address().to_bytes()).toString('hex')
+          );
           if (rewardAddrKey != null) {
             relatedAddressesInfo.push({
               AddressId: rewardAddrKey,

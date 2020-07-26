@@ -438,7 +438,8 @@ async function syncingSimpleTransaction(): Promise<void> {
             BlockId: 1,
             LastUpdateTime: 1568392636000,
             Status: 1,
-            TransactionId: 1
+            TransactionId: 1,
+            Extra: null,
           },
           UtxoTransactionOutput: {
             AddressId: 10,
@@ -529,7 +530,8 @@ async function syncingSimpleTransaction(): Promise<void> {
             BlockId: 2,
             LastUpdateTime: 1568392656000,
             Status: 1,
-            TransactionId: 2
+            TransactionId: 2,
+            Extra: null,
           },
           UtxoTransactionOutput: {
             AddressId: 42,
@@ -562,7 +564,8 @@ async function syncingSimpleTransaction(): Promise<void> {
             BlockId: 2,
             LastUpdateTime: 1568392656000,
             Status: 1,
-            TransactionId: 2
+            TransactionId: 2,
+            Extra: null,
           },
           UtxoTransactionOutput: {
             AddressId: 39,
@@ -677,7 +680,8 @@ async function syncWithSwappedGroup(): Promise<void> {
             BlockId: 1,
             LastUpdateTime: 1568392636000,
             Status: 1,
-            TransactionId: 1
+            TransactionId: 1,
+            Extra: null,
           },
           UtxoTransactionOutput: {
             AddressId: 92,
@@ -797,6 +801,7 @@ async function syncWithCertificate(): Promise<void> {
       Ordinal: 0,
       Status: 1,
       TransactionId: 1,
+      Extra: null,
     },
   };
 
@@ -849,6 +854,7 @@ async function syncWithCertificate(): Promise<void> {
       Ordinal: null,
       Status: 0,
       TransactionId: 2,
+      Extra: null,
     },
   };
 

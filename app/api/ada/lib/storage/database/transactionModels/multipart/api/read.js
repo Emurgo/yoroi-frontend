@@ -9,7 +9,7 @@ import type {
 } from '../../../primitives/tables';
 import { TransactionType } from '../../../primitives/tables';
 import { GetCertificates, } from '../../../primitives/api/read';
-import type { CardanoByronTxIO, JormungandrTxIO } from '../tables';
+import type { CardanoByronTxIO, CardanoShelleyTxIO, JormungandrTxIO } from '../tables';
 
 import {
   AssociateTxWithAccountingIOs,
@@ -84,6 +84,47 @@ export class JormungandrAssociateTxWithIOs {
       certificates: certsForTxs.get(transaction.TransactionId) ?? [],
       ...getOrThrow(utxo.get(transaction)),
       ...getOrThrow(accounting.get(transaction)),
+    }));
+    return fullTx;
+  }
+}
+
+export class CardanoShelleyAssociateTxWithIOs {
+  static ownTables: {||} = Object.freeze({});
+  static depTables: {|
+    AssociateTxWithUtxoIOs: typeof AssociateTxWithUtxoIOs,
+    GetCertificates: typeof GetCertificates,
+    AssociateTxWithAccountingIOs: typeof AssociateTxWithAccountingIOs,
+  |} = Object.freeze({
+    AssociateTxWithUtxoIOs,
+    GetCertificates,
+    AssociateTxWithAccountingIOs,
+  });
+
+  static async getIOsForTx(
+    db: lf$Database,
+    tx: lf$Transaction,
+    request: {| txs: $ReadOnlyArray<$ReadOnly<TransactionRow>>, |},
+  ): Promise<Array<CardanoShelleyTxIO>> {
+    const { depTables } = CardanoShelleyAssociateTxWithIOs;
+    const utxo = await depTables.AssociateTxWithUtxoIOs.getIOsForTx(
+      db, tx, request
+    );
+    const accounting = await depTables.AssociateTxWithAccountingIOs.getIOsForTx(
+      db, tx, request
+    );
+
+    const certsForTxs = await depTables.GetCertificates.forTransactions(
+      db, tx,
+      { txIds: request.txs.map(transaction => transaction.TransactionId) },
+    );
+
+    const fullTx = request.txs.map(transaction  => ({
+      txType: TransactionType.CardanoByron,
+      transaction,
+      certificates: certsForTxs.get(transaction.TransactionId) ?? [],
+      ...getOrThrow(utxo.get(transaction)),
+      accountingInputs: getOrThrow(accounting.get(transaction)).accountingInputs,
     }));
     return fullTx;
   }

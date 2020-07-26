@@ -67,7 +67,7 @@ export type RemoteTransactionShelley = {|
   +fee: string,
   +certificates: Array<RemoteCertificate>,
   +withdrawals: Array<RemoteWithdrawal>,
-  +metadata: void | string,
+  +metadata: null | string,
 |};
 export type RemoteTransactionBase = {|
   ...WithNullableFields<RemoteTxBlockMeta>,

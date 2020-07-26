@@ -209,7 +209,8 @@ async function checkPub1HasTx(
           BlockId: 1,
           LastUpdateTime: 1568392636000,
           Status: 1,
-          TransactionId: 1
+          TransactionId: 1,
+          Extra: null,
         },
         UtxoTransactionOutput: {
           AddressId: purposeForTest === WalletTypePurpose.CIP1852
@@ -318,7 +319,8 @@ async function checkPub2HasTx(
           BlockId: 1,
           LastUpdateTime: 1568392636000,
           Status: 1,
-          TransactionId: 2
+          TransactionId: 2,
+          Extra: null,
         },
         UtxoTransactionOutput: {
           AddressId: purposeForTest === WalletTypePurpose.CIP1852

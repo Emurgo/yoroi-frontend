@@ -180,6 +180,7 @@ const _tx = (
       LastUpdateTime: 0,
       Status: TxStatusCodes.IN_BLOCK,
       ErrorMessage: null,
+      Extra: null,
     },
     block: {
       BlockId: 0,

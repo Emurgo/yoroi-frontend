@@ -22,6 +22,7 @@ export type CardanoShelleyTxIO = {|
     +Type: $PropertyType<typeof TransactionType, "CardanoShelley">,
   |}>,
   ...DbUtxoInputs, ...DbUtxoOutputs,
+  ...DbAccountingInputs,
   +certificates: Array<CertificatePart>,
 |};
 export type ErgoTxIO = {|

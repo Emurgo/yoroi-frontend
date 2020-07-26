@@ -333,7 +333,8 @@ async function syncingSimpleTransaction(
             BlockId: 1,
             LastUpdateTime: 1568392636000,
             Status: 1,
-            TransactionId: 1
+            TransactionId: 1,
+            Extra: null,
           },
           UtxoTransactionOutput: {
             AddressId: purposeForTest === WalletTypePurpose.CIP1852
@@ -443,7 +444,8 @@ async function syncingSimpleTransaction(
             BlockId: 2,
             LastUpdateTime: 1568392656000,
             Status: 1,
-            TransactionId: 2
+            TransactionId: 2,
+            Extra: null,
           },
           UtxoTransactionOutput: {
             AddressId: purposeForTest === WalletTypePurpose.CIP1852
@@ -477,7 +479,8 @@ async function syncingSimpleTransaction(
             BlockId: 2,
             LastUpdateTime: 1568392656000,
             Status: 1,
-            TransactionId: 2
+            TransactionId: 2,
+            Extra: null,
           },
           UtxoTransactionOutput: {
             AddressId: purposeForTest === WalletTypePurpose.CIP1852
@@ -696,7 +699,8 @@ async function utxoCreatedAndUsed(
             BlockId: 2,
             LastUpdateTime: 1568392656000,
             Status: 1,
-            TransactionId: 2
+            TransactionId: 2,
+            Extra: null,
           },
           UtxoTransactionOutput: {
             AddressId: purposeForTest === WalletTypePurpose.CIP1852
@@ -730,7 +734,8 @@ async function utxoCreatedAndUsed(
             BlockId: 2,
             LastUpdateTime: 1568392656000,
             Status: 1,
-            TransactionId: 2
+            TransactionId: 2,
+            Extra: null,
           },
           UtxoTransactionOutput: {
             AddressId: purposeForTest === WalletTypePurpose.CIP1852
