@@ -179,6 +179,7 @@ export class ModifyCardanoShelleyTx {
       ioGen: (txRowId: number) => {|
         utxoInputs: Array<UtxoTransactionInputInsert>,
         utxoOutputs: Array<UtxoTransactionOutputInsert>,
+        accountingInputs: Array<AccountingTransactionInputInsert>,
       |},
     |},
   ): Promise<{|
@@ -196,11 +197,17 @@ export class ModifyCardanoShelleyTx {
 
     const {
       utxoInputs, utxoOutputs,
+      accountingInputs,
     } = request.ioGen(newTx.transaction.TransactionId);
 
     const utxo = await ModifyCardanoShelleyTx.depTables.ModifyUtxoTransaction.addIOsToTx(
       db, tx, {
         utxoInputs, utxoOutputs,
+      }
+    );
+    const accounting = await ModifyJormungandrTx.depTables.ModifyAccountingTransaction.addIOsToTx(
+      db, tx, {
+        accountingInputs, accountingOutputs: [],
       }
     );
 
@@ -220,6 +227,7 @@ export class ModifyCardanoShelleyTx {
       ...newTx,
       certificates,
       ...utxo,
+      accountingInputs: accounting.accountingInputs,
     };
   }
 }

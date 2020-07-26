@@ -380,7 +380,8 @@ async function baseTest(
             BlockId: 1,
             LastUpdateTime: 1568392636000,
             Status: 1,
-            TransactionId: 2
+            TransactionId: 2,
+            Extra: null,
           },
           UtxoTransactionOutput: {
             AddressId: purposeForTest === WalletTypePurpose.CIP1852
@@ -478,7 +479,8 @@ async function baseTest(
             BlockId: 2,
             LastUpdateTime: 1568392656000,
             Status: 1,
-            TransactionId: 1
+            TransactionId: 1,
+            Extra: null,
           },
           UtxoTransactionOutput: {
             AddressId: purposeForTest === WalletTypePurpose.CIP1852
@@ -518,7 +520,8 @@ async function baseTest(
             BlockId: 1,
             LastUpdateTime: 1568392636000,
             Status: 1,
-            TransactionId: 2
+            TransactionId: 2,
+            Extra: null,
           },
           UtxoTransactionOutput: {
             AddressId: purposeForTest === WalletTypePurpose.CIP1852
@@ -604,7 +607,8 @@ async function baseTest(
             BlockId: 2,
             LastUpdateTime: 1568392656000,
             Status: 1,
-            TransactionId: 1
+            TransactionId: 1,
+            Extra: null,
           },
           UtxoTransactionOutput: {
             AddressId: purposeForTest === WalletTypePurpose.CIP1852
@@ -644,7 +648,8 @@ async function baseTest(
             BlockId: 1,
             LastUpdateTime: 1568392636000,
             Status: 1,
-            TransactionId: 2
+            TransactionId: 2,
+            Extra: null,
           },
           UtxoTransactionOutput: {
             AddressId: purposeForTest === WalletTypePurpose.CIP1852
@@ -699,7 +704,8 @@ async function baseTest(
       Status: -2,
       LastUpdateTime: 1568392656000,
       ErrorMessage: null,
-      TransactionId: 1
+      TransactionId: 1,
+      Extra: null,
     },
     {
       Type: TransactionType.Jormungandr,
@@ -710,7 +716,8 @@ async function baseTest(
       LastUpdateTime: 1568392636000,
       Status: -2,
       ErrorMessage: null,
-      TransactionId: 2
+      TransactionId: 2,
+      Extra: null,
     },
     {
       Type: TransactionType.Jormungandr,
@@ -722,7 +729,8 @@ async function baseTest(
       // failed tx stays failed
       Status: type === 'Pending' ? -2 : -1,
       ErrorMessage: null,
-      TransactionId: 3
+      TransactionId: 3,
+      Extra: null,
     }]);
 
     {
@@ -828,7 +836,8 @@ async function pendingDropped(
       LastUpdateTime: 1568392636000,
       Status: -3,
       ErrorMessage: null,
-      TransactionId: 1
+      TransactionId: 1,
+      Extra: null,
     }
   ]);
 }

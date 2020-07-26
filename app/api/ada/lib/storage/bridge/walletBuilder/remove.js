@@ -31,6 +31,7 @@ import { AssociateTxWithUtxoIOs, } from '../../database/transactionModels/utxo/a
 import { AssociateTxWithAccountingIOs, } from '../../database/transactionModels/account/api/read';
 import {
   CardanoByronAssociateTxWithIOs,
+  CardanoShelleyAssociateTxWithIOs,
   JormungandrAssociateTxWithIOs,
 } from '../../database/transactionModels/multipart/api/read';
 import { GetDerivationSpecific, } from '../../database/walletTypes/common/api/read';
@@ -50,6 +51,7 @@ export async function removePublicDeriver(request: {|
     GetAddress,
     CardanoByronAssociateTxWithIOs,
     JormungandrAssociateTxWithIOs,
+    CardanoShelleyAssociateTxWithIOs,
     AssociateTxWithAccountingIOs,
     AssociateTxWithUtxoIOs,
     GetDerivationSpecific,
@@ -84,7 +86,9 @@ export async function removePublicDeriver(request: {|
               GetPathWithSpecific: deps.GetPathWithSpecific,
               GetAddress: deps.GetAddress,
               CardanoByronAssociateTxWithIOs: deps.CardanoByronAssociateTxWithIOs,
+              CardanoShelleyAssociateTxWithIOs: deps.CardanoShelleyAssociateTxWithIOs,
               AssociateTxWithUtxoIOs: deps.AssociateTxWithUtxoIOs,
+              AssociateTxWithAccountingIOs: deps.AssociateTxWithAccountingIOs,
               GetDerivationSpecific: deps.GetDerivationSpecific,
               DeleteAllTransactions: deps.DeleteAllTransactions,
               ModifyAddress: deps.ModifyAddress,

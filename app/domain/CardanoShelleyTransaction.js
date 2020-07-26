@@ -15,18 +15,25 @@ import type { ApiOptionType } from '../api/common/utils';
 import { getApiMeta } from '../api/common/utils';
 import WalletTransaction, { toAddr } from './WalletTransaction';
 import type { WalletTransactionCtorData } from './WalletTransaction';
+import { TransactionType } from '../api/ada/lib/storage/database/primitives/tables';
 
 export default class CardanoShelleyTransaction extends WalletTransaction {
 
   @observable certificates: Array<CertificatePart>;
+  @observable ttl: BigNumber;
+  @observable metadata: null | string;
 
   constructor(data: {|
     ...WalletTransactionCtorData,
     certificates: Array<CertificatePart>,
+    ttl: BigNumber,
+    metadata: null | string,
   |}) {
-    const { certificates, ...rest } = data;
+    const { certificates, ttl, metadata, ...rest } = data;
     super(rest);
     this.certificates = certificates;
+    this.ttl = ttl;
+    this.metadata = metadata;
   }
 
   @action
@@ -44,13 +51,23 @@ export default class CardanoShelleyTransaction extends WalletTransaction {
     const amountPerUnit = new BigNumber(10).pow(apiMeta.decimalPlaces);
 
     const { addressLookupMap, tx } = request;
-
+    if (tx.transaction.Type !== TransactionType.CardanoShelley) {
+      throw new Error(`${nameof(CardanoShelleyTransaction)}::${this.constructor.fromAnnotatedTx} tx type incorrect`);
+    }
+    const { Extra } = tx.transaction;
+    if (Extra == null) {
+      throw new Error(`${nameof(CardanoShelleyTransaction)}::${this.constructor.fromAnnotatedTx} missing extra data`);
+    }
     return new CardanoShelleyTransaction({
       txid: tx.transaction.Hash,
       block: tx.block,
       type: tx.type,
+      // note: we use the explicitly fee in the transaction
+      // and not outputs - inputs since Shelley has implicit inputs like refunds or withdrawals
+      fee: new BigNumber(Extra.Fee).dividedBy(amountPerUnit),
+      ttl: new BigNumber(Extra.Ttl),
+      metadata: Extra.Metadata,
       amount: tx.amount.dividedBy(amountPerUnit).plus(tx.fee.dividedBy(amountPerUnit)),
-      fee: tx.fee.dividedBy(amountPerUnit),
       date: tx.block != null
         ? tx.block.BlockTime
         : new Date(tx.transaction.LastUpdateTime),

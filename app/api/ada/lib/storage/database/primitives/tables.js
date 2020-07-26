@@ -205,9 +205,8 @@ export const TransactionType = Object.freeze({
   Ergo: 2_00,
 });
 
-export type TransactionInsert = {|
+export type TransactionInsertBase = {|
   Digest: number,
-  Type: $Values<typeof TransactionType>,
   Hash: string,
   BlockId: null | number,
   Ordinal: null | number, // index within the block
@@ -219,6 +218,36 @@ export type TransactionInsert = {|
   Status: TxStatusCodesType,
   ErrorMessage: string | null,
 |};
+export type CardanoByronTransactionInsert = {|
+  Type: $PropertyType<typeof TransactionType, 'CardanoByron'>,
+  Extra: null,
+  ...TransactionInsertBase,
+|};
+export type CardanoShelleyTransactionInsert = {|
+  Type: $PropertyType<typeof TransactionType, 'CardanoShelley'>,
+  Extra: {|
+    Fee: string,
+    Ttl: string,
+    Metadata: null | string,
+  |},
+  ...TransactionInsertBase,
+|};
+export type JormungandrTransactionInsert = {|
+  Type: $PropertyType<typeof TransactionType, 'Jormungandr'>,
+  Extra: null,
+  ...TransactionInsertBase,
+|};
+export type ErgoTransactionInsert = {|
+  Type: $PropertyType<typeof TransactionType, 'Ergo'>,
+  Extra: null,
+  ...TransactionInsertBase
+|};
+
+export type TransactionInsert =
+  CardanoByronTransactionInsert |
+  CardanoShelleyTransactionInsert |
+  JormungandrTransactionInsert |
+  ErgoTransactionInsert;
 export type TransactionRow = {|
   TransactionId: number,
   ...TransactionInsert,
@@ -238,28 +267,7 @@ export const TransactionSchema: {|
     LastUpdateTime: 'LastUpdateTime',
     Status: 'Status',
     ErrorMessage: 'ErrorMessage',
-  }
-};
-
-export type ShelleyTransactionInsert = {|
-  Fee: string,
-  Ttl: number,
-  Metadata: null | string,
-|};
-export type ShelleyTransactionRow = {|
-  ShelleyTransactionId: number,
-  ...ShelleyTransactionInsert,
-|};
-export const ShelleyTransactionSchema: {|
-  +name: 'ShelleyTransaction',
-  properties: $ObjMapi<ShelleyTransactionRow, ToSchemaProp>,
-|} = {
-  name: 'ShelleyTransaction',
-  properties: {
-    ShelleyTransactionId: 'ShelleyTransactionId',
-    Fee: 'Fee',
-    Ttl: 'Ttl',
-    Metadata: 'Metadata',
+    Extra: 'Extra',
   }
 };
 
@@ -495,6 +503,7 @@ export const populatePrimitivesDb = (schemaBuilder: lf$schema$Builder) => {
     .addColumn(TransactionSchema.properties.LastUpdateTime, Type.NUMBER)
     .addColumn(TransactionSchema.properties.Status, Type.INTEGER)
     .addColumn(TransactionSchema.properties.ErrorMessage, Type.STRING)
+    .addColumn(TransactionSchema.properties.Extra, Type.OBJECT)
     .addPrimaryKey(
       ([TransactionSchema.properties.TransactionId]: Array<string>),
       true,
@@ -507,6 +516,7 @@ export const populatePrimitivesDb = (schemaBuilder: lf$schema$Builder) => {
       TransactionSchema.properties.BlockId,
       TransactionSchema.properties.Ordinal,
       TransactionSchema.properties.ErrorMessage,
+      TransactionSchema.properties.Extra,
     ])
     .addIndex(
       'Transaction_Digest_Index',

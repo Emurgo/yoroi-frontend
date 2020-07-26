@@ -171,7 +171,7 @@ declare module 'lovefield' {
     addTableColumn(
       tableName: string,
       columnName: string,
-      defaultValue: string | boolean | number | Date | ArrayBuffer
+      defaultValue: string | boolean | number | Date | ArrayBuffer | null
     ): Promise<void>;
     dropTableColumn(tableName: string, columnName: string): Promise<void>;
     renameTableColumn(

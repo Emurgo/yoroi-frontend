@@ -441,7 +441,7 @@ export class ModifyTransaction {
     await addOrReplaceRow<$ReadOnly<TransactionRow>, TransactionRow>(
       db, tx,
       {
-        ...request.transaction,
+        ...(request.transaction: $ReadOnly<TransactionRow>),
         Status: request.status,
       },
       ModifyTransaction.ownTables[Tables.TransactionSchema.name].name,

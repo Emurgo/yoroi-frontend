@@ -39,11 +39,9 @@ export function getFromUserPerspective(data: {|
   utxoOutputs: $ReadOnlyArray<$ReadOnly<UtxoTransactionOutputRow>>,
   accountingInputs?: $ReadOnlyArray<$ReadOnly<AccountingTransactionInputRow>>,
   accountingOutputs?: $ReadOnlyArray<$ReadOnly<AccountingTransactionOutputRow>>,
+  ownImplicitInput?: BigNumber,
   allOwnedAddressIds: Set<number>,
 |}): UserAnnotation {
-  // Note: logic taken from the mobile version of Yoroi
-  // https://github.com/Emurgo/yoroi-mobile/blob/a3d72218b1e63f6362152aae2f03c8763c168795/src/crypto/transactionUtils.js#L73-L103
-
   const unifiedInputs = [
     ...data.utxoInputs,
     ...(data.accountingInputs ?? []),
@@ -62,7 +60,7 @@ export function getFromUserPerspective(data: {|
 
   const totalIn = sumInputsOutputs(unifiedInputs);
   const totalOut = sumInputsOutputs(unifiedOutputs);
-  const ownIn = sumInputsOutputs(ownInputs);
+  const ownIn = sumInputsOutputs(ownInputs).plus(data.ownImplicitInput ?? 0);
   const ownOut = sumInputsOutputs(ownOutputs);
 
   const hasOnlyOwnInputs = ownInputs.length === unifiedInputs.length;

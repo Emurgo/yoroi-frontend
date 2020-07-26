@@ -30,6 +30,7 @@ import { populateExplorerDb } from './explorers/tables';
 import { KeyKind } from '../../../../common/lib/crypto/keys/types';
 import { networks } from './prepackaged/networks';
 import { prepackagedExplorers } from './prepackaged/explorers';
+import environment from '../../../../../environment';
 
 // global var from window.indexedDB
 declare var indexedDB: IDBFactory;
@@ -266,11 +267,22 @@ async function onUpgrade(
     );
   }
   if (version >= 3 && version <= 12) {
+    if (environment.isNightly()) {
+      // nightly used to run on ITN, but we want to switch it to run on main Yoroi instead
+      await deleteDb();
+      window.location.reload();
+    }
     await rawDb.addTableColumn(
       'Transaction',
       'Type',
       // recall: at the time we only supported Byron at this time
       TransactionType.CardanoByron
+    );
+    await rawDb.addTableColumn(
+      'Transaction',
+      'Extra',
+      // recall: at the time we only supported Byron at this time
+      null
     );
   }
 }
