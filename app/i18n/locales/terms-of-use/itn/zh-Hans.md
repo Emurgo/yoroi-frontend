@@ -4,6 +4,6 @@
 
 12.2 **委托。** 用户可以将其权益委托给公司的某一权益池或第三方权益池。用户拥有的唯一的权力是能够把握要委托给权益池的数量，并且可以随时增加或减少其参与程度。公司分享的有关权益池的任何信息，包括绩效指标和奖励，仅用于指导目的，可能不准确。如果其ADA存在于最新的Daedalus或Yoroi钱包中，用户就能将其权益委托给一个权益池。用户由于委托其权益并不会产生额外的权利。
 
-12.3 **Company Stake-Pools.** The Company will operate various stake pools which will be visible in Yoroi or Seiza. The cost and network and server requirements to reliably operate such stake pools shall be determined by the Company in its sole discretion. Company will communicate the percentage amount of Reward to be shared with Users through the User’s Yoroi wallet. Rewards will accrue at the end of each epoch and will automatically appear in the User’s Yoroi wallet.
+12.3 **公司的权益池。** 公司将运营各种权益池，这些权益池将在Yoroi或Seiza中显示。可靠地运营此类权益池的成本以及对网络和服务器要求，应由公司自行决定。公司将通过用户的Yoroi钱包告知用户奖励的比例。奖励将在每个纪元结束时产生，并自动出现在用户的Yoroi钱包中。
 
-12.4 **Redeeming Rewards.** User shall be responsible for payment of all applicable taxes, if any, to which the Rewards might be subject and any and all other taxes which may apply to User once Rewards are redeemed.
+12.4**提取奖励。**如果有任何可能的交易税款，应由用户承担。特别是提取奖励时有可能会产生税款。
