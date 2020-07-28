@@ -32,6 +32,9 @@ import {
   PublicDeriver,
 } from '../models/PublicDeriver/index';
 import {
+  networks,
+} from '../database/prepackaged/networks';
+import {
   asAddBip44FromPublic,
   asGetAllUtxos,
   asDisplayCutoff,
@@ -43,13 +46,8 @@ import {
   createStandardBip44Wallet,
 } from '../bridge/walletBuilder/byron';
 
-import type { ConfigType } from '../../../../../../config/config-types';
-
 jest.mock('../../../../../utils/passwordCipher');
 jest.mock('../database/initialSeed');
-
-declare var CONFIG: ConfigType;
-const protocolMagic = CONFIG.network.protocolMagic;
 
 const mnemonic = 'prevent company field green slot measure chief hero apple task eagle sunset endorse dress seed';
 
@@ -61,8 +59,13 @@ beforeAll(async () => {
 });
 
 test('Can add and fetch address in wallet', async (done) => {
+  const network =  networks.ByronMainnet;
+
+  if (network.BaseConfig[0].ByronNetworkId == null) {
+    throw new Error('Should never happen');
+  }
   const settings = RustModule.WalletV2.BlockchainSettings.from_json({
-    protocol_magic: protocolMagic
+    protocol_magic: network.BaseConfig[0].ByronNetworkId,
   });
   const entropy = RustModule.WalletV2.Entropy.from_english_mnemonics(mnemonic);
   const rootPk = RustModule.WalletV2.Bip44RootPrivateKey.recover(entropy, '');
@@ -89,6 +92,7 @@ test('Can add and fetch address in wallet', async (done) => {
     accountIndex: HARD_DERIVATION_START + 0,
     walletName: 'My Test Wallet',
     accountName: '',
+    network,
   });
 
   // test wallet functionality detection and usage

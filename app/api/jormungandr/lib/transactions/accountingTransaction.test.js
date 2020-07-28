@@ -19,6 +19,16 @@ beforeAll(async () => {
   await RustModule.load();
 });
 
+const linearFeeConfig = {
+  constant: '155381',
+  coefficient: '1',
+  certificate: '4',
+  per_certificate_fees: {
+    certificate_pool_registration: '5',
+    certificate_stake_delegation: '6',
+  },
+};
+
 describe('Create unsigned TX for account', () => {
   it('Should create a valid transaction', async () => {
     const senderKey = RustModule.WalletV3.PrivateKey.from_bech32(
@@ -34,6 +44,7 @@ describe('Create unsigned TX for account', () => {
         amount: new BigNumber(2000000)
       },
       new BigNumber(5000000),
+      linearFeeConfig,
     );
     const inputSum = getTxInputTotal(unsignedTxResponse, false);
     const outputSum = getTxOutputTotal(unsignedTxResponse, false);
@@ -46,6 +57,7 @@ describe('Create unsigned TX for account', () => {
       0,
       undefined,
       senderKey,
+      'adbdd5ede31637f6c9bad5c271eec0bc3d0cb9efb86a5b913bb55cba549d0770',
     );
     const signedTx = fragment.get_transaction();
     const witnesses = signedTx.witnesses();
@@ -73,6 +85,7 @@ describe('Create unsigned TX for account', () => {
         amount: new BigNumber(2000000),
       },
       new BigNumber(2000000),
+      linearFeeConfig,
     )).toThrow(NotEnoughMoneyToSendError);
   });
 
@@ -90,6 +103,7 @@ describe('Create unsigned TX for account', () => {
         amount: new BigNumber(2000000),
       },
       new BigNumber(1000000),
+      linearFeeConfig,
     )).toThrow(NotEnoughMoneyToSendError);
   });
 });

@@ -131,6 +131,7 @@ import type {
 } from '../common/types';
 import { getApiForNetwork } from '../common/utils';
 import { CoreAddressTypes } from '../ada/lib/storage/database/primitives/enums';
+import { getJormungandrBaseConfig } from '../ada/lib/storage/database/prepackaged/networks';
 
 // getAllAddressesForDisplay
 
@@ -209,7 +210,7 @@ export type CreateUnsignedTxFunc = (
 // createDelegationTx
 
 export type CreateDelegationTxRequest = {|
-  publicDeriver: IGetAllUtxos & IHasUtxoChains & IGetStakingKey,
+  publicDeriver: IPublicDeriver<ConceptualWallet> & IGetAllUtxos & IHasUtxoChains & IGetStakingKey,
   poolRequest: PoolRequest,
   /**
    * TODO: right now we can only get this information from the network
@@ -435,6 +436,9 @@ export default class JormungandrApi {
         password,
       });
 
+      const config = getJormungandrBaseConfig(
+        request.publicDeriver.getParent().getNetworkInfo()
+      ).reduce((acc, next) => Object.assign(acc, next), {});
       const signedTx = jormungandrSignTransaction(
         {
           senderUtxos: signRequest.senderUtxos,
@@ -448,6 +452,8 @@ export default class JormungandrApi {
         ),
         // Note: always false because we should only do legacy txs for wallet transfers
         false,
+        undefined,
+        config.ChainNetworkId,
       );
       const response = request.sendTx({
         id: Buffer.from(signedTx.id().as_bytes()).toString('hex'),
@@ -480,11 +486,17 @@ export default class JormungandrApi {
 
       const addressedUtxo = jormungandrAsAddressedUtxo(filteredUtxos);
 
+      const config = getJormungandrBaseConfig(
+        request.publicDeriver.getParent().getNetworkInfo()
+      ).reduce((acc, next) => Object.assign(acc, next), {});
+
       let unsignedTxResponse;
       if (request.shouldSendAll != null) {
         unsignedTxResponse = jormungandrSendAllUnsignedTx(
           receiver,
-          addressedUtxo
+          addressedUtxo,
+          undefined,
+          config.LinearFee,
         );
       } else if (request.amount != null) {
         const amount = request.amount;
@@ -502,7 +514,9 @@ export default class JormungandrApi {
             address: changeAddr.addr.Hash,
             addressing: changeAddr.addressing,
           }],
-          addressedUtxo
+          addressedUtxo,
+          undefined,
+          config.LinearFee,
         );
       } else {
         throw new Error(`${nameof(this.createUnsignedTx)} unknown param`);
@@ -530,6 +544,10 @@ export default class JormungandrApi {
   ): Promise<CreateDelegationTxResponse> {
     Logger.debug(`${nameof(JormungandrApi)}::${nameof(this.createDelegationTx)} called`);
 
+    const config = getJormungandrBaseConfig(
+      request.publicDeriver.getParent().getNetworkInfo()
+    ).reduce((acc, next) => Object.assign(acc, next), {});
+
     const stakingKeyResp = await request.publicDeriver.getStakingKey();
     const stakingKey = unwrapStakingKey(stakingKeyResp.addr.Hash);
 
@@ -550,7 +568,8 @@ export default class JormungandrApi {
         addressing: changeAddr.addressing,
       }],
       addressedUtxo,
-      certificate
+      certificate,
+      config.LinearFee,
     );
 
     const allUtxosForKey = filterAddressesByStakingKey(
@@ -585,6 +604,10 @@ export default class JormungandrApi {
     Logger.debug(`${nameof(JormungandrApi)}::${nameof(this.signAndBroadcastDelegationTx)} called`);
     const { password, signRequest } = request;
     try {
+      const config = getJormungandrBaseConfig(
+        request.publicDeriver.getParent().getNetworkInfo()
+      ).reduce((acc, next) => Object.assign(acc, next), {});
+
       const signingKeyFromStorage = await request.publicDeriver.getSigningKey();
       const stakingAddr = await request.publicDeriver.getStakingKey();
       const normalizedKey = await request.publicDeriver.normalizeKey({
@@ -621,6 +644,7 @@ export default class JormungandrApi {
           certificate,
           stakingKey: normalizedStakingKey,
         },
+        config.ChainNetworkId,
       );
       const id = Buffer.from(signedTx.id().as_bytes()).toString('hex');
       const encodedTx = signedTx.as_bytes();
@@ -708,7 +732,8 @@ export default class JormungandrApi {
         password: walletPassword,
         accountIndex,
         walletName,
-        accountName: '', // set account name empty now
+        accountName: '', // set account name empty now,
+        network: request.network,
       });
 
       const cip1852Wallet = await Cip1852Wallet.createCip1852Wallet(

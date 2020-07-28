@@ -62,7 +62,7 @@ import type {
 } from '../../../../ada/transactions/types';
 import type {
   ToAbsoluteSlotNumberFunc,
-} from './timeUtils';
+} from '../../../../common/lib/storage/bridge/timeUtils';
 import type {
   UtxoTransactionInputInsert, UtxoTransactionOutputInsert,
 } from '../../../../ada/lib/storage/database/transactionModels/utxo/tables';
@@ -125,7 +125,7 @@ import type {
 import { addressToKind } from '../../../../ada/lib/storage/bridge/utils';
 import { getFromUserPerspective, } from '../../../../ada/transactions/utils';
 import environment from '../../../../../environment';
-
+import { getJormungandrBaseConfig, } from '../../../../ada/lib/storage/database/prepackaged/networks';
 
 async function rawGetAllTxIds(
   db: lf$Database,
@@ -943,7 +943,9 @@ async function rawUpdateTransactions(
   derivationTables: Map<number, string>,
 ): Promise<void> {
   // TODO: consider passing this function in as an argument instead of generating it here
-  const toAbsoluteSlotNumber = await genToAbsoluteSlotNumber();
+  const toAbsoluteSlotNumber = await genToAbsoluteSlotNumber(
+    getJormungandrBaseConfig(publicDeriver.getParent().getNetworkInfo())
+  );
   // 1) Check if backend is synced (avoid rollbacks if backend has to resync from block 1)
 
   const bestBlock = await getBestBlock();

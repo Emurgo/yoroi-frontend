@@ -473,7 +473,7 @@ async function syncingSimpleTransaction(): Promise<void> {
       expect(response).toEqual({
         BlockHash: 'a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba25',
         LastSyncInfoId: 1,
-        SlotNum: 219650,
+        SlotNum: 435650,
         Height: 218608,
         Time: new Date(0),
       });
@@ -600,7 +600,7 @@ async function syncingSimpleTransaction(): Promise<void> {
       expect(response).toEqual({
         BlockHash: 'a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba26',
         LastSyncInfoId: 1,
-        SlotNum: 219651,
+        SlotNum: 435651,
         Height: 218609,
         Time: new Date(1),
       });
@@ -715,7 +715,7 @@ async function syncWithSwappedGroup(): Promise<void> {
       expect(response).toEqual({
         BlockHash: 'a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba25',
         LastSyncInfoId: 1,
-        SlotNum: 219650,
+        SlotNum: 435650,
         Height: 218608,
         Time: new Date(0),
       });
@@ -777,7 +777,7 @@ async function syncWithCertificate(): Promise<void> {
       Digest: -9.690691258114666e-56,
       Hash: 'a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba25',
       Height: 218608,
-      SlotNum: 219650,
+      SlotNum: 435650,
     },
     certificate: {
       CertificateId: 1,

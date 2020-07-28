@@ -3,12 +3,10 @@
 import {
   NotEnoughMoneyToSendError,
 } from '../../../common/errors';
-import type { ConfigType } from '../../../../../config/config-types';
 import { RustModule } from '../../../ada/lib/cardanoCrypto/rustLoader';
 import BigNumber from 'bignumber.js';
 import { generateAuthData, generateFee, } from './utils';
-
-declare var CONFIG: ConfigType;
+import type { JormungandrFeeConfig } from '../../../ada/lib/storage/database/primitives/tables';
 
 /**
  * Transactions cannot both send money and post a certificate
@@ -24,6 +22,7 @@ export function buildUnsignedAccountTx(
   receiver: string,
   typeSpecific: SendType,
   accountBalance: BigNumber,
+  feeConfig: JormungandrFeeConfig,
 ): RustModule.WalletV3.InputOutput {
   const wasmReceiver = RustModule.WalletV3.Address.from_bytes(
     Buffer.from(receiver, 'hex')
@@ -36,7 +35,7 @@ export function buildUnsignedAccountTx(
     : RustModule.WalletV3.Payload.no_payload();
   const sourceAccount = RustModule.WalletV3.Account.single_from_public_key(sender);
 
-  const feeAlgorithm = generateFee();
+  const feeAlgorithm = generateFee(feeConfig);
 
   let fee;
   {
@@ -97,7 +96,8 @@ export function signTransaction(
   IOs: RustModule.WalletV3.InputOutput,
   accountCounter: number,
   certificate: ?RustModule.WalletV3.Certificate,
-  accountPrivateKey: RustModule.WalletV3.PrivateKey
+  accountPrivateKey: RustModule.WalletV3.PrivateKey,
+  genesisHash: string,
 ): RustModule.WalletV3.Fragment {
   const txbuilder = new RustModule.WalletV3.TransactionBuilder();
 
@@ -111,7 +111,7 @@ export function signTransaction(
   );
 
   const witness = RustModule.WalletV3.Witness.for_account(
-    RustModule.WalletV3.Hash.from_hex(CONFIG.genesis.genesisHash),
+    RustModule.WalletV3.Hash.from_hex(genesisHash),
     builderSetWitness.get_auth_data_for_witness(),
     accountPrivateKey,
     RustModule.WalletV3.SpendingCounter.from_u32(accountCounter)

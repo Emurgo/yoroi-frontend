@@ -21,15 +21,15 @@ import type {
   TimeToAbsoluteSlotFunc,
   CurrentEpochLengthFunc,
   CurrentSlotLengthFunc,
-  TimeSinceGenesisRequestFunc,
+  TimeSinceGenesisFunc,
   ToRealTimeFunc,
-} from '../../api/jormungandr/lib/storage/bridge/timeUtils';
+} from '../../api/common/lib/storage/bridge/timeUtils';
 import {
   buildCheckAndCall,
 } from '../lib/check';
 import { getApiForNetwork, ApiOptions } from '../../api/common/utils';
 import type { CurrentTimeRequests } from '../base/BaseCardanoTimeStore';
-import { isJormungandr, } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { isJormungandr, getJormungandrBaseConfig, } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 /**
  * Different wallets can be on different networks and therefore have different measures of time
@@ -55,25 +55,39 @@ export default class JormungandrTimeStore extends BaseCardanoTimeStore {
       publicDeriver,
       requests: {
         toAbsoluteSlot: new CachedRequest<void => Promise<ToAbsoluteSlotNumberFunc>>(
-          genToAbsoluteSlotNumber
+          () => genToAbsoluteSlotNumber(
+            getJormungandrBaseConfig(publicDeriver.getParent().getNetworkInfo())
+          )
         ),
         toRelativeSlotNumber: new CachedRequest<void => Promise<ToRelativeSlotNumberFunc>>(
-          genToRelativeSlotNumber
+          () => genToRelativeSlotNumber(
+            getJormungandrBaseConfig(publicDeriver.getParent().getNetworkInfo())
+          )
         ),
         timeToSlot: new CachedRequest<void => Promise<TimeToAbsoluteSlotFunc>>(
-          genTimeToSlot
+          () => genTimeToSlot(
+            getJormungandrBaseConfig(publicDeriver.getParent().getNetworkInfo())
+          )
         ),
         currentEpochLength: new CachedRequest<void => Promise<CurrentEpochLengthFunc>>(
-          genCurrentEpochLength
+          () => genCurrentEpochLength(
+            getJormungandrBaseConfig(publicDeriver.getParent().getNetworkInfo())
+          )
         ),
         currentSlotLength: new CachedRequest<void => Promise<CurrentSlotLengthFunc>>(
-          genCurrentSlotLength
+          () => genCurrentSlotLength(
+            getJormungandrBaseConfig(publicDeriver.getParent().getNetworkInfo())
+          )
         ),
-        timeSinceGenesis: new CachedRequest<void => Promise<TimeSinceGenesisRequestFunc>>(
-          genTimeSinceGenesis
+        timeSinceGenesis: new CachedRequest<void => Promise<TimeSinceGenesisFunc>>(
+          () => genTimeSinceGenesis(
+            getJormungandrBaseConfig(publicDeriver.getParent().getNetworkInfo())
+          )
         ),
         toRealTime: new CachedRequest<void => Promise<ToRealTimeFunc>>(
-          genToRealTime
+          () => genToRealTime(
+            getJormungandrBaseConfig(publicDeriver.getParent().getNetworkInfo())
+          )
         ),
       },
     });

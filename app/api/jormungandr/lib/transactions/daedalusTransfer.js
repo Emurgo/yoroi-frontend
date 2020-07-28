@@ -28,10 +28,7 @@ import type {
   AddressKeyMap,
 } from '../../../ada/transactions/types';
 import { getJormungandrCurrencyMeta } from '../../currencyInfo';
-
-import type { ConfigType } from '../../../../../config/config-types';
-
-declare var CONFIG : ConfigType;
+import type { JormungandrFeeConfig } from '../../../ada/lib/storage/database/primitives/tables';
 
 /**
  * Generate transaction including all addresses with no change.
@@ -40,6 +37,8 @@ export async function buildDaedalusTransferTx(payload: {|
   addressKeys: AddressKeyMap,
   senderUtxos: Array<RemoteUnspentOutput>,
   outputAddr: string,
+  genesisHash: string,
+  feeConfig: JormungandrFeeConfig,
 |}): Promise<TransferTx> {
   try {
     const { addressKeys, senderUtxos, outputAddr } = payload;
@@ -54,7 +53,9 @@ export async function buildDaedalusTransferTx(payload: {|
     // build tx
     const utxoResponse = sendAllUnsignedTxFromUtxo(
       outputAddr,
-      senderUtxos
+      senderUtxos,
+      undefined,
+      payload.feeConfig
     );
     const fee = getJormungandrTxFee(utxoResponse.IOs, false);
 
@@ -62,6 +63,7 @@ export async function buildDaedalusTransferTx(payload: {|
     const signedTx = signDaedalusTransaction(
       utxoResponse,
       addressKeys,
+      payload.genesisHash,
     );
 
     const fragment = RustModule.WalletV3.Fragment.from_transaction(signedTx);
@@ -91,6 +93,7 @@ export async function buildDaedalusTransferTx(payload: {|
 function signDaedalusTransaction(
   signRequest: V3UnsignedTxUtxoResponse,
   addressKeys: AddressKeyMap,
+  genesisHash: string,
 ): RustModule.WalletV3.Transaction {
   const { senderUtxos, IOs } = signRequest;
 
@@ -105,6 +108,7 @@ function signDaedalusTransaction(
     builderSetWitnesses,
     addressKeys,
     senderUtxos,
+    genesisHash,
   );
 
   const signedTx = builderSetAuthData.set_payload_auth(
@@ -118,11 +122,12 @@ function addWitnesses(
   builderSetWitnesses: RustModule.WalletV3.TransactionBuilderSetWitness,
   addressKeys: AddressKeyMap,
   senderUtxos: Array<RemoteUnspentOutput>,
+  genesisHash: string,
 ): RustModule.WalletV3.TransactionBuilderSetAuthData {
   const witnesses = RustModule.WalletV3.Witnesses.new();
   for (let i = 0; i < senderUtxos.length; i++) {
     const witness = RustModule.WalletV3.Witness.for_legacy_daedalus_utxo(
-      RustModule.WalletV3.Hash.from_hex(CONFIG.genesis.genesisHash),
+      RustModule.WalletV3.Hash.from_hex(genesisHash),
       builderSetWitnesses.get_auth_data_for_witness(),
       RustModule.WalletV3.LegacyDaedalusPrivateKey.from_bytes(
         Buffer.from(addressKeys[senderUtxos[i].receiver].to_hex(), 'hex')

@@ -78,7 +78,7 @@ import { ledgerErrors } from '../../app/domain/LedgerLocalizedError';
 import BigNumber from 'bignumber.js';
 import { utxoToTxInput } from '../../app/api/jormungandr/lib/transactions/inputSelection';
 import { RustModule } from '../../app/api/ada/lib/cardanoCrypto/rustLoader';
-import { networks, isCardanoHaskell, isJormungandr } from '../../app/api/ada/lib/storage/database/prepackaged/networks';
+import { networks, getJormungandrBaseConfig, isCardanoHaskell, isJormungandr } from '../../app/api/ada/lib/storage/database/prepackaged/networks';
 import { ByronTxSignRequest } from '../../app/api/ada/transactions/byron/ByronTxSignRequest';
 import { JormungandrTxSignRequest } from '../../app/api/jormungandr/lib/transactions/JormungandrTxSignRequest';
 
@@ -366,13 +366,41 @@ function genMockCache(dummyWallet: PublicDeriver<>) {
     getTimeCalcRequests: (publicDeriver) => ({
       publicDeriver,
       requests: {
-        toAbsoluteSlot: new CachedRequest(genToAbsoluteSlotNumber),
-        toRelativeSlotNumber: new CachedRequest(genToRelativeSlotNumber),
-        timeToSlot: new CachedRequest(genTimeToSlot),
-        currentEpochLength: new CachedRequest(genCurrentEpochLength),
-        currentSlotLength: new CachedRequest(genCurrentSlotLength),
-        timeSinceGenesis: new CachedRequest(genTimeSinceGenesis),
-        toRealTime: new CachedRequest(genToRealTime),
+        toAbsoluteSlot: new CachedRequest(() => {
+          return genToAbsoluteSlotNumber(
+            getJormungandrBaseConfig(publicDeriver.getParent().getNetworkInfo())
+          );
+        }),
+        toRelativeSlotNumber: new CachedRequest(() => {
+          return genToRelativeSlotNumber(
+            getJormungandrBaseConfig(publicDeriver.getParent().getNetworkInfo())
+          );
+        }),
+        timeToSlot: new CachedRequest(() => {
+          return genTimeToSlot(
+            getJormungandrBaseConfig(publicDeriver.getParent().getNetworkInfo())
+          );
+        }),
+        currentEpochLength: new CachedRequest(() => {
+          return genCurrentEpochLength(
+            getJormungandrBaseConfig(publicDeriver.getParent().getNetworkInfo())
+          );
+        }),
+        currentSlotLength: new CachedRequest(() => {
+          return genCurrentSlotLength(
+            getJormungandrBaseConfig(publicDeriver.getParent().getNetworkInfo())
+          );
+        }),
+        timeSinceGenesis: new CachedRequest(() => {
+          return genTimeSinceGenesis(
+            getJormungandrBaseConfig(publicDeriver.getParent().getNetworkInfo())
+          );
+        }),
+        toRealTime: new CachedRequest(() => {
+          return genToRealTime(
+            getJormungandrBaseConfig(publicDeriver.getParent().getNetworkInfo())
+          );
+        }),
       },
     }),
     getCurrentTimeRequests: (publicDeriver) => ({

@@ -9,17 +9,17 @@ import {
   HARD_DERIVATION_START,
 } from '../../../../config/numbersConfig';
 import { v4PublicToV2 } from './utils';
-import { getCardanoHaskellStaticConfig, networks } from '../storage/database/prepackaged/networks';
+import { getCardanoHaskellBaseConfig, networks } from '../storage/database/prepackaged/networks';
 
 beforeAll(async () => {
   await RustModule.load();
 });
 
 const getAddressForLedgerMnemonic = (mnemonic: string): string => {
-  const staticConfigs = getCardanoHaskellStaticConfig(networks.ByronMainnet);
-  if (staticConfigs == null) throw new Error('Should never happen');
+  const baseConfig = getCardanoHaskellBaseConfig(networks.ByronMainnet)
+    .reduce((acc, next) => Object.assign(acc, next), {});
   const settings = RustModule.WalletV2.BlockchainSettings.from_json({
-    protocol_magic: staticConfigs.ByronNetworkId,
+    protocol_magic: baseConfig.ByronNetworkId,
   });
 
   const rootKey = generateLedgerWalletRootKey(mnemonic);

@@ -19,6 +19,7 @@ import type {
 import type { Bip44ChainInsert } from '../../../../../ada/lib/storage/database/walletTypes/common/tables';
 
 import { WalletBuilder } from '../../../../../ada/lib/storage/bridge/walletBuilder/builder';
+import type { NetworkRow } from '../../../../../ada/lib/storage/database/primitives/tables';
 
 import { RustModule } from '../../../../../ada/lib/cardanoCrypto/rustLoader';
 import { encryptWithPassword } from '../../../../../../utils/passwordCipher';
@@ -41,7 +42,6 @@ import {
   addJormungandrChimericAccountAddress,
 } from '../../../restoration/scan';
 import { KeyKind } from '../../../../../common/lib/crypto/keys/types';
-import { networks } from '../../../../../ada/lib/storage/database/prepackaged/networks';
 
 // TODO: maybe move this inside walletBuilder somehow so it's all done in the same transaction
 /**
@@ -167,9 +167,10 @@ export async function createStandardCip1852Wallet(request: {|
   accountIndex: number,
   walletName: string,
   accountName: string,
+  network: $ReadOnly<NetworkRow>,
 |}): Promise<HasConceptualWallet & HasCip1852Wrapper & HasRoot & HasPublicDeriver<mixed>> {
   if (request.accountIndex < HARD_DERIVATION_START) {
-    throw new Error('createStandardCip1852Wallet needs hardened index');
+    throw new Error(`${nameof(createStandardCip1852Wallet)} needs hardened index`);
   }
 
   const encryptedRoot = encryptWithPassword(
@@ -199,7 +200,7 @@ export async function createStandardCip1852Wallet(request: {|
       )
       .addConceptualWallet(
         _finalState => ({
-          NetworkId: networks.JormungandrMainnet.NetworkId,
+          NetworkId: request.network.NetworkId,
           Name: request.walletName,
         })
       )

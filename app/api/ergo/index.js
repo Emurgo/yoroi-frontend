@@ -256,6 +256,7 @@ export default class ErgoApi {
         accountIndex,
         walletName,
         accountName: '', // set account name empty now
+        network: request.network,
       });
 
       const bip44Wallet = await Bip44Wallet.createBip44Wallet(

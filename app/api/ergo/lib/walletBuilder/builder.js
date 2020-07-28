@@ -22,6 +22,7 @@ import type {
 } from '../../../ada/lib/storage/database/walletTypes/common/utils';
 import type { Bip44ChainInsert } from '../../../ada/lib/storage/database/walletTypes/common/tables';
 import { WalletBuilder } from '../../../ada/lib/storage/bridge/walletBuilder/builder';
+import type { NetworkRow } from '../../../ada/lib/storage/database/primitives/tables';
 import {
   Bip44DerivationLevels,
   Bip44TableMap,
@@ -37,7 +38,6 @@ import { rawGenAddByHash } from '../../../common/lib/storage/bridge/hashMapper';
 import { addErgoP2PK } from '../restoration/scan';
 import { decode } from 'bs58check';
 import { KeyKind } from '../../../common/lib/crypto/keys/types';
-import { networks } from '../../../ada/lib/storage/database/prepackaged/networks';
 
 // TODO: maybe move this inside walletBuilder somehow so it's all done in the same transaction
 /**
@@ -129,6 +129,7 @@ export async function createStandardBip44Wallet(request: {|
   accountIndex: number,
   walletName: string,
   accountName: string,
+  network: $ReadOnly<NetworkRow>,
 |}): Promise<HasConceptualWallet & HasBip44Wrapper & HasRoot & HasPublicDeriver<mixed>> {
   if (request.accountIndex < HARD_DERIVATION_START) {
     throw new Error(`${nameof(createStandardBip44Wallet)} needs hardened index`);
@@ -158,7 +159,7 @@ export async function createStandardBip44Wallet(request: {|
       )
       .addConceptualWallet(
         _finalState => ({
-          NetworkId: networks.ErgoMainnet.NetworkId,
+          NetworkId: request.network.NetworkId,
           Name: request.walletName,
         })
       )

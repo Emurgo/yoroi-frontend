@@ -30,6 +30,7 @@ import type {
   Address, Addressing
 } from '../../../../ada/lib/storage/models/PublicDeriver/interfaces';
 import { toSenderUtxos } from '../../../../ada/transactions/transfer/utils';
+import type { JormungandrFeeConfig } from '../../../../ada/lib/storage/database/primitives/tables';
 
 /**
  * Generate transaction including all addresses with no change.
@@ -40,6 +41,8 @@ export async function buildYoroiTransferTx(payload: {|
   keyLevel: number,
   signingKey: RustModule.WalletV3.Bip32PrivateKey,
   useLegacyWitness: boolean,
+  genesisHash: string,
+  feeConfig: JormungandrFeeConfig,
 |}): Promise<TransferTx> {
   try {
     const { senderUtxos, outputAddr, } = payload;
@@ -54,7 +57,9 @@ export async function buildYoroiTransferTx(payload: {|
     // first build a transaction to see what the fee will be
     const unsignedTxResponse = sendAllUnsignedTx(
       outputAddr,
-      senderUtxos
+      senderUtxos,
+      undefined,
+      payload.feeConfig
     );
     const fee = getJormungandrTxFee(unsignedTxResponse.IOs, false);
 
@@ -64,6 +69,8 @@ export async function buildYoroiTransferTx(payload: {|
       payload.keyLevel,
       payload.signingKey,
       payload.useLegacyWitness,
+      undefined,
+      payload.genesisHash,
     );
 
     const uniqueSenders = Array.from(new Set(senderUtxos.map(utxo => utxo.receiver)));
@@ -98,6 +105,8 @@ export async function yoroiTransferTxFromAddresses(payload: {|
   signingKey: RustModule.WalletV3.Bip32PrivateKey,
   getUTXOsForAddresses: AddressUtxoFunc,
   useLegacyWitness: boolean,
+  genesisHash: string,
+  feeConfig: JormungandrFeeConfig,
 |}): Promise<TransferTx> {
   const senderUtxos = await toSenderUtxos({
     addresses: payload.addresses,
@@ -109,5 +118,7 @@ export async function yoroiTransferTxFromAddresses(payload: {|
     signingKey: payload.signingKey,
     senderUtxos,
     useLegacyWitness: payload.useLegacyWitness,
+    genesisHash: payload.genesisHash,
+    feeConfig: payload.feeConfig,
   });
 }

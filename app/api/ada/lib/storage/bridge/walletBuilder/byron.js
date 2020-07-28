@@ -16,7 +16,7 @@ import type {
   TreeInsert,
 } from '../../database/walletTypes/common/utils';
 import type { Bip44ChainInsert } from '../../database/walletTypes/common/tables';
-import type { KeyInsert } from '../../database/primitives/tables';
+import type { KeyInsert, NetworkRow } from '../../database/primitives/tables';
 import type { HWFeatures, } from '../../database/walletTypes/core/tables';
 
 import { WalletBuilder } from './builder';
@@ -39,7 +39,6 @@ import type { AddByHashFunc } from '../../../../../common/lib/storage/bridge/has
 import { rawGenAddByHash } from '../../../../../common/lib/storage/bridge/hashMapper';
 import { addByronAddress } from '../../../../restoration/byron/scan';
 import { KeyKind } from '../../../../../common/lib/crypto/keys/types';
-import { networks } from '../../database/prepackaged/networks';
 
 // TODO: maybe move this inside walletBuilder somehow so it's all done in the same transaction
 /**
@@ -129,6 +128,7 @@ export async function createStandardBip44Wallet(request: {|
   accountIndex: number,
   walletName: string,
   accountName: string,
+  network: $ReadOnly<NetworkRow>,
 |}): Promise<HasConceptualWallet & HasBip44Wrapper & HasRoot & HasPublicDeriver<mixed>> {
   if (request.accountIndex < HARD_DERIVATION_START) {
     throw new Error(`${nameof(createStandardBip44Wallet)} needs hardened index`);
@@ -159,7 +159,7 @@ export async function createStandardBip44Wallet(request: {|
       )
       .addConceptualWallet(
         _finalState => ({
-          NetworkId: networks.ByronMainnet.NetworkId,
+          NetworkId: request.network.NetworkId,
           Name: request.walletName,
         })
       )
@@ -234,6 +234,7 @@ export async function createHardwareWallet(request: {
   walletName: string,
   accountName: string,
   hwWalletMetaInsert: HWFeatures,
+  network: $ReadOnly<NetworkRow>,
   ...
 }): Promise<HasConceptualWallet & HasBip44Wrapper & HasPublicDeriver<mixed>> {
   if (request.accountIndex < HARD_DERIVATION_START) {
@@ -254,7 +255,7 @@ export async function createHardwareWallet(request: {
       )
       .addConceptualWallet(
         _finalState => ({
-          NetworkId: networks.ByronMainnet.NetworkId,
+          NetworkId: request.network.NetworkId,
           Name: request.walletName,
         })
       )
@@ -348,6 +349,7 @@ export async function migrateFromStorageV1(request: {
   displayCutoff: number,
   walletName: string,
   hwWalletMetaInsert: void | HWFeatures,
+  network: $ReadOnly<NetworkRow>,
   ...
 }): Promise<void> {
   // hardware wallet
@@ -359,7 +361,7 @@ export async function migrateFromStorageV1(request: {
       )
       .addConceptualWallet(
         _finalState => ({
-          NetworkId: networks.ByronMainnet.NetworkId,
+          NetworkId: request.network.NetworkId,
           Name: request.walletName,
         })
       )
@@ -413,7 +415,7 @@ export async function migrateFromStorageV1(request: {
       )
       .addConceptualWallet(
         _finalState => ({
-          NetworkId: networks.ByronMainnet.NetworkId,
+          NetworkId: request.network.NetworkId,
           Name: request.walletName,
         })
       )

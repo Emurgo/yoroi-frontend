@@ -396,6 +396,9 @@ export default class TrezorConnectStore
       throw new Error(`${nameof(this._prepareCreateHWReqParams)} db not loaded. Should never happen`);
     }
 
+    const { selectedNetwork } = this.stores.profile;
+    if (selectedNetwork == null) throw new Error(`${nameof(this._prepareCreateHWReqParams)} no network selected`);
+
     const stateFetcher = this.stores.substores.ada.stateFetchStore.fetcher;
     return {
       db: persistentDb,
@@ -403,6 +406,7 @@ export default class TrezorConnectStore
       walletName,
       publicKey: this.hwDeviceInfo.publicMasterKey,
       hwFeatures: this.hwDeviceInfo.hwFeatures,
+      network: selectedNetwork,
       checkAddressesInUse: stateFetcher.checkAddressesInUse,
     };
   }

@@ -7,10 +7,9 @@ import {
 import type {
   Addressing,
 } from '../../../ada/lib/storage/models/PublicDeriver/interfaces';
-
-import type { ConfigType } from '../../../../../config/config-types';
-
-declare var CONFIG: ConfigType;
+import type {
+  JormungandrFeeConfig,
+} from '../../../ada/lib/storage/database/primitives/tables';
 
 export function normalizeKey(request: {|
   addressing: $PropertyType<Addressing, 'addressing'>,
@@ -52,13 +51,15 @@ export function generateAuthData(
         )
       );
     }
-    default: throw new Error('generateAuthData unexptected cert type ' + certificate.get_type());
+    default: throw new Error('generateAuthData unexpected cert type ' + certificate.get_type());
   }
 }
 
-export function generateFee(): RustModule.WalletV3.Fee {
+export function generateFee(
+  feeConfig: JormungandrFeeConfig,
+): RustModule.WalletV3.Fee {
   const perCertificate = RustModule.WalletV3.PerCertificateFee.new();
-  const genesisPerCert = CONFIG.genesis.linearFee.per_certificate_fees;
+  const genesisPerCert = feeConfig.per_certificate_fees;
   if (genesisPerCert) {
     if (genesisPerCert.certificate_pool_registration != null) {
       perCertificate.set_pool_registration(
@@ -78,9 +79,9 @@ export function generateFee(): RustModule.WalletV3.Fee {
   }
 
   const feeAlgorithm = RustModule.WalletV3.Fee.linear_fee(
-    RustModule.WalletV3.Value.from_str(CONFIG.genesis.linearFee.constant),
-    RustModule.WalletV3.Value.from_str(CONFIG.genesis.linearFee.coefficient),
-    RustModule.WalletV3.Value.from_str(CONFIG.genesis.linearFee.certificate),
+    RustModule.WalletV3.Value.from_str(feeConfig.constant),
+    RustModule.WalletV3.Value.from_str(feeConfig.coefficient),
+    RustModule.WalletV3.Value.from_str(feeConfig.certificate),
     perCertificate,
   );
 

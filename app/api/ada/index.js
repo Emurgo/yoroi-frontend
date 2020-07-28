@@ -153,6 +153,7 @@ import type {
 } from '../common/types';
 import { getApiForNetwork } from '../common/utils';
 import { CoreAddressTypes } from './lib/storage/database/primitives/enums';
+import type { NetworkRow } from './lib/storage/database/primitives/tables';
 
 declare var CONFIG: ConfigType;
 const protocolMagic = CONFIG.network.protocolMagic;
@@ -383,6 +384,7 @@ export type CreateHardwareWalletRequest = {|
   derivationIndex: number,
   hwFeatures: HWFeatures,
   checkAddressesInUse: FilterFunc,
+  network: $ReadOnly<NetworkRow>,
 |};
 export type CreateHardwareWalletResponse = {|
   bip44Wallet: Bip44Wallet,
@@ -935,6 +937,7 @@ export default class AdaApi {
         accountIndex: request.accountIndex,
         walletName,
         accountName: '', // set account name empty now
+        network: request.network,
       });
 
       const bip44Wallet = await Bip44Wallet.createBip44Wallet(
@@ -1097,6 +1100,7 @@ export default class AdaApi {
         walletName: request.walletName,
         accountName: '',
         hwWalletMetaInsert: request.hwFeatures,
+        network: request.network,
       });
 
       const bip44Wallet = await Bip44Wallet.createBip44Wallet(

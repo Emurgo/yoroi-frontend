@@ -13,9 +13,9 @@ import type {
   TimeToAbsoluteSlotFunc,
   CurrentEpochLengthFunc,
   CurrentSlotLengthFunc,
-  TimeSinceGenesisRequestFunc,
+  TimeSinceGenesisFunc,
   ToRealTimeFunc,
-} from '../../api/ada/lib/storage/bridge/timeUtils';
+} from '../../api/common/lib/storage/bridge/timeUtils';
 
 export type TimeCalcRequests = {|
   // although time is network-specific
@@ -28,7 +28,7 @@ export type TimeCalcRequests = {|
     timeToSlot: CachedRequest<void => Promise<TimeToAbsoluteSlotFunc>>;
     currentEpochLength: CachedRequest<void => Promise<CurrentEpochLengthFunc>>;
     currentSlotLength: CachedRequest<void => Promise<CurrentSlotLengthFunc>>;
-    timeSinceGenesis: CachedRequest<void => Promise<TimeSinceGenesisRequestFunc>>,
+    timeSinceGenesis: CachedRequest<void => Promise<TimeSinceGenesisFunc>>,
     toRealTime: CachedRequest<void => Promise<ToRealTimeFunc>>;
   |},
 |};

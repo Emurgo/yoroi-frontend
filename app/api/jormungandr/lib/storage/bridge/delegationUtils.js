@@ -28,7 +28,7 @@ import type {
 import { TxStatusCodes } from '../../../../ada/lib/storage/database/primitives/enums';
 import type { CertificateInsert } from '../../../../ada/lib/storage/database/primitives/tables';
 import type { CertificateForKey } from '../../../../ada/lib/storage/database/primitives/api/read';
-import type { ToRelativeSlotNumberFunc } from './timeUtils';
+import type { ToRelativeSlotNumberFunc } from '../../../../common/lib/storage/bridge/timeUtils';
 
 export type GetDelegatedBalanceRequest = {|
   publicDeriver: PublicDeriver<> & IGetStakingKey,

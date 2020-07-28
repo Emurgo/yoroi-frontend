@@ -17,7 +17,8 @@ import {
 import type { WalletTypePurposeT } from '../../../../../../config/numbersConfig';
 
 import { RustModule } from '../../../cardanoCrypto/rustLoader';
-import { networks, getCardanoHaskellStaticConfig } from '../../database/prepackaged/networks';
+import { networks } from '../../database/prepackaged/networks';
+import type { NetworkRow } from '../../database/primitives/tables';
 
 const privateDeriverPassword = 'greatest_password_ever';
 
@@ -27,7 +28,7 @@ export async function setup(
   purposeForTest: WalletTypePurposeT,
 ): Promise<PublicDeriver<>> {
   if (purposeForTest === WalletTypePurpose.BIP44) {
-    return setupBip44(db, walletMnemonic);
+    return setupBip44(db, walletMnemonic, networks.ByronMainnet);
   }
   throw new Error(`${nameof(setup)} Unexpected purpose ` + purposeForTest);
 }
@@ -35,13 +36,15 @@ export async function setup(
 export async function setupBip44(
   db: lf$Database,
   walletMnemonic: string,
+  network: $ReadOnly<NetworkRow>,
 ): Promise<PublicDeriver<>> {
   await RustModule.load();
 
-  const staticConfigs = getCardanoHaskellStaticConfig(networks.ByronMainnet);
-  if (staticConfigs == null) throw new Error('Should never happen');
+  if (network.BaseConfig[0].ByronNetworkId == null) {
+    throw new Error(`${nameof(setupBip44)} missing Byron network id`);
+  }
   const settings = RustModule.WalletV2.BlockchainSettings.from_json({
-    protocol_magic: staticConfigs.ByronNetworkId,
+    protocol_magic: network.BaseConfig[0].ByronNetworkId,
   });
   const entropy = RustModule.WalletV2.Entropy.from_english_mnemonics(walletMnemonic);
   const rootPk = RustModule.WalletV2.Bip44RootPrivateKey.recover(entropy, '');
@@ -54,6 +57,7 @@ export async function setupBip44(
     accountIndex: HARD_DERIVATION_START + 0,
     walletName: 'My Test Wallet',
     accountName: '',
+    network
   });
 
   const bipWallet = await Bip44Wallet.createBip44Wallet(

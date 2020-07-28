@@ -12,7 +12,6 @@ import type { RemoteUnspentOutput, } from '../state-fetch/types';
 import {
   NotEnoughMoneyToSendError,
 } from '../../../common/errors';
-import type { ConfigType } from '../../../../../config/config-types';
 
 import { RustModule } from '../../../ada/lib/cardanoCrypto/rustLoader';
 
@@ -26,8 +25,7 @@ import {
   firstMatchFirstInputSelection,
   utxoToTxInput,
 } from './inputSelection';
-
-declare var CONFIG: ConfigType;
+import type { JormungandrFeeConfig } from '../../../ada/lib/storage/database/primitives/tables';
 
 type TxOutput = {|
   address: string,
@@ -38,6 +36,7 @@ export function sendAllUnsignedTx(
   receiver: string,
   allUtxos: Array<AddressedUtxo>,
   certificate: void | RustModule.WalletV3.Certificate,
+  feeConfig: JormungandrFeeConfig,
 ): V3UnsignedTxAddressedUtxoResponse {
   const addressingMap = new Map<RemoteUnspentOutput, AddressedUtxo>();
   for (const utxo of allUtxos) {
@@ -53,6 +52,7 @@ export function sendAllUnsignedTx(
     receiver,
     Array.from(addressingMap.keys()),
     certificate,
+    feeConfig,
   );
 
   const addressedUtxos = unsignedTxResponse.senderUtxos.map(
@@ -77,6 +77,7 @@ export function sendAllUnsignedTxFromUtxo(
   receiver: string,
   allUtxos: Array<RemoteUnspentOutput>,
   certificate: void | RustModule.WalletV3.Certificate,
+  feeConfig: JormungandrFeeConfig,
 ): V3UnsignedTxUtxoResponse {
   const totalBalance = allUtxos
     .map(utxo => new BigNumber(utxo.amount))
@@ -88,7 +89,7 @@ export function sendAllUnsignedTxFromUtxo(
     throw new NotEnoughMoneyToSendError();
   }
 
-  const feeAlgorithm = generateFee();
+  const feeAlgorithm = generateFee(feeConfig);
   let fee;
   {
     // first build a transaction to see what the cost would be
@@ -126,6 +127,7 @@ export function sendAllUnsignedTxFromUtxo(
     [],
     allUtxos,
     certificate,
+    feeConfig,
   );
   return unsignedTxResponse;
 }
@@ -135,6 +137,7 @@ export function newAdaUnsignedTx(
   changeAdaAddr: Array<{| ...Address, ...Addressing |}>,
   allUtxos: Array<AddressedUtxo>,
   certificate: void | RustModule.WalletV3.Certificate,
+  feeConfig: JormungandrFeeConfig,
 ): V3UnsignedTxAddressedUtxoResponse {
   const addressingMap = new Map<RemoteUnspentOutput, AddressedUtxo>();
   for (const utxo of allUtxos) {
@@ -151,6 +154,7 @@ export function newAdaUnsignedTx(
     changeAdaAddr,
     Array.from(addressingMap.keys()),
     certificate,
+    feeConfig,
   );
 
   const addressedUtxos = unsignedTxResponse.senderUtxos.map(
@@ -181,8 +185,9 @@ export function newAdaUnsignedTxFromUtxo(
   changeAddresses: Array<{| ...Address, ...Addressing |}>,
   allUtxos: Array<RemoteUnspentOutput>,
   certificate: void | RustModule.WalletV3.Certificate,
+  feeConfig: JormungandrFeeConfig,
 ): V3UnsignedTxUtxoResponse {
-  const feeAlgorithm = generateFee();
+  const feeAlgorithm = generateFee(feeConfig);
 
   const ioBuilder = RustModule.WalletV3.InputOutputBuilder.empty();
   for (const output of outputs) {
@@ -304,6 +309,7 @@ export function signTransaction(
     stakingKey: RustModule.WalletV3.PrivateKey,
     certificate: RustModule.WalletV3.Certificate,
   |},
+  genesisHash: string,
 ): RustModule.WalletV3.Fragment {
   const { senderUtxos, IOs } = signRequest;
 
@@ -322,6 +328,7 @@ export function signTransaction(
     keyLevel,
     signingKey,
     useLegacy,
+    genesisHash,
   );
 
   const payloadAuthData = payload == null
@@ -347,6 +354,7 @@ function addWitnesses(
   keyLevel: number,
   signingKey: RustModule.WalletV3.Bip32PrivateKey,
   useLegacy: boolean,
+  genesisHash: string,
 ): RustModule.WalletV3.TransactionBuilderSetAuthData {
   const privateKeys = senderUtxos.map(utxo => normalizeKey({
     addressing: utxo.addressing,
@@ -360,12 +368,12 @@ function addWitnesses(
   for (let i = 0; i < senderUtxos.length; i++) {
     const witness = useLegacy
       ? RustModule.WalletV3.Witness.for_legacy_icarus_utxo(
-        RustModule.WalletV3.Hash.from_hex(CONFIG.genesis.genesisHash),
+        RustModule.WalletV3.Hash.from_hex(genesisHash),
         builderSetWitnesses.get_auth_data_for_witness(),
         privateKeys[i],
       )
       : RustModule.WalletV3.Witness.for_utxo(
-        RustModule.WalletV3.Hash.from_hex(CONFIG.genesis.genesisHash),
+        RustModule.WalletV3.Hash.from_hex(genesisHash),
         builderSetWitnesses.get_auth_data_for_witness(),
         privateKeys[i].to_raw_key(),
       );

@@ -38,7 +38,7 @@ import {
   removeLocalItem,
 } from '../../../localStorage/primitives';
 import {
-  isCardanoHaskell,
+  isCardanoHaskell, networks
 } from './database/prepackaged/networks';
 
 declare var CONFIG: ConfigType;
@@ -224,6 +224,7 @@ export async function storagev2Migation(
         },
       settings,
       walletName: wallet.adaWallet.cwMeta.cwName,
+      network: networks.ByronMainnet, // all wallets used this at the time
     });
   }
 

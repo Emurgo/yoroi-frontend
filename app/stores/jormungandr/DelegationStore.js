@@ -36,7 +36,7 @@ import {
   genToRelativeSlotNumber,
   genTimeToSlot,
 } from '../../api/jormungandr/lib/storage/bridge/timeUtils';
-import { isJormungandr } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { isJormungandr, getJormungandrBaseConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 export type StakingKeyState = {|
   state: AccountStateSuccess,
@@ -220,8 +220,11 @@ export default class DelegationStore extends Store {
     stakingKeyAddressId: number,
     delegationRequest: DelegationRequests,
   |} => Promise<void> = async (request) => {
-    const toRelativeSlotNumber = await genToRelativeSlotNumber();
-    const timeToSlot = await genTimeToSlot();
+    const jormungandrConfig = getJormungandrBaseConfig(
+      request.publicDeriver.getParent().getNetworkInfo()
+    );
+    const toRelativeSlotNumber = await genToRelativeSlotNumber(jormungandrConfig);
+    const timeToSlot = await genTimeToSlot(jormungandrConfig);
     const currentEpoch = toRelativeSlotNumber(
       timeToSlot({
         time: new Date(),

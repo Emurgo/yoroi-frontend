@@ -36,7 +36,7 @@ import { RustModule } from '../../../ada/lib/cardanoCrypto/rustLoader';
 
 import { generateLedgerWalletRootKey } from '../../../ada/lib/cardanoCrypto/cryptoWallet';
 import { v4Bip32PrivateToV3 } from '../crypto/utils';
-import { networks, getJormungandrStaticConfig } from '../../../ada/lib/storage/database/prepackaged/networks';
+import { networks, getJormungandrBaseConfig } from '../../../ada/lib/storage/database/prepackaged/networks';
 
 export function genCheckAddressesInUse(
   blockchain: Array<RemoteTransaction>,
@@ -308,10 +308,10 @@ export function getSingleAddressString(
     const v2Key = RustModule.WalletV2.PublicKey.from_hex(
       Buffer.from(derivedKey.to_public().as_bytes()).toString('hex')
     );
-    const staticConfigs = getJormungandrStaticConfig(networks.JormungandrMainnet);
-    if (staticConfigs == null) throw new Error('Should never happen');
+    const baseConfig = getJormungandrBaseConfig(networks.JormungandrMainnet)
+      .reduce((acc, next) => Object.assign(acc, next), {});
     const settings = RustModule.WalletV2.BlockchainSettings.from_json({
-      protocol_magic: staticConfigs.ByronNetworkId,
+      protocol_magic: baseConfig.ByronNetworkId,
     });
     const addr = v2Key.bootstrap_era_address(settings);
     const hex = addr.to_base58();

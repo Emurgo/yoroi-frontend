@@ -25,6 +25,16 @@ import {
 
 import { RustModule } from '../../../../ada/lib/cardanoCrypto/rustLoader';
 
+const linearFeeConfig = {
+  constant: '155381',
+  coefficient: '1',
+  certificate: '4',
+  per_certificate_fees: {
+    certificate_pool_registration: '5',
+    certificate_stake_delegation: '6',
+  },
+};
+
 beforeAll(async () => {
   await RustModule.load();
   await loadLovefieldDB(schema.DataStoreType.MEMORY);
@@ -86,7 +96,9 @@ describe('Jormungandr tx format tests', () => {
       keyLevel: Bip44DerivationLevels.ACCOUNT.level,
       signingKey: accountPrivateKey,
       outputAddr: outAddress,
-      useLegacyWitness: false
+      useLegacyWitness: true,
+      genesisHash: 'adbdd5ede31637f6c9bad5c271eec0bc3d0cb9efb86a5b913bb55cba549d0770',
+      feeConfig: linearFeeConfig,
     });
 
     expect(transferInfo.fee.toString()).toBe('0.155383');

@@ -1,7 +1,9 @@
 // @flow
 import BigNumber from 'bignumber.js';
 
-export const EPOCH_REWARD_DENOMINATOR: BigNumber = new BigNumber(10).pow(6);
+// This is the precision of the yearly return percentage
+// ex: 1.00000000% return per year, 1.23456789% return per year are all 8 digit precision
+export const EPOCH_REWARD_DENOMINATOR: BigNumber = new BigNumber(10).pow(8);
 
 export const HARD_DERIVATION_START: 2147483648 = 0x80000000;
 

@@ -1147,30 +1147,61 @@ Object {
   ],
   "Network": Array [
     Object {
+      "BaseConfig": Array [
+        Object {
+          "ByronNetworkId": 764824073,
+          "ChainNetworkId": "1",
+          "GenesisDate": "150620309100",
+          "SlotDuration": 20,
+          "SlotsPerEpoch": 21600,
+          "StartAt": 0,
+        },
+        Object {
+          "PerEpochPercentageReward": 69344,
+          "SlotDuration": 1,
+          "SlotsPerEpoch": 432000,
+          "StartAt": 208,
+        },
+      ],
       "CoinType": 2147485463,
       "Fork": 0,
       "NetworkId": 0,
-      "StaticConfig": Object {
-        "ByronNetworkId": 764824073,
-        "NetworkId": "1",
-      },
     },
     Object {
+      "BaseConfig": Array [
+        Object {
+          "ByronNetworkId": 764824073,
+          "ChainNetworkId": "8e4d2a343f3dcf9330ad9035b3e8d168e6728904262f2c434a4f8f934ec7b676",
+          "GenesisDate": "1576264417000",
+          "LinearFee": Object {
+            "certificate": "400000",
+            "coefficient": "100000",
+            "constant": "200000",
+            "per_certificate_fees": Object {
+              "certificate_pool_registration": "500000000",
+              "certificate_stake_delegation": "400000",
+            },
+          },
+          "PerEpochPercentageReward": 19666,
+          "SlotDuration": 2,
+          "SlotsPerEpoch": 43200,
+          "StartAt": 0,
+        },
+      ],
       "CoinType": 2147485463,
       "Fork": 1,
       "NetworkId": 100,
-      "StaticConfig": Object {
-        "ByronNetworkId": 764824073,
-        "NetworkId": "8e4d2a343f3dcf9330ad9035b3e8d168e6728904262f2c434a4f8f934ec7b676",
-      },
     },
     Object {
+      "BaseConfig": Array [
+        Object {
+          "ChainNetworkId": "0",
+          "StartAt": 0,
+        },
+      ],
       "CoinType": 2147484077,
       "Fork": 0,
       "NetworkId": 200,
-      "StaticConfig": Object {
-        "NetworkId": "0",
-      },
     },
   ],
   "PreferredExplorer": Array [],
