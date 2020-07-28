@@ -5,7 +5,6 @@
 import type {
   GenerateAddressFunc,
 } from '../../../common/lib/restoration/bip44AddressScan';
-import type { ConfigType } from '../../../../../config/config-types';
 
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 
@@ -15,20 +14,12 @@ import type {
 import type { AddByHashFunc, } from '../../../common/lib/storage/bridge/hashMapper';
 import { CoreAddressTypes } from '../../lib/storage/database/primitives/enums';
 
-declare var CONFIG: ConfigType;
-/**
- * Note: we purpose hardcode this in the Bip44 case
- * because for Cardano we want to use the legacy Cardano protocol magic
- * to be able to generate the right legacy addresses
- * instead of the actual protocol magic the network is using (which is a block hash for Jormungandr)
- */
-const protocolMagic = CONFIG.network.protocolMagic;
-
 export function v2genAddressBatchFunc(
   addressChain: RustModule.WalletV2.Bip44ChainPublic,
+  byronProtocolMagic: number,
 ): GenerateAddressFunc {
   const settings = RustModule.WalletV2.BlockchainSettings.from_json({
-    protocol_magic: protocolMagic
+    protocol_magic: byronProtocolMagic
   });
   return (
     indices: Array<number>

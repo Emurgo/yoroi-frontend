@@ -11,34 +11,103 @@ import typeof { CertificateKind } from '@emurgo/cardano-serialization-lib-browse
 import type { KeyKindType } from '../../../../../common/lib/crypto/keys/types';
 import type { CoinTypesT } from '../../../../../../config/numbersConfig';
 
-export type CommonStaticConfig = {|
+export type CommonBaseConfig = {|
+  /**
+   * At what point the config becomes active
+   */
+  +StartAt: number,
   /**
     many blockchains require a different kind of magic number or string to identify a network
     ex: hash of the genesis block or 0=mainnet,1=testnet, etc.
   */
-  NetworkId: string,
+  +ChainNetworkId: string,
 |};
-export type CardanoHaskellStaticConfig = {|
-  ...CommonStaticConfig,
+export type CardanoHaskellByronBaseConfig = {|
+  ...CommonBaseConfig,
   /*
   * Legacy byron addresses contained a network id inside of its attributes
   * This network id was a 32-bit number, but the bech32 ID is smaller
   * Therefore, the Byron network ID is only used to generate legacy addresses
   */
-  ByronNetworkId: number,
+  +ByronNetworkId: number,
+  +GenesisDate: string,
+  +SlotsPerEpoch: number,
+  +SlotDuration: number,
 |};
-export type JormungandrStaticConfig = CardanoHaskellStaticConfig;
-export type ErgoStaticConfig = {|
-  ...CommonStaticConfig,
+export type CardanoHaskellShelleyBaseConfig = {|
+  +StartAt: number,
+  +SlotsPerEpoch: number,
+  +SlotDuration: number,
+  // based on https://staking.cardano.org/en/calculator/
+  +PerEpochPercentageReward: number,
 |};
+export type CardanoHaskellBaseConfig = [
+  $ReadOnly<CardanoHaskellByronBaseConfig>,
+  $ReadOnly<CardanoHaskellShelleyBaseConfig>
+];
+
+export type JormungandrFeeConfig = {|
+  constant: string,
+  coefficient: string,
+  certificate: string,
+  per_certificate_fees?: {|
+    certificate_pool_registration?: string,
+    certificate_stake_delegation?: string,
+    certificate_owner_stake_delegation?: string,
+  |},
+|};
+export type JormungandrGenesisBaseConfig = {|
+  ...CommonBaseConfig,
+  /*
+  * Legacy byron addresses contained a network id inside of its attributes
+  * This network id was a 32-bit number, but the bech32 ID is smaller
+  * Therefore, the Byron network ID is only used to generate legacy addresses
+  */
+  +ByronNetworkId: number,
+  +GenesisDate: string, // start of the network
+  +SlotsPerEpoch: number,
+  +SlotDuration: number,
+
+  // based on https://staking.cardano.org/en/calculator/ (ITN version -- link no longer exists)
+  +PerEpochPercentageReward: number,
+  +LinearFee: JormungandrFeeConfig,
+|};
+export type JormungandrBaseConfig = [$ReadOnly<JormungandrGenesisBaseConfig>];
+
+export type ErgoGenesisBaseConfig = {|
+  ...CommonBaseConfig,
+|};
+export type ErgoBaseConfig = [$ReadOnly<ErgoGenesisBaseConfig>];
+
+// unfortunate hack to get around the fact tuple spreading is broken in Flow
+export type CardanoHaskellConfig = $ReadOnly<InexactSubset<{|
+  ...$ElementType<CardanoHaskellBaseConfig, 0>,
+  ...$ElementType<CardanoHaskellBaseConfig, 1>,
+|}>>;
+export type JormungandrConfig = $ReadOnly<InexactSubset<{|
+  ...$ElementType<JormungandrBaseConfig, 0>,
+|}>>;
+export type ErgoConfig = $ReadOnly<InexactSubset<{|
+  ...$ElementType<ErgoBaseConfig, 0>,
+|}>>;
+
 export type NetworkInsert = {|
   NetworkId: number,
   CoinType: CoinTypesT,
   /**
-   * This is meant for static configs and not protocol parameters that change over time.
-   * Protocol parameters should be queries from a server
+   * Starting configuration for the wallet.
+   * This is meant for protocol parameters that rarely change
+   * This allows wallets to work without ever connecting to a network
+   * Keep in mind parameters in here can change over time
+   * Ex: on-chain governance
+   * HOWEVER, a new field shouldn't be introduced externally.
+   * Only updates to fields specified here.
+   * For these updates, you need to query a full node for current parameters
    */
-  StaticConfig: CardanoHaskellStaticConfig | JormungandrStaticConfig | ErgoStaticConfig,
+  BaseConfig:
+    CardanoHaskellBaseConfig |
+    JormungandrBaseConfig |
+    ErgoBaseConfig,
   /**
    * Some currencies have totally different implementations that use the same coin type
    * To differentiate these, we need some identifier of the fork
@@ -56,7 +125,7 @@ export const NetworkSchema: {|
   properties: {
     NetworkId: 'NetworkId',
     CoinType: 'CoinType',
-    StaticConfig: 'StaticConfig',
+    BaseConfig: 'BaseConfig',
     Fork: 'Fork',
   }
 };
@@ -384,7 +453,7 @@ export const populatePrimitivesDb = (schemaBuilder: lf$schema$Builder) => {
   schemaBuilder.createTable(NetworkSchema.name)
     .addColumn(NetworkSchema.properties.NetworkId, Type.INTEGER)
     .addColumn(NetworkSchema.properties.CoinType, Type.NUMBER)
-    .addColumn(NetworkSchema.properties.StaticConfig, Type.OBJECT)
+    .addColumn(NetworkSchema.properties.BaseConfig, Type.OBJECT)
     .addColumn(NetworkSchema.properties.Fork, Type.INTEGER)
     .addPrimaryKey(
       /* note: doesn't auto-increment

@@ -1364,7 +1364,7 @@ export function asGetSigningKey<T: IPublicDeriver<any>>(
 //   ScanLegacyCardanoUtxo
 // =========================
 
-type ScanLegacyCardanoUtxoDependencies = IPublicDeriver<>;
+type ScanLegacyCardanoUtxoDependencies = IPublicDeriver<ConceptualWallet>;
 const ScanLegacyCardanoUtxoMixin = (
   superclass: Class<ScanLegacyCardanoUtxoDependencies>,
 ) => (class ScanLegacyCardanoUtxo extends superclass implements IScanUtxo {
@@ -1388,12 +1388,20 @@ const ScanLegacyCardanoUtxoMixin = (
       RustModule.WalletV2.DerivationScheme.v2()
     );
 
+    const network = this.getParent().getNetworkInfo();
+    if (network.BaseConfig[0].ByronNetworkId == null) {
+      throw new Error(`missing Byron network id`);
+    }
+    const { ByronNetworkId } = network.BaseConfig[0];
+
     return await scanBip44Account({
       generateInternalAddresses: v2genAddressBatchFunc(
         key.bip44_chain(false),
+        ByronNetworkId,
       ),
       generateExternalAddresses: v2genAddressBatchFunc(
         key.bip44_chain(true),
+        ByronNetworkId,
       ),
       lastUsedInternal: body.lastUsedInternal,
       lastUsedExternal: body.lastUsedExternal,

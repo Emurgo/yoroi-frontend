@@ -21,13 +21,9 @@ import {
 import {
   loadLovefieldDB,
 } from '../../lib/storage/database/index';
-
-import type { ConfigType } from '../../../../../config/config-types';
+import { networks } from '../../lib/storage/database/prepackaged/networks';
 
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
-
-declare var CONFIG: ConfigType;
-const protocolMagic = CONFIG.network.protocolMagic;
 
 beforeAll(async () => {
   await RustModule.load();
@@ -46,9 +42,15 @@ function getByronAddress(
   const v2Key = RustModule.WalletV2.PublicKey.from_hex(
     Buffer.from(v3Key.as_bytes()).toString('hex')
   );
+
+  const baseConfig = networks.ByronMainnet.BaseConfig[0];
+  if (baseConfig.ByronNetworkId == null) {
+    throw new Error(`missing Byron network id`);
+  }
+  const { ByronNetworkId } = baseConfig;
   const addr = v2Key.bootstrap_era_address(
     RustModule.WalletV2.BlockchainSettings.from_json({
-      protocol_magic: protocolMagic
+      protocol_magic: ByronNetworkId
     })
   );
   return {
@@ -85,12 +87,18 @@ describe('Byron era tx format tests', () => {
       amount: inputAmount
     };
 
+    const baseConfig = networks.ByronMainnet.BaseConfig[0];
+    if (baseConfig.ByronNetworkId == null) {
+      throw new Error(`missing Byron network id`);
+    }
+
     const transferInfo = await yoroiTransferTxFromAddresses({
       addresses: [addr1, addr2],
       getUTXOsForAddresses: (_addresses) => Promise.resolve([utxo]),
       keyLevel: Bip44DerivationLevels.ACCOUNT.level,
       signingKey: accountPrivateKey,
       outputAddr: outAddress,
+      byronNetworkMagic: baseConfig.ByronNetworkId,
     });
 
     expect(transferInfo.fee.toString()).toBe('0.165841');

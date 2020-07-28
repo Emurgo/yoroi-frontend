@@ -143,17 +143,18 @@ export default class SeizaFetcher extends Component<Props> {
       return null;
     }
 
-    const apiMeta = getApiMeta(getApiForNetwork(selectedWallet.getParent().getNetworkInfo()))?.meta;
+    const networkInfo = selectedWallet.getParent().getNetworkInfo();
+    const apiMeta = getApiMeta(getApiForNetwork(networkInfo))?.meta;
     if (apiMeta == null) throw new Error(`${nameof(SeizaFetcher)} no API selected`);
     const amountPerUnit = new BigNumber(10).pow(apiMeta.decimalPlaces);
 
+    const currentParams = networkInfo.BaseConfig
+      .reduce((acc, next) => Object.assign(acc, next), {});
+
     const approximateReward: BigNumber => BigNumber = (amount) => {
-      // TODO: based on https://staking.cardano.org/en/calculator/
-      // needs to be update per-network
       const rewardMultiplier = (number) => number
-        .times(CONFIG.genesis.epoch_reward)
-        .div(EPOCH_REWARD_DENOMINATOR)
-        .div(100);
+        .times(currentParams.PerEpochPercentageReward)
+        .div(EPOCH_REWARD_DENOMINATOR);
 
       const result = rewardMultiplier(amount)
         .div(amountPerUnit);

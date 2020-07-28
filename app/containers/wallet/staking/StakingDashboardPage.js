@@ -42,7 +42,8 @@ import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import type {
   ToRealTimeFunc,
   ToAbsoluteSlotNumberFunc,
-} from '../../../api/jormungandr/lib/storage/bridge/timeUtils';
+  TimeSinceGenesisFunc,
+} from '../../../api/common/lib/storage/bridge/timeUtils';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import type { CreateDelegationTxFunc } from '../../../api/jormungandr/index';
 import type { CurrentTimeRequests, TimeCalcRequests } from '../../../stores/base/BaseCardanoTimeStore';
@@ -288,6 +289,8 @@ export default class StakingDashboardPage extends Component<Props> {
     if (toAbsoluteSlot == null) return undefined;
     const toRealTime = timeCalcRequests.requests.toRealTime.result;
     if (toRealTime == null) return undefined;
+    const timeSinceGenesis = timeCalcRequests.requests.timeSinceGenesis.result;
+    if (timeSinceGenesis == null) return undefined;
 
     const delegationStore = this.generated.stores.substores.jormungandr.delegation;
     const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
@@ -310,18 +313,21 @@ export default class StakingDashboardPage extends Component<Props> {
                   pools: [],
                   toAbsoluteSlot,
                   toRealTime,
+                  timeSinceGenesis,
                 }),
                 this.generateUpcomingRewardInfo({
                   epoch: currTimeRequests.currentEpoch + 2,
                   pools: [],
                   toAbsoluteSlot,
                   toRealTime,
+                  timeSinceGenesis,
                 }),
                 this.generateUpcomingRewardInfo({
                   epoch: currTimeRequests.currentEpoch + 3,
                   pools: [],
                   toAbsoluteSlot,
                   toRealTime,
+                  timeSinceGenesis,
                 }),
               ]}
               showWarning={false}
@@ -344,6 +350,7 @@ export default class StakingDashboardPage extends Component<Props> {
             pools: currEpochCert.pools,
             toAbsoluteSlot,
             toRealTime,
+            timeSinceGenesis,
           }));
         }
         if (result.prevEpoch) {
@@ -352,6 +359,7 @@ export default class StakingDashboardPage extends Component<Props> {
             pools: result.prevEpoch.pools,
             toAbsoluteSlot,
             toRealTime,
+            timeSinceGenesis,
           }));
         }
         if (result.prevPrevEpoch) {
@@ -360,6 +368,7 @@ export default class StakingDashboardPage extends Component<Props> {
             pools: result.prevPrevEpoch.pools,
             toAbsoluteSlot,
             toRealTime,
+            timeSinceGenesis,
           }));
         }
 
@@ -401,13 +410,15 @@ export default class StakingDashboardPage extends Component<Props> {
     pools: Array<PoolTuples>,
     toRealTime: ToRealTimeFunc,
     toAbsoluteSlot: ToAbsoluteSlotNumberFunc,
+    timeSinceGenesis: TimeSinceGenesisFunc,
   |} => BoxInfo = (request) => {
 
     const endEpochTime = request.toRealTime({
       absoluteSlotNum: request.toAbsoluteSlot({
         epoch: request.epoch,
         slot: 0,
-      })
+      }),
+      timeSinceGenesisFunc: request.timeSinceGenesis,
     });
     const endEpochMoment = moment(endEpochTime);
     return {

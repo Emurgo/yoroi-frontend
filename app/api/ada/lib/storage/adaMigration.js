@@ -23,7 +23,6 @@ import {
 } from '../../../../utils/tabManager';
 import { migrateFromStorageV1 } from './bridge/walletBuilder/byron';
 import { RustModule } from '../cardanoCrypto/rustLoader';
-import type { ConfigType } from '../../../../../config/config-types';
 import { removeAllTransactions } from './bridge/updateTransactions';
 import {
   asHasLevels,
@@ -38,11 +37,8 @@ import {
   removeLocalItem,
 } from '../../../localStorage/primitives';
 import {
-  isCardanoHaskell,
+  isCardanoHaskell, networks
 } from './database/prepackaged/networks';
-
-declare var CONFIG: ConfigType;
-const protocolMagic = CONFIG.network.protocolMagic;
 
 export async function migrateToLatest(
   localStorageApi: LocalStorageApi,
@@ -198,8 +194,14 @@ export async function storagev2Migation(
   if (wallet != null && account != null) {
     const lastReceiveIndex = await legacyGetLastReceiveAddressIndex();
 
+    // all wallets used this at the time
+    const network = networks.ByronMainnet;
+    if (network.BaseConfig[0].ByronNetworkId == null) {
+      throw new Error(`missing Byron network id`);
+    }
+    const { ByronNetworkId } = network.BaseConfig[0];
     const settings = RustModule.WalletV2.BlockchainSettings.from_json({
-      protocol_magic: protocolMagic
+      protocol_magic: ByronNetworkId
     });
     await migrateFromStorageV1({
       db: persistentDb,
@@ -224,6 +226,7 @@ export async function storagev2Migation(
         },
       settings,
       walletName: wallet.adaWallet.cwMeta.cwName,
+      network,
     });
   }
 

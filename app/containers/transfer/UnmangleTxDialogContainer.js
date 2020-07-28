@@ -70,7 +70,9 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
     const filterTo = new Set(
       request.all
         // we don't want to include any UTXO that would do nothing but increase the tx fee
-        .filter(info => info.value != null && info.value.gt(CONFIG.genesis.linearFee.coefficient))
+        .filter(info => info.value != null)
+        // TODO: filtering in Haskell Shelley is more complicated unfortunately
+        // .filter(info => info.value.gt(CONFIG.genesis.linearFee.coefficient))
         .map(info => getAddressPayload(info.address, selected.getParent.getNetworkInfo()))
     );
 

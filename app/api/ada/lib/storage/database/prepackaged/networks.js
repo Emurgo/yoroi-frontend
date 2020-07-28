@@ -6,9 +6,9 @@ import {
 import { Network } from '@coinbarn/ergo-ts';
 import type {
   NetworkRow,
-  CardanoHaskellStaticConfig,
-  ErgoStaticConfig,
-  JormungandrStaticConfig,
+  CardanoHaskellBaseConfig,
+  ErgoBaseConfig,
+  JormungandrBaseConfig,
 } from '../primitives/tables';
 
 export const CardanoForks = Object.freeze({
@@ -22,27 +22,54 @@ export const ErgoForks = Object.freeze({
 export const networks = Object.freeze({
   ByronMainnet: ({
     NetworkId: 0,
-    StaticConfig: Object.freeze({
-      NetworkId: '1',
-      ByronNetworkId: 764824073,
-    }),
+    BaseConfig: ([
+      Object.freeze({
+        StartAt: 0,
+        ChainNetworkId: '1',
+        ByronNetworkId: 764824073,
+        GenesisDate: '150620309100',
+        SlotsPerEpoch: 21600,
+        SlotDuration: 20,
+      }),
+      Object.freeze({
+        StartAt: 208,
+        SlotsPerEpoch: 432000,
+        SlotDuration: 1,
+        PerEpochPercentageReward: 69344,
+      })
+    ]: CardanoHaskellBaseConfig),
     CoinType: CoinTypes.CARDANO,
     Fork: CardanoForks.Haskell,
   }: NetworkRow),
   JormungandrMainnet: ({
     NetworkId: 1_00,
-    StaticConfig: Object.freeze({
-      NetworkId: '8e4d2a343f3dcf9330ad9035b3e8d168e6728904262f2c434a4f8f934ec7b676',
+    BaseConfig: ([Object.freeze({
+      StartAt: 0,
+      ChainNetworkId: '8e4d2a343f3dcf9330ad9035b3e8d168e6728904262f2c434a4f8f934ec7b676',
       ByronNetworkId: 764824073,
-    }),
+      GenesisDate: '1576264417000',
+      SlotsPerEpoch: 43200,
+      SlotDuration: 2,
+      PerEpochPercentageReward: 19666,
+      LinearFee: {
+        constant: '200000',
+        coefficient: '100000',
+        certificate: '400000',
+        per_certificate_fees: {
+          certificate_pool_registration: '500000000',
+          certificate_stake_delegation: '400000',
+        },
+      },
+    })]: JormungandrBaseConfig),
     CoinType: CoinTypes.CARDANO,
     Fork: CardanoForks.Jormungandr,
   }: NetworkRow),
   ErgoMainnet: ({
     NetworkId: 2_00,
-    StaticConfig: Object.freeze({
-      NetworkId: (Network.Mainnet.toString(): string),
-    }),
+    BaseConfig: ([Object.freeze({
+      StartAt: 0,
+      ChainNetworkId: (Network.Mainnet.toString(): string),
+    })]: ErgoBaseConfig),
     CoinType: CoinTypes.ERGO,
     Fork: ErgoForks.Primary,
   }: NetworkRow),
@@ -82,21 +109,21 @@ export function isErgo(
   ) return true;
   return false;
 }
-export function getCardanoHaskellStaticConfig(
+export function getCardanoHaskellBaseConfig(
   network: $ReadOnly<NetworkRow>,
-): void | CardanoHaskellStaticConfig {
-  if (!isCardanoHaskell(network)) return undefined;
-  return (network.StaticConfig: any); // cast to return type
+): CardanoHaskellBaseConfig {
+  if (!isCardanoHaskell(network)) throw new Error(`Incorrect network type ${JSON.stringify(network)}`);
+  return (network.BaseConfig: any); // cast to return type
 }
-export function getJormungandrStaticConfig(
+export function getJormungandrBaseConfig(
   network: $ReadOnly<NetworkRow>,
-): void | JormungandrStaticConfig {
-  if (!isJormungandr(network)) return undefined;
-  return (network.StaticConfig: any); // cast to return type
+): JormungandrBaseConfig {
+  if (!isJormungandr(network)) throw new Error(`Incorrect network type ${JSON.stringify(network)}`);
+  return (network.BaseConfig: any); // cast to return type
 }
-export function getErgoStaticConfig(
+export function getErgoBaseConfig(
   network: $ReadOnly<NetworkRow>,
-): void | ErgoStaticConfig {
-  if (!isErgo(network)) return undefined;
-  return (network.StaticConfig: any); // cast to return type
+): ErgoBaseConfig {
+  if (!isErgo(network)) throw new Error(`Incorrect network type ${JSON.stringify(network)}`);
+  return (network.BaseConfig: any); // cast to return type
 }

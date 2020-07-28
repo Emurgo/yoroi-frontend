@@ -26,7 +26,11 @@ import {
   getCardanoAddrKeyHash,
 } from '../../lib/storage/bridge/utils';
 
-const defaultTtlOffset = 7200; // based off what the cardano-wallet team found worked empirically
+/**
+ * based off what the cardano-wallet team found worked empirically
+ * note: slots are 1 second in Shelley mainnet, so this is 2 minutes
+ */
+const defaultTtlOffset = 7200;
 const minimumUtxoValue = '0'; // TODO: make this a protocol parameter that can dynamically change
 
 export function sendAllUnsignedTx(

@@ -95,10 +95,16 @@ export default class PaperWalletCreateStore extends Store {
   };
 
   @action _createPaperWallet: void => void = () => {
+    if (this.stores.profile.selectedNetwork == null) {
+      throw new Error(`${nameof(PaperWalletCreateStore)}::${nameof(this._createPaperWallet)} no network selected`);
+    }
+    const selectedNetwork = this.stores.profile.selectedNetwork;
+
     if (this.numAddresses != null && this.userPassword != null) {
       this.paper = this.api.ada.createAdaPaper({
         numAddresses: this.numAddresses,
         password: this.userPassword,
+        network: selectedNetwork,
       });
     }
   };

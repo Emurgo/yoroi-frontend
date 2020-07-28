@@ -42,17 +42,14 @@ import type {
   Address, Value, Addressing,
 } from '../../lib/storage/models/PublicDeriver/interfaces';
 
-import type { ConfigType } from '../../../../../config/config-types';
-
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
-
-declare var CONFIG: ConfigType;
 
 // ==================== TREZOR ==================== //
 /** Generate a payload for Trezor SignTx */
 export async function createTrezorSignTxPayload(
   signRequest: BaseSignRequest<RustModule.WalletV2.Transaction>,
   getTxsBodiesForUTXOs: TxBodiesFunc,
+  byronNetworkMagic: number,
 ): Promise<$Exact<CardanoSignTransaction>> {
   const txJson = signRequest.unsignedTx.to_json();
 
@@ -92,7 +89,7 @@ export async function createTrezorSignTxPayload(
     inputs: trezorInputs,
     outputs: trezorOutputs,
     transactions: txsBodies,
-    protocol_magic: CONFIG.network.protocolMagic,
+    protocol_magic: byronNetworkMagic,
   };
 }
 

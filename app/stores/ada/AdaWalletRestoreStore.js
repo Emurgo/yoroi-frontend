@@ -22,7 +22,7 @@ import {
   buildCheckAndCall,
 } from '../lib/check';
 import { ApiOptions, getApiForNetwork } from '../../api/common/utils';
-import { getCardanoHaskellStaticConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { getCardanoHaskellBaseConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 export default class AdaWalletRestoreStore extends Store {
 
@@ -64,8 +64,8 @@ export default class AdaWalletRestoreStore extends Store {
 
     const { selectedNetwork } = this.stores.profile;
     if (selectedNetwork == null) throw new Error('Should never happen');
-    const staticConfigs = getCardanoHaskellStaticConfig(selectedNetwork);
-    if (staticConfigs == null) throw new Error('Should never happen');
+    const baseConfig = getCardanoHaskellBaseConfig(selectedNetwork)
+      .reduce((acc, next) => Object.assign(acc, next), {});
 
     const accountKey = generateWalletRootKey(phrase)
       .derive(WalletTypePurpose.CIP1852)
@@ -85,7 +85,7 @@ export default class AdaWalletRestoreStore extends Store {
       .to_raw_key();
 
     const internalAddr = RustModule.WalletV4.BaseAddress.new(
-      Number.parseInt(staticConfigs.NetworkId, 10),
+      Number.parseInt(baseConfig.ChainNetworkId, 10),
       RustModule.WalletV4.StakeCredential.from_keyhash(
         internalKey.hash()
       ),

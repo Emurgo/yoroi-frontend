@@ -67,6 +67,7 @@ test('Restore wallet for transfer', async () => {
     checkAddressesInUse,
     accountIndex: HARD_DERIVATION_START + 0,
     transferSource: TransferSource.BYRON,
+    network: networks.ByronMainnet,
   });
 
   expect(response).toEqual(RESTORED_ADDRESSES);

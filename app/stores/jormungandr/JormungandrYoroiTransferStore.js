@@ -19,6 +19,9 @@ import type { RestoreWalletForTransferResponse, RestoreWalletForTransferFunc } f
 import {
   Bip44DerivationLevels,
 } from '../../api/ada/lib/storage/database/walletTypes/bip44/api/utils';
+import {
+  getJormungandrBaseConfig,
+} from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 export default class JormungandrYoroiTransferStore extends Store {
 
@@ -33,7 +36,12 @@ export default class JormungandrYoroiTransferStore extends Store {
       ? generateLedgerWalletRootKey(recoveryPhrase)
       : generateWalletRootKey(recoveryPhrase);
     const stateFetcher = this.stores.substores.jormungandr.stateFetchStore.fetcher;
+
+    if (this.stores.profile.selectedNetwork == null) {
+      throw new Error(`${nameof(JormungandrYoroiTransferStore)}::${nameof(this.generateTransferTxFromMnemonic)} no network selected`);
+    }
     const restoreResult = await this.restoreForTransferRequest.execute({
+      network: this.stores.profile.selectedNetwork,
       rootPk: v4Bip32PrivateToV3(rootPk),
       accountIndex,
       checkAddressesInUse: stateFetcher.checkAddressesInUse,
@@ -75,6 +83,14 @@ export default class JormungandrYoroiTransferStore extends Store {
       .derive(accountIndex);
 
     // 4) generate transaction
+
+    if (this.stores.profile.selectedNetwork == null) {
+      throw new Error(`${nameof(JormungandrYoroiTransferStore)}::${nameof(this.generateTransferTxFromMnemonic)} no network selected`);
+    }
+    const config = getJormungandrBaseConfig(
+      this.stores.profile.selectedNetwork
+    ).reduce((acc, next) => Object.assign(acc, next), {});
+
     const transferTx = await yoroiTransferTxFromAddresses({
       addresses,
       outputAddr: destinationAddress,
@@ -83,6 +99,8 @@ export default class JormungandrYoroiTransferStore extends Store {
       getUTXOsForAddresses:
         this.stores.substores.jormungandr.stateFetchStore.fetcher.getUTXOsForAddresses,
       useLegacyWitness: !sourceIsJormungandrWallet,
+      genesisHash: config.ChainNetworkId,
+      feeConfig: config.LinearFee,
     });
     // Possible exception: NotEnoughMoneyToSendError
     return transferTx;

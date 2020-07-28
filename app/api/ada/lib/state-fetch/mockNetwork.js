@@ -28,7 +28,7 @@ import type { NetworkRow } from '../storage/database/primitives/tables';
 import { RustModule } from '../cardanoCrypto/rustLoader';
 
 import { generateLedgerWalletRootKey } from '../cardanoCrypto/cryptoWallet';
-import { networks, getCardanoHaskellStaticConfig } from '../storage/database/prepackaged/networks';
+import { networks, getCardanoHaskellBaseConfig } from '../storage/database/prepackaged/networks';
 
 export function genCheckAddressesInUse(
   blockchain: Array<RemoteTransaction>,
@@ -286,15 +286,15 @@ export function getSingleAddressString(
     );
   const derivedKey = derivePath(rootKey, path);
 
-  const staticConfigs = getCardanoHaskellStaticConfig(networks.ByronMainnet);
-  if (staticConfigs == null) throw new Error('Should never happen');
+  const baseConfig = getCardanoHaskellBaseConfig(networks.ByronMainnet)
+    .reduce((acc, next) => Object.assign(acc, next), {});
 
   if (path[0] === WalletTypePurpose.BIP44) {
     const v2Key = RustModule.WalletV2.PublicKey.from_hex(
       Buffer.from(derivedKey.to_public().as_bytes()).toString('hex')
     );
     const settings = RustModule.WalletV2.BlockchainSettings.from_json({
-      protocol_magic: staticConfigs.ByronNetworkId,
+      protocol_magic: baseConfig.ByronNetworkId,
     });
     const addr = v2Key.bootstrap_era_address(settings);
     const hex = addr.to_base58();
@@ -302,7 +302,7 @@ export function getSingleAddressString(
   }
   if (path[0] === WalletTypePurpose.CIP1852) {
     const addr = RustModule.WalletV4.EnterpriseAddress.new(
-      Number.parseInt(staticConfigs.NetworkId, 10),
+      Number.parseInt(baseConfig.ChainNetworkId, 10),
       RustModule.WalletV4.StakeCredential.from_keyhash(
         derivedKey.to_public().to_raw_key().hash()
       ),
@@ -325,8 +325,8 @@ export function getAddressForType(
   );
   const derivedKey = derivePath(rootKey, path);
 
-  const staticConfigs = getCardanoHaskellStaticConfig(networks.ByronMainnet);
-  if (staticConfigs == null) throw new Error('Should never happen');
+  const baseConfig = getCardanoHaskellBaseConfig(networks.ByronMainnet)
+    .reduce((acc, next) => Object.assign(acc, next), {});
 
   switch (type) {
     case CoreAddressTypes.CARDANO_BASE: {
@@ -338,7 +338,7 @@ export function getAddressForType(
       newPath[addressLevel] = 0;
       const stakingKey = derivePath(rootKey, newPath);
       const addr = RustModule.WalletV4.BaseAddress.new(
-        Number.parseInt(staticConfigs.NetworkId, 10),
+        Number.parseInt(baseConfig.ChainNetworkId, 10),
         RustModule.WalletV4.StakeCredential.from_keyhash(
           derivedKey.to_public().to_raw_key().hash()
         ),
@@ -353,7 +353,7 @@ export function getAddressForType(
     }
     case CoreAddressTypes.CARDANO_ENTERPRISE: {
       const addr = RustModule.WalletV4.EnterpriseAddress.new(
-        Number.parseInt(staticConfigs.NetworkId, 10),
+        Number.parseInt(baseConfig.ChainNetworkId, 10),
         RustModule.WalletV4.StakeCredential.from_keyhash(
           derivedKey.to_public().to_raw_key().hash()
         ),
@@ -362,7 +362,7 @@ export function getAddressForType(
     }
     case CoreAddressTypes.CARDANO_REWARD: {
       const addr = RustModule.WalletV4.RewardAddress.new(
-        Number.parseInt(staticConfigs.NetworkId, 10),
+        Number.parseInt(baseConfig.ChainNetworkId, 10),
         RustModule.WalletV4.StakeCredential.from_keyhash(
           derivedKey.to_public().to_raw_key().hash()
         ),

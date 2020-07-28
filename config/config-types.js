@@ -4,7 +4,6 @@ export type ConfigType = {|
   network: NetworkConfigType,
   seiza: SeizaConfigType,
   app: AppConfigType,
-  genesis: GenesisConfigType,
 |};
 
 export type SeizaConfigType = {|
@@ -40,29 +39,6 @@ export type NetworkConfigType = {|
   websocketUrl: string,
   name: Network,
   priceBackendUrl: string,
-|};
-
-export type GenesisConfigType = {|
-  linearFee: {|
-    constant: string,
-    coefficient: string,
-    certificate: string,
-    per_certificate_fees?: {|
-      certificate_pool_registration?: string,
-      certificate_stake_delegation?: string,
-      certificate_owner_stake_delegation?: string,
-    |},
-  |},
-  /**
-   * Reward for a single epoch
-   * To avoid rounding errors, this should be an integer
-   * ex: 0.0000001 => 1
-   */
-  epoch_reward: number,
-  genesisHash: string,
-  block0_date: number,
-  slots_per_epoch: number,
-  slot_duration: number,
 |};
 
 export type Network =  'development' | 'mainnet' | 'testnet' | 'test';

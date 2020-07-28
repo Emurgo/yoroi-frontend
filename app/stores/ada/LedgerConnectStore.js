@@ -298,6 +298,8 @@ export default class LedgerConnectStore
     if (persistentDb == null) {
       throw new Error(`${nameof(this._prepareCreateHWReqParams)} db not loaded. Should never happen`);
     }
+    const { selectedNetwork } = this.stores.profile;
+    if (selectedNetwork == null) throw new Error(`${nameof(this._prepareCreateHWReqParams)} no network selected`);
 
     const stateFetcher = this.stores.substores.ada.stateFetchStore.fetcher;
     return {
@@ -307,6 +309,7 @@ export default class LedgerConnectStore
       publicKey: this.hwDeviceInfo.publicMasterKey,
       hwFeatures: this.hwDeviceInfo.hwFeatures,
       checkAddressesInUse: stateFetcher.checkAddressesInUse,
+      network: selectedNetwork,
     };
   };
 

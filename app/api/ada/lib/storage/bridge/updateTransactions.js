@@ -62,7 +62,7 @@ import type {
 } from '../../../transactions/types';
 import type {
   ToAbsoluteSlotNumberFunc,
-} from './timeUtils';
+} from '../../../../common/lib/storage/bridge/timeUtils';
 import type {
   UtxoTransactionInputInsert, UtxoTransactionOutputInsert,
 } from '../database/transactionModels/utxo/tables';
@@ -90,6 +90,7 @@ import {
 import { ModifyDisplayCutoff, } from '../database/walletTypes/bip44/api/write';
 import { AddDerivationTree, } from '../database/walletTypes/common/api/write';
 import { GetDerivationSpecific, } from '../database/walletTypes/common/api/read';
+import { getCardanoHaskellBaseConfig, } from '../database/prepackaged/networks';
 import {
   ModifyLastSyncInfo,
   DeleteAllTransactions,
@@ -1004,7 +1005,9 @@ async function rawUpdateTransactions(
   derivationTables: Map<number, string>,
 ): Promise<void> {
   // TODO: consider passing this function in as an argument instead of generating it here
-  const toAbsoluteSlotNumber = await genToAbsoluteSlotNumber();
+  const toAbsoluteSlotNumber = await genToAbsoluteSlotNumber(
+    getCardanoHaskellBaseConfig(publicDeriver.getParent().getNetworkInfo())
+  );
   // 1) Check if backend is synced (avoid rollbacks if backend has to resync from block 1)
 
   const bestBlock = await getBestBlock();
@@ -1576,6 +1579,8 @@ async function networkTxToDbTx(
         ioGen: genByronIOGen(networkTx, getIdOrThrow),
       });
     } else if (networkTx.type === RemoteTransactionTypes.shelley) {
+      const baseConfig = getCardanoHaskellBaseConfig(network)
+        .reduce((acc, next) => Object.assign(acc, next), {});
       const certificates: $ReadOnlyArray<
         number => (void | AddCertificateRequest)
       > = networkTx.certificates == null
@@ -1586,7 +1591,7 @@ async function networkTxToDbTx(
             certificates: networkTx.certificates,
             hashToIds,
             derivationTables,
-            network: Number.parseInt(network.StaticConfig.NetworkId, 10)
+            network: Number.parseInt(baseConfig.ChainNetworkId, 10)
           }
         );
       shelleyTxs.push({

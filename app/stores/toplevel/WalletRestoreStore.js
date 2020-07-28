@@ -32,7 +32,7 @@ import {
 } from '../../api/ada/lib/cardanoCrypto/cryptoWallet';
 import { getApiForNetwork } from '../../api/common/utils';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
-import { isJormungandr } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { isJormungandr, isCardanoHaskell } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 export const NUMBER_OF_VERIFIED_ADDRESSES = 1;
 export const NUMBER_OF_VERIFIED_ADDRESSES_PAPER = 5;
@@ -176,18 +176,26 @@ export function generatePlates(
   mode: RestoreModeType,
   network: $ReadOnly<NetworkRow>,
 ): {|
-  byronPlate: PlateResponse,
+  byronPlate: void | PlateResponse,
   jormungandrPlate: void | PlateResponse,
 |} {
   const addressCount = mode === RestoreMode.PAPER
     ? NUMBER_OF_VERIFIED_ADDRESSES_PAPER
     : NUMBER_OF_VERIFIED_ADDRESSES;
 
-  const byronPlate = generateByronPlate(
-    rootPk,
-    accountIndex - HARD_DERIVATION_START, // show addresses for account #0
-    addressCount
-  );
+  const byronPlate = (isCardanoHaskell(network) || isJormungandr(network))
+    ? generateByronPlate(
+      rootPk,
+      accountIndex - HARD_DERIVATION_START, // show addresses for account #0
+      addressCount,
+      (() => {
+        if (network.BaseConfig[0].ByronNetworkId != null) {
+          return network.BaseConfig[0].ByronNetworkId;
+        }
+        throw new Error(`${nameof(generatePlates)} missing Byron network id`);
+      })()
+    )
+    : undefined;
   // TODO: we disable shelley restoration information for paper wallet restoration
   // this is because we've temporarily disabled paper wallet creation for Shelley
   // so no point in showing the Shelley checksum

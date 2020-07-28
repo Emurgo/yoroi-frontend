@@ -40,6 +40,16 @@ import {
   getTxOutputTotal,
 } from './JormungandrTxSignRequest';
 
+const linearFeeConfig = {
+  constant: '155381',
+  coefficient: '1',
+  certificate: '4',
+  per_certificate_fees: {
+    certificate_pool_registration: '5',
+    certificate_stake_delegation: '6',
+  },
+};
+
 const keys = [
   {
     legacyAddress: 'Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4',
@@ -136,7 +146,9 @@ describe('Create unsigned TX from UTXO', () => {
         amount: '5001', // smaller than input
       }],
       [],
-      utxos
+      utxos,
+      undefined,
+      linearFeeConfig,
     );
     expect(unsignedTxResponse.senderUtxos).toEqual(utxos);
     const inputSum = getTxInputTotal(unsignedTxResponse.IOs, false);
@@ -154,7 +166,9 @@ describe('Create unsigned TX from UTXO', () => {
         amount: '1900001', // bigger than input including fees
       }],
       [],
-      utxos
+      utxos,
+      undefined,
+      linearFeeConfig
     )).toThrow(NotEnoughMoneyToSendError);
   });
 
@@ -166,6 +180,8 @@ describe('Create unsigned TX from UTXO', () => {
       }],
       [],
       [],
+      undefined,
+      linearFeeConfig,
     )).toThrow(NotEnoughMoneyToSendError);
   });
 
@@ -178,6 +194,8 @@ describe('Create unsigned TX from UTXO', () => {
       }],
       [],
       utxos,
+      undefined,
+      linearFeeConfig,
     )).toThrow(NotEnoughMoneyToSendError);
   });
 
@@ -189,7 +207,9 @@ describe('Create unsigned TX from UTXO', () => {
         amount: '1001', // smaller than input
       }],
       [sampleAdaAddresses[0]],
-      utxos
+      utxos,
+      undefined,
+      linearFeeConfig
     );
     // input selection will only take 2 of the 3 inputs
     // it takes 2 inputs because input selection algorithm
@@ -211,6 +231,8 @@ describe('Create unsigned TX from addressed UTXOs', () => {
       }],
       [],
       [addressedUtxos[0], addressedUtxos[1]],
+      undefined,
+      linearFeeConfig,
     );
     expect(unsignedTxResponse.senderUtxos).toEqual([addressedUtxos[0], addressedUtxos[1]]);
     const inputSum = getTxInputTotal(unsignedTxResponse.IOs, false);
@@ -230,6 +252,8 @@ describe('Create signed transactions with legacy witness', () => {
       }],
       [],
       [addressedUtxos[0], addressedUtxos[1]],
+      undefined,
+      linearFeeConfig,
     );
     const accountPrivateKey = RustModule.WalletV3.Bip32PrivateKey.from_bytes(
       Buffer.from(
@@ -242,6 +266,8 @@ describe('Create signed transactions with legacy witness', () => {
       Bip44DerivationLevels.ACCOUNT.level,
       accountPrivateKey,
       true,
+      undefined,
+      'adbdd5ede31637f6c9bad5c271eec0bc3d0cb9efb86a5b913bb55cba549d0770',
     );
     const signedTx = fragment.get_transaction();
     const witnesses = signedTx.witnesses();
@@ -265,6 +291,8 @@ describe('Create signed transactions', () => {
       }],
       [],
       [addressedUtxos[0], addressedUtxos[1]],
+      undefined,
+      linearFeeConfig,
     );
 
     const accountPrivateKey = RustModule.WalletV3.Bip32PrivateKey.from_bytes(
@@ -278,6 +306,8 @@ describe('Create signed transactions', () => {
       Bip44DerivationLevels.ACCOUNT.level,
       accountPrivateKey,
       false,
+      undefined,
+      'adbdd5ede31637f6c9bad5c271eec0bc3d0cb9efb86a5b913bb55cba549d0770',
     );
     const signedTx = fragment.get_transaction();
     const witnesses = signedTx.witnesses();
@@ -322,6 +352,8 @@ describe('Create signed transactions', () => {
           }
         }
       ],
+      undefined,
+      linearFeeConfig,
     );
 
     const accountPrivateKey = RustModule.WalletV3.Bip32PrivateKey.from_bytes(
@@ -335,6 +367,8 @@ describe('Create signed transactions', () => {
       Bip44DerivationLevels.ACCOUNT.level,
       accountPrivateKey,
       false,
+      undefined,
+      'adbdd5ede31637f6c9bad5c271eec0bc3d0cb9efb86a5b913bb55cba549d0770',
     );
     const signedTx = fragment.get_transaction();
     const witnesses = signedTx.witnesses();
@@ -395,6 +429,7 @@ describe('Create signed transactions', () => {
         },
       }],
       certificate,
+      linearFeeConfig,
     );
 
     const fragment = signTransaction(
@@ -405,7 +440,8 @@ describe('Create signed transactions', () => {
       {
         stakingKey,
         certificate,
-      }
+      },
+      'adbdd5ede31637f6c9bad5c271eec0bc3d0cb9efb86a5b913bb55cba549d0770',
     );
     const signedTx = fragment.get_transaction();
 
@@ -474,6 +510,7 @@ describe('Create signed transactions', () => {
         },
       }],
       certificate,
+      linearFeeConfig,
     );
 
     const fragment = signTransaction(
@@ -484,7 +521,8 @@ describe('Create signed transactions', () => {
       {
         stakingKey,
         certificate,
-      }
+      },
+      'adbdd5ede31637f6c9bad5c271eec0bc3d0cb9efb86a5b913bb55cba549d0770',
     );
     const signedTx = fragment.get_transaction();
 
@@ -518,6 +556,8 @@ describe('Create sendAll unsigned TX from UTXO', () => {
     const sendAllResponse = sendAllUnsignedTxFromUtxo(
       keys[0].bechAddress,
       utxos,
+      undefined,
+      linearFeeConfig
     );
 
     expect(sendAllResponse.senderUtxos).toEqual([utxos[0], utxos[1]]);
@@ -532,6 +572,8 @@ describe('Create sendAll unsigned TX from UTXO', () => {
     expect(() => sendAllUnsignedTxFromUtxo(
       keys[0].bechAddress,
       [],
+      undefined,
+      linearFeeConfig,
     )).toThrow(NotEnoughMoneyToSendError);
   });
 
@@ -540,6 +582,8 @@ describe('Create sendAll unsigned TX from UTXO', () => {
     expect(() => sendAllUnsignedTxFromUtxo(
       keys[0].bechAddress,
       utxos,
+      undefined,
+      linearFeeConfig
     )).toThrow(NotEnoughMoneyToSendError);
   });
 
@@ -566,7 +610,8 @@ describe('Create sendAll unsigned TX from UTXO', () => {
         receiver: 'Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4',
         amount: '1',
       }],
-      undefined
+      undefined,
+      linearFeeConfig,
     );
     const inputSum = getTxInputTotal(unsignedTxResponse.IOs, false);
     const outputSum = getTxOutputTotal(unsignedTxResponse.IOs, false);
