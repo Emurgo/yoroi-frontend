@@ -25,11 +25,6 @@ import type { AddressKeyMap } from '../types';
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 import { getAdaCurrencyMeta } from '../../currencyInfo';
 
-import type { ConfigType } from '../../../../../config/config-types';
-
-declare var CONFIG : ConfigType;
-const protocolMagic = CONFIG.network.protocolMagic;
-
 /**
  * Generate transaction including all addresses with no change.
 */
@@ -37,6 +32,7 @@ export async function buildDaedalusTransferTx(payload: {|
   addressKeys: AddressKeyMap,
   senderUtxos: Array<RemoteUnspentOutput>,
   outputAddr: string,
+  byronNetworkMagic: number,
 |}): Promise<TransferTx> {
   try {
     const { addressKeys, senderUtxos, outputAddr } = payload;
@@ -60,6 +56,7 @@ export async function buildDaedalusTransferTx(payload: {|
       txBuilder.make_transaction(),
       addressKeys,
       senderUtxos,
+      payload.byronNetworkMagic,
     );
 
     const lovelacesPerAda = new BigNumber(10).pow(getAdaCurrencyMeta().decimalPlaces);
@@ -85,11 +82,12 @@ function signDaedalusTransaction(
   unsignedTx: RustModule.WalletV2.Transaction,
   addressKeys: AddressKeyMap,
   senderUtxos: Array<RemoteUnspentOutput>,
+  byronNetworkMagic: number,
 ): RustModule.WalletV2.SignedTransaction {
   const txFinalizer = new RustModule.WalletV2.TransactionFinalized(unsignedTx);
 
   const setting = RustModule.WalletV2.BlockchainSettings.from_json({
-    protocol_magic: protocolMagic
+    protocol_magic: byronNetworkMagic
   });
   for (let i = 0; i < senderUtxos.length; i++) {
     const witness = RustModule.WalletV2.Witness.new_extended_key(

@@ -15,6 +15,7 @@ export const generateByronPlate = (
   rootPk: RustModule.WalletV4.Bip32PrivateKey,
   accountIndex: number,
   count: number,
+  byronNetworkMagic: number,
 ): PlateResponse => {
   const accountKey = rootPk
     .derive(WalletTypePurpose.BIP44)
@@ -33,6 +34,7 @@ export const generateByronPlate = (
       ),
       RustModule.WalletV2.DerivationScheme.v2()
     ),
+    byronNetworkMagic
   );
   const addresses = generateAddressFunc([...Array(count).keys()]);
   return { addresses, accountPlate };

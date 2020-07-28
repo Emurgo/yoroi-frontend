@@ -19,8 +19,13 @@ import {
 import {
   loadLovefieldDB,
 } from '../../lib/storage/database/index';
+import {
+  networks,
+} from '../../lib/storage/database/prepackaged/networks';
 
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
+
+const network = networks.ByronMainnet;
 
 beforeAll(async () => {
   await RustModule.load();
@@ -70,10 +75,17 @@ describe('Byron era tx format tests', () => {
       amount: inputAmount
     };
 
+    const baseConfig = network.BaseConfig[0];
+    if (baseConfig.ByronNetworkId == null) {
+      throw new Error(`missing Byron network id`);
+    }
+    const { ByronNetworkId } = baseConfig;
+
     const transferInfo = await daedalusTransferTxFromAddresses({
       addressKeys: addressMap,
       getUTXOsForAddresses: (_addresses) => Promise.resolve([utxo]),
       outputAddr: outAddress,
+      byronNetworkMagic: ByronNetworkId,
     });
 
     expect(transferInfo.fee.toString()).toBe('0.165841');
@@ -122,10 +134,17 @@ describe('Byron era tx format tests', () => {
       amount: inputAmount
     };
 
+    const baseConfig = network.BaseConfig[0];
+    if (baseConfig.ByronNetworkId == null) {
+      throw new Error(`missing Byron network id`);
+    }
+    const { ByronNetworkId } = baseConfig;
+
     expect(daedalusTransferTxFromAddresses({
       addressKeys: addressMap,
       getUTXOsForAddresses: (_addresses) => Promise.resolve([utxo]),
       outputAddr: outAddress,
+      byronNetworkMagic: ByronNetworkId,
     })).rejects.toThrow(NotEnoughMoneyToSendError);
   });
 
@@ -156,10 +175,17 @@ describe('Byron era tx format tests', () => {
       });
     }
 
+    const baseConfig = network.BaseConfig[0];
+    if (baseConfig.ByronNetworkId == null) {
+      throw new Error(`missing Byron network id`);
+    }
+    const { ByronNetworkId } = baseConfig;
+
     const transferInfo = await daedalusTransferTxFromAddresses({
       addressKeys: addressMap,
       getUTXOsForAddresses: (_addresses) => Promise.resolve(utxo),
       outputAddr: outAddress,
+      byronNetworkMagic: ByronNetworkId,
     });
 
     expect(transferInfo.fee.toString()).toBe('0.956693');

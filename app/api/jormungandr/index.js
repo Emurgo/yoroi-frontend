@@ -132,6 +132,7 @@ import type {
 import { getApiForNetwork } from '../common/utils';
 import { CoreAddressTypes } from '../ada/lib/storage/database/primitives/enums';
 import { getJormungandrBaseConfig } from '../ada/lib/storage/database/prepackaged/networks';
+import type { NetworkRow } from '../ada/lib/storage/database/primitives/tables';
 
 // getAllAddressesForDisplay
 
@@ -267,6 +268,7 @@ export type RestoreWalletForTransferRequest = {|
   transferSource: TransferSourceType,
   accountIndex: number,
   checkAddressesInUse: FilterFunc,
+  network: $ReadOnly<NetworkRow>,
 |};
 export type RestoreWalletForTransferResponse = {|
   masterKey: string,
@@ -778,6 +780,10 @@ export default class JormungandrApi {
     Logger.debug(`${nameof(JormungandrApi)}::${nameof(this.restoreWalletForTransfer)} called`);
     const { rootPk, checkAddressesInUse } = request;
 
+    const config = getJormungandrBaseConfig(
+      request.network
+    ).reduce((acc, next) => Object.assign(acc, next), {});
+
     try {
       // need this to persist outside the scope of the hashToIds lambda
       // since the lambda is called multiple times
@@ -818,9 +824,11 @@ export default class JormungandrApi {
         insertTree = await scanBip44Account({
           generateInternalAddresses: v2genAddressBatchFunc(
             key.bip44_chain(false),
+            config.ByronNetworkId
           ),
           generateExternalAddresses: v2genAddressBatchFunc(
             key.bip44_chain(true),
+            config.ByronNetworkId
           ),
           lastUsedInternal: -1,
           lastUsedExternal: -1,

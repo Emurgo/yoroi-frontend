@@ -19,6 +19,7 @@ export async function yoroiTransferTxFromAddresses(payload: {|
   keyLevel: number,
   signingKey: RustModule.WalletV4.Bip32PrivateKey,
   getUTXOsForAddresses: AddressUtxoFunc,
+  byronNetworkMagic: number,
 |}): Promise<TransferTx> {
   const senderUtxos = await toSenderUtxos({
     addresses: payload.addresses,
@@ -29,5 +30,6 @@ export async function yoroiTransferTxFromAddresses(payload: {|
     keyLevel: payload.keyLevel,
     signingKey: payload.signingKey,
     senderUtxos,
+    byronNetworkMagic: payload.byronNetworkMagic,
   });
 }

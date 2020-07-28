@@ -27,7 +27,8 @@ import {
 } from '../storage/database/prepackaged/networks';
 
 declare var CONFIG: ConfigType;
-const protocolMagic = CONFIG.network.protocolMagic;
+
+const network = networks.ByronMainnet;
 
 beforeAll(async () => {
   await RustModule.load();
@@ -62,9 +63,13 @@ test('Batched history pagination', async (done) => {
     const pubKey = chainKey.address_key(
       RustModule.WalletV2.AddressKeyIndex.new(i)
     );
-    const addr = pubKey.bootstrap_era_address(RustModule.WalletV2.BlockchainSettings.from_json({
-      protocol_magic: protocolMagic
-    }));
+    if (network.BaseConfig[0].ByronNetworkId == null) {
+      throw new Error(`missing Byron network id`);
+    }
+    const settings = RustModule.WalletV2.BlockchainSettings.from_json({
+      protocol_magic: network.BaseConfig[0].ByronNetworkId,
+    });
+    const addr = pubKey.bootstrap_era_address(settings);
     const hex = addr.to_base58();
     addresses.push(hex);
   }
@@ -101,7 +106,7 @@ test('Batched history pagination', async (done) => {
   }
 
   const getTransactionsHistoryForAddresses = await batchGetTransactionsHistoryForAddresses(
-    genGetTransactionsHistoryForAddresses(transactions, networks.ByronMainnet)
+    genGetTransactionsHistoryForAddresses(transactions, network)
   );
   const result = await getTransactionsHistoryForAddresses({
     addresses,
@@ -120,9 +125,13 @@ test('Batched history edge case: full response with a pending transaction', asyn
     const pubKey = chainKey.address_key(
       RustModule.WalletV2.AddressKeyIndex.new(i)
     );
-    const addr = pubKey.bootstrap_era_address(RustModule.WalletV2.BlockchainSettings.from_json({
-      protocol_magic: protocolMagic
-    }));
+    if (network.BaseConfig[0].ByronNetworkId == null) {
+      throw new Error(`missing Byron network id`);
+    }
+    const settings = RustModule.WalletV2.BlockchainSettings.from_json({
+      protocol_magic: network.BaseConfig[0].ByronNetworkId,
+    });
+    const addr = pubKey.bootstrap_era_address(settings);
     const hex = addr.to_base58();
     addresses.push(hex);
   }
@@ -191,7 +200,7 @@ test('Batched history edge case: full response with a pending transaction', asyn
   }
 
   const getTransactionsHistoryForAddresses = await batchGetTransactionsHistoryForAddresses(
-    genGetTransactionsHistoryForAddresses(transactions, networks.ByronMainnet)
+    genGetTransactionsHistoryForAddresses(transactions, network)
   );
   const result = await getTransactionsHistoryForAddresses({
     addresses,

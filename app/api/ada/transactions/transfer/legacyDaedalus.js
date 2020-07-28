@@ -68,6 +68,7 @@ export async function daedalusTransferTxFromAddresses(payload: {|
   addressKeys: AddressKeyMap,
   outputAddr: string,
   getUTXOsForAddresses: AddressUtxoFunc,
+  byronNetworkMagic: number,
 |}): Promise<TransferTx> {
   const senderUtxos = await toSenderUtxos({
     addressKeys: payload.addressKeys,
@@ -77,5 +78,6 @@ export async function daedalusTransferTxFromAddresses(payload: {|
     outputAddr: payload.outputAddr,
     addressKeys: payload.addressKeys,
     senderUtxos,
+    byronNetworkMagic: payload.byronNetworkMagic,
   });
 }

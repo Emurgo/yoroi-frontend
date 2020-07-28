@@ -18,6 +18,7 @@ import type { RestoreWalletForTransferResponse, RestoreWalletForTransferFunc } f
 import {
   Bip44DerivationLevels,
 } from '../../api/ada/lib/storage/database/walletTypes/bip44/api/utils';
+import { getCardanoHaskellBaseConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 export default class AdaYoroiTransferStore extends Store {
 
@@ -31,12 +32,18 @@ export default class AdaYoroiTransferStore extends Store {
     const rootPk = this.stores.yoroiTransfer.transferKind === TransferKind.LEDGER
       ? generateLedgerWalletRootKey(recoveryPhrase)
       : generateWalletRootKey(recoveryPhrase);
+
+    if (this.stores.profile.selectedNetwork == null) {
+      throw new Error(`${nameof(AdaYoroiTransferStore)}::${nameof(this._restoreWalletForTransfer)} no network selected`);
+    }
+
     const stateFetcher = this.stores.substores.ada.stateFetchStore.fetcher;
     const restoreResult = await this.restoreForTransferRequest.execute({
       rootPk,
       accountIndex,
       checkAddressesInUse: stateFetcher.checkAddressesInUse,
       transferSource: this.stores.yoroiTransfer.transferSource,
+      network: this.stores.profile.selectedNetwork,
     }).promise;
     if (!restoreResult) throw new Error('Restored wallet was not received correctly');
     return restoreResult;
@@ -67,6 +74,14 @@ export default class AdaYoroiTransferStore extends Store {
       .derive(accountIndex);
 
     // 4) generate transaction
+
+    if (this.stores.profile.selectedNetwork == null) {
+      throw new Error(`${nameof(AdaYoroiTransferStore)}::${nameof(this._restoreWalletForTransfer)} no network selected`);
+    }
+    const config = getCardanoHaskellBaseConfig(
+      this.stores.profile.selectedNetwork
+    ).reduce((acc, next) => Object.assign(acc, next), {});
+
     const transferTx = await yoroiTransferTxFromAddresses({
       addresses,
       outputAddr: destinationAddress,
@@ -74,6 +89,7 @@ export default class AdaYoroiTransferStore extends Store {
       signingKey: accountKey,
       getUTXOsForAddresses:
         this.stores.substores.ada.stateFetchStore.fetcher.getUTXOsForAddresses,
+      byronNetworkMagic: config.ByronNetworkId,
     });
     // Possible exception: NotEnoughMoneyToSendError
     return transferTx;

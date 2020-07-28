@@ -36,7 +36,12 @@ export default class JormungandrYoroiTransferStore extends Store {
       ? generateLedgerWalletRootKey(recoveryPhrase)
       : generateWalletRootKey(recoveryPhrase);
     const stateFetcher = this.stores.substores.jormungandr.stateFetchStore.fetcher;
+
+    if (this.stores.profile.selectedNetwork == null) {
+      throw new Error(`${nameof(JormungandrYoroiTransferStore)}::${nameof(this.generateTransferTxFromMnemonic)} no network selected`);
+    }
     const restoreResult = await this.restoreForTransferRequest.execute({
+      network: this.stores.profile.selectedNetwork,
       rootPk: v4Bip32PrivateToV3(rootPk),
       accountIndex,
       checkAddressesInUse: stateFetcher.checkAddressesInUse,

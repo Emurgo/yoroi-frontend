@@ -13,7 +13,6 @@ import type { RemoteUnspentOutput, } from '../../lib/state-fetch/types';
 import {
   NotEnoughMoneyToSendError,
 } from '../../../common/errors';
-import type { ConfigType } from '../../../../../config/config-types';
 import { utxosToLookupMap, } from '../utils';
 import { coinToBigNumber } from './utils';
 
@@ -26,9 +25,6 @@ import type {
   Address, Value, Addressing,
   IGetAllUtxosResponse
 } from '../../lib/storage/models/PublicDeriver/interfaces';
-
-declare var CONFIG: ConfigType;
-const protocolMagic = CONFIG.network.protocolMagic;
 
 export function sendAllUnsignedTx(
   receiver: string,
@@ -235,7 +231,8 @@ function filterToUsedChange(
 export function signTransaction(
   signRequest: BaseSignRequest<RustModule.WalletV2.Transaction>,
   keyLevel: number,
-  signingKey: RustModule.WalletV2.PrivateKey
+  signingKey: RustModule.WalletV2.PrivateKey,
+  byronNetworkMagic: number,
 ): RustModule.WalletV2.SignedTransaction {
   const { senderUtxos, unsignedTx } = signRequest;
   const txFinalizer = new RustModule.WalletV2.TransactionFinalized(unsignedTx);
@@ -243,7 +240,8 @@ export function signTransaction(
     txFinalizer,
     senderUtxos,
     keyLevel,
-    signingKey
+    signingKey,
+    byronNetworkMagic,
   );
   const signedTx = txFinalizer.finalize();
   return signedTx;
@@ -323,16 +321,17 @@ function addWitnesses(
   txFinalizer: RustModule.WalletV2.TransactionFinalized,
   senderUtxos: Array<AddressedUtxo>,
   keyLevel: number,
-  signingKey: RustModule.WalletV2.PrivateKey
+  signingKey: RustModule.WalletV2.PrivateKey,
+  byronNetworkMagic: number,
 ): void {
   // get private keys
   const privateKeys = senderUtxos.map(utxo => {
     const lastLevelSpecified = utxo.addressing.startLevel + utxo.addressing.path.length - 1;
     if (lastLevelSpecified !== Bip44DerivationLevels.ADDRESS.level) {
-      throw new Error('addWitnesses incorrect addressing size');
+      throw new Error(`${nameof(addWitnesses)} incorrect addressing size`);
     }
     if (keyLevel + 1 < utxo.addressing.startLevel) {
-      throw new Error('addWitnesses keyLevel < startLevel');
+      throw new Error(`${nameof(addWitnesses)} keyLevel < startLevel`);
     }
     let key = signingKey;
     for (let i = keyLevel - utxo.addressing.startLevel + 1; i < utxo.addressing.path.length; i++) {
@@ -346,7 +345,7 @@ function addWitnesses(
 
   // sign the transactions
   const setting = RustModule.WalletV2.BlockchainSettings.from_json({
-    protocol_magic: protocolMagic
+    protocol_magic: byronNetworkMagic
   });
   for (let i = 0; i < senderUtxos.length; i++) {
     const witness = RustModule.WalletV2.Witness.new_extended_key(

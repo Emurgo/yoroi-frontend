@@ -122,7 +122,6 @@ export async function getAccountDefaultDerivations(
 
 export async function createStandardBip44Wallet(request: {|
   db: lf$Database,
-  settings: RustModule.WalletV2.BlockchainSettings,
   rootPk: RustModule.WalletV2.Bip44RootPrivateKey,
   password: string,
   accountIndex: number,
@@ -143,8 +142,15 @@ export async function createStandardBip44Wallet(request: {|
     RustModule.WalletV2.AccountIndex.new(request.accountIndex)
   ).public();
 
+  if (request.network.BaseConfig[0].ByronNetworkId == null) {
+    throw new Error(`${nameof(createStandardBip44Wallet)} missing Byron network id`);
+  }
+  const settings = RustModule.WalletV2.BlockchainSettings.from_json({
+    protocol_magic: request.network.BaseConfig[0].ByronNetworkId,
+  });
+
   const initialDerivations = await getAccountDefaultDerivations(
-    request.settings,
+    settings,
     accountPublicKey,
     rawGenAddByHash(new Set()),
   );

@@ -30,6 +30,7 @@ export async function buildYoroiTransferTx(payload: {|
   outputAddr: string,
   keyLevel: number,
   signingKey: RustModule.WalletV4.Bip32PrivateKey,
+  byronNetworkMagic: number,
 |}): Promise<TransferTx> {
   try {
     const { senderUtxos, outputAddr, } = payload;
@@ -59,8 +60,8 @@ export async function buildYoroiTransferTx(payload: {|
         certificate: undefined,
       },
       payload.keyLevel,
-      v4SecretToV2(payload.signingKey)
-      ,
+      v4SecretToV2(payload.signingKey),
+      payload.byronNetworkMagic,
     );
 
     const lovelacesPerAda = new BigNumber(10).pow(getAdaCurrencyMeta().decimalPlaces);

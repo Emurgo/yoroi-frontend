@@ -86,7 +86,6 @@ test('Can add and fetch address in wallet', async (done) => {
 
   const state = await createStandardBip44Wallet({
     db,
-    settings,
     rootPk,
     password: privateDeriverPassword,
     accountIndex: HARD_DERIVATION_START + 0,

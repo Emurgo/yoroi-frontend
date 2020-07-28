@@ -32,6 +32,7 @@ import {
   CoinTypes,
   WalletTypePurpose,
 } from '../../../../config/numbersConfig';
+import { networks } from '../../lib/storage/database/prepackaged/networks';
 
 const sampleUtxos: Array<RemoteUnspentOutput> = [
   {
@@ -206,10 +207,18 @@ describe('Create signed transactions', () => {
       ),
       RustModule.WalletV2.DerivationScheme.v2()
     );
+
+    const baseConfig = networks.ByronMainnet.BaseConfig[0];
+    if (baseConfig.ByronNetworkId == null) {
+      throw new Error(`missing Byron network id`);
+    }
+    const { ByronNetworkId } = baseConfig;
+
     const signedTx = signTransaction(
       signRequest,
       Bip44DerivationLevels.ACCOUNT.level,
       accountPrivateKey.key(),
+      ByronNetworkId,
     );
     const witnesses = signedTx.to_json().witness;
 
@@ -281,10 +290,17 @@ describe('Create signed transactions', () => {
       ),
       certificate: undefined,
     };
+
+    const baseConfig = networks.ByronMainnet.BaseConfig[0];
+    if (baseConfig.ByronNetworkId == null) {
+      throw new Error(`missing Byron network id`);
+    }
+    const { ByronNetworkId } = baseConfig;
     const signedTx = signTransaction(
       signRequest,
       Bip44DerivationLevels.ACCOUNT.level,
       accountPrivateKey.key(),
+      ByronNetworkId
     );
     const witnesses = signedTx.to_json().witness;
 

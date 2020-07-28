@@ -40,18 +40,11 @@ export async function setupBip44(
 ): Promise<PublicDeriver<>> {
   await RustModule.load();
 
-  if (network.BaseConfig[0].ByronNetworkId == null) {
-    throw new Error(`${nameof(setupBip44)} missing Byron network id`);
-  }
-  const settings = RustModule.WalletV2.BlockchainSettings.from_json({
-    protocol_magic: network.BaseConfig[0].ByronNetworkId,
-  });
   const entropy = RustModule.WalletV2.Entropy.from_english_mnemonics(walletMnemonic);
   const rootPk = RustModule.WalletV2.Bip44RootPrivateKey.recover(entropy, '');
 
   const state = await createStandardBip44Wallet({
     db,
-    settings,
     rootPk,
     password: privateDeriverPassword,
     accountIndex: HARD_DERIVATION_START + 0,

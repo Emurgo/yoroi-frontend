@@ -7,7 +7,7 @@ import {
   prepareAndBroadcastLedgerSignedTx,
   createTrezorSignTxPayload,
 } from './hwTransactions';
-
+import { networks } from '../../lib/storage/database/prepackaged/networks';
 
 beforeAll(async () => {
   await RustModule.load();
@@ -47,6 +47,12 @@ test('Create Trezor transaction', async () => {
     '1029eef5bb0f06979ab0b9530a62bac11e180797d08cab980fe39389d42b3657':
       '839f8200d81858248258202bddf3710ee44383a5a9f53aee9f3e27d1d8382537b8b21b30e6314c2897664b00ff9f8282d818582183581c02d2cf0eca7f55fdce2f4c51a307583f50eae31c052c934ae59bf704a0001a0a0584011a000f42408282d818582183581ca3f6cfcb530b5c1d148a07707baef7fea7d61217117903c4109694d2a0001a3dca8fd51a000a0a5cffa0',
   };
+
+  const baseConfig = networks.ByronMainnet.BaseConfig[0];
+  if (baseConfig.ByronNetworkId == null) {
+    throw new Error(`missing Byron network id`);
+  }
+  const { ByronNetworkId } = baseConfig;
   const response = await createTrezorSignTxPayload(
     {
       unsignedTx,
@@ -85,6 +91,7 @@ test('Create Trezor transaction', async () => {
       certificate: undefined,
     },
     async (_request) => txBodyMap,
+    ByronNetworkId
   );
   expect(response).toStrictEqual({
     inputs: [{

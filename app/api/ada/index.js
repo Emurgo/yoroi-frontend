@@ -21,7 +21,6 @@ import {
 } from '../../types/TransferTypes';
 import type {
   Network,
-  ConfigType,
 } from '../../../config/config-types';
 import {
   createStandardBip44Wallet, createHardwareWallet,
@@ -154,9 +153,9 @@ import type {
 import { getApiForNetwork } from '../common/utils';
 import { CoreAddressTypes } from './lib/storage/database/primitives/enums';
 import type { NetworkRow } from './lib/storage/database/primitives/tables';
-
-declare var CONFIG: ConfigType;
-const protocolMagic = CONFIG.network.protocolMagic;
+import {
+  getCardanoHaskellBaseConfig,
+} from './lib/storage/database/prepackaged/networks';
 
 // ADA specific Request / Response params
 
@@ -165,6 +164,7 @@ const protocolMagic = CONFIG.network.protocolMagic;
 export type CreateAdaPaperRequest = {|
   password: string,
   numAddresses?: number,
+  network: $ReadOnly<NetworkRow>,
 |};
 export type AdaPaper = {|
   addresses: Array<string>,
@@ -254,6 +254,7 @@ export type SignAndBroadcastFunc = (
 export type CreateTrezorSignTxDataRequest = {|
   signRequest: BaseSignRequest<RustModule.WalletV2.Transaction>,
   getTxsBodiesForUTXOs: TxBodiesFunc,
+  network: $ReadOnly<NetworkRow>,
 |};
 export type CreateTrezorSignTxDataResponse = {|
   // https://github.com/trezor/connect/blob/develop/docs/methods/cardanoSignTransaction.md
@@ -366,6 +367,7 @@ export type RestoreWalletForTransferRequest = {|
   transferSource: TransferSourceType,
   accountIndex: number,
   checkAddressesInUse: FilterFunc,
+  network: $ReadOnly<NetworkRow>,
 |};
 export type RestoreWalletForTransferResponse = {|
   masterKey: string,
@@ -418,10 +420,16 @@ export default class AdaApi {
       words.join(' '),
       request.password
     ).split(' ');
+
+    const config = getCardanoHaskellBaseConfig(
+      request.network
+    ).reduce((acc, next) => Object.assign(acc, next), {});
+
     const { addresses, accountPlate } = generateByronPlate(
       rootPk,
       0, // paper wallets always use account 0
       request.numAddresses != null ? request.numAddresses : DEFAULT_ADDRESSES_PER_PAPER,
+      config.ByronNetworkId
     );
     return { addresses, scrambledWords, accountPlate };
   }
@@ -649,6 +657,10 @@ export default class AdaApi {
     Logger.debug(`${nameof(AdaApi)}::${nameof(this.signAndBroadcast)} called`);
     const { password, signRequest } = request;
     try {
+      const config = getCardanoHaskellBaseConfig(
+        request.publicDeriver.getParent().getNetworkInfo()
+      ).reduce((acc, next) => Object.assign(acc, next), {});
+
       const signingKey = await request.publicDeriver.getSigningKey();
       const normalizedKey = await request.publicDeriver.normalizeKey({
         ...signingKey,
@@ -662,7 +674,8 @@ export default class AdaApi {
           unsignedTx,
         },
         request.publicDeriver.getParent().getPublicDeriverLevel(),
-        RustModule.WalletV2.PrivateKey.from_hex(normalizedKey.prvKeyHex)
+        RustModule.WalletV2.PrivateKey.from_hex(normalizedKey.prvKeyHex),
+        config.ByronNetworkId,
       );
 
       const response = request.sendTx({
@@ -690,11 +703,15 @@ export default class AdaApi {
   ): Promise<CreateTrezorSignTxDataResponse> {
     try {
       Logger.debug(`${nameof(AdaApi)}::${nameof(this.createTrezorSignTxData)} called`);
-      const { signRequest } = request;
+
+      const config = getCardanoHaskellBaseConfig(
+        request.network
+      ).reduce((acc, next) => Object.assign(acc, next), {});
 
       const trezorSignTxPayload = await createTrezorSignTxPayload(
-        signRequest,
+        request.signRequest,
         request.getTxsBodiesForUTXOs,
+        config.ByronNetworkId,
       );
       Logger.debug(`${nameof(AdaApi)}::${nameof(this.createTrezorSignTxData)} success: ` + stringifyData(trezorSignTxPayload));
 
@@ -924,9 +941,6 @@ export default class AdaApi {
 
       const wallet = await createStandardBip44Wallet({
         db: request.db,
-        settings: RustModule.WalletV2.BlockchainSettings.from_json({
-          protocol_magic: protocolMagic
-        }),
         rootPk: RustModule.WalletV2.Bip44RootPrivateKey.new(
           RustModule.WalletV2.PrivateKey.from_hex(
             Buffer.from(rootPk.as_bytes()).toString('hex')
@@ -982,6 +996,10 @@ export default class AdaApi {
     Logger.debug(`${nameof(AdaApi)}::${nameof(this.restoreWalletForTransfer)} called`);
     const { rootPk, checkAddressesInUse } = request;
 
+    const config = getCardanoHaskellBaseConfig(
+      request.network
+    ).reduce((acc, next) => Object.assign(acc, next), {});
+
     try {
       // need this to persist outside the scope of the hashToIds lambda
       // since the lambda is called multiple times
@@ -1022,9 +1040,11 @@ export default class AdaApi {
         insertTree = await scanBip44Account({
           generateInternalAddresses: v2genAddressBatchFunc(
             key.bip44_chain(false),
+            config.ByronNetworkId,
           ),
           generateExternalAddresses: v2genAddressBatchFunc(
             key.bip44_chain(true),
+            config.ByronNetworkId,
           ),
           lastUsedInternal: -1,
           lastUsedExternal: -1,
@@ -1087,10 +1107,14 @@ export default class AdaApi {
   ): Promise<CreateHardwareWalletResponse> {
     try {
       Logger.debug(`${nameof(AdaApi)}::${nameof(this.createHardwareWallet)} called`);
+      const config = getCardanoHaskellBaseConfig(
+        request.network
+      ).reduce((acc, next) => Object.assign(acc, next), {});
+
       const wallet = await createHardwareWallet({
         db: request.db,
         settings: RustModule.WalletV2.BlockchainSettings.from_json({
-          protocol_magic: protocolMagic
+          protocol_magic: config.ByronNetworkId
         }),
         accountPublicKey: RustModule.WalletV2.Bip44AccountPublic.new(
           RustModule.WalletV2.PublicKey.from_hex(request.publicKey),

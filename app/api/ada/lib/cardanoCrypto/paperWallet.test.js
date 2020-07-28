@@ -24,6 +24,7 @@ import {
   loadLovefieldDB,
 } from '../storage/database/index';
 import config from '../../../../config';
+import { networks } from '../storage/database/prepackaged/networks';
 
 const VALID_DD_PAPER = {
   words: 'fire shaft radar three ginger receive result phrase song staff scorpion food undo will have expire nice uncle dune until lift unlock exist step world slush disagree',
@@ -139,6 +140,12 @@ test('Unscramble Yoroi paper matches expected address', async () => {
     config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT,
     VALID_YOROI_PAPER.password
   );
+
+  const baseConfig = networks.ByronMainnet.BaseConfig[0];
+  if (baseConfig.ByronNetworkId == null) {
+    throw new Error(`missing Byron network id`);
+  }
+  const { ByronNetworkId } = baseConfig;
   expect(words).toBeTruthy();
   if (words != null) {
     const rootPk = generateWalletRootKey(words);
@@ -147,6 +154,7 @@ test('Unscramble Yoroi paper matches expected address', async () => {
       rootPk,
       0, // account index
       1, // address count
+      ByronNetworkId
     );
     expect(plate.addresses[0]).toEqual(VALID_YOROI_PAPER.byronAddress);
   }

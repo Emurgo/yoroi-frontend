@@ -76,6 +76,7 @@ export default class TrezorSendStore extends Store {
       this.createTrezorSignTxDataRequest.execute({
         ...request.params,
         getTxsBodiesForUTXOs: stateFetcher.getTxsBodiesForUTXOs,
+        network: request.publicDeriver.getParent().getNetworkInfo(),
       });
       if (!this.createTrezorSignTxDataRequest.promise) throw new Error('should never happen');
 
