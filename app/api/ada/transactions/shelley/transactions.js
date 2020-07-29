@@ -21,6 +21,7 @@ import {
 } from '../../lib/storage/database/walletTypes/bip44/api/utils';
 import type {
   Address, Addressing,
+  IGetAllUtxosResponse,
 } from '../../lib/storage/models/PublicDeriver/interfaces';
 import {
   getCardanoAddrKeyHash,
@@ -399,4 +400,20 @@ function addWitnesses(
   if (bootstrapWits.len() > 0) witSet.set_bootstraps(bootstrapWits);
   if (vkeyWits.len() > 0) witSet.set_vkeys(vkeyWits);
   return witSet;
+}
+
+// TODO: should go in a utility class somewhere instead of being copy-pasted in multiple places
+export function asAddressedUtxo(
+  utxos: IGetAllUtxosResponse,
+): Array<AddressedUtxo> {
+  return utxos.map(utxo => {
+    return {
+      amount: utxo.output.UtxoTransactionOutput.Amount,
+      receiver: utxo.address,
+      tx_hash: utxo.output.Transaction.Hash,
+      tx_index: utxo.output.UtxoTransactionOutput.OutputIndex,
+      utxo_id: utxo.output.Transaction.Hash + utxo.output.UtxoTransactionOutput.OutputIndex,
+      addressing: utxo.addressing,
+    };
+  });
 }

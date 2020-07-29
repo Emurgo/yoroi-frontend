@@ -1,5 +1,6 @@
 // @flow
 import { observable, } from 'mobx';
+import BigNumber from 'bignumber.js';
 import Store from '../base/Store';
 import Request from '../lib/LocalizedRequest';
 import type {
@@ -19,6 +20,9 @@ import {
   Bip44DerivationLevels,
 } from '../../api/ada/lib/storage/database/walletTypes/bip44/api/utils';
 import { getCardanoHaskellBaseConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import {
+  genTimeToSlot,
+} from '../../api/ada/lib/storage/bridge/timeUtils';
 
 export default class AdaYoroiTransferStore extends Store {
 
@@ -78,9 +82,13 @@ export default class AdaYoroiTransferStore extends Store {
     if (this.stores.profile.selectedNetwork == null) {
       throw new Error(`${nameof(AdaYoroiTransferStore)}::${nameof(this._restoreWalletForTransfer)} no network selected`);
     }
-    const config = getCardanoHaskellBaseConfig(
+    const fullConfig = getCardanoHaskellBaseConfig(
       this.stores.profile.selectedNetwork
-    ).reduce((acc, next) => Object.assign(acc, next), {});
+    );
+    const config = fullConfig.reduce((acc, next) => Object.assign(acc, next), {});
+
+    // note: no wallet selected so we call this directly
+    const toRelativeSlotNumber = await genTimeToSlot(fullConfig);
 
     const transferTx = await yoroiTransferTxFromAddresses({
       addresses,
@@ -89,7 +97,16 @@ export default class AdaYoroiTransferStore extends Store {
       signingKey: accountKey,
       getUTXOsForAddresses:
         this.stores.substores.ada.stateFetchStore.fetcher.getUTXOsForAddresses,
-      byronNetworkMagic: config.ByronNetworkId,
+      protocolParams: {
+        keyDeposit: RustModule.WalletV4.BigNum.from_str(config.KeyDeposit),
+        linearFee: RustModule.WalletV4.LinearFee.new(
+          RustModule.WalletV4.BigNum.from_str(config.LinearFee.coefficient),
+          RustModule.WalletV4.BigNum.from_str(config.LinearFee.constant),
+        ),
+        minimumUtxoVal: RustModule.WalletV4.BigNum.from_str(config.minimumUtxoVal),
+        poolDeposit: RustModule.WalletV4.BigNum.from_str(config.poolDeposit),
+      },
+      absSlotNumber: new BigNumber(toRelativeSlotNumber({ time: new Date() }).slot),
     });
     // Possible exception: NotEnoughMoneyToSendError
     return transferTx;

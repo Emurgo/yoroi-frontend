@@ -131,6 +131,38 @@ export function byronAddrToHex(
   ).to_bytes()).toString('hex');
 }
 
+export function normalizeToBase58(
+  addr: string
+): void | string {
+  // in Shelley, addresses can be base16, bech32 or base58
+  // this function normalizes everything to base58
+
+  // 1) If already base58, simply return
+  if (RustModule.WalletV2.Address.is_valid(addr)) {
+    return addr;
+  }
+
+  // 2) Try converting from base16
+  try {
+    const wasmAddr = RustModule.WalletV4.Address.from_bytes(
+      Buffer.from(addr, 'hex')
+    );
+    const byronAddr = RustModule.WalletV4.ByronAddress.from_address(wasmAddr);
+    if (byronAddr) return byronAddr.to_base58();
+    return undefined; // wrong address kind
+  } catch (_e) {} // eslint-disable-line no-empty
+
+  // 3) Try converting from base32
+  try {
+    const wasmAddr = RustModule.WalletV4.Address.from_bech32(addr);
+    const byronAddr = RustModule.WalletV4.ByronAddress.from_address(wasmAddr);
+    if (byronAddr) return byronAddr.to_base58();
+    return undefined; // wrong address kind
+  } catch (_e) {} // eslint-disable-line no-empty
+
+  return undefined;
+}
+
 export function isJormungandrAddress(
   kind: CoreAddressT
 ): boolean {

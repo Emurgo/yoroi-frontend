@@ -3,7 +3,6 @@
 // Create byron transactions for wallets created with the v1 address scheme
 
 import BigNumber from 'bignumber.js';
-import { coinToBigNumber, } from './utils';
 import {
   Logger,
   stringifyError,
@@ -14,7 +13,7 @@ import {
 import LocalizableError from '../../../../i18n/LocalizableError';
 import {
   sendAllUnsignedTxFromUtxo,
-} from './transactionsV2';
+} from '../shelley/transactions';
 import type {
   RemoteUnspentOutput
 } from '../../lib/state-fetch/types';
@@ -32,7 +31,13 @@ export async function buildDaedalusTransferTx(payload: {|
   addressKeys: AddressKeyMap,
   senderUtxos: Array<RemoteUnspentOutput>,
   outputAddr: string,
-  byronNetworkMagic: number,
+  absSlotNumber: BigNumber,
+  protocolParams: {|
+    keyDeposit: RustModule.WalletV4.BigNum,
+    linearFee: RustModule.WalletV4.LinearFee,
+    minimumUtxoVal: RustModule.WalletV4.BigNum,
+    poolDeposit: RustModule.WalletV4.BigNum,
+  |}
 |}): Promise<TransferTx> {
   try {
     const { addressKeys, senderUtxos, outputAddr } = payload;
@@ -45,18 +50,18 @@ export async function buildDaedalusTransferTx(payload: {|
       );
 
     // build tx
-    const txBuilder = sendAllUnsignedTxFromUtxo(
+    const unsignedTxResponse = sendAllUnsignedTxFromUtxo(
       outputAddr,
-      senderUtxos
-    ).txBuilder;
-    const fee = coinToBigNumber(txBuilder.get_balance_without_fees().value());
+      senderUtxos,
+      payload.absSlotNumber,
+      payload.protocolParams,
+    );
+    const fee = new BigNumber(unsignedTxResponse.txBuilder.get_fee_or_calc().to_str());
 
     // sign
     const signedTx = signDaedalusTransaction(
-      txBuilder.make_transaction(),
+      unsignedTxResponse.txBuilder.build(),
       addressKeys,
-      senderUtxos,
-      payload.byronNetworkMagic,
     );
 
     const lovelacesPerAda = new BigNumber(10).pow(getAdaCurrencyMeta().decimalPlaces);
@@ -64,13 +69,15 @@ export async function buildDaedalusTransferTx(payload: {|
     return {
       recoveredBalance: totalBalance.dividedBy(lovelacesPerAda),
       fee: fee.dividedBy(lovelacesPerAda),
-      id: signedTx.id(),
-      encodedTx: Buffer.from(signedTx.to_hex(), 'hex'),
-      senders: Object.keys(addressKeys),
+      id: Buffer.from(
+        RustModule.WalletV4.hash_transaction(signedTx.body()).to_bytes()
+      ).toString('hex'),
+      encodedTx: signedTx.to_bytes(),
+      senders: Object.keys(addressKeys), // recall: js keys are unique so need to dedupe
       receiver: outputAddr,
     };
   } catch (error) {
-    Logger.error(`daedalusTransfer::buildTransferTx ${stringifyError(error)}`);
+    Logger.error(`daedalusTransfer::${nameof(buildDaedalusTransferTx)} ${stringifyError(error)}`);
     if (error instanceof LocalizableError) {
       throw error;
     }
@@ -79,25 +86,31 @@ export async function buildDaedalusTransferTx(payload: {|
 }
 
 function signDaedalusTransaction(
-  unsignedTx: RustModule.WalletV2.Transaction,
+  unsignedTx: RustModule.WalletV4.TransactionBody,
   addressKeys: AddressKeyMap,
-  senderUtxos: Array<RemoteUnspentOutput>,
-  byronNetworkMagic: number,
-): RustModule.WalletV2.SignedTransaction {
-  const txFinalizer = new RustModule.WalletV2.TransactionFinalized(unsignedTx);
-
-  const setting = RustModule.WalletV2.BlockchainSettings.from_json({
-    protocol_magic: byronNetworkMagic
-  });
-  for (let i = 0; i < senderUtxos.length; i++) {
-    const witness = RustModule.WalletV2.Witness.new_extended_key(
-      setting,
-      addressKeys[senderUtxos[i].receiver],
-      txFinalizer.id()
+): RustModule.WalletV4.Transaction {
+  const txHash = RustModule.WalletV4.hash_transaction(unsignedTx);
+  const bootstrapWits = RustModule.WalletV4.BootstrapWitnesses.new();
+  // recall: we only need once signature per address
+  // since witnesses are a set in Shelley
+  // so we iterate over addressKeys which conveniently holds all unique addresses
+  for (const base58Addr of Object.keys(addressKeys)) {
+    const bootstrapWit = RustModule.WalletV4.make_daedalus_bootstrap_witness(
+      txHash,
+      RustModule.WalletV4.ByronAddress.from_base58(base58Addr),
+      RustModule.WalletV4.LegacyDaedalusPrivateKey.from_bytes(
+        Buffer.from(addressKeys[base58Addr].to_hex(), 'hex')
+      )
     );
-    txFinalizer.add_witness(witness);
+    bootstrapWits.add(bootstrapWit);
   }
 
-  const signedTx = txFinalizer.finalize();
-  return signedTx;
+  const witSet = RustModule.WalletV4.TransactionWitnessSet.new();
+  witSet.set_bootstraps(bootstrapWits);
+
+  return RustModule.WalletV4.Transaction.new(
+    unsignedTx,
+    witSet,
+    undefined,
+  );
 }

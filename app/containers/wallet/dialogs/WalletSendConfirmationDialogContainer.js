@@ -89,9 +89,8 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
           apiMeta.decimalPlaces.toNumber()
         )}
         onSubmit={async ({ password }) => {
-          const copyRequest = signRequest.copy();
           await sendMoney.trigger({
-            signRequest: copyRequest,
+            signRequest,
             password,
             publicDeriver,
           });

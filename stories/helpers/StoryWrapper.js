@@ -79,7 +79,7 @@ import BigNumber from 'bignumber.js';
 import { utxoToTxInput } from '../../app/api/jormungandr/lib/transactions/inputSelection';
 import { RustModule } from '../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import { networks, getJormungandrBaseConfig, isCardanoHaskell, isJormungandr } from '../../app/api/ada/lib/storage/database/prepackaged/networks';
-import { ByronTxSignRequest } from '../../app/api/ada/transactions/byron/ByronTxSignRequest';
+import { HaskellShelleyTxSignRequest } from '../../app/api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 import { JormungandrTxSignRequest } from '../../app/api/jormungandr/lib/transactions/JormungandrTxSignRequest';
 
 /**
@@ -709,7 +709,7 @@ export const genTentativeTx = (
       tx_index: 0,
       utxo_id: '6930f123df83e4178b0324ae617b2028c0b38c6ff4660583a2abf1f7b08195fe0',
     };
-    const unsignedTx = RustModule.WalletV2.Transaction.from_json({
+    const unsignedTx = RustModule.WalletV4.TransactionBuilder.from_json({
       inputs: [{
         id: remoteUnspentUtxo.tx_hash,
         index: remoteUnspentUtxo.tx_index
@@ -720,7 +720,7 @@ export const genTentativeTx = (
       }]
     });
     return {
-      tentativeTx: new ByronTxSignRequest({
+      tentativeTx: new HaskellShelleyTxSignRequest({
         senderUtxos: [{
           ...remoteUnspentUtxo,
           addressing: {

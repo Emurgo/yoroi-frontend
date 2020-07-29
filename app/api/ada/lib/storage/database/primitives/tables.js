@@ -40,6 +40,13 @@ export type CardanoHaskellShelleyBaseConfig = {|
   +SlotDuration: number,
   // based on https://staking.cardano.org/en/calculator/
   +PerEpochPercentageReward: number,
+  +LinearFee: {|
+    +coefficient: string,
+    +constant: string,
+  |};
+  +MinimumUtxoVal: string,
+  +PoolDeposit: string,
+  +KeyDeposit: string,
 |};
 export type CardanoHaskellBaseConfig = [
   $ReadOnly<CardanoHaskellByronBaseConfig>,

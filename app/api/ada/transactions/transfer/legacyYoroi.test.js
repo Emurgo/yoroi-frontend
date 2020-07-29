@@ -1,6 +1,7 @@
 // @flow
 
 import '../../lib/test-config';
+import BigNumber from 'bignumber.js';
 import { schema } from 'lovefield';
 import {
   yoroiTransferTxFromAddresses,
@@ -21,7 +22,7 @@ import {
 import {
   loadLovefieldDB,
 } from '../../lib/storage/database/index';
-import { networks } from '../../lib/storage/database/prepackaged/networks';
+import { networks, getCardanoHaskellBaseConfig } from '../../lib/storage/database/prepackaged/networks';
 
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 
@@ -30,6 +31,27 @@ beforeAll(async () => {
   await loadLovefieldDB(schema.DataStoreType.MEMORY);
   silenceLogsForTesting();
 });
+
+const network = networks.ByronMainnet;
+
+function getProtocolParams(): {|
+  keyDeposit: RustModule.WalletV4.BigNum,
+  linearFee: RustModule.WalletV4.LinearFee,
+  minimumUtxoVal: RustModule.WalletV4.BigNum,
+  poolDeposit: RustModule.WalletV4.BigNum,
+  |} {
+  const baseConfig = getCardanoHaskellBaseConfig(network)
+    .reduce((acc, next) => Object.assign(acc, next), {});
+  return {
+    keyDeposit: RustModule.WalletV4.BigNum.from_str(baseConfig.KeyDeposit),
+    linearFee: RustModule.WalletV4.LinearFee.new(
+      RustModule.WalletV4.BigNum.from_str(baseConfig.LinearFee.coefficient),
+      RustModule.WalletV4.BigNum.from_str(baseConfig.LinearFee.constant),
+    ),
+    minimumUtxoVal: RustModule.WalletV4.BigNum.from_str(baseConfig.minimumUtxoVal),
+    poolDeposit: RustModule.WalletV4.BigNum.from_str(baseConfig.poolDeposit),
+  };
+}
 
 function getByronAddress(
   accountKey: RustModule.WalletV4.Bip32PrivateKey,
@@ -43,7 +65,7 @@ function getByronAddress(
     Buffer.from(v3Key.as_bytes()).toString('hex')
   );
 
-  const baseConfig = networks.ByronMainnet.BaseConfig[0];
+  const baseConfig = network.BaseConfig[0];
   if (baseConfig.ByronNetworkId == null) {
     throw new Error(`missing Byron network id`);
   }
@@ -62,7 +84,7 @@ function getByronAddress(
   };
 }
 
-describe('Byron era tx format tests', () => {
+describe('Haskell Shelley era tx format tests', () => {
   test('Yoroi transfer from single small UTXO', async () => {
     const txId = '915f2e6865fb31cc93410efb6c0e580ca74862374b3da461e20135c01f312e7c';
     const inputAmount = '1000000';
@@ -98,7 +120,8 @@ describe('Byron era tx format tests', () => {
       keyLevel: Bip44DerivationLevels.ACCOUNT.level,
       signingKey: accountPrivateKey,
       outputAddr: outAddress,
-      byronNetworkMagic: baseConfig.ByronNetworkId,
+      absSlotNumber: new BigNumber(1),
+      protocolParams: getProtocolParams(),
     });
 
     expect(transferInfo.fee.toString()).toBe('0.165841');

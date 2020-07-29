@@ -69,11 +69,11 @@ import type {
   GetForeignAddressesRequest, GetForeignAddressesResponse,
 } from '../common/index';
 import {
-  sendAllUnsignedTx as byronSendAllUnsignedTx,
-  newAdaUnsignedTx as byronNewAdaUnsignedTx,
-  asAddressedUtxo as byronAsAddressedUtxo,
-  signTransaction as byronSignTransaction,
-} from './transactions/byron/transactionsV2';
+  sendAllUnsignedTx as shelleySendAllUnsignedTx,
+  newAdaUnsignedTx as shelleyNewAdaUnsignedTx,
+  asAddressedUtxo as shelleyAsAddressedUtxo,
+  signTransaction as shelleySignTransaction,
+} from './transactions/shelley/transactions';
 import {
   generateWalletRootKey,
   generateAdaMnemonic,
@@ -114,7 +114,7 @@ import { v2genAddressBatchFunc, } from './restoration/byron/scan';
 import type {
   BaseSignRequest,
 } from './transactions/types';
-import { ByronTxSignRequest, copySignRequest } from './transactions/byron/ByronTxSignRequest';
+import { HaskellShelleyTxSignRequest, } from './transactions/shelley/HaskellShelleyTxSignRequest';
 import type {
   SignTransactionResponse as LedgerSignTxResponse
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
@@ -240,7 +240,7 @@ export type GetNoticesFunc = (
 
 export type SignAndBroadcastRequest = {|
   publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetSigningKey,
-  signRequest: BaseSignRequest<RustModule.WalletV2.Transaction>,
+  signRequest: BaseSignRequest<RustModule.WalletV4.TransactionBody>,
   password: string,
   sendTx: SendFunc,
 |};
@@ -252,7 +252,7 @@ export type SignAndBroadcastFunc = (
 // createTrezorSignTxData
 
 export type CreateTrezorSignTxDataRequest = {|
-  signRequest: BaseSignRequest<RustModule.WalletV2.Transaction>,
+  signRequest: BaseSignRequest<RustModule.WalletV4.TransactionBody>,
   getTxsBodiesForUTXOs: TxBodiesFunc,
   network: $ReadOnly<NetworkRow>,
 |};
@@ -278,7 +278,7 @@ export type BroadcastTrezorSignedTxFunc = (
 // createLedgerSignTxData
 
 export type CreateLedgerSignTxDataRequest = {|
-  signRequest: BaseSignRequest<RustModule.WalletV2.Transaction>,
+  signRequest: BaseSignRequest<RustModule.WalletV4.TransactionBody>,
   getTxsBodiesForUTXOs: TxBodiesFunc,
 |};
 export type CreateLedgerSignTxDataResponse = {| ledgerSignTxPayload: LedgerSignTxPayload, |};
@@ -292,7 +292,7 @@ export type PrepareAndBroadcastLedgerSignedTxRequest = {|
   getPublicKey: () => Promise<IGetPublicResponse>,
   keyLevel: number,
   ledgerSignTxResp: LedgerSignTxResponse,
-  unsignedTx: RustModule.WalletV2.Transaction,
+  unsignedTx: RustModule.WalletV4.TransactionBody,
   sendTx: SendFunc,
 |};
 export type PrepareAndBroadcastLedgerSignedTxResponse = SignedResponse;
@@ -312,7 +312,7 @@ export type CreateUnsignedTxRequest = {|
     shouldSendAll: true,
   |}),
 |};
-export type CreateUnsignedTxResponse = ByronTxSignRequest;
+export type CreateUnsignedTxResponse = HaskellShelleyTxSignRequest;
 
 export type CreateUnsignedTxFunc = (
   request: CreateUnsignedTxRequest
@@ -657,25 +657,25 @@ export default class AdaApi {
     Logger.debug(`${nameof(AdaApi)}::${nameof(this.signAndBroadcast)} called`);
     const { password } = request;
     try {
-      const config = getCardanoHaskellBaseConfig(
-        request.publicDeriver.getParent().getNetworkInfo()
-      ).reduce((acc, next) => Object.assign(acc, next), {});
-
       const signingKey = await request.publicDeriver.getSigningKey();
       const normalizedKey = await request.publicDeriver.normalizeKey({
         ...signingKey,
         password,
       });
-      const signedTx = byronSignTransaction(
-        copySignRequest(request.signRequest),
+      const signedTx = shelleySignTransaction(
+        request.signRequest,
         request.publicDeriver.getParent().getPublicDeriverLevel(),
-        RustModule.WalletV2.PrivateKey.from_hex(normalizedKey.prvKeyHex),
-        config.ByronNetworkId,
+        RustModule.WalletV4.Bip32PrivateKey.from_bytes(
+          Buffer.from(normalizedKey.prvKeyHex, 'hex')
+        ),
+        undefined,
       );
 
       const response = request.sendTx({
-        id: signedTx.id(),
-        encodedTx: Buffer.from(signedTx.to_hex(), 'hex'),
+        id: Buffer.from(
+          RustModule.WalletV4.hash_transaction(signedTx.body()).to_bytes()
+        ).toString('hex'),
+        encodedTx: signedTx.to_bytes(),
       });
       Logger.debug(
         `${nameof(AdaApi)}::${nameof(this.signAndBroadcast)} success: ` + stringifyData(response)
@@ -818,11 +818,11 @@ export default class AdaApi {
       const utxos = await request.publicDeriver.getAllUtxos();
       const filteredUtxos = utxos.filter(utxo => request.filter(utxo));
 
-      const addressedUtxo = byronAsAddressedUtxo(filteredUtxos);
+      const addressedUtxo = shelleyAsAddressedUtxo(filteredUtxos);
 
       let unsignedTxResponse;
       if (request.shouldSendAll != null) {
-        unsignedTxResponse = byronSendAllUnsignedTx(
+        unsignedTxResponse = shelleySendAllUnsignedTx(
           receiver,
           addressedUtxo
         );
@@ -833,7 +833,7 @@ export default class AdaApi {
           throw new Error(`${nameof(this.createUnsignedTx)} no internal addresses left. Should never happen`);
         }
         const changeAddr = nextUnusedInternal.addressInfo;
-        unsignedTxResponse = byronNewAdaUnsignedTx(
+        unsignedTxResponse = shelleyNewAdaUnsignedTx(
           receiver,
           amount,
           [{
@@ -848,9 +848,9 @@ export default class AdaApi {
       Logger.debug(
         `${nameof(AdaApi)}::${nameof(this.createUnsignedTx)} success: ` + stringifyData(unsignedTxResponse)
       );
-      return new ByronTxSignRequest({
+      return new HaskellShelleyTxSignRequest({
         senderUtxos: unsignedTxResponse.senderUtxos,
-        unsignedTx: unsignedTxResponse.txBuilder.make_transaction(),
+        unsignedTx: unsignedTxResponse.txBuilder,
         changeAddr: unsignedTxResponse.changeAddr,
         certificate: undefined,
       });

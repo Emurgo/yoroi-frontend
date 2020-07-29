@@ -19,6 +19,8 @@ export const ErgoForks = Object.freeze({
   Primary: 0,
 });
 
+const isMC4 = true;
+
 export const networks = Object.freeze({
   ByronMainnet: ({
     NetworkId: 0,
@@ -27,16 +29,39 @@ export const networks = Object.freeze({
         StartAt: 0,
         ChainNetworkId: '1',
         ByronNetworkId: 764824073,
-        GenesisDate: '150620309100',
+        GenesisDate: isMC4
+          ? '1595682000000'
+          : '1506203091000',
         SlotsPerEpoch: 21600,
         SlotDuration: 20,
       }),
-      Object.freeze({
-        StartAt: 208,
-        SlotsPerEpoch: 432000,
-        SlotDuration: 1,
-        PerEpochPercentageReward: 69344,
-      })
+      isMC4 ?
+        Object.freeze({
+          StartAt: 1, // no idea if this is correct
+          SlotsPerEpoch: 21600,
+          SlotDuration: 1,
+          PerEpochPercentageReward: 69344,
+          LinearFee: {
+            coefficient: '44',
+            constant: '155381',
+          },
+          MinimumUtxoVal: '1000000',
+          PoolDeposit: '500000000',
+          KeyDeposit: '2000000',
+        })
+        : Object.freeze({
+          StartAt: 208,
+          SlotsPerEpoch: 432000,
+          SlotDuration: 1,
+          PerEpochPercentageReward: 69344,
+          LinearFee: {
+            coefficient: '44',
+            constant: '155381',
+          },
+          MinimumUtxoVal: '1000000',
+          PoolDeposit: '500000000',
+          KeyDeposit: '2000000',
+        })
     ]: CardanoHaskellBaseConfig),
     CoinType: CoinTypes.CARDANO,
     Fork: CardanoForks.Haskell,

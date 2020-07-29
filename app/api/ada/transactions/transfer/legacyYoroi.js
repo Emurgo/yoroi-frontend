@@ -1,5 +1,6 @@
 // @flow
 
+import BigNumber from 'bignumber.js';
 import type {
   AddressUtxoFunc,
 } from '../../lib/state-fetch/types';
@@ -19,7 +20,13 @@ export async function yoroiTransferTxFromAddresses(payload: {|
   keyLevel: number,
   signingKey: RustModule.WalletV4.Bip32PrivateKey,
   getUTXOsForAddresses: AddressUtxoFunc,
-  byronNetworkMagic: number,
+  absSlotNumber: BigNumber,
+  protocolParams: {|
+    keyDeposit: RustModule.WalletV4.BigNum,
+    linearFee: RustModule.WalletV4.LinearFee,
+    minimumUtxoVal: RustModule.WalletV4.BigNum,
+    poolDeposit: RustModule.WalletV4.BigNum,
+  |},
 |}): Promise<TransferTx> {
   const senderUtxos = await toSenderUtxos({
     addresses: payload.addresses,
@@ -30,6 +37,7 @@ export async function yoroiTransferTxFromAddresses(payload: {|
     keyLevel: payload.keyLevel,
     signingKey: payload.signingKey,
     senderUtxos,
-    byronNetworkMagic: payload.byronNetworkMagic,
+    protocolParams: payload.protocolParams,
+    absSlotNumber: payload.absSlotNumber,
   });
 }

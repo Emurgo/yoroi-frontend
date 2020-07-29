@@ -7,20 +7,35 @@ import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 import { getAdaCurrencyMeta } from '../../currencyInfo';
 
 export class HaskellShelleyTxSignRequest
-implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
+implements ISignRequest<RustModule.WalletV4.TransactionBody> {
 
-  signRequest: BaseSignRequest<RustModule.WalletV4.TransactionBuilder>;
+  signRequest: BaseSignRequest<RustModule.WalletV4.TransactionBody>;
+  poolDeposit: RustModule.WalletV4.BigNum;
+  keyDeposit: RustModule.WalletV4.BigNum;
 
-  constructor(signRequest: BaseSignRequest<RustModule.WalletV4.TransactionBuilder>) {
+  constructor(
+    signRequest: BaseSignRequest<RustModule.WalletV4.TransactionBody>,
+    poolDeposit: RustModule.WalletV4.BigNum,
+    keyDeposit: RustModule.WalletV4.BigNum,
+  ) {
     this.signRequest = signRequest;
+    this.poolDeposit = poolDeposit;
+    this.keyDeposit = keyDeposit;
   }
 
   totalInput(shift: boolean): BigNumber {
-    const inputTotal = this.signRequest.unsignedTx.get_implicit_input().checked_add(
-      this.signRequest.unsignedTx.get_explicit_input()
+    const inputTotal = this.signRequest.senderUtxos
+      .map(utxo => new BigNumber(utxo.amount))
+      .reduce((sum, val) => sum.plus(val), new BigNumber(0));
+
+    const result = inputTotal.plus(
+      RustModule.WalletV4.get_implicit_input(
+        this.signRequest.unsignedTx,
+        this.poolDeposit,
+        this.keyDeposit
+      ).to_str()
     );
 
-    const result = new BigNumber(inputTotal.to_str());
     if (shift) {
       return result.shiftedBy(-getAdaCurrencyMeta().decimalPlaces.toNumber());
     }
@@ -28,17 +43,20 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
   }
 
   totalOutput(shift: boolean): BigNumber {
-    const totalOutput = this.signRequest.unsignedTx.get_explicit_output();
-
-    const result = new BigNumber(totalOutput.to_str());
-    if (shift) {
-      return result.shiftedBy(-getAdaCurrencyMeta().decimalPlaces.toNumber());
+    let outputSum = new BigNumber(0);
+    const outputs = this.signRequest.unsignedTx.outputs();
+    for (let i = 0; i < outputs.len(); i++) {
+      outputSum = outputSum.plus(outputs.get(i).amount().to_str());
     }
-    return result;
+
+    if (shift) {
+      return outputSum.shiftedBy(-getAdaCurrencyMeta().decimalPlaces.toNumber());
+    }
+    return outputSum;
   }
 
   fee(shift: boolean): BigNumber {
-    const fee = this.signRequest.unsignedTx.get_fee_or_calc();
+    const fee = this.signRequest.unsignedTx.fee();
     const result = new BigNumber(fee.to_str());
 
     if (shift) {
@@ -48,7 +66,7 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
   }
 
   receivers(includeChange: boolean): Array<string> {
-    const outputs = this.signRequest.unsignedTx.build().outputs();
+    const outputs = this.signRequest.unsignedTx.outputs();
 
     const outputStrings = [];
     for (let i = 0; i < outputs.len(); i++) {
@@ -68,18 +86,9 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
     return Array.from(new Set(this.signRequest.senderUtxos.map(utxo => utxo.receiver)));
   }
 
-  copy(): HaskellShelleyTxSignRequest {
-    return new HaskellShelleyTxSignRequest({
-      changeAddr: this.signRequest.changeAddr,
-      senderUtxos: this.signRequest.senderUtxos,
-      unsignedTx: this.signRequest.unsignedTx,
-      certificate: undefined,
-    });
-  }
-
   isEqual(tx: ?(mixed| RustModule.WalletV4.TransactionBuilder)): boolean {
     if (tx == null) return false;
-    if (!(tx instanceof RustModule.WalletV4.TransactionBuilder)) {
+    if (!(tx instanceof RustModule.WalletV4.TransactionBody)) {
       return false;
     }
     return shelleyTxEqual(
@@ -88,14 +97,14 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
     );
   }
 
-  self(): BaseSignRequest<RustModule.WalletV4.TransactionBuilder> {
+  self(): BaseSignRequest<RustModule.WalletV4.TransactionBody> {
     return this.signRequest;
   }
 }
 
 export function shelleyTxEqual(
-  req1: RustModule.WalletV4.TransactionBuilder,
-  req2: RustModule.WalletV4.TransactionBuilder,
+  req1: RustModule.WalletV4.TransactionBody,
+  req2: RustModule.WalletV4.TransactionBody,
 ): boolean {
-  return Buffer.from(req1.build().to_bytes()).toString('hex') === Buffer.from(req2.build().to_bytes()).toString('hex');
+  return Buffer.from(req1.to_bytes()).toString('hex') === Buffer.from(req2.to_bytes()).toString('hex');
 }

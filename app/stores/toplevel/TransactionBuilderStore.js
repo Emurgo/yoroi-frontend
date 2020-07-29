@@ -285,7 +285,7 @@ export default class AdaTransactionBuilderStore extends Store {
      * To avoid the back button breaking the send page form, we clone the tx
      */
     return toJS( // drop mobx observable behavior
-      signRequest.copy()
+      signRequest
     );
   }
 

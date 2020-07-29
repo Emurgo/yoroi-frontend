@@ -1,6 +1,7 @@
 // @flow
 
 import { isEmpty } from 'lodash';
+import BigNumber from 'bignumber.js';
 import {
   Logger,
   stringifyError,
@@ -68,7 +69,13 @@ export async function daedalusTransferTxFromAddresses(payload: {|
   addressKeys: AddressKeyMap,
   outputAddr: string,
   getUTXOsForAddresses: AddressUtxoFunc,
-  byronNetworkMagic: number,
+  absSlotNumber: BigNumber,
+  protocolParams: {|
+    keyDeposit: RustModule.WalletV4.BigNum,
+    linearFee: RustModule.WalletV4.LinearFee,
+    minimumUtxoVal: RustModule.WalletV4.BigNum,
+    poolDeposit: RustModule.WalletV4.BigNum,
+  |}
 |}): Promise<TransferTx> {
   const senderUtxos = await toSenderUtxos({
     addressKeys: payload.addressKeys,
@@ -78,6 +85,7 @@ export async function daedalusTransferTxFromAddresses(payload: {|
     outputAddr: payload.outputAddr,
     addressKeys: payload.addressKeys,
     senderUtxos,
-    byronNetworkMagic: payload.byronNetworkMagic,
+    absSlotNumber: payload.absSlotNumber,
+    protocolParams: payload.protocolParams,
   });
 }

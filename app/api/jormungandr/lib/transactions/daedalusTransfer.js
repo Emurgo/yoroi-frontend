@@ -76,13 +76,13 @@ export async function buildDaedalusTransferTx(payload: {|
       id: Buffer.from(fragment.id().as_bytes()).toString('hex'),
       encodedTx: fragment.as_bytes(),
       // recall: Daedalus addresses all have to be legacy so we don't turn them to bech32
-      senders: Object.keys(addressKeys),
+      senders: Object.keys(addressKeys),  // recall: js keys are unique so need to dedupe
       receiver: RustModule.WalletV3.Address.from_bytes(
         Buffer.from(outputAddr, 'hex')
       ).to_string(Bech32Prefix.ADDRESS)
     };
   } catch (error) {
-    Logger.error(`daedalusTransfer::buildTransferTx ${stringifyError(error)}`);
+    Logger.error(`daedalusTransfer::${nameof(buildDaedalusTransferTx)} ${stringifyError(error)}`);
     if (error instanceof LocalizableError) {
       throw error;
     }

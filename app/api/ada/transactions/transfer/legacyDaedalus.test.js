@@ -1,6 +1,7 @@
 // @flow
 
 import '../../lib/test-config';
+import BigNumber from 'bignumber.js';
 import { schema } from 'lovefield';
 import {
   getCryptoDaedalusWalletFromMnemonics,
@@ -20,7 +21,7 @@ import {
   loadLovefieldDB,
 } from '../../lib/storage/database/index';
 import {
-  networks,
+  networks, getCardanoHaskellBaseConfig,
 } from '../../lib/storage/database/prepackaged/networks';
 
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
@@ -32,6 +33,25 @@ beforeAll(async () => {
   await loadLovefieldDB(schema.DataStoreType.MEMORY);
   silenceLogsForTesting();
 });
+
+function getProtocolParams(): {|
+  keyDeposit: RustModule.WalletV4.BigNum,
+  linearFee: RustModule.WalletV4.LinearFee,
+  minimumUtxoVal: RustModule.WalletV4.BigNum,
+  poolDeposit: RustModule.WalletV4.BigNum,
+  |} {
+  const baseConfig = getCardanoHaskellBaseConfig(network)
+    .reduce((acc, next) => Object.assign(acc, next), {});
+  return {
+    keyDeposit: RustModule.WalletV4.BigNum.from_str(baseConfig.KeyDeposit),
+    linearFee: RustModule.WalletV4.LinearFee.new(
+      RustModule.WalletV4.BigNum.from_str(baseConfig.LinearFee.coefficient),
+      RustModule.WalletV4.BigNum.from_str(baseConfig.LinearFee.constant),
+    ),
+    minimumUtxoVal: RustModule.WalletV4.BigNum.from_str(baseConfig.minimumUtxoVal),
+    poolDeposit: RustModule.WalletV4.BigNum.from_str(baseConfig.poolDeposit),
+  };
+}
 
 describe('Daedalus checker tests', () => {
   test('Daedalus transfer filters address not belonging to user', async () => {
@@ -75,17 +95,12 @@ describe('Byron era tx format tests', () => {
       amount: inputAmount
     };
 
-    const baseConfig = network.BaseConfig[0];
-    if (baseConfig.ByronNetworkId == null) {
-      throw new Error(`missing Byron network id`);
-    }
-    const { ByronNetworkId } = baseConfig;
-
     const transferInfo = await daedalusTransferTxFromAddresses({
       addressKeys: addressMap,
       getUTXOsForAddresses: (_addresses) => Promise.resolve([utxo]),
       outputAddr: outAddress,
-      byronNetworkMagic: ByronNetworkId,
+      absSlotNumber: new BigNumber(1),
+      protocolParams: getProtocolParams(),
     });
 
     expect(transferInfo.fee.toString()).toBe('0.165841');
@@ -134,17 +149,12 @@ describe('Byron era tx format tests', () => {
       amount: inputAmount
     };
 
-    const baseConfig = network.BaseConfig[0];
-    if (baseConfig.ByronNetworkId == null) {
-      throw new Error(`missing Byron network id`);
-    }
-    const { ByronNetworkId } = baseConfig;
-
     expect(daedalusTransferTxFromAddresses({
       addressKeys: addressMap,
       getUTXOsForAddresses: (_addresses) => Promise.resolve([utxo]),
       outputAddr: outAddress,
-      byronNetworkMagic: ByronNetworkId,
+      absSlotNumber: new BigNumber(1),
+      protocolParams: getProtocolParams(),
     })).rejects.toThrow(NotEnoughMoneyToSendError);
   });
 
@@ -175,17 +185,12 @@ describe('Byron era tx format tests', () => {
       });
     }
 
-    const baseConfig = network.BaseConfig[0];
-    if (baseConfig.ByronNetworkId == null) {
-      throw new Error(`missing Byron network id`);
-    }
-    const { ByronNetworkId } = baseConfig;
-
     const transferInfo = await daedalusTransferTxFromAddresses({
       addressKeys: addressMap,
       getUTXOsForAddresses: (_addresses) => Promise.resolve(utxo),
       outputAddr: outAddress,
-      byronNetworkMagic: ByronNetworkId,
+      absSlotNumber: new BigNumber(1),
+      protocolParams: getProtocolParams(),
     });
 
     expect(transferInfo.fee.toString()).toBe('0.956693');
