@@ -48,8 +48,8 @@ function getProtocolParams(): {|
       RustModule.WalletV4.BigNum.from_str(baseConfig.LinearFee.coefficient),
       RustModule.WalletV4.BigNum.from_str(baseConfig.LinearFee.constant),
     ),
-    minimumUtxoVal: RustModule.WalletV4.BigNum.from_str(baseConfig.minimumUtxoVal),
-    poolDeposit: RustModule.WalletV4.BigNum.from_str(baseConfig.poolDeposit),
+    minimumUtxoVal: RustModule.WalletV4.BigNum.from_str(baseConfig.MinimumUtxoVal),
+    poolDeposit: RustModule.WalletV4.BigNum.from_str(baseConfig.PoolDeposit),
   };
 }
 

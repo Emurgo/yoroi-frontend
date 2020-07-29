@@ -13,7 +13,7 @@ import {
   sendAllUnsignedTx,
   signTransaction,
 } from '../shelley/transactions';
-import type { AddressedUtxo } from '../types';
+import type { AddressedUtxo, BaseSignRequest } from '../types';
 import type {
   TransferTx
 } from '../../../../types/TransferTypes';
@@ -57,12 +57,12 @@ export async function buildYoroiTransferTx(payload: {|
 
     // sign inputs
     const signedTx = signTransaction(
-      {
+      ({
         senderUtxos: unsignedTxResponse.senderUtxos,
-        unsignedTx: unsignedTxResponse.txBuilder.build(),
+        unsignedTx: unsignedTxResponse.txBuilder,
         changeAddr: unsignedTxResponse.changeAddr,
         certificate: undefined,
-      },
+      }: BaseSignRequest<RustModule.WalletV4.TransactionBuilder>),
       payload.keyLevel,
       payload.signingKey,
       undefined,

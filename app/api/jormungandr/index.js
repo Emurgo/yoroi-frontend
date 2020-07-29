@@ -303,6 +303,7 @@ export default class JormungandrApi {
       return await getAllAddressesForDisplay(request);
     } catch (error) {
       Logger.error(`${nameof(JormungandrApi)}::${nameof(this.getAllAddressesForDisplay)} error: ` + stringifyError(error));
+      if (error instanceof LocalizableError) throw error;
       throw new GenericApiError();
     }
   }
@@ -319,6 +320,7 @@ export default class JormungandrApi {
       return await getChainAddressesForDisplay(request);
     } catch (error) {
       Logger.error(`${nameof(JormungandrApi)}::${nameof(this.getChainAddressesForDisplay)} error: ` + stringifyError(error));
+      if (error instanceof LocalizableError) throw error;
       throw new GenericApiError();
     }
   }
@@ -361,6 +363,7 @@ export default class JormungandrApi {
       };
     } catch (error) {
       Logger.error(`${nameof(JormungandrApi)}::${nameof(this.refreshTransactions)} error: ` + stringifyError(error));
+      if (error instanceof LocalizableError) throw error;
       throw new GenericApiError();
     }
   }
@@ -385,6 +388,7 @@ export default class JormungandrApi {
       return mappedTransactions;
     } catch (error) {
       Logger.error(`${nameof(JormungandrApi)}::${nameof(this.refreshPendingTransactions)} error: ` + stringifyError(error));
+      if (error instanceof LocalizableError) throw error;
       throw new GenericApiError();
     }
   }
@@ -404,6 +408,7 @@ export default class JormungandrApi {
       }
     } catch (error) {
       Logger.error(`${nameof(JormungandrApi)}::${nameof(this.removeAllTransactions)} error: ` + stringifyError(error));
+      if (error instanceof LocalizableError) throw error;
       throw new GenericApiError();
     }
   }
@@ -415,6 +420,7 @@ export default class JormungandrApi {
       return await getForeignAddresses({ publicDeriver: request.publicDeriver });
     } catch (error) {
       Logger.error(`${nameof(JormungandrApi)}::${nameof(this.getForeignAddresses)} error: ` + stringifyError(error));
+      if (error instanceof LocalizableError) throw error;
       throw new GenericApiError();
     }
   }
@@ -470,9 +476,7 @@ export default class JormungandrApi {
         throw new IncorrectWalletPasswordError();
       }
       Logger.error(`${nameof(JormungandrApi)}::${nameof(this.signAndBroadcast)} error: ` + stringifyError(error));
-      if (error instanceof InvalidWitnessError) {
-        throw new InvalidWitnessError();
-      }
+      if (error instanceof LocalizableError) throw error;
       throw new GenericApiError();
     }
   }
@@ -536,7 +540,7 @@ export default class JormungandrApi {
       Logger.error(
         `${nameof(JormungandrApi)}::${nameof(this.createUnsignedTx)} error: ` + stringifyError(error)
       );
-      if (error.id.includes('NotEnoughMoneyToSendError')) throw error;
+      if (error instanceof LocalizableError) throw error;
       throw new GenericApiError();
     }
   }
@@ -663,9 +667,7 @@ export default class JormungandrApi {
         throw new IncorrectWalletPasswordError();
       }
       Logger.error(`${nameof(JormungandrApi)}::${nameof(this.signAndBroadcastDelegationTx)} error: ` + stringifyError(error));
-      if (error instanceof InvalidWitnessError) {
-        throw new InvalidWitnessError();
-      }
+      if (error instanceof LocalizableError) throw error;
       throw new GenericApiError();
     }
   }
@@ -686,6 +688,7 @@ export default class JormungandrApi {
       });
     } catch (error) {
       Logger.error(`${nameof(JormungandrApi)}::${nameof(this.saveLastReceiveAddressIndex)} error: ` + stringifyError(error));
+      if (error instanceof LocalizableError) throw error;
       throw new GenericApiError();
     }
   }
@@ -708,6 +711,7 @@ export default class JormungandrApi {
       Logger.error(
         `${nameof(JormungandrApi)}::${nameof(this.generateWalletRecoveryPhrase)} error: ` + stringifyError(error)
       );
+      if (error instanceof LocalizableError) throw error;
       throw new GenericApiError();
     }
   }
@@ -761,13 +765,8 @@ export default class JormungandrApi {
       }
 
       // Refer: https://github.com/Emurgo/yoroi-frontend/pull/1055
-      if (error instanceof CheckAddressesInUseApiError) {
-        // CheckAddressesInUseApiError throw it as it is.
-        throw error;
-      } else {
-        // We don't know what the problem was so throw a generic error
-        throw new GenericApiError();
-      }
+      if (error instanceof LocalizableError) throw error;
+      throw new GenericApiError();
     }
   }
 
@@ -908,7 +907,7 @@ export default class JormungandrApi {
       if (error.message.includes('Wallet with that mnemonics already exists')) {
         throw new WalletAlreadyRestoredError();
       }
-      // We don't know what the problem was -> throw generic error
+      if (error instanceof LocalizableError) throw error;
       throw new GenericApiError();
     }
   }
@@ -927,13 +926,8 @@ export default class JormungandrApi {
     } catch (error) {
       Logger.error(`${nameof(JormungandrApi)}::${nameof(this.getTransactionRowsToExport)}: ` + stringifyError(error));
 
-      if (error instanceof LocalizableError) {
-        // we found it as a LocalizableError, so could throw it as it is.
-        throw error;
-      } else {
-        // We don't know what the problem was so throw a generic error
-        throw new GenericApiError();
-      }
+      if (error instanceof LocalizableError) throw error;
+      throw new GenericApiError();
     }
   }
 

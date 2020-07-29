@@ -15,6 +15,10 @@ import {
 import type {
   IGetAllUtxosResponse, IHasUtxoChains,
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
+import { getCardanoHaskellBaseConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import {
+  genTimeToSlot,
+} from '../../api/ada/lib/storage/bridge/timeUtils';
 
 export type SetupSelfTxRequest = {|
   publicDeriver: IHasUtxoChains,
@@ -50,6 +54,7 @@ export default class AdaTransactionBuilderStore extends Store {
 
   @observable memo: void | string;
 
+  // TODO: This should not be ADA-specific
   @observable setupSelfTx: LocalizedRequest<SetupSelfTxFunc>
     = new LocalizedRequest<SetupSelfTxFunc>(this._setupSelfTx);
 
@@ -191,12 +196,18 @@ export default class AdaTransactionBuilderStore extends Store {
     if (withHasUtxoChains == null) {
       throw new Error(`${nameof(this._updateTxBuilder)} missing chains functionality`);
     }
+
+    const fullConfig = getCardanoHaskellBaseConfig(
+      withHasUtxoChains.getParent().getNetworkInfo(),
+    );
+    const toRelativeSlotNumber = await genTimeToSlot(fullConfig);
     if (amount == null && shouldSendAll === true) {
       await this.createUnsignedTx.execute({
         publicDeriver: withHasUtxoChains,
         receiver,
         shouldSendAll,
         filter: this.filter,
+        absSlotNumber: new BigNumber(toRelativeSlotNumber({ time: new Date() }).slot),
       });
     } else if (amount != null) {
       await this.createUnsignedTx.execute({
@@ -204,6 +215,7 @@ export default class AdaTransactionBuilderStore extends Store {
         receiver,
         amount,
         filter: this.filter,
+        absSlotNumber: new BigNumber(toRelativeSlotNumber({ time: new Date() }).slot),
       });
     }
   }

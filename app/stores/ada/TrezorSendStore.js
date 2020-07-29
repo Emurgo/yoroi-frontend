@@ -24,6 +24,7 @@ import {
 import LocalizableError from '../../i18n/LocalizableError';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import { ROUTES } from '../../routes-config';
+import { HardwareUnsupportedError } from '../../api/common/errors';
 
 /** Note: Handles Trezor Signing */
 export default class TrezorSendStore extends Store {
@@ -71,30 +72,32 @@ export default class TrezorSendStore extends Store {
       this._setError(null);
       this._setActionProcessing(true);
 
-      const stateFetcher = this.stores.substores.ada.stateFetchStore.fetcher;
+      throw new HardwareUnsupportedError();
 
-      this.createTrezorSignTxDataRequest.execute({
-        ...request.params,
-        getTxsBodiesForUTXOs: stateFetcher.getTxsBodiesForUTXOs,
-        network: request.publicDeriver.getParent().getNetworkInfo(),
-      });
-      if (!this.createTrezorSignTxDataRequest.promise) throw new Error('should never happen');
+      // const stateFetcher = this.stores.substores.ada.stateFetchStore.fetcher;
 
-      const trezorSignTxDataResp = await this.createTrezorSignTxDataRequest.promise;
+      // this.createTrezorSignTxDataRequest.execute({
+      //   ...request.params,
+      //   getTxsBodiesForUTXOs: stateFetcher.getTxsBodiesForUTXOs,
+      //   network: request.publicDeriver.getParent().getNetworkInfo(),
+      // });
+      // if (!this.createTrezorSignTxDataRequest.promise) throw new Error('should never happen');
 
-      const trezorSignTxResp = await wrapWithFrame(trezor => trezor.cardanoSignTransaction(
-        { ...trezorSignTxDataResp.trezorSignTxPayload }
-      ));
+      // const trezorSignTxDataResp = await this.createTrezorSignTxDataRequest.promise;
 
-      if (trezorSignTxResp && trezorSignTxResp.payload && trezorSignTxResp.payload.error != null) {
-        // this Error will be converted to LocalizableError()
-        throw new Error(trezorSignTxResp.payload.error);
-      }
+      // const trezorSignTxResp = await wrapWithFrame(trezor => trezor.cardanoSignTransaction(
+      //   { ...trezorSignTxDataResp.trezorSignTxPayload }
+      // ));
 
-      await this._brodcastSignedTx(
-        trezorSignTxResp,
-        request.publicDeriver
-      );
+      // if (trezorSignTxResp && trezorSignTxResp.payload && trezorSignTxResp.payload.error != null) {
+      //   // this Error will be converted to LocalizableError()
+      //   throw new Error(trezorSignTxResp.payload.error);
+      // }
+
+      // await this._brodcastSignedTx(
+      //   trezorSignTxResp,
+      //   request.publicDeriver
+      // );
 
     } catch (error) {
       Logger.error(`${nameof(TrezorSendStore)}::${nameof(this._sendUsingTrezor)} error: ` + stringifyError(error));

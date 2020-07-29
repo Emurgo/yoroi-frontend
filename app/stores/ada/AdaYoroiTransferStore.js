@@ -103,8 +103,8 @@ export default class AdaYoroiTransferStore extends Store {
           RustModule.WalletV4.BigNum.from_str(config.LinearFee.coefficient),
           RustModule.WalletV4.BigNum.from_str(config.LinearFee.constant),
         ),
-        minimumUtxoVal: RustModule.WalletV4.BigNum.from_str(config.minimumUtxoVal),
-        poolDeposit: RustModule.WalletV4.BigNum.from_str(config.poolDeposit),
+        minimumUtxoVal: RustModule.WalletV4.BigNum.from_str(config.MinimumUtxoVal),
+        poolDeposit: RustModule.WalletV4.BigNum.from_str(config.PoolDeposit),
       },
       absSlotNumber: new BigNumber(toRelativeSlotNumber({ time: new Date() }).slot),
     });

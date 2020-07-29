@@ -163,6 +163,32 @@ export function normalizeToBase58(
   return undefined;
 }
 
+export function normalizeToAddress(
+  addr: string
+): void | RustModule.WalletV4.Address {
+  // in Shelley, addresses can be base16, bech32 or base58
+  // this function, we try parsing in all encodings possible
+
+  // 1) Try converting from base58
+  if (RustModule.WalletV2.Address.is_valid(addr)) {
+    return RustModule.WalletV4.ByronAddress.from_base58(addr).to_address();
+  }
+
+  // 2) If already base16, simply return
+  try {
+    return RustModule.WalletV4.Address.from_bytes(
+      Buffer.from(addr, 'hex')
+    );
+  } catch (_e) {} // eslint-disable-line no-empty
+
+  // 3) Try converting from base32
+  try {
+    return RustModule.WalletV4.Address.from_bech32(addr);
+  } catch (_e) {} // eslint-disable-line no-empty
+
+  return undefined;
+}
+
 export function isJormungandrAddress(
   kind: CoreAddressT
 ): boolean {
@@ -204,33 +230,30 @@ export function isCardanoHaskellAddress(
 }
 
 export function getCardanoAddrKeyHash(
-  addr: string | RustModule.WalletV4.Address,
+  addr: RustModule.WalletV4.Address,
 ): (
   // null -> legacy address (no key hash)
   // undefined -> script hash instead of key hash
   RustModule.WalletV4.Ed25519KeyHash | null | void
 ) {
-  const wasmAddr = typeof addr === 'string'
-    ? RustModule.WalletV4.Address.from_bytes(Buffer.from(addr, 'hex'))
-    : addr;
   {
-    const byronAddr = RustModule.WalletV4.ByronAddress.from_address(wasmAddr);
+    const byronAddr = RustModule.WalletV4.ByronAddress.from_address(addr);
     if (byronAddr) return null;
   }
   {
-    const baseAddr = RustModule.WalletV4.BaseAddress.from_address(wasmAddr);
+    const baseAddr = RustModule.WalletV4.BaseAddress.from_address(addr);
     if (baseAddr) return baseAddr.payment_cred().to_keyhash();
   }
   {
-    const ptrAddr = RustModule.WalletV4.PointerAddress.from_address(wasmAddr);
+    const ptrAddr = RustModule.WalletV4.PointerAddress.from_address(addr);
     if (ptrAddr) return ptrAddr.payment_cred().to_keyhash();
   }
   {
-    const enterpriseAddr = RustModule.WalletV4.EnterpriseAddress.from_address(wasmAddr);
+    const enterpriseAddr = RustModule.WalletV4.EnterpriseAddress.from_address(addr);
     if (enterpriseAddr) return enterpriseAddr.payment_cred().to_keyhash();
   }
   {
-    const rewardAddr = RustModule.WalletV4.RewardAddress.from_address(wasmAddr);
+    const rewardAddr = RustModule.WalletV4.RewardAddress.from_address(addr);
     if (rewardAddr) return rewardAddr.payment_cred().to_keyhash();
   }
   throw new Error(`${nameof(getCardanoAddrKeyHash)} unknown address type`);

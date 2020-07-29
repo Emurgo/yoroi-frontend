@@ -41,6 +41,7 @@ import {
 } from '../../utils/hwConnectHandler';
 import { ROUTES } from '../../routes-config';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
+import { HardwareUnsupportedError } from '../../api/common/errors';
 
 /** Note: Handles Ledger Signing */
 export default class LedgerSendStore extends Store {
@@ -105,33 +106,35 @@ export default class LedgerSendStore extends Store {
       this._setError(null);
       this._setActionProcessing(true);
 
-      const stateFetcher = this.stores.substores.ada.stateFetchStore.fetcher;
-      this.createLedgerSignTxDataRequest.execute({
-        ...request.params,
-        getTxsBodiesForUTXOs: stateFetcher.getTxsBodiesForUTXOs,
-      });
-      if (!this.createLedgerSignTxDataRequest.promise) throw new Error('should never happen');
-      const ledgerSignTxDataResp = await this.createLedgerSignTxDataRequest.promise;
+      throw new HardwareUnsupportedError();
 
-      await prepareLedgerConnect(ledgerConnect);
+      // const stateFetcher = this.stores.substores.ada.stateFetchStore.fetcher;
+      // this.createLedgerSignTxDataRequest.execute({
+      //   ...request.params,
+      //   getTxsBodiesForUTXOs: stateFetcher.getTxsBodiesForUTXOs,
+      // });
+      // if (!this.createLedgerSignTxDataRequest.promise) throw new Error('should never happen');
+      // const ledgerSignTxDataResp = await this.createLedgerSignTxDataRequest.promise;
 
-      const ledgerSignTxResp: LedgerSignTxResponse =
-        await ledgerConnect.signTransaction(
-          ledgerSignTxDataResp.ledgerSignTxPayload.inputs,
-          ledgerSignTxDataResp.ledgerSignTxPayload.outputs,
-        );
+      // await prepareLedgerConnect(ledgerConnect);
 
-      // There is no need of ledgerConnect after this line.
-      // UI was getting blocked for few seconds
-      // because _prepareAndBroadcastSignedTx takes time.
-      // Disposing here will fix the UI issue.
-      ledgerConnect.dispose();
+      // const ledgerSignTxResp: LedgerSignTxResponse =
+      //   await ledgerConnect.signTransaction(
+      //     ledgerSignTxDataResp.ledgerSignTxPayload.inputs,
+      //     ledgerSignTxDataResp.ledgerSignTxPayload.outputs,
+      //   );
 
-      await this._prepareAndBroadcastSignedTx(
-        ledgerSignTxResp,
-        request.params.signRequest.unsignedTx,
-        request.publicDeriver,
-      );
+      // // There is no need of ledgerConnect after this line.
+      // // UI was getting blocked for few seconds
+      // // because _prepareAndBroadcastSignedTx takes time.
+      // // Disposing here will fix the UI issue.
+      // ledgerConnect.dispose();
+
+      // await this._prepareAndBroadcastSignedTx(
+      //   ledgerSignTxResp,
+      //   request.params.signRequest.unsignedTx,
+      //   request.publicDeriver,
+      // );
     } catch (error) {
       this._setError(convertToLocalizableError(error));
     } finally {

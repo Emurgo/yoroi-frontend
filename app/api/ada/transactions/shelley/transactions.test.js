@@ -5,6 +5,7 @@ import { schema } from 'lovefield';
 import BigNumber from 'bignumber.js';
 import type {
   AddressedUtxo,
+  BaseSignRequest,
 } from '../types';
 import type { RemoteUnspentOutput } from '../../lib/state-fetch/types';
 import {
@@ -37,32 +38,6 @@ import {
   WalletTypePurpose,
 } from '../../../../config/numbersConfig';
 
-function sumAddressedInputs(
-  inputs: $ReadOnlyArray<AddressedUtxo>
-): BigNumber {
-  return inputs.reduce(
-    (acc, next) => acc.plus(next.amount),
-    new BigNumber(0),
-  );
-}
-function sumInputs(
-  inputs: $ReadOnlyArray<$ReadOnly<RemoteUnspentOutput>>
-): BigNumber {
-  return inputs.reduce(
-    (acc, next) => acc.plus(next.amount),
-    new BigNumber(0),
-  );
-}
-function sumOutput(
-  txBody: RustModule.WalletV4.TransactionBody,
-): BigNumber {
-  let outputSum = new BigNumber(0);
-  const outputs = txBody.outputs();
-  for (let i = 0; i < outputs.len(); i++) {
-    outputSum = outputSum.plus(outputs.get(i).amount().to_str());
-  }
-  return outputSum;
-}
 const genSampleUtxos: void => Array<RemoteUnspentOutput> = () => [
   {
     amount: '701',
@@ -199,8 +174,9 @@ describe('Create unsigned TX from UTXO', () => {
     // input selection will only take 2 of the 3 inputs
     // it takes 2 inputs because input selection algorithm
     expect(unsignedTxResponse.senderUtxos).toEqual([utxos[0], utxos[1]]);
-    expect(sumOutput(unsignedTxResponse.txBuilder).toString()).toEqual('999528');
-    expect(unsignedTxResponse.txBuilder.fee().to_str()).toEqual('1154');
+    expect(unsignedTxResponse.txBuilder.get_explicit_input().to_str()).toEqual('1000702');
+    expect(unsignedTxResponse.txBuilder.get_explicit_output().to_str()).toEqual('999528');
+    expect(unsignedTxResponse.txBuilder.estimate_fee().to_str()).toEqual('1154');
   });
 });
 
@@ -217,13 +193,14 @@ describe('Create unsigned TX from addresses', () => {
     );
     expect(unsignedTxResponse.senderUtxos).toEqual([addressedUtxos[0], addressedUtxos[1]]);
 
-    expect(sumOutput(unsignedTxResponse.txBuilder).toString()).toEqual('5001');
-    expect(unsignedTxResponse.txBuilder.fee().to_str()).toEqual('1052');
+    expect(unsignedTxResponse.txBuilder.get_explicit_input().to_str()).toEqual('1000702');
+    expect(unsignedTxResponse.txBuilder.get_explicit_output().to_str()).toEqual('5001');
+    expect(unsignedTxResponse.txBuilder.estimate_fee().to_str()).toEqual('1052');
     // burns remaining amount
     expect(
-      sumAddressedInputs(unsignedTxResponse.senderUtxos).minus(
-        sumOutput(unsignedTxResponse.txBuilder)
-      ).toString()
+      unsignedTxResponse.txBuilder.get_explicit_input().checked_sub(
+        unsignedTxResponse.txBuilder.get_explicit_output()
+      ).to_str()
     ).toEqual('995701');
   });
 });
@@ -239,7 +216,7 @@ describe('Create signed transactions', () => {
       new BigNumber(0),
       getProtocolParams(),
     );
-    const signRequest = {
+    const signRequest: BaseSignRequest<RustModule.WalletV4.TransactionBuilder> = {
       changeAddr: unsignedTxResponse.changeAddr,
       senderUtxos: unsignedTxResponse.senderUtxos,
       unsignedTx: unsignedTxResponse.txBuilder,
@@ -304,7 +281,7 @@ describe('Create signed transactions', () => {
       RustModule.WalletV4.BigNum.from_str('1000'),
       0,
     );
-    const signRequest = {
+    const signRequest: BaseSignRequest<RustModule.WalletV4.TransactionBody> = {
       changeAddr: [],
       senderUtxos: [
         {
@@ -366,13 +343,14 @@ describe('Create sendAll unsigned TX from UTXO', () => {
       );
 
       expect(sendAllResponse.senderUtxos).toEqual([utxos[0], utxos[1]]);
-      expect(sumOutput(sendAllResponse.txBuilder).toString()).toEqual('10998652');
-      expect(sendAllResponse.txBuilder.fee().to_str()).toEqual('1330');
+      expect(sendAllResponse.txBuilder.get_explicit_input().to_str()).toEqual('11000002');
+      expect(sendAllResponse.txBuilder.get_explicit_output().to_str()).toEqual('10998652');
+      expect(sendAllResponse.txBuilder.estimate_fee().to_str()).toEqual('1330');
       // make sure we don't accidentally burn a lot of coins
       expect(
-        sumInputs(sendAllResponse.senderUtxos).minus(
-          sumOutput(sendAllResponse.txBuilder)
-        ).toString()
+        sendAllResponse.txBuilder.get_explicit_input().checked_sub(
+          sendAllResponse.txBuilder.get_explicit_output()
+        ).to_str()
       ).toEqual('1350');
     });
   });
