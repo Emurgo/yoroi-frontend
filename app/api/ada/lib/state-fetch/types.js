@@ -63,7 +63,7 @@ export type SendFunc = (body: SignedRequest) => Promise<SignedResponse>;
 export type RemoteTxState = 'Successful' | 'Failed' | 'Pending';
 
 export type RemoteTransactionShelley = {|
-  +ttl: string,
+  +ttl?: string,
   +fee: string,
   +certificates: Array<RemoteCertificate>,
   +withdrawals: Array<RemoteWithdrawal>,
@@ -78,8 +78,8 @@ export type RemoteTransactionBase = {|
   +outputs: Array<RemoteTransactionOutput>,
 |};
 type RemoteTransactionTypeT = {|
-  byron: void | 'byron',
-  shelley: 'shelley',
+  +byron: void | 'byron',
+  +shelley: 'shelley',
 |};
 export const RemoteTransactionTypes: RemoteTransactionTypeT = Object.freeze({
   byron: 'byron',
@@ -133,8 +133,8 @@ export type RemoteUnspentOutput = {|
 |};
 
 export type RemoteWithdrawal = {|
-  address: string,
-  amount: string,
+  +address: string,
+  +amount: string,
 |};
 
 export const ShelleyCertificateTypes = Object.freeze({
@@ -148,66 +148,66 @@ export const ShelleyCertificateTypes = Object.freeze({
 });
 
 export type RemoteStakeRegistrationCert = {|
-  stake_credential: string,
+  +stake_credential: string,
 |};
 export type RemoteStakeDeregistrationCert = {|
-  stake_credential: string,
+  +stake_credential: string,
 |};
 export type RemoteStakeDelegationCert = {|
-  stake_credential: string,
-  pool_keyhash: string,
+  +stake_credential: string,
+  +pool_keyhash: string,
 |};
 export type RemotePoolRegistrationCert = {|
-  pool_params: {|
-    operator: string,
-    vrf_keyhash: string,
-    pledge: string,
-    cost: string,
-    margin: {|
-      numerator: string,
-      denominator: string
+  +pool_params: {|
+    +operator: string,
+    +vrf_keyhash: string,
+    +pledge: string,
+    +cost: string,
+    +margin: {|
+      +numerator: string,
+      +denominator: string
     |},
-    reward_account: string,
-    pool_owners: Array<string>,
-    relays: Array<string>,
-    pool_metadata: void | {|
-      url: string,
-      metadata_hash: string,
+    +reward_account: string,
+    +pool_owners: Array<string>,
+    +relays: Array<string>,
+    +pool_metadata: void | {|
+      +url: string,
+      +metadata_hash: string,
     |},
   |},
 |};
 export type RemotePoolRetirementCert = {|
-  pool_keyhash: string,
-  epoch: number,
+  +pool_keyhash: string,
+  +epoch: number,
 |};
 export type RemoteGenesisKeyDelegationCert = {|
-  genesishash: string,
-  genesis_delegate_hash: string,
-  vrf_keyhash: string,
+  +genesishash: string,
+  +genesis_delegate_hash: string,
+  +vrf_keyhash: string,
 |};
 export type RemoteMoveInstantaneousRewardsCert = {|
-  pot: $Values<MIRPot>,
-  rewards: {| [stake_credential: string]: string /* coin */ |},
+  +pot: $Values<MIRPot>,
+  +rewards: {| [stake_credential: string]: string /* coin */ |},
 |};
 export type RemoteCertificate = {|
-  type: typeof ShelleyCertificateTypes.StakeRegistration,
+  +type: typeof ShelleyCertificateTypes.StakeRegistration,
   ...RemoteStakeRegistrationCert,
 |} | {|
-  type: typeof ShelleyCertificateTypes.StakeDeregistration,
+  +type: typeof ShelleyCertificateTypes.StakeDeregistration,
   ...RemoteStakeDeregistrationCert,
 |} | {|
-  type: typeof ShelleyCertificateTypes.StakeDelegation,
+  +type: typeof ShelleyCertificateTypes.StakeDelegation,
   ...RemoteStakeDelegationCert,
 |} | {|
-  type: typeof ShelleyCertificateTypes.PoolRegistration,
+  +type: typeof ShelleyCertificateTypes.PoolRegistration,
   ...RemotePoolRegistrationCert,
 |} | {|
-  type: typeof ShelleyCertificateTypes.PoolRetirement,
+  +type: typeof ShelleyCertificateTypes.PoolRetirement,
   ...RemotePoolRetirementCert,
 |} | {|
-  type: typeof ShelleyCertificateTypes.GenesisKeyDelegation,
+  +type: typeof ShelleyCertificateTypes.GenesisKeyDelegation,
   ...RemoteGenesisKeyDelegationCert,
 |} | {|
-  type: typeof ShelleyCertificateTypes.MoveInstantaneousRewardsCert,
+  +type: typeof ShelleyCertificateTypes.MoveInstantaneousRewardsCert,
   ...RemoteMoveInstantaneousRewardsCert,
 |};

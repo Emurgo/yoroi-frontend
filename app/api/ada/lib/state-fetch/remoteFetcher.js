@@ -34,6 +34,7 @@ import {
 } from '../../../common/errors';
 
 import type { ConfigType } from '../../../../../config/config-types';
+import { fromWords, decode } from 'bech32';
 
 declare var CONFIG: ConfigType;
 const backendUrl = CONFIG.network.backendUrl;
@@ -131,6 +132,38 @@ export class RemoteFetcher implements IFetcher {
       }
     ).then(response => {
       return response.data.map((resp: RemoteTransaction) => {
+        if (resp.type === 'shelley') {
+          // unfortunately the backend returns Shelley addresses as bech32
+          // this is a bad idea, and so we manually change them to raw payload
+          for (const input of resp.inputs) {
+            try {
+              const payload = fromWords(decode(input.address, 1000).words);
+              // $FlowExpectedError[cannot-write]
+              input.address = Buffer.from(payload).toString('hex');
+            } catch (_e) { /* expected not to work for base58 addresses */ }
+          }
+          for (const output of resp.outputs) {
+            try {
+              const payload = fromWords(decode(output.address, 1000).words);
+              // $FlowExpectedError[cannot-write]
+              output.address = Buffer.from(payload).toString('hex');
+            } catch (_e) { /* expected not to work for base58 addresses */ }
+          }
+          // this was caused by a typo in the backend
+          if (resp.withdrawals == null) {
+            resp.withdrawals = [];
+          }
+          for (const withdrawal of resp.withdrawals) {
+            try {
+              const payload = fromWords(decode(withdrawal.address, 1000).words);
+              // $FlowExpectedError[cannot-write]
+              withdrawal.address = Buffer.from(payload).toString('hex');
+            } catch (_e) { /* expected not to work for base58 addresses */ }
+          }
+          // the format of this will probably change, so best not to parse it
+          // so that changing the backend doesn't break the frontend
+          resp.certificates = [];
+        }
         for (const input of resp.inputs) {
           // backend stores inputs as numbers but outputs as strings
           // we solve this mismatch locally

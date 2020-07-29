@@ -6,6 +6,8 @@ import { Bech32Prefix } from '../../../../../config/stringConfig';
 import { RustModule } from '../../cardanoCrypto/rustLoader';
 import type { NetworkRow } from '../database/primitives/tables';
 import { isJormungandr, isCardanoHaskell } from '../database/prepackaged/networks';
+import { defineMessages, } from 'react-intl';
+import type { $npm$ReactIntl$MessageDescriptor, } from 'react-intl';
 
 export function tryAddressToKind(
   address: string,
@@ -75,6 +77,52 @@ export function addressToKind(
   }
 }
 
+export function isValidReceiveAddress(
+  bech32: string,
+  network: $ReadOnly<NetworkRow>,
+): true | [false, $Exact<$npm$ReactIntl$MessageDescriptor>] {
+  const messages = defineMessages({
+    invalidAddress: {
+      id: 'wallet.send.form.errors.invalidAddress',
+      defaultMessage: '!!!Please enter a valid address.',
+    },
+    cannotSendToLegacy: {
+      id: 'wallet.send.form.cannotSendToLegacy',
+      defaultMessage: '!!!You cannot send to legacy addresses (any address created before November 29th, 2019)',
+    },
+    cannotSendToReward: {
+      id: 'wallet.send.form.cannotSendToReward',
+      defaultMessage: '!!!You cannot send to a reward account',
+    },
+  });
+
+  const kind = tryAddressToKind(bech32, 'bech32', network);
+  if (kind == null) {
+    return [false, this.context.intl.formatMessage(messages.invalidAddress)];
+  }
+  if (isJormungandr(network)) {
+    if (kind === CoreAddressTypes.CARDANO_LEGACY) {
+      return [false, this.context.intl.formatMessage(messages.cannotSendToLegacy)];
+    }
+    if (isJormungandrAddress(kind)) {
+      return true;
+    }
+    return [false, this.context.intl.formatMessage(messages.invalidAddress)];
+  }
+  if (isCardanoHaskell(network)) {
+    if (kind === CoreAddressTypes.CARDANO_REWARD) {
+      return [false, this.context.intl.formatMessage(messages.cannotSendToLegacy)];
+    }
+    if (isCardanoHaskellAddress(kind)) {
+      return true;
+    }
+    return [false, this.context.intl.formatMessage(messages.invalidAddress)];
+  }
+
+  throw new Error(`${nameof(isValidReceiveAddress)} Unsupported network ${JSON.stringify(network)}`);
+}
+
+
 export function byronAddrToHex(
   base58Addr: string
 ): string {
@@ -94,14 +142,14 @@ export function isJormungandrAddress(
 }
 
 export function baseToEnterprise(
-  groupAddress: string
+  baseAddress: string
 ): string {
   const wasmAddr = RustModule.WalletV4.Address.from_bytes(
-    Buffer.from(groupAddress, 'hex')
+    Buffer.from(baseAddress, 'hex')
   );
   const baseAddr = RustModule.WalletV4.BaseAddress.from_address(wasmAddr);
   if (baseAddr == null) {
-    throw new Error(`${nameof(baseToEnterprise)} not a group address ` + groupAddress);
+    throw new Error(`${nameof(baseToEnterprise)} not a base address ` + baseAddress);
   }
   const singleAddr = RustModule.WalletV4.EnterpriseAddress.new(
     wasmAddr.network_id(),
@@ -173,7 +221,14 @@ export function addressToDisplayString(
       return wasmAddr.to_string(Bech32Prefix.ADDRESS);
     }
     if (isCardanoHaskell(network)) {
-      throw new Error(`${nameof(addressToKind)} not implemented for network ${network.NetworkId}`);
+      const wasmAddr = RustModule.WalletV4.Address.from_bytes(
+        Buffer.from(address, 'hex')
+      );
+      const byronAddr = RustModule.WalletV4.ByronAddress.from_address(wasmAddr);
+      if (byronAddr == null) {
+        return wasmAddr.to_bech32();
+      }
+      byronAddr.to_base58();
     }
     throw new Error(`${nameof(addressToKind)} not implemented for network ${network.NetworkId}`);
   } catch (_e2) {
@@ -193,11 +248,17 @@ export function getAddressPayload(
   try {
     if (isJormungandr(network)) {
       return Buffer.from(
+        // bech32
         RustModule.WalletV3.Address.from_string(address).as_bytes()
       ).toString('hex');
     }
     if (isCardanoHaskell(network)) {
-      throw new Error(`${nameof(addressToKind)} not implemented for network ${network.NetworkId}`);
+      const wasmAddr = RustModule.WalletV4.Address.from_bech32(address);
+      const byronAddr = RustModule.WalletV4.ByronAddress.from_address(wasmAddr);
+      if (byronAddr == null) {
+        return Buffer.from(wasmAddr.to_bytes()).toString('hex');
+      }
+      return byronAddr.to_base58();
     }
     throw new Error(`${nameof(addressToKind)} not implemented for network ${network.NetworkId}`);
   } catch (_e2) {

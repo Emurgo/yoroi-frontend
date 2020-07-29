@@ -31,12 +31,17 @@ import {
  * note: slots are 1 second in Shelley mainnet, so this is 2 minutes
  */
 const defaultTtlOffset = 7200;
-const minimumUtxoValue = '0'; // TODO: make this a protocol parameter that can dynamically change
 
 export function sendAllUnsignedTx(
   receiver: string,
   allUtxos: Array<AddressedUtxo>,
   absSlotNumber: BigNumber,
+  protocolParams: {|
+    linearFee: RustModule.WalletV4.LinearFee,
+    minimumUtxoVal: RustModule.WalletV4.BigNum,
+    poolDeposit: RustModule.WalletV4.BigNum,
+    keyDeposit: RustModule.WalletV4.BigNum,
+  |},
 ): V4UnsignedTxAddressedUtxoResponse {
   const addressingMap = new Map<RemoteUnspentOutput, AddressedUtxo>();
   for (const utxo of allUtxos) {
@@ -52,6 +57,7 @@ export function sendAllUnsignedTx(
     receiver,
     Array.from(addressingMap.keys()),
     absSlotNumber,
+    protocolParams,
   );
 
   const addressedUtxos = unsignedTxResponse.senderUtxos.map(
@@ -98,6 +104,12 @@ export function sendAllUnsignedTxFromUtxo(
   receiver: string,
   allUtxos: Array<RemoteUnspentOutput>,
   absSlotNumber: BigNumber,
+  protocolParams: {|
+    linearFee: RustModule.WalletV4.LinearFee,
+    minimumUtxoVal: RustModule.WalletV4.BigNum,
+    poolDeposit: RustModule.WalletV4.BigNum,
+    keyDeposit: RustModule.WalletV4.BigNum,
+  |},
 ): V4UnsignedTxUtxoResponse {
   const totalBalance = allUtxos
     .map(utxo => new BigNumber(utxo.amount))
@@ -110,11 +122,10 @@ export function sendAllUnsignedTxFromUtxo(
   }
 
   const txBuilder = RustModule.WalletV4.TransactionBuilder.new(
-    RustModule.WalletV4.LinearFee.new(
-      RustModule.WalletV4.BigNum.from_str('2'),
-      RustModule.WalletV4.BigNum.from_str('500'),
-    ),
-    RustModule.WalletV4.BigNum.from_str(minimumUtxoValue),
+    protocolParams.linearFee,
+    protocolParams.minimumUtxoVal,
+    protocolParams.poolDeposit,
+    protocolParams.keyDeposit,
   );
   txBuilder.set_ttl(absSlotNumber.plus(defaultTtlOffset).toNumber());
   for (const input of allUtxos) {
@@ -155,6 +166,12 @@ export function newAdaUnsignedTx(
   changeAdaAddr: void | {| ...Address, ...Addressing |},
   allUtxos: Array<AddressedUtxo>,
   absSlotNumber: BigNumber,
+  protocolParams: {|
+    linearFee: RustModule.WalletV4.LinearFee,
+    minimumUtxoVal: RustModule.WalletV4.BigNum,
+    poolDeposit: RustModule.WalletV4.BigNum,
+    keyDeposit: RustModule.WalletV4.BigNum,
+  |},
 ): V4UnsignedTxAddressedUtxoResponse {
   const addressingMap = new Map<RemoteUnspentOutput, AddressedUtxo>();
   for (const utxo of allUtxos) {
@@ -172,6 +189,7 @@ export function newAdaUnsignedTx(
     changeAdaAddr,
     Array.from(addressingMap.keys()),
     absSlotNumber,
+    protocolParams,
   );
 
   const addressedUtxos = unsignedTxResponse.senderUtxos.map(
@@ -203,13 +221,18 @@ export function newAdaUnsignedTxFromUtxo(
   changeAdaAddr: void | {| ...Address, ...Addressing |},
   utxos: Array<RemoteUnspentOutput>,
   absSlotNumber: BigNumber,
+  protocolParams: {|
+    linearFee: RustModule.WalletV4.LinearFee,
+    minimumUtxoVal: RustModule.WalletV4.BigNum,
+    poolDeposit: RustModule.WalletV4.BigNum,
+    keyDeposit: RustModule.WalletV4.BigNum,
+  |},
 ): V4UnsignedTxUtxoResponse {
   const txBuilder = RustModule.WalletV4.TransactionBuilder.new(
-    RustModule.WalletV4.LinearFee.new(
-      RustModule.WalletV4.BigNum.from_str('2'),
-      RustModule.WalletV4.BigNum.from_str('500'),
-    ),
-    RustModule.WalletV4.BigNum.from_str(minimumUtxoValue),
+    protocolParams.linearFee,
+    protocolParams.minimumUtxoVal,
+    protocolParams.poolDeposit,
+    protocolParams.keyDeposit,
   );
   txBuilder.set_ttl(absSlotNumber.plus(defaultTtlOffset).toNumber());
   txBuilder.add_output(
@@ -227,7 +250,7 @@ export function newAdaUnsignedTxFromUtxo(
     currentInputSum = currentInputSum.plus(utxo.amount);
     addUtxoInput(txBuilder, utxo);
     const output = new BigNumber(
-      txBuilder.get_feeless_output_total().checked_add(txBuilder.estimate_fee()).to_str()
+      txBuilder.get_explicit_output().checked_add(txBuilder.estimate_fee()).to_str()
     );
 
     if (currentInputSum.gte(output)) {
@@ -237,7 +260,7 @@ export function newAdaUnsignedTxFromUtxo(
   // check to see if we have enough balance in the wallet to cover the transaction
   {
     const output = new BigNumber(
-      txBuilder.get_feeless_output_total().checked_add(txBuilder.estimate_fee()).to_str()
+      txBuilder.get_explicit_output().checked_add(txBuilder.estimate_fee()).to_str()
     );
     if (currentInputSum.lt(output)) {
       throw new NotEnoughMoneyToSendError();
@@ -249,12 +272,12 @@ export function newAdaUnsignedTxFromUtxo(
       txBuilder.set_fee(txBuilder.estimate_fee());
       return [];
     }
-    const oldOutput = txBuilder.get_feeless_output_total();
+    const oldOutput = txBuilder.get_explicit_output();
     const changeWasAdded = txBuilder.add_change_if_needed(
       RustModule.WalletV4.Address.from_bytes(Buffer.from(changeAdaAddr.address, 'hex'))
     );
     const changeValue = new BigNumber(
-      txBuilder.get_feeless_output_total().checked_sub(oldOutput).to_str
+      txBuilder.get_explicit_output().checked_sub(oldOutput).to_str
     );
     return changeWasAdded
       ? [{

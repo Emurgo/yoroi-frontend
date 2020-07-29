@@ -20,13 +20,13 @@ import { TransactionType } from '../api/ada/lib/storage/database/primitives/tabl
 export default class CardanoShelleyTransaction extends WalletTransaction {
 
   @observable certificates: Array<CertificatePart>;
-  @observable ttl: BigNumber;
+  @observable ttl: void | BigNumber;
   @observable metadata: null | string;
 
   constructor(data: {|
     ...WalletTransactionCtorData,
     certificates: Array<CertificatePart>,
-    ttl: BigNumber,
+    ttl: void | BigNumber,
     metadata: null | string,
   |}) {
     const { certificates, ttl, metadata, ...rest } = data;
@@ -65,7 +65,7 @@ export default class CardanoShelleyTransaction extends WalletTransaction {
       // note: we use the explicitly fee in the transaction
       // and not outputs - inputs since Shelley has implicit inputs like refunds or withdrawals
       fee: new BigNumber(Extra.Fee).dividedBy(amountPerUnit),
-      ttl: new BigNumber(Extra.Ttl),
+      ttl: Extra.Ttl != null ? new BigNumber(Extra.Ttl) : undefined,
       metadata: Extra.Metadata,
       amount: tx.amount.dividedBy(amountPerUnit).plus(tx.fee.dividedBy(amountPerUnit)),
       date: tx.block != null

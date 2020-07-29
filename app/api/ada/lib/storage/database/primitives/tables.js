@@ -296,7 +296,7 @@ export type CardanoShelleyTransactionInsert = {|
   Type: $PropertyType<typeof TransactionType, 'CardanoShelley'>,
   Extra: {|
     Fee: string,
-    Ttl: string,
+    Ttl?: string,
     Metadata: null | string,
   |},
   ...TransactionInsertBase,

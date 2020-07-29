@@ -153,17 +153,6 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
           currencyMaxFractionalDigits={apiMeta.decimalPlaces.toNumber()}
           validateAmount={amount => Promise.resolve(isWithinSupply(amount, apiMeta.totalSupply))}
           onSubmit={onSubmit}
-          isValidJormungandrAddress={address => {
-            const kind = tryAddressToKind(address, 'bech32', networks.JormungandrMainnet);
-            if (kind == null) return false;
-            return isJormungandrAddress(kind);
-          }}
-          isValidLegacyAddress={address => {
-            const kind = tryAddressToKind(address, 'bech32', networks.ByronMainnet);
-            if (kind == null) return false;
-            if (kind === CoreAddressTypes.CARDANO_LEGACY) return true;
-            return false;
-          }}
           totalInput={transactionBuilderStore.totalInput}
           hasAnyPending={hasAnyPending}
           classicTheme={profile.isClassicTheme}

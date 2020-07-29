@@ -120,8 +120,5 @@ export function byronTxEqual(
   req1: RustModule.WalletV2.Transaction,
   req2: RustModule.WalletV2.Transaction,
 ): boolean {
-  const tentativeTxJson = JSON.stringify(req1.to_json());
-  const plannedTxJson = JSON.stringify(req2.to_json());
-
-  return tentativeTxJson === plannedTxJson;
+  return JSON.stringify(req1.to_json()) === JSON.stringify(req2.to_json());
 }

@@ -126,7 +126,7 @@ import {
 import type {
   FilterFunc,
 } from '../../../../common/lib/state-fetch/currencySpecificTypes';
-import { addressToKind } from './utils';
+import { addressToKind, addressToDisplayString } from './utils';
 import { RustModule } from '../../cardanoCrypto/rustLoader';
 
 async function rawGetAllTxIds(
@@ -1100,13 +1100,14 @@ async function rawUpdateTransactions(
         ...utxoAddresses
           // Note: don't send base/ptr keys
           // Since the payment key is duplicated inside the enterprise addresses
-          .filter(address => (
-            address.Type !== CoreAddressTypes.CARDANO_BASE &&
-            address.Type !== CoreAddressTypes.CARDANO_PTR
-          ))
+          // .filter(address => (
+          //   address.Type !== CoreAddressTypes.CARDANO_BASE &&
+          //   address.Type !== CoreAddressTypes.CARDANO_PTR
+          // ))
           .map(address => address.Hash),
         ...accountingAddresses.map(address => address.Hash),
-      ],
+        // TODO: get rid of this once backend supports querying by payment key
+      ].map(addr => addressToDisplayString(addr, publicDeriver.getParent().getNetworkInfo())),
       untilBlock,
     });
 
@@ -1732,7 +1733,6 @@ export function networkTxHeaderToDb(
         Type: TransactionType.CardanoShelley,
         Extra: {
           Fee: tx.fee,
-          Ttl: tx.ttl,
           Metadata: tx.metadata,
         },
         BlockId: blockId,

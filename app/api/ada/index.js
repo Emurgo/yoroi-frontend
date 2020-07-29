@@ -114,7 +114,7 @@ import { v2genAddressBatchFunc, } from './restoration/byron/scan';
 import type {
   BaseSignRequest,
 } from './transactions/types';
-import { ByronTxSignRequest } from './transactions/byron/ByronTxSignRequest';
+import { ByronTxSignRequest, copySignRequest } from './transactions/byron/ByronTxSignRequest';
 import type {
   SignTransactionResponse as LedgerSignTxResponse
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
@@ -655,7 +655,7 @@ export default class AdaApi {
     request: SignAndBroadcastRequest
   ): Promise<SignAndBroadcastResponse> {
     Logger.debug(`${nameof(AdaApi)}::${nameof(this.signAndBroadcast)} called`);
-    const { password, signRequest } = request;
+    const { password } = request;
     try {
       const config = getCardanoHaskellBaseConfig(
         request.publicDeriver.getParent().getNetworkInfo()
@@ -666,13 +666,8 @@ export default class AdaApi {
         ...signingKey,
         password,
       });
-      const unsignedTx = signRequest.unsignedTx;
-
       const signedTx = byronSignTransaction(
-        {
-          ...signRequest,
-          unsignedTx,
-        },
+        copySignRequest(request.signRequest),
         request.publicDeriver.getParent().getPublicDeriverLevel(),
         RustModule.WalletV2.PrivateKey.from_hex(normalizedKey.prvKeyHex),
         config.ByronNetworkId,
