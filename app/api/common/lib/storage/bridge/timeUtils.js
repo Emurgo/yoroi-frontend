@@ -48,7 +48,6 @@ export async function genToAbsoluteSlotNumber(
   };
 }
 
-
 export type ToRelativeSlotNumberRequest = ToAbsoluteSlotNumberResponse;
 export type ToRelativeSlotNumberResponse = ToAbsoluteSlotNumberRequest;
 export type ToRelativeSlotNumberFunc = (
@@ -73,12 +72,13 @@ export async function genToRelativeSlotNumber(
       const numEpochs = end - start;
 
       if (SlotsPerEpoch == null) throw new Error(`${nameof(genToAbsoluteSlotNumber)} missing params`);
-      slotsLeft -= SlotsPerEpoch * numEpochs;
 
       // queried time is before the next protocol parameter choice
-      if (slotsLeft < 0) {
+      if (slotsLeft < SlotsPerEpoch * numEpochs) {
         break;
       }
+
+      slotsLeft -= SlotsPerEpoch * numEpochs;
       epochCount += numEpochs;
 
       SlotsPerEpoch = config[i + 1].SlotsPerEpoch ?? SlotsPerEpoch;
@@ -144,7 +144,6 @@ export async function genTimeToSlot(
       SlotDuration = config[i + 1].SlotDuration ?? SlotDuration;
       SlotsPerEpoch = config[i + 1].SlotsPerEpoch ?? SlotsPerEpoch;
     }
-
 
     if (SlotDuration == null || SlotsPerEpoch == null) throw new Error(`${nameof(genTimeToSlot)} missing params`);
 
