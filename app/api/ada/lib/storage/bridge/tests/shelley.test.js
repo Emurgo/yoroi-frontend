@@ -166,7 +166,7 @@ const nextRegularSpend: number => RemoteTransaction = (purpose) => ({
       amount: '900000'
     },
     {
-      // Ae2tdPwUPEYxsngJhnW49jrmGuaCvQK34Hqrnx5w5SWxgfjDkSDcnrRdT5G
+      // TODO: find address
       address: getSingleAddressString(
         TX_TEST_MNEMONIC_1,
         [

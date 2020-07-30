@@ -14,7 +14,7 @@ import type {
   FilterUsedRequest, FilterUsedResponse, FilterFunc,
 } from '../../../common/lib/state-fetch/currencySpecificTypes';
 import { RollbackApiError, } from '../../../common/errors';
-import { baseToEnterprise, addressToKind, } from '../storage/bridge/utils';
+import { baseToEnterprise, addressToKind, toHexOrBase58, } from '../storage/bridge/utils';
 import { CoreAddressTypes } from '../storage/database/primitives/enums';
 import type { CoreAddressT } from '../storage/database/primitives/enums';
 import {
@@ -425,10 +425,9 @@ export function toRemoteByronTx(
   const outputs = [];
   for (let i = 0; i < wasmOutputs.len(); i++) {
     const output = wasmOutputs.get(i);
-    const asByron = RustModule.WalletV4.ByronAddress.from_address(output.address());
 
     outputs.push({
-      address: asByron != null ? asByron.to_base58() : Buffer.from(output.address().to_bytes()).toString('hex'),
+      address: toHexOrBase58(output.address()),
       amount: output.amount().to_str(),
     });
   }

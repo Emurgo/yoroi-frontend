@@ -5,6 +5,7 @@ import { ISignRequest } from '../../../common/lib/transactions/ISignRequest';
 import type { BaseSignRequest } from '../types';
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 import { getAdaCurrencyMeta } from '../../currencyInfo';
+import { toHexOrBase58 } from '../../lib/storage/bridge/utils';
 
 export class HaskellShelleyTxSignRequest
 implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
@@ -55,9 +56,7 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
 
     const outputStrings = [];
     for (let i = 0; i < outputs.len(); i++) {
-      outputStrings.push(
-        Buffer.from(outputs.get(i).address().to_bytes()).toString('hex')
-      );
+      outputStrings.push(toHexOrBase58(outputs.get(i).address()));
     }
 
     if (!includeChange) {

@@ -59,7 +59,7 @@ export function sendAllUnsignedTx(
     utxo => {
       const addressedUtxo = addressingMap.get(utxo);
       if (addressedUtxo == null) {
-        throw new Error('sendAllUnsignedTx utxo reference was changed. Should not happen');
+        throw new Error(`${nameof(sendAllUnsignedTx)}  utxo reference was changed. Should not happen`);
       }
       return addressedUtxo;
     }

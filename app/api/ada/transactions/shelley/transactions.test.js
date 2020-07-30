@@ -322,7 +322,7 @@ describe('Create signed transactions', () => {
     expect(witnesses.scripts()).toEqual(undefined);
     const bootstrapWits = witnesses.bootstraps();
     if (bootstrapWits == null) throw new Error('Bootstrap witnesses should not be null');
-    expect(bootstrapWits.len()).toEqual(1);
+    expect(bootstrapWits.len()).toEqual(1); // note: only one witness since we got rid of duplicates
 
     expect(Buffer.from(bootstrapWits.get(0).to_bytes()).toString('hex')).toEqual(
       '8458208fb03c3aa052f51c086c54bd4059ead2d2e426ac89fa4b3ce41cbfd8800b51c058401edebb108c74a991bef5b28458778fc0713499349d77fb98acc63e4219cfcd1b51321ccaccdf2ce2e80d7c2687f3d79feea32daedcfbc19792dff0358af5950358202623fceb96b07408531a5cb259f53845a38d6b68928e7c0c7e390f07545d0e6241a0'

@@ -245,7 +245,7 @@ export async function createStandardCip1852Wallet(request: {|
           const id = finalState.cip1852WrapperRow.PrivateDeriverKeyDerivationId;
           const level = finalState.cip1852WrapperRow.PrivateDeriverLevel;
           if (id == null || level == null) {
-            throw new Error('createStandardCip1852Wallet missing private deriver');
+            throw new Error(`${nameof(createStandardCip1852Wallet)} missing private deriver`);
           }
           return {
             deriverRequest: {

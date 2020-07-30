@@ -195,7 +195,8 @@ export default class ErgoApi {
   async getForeignAddresses(
     _request: GetForeignAddressesRequest
   ): Promise<GetForeignAddressesResponse> {
-    throw new Error(`${nameof(ErgoApi)}::${nameof(this.getForeignAddresses)} not implemented yet`);
+    // TODO: implement
+    return [];
   }
 
   /**

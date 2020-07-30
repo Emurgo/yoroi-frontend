@@ -28,6 +28,7 @@ import type { StoresMap } from '../index';
 import type { ActionsMap } from '../../actions';
 import { ROUTES } from '../../routes-config';
 import { buildRoute } from '../../utils/routing';
+import { CardanoForks } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 export type SubgroupCtorData = {|
   stores: StoresMap,
@@ -79,6 +80,12 @@ function matchCoinType(
   match: CoinTypesT => boolean
 ): boolean {
   return match(publicDeriver.parent.getNetworkInfo().CoinType);
+}
+function matchForkType(
+  publicDeriver: PublicDeriver<>,
+  match: number => boolean
+): boolean {
+  return match(publicDeriver.parent.getNetworkInfo().Fork);
 }
 
 const standardFilter = [
@@ -141,7 +148,8 @@ export const GROUP_EXTERNAL: AddressSubgroupMeta<
   isRelated: request => (
     matchParent(request.selected, parent => parent instanceof Cip1852Wallet) &&
     asHasUtxoChains(request.selected) != null &&
-    matchCoinType(request.selected, coinType => coinType === CoinTypes.CARDANO)
+    matchCoinType(request.selected, coinType => coinType === CoinTypes.CARDANO) &&
+    matchForkType(request.selected, fork => fork === CardanoForks.Jormungandr)
   ),
   class: GroupExternalAddressesSubgroup,
   validFilters: standardFilter,
@@ -157,7 +165,8 @@ export const GROUP_INTERNAL: AddressSubgroupMeta<
   isRelated: request => (
     matchParent(request.selected, parent => parent instanceof Cip1852Wallet) &&
     asHasUtxoChains(request.selected) != null &&
-    matchCoinType(request.selected, coinType => coinType === CoinTypes.CARDANO)
+    matchCoinType(request.selected, coinType => coinType === CoinTypes.CARDANO) &&
+    matchForkType(request.selected, fork => fork === CardanoForks.Jormungandr)
   ),
   class: GroupInternalAddressesSubgroup,
   validFilters: standardFilter,

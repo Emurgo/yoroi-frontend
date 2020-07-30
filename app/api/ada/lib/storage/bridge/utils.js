@@ -290,6 +290,17 @@ export function addressToDisplayString(
   }
 }
 
+// need to format shelley addresses as base16 but only legacy addresses as base58
+export function toHexOrBase58(
+  address: RustModule.WalletV4.Address,
+): string {
+  const asByron = RustModule.WalletV4.ByronAddress.from_address(address);
+  if (asByron == null) {
+    return Buffer.from(address.to_bytes()).toString('hex');
+  }
+  return asByron.to_base58();
+}
+
 export function getAddressPayload(
   address: string,
   network: $ReadOnly<NetworkRow>,
