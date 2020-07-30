@@ -68,10 +68,6 @@ const messages = defineMessages({
     id: 'wallet.send.form.sendAll.checkboxLabel',
     defaultMessage: '!!!Send all {coinName}',
   },
-  invalidAmount: {
-    id: 'wallet.send.form.errors.invalidAmount',
-    defaultMessage: '!!!Please enter a valid amount.',
-  },
   invalidTitle: {
     id: 'wallet.send.form.errors.invalidTitle',
     defaultMessage: '!!!Please enter a title with at least 3 characters.',
@@ -102,7 +98,7 @@ type Props = {|
   +currencyMaxIntegerDigits: number,
   +currencyMaxFractionalDigits: number,
   +hasAnyPending: boolean,
-  +validateAmount: (amountInNaturalUnits: string) => Promise<boolean>,
+  +validateAmount: (amountInNaturalUnits: string) => Promise<[boolean, void | string]>,
   +onSubmit: void => void,
   +totalInput: ?BigNumber,
   +classicTheme: boolean,
@@ -193,7 +189,7 @@ export default class WalletSendForm extends Component<Props> {
             this.props.updateReceiver();
             return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
           }
-          const updateReceiver = (isValid) => {
+          const updateReceiver = (isValid: bool) => {
             if (isValid) {
               this.props.updateReceiver(
                 getAddressPayload(receiverValue, this.props.selectedNetwork)
@@ -204,11 +200,12 @@ export default class WalletSendForm extends Component<Props> {
           };
 
           const isValid = isValidReceiveAddress(receiverValue, this.props.selectedNetwork);
-          updateReceiver(isValid);
           if (isValid === true) {
+            updateReceiver(true);
             return [isValid];
           }
-          return isValid;
+          updateReceiver(isValid[0]);
+          return [isValid[0], this.context.intl.formatMessage(isValid[1])];
         }],
       },
       amount: {
@@ -236,12 +233,12 @@ export default class WalletSendForm extends Component<Props> {
             this.props.currencyMaxFractionalDigits,
           );
           const isValidAmount = await this.props.validateAmount(formattedAmount);
-          if (isValidAmount) {
+          if (isValidAmount[0]) {
             this.props.updateAmount(Number(formattedAmount));
           } else {
             this.props.updateAmount();
           }
-          return [isValidAmount, this.context.intl.formatMessage(messages.invalidAmount)];
+          return isValidAmount;
         }],
       },
       memo: {

@@ -201,13 +201,15 @@ export default class AdaTransactionBuilderStore extends Store {
       withHasUtxoChains.getParent().getNetworkInfo(),
     );
     const toRelativeSlotNumber = await genTimeToSlot(fullConfig);
+    const absSlotNumber = new BigNumber(toRelativeSlotNumber({ time: new Date() }).slot);
+
     if (amount == null && shouldSendAll === true) {
       await this.createUnsignedTx.execute({
         publicDeriver: withHasUtxoChains,
         receiver,
         shouldSendAll,
         filter: this.filter,
-        absSlotNumber: new BigNumber(toRelativeSlotNumber({ time: new Date() }).slot),
+        absSlotNumber,
       });
     } else if (amount != null) {
       await this.createUnsignedTx.execute({
@@ -215,7 +217,7 @@ export default class AdaTransactionBuilderStore extends Store {
         receiver,
         amount,
         filter: this.filter,
-        absSlotNumber: new BigNumber(toRelativeSlotNumber({ time: new Date() }).slot),
+        absSlotNumber,
       });
     }
   }

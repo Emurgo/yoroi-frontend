@@ -1151,13 +1151,20 @@ Object {
         Object {
           "ByronNetworkId": 764824073,
           "ChainNetworkId": "1",
-          "GenesisDate": "150620309100",
+          "GenesisDate": "1506203091000",
           "SlotDuration": 20,
           "SlotsPerEpoch": 21600,
           "StartAt": 0,
         },
         Object {
+          "KeyDeposit": "2000000",
+          "LinearFee": Object {
+            "coefficient": "44",
+            "constant": "155381",
+          },
+          "MinimumUtxoVal": "1000000",
           "PerEpochPercentageReward": 69344,
+          "PoolDeposit": "500000000",
           "SlotDuration": 1,
           "SlotsPerEpoch": 432000,
           "StartAt": 208,

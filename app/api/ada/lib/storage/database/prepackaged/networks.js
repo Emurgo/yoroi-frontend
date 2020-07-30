@@ -19,7 +19,7 @@ export const ErgoForks = Object.freeze({
   Primary: 0,
 });
 
-const isMC4 = true;
+const isMC4 = false;
 
 export const networks = Object.freeze({
   ByronMainnet: ({
@@ -38,7 +38,7 @@ export const networks = Object.freeze({
       isMC4 ?
         Object.freeze({
           StartAt: 1, // no idea if this is correct
-          SlotsPerEpoch: 21600,
+          SlotsPerEpoch: 432000,
           SlotDuration: 1,
           PerEpochPercentageReward: 69344,
           LinearFee: {

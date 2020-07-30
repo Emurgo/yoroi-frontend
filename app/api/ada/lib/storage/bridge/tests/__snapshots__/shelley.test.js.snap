@@ -454,7 +454,6 @@ Array [
         "Extra": Object {
           "Fee": "100000",
           "Metadata": null,
-          "Ttl": "1000000",
         },
         "Hash": "29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546",
         "LastUpdateTime": 1568392656000,

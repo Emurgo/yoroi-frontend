@@ -20,7 +20,10 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
       this.signRequest.unsignedTx.get_explicit_input()
     );
 
-    const result = new BigNumber(inputTotal.to_str());
+    const change = this.signRequest.changeAddr
+      .map(val => new BigNumber(val.value || new BigNumber(0)))
+      .reduce((sum, val) => sum.plus(val), new BigNumber(0));
+    const result = new BigNumber(inputTotal.to_str()).minus(change);
     if (shift) {
       return result.shiftedBy(-getAdaCurrencyMeta().decimalPlaces.toNumber());
     }

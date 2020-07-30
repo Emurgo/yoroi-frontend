@@ -1,4 +1,8 @@
-// // @flow
+// @flow
+
+test('fake test', async () => {
+  // need at least one dummy Jest test or it automatically fails
+});
 
 // import '../../lib/test-config';
 // import { RustModule } from '../../lib/cardanoCrypto/rustLoader';

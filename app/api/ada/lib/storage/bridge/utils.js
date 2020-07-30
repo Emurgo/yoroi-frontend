@@ -98,25 +98,25 @@ export function isValidReceiveAddress(
 
   const kind = tryAddressToKind(bech32, 'bech32', network);
   if (kind == null) {
-    return [false, this.context.intl.formatMessage(messages.invalidAddress)];
+    return [false, messages.invalidAddress];
   }
   if (isJormungandr(network)) {
     if (kind === CoreAddressTypes.CARDANO_LEGACY) {
-      return [false, this.context.intl.formatMessage(messages.cannotSendToLegacy)];
+      return [false, messages.cannotSendToLegacy];
     }
     if (isJormungandrAddress(kind)) {
       return true;
     }
-    return [false, this.context.intl.formatMessage(messages.invalidAddress)];
+    return [false, messages.invalidAddress];
   }
   if (isCardanoHaskell(network)) {
     if (kind === CoreAddressTypes.CARDANO_REWARD) {
-      return [false, this.context.intl.formatMessage(messages.cannotSendToLegacy)];
+      return [false, messages.cannotSendToLegacy];
     }
     if (isCardanoHaskellAddress(kind)) {
       return true;
     }
-    return [false, this.context.intl.formatMessage(messages.invalidAddress)];
+    return [false, messages.invalidAddress];
   }
 
   throw new Error(`${nameof(isValidReceiveAddress)} Unsupported network ${JSON.stringify(network)}`);
@@ -283,7 +283,7 @@ export function addressToDisplayString(
       if (byronAddr == null) {
         return wasmAddr.to_bech32();
       }
-      byronAddr.to_base58();
+      return byronAddr.to_base58();
     }
     throw new Error(`${nameof(addressToKind)} not implemented for network ${network.NetworkId}`);
   } catch (_e2) {

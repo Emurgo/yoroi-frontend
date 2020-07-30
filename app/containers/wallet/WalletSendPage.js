@@ -30,7 +30,7 @@ import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import LocalizableError from '../../i18n/LocalizableError';
 import type { ISignRequest } from '../../api/common/lib/transactions/ISignRequest';
 import { ApiOptions, getApiForNetwork, getApiMeta } from '../../api/common/utils';
-import { isWithinSupply } from '../../utils/validations';
+import { validateAmount } from '../../utils/validations';
 import { formattedWalletAmount } from '../../utils/formatters';
 
 // Hardware Wallet Confirmation
@@ -148,7 +148,11 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
             apiMeta.totalSupply.div(apiMeta.decimalPlaces).toFixed().length
           }
           currencyMaxFractionalDigits={apiMeta.decimalPlaces.toNumber()}
-          validateAmount={amount => Promise.resolve(isWithinSupply(amount, apiMeta.totalSupply))}
+          validateAmount={(amount) => validateAmount(
+            amount,
+            publicDeriver.getParent().getNetworkInfo(),
+            this.context.intl,
+          )}
           onSubmit={onSubmit}
           totalInput={transactionBuilderStore.totalInput}
           hasAnyPending={hasAnyPending}

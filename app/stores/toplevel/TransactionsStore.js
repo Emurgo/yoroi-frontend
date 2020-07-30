@@ -99,18 +99,6 @@ export default class TransactionsStore extends Store {
     actions.closeExportTransactionDialog.listen(this._closeExportTransactionDialog);
   }
 
-  // TODO: should probably turn the amount to a class with a validate function. Must more scalable
-  validateAmount: string => Promise<boolean> = (
-    amount: string
-  ): Promise<boolean> => {
-    const { selectedNetwork } = this.stores.profile;
-    if (selectedNetwork == null) throw new Error(`${nameof(this.validateAmount)} no API selected`);
-    const meta = getApiMeta(getApiForNetwork(selectedNetwork));
-    if (meta == null) throw new Error(`${nameof(this.validateAmount)} no meta found`);
-    return Promise.resolve(isWithinSupply(amount, meta.meta.totalSupply));
-  };
-
-
   /** Calculate information about transactions that are still realistically reversible */
   @computed get unconfirmedAmount(): UnconfirmedAmount {
     const defaultUnconfirmedAmount = {

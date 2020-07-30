@@ -23,15 +23,20 @@ export async function genToAbsoluteSlotNumber(
 
     // for pairs of config changes (x, x+1), get the time between these pairs
     for (let i = 0; i < config.length - 1; i++) {
-      SlotsPerEpoch = config[i].SlotsPerEpoch ?? SlotsPerEpoch;
-
       const start = config[i].StartAt ?? (() => { throw new Error(`${nameof(genToAbsoluteSlotNumber)} missing start`); })();
       const end = config[i + 1].StartAt ?? (() => { throw new Error(`${nameof(genToAbsoluteSlotNumber)} missing end`); })();
+
+      // queried time is before the next protocol parameter choice
+      if (end > request.epoch) {
+        break;
+      }
       const numEpochs = end - start;
 
       if (SlotsPerEpoch == null) throw new Error(`${nameof(genToAbsoluteSlotNumber)} missing params`);
       slotCount += SlotsPerEpoch * numEpochs;
       epochsLeft -= numEpochs;
+
+      SlotsPerEpoch = config[i + 1].SlotsPerEpoch ?? SlotsPerEpoch;
     }
 
     if (SlotsPerEpoch == null) throw new Error(`${nameof(genToAbsoluteSlotNumber)} missing params`);
@@ -63,15 +68,20 @@ export async function genToRelativeSlotNumber(
 
     // for pairs of config changes (x, x+1), get the time between these pairs
     for (let i = 0; i < config.length - 1; i++) {
-      SlotsPerEpoch = config[i].SlotsPerEpoch ?? SlotsPerEpoch;
-
       const start = config[i].StartAt ?? (() => { throw new Error(`${nameof(genToAbsoluteSlotNumber)} missing start`); })();
       const end = config[i + 1].StartAt ?? (() => { throw new Error(`${nameof(genToAbsoluteSlotNumber)} missing end`); })();
       const numEpochs = end - start;
 
       if (SlotsPerEpoch == null) throw new Error(`${nameof(genToAbsoluteSlotNumber)} missing params`);
       slotsLeft -= SlotsPerEpoch * numEpochs;
+
+      // queried time is before the next protocol parameter choice
+      if (slotsLeft < 0) {
+        break;
+      }
       epochCount += numEpochs;
+
+      SlotsPerEpoch = config[i + 1].SlotsPerEpoch ?? SlotsPerEpoch;
     }
 
     if (SlotsPerEpoch == null) throw new Error(`${nameof(genToAbsoluteSlotNumber)} missing params`);
@@ -111,22 +121,30 @@ export async function genTimeToSlot(
     if (GenesisDate == null) throw new Error(`${nameof(genTimeToSlot)} missing genesis params`);
     let SlotDuration = config[0].SlotDuration;
     let SlotsPerEpoch = config[0].SlotsPerEpoch;
-    let timeLeftToTip = request.time.getTime() - new Date(GenesisDate).getTime();
+    let timeLeftToTip = (
+      request.time.getTime() - new Date(Number.parseInt(GenesisDate, 10)).getTime()
+    );
     let slotCount = 0;
 
     // for pairs of config changes (x, x+1), get the time between these pairs
     for (let i = 0; i < config.length - 1; i++) {
-      SlotDuration = config[i].SlotDuration ?? SlotDuration;
-      SlotsPerEpoch = config[i].SlotsPerEpoch ?? SlotsPerEpoch;
-
       const start = config[i].StartAt ?? (() => { throw new Error(`${nameof(genTimeToSlot)} missing start`); })();
       const end = config[i + 1].StartAt ?? (() => { throw new Error(`${nameof(genTimeToSlot)} missing end`); })();
       const numEpochs = end - start;
 
       if (SlotDuration == null || SlotsPerEpoch == null) throw new Error(`${nameof(genTimeToSlot)} missing params`);
+
+      // queried time is before the next protocol parameter choice
+      if (timeLeftToTip < (SlotsPerEpoch * SlotDuration * 1000) * numEpochs) {
+        break;
+      }
       slotCount += SlotsPerEpoch * numEpochs;
       timeLeftToTip -= (SlotsPerEpoch * SlotDuration * 1000) * numEpochs;
+
+      SlotDuration = config[i + 1].SlotDuration ?? SlotDuration;
+      SlotsPerEpoch = config[i + 1].SlotsPerEpoch ?? SlotsPerEpoch;
     }
+
 
     if (SlotDuration == null || SlotsPerEpoch == null) throw new Error(`${nameof(genTimeToSlot)} missing params`);
 
@@ -202,16 +220,21 @@ export async function genTimeSinceGenesis(
 
     // for pairs of config changes (x, x+1), get the time between these pairs
     for (let i = 0; i < config.length - 1; i++) {
-      SlotDuration = config[i].SlotDuration ?? SlotDuration;
-      SlotsPerEpoch = config[i].SlotsPerEpoch ?? SlotsPerEpoch;
-
       const start = config[i].StartAt ?? (() => { throw new Error(`${nameof(genTimeSinceGenesis)} missing start`); })();
       const end = config[i + 1].StartAt ?? (() => { throw new Error(`${nameof(genTimeSinceGenesis)} missing end`); })();
       const numEpochs = end - start;
 
       if (SlotDuration == null || SlotsPerEpoch == null) throw new Error(`${nameof(genTimeSinceGenesis)} missing params`);
+
+      // queried time is before the next protocol parameter choice
+      if (slotsLeft < SlotsPerEpoch * numEpochs) {
+        break;
+      }
       time += (SlotsPerEpoch * SlotDuration) * numEpochs;
       slotsLeft -= SlotsPerEpoch * numEpochs;
+
+      SlotDuration = config[i + 1].SlotDuration ?? SlotDuration;
+      SlotsPerEpoch = config[i + 1].SlotsPerEpoch ?? SlotsPerEpoch;
     }
 
     if (SlotDuration == null || SlotsPerEpoch == null) throw new Error(`${nameof(genTimeSinceGenesis)} missing params`);
@@ -244,7 +267,7 @@ export async function genToRealTime(
     const timeSinceGenesis = request.timeSinceGenesisFunc({
       absoluteSlotNum: request.absoluteSlotNum,
     });
-    const time = (new Date(GenesisDate).getTime() + (1000 * timeSinceGenesis));
+    const time = (new Date(Number.parseInt(GenesisDate, 10)).getTime() + (1000 * timeSinceGenesis));
     return new Date(time);
   };
 }

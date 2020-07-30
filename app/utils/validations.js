@@ -2,6 +2,11 @@
 import BigNumber from 'bignumber.js';
 import isInt from 'validator/lib/isInt';
 import { MAX_MEMO_SIZE } from '../config/externalStorageConfig';
+import { getApiForNetwork, getApiMeta } from '../api/common/utils';
+import type { $npm$ReactIntl$IntlFormat, } from 'react-intl';
+import { defineMessages, } from 'react-intl';
+import type { NetworkRow } from '../api/ada/lib/storage/database/primitives/tables';
+import { isCardanoHaskell, getCardanoHaskellBaseConfig } from '../api/ada/lib/storage/database/prepackaged/networks';
 
 export const isValidWalletName: string => boolean = (walletName) => {
   const nameLength = walletName.length;
@@ -54,3 +59,43 @@ export const isWithinSupply: (string, BigNumber) => boolean = (value, totalSuppl
   const isValid = numericValue.gte(minValue) && numericValue.lte(totalSupply);
   return isValid;
 };
+
+export async function validateAmount(
+  amount: string,
+  network: $ReadOnly<NetworkRow>,
+  formatter: $npm$ReactIntl$IntlFormat,
+): Promise<[boolean, void | string]> {
+  const messages = defineMessages({
+    invalidAmount: {
+      id: 'wallet.send.form.errors.invalidAmount',
+      defaultMessage: '!!!Please enter a valid amount.',
+    },
+    tooSmallUtxo: {
+      id: 'wallet.send.form.errors.tooSmallUtxo',
+      defaultMessage: '!!!Cannot send less than {minUtxo} ADA.',
+    }
+  });
+
+  const meta = getApiMeta(getApiForNetwork(network));
+  if (meta == null) throw new Error(`${nameof(this.validateAmount)} no meta found`);
+
+  const withinBounds = isWithinSupply(amount, meta.meta.totalSupply);
+  if (withinBounds) {
+    if (isCardanoHaskell(network)) {
+      const config = getCardanoHaskellBaseConfig(network)
+        .reduce((acc, next) => Object.assign(acc, next), {});
+
+      const minUtxo = new BigNumber(config.MinimumUtxoVal);
+      if (new BigNumber(amount).lt(minUtxo)) {
+        return [
+          false,
+          formatter.formatMessage(messages.tooSmallUtxo, {
+            minUtxo: minUtxo.div(new BigNumber(10).pow(meta.meta.decimalPlaces))
+          })
+        ];
+      }
+    }
+    return [true, undefined];
+  }
+  return [false, formatter.formatMessage(messages.invalidAmount)];
+}

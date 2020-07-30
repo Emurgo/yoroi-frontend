@@ -146,12 +146,15 @@ export function sendAllUnsignedTxFromUtxo(
     throw new NotEnoughMoneyToSendError();
   }
   {
+    const wasmReceiver = normalizeToAddress(receiver);
+    if (wasmReceiver == null) {
+      throw new Error(`${nameof(sendAllUnsignedTxFromUtxo)} receiver not a valid Shelley address`);
+    }
+
     // semantically, sending all ADA to somebody
     // is the same as if you're sending all the ADA as change to yourself
     // (module the fact the address doesn't belong to you)
-    const couldSendAmount = txBuilder.add_change_if_needed(
-      RustModule.WalletV4.Address.from_bytes(Buffer.from(receiver, 'hex'))
-    );
+    const couldSendAmount = txBuilder.add_change_if_needed(wasmReceiver);
     if (!couldSendAmount) {
       // if you couldn't send any amount,
       // it's because you couldn't cover the fee of adding an output
@@ -295,7 +298,7 @@ export function newAdaUnsignedTxFromUtxo(
     }
     const changeWasAdded = txBuilder.add_change_if_needed(wasmChange);
     const changeValue = new BigNumber(
-      txBuilder.get_explicit_output().checked_sub(oldOutput).to_str
+      txBuilder.get_explicit_output().checked_sub(oldOutput).to_str()
     );
     return changeWasAdded
       ? [{
