@@ -91,7 +91,6 @@ module.exports = {
     'spaced-comment': 1,
     quotes: ['error', 'single', {avoidEscape: true, allowTemplateLiterals: true}],
     'import/imports-first': 1,
-    'no-multiple-empty-lines': 1,
     'react/jsx-indent': 1,
     'flowtype/define-flow-type': 1,
     'flowtype/use-flow-type': 1,
