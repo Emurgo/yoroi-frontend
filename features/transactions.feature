@@ -24,9 +24,8 @@ Feature: Send transaction
 
     Examples:
       | amount              | fee       |
-      | 0.001000            | 0.183815  |
-      | 1.000000            | 0.199811  |
-      | 2.000000            | 0.215719  |
+      | 1.000000            | 0.640003  |
+      | 2.000000            | 0.460004  |
 
   @it-90
   Scenario Outline: Spending Password should be case-sensitive [Transaction confirmation] (IT-90)
@@ -35,7 +34,7 @@ Feature: Send transaction
     When I go to the send transaction screen
     And I fill the form:
       | address                                                     | amount   |
-      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 0.100000 |
+      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 1.000000 |
     And I click on the next button in the wallet send form
     And I see send money confirmation dialog
     And I enter the wallet password:
@@ -66,7 +65,7 @@ Feature: Send transaction
 
   Examples:
       | address                                                     | amount    |fee      |
-      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 0.001000  |0.183815 | 
+      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 1.000000  |0.640003 | 
 
   @it-46
   Scenario: User can't send funds to the invalid address (IT-46)
@@ -110,7 +109,7 @@ Feature: Send transaction
 
     Examples:
       | fee       |
-      | 0.229474  |
+      | 0.209369  |
 
   @invalidWitnessTest @it-20
   Scenario: Sending a Tx and receiving from the server an invalid signature error (IT-20)
@@ -119,8 +118,8 @@ Feature: Send transaction
     When I go to the send transaction screen
     And I fill the form:
       | address                                                     | amount   |
-      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 0.001000 |
-    And The transaction fees are "0.183815"
+      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 1.000000 |
+    And The transaction fees are "0.640003"
     And I click on the next button in the wallet send form
     And I see send money confirmation dialog
     And I enter the wallet password:
@@ -136,8 +135,8 @@ Feature: Send transaction
     When I go to the send transaction screen
     And I fill the form:
       | address                                                     | amount   |
-      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 0.001000 |
-    And The transaction fees are "0.183815"
+      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 1.000000 |
+    And The transaction fees are "0.640003"
     And I click on the next button in the wallet send form
     And I see send money confirmation dialog
     And I enter the wallet password:
@@ -169,7 +168,7 @@ Feature: Send transaction
     When I go to the send transaction screen
     And I fill the form:
       | address                                                     | amount   |
-      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 0.100000 |
+      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 1.000000 |
     Then I should see a not enough ada error
 
   @it-59
@@ -180,7 +179,7 @@ Feature: Send transaction
     And I fill the form:
       | address                                                     | amount   |
       | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 2.000000 |
-    And The transaction fees are "0.215719"
+    And The transaction fees are "0.460004"
     And I click on the next button in the wallet send form
     And I see send money confirmation dialog
     Then A successful tx gets sent from my wallet from another client
@@ -203,8 +202,8 @@ Feature: Send transaction
     When I go to the send transaction screen
     And I fill the form:
       | address                                                     | amount   |
-      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 0.001000 |
-    And The transaction fees are "0.183815"
+      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 1.000000 |
+    And The transaction fees are "0.640003"
     And I click on the next button in the wallet send form
     And I see send money confirmation dialog
     And I enter the wallet password:
@@ -227,6 +226,6 @@ Feature: Send transaction
     And I fill the form:
       | address                                                     | amount   |
       | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 2.000000 |
-    And The transaction fees are "0.215719"
+    And The transaction fees are "0.460004"
     Then A pending tx gets sent from my wallet from another client
     Then I should see a warning block

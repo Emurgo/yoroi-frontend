@@ -59,4 +59,4 @@ Feature: Migration
 
     Examples:
       | amount              | fee       |
-      | 0.001000            | 0.168082  |
+      | 1.000000            | 0.168801  |

@@ -119,6 +119,6 @@ Feature: Transfer Yoroi Wallet funds
     Then I click the next button
     Then I should see on the Yoroi transfer summary screen:
     | fromAddress                                                 | amount           |   
-    | Ae2tdPwUPEZ7TQpzbJZCbA5BjW4zWYFn47jKo43ouvfe4EABoCfvEjwYvJr | 500000    |
+    | Ae2tdPwUPEZ7TQpzbJZCbA5BjW4zWYFn47jKo43ouvfe4EABoCfvEjwYvJr | 2000000    |
     When I confirm Yoroi transfer funds
     Then I should see the Yoroi transfer success screen

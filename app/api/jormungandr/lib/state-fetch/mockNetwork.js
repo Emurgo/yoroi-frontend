@@ -567,6 +567,7 @@ export function toRemoteByronTx(
   blockchain: Array<RemoteTransaction>,
   request: SignedRequestInternal,
 ): RemoteTransaction {
+  // TODO: this is wrong. Should be V3 transaction parsing
   const signedTx = RustModule.WalletV2.SignedTransaction
     .from_bytes(Buffer.from(request.signedTx, 'base64'));
   const hash = signedTx.id();

@@ -28,7 +28,7 @@ export function addressToKind(
 ): CoreAddressT {
   // Need to try parsing as a legacy address first
   // Since parsing as bech32 directly may give a wrong result if the address contains a 1
-  if (RustModule.WalletV2.Address.is_valid(address)) {
+  if (RustModule.WalletV4.ByronAddress.is_valid(address)) {
     return CoreAddressTypes.CARDANO_LEGACY;
   }
   try {
@@ -122,7 +122,6 @@ export function isValidReceiveAddress(
   throw new Error(`${nameof(isValidReceiveAddress)} Unsupported network ${JSON.stringify(network)}`);
 }
 
-
 export function byronAddrToHex(
   base58Addr: string
 ): string {
@@ -138,7 +137,7 @@ export function normalizeToBase58(
   // this function normalizes everything to base58
 
   // 1) If already base58, simply return
-  if (RustModule.WalletV2.Address.is_valid(addr)) {
+  if (RustModule.WalletV4.ByronAddress.is_valid(addr)) {
     return addr;
   }
 
@@ -170,7 +169,7 @@ export function normalizeToAddress(
   // this function, we try parsing in all encodings possible
 
   // 1) Try converting from base58
-  if (RustModule.WalletV2.Address.is_valid(addr)) {
+  if (RustModule.WalletV4.ByronAddress.is_valid(addr)) {
     return RustModule.WalletV4.ByronAddress.from_base58(addr).to_address();
   }
 
@@ -265,7 +264,7 @@ export function addressToDisplayString(
 ): string {
   // Need to try parsing as a legacy address first
   // Since parsing as bech32 directly may give a wrong result if the address contains a 1
-  if (RustModule.WalletV2.Address.is_valid(address)) {
+  if (RustModule.WalletV4.ByronAddress.is_valid(address)) {
     return address;
   }
   try {
@@ -297,7 +296,7 @@ export function getAddressPayload(
 ): string {
   // Need to try parsing as a legacy address first
   // Since parsing as bech32 directly may give a wrong result if the address contains a 1
-  if (RustModule.WalletV2.Address.is_valid(address)) {
+  if (RustModule.WalletV4.ByronAddress.is_valid(address)) {
     return address;
   }
   try {

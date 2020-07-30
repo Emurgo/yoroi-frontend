@@ -415,20 +415,40 @@ export function toRemoteByronTx(
   blockchain: Array<RemoteTransaction>,
   request: SignedRequestInternal,
 ): RemoteTransaction {
-  const signedTx = RustModule.WalletV2.SignedTransaction
+  const signedTx = RustModule.WalletV4.Transaction
     .from_bytes(Buffer.from(request.signedTx, 'base64'));
-  const hash = signedTx.id();
-  const transaction = signedTx.to_json().tx;
 
+  const body = signedTx.body();
+  const hash = Buffer.from(RustModule.WalletV4.hash_transaction(body).to_bytes()).toString('hex');
+
+  const wasmOutputs = body.outputs();
+  const outputs = [];
+  for (let i = 0; i < wasmOutputs.len(); i++) {
+    const output = wasmOutputs.get(i);
+    const asByron = RustModule.WalletV4.ByronAddress.from_address(output.address());
+
+    outputs.push({
+      address: asByron != null ? asByron.to_base58() : Buffer.from(output.address().to_bytes()).toString('hex'),
+      amount: output.amount().to_str(),
+    });
+  }
+
+  const wasmInputs = body.inputs();
+  const inputs = [];
+  for (let i = 0; i < wasmInputs.len(); i++) {
+    const input = wasmInputs.get(i);
+
+    inputs.push({
+      id: Buffer.from(input.transaction_id().to_bytes()).toString('hex'),
+      index: input.index(),
+    });
+  }
   const base = {
     hash,
     last_update: new Date().toString(),
     tx_state: 'Pending',
-    inputs: getByronInputs(blockchain, transaction.inputs),
-    outputs: transaction.outputs.map(output => ({
-      address: output.address,
-      amount: output.value.toString(),
-    })),
+    inputs: getByronInputs(blockchain, inputs),
+    outputs,
   };
 
   return {

@@ -34,6 +34,7 @@ module.exports = {
     'import/prefer-default-export': 'off',
     'import/order': 'off',
     'lines-between-class-members': 'off',
+    'no-multiple-empty-lines': 'off',
     'no-multi-spaces': 'off',
     'no-restricted-globals': 'off',
     'no-restricted-syntax': 'off',
