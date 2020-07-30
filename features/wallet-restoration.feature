@@ -342,7 +342,6 @@ Feature: Restore Wallet
     | password   | repeatedPassword |
     | asdfasdfasdf | asdfasdfasdf       |
     And I click the "Restore Wallet" button
-    Then I should see a plate EAJD-7036
     Then I click the next button
     Then I should see the opened wallet with name "Restored Wallet"
     And I go to the receive screen

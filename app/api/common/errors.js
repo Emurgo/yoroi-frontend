@@ -152,6 +152,10 @@ const messages = defineMessages({
     id: 'api.errors.invalidMnemonicError',
     defaultMessage: '!!!Invalid phrase entered, please check.',
   },
+  hardwareUnsupportedError: {
+    id: 'api.errors.hardwareUnsupportedError',
+    defaultMessage: '!!!This hardware wallet is currently not supported.',
+  },
 });
 
 export class ServerStatusError extends LocalizableError {
@@ -483,6 +487,15 @@ export class InvalidMnemonicError extends LocalizableError {
     super({
       id: messages.invalidMnemonicError.id,
       defaultMessage: messages.invalidMnemonicError.defaultMessage || '',
+    });
+  }
+}
+
+export class HardwareUnsupportedError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.hardwareUnsupportedError.id,
+      defaultMessage: messages.hardwareUnsupportedError.defaultMessage || '',
     });
   }
 }

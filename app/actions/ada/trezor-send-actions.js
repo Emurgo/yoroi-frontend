@@ -5,7 +5,7 @@ import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 
 export type SendUsingTrezorParams = {|
-  signRequest: BaseSignRequest<RustModule.WalletV2.Transaction>,
+  signRequest: BaseSignRequest<RustModule.WalletV4.TransactionBuilder>,
 |};
 
 // ======= Sending ADA using Trezor ACTIONS =======

@@ -33,7 +33,7 @@ import { SelectedExplorer } from '../../domain/SelectedExplorer';
 import type { Notification } from '../../types/notificationType';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import { getApiForNetwork, getApiMeta } from '../../api/common/utils';
-import { isWithinSupply } from '../../utils/validations';
+import { validateAmount } from '../../utils/validations';
 import { Logger, } from '../../utils/logging';
 import type { AddressSubgroupMeta, IAddressTypeUiSubset, IAddressTypeStore } from '../../stores/stateless/addressStores';
 import { routeForStore, allAddressSubgroups, applyAddressFilter, } from '../../stores/stateless/addressStores';
@@ -264,8 +264,10 @@ export default class WalletReceivePage extends Component<Props> {
               apiMeta.totalSupply.div(apiMeta.decimalPlaces).toFixed().length
             }
             currencyMaxFractionalDigits={apiMeta.decimalPlaces.toNumber()}
-            validateAmount={(amount) => Promise.resolve(
-              isWithinSupply(amount, apiMeta.totalSupply)
+            validateAmount={(amount) => validateAmount(
+              amount,
+              publicDeriver.getParent().getNetworkInfo(),
+              this.context.intl,
             )}
           />
         ) : null}

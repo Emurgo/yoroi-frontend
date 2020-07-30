@@ -145,7 +145,6 @@ export function getMockServer(
       res.send(response);
     });
 
-
     installCoinPriceRequestHandlers(server);
 
     MockServer = server.listen(Ports.DevBackendServe, () => {

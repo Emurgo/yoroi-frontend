@@ -1,6 +1,5 @@
 {
   "network": {
-    "protocolMagic": 764824073,
     "backendUrl": "https://shelley-itn-yoroi-backend.yoroiwallet.com",
     "websocketUrl": "wss://shelley-itn-yoroi-backend.yoroiwallet.com:443",
     "name": "shelley-testnet"

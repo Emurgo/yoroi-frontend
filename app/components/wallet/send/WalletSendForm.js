@@ -21,7 +21,7 @@ import BorderedBox from '../../widgets/BorderedBox';
 import styles from './WalletSendForm.scss';
 import globalMessages, { memoMessages, } from '../../../i18n/global-messages';
 import type { UriParams } from '../../../utils/URIHandling';
-import { getAddressPayload } from '../../../api/ada/lib/storage/bridge/utils';
+import { getAddressPayload, isValidReceiveAddress } from '../../../api/ada/lib/storage/bridge/utils';
 import { MAX_MEMO_SIZE } from '../../../config/externalStorageConfig';
 import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import {
@@ -32,9 +32,8 @@ import {
 import config from '../../../config';
 import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
 import LocalizableError from '../../../i18n/LocalizableError';
-import { isJormungandr } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import WarningBox from '../../widgets/WarningBox';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type { $npm$ReactIntl$IntlFormat, } from 'react-intl';
 
 const messages = defineMessages({
   titleLabel: {
@@ -69,14 +68,6 @@ const messages = defineMessages({
     id: 'wallet.send.form.sendAll.checkboxLabel',
     defaultMessage: '!!!Send all {coinName}',
   },
-  invalidAddress: {
-    id: 'wallet.send.form.errors.invalidAddress',
-    defaultMessage: '!!!Please enter a valid address.',
-  },
-  invalidAmount: {
-    id: 'wallet.send.form.errors.invalidAmount',
-    defaultMessage: '!!!Please enter a valid amount.',
-  },
   invalidTitle: {
     id: 'wallet.send.form.errors.invalidTitle',
     defaultMessage: '!!!Please enter a title with at least 3 characters.',
@@ -97,10 +88,6 @@ const messages = defineMessages({
     id: 'wallet.transaction.memo.optional.invalid',
     defaultMessage: '!!!Memo cannot be more than {maxMemo} characters.',
   },
-  cannotSendtoLegacy: {
-    id: 'wallet.send.form.cannotSendToLegacy',
-    defaultMessage: '!!!You cannot send to legacy addresses (any address created before November 29th, 2019)',
-  },
 });
 
 type Props = {|
@@ -111,10 +98,8 @@ type Props = {|
   +currencyMaxIntegerDigits: number,
   +currencyMaxFractionalDigits: number,
   +hasAnyPending: boolean,
-  +validateAmount: (amountInNaturalUnits: string) => Promise<boolean>,
+  +validateAmount: (amountInNaturalUnits: string) => Promise<[boolean, void | string]>,
   +onSubmit: void => void,
-  +isValidJormungandrAddress: string => boolean,
-  +isValidLegacyAddress: string => boolean,
   +totalInput: ?BigNumber,
   +classicTheme: boolean,
   +updateReceiver: (void | string) => void,
@@ -204,7 +189,7 @@ export default class WalletSendForm extends Component<Props> {
             this.props.updateReceiver();
             return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
           }
-          const updateReceiver = (isValid) => {
+          const updateReceiver = (isValid: bool) => {
             if (isValid) {
               this.props.updateReceiver(
                 getAddressPayload(receiverValue, this.props.selectedNetwork)
@@ -213,17 +198,14 @@ export default class WalletSendForm extends Component<Props> {
               this.props.updateReceiver();
             }
           };
-          const isValidLegacy = this.props.isValidLegacyAddress(receiverValue);
-          if (!isJormungandr(this.props.selectedNetwork)) {
-            updateReceiver(isValidLegacy);
-            return [isValidLegacy, this.context.intl.formatMessage(messages.invalidAddress)];
+
+          const isValid = isValidReceiveAddress(receiverValue, this.props.selectedNetwork);
+          if (isValid === true) {
+            updateReceiver(true);
+            return [isValid];
           }
-          if (isValidLegacy) {
-            return [false, this.context.intl.formatMessage(messages.cannotSendtoLegacy)];
-          }
-          const isValidJormungandr = this.props.isValidJormungandrAddress(receiverValue);
-          updateReceiver(isValidJormungandr);
-          return [isValidJormungandr, this.context.intl.formatMessage(messages.invalidAddress)];
+          updateReceiver(isValid[0]);
+          return [isValid[0], this.context.intl.formatMessage(isValid[1])];
         }],
       },
       amount: {
@@ -251,12 +233,12 @@ export default class WalletSendForm extends Component<Props> {
             this.props.currencyMaxFractionalDigits,
           );
           const isValidAmount = await this.props.validateAmount(formattedAmount);
-          if (isValidAmount) {
+          if (isValidAmount[0]) {
             this.props.updateAmount(Number(formattedAmount));
           } else {
             this.props.updateAmount();
           }
-          return [isValidAmount, this.context.intl.formatMessage(messages.invalidAmount)];
+          return isValidAmount;
         }],
       },
       memo: {

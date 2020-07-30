@@ -31,6 +31,8 @@ import {
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import { getApiForNetwork } from '../../api/common/utils';
 import type { AddressKeyMap } from '../../api/ada/transactions/types';
+import { isCardanoHaskell } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { normalizeToBase58 } from '../../api/ada/lib/storage/bridge/utils';
 
 declare var CONFIG: ConfigType;
 const websocketUrl = CONFIG.network.websocketUrl;
@@ -135,12 +137,31 @@ export default class DaedalusTransferStore extends Store {
         if (!this.ws) { throw new Error('Invalid WebSocket'); }
         this.ws.close(WS_CODE_NORMAL_CLOSURE);
 
-        const data = JSON.parse(event.data);
+        const data: {
+          addresses: Array<string>,
+          msg: string,
+          ...,
+        } = JSON.parse(event.data);
         Logger.info(`[ws::message] on: ${data.msg}`);
         if (data.msg === MSG_TYPE_RESTORE) {
           this._updateStatus(TransferStatus.CHECKING_ADDRESSES);
           const checker = RustModule.WalletV2.DaedalusAddressChecker.new(wallet);
-          const addressKeys = getAddressesKeys({ checker, fullUtxo: data.addresses });
+
+          const fullUtxo = isCardanoHaskell(publicDeriver.getParent().getNetworkInfo())
+            // no server-side filtering for address type so we instead filter here
+            // additionally, need to normalize backend response to base58
+            ? data.addresses.reduce(
+              (addrs, addr) => {
+                const normalized = normalizeToBase58(addr);
+                if (normalized == null) return addrs;
+                addrs.push(normalized);
+                return addrs;
+              },
+              ([]: Array<string>)
+            )
+            : data.addresses; // Jormungandr filtered server-side
+
+          const addressKeys = getAddressesKeys({ checker, fullUtxo });
           this._updateStatus(TransferStatus.GENERATING_TX);
 
           const selectedApiType = getApiForNetwork(publicDeriver.getParent().getNetworkInfo());

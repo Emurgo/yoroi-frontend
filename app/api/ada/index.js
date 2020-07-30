@@ -1,5 +1,6 @@
 // @flow
 import moment from 'moment';
+import BigNumber from 'bignumber.js';
 import type { lf$Database } from 'lovefield';
 import {
   Logger,
@@ -69,11 +70,11 @@ import type {
   GetForeignAddressesRequest, GetForeignAddressesResponse,
 } from '../common/index';
 import {
-  sendAllUnsignedTx as byronSendAllUnsignedTx,
-  newAdaUnsignedTx as byronNewAdaUnsignedTx,
-  asAddressedUtxo as byronAsAddressedUtxo,
-  signTransaction as byronSignTransaction,
-} from './transactions/byron/transactionsV2';
+  sendAllUnsignedTx as shelleySendAllUnsignedTx,
+  newAdaUnsignedTx as shelleyNewAdaUnsignedTx,
+  asAddressedUtxo as shelleyAsAddressedUtxo,
+  signTransaction as shelleySignTransaction,
+} from './transactions/shelley/transactions';
 import {
   generateWalletRootKey,
   generateAdaMnemonic,
@@ -95,18 +96,18 @@ import type {
 } from '../../domain/HWSignTx';
 import Notice from '../../domain/Notice';
 import type { CardanoSignTransaction } from 'trezor-connect/lib/types/networks/cardano';
-import {
-  createTrezorSignTxPayload,
-  broadcastTrezorSignedTx,
-  createLedgerSignTxPayload,
-  prepareAndBroadcastLedgerSignedTx,
-} from './transactions/byron/hwTransactions';
+// import {
+//   createTrezorSignTxPayload,
+//   broadcastTrezorSignedTx,
+//   createLedgerSignTxPayload,
+//   prepareAndBroadcastLedgerSignedTx,
+// } from './transactions/byron/hwTransactions';
 import {
   GenericApiError,
   IncorrectWalletPasswordError,
   WalletAlreadyRestoredError,
   InvalidWitnessError,
-  CheckAddressesInUseApiError,
+  HardwareUnsupportedError,
 } from '../common/errors';
 import LocalizableError from '../../i18n/LocalizableError';
 import { scanBip44Account, } from '../common/lib/restoration/bip44';
@@ -114,7 +115,7 @@ import { v2genAddressBatchFunc, } from './restoration/byron/scan';
 import type {
   BaseSignRequest,
 } from './transactions/types';
-import { ByronTxSignRequest } from './transactions/byron/ByronTxSignRequest';
+import { HaskellShelleyTxSignRequest, } from './transactions/shelley/HaskellShelleyTxSignRequest';
 import type {
   SignTransactionResponse as LedgerSignTxResponse
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
@@ -240,7 +241,7 @@ export type GetNoticesFunc = (
 
 export type SignAndBroadcastRequest = {|
   publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetSigningKey,
-  signRequest: BaseSignRequest<RustModule.WalletV2.Transaction>,
+  signRequest: BaseSignRequest<RustModule.WalletV4.TransactionBuilder>,
   password: string,
   sendTx: SendFunc,
 |};
@@ -252,7 +253,7 @@ export type SignAndBroadcastFunc = (
 // createTrezorSignTxData
 
 export type CreateTrezorSignTxDataRequest = {|
-  signRequest: BaseSignRequest<RustModule.WalletV2.Transaction>,
+  signRequest: BaseSignRequest<RustModule.WalletV4.TransactionBuilder>,
   getTxsBodiesForUTXOs: TxBodiesFunc,
   network: $ReadOnly<NetworkRow>,
 |};
@@ -278,7 +279,7 @@ export type BroadcastTrezorSignedTxFunc = (
 // createLedgerSignTxData
 
 export type CreateLedgerSignTxDataRequest = {|
-  signRequest: BaseSignRequest<RustModule.WalletV2.Transaction>,
+  signRequest: BaseSignRequest<RustModule.WalletV4.TransactionBuilder>,
   getTxsBodiesForUTXOs: TxBodiesFunc,
 |};
 export type CreateLedgerSignTxDataResponse = {| ledgerSignTxPayload: LedgerSignTxPayload, |};
@@ -292,7 +293,7 @@ export type PrepareAndBroadcastLedgerSignedTxRequest = {|
   getPublicKey: () => Promise<IGetPublicResponse>,
   keyLevel: number,
   ledgerSignTxResp: LedgerSignTxResponse,
-  unsignedTx: RustModule.WalletV2.Transaction,
+  unsignedTx: RustModule.WalletV4.TransactionBody,
   sendTx: SendFunc,
 |};
 export type PrepareAndBroadcastLedgerSignedTxResponse = SignedResponse;
@@ -304,6 +305,7 @@ export type PrepareAndBroadcastLedgerSignedTxFunc = (
 
 export type CreateUnsignedTxRequest = {|
   publicDeriver: IPublicDeriver<ConceptualWallet> & IGetAllUtxos & IHasUtxoChains,
+  absSlotNumber: BigNumber,
   receiver: string,
   filter: ElementOf<IGetAllUtxosResponse> => boolean,
   ...({|
@@ -312,7 +314,7 @@ export type CreateUnsignedTxRequest = {|
     shouldSendAll: true,
   |}),
 |};
-export type CreateUnsignedTxResponse = ByronTxSignRequest;
+export type CreateUnsignedTxResponse = HaskellShelleyTxSignRequest;
 
 export type CreateUnsignedTxFunc = (
   request: CreateUnsignedTxRequest
@@ -469,6 +471,7 @@ export default class AdaApi {
       return await getAllAddressesForDisplay(request);
     } catch (error) {
       Logger.error(`${nameof(AdaApi)}::${nameof(this.getAllAddressesForDisplay)} error: ` + stringifyError(error));
+      if (error instanceof LocalizableError) throw error;
       throw new GenericApiError();
     }
   }
@@ -485,6 +488,7 @@ export default class AdaApi {
       return await getChainAddressesForDisplay(request);
     } catch (error) {
       Logger.error(`${nameof(AdaApi)}::${nameof(this.getChainAddressesForDisplay)} error: ` + stringifyError(error));
+      if (error instanceof LocalizableError) throw error;
       throw new GenericApiError();
     }
   }
@@ -537,6 +541,7 @@ export default class AdaApi {
       };
     } catch (error) {
       Logger.error(`${nameof(AdaApi)}::${nameof(this.refreshTransactions)} error: ` + stringifyError(error));
+      if (error instanceof LocalizableError) throw error;
       throw new GenericApiError();
     }
   }
@@ -571,6 +576,7 @@ export default class AdaApi {
       return mappedTransactions;
     } catch (error) {
       Logger.error(`${nameof(AdaApi)}::${nameof(this.refreshPendingTransactions)} error: ` + stringifyError(error));
+      if (error instanceof LocalizableError) throw error;
       throw new GenericApiError();
     }
   }
@@ -590,6 +596,7 @@ export default class AdaApi {
       }
     } catch (error) {
       Logger.error(`${nameof(AdaApi)}::${nameof(this.removeAllTransactions)} error: ` + stringifyError(error));
+      if (error instanceof LocalizableError) throw error;
       throw new GenericApiError();
     }
   }
@@ -601,6 +608,7 @@ export default class AdaApi {
       return await getForeignAddresses({ publicDeriver: request.publicDeriver });
     } catch (error) {
       Logger.error(`${nameof(AdaApi)}::${nameof(this.getForeignAddresses)} error: ` + stringifyError(error));
+      if (error instanceof LocalizableError) throw error;
       throw new GenericApiError();
     }
   }
@@ -640,6 +648,7 @@ export default class AdaApi {
       };
     } catch (error) {
       Logger.error(`${nameof(AdaApi)}::${nameof(this.getNotices)} error: ` + stringifyError(error));
+      if (error instanceof LocalizableError) throw error;
       throw new GenericApiError();
     }
   }
@@ -655,32 +664,27 @@ export default class AdaApi {
     request: SignAndBroadcastRequest
   ): Promise<SignAndBroadcastResponse> {
     Logger.debug(`${nameof(AdaApi)}::${nameof(this.signAndBroadcast)} called`);
-    const { password, signRequest } = request;
+    const { password } = request;
     try {
-      const config = getCardanoHaskellBaseConfig(
-        request.publicDeriver.getParent().getNetworkInfo()
-      ).reduce((acc, next) => Object.assign(acc, next), {});
-
       const signingKey = await request.publicDeriver.getSigningKey();
       const normalizedKey = await request.publicDeriver.normalizeKey({
         ...signingKey,
         password,
       });
-      const unsignedTx = signRequest.unsignedTx;
-
-      const signedTx = byronSignTransaction(
-        {
-          ...signRequest,
-          unsignedTx,
-        },
+      const signedTx = shelleySignTransaction(
+        request.signRequest,
         request.publicDeriver.getParent().getPublicDeriverLevel(),
-        RustModule.WalletV2.PrivateKey.from_hex(normalizedKey.prvKeyHex),
-        config.ByronNetworkId,
+        RustModule.WalletV4.Bip32PrivateKey.from_bytes(
+          Buffer.from(normalizedKey.prvKeyHex, 'hex')
+        ),
+        undefined,
       );
 
       const response = request.sendTx({
-        id: signedTx.id(),
-        encodedTx: Buffer.from(signedTx.to_hex(), 'hex'),
+        id: Buffer.from(
+          RustModule.WalletV4.hash_transaction(signedTx.body()).to_bytes()
+        ).toString('hex'),
+        encodedTx: signedTx.to_bytes(),
       });
       Logger.debug(
         `${nameof(AdaApi)}::${nameof(this.signAndBroadcast)} success: ` + stringifyData(response)
@@ -694,6 +698,7 @@ export default class AdaApi {
       if (error instanceof InvalidWitnessError) {
         throw new InvalidWitnessError();
       }
+      if (error instanceof LocalizableError) throw error;
       throw new GenericApiError();
     }
   }
@@ -704,24 +709,25 @@ export default class AdaApi {
     try {
       Logger.debug(`${nameof(AdaApi)}::${nameof(this.createTrezorSignTxData)} called`);
 
-      const config = getCardanoHaskellBaseConfig(
-        request.network
-      ).reduce((acc, next) => Object.assign(acc, next), {});
+      throw new HardwareUnsupportedError();
 
-      const trezorSignTxPayload = await createTrezorSignTxPayload(
-        request.signRequest,
-        request.getTxsBodiesForUTXOs,
-        config.ByronNetworkId,
-      );
-      Logger.debug(`${nameof(AdaApi)}::${nameof(this.createTrezorSignTxData)} success: ` + stringifyData(trezorSignTxPayload));
+      // const config = getCardanoHaskellBaseConfig(
+      //   request.network
+      // ).reduce((acc, next) => Object.assign(acc, next), {});
 
-      return {
-        trezorSignTxPayload,
-      };
+      // const trezorSignTxPayload = await createTrezorSignTxPayload(
+      //   request.signRequest,
+      //   request.getTxsBodiesForUTXOs,
+      //   config.ByronNetworkId,
+      // );
+      // Logger.debug(`${nameof(AdaApi)}::${nameof(this.createTrezorSignTxData)} success: ` + stringifyData(trezorSignTxPayload));
+
+      // return {
+      //   trezorSignTxPayload,
+      // };
     } catch (error) {
       Logger.error(`${nameof(AdaApi)}::${nameof(this.createTrezorSignTxData)} error: ` + stringifyError(error));
-
-      // We don't know what the problem was so throw a generic error
+      if (error instanceof LocalizableError) throw error;
       throw new GenericApiError();
     }
   }
@@ -731,13 +737,14 @@ export default class AdaApi {
   ): Promise<BroadcastTrezorSignedTxResponse> {
     Logger.debug(`${nameof(AdaApi)}::${nameof(this.broadcastTrezorSignedTx)} called`);
     try {
-      const response = await broadcastTrezorSignedTx(
-        request.signedTxRequest,
-        request.sendTx
-      );
-      Logger.debug(`${nameof(AdaApi)}::${nameof(this.broadcastTrezorSignedTx)} success: ` + stringifyData(response));
+      throw new HardwareUnsupportedError();
+      // const response = await broadcastTrezorSignedTx(
+      //   request.signedTxRequest,
+      //   request.sendTx
+      // );
+      // Logger.debug(`${nameof(AdaApi)}::${nameof(this.broadcastTrezorSignedTx)} success: ` + stringifyData(response));
 
-      return response;
+      // return response;
     } catch (error) {
       Logger.error(`${nameof(AdaApi)}::${nameof(this.broadcastTrezorSignedTx)} error: ` + stringifyError(error));
 
@@ -745,7 +752,7 @@ export default class AdaApi {
         throw new InvalidWitnessError();
       }
 
-      // We don't know what the problem was so throw a generic error
+      if (error instanceof LocalizableError) throw error;
       throw new GenericApiError();
     }
   }
@@ -755,27 +762,24 @@ export default class AdaApi {
   ): Promise<CreateLedgerSignTxDataResponse> {
     try {
       Logger.debug(`${nameof(AdaApi)}::${nameof(this.createLedgerSignTxData)} called`);
-      const { signRequest, getTxsBodiesForUTXOs } = request;
 
-      const ledgerSignTxPayload = await createLedgerSignTxPayload(
-        signRequest,
-        getTxsBodiesForUTXOs,
-      );
+      throw new HardwareUnsupportedError();
+      // const { signRequest, getTxsBodiesForUTXOs } = request;
 
-      Logger.debug(`${nameof(AdaApi)}::${nameof(this.createLedgerSignTxData)} success: ` + stringifyData(ledgerSignTxPayload));
-      return {
-        ledgerSignTxPayload,
-      };
+      // const ledgerSignTxPayload = await createLedgerSignTxPayload(
+      //   signRequest,
+      //   getTxsBodiesForUTXOs,
+      // );
+
+      // Logger.debug(`${nameof(AdaApi)}::${nameof(this.createLedgerSignTxData)} success: ` + stringifyData(ledgerSignTxPayload));
+      // return {
+      //   ledgerSignTxPayload,
+      // };
     } catch (error) {
       Logger.error(`${nameof(AdaApi)}::${nameof(this.createLedgerSignTxData)} error: ` + stringifyError(error));
 
-      if (error instanceof LocalizableError) {
-        // we found it as a LocalizableError, so could throw it as it is.
-        throw error;
-      } else {
-        // We don't know what the problem was so throw a generic error
-        throw new GenericApiError();
-      }
+      if (error instanceof LocalizableError) throw error;
+      throw new GenericApiError();
     }
   }
 
@@ -785,32 +789,28 @@ export default class AdaApi {
     try {
       Logger.debug(`${nameof(AdaApi)}::${nameof(this.prepareAndBroadcastLedgerSignedTx)} called`);
 
-      const publicKeyRow = await request.getPublicKey();
-      if (publicKeyRow.IsEncrypted) {
-        throw new Error(`${nameof(AdaApi)}::${nameof(this.prepareAndBroadcastLedgerSignedTx)} unexpected encrypted public key`);
-      }
-      const publicKey = RustModule.WalletV2.PublicKey.from_hex(publicKeyRow.Hash);
-      const { ledgerSignTxResp, unsignedTx, sendTx } = request;
-      const response = await prepareAndBroadcastLedgerSignedTx(
-        ledgerSignTxResp,
-        unsignedTx,
-        publicKey,
-        request.keyLevel,
-        sendTx,
-      );
-      Logger.debug(`${nameof(AdaApi)}::${nameof(this.prepareAndBroadcastLedgerSignedTx)} success: ` + stringifyData(response));
+      throw new HardwareUnsupportedError();
+      // const publicKeyRow = await request.getPublicKey();
+      // if (publicKeyRow.IsEncrypted) {
+      //   throw new Error(`${nameof(AdaApi)}::${nameof(this.prepareAndBroadcastLedgerSignedTx)} unexpected encrypted public key`);
+      // }
+      // const publicKey = RustModule.WalletV2.PublicKey.from_hex(publicKeyRow.Hash);
+      // const { ledgerSignTxResp, unsignedTx, sendTx } = request;
+      // const response = await prepareAndBroadcastLedgerSignedTx(
+      //   ledgerSignTxResp,
+      //   unsignedTx,
+      //   publicKey,
+      //   request.keyLevel,
+      //   sendTx,
+      // );
+      // Logger.debug(`${nameof(AdaApi)}::${nameof(this.prepareAndBroadcastLedgerSignedTx)} success: ` + stringifyData(response));
 
-      return response;
+      // return response;
     } catch (error) {
       Logger.error(`${nameof(AdaApi)}::${nameof(this.prepareAndBroadcastLedgerSignedTx)} error: ` + stringifyError(error));
 
-      if (error instanceof LocalizableError) {
-        // we found it as a LocalizableError, so could throw it as it is.
-        throw error;
-      } else {
-        // We don't know what the problem was so throw a generic error
-        throw new GenericApiError();
-      }
+      if (error instanceof LocalizableError) throw error;
+      throw new GenericApiError();
     }
   }
 
@@ -820,16 +820,32 @@ export default class AdaApi {
     Logger.debug(`${nameof(AdaApi)}::${nameof(this.createUnsignedTx)} called`);
     const { receiver, } = request;
     try {
+      const config = getCardanoHaskellBaseConfig(
+        request.publicDeriver.getParent().getNetworkInfo()
+      ).reduce((acc, next) => Object.assign(acc, next), {});
+
+      const protocolParams = {
+        keyDeposit: RustModule.WalletV4.BigNum.from_str(config.KeyDeposit),
+        linearFee: RustModule.WalletV4.LinearFee.new(
+          RustModule.WalletV4.BigNum.from_str(config.LinearFee.coefficient),
+          RustModule.WalletV4.BigNum.from_str(config.LinearFee.constant),
+        ),
+        minimumUtxoVal: RustModule.WalletV4.BigNum.from_str(config.MinimumUtxoVal),
+        poolDeposit: RustModule.WalletV4.BigNum.from_str(config.PoolDeposit),
+      };
+
       const utxos = await request.publicDeriver.getAllUtxos();
       const filteredUtxos = utxos.filter(utxo => request.filter(utxo));
 
-      const addressedUtxo = byronAsAddressedUtxo(filteredUtxos);
+      const addressedUtxo = shelleyAsAddressedUtxo(filteredUtxos);
 
       let unsignedTxResponse;
       if (request.shouldSendAll != null) {
-        unsignedTxResponse = byronSendAllUnsignedTx(
+        unsignedTxResponse = shelleySendAllUnsignedTx(
           receiver,
-          addressedUtxo
+          addressedUtxo,
+          request.absSlotNumber,
+          protocolParams
         );
       } else if (request.amount != null) {
         const amount = request.amount;
@@ -838,14 +854,16 @@ export default class AdaApi {
           throw new Error(`${nameof(this.createUnsignedTx)} no internal addresses left. Should never happen`);
         }
         const changeAddr = nextUnusedInternal.addressInfo;
-        unsignedTxResponse = byronNewAdaUnsignedTx(
+        unsignedTxResponse = shelleyNewAdaUnsignedTx(
           receiver,
           amount,
-          [{
+          {
             address: changeAddr.addr.Hash,
             addressing: changeAddr.addressing,
-          }],
-          addressedUtxo
+          },
+          addressedUtxo,
+          request.absSlotNumber,
+          protocolParams
         );
       } else {
         throw new Error(`${nameof(this.createUnsignedTx)} unknown param`);
@@ -853,9 +871,9 @@ export default class AdaApi {
       Logger.debug(
         `${nameof(AdaApi)}::${nameof(this.createUnsignedTx)} success: ` + stringifyData(unsignedTxResponse)
       );
-      return new ByronTxSignRequest({
+      return new HaskellShelleyTxSignRequest({
         senderUtxos: unsignedTxResponse.senderUtxos,
-        unsignedTx: unsignedTxResponse.txBuilder.make_transaction(),
+        unsignedTx: unsignedTxResponse.txBuilder,
         changeAddr: unsignedTxResponse.changeAddr,
         certificate: undefined,
       });
@@ -863,7 +881,7 @@ export default class AdaApi {
       Logger.error(
         `${nameof(AdaApi)}::${nameof(this.createUnsignedTx)} error: ` + stringifyError(error)
       );
-      if (error.id.includes('NotEnoughMoneyToSendError')) throw error;
+      if (error instanceof LocalizableError) throw error;
       throw new GenericApiError();
     }
   }
@@ -884,6 +902,7 @@ export default class AdaApi {
       });
     } catch (error) {
       Logger.error(`${nameof(AdaApi)}::${nameof(this.saveLastReceiveAddressIndex)} error: ` + stringifyError(error));
+      if (error instanceof LocalizableError) throw error;
       throw new GenericApiError();
     }
   }
@@ -918,6 +937,7 @@ export default class AdaApi {
       Logger.error(
         `${nameof(AdaApi)}::${nameof(this.generateWalletRecoveryPhrase)} error: ` + stringifyError(error)
       );
+      if (error instanceof LocalizableError) throw error;
       throw new GenericApiError();
     }
   }
@@ -977,13 +997,8 @@ export default class AdaApi {
       }
 
       // Refer: https://github.com/Emurgo/yoroi-frontend/pull/1055
-      if (error instanceof CheckAddressesInUseApiError) {
-        // CheckAddressesInUseApiError throw it as it is.
-        throw error;
-      } else {
-        // We don't know what the problem was so throw a generic error
-        throw new GenericApiError();
-      }
+      if (error instanceof LocalizableError) throw error;
+      throw new GenericApiError();
     }
   }
 
@@ -1097,7 +1112,7 @@ export default class AdaApi {
       if (error.message.includes('Wallet with that mnemonics already exists')) {
         throw new WalletAlreadyRestoredError();
       }
-      // We don't know what the problem was -> throw generic error
+      if (error instanceof LocalizableError) throw error;
       throw new GenericApiError();
     }
   }
@@ -1149,13 +1164,8 @@ export default class AdaApi {
     } catch (error) {
       Logger.error(`${nameof(AdaApi)}::${nameof(this.createHardwareWallet)} error: ` + stringifyError(error));
 
-      if (error instanceof LocalizableError) {
-        // we found it as a LocalizableError, so could throw it as it is.
-        throw error;
-      } else {
-        // We don't know what the problem was so throw a generic error
-        throw new GenericApiError();
-      }
+      if (error instanceof LocalizableError) throw error;
+      throw new GenericApiError();
     }
   }
 
@@ -1173,13 +1183,8 @@ export default class AdaApi {
     } catch (error) {
       Logger.error(`${nameof(AdaApi)}::${nameof(this.getTransactionRowsToExport)}: ` + stringifyError(error));
 
-      if (error instanceof LocalizableError) {
-        // we found it as a LocalizableError, so could throw it as it is.
-        throw error;
-      } else {
-        // We don't know what the problem was so throw a generic error
-        throw new GenericApiError();
-      }
+      if (error instanceof LocalizableError) throw error;
+      throw new GenericApiError();
     }
   }
 }

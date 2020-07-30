@@ -1,6 +1,7 @@
 // @flow
 
 import '../../lib/test-config';
+import BigNumber from 'bignumber.js';
 import { schema } from 'lovefield';
 import {
   yoroiTransferTxFromAddresses,
@@ -21,7 +22,7 @@ import {
 import {
   loadLovefieldDB,
 } from '../../lib/storage/database/index';
-import { networks } from '../../lib/storage/database/prepackaged/networks';
+import { networks, getCardanoHaskellBaseConfig } from '../../lib/storage/database/prepackaged/networks';
 
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 
@@ -30,6 +31,27 @@ beforeAll(async () => {
   await loadLovefieldDB(schema.DataStoreType.MEMORY);
   silenceLogsForTesting();
 });
+
+const network = networks.ByronMainnet;
+
+function getProtocolParams(): {|
+  keyDeposit: RustModule.WalletV4.BigNum,
+  linearFee: RustModule.WalletV4.LinearFee,
+  minimumUtxoVal: RustModule.WalletV4.BigNum,
+  poolDeposit: RustModule.WalletV4.BigNum,
+  |} {
+  const baseConfig = getCardanoHaskellBaseConfig(network)
+    .reduce((acc, next) => Object.assign(acc, next), {});
+  return {
+    keyDeposit: RustModule.WalletV4.BigNum.from_str(baseConfig.KeyDeposit),
+    linearFee: RustModule.WalletV4.LinearFee.new(
+      RustModule.WalletV4.BigNum.from_str(baseConfig.LinearFee.coefficient),
+      RustModule.WalletV4.BigNum.from_str(baseConfig.LinearFee.constant),
+    ),
+    minimumUtxoVal: RustModule.WalletV4.BigNum.from_str(baseConfig.MinimumUtxoVal),
+    poolDeposit: RustModule.WalletV4.BigNum.from_str(baseConfig.PoolDeposit),
+  };
+}
 
 function getByronAddress(
   accountKey: RustModule.WalletV4.Bip32PrivateKey,
@@ -43,7 +65,7 @@ function getByronAddress(
     Buffer.from(v3Key.as_bytes()).toString('hex')
   );
 
-  const baseConfig = networks.ByronMainnet.BaseConfig[0];
+  const baseConfig = network.BaseConfig[0];
   if (baseConfig.ByronNetworkId == null) {
     throw new Error(`missing Byron network id`);
   }
@@ -62,10 +84,10 @@ function getByronAddress(
   };
 }
 
-describe('Byron era tx format tests', () => {
+describe('Haskell Shelley era tx format tests', () => {
   test('Yoroi transfer from single small UTXO', async () => {
     const txId = '915f2e6865fb31cc93410efb6c0e580ca74862374b3da461e20135c01f312e7c';
-    const inputAmount = '1000000';
+    const inputAmount = '10000000';
     const txIndex = 0;
     const outAddress = 'Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4';
 
@@ -98,29 +120,32 @@ describe('Byron era tx format tests', () => {
       keyLevel: Bip44DerivationLevels.ACCOUNT.level,
       signingKey: accountPrivateKey,
       outputAddr: outAddress,
-      byronNetworkMagic: baseConfig.ByronNetworkId,
+      absSlotNumber: new BigNumber(1),
+      protocolParams: getProtocolParams(),
     });
 
-    expect(transferInfo.fee.toString()).toBe('0.165841');
-    expect(transferInfo.recoveredBalance.toString()).toBe('1');
+    expect(transferInfo.fee.toString()).toBe('0.166469');
+    expect(transferInfo.recoveredBalance.toString()).toBe('10');
     expect(transferInfo.senders).toEqual([addr1.address]);
     expect(transferInfo.receiver).toBe(outAddress);
 
     // check tx itself
-    const signedTx = RustModule.WalletV2.SignedTransaction.from_bytes(transferInfo.encodedTx);
-    const txJson = signedTx.to_json();
-    expect(txJson.tx.inputs).toHaveLength(1);
-    expect(txJson.tx.inputs[0].id).toBe(txId);
-    expect(txJson.tx.inputs[0].index).toBe(txIndex);
+    const signedTx = RustModule.WalletV4.Transaction.from_bytes(transferInfo.encodedTx);
+    const body = signedTx.body();
+    expect(body.inputs().len()).toBe(1);
+    expect(Buffer.from(body.inputs().get(0).transaction_id().to_bytes()).toString('hex')).toBe(txId);
+    expect(body.inputs().get(0).index()).toBe(txIndex);
 
-    expect(txJson.tx.outputs).toHaveLength(1);
-    expect(txJson.tx.outputs[0].address).toBe(outAddress);
-    expect(txJson.tx.outputs[0].value).toBe(834159);
+    expect(body.outputs().len()).toBe(1);
+    expect(
+      // eslint-disable-next-line camelcase
+      RustModule.WalletV4.ByronAddress.from_address(body.outputs().get(0).address())?.to_base58()
+    ).toBe(outAddress);
+    expect(body.outputs().get(0).amount().to_str()).toBe('9833531');
 
-    expect(txJson.witness).toHaveLength(1);
-    expect(txJson.witness[0].PkWitness).toEqual([
-      '07cc5b01ab460562479f3e7fdf782b11636c4a1b721c19b9c1609bc7360b518ef3748736afd541361c4fb90b2963723fe9a10d237a024530d378181df4bf2c68',
-      'c7beab6de0a38171bb4530c5f287239fba79fd8f2d89ba05a233c172bac4995d6933634521aba2ae43a175929ef0738ca531b22cf564071bd7149d8e80845500',
-    ]);
+    const witnesses = signedTx.witness_set().bootstraps();
+    if (witnesses == null) throw new Error('no bootstrap witnesses found');
+    expect(witnesses.len()).toBe(1);
+    expect(Buffer.from(witnesses.get(0).to_bytes()).toString('hex')).toBe('84582007cc5b01ab460562479f3e7fdf782b11636c4a1b721c19b9c1609bc7360b518e584064bc0e2723eae9f387aab05299bb41fab5275e86321bad668655085afee3713999095794c1ed18767ee49c9ea281313d396bc9237ff8ee0d4b796bd2ee1f69085820f3748736afd541361c4fb90b2963723fe9a10d237a024530d378181df4bf2c6841a0');
   });
 });

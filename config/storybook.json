@@ -1,6 +1,5 @@
 {
   "network": {
-    "protocolMagic": 764824073,
     "backendUrl": "should_mock_backend_url",
     "websocketUrl": "should_mock_websocket_url",
     "name": "storybook"

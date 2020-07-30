@@ -9,7 +9,6 @@ export interface ISignRequest<T> {
   fee(shift: boolean): BigNumber;
   uniqueSenderAddresses(): Array<string>;
   receivers(includeChange: boolean): Array<string>;
-  copy(): ISignRequest<T>;
   isEqual(tx: ?mixed): boolean;
 
   self(): BaseSignRequest<T>;

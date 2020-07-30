@@ -223,6 +223,7 @@ export default class DelegationStore extends Store {
     const jormungandrConfig = getJormungandrBaseConfig(
       request.publicDeriver.getParent().getNetworkInfo()
     );
+    // TODO: use time store instead?
     const toRelativeSlotNumber = await genToRelativeSlotNumber(jormungandrConfig);
     const timeToSlot = await genTimeToSlot(jormungandrConfig);
     const currentEpoch = toRelativeSlotNumber(

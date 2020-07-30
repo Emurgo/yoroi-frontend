@@ -37,8 +37,8 @@ import { getApiForNetwork } from '../common/utils';
 import {
   GenericApiError,
   WalletAlreadyRestoredError,
-  CheckAddressesInUseApiError,
 } from '../common/errors';
+import LocalizableError from '../../i18n/LocalizableError';
 import type { CoreAddressT } from '../ada/lib/storage/database/primitives/enums';
 import {
   getChainAddressesForDisplay,
@@ -155,6 +155,7 @@ export default class ErgoApi {
       };
     } catch (error) {
       Logger.error(`${nameof(ErgoApi)}::${nameof(this.refreshTransactions)} error: ` + stringifyError(error));
+      if (error instanceof LocalizableError) throw error;
       throw new GenericApiError();
     }
   }
@@ -180,6 +181,7 @@ export default class ErgoApi {
     //   return mappedTransactions;
     // } catch (error) {
     //   Logger.error(`${nameof(ErgoApi)}::${nameof(this.refreshPendingTransactions)} error: ` + stringifyError(error));
+    //   if (error instanceof LocalizableError) throw error;
     //   throw new GenericApiError();
     // }
   }
@@ -208,6 +210,7 @@ export default class ErgoApi {
       return await getChainAddressesForDisplay(request);
     } catch (error) {
       Logger.error(`${nameof(ErgoApi)}::${nameof(this.getChainAddressesForDisplay)} error: ` + stringifyError(error));
+      if (error instanceof LocalizableError) throw error;
       throw new GenericApiError();
     }
   }
@@ -223,6 +226,7 @@ export default class ErgoApi {
       return await getAllAddressesForDisplay(request);
     } catch (error) {
       Logger.error(`${nameof(ErgoApi)}::${nameof(this.getAllAddressesForDisplay)} error: ` + stringifyError(error));
+      if (error instanceof LocalizableError) throw error;
       throw new GenericApiError();
     }
   }
@@ -282,13 +286,8 @@ export default class ErgoApi {
       }
 
       // Refer: https://github.com/Emurgo/yoroi-frontend/pull/1055
-      if (error instanceof CheckAddressesInUseApiError) {
-        // CheckAddressesInUseApiError throw it as it is.
-        throw error;
-      } else {
-        // We don't know what the problem was so throw a generic error
-        throw new GenericApiError();
-      }
+      if (error instanceof LocalizableError) throw error;
+      throw new GenericApiError();
     }
   }
 
@@ -304,6 +303,7 @@ export default class ErgoApi {
       Logger.error(
         `${nameof(ErgoApi)}::${nameof(this.generateWalletRecoveryPhrase)} error: ` + stringifyError(error)
       );
+      if (error instanceof LocalizableError) throw error;
       throw new GenericApiError();
     }
   }

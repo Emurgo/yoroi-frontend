@@ -13,7 +13,7 @@ import type {
 import {
   asGetSigningKey,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
-import { ByronTxSignRequest } from '../../api/ada/transactions/byron/ByronTxSignRequest';
+import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import { ROUTES } from '../../routes-config';
 import { buildCheckAndCall } from '../lib/check';
@@ -55,7 +55,7 @@ export default class AdaWalletsStore extends Store {
       throw new Error(`${nameof(this._sendMoney)} public deriver missing signing functionality.`);
     }
     const { signRequest } = transactionDetails;
-    if (!(signRequest instanceof ByronTxSignRequest)) {
+    if (!(signRequest instanceof HaskellShelleyTxSignRequest)) {
       throw new Error(`${nameof(this._sendMoney)} wrong tx sign request`);
     }
     await this.stores.wallets.sendMoneyRequest.execute({

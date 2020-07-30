@@ -38,10 +38,6 @@ const messages = defineMessages({
     id: 'uri.generate.dialog.amount.label',
     defaultMessage: '!!!Amount ({currency})',
   },
-  uriGenerateDialogInvalidAmount: {
-    id: 'uri.generate.dialog.invalid.amount',
-    defaultMessage: '!!!Please enter a valid amount',
-  }
 });
 
 type Props = {|
@@ -53,7 +49,7 @@ type Props = {|
   +primaryTicker: string,
   +currencyMaxIntegerDigits: number,
   +currencyMaxFractionalDigits: number,
-  +validateAmount: (amountInNaturalUnits: string) => Promise<boolean>,
+  +validateAmount: (amountInNaturalUnits: string) => Promise<[boolean, void | string]>,
 |};
 
 @observer
@@ -94,11 +90,7 @@ export default class URIGenerateDialog extends Component<Props> {
             amountValue,
             this.props.currencyMaxFractionalDigits
           );
-          const isValidAmount = await this.props.validateAmount(formattedAmount);
-          return [
-            isValidAmount,
-            this.context.intl.formatMessage(messages.uriGenerateDialogInvalidAmount)
-          ];
+          return await this.props.validateAmount(formattedAmount);
         }],
       },
     },

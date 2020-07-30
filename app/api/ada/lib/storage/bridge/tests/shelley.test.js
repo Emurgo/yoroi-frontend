@@ -181,7 +181,6 @@ const nextRegularSpend: number => RemoteTransaction = (purpose) => ({
     }
   ],
   type: 'shelley',
-  ttl: '1000000',
   fee: '100000',
   certificates: [],
   withdrawals: [{
@@ -353,7 +352,6 @@ async function syncingSimpleTransaction(
             Status: 1,
             TransactionId: 2,
             Extra: {
-              Ttl: '1000000',
               Fee: '100000',
               Metadata: null,
             },
@@ -390,7 +388,6 @@ async function syncingSimpleTransaction(
             Status: 1,
             TransactionId: 2,
             Extra: {
-              Ttl: '1000000',
               Fee: '100000',
               Metadata: null,
             },

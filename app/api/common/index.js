@@ -13,8 +13,9 @@ import {
   PublicDeriver,
 } from '../ada/lib/storage/models/PublicDeriver/index';
 import {
-  GenericApiError, UnusedAddressesError, IncorrectWalletPasswordError,
+  GenericApiError, IncorrectWalletPasswordError,
 } from './errors';
+import LocalizableError from '../../i18n/LocalizableError';
 import type {
   IPublicDeriver,
   IGetLastSyncInfo,
@@ -60,6 +61,7 @@ export async function getWallets(
     return wallets;
   } catch (error) {
     Logger.error(`${nameof(getWallets)} error: ` + stringifyError(error));
+    if (error instanceof LocalizableError) throw error;
     throw new GenericApiError();
   }
 }
@@ -176,6 +178,7 @@ export default class CommonApi {
       return await request.getLastSyncInfo();
     } catch (error) {
       Logger.error(`${nameof(CommonApi)}::${nameof(this.getTxLastUpdatedDate)} error: ` + stringifyError(error));
+      if (error instanceof LocalizableError) throw error;
       throw new GenericApiError();
     }
   }
@@ -190,10 +193,8 @@ export default class CommonApi {
       Logger.info(`${nameof(CommonApi)}::${nameof(this.createAddress)} success: ` + stringifyData(newAddress));
       return newAddress;
     } catch (error) {
-      if (error instanceof UnusedAddressesError) {
-        throw error;
-      }
       Logger.error(`${nameof(CommonApi)}::${nameof(this.createAddress)} error: ` + stringifyError(error));
+      if (error instanceof LocalizableError) throw error;
       throw new GenericApiError();
     }
   }
@@ -206,6 +207,7 @@ export default class CommonApi {
       return balance;
     } catch (error) {
       Logger.error(`${nameof(CommonApi)}::${nameof(this.getBalance)} error: ` + stringifyError(error));
+      if (error instanceof LocalizableError) throw error;
       throw new GenericApiError();
     }
   }
@@ -245,6 +247,7 @@ export default class CommonApi {
       return result;
     } catch (error) {
       Logger.error(`${nameof(CommonApi)}::${nameof(this.renameModel)} error: ` + stringifyError(error));
+      if (error instanceof LocalizableError) throw error;
       throw new GenericApiError();
     }
   }
@@ -264,6 +267,7 @@ export default class CommonApi {
       if (error instanceof WrongPassphraseError) {
         throw new IncorrectWalletPasswordError();
       }
+      if (error instanceof LocalizableError) throw error;
       throw new GenericApiError();
     }
   }

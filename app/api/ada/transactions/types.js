@@ -33,16 +33,6 @@ export type AddressedUtxo = {|
   ...Addressing,
 |};
 
-export type UnsignedTxFromUtxoResponse = {|
-  senderUtxos: Array<RemoteUnspentOutput>,
-  txBuilder: RustModule.WalletV2.TransactionBuilder,
-  changeAddr: Array<{| ...Address, ...Value, ...Addressing |}>,
-|};
-export type UnsignedTxResponse = {|
-  senderUtxos: Array<AddressedUtxo>,
-  txBuilder: RustModule.WalletV2.TransactionBuilder,
-  changeAddr: Array<{| ...Address, ...Value, ...Addressing |}>,
-|};
 export type BaseSignRequest<T> = {|
   senderUtxos: Array<AddressedUtxo>,
   unsignedTx: T,

@@ -78,8 +78,8 @@ import { ledgerErrors } from '../../app/domain/LedgerLocalizedError';
 import BigNumber from 'bignumber.js';
 import { utxoToTxInput } from '../../app/api/jormungandr/lib/transactions/inputSelection';
 import { RustModule } from '../../app/api/ada/lib/cardanoCrypto/rustLoader';
-import { networks, getJormungandrBaseConfig, isCardanoHaskell, isJormungandr } from '../../app/api/ada/lib/storage/database/prepackaged/networks';
-import { ByronTxSignRequest } from '../../app/api/ada/transactions/byron/ByronTxSignRequest';
+import { networks, getJormungandrBaseConfig, isCardanoHaskell, getCardanoHaskellBaseConfig, isJormungandr } from '../../app/api/ada/lib/storage/database/prepackaged/networks';
+import { HaskellShelleyTxSignRequest } from '../../app/api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 import { JormungandrTxSignRequest } from '../../app/api/jormungandr/lib/transactions/JormungandrTxSignRequest';
 
 /**
@@ -702,6 +702,8 @@ export const genTentativeTx = (
     };
   }
   if (isCardanoHaskell(networkInfo)) {
+    const config = getCardanoHaskellBaseConfig(networkInfo)
+      .reduce((acc, next) => Object.assign(acc, next), {});
     const remoteUnspentUtxo = {
       amount: inputAmount,
       receiver: 'Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4',
@@ -709,18 +711,33 @@ export const genTentativeTx = (
       tx_index: 0,
       utxo_id: '6930f123df83e4178b0324ae617b2028c0b38c6ff4660583a2abf1f7b08195fe0',
     };
-    const unsignedTx = RustModule.WalletV2.Transaction.from_json({
-      inputs: [{
-        id: remoteUnspentUtxo.tx_hash,
-        index: remoteUnspentUtxo.tx_index
-      }],
-      outputs: [{
-        address: 'Ae2tdPwUPEZ4xAL3nxLq4Py7BfS1D2tJ3u2rxZGnrAXC8TNkWhTaz41J3FN',
-        value: Number(ouputAmount)
-      }]
-    });
+    const txBuilder = RustModule.WalletV4.TransactionBuilder.new(
+      RustModule.WalletV4.LinearFee.new(
+        RustModule.WalletV4.BigNum.from_str(config.LinearFee.coefficient),
+        RustModule.WalletV4.BigNum.from_str(config.LinearFee.constant),
+      ),
+      RustModule.WalletV4.BigNum.from_str(config.MinimumUtxoVal),
+      RustModule.WalletV4.BigNum.from_str(config.PoolDeposit),
+      RustModule.WalletV4.BigNum.from_str(config.KeyDeposit),
+    );
+    txBuilder.add_bootstrap_input(
+      RustModule.WalletV4.ByronAddress.from_base58(remoteUnspentUtxo.receiver),
+      RustModule.WalletV4.TransactionInput.new(
+        RustModule.WalletV4.TransactionHash.from_bytes(
+          Buffer.from(remoteUnspentUtxo.tx_hash, 'hex')
+        ),
+        remoteUnspentUtxo.tx_index
+      ),
+      RustModule.WalletV4.BigNum.from_str(remoteUnspentUtxo.amount)
+    );
+    txBuilder.add_output(RustModule.WalletV4.TransactionOutput.new(
+      RustModule.WalletV4.ByronAddress.from_base58('Ae2tdPwUPEZ4xAL3nxLq4Py7BfS1D2tJ3u2rxZGnrAXC8TNkWhTaz41J3FN').to_address(),
+      RustModule.WalletV4.BigNum.from_str(ouputAmount)
+    ));
+    txBuilder.set_fee(RustModule.WalletV4.BigNum.from_str('5'));
+    txBuilder.set_ttl(5);
     return {
-      tentativeTx: new ByronTxSignRequest({
+      tentativeTx: new HaskellShelleyTxSignRequest({
         senderUtxos: [{
           ...remoteUnspentUtxo,
           addressing: {
@@ -728,7 +745,7 @@ export const genTentativeTx = (
             startLevel: 0,
           },
         }],
-        unsignedTx,
+        unsignedTx: txBuilder,
         changeAddr: [],
         certificate: undefined,
       }),

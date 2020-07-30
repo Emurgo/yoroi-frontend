@@ -48,10 +48,6 @@ export class JormungandrTxSignRequest implements ISignRequest<RustModule.WalletV
     return receivers;
   }
 
-  copy(): JormungandrTxSignRequest {
-    return this; // no need to copy for V3
-  }
-
   isEqual(tx: ?(mixed| RustModule.WalletV3.InputOutput)): boolean {
     if (tx == null) return false;
     if (!(tx instanceof RustModule.WalletV3.InputOutput)) {

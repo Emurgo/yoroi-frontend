@@ -8,8 +8,6 @@ import { defineMessages, intlShape } from 'react-intl';
 import { ROUTES } from '../../routes-config';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import globalMessages from '../../i18n/global-messages';
-import { tryAddressToKind, isJormungandrAddress } from '../../api/ada/lib/storage/bridge/utils';
-import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
 
 import WalletSendForm from '../../components/wallet/send/WalletSendForm';
 // Web Wallet Confirmation
@@ -21,7 +19,7 @@ import WalletSendConfirmationDialog from '../../components/wallet/send/WalletSen
 import MemoNoExternalStorageDialog from '../../components/wallet/memos/MemoNoExternalStorageDialog';
 import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import { isLedgerNanoWallet, isTrezorTWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
-import { ByronTxSignRequest } from '../../api/ada/transactions/byron/ByronTxSignRequest';
+import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { SendUsingLedgerParams } from '../../actions/ada/ledger-send-actions';
 import type { SendUsingTrezorParams } from '../../actions/ada/trezor-send-actions';
@@ -32,9 +30,8 @@ import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import LocalizableError from '../../i18n/LocalizableError';
 import type { ISignRequest } from '../../api/common/lib/transactions/ISignRequest';
 import { ApiOptions, getApiForNetwork, getApiMeta } from '../../api/common/utils';
-import { isWithinSupply } from '../../utils/validations';
+import { validateAmount } from '../../utils/validations';
 import { formattedWalletAmount } from '../../utils/formatters';
-import { networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 // Hardware Wallet Confirmation
 import HWSendConfirmationDialog from '../../components/wallet/send/HWSendConfirmationDialog';
@@ -151,19 +148,12 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
             apiMeta.totalSupply.div(apiMeta.decimalPlaces).toFixed().length
           }
           currencyMaxFractionalDigits={apiMeta.decimalPlaces.toNumber()}
-          validateAmount={amount => Promise.resolve(isWithinSupply(amount, apiMeta.totalSupply))}
+          validateAmount={(amount) => validateAmount(
+            amount,
+            publicDeriver.getParent().getNetworkInfo(),
+            this.context.intl,
+          )}
           onSubmit={onSubmit}
-          isValidJormungandrAddress={address => {
-            const kind = tryAddressToKind(address, 'bech32', networks.JormungandrMainnet);
-            if (kind == null) return false;
-            return isJormungandrAddress(kind);
-          }}
-          isValidLegacyAddress={address => {
-            const kind = tryAddressToKind(address, 'bech32', networks.ByronMainnet);
-            if (kind == null) return false;
-            if (kind === CoreAddressTypes.CARDANO_LEGACY) return true;
-            return false;
-          }}
           totalInput={transactionBuilderStore.totalInput}
           hasAnyPending={hasAnyPending}
           classicTheme={profile.isClassicTheme}
@@ -281,7 +271,7 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
     const conceptualWallet = publicDeriver.getParent();
     let hwSendConfirmationDialog: Node = null;
 
-    if (!(signRequest instanceof ByronTxSignRequest)) {
+    if (!(signRequest instanceof HaskellShelleyTxSignRequest)) {
       throw new Error(`${nameof(this.hardwareWalletDoConfirmation)} hw wallets only supported for Byron`);
     }
     const selectedExplorerForNetwork = this.generated.stores.explorers.selectedExplorer
@@ -306,7 +296,7 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
           error={ledgerSendStore.error}
           onSubmit={
             () => ledgerSendAction.sendUsingLedger.trigger({
-              params: { signRequest: signRequest.copy().self() },
+              params: { signRequest: signRequest.self() },
               publicDeriver,
             })
           }
@@ -335,7 +325,7 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
           error={trezorSendStore.error}
           onSubmit={
             () => trezorSendAction.sendUsingTrezor.trigger({
-              params: { signRequest: signRequest.copy().self() },
+              params: { signRequest: signRequest.self() },
               publicDeriver,
             })
           }

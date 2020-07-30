@@ -13,7 +13,6 @@ import type {
 import {
   asGetSigningKey,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
-import { ByronTxSignRequest } from '../../api/ada/transactions/byron/ByronTxSignRequest';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import { ROUTES } from '../../routes-config';
 import { buildCheckAndCall } from '../lib/check';
@@ -54,10 +53,10 @@ export default class ErgoWalletsStore extends Store {
     if (withSigning == null) {
       throw new Error(`${nameof(ErgoWalletsStore)}::${nameof(this._sendMoney)} public deriver missing signing functionality.`);
     }
-    const { signRequest } = transactionDetails;
-    if (!(signRequest instanceof ByronTxSignRequest)) {
-      throw new Error(`${nameof(ErgoWalletsStore)}::${nameof(this._sendMoney)} wrong tx sign request`);
-    }
+    // const { signRequest } = transactionDetails;
+    // if (!(signRequest instanceof ByronTxSignRequest)) {
+    //   throw new Error(`${nameof(ErgoWalletsStore)}::${nameof(this._sendMoney)} wrong tx sign request`);
+    // }
     // await this.stores.wallets.sendMoneyRequest.execute({
     //   broadcastRequest: async () => await this.api.ergo.signAndBroadcast({
     //     publicDeriver: withSigning,

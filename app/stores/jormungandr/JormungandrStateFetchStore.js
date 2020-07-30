@@ -14,7 +14,7 @@ export default class JormungandrStateFetchStore extends Store {
   setup(): void {
     super.setup();
     this.fetcher = new BatchedFetcher(new RemoteFetcher(
-      () => this.stores.profile.lastLaunchVersion,
+      () => environment.version,
       () => this.stores.profile.currentLocale,
       () => {
         if (environment.userAgentInfo.isFirefox) {

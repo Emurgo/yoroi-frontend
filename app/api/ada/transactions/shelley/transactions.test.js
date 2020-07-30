@@ -5,6 +5,7 @@ import { schema } from 'lovefield';
 import BigNumber from 'bignumber.js';
 import type {
   AddressedUtxo,
+  BaseSignRequest,
 } from '../types';
 import type { RemoteUnspentOutput } from '../../lib/state-fetch/types';
 import {
@@ -104,6 +105,23 @@ beforeAll(async () => {
   await loadLovefieldDB(schema.DataStoreType.MEMORY);
 });
 
+function getProtocolParams(): {|
+  linearFee: RustModule.WalletV4.LinearFee,
+  minimumUtxoVal: RustModule.WalletV4.BigNum,
+  poolDeposit: RustModule.WalletV4.BigNum,
+  keyDeposit: RustModule.WalletV4.BigNum,
+  |} {
+  return {
+    linearFee: RustModule.WalletV4.LinearFee.new(
+      RustModule.WalletV4.BigNum.from_str('2'),
+      RustModule.WalletV4.BigNum.from_str('500'),
+    ),
+    minimumUtxoVal: RustModule.WalletV4.BigNum.from_str('1'),
+    poolDeposit: RustModule.WalletV4.BigNum.from_str('500'),
+    keyDeposit: RustModule.WalletV4.BigNum.from_str('500'),
+  };
+}
+
 describe('Create unsigned TX from UTXO', () => {
   it('Should fail due to insufficient funds (bigger than all inputs)', () => {
     const sampleUtxos = genSampleUtxos();
@@ -114,6 +132,7 @@ describe('Create unsigned TX from UTXO', () => {
       undefined,
       utxos,
       new BigNumber(0),
+      getProtocolParams(),
     )).toThrow(NotEnoughMoneyToSendError);
   });
 
@@ -124,6 +143,7 @@ describe('Create unsigned TX from UTXO', () => {
       undefined,
       [],
       new BigNumber(0),
+      getProtocolParams(),
     )).toThrow(NotEnoughMoneyToSendError);
   });
 
@@ -136,6 +156,7 @@ describe('Create unsigned TX from UTXO', () => {
       undefined,
       utxos,
       new BigNumber(0),
+      getProtocolParams(),
     )).toThrow(NotEnoughMoneyToSendError);
   });
 
@@ -148,12 +169,13 @@ describe('Create unsigned TX from UTXO', () => {
       sampleAdaAddresses[0],
       utxos,
       new BigNumber(0),
+      getProtocolParams(),
     );
     // input selection will only take 2 of the 3 inputs
     // it takes 2 inputs because input selection algorithm
     expect(unsignedTxResponse.senderUtxos).toEqual([utxos[0], utxos[1]]);
-    expect(unsignedTxResponse.txBuilder.get_input_total().to_str()).toEqual('1000702');
-    expect(unsignedTxResponse.txBuilder.get_feeless_output_total().to_str()).toEqual('999528');
+    expect(unsignedTxResponse.txBuilder.get_explicit_input().to_str()).toEqual('1000702');
+    expect(unsignedTxResponse.txBuilder.get_explicit_output().to_str()).toEqual('999528');
     expect(unsignedTxResponse.txBuilder.estimate_fee().to_str()).toEqual('1154');
   });
 });
@@ -167,16 +189,17 @@ describe('Create unsigned TX from addresses', () => {
       undefined,
       [addressedUtxos[0], addressedUtxos[1]],
       new BigNumber(0),
+      getProtocolParams(),
     );
     expect(unsignedTxResponse.senderUtxos).toEqual([addressedUtxos[0], addressedUtxos[1]]);
 
-    expect(unsignedTxResponse.txBuilder.get_input_total().to_str()).toEqual('1000702');
-    expect(unsignedTxResponse.txBuilder.get_feeless_output_total().to_str()).toEqual('5001');
+    expect(unsignedTxResponse.txBuilder.get_explicit_input().to_str()).toEqual('1000702');
+    expect(unsignedTxResponse.txBuilder.get_explicit_output().to_str()).toEqual('5001');
     expect(unsignedTxResponse.txBuilder.estimate_fee().to_str()).toEqual('1052');
     // burns remaining amount
     expect(
-      unsignedTxResponse.txBuilder.get_input_total().checked_sub(
-        unsignedTxResponse.txBuilder.get_feeless_output_total()
+      unsignedTxResponse.txBuilder.get_explicit_input().checked_sub(
+        unsignedTxResponse.txBuilder.get_explicit_output()
       ).to_str()
     ).toEqual('995701');
   });
@@ -191,11 +214,12 @@ describe('Create signed transactions', () => {
       undefined,
       [addressedUtxos[0], addressedUtxos[1]],
       new BigNumber(0),
+      getProtocolParams(),
     );
-    const signRequest = {
+    const signRequest: BaseSignRequest<RustModule.WalletV4.TransactionBuilder> = {
       changeAddr: unsignedTxResponse.changeAddr,
       senderUtxos: unsignedTxResponse.senderUtxos,
-      unsignedTx: unsignedTxResponse.txBuilder.build(),
+      unsignedTx: unsignedTxResponse.txBuilder,
       certificate: undefined,
     };
 
@@ -257,7 +281,7 @@ describe('Create signed transactions', () => {
       RustModule.WalletV4.BigNum.from_str('1000'),
       0,
     );
-    const signRequest = {
+    const signRequest: BaseSignRequest<RustModule.WalletV4.TransactionBody> = {
       changeAddr: [],
       senderUtxos: [
         {
@@ -315,16 +339,17 @@ describe('Create sendAll unsigned TX from UTXO', () => {
         byronAddrToHex('Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4'),
         utxos,
         new BigNumber(0),
+        getProtocolParams(),
       );
 
       expect(sendAllResponse.senderUtxos).toEqual([utxos[0], utxos[1]]);
-      expect(sendAllResponse.txBuilder.get_input_total().to_str()).toEqual('11000002');
-      expect(sendAllResponse.txBuilder.get_feeless_output_total().to_str()).toEqual('10998652');
+      expect(sendAllResponse.txBuilder.get_explicit_input().to_str()).toEqual('11000002');
+      expect(sendAllResponse.txBuilder.get_explicit_output().to_str()).toEqual('10998652');
       expect(sendAllResponse.txBuilder.estimate_fee().to_str()).toEqual('1330');
       // make sure we don't accidentally burn a lot of coins
       expect(
-        sendAllResponse.txBuilder.get_input_total().checked_sub(
-          sendAllResponse.txBuilder.get_feeless_output_total()
+        sendAllResponse.txBuilder.get_explicit_input().checked_sub(
+          sendAllResponse.txBuilder.get_explicit_output()
         ).to_str()
       ).toEqual('1350');
     });
@@ -335,6 +360,7 @@ describe('Create sendAll unsigned TX from UTXO', () => {
       byronAddrToHex('Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4'),
       [],
       new BigNumber(0),
+      getProtocolParams(),
     )).toThrow(NotEnoughMoneyToSendError);
   });
 
@@ -345,6 +371,7 @@ describe('Create sendAll unsigned TX from UTXO', () => {
       byronAddrToHex('Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4'),
       utxos,
       new BigNumber(0),
+      getProtocolParams(),
     )).toThrow(NotEnoughMoneyToSendError);
   });
 

@@ -21,14 +21,14 @@ Feature: Memos
     When I delete the memo
     Then There is no memo for the transaction
 
-  @it-98
-  Scenario: Create a transaction with a memo (IT-98)
+  @it-135
+  Scenario: Create a transaction with a memo (IT-135)
     Given There is a wallet stored named many-tx-wallet
     And I have a wallet with funds
     When I go to the send transaction screen
     And I fill the form:
       | address                                                     | amount   |
-      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 0.001000 |
+      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 1.000000 |
     When I add a transaction memo that says "my awesome memo"
     And I click on the next button in the wallet send form
     And I see send money confirmation dialog
