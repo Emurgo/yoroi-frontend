@@ -466,7 +466,7 @@
   "wallet.delegation.transaction.success.explanation": "Realiza un control del estado del stake pool, y del tiempo que resta para recibir una recompensa, desde la página de Seguimiento",
   "wallet.delegation.transaction.success.title": "Delegación exitosa",
   "wallet.deprecation.byronLine1": "La actualización del protocolo Shelley añade un nuevo tipo de billetera Shelley que permite la delegación.",
-  "wallet.deprecation.byronLine2": "To delegate your ADA you will need to upgrade to a Shelley wallet.",
+  "wallet.deprecation.byronLine2": "Para delegar su ADA tendrá que actualizarse a una billetera Shelley.",
   "wallet.hw.common.error.101": "Los permisos necesarios no fueron concedidos por el usuario. Por favor, inténtalo de nuevo.",
   "wallet.hw.ledger.common.error.101": "Operación cancelada en el dispositivo Ledger.",
   "wallet.hw.ledger.common.error.102": "Operación cancelada por el usuario.",
