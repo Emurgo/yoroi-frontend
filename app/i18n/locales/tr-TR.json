@@ -154,7 +154,7 @@
   "profile.complexityLevel.simple": "Basit",
   "profile.complexityLevel.simple.description": "Mümkün olan en basit deneyim. Blockchain hakkında ön bilgi gerekmez. Yeni başlayanlar ve basitliği tercih eden kullanıcılar için son derece uygundur.",
   "profile.complexityLevel.subtitle": "Blockchain'i anlamak zor olabilir, bu yüzden arayüzü sizin için mümkün olduğunca basit tutmaya çalışacağız",
-  "profile.complexityLevel.title": "Arayüzün zorluk düzeyi",
+  "profile.complexityLevel.title": "Arayüz Seçimi",
   "profile.languageSelect.form.languageSelectLabel": "Dilinizi seçin",
   "profile.languageSelect.title": "Dil Seçimi",
   "profile.nightly.acknowledgedRisks": "Risk'i anlıyorum",
