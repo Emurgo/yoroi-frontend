@@ -25,7 +25,7 @@
   "api.errors.getTxsBodiesForUTXOsError": "Fehler von der API beim Abrufen der TxBodies.",
   "api.errors.getUtxosForAddressesApiError": "Fehler vom Server beim Abrufen der UTxOs.",
   "api.errors.getUtxosSumsForAddressesApiError": "Fehler vom Server beim Abrufen der Kontostände.",
-  "api.errors.hardwareUnsupportedError": "This hardware wallet is currently not supported.",
+  "api.errors.hardwareUnsupportedError": "Diese Hardware Wallet wird derzeit nicht unterstützt.",
   "api.errors.histoicalCoinPriceError": "Der historische Kursverkauf ist derzeit nicht verfügbar.",
   "api.errors.invalidMnemonicError": "Do not translate.",
   "api.errors.invalidWitnessError": "Die Signatur ist ungültig.",
