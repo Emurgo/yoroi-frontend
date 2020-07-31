@@ -16,56 +16,56 @@ import {
 } from '../../../../config/numbersConfig';
 import environment from '../../../../environment';
 
-import { RustModule } from '../../../ada/lib/cardanoCrypto/rustLoader';
+import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 
 import type {
   TreeInsert, InsertRequest,
-} from '../../../ada/lib/storage/database/walletTypes/common/utils';
+} from '../../lib/storage/database/walletTypes/common/utils';
 import type { AddByHashFunc, } from '../../../common/lib/storage/bridge/hashMapper';
 import type { AddressDiscriminationType } from '@emurgo/js-chain-libs/js_chain_libs';
-import type { CanonicalAddressInsert } from '../../../ada/lib/storage/database/primitives/tables';
-import { CoreAddressTypes } from '../../../ada/lib/storage/database/primitives/enums';
-import type { Bip44ChainInsert } from '../../../ada/lib/storage/database/walletTypes/common/tables';
+import type { CanonicalAddressInsert } from '../../lib/storage/database/primitives/tables';
+import { CoreAddressTypes } from '../../lib/storage/database/primitives/enums';
+import type { Bip44ChainInsert } from '../../lib/storage/database/walletTypes/common/tables';
 
 declare var CONFIG: ConfigType;
 const addressRequestSize = CONFIG.app.addressRequestSize;
 
-function genSingleAddressBatchFunc(
-  addressChain: RustModule.WalletV3.Bip32PublicKey,
-  discrimination: AddressDiscriminationType,
+function genEnterpriseAddressBatchFunc(
+  addressChain: RustModule.WalletV4.Bip32PublicKey,
+  chainNetworkId: number,
 ): GenerateAddressFunc {
   return (
     indices: Array<number>
   ) => {
     return indices.map(i => {
       const addressKey = addressChain.derive(i).to_raw_key();
-      const address = RustModule.WalletV3.Address.single_from_public_key(
-        addressKey,
-        discrimination
+      const addr = RustModule.WalletV4.EnterpriseAddress.new(
+        chainNetworkId,
+        RustModule.WalletV4.StakeCredential.from_keyhash(addressKey.hash())
       );
-      const asHex = Buffer.from(address.as_bytes()).toString('hex');
+      const asHex = Buffer.from(addr.to_address().to_bytes()).toString('hex');
       return asHex;
     });
   };
 }
 
-export async function addJormungandrChimericAccountAddress(
+export async function addShelleyChimericAccountAddress(
   addByHash: AddByHashFunc,
   insertRequest: InsertRequest,
-  stakingKey: RustModule.WalletV3.PublicKey,
-  discrimination: AddressDiscriminationType,
+  stakingKey: RustModule.WalletV4.PublicKey,
+  chainNetworkId: number,
 ): Promise<{|
   KeyDerivationId: number,
 |}> {
-  const accountAddr = RustModule.WalletV3.Address.account_from_public_key(
-    stakingKey,
-    discrimination,
+  const accountAddr = RustModule.WalletV4.RewardAddress.new(
+    chainNetworkId,
+    RustModule.WalletV4.StakeCredential.from_keyhash(stakingKey.hash()),
   );
   await addByHash({
     ...insertRequest,
     address: {
-      type: CoreAddressTypes.JORMUNGANDR_ACCOUNT,
-      data: Buffer.from(accountAddr.as_bytes()).toString('hex'),
+      type: CoreAddressTypes.CARDANO_REWARD,
+      data: Buffer.from(accountAddr.to_address().to_bytes()).toString('hex'),
     },
   });
 
@@ -74,37 +74,37 @@ export async function addJormungandrChimericAccountAddress(
   };
 }
 
-export async function addJormungandrUtxoAddress(
+export async function addShelleyUtxoAddress(
   addByHash: AddByHashFunc,
   insertRequest: InsertRequest,
-  stakingKey: RustModule.WalletV3.PublicKey,
-  singleAddress: string,
+  stakingKey: RustModule.WalletV4.PublicKey,
+  enterpriseAddress: string,
 ): Promise<{|
   KeyDerivationId: number,
 |}> {
-  const paymentAddr = RustModule.WalletV3.Address.from_bytes(Buffer.from(singleAddress, 'hex'));
-  const singleAddr = paymentAddr.to_single_address();
-  if (singleAddr == null) {
-    throw new Error(`${nameof(addJormungandrUtxoAddress)} address is not a single address`);
+  const wasmAddr = RustModule.WalletV4.Address.from_bytes(Buffer.from(enterpriseAddress, 'hex'));
+  const wasmEnterpriseAddr = RustModule.WalletV4.EnterpriseAddress.from_address(wasmAddr);
+  if (wasmEnterpriseAddr == null) {
+    throw new Error(`${nameof(addShelleyUtxoAddress)} address is not an enterprise address`);
   }
-  const paymentKey = singleAddr.get_spending_key();
+  const paymentKey = wasmEnterpriseAddr.payment_cred();
   await addByHash({
     ...insertRequest,
     address: {
-      type: CoreAddressTypes.JORMUNGANDR_SINGLE,
-      data: singleAddress,
+      type: CoreAddressTypes.CARDANO_ENTERPRISE,
+      data: enterpriseAddress,
     },
   });
-  const groupAddr = RustModule.WalletV3.Address.delegation_from_public_key(
+  const baseAddr = RustModule.WalletV4.BaseAddress.new(
+    wasmAddr.network_id(),
     paymentKey,
-    stakingKey,
-    paymentAddr.get_discrimination()
+    RustModule.WalletV4.StakeCredential.from_keyhash(stakingKey.hash())
   );
   await addByHash({
     ...insertRequest,
     address: {
-      type: CoreAddressTypes.JORMUNGANDR_GROUP,
-      data: Buffer.from(groupAddr.as_bytes()).toString('hex'),
+      type: CoreAddressTypes.CARDANO_BASE,
+      data: Buffer.from(baseAddr.to_address().to_bytes()).toString('hex'),
     },
   });
   return {
@@ -116,7 +116,7 @@ async function scanChain(request: {|
   generateAddressFunc: GenerateAddressFunc,
   lastUsedIndex: number,
   checkAddressesInUse: FilterFunc,
-  stakingKey: RustModule.WalletV3.PublicKey,
+  stakingKey: RustModule.WalletV4.PublicKey,
   addByHash: AddByHashFunc,
 |}): Promise<TreeInsert<CanonicalAddressInsert>> {
   const addresses = await discoverAllAddressesFrom(
@@ -127,12 +127,18 @@ async function scanChain(request: {|
     request.checkAddressesInUse,
   );
 
+  /**
+   * TODO: we need an endpoint here that
+   * gets all the certificates ever registered with the staking key
+   * that way we can properly generate pointer addresses ahead of time
+   */
+
   return addresses
     .map((address, i) => {
       return {
         index: i + request.lastUsedIndex + 1,
         insert: async insertRequest => {
-          return await addJormungandrUtxoAddress(
+          return await addShelleyUtxoAddress(
             request.addByHash,
             insertRequest,
             request.stakingKey,
@@ -149,19 +155,19 @@ export async function scanCip1852Account(request: {|
   lastUsedExternal: number,
   checkAddressesInUse: FilterFunc,
   addByHash: AddByHashFunc,
-  stakingKey: RustModule.WalletV3.PublicKey,
+  stakingKey: RustModule.WalletV4.PublicKey,
 |}): Promise<TreeInsert<Bip44ChainInsert>> {
-  const key = RustModule.WalletV3.Bip32PublicKey.from_bytes(
+  const key = RustModule.WalletV4.Bip32PublicKey.from_bytes(
     Buffer.from(request.accountPublicKey, 'hex'),
   );
   const discrimination = environment.getDiscriminant();
 
   const insert = await scanAccount({
-    generateInternalAddresses: genSingleAddressBatchFunc(
+    generateInternalAddresses: genEnterpriseAddressBatchFunc(
       key.derive(ChainDerivations.INTERNAL),
       discrimination,
     ),
-    generateExternalAddresses: genSingleAddressBatchFunc(
+    generateExternalAddresses: genEnterpriseAddressBatchFunc(
       key.derive(ChainDerivations.EXTERNAL),
       discrimination,
     ),
@@ -181,7 +187,7 @@ async function scanAccount(request: {|
   lastUsedExternal: number,
   checkAddressesInUse: FilterFunc,
   addByHash: AddByHashFunc,
-  stakingKey: RustModule.WalletV3.PublicKey,
+  stakingKey: RustModule.WalletV4.PublicKey,
   discrimination: AddressDiscriminationType,
 |}): Promise<TreeInsert<Bip44ChainInsert>> {
   const externalAddresses = await scanChain({
@@ -202,7 +208,7 @@ async function scanAccount(request: {|
   const accountAddress = [0].map(i => ({
     index: i,
     insert: async insertRequest => {
-      return await addJormungandrChimericAccountAddress(
+      return await addShelleyChimericAccountAddress(
         request.addByHash,
         insertRequest,
         request.stakingKey,

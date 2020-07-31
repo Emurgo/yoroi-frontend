@@ -141,8 +141,8 @@ export default class WalletAddPage extends Component<Props> {
         <WalletCreateOptionDialogContainer
           onClose={this.onClose}
           onCreate={() => actions.dialogs.open.trigger({ dialog: WalletCreateDialog })}
-          onPaper={
-            getApiForNetwork(selectedNetwork) !== ApiOptions.ada || isJormungandr(selectedNetwork)
+          onPaper={/* re-enable paper wallets once we have a good way to do them in Shelley */
+            false // eslint-disable-line
               ? undefined
               : () => actions.dialogs.open.trigger({ dialog: WalletPaperDialog })
           }
@@ -182,8 +182,17 @@ export default class WalletAddPage extends Component<Props> {
       activeDialog = (
         <WalletRestoreOptionDialogContainer
           onClose={this.onClose}
-          onRestore_15={() => actions.dialogs.open.trigger({ dialog: WalletRestoreDialog })}
-          onRestore_24={() => actions.dialogs.open.trigger({ dialog: WalletRestoreDialog })}
+          onRestore15={() => actions.dialogs.open.trigger({
+            dialog: WalletRestoreDialog,
+            params: { restoreType: (RestoreMode.REGULAR_15: RestoreModeType)  }
+          })}
+          onRestore24={isJormungandr(selectedNetwork)
+            ? undefined
+            : () => actions.dialogs.open.trigger({
+              dialog: WalletRestoreDialog,
+              params: { restoreType: (RestoreMode.REGULAR_24: RestoreModeType)  }
+            })
+          }
           onPaperRestore={
             getApiForNetwork(selectedNetwork) !== ApiOptions.ada || isJormungandr(selectedNetwork)
               ? undefined
@@ -195,7 +204,8 @@ export default class WalletAddPage extends Component<Props> {
         />
       );
     } else if (uiDialogs.isOpen(WalletRestoreDialog)) {
-      const mode = uiDialogs.getParam<?RestoreModeType>('restoreType') || RestoreMode.REGULAR_15 || RestoreMode.REGULAR_24;
+      const mode = uiDialogs.getParam<?RestoreModeType>('restoreType');
+      if (mode == null) throw new Error(`${nameof(WalletAddPage)} no mode for restoration selected`);
       activeDialog = (
         <WalletRestoreDialogContainer
           {...this.generated.WalletRestoreDialogContainerProps}

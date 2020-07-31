@@ -40,8 +40,8 @@ const messages = defineMessages({
 
 type Props = {|
   +onCancel: void => void,
-  +onRestore_15: void => void,
-  +onRestore_24: void => void,
+  +onRestore15: void => void,
+  +onRestore24: void | (void => void),
   +onPaperRestore: void | (void => void),
 |};
 
@@ -53,7 +53,7 @@ export default class WalletRestoreOptionDialog extends Component<Props> {
 
   render(): Node {
     const { intl } = this.context;
-    const { onCancel, onRestore_15, onRestore_24, onPaperRestore, } = this.props;
+    const { onCancel, onRestore15, onRestore24, onPaperRestore, } = this.props;
 
     return (
       <Dialog
@@ -70,15 +70,17 @@ export default class WalletRestoreOptionDialog extends Component<Props> {
               type="restoreNormalWallet"
               title={intl.formatMessage(messages.restoreNormalTitle)}
               learnMoreText={intl.formatMessage(messages.restoreNormalDescription)}
-              onSubmit={onRestore_15}
+              onSubmit={onRestore15}
             />
-            <OptionBlock
+            {onRestore24 != null && (
+              <OptionBlock
                 parentName="WalletRestoreOptionDialog"
                 type="restoreNormalWallet"
                 title={intl.formatMessage(messages.restoreNormal24Title)}
                 learnMoreText={intl.formatMessage(messages.restoreNormal24Description)}
-                onSubmit={onRestore_24}
-            />
+                onSubmit={onRestore24}
+              />
+            )}
             {onPaperRestore != null && (
               <OptionBlock
                 parentName="WalletRestoreOptionDialog"

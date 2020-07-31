@@ -43,24 +43,24 @@ export default class YoroiPlatePage extends Component<Props> {
       ? generateLedgerWalletRootKey(yoroiTransfer.recoveryPhrase)
       : generateWalletRootKey(yoroiTransfer.recoveryPhrase);
 
-    const transferKind = () => {
-      return switch(yoroiTransfer.transferKind) {
-        case (TransferKind.PAPER): {
+    // const transferKind = () => {
+    //   return switch(yoroiTransfer.transferKind) {
+    //     case (TransferKind.PAPER): {
 
-        }
-        case (): {
+    //     }
+    //     case (): {
 
-        }
+    //     }
 
-      }
-    }
+    //   }
+    // }
 
     const { byronPlate, jormungandrPlate } = generatePlates(
       rootPk,
       this.props.accountIndex,
       yoroiTransfer.transferKind === TransferKind.PAPER
         ? RestoreMode.PAPER
-        : RestoreMode.REGULAR,
+        : RestoreMode.REGULAR_15,
       this.getSelectedNetwork(),
     );
     runInAction(() => {

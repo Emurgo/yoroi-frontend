@@ -17,6 +17,7 @@ import WalletRestoreStore from './toplevel/WalletRestoreStore';
 import DaedalusTransferStore from './toplevel/DaedalusTransferStore';
 import YoroiTransferStore from './toplevel/YoroiTransferStore';
 import TransactionBuilderStore from './toplevel/TransactionBuilderStore';
+import DelegationStore from './toplevel/DelegationStore';
 import setupAdaStores from './ada/index';
 import setupErgoStores from './ergo/index';
 import setupJormungandrStores from './jormungandr/index';
@@ -52,6 +53,7 @@ const storeClasses = Object.freeze({
   walletRestore: WalletRestoreStore,
   walletSettings: WalletSettingsStore,
   transactionBuilderStore: TransactionBuilderStore,
+  delegation: DelegationStore,
   daedalusTransfer: DaedalusTransferStore,
   yoroiTransfer: YoroiTransferStore,
   explorers: ExplorerStore,
@@ -78,6 +80,7 @@ export type StoresMap = {|
   walletSettings: WalletSettingsStore,
   transactionBuilderStore: TransactionBuilderStore,
   daedalusTransfer: DaedalusTransferStore,
+  delegation: DelegationStore,
   yoroiTransfer: YoroiTransferStore,
   explorers: ExplorerStore,
   substores: {|
@@ -109,6 +112,7 @@ const stores: WithNullableFields<StoresMap> = observable({
   walletRestore: null,
   walletSettings: null,
   transactionBuilderStore: null,
+  delegation: null,
   daedalusTransfer: null,
   yoroiTransfer: null,
   explorers: null,

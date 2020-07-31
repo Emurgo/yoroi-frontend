@@ -59,7 +59,10 @@ const genBaseProps: {|
     walletRestore: {
       isValidMnemonic: (isValidRequest) => {
         const { mnemonic, numberOfWords } = isValidRequest;
-        if ((isValidRequest.mode === RestoreMode.REGULAR_15) || (isValidRequest.mode === RestoreMode.REGULAR_24)) {
+        if (
+          (isValidRequest.mode === RestoreMode.REGULAR_15) ||
+          (isValidRequest.mode === RestoreMode.REGULAR_24)
+        ) {
           return AdaApi.isValidMnemonic({ mnemonic, numberOfWords });
         }
         return AdaApi.prototype.isValidPaperMnemonic({ mnemonic, numberOfWords });

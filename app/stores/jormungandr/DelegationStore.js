@@ -41,10 +41,6 @@ import { isJormungandr, getJormungandrBaseConfig } from '../../api/ada/lib/stora
 export type StakingKeyState = {|
   state: AccountStateSuccess,
   /**
-    * Pool selected in the UI
-    */
-  selectedPool: number;
-  /**
     * careful: there may be less entries in this map than # of pools in a certificate
     * I think you can use ratio stake to stake to the same stake pool multiple times
     */
@@ -62,7 +58,7 @@ export type DelegationRequests = {|
   stakingKeyState: void | StakingKeyState;
 |};
 
-export default class DelegationStore extends Store {
+export default class JormungandrDelegationStore extends Store {
 
   @observable delegationRequests: Array<DelegationRequests> = [];
 
@@ -184,7 +180,7 @@ export default class DelegationStore extends Store {
         rewardHistory,
       ]);
     } catch (e) {
-      Logger.error(`${nameof(DelegationStore)}::${nameof(this.refreshDelegation)} error: ` + stringifyError(e));
+      Logger.error(`${nameof(JormungandrDelegationStore)}::${nameof(this.refreshDelegation)} error: ` + stringifyError(e));
     }
   }
 
@@ -209,7 +205,6 @@ export default class DelegationStore extends Store {
     runInAction(() => {
       request.delegationRequest.stakingKeyState = {
         state: request.stateForStakingKey,
-        selectedPool: 0,
         poolInfo: meta,
       };
     });

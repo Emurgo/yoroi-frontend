@@ -188,7 +188,6 @@ function getStakingInfo(
         },
         value: accountBalance.toNumber()
       },
-      selectedPool: 0,
       poolInfo,
     },
   };

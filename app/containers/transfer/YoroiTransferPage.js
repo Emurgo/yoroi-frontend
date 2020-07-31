@@ -164,7 +164,7 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
             mnemonicValidator={mnemonic => this.generated.stores.walletRestore.isValidMnemonic({
               mnemonic,
               numberOfWords: config.wallets.WALLET_RECOVERY_PHRASE_WORD_COUNT,
-              mode: RestoreMode.REGULAR,
+              mode: RestoreMode.REGULAR_15,
             })}
             validWords={validWords}
             mnemonicLength={config.wallets.WALLET_RECOVERY_PHRASE_WORD_COUNT}

@@ -37,7 +37,7 @@ export default class ErgoRestoreStore extends Store {
     mode: $PropertyType<typeof RestoreMode, 'REGULAR_15'> | $PropertyType<typeof RestoreMode, 'REGULAR_24'> | $PropertyType<typeof RestoreMode, 'PAPER'>,
   |} => boolean = request => {
     const { mnemonic, numberOfWords } = request;
-    if (request.mode === RestoreMode.REGULAR) {
+    if (request.mode === RestoreMode.REGULAR_15 || request.mode === RestoreMode.REGULAR_24) {
       return this.api.ergo.constructor.isValidMnemonic({ mnemonic, numberOfWords });
     }
     throw new Error(`${nameof(this.isValidMnemonic)} unexpected mode ${request.mode}`);

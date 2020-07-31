@@ -179,6 +179,14 @@ export function getMnemonicCases(length: number): {|
   Invalid: string,
   Correct: string,
 |} {
+  if (length === 24) {
+    return {
+      Empty: '',
+      Partial: 'lamp',
+      Invalid: 'lamp lamp lamp lamp lamp lamp lamp lamp lamp lamp lamp lamp lamp lamp lamp lamp lamp lamp lamp lamp lamp lamp lamp lamp',
+      Correct: 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art',
+    };
+  }
   if (length === 21) {
     return {
       Empty: '',
@@ -204,6 +212,12 @@ export function getValidationMnemonicCases(length: number): {|
   Invalid: string,
   Correct: string,
 |} {
+  if (length === 24) {
+    return {
+      ...getMnemonicCases(24),
+      Incorrect: 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon share',
+    };
+  }
   if (length === 21) {
     return {
       ...getMnemonicCases(21),

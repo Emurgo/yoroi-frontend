@@ -162,7 +162,7 @@ export default class JormungandrWalletRestoreStore extends Store {
       // note: validate with ADA since Jormungandr doesn't itself use paper wallets
       return this.api.ada.isValidPaperMnemonic({ mnemonic, numberOfWords });
     }
-    if (request.mode === RestoreMode.REGULAR) {
+    if (request.mode === RestoreMode.REGULAR_15) {
       return this.api.jormungandr.constructor.isValidMnemonic({ mnemonic, numberOfWords });
     }
     throw new Error(`${nameof(this.isValidMnemonic)} unexpected mode ${request.mode}`);

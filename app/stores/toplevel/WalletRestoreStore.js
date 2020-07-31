@@ -25,7 +25,7 @@ import {
 import {
   v4Bip32PrivateToV3,
 } from '../../api/jormungandr/lib/crypto/utils';
-import config from '../../config';
+import { getWordsCount } from '../stateless/modeInfo';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import {
   generateWalletRootKey,
@@ -89,9 +89,7 @@ export default class AdaWalletRestoreStore extends Store {
     this.walletRestoreMeta = restoreMeta;
     this.step = RestoreSteps.VERIFY_MNEMONIC;
 
-    const wordCount = this.mode === RestoreMode.PAPER
-      ? config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT
-      : config.wallets.WALLET_RECOVERY_PHRASE_WORD_COUNT;
+    const wordCount = getWordsCount(this.mode);
 
     let resolvedRecoveryPhrase = restoreMeta.recoveryPhrase;
 

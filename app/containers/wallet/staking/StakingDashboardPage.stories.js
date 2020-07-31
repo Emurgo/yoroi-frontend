@@ -125,6 +125,9 @@ const genBaseProps: {|
           },
         ]]),
       },
+      delegation: {
+        selectedPage: 0,
+      },
       substores: {
         jormungandr: {
           time: {
@@ -153,6 +156,11 @@ const genBaseProps: {|
       },
     },
     actions: {
+      delegation: {
+        setSelectedPage: {
+          trigger: action('setSelectedPage'),
+        },
+      },
       dialogs: {
         closeActiveDialog: {
           trigger: action('closeActiveDialog'),
@@ -481,7 +489,6 @@ function getStakingInfo(
           ? 0
           : accountBalance.toNumber(),
       },
-      selectedPool: 0,
       poolInfo,
     },
   };

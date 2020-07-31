@@ -153,13 +153,9 @@ export default class StakingDashboardPage extends Component<Props> {
           delegationRequests.getCurrentDelegation.isExecuting
             ? undefined
             : {
-              currentPage: delegationRequests.stakingKeyState.selectedPool,
+              currentPage: this.generated.stores.delegation.selectedPage,
               numPages: delegationRequests.stakingKeyState.state.delegation.pools.length,
-              goToPage: page => runInAction(() => {
-                if (delegationRequests.stakingKeyState) {
-                  delegationRequests.stakingKeyState.selectedPool = page;
-                }
-              })
+              goToPage: page => this.generated.actions.delegation.setSelectedPage.trigger(page),
             }}
         hasAnyPending={this.generated.stores.transactions.hasAnyPending}
         themeVars={getThemeVars({ theme: 'YoroiModern' })}
@@ -787,6 +783,11 @@ export default class StakingDashboardPage extends Component<Props> {
           |}
         |}
       |},
+      delegation: {|
+        setSelectedPage: {|
+          trigger: (params: number) => void
+        |},
+      |},
       dialogs: {|
         closeActiveDialog: {|
           trigger: (params: void) => void
@@ -820,6 +821,9 @@ export default class StakingDashboardPage extends Component<Props> {
         isClassicTheme: boolean,
         shouldHideBalance: boolean,
         unitOfAccount: UnitOfAccountSettingType
+      |},
+      delegation: {|
+        selectedPage: number,
       |},
       substores: {|
         jormungandr: {|
@@ -908,6 +912,9 @@ export default class StakingDashboardPage extends Component<Props> {
           hasAnyPending: stores.transactions.hasAnyPending,
           getTxRequests: stores.transactions.getTxRequests,
         },
+        delegation: {
+          selectedPage: stores.delegation.selectedPage,
+        },
         substores: {
           jormungandr: {
             time: {
@@ -948,6 +955,11 @@ export default class StakingDashboardPage extends Component<Props> {
         notifications: {
           open: {
             trigger: actions.notifications.open.trigger,
+          },
+        },
+        delegation: {
+          setSelectedPage: {
+            trigger: actions.delegation.setSelectedPage.trigger,
           },
         },
         jormungandr: {

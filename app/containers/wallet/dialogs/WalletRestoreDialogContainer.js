@@ -37,6 +37,7 @@ import type {
   NetworkRow,
 } from '../../../api/ada/lib/storage/database/primitives/tables';
 import { isJormungandr } from '../../../api/ada/lib/storage/database/prepackaged/networks';
+import { isPaperMode, getWordsCount } from '../../../stores/stateless/modeInfo';
 
 const messages = defineMessages({
   walletUpgradeNoop: {
@@ -115,13 +116,13 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
     switch (walletRestore.step) {
       case RestoreSteps.START: {
         return (<WalletRestoreDialog
-            mnemonicValidator={mnemonic => (
-                this.generated.stores.walletRestore.isValidMnemonic({
-                  mnemonic,
-                  numberOfWords: wordsCount,
-                  mode: mode,
-                })
-            )}
+          mnemonicValidator={mnemonic => (
+            this.generated.stores.walletRestore.isValidMnemonic({
+              mnemonic,
+              numberOfWords: wordsCount,
+              mode,
+            })
+          )}
           validWords={validWords}
           numberOfMnemonics={wordsCount}
           onSubmit={meta => actions.walletRestore.submitFields.trigger(meta)}
@@ -448,21 +449,5 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
         },
       },
     });
-  }
-}
-
-function isPaperMode(mode: RestoreModeType): boolean {
-  return mode === RestoreMode.PAPER;
-}
-
-function getWordsCount(mode: RestoreModeType): number {
-  switch (mode) {
-    case (RestoreMode.PAPER):
-      return config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT;
-    case (RestoreMode.REGULAR_24):
-      return config.wallets.DAEDALUS_SHELLEY_RECOVERY_PHRASE_WORD_COUNT;
-    case (RestoreMode.REGULAR_15):
-    default:
-      return config.wallets.WALLET_RECOVERY_PHRASE_WORD_COUNT;
   }
 }
