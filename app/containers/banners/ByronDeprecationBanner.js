@@ -17,7 +17,9 @@ const messages = defineMessages({
   }
 });
 
-type Props = {||};
+type Props = {|
+  onUpgrade: void | (void => void),
+|};
 
 @observer
 export default class ByronDeprecationBanner extends Component<Props> {
@@ -30,7 +32,7 @@ export default class ByronDeprecationBanner extends Component<Props> {
     const { intl } = this.context;
     return (
       <DeprecatedCurrencyBanner
-        onSubmit={() => {}}
+        onSubmit={this.props.onUpgrade}
       >
         <>
           {intl.formatMessage(messages.byronDeprecationLine1)}<br />

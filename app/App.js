@@ -18,6 +18,7 @@ import pt from 'react-intl/locale-data/pt';
 import id from 'react-intl/locale-data/id';
 import es from 'react-intl/locale-data/es';
 import it from 'react-intl/locale-data/it';
+import tr from 'react-intl/locale-data/tr';
 import { Routes } from './Routes';
 import { yoroiPolymorphTheme } from './themes/PolymorphThemes';
 import { themeOverrides } from './themes/overrides';
@@ -30,7 +31,21 @@ import environment from './environment';
 import MaintenancePage from './containers/MaintenancePage';
 
 // https://github.com/yahoo/react-intl/wiki#loading-locale-data
-addLocaleData([...en, ...ko, ...ja, ...zh, ...ru, ...de, ...fr, ...nl, ...pt, ...id, ...es, ...it]);
+addLocaleData([
+  ...en,
+  ...ko,
+  ...ja,
+  ...zh,
+  ...ru,
+  ...de,
+  ...fr,
+  ...nl,
+  ...pt,
+  ...id,
+  ...es,
+  ...it,
+  ...tr,
+]);
 
 type Props = {|
   +stores: StoresMap,

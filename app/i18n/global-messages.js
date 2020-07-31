@@ -140,6 +140,10 @@ const globalMessages: * = defineMessages({
     id: 'global.language.indonesian',
     defaultMessage: '!!!Bahasa Indonesia',
   },
+  languageTurkish: {
+    id: 'global.language.turkish',
+    defaultMessage: '!!!Turkish',
+  },
   languageSpanish: {
     id: 'global.language.spanish',
     defaultMessage: '!!!Español',

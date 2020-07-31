@@ -17,6 +17,7 @@ import pt from 'react-intl/locale-data/pt';
 import id from 'react-intl/locale-data/id';
 import es from 'react-intl/locale-data/es';
 import it from 'react-intl/locale-data/it';
+import tr from 'react-intl/locale-data/tr';
 import '../../app/themes/index.global.scss';
 import type { UnitOfAccountSettingType } from '../../app/types/unitOfAccountType';
 import type { V3UnsignedTxAddressedUtxoResponse } from '../../app/api/ada/transactions/types';
@@ -87,7 +88,22 @@ import { JormungandrTxSignRequest } from '../../app/api/jormungandr/lib/transact
  */
 
 // https://github.com/yahoo/react-intl/wiki#loading-locale-data
-addLocaleData([...en, ...ko, ...ja, ...zh, ...ru, ...de, ...fr, ...nl, ...pt, ...id, ...es, ...it]);
+addLocaleData([
+  ...en,
+  ...ko,
+  ...ja,
+  ...zh,
+  ...ru,
+  ...de,
+  ...fr,
+  ...nl,
+  ...pt,
+  ...id,
+  ...es,
+  ...it,
+  ...tr,
+]);
+
 
 addDecorator(withKnobs);
 

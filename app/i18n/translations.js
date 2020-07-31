@@ -13,6 +13,7 @@ import BrazilFlag from '../assets/images/flags/brazil.inline.svg';
 import SpanishFlag from '../assets/images/flags/spanish.inline.svg';
 import ItalianFlag from '../assets/images/flags/italian.inline.svg';
 import IndonesianFlag from '../assets/images/flags/indonesian.inline.svg';
+import TurkishFlag from '../assets/images/flags/turkish.inline.svg';
 
 // This is essentially bulk require
 
@@ -96,5 +97,10 @@ export const LANGUAGES: Array<LanguageType> = [
     value: 'id-ID',
     label: globalMessages.languageIndonesian,
     svg: IndonesianFlag
+  },
+  {
+    value: 'tr-TR',
+    label: globalMessages.languageTurkish,
+    svg: TurkishFlag
   },
 ];
