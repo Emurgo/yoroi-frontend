@@ -182,7 +182,8 @@ export default class WalletAddPage extends Component<Props> {
       activeDialog = (
         <WalletRestoreOptionDialogContainer
           onClose={this.onClose}
-          onRestore={() => actions.dialogs.open.trigger({ dialog: WalletRestoreDialog })}
+          onRestore_15={() => actions.dialogs.open.trigger({ dialog: WalletRestoreDialog })}
+          onRestore_24={() => actions.dialogs.open.trigger({ dialog: WalletRestoreDialog })}
           onPaperRestore={
             getApiForNetwork(selectedNetwork) !== ApiOptions.ada || isJormungandr(selectedNetwork)
               ? undefined
@@ -194,7 +195,7 @@ export default class WalletAddPage extends Component<Props> {
         />
       );
     } else if (uiDialogs.isOpen(WalletRestoreDialog)) {
-      const mode = uiDialogs.getParam<?RestoreModeType>('restoreType') || RestoreMode.REGULAR;
+      const mode = uiDialogs.getParam<?RestoreModeType>('restoreType') || RestoreMode.REGULAR_15 || RestoreMode.REGULAR_24;
       activeDialog = (
         <WalletRestoreDialogContainer
           {...this.generated.WalletRestoreDialogContainerProps}

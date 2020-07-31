@@ -24,6 +24,14 @@ const messages = defineMessages({
     id: 'wallet.add.optionDialog.restore.normalWallet.description',
     defaultMessage: '!!!If you have a Yoroi recovery phrase consisting of 15 words generated when you created a Yoroi Wallet, choose this option to restore your wallet.',
   },
+  restoreNormal24Title: {
+    id: 'wallet.add.optionDialog.restore.normal24Wallet.title',
+    defaultMessage: '!!!Enter a 24-word recovery phrase',
+  },
+  restoreNormal24Description: {
+    id: 'wallet.add.optionDialog.restore.normal24Wallet.description',
+    defaultMessage: '!!!If you have a recovery phrase consisting of 24 words, choose this option to restore your wallet.',
+  },
   restorePaperWalletDescription: {
     id: 'wallet.add.optionDialog.restore.paperWallet.description',
     defaultMessage: '!!!If you have generated a Yoroi paper wallet (which is usually printed and kept offline), you can choose this option to import the funds from your Yoroi paper wallet.',
@@ -32,7 +40,8 @@ const messages = defineMessages({
 
 type Props = {|
   +onCancel: void => void,
-  +onRestore: void => void,
+  +onRestore_15: void => void,
+  +onRestore_24: void => void,
   +onPaperRestore: void | (void => void),
 |};
 
@@ -44,7 +53,7 @@ export default class WalletRestoreOptionDialog extends Component<Props> {
 
   render(): Node {
     const { intl } = this.context;
-    const { onCancel, onRestore, onPaperRestore, } = this.props;
+    const { onCancel, onRestore_15, onRestore_24, onPaperRestore, } = this.props;
 
     return (
       <Dialog
@@ -61,7 +70,14 @@ export default class WalletRestoreOptionDialog extends Component<Props> {
               type="restoreNormalWallet"
               title={intl.formatMessage(messages.restoreNormalTitle)}
               learnMoreText={intl.formatMessage(messages.restoreNormalDescription)}
-              onSubmit={onRestore}
+              onSubmit={onRestore_15}
+            />
+            <OptionBlock
+                parentName="WalletRestoreOptionDialog"
+                type="restoreNormalWallet"
+                title={intl.formatMessage(messages.restoreNormal24Title)}
+                learnMoreText={intl.formatMessage(messages.restoreNormal24Description)}
+                onSubmit={onRestore_24}
             />
             {onPaperRestore != null && (
               <OptionBlock

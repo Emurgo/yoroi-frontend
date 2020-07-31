@@ -340,7 +340,7 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
         isValidMnemonic: ({|
           mnemonic: string,
           numberOfWords: number,
-          mode: $PropertyType<typeof RestoreMode, 'REGULAR'> | $PropertyType<typeof RestoreMode, 'PAPER'>,
+          mode: $PropertyType<typeof RestoreMode, 'REGULAR_15'> | $PropertyType<typeof RestoreMode, 'REGULAR_24'> | $PropertyType<typeof RestoreMode, 'PAPER'>,
         |}) => boolean,
       |},
       wallets: {|

@@ -103,6 +103,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
     const { wallets } = this.generated.stores;
     const { restoreRequest } = wallets;
 
+    const mode = this.props.mode;
     const isPaper = isPaperMode(this.props.mode);
     const wordsCount = getWordsCount(this.props.mode);
 
@@ -114,20 +115,13 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
     switch (walletRestore.step) {
       case RestoreSteps.START: {
         return (<WalletRestoreDialog
-          mnemonicValidator={mnemonic => {
-            if (isPaper) {
-              return this.generated.stores.walletRestore.isValidMnemonic({
-                mnemonic,
-                numberOfWords: wordsCount,
-                mode: RestoreMode.PAPER,
-              });
-            }
-            return this.generated.stores.walletRestore.isValidMnemonic({
-              mnemonic,
-              numberOfWords: wordsCount,
-              mode: RestoreMode.REGULAR,
-            });
-          }}
+            mnemonicValidator={mnemonic => (
+                this.generated.stores.walletRestore.isValidMnemonic({
+                  mnemonic,
+                  numberOfWords: wordsCount,
+                  mode: mode,
+                })
+            )}
           validWords={validWords}
           numberOfMnemonics={wordsCount}
           onSubmit={meta => actions.walletRestore.submitFields.trigger(meta)}
@@ -348,7 +342,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
         isValidMnemonic: ({|
           mnemonic: string,
           numberOfWords: number,
-          mode: $PropertyType<typeof RestoreMode, 'REGULAR'> | $PropertyType<typeof RestoreMode, 'PAPER'>,
+          mode: $PropertyType<typeof RestoreMode, 'REGULAR_15'> | $PropertyType<typeof RestoreMode, 'REGULAR_24'> | $PropertyType<typeof RestoreMode, 'PAPER'>,
         |}) => boolean,
       |},
       yoroiTransfer: {|
@@ -462,7 +456,13 @@ function isPaperMode(mode: RestoreModeType): boolean {
 }
 
 function getWordsCount(mode: RestoreModeType): number {
-  return mode === RestoreMode.PAPER
-    ? config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT
-    : config.wallets.WALLET_RECOVERY_PHRASE_WORD_COUNT;
+  switch (mode) {
+    case (RestoreMode.PAPER):
+      return config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT;
+    case (RestoreMode.REGULAR_24):
+      return config.wallets.DAEDALUS_SHELLEY_RECOVERY_PHRASE_WORD_COUNT;
+    case (RestoreMode.REGULAR_15):
+    default:
+      return config.wallets.WALLET_RECOVERY_PHRASE_WORD_COUNT;
+  }
 }

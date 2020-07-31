@@ -164,7 +164,7 @@ export default class AdaWalletRestoreStore extends Store {
   isValidMnemonic: {|
     mnemonic: string,
     numberOfWords: number,
-    mode: $PropertyType<typeof RestoreMode, 'REGULAR'> | $PropertyType<typeof RestoreMode, 'PAPER'>,
+    mode: $PropertyType<typeof RestoreMode, 'REGULAR_15'> | $PropertyType<typeof RestoreMode, 'REGULAR_24'> | $PropertyType<typeof RestoreMode, 'PAPER'>,
   |} => boolean = request => {
     const { mnemonic, numberOfWords } = request;
     if (request.mode === RestoreMode.PAPER) {

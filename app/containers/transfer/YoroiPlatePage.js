@@ -42,6 +42,19 @@ export default class YoroiPlatePage extends Component<Props> {
     const rootPk = yoroiTransfer.transferKind === TransferKind.LEDGER
       ? generateLedgerWalletRootKey(yoroiTransfer.recoveryPhrase)
       : generateWalletRootKey(yoroiTransfer.recoveryPhrase);
+
+    const transferKind = () => {
+      return switch(yoroiTransfer.transferKind) {
+        case (TransferKind.PAPER): {
+
+        }
+        case (): {
+
+        }
+
+      }
+    }
+
     const { byronPlate, jormungandrPlate } = generatePlates(
       rootPk,
       this.props.accountIndex,

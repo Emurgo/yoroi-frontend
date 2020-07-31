@@ -141,7 +141,7 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
             mnemonicValidator={mnemonic => this.generated.stores.walletRestore.isValidMnemonic({
               mnemonic,
               numberOfWords: config.wallets.DAEDALUS_RECOVERY_PHRASE_WORD_COUNT,
-              mode: RestoreMode.REGULAR,
+              mode: RestoreMode.REGULAR_15,
             })}
             validWords={validWords}
             mnemonicLength={config.wallets.DAEDALUS_RECOVERY_PHRASE_WORD_COUNT}
@@ -270,7 +270,7 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
         isValidMnemonic: ({|
           mnemonic: string,
           numberOfWords: number,
-          mode: $PropertyType<typeof RestoreMode, 'REGULAR'> | $PropertyType<typeof RestoreMode, 'PAPER'>,
+          mode: $PropertyType<typeof RestoreMode, 'REGULAR_15'> | $PropertyType<typeof RestoreMode, 'REGULAR_24'>| $PropertyType<typeof RestoreMode, 'PAPER'>,
         |}) => boolean,
       |},
       daedalusTransfer: {|

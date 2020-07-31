@@ -479,7 +479,7 @@ const restoreWalletProps: {|
       recoveryResult: request.recoveryResult,
       isValidMnemonic: (isValidRequest) => {
         const { mnemonic, numberOfWords } = isValidRequest;
-        if (isValidRequest.mode === RestoreMode.REGULAR) {
+        if ((isValidRequest.mode === RestoreMode.REGULAR_15) || (isValidRequest.mode === RestoreMode.REGULAR_24)) {
           return AdaApi.isValidMnemonic({ mnemonic, numberOfWords });
         }
         return AdaApi.prototype.isValidPaperMnemonic({ mnemonic, numberOfWords });
@@ -580,7 +580,11 @@ export const RestoreWalletStart = (): Node => {
             step: RestoreSteps.START,
             walletRestoreMeta: {
               recoveryPhrase: (() => {
-                if (getRestoreMode() === restoreMode.Regular) {
+                if (getRestoreMode() === restoreMode.REGULAR_24) {
+                  const cases = getMnemonicCases(24);
+                  return select('regularRecoveryPhrase', cases, cases.Empty);
+                }
+                if (getRestoreMode() === restoreMode.REGULAR_15) {
                   const cases = getMnemonicCases(15);
                   return select('regularRecoveryPhrase', cases, cases.Empty);
                 }

@@ -61,7 +61,8 @@ const genBaseProps: {|
       selectedAccount: 0 + HARD_DERIVATION_START,
       isValidMnemonic: (isValidRequest) => {
         const { mnemonic, numberOfWords } = isValidRequest;
-        if (isValidRequest.mode === RestoreMode.REGULAR) {
+
+        if ((isValidRequest.mode === RestoreMode.REGULAR_15) || (isValidRequest.mode === RestoreMode.REGULAR_24)) {
           return AdaApi.isValidMnemonic({ mnemonic, numberOfWords });
         }
         return AdaApi.prototype.isValidPaperMnemonic({ mnemonic, numberOfWords });
