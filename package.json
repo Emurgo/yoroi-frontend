@@ -76,7 +76,7 @@
     "@babel/preset-react": "7.10.4",
     "@babel/register": "7.10.5",
     "@babel/runtime": "7.10.5",
-    "@babel/runtime-corejs3": "7.10.4",
+    "@babel/runtime-corejs3": "7.11.0",
     "@emurgo/cardano-serialization-lib-nodejs": "1.0.1",
     "@emurgo/js-chain-libs-node": "0.7.1",
     "@storybook/addon-actions": "5.3.19",
