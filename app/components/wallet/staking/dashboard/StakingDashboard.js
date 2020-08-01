@@ -62,7 +62,7 @@ export type GraphData = {|
 type Props = {|
   +themeVars: Object,
   +graphData: GraphData,
-  +stakePools: {| error: LocalizableError, |} | {| pools: null | Array<Node> |},
+  +stakePools: {| error: LocalizableError, |} | {| pools: null | Array<Node | void> |},
   +epochProgress: Node,
   +userSummary: Node,
   +upcomingRewards: void | Node,
@@ -236,6 +236,15 @@ export default class StakingDashboard extends Component<Props> {
               : intl.formatMessage(emptyDashboardMessages.text)
             }
           />
+        </div>
+      );
+    }
+    if (this.props.stakePools.pools[currPool] == null) {
+      return (
+        <div className={width}>
+          <VerticallyCenteredLayout>
+            <LoadingSpinner />
+          </VerticallyCenteredLayout>
         </div>
       );
     }

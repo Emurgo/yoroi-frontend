@@ -69,7 +69,7 @@ import {
 import type { ConceptualWalletSettingsCache } from '../../app/stores/toplevel/WalletSettingsStore';
 import WalletSettingsStore from '../../app/stores/toplevel/WalletSettingsStore';
 import TransactionsStore from '../../app/stores/toplevel/TransactionsStore';
-import DelegationStore from '../../app/stores/jormungandr/DelegationStore';
+import DelegationStore from '../../app/stores/toplevel/DelegationStore';
 import WalletStore from '../../app/stores/toplevel/WalletStore';
 import AdaTimeStore from '../../app/stores/ada/AdaTimeStore';
 import CachedRequest from '../../app/stores/lib/LocalizedCachedRequest';

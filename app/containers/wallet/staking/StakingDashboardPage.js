@@ -29,8 +29,8 @@ import UnmangleTxDialogContainer from '../../transfer/UnmangleTxDialogContainer'
 import type { GeneratedData as UnmangleTxDialogContainerData } from '../../transfer/UnmangleTxDialogContainer';
 import config from '../../../config';
 import { formattedWalletAmount } from '../../../utils/formatters';
-import type { PoolTuples, ReputationObject, ReputationFunc, } from '../../../api/jormungandr/lib/state-fetch/types';
-import type { DelegationRequests } from '../../../stores/jormungandr/DelegationStore';
+import type { PoolTuples, ReputationObject, } from '../../../api/jormungandr/lib/state-fetch/types';
+import type { PoolMeta, DelegationRequests } from '../../../stores/toplevel/DelegationStore';
 import EpochProgressContainer from './EpochProgressContainer';
 import type { GeneratedData as EpochProgressContainerData } from './EpochProgressContainer';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
@@ -56,6 +56,7 @@ import type { SelectedApiType, } from '../../../api/common/utils';
 import { getUnmangleAmounts, } from '../../../stores/stateless/mangledAddresses';
 import type { IAddressTypeStore, IAddressTypeUiSubset } from '../../../stores/stateless/addressStores';
 import { GROUP_MANGLED } from '../../../stores/stateless/addressStores';
+import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 
 export type GeneratedData = typeof StakingDashboardPage.prototype.generated;
 
@@ -129,7 +130,7 @@ export default class StakingDashboardPage extends Component<Props> {
       throw new Error(`${nameof(StakingDashboardPage)} no public deriver. Should never happen`);
     }
 
-    const delegationStore = this.generated.stores.substores.jormungandr.delegation;
+    const delegationStore = this.generated.stores.delegation;
     const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
     if (delegationRequests == null) {
       throw new Error(`${nameof(StakingDashboardPage)} opened for non-reward wallet`);
@@ -291,7 +292,7 @@ export default class StakingDashboardPage extends Component<Props> {
     const timeSinceGenesis = timeCalcRequests.requests.timeSinceGenesis.result;
     if (timeSinceGenesis == null) return undefined;
 
-    const delegationStore = this.generated.stores.substores.jormungandr.delegation;
+    const delegationStore = this.generated.stores.delegation;
     const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
     if (delegationRequests == null) {
       throw new Error(`${nameof(StakingDashboardPage)} opened for non-reward wallet`);
@@ -436,7 +437,7 @@ export default class StakingDashboardPage extends Component<Props> {
   getErrorInFetch: PublicDeriver<> => void | {| error: LocalizableError, |} = (
     publicDeriver
   ) => {
-    const delegationStore = this.generated.stores.substores.jormungandr.delegation;
+    const delegationStore = this.generated.stores.delegation;
     const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
     if (delegationRequests == null) {
       throw new Error(`${nameof(StakingDashboardPage)} opened for non-reward wallet`);
@@ -454,10 +455,10 @@ export default class StakingDashboardPage extends Component<Props> {
     return undefined;
   }
 
-  getStakePools: PublicDeriver<> => {| pools: null | Array<Node> |} = (
+  getStakePools: PublicDeriver<> => {| pools: null | Array<Node | void> |} = (
     publicDeriver
   ) => {
-    const delegationStore = this.generated.stores.substores.jormungandr.delegation;
+    const delegationStore = this.generated.stores.delegation;
     const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
     if (delegationRequests == null) {
       throw new Error(`${nameof(StakingDashboardPage)} opened for non-reward wallet`);
@@ -479,15 +480,17 @@ export default class StakingDashboardPage extends Component<Props> {
       message: globalMessages.copyTooltipMessage,
     };
 
-    const poolReputation = delegationStore.poolReputation.result ?? {};
-
     const { uiNotifications, } = this.generated.stores;
     const { intl } = this.context;
     return {
       pools: currentPools.map(pool => {
-        const meta = delegationRequests.stakingKeyState?.poolInfo.get(pool[0]);
+        const meta = this.generated.stores.delegation.getPoolInfo(
+          publicDeriver.getParent().getNetworkInfo(),
+          pool[0],
+        );
         if (meta == null) {
-          throw new Error(`${nameof(this.getStakePools)} no meta for ${pool[0]}`);
+          // server hasn't returned information about the stake pool yet
+          return undefined;
         }
         const name = meta.info?.name ?? intl.formatMessage(globalMessages.unknownPoolLabel);
 
@@ -554,10 +557,10 @@ export default class StakingDashboardPage extends Component<Props> {
                 }
                 : undefined
             }
-            reputationInfo={poolReputation[pool[0]] ?? {}}
+            reputationInfo={meta.reputation}
             openReputationDialog={() => this.generated.actions.dialogs.open.trigger({
               dialog: PoolWarningDialog,
-              params: { reputation: (poolReputation[pool[0]] ?? {}) },
+              params: { reputation: meta.reputation },
             })}
           />
         );
@@ -821,17 +824,13 @@ export default class StakingDashboardPage extends Component<Props> {
       |},
       delegation: {|
         selectedPage: number,
+        getPoolInfo: ($ReadOnly<NetworkRow>, string) => (void | PoolMeta),
+        getDelegationRequests: (
+          PublicDeriver<>
+        ) => void | DelegationRequests,
       |},
       substores: {|
         jormungandr: {|
-          delegation: {|
-            getDelegationRequests: (
-              PublicDeriver<>
-            ) => void | DelegationRequests,
-            poolReputation: {|
-              result: ?PromisslessReturnType<ReputationFunc>
-            |}
-          |},
           delegationTransaction: {|
             createDelegationTx: {|
               error: ?LocalizableError,
@@ -911,18 +910,14 @@ export default class StakingDashboardPage extends Component<Props> {
         },
         delegation: {
           selectedPage: stores.delegation.selectedPage,
+          getPoolInfo: stores.delegation.getPoolInfo,
+          getDelegationRequests: stores.delegation.getDelegationRequests,
         },
         substores: {
           jormungandr: {
             time: {
               getTimeCalcRequests: jormungandrStore.time.getTimeCalcRequests,
               getCurrentTimeRequests: jormungandrStore.time.getCurrentTimeRequests,
-            },
-            delegation: {
-              getDelegationRequests: jormungandrStore.delegation.getDelegationRequests,
-              poolReputation: {
-                result: jormungandrStore.delegation.poolReputation.result,
-              },
             },
             delegationTransaction: {
               isStale: jormungandrStore.delegationTransaction.isStale,

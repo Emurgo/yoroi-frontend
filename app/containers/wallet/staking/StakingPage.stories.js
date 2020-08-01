@@ -31,7 +31,7 @@ import type {
 import type {
   RewardHistoryForWallet,
   DelegationRequests,
-} from '../../../stores/jormungandr/DelegationStore';
+} from '../../../stores/toplevel/DelegationStore';
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -152,7 +152,6 @@ const genBaseProps: {|
 function getStakingInfo(
   publicDeriver: *,
 ): DelegationRequests {
-  const poolInfo = new Map();
   const accountBalance = new BigNumber(4);
   const getDelegatedBalance: CachedRequest<GetDelegatedBalanceFunc> = new CachedRequest(
     _request => Promise.resolve({
@@ -166,6 +165,7 @@ function getStakingInfo(
       prevEpoch: undefined,
       prevPrevEpoch: undefined,
       fullHistory: [],
+      allPoolIds: [],
     })
   );
   const rewardHistory: CachedRequest<RewardHistoryForWallet> = new CachedRequest(
@@ -180,9 +180,6 @@ function getStakingInfo(
     getCurrentDelegation,
     rewardHistory,
     error: undefined,
-    stakingKeyState: {
-      poolInfo,
-    },
   };
 }
 

@@ -1,7 +1,6 @@
 // @flow
 
-import { observable, action, reaction, runInAction } from 'mobx';
-import { find } from 'lodash';
+import { action, reaction, runInAction } from 'mobx';
 import Store from '../base/Store';
 import {
   Logger,
@@ -24,58 +23,18 @@ import {
 import type {
   GetDelegatedBalanceFunc,
   GetCurrentDelegationFunc,
-} from '../../api/jormungandr/lib/storage/bridge/delegationUtils';
-import type {
-  AccountStateSuccess,
-  RemotePoolMetaSuccess,
-  ReputationFunc,
-  RewardTuple,
-} from '../../api/jormungandr/lib/state-fetch/types';
-import LocalizableError from '../../i18n/LocalizableError';
+  GetCurrentDelegationResponse,
+} from '../../api/common/lib/storage/bridge/delegationUtils';
 import {
   genToRelativeSlotNumber,
   genTimeToSlot,
 } from '../../api/jormungandr/lib/storage/bridge/timeUtils';
 import { isJormungandr, getJormungandrBaseConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
-
-export type StakingKeyState = {|
-  poolInfo: Map<string, RemotePoolMetaSuccess>
-|};
-
-export type RewardHistoryForWallet = string => Promise<Array<RewardTuple>>;
-
-export type DelegationRequests = {|
-  publicDeriver: PublicDeriver<>,
-  getDelegatedBalance: CachedRequest<GetDelegatedBalanceFunc>,
-  getCurrentDelegation: CachedRequest<GetCurrentDelegationFunc>,
-  rewardHistory: CachedRequest<RewardHistoryForWallet>,
-  error: LocalizableError | any;
-  stakingKeyState: void | StakingKeyState; // TODO: remove
-|};
+import type { DelegationRequests, RewardHistoryForWallet } from '../toplevel/DelegationStore';
 
 export default class JormungandrDelegationStore extends Store {
 
-  @observable delegationRequests: Array<DelegationRequests> = [];
-
-  @observable poolReputation: CachedRequest<ReputationFunc>
-    = new CachedRequest<ReputationFunc>(() => {
-      // we need to defer this call because the store may not be initialized yet
-      // by the time this constructor is called
-      const stateFetcher = this.stores.substores.jormungandr.stateFetchStore.fetcher;
-      return stateFetcher.getReputation();
-    });
-
   _recalculateDelegationInfoDisposer: void => void = () => {};
-
-  // TODO: refine input type to staking key wallets only
-  getDelegationRequests: PublicDeriver<> => void | DelegationRequests = (
-    publicDeriver
-  ) => {
-    const foundRequest = find(this.delegationRequests, { publicDeriver });
-    if (foundRequest) return foundRequest;
-
-    return undefined; // can happen if the wallet is not a Shelley wallet
-  }
 
   @action addObservedWallet: PublicDeriver<> => void = (
     publicDeriver
@@ -91,25 +50,21 @@ export default class JormungandrDelegationStore extends Store {
         const result = await stateFetcher.getRewardHistory({ addresses: [address] });
         return result[address] ?? [];
       }),
-      stakingKeyState: undefined,
       error: undefined,
     };
-    this.delegationRequests.push(newObserved);
+    this.stores.delegation.delegationRequests.push(newObserved);
   }
 
   setup(): void {
     super.setup();
     this.reset();
     this._startWatch();
-    this.registerReactions([
-      this._loadPoolReputation,
-    ]);
   }
 
   refreshDelegation: PublicDeriver<> => Promise<void> = async (
     publicDeriver
   ) => {
-    const delegationRequest = this.getDelegationRequests(publicDeriver);
+    const delegationRequest = this.stores.delegation.getDelegationRequests(publicDeriver);
     if (delegationRequest == null) return;
 
     try {
@@ -117,7 +72,6 @@ export default class JormungandrDelegationStore extends Store {
       delegationRequest.getCurrentDelegation.reset();
       runInAction(() => {
         delegationRequest.error = undefined;
-        delegationRequest.stakingKeyState = undefined;
       });
 
       const withStakingKey = asGetStakingKey(publicDeriver);
@@ -135,10 +89,7 @@ export default class JormungandrDelegationStore extends Store {
           });
           const stateForStakingKey = accountStateResp[stakingKeyResp.addr.Hash];
           if (!stateForStakingKey.delegation) {
-            return runInAction(() => {
-              delegationRequest.stakingKeyState = undefined;
-              throw new Error(`${nameof(this.refreshDelegation)} stake key invalid - ${stateForStakingKey.comment}`);
-            });
+            throw new Error(`${nameof(this.refreshDelegation)} stake key invalid - ${stateForStakingKey.comment}`);
           }
           const delegatedBalance = delegationRequest.getDelegatedBalance.execute({
             publicDeriver: withStakingKey,
@@ -147,10 +98,8 @@ export default class JormungandrDelegationStore extends Store {
           }).promise;
           if (delegatedBalance == null) throw new Error('Should never happen');
 
-          const poolInfoRequest = this._getPoolInfo({ delegationRequest, stateForStakingKey });
           return await Promise.all([
             delegatedBalance,
-            poolInfoRequest,
           ]);
         } catch (e) {
           runInAction(() => {
@@ -163,7 +112,10 @@ export default class JormungandrDelegationStore extends Store {
         publicDeriver: withStakingKey,
         stakingKeyAddressId: stakingKeyResp.addr.AddressId,
         delegationRequest,
-      });
+      }).then(currentDelegation => this._updatePoolInfo({
+        publicDeriver: withStakingKey,
+        allPoolIds: currentDelegation.allPoolIds,
+      }));
 
       const rewardHistory = delegationRequest.rewardHistory.execute(
         stakingKeyResp.addr.Hash
@@ -179,36 +131,11 @@ export default class JormungandrDelegationStore extends Store {
     }
   }
 
-  _getPoolInfo: {|
-    delegationRequest: DelegationRequests,
-    stateForStakingKey: AccountStateSuccess,
-  |} => Promise<void> = async (request) => {
-    const stateFetcher = this.stores.substores.jormungandr.stateFetchStore.fetcher;
-    const poolInfoResp = await stateFetcher.getPoolInfo({
-      ids: request.stateForStakingKey.delegation.pools.map(delegation => delegation[0]),
-    });
-    const meta = new Map(request.stateForStakingKey.delegation.pools.map(delegation => {
-      const info = poolInfoResp[delegation[0]];
-      if (!info.history) {
-        return runInAction(() => {
-          request.delegationRequest.stakingKeyState = undefined;
-          throw new Error(`${nameof(this.refreshDelegation)} pool info missing ${info.error}`);
-        });
-      }
-      return [delegation[0], info];
-    }));
-    runInAction(() => {
-      request.delegationRequest.stakingKeyState = {
-        poolInfo: meta,
-      };
-    });
-  }
-
   _getDelegationHistory: {|
     publicDeriver: PublicDeriver<> & IGetStakingKey,
     stakingKeyAddressId: number,
     delegationRequest: DelegationRequests,
-  |} => Promise<void> = async (request) => {
+  |} => Promise<GetCurrentDelegationResponse> = async (request) => {
     const jormungandrConfig = getJormungandrBaseConfig(
       request.publicDeriver.getParent().getNetworkInfo()
     );
@@ -221,13 +148,56 @@ export default class JormungandrDelegationStore extends Store {
       }).slot
     ).epoch;
 
-    const currentDelegation = request.delegationRequest.getCurrentDelegation.execute({
+    // re-calculate which pools we've delegated to
+    const currentDelegation = await request.delegationRequest.getCurrentDelegation.execute({
       publicDeriver: request.publicDeriver,
       stakingKeyAddressId: request.stakingKeyAddressId,
       toRelativeSlotNumber,
       currentEpoch,
     }).promise;
     if (currentDelegation == null) throw new Error('Should never happen');
+    return currentDelegation;
+  }
+
+  _updatePoolInfo: {|
+    publicDeriver: PublicDeriver<> & IGetStakingKey,
+    allPoolIds: Array<string>,
+  |} => Promise<void> = async (request) => {
+    // update pool information
+    const poolsCachedForNetwork = this.stores.delegation.poolInfo
+      .reduce(
+        (acc, next) => {
+          if (
+            next.network.NetworkId === request.publicDeriver.getParent().getNetworkInfo().NetworkId
+          ) {
+            acc.add(next.poolId);
+            return acc;
+          }
+          return acc;
+        },
+        (new Set<string>())
+      );
+    const poolsToQuery = request.allPoolIds.filter(
+      pool => !poolsCachedForNetwork.has(pool)
+    );
+    const stateFetcher = this.stores.substores.jormungandr.stateFetchStore.fetcher;
+    const poolInfoResp = await stateFetcher.getPoolInfo({
+      ids: poolsToQuery,
+    });
+    const reputation = await stateFetcher.getReputation();
+    for (const poolId of Object.keys(poolInfoResp)) {
+      const poolInfo = poolInfoResp[poolId];
+      if (!poolInfo.info) continue; // skip pools that error out
+      this.stores.delegation.poolInfo.push({
+        network: request.publicDeriver.getParent().getNetworkInfo(),
+        poolId,
+        poolInfo: {
+          info: poolInfo.info,
+          history: poolInfo.history,
+          reputation: reputation[poolId] ?? Object.freeze({}),
+        },
+      });
+    }
   }
 
   @action.bound
@@ -263,15 +233,5 @@ export default class JormungandrDelegationStore extends Store {
   reset(): void {
     this._recalculateDelegationInfoDisposer();
     this._recalculateDelegationInfoDisposer = () => {};
-    this.delegationRequests = [];
-  }
-
-  _loadPoolReputation: void => Promise<void> = async () => {
-    const { selected } = this.stores.wallets;
-    if (selected == null) return undefined;
-    if (!isJormungandr(selected.getParent().getNetworkInfo())) return undefined;
-    if (!this.poolReputation.wasExecuted && !this.poolReputation.isExecuting) {
-      await this.poolReputation.execute();
-    }
   }
 }

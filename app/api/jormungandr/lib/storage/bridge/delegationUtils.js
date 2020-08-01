@@ -23,25 +23,13 @@ import {
 } from './utils';
 import type {
   AccountStateDelegation,
-  AccountStateSuccess,
 } from '../../state-fetch/types';
 import { TxStatusCodes } from '../../../../ada/lib/storage/database/primitives/enums';
 import type { CertificateInsert } from '../../../../ada/lib/storage/database/primitives/tables';
-import type { CertificateForKey } from '../../../../ada/lib/storage/database/primitives/api/read';
-import type { ToRelativeSlotNumberFunc } from '../../../../common/lib/storage/bridge/timeUtils';
-
-export type GetDelegatedBalanceRequest = {|
-  publicDeriver: PublicDeriver<> & IGetStakingKey,
-  accountState: AccountStateSuccess,
-  stakingAddress: string,
-|};
-export type GetDelegatedBalanceResponse = {|
-  utxoPart: BigNumber,
-  accountPart: BigNumber,
-|};
-export type GetDelegatedBalanceFunc = (
-  request: GetDelegatedBalanceRequest
-) => Promise<GetDelegatedBalanceResponse>;
+import type {
+  GetDelegatedBalanceRequest,
+  GetDelegatedBalanceResponse,
+} from '../../../../common/lib/storage/bridge/delegationUtils';
 
 export async function getDelegatedBalance(
   request: GetDelegatedBalanceRequest,
@@ -53,7 +41,7 @@ export async function getDelegatedBalance(
 
   return {
     utxoPart,
-    accountPart: new BigNumber(request.accountState.value),
+    accountPart: new BigNumber(request.rewardBalance),
   };
 }
 
@@ -81,26 +69,6 @@ export async function getUtxoDelegatedBalance(
 
   return utxoSum;
 }
-
-export type GetCurrentDelegationRequest = {|
-  publicDeriver: PublicDeriver<> & IGetStakingKey,
-  stakingKeyAddressId: number,
-  currentEpoch: number,
-  toRelativeSlotNumber: ToRelativeSlotNumberFunc,
-|};
-export type CertificateForEpoch = {|
-  ...CertificateForKey,
-  ...AccountStateDelegation,
-|};
-export type GetCurrentDelegationResponse = {|
-  currEpoch: void | CertificateForEpoch,
-  prevEpoch: void | CertificateForEpoch,
-  prevPrevEpoch: void | CertificateForEpoch,
-  fullHistory: Array<CertificateForKey>,
-|};
-export type GetCurrentDelegationFunc = (
-  request: GetCurrentDelegationRequest
-) => Promise<GetCurrentDelegationResponse>;
 
 export async function getCurrentDelegation(
   request: GetCurrentDelegationRequest,
@@ -130,6 +98,7 @@ export async function getCurrentDelegation(
     prevPrevEpoch: undefined,
     fullHistory: allDelegations,
   };
+  const seenPools = new Set<string>();
   for (const delegation of allDelegations) {
     const block = delegation.block;
     if (block == null) {
@@ -148,7 +117,11 @@ export async function getCurrentDelegation(
     ) {
       continue;
     }
+
+    // recall: undelegation is a type of delegation to an empty list of pool
+    // so this code handles undelegation as well
     const { pools } = certificateToPoolList(delegation.certificate.Payload, kind);
+    pools.forEach(pool => seenPools.add(pool[0]));
     // calculate which certificate was active at the end of each epoch
     if (result.currEpoch == null && relativeSlot.epoch <= request.currentEpoch) {
       result.currEpoch = {
@@ -170,7 +143,10 @@ export async function getCurrentDelegation(
       break;
     }
   }
-  return result;
+  return {
+    ...result,
+    allPoolIds: Array.from(seenPools)
+  };
 }
 
 export function certificateToPoolList(

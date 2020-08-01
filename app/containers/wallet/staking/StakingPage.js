@@ -16,7 +16,7 @@ import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 import LoadingSpinner from '../../../components/widgets/LoadingSpinner';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
-import type { DelegationRequests } from '../../../stores/jormungandr/DelegationStore';
+import type { DelegationRequests } from '../../../stores/toplevel/DelegationStore';
 import type { TxRequests } from '../../../stores/toplevel/TransactionsStore';
 import { getApiForNetwork, getApiMeta } from '../../../api/common/utils';
 
@@ -208,7 +208,7 @@ export default class StakingPage extends Component<Props> {
         substores: {
           jormungandr: {
             delegation: {
-              getDelegationRequests: jormungandrStores.delegation.getDelegationRequests,
+              getDelegationRequests: stores.delegation.getDelegationRequests,
             },
             delegationTransaction: {
               signAndBroadcastDelegationTx: {

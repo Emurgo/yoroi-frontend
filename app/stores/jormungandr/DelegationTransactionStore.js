@@ -89,7 +89,7 @@ export default class DelegationTransactionStore extends Store {
     }
     const basePubDeriver = withStakingKey;
 
-    const delegationRequests = this.stores.substores.jormungandr.delegation.getDelegationRequests(
+    const delegationRequests = this.stores.delegation.getDelegationRequests(
       request.publicDeriver
     );
     if (delegationRequests == null) {
