@@ -106,12 +106,12 @@ export default class StakingPage extends Component<Props> {
     if (delegationRequests == null) {
       throw new Error(`${nameof(StakingPage)} opened for non-reward wallet`);
     }
-    const delegation = delegationRequests.stakingKeyState;
-    if (!delegation) {
+    const delegation = delegationRequests.getCurrentDelegation.result;
+    if (!delegation || delegation.currEpoch == null) {
       return null;
     }
     const poolList = Array.from(
-      new Set(delegation.state.delegation.pools.map(pool => pool[0]))
+      new Set(delegation.currEpoch.pools.map(pool => pool[0]))
     );
     finalURL += `&delegated=${encodeURIComponent(JSON.stringify(poolList))}`;
     return finalURL;

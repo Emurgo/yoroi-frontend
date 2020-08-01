@@ -39,11 +39,6 @@ import {
 import { isJormungandr, getJormungandrBaseConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 export type StakingKeyState = {|
-  state: AccountStateSuccess,
-  /**
-    * careful: there may be less entries in this map than # of pools in a certificate
-    * I think you can use ratio stake to stake to the same stake pool multiple times
-    */
   poolInfo: Map<string, RemotePoolMetaSuccess>
 |};
 
@@ -55,7 +50,7 @@ export type DelegationRequests = {|
   getCurrentDelegation: CachedRequest<GetCurrentDelegationFunc>,
   rewardHistory: CachedRequest<RewardHistoryForWallet>,
   error: LocalizableError | any;
-  stakingKeyState: void | StakingKeyState;
+  stakingKeyState: void | StakingKeyState; // TODO: remove
 |};
 
 export default class JormungandrDelegationStore extends Store {
@@ -204,7 +199,6 @@ export default class JormungandrDelegationStore extends Store {
     }));
     runInAction(() => {
       request.delegationRequest.stakingKeyState = {
-        state: request.stateForStakingKey,
         poolInfo: meta,
       };
     });

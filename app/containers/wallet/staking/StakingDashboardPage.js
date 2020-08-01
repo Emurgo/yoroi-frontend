@@ -24,7 +24,6 @@ import LessThanExpectedDialog from '../../../components/wallet/staking/dashboard
 import PoolWarningDialog from '../../../components/wallet/staking/dashboard/PoolWarningDialog';
 import { digestForHash } from '../../../api/ada/lib/storage/database/primitives/api/utils';
 import { handleExternalLinkClick } from '../../../utils/routing';
-import { GetPoolInfoApiError } from '../../../api/common/errors';
 import LocalizableError from '../../../i18n/LocalizableError';
 import UnmangleTxDialogContainer from '../../transfer/UnmangleTxDialogContainer';
 import type { GeneratedData as UnmangleTxDialogContainerData } from '../../transfer/UnmangleTxDialogContainer';
@@ -148,13 +147,17 @@ export default class StakingDashboardPage extends Component<Props> {
     const dashboard = (
       <StakingDashboard
         pageInfo={
-          delegationRequests.stakingKeyState == null ||
           !delegationRequests.getCurrentDelegation.wasExecuted ||
-          delegationRequests.getCurrentDelegation.isExecuting
+          delegationRequests.getCurrentDelegation.isExecuting ||
+          delegationRequests.getCurrentDelegation.result?.currEpoch == null
             ? undefined
             : {
               currentPage: this.generated.stores.delegation.selectedPage,
-              numPages: delegationRequests.stakingKeyState.state.delegation.pools.length,
+              numPages: Array.from(new Set(
+                delegationRequests.getCurrentDelegation.result.currEpoch.pools.map(
+                  tuple => tuple[0]
+                )
+              )).length,
               goToPage: page => this.generated.actions.delegation.setSelectedPage.trigger(page),
             }}
         hasAnyPending={this.generated.stores.transactions.hasAnyPending}
@@ -441,19 +444,11 @@ export default class StakingDashboardPage extends Component<Props> {
     if (delegationRequests.error != null) {
       return { error: delegationRequests.error };
     }
-    const keyState = delegationRequests.stakingKeyState;
-    if (
-      keyState &&
-      keyState.state.delegation.pools.length === 0 &&
-      delegationRequests.getCurrentDelegation.result != null
-    ) {
+    if (delegationRequests.getCurrentDelegation.result != null) {
       const currentDelegation = delegationRequests.getCurrentDelegation.result;
       const currEpochInfo = currentDelegation.currEpoch;
       if (currEpochInfo == null) {
         return undefined;
-      }
-      if (currEpochInfo.pools.length !== 0) {
-        return { error: new GetPoolInfoApiError() };
       }
     }
     return undefined;
@@ -469,13 +464,16 @@ export default class StakingDashboardPage extends Component<Props> {
     }
     if (
       !delegationRequests.getCurrentDelegation.wasExecuted ||
-      delegationRequests.getCurrentDelegation.isExecuting
+      delegationRequests.getCurrentDelegation.isExecuting ||
+      delegationRequests.getCurrentDelegation.result == null
     ) {
       return { pools: null };
     }
-    if (delegationRequests.stakingKeyState == null) {
+    if (delegationRequests.getCurrentDelegation.result.currEpoch == null) {
       return { pools: [] };
     }
+    const currentPools = delegationRequests.getCurrentDelegation.result.currEpoch.pools;
+
     const tooltipNotification = {
       duration: config.wallets.ADDRESS_COPY_TOOLTIP_NOTIFICATION_DURATION,
       message: globalMessages.copyTooltipMessage,
@@ -484,11 +482,10 @@ export default class StakingDashboardPage extends Component<Props> {
     const poolReputation = delegationStore.poolReputation.result ?? {};
 
     const { uiNotifications, } = this.generated.stores;
-    const keyState = delegationRequests.stakingKeyState;
     const { intl } = this.context;
     return {
-      pools: keyState.state.delegation.pools.map(pool => {
-        const meta = keyState.poolInfo.get(pool[0]);
+      pools: currentPools.map(pool => {
+        const meta = delegationRequests.stakingKeyState?.poolInfo.get(pool[0]);
         if (meta == null) {
           throw new Error(`${nameof(this.getStakePools)} no meta for ${pool[0]}`);
         }
@@ -544,7 +541,7 @@ export default class StakingDashboardPage extends Component<Props> {
             }
             undelegate={
               // don't support undelegation for ratio stake since it's a less intuitive UX
-              keyState.state.delegation.pools.length === 1
+              currentPools.length === 1
                 ? async () => {
                   this.generated.actions.dialogs.open.trigger({ dialog: UndelegateDialog });
                   await this.generated.actions.jormungandr

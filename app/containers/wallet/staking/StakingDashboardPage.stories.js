@@ -477,18 +477,6 @@ function getStakingInfo(
     rewardHistory,
     error: undefined,
     stakingKeyState: {
-      state: {
-        counter: 0,
-        delegation: {
-          pools: stakingCase === stakingKeyCases.NeverDelegated
-          || currEpochCert?.pools == null
-            ? []
-            : currEpochCert.pools,
-        },
-        value: stakingCase === stakingKeyCases.NeverDelegated
-          ? 0
-          : accountBalance.toNumber(),
-      },
       poolInfo,
     },
   };

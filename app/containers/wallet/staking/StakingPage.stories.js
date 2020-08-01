@@ -181,13 +181,6 @@ function getStakingInfo(
     rewardHistory,
     error: undefined,
     stakingKeyState: {
-      state: {
-        counter: 0,
-        delegation: {
-          pools: [],
-        },
-        value: accountBalance.toNumber()
-      },
       poolInfo,
     },
   };

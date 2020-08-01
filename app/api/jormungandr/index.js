@@ -213,11 +213,7 @@ export type CreateUnsignedTxFunc = (
 export type CreateDelegationTxRequest = {|
   publicDeriver: IPublicDeriver<ConceptualWallet> & IGetAllUtxos & IHasUtxoChains & IGetStakingKey,
   poolRequest: PoolRequest,
-  /**
-   * TODO: right now we can only get this information from the network
-   * but it should be held in storage eventually
-   */
-  valueInAccount: number,
+  valueInAccount: BigNumber,
 |};
 export type CreateDelegationTxResponse = {|
   unsignedTx: V3UnsignedTxAddressedUtxoResponse,
