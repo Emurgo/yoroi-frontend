@@ -105,7 +105,7 @@
     "config": "1.31.0",
     "config-webpack": "1.0.4",
     "crx": "5.0.1",
-    "css-loader": "3.6.0",
+    "css-loader": "4.2.0",
     "cucumber": "git+https://github.com/SebastienGllmt/cucumber-js.git",
     "eslint": "7.5.0",
     "eslint-config-airbnb": "18.2.0",
