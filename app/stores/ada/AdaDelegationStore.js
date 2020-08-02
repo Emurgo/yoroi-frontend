@@ -16,15 +16,15 @@ import {
 import type {
   IGetStakingKey,
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
-// import {
-//   getDelegatedBalance,
-//   getCurrentDelegation,
-// } from '../../api/ada/lib/storage/bridge/delegationUtils';
-// import type {
-//   GetDelegatedBalanceFunc,
-//   GetCurrentDelegationFunc,
-//   GetCurrentDelegationResponse,
-// } from '../../api/ada/lib/storage/bridge/delegationUtils';
+import {
+  getDelegatedBalance,
+  getCurrentDelegation,
+} from '../../api/ada/lib/storage/bridge/delegationUtils';
+import type {
+  GetDelegatedBalanceFunc,
+  GetCurrentDelegationFunc,
+  GetCurrentDelegationResponse,
+} from '../../api/common/lib/storage/bridge/delegationUtils';
 import {
   genToRelativeSlotNumber,
   genTimeToSlot,
@@ -33,8 +33,6 @@ import { isJormungandr, getJormungandrBaseConfig } from '../../api/ada/lib/stora
 import type { DelegationRequests, RewardHistoryForWallet } from '../toplevel/DelegationStore';
 
 export default class AdaDelegationStore extends Store {
-
-  _recalculateDelegationInfoDisposer: void => void = () => {};
 
   @action addObservedWallet: PublicDeriver<> => void = (
     publicDeriver

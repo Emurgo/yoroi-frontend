@@ -16,8 +16,8 @@ import type {
 } from '../../api/common/lib/state-fetch/types';
 import WalletTransaction from '../../domain/WalletTransaction';
 import type { Ticker, PriceDataRow } from '../../api/ada/lib/storage/database/prices/tables';
-import { getPrice, upsertPrices, getAllPrices, getPriceKey } from '../../api/ada/lib/storage/bridge/prices';
-import type { GetAllPricesFunc } from '../../api/ada/lib/storage/bridge/prices';
+import { getPrice, upsertPrices, getAllPrices, getPriceKey } from '../../api/common/lib/storage/bridge/prices';
+import type { GetAllPricesFunc } from '../../api/common/lib/storage/bridge/prices';
 import { verifyTicker, verifyPubKeyDataReplacement } from '../../api/verify';
 import type { ConfigType } from '../../../config/config-types';
 

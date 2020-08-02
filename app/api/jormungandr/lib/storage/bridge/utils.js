@@ -1,4 +1,3 @@
-
 // @flow
 
 import { RustModule } from '../../../../ada/lib/cardanoCrypto/rustLoader';

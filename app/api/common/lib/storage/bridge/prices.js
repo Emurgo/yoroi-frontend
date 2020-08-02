@@ -1,13 +1,13 @@
 // @flow
 
-import type { Ticker, PriceDataInsert, PriceDataRow } from '../database/prices/tables';
+import type { Ticker, PriceDataInsert, PriceDataRow } from '../../../../ada/lib/storage/database/prices/tables';
 import type { lf$Database } from 'lovefield';
 import {
   getAllSchemaTables,
   raii,
-} from '../database/utils';
-import { GetPriceData } from '../database/prices/api/read';
-import { ModifyPriceData } from '../database/prices/api/write';
+} from '../../../../ada/lib/storage/database/utils';
+import { GetPriceData } from '../../../../ada/lib/storage/database/prices/api/read';
+import { ModifyPriceData } from '../../../../ada/lib/storage/database/prices/api/write';
 
 
 export function getPriceKey(

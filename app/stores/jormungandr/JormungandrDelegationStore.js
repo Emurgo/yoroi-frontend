@@ -1,5 +1,6 @@
 // @flow
 
+import BigNumber from 'bignumber.js';
 import { action, reaction, runInAction } from 'mobx';
 import Store from '../base/Store';
 import {
@@ -93,7 +94,7 @@ export default class JormungandrDelegationStore extends Store {
           }
           const delegatedBalance = delegationRequest.getDelegatedBalance.execute({
             publicDeriver: withStakingKey,
-            accountState: stateForStakingKey,
+            rewardBalance: new BigNumber(stateForStakingKey.value),
             stakingAddress: stakingKeyResp.addr.Hash,
           }).promise;
           if (delegatedBalance == null) throw new Error('Should never happen');

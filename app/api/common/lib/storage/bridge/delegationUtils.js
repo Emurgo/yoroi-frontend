@@ -2,9 +2,6 @@
 
 import BigNumber from 'bignumber.js';
 import {
-  asGetAllUtxos,
-} from '../../../../ada/lib/storage/models/PublicDeriver/traits';
-import {
   PublicDeriver,
 } from '../../../../ada/lib/storage/models/PublicDeriver/index';
 import type {
@@ -32,9 +29,13 @@ export type GetCurrentDelegationRequest = {|
   currentEpoch: number,
   toRelativeSlotNumber: ToRelativeSlotNumberFunc,
 |};
+export type PoolTuples = [
+  string, // PoolId
+  number, // parts
+];
 export type CertificateForEpoch = {|
   ...CertificateForKey,
-  ...AccountStateDelegation,
+  pools: Array<PoolTuples>,
 |};
 export type GetCurrentDelegationResponse = {|
   currEpoch: void | CertificateForEpoch,

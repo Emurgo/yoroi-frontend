@@ -27,7 +27,7 @@ import { wrapWallet } from '../../../Routes';
 import type {
   GetDelegatedBalanceFunc,
   GetCurrentDelegationFunc,
-} from '../../../api/jormungandr/lib/storage/bridge/delegationUtils';
+} from '../../../api/common/lib/storage/bridge/delegationUtils';
 import type {
   RewardHistoryForWallet,
   DelegationRequests,

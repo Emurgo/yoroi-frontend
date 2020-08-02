@@ -34,6 +34,8 @@ export async function filterMangledAddresses(request: {|
   }
 
   const stakingKeyResp = await withStakingKey.getStakingKey();
+
+  // TODO: this is Jormungandr-specific logic
   const stakingKey = unwrapStakingKey(stakingKeyResp.addr.Hash);
 
   const filterResult = filterAddressesByStakingKey(

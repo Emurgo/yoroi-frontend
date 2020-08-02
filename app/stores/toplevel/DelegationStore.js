@@ -1,6 +1,6 @@
 // @flow
 
-import { observable, action, reaction, runInAction } from 'mobx';
+import { observable, action, } from 'mobx';
 import { find } from 'lodash';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import {
@@ -10,7 +10,7 @@ import Store from '../base/Store';
 import type {
   GetDelegatedBalanceFunc,
   GetCurrentDelegationFunc,
-} from '../../api/jormungandr/lib/storage/bridge/delegationUtils';
+} from '../../api/common/lib/storage/bridge/delegationUtils';
 import CachedRequest from '../lib/LocalizedCachedRequest';
 import LocalizableError from '../../i18n/LocalizableError';
 import type {
