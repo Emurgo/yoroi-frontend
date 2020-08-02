@@ -50,6 +50,12 @@ import {
   getBalanceForUtxos,
 } from '../utils';
 import {
+  unwrapStakingKey as unwrapCardanoStakingKey,
+} from '../../bridge/utils';
+import {
+  unwrapStakingKey as unwrapJormungandrStakingKey,
+} from '../../../../../jormungandr/lib/storage/bridge/utils';
+import {
   normalizeToPubDeriverLevel,
   rawChangePassword,
   decryptKey,
@@ -102,7 +108,8 @@ import { ModifyKey, ModifyAddress, } from '../../database/primitives/api/write';
 import { v2genAddressBatchFunc, } from '../../../../restoration/byron/scan';
 import { ergoGenAddressBatchFunc, } from '../../../../../ergo/lib/restoration/scan';
 import { scanBip44Account, } from '../../../../../common/lib/restoration/bip44';
-import { scanCip1852Account } from '../../../../../jormungandr/lib/restoration/scan';
+import { scanJormungandrCip1852Account } from '../../../../../jormungandr/lib/restoration/scan';
+import { scanShelleyCip1852Account } from '../../../../restoration/shelley/scan';
 
 import {
   UnusedAddressesError,
@@ -117,7 +124,12 @@ import type {
 } from './index';
 import { ConceptualWallet } from '../ConceptualWallet/index';
 import { RustModule } from '../../../cardanoCrypto/rustLoader';
+import { derivePublicByAddressing } from '../../../cardanoCrypto/utils';
 import { fromBase58 } from 'bip32';
+import {
+  isCardanoHaskell,
+  isJormungandr,
+} from '../../database/prepackaged/networks';
 
 interface Empty {}
 type HasPrivateDeriverDependencies = IPublicDeriver<ConceptualWallet & IHasPrivateDeriver>;
@@ -224,7 +236,7 @@ const GetAllUtxosMixin = (
     for (const utxo of utxosInStorage) {
       const addressingInfo = addressingMap.get(utxo.UtxoTransactionOutput.AddressId);
       if (addressingInfo == null) {
-        throw new Error('rawGetAllUtxos should never happen');
+        throw new Error(`${nameof(GetAllUtxos)}::${nameof(this.rawGetAllUtxos)} should never happen`);
       }
       addressedUtxos.push({
         output: utxo,
@@ -389,7 +401,7 @@ const GetAllAccountingMixin = (
   ) => {
     if (this.getParent().getPublicDeriverLevel() !== Bip44DerivationLevels.ACCOUNT.level) {
       // we only allow this on accounts instead of any level < ACCOUNT.level to simplify the code
-      throw new Error('HasUtxoChains::rawGetAddressesForChain incorrect pubderiver level');
+      throw new Error(`${nameof(GetAllAccounting)}::${nameof(this.rawGetAllAccountingAddresses)} incorrect pubderiver level`);
     }
     return rawGetBip44AddressesByPath(
       super.getDb(), tx,
@@ -445,11 +457,12 @@ const GetAllAccountingMixin = (
   ) => {
     const allAccounts = await this.rawGetAllAccountingAddresses(tx, deps, body, derivationTables);
     const stakingKeyAccount = allAccounts[0];
-    const stakingAddr = stakingKeyAccount.addrs.find(
-      addr => addr.Type === CoreAddressTypes.JORMUNGANDR_ACCOUNT
-    );
+    const stakingAddr = stakingKeyAccount.addrs.find(addr => (
+      addr.Type === CoreAddressTypes.JORMUNGANDR_ACCOUNT ||
+      addr.Type === CoreAddressTypes.CARDANO_REWARD
+    ));
     if (stakingAddr == null) {
-      throw new StaleStateError('rawGetStakingKey no account found at account derivation');
+      throw new StaleStateError(`${nameof(GetAllAccounting)}::${nameof(this.rawGetStakingKey)} no account found at account derivation`);
     }
     return {
       row: stakingKeyAccount.row,
@@ -557,7 +570,7 @@ const AddBip44FromPublicMixin = (
       super.getPublicDeriverId(),
     );
     if (pubDeriver === undefined) {
-      throw new Error('AddBip44FromPublic::rawAddBip44FromPublic pubDeriver');
+      throw new Error(`${nameof(AddBip44FromPublic)}::${nameof(this.rawAddBip44FromPublic)} pubDeriver`);
     }
     await deps.AddDerivationTree.excludingParent(
       super.getDb(), tx,
@@ -654,7 +667,7 @@ const DisplayCutoffMixin = (
   ): Promise<IDisplayCutoffPopResponse> => {
     if (this.getParent().getPublicDeriverLevel() !== Bip44DerivationLevels.ACCOUNT.level) {
       // we only allow this on accounts instead of any level < ACCOUNT.level to simplify the code
-      throw new Error('DisplayCutoffMixin::popAddress incorrect pubderiver level');
+      throw new Error(`${nameof(DisplayCutoffMixin)}::${nameof(this.popAddress)} incorrect pubderiver level`);
     }
     const nextAddr = await deps.ModifyDisplayCutoff.pop(
       super.getDb(), tx,
@@ -675,7 +688,7 @@ const DisplayCutoffMixin = (
     );
     const addrs = family.get(nextAddr.row.KeyDerivationId);
     if (addrs == null) {
-      throw new Error('DisplayCutoff::popAddress should never happen');
+      throw new Error(`${nameof(DisplayCutoffMixin)}::${nameof(this.popAddress)} should never happen`);
     }
     return {
       ...nextAddr,
@@ -720,7 +733,7 @@ const DisplayCutoffMixin = (
   ): Promise<IDisplayCutoffGetResponse> => {
     if (this.getParent().getPublicDeriverLevel() !== Bip44DerivationLevels.ACCOUNT.level) {
       // we only allow this on accounts instead of any level < ACCOUNT.level to simplify the code
-      throw new Error('DisplayCutoffMixin::getCutoff incorrect pubderiver level');
+      throw new Error(`${nameof(DisplayCutoffMixin)}::${nameof(this.getCutoff)} incorrect pubderiver level`);
     }
     const chain = await deps.GetPathWithSpecific.getPath<$ReadOnly<Bip44ChainRow>>(
       super.getDb(), tx,
@@ -740,17 +753,17 @@ const DisplayCutoffMixin = (
         );
         const chainDerivation = result[0];
         if (chainDerivation === undefined) {
-          throw new Error('DisplayCutoff::rawGetCutoff missing chain. Should never happen');
+          throw new Error(`${nameof(DisplayCutoffMixin)}::${nameof(this.rawGetCutoff)} missing chain. Should never happen`);
         }
         return chainDerivation;
       }
     );
     if (chain === undefined) {
-      throw new Error('DisplayCutoffMixin::getCutoff no chain found');
+      throw new Error(`${nameof(DisplayCutoffMixin)}::${nameof(this.getCutoff)} no chain found`);
     }
     const cutoff = chain.levelSpecific.DisplayCutoff;
     if (cutoff == null) {
-      throw new Error('DisplayCutoffMixin::getCutoff null cutoff');
+      throw new Error(`${nameof(DisplayCutoffMixin)}::${nameof(this.getCutoff)} null cutoff`);
     }
     return cutoff;
   }
@@ -790,7 +803,7 @@ const DisplayCutoffMixin = (
   ): Promise<IDisplayCutoffSetResponse> => {
     if (this.getParent().getPublicDeriverLevel() !== Bip44DerivationLevels.ACCOUNT.level) {
       // we only allow this on accounts instead of any level < ACCOUNT.level to simplify the code
-      throw new Error('DisplayCutoffMixin::popAddress incorrect pubderiver level');
+      throw new Error(`${nameof(DisplayCutoffMixin)}::${nameof(this.popAddress)} incorrect pubderiver level`);
     }
     const path = await deps.GetDerivationsByPath.getSinglePath(
       super.getDb(), tx,
@@ -867,7 +880,7 @@ const Bip44PickInternalMixin = (
   ) => {
     const legacyAddr = body.addrs
       .filter(addr => addr.Type === CoreAddressTypes.CARDANO_LEGACY);
-    if (legacyAddr.length !== 1) throw new Error('pickInternal no legacy address found');
+    if (legacyAddr.length !== 1) throw new Error(`${nameof(Bip44PickInternal)}::${nameof(this.rawPickInternal)} no legacy address found`);
     return {
       addr: legacyAddr[0],
       row: body.row,
@@ -909,17 +922,23 @@ const Cip1852PickInternalMixin = (
       undefined,
       derivationTables
     );
-    const stakingAddr = RustModule.WalletV3.Address.from_bytes(
-      Buffer.from(stakingAddressDbRow.addr.Hash, 'hex')
-    ).to_account_address();
-    if (stakingAddr == null) {
-      throw new Error(`${nameof(this.rawPickInternal)} staking key invalid`);
-    }
-    const stakingKey = Buffer.from(stakingAddr.get_account_key().as_bytes()).toString('hex');
+
+    const stakingKey = (() => {
+      if (isCardanoHaskell(this.getParent().getNetworkInfo())) {
+        return Buffer.from(unwrapCardanoStakingKey(stakingAddressDbRow.addr.Hash).to_bytes()).toString('hex');
+      }
+      if (isJormungandr(this.getParent().getNetworkInfo())) {
+        return Buffer.from(unwrapJormungandrStakingKey(stakingAddressDbRow.addr.Hash).as_bytes()).toString('hex');
+      }
+      throw new Error(`${nameof(Cip1852PickInternal)}::${nameof(this.rawPickInternal)} don't know how to pick for this network`);
+    })();
     const ourGroupAddress = body.addrs
-      .filter(addr => addr.Type === CoreAddressTypes.JORMUNGANDR_GROUP)
+      .filter(addr => (
+        addr.Type === CoreAddressTypes.JORMUNGANDR_GROUP ||
+        addr.Type === CoreAddressTypes.CARDANO_REWARD
+      ))
       .filter(addr => addr.Hash.includes(stakingKey));
-    if (ourGroupAddress.length !== 1) throw new Error('pickInternal no group address found');
+    if (ourGroupAddress.length !== 1) throw new Error(`${nameof(Cip1852PickInternal)}::${nameof(this.rawPickInternal)} no group address found`);
     return {
       addr: ourGroupAddress[0],
       row: body.row,
@@ -959,7 +978,7 @@ const HasUtxoChainsMixin = (
   ) => {
     if (this.getParent().getPublicDeriverLevel() !== Bip44DerivationLevels.ACCOUNT.level) {
       // we only allow this on accounts instead of any level < ACCOUNT.level to simplify the code
-      throw new Error('HasUtxoChains::rawGetAddressesForChain incorrect pubderiver level');
+      throw new Error(`${nameof(HasUtxoChains)}::${nameof(this.rawGetAddressesForChain)} incorrect pubderiver level`);
     }
     return rawGetBip44AddressesByPath(
       super.getDb(), tx,
@@ -1104,7 +1123,7 @@ const GetPublicKeyMixin = (
       false,
     );
     if (derivationAndKey.publicKey == null) {
-      throw new StaleStateError('GetPublicKey::rawGetPublicKey publicKey');
+      throw new StaleStateError(`${nameof(GetPublicKey)}::${nameof(this.rawGetPublicKey)} publicKey`);
     }
     return derivationAndKey.publicKey;
   }
@@ -1204,13 +1223,13 @@ const GetSigningKeyMixin = (
   ): Promise<IGetSigningKeyResponse> => {
     const signingLevel = this.getParent().getSigningLevel();
     if (signingLevel === null) {
-      throw new StaleStateError('GetSigningKey::getSigningKey signingLevel=null');
+      throw new StaleStateError(`${nameof(GetSigningKey)}::${nameof(this.getSigningKey)} signingLevel=null`);
     }
 
     const levelDifference = this.getParent().getPublicDeriverLevel() - signingLevel;
     // if bip44 wallet signing level == private deriver level
     if (levelDifference < 0) {
-      throw new StaleStateError('GetSigningKey::getSigningKey levelDifference<0');
+      throw new StaleStateError(`${nameof(GetSigningKey)}::${nameof(this.getSigningKey)} levelDifference<0`);
     }
 
     const pubDeriver = await deps.GetPublicDeriver.get(
@@ -1218,14 +1237,14 @@ const GetSigningKeyMixin = (
       super.getPublicDeriverId(),
     );
     if (pubDeriver === undefined) {
-      throw new Error('GetSigningKey::getSigningKey pubDeriver');
+      throw new Error(`${nameof(GetSigningKey)}::${nameof(this.getSigningKey)} pubDeriver`);
     }
     const keyDerivation = await deps.GetKeyDerivation.get(
       super.getDb(), tx,
       pubDeriver.KeyDerivationId,
     );
     if (keyDerivation === undefined) {
-      throw new Error('GetSigningKey::getSigningKey keyDerivation');
+      throw new Error(`${nameof(GetSigningKey)}::${nameof(this.getSigningKey)} keyDerivation`);
     }
     const path = await deps.GetDerivationsByPath.getParentPath(
       super.getDb(), tx,
@@ -1236,14 +1255,14 @@ const GetSigningKeyMixin = (
     );
     const privateKeyId = path[0].PrivateKeyId;
     if (privateKeyId === null) {
-      throw new Error('GetSigningKey::getSigningKey privateKeyId');
+      throw new Error(`${nameof(GetSigningKey)}::${nameof(this.getSigningKey)} privateKeyId`);
     }
     const privateKeyRow = await deps.GetKey.get(
       super.getDb(), tx,
       privateKeyId,
     );
     if (privateKeyRow === undefined) {
-      throw new Error('GetSigningKey::getSigningKey privateKeyRow');
+      throw new Error(`${nameof(GetSigningKey)}::${nameof(this.getSigningKey)} privateKeyRow`);
     }
     return {
       level: signingLevel,
@@ -1332,7 +1351,7 @@ const GetSigningKeyMixin = (
     const pathToPublic = body.path.slice(1);
     const indexPath = pathToPublic.map(derivation => {
       if (derivation.Index === null) {
-        throw new Error('GetSigningKey::normalizeKey null index');
+        throw new Error(`${nameof(GetSigningKey)}::${nameof(this.normalizeKey)} null index`);
       }
       return derivation.Index;
     });
@@ -1390,7 +1409,7 @@ const ScanLegacyCardanoUtxoMixin = (
 
     const network = this.getParent().getNetworkInfo();
     if (network.BaseConfig[0].ByronNetworkId == null) {
-      throw new Error(`missing Byron network id`);
+      throw new Error(`${nameof(ScanLegacyCardanoUtxo)}::${nameof(this.rawScanAccount)} missing Byron network id`);
     }
     const { ByronNetworkId } = network.BaseConfig[0];
 
@@ -1435,14 +1454,14 @@ export function asScanLegacyCardanoUtxoInstance<
   return undefined;
 }
 
-// ===================
-//   ScanShelleyUtxo
-// ===================
+// =======================
+//   ScanJormungandrUtxo
+// =======================
 
-type ScanShelleyUtxoDependencies = IPublicDeriver<> & IGetStakingKey;
-const ScanShelleyUtxoMixin = (
-  superclass: Class<ScanShelleyUtxoDependencies>,
-) => (class ScanShelleyUtxo extends superclass implements IScanUtxo {
+type ScanJormungandrUtxoDependencies = IPublicDeriver<> & IGetStakingKey;
+const ScanJormungandrUtxoMixin = (
+  superclass: Class<ScanJormungandrUtxoDependencies>,
+) => (class ScanJormungandrUtxo extends superclass implements IScanUtxo {
   rawScanAccount: (
     lf$Transaction,
     {|
@@ -1470,9 +1489,9 @@ const ScanShelleyUtxoMixin = (
     );
     const stakingAddress = address.to_account_address();
     if (stakingAddress == null) {
-      throw new StaleStateError('Could non-account hash in staking key derivation');
+      throw new StaleStateError(`${nameof(ScanJormungandrUtxo)}::${nameof(this.rawScanAccount)} Could non-account hash in staking key derivation`);
     }
-    return await scanCip1852Account({
+    return await scanJormungandrCip1852Account({
       accountPublicKey: body.accountPublicKey,
       lastUsedInternal: body.lastUsedInternal,
       lastUsedExternal: body.lastUsedExternal,
@@ -1484,6 +1503,80 @@ const ScanShelleyUtxoMixin = (
         ])
       ),
       stakingKey: stakingAddress.get_account_key(),
+    });
+  }
+});
+
+const ScanJormungandrUtxo: * = Mixin<
+  ScanJormungandrUtxoDependencies,
+  IScanUtxo,
+>(ScanJormungandrUtxoMixin);
+const ScanJormungandrUtxoInstance = (
+  (ScanJormungandrUtxo: any): ReturnType<typeof ScanJormungandrUtxoMixin>
+);
+export function asScanJormungandrUtxoInstance<
+  T: IPublicDeriver<any>
+>(
+  obj: T
+): void | (IScanUtxo & ScanJormungandrUtxoDependencies & T) {
+  if (obj instanceof ScanJormungandrUtxoInstance) {
+    return obj;
+  }
+  return undefined;
+}
+
+// ===================
+//   ScanShelleyUtxo
+// ===================
+
+type ScanShelleyUtxoDependencies = IPublicDeriver<ConceptualWallet & IHasLevels> & IGetStakingKey;
+const ScanShelleyUtxoMixin = (
+  superclass: Class<ScanShelleyUtxoDependencies>,
+) => (class ScanShelleyUtxo extends superclass implements IScanUtxo {
+  rawScanAccount: (
+    lf$Transaction,
+    {|
+      GetPathWithSpecific: Class<GetPathWithSpecific>,
+      GetAddress: Class<GetAddress>,
+      GetDerivationSpecific: Class<GetDerivationSpecific>,
+    |},
+    IScanAccountRequest,
+    Map<number, string>,
+  ) => Promise<IScanAccountResponse> = async (
+    tx,
+    deps,
+    body,
+    derivationTables,
+  ): Promise<IScanAccountResponse> => {
+    const stakingAddressDbRow = await this.rawGetStakingKey(
+      tx,
+      deps,
+      undefined,
+      derivationTables
+    );
+
+    const publicKey = RustModule.WalletV4.Bip32PublicKey.from_bytes(
+      Buffer.from(body.accountPublicKey, 'hex')
+    );
+
+    const stakingKey = derivePublicByAddressing(
+      this.getParent().getPublicDeriverLevel(),
+      stakingAddressDbRow.addressing,
+      publicKey
+    );
+
+    return await scanShelleyCip1852Account({
+      accountPublicKey: body.accountPublicKey,
+      lastUsedInternal: body.lastUsedInternal,
+      lastUsedExternal: body.lastUsedExternal,
+      checkAddressesInUse: body.checkAddressesInUse,
+      addByHash: rawGenAddByHash(
+        new Set([
+          ...body.internalAddresses,
+          ...body.externalAddresses,
+        ])
+      ),
+      stakingKey: stakingKey.to_raw_key(),
     });
   }
 });
@@ -1922,7 +2015,7 @@ export async function addTraitsForCardanoBip44(
           false,
         );
         if (derivationAndKey.publicKey === undefined) {
-          throw new StaleStateError('addTraitsForBip44Child publicKey');
+          throw new StaleStateError(`${nameof(addTraitsForCardanoBip44)} publicKey`);
         }
         return derivationAndKey.publicKey;
       }
@@ -1988,7 +2081,7 @@ export async function addTraitsForErgoBip44(
           false,
         );
         if (derivationAndKey.publicKey === undefined) {
-          throw new StaleStateError('addTraitsForBip44Child publicKey');
+          throw new StaleStateError(`${nameof(addTraitsForErgoBip44)} publicKey`);
         }
         return derivationAndKey.publicKey;
       }
@@ -2054,7 +2147,7 @@ export async function addTraitsForBip44Child(
         const result = [];
         for (const derivation of path.slice(1)) {
           if (derivation.Index == null) {
-            throw new Error('addTraitsForBip44Child null index');
+            throw new Error(`${nameof(addTraitsForBip44Child)} null index`);
           }
           result.push(derivation.Index);
         }
@@ -2072,7 +2165,7 @@ export async function addTraitsForCip1852Child(
   db: lf$Database,
   pubDeriver: $ReadOnly<PublicDeriverRow>,
   pubDeriverKeyDerivation: $ReadOnly<KeyDerivationRow>,
-  conceptualWallet: IHasLevels & IHasSign,
+  conceptualWallet: IConceptualWallet & IHasLevels & IHasSign,
   startClass: Class<Cip1852PublicDeriver>,
 ): Promise<{|
   finalClass: Class<Cip1852PublicDeriver>,
@@ -2111,7 +2204,7 @@ export async function addTraitsForCip1852Child(
           false,
         );
         if (derivationAndKey.publicKey === undefined) {
-          throw new StaleStateError('addTraitsForBip44Child publicKey');
+          throw new StaleStateError(`${nameof(addTraitsForCip1852Child)} publicKey`);
         }
         return derivationAndKey.publicKey;
       }
@@ -2127,7 +2220,14 @@ export async function addTraitsForCip1852Child(
     currClass = HasUtxoChains(Cip1852PickInternal(currClass));
     if (publicKey !== null) {
       currClass = GetPublicKey(currClass);
-      currClass = ScanShelleyUtxo(currClass);
+      if (isJormungandr(conceptualWallet.getNetworkInfo())) {
+        currClass = ScanJormungandrUtxo(currClass);
+      }
+      if (isCardanoHaskell(conceptualWallet.getNetworkInfo())) {
+        currClass = ScanShelleyUtxo(currClass);
+      } else {
+        throw new Error(`${nameof(addTraitsForCip1852Child)} don't know how to scan for network`);
+      }
       currClass = ScanUtxoAccountAddresses(currClass);
       currClass = ScanAddresses(currClass);
     }
@@ -2165,7 +2265,7 @@ export async function addTraitsForCip1852Child(
         const result = [];
         for (const derivation of path.slice(1)) {
           if (derivation.Index == null) {
-            throw new Error('addTraitsForBip44Child null index');
+            throw new Error(`${nameof(addTraitsForCip1852Child)} null index`);
           }
           result.push(derivation.Index);
         }

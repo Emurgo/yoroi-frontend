@@ -87,13 +87,11 @@ import {
   GenericApiError,
   IncorrectWalletPasswordError,
   WalletAlreadyRestoredError,
-  InvalidWitnessError,
-  CheckAddressesInUseApiError,
 } from '../common/errors';
 import LocalizableError from '../../i18n/LocalizableError';
 import { scanBip44Account, } from '../common/lib/restoration/bip44';
 import { v2genAddressBatchFunc, } from '../ada/restoration/byron/scan';
-import { scanCip1852Account, } from './lib/restoration/scan';
+import { scanJormungandrCip1852Account, } from './lib/restoration/scan';
 import type {
   BaseSignRequest,
   V3UnsignedTxAddressedUtxoResponse,
@@ -838,7 +836,7 @@ export default class JormungandrApi {
           .to_public()
           .to_raw_key();
 
-        const cip1852InsertTree = await scanCip1852Account({
+        const cip1852InsertTree = await scanJormungandrCip1852Account({
           accountPublicKey: Buffer.from(accountKey.to_public().as_bytes()).toString('hex'),
           lastUsedInternal: -1,
           lastUsedExternal: -1,

@@ -146,6 +146,42 @@ export class ByronInternalAddressesSubgroup extends AddressTypeStore implements 
     return this;
   }
 }
+export class BaseExternalAddressesSubgroup extends AddressTypeStore implements IAddressTypeStore {
+  constructor(data: SubgroupCtorData): IAddressTypeStore {
+    super({
+      stores: data.stores,
+      actions: data.actions,
+      request: (request) => data.stores.addresses._createAddressIfNeeded({
+        publicDeriver: request.publicDeriver,
+        genAddresses: () => data.stores.addresses._wrapForChainAddresses({
+          ...request,
+          storeName: data.name,
+          type: CoreAddressTypes.CARDANO_BASE,
+          chainsRequest: { chainId: ChainDerivations.EXTERNAL },
+        }),
+      }),
+    });
+    return this;
+  }
+}
+export class BaseInternalAddressesSubgroup extends AddressTypeStore implements IAddressTypeStore {
+  constructor(data: SubgroupCtorData): IAddressTypeStore {
+    super({
+      stores: data.stores,
+      actions: data.actions,
+      request: (request) => data.stores.addresses._createAddressIfNeeded({
+        publicDeriver: request.publicDeriver,
+        genAddresses: () => data.stores.addresses._wrapForChainAddresses({
+          ...request,
+          storeName: data.name,
+          type: CoreAddressTypes.CARDANO_BASE,
+          chainsRequest: { chainId: ChainDerivations.INTERNAL },
+        }),
+      }),
+    });
+    return this;
+  }
+}
 export class GroupExternalAddressesSubgroup extends AddressTypeStore implements IAddressTypeStore {
   constructor(data: SubgroupCtorData): IAddressTypeStore {
     super({

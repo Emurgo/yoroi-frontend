@@ -6,6 +6,8 @@ import {
   ByronAllAddressesSubgroup,
   ByronExternalAddressesSubgroup,
   ByronInternalAddressesSubgroup,
+  BaseExternalAddressesSubgroup,
+  BaseInternalAddressesSubgroup,
   GroupExternalAddressesSubgroup,
   GroupInternalAddressesSubgroup,
   GroupMangledAddressesSubgroup,
@@ -139,6 +141,40 @@ export const BYRON_INTERNAL: AddressSubgroupMeta<
   name: {
     subgroup: AddressSubgroup.internal,
     group: AddressGroupTypes.byron,
+  },
+  isHidden: _request => false,
+});
+export const BASE_EXTERNAL: AddressSubgroupMeta<
+  BaseExternalAddressesSubgroup
+> = registerAddressSubgroup({
+  isRelated: request => (
+    matchParent(request.selected, parent => parent instanceof Cip1852Wallet) &&
+    asHasUtxoChains(request.selected) != null &&
+    matchCoinType(request.selected, coinType => coinType === CoinTypes.CARDANO) &&
+    matchForkType(request.selected, fork => fork === CardanoForks.Haskell)
+  ),
+  class: BaseExternalAddressesSubgroup,
+  validFilters: standardFilter,
+  name: {
+    subgroup: AddressSubgroup.external,
+    group: AddressGroupTypes.base,
+  },
+  isHidden: _request => false,
+});
+export const BASE_INTERNAL: AddressSubgroupMeta<
+  BaseInternalAddressesSubgroup
+> = registerAddressSubgroup({
+  isRelated: request => (
+    matchParent(request.selected, parent => parent instanceof Cip1852Wallet) &&
+    asHasUtxoChains(request.selected) != null &&
+    matchCoinType(request.selected, coinType => coinType === CoinTypes.CARDANO) &&
+    matchForkType(request.selected, fork => fork === CardanoForks.Haskell)
+  ),
+  class: BaseInternalAddressesSubgroup,
+  validFilters: standardFilter,
+  name: {
+    subgroup: AddressSubgroup.internal,
+    group: AddressGroupTypes.base,
   },
   isHidden: _request => false,
 });

@@ -15,6 +15,7 @@ import {
 } from '../../../common/errors';
 
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
+import { derivePrivateByAddressing } from '../../lib/cardanoCrypto/utils';
 
 import {
   Bip44DerivationLevels,
@@ -391,16 +392,7 @@ function addWitnesses(
     if (lastLevelSpecified !== Bip44DerivationLevels.ADDRESS.level) {
       throw new Error(`${nameof(addWitnesses)} incorrect addressing size`);
     }
-    if (keyLevel + 1 < utxo.addressing.startLevel) {
-      throw new Error(`${nameof(addWitnesses)} keyLevel < startLevel`);
-    }
-    let key = signingKey;
-    for (let i = keyLevel - utxo.addressing.startLevel + 1; i < utxo.addressing.path.length; i++) {
-      key = key.derive(
-        utxo.addressing.path[i]
-      );
-    }
-    return key;
+    return derivePrivateByAddressing(keyLevel, utxo.addressing, signingKey);
   });
 
   // sign the transactions

@@ -149,7 +149,7 @@ async function scanChain(request: {|
     });
 }
 
-export async function scanCip1852Account(request: {|
+export async function scanShelleyCip1852Account(request: {|
   accountPublicKey: string,
   lastUsedInternal: number,
   lastUsedExternal: number,

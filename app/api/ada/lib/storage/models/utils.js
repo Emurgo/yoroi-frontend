@@ -98,7 +98,7 @@ export async function rawGetDerivationsByPath<
   const result = pathWithSpecific.rows.map(row => {
     const path = pathWithSpecific.pathMap.get(row.KeyDerivationId);
     if (path == null) {
-      throw new Error('getDerivationsByPath should never happen');
+      throw new Error(`${nameof(rawGetDerivationsByPath)} should never happen`);
     }
     return {
       row,
@@ -140,7 +140,7 @@ export async function rawGetBip44AddressesByPath(
   return canonicalAddresses.map(canonical => {
     const addrs = family.get(canonical.row.KeyDerivationId);
     if (addrs == null) {
-      throw new Error('getBip44AddressesByPath should never happen');
+      throw new Error(`${nameof(rawGetBip44AddressesByPath)} should never happen`);
     }
     return {
       ...canonical,
@@ -403,11 +403,11 @@ export async function updateCutoffFromInsert(
 ): Promise<void> {
   if (request.displayCutoffInstance != null) {
     if (request.publicDeriverLevel !== Bip44DerivationLevels.ACCOUNT.level) {
-      throw new Error('updateCutoffFromInsert incorrect pubderiver level');
+      throw new Error(`${nameof(updateCutoffFromInsert)} incorrect pubderiver level`);
     }
     const external = request.tree.find(node => node.index === ChainDerivations.EXTERNAL);
     if (external == null || external.children == null) {
-      throw new Error('updateCutoffFromInsert should never happen');
+      throw new Error(`${nameof(updateCutoffFromInsert)} should never happen`);
     }
     let bestNewCutoff = 0;
     for (const child of external.children) {
