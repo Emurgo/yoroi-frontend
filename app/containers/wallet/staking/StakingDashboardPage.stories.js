@@ -131,12 +131,12 @@ const genBaseProps: {|
         getPoolInfo: request.getPoolInfo,
         getDelegationRequests: request.lookup.getDelegation,
       },
+      time: {
+        getTimeCalcRequests: request.lookup.getTimeCalcRequests,
+        getCurrentTimeRequests: request.lookup.getCurrentTimeRequests,
+      },
       substores: {
         jormungandr: {
-          time: {
-            getTimeCalcRequests: request.lookup.getTimeCalcRequests,
-            getCurrentTimeRequests: request.lookup.getCurrentTimeRequests,
-          },
           delegationTransaction: request.delegationTransaction || {
             isStale: false,
             createDelegationTx: {
@@ -188,13 +188,9 @@ const genBaseProps: {|
     EpochProgressContainerProps: {
       generated: {
         stores: {
-          substores: {
-            jormungandr: {
-              time: {
-                getTimeCalcRequests: request.lookup.getTimeCalcRequests,
-                getCurrentTimeRequests: request.lookup.getCurrentTimeRequests,
-              },
-            },
+          time: {
+            getTimeCalcRequests: request.lookup.getTimeCalcRequests,
+            getCurrentTimeRequests: request.lookup.getCurrentTimeRequests,
           },
         },
       },

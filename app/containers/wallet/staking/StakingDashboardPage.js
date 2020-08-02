@@ -51,7 +51,7 @@ import type { Notification } from '../../../types/notificationType';
 
 import globalMessages from '../../../i18n/global-messages';
 import { computed, observable, runInAction } from 'mobx';
-import { getApiForNetwork, getApiMeta } from '../../../api/common/utils';
+import { ApiOptions, getApiForNetwork, getApiMeta } from '../../../api/common/utils';
 import type { SelectedApiType, } from '../../../api/common/utils';
 import { getUnmangleAmounts, } from '../../../stores/stateless/mangledAddresses';
 import type { IAddressTypeStore, IAddressTypeUiSubset } from '../../../stores/stateless/addressStores';
@@ -71,7 +71,7 @@ export default class StakingDashboardPage extends Component<Props> {
   @observable notificationElementId: string = '';
 
   async componentDidMount() {
-    const timeStore = this.generated.stores.substores.jormungandr.time;
+    const timeStore = this.generated.stores.time;
     const publicDeriver = this.generated.stores.wallets.selected;
     if (publicDeriver == null) {
       throw new Error(`${nameof(StakingDashboardPage)} no public deriver. Should never happen`);
@@ -194,7 +194,7 @@ export default class StakingDashboardPage extends Component<Props> {
   }
 
   getEpochLengthInDays: PublicDeriver<> => ?number = (publicDeriver) => {
-    const timeStore = this.generated.stores.substores.jormungandr.time;
+    const timeStore = this.generated.stores.time;
     const timeCalcRequests = timeStore.getTimeCalcRequests(publicDeriver);
     const getEpochLength = timeCalcRequests.requests.currentEpochLength.result;
     if (getEpochLength == null) return null;
@@ -282,7 +282,7 @@ export default class StakingDashboardPage extends Component<Props> {
     rewardPopup: Node,
     showWarning: boolean,
   |}) = (publicDeriver) => {
-    const timeStore = this.generated.stores.substores.jormungandr.time;
+    const timeStore = this.generated.stores.time;
     const timeCalcRequests = timeStore.getTimeCalcRequests(publicDeriver);
     const currTimeRequests = timeStore.getCurrentTimeRequests(publicDeriver);
     const toAbsoluteSlot = timeCalcRequests.requests.toAbsoluteSlot.result;
@@ -746,7 +746,7 @@ export default class StakingDashboardPage extends Component<Props> {
     delegationRequests: DelegationRequests,
     publicDeriver: PublicDeriver<>,
   |} => GraphData = (request) => {
-    const timeStore = this.generated.stores.substores.jormungandr.time;
+    const timeStore = this.generated.stores.time;
     const currTimeRequests = timeStore.getCurrentTimeRequests(request.publicDeriver);
 
     return {
@@ -829,6 +829,14 @@ export default class StakingDashboardPage extends Component<Props> {
           PublicDeriver<>
         ) => void | DelegationRequests,
       |},
+      time: {|
+        getCurrentTimeRequests: (
+          PublicDeriver<>
+        ) => CurrentTimeRequests,
+        getTimeCalcRequests: (
+          PublicDeriver<>
+        ) => TimeCalcRequests
+      |},
       substores: {|
         jormungandr: {|
           delegationTransaction: {|
@@ -843,14 +851,6 @@ export default class StakingDashboardPage extends Component<Props> {
               isExecuting: boolean
             |}
           |},
-          time: {|
-            getCurrentTimeRequests: (
-              PublicDeriver<>
-            ) => CurrentTimeRequests,
-            getTimeCalcRequests: (
-              PublicDeriver<>
-            ) => TimeCalcRequests
-          |}
         |}
       |},
       transactions: {|
@@ -876,6 +876,27 @@ export default class StakingDashboardPage extends Component<Props> {
     }
     const { stores, actions } = this.props;
     const jormungandrStore = stores.substores.jormungandr;
+
+    const selected = stores.wallets.selected;
+    if (selected == null) {
+      throw new Error(`${nameof(EpochProgressContainer)} no wallet selected`);
+    }
+    const api = getApiForNetwork(selected.getParent().getNetworkInfo());
+    const time = (() => {
+      if (api === ApiOptions.ada) {
+        return {
+          getTimeCalcRequests: stores.substores.ada.time.getTimeCalcRequests,
+          getCurrentTimeRequests: stores.substores.ada.time.getCurrentTimeRequests,
+        };
+      }
+      if (api === ApiOptions.jormungandr) {
+        return {
+          getTimeCalcRequests: stores.substores.jormungandr.time.getTimeCalcRequests,
+          getCurrentTimeRequests: stores.substores.jormungandr.time.getCurrentTimeRequests,
+        };
+      }
+      throw new Error(`${nameof(EpochProgressContainer)} api not supported`);
+    })();
     return Object.freeze({
       stores: {
         explorers: {
@@ -913,12 +934,9 @@ export default class StakingDashboardPage extends Component<Props> {
           getPoolInfo: stores.delegation.getPoolInfo,
           getDelegationRequests: stores.delegation.getDelegationRequests,
         },
+        time,
         substores: {
           jormungandr: {
-            time: {
-              getTimeCalcRequests: jormungandrStore.time.getTimeCalcRequests,
-              getCurrentTimeRequests: jormungandrStore.time.getCurrentTimeRequests,
-            },
             delegationTransaction: {
               isStale: jormungandrStore.delegationTransaction.isStale,
               createDelegationTx: {
