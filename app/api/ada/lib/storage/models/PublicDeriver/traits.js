@@ -2222,8 +2222,7 @@ export async function addTraitsForCip1852Child(
       currClass = GetPublicKey(currClass);
       if (isJormungandr(conceptualWallet.getNetworkInfo())) {
         currClass = ScanJormungandrUtxo(currClass);
-      }
-      if (isCardanoHaskell(conceptualWallet.getNetworkInfo())) {
+      } else if (isCardanoHaskell(conceptualWallet.getNetworkInfo())) {
         currClass = ScanShelleyUtxo(currClass);
       } else {
         throw new Error(`${nameof(addTraitsForCip1852Child)} don't know how to scan for network`);
