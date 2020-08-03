@@ -8,6 +8,7 @@ Feature: Restore Wallet
   @it-6
   Scenario: Restoring an empty wallet (IT-6)
     When I click the restore button for cardano
+    Then I select Byron-era 15-word wallet
     And I enter the name "Restored Wallet"
     And I enter the recovery phrase:
     | recoveryPhrase                                                                             |
@@ -28,6 +29,7 @@ Feature: Restore Wallet
   @it-13
   Scenario: Mnemonic words can be cleared by pressing "x" sign for each word on wallet restoration screen (IT-13)
     When I click the restore button for cardano
+    Then I select Byron-era 15-word wallet
     And I enter the name "Restored Wallet"
     And I enter the recovery phrase:
     | recoveryPhrase                                                                             |
@@ -37,6 +39,7 @@ Feature: Restore Wallet
   @it-86
   Scenario: Successfully restoring a simple wallet (IT-86)
     When I click the restore button for cardano
+    Then I select Byron-era 15-word wallet
     And I enter the name "Restored Wallet"
     And I enter the recovery phrase:
     | recoveryPhrase                                                                                   |
@@ -58,6 +61,7 @@ Feature: Restore Wallet
   @it-87
   Scenario: Ensure that wallet addresses are restored correctly (IT-87)
     When I click the restore button for cardano
+    Then I select Byron-era 15-word wallet
     And I enter the name "Restored Wallet"
     And I enter the recovery phrase:
     | recoveryPhrase                                                                                        |
@@ -83,6 +87,7 @@ Feature: Restore Wallet
   @it-11
   Scenario: Fail to completely restore a wallet with addresses generated not following gap from BIP44 protocol (IT-11)
     When I click the restore button for cardano
+    Then I select Byron-era 15-word wallet
     And I enter the name "Restored Wallet"
     And I enter the recovery phrase:
     | recoveryPhrase                                                                                 |
@@ -102,6 +107,7 @@ Feature: Restore Wallet
     @it-26
     Scenario: Wallet can't be restored without entering password (IT-26)
     And I click the restore button for cardano
+    Then I select Byron-era 15-word wallet
     And I enter the name "Restored Wallet"
     And I enter the recovery phrase:
     | recoveryPhrase                                                                                           |
@@ -116,6 +122,7 @@ Feature: Restore Wallet
     @it-70
     Scenario Outline: Wallet restoration Recovery Phrase test (IT-70)
     And I click the restore button for cardano
+    Then I select Byron-era 15-word wallet
     And I enter the name "Restored Wallet"
     And I enter the recovery phrase:
     | recoveryPhrase   |
@@ -135,6 +142,7 @@ Feature: Restore Wallet
     @it-71
     Scenario Outline: Ensure user can not add more than 15 words to the Yoroi Wallet Recovery Phrase (IT-71)
     And I click the restore button for cardano
+    Then I select Byron-era 15-word wallet
     And I enter the name "Restored Wallet"
     And I enter the recovery phrase:
     | recoveryPhrase   |
@@ -168,6 +176,7 @@ Feature: Restore Wallet
     @it-73
     Scenario Outline: Wallet restoration Recovery Phrase with less than 15 words (IT-73)
     And I click the restore button for cardano
+    Then I select Byron-era 15-word wallet
     And I enter the name "Restored Wallet"
     And I enter the recovery phrase:
     | recoveryPhrase   |
@@ -183,6 +192,7 @@ Feature: Restore Wallet
   Scenario: Create & delete (3 wallets) (IT-92)
     # wallet 1
     When I click the restore button for cardano
+    Then I select Byron-era 15-word wallet
     And I enter the name "many-tx-wallet"
     And I enter the recovery phrase:
     | recoveryPhrase                                                                                   |
@@ -199,6 +209,7 @@ Feature: Restore Wallet
     And I click to add an additional wallet
     # wallet 2 (same as wallet 1)
     When I click the restore button for cardano
+    Then I select Byron-era 15-word wallet
     And I enter the name "Restored Wallet (copy)"
     And I enter the recovery phrase:
     | recoveryPhrase                                                                                   |
@@ -217,6 +228,7 @@ Feature: Restore Wallet
     Given I capture DB state snapshot
     # wallet 3 (different wallet)
     When I click the restore button for cardano
+    Then I select Byron-era 15-word wallet
     And I enter the name "Restored Wallet 2"
     And I enter the recovery phrase:
     | recoveryPhrase                                                                                   |
@@ -244,6 +256,7 @@ Feature: Restore Wallet
   Scenario: Create & delete (2 wallets) (IT-93)
     # wallet 1
     When I click the restore button for cardano
+    Then I select Byron-era 15-word wallet
     And I enter the name "many-tx-wallet"
     And I enter the recovery phrase:
     | recoveryPhrase                                                                                   |
@@ -264,6 +277,7 @@ Feature: Restore Wallet
     Given I capture DB state snapshot
     # wallet 2 (same as wallet 1)
     When I click the restore button for cardano
+    Then I select Byron-era 15-word wallet
     And I enter the name "Restored Wallet (copy)"
     And I enter the recovery phrase:
     | recoveryPhrase                                                                                   |
@@ -293,6 +307,7 @@ Feature: Restore Wallet
     Given I capture DB state snapshot
     # wallet 1
     When I click the restore button for cardano
+    Then I select Byron-era 15-word wallet
     And I enter the name "many-tx-wallet"
     And I enter the recovery phrase:
     | recoveryPhrase                                                                                   |
@@ -334,6 +349,7 @@ Feature: Restore Wallet
   @it-130
   Scenario: Restoring an empty ergo wallet (IT-130)
     When I click the restore button for ergo
+    Then I select bip44 15-word wallet
     And I enter the name "Restored Wallet"
     And I enter the recovery phrase:
     | recoveryPhrase                                                                             |
@@ -348,3 +364,47 @@ Feature: Restore Wallet
     And I should see the addresses exactly list them
     | address                                                     |
     | 9erND2FjDWVTgT2TWRZ9dCLueKAWjoskx6KqRmZbtvtRXEgCrja |
+
+  @it-132
+  Scenario: Restoring a shelley 15-word wallet (IT-132)
+    When I click the restore button for cardano
+    Then I select Shelley-era 15-word wallet
+    And I enter the name "Restored Wallet"
+    And I enter the recovery phrase:
+    | recoveryPhrase                                                                             |
+    | eight country switch draw meat scout mystery blade tip drift useless good keep usage title |
+    And I enter the restored wallet password:
+    | password   | repeatedPassword |
+    | asdfasdfasdf | asdfasdfasdf       |
+    And I click the "Restore Wallet" button
+    Then I should see a plates
+    | plate    |
+    | ZDDC-9858 |
+    | EAJD-7036 |
+    | TSEK-7426 |
+    Then I click the next button
+    Then I should see the opened wallet with name "Restored Wallet"
+    And I go to the receive screen
+    And I should see the addresses exactly list them
+    | address                                                     |
+    | addr1qyv7qlaucathxkwkc503ujw0rv9lfj2rkj96feyst2rs9ey4tr5knj4fu4adelzqhxg8adu5xca4jra0gtllfrpcawyqzajfkn |
+
+  @it-133
+  Scenario: Restoring a shelley 24-word wallet (IT-133)
+    When I click the restore button for cardano
+    Then I select Shelley-era 24-word wallet
+    And I enter the name "Restored Wallet"
+    And I enter the recovery phrase:
+    | recoveryPhrase                                                                             |
+    | reunion walnut update express purse defense slice barrel estate olympic february flock give team alert coast luggage exhaust notable bag december split furnace sponsor |
+    And I enter the restored wallet password:
+    | password   | repeatedPassword |
+    | asdfasdfasdf | asdfasdfasdf       |
+    And I click the "Restore Wallet" button
+    Then I should see a plate DSKC-9213
+    Then I click the next button
+    Then I should see the opened wallet with name "Restored Wallet"
+    And I go to the receive screen
+    And I should see the addresses exactly list them
+    | address                                                     |
+    | addr1qx9d2x5e9exhup6xlf5macv3c78qw66mru3tl7m3yn9je0qncaqpmszl9y4jl8vgqvhg6n3ad5td5m74fu4un65ayshqx479hd |

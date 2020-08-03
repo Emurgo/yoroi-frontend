@@ -152,6 +152,7 @@ Given(/^There is a wallet stored named ([^"]*)$/, async function (walletName) {
   await this.waitForElement('.WalletRestoreOptionDialog');
 
   await this.click('.WalletRestoreOptionDialog_restoreNormalWallet');
+  await this.click('.WalletEraOptionDialog_bgByronMainnet');
   await this.waitForElement('.WalletRestoreDialog');
 
   await this.input("input[name='walletName']", restoreInfo.name);

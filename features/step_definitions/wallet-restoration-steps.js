@@ -16,10 +16,29 @@ When(/^I click the restore button for ([^"]*)$/, async function (currency) {
   await this.click(`.PickCurrencyOptionDialog_${currency}`);
 
   await this.waitForElement('.WalletRestoreOptionDialog');
+});
 
+Then(/^I select Byron-era 15-word wallet$/, async function () {
+  await this.click('.WalletRestoreOptionDialog_restoreNormalWallet');
+  await this.click('.WalletEraOptionDialog_bgByronMainnet');
+  await this.waitForElement('.WalletRestoreDialog');
+});
+Then(/^I select Shelley-era 15-word wallet$/, async function () {
+  await this.click('.WalletRestoreOptionDialog_restoreNormalWallet');
+  await this.click('.WalletEraOptionDialog_bgShelleyMainnet');
+  await this.waitForElement('.WalletRestoreDialog');
+});
+Then(/^I select Shelley-era 24-word wallet$/, async function () {
+  await this.click('.WalletRestoreOptionDialog_normal24WordWallet');
+  await this.waitForElement('.WalletRestoreDialog');
+});
+
+
+Then(/^I select bip44 15-word wallet$/, async function () {
   await this.click('.WalletRestoreOptionDialog_restoreNormalWallet');
   await this.waitForElement('.WalletRestoreDialog');
 });
+
 
 When(/^I click the restore paper wallet button$/, async function () {
   await this.click('.WalletAdd_btnRestoreWallet');
@@ -90,19 +109,30 @@ Then(/^I should see an "Invalid recovery phrase" error message$/, async function
 });
 
 Then(/^I should see a plate ([^"]*)$/, async function (plate) {
-  await assertPlate(this, plate);
+  const plateElements = await getPlates(this);
+  const plateText = await plateElements[0].getText();
+  expect(plateText).to.be.equal(plate);
 });
 
-export async function assertPlate(customWorld: any, plate: string): Promise<void> {
+Then(/^I should see a plates$/, async function (table) {
+  const rows = table.hashes();
+
+  const plateElements = await getPlates(this);
+  for (let i = 0; i < rows.length; i++) {
+    const plateText = await plateElements[i].getText();
+    expect(plateText).to.be.equal(rows[i].plate);
+  }
+});
+
+export async function getPlates(customWorld: any): Promise<any> {
   // check plate in confirmation dialog
-  let plateElement = await customWorld.driver.findElements(By.css('.WalletRestoreVerifyDialog_plateIdSpan'));
+  let plateElements = await customWorld.driver.findElements(By.css('.WalletRestoreVerifyDialog_plateIdSpan'));
 
   // this makes this function also work for wallets that already exist
-  if (plateElement.length === 0) {
-    plateElement = await customWorld.driver.findElements(By.css('.NavPlate_plate'));
+  if (plateElements.length === 0) {
+    plateElements = await customWorld.driver.findElements(By.css('.NavPlate_plate'));
   }
-  const plateText = await plateElement[0].getText();
-  expect(plateText).to.be.equal(plate);
+  return plateElements;
 }
 
 Then(/^I should stay in the restore wallet dialog$/, async function () {

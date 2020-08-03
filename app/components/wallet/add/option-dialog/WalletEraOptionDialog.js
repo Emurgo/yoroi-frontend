@@ -63,14 +63,14 @@ export default class WalletEraOptionDialog extends Component<Props> {
           <ul className={styles.optionBlockList}>
             <OptionBlock
               parentName="WalletEraOptionDialog"
-              type="restoreNormalWallet"
+              type="bgByronMainnet"
               title={intl.formatMessage(messages.restoreByronEraWalletTitle)}
               learnMoreText={intl.formatMessage(messages.restoreByronEraWalletDescription)}
               onSubmit={this.props.onByron}
             />
             <OptionBlock
               parentName="WalletEraOptionDialog"
-              type="restoreNormalWallet"
+              type="bgShelleyMainnet"
               title={intl.formatMessage(messages.restoreShelleyEraWalletTitle)}
               learnMoreText={intl.formatMessage(messages.restoreShelleyEraWalletDescription)}
               onSubmit={this.props.onShelley}

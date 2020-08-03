@@ -98,7 +98,7 @@ export default class AdaWalletRestoreStore extends Store {
     }
     const mode = this.mode;
     const wordCount = mode.length;
-    if (mode.type === 'byron-paper') {
+    if (mode.extra === 'paper') {
       const [newPhrase] = unscramblePaperAdaMnemonic(
         restoreMeta.recoveryPhrase,
         wordCount,
@@ -184,7 +184,7 @@ export function generatePlates(
     : NUMBER_OF_VERIFIED_ADDRESSES;
 
   const shouldShowByronPlate = () => {
-    if (isCardanoHaskell(network) && mode.length === 15) {
+    if (isCardanoHaskell(network) && (mode.length === 15 || mode.extra === 'paper')) {
       return true;
     }
     if (isJormungandr(network)) {

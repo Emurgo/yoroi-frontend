@@ -25,6 +25,7 @@ function createWallet(payload: {|
 // https://iancoleman.io/bip39/
 
 type WalletNames =
+  'shelley-simple-24' |
   'small-single-tx' |
   'failed-single-tx' |
   'many-tx-wallet' |
@@ -90,5 +91,10 @@ export const testWallets: { [key: WalletNames]: RestorationInput, ... } = Object
     name: ('trezor-wallet': WalletNames),
     mnemonic: 'lyrics tray aunt muffin brisk ensure wedding cereal capital path replace weasel',
     plate: 'CZSA-2051',
+  }),
+  createWallet({
+    name: ('shelley-simple-24': WalletNames),
+    mnemonic: 'reunion walnut update express purse defense slice barrel estate olympic february flock give team alert coast luggage exhaust notable bag december split furnace sponsor',
+    plate: 'DSKC-9213',
   }),
 );

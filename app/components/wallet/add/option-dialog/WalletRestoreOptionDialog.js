@@ -75,7 +75,7 @@ export default class WalletRestoreOptionDialog extends Component<Props> {
             {onRestore24 != null && (
               <OptionBlock
                 parentName="WalletRestoreOptionDialog"
-                type="restoreNormalWallet"
+                type="normal24WordWallet"
                 title={intl.formatMessage(messages.restoreNormal24Title)}
                 learnMoreText={intl.formatMessage(messages.restoreNormal24Description)}
                 onSubmit={onRestore24}

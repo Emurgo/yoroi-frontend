@@ -62,7 +62,7 @@ import type {
   NetworkRow,
 } from '../../api/ada/lib/storage/database/primitives/tables';
 import {
-  networks, isJormungandr,
+  networks, isJormungandr, isCardanoHaskell,
 } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 export type GeneratedData = typeof WalletAddPage.prototype.generated;
@@ -182,9 +182,17 @@ export default class WalletAddPage extends Component<Props> {
       activeDialog = (
         <WalletRestoreOptionDialogContainer
           onClose={this.onClose}
-          onRestore15={() => actions.dialogs.open.trigger({
-            dialog: WalletEraOptionDialogContainer,
-          })}
+          onRestore15={() => {
+            if (isCardanoHaskell(selectedNetwork)) {
+              return actions.dialogs.open.trigger({
+                dialog: WalletEraOptionDialogContainer,
+              });
+            }
+            return actions.dialogs.open.trigger({
+              dialog: WalletRestoreDialog,
+              params: { restoreType: { type: 'bip44', extra: undefined, length: 15 } }
+            });
+          }}
           onRestore24={isJormungandr(selectedNetwork)
             ? undefined
             : () => actions.dialogs.open.trigger({
