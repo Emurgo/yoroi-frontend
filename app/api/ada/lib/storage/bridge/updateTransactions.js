@@ -1751,7 +1751,7 @@ async function certificateToDb(
   dbTx: lf$Transaction,
   request: {|
     network: number,
-    certificates: Array<RemoteCertificate>,
+    certificates: $ReadOnlyArray<RemoteCertificate>,
     hashToIds: HashToIdsFunc,
     derivationTables: Map<number, string>,
   |},
@@ -1825,6 +1825,7 @@ async function certificateToDb(
         const addressId = await addressToId(addrBytes);
         result.push((txId: number) => ({
           certificate: {
+            Ordinal: cert.cert_index,
             Kind: RustModule.WalletV4.CertificateKind.StakeRegistration,
             Payload: Buffer.from(certificate.to_bytes()).toString('hex'),
             TransactionId: txId,
@@ -1852,6 +1853,7 @@ async function certificateToDb(
         const addressId = await addressToId(addrBytes);
         result.push((txId: number) => ({
           certificate: {
+            Ordinal: cert.cert_index,
             Kind: RustModule.WalletV4.CertificateKind.StakeDeregistration,
             Payload: Buffer.from(certificate.to_bytes()).toString('hex'),
             TransactionId: txId,
@@ -1909,6 +1911,7 @@ async function certificateToDb(
 
         result.push((txId: number) => ({
           certificate: {
+            Ordinal: cert.cert_index,
             Kind: RustModule.WalletV4.CertificateKind.StakeDelegation,
             Payload: Buffer.from(certificate.to_bytes()).toString('hex'),
             TransactionId: txId,
@@ -2009,6 +2012,7 @@ async function certificateToDb(
 
         result.push((txId: number) => ({
           certificate: {
+            Ordinal: cert.cert_index,
             Kind: RustModule.WalletV4.CertificateKind.PoolRegistration,
             Payload: Buffer.from(certificate.to_bytes()).toString('hex'),
             TransactionId: txId,
@@ -2046,6 +2050,7 @@ async function certificateToDb(
 
         result.push((txId: number) => ({
           certificate: {
+            Ordinal: cert.cert_index,
             Kind: RustModule.WalletV4.CertificateKind.PoolRetirement,
             Payload: Buffer.from(certificate.to_bytes()).toString('hex'),
             TransactionId: txId,
@@ -2073,6 +2078,7 @@ async function certificateToDb(
 
         result.push((txId: number) => ({
           certificate: {
+            Ordinal: cert.cert_index,
             Kind: RustModule.WalletV4.CertificateKind.GenesisKeyDelegation,
             Payload: Buffer.from(certificate.to_bytes()).toString('hex'),
             TransactionId: txId,
@@ -2116,6 +2122,7 @@ async function certificateToDb(
         const certificate = RustModule.WalletV4.MoveInstantaneousRewardsCert.new(certPot);
         result.push((txId: number) => ({
           certificate: {
+            Ordinal: cert.cert_index,
             Kind: RustModule.WalletV4.CertificateKind.MoveInstantaneousRewardsCert,
             Payload: Buffer.from(certificate.to_bytes()).toString('hex'),
             TransactionId: txId,

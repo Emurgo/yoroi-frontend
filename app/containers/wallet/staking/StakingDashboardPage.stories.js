@@ -266,6 +266,7 @@ const delegateCert1 = {
     Relation: 0,
   }],
   certificate: {
+    Ordinal: 0,
     CertificateId: 10,
     TransactionId: 14,
     Kind: 0,

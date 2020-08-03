@@ -969,7 +969,8 @@ export class GetCertificates {
         request.addressIds
       ))
       .orderBy(blockTable[Tables.BlockSchema.properties.SlotNum], lf.Order.DESC)
-      .orderBy(txTable[Tables.TransactionSchema.properties.Ordinal], lf.Order.DESC);
+      .orderBy(txTable[Tables.TransactionSchema.properties.Ordinal], lf.Order.DESC)
+      .orderBy(txTable[Tables.CertificateSchema.properties.Ordinal], lf.Order.DESC);
 
     const queryResult: $ReadOnlyArray<{|
       CertificateAddress: $ReadOnly<CertificateAddressRow>,

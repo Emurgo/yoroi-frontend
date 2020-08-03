@@ -1587,6 +1587,7 @@ async function certificateToDb(
 
       return (txId: number) => ({
         certificate: {
+          Ordinal: 0, // only one cert per tx in Jormungandr
           Kind: kind,
           Payload: request.certificate.payloadHex,
           TransactionId: txId,
@@ -1611,6 +1612,7 @@ async function certificateToDb(
       }
       return (txId: number) => ({
         certificate: {
+          Ordinal: 0, // only one cert per tx in Jormungandr
           Kind: kind,
           Payload: request.certificate.payloadHex,
           TransactionId: txId,
@@ -1633,6 +1635,7 @@ async function certificateToDb(
 
       return (txId: number) => ({
         certificate: {
+          Ordinal: 0, // only one cert per tx in Jormungandr
           Kind: kind,
           Payload: request.certificate.payloadHex,
           TransactionId: txId,
@@ -1652,6 +1655,7 @@ async function certificateToDb(
     case RustModule.WalletV3.CertificateKind.PoolRetirement: {
       return (txId: number) => ({
         certificate: {
+          Ordinal: 0, // only one cert per tx in Jormungandr
           Kind: kind,
           Payload: request.certificate.payloadHex,
           TransactionId: txId,
@@ -1663,6 +1667,7 @@ async function certificateToDb(
     case RustModule.WalletV3.CertificateKind.PoolUpdate: {
       return (txId: number) => ({
         certificate: {
+          Ordinal: 0, // only one cert per tx in Jormungandr
           Kind: kind,
           Payload: request.certificate.payloadHex,
           TransactionId: txId,

@@ -166,9 +166,6 @@ export class RemoteFetcher implements IFetcher {
               withdrawal.address = Buffer.from(payload).toString('hex');
             } catch (_e) { /* expected not to work for base58 addresses */ }
           }
-          // the format of this will probably change, so best not to parse it
-          // so that changing the backend doesn't break the frontend
-          resp.certificates = [];
         }
         for (const input of resp.inputs) {
           // backend stores inputs as numbers but outputs as strings

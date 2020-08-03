@@ -354,6 +354,7 @@ export type CertificatePart = {|
 
 export type CertificateInsert = {|
   TransactionId: number,
+  Ordinal: number, // transactions can contain multiple certificates in some blockchains
   Kind: CertificateKindType | $Values<CertificateKind>,
   Payload: string,
 |};
@@ -369,6 +370,7 @@ export const CertificateSchema: {|
   properties: {
     CertificateId: 'CertificateId',
     TransactionId: 'TransactionId',
+    Ordinal: 'Ordinal',
     Kind: 'Kind',
     Payload: 'Payload',
   }
@@ -646,6 +648,7 @@ export const populatePrimitivesDb = (schemaBuilder: lf$schema$Builder) => {
   schemaBuilder.createTable(CertificateSchema.name)
     .addColumn(CertificateSchema.properties.CertificateId, Type.INTEGER)
     .addColumn(CertificateSchema.properties.TransactionId, Type.INTEGER)
+    .addColumn(CertificateSchema.properties.Ordinal, Type.INTEGER)
     .addColumn(CertificateSchema.properties.Kind, Type.INTEGER)
     .addColumn(CertificateSchema.properties.Payload, Type.STRING)
     .addPrimaryKey(

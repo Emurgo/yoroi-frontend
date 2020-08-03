@@ -65,7 +65,7 @@ export type RemoteTxState = 'Successful' | 'Failed' | 'Pending';
 export type RemoteTransactionShelley = {|
   +ttl?: string,
   +fee: string,
-  +certificates: Array<RemoteCertificate>,
+  +certificates: $ReadOnlyArray<RemoteCertificate>,
   +withdrawals: Array<RemoteWithdrawal>,
   +metadata: null | string,
 |};
@@ -190,26 +190,29 @@ export type RemoteMoveInstantaneousRewardsCert = {|
   +rewards: {| [stake_credential: string]: string /* coin */ |},
 |};
 export type RemoteCertificate = {|
-  +type: typeof ShelleyCertificateTypes.StakeRegistration,
-  ...RemoteStakeRegistrationCert,
-|} | {|
-  +type: typeof ShelleyCertificateTypes.StakeDeregistration,
-  ...RemoteStakeDeregistrationCert,
-|} | {|
-  +type: typeof ShelleyCertificateTypes.StakeDelegation,
-  ...RemoteStakeDelegationCert,
-|} | {|
-  +type: typeof ShelleyCertificateTypes.PoolRegistration,
-  ...RemotePoolRegistrationCert,
-|} | {|
-  +type: typeof ShelleyCertificateTypes.PoolRetirement,
-  ...RemotePoolRetirementCert,
-|} | {|
-  +type: typeof ShelleyCertificateTypes.GenesisKeyDelegation,
-  ...RemoteGenesisKeyDelegationCert,
-|} | {|
-  +type: typeof ShelleyCertificateTypes.MoveInstantaneousRewardsCert,
-  ...RemoteMoveInstantaneousRewardsCert,
+  cert_index: number,
+  ...({|
+    +type: typeof ShelleyCertificateTypes.StakeRegistration,
+    ...RemoteStakeRegistrationCert,
+  |} | {|
+    +type: typeof ShelleyCertificateTypes.StakeDeregistration,
+    ...RemoteStakeDeregistrationCert,
+  |} | {|
+    +type: typeof ShelleyCertificateTypes.StakeDelegation,
+    ...RemoteStakeDelegationCert,
+  |} | {|
+    +type: typeof ShelleyCertificateTypes.PoolRegistration,
+    ...RemotePoolRegistrationCert,
+  |} | {|
+    +type: typeof ShelleyCertificateTypes.PoolRetirement,
+    ...RemotePoolRetirementCert,
+  |} | {|
+    +type: typeof ShelleyCertificateTypes.GenesisKeyDelegation,
+    ...RemoteGenesisKeyDelegationCert,
+  |} | {|
+    +type: typeof ShelleyCertificateTypes.MoveInstantaneousRewardsCert,
+    ...RemoteMoveInstantaneousRewardsCert,
+  |})
 |};
 
 // getAccountState
