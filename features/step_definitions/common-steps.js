@@ -3,7 +3,7 @@
 import { Before, BeforeAll, Given, Then, After, AfterAll, setDefinitionFunctionWrapper, setDefaultTimeout } from 'cucumber';
 import { getMockServer, closeMockServer } from '../mock-chain/mockCardanoServer';
 import { By } from 'selenium-webdriver';
-import { enterRecoveryPhrase, assertPlate } from './wallet-restoration-steps';
+import { enterRecoveryPhrase, getPlates } from './wallet-restoration-steps';
 import { testWallets } from '../mock-chain/TestWallets';
 import {
   resetChain, MockChain,
@@ -163,7 +163,11 @@ Given(/^There is a wallet stored named ([^"]*)$/, async function (walletName) {
   await this.input("input[name='walletPassword']", restoreInfo.password);
   await this.input("input[name='repeatPassword']", restoreInfo.password);
   await this.click('.WalletRestoreDialog .primary');
-  await assertPlate(this, restoreInfo.plate);
+
+  const plateElements = await getPlates(this);
+  const plateText = await plateElements[0].getText();
+  expect(plateText).to.be.equal(restoreInfo.plate);
+
   await this.click('.confirmButton');
   await this.waitUntilText('.NavPlate_name', truncateLongName(walletName));
 });
