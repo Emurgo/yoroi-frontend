@@ -16,6 +16,7 @@ import HWVerifyAddressStore from './HWVerifyAddressStore';
 import PaperWalletCreateStore from './PaperWalletCreateStore';
 import AdaStateFetchStore from './AdaStateFetchStore';
 import AdaWalletRestoreStore from './AdaWalletRestoreStore';
+import AdaDelegationStore from './AdaDelegationStore';
 import AdaTimeStore from './AdaTimeStore';
 import type { ActionsMap } from '../../actions/index';
 import type { Api } from '../../api/index';
@@ -35,6 +36,7 @@ export const adaStoreClasses = Object.freeze({
   hwVerifyAddress: HWVerifyAddressStore,
   stateFetchStore: AdaStateFetchStore,
   walletRestore: AdaWalletRestoreStore,
+  delegation: AdaDelegationStore,
   time: AdaTimeStore,
 });
 
@@ -52,6 +54,7 @@ export type AdaStoresMap = {|
   hwVerifyAddress: HWVerifyAddressStore,
   stateFetchStore: AdaStateFetchStore,
   walletRestore: AdaWalletRestoreStore,
+  delegation: AdaDelegationStore,
   time: AdaTimeStore,
 |};
 
@@ -69,6 +72,7 @@ const adaStores: WithNullableFields<AdaStoresMap> = observable({
   hwVerifyAddress: null,
   stateFetchStore: null,
   walletRestore: null,
+  delegation: null,
   time: null,
 });
 

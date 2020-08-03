@@ -31,11 +31,12 @@ import type {
   GetDelegatedBalanceFunc,
   CertificateForEpoch,
   GetCurrentDelegationFunc,
-} from '../../../api/jormungandr/lib/storage/bridge/delegationUtils';
+} from '../../../api/common/lib/storage/bridge/delegationUtils';
 import type {
   RewardHistoryForWallet,
   DelegationRequests,
-} from '../../../stores/jormungandr/DelegationStore';
+  PoolMeta,
+} from '../../../stores/toplevel/DelegationStore';
 import { GenericApiError, GetAccountStateApiError, GetPoolInfoApiError } from '../../../api/common/errors';
 import LessThanExpectedDialog from '../../../components/wallet/staking/dashboard/LessThanExpectedDialog';
 import UnmangleTxDialogContainer from '../../transfer/UnmangleTxDialogContainer';
@@ -47,7 +48,7 @@ import {
   TransactionType,
 } from '../../../api/ada/lib/storage/database/primitives/tables';
 import type {
-  JormungandrTransactionInsert,
+  JormungandrTransactionInsert, NetworkRow,
 } from '../../../api/ada/lib/storage/database/primitives/tables';
 
 export default {
@@ -67,11 +68,11 @@ const genBaseProps: {|
   transactionBuilderStore?: *,
   openDialog?: *,
   delegationTransaction?: *,
-  poolReputation?: *,
   allowToggleHidden?: *,
   mangledInfo?: {|
     addresses: $ReadOnlyArray<$ReadOnly<StandardAddress>>,
   |},
+  getPoolInfo: *,
   getParam?: <T>(number | string) => T,
 |} => * = (request) => {
   const sendErrorCases = {
@@ -125,18 +126,17 @@ const genBaseProps: {|
           },
         ]]),
       },
+      delegation: {
+        selectedPage: 0,
+        getPoolInfo: request.getPoolInfo,
+        getDelegationRequests: request.lookup.getDelegation,
+      },
+      time: {
+        getTimeCalcRequests: request.lookup.getTimeCalcRequests,
+        getCurrentTimeRequests: request.lookup.getCurrentTimeRequests,
+      },
       substores: {
         jormungandr: {
-          time: {
-            getTimeCalcRequests: request.lookup.getTimeCalcRequests,
-            getCurrentTimeRequests: request.lookup.getCurrentTimeRequests,
-          },
-          delegation: {
-            getDelegationRequests: request.lookup.getDelegation,
-            poolReputation: {
-              result: request.poolReputation || (null: any)
-            },
-          },
           delegationTransaction: request.delegationTransaction || {
             isStale: false,
             createDelegationTx: {
@@ -153,6 +153,11 @@ const genBaseProps: {|
       },
     },
     actions: {
+      delegation: {
+        setSelectedPage: {
+          trigger: action('setSelectedPage'),
+        },
+      },
       dialogs: {
         closeActiveDialog: {
           trigger: action('closeActiveDialog'),
@@ -183,13 +188,9 @@ const genBaseProps: {|
     EpochProgressContainerProps: {
       generated: {
         stores: {
-          substores: {
-            jormungandr: {
-              time: {
-                getTimeCalcRequests: request.lookup.getTimeCalcRequests,
-                getCurrentTimeRequests: request.lookup.getCurrentTimeRequests,
-              },
-            },
+          time: {
+            getTimeCalcRequests: request.lookup.getTimeCalcRequests,
+            getCurrentTimeRequests: request.lookup.getCurrentTimeRequests,
           },
         },
       },
@@ -333,11 +334,7 @@ const emurgo2Pool = {
       payloadHex: '0000000000000000000000000000000000000000000000000000000000000001da464571fc561c09439d040aa15b22f6094c7e824ceb9ac0fbfc6dcb7f79b1187df6bb3603be1a3f7cf44240469ea1b4dea93ed6a113dc1e3a0a33329433c2a701a6a920e3dee3dfec6b3cf9f104a432259e1988ab9eb4fe1dfe20789c368426bd000000000000000000000000000000003700000000000003e8000000000000000001d73444201a6785e43bcf83a0ee58632d130ea0242f33ae1322117b3cd87bcac5',
     },
   }],
-  owners: {
-    a6a920e3dee3dfec6b3cf9f104a432259e1988ab9eb4fe1dfe20789c368426bd: {
-      pledgeAddress: 'addr1skn2jg8rmm3almrt8nulzp9yxgjeuxvg4w0tflsalcs838pkssnt6fqthxk',
-    },
-  },
+  reputation: Object.freeze({}),
 };
 
 const privatePoolInfo = {
@@ -355,11 +352,7 @@ const privatePoolInfo = {
       }
     }
   ],
-  owners: {
-    '829465349415b2e908fd7dc32fa433f9f0dcfcc92a3a4d336349ab0ddbd5a8fc': {
-      pledgeAddress: 'addr1skpfgef5js2m96ggl47uxtayx0ulph8uey4r5nfnvdy6krwm6k50cfwhjgf'
-    }
-  }
+  reputation: Object.freeze({}),
 };
 const emurgo1Pool = {
   info: {
@@ -368,8 +361,18 @@ const emurgo1Pool = {
     description: 'EMURGO’s official Stake Pool. EMURGO is one of three organizations that contribute to the development of Cardano. Let’s make this Testnet successful by delegation to multiple stakepools.',
     homepage: 'https://emurgo.io'
   },
+  reputation: Object.freeze({}),
   ...privatePoolInfo,
 };
+
+function mockGetPoolInfo(networkId: $ReadOnly<NetworkRow>, poolId: string): void | PoolMeta {
+  if (poolId === '7186b11017e877329798ac925480585208516c4e5c30b69e38f0b997e7b72a83') {
+    return emurgo1Pool;
+  }
+  if (poolId === 'f989090208512a2d56aed13b81c98407b10ba04fde3b8d4a3442b8b25368f512') {
+    return emurgo2Pool;
+  }
+}
 
 function getChainInfo(full: CertificateForEpoch) {
   const { relatedAddresses, certificate, transaction, block } = full;
@@ -388,15 +391,6 @@ function getStakingInfo(
   publicDeriver: *,
   stakingCase: $Values<typeof stakingKeyCases>
 ): DelegationRequests {
-  const poolInfo = new Map();
-  poolInfo.set(
-    '7186b11017e877329798ac925480585208516c4e5c30b69e38f0b997e7b72a83',
-    emurgo1Pool
-  );
-  poolInfo.set(
-    'f989090208512a2d56aed13b81c98407b10ba04fde3b8d4a3442b8b25368f512',
-    emurgo2Pool
-  );
   const accountBalance = new BigNumber(3);
   const getDelegatedBalance: CachedRequest<GetDelegatedBalanceFunc> = new CachedRequest(
     _request => Promise.resolve({
@@ -448,6 +442,11 @@ function getStakingInfo(
         ...(prevEpochCert == null ? [] : [getChainInfo(prevEpochCert)]),
         ...(prevPrevEpochCert == null ? [] : [getChainInfo(prevPrevEpochCert)]),
       ],
+      allPoolIds: Array.from(new Set(
+        ...(currEpochCert == null ? [] : currEpochCert.pools.map(pool => pool[0])),
+        ...(prevEpochCert == null ? [] : prevEpochCert.pools.map(pool => pool[0])),
+        ...(prevPrevEpochCert == null ? [] : prevPrevEpochCert.pools.map(pool => pool[0])),
+      )),
     })
   );
   const rewardHistory: CachedRequest<RewardHistoryForWallet> = new CachedRequest(
@@ -468,22 +467,6 @@ function getStakingInfo(
     getCurrentDelegation,
     rewardHistory,
     error: undefined,
-    stakingKeyState: {
-      state: {
-        counter: 0,
-        delegation: {
-          pools: stakingCase === stakingKeyCases.NeverDelegated
-          || currEpochCert?.pools == null
-            ? []
-            : currEpochCert.pools,
-        },
-        value: stakingCase === stakingKeyCases.NeverDelegated
-          ? 0
-          : accountBalance.toNumber(),
-      },
-      selectedPool: 0,
-      poolInfo,
-    },
   };
 }
 
@@ -502,6 +485,7 @@ export const Loading = (): Node => {
         prevEpoch: undefined,
         prevPrevEpoch: undefined,
         fullHistory: [],
+        allPoolIds: [],
       })
     );
     const rewardHistory: CachedRequest<RewardHistoryForWallet> = new CachedRequest(
@@ -566,7 +550,6 @@ export const Loading = (): Node => {
       getCurrentDelegation,
       rewardHistory,
       error: undefined,
-      stakingKeyState: undefined,
     });
     const oldResults = wallet.getTransactions(wallet.publicDeriver);
     wallet.getTransactions = (_req) => ({
@@ -590,6 +573,7 @@ export const Loading = (): Node => {
       generated={genBaseProps({
         wallet,
         lookup,
+        getPoolInfo: mockGetPoolInfo,
       })}
     />)
   );
@@ -643,6 +627,7 @@ export const DelegationCases = (): Node => {
         wallet,
         lookup,
         allowToggleHidden: true,
+        getPoolInfo: mockGetPoolInfo,
       })}
     />)
   );
@@ -713,6 +698,7 @@ export const Errors = (): Node => {
       generated={genBaseProps({
         wallet,
         lookup,
+        getPoolInfo: mockGetPoolInfo,
       })}
     />)
   );
@@ -763,6 +749,7 @@ export const LessThanExpected = (): Node => {
         wallet,
         lookup,
         openDialog: LessThanExpectedDialog,
+        getPoolInfo: mockGetPoolInfo,
       })}
     />)
   );
@@ -772,21 +759,12 @@ export const UnknownPool = (): Node => {
   const wallet = genBaseWallet();
 
   // setup a map that doesn't have the metadata for a pool (a private pool)
-  const mockPoolInfo = new Map();
-  mockPoolInfo.set(
-    'f989090208512a2d56aed13b81c98407b10ba04fde3b8d4a3442b8b25368f512',
-    privatePoolInfo
-  );
-  const oldResult = wallet.getDelegation(wallet.publicDeriver);
-  if (oldResult == null || oldResult.stakingKeyState == null) throw new Error('Should never happen');
-  const oldStakingKeyState = oldResult.stakingKeyState;
-  wallet.getDelegation = (_publicDeriver) => ({
-    ...oldResult,
-    stakingKeyState: {
-      ...oldStakingKeyState,
-      poolInfo: mockPoolInfo,
-    },
-  });
+  const newMockPoolInfo = (network, poolId) => {
+    if (poolId === 'f989090208512a2d56aed13b81c98407b10ba04fde3b8d4a3442b8b25368f512') {
+      return privatePoolInfo;
+    }
+    return mockGetPoolInfo(network, poolId);
+  };
 
   const lookup = walletLookup([wallet]);
   return wrapWallet(
@@ -800,6 +778,7 @@ export const UnknownPool = (): Node => {
         wallet,
         lookup,
         openDialog: undefined,
+        getPoolInfo: newMockPoolInfo,
       })}
     />)
   );
@@ -818,6 +797,7 @@ export const UndelegateExecuting = (): Node => {
       generated={genBaseProps({
         wallet,
         lookup,
+        getPoolInfo: mockGetPoolInfo,
         openDialog: UndelegateDialog,
         delegationTransaction: {
           isStale: false,
@@ -852,6 +832,7 @@ export const UndelegateError = (): Node => {
       generated={genBaseProps({
         wallet,
         lookup,
+        getPoolInfo: mockGetPoolInfo,
         openDialog: UndelegateDialog,
         delegationTransaction: {
           isStale: false,
@@ -895,6 +876,7 @@ export const UndelegateDialogShown = (): Node => {
       generated={genBaseProps({
         wallet,
         lookup,
+        getPoolInfo: mockGetPoolInfo,
         openDialog: UndelegateDialog,
         delegationTransaction: {
           isStale: boolean('isStale', false),
@@ -940,6 +922,18 @@ export const Reputation = (): Node => {
     dialogCases,
     dialogCases.DialogOpen
   );
+
+  const newMockPoolInfo = (network, poolId) => {
+    if (poolId === 'f989090208512a2d56aed13b81c98407b10ba04fde3b8d4a3442b8b25368f512') {
+      return {
+        ...emurgo2Pool,
+        reputation: {
+          node_flags: getFlag(),
+        },
+      };
+    }
+    return mockGetPoolInfo(network, poolId);
+  };
   return wrapWallet(
     mockWalletProps({
       location: getRoute(wallet.publicDeriver.getPublicDeriverId()),
@@ -950,12 +944,8 @@ export const Reputation = (): Node => {
       generated={genBaseProps({
         wallet,
         lookup,
+        getPoolInfo: newMockPoolInfo,
         openDialog: getDialog() === dialogCases.DialogClosed ? undefined : PoolWarningDialog,
-        poolReputation: {
-          f989090208512a2d56aed13b81c98407b10ba04fde3b8d4a3442b8b25368f512: {
-            node_flags: getFlag(),
-          },
-        },
         getParam: <T>(param) => { // eslint-disable-line no-unused-vars
           if (param === 'reputation') {
             return {
@@ -1016,6 +1006,7 @@ export const MangledDashboardWarning = (): Node => {
       generated={genBaseProps({
         wallet,
         lookup,
+        getPoolInfo: mockGetPoolInfo,
         mangledInfo: {
           addresses,
         },
@@ -1037,6 +1028,7 @@ export const UnmangleDialogLoading = (): Node => {
       generated={genBaseProps({
         wallet,
         lookup,
+        getPoolInfo: mockGetPoolInfo,
         mangledInfo: {
           addresses: [],
         },
@@ -1065,6 +1057,7 @@ export const UnmangleDialogError = (): Node => {
       generated={genBaseProps({
         wallet,
         lookup,
+        getPoolInfo: mockGetPoolInfo,
         mangledInfo: {
           addresses: [],
         },
@@ -1094,6 +1087,7 @@ export const UnmangleDialogConfirm = (): Node => {
       generated={genBaseProps({
         wallet,
         lookup,
+        getPoolInfo: mockGetPoolInfo,
         mangledInfo: {
           addresses: [],
         },

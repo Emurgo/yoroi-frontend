@@ -155,14 +155,14 @@ export default class JormungandrWalletRestoreStore extends Store {
   isValidMnemonic: {|
     mnemonic: string,
     numberOfWords: number,
-    mode: $PropertyType<typeof RestoreMode, 'REGULAR'> | $PropertyType<typeof RestoreMode, 'PAPER'>,
+    mode: $PropertyType<typeof RestoreMode, 'REGULAR_15'> | $PropertyType<typeof RestoreMode, 'REGULAR_24'> | $PropertyType<typeof RestoreMode, 'PAPER'>,
   |} => boolean = request => {
     const { mnemonic, numberOfWords } = request;
     if (request.mode === RestoreMode.PAPER) {
       // note: validate with ADA since Jormungandr doesn't itself use paper wallets
       return this.api.ada.isValidPaperMnemonic({ mnemonic, numberOfWords });
     }
-    if (request.mode === RestoreMode.REGULAR) {
+    if (request.mode === RestoreMode.REGULAR_15) {
       return this.api.jormungandr.constructor.isValidMnemonic({ mnemonic, numberOfWords });
     }
     throw new Error(`${nameof(this.isValidMnemonic)} unexpected mode ${request.mode}`);

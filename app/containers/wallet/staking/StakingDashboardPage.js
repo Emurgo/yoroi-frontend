@@ -24,14 +24,13 @@ import LessThanExpectedDialog from '../../../components/wallet/staking/dashboard
 import PoolWarningDialog from '../../../components/wallet/staking/dashboard/PoolWarningDialog';
 import { digestForHash } from '../../../api/ada/lib/storage/database/primitives/api/utils';
 import { handleExternalLinkClick } from '../../../utils/routing';
-import { GetPoolInfoApiError } from '../../../api/common/errors';
 import LocalizableError from '../../../i18n/LocalizableError';
 import UnmangleTxDialogContainer from '../../transfer/UnmangleTxDialogContainer';
 import type { GeneratedData as UnmangleTxDialogContainerData } from '../../transfer/UnmangleTxDialogContainer';
 import config from '../../../config';
 import { formattedWalletAmount } from '../../../utils/formatters';
-import type { PoolTuples, ReputationObject, ReputationFunc, } from '../../../api/jormungandr/lib/state-fetch/types';
-import type { DelegationRequests } from '../../../stores/jormungandr/DelegationStore';
+import type { PoolTuples, ReputationObject, } from '../../../api/jormungandr/lib/state-fetch/types';
+import type { PoolMeta, DelegationRequests } from '../../../stores/toplevel/DelegationStore';
 import EpochProgressContainer from './EpochProgressContainer';
 import type { GeneratedData as EpochProgressContainerData } from './EpochProgressContainer';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
@@ -52,11 +51,12 @@ import type { Notification } from '../../../types/notificationType';
 
 import globalMessages from '../../../i18n/global-messages';
 import { computed, observable, runInAction } from 'mobx';
-import { getApiForNetwork, getApiMeta } from '../../../api/common/utils';
+import { ApiOptions, getApiForNetwork, getApiMeta } from '../../../api/common/utils';
 import type { SelectedApiType, } from '../../../api/common/utils';
 import { getUnmangleAmounts, } from '../../../stores/stateless/mangledAddresses';
 import type { IAddressTypeStore, IAddressTypeUiSubset } from '../../../stores/stateless/addressStores';
 import { GROUP_MANGLED } from '../../../stores/stateless/addressStores';
+import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 
 export type GeneratedData = typeof StakingDashboardPage.prototype.generated;
 
@@ -71,7 +71,7 @@ export default class StakingDashboardPage extends Component<Props> {
   @observable notificationElementId: string = '';
 
   async componentDidMount() {
-    const timeStore = this.generated.stores.substores.jormungandr.time;
+    const timeStore = this.generated.stores.time;
     const publicDeriver = this.generated.stores.wallets.selected;
     if (publicDeriver == null) {
       throw new Error(`${nameof(StakingDashboardPage)} no public deriver. Should never happen`);
@@ -130,7 +130,7 @@ export default class StakingDashboardPage extends Component<Props> {
       throw new Error(`${nameof(StakingDashboardPage)} no public deriver. Should never happen`);
     }
 
-    const delegationStore = this.generated.stores.substores.jormungandr.delegation;
+    const delegationStore = this.generated.stores.delegation;
     const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
     if (delegationRequests == null) {
       throw new Error(`${nameof(StakingDashboardPage)} opened for non-reward wallet`);
@@ -148,18 +148,18 @@ export default class StakingDashboardPage extends Component<Props> {
     const dashboard = (
       <StakingDashboard
         pageInfo={
-          delegationRequests.stakingKeyState == null ||
           !delegationRequests.getCurrentDelegation.wasExecuted ||
-          delegationRequests.getCurrentDelegation.isExecuting
+          delegationRequests.getCurrentDelegation.isExecuting ||
+          delegationRequests.getCurrentDelegation.result?.currEpoch == null
             ? undefined
             : {
-              currentPage: delegationRequests.stakingKeyState.selectedPool,
-              numPages: delegationRequests.stakingKeyState.state.delegation.pools.length,
-              goToPage: page => runInAction(() => {
-                if (delegationRequests.stakingKeyState) {
-                  delegationRequests.stakingKeyState.selectedPool = page;
-                }
-              })
+              currentPage: this.generated.stores.delegation.selectedPage,
+              numPages: Array.from(new Set(
+                delegationRequests.getCurrentDelegation.result.currEpoch.pools.map(
+                  tuple => tuple[0]
+                )
+              )).length,
+              goToPage: page => this.generated.actions.delegation.setSelectedPage.trigger(page),
             }}
         hasAnyPending={this.generated.stores.transactions.hasAnyPending}
         themeVars={getThemeVars({ theme: 'YoroiModern' })}
@@ -194,7 +194,7 @@ export default class StakingDashboardPage extends Component<Props> {
   }
 
   getEpochLengthInDays: PublicDeriver<> => ?number = (publicDeriver) => {
-    const timeStore = this.generated.stores.substores.jormungandr.time;
+    const timeStore = this.generated.stores.time;
     const timeCalcRequests = timeStore.getTimeCalcRequests(publicDeriver);
     const getEpochLength = timeCalcRequests.requests.currentEpochLength.result;
     if (getEpochLength == null) return null;
@@ -282,7 +282,7 @@ export default class StakingDashboardPage extends Component<Props> {
     rewardPopup: Node,
     showWarning: boolean,
   |}) = (publicDeriver) => {
-    const timeStore = this.generated.stores.substores.jormungandr.time;
+    const timeStore = this.generated.stores.time;
     const timeCalcRequests = timeStore.getTimeCalcRequests(publicDeriver);
     const currTimeRequests = timeStore.getCurrentTimeRequests(publicDeriver);
     const toAbsoluteSlot = timeCalcRequests.requests.toAbsoluteSlot.result;
@@ -292,7 +292,7 @@ export default class StakingDashboardPage extends Component<Props> {
     const timeSinceGenesis = timeCalcRequests.requests.timeSinceGenesis.result;
     if (timeSinceGenesis == null) return undefined;
 
-    const delegationStore = this.generated.stores.substores.jormungandr.delegation;
+    const delegationStore = this.generated.stores.delegation;
     const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
     if (delegationRequests == null) {
       throw new Error(`${nameof(StakingDashboardPage)} opened for non-reward wallet`);
@@ -437,7 +437,7 @@ export default class StakingDashboardPage extends Component<Props> {
   getErrorInFetch: PublicDeriver<> => void | {| error: LocalizableError, |} = (
     publicDeriver
   ) => {
-    const delegationStore = this.generated.stores.substores.jormungandr.delegation;
+    const delegationStore = this.generated.stores.delegation;
     const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
     if (delegationRequests == null) {
       throw new Error(`${nameof(StakingDashboardPage)} opened for non-reward wallet`);
@@ -445,56 +445,52 @@ export default class StakingDashboardPage extends Component<Props> {
     if (delegationRequests.error != null) {
       return { error: delegationRequests.error };
     }
-    const keyState = delegationRequests.stakingKeyState;
-    if (
-      keyState &&
-      keyState.state.delegation.pools.length === 0 &&
-      delegationRequests.getCurrentDelegation.result != null
-    ) {
+    if (delegationRequests.getCurrentDelegation.result != null) {
       const currentDelegation = delegationRequests.getCurrentDelegation.result;
       const currEpochInfo = currentDelegation.currEpoch;
       if (currEpochInfo == null) {
         return undefined;
       }
-      if (currEpochInfo.pools.length !== 0) {
-        return { error: new GetPoolInfoApiError() };
-      }
     }
     return undefined;
   }
 
-  getStakePools: PublicDeriver<> => {| pools: null | Array<Node> |} = (
+  getStakePools: PublicDeriver<> => {| pools: null | Array<Node | void> |} = (
     publicDeriver
   ) => {
-    const delegationStore = this.generated.stores.substores.jormungandr.delegation;
+    const delegationStore = this.generated.stores.delegation;
     const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
     if (delegationRequests == null) {
       throw new Error(`${nameof(StakingDashboardPage)} opened for non-reward wallet`);
     }
     if (
       !delegationRequests.getCurrentDelegation.wasExecuted ||
-      delegationRequests.getCurrentDelegation.isExecuting
+      delegationRequests.getCurrentDelegation.isExecuting ||
+      delegationRequests.getCurrentDelegation.result == null
     ) {
       return { pools: null };
     }
-    if (delegationRequests.stakingKeyState == null) {
+    if (delegationRequests.getCurrentDelegation.result.currEpoch == null) {
       return { pools: [] };
     }
+    const currentPools = delegationRequests.getCurrentDelegation.result.currEpoch.pools;
+
     const tooltipNotification = {
       duration: config.wallets.ADDRESS_COPY_TOOLTIP_NOTIFICATION_DURATION,
       message: globalMessages.copyTooltipMessage,
     };
 
-    const poolReputation = delegationStore.poolReputation.result ?? {};
-
     const { uiNotifications, } = this.generated.stores;
-    const keyState = delegationRequests.stakingKeyState;
     const { intl } = this.context;
     return {
-      pools: keyState.state.delegation.pools.map(pool => {
-        const meta = keyState.poolInfo.get(pool[0]);
+      pools: currentPools.map(pool => {
+        const meta = this.generated.stores.delegation.getPoolInfo(
+          publicDeriver.getParent().getNetworkInfo(),
+          pool[0],
+        );
         if (meta == null) {
-          throw new Error(`${nameof(this.getStakePools)} no meta for ${pool[0]}`);
+          // server hasn't returned information about the stake pool yet
+          return undefined;
         }
         const name = meta.info?.name ?? intl.formatMessage(globalMessages.unknownPoolLabel);
 
@@ -548,7 +544,7 @@ export default class StakingDashboardPage extends Component<Props> {
             }
             undelegate={
               // don't support undelegation for ratio stake since it's a less intuitive UX
-              keyState.state.delegation.pools.length === 1
+              currentPools.length === 1
                 ? async () => {
                   this.generated.actions.dialogs.open.trigger({ dialog: UndelegateDialog });
                   await this.generated.actions.jormungandr
@@ -561,10 +557,10 @@ export default class StakingDashboardPage extends Component<Props> {
                 }
                 : undefined
             }
-            reputationInfo={poolReputation[pool[0]] ?? {}}
+            reputationInfo={meta.reputation}
             openReputationDialog={() => this.generated.actions.dialogs.open.trigger({
               dialog: PoolWarningDialog,
-              params: { reputation: (poolReputation[pool[0]] ?? {}) },
+              params: { reputation: meta.reputation },
             })}
           />
         );
@@ -750,7 +746,7 @@ export default class StakingDashboardPage extends Component<Props> {
     delegationRequests: DelegationRequests,
     publicDeriver: PublicDeriver<>,
   |} => GraphData = (request) => {
-    const timeStore = this.generated.stores.substores.jormungandr.time;
+    const timeStore = this.generated.stores.time;
     const currTimeRequests = timeStore.getCurrentTimeRequests(request.publicDeriver);
 
     return {
@@ -787,6 +783,11 @@ export default class StakingDashboardPage extends Component<Props> {
           |}
         |}
       |},
+      delegation: {|
+        setSelectedPage: {|
+          trigger: (params: number) => void
+        |},
+      |},
       dialogs: {|
         closeActiveDialog: {|
           trigger: (params: void) => void
@@ -821,16 +822,23 @@ export default class StakingDashboardPage extends Component<Props> {
         shouldHideBalance: boolean,
         unitOfAccount: UnitOfAccountSettingType
       |},
+      delegation: {|
+        selectedPage: number,
+        getPoolInfo: ($ReadOnly<NetworkRow>, string) => (void | PoolMeta),
+        getDelegationRequests: (
+          PublicDeriver<>
+        ) => void | DelegationRequests,
+      |},
+      time: {|
+        getCurrentTimeRequests: (
+          PublicDeriver<>
+        ) => CurrentTimeRequests,
+        getTimeCalcRequests: (
+          PublicDeriver<>
+        ) => TimeCalcRequests
+      |},
       substores: {|
         jormungandr: {|
-          delegation: {|
-            getDelegationRequests: (
-              PublicDeriver<>
-            ) => void | DelegationRequests,
-            poolReputation: {|
-              result: ?PromisslessReturnType<ReputationFunc>
-            |}
-          |},
           delegationTransaction: {|
             createDelegationTx: {|
               error: ?LocalizableError,
@@ -843,14 +851,6 @@ export default class StakingDashboardPage extends Component<Props> {
               isExecuting: boolean
             |}
           |},
-          time: {|
-            getCurrentTimeRequests: (
-              PublicDeriver<>
-            ) => CurrentTimeRequests,
-            getTimeCalcRequests: (
-              PublicDeriver<>
-            ) => TimeCalcRequests
-          |}
         |}
       |},
       transactions: {|
@@ -876,6 +876,27 @@ export default class StakingDashboardPage extends Component<Props> {
     }
     const { stores, actions } = this.props;
     const jormungandrStore = stores.substores.jormungandr;
+
+    const selected = stores.wallets.selected;
+    if (selected == null) {
+      throw new Error(`${nameof(EpochProgressContainer)} no wallet selected`);
+    }
+    const api = getApiForNetwork(selected.getParent().getNetworkInfo());
+    const time = (() => {
+      if (api === ApiOptions.ada) {
+        return {
+          getTimeCalcRequests: stores.substores.ada.time.getTimeCalcRequests,
+          getCurrentTimeRequests: stores.substores.ada.time.getCurrentTimeRequests,
+        };
+      }
+      if (api === ApiOptions.jormungandr) {
+        return {
+          getTimeCalcRequests: stores.substores.jormungandr.time.getTimeCalcRequests,
+          getCurrentTimeRequests: stores.substores.jormungandr.time.getCurrentTimeRequests,
+        };
+      }
+      throw new Error(`${nameof(EpochProgressContainer)} api not supported`);
+    })();
     return Object.freeze({
       stores: {
         explorers: {
@@ -908,18 +929,14 @@ export default class StakingDashboardPage extends Component<Props> {
           hasAnyPending: stores.transactions.hasAnyPending,
           getTxRequests: stores.transactions.getTxRequests,
         },
+        delegation: {
+          selectedPage: stores.delegation.selectedPage,
+          getPoolInfo: stores.delegation.getPoolInfo,
+          getDelegationRequests: stores.delegation.getDelegationRequests,
+        },
+        time,
         substores: {
           jormungandr: {
-            time: {
-              getTimeCalcRequests: jormungandrStore.time.getTimeCalcRequests,
-              getCurrentTimeRequests: jormungandrStore.time.getCurrentTimeRequests,
-            },
-            delegation: {
-              getDelegationRequests: jormungandrStore.delegation.getDelegationRequests,
-              poolReputation: {
-                result: jormungandrStore.delegation.poolReputation.result,
-              },
-            },
             delegationTransaction: {
               isStale: jormungandrStore.delegationTransaction.isStale,
               createDelegationTx: {
@@ -948,6 +965,11 @@ export default class StakingDashboardPage extends Component<Props> {
         notifications: {
           open: {
             trigger: actions.notifications.open.trigger,
+          },
+        },
+        delegation: {
+          setSelectedPage: {
+            trigger: actions.delegation.setSelectedPage.trigger,
           },
         },
         jormungandr: {

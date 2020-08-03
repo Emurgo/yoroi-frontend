@@ -11,7 +11,8 @@ export type WalletRestoreMeta = {|
 
 export const RestoreMode = Object.freeze({
   UNSET: -1,
-  REGULAR: 0,
+  REGULAR_15: 0,
+  REGULAR_24: 2,
   PAPER: 1,
 });
 export type RestoreModeType = $Values<typeof RestoreMode>;

@@ -5,7 +5,7 @@ import BigNumber from 'bignumber.js';
 import Store from '../base/Store';
 import CachedRequest from '../lib/LocalizedCachedRequest';
 import WalletTransaction, { calculateUnconfirmedAmount } from '../../domain/WalletTransaction';
-import { getPriceKey } from '../../api/ada/lib/storage/bridge/prices';
+import { getPriceKey } from '../../api/common/lib/storage/bridge/prices';
 import type {
   GetBalanceFunc,
 } from '../../api/common/types';

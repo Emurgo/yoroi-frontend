@@ -34,13 +34,16 @@ export async function filterMangledAddresses(request: {|
   }
 
   const stakingKeyResp = await withStakingKey.getStakingKey();
-  const stakingKey = unwrapStakingKey(stakingKeyResp.addr.Hash);
 
-  const filterResult = filterAddressesByStakingKey(
-    stakingKey,
-    request.baseAddresses,
-    !request.invertFilter,
-  );
+  // // TODO: this is Jormungandr-specific logic
+  // const stakingKey = unwrapStakingKey(stakingKeyResp.addr.Hash);
+
+  // const filterResult = filterAddressesByStakingKey(
+  //   stakingKey,
+  //   request.baseAddresses,
+  //   !request.invertFilter,
+  // );
+  const filterResult = request.baseAddresses;
 
   let result = filterResult;
   if (request.invertFilter) {

@@ -16,6 +16,7 @@ import DaedalusTransferActions from './common/daedalus-transfer-actions';
 import YoroiTransferActions from './common/yoroi-transfer-actions';
 import TxBuilderActions from './common/tx-builder-actions';
 import ExplorerActions from './common/explorer-actions';
+import DelegationActions from './common/delegation-actions';
 import WalletSettingsActions from './common/wallet-settings-actions';
 import adaActionsMap from './ada/index';
 import ergoActionsMap from './ergo/index';
@@ -42,6 +43,7 @@ export type ActionsMap = {|
   time: TimeActions,
   transactions: TransactionsActions,
   walletRestore: WalletRestoreActions,
+  delegation: DelegationActions,
   explorers: ExplorerActions,
   ada: AdaActionsMap,
   ergo: ErgoActionsMap,
@@ -65,6 +67,7 @@ const actionsMap: ActionsMap = Object.freeze({
   addresses: new AddressesActions(),
   time: new TimeActions(),
   walletRestore: new WalletRestoreActions(),
+  delegation: new DelegationActions(),
   transactions: new TransactionsActions(),
   explorers: new ExplorerActions(),
   ada: adaActionsMap,

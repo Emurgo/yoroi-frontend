@@ -27,6 +27,9 @@ import {
   createStandardBip44Wallet, createHardwareWallet,
 } from './lib/storage/bridge/walletBuilder/byron';
 import {
+  createStandardCip1852Wallet,
+} from './lib/storage/bridge/walletBuilder/shelley';
+import {
   getPendingTransactions,
   getAllTransactions,
   updateTransactions,
@@ -36,6 +39,9 @@ import {
 import {
   Bip44Wallet,
 } from './lib/storage/models/Bip44Wallet/wrapper';
+import {
+  Cip1852Wallet,
+} from './lib/storage/models/Cip1852Wallet/wrapper';
 import type { HWFeatures, } from './lib/storage/database/walletTypes/core/tables';
 import {
   flattenInsertTree,
@@ -654,7 +660,10 @@ export default class AdaApi {
   }
 
   async createWallet(
-    request: CreateWalletRequest
+    request: {|
+      mode: 'bip44' | 'cip1852',
+      ...CreateWalletRequest,
+    |},
   ): Promise<CreateWalletResponse> {
     // creating a wallet is the same as restoring a wallet
     return await this.restoreWallet(request);
@@ -946,7 +955,10 @@ export default class AdaApi {
    * Creates wallet and saves result to DB
   */
   async restoreWallet(
-    request: RestoreWalletRequest
+    request: {|
+      mode: 'bip44' | 'cip1852',
+      ...RestoreWalletRequest,
+    |}
   ): Promise<RestoreWalletResponse> {
     Logger.debug(`${nameof(AdaApi)}::${nameof(this.restoreWallet)} called`);
     const { recoveryPhrase, walletName, walletPassword, } = request;
@@ -959,30 +971,54 @@ export default class AdaApi {
       const rootPk = generateWalletRootKey(recoveryPhrase);
       const newPubDerivers = [];
 
-      const wallet = await createStandardBip44Wallet({
-        db: request.db,
-        rootPk: RustModule.WalletV2.Bip44RootPrivateKey.new(
-          RustModule.WalletV2.PrivateKey.from_hex(
-            Buffer.from(rootPk.as_bytes()).toString('hex')
+      if (request.mode === 'bip44') {
+        const wallet = await createStandardBip44Wallet({
+          db: request.db,
+          rootPk: RustModule.WalletV2.Bip44RootPrivateKey.new(
+            RustModule.WalletV2.PrivateKey.from_hex(
+              Buffer.from(rootPk.as_bytes()).toString('hex')
+            ),
+            RustModule.WalletV2.DerivationScheme.v2()
           ),
-          RustModule.WalletV2.DerivationScheme.v2()
-        ),
-        password: walletPassword,
-        accountIndex: request.accountIndex,
-        walletName,
-        accountName: '', // set account name empty now
-        network: request.network,
-      });
+          password: walletPassword,
+          accountIndex: request.accountIndex,
+          walletName,
+          accountName: '', // set account name empty now
+          network: request.network,
+        });
 
-      const bip44Wallet = await Bip44Wallet.createBip44Wallet(
-        request.db,
-        wallet.bip44WrapperRow,
-      );
-      for (const pubDeriver of wallet.publicDeriver) {
-        newPubDerivers.push(await PublicDeriver.createPublicDeriver(
-          pubDeriver.publicDeriverResult,
-          bip44Wallet,
-        ));
+        const bip44Wallet = await Bip44Wallet.createBip44Wallet(
+          request.db,
+          wallet.bip44WrapperRow,
+        );
+        for (const pubDeriver of wallet.publicDeriver) {
+          newPubDerivers.push(await PublicDeriver.createPublicDeriver(
+            pubDeriver.publicDeriverResult,
+            bip44Wallet,
+          ));
+        }
+      }
+      if (request.mode === 'cip1852') {
+        const wallet = await createStandardCip1852Wallet({
+          db: request.db,
+          rootPk,
+          password: walletPassword,
+          accountIndex: request.accountIndex,
+          walletName,
+          accountName: '', // set account name empty now
+          network: request.network,
+        });
+
+        const cip1852Wallet = await Cip1852Wallet.createCip1852Wallet(
+          request.db,
+          wallet.cip1852WrapperRow,
+        );
+        for (const pubDeriver of wallet.publicDeriver) {
+          newPubDerivers.push(await PublicDeriver.createPublicDeriver(
+            pubDeriver.publicDeriverResult,
+            cip1852Wallet,
+          ));
+        }
       }
 
       Logger.debug(`${nameof(AdaApi)}::${nameof(this.restoreWallet)} success`);

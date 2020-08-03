@@ -6,7 +6,8 @@ import WalletRestoreOptionDialog from '../../../components/wallet/add/option-dia
 
 type Props = {|
   +onClose: void => void,
-  +onRestore: void => void,
+  +onRestore15: void => void,
+  +onRestore24: void | (void => void),
   +onPaperRestore: void | (void => void),
 |};
 
@@ -17,7 +18,8 @@ export default class WalletRestoreOptionDialogContainer extends Component<Props>
     return (
       <WalletRestoreOptionDialog
         onCancel={this.props.onClose}
-        onRestore={this.props.onRestore}
+        onRestore15={this.props.onRestore15}
+        onRestore24={this.props.onRestore24}
         onPaperRestore={this.props.onPaperRestore}
       />
     );

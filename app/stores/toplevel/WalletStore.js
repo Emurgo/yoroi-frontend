@@ -27,6 +27,9 @@ import {
   asGetPublicKey,
   asGetStakingKey,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
+import {
+  isCardanoHaskell,
+} from '../../api/ada/lib/storage/database/prepackaged/networks';
 import type {
   IGetLastSyncInfoResponse,
   IGetSigningKey,
@@ -36,9 +39,10 @@ import { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWal
 import { Logger, stringifyError } from '../../utils/logging';
 import { assuranceModes, } from '../../config/transactionAssuranceConfig';
 import type { WalletChecksum } from '@emurgo/cip4-js';
-import { legacyWalletChecksum } from '@emurgo/cip4-js';
+import { walletChecksum, legacyWalletChecksum } from '@emurgo/cip4-js';
 import { createDebugWalletDialog } from '../../containers/wallet/dialogs/DebugWalletDialogContainer';
 import { getApiForNetwork } from '../../api/common/utils';
+import { Bip44Wallet } from '../../api/ada/lib/storage/models/Bip44Wallet/wrapper';
 
 type GroupedWallets = {|
   publicDerivers: Array<PublicDeriver<>>;
@@ -410,12 +414,19 @@ export default class WalletStore extends Store {
     if (withPubKey != null) {
       const publicKey = await withPubKey.getPublicKey();
       if (publicKey.IsEncrypted) {
-        throw new Error('fromPublicDeriver unexpected encrypted public key');
+        throw new Error(`${nameof(this.populateCacheForWallet)} unexpected encrypted public key`);
       }
+      const isLegacyWallet = (
+        isCardanoHaskell(publicDeriver.getParent().getNetworkInfo()) &&
+        publicDeriver.getParent() instanceof Bip44Wallet
+      );
+      const checksum = isLegacyWallet
+        ? legacyWalletChecksum(publicKey.Hash)
+        : walletChecksum(publicKey.Hash);
       runInAction(() => {
         this.publicKeyCache.push({
           publicDeriver: withPubKey,
-          plate: legacyWalletChecksum(publicKey.Hash),
+          plate: checksum,
         });
       });
     }

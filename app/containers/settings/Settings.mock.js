@@ -7,7 +7,7 @@ import { action } from '@storybook/addon-actions';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 import WalletSettingsStore from '../../stores/toplevel/WalletSettingsStore';
 import TransactionsStore from '../../stores/toplevel/TransactionsStore';
-import DelegationStore from '../../stores/jormungandr/DelegationStore';
+import DelegationStore from '../../stores/toplevel/DelegationStore';
 import WalletStore from '../../stores/toplevel/WalletStore';
 import type { GeneratedData } from './Settings';
 

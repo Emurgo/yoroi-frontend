@@ -37,6 +37,7 @@ import type {
   NetworkRow,
 } from '../../../api/ada/lib/storage/database/primitives/tables';
 import { isJormungandr } from '../../../api/ada/lib/storage/database/prepackaged/networks';
+import { isPaperMode, getWordsCount } from '../../../stores/stateless/modeInfo';
 
 const messages = defineMessages({
   walletUpgradeNoop: {
@@ -103,6 +104,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
     const { wallets } = this.generated.stores;
     const { restoreRequest } = wallets;
 
+    const mode = this.props.mode;
     const isPaper = isPaperMode(this.props.mode);
     const wordsCount = getWordsCount(this.props.mode);
 
@@ -114,20 +116,13 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
     switch (walletRestore.step) {
       case RestoreSteps.START: {
         return (<WalletRestoreDialog
-          mnemonicValidator={mnemonic => {
-            if (isPaper) {
-              return this.generated.stores.walletRestore.isValidMnemonic({
-                mnemonic,
-                numberOfWords: wordsCount,
-                mode: RestoreMode.PAPER,
-              });
-            }
-            return this.generated.stores.walletRestore.isValidMnemonic({
+          mnemonicValidator={mnemonic => (
+            this.generated.stores.walletRestore.isValidMnemonic({
               mnemonic,
               numberOfWords: wordsCount,
-              mode: RestoreMode.REGULAR,
-            });
-          }}
+              mode,
+            })
+          )}
           validWords={validWords}
           numberOfMnemonics={wordsCount}
           onSubmit={meta => actions.walletRestore.submitFields.trigger(meta)}
@@ -158,6 +153,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
         return (
           <WalletRestoreVerifyDialog
             byronPlate={walletRestore.recoveryResult ?.byronPlate}
+            shelleyPlate={walletRestore.recoveryResult ?.shelleyPlate}
             jormungandrPlate={walletRestore.recoveryResult ?.jormungandrPlate}
             selectedExplorer={this.generated.stores.explorers.selectedExplorer
               .get(this.getSelectedNetwork().NetworkId) ?? (() => { throw new Error('No explorer for wallet network'); })()
@@ -339,6 +335,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
       |},
       walletRestore: {|
         recoveryResult: void | {|
+          shelleyPlate: void | PlateResponse,
           byronPlate: void | PlateResponse,
           phrase: string,
           jormungandrPlate: void | PlateResponse
@@ -348,7 +345,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
         isValidMnemonic: ({|
           mnemonic: string,
           numberOfWords: number,
-          mode: $PropertyType<typeof RestoreMode, 'REGULAR'> | $PropertyType<typeof RestoreMode, 'PAPER'>,
+          mode: $PropertyType<typeof RestoreMode, 'REGULAR_15'> | $PropertyType<typeof RestoreMode, 'REGULAR_24'> | $PropertyType<typeof RestoreMode, 'PAPER'>,
         |}) => boolean,
       |},
       yoroiTransfer: {|
@@ -455,14 +452,4 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
       },
     });
   }
-}
-
-function isPaperMode(mode: RestoreModeType): boolean {
-  return mode === RestoreMode.PAPER;
-}
-
-function getWordsCount(mode: RestoreModeType): number {
-  return mode === RestoreMode.PAPER
-    ? config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT
-    : config.wallets.WALLET_RECOVERY_PHRASE_WORD_COUNT;
 }

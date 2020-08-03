@@ -330,3 +330,20 @@ export function getAddressPayload(
     throw new Error(`${nameof(getAddressPayload)} failed to parse address type ` + address);
   }
 }
+
+export function unwrapStakingKey(
+  stakingAddress: string,
+): RustModule.WalletV4.StakeCredential {
+  const accountAddress =
+    RustModule.WalletV4.RewardAddress.from_address(
+      RustModule.WalletV4.Address.from_bytes(
+        Buffer.from(stakingAddress, 'hex')
+      )
+    );
+  if (accountAddress == null) {
+    throw new Error(`${nameof(unwrapStakingKey)} staking key invalid`);
+  }
+  const stakingKey = accountAddress.payment_cred();
+
+  return stakingKey;
+}

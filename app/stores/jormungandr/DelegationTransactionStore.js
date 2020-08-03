@@ -1,6 +1,7 @@
 // @flow
 
 import { observable, action, reaction } from 'mobx';
+import BigNumber from 'bignumber.js';
 import Store from '../base/Store';
 import LocalizedRequest from '../lib/LocalizedRequest';
 import type {
@@ -88,7 +89,7 @@ export default class DelegationTransactionStore extends Store {
     }
     const basePubDeriver = withStakingKey;
 
-    const delegationRequests = this.stores.substores.jormungandr.delegation.getDelegationRequests(
+    const delegationRequests = this.stores.delegation.getDelegationRequests(
       request.publicDeriver
     );
     if (delegationRequests == null) {
@@ -97,7 +98,8 @@ export default class DelegationTransactionStore extends Store {
     const delegationTxPromise = this.createDelegationTx.execute({
       publicDeriver: basePubDeriver,
       poolRequest: request.poolRequest,
-      valueInAccount: delegationRequests.stakingKeyState?.state.value ?? 0
+      valueInAccount: delegationRequests.getDelegatedBalance.result?.accountPart
+        ?? new BigNumber(0),
     }).promise;
     if (delegationTxPromise == null) {
       throw new Error(`${nameof(this._createTransaction)} should never happen`);

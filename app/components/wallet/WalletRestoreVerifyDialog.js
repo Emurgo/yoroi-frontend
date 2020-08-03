@@ -55,6 +55,10 @@ const messages = defineMessages({
     id: 'wallet.restore.dialog.verify.accountId.shelley.label',
     defaultMessage: '!!!Shelley account checksum:',
   },
+  walletRestoreVerifyJormungandrAccountIdLabel: {
+    id: 'wallet.restore.dialog.verify.accountId.itn.label',
+    defaultMessage: '!!!ITN account checksum:',
+  },
   walletRestoreVerifyAddressesLabel: {
     id: 'wallet.restore.dialog.verify.addressesLabel',
     defaultMessage: '!!!Your Wallet address[es]:',
@@ -67,9 +71,14 @@ const messages = defineMessages({
     id: 'wallet.restore.dialog.verify.shelley.addressesLabel',
     defaultMessage: '!!!Shelley Wallet address[es]:',
   },
+  walletRestoreVerifyJormungandrAddressesLabel: {
+    id: 'wallet.restore.dialog.verify.itn.addressesLabel',
+    defaultMessage: '!!!ITN Wallet address[es]:',
+  },
 });
 
 type Props = {|
+  +shelleyPlate: void | PlateResponse,
   +byronPlate: void | PlateResponse,
   +jormungandrPlate: void | PlateResponse,
   +selectedExplorer: SelectedExplorer,
@@ -153,6 +162,7 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
   render(): Node {
     const { intl } = this.context;
     const {
+      shelleyPlate,
       byronPlate,
       jormungandrPlate,
       error,
@@ -206,12 +216,19 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
         byronPlate.accountPlate
       );
 
+    const shelleyPlateElem = shelleyPlate == null
+      ? undefined
+      : this.generatePlate(
+        intl.formatMessage(messages.walletRestoreVerifyShelleyAccountIdLabel),
+        shelleyPlate.accountPlate
+      );
+
     const jormungandrPlateElem = jormungandrPlate == null
       ? undefined
       : this.generatePlate(
         byronPlate == null
           ? intl.formatMessage(messages.walletRestoreVerifyAccountIdLabel)
-          : intl.formatMessage(messages.walletRestoreVerifyShelleyAccountIdLabel),
+          : intl.formatMessage(messages.walletRestoreVerifyJormungandrAccountIdLabel),
         jormungandrPlate.accountPlate
       );
 
@@ -231,12 +248,26 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
       : this.generateAddresses(
         byronPlate == null
           ? intl.formatMessage(messages.walletRestoreVerifyAddressesLabel)
-          : intl.formatMessage(messages.walletRestoreVerifyShelleyAddressesLabel),
+          : intl.formatMessage(messages.walletRestoreVerifyJormungandrAddressesLabel),
         jormungandrPlate.addresses,
         onCopyAddressTooltip,
         notification,
       );
 
+    const shelleyAddressesElem = shelleyPlate == null
+      ? undefined
+      : this.generateAddresses(
+        intl.formatMessage(messages.walletRestoreVerifyShelleyAddressesLabel),
+        shelleyPlate.addresses,
+        onCopyAddressTooltip,
+        notification,
+      );
+
+    const addressElems: Array<React$Node> = [
+      ...(shelleyAddressesElem != null ? [shelleyAddressesElem] : []),
+      ...(byronAddressesElem != null ? [byronAddressesElem] : []),
+      ...(jormungandrAddressesElem  != null ? [jormungandrAddressesElem] : []),
+    ];
     return (
       <Dialog
         title={intl.formatMessage(messages.dialogTitleVerifyWalletRestoration)}
@@ -252,14 +283,19 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
 
         <DialogTextBlock>
           <CenteredLayout>
+            {shelleyPlateElem}
             {byronPlateElem}
             {jormungandrPlateElem}
           </CenteredLayout>
         </DialogTextBlock>
 
         <DialogTextBlock subclass="component-bottom">
-          {byronAddressesElem}<br />
-          {jormungandrAddressesElem}
+          {addressElems.map((elem, i) => {
+            if (i === 0) {
+              return <>{elem}</>;
+            }
+            return <><br />{elem}</>;
+          })}
         </DialogTextBlock>
 
         <div className={styles.postCopyMargin} />

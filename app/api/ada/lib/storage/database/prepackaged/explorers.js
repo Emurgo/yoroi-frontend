@@ -47,12 +47,23 @@ const ByronExplorers: Array<$ReadOnly<ExplorerRow>> = [
   {
     ExplorerId: 1_04,
     NetworkId: networks.ByronMainnet.NetworkId,
-    IsBackup: true,
+    IsBackup: false,
     Endpoints: {
       address: 'https://cardanoexplorer.com/address/',
       transaction: 'https://explorer.cardano.org/en/transaction/',
     },
     Name: 'CardanoExplorer',
+  },
+  {
+    ExplorerId: 1_05,
+    NetworkId: networks.ByronMainnet.NetworkId,
+    IsBackup: true,
+    Endpoints: {
+      address: 'https://adapools.org/address/',
+      transaction: 'https://adapools.org/transactions/',
+      pool: 'https://adapools.org/pool/',
+    },
+    Name: 'AdaPools',
   },
 ];
 
@@ -60,7 +71,7 @@ const JormungandrExplorers: Array<$ReadOnly<ExplorerRow>> = [
   {
     ExplorerId: 2_00,
     NetworkId: networks.JormungandrMainnet.NetworkId,
-    IsBackup: false,
+    IsBackup: true,
     Endpoints: {
       address: 'https://adastat.net/address/',
       transaction: 'https://adastat.net/transaction/',
@@ -71,7 +82,7 @@ const JormungandrExplorers: Array<$ReadOnly<ExplorerRow>> = [
   {
     ExplorerId: 2_01,
     NetworkId: networks.JormungandrMainnet.NetworkId,
-    IsBackup: true,
+    IsBackup: false,
     Endpoints: {
       address: 'https://itnexplorer.cardano.org/en/address/',
       transaction: 'https://itnexplorer.cardano.org/en/transaction/',

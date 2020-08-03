@@ -57,7 +57,7 @@ import {
   GetSigningKey,
   GetPublicKey,
   DisplayCutoff,
-  Cip1852PickInternal,
+  Cip1852JormungandrPickInternal,
   Bip44PickInternal,
   GetAllAccounting,
   GetStakingKey,
@@ -69,7 +69,7 @@ import {
 import type { ConceptualWalletSettingsCache } from '../../app/stores/toplevel/WalletSettingsStore';
 import WalletSettingsStore from '../../app/stores/toplevel/WalletSettingsStore';
 import TransactionsStore from '../../app/stores/toplevel/TransactionsStore';
-import DelegationStore from '../../app/stores/jormungandr/DelegationStore';
+import DelegationStore from '../../app/stores/toplevel/DelegationStore';
 import WalletStore from '../../app/stores/toplevel/WalletStore';
 import AdaTimeStore from '../../app/stores/ada/AdaTimeStore';
 import CachedRequest from '../../app/stores/lib/LocalizedCachedRequest';
@@ -179,6 +179,14 @@ export function getMnemonicCases(length: number): {|
   Invalid: string,
   Correct: string,
 |} {
+  if (length === 24) {
+    return {
+      Empty: '',
+      Partial: 'lamp',
+      Invalid: 'lamp lamp lamp lamp lamp lamp lamp lamp lamp lamp lamp lamp lamp lamp lamp lamp lamp lamp lamp lamp lamp lamp lamp lamp',
+      Correct: 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art',
+    };
+  }
   if (length === 21) {
     return {
       Empty: '',
@@ -204,6 +212,12 @@ export function getValidationMnemonicCases(length: number): {|
   Invalid: string,
   Correct: string,
 |} {
+  if (length === 24) {
+    return {
+      ...getMnemonicCases(24),
+      Incorrect: 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon share',
+    };
+  }
   if (length === 21) {
     return {
       ...getMnemonicCases(21),
@@ -468,7 +482,7 @@ function genSigningWallet(
     null,
     null,
   );
-  const clazz = HasUtxoChains(Cip1852PickInternal(GetStakingKey(GetAllAccounting(
+  const clazz = HasUtxoChains(Cip1852JormungandrPickInternal(GetStakingKey(GetAllAccounting(
     DisplayCutoff(GetSigningKey(GetPublicKey(
       GetAllUtxos(HasLevels(HasSign(HasPrivateDeriver((PublicDeriver: any)))))
     )))

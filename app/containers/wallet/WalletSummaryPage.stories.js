@@ -40,7 +40,7 @@ import { TxStatusCodes } from '../../api/ada/lib/storage/database/primitives/enu
 import { assuranceModes, } from '../../config/transactionAssuranceConfig';
 import WalletSettingsStore from '../../stores/toplevel/WalletSettingsStore';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
-import { getPriceKey } from '../../api/ada/lib/storage/bridge/prices';
+import { getPriceKey } from '../../api/common/lib/storage/bridge/prices';
 import { createDebugWalletDialog } from './dialogs/DebugWalletDialogContainer';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import {

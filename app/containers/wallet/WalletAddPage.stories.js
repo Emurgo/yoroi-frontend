@@ -479,7 +479,10 @@ const restoreWalletProps: {|
       recoveryResult: request.recoveryResult,
       isValidMnemonic: (isValidRequest) => {
         const { mnemonic, numberOfWords } = isValidRequest;
-        if (isValidRequest.mode === RestoreMode.REGULAR) {
+        if (
+          (isValidRequest.mode === RestoreMode.REGULAR_15) ||
+          (isValidRequest.mode === RestoreMode.REGULAR_24)
+        ) {
           return AdaApi.isValidMnemonic({ mnemonic, numberOfWords });
         }
         return AdaApi.prototype.isValidPaperMnemonic({ mnemonic, numberOfWords });
@@ -555,13 +558,14 @@ export const RestoreOptions = (): Node => {
 
 export const RestoreWalletStart = (): Node => {
   const restoreMode = Object.freeze({
-    Regular: 0,
+    REGULAR_15: 0,
+    REGULAR_24: 0,
     Paper: 1,
   });
   const getRestoreMode = () => select(
     'restoreMode',
     restoreMode,
-    restoreMode.Regular
+    restoreMode.REGULAR_15
   );
   const nameCases = getWalletNameCases();
   const password = getPasswordCreationCases();
@@ -580,7 +584,11 @@ export const RestoreWalletStart = (): Node => {
             step: RestoreSteps.START,
             walletRestoreMeta: {
               recoveryPhrase: (() => {
-                if (getRestoreMode() === restoreMode.Regular) {
+                if (getRestoreMode() === restoreMode.REGULAR_24) {
+                  const cases = getMnemonicCases(24);
+                  return select('regularRecoveryPhrase', cases, cases.Empty);
+                }
+                if (getRestoreMode() === restoreMode.REGULAR_15) {
                   const cases = getMnemonicCases(15);
                   return select('regularRecoveryPhrase', cases, cases.Empty);
                 }
@@ -616,7 +624,7 @@ export const RestoreVerify = (): Node => {
   const recoveryPhrase = creationRecoveryPhrase.join(' ');
   const rootPk = generateWalletRootKey(recoveryPhrase);
   const selectedNetwork = networks.ByronMainnet;
-  const { byronPlate, jormungandrPlate } = generatePlates(
+  const { byronPlate, shelleyPlate, jormungandrPlate } = generatePlates(
     rootPk,
     0, // 0th account
     getRestoreMode(),
@@ -641,6 +649,7 @@ export const RestoreVerify = (): Node => {
               phrase: recoveryPhrase,
               byronPlate,
               jormungandrPlate,
+              shelleyPlate,
             },
           })
         },

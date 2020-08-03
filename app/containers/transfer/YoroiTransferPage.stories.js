@@ -17,8 +17,8 @@ import { defaultToSelectedExplorer } from '../../domain/SelectedExplorer';
 import { ROUTES } from '../../routes-config';
 import YoroiTransferPage from './YoroiTransferPage';
 import type { MockYoroiTransferStore } from './YoroiTransferPage';
-import { TransferKind, TransferStatus, } from '../../types/TransferTypes';
-import type { TransferKindType } from '../../types/TransferTypes';
+import { TransferKind, TransferSource, TransferStatus, } from '../../types/TransferTypes';
+import type { TransferKindType, TransferSourceType } from '../../types/TransferTypes';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import {
   GenerateTransferTxError,
@@ -47,6 +47,7 @@ const genBaseProps: {|
     ...InexactSubset<MockYoroiTransferStore>,
   |},
   transferKind?: TransferKindType,
+  transferSource?: TransferSourceType,
   openDialog?: boolean,
 |} => * = (request) => ({
   stores: {
@@ -61,7 +62,11 @@ const genBaseProps: {|
       selectedAccount: 0 + HARD_DERIVATION_START,
       isValidMnemonic: (isValidRequest) => {
         const { mnemonic, numberOfWords } = isValidRequest;
-        if (isValidRequest.mode === RestoreMode.REGULAR) {
+
+        if (
+          (isValidRequest.mode === RestoreMode.REGULAR_15) ||
+          (isValidRequest.mode === RestoreMode.REGULAR_24)
+        ) {
           return AdaApi.isValidMnemonic({ mnemonic, numberOfWords });
         }
         return AdaApi.prototype.isValidPaperMnemonic({ mnemonic, numberOfWords });
@@ -119,6 +124,9 @@ const genBaseProps: {|
           transferKind: request.transferKind == null
             ? TransferKind.NORMAL
             : request.transferKind,
+          transferSource: request.transferSource == null
+            ? TransferSource.BYRON
+            : request.transferSource,
           recoveryPhrase: request.yoroiTransfer.recoveryPhrase == null
             ? ''
             : request.yoroiTransfer.recoveryPhrase,
