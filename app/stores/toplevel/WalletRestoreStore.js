@@ -15,6 +15,7 @@ import {
 } from '../../api/ada/lib/cardanoCrypto/paperWallet';
 import {
   generateByronPlate,
+  generateShelleyPlate,
 } from '../../api/ada/lib/cardanoCrypto/plate';
 import {
   generateJormungandrPlate,
@@ -58,6 +59,7 @@ export default class AdaWalletRestoreStore extends Store {
 
   @observable recoveryResult: void | {|
     phrase: string,
+    shelleyPlate: void | PlateResponse,
     byronPlate: void | PlateResponse,
     jormungandrPlate: void | PlateResponse,
   |};
@@ -114,7 +116,7 @@ export default class AdaWalletRestoreStore extends Store {
     const rootPk = generateWalletRootKey(resolvedRecoveryPhrase);
     const { selectedNetwork } = this.stores.profile;
     if (selectedNetwork == null) throw new Error(`${nameof(this._processRestoreMeta)} no network selected`);
-    const { byronPlate, jormungandrPlate } = generatePlates(
+    const { byronPlate, shelleyPlate, jormungandrPlate } = generatePlates(
       rootPk,
       this.selectedAccount,
       this.mode,
@@ -126,6 +128,7 @@ export default class AdaWalletRestoreStore extends Store {
         phrase: resolvedRecoveryPhrase,
         byronPlate,
         jormungandrPlate,
+        shelleyPlate,
       };
     });
   }
@@ -175,16 +178,20 @@ export function generatePlates(
   network: $ReadOnly<NetworkRow>,
 ): {|
   byronPlate: void | PlateResponse,
+  shelleyPlate: void | PlateResponse,
   jormungandrPlate: void | PlateResponse,
 |} {
   const addressCount = mode === RestoreMode.PAPER
     ? NUMBER_OF_VERIFIED_ADDRESSES_PAPER
     : NUMBER_OF_VERIFIED_ADDRESSES;
 
-  const byronPlate = (isCardanoHaskell(network) || isJormungandr(network))
+  const byronPlate = (mode === RestoreMode.REGULAR_15 || mode === RestoreMode.PAPER) && (
+    isCardanoHaskell(network) ||
+    isJormungandr(network)
+  )
     ? generateByronPlate(
       rootPk,
-      accountIndex - HARD_DERIVATION_START, // show addresses for account #0
+      accountIndex - HARD_DERIVATION_START,
       addressCount,
       (() => {
         if (network.BaseConfig[0].ByronNetworkId != null) {
@@ -194,20 +201,40 @@ export function generatePlates(
       })()
     )
     : undefined;
+
+  const shelleyPlate = (
+    isCardanoHaskell(network) &&
+    !isJormungandr(network) &&
+    // TODO: needs to be change to "is cip1852" instead.
+    mode === RestoreMode.REGULAR_24
+  )
+    ? generateShelleyPlate(
+      rootPk,
+      accountIndex - HARD_DERIVATION_START,
+      addressCount,
+      (() => {
+        if (network.BaseConfig[0].ChainNetworkId != null) {
+          return Number.parseInt(network.BaseConfig[0].ChainNetworkId, 10);
+        }
+        throw new Error(`${nameof(generatePlates)} missing chain network id`);
+      })()
+    )
+    : undefined;
   // TODO: we disable shelley restoration information for paper wallet restoration
   // this is because we've temporarily disabled paper wallet creation for Shelley
   // so no point in showing the Shelley checksum
-  const jormungandrPlate = !isJormungandr(network) || mode === RestoreMode.PAPER
-    ? undefined
-    : generateJormungandrPlate(
+  const jormungandrPlate = isJormungandr(network) && mode === RestoreMode.REGULAR_15
+    ? generateJormungandrPlate(
       v4Bip32PrivateToV3(rootPk),
-      accountIndex - HARD_DERIVATION_START, // show addresses for account #0
+      accountIndex - HARD_DERIVATION_START,
       addressCount,
       environment.getDiscriminant(),
-    );
+    )
+    : undefined;
 
   return {
     byronPlate,
+    shelleyPlate,
     jormungandrPlate,
   };
 }

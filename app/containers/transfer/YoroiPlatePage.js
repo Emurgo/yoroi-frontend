@@ -12,11 +12,11 @@ import {
   generateWalletRootKey,
 } from '../../api/ada/lib/cardanoCrypto/cryptoWallet';
 import type { PlateResponse } from '../../api/common/lib/crypto/plate';
-import { TransferKind } from '../../types/TransferTypes';
+import { TransferKind, TransferSource } from '../../types/TransferTypes';
 import { generatePlates } from '../../stores/toplevel/WalletRestoreStore';
 import { RestoreMode } from '../../actions/common/wallet-restore-actions';
 import { SelectedExplorer } from '../../domain/SelectedExplorer';
-import type { TransferKindType, } from '../../types/TransferTypes';
+import type { TransferKindType, TransferSourceType, } from '../../types/TransferTypes';
 import type { Notification } from '../../types/notificationType';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 
@@ -31,6 +31,7 @@ type Props = {|
 type WalletRestoreDialogContainerState = {|
   byronPlate: void | PlateResponse,
   jormungandrPlate: void | PlateResponse,
+  shelleyPlate: void | PlateResponse,
 |}
 
 @observer
@@ -43,30 +44,35 @@ export default class YoroiPlatePage extends Component<Props> {
       ? generateLedgerWalletRootKey(yoroiTransfer.recoveryPhrase)
       : generateWalletRootKey(yoroiTransfer.recoveryPhrase);
 
-    // const transferKind = () => {
-    //   return switch(yoroiTransfer.transferKind) {
-    //     case (TransferKind.PAPER): {
-
-    //     }
-    //     case (): {
-
-    //     }
-
-    //   }
-    // }
-
-    const { byronPlate, jormungandrPlate } = generatePlates(
+    const getRestoreMode = () => {
+      if (yoroiTransfer.transferKind === TransferKind.PAPER) {
+        return RestoreMode.PAPER;
+      }
+      if (yoroiTransfer.transferSource === TransferSource.BYRON) {
+        return RestoreMode.REGULAR_15;
+      }
+      if (yoroiTransfer.transferSource === TransferSource.JORMUNGANDR_UTXO) {
+        return RestoreMode.REGULAR_15;
+      }
+      if (yoroiTransfer.transferSource === TransferSource.JORMUNGANDR_CHIMERIC_ACCOUNT) {
+        return RestoreMode.REGULAR_15;
+      }
+      if (yoroiTransfer.transferSource === TransferSource.SHELLEY) {
+        return RestoreMode.REGULAR_24;
+      }
+      throw new Error(`${nameof(YoroiPlatePage)} unknown mode`);
+    };
+    const { byronPlate, shelleyPlate, jormungandrPlate } = generatePlates(
       rootPk,
       this.props.accountIndex,
-      yoroiTransfer.transferKind === TransferKind.PAPER
-        ? RestoreMode.PAPER
-        : RestoreMode.REGULAR_15,
+      getRestoreMode(),
       this.getSelectedNetwork(),
     );
     runInAction(() => {
       this.plates = {
         byronPlate,
         jormungandrPlate,
+        shelleyPlate,
       };
     });
   }
@@ -92,9 +98,10 @@ export default class YoroiPlatePage extends Component<Props> {
       duration: config.wallets.ADDRESS_COPY_TOOLTIP_NOTIFICATION_DURATION,
       message: globalMessages.copyTooltipMessage,
     };
-    const { byronPlate, jormungandrPlate } = this.plates;
+    const { byronPlate, shelleyPlate, jormungandrPlate } = this.plates;
     return (
       <WalletRestoreVerifyDialog
+        shelleyPlate={shelleyPlate}
         byronPlate={byronPlate}
         jormungandrPlate={jormungandrPlate}
         selectedExplorer={this.generated.stores.explorers.selectedExplorer
@@ -138,7 +145,8 @@ export default class YoroiPlatePage extends Component<Props> {
       |},
       yoroiTransfer: {|
         recoveryPhrase: string,
-        transferKind: TransferKindType
+        transferKind: TransferKindType,
+        transferSource: TransferSourceType
       |},
       uiNotifications: {|
         getTooltipActiveNotification: string => ?Notification,
@@ -167,6 +175,7 @@ export default class YoroiPlatePage extends Component<Props> {
         },
         yoroiTransfer: {
           transferKind: stores.yoroiTransfer.transferKind,
+          transferSource: stores.yoroiTransfer.transferSource,
           recoveryPhrase: stores.yoroiTransfer.recoveryPhrase,
         },
       },

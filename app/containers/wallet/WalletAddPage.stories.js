@@ -624,7 +624,7 @@ export const RestoreVerify = (): Node => {
   const recoveryPhrase = creationRecoveryPhrase.join(' ');
   const rootPk = generateWalletRootKey(recoveryPhrase);
   const selectedNetwork = networks.ByronMainnet;
-  const { byronPlate, jormungandrPlate } = generatePlates(
+  const { byronPlate, shelleyPlate, jormungandrPlate } = generatePlates(
     rootPk,
     0, // 0th account
     getRestoreMode(),
@@ -649,6 +649,7 @@ export const RestoreVerify = (): Node => {
               phrase: recoveryPhrase,
               byronPlate,
               jormungandrPlate,
+              shelleyPlate,
             },
           })
         },

@@ -893,6 +893,53 @@ export const Bip44PickInternal: * = Mixin<
   IPickInternal
 >(Bip44PickInternalMixin);
 
+// ==================================
+//   Cip1852JormungandrPickInternal
+// ==================================
+
+type Cip1852JormungandrPickInternalMixinDependencies = IPublicDeriver<> & IGetStakingKey;
+const Cip1852JormungandrPickInternalMixin = (
+  superclass: Class<Cip1852JormungandrPickInternalMixinDependencies>,
+) => (class Cip1852JormungandrPickInternal extends superclass implements IPickInternal {
+  rawPickInternal: (
+    lf$Transaction,
+    {|
+      GetPathWithSpecific: Class<GetPathWithSpecific>,
+      GetAddress: Class<GetAddress>,
+      GetDerivationSpecific: Class<GetDerivationSpecific>,
+    |},
+    IPickInternalRequest,
+    Map<number, string>,
+  ) => Promise<IPickInternalResponse> = async (
+    tx,
+    deps,
+    body,
+    derivationTables,
+  ) => {
+    const stakingAddressDbRow = await this.rawGetStakingKey(
+      tx,
+      deps,
+      undefined,
+      derivationTables
+    );
+
+    const stakingKey = Buffer.from(unwrapJormungandrStakingKey(stakingAddressDbRow.addr.Hash).as_bytes()).toString('hex');
+    const ourGroupAddress = body.addrs
+      .filter(addr => (addr.Type === CoreAddressTypes.JORMUNGANDR_GROUP))
+      .filter(addr => addr.Hash.includes(stakingKey));
+    if (ourGroupAddress.length !== 1) throw new Error(`${nameof(Cip1852JormungandrPickInternal)}::${nameof(this.rawPickInternal)} no group address found`);
+    return {
+      addr: ourGroupAddress[0],
+      row: body.row,
+      addressing: body.addressing,
+    };
+  }
+});
+export const Cip1852JormungandrPickInternal: * = Mixin<
+  Cip1852JormungandrPickInternalMixinDependencies,
+  IPickInternal
+>(Cip1852JormungandrPickInternalMixin);
+
 // =======================
 //   Cip1852PickInternal
 // =======================
@@ -923,24 +970,17 @@ const Cip1852PickInternalMixin = (
       derivationTables
     );
 
-    const stakingKey = (() => {
-      if (isCardanoHaskell(this.getParent().getNetworkInfo())) {
-        return Buffer.from(unwrapCardanoStakingKey(stakingAddressDbRow.addr.Hash).to_bytes()).toString('hex');
-      }
-      if (isJormungandr(this.getParent().getNetworkInfo())) {
-        return Buffer.from(unwrapJormungandrStakingKey(stakingAddressDbRow.addr.Hash).as_bytes()).toString('hex');
-      }
-      throw new Error(`${nameof(Cip1852PickInternal)}::${nameof(this.rawPickInternal)} don't know how to pick for this network`);
-    })();
-    const ourGroupAddress = body.addrs
-      .filter(addr => (
-        addr.Type === CoreAddressTypes.JORMUNGANDR_GROUP ||
-        addr.Type === CoreAddressTypes.CARDANO_REWARD
-      ))
+    const keyHash = unwrapCardanoStakingKey(stakingAddressDbRow.addr.Hash).to_keyhash();
+    if (keyHash == null) {
+      throw new Error(`${nameof(Cip1852PickInternal)}::${nameof(this.rawPickInternal)} internal address is a script`);
+    }
+    const stakingKey = Buffer.from(keyHash.to_bytes()).toString('hex');
+    const ourBaseAddress = body.addrs
+      .filter(addr => addr.Type === CoreAddressTypes.CARDANO_BASE)
       .filter(addr => addr.Hash.includes(stakingKey));
-    if (ourGroupAddress.length !== 1) throw new Error(`${nameof(Cip1852PickInternal)}::${nameof(this.rawPickInternal)} no group address found`);
+    if (ourBaseAddress.length !== 1) throw new Error(`${nameof(Cip1852PickInternal)}::${nameof(this.rawPickInternal)} no base address found`);
     return {
-      addr: ourGroupAddress[0],
+      addr: ourBaseAddress[0],
       row: body.row,
       addressing: body.addressing,
     };
@@ -2217,7 +2257,14 @@ export async function addTraitsForCip1852Child(
   if (conceptualWallet.getPublicDeriverLevel() === Bip44DerivationLevels.ACCOUNT.level) {
     currClass = DisplayCutoff(currClass);
 
-    currClass = HasUtxoChains(Cip1852PickInternal(currClass));
+    if (isJormungandr(conceptualWallet.getNetworkInfo())) {
+      currClass = Cip1852JormungandrPickInternal(currClass);
+    } else if (isCardanoHaskell(conceptualWallet.getNetworkInfo())) {
+      currClass = Cip1852PickInternal(currClass);
+    } else {
+      throw new Error(`${nameof(addTraitsForCip1852Child)} don't know how to pick internal`);
+    }
+    currClass = HasUtxoChains(currClass);
     if (publicKey !== null) {
       currClass = GetPublicKey(currClass);
       if (isJormungandr(conceptualWallet.getNetworkInfo())) {
