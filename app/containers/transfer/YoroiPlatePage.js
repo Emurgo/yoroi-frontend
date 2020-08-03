@@ -14,7 +14,6 @@ import {
 import type { PlateResponse } from '../../api/common/lib/crypto/plate';
 import { TransferKind, TransferSource } from '../../types/TransferTypes';
 import { generatePlates } from '../../stores/toplevel/WalletRestoreStore';
-import { RestoreMode } from '../../actions/common/wallet-restore-actions';
 import { SelectedExplorer } from '../../domain/SelectedExplorer';
 import type { TransferKindType, TransferSourceType, } from '../../types/TransferTypes';
 import type { Notification } from '../../types/notificationType';
@@ -46,19 +45,19 @@ export default class YoroiPlatePage extends Component<Props> {
 
     const getRestoreMode = () => {
       if (yoroiTransfer.transferKind === TransferKind.PAPER) {
-        return RestoreMode.PAPER;
+        return { type: 'bip44', extra: 'paper', length: 21 };
       }
       if (yoroiTransfer.transferSource === TransferSource.BYRON) {
-        return RestoreMode.REGULAR_15;
+        return { type: 'bip44', extra: undefined, length: 15 };
       }
       if (yoroiTransfer.transferSource === TransferSource.JORMUNGANDR_UTXO) {
-        return RestoreMode.REGULAR_15;
+        return { type: 'cip1852', extra: undefined, length: 15 };
       }
       if (yoroiTransfer.transferSource === TransferSource.JORMUNGANDR_CHIMERIC_ACCOUNT) {
-        return RestoreMode.REGULAR_15;
+        return { type: 'cip1852', extra: undefined, length: 15 };
       }
       if (yoroiTransfer.transferSource === TransferSource.SHELLEY) {
-        return RestoreMode.REGULAR_24;
+        return { type: 'cip1852', extra: undefined, length: 15 };
       }
       throw new Error(`${nameof(YoroiPlatePage)} unknown mode`);
     };

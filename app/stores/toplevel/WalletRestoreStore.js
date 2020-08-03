@@ -8,7 +8,6 @@ import type {
   WalletRestoreMeta,
   RestoreModeType,
 } from '../../actions/common/wallet-restore-actions';
-import { RestoreMode } from '../../actions/common/wallet-restore-actions';
 import type { PlateResponse } from '../../api/common/lib/crypto/plate';
 import {
   unscramblePaperAdaMnemonic,
@@ -26,7 +25,6 @@ import {
 import {
   v4Bip32PrivateToV3,
 } from '../../api/jormungandr/lib/crypto/utils';
-import { getWordsCount } from '../stateless/modeInfo';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import {
   generateWalletRootKey,
@@ -55,7 +53,7 @@ export default class AdaWalletRestoreStore extends Store {
   // only to handle the back button
   @observable walletRestoreMeta: void | WalletRestoreMeta;
 
-  @observable mode: RestoreModeType;
+  @observable mode: void | RestoreModeType;
 
   @observable recoveryResult: void | {|
     phrase: string,
@@ -91,16 +89,16 @@ export default class AdaWalletRestoreStore extends Store {
     this.walletRestoreMeta = restoreMeta;
     this.step = RestoreSteps.VERIFY_MNEMONIC;
 
-    const wordCount = getWordsCount(this.mode);
-
     let resolvedRecoveryPhrase = restoreMeta.recoveryPhrase;
 
-    if (this.mode === RestoreMode.UNSET) {
+    if (this.mode === undefined) {
       throw new Error(
         `${nameof(this._processRestoreMeta)} ${nameof(this.mode)} unset`
       );
     }
-    if (this.mode === RestoreMode.PAPER) {
+    const mode = this.mode;
+    const wordCount = mode.length;
+    if (mode.type === 'byron-paper') {
       const [newPhrase] = unscramblePaperAdaMnemonic(
         restoreMeta.recoveryPhrase,
         wordCount,
@@ -119,7 +117,7 @@ export default class AdaWalletRestoreStore extends Store {
     const { byronPlate, shelleyPlate, jormungandrPlate } = generatePlates(
       rootPk,
       this.selectedAccount,
-      this.mode,
+      mode,
       selectedNetwork,
     );
 
@@ -152,7 +150,7 @@ export default class AdaWalletRestoreStore extends Store {
 
   @action.bound
   reset(): void {
-    this.mode = RestoreMode.UNSET;
+    this.mode = undefined;
     this.step = RestoreSteps.START;
     this.walletRestoreMeta = undefined;
     this.recoveryResult = undefined;
@@ -161,8 +159,7 @@ export default class AdaWalletRestoreStore extends Store {
 
   isValidMnemonic: {|
     mnemonic: string,
-    numberOfWords: number,
-    mode: $PropertyType<typeof RestoreMode, 'REGULAR_15'> | $PropertyType<typeof RestoreMode, 'REGULAR_24'> | $PropertyType<typeof RestoreMode, 'PAPER'>,
+    mode: RestoreModeType,
   |} => boolean = request => {
     const { selectedNetwork } = this.stores.profile;
     if (selectedNetwork == null) throw new Error(`${nameof(this.isValidMnemonic)} no API selected`);
@@ -181,14 +178,21 @@ export function generatePlates(
   shelleyPlate: void | PlateResponse,
   jormungandrPlate: void | PlateResponse,
 |} {
-  const addressCount = mode === RestoreMode.PAPER
+  if (mode == null) throw new Error(`${nameof(generatePlates)} restore mode unset`);
+  const addressCount = mode.extra === 'paper'
     ? NUMBER_OF_VERIFIED_ADDRESSES_PAPER
     : NUMBER_OF_VERIFIED_ADDRESSES;
 
-  const byronPlate = (mode === RestoreMode.REGULAR_15 || mode === RestoreMode.PAPER) && (
-    isCardanoHaskell(network) ||
-    isJormungandr(network)
-  )
+  const shouldShowByronPlate = () => {
+    if (isCardanoHaskell(network) && mode.length === 15) {
+      return true;
+    }
+    if (isJormungandr(network)) {
+      return true;
+    }
+    return false;
+  };
+  const byronPlate = shouldShowByronPlate()
     ? generateByronPlate(
       rootPk,
       accountIndex - HARD_DERIVATION_START,
@@ -205,8 +209,7 @@ export function generatePlates(
   const shelleyPlate = (
     isCardanoHaskell(network) &&
     !isJormungandr(network) &&
-    // TODO: needs to be change to "is cip1852" instead.
-    mode === RestoreMode.REGULAR_24
+    mode.type === 'cip1852'
   )
     ? generateShelleyPlate(
       rootPk,
@@ -220,10 +223,32 @@ export function generatePlates(
       })()
     )
     : undefined;
-  // TODO: we disable shelley restoration information for paper wallet restoration
-  // this is because we've temporarily disabled paper wallet creation for Shelley
-  // so no point in showing the Shelley checksum
-  const jormungandrPlate = isJormungandr(network) && mode === RestoreMode.REGULAR_15
+
+  const shouldShowJormungandrPlate = () => {
+    // TODO: we disable shelley restoration information for paper wallet restoration
+    // this is because we've temporarily disabled paper wallet creation for Shelley
+    // so no point in showing the Shelley checksum
+    if (mode.extra === 'paper') {
+      return false;
+    }
+
+    if (
+      isJormungandr(network) &&
+      mode.type === 'cip1852'
+    ) {
+      return true;
+    }
+    if (
+      isCardanoHaskell(network) &&
+      mode.type === 'cip1852' &&
+      mode.length === 15
+    ) {
+      return true;
+    }
+
+    return false;
+  };
+  const jormungandrPlate = shouldShowJormungandrPlate()
     ? generateJormungandrPlate(
       v4Bip32PrivateToV3(rootPk),
       accountIndex - HARD_DERIVATION_START,

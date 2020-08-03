@@ -32,7 +32,6 @@ import { defaultToSelectedExplorer } from '../../domain/SelectedExplorer';
 import { StepState } from '../../components/widgets/ProgressSteps';
 import { ProgressStep } from '../../types/HWConnectStoreTypes';
 import { RestoreSteps, generatePlates } from '../../stores/toplevel/WalletRestoreStore';
-import { RestoreMode } from '../../actions/common/wallet-restore-actions';
 import WalletCreateDialog from '../../components/wallet/WalletCreateDialog';
 import WalletBackupDialog from '../../components/wallet/WalletBackupDialog';
 import WalletRestoreDialog from '../../components/wallet/WalletRestoreDialog';
@@ -478,14 +477,11 @@ const restoreWalletProps: {|
       walletRestoreMeta: request.walletRestoreMeta,
       recoveryResult: request.recoveryResult,
       isValidMnemonic: (isValidRequest) => {
-        const { mnemonic, numberOfWords } = isValidRequest;
-        if (
-          (isValidRequest.mode === RestoreMode.REGULAR_15) ||
-          (isValidRequest.mode === RestoreMode.REGULAR_24)
-        ) {
-          return AdaApi.isValidMnemonic({ mnemonic, numberOfWords });
+        const { mnemonic, mode } = isValidRequest;
+        if (isValidRequest.mode.extra === 'paper') {
+          return AdaApi.prototype.isValidPaperMnemonic({ mnemonic, numberOfWords: mode.length  });
         }
-        return AdaApi.prototype.isValidPaperMnemonic({ mnemonic, numberOfWords });
+        return AdaApi.isValidMnemonic({ mnemonic, numberOfWords: mode.length  });
       },
     },
     yoroiTransfer: {
@@ -600,7 +596,7 @@ export const RestoreWalletStart = (): Node => {
               })(),
               walletName: select('walletName', nameCases, nameCases.None),
               walletPassword: select('walletPassword', password, password.Empty),
-              paperPassword: getRestoreMode() === RestoreMode.PAPER
+              paperPassword: getRestoreMode().extra === 'paper'
                 ? select('paperPassword', paperPassword, paperPassword.Empty)
                 : '',
             },

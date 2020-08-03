@@ -16,7 +16,6 @@ import {
   NoInputsError,
 } from '../../../api/common/errors';
 import type { RestoreModeType, WalletRestoreMeta } from '../../../actions/common/wallet-restore-actions';
-import { RestoreMode } from '../../../actions/common/wallet-restore-actions';
 import { RestoreSteps } from '../../../stores/toplevel/WalletRestoreStore';
 import { defineMessages, intlShape } from 'react-intl';
 import YoroiTransferWaitingPage from '../../transfer/YoroiTransferWaitingPage';
@@ -37,7 +36,6 @@ import type {
   NetworkRow,
 } from '../../../api/ada/lib/storage/database/primitives/tables';
 import { isJormungandr } from '../../../api/ada/lib/storage/database/prepackaged/networks';
-import { isPaperMode, getWordsCount } from '../../../stores/stateless/modeInfo';
 
 const messages = defineMessages({
   walletUpgradeNoop: {
@@ -105,8 +103,8 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
     const { restoreRequest } = wallets;
 
     const mode = this.props.mode;
-    const isPaper = isPaperMode(this.props.mode);
-    const wordsCount = getWordsCount(this.props.mode);
+    const isPaper = mode.extra === 'paper';
+    const wordsCount = mode.length;
 
     const tooltipNotification = {
       duration: config.wallets.ADDRESS_COPY_TOOLTIP_NOTIFICATION_DURATION,
@@ -119,7 +117,6 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
           mnemonicValidator={mnemonic => (
             this.generated.stores.walletRestore.isValidMnemonic({
               mnemonic,
-              numberOfWords: wordsCount,
               mode,
             })
           )}
@@ -344,8 +341,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
         walletRestoreMeta: void | WalletRestoreMeta,
         isValidMnemonic: ({|
           mnemonic: string,
-          numberOfWords: number,
-          mode: $PropertyType<typeof RestoreMode, 'REGULAR_15'> | $PropertyType<typeof RestoreMode, 'REGULAR_24'> | $PropertyType<typeof RestoreMode, 'PAPER'>,
+          mode: RestoreModeType,
         |}) => boolean,
       |},
       yoroiTransfer: {|

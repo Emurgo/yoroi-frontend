@@ -7,7 +7,6 @@ import {
   stringifyError
 } from '../../utils/logging';
 import Request from '../lib/LocalizedRequest';
-import { RestoreMode } from '../../actions/common/wallet-restore-actions';
 import type {
   GenerateWalletRecoveryPhraseFunc
 } from '../../api/ada/index';

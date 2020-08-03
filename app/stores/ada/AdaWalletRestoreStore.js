@@ -3,7 +3,7 @@
 import { action, runInAction, } from 'mobx';
 import Store from '../base/Store';
 
-import { RestoreMode } from '../../actions/common/wallet-restore-actions';
+import type { RestoreModeType } from '../../actions/common/wallet-restore-actions';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { TransferSource } from '../../types/TransferTypes';
 import {
@@ -137,22 +137,11 @@ export default class AdaWalletRestoreStore extends Store {
     const { selectedNetwork } = this.stores.profile;
     if (selectedNetwork == null) throw new Error(`${nameof(this._restoreToDb)} no network selected`);
 
-    const walletType = (() => {
-      const { mode } = this.stores.walletRestore;
-      if (mode === RestoreMode.PAPER) {
-        return 'bip44';
-      }
-      if (mode === RestoreMode.REGULAR_15) {
-        return 'bip44'; // TODO: it's more complicated than this
-      }
-      if (mode === RestoreMode.REGULAR_24) {
-        return 'cip1852';
-      }
-      throw new Error(`${nameof(this._restoreToDb)} Unknown restoration type`);
-    })();
+    const { mode } = this.stores.walletRestore;
+    if (mode == null) throw new Error(`${nameof(this._restoreToDb)} Unknown restoration type`);
     await this.stores.wallets.restoreRequest.execute(async () => {
       const wallet = await this.api.ada.restoreWallet({
-        mode: walletType,
+        mode: mode.type,
         db: persistentDb,
         recoveryPhrase: phrase,
         walletName,
@@ -178,16 +167,15 @@ export default class AdaWalletRestoreStore extends Store {
 
   isValidMnemonic: {|
     mnemonic: string,
-    numberOfWords: number,
-    mode: $PropertyType<typeof RestoreMode, 'REGULAR_15'> | $PropertyType<typeof RestoreMode, 'REGULAR_24'> | $PropertyType<typeof RestoreMode, 'PAPER'>,
+    mode: RestoreModeType,
   |} => boolean = request => {
-    const { mnemonic, numberOfWords } = request;
-    if (request.mode === RestoreMode.PAPER) {
-      return this.api.ada.isValidPaperMnemonic({ mnemonic, numberOfWords });
+    const { mnemonic } = request;
+    if (request.mode.extra === 'paper') {
+      return this.api.ada.isValidPaperMnemonic({ mnemonic, numberOfWords: request.mode.length });
     }
-    if (request.mode === RestoreMode.REGULAR_15 || request.mode === RestoreMode.REGULAR_24) {
-      return this.api.ada.constructor.isValidMnemonic({ mnemonic, numberOfWords });
-    }
-    throw new Error(`${nameof(this.isValidMnemonic)} unexpected mode ${request.mode}`);
+    return this.api.ada.constructor.isValidMnemonic({
+      mnemonic,
+      numberOfWords: request.mode.length
+    });
   }
 }
