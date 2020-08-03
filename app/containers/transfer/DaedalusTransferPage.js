@@ -20,7 +20,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { SelectedExplorer } from '../../domain/SelectedExplorer';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import { RestoreMode } from '../../actions/common/wallet-restore-actions';
+import type { RestoreModeType } from '../../actions/common/wallet-restore-actions';
 import { formattedWalletAmount } from '../../utils/formatters';
 import { ROUTES } from '../../routes-config';
 import { ApiOptions, getApiForNetwork, getApiMeta } from '../../api/common/utils';
@@ -140,8 +140,7 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
             onBack={this.backToUninitialized}
             mnemonicValidator={mnemonic => this.generated.stores.walletRestore.isValidMnemonic({
               mnemonic,
-              numberOfWords: config.wallets.DAEDALUS_RECOVERY_PHRASE_WORD_COUNT,
-              mode: RestoreMode.REGULAR_15,
+              mode: { type: 'bip44', extra: undefined, length: config.wallets.DAEDALUS_RECOVERY_PHRASE_WORD_COUNT },
             })}
             validWords={validWords}
             mnemonicLength={config.wallets.DAEDALUS_RECOVERY_PHRASE_WORD_COUNT}
@@ -155,8 +154,7 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
             onBack={this.backToUninitialized}
             mnemonicValidator={mnemonic => this.generated.stores.walletRestore.isValidMnemonic({
               mnemonic,
-              numberOfWords: config.wallets.DAEDALUS_PAPER_RECOVERY_PHRASE_WORD_COUNT,
-              mode: RestoreMode.PAPER,
+              mode: { type: 'bip44', extra: 'paper', length: config.wallets.DAEDALUS_PAPER_RECOVERY_PHRASE_WORD_COUNT },
             })}
             validWords={validWords}
             mnemonicLength={config.wallets.DAEDALUS_PAPER_RECOVERY_PHRASE_WORD_COUNT}
@@ -269,8 +267,7 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
       walletRestore: {|
         isValidMnemonic: ({|
           mnemonic: string,
-          numberOfWords: number,
-          mode: $PropertyType<typeof RestoreMode, 'REGULAR_15'> | $PropertyType<typeof RestoreMode, 'REGULAR_24'>| $PropertyType<typeof RestoreMode, 'PAPER'>,
+          mode: RestoreModeType,
         |}) => boolean,
       |},
       daedalusTransfer: {|

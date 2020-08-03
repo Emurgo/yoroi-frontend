@@ -37,6 +37,7 @@ import type { GeneratedData as WalletTrezorConnectDialogContainerData } from './
 import WalletLedgerConnectDialogContainer from './dialogs/WalletLedgerConnectDialogContainer';
 import type { GeneratedData as WalletLedgerConnectDialogContainerData } from './dialogs/WalletLedgerConnectDialogContainer';
 
+import WalletEraOptionDialogContainer from './dialogs/WalletEraOptionDialogContainer';
 import WalletCreateOptionDialog from '../../components/wallet/add/option-dialog/WalletCreateOptionDialog';
 import WalletCreateOptionDialogContainer from './dialogs/WalletCreateOptionDialogContainer';
 import WalletPaperDialog from '../../components/wallet/WalletPaperDialog';
@@ -54,7 +55,6 @@ import NavBar from '../../components/topbar/NavBar';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
 
 import type { RestoreModeType } from '../../actions/common/wallet-restore-actions';
-import { RestoreMode } from '../../actions/common/wallet-restore-actions';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { getApiForNetwork, ApiOptions } from '../../api/common/utils';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
@@ -62,7 +62,7 @@ import type {
   NetworkRow,
 } from '../../api/ada/lib/storage/database/primitives/tables';
 import {
-  networks, isJormungandr,
+  networks, isJormungandr, isCardanoHaskell,
 } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 export type GeneratedData = typeof WalletAddPage.prototype.generated;
@@ -182,15 +182,22 @@ export default class WalletAddPage extends Component<Props> {
       activeDialog = (
         <WalletRestoreOptionDialogContainer
           onClose={this.onClose}
-          onRestore15={() => actions.dialogs.open.trigger({
-            dialog: WalletRestoreDialog,
-            params: { restoreType: (RestoreMode.REGULAR_15: RestoreModeType)  }
-          })}
+          onRestore15={() => {
+            if (isCardanoHaskell(selectedNetwork)) {
+              return actions.dialogs.open.trigger({
+                dialog: WalletEraOptionDialogContainer,
+              });
+            }
+            return actions.dialogs.open.trigger({
+              dialog: WalletRestoreDialog,
+              params: { restoreType: { type: 'bip44', extra: undefined, length: 15 } }
+            });
+          }}
           onRestore24={isJormungandr(selectedNetwork)
             ? undefined
             : () => actions.dialogs.open.trigger({
               dialog: WalletRestoreDialog,
-              params: { restoreType: (RestoreMode.REGULAR_24: RestoreModeType)  }
+              params: { restoreType: { type: 'cip1852', extra: undefined, length: 24 }  }
             })
           }
           onPaperRestore={
@@ -198,9 +205,29 @@ export default class WalletAddPage extends Component<Props> {
               ? undefined
               : () => actions.dialogs.open.trigger({
                 dialog: WalletRestoreDialog,
-                params: { restoreType: (RestoreMode.PAPER: RestoreModeType)  }
+                params: { restoreType: { type: 'bip44', extra: 'paper', length: 21 }  }
               })
           }
+        />
+      );
+    } else if (uiDialogs.isOpen(WalletEraOptionDialogContainer)) {
+      if (selectedNetwork === undefined) {
+        throw new Error(`${nameof(WalletAddPage)} no API selected`);
+      }
+      activeDialog = (
+        <WalletEraOptionDialogContainer
+          onClose={this.onClose}
+          onByron={() => actions.dialogs.open.trigger({
+            dialog: WalletRestoreDialog,
+            params: { restoreType: { type: 'bip44', extra: undefined, length: 15 }  }
+          })}
+          onShelley={() => actions.dialogs.open.trigger({
+            dialog: WalletRestoreDialog,
+            params: { restoreType: { type: 'cip1852', extra: undefined, length: 15 }  }
+          })}
+          onBack={() => actions.dialogs.open.trigger({
+            dialog: WalletRestoreOptionDialog,
+          })}
         />
       );
     } else if (uiDialogs.isOpen(WalletRestoreDialog)) {

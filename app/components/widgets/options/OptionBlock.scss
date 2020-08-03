@@ -160,9 +160,19 @@
           &.restoreNormalWallet {
             background-image: url(../../../assets/images/add-wallet/option-dialog/restore-normal-wallet-classic.inline.svg);
           }
-        
+          &.normal24WordWallet {
+            background-image: url(../../../assets/images/add-wallet/option-dialog/restore-normal-wallet-classic.inline.svg);
+          }
           &.restorePaperWallet {
             background-image: url(../../../assets/images/add-wallet/option-dialog/restore-paper-wallet-classic.inline.svg);
+          }
+          &.bgByronMainnet {
+            background-image: url(../../../assets/images/claim/byron-mainnet.inline.svg);
+            background-position: center 20px !important;
+          }
+          &.bgShelleyMainnet {
+            background-image: url(../../../assets/images/claim/shelley-mainnet.inline.svg);
+            background-position: center 20px !important;
           }
         }
       }
@@ -211,9 +221,19 @@
           &.restoreNormalWallet {
             background-image: url(../../../assets/images/add-wallet/option-dialog/restore-normal-wallet-modern.inline.svg);
           }
-        
+          &.normal24WordWallet {
+            background-image: url(../../../assets/images/add-wallet/option-dialog/restore-normal-wallet-modern.inline.svg);
+          }
           &.restorePaperWallet {
             background-image: url(../../../assets/images/add-wallet/option-dialog/restore-paper-wallet-modern.inline.svg);
+          }
+          &.bgByronMainnet {
+            background-image: url(../../../assets/images/claim/byron-mainnet.inline.svg);
+            background-position: center 20px !important;
+          }
+          &.bgShelleyMainnet {
+            background-image: url(../../../assets/images/claim/shelley-mainnet.inline.svg);
+            background-position: center 20px !important;
           }
         }
       }

@@ -4,7 +4,7 @@ import { action, runInAction, } from 'mobx';
 import Store from '../base/Store';
 
 import environment from '../../environment';
-import { RestoreMode } from '../../actions/common/wallet-restore-actions';
+import type { RestoreModeType } from '../../actions/common/wallet-restore-actions';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { TransferSource } from '../../types/TransferTypes';
 import {
@@ -154,17 +154,16 @@ export default class JormungandrWalletRestoreStore extends Store {
 
   isValidMnemonic: {|
     mnemonic: string,
-    numberOfWords: number,
-    mode: $PropertyType<typeof RestoreMode, 'REGULAR_15'> | $PropertyType<typeof RestoreMode, 'REGULAR_24'> | $PropertyType<typeof RestoreMode, 'PAPER'>,
+    mode: RestoreModeType,
   |} => boolean = request => {
-    const { mnemonic, numberOfWords } = request;
-    if (request.mode === RestoreMode.PAPER) {
+    const { mnemonic } = request;
+    if (request.mode.extra === 'paper') {
       // note: validate with ADA since Jormungandr doesn't itself use paper wallets
-      return this.api.ada.isValidPaperMnemonic({ mnemonic, numberOfWords });
+      return this.api.ada.isValidPaperMnemonic({ mnemonic, numberOfWords: request.mode.length });
     }
-    if (request.mode === RestoreMode.REGULAR_15) {
-      return this.api.jormungandr.constructor.isValidMnemonic({ mnemonic, numberOfWords });
-    }
-    throw new Error(`${nameof(this.isValidMnemonic)} unexpected mode ${request.mode}`);
+    return this.api.jormungandr.constructor.isValidMnemonic({
+      mnemonic,
+      numberOfWords: request.mode.length
+    });
   }
 }

@@ -30,7 +30,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { GeneratedData as YoroiPlateData } from './YoroiPlatePage';
 import { SelectedExplorer } from '../../domain/SelectedExplorer';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
-import { RestoreMode } from '../../actions/common/wallet-restore-actions';
+import type { RestoreModeType } from '../../actions/common/wallet-restore-actions';
 import { ApiOptions, getApiMeta, getApiForNetwork, } from '../../api/common/utils';
 
 // Stay this long on the success page, then jump to the wallet transactions page
@@ -163,8 +163,7 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
             onBack={this.backToUninitialized}
             mnemonicValidator={mnemonic => this.generated.stores.walletRestore.isValidMnemonic({
               mnemonic,
-              numberOfWords: config.wallets.WALLET_RECOVERY_PHRASE_WORD_COUNT,
-              mode: RestoreMode.REGULAR_15,
+              mode: { type: 'bip44', extra: undefined, length: config.wallets.WALLET_RECOVERY_PHRASE_WORD_COUNT },
             })}
             validWords={validWords}
             mnemonicLength={config.wallets.WALLET_RECOVERY_PHRASE_WORD_COUNT}
@@ -178,8 +177,7 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
             onBack={this.backToUninitialized}
             mnemonicValidator={mnemonic => this.generated.stores.walletRestore.isValidMnemonic({
               mnemonic,
-              numberOfWords: config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT,
-              mode: RestoreMode.PAPER,
+              mode: { type: 'bip44', extra: 'paper', length: config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT },
             })}
             validWords={validWords}
             mnemonicLength={config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT}
@@ -339,8 +337,7 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
         selectedAccount: number,
         isValidMnemonic: ({|
           mnemonic: string,
-          numberOfWords: number,
-          mode: $PropertyType<typeof RestoreMode, 'REGULAR_15'> | $PropertyType<typeof RestoreMode, 'REGULAR_24'> | $PropertyType<typeof RestoreMode, 'PAPER'>,
+          mode: RestoreModeType,
         |}) => boolean,
       |},
       wallets: {|

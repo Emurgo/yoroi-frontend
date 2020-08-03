@@ -29,7 +29,6 @@ import {
   NotEnoughMoneyToSendError,
 } from '../../api/common/errors';
 import AdaApi from '../../api/ada/index';
-import { RestoreMode } from '../../actions/common/wallet-restore-actions';
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -58,14 +57,11 @@ const genBaseProps: {|
     },
     walletRestore: {
       isValidMnemonic: (isValidRequest) => {
-        const { mnemonic, numberOfWords } = isValidRequest;
-        if (
-          (isValidRequest.mode === RestoreMode.REGULAR_15) ||
-          (isValidRequest.mode === RestoreMode.REGULAR_24)
-        ) {
-          return AdaApi.isValidMnemonic({ mnemonic, numberOfWords });
+        const { mnemonic, mode } = isValidRequest;
+        if (isValidRequest.mode.extra === 'paper') {
+          return AdaApi.prototype.isValidPaperMnemonic({ mnemonic, numberOfWords: mode.length });
         }
-        return AdaApi.prototype.isValidPaperMnemonic({ mnemonic, numberOfWords });
+        return AdaApi.isValidMnemonic({ mnemonic, numberOfWords: mode.length  });
       },
     },
     daedalusTransfer: {

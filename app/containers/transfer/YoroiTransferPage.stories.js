@@ -30,7 +30,6 @@ import {
   WalletChangedError,
 } from '../../stores/toplevel/YoroiTransferStore';
 import AdaApi from '../../api/ada/index';
-import { RestoreMode } from '../../actions/common/wallet-restore-actions';
 import {
   HARD_DERIVATION_START,
 } from '../../config/numbersConfig';
@@ -61,15 +60,12 @@ const genBaseProps: {|
     walletRestore: {
       selectedAccount: 0 + HARD_DERIVATION_START,
       isValidMnemonic: (isValidRequest) => {
-        const { mnemonic, numberOfWords } = isValidRequest;
+        const { mnemonic, mode } = isValidRequest;
 
-        if (
-          (isValidRequest.mode === RestoreMode.REGULAR_15) ||
-          (isValidRequest.mode === RestoreMode.REGULAR_24)
-        ) {
-          return AdaApi.isValidMnemonic({ mnemonic, numberOfWords });
+        if (isValidRequest.mode.extra === 'paper') {
+          return AdaApi.prototype.isValidPaperMnemonic({ mnemonic, numberOfWords: mode.length  });
         }
-        return AdaApi.prototype.isValidPaperMnemonic({ mnemonic, numberOfWords });
+        return AdaApi.isValidMnemonic({ mnemonic, numberOfWords: mode.length  });
       },
     },
     wallets: {
