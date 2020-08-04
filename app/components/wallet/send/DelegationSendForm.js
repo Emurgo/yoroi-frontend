@@ -29,7 +29,6 @@ const messages = defineMessages({
 type Props = {|
   +hasAnyPending: boolean,
   +onSubmit: void => void,
-  +updatePool: (void | string) => void,
   +reset: void => void,
   +error: ?LocalizableError,
 |};
@@ -66,17 +65,10 @@ export default class DelegationSendForm extends Component<Props> {
         validators: [({ field }) => {
           const poolIdValue = field.value;
           if (poolIdValue === '') {
-            this.props.updatePool();
             return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
           }
           const isValid = isValidPool(poolIdValue);
-          if (isValid) {
-            this.props.updatePool(poolIdValue);
-            return [isValid];
-          }
-
-          this.props.updatePool();
-          return [false, this.context.intl.formatMessage(messages.invalidPoolId)];
+          return [isValid, this.context.intl.formatMessage(messages.invalidPoolId)];
         }],
       },
     },

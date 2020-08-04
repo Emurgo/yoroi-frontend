@@ -43,7 +43,6 @@ export default class CardanoStakingPage extends Component<Props> {
         <DelegationSendForm
           hasAnyPending={false}
           onSubmit={() => {}}
-          updatePool={() => {}}
           reset={() => {}}
           error={undefined}
         />
