@@ -211,3 +211,43 @@ export type RemoteCertificate = {|
   +type: typeof ShelleyCertificateTypes.MoveInstantaneousRewardsCert,
   ...RemoteMoveInstantaneousRewardsCert,
 |};
+
+// getRewardHistory
+
+export type RewardHistoryRequest = {|
+  addresses: Array<string>,
+|};
+export type RewardTuple = [
+  number, /* epoch */
+  number /* amount in lovelaces */
+];
+export type RewardHistoryResponse = { [address: string]: Array<RewardTuple>, ... };
+export type RewardHistoryFunc = (body: RewardHistoryRequest) => Promise<RewardHistoryResponse>;
+
+export type PoolInfoRequest = {|
+  ids: Array<string>
+|};
+export type RemotePoolInfo = {|
+  +owner: string, // bech32
+  +pledge_address: string, // bech32
+
+  // from pool metadata (off chain)
+  +name: void | string,
+  +description: void | string,
+  +ticker: void | string,
+  +homepage: void | string,
+|};
+export type RemotePool = {|
+  +info: RemotePoolInfo,
+  +history: Array<{|
+    epoch: number,
+    slot: number,
+    tx_ordinal: number,
+    cert_ordinal: number,
+    payload: any, // TODO: how to store this since different networks have different cert types
+  |}>,
+|};
+export type PoolInfoResponse = {|
+  [key: string]: RemotePool,
+|};
+export type PoolInfoFunc = (body: PoolInfoRequest) => Promise<PoolInfoResponse>;

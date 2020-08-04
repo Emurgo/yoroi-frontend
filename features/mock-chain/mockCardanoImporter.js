@@ -6,7 +6,9 @@ import type {
   RemoteTransaction,
   TxBodiesFunc,
   UtxoSumFunc,
+  PoolInfoFunc,
   AddressUtxoFunc,
+  RewardHistoryFunc,
   HistoryFunc,
   BestBlockFunc,
 } from '../../app/api/ada/lib/state-fetch/types';
@@ -18,6 +20,8 @@ import type {
 } from '../../app/api/common/lib/state-fetch/types';
 import {
   genGetTransactionsHistoryForAddresses,
+  genGetRewardHistory,
+  genGetPoolInfo,
   genGetBestBlock,
   genCheckAddressesInUse,
   genUtxoForAddresses,
@@ -1259,6 +1263,9 @@ const getTxsBodiesForUTXOs: TxBodiesFunc = async req => {
   return result;
 };
 
+const getPoolInfo: PoolInfoFunc = genGetPoolInfo(transactions);
+const getRewardHistory: RewardHistoryFunc = genGetRewardHistory();
+
 export default {
   utxoForAddresses,
   utxoSumForAddresses,
@@ -1268,4 +1275,6 @@ export default {
   getTxsBodiesForUTXOs,
   getBestBlock,
   sendTx,
+  getPoolInfo,
+  getRewardHistory
 };

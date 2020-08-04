@@ -6,6 +6,8 @@ import type {
   BestBlockRequest, BestBlockResponse, BestBlockFunc,
   AddressUtxoRequest, AddressUtxoResponse, AddressUtxoFunc,
   UtxoSumRequest, UtxoSumResponse, UtxoSumFunc,
+  RewardHistoryRequest, RewardHistoryResponse, RewardHistoryFunc,
+  PoolInfoRequest, PoolInfoResponse, PoolInfoFunc,
   RemoteTransaction, RemoteUnspentOutput,
   SignedRequestInternal,
   RemoteTransactionInput,
@@ -29,6 +31,7 @@ import { RustModule } from '../cardanoCrypto/rustLoader';
 
 import { generateLedgerWalletRootKey } from '../cardanoCrypto/cryptoWallet';
 import { networks, getCardanoHaskellBaseConfig } from '../storage/database/prepackaged/networks';
+import { encode, toWords } from 'bech32';
 
 export function genCheckAddressesInUse(
   blockchain: Array<RemoteTransaction>,
@@ -458,5 +461,50 @@ export function toRemoteByronTx(
     time: null,
     epoch: null,
     slot: null,
+  };
+}
+
+export function genGetRewardHistory(
+): RewardHistoryFunc {
+  return async (
+    _body: RewardHistoryRequest,
+  ): Promise<RewardHistoryResponse> => {
+    return {};
+  };
+}
+
+export function genGetPoolInfo(
+  _blockchain: Array<RemoteTransaction>,
+): PoolInfoFunc {
+  return async (
+    body: PoolInfoRequest,
+  ): Promise<PoolInfoResponse> => {
+    // TODO: scan the chain properly for this information
+    const mockPoolId = 'df1750df9b2df285fcfb50f4740657a18ee3af42727d410c37b86207';
+    const result: PoolInfoResponse = {};
+    for (const poolId of body.ids) {
+      if (poolId === mockPoolId) {
+        result[mockPoolId] = {
+          info: {
+            owner: encode(
+              'ed25519_pk',
+              toWords(Buffer.from('df1750df9b2df285fcfb50f4740657a18ee3af42727d410c37b86207', 'hex')),
+              Number.MAX_SAFE_INTEGER
+            ),
+            pledge_address: encode(
+              'addr',
+              toWords(Buffer.from('29b68b190d8afa4a546004821be4a7bedb8b28e2041293c91f31a6d2', 'hex')),
+              Number.MAX_SAFE_INTEGER
+            ),
+            name: 'Yoroi',
+            description: 'Yoroi is a light wallet for Cardano. It’s simple, fast and secure.',
+            ticker: 'YOROI',
+            homepage: 'https://yoroi-wallet.com/',
+          },
+          history: [],
+        };
+      }
+    }
+    return result;
   };
 }

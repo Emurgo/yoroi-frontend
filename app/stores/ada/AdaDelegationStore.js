@@ -29,10 +29,12 @@ import {
   genToRelativeSlotNumber,
   genTimeToSlot,
 } from '../../api/ada/lib/storage/bridge/timeUtils';
-import { isJormungandr, getJormungandrBaseConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { isCardanoHaskell, getCardanoHaskellBaseConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import type { DelegationRequests, RewardHistoryForWallet } from '../toplevel/DelegationStore';
 
 export default class AdaDelegationStore extends Store {
+
+  _recalculateDelegationInfoDisposer: void => void = () => {};
 
   @action addObservedWallet: PublicDeriver<> => void = (
     publicDeriver
@@ -44,7 +46,7 @@ export default class AdaDelegationStore extends Store {
       rewardHistory: new CachedRequest<RewardHistoryForWallet>(async (address) => {
         // we need to defer this call because the store may not be initialized yet
         // by the time this constructor is called
-        const stateFetcher = this.stores.substores.jormungandr.stateFetchStore.fetcher;
+        const stateFetcher = this.stores.substores.ada.stateFetchStore.fetcher;
         const result = await stateFetcher.getRewardHistory({ addresses: [address] });
         return result[address] ?? [];
       }),
@@ -55,33 +57,33 @@ export default class AdaDelegationStore extends Store {
 
   setup(): void {
     super.setup();
-    // this.reset();
-    // this._startWatch();
+    this.reset();
+    this._startWatch();
   }
 
-  // refreshDelegation: PublicDeriver<> => Promise<void> = async (
-  //   publicDeriver
-  // ) => {
-  //   const delegationRequest = this.stores.delegation.getDelegationRequests(publicDeriver);
-  //   if (delegationRequest == null) return;
+  refreshDelegation: PublicDeriver<> => Promise<void> = async (
+    publicDeriver
+  ) => {
+    const delegationRequest = this.stores.delegation.getDelegationRequests(publicDeriver);
+    if (delegationRequest == null) return;
 
-  //   try {
-  //     delegationRequest.getDelegatedBalance.reset();
-  //     delegationRequest.getCurrentDelegation.reset();
-  //     runInAction(() => {
-  //       delegationRequest.error = undefined;
-  //     });
+    try {
+      delegationRequest.getDelegatedBalance.reset();
+      delegationRequest.getCurrentDelegation.reset();
+      runInAction(() => {
+        delegationRequest.error = undefined;
+      });
 
-  //     const withStakingKey = asGetStakingKey(publicDeriver);
-  //     if (withStakingKey == null) {
-  //       throw new Error(`${nameof(this.refreshDelegation)} missing staking key functionality`);
-  //     }
+      const withStakingKey = asGetStakingKey(publicDeriver);
+      if (withStakingKey == null) {
+        throw new Error(`${nameof(this.refreshDelegation)} missing staking key functionality`);
+      }
 
-  //     const stakingKeyResp = await withStakingKey.getStakingKey();
+      const stakingKeyResp = await withStakingKey.getStakingKey();
 
   //     const accountStateCalcs = (async () => {
   //       try {
-  //         const stateFetcher = this.stores.substores.jormungandr.stateFetchStore.fetcher;
+  //         const stateFetcher = this.stores.substores.ada.stateFetchStore.fetcher;
   //         const accountStateResp = await stateFetcher.getAccountState({
   //           addresses: [stakingKeyResp.addr.Hash],
   //         });
@@ -106,130 +108,133 @@ export default class AdaDelegationStore extends Store {
   //       }
   //     })();
 
-  //     const delegationHistory = this._getDelegationHistory({
-  //       publicDeriver: withStakingKey,
-  //       stakingKeyAddressId: stakingKeyResp.addr.AddressId,
-  //       delegationRequest,
-  //     }).then(currentDelegation => this._updatePoolInfo({
-  //       publicDeriver: withStakingKey,
-  //       allPoolIds: currentDelegation.allPoolIds,
-  //     }));
+      const delegationHistory = this._getDelegationHistory({
+        publicDeriver: withStakingKey,
+        stakingKeyAddressId: stakingKeyResp.addr.AddressId,
+        delegationRequest,
+      }).then(currentDelegation => this._updatePoolInfo({
+        publicDeriver: withStakingKey,
+        allPoolIds: currentDelegation.allPoolIds,
+      }));
 
-  //     const rewardHistory = delegationRequest.rewardHistory.execute(
-  //       stakingKeyResp.addr.Hash
-  //     ).promise;
+      const rewardHistory = delegationRequest.rewardHistory.execute(
+        stakingKeyResp.addr.Hash
+      ).promise;
 
-  //     await Promise.all([
-  //       accountStateCalcs,
-  //       delegationHistory,
-  //       rewardHistory,
-  //     ]);
-  //   } catch (e) {
-  //     Logger.error(`${nameof(AdaDelegationStore)}::${nameof(this.refreshDelegation)} error: ` + stringifyError(e));
-  //   }
-  // }
+      await Promise.all([
+        // accountStateCalcs,
+        delegationHistory,
+        rewardHistory,
+      ]);
+    } catch (e) {
+      Logger.error(`${nameof(AdaDelegationStore)}::${nameof(this.refreshDelegation)} error: ` + stringifyError(e));
+    }
+  }
 
-  // _getDelegationHistory: {|
-  //   publicDeriver: PublicDeriver<> & IGetStakingKey,
-  //   stakingKeyAddressId: number,
-  //   delegationRequest: DelegationRequests,
-  // |} => Promise<GetCurrentDelegationResponse> = async (request) => {
-  //   const jormungandrConfig = getJormungandrBaseConfig(
-  //     request.publicDeriver.getParent().getNetworkInfo()
-  //   );
-  //   // TODO: use time store instead?
-  //   const toRelativeSlotNumber = await genToRelativeSlotNumber(jormungandrConfig);
-  //   const timeToSlot = await genTimeToSlot(jormungandrConfig);
-  //   const currentEpoch = toRelativeSlotNumber(
-  //     timeToSlot({
-  //       time: new Date(),
-  //     }).slot
-  //   ).epoch;
+  _getDelegationHistory: {|
+    publicDeriver: PublicDeriver<> & IGetStakingKey,
+    stakingKeyAddressId: number,
+    delegationRequest: DelegationRequests,
+  |} => Promise<GetCurrentDelegationResponse> = async (request) => {
+    const adaConfig = getCardanoHaskellBaseConfig(
+      request.publicDeriver.getParent().getNetworkInfo()
+    );
+    // TODO: use time store instead?
+    const toRelativeSlotNumber = await genToRelativeSlotNumber(adaConfig);
+    const timeToSlot = await genTimeToSlot(adaConfig);
+    const currentEpoch = toRelativeSlotNumber(
+      timeToSlot({
+        time: new Date(),
+      }).slot
+    ).epoch;
 
-  //   // re-calculate which pools we've delegated to
-  //   const currentDelegation = await request.delegationRequest.getCurrentDelegation.execute({
-  //     publicDeriver: request.publicDeriver,
-  //     stakingKeyAddressId: request.stakingKeyAddressId,
-  //     toRelativeSlotNumber,
-  //     currentEpoch,
-  //   }).promise;
-  //   if (currentDelegation == null) throw new Error('Should never happen');
-  //   return currentDelegation;
-  // }
+    // re-calculate which pools we've delegated to
+    const currentDelegation = await request.delegationRequest.getCurrentDelegation.execute({
+      publicDeriver: request.publicDeriver,
+      stakingKeyAddressId: request.stakingKeyAddressId,
+      toRelativeSlotNumber,
+      currentEpoch,
+    }).promise;
+    if (currentDelegation == null) throw new Error('Should never happen');
+    return currentDelegation;
+  }
 
-  // _updatePoolInfo: {|
-  //   publicDeriver: PublicDeriver<> & IGetStakingKey,
-  //   allPoolIds: Array<string>,
-  // |} => Promise<void> = async (request) => {
-  //   // update pool information
-  //   const poolsCachedForNetwork = this.stores.delegation.poolInfo
-  //     .reduce(
-  //       (acc, next) => {
-  //         if (
-  //           next.network.NetworkId === request.publicDeriver.getParent().getNetworkInfo().NetworkId
-  //         ) {
-  //           acc.add(next.poolId);
-  //           return acc;
-  //         }
-  //         return acc;
-  //       },
-  //       (new Set<string>())
-  //     );
-  //   const poolsToQuery = request.allPoolIds.filter(
-  //     pool => !poolsCachedForNetwork.has(pool)
-  //   );
-  //   const stateFetcher = this.stores.substores.jormungandr.stateFetchStore.fetcher;
-  //   const poolInfoResp = await stateFetcher.getPoolInfo({
-  //     ids: poolsToQuery,
-  //   });
-  //   const reputation = await stateFetcher.getReputation();
-  //   for (const poolId of Object.keys(poolInfoResp)) {
-  //     const poolInfo = poolInfoResp[poolId];
-  //     if (!poolInfo.info) continue; // skip pools that error out
-  //     this.stores.delegation.poolInfo.push({
-  //       network: request.publicDeriver.getParent().getNetworkInfo(),
-  //       poolId,
-  //       poolInfo: {
-  //         info: poolInfo.info,
-  //         history: poolInfo.history,
-  //         reputation: reputation[poolId] ?? Object.freeze({}),
-  //       },
-  //     });
-  //   }
-  // }
+  _updatePoolInfo: {|
+    publicDeriver: PublicDeriver<> & IGetStakingKey,
+    allPoolIds: Array<string>,
+  |} => Promise<void> = async (request) => {
+    // update pool information
+    const poolsCachedForNetwork = this.stores.delegation.poolInfo
+      .reduce(
+        (acc, next) => {
+          if (
+            next.network.NetworkId === request.publicDeriver.getParent().getNetworkInfo().NetworkId
+          ) {
+            acc.add(next.poolId);
+            return acc;
+          }
+          return acc;
+        },
+        (new Set<string>())
+      );
+    const poolsToQuery = request.allPoolIds.filter(
+      pool => !poolsCachedForNetwork.has(pool)
+    );
+    const stateFetcher = this.stores.substores.ada.stateFetchStore.fetcher;
+    const poolInfoResp = await stateFetcher.getPoolInfo({
+      ids: poolsToQuery,
+    });
+    for (const poolId of Object.keys(poolInfoResp)) {
+      const poolInfo = poolInfoResp[poolId];
+      this.stores.delegation.poolInfo.push({
+        network: request.publicDeriver.getParent().getNetworkInfo(),
+        poolId,
+        poolInfo: {
+          info: {
+            name: poolInfo.info.name,
+            ticker: poolInfo.info.ticker,
+            description: poolInfo.info.description,
+            homepage: poolInfo.info.homepage,
+          },
+          history: poolInfo.history,
+          reputation: Object.freeze({}),
+        },
+      });
+    }
+  }
 
-  // @action.bound
-  // _startWatch: void => void = () => {
-  //   this._recalculateDelegationInfoDisposer = reaction(
-  //     () => [
-  //       this.stores.wallets.selected,
-  //       // update if tx history changes
-  //       this.stores.transactions.hash,
-  //       // if query failed due to server issue, need to re-query when it comes back online
-  //       this.stores.serverConnectionStore.checkAdaServerStatus,
-  //       // reward grows every epoch so we have to refresh
-  //       this.stores.substores.jormungandr.time.currentTime?.currentEpoch,
-  //     ],
-  //     async () => {
-  //       if (!this.stores.serverConnectionStore.checkAdaServerStatus) {
-  //         // don't re-query when server goes offline -- only when it comes back online
-  //         return;
-  //       }
-  //       const selected = this.stores.wallets.selected;
-  //       if (selected == null) return;
-  //       if (!isJormungandr(selected.getParent().getNetworkInfo())) {
-  //         return;
-  //       }
-  //       if (asGetStakingKey(selected) != null) {
-  //         await this.refreshDelegation(selected);
-  //       }
-  //     },
-  //   );
-  // }
+  @action.bound
+  _startWatch: void => void = () => {
+    this._recalculateDelegationInfoDisposer = reaction(
+      () => [
+        this.stores.wallets.selected,
+        // update if tx history changes
+        this.stores.transactions.hash,
+        // if query failed due to server issue, need to re-query when it comes back online
+        this.stores.serverConnectionStore.checkAdaServerStatus,
+        // reward grows every epoch so we have to refresh
+        this.stores.substores.ada.time.currentTime?.currentEpoch,
+      ],
+      async () => {
+        if (!this.stores.serverConnectionStore.checkAdaServerStatus) {
+          // don't re-query when server goes offline -- only when it comes back online
+          return;
+        }
+        const selected = this.stores.wallets.selected;
+        if (selected == null) return;
+        if (!isCardanoHaskell(selected.getParent().getNetworkInfo())) {
+          return;
+        }
+        if (asGetStakingKey(selected) != null) {
+          await this.refreshDelegation(selected);
+        }
+      },
+    );
+  }
 
-  // @action.bound
-  // reset(): void {
-  //   this._recalculateDelegationInfoDisposer();
-  //   this._recalculateDelegationInfoDisposer = () => {};
-  // }
+  @action.bound
+  reset(): void {
+    this._recalculateDelegationInfoDisposer();
+    this._recalculateDelegationInfoDisposer = () => {};
+  }
 }
