@@ -302,8 +302,8 @@ export function batchGetAccountState(
       const chimericAccountPromises = chimericAccountAddresses.map(
         addr => getAccountState({ addresses: addr })
       );
-      const chimericAccounutStates = await Promise.all(chimericAccountPromises);
-      return Object.assign({}, ...chimericAccounutStates);
+      const chimericAccountStates = await Promise.all(chimericAccountPromises);
+      return Object.assign({}, ...chimericAccountStates);
     } catch (error) {
       Logger.error(`batchedFetcher::${nameof(batchGetAccountState)} error: ` + stringifyError(error));
       throw new GetAccountStateApiError();

@@ -5,8 +5,11 @@ import type {
   TxBodiesRequest, TxBodiesResponse,
   UtxoSumRequest, UtxoSumResponse,
   HistoryRequest, HistoryResponse,
+  AccountStateRequest, AccountStateResponse,
+  RewardHistoryRequest, RewardHistoryResponse,
   BestBlockRequest, BestBlockResponse,
   SignedRequest, SignedResponse,
+  PoolInfoRequest, PoolInfoResponse,
   SignedRequestInternal,
   RemoteTransaction,
 } from './types';
@@ -26,6 +29,9 @@ import {
   GetUtxosForAddressesApiError,
   GetUtxosSumsForAddressesApiError,
   GetTxHistoryForAddressesApiError,
+  GetRewardHistoryApiError,
+  GetPoolInfoApiError,
+  GetAccountStateApiError,
   GetBestBlockError,
   SendTransactionApiError,
   CheckAddressesInUseApiError,
@@ -34,7 +40,7 @@ import {
 } from '../../../common/errors';
 
 import type { ConfigType } from '../../../../../config/config-types';
-import { fromWords, decode } from 'bech32';
+import { fromWords, decode, } from 'bech32';
 
 declare var CONFIG: ConfigType;
 const backendUrl = CONFIG.network.backendUrl;
@@ -196,6 +202,25 @@ export class RemoteFetcher implements IFetcher {
       })
   )
 
+  getRewardHistory: RewardHistoryRequest => Promise<RewardHistoryResponse> = (body) => (
+    // axios(
+    //   `${backendUrl}/api/v2/account/rewards`,
+    //   {
+    //     method: 'post',
+    //     data: body,
+    //     headers: {
+    //       'yoroi-version': this.getLastLaunchVersion(),
+    //       'yoroi-locale': this.getCurrentLocale()
+    //     }
+    //   }
+    // ).then(response => response.data)
+    //   .catch((error) => {
+    //     Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getRewardHistory)} error: ` + stringifyError(error));
+    //     throw new GetRewardHistoryApiError();
+    //   })
+    Promise.resolve({ [body.addresses[0]]: [] }) // TODO: enable once supported by the backend
+  )
+
   getBestBlock: BestBlockRequest => Promise<BestBlockResponse> = (_body) => (
     axios(
       `${backendUrl}/api/v2/bestblock`,
@@ -257,5 +282,47 @@ export class RemoteFetcher implements IFetcher {
         Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.checkAddressesInUse)} error: ` + stringifyError(error));
         throw new CheckAddressesInUseApiError();
       })
+  )
+
+  getAccountState: AccountStateRequest => Promise<AccountStateResponse> = (body) => (
+    // axios(
+    //   `${backendUrl}/api/v2/account/state`,
+    //   {
+    //     method: 'post',
+    //     data: {
+    //       addresses: body.addresses
+    //     },
+    //     headers: {
+    //       'yoroi-version': this.getLastLaunchVersion(),
+    //       'yoroi-locale': this.getCurrentLocale()
+    //     }
+    //   }
+    // ).then(response => response.data)
+    //   .catch((error) => {
+    //     Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getAccountState)} error: ` + stringifyError(error));
+    //     throw new GetAccountStateApiError();
+    //   })
+    Promise.resolve({ [body.addresses[0]]: { value: '0' }}) // TODO: replace when endpoint is implemented
+  )
+
+  getPoolInfo: PoolInfoRequest => Promise<PoolInfoResponse> = (body) => (
+    // axios(
+    //   `${backendUrl}/api/v2/pool/info`,
+    //   {
+    //     method: 'post',
+    //     data: {
+    //       ids: body.ids
+    //     },
+    //     headers: {
+    //       'yoroi-version': this.getLastLaunchVersion(),
+    //       'yoroi-locale': this.getCurrentLocale()
+    //     }
+    //   }
+    // ).then(response => response.data)
+    //   .catch((error) => {
+    //     Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getPoolInfo)} error: ` + stringifyError(error));
+    //     throw new GetPoolInfoApiError();
+    //   })
+    Promise.resolve({}) // TODO: replace when endpoint is implemented
   )
 }

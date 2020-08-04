@@ -85,10 +85,9 @@ export type AccountStateFailure = {|
   error: string,
   comment: string,
 |};
-export type AccountStateResponse = {
+export type AccountStateResponse = {|
   [key: string]: (AccountStateSuccess | AccountStateFailure),
-  ...
-};
+|};
 export type AccountStateFunc = (body: AccountStateRequest) => Promise<AccountStateResponse>;
 
 // getPoolInfo
@@ -120,10 +119,9 @@ export type RemotePoolMetaSuccess = {|
 export type RemotePoolMetaFailure = {|
   error: string,
 |};
-export type PoolInfoResponse = {
-  [key: string]: (RemotePoolMetaSuccess | RemotePoolMetaFailure),
-  ...
-};
+export type PoolInfoResponse = {|
+  [key: string]: (RemotePoolMetaSuccess | RemotePoolMetaFailure)
+|};
 export type PoolInfoFunc = (body: PoolInfoRequest) => Promise<PoolInfoResponse>;
 
 // getReputation
@@ -134,7 +132,7 @@ export type ReputationObject = {
   ...
 };
 export type ReputationRequest = void;
-export type ReputationResponse = { [poolId: string]: ReputationObject, ... };
+export type ReputationResponse = {| [poolId: string]: ReputationObject, |};
 export type ReputationFunc = (body: ReputationRequest) => Promise<ReputationResponse>;
 
 /* Backend service data types */

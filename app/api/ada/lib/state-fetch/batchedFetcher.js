@@ -6,6 +6,9 @@ import type {
   TxBodiesRequest, TxBodiesResponse,
   UtxoSumRequest, UtxoSumResponse,
   HistoryRequest, HistoryResponse,
+  RewardHistoryFunc, RewardHistoryRequest, RewardHistoryResponse,
+  PoolInfoFunc, PoolInfoRequest, PoolInfoResponse,
+  AccountStateFunc, AccountStateRequest, AccountStateResponse,
   SignedRequest, SignedResponse,
   BestBlockRequest, BestBlockResponse,
   AddressUtxoFunc,
@@ -27,6 +30,9 @@ import {
   GetTxsBodiesForUTXOsError,
   GetUtxosSumsForAddressesApiError,
   GetTxHistoryForAddressesApiError,
+  GetRewardHistoryApiError,
+  GetAccountStateApiError,
+  GetPoolInfoApiError,
 } from '../../../common/errors';
 import {
   Logger,
@@ -69,6 +75,12 @@ export class BatchedFetcher implements IFetcher {
     )(body)
   )
 
+  getRewardHistory: RewardHistoryRequest => Promise<RewardHistoryResponse> = (body) => (
+    batchGetRewardHistory(
+      this.baseFetcher.getRewardHistory
+    )(body)
+  )
+
   getBestBlock: BestBlockRequest => Promise<BestBlockResponse> = (body) => (
     // We don't batch transaction sending (it's just a single request)
     this.baseFetcher.getBestBlock(body)
@@ -80,8 +92,16 @@ export class BatchedFetcher implements IFetcher {
     this.baseFetcher.sendTx(body)
   )
 
+  getAccountState: AccountStateRequest => Promise<AccountStateResponse> = (body) => (
+    batchGetAccountState(this.baseFetcher.getAccountState)(body)
+  )
+
   checkAddressesInUse: FilterUsedRequest => Promise<FilterUsedResponse> = (body) => (
     batchCheckAddressesInUse(this.baseFetcher.checkAddressesInUse)(body)
+  )
+
+  getPoolInfo: PoolInfoRequest => Promise<PoolInfoResponse> = (body) => (
+    batchGetPoolInfo(this.baseFetcher.getPoolInfo)(body)
   )
 }
 
@@ -176,6 +196,24 @@ export function batchGetUTXOsSumsForAddresses(
     } catch (error) {
       Logger.error('batchedFetcher::batchGetUTXOsSumsForAddresses error: ' + stringifyError(error));
       throw new GetUtxosSumsForAddressesApiError();
+    }
+  };
+}
+
+export function batchGetRewardHistory(
+  getRewardHistory: RewardHistoryFunc,
+): RewardHistoryFunc {
+  return async function (body: RewardHistoryRequest): Promise<RewardHistoryResponse> {
+    try {
+      const chimericAccountAddresses = chunk(body.addresses, addressesLimit);
+      const chimericAccountPromises = chimericAccountAddresses.map(
+        addr => getRewardHistory({ addresses: addr })
+      );
+      const rewardHistories = await Promise.all(chimericAccountPromises);
+      return Object.assign({}, ...rewardHistories);
+    } catch (error) {
+      Logger.error(`batchedFetcher::${nameof(batchGetRewardHistory)} error: ` + stringifyError(error));
+      throw new GetRewardHistoryApiError();
     }
   };
 }
@@ -321,4 +359,40 @@ function getLatestTransaction(
     }
   }
   return best;
+}
+
+export function batchGetAccountState(
+  getAccountState: AccountStateFunc,
+): AccountStateFunc {
+  return async function (body: AccountStateRequest): Promise<AccountStateResponse> {
+    try {
+      const chimericAccountAddresses = chunk(body.addresses, addressesLimit);
+      const chimericAccountPromises = chimericAccountAddresses.map(
+        addr => getAccountState({ addresses: addr })
+      );
+      const chimericAccountStates = await Promise.all(chimericAccountPromises);
+      return Object.assign({}, ...chimericAccountStates);
+    } catch (error) {
+      Logger.error(`batchedFetcher::${nameof(batchGetAccountState)} error: ` + stringifyError(error));
+      throw new GetAccountStateApiError();
+    }
+  };
+}
+
+export function batchGetPoolInfo(
+  getPoolInfo: PoolInfoFunc,
+): PoolInfoFunc {
+  return async function (body: PoolInfoRequest): Promise<PoolInfoResponse> {
+    try {
+      const poolIds = chunk(body.ids, addressesLimit);
+      const poolInfoPromises = poolIds.map(
+        addr => getPoolInfo({ ids: addr })
+      );
+      const poolInfos = await Promise.all(poolInfoPromises);
+      return Object.assign({}, ...poolInfos);
+    } catch (error) {
+      Logger.error(`batchedFetcher::${nameof(batchGetPoolInfo)} error: ` + stringifyError(error));
+      throw new GetPoolInfoApiError();
+    }
+  };
 }
