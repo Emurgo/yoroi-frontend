@@ -188,3 +188,36 @@ export function certificateToPoolList(
     }
   }
 }
+
+export function createCertificate(
+  stakingKey: RustModule.WalletV4.PublicKey,
+  isRegistered: boolean,
+  poolRequest: void | string,
+): Array<RustModule.WalletV4.Certificate> {
+  const credential = RustModule.WalletV4.StakeCredential.from_keyhash(
+    stakingKey.hash()
+  );
+  if (poolRequest == null) {
+    if (isRegistered) {
+      return [RustModule.WalletV4.Certificate.new_stake_deregistration(
+        RustModule.WalletV4.StakeDeregistration.new(credential)
+      )];
+    }
+    return []; // no need to undelegate if no staking key registered
+  }
+  const result = [];
+  if (!isRegistered) {
+    // if unregistered, need to register first
+    result.push(RustModule.WalletV4.Certificate.new_stake_registration(
+      RustModule.WalletV4.StakeRegistration.new(credential)
+    ));
+  }
+  result.push(RustModule.WalletV4.Certificate.new_stake_delegation(
+    RustModule.WalletV4.StakeDelegation.new(
+      credential,
+      RustModule.WalletV4.Ed25519KeyHash.from_bytes(Buffer.from(poolRequest, 'hex'))
+    )
+  ));
+  return result;
+}
+

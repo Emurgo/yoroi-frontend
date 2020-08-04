@@ -11,7 +11,6 @@ const CONFIG: ConfigType = {
   },
   seiza: {
     simpleTemplate: '',
-    advanceTemplate: '',
   },
   app: {
     walletRefreshInterval: 10,

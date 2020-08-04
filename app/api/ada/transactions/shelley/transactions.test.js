@@ -36,6 +36,7 @@ import {
   HARD_DERIVATION_START,
   CoinTypes,
   WalletTypePurpose,
+  STAKING_KEY_INDEX,
 } from '../../../../config/numbersConfig';
 
 const genSampleUtxos: void => Array<RemoteUnspentOutput> = () => [
@@ -60,6 +61,15 @@ const genSampleUtxos: void => Array<RemoteUnspentOutput> = () => [
     tx_index: 0,
     utxo_id: '0df0273e382739f8b4ae3783d81168093e78e0b48ec2c5430ff03d444806a1730',
   },
+  // {
+  //   amount: '30000000',
+  //   receiver: Buffer.from(RustModule.WalletV3.Address.from_string(
+  //     'ca1ssuvzjs82mshgvyp4r4lmwgknvgjswnm7mpcq3wycjj7v2nk393e6qwqr79etp5e4emf5frwj7zakknsuq3ewl4yhptdlt8j8s3ngm906x2vwl'
+  //   ).as_bytes()).toString('hex'),
+  //   tx_hash: '86e36b6a65d82c9dcc0370b0ee3953aee579db0b837753306405c28a74de5550',
+  //   tx_index: 0,
+  //   utxo_id: '86e36b6a65d82c9dcc0370b0ee3953aee579db0b837753306405c28a74de55500',
+  // },
 ];
 
 const genSampleAdaAddresses: void => Array<{| ...Address, ...Addressing |}> = () => [
@@ -127,23 +137,29 @@ describe('Create unsigned TX from UTXO', () => {
     const sampleUtxos = genSampleUtxos();
     const utxos: Array<RemoteUnspentOutput> = [sampleUtxos[1]];
     expect(() => newAdaUnsignedTxFromUtxo(
-      byronAddrToHex('Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4'),
-      '1900001', // bigger than input including fees
+      [{
+        address: byronAddrToHex('Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4'),
+        amount: '1900001', // bigger than input including fees
+      }],
       undefined,
       utxos,
       new BigNumber(0),
       getProtocolParams(),
+      [],
     )).toThrow(NotEnoughMoneyToSendError);
   });
 
   it('Should fail due to insufficient funds (no inputs)', () => {
     expect(() => newAdaUnsignedTxFromUtxo(
-      byronAddrToHex('Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4'),
-      '1', // bigger than input including fees
+      [{
+        address: byronAddrToHex('Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4'),
+        amount: '1', // bigger than input including fees
+      }],
       undefined,
       [],
       new BigNumber(0),
       getProtocolParams(),
+      [],
     )).toThrow(NotEnoughMoneyToSendError);
   });
 
@@ -151,12 +167,15 @@ describe('Create unsigned TX from UTXO', () => {
     const sampleUtxos = genSampleUtxos();
     const utxos: Array<RemoteUnspentOutput> = [sampleUtxos[0]];
     expect(() => newAdaUnsignedTxFromUtxo(
-      byronAddrToHex('Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4'),
-      '1', // bigger than input including fees
+      [{
+        address: byronAddrToHex('Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4'),
+        amount: '1', // bigger than input including fees
+      }],
       undefined,
       utxos,
       new BigNumber(0),
       getProtocolParams(),
+      [],
     )).toThrow(NotEnoughMoneyToSendError);
   });
 
@@ -164,12 +183,15 @@ describe('Create unsigned TX from UTXO', () => {
     const utxos: Array<RemoteUnspentOutput> = genSampleUtxos();
     const sampleAdaAddresses = genSampleAdaAddresses();
     const unsignedTxResponse = newAdaUnsignedTxFromUtxo(
-      byronAddrToHex('Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4'),
-      '1001', // smaller than input
+      [{
+        address: byronAddrToHex('Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4'),
+        amount: '1001', // smaller than input
+      }],
       sampleAdaAddresses[0],
       utxos,
       new BigNumber(0),
       getProtocolParams(),
+      [],
     );
     // input selection will only take 2 of the 3 inputs
     // it takes 2 inputs because input selection algorithm
@@ -184,12 +206,15 @@ describe('Create unsigned TX from addresses', () => {
   it('Should create a valid transaction without selection', () => {
     const addressedUtxos = genAddressedUtxos();
     const unsignedTxResponse = newAdaUnsignedTx(
-      byronAddrToHex('Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4'),
-      '5001', // smaller than input
+      [{
+        address: byronAddrToHex('Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4'),
+        amount: '5001', // smaller than input
+      }],
       undefined,
       [addressedUtxos[0], addressedUtxos[1]],
       new BigNumber(0),
       getProtocolParams(),
+      [],
     );
     expect(unsignedTxResponse.senderUtxos).toEqual([addressedUtxos[0], addressedUtxos[1]]);
 
@@ -209,12 +234,15 @@ describe('Create signed transactions', () => {
   it('Witness should match on valid private key', () => {
     const addressedUtxos = genAddressedUtxos();
     const unsignedTxResponse = newAdaUnsignedTx(
-      byronAddrToHex('Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4'),
-      '5001', // smaller than input
+      [{
+        address: byronAddrToHex('Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4'),
+        amount: '5001', // smaller than input
+      }],
       undefined,
       [addressedUtxos[0], addressedUtxos[1]],
       new BigNumber(0),
       getProtocolParams(),
+      [],
     );
     const signRequest: BaseSignRequest<RustModule.WalletV4.TransactionBuilder> = {
       changeAddr: unsignedTxResponse.changeAddr,
@@ -233,6 +261,7 @@ describe('Create signed transactions', () => {
       signRequest,
       Bip44DerivationLevels.ACCOUNT.level,
       accountPrivateKey,
+      [],
       undefined,
     );
     const witnesses = signedTx.witness_set();
@@ -315,6 +344,8 @@ describe('Create signed transactions', () => {
       signRequest,
       Bip44DerivationLevels.ACCOUNT.level,
       accountPrivateKey,
+      [],
+      undefined,
     );
     const witnesses = signedTx.witness_set();
 
@@ -328,32 +359,85 @@ describe('Create signed transactions', () => {
       '8458208fb03c3aa052f51c086c54bd4059ead2d2e426ac89fa4b3ce41cbfd8800b51c058401edebb108c74a991bef5b28458778fc0713499349d77fb98acc63e4219cfcd1b51321ccaccdf2ce2e80d7c2687f3d79feea32daedcfbc19792dff0358af5950358202623fceb96b07408531a5cb259f53845a38d6b68928e7c0c7e390f07545d0e6241a0'
     );
   });
-});
 
-describe('Create sendAll unsigned TX from UTXO', () => {
-  describe('Create send-all TX from UTXO', () => {
-    it('Create a transaction involving all input with no change', () => {
-      const sampleUtxos = genSampleUtxos();
-      const utxos: Array<RemoteUnspentOutput> = [sampleUtxos[1], sampleUtxos[2]];
-      const sendAllResponse = sendAllUnsignedTxFromUtxo(
-        byronAddrToHex('Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4'),
-        utxos,
-        new BigNumber(0),
-        getProtocolParams(),
-      );
+//   it('Transaction should support certificates', () => {
+//     const accountPrivateKey = RustModule.WalletV4.Bip32PrivateKey.from_bytes(
+//       Buffer.from(
+//         '408a1cb637d615c49e8696c30dd54883302a20a7b9b8a9d1c307d2ed3cd50758c9402acd000461a8fc0f25728666e6d3b86d031b8eea8d2f69b21e8aa6ba2b153e3ec212cc8a36ed9860579dfe1e3ef4d6de778c5dbdd981623b48727cd96247',
+//         'hex',
+//       ),
+//     );
+//     const stakingKey = accountPrivateKey.derive(2).derive(STAKING_KEY_INDEX).to_raw_key();
 
-      expect(sendAllResponse.senderUtxos).toEqual([utxos[0], utxos[1]]);
-      expect(sendAllResponse.txBuilder.get_explicit_input().to_str()).toEqual('11000002');
-      expect(sendAllResponse.txBuilder.get_explicit_output().to_str()).toEqual('10998652');
-      expect(sendAllResponse.txBuilder.estimate_fee().to_str()).toEqual('1330');
-      // make sure we don't accidentally burn a lot of coins
-      expect(
-        sendAllResponse.txBuilder.get_explicit_input().checked_sub(
-          sendAllResponse.txBuilder.get_explicit_output()
-        ).to_str()
-      ).toEqual('1350');
-    });
-  });
+//     const addressedUtxos = genAddressedUtxos();
+//     const unsignedTxResponse = newAdaUnsignedTx(
+//       [{
+//         address: byronAddrToHex('Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4'),
+//         amount: '5001', // smaller than input
+//       }],
+//       undefined,
+//       [addressedUtxos[3]],
+//       new BigNumber(0),
+//       getProtocolParams(),
+//       [
+//         RustModule.WalletV4.Certificate.new_stake_registration(
+//           RustModule.WalletV4.StakeRegistration.new(
+//             RustModule.WalletV4.StakeCredential.from_keyhash(stakingKey.to_public().hash())
+//           )
+//         ),
+//       ],
+//     );
+//     const signRequest: BaseSignRequest<RustModule.WalletV4.TransactionBuilder> = {
+//       changeAddr: unsignedTxResponse.changeAddr,
+//       senderUtxos: unsignedTxResponse.senderUtxos,
+//       unsignedTx: unsignedTxResponse.txBuilder,
+//       certificate: undefined,
+//     };
+//     const signedTx = signTransaction(
+//       signRequest,
+//       Bip44DerivationLevels.ACCOUNT.level,
+//       accountPrivateKey,
+//       [stakingKey],
+//       undefined,
+//     );
+//     const witnesses = signedTx.witness_set();
+
+//     expect(witnesses.vkeys()).toEqual(undefined);
+//     expect(witnesses.scripts()).toEqual(undefined);
+//     const bootstrapWits = witnesses.bootstraps();
+//     if (bootstrapWits == null) throw new Error('Bootstrap witnesses should not be null');
+//     expect(bootstrapWits.len()).toEqual(1);
+
+//     expect(Buffer.from(bootstrapWits.get(0).to_bytes()).toString('hex')).toEqual(
+//       '8458208fb03c3aa052f51c086c54bd4059ead2d2e426ac89fa4b3ce41cbfd8800b51c0584053685c27ee95dc8e2ea87e6c9e7b0557c7d060cc9d18ada7df3c2eec5949011c76e8647b072fe3fa8310894f087b097cbb15d7fbcc743100a716bf5df3c6190058202623fceb96b07408531a5cb259f53845a38d6b68928e7c0c7e390f07545d0e6241a0'
+//     );
+//   });
+// });
+
+// describe('Create sendAll unsigned TX from UTXO', () => {
+//   describe('Create send-all TX from UTXO', () => {
+//     it('Create a transaction involving all input with no change', () => {
+//       const sampleUtxos = genSampleUtxos();
+//       const utxos: Array<RemoteUnspentOutput> = [sampleUtxos[1], sampleUtxos[2]];
+//       const sendAllResponse = sendAllUnsignedTxFromUtxo(
+//         byronAddrToHex('Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4'),
+//         utxos,
+//         new BigNumber(0),
+//         getProtocolParams(),
+//       );
+
+//       expect(sendAllResponse.senderUtxos).toEqual([utxos[0], utxos[1]]);
+//       expect(sendAllResponse.txBuilder.get_explicit_input().to_str()).toEqual('11000002');
+//       expect(sendAllResponse.txBuilder.get_explicit_output().to_str()).toEqual('10998652');
+//       expect(sendAllResponse.txBuilder.estimate_fee().to_str()).toEqual('1330');
+//       // make sure we don't accidentally burn a lot of coins
+//       expect(
+//         sendAllResponse.txBuilder.get_explicit_input().checked_sub(
+//           sendAllResponse.txBuilder.get_explicit_output()
+//         ).to_str()
+//       ).toEqual('1350');
+//     });
+//   });
 
   it('Should fail due to insufficient funds (no inputs)', () => {
     expect(() => sendAllUnsignedTxFromUtxo(

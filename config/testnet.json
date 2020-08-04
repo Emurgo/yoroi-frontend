@@ -6,8 +6,7 @@
     "priceBackendUrl": "https://testnet-yoroi-coin-price-feed.yoroiwallet.com"
   },
   "seiza": {
-    "simpleTemplate": "",
-    "advanceTemplate": ""
+    "simpleTemplate": ""
   },
   "app": {
     "walletRefreshInterval": 20000,

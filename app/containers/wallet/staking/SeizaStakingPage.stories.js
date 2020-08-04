@@ -16,7 +16,7 @@ import type {
   CacheValue
 } from '../../../../stories/helpers/StoryWrapper';
 import CachedRequest from '../../../stores/lib/LocalizedCachedRequest';
-import StakingPage from './StakingPage';
+import SeizaStakingPage from './SeizaStakingPage';
 import { mockWalletProps } from '../Wallet.mock';
 import { defaultToSelectedExplorer } from '../../../domain/SelectedExplorer';
 import { buildRoute } from '../../../utils/routing';
@@ -35,12 +35,12 @@ import type {
 
 export default {
   title: `${__filename.split('.')[0]}`,
-  component: StakingPage,
+  component: SeizaStakingPage,
   decorators: [withScreenshot],
 };
 
 const getRoute = (id) => buildRoute(
-  ROUTES.WALLETS.DELEGATION_SIMPLE,
+  ROUTES.WALLETS.SEIZA_DELEGATION_SIMPLE,
   { id, }
 );
 
@@ -64,11 +64,11 @@ const genBaseProps: {|
         getTxRequests: request.lookup.getTransactions,
         hasAnyPending: request.hasPending || false,
       },
+      delegation: {
+        getDelegationRequests: request.lookup.getDelegation,
+      },
       substores: {
         jormungandr: {
-          delegation: {
-            getDelegationRequests: request.lookup.getDelegation,
-          },
           delegationTransaction: {
             signAndBroadcastDelegationTx: request.signAndBroadcastDelegationTx == null
               ? {
@@ -200,7 +200,7 @@ export const Frame = (): Node => {
       selected: wallet.publicDeriver,
       ...lookup,
     }),
-    (<StakingPage
+    (<SeizaStakingPage
       urlTemplate="localhost://no-frame-when-testing"
       generated={genBaseProps({
         wallet,
@@ -227,7 +227,7 @@ export const PendingTransaction = (): Node => {
       selected: wallet.publicDeriver,
       ...lookup,
     }),
-    (<StakingPage
+    (<SeizaStakingPage
       urlTemplate="localhost://no-frame-when-testing"
       generated={genBaseProps({
         wallet,
@@ -255,7 +255,7 @@ export const TransactionIsExecuting = (): Node => {
       selected: wallet.publicDeriver,
       ...lookup,
     }),
-    (<StakingPage
+    (<SeizaStakingPage
       urlTemplate="localhost://no-frame-when-testing"
       generated={genBaseProps({
         wallet,
@@ -287,7 +287,7 @@ export const TransactionError = (): Node => {
       selected: wallet.publicDeriver,
       ...lookup,
     }),
-    (<StakingPage
+    (<SeizaStakingPage
       urlTemplate="localhost://no-frame-when-testing"
       generated={genBaseProps({
         wallet,
@@ -338,7 +338,7 @@ export const Transaction = (): Node => {
       selected: wallet.publicDeriver,
       ...lookup,
     }),
-    (<StakingPage
+    (<SeizaStakingPage
       urlTemplate="localhost://no-frame-when-testing"
       generated={genBaseProps({
         wallet,
@@ -386,7 +386,7 @@ export const DelegationSuccess = (): Node => {
       selected: wallet.publicDeriver,
       ...lookup,
     }),
-    (<StakingPage
+    (<SeizaStakingPage
       urlTemplate="localhost://no-frame-when-testing"
       generated={genBaseProps({
         wallet,

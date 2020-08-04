@@ -3,8 +3,8 @@ import { ROUTES } from '../../routes-config';
 import type { MessageDescriptor } from 'react-intl';
 import { defineMessages, } from 'react-intl';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import environment from '../../environment';
 import { asGetStakingKey } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
+import { isCardanoHaskell, isJormungandr } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 import transactionsIcon from '../../assets/images/wallet-nav/tab-transactions.inline.svg';
 import sendIcon from '../../assets/images/wallet-nav/tab-send.inline.svg';
@@ -93,22 +93,23 @@ export const STAKE_DASHBOARD: TopbarCategory = registerCategory({
     asGetStakingKey(request.selected) != null
   ),
 });
-export const STAKE_SIMULATOR_SIMPLE: TopbarCategory = registerCategory({
+export const SEIZA_STAKE_SIMULATOR: TopbarCategory = registerCategory({
   className: 'stakeSimulator',
-  route: ROUTES.WALLETS.DELEGATION_SIMPLE,
+  route: ROUTES.WALLETS.SEIZA_DELEGATION_SIMPLE,
   icon: undefined,
   label: messages.delegationSimple,
   isVisible: request => (
-    asGetStakingKey(request.selected) != null
+    asGetStakingKey(request.selected) != null &&
+    isJormungandr(request.selected.getParent().getNetworkInfo())
   ),
 });
-export const STAKE_SIMULATOR_ADVANCED: TopbarCategory = registerCategory({
-  className: 'stakeAdvancedSimulator',
-  route: ROUTES.WALLETS.DELEGATION_ADVANCE,
+export const CARDANO_DELEGATION: TopbarCategory = registerCategory({
+  className: 'cardanoStake',
+  route: ROUTES.WALLETS.CARDANO_DELEGATION,
   icon: undefined,
-  label: messages.delegationAdvance,
+  label: messages.delegationSimple,
   isVisible: request => (
-    !environment.isProduction() &&
-    asGetStakingKey(request.selected) != null
+    asGetStakingKey(request.selected) != null &&
+    isCardanoHaskell(request.selected.getParent().getNetworkInfo())
   ),
 });

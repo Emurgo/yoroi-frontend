@@ -34,6 +34,11 @@ import {
  */
 const defaultTtlOffset = 7200;
 
+type TxOutput = {|
+  address: string,
+  amount: string,
+|};
+
 export function sendAllUnsignedTx(
   receiver: string,
   allUtxos: Array<AddressedUtxo>,
@@ -76,6 +81,7 @@ export function sendAllUnsignedTx(
     senderUtxos: addressedUtxos,
     txBuilder: unsignedTxResponse.txBuilder,
     changeAddr: unsignedTxResponse.changeAddr,
+    certificates: [],
   };
 }
 
@@ -174,8 +180,7 @@ export function sendAllUnsignedTxFromUtxo(
  * we use all UTXOs as possible inputs for selection
  */
 export function newAdaUnsignedTx(
-  receiver: string,
-  amount: string,
+  outputs: Array<TxOutput>,
   changeAdaAddr: void | {| ...Address, ...Addressing |},
   allUtxos: Array<AddressedUtxo>,
   absSlotNumber: BigNumber,
@@ -185,6 +190,7 @@ export function newAdaUnsignedTx(
     poolDeposit: RustModule.WalletV4.BigNum,
     keyDeposit: RustModule.WalletV4.BigNum,
   |},
+  certificates: $ReadOnlyArray<RustModule.WalletV4.Certificate>,
 ): V4UnsignedTxAddressedUtxoResponse {
   const addressingMap = new Map<RemoteUnspentOutput, AddressedUtxo>();
   for (const utxo of allUtxos) {
@@ -197,12 +203,12 @@ export function newAdaUnsignedTx(
     }, utxo);
   }
   const unsignedTxResponse = newAdaUnsignedTxFromUtxo(
-    receiver,
-    amount,
+    outputs,
     changeAdaAddr,
     Array.from(addressingMap.keys()),
     absSlotNumber,
     protocolParams,
+    certificates
   );
 
   const addressedUtxos = unsignedTxResponse.senderUtxos.map(
@@ -219,6 +225,7 @@ export function newAdaUnsignedTx(
     senderUtxos: addressedUtxos,
     txBuilder: unsignedTxResponse.txBuilder,
     changeAddr: unsignedTxResponse.changeAddr,
+    certificates,
   };
 }
 
@@ -229,8 +236,7 @@ export function newAdaUnsignedTx(
  * B) Having the key provided externally
  */
 export function newAdaUnsignedTxFromUtxo(
-  receiver: string,
-  amount: string,
+  outputs: Array<TxOutput>,
   changeAdaAddr: void | {| ...Address, ...Addressing |},
   utxos: Array<RemoteUnspentOutput>,
   absSlotNumber: BigNumber,
@@ -240,26 +246,36 @@ export function newAdaUnsignedTxFromUtxo(
     poolDeposit: RustModule.WalletV4.BigNum,
     keyDeposit: RustModule.WalletV4.BigNum,
   |},
+  certificates: $ReadOnlyArray<RustModule.WalletV4.Certificate>,
 ): V4UnsignedTxUtxoResponse {
-
-  const wasmReceiver = normalizeToAddress(receiver);
-  if (wasmReceiver == null) {
-    throw new Error(`${nameof(newAdaUnsignedTxFromUtxo)} receiver not a valid Shelley address`);
-  }
-
   const txBuilder = RustModule.WalletV4.TransactionBuilder.new(
     protocolParams.linearFee,
     protocolParams.minimumUtxoVal,
     protocolParams.poolDeposit,
     protocolParams.keyDeposit,
   );
+  if (certificates.length > 0) {
+    const certsWasm = certificates.reduce(
+      (certs, cert) => { certs.add(cert); return certs; },
+      RustModule.WalletV4.Certificates.new()
+    );
+    txBuilder.set_certs(certsWasm);
+  }
   txBuilder.set_ttl(absSlotNumber.plus(defaultTtlOffset).toNumber());
-  txBuilder.add_output(
-    RustModule.WalletV4.TransactionOutput.new(
-      wasmReceiver,
-      RustModule.WalletV4.BigNum.from_str(amount),
-    )
-  );
+  {
+    for (const output of outputs) {
+      const wasmReceiver = normalizeToAddress(output.address);
+      if (wasmReceiver == null) {
+        throw new Error(`${nameof(newAdaUnsignedTxFromUtxo)} receiver not a valid Shelley address`);
+      }
+      txBuilder.add_output(
+        RustModule.WalletV4.TransactionOutput.new(
+          wasmReceiver,
+          RustModule.WalletV4.BigNum.from_str(output.amount),
+        )
+      );
+    }
+  }
 
   let currentInputSum = new BigNumber(0);
   const usedUtxos: Array<RemoteUnspentOutput> = [];
@@ -321,6 +337,7 @@ export function signTransaction(
     BaseSignRequest<RustModule.WalletV4.TransactionBody>,
   keyLevel: number,
   signingKey: RustModule.WalletV4.Bip32PrivateKey,
+  stakingKeys: Array<RustModule.WalletV4.PrivateKey>,
   metadata: void | RustModule.WalletV4.TransactionMetadata,
 ): RustModule.WalletV4.Transaction {
   const seenByronKeys: Set<string> = new Set();
@@ -355,13 +372,38 @@ export function signTransaction(
   const txBody = signRequest.unsignedTx instanceof RustModule.WalletV4.TransactionBuilder
     ? signRequest.unsignedTx.build()
     : signRequest.unsignedTx;
+  const txHash = RustModule.WalletV4.hash_transaction(txBody);
 
-  const witnessSet = addWitnesses(
-    txBody,
+  const vkeyWits = RustModule.WalletV4.Vkeywitnesses.new();
+  const bootstrapWits = RustModule.WalletV4.BootstrapWitnesses.new();
+
+  addWitnesses(
+    txHash,
     deduped,
     keyLevel,
-    signingKey
+    signingKey,
+    vkeyWits,
+    bootstrapWits,
   );
+
+  const stakingKeySet = new Set<string>();
+  for (const stakingKey of stakingKeys) {
+    const asString = Buffer.from(stakingKey.as_bytes()).toString('hex');
+    if (stakingKeySet.has(asString)) {
+      continue;
+    }
+    stakingKeySet.add(asString);
+    const vkeyWit = RustModule.WalletV4.make_vkey_witness(
+      txHash,
+      stakingKey,
+    );
+    vkeyWits.add(vkeyWit);
+  }
+
+  const witnessSet = RustModule.WalletV4.TransactionWitnessSet.new();
+  if (bootstrapWits.len() > 0) witnessSet.set_bootstraps(bootstrapWits);
+  if (vkeyWits.len() > 0) witnessSet.set_vkeys(vkeyWits);
+
   return RustModule.WalletV4.Transaction.new(
     txBody,
     witnessSet,
@@ -381,24 +423,29 @@ function utxoToTxInput(
 }
 
 function addWitnesses(
-  txBody: RustModule.WalletV4.TransactionBody,
+  txHash: RustModule.WalletV4.TransactionHash,
   uniqueUtxos: Array<AddressedUtxo>, // pre-req: does not contain duplicate keys
   keyLevel: number,
-  signingKey: RustModule.WalletV4.Bip32PrivateKey
-): RustModule.WalletV4.TransactionWitnessSet {
+  signingKey: RustModule.WalletV4.Bip32PrivateKey,
+  vkeyWits: RustModule.WalletV4.Vkeywitnesses,
+  bootstrapWits: RustModule.WalletV4.BootstrapWitnesses,
+): void {
   // get private keys
   const privateKeys = uniqueUtxos.map(utxo => {
     const lastLevelSpecified = utxo.addressing.startLevel + utxo.addressing.path.length - 1;
     if (lastLevelSpecified !== Bip44DerivationLevels.ADDRESS.level) {
       throw new Error(`${nameof(addWitnesses)} incorrect addressing size`);
     }
-    return derivePrivateByAddressing(keyLevel, utxo.addressing, signingKey);
+    return derivePrivateByAddressing({
+      addressing: utxo.addressing,
+      startingFrom: {
+        level: keyLevel,
+        key: signingKey,
+      }
+    });
   });
 
   // sign the transactions
-  const txHash = RustModule.WalletV4.hash_transaction(txBody);
-  const vkeyWits = RustModule.WalletV4.Vkeywitnesses.new();
-  const bootstrapWits = RustModule.WalletV4.BootstrapWitnesses.new();
   for (let i = 0; i < uniqueUtxos.length; i++) {
     const wasmAddr = normalizeToAddress(uniqueUtxos[i].receiver);
     if (wasmAddr == null) {
@@ -420,11 +467,6 @@ function addWitnesses(
       bootstrapWits.add(bootstrapWit);
     }
   }
-
-  const witSet = RustModule.WalletV4.TransactionWitnessSet.new();
-  if (bootstrapWits.len() > 0) witSet.set_bootstraps(bootstrapWits);
-  if (vkeyWits.len() > 0) witSet.set_vkeys(vkeyWits);
-  return witSet;
 }
 
 // TODO: should go in a utility class somewhere instead of being copy-pasted in multiple places

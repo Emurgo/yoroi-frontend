@@ -65,6 +65,7 @@ export async function buildYoroiTransferTx(payload: {|
       }: BaseSignRequest<RustModule.WalletV4.TransactionBuilder>),
       payload.keyLevel,
       payload.signingKey,
+      [],
       undefined,
     );
 

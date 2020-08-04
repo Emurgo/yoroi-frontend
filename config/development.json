@@ -6,8 +6,7 @@
     "priceBackendUrl": "http://localhost:8080"
   },
   "seiza": {
-    "simpleTemplate": "",
-    "advanceTemplate": ""
+    "simpleTemplate": ""
   },
   "app": {
     "walletRefreshInterval": 20000,

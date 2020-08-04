@@ -37,7 +37,8 @@ import Transfer from './containers/transfer/Transfer';
 import Receive from './containers/wallet/Receive';
 import type { GeneratedData as ReceiveData } from './containers/wallet/Receive';
 import StakingDashboardPage from './containers/wallet/staking/StakingDashboardPage';
-import StakingPage from './containers/wallet/staking/StakingPage';
+import SeizaStakingPage from './containers/wallet/staking/SeizaStakingPage';
+import CardanoStakingPage from './containers/wallet/staking/CardanoStakingPage';
 import NoticeBoardPage from './containers/notice-board/NoticeBoardPage';
 
 import type { ConfigType } from '../config/config-types';
@@ -170,13 +171,13 @@ const WalletsSubpages = (stores, actions) => (
     />
     <Route
       exact
-      path={ROUTES.WALLETS.DELEGATION_SIMPLE}
-      component={(props) => <StakingPage {...props} stores={stores} actions={actions} urlTemplate={CONFIG.seiza.simpleTemplate} />}
+      path={ROUTES.WALLETS.SEIZA_DELEGATION_SIMPLE}
+      component={(props) => <SeizaStakingPage {...props} stores={stores} actions={actions} urlTemplate={CONFIG.seiza.simpleTemplate} />}
     />
     <Route
       exact
-      path={ROUTES.WALLETS.DELEGATION_ADVANCE}
-      component={(props) => <StakingPage {...props} stores={stores} actions={actions} urlTemplate={CONFIG.seiza.advanceTemplate} />}
+      path={ROUTES.WALLETS.CARDANO_DELEGATION}
+      component={(props) => <CardanoStakingPage {...props} stores={stores} actions={actions} />}
     />
     <Redirect to={ROUTES.WALLETS.TRANSACTIONS} />
   </Switch>

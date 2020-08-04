@@ -21,8 +21,8 @@ export const ROUTES = {
       ADDRESS_LIST: '/wallets/receive/:group/:name',
     },
     DELEGATION_DASHBOARD: '/wallets/delegation-dashboard',
-    DELEGATION_SIMPLE: '/wallets/delegation-simple',
-    DELEGATION_ADVANCE: '/wallets/delegation-advance',
+    SEIZA_DELEGATION_SIMPLE: '/wallets/delegation-simple',
+    CARDANO_DELEGATION: '/wallets/cardano-delegation',
   },
   SETTINGS: {
     ROOT: '/settings',

@@ -577,6 +577,14 @@ const globalMessages: * = defineMessages({
     id: 'global.labels.upgrade',
     defaultMessage: '!!!Upgrade'
   },
+  pendingTxWarning: {
+    id: 'wallet.staking.warning.pendingTx',
+    defaultMessage: '!!!You cannot change your delegation preference while a transaction is pending',
+  },
+  stakePoolHash: {
+    id: 'wallet.delegation.transaction.stakePoolHash',
+    defaultMessage: '!!!Stake pool id',
+  },
 });
 export default globalMessages;
 
