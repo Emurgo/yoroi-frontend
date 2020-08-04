@@ -212,6 +212,19 @@ export type RemoteCertificate = {|
   ...RemoteMoveInstantaneousRewardsCert,
 |};
 
+// getAccountState
+
+export type AccountStateRequest = {|
+  addresses: Array<string>
+|};
+export type RemoteAccountState = {|
+  value: string,
+|};
+export type AccountStateResponse = {|
+  [key: string]: RemoteAccountState,
+|};
+export type AccountStateFunc = (body: AccountStateRequest) => Promise<AccountStateResponse>;
+
 // getRewardHistory
 
 export type RewardHistoryRequest = {|

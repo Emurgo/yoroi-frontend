@@ -6,6 +6,7 @@ import type {
   UtxoSumRequest, UtxoSumResponse,
   HistoryRequest, HistoryResponse,
   RewardHistoryRequest, RewardHistoryResponse,
+  AccountStateRequest, AccountStateResponse,
   SignedRequest, SignedResponse,
   PoolInfoRequest, PoolInfoResponse,
   BestBlockRequest, BestBlockResponse,
@@ -22,6 +23,7 @@ export interface IFetcher {
   getRewardHistory(body: RewardHistoryRequest): Promise<RewardHistoryResponse>;
   getBestBlock(body: BestBlockRequest): Promise<BestBlockResponse>;
   sendTx(body: SignedRequest): Promise<SignedResponse>;
+  getAccountState(body: AccountStateRequest): Promise<AccountStateResponse>;
   getPoolInfo(body: PoolInfoRequest): Promise<PoolInfoResponse>;
   checkAddressesInUse(body: FilterUsedRequest): Promise<FilterUsedResponse>;
 }

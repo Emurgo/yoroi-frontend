@@ -5,6 +5,7 @@ import type {
   TxBodiesRequest, TxBodiesResponse,
   UtxoSumRequest, UtxoSumResponse,
   HistoryRequest, HistoryResponse,
+  AccountStateRequest, AccountStateResponse,
   RewardHistoryRequest, RewardHistoryResponse,
   BestBlockRequest, BestBlockResponse,
   SignedRequest, SignedResponse,
@@ -30,6 +31,7 @@ import {
   GetTxHistoryForAddressesApiError,
   GetRewardHistoryApiError,
   GetPoolInfoApiError,
+  GetAccountStateApiError,
   GetBestBlockError,
   SendTransactionApiError,
   CheckAddressesInUseApiError,
@@ -280,6 +282,27 @@ export class RemoteFetcher implements IFetcher {
         Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.checkAddressesInUse)} error: ` + stringifyError(error));
         throw new CheckAddressesInUseApiError();
       })
+  )
+
+  getAccountState: AccountStateRequest => Promise<AccountStateResponse> = (body) => (
+    // axios(
+    //   `${backendUrl}/api/v2/account/state`,
+    //   {
+    //     method: 'post',
+    //     data: {
+    //       addresses: body.addresses
+    //     },
+    //     headers: {
+    //       'yoroi-version': this.getLastLaunchVersion(),
+    //       'yoroi-locale': this.getCurrentLocale()
+    //     }
+    //   }
+    // ).then(response => response.data)
+    //   .catch((error) => {
+    //     Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getAccountState)} error: ` + stringifyError(error));
+    //     throw new GetAccountStateApiError();
+    //   })
+    Promise.resolve({ [body.addresses[0]]: { value: '0' }}) // TODO: replace when endpoint is implemented
   )
 
   getPoolInfo: PoolInfoRequest => Promise<PoolInfoResponse> = (body) => (

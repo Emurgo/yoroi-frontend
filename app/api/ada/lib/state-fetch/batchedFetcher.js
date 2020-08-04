@@ -8,6 +8,7 @@ import type {
   HistoryRequest, HistoryResponse,
   RewardHistoryFunc, RewardHistoryRequest, RewardHistoryResponse,
   PoolInfoFunc, PoolInfoRequest, PoolInfoResponse,
+  AccountStateFunc, AccountStateRequest, AccountStateResponse,
   SignedRequest, SignedResponse,
   BestBlockRequest, BestBlockResponse,
   AddressUtxoFunc,
@@ -30,6 +31,7 @@ import {
   GetUtxosSumsForAddressesApiError,
   GetTxHistoryForAddressesApiError,
   GetRewardHistoryApiError,
+  GetAccountStateApiError,
   GetPoolInfoApiError,
 } from '../../../common/errors';
 import {
@@ -88,6 +90,10 @@ export class BatchedFetcher implements IFetcher {
     // We don't batch transaction sending (it's just a single request)
     // TODO: Should we support batching a list of transactions?
     this.baseFetcher.sendTx(body)
+  )
+
+  getAccountState: AccountStateRequest => Promise<AccountStateResponse> = (body) => (
+    batchGetAccountState(this.baseFetcher.getAccountState)(body)
   )
 
   checkAddressesInUse: FilterUsedRequest => Promise<FilterUsedResponse> = (body) => (
@@ -353,6 +359,24 @@ function getLatestTransaction(
     }
   }
   return best;
+}
+
+export function batchGetAccountState(
+  getAccountState: AccountStateFunc,
+): AccountStateFunc {
+  return async function (body: AccountStateRequest): Promise<AccountStateResponse> {
+    try {
+      const chimericAccountAddresses = chunk(body.addresses, addressesLimit);
+      const chimericAccountPromises = chimericAccountAddresses.map(
+        addr => getAccountState({ addresses: addr })
+      );
+      const chimericAccountStates = await Promise.all(chimericAccountPromises);
+      return Object.assign({}, ...chimericAccountStates);
+    } catch (error) {
+      Logger.error(`batchedFetcher::${nameof(batchGetAccountState)} error: ` + stringifyError(error));
+      throw new GetAccountStateApiError();
+    }
+  };
 }
 
 export function batchGetPoolInfo(

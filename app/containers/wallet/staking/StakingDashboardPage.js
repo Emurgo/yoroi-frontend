@@ -149,16 +149,15 @@ export default class StakingDashboardPage extends Component<Props> {
       <StakingDashboard
         pageInfo={
           !delegationRequests.getCurrentDelegation.wasExecuted ||
-          delegationRequests.getCurrentDelegation.isExecuting ||
-          delegationRequests.getCurrentDelegation.result?.currEpoch == null
+          delegationRequests.getCurrentDelegation.isExecuting
             ? undefined
             : {
               currentPage: this.generated.stores.delegation.selectedPage,
               numPages: Array.from(new Set(
-                delegationRequests.getCurrentDelegation.result.currEpoch.pools.map(
+                delegationRequests.getCurrentDelegation.result?.currEpoch?.pools.map(
                   tuple => tuple[0]
                 )
-              )).length,
+              ) ?? []).length,
               goToPage: page => this.generated.actions.delegation.setSelectedPage.trigger(page),
             }}
         hasAnyPending={this.generated.stores.transactions.hasAnyPending}

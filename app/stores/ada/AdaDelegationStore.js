@@ -1,6 +1,7 @@
 // @flow
 
 import { action, reaction, runInAction } from 'mobx';
+import BigNumber from 'bignumber.js';
 import Store from '../base/Store';
 import {
   Logger,
@@ -81,32 +82,29 @@ export default class AdaDelegationStore extends Store {
 
       const stakingKeyResp = await withStakingKey.getStakingKey();
 
-  //     const accountStateCalcs = (async () => {
-  //       try {
-  //         const stateFetcher = this.stores.substores.ada.stateFetchStore.fetcher;
-  //         const accountStateResp = await stateFetcher.getAccountState({
-  //           addresses: [stakingKeyResp.addr.Hash],
-  //         });
-  //         const stateForStakingKey = accountStateResp[stakingKeyResp.addr.Hash];
-  //         if (!stateForStakingKey.delegation) {
-  //           throw new Error(`${nameof(this.refreshDelegation)} stake key invalid - ${stateForStakingKey.comment}`);
-  //         }
-  //         const delegatedBalance = delegationRequest.getDelegatedBalance.execute({
-  //           publicDeriver: withStakingKey,
-  //           accountState: stateForStakingKey,
-  //           stakingAddress: stakingKeyResp.addr.Hash,
-  //         }).promise;
-  //         if (delegatedBalance == null) throw new Error('Should never happen');
+      const accountStateCalcs = (async () => {
+        try {
+          const stateFetcher = this.stores.substores.ada.stateFetchStore.fetcher;
+          const accountStateResp = await stateFetcher.getAccountState({
+            addresses: [stakingKeyResp.addr.Hash],
+          });
+          const stateForStakingKey = accountStateResp[stakingKeyResp.addr.Hash];
+          const delegatedBalance = delegationRequest.getDelegatedBalance.execute({
+            publicDeriver: withStakingKey,
+            rewardBalance: new BigNumber(stateForStakingKey.value),
+            stakingAddress: stakingKeyResp.addr.Hash,
+          }).promise;
+          if (delegatedBalance == null) throw new Error('Should never happen');
 
-  //         return await Promise.all([
-  //           delegatedBalance,
-  //         ]);
-  //       } catch (e) {
-  //         runInAction(() => {
-  //           delegationRequest.error = e;
-  //         });
-  //       }
-  //     })();
+          return await Promise.all([
+            delegatedBalance,
+          ]);
+        } catch (e) {
+          runInAction(() => {
+            delegationRequest.error = e;
+          });
+        }
+      })();
 
       const delegationHistory = this._getDelegationHistory({
         publicDeriver: withStakingKey,
@@ -122,7 +120,7 @@ export default class AdaDelegationStore extends Store {
       ).promise;
 
       await Promise.all([
-        // accountStateCalcs,
+        accountStateCalcs,
         delegationHistory,
         rewardHistory,
       ]);

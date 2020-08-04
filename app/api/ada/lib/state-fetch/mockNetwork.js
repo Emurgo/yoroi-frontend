@@ -7,6 +7,7 @@ import type {
   AddressUtxoRequest, AddressUtxoResponse, AddressUtxoFunc,
   UtxoSumRequest, UtxoSumResponse, UtxoSumFunc,
   RewardHistoryRequest, RewardHistoryResponse, RewardHistoryFunc,
+  AccountStateRequest, AccountStateResponse, AccountStateFunc,
   PoolInfoRequest, PoolInfoResponse, PoolInfoFunc,
   RemoteTransaction, RemoteUnspentOutput,
   SignedRequestInternal,
@@ -461,6 +462,24 @@ export function toRemoteByronTx(
     time: null,
     epoch: null,
     slot: null,
+  };
+}
+
+export function genGetAccountState(
+  _blockchain: Array<RemoteTransaction>,
+): AccountStateFunc {
+  return async (
+    body: AccountStateRequest,
+  ): Promise<AccountStateResponse> => {
+    const result: AccountStateResponse = {};
+    for (const address of body.addresses) {
+      // TODO: this is harder to mock since rewards are implicit
+      const state = {
+        value: '0',
+      };
+      result[address] = state;
+    }
+    return result;
   };
 }
 
