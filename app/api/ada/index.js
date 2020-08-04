@@ -1065,6 +1065,7 @@ export default class AdaApi {
         // TODO: this not a great way to pick which key to sign with
         // it will work for the basic case (sign your own certificate)
         // but won't work for registration certificates
+        // or submitting a key registration without delegating
         // or submitting somebody else's key registration certificate
         [normalizedStakingKey],
         undefined,
