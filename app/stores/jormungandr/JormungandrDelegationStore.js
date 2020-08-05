@@ -195,6 +195,7 @@ export default class JormungandrDelegationStore extends Store {
           networkId: request.network.NetworkId,
           poolId,
           poolInfo: {
+            poolId,
             info: poolInfo.info,
             history: poolInfo.history,
             reputation: reputation[poolId] ?? Object.freeze({}),

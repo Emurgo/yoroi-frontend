@@ -317,6 +317,7 @@ const changeDelegationCert = {
 };
 
 const emurgo2Pool = {
+  poolId: '2',
   info: {
     ticker: '2EMUR',
     name: 'EMURGO’ STAKEPOOL',
@@ -339,6 +340,7 @@ const emurgo2Pool = {
 
 const privatePoolInfo = {
   info: undefined,
+  poolId: '3',
   history: [
     {
       epoch: 13,
@@ -363,6 +365,7 @@ const emurgo1Pool = {
   },
   reputation: Object.freeze({}),
   ...privatePoolInfo,
+  poolId: '1',
 };
 
 function mockGetPoolInfo(networkId: $ReadOnly<NetworkRow>, poolId: string): void | PoolMeta {

@@ -30,6 +30,7 @@ export type DelegationRequests = {|
 |};
 
 export type PoolMeta = {|
+  poolId: string,
   info: ?{|
     name?: string,
     ticker?: string,

@@ -190,6 +190,7 @@ export default class AdaDelegationStore extends Store {
           networkId: request.network.NetworkId,
           poolId,
           poolInfo: {
+            poolId,
             info: {
               name: poolInfo.info.name,
               ticker: poolInfo.info.ticker,

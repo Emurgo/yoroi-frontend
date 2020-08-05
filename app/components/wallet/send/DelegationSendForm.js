@@ -12,11 +12,11 @@ import vjf from 'mobx-react-form/lib/validators/VJF';
 import BorderedBox from '../../widgets/BorderedBox';
 import styles from './DelegationSendForm.scss';
 import globalMessages from '../../../i18n/global-messages';
-import config from '../../../config';
 import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
 import WarningBox from '../../widgets/WarningBox';
 import type { $npm$ReactIntl$IntlFormat, } from 'react-intl';
 import isHexadecimal from 'validator/lib/isHexadecimal';
+import LocalizableError from '../../../i18n/LocalizableError';
 
 const messages = defineMessages({
   invalidPoolId: {
@@ -28,7 +28,9 @@ const messages = defineMessages({
 type Props = {|
   +hasAnyPending: boolean,
   +updatePool: (void | string) => Promise<void>,
+  +poolQueryError: ?LocalizableError,
   +onNext: void => Promise<void>,
+  +isProcessing: boolean,
 |};
 
 function isValidPool(poolId: string): boolean {
@@ -64,6 +66,9 @@ export default class DelegationSendForm extends Component<Props> {
           } else {
             this.props.updatePool(undefined);
           }
+          if (this.props.poolQueryError != null) {
+            return [false]; // no error message since container already displays one
+          }
           return [isValid, this.context.intl.formatMessage(messages.invalidPoolId)];
         }],
       },
@@ -73,7 +78,7 @@ export default class DelegationSendForm extends Component<Props> {
       showErrorsOnInit: false, // TODO: support URI
       validateOnBlur: false,
       validateOnChange: true,
-      validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
+      validationDebounceWait: 0,
     },
     plugins: {
       vjf: vjf()
@@ -94,6 +99,10 @@ export default class DelegationSendForm extends Component<Props> {
       </div>
     );
 
+    const poolQueryError = this.props.poolQueryError == null
+      ? this.props.poolQueryError
+      : intl.formatMessage(this.props.poolQueryError);
+
     return (
       <div className={styles.component}>
 
@@ -105,7 +114,7 @@ export default class DelegationSendForm extends Component<Props> {
             <Input
               className="poolId"
               {...poolIdField.bind()}
-              error={poolIdField.error}
+              error={poolIdField.error || poolQueryError}
               skin={InputOwnSkin}
               done={poolIdField.isValid}
             />
@@ -131,7 +140,11 @@ export default class DelegationSendForm extends Component<Props> {
         className={buttonClasses}
         label={intl.formatMessage(globalMessages.nextButtonLabel)}
         onMouseUp={this.props.onNext}
-        disabled={this.props.hasAnyPending}
+        disabled={
+          this.props.hasAnyPending ||
+          this.props.isProcessing ||
+          this.props.poolQueryError != null
+        }
         skin={ButtonSkin}
       />);
   }

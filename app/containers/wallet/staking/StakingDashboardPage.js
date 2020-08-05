@@ -514,6 +514,7 @@ export default class StakingDashboardPage extends Component<Props> {
         };
         return (
           <StakePool
+            purpose="dashboard"
             poolName={name}
             key={digestForHash(JSON.stringify(meta), 0)}
             data={stakePoolMeta}

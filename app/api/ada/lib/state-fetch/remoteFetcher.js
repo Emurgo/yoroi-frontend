@@ -312,6 +312,10 @@ export class RemoteFetcher implements IFetcher {
           info: {
             owner: 'df1750df9b2df285fcfb50f4740657a18ee3af42727d410c37b86207',
             pledge_address: 'todo',
+            name: 'Yoroi',
+            description: 'Yoroi is a light wallet for Cardano. It’s simple, fast and secure.',
+            ticker: 'YOROI',
+            homepage: 'https://yoroi-wallet.com/',
           },
           history: [],
         },
