@@ -57,6 +57,7 @@ import { getUnmangleAmounts, } from '../../../stores/stateless/mangledAddresses'
 import type { IAddressTypeStore, IAddressTypeUiSubset } from '../../../stores/stateless/addressStores';
 import { GROUP_MANGLED } from '../../../stores/stateless/addressStores';
 import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
+import { isJormungandr } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 
 export type GeneratedData = typeof StakingDashboardPage.prototype.generated;
 
@@ -85,6 +86,7 @@ export default class StakingDashboardPage extends Component<Props> {
 
   componentWillUnmount() {
     this.generated.actions.jormungandr.delegationTransaction.reset.trigger();
+    this.generated.actions.ada.delegationTransaction.reset.trigger();
   }
 
   hideOrFormat: (BigNumber, $PropertyType<SelectedApiType, 'meta'>) => {|
@@ -207,6 +209,9 @@ export default class StakingDashboardPage extends Component<Props> {
   }
 
   generatePopupDialog: PublicDeriver<> => (null | Node) = (publicDeriver) => {
+    if (!isJormungandr(publicDeriver.getParent().getNetworkInfo())) {
+      return null; // TODO
+    }
     const apiMeta = getApiMeta(
       getApiForNetwork(publicDeriver.getParent().getNetworkInfo())
     )?.meta;
@@ -544,7 +549,7 @@ export default class StakingDashboardPage extends Component<Props> {
             }
             undelegate={
               // don't support undelegation for ratio stake since it's a less intuitive UX
-              currentPools.length === 1
+              currentPools.length === 1 && isJormungandr(publicDeriver.getParent().getNetworkInfo())
                 ? async () => {
                   this.generated.actions.dialogs.open.trigger({ dialog: UndelegateDialog });
                   await this.generated.actions.jormungandr
@@ -766,6 +771,11 @@ export default class StakingDashboardPage extends Component<Props> {
     EpochProgressContainerProps: InjectedOrGenerated<EpochProgressContainerData>,
     UnmangleTxDialogContainerProps: InjectedOrGenerated<UnmangleTxDialogContainerData>,
     actions: {|
+      ada: {|
+        delegationTransaction: {|
+          reset: {| trigger: (params: void) => void |},
+        |},
+      |},
       jormungandr: {|
         delegationTransaction: {|
           createTransaction: {|
@@ -970,6 +980,13 @@ export default class StakingDashboardPage extends Component<Props> {
         delegation: {
           setSelectedPage: {
             trigger: actions.delegation.setSelectedPage.trigger,
+          },
+        },
+        ada: {
+          delegationTransaction: {
+            reset: {
+              trigger: actions.jormungandr.delegationTransaction.reset.trigger,
+            },
           },
         },
         jormungandr: {

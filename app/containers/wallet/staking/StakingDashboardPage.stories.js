@@ -171,6 +171,13 @@ const genBaseProps: {|
           trigger: action('closeActiveDialog'),
         },
       },
+      ada: {
+        delegationTransaction: {
+          reset: {
+            trigger: action('closeActiveDialog'),
+          },
+        },
+      },
       jormungandr: {
         delegationTransaction: {
           reset: {
@@ -266,6 +273,7 @@ const delegateCert1 = {
     Relation: 0,
   }],
   certificate: {
+    Ordinal: 0,
     CertificateId: 10,
     TransactionId: 14,
     Kind: 0,

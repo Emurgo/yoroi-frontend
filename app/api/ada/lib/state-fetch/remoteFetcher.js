@@ -155,26 +155,6 @@ export class RemoteFetcher implements IFetcher {
               output.address = Buffer.from(payload).toString('hex');
             } catch (_e) { /* expected not to work for base58 addresses */ }
           }
-          // this was caused by a typo in the backend
-          if (resp.withdrawals == null) {
-            resp.withdrawals = [];
-          }
-          for (const withdrawal of resp.withdrawals) {
-            try {
-              const payload = fromWords(decode(withdrawal.address, 1000).words);
-              // $FlowExpectedError[cannot-write]
-              withdrawal.address = Buffer.from(payload).toString('hex');
-            } catch (_e) { /* expected not to work for base58 addresses */ }
-          }
-          // the format of this will probably change, so best not to parse it
-          // so that changing the backend doesn't break the frontend
-          resp.certificates = [];
-        }
-        for (const input of resp.inputs) {
-          // backend stores inputs as numbers but outputs as strings
-          // we solve this mismatch locally
-          // $FlowExpectedError[cannot-write]
-          input.amount = input.amount.toString();
         }
         if (resp.height != null) {
           return resp;

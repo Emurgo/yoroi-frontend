@@ -780,6 +780,7 @@ async function syncWithCertificate(): Promise<void> {
       SlotNum: 435650,
     },
     certificate: {
+      Ordinal: 0,
       CertificateId: 1,
       Kind: 0,
       Payload: 'd993c5b8ca62c78801d3228a8de6b9e18217b001820c24d60c1bcd91c895d58501312e3d449038372ba2fc3300cfedf1b152ae739201b3e5da47ab3f933a421b62',
@@ -833,6 +834,7 @@ async function syncWithCertificate(): Promise<void> {
   const cert2 = {
     block: null,
     certificate: {
+      Ordinal: 0,
       CertificateId: 2,
       Kind: 0,
       Payload: 'd993c5b8ca62c78801d3228a8de6b9e18217b001820c24d60c1bcd91c895d58501312e3d449038372ba2fc3300cfedf1b152ae739201b3e5da47ab3f933a421b62',

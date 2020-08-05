@@ -135,7 +135,7 @@ const populateAndCreate = async (
   storeType: $Values<typeof schema.DataStoreType>
 ): Promise<lf$Database> => {
   const schemaName = 'yoroi-schema';
-  const schemaVersion = 13;
+  const schemaVersion = 14;
   const schemaBuilder = schema.create(schemaName, schemaVersion);
 
   populatePrimitivesDb(schemaBuilder);
@@ -283,6 +283,14 @@ async function onUpgrade(
       'Extra',
       // recall: at the time we only supported Byron at this time
       null
+    );
+  }
+  if (version >= 3 && version <= 13) {
+    await rawDb.addTableColumn(
+      'Certificate',
+      'Ordinal',
+      // recall: certificates weren't supported at this time
+      TransactionType.CardanoByron
     );
   }
 }
