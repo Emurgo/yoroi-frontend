@@ -88,7 +88,7 @@ export default class AdaYoroiTransferStore extends Store {
     const config = fullConfig.reduce((acc, next) => Object.assign(acc, next), {});
 
     // note: no wallet selected so we call this directly
-    const toRelativeSlotNumber = await genTimeToSlot(fullConfig);
+    const timeToSlot = await genTimeToSlot(fullConfig);
 
     const transferTx = await yoroiTransferTxFromAddresses({
       addresses,
@@ -106,7 +106,7 @@ export default class AdaYoroiTransferStore extends Store {
         minimumUtxoVal: RustModule.WalletV4.BigNum.from_str(config.MinimumUtxoVal),
         poolDeposit: RustModule.WalletV4.BigNum.from_str(config.PoolDeposit),
       },
-      absSlotNumber: new BigNumber(toRelativeSlotNumber({ time: new Date() }).slot),
+      absSlotNumber: new BigNumber(timeToSlot({ time: new Date() }).slot),
     });
     // Possible exception: NotEnoughMoneyToSendError
     return transferTx;

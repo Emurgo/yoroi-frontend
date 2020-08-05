@@ -201,9 +201,9 @@ export default class AdaTransactionBuilderStore extends Store {
     const fullConfig = getCardanoHaskellBaseConfig(
       withHasUtxoChains.getParent().getNetworkInfo(),
     );
-    const toRelativeSlotNumber = await genTimeToSlot(fullConfig);
+    const timeToSlot = await genTimeToSlot(fullConfig);
     // TODO: should not be ADA-specific
-    const absSlotNumber = new BigNumber(toRelativeSlotNumber({ time: new Date() }).slot);
+    const absSlotNumber = new BigNumber(timeToSlot({ time: new Date() }).slot);
 
     if (amount == null && shouldSendAll === true) {
       await this.createUnsignedTx.execute({

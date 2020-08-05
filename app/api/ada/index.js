@@ -344,7 +344,8 @@ export type CreateDelegationTxRequest = {|
     IGetPublic & IGetAllUtxos & IHasUtxoChains & IGetStakingKey
   ),
   absSlotNumber: BigNumber,
-  isRegistered: boolean, // TODO: maybe this probably be a trait of public deriver instead?
+  // TODO: maybe this probably be a trait of public deriver instead?
+  computeRegistrationStatus: void => Promise<boolean>,
   poolRequest: void | string,
   valueInAccount: BigNumber,
 |};
@@ -946,6 +947,8 @@ export default class AdaApi {
   ): Promise<CreateDelegationTxResponse> {
     Logger.debug(`${nameof(AdaApi)}::${nameof(this.createDelegationTx)} called`);
 
+    const registartionStatus = await request.computeRegistrationStatus();
+
     const config = getCardanoHaskellBaseConfig(
       request.publicDeriver.getParent().getNetworkInfo()
     ).reduce((acc, next) => Object.assign(acc, next), {});
@@ -979,7 +982,7 @@ export default class AdaApi {
 
     const stakeDelegationCert = createCertificate(
       stakingKey,
-      request.isRegistered,
+      registartionStatus,
       request.poolRequest
     );
 

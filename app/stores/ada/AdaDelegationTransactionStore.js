@@ -18,8 +18,11 @@ import {
 } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import { getCardanoHaskellBaseConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import {
-  genTimeToSlot,
+  genTimeToSlot, genToRelativeSlotNumber,
 } from '../../api/ada/lib/storage/bridge/timeUtils';
+import {
+  getRegistrationHistory,
+} from '../../api/ada/lib/storage/bridge/delegationUtils';
 
 export default class AdaDelegationTransactionStore extends Store {
 
@@ -110,13 +113,24 @@ export default class AdaDelegationTransactionStore extends Store {
     const fullConfig = getCardanoHaskellBaseConfig(
       withHasUtxoChains.getParent().getNetworkInfo(),
     );
-    const toRelativeSlotNumber = await genTimeToSlot(fullConfig);
-    const absSlotNumber = new BigNumber(toRelativeSlotNumber({ time: new Date() }).slot);
+    const toRelativeSlotNumber = await genToRelativeSlotNumber(fullConfig);
+    const timeToSlot = await genTimeToSlot(fullConfig);
+    const absSlotNumber = new BigNumber(timeToSlot({ time: new Date() }).slot);
+    const currentEpoch = toRelativeSlotNumber(
+      timeToSlot({
+        time: new Date(),
+      }).slot
+    ).epoch;
 
     const delegationTxPromise = this.createDelegationTx.execute({
       publicDeriver: basePubDeriver,
       poolRequest: request.poolRequest,
-      isRegistered: false, // TODO
+      computeRegistrationStatus: async () => (await getRegistrationHistory({
+        publicDeriver: basePubDeriver,
+        stakingKeyAddressId: (await withStakingKey.getStakingKey()).addr.AddressId,
+        toRelativeSlotNumber,
+        currentEpoch,
+      })).currEpoch,
       valueInAccount: delegationRequests.getDelegatedBalance.result?.accountPart
         ?? new BigNumber(0),
       absSlotNumber,
