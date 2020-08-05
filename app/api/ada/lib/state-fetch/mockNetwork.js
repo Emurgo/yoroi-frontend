@@ -475,7 +475,10 @@ export function genGetAccountState(
     for (const address of body.addresses) {
       // TODO: this is harder to mock since rewards are implicit
       const state = {
-        value: '0',
+        poolOperator: null,
+        remainingAmount: '0',
+        rewards: '0',
+        withdrawals: '0'
       };
       result[address] = state;
     }

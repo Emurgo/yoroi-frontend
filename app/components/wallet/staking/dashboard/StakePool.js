@@ -173,8 +173,8 @@ export default class StakePool extends Component<Props> {
       <Card title={
         this.props.purpose === 'dashboard'
           ? intl.formatMessage(messages.title)
-          : undefined
-        }>
+          : undefined}
+      >
         <div className={styles.head}>
           <div className={styles.avatarWrapper}>
             <img alt="User avatar" src={avatar} className={styles.avatar} />

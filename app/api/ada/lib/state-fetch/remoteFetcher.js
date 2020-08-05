@@ -282,7 +282,7 @@ export class RemoteFetcher implements IFetcher {
     //     Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getAccountState)} error: ` + stringifyError(error));
     //     throw new GetAccountStateApiError();
     //   })
-    Promise.resolve({ [body.addresses[0]]: { value: '0' }}) // TODO: replace when endpoint is implemented
+    Promise.resolve({ [body.addresses[0]]: { remainingAmount: '0' }}) // TODO: replace when endpoint is implemented
   )
 
   getPoolInfo: PoolInfoRequest => Promise<PoolInfoResponse> = (body) => (
