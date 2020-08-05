@@ -446,6 +446,7 @@
   "wallet.dashboard.stakePool.pledge": "Pledge",
   "wallet.dashboard.stakePool.stake": "Stake",
   "wallet.dashboard.stakePool.title": "Stake Pool Delegated",
+  "wallet.dashboard.stakePool.viewWebpage": "View pool webpage",
   "wallet.dashboard.summary.adaTitle": "Total ADA",
   "wallet.dashboard.summary.delegatedTitle": "Total Delegated",
   "wallet.dashboard.summary.mangled.can": "{adaAmount} ADA can be corrected",
