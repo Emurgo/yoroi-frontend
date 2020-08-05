@@ -112,7 +112,9 @@ export type RemoteTxInfo = {|
   +hash: string,
   +last_update: string, // timestamp with timezone
   +tx_state: RemoteTxState,
+  // these will be ordered by the input transaction id asc
   +inputs: Array<RemoteTransactionInput>,
+  // these will be ordered by transaction index asc.
   +outputs: Array<RemoteTransactionOutput>,
 |};
 export type RemoteTransaction = {|
@@ -133,7 +135,7 @@ export type RemoteUnspentOutput = {|
 |};
 
 export type RemoteWithdrawal = {|
-  +address: string,
+  +address: string, // hex
   +amount: string,
 |};
 
@@ -148,46 +150,55 @@ export const ShelleyCertificateTypes = Object.freeze({
 });
 
 export type RemoteStakeRegistrationCert = {|
-  +stake_credential: string,
+  +stakeCredential: string, // hex
 |};
 export type RemoteStakeDeregistrationCert = {|
-  +stake_credential: string,
+  +stakeCredential: string, // hex
 |};
 export type RemoteStakeDelegationCert = {|
-  +stake_credential: string,
-  +pool_keyhash: string,
+  +stakeCredential: string, // hex
+  +poolKeyHash: string, // hex
 |};
 export type RemotePoolRegistrationCert = {|
   +pool_params: {|
     +operator: string,
-    +vrf_keyhash: string,
-    +pledge: string,
+    +vrfKeyHash: string,
+    +pledge: number | string, // TODO: should be string
     +cost: string,
-    +margin: {|
-      +numerator: string,
-      +denominator: string
-    |},
-    +reward_account: string,
-    +pool_owners: Array<string>,
-    +relays: Array<string>,
-    +pool_metadata: void | {|
+    +margin: number,
+    // +margin: {|
+    //   +numerator: string,
+    //   +denominator: string
+    // |},
+    +rewardAccount: string, // hex
+    +poolOwners: Array<string>, // hex
+    // TODO: some relay fields are optional I think. Need to investigate
+    +relays: Array<{|
+      ipv4: string,
+      ipv6: string,
+      dnsName: string,
+      dnsSrvName: string,
+      port: string,
+    |}>,
+    +poolMetadata: null | {|
       +url: string,
-      +metadata_hash: string,
+      +metadataHash: string, // hex
     |},
   |},
 |};
 export type RemotePoolRetirementCert = {|
-  +pool_keyhash: string,
+  +poolKeyHash: string, // hex
   +epoch: number,
 |};
 export type RemoteGenesisKeyDelegationCert = {|
   +genesishash: string,
-  +genesis_delegate_hash: string,
-  +vrf_keyhash: string,
+  +genesisDelegateHash: string,
+  +vrfKeyHash: string,
 |};
 export type RemoteMoveInstantaneousRewardsCert = {|
-  +pot: $Values<MIRPot>,
-  +rewards: {| [stake_credential: string]: string /* coin */ |},
+  +pot: number | ('Reserve' | 'Treasury'),
+  +rewards: Array<string>, // stakeCredential hex
+  // +rewards: {| [stake_credential: string]: string /* coin */ |},
 |};
 export type RemoteCertificate = {|
   cert_index: number,

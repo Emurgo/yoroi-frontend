@@ -171,6 +171,13 @@ const genBaseProps: {|
           trigger: action('closeActiveDialog'),
         },
       },
+      ada: {
+        delegationTransaction: {
+          reset: {
+            trigger: action('closeActiveDialog'),
+          },
+        },
+      },
       jormungandr: {
         delegationTransaction: {
           reset: {
