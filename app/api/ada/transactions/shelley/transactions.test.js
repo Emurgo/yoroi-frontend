@@ -230,13 +230,13 @@ describe('Create unsigned TX from addresses', () => {
 
     expect(unsignedTxResponse.txBuilder.get_explicit_input().to_str()).toEqual('1000702');
     expect(unsignedTxResponse.txBuilder.get_explicit_output().to_str()).toEqual('5001');
-    expect(unsignedTxResponse.txBuilder.estimate_fee().to_str()).toEqual('1052');
+    expect(unsignedTxResponse.txBuilder.estimate_fee().to_str()).toEqual('1056');
     // burns remaining amount
     expect(
       unsignedTxResponse.txBuilder.get_explicit_input().checked_sub(
         unsignedTxResponse.txBuilder.get_explicit_output()
       ).to_str()
-    ).toEqual('995701');
+    ).toEqual(unsignedTxResponse.txBuilder.build().fee().to_str());
   });
 });
 
@@ -283,7 +283,7 @@ describe('Create signed transactions', () => {
     expect(bootstrapWits.len()).toEqual(1);
 
     expect(Buffer.from(bootstrapWits.get(0).to_bytes()).toString('hex')).toEqual(
-      '8458208fb03c3aa052f51c086c54bd4059ead2d2e426ac89fa4b3ce41cbfd8800b51c0584053685c27ee95dc8e2ea87e6c9e7b0557c7d060cc9d18ada7df3c2eec5949011c76e8647b072fe3fa8310894f087b097cbb15d7fbcc743100a716bf5df3c6190058202623fceb96b07408531a5cb259f53845a38d6b68928e7c0c7e390f07545d0e6241a0'
+      '8458208fb03c3aa052f51c086c54bd4059ead2d2e426ac89fa4b3ce41cbfd8800b51c05840d4da0fe3615f90581926281be0510df5f6616ebed5a6d6831cceab4dd9935f7f5b6150d43b918d79e8db7cd3e17b9de91fdfbaed7cdab18818331942852fd10b58202623fceb96b07408531a5cb259f53845a38d6b68928e7c0c7e390f07545d0e6241a0'
     );
   });
 
@@ -431,8 +431,8 @@ describe('Create signed transactions', () => {
     ].sort();
 
     expect(witArray).toEqual([
-      '82582001c01f8b958699ae769a246e9785db5a70e023977ea4b856dfacf23c23346caf5840f5aa462d15e71a835c1624ae824d00a0fc0d403cb5f8cb415f9cecb7f1e598b4da1201ad0d8aa23a218613e342d4a8ff2ba7930f9c5b35ee297e3df824b3bd06',
-      '82582038c14a0756e1743081a8ebfdb9169b11283a7bf6c38045c4c4a5e62a7689639d584060923529cf169eadcb8fa003d40be56b6a6bcea093c60f821f79947bedc1c7408249e8feafb10263b6eb7de7b332e83af389d48644ff6795f2bcf399078b4901',
+      '82582001c01f8b958699ae769a246e9785db5a70e023977ea4b856dfacf23c23346caf584020a6884b523bc4ec018703126de273b589a28fad69dd0d77509ae722b7694fcd11698194177b50598ed8821b09eff93fb77185e1b3554aef92c28215f1bad604',
+      '82582038c14a0756e1743081a8ebfdb9169b11283a7bf6c38045c4c4a5e62a7689639d58402805b2e48b8c7872bc4c837c1b0cadd9585fcdea188eaf39055760d059281f7e62211fbff01bd34b0e9d78b62b964f53bc13503417220f4bf5b837df49e2ca08',
     ]);
   });
 });

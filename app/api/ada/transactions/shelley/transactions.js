@@ -304,7 +304,16 @@ export function newAdaUnsignedTxFromUtxo(
 
   const changeAddr = (() => {
     if (changeAdaAddr == null) {
-      txBuilder.set_fee(txBuilder.estimate_fee());
+      const totalInput = txBuilder.get_explicit_input().checked_add(txBuilder.get_implicit_input());
+      const totalOutput = txBuilder.get_explicit_output();
+      const fee = new BigNumber(totalInput.checked_sub(totalOutput).to_str());
+      const minFee = new BigNumber(txBuilder.estimate_fee().to_str());
+      if (fee.lt(minFee)) {
+        throw new NotEnoughMoneyToSendError();
+      }
+      // recall: min fee assumes the largest fee possible
+      // so no worries of cbor issue by including larger fee
+      txBuilder.set_fee(RustModule.WalletV4.BigNum.from_str(fee.toString()));
       return [];
     }
     const oldOutput = txBuilder.get_explicit_output();
