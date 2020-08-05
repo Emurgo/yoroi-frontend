@@ -36,14 +36,6 @@ import WarningBox from '../../widgets/WarningBox';
 import type { $npm$ReactIntl$IntlFormat, } from 'react-intl';
 
 const messages = defineMessages({
-  titleLabel: {
-    id: 'wallet.send.form.title.label',
-    defaultMessage: '!!!Title',
-  },
-  titleHint: {
-    id: 'wallet.send.form.title.hint',
-    defaultMessage: '!!!E.g: Money for Frank',
-  },
   receiverLabel: {
     id: 'wallet.send.form.receiver.label',
     defaultMessage: '!!!Receiver',
@@ -56,21 +48,9 @@ const messages = defineMessages({
     id: 'wallet.send.form.amount.equalsAda',
     defaultMessage: '!!!equals {amount} ADA',
   },
-  descriptionLabel: {
-    id: 'wallet.send.form.description.label',
-    defaultMessage: '!!!Description',
-  },
-  descriptionHint: {
-    id: 'wallet.send.form.description.hint',
-    defaultMessage: '!!!You can add a message if you want',
-  },
   checkboxLabel: {
     id: 'wallet.send.form.sendAll.checkboxLabel',
     defaultMessage: '!!!Send all {coinName}',
-  },
-  invalidTitle: {
-    id: 'wallet.send.form.errors.invalidTitle',
-    defaultMessage: '!!!Please enter a title with at least 3 characters.',
   },
   transactionFeeError: {
     id: 'wallet.send.form.transactionFeeError',

@@ -331,7 +331,6 @@ const YoroiClassic = {
   '--theme-transactions-icon-type-income-background-color': '#9ab2d9',
   '--theme-transactions-icon-type-exchange-background-color': '#10aca4',
   '--theme-transactions-icon-type-failed-background-color': '#eb6d7a',
-  '--theme-transactions-amount-color': '#3154CB',
 
   '--theme-icon-nav-color': 'rgba(18, 19, 39, 0.6)', // #121327
   '--theme-icon-nav-color-active': '#ffffff',

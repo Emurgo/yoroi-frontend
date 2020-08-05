@@ -5,8 +5,7 @@
     "name": "mainnet"
   },
   "seiza": {
-    "simpleTemplate": "",
-    "advanceTemplate": ""
+    "simpleTemplate": ""
   },
   "app": {
     "walletRefreshInterval": 20000,

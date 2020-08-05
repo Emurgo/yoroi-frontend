@@ -19,8 +19,9 @@ import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver
 import type { DelegationRequests } from '../../../stores/toplevel/DelegationStore';
 import type { TxRequests } from '../../../stores/toplevel/TransactionsStore';
 import { getApiForNetwork, getApiMeta } from '../../../api/common/utils';
+import globalMessages from '../../../i18n/global-messages';
 
-export type GeneratedData = typeof StakingPage.prototype.generated;
+export type GeneratedData = typeof SeizaStakingPage.prototype.generated;
 
 type Props = {|
   ...InjectedOrGenerated<GeneratedData>,
@@ -32,10 +33,6 @@ const messages = defineMessages({
     id: 'wallet.staking.warning.title',
     defaultMessage: '!!!Delegation temporarily disabled',
   },
-  pendingTxWarning: {
-    id: 'wallet.staking.warning.pendingTx',
-    defaultMessage: '!!!You cannot change your delegation preference while a transaction is pending',
-  },
 });
 
 /*::
@@ -43,7 +40,7 @@ declare var chrome;
 */
 
 @observer
-export default class StakingPage extends Component<Props> {
+export default class SeizaStakingPage extends Component<Props> {
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
@@ -91,7 +88,7 @@ export default class StakingPage extends Component<Props> {
       const apiMeta = getApiMeta(
         getApiForNetwork(publicDeriver.getParent().getNetworkInfo())
       )?.meta;
-      if (apiMeta == null) throw new Error(`${nameof(StakingPage)} no API selected`);
+      if (apiMeta == null) throw new Error(`${nameof(SeizaStakingPage)} no API selected`);
       const amountPerUnit = new BigNumber(10).pow(apiMeta.decimalPlaces);
 
       // Seiza does not understand decimal places, so removing all Lovelaces
@@ -101,10 +98,10 @@ export default class StakingPage extends Component<Props> {
     }
 
     finalURL += `&locale=${this.generated.stores.profile.currentLocale}`;
-    const delegationStore = this.generated.stores.substores.jormungandr.delegation;
+    const delegationStore = this.generated.stores.delegation;
     const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
     if (delegationRequests == null) {
-      throw new Error(`${nameof(StakingPage)} opened for non-reward wallet`);
+      throw new Error(`${nameof(SeizaStakingPage)} opened for non-reward wallet`);
     }
     const delegation = delegationRequests.getCurrentDelegation.result;
     if (!delegation || delegation.currEpoch == null) {
@@ -131,7 +128,7 @@ export default class StakingPage extends Component<Props> {
       return (
         <InformativeError
           title={intl.formatMessage(messages.title)}
-          text={intl.formatMessage(messages.pendingTxWarning)}
+          text={intl.formatMessage(globalMessages.pendingTxWarning)}
         />
       );
     }
@@ -163,13 +160,13 @@ export default class StakingPage extends Component<Props> {
     |},
     stores: {|
       profile: {| currentLocale: string |},
+      delegation: {|
+        getDelegationRequests: (
+          PublicDeriver<>
+        ) => void | DelegationRequests
+      |},
       substores: {|
         jormungandr: {|
-          delegation: {|
-            getDelegationRequests: (
-              PublicDeriver<>
-            ) => void | DelegationRequests
-          |},
           delegationTransaction: {|
             signAndBroadcastDelegationTx: {|
               isExecuting: boolean,
@@ -189,7 +186,7 @@ export default class StakingPage extends Component<Props> {
       return this.props.generated;
     }
     if (this.props.stores == null || this.props.actions == null) {
-      throw new Error(`${nameof(StakingPage)} no way to generated props`);
+      throw new Error(`${nameof(SeizaStakingPage)} no way to generated props`);
     }
     const { stores, actions } = this.props;
     const jormungandrStores = stores.substores.jormungandr;
@@ -205,11 +202,11 @@ export default class StakingPage extends Component<Props> {
           getTxRequests: stores.transactions.getTxRequests,
           hasAnyPending: stores.transactions.hasAnyPending,
         },
+        delegation: {
+          getDelegationRequests: stores.delegation.getDelegationRequests,
+        },
         substores: {
           jormungandr: {
-            delegation: {
-              getDelegationRequests: stores.delegation.getDelegationRequests,
-            },
             delegationTransaction: {
               signAndBroadcastDelegationTx: {
                 isExecuting:

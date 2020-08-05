@@ -20,34 +20,46 @@ export function v4PublicToV2(
   );
 }
 
-export function derivePublicByAddressing(
-  keyLevel: number,
+export function derivePublicByAddressing(request: {|
   addressing: $PropertyType<Addressing, 'addressing'>,
-  key: RustModule.WalletV4.Bip32PublicKey,
-): RustModule.WalletV4.Bip32PublicKey {
-  if (keyLevel + 1 < addressing.startLevel) {
+  startingFrom: {|
+    key: RustModule.WalletV4.Bip32PublicKey,
+    level: number,
+  |},
+|}): RustModule.WalletV4.Bip32PublicKey {
+  if (request.startingFrom.level + 1 < request.addressing.startLevel) {
     throw new Error(`${nameof(derivePublicByAddressing)} keyLevel < startLevel`);
   }
-  let derivedKey = key;
-  for (let i = keyLevel - addressing.startLevel + 1; i < addressing.path.length; i++) {
+  let derivedKey = request.startingFrom.key;
+  for (
+    let i = request.startingFrom.level - request.addressing.startLevel + 1;
+    i < request.addressing.path.length;
+    i++
+  ) {
     derivedKey = derivedKey.derive(
-      addressing.path[i]
+      request.addressing.path[i]
     );
   }
   return derivedKey;
 }
-export function derivePrivateByAddressing(
-  keyLevel: number,
+export function derivePrivateByAddressing(request: {|
   addressing: $PropertyType<Addressing, 'addressing'>,
-  key: RustModule.WalletV4.Bip32PrivateKey,
-): RustModule.WalletV4.Bip32PrivateKey {
-  if (keyLevel + 1 < addressing.startLevel) {
+  startingFrom: {|
+    key: RustModule.WalletV4.Bip32PrivateKey,
+    level: number,
+  |},
+|}): RustModule.WalletV4.Bip32PrivateKey {
+  if (request.startingFrom.level + 1 < request.addressing.startLevel) {
     throw new Error(`${nameof(derivePrivateByAddressing)} keyLevel < startLevel`);
   }
-  let derivedKey = key;
-  for (let i = keyLevel - addressing.startLevel + 1; i < addressing.path.length; i++) {
+  let derivedKey = request.startingFrom.key;
+  for (
+    let i = request.startingFrom.level - request.addressing.startLevel + 1;
+    i < request.addressing.path.length;
+    i++
+  ) {
     derivedKey = derivedKey.derive(
-      addressing.path[i]
+      request.addressing.path[i]
     );
   }
   return derivedKey;

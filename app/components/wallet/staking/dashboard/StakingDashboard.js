@@ -43,7 +43,7 @@ const emptyDashboardMessages = defineMessages({
   },
   text: {
     id: 'wallet.dashboard.empty.text',
-    defaultMessage: '!!!Go to Simple or Advance Staking to choose what stake pool you want to delegate in. Note, you may delegate only to one stake pool in this Testnet'
+    defaultMessage: '!!!Go to the delegation page to choose what stake pool you want to delegate in.'
   }
 });
 

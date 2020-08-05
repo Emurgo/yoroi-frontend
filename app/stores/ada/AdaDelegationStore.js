@@ -32,6 +32,7 @@ import {
 } from '../../api/ada/lib/storage/bridge/timeUtils';
 import { isCardanoHaskell, getCardanoHaskellBaseConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import type { DelegationRequests, RewardHistoryForWallet } from '../toplevel/DelegationStore';
+import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 
 export default class AdaDelegationStore extends Store {
 
@@ -110,8 +111,8 @@ export default class AdaDelegationStore extends Store {
         publicDeriver: withStakingKey,
         stakingKeyAddressId: stakingKeyResp.addr.AddressId,
         delegationRequest,
-      }).then(currentDelegation => this._updatePoolInfo({
-        publicDeriver: withStakingKey,
+      }).then(currentDelegation => this.updatePoolInfo({
+        network: publicDeriver.getParent().getNetworkInfo(),
         allPoolIds: currentDelegation.allPoolIds,
       }));
 
@@ -157,8 +158,8 @@ export default class AdaDelegationStore extends Store {
     return currentDelegation;
   }
 
-  _updatePoolInfo: {|
-    publicDeriver: PublicDeriver<> & IGetStakingKey,
+  updatePoolInfo: {|
+    network: $ReadOnly<NetworkRow>,
     allPoolIds: Array<string>,
   |} => Promise<void> = async (request) => {
     // update pool information
@@ -166,7 +167,7 @@ export default class AdaDelegationStore extends Store {
       .reduce(
         (acc, next) => {
           if (
-            next.network.NetworkId === request.publicDeriver.getParent().getNetworkInfo().NetworkId
+            next.networkId === request.network.NetworkId
           ) {
             acc.add(next.poolId);
             return acc;
@@ -182,23 +183,27 @@ export default class AdaDelegationStore extends Store {
     const poolInfoResp = await stateFetcher.getPoolInfo({
       ids: poolsToQuery,
     });
-    for (const poolId of Object.keys(poolInfoResp)) {
-      const poolInfo = poolInfoResp[poolId];
-      this.stores.delegation.poolInfo.push({
-        network: request.publicDeriver.getParent().getNetworkInfo(),
-        poolId,
-        poolInfo: {
-          info: {
-            name: poolInfo.info.name,
-            ticker: poolInfo.info.ticker,
-            description: poolInfo.info.description,
-            homepage: poolInfo.info.homepage,
+    runInAction(() => {
+      for (const poolId of Object.keys(poolInfoResp)) {
+        const poolInfo = poolInfoResp[poolId];
+        if (poolInfo == null) continue;
+        this.stores.delegation.poolInfo.push({
+          networkId: request.network.NetworkId,
+          poolId,
+          poolInfo: {
+            poolId,
+            info: {
+              name: poolInfo.info.name,
+              ticker: poolInfo.info.ticker,
+              description: poolInfo.info.description,
+              homepage: poolInfo.info.homepage,
+            },
+            history: poolInfo.history,
+            reputation: Object.freeze({}),
           },
-          history: poolInfo.history,
-          reputation: Object.freeze({}),
-        },
-      });
-    }
+        });
+      }
+    });
   }
 
   @action.bound

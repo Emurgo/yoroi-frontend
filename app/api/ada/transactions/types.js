@@ -60,4 +60,5 @@ export type V4UnsignedTxAddressedUtxoResponse = {|
   senderUtxos: Array<AddressedUtxo>,
   txBuilder: RustModule.WalletV4.TransactionBuilder,
   changeAddr: Array<{| ...Address, ...Value, ...Addressing |}>,
+  certificates: $ReadOnlyArray<RustModule.WalletV4.Certificate>,
 |};

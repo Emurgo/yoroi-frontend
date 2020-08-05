@@ -72,7 +72,7 @@ const genBaseProps: {|
   mangledInfo?: {|
     addresses: $ReadOnlyArray<$ReadOnly<StandardAddress>>,
   |},
-  getPoolInfo: *,
+  getLocalPoolInfo: *,
   getParam?: <T>(number | string) => T,
 |} => * = (request) => {
   const sendErrorCases = {
@@ -128,7 +128,7 @@ const genBaseProps: {|
       },
       delegation: {
         selectedPage: 0,
-        getPoolInfo: request.getPoolInfo,
+        getLocalPoolInfo: request.getLocalPoolInfo,
         getDelegationRequests: request.lookup.getDelegation,
       },
       time: {
@@ -317,6 +317,7 @@ const changeDelegationCert = {
 };
 
 const emurgo2Pool = {
+  poolId: '2',
   info: {
     ticker: '2EMUR',
     name: 'EMURGO’ STAKEPOOL',
@@ -339,6 +340,7 @@ const emurgo2Pool = {
 
 const privatePoolInfo = {
   info: undefined,
+  poolId: '3',
   history: [
     {
       epoch: 13,
@@ -363,6 +365,7 @@ const emurgo1Pool = {
   },
   reputation: Object.freeze({}),
   ...privatePoolInfo,
+  poolId: '1',
 };
 
 function mockGetPoolInfo(networkId: $ReadOnly<NetworkRow>, poolId: string): void | PoolMeta {
@@ -573,7 +576,7 @@ export const Loading = (): Node => {
       generated={genBaseProps({
         wallet,
         lookup,
-        getPoolInfo: mockGetPoolInfo,
+        getLocalPoolInfo: mockGetPoolInfo,
       })}
     />)
   );
@@ -627,7 +630,7 @@ export const DelegationCases = (): Node => {
         wallet,
         lookup,
         allowToggleHidden: true,
-        getPoolInfo: mockGetPoolInfo,
+        getLocalPoolInfo: mockGetPoolInfo,
       })}
     />)
   );
@@ -698,7 +701,7 @@ export const Errors = (): Node => {
       generated={genBaseProps({
         wallet,
         lookup,
-        getPoolInfo: mockGetPoolInfo,
+        getLocalPoolInfo: mockGetPoolInfo,
       })}
     />)
   );
@@ -749,7 +752,7 @@ export const LessThanExpected = (): Node => {
         wallet,
         lookup,
         openDialog: LessThanExpectedDialog,
-        getPoolInfo: mockGetPoolInfo,
+        getLocalPoolInfo: mockGetPoolInfo,
       })}
     />)
   );
@@ -778,7 +781,7 @@ export const UnknownPool = (): Node => {
         wallet,
         lookup,
         openDialog: undefined,
-        getPoolInfo: newMockPoolInfo,
+        getLocalPoolInfo: newMockPoolInfo,
       })}
     />)
   );
@@ -797,7 +800,7 @@ export const UndelegateExecuting = (): Node => {
       generated={genBaseProps({
         wallet,
         lookup,
-        getPoolInfo: mockGetPoolInfo,
+        getLocalPoolInfo: mockGetPoolInfo,
         openDialog: UndelegateDialog,
         delegationTransaction: {
           isStale: false,
@@ -832,7 +835,7 @@ export const UndelegateError = (): Node => {
       generated={genBaseProps({
         wallet,
         lookup,
-        getPoolInfo: mockGetPoolInfo,
+        getLocalPoolInfo: mockGetPoolInfo,
         openDialog: UndelegateDialog,
         delegationTransaction: {
           isStale: false,
@@ -876,7 +879,7 @@ export const UndelegateDialogShown = (): Node => {
       generated={genBaseProps({
         wallet,
         lookup,
-        getPoolInfo: mockGetPoolInfo,
+        getLocalPoolInfo: mockGetPoolInfo,
         openDialog: UndelegateDialog,
         delegationTransaction: {
           isStale: boolean('isStale', false),
@@ -944,7 +947,7 @@ export const Reputation = (): Node => {
       generated={genBaseProps({
         wallet,
         lookup,
-        getPoolInfo: newMockPoolInfo,
+        getLocalPoolInfo: newMockPoolInfo,
         openDialog: getDialog() === dialogCases.DialogClosed ? undefined : PoolWarningDialog,
         getParam: <T>(param) => { // eslint-disable-line no-unused-vars
           if (param === 'reputation') {
@@ -1006,7 +1009,7 @@ export const MangledDashboardWarning = (): Node => {
       generated={genBaseProps({
         wallet,
         lookup,
-        getPoolInfo: mockGetPoolInfo,
+        getLocalPoolInfo: mockGetPoolInfo,
         mangledInfo: {
           addresses,
         },
@@ -1028,7 +1031,7 @@ export const UnmangleDialogLoading = (): Node => {
       generated={genBaseProps({
         wallet,
         lookup,
-        getPoolInfo: mockGetPoolInfo,
+        getLocalPoolInfo: mockGetPoolInfo,
         mangledInfo: {
           addresses: [],
         },
@@ -1057,7 +1060,7 @@ export const UnmangleDialogError = (): Node => {
       generated={genBaseProps({
         wallet,
         lookup,
-        getPoolInfo: mockGetPoolInfo,
+        getLocalPoolInfo: mockGetPoolInfo,
         mangledInfo: {
           addresses: [],
         },
@@ -1087,7 +1090,7 @@ export const UnmangleDialogConfirm = (): Node => {
       generated={genBaseProps({
         wallet,
         lookup,
-        getPoolInfo: mockGetPoolInfo,
+        getLocalPoolInfo: mockGetPoolInfo,
         mangledInfo: {
           addresses: [],
         },

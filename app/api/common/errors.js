@@ -140,6 +140,10 @@ const messages = defineMessages({
     id: 'api.errors.getPoolInfoApiError',
     defaultMessage: '!!!Error received from server while getting pool info.',
   },
+  poolMissingApiError: {
+    id: 'api.errors.poolMissingApiError',
+    defaultMessage: '!!!Could not find this pool. Double-check the ID and make sure the pool was not deregistered.',
+  },
   getReputationError: {
     id: 'api.errors.getReputationError',
     defaultMessage: '!!!Error received from server while getting reputation.',
@@ -460,6 +464,14 @@ export class GetPoolInfoApiError extends LocalizableError {
     super({
       id: messages.getPoolInfoApiError.id,
       defaultMessage: messages.getPoolInfoApiError.defaultMessage || '',
+    });
+  }
+}
+export class PoolMissingApiError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.poolMissingApiError.id,
+      defaultMessage: messages.poolMissingApiError.defaultMessage || '',
     });
   }
 }

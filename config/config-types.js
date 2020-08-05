@@ -8,7 +8,6 @@ export type ConfigType = {|
 
 export type SeizaConfigType = {|
     simpleTemplate: string,
-    advanceTemplate: string,
 |}
 
 export type AppConfigType = {|

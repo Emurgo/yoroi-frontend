@@ -31,9 +31,13 @@ const messages = defineMessages({
     id: 'wallet.dashboard.stakePool.circleText',
     defaultMessage: '!!!Revenue',
   },
-  button: {
+  viewWebpage: {
+    id: 'wallet.dashboard.stakePool.viewWebpage',
+    defaultMessage: '!!!View pool webpage',
+  },
+  description: {
     id: 'wallet.dashboard.stakePool.descriptionButton',
-    defaultMessage: '!!!Full description',
+    defaultMessage: '!!!Description',
   },
   performance: {
     id: 'wallet.dashboard.stakePool.performance',
@@ -72,6 +76,7 @@ type MoreInfoProp = {|
 
 type Props = {|
   +data: {|
+    description?: string,
     // percentage: string,
     // fullness: string,
     // margins: string,
@@ -96,6 +101,7 @@ type Props = {|
   +undelegate: void | (void => Promise<void>),
   +reputationInfo: ReputationObject,
   +openReputationDialog: void => void,
+  +purpose: 'dashboard' | 'delegation',
 |};
 
 @observer
@@ -164,7 +170,11 @@ export default class StakePool extends Component<Props> {
       );
 
     return (
-      <Card title={intl.formatMessage(messages.title)}>
+      <Card title={
+        this.props.purpose === 'dashboard'
+          ? intl.formatMessage(messages.title)
+          : undefined
+        }>
         <div className={styles.head}>
           <div className={styles.avatarWrapper}>
             <img alt="User avatar" src={avatar} className={styles.avatar} />
@@ -216,6 +226,10 @@ export default class StakePool extends Component<Props> {
               );
             })}
           </ul> */}
+          {this.props.purpose === 'delegation'
+            ? <span className={styles.description}>{this.props.data.description}</span>
+            : undefined
+          }
           {this.getMoreInfoButton(this.props.moreInfo)}
         </div>
       </Card>
@@ -238,9 +252,10 @@ export default class StakePool extends Component<Props> {
             href={info.url}
             onClick={info.openPoolPage}
           >
+            <div className={styles.data} />
             <Button
               type="button"
-              label={intl.formatMessage(messages.button)}
+              label={intl.formatMessage(messages.viewWebpage)}
               className={moreInfoButtonClasses}
               skin={ButtonSkin}
             />

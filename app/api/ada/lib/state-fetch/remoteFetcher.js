@@ -306,23 +306,22 @@ export class RemoteFetcher implements IFetcher {
   )
 
   getPoolInfo: PoolInfoRequest => Promise<PoolInfoResponse> = (body) => (
-    // axios(
-    //   `${backendUrl}/api/v2/pool/info`,
-    //   {
-    //     method: 'post',
-    //     data: {
-    //       ids: body.ids
-    //     },
-    //     headers: {
-    //       'yoroi-version': this.getLastLaunchVersion(),
-    //       'yoroi-locale': this.getCurrentLocale()
-    //     }
-    //   }
-    // ).then(response => response.data)
-    //   .catch((error) => {
-    //     Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getPoolInfo)} error: ` + stringifyError(error));
-    //     throw new GetPoolInfoApiError();
-    //   })
-    Promise.resolve({}) // TODO: replace when endpoint is implemented
+    axios(
+      `${backendUrl}/api/v2/pool/info`,
+      {
+        method: 'post',
+        data: {
+          ids: body.ids
+        },
+        headers: {
+          'yoroi-version': this.getLastLaunchVersion(),
+          'yoroi-locale': this.getCurrentLocale()
+        }
+      }
+    ).then(response => response.data)
+      .catch((error) => {
+        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getPoolInfo)} error: ` + stringifyError(error));
+        throw new GetPoolInfoApiError();
+      })
   )
 }

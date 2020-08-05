@@ -28,7 +28,7 @@ export default class ErrorBlock extends Component<Props> {
     try {
       errorText = (error) ? intl.formatMessage(error) : '';
     } catch (e) {
-      Logger.error(`ErrorBlock:render ${stringifyError(e)}`);
+      Logger.error(`${nameof(ErrorBlock)}:${nameof(this.render)} ${stringifyError(e)}`);
     }
 
     return (

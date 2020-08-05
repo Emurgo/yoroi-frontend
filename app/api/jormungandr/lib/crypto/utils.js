@@ -1,6 +1,9 @@
 // @flow
 
 import { RustModule } from '../../../ada/lib/cardanoCrypto/rustLoader';
+import type {
+  Addressing,
+} from '../../../ada/lib/storage/models/PublicDeriver/interfaces';
 
 export function v4Bip32PrivateToV3(
   v4key: RustModule.WalletV4.Bip32PrivateKey,
@@ -55,4 +58,24 @@ export function v2PublicToV3(
   } catch (_e) {
     return undefined;
   }
+}
+
+export function derivePrivateByAddressing(request: {|
+  addressing: $PropertyType<Addressing, 'addressing'>,
+  startingFrom: {|
+    key: RustModule.WalletV3.Bip32PrivateKey,
+    level: number,
+  |},
+|}): RustModule.WalletV3.Bip32PrivateKey {
+  const startLevel = request.addressing.startLevel;
+  const pathLength = request.addressing.path.length;
+
+  if (request.startingFrom.level + 1 < startLevel) {
+    throw new Error(`${nameof(derivePrivateByAddressing)} keyLevel < startLevel`);
+  }
+  let key = request.startingFrom.key;
+  for (let i = request.startingFrom.level - startLevel + 1; i < pathLength; i++) {
+    key = key.derive(request.addressing.path[i]);
+  }
+  return key;
 }

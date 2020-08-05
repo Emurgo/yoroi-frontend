@@ -24,6 +24,13 @@ import type {
   GetCurrentDelegationResponse,
   PoolTuples,
 } from '../../../../common/lib/storage/bridge/delegationUtils';
+import typeof { CertificateKind } from '@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib';
+import type {
+  IGetStakingKey,
+} from '../models/PublicDeriver/interfaces';
+import type {
+  CertificateForKey,
+} from '../database/primitives/api/read';
 
 export async function getDelegatedBalance(
   request: GetDelegatedBalanceRequest,
@@ -104,43 +111,72 @@ export async function getUtxoDelegatedBalance(
   return utxoSum;
 }
 
-export async function getCurrentDelegation(
-  request: GetCurrentDelegationRequest,
-): Promise<GetCurrentDelegationResponse> {
+export async function getCertificateHistory(request: {|
+  publicDeriver: PublicDeriver<> & IGetStakingKey,
+  stakingKeyAddressId: number,
+  kindFilter: Array<$Values<CertificateKind>>,
+|}): Promise<Array<CertificateForKey>> {
+  // recall: results are sorted by block & cert index order
   const allDelegations = await getCertificates(
     request.publicDeriver.getDb(),
     [request.stakingKeyAddressId]
   );
-  // recall: results are sorted by block order
-  const result = {
-    currEpoch: undefined,
-    prevEpoch: undefined,
-    prevPrevEpoch: undefined,
-    fullHistory: allDelegations,
-  };
-  const seenPools = new Set<string>();
+
+  const filteredList = [];
   for (const delegation of allDelegations) {
     const block = delegation.block;
     if (block == null) {
       continue;
     }
-    const relativeSlot = request.toRelativeSlotNumber(block.SlotNum);
 
     // only look at successful txs
     if (delegation.transaction.Status !== TxStatusCodes.IN_BLOCK) {
       continue;
     }
     const kind = delegation.certificate.Kind;
-    if (
-      kind !== RustModule.WalletV4.CertificateKind.StakeDeregistration &&
-      kind !== RustModule.WalletV4.CertificateKind.StakeDelegation
-    ) {
+    if (!request.kindFilter.includes(kind)) {
       continue;
     }
 
+    filteredList.push(delegation);
+  }
+  return filteredList;
+}
+
+
+export async function getCurrentDelegation(
+  request: GetCurrentDelegationRequest,
+): Promise<GetCurrentDelegationResponse> {
+  const delegations = await getCertificateHistory({
+    publicDeriver: request.publicDeriver,
+    stakingKeyAddressId: request.stakingKeyAddressId,
+    kindFilter: [
+      // note: we don't care about stake registration
+      // since it  doesn't actually change what pool you're delegating to
+      // stake deregistration, on the other hand, undelegates you from the pool
+      RustModule.WalletV4.CertificateKind.StakeDeregistration,
+      RustModule.WalletV4.CertificateKind.StakeDelegation
+    ]
+  });
+
+  const result = {
+    currEpoch: undefined,
+    prevEpoch: undefined,
+    prevPrevEpoch: undefined,
+    fullHistory: delegations,
+  };
+  const seenPools = new Set<string>();
+  for (const delegation of delegations) {
+    const block = delegation.block;
+    if (block == null) continue; // should never happen
+    const relativeSlot = request.toRelativeSlotNumber(block.SlotNum);
+
     // recall: undelegation is an empty array
     // so this code handles undelegation as well
-    const pools = certificateToPoolList(delegation.certificate.Payload, kind);
+    const pools = certificateToPoolList(
+      delegation.certificate.Payload,
+      delegation.certificate.Kind
+    );
     pools.forEach(pool => seenPools.add(pool[0]));
     // calculate which certificate was active at the end of each epoch
     if (result.currEpoch == null && relativeSlot.epoch <= request.currentEpoch) {
@@ -168,6 +204,54 @@ export async function getCurrentDelegation(
     allPoolIds: Array.from(seenPools)
   };
 }
+export async function getRegistrationHistory(
+  request: GetCurrentDelegationRequest,
+): Promise<{|
+  currEpoch: boolean,
+  prevEpoch: boolean,
+  prevPrevEpoch: boolean,
+  fullHistory: Array<CertificateForKey>,
+|}> {
+  const delegations = await getCertificateHistory({
+    publicDeriver: request.publicDeriver,
+    stakingKeyAddressId: request.stakingKeyAddressId,
+    kindFilter: [
+      RustModule.WalletV4.CertificateKind.StakeDeregistration,
+      RustModule.WalletV4.CertificateKind.StakeRegistration
+    ]
+  });
+
+  const result = {
+    currEpoch: false,
+    prevEpoch: false,
+    prevPrevEpoch: false,
+    fullHistory: delegations,
+  };
+  for (const delegation of delegations) {
+    const block = delegation.block;
+    if (block == null) continue; // should never happen
+    const relativeSlot = request.toRelativeSlotNumber(block.SlotNum);
+
+    // calculate which certificate was active at the end of each epoch
+    if (result.currEpoch == null && relativeSlot.epoch <= request.currentEpoch) {
+      result.currEpoch = (
+        delegation.certificate.Kind === RustModule.WalletV4.CertificateKind.StakeRegistration
+      );
+    }
+    if (result.prevEpoch == null && relativeSlot.epoch <= request.currentEpoch - 1) {
+      result.prevEpoch = (
+        delegation.certificate.Kind === RustModule.WalletV4.CertificateKind.StakeRegistration
+      );
+    }
+    if (result.prevPrevEpoch == null && relativeSlot.epoch <= request.currentEpoch - 2) {
+      result.prevPrevEpoch = (
+        delegation.certificate.Kind === RustModule.WalletV4.CertificateKind.StakeRegistration
+      );
+      break;
+    }
+  }
+  return result;
+}
 
 export function certificateToPoolList(
   certificateHex: string,
@@ -188,3 +272,36 @@ export function certificateToPoolList(
     }
   }
 }
+
+export function createCertificate(
+  stakingKey: RustModule.WalletV4.PublicKey,
+  isRegistered: boolean,
+  poolRequest: void | string,
+): Array<RustModule.WalletV4.Certificate> {
+  const credential = RustModule.WalletV4.StakeCredential.from_keyhash(
+    stakingKey.hash()
+  );
+  if (poolRequest == null) {
+    if (isRegistered) {
+      return [RustModule.WalletV4.Certificate.new_stake_deregistration(
+        RustModule.WalletV4.StakeDeregistration.new(credential)
+      )];
+    }
+    return []; // no need to undelegate if no staking key registered
+  }
+  const result = [];
+  if (!isRegistered) {
+    // if unregistered, need to register first
+    result.push(RustModule.WalletV4.Certificate.new_stake_registration(
+      RustModule.WalletV4.StakeRegistration.new(credential)
+    ));
+  }
+  result.push(RustModule.WalletV4.Certificate.new_stake_delegation(
+    RustModule.WalletV4.StakeDelegation.new(
+      credential,
+      RustModule.WalletV4.Ed25519KeyHash.from_bytes(Buffer.from(poolRequest, 'hex'))
+    )
+  ));
+  return result;
+}
+

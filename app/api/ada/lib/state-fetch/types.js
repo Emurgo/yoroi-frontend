@@ -245,22 +245,22 @@ export type RemotePoolInfo = {|
   +pledge_address: string, // bech32
 
   // from pool metadata (off chain)
-  +name: void | string,
-  +description: void | string,
-  +ticker: void | string,
-  +homepage: void | string,
+  +name?: string,
+  +description?: string,
+  +ticker?: string,
+  +homepage?: string,
 |};
 export type RemotePool = {|
   +info: RemotePoolInfo,
   +history: Array<{|
-    epoch: number,
-    slot: number,
-    tx_ordinal: number,
-    cert_ordinal: number,
-    payload: any, // TODO: how to store this since different networks have different cert types
+    +epoch: number,
+    +slot: number,
+    +tx_ordinal: number,
+    +cert_ordinal: number,
+    +payload: any, // TODO: how to store this since different networks have different cert types
   |}>,
 |};
 export type PoolInfoResponse = {|
-  [key: string]: RemotePool,
+  [key: string]: (RemotePool | null),
 |};
 export type PoolInfoFunc = (body: PoolInfoRequest) => Promise<PoolInfoResponse>;

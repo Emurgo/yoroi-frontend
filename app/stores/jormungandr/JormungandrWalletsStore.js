@@ -49,7 +49,6 @@ export default class JormungandrWalletsStore extends Store {
   /** Send money and then return to transaction screen */
   _sendMoney:  {|
     signRequest: ISignRequest<any>,
-    // signRequest: BaseSignRequest<RustModule.WalletV3.InputOutput>,
     password: string,
     publicDeriver: PublicDeriver<>,
   |} => Promise<void> = async (transactionDetails) => {

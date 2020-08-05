@@ -41,7 +41,7 @@ class LocalizableError extends ExtendableError {
 
 // We are only supposed to throw LocalizableError
 // We use this as a fallback in case of programmer error
-class UnknowError extends LocalizableError {
+class UnknownError extends LocalizableError {
   constructor() {
     super({
       id: messages.unknowError.id,
@@ -63,7 +63,7 @@ export function localizedError(error: Error): LocalizableError {
   if (error instanceof LocalizableError) {
     return error;
   }
-  return new UnknowError();
+  return new UnknownError();
 }
 
 export default LocalizableError;

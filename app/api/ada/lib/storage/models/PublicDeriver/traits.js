@@ -1599,11 +1599,13 @@ const ScanShelleyUtxoMixin = (
       Buffer.from(body.accountPublicKey, 'hex')
     );
 
-    const stakingKey = derivePublicByAddressing(
-      this.getParent().getPublicDeriverLevel(),
-      stakingAddressDbRow.addressing,
-      publicKey
-    );
+    const stakingKey = derivePublicByAddressing({
+      addressing: stakingAddressDbRow.addressing,
+      startingFrom: {
+        level: this.getParent().getPublicDeriverLevel(),
+        key: publicKey,
+      },
+    });
 
     return await scanShelleyCip1852Account({
       accountPublicKey: body.accountPublicKey,

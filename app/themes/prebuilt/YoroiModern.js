@@ -340,7 +340,6 @@ const YoroiModern = {
   '--theme-transactions-icon-type-income-background-color': '#9ab2d9',
   '--theme-transactions-icon-type-exchange-background-color': '#10aca4',
   '--theme-transactions-icon-type-failed-background-color': '#eb6d7a',
-  '--theme-transactions-amount-color': '#3154CB',
 
   '--theme-icon-nav-color': '#adaeb6',
   '--theme-icon-nav-color-active': '#ffffff',

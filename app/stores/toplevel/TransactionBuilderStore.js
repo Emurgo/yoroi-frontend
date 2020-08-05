@@ -50,11 +50,11 @@ export default class AdaTransactionBuilderStore extends Store {
 
   // REQUESTS
   @observable createUnsignedTx: LocalizedRequest<CreateUnsignedTxFunc>
+    // TODO: This should not be ADA-specific
     = new LocalizedRequest<CreateUnsignedTxFunc>(this.api.ada.createUnsignedTx);
 
   @observable memo: void | string;
 
-  // TODO: This should not be ADA-specific
   @observable setupSelfTx: LocalizedRequest<SetupSelfTxFunc>
     = new LocalizedRequest<SetupSelfTxFunc>(this._setupSelfTx);
 
@@ -197,11 +197,13 @@ export default class AdaTransactionBuilderStore extends Store {
       throw new Error(`${nameof(this._updateTxBuilder)} missing chains functionality`);
     }
 
+    // TODO: should not be ADA-specific
     const fullConfig = getCardanoHaskellBaseConfig(
       withHasUtxoChains.getParent().getNetworkInfo(),
     );
-    const toRelativeSlotNumber = await genTimeToSlot(fullConfig);
-    const absSlotNumber = new BigNumber(toRelativeSlotNumber({ time: new Date() }).slot);
+    const timeToSlot = await genTimeToSlot(fullConfig);
+    // TODO: should not be ADA-specific
+    const absSlotNumber = new BigNumber(timeToSlot({ time: new Date() }).slot);
 
     if (amount == null && shouldSendAll === true) {
       await this.createUnsignedTx.execute({

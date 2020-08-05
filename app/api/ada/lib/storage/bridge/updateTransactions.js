@@ -1104,9 +1104,12 @@ async function rawUpdateTransactions(
           //   address.Type !== CoreAddressTypes.CARDANO_BASE &&
           //   address.Type !== CoreAddressTypes.CARDANO_PTR
           // ))
+          // TODO: get rid of this once backend supports querying by payment key
           .map(address => address.Hash),
+        // note: sending account addresses is required
+        // since for example, the staking key registration certificate doesn't need a witness
+        // so a tx where no input/output belongs to you could register your staking key
         ...accountingAddresses.map(address => address.Hash),
-        // TODO: get rid of this once backend supports querying by payment key
       ].map(addr => addressToDisplayString(addr, publicDeriver.getParent().getNetworkInfo())),
       untilBlock,
     });

@@ -44,10 +44,6 @@ const messages = defineMessages({
     id: 'wallet.delegation.transaction.stakePoolName',
     defaultMessage: '!!!Stake pool name',
   },
-  stakePoolHash: {
-    id: 'wallet.delegation.transaction.stakePoolHash',
-    defaultMessage: '!!!Stake pool hash',
-  },
   approximateLabel: {
     id: 'wallet.delegation.transaction.approximationLabel',
     defaultMessage: '!!!Current approximation of rewards that you will receive per epoch:',
@@ -185,7 +181,7 @@ export default class DelegationTxDialog extends Component<Props> {
           </p>
         </div>
         <div className={styles.headerBlock}>
-          <p className={styles.header}>{intl.formatMessage(messages.stakePoolHash)}</p>
+          <p className={styles.header}>{intl.formatMessage(globalMessages.stakePoolHash)}</p>
           <div className={styles.content}>
             <ExplorableHashContainer
               selectedExplorer={this.props.selectedExplorer}

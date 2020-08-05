@@ -32,6 +32,7 @@ import {
 } from '../../api/jormungandr/lib/storage/bridge/timeUtils';
 import { isJormungandr, getJormungandrBaseConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import type { DelegationRequests, RewardHistoryForWallet } from '../toplevel/DelegationStore';
+import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 
 export default class JormungandrDelegationStore extends Store {
 
@@ -113,8 +114,8 @@ export default class JormungandrDelegationStore extends Store {
         publicDeriver: withStakingKey,
         stakingKeyAddressId: stakingKeyResp.addr.AddressId,
         delegationRequest,
-      }).then(currentDelegation => this._updatePoolInfo({
-        publicDeriver: withStakingKey,
+      }).then(currentDelegation => this.updatePoolInfo({
+        network: publicDeriver.getParent().getNetworkInfo(),
         allPoolIds: currentDelegation.allPoolIds,
       }));
 
@@ -160,8 +161,8 @@ export default class JormungandrDelegationStore extends Store {
     return currentDelegation;
   }
 
-  _updatePoolInfo: {|
-    publicDeriver: PublicDeriver<> & IGetStakingKey,
+  updatePoolInfo: {|
+    network: $ReadOnly<NetworkRow>,
     allPoolIds: Array<string>,
   |} => Promise<void> = async (request) => {
     // update pool information
@@ -169,7 +170,7 @@ export default class JormungandrDelegationStore extends Store {
       .reduce(
         (acc, next) => {
           if (
-            next.network.NetworkId === request.publicDeriver.getParent().getNetworkInfo().NetworkId
+            next.networkId === request.network.NetworkId
           ) {
             acc.add(next.poolId);
             return acc;
@@ -186,19 +187,22 @@ export default class JormungandrDelegationStore extends Store {
       ids: poolsToQuery,
     });
     const reputation = await stateFetcher.getReputation();
-    for (const poolId of Object.keys(poolInfoResp)) {
-      const poolInfo = poolInfoResp[poolId];
-      if (!poolInfo.info) continue; // skip pools that error out
-      this.stores.delegation.poolInfo.push({
-        network: request.publicDeriver.getParent().getNetworkInfo(),
-        poolId,
-        poolInfo: {
-          info: poolInfo.info,
-          history: poolInfo.history,
-          reputation: reputation[poolId] ?? Object.freeze({}),
-        },
-      });
-    }
+    runInAction(() => {
+      for (const poolId of Object.keys(poolInfoResp)) {
+        const poolInfo = poolInfoResp[poolId];
+        if (!poolInfo.info) continue; // skip pools that error out
+        this.stores.delegation.poolInfo.push({
+          networkId: request.network.NetworkId,
+          poolId,
+          poolInfo: {
+            poolId,
+            info: poolInfo.info,
+            history: poolInfo.history,
+            reputation: reputation[poolId] ?? Object.freeze({}),
+          },
+        });
+      }
+    });
   }
 
   @action.bound

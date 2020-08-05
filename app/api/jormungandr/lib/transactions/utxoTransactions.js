@@ -19,7 +19,8 @@ import type {
   Address, Value, Addressing,
   IGetAllUtxosResponse
 } from '../../../ada/lib/storage/models/PublicDeriver/interfaces';
-import { generateAuthData, normalizeKey, generateFee, } from './utils';
+import { generateAuthData, generateFee, } from './utils';
+import { derivePrivateByAddressing } from '../crypto/utils';
 import {
   selectAllInputSelection,
   firstMatchFirstInputSelection,
@@ -356,7 +357,7 @@ function addWitnesses(
   useLegacy: boolean,
   genesisHash: string,
 ): RustModule.WalletV3.TransactionBuilderSetAuthData {
-  const privateKeys = senderUtxos.map(utxo => normalizeKey({
+  const privateKeys = senderUtxos.map(utxo => derivePrivateByAddressing({
     addressing: utxo.addressing,
     startingFrom: {
       key: signingKey,

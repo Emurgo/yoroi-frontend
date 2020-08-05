@@ -74,9 +74,6 @@ import {
   signTransaction as jormungandrSignTransaction,
 } from './lib/transactions/utxoTransactions';
 import {
-  normalizeKey
-} from './lib/transactions/utils';
-import {
   generateWalletRootKey,
   generateAdaMnemonic,
 } from '../ada/lib/cardanoCrypto/cryptoWallet';
@@ -115,7 +112,7 @@ import {
   getAllAddressesForDisplay,
 } from '../ada/lib/storage/bridge/traitUtils';
 import { convertAdaTransactionsToExportRows } from '../ada/transactions/utils';
-import { v3PublicToV2, v4Bip32PrivateToV3, } from './lib/crypto/utils';
+import { v3PublicToV2, v4Bip32PrivateToV3, derivePrivateByAddressing } from './lib/crypto/utils';
 import { migrateToLatest } from '../ada/lib/storage/adaMigration';
 import type { TransactionExportRow } from '../export';
 
@@ -617,7 +614,7 @@ export default class JormungandrApi {
       const normalizedSigningKey = RustModule.WalletV3.Bip32PrivateKey.from_bytes(
         Buffer.from(normalizedKey.prvKeyHex, 'hex')
       );
-      const normalizedStakingKey = normalizeKey({
+      const normalizedStakingKey = derivePrivateByAddressing({
         addressing: stakingAddr.addressing,
         startingFrom: {
           key: normalizedSigningKey,
