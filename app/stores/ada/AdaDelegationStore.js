@@ -186,6 +186,7 @@ export default class AdaDelegationStore extends Store {
     runInAction(() => {
       for (const poolId of Object.keys(poolInfoResp)) {
         const poolInfo = poolInfoResp[poolId];
+        if (poolInfo == null) continue;
         this.stores.delegation.poolInfo.push({
           networkId: request.network.NetworkId,
           poolId,

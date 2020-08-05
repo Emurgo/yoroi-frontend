@@ -32,7 +32,6 @@ import {
   GetRewardHistoryApiError,
   GetPoolInfoApiError,
   GetAccountStateApiError,
-  PoolMissingApiError,
   GetBestBlockError,
   SendTransactionApiError,
   CheckAddressesInUseApiError,
@@ -306,39 +305,23 @@ export class RemoteFetcher implements IFetcher {
     Promise.resolve({ [body.addresses[0]]: { value: '0' }}) // TODO: replace when endpoint is implemented
   )
 
-    getPoolInfo: PoolInfoRequest => Promise<PoolInfoResponse> = (body) => {
-      return Promise.resolve({
-        df1750df9b2df285fcfb50f4740657a18ee3af42727d410c37b86207: {
-          info: {
-            owner: 'df1750df9b2df285fcfb50f4740657a18ee3af42727d410c37b86207',
-            pledge_address: 'todo',
-            name: 'Yoroi',
-            description: 'Yoroi is a light wallet for Cardano. It’s simple, fast and secure.',
-            ticker: 'YOROI',
-            homepage: 'https://yoroi-wallet.com/',
-          },
-          history: [],
+  getPoolInfo: PoolInfoRequest => Promise<PoolInfoResponse> = (body) => (
+    axios(
+      `${backendUrl}/api/v2/pool/info`,
+      {
+        method: 'post',
+        data: {
+          ids: body.ids
         },
-      });
-      // throw new PoolMissingApiError();
-    }
-  // getPoolInfo: PoolInfoRequest => Promise<PoolInfoResponse> = (body) => (
-    // axios(
-    //   `${backendUrl}/api/v2/pool/info`,
-    //   {
-    //     method: 'post',
-    //     data: {
-    //       ids: body.ids
-    //     },
-    //     headers: {
-    //       'yoroi-version': this.getLastLaunchVersion(),
-    //       'yoroi-locale': this.getCurrentLocale()
-    //     }
-    //   }
-    // ).then(response => response.data)
-    //   .catch((error) => {
-    //     Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getPoolInfo)} error: ` + stringifyError(error));
-    //     throw new GetPoolInfoApiError();
-    //   })
-  // )
+        headers: {
+          'yoroi-version': this.getLastLaunchVersion(),
+          'yoroi-locale': this.getCurrentLocale()
+        }
+      }
+    ).then(response => response.data)
+      .catch((error) => {
+        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getPoolInfo)} error: ` + stringifyError(error));
+        throw new GetPoolInfoApiError();
+      })
+  )
 }

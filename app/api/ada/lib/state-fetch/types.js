@@ -253,14 +253,14 @@ export type RemotePoolInfo = {|
 export type RemotePool = {|
   +info: RemotePoolInfo,
   +history: Array<{|
-    epoch: number,
-    slot: number,
-    tx_ordinal: number,
-    cert_ordinal: number,
-    payload: any, // TODO: how to store this since different networks have different cert types
+    +epoch: number,
+    +slot: number,
+    +tx_ordinal: number,
+    +cert_ordinal: number,
+    +payload: any, // TODO: how to store this since different networks have different cert types
   |}>,
 |};
 export type PoolInfoResponse = {|
-  [key: string]: RemotePool,
+  [key: string]: (RemotePool | null),
 |};
 export type PoolInfoFunc = (body: PoolInfoRequest) => Promise<PoolInfoResponse>;

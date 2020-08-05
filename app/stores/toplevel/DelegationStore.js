@@ -18,6 +18,9 @@ import type {
   RewardTuple, ReputationObject,
 } from '../../api/jormungandr/lib/state-fetch/types';
 import { getApiForNetwork } from '../../api/common/utils';
+import {
+  PoolMissingApiError,
+} from '../../api/common/errors';
 
 export type RewardHistoryForWallet = string => Promise<Array<RewardTuple>>;
 
@@ -30,22 +33,22 @@ export type DelegationRequests = {|
 |};
 
 export type PoolMeta = {|
-  poolId: string,
-  info: ?{|
-    name?: string,
-    ticker?: string,
-    description?: string,
-    homepage?: string,
+  +poolId: string,
+  +info: ?{|
+    +name?: string,
+    +ticker?: string,
+    +description?: string,
+    +homepage?: string,
   |},
-  history: Array<{|
-    epoch: number,
-    slot: number,
-    tx_ordinal: number,
-    cert_ordinal: number,
-    payload: any, // TODO: how to store this since different networks have different cert types
+  +history: $ReadOnlyArray<{|
+    +epoch: number,
+    +slot: number,
+    +tx_ordinal: number,
+    +cert_ordinal: number,
+    +payload: any, // TODO: how to store this since different networks have different cert types
   |}>,
   // TODO: we need to get information about how much pledge and whether the pledge is met
-  reputation: ReputationObject, // TODO: decide what to do. Replace with community standard?
+  +reputation: ReputationObject, // TODO: decide what to do. Replace with community standard?
 |};
 
 export default class DelegationStore extends Store {
@@ -62,6 +65,12 @@ export default class DelegationStore extends Store {
           network: selectedNetwork,
           allPoolIds: poolIds,
         });
+        // make sure all the pools were found or throw an error
+        for (const poolId of poolIds) {
+          if (this.getLocalPoolInfo(selectedNetwork, poolId) == null) {
+            throw new PoolMissingApiError();
+          }
+        }
       }
     });
 
