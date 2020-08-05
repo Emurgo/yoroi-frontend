@@ -1,7 +1,7 @@
 // @flow
 import {
   observable,
-  computed
+  computed,
 } from 'mobx';
 
 import Store from '../base/Store';
@@ -38,11 +38,12 @@ export default class ExplorerStore extends Store {
   @computed get selectedExplorer(): Map<number, SelectedExplorer> {
     const db = this.stores.loading.loadPersistentDbRequest.result;
     if (db == null) throw new Error(`${nameof(ExplorerStore)}::${nameof(this.selectedExplorer)} called before storage was initialized`);
-    const { result } = this.getSelectedExplorerRequest.execute({ db });
-    if (result == null) {
+    if (this.getSelectedExplorerRequest.result == null) {
       // when still loading, just return the defaults
+      this.getSelectedExplorerRequest.execute({ db });
       return defaultToSelectedExplorer();
     }
+    const { result } = this.getSelectedExplorerRequest;
     const convertedMap: Map<number, SelectedExplorer> = new Map();
     for (const [networkId, v] of result.entries()) {
       convertedMap.set(networkId, new SelectedExplorer({ backup: v.backup, selected: v.selected }));
@@ -53,12 +54,12 @@ export default class ExplorerStore extends Store {
   @computed get allExplorers(): GetAllExplorersResponse {
     const db = this.stores.loading.loadPersistentDbRequest.result;
     if (db == null) throw new Error(`${nameof(ExplorerStore)}::${nameof(this.allExplorers)} called before storage was initialized`);
-    const { result } = this.getAllExplorerRequest.execute({ db });
-    if (result == null) {
+    if (this.getAllExplorerRequest.result == null) {
       // when still loading, just return the defaults
+      this.getAllExplorerRequest.execute({ db });
       return prepackagedExplorers;
     }
-    return result;
+    return this.getAllExplorerRequest.result;
   }
 
   setSelectedExplorer: {|

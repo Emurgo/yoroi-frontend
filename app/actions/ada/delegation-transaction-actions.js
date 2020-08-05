@@ -3,7 +3,7 @@ import { AsyncAction, Action } from '../lib/Action';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 
 export default class DelegationTransactionActions {
-  setPools: Action<Array<string | void>> = new Action();
+  setPools: AsyncAction<Array<string>> = new AsyncAction();
   createTransaction: AsyncAction<{|
     publicDeriver: PublicDeriver<>,
     poolRequest: string | void,

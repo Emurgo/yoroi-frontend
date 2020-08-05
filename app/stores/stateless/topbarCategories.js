@@ -30,13 +30,9 @@ const messages = defineMessages({
     id: 'wallet.navigation.delegationDashboard',
     defaultMessage: '!!!Dashboard',
   },
-  delegationAdvance: {
-    id: 'wallet.navigation.delegationAdvance',
-    defaultMessage: '!!!Delegation (Advance)',
-  },
   delegationSimple: {
     id: 'wallet.navigation.delegationSimple',
-    defaultMessage: '!!!Delegation (Simple)',
+    defaultMessage: '!!!Delegation',
   },
 });
 

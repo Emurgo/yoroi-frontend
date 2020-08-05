@@ -1,9 +1,6 @@
 // @flow
 
 import { RustModule } from '../../../ada/lib/cardanoCrypto/rustLoader';
-import {
-  Bip44DerivationLevels,
-} from '../../../ada/lib/storage/database/walletTypes/bip44/api/utils';
 import type {
   Addressing,
 } from '../../../ada/lib/storage/models/PublicDeriver/interfaces';
@@ -73,10 +70,6 @@ export function derivePrivateByAddressing(request: {|
   const startLevel = request.addressing.startLevel;
   const pathLength = request.addressing.path.length;
 
-  const lastLevelSpecified = startLevel + pathLength - 1;
-  if (lastLevelSpecified !== Bip44DerivationLevels.ADDRESS.level) {
-    throw new Error(`${nameof(derivePrivateByAddressing)} incorrect addressing size ${lastLevelSpecified}`);
-  }
   if (request.startingFrom.level + 1 < startLevel) {
     throw new Error(`${nameof(derivePrivateByAddressing)} keyLevel < startLevel`);
   }

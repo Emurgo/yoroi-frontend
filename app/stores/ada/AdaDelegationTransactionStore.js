@@ -23,7 +23,7 @@ import {
 
 export default class AdaDelegationTransactionStore extends Store {
 
-  @observable selectedPools: Array<string | void>;
+  @observable selectedPools: Array<string>;
 
   @observable createDelegationTx: LocalizedRequest<CreateDelegationTxFunc>
     = new LocalizedRequest<CreateDelegationTxFunc>(this.api.ada.createDelegationTx);
@@ -52,8 +52,13 @@ export default class AdaDelegationTransactionStore extends Store {
   )
 
   @action
-  _setPools: Array<string | void> => void = (pools) => {
+  _setPools: Array<string> => Promise<void> = async (pools) => {
     this.selectedPools = pools;
+    if (pools.length > 0) {
+      try {
+        await this.stores.delegation.poolInfoQuery.execute(pools);
+      } catch (_e) { /* error handled by request */ }
+    }
   }
 
   @action.bound

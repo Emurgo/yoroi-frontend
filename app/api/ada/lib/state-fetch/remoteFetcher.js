@@ -32,6 +32,7 @@ import {
   GetRewardHistoryApiError,
   GetPoolInfoApiError,
   GetAccountStateApiError,
+  PoolMissingApiError,
   GetBestBlockError,
   SendTransactionApiError,
   CheckAddressesInUseApiError,
@@ -305,7 +306,19 @@ export class RemoteFetcher implements IFetcher {
     Promise.resolve({ [body.addresses[0]]: { value: '0' }}) // TODO: replace when endpoint is implemented
   )
 
-  getPoolInfo: PoolInfoRequest => Promise<PoolInfoResponse> = (body) => (
+    getPoolInfo: PoolInfoRequest => Promise<PoolInfoResponse> = (body) => {
+      return Promise.resolve({
+        df1750df9b2df285fcfb50f4740657a18ee3af42727d410c37b86207: {
+          info: {
+            owner: 'df1750df9b2df285fcfb50f4740657a18ee3af42727d410c37b86207',
+            pledge_address: 'todo',
+          },
+          history: [],
+        },
+      });
+      // throw new PoolMissingApiError();
+    }
+  // getPoolInfo: PoolInfoRequest => Promise<PoolInfoResponse> = (body) => (
     // axios(
     //   `${backendUrl}/api/v2/pool/info`,
     //   {
@@ -323,6 +336,5 @@ export class RemoteFetcher implements IFetcher {
     //     Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getPoolInfo)} error: ` + stringifyError(error));
     //     throw new GetPoolInfoApiError();
     //   })
-    Promise.resolve({}) // TODO: replace when endpoint is implemented
-  )
+  // )
 }

@@ -245,10 +245,10 @@ export type RemotePoolInfo = {|
   +pledge_address: string, // bech32
 
   // from pool metadata (off chain)
-  +name: void | string,
-  +description: void | string,
-  +ticker: void | string,
-  +homepage: void | string,
+  +name?: string,
+  +description?: string,
+  +ticker?: string,
+  +homepage?: string,
 |};
 export type RemotePool = {|
   +info: RemotePoolInfo,

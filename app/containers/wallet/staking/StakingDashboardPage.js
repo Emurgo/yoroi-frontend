@@ -483,7 +483,7 @@ export default class StakingDashboardPage extends Component<Props> {
     const { intl } = this.context;
     return {
       pools: currentPools.map(pool => {
-        const meta = this.generated.stores.delegation.getPoolInfo(
+        const meta = this.generated.stores.delegation.getLocalPoolInfo(
           publicDeriver.getParent().getNetworkInfo(),
           pool[0],
         );
@@ -823,7 +823,7 @@ export default class StakingDashboardPage extends Component<Props> {
       |},
       delegation: {|
         selectedPage: number,
-        getPoolInfo: ($ReadOnly<NetworkRow>, string) => (void | PoolMeta),
+        getLocalPoolInfo: ($ReadOnly<NetworkRow>, string) => (void | PoolMeta),
         getDelegationRequests: (
           PublicDeriver<>
         ) => void | DelegationRequests,
@@ -930,7 +930,7 @@ export default class StakingDashboardPage extends Component<Props> {
         },
         delegation: {
           selectedPage: stores.delegation.selectedPage,
-          getPoolInfo: stores.delegation.getPoolInfo,
+          getLocalPoolInfo: stores.delegation.getLocalPoolInfo,
           getDelegationRequests: stores.delegation.getDelegationRequests,
         },
         time,

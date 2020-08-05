@@ -357,7 +357,10 @@ export default class MemosStore extends Store {
   }
 
   @computed get selectedProvider(): ?SelectedExternalStorageProvider {
-    const { result } = this.getExternalStorageProviderRequest.execute();
+    let { result } = this.getExternalStorageProviderRequest;
+    if (result == null) {
+      result = this.getExternalStorageProviderRequest.execute().result;
+    }
     return result;
   }
 

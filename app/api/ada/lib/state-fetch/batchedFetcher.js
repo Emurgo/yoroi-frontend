@@ -20,6 +20,7 @@ import type {
 import type {
   FilterFunc, FilterUsedRequest, FilterUsedResponse,
 } from '../../../common/lib/state-fetch/currencySpecificTypes';
+import LocalizableError from '../../../../i18n/LocalizableError';
 
 import type { IFetcher } from './IFetcher';
 
@@ -126,9 +127,9 @@ function batchUTXOsForAddresses(
         .then(groupsOfUTXOs => (
           groupsOfUTXOs.reduce((acc, groupOfUTXOs) => acc.concat(groupOfUTXOs), [])
         ));
-    } catch (getUtxosError) {
-      Logger.error('batchedFetcher:::batchUTXOsForAddresses error: ' +
-        stringifyError(getUtxosError));
+    } catch (error) {
+      Logger.error(`batchedFetcher:::${nameof(batchUTXOsForAddresses)} error: ` + stringifyError(error));
+      if (error instanceof LocalizableError) throw error;
       throw new GetAllUTXOsForAddressesError();
     }
   };
@@ -157,9 +158,9 @@ function batchTxsBodiesForInputs(
           }
           return bodies;
         });
-    } catch (getTxBodiesError) {
-      Logger.error('batchedFetcher::batchTxsBodiesForInputs error: ' +
-        stringifyError(getTxBodiesError));
+    } catch (error) {
+      Logger.error('batchedFetcher::batchTxsBodiesForInputs error: ' + stringifyError(error));
+      if (error instanceof LocalizableError) throw error;
       throw new GetTxsBodiesForUTXOsError();
     }
   };
@@ -195,6 +196,7 @@ export function batchGetUTXOsSumsForAddresses(
       return { sum: sum.toString() };
     } catch (error) {
       Logger.error('batchedFetcher::batchGetUTXOsSumsForAddresses error: ' + stringifyError(error));
+      if (error instanceof LocalizableError) throw error;
       throw new GetUtxosSumsForAddressesApiError();
     }
   };
@@ -213,6 +215,7 @@ export function batchGetRewardHistory(
       return Object.assign({}, ...rewardHistories);
     } catch (error) {
       Logger.error(`batchedFetcher::${nameof(batchGetRewardHistory)} error: ` + stringifyError(error));
+      if (error instanceof LocalizableError) throw error;
       throw new GetRewardHistoryApiError();
     }
   };
@@ -248,7 +251,8 @@ export function batchGetTransactionsHistoryForAddresses(
       }
       return deduplicated;
     } catch (error) {
-      Logger.error('batchedFetcher::batchGetTransactionsHistoryForAddresses error: ' + stringifyError(error));
+      Logger.error(`batchedFetcher::${nameof(batchGetTransactionsHistoryForAddresses)} error: ` + stringifyError(error));
+      if (error instanceof LocalizableError) throw error;
       throw new GetTxHistoryForAddressesApiError();
     }
   };
@@ -317,6 +321,7 @@ export function batchCheckAddressesInUse(
       return groupedAddresses.reduce((accum, chunkAddrs) => accum.concat(chunkAddrs), []);
     } catch (error) {
       Logger.error('batchedFetcher::batchCheckAddressesInUse error: ' + stringifyError(error));
+      if (error instanceof LocalizableError) throw error;
       throw new CheckAddressesInUseApiError();
     }
   };
@@ -374,6 +379,7 @@ export function batchGetAccountState(
       return Object.assign({}, ...chimericAccountStates);
     } catch (error) {
       Logger.error(`batchedFetcher::${nameof(batchGetAccountState)} error: ` + stringifyError(error));
+      if (error instanceof LocalizableError) throw error;
       throw new GetAccountStateApiError();
     }
   };
@@ -392,6 +398,7 @@ export function batchGetPoolInfo(
       return Object.assign({}, ...poolInfos);
     } catch (error) {
       Logger.error(`batchedFetcher::${nameof(batchGetPoolInfo)} error: ` + stringifyError(error));
+      if (error instanceof LocalizableError) throw error;
       throw new GetPoolInfoApiError();
     }
   };

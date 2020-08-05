@@ -14,7 +14,6 @@ import styles from './DelegationSendForm.scss';
 import globalMessages from '../../../i18n/global-messages';
 import config from '../../../config';
 import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
-import LocalizableError from '../../../i18n/LocalizableError';
 import WarningBox from '../../widgets/WarningBox';
 import type { $npm$ReactIntl$IntlFormat, } from 'react-intl';
 import isHexadecimal from 'validator/lib/isHexadecimal';
@@ -28,9 +27,8 @@ const messages = defineMessages({
 
 type Props = {|
   +hasAnyPending: boolean,
-  +onSubmit: void => void,
-  +reset: void => void,
-  +error: ?LocalizableError,
+  +updatePool: (void | string) => Promise<void>,
+  +onNext: void => Promise<void>,
 |};
 
 function isValidPool(poolId: string): boolean {
@@ -47,14 +45,6 @@ export default class DelegationSendForm extends Component<Props> {
     intl: intlShape.isRequired,
   };
 
-  componentDidMount(): void {
-    this.props.reset();
-  }
-
-  componentWillUnmount(): void {
-    this.props.reset();
-  }
-
   // FORM VALIDATION
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
     fields: {
@@ -65,9 +55,15 @@ export default class DelegationSendForm extends Component<Props> {
         validators: [({ field }) => {
           const poolIdValue = field.value;
           if (poolIdValue === '') {
+            this.props.updatePool(undefined);
             return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
           }
           const isValid = isValidPool(poolIdValue);
+          if (isValid) {
+            this.props.updatePool(poolIdValue);
+          } else {
+            this.props.updatePool(undefined);
+          }
           return [isValid, this.context.intl.formatMessage(messages.invalidPoolId)];
         }],
       },
@@ -134,7 +130,7 @@ export default class DelegationSendForm extends Component<Props> {
       <Button
         className={buttonClasses}
         label={intl.formatMessage(globalMessages.nextButtonLabel)}
-        onMouseUp={this.props.onSubmit}
+        onMouseUp={this.props.onNext}
         disabled={this.props.hasAnyPending}
         skin={ButtonSkin}
       />);

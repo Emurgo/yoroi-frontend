@@ -280,7 +280,10 @@ export default class ProfileStore extends Store {
     if (this.inMemoryLanguage !== null) {
       return this.inMemoryLanguage;
     }
-    const { result } = this.getProfileLocaleRequest.execute();
+    let { result } = this.getProfileLocaleRequest;
+    if (result == null) {
+      result = this.getProfileLocaleRequest.execute().result;
+    }
     if (this.isCurrentLocaleSet && result != null && result !== '') return result;
 
     return ProfileStore.getDefaultLocale();
@@ -358,7 +361,10 @@ export default class ProfileStore extends Store {
       return THEMES.YOROI_CLASSIC;
     }
 
-    const { result } = this.getThemeRequest.execute();
+    let { result } = this.getThemeRequest;
+    if (result == null) {
+      result = this.getThemeRequest.execute().result;
+    }
     if (this.isCurrentThemeSet && result != null) {
       // verify content is an actual theme
       if (Object.values(THEMES).find(theme => theme === result)) {
@@ -381,8 +387,11 @@ export default class ProfileStore extends Store {
 
   /* @Returns Merged Pre-Built Theme and Custom Theme */
   @computed get currentThemeVars(): { [key: string]: string, ... } {
-    const { result } = this.getCustomThemeRequest.execute();
     const currentThemeVars = this.getThemeVars({ theme: this.currentTheme });
+    let { result } = this.getCustomThemeRequest;
+    if (result == null) {
+      result = this.getCustomThemeRequest.execute().result;
+    }
     let customThemeVars = {};
     if (result != null) customThemeVars = JSON.parse(result);
     // Merge Custom Theme and Current Theme
@@ -431,7 +440,10 @@ export default class ProfileStore extends Store {
   };
 
   hasCustomTheme: void => boolean = (): boolean => {
-    const { result } = this.getCustomThemeRequest.execute();
+    let { result } = this.getCustomThemeRequest;
+    if (result == null) {
+      result = this.getCustomThemeRequest.execute().result;
+    }
     return result !== undefined;
   };
 
@@ -483,7 +495,10 @@ export default class ProfileStore extends Store {
   // ========== Complexity Level Choice ========== //
 
   @computed get selectedComplexityLevel(): ?ComplexityLevelType {
-    const { result } = this.getComplexityLevelRequest.execute();
+    let { result } = this.getComplexityLevelRequest;
+    if (result == null) {
+      result = this.getComplexityLevelRequest.execute().result;
+    }
     return result;
   }
 
@@ -526,7 +541,10 @@ export default class ProfileStore extends Store {
   // ========== Last Launch Version ========== //
 
   @computed get lastLaunchVersion(): string {
-    const { result } = this.getLastLaunchVersionRequest.execute();
+    let { result } = this.getLastLaunchVersionRequest;
+    if (result == null) {
+      result = this.getLastLaunchVersionRequest.execute().result;
+    }
     return result != null ? result : '0.0.0';
   }
 
@@ -547,7 +565,10 @@ export default class ProfileStore extends Store {
   // ========== Show/hide Balance ========== //
 
   @computed get shouldHideBalance(): boolean {
-    const { result } = this.getHideBalanceRequest.execute();
+    let { result } = this.getHideBalanceRequest;
+    if (result == null) {
+      result = this.getHideBalanceRequest.execute().result;
+    }
     return result === true;
   }
 
@@ -560,7 +581,10 @@ export default class ProfileStore extends Store {
   // ========== Expand / Retract Sidebar ========== //
 
   @computed get isSidebarExpanded(): boolean {
-    const { result } = this.getToggleSidebarRequest.execute();
+    let { result } = this.getToggleSidebarRequest;
+    if (result == null) {
+      result = this.getToggleSidebarRequest.execute().result;
+    }
     return result === true;
   }
 
@@ -593,7 +617,10 @@ export default class ProfileStore extends Store {
   // ========== Coin Price Currency ========== //
 
   @computed.struct get unitOfAccount(): UnitOfAccountSettingType {
-    const { result } = this.getUnitOfAccountRequest.execute();
+    let { result } = this.getUnitOfAccountRequest;
+    if (result == null) {
+      result = this.getUnitOfAccountRequest.execute().result;
+    }
     return result || unitOfAccountDisabledValue;
   }
 
