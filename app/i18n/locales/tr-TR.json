@@ -465,7 +465,7 @@
   "wallet.debugwallet.explanation2": "Herhangi bir sorunu önlemek için bu cüzdanı kullanmayın. <br /> Bunun yerine yeni bir cüzdan oluşturmak için Yoroi'yi kullanın.",
   "wallet.debugwallet.explanation3": "Eğer bu mesajı beklemediyseniz, lütfen {contactSupportLink}.",
   "wallet.delegate.form.invalidPoolId": "Geçersiz havuz kimliği",
-  "wallet.delegation.poolInfo.fetching": "Fetching pool information",
+  "wallet.delegation.poolInfo.fetching": "Havuz bilgileri alınıyor",
   "wallet.delegation.transaction.approximationLabel": "Dönem başına alacağınız ödüllerin tahmini değeri:",
   "wallet.delegation.transaction.explanationLine1": "Bir seferde yalnızca bir bahis havuzuna yetki verebilirsiniz",
   "wallet.delegation.transaction.explanationLine2": "İstediğiniz zaman farklı bir bahis havuzuna yetkilendirme yapabilirsiniz",
