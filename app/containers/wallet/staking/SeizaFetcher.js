@@ -12,13 +12,16 @@ import type { ConfigType } from '../../../../config/config-types';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 import type {SelectedPool} from "../../../actions/jormungandr/delegation-transaction-actions";
+import VerticallyCenteredLayout from "../../../components/layout/VerticallyCenteredLayout";
+import LoadingSpinner from "../../../components/widgets/LoadingSpinner";
+import environment from "../../../environment";
 
 declare var CONFIG: ConfigType;
 
 type Props = {|
   ...InjectedOrGenerated<GeneratedData>,
   +children?: Node,
-  +stakingUrl: string,
+  +urlTemplate: string,
   stakepoolSelectedAction: any,
 |};
 
@@ -63,7 +66,16 @@ export default class SeizaFetcher extends Component<Props> {
   };
 
   render(): Node {
-    const { stakingUrl } = this.props;
+    const { urlTemplate } = this.props;
+
+    const stakingUrl = this._prepareStakingURL(urlTemplate);
+    if (stakingUrl == null) {
+      return (
+          <VerticallyCenteredLayout>
+            <LoadingSpinner />
+          </VerticallyCenteredLayout>
+      );
+    }
 
     if (stakingUrl == null) {
       throw new Error('Staking undefined POOLS_UI_URL_FOR_YOROI should never happen');
@@ -79,6 +91,53 @@ export default class SeizaFetcher extends Component<Props> {
           height={this.iframe != null && this.frameHeight != null ? this.frameHeight + 'px' : null}
         />
     );
+  }
+
+  _getBrowserReplacement(): string {
+    // 1) handle Yoroi running as an extension
+    if (environment.userAgentInfo.isExtension) {
+      if (environment.userAgentInfo.isFirefox) {
+        return 'firefox&mozId=' + location.hostname;
+      }
+      // otherwise assume Chrome
+      return 'chrome&chromeId=' + chrome.runtime.id;
+    }
+
+    // 2) Handle Yoroi running as a website
+    if (environment.userAgentInfo.isFirefox) {
+      return 'firefox&host' + location.host;
+    }
+    // otherwise assume Chrome
+    return 'chrome&chromeId=' + location.host;
+  }
+
+  _prepareStakingURL(urlTemplate: string): null | string {
+    let finalURL = urlTemplate
+        .replace(
+            '$$BROWSER$$',
+            this._getBrowserReplacement()
+        );
+
+    // TODO: adds locale when adapools supports it
+    // finalURL += `&locale=${this.generated.stores.profile.currentLocale}`;
+    // const delegationStore = this.generated.stores.delegation;
+
+    // TODO: adds to which stakepool you have already delegated.
+    // const delegationStore = this.generated.stores.delegation;
+    // const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
+    // if (delegationRequests == null) {
+    //   throw new Error(`${nameof(SeizaStakingPage)} opened for non-reward wallet`);
+    // }
+    // const delegation = delegationRequests.getCurrentDelegation.result;
+    // if (!delegation || delegation.currEpoch == null) {
+    //   return null;
+    // }
+    // const poolList = Array.from(
+    //   new Set(delegation.currEpoch.pools.map(pool => pool[0]))
+    // );
+    // finalURL += `&delegated=${encodeURIComponent(JSON.stringify(poolList))}`;
+
+    return finalURL;
   }
 
   @action

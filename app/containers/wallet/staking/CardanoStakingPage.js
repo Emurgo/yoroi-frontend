@@ -70,19 +70,17 @@ export default class CardanoStakingPage extends Component<Props> {
     const { urlTemplate } = this.props;
 
     if (urlTemplate != null) {
-      const stakingUrl = this._prepareStakingURL(urlTemplate);
-      if (stakingUrl == null) {
-        return (
-            <VerticallyCenteredLayout>
-              <LoadingSpinner />
-            </VerticallyCenteredLayout>
-        );
-      }
       return (
-          <SeizaFetcher
-              stakingUrl={stakingUrl}
-              stakepoolSelectedAction={async (poolId) => (this._updatePool(poolId))}
-          />
+          <div>
+            {this.getDialog()}
+            <SeizaFetcher
+                urlTemplate={urlTemplate}
+                stakepoolSelectedAction={async (poolId) => {
+                  await this._updatePool(poolId);
+                  await this._next();
+                }}
+            />
+          </div>
       );
     } else {
       return (
@@ -224,53 +222,6 @@ export default class CardanoStakingPage extends Component<Props> {
         </>
       </Dialog>
     );
-  }
-
-  _getBrowserReplacement(): string {
-    // 1) handle Yoroi running as an extension
-    if (environment.userAgentInfo.isExtension) {
-      if (environment.userAgentInfo.isFirefox) {
-        return 'firefox&mozId=' + location.hostname;
-      }
-      // otherwise assume Chrome
-      return 'chrome&chromeId=' + chrome.runtime.id;
-    }
-
-    // 2) Handle Yoroi running as a website
-    if (environment.userAgentInfo.isFirefox) {
-      return 'firefox&host' + location.host;
-    }
-    // otherwise assume Chrome
-    return 'chrome&chromeId=' + location.host;
-  }
-
-  _prepareStakingURL(urlTemplate: string): null | string {
-    let finalURL = urlTemplate
-        .replace(
-            '$$BROWSER$$',
-            this._getBrowserReplacement()
-        );
-
-    // TODO: adds locale when adapools supports it
-    // finalURL += `&locale=${this.generated.stores.profile.currentLocale}`;
-    const delegationStore = this.generated.stores.delegation;
-
-    // TODO: adds to which stakepool you have already delegated.
-    // const delegationStore = this.generated.stores.delegation;
-    // const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
-    // if (delegationRequests == null) {
-    //   throw new Error(`${nameof(SeizaStakingPage)} opened for non-reward wallet`);
-    // }
-    // const delegation = delegationRequests.getCurrentDelegation.result;
-    // if (!delegation || delegation.currEpoch == null) {
-    //   return null;
-    // }
-    // const poolList = Array.from(
-    //   new Set(delegation.currEpoch.pools.map(pool => pool[0]))
-    // );
-    // finalURL += `&delegated=${encodeURIComponent(JSON.stringify(poolList))}`;
-
-    return finalURL;
   }
 
   getDialog: void => (void | Node) = () => {
