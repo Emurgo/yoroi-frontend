@@ -96,7 +96,7 @@ export const SEIZA_STAKE_SIMULATOR: TopbarCategory = registerCategory({
   label: messages.delegationSimple,
   isVisible: request => (
     asGetStakingKey(request.selected) != null &&
-    isJormungandr(request.selected.getParent().getNetworkInfo())
+    isCardanoHaskell(request.selected.getParent().getNetworkInfo())
   ),
 });
 export const CARDANO_DELEGATION: TopbarCategory = registerCategory({

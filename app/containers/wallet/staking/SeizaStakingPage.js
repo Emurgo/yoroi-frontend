@@ -45,8 +45,13 @@ export default class SeizaStakingPage extends Component<Props> {
     intl: intlShape.isRequired,
   };
 
+  cancel: void => void = () => {
+    this.generated.actions.ada.delegationTransaction.reset.trigger();
+  }
   componentWillUnmount() {
-    this.generated.actions.jormungandr.delegationTransaction.reset.trigger();
+    this.cancel();
+    this.generated.actions.ada.delegationTransaction.setPools.trigger([]);
+    this.generated.stores.delegation.poolInfoQuery.reset();
   }
 
   getBrowserReplacement(): string {
@@ -104,13 +109,13 @@ export default class SeizaStakingPage extends Component<Props> {
       throw new Error(`${nameof(SeizaStakingPage)} opened for non-reward wallet`);
     }
     const delegation = delegationRequests.getCurrentDelegation.result;
-    if (!delegation || delegation.currEpoch == null) {
-      return null;
-    }
-    const poolList = Array.from(
-      new Set(delegation.currEpoch.pools.map(pool => pool[0]))
-    );
-    finalURL += `&delegated=${encodeURIComponent(JSON.stringify(poolList))}`;
+    // if (!delegation || delegation.currEpoch == null) {
+    //   return null;
+    // }
+    // const poolList = Array.from(
+    //   new Set(delegation.currEpoch.pools.map(pool => pool[0]))
+    // );
+    // finalURL += `&delegated=${encodeURIComponent(JSON.stringify(poolList))}`;
     return finalURL;
   }
 

@@ -172,7 +172,7 @@ const WalletsSubpages = (stores, actions) => (
     <Route
       exact
       path={ROUTES.WALLETS.SEIZA_DELEGATION_SIMPLE}
-      component={(props) => <SeizaStakingPage {...props} stores={stores} actions={actions} urlTemplate={CONFIG.seiza.simpleTemplate} />}
+      component={(props) => <CardanoStakingPage {...props} stores={stores} actions={actions} urlTemplate={CONFIG.seiza.simpleTemplate} />}
     />
     <Route
       exact

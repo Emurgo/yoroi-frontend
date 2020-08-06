@@ -30,16 +30,23 @@ import { getApiForNetwork, getApiMeta } from '../../../api/common/utils';
 import type { PoolMeta } from '../../../stores/toplevel/DelegationStore';
 import DelegationTxDialog from '../../../components/wallet/staking/DelegationTxDialog';
 import StakePool from '../../../components/wallet/staking/dashboard/StakePool';
+import SeizaFetcher from './SeizaFetcher';
 import PoolWarningDialog from '../../../components/wallet/staking/dashboard/PoolWarningDialog';
 import type { Notification } from '../../../types/notificationType';
 import type { ReputationObject, } from '../../../api/jormungandr/lib/state-fetch/types';
 import config from '../../../config';
 import { handleExternalLinkClick } from '../../../utils/routing';
+import environment from "../../../environment";
+import {formattedAmountWithoutLovelace} from "../../../utils/formatters";
+import type {GeneratedData as SeizaFetcherData} from "./SeizaFetcher";
+import VerticallyCenteredLayout from "../../../components/layout/VerticallyCenteredLayout";
+import LoadingSpinner from "../../../components/widgets/LoadingSpinner";
 
 export type GeneratedData = typeof CardanoStakingPage.prototype.generated;
 
 type Props = {|
   ...InjectedOrGenerated<GeneratedData>,
+  urlTemplate: ?string,
 |};
 
 @observer
@@ -60,38 +67,61 @@ export default class CardanoStakingPage extends Component<Props> {
   }
 
   render(): Node {
-    return (
-      <div>
-        {this.getDialog()}
-        <DelegationSendForm
-          hasAnyPending={this.generated.stores.transactions.hasAnyPending}
-          poolQueryError={this.generated.stores.delegation.poolInfoQuery.error}
-          isProcessing={this.generated.stores.delegation.poolInfoQuery.isExecuting}
-          updatePool={async (poolId) => {
-            this.generated.stores.delegation.poolInfoQuery.reset();
-            if (poolId == null) {
-              await this.generated.actions.ada.delegationTransaction.setPools.trigger([]);
-              return;
-            }
-            await this.generated.actions.ada.delegationTransaction.setPools.trigger([poolId]);
-          }}
-          onNext={async () => {
-            const selectedWallet = this.generated.stores.wallets.selected;
-            if (selectedWallet == null) {
-              return;
-            }
-            const { delegationTransaction } = this.generated.stores.substores.ada;
-            if (delegationTransaction.selectedPools.length === 0) {
-              return;
-            }
-            await this.generated.actions.ada.delegationTransaction.createTransaction.trigger({
-              poolRequest: delegationTransaction.selectedPools[0],
-              publicDeriver: selectedWallet,
-            });
-          }}
-        />
-        {this._displayPoolInfo()}
-      </div>);
+    const { urlTemplate } = this.props;
+
+    if (urlTemplate != null) {
+      const stakingUrl = this._prepareStakingURL(urlTemplate);
+      if (stakingUrl == null) {
+        return (
+            <VerticallyCenteredLayout>
+              <LoadingSpinner />
+            </VerticallyCenteredLayout>
+        );
+      }
+      return (
+          <SeizaFetcher
+              stakingUrl={stakingUrl}
+              stakepoolSelectedAction={async (poolId) => (this._updatePool(poolId))}
+          />
+      );
+    } else {
+      return (
+          <div>
+            {this.getDialog()}
+            <DelegationSendForm
+                hasAnyPending={this.generated.stores.transactions.hasAnyPending}
+                poolQueryError={this.generated.stores.delegation.poolInfoQuery.error}
+                isProcessing={this.generated.stores.delegation.poolInfoQuery.isExecuting}
+                updatePool={async (poolId) => (this._updatePool(poolId))}
+                onNext={async () => (this._next())}
+            />
+            {this._displayPoolInfo()}
+          </div>);
+    }
+  }
+
+  _updatePool: string => (void) = async (poolId) => {
+    this.generated.stores.delegation.poolInfoQuery.reset();
+    if (poolId == null) {
+      await this.generated.actions.ada.delegationTransaction.setPools.trigger([]);
+      return;
+    }
+    await this.generated.actions.ada.delegationTransaction.setPools.trigger([poolId]);
+  }
+
+  _next: void => (void) = async () => {
+    const selectedWallet = this.generated.stores.wallets.selected;
+    if (selectedWallet == null) {
+      return;
+    }
+    const { delegationTransaction } = this.generated.stores.substores.ada;
+    if (delegationTransaction.selectedPools.length === 0) {
+      return;
+    }
+    await this.generated.actions.ada.delegationTransaction.createTransaction.trigger({
+      poolRequest: delegationTransaction.selectedPools[0],
+      publicDeriver: selectedWallet,
+    });
   }
 
   _displayPoolInfo: void => (void | Node) = () => {
@@ -194,6 +224,53 @@ export default class CardanoStakingPage extends Component<Props> {
         </>
       </Dialog>
     );
+  }
+
+  _getBrowserReplacement(): string {
+    // 1) handle Yoroi running as an extension
+    if (environment.userAgentInfo.isExtension) {
+      if (environment.userAgentInfo.isFirefox) {
+        return 'firefox&mozId=' + location.hostname;
+      }
+      // otherwise assume Chrome
+      return 'chrome&chromeId=' + chrome.runtime.id;
+    }
+
+    // 2) Handle Yoroi running as a website
+    if (environment.userAgentInfo.isFirefox) {
+      return 'firefox&host' + location.host;
+    }
+    // otherwise assume Chrome
+    return 'chrome&chromeId=' + location.host;
+  }
+
+  _prepareStakingURL(urlTemplate: string): null | string {
+    let finalURL = urlTemplate
+        .replace(
+            '$$BROWSER$$',
+            this._getBrowserReplacement()
+        );
+
+    // TODO: adds locale when adapools supports it
+    // finalURL += `&locale=${this.generated.stores.profile.currentLocale}`;
+    const delegationStore = this.generated.stores.delegation;
+
+    // TODO: adds to which stakepool you have already delegated.
+    // const delegationStore = this.generated.stores.delegation;
+    // const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
+    // if (delegationRequests == null) {
+    //   throw new Error(`${nameof(SeizaStakingPage)} opened for non-reward wallet`);
+    // }
+    // const delegation = delegationRequests.getCurrentDelegation.result;
+    // if (!delegation || delegation.currEpoch == null) {
+    //   return null;
+    // }
+    // const poolList = Array.from(
+    //   new Set(delegation.currEpoch.pools.map(pool => pool[0]))
+    // );
+    // finalURL += `&delegated=${encodeURIComponent(JSON.stringify(poolList))}`;
+
+    return finalURL;
   }
 
   getDialog: void => (void | Node) = () => {
@@ -318,6 +395,7 @@ export default class CardanoStakingPage extends Component<Props> {
   }
 
   @computed get generated(): {|
+    SeizaFetcherProps: InjectedOrGenerated<SeizaFetcherData>,
     actions: {|
       ada: {|
         delegationTransaction: {|
@@ -459,6 +537,9 @@ export default class CardanoStakingPage extends Component<Props> {
           getTooltipActiveNotification: stores.uiNotifications.getTooltipActiveNotification,
         },
       },
+      SeizaFetcherProps: (
+          { actions, stores, }: InjectedOrGenerated<SeizaFetcherData>
+      ),
       actions: {
         notifications: {
           open: {

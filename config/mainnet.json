@@ -5,7 +5,7 @@
     "name": "mainnet"
   },
   "seiza": {
-    "simpleTemplate": ""
+    "simpleTemplate": "https://a.adapools.org/yoroi/?source=$$BROWSER$$"
   },
   "app": {
     "walletRefreshInterval": 20000,
