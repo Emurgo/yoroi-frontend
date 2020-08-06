@@ -259,6 +259,10 @@ export type GetNoticesFunc = (
 export type SignAndBroadcastRequest = {|
   publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetSigningKey,
   signRequest: BaseSignRequest<RustModule.WalletV4.TransactionBuilder>,
+  /** note: this should include your own staking key too if it's needed to sign the transaction */
+  getStakingWitnesses: void => Promise<(
+    RustModule.WalletV4.TransactionHash => Array<RustModule.WalletV4.Vkeywitness>
+  )>,
   password: string,
   sendTx: SendFunc,
 |};
@@ -358,20 +362,6 @@ export type CreateDelegationTxResponse = {|
 export type CreateDelegationTxFunc = (
   request: CreateDelegationTxRequest
 ) => Promise<CreateDelegationTxResponse>;
-
-// signAndBroadcastDelegationTx
-
-export type SignAndBroadcastDelegationTxRequest = {|
-  publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetSigningKey & IGetStakingKey,
-  signRequest: BaseSignRequest<RustModule.WalletV4.TransactionBuilder>,
-  password: string,
-  sendTx: SendFunc,
-|};
-export type SignAndBroadcastDelegationTxResponse = SignedResponse;
-
-export type SignAndBroadcastDelegationTxFunc = (
-  request: SignAndBroadcastDelegationTxRequest
-) => Promise<SignAndBroadcastDelegationTxResponse>;
 
 // createWithdrawalTx
 
@@ -756,7 +746,7 @@ export default class AdaApi {
         RustModule.WalletV4.Bip32PrivateKey.from_bytes(
           Buffer.from(normalizedKey.prvKeyHex, 'hex')
         ),
-        [],
+        () => [],
         undefined,
       );
 
@@ -1064,65 +1054,6 @@ export default class AdaApi {
       };
     } catch (error) {
       Logger.error(`${nameof(AdaApi)}::${nameof(this.createDelegationTx)} error: ` + stringifyError(error));
-      if (error instanceof LocalizableError) throw error;
-      throw new GenericApiError();
-    }
-  }
-
-  async signAndBroadcastDelegationTx(
-    request: SignAndBroadcastDelegationTxRequest
-  ): Promise<SignAndBroadcastDelegationTxResponse> {
-    // TODO: should probably delete this function entirely and fix the below TODO
-    // tricky since for claiming ITN rewards, you could want to use a staking key that is not yours
-    // so the function API would change. Need to think about it.
-    Logger.debug(`${nameof(AdaApi)}::${nameof(this.signAndBroadcastDelegationTx)} called`);
-    const { password, } = request;
-    try {
-      const signingKeyFromStorage = await request.publicDeriver.getSigningKey();
-      const stakingAddr = await request.publicDeriver.getStakingKey();
-      const normalizedKey = await request.publicDeriver.normalizeKey({
-        ...signingKeyFromStorage,
-        password,
-      });
-      const normalizedSigningKey = RustModule.WalletV4.Bip32PrivateKey.from_bytes(
-        Buffer.from(normalizedKey.prvKeyHex, 'hex')
-      );
-      const normalizedStakingKey = derivePrivateByAddressing({
-        addressing: stakingAddr.addressing,
-        startingFrom: {
-          key: normalizedSigningKey,
-          level: request.publicDeriver.getParent().getPublicDeriverLevel(),
-        },
-      }).to_raw_key();
-      const signedTx = shelleySignTransaction(
-        request.signRequest,
-        request.publicDeriver.getParent().getPublicDeriverLevel(),
-        RustModule.WalletV4.Bip32PrivateKey.from_bytes(
-          Buffer.from(normalizedKey.prvKeyHex, 'hex')
-        ),
-        // TODO: this not a great way to pick which key to sign with
-        // it will work for the basic case (sign your own certificate)
-        // but won't work for registration certificates
-        // or submitting a key registration without delegating
-        // or submitting somebody else's key registration certificate
-        [normalizedStakingKey],
-        undefined,
-      );
-      const response = request.sendTx({
-        id: Buffer.from(
-          RustModule.WalletV4.hash_transaction(signedTx.body()).to_bytes()
-        ).toString('hex'),
-        encodedTx: signedTx.to_bytes(),
-      });
-      Logger.debug(
-        `${nameof(AdaApi)}::${nameof(this.signAndBroadcastDelegationTx)} success: ` + stringifyData(response)
-      );
-      return response;
-    } catch (error) {
-      if (error instanceof WrongPassphraseError) {
-        throw new IncorrectWalletPasswordError();
-      }
-      Logger.error(`${nameof(AdaApi)}::${nameof(this.signAndBroadcastDelegationTx)} error: ` + stringifyError(error));
       if (error instanceof LocalizableError) throw error;
       throw new GenericApiError();
     }
@@ -1587,4 +1518,35 @@ function getDifferenceAfterTx(
   }
 
   return sumOutForKey.minus(sumInForKey);
+}
+
+export async function genOwnStakingKey(request: {|
+  publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetSigningKey & IGetStakingKey,
+  password: string,
+|}): Promise<(
+  RustModule.WalletV4.TransactionHash => Array<RustModule.WalletV4.Vkeywitness>
+)> {
+  const signingKeyFromStorage = await request.publicDeriver.getSigningKey();
+  const stakingAddr = await request.publicDeriver.getStakingKey();
+  const normalizedKey = await request.publicDeriver.normalizeKey({
+    ...signingKeyFromStorage,
+    password: request.password,
+  });
+  const normalizedSigningKey = RustModule.WalletV4.Bip32PrivateKey.from_bytes(
+    Buffer.from(normalizedKey.prvKeyHex, 'hex')
+  );
+  const normalizedStakingKey = derivePrivateByAddressing({
+    addressing: stakingAddr.addressing,
+    startingFrom: {
+      key: normalizedSigningKey,
+      level: request.publicDeriver.getParent().getPublicDeriverLevel(),
+    },
+  }).to_raw_key();
+
+  return (txHash) => {
+    return [RustModule.WalletV4.make_vkey_witness(
+      txHash,
+      normalizedStakingKey,
+    )];
+  };
 }

@@ -72,18 +72,18 @@ export default class AdaYoroiTransferStore extends Store {
     recoveryPhrase: string,
     updateStatusCallback: void => void,
     getDestinationAddress: void => Promise<string>,
-  |} => Promise<TransferTx> = async (request) => {
-    const rootPk = this.stores.yoroiTransfer.transferKind === TransferKind.LEDGER
-      ? generateLedgerWalletRootKey(request.recoveryPhrase)
-      : generateWalletRootKey(request.recoveryPhrase);
+  |} => Promise<TransferTx> = async (_request) => {
+    // const rootPk = this.stores.yoroiTransfer.transferKind === TransferKind.LEDGER
+    //   ? generateLedgerWalletRootKey(request.recoveryPhrase)
+    //   : generateWalletRootKey(request.recoveryPhrase);
 
-    const accountIndex = 0 + HARD_DERIVATION_START; // TODO: don't hardcode index
-    const stakeKey = rootPk
-      .derive(WalletTypePurpose.BIP44)
-      .derive(CoinTypes.CARDANO)
-      .derive(accountIndex)
-      .derive(ChainDerivations.CHIMERIC_ACCOUNT)
-      .derive(0);
+    // const accountIndex = 0 + HARD_DERIVATION_START; // TODO: don't hardcode index
+    // const stakeKey = rootPk
+    //   .derive(WalletTypePurpose.BIP44)
+    //   .derive(CoinTypes.CARDANO)
+    //   .derive(accountIndex)
+    //   .derive(ChainDerivations.CHIMERIC_ACCOUNT)
+    //   .derive(0);
 
     throw new Error(`${nameof(this.generateTransferTxForRewardAccount)} Not supported yet`);
   }

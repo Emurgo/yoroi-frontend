@@ -376,7 +376,9 @@ export function signTransaction(
     BaseSignRequest<RustModule.WalletV4.TransactionBody>,
   keyLevel: number,
   signingKey: RustModule.WalletV4.Bip32PrivateKey,
-  stakingKeys: Array<RustModule.WalletV4.PrivateKey>,
+  getStakingWitnesses: (
+    RustModule.WalletV4.TransactionHash => Array<RustModule.WalletV4.Vkeywitness>
+  ),
   metadata: void | RustModule.WalletV4.TransactionMetadata,
 ): RustModule.WalletV4.Transaction {
   const seenByronKeys: Set<string> = new Set();
@@ -425,18 +427,14 @@ export function signTransaction(
     bootstrapWits,
   );
 
-  const stakingKeySet = new Set<string>();
-  for (const stakingKey of stakingKeys) {
-    const asString = Buffer.from(stakingKey.as_bytes()).toString('hex');
-    if (stakingKeySet.has(asString)) {
+  const stakingKeySigSet = new Set<string>();
+  for (const witness of getStakingWitnesses(txHash)) {
+    const asString = Buffer.from(witness.to_bytes()).toString('hex');
+    if (stakingKeySigSet.has(asString)) {
       continue;
     }
-    stakingKeySet.add(asString);
-    const vkeyWit = RustModule.WalletV4.make_vkey_witness(
-      txHash,
-      stakingKey,
-    );
-    vkeyWits.add(vkeyWit);
+    stakingKeySigSet.add(asString);
+    vkeyWits.add(witness);
   }
 
   const witnessSet = RustModule.WalletV4.TransactionWitnessSet.new();

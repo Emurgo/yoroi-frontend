@@ -282,7 +282,7 @@ describe('Create signed transactions', () => {
       signRequest,
       Bip44DerivationLevels.ACCOUNT.level,
       accountPrivateKey,
-      [],
+      () => [],
       undefined,
     );
     const witnesses = signedTx.witness_set();
@@ -365,7 +365,7 @@ describe('Create signed transactions', () => {
       signRequest,
       Bip44DerivationLevels.ACCOUNT.level,
       accountPrivateKey,
-      [],
+      () => [],
       undefined,
     );
     const witnesses = signedTx.witness_set();
@@ -425,7 +425,10 @@ describe('Create signed transactions', () => {
       signRequest,
       Bip44DerivationLevels.ACCOUNT.level,
       accountPrivateKey,
-      [stakingKey],
+      (txHash) => [RustModule.WalletV4.make_vkey_witness(
+        txHash,
+        stakingKey,
+      )],
       undefined,
     );
     const witnesses = signedTx.witness_set();
@@ -497,7 +500,10 @@ describe('Create signed transactions', () => {
       signRequest,
       Bip44DerivationLevels.ACCOUNT.level,
       accountPrivateKey,
-      [stakingKey],
+      (txHash) => [RustModule.WalletV4.make_vkey_witness(
+        txHash,
+        stakingKey,
+      )],
       undefined,
     );
     const witnesses = signedTx.witness_set();
