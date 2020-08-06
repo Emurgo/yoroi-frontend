@@ -72,7 +72,7 @@ export default class WalletTransferPage extends Component<Props> {
           onByron={() => actions.dialogs.open.trigger({ dialog: ByronEraOptionDialogContainer })}
           onShelleyItn={() => this.generated.actions.yoroiTransfer
             .startTransferFunds.trigger({
-              source: TransferSource.JORMUNGANDR_UTXO
+              source: TransferSource.CHIMERIC_ACCOUNT
             })
           }
         />

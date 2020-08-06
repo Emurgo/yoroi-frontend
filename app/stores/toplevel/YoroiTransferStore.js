@@ -37,7 +37,7 @@ export default class YoroiTransferStore extends Store {
   @observable transferTx: ?TransferTx = null;
   @observable recoveryPhrase: string = '';
   @observable transferKind: TransferKindType = TransferKind.NORMAL;
-  @observable transferSource: TransferSourceType = TransferSource.BYRON;
+  @observable transferSource: TransferSourceType = TransferSource.BIP44;
 
   // eslint-disable-next-line no-restricted-syntax
   _asyncErrorWrapper: (<PT, RT>(
@@ -121,7 +121,7 @@ export default class YoroiTransferStore extends Store {
   _startTransferLegacyHardwareFunds: TransferKindType => void = (kind) => {
     runInAction(() => {
       this.transferKind = kind;
-      this.transferSource = TransferSource.BYRON;
+      this.transferSource = TransferSource.BIP44;
     });
     this._updateStatus(TransferStatus.HARDWARE_DISCLAIMER);
   }
@@ -289,7 +289,7 @@ export default class YoroiTransferStore extends Store {
     this.transferFundsRequest.reset();
     this.recoveryPhrase = '';
     this.transferKind = TransferKind.NORMAL;
-    this.transferSource = TransferSource.BYRON;
+    this.transferSource = TransferSource.BIP44;
   }
 
   _checkAndTransfer: {|

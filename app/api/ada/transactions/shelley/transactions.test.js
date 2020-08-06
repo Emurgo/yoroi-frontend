@@ -38,6 +38,11 @@ import {
   WalletTypePurpose,
   STAKING_KEY_INDEX,
 } from '../../../../config/numbersConfig';
+import {
+  networks,
+} from '../../lib/storage/database/prepackaged/networks';
+
+const network = networks.ByronMainnet;
 
 const genSampleUtxos: void => Array<RemoteUnspentOutput> = () => [
   {
@@ -156,6 +161,7 @@ describe('Create unsigned TX from UTXO', () => {
       new BigNumber(0),
       getProtocolParams(),
       [],
+      [],
     )).toThrow(NotEnoughMoneyToSendError);
   });
 
@@ -169,6 +175,7 @@ describe('Create unsigned TX from UTXO', () => {
       [],
       new BigNumber(0),
       getProtocolParams(),
+      [],
       [],
     )).toThrow(NotEnoughMoneyToSendError);
   });
@@ -186,6 +193,7 @@ describe('Create unsigned TX from UTXO', () => {
       new BigNumber(0),
       getProtocolParams(),
       [],
+      [],
     )).toThrow(NotEnoughMoneyToSendError);
   });
 
@@ -201,6 +209,7 @@ describe('Create unsigned TX from UTXO', () => {
       utxos,
       new BigNumber(0),
       getProtocolParams(),
+      [],
       [],
     );
     // input selection will only take 2 of the 3 inputs
@@ -224,6 +233,7 @@ describe('Create unsigned TX from addresses', () => {
       [addressedUtxos[0], addressedUtxos[1]],
       new BigNumber(0),
       getProtocolParams(),
+      [],
       [],
     );
     expect(unsignedTxResponse.senderUtxos).toEqual([addressedUtxos[0], addressedUtxos[1]]);
@@ -252,6 +262,7 @@ describe('Create signed transactions', () => {
       [addressedUtxos[0], addressedUtxos[1]],
       new BigNumber(0),
       getProtocolParams(),
+      [],
       [],
     );
     const signRequest: BaseSignRequest<RustModule.WalletV4.TransactionBuilder> = {
@@ -402,6 +413,7 @@ describe('Create signed transactions', () => {
           )
         ),
       ],
+      [],
     );
     const signRequest: BaseSignRequest<RustModule.WalletV4.TransactionBuilder> = {
       changeAddr: unsignedTxResponse.changeAddr,
@@ -433,6 +445,91 @@ describe('Create signed transactions', () => {
     expect(witArray).toEqual([
       '82582001c01f8b958699ae769a246e9785db5a70e023977ea4b856dfacf23c23346caf584020a6884b523bc4ec018703126de273b589a28fad69dd0d77509ae722b7694fcd11698194177b50598ed8821b09eff93fb77185e1b3554aef92c28215f1bad604',
       '82582038c14a0756e1743081a8ebfdb9169b11283a7bf6c38045c4c4a5e62a7689639d58402805b2e48b8c7872bc4c837c1b0cadd9585fcdea188eaf39055760d059281f7e62211fbff01bd34b0e9d78b62b964f53bc13503417220f4bf5b837df49e2ca08',
+    ]);
+  });
+
+  it('Transaction should support withdrawals', () => {
+    const accountPrivateKey = RustModule.WalletV4.Bip32PrivateKey.from_bytes(
+      Buffer.from(
+        '408a1cb637d615c49e8696c30dd54883302a20a7b9b8a9d1c307d2ed3cd50758c9402acd000461a8fc0f25728666e6d3b86d031b8eea8d2f69b21e8aa6ba2b153e3ec212cc8a36ed9860579dfe1e3ef4d6de778c5dbdd981623b48727cd96247',
+        'hex',
+      ),
+    );
+    const stakingKey = accountPrivateKey.derive(2).derive(STAKING_KEY_INDEX).to_raw_key();
+    const stakingKeyCredential = RustModule.WalletV4.StakeCredential.from_keyhash(
+      stakingKey.to_public().hash()
+    );
+
+    if (network.BaseConfig[0].ChainNetworkId == null) {
+      throw new Error(`missing network id`);
+    }
+
+    const protocolParms = getProtocolParams();
+    const withdrawAmount = '1000000';
+    const addressedUtxos = genAddressedUtxos();
+    const sampleAdaAddresses = genSampleAdaAddresses();
+    const unsignedTxResponse = newAdaUnsignedTx(
+      [],
+      sampleAdaAddresses[3],
+      [addressedUtxos[3]],
+      new BigNumber(0),
+      protocolParms,
+      [
+        RustModule.WalletV4.Certificate.new_stake_deregistration(
+          RustModule.WalletV4.StakeDeregistration.new(stakingKeyCredential)
+        ),
+      ],
+      [{
+        address: RustModule.WalletV4.RewardAddress.new(
+          Number.parseInt(network.BaseConfig[0].ChainNetworkId, 10),
+          stakingKeyCredential
+        ),
+        amount: RustModule.WalletV4.BigNum.from_str(withdrawAmount)
+      }],
+    );
+    const signRequest: BaseSignRequest<RustModule.WalletV4.TransactionBuilder> = {
+      changeAddr: unsignedTxResponse.changeAddr,
+      senderUtxos: unsignedTxResponse.senderUtxos,
+      unsignedTx: unsignedTxResponse.txBuilder,
+      certificate: undefined,
+    };
+    const signedTx = signTransaction(
+      signRequest,
+      Bip44DerivationLevels.ACCOUNT.level,
+      accountPrivateKey,
+      [stakingKey],
+      undefined,
+    );
+    const witnesses = signedTx.witness_set();
+
+    const vKeyWits = witnesses.vkeys();
+    if (vKeyWits == null) throw new Error('Vkey witnesses should not be null');
+    expect(vKeyWits.len()).toEqual(2);
+    expect(witnesses.scripts()).toEqual(undefined);
+    expect(witnesses.bootstraps()).toEqual(undefined);
+
+    const txBody = unsignedTxResponse.txBuilder.build();
+    expect(txBody.withdrawals()?.len()).toEqual(1);
+    const fee = txBody.fee().to_str();
+    expect(fee).toEqual('1310');
+    expect(txBody.outputs().len()).toEqual(1);
+    expect(txBody.outputs().get(0).amount().to_str()).toEqual(
+      new BigNumber(addressedUtxos[3].amount)
+        .minus(fee)
+        .plus(withdrawAmount)
+        .plus(protocolParms.keyDeposit.to_str())
+        .toString()
+    );
+
+    // set is used so order not defined so we sort the list
+    const witArray = [
+      Buffer.from(vKeyWits.get(0).to_bytes()).toString('hex'),
+      Buffer.from(vKeyWits.get(1).to_bytes()).toString('hex')
+    ].sort();
+
+    expect(witArray).toEqual([
+      '82582001c01f8b958699ae769a246e9785db5a70e023977ea4b856dfacf23c23346caf5840ed278dd61c950a8e8c8a5252dd028ac5ccde0571be351bd84e7d363071bb852ae803d5cd882036d3d6495a3a20078c3843c15be6c76236bc5f25f432acf3f108',
+      '82582038c14a0756e1743081a8ebfdb9169b11283a7bf6c38045c4c4a5e62a7689639d5840f533e0d1bad015c5b2f409309405c58ae27f5da6b38e24f3e7b92faba77dee0021865d6a2b70dcc3cb5b816469affd42f0aff83edf5c4773c861ee0255991f03',
     ]);
   });
 });

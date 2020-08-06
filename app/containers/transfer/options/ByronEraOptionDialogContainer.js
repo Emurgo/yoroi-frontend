@@ -34,13 +34,13 @@ export default class ByronEraOptionDialogContainer extends Component<Props> {
 
   startTransferIcarusFunds: void => void = () => {
     this.generated.actions.yoroiTransfer.startTransferFunds.trigger({
-      source: TransferSource.BYRON
+      source: TransferSource.BIP44
     });
   }
 
   startTransferYoroiPaperFunds: void => void = () => {
     this.generated.actions.yoroiTransfer.startTransferPaperFunds.trigger({
-      source: TransferSource.BYRON
+      source: TransferSource.BIP44
     });
   }
 

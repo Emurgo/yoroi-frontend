@@ -47,16 +47,13 @@ export default class YoroiPlatePage extends Component<Props> {
       if (yoroiTransfer.transferKind === TransferKind.PAPER) {
         return { type: 'bip44', extra: 'paper', length: 21 };
       }
-      if (yoroiTransfer.transferSource === TransferSource.BYRON) {
+      if (yoroiTransfer.transferSource === TransferSource.BIP44) {
         return { type: 'bip44', extra: undefined, length: 15 };
       }
-      if (yoroiTransfer.transferSource === TransferSource.JORMUNGANDR_UTXO) {
+      if (yoroiTransfer.transferSource === TransferSource.CIP1852) {
         return { type: 'cip1852', extra: undefined, length: 15 };
       }
-      if (yoroiTransfer.transferSource === TransferSource.JORMUNGANDR_CHIMERIC_ACCOUNT) {
-        return { type: 'cip1852', extra: undefined, length: 15 };
-      }
-      if (yoroiTransfer.transferSource === TransferSource.SHELLEY) {
+      if (yoroiTransfer.transferSource === TransferSource.CHIMERIC_ACCOUNT) {
         return { type: 'cip1852', extra: undefined, length: 15 };
       }
       throw new Error(`${nameof(YoroiPlatePage)} unknown mode`);

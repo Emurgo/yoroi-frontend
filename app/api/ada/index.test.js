@@ -67,7 +67,7 @@ test('Restore wallet for transfer', async () => {
     rootPk: generateWalletRootKey(recoveryPhrase),
     checkAddressesInUse,
     accountIndex: HARD_DERIVATION_START + 0,
-    transferSource: TransferSource.BYRON,
+    transferSource: TransferSource.BIP44,
     network: networks.ByronMainnet,
   });
 

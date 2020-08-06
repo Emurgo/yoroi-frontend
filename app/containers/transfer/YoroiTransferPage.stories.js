@@ -121,7 +121,7 @@ const genBaseProps: {|
             ? TransferKind.NORMAL
             : request.transferKind,
           transferSource: request.transferSource == null
-            ? TransferSource.BYRON
+            ? TransferSource.BIP44
             : request.transferSource,
           recoveryPhrase: request.yoroiTransfer.recoveryPhrase == null
             ? ''
