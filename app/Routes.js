@@ -37,7 +37,6 @@ import Transfer from './containers/transfer/Transfer';
 import Receive from './containers/wallet/Receive';
 import type { GeneratedData as ReceiveData } from './containers/wallet/Receive';
 import StakingDashboardPage from './containers/wallet/staking/StakingDashboardPage';
-import SeizaStakingPage from './containers/wallet/staking/SeizaStakingPage';
 import CardanoStakingPage from './containers/wallet/staking/CardanoStakingPage';
 import NoticeBoardPage from './containers/notice-board/NoticeBoardPage';
 

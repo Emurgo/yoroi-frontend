@@ -45,13 +45,8 @@ export default class SeizaStakingPage extends Component<Props> {
     intl: intlShape.isRequired,
   };
 
-  cancel: void => void = () => {
-    this.generated.actions.ada.delegationTransaction.reset.trigger();
-  }
   componentWillUnmount() {
-    this.cancel();
-    this.generated.actions.ada.delegationTransaction.setPools.trigger([]);
-    this.generated.stores.delegation.poolInfoQuery.reset();
+    this.generated.actions.jormungandr.delegationTransaction.reset.trigger();
   }
 
   getBrowserReplacement(): string {
@@ -76,10 +71,10 @@ export default class SeizaStakingPage extends Component<Props> {
 
   prepareStakingURL(): null | string {
     let finalURL = this.props.urlTemplate
-      .replace(
-        '$$BROWSER$$',
-        this.getBrowserReplacement()
-      );
+        .replace(
+            '$$BROWSER$$',
+            this.getBrowserReplacement()
+        );
 
     // Add userAda
     const publicDeriver = this.generated.stores.wallets.selected;
@@ -87,18 +82,18 @@ export default class SeizaStakingPage extends Component<Props> {
       return null;
     }
     const txRequests = this.generated.stores.transactions
-      .getTxRequests(publicDeriver);
+        .getTxRequests(publicDeriver);
     const balance = txRequests.requests.getBalanceRequest.result;
     if (balance != null) {
       const apiMeta = getApiMeta(
-        getApiForNetwork(publicDeriver.getParent().getNetworkInfo())
+          getApiForNetwork(publicDeriver.getParent().getNetworkInfo())
       )?.meta;
       if (apiMeta == null) throw new Error(`${nameof(SeizaStakingPage)} no API selected`);
       const amountPerUnit = new BigNumber(10).pow(apiMeta.decimalPlaces);
 
       // Seiza does not understand decimal places, so removing all Lovelaces
       finalURL += `&userAda=${formattedAmountWithoutLovelace(balance.dividedBy(
-        amountPerUnit
+          amountPerUnit
       ))}`;
     }
 
@@ -109,13 +104,13 @@ export default class SeizaStakingPage extends Component<Props> {
       throw new Error(`${nameof(SeizaStakingPage)} opened for non-reward wallet`);
     }
     const delegation = delegationRequests.getCurrentDelegation.result;
-    // if (!delegation || delegation.currEpoch == null) {
-    //   return null;
-    // }
-    // const poolList = Array.from(
-    //   new Set(delegation.currEpoch.pools.map(pool => pool[0]))
-    // );
-    // finalURL += `&delegated=${encodeURIComponent(JSON.stringify(poolList))}`;
+    if (!delegation || delegation.currEpoch == null) {
+      return null;
+    }
+    const poolList = Array.from(
+        new Set(delegation.currEpoch.pools.map(pool => pool[0]))
+    );
+    finalURL += `&delegated=${encodeURIComponent(JSON.stringify(poolList))}`;
     return finalURL;
   }
 
@@ -126,31 +121,31 @@ export default class SeizaStakingPage extends Component<Props> {
     const delegationTxStore = stores.substores.jormungandr.delegationTransaction;
 
     if (
-      !delegationTxStore.signAndBroadcastDelegationTx.isExecuting &&
-      !delegationTxStore.signAndBroadcastDelegationTx.wasExecuted &&
-      this.generated.stores.transactions.hasAnyPending
+        !delegationTxStore.signAndBroadcastDelegationTx.isExecuting &&
+        !delegationTxStore.signAndBroadcastDelegationTx.wasExecuted &&
+        this.generated.stores.transactions.hasAnyPending
     ) {
       return (
-        <InformativeError
-          title={intl.formatMessage(messages.title)}
-          text={intl.formatMessage(globalMessages.pendingTxWarning)}
-        />
+          <InformativeError
+              title={intl.formatMessage(messages.title)}
+              text={intl.formatMessage(globalMessages.pendingTxWarning)}
+          />
       );
     }
 
     const url = this.prepareStakingURL();
     if (url == null) {
       return (
-        <VerticallyCenteredLayout>
-          <LoadingSpinner />
-        </VerticallyCenteredLayout>
+          <VerticallyCenteredLayout>
+            <LoadingSpinner />
+          </VerticallyCenteredLayout>
       );
     }
     return (
-      <SeizaFetcher
-        {...this.generated.SeizaFetcherProps}
-        stakingUrl={url}
-      />
+        <SeizaFetcher
+            {...this.generated.SeizaFetcherProps}
+            stakingUrl={url}
+        />
     );
   }
 
@@ -167,7 +162,7 @@ export default class SeizaStakingPage extends Component<Props> {
       profile: {| currentLocale: string |},
       delegation: {|
         getDelegationRequests: (
-          PublicDeriver<>
+            PublicDeriver<>
         ) => void | DelegationRequests
       |},
       substores: {|
@@ -186,7 +181,7 @@ export default class SeizaStakingPage extends Component<Props> {
       |},
       wallets: {| selected: null | PublicDeriver<> |}
     |}
-    |} {
+  |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }
@@ -215,9 +210,9 @@ export default class SeizaStakingPage extends Component<Props> {
             delegationTransaction: {
               signAndBroadcastDelegationTx: {
                 isExecuting:
-                  jormungandrStores.delegationTransaction.signAndBroadcastDelegationTx.isExecuting,
+                jormungandrStores.delegationTransaction.signAndBroadcastDelegationTx.isExecuting,
                 wasExecuted:
-                  jormungandrStores.delegationTransaction.signAndBroadcastDelegationTx.wasExecuted,
+                jormungandrStores.delegationTransaction.signAndBroadcastDelegationTx.wasExecuted,
               },
             },
           },
@@ -233,7 +228,7 @@ export default class SeizaStakingPage extends Component<Props> {
         },
       },
       SeizaFetcherProps: (
-        { actions, stores, }: InjectedOrGenerated<SeizaFetcherData>
+          { actions, stores, }: InjectedOrGenerated<SeizaFetcherData>
       ),
     });
   }
