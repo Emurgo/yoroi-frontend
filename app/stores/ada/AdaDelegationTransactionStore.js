@@ -6,7 +6,7 @@ import Store from '../base/Store';
 import LocalizedRequest from '../lib/LocalizedRequest';
 import type {
   CreateDelegationTxFunc,
-  SignAndBroadcastDelegationTxRequest, SignAndBroadcastDelegationTxResponse,
+  SignAndBroadcastRequest, SignAndBroadcastResponse,
 } from '../../api/ada';
 import { buildRoute } from '../../utils/routing';
 import { ROUTES } from '../../routes-config';
@@ -23,6 +23,7 @@ import {
 import {
   getRegistrationHistory,
 } from '../../api/ada/lib/storage/bridge/delegationUtils';
+import { genOwnStakingKey } from '../../api/ada/index';
 
 export default class AdaDelegationTransactionStore extends Store {
 
@@ -166,6 +167,10 @@ export default class AdaDelegationTransactionStore extends Store {
       broadcastRequest: {
         publicDeriver: basePubDeriver,
         signRequest: result.signTxRequest.self(),
+        getStakingWitnesses: async () => await genOwnStakingKey({
+          publicDeriver: basePubDeriver,
+          password: request.password,
+        }),
         password: request.password,
         sendTx: this.stores.substores.ada.stateFetchStore.fetcher.sendTx,
       },
@@ -186,10 +191,10 @@ export default class AdaDelegationTransactionStore extends Store {
   }
 
   sendAndRefresh: {|
-    broadcastRequest: SignAndBroadcastDelegationTxRequest,
+    broadcastRequest: SignAndBroadcastRequest,
     refreshWallet: () => Promise<void>,
-  |} => Promise<SignAndBroadcastDelegationTxResponse> = async (request) => {
-    const result = await this.api.ada.signAndBroadcastDelegationTx(
+  |} => Promise<SignAndBroadcastResponse> = async (request) => {
+    const result = await this.api.ada.signAndBroadcast(
       request.broadcastRequest
     );
     try {

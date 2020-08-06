@@ -106,7 +106,7 @@ export default class AdaWalletRestoreStore extends Store {
     }
 
     this.actions.yoroiTransfer.startTransferFunds.trigger({
-      source: TransferSource.BYRON,
+      source: TransferSource.BIP44,
     });
     this.actions.yoroiTransfer.setupTransferFundsWithMnemonic.trigger({
       recoveryPhrase: phrase

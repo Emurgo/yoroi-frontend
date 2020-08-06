@@ -126,7 +126,7 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
     notification: ?Notification,
   ): Node {
     return (
-      <div>
+      <div key={title}>
         <h2 className={styles.addressLabel}>
           {title}
         </h2>

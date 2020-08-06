@@ -781,12 +781,8 @@ export default class JormungandrApi {
       const reverseAddressLookup = new Map<number, Array<string>>();
       const foundAddresses = new Set<string>();
 
-      const sourceIsJormungandrWallet = (
-        request.transferSource === TransferSource.JORMUNGANDR_UTXO ||
-        request.transferSource === TransferSource.JORMUNGANDR_CHIMERIC_ACCOUNT
-      );
       const accountKey = rootPk
-        .derive(sourceIsJormungandrWallet
+        .derive(request.transferSource === TransferSource.CIP1852
           ? WalletTypePurpose.CIP1852
           : WalletTypePurpose.BIP44)
         .derive(CoinTypes.CARDANO)
@@ -806,7 +802,7 @@ export default class JormungandrApi {
       };
 
       let insertTree;
-      if (request.transferSource === TransferSource.BYRON) {
+      if (request.transferSource === TransferSource.BIP44) {
         const key = RustModule.WalletV2.Bip44AccountPublic.new(
           v3PublicToV2(accountKey.to_public()),
           RustModule.WalletV2.DerivationScheme.v2(),
@@ -826,7 +822,7 @@ export default class JormungandrApi {
           addByHash,
           type: CoreAddressTypes.CARDANO_LEGACY,
         });
-      } else if (sourceIsJormungandrWallet) {
+      } else if (request.transferSource === TransferSource.CIP1852) {
         const stakingKey = accountKey
           .derive(ChainDerivations.CHIMERIC_ACCOUNT)
           .derive(STAKING_KEY_INDEX)
@@ -842,13 +838,9 @@ export default class JormungandrApi {
           stakingKey,
         });
 
-        if (request.transferSource === TransferSource.JORMUNGANDR_UTXO) {
+        if (request.transferSource === TransferSource.CIP1852) {
           insertTree = cip1852InsertTree.filter(child => (
             child.index === ChainDerivations.EXTERNAL || child.index === ChainDerivations.INTERNAL
-          ));
-        } else if (request.transferSource === TransferSource.JORMUNGANDR_CHIMERIC_ACCOUNT) {
-          insertTree = cip1852InsertTree.filter(child => (
-            child.index === ChainDerivations.CHIMERIC_ACCOUNT
           ));
         } else {
           throw new Error(`${nameof(this.restoreWalletForTransfer)} unexpected shelley type ${request.transferSource}`);

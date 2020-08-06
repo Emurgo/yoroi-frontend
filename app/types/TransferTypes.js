@@ -29,10 +29,9 @@ export type TransferTx = {|
 |}
 
 export const TransferSource = Object.freeze({
-  BYRON: 0,
-  JORMUNGANDR_UTXO: 1,
-  JORMUNGANDR_CHIMERIC_ACCOUNT: 2,
-  SHELLEY: 3,
+  BIP44: 0,
+  CIP1852: 1,
+  CHIMERIC_ACCOUNT: 2,
 });
 export type TransferSourceType = $Values<typeof TransferSource>;
 

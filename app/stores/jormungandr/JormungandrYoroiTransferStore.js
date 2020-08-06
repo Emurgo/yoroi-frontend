@@ -68,15 +68,10 @@ export default class JormungandrYoroiTransferStore extends Store {
 
     request.updateStatusCallback();
 
-    const sourceIsJormungandrWallet = (
-      this.stores.yoroiTransfer.transferSource === TransferSource.JORMUNGANDR_UTXO ||
-      this.stores.yoroiTransfer.transferSource === TransferSource.JORMUNGANDR_CHIMERIC_ACCOUNT
-    );
-
     // 3) Calculate private keys for restored wallet utxo
     const accountKey = RustModule.WalletV3.Bip32PrivateKey
       .from_bytes(Buffer.from(masterKey, 'hex'))
-      .derive(sourceIsJormungandrWallet
+      .derive(this.stores.yoroiTransfer.transferSource === TransferSource.CIP1852
         ? WalletTypePurpose.CIP1852
         : WalletTypePurpose.BIP44)
       .derive(CoinTypes.CARDANO)
@@ -98,7 +93,7 @@ export default class JormungandrYoroiTransferStore extends Store {
       signingKey: accountKey,
       getUTXOsForAddresses:
         this.stores.substores.jormungandr.stateFetchStore.fetcher.getUTXOsForAddresses,
-      useLegacyWitness: !sourceIsJormungandrWallet,
+      useLegacyWitness: this.stores.yoroiTransfer.transferSource === TransferSource.BIP44,
       genesisHash: config.ChainNetworkId,
       feeConfig: config.LinearFee,
     });

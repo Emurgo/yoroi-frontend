@@ -97,7 +97,7 @@ export default class JormungandrWalletRestoreStore extends Store {
     }
 
     this.actions.yoroiTransfer.startTransferFunds.trigger({
-      source: TransferSource.BYRON,
+      source: TransferSource.BIP44,
     });
     this.actions.yoroiTransfer.setupTransferFundsWithMnemonic.trigger({
       recoveryPhrase: phrase

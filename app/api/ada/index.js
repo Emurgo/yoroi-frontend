@@ -144,6 +144,7 @@ import type {
   TxBodiesFunc,
   BestBlockFunc,
   SignedRequest,
+  AccountStateFunc,
 } from './lib/state-fetch/types';
 import type {
   FilterFunc,
@@ -258,6 +259,10 @@ export type GetNoticesFunc = (
 export type SignAndBroadcastRequest = {|
   publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetSigningKey,
   signRequest: BaseSignRequest<RustModule.WalletV4.TransactionBuilder>,
+  /** note: this should include your own staking key too if it's needed to sign the transaction */
+  getStakingWitnesses: void => Promise<(
+    RustModule.WalletV4.TransactionHash => Array<RustModule.WalletV4.Vkeywitness>
+  )>,
   password: string,
   sendTx: SendFunc,
 |};
@@ -358,19 +363,28 @@ export type CreateDelegationTxFunc = (
   request: CreateDelegationTxRequest
 ) => Promise<CreateDelegationTxResponse>;
 
-// signAndBroadcastDelegationTx
+// createWithdrawalTx
 
-export type SignAndBroadcastDelegationTxRequest = {|
-  publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetSigningKey & IGetStakingKey,
-  signRequest: BaseSignRequest<RustModule.WalletV4.TransactionBuilder>,
-  password: string,
-  sendTx: SendFunc,
+export type CreateWithdrawalTxRequest = {|
+  publicDeriver: IPublicDeriver<ConceptualWallet> & IGetAllUtxos & IHasUtxoChains,
+  absSlotNumber: BigNumber,
+  getAccountState: AccountStateFunc,
+  withdrawals: Array<{|
+    rewardAddress: string, // address you're withdrawing from
+    /**
+     * you need to withdraw all ADA before deregistering
+     * but you don't need to deregister in order to withdraw
+     * deregistering gives you back the key deposit
+     * so it makes sense if you don't intend to stake on the wallet anymore
+     */
+    shouldDeregister: boolean,
+  |}>,
 |};
-export type SignAndBroadcastDelegationTxResponse = SignedResponse;
+export type CreateWithdrawalTxResponse = HaskellShelleyTxSignRequest;
 
-export type SignAndBroadcastDelegationTxFunc = (
-  request: SignAndBroadcastDelegationTxRequest
-) => Promise<SignAndBroadcastDelegationTxResponse>;
+export type CreateWithdrawalTxFunc = (
+  request: CreateWithdrawalTxRequest
+) => Promise<CreateWithdrawalTxResponse>;
 
 // saveLastReceiveAddressIndex
 
@@ -732,7 +746,7 @@ export default class AdaApi {
         RustModule.WalletV4.Bip32PrivateKey.from_bytes(
           Buffer.from(normalizedKey.prvKeyHex, 'hex')
         ),
-        [],
+        () => [],
         undefined,
       );
 
@@ -920,6 +934,7 @@ export default class AdaApi {
           request.absSlotNumber,
           protocolParams,
           [],
+          [],
         );
       } else {
         throw new Error(`${nameof(this.createUnsignedTx)} unknown param`);
@@ -947,147 +962,181 @@ export default class AdaApi {
   ): Promise<CreateDelegationTxResponse> {
     Logger.debug(`${nameof(AdaApi)}::${nameof(this.createDelegationTx)} called`);
 
-    const registartionStatus = await request.computeRegistrationStatus();
-
-    const config = getCardanoHaskellBaseConfig(
-      request.publicDeriver.getParent().getNetworkInfo()
-    ).reduce((acc, next) => Object.assign(acc, next), {});
-
-    const protocolParams = {
-      keyDeposit: RustModule.WalletV4.BigNum.from_str(config.KeyDeposit),
-      linearFee: RustModule.WalletV4.LinearFee.new(
-        RustModule.WalletV4.BigNum.from_str(config.LinearFee.coefficient),
-        RustModule.WalletV4.BigNum.from_str(config.LinearFee.constant),
-      ),
-      minimumUtxoVal: RustModule.WalletV4.BigNum.from_str(config.MinimumUtxoVal),
-      poolDeposit: RustModule.WalletV4.BigNum.from_str(config.PoolDeposit),
-    };
-
-    const publicKeyDbRow = await request.publicDeriver.getPublicKey();
-    if (publicKeyDbRow.IsEncrypted) {
-      throw new Error(`${nameof(AdaApi)}::${nameof(this.createDelegationTx)} public key is encrypted`);
-    }
-    const publicKey = RustModule.WalletV4.Bip32PublicKey.from_bytes(
-      Buffer.from(publicKeyDbRow.Hash, 'hex')
-    );
-
-    const stakingKeyDbRow = await request.publicDeriver.getStakingKey();
-    const stakingKey = derivePublicByAddressing({
-      addressing: stakingKeyDbRow.addressing,
-      startingFrom: {
-        level: request.publicDeriver.getParent().getPublicDeriverLevel(),
-        key: publicKey,
-      },
-    }).to_raw_key();
-
-    const stakeDelegationCert = createCertificate(
-      stakingKey,
-      registartionStatus,
-      request.poolRequest
-    );
-
-    const allUtxo = await request.publicDeriver.getAllUtxos();
-    const addressedUtxo = shelleyAsAddressedUtxo(allUtxo);
-    const nextUnusedInternal = await request.publicDeriver.nextInternal();
-    if (nextUnusedInternal.addressInfo == null) {
-      throw new Error(`${nameof(this.createDelegationTx)} no internal addresses left. Should never happen`);
-    }
-    const changeAddr = nextUnusedInternal.addressInfo;
-    const unsignedTx = shelleyNewAdaUnsignedTx(
-      [],
-      {
-        address: changeAddr.addr.Hash,
-        addressing: changeAddr.addressing,
-      },
-      addressedUtxo,
-      request.absSlotNumber,
-      protocolParams,
-      stakeDelegationCert
-    );
-
-    const allUtxosForKey = filterAddressesByStakingKey(
-      RustModule.WalletV4.StakeCredential.from_keyhash(stakingKey.hash()),
-      allUtxo,
-      false,
-    );
-    const utxoSum = allUtxosForKey.reduce(
-      (sum, utxo) => sum.plus(new BigNumber(utxo.output.UtxoTransactionOutput.Amount)),
-      new BigNumber(0)
-    );
-
-    const differenceAfterTx = getDifferenceAfterTx(
-      unsignedTx,
-      allUtxo,
-      stakingKey
-    );
-
-    const totalAmountToDelegate = utxoSum
-      .plus(differenceAfterTx) // subtract any part of the fee that comes from UTXO
-      .plus(request.valueInAccount); // recall: rewards are compounding
-
-    const signTxRequest = new HaskellShelleyTxSignRequest({
-      senderUtxos: unsignedTx.senderUtxos,
-      unsignedTx: unsignedTx.txBuilder,
-      changeAddr: unsignedTx.changeAddr,
-      certificate: undefined,
-    });
-    return {
-      signTxRequest,
-      totalAmountToDelegate
-    };
-  }
-
-  async signAndBroadcastDelegationTx(
-    request: SignAndBroadcastDelegationTxRequest
-  ): Promise<SignAndBroadcastDelegationTxResponse> {
-    Logger.debug(`${nameof(AdaApi)}::${nameof(this.signAndBroadcastDelegationTx)} called`);
-    const { password, } = request;
     try {
-      const signingKeyFromStorage = await request.publicDeriver.getSigningKey();
-      const stakingAddr = await request.publicDeriver.getStakingKey();
-      const normalizedKey = await request.publicDeriver.normalizeKey({
-        ...signingKeyFromStorage,
-        password,
-      });
-      const normalizedSigningKey = RustModule.WalletV4.Bip32PrivateKey.from_bytes(
-        Buffer.from(normalizedKey.prvKeyHex, 'hex')
+      const registrationStatus = await request.computeRegistrationStatus();
+
+      const config = getCardanoHaskellBaseConfig(
+        request.publicDeriver.getParent().getNetworkInfo()
+      ).reduce((acc, next) => Object.assign(acc, next), {});
+
+      const protocolParams = {
+        keyDeposit: RustModule.WalletV4.BigNum.from_str(config.KeyDeposit),
+        linearFee: RustModule.WalletV4.LinearFee.new(
+          RustModule.WalletV4.BigNum.from_str(config.LinearFee.coefficient),
+          RustModule.WalletV4.BigNum.from_str(config.LinearFee.constant),
+        ),
+        minimumUtxoVal: RustModule.WalletV4.BigNum.from_str(config.MinimumUtxoVal),
+        poolDeposit: RustModule.WalletV4.BigNum.from_str(config.PoolDeposit),
+      };
+
+      const publicKeyDbRow = await request.publicDeriver.getPublicKey();
+      if (publicKeyDbRow.IsEncrypted) {
+        throw new Error(`${nameof(AdaApi)}::${nameof(this.createDelegationTx)} public key is encrypted`);
+      }
+      const publicKey = RustModule.WalletV4.Bip32PublicKey.from_bytes(
+        Buffer.from(publicKeyDbRow.Hash, 'hex')
       );
-      const normalizedStakingKey = derivePrivateByAddressing({
-        addressing: stakingAddr.addressing,
+
+      const stakingKeyDbRow = await request.publicDeriver.getStakingKey();
+      const stakingKey = derivePublicByAddressing({
+        addressing: stakingKeyDbRow.addressing,
         startingFrom: {
-          key: normalizedSigningKey,
           level: request.publicDeriver.getParent().getPublicDeriverLevel(),
+          key: publicKey,
         },
       }).to_raw_key();
-      const signedTx = shelleySignTransaction(
-        request.signRequest,
-        request.publicDeriver.getParent().getPublicDeriverLevel(),
-        RustModule.WalletV4.Bip32PrivateKey.from_bytes(
-          Buffer.from(normalizedKey.prvKeyHex, 'hex')
-        ),
-        // TODO: this not a great way to pick which key to sign with
-        // it will work for the basic case (sign your own certificate)
-        // but won't work for registration certificates
-        // or submitting a key registration without delegating
-        // or submitting somebody else's key registration certificate
-        [normalizedStakingKey],
-        undefined,
+
+      const stakeDelegationCert = createCertificate(
+        stakingKey,
+        registrationStatus,
+        request.poolRequest
       );
-      const response = request.sendTx({
-        id: Buffer.from(
-          RustModule.WalletV4.hash_transaction(signedTx.body()).to_bytes()
-        ).toString('hex'),
-        encodedTx: signedTx.to_bytes(),
-      });
-      Logger.debug(
-        `${nameof(AdaApi)}::${nameof(this.signAndBroadcastDelegationTx)} success: ` + stringifyData(response)
-      );
-      return response;
-    } catch (error) {
-      if (error instanceof WrongPassphraseError) {
-        throw new IncorrectWalletPasswordError();
+
+      const allUtxo = await request.publicDeriver.getAllUtxos();
+      const addressedUtxo = shelleyAsAddressedUtxo(allUtxo);
+      const nextUnusedInternal = await request.publicDeriver.nextInternal();
+      if (nextUnusedInternal.addressInfo == null) {
+        throw new Error(`${nameof(this.createDelegationTx)} no internal addresses left. Should never happen`);
       }
-      Logger.error(`${nameof(AdaApi)}::${nameof(this.signAndBroadcastDelegationTx)} error: ` + stringifyError(error));
+      const changeAddr = nextUnusedInternal.addressInfo;
+      const unsignedTx = shelleyNewAdaUnsignedTx(
+        [],
+        {
+          address: changeAddr.addr.Hash,
+          addressing: changeAddr.addressing,
+        },
+        addressedUtxo,
+        request.absSlotNumber,
+        protocolParams,
+        stakeDelegationCert,
+        [],
+      );
+
+      const allUtxosForKey = filterAddressesByStakingKey(
+        RustModule.WalletV4.StakeCredential.from_keyhash(stakingKey.hash()),
+        allUtxo,
+        false,
+      );
+      const utxoSum = allUtxosForKey.reduce(
+        (sum, utxo) => sum.plus(new BigNumber(utxo.output.UtxoTransactionOutput.Amount)),
+        new BigNumber(0)
+      );
+
+      const differenceAfterTx = getDifferenceAfterTx(
+        unsignedTx,
+        allUtxo,
+        stakingKey
+      );
+
+      const totalAmountToDelegate = utxoSum
+        .plus(differenceAfterTx) // subtract any part of the fee that comes from UTXO
+        .plus(request.valueInAccount); // recall: rewards are compounding
+
+      const signTxRequest = new HaskellShelleyTxSignRequest({
+        senderUtxos: unsignedTx.senderUtxos,
+        unsignedTx: unsignedTx.txBuilder,
+        changeAddr: unsignedTx.changeAddr,
+        certificate: undefined,
+      });
+      return {
+        signTxRequest,
+        totalAmountToDelegate
+      };
+    } catch (error) {
+      Logger.error(`${nameof(AdaApi)}::${nameof(this.createDelegationTx)} error: ` + stringifyError(error));
+      if (error instanceof LocalizableError) throw error;
+      throw new GenericApiError();
+    }
+  }
+
+  async createWithdrawalTx(
+    request: CreateWithdrawalTxRequest
+  ): Promise<CreateWithdrawalTxResponse> {
+    Logger.debug(`${nameof(AdaApi)}::${nameof(this.createUnsignedTx)} called`);
+    try {
+      const config = getCardanoHaskellBaseConfig(
+        request.publicDeriver.getParent().getNetworkInfo()
+      ).reduce((acc, next) => Object.assign(acc, next), {});
+
+      const protocolParams = {
+        keyDeposit: RustModule.WalletV4.BigNum.from_str(config.KeyDeposit),
+        linearFee: RustModule.WalletV4.LinearFee.new(
+          RustModule.WalletV4.BigNum.from_str(config.LinearFee.coefficient),
+          RustModule.WalletV4.BigNum.from_str(config.LinearFee.constant),
+        ),
+        minimumUtxoVal: RustModule.WalletV4.BigNum.from_str(config.MinimumUtxoVal),
+        poolDeposit: RustModule.WalletV4.BigNum.from_str(config.PoolDeposit),
+      };
+
+      const utxos = await request.publicDeriver.getAllUtxos();
+      const addressedUtxo = shelleyAsAddressedUtxo(utxos);
+
+      const nextUnusedInternal = await request.publicDeriver.nextInternal();
+      if (nextUnusedInternal.addressInfo == null) {
+        throw new Error(`${nameof(this.createWithdrawalTx)} no internal addresses left. Should never happen`);
+      }
+      const changeAddr = nextUnusedInternal.addressInfo;
+
+      const certificates = [];
+      for (const withdrawal of request.withdrawals) {
+        if (withdrawal.shouldDeregister) {
+          const wasmAddr = RustModule.WalletV4.RewardAddress.from_address(
+            RustModule.WalletV4.Address.from_bytes(
+              Buffer.from(withdrawal.rewardAddress, 'hex')
+            )
+          );
+          if (wasmAddr == null) throw new Error(`${nameof(AdaApi)}::${nameof(this.createUnsignedTx)} withdrawal not a reward address`);
+          certificates.push(RustModule.WalletV4.Certificate.new_stake_deregistration(
+            RustModule.WalletV4.StakeDeregistration.new(wasmAddr.payment_cred())
+          ));
+        }
+      }
+      const accountStates = await request.getAccountState({
+        addresses: request.withdrawals.map(withdrawal => withdrawal.rewardAddress)
+      });
+      const finalWithdrawals = Object.keys(accountStates).map(address => ({
+        address: RustModule.WalletV4.RewardAddress.from_address(
+          RustModule.WalletV4.Address.from_bytes(
+            Buffer.from(address, 'hex')
+          )
+        ) ?? (() => { throw new Error(`${nameof(AdaApi)}::${nameof(this.createUnsignedTx)} withdrawal not a reward address`); })(),
+        amount: RustModule.WalletV4.BigNum.from_str(accountStates[address].remainingAmount),
+      }));
+      const unsignedTxResponse = shelleyNewAdaUnsignedTx(
+        [],
+        {
+          address: changeAddr.addr.Hash,
+          addressing: changeAddr.addressing,
+        },
+        addressedUtxo,
+        request.absSlotNumber,
+        protocolParams,
+        certificates,
+        finalWithdrawals
+      );
+      Logger.debug(
+        `${nameof(AdaApi)}::${nameof(this.createWithdrawalTx)} success: ` + stringifyData(unsignedTxResponse)
+      );
+      return new HaskellShelleyTxSignRequest({
+        senderUtxos: unsignedTxResponse.senderUtxos,
+        unsignedTx: unsignedTxResponse.txBuilder,
+        changeAddr: unsignedTxResponse.changeAddr,
+        certificate: undefined,
+      });
+    } catch (error) {
+      Logger.error(
+        `${nameof(AdaApi)}::${nameof(this.createWithdrawalTx)} error: ` + stringifyError(error)
+      );
       if (error instanceof LocalizableError) throw error;
       throw new GenericApiError();
     }
@@ -1256,12 +1305,8 @@ export default class AdaApi {
       const reverseAddressLookup = new Map<number, Array<string>>();
       const foundAddresses = new Set<string>();
 
-      const sourceIsJormungandrWallet = (
-        request.transferSource === TransferSource.JORMUNGANDR_UTXO ||
-        request.transferSource === TransferSource.JORMUNGANDR_CHIMERIC_ACCOUNT
-      );
       const accountKey = rootPk
-        .derive(sourceIsJormungandrWallet
+        .derive(request.transferSource === TransferSource.CIP1852
           ? WalletTypePurpose.CIP1852
           : WalletTypePurpose.BIP44)
         .derive(CoinTypes.CARDANO)
@@ -1281,7 +1326,7 @@ export default class AdaApi {
       };
 
       let insertTree;
-      if (request.transferSource === TransferSource.BYRON) {
+      if (request.transferSource === TransferSource.BIP44) {
         const key = RustModule.WalletV2.Bip44AccountPublic.new(
           v4PublicToV2(accountKey.to_public()),
           RustModule.WalletV2.DerivationScheme.v2(),
@@ -1473,4 +1518,35 @@ function getDifferenceAfterTx(
   }
 
   return sumOutForKey.minus(sumInForKey);
+}
+
+export async function genOwnStakingKey(request: {|
+  publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetSigningKey & IGetStakingKey,
+  password: string,
+|}): Promise<(
+  RustModule.WalletV4.TransactionHash => Array<RustModule.WalletV4.Vkeywitness>
+)> {
+  const signingKeyFromStorage = await request.publicDeriver.getSigningKey();
+  const stakingAddr = await request.publicDeriver.getStakingKey();
+  const normalizedKey = await request.publicDeriver.normalizeKey({
+    ...signingKeyFromStorage,
+    password: request.password,
+  });
+  const normalizedSigningKey = RustModule.WalletV4.Bip32PrivateKey.from_bytes(
+    Buffer.from(normalizedKey.prvKeyHex, 'hex')
+  );
+  const normalizedStakingKey = derivePrivateByAddressing({
+    addressing: stakingAddr.addressing,
+    startingFrom: {
+      key: normalizedSigningKey,
+      level: request.publicDeriver.getParent().getPublicDeriverLevel(),
+    },
+  }).to_raw_key();
+
+  return (txHash) => {
+    return [RustModule.WalletV4.make_vkey_witness(
+      txHash,
+      normalizedStakingKey,
+    )];
+  };
 }

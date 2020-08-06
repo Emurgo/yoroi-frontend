@@ -65,7 +65,7 @@ export async function buildYoroiTransferTx(payload: {|
       }: BaseSignRequest<RustModule.WalletV4.TransactionBuilder>),
       payload.keyLevel,
       payload.signingKey,
-      [],
+      () => [],
       undefined,
     );
 
@@ -83,7 +83,7 @@ export async function buildYoroiTransferTx(payload: {|
       receiver: outputAddr,
     };
   } catch (error) {
-    Logger.error(`transfer::buildTransferTx ${stringifyError(error)}`);
+    Logger.error(`transfer::${nameof(buildYoroiTransferTx)} ${stringifyError(error)}`);
     if (error instanceof LocalizableError) {
       throw error;
     }

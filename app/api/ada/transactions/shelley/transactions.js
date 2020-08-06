@@ -191,6 +191,10 @@ export function newAdaUnsignedTx(
     keyDeposit: RustModule.WalletV4.BigNum,
   |},
   certificates: $ReadOnlyArray<RustModule.WalletV4.Certificate>,
+  withdrawals: $ReadOnlyArray<{|
+    address: RustModule.WalletV4.RewardAddress,
+    amount: RustModule.WalletV4.BigNum,
+  |}>,
 ): V4UnsignedTxAddressedUtxoResponse {
   const addressingMap = new Map<RemoteUnspentOutput, AddressedUtxo>();
   for (const utxo of allUtxos) {
@@ -208,7 +212,8 @@ export function newAdaUnsignedTx(
     Array.from(addressingMap.keys()),
     absSlotNumber,
     protocolParams,
-    certificates
+    certificates,
+    withdrawals
   );
 
   const addressedUtxos = unsignedTxResponse.senderUtxos.map(
@@ -247,6 +252,10 @@ export function newAdaUnsignedTxFromUtxo(
     keyDeposit: RustModule.WalletV4.BigNum,
   |},
   certificates: $ReadOnlyArray<RustModule.WalletV4.Certificate>,
+  withdrawals: $ReadOnlyArray<{|
+    address: RustModule.WalletV4.RewardAddress,
+    amount: RustModule.WalletV4.BigNum,
+  |}>,
 ): V4UnsignedTxUtxoResponse {
   const txBuilder = RustModule.WalletV4.TransactionBuilder.new(
     protocolParams.linearFee,
@@ -260,6 +269,19 @@ export function newAdaUnsignedTxFromUtxo(
       RustModule.WalletV4.Certificates.new()
     );
     txBuilder.set_certs(certsWasm);
+  }
+  if (withdrawals.length > 0) {
+    const withdrawalWasm = withdrawals.reduce(
+      (withs, withdrawal) => {
+        withs.insert(
+          withdrawal.address,
+          withdrawal.amount,
+        );
+        return withs;
+      },
+      RustModule.WalletV4.Withdrawals.new()
+    );
+    txBuilder.set_withdrawals(withdrawalWasm);
   }
   txBuilder.set_ttl(absSlotNumber.plus(defaultTtlOffset).toNumber());
   {
@@ -277,28 +299,36 @@ export function newAdaUnsignedTxFromUtxo(
     }
   }
 
-  let currentInputSum = new BigNumber(0);
+  // pick inputs
   const usedUtxos: Array<RemoteUnspentOutput> = [];
-  // add utxos until we have enough to send the transaction
-  for (const utxo of utxos) {
-    usedUtxos.push(utxo);
-    currentInputSum = currentInputSum.plus(utxo.amount);
-    addUtxoInput(txBuilder, utxo);
-    const output = new BigNumber(
-      txBuilder.get_explicit_output().checked_add(txBuilder.estimate_fee()).to_str()
-    );
-
-    if (currentInputSum.gte(output)) {
-      break;
-    }
-  }
-  // check to see if we have enough balance in the wallet to cover the transaction
   {
-    const output = new BigNumber(
-      txBuilder.get_explicit_output().checked_add(txBuilder.estimate_fee()).to_str()
-    );
-    if (currentInputSum.lt(output)) {
+    // recall: we might have some implicit input to start with from deposit refunds
+    let currentInputSum = new BigNumber(txBuilder.get_explicit_input().to_str());
+
+    if (utxos.length === 0) {
       throw new NotEnoughMoneyToSendError();
+    }
+    // add utxos until we have enough to send the transaction
+    for (const utxo of utxos) {
+      usedUtxos.push(utxo); // note: this ensure we have at least one UTXO in the tx
+      currentInputSum = currentInputSum.plus(utxo.amount);
+      addUtxoInput(txBuilder, utxo);
+      const output = new BigNumber(
+        txBuilder.get_explicit_output().checked_add(txBuilder.estimate_fee()).to_str()
+      );
+
+      if (currentInputSum.gte(output)) {
+        break;
+      }
+    }
+    // check to see if we have enough balance in the wallet to cover the transaction
+    {
+      const output = new BigNumber(
+        txBuilder.get_explicit_output().checked_add(txBuilder.estimate_fee()).to_str()
+      );
+      if (currentInputSum.lt(output)) {
+        throw new NotEnoughMoneyToSendError();
+      }
     }
   }
 
@@ -346,7 +376,9 @@ export function signTransaction(
     BaseSignRequest<RustModule.WalletV4.TransactionBody>,
   keyLevel: number,
   signingKey: RustModule.WalletV4.Bip32PrivateKey,
-  stakingKeys: Array<RustModule.WalletV4.PrivateKey>,
+  getStakingWitnesses: (
+    RustModule.WalletV4.TransactionHash => Array<RustModule.WalletV4.Vkeywitness>
+  ),
   metadata: void | RustModule.WalletV4.TransactionMetadata,
 ): RustModule.WalletV4.Transaction {
   const seenByronKeys: Set<string> = new Set();
@@ -395,18 +427,14 @@ export function signTransaction(
     bootstrapWits,
   );
 
-  const stakingKeySet = new Set<string>();
-  for (const stakingKey of stakingKeys) {
-    const asString = Buffer.from(stakingKey.as_bytes()).toString('hex');
-    if (stakingKeySet.has(asString)) {
+  const stakingKeySigSet = new Set<string>();
+  for (const witness of getStakingWitnesses(txHash)) {
+    const asString = Buffer.from(witness.to_bytes()).toString('hex');
+    if (stakingKeySigSet.has(asString)) {
       continue;
     }
-    stakingKeySet.add(asString);
-    const vkeyWit = RustModule.WalletV4.make_vkey_witness(
-      txHash,
-      stakingKey,
-    );
-    vkeyWits.add(vkeyWit);
+    stakingKeySigSet.add(asString);
+    vkeyWits.add(witness);
   }
 
   const witnessSet = RustModule.WalletV4.TransactionWitnessSet.new();

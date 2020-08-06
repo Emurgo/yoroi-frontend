@@ -6,7 +6,7 @@ import Request from '../lib/LocalizedRequest';
 import type {
   TransferTx,
 } from '../../types/TransferTypes';
-import { TransferKind, } from '../../types/TransferTypes';
+import { TransferKind, TransferSource, } from '../../types/TransferTypes';
 import { yoroiTransferTxFromAddresses } from '../../api/ada/transactions/transfer/legacyYoroi';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { generateWalletRootKey, generateLedgerWalletRootKey, } from '../../api/ada/lib/cardanoCrypto/cryptoWallet';
@@ -14,6 +14,7 @@ import {
   HARD_DERIVATION_START,
   WalletTypePurpose,
   CoinTypes,
+  ChainDerivations,
 } from '../../config/numbersConfig';
 import type { RestoreWalletForTransferResponse, RestoreWalletForTransferFunc } from '../../api/ada/index';
 import {
@@ -58,11 +59,45 @@ export default class AdaYoroiTransferStore extends Store {
     updateStatusCallback: void => void,
     getDestinationAddress: void => Promise<string>,
   |} => Promise<TransferTx> = async (request) => {
+    if (this.stores.yoroiTransfer.transferSource === TransferSource.BIP44) {
+      return this.generateTransferTxForByron(request);
+    }
+    if (this.stores.yoroiTransfer.transferSource === TransferSource.CHIMERIC_ACCOUNT) {
+      return this.generateTransferTxForByron(request);
+    }
+    throw new Error(`${nameof(AdaYoroiTransferStore)}::${nameof(this.generateTransferTxFromMnemonic)} unknown restore type ${this.stores.yoroiTransfer.transferSource}`);
+  }
+
+  generateTransferTxForRewardAccount: {|
+    recoveryPhrase: string,
+    updateStatusCallback: void => void,
+    getDestinationAddress: void => Promise<string>,
+  |} => Promise<TransferTx> = async (_request) => {
+    // const rootPk = this.stores.yoroiTransfer.transferKind === TransferKind.LEDGER
+    //   ? generateLedgerWalletRootKey(request.recoveryPhrase)
+    //   : generateWalletRootKey(request.recoveryPhrase);
+
+    // const accountIndex = 0 + HARD_DERIVATION_START; // TODO: don't hardcode index
+    // const stakeKey = rootPk
+    //   .derive(WalletTypePurpose.BIP44)
+    //   .derive(CoinTypes.CARDANO)
+    //   .derive(accountIndex)
+    //   .derive(ChainDerivations.CHIMERIC_ACCOUNT)
+    //   .derive(0);
+
+    throw new Error(`${nameof(this.generateTransferTxForRewardAccount)} Not supported yet`);
+  }
+
+  generateTransferTxForByron: {|
+    recoveryPhrase: string,
+    updateStatusCallback: void => void,
+    getDestinationAddress: void => Promise<string>,
+  |} => Promise<TransferTx> = async (request) => {
     // 1) get receive address
     const destinationAddress = await request.getDestinationAddress();
 
     // 2) Perform restoration
-    const accountIndex = 0 + HARD_DERIVATION_START;
+    const accountIndex = 0 + HARD_DERIVATION_START; // TODO: don't hardcode index
     const { masterKey, addresses } = await this._restoreWalletForTransfer(
       request.recoveryPhrase,
       accountIndex,
