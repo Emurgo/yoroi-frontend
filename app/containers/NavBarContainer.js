@@ -79,7 +79,7 @@ export default class NavBarContainer extends Component<Props> {
     let utxoTotal = new BigNumber(0);
     const walletBalances = wallets.map(wallet => stores.transactions
       .getTxRequests(wallet).requests.getBalanceRequest.result
-        ?.dividedBy(new BigNumber(10).pow(this.getMeta(wallet).decimalPlaces)));
+      ?.dividedBy(new BigNumber(10).pow(this.getMeta(wallet).decimalPlaces)));
     for (const walletUtxoAmount of walletBalances) {
       if (walletUtxoAmount == null) {
         utxoTotal = null;

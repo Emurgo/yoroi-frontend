@@ -149,9 +149,9 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
           (restoreRequest.error instanceof CheckAddressesInUseApiError);
         return (
           <WalletRestoreVerifyDialog
-            byronPlate={walletRestore.recoveryResult ?.byronPlate}
-            shelleyPlate={walletRestore.recoveryResult ?.shelleyPlate}
-            jormungandrPlate={walletRestore.recoveryResult ?.jormungandrPlate}
+            byronPlate={walletRestore.recoveryResult?.byronPlate}
+            shelleyPlate={walletRestore.recoveryResult?.shelleyPlate}
+            jormungandrPlate={walletRestore.recoveryResult?.jormungandrPlate}
             selectedExplorer={this.generated.stores.explorers.selectedExplorer
               .get(this.getSelectedNetwork().NetworkId) ?? (() => { throw new Error('No explorer for wallet network'); })()
             }

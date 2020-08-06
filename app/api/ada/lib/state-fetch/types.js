@@ -1,7 +1,5 @@
 // @flow
 
-import typeof { MIRPot } from '@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib';
-
 // getUTXOsForAddresses
 
 export type AddressUtxoRequest = {| addresses: Array<string>, |};
@@ -232,7 +230,10 @@ export type AccountStateRequest = {|
   addresses: Array<string>
 |};
 export type RemoteAccountState = {|
-  value: string,
+  poolOperator: null, // not implemented yet
+  remainingAmount: string, // current remaining awards
+  rewards: string, // all the rewards every added
+  withdrawals: string // all the withdrawals that have ever happened
 |};
 export type AccountStateResponse = {|
   [key: string]: RemoteAccountState,

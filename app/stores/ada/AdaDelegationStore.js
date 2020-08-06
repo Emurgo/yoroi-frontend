@@ -92,7 +92,7 @@ export default class AdaDelegationStore extends Store {
           const stateForStakingKey = accountStateResp[stakingKeyResp.addr.Hash];
           const delegatedBalance = delegationRequest.getDelegatedBalance.execute({
             publicDeriver: withStakingKey,
-            rewardBalance: new BigNumber(stateForStakingKey.value),
+            rewardBalance: new BigNumber(stateForStakingKey.remainingAmount),
             stakingAddress: stakingKeyResp.addr.Hash,
           }).promise;
           if (delegatedBalance == null) throw new Error('Should never happen');
