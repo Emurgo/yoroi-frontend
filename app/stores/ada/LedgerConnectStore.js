@@ -44,7 +44,14 @@ import {
   stringifyData,
   stringifyError
 } from '../../utils/logging';
-import { HARD_DERIVATION_START } from '../../config/numbersConfig';
+import {
+  CoinTypes,
+  HARD_DERIVATION_START,
+  WalletTypePurpose,
+} from '../../config/numbersConfig';
+import {
+  Bip44DerivationLevels,
+} from '../../api/ada/lib/storage/database/walletTypes/bip44/api/utils';
 
 export default class LedgerConnectStore
   extends Store
@@ -53,6 +60,7 @@ export default class LedgerConnectStore
   // =================== VIEW RELATED =================== //
   @observable progressInfo: ProgressInfo;
   @observable derivationIndex: number = HARD_DERIVATION_START + 0; // assume single account
+  @observable purpose: number = WalletTypePurpose.BIP44;
   error: ?LocalizableError;
   hwDeviceInfo: ?HWDeviceInfo;
   ledgerConnect: ?LedgerConnect;
@@ -250,7 +258,6 @@ export default class LedgerConnectStore
 
       const reqParams = this._prepareCreateHWReqParams(
         walletName,
-        this.derivationIndex,
       );
       this.createHWRequest.execute(reqParams);
       if (!this.createHWRequest.promise) throw new Error('should never happen');
@@ -284,9 +291,8 @@ export default class LedgerConnectStore
     }
   };
 
-  _prepareCreateHWReqParams: (string, number) => CreateHardwareWalletRequest = (
+  _prepareCreateHWReqParams: string => CreateHardwareWalletRequest = (
     walletName,
-    derivationIndex,
   ) => {
     if (this.hwDeviceInfo == null
       || this.hwDeviceInfo.publicMasterKey == null
@@ -304,7 +310,10 @@ export default class LedgerConnectStore
     const stateFetcher = this.stores.substores.ada.stateFetchStore.fetcher;
     return {
       db: persistentDb,
-      derivationIndex,
+      addressing: {
+        path: [this.purpose, CoinTypes.CARDANO, this.derivationIndex],
+        startLevel: Bip44DerivationLevels.PURPOSE.level,
+      },
       walletName,
       publicKey: this.hwDeviceInfo.publicMasterKey,
       hwFeatures: this.hwDeviceInfo.hwFeatures,

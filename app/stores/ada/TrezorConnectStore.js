@@ -37,7 +37,14 @@ import type {
   CreateHardwareWalletFunc,
 } from '../../api/ada';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
-import { HARD_DERIVATION_START } from '../../config/numbersConfig';
+import {
+  CoinTypes,
+  HARD_DERIVATION_START,
+  WalletTypePurpose,
+} from '../../config/numbersConfig';
+import {
+  Bip44DerivationLevels,
+} from '../../api/ada/lib/storage/database/walletTypes/bip44/api/utils';
 
 type TrezorConnectionResponse = {|
   trezorResp: Success<CardanoPublicKey> | Unsuccessful,
@@ -53,6 +60,7 @@ export default class TrezorConnectStore
   /** the only observable which manages state change */
   @observable progressInfo: ProgressInfo;
   @observable derivationIndex: number = HARD_DERIVATION_START + 0; // assume single account
+  @observable purpose: number = WalletTypePurpose.CIP1852;
 
   /** only in ERROR state it will hold LocalizableError object */
   error: ?LocalizableError;
@@ -104,7 +112,7 @@ export default class TrezorConnectStore
       const trezorManifest = getTrezorManifest();
       wrapWithoutFrame(trezor => trezor.manifest(trezorManifest));
     } catch (error) {
-      Logger.error(`TrezorConnectStore::setup:error: ${stringifyError(error)}`);
+      Logger.error(`${nameof(TrezorConnectStore)}::${nameof(this.setup)} error: ${stringifyError(error)}`);
     }
   }
 
@@ -178,7 +186,8 @@ export default class TrezorConnectStore
       this.hwDeviceInfo = undefined;
 
       const trezorResp = await wrapWithFrame(trezor => trezor.cardanoGetPublicKey({
-        path: derivePathPrefix(this.derivationIndex)
+        path: derivePathPrefix(this.purpose, this.derivationIndex),
+        showOnTrezor: false
       }));
 
       if (this.trezorEventDevice == null) {
@@ -207,7 +216,7 @@ export default class TrezorConnectStore
   ) => {
     this._validateHWResponse(resp);
     if (!resp.trezorResp.success) {
-      throw new Error('TrezorConnectStore::_normalizeHWResponse should never happen');
+      throw new Error(`${nameof(TrezorConnectStore)}::${nameof(this._normalizeHWResponse)} should never happen`);
     }
 
     const { trezorResp, trezorEventDevice } = resp;
@@ -346,7 +355,6 @@ export default class TrezorConnectStore
 
       const reqParams = this._prepareCreateHWReqParams(
         walletName,
-        this.derivationIndex,
       );
       this.createHWRequest.execute(reqParams);
       if (!this.createHWRequest.promise) throw new Error('should never happen');
@@ -381,9 +389,8 @@ export default class TrezorConnectStore
     }
   };
 
-  _prepareCreateHWReqParams: (string, number) => CreateHardwareWalletRequest = (
+  _prepareCreateHWReqParams: string => CreateHardwareWalletRequest = (
     walletName,
-    derivationIndex,
   ) => {
     if (this.hwDeviceInfo == null
       || this.hwDeviceInfo.publicMasterKey == null
@@ -402,7 +409,10 @@ export default class TrezorConnectStore
     const stateFetcher = this.stores.substores.ada.stateFetchStore.fetcher;
     return {
       db: persistentDb,
-      derivationIndex,
+      addressing: {
+        path: [this.purpose, CoinTypes.CARDANO, this.derivationIndex],
+        startLevel: Bip44DerivationLevels.PURPOSE.level,
+      },
       walletName,
       publicKey: this.hwDeviceInfo.publicMasterKey,
       hwFeatures: this.hwDeviceInfo.hwFeatures,

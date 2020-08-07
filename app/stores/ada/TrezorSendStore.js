@@ -24,7 +24,6 @@ import {
 import LocalizableError from '../../i18n/LocalizableError';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import { ROUTES } from '../../routes-config';
-import { HardwareUnsupportedError } from '../../api/common/errors';
 
 /** Note: Handles Trezor Signing */
 export default class TrezorSendStore extends Store {
@@ -72,32 +71,27 @@ export default class TrezorSendStore extends Store {
       this._setError(null);
       this._setActionProcessing(true);
 
-      throw new HardwareUnsupportedError();
+      this.createTrezorSignTxDataRequest.execute({
+        ...request.params,
+        network: request.publicDeriver.getParent().getNetworkInfo(),
+      });
+      if (!this.createTrezorSignTxDataRequest.promise) throw new Error('should never happen');
 
-      // const stateFetcher = this.stores.substores.ada.stateFetchStore.fetcher;
+      const trezorSignTxDataResp = await this.createTrezorSignTxDataRequest.promise;
 
-      // this.createTrezorSignTxDataRequest.execute({
-      //   ...request.params,
-      //   getTxsBodiesForUTXOs: stateFetcher.getTxsBodiesForUTXOs,
-      //   network: request.publicDeriver.getParent().getNetworkInfo(),
-      // });
-      // if (!this.createTrezorSignTxDataRequest.promise) throw new Error('should never happen');
+      const trezorSignTxResp = await wrapWithFrame(trezor => trezor.cardanoSignTransaction(
+        { ...trezorSignTxDataResp.trezorSignTxPayload }
+      ));
 
-      // const trezorSignTxDataResp = await this.createTrezorSignTxDataRequest.promise;
+      if (trezorSignTxResp && trezorSignTxResp.payload && trezorSignTxResp.payload.error != null) {
+        // this Error will be converted to LocalizableError()
+        throw new Error(trezorSignTxResp.payload.error);
+      }
 
-      // const trezorSignTxResp = await wrapWithFrame(trezor => trezor.cardanoSignTransaction(
-      //   { ...trezorSignTxDataResp.trezorSignTxPayload }
-      // ));
-
-      // if (trezorSignTxResp && trezorSignTxResp.payload && trezorSignTxResp.payload.error != null) {
-      //   // this Error will be converted to LocalizableError()
-      //   throw new Error(trezorSignTxResp.payload.error);
-      // }
-
-      // await this._brodcastSignedTx(
-      //   trezorSignTxResp,
-      //   request.publicDeriver
-      // );
+      await this._broadcastSignedTx(
+        trezorSignTxResp,
+        request.publicDeriver
+      );
 
     } catch (error) {
       Logger.error(`${nameof(TrezorSendStore)}::${nameof(this._sendUsingTrezor)} error: ` + stringifyError(error));
@@ -109,7 +103,7 @@ export default class TrezorSendStore extends Store {
     }
   };
 
-  _brodcastSignedTx: (
+  _broadcastSignedTx: (
     Success<CardanoSignedTx> | Unsuccessful,
     PublicDeriver<>,
   ) => Promise<void> = async (
@@ -117,14 +111,14 @@ export default class TrezorSendStore extends Store {
     publicDeriver,
   ): Promise<void> => {
     if (!trezorSignTxResp.success) {
-      throw new Error(`${nameof(TrezorSendStore)}::${nameof(this._brodcastSignedTx)} should never happen`);
+      throw new Error(`${nameof(TrezorSendStore)}::${nameof(this._broadcastSignedTx)} should never happen`);
     }
     const { wallets } = this.stores;
     const signedTxResponse = await this.broadcastTrezorSignedTxRequest.execute({
       broadcast: () => this.api.ada.broadcastTrezorSignedTx({
         signedTxRequest: {
           id: trezorSignTxResp.payload.hash,
-          encodedTx: Buffer.from(trezorSignTxResp.payload.body, 'hex'),
+          encodedTx: Buffer.from(trezorSignTxResp.payload.serializedTx, 'hex'),
         },
         sendTx: this.stores.substores.ada.stateFetchStore.fetcher.sendTx,
       }),
@@ -144,7 +138,7 @@ export default class TrezorSendStore extends Store {
           },
         });
       } catch (error) {
-        Logger.error(`${nameof(TrezorSendStore)}::${nameof(this._brodcastSignedTx)} error: ` + stringifyError(error));
+        Logger.error(`${nameof(TrezorSendStore)}::${nameof(this._broadcastSignedTx)} error: ` + stringifyError(error));
       }
     }
 

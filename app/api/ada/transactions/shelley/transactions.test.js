@@ -467,7 +467,7 @@ describe('Create signed transactions', () => {
       throw new Error(`missing network id`);
     }
 
-    const protocolParms = getProtocolParams();
+    const protocolParams = getProtocolParams();
     const withdrawAmount = '1000000';
     const addressedUtxos = genAddressedUtxos();
     const sampleAdaAddresses = genSampleAdaAddresses();
@@ -476,7 +476,7 @@ describe('Create signed transactions', () => {
       sampleAdaAddresses[3],
       [addressedUtxos[3]],
       new BigNumber(0),
-      protocolParms,
+      protocolParams,
       [
         RustModule.WalletV4.Certificate.new_stake_deregistration(
           RustModule.WalletV4.StakeDeregistration.new(stakingKeyCredential)
@@ -523,7 +523,7 @@ describe('Create signed transactions', () => {
       new BigNumber(addressedUtxos[3].amount)
         .minus(fee)
         .plus(withdrawAmount)
-        .plus(protocolParms.keyDeposit.to_str())
+        .plus(protocolParams.keyDeposit.to_str())
         .toString()
     );
 

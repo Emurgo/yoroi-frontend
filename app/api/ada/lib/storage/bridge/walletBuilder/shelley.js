@@ -18,6 +18,7 @@ import type {
 } from '../../database/walletTypes/common/utils';
 import type { Bip44ChainInsert } from '../../database/walletTypes/common/tables';
 import type { NetworkRow } from '../../database/primitives/tables';
+import type { HWFeatures, } from '../../database/walletTypes/core/tables';
 
 import { WalletBuilder } from './builder';
 
@@ -259,6 +260,120 @@ export async function createStandardCip1852Wallet(request: {|
             privateDeriverLevel: level,
           };
         }
+      )
+      .commit();
+  }
+
+  return state;
+}
+
+export async function createHardwareCip1852Wallet(request: {|
+  db: lf$Database,
+  accountPublicKey: RustModule.WalletV4.Bip32PublicKey,
+  accountIndex: number,
+  walletName: string,
+  accountName: string,
+  hwWalletMetaInsert: HWFeatures,
+  network: $ReadOnly<NetworkRow>,
+|}): Promise<HasConceptualWallet & HasCip1852Wrapper & HasRoot & HasPublicDeriver<mixed>> {
+  if (request.accountIndex < HARD_DERIVATION_START) {
+    throw new Error(`${nameof(createStandardCip1852Wallet)} needs hardened index`);
+  }
+
+  const initialDerivations = await getAccountDefaultDerivations(
+    Number.parseInt(request.network.BaseConfig[0].ChainNetworkId, 10),
+    request.accountPublicKey,
+    rawGenAddByHash(new Set()),
+  );
+
+  let state;
+  {
+    state = await WalletBuilder
+      .start(
+        request.db,
+        Bip44TableMap, // recall: Cip1852 uses the same table map as bip44
+      )
+      .addConceptualWallet(
+        _finalState => ({
+          NetworkId: request.network.NetworkId,
+          Name: request.walletName,
+        })
+      )
+      .addFromRoot(
+        _finalState => ({
+          rootInsert: {
+            privateKeyInfo: null,
+            publicKeyInfo: null,
+            derivationInfo: keys => ({
+              PublicKeyId: keys.public,
+              PrivateKeyId: keys.private,
+              Parent: null,
+              Index: null,
+            }),
+            levelInfo: insertRequest => Promise.resolve({
+              KeyDerivationId: insertRequest.keyDerivationId,
+            }),
+          },
+          tree: rootDerivation => ({
+            derivationId: rootDerivation,
+            children: [],
+          }),
+        })
+      )
+      .addCip1852Wrapper(
+        finalState => ({
+          ConceptualWalletId: finalState.conceptualWalletRow.ConceptualWalletId,
+          SignerLevel: null,
+          PublicDeriverLevel: Bip44DerivationLevels.ACCOUNT.level,
+          PrivateDeriverKeyDerivationId: null,
+          PrivateDeriverLevel: null,
+          RootKeyDerivationId: finalState.root.root.KeyDerivation.KeyDerivationId,
+        })
+      )
+      .addAdhocPublicDeriver(
+        finalState => ({
+          parentDerivationId: finalState.root.root.KeyDerivation.KeyDerivationId,
+          pathStartLevel: 1,
+          publicDeriverMeta: {
+            name: request.accountName,
+          },
+          pathToPublic: [
+            {
+              index: WalletTypePurpose.CIP1852,
+              insert: insertRequest => Promise.resolve({
+                KeyDerivationId: insertRequest.keyDerivationId,
+              }),
+              publicKey: null,
+              privateKey: null,
+            },
+            {
+              index: CoinTypes.CARDANO,
+              insert: insertRequest => Promise.resolve({
+                KeyDerivationId: insertRequest.keyDerivationId,
+              }),
+              publicKey: null,
+              privateKey: null,
+            },
+            {
+              index: request.accountIndex,
+              insert: insertRequest => Promise.resolve({
+                KeyDerivationId: insertRequest.keyDerivationId,
+              }),
+              publicKey: {
+                Hash: Buffer.from(request.accountPublicKey.as_bytes()).toString('hex'),
+                IsEncrypted: false,
+                PasswordLastUpdate: null,
+                Type: KeyKind.BIP32ED25519,
+              },
+              privateKey: null,
+            },
+          ],
+          initialDerivations,
+          hwWalletMetaInsert: {
+            ConceptualWalletId: finalState.conceptualWalletRow.ConceptualWalletId,
+            ...request.hwWalletMetaInsert
+          },
+        })
       )
       .commit();
   }

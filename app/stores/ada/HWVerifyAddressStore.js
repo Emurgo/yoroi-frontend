@@ -33,8 +33,12 @@ import {
 import {
   PublicDeriver,
 } from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import { normalizeToAddress, } from '../../api/ada/lib/storage/bridge/utils';
+import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
+import { getCardanoHaskellBaseConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { toTrezorAddressParameters } from '../../api/ada/transactions/shelley/trezorTx';
 
-export default class AddressesStore extends Store {
+export default class HWVerifyAddressStore extends Store {
   @observable isActionProcessing: boolean = false;
   @observable error: ?LocalizableError = null;
   @observable selectedAddress: ?{|
@@ -54,10 +58,10 @@ export default class AddressesStore extends Store {
   @action _verifyAddress: (PublicDeriver<>) => Promise<void> = async (
     publicDeriver,
   ) => {
-    Logger.info('AddressStore::_verifyAddress called');
+    Logger.info(`${nameof(HWVerifyAddressStore)}::${nameof(this._verifyAddress)} called`);
 
     if (!this.selectedAddress) {
-      throw new Error('AddressStore::_verifyAddress called with no address selected');
+      throw new Error(`${nameof(HWVerifyAddressStore)}::${nameof(this._verifyAddress)} called with no address selected`);
     }
     // remove null/undefined type to satisfy Flow
     const selectedAddress = this.selectedAddress;
@@ -73,28 +77,39 @@ export default class AddressesStore extends Store {
     if (isLedgerNanoWallet(conceptualWallet)) {
       await this.ledgerVerifyAddress(path, address);
     } else if (isTrezorTWallet(conceptualWallet)) {
-      await this.trezorVerifyAddress(path, address);
+      await this.trezorVerifyAddress(path, address, publicDeriver.getParent().getNetworkInfo());
     } else {
-      throw new Error('AddressStore::_verifyAddress called with unrecognized hardware wallet');
+      throw new Error(`${nameof(HWVerifyAddressStore)}::${nameof(this._verifyAddress)} called with unrecognized hardware wallet`);
     }
 
     this._setActionProcessing(false);
   }
 
-  trezorVerifyAddress: (BIP32Path, string) => Promise<void> = async (
-    path: BIP32Path,
-    address: string
+  trezorVerifyAddress: (BIP32Path, string, $ReadOnly<NetworkRow>) => Promise<void> = async (
+    path,
+    address,
+    network,
   ): Promise<void> => {
+    const config = getCardanoHaskellBaseConfig(network)
+      .reduce((acc, next) => Object.assign(acc, next), {});
+
+    const wasmAddr = normalizeToAddress(address);
+    if (wasmAddr == null) throw new Error(`${nameof(HWVerifyAddressStore)}::${nameof(this.trezorVerifyAddress)} invalid address ${address}`);
+    const addressParams = toTrezorAddressParameters(
+      wasmAddr,
+      path,
+    );
     try {
       await wrapWithFrame(trezor => trezor.cardanoGetAddress({
-        path,
-        address,
+        protocolMagic: config.ByronNetworkId,
+        networkId: Number.parseInt(config.ChainNetworkId, 10),
+        addressParameters: addressParams,
       }));
     } catch (error) {
-      Logger.error('AddressStore::trezorVerifyAddress::error: ' + stringifyError(error));
+      Logger.error(`${nameof(HWVerifyAddressStore)}::${nameof(this.trezorVerifyAddress)}::error: ` + stringifyError(error));
       this._setError(trezorErrorToLocalized(error));
     } finally {
-      Logger.info('HWVerifyStore::trezorVerifyAddress finalized ');
+      Logger.info(`${nameof(HWVerifyAddressStore)}::${nameof(this.trezorVerifyAddress)} finalized`);
     }
   }
 
@@ -108,7 +123,7 @@ export default class AddressesStore extends Store {
       });
       await prepareLedgerConnect(this.ledgerConnect);
 
-      Logger.info('AddressStore::_verifyAddress show path ' + JSON.stringify(path));
+      Logger.info(`${nameof(HWVerifyAddressStore)}::${nameof(this.ledgerVerifyAddress)} show path ` + JSON.stringify(path));
       if (this.ledgerConnect) {
         await this.ledgerConnect.showAddress(path, address);
       }
@@ -117,7 +132,7 @@ export default class AddressesStore extends Store {
     } finally {
       this.ledgerConnect && this.ledgerConnect.dispose();
       this.ledgerConnect = undefined;
-      Logger.info('HWVerifyStore::ledgerVerifyAddress finalized ');
+      Logger.info(`${nameof(HWVerifyAddressStore)}::${nameof(this.ledgerVerifyAddress)} finalized`);
     }
   }
 
@@ -125,7 +140,7 @@ export default class AddressesStore extends Store {
     address: string,
     path: void | BIP32Path,
   |} => Promise<void> = async (params) => {
-    Logger.info('AddressStore::_selectAddress::called: ' + params.address);
+    Logger.info(`${nameof(HWVerifyAddressStore)}::${nameof(this._selectAddress)} called: ` + params.address);
     this.selectedAddress = { address: params.address, path: params.path };
   }
 

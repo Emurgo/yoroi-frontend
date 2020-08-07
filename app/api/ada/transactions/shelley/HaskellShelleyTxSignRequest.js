@@ -11,9 +11,18 @@ export class HaskellShelleyTxSignRequest
 implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
 
   signRequest: BaseSignRequest<RustModule.WalletV4.TransactionBuilder>;
+  metadata: void | RustModule.WalletV4.TransactionMetadata; // TODO: shouldn't need this
 
-  constructor(signRequest: BaseSignRequest<RustModule.WalletV4.TransactionBuilder>) {
+  constructor(
+    signRequest: BaseSignRequest<RustModule.WalletV4.TransactionBuilder>,
+    metadata: void | RustModule.WalletV4.TransactionMetadata,
+  ) {
     this.signRequest = signRequest;
+    this.metadata = metadata;
+  }
+
+  txMetadata(): void | RustModule.WalletV4.TransactionMetadata {
+    return this.metadata;
   }
 
   totalInput(shift: boolean): BigNumber {

@@ -32,6 +32,7 @@ import type { ISignRequest } from '../../api/common/lib/transactions/ISignReques
 import { ApiOptions, getApiForNetwork, getApiMeta } from '../../api/common/utils';
 import { validateAmount } from '../../utils/validations';
 import { formattedWalletAmount } from '../../utils/formatters';
+import { addressToDisplayString } from '../../api/ada/lib/storage/bridge/utils';
 
 // Hardware Wallet Confirmation
 import HWSendConfirmationDialog from '../../components/wallet/send/HWSendConfirmationDialog';
@@ -307,6 +308,9 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
             amount,
             apiMeta.decimalPlaces.toNumber()
           )}
+          addressToDisplayString={
+            addr => addressToDisplayString(addr, publicDeriver.getParent().getNetworkInfo())
+          }
         />);
     } else if (isTrezorTWallet(conceptualWallet)) {
       const trezorSendAction = this.generated.actions[adaApi].trezorSend;
@@ -325,7 +329,7 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
           error={trezorSendStore.error}
           onSubmit={
             () => trezorSendAction.sendUsingTrezor.trigger({
-              params: { signRequest: signRequest.self() },
+              params: { signRequest },
               publicDeriver,
             })
           }
@@ -336,6 +340,9 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
             amount,
             apiMeta.decimalPlaces.toNumber()
           )}
+          addressToDisplayString={
+            addr => addressToDisplayString(addr, publicDeriver.getParent().getNetworkInfo())
+          }
         />);
     } else {
       throw new Error('Unsupported hardware wallet found at hardwareWalletDoConfirmation.');

@@ -55,14 +55,14 @@ export interface HWConnectStoreTypes<ConnectionResponse> {
   createHWRequest: LocalizedRequest<CreateHardwareWalletFunc>;
 
   /** While hardware wallet creation is taking place, we need to block users from starting a
-    * hardware wallet creation on a seperate wallet and explain to them why the action is blocked */
+    * hardware wallet creation on a separate wallet and explain to them why the action is blocked */
   isCreateHWActive: boolean;
   // =================== API RELATED =================== //
 
   setup(): void;
 
   /** setup() is called when stores are being created
-    * _init() is called when connect dailog is about to show */
+    * _init() is called when connect dialog is about to show */
   _init(): void;
 
   teardown(): void;
@@ -110,7 +110,6 @@ export interface HWConnectStoreTypes<ConnectionResponse> {
 
   _prepareCreateHWReqParams(
     walletName: string,
-    derivationIndex: number,
   ): CreateHardwareWalletRequest;
 
   _onSaveSuccess(publicDeriver: PublicDeriver<>): Promise<void>;

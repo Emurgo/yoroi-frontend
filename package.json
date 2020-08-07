@@ -77,7 +77,11 @@
     "@babel/register": "7.10.5",
     "@babel/runtime": "7.11.2",
     "@babel/runtime-corejs3": "7.11.2",
+<<<<<<< HEAD
     "@emurgo/cardano-serialization-lib-nodejs": "1.2.0",
+=======
+    "@emurgo/cardano-serialization-lib-nodejs": "1.1.0",
+>>>>>>> checkpoint
     "@emurgo/js-chain-libs-node": "0.7.1",
     "@storybook/addon-actions": "5.3.19",
     "@storybook/addon-knobs": "5.3.19",
@@ -197,7 +201,7 @@
     "route-parser": "0.0.5",
     "semver": "7.3.2",
     "tinycolor2": "1.4.1",
-    "trezor-connect": "8.1.7",
+    "trezor-connect": "8.1.10",
     "ua-parser-js": "0.7.21",
     "unorm": "1.6.0",
     "validator": "13.1.1"
