@@ -60,7 +60,7 @@
   "daedalusTransfer.waiting.progressInfo.restoringAddresses": "İnternet adresleri getiriliyor",
   "daedalusTransfer.waiting.title.label": "Daedalus cüzdanı yeniden yükleniyor",
   "daedalusTransfer.waiting.warning": "Bu uzun zaman alabilir veya zayıf internet bağlantılarında başarısız olabilir",
-  "global.contact": "iletişim desteği",
+  "global.contact": "iletişim desteği 2",
   "global.copyTooltipMessage": "Kopyalandı",
   "global.errors.fieldIsRequired": "Girilmesi gerekli alan.",
   "global.errors.invalidMasterKey": "Geçersiz kodlama anahtarı girildi, lütfen kontrol edin.",
