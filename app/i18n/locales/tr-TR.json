@@ -192,7 +192,7 @@
   "settings.externalStorage.intro": "Hesabınıza bağlanmak ve hatırlatıcı notlarınızı kaydetmek için harici bir depolama hizmeti seçin.",
   "settings.externalStorage.provider": "{provider}'a bağlanın",
   "settings.externalStorage.title": "Bir hesap bağlayın",
-  "settings.general.aboutYoroi.commitLabel": "Teslim Et:",
+  "settings.general.aboutYoroi.commitLabel": "Değişiklikler:",
   "settings.general.aboutYoroi.facebook": "Yoroi Facebook",
   "settings.general.aboutYoroi.git.branch": "Bölüm:",
   "settings.general.aboutYoroi.github": "Yoroi GitHub",
