@@ -31,7 +31,7 @@
   "api.errors.invalidWitnessError": "İmza geçersiz.",
   "api.errors.noInputsError": "İyileştirme tümceciğinizden yeniden yüklenen cüzdan boş. Lütfen İyileştirme tümceciğinizi kontrol edin ve geri yüklemeyi tekrar deneyin.",
   "api.errors.pendingTransactionError": "Bekleyen işlemler güncellenirken hata oluştu.",
-  "api.errors.poolMissingApiError": "Could not find this pool. Double-check the ID and make sure the pool was not deregistered.",
+  "api.errors.poolMissingApiError": "Bu havuz bulunamadı. Kimliği tekrar kontrol edin ve havuzun kaydının kaldırılmadığından emin olun.",
   "api.errors.rollbackApiError": "Geri alma algılandı.",
   "api.errors.sendTransactionApiError": "İşlem gönderilirken sunucudan hata alındı.",
   "api.errors.sendTransactionError": "İşlem gönderilirken api çağrı yönteminden hata alındı.",
