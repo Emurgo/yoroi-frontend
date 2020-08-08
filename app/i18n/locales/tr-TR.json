@@ -642,7 +642,7 @@
   "wallet.transaction.certificate.StakeDeregistration": "Staking key deregistration",
   "wallet.transaction.certificate.StakeRegistration": "Staking key registration",
   "wallet.transaction.certificateLabel": "Sertifika",
-  "wallet.transaction.certificatesLabel": "Certificates",
+  "wallet.transaction.certificatesLabel": "Sertifikalar",
   "wallet.transaction.confirmations": "onaylama",
   "wallet.transaction.conversion.rate": "Dönüşüm oranı",
   "wallet.transaction.export.dialog.exportButton.label": "Dışarı aktar",
