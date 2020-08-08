@@ -1386,13 +1386,13 @@ async function networkTxToDbTx(
         }
         for (let i = 0; i < networkTx.outputs.length; i++) {
           const output = networkTx.outputs[i];
-          const txType = addressToKind(output.address, 'bytes', network);
+          const outputType = addressToKind(output.address, 'bytes', network);
           // consider a group address as a UTXO output
           // since the payment (UTXO) key is the one that signs
           if (
-            txType === CoreAddressTypes.CARDANO_LEGACY ||
-            txType === CoreAddressTypes.JORMUNGANDR_SINGLE ||
-            txType === CoreAddressTypes.JORMUNGANDR_GROUP
+            outputType === CoreAddressTypes.CARDANO_LEGACY ||
+            outputType === CoreAddressTypes.JORMUNGANDR_SINGLE ||
+            outputType === CoreAddressTypes.JORMUNGANDR_GROUP
           ) {
             utxoOutputs.push({
               TransactionId: txRowId,
@@ -1407,7 +1407,7 @@ async function networkTxToDbTx(
               IsUnspent: true,
             });
           } else if (
-            txType === CoreAddressTypes.JORMUNGANDR_ACCOUNT
+            outputType === CoreAddressTypes.JORMUNGANDR_ACCOUNT
           ) {
             accountingOutputs.push({
               TransactionId: txRowId,

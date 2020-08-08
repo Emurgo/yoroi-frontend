@@ -663,7 +663,7 @@ export const populatePrimitivesDb = (schemaBuilder: lf$schema$Builder) => {
     .addIndex(
       'Certificate_Transaction_Index',
       ([CertificateSchema.properties.TransactionId]: Array<string>),
-      true // only one certificate per transaction
+      false // haskell shelley allows multiple certificates per transaction
     );
 
   // CertificateAddress Table
