@@ -642,7 +642,7 @@
   "wallet.transaction.certificate.StakeDeregistration": "Staking key deregistration",
   "wallet.transaction.certificate.StakeRegistration": "Staking key registration",
   "wallet.transaction.certificateLabel": "证书",
-  "wallet.transaction.certificatesLabel": "Certificates",
+  "wallet.transaction.certificatesLabel": "证书",
   "wallet.transaction.confirmations": "确认",
   "wallet.transaction.conversion.rate": "汇价",
   "wallet.transaction.export.dialog.exportButton.label": "导出",
