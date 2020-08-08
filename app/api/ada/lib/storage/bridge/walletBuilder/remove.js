@@ -25,6 +25,7 @@ import {
   GetAddress,
   GetPathWithSpecific,
   GetTransaction,
+  GetCertificates,
 } from '../../database/primitives/api/read';
 import { ModifyAddress, FreeBlocks, } from '../../database/primitives/api/write';
 import { AssociateTxWithUtxoIOs, } from '../../database/transactionModels/utxo/api/read';
@@ -59,6 +60,7 @@ export async function removePublicDeriver(request: {|
     ModifyAddress,
     GetTransaction,
     FreeBlocks,
+    GetCertificates,
   });
   const db = request.publicDeriver.getDb();
   const depTables = Object
@@ -94,6 +96,7 @@ export async function removePublicDeriver(request: {|
               ModifyAddress: deps.ModifyAddress,
               GetTransaction: deps.GetTransaction,
               FreeBlocks: deps.FreeBlocks,
+              GetCertificates: deps.GetCertificates,
             },
             withLevels.getParent().getDerivationTables(),
             {

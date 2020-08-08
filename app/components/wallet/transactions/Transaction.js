@@ -16,6 +16,7 @@ import AddMemoSvg from '../../../assets/images/add-memo.inline.svg';
 import EditSvg from '../../../assets/images/edit.inline.svg';
 import WalletTransaction from '../../../domain/WalletTransaction';
 import JormungandrTransaction from '../../../domain/JormungandrTransaction';
+import CardanoShelleyTransaction from '../../../domain/CardanoShelleyTransaction';
 import globalMessages, { memoMessages, } from '../../../i18n/global-messages';
 import type { TransactionDirectionType, } from '../../../api/ada/transactions/types';
 import { transactionTypes } from '../../../api/ada/transactions/types';
@@ -96,13 +97,17 @@ const messages = defineMessages({
     id: 'wallet.transaction.certificateLabel',
     defaultMessage: '!!!Certificate',
   },
+  certificatesLabel: {
+    id: 'wallet.transaction.certificatesLabel',
+    defaultMessage: '!!!Certificates',
+  },
   transactionAmount: {
     id: 'wallet.transaction.transactionAmount',
     defaultMessage: '!!!Transaction amount',
   },
 });
 
-const certificateKinds = defineMessages({
+const jormungandrCertificateKinds = defineMessages({
   PoolRegistration: {
     id: 'wallet.transaction.certificate.PoolRegistration',
     defaultMessage: '!!!Pool registration',
@@ -124,6 +129,31 @@ const certificateKinds = defineMessages({
     defaultMessage: '!!!Owner stake delegation',
   },
 });
+
+const shelleyCertificateKinds = {
+  PoolRegistration: jormungandrCertificateKinds.PoolRegistration,
+  PoolRetirement: jormungandrCertificateKinds.PoolRetirement,
+  StakeDelegation: jormungandrCertificateKinds.StakeDelegation,
+  ...defineMessages({
+    StakeRegistration: {
+      id: 'wallet.transaction.certificate.StakeRegistration',
+      defaultMessage: '!!!Staking key registration',
+    },
+    StakeDeregistration: {
+      id: 'wallet.transaction.certificate.StakeDeregistration',
+      defaultMessage: '!!!Staking key deregistration',
+    },
+    GenesisKeyDelegation: {
+      id: 'wallet.transaction.certificate.GenesisKeyDelegation',
+      defaultMessage: '!!!Genesis key delegation',
+    },
+    MoveInstantaneousRewardsCert: {
+      id: 'wallet.transaction.certificate.MoveInstantaneousRewardsCert',
+      defaultMessage: '!!!Manually-initiated reward payout',
+    },
+  }),
+};
+
 
 const assuranceLevelTranslations = defineMessages({
   low: {
@@ -645,45 +675,95 @@ export default class Transaction extends Component<Props, State> {
     );
   }
 
-  certificateToText: $ReadOnly<CertificateRow> => string = (certificate) => {
+  jormungandrCertificateToText: $ReadOnly<CertificateRow> => string = (certificate) => {
     const { intl } = this.context;
     const kind = certificate.Kind;
     switch (kind) {
       case RustModule.WalletV3.CertificateKind.PoolRegistration:
-        return intl.formatMessage(certificateKinds.PoolRegistration);
+        return intl.formatMessage(jormungandrCertificateKinds.PoolRegistration);
       case RustModule.WalletV3.CertificateKind.PoolUpdate:
-        return intl.formatMessage(certificateKinds.PoolUpdate);
+        return intl.formatMessage(jormungandrCertificateKinds.PoolUpdate);
       case RustModule.WalletV3.CertificateKind.PoolRetirement:
-        return intl.formatMessage(certificateKinds.PoolRetirement);
+        return intl.formatMessage(jormungandrCertificateKinds.PoolRetirement);
       case RustModule.WalletV3.CertificateKind.StakeDelegation:
-        return intl.formatMessage(certificateKinds.StakeDelegation);
+        return intl.formatMessage(jormungandrCertificateKinds.StakeDelegation);
       case RustModule.WalletV3.CertificateKind.OwnerStakeDelegation:
-        return intl.formatMessage(certificateKinds.OwnerStakeDelegation);
+        return intl.formatMessage(jormungandrCertificateKinds.OwnerStakeDelegation);
       default: {
-        throw new Error(`${nameof(this.certificateToText)} unexpected kind ${kind}`);
+        throw new Error(`${nameof(this.jormungandrCertificateToText)} unexpected kind ${kind}`);
       }
     }
   }
 
-  getCertificate: WalletTransaction => Node = (data) => {
+  shelleyCertificateToText: $ReadOnly<CertificateRow> => string = (certificate) => {
     const { intl } = this.context;
-    if (!(data instanceof JormungandrTransaction)) {
-      return null;
+    const kind = certificate.Kind;
+    switch (kind) {
+      case RustModule.WalletV4.CertificateKind.StakeRegistration:
+        return intl.formatMessage(shelleyCertificateKinds.StakeRegistration);
+      case RustModule.WalletV4.CertificateKind.StakeDeregistration:
+        return intl.formatMessage(shelleyCertificateKinds.StakeDeregistration);
+      case RustModule.WalletV4.CertificateKind.StakeDelegation:
+        return intl.formatMessage(shelleyCertificateKinds.StakeDelegation);
+      case RustModule.WalletV4.CertificateKind.PoolRegistration:
+        return intl.formatMessage(shelleyCertificateKinds.PoolRegistration);
+      case RustModule.WalletV4.CertificateKind.GenesisKeyDelegation:
+        return intl.formatMessage(shelleyCertificateKinds.GenesisKeyDelegation);
+      case RustModule.WalletV4.CertificateKind.MoveInstantaneousRewardsCert:
+        return intl.formatMessage(shelleyCertificateKinds.MoveInstantaneousRewardsCert);
+      default: {
+        throw new Error(`${nameof(this.jormungandrCertificateToText)} unexpected kind ${kind}`);
+      }
     }
-    if (data.certificates.length === 0) {
-      return null;
-    }
-    // TODO: deicide what to show in multi-certificate case of Haskell Shelley
-    const certificateText = this.certificateToText(data.certificates[0].certificate);
-    return (
+  }
+
+  getCertificate: WalletTransaction => ?Node = (data) => {
+    const { intl } = this.context;
+
+    const wrapCertificateText = (node, manyCerts) => (
       <>
         <h2>
-          {intl.formatMessage(messages.certificateLabel)}
+          {manyCerts
+            ? intl.formatMessage(messages.certificatesLabel)
+            : intl.formatMessage(messages.certificateLabel)
+          }
         </h2>
         <span className={styles.rowData}>
-          {certificateText}
+          {node}
         </span>
       </>
     );
+    if (data instanceof JormungandrTransaction) {
+      if (data.certificates.length === 0) {
+        return null;
+      }
+      return wrapCertificateText(
+        this.jormungandrCertificateToText(data.certificates[0].certificate),
+        data.certificates.length > 1
+      );
+    }
+    if (data instanceof CardanoShelleyTransaction) {
+      if (data.certificates.length === 0) {
+        return null;
+      }
+      const certBlock = data.certificates.reduce(
+        (acc, curr, idx) => {
+          const newElem = (
+            // eslint-disable-next-line react/no-array-index-key
+            <span key={idx}>
+              {acc.length !== 0 ? (<br />) : undefined}
+              {this.shelleyCertificateToText(curr.certificate)}
+            </span>
+          );
+          acc.push(newElem);
+          return acc;
+        },
+        ([]: Array<Node>)
+      );
+      return wrapCertificateText(
+        certBlock,
+        data.certificates.length > 1
+      );
+    }
   }
 }

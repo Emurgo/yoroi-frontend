@@ -148,20 +148,20 @@ export const ShelleyCertificateTypes = Object.freeze({
 });
 
 export type RemoteStakeRegistrationCert = {|
-  +stakeCredential: string, // hex
+  +rewardAddress: string, // hex
 |};
 export type RemoteStakeDeregistrationCert = {|
-  +stakeCredential: string, // hex
+  +rewardAddress: string, // hex
 |};
 export type RemoteStakeDelegationCert = {|
-  +stakeCredential: string, // hex
+  +rewardAddress: string, // hex
   +poolKeyHash: string, // hex
 |};
 export type RemotePoolRegistrationCert = {|
   +pool_params: {|
     +operator: string,
     +vrfKeyHash: string,
-    +pledge: number | string, // TODO: should be string
+    +pledge: string,
     +cost: string,
     +margin: number,
     // +margin: {|
@@ -170,13 +170,12 @@ export type RemotePoolRegistrationCert = {|
     // |},
     +rewardAccount: string, // hex
     +poolOwners: Array<string>, // hex
-    // TODO: some relay fields are optional I think. Need to investigate
     +relays: Array<{|
-      ipv4: string,
-      ipv6: string,
-      dnsName: string,
-      dnsSrvName: string,
-      port: string,
+      ipv4: string | null,
+      ipv6: string | null,
+      dnsName: string | null,
+      dnsSrvName: string | null,
+      port: string | null,
     |}>,
     +poolMetadata: null | {|
       +url: string,
@@ -195,31 +194,30 @@ export type RemoteGenesisKeyDelegationCert = {|
 |};
 export type RemoteMoveInstantaneousRewardsCert = {|
   +pot: number | ('Reserve' | 'Treasury'),
-  +rewards: Array<string>, // stakeCredential hex
-  // +rewards: {| [stake_credential: string]: string /* coin */ |},
+  +rewards: {| [stake_credential: string]: string /* coin */ |},
 |};
 export type RemoteCertificate = {|
-  cert_index: number,
+  certIndex: number,
   ...({|
-    +type: typeof ShelleyCertificateTypes.StakeRegistration,
+    +kind: typeof ShelleyCertificateTypes.StakeRegistration,
     ...RemoteStakeRegistrationCert,
   |} | {|
-    +type: typeof ShelleyCertificateTypes.StakeDeregistration,
+    +kind: typeof ShelleyCertificateTypes.StakeDeregistration,
     ...RemoteStakeDeregistrationCert,
   |} | {|
-    +type: typeof ShelleyCertificateTypes.StakeDelegation,
+    +kind: typeof ShelleyCertificateTypes.StakeDelegation,
     ...RemoteStakeDelegationCert,
   |} | {|
-    +type: typeof ShelleyCertificateTypes.PoolRegistration,
+    +kind: typeof ShelleyCertificateTypes.PoolRegistration,
     ...RemotePoolRegistrationCert,
   |} | {|
-    +type: typeof ShelleyCertificateTypes.PoolRetirement,
+    +kind: typeof ShelleyCertificateTypes.PoolRetirement,
     ...RemotePoolRetirementCert,
   |} | {|
-    +type: typeof ShelleyCertificateTypes.GenesisKeyDelegation,
+    +kind: typeof ShelleyCertificateTypes.GenesisKeyDelegation,
     ...RemoteGenesisKeyDelegationCert,
   |} | {|
-    +type: typeof ShelleyCertificateTypes.MoveInstantaneousRewardsCert,
+    +kind: typeof ShelleyCertificateTypes.MoveInstantaneousRewardsCert,
     ...RemoteMoveInstantaneousRewardsCert,
   |})
 |};
@@ -236,7 +234,7 @@ export type RemoteAccountState = {|
   withdrawals: string // all the withdrawals that have ever happened
 |};
 export type AccountStateResponse = {|
-  [key: string]: RemoteAccountState,
+  [key: string]: null | RemoteAccountState,
 |};
 export type AccountStateFunc = (body: AccountStateRequest) => Promise<AccountStateResponse>;
 
@@ -256,9 +254,6 @@ export type PoolInfoRequest = {|
   ids: Array<string>
 |};
 export type RemotePoolInfo = {|
-  +owner: string, // bech32
-  +pledge_address: string, // bech32
-
   // from pool metadata (off chain)
   +name?: string,
   +description?: string,

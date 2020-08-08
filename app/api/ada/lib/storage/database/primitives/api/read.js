@@ -1021,9 +1021,9 @@ export class GetCertificates {
     const certTable = db.getSchema().table(certSchema.name);
     const query = db
       .select()
-      .from(certAddrTable)
-      .innerJoin(
-        certTable,
+      .from(certTable)
+      .leftOuterJoin(
+        certAddrTable,
         certTable[certSchema.properties.CertificateId].eq(
           certAddrTable[certAddrSchema.properties.CertificateId]
         )
@@ -1033,7 +1033,7 @@ export class GetCertificates {
       ));
 
     const queryResult: $ReadOnlyArray<{|
-      CertificateAddress: $ReadOnly<CertificateAddressRow>,
+      CertificateAddress: null | $ReadOnly<CertificateAddressRow>,
       Certificate: $ReadOnly<CertificateRow>,
     |}> = await dbTx.attach(query);
 
@@ -1048,11 +1048,13 @@ export class GetCertificates {
         relationsForCert.set(
           result.Certificate.CertificateId,
           {
-            relatedAddresses: [result.CertificateAddress],
+            relatedAddresses: result.CertificateAddress == null
+              ? []
+              : [result.CertificateAddress],
             certificate: result.Certificate,
           }
         );
-      } else {
+      } else if (result.CertificateAddress != null) {
         entry.relatedAddresses.push(result.CertificateAddress);
       }
     }

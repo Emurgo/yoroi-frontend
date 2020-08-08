@@ -163,10 +163,12 @@ export class ModifyCardanoShelleyTx {
     ModifyTransaction: typeof ModifyTransaction,
     ModifyCertificate: typeof ModifyCertificate,
     ModifyUtxoTransaction: typeof ModifyUtxoTransaction,
+    ModifyAccountingTransaction: typeof ModifyAccountingTransaction,
   |} = Object.freeze({
     ModifyTransaction,
     ModifyCertificate,
     ModifyUtxoTransaction,
+    ModifyAccountingTransaction,
   });
 
   static async addTxWithIOs(
@@ -190,7 +192,9 @@ export class ModifyCardanoShelleyTx {
       block, transaction,
     } = request;
 
-    const newTx = await ModifyCardanoShelleyTx.depTables.ModifyTransaction.addNew(
+    const { depTables } = ModifyCardanoShelleyTx;
+
+    const newTx = await depTables.ModifyTransaction.addNew(
       db, tx,
       { block, transaction, }
     );
@@ -200,12 +204,12 @@ export class ModifyCardanoShelleyTx {
       accountingInputs,
     } = request.ioGen(newTx.transaction.TransactionId);
 
-    const utxo = await ModifyCardanoShelleyTx.depTables.ModifyUtxoTransaction.addIOsToTx(
+    const utxo = await depTables.ModifyUtxoTransaction.addIOsToTx(
       db, tx, {
         utxoInputs, utxoOutputs,
       }
     );
-    const accounting = await ModifyJormungandrTx.depTables.ModifyAccountingTransaction.addIOsToTx(
+    const accounting = await depTables.ModifyAccountingTransaction.addIOsToTx(
       db, tx, {
         accountingInputs, accountingOutputs: [],
       }
@@ -215,7 +219,7 @@ export class ModifyCardanoShelleyTx {
     for (const certGen of request.certificates) {
       const certRequest = certGen(newTx.transaction.TransactionId);
       if (certRequest != null) {
-        certificates.push(await ModifyJormungandrTx.depTables.ModifyCertificate.addNew(
+        certificates.push(await depTables.ModifyCertificate.addNew(
           db, tx,
           certRequest,
         ));

@@ -1110,7 +1110,9 @@ export default class AdaApi {
             Buffer.from(address, 'hex')
           )
         ) ?? (() => { throw new Error(`${nameof(AdaApi)}::${nameof(this.createUnsignedTx)} withdrawal not a reward address`); })(),
-        amount: RustModule.WalletV4.BigNum.from_str(accountStates[address].remainingAmount),
+        amount: accountStates[address] == null
+          ? RustModule.WalletV4.BigNum.from_str('0')
+          : RustModule.WalletV4.BigNum.from_str(accountStates[address].remainingAmount),
       }));
       const unsignedTxResponse = shelleyNewAdaUnsignedTx(
         [],

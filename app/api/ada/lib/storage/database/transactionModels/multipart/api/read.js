@@ -120,7 +120,7 @@ export class CardanoShelleyAssociateTxWithIOs {
     );
 
     const fullTx = request.txs.map(transaction  => ({
-      txType: TransactionType.CardanoByron,
+      txType: TransactionType.CardanoShelley,
       transaction,
       certificates: certsForTxs.get(transaction.TransactionId) ?? [],
       ...getOrThrow(utxo.get(transaction)),

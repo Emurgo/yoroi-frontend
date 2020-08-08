@@ -265,33 +265,32 @@ export class RemoteFetcher implements IFetcher {
   )
 
   getAccountState: AccountStateRequest => Promise<AccountStateResponse> = (body) => (
-    // axios(
-    //   `${backendUrl}/api/v2/account/state`,
-    //   {
-    //     method: 'post',
-    //     data: {
-    //       addresses: body.addresses
-    //     },
-    //     headers: {
-    //       'yoroi-version': this.getLastLaunchVersion(),
-    //       'yoroi-locale': this.getCurrentLocale()
-    //     }
-    //   }
-    // ).then(response => response.data)
-    //   .catch((error) => {
-    //     Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getAccountState)} error: ` + stringifyError(error));
-    //     throw new GetAccountStateApiError();
-    //   })
-    Promise.resolve({ [body.addresses[0]]: { remainingAmount: '0' }}) // TODO: replace when endpoint is implemented
+    axios(
+      `${backendUrl}/api/getAccountState`,
+      {
+        method: 'post',
+        data: {
+          addresses: body.addresses
+        },
+        headers: {
+          'yoroi-version': this.getLastLaunchVersion(),
+          'yoroi-locale': this.getCurrentLocale()
+        }
+      }
+    ).then(response => response.data)
+      .catch((error) => {
+        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getAccountState)} error: ` + stringifyError(error));
+        throw new GetAccountStateApiError();
+      })
   )
 
   getPoolInfo: PoolInfoRequest => Promise<PoolInfoResponse> = (body) => (
     axios(
-      `${backendUrl}/api/v2/pool/info`,
+      `${backendUrl}/api/getPoolInfo`,
       {
         method: 'post',
         data: {
-          ids: body.ids
+          poolIds: body.ids
         },
         headers: {
           'yoroi-version': this.getLastLaunchVersion(),
