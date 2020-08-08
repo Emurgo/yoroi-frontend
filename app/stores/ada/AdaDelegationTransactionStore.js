@@ -72,7 +72,7 @@ export default class AdaDelegationTransactionStore extends Store {
 
   setup(): void {
     super.setup();
-    this.reset();
+    this.reset({ justTransaction: false });
     const { ada } = this.actions;
     ada.delegationTransaction.createTransaction.listen(this._createTransaction);
     ada.delegationTransaction.signTransaction.listen(this._signTransaction);
@@ -207,10 +207,12 @@ export default class AdaDelegationTransactionStore extends Store {
   }
 
   @action.bound
-  reset(): void {
+  reset(request: {| justTransaction: boolean |}): void {
     this.signAndBroadcastDelegationTx.reset();
     this.createDelegationTx.reset();
-    this.isStale = false;
-    this.selectedPools = [];
+    if (!request.justTransaction) {
+      this.isStale = false;
+      this.selectedPools = [];
+    }
   }
 }

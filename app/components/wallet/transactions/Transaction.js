@@ -476,7 +476,7 @@ export default class Transaction extends Component<Props, State> {
                         // eslint-disable-next-line react/no-array-index-key
                         <div key={`${data.txid}-from-${address.address}-${addressIndex}`} className={styles.addressItem}>
                           <CopyableAddress
-                            hash={address.address}
+                            hash={this.props.addressToDisplayString(address.address)}
                             elementId={notificationElementId}
                             onCopyAddress={
                               () => onCopyAddressTooltip(address.address, notificationElementId)
@@ -530,7 +530,7 @@ export default class Transaction extends Component<Props, State> {
                           className={styles.addressItem}
                         >
                           <CopyableAddress
-                            hash={address.address}
+                            hash={this.props.addressToDisplayString(address.address)}
                             elementId={notificationElementId}
                             onCopyAddress={
                               () => onCopyAddressTooltip(address.address, notificationElementId)
