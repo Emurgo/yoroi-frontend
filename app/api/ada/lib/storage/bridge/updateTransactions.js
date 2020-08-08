@@ -106,10 +106,10 @@ import {
   genToAbsoluteSlotNumber,
 } from './timeUtils';
 import {
-  rawGenHashToIdsFunc,
+  rawGenHashToIdsFunc, rawGenFindOwnAddress,
 } from '../../../../common/lib/storage/bridge/hashMapper';
 import type {
-  HashToIdsFunc,
+  HashToIdsFunc, FindOwnAddressFunc,
 } from '../../../../common/lib/storage/bridge/hashMapper';
 import { STABLE_SIZE } from '../../../../../config/numbersConfig';
 import { RollbackApiError } from '../../../../common/errors';
@@ -317,6 +317,45 @@ export async function rawGetTransactions(
         *    Again, it's easier to say it's just whoever gets it
       */
       ownImplicitInput: new BigNumber(0),
+      ownImplicitOutput: (() => {
+        if (tx.txType === TransactionType.CardanoShelley) {
+          let implicitOutputSum = new BigNumber(0);
+          for (const cert of tx.certificates) {
+            if (
+              cert.certificate.Kind !==
+              RustModule.WalletV4.CertificateKind.MoveInstantaneousRewardsCert
+            ) {
+              continue;
+            }
+            // TODO: uncomment once this works in the WASM side
+            // const mir = RustModule.WalletV4.MoveInstantaneousRewardsCert.from_bytes(
+            //   Buffer.from(cert.certificate.Payload, 'hex')
+            // ).move_instantaneous_reward();
+
+            // for (const relatedAddr of cert.relatedAddresses) {
+            //   // recall: length of this list is usually just 1
+            //   for (const addr of addresses.accountingAddresses) {
+            //     if (relatedAddr.AddressId === addr.AddressId) {
+            //       // this address got some rewards inside the cert
+            //       const rewardAddr = RustModule.WalletV4.RewardAddress.from_address(
+            //         RustModule.WalletV4.Address.from_bytes(
+            //           Buffer.from(addr.Hash, 'hex')
+            //         )
+            //       );
+            //       if (rewardAddr == null) continue; // should never happen
+            //       const rewardAmount = mir.get(rewardAddr.payment_cred());
+            //       if (rewardAmount == null) continue; // should never happen
+            //       implicitOutputSum = implicitOutputSum.plus(
+            //         rewardAmount.to_str()
+            //       );
+            //     }
+            //   }
+            // }
+          }
+          return implicitOutputSum;
+        }
+        return new BigNumber(0);
+      })(),
     })
   }));
 
@@ -1143,6 +1182,9 @@ async function rawUpdateTransactions(
           ourIds,
           publicDeriver.getParent().getNetworkInfo()
         ),
+        findOwnAddress: rawGenFindOwnAddress(
+          ourIds
+        ),
         toAbsoluteSlotNumber,
         derivationTables,
       }
@@ -1186,6 +1228,7 @@ export async function updateTransactionBatch(
     txIds: Array<number>,
     txsFromNetwork: Array<RemoteTransaction>,
     hashToIds: HashToIdsFunc,
+    findOwnAddress: FindOwnAddressFunc,
     derivationTables: Map<number, string>,
   |}
 ): Promise<Array<{|
@@ -1285,6 +1328,7 @@ export async function updateTransactionBatch(
     request.derivationTables,
     unseenNewTxs,
     request.hashToIds,
+    request.findOwnAddress,
     request.toAbsoluteSlotNumber,
     TransactionSeed,
     BlockSeed,
@@ -1521,6 +1565,7 @@ async function networkTxToDbTx(
   derivationTables: Map<number, string>,
   newTxs: Array<RemoteTransaction>,
   hashToIds: HashToIdsFunc,
+  findOwnAddress: FindOwnAddressFunc,
   toAbsoluteSlotNumber: ToAbsoluteSlotNumberFunc,
   TransactionSeed: number,
   BlockSeed: number,
@@ -1595,6 +1640,7 @@ async function networkTxToDbTx(
           {
             certificates: networkTx.certificates,
             hashToIds,
+            findOwnAddress,
             derivationTables,
             network: Number.parseInt(baseConfig.ChainNetworkId, 10)
           }
@@ -1754,14 +1800,15 @@ async function certificateToDb(
     network: number,
     certificates: $ReadOnlyArray<RemoteCertificate>,
     hashToIds: HashToIdsFunc,
+    findOwnAddress: FindOwnAddressFunc,
     derivationTables: Map<number, string>,
   |},
 ): Promise<$ReadOnlyArray<number => AddCertificateRequest>> {
-  const existingAddressesMap = await request.hashToIds({
+  const findOwnAddress = async (addr: string) => await request.findOwnAddress({
     db,
     tx: dbTx,
     lockedTables: Array.from(request.derivationTables.values()),
-    hashes: []
+    hash: addr
   });
   const addressToId = async (bytes: string): Promise<number> => {
     const idMap = await request.hashToIds({
@@ -1776,7 +1823,9 @@ async function certificateToDb(
     }
     return id;
   };
-  const tryGetKey = (stakeCredentials: RustModule.WalletV4.StakeCredential): void | number => {
+  const tryGetKey = async (
+    stakeCredentials: RustModule.WalletV4.StakeCredential
+  ): Promise<void | number> => {
     // an operator/owner key might belong to the wallet
     // however, these keys are plain ED25519 hashes
     // there there is no way of knowing what address it corresponds to
@@ -1789,20 +1838,22 @@ async function certificateToDb(
         request.network,
         stakeCredentials
       );
-      const addressId = existingAddressesMap.get(
+      const ownAddress = await findOwnAddress(
         Buffer.from(rewardAddress.to_address().to_bytes()).toString('hex')
       );
-      if (addressId != null) return addressId;
+      if (ownAddress != null) {
+        return ownAddress;
+      }
     }
     {
       const enterpriseAddress = RustModule.WalletV4.EnterpriseAddress.new(
         request.network,
         stakeCredentials
       );
-      const addressId = existingAddressesMap.get(
+      const ownAddress = await findOwnAddress((
         Buffer.from(enterpriseAddress.to_address().to_bytes()).toString('hex')
-      );
-      if (addressId != null) return addressId;
+      ));
+      if (ownAddress != null) return ownAddress;
     }
     return undefined;
   };
@@ -1894,7 +1945,7 @@ async function certificateToDb(
         );
 
         { // pool key
-          const poolKeyId = tryGetKey(
+          const poolKeyId = await tryGetKey(
             RustModule.WalletV4.StakeCredential.from_keyhash(poolKeyHash)
           );
           if (poolKeyId != null) {
@@ -1943,7 +1994,7 @@ async function certificateToDb(
           Buffer.from(cert.pool_params.operator, 'hex')
         );
         { // operator
-          const operatorId = tryGetKey(
+          const operatorId = await tryGetKey(
             RustModule.WalletV4.StakeCredential.from_keyhash(operatorKey)
           );
           if (operatorId != null) {
@@ -1976,7 +2027,7 @@ async function certificateToDb(
             Buffer.from(owner, 'hex')
           );
           owners.add(ownerKey);
-          const ownerId = tryGetKey(
+          const ownerId = await tryGetKey(
             RustModule.WalletV4.StakeCredential.from_keyhash(ownerKey)
           );
           if (ownerId != null) {
@@ -2078,7 +2129,7 @@ async function certificateToDb(
           cert.epoch
         );
 
-        const poolKeyId = tryGetKey(
+        const poolKeyId = await tryGetKey(
           RustModule.WalletV4.StakeCredential.from_keyhash(poolKeyHash)
         );
         if (poolKeyId != null) {
@@ -2133,25 +2184,7 @@ async function certificateToDb(
           Relation: CertificateRelationType,
         |}> = [];
 
-        const pot = (() => {
-          if (typeof cert.pot === 'number') {
-            return cert.pot;
-          }
-          // TODO: remove the below if the backend ever returns a number
-          if (cert.pot === `${nameof(RustModule.WalletV4.MIRPot.Reserves)}`) {
-            return RustModule.WalletV4.MIRPot.Reserves;
-          }
-          if (cert.pot === `Reserve`) { // typo in backend
-            return RustModule.WalletV4.MIRPot.Reserves;
-          }
-          if (cert.pot === `${nameof(RustModule.WalletV4.MIRPot.Treasury)}`) {
-            return RustModule.WalletV4.MIRPot.Treasury;
-          }
-          // In the future, maybe some new pot gets added
-          // this would need to be added here
-        })();
-        if (pot == null) break;
-        const certPot = RustModule.WalletV4.MoveInstantaneousReward.new(pot);
+        const certPot = RustModule.WalletV4.MoveInstantaneousReward.new(cert.pot);
         for (const key of Object.keys(cert.rewards)) {
           const rewardAddress = RustModule.WalletV4.RewardAddress.from_address(
             RustModule.WalletV4.Address.from_bytes(
@@ -2166,7 +2199,7 @@ async function certificateToDb(
             RustModule.WalletV4.BigNum.from_str(cert.rewards[key])
           );
 
-          const rewardAddrKey = existingAddressesMap.get(
+          const rewardAddrKey = await findOwnAddress(
             Buffer.from(rewardAddress.to_address().to_bytes()).toString('hex')
           );
           if (rewardAddrKey != null) {

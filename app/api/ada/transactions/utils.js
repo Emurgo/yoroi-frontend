@@ -40,6 +40,7 @@ export function getFromUserPerspective(data: {|
   accountingInputs?: $ReadOnlyArray<$ReadOnly<AccountingTransactionInputRow>>,
   accountingOutputs?: $ReadOnlyArray<$ReadOnly<AccountingTransactionOutputRow>>,
   ownImplicitInput?: BigNumber,
+  ownImplicitOutput?: BigNumber,
   allOwnedAddressIds: Set<number>,
 |}): UserAnnotation {
   const unifiedInputs = [
@@ -61,7 +62,7 @@ export function getFromUserPerspective(data: {|
   const totalIn = sumInputsOutputs(unifiedInputs);
   const totalOut = sumInputsOutputs(unifiedOutputs);
   const ownIn = sumInputsOutputs(ownInputs).plus(data.ownImplicitInput ?? 0);
-  const ownOut = sumInputsOutputs(ownOutputs);
+  const ownOut = sumInputsOutputs(ownOutputs).plus(data.ownImplicitOutput ?? 0);
 
   const hasOnlyOwnInputs = ownInputs.length === unifiedInputs.length;
   const hasOnlyOwnOutputs = ownOutputs.length === unifiedOutputs.length;

@@ -233,17 +233,17 @@ export async function getRegistrationHistory(
     const relativeSlot = request.toRelativeSlotNumber(block.SlotNum);
 
     // calculate which certificate was active at the end of each epoch
-    if (result.currEpoch == null && relativeSlot.epoch <= request.currentEpoch) {
+    if (result.currEpoch === false && relativeSlot.epoch <= request.currentEpoch) {
       result.currEpoch = (
         delegation.certificate.Kind === RustModule.WalletV4.CertificateKind.StakeRegistration
       );
     }
-    if (result.prevEpoch == null && relativeSlot.epoch <= request.currentEpoch - 1) {
+    if (result.prevEpoch === false && relativeSlot.epoch <= request.currentEpoch - 1) {
       result.prevEpoch = (
         delegation.certificate.Kind === RustModule.WalletV4.CertificateKind.StakeRegistration
       );
     }
-    if (result.prevPrevEpoch == null && relativeSlot.epoch <= request.currentEpoch - 2) {
+    if (result.prevPrevEpoch === false && relativeSlot.epoch <= request.currentEpoch - 2) {
       result.prevPrevEpoch = (
         delegation.certificate.Kind === RustModule.WalletV4.CertificateKind.StakeRegistration
       );

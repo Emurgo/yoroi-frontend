@@ -746,7 +746,7 @@ export default class AdaApi {
         RustModule.WalletV4.Bip32PrivateKey.from_bytes(
           Buffer.from(normalizedKey.prvKeyHex, 'hex')
         ),
-        () => [],
+        await request.getStakingWitnesses(),
         undefined,
       );
 

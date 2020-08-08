@@ -112,11 +112,50 @@ async function addFromCanonical(
     const newAddr = await deps.ModifyAddress.addFromCanonicalByHash(db, tx, [{
       keyDerivationId,
       data: address.data,
-      type: CoreAddressTypes.JORMUNGANDR_GROUP,
+      type: address.type,
     }]);
     finalMapping.set(address.data, newAddr[0].AddressId);
     ownAddressIds.add(newAddr[0].AddressId);
   }
+}
+
+export type FindOwnAddressRequest = {|
+  db: lf$Database,
+  tx: lf$Transaction,
+  lockedTables: Array<string>,
+  hash: string,
+|};
+export type FindOwnAddressFunc = FindOwnAddressRequest => Promise<number | void>;
+
+export function rawGenFindOwnAddress(
+  ownAddressIds: Set<number>,
+): FindOwnAddressFunc {
+  return async (
+    request: FindOwnAddressRequest
+  ): Promise<number | void> => {
+    const deps = Object.freeze({
+      GetAddress,
+    });
+    const depsTables = Array.from(
+      getAllTables(...Object.keys(deps).map(key => deps[key]))
+    );
+    // to make sure all addresses get added in the same transaction
+    // we require the tables to be locked prior to calling this function
+    const locked = new Set(request.lockedTables);
+    for (const table of depsTables) {
+      if (!locked.has(table)) {
+        throw new Error(`${nameof(rawGenFindOwnAddress)} missing lock on ` + table);
+      }
+    }
+
+    const rows = await deps.GetAddress.getByHash(request.db, request.tx, [request.hash]);
+    for (const row of rows) {
+      if (ownAddressIds.has(row.AddressId)) {
+        return row.AddressId;
+      }
+    }
+    return undefined;
+  };
 }
 
 export type HashToIdsRequest = {|
