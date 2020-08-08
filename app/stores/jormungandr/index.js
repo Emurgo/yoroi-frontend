@@ -8,7 +8,7 @@ import JormungandrDaedalusTransferStore from './JormungandrDaedalusTransferStore
 import JormungandrYoroiTransferStore from './JormungandrYoroiTransferStore';
 import JormungandrStateFetchStore from './JormungandrStateFetchStore';
 import JormungandrWalletRestoreStore from './JormungandrWalletRestoreStore';
-import DelegationTransactionStore from './DelegationTransactionStore';
+import JormungandrDelegationTransactionStore from './JormungandrDelegationTransactionStore';
 import JormungandrDelegationStore from './JormungandrDelegationStore';
 import JormungandrTimeStore from './JormungandrTimeStore';
 import type { ActionsMap } from '../../actions/index';
@@ -23,7 +23,7 @@ export const jormungandrStoreClasses = Object.freeze({
   yoroiTransfer: JormungandrYoroiTransferStore,
   stateFetchStore: JormungandrStateFetchStore,
   walletRestore: JormungandrWalletRestoreStore,
-  delegationTransaction: DelegationTransactionStore,
+  delegationTransaction: JormungandrDelegationTransactionStore,
   delegation: JormungandrDelegationStore,
   time: JormungandrTimeStore,
 });
@@ -36,7 +36,7 @@ export type JormungandrStoresMap = {|
   yoroiTransfer: JormungandrYoroiTransferStore,
   stateFetchStore: JormungandrStateFetchStore,
   walletRestore: JormungandrWalletRestoreStore,
-  delegationTransaction: DelegationTransactionStore,
+  delegationTransaction: JormungandrDelegationTransactionStore,
   delegation: JormungandrDelegationStore,
   time: JormungandrTimeStore,
 |};

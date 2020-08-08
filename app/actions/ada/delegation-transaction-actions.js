@@ -13,5 +13,5 @@ export default class DelegationTransactionActions {
     publicDeriver: PublicDeriver<>,
   |}> = new AsyncAction();
   complete: Action<void> = new Action();
-  reset: Action<void> = new Action();
+  reset: Action<{| justTransaction: boolean |}> = new Action();
 }

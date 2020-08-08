@@ -51,10 +51,10 @@ export default class CardanoStakingPage extends Component<Props> {
   @observable notificationElementId: string = '';
 
   cancel: void => void = () => {
-    this.generated.actions.ada.delegationTransaction.reset.trigger();
+    this.generated.actions.ada.delegationTransaction.reset.trigger({ justTransaction: true });
   }
   componentWillUnmount() {
-    this.cancel();
+    this.generated.actions.ada.delegationTransaction.reset.trigger({ justTransaction: false });
     this.generated.actions.ada.delegationTransaction.setPools.trigger([]);
     this.generated.stores.delegation.poolInfoQuery.reset();
   }
@@ -330,7 +330,7 @@ export default class CardanoStakingPage extends Component<Props> {
               publicDeriver: PublicDeriver<>
             |}) => Promise<void>
           |},
-          reset: {| trigger: (params: void) => void |},
+          reset: {| trigger: (params: {| justTransaction: boolean |}) => void |},
           setPools: {|
             trigger: (params: Array<string>) => Promise<void>,
           |},

@@ -19,7 +19,7 @@ import {
 import type { PoolRequest } from '../../api/jormungandr/lib/storage/bridge/delegationUtils';
 import type { SelectedPool } from '../../actions/jormungandr/delegation-transaction-actions';
 
-export default class DelegationTransactionStore extends Store {
+export default class JormungandrDelegationTransactionStore extends Store {
 
   @observable selectedPools: Array<SelectedPool>;
 
@@ -27,8 +27,8 @@ export default class DelegationTransactionStore extends Store {
     = new LocalizedRequest<CreateDelegationTxFunc>(this.api.jormungandr.createDelegationTx);
 
   @observable signAndBroadcastDelegationTx: LocalizedRequest<
-    typeof DelegationTransactionStore.prototype.sendAndRefresh
-  > = new LocalizedRequest<typeof DelegationTransactionStore.prototype.sendAndRefresh>(
+    typeof JormungandrDelegationTransactionStore.prototype.sendAndRefresh
+  > = new LocalizedRequest<typeof JormungandrDelegationTransactionStore.prototype.sendAndRefresh>(
     this.sendAndRefresh
   );
 
@@ -93,7 +93,7 @@ export default class DelegationTransactionStore extends Store {
       request.publicDeriver
     );
     if (delegationRequests == null) {
-      throw new Error(`${nameof(DelegationTransactionStore)}::${nameof(this._createTransaction)} called for non-reward wallet`);
+      throw new Error(`${nameof(JormungandrDelegationTransactionStore)}::${nameof(this._createTransaction)} called for non-reward wallet`);
     }
     const delegationTxPromise = this.createDelegationTx.execute({
       publicDeriver: basePubDeriver,

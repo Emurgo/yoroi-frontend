@@ -82,6 +82,7 @@ export default class StakingDashboardPage extends Component<Props> {
     await timeCalcRequests.requests.toRealTime.execute().promise;
     await timeCalcRequests.requests.currentEpochLength.execute().promise;
     await timeCalcRequests.requests.currentSlotLength.execute().promise;
+    await timeCalcRequests.requests.timeSinceGenesis.execute().promise;
   }
 
   componentWillUnmount() {
