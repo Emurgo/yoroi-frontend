@@ -750,11 +750,11 @@ export default class Transaction extends Component<Props, State> {
         (acc, curr, idx) => {
           const newElem = (
             // eslint-disable-next-line react/no-array-index-key
-            <span key={idx}>{this.shelleyCertificateToText(curr.certificate)}</span>
+            <span key={idx}>
+              {acc.length !== 0 ? (<br />) : undefined}
+              {this.shelleyCertificateToText(curr.certificate)}
+            </span>
           );
-          if (acc.length !== 0) {
-            acc.push(<br />);
-          }
           acc.push(newElem);
           return acc;
         },

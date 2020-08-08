@@ -126,7 +126,7 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
     notification: ?Notification,
   ): Node {
     return (
-      <div key={title}>
+      <>
         <h2 className={styles.addressLabel}>
           {title}
         </h2>
@@ -155,7 +155,7 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
             </CopyableAddress>
           );
         })}
-      </div>
+      </>
     );
   }
 
@@ -292,9 +292,9 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
         <DialogTextBlock subclass="component-bottom">
           {addressElems.map((elem, i) => {
             if (i === 0) {
-              return <>{elem}</>;
+              return <span key={i}>{elem}</span>;
             }
-            return <><br />{elem}</>;
+            return <span key={i}><br />{elem}</span>;
           })}
         </DialogTextBlock>
 

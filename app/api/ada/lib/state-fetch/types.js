@@ -148,13 +148,13 @@ export const ShelleyCertificateTypes = Object.freeze({
 });
 
 export type RemoteStakeRegistrationCert = {|
-  +stakeCredential: string, // hex
+  +rewardAddress: string, // hex
 |};
 export type RemoteStakeDeregistrationCert = {|
-  +stakeCredential: string, // hex
+  +rewardAddress: string, // hex
 |};
 export type RemoteStakeDelegationCert = {|
-  +stakeCredential: string, // hex
+  +rewardAddress: string, // hex
   +poolKeyHash: string, // hex
 |};
 export type RemotePoolRegistrationCert = {|
@@ -194,8 +194,7 @@ export type RemoteGenesisKeyDelegationCert = {|
 |};
 export type RemoteMoveInstantaneousRewardsCert = {|
   +pot: number | ('Reserve' | 'Treasury'),
-  +rewards: Array<string>, // stakeCredential hex
-  // +rewards: {| [stake_credential: string]: string /* coin */ |},
+  +rewards: {| [stake_credential: string]: string /* coin */ |},
 |};
 export type RemoteCertificate = {|
   certIndex: number,
@@ -255,9 +254,6 @@ export type PoolInfoRequest = {|
   ids: Array<string>
 |};
 export type RemotePoolInfo = {|
-  +owner: string, // bech32
-  +pledge_address: string, // bech32
-
   // from pool metadata (off chain)
   +name?: string,
   +description?: string,

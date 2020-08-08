@@ -1814,7 +1814,7 @@ async function certificateToDb(
       case ShelleyCertificateTypes.StakeRegistration: {
         const stakeCredentials = RustModule.WalletV4.RewardAddress.from_address(
           RustModule.WalletV4.Address.from_bytes(
-            Buffer.from(cert.stakeCredential, 'hex')
+            Buffer.from(cert.rewardAddress, 'hex')
           )
         )?.payment_cred();
         if (stakeCredentials == null) throw new Error(`${nameof(certificateToDb)} not a valid reward account`);
@@ -1845,7 +1845,7 @@ async function certificateToDb(
       case ShelleyCertificateTypes.StakeDeregistration: {
         const stakeCredentials = RustModule.WalletV4.RewardAddress.from_address(
           RustModule.WalletV4.Address.from_bytes(
-            Buffer.from(cert.stakeCredential, 'hex')
+            Buffer.from(cert.rewardAddress, 'hex')
           )
         )?.payment_cred();
         if (stakeCredentials == null) throw new Error(`${nameof(certificateToDb)} not a valid reward account`);
@@ -1881,7 +1881,7 @@ async function certificateToDb(
 
         const stakeCredentials = RustModule.WalletV4.RewardAddress.from_address(
           RustModule.WalletV4.Address.from_bytes(
-            Buffer.from(cert.stakeCredential, 'hex')
+            Buffer.from(cert.rewardAddress, 'hex')
           )
         )?.payment_cred();
         if (stakeCredentials == null) throw new Error(`${nameof(certificateToDb)} not a valid reward account`);
@@ -2152,49 +2152,28 @@ async function certificateToDb(
         })();
         if (pot == null) break;
         const certPot = RustModule.WalletV4.MoveInstantaneousReward.new(pot);
-        // TODO: remove this block with the proper block when backend supports it
-        if (Array.isArray(cert.rewards)) {
-          for (const key of cert.rewards) {
-            const rewardAddress = RustModule.WalletV4.RewardAddress.from_address(
-              RustModule.WalletV4.Address.from_bytes(
-                Buffer.from(key, 'hex')
-              )
-            );
-            if (rewardAddress == null) throw new Error(`${nameof(certificateToDb)} not a valid reward account`);
-            const rewardAddrKey = existingAddressesMap.get(
-              Buffer.from(rewardAddress.to_address().to_bytes()).toString('hex')
-            );
-            if (rewardAddrKey != null) {
-              relatedAddressesInfo.push({
-                AddressId: rewardAddrKey,
-                Relation: CertificateRelation.REWARD_ADDRESS
-              });
-            }
-          }
-        } else {
-          for (const key of Object.keys(cert.rewards)) {
-            const rewardAddress = RustModule.WalletV4.RewardAddress.from_address(
-              RustModule.WalletV4.Address.from_bytes(
-                Buffer.from(key, 'hex')
-              )
-            );
-            if (rewardAddress == null) throw new Error(`${nameof(certificateToDb)} not a valid reward account`);
-            const stakeCredentials = rewardAddress.payment_cred();
-            if (stakeCredentials == null) throw new Error(`${nameof(certificateToDb)} not a valid reward account`);
-            certPot.insert(
-              stakeCredentials,
-              RustModule.WalletV4.BigNum.from_str(cert.rewards[key])
-            );
+        for (const key of Object.keys(cert.rewards)) {
+          const rewardAddress = RustModule.WalletV4.RewardAddress.from_address(
+            RustModule.WalletV4.Address.from_bytes(
+              Buffer.from(key, 'hex')
+            )
+          );
+          if (rewardAddress == null) throw new Error(`${nameof(certificateToDb)} not a valid reward account`);
+          const stakeCredentials = rewardAddress.payment_cred();
+          if (stakeCredentials == null) throw new Error(`${nameof(certificateToDb)} not a valid reward account`);
+          certPot.insert(
+            stakeCredentials,
+            RustModule.WalletV4.BigNum.from_str(cert.rewards[key])
+          );
 
-            const rewardAddrKey = existingAddressesMap.get(
-              Buffer.from(rewardAddress.to_address().to_bytes()).toString('hex')
-            );
-            if (rewardAddrKey != null) {
-              relatedAddressesInfo.push({
-                AddressId: rewardAddrKey,
-                Relation: CertificateRelation.REWARD_ADDRESS
-              });
-            }
+          const rewardAddrKey = existingAddressesMap.get(
+            Buffer.from(rewardAddress.to_address().to_bytes()).toString('hex')
+          );
+          if (rewardAddrKey != null) {
+            relatedAddressesInfo.push({
+              AddressId: rewardAddrKey,
+              Relation: CertificateRelation.REWARD_ADDRESS
+            });
           }
         }
         const certificate = RustModule.WalletV4.MoveInstantaneousRewardsCert.new(certPot);

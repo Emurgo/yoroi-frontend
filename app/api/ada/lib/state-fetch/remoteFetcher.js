@@ -290,31 +290,14 @@ export class RemoteFetcher implements IFetcher {
       {
         method: 'post',
         data: {
-          ids: body.ids
+          poolIds: body.ids
         },
         headers: {
           'yoroi-version': this.getLastLaunchVersion(),
           'yoroi-locale': this.getCurrentLocale()
         }
       }
-    ).then(response => {
-      // backend returns some weird response if the pool doesn't exist
-      // I change this to be just "null"
-      const newResult: PoolInfoResponse = {};
-      for (const key of Object.keys(response.data)) {
-        const backendValue = response.data[key];
-        if (backendValue === null) { // future proof in case API changes to return null
-          newResult[key] = null;
-          continue;
-        }
-        if (backendValue?.history.length === 0 && backendValue?.info?.pledge_address === null) {
-          newResult[key] = null;
-          continue;
-        }
-        newResult[key] = backendValue;
-      }
-      return newResult;
-    })
+    ).then(response => response.data)
       .catch((error) => {
         Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getPoolInfo)} error: ` + stringifyError(error));
         throw new GetPoolInfoApiError();
