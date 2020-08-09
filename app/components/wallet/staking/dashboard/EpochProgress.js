@@ -37,6 +37,7 @@ type Props = {|
   percentage: number,
   currentEpoch: number,
   endTime: {|
+    d?: string,
     h: string,
     m: string,
     s: string,

@@ -58,11 +58,19 @@ export default class EpochProgressContainer extends Component<Props> {
       (1000 * secondsLeftInEpoch) - currTimeRequests.msIntoSlot
     );
 
+    // only show a days column if there can be one in the first place
+    const hasDays = new Date(
+      (1000 * epochLength * getSlotLength()) - currTimeRequests.msIntoSlot
+    ).getUTCDate() > 1;
+
     return (
       <EpochProgress
         currentEpoch={currTimeRequests.currentEpoch}
         percentage={Math.floor(100 * currTimeRequests.currentSlot / epochLength)}
         endTime={{
+          d: hasDays
+            ? this._leftPadDate(timeLeftInEpoch.getUTCDate())
+            : undefined,
           h: this._leftPadDate(timeLeftInEpoch.getUTCHours()),
           m: this._leftPadDate(timeLeftInEpoch.getUTCMinutes()),
           s: this._leftPadDate(timeLeftInEpoch.getUTCSeconds()),

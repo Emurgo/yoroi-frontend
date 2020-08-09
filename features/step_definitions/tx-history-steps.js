@@ -193,7 +193,7 @@ const displayInfo = {
       ['Ae2tdPwUPE...BA7XbSMhKd', 'BYRON - INTERNAL', '+0.650000 ADA'],
     ],
     txId: '0a073669845fea4ae83cd4418a0b4fd56610097a89601a816b5891f667e3496c',
-    txConfirmations: 'High. 103 confirmations.',
+    txConfirmations: 'High. 101 confirmations.',
     txFee: '0.169999',
   },
   'simple-pending-wallet': {
