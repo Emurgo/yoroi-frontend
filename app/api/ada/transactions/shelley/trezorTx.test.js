@@ -172,6 +172,18 @@ test('Create Trezor transaction', async () => {
       RustModule.WalletV4.BigNum.from_str('5326134')
     )
   );
+  const certs = RustModule.WalletV4.Certificates.new();
+  certs.add(RustModule.WalletV4.Certificate.new_stake_registration(
+    RustModule.WalletV4.StakeRegistration.new(
+      RustModule.WalletV4.StakeCredential.from_keyhash(
+        // note: this key doesn't belong to the wallet sending the transaction
+        RustModule.WalletV4.PrivateKey.from_extended_bytes(
+          Buffer.from('40f11e8501f0695cebdb9e980e007c3979a7dc958af16693d62c45e849d507589029b318010a87ad66465b1384afe4d70573a24eaf2ede273aa1e6a6177d5196', 'hex')
+        ).to_public().hash()
+      )
+    )
+  ));
+  txBuilder.set_certs(certs);
   txBuilder.set_fee(RustModule.WalletV4.BigNum.from_str('1000'));
   txBuilder.set_ttl(500);
 
@@ -215,6 +227,16 @@ test('Create Trezor transaction', async () => {
     outputs: [{
       address: 'Ae2tdPwUPEZAVDjkPPpwDhXMSAjH53CDmd2xMwuR9tZMAZWxLhFphrHKHXe',
       amount: `5326134`
+    }],
+    certificates: [{
+      path: [
+        2147483692,
+        2147485463,
+        2147483648,
+        2,
+        0,
+      ],
+      type: 0,
     }],
   });
 });

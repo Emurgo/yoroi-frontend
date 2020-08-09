@@ -51,13 +51,14 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
   }
 
   fee(shift: boolean): BigNumber {
-    const fee = this.signRequest.unsignedTx.get_fee_or_calc();
-    const result = new BigNumber(fee.to_str());
+    const fee = new BigNumber(
+      this.signRequest.unsignedTx.get_fee_if_set()?.to_str() || '0'
+    ).plus(this.signRequest.unsignedTx.get_deposit().to_str());
 
     if (shift) {
-      return result.shiftedBy(-getAdaCurrencyMeta().decimalPlaces.toNumber());
+      return fee.shiftedBy(-getAdaCurrencyMeta().decimalPlaces.toNumber());
     }
-    return result;
+    return fee;
   }
 
   receivers(includeChange: boolean): Array<string> {

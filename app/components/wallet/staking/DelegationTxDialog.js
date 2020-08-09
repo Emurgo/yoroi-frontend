@@ -8,8 +8,6 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { action, observable } from 'mobx';
 import classnames from 'classnames';
-import { Input } from 'react-polymorph/lib/components/Input';
-import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
 import AmountInputSkin from '../skins/AmountInputSkin';
 import { NumericInput } from 'react-polymorph/lib/components/NumericInput';
 import { defineMessages, intlShape } from 'react-intl';
@@ -58,9 +56,10 @@ type Props = {|
   +amountToDelegate: BigNumber,
   +transactionFee: BigNumber,
   +approximateReward: BigNumber,
+  +isHardware: boolean,
   +isSubmitting: boolean,
   +onCancel: void => void,
-  +onSubmit: ({| password: string |}) => PossiblyAsync<void>,
+  +onSubmit: ({| password?: string |}) => PossiblyAsync<void>,
   +classicTheme: boolean,
   +error: ?LocalizableError,
   +meta: {|
@@ -84,13 +83,14 @@ export default class DelegationTxDialog extends Component<Props> {
   }
 
   submit(): void {
-    this.spendingPasswordForm?.submit({
+    if (this.spendingPasswordForm == null) {
+      this.props.onSubmit(Object.freeze({}));
+      return;
+    }
+    this.spendingPasswordForm.submit({
       onSuccess: async (form) => {
         const { walletPassword } = form.values();
-        const transactionData = {
-          password: walletPassword,
-        };
-        await this.props.onSubmit(transactionData);
+        await this.props.onSubmit({ password: walletPassword });
       },
       onError: () => {}
     });
@@ -99,11 +99,13 @@ export default class DelegationTxDialog extends Component<Props> {
   render(): Node {
     const { intl } = this.context;
 
-    const spendingPasswordForm = (<SpendingPasswordInput
-      setForm={(form) => this.setSpendingPasswordForm(form)}
-      classicTheme={this.props.classicTheme}
-      isSubmitting={this.props.isSubmitting}
-    />);
+    const spendingPasswordForm = this.props.isHardware
+      ? undefined
+      : (<SpendingPasswordInput
+        setForm={(form) => this.setSpendingPasswordForm(form)}
+        classicTheme={this.props.classicTheme}
+        isSubmitting={this.props.isSubmitting}
+      />);
 
     const staleTxWarning = (
       <div className={styles.warningBox}>

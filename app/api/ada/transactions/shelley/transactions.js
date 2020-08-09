@@ -148,7 +148,7 @@ export function sendAllUnsignedTxFromUtxo(
     addUtxoInput(txBuilder, input);
   }
 
-  if (totalBalance.lt(txBuilder.estimate_fee().to_str())) {
+  if (totalBalance.lt(txBuilder.min_fee().to_str())) {
     // not enough in inputs to even cover the cost of including themselves in a tx
     throw new NotEnoughMoneyToSendError();
   }
@@ -314,7 +314,11 @@ export function newAdaUnsignedTxFromUtxo(
       currentInputSum = currentInputSum.plus(utxo.amount);
       addUtxoInput(txBuilder, utxo);
       const output = new BigNumber(
-        txBuilder.get_explicit_output().checked_add(txBuilder.estimate_fee()).to_str()
+        txBuilder
+          .get_explicit_output()
+          .checked_add(txBuilder.min_fee())
+          .checked_add(txBuilder.get_deposit())
+          .to_str()
       );
 
       if (currentInputSum.gte(output)) {
@@ -324,7 +328,11 @@ export function newAdaUnsignedTxFromUtxo(
     // check to see if we have enough balance in the wallet to cover the transaction
     {
       const output = new BigNumber(
-        txBuilder.get_explicit_output().checked_add(txBuilder.estimate_fee()).to_str()
+        txBuilder
+          .get_explicit_output()
+          .checked_add(txBuilder.min_fee())
+          .checked_add(txBuilder.get_deposit())
+          .to_str()
       );
       if (currentInputSum.lt(output)) {
         throw new NotEnoughMoneyToSendError();
@@ -336,14 +344,20 @@ export function newAdaUnsignedTxFromUtxo(
     if (changeAdaAddr == null) {
       const totalInput = txBuilder.get_explicit_input().checked_add(txBuilder.get_implicit_input());
       const totalOutput = txBuilder.get_explicit_output();
-      const fee = new BigNumber(totalInput.checked_sub(totalOutput).to_str());
-      const minFee = new BigNumber(txBuilder.estimate_fee().to_str());
-      if (fee.lt(minFee)) {
+      const deposit = txBuilder.get_deposit();
+      const difference = new BigNumber(
+        totalInput
+          .checked_sub(totalOutput)
+          .checked_sub(deposit)
+          .to_str()
+      );
+      const minFee = new BigNumber(txBuilder.min_fee().to_str());
+      if (difference.lt(minFee)) {
         throw new NotEnoughMoneyToSendError();
       }
       // recall: min fee assumes the largest fee possible
       // so no worries of cbor issue by including larger fee
-      txBuilder.set_fee(RustModule.WalletV4.BigNum.from_str(fee.toString()));
+      txBuilder.set_fee(RustModule.WalletV4.BigNum.from_str(difference.toString()));
       return [];
     }
     const oldOutput = txBuilder.get_explicit_output();

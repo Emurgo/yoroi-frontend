@@ -11,6 +11,7 @@ export type SendUsingTrezorParams = {|
 
 export default class TrezorSendActions {
   cancel: Action<void> = new Action();
+  reset: Action<void> = new Action();
   sendUsingTrezor: AsyncAction<{|
     params: SendUsingTrezorParams,
     publicDeriver: PublicDeriver<>,

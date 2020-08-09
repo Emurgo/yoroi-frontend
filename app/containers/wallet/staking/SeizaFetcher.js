@@ -30,6 +30,7 @@ import type {
   CreateDelegationTxFunc,
 } from '../../../api/jormungandr/index';
 import { getApiForNetwork, getApiMeta } from '../../../api/common/utils';
+import { WalletTypeOption, } from '../../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 
 declare var CONFIG: ConfigType;
 
@@ -207,6 +208,9 @@ export default class SeizaFetcher extends Component<Props> {
           isSubmitting={
             delegationTxStore.signAndBroadcastDelegationTx.isExecuting
           }
+          isHardware={
+            selectedWallet.getParent().getWalletType() === WalletTypeOption.HARDWARE_WALLET
+          }
           onCancel={this.cancel}
           onSubmit={({ password }) => delegationTxActions.signTransaction.trigger({
             password,
@@ -268,7 +272,7 @@ export default class SeizaFetcher extends Component<Props> {
           |},
           signTransaction: {|
             trigger: (params: {|
-              password: string,
+              password?: string,
               publicDeriver: PublicDeriver<>
             |}) => Promise<void>
           |}

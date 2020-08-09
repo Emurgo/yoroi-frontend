@@ -788,7 +788,7 @@ export default class StakingDashboardPage extends Component<Props> {
           reset: {| trigger: (params: void) => void |},
           signTransaction: {|
             trigger: (params: {|
-              password: string,
+              password?: string,
               publicDeriver: PublicDeriver<>
             |}) => Promise<void>
           |}

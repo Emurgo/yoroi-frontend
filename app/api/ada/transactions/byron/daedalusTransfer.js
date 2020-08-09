@@ -56,7 +56,9 @@ export async function buildDaedalusTransferTx(payload: {|
       payload.absSlotNumber,
       payload.protocolParams,
     );
-    const fee = new BigNumber(unsignedTxResponse.txBuilder.get_fee_or_calc().to_str());
+    const fee = new BigNumber(
+      unsignedTxResponse.txBuilder.get_fee_if_set()?.to_str() || '0'
+    ).plus(unsignedTxResponse.txBuilder.get_deposit().to_str());
 
     // sign
     const signedTx = signDaedalusTransaction(

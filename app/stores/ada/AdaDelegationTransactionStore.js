@@ -154,15 +154,10 @@ export default class AdaDelegationTransactionStore extends Store {
     password?: string,
     publicDeriver: PublicDeriver<>,
   |} => Promise<void> = async (request) => {
-    const withSigning = (asGetSigningKey(request.publicDeriver));
-    if (withSigning == null) {
-      throw new Error(`${nameof(this._signTransaction)} public deriver missing signing functionality.`);
-    }
-    const withStakingKey = asGetAllAccounting(withSigning);
+    const withStakingKey = asGetAllAccounting(request.publicDeriver);
     if (withStakingKey == null) {
       throw new Error(`${nameof(this._signTransaction)} missing staking key functionality`);
     }
-    const basePubDeriver = withStakingKey;
 
     const result = this.createDelegationTx.result;
     if (result == null) {
@@ -172,7 +167,7 @@ export default class AdaDelegationTransactionStore extends Store {
       await this.signAndBroadcastDelegationTx.execute({
         broadcastRequest: {
           trezor: {
-            publicDeriver: basePubDeriver,
+            publicDeriver: withStakingKey,
             signRequest: result.signTxRequest,
           }
         },
@@ -182,6 +177,11 @@ export default class AdaDelegationTransactionStore extends Store {
       }).promise;
       return;
     }
+    // normal password-based wallet
+    const withSigning = (asGetSigningKey(withStakingKey));
+    if (withSigning == null) {
+      throw new Error(`${nameof(this._signTransaction)} public deriver missing signing functionality.`);
+    }
     if (request.password == null) {
       throw new Error(`${nameof(this._signTransaction)} missing password for non-hardware signing`);
     }
@@ -189,10 +189,10 @@ export default class AdaDelegationTransactionStore extends Store {
     await this.signAndBroadcastDelegationTx.execute({
       broadcastRequest: {
         normal: {
-          publicDeriver: basePubDeriver,
+          publicDeriver: withSigning,
           signRequest: result.signTxRequest,
           getStakingWitnesses: async () => await genOwnStakingKey({
-            publicDeriver: basePubDeriver,
+            publicDeriver: withSigning,
             password,
           }),
           password: request.password,
@@ -235,10 +235,15 @@ export default class AdaDelegationTransactionStore extends Store {
       }
     };
     if (request.broadcastRequest.trezor) {
-      this.actions.ada.trezorSend.sendUsingTrezor.trigger({
+      await this.actions.ada.trezorSend.sendUsingTrezor.trigger({
         params: { signRequest: request.broadcastRequest.trezor.signRequest },
         publicDeriver: request.broadcastRequest.trezor.publicDeriver,
       });
+      const { error } = this.stores.substores.ada.trezorSend;
+      this.actions.ada.trezorSend.reset.trigger();
+      if (error) {
+        throw error;
+      }
     }
     if (request.broadcastRequest.normal) {
       await this.api.ada.signAndBroadcast(

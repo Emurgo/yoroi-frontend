@@ -217,7 +217,7 @@ describe('Create unsigned TX from UTXO', () => {
     expect(unsignedTxResponse.senderUtxos).toEqual([utxos[0], utxos[1]]);
     expect(unsignedTxResponse.txBuilder.get_explicit_input().to_str()).toEqual('1000702');
     expect(unsignedTxResponse.txBuilder.get_explicit_output().to_str()).toEqual('999528');
-    expect(unsignedTxResponse.txBuilder.estimate_fee().to_str()).toEqual('1154');
+    expect(unsignedTxResponse.txBuilder.min_fee().to_str()).toEqual('1166');
   });
 });
 
@@ -240,7 +240,7 @@ describe('Create unsigned TX from addresses', () => {
 
     expect(unsignedTxResponse.txBuilder.get_explicit_input().to_str()).toEqual('1000702');
     expect(unsignedTxResponse.txBuilder.get_explicit_output().to_str()).toEqual('5001');
-    expect(unsignedTxResponse.txBuilder.estimate_fee().to_str()).toEqual('1056');
+    expect(unsignedTxResponse.txBuilder.min_fee().to_str()).toEqual('1064');
     // burns remaining amount
     expect(
       unsignedTxResponse.txBuilder.get_explicit_input().checked_sub(
@@ -446,8 +446,8 @@ describe('Create signed transactions', () => {
     ].sort();
 
     expect(witArray).toEqual([
-      '82582001c01f8b958699ae769a246e9785db5a70e023977ea4b856dfacf23c23346caf584020a6884b523bc4ec018703126de273b589a28fad69dd0d77509ae722b7694fcd11698194177b50598ed8821b09eff93fb77185e1b3554aef92c28215f1bad604',
-      '82582038c14a0756e1743081a8ebfdb9169b11283a7bf6c38045c4c4a5e62a7689639d58402805b2e48b8c7872bc4c837c1b0cadd9585fcdea188eaf39055760d059281f7e62211fbff01bd34b0e9d78b62b964f53bc13503417220f4bf5b837df49e2ca08',
+      '82582001c01f8b958699ae769a246e9785db5a70e023977ea4b856dfacf23c23346caf58401b10a18433be709391e70a82c4de91d1c8b3cb27dfa7c7d19a247a4dfe5dea437a0ebefe3ced5f6f7ad2bc79b11c5556614f8bec19b87fc5145a13edc3ae320f',
+      '82582038c14a0756e1743081a8ebfdb9169b11283a7bf6c38045c4c4a5e62a7689639d58403a56ed05738ec98589a1263281bfd33ec5f0bed3f90eafced8ed8652be65f3327487cb487dde0d26ca9a7ce568a4c05367630baec47a5d771ba7b184161b100d',
     ]);
   });
 
@@ -555,7 +555,7 @@ describe('Create sendAll unsigned TX from UTXO', () => {
       expect(sendAllResponse.senderUtxos).toEqual([utxos[0], utxos[1]]);
       expect(sendAllResponse.txBuilder.get_explicit_input().to_str()).toEqual('11000002');
       expect(sendAllResponse.txBuilder.get_explicit_output().to_str()).toEqual('10998652');
-      expect(sendAllResponse.txBuilder.estimate_fee().to_str()).toEqual('1330');
+      expect(sendAllResponse.txBuilder.min_fee().to_str()).toEqual('1342');
       // make sure we don't accidentally burn a lot of coins
       expect(
         sendAllResponse.txBuilder.get_explicit_input().checked_sub(

@@ -47,9 +47,10 @@ export default class TrezorSendStore extends Store {
     const trezorSendAction = this.actions.ada.trezorSend;
     trezorSendAction.sendUsingTrezor.listen(this._sendUsingTrezor);
     trezorSendAction.cancel.listen(this._cancel);
+    trezorSendAction.reset.listen(this._reset);
   }
 
-  _reset(): void {
+  _reset: void => void = () => {
     this._setActionProcessing(false);
     this._setError(null);
   }
