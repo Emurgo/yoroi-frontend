@@ -4,7 +4,6 @@ import cryptoRandomString from 'crypto-random-string';
 import type {
   SignedRequestInternal, SignedResponse,
   RemoteTransaction,
-  TxBodiesFunc,
   UtxoSumFunc,
   PoolInfoFunc,
   AddressUtxoFunc,

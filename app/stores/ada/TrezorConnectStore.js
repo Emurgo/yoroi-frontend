@@ -401,7 +401,7 @@ export default class TrezorConnectStore
       || this.hwDeviceInfo.hwFeatures == null) {
       throw new Error('Trezor device hardware info not valid');
     }
-    const { publicMasterKey, hwFeatures} = this.hwDeviceInfo;
+    const { publicMasterKey, hwFeatures } = this.hwDeviceInfo;
 
     const persistentDb = this.stores.loading.loadPersistentDbRequest.result;
     if (persistentDb == null) {

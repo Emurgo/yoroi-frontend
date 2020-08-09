@@ -7,7 +7,6 @@ import type {
   HistoryRequest, HistoryResponse,
   BestBlockRequest, BestBlockResponse,
   SignedResponse,
-  TxBodiesRequest, TxBodiesResponse,
   SignedRequestInternal,
 } from '../../app/api/ada/lib/state-fetch/types';
 import type {

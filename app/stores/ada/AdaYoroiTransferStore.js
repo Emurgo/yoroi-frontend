@@ -14,7 +14,6 @@ import {
   HARD_DERIVATION_START,
   WalletTypePurpose,
   CoinTypes,
-  ChainDerivations,
 } from '../../config/numbersConfig';
 import type { RestoreWalletForTransferResponse, RestoreWalletForTransferFunc } from '../../api/ada/index';
 import {
