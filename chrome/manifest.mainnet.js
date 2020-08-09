@@ -17,7 +17,7 @@ export default (isDebug: boolean): * => buildManifest({
   contentSecurityPolicy: genCSP({
     isDev: isDebug,
     additional: {
-      'connect-src': [serverToPermission(Servers.ByronMainnet)],
+      'connect-src': [serverToPermission(Servers.ShelleyMainnet)],
     },
   }),
   version: Version.Byron,
