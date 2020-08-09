@@ -298,7 +298,7 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
           error={ledgerSendStore.error}
           onSubmit={
             () => ledgerSendAction.sendUsingLedger.trigger({
-              params: { signRequest: signRequest.self() },
+              params: { signRequest },
               publicDeriver,
             })
           }

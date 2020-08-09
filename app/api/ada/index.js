@@ -116,8 +116,8 @@ import {
   broadcastTrezorSignedTx,
 } from './transactions/shelley/trezorTx';
 // import {
-  // createLedgerSignTxPayload,
-  // prepareAndBroadcastLedgerSignedTx,
+// createLedgerSignTxPayload,
+// prepareAndBroadcastLedgerSignedTx,
 // } from './transactions/shelley/ledgerTx';
 import {
   GenericApiError,
@@ -260,7 +260,7 @@ export type GetNoticesFunc = (
 
 export type SignAndBroadcastRequest = {|
   publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetSigningKey,
-  signRequest: BaseSignRequest<RustModule.WalletV4.TransactionBuilder>,
+  signRequest: HaskellShelleyTxSignRequest,
   /** note: this should include your own staking key too if it's needed to sign the transaction */
   getStakingWitnesses: void => Promise<(
     RustModule.WalletV4.TransactionHash => Array<RustModule.WalletV4.Vkeywitness>
@@ -741,7 +741,7 @@ export default class AdaApi {
         password,
       });
       const signedTx = shelleySignTransaction(
-        request.signRequest,
+        request.signRequest.self(),
         request.publicDeriver.getParent().getPublicDeriverLevel(),
         RustModule.WalletV4.Bip32PrivateKey.from_bytes(
           Buffer.from(normalizedKey.prvKeyHex, 'hex')

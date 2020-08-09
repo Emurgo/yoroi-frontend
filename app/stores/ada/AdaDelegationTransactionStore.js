@@ -6,7 +6,7 @@ import Store from '../base/Store';
 import LocalizedRequest from '../lib/LocalizedRequest';
 import type {
   CreateDelegationTxFunc,
-  SignAndBroadcastRequest, SignAndBroadcastResponse,
+  SignAndBroadcastRequest,
 } from '../../api/ada';
 import { buildRoute } from '../../utils/routing';
 import { ROUTES } from '../../routes-config';
@@ -24,6 +24,11 @@ import {
   getRegistrationHistory,
 } from '../../api/ada/lib/storage/bridge/delegationUtils';
 import { genOwnStakingKey } from '../../api/ada/index';
+import {
+  // isLedgerNanoWallet,
+  isTrezorTWallet,
+} from '../../api/ada/lib/storage/models/ConceptualWallet/index';
+import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 
 export default class AdaDelegationTransactionStore extends Store {
 
@@ -146,7 +151,7 @@ export default class AdaDelegationTransactionStore extends Store {
 
   @action
   _signTransaction: {|
-    password: string,
+    password?: string,
     publicDeriver: PublicDeriver<>,
   |} => Promise<void> = async (request) => {
     const withSigning = (asGetSigningKey(request.publicDeriver));
@@ -163,16 +168,36 @@ export default class AdaDelegationTransactionStore extends Store {
     if (result == null) {
       throw new Error(`${nameof(this._signTransaction)} no tx to broadcast`);
     }
+    if (isTrezorTWallet(request.publicDeriver.getParent())) {
+      await this.signAndBroadcastDelegationTx.execute({
+        broadcastRequest: {
+          trezor: {
+            publicDeriver: basePubDeriver,
+            signRequest: result.signTxRequest,
+          }
+        },
+        refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(
+          request.publicDeriver
+        ),
+      }).promise;
+      return;
+    }
+    if (request.password == null) {
+      throw new Error(`${nameof(this._signTransaction)} missing password for non-hardware signing`);
+    }
+    const { password } = request;
     await this.signAndBroadcastDelegationTx.execute({
       broadcastRequest: {
-        publicDeriver: basePubDeriver,
-        signRequest: result.signTxRequest.self(),
-        getStakingWitnesses: async () => await genOwnStakingKey({
+        normal: {
           publicDeriver: basePubDeriver,
+          signRequest: result.signTxRequest,
+          getStakingWitnesses: async () => await genOwnStakingKey({
+            publicDeriver: basePubDeriver,
+            password,
+          }),
           password: request.password,
-        }),
-        password: request.password,
-        sendTx: this.stores.substores.ada.stateFetchStore.fetcher.sendTx,
+          sendTx: this.stores.substores.ada.stateFetchStore.fetcher.sendTx,
+        }
       },
       refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(
         request.publicDeriver
@@ -191,19 +216,36 @@ export default class AdaDelegationTransactionStore extends Store {
   }
 
   sendAndRefresh: {|
-    broadcastRequest: SignAndBroadcastRequest,
+    broadcastRequest: {|
+      normal: SignAndBroadcastRequest,
+    |} | {|
+     trezor: {|
+        publicDeriver: PublicDeriver<>,
+        signRequest: HaskellShelleyTxSignRequest,
+     |},
+    |},
     refreshWallet: () => Promise<void>,
-  |} => Promise<SignAndBroadcastResponse> = async (request) => {
-    const result = await this.api.ada.signAndBroadcast(
-      request.broadcastRequest
-    );
-    try {
-      await request.refreshWallet();
-    } catch (_e) {
-      // even if refreshing the wallet fails, we don't want to fail the tx
-      // otherwise user may try and re-send the tx
+  |} => Promise<void> = async (request) => {
+    const refresh = async () => {
+      try {
+        await request.refreshWallet();
+      } catch (_e) {
+        // even if refreshing the wallet fails, we don't want to fail the tx
+        // otherwise user may try and re-send the tx
+      }
+    };
+    if (request.broadcastRequest.trezor) {
+      this.actions.ada.trezorSend.sendUsingTrezor.trigger({
+        params: { signRequest: request.broadcastRequest.trezor.signRequest },
+        publicDeriver: request.broadcastRequest.trezor.publicDeriver,
+      });
     }
-    return result;
+    if (request.broadcastRequest.normal) {
+      await this.api.ada.signAndBroadcast(
+        request.broadcastRequest.normal
+      );
+    }
+    await refresh();
   }
 
   @action.bound

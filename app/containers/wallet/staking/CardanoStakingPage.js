@@ -336,7 +336,7 @@ export default class CardanoStakingPage extends Component<Props> {
           |},
           signTransaction: {|
             trigger: (params: {|
-              password: string,
+              password?: string,
               publicDeriver: PublicDeriver<>
             |}) => Promise<void>
           |}

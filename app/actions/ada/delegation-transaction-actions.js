@@ -9,7 +9,7 @@ export default class DelegationTransactionActions {
     poolRequest: string | void,
   |}> = new AsyncAction();
   signTransaction: AsyncAction<{|
-    password: string,
+    password?: string,
     publicDeriver: PublicDeriver<>,
   |}> = new AsyncAction();
   complete: Action<void> = new Action();

@@ -63,7 +63,7 @@ export default class AdaWalletsStore extends Store {
         publicDeriver: withSigning,
         password: transactionDetails.password,
         getStakingWitnesses: () => Promise.resolve(() => []),
-        signRequest: signRequest.self(),
+        signRequest,
         sendTx: this.stores.substores.ada.stateFetchStore.fetcher.sendTx,
       }),
       refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(
