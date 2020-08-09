@@ -18,7 +18,7 @@ import {
 import type {
   BroadcastTrezorSignedTxResponse,
 } from '../../index';
-import { toDerivationPathString } from '@emurgo/ledger-connect-handler';
+import { toDerivationPathString } from '../../../common/lib/crypto/keys/path';
 import type {
   CardanoSignTransaction,
   CardanoInput,

@@ -79,7 +79,7 @@ const actions = {
     selectTransaction: { trigger: action('selectTransaction') },
   },
   dialogs: {
-    open: { trigger: action('open') },
+    push: { trigger: action('push') },
   },
   transactions: {
     exportTransactionsToFile: {

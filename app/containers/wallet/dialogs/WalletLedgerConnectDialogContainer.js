@@ -16,12 +16,14 @@ import { ProgressStep, ProgressInfo } from '../../../types/HWConnectStoreTypes';
 import { getApiForNetwork, ApiOptions } from '../../../api/common/utils';
 import LocalizableError from '../../../i18n/LocalizableError';
 import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
+import type { RestoreModeType, } from '../../../actions/common/wallet-restore-actions';
 
 export type GeneratedData = typeof WalletLedgerConnectDialogContainer.prototype.generated;
 
 type Props = {|
   ...InjectedOrGenerated<GeneratedData>,
   +onClose: void => void,
+  +mode: RestoreModeType,
   +onBack: void => void,
 |};
 
@@ -44,6 +46,13 @@ export default class WalletLedgerConnectDialogContainer extends Component<Props>
     this.props.onClose();
     this.generated.actions[ApiOptions.ada].ledgerConnect.cancel.trigger();
   };
+
+  componentDidMount() {
+    const { ledgerConnect } = this.props.generated
+      ? this.props.generated.actions.ada
+      : this.props.actions.ada;
+    ledgerConnect.setMode.trigger(this.props.mode);
+  }
 
   render(): null | Node {
     const api = getApiForNetwork(this.getSelectedNetwork());
@@ -108,6 +117,9 @@ export default class WalletLedgerConnectDialogContainer extends Component<Props>
     actions: {|
       ada: {|
         ledgerConnect: {|
+          setMode: {|
+            trigger: (params: RestoreModeType) => void
+          |},
           cancel: {| trigger: (params: void) => void |},
           goBackToCheck: {|
             trigger: (params: void) => void
@@ -166,6 +178,9 @@ export default class WalletLedgerConnectDialogContainer extends Component<Props>
       actions: {
         ada: {
           ledgerConnect: {
+            setMode: {
+              trigger: actions.ada.ledgerConnect.setMode.trigger,
+            },
             submitCheck: {
               trigger: actions.ada.ledgerConnect.submitCheck.trigger,
             },

@@ -828,6 +828,9 @@ const trezorPops: {|
   actions: {
     ada: {
       trezorConnect: {
+        setMode: {
+          trigger: action('setMode'),
+        },
         submitCheck: {
           trigger: action('submitCheck'),
         },
@@ -984,6 +987,9 @@ const ledgerProps: {|
   actions: {
     ada: {
       ledgerConnect: {
+        setMode: {
+          trigger: action('setMode'),
+        },
         submitCheck: {
           trigger: action('submitCheck'),
         },

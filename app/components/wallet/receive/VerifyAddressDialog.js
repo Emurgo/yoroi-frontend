@@ -11,9 +11,7 @@ import QRCode from 'qrcode.react';
 import type {
   BIP32Path
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
-import {
-  toDerivationPathString,
-} from '@emurgo/ledger-connect-handler';
+import { toDerivationPathString } from '../../../api/common/lib/crypto/keys/path';
 
 import Dialog from '../../widgets/Dialog';
 import DialogCloseButton from '../../widgets/DialogCloseButton';

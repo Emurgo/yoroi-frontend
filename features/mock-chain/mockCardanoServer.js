@@ -137,14 +137,6 @@ export function getMockServer(
       res.send(status);
     });
 
-    server.post('/api/txs/txBodies', async (
-      req: { body: TxBodiesRequest, ... },
-      res: { send(arg: TxBodiesResponse): any, ... }
-    ): Promise<void> => {
-      const response = await mockImporter.getTxsBodiesForUTXOs(req.body);
-      res.send(response);
-    });
-
     installCoinPriceRequestHandlers(server);
 
     MockServer = server.listen(Ports.DevBackendServe, () => {

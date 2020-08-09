@@ -56,8 +56,11 @@ Then(
 Then(
   /^I add a transaction memo that says "([^"]*)"$/,
   async function (memo) {
+    await this.driver.sleep(500);
     await this.click('.addMemoButton');
+    await this.driver.sleep(500);
     await this.click('.Dialog_actions .primary');
+    await this.driver.sleep(500);
     await this.input("input[name='memo']", memo);
   }
 );

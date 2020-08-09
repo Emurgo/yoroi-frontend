@@ -87,6 +87,7 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
   @action
   toggleShowMemo: void => void = () => {
     this.showMemo = !this.showMemo;
+    this.generated.actions.memos.closeMemoDialog.trigger();
   };
 
   getApiType: PublicDeriver<> => 'ada' = (_publicDeriver) => {
@@ -132,7 +133,7 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
       WalletSendConfirmationDialog;
 
     const onSubmit = () => {
-      actions.dialogs.open.trigger({
+      actions.dialogs.push.trigger({
         dialog: targetDialog
       });
       txBuilderActions.updateTentativeTx.trigger();
@@ -359,7 +360,7 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
       return request.continuation();
     }
 
-    this.generated.actions.dialogs.open.trigger({
+    this.generated.actions.dialogs.push.trigger({
       dialog: request.dialog,
       params: {
         continuation: request.continuation,
@@ -376,7 +377,6 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
         actions.router.goToRoute.trigger({ route: ROUTES.SETTINGS.EXTERNAL_STORAGE });
       }}
       onAcknowledge={() => {
-        actions.memos.closeMemoDialog.trigger();
         this.generated.stores.uiDialogs.getParam<void => void>('continuation')();
       }}
     />);
@@ -429,12 +429,12 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
         closeActiveDialog: {|
           trigger: (params: void) => void
         |},
-        open: {|
+        push: {|
           trigger: (params: {|
             dialog: any,
             params?: any
           |}) => void
-        |}
+        |},
       |},
       memos: {|
         closeMemoDialog: {| trigger: (params: void) => void |}
@@ -562,7 +562,9 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
       },
       actions: {
         dialogs: {
-          open: { trigger: actions.dialogs.open.trigger },
+          push: {
+            trigger: actions.dialogs.push.trigger,
+          },
           closeActiveDialog: { trigger: actions.dialogs.closeActiveDialog.trigger },
         },
         router: {

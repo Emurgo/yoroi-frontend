@@ -22,7 +22,7 @@ When(/^I restore a Ledger device$/, async function () {
   await this.click('.primary');
 });
 
-When(/^I restore a Trezor device$/, async function () {
+When(/^I select a Byron-era Trezor device$/, async function () {
   await this.click('.WalletAdd_btnConnectHW');
 
   await this.waitForElement('.PickCurrencyOptionDialog');
@@ -31,6 +31,21 @@ When(/^I restore a Trezor device$/, async function () {
   await this.waitForElement('.WalletConnectHWOptionDialog');
 
   await this.click('.WalletConnectHWOptionDialog_connectTrezor');
+  await this.click('.WalletEraOptionDialog_bgByronMainnet');
+});
+When(/^I select a Shelley-era Trezor device$/, async function () {
+  await this.click('.WalletAdd_btnConnectHW');
+
+  await this.waitForElement('.PickCurrencyOptionDialog');
+  await this.click('.PickCurrencyOptionDialog_cardano');
+
+  await this.waitForElement('.WalletConnectHWOptionDialog');
+
+  await this.click('.WalletConnectHWOptionDialog_connectTrezor');
+  await this.click('.WalletEraOptionDialog_bgShelleyMainnet');
+});
+
+When(/^I restore the Trezor device$/, async function () {
   await this.waitForElement('.CheckDialog_component');
   await this.click('.primary');
   await this.click('.primary');
