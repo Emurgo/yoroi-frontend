@@ -71,7 +71,7 @@ const defaultProps: {|
       selectedNetwork: request.selectedNetwork,
     },
     uiDialogs: {
-      activeDialog: request.openDialog,
+      hasOpen: request.openDialog != null,
       isOpen: (clazz) => clazz === request.openDialog,
       getParam: request.getParam || (() => (undefined: any)),
     },
@@ -91,6 +91,12 @@ const defaultProps: {|
       },
       open: {
         trigger: action('open'),
+      },
+      push: {
+        trigger: action('push'),
+      },
+      pop: {
+        trigger: action('pop'),
       },
     },
     profile: {
@@ -1205,12 +1211,12 @@ export const PaperWalletUserPasswordDialog = (): Node => {
                 selectedNetwork,
               },
               uiDialogs: {
-                dataForActiveDialog: {
+                getActiveData: (key) => ({
                   numAddresses: 5,
                   printAccountPlate: true,
                   repeatedPasswordValue: getRepeatPassword(),
                   passwordValue: getNewPassword(),
-                }
+                }[key]),
               },
               uiNotifications: {
                 isOpen: () => false,
@@ -1271,12 +1277,12 @@ export const PaperWalletCreateDialog = (): Node => {
                 selectedNetwork,
               },
               uiDialogs: {
-                dataForActiveDialog: {
+                getActiveData: (key) => ({
                   numAddresses: 5,
                   printAccountPlate: true,
                   repeatedPasswordValue: '',
                   passwordValue: '',
-                }
+                }[key]),
               },
               uiNotifications: {
                 isOpen: () => false,
@@ -1349,12 +1355,12 @@ export const PaperWalletVerifyDialog = (): Node => {
                 selectedNetwork,
               },
               uiDialogs: {
-                dataForActiveDialog: {
+                getActiveData: (key) => ({
                   numAddresses: 5,
                   printAccountPlate: true,
                   repeatedPasswordValue: '',
                   passwordValue: '',
-                }
+                }[key]),
               },
               uiNotifications: {
                 isOpen: () => false,
@@ -1403,12 +1409,12 @@ export const PaperWalletFinalizeDialog = (): Node => {
               selectedNetwork,
             },
             uiDialogs: {
-              dataForActiveDialog: {
+              getActiveData: (key) => ({
                 numAddresses: 5,
                 printAccountPlate: true,
                 repeatedPasswordValue: '',
                 passwordValue: '',
-              }
+              }[key]),
             },
             uiNotifications: {
               isOpen: () => false,

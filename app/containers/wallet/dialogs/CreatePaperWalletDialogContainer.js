@@ -55,7 +55,6 @@ export default class CreatePaperWalletDialogContainer
     const { intl } = this.context;
     const { uiDialogs, uiNotifications, profile } = this.generated.stores;
     const { updateDataForActiveDialog } = this.generated.actions.dialogs;
-    const dialogData = uiDialogs.dataForActiveDialog;
 
     const getPaperFromStore = (): AdaPaper => {
       const paper = this.generated.stores.paperWallets.paper;
@@ -77,8 +76,8 @@ export default class CreatePaperWalletDialogContainer
 
     if (this.generated.stores.paperWallets.progressInfo === ProgressStep.INIT) {
       this.generated.actions.paperWallets.submitInit.trigger({
-        numAddresses: dialogData.numAddresses,
-        printAccountPlate: dialogData.printAccountPlate,
+        numAddresses: uiDialogs.getActiveData<number>('numAddresses') || 0,
+        printAccountPlate: uiDialogs.getActiveData<boolean>('printAccountPlate') || true,
       });
     }
 
@@ -87,8 +86,8 @@ export default class CreatePaperWalletDialogContainer
         return (
           <UserPasswordDialog
             dialogData={{
-              passwordValue: dialogData.passwordValue,
-              repeatedPasswordValue: dialogData.repeatedPasswordValue,
+              passwordValue: uiDialogs.getActiveData<string>('passwordValue') || '',
+              repeatedPasswordValue: uiDialogs.getActiveData<string>('repeatedPasswordValue') || '',
             }}
             onNext={this.generated.actions.paperWallets.submitUserPassword.trigger}
             onCancel={onCancel}
@@ -107,9 +106,6 @@ export default class CreatePaperWalletDialogContainer
             onCancel={onCancel}
             loadingGif={<LoadingGif />}
             onDownload={this.generated.actions.paperWallets.downloadPaperWallet.trigger}
-            onDataChange={data => {
-              updateDataForActiveDialog.trigger({ data });
-            }}
           />
         );
       case ProgressStep.VERIFY:
@@ -222,12 +218,7 @@ export default class CreatePaperWalletDialogContainer
         selectedNetwork: void | $ReadOnly<NetworkRow>,
       |},
       uiDialogs: {|
-        dataForActiveDialog: {|
-          numAddresses: any,
-          passwordValue: any,
-          printAccountPlate: any,
-          repeatedPasswordValue: any
-        |}
+        getActiveData: <T>(number | string) => (void |T),
       |},
       uiNotifications: {|
         getTooltipActiveNotification: string => ?Notification,
@@ -254,12 +245,7 @@ export default class CreatePaperWalletDialogContainer
           selectedNetwork: stores.profile.selectedNetwork,
         },
         uiDialogs: {
-          dataForActiveDialog: {
-            numAddresses: stores.uiDialogs.dataForActiveDialog.numAddresses,
-            printAccountPlate: stores.uiDialogs.dataForActiveDialog.printAccountPlate,
-            repeatedPasswordValue: stores.uiDialogs.dataForActiveDialog.repeatedPasswordValue,
-            passwordValue: stores.uiDialogs.dataForActiveDialog.passwordValue,
-          }
+          getActiveData: stores.uiDialogs.getActiveData,
         },
         uiNotifications: {
           isOpen: stores.uiNotifications.isOpen,

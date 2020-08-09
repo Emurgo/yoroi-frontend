@@ -287,7 +287,7 @@ export function toTrezorAddressParameters(
   {
     const ptrAddr = RustModule.WalletV4.PointerAddress.from_address(address);
     if (ptrAddr) {
-      const pointer = ptrAddr.stake_ponter();
+      const pointer = ptrAddr.stake_pointer();
       return {
         addressType: ADDRESS_TYPE.Pointer,
         path: toDerivationPathString(path),

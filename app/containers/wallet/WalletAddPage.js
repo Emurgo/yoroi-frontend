@@ -125,7 +125,7 @@ export default class WalletAddPage extends Component<Props> {
     };
 
     let activeDialog = null;
-    if (uiDialogs.activeDialog != null && selectedNetwork == null) {
+    if (uiDialogs.hasOpen && selectedNetwork == null) {
       activeDialog = (<PickCurrencyDialogContainer
         onClose={this.onClose}
         onCardano={() => actions.profile.setSelectedNetwork.trigger(networks.ByronMainnet)}
@@ -231,7 +231,7 @@ export default class WalletAddPage extends Component<Props> {
         />
       );
     } else if (uiDialogs.isOpen(WalletRestoreDialog)) {
-      const mode = uiDialogs.getParam<?RestoreModeType>('restoreType');
+      const mode = uiDialogs.getParam<RestoreModeType>('restoreType');
       if (mode == null) throw new Error(`${nameof(WalletAddPage)} no mode for restoration selected`);
       activeDialog = (
         <WalletRestoreDialogContainer
@@ -357,7 +357,16 @@ export default class WalletAddPage extends Component<Props> {
             dialog: any,
             params?: any
           |}) => void
-        |}
+        |},
+        push: {|
+          trigger: (params: {|
+            dialog: any,
+            params?: any
+          |}) => void
+        |},
+        pop: {|
+          trigger: void => void,
+        |},
       |},
       profile: {|
         setSelectedNetwork: {|
@@ -380,7 +389,7 @@ export default class WalletAddPage extends Component<Props> {
     stores: {|
       profile: {| selectedNetwork: void | $ReadOnly<NetworkRow> |},
       uiDialogs: {|
-        activeDialog: ?any,
+        hasOpen: boolean,
         getParam: <T>(number | string) => T,
         isOpen: any => boolean
       |},
@@ -400,7 +409,7 @@ export default class WalletAddPage extends Component<Props> {
           selectedNetwork: stores.profile.selectedNetwork,
         },
         uiDialogs: {
-          activeDialog: stores.uiDialogs.activeDialog,
+          hasOpen: stores.uiDialogs.hasOpen,
           isOpen: stores.uiDialogs.isOpen,
           getParam: stores.uiDialogs.getParam,
         },
@@ -420,6 +429,12 @@ export default class WalletAddPage extends Component<Props> {
           },
           open: {
             trigger: actions.dialogs.open.trigger,
+          },
+          push: {
+            trigger: actions.dialogs.push.trigger,
+          },
+          pop: {
+            trigger: actions.dialogs.pop.trigger,
           },
         },
         profile: {

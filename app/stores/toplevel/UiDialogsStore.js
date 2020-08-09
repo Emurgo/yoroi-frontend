@@ -1,38 +1,74 @@
 // @flow
-import { observable, action } from 'mobx';
+import { computed, observable, action } from 'mobx';
 import Store from '../base/Store';
+
+type DialogEntry = {|
+  dialog: any,
+  /**
+   * Arbitrary data that can change at any time
+   * NOT inherited when opening a new dialog (ex: 2nd dialog has its own data)
+   * There are two main uses for this
+   * 1) Statically set data for a Storybook tests to inject data
+   * 2) Let a parent component know about a modification to a field inside the dialog
+   *    Ex: When a field updates, it updates this field
+   *    So that the parent can react to the data change
+   */
+  dataForActiveDialog: {...},
+  /**
+  * Arbitrary data set at dialog-open-time
+  * IS inherited when opening a new dialog (ex: 2nd dialog has shallow copy of data of 1st dialog)
+  * This can be used to set the context in which this dialog was opened
+  * ex: chose this option in a menu dialog
+  */
+  paramsForActiveDialog: {...}
+|};
 
 /** Manages the open dialog window in Yoroi.
  * Note: There can only be one open dialog at a time
  */
 export default class UiDialogsStore extends Store {
 
-  @observable activeDialog: ?any = null;
-  @observable secondsSinceActiveDialogIsOpen: number = 0;
+  @observable dialogList: Array<DialogEntry> = [];
 
-  /** Arbitrary data that may be used to render the dialog */
-  @observable dataForActiveDialog: Object = {};
-  @observable paramsForActiveDialog: Object = {};
+  @observable secondsSinceActiveDialogIsOpen: number = 0;
 
   _secondsTimerInterval: ?IntervalID = null;
 
   setup(): void {
     super.setup();
     this.actions.dialogs.open.listen(this._onOpen);
+    this.actions.dialogs.push.listen(this._onPush);
+    this.actions.dialogs.pop.listen(this._onPop);
     this.actions.dialogs.closeActiveDialog.listen(this._onClose);
     this.actions.dialogs.resetActiveDialog.listen(this._reset);
     this.actions.dialogs.updateDataForActiveDialog.listen(this._onUpdateDataForActiveDialog);
   }
 
+  @computed
+  get hasOpen(): boolean {
+    return this.dialogList.length > 0;
+  }
+
   isOpen: any => boolean = (
     dialog: any
-  ): boolean => (this.activeDialog
-    ? this.activeDialog === dialog
-    : false);
+  ): boolean => (
+    // flowlint-next-line unnecessary-optional-chain:off
+    this.dialogList[this.dialogList.length - 1]?.dialog === dialog
+  )
 
-  getParam: <T>(number | string) => T = <T>(
+  getParam: <T>(number | string) => (void | T) = <T>(
     key: (number | string)
-  ): T => this.paramsForActiveDialog[key];
+  ): (void | T) => (
+    // flowlint-next-line unnecessary-optional-chain:off
+    this.dialogList[this.dialogList.length - 1]?.paramsForActiveDialog[key]
+  );
+
+  getActiveData: <T>(number | string) => (void | T) = <T>(
+    key: (number | string)
+  ): (void | T) => (
+    // flowlint-next-line unnecessary-optional-chain:off
+    this.dialogList[this.dialogList.length - 1]?.dataForActiveDialog[key]
+  )
 
   countdownSinceDialogOpened: number => number = (
     countDownTo: number
@@ -40,14 +76,29 @@ export default class UiDialogsStore extends Store {
     Math.max(countDownTo - this.secondsSinceActiveDialogIsOpen, 0)
   );
 
-  @action _onOpen: {| dialog : any, params?: Object |} => void = ({ dialog, params }) => {
-    this._reset();
-    this.activeDialog = dialog;
-    this.paramsForActiveDialog = params || {};
-    this.dataForActiveDialog = observable.box(dialog.defaultProps);
+  @action _onPush: {| dialog : any, params?: {...} |} => void = ({ dialog, params }) => {
+    const prevEntry = this.dialogList[this.dialogList.length - 1] ?? {};
+    this.dialogList.push({
+      dialog,
+      paramsForActiveDialog: {
+        ...prevEntry.paramsForActiveDialog,
+        ...params,
+      },
+      dataForActiveDialog: observable.box(dialog.defaultProps),
+    });
     this.secondsSinceActiveDialogIsOpen = 0;
     if (this._secondsTimerInterval) clearInterval(this._secondsTimerInterval);
     this._secondsTimerInterval = setInterval(this._updateSeconds, 1000);
+  };
+  @action _onPop: void => void = () => {
+    this.dialogList.pop();
+  }
+  @action _onOpen: {| dialog : any, params?: {...} |} => void = ({ dialog, params }) => {
+    this._reset();
+    this._onPush({
+      dialog,
+      params,
+    });
   };
 
   @action _onClose: void => void = () => {
@@ -59,13 +110,16 @@ export default class UiDialogsStore extends Store {
   };
 
   @action _onUpdateDataForActiveDialog: { [key: string]: any, ... } => void = ({ data }) => {
-    Object.assign(this.dataForActiveDialog, data);
+    if (this.dialogList.length === 0) return;
+    Object.assign(
+      this.dialogList[this.dialogList.length - 1].dataForActiveDialog,
+      data
+    );
   };
 
   @action _reset: void => void = () => {
-    this.activeDialog = null;
+    this.dialogList.splice(0); // remove all elements. Need this to trigger mobx reaction
     this.secondsSinceActiveDialogIsOpen = 0;
-    this.dataForActiveDialog = {};
   };
 
 }
