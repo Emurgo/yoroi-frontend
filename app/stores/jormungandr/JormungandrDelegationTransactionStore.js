@@ -111,7 +111,7 @@ export default class JormungandrDelegationTransactionStore extends Store {
 
   @action
   _signTransaction: {|
-    password: string,
+    password?: string,
     publicDeriver: PublicDeriver<>,
   |} => Promise<void> = async (request) => {
     const withSigning = (asGetSigningKey(request.publicDeriver));
@@ -127,6 +127,9 @@ export default class JormungandrDelegationTransactionStore extends Store {
     const result = this.createDelegationTx.result;
     if (result == null) {
       throw new Error(`${nameof(this._signTransaction)} no tx to broadcast`);
+    }
+    if (request.password == null) {
+      throw new Error(`${nameof(this._signTransaction)} missing password for non-hardware signing`);
     }
     await this.signAndBroadcastDelegationTx.execute({
       broadcastRequest: {

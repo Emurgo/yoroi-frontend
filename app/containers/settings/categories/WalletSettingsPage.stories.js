@@ -275,11 +275,11 @@ const defaultChangeWalletPasswordDialogContainerProps: void => * = (_request) =>
       isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
     },
     uiDialogs: {
-      dataForActiveDialog: {
+      getActiveData: (key) => ({
         currentPasswordValue: '',
         newPasswordValue: '',
         repeatedPasswordValue: '',
-      },
+      }[key]),
     },
   },
   actions: {
@@ -381,12 +381,12 @@ export const EditPassword = (): Node => {
                   },
                   uiDialogs: {
                     ...defaultProps.stores.uiDialogs,
-                    dataForActiveDialog: {
-                      ...defaultProps.stores.uiDialogs.dataForActiveDialog,
+                    getActiveData: (key) => ({
+                      ...defaultProps.stores.uiDialogs.getActiveData(key),
                       currentPasswordValue: getCurrentPassword(),
                       newPasswordValue: getNewPassword(),
                       repeatedPasswordValue: getRepeatPassword(),
-                    },
+                    }[key]),
                   },
                 },
               },

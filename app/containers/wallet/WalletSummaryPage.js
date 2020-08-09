@@ -148,14 +148,14 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
               dialog: MemoNoExternalStorageDialog,
               continuation: () => {
                 actions.memos.selectTransaction.trigger({ tx: transaction });
-                actions.dialogs.open.trigger({ dialog: AddMemoDialog });
+                actions.dialogs.push.trigger({ dialog: AddMemoDialog });
               }
             })}
             onEditMemo={(transaction) => this.showMemoDialog({
               dialog: MemoNoExternalStorageDialog,
               continuation: () => {
                 actions.memos.selectTransaction.trigger({ tx: transaction });
-                actions.dialogs.open.trigger({ dialog: EditMemoDialog });
+                actions.dialogs.push.trigger({ dialog: EditMemoDialog });
               }
             })}
             unitOfAccountSetting={{
@@ -274,7 +274,6 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
               actions.router.goToRoute.trigger({ route: ROUTES.SETTINGS.EXTERNAL_STORAGE });
             }}
             onAcknowledge={() => {
-              actions.memos.closeMemoDialog.trigger();
               this.generated.stores.uiDialogs.getParam<void => void>('continuation')();
             }}
           />
@@ -311,7 +310,6 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
             error={memos.error}
             onCancel={() => {
               actions.memos.closeMemoDialog.trigger();
-              actions.dialogs.open.trigger({ dialog: EditMemoDialog });
             }}
             onClose={actions.memos.closeMemoDialog.trigger}
             onDelete={txHash => {
@@ -343,7 +341,7 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
 
   openExportTransactionDialog: void => void = () => {
     const { actions } = this.generated;
-    actions.dialogs.open.trigger({ dialog: ExportTransactionDialog });
+    actions.dialogs.push.trigger({ dialog: ExportTransactionDialog });
   }
 
   showMemoDialog: {|
@@ -354,7 +352,7 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
       return request.continuation();
     }
 
-    this.generated.actions.dialogs.open.trigger({
+    this.generated.actions.dialogs.push.trigger({
       dialog: request.dialog,
       params: {
         continuation: request.continuation,
@@ -364,18 +362,18 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
 
   openDeleteMemoDialog: void => void = () => {
     const { actions } = this.generated;
-    actions.dialogs.open.trigger({ dialog: DeleteMemoDialog });
+    actions.dialogs.push.trigger({ dialog: DeleteMemoDialog });
   }
 
   @computed get generated(): {|
     actions: {|
       dialogs: {|
-        open: {|
+        push: {|
           trigger: (params: {|
             dialog: any,
             params?: any
           |}) => void
-        |}
+        |},
       |},
       memos: {|
         closeMemoDialog: {|
@@ -549,7 +547,9 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
           },
         },
         dialogs: {
-          open: { trigger: actions.dialogs.open.trigger },
+          push: {
+            trigger: actions.dialogs.push.trigger,
+          },
         },
         router: {
           goToRoute: { trigger: actions.router.goToRoute.trigger },

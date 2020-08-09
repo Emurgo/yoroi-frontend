@@ -16,12 +16,14 @@ import { ProgressStep, ProgressInfo } from '../../../types/HWConnectStoreTypes';
 import LocalizableError from '../../../i18n/LocalizableError';
 import { getApiForNetwork, ApiOptions } from '../../../api/common/utils';
 import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
+import type { RestoreModeType, } from '../../../actions/common/wallet-restore-actions';
 
 export type GeneratedData = typeof WalletTrezorConnectDialogContainer.prototype.generated;
 
 type Props = {|
   ...InjectedOrGenerated<GeneratedData>,
   +onClose: (void) => void,
+  +mode: RestoreModeType,
   +onBack: void => void,
 |};
 
@@ -34,6 +36,13 @@ export default class WalletTrezorConnectDialogContainer extends Component<Props>
       throw new Error(`${nameof(WalletTrezorConnectDialogContainer)} no API selected`);
     }
     return selectedNetwork;
+  }
+
+  componentDidMount() {
+    const { trezorConnect } = this.props.generated
+      ? this.props.generated.actions.ada
+      : this.props.actions.ada;
+    trezorConnect.setMode.trigger(this.props.mode);
   }
 
   cancel: void => void = () => {
@@ -97,7 +106,7 @@ export default class WalletTrezorConnectDialogContainer extends Component<Props>
           />);
         break;
       default:
-        Logger.error('WalletTrezorConnectDialogContainer::render: something unexpected happened');
+        Logger.error(`${nameof(WalletTrezorConnectDialogContainer)}::render: something unexpected happened`);
         break;
     }
 
@@ -108,6 +117,9 @@ export default class WalletTrezorConnectDialogContainer extends Component<Props>
     actions: {|
       ada: {|
         trezorConnect: {|
+          setMode: {|
+            trigger: (params: RestoreModeType) => void
+          |},
           cancel: {| trigger: (params: void) => void |},
           goBackToCheck: {|
             trigger: (params: void) => void
@@ -166,6 +178,9 @@ export default class WalletTrezorConnectDialogContainer extends Component<Props>
       actions: {
         ada: {
           trezorConnect: {
+            setMode: {
+              trigger: actions.ada.trezorConnect.setMode.trigger,
+            },
             submitCheck: {
               trigger: actions.ada.trezorConnect.submitCheck.trigger,
             },

@@ -1,7 +1,7 @@
 // @flow
 // Handles Connect to Ledger Hardware Wallet dialog
 
-import { observable, action } from 'mobx';
+import { observable, action, runInAction } from 'mobx';
 
 import type { ExtendedPublicKeyResp } from '@emurgo/ledger-connect-handler';
 import LedgerConnect, {
@@ -44,7 +44,17 @@ import {
   stringifyData,
   stringifyError
 } from '../../utils/logging';
-import { HARD_DERIVATION_START } from '../../config/numbersConfig';
+import {
+  CoinTypes,
+  HARD_DERIVATION_START,
+  WalletTypePurpose,
+} from '../../config/numbersConfig';
+import {
+  Bip44DerivationLevels,
+} from '../../api/ada/lib/storage/database/walletTypes/bip44/api/utils';
+import type {
+  RestoreModeType,
+} from '../../actions/common/wallet-restore-actions';
 
 export default class LedgerConnectStore
   extends Store
@@ -53,6 +63,7 @@ export default class LedgerConnectStore
   // =================== VIEW RELATED =================== //
   @observable progressInfo: ProgressInfo;
   @observable derivationIndex: number = HARD_DERIVATION_START + 0; // assume single account
+  @observable mode: void | RestoreModeType;
   error: ?LocalizableError;
   hwDeviceInfo: ?HWDeviceInfo;
   ledgerConnect: ?LedgerConnect;
@@ -86,12 +97,13 @@ export default class LedgerConnectStore
     ledgerConnectAction.goBackToCheck.listen(this._goBackToCheck);
     ledgerConnectAction.submitConnect.listen(this._submitConnect);
     ledgerConnectAction.submitSave.listen(this._submitSave);
+    ledgerConnectAction.setMode.listen((mode) => runInAction(() => { this.mode = mode; }));
   }
 
   /** setup() is called when stores are being created
     * _init() is called when connect dialog is about to show */
   _init: void => void = () => {
-    Logger.debug('LedgerConnectStore::_init called');
+    Logger.debug(`${nameof(LedgerConnectStore)}::${nameof(this._init)} called`);
   }
 
   @action _cancel: void => void = () => {
@@ -106,6 +118,7 @@ export default class LedgerConnectStore
   }
 
   @action _reset: void => void = () => {
+    this.mode = undefined;
     this.progressInfo = {
       currentStep: ProgressStep.CHECK,
       stepState: StepState.LOAD,
@@ -250,7 +263,6 @@ export default class LedgerConnectStore
 
       const reqParams = this._prepareCreateHWReqParams(
         walletName,
-        this.derivationIndex,
       );
       this.createHWRequest.execute(reqParams);
       if (!this.createHWRequest.promise) throw new Error('should never happen');
@@ -284,15 +296,15 @@ export default class LedgerConnectStore
     }
   };
 
-  _prepareCreateHWReqParams: (string, number) => CreateHardwareWalletRequest = (
+  _prepareCreateHWReqParams: string => CreateHardwareWalletRequest = (
     walletName,
-    derivationIndex,
   ) => {
     if (this.hwDeviceInfo == null
       || this.hwDeviceInfo.publicMasterKey == null
       || this.hwDeviceInfo.hwFeatures == null) {
       throw new Error('Ledger device hardware info not valid');
     }
+    const { publicMasterKey, hwFeatures} = this.hwDeviceInfo;
 
     const persistentDb = this.stores.loading.loadPersistentDbRequest.result;
     if (persistentDb == null) {
@@ -302,16 +314,34 @@ export default class LedgerConnectStore
     if (selectedNetwork == null) throw new Error(`${nameof(this._prepareCreateHWReqParams)} no network selected`);
 
     const stateFetcher = this.stores.substores.ada.stateFetchStore.fetcher;
+
     return {
       db: persistentDb,
-      derivationIndex,
+      addressing: {
+        path: this.getPath(),
+        startLevel: Bip44DerivationLevels.PURPOSE.level,
+      },
       walletName,
-      publicKey: this.hwDeviceInfo.publicMasterKey,
-      hwFeatures: this.hwDeviceInfo.hwFeatures,
+      publicKey: publicMasterKey,
+      hwFeatures,
       checkAddressesInUse: stateFetcher.checkAddressesInUse,
       network: selectedNetwork,
     };
   };
+
+  getPath: void => Array<number> = () => {
+    const suffix = [CoinTypes.CARDANO, this.derivationIndex];
+    if (this.mode == null) {
+      throw new Error(`${nameof(LedgerConnectStore)}::${nameof(this._prepareCreateHWReqParams)} missing mode`);
+    }
+    if (this.mode.type === 'bip44') {
+      return [WalletTypePurpose.BIP44, ...suffix];
+    }
+    if (this.mode.type === 'cip1852') {
+      return [WalletTypePurpose.CIP1852, ...suffix];
+    }
+    throw new Error(`${nameof(LedgerConnectStore)}::${nameof(this._prepareCreateHWReqParams)} unknown purpose`);
+  }
 
   async _onSaveSuccess(publicDeriver: PublicDeriver<>): Promise<void> {
     // close the active dialog

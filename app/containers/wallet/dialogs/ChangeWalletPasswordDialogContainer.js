@@ -22,13 +22,16 @@ export default class ChangeWalletPasswordDialogContainer extends Component<Props
     const { actions } = this.generated;
     const { uiDialogs, profile } = this.generated.stores;
     const { walletSettings } = this.generated.stores;
-    const dialogData = uiDialogs.dataForActiveDialog;
     const { updateDataForActiveDialog } = actions.dialogs;
     const { changeSigningKeyRequest } = walletSettings;
 
     return (
       <ChangeWalletPasswordDialog
-        dialogData={dialogData}
+        dialogData={{
+          currentPasswordValue: uiDialogs.getActiveData<string>('currentPasswordValue'),
+          newPasswordValue: uiDialogs.getActiveData<string>('newPasswordValue'),
+          repeatedPasswordValue: uiDialogs.getActiveData<string>('repeatedPasswordValue'),
+        }}
         onSave={async (values) => {
           const { oldPassword, newPassword } = values;
           await actions.walletSettings.updateSigningPassword.trigger({
@@ -80,11 +83,7 @@ export default class ChangeWalletPasswordDialogContainer extends Component<Props
     stores: {|
       profile: {| isClassicTheme: boolean |},
       uiDialogs: {|
-        dataForActiveDialog: {|
-          +currentPasswordValue: void | string,
-          +newPasswordValue: void | string,
-          +repeatedPasswordValue: void | string
-        |}
+        getActiveData: <T>(number | string) => (void |T),
       |},
       walletSettings: {|
         changeSigningKeyRequest: {|
@@ -117,11 +116,7 @@ export default class ChangeWalletPasswordDialogContainer extends Component<Props
           isClassicTheme: stores.profile.isClassicTheme,
         },
         uiDialogs: {
-          dataForActiveDialog: {
-            currentPasswordValue: stores.uiDialogs.dataForActiveDialog.currentPasswordValue,
-            newPasswordValue: stores.uiDialogs.dataForActiveDialog.newPasswordValue,
-            repeatedPasswordValue: stores.uiDialogs.dataForActiveDialog.repeatedPasswordValue,
-          },
+          getActiveData: stores.uiDialogs.getActiveData,
         },
       },
       actions: {

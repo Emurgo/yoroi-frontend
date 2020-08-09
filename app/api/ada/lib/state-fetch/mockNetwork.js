@@ -32,8 +32,17 @@ import { RustModule } from '../cardanoCrypto/rustLoader';
 
 import { generateLedgerWalletRootKey } from '../cardanoCrypto/cryptoWallet';
 import { networks, getCardanoHaskellBaseConfig } from '../storage/database/prepackaged/networks';
-import { encode, toWords } from 'bech32';
+import { decode, fromWords } from 'bech32';
 
+/** convert bech32 address to bytes */
+function fixAddresses(address: string): string {
+  try {
+    const payload = fromWords(decode(address, 1000).words);
+    return Buffer.from(payload).toString('hex');
+  } catch (_e) {
+    return address;
+  }
+}
 export function genCheckAddressesInUse(
   blockchain: Array<RemoteTransaction>,
   network: $ReadOnly<NetworkRow>,
@@ -41,7 +50,8 @@ export function genCheckAddressesInUse(
   return async (
     body: FilterUsedRequest,
   ): Promise<FilterUsedResponse> => {
-    const addressSet = new Set(body.addresses);
+    const addresses = body.addresses.map(addr => fixAddresses(addr));
+    const addressSet = new Set(addresses);
     const usedSet = new Set();
     for (const tx of blockchain) {
       if (tx.tx_state !== 'Successful') {
@@ -100,6 +110,7 @@ export function genGetTransactionsHistoryForAddresses(
   return async (
     body: HistoryRequest,
   ): Promise<HistoryResponse> => {
+    const addresses = body.addresses.map(addr => fixAddresses(addr));
     const untilBlockIndex = blockchain.map(tx => tx.block_hash).lastIndexOf(body.untilBlock);
     if (untilBlockIndex === -1) {
       throw new RollbackApiError();
@@ -111,7 +122,7 @@ export function genGetTransactionsHistoryForAddresses(
         subChain.push(blockchain[i]);
       }
     }
-    const ownAddresses = new Set(body.addresses);
+    const ownAddresses = new Set(addresses);
     if (body.after == null)  {
       const filtered = filterForOwn(subChain, ownAddresses, network);
       return filtered;
@@ -203,17 +214,18 @@ export function genUtxoForAddresses(
   return async (
     body: AddressUtxoRequest,
   ): Promise<AddressUtxoResponse> => {
+    const addresses = body.addresses.map(addr => fixAddresses(addr));
     const bestBlock = await getBestBlock();
     if (bestBlock.hash == null) {
       return [];
     }
     const until = bestBlock.hash;
     const history = await getHistory({
-      addresses: body.addresses,
+      addresses,
       untilBlock: until,
     });
     const inBlockHistory = history.filter(tx => tx.block_hash != null);
-    const ourAddressSet = new Set(body.addresses);
+    const ourAddressSet = new Set(addresses);
 
     const utxoMap = new Map<string, RemoteUnspentOutput>();
     for (const tx of inBlockHistory) {

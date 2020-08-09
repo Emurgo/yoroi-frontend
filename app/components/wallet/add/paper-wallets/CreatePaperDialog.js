@@ -61,7 +61,6 @@ type Props = {|
   +onNext: void => PossiblyAsync<void>,
   +onCancel: void => PossiblyAsync<void>,
   +onDownload: void => PossiblyAsync<void>,
-  +onDataChange: { [key: string]: any, ... } => void,
   +loadingGif: Node,
 |};
 
@@ -75,10 +74,6 @@ export default class CreatePaperDialog extends Component<Props> {
 
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
-  };
-
-  handleDataChange: ((key: string, value: string) => void) = (key, value) => {
-    this.props.onDataChange({ [key]: value });
   };
 
   statusToMessage(status: ?PdfGenStepType): string {

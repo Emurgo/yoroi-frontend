@@ -6,24 +6,22 @@ import type { Node } from 'react';
 import BigNumber from 'bignumber.js';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
+import { action, observable } from 'mobx';
 import classnames from 'classnames';
-import { Input } from 'react-polymorph/lib/components/Input';
-import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
 import AmountInputSkin from '../skins/AmountInputSkin';
 import { NumericInput } from 'react-polymorph/lib/components/NumericInput';
 import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
-import vjf from 'mobx-react-form/lib/validators/VJF';
 import Dialog from '../../widgets/Dialog';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
 import globalMessages from '../../../i18n/global-messages';
 import LocalizableError from '../../../i18n/LocalizableError';
 import styles from './DelegationTxDialog.scss';
-import config from '../../../config';
 import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
 import RawHash from '../../widgets/hashWrappers/RawHash';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import SpendingPasswordInput from '../../widgets/forms/SpendingPasswordInput';
 
 import WarningBox from '../../widgets/WarningBox';
 
@@ -58,9 +56,10 @@ type Props = {|
   +amountToDelegate: BigNumber,
   +transactionFee: BigNumber,
   +approximateReward: BigNumber,
+  +isHardware: boolean,
   +isSubmitting: boolean,
   +onCancel: void => void,
-  +onSubmit: ({| password: string |}) => PossiblyAsync<void>,
+  +onSubmit: ({| password?: string |}) => PossiblyAsync<void>,
   +classicTheme: boolean,
   +error: ?LocalizableError,
   +meta: {|
@@ -72,53 +71,41 @@ type Props = {|
 @observer
 export default class DelegationTxDialog extends Component<Props> {
 
+  @observable spendingPasswordForm: void | ReactToolboxMobxForm;
+
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
-    fields: {
-      walletPassword: {
-        type: 'password',
-        label: this.context.intl.formatMessage(globalMessages.walletPasswordLabel),
-        placeholder: this.props.classicTheme ?
-          this.context.intl.formatMessage(globalMessages.walletPasswordFieldPlaceholder) : '',
-        value: '',
-        validators: [({ field }) => {
-          if (field.value === '') {
-            return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
-          }
-          return [true];
-        }],
-      },
-    }
-  }, {
-    options: {
-      validateOnChange: true,
-      validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
-    },
-    plugins: {
-      vjf: vjf()
-    },
-  });
+  @action
+  setSpendingPasswordForm(form: ReactToolboxMobxForm) {
+    this.spendingPasswordForm = form;
+  }
 
   submit(): void {
-    this.form.submit({
+    if (this.spendingPasswordForm == null) {
+      this.props.onSubmit(Object.freeze({}));
+      return;
+    }
+    this.spendingPasswordForm.submit({
       onSuccess: async (form) => {
         const { walletPassword } = form.values();
-        const transactionData = {
-          password: walletPassword,
-        };
-        await this.props.onSubmit(transactionData);
+        await this.props.onSubmit({ password: walletPassword });
       },
       onError: () => {}
     });
   }
 
   render(): Node {
-    const { form } = this;
     const { intl } = this.context;
-    const walletPasswordField = form.$('walletPassword');
+
+    const spendingPasswordForm = this.props.isHardware
+      ? undefined
+      : (<SpendingPasswordInput
+        setForm={(form) => this.setSpendingPasswordForm(form)}
+        classicTheme={this.props.classicTheme}
+        isSubmitting={this.props.isSubmitting}
+      />);
 
     const staleTxWarning = (
       <div className={styles.warningBox}>
@@ -148,7 +135,7 @@ export default class DelegationTxDialog extends Component<Props> {
         primary: true,
         className: confirmButtonClasses,
         isSubmitting: this.props.isSubmitting,
-        disabled: !walletPasswordField.isValid || this.props.isSubmitting,
+        disabled: this.props.isSubmitting,
       },
     ];
 
@@ -221,14 +208,7 @@ export default class DelegationTxDialog extends Component<Props> {
           />
         </div>
         <div className={styles.walletPasswordFields}>
-          <Input
-            type="password"
-            className={styles.walletPassword}
-            {...walletPasswordField.bind()}
-            disabled={this.props.isSubmitting}
-            error={walletPasswordField.error}
-            skin={InputOwnSkin}
-          />
+          {spendingPasswordForm}
         </div>
         <div className={styles.headerBlock}>
           <p className={styles.header}>{intl.formatMessage(messages.approximateLabel)}</p>

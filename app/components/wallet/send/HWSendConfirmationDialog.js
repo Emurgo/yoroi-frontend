@@ -45,6 +45,7 @@ type Props = {|
   +unitOfAccountSetting: UnitOfAccountSettingType,
   +coinPrice: ?number,
   +formattedWalletAmount: BigNumber => string,
+  +addressToDisplayString: string => string,
 |};
 
 @observer
@@ -96,13 +97,13 @@ export default class HWSendConfirmationDialog extends Component<Props> {
           <ExplorableHashContainer
             key={receiver + i} // eslint-disable-line react/no-array-index-key
             selectedExplorer={this.props.selectedExplorer}
-            hash={receiver}
+            hash={this.props.addressToDisplayString(receiver)}
             light
             linkType="address"
           >
             <RawHash light>
               <span className={styles.addressTo}>
-                {receiver}
+                {this.props.addressToDisplayString(receiver)}
               </span>
             </RawHash>
           </ExplorableHashContainer>

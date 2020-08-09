@@ -4,12 +4,13 @@
   .infoBlock {
     background-color: var(--theme-hw-send-confirmation-info-block-background-color);
     font-family: var(--font-regular);
-    padding: 5px;
+    padding: 10px;
     margin-bottom: 30px;
     line-height: 1.38;
     font-size: 14px;
     opacity: 0.7;
     letter-spacing: 0.5px;
+    border-radius: 10px;
     li {
       list-style-type: disc;
       margin-left: 18px;

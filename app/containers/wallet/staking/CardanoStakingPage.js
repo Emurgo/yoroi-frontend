@@ -35,6 +35,7 @@ import type { Notification } from '../../../types/notificationType';
 import type { ReputationObject, } from '../../../api/jormungandr/lib/state-fetch/types';
 import config from '../../../config';
 import { handleExternalLinkClick } from '../../../utils/routing';
+import { WalletTypeOption, } from '../../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 
 export type GeneratedData = typeof CardanoStakingPage.prototype.generated;
 
@@ -285,6 +286,9 @@ export default class CardanoStakingPage extends Component<Props> {
           isSubmitting={
             delegationTransaction.signAndBroadcastDelegationTx.isExecuting
           }
+          isHardware={
+            selectedWallet.getParent().getWalletType() === WalletTypeOption.HARDWARE_WALLET
+          }
           onCancel={this.cancel}
           onSubmit={({ password }) => (
             this.generated.actions.ada.delegationTransaction.signTransaction.trigger({
@@ -336,7 +340,7 @@ export default class CardanoStakingPage extends Component<Props> {
           |},
           signTransaction: {|
             trigger: (params: {|
-              password: string,
+              password?: string,
               publicDeriver: PublicDeriver<>
             |}) => Promise<void>
           |}

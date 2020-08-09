@@ -7,7 +7,6 @@ import type {
   HistoryRequest, HistoryResponse,
   BestBlockRequest, BestBlockResponse,
   SignedResponse,
-  TxBodiesRequest, TxBodiesResponse,
   SignedRequestInternal,
 } from '../../app/api/ada/lib/state-fetch/types';
 import type {
@@ -135,14 +134,6 @@ export function getMockServer(
     ): void => {
       const status = mockImporter.getApiStatus();
       res.send(status);
-    });
-
-    server.post('/api/txs/txBodies', async (
-      req: { body: TxBodiesRequest, ... },
-      res: { send(arg: TxBodiesResponse): any, ... }
-    ): Promise<void> => {
-      const response = await mockImporter.getTxsBodiesForUTXOs(req.body);
-      res.send(response);
     });
 
     installCoinPriceRequestHandlers(server);

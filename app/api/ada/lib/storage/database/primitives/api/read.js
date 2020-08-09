@@ -376,14 +376,14 @@ export class GetDerivationsByPath {
     for (let i = 0; i < request.numLevels; i++) {
       const parentId = path[path.length - 1].Parent;
       if (parentId === null) {
-        throw new Error('GetDerivationsByPath::getParentPath unexpected end');
+        throw new Error(`${nameof(GetDerivationsByPath)}::${nameof(this.getParentPath)} unexpected end`);
       }
       const parent = await GetDerivationsByPath.depTables.GetKeyDerivation.get(
         db, tx,
         parentId
       );
       if (parent === undefined) {
-        throw new Error('GetDerivationsByPath::getParentPath parent not found');
+        throw new Error(`${nameof(GetDerivationsByPath)}::${nameof(this.getParentPath)} parent not found`);
       }
       path.push(parent);
     }
@@ -398,7 +398,7 @@ export class GetDerivationsByPath {
     queryPath: Array<number>,
   ): Promise<Array<$ReadOnly<KeyDerivationRow>>> {
     if (queryPath.length === 0) {
-      throw new Error('GetDerivationsByPath::getSinglePath empty path');
+      throw new Error(`${nameof(GetDerivationsByPath)}::${nameof(this.getSinglePath)} empty path`);
     }
 
     let currDerivationId = startingDerivationId;
@@ -410,7 +410,7 @@ export class GetDerivationsByPath {
         queryPath[index],
       );
       if (nextDerivation === undefined) {
-        throw new Error('GetDerivationsByPath::getSinglePath no path from' + currDerivationId + ' to ' + index);
+        throw new Error(`${nameof(GetDerivationsByPath)}::${nameof(this.getSinglePath)} no path from` + currDerivationId + ' to ' + index);
       }
       derivations.push(nextDerivation);
       currDerivationId = nextDerivation.KeyDerivationId;

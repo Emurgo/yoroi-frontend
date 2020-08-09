@@ -27,7 +27,7 @@ import {
   createStandardBip44Wallet, createHardwareWallet,
 } from './lib/storage/bridge/walletBuilder/byron';
 import {
-  createStandardCip1852Wallet,
+  createStandardCip1852Wallet, createHardwareCip1852Wallet,
 } from './lib/storage/bridge/walletBuilder/shelley';
 import {
   getPendingTransactions,
@@ -111,12 +111,14 @@ import type {
 } from '../../domain/HWSignTx';
 import Notice from '../../domain/Notice';
 import type { CardanoSignTransaction } from 'trezor-connect/lib/types/networks/cardano';
+import {
+  createTrezorSignTxPayload,
+  broadcastTrezorSignedTx,
+} from './transactions/shelley/trezorTx';
 // import {
-//   createTrezorSignTxPayload,
-//   broadcastTrezorSignedTx,
-//   createLedgerSignTxPayload,
-//   prepareAndBroadcastLedgerSignedTx,
-// } from './transactions/byron/hwTransactions';
+// createLedgerSignTxPayload,
+// prepareAndBroadcastLedgerSignedTx,
+// } from './transactions/shelley/ledgerTx';
 import {
   GenericApiError,
   IncorrectWalletPasswordError,
@@ -258,7 +260,7 @@ export type GetNoticesFunc = (
 
 export type SignAndBroadcastRequest = {|
   publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetSigningKey,
-  signRequest: BaseSignRequest<RustModule.WalletV4.TransactionBuilder>,
+  signRequest: HaskellShelleyTxSignRequest,
   /** note: this should include your own staking key too if it's needed to sign the transaction */
   getStakingWitnesses: void => Promise<(
     RustModule.WalletV4.TransactionHash => Array<RustModule.WalletV4.Vkeywitness>
@@ -274,8 +276,7 @@ export type SignAndBroadcastFunc = (
 // createTrezorSignTxData
 
 export type CreateTrezorSignTxDataRequest = {|
-  signRequest: BaseSignRequest<RustModule.WalletV4.TransactionBuilder>,
-  getTxsBodiesForUTXOs: TxBodiesFunc,
+  signRequest: HaskellShelleyTxSignRequest,
   network: $ReadOnly<NetworkRow>,
 |};
 export type CreateTrezorSignTxDataResponse = {|
@@ -451,13 +452,12 @@ export type CreateHardwareWalletRequest = {|
   db: lf$Database,
   walletName: string,
   publicKey: string,
-  derivationIndex: number,
+  ...Addressing,
   hwFeatures: HWFeatures,
   checkAddressesInUse: FilterFunc,
   network: $ReadOnly<NetworkRow>,
 |};
 export type CreateHardwareWalletResponse = {|
-  bip44Wallet: Bip44Wallet,
   publicDeriver: PublicDeriver<>,
 |};
 export type CreateHardwareWalletFunc = (
@@ -741,7 +741,7 @@ export default class AdaApi {
         password,
       });
       const signedTx = shelleySignTransaction(
-        request.signRequest,
+        request.signRequest.self(),
         request.publicDeriver.getParent().getPublicDeriverLevel(),
         RustModule.WalletV4.Bip32PrivateKey.from_bytes(
           Buffer.from(normalizedKey.prvKeyHex, 'hex')
@@ -779,22 +779,20 @@ export default class AdaApi {
     try {
       Logger.debug(`${nameof(AdaApi)}::${nameof(this.createTrezorSignTxData)} called`);
 
-      throw new HardwareUnsupportedError();
+      const config = getCardanoHaskellBaseConfig(
+        request.network
+      ).reduce((acc, next) => Object.assign(acc, next), {});
 
-      // const config = getCardanoHaskellBaseConfig(
-      //   request.network
-      // ).reduce((acc, next) => Object.assign(acc, next), {});
+      const trezorSignTxPayload = await createTrezorSignTxPayload(
+        request.signRequest,
+        config.ByronNetworkId,
+        Number.parseInt(config.ChainNetworkId, 10),
+      );
+      Logger.debug(`${nameof(AdaApi)}::${nameof(this.createTrezorSignTxData)} success: ` + stringifyData(trezorSignTxPayload));
 
-      // const trezorSignTxPayload = await createTrezorSignTxPayload(
-      //   request.signRequest,
-      //   request.getTxsBodiesForUTXOs,
-      //   config.ByronNetworkId,
-      // );
-      // Logger.debug(`${nameof(AdaApi)}::${nameof(this.createTrezorSignTxData)} success: ` + stringifyData(trezorSignTxPayload));
-
-      // return {
-      //   trezorSignTxPayload,
-      // };
+      return {
+        trezorSignTxPayload,
+      };
     } catch (error) {
       Logger.error(`${nameof(AdaApi)}::${nameof(this.createTrezorSignTxData)} error: ` + stringifyError(error));
       if (error instanceof LocalizableError) throw error;
@@ -807,14 +805,13 @@ export default class AdaApi {
   ): Promise<BroadcastTrezorSignedTxResponse> {
     Logger.debug(`${nameof(AdaApi)}::${nameof(this.broadcastTrezorSignedTx)} called`);
     try {
-      throw new HardwareUnsupportedError();
-      // const response = await broadcastTrezorSignedTx(
-      //   request.signedTxRequest,
-      //   request.sendTx
-      // );
-      // Logger.debug(`${nameof(AdaApi)}::${nameof(this.broadcastTrezorSignedTx)} success: ` + stringifyData(response));
+      const response = await broadcastTrezorSignedTx(
+        request.signedTxRequest,
+        request.sendTx
+      );
+      Logger.debug(`${nameof(AdaApi)}::${nameof(this.broadcastTrezorSignedTx)} success: ` + stringifyData(response));
 
-      // return response;
+      return response;
     } catch (error) {
       Logger.error(`${nameof(AdaApi)}::${nameof(this.broadcastTrezorSignedTx)} error: ` + stringifyError(error));
 
@@ -1246,8 +1243,7 @@ export default class AdaApi {
             bip44Wallet,
           ));
         }
-      }
-      if (request.mode === 'cip1852') {
+      } else if (request.mode === 'cip1852') {
         const wallet = await createStandardCip1852Wallet({
           db: request.db,
           rootPk,
@@ -1268,6 +1264,8 @@ export default class AdaApi {
             cip1852Wallet,
           ));
         }
+      } else {
+        throw new Error(`${nameof(this.restoreWallet)} unknown restoration mode`);
       }
 
       Logger.debug(`${nameof(AdaApi)}::${nameof(this.restoreWallet)} success`);
@@ -1407,41 +1405,80 @@ export default class AdaApi {
         request.network
       ).reduce((acc, next) => Object.assign(acc, next), {});
 
-      const wallet = await createHardwareWallet({
-        db: request.db,
-        settings: RustModule.WalletV2.BlockchainSettings.from_json({
-          protocol_magic: config.ByronNetworkId
-        }),
-        accountPublicKey: RustModule.WalletV2.Bip44AccountPublic.new(
-          RustModule.WalletV2.PublicKey.from_hex(request.publicKey),
-          RustModule.WalletV2.DerivationScheme.v2()
-        ),
-        accountIndex: request.derivationIndex,
-        walletName: request.walletName,
-        accountName: '',
-        hwWalletMetaInsert: request.hwFeatures,
-        network: request.network,
-      });
-
-      const bip44Wallet = await Bip44Wallet.createBip44Wallet(
-        request.db,
-        wallet.bip44WrapperRow,
-      );
-
-      if (wallet.publicDeriver.length !== 1) {
-        throw new Error(`${nameof(AdaApi)}::${nameof(this.createHardwareWallet)} should only do 1 HW derivation at a time`);
+      if (request.addressing.startLevel !== Bip44DerivationLevels.PURPOSE.level) {
+        throw new Error(`${nameof(AdaApi)}::${nameof(this.createHardwareWallet)} bad addressing start level`);
       }
-      const pubDeriverResult = wallet.publicDeriver[0].publicDeriverResult;
-      const newPubDeriver = await PublicDeriver.createPublicDeriver(
-        pubDeriverResult,
-        bip44Wallet,
-      );
+      if (request.addressing.path[0] === WalletTypePurpose.BIP44) {
+        const wallet = await createHardwareWallet({
+          db: request.db,
+          settings: RustModule.WalletV2.BlockchainSettings.from_json({
+            protocol_magic: config.ByronNetworkId
+          }),
+          accountPublicKey: RustModule.WalletV2.Bip44AccountPublic.new(
+            RustModule.WalletV2.PublicKey.from_hex(request.publicKey),
+            RustModule.WalletV2.DerivationScheme.v2()
+          ),
+          accountIndex: request.addressing.path[
+            Bip44DerivationLevels.ACCOUNT.level - request.addressing.startLevel
+          ],
+          walletName: request.walletName,
+          accountName: '',
+          hwWalletMetaInsert: request.hwFeatures,
+          network: request.network,
+        });
 
-      Logger.debug(`${nameof(AdaApi)}::${nameof(this.restoreWallet)} success`);
-      return {
-        bip44Wallet,
-        publicDeriver: newPubDeriver,
-      };
+        const bip44Wallet = await Bip44Wallet.createBip44Wallet(
+          request.db,
+          wallet.bip44WrapperRow,
+        );
+
+        if (wallet.publicDeriver.length !== 1) {
+          throw new Error(`${nameof(AdaApi)}::${nameof(this.createHardwareWallet)} should only do 1 HW derivation at a time`);
+        }
+        const pubDeriverResult = wallet.publicDeriver[0].publicDeriverResult;
+        const newPubDeriver = await PublicDeriver.createPublicDeriver(
+          pubDeriverResult,
+          bip44Wallet,
+        );
+        Logger.debug(`${nameof(AdaApi)}::${nameof(this.restoreWallet)} success`);
+        return {
+          publicDeriver: newPubDeriver,
+        };
+      }
+      if (request.addressing.path[0] === WalletTypePurpose.CIP1852) {
+        const wallet = await createHardwareCip1852Wallet({
+          db: request.db,
+          accountPublicKey: RustModule.WalletV4.Bip32PublicKey.from_bytes(
+            Buffer.from(request.publicKey, 'hex')
+          ),
+          accountIndex: request.addressing.path[
+            Bip44DerivationLevels.ACCOUNT.level - request.addressing.startLevel
+          ],
+          walletName: request.walletName,
+          accountName: '',
+          hwWalletMetaInsert: request.hwFeatures,
+          network: request.network,
+        });
+
+        const cip1852Wallet = await Cip1852Wallet.createCip1852Wallet(
+          request.db,
+          wallet.cip1852WrapperRow,
+        );
+
+        if (wallet.publicDeriver.length !== 1) {
+          throw new Error(`${nameof(AdaApi)}::${nameof(this.createHardwareWallet)} should only do 1 HW derivation at a time`);
+        }
+        const pubDeriverResult = wallet.publicDeriver[0].publicDeriverResult;
+        const newPubDeriver = await PublicDeriver.createPublicDeriver(
+          pubDeriverResult,
+          cip1852Wallet,
+        );
+        Logger.debug(`${nameof(AdaApi)}::${nameof(this.restoreWallet)} success`);
+        return {
+          publicDeriver: newPubDeriver,
+        };
+      }
+      throw new Error(`${nameof(this.createHardwareWallet)} unknown restoration mode`);
     } catch (error) {
       Logger.error(`${nameof(AdaApi)}::${nameof(this.createHardwareWallet)} error: ` + stringifyError(error));
 

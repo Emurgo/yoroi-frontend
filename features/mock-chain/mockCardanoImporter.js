@@ -4,7 +4,6 @@ import cryptoRandomString from 'crypto-random-string';
 import type {
   SignedRequestInternal, SignedResponse,
   RemoteTransaction,
-  TxBodiesFunc,
   UtxoSumFunc,
   PoolInfoFunc,
   AddressUtxoFunc,
@@ -73,9 +72,10 @@ export const generateTransaction = (): {|
   postLaunchPendingTx: RemoteTransaction,
   failedTx: RemoteTransaction,
   ledgerTx1: RemoteTransaction,
-  trezorTx1: RemoteTransaction,
-  trezorTx2: RemoteTransaction,
-  trezorTx3: RemoteTransaction,
+  bip44TrezorTx1: RemoteTransaction,
+  bip44TrezorTx2: RemoteTransaction,
+  bip44TrezorTx3: RemoteTransaction,
+  cip1852TrezorTx1: RemoteTransaction,
 |} => {
   const genesisTx = {
     hash: cryptoRandomString({ length: 64 }),
@@ -303,6 +303,20 @@ export const generateTransaction = (): {|
           ],
         ),
         amount: '2000000'
+      },
+      {
+        // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
+        address: getSingleAddressString(
+          testWallets['dump-wallet'].mnemonic,
+          [
+            WalletTypePurpose.BIP44,
+            CoinTypes.CARDANO,
+            0 + HARD_DERIVATION_START,
+            ChainDerivations.EXTERNAL,
+            1
+          ],
+        ),
+        amount: '7000000'
       },
     ],
     height: 1,
@@ -933,7 +947,7 @@ export const generateTransaction = (): {|
   //   trezor-wallet
   // =================
 
-  const trezorTx1 = {
+  const bip44TrezorTx1 = {
     hash: '3677e75c7ba699bfdc6cd57d42f246f86f69aefd76025006ac78313fad2bba20',
     inputs: [
       {
@@ -974,7 +988,7 @@ export const generateTransaction = (): {|
         address: getSingleAddressString(
           testWallets['trezor-wallet'].mnemonic,
           [
-            isShelley ? WalletTypePurpose.CIP1852 : WalletTypePurpose.BIP44,
+            WalletTypePurpose.BIP44,
             CoinTypes.CARDANO,
             0 + HARD_DERIVATION_START,
             ChainDerivations.INTERNAL,
@@ -993,7 +1007,7 @@ export const generateTransaction = (): {|
     last_update: '2019-05-20T23:17:11.899Z',
     tx_state: 'Successful'
   };
-  const trezorTx2 = {
+  const bip44TrezorTx2 = {
     hash: '058405892f66075d83abd1b7fe341d2d5bfd2f6122b2f874700039e5078e0dd5',
     inputs: [
       {
@@ -1034,7 +1048,7 @@ export const generateTransaction = (): {|
         address: getSingleAddressString(
           testWallets['trezor-wallet'].mnemonic,
           [
-            isShelley ? WalletTypePurpose.CIP1852 : WalletTypePurpose.BIP44,
+            WalletTypePurpose.BIP44,
             CoinTypes.CARDANO,
             0 + HARD_DERIVATION_START,
             ChainDerivations.INTERNAL,
@@ -1053,7 +1067,7 @@ export const generateTransaction = (): {|
     last_update: '2019-05-20T23:17:31.899Z',
     tx_state: 'Successful'
   };
-  const trezorTx3 = {
+  const bip44TrezorTx3 = {
     hash: '1029eef5bb0f06979ab0b9530a62bac11e180797d08cab980fe39389d42b3657',
     inputs: [
       {
@@ -1080,7 +1094,7 @@ export const generateTransaction = (): {|
         address: getSingleAddressString(
           testWallets['trezor-wallet'].mnemonic,
           [
-            isShelley ? WalletTypePurpose.CIP1852 : WalletTypePurpose.BIP44,
+            WalletTypePurpose.BIP44,
             CoinTypes.CARDANO,
             0 + HARD_DERIVATION_START,
             ChainDerivations.EXTERNAL,
@@ -1099,6 +1113,57 @@ export const generateTransaction = (): {|
     last_update: '2019-05-20T23:17:51.899Z',
     tx_state: 'Successful'
   };
+  const cip1852TrezorTx1 = {
+    hash: '3677e75c7ba699bfdc6cd57d42f246f86f69aefd76025006ac78313fad2bba21',
+    inputs: [
+      {
+        // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
+        address: getSingleAddressString(
+          testWallets['dump-wallet'].mnemonic,
+          [
+            WalletTypePurpose.BIP44,
+            CoinTypes.CARDANO,
+            0 + HARD_DERIVATION_START,
+            ChainDerivations.EXTERNAL,
+            1
+          ]
+        ),
+        txHash: distributorTx.hash,
+        id: distributorTx.hash + '15',
+        index: 15,
+        amount: '7000000'
+      }
+    ],
+    outputs: [
+      {
+        // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
+        address: getSingleAddressString(
+          testWallets['dump-wallet'].mnemonic,
+          [
+            WalletTypePurpose.BIP44,
+            CoinTypes.CARDANO,
+            0 + HARD_DERIVATION_START,
+            ChainDerivations.EXTERNAL,
+            1
+          ]
+        ),
+        amount: '1'
+      },
+      {
+        // trezor-wallet base address index 0'/0/2
+        address: '0101ea7455b13eceade036aa02c2eecfeb0c2f5fd7398f08c573717d1764238bc39c962aa28156a45a461213770d88d808896785f92c3aa4d2',
+        amount: '5500000'
+      },
+    ],
+    height: 301,
+    block_hash: '301',
+    tx_ordinal: 2,
+    time: '2019-04-20T15:15:53.000Z',
+    epoch: 0,
+    slot: 301,
+    last_update: '2019-05-20T23:17:11.899Z',
+    tx_state: 'Successful'
+  };
 
   return {
     genesisTx,
@@ -1114,9 +1179,10 @@ export const generateTransaction = (): {|
     postLaunchPendingTx,
     failedTx,
     ledgerTx1,
-    trezorTx1,
-    trezorTx2,
-    trezorTx3,
+    bip44TrezorTx1,
+    bip44TrezorTx2,
+    bip44TrezorTx3,
+    cip1852TrezorTx1
   };
 };
 
@@ -1162,9 +1228,10 @@ export function resetChain(
     // ledger-wallet
     addTransaction(txs.ledgerTx1);
     // trezor-wallet
-    addTransaction(txs.trezorTx1);
-    addTransaction(txs.trezorTx2);
-    addTransaction(txs.trezorTx3);
+    addTransaction(txs.bip44TrezorTx1);
+    addTransaction(txs.bip44TrezorTx2);
+    addTransaction(txs.bip44TrezorTx3);
+    addTransaction(txs.cip1852TrezorTx1);
   } else if (chainToUse === MockChain.TestAssurance) {
     // test setup
     addTransaction(txs.genesisTx);
@@ -1245,23 +1312,6 @@ const sendTx = (request: SignedRequestInternal): SignedResponse => {
   addTransaction(remoteTx);
   return { txId: remoteTx.hash };
 };
-const getTxsBodiesForUTXOs: TxBodiesFunc = async req => {
-  const result = {};
-  for (const hash of req.txsHashes) {
-    if (hash === '166dfde5b183b7e09483afbbfce7b41e7d6fed34b405cc1041b45f27e8b05d47') {
-      result[hash] = '839f8200d818582482582000665adfef649eb8e7ccb104c14d4c33ccba708aeb0ec85e6a34555bb76b119f008200d818582482582000665adfef649eb8e7ccb104c14d4c33ccba708aeb0ec85e6a34555bb76b119f01ff9f8282d818582183581c18ddda3e6ad67cfa6e91357e75f565835b86379e8f3f22f60fa8a312a0001a9c55fede1a0009be21ffa0';
-    } else if (hash === '3677e75c7ba699bfdc6cd57d42f246f86f69aefd76025006ac78313fad2bba20') {
-      result[hash] = '839f8200d8185824825820591267207e36e03789c74b282cce9d0637325d46d6bd5b9a27fe6e75abf1b08700ff9f8282d818582183581ce999ddf0e7b22ffdc8a6ea041ba4b1382c4834fd553f308c407d9e1aa0001a8132b4e41a001e84808282d818582183581c829e3e4cecea3cd73fae255123bef7be317ed0ac3be40c1616ade9fea0001ab3ff94641a002b3686ffa0';
-    } else if (hash === '058405892f66075d83abd1b7fe341d2d5bfd2f6122b2f874700039e5078e0dd5') {
-      result[hash] = '839f8200d8185824825820c54e97f5d6fa9b1170a986d081dc860f9721e253b40c0c6b79edbab922f235f201ff9f8282d818582183581c429bfc0da2711bf754edc60f6ec0349c4fb02eabfd5b66597d25a9e3a0001a1d25653f1a000f42408282d818582183581cf03274dad3c7a1b7aa3951a4cdecc167d5c17d82f3cbfb291f71d2c2a0001a98ca71d01a0016cc70ffa0';
-    } else if (hash === '1029eef5bb0f06979ab0b9530a62bac11e180797d08cab980fe39389d42b3657') {
-      result[hash] = '839f8200d81858248258202bddf3710ee44383a5a9f53aee9f3e27d1d8382537b8b21b30e6314c2897664b00ff9f8282d818582183581c02d2cf0eca7f55fdce2f4c51a307583f50eae31c052c934ae59bf704a0001a0a0584011a000f42408282d818582183581ca3f6cfcb530b5c1d148a07707baef7fea7d61217117903c4109694d2a0001a3dca8fd51a000a0a5cffa0';
-    } else {
-      throw new Error(`Txhash found with no body ${hash}`);
-    }
-  }
-  return result;
-};
 
 const getPoolInfo: PoolInfoFunc = genGetPoolInfo(transactions);
 const getRewardHistory: RewardHistoryFunc = genGetRewardHistory();
@@ -1272,7 +1322,6 @@ export default {
   usedAddresses,
   getApiStatus,
   history,
-  getTxsBodiesForUTXOs,
   getBestBlock,
   sendTx,
   getPoolInfo,

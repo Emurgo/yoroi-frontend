@@ -123,7 +123,7 @@ const genBaseProps: {|
   },
   actions: {
     dialogs: {
-      open: { trigger: action('open') },
+      push: { trigger: action('push') },
       closeActiveDialog: { trigger: action('closeActiveDialog') },
     },
     router: {

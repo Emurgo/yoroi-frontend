@@ -1,11 +1,10 @@
 // @flow
 import { AsyncAction, Action } from '../lib/Action';
-import type { BaseSignRequest } from '../../api/ada/transactions/types';
-import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
+import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 
 export type SendUsingLedgerParams = {|
-  signRequest: BaseSignRequest<RustModule.WalletV4.TransactionBuilder>,
+  signRequest: HaskellShelleyTxSignRequest,
 |};
 
 // ======= Sending ADA using Ledger ACTIONS =======

@@ -101,23 +101,29 @@ export default class WalletAddPage extends Component<Props> {
     const { actions, stores } = this.generated;
     const { uiDialogs } = stores;
 
-    const openTrezorConnectDialog = () => {
+    const openTrezorConnectDialog = (type: string) => {
       if (selectedNetwork === undefined) {
         throw new Error(`${nameof(WalletAddPage)} no API selected`);
       }
       const api = getApiForNetwork(selectedNetwork);
-      actions.dialogs.open.trigger({ dialog: WalletTrezorConnectDialogContainer });
+      actions.dialogs.push.trigger({
+        dialog: WalletTrezorConnectDialogContainer,
+        params: { restoreType: { type } },
+      });
       if (api !== ApiOptions.ada) {
         throw new Error(`${nameof(WalletAddPage)} not ADA API type`);
       }
       this.generated.actions[ApiOptions.ada].trezorConnect.init.trigger();
     };
-    const openLedgerConnectDialog = () => {
+    const openLedgerConnectDialog = (type: string) => {
       if (selectedNetwork === undefined) {
         throw new Error(`${nameof(WalletAddPage)} no API selected`);
       }
       const api = getApiForNetwork(selectedNetwork);
-      actions.dialogs.open.trigger({ dialog: WalletLedgerConnectDialogContainer });
+      actions.dialogs.push.trigger({
+        dialog: WalletLedgerConnectDialogContainer,
+        params: { restoreType: { type } },
+      });
       if (api !== ApiOptions.ada) {
         throw new Error(`${nameof(WalletAddPage)} not ADA API type`);
       }
@@ -125,7 +131,7 @@ export default class WalletAddPage extends Component<Props> {
     };
 
     let activeDialog = null;
-    if (uiDialogs.activeDialog != null && selectedNetwork == null) {
+    if (uiDialogs.hasOpen && selectedNetwork == null) {
       activeDialog = (<PickCurrencyDialogContainer
         onClose={this.onClose}
         onCardano={() => actions.profile.setSelectedNetwork.trigger(networks.ByronMainnet)}
@@ -140,11 +146,11 @@ export default class WalletAddPage extends Component<Props> {
       activeDialog = (
         <WalletCreateOptionDialogContainer
           onClose={this.onClose}
-          onCreate={() => actions.dialogs.open.trigger({ dialog: WalletCreateDialog })}
+          onCreate={() => actions.dialogs.push.trigger({ dialog: WalletCreateDialog })}
           onPaper={/* re-enable paper wallets once we have a good way to do them in Shelley */
             false // eslint-disable-line
               ? undefined
-              : () => actions.dialogs.open.trigger({ dialog: WalletPaperDialog })
+              : () => actions.dialogs.push.trigger({ dialog: WalletPaperDialog })
           }
         />
       );
@@ -184,18 +190,18 @@ export default class WalletAddPage extends Component<Props> {
           onClose={this.onClose}
           onRestore15={() => {
             if (isCardanoHaskell(selectedNetwork)) {
-              return actions.dialogs.open.trigger({
+              return actions.dialogs.push.trigger({
                 dialog: WalletEraOptionDialogContainer,
               });
             }
-            return actions.dialogs.open.trigger({
+            return actions.dialogs.push.trigger({
               dialog: WalletRestoreDialog,
               params: { restoreType: { type: 'bip44', extra: undefined, length: 15 } }
             });
           }}
           onRestore24={isJormungandr(selectedNetwork)
             ? undefined
-            : () => actions.dialogs.open.trigger({
+            : () => actions.dialogs.push.trigger({
               dialog: WalletRestoreDialog,
               params: { restoreType: { type: 'cip1852', extra: undefined, length: 24 }  }
             })
@@ -203,7 +209,7 @@ export default class WalletAddPage extends Component<Props> {
           onPaperRestore={
             getApiForNetwork(selectedNetwork) !== ApiOptions.ada || isJormungandr(selectedNetwork)
               ? undefined
-              : () => actions.dialogs.open.trigger({
+              : () => actions.dialogs.push.trigger({
                 dialog: WalletRestoreDialog,
                 params: { restoreType: { type: 'bip44', extra: 'paper', length: 21 }  }
               })
@@ -214,30 +220,37 @@ export default class WalletAddPage extends Component<Props> {
       if (selectedNetwork === undefined) {
         throw new Error(`${nameof(WalletAddPage)} no API selected`);
       }
+      const hardware = uiDialogs.getParam<'trezor' | 'ledger'>('hardware');
+      const onEra = (era: 'bip44' | 'cip1852') => {
+        if (hardware == null) {
+          return actions.dialogs.push.trigger({
+            dialog: WalletRestoreDialog,
+            params: { restoreType: { type: era, extra: undefined, length: 15 }  }
+          });
+        }
+        if (hardware === 'ledger') {
+          openLedgerConnectDialog(era);
+        }
+        if (hardware === 'trezor') {
+          openTrezorConnectDialog(era);
+        }
+      };
       activeDialog = (
         <WalletEraOptionDialogContainer
           onClose={this.onClose}
-          onByron={() => actions.dialogs.open.trigger({
-            dialog: WalletRestoreDialog,
-            params: { restoreType: { type: 'bip44', extra: undefined, length: 15 }  }
-          })}
-          onShelley={() => actions.dialogs.open.trigger({
-            dialog: WalletRestoreDialog,
-            params: { restoreType: { type: 'cip1852', extra: undefined, length: 15 }  }
-          })}
-          onBack={() => actions.dialogs.open.trigger({
-            dialog: WalletRestoreOptionDialog,
-          })}
+          onByron={() => onEra('bip44')}
+          onShelley={() => onEra('cip1852')}
+          onBack={() => actions.dialogs.pop.trigger()}
         />
       );
     } else if (uiDialogs.isOpen(WalletRestoreDialog)) {
-      const mode = uiDialogs.getParam<?RestoreModeType>('restoreType');
+      const mode = uiDialogs.getParam<RestoreModeType>('restoreType');
       if (mode == null) throw new Error(`${nameof(WalletAddPage)} no mode for restoration selected`);
       activeDialog = (
         <WalletRestoreDialogContainer
           {...this.generated.WalletRestoreDialogContainerProps}
           onClose={this.onClose}
-          onBack={() => actions.dialogs.open.trigger({ dialog: WalletRestoreOptionDialog })}
+          onBack={() => actions.dialogs.pop.trigger()}
           mode={mode}
         />
       );
@@ -245,24 +258,36 @@ export default class WalletAddPage extends Component<Props> {
       activeDialog = (
         <WalletConnectHWOptionDialogContainer
           onClose={this.onClose}
-          onTrezor={openTrezorConnectDialog}
-          onLedger={openLedgerConnectDialog}
+          onTrezor={() => actions.dialogs.push.trigger({
+            dialog: WalletEraOptionDialogContainer,
+            params: { hardware: 'trezor' },
+          })}
+          onLedger={() => actions.dialogs.push.trigger({
+            dialog: WalletEraOptionDialogContainer,
+            params: { hardware: 'ledger' },
+          })}
         />
       );
     } else if (uiDialogs.isOpen(WalletTrezorConnectDialogContainer)) {
+      const mode = uiDialogs.getParam<RestoreModeType>('restoreType');
+      if (mode == null) throw new Error(`${nameof(WalletAddPage)} no mode for restoration selected`);
       activeDialog = (
         <WalletTrezorConnectDialogContainer
           {...this.generated.WalletTrezorConnectDialogContainerProps}
+          mode={mode}
           onClose={this.onClose}
-          onBack={() => actions.dialogs.open.trigger({ dialog: WalletConnectHWOptionDialog })}
+          onBack={() => actions.dialogs.pop.trigger()}
         />
       );
     } else if (uiDialogs.isOpen(WalletLedgerConnectDialogContainer)) {
+      const mode = uiDialogs.getParam<RestoreModeType>('restoreType');
+      if (mode == null) throw new Error(`${nameof(WalletAddPage)} no mode for restoration selected`);
       activeDialog = (
         <WalletLedgerConnectDialogContainer
           {...this.generated.WalletLedgerConnectDialogContainerProps}
+          mode={mode}
           onClose={this.onClose}
-          onBack={() => actions.dialogs.open.trigger({ dialog: WalletConnectHWOptionDialog })}
+          onBack={() => actions.dialogs.pop.trigger()}
         />
       );
     }
@@ -357,7 +382,16 @@ export default class WalletAddPage extends Component<Props> {
             dialog: any,
             params?: any
           |}) => void
-        |}
+        |},
+        push: {|
+          trigger: (params: {|
+            dialog: any,
+            params?: any
+          |}) => void
+        |},
+        pop: {|
+          trigger: void => void,
+        |},
       |},
       profile: {|
         setSelectedNetwork: {|
@@ -380,8 +414,8 @@ export default class WalletAddPage extends Component<Props> {
     stores: {|
       profile: {| selectedNetwork: void | $ReadOnly<NetworkRow> |},
       uiDialogs: {|
-        activeDialog: ?any,
-        getParam: <T>(number | string) => T,
+        hasOpen: boolean,
+        getParam: <T>(number | string) => (void | T),
         isOpen: any => boolean
       |},
       wallets: {| hasAnyWallets: boolean |}
@@ -400,7 +434,7 @@ export default class WalletAddPage extends Component<Props> {
           selectedNetwork: stores.profile.selectedNetwork,
         },
         uiDialogs: {
-          activeDialog: stores.uiDialogs.activeDialog,
+          hasOpen: stores.uiDialogs.hasOpen,
           isOpen: stores.uiDialogs.isOpen,
           getParam: stores.uiDialogs.getParam,
         },
@@ -420,6 +454,12 @@ export default class WalletAddPage extends Component<Props> {
           },
           open: {
             trigger: actions.dialogs.open.trigger,
+          },
+          push: {
+            trigger: actions.dialogs.push.trigger,
+          },
+          pop: {
+            trigger: actions.dialogs.pop.trigger,
           },
         },
         profile: {

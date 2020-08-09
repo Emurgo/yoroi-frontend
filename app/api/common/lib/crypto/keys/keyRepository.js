@@ -254,7 +254,7 @@ export function deriveKey<T: IKeyDerivation>(key: T, index: number): T {
   if (key instanceof BIP32PublicKey) {
     return coerceToT(BIP32PublicKey.fromBip32(key.key.derive(index)));
   }
-  throw new Error('Unexpected class in foo');
+  throw new Error(`Unexpected class in ${nameof(deriveKey)}`);
 }
 export function derivePath<T: IKeyDerivation>(startingKey: T, path: $ReadOnlyArray<number>): T {
   let currKey = startingKey;

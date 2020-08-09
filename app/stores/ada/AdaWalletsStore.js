@@ -19,7 +19,6 @@ import { ROUTES } from '../../routes-config';
 import { buildCheckAndCall } from '../lib/check';
 import { getApiForNetwork, ApiOptions } from '../../api/common/utils';
 import type { ISignRequest } from '../../api/common/lib/transactions/ISignRequest';
-import { genOwnStakingKey } from '../../api/ada/index';
 
 export default class AdaWalletsStore extends Store {
 
@@ -64,7 +63,7 @@ export default class AdaWalletsStore extends Store {
         publicDeriver: withSigning,
         password: transactionDetails.password,
         getStakingWitnesses: () => Promise.resolve(() => []),
-        signRequest: signRequest.self(),
+        signRequest,
         sendTx: this.stores.substores.ada.stateFetchStore.fetcher.sendTx,
       }),
       refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(
