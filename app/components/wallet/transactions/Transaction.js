@@ -101,6 +101,10 @@ const messages = defineMessages({
     id: 'wallet.transaction.certificatesLabel',
     defaultMessage: '!!!Certificates',
   },
+  withdrawals: {
+    id: 'wallet.transaction.withdrawalsLabel',
+    defaultMessage: '!!!Withdrawals',
+  },
   transactionAmount: {
     id: 'wallet.transaction.transactionAmount',
     defaultMessage: '!!!Transaction amount',
@@ -564,6 +568,7 @@ export default class Transaction extends Component<Props, State> {
                   </div>
                 </div>
               </div>
+              {this.getWithdrawals(data)}
               {this.getCertificate(data)}
 
               {(
@@ -714,6 +719,37 @@ export default class Transaction extends Component<Props, State> {
       default: {
         throw new Error(`${nameof(this.jormungandrCertificateToText)} unexpected kind ${kind}`);
       }
+    }
+  }
+
+  getWithdrawals: WalletTransaction => ?Node = (data) => {
+    const { intl } = this.context;
+    if (data instanceof CardanoShelleyTransaction) {
+      const wrapWithdrawalsText = (node) => (
+        <>
+          <h2>
+            {intl.formatMessage(messages.withdrawals)}
+          </h2>
+          <span className={styles.rowData}>
+            {node}
+          </span>
+        </>
+      );
+      const withdrawalBlock = data.withdrawals.reduce(
+        (acc, curr, idx) => {
+          const newElem = (
+            // eslint-disable-next-line react/no-array-index-key
+            <span key={idx}>
+              {acc.length !== 0 ? (<br />) : undefined}
+              {curr.address}
+            </span>
+          );
+          acc.push(newElem);
+          return acc;
+        },
+        ([]: Array<Node>)
+      );
+      return wrapWithdrawalsText(withdrawalBlock);
     }
   }
 

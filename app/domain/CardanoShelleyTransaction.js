@@ -20,6 +20,10 @@ import { TransactionType } from '../api/ada/lib/storage/database/primitives/tabl
 export default class CardanoShelleyTransaction extends WalletTransaction {
 
   @observable certificates: Array<CertificatePart>;
+  @observable withdrawals: Array<{|
+    address: string,
+    value: BigNumber,
+  |}>;
   @observable ttl: void | BigNumber;
   @observable metadata: null | string;
 
@@ -28,12 +32,17 @@ export default class CardanoShelleyTransaction extends WalletTransaction {
     certificates: Array<CertificatePart>,
     ttl: void | BigNumber,
     metadata: null | string,
+    withdrawals: Array<{|
+      address: string,
+      value: BigNumber,
+    |}>
   |}) {
-    const { certificates, ttl, metadata, ...rest } = data;
+    const { certificates, ttl, metadata, withdrawals, ...rest } = data;
     super(rest);
     this.certificates = certificates;
     this.ttl = ttl;
     this.metadata = metadata;
+    this.withdrawals = withdrawals;
   }
 
   @action
@@ -75,6 +84,7 @@ export default class CardanoShelleyTransaction extends WalletTransaction {
         from: toAddr({ rows: tx.utxoInputs, amountPerUnit, addressLookupMap }),
         to: toAddr({ rows: tx.utxoOutputs, amountPerUnit, addressLookupMap }),
       },
+      withdrawals: toAddr({ rows: tx.accountingInputs, amountPerUnit, addressLookupMap }),
       certificates: tx.certificates,
       state: tx.transaction.Status,
       errorMsg: tx.transaction.ErrorMessage,
