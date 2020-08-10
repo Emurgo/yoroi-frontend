@@ -484,6 +484,9 @@ const restoreWalletProps: {|
       recoveryResult: request.recoveryResult,
       isValidMnemonic: (isValidRequest) => {
         const { mnemonic, mode } = isValidRequest;
+        if (!mode.length) {
+          throw new Error(`${nameof(WalletAddPage)}::story no length in mode`);
+        }
         if (isValidRequest.mode.extra === 'paper') {
           return AdaApi.prototype.isValidPaperMnemonic({ mnemonic, numberOfWords: mode.length  });
         }

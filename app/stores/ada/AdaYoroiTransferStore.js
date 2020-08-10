@@ -6,7 +6,6 @@ import Request from '../lib/LocalizedRequest';
 import type {
   TransferTx,
 } from '../../types/TransferTypes';
-import { TransferKind, TransferSource, } from '../../types/TransferTypes';
 import { yoroiTransferTxFromAddresses } from '../../api/ada/transactions/transfer/legacyYoroi';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { generateWalletRootKey, generateLedgerWalletRootKey, } from '../../api/ada/lib/cardanoCrypto/cryptoWallet';
@@ -23,6 +22,7 @@ import { getCardanoHaskellBaseConfig } from '../../api/ada/lib/storage/database/
 import {
   genTimeToSlot,
 } from '../../api/ada/lib/storage/bridge/timeUtils';
+import { ApiMethodNotYetImplementedError } from '../lib/Request';
 
 export default class AdaYoroiTransferStore extends Store {
 
@@ -33,20 +33,24 @@ export default class AdaYoroiTransferStore extends Store {
     recoveryPhrase,
     accountIndex,
   ) => {
-    const rootPk = this.stores.yoroiTransfer.transferKind === TransferKind.LEDGER
+    const rootPk = this.stores.yoroiTransfer.mode?.extra === 'ledger'
       ? generateLedgerWalletRootKey(recoveryPhrase)
       : generateWalletRootKey(recoveryPhrase);
 
     if (this.stores.profile.selectedNetwork == null) {
       throw new Error(`${nameof(AdaYoroiTransferStore)}::${nameof(this._restoreWalletForTransfer)} no network selected`);
     }
+    if (!this.stores.yoroiTransfer.mode) {
+      throw new Error(`${nameof(AdaYoroiTransferStore)}::${nameof(this._restoreWalletForTransfer)} no mode specified`);
+    }
+    const { mode } = this.stores.yoroiTransfer;
 
     const stateFetcher = this.stores.substores.ada.stateFetchStore.fetcher;
     const restoreResult = await this.restoreForTransferRequest.execute({
       rootPk,
       accountIndex,
       checkAddressesInUse: stateFetcher.checkAddressesInUse,
-      transferSource: this.stores.yoroiTransfer.transferSource,
+      transferSource: mode.type,
       network: this.stores.profile.selectedNetwork,
     }).promise;
     if (!restoreResult) throw new Error('Restored wallet was not received correctly');
@@ -58,13 +62,16 @@ export default class AdaYoroiTransferStore extends Store {
     updateStatusCallback: void => void,
     getDestinationAddress: void => Promise<string>,
   |} => Promise<TransferTx> = async (request) => {
-    if (this.stores.yoroiTransfer.transferSource === TransferSource.BIP44) {
+    if (!this.stores.yoroiTransfer.mode) {
+      throw new Error(`${nameof(AdaYoroiTransferStore)}::${nameof(this.generateTransferTxFromMnemonic)} no mode specified`);
+    }
+    if (this.stores.yoroiTransfer.mode.type === 'bip44') {
       return this.generateTransferTxForByron(request);
     }
-    if (this.stores.yoroiTransfer.transferSource === TransferSource.CHIMERIC_ACCOUNT) {
-      return this.generateTransferTxForByron(request);
+    if (this.stores.yoroiTransfer.mode.type === 'cip1852') {
+      return this.generateTransferTxForRewardAccount(request);
     }
-    throw new Error(`${nameof(AdaYoroiTransferStore)}::${nameof(this.generateTransferTxFromMnemonic)} unknown restore type ${this.stores.yoroiTransfer.transferSource}`);
+    throw new Error(`${nameof(AdaYoroiTransferStore)}::${nameof(this.generateTransferTxFromMnemonic)} unknown restore type ${this.stores.yoroiTransfer.mode?.type || ''}`);
   }
 
   generateTransferTxForRewardAccount: {|
@@ -72,7 +79,7 @@ export default class AdaYoroiTransferStore extends Store {
     updateStatusCallback: void => void,
     getDestinationAddress: void => Promise<string>,
   |} => Promise<TransferTx> = async (_request) => {
-    // const rootPk = this.stores.yoroiTransfer.transferKind === TransferKind.LEDGER
+    // const rootPk = this.stores.yoroiTransfer.mode?.extra === 'ledger'
     //   ? generateLedgerWalletRootKey(request.recoveryPhrase)
     //   : generateWalletRootKey(request.recoveryPhrase);
 
@@ -84,7 +91,7 @@ export default class AdaYoroiTransferStore extends Store {
     //   .derive(ChainDerivations.CHIMERIC_ACCOUNT)
     //   .derive(0);
 
-    throw new Error(`${nameof(this.generateTransferTxForRewardAccount)} Not supported yet`);
+    throw new ApiMethodNotYetImplementedError();
   }
 
   generateTransferTxForByron: {|

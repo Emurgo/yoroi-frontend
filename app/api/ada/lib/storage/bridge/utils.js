@@ -284,7 +284,7 @@ export function addressToDisplayString(
       }
       return byronAddr.to_base58();
     }
-    throw new Error(`${nameof(addressToKind)} not implemented for network ${network.NetworkId}`);
+    throw new Error(`${nameof(addressToDisplayString)} not implemented for network ${network.NetworkId}`);
   } catch (_e2) {
     throw new Error(`${nameof(addressToDisplayString)} failed to parse address type ` + address);
   }
@@ -325,7 +325,7 @@ export function getAddressPayload(
       }
       return byronAddr.to_base58();
     }
-    throw new Error(`${nameof(addressToKind)} not implemented for network ${network.NetworkId}`);
+    throw new Error(`${nameof(getAddressPayload)} not implemented for network ${network.NetworkId}`);
   } catch (_e2) {
     throw new Error(`${nameof(getAddressPayload)} failed to parse address type ` + address);
   }

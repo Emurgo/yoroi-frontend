@@ -5,10 +5,10 @@ import { computed } from 'mobx';
 import { observer } from 'mobx-react';
 import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 import ByronOptionDialog from '../../../components/transfer/cards/ByronOptionDialog';
-import { TransferKind, TransferSource, } from '../../../types/TransferTypes';
-import type { TransferSourceType, TransferKindType, } from '../../../types/TransferTypes';
+import type { RestoreModeType } from '../../../actions/common/wallet-restore-actions';
 import type { ComplexityLevelType } from '../../../types/complexityLevelType';
 import { ComplexityLevels } from '../../../types/complexityLevelType';
+import config from '../../../config';
 
 export type GeneratedData = typeof ByronEraOptionDialogContainer.prototype.generated;
 
@@ -34,26 +34,34 @@ export default class ByronEraOptionDialogContainer extends Component<Props> {
 
   startTransferIcarusFunds: void => void = () => {
     this.generated.actions.yoroiTransfer.startTransferFunds.trigger({
-      source: TransferSource.BIP44
+      source: {
+        type: 'bip44',
+        extra: undefined,
+        length: config.wallets.WALLET_RECOVERY_PHRASE_WORD_COUNT,
+      },
     });
   }
 
   startTransferYoroiPaperFunds: void => void = () => {
-    this.generated.actions.yoroiTransfer.startTransferPaperFunds.trigger({
-      source: TransferSource.BIP44
+    this.generated.actions.yoroiTransfer.startTransferFunds.trigger({
+      source: {
+        type: 'bip44',
+        extra: 'paper',
+        length: config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT,
+      },
     });
   }
 
   startTransferTrezorFunds: void => void = () => {
-    this.generated.actions.yoroiTransfer.startTransferLegacyHardwareFunds.trigger(
-      TransferKind.TREZOR
-    );
+    this.generated.actions.yoroiTransfer.startTransferFunds.trigger({
+      source: { type: 'bip44', extra: 'trezor' },
+    });
   }
 
   startTransferLedgerFunds: void => void = () => {
-    this.generated.actions.yoroiTransfer.startTransferLegacyHardwareFunds.trigger(
-      TransferKind.LEDGER
-    );
+    this.generated.actions.yoroiTransfer.startTransferFunds.trigger({
+      source: { type: 'bip44', extra: 'ledger' },
+    });
   }
 
   render(): Node {
@@ -99,17 +107,9 @@ export default class ByronEraOptionDialogContainer extends Component<Props> {
       yoroiTransfer: {|
         startTransferFunds: {|
           trigger: (params: {|
-            source: TransferSourceType
+            source: RestoreModeType
           |}) => void
         |},
-        startTransferLegacyHardwareFunds: {|
-          trigger: (params: TransferKindType) => void
-        |},
-        startTransferPaperFunds: {|
-          trigger: (params: {|
-            source: TransferSourceType
-          |}) => void
-        |}
       |}
     |}
     |} {
@@ -135,10 +135,6 @@ export default class ByronEraOptionDialogContainer extends Component<Props> {
           startTransferMasterKey: { trigger: daedalusTransfer.startTransferMasterKey.trigger },
         },
         yoroiTransfer: {
-          startTransferLegacyHardwareFunds: {
-            trigger: yoroiTransfer.startTransferLegacyHardwareFunds.trigger
-          },
-          startTransferPaperFunds: { trigger: yoroiTransfer.startTransferPaperFunds.trigger },
           startTransferFunds: { trigger: yoroiTransfer.startTransferFunds.trigger },
         },
       },

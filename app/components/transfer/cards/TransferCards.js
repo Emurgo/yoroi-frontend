@@ -61,29 +61,27 @@ export default class TransferCards extends Component<Props> {
           </div>
         </button>
         {/* shelley-itn wallet */}
-        {!environment.isProduction() &&
-          <button
-            type="button"
-            className="TransferCards_shelleyItn"
-            onClick={this.props.onShelleyItn}
-          >
-            <div className={styles.heroCardsItem}>
-              <div className={classnames([styles.heroCardsItemBg, styles.bgShelleyTestnet])} />
-              <div className={styles.heroCardsItemTitle}>
-                {intl.formatMessage(messages.shelleyItnWallet)}
-                <div className={styles.tooltip}>
-                  <CustomTooltip
-                    toolTip={
-                      <div className={styles.tooltipSize}>
-                        {intl.formatMessage(globalMessages.legacyAttentionText)}
-                      </div>
-                    }
-                  />
-                </div>
+        <button
+          type="button"
+          className="TransferCards_shelleyItn"
+          onClick={this.props.onShelleyItn}
+        >
+          <div className={styles.heroCardsItem}>
+            <div className={classnames([styles.heroCardsItemBg, styles.bgShelleyTestnet])} />
+            <div className={styles.heroCardsItemTitle}>
+              {intl.formatMessage(messages.shelleyItnWallet)}
+              <div className={styles.tooltip}>
+                <CustomTooltip
+                  toolTip={
+                    <div className={styles.tooltipSize}>
+                      {intl.formatMessage(globalMessages.legacyAttentionText)}
+                    </div>
+                  }
+                />
               </div>
             </div>
-          </button>
-        }
+          </div>
+        </button>
       </div>
     );
   }

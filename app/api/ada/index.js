@@ -15,12 +15,6 @@ import {
   CoinTypes,
 } from '../../config/numbersConfig';
 import type {
-  TransferSourceType,
-} from '../../types/TransferTypes';
-import {
-  TransferSource,
-} from '../../types/TransferTypes';
-import type {
   Network,
 } from '../../../config/config-types';
 import {
@@ -433,7 +427,7 @@ export type GenerateWalletRecoveryPhraseFunc = (
 
 export type RestoreWalletForTransferRequest = {|
   rootPk: RustModule.WalletV4.Bip32PrivateKey,
-  transferSource: TransferSourceType,
+  transferSource: 'cip1852' | 'bip44',
   accountIndex: number,
   checkAddressesInUse: FilterFunc,
   network: $ReadOnly<NetworkRow>,
@@ -1306,7 +1300,7 @@ export default class AdaApi {
       const foundAddresses = new Set<string>();
 
       const accountKey = rootPk
-        .derive(request.transferSource === TransferSource.CIP1852
+        .derive(request.transferSource === 'cip1852'
           ? WalletTypePurpose.CIP1852
           : WalletTypePurpose.BIP44)
         .derive(CoinTypes.CARDANO)
@@ -1326,7 +1320,7 @@ export default class AdaApi {
       };
 
       let insertTree;
-      if (request.transferSource === TransferSource.BIP44) {
+      if (request.transferSource === 'bip44') {
         const key = RustModule.WalletV2.Bip44AccountPublic.new(
           v4PublicToV2(accountKey.to_public()),
           RustModule.WalletV2.DerivationScheme.v2(),

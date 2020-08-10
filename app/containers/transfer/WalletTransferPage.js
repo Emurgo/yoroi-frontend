@@ -9,7 +9,6 @@ import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 
 import TransferTypeSelect from '../../components/transfer/cards/TransferTypeSelect';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
-import { TransferSource, } from '../../types/TransferTypes';
 import YoroiTransferPage from './YoroiTransferPage';
 import type { GeneratedData as YoroiTransferPageData } from './YoroiTransferPage';
 import DaedalusTransferPage from './DaedalusTransferPage';
@@ -17,7 +16,7 @@ import type { GeneratedData as DaedalusTransferPageData } from './DaedalusTransf
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import ByronEraOptionDialogContainer from './options/ByronEraOptionDialogContainer';
 import type { GeneratedData as ByronEraOptionDialogContainerData } from './options/ByronEraOptionDialogContainer';
-import type { TransferSourceType, } from '../../types/TransferTypes';
+import type { RestoreModeType } from '../../actions/common/wallet-restore-actions';
 
 export type GeneratedData = typeof WalletTransferPage.prototype.generated;
 
@@ -72,7 +71,7 @@ export default class WalletTransferPage extends Component<Props> {
           onByron={() => actions.dialogs.open.trigger({ dialog: ByronEraOptionDialogContainer })}
           onShelleyItn={() => this.generated.actions.yoroiTransfer
             .startTransferFunds.trigger({
-              source: TransferSource.CHIMERIC_ACCOUNT
+              source: { type: 'cip1852', extra: undefined, length: 15, }
             })
           }
         />
@@ -92,7 +91,7 @@ export default class WalletTransferPage extends Component<Props> {
       yoroiTransfer: {|
         startTransferFunds: {|
           trigger: (params: {|
-            source: TransferSourceType
+            source: RestoreModeType
           |}) => void
         |}
       |},

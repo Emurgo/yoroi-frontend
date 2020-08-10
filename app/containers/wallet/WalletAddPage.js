@@ -108,7 +108,7 @@ export default class WalletAddPage extends Component<Props> {
       const api = getApiForNetwork(selectedNetwork);
       actions.dialogs.push.trigger({
         dialog: WalletTrezorConnectDialogContainer,
-        params: { restoreType: { type } },
+        params: { restoreType: { type, extra: 'trezor' } },
       });
       if (api !== ApiOptions.ada) {
         throw new Error(`${nameof(WalletAddPage)} not ADA API type`);
@@ -122,7 +122,7 @@ export default class WalletAddPage extends Component<Props> {
       const api = getApiForNetwork(selectedNetwork);
       actions.dialogs.push.trigger({
         dialog: WalletLedgerConnectDialogContainer,
-        params: { restoreType: { type } },
+        params: { restoreType: { type, extra: 'ledger' } },
       });
       if (api !== ApiOptions.ada) {
         throw new Error(`${nameof(WalletAddPage)} not ADA API type`);

@@ -1,12 +1,11 @@
 // @flow
 
-import { action, runInAction, } from 'mobx';
+import { action, } from 'mobx';
 import Store from '../base/Store';
 
 import environment from '../../environment';
 import type { RestoreModeType } from '../../actions/common/wallet-restore-actions';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
-import { TransferSource } from '../../types/TransferTypes';
 import {
   WalletTypePurpose,
   CoinTypes,
@@ -19,9 +18,6 @@ import {
 import {
   v4Bip32PrivateToV3,
 } from '../../api/jormungandr/lib/crypto/utils';
-import {
-  RestoreSteps,
-} from '../toplevel/WalletRestoreStore';
 import {
   buildCheckAndCall,
 } from '../lib/check';
@@ -89,27 +85,6 @@ export default class JormungandrWalletRestoreStore extends Store {
     return internalAddrHash;
   }
 
-  @action
-  _startCheck: void => Promise<void> = async () => {
-    const phrase = this.stores.walletRestore.recoveryResult?.phrase;
-    if (phrase == null) {
-      throw new Error(`${nameof(this._startCheck)} no recovery phrase set. Should never happen`);
-    }
-
-    this.actions.yoroiTransfer.startTransferFunds.trigger({
-      source: TransferSource.BIP44,
-    });
-    this.actions.yoroiTransfer.setupTransferFundsWithMnemonic.trigger({
-      recoveryPhrase: phrase
-    });
-    runInAction(() => { this.stores.walletRestore.step = RestoreSteps.TRANSFER_TX_GEN; });
-
-    const internalAddrHash = this._getFirstCip1852InternalAddr();
-    await this.actions.yoroiTransfer.checkAddresses.trigger({
-      getDestinationAddress: () => Promise.resolve(internalAddrHash),
-    });
-  }
-
   _restoreToDb: void => Promise<void> = async () => {
     if (
       this.stores.walletRestore.recoveryResult == null ||
@@ -160,6 +135,9 @@ export default class JormungandrWalletRestoreStore extends Store {
     if (request.mode.extra === 'paper') {
       // note: validate with ADA since Jormungandr doesn't itself use paper wallets
       return this.api.ada.isValidPaperMnemonic({ mnemonic, numberOfWords: request.mode.length });
+    }
+    if (!request.mode.length) {
+      throw new Error(`${nameof(JormungandrWalletRestoreStore)}::${nameof(this.isValidMnemonic)} missing length`);
     }
     return this.api.jormungandr.constructor.isValidMnemonic({
       mnemonic,

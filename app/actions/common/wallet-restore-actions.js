@@ -31,6 +31,9 @@ export type RestoreModeType = {|
     typeof config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT |
     typeof config.wallets.DAEDALUS_PAPER_RECOVERY_PHRASE_WORD_COUNT
   ),
+|} | {|
+  type: 'bip44' | 'cip1852',
+  extra: 'ledger' | 'trezor',
 |};
 
 export default class WalletRestoreActions {

@@ -152,10 +152,6 @@ export const mockTransferProps: {
                 startTransferMasterKey: { trigger: action('startTransferMasterKey') },
               },
               yoroiTransfer: {
-                startTransferLegacyHardwareFunds: {
-                  trigger: action('startTransferLegacyHardwareFunds')
-                },
-                startTransferPaperFunds: { trigger: action('startTransferPaperFunds') },
                 startTransferFunds: { trigger: action('startTransferFunds') },
               },
             },

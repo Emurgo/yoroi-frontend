@@ -97,6 +97,9 @@ export default class AdaWalletRestoreStore extends Store {
       );
     }
     const mode = this.mode;
+    if (!mode.length) {
+      throw new Error(`${nameof(AdaWalletRestoreStore)}::${nameof(this._processRestoreMeta)} missing length`);
+    }
     const wordCount = mode.length;
     if (mode.extra === 'paper') {
       const [newPhrase] = unscramblePaperAdaMnemonic(
@@ -184,7 +187,13 @@ export function generatePlates(
     : NUMBER_OF_VERIFIED_ADDRESSES;
 
   const shouldShowByronPlate = () => {
-    if (isCardanoHaskell(network) && (mode.length === 15 || mode.extra === 'paper')) {
+    if (
+      // generically show byron checksum if length is 15
+      // since 15-word wallets were supported in Byron
+      isCardanoHaskell(network) && (mode.length === 15 || mode.extra === 'paper') ||
+      // only show HW byron checksums if using bip44
+      (mode.type === 'bip44' && (mode.extra === 'trezor' || mode.extra === 'ledger'))
+    ) {
       return true;
     }
     if (isJormungandr(network)) {

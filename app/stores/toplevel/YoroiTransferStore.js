@@ -14,10 +14,8 @@ import LocalizableError, {
 import type {
   TransferStatusT,
   TransferTx,
-  TransferSourceType,
-  TransferKindType,
 } from '../../types/TransferTypes';
-import { TransferStatus, TransferSource, TransferKind, } from '../../types/TransferTypes';
+import { TransferStatus, } from '../../types/TransferTypes';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import {
   asHasUtxoChains,
@@ -27,6 +25,7 @@ import {
 } from '../../api/ada/lib/cardanoCrypto/paperWallet';
 import config from '../../config';
 import { getApiForNetwork } from '../../api/common/utils';
+import type { RestoreModeType } from '../../actions/common/wallet-restore-actions';
 
 export default class YoroiTransferStore extends Store {
 
@@ -36,8 +35,7 @@ export default class YoroiTransferStore extends Store {
   @observable error: ?LocalizableError = null;
   @observable transferTx: ?TransferTx = null;
   @observable recoveryPhrase: string = '';
-  @observable transferKind: TransferKindType = TransferKind.NORMAL;
-  @observable transferSource: TransferSourceType = TransferSource.BIP44;
+  @observable mode: RestoreModeType | void = undefined;
 
   // eslint-disable-next-line no-restricted-syntax
   _asyncErrorWrapper: (<PT, RT>(
@@ -78,8 +76,6 @@ export default class YoroiTransferStore extends Store {
     super.setup();
     const actions = this.actions.yoroiTransfer;
     actions.startTransferFunds.listen(this._startTransferFunds);
-    actions.startTransferLegacyHardwareFunds.listen(this._startTransferLegacyHardwareFunds);
-    actions.startTransferPaperFunds.listen(this._startTransferPaperFunds);
     actions.startHardwareMnemonic.listen(this._startHardwareMnemonic);
     actions.setupTransferFundsWithMnemonic.listen(this.setupTransferFundsWithMnemonic);
     actions.setupTransferFundsWithPaperMnemonic.listen(
@@ -99,31 +95,20 @@ export default class YoroiTransferStore extends Store {
   }
 
   _startTransferFunds: {|
-    source: TransferSourceType,
+    source: RestoreModeType,
   |} => void = (payload) => {
     runInAction(() => {
-      this.transferKind = TransferKind.NORMAL;
-      this.transferSource = payload.source;
+      this.mode = payload.source;
     });
+    if (payload.source.extra === 'paper') {
+      this._updateStatus(TransferStatus.GETTING_PAPER_MNEMONICS);
+      return;
+    }
+    if (payload.source.extra === 'ledger' || payload.source.extra === 'trezor') {
+      this._updateStatus(TransferStatus.HARDWARE_DISCLAIMER);
+      return;
+    }
     this._updateStatus(TransferStatus.GETTING_MNEMONICS);
-  }
-
-  _startTransferPaperFunds: {|
-    source: TransferSourceType,
-  |} => void = (payload) => {
-    runInAction(() => {
-      this.transferKind = TransferKind.PAPER;
-      this.transferSource = payload.source;
-    });
-    this._updateStatus(TransferStatus.GETTING_PAPER_MNEMONICS);
-  }
-
-  _startTransferLegacyHardwareFunds: TransferKindType => void = (kind) => {
-    runInAction(() => {
-      this.transferKind = kind;
-      this.transferSource = TransferSource.BIP44;
-    });
-    this._updateStatus(TransferStatus.HARDWARE_DISCLAIMER);
   }
 
   _startHardwareMnemonic: void => void = () => {
@@ -288,8 +273,7 @@ export default class YoroiTransferStore extends Store {
     this.transferTx = null;
     this.transferFundsRequest.reset();
     this.recoveryPhrase = '';
-    this.transferKind = TransferKind.NORMAL;
-    this.transferSource = TransferSource.BIP44;
+    this.mode = undefined;
   }
 
   _checkAndTransfer: {|
