@@ -5,7 +5,6 @@ import Request from '../lib/LocalizedRequest';
 import type {
   TransferTx,
 } from '../../types/TransferTypes';
-import { TransferSource, TransferKind, } from '../../types/TransferTypes';
 import { v4Bip32PrivateToV3 } from '../../api/jormungandr/lib/crypto/utils';
 import { yoroiTransferTxFromAddresses } from '../../api/jormungandr/lib/transactions/transfer/yoroiTransfer';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
@@ -32,7 +31,7 @@ export default class JormungandrYoroiTransferStore extends Store {
     recoveryPhrase,
     accountIndex,
   ) => {
-    const rootPk = this.stores.yoroiTransfer.transferKind === TransferKind.LEDGER
+    const rootPk = this.stores.yoroiTransfer.mode?.extra === 'ledger'
       ? generateLedgerWalletRootKey(recoveryPhrase)
       : generateWalletRootKey(recoveryPhrase);
     const stateFetcher = this.stores.substores.jormungandr.stateFetchStore.fetcher;
@@ -40,12 +39,16 @@ export default class JormungandrYoroiTransferStore extends Store {
     if (this.stores.profile.selectedNetwork == null) {
       throw new Error(`${nameof(JormungandrYoroiTransferStore)}::${nameof(this.generateTransferTxFromMnemonic)} no network selected`);
     }
+    if (!this.stores.yoroiTransfer.mode) {
+      throw new Error(`${nameof(JormungandrYoroiTransferStore)}::${nameof(this._restoreWalletForTransfer)} no mode specified`);
+    }
+    const { mode } = this.stores.yoroiTransfer;
     const restoreResult = await this.restoreForTransferRequest.execute({
       network: this.stores.profile.selectedNetwork,
       rootPk: v4Bip32PrivateToV3(rootPk),
       accountIndex,
       checkAddressesInUse: stateFetcher.checkAddressesInUse,
-      transferSource: this.stores.yoroiTransfer.transferSource,
+      transferSource: mode.type,
     }).promise;
     if (!restoreResult) throw new Error('Restored wallet was not received correctly');
     return restoreResult;
@@ -68,10 +71,15 @@ export default class JormungandrYoroiTransferStore extends Store {
 
     request.updateStatusCallback();
 
+    if (!this.stores.yoroiTransfer.mode) {
+      throw new Error(`${nameof(JormungandrYoroiTransferStore)}::${nameof(this.generateTransferTxFromMnemonic)} no mode specified`);
+    }
+    const { mode } = this.stores.yoroiTransfer;
+
     // 3) Calculate private keys for restored wallet utxo
     const accountKey = RustModule.WalletV3.Bip32PrivateKey
       .from_bytes(Buffer.from(masterKey, 'hex'))
-      .derive(this.stores.yoroiTransfer.transferSource === TransferSource.CIP1852
+      .derive(mode.type === 'cip1852'
         ? WalletTypePurpose.CIP1852
         : WalletTypePurpose.BIP44)
       .derive(CoinTypes.CARDANO)
@@ -93,7 +101,7 @@ export default class JormungandrYoroiTransferStore extends Store {
       signingKey: accountKey,
       getUTXOsForAddresses:
         this.stores.substores.jormungandr.stateFetchStore.fetcher.getUTXOsForAddresses,
-      useLegacyWitness: this.stores.yoroiTransfer.transferSource === TransferSource.BIP44,
+      useLegacyWitness: mode.type === 'bip44',
       genesisHash: config.ChainNetworkId,
       feeConfig: config.LinearFee,
     });

@@ -36,6 +36,9 @@ export default class ErgoRestoreStore extends Store {
     mode: RestoreModeType,
   |} => boolean = request => {
     const { mnemonic } = request;
+    if (!request.mode.length) {
+      throw new Error(`${nameof(ErgoRestoreStore)}::${nameof(this.isValidMnemonic)} missing length`);
+    }
     return this.api.ergo.constructor.isValidMnemonic({
       mnemonic,
       numberOfWords: request.mode.length

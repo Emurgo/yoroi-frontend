@@ -34,7 +34,7 @@ const daedalusMessages = defineMessages({
   },
 });
 
-const icarusMessages = defineMessages({
+export const icarusMessages: * = defineMessages({
   transferText: {
     id: 'transfer.legacy.icarus.title',
     defaultMessage: '!!!Icarus/Yoroi Wallet',

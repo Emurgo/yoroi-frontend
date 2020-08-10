@@ -230,7 +230,6 @@ export function rawGenHashToIdsFunc(
     const notFoundWithoutCanonical: Array<{| data: string, type: CoreAddressT |}> = [];
     const addressWithType = notFound.map(addr => ({
       data: addr,
-      // TODO: make multi-currency friendly
       type: addressToKind(addr, 'bytes', network),
     }));
     for (const address of addressWithType) {

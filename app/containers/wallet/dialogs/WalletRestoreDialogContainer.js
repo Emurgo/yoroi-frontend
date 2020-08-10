@@ -104,7 +104,6 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
 
     const mode = this.props.mode;
     const isPaper = mode.extra === 'paper';
-    const wordsCount = mode.length;
 
     const tooltipNotification = {
       duration: config.wallets.ADDRESS_COPY_TOOLTIP_NOTIFICATION_DURATION,
@@ -113,6 +112,10 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
 
     switch (walletRestore.step) {
       case RestoreSteps.START: {
+        if (!mode.length) {
+          throw new Error(`${nameof(WalletRestoreDialogContainer)} no length in mode`);
+        }
+        const wordsCount = mode.length;
         return (<WalletRestoreDialog
           mnemonicValidator={mnemonic => (
             this.generated.stores.walletRestore.isValidMnemonic({

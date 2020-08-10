@@ -27,18 +27,3 @@ export type TransferTx = {|
   senders: Array<string>,
   receiver: string,
 |}
-
-export const TransferSource = Object.freeze({
-  BIP44: 0,
-  CIP1852: 1,
-  CHIMERIC_ACCOUNT: 2,
-});
-export type TransferSourceType = $Values<typeof TransferSource>;
-
-export const TransferKind = Object.freeze({
-  NORMAL: 0,
-  PAPER: 1,
-  TREZOR: 2,
-  LEDGER: 3
-});
-export type TransferKindType = $Values<typeof TransferKind>;

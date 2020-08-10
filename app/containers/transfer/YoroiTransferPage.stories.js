@@ -17,8 +17,7 @@ import { defaultToSelectedExplorer } from '../../domain/SelectedExplorer';
 import { ROUTES } from '../../routes-config';
 import YoroiTransferPage from './YoroiTransferPage';
 import type { MockYoroiTransferStore } from './YoroiTransferPage';
-import { TransferKind, TransferSource, TransferStatus, } from '../../types/TransferTypes';
-import type { TransferKindType, TransferSourceType } from '../../types/TransferTypes';
+import { TransferStatus, } from '../../types/TransferTypes';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import {
   GenerateTransferTxError,
@@ -33,6 +32,8 @@ import AdaApi from '../../api/ada/index';
 import {
   HARD_DERIVATION_START,
 } from '../../config/numbersConfig';
+import type { RestoreModeType } from '../../actions/common/wallet-restore-actions';
+import config from '../../config';
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -45,8 +46,7 @@ const genBaseProps: {|
   yoroiTransfer: {|
     ...InexactSubset<MockYoroiTransferStore>,
   |},
-  transferKind?: TransferKindType,
-  transferSource?: TransferSourceType,
+  mode?: RestoreModeType,
   openDialog?: boolean,
 |} => * = (request) => ({
   stores: {
@@ -61,7 +61,9 @@ const genBaseProps: {|
       selectedAccount: 0 + HARD_DERIVATION_START,
       isValidMnemonic: (isValidRequest) => {
         const { mnemonic, mode } = isValidRequest;
-
+        if (!mode.length) {
+          throw new Error(`${nameof(YoroiTransferPage)}::story no length in mode`);
+        }
         if (isValidRequest.mode.extra === 'paper') {
           return AdaApi.prototype.isValidPaperMnemonic({ mnemonic, numberOfWords: mode.length  });
         }
@@ -117,12 +119,7 @@ const genBaseProps: {|
           getTooltipActiveNotification: () => null,
         },
         yoroiTransfer: {
-          transferKind: request.transferKind == null
-            ? TransferKind.NORMAL
-            : request.transferKind,
-          transferSource: request.transferSource == null
-            ? TransferSource.BIP44
-            : request.transferSource,
+          mode: request.mode,
           recoveryPhrase: request.yoroiTransfer.recoveryPhrase == null
             ? ''
             : request.yoroiTransfer.recoveryPhrase,
@@ -225,16 +222,23 @@ export const Checksum = (): Node => {
   const wallet = genDummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
-    const transferKindSelect = () => select(
-      'transferKind',
-      TransferKind,
-      TransferKind.NORMAL,
+    const modeOptions: {| [key: string]: RestoreModeType |} = {
+      BYRON: { type: 'bip44', extra: undefined, length: 15 },
+      'SHELLEY-15': { type: 'cip1852', extra: undefined, length: 15 },
+      'SHELLEY-24': { type: 'cip1852', extra: undefined, length: 24 },
+      PAPER: { type: 'bip44', extra: 'paper', length: config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT },
+      TREZOR: { type: 'bip44', extra: 'trezor', },
+    };
+    const modeSelect = () => select(
+      'mode',
+      modeOptions,
+      modeOptions.BYRON,
     );
-    const transferKind = transferKindSelect();
+    const mode = modeSelect();
     const baseProps = genBaseProps({
       wallet: wallet.publicDeriver,
       openDialog: true,
-      transferKind,
+      mode,
       yoroiTransfer: {
         status: TransferStatus.DISPLAY_CHECKSUM,
         recoveryPhrase: 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon share',
@@ -359,7 +363,7 @@ export const TransferTx = (): Node => {
   })();
 };
 
-export const Error = (): Node => {
+export const ErrorPage = (): Node => {
   const wallet = genDummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {

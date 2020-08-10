@@ -58,6 +58,9 @@ const genBaseProps: {|
     walletRestore: {
       isValidMnemonic: (isValidRequest) => {
         const { mnemonic, mode } = isValidRequest;
+        if (!mode.length) {
+          throw new Error(`${nameof(DaedalusTransferPage)}::story no length in mode`);
+        }
         if (isValidRequest.mode.extra === 'paper') {
           return AdaApi.prototype.isValidPaperMnemonic({ mnemonic, numberOfWords: mode.length });
         }
@@ -247,7 +250,7 @@ export const ReadyToTransfer = (): Node => {
   })();
 };
 
-export const Error = (): Node => {
+export const ErrorPage = (): Node => {
   const wallet = genDummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {

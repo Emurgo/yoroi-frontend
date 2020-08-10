@@ -152,10 +152,16 @@ export const mockTransferProps: {
                 startTransferMasterKey: { trigger: action('startTransferMasterKey') },
               },
               yoroiTransfer: {
-                startTransferLegacyHardwareFunds: {
-                  trigger: action('startTransferLegacyHardwareFunds')
-                },
-                startTransferPaperFunds: { trigger: action('startTransferPaperFunds') },
+                startTransferFunds: { trigger: action('startTransferFunds') },
+              },
+            },
+          },
+        },
+        ItnEraOptionDialogContainerProps: {
+          generated: {
+            stores: Object.freeze({}),
+            actions: {
+              yoroiTransfer: {
                 startTransferFunds: { trigger: action('startTransferFunds') },
               },
             },

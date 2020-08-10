@@ -1,16 +1,12 @@
 // @flow
 import { AsyncAction, Action } from '../lib/Action';
-import type { TransferSourceType, TransferKindType, } from '../../types/TransferTypes';
+import type { RestoreModeType } from './wallet-restore-actions';
 
 export default class YoroiTransferActions {
   startTransferFunds: Action<{|
-    source: TransferSourceType,
-  |}> = new Action();
-  startTransferPaperFunds: Action<{|
-    source: TransferSourceType,
+    source: RestoreModeType,
   |}> = new Action();
   startHardwareMnemonic: Action<void> = new Action();
-  startTransferLegacyHardwareFunds: Action<TransferKindType> = new Action();
   setupTransferFundsWithMnemonic: Action<{|
     recoveryPhrase: string,
   |}> = new Action();

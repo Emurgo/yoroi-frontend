@@ -12,12 +12,11 @@ import {
   generateWalletRootKey,
 } from '../../api/ada/lib/cardanoCrypto/cryptoWallet';
 import type { PlateResponse } from '../../api/common/lib/crypto/plate';
-import { TransferKind, TransferSource } from '../../types/TransferTypes';
 import { generatePlates } from '../../stores/toplevel/WalletRestoreStore';
 import { SelectedExplorer } from '../../domain/SelectedExplorer';
-import type { TransferKindType, TransferSourceType, } from '../../types/TransferTypes';
 import type { Notification } from '../../types/notificationType';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
+import type { RestoreModeType } from '../../actions/common/wallet-restore-actions';
 
 export type GeneratedData = typeof YoroiPlatePage.prototype.generated;
 
@@ -39,29 +38,18 @@ export default class YoroiPlatePage extends Component<Props> {
   async componentDidMount() {
     const { yoroiTransfer } = this.generated.stores;
 
-    const rootPk = yoroiTransfer.transferKind === TransferKind.LEDGER
+    if (!yoroiTransfer.mode) {
+      throw new Error(`${nameof(YoroiPlatePage)} no mode selected`);
+    }
+
+    const rootPk = yoroiTransfer.mode.type === 'ledger'
       ? generateLedgerWalletRootKey(yoroiTransfer.recoveryPhrase)
       : generateWalletRootKey(yoroiTransfer.recoveryPhrase);
 
-    const getRestoreMode = () => {
-      if (yoroiTransfer.transferKind === TransferKind.PAPER) {
-        return { type: 'bip44', extra: 'paper', length: 21 };
-      }
-      if (yoroiTransfer.transferSource === TransferSource.BIP44) {
-        return { type: 'bip44', extra: undefined, length: 15 };
-      }
-      if (yoroiTransfer.transferSource === TransferSource.CIP1852) {
-        return { type: 'cip1852', extra: undefined, length: 15 };
-      }
-      if (yoroiTransfer.transferSource === TransferSource.CHIMERIC_ACCOUNT) {
-        return { type: 'cip1852', extra: undefined, length: 15 };
-      }
-      throw new Error(`${nameof(YoroiPlatePage)} unknown mode`);
-    };
     const { byronPlate, shelleyPlate, jormungandrPlate } = generatePlates(
       rootPk,
       this.props.accountIndex,
-      getRestoreMode(),
+      yoroiTransfer.mode,
       this.getSelectedNetwork(),
     );
     runInAction(() => {
@@ -141,8 +129,7 @@ export default class YoroiPlatePage extends Component<Props> {
       |},
       yoroiTransfer: {|
         recoveryPhrase: string,
-        transferKind: TransferKindType,
-        transferSource: TransferSourceType
+        mode: RestoreModeType | void,
       |},
       uiNotifications: {|
         getTooltipActiveNotification: string => ?Notification,
@@ -170,8 +157,7 @@ export default class YoroiPlatePage extends Component<Props> {
           selectedNetwork: stores.profile.selectedNetwork,
         },
         yoroiTransfer: {
-          transferKind: stores.yoroiTransfer.transferKind,
-          transferSource: stores.yoroiTransfer.transferSource,
+          mode: stores.yoroiTransfer.mode,
           recoveryPhrase: stores.yoroiTransfer.recoveryPhrase,
         },
       },

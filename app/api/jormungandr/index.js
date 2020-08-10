@@ -14,12 +14,6 @@ import {
   ChainDerivations,
   STAKING_KEY_INDEX,
 } from '../../config/numbersConfig';
-import type {
-  TransferSourceType,
-} from '../../types/TransferTypes';
-import {
-  TransferSource,
-} from '../../types/TransferTypes';
 import {
   createStandardCip1852Wallet,
 } from './lib/storage/bridge/walletBuilder/jormungandr';
@@ -256,7 +250,7 @@ export type GenerateWalletRecoveryPhraseFunc = (
 
 export type RestoreWalletForTransferRequest = {|
   rootPk: RustModule.WalletV3.Bip32PrivateKey,
-  transferSource: TransferSourceType,
+  transferSource: 'bip44' | 'cip1852',
   accountIndex: number,
   checkAddressesInUse: FilterFunc,
   network: $ReadOnly<NetworkRow>,
@@ -782,7 +776,7 @@ export default class JormungandrApi {
       const foundAddresses = new Set<string>();
 
       const accountKey = rootPk
-        .derive(request.transferSource === TransferSource.CIP1852
+        .derive(request.transferSource === 'cip1852'
           ? WalletTypePurpose.CIP1852
           : WalletTypePurpose.BIP44)
         .derive(CoinTypes.CARDANO)
@@ -802,7 +796,7 @@ export default class JormungandrApi {
       };
 
       let insertTree;
-      if (request.transferSource === TransferSource.BIP44) {
+      if (request.transferSource === 'bip44') {
         const key = RustModule.WalletV2.Bip44AccountPublic.new(
           v3PublicToV2(accountKey.to_public()),
           RustModule.WalletV2.DerivationScheme.v2(),
@@ -822,7 +816,7 @@ export default class JormungandrApi {
           addByHash,
           type: CoreAddressTypes.CARDANO_LEGACY,
         });
-      } else if (request.transferSource === TransferSource.CIP1852) {
+      } else if (request.transferSource === 'cip1852') {
         const stakingKey = accountKey
           .derive(ChainDerivations.CHIMERIC_ACCOUNT)
           .derive(STAKING_KEY_INDEX)
@@ -838,7 +832,7 @@ export default class JormungandrApi {
           stakingKey,
         });
 
-        if (request.transferSource === TransferSource.CIP1852) {
+        if (request.transferSource === 'cip1852') {
           insertTree = cip1852InsertTree.filter(child => (
             child.index === ChainDerivations.EXTERNAL || child.index === ChainDerivations.INTERNAL
           ));
