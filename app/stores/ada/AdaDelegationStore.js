@@ -30,9 +30,10 @@ import {
   genToRelativeSlotNumber,
   genTimeToSlot,
 } from '../../api/ada/lib/storage/bridge/timeUtils';
-import { isCardanoHaskell, getCardanoHaskellBaseConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { networks, isCardanoHaskell, getCardanoHaskellBaseConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import type { DelegationRequests, RewardHistoryForWallet } from '../toplevel/DelegationStore';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
+import { YoroiPoolId } from '../../config/stringConfig';
 
 export default class AdaDelegationStore extends Store {
 
@@ -232,6 +233,13 @@ export default class AdaDelegationStore extends Store {
         }
         if (asGetStakingKey(selected) != null) {
           await this.refreshDelegation(selected);
+          if (selected.getParent().getNetworkInfo().NetworkId === networks.ByronMainnet.NetworkId) {
+            // we want to always cache the Yoroi pool info on mainnet
+            await this.updatePoolInfo({
+              network: networks.ByronMainnet,
+              allPoolIds: [YoroiPoolId],
+            });
+          }
         }
       },
     );
