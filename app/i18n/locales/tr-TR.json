@@ -665,6 +665,7 @@
   "wallet.transaction.type.exchange": "Kur",
   "wallet.transaction.type.intrawallet": "{currency} cüzdan içi işlem",
   "wallet.transaction.type.multiparty": "{currency} çok parçalı işlem",
+  "wallet.transaction.withdrawalsLabel": "Withdrawals",
   "wallet.transfer.cards.byron": "Byron-era cüzdan",
   "wallet.transfer.cards.shelleyItn": "Shelley testnet",
   "wallet.transfer.instruction": "Talep edilen ADA seçili olan cüzdanınıza aktarılacaktır",
