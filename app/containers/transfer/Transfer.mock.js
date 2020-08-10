@@ -157,6 +157,16 @@ export const mockTransferProps: {
             },
           },
         },
+        ItnEraOptionDialogContainerProps: {
+          generated: {
+            stores: Object.freeze({}),
+            actions: {
+              yoroiTransfer: {
+                startTransferFunds: { trigger: action('startTransferFunds') },
+              },
+            },
+          },
+        },
         YoroiTransferPageProps: request.YoroiTransferPageProps
           ? { generated: request.YoroiTransferPageProps }
           : null,

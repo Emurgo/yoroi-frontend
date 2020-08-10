@@ -25,7 +25,9 @@ export type RestoreModeType = {|
     typeof config.wallets.DAEDALUS_SHELLEY_RECOVERY_PHRASE_WORD_COUNT
   ),
 |} | {|
-  type: 'bip44',
+  // note: we didn't allow paper wallet creation during the ITN
+  // but we did allow paper wallet restoration
+  type: 'bip44' | 'cip1852',
   extra: 'paper',
   length: (
     typeof config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT |
