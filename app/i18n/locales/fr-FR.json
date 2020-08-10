@@ -665,6 +665,7 @@
   "wallet.transaction.type.exchange": "Échange",
   "wallet.transaction.type.intrawallet": "Transaction entre wallets {currency}",
   "wallet.transaction.type.multiparty": "Transaction multiparties {currency}",
+  "wallet.transaction.withdrawalsLabel": "Withdrawals",
   "wallet.transfer.cards.byron": "Wallet de l'ère Byron",
   "wallet.transfer.cards.shelleyItn": "Testnet Shelley",
   "wallet.transfer.instruction": "Tout ADA réclamé sera transféré dans votre portefeuille actuellement sélectionné",
