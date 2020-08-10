@@ -665,6 +665,7 @@
   "wallet.transaction.type.exchange": "Ανταλλαγή",
   "wallet.transaction.type.intrawallet": "{currency} εντός πορτοφολιού συναλλαγή",
   "wallet.transaction.type.multiparty": "{currency} πολυμερείς συναλλαγή",
+  "wallet.transaction.withdrawalsLabel": "Withdrawals",
   "wallet.transfer.cards.byron": "Byron-era wallet",
   "wallet.transfer.cards.shelleyItn": "Shelley testnet",
   "wallet.transfer.instruction": "Όσα ADA δηλώθηκαν θα μεταφερθούν στο τρέχων επιλεγμένο πορτοφόλι σας",
