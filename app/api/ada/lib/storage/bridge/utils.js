@@ -111,7 +111,7 @@ export function isValidReceiveAddress(
   }
   if (isCardanoHaskell(network)) {
     if (kind === CoreAddressTypes.CARDANO_REWARD) {
-      return [false, messages.cannotSendToLegacy];
+      return [false, messages.cannotSendToReward];
     }
     if (isCardanoHaskellAddress(kind)) {
       return true;
