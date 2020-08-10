@@ -319,7 +319,7 @@ function genDummyWallet(): PublicDeriver<> {
       conceptualWalletId,
       walletType: WalletTypeOption.WEB_WALLET,
       hardwareInfo: null,
-      networkInfo: networks.JormungandrMainnet,
+      networkInfo: networks.ByronMainnet,
     },
     {
       ConceptualWalletId: conceptualWalletId,
