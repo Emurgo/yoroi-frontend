@@ -640,7 +640,7 @@
   "wallet.transaction.certificate.PoolUpdate": "Havuz güncellemesi",
   "wallet.transaction.certificate.StakeDelegation": "Bahis heyeti",
   "wallet.transaction.certificate.StakeDeregistration": "Stake anahtar kaydı silme",
-  "wallet.transaction.certificate.StakeRegistration": "Staking key registration",
+  "wallet.transaction.certificate.StakeRegistration": "Stake anahtarı kaydı",
   "wallet.transaction.certificateLabel": "Sertifika",
   "wallet.transaction.certificatesLabel": "Sertifikalar",
   "wallet.transaction.confirmations": "onaylama",
