@@ -36,7 +36,6 @@ import type { ReputationObject, } from '../../../api/jormungandr/lib/state-fetch
 import config from '../../../config';
 import { handleExternalLinkClick } from '../../../utils/routing';
 import { WalletTypeOption, } from '../../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
-import { YoroiPoolId } from '../../../config/stringConfig';
 
 export type GeneratedData = typeof CardanoStakingPage.prototype.generated;
 
@@ -59,10 +58,6 @@ export default class CardanoStakingPage extends Component<Props> {
     this.generated.actions.ada.delegationTransaction.reset.trigger({ justTransaction: false });
     this.generated.actions.ada.delegationTransaction.setPools.trigger([]);
     this.generated.stores.delegation.poolInfoQuery.reset();
-  }
-
-  async componentDidMount() {
-    await this.generated.actions.ada.delegationTransaction.setPools.trigger([YoroiPoolId]);
   }
 
   render(): Node {
