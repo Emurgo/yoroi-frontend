@@ -159,10 +159,23 @@ export const mockTransferProps: {
         },
         ItnEraOptionDialogContainerProps: {
           generated: {
-            stores: Object.freeze({}),
+            stores: {
+              wallets: {
+                selected: request.selected,
+              },
+              uiDialogs: {
+                getActiveData: (key) => ({
+                  disclaimer: 0,
+                  continuation: () => {},
+                }[key]),
+              },
+            },
             actions: {
               yoroiTransfer: {
                 startTransferFunds: { trigger: action('startTransferFunds') },
+              },
+              dialogs: {
+                updateDataForActiveDialog: { trigger: action('updateDataForActiveDialog') },
               },
             },
           },

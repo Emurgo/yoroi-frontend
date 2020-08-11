@@ -39,14 +39,14 @@ export default class ItnOptionDialog extends Component<Props> {
           <ul className={styles.optionBlockList}>
             <OptionBlock
               parentName={`${nameof(ItnOptionDialog)}`}
-              type="bgByronMainnet"
+              type="restoreNormalWallet"
               title={intl.formatMessage(icarusMessages.mnemonicLabel15)}
               learnMoreText={intl.formatMessage(globalMessages.legacyAttentionText)}
               onSubmit={this.props.onRegular}
             />
             <OptionBlock
               parentName={`${nameof(ItnOptionDialog)}`}
-              type="bgShelleyMainnet"
+              type="restorePaperWallet"
               title={intl.formatMessage(icarusMessages.yoroiPaperLabel)}
               learnMoreText={intl.formatMessage(globalMessages.legacyAttentionText)}
               onSubmit={this.props.onPaper}

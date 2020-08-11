@@ -25,7 +25,7 @@
   "api.errors.getTxsBodiesForUTXOsError": "Error received from api method call while getting TxBodies.",
   "api.errors.getUtxosForAddressesApiError": "Error received from server while getting UTxOs.",
   "api.errors.getUtxosSumsForAddressesApiError": "Error received from server while getting balance.",
-  "api.errors.hardwareUnsupportedError": "This hardware wallet is currently not supported.",
+  "api.errors.hardwareUnsupportedError": "This action is not supported for the currently selected hardware.",
   "api.errors.histoicalCoinPriceError": "Historical coin price data not available now.",
   "api.errors.invalidMnemonicError": "Invalid phrase entered, please check.",
   "api.errors.invalidWitnessError": "The signature is invalid.",

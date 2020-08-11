@@ -158,7 +158,7 @@ const messages = defineMessages({
   },
   hardwareUnsupportedError: {
     id: 'api.errors.hardwareUnsupportedError',
-    defaultMessage: '!!!This hardware wallet is currently not supported.',
+    defaultMessage: '!!!This action is not supported for the currently selected hardware.',
   },
 });
 

@@ -92,7 +92,7 @@ export default class CreatePaperWalletDialogContainer
             onNext={this.generated.actions.paperWallets.submitUserPassword.trigger}
             onCancel={onCancel}
             onDataChange={data => {
-              updateDataForActiveDialog.trigger({ data });
+              updateDataForActiveDialog.trigger(data);
             }}
             classicTheme={profile.isClassicTheme}
           />

@@ -12,6 +12,7 @@ import { generateWalletRootKey, generateLedgerWalletRootKey, } from '../../api/a
 import {
   HARD_DERIVATION_START,
   WalletTypePurpose,
+  ChainDerivations,
   CoinTypes,
 } from '../../config/numbersConfig';
 import type { RestoreWalletForTransferResponse, RestoreWalletForTransferFunc } from '../../api/ada/index';
@@ -22,7 +23,13 @@ import { getCardanoHaskellBaseConfig } from '../../api/ada/lib/storage/database/
 import {
   genTimeToSlot,
 } from '../../api/ada/lib/storage/bridge/timeUtils';
-import { ApiMethodNotYetImplementedError } from '../lib/Request';
+import { ApiMethodNotYetImplementedError, } from '../lib/Request';
+import {
+  NoInputsError,
+} from '../../api/common/errors';
+import {
+  asGetAllUtxos, asHasUtxoChains,
+} from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 
 export default class AdaYoroiTransferStore extends Store {
 
@@ -78,18 +85,55 @@ export default class AdaYoroiTransferStore extends Store {
     recoveryPhrase: string,
     updateStatusCallback: void => void,
     getDestinationAddress: void => Promise<string>,
-  |} => Promise<TransferTx> = async (_request) => {
-    // const rootPk = this.stores.yoroiTransfer.mode?.extra === 'ledger'
-    //   ? generateLedgerWalletRootKey(request.recoveryPhrase)
-    //   : generateWalletRootKey(request.recoveryPhrase);
+  |} => Promise<TransferTx> = async (request) => {
+    const rootPk = this.stores.yoroiTransfer.mode?.extra === 'ledger'
+      ? generateLedgerWalletRootKey(request.recoveryPhrase)
+      : generateWalletRootKey(request.recoveryPhrase);
 
-    // const accountIndex = 0 + HARD_DERIVATION_START; // TODO: don't hardcode index
-    // const stakeKey = rootPk
-    //   .derive(WalletTypePurpose.BIP44)
-    //   .derive(CoinTypes.CARDANO)
-    //   .derive(accountIndex)
-    //   .derive(ChainDerivations.CHIMERIC_ACCOUNT)
-    //   .derive(0);
+    const accountIndex = 0 + HARD_DERIVATION_START; // TODO: don't hardcode index
+    const stakeKey = rootPk
+      .derive(WalletTypePurpose.BIP44)
+      .derive(CoinTypes.CARDANO)
+      .derive(accountIndex)
+      .derive(ChainDerivations.CHIMERIC_ACCOUNT)
+      .derive(0);
+    const stakeCredential = RustModule.WalletV4.StakeCredential.from_keyhash(
+      stakeKey.to_raw_key().to_public().hash()
+    );
+
+    const { selected } = this.stores.wallets;
+    if (selected == null) {
+      throw new Error(`${nameof(AdaYoroiTransferStore)}::${nameof(this._restoreWalletForTransfer)} no wallet selected`);
+    }
+    const withUtxos = asGetAllUtxos(selected);
+    if (withUtxos == null) {
+      throw new Error(`${nameof(AdaYoroiTransferStore)}::${nameof(this._restoreWalletForTransfer)} missing utxo functionality`);
+    }
+    const withHasUtxoChains = asHasUtxoChains(withUtxos);
+    if (withHasUtxoChains == null) {
+      throw new Error(`${nameof(AdaYoroiTransferStore)}::${nameof(this._restoreWalletForTransfer)} missing chains functionality`);
+    }
+
+    const fullConfig = getCardanoHaskellBaseConfig(
+      selected.getParent().getNetworkInfo()
+    );
+    const config = fullConfig.reduce((acc, next) => Object.assign(acc, next), {});
+    const timeToSlot = await genTimeToSlot(fullConfig);
+    const absSlotNumber = new BigNumber(timeToSlot({ time: new Date() }).slot);
+
+    const rewardHex = Buffer.from(RustModule.WalletV4.RewardAddress.new(
+      Number.parseInt(config.ChainNetworkId, 10),
+      stakeCredential
+    ).to_address().to_bytes()).toString('hex');
+    const unsignedTx = await this.api.ada.createWithdrawalTx({
+      publicDeriver: withHasUtxoChains,
+      getAccountState: this.stores.substores.ada.stateFetchStore.fetcher.getAccountState,
+      absSlotNumber,
+      withdrawals: [{
+        rewardAddress: rewardHex,
+        shouldDeregister: true,
+      }],
+    });
 
     throw new ApiMethodNotYetImplementedError();
   }

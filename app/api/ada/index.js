@@ -119,6 +119,7 @@ import {
   WalletAlreadyRestoredError,
   InvalidWitnessError,
   HardwareUnsupportedError,
+  NoInputsError,
 } from '../common/errors';
 import LocalizableError from '../../i18n/LocalizableError';
 import { scanBip44Account, } from '../common/lib/restoration/bip44';
@@ -1095,16 +1096,24 @@ export default class AdaApi {
       const accountStates = await request.getAccountState({
         addresses: request.withdrawals.map(withdrawal => withdrawal.rewardAddress)
       });
-      const finalWithdrawals = Object.keys(accountStates).map(address => ({
-        address: RustModule.WalletV4.RewardAddress.from_address(
-          RustModule.WalletV4.Address.from_bytes(
-            Buffer.from(address, 'hex')
-          )
-        ) ?? (() => { throw new Error(`${nameof(AdaApi)}::${nameof(this.createUnsignedTx)} withdrawal not a reward address`); })(),
-        amount: accountStates[address] == null
-          ? RustModule.WalletV4.BigNum.from_str('0')
-          : RustModule.WalletV4.BigNum.from_str(accountStates[address].remainingAmount),
-      }));
+      const finalWithdrawals = Object.keys(accountStates).map(address => {
+        const rewardForAddress = accountStates[address];
+        if (rewardForAddress == null) {
+          throw new NoInputsError();
+        }
+        const rewardBalance = new BigNumber(rewardForAddress.remainingAmount);
+        if (rewardBalance.eq(0)) {
+          throw new NoInputsError();
+        }
+        return {
+          address: RustModule.WalletV4.RewardAddress.from_address(
+            RustModule.WalletV4.Address.from_bytes(
+              Buffer.from(address, 'hex')
+            )
+          ) ?? (() => { throw new Error(`${nameof(AdaApi)}::${nameof(this.createUnsignedTx)} withdrawal not a reward address`); })(),
+          amount: RustModule.WalletV4.BigNum.from_str(rewardForAddress.remainingAmount)
+        };
+      });
       const unsignedTxResponse = shelleyNewAdaUnsignedTx(
         [],
         {
