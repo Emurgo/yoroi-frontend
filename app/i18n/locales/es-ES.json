@@ -498,7 +498,7 @@
   "wallet.navigation.transactions": "Transacciones",
   "wallet.nowallet.subtitle": "Por favor, elige una billetera del menú desplegable ubicado en la parte superior derecha de la pantalla",
   "wallet.nowallet.title": "No has seleccionado ninguna billetera",
-  "wallet.problematic.explanation1": "The wallet you selected ({checksumTextPart}) was detected to contain some kind of issue.",
+  "wallet.problematic.explanation1": "La billetera seleccionada ({checksumTextPart}) se detectó que posee algún tipo de problema.",
   "wallet.receive.confirmationDialog.addressDetailsTitleLabel": "Verifica la dirección",
   "wallet.receive.confirmationDialog.addressLabel": "Dirección",
   "wallet.receive.confirmationDialog.addressesLabel": "Direcciones",
