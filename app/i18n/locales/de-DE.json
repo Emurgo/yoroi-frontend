@@ -498,6 +498,7 @@
   "wallet.navigation.transactions": "Transaktionen",
   "wallet.nowallet.subtitle": "Bitte wähle rechts oben aus der Liste eine Wallet",
   "wallet.nowallet.title": "Keine Wallet ausgewählt",
+  "wallet.problematic.explanation1": "The wallet you selected ({checksumTextPart}) was detected to contain some kind of issue.",
   "wallet.receive.confirmationDialog.addressDetailsTitleLabel": "Adressprüfung",
   "wallet.receive.confirmationDialog.addressLabel": "Adresse",
   "wallet.receive.confirmationDialog.addressesLabel": "Addressen",
