@@ -498,6 +498,7 @@
   "wallet.navigation.transactions": "İşlemler",
   "wallet.nowallet.subtitle": "Lütfen sağ-üst açılır menüden bir cüzdan seçin",
   "wallet.nowallet.title": "Cüzdan seçilmedi",
+  "wallet.problematic.explanation1": "The wallet you selected ({checksumTextPart}) was detected to contain some kind of issue.",
   "wallet.receive.confirmationDialog.addressDetailsTitleLabel": "Adresi doğrula",
   "wallet.receive.confirmationDialog.addressLabel": "Adres",
   "wallet.receive.confirmationDialog.addressesLabel": "Adresler",
