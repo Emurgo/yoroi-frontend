@@ -19,6 +19,7 @@ import {
 } from '../lib/check';
 import { ApiOptions, getApiForNetwork } from '../../api/common/utils';
 import { getCardanoHaskellBaseConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { ApiMethodNotYetImplementedError } from '../lib/Request';
 
 export default class AdaWalletRestoreStore extends Store {
 
@@ -53,45 +54,46 @@ export default class AdaWalletRestoreStore extends Store {
   }
 
   _getFirstCip1852InternalAddr: void => string = () => {
-    const phrase = this.stores.walletRestore.recoveryResult?.phrase;
-    if (phrase == null) {
-      throw new Error(`${nameof(this._getFirstCip1852InternalAddr)} no recovery phrase set. Should never happen`);
-    }
+    throw new ApiMethodNotYetImplementedError();
+    // const phrase = this.stores.walletRestore.recoveryResult?.phrase;
+    // if (phrase == null) {
+    //   throw new Error(`${nameof(this._getFirstCip1852InternalAddr)} no recovery phrase set. Should never happen`);
+    // }
 
-    const { selectedNetwork } = this.stores.profile;
-    if (selectedNetwork == null) throw new Error('Should never happen');
-    const baseConfig = getCardanoHaskellBaseConfig(selectedNetwork)
-      .reduce((acc, next) => Object.assign(acc, next), {});
+    // const { selectedNetwork } = this.stores.profile;
+    // if (selectedNetwork == null) throw new Error('Should never happen');
+    // const baseConfig = getCardanoHaskellBaseConfig(selectedNetwork)
+    //   .reduce((acc, next) => Object.assign(acc, next), {});
 
-    const accountKey = generateWalletRootKey(phrase)
-      .derive(WalletTypePurpose.CIP1852)
-      .derive(CoinTypes.CARDANO)
-      .derive(this.stores.walletRestore.selectedAccount);
+    // const accountKey = generateWalletRootKey(phrase)
+    //   .derive(WalletTypePurpose.CIP1852)
+    //   .derive(CoinTypes.CARDANO)
+    //   .derive(this.stores.walletRestore.selectedAccount);
 
-    const internalKey = accountKey
-      .derive(ChainDerivations.INTERNAL)
-      .derive(0) // first address
-      .to_public()
-      .to_raw_key();
+    // const internalKey = accountKey
+    //   .derive(ChainDerivations.INTERNAL)
+    //   .derive(0) // first address
+    //   .to_public()
+    //   .to_raw_key();
 
-    const stakingKey = accountKey
-      .derive(ChainDerivations.CHIMERIC_ACCOUNT)
-      .derive(STAKING_KEY_INDEX)
-      .to_public()
-      .to_raw_key();
+    // const stakingKey = accountKey
+    //   .derive(ChainDerivations.CHIMERIC_ACCOUNT)
+    //   .derive(STAKING_KEY_INDEX)
+    //   .to_public()
+    //   .to_raw_key();
 
-    const internalAddr = RustModule.WalletV4.BaseAddress.new(
-      Number.parseInt(baseConfig.ChainNetworkId, 10),
-      RustModule.WalletV4.StakeCredential.from_keyhash(
-        internalKey.hash()
-      ),
-      RustModule.WalletV4.StakeCredential.from_keyhash(
-        stakingKey.hash()
-      ),
-    );
+    // const internalAddr = RustModule.WalletV4.BaseAddress.new(
+    //   Number.parseInt(baseConfig.ChainNetworkId, 10),
+    //   RustModule.WalletV4.StakeCredential.from_keyhash(
+    //     internalKey.hash()
+    //   ),
+    //   RustModule.WalletV4.StakeCredential.from_keyhash(
+    //     stakingKey.hash()
+    //   ),
+    // );
 
-    const internalAddrHash = Buffer.from(internalAddr.to_address().to_bytes()).toString('hex');
-    return internalAddrHash;
+    // const internalAddrHash = Buffer.from(internalAddr.to_address().to_bytes()).toString('hex');
+    // return internalAddrHash;
   }
 
   _restoreToDb: void => Promise<void> = async () => {

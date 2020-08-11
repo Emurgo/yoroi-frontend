@@ -2,19 +2,15 @@
 import React, { Component } from 'react';
 import type { Node } from 'react';
 import { defineMessages, intlShape, FormattedMessage, FormattedHTMLMessage } from 'react-intl';
-import globalMessages from '../../i18n/global-messages';
+import globalMessages from '../../../i18n/global-messages';
 import { observer } from 'mobx-react';
-import Dialog from '../widgets/Dialog';
-import DialogCloseButton from '../widgets/DialogCloseButton';
+import Dialog from '../../widgets/Dialog';
+import DialogCloseButton from '../../widgets/DialogCloseButton';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
-import styles from './DebugWalletDialog.scss';
+import styles from './BaseWarningDialog.scss';
 
 const messages = defineMessages({
-  explanation1: {
-    id: 'wallet.debugwallet.explanation1',
-    defaultMessage: '!!!The wallet you selected ({checksumTextPart}) is for testing & debugging.',
-  },
   explanation2: {
     id: 'wallet.debugwallet.explanation2',
     defaultMessage: '!!!To avoid any issues, do not use this wallet.<br />Instead, use Yoroi to create a new wallet.',
@@ -28,11 +24,11 @@ const messages = defineMessages({
 type Props = {|
   +onClose: void => void,
   +onExternalLinkClick: MouseEvent => void,
-  +checksumTextPart: string,
+  +explanationHeader: Node,
 |};
 
 @observer
-export default class DebugWalletDialog extends Component<Props> {
+export default class BaseWarningDialog extends Component<Props> {
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired
   };
@@ -51,7 +47,6 @@ export default class DebugWalletDialog extends Component<Props> {
       </a>
     );
 
-    const { checksumTextPart } = this.props;
     return (
       <Dialog
         title={intl.formatMessage(globalMessages.attentionTitle)}
@@ -61,7 +56,7 @@ export default class DebugWalletDialog extends Component<Props> {
       >
         <div className={styles.component}>
           <div className={styles.header}>
-            <FormattedMessage {...messages.explanation1} values={{ checksumTextPart }} /><br />
+            {this.props.explanationHeader}
             <FormattedHTMLMessage {...messages.explanation2} />
           </div>
           <FormattedMessage {...messages.explanation3} values={{ contactSupportLink }} />

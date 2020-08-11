@@ -3,11 +3,11 @@ import React, { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { computed } from 'mobx';
-import DebugWalletDialog from '../../../components/wallet/warning-dialogs/DebugWalletDialog';
+import ProblematicWalletDialog from '../../../components/wallet/warning-dialogs/ProblematicWalletDialog';
 import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 import { handleExternalLinkClick } from '../../../utils/routing';
 
-export type GeneratedData = typeof DebugWalletDialogContainer.prototype.generated;
+export type GeneratedData = typeof ProblematicWalletDialogContainer.prototype.generated;
 
 type Props = {|
   ...InjectedOrGenerated<GeneratedData>,
@@ -16,11 +16,11 @@ type Props = {|
 |};
 
 @observer
-export default class DebugWalletDialogContainer extends Component<Props> {
+export default class ProblematicWalletDialogContainer extends Component<Props> {
 
   render(): Node {
     return (
-      <DebugWalletDialog
+      <ProblematicWalletDialog
         onClose={this.props.onClose}
         onExternalLinkClick={handleExternalLinkClick}
         checksumTextPart={this.props.checksumTextPart}
@@ -33,19 +33,19 @@ export default class DebugWalletDialogContainer extends Component<Props> {
       return this.props.generated;
     }
     if (this.props.stores == null || this.props.actions == null) {
-      throw new Error(`${nameof(DebugWalletDialogContainer)} no way to generated props`);
+      throw new Error(`${nameof(ProblematicWalletDialogContainer)} no way to generated props`);
     }
     return Object.freeze({
     });
   }
 }
 
-export function createDebugWalletDialog(
+export function createProblematicWalletDialog(
   checksumTextPart: string,
   onClose: void => void,
   props: InjectedOrGenerated<GeneratedData>,
 ): (void => Node) {
-  return (() => <DebugWalletDialogContainer
+  return (() => <ProblematicWalletDialogContainer
     {...props}
     checksumTextPart={checksumTextPart}
     onClose={onClose}

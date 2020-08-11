@@ -35,14 +35,18 @@ import type {
   IGetSigningKey,
   IGetPublic,
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
-import { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
+import { isLedgerNanoWallet, ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import { Logger, stringifyError } from '../../utils/logging';
 import { assuranceModes, } from '../../config/transactionAssuranceConfig';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import { walletChecksum, legacyWalletChecksum } from '@emurgo/cip4-js';
 import { createDebugWalletDialog } from '../../containers/wallet/dialogs/DebugWalletDialogContainer';
+import { createProblematicWalletDialog } from '../../containers/wallet/dialogs/ProblematicWalletDialogContainer';
 import { getApiForNetwork } from '../../api/common/utils';
 import { Bip44Wallet } from '../../api/ada/lib/storage/models/Bip44Wallet/wrapper';
+import {
+  Cip1852Wallet,
+} from '../../api/ada/lib/storage/models/Cip1852Wallet/wrapper';
 
 type GroupedWallets = {|
   publicDerivers: Array<PublicDeriver<>>;
@@ -483,10 +487,19 @@ export default class WalletStore extends Store {
     const withPubKey = asGetPublicKey(publicDeriver);
     if (withPubKey != null) {
       const { plate } = this.getPublicKeyCache(withPubKey);
+      const existingWarnings = this.stores.walletSettings.getWalletWarnings(
+        publicDeriver
+      );
+      if (publicDeriver.getParent() instanceof Cip1852Wallet) {
+        if (isLedgerNanoWallet(publicDeriver.getParent())) {
+          existingWarnings.dialogs.push(createProblematicWalletDialog(
+            plate.TextPart,
+            action(() => { existingWarnings.dialogs.pop(); }),
+            { stores: this.stores, actions: this.actions },
+          ));
+        }
+      }
       if (debugWalletChecksums.find(elem => elem === plate.TextPart) != null) {
-        const existingWarnings = this.stores.walletSettings.getWalletWarnings(
-          publicDeriver
-        );
         existingWarnings.dialogs.push(createDebugWalletDialog(
           plate.TextPart,
           action(() => { existingWarnings.dialogs.pop(); }),
