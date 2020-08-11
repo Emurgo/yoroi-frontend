@@ -498,6 +498,7 @@
   "wallet.navigation.transactions": "Транзакции",
   "wallet.nowallet.subtitle": "Пожалуйста, выберите кошелек из выпадающего списка в правом верхнем углу",
   "wallet.nowallet.title": "Кошелек не выбран",
+  "wallet.problematic.explanation1": "The wallet you selected ({checksumTextPart}) was detected to contain some kind of issue.",
   "wallet.receive.confirmationDialog.addressDetailsTitleLabel": "Проверить адрес",
   "wallet.receive.confirmationDialog.addressLabel": "Адрес",
   "wallet.receive.confirmationDialog.addressesLabel": "Адреса",
