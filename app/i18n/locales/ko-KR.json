@@ -498,6 +498,7 @@
   "wallet.navigation.transactions": "거래",
   "wallet.nowallet.subtitle": "우상단의 드롭 다운 버튼을 눌러 지갑을 선택하세요.",
   "wallet.nowallet.title": "선택된 지갑 없음",
+  "wallet.problematic.explanation1": "The wallet you selected ({checksumTextPart}) was detected to contain some kind of issue.",
   "wallet.receive.confirmationDialog.addressDetailsTitleLabel": "주소 검증하기",
   "wallet.receive.confirmationDialog.addressLabel": "주소",
   "wallet.receive.confirmationDialog.addressesLabel": "주소",
