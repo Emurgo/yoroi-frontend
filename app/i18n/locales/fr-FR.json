@@ -498,7 +498,7 @@
   "wallet.navigation.transactions": "Transactions",
   "wallet.nowallet.subtitle": "Veuillez choisir un portefeuille dans la liste déroulante en haut à droite",
   "wallet.nowallet.title": "Pas de portefeuille sélectionné",
-  "wallet.problematic.explanation1": "The wallet you selected ({checksumTextPart}) was detected to contain some kind of issue.",
+  "wallet.problematic.explanation1": "Le portefeuille que vous avez sélectionné ({checksumTextPart}) a été détecté comme contenant une sorte de problème.",
   "wallet.receive.confirmationDialog.addressDetailsTitleLabel": "Vérifier l'adresse",
   "wallet.receive.confirmationDialog.addressLabel": "Adresse",
   "wallet.receive.confirmationDialog.addressesLabel": "Adresses",
