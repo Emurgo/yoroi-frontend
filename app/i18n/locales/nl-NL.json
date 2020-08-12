@@ -498,7 +498,7 @@
   "wallet.navigation.transactions": "Transacties",
   "wallet.nowallet.subtitle": "Kies alstublieft een Portemonnee uit de keuzelijst rechts boven",
   "wallet.nowallet.title": "Geen Portemonnee gekozen",
-  "wallet.problematic.explanation1": "The wallet you selected ({checksumTextPart}) was detected to contain some kind of issue.",
+  "wallet.problematic.explanation1": "De portemonnee die u geselecteerd heeft: ({checksumTextPart})  bevat een probleem.",
   "wallet.receive.confirmationDialog.addressDetailsTitleLabel": "Controleer adres",
   "wallet.receive.confirmationDialog.addressLabel": "Adres",
   "wallet.receive.confirmationDialog.addressesLabel": "Adressen",
