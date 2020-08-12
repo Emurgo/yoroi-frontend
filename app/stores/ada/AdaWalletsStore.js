@@ -8,10 +8,11 @@ import {
 } from '../../utils/logging';
 import Request from '../lib/LocalizedRequest';
 import type {
+  SignAndBroadcastRequest,
   GenerateWalletRecoveryPhraseFunc
 } from '../../api/ada/index';
 import {
-  asGetSigningKey,
+  asGetSigningKey, asHasLevels,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
@@ -19,6 +20,7 @@ import { ROUTES } from '../../routes-config';
 import { buildCheckAndCall } from '../lib/check';
 import { getApiForNetwork, ApiOptions } from '../../api/common/utils';
 import type { ISignRequest } from '../../api/common/lib/transactions/ISignRequest';
+import { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet';
 
 export default class AdaWalletsStore extends Store {
 
@@ -50,7 +52,11 @@ export default class AdaWalletsStore extends Store {
     password: string,
     publicDeriver: PublicDeriver<>,
   |} => Promise<void> = async (transactionDetails) => {
-    const withSigning = (asGetSigningKey(transactionDetails.publicDeriver));
+    const publicDeriver = asHasLevels<
+      ConceptualWallet
+    >(transactionDetails.publicDeriver);
+    if (publicDeriver == null) throw new Error();
+    const withSigning = (asGetSigningKey(publicDeriver));
     if (withSigning == null) {
       throw new Error(`${nameof(this._sendMoney)} public deriver missing signing functionality.`);
     }
@@ -58,42 +64,72 @@ export default class AdaWalletsStore extends Store {
     if (!(signRequest instanceof HaskellShelleyTxSignRequest)) {
       throw new Error(`${nameof(this._sendMoney)} wrong tx sign request`);
     }
-    await this.stores.wallets.sendMoneyRequest.execute({
-      broadcastRequest: async () => await this.api.ada.signAndBroadcast({
-        publicDeriver: withSigning,
-        password: transactionDetails.password,
-        getStakingWitnesses: () => Promise.resolve(() => []),
-        signRequest,
-        sendTx: this.stores.substores.ada.stateFetchStore.fetcher.sendTx,
-      }),
+    this.adaSendAndRefresh({
+      broadcastRequest: {
+        normal: {
+          publicDeriver: withSigning,
+          password: transactionDetails.password,
+          getStakingWitnesses: () => Promise.resolve(() => []),
+          signRequest,
+          sendTx: this.stores.substores.ada.stateFetchStore.fetcher.sendTx,
+        },
+      },
       refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(
         transactionDetails.publicDeriver
       ),
-    })
-      .then(async (response) => {
-        const memo = this.stores.transactionBuilderStore.memo;
-        if (memo !== '' && memo !== undefined) {
-          try {
-            await this.actions.memos.saveTxMemo.trigger({
-              publicDeriver: transactionDetails.publicDeriver,
-              memo: {
-                Content: memo,
-                TransactionHash: response.txId,
-                LastUpdated: new Date(),
-              },
-            });
-          } catch (error) {
-            Logger.error(`${nameof(AdaWalletsStore)}::${nameof(this._sendMoney)} error: ` + stringifyError(error));
-            throw new Error('An error has ocurred when saving the transaction memo.');
-          }
-        }
-        return response;
-      });
+    });
 
     this.actions.dialogs.closeActiveDialog.trigger();
     this.stores.wallets.sendMoneyRequest.reset();
     this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ROOT });
   };
+
+  adaSendAndRefresh: {|
+    broadcastRequest: {|
+      normal: SignAndBroadcastRequest,
+    |} | {|
+     trezor: {|
+        publicDeriver: PublicDeriver<>,
+        signRequest: HaskellShelleyTxSignRequest,
+     |},
+    |} | {|
+     ledger: {|
+        publicDeriver: PublicDeriver<>,
+        signRequest: HaskellShelleyTxSignRequest,
+     |},
+    |},
+    refreshWallet: () => Promise<void>,
+  |} => Promise<void> = async (request) => {
+
+    const broadcastRequest = async () => {
+      if (request.broadcastRequest.ledger) {
+        throw new Error(`Not implemented yet`);
+      }
+      if (request.broadcastRequest.trezor) {
+        return await this.stores.substores.ada.trezorSend.signAndBroadcast({
+          params: { signRequest: request.broadcastRequest.trezor.signRequest },
+          publicDeriver: request.broadcastRequest.trezor.publicDeriver,
+        });
+      }
+      if (request.broadcastRequest.normal) {
+        return await this.api.ada.signAndBroadcast(
+          request.broadcastRequest.normal
+        );
+      }
+      throw new Error(`${nameof(AdaWalletsStore)}::${nameof(this.adaSendAndRefresh)} unhandled wallet type`);
+    };
+    const publicDeriver = (() => {
+      if (request.broadcastRequest.ledger) return request.broadcastRequest.ledger.publicDeriver;
+      if (request.broadcastRequest.trezor) return request.broadcastRequest.trezor.publicDeriver;
+      if (request.broadcastRequest.normal) return request.broadcastRequest.normal.publicDeriver;
+      throw new Error(`${nameof(AdaWalletsStore)}::${nameof(this.adaSendAndRefresh)} unhandled wallet type`);
+    })();
+    this.stores.wallets.sendAndRefresh({
+      publicDeriver,
+      broadcastRequest,
+      refreshWallet: request.refreshWallet,
+    });
+  }
 
   // =================== WALLET RESTORATION ==================== //
 

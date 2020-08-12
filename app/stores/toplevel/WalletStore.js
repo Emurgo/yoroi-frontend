@@ -510,10 +510,30 @@ export default class WalletStore extends Store {
   }
 
   sendAndRefresh: {|
+    publicDeriver: PublicDeriver<>,
     broadcastRequest: void => Promise<{| txId: string |}>,
     refreshWallet: () => Promise<void>,
   |} => Promise<{| txId: string |}> = async (request) => {
     const result = await request.broadcastRequest();
+
+    {
+      const memo = this.stores.transactionBuilderStore.memo;
+      if (memo !== '' && memo !== undefined) {
+        try {
+          await this.actions.memos.saveTxMemo.trigger({
+            publicDeriver: request.publicDeriver,
+            memo: {
+              Content: memo,
+              TransactionHash: result.txId,
+              LastUpdated: new Date(),
+            },
+          });
+        } catch (error) {
+          Logger.error(`${nameof(WalletStore)}::${nameof(this.sendAndRefresh)} error: ` + stringifyError(error));
+          throw new Error('An error has ocurred when saving the transaction memo.');
+        }
+      }
+    }
     try {
       await request.refreshWallet();
     } catch (_e) {

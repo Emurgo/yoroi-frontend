@@ -7,6 +7,7 @@ import LocalizedRequest from '../lib/LocalizedRequest';
 import type {
   CreateDelegationTxFunc,
   SignAndBroadcastRequest,
+  CreateWithdrawalTxFunc,
 } from '../../api/ada';
 import { buildRoute } from '../../utils/routing';
 import { ROUTES } from '../../routes-config';
@@ -25,14 +26,18 @@ import {
 } from '../../api/ada/lib/storage/bridge/delegationUtils';
 import { genOwnStakingKey } from '../../api/ada/index';
 import {
-  // isLedgerNanoWallet,
+  isLedgerNanoWallet,
   isTrezorTWallet,
 } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
+import { ApiMethodNotYetImplementedError } from '../lib/Request';
 
 export default class AdaDelegationTransactionStore extends Store {
 
   @observable selectedPools: Array<string>;
+
+  @observable createWithdrawalTx: LocalizedRequest<CreateWithdrawalTxFunc>
+    = new LocalizedRequest<CreateWithdrawalTxFunc>(this.api.ada.createWithdrawalTx);
 
   @observable createDelegationTx: LocalizedRequest<CreateDelegationTxFunc>
     = new LocalizedRequest<CreateDelegationTxFunc>(this.api.ada.createDelegationTx);
@@ -162,6 +167,9 @@ export default class AdaDelegationTransactionStore extends Store {
     const result = this.createDelegationTx.result;
     if (result == null) {
       throw new Error(`${nameof(this._signTransaction)} no tx to broadcast`);
+    }
+    if (isLedgerNanoWallet(request.publicDeriver.getParent())) {
+      throw new ApiMethodNotYetImplementedError();
     }
     if (isTrezorTWallet(request.publicDeriver.getParent())) {
       await this.signAndBroadcastDelegationTx.execute({

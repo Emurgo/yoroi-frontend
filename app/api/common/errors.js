@@ -261,29 +261,11 @@ export class NotEnoughMoneyToSendError extends LocalizableError {
   }
 }
 
-export class UpdateAdaWalletError extends LocalizableError {
-  constructor() {
-    super({
-      id: messages.updateAdaWalletError.id,
-      defaultMessage: messages.updateAdaWalletError.defaultMessage || '',
-    });
-  }
-}
-
 export class GetBalanceError extends LocalizableError {
   constructor() {
     super({
       id: messages.getBalanceError.id,
       defaultMessage: messages.getBalanceError.defaultMessage || '',
-    });
-  }
-}
-
-export class UpdateAdaTxsHistoryError extends LocalizableError {
-  constructor() {
-    super({
-      id: messages.updateAdaTxsHistoryError.id,
-      defaultMessage: messages.updateAdaTxsHistoryError.defaultMessage || '',
     });
   }
 }

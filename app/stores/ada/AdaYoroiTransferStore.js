@@ -135,7 +135,26 @@ export default class AdaYoroiTransferStore extends Store {
       }],
     });
 
-    throw new ApiMethodNotYetImplementedError();
+    this.actions.ada.delegationTransaction.signTransaction.trigger({
+
+    });
+
+    await this.api.ada.signAndBroadcast({
+      publicDeriver: withSigning,
+      password: transactionDetails.password,
+      getStakingWitnesses: () => Promise.resolve(() => []),
+      signRequest,
+      sendTx: this.stores.substores.ada.stateFetchStore.fetcher.sendTx,
+    });
+
+    // return {
+    //   encodedTx: Uint8Array,
+    //   fee: BigNumber,
+    //   id: string,
+    //   receiver: string,
+    //   recoveredBalance: BigNumber,
+    //   senders: Array<string>
+    // };
   }
 
   generateTransferTxForByron: {|
