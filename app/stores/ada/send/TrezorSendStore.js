@@ -1,26 +1,22 @@
 // @flow
 import { action, observable } from 'mobx';
 
-import Store from '../base/Store';
-import LocalizedRequest from '../lib/LocalizedRequest';
+import Store from '../../base/Store';
 
-import { wrapWithFrame } from '../lib/TrezorWrapper';
-import type {
-  CreateTrezorSignTxDataFunc,
-} from '../../api/ada';
+import { wrapWithFrame } from '../../lib/TrezorWrapper';
 import type {
   SendUsingTrezorParams
-} from '../../actions/ada/trezor-send-actions';
+} from '../../../actions/ada/trezor-send-actions';
 import {
   Logger,
   stringifyError,
-} from '../../utils/logging';
+} from '../../../utils/logging';
 import {
   convertToLocalizableError
-} from '../../domain/TrezorLocalizedError';
-import LocalizableError from '../../i18n/LocalizableError';
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import { ROUTES } from '../../routes-config';
+} from '../../../domain/TrezorLocalizedError';
+import LocalizableError from '../../../i18n/LocalizableError';
+import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
+import { ROUTES } from '../../../routes-config';
 
 /** Note: Handles Trezor Signing */
 export default class TrezorSendStore extends Store {
@@ -45,7 +41,6 @@ export default class TrezorSendStore extends Store {
     this._setError(null);
   }
 
-  /** Generates a payload with Trezor format and tries Send ADA using Trezor signing */
   _sendWrapper: {|
     params: SendUsingTrezorParams,
     publicDeriver: PublicDeriver<>,
@@ -68,9 +63,10 @@ export default class TrezorSendStore extends Store {
         },
         refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.publicDeriver),
       });
-      await this.signAndBroadcast(request);
+
       this.actions.dialogs.closeActiveDialog.trigger();
       this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ROOT });
+      this._reset();
 
       Logger.info('SUCCESS: ADA sent using Trezor SignTx');
     } catch (e) {

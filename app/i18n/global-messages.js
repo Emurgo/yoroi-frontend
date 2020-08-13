@@ -589,6 +589,10 @@ const globalMessages: * = defineMessages({
     id: 'wallet.delegation.transaction.stakePoolHash',
     defaultMessage: '!!!Stake pool id',
   },
+  finalBalanceLabel: {
+    id: 'transfer.summary.finalBalance.label',
+    defaultMessage: '!!!Final balance',
+  },
 });
 export default globalMessages;
 

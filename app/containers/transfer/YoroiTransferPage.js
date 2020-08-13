@@ -32,6 +32,7 @@ import { SelectedExplorer } from '../../domain/SelectedExplorer';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import type { RestoreModeType } from '../../actions/common/wallet-restore-actions';
 import { ApiOptions, getApiMeta, getApiForNetwork, } from '../../api/common/utils';
+import { addressToDisplayString, } from '../../api/ada/lib/storage/bridge/utils';
 
 // Stay this long on the success page, then jump to the wallet transactions page
 const SUCCESS_PAGE_STAY_TIME = 5 * 1000;
@@ -243,6 +244,9 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
             dialogTitle={intl.formatMessage(globalMessages.walletSendConfirmationDialogTitle)}
             coinPrice={coinPrice}
             unitOfAccountSetting={stores.profile.unitOfAccount}
+            addressToDisplayString={
+              addr => addressToDisplayString(addr, publicDeriver.getParent().getNetworkInfo())
+            }
           />
         );
       }

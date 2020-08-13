@@ -233,9 +233,9 @@ export default class CardanoStakingPage extends Component<Props> {
       return result;
     };
 
-    const showSignDialog = delegationTransaction.signAndBroadcastDelegationTx.isExecuting ||
-      !delegationTransaction.signAndBroadcastDelegationTx.wasExecuted ||
-      delegationTransaction.signAndBroadcastDelegationTx.error != null;
+    const showSignDialog = this.generated.stores.wallets.sendMoneyRequest.isExecuting ||
+      !this.generated.stores.wallets.sendMoneyRequest.wasExecuted ||
+      this.generated.stores.wallets.sendMoneyRequest.error != null;
 
     const selectedPoolInfo = this._getPoolInfo(selectedWallet);
     if (this.generated.stores.delegation.poolInfoQuery.error != null) {
@@ -284,7 +284,7 @@ export default class CardanoStakingPage extends Component<Props> {
           amountToDelegate={delegationTx.totalAmountToDelegate}
           approximateReward={approximateReward(delegationTx.totalAmountToDelegate)}
           isSubmitting={
-            delegationTransaction.signAndBroadcastDelegationTx.isExecuting
+            this.generated.stores.wallets.sendMoneyRequest.isExecuting
           }
           isHardware={
             selectedWallet.getParent().getWalletType() === WalletTypeOption.HARDWARE_WALLET
@@ -297,7 +297,7 @@ export default class CardanoStakingPage extends Component<Props> {
             })
           )}
           classicTheme={this.generated.stores.profile.isClassicTheme}
-          error={delegationTransaction.signAndBroadcastDelegationTx.error}
+          error={this.generated.stores.wallets.sendMoneyRequest.error}
           selectedExplorer={this.generated.stores.explorers.selectedExplorer
             .get(
               selectedWallet.getParent().getNetworkInfo().NetworkId
@@ -387,11 +387,6 @@ export default class CardanoStakingPage extends Component<Props> {
             |},
             isStale: boolean,
             selectedPools: Array<string>,
-            signAndBroadcastDelegationTx: {|
-              error: ?LocalizableError,
-              isExecuting: boolean,
-              wasExecuted: boolean
-            |}
           |}
         |}
       |},
@@ -403,7 +398,14 @@ export default class CardanoStakingPage extends Component<Props> {
         getTooltipActiveNotification: string => ?Notification,
         isOpen: string => boolean
       |},
-      wallets: {| selected: null | PublicDeriver<> |}
+      wallets: {|
+        sendMoneyRequest: {|
+          error: ?LocalizableError,
+          isExecuting: boolean,
+          wasExecuted: boolean
+        |},
+        selected: null | PublicDeriver<>
+      |}
     |}
     |} {
     if (this.props.generated !== undefined) {
@@ -421,6 +423,11 @@ export default class CardanoStakingPage extends Component<Props> {
         },
         wallets: {
           selected: stores.wallets.selected,
+          sendMoneyRequest: {
+            error: stores.wallets.sendMoneyRequest.error,
+            isExecuting: stores.wallets.sendMoneyRequest.isExecuting,
+            wasExecuted: stores.wallets.sendMoneyRequest.wasExecuted,
+          },
         },
         profile: {
           isClassicTheme: stores.profile.isClassicTheme,
@@ -445,11 +452,6 @@ export default class CardanoStakingPage extends Component<Props> {
                 result: delegationTxStore.createDelegationTx.result,
                 error: delegationTxStore.createDelegationTx.error,
                 isExecuting: delegationTxStore.createDelegationTx.isExecuting,
-              },
-              signAndBroadcastDelegationTx: {
-                error: delegationTxStore.signAndBroadcastDelegationTx.error,
-                isExecuting: delegationTxStore.signAndBroadcastDelegationTx.isExecuting,
-                wasExecuted: delegationTxStore.signAndBroadcastDelegationTx.wasExecuted,
               },
             },
           },

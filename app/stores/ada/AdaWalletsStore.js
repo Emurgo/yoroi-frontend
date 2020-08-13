@@ -2,25 +2,15 @@
 import { observable, } from 'mobx';
 
 import Store from '../base/Store';
-import {
-  Logger,
-  stringifyError
-} from '../../utils/logging';
 import Request from '../lib/LocalizedRequest';
 import type {
-  SignAndBroadcastRequest,
   GenerateWalletRecoveryPhraseFunc
 } from '../../api/ada/index';
-import {
-  asGetSigningKey, asHasLevels,
-} from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import { ROUTES } from '../../routes-config';
 import { buildCheckAndCall } from '../lib/check';
 import { getApiForNetwork, ApiOptions } from '../../api/common/utils';
-import type { ISignRequest } from '../../api/common/lib/transactions/ISignRequest';
-import { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet';
+import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 
 export default class AdaWalletsStore extends Store {
 
@@ -31,7 +21,7 @@ export default class AdaWalletsStore extends Store {
 
   setup(): void {
     super.setup();
-    const { ada, wallets, walletBackup } = this.actions;
+    const { ada, walletBackup } = this.actions;
     const { asyncCheck } = buildCheckAndCall(
       ApiOptions.ada,
       () => {
@@ -41,52 +31,20 @@ export default class AdaWalletsStore extends Store {
     );
     walletBackup.finishWalletBackup.listen(asyncCheck(this._createInDb));
     ada.wallets.createWallet.listen(this._startWalletCreation);
-    wallets.sendMoney.listen(asyncCheck(this._sendMoney));
   }
 
   // =================== SEND MONEY ==================== //
 
-  /** Send money and then return to transaction screen */
-  _sendMoney:  {|
-    signRequest: ISignRequest<any>,
-    password: string,
-    publicDeriver: PublicDeriver<>,
-  |} => Promise<void> = async (transactionDetails) => {
-    const publicDeriver = asHasLevels<
-      ConceptualWallet
-    >(transactionDetails.publicDeriver);
-    if (publicDeriver == null) throw new Error();
-    const withSigning = (asGetSigningKey(publicDeriver));
-    if (withSigning == null) {
-      throw new Error(`${nameof(this._sendMoney)} public deriver missing signing functionality.`);
-    }
-    const { signRequest } = transactionDetails;
-    if (!(signRequest instanceof HaskellShelleyTxSignRequest)) {
-      throw new Error(`${nameof(this._sendMoney)} wrong tx sign request`);
-    }
-    this.adaSendAndRefresh({
-      broadcastRequest: {
-        normal: {
-          publicDeriver: withSigning,
-          password: transactionDetails.password,
-          getStakingWitnesses: () => Promise.resolve(() => []),
-          signRequest,
-          sendTx: this.stores.substores.ada.stateFetchStore.fetcher.sendTx,
-        },
-      },
-      refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(
-        transactionDetails.publicDeriver
-      ),
-    });
-
-    this.actions.dialogs.closeActiveDialog.trigger();
-    this.stores.wallets.sendMoneyRequest.reset();
-    this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ROOT });
-  };
-
   adaSendAndRefresh: {|
     broadcastRequest: {|
-      normal: SignAndBroadcastRequest,
+      normal: {|
+        publicDeriver: PublicDeriver<>,
+        signRequest: HaskellShelleyTxSignRequest,
+        password: string,
+        getStakingWitnesses: void => Promise<(
+          RustModule.WalletV4.TransactionHash => Array<RustModule.WalletV4.Vkeywitness>
+        )>,
+      |}
     |} | {|
      trezor: {|
         publicDeriver: PublicDeriver<>,
@@ -103,7 +61,10 @@ export default class AdaWalletsStore extends Store {
 
     const broadcastRequest = async () => {
       if (request.broadcastRequest.ledger) {
-        throw new Error(`Not implemented yet`);
+        return await this.stores.substores.ada.trezorSend.signAndBroadcast({
+          params: { signRequest: request.broadcastRequest.ledger.signRequest },
+          publicDeriver: request.broadcastRequest.ledger.publicDeriver,
+        });
       }
       if (request.broadcastRequest.trezor) {
         return await this.stores.substores.ada.trezorSend.signAndBroadcast({
@@ -112,7 +73,7 @@ export default class AdaWalletsStore extends Store {
         });
       }
       if (request.broadcastRequest.normal) {
-        return await this.api.ada.signAndBroadcast(
+        return await this.stores.substores.ada.mnemonicSend.signAndBroadcast(
           request.broadcastRequest.normal
         );
       }
@@ -124,7 +85,7 @@ export default class AdaWalletsStore extends Store {
       if (request.broadcastRequest.normal) return request.broadcastRequest.normal.publicDeriver;
       throw new Error(`${nameof(AdaWalletsStore)}::${nameof(this.adaSendAndRefresh)} unhandled wallet type`);
     })();
-    this.stores.wallets.sendAndRefresh({
+    await this.stores.wallets.sendAndRefresh({
       publicDeriver,
       broadcastRequest,
       refreshWallet: request.refreshWallet,

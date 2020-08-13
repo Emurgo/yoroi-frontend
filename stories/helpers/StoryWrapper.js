@@ -788,7 +788,7 @@ export const genTentativeTx = (
 
 export const genUndelegateTx = (
   publicDeriver: PublicDeriver<>,
-): V3UnsignedTxAddressedUtxoResponse => {
+): JormungandrTxSignRequest => {
   const inputAmount = '1000001';
 
   if (!isJormungandr(publicDeriver.getParent().getNetworkInfo())) {
@@ -805,7 +805,7 @@ export const genUndelegateTx = (
   const builder = RustModule.WalletV3.InputOutputBuilder.empty();
   builder.add_input(input);
   const IOs = builder.build();
-  return {
+  return new JormungandrTxSignRequest({
     senderUtxos: [{
       ...remoteUnspentUtxo,
       addressing: {
@@ -813,10 +813,10 @@ export const genUndelegateTx = (
         startLevel: 0,
       },
     }],
-    IOs,
+    unsignedTx: IOs,
     changeAddr: [],
     certificate: undefined, // TODO
-  };
+  });
 };
 
 export const genUnitOfAccount: void => UnitOfAccountSettingType = () => {

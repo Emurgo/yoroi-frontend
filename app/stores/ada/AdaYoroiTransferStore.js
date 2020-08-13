@@ -23,10 +23,6 @@ import { getCardanoHaskellBaseConfig } from '../../api/ada/lib/storage/database/
 import {
   genTimeToSlot,
 } from '../../api/ada/lib/storage/bridge/timeUtils';
-import { ApiMethodNotYetImplementedError, } from '../lib/Request';
-import {
-  NoInputsError,
-} from '../../api/common/errors';
 import {
   asGetAllUtxos, asHasUtxoChains,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
@@ -92,7 +88,7 @@ export default class AdaYoroiTransferStore extends Store {
 
     const accountIndex = 0 + HARD_DERIVATION_START; // TODO: don't hardcode index
     const stakeKey = rootPk
-      .derive(WalletTypePurpose.BIP44)
+      .derive(WalletTypePurpose.CIP1852)
       .derive(CoinTypes.CARDANO)
       .derive(accountIndex)
       .derive(ChainDerivations.CHIMERIC_ACCOUNT)
@@ -135,26 +131,22 @@ export default class AdaYoroiTransferStore extends Store {
       }],
     });
 
-    this.actions.ada.delegationTransaction.signTransaction.trigger({
+    const withdrawalSum = unsignedTx.withdrawalSum(true);
 
-    });
-
-    await this.api.ada.signAndBroadcast({
-      publicDeriver: withSigning,
-      password: transactionDetails.password,
-      getStakingWitnesses: () => Promise.resolve(() => []),
-      signRequest,
-      sendTx: this.stores.substores.ada.stateFetchStore.fetcher.sendTx,
-    });
-
-    // return {
-    //   encodedTx: Uint8Array,
-    //   fee: BigNumber,
-    //   id: string,
-    //   receiver: string,
-    //   recoveredBalance: BigNumber,
-    //   senders: Array<string>
-    // };
+    // TODO: support multiple change addresses
+    if (unsignedTx.signRequest.changeAddr.length > 1) {
+      throw new Error(`${nameof(this.generateTransferTxForRewardAccount)} multiple change addresses`);
+    }
+    const changeAddr = unsignedTx.signRequest.changeAddr[0];
+    return {
+      encodedTx: Uint8Array.from([]),
+      fee: unsignedTx.fee(true),
+      id: unsignedTx.txId(),
+      receiver: changeAddr.address,
+      recoveredBalance: withdrawalSum,
+      senders: unsignedTx
+        .uniqueSenderAddresses(),
+    };
   }
 
   generateTransferTxForByron: {|

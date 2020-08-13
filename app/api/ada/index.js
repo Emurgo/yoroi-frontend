@@ -254,7 +254,7 @@ export type GetNoticesFunc = (
 // signAndBroadcast
 
 export type SignAndBroadcastRequest = {|
-  publicDeriver: PublicDeriver<ConceptualWallet & IHasLevels> & IGetSigningKey,
+  publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetSigningKey,
   signRequest: HaskellShelleyTxSignRequest,
   /** note: this should include your own staking key too if it's needed to sign the transaction */
   getStakingWitnesses: void => Promise<(

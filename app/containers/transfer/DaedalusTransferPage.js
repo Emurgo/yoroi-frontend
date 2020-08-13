@@ -24,6 +24,7 @@ import type { RestoreModeType } from '../../actions/common/wallet-restore-action
 import { formattedWalletAmount } from '../../utils/formatters';
 import { ROUTES } from '../../routes-config';
 import { ApiOptions, getApiForNetwork, getApiMeta } from '../../api/common/utils';
+import { addressToDisplayString, } from '../../api/ada/lib/storage/bridge/utils';
 
 export type MockDaedalusTransferStore = {|
   +status: TransferStatusT,
@@ -198,6 +199,9 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
             dialogTitle={intl.formatMessage(globalMessages.walletSendConfirmationDialogTitle)}
             coinPrice={coinPrice}
             unitOfAccountSetting={this.generated.stores.profile.unitOfAccount}
+            addressToDisplayString={
+              addr => addressToDisplayString(addr, publicDeriver.getParent().getNetworkInfo())
+            }
           />
         );
       }

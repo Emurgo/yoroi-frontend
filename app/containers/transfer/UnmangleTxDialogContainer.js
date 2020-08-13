@@ -73,7 +73,7 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
         .filter(info => info.value != null)
         // TODO: filtering in Haskell Shelley is more complicated unfortunately
         // .filter(info => info.value.gt(CONFIG.genesis.linearFee.coefficient))
-        .map(info => getAddressPayload(info.address, selected.getParent.getNetworkInfo()))
+        .map(info => getAddressPayload(info.address, selected.getParent().getNetworkInfo()))
     );
 
     // note: don't await
@@ -180,11 +180,9 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
       recoveredBalance: tentativeTx.totalInput(true),
       fee: tentativeTx.fee(true),
       senders: tentativeTx
-        .uniqueSenderAddresses()
-        .map(addr => addressToDisplayString(addr, selected.getParent.getNetworkInfo())),
+        .uniqueSenderAddresses(),
       receiver: tentativeTx
-        .receivers(false)
-        .map(addr => addressToDisplayString(addr, selected.getParent.getNetworkInfo()))[0],
+        .receivers(false)[0],
     };
 
     const spendingPasswordForm = (<SpendingPasswordInput
@@ -213,6 +211,9 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
         dialogTitle={intl.formatMessage(globalMessages.walletSendConfirmationDialogTitle)}
         coinPrice={coinPrice}
         unitOfAccountSetting={this.generated.stores.profile.unitOfAccount}
+        addressToDisplayString={
+          addr => addressToDisplayString(addr, selected.getParent().getNetworkInfo())
+        }
       />
     );
   }

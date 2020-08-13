@@ -5,39 +5,27 @@ import { observer } from 'mobx-react';
 import BigNumber from 'bignumber.js';
 import classnames from 'classnames';
 import { defineMessages, intlShape } from 'react-intl';
-import styles from './TransferSummaryPage.scss';
-import LocalizableError from '../../i18n/LocalizableError';
-import RawHash from '../widgets/hashWrappers/RawHash';
-import DialogCloseButton from '../widgets/DialogCloseButton';
-import Dialog from '../widgets/Dialog';
-import ExplorableHashContainer from '../../containers/widgets/ExplorableHashContainer';
-import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
-import { calculateAndFormatValue } from '../../utils/unit-of-account';
-import globalMessages from '../../i18n/global-messages';
+import styles from './WithdrawalTxDialog.scss';
+import LocalizableError from '../../../i18n/LocalizableError';
+import RawHash from '../../widgets/hashWrappers/RawHash';
+import DialogCloseButton from '../../widgets/DialogCloseButton';
+import Dialog from '../../widgets/Dialog';
+import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
+import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
+import { calculateAndFormatValue } from '../../../utils/unit-of-account';
+import globalMessages from '../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { SelectedExplorer } from '../../domain/SelectedExplorer';
+import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 
 const messages = defineMessages({
-  addressFromLabel: {
-    id: 'transfer.summary.addressFrom.label',
-    defaultMessage: '!!!From',
+  unregisterExplanation: {
+    id: 'wallet.withdrawal.transaction.unregister',
+    defaultMessage: '!!!This transaction will unregister the staking key, giving you back your {refundAmount} ADA from your deposit',
   },
-  recoveredBalanceLabel: {
-    id: 'transfer.summary.recoveredBalance.label',
-    defaultMessage: '!!!Recovered balance',
+  withdrawalAddress: {
+    id: 'wallet.withdrawal.transaction.addressLabel',
+    defaultMessage: '!!!Withdraw from',
   },
-  transactionFeeLabel: {
-    id: 'transfer.summary.transactionFee.label',
-    defaultMessage: '!!!Transaction fees',
-  },
-  transferButtonLabel: {
-    id: 'transfer.summary.transferButton.label',
-    defaultMessage: '!!!Transfer Funds',
-  },
-  addressFromSubLabel: {
-    id: 'yoroiTransfer.summary.addressFrom.subLabel',
-    defaultMessage: '!!!Wallet Addresses',
-  }
 });
 
 type Props = {|
@@ -64,7 +52,7 @@ type Props = {|
 
 /** Show user what the transfer would do to get final confirmation */
 @observer
-export default class TransferSummaryPage extends Component<Props> {
+export default class WithdrawalTxDialog extends Component<Props> {
 
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired
@@ -117,10 +105,7 @@ export default class TransferSummaryPage extends Component<Props> {
 
         <div className={styles.addressLabelWrapper}>
           <div className={styles.addressLabel}>
-            {intl.formatMessage(messages.addressFromLabel)}
-          </div>
-          <div className={styles.addressSubLabel}>
-            {intl.formatMessage(messages.addressFromSubLabel)}
+            {intl.formatMessage(messages.withdrawalAddress)}
           </div>
           {
             transferTx.senders.map((sender, index) => {
@@ -175,7 +160,7 @@ export default class TransferSummaryPage extends Component<Props> {
         <div className={styles.amountFeesWrapper}>
           <div className={styles.amountWrapper}>
             <div className={styles.amountLabel}>
-              {intl.formatMessage(messages.recoveredBalanceLabel)}
+              {intl.formatMessage(globalMessages.amountLabel)}
             </div>
             {unitOfAccountSetting.enabled ? (
               <>
@@ -205,7 +190,7 @@ export default class TransferSummaryPage extends Component<Props> {
 
           <div className={styles.feesWrapper}>
             <div className={styles.feesLabel}>
-              {intl.formatMessage(messages.transactionFeeLabel)}
+              {intl.formatMessage(globalMessages.feeLabel)}
             </div>
             {unitOfAccountSetting.enabled ? (
               <>

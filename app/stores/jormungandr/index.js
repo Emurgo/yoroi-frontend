@@ -11,6 +11,7 @@ import JormungandrWalletRestoreStore from './JormungandrWalletRestoreStore';
 import JormungandrDelegationTransactionStore from './JormungandrDelegationTransactionStore';
 import JormungandrDelegationStore from './JormungandrDelegationStore';
 import JormungandrTimeStore from './JormungandrTimeStore';
+import JormungandrMnemonicSendStore  from './send/JormungandrMnemonicSendStore';
 import type { ActionsMap } from '../../actions/index';
 import type { Api } from '../../api/index';
 import type { StoresMap } from '../index';
@@ -26,6 +27,7 @@ export const jormungandrStoreClasses = Object.freeze({
   delegationTransaction: JormungandrDelegationTransactionStore,
   delegation: JormungandrDelegationStore,
   time: JormungandrTimeStore,
+  mnemonicSend: JormungandrMnemonicSendStore,
 });
 
 export type JormungandrStoresMap = {|
@@ -39,6 +41,7 @@ export type JormungandrStoresMap = {|
   delegationTransaction: JormungandrDelegationTransactionStore,
   delegation: JormungandrDelegationStore,
   time: JormungandrTimeStore,
+  mnemonicSend: JormungandrMnemonicSendStore,
 |};
 
 const jormungandrStores: WithNullableFields<JormungandrStoresMap> = observable({
@@ -52,6 +55,7 @@ const jormungandrStores: WithNullableFields<JormungandrStoresMap> = observable({
   delegationTransaction: null,
   delegation: null,
   time: null,
+  mnemonicSend: null,
 });
 
 /** See `stores` index for description of this weird behavior

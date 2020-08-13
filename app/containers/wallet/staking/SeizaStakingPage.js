@@ -118,11 +118,9 @@ export default class SeizaStakingPage extends Component<Props> {
     const { stores } = this.generated;
     const { intl } = this.context;
 
-    const delegationTxStore = stores.substores.jormungandr.delegationTransaction;
-
     if (
-      !delegationTxStore.signAndBroadcastDelegationTx.isExecuting &&
-      !delegationTxStore.signAndBroadcastDelegationTx.wasExecuted &&
+      !stores.wallets.sendMoneyRequest.isExecuting &&
+      !stores.wallets.sendMoneyRequest.wasExecuted &&
       this.generated.stores.transactions.hasAnyPending
     ) {
       return (
@@ -165,21 +163,17 @@ export default class SeizaStakingPage extends Component<Props> {
           PublicDeriver<>
         ) => void | DelegationRequests
       |},
-      substores: {|
-        jormungandr: {|
-          delegationTransaction: {|
-            signAndBroadcastDelegationTx: {|
-              isExecuting: boolean,
-              wasExecuted: boolean
-            |}
-          |}
-        |}
-      |},
       transactions: {|
         getTxRequests: (PublicDeriver<>) => TxRequests,
         hasAnyPending: boolean
       |},
-      wallets: {| selected: null | PublicDeriver<> |}
+      wallets: {|
+        sendMoneyRequest: {|
+          isExecuting: boolean,
+          wasExecuted: boolean
+        |},
+        selected: null | PublicDeriver<>
+      |}
     |}
     |} {
     if (this.props.generated !== undefined) {
@@ -189,7 +183,6 @@ export default class SeizaStakingPage extends Component<Props> {
       throw new Error(`${nameof(SeizaStakingPage)} no way to generated props`);
     }
     const { stores, actions } = this.props;
-    const jormungandrStores = stores.substores.jormungandr;
     return Object.freeze({
       stores: {
         profile: {
@@ -197,6 +190,10 @@ export default class SeizaStakingPage extends Component<Props> {
         },
         wallets: {
           selected: stores.wallets.selected,
+          sendMoneyRequest: {
+            isExecuting: stores.wallets.sendMoneyRequest.isExecuting,
+            wasExecuted: stores.wallets.sendMoneyRequest.wasExecuted,
+          },
         },
         transactions: {
           getTxRequests: stores.transactions.getTxRequests,
@@ -204,18 +201,6 @@ export default class SeizaStakingPage extends Component<Props> {
         },
         delegation: {
           getDelegationRequests: stores.delegation.getDelegationRequests,
-        },
-        substores: {
-          jormungandr: {
-            delegationTransaction: {
-              signAndBroadcastDelegationTx: {
-                isExecuting:
-                  jormungandrStores.delegationTransaction.signAndBroadcastDelegationTx.isExecuting,
-                wasExecuted:
-                  jormungandrStores.delegationTransaction.signAndBroadcastDelegationTx.wasExecuted,
-              },
-            },
-          },
         },
       },
       actions: {

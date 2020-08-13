@@ -135,9 +135,9 @@ export default class SeizaFetcher extends Component<Props> {
       },
     ];
 
-    const showSignDialog = delegationTxStore.signAndBroadcastDelegationTx.isExecuting ||
-      !delegationTxStore.signAndBroadcastDelegationTx.wasExecuted ||
-      delegationTxStore.signAndBroadcastDelegationTx.error != null;
+    const showSignDialog = this.generated.stores.wallets.sendMoneyRequest.isExecuting ||
+      !this.generated.stores.wallets.sendMoneyRequest.wasExecuted ||
+      this.generated.stores.wallets.sendMoneyRequest.error != null;
 
     const selectedWallet = this.generated.stores.wallets.selected;
     if (selectedWallet == null) {
@@ -202,12 +202,10 @@ export default class SeizaFetcher extends Component<Props> {
           staleTx={delegationTxStore.isStale}
           poolName={delegationTxStore.selectedPools[0].name}
           poolHash={delegationTxStore.selectedPools[0].poolHash}
-          transactionFee={getJormungandrTxFee(delegationTx.unsignedTx.IOs, true)}
+          transactionFee={getJormungandrTxFee(delegationTx.signTxRequest.self().unsignedTx, true)}
           amountToDelegate={delegationTx.totalAmountToDelegate}
           approximateReward={approximateReward(delegationTx.totalAmountToDelegate)}
-          isSubmitting={
-            delegationTxStore.signAndBroadcastDelegationTx.isExecuting
-          }
+          isSubmitting={this.generated.stores.wallets.sendMoneyRequest.isExecuting}
           isHardware={
             selectedWallet.getParent().getWalletType() === WalletTypeOption.HARDWARE_WALLET
           }
@@ -217,7 +215,7 @@ export default class SeizaFetcher extends Component<Props> {
             publicDeriver: selectedWallet,
           })}
           classicTheme={profile.isClassicTheme}
-          error={delegationTxStore.signAndBroadcastDelegationTx.error}
+          error={this.generated.stores.wallets.sendMoneyRequest.error}
           selectedExplorer={stores.explorers.selectedExplorer
             .get(
               selectedWallet.getParent().getNetworkInfo().NetworkId
@@ -296,15 +294,17 @@ export default class SeizaFetcher extends Component<Props> {
             |},
             isStale: boolean,
             selectedPools: Array<SelectedPool>,
-            signAndBroadcastDelegationTx: {|
-              error: ?LocalizableError,
-              isExecuting: boolean,
-              wasExecuted: boolean
-            |}
           |}
         |}
       |},
-      wallets: {| selected: null | PublicDeriver<> |}
+      wallets: {|
+        sendMoneyRequest: {|
+          error: ?LocalizableError,
+          isExecuting: boolean,
+          wasExecuted: boolean
+        |},
+        selected: null | PublicDeriver<>
+      |}
     |}
     |} {
     if (this.props.generated !== undefined) {
@@ -325,6 +325,11 @@ export default class SeizaFetcher extends Component<Props> {
         },
         wallets: {
           selected: stores.wallets.selected,
+          sendMoneyRequest: {
+            error: stores.wallets.sendMoneyRequest.error,
+            isExecuting: stores.wallets.sendMoneyRequest.isExecuting,
+            wasExecuted: stores.wallets.sendMoneyRequest.wasExecuted,
+          },
         },
         substores: {
           jormungandr: {
@@ -335,11 +340,6 @@ export default class SeizaFetcher extends Component<Props> {
                 result: delegationTxStore.createDelegationTx.result,
                 error: delegationTxStore.createDelegationTx.error,
                 isExecuting: delegationTxStore.createDelegationTx.isExecuting,
-              },
-              signAndBroadcastDelegationTx: {
-                error: delegationTxStore.signAndBroadcastDelegationTx.error,
-                isExecuting: delegationTxStore.signAndBroadcastDelegationTx.isExecuting,
-                wasExecuted: delegationTxStore.signAndBroadcastDelegationTx.wasExecuted,
               },
             },
           },

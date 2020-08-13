@@ -21,6 +21,12 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
     this.metadata = metadata;
   }
 
+  txId(): string {
+    return Buffer.from(RustModule.WalletV4.hash_transaction(
+      this.signRequest.unsignedTx.build()
+    ).to_bytes()).toString('hex');
+  }
+
   txMetadata(): void | RustModule.WalletV4.TransactionMetadata {
     return this.metadata;
   }
@@ -59,6 +65,23 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
       return fee.shiftedBy(-getAdaCurrencyMeta().decimalPlaces.toNumber());
     }
     return fee;
+  }
+
+  withdrawalSum(shift: boolean): BigNumber {
+    const withdrawals = this.signRequest.unsignedTx.build().withdrawals();
+    if (withdrawals == null) return new BigNumber(0);
+
+    const withdrawalKeys = withdrawals.keys();
+    let sum = new BigNumber(0);
+    for (let i = 0; i < withdrawalKeys.len(); i++) {
+      const withdrawal = withdrawals.get(withdrawalKeys.get(i))?.to_str();
+      if (withdrawal == null) continue;
+      sum = sum.plus(withdrawal);
+    }
+    if (shift) {
+      return sum.shiftedBy(-getAdaCurrencyMeta().decimalPlaces.toNumber());
+    }
+    return sum;
   }
 
   receivers(includeChange: boolean): Array<string> {

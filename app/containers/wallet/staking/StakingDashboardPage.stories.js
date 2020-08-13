@@ -67,6 +67,7 @@ const genBaseProps: {|
   lookup: *,
   transactionBuilderStore?: *,
   openDialog?: *,
+  sendMoneyRequest?: *,
   delegationTransaction?: *,
   allowToggleHidden?: *,
   mangledInfo?: {|
@@ -98,6 +99,10 @@ const genBaseProps: {|
         unitOfAccount: genUnitOfAccount(),
       },
       wallets: {
+        sendMoneyRequest: request.sendMoneyRequest || {
+          error: undefined,
+          isExecuting: false,
+        },
         selected: request.wallet.publicDeriver,
       },
       coinPriceStore: {
@@ -143,10 +148,6 @@ const genBaseProps: {|
               isExecuting: false,
               error: undefined,
               result: undefined,
-            },
-            signAndBroadcastDelegationTx: {
-              error: undefined,
-              isExecuting: false,
             },
           },
         },
@@ -810,19 +811,19 @@ export const UndelegateExecuting = (): Node => {
         lookup,
         getLocalPoolInfo: mockGetPoolInfo,
         openDialog: UndelegateDialog,
+        sendMoneyRequest: {
+          error: undefined,
+          isExecuting: false,
+        },
         delegationTransaction: {
           isStale: false,
           createDelegationTx: {
             isExecuting: true,
             error: undefined,
             result: {
-              unsignedTx: genUndelegateTx(wallet.publicDeriver),
+              signTxRequest: genUndelegateTx(wallet.publicDeriver),
               totalAmountToDelegate: new BigNumber(0),
             },
-          },
-          signAndBroadcastDelegationTx: {
-            error: undefined,
-            isExecuting: false,
           },
         },
       })}
@@ -845,19 +846,19 @@ export const UndelegateError = (): Node => {
         lookup,
         getLocalPoolInfo: mockGetPoolInfo,
         openDialog: UndelegateDialog,
+        sendMoneyRequest: {
+          error: undefined,
+          isExecuting: false,
+        },
         delegationTransaction: {
           isStale: false,
           createDelegationTx: {
             isExecuting: true,
             error: new GenericApiError(),
             result: {
-              unsignedTx: genUndelegateTx(wallet.publicDeriver),
+              signTxRequest: genUndelegateTx(wallet.publicDeriver),
               totalAmountToDelegate: new BigNumber(0),
             },
-          },
-          signAndBroadcastDelegationTx: {
-            error: undefined,
-            isExecuting: false,
           },
         },
       })}
@@ -889,21 +890,21 @@ export const UndelegateDialogShown = (): Node => {
         lookup,
         getLocalPoolInfo: mockGetPoolInfo,
         openDialog: UndelegateDialog,
+        sendMoneyRequest: {
+          error: getError() === errorCases.NoError
+            ? undefined
+            : new GenericApiError(),
+          isExecuting: boolean('isExecuting', false),
+        },
         delegationTransaction: {
           isStale: boolean('isStale', false),
           createDelegationTx: {
             isExecuting: false,
             error: undefined,
             result: {
-              unsignedTx: genUndelegateTx(wallet.publicDeriver),
+              signTxRequest: genUndelegateTx(wallet.publicDeriver),
               totalAmountToDelegate: new BigNumber(0),
             },
-          },
-          signAndBroadcastDelegationTx: {
-            error: getError() === errorCases.NoError
-              ? undefined
-              : new GenericApiError(),
-            isExecuting: boolean('isExecuting', false),
           },
         },
       })}

@@ -48,7 +48,7 @@ const genBaseProps: {|
   wallet: CacheValue,
   lookup: *,
   hasPending?: boolean,
-  signAndBroadcastDelegationTx?: *,
+  sendMoneyRequest?: *,
   createDelegationTx?: *,
   selectedPools?: *,
 |} => * = (request) => {
@@ -59,6 +59,15 @@ const genBaseProps: {|
       },
       wallets: {
         selected: request.wallet.publicDeriver,
+        sendMoneyRequest: request.sendMoneyRequest == null
+          ? {
+            isExecuting: false,
+            wasExecuted: false,
+          }
+          : {
+            isExecuting: request.sendMoneyRequest.isExecuting,
+            wasExecuted: request.sendMoneyRequest.wasExecuted,
+          },
       },
       transactions: {
         getTxRequests: request.lookup.getTransactions,
@@ -66,21 +75,6 @@ const genBaseProps: {|
       },
       delegation: {
         getDelegationRequests: request.lookup.getDelegation,
-      },
-      substores: {
-        jormungandr: {
-          delegationTransaction: {
-            signAndBroadcastDelegationTx: request.signAndBroadcastDelegationTx == null
-              ? {
-                isExecuting: false,
-                wasExecuted: false,
-              }
-              : {
-                isExecuting: request.signAndBroadcastDelegationTx.isExecuting,
-                wasExecuted: request.signAndBroadcastDelegationTx.wasExecuted,
-              },
-          },
-        },
       },
     },
     actions: {
@@ -101,6 +95,13 @@ const genBaseProps: {|
           },
           wallets: {
             selected: request.wallet.publicDeriver,
+            sendMoneyRequest: request.sendMoneyRequest == null
+              ? {
+                error: undefined,
+                isExecuting: false,
+                wasExecuted: false,
+              }
+              : request.sendMoneyRequest,
           },
           substores: {
             jormungandr: {
@@ -108,7 +109,7 @@ const genBaseProps: {|
                 selectedPools: request.selectedPools != null ? request.selectedPools : [],
                 isStale: request.createDelegationTx == null
                   || request.createDelegationTx.result == null
-                  || request.signAndBroadcastDelegationTx?.wasExecuted === true
+                  || request.sendMoneyRequest?.wasExecuted === true
                   ? false
                   : boolean('isStale', false),
                 createDelegationTx: request.createDelegationTx == null
@@ -118,13 +119,6 @@ const genBaseProps: {|
                     isExecuting: false,
                   }
                   : request.createDelegationTx,
-                signAndBroadcastDelegationTx: request.signAndBroadcastDelegationTx == null
-                  ? {
-                    error: undefined,
-                    isExecuting: false,
-                    wasExecuted: false,
-                  }
-                  : request.signAndBroadcastDelegationTx,
               }
             },
           },
@@ -343,7 +337,7 @@ export const Transaction = (): Node => {
       generated={genBaseProps({
         wallet,
         lookup,
-        signAndBroadcastDelegationTx: {
+        sendMoneyRequest: {
           error: errorValue === errorCases.NoError
             ? undefined
             : new GenericApiError(),
@@ -358,7 +352,7 @@ export const Transaction = (): Node => {
         }],
         createDelegationTx: {
           result: {
-            unsignedTx: genUndelegateTx(wallet.publicDeriver),
+            signTxRequest: genUndelegateTx(wallet.publicDeriver),
             totalAmountToDelegate: new BigNumber(1000000),
           },
           error: undefined,
@@ -391,7 +385,7 @@ export const DelegationSuccess = (): Node => {
       generated={genBaseProps({
         wallet,
         lookup,
-        signAndBroadcastDelegationTx: {
+        sendMoneyRequest: {
           error: undefined,
           isExecuting: false,
           wasExecuted: true,
@@ -399,7 +393,7 @@ export const DelegationSuccess = (): Node => {
         selectedPools: [],
         createDelegationTx: {
           result: {
-            unsignedTx: genUndelegateTx(wallet.publicDeriver),
+            signTxRequest: genUndelegateTx(wallet.publicDeriver),
             totalAmountToDelegate: new BigNumber(100),
           },
           error: undefined,

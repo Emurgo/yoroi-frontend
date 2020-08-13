@@ -36,6 +36,7 @@ import type {
   NetworkRow,
 } from '../../../api/ada/lib/storage/database/primitives/tables';
 import { isJormungandr } from '../../../api/ada/lib/storage/database/prepackaged/networks';
+import { addressToDisplayString, } from '../../../api/ada/lib/storage/bridge/utils';
 
 const messages = defineMessages({
   walletUpgradeNoop: {
@@ -253,6 +254,9 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
           dialogTitle={intl.formatMessage(globalMessages.walletUpgrade)}
           coinPrice={coinPrice}
           unitOfAccountSetting={this.generated.stores.profile.unitOfAccount}
+          addressToDisplayString={
+              addr => addressToDisplayString(addr, this.getSelectedNetwork())
+            }
         />);
       }
       case TransferStatus.ERROR: {

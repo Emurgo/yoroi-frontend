@@ -38,7 +38,7 @@ export async function toSenderUtxos(payload: {|
   const senderUtxos = utxos.map(utxo => {
     const addressing = addressingMap.get(utxo.receiver);
     if (addressing == null) {
-      throw new Error('should never happen');
+      throw new Error(`${nameof(toSenderUtxos)} should never happen ${utxo.receiver}`);
     }
     return {
       ...utxo,
