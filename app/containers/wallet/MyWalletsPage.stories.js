@@ -7,9 +7,11 @@ import { select, } from '@storybook/addon-knobs';
 import { action } from '@storybook/addon-actions';
 import { withScreenshot } from 'storycap';
 import {
-  walletLookup,
   genSigningWalletWithCache,
-} from '../../../stories/helpers/StoryWrapper';
+} from '../../../stories/helpers/cardano/ShelleyCip1852Mocks';
+import {
+  walletLookup,
+} from '../../../stories/helpers/WalletCache';
 import CachedRequest from '../../stores/lib/LocalizedCachedRequest';
 import type { GetBalanceFunc } from '../../api/common/types';
 import MyWalletsPage from './MyWalletsPage';

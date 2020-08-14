@@ -1102,6 +1102,9 @@ export default class AdaApi {
           throw new NoInputsError();
         }
         const rewardBalance = new BigNumber(rewardForAddress.remainingAmount);
+        // TODO: this is actually incorrect
+        // since you may want to unregister your staking key even if the balance is 0
+        // to get back your deposit
         if (rewardBalance.eq(0)) {
           throw new NoInputsError();
         }
@@ -1126,6 +1129,10 @@ export default class AdaApi {
         certificates,
         finalWithdrawals
       );
+      // there wasn't enough in the withdrawal to send anything to us
+      if (unsignedTxResponse.changeAddr.length === 0) {
+        throw new NoInputsError();
+      }
       Logger.debug(
         `${nameof(AdaApi)}::${nameof(this.createWithdrawalTx)} success: ` + stringifyData(unsignedTxResponse)
       );

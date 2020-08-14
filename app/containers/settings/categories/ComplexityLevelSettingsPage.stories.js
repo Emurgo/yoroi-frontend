@@ -11,7 +11,7 @@ import { withScreenshot } from 'storycap';
 import { ComplexityLevels } from '../../../types/complexityLevelType';
 import {
   walletLookup,
-} from '../../../../stories/helpers/StoryWrapper';
+} from '../../../../stories/helpers/WalletCache';
 import { wrapSettings } from '../../../Routes';
 import { mockSettingsProps } from '../Settings.mock';
 import { ROUTES } from '../../../routes-config';

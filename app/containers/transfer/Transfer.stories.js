@@ -6,8 +6,10 @@ import { select, } from '@storybook/addon-knobs';
 import { withScreenshot } from 'storycap';
 import {
   walletLookup,
-  genDummyWithCache,
-} from '../../../stories/helpers/StoryWrapper';
+} from '../../../stories/helpers/WalletCache';
+import {
+  genShelleyCip1852DummyWithCache,
+} from '../../../stories/helpers/cardano/ShelleyCip1852Mocks';
 import ByronEraOptionDialogContainer from './options/ByronEraOptionDialogContainer';
 import { ROUTES } from '../../routes-config';
 import Transfer from './Transfer';
@@ -20,7 +22,7 @@ export default {
 };
 
 export const MainPage = (): Node => {
-  const wallet = genDummyWithCache();
+  const wallet = genShelleyCip1852DummyWithCache();
   const walletCases = {
     NoWallet: 0,
     HasWallet: 1
@@ -45,7 +47,7 @@ export const MainPage = (): Node => {
 
 
 export const ByronDialog = (): Node => {
-  const wallet = genDummyWithCache();
+  const wallet = genShelleyCip1852DummyWithCache();
   const lookup = walletLookup([wallet]);
   return (<Transfer
     {...mockTransferProps({

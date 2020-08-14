@@ -7,16 +7,19 @@ import { boolean, select, } from '@storybook/addon-knobs';
 import { action } from '@storybook/addon-actions';
 import {
   globalKnobs,
-  walletLookup,
-  genDummyWithCache,
   genUnitOfAccount,
 } from '../../../stories/helpers/StoryWrapper';
+import {
+  walletLookup,
+} from '../../../stories/helpers/WalletCache';
+import {
+  genShelleyCip1852DummyWithCache,
+} from '../../../stories/helpers/cardano/ShelleyCip1852Mocks';
 import { mockTransferProps, wrapTransfer, } from './Transfer.mock';
 import { THEMES } from '../../themes';
 import { defaultToSelectedExplorer } from '../../domain/SelectedExplorer';
 import { ROUTES } from '../../routes-config';
 import YoroiTransferPage from './YoroiTransferPage';
-import type { MockYoroiTransferStore } from './YoroiTransferPage';
 import { TransferStatus, } from '../../types/TransferTypes';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import {
@@ -34,6 +37,8 @@ import {
 } from '../../config/numbersConfig';
 import type { RestoreModeType } from '../../actions/common/wallet-restore-actions';
 import config from '../../config';
+import type { TransferStatusT, TransferTx } from '../../types/TransferTypes';
+import LocalizableError from '../../i18n/LocalizableError';
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -43,8 +48,15 @@ export default {
 
 const genBaseProps: {|
   wallet: null | PublicDeriver<>,
+  sendMoneyRequest?: *,
   yoroiTransfer: {|
-    ...InexactSubset<MockYoroiTransferStore>,
+    ...InexactSubset<{|
+      +status: TransferStatusT,
+      +error: ?LocalizableError,
+      +transferTx: ?TransferTx,
+      +nextInternalAddress: PublicDeriver<> => (void => Promise<string>),
+      +recoveryPhrase: string,
+    |}>,
   |},
   mode?: RestoreModeType,
   openDialog?: boolean,
@@ -73,17 +85,18 @@ const genBaseProps: {|
     wallets: {
       selected: request.wallet,
       refreshWalletFromRemote: async () => action('refreshWalletFromRemote')(),
+      sendMoneyRequest: request.sendMoneyRequest ?? Object.freeze({
+        isExecuting: false,
+      })
     },
     coinPriceStore: {
       getCurrentPrice: (_from, _to) => 5,
     },
     yoroiTransfer: {
+      mode: request.mode,
       status: TransferStatus.UNINITIALIZED,
       error: undefined,
       transferTx: undefined,
-      transferFundsRequest: Object.freeze({
-        isExecuting: false,
-      }),
       nextInternalAddress: (_publicDeriver) => (async () => 'Ae2tdPwUPEZ5PxKxoyZDgjsKgMWMpTRa4PH3sVgARSGBsWwNBH3qg7cMFsP'),
       recoveryPhrase: '',
       ...request.yoroiTransfer,
@@ -103,6 +116,7 @@ const genBaseProps: {|
       setupTransferFundsWithMnemonic: { trigger: action('setupTransferFundsWithMnemonic') },
     },
   },
+  WithdrawalTxDialogContainerProps: (null: any),
   YoroiPlateProps: {
     generated: {
       stores: {
@@ -135,7 +149,7 @@ const genBaseProps: {|
 });
 
 export const GettingMnemonics = (): Node => {
-  const wallet = genDummyWithCache();
+  const wallet = genShelleyCip1852DummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
     const baseProps = genBaseProps({
@@ -143,6 +157,7 @@ export const GettingMnemonics = (): Node => {
       yoroiTransfer: {
         status: TransferStatus.GETTING_MNEMONICS,
       },
+      mode: { type: 'bip44', extra: undefined, length: config.wallets.WALLET_RECOVERY_PHRASE_WORD_COUNT },
     });
     return wrapTransfer(
       mockTransferProps({
@@ -156,7 +171,7 @@ export const GettingMnemonics = (): Node => {
 };
 
 export const GettingPaperMnemonics = (): Node => {
-  const wallet = genDummyWithCache();
+  const wallet = genShelleyCip1852DummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
     const baseProps = genBaseProps({
@@ -164,6 +179,7 @@ export const GettingPaperMnemonics = (): Node => {
       yoroiTransfer: {
         status: TransferStatus.GETTING_PAPER_MNEMONICS,
       },
+      mode: { type: 'bip44', extra: 'paper', length: config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT },
     });
     return wrapTransfer(
       mockTransferProps({
@@ -177,7 +193,7 @@ export const GettingPaperMnemonics = (): Node => {
 };
 
 export const HardwareDisclaimer = (): Node => {
-  const wallet = genDummyWithCache();
+  const wallet = genShelleyCip1852DummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
     const baseProps = genBaseProps({
@@ -198,7 +214,7 @@ export const HardwareDisclaimer = (): Node => {
 };
 
 export const HardwareMnemonic = (): Node => {
-  const wallet = genDummyWithCache();
+  const wallet = genShelleyCip1852DummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
     const baseProps = genBaseProps({
@@ -219,7 +235,7 @@ export const HardwareMnemonic = (): Node => {
 };
 
 export const Checksum = (): Node => {
-  const wallet = genDummyWithCache();
+  const wallet = genShelleyCip1852DummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
     const modeOptions: {| [key: string]: RestoreModeType |} = {
@@ -256,7 +272,7 @@ export const Checksum = (): Node => {
 };
 
 export const RestoringAddresses = (): Node => {
-  const wallet = genDummyWithCache();
+  const wallet = genShelleyCip1852DummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
     const baseProps = genBaseProps({
@@ -277,7 +293,7 @@ export const RestoringAddresses = (): Node => {
 };
 
 export const CheckingAddresses = (): Node => {
-  const wallet = genDummyWithCache();
+  const wallet = genShelleyCip1852DummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
     const baseProps = genBaseProps({
@@ -298,7 +314,7 @@ export const CheckingAddresses = (): Node => {
 };
 
 export const GeneratingTx = (): Node => {
-  const wallet = genDummyWithCache();
+  const wallet = genShelleyCip1852DummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
     const baseProps = genBaseProps({
@@ -318,8 +334,8 @@ export const GeneratingTx = (): Node => {
   })();
 };
 
-export const TransferTx = (): Node => {
-  const wallet = genDummyWithCache();
+export const TransferTxPage = (): Node => {
+  const wallet = genShelleyCip1852DummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
     const errorCases = {
@@ -333,7 +349,11 @@ export const TransferTx = (): Node => {
     );
     const error = errorValue();
     const baseProps = genBaseProps({
+      mode: { type: 'bip44', extra: undefined, length: config.wallets.WALLET_RECOVERY_PHRASE_WORD_COUNT },
       wallet: wallet.publicDeriver,
+      sendMoneyRequest: {
+        isExecuting: boolean('isExecuting', false)
+      },
       yoroiTransfer: {
         status: TransferStatus.READY_TO_TRANSFER,
         error: error === errorCases.NoError
@@ -346,9 +366,6 @@ export const TransferTx = (): Node => {
           encodedTx: new Uint8Array([]),
           senders: ['Ae2tdPwUPEZE9RAm3d3zuuh22YjqDxhR1JF6G93uJsRrk51QGHzRUzLvDjL'],
           receiver: 'Ae2tdPwUPEZ5PxKxoyZDgjsKgMWMpTRa4PH3sVgARSGBsWwNBH3qg7cMFsP',
-        },
-        transferFundsRequest: {
-          isExecuting: boolean('isExecuting', false),
         },
       },
     });
@@ -364,7 +381,7 @@ export const TransferTx = (): Node => {
 };
 
 export const ErrorPage = (): Node => {
-  const wallet = genDummyWithCache();
+  const wallet = genShelleyCip1852DummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
     const errorCases = {
@@ -397,7 +414,7 @@ export const ErrorPage = (): Node => {
 };
 
 export const Success = (): Node => {
-  const wallet = genDummyWithCache();
+  const wallet = genShelleyCip1852DummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
     const baseProps = genBaseProps({

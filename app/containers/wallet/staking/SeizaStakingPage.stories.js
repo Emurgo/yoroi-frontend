@@ -8,13 +8,17 @@ import { action } from '@storybook/addon-actions';
 import { withScreenshot } from 'storycap';
 import {
   globalKnobs,
-  walletLookup,
+} from '../../../../stories/helpers/StoryWrapper';
+import {
   genSigningWalletWithCache,
-  genUndelegateTx,
-} from '../../../../stories/helpers/StoryWrapper';
+  genJormungandrUndelegateTx,
+} from '../../../../stories/helpers/jormungandr/JormungandrMocks';
+import {
+  walletLookup
+} from '../../../../stories/helpers/WalletCache';
 import type {
-  CacheValue
-} from '../../../../stories/helpers/StoryWrapper';
+  PossibleCacheTypes
+} from '../../../../stories/helpers/WalletCache';
 import CachedRequest from '../../../stores/lib/LocalizedCachedRequest';
 import SeizaStakingPage from './SeizaStakingPage';
 import { mockWalletProps } from '../Wallet.mock';
@@ -45,7 +49,7 @@ const getRoute = (id) => buildRoute(
 );
 
 const genBaseProps: {|
-  wallet: CacheValue,
+  wallet: PossibleCacheTypes,
   lookup: *,
   hasPending?: boolean,
   sendMoneyRequest?: *,
@@ -352,7 +356,7 @@ export const Transaction = (): Node => {
         }],
         createDelegationTx: {
           result: {
-            signTxRequest: genUndelegateTx(wallet.publicDeriver),
+            signTxRequest: genJormungandrUndelegateTx(wallet.publicDeriver),
             totalAmountToDelegate: new BigNumber(1000000),
           },
           error: undefined,
@@ -393,7 +397,7 @@ export const DelegationSuccess = (): Node => {
         selectedPools: [],
         createDelegationTx: {
           result: {
-            signTxRequest: genUndelegateTx(wallet.publicDeriver),
+            signTxRequest: genJormungandrUndelegateTx(wallet.publicDeriver),
             totalAmountToDelegate: new BigNumber(100),
           },
           error: undefined,

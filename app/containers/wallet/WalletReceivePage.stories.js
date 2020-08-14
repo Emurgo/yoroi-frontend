@@ -11,15 +11,21 @@ import { THEMES } from '../../themes';
 import { withScreenshot } from 'storycap';
 import {
   globalKnobs,
-  walletLookup,
-  genSigningWalletWithCache,
   ledgerErrorCases,
   mockLedgerMeta,
-  genTentativeTx,
   genUnitOfAccount,
 } from '../../../stories/helpers/StoryWrapper';
+import {
+  walletLookup,
+} from '../../../stories/helpers/WalletCache';
+import {
+  genSigningWalletWithCache,
+} from '../../../stories/helpers/cardano/ShelleyCip1852Mocks';
+import {
+  genTentativeByronTx
+} from '../../../stories/helpers/cardano/ByronMocks';
 import { GenericApiError, } from '../../api/common/errors';
-import type { CacheValue } from '../../../stories/helpers/StoryWrapper';
+import type { PossibleCacheTypes } from '../../../stories/helpers/WalletCache';
 import { wrapReceive, wrapWallet } from '../../Routes';
 import { mockWalletProps } from './Wallet.mock';
 import { mockReceiveProps } from './Receive.mock';
@@ -35,9 +41,9 @@ import {
   allAddressSubgroups,
   routeForStore,
   ADDRESS_BOOK,
-  GROUP_EXTERNAL,
-  GROUP_INTERNAL,
-  GROUP_MANGLED,
+  BASE_EXTERNAL,
+  BASE_INTERNAL,
+  BASE_MANGLED,
 } from '../../stores/stateless/addressStores';
 import type { IAddressTypeStore, IAddressTypeUiSubset } from '../../stores/stateless/addressStores';
 
@@ -94,7 +100,7 @@ const genAddresses: (
 const genBaseProps: {|
   location: string,
   addressBook?: boolean,
-  wallet: CacheValue,
+  wallet: PossibleCacheTypes,
   dialog?: any,
   addressSubgroupMap: $ReadOnlyMap<Class<IAddressTypeStore>, IAddressTypeUiSubset>,
   addressFilter: AddressFilterKind,
@@ -208,32 +214,48 @@ const genBaseProps: {|
     },
     UnmangleTxDialogContainerProps: {
       generated: {
+        TransferSendProps: {
+          generated: {
+            actions: {
+              wallets: {
+                sendMoney: {
+                  trigger: async (req) => action('sendMoney')(req),
+                },
+              },
+            },
+            stores: {
+              coinPriceStore: {
+                getCurrentPrice: (_from, _to) => 5,
+              },
+              explorers: {
+                selectedExplorer: defaultToSelectedExplorer(),
+              },
+              profile: {
+                isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
+                unitOfAccount: genUnitOfAccount(),
+              },
+              wallets: {
+                selected: request.wallet.publicDeriver,
+                sendMoneyRequest: request.transactionBuilderStore == null
+                  ? {
+                    reset: action('reset'),
+                    error: undefined,
+                    isExecuting: false,
+                  }
+                  : {
+                    reset: action('reset'),
+                    error: sendErrorValue() === sendErrorCases.None
+                      ? undefined
+                      : sendErrorValue(),
+                    isExecuting: boolean('isExecuting', false),
+                  },
+              },
+            },
+          },
+        },
         stores: {
-          explorers: {
-            selectedExplorer: defaultToSelectedExplorer(),
-          },
-          profile: {
-            isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
-            unitOfAccount: genUnitOfAccount(),
-          },
           wallets: {
             selected: request.wallet.publicDeriver,
-            sendMoneyRequest: request.transactionBuilderStore == null
-              ? {
-                reset: action('reset'),
-                error: undefined,
-                isExecuting: false,
-              }
-              : {
-                reset: action('reset'),
-                error: sendErrorValue() === sendErrorCases.None
-                  ? undefined
-                  : sendErrorValue(),
-                isExecuting: boolean('isExecuting', false),
-              },
-          },
-          coinPriceStore: {
-            getCurrentPrice: (_from, _to) => 5,
           },
           addresses: {
             addressSubgroupMap: request.addressSubgroupMap,
@@ -245,11 +267,6 @@ const genBaseProps: {|
             initialize: { trigger: async (req) => action('initialize')(req), },
             reset: {
               trigger: action('reset'),
-            },
-          },
-          wallets: {
-            sendMoney: {
-              trigger: async (req) => action('sendMoney')(req),
             },
           },
         },
@@ -276,7 +293,7 @@ export const Loading = (): Node => {
   const wallet = genSigningWalletWithCache();
   const lookup = walletLookup([wallet]);
 
-  const location = routeForStore(GROUP_EXTERNAL.name);
+  const location = routeForStore(BASE_EXTERNAL.name);
   const addressFilter = AddressFilter.None;
   const addressSubgroupMap = genDefaultGroupMap(false);
 
@@ -309,11 +326,11 @@ export const NoMatchFilter = (): Node => {
   const wallet = genSigningWalletWithCache();
   const lookup = walletLookup([wallet]);
 
-  const location = routeForStore(GROUP_EXTERNAL.name);
+  const location = routeForStore(BASE_EXTERNAL.name);
   const addressFilter = AddressFilter.Used;
   const addressSubgroupMap = genDefaultGroupMap(true);
 
-  addressSubgroupMap.set(GROUP_EXTERNAL.class, {
+  addressSubgroupMap.set(BASE_EXTERNAL.class, {
     all: [genAddresses('byron')[0]],
     wasExecuted: true,
   });
@@ -356,10 +373,10 @@ export const ExternalTab = (): Node => {
   );
 
   const addressFilter = select('AddressFilter', AddressFilter, AddressFilter.None);
-  const location = routeForStore(GROUP_EXTERNAL.name);
+  const location = routeForStore(BASE_EXTERNAL.name);
 
   const addressSubgroupMap = genDefaultGroupMap(true);
-  addressSubgroupMap.set(GROUP_EXTERNAL.class, {
+  addressSubgroupMap.set(BASE_EXTERNAL.class, {
     all: genAddresses('jormungandr'),
     wasExecuted: true,
   });
@@ -398,10 +415,10 @@ export const InternalTab = (): Node => {
   const lookup = walletLookup([wallet]);
 
   const addressFilter = select('AddressFilter', AddressFilter, AddressFilter.None);
-  const location = routeForStore(GROUP_INTERNAL.name);
+  const location = routeForStore(BASE_INTERNAL.name);
 
   const addressSubgroupMap = genDefaultGroupMap(true);
-  addressSubgroupMap.set(GROUP_INTERNAL.class, {
+  addressSubgroupMap.set(BASE_INTERNAL.class, {
     all: genAddresses('jormungandr'),
     wasExecuted: true,
   });
@@ -436,7 +453,7 @@ export const MangledTab = (): Node => {
   const lookup = walletLookup([wallet]);
 
   const addressFilter = select('AddressFilter', AddressFilter, AddressFilter.None);
-  const location = routeForStore(GROUP_MANGLED.name);
+  const location = routeForStore(BASE_MANGLED.name);
 
   const mangledCases = {
     NoMangled: 0,
@@ -449,7 +466,7 @@ export const MangledTab = (): Node => {
   );
 
   const addressSubgroupMap = genDefaultGroupMap(true);
-  addressSubgroupMap.set(GROUP_MANGLED.class, {
+  addressSubgroupMap.set(BASE_MANGLED.class, {
     all: genAddresses('jormungandr').map(addr => ({
       ...addr,
       value: new BigNumber(getMangledValue()),
@@ -524,10 +541,10 @@ export const UnmangleDialogLoading = (): Node => {
   const lookup = walletLookup([wallet]);
 
   const addressFilter = AddressFilter.None;
-  const location = routeForStore(GROUP_MANGLED.name);
+  const location = routeForStore(BASE_MANGLED.name);
 
   const addressSubgroupMap = genDefaultGroupMap(true);
-  addressSubgroupMap.set(GROUP_MANGLED.class, {
+  addressSubgroupMap.set(BASE_MANGLED.class, {
     all: genAddresses('jormungandr'),
     wasExecuted: true,
   });
@@ -569,10 +586,10 @@ export const UnmangleDialogError = (): Node => {
   const lookup = walletLookup([wallet]);
 
   const addressFilter = AddressFilter.None;
-  const location = routeForStore(GROUP_MANGLED.name);
+  const location = routeForStore(BASE_MANGLED.name);
 
   const addressSubgroupMap = genDefaultGroupMap(true);
-  addressSubgroupMap.set(GROUP_MANGLED.class, {
+  addressSubgroupMap.set(BASE_MANGLED.class, {
     all: genAddresses('jormungandr'),
     wasExecuted: true,
   });
@@ -612,13 +629,14 @@ export const UnmangleDialogError = (): Node => {
 export const UnmangleDialogConfirm = (): Node => {
   const wallet = genSigningWalletWithCache();
   const lookup = walletLookup([wallet]);
-  const { tentativeTx } = genTentativeTx(wallet.publicDeriver);
+  // TODO: wrong transaction type
+  const { tentativeTx } = genTentativeByronTx(wallet.publicDeriver);
 
   const addressFilter = AddressFilter.None;
-  const location = routeForStore(GROUP_MANGLED.name);
+  const location = routeForStore(BASE_MANGLED.name);
 
   const addressSubgroupMap = genDefaultGroupMap(true);
-  addressSubgroupMap.set(GROUP_MANGLED.class, {
+  addressSubgroupMap.set(BASE_MANGLED.class, {
     all: genAddresses('jormungandr'),
     wasExecuted: true,
   });
@@ -660,11 +678,11 @@ export const UriGenerateDialog = (): Node => {
   const lookup = walletLookup([wallet]);
 
   const addressFilter = AddressFilter.None;
-  const location = routeForStore(GROUP_EXTERNAL.name);
+  const location = routeForStore(BASE_EXTERNAL.name);
 
   const addressSubgroupMap = genDefaultGroupMap(true);
   const addresses = genAddresses('jormungandr');
-  addressSubgroupMap.set(GROUP_EXTERNAL.class, {
+  addressSubgroupMap.set(BASE_EXTERNAL.class, {
     all: addresses,
     wasExecuted: true,
   });
@@ -705,11 +723,11 @@ export const UriDisplayDialog = (): Node => {
   const lookup = walletLookup([wallet]);
 
   const addressFilter = AddressFilter.None;
-  const location = routeForStore(GROUP_EXTERNAL.name);
+  const location = routeForStore(BASE_EXTERNAL.name);
 
   const addresses = genAddresses('jormungandr');
   const addressSubgroupMap = genDefaultGroupMap(true);
-  addressSubgroupMap.set(GROUP_EXTERNAL.class, {
+  addressSubgroupMap.set(BASE_EXTERNAL.class, {
     all: addresses,
     wasExecuted: true,
   });
@@ -753,10 +771,10 @@ export const VerifyRegularAddress = (): Node => {
   const lookup = walletLookup([wallet]);
 
   const addressFilter = AddressFilter.None;
-  const location = routeForStore(GROUP_EXTERNAL.name);
+  const location = routeForStore(BASE_EXTERNAL.name);
 
   const addressSubgroupMap = genDefaultGroupMap(true);
-  addressSubgroupMap.set(GROUP_EXTERNAL.class, {
+  addressSubgroupMap.set(BASE_EXTERNAL.class, {
     all: genAddresses('jormungandr'),
     wasExecuted: true,
   });
@@ -800,10 +818,10 @@ export const VerifyLedgerAddress = (): Node => {
   const lookup = walletLookup([wallet]);
 
   const addressFilter = AddressFilter.None;
-  const location = routeForStore(GROUP_EXTERNAL.name);
+  const location = routeForStore(BASE_EXTERNAL.name);
 
   const addressSubgroupMap = genDefaultGroupMap(true);
-  addressSubgroupMap.set(GROUP_EXTERNAL.class, {
+  addressSubgroupMap.set(BASE_EXTERNAL.class, {
     all: genAddresses('jormungandr'),
     wasExecuted: true,
   });

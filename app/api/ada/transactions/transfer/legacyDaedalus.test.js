@@ -109,6 +109,7 @@ describe('Byron era tx format tests', () => {
     expect(transferInfo.receiver).toBe(outAddress);
 
     // check tx itself
+    if (!transferInfo.encodedTx) throw new Error(`Tx not signed`);
     const signedTx = RustModule.WalletV4.Transaction.from_bytes(transferInfo.encodedTx);
     const body = signedTx.body();
     expect(body.inputs().len()).toBe(1);
@@ -201,6 +202,7 @@ describe('Byron era tx format tests', () => {
     expect(transferInfo.receiver).toBe(outAddress);
 
     // check tx itself
+    if (!transferInfo.encodedTx) throw new Error(`Tx not signed`);
     const signedTx = RustModule.WalletV4.Transaction.from_bytes(transferInfo.encodedTx);
     const body = signedTx.body();
     expect(body.inputs().len()).toBe(numUtxos);

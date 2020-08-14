@@ -8,15 +8,19 @@ import { action } from '@storybook/addon-actions';
 import { withScreenshot } from 'storycap';
 import {
   globalKnobs,
-  walletLookup,
-  genSigningWalletWithCache,
-  genUndelegateTx,
-  genTentativeTx,
   genUnitOfAccount,
 } from '../../../../stories/helpers/StoryWrapper';
+import {
+  genSigningWalletWithCache,
+  genJormungandrUndelegateTx,
+  genTentativeJormungandrTx,
+} from '../../../../stories/helpers/jormungandr/JormungandrMocks';
+import {
+  walletLookup
+} from '../../../../stories/helpers/WalletCache';
 import type {
-  CacheValue
-} from '../../../../stories/helpers/StoryWrapper';
+  PossibleCacheTypes
+} from '../../../../stories/helpers/WalletCache';
 import CachedRequest from '../../../stores/lib/LocalizedCachedRequest';
 import type { GetBalanceFunc } from '../../../api/common/types';
 import StakingDashboardPage from './StakingDashboardPage';
@@ -63,7 +67,7 @@ const getRoute = (id) => buildRoute(
 );
 
 const genBaseProps: {|
-  wallet: CacheValue,
+  wallet: PossibleCacheTypes,
   lookup: *,
   transactionBuilderStore?: *,
   openDialog?: *,
@@ -205,35 +209,51 @@ const genBaseProps: {|
     },
     UnmangleTxDialogContainerProps: {
       generated: {
+        TransferSendProps: {
+          generated: {
+            actions: {
+              wallets: {
+                sendMoney: {
+                  trigger: async (req) => action('sendMoney')(req),
+                },
+              },
+            },
+            stores: {
+              coinPriceStore: {
+                getCurrentPrice: (_from, _to) => 5,
+              },
+              wallets: {
+                selected: request.wallet.publicDeriver,
+                sendMoneyRequest: (
+                  request.transactionBuilderStore == null
+                  || request.transactionBuilderStore.tentativeTx == null
+                )
+                  ? {
+                    reset: action('reset'),
+                    error: undefined,
+                    isExecuting: false,
+                  }
+                  : {
+                    reset: action('reset'),
+                    error: sendErrorValue() === sendErrorCases.None
+                      ? undefined
+                      : sendErrorValue(),
+                    isExecuting: boolean('isExecuting', false),
+                  },
+              },
+              explorers: {
+                selectedExplorer: defaultToSelectedExplorer(),
+              },
+              profile: {
+                isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
+                unitOfAccount: genUnitOfAccount(),
+              },
+            },
+          },
+        },
         stores: {
-          explorers: {
-            selectedExplorer: defaultToSelectedExplorer(),
-          },
-          profile: {
-            isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
-            unitOfAccount: genUnitOfAccount(),
-          },
           wallets: {
             selected: request.wallet.publicDeriver,
-            sendMoneyRequest: (
-              request.transactionBuilderStore == null
-              || request.transactionBuilderStore.tentativeTx == null
-            )
-              ? {
-                reset: action('reset'),
-                error: undefined,
-                isExecuting: false,
-              }
-              : {
-                reset: action('reset'),
-                error: sendErrorValue() === sendErrorCases.None
-                  ? undefined
-                  : sendErrorValue(),
-                isExecuting: boolean('isExecuting', false),
-              },
-          },
-          coinPriceStore: {
-            getCurrentPrice: (_from, _to) => 5,
           },
           addresses: {
             addressSubgroupMap: new Map([[
@@ -253,11 +273,6 @@ const genBaseProps: {|
             },
             reset: {
               trigger: action('reset'),
-            },
-          },
-          wallets: {
-            sendMoney: {
-              trigger: async (req) => action('sendMoney')(req),
             },
           },
         },
@@ -821,7 +836,7 @@ export const UndelegateExecuting = (): Node => {
             isExecuting: true,
             error: undefined,
             result: {
-              signTxRequest: genUndelegateTx(wallet.publicDeriver),
+              signTxRequest: genJormungandrUndelegateTx(wallet.publicDeriver),
               totalAmountToDelegate: new BigNumber(0),
             },
           },
@@ -856,7 +871,7 @@ export const UndelegateError = (): Node => {
             isExecuting: true,
             error: new GenericApiError(),
             result: {
-              signTxRequest: genUndelegateTx(wallet.publicDeriver),
+              signTxRequest: genJormungandrUndelegateTx(wallet.publicDeriver),
               totalAmountToDelegate: new BigNumber(0),
             },
           },
@@ -902,7 +917,7 @@ export const UndelegateDialogShown = (): Node => {
             isExecuting: false,
             error: undefined,
             result: {
-              signTxRequest: genUndelegateTx(wallet.publicDeriver),
+              signTxRequest: genJormungandrUndelegateTx(wallet.publicDeriver),
               totalAmountToDelegate: new BigNumber(0),
             },
           },
@@ -1088,7 +1103,7 @@ export const UnmangleDialogError = (): Node => {
 export const UnmangleDialogConfirm = (): Node => {
   const wallet = genBaseWallet();
   const lookup = walletLookup([wallet]);
-  const { tentativeTx } = genTentativeTx(wallet.publicDeriver);
+  const { tentativeTx } = genTentativeJormungandrTx();
   return wrapWallet(
     mockWalletProps({
       location: getRoute(wallet.publicDeriver.getPublicDeriverId()),

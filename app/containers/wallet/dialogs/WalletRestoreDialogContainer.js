@@ -248,7 +248,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
             .get(this.getSelectedNetwork().NetworkId) ?? (() => { throw new Error('No explorer for wallet network'); })()
           }
           onSubmit={adaWalletRestoreActions.transferFromLegacy.trigger}
-          isSubmitting={yoroiTransfer.transferFundsRequest.isExecuting}
+          isSubmitting={this.generated.stores.wallets.sendMoneyRequest.isExecuting}
           onCancel={this.onCancel}
           error={yoroiTransfer.error}
           dialogTitle={intl.formatMessage(globalMessages.walletUpgrade)}
@@ -354,7 +354,6 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
       yoroiTransfer: {|
         error: ?LocalizableError,
         status: TransferStatusT,
-        transferFundsRequest: {| isExecuting: boolean |},
         transferTx: ?TransferTx
       |},
       uiNotifications: {|
@@ -362,6 +361,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
         isOpen: string => boolean
       |},
       wallets: {|
+        sendMoneyRequest: {| isExecuting: boolean |},
         restoreRequest: {|
           error: ?LocalizableError,
           isExecuting: boolean,
@@ -397,6 +397,9 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
             error: stores.wallets.restoreRequest.error,
             reset: stores.wallets.restoreRequest.reset,
           },
+          sendMoneyRequest: {
+            isExecuting: stores.wallets.sendMoneyRequest.isExecuting,
+          },
         },
         coinPriceStore: {
           getCurrentPrice: stores.coinPriceStore.getCurrentPrice,
@@ -411,9 +414,6 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
           status: stores.yoroiTransfer.status,
           error: stores.yoroiTransfer.error,
           transferTx: stores.yoroiTransfer.transferTx,
-          transferFundsRequest: {
-            isExecuting: stores.yoroiTransfer.transferFundsRequest.isExecuting,
-          },
         },
       },
       actions: {

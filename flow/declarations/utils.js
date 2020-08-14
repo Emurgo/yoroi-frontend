@@ -24,6 +24,8 @@ declare type WithNullableFields<T: {...}> = $ObjMap<T, Nullable>;
 
 declare type PossiblyAsync<T> = T | Promise<T>;
 
+declare type DeferredCall<T> = (() => Promise<T>) => Promise<T>;
+
 /* eslint-disable no-redeclare */
 declare function arguments<A>(() => any): []
 declare function arguments<A>((A) => any): [A]

@@ -99,8 +99,6 @@ export type PublicKeyCache = {|
   plate: WalletChecksum,
 |};
 
-type DeferredCall<T> = (() => Promise<T>) => Promise<T>;
-
 /**
  * The base wallet store that contains the shared logic
  * dealing with wallets / accounts.
@@ -510,7 +508,7 @@ export default class WalletStore extends Store {
   }
 
   sendAndRefresh: {|
-    publicDeriver: PublicDeriver<>,
+    publicDeriver: void | PublicDeriver<>,
     broadcastRequest: void => Promise<{| txId: string |}>,
     refreshWallet: () => Promise<void>,
   |} => Promise<{| txId: string |}> = async (request) => {
@@ -518,7 +516,7 @@ export default class WalletStore extends Store {
     const tx = await this.sendMoneyRequest.execute(async () => {
       const result = await request.broadcastRequest();
 
-      {
+      if (request.publicDeriver != null) {
         const memo = this.stores.transactionBuilderStore.memo;
         if (memo !== '' && memo !== undefined) {
           try {

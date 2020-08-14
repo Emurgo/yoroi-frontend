@@ -15,6 +15,7 @@ import globalMessages from '../../../i18n/global-messages';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 import { WalletTypeOption, } from '../../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import ItnClaimDisclaimer from '../../../components/transfer/ItnClaimDisclaimer';
+import { ChainDerivations } from '../../../config/numbersConfig';
 
 export type GeneratedData = typeof ItnEraOptionDialogContainer.prototype.generated;
 
@@ -41,6 +42,7 @@ export default class ItnEraOptionDialogContainer extends Component<Props> {
         type: 'cip1852',
         extra: undefined,
         length: config.wallets.WALLET_RECOVERY_PHRASE_WORD_COUNT,
+        chain: ChainDerivations.CHIMERIC_ACCOUNT,
       },
     });
   }
@@ -51,6 +53,7 @@ export default class ItnEraOptionDialogContainer extends Component<Props> {
         type: 'cip1852',
         extra: 'paper',
         length: config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT,
+        chain: ChainDerivations.CHIMERIC_ACCOUNT,
       },
     });
   }

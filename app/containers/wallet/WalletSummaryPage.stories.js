@@ -7,14 +7,18 @@ import { boolean, select, } from '@storybook/addon-knobs';
 import { action } from '@storybook/addon-actions';
 import { withScreenshot } from 'storycap';
 import {
-  walletLookup,
   globalKnobs,
-  getByronSigningWalletWithCache,
   genUnitOfAccount,
 } from '../../../stories/helpers/StoryWrapper';
+import {
+  walletLookup,
+} from '../../../stories/helpers/WalletCache';
+import {
+  getByronSigningWalletWithCache,
+} from '../../../stories/helpers/cardano/ByronMocks';
 import type {
-  CacheValue,
-} from '../../../stories/helpers/StoryWrapper';
+  PossibleCacheTypes,
+} from '../../../stories/helpers/WalletCache';
 import LocalizableError from '../../i18n/LocalizableError';
 import { GenericApiError, } from '../../api/common/errors';
 import WalletSummaryPage from './WalletSummaryPage';
@@ -197,7 +201,7 @@ const genDefaultGroupMap: (
 };
 
 const genPropsForTransactions: {|
-  wallet: CacheValue,
+  wallet: PossibleCacheTypes,
   getPublicDeriverSettingsCache:
     typeof WalletSettingsStore.prototype.getPublicDeriverSettingsCache,
   transactions: Array<WalletTransaction>,

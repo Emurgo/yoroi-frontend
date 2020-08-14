@@ -3,7 +3,7 @@ import type { Node } from 'react';
 import {
   validateMnemonic,
 } from 'bip39';
-import { computed } from 'mobx';
+import { computed, } from 'mobx';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape, } from 'react-intl';
@@ -33,22 +33,14 @@ import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import type { RestoreModeType } from '../../actions/common/wallet-restore-actions';
 import { ApiOptions, getApiMeta, getApiForNetwork, } from '../../api/common/utils';
 import { addressToDisplayString, } from '../../api/ada/lib/storage/bridge/utils';
+import { ChainDerivations } from '../../config/numbersConfig';
+import WithdrawalTxDialogContainer from './WithdrawalTxDialogContainer';
+import type { GeneratedData as WithdrawalTxDialogContainerData } from './WithdrawalTxDialogContainer';
 
 // Stay this long on the success page, then jump to the wallet transactions page
 const SUCCESS_PAGE_STAY_TIME = 5 * 1000;
 
 export type GeneratedData = typeof YoroiTransferPage.prototype.generated;
-
-export type MockYoroiTransferStore = {|
-  +status: TransferStatusT,
-  +error: ?LocalizableError,
-  +transferTx: ?TransferTx,
-  +transferFundsRequest: {|
-    isExecuting: boolean,
-  |},
-  +nextInternalAddress: PublicDeriver<> => (void => Promise<string>),
-  +recoveryPhrase: string,
-|};
 
 @observer
 export default class YoroiTransferPage extends Component<InjectedOrGenerated<GeneratedData>> {
@@ -225,7 +217,19 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
         if (yoroiTransfer.transferTx == null) {
           return null; // TODO: throw error? Shouldn't happen
         }
+        const { transferTx } = yoroiTransfer;
         const { intl } = this.context;
+        if (this.generated.stores.yoroiTransfer.mode == null) {
+          throw new Error(`${nameof(YoroiTransferPage)} unknown mode`);
+        }
+        if (this.generated.stores.yoroiTransfer.mode.chain === ChainDerivations.CHIMERIC_ACCOUNT) {
+          return (
+            <WithdrawalTxDialogContainer
+              {...this.generated.WithdrawalTxDialogContainerProps}
+              onClose={this.cancelTransferFunds}
+            />
+          );
+        }
         return (
           <TransferSummaryPage
             form={null}
@@ -233,12 +237,12 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
               amount,
               apiMeta.meta.decimalPlaces.toNumber(),
             )}
-            transferTx={yoroiTransfer.transferTx}
+            transferTx={transferTx}
             selectedExplorer={this.generated.stores.explorers.selectedExplorer
               .get(publicDeriver.getParent().getNetworkInfo().NetworkId) ?? (() => { throw new Error('No explorer for wallet network'); })()
             }
             onSubmit={this.transferFunds}
-            isSubmitting={yoroiTransfer.transferFundsRequest.isExecuting}
+            isSubmitting={stores.wallets.sendMoneyRequest.isExecuting}
             onCancel={this.cancelTransferFunds}
             error={yoroiTransfer.error}
             dialogTitle={intl.formatMessage(globalMessages.walletSendConfirmationDialogTitle)}
@@ -334,8 +338,8 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
         ) => void => Promise<string>,
         recoveryPhrase: string,
         status: TransferStatusT,
-        transferFundsRequest: {| isExecuting: boolean |},
-        transferTx: ?TransferTx
+        transferTx: ?TransferTx,
+        mode: void | RestoreModeType,
       |},
       walletRestore: {|
         selectedAccount: number,
@@ -345,12 +349,14 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
         |}) => boolean,
       |},
       wallets: {|
+        sendMoneyRequest: {| isExecuting: boolean |},
         refreshWalletFromRemote: (
           PublicDeriver<>
         ) => Promise<void>,
         selected: null | PublicDeriver<>
       |}
-    |}
+    |},
+    WithdrawalTxDialogContainerProps: InjectedOrGenerated<WithdrawalTxDialogContainerData>,
     |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
@@ -371,6 +377,9 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
         wallets: {
           selected: stores.wallets.selected,
           refreshWalletFromRemote: stores.wallets.refreshWalletFromRemote,
+          sendMoneyRequest: {
+            isExecuting: stores.wallets.sendMoneyRequest.isExecuting,
+          },
         },
         coinPriceStore: {
           getCurrentPrice: stores.coinPriceStore.getCurrentPrice,
@@ -380,12 +389,10 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
           isValidMnemonic: stores.walletRestore.isValidMnemonic,
         },
         yoroiTransfer: {
+          mode: stores.yoroiTransfer.mode,
           status: stores.yoroiTransfer.status,
           error: stores.yoroiTransfer.error,
           transferTx: stores.yoroiTransfer.transferTx,
-          transferFundsRequest: {
-            isExecuting: stores.yoroiTransfer.transferFundsRequest.isExecuting,
-          },
           nextInternalAddress: stores.yoroiTransfer.nextInternalAddress,
           recoveryPhrase: stores.yoroiTransfer.recoveryPhrase,
         },
@@ -409,6 +416,8 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
         },
       },
       YoroiPlateProps: ({ actions, stores, }: InjectedOrGenerated<YoroiPlateData>),
+      WithdrawalTxDialogContainerProps:
+        ({ actions, stores, }: InjectedOrGenerated<WithdrawalTxDialogContainerData>),
     });
   }
 }

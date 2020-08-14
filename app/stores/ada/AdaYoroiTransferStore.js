@@ -82,12 +82,13 @@ export default class AdaYoroiTransferStore extends Store {
     updateStatusCallback: void => void,
     getDestinationAddress: void => Promise<string>,
   |} => Promise<TransferTx> = async (request) => {
-    const rootPk = this.stores.yoroiTransfer.mode?.extra === 'ledger'
-      ? generateLedgerWalletRootKey(request.recoveryPhrase)
-      : generateWalletRootKey(request.recoveryPhrase);
+    const { createWithdrawalTx } = this.stores.substores.ada.delegationTransaction;
+    createWithdrawalTx.reset();
 
-    const accountIndex = 0 + HARD_DERIVATION_START; // TODO: don't hardcode index
-    const stakeKey = rootPk
+    // recall: all ITN rewards were on account path 0
+    const accountIndex = 0 + HARD_DERIVATION_START;
+    // recall: Hardware wallets weren't supported during the ITN
+    const stakeKey = generateWalletRootKey(request.recoveryPhrase)
       .derive(WalletTypePurpose.CIP1852)
       .derive(CoinTypes.CARDANO)
       .derive(accountIndex)
@@ -121,21 +122,27 @@ export default class AdaYoroiTransferStore extends Store {
       Number.parseInt(config.ChainNetworkId, 10),
       stakeCredential
     ).to_address().to_bytes()).toString('hex');
-    const unsignedTx = await this.api.ada.createWithdrawalTx({
-      publicDeriver: withHasUtxoChains,
-      getAccountState: this.stores.substores.ada.stateFetchStore.fetcher.getAccountState,
-      absSlotNumber,
-      withdrawals: [{
-        rewardAddress: rewardHex,
-        shouldDeregister: true,
-      }],
-    });
+    const unsignedTx = await createWithdrawalTx.execute(async () => {
+      return await this.api.ada.createWithdrawalTx({
+        publicDeriver: withHasUtxoChains,
+        getAccountState: this.stores.substores.ada.stateFetchStore.fetcher.getAccountState,
+        absSlotNumber,
+        withdrawals: [{
+          rewardAddress: rewardHex,
+          shouldDeregister: true,
+        }],
+      });
+    }).promise;
+    if (unsignedTx == null) throw new Error(`Should never happen`);
 
     const withdrawalSum = unsignedTx.withdrawalSum(true);
 
     // TODO: support multiple change addresses
     if (unsignedTx.signRequest.changeAddr.length > 1) {
       throw new Error(`${nameof(this.generateTransferTxForRewardAccount)} multiple change addresses`);
+    }
+    if (unsignedTx.signRequest.changeAddr.length === 0) {
+      throw new Error(`${nameof(this.generateTransferTxForRewardAccount)} no change`);
     }
     const changeAddr = unsignedTx.signRequest.changeAddr[0];
     return {

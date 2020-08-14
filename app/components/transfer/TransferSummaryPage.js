@@ -37,7 +37,11 @@ const messages = defineMessages({
   addressFromSubLabel: {
     id: 'yoroiTransfer.summary.addressFrom.subLabel',
     defaultMessage: '!!!Wallet Addresses',
-  }
+  },
+  unregisterExplanation: {
+    id: 'wallet.withdrawal.transaction.unregister',
+    defaultMessage: '!!!This transaction will unregister the staking key, giving you back your {refundAmount} ADA from your deposit',
+  },
 });
 
 type Props = {|

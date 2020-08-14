@@ -22,8 +22,8 @@ export type TransferStatusT = $Values<typeof TransferStatus>;
 export type TransferTx = {|
   recoveredBalance: BigNumber,
   fee: BigNumber,
-  id: string,
-  encodedTx: Uint8Array,
   senders: Array<string>,
   receiver: string,
+  id?: string,
+  encodedTx?: Uint8Array,
 |}

@@ -7,10 +7,14 @@ import { boolean, select, } from '@storybook/addon-knobs';
 import { action } from '@storybook/addon-actions';
 import {
   globalKnobs,
-  walletLookup,
-  genDummyWithCache,
   genUnitOfAccount,
 } from '../../../stories/helpers/StoryWrapper';
+import {
+  walletLookup,
+} from '../../../stories/helpers/WalletCache';
+import {
+  genShelleyCip1852DummyWithCache,
+} from '../../../stories/helpers/cardano/ShelleyCip1852Mocks';
 import { mockTransferProps, wrapTransfer } from './Transfer.mock';
 import { THEMES } from '../../themes';
 import { defaultToSelectedExplorer } from '../../domain/SelectedExplorer';
@@ -92,7 +96,7 @@ const genBaseProps: {|
 });
 
 export const GettingMnemonics = (): Node => {
-  const wallet = genDummyWithCache();
+  const wallet = genShelleyCip1852DummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
     const baseProps = genBaseProps({
@@ -113,7 +117,7 @@ export const GettingMnemonics = (): Node => {
 };
 
 export const GettingPaperMnemonics = (): Node => {
-  const wallet = genDummyWithCache();
+  const wallet = genShelleyCip1852DummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
     const baseProps = genBaseProps({
@@ -134,7 +138,7 @@ export const GettingPaperMnemonics = (): Node => {
 };
 
 export const GettingMasterKey = (): Node => {
-  const wallet = genDummyWithCache();
+  const wallet = genShelleyCip1852DummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
     const baseProps = genBaseProps({
@@ -155,7 +159,7 @@ export const GettingMasterKey = (): Node => {
 };
 
 export const RestoringAddresses = (): Node => {
-  const wallet = genDummyWithCache();
+  const wallet = genShelleyCip1852DummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
     const baseProps = genBaseProps({
@@ -176,7 +180,7 @@ export const RestoringAddresses = (): Node => {
 };
 
 export const CheckingAddresses = (): Node => {
-  const wallet = genDummyWithCache();
+  const wallet = genShelleyCip1852DummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
     const baseProps = genBaseProps({
@@ -197,7 +201,7 @@ export const CheckingAddresses = (): Node => {
 };
 
 export const GeneratingTx = (): Node => {
-  const wallet = genDummyWithCache();
+  const wallet = genShelleyCip1852DummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
     const baseProps = genBaseProps({
@@ -218,7 +222,7 @@ export const GeneratingTx = (): Node => {
 };
 
 export const ReadyToTransfer = (): Node => {
-  const wallet = genDummyWithCache();
+  const wallet = genShelleyCip1852DummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
     const baseProps = genBaseProps({
@@ -251,7 +255,7 @@ export const ReadyToTransfer = (): Node => {
 };
 
 export const ErrorPage = (): Node => {
-  const wallet = genDummyWithCache();
+  const wallet = genShelleyCip1852DummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
     const errorCases = {

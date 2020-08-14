@@ -7,7 +7,8 @@ import { boolean, select, } from '@storybook/addon-knobs';
 import { action } from '@storybook/addon-actions';
 import { SUPPORTED_CURRENCIES } from '../../../config/unitOfAccount';
 import { withScreenshot } from 'storycap';
-import { walletLookup, genDummyWithCache } from '../../../../stories/helpers/StoryWrapper';
+import { walletLookup, } from '../../../../stories/helpers/WalletCache';
+import { genShelleyCip1852DummyWithCache } from '../../../../stories/helpers/cardano/ShelleyCip1852Mocks';
 import { wrapSettings } from '../../../Routes';
 import { mockSettingsProps } from '../Settings.mock';
 import { defaultToSelectedExplorer } from '../../../domain/SelectedExplorer';
@@ -69,7 +70,7 @@ const defaultSettingsPageProps: {|
 });
 
 export const Generic = (): Node => {
-  const wallet = genDummyWithCache();
+  const wallet = genShelleyCip1852DummyWithCache();
   const lookup = walletLookup([wallet]);
 
   const lastUpdateCases = {

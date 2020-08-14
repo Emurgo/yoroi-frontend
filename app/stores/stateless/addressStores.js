@@ -8,6 +8,7 @@ import {
   ByronInternalAddressesSubgroup,
   BaseExternalAddressesSubgroup,
   BaseInternalAddressesSubgroup,
+  BaseMangledAddressesSubgroup,
   GroupExternalAddressesSubgroup,
   GroupInternalAddressesSubgroup,
   GroupMangledAddressesSubgroup,
@@ -178,6 +179,22 @@ export const BASE_INTERNAL: AddressSubgroupMeta<
   },
   isHidden: _request => false,
 });
+export const BASE_MANGLED: AddressSubgroupMeta<
+  BaseMangledAddressesSubgroup
+> = registerAddressSubgroup({
+  isRelated: request => (
+    matchParent(request.selected, parent => parent instanceof Cip1852Wallet) &&
+    matchCoinType(request.selected, coinType => coinType === CoinTypes.CARDANO) &&
+    matchForkType(request.selected, fork => fork === CardanoForks.Haskell)
+  ),
+  class: BaseMangledAddressesSubgroup,
+  validFilters: standardFilter,
+  name: {
+    subgroup: AddressSubgroup.mangled,
+    group: AddressGroupTypes.base,
+  },
+  isHidden: request => request.result == null || request.result.length === 0,
+});
 export const GROUP_EXTERNAL: AddressSubgroupMeta<
   GroupExternalAddressesSubgroup
 > = registerAddressSubgroup({
@@ -217,7 +234,8 @@ export const GROUP_MANGLED: AddressSubgroupMeta<
 > = registerAddressSubgroup({
   isRelated: request => (
     matchParent(request.selected, parent => parent instanceof Cip1852Wallet) &&
-    matchCoinType(request.selected, coinType => coinType === CoinTypes.CARDANO)
+    matchCoinType(request.selected, coinType => coinType === CoinTypes.CARDANO) &&
+    matchForkType(request.selected, fork => fork === CardanoForks.Jormungandr)
   ),
   class: GroupMangledAddressesSubgroup,
   validFilters: standardFilter,

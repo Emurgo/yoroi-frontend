@@ -11,16 +11,22 @@ import { THEMES } from '../../themes';
 import { withScreenshot } from 'storycap';
 import {
   globalKnobs,
-  walletLookup,
-  genSigningWalletWithCache,
   ledgerErrorCases,
   trezorErrorCases,
   mockTrezorMeta,
   mockLedgerMeta,
-  genTentativeTx,
   genUnitOfAccount,
 } from '../../../stories/helpers/StoryWrapper';
-import type { CacheValue } from '../../../stories/helpers/StoryWrapper';
+import {
+  walletLookup,
+} from '../../../stories/helpers/WalletCache';
+import {
+  genSigningWalletWithCache,
+} from '../../../stories/helpers/cardano/ShelleyCip1852Mocks';
+import {
+  genTentativeByronTx,
+} from '../../../stories/helpers/cardano/ByronMocks';
+import type { PossibleCacheTypes } from '../../../stories/helpers/WalletCache';
 import MemoNoExternalStorageDialog from '../../components/wallet/memos/MemoNoExternalStorageDialog';
 import { wrapWallet } from '../../Routes';
 import { mockWalletProps } from './Wallet.mock';
@@ -44,7 +50,7 @@ const getRoute = (id) => buildRoute(
 );
 
 const genBaseProps: {|
-  wallet: CacheValue,
+  wallet: PossibleCacheTypes,
   dialogInfo?: {|
     sendMoneyRequest: *,
     transactionBuilderStore: *,
@@ -162,16 +168,10 @@ const genBaseProps: {|
           isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
         },
         wallets: {
+          sendMoneyRequest: request.dialogInfo == null
+            ? (null: any)
+            : request.dialogInfo.sendMoneyRequest,
           selected: request.wallet.publicDeriver,
-        },
-        substores: {
-          ada: {
-            wallets: {
-              sendMoneyRequest: request.dialogInfo == null
-                ? (null: any)
-                : request.dialogInfo.sendMoneyRequest,
-            },
-          },
         },
       },
       actions: {
@@ -249,7 +249,7 @@ export const RegularConfirmationDialog = (): Node => {
   const wallet = genSigningWalletWithCache();
   const lookup = walletLookup([wallet]);
 
-  const { tentativeTx, inputAmount, fee } = genTentativeTx(wallet.publicDeriver);
+  const { tentativeTx, inputAmount, fee } = genTentativeByronTx(wallet.publicDeriver);
   const errorCases = Object.freeze({
     None: undefined,
     InvalidWitness: new InvalidWitnessError(),
@@ -298,7 +298,7 @@ export const LedgerConfirmationDialog = (): Node => {
   }));
   const lookup = walletLookup([wallet]);
 
-  const { tentativeTx, inputAmount, fee } = genTentativeTx(wallet.publicDeriver);
+  const { tentativeTx, inputAmount, fee } = genTentativeByronTx(wallet.publicDeriver);
   const getErrorValue = () => select(
     'errorCases',
     ledgerErrorCases,
@@ -350,7 +350,7 @@ export const TrezorConfirmationDialog = (): Node => {
   }));
   const lookup = walletLookup([wallet]);
 
-  const { tentativeTx, inputAmount, fee } = genTentativeTx(wallet.publicDeriver);
+  const { tentativeTx, inputAmount, fee } = genTentativeByronTx(wallet.publicDeriver);
   const getErrorValue = () => select(
     'errorCases',
     trezorErrorCases,

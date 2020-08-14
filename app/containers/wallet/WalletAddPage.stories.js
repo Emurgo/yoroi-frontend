@@ -469,6 +469,11 @@ const restoreWalletProps: {|
       getTooltipActiveNotification: () => null,
     },
     wallets: {
+      sendMoneyRequest: {
+        isExecuting: request.yoroiTransferStep === TransferStatus.READY_TO_TRANSFER
+          ? boolean('isExecuting', false)
+          : false,
+      },
       restoreRequest: request.restoreRequest || {
         isExecuting: false,
         error: undefined,
@@ -503,11 +508,6 @@ const restoreWalletProps: {|
         receiver: 'Ae2tdPwUPEZ5PxKxoyZDgjsKgMWMpTRa4PH3sVgARSGBsWwNBH3qg7cMFsP',
         recoveredBalance: new BigNumber(1000),
         senders: ['Ae2tdPwUPEZE9RAm3d3zuuh22YjqDxhR1JF6G93uJsRrk51QGHzRUzLvDjL'],
-      },
-      transferFundsRequest: {
-        isExecuting: request.yoroiTransferStep === TransferStatus.READY_TO_TRANSFER
-          ? boolean('isExecuting', false)
-          : false,
       },
     },
   },

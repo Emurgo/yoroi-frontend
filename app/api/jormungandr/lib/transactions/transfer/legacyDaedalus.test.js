@@ -81,6 +81,7 @@ describe('Jormungandr tx format tests', () => {
     expect(transferInfo.receiver).toBe(bech32Addr);
 
     // check tx itself
+    if (!transferInfo.encodedTx) throw new Error(`Tx not signed`);
     const fragment = RustModule.WalletV3.Fragment.from_bytes(transferInfo.encodedTx);
     const signedTx = fragment.get_transaction();
 
@@ -180,6 +181,7 @@ describe('Jormungandr tx format tests', () => {
     expect(transferInfo.receiver).toBe(bech32Addr);
 
     // check tx itself
+    if (!transferInfo.encodedTx) throw new Error(`Tx not signed`);
     const fragment = RustModule.WalletV3.Fragment.from_bytes(transferInfo.encodedTx);
     const signedTx = fragment.get_transaction();
 

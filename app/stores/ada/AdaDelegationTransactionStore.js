@@ -6,7 +6,7 @@ import Store from '../base/Store';
 import LocalizedRequest from '../lib/LocalizedRequest';
 import type {
   CreateDelegationTxFunc,
-  CreateWithdrawalTxFunc,
+  CreateWithdrawalTxResponse,
 } from '../../api/ada';
 import { buildRoute } from '../../utils/routing';
 import { ROUTES } from '../../routes-config';
@@ -33,8 +33,8 @@ export default class AdaDelegationTransactionStore extends Store {
 
   @observable selectedPools: Array<string>;
 
-  @observable createWithdrawalTx: LocalizedRequest<CreateWithdrawalTxFunc>
-    = new LocalizedRequest<CreateWithdrawalTxFunc>(this.api.ada.createWithdrawalTx);
+  @observable createWithdrawalTx: LocalizedRequest<DeferredCall<CreateWithdrawalTxResponse>>
+    = new LocalizedRequest<DeferredCall<CreateWithdrawalTxResponse>>(request => request());
 
   @observable createDelegationTx: LocalizedRequest<CreateDelegationTxFunc>
     = new LocalizedRequest<CreateDelegationTxFunc>(this.api.ada.createDelegationTx);
