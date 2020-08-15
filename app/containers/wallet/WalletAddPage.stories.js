@@ -47,6 +47,8 @@ import { ProgressStep as PaperWalletProgressStep } from '../../stores/ada/PaperW
 import { PdfGenSteps } from '../../api/ada/paperWallet/paperWalletPdf';
 import { ROUTES } from '../../routes-config';
 import { networks, isJormungandr, } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import type { RestoreModeType } from '../../actions/common/wallet-restore-actions';
+import config from '../../config';
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -562,15 +564,14 @@ export const RestoreOptions = (): Node => {
 };
 
 export const RestoreWalletStart = (): Node => {
-  const restoreMode = Object.freeze({
-    REGULAR_15: 0,
-    REGULAR_24: 0,
-    Paper: 1,
-  });
+  const modeOptions: {| [key: string]: RestoreModeType |} = {
+    SHELLEY15: { type: 'cip1852', extra: undefined, length: 15 },
+    PAPER: { type: 'bip44', extra: 'paper', length: config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT },
+  };
   const getRestoreMode = () => select(
     'restoreMode',
-    restoreMode,
-    restoreMode.REGULAR_15
+    modeOptions,
+    modeOptions.SHELLEY15
   );
   const nameCases = getWalletNameCases();
   const password = getPasswordCreationCases();
@@ -589,16 +590,13 @@ export const RestoreWalletStart = (): Node => {
             step: RestoreSteps.START,
             walletRestoreMeta: {
               recoveryPhrase: (() => {
-                if (getRestoreMode() === restoreMode.REGULAR_24) {
-                  const cases = getMnemonicCases(24);
+                const restoreMode = getRestoreMode();
+                if (restoreMode.extra === undefined && restoreMode.length) {
+                  const cases = getMnemonicCases(restoreMode.length);
                   return select('regularRecoveryPhrase', cases, cases.Empty);
                 }
-                if (getRestoreMode() === restoreMode.REGULAR_15) {
-                  const cases = getMnemonicCases(15);
-                  return select('regularRecoveryPhrase', cases, cases.Empty);
-                }
-                if (getRestoreMode() === restoreMode.Paper) {
-                  const cases = getMnemonicCases(21);
+                if (restoreMode.extra === 'paper' && restoreMode.length) {
+                  const cases = getMnemonicCases(restoreMode.length);
                   return select('paperRecoveryPhrase', cases, cases.Empty);
                 }
                 throw new Error(`recoveryPhrase unknown mode`);
@@ -617,14 +615,16 @@ export const RestoreWalletStart = (): Node => {
 };
 
 export const RestoreVerify = (): Node => {
-  const restoreMode = Object.freeze({
-    Regular: 0,
-    Paper: 1,
-  });
+  const modeOptions: {| [key: string]: RestoreModeType |} = {
+    BYRON: { type: 'bip44', extra: undefined, length: 15 },
+    SHELLEY15: { type: 'cip1852', extra: undefined, length: 15 },
+    SHELLEY24: { type: 'cip1852', extra: undefined, length: 24 },
+    PAPER: { type: 'bip44', extra: 'paper', length: config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT },
+  };
   const getRestoreMode = () => select(
     'restoreMode',
-    restoreMode,
-    restoreMode.Regular
+    modeOptions,
+    modeOptions.SHELLEY15
   );
   const recoveryPhrase = creationRecoveryPhrase.join(' ');
   const rootPk = generateWalletRootKey(recoveryPhrase);
@@ -670,6 +670,8 @@ export const RestoreLegacyExplanation = (): Node => {
       generated={defaultProps(Object.freeze({
         openDialog: WalletRestoreDialog,
         selectedNetwork,
+        // eslint-disable-next-line no-unused-vars
+        getParam: <T>() => ({ type: 'bip44', extra: undefined, length: 15 }),
         WalletRestoreDialogContainerProps: {
           generated: restoreWalletProps({
             selectedNetwork,
@@ -693,6 +695,8 @@ export const RestoreUpgradeRestoringAddresses = (): Node => {
       generated={defaultProps(Object.freeze({
         openDialog: WalletRestoreDialog,
         selectedNetwork,
+        // eslint-disable-next-line no-unused-vars
+        getParam: <T>() => ({ type: 'cip1852', extra: undefined, length: 15 }),
         WalletRestoreDialogContainerProps: {
           generated: restoreWalletProps({
             selectedNetwork,
@@ -712,6 +716,8 @@ export const RestoreUpgradeCheckingAddresses = (): Node => {
       generated={defaultProps(Object.freeze({
         openDialog: WalletRestoreDialog,
         selectedNetwork,
+        // eslint-disable-next-line no-unused-vars
+        getParam: <T>() => ({ type: 'cip1852', extra: undefined, length: 15 }),
         WalletRestoreDialogContainerProps: {
           generated: restoreWalletProps({
             selectedNetwork,
@@ -731,6 +737,8 @@ export const RestoreUpgradeGeneratingTx = (): Node => {
       generated={defaultProps(Object.freeze({
         openDialog: WalletRestoreDialog,
         selectedNetwork,
+        // eslint-disable-next-line no-unused-vars
+        getParam: <T>() => ({ type: 'cip1852', extra: undefined, length: 15 }),
         WalletRestoreDialogContainerProps: {
           generated: restoreWalletProps({
             selectedNetwork,
@@ -750,6 +758,8 @@ export const RestoreUpgradeReadyToTransfer = (): Node => {
       generated={defaultProps(Object.freeze({
         openDialog: WalletRestoreDialog,
         selectedNetwork,
+        // eslint-disable-next-line no-unused-vars
+        getParam: <T>() => ({ type: 'cip1852', extra: undefined, length: 15 }),
         WalletRestoreDialogContainerProps: {
           generated: restoreWalletProps({
             selectedNetwork,
@@ -769,6 +779,8 @@ export const RestoreUpgradeError = (): Node => {
       generated={defaultProps(Object.freeze({
         openDialog: WalletRestoreDialog,
         selectedNetwork,
+        // eslint-disable-next-line no-unused-vars
+        getParam: <T>() => ({ type: 'cip1852', extra: undefined, length: 15 }),
         WalletRestoreDialogContainerProps: {
           generated: restoreWalletProps({
             selectedNetwork,
@@ -789,6 +801,8 @@ export const RestoreUpgradeNoNeed = (): Node => {
       generated={defaultProps(Object.freeze({
         openDialog: WalletRestoreDialog,
         selectedNetwork,
+        // eslint-disable-next-line no-unused-vars
+        getParam: <T>() => ({ type: 'cip1852', extra: undefined, length: 15 }),
         WalletRestoreDialogContainerProps: {
           generated: restoreWalletProps({
             selectedNetwork,
@@ -861,6 +875,8 @@ export const TrezorCheck = (): Node => {
       generated={defaultProps(Object.freeze({
         openDialog: WalletTrezorConnectDialogContainer,
         selectedNetwork,
+        // eslint-disable-next-line no-unused-vars
+        getParam: <T>() => ({ type: 'bip44', extra: 'trezor', }),
         WalletTrezorConnectDialogContainerProps: {
           generated: trezorPops({
             selectedNetwork,
@@ -903,6 +919,8 @@ export const TrezorConnect = (): Node => {
       generated={defaultProps(Object.freeze({
         openDialog: WalletTrezorConnectDialogContainer,
         selectedNetwork,
+        // eslint-disable-next-line no-unused-vars
+        getParam: <T>() => ({ type: 'bip44', extra: 'trezor', }),
         WalletTrezorConnectDialogContainerProps: {
           generated: trezorPops({
             selectedNetwork,
@@ -951,6 +969,8 @@ export const TrezorSave = (): Node => {
       generated={defaultProps(Object.freeze({
         openDialog: WalletTrezorConnectDialogContainer,
         selectedNetwork,
+        // eslint-disable-next-line no-unused-vars
+        getParam: <T>() => ({ type: 'bip44', extra: 'trezor', }),
         WalletTrezorConnectDialogContainerProps: {
           generated: trezorPops({
             selectedNetwork,
@@ -1020,6 +1040,8 @@ export const LedgerCheck = (): Node => {
       generated={defaultProps(Object.freeze({
         openDialog: WalletLedgerConnectDialogContainer,
         selectedNetwork,
+        // eslint-disable-next-line no-unused-vars
+        getParam: <T>() => ({ type: 'bip44', extra: 'ledger', }),
         WalletLedgerConnectDialogContainerProps: {
           generated: ledgerProps({
             selectedNetwork,
@@ -1062,6 +1084,8 @@ export const LedgerConnect = (): Node => {
       generated={defaultProps(Object.freeze({
         openDialog: WalletLedgerConnectDialogContainer,
         selectedNetwork,
+        // eslint-disable-next-line no-unused-vars
+        getParam: <T>() => ({ type: 'bip44', extra: 'ledger', }),
         WalletLedgerConnectDialogContainerProps: {
           generated: ledgerProps({
             selectedNetwork,
@@ -1110,6 +1134,8 @@ export const LedgerSave = (): Node => {
       generated={defaultProps(Object.freeze({
         openDialog: WalletLedgerConnectDialogContainer,
         selectedNetwork,
+        // eslint-disable-next-line no-unused-vars
+        getParam: <T>() => ({ type: 'bip44', extra: 'ledger', }),
         WalletLedgerConnectDialogContainerProps: {
           generated: ledgerProps({
             selectedNetwork,

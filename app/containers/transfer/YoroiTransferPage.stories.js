@@ -34,6 +34,7 @@ import {
 import AdaApi from '../../api/ada/index';
 import {
   HARD_DERIVATION_START,
+  ChainDerivations,
 } from '../../config/numbersConfig';
 import type { RestoreModeType } from '../../actions/common/wallet-restore-actions';
 import config from '../../config';
@@ -240,8 +241,8 @@ export const Checksum = (): Node => {
   return (() => {
     const modeOptions: {| [key: string]: RestoreModeType |} = {
       BYRON: { type: 'bip44', extra: undefined, length: 15 },
-      'SHELLEY-15': { type: 'cip1852', extra: undefined, length: 15 },
-      'SHELLEY-24': { type: 'cip1852', extra: undefined, length: 24 },
+      SHELLEY15: { type: 'cip1852', extra: undefined, length: 15 },
+      SHELLEY24: { type: 'cip1852', extra: undefined, length: 24 },
       PAPER: { type: 'bip44', extra: 'paper', length: config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT },
       TREZOR: { type: 'bip44', extra: 'trezor', },
     };
@@ -350,6 +351,57 @@ export const TransferTxPage = (): Node => {
     const error = errorValue();
     const baseProps = genBaseProps({
       mode: { type: 'bip44', extra: undefined, length: config.wallets.WALLET_RECOVERY_PHRASE_WORD_COUNT },
+      wallet: wallet.publicDeriver,
+      sendMoneyRequest: {
+        isExecuting: boolean('isExecuting', false)
+      },
+      yoroiTransfer: {
+        status: TransferStatus.READY_TO_TRANSFER,
+        error: error === errorCases.NoError
+          ? undefined
+          : new WalletChangedError(),
+        transferTx: {
+          recoveredBalance: new BigNumber(1),
+          fee: new BigNumber(0.1),
+          id: 'b65ae37bcc560e323ea8922de6573004299b6646e69ab9fac305f62f0c94c3ab',
+          encodedTx: new Uint8Array([]),
+          senders: ['Ae2tdPwUPEZE9RAm3d3zuuh22YjqDxhR1JF6G93uJsRrk51QGHzRUzLvDjL'],
+          receiver: 'Ae2tdPwUPEZ5PxKxoyZDgjsKgMWMpTRa4PH3sVgARSGBsWwNBH3qg7cMFsP',
+        },
+      },
+    });
+    return wrapTransfer(
+      mockTransferProps({
+        currentRoute: ROUTES.TRANSFER.YOROI,
+        selected: wallet.publicDeriver,
+        ...lookup,
+        YoroiTransferPageProps: baseProps,
+      }),
+    );
+  })();
+};
+
+export const WithdrawalTxPage = (): Node => {
+  const wallet = genShelleyCip1852DummyWithCache();
+  const lookup = walletLookup([wallet]);
+  return (() => {
+    const errorCases = {
+      NoError: 0,
+      WalletChangedError: 1,
+    };
+    const errorValue = () => select(
+      'errorCases',
+      errorCases,
+      errorCases.NoError,
+    );
+    const error = errorValue();
+    const baseProps = genBaseProps({
+      mode: {
+        type: 'cip1852',
+        extra: undefined,
+        length: config.wallets.WALLET_RECOVERY_PHRASE_WORD_COUNT,
+        chain: ChainDerivations.CHIMERIC_ACCOUNT,
+      },
       wallet: wallet.publicDeriver,
       sendMoneyRequest: {
         isExecuting: boolean('isExecuting', false)
