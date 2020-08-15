@@ -137,19 +137,11 @@ export default class AdaYoroiTransferStore extends Store {
 
     const withdrawalSum = unsignedTx.withdrawalSum(true);
 
-    // TODO: support multiple change addresses
-    if (unsignedTx.signRequest.changeAddr.length > 1) {
-      throw new Error(`${nameof(this.generateTransferTxForRewardAccount)} multiple change addresses`);
-    }
-    if (unsignedTx.signRequest.changeAddr.length === 0) {
-      throw new Error(`${nameof(this.generateTransferTxForRewardAccount)} no change`);
-    }
-    const changeAddr = unsignedTx.signRequest.changeAddr[0];
     return {
       encodedTx: Uint8Array.from([]),
       fee: unsignedTx.fee(true),
       id: unsignedTx.txId(),
-      receiver: changeAddr.address,
+      receivers: unsignedTx.signRequest.changeAddr.map(change => change.address),
       recoveredBalance: withdrawalSum,
       senders: unsignedTx
         .uniqueSenderAddresses(),

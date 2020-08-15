@@ -42,9 +42,8 @@ import type {
 } from '../../api/common/index';
 import type { UnconfirmedAmount } from '../../types/unconfirmedAmountType';
 import { getApiForNetwork, getApiMeta } from '../../api/common/utils';
-import { addressSubgroupName, addressGroupName, AddressSubgroup } from '../../types/AddressFilterTypes';
 import type { IAddressTypeStore, IAddressTypeUiSubset } from '../../stores/stateless/addressStores';
-import { routeForStore, allAddressSubgroups, } from '../../stores/stateless/addressStores';
+import { genAddressLookup } from '../../stores/stateless/addressStores';
 import { addressToDisplayString } from '../../api/ada/lib/storage/bridge/utils';
 
 export type GeneratedData = typeof WalletSummaryPage.prototype.generated;
@@ -162,29 +161,7 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
               primaryTicker: apiMeta.primaryTicker,
               settings: profile.unitOfAccount,
             }}
-            addressLookup={(address) => {
-              for (const addressStore of allAddressSubgroups) {
-                if (!addressStore.isRelated({ selected: publicDeriver })) {
-                  continue;
-                }
-                const request = this.generated.stores.addresses.addressSubgroupMap.get(
-                  addressStore.class
-                );
-                if (request == null) throw new Error('Should never happen');
-                if (request.all.some(addressInStore => addressInStore.address === address)) {
-                  const name = addressStore.name.subgroup === AddressSubgroup.all
-                    ? intl.formatMessage(addressGroupName[addressStore.name.group])
-                    : `${intl.formatMessage(addressGroupName[addressStore.name.group])} - ${intl.formatMessage(addressSubgroupName[addressStore.name.subgroup])}`;
-                  return {
-                    goToRoute: () => this.generated.actions.router.goToRoute.trigger({
-                      route: routeForStore(addressStore.name)
-                    }),
-                    name,
-                  };
-                }
-              }
-              return undefined; // could mean the address store is still loading
-            }}
+            addressLookup={genAddressLookup(publicDeriver, intl)}
             onCopyAddressTooltip={onCopyAddressTooltip}
             notification={notificationToolTip}
             decimalPlaces={apiMeta.decimalPlaces.toNumber()}

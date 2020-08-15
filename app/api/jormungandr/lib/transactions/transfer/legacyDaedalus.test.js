@@ -78,7 +78,7 @@ describe('Jormungandr tx format tests', () => {
     expect(transferInfo.fee.toString()).toBe('0.155383');
     expect(transferInfo.recoveredBalance.toString()).toBe('1');
     expect(transferInfo.senders).toEqual([address]);
-    expect(transferInfo.receiver).toBe(bech32Addr);
+    expect(transferInfo.receivers[0]).toBe(bech32Addr);
 
     // check tx itself
     if (!transferInfo.encodedTx) throw new Error(`Tx not signed`);
@@ -178,7 +178,7 @@ describe('Jormungandr tx format tests', () => {
     expect(transferInfo.fee.toString()).toBe('0.155482');
     expect(transferInfo.recoveredBalance.toString()).toBe('100.0001');
     expect(transferInfo.senders).toEqual([address]);
-    expect(transferInfo.receiver).toBe(bech32Addr);
+    expect(transferInfo.receivers[0]).toBe(bech32Addr);
 
     // check tx itself
     if (!transferInfo.encodedTx) throw new Error(`Tx not signed`);

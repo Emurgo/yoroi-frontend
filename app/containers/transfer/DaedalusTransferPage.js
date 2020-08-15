@@ -25,6 +25,7 @@ import { formattedWalletAmount } from '../../utils/formatters';
 import { ROUTES } from '../../routes-config';
 import { ApiOptions, getApiForNetwork, getApiMeta } from '../../api/common/utils';
 import { addressToDisplayString, } from '../../api/ada/lib/storage/bridge/utils';
+import { genAddressLookup } from '../../stores/stateless/addressStores';
 
 export type MockDaedalusTransferStore = {|
   +status: TransferStatusT,
@@ -198,6 +199,7 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
             error={daedalusTransfer.error}
             dialogTitle={intl.formatMessage(globalMessages.walletSendConfirmationDialogTitle)}
             coinPrice={coinPrice}
+            addressLookup={genAddressLookup(publicDeriver, intl)}
             unitOfAccountSetting={this.generated.stores.profile.unitOfAccount}
             addressToDisplayString={
               addr => addressToDisplayString(addr, publicDeriver.getParent().getNetworkInfo())

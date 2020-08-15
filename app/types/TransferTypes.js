@@ -20,10 +20,16 @@ export type TransferStatusT = $Values<typeof TransferStatus>;
 
 /** Contains all information necessary to send and display the transfer transaction */
 export type TransferTx = {|
-  recoveredBalance: BigNumber,
-  fee: BigNumber,
-  senders: Array<string>,
-  receiver: string,
-  id?: string,
-  encodedTx?: Uint8Array,
+  +recoveredBalance: BigNumber, // TODO: remove
+  +fee: BigNumber,
+  +senders: Array<string>,
+  +receivers: Array<string>,
+  +id?: string,
+  +encodedTx?: Uint8Array,
+  +withdrawals?: Array<{|
+    +address: string,
+    +amount: BigNumber,
+    // transaction may not be unregistering staking key
+    +refund?: BigNumber,
+  |}>,
 |}

@@ -17,6 +17,8 @@ import globalMessages from '../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { SelectedExplorer } from '../../domain/SelectedExplorer';
 import { truncateAddress } from '../../utils/formatters';
+import type { TransferTx } from '../../types/TransferTypes';
+import { genAddressLookup } from '../../stores/stateless/addressStores';
 
 const messages = defineMessages({
   addressFromLabel: {
@@ -45,14 +47,7 @@ type Props = {|
   +dialogTitle: string,
   +formattedWalletAmount: BigNumber => string,
   +selectedExplorer: SelectedExplorer,
-  +transferTx: {|
-    +recoveredBalance: BigNumber,
-    +fee: BigNumber,
-    +id?: string,
-    +senders: Array<string>,
-    +receiver: string,
-    +encodedTx?: Uint8Array,
-  |},
+  +transferTx: TransferTx,
   +onSubmit: void => PossiblyAsync<void>,
   +isSubmitting: boolean,
   +onCancel: void => void,
@@ -61,6 +56,7 @@ type Props = {|
   +unitOfAccountSetting: UnitOfAccountSettingType,
   +coinPrice: ?number,
   +addressToDisplayString: string => string,
+  +addressLookup: ReturnType<typeof genAddressLookup>, 
 |};
 
 /** Show user what the transfer would do to get final confirmation */
@@ -106,7 +102,6 @@ export default class TransferSummaryPage extends Component<Props> {
     const { intl } = this.context;
     const { transferTx, isSubmitting, error, unitOfAccountSetting, coinPrice, } = this.props;
 
-    const receiver = transferTx.receiver;
     const recoveredBalance = this.props.formattedWalletAmount(transferTx.recoveredBalance);
     const transactionFee = this.props.formattedWalletAmount(transferTx.fee);
     const finalBalance = this.props.formattedWalletAmount(
@@ -154,18 +149,32 @@ export default class TransferSummaryPage extends Component<Props> {
           <div className={styles.addressLabel}>
             {intl.formatMessage(globalMessages.walletSendConfirmationAddressToLabel)}
           </div>
-          <ExplorableHashContainer
-            selectedExplorer={this.props.selectedExplorer}
-            light
-            hash={this.props.addressToDisplayString(receiver)}
-            linkType="address"
-          >
-            <RawHash light>
-              <span className={styles.address}>
-                {truncateAddress(this.props.addressToDisplayString(receiver))}
-              </span>
-            </RawHash>
-          </ExplorableHashContainer>
+          {
+            transferTx.receivers.map((receiver, index) => {
+              const addressesClasses = classnames([
+                'to-' + (index + 1),
+                styles.address
+              ]);
+              return (
+                <div
+                  key={index /* eslint-disable-line react/no-array-index-key */}
+                >
+                  <ExplorableHashContainer
+                    selectedExplorer={this.props.selectedExplorer}
+                    light
+                    hash={this.props.addressToDisplayString(receiver)}
+                    linkType="address"
+                  >
+                    <RawHash light>
+                      <span className={addressesClasses}>
+                        {truncateAddress(this.props.addressToDisplayString(receiver))}
+                      </span>
+                    </RawHash>
+                  </ExplorableHashContainer>
+                </div>
+              );
+            })
+          }
         </div>
 
         {transferTx.id != null && (this._getTxIdNode(transferTx.id))}

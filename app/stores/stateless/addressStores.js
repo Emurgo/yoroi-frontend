@@ -23,7 +23,13 @@ import {
 import { Bip44Wallet } from '../../api/ada/lib/storage/models/Bip44Wallet/wrapper';
 import { Cip1852Wallet } from '../../api/ada/lib/storage/models/Cip1852Wallet/wrapper';
 import type { AddressFilterKind, StandardAddress, AddressTypeName } from '../../types/AddressFilterTypes';
-import { AddressFilter, AddressGroupTypes, AddressSubgroup, } from '../../types/AddressFilterTypes';
+import {
+  AddressFilter,
+  AddressGroupTypes,
+  AddressSubgroup,
+  addressSubgroupName,
+  addressGroupName,
+} from '../../types/AddressFilterTypes';
 import {
   ConceptualWallet
 } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
@@ -32,6 +38,7 @@ import type { ActionsMap } from '../../actions';
 import { ROUTES } from '../../routes-config';
 import { buildRoute } from '../../utils/routing';
 import { CardanoForks } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import type { $npm$ReactIntl$IntlFormat, } from 'react-intl';
 
 export type SubgroupCtorData = {|
   stores: StoresMap,
@@ -322,3 +329,36 @@ export const routeForStore = (name: AddressTypeName): string => buildRoute(
     name: name.subgroup,
   }
 );
+
+/**
+ * Creates a function that returns information about whether or not
+ * a given address belongs to the wallet
+ */
+export function genAddressLookup(
+  publicDeriver: PublicDeriver<>,
+  intl: $npm$ReactIntl$IntlFormat,
+): (string => void | {| goToRoute: void => void, name: string |}) {
+  return (address) => {
+    for (const addressStore of allAddressSubgroups) {
+      if (!addressStore.isRelated({ selected: publicDeriver })) {
+        continue;
+      }
+      const request = this.generated.stores.addresses.addressSubgroupMap.get(
+        addressStore.class
+      );
+      if (request == null) throw new Error('Should never happen');
+      if (request.all.some(addressInStore => addressInStore.address === address)) {
+        const name = addressStore.name.subgroup === AddressSubgroup.all
+          ? intl.formatMessage(addressGroupName[addressStore.name.group])
+          : `${intl.formatMessage(addressGroupName[addressStore.name.group])} - ${intl.formatMessage(addressSubgroupName[addressStore.name.subgroup])}`;
+        return {
+          goToRoute: () => this.generated.actions.router.goToRoute.trigger({
+            route: routeForStore(addressStore.name)
+          }),
+          name,
+        };
+      }
+    }
+    return undefined;
+  };
+}

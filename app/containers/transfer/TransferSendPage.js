@@ -27,6 +27,7 @@ import type { ISignRequest } from '../../api/common/lib/transactions/ISignReques
 import type {
   TransferTx,
 } from '../../types/TransferTypes';
+import { genAddressLookup } from '../../stores/stateless/addressStores';
 
 declare var CONFIG: ConfigType;
 
@@ -164,6 +165,7 @@ export default class TransferSendPage extends Component<Props> {
         dialogTitle={intl.formatMessage(globalMessages.walletSendConfirmationDialogTitle)}
         coinPrice={coinPrice}
         unitOfAccountSetting={this.generated.stores.profile.unitOfAccount}
+        addressLookup={genAddressLookup(selected, intl)}
         addressToDisplayString={
           addr => addressToDisplayString(addr, selected.getParent().getNetworkInfo())
         }

@@ -37,6 +37,7 @@ import type {
 } from '../../../api/ada/lib/storage/database/primitives/tables';
 import { isJormungandr } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import { addressToDisplayString, } from '../../../api/ada/lib/storage/bridge/utils';
+import { genAddressLookup } from '../../../stores/stateless/addressStores';
 
 const messages = defineMessages({
   walletUpgradeNoop: {
@@ -251,6 +252,10 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
           isSubmitting={this.generated.stores.wallets.sendMoneyRequest.isExecuting}
           onCancel={this.onCancel}
           error={yoroiTransfer.error}
+          addressLookup={
+            /** no wallet is created yet so we can't know this information */
+            () => undefined
+          }
           dialogTitle={intl.formatMessage(globalMessages.walletUpgrade)}
           coinPrice={coinPrice}
           unitOfAccountSetting={this.generated.stores.profile.unitOfAccount}

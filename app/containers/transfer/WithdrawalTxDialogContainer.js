@@ -34,8 +34,8 @@ export default class WithdrawalTxDialogContainer extends Component<Props> {
           fee: tentativeTx.fee(true),
           senders: tentativeTx
             .uniqueSenderAddresses(),
-          receiver: tentativeTx
-            .receivers(true)[0],
+          receivers: tentativeTx
+            .receivers(true),
         })}
       />
     );

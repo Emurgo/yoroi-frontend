@@ -127,7 +127,7 @@ describe('Haskell Shelley era tx format tests', () => {
     expect(transferInfo.fee.toString()).toBe('0.166469');
     expect(transferInfo.recoveredBalance.toString()).toBe('10');
     expect(transferInfo.senders).toEqual([addr1.address]);
-    expect(transferInfo.receiver).toBe(outAddress);
+    expect(transferInfo.receivers[0]).toBe(outAddress);
 
     // check tx itself
     if (!transferInfo.encodedTx) throw new Error(`Tx not signed`);

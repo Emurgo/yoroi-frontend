@@ -36,6 +36,7 @@ import { addressToDisplayString, } from '../../api/ada/lib/storage/bridge/utils'
 import { ChainDerivations } from '../../config/numbersConfig';
 import WithdrawalTxDialogContainer from './WithdrawalTxDialogContainer';
 import type { GeneratedData as WithdrawalTxDialogContainerData } from './WithdrawalTxDialogContainer';
+import { genAddressLookup } from '../../stores/stateless/addressStores';
 
 // Stay this long on the success page, then jump to the wallet transactions page
 const SUCCESS_PAGE_STAY_TIME = 5 * 1000;
@@ -247,6 +248,7 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
             error={yoroiTransfer.error}
             dialogTitle={intl.formatMessage(globalMessages.walletSendConfirmationDialogTitle)}
             coinPrice={coinPrice}
+            addressLookup={genAddressLookup(publicDeriver, intl)}
             unitOfAccountSetting={stores.profile.unitOfAccount}
             addressToDisplayString={
               addr => addressToDisplayString(addr, publicDeriver.getParent().getNetworkInfo())

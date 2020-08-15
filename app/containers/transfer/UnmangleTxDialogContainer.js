@@ -79,8 +79,8 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
           fee: tentativeTx.fee(true),
           senders: tentativeTx
             .uniqueSenderAddresses(),
-          receiver: tentativeTx
-            .receivers(false)[0],
+          receivers: tentativeTx
+            .receivers(false),
         })}
       />
     );
