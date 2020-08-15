@@ -15,6 +15,7 @@ import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashC
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import type { Notification } from '../../../types/notificationType';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { truncateAddress } from '../../../utils/formatters';
 
 const messages = defineMessages({
   walletAddressLabel: {
@@ -141,11 +142,4 @@ export default class StandardHeader extends Component<Props> {
 
     return walletHeader;
   }
-}
-
-function truncateAddress(addr: string): string {
-  if (addr.length <= 63) {
-    return addr;
-  }
-  return addr.substring(0, 30) + '...' + addr.substring(addr.length - 30, addr.length);
 }

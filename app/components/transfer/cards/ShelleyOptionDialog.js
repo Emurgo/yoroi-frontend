@@ -19,7 +19,7 @@ type Props = {|
 |};
 
 @observer
-export default class ItnOptionDialog extends Component<Props> {
+export default class ShelleyOptionDialog extends Component<Props> {
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
@@ -33,22 +33,22 @@ export default class ItnOptionDialog extends Component<Props> {
         closeOnOverlayClick={false}
         onClose={this.props.onCancel}
         closeButton={<DialogCloseButton />}
-        className={`${nameof(ItnOptionDialog)}`}
+        className={`${nameof(ShelleyOptionDialog)}`}
       >
         <div className={styles.component}>
           <ul className={styles.optionBlockList}>
             <OptionBlock
-              parentName={`${nameof(ItnOptionDialog)}`}
+              parentName={`${nameof(ShelleyOptionDialog)}`}
               type="restoreNormalWallet"
               title={intl.formatMessage(icarusMessages.mnemonicLabel15)}
-              learnMoreText={intl.formatMessage(globalMessages.legacyAttentionText)}
+              learnMoreText={intl.formatMessage(globalMessages.restoreShelleyEraWalletDescription)}
               onSubmit={this.props.onRegular}
             />
             <OptionBlock
-              parentName={`${nameof(ItnOptionDialog)}`}
+              parentName={`${nameof(ShelleyOptionDialog)}`}
               type="restorePaperWallet"
               title={intl.formatMessage(icarusMessages.yoroiPaperLabel)}
-              learnMoreText={intl.formatMessage(globalMessages.legacyAttentionText)}
+              learnMoreText={intl.formatMessage(globalMessages.restoreShelleyEraWalletDescription)}
               onSubmit={this.props.onPaper}
             />
           </ul>

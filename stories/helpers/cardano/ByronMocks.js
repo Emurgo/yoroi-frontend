@@ -264,7 +264,7 @@ export const genTentativeByronTx = (
     RustModule.WalletV4.ByronAddress.from_base58('Ae2tdPwUPEZ4xAL3nxLq4Py7BfS1D2tJ3u2rxZGnrAXC8TNkWhTaz41J3FN').to_address(),
     RustModule.WalletV4.BigNum.from_str(ouputAmount)
   ));
-  txBuilder.set_fee(RustModule.WalletV4.BigNum.from_str('5'));
+  txBuilder.set_fee(RustModule.WalletV4.BigNum.from_str(fee.toString()));
   txBuilder.set_ttl(5);
   return {
     tentativeTx: new HaskellShelleyTxSignRequest({

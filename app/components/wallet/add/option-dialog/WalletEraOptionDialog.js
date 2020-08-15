@@ -10,6 +10,7 @@ import OptionBlock from '../../../widgets/options/OptionBlock';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import styles from '../../../widgets/options/OptionListWrapperStyle.scss';
 import DialogBackButton from '../../../widgets/DialogBackButton';
+import globalMessages from '../../../../i18n/global-messages';
 
 const messages = defineMessages({
   dialogTitle: {
@@ -20,17 +21,9 @@ const messages = defineMessages({
     id: 'wallet.add.optionDialog.walletEra.byronEra.title',
     defaultMessage: '!!!Byron-era (read-only) wallet',
   },
-  restoreByronEraWalletDescription: {
-    id: 'wallet.add.optionDialog.walletEra.byronEra.description',
-    defaultMessage: '!!!Wallets created before July 29th, 2020 are Byron-era wallets and cannot delegate.',
-  },
   restoreShelleyEraWalletTitle: {
     id: 'wallet.add.optionDialog.walletEra.shelleyEra.title',
     defaultMessage: '!!!Shelley-era wallet',
-  },
-  restoreShelleyEraWalletDescription: {
-    id: 'wallet.add.optionDialog.walletEra.shelleyEra.description',
-    defaultMessage: '!!!Shelley-era wallets support delegation to stake pools.',
   },
 });
 
@@ -65,14 +58,14 @@ export default class WalletEraOptionDialog extends Component<Props> {
               parentName="WalletEraOptionDialog"
               type="bgByronMainnet"
               title={intl.formatMessage(messages.restoreByronEraWalletTitle)}
-              learnMoreText={intl.formatMessage(messages.restoreByronEraWalletDescription)}
+              learnMoreText={intl.formatMessage(globalMessages.restoreByronEraWalletDescription)}
               onSubmit={this.props.onByron}
             />
             <OptionBlock
               parentName="WalletEraOptionDialog"
               type="bgShelleyMainnet"
               title={intl.formatMessage(messages.restoreShelleyEraWalletTitle)}
-              learnMoreText={intl.formatMessage(messages.restoreShelleyEraWalletDescription)}
+              learnMoreText={intl.formatMessage(globalMessages.restoreShelleyEraWalletDescription)}
               onSubmit={this.props.onShelley}
             />
           </ul>

@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import DialogBackButton from '../widgets/DialogBackButton';
 import Dialog from '../widgets/Dialog';
-import styles from './ItnClaimDisclaimer.scss';
+import styles from './RewardClaimDisclaimer.scss';
 import globalMessages from '../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
@@ -22,7 +22,7 @@ type Props = {|
 |};
 
 @observer
-export default class ItnClaimDisclaimer extends Component<Props> {
+export default class RewardClaimDisclaimer extends Component<Props> {
 
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired

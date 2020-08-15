@@ -4,7 +4,7 @@ import React, { Component } from 'react';
 import { computed, } from 'mobx';
 import { observer } from 'mobx-react';
 import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
-import ItnOptionDialog from '../../../components/transfer/cards/ItnOptionDialog';
+import ShelleyOptionDialog from '../../../components/transfer/cards/ShelleyOptionDialog';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { RestoreModeType } from '../../../actions/common/wallet-restore-actions';
 import config from '../../../config';
@@ -14,23 +14,23 @@ import { intlShape } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 import { WalletTypeOption, } from '../../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
-import ItnClaimDisclaimer from '../../../components/transfer/ItnClaimDisclaimer';
+import RewardClaimDisclaimer from '../../../components/transfer/RewardClaimDisclaimer';
 import { ChainDerivations } from '../../../config/numbersConfig';
 
-export type GeneratedData = typeof ItnEraOptionDialogContainer.prototype.generated;
+export type GeneratedData = typeof ShelleyEraOptionDialogContainer.prototype.generated;
 
 type Props = {|
   ...InjectedOrGenerated<GeneratedData>,
   +onCancel: void => void,
 |};
 
-const DisclaimerStatus = Object.freeze({
+export const DisclaimerStatus = Object.freeze({
   Seeing: 1,
   Accepted: 2,
 });
 
 @observer
-export default class ItnEraOptionDialogContainer extends Component<Props> {
+export default class ShelleyEraOptionDialogContainer extends Component<Props> {
 
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired
@@ -62,7 +62,7 @@ export default class ItnEraOptionDialogContainer extends Component<Props> {
     const { intl } = this.context;
 
     const { selected } = this.generated.stores.wallets;
-    if (selected == null) throw new Error(`${nameof(ItnEraOptionDialogContainer)} no wallet selected`);
+    if (selected == null) throw new Error(`${nameof(ShelleyEraOptionDialogContainer)} no wallet selected`);
     if (selected.getParent().getWalletType() === WalletTypeOption.HARDWARE_WALLET) {
       return (
         <ErrorPage
@@ -79,14 +79,14 @@ export default class ItnEraOptionDialogContainer extends Component<Props> {
 
     if (disclaimerStatus === DisclaimerStatus.Seeing) {
       return (
-        <ItnClaimDisclaimer
+        <RewardClaimDisclaimer
           onBack={() => this.generated.actions.dialogs.updateDataForActiveDialog.trigger({
             disclaimer: undefined,
             continuation: undefined,
           })}
           onNext={() => {
             const continuation = this.generated.stores.uiDialogs.getActiveData<void => void>('continuation');
-            if (continuation == null) throw new Error(`${nameof(ItnEraOptionDialogContainer)} empty continuation`);
+            if (continuation == null) throw new Error(`${nameof(ShelleyEraOptionDialogContainer)} empty continuation`);
             this.generated.actions.dialogs.updateDataForActiveDialog.trigger({
               disclaimer: DisclaimerStatus.Accepted,
             });
@@ -104,7 +104,7 @@ export default class ItnEraOptionDialogContainer extends Component<Props> {
       ? DisclaimerStatus.Seeing
       : DisclaimerStatus.Accepted;
     return (
-      <ItnOptionDialog
+      <ShelleyOptionDialog
         onRegular={() => this.generated.actions.dialogs.updateDataForActiveDialog.trigger({
           disclaimer: nextDisclaimerStatus,
           continuation: this.startTransferIcarusRewards
@@ -148,7 +148,7 @@ export default class ItnEraOptionDialogContainer extends Component<Props> {
       return this.props.generated;
     }
     if (this.props.stores == null || this.props.actions == null) {
-      throw new Error(`${nameof(ItnEraOptionDialogContainer)} no way to generated props`);
+      throw new Error(`${nameof(ShelleyEraOptionDialogContainer)} no way to generated props`);
     }
     const { actions, stores } = this.props;
     const { yoroiTransfer } = actions;

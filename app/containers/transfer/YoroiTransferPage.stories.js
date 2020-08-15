@@ -14,6 +14,7 @@ import {
 } from '../../../stories/helpers/WalletCache';
 import {
   genShelleyCip1852DummyWithCache,
+  genWithdrawalTx,
 } from '../../../stories/helpers/cardano/ShelleyCip1852Mocks';
 import { mockTransferProps, wrapTransfer, } from './Transfer.mock';
 import { THEMES } from '../../themes';
@@ -50,6 +51,7 @@ export default {
 const genBaseProps: {|
   wallet: null | PublicDeriver<>,
   sendMoneyRequest?: *,
+  withdrawalProps?: *,
   yoroiTransfer: {|
     ...InexactSubset<{|
       +status: TransferStatusT,
@@ -117,7 +119,44 @@ const genBaseProps: {|
       setupTransferFundsWithMnemonic: { trigger: action('setupTransferFundsWithMnemonic') },
     },
   },
-  WithdrawalTxDialogContainerProps: (null: any),
+  WithdrawalTxDialogContainerProps: {
+    generated: {
+      TransferSendProps: {
+        generated: {
+          stores: {
+            explorers: {
+              selectedExplorer: defaultToSelectedExplorer(),
+            },
+            profile: {
+              isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
+              unitOfAccount: genUnitOfAccount(),
+            },
+            wallets: {
+              selected: request.wallet,
+              sendMoneyRequest: {
+                ...(request.sendMoneyRequest ?? Object.freeze({
+                  isExecuting: false,
+                })),
+                error: undefined,
+                reset: action('sendMoneyRequest reset'),
+              },
+            },
+            coinPriceStore: {
+              getCurrentPrice: (_from, _to) => 5,
+            },
+          },
+          actions: {
+            wallets: {
+              sendMoney: {
+                trigger: async (req) => action('sendMoney')(req),
+              },
+            },
+          },
+        },
+      },
+      ...(request.withdrawalProps ?? ({}: any)),
+    },
+  },
   YoroiPlateProps: {
     generated: {
       stores: {
@@ -396,6 +435,22 @@ export const WithdrawalTxPage = (): Node => {
     );
     const error = errorValue();
     const baseProps = genBaseProps({
+      withdrawalProps: {
+        actions: Object.freeze({}),
+        stores: {
+          substores: {
+            ada: {
+              delegationTransaction: {
+                createWithdrawalTx: {
+                  error: undefined,
+                  result: genWithdrawalTx(wallet.publicDeriver),
+                  reset: action('createWithdrawalTx reset'),
+                },
+              },
+            },
+          },
+        },
+      },
       mode: {
         type: 'cip1852',
         extra: undefined,

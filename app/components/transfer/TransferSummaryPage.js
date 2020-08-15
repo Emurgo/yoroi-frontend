@@ -16,6 +16,7 @@ import { calculateAndFormatValue } from '../../utils/unit-of-account';
 import globalMessages from '../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { SelectedExplorer } from '../../domain/SelectedExplorer';
+import { truncateAddress } from '../../utils/formatters';
 
 const messages = defineMessages({
   addressFromLabel: {
@@ -33,10 +34,6 @@ const messages = defineMessages({
   transferButtonLabel: {
     id: 'transfer.summary.transferButton.label',
     defaultMessage: '!!!Transfer Funds',
-  },
-  addressFromSubLabel: {
-    id: 'yoroiTransfer.summary.addressFrom.subLabel',
-    defaultMessage: '!!!Wallet Addresses',
   },
   unregisterExplanation: {
     id: 'wallet.withdrawal.transaction.unregister',
@@ -123,9 +120,6 @@ export default class TransferSummaryPage extends Component<Props> {
           <div className={styles.addressLabel}>
             {intl.formatMessage(messages.addressFromLabel)}
           </div>
-          <div className={styles.addressSubLabel}>
-            {intl.formatMessage(messages.addressFromSubLabel)}
-          </div>
           {
             transferTx.senders.map((sender, index) => {
               const addressesClasses = classnames([
@@ -146,7 +140,7 @@ export default class TransferSummaryPage extends Component<Props> {
                   >
                     <RawHash light>
                       <span className={addressesClasses}>
-                        {this.props.addressToDisplayString(sender)}
+                        {truncateAddress(this.props.addressToDisplayString(sender))}
                       </span>
                     </RawHash>
                   </ExplorableHashContainer>
@@ -168,7 +162,7 @@ export default class TransferSummaryPage extends Component<Props> {
           >
             <RawHash light>
               <span className={styles.address}>
-                {this.props.addressToDisplayString(receiver)}
+                {truncateAddress(this.props.addressToDisplayString(receiver))}
               </span>
             </RawHash>
           </ExplorableHashContainer>

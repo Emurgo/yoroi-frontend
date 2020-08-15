@@ -313,6 +313,21 @@ export default class WalletReceivePage extends Component<Props> {
             error={hwVerifyAddress.error}
             walletAddress={hwVerifyAddress.selectedAddress.address}
             walletPath={hwVerifyAddress.selectedAddress.path}
+            onCopyAddressTooltip={(elementId) => {
+              if (!uiNotifications.isOpen(elementId)) {
+                runInAction(() => {
+                  this.notificationElementId = elementId;
+                });
+                actions.notifications.open.trigger({
+                  id: elementId,
+                  duration: tooltipNotification.duration,
+                  message: tooltipNotification.message,
+                });
+              }
+            }}
+            notification={uiNotifications.getTooltipActiveNotification(
+              this.notificationElementId
+            )}
             isHardware={isHwWallet}
             verify={() => actions.ada.hwVerifyAddress.verifyAddress.trigger(publicDeriver)}
             cancel={actions.ada.hwVerifyAddress.closeAddressDetailDialog.trigger}

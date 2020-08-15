@@ -10,7 +10,7 @@ import DialogCloseButton from '../widgets/DialogCloseButton';
 import DialogBackButton from '../widgets/DialogBackButton';
 import type { UriParams } from '../../utils/URIHandling';
 import globalMessages from '../../i18n/global-messages';
-import { formattedWalletAmount } from '../../utils/formatters';
+import { formattedWalletAmount, truncateAddress } from '../../utils/formatters';
 import ExplorableHashContainer from '../../containers/widgets/ExplorableHashContainer';
 import RawHash from '../widgets/hashWrappers/RawHash';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
@@ -100,7 +100,9 @@ export default class URIVerifyDialog extends Component<Props> {
             linkType="address"
           >
             <RawHash light>
-              <span className={styles.address}>{this.props.uriParams.address}</span>
+              <span className={styles.address}>
+                {truncateAddress(this.props.uriParams.address)}
+              </span>
             </RawHash>
           </ExplorableHashContainer>
         </div>

@@ -24,6 +24,9 @@ import LocalizableError from '../../../i18n/LocalizableError';
 import globalMessages from '../../../i18n/global-messages';
 import styles from './VerifyAddressDialog.scss';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { truncateAddress } from '../../../utils/formatters';
+import CopyableAddress from '../../widgets/CopyableAddress';
+import type { Notification } from '../../../types/notificationType';
 
 const messages = defineMessages({
   addressDetailsTitleLabel: {
@@ -46,6 +49,8 @@ type Props = {|
   +verify: void => PossiblyAsync<void>,
   +cancel: void => void,
   +selectedExplorer: SelectedExplorer,
+  +notification: ?Notification,
+  +onCopyAddressTooltip: string => void,
   +isHardware: boolean,
   +walletAddress: string,
   +walletPath: void | BIP32Path,
@@ -80,6 +85,8 @@ export default class VerifyAddressDialog extends Component<Props> {
         isSubmitting: isActionProcessing,
         onClick: verify,
       }];
+
+    const notificationId = 'verify-address-notification';
 
     // TODO: This should be refactored somehow so it’s not duplicated in multiple files.
     // Get QRCode color value from active theme's CSS variable
@@ -119,16 +126,25 @@ export default class VerifyAddressDialog extends Component<Props> {
               {intl.formatMessage(globalMessages.addressLabel)}
             </span>
             <div className="verificationAddress">
-              <ExplorableHashContainer
-                light={false}
-                selectedExplorer={this.props.selectedExplorer}
+              <CopyableAddress
                 hash={walletAddress}
-                linkType="address"
+                elementId={notificationId}
+                onCopyAddress={
+                  () => this.props.onCopyAddressTooltip(notificationId)
+                }
+                notification={this.props.notification}
               >
-                <RawHash light={false} className={styles.hash}>
-                  {walletAddress}
-                </RawHash>
-              </ExplorableHashContainer>
+                <ExplorableHashContainer
+                  light={false}
+                  selectedExplorer={this.props.selectedExplorer}
+                  hash={walletAddress}
+                  linkType="address"
+                >
+                  <RawHash light={false} className={styles.hash}>
+                    {truncateAddress(walletAddress)}
+                  </RawHash>
+                </ExplorableHashContainer>
+              </CopyableAddress>
             </div>
             <br />
             {walletPath != null && (

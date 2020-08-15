@@ -20,6 +20,7 @@ import type { PlateResponse } from '../../api/common/lib/crypto/plate';
 import CenteredLayout from '../layout/CenteredLayout';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { truncateAddress } from '../../utils/formatters';
 
 const messages = defineMessages({
   dialogTitleVerifyWalletRestoration: {
@@ -149,7 +150,7 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
                 linkType="address"
               >
                 <RawHash light>
-                  {address}
+                  {truncateAddress(address)}
                 </RawHash>
               </ExplorableHashContainer>
             </CopyableAddress>

@@ -20,7 +20,7 @@ import type {
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import BigNumber from 'bignumber.js';
-import { truncateAddress, splitAmount } from '../../utils/formatters';
+import { truncateAddressShort, splitAmount } from '../../utils/formatters';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import NoTransactionModernSvg from '../../assets/images/transaction/no-transactions-yet.modern.inline.svg';
 import AddLabelIcon from '../../assets/images/add-label.inline.svg';
@@ -248,7 +248,7 @@ export default class WalletReceive extends Component<Props> {
                         address.isUsed === true && styles.addressHashUsed
                       ])}
                     >
-                      {truncateAddress(address.address)}
+                      {truncateAddressShort(address.address)}
                     </span>
                   </RawHash>
                 </ExplorableHashContainer>

@@ -31,7 +31,7 @@ import { TxStatusCodes, } from '../../../api/ada/lib/storage/database/primitives
 import type { TxStatusCodesType, } from '../../../api/ada/lib/storage/database/primitives/enums';
 import type { CertificateRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import { RustModule } from '../../../api/ada/lib/cardanoCrypto/rustLoader';
-import { splitAmount } from '../../../utils/formatters';
+import { splitAmount, truncateAddressShort } from '../../../utils/formatters';
 import type { TxMemoTableRow } from '../../../api/ada/lib/storage/database/memos/tables';
 import CopyableAddress from '../../widgets/CopyableAddress';
 import type { Notification } from '../../../types/notificationType';
@@ -273,11 +273,6 @@ export default class Transaction extends Component<Props, State> {
     throw new Error(`${nameof(this.getStatusString)} unexpected state ` + state);
   }
 
-  truncateString(string: string): string {
-    const { length } = string;
-    return length > 20 ? `${string.substring(0, 10)}...${string.substring(length - 10)}` : string;
-  }
-
   renderAmountDisplay: {|
     amount: BigNumber,
     decimalPlaces: number,
@@ -494,7 +489,7 @@ export default class Transaction extends Component<Props, State> {
                               linkType="address"
                             >
                               <span className={classnames([styles.rowData, styles.hash])}>
-                                {this.truncateString(
+                                {truncateAddressShort(
                                   this.props.addressToDisplayString(address.address)
                                 )}
                               </span>
@@ -548,7 +543,7 @@ export default class Transaction extends Component<Props, State> {
                               linkType="address"
                             >
                               <span className={classnames([styles.rowData, styles.hash])}>
-                                {this.truncateString(
+                                {truncateAddressShort(
                                   this.props.addressToDisplayString(address.address)
                                 )}
                               </span>
