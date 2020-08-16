@@ -135,14 +135,13 @@ export default class AdaYoroiTransferStore extends Store {
     }).promise;
     if (unsignedTx == null) throw new Error(`Should never happen`);
 
-    const withdrawalSum = unsignedTx.withdrawalSum(true);
-
+    // TODO: this isn't actually used anywhere. Should probably remove it
     return {
       encodedTx: Uint8Array.from([]),
       fee: unsignedTx.fee(true),
       id: unsignedTx.txId(),
-      receivers: unsignedTx.signRequest.changeAddr.map(change => change.address),
-      recoveredBalance: withdrawalSum,
+      receivers: unsignedTx.receivers(true),
+      recoveredBalance: new BigNumber(0),
       senders: unsignedTx
         .uniqueSenderAddresses(),
     };

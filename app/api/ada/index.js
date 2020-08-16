@@ -934,12 +934,20 @@ export default class AdaApi {
       Logger.debug(
         `${nameof(AdaApi)}::${nameof(this.createUnsignedTx)} success: ` + stringifyData(unsignedTxResponse)
       );
-      return new HaskellShelleyTxSignRequest({
-        senderUtxos: unsignedTxResponse.senderUtxos,
-        unsignedTx: unsignedTxResponse.txBuilder,
-        changeAddr: unsignedTxResponse.changeAddr,
-        certificate: undefined,
-      });
+      return new HaskellShelleyTxSignRequest(
+        {
+          senderUtxos: unsignedTxResponse.senderUtxos,
+          unsignedTx: unsignedTxResponse.txBuilder,
+          changeAddr: unsignedTxResponse.changeAddr,
+          certificate: undefined,
+        },
+        undefined,
+        {
+          ChainNetworkId: Number.parseInt(config.ChainNetworkId, 10),
+          KeyDeposit: new BigNumber(config.KeyDeposit),
+          PoolDeposit: new BigNumber(config.PoolDeposit),
+        },
+      );
     } catch (error) {
       Logger.error(
         `${nameof(AdaApi)}::${nameof(this.createUnsignedTx)} error: ` + stringifyError(error)
@@ -1034,12 +1042,20 @@ export default class AdaApi {
         .plus(differenceAfterTx) // subtract any part of the fee that comes from UTXO
         .plus(request.valueInAccount); // recall: rewards are compounding
 
-      const signTxRequest = new HaskellShelleyTxSignRequest({
-        senderUtxos: unsignedTx.senderUtxos,
-        unsignedTx: unsignedTx.txBuilder,
-        changeAddr: unsignedTx.changeAddr,
-        certificate: undefined,
-      });
+      const signTxRequest = new HaskellShelleyTxSignRequest(
+        {
+          senderUtxos: unsignedTx.senderUtxos,
+          unsignedTx: unsignedTx.txBuilder,
+          changeAddr: unsignedTx.changeAddr,
+          certificate: undefined,
+        },
+        undefined,
+        {
+          ChainNetworkId: Number.parseInt(config.ChainNetworkId, 10),
+          KeyDeposit: new BigNumber(config.KeyDeposit),
+          PoolDeposit: new BigNumber(config.PoolDeposit),
+        },
+      );
       return {
         signTxRequest,
         totalAmountToDelegate
@@ -1136,12 +1152,20 @@ export default class AdaApi {
       Logger.debug(
         `${nameof(AdaApi)}::${nameof(this.createWithdrawalTx)} success: ` + stringifyData(unsignedTxResponse)
       );
-      return new HaskellShelleyTxSignRequest({
-        senderUtxos: unsignedTxResponse.senderUtxos,
-        unsignedTx: unsignedTxResponse.txBuilder,
-        changeAddr: unsignedTxResponse.changeAddr,
-        certificate: undefined,
-      });
+      return new HaskellShelleyTxSignRequest(
+        {
+          senderUtxos: unsignedTxResponse.senderUtxos,
+          unsignedTx: unsignedTxResponse.txBuilder,
+          changeAddr: unsignedTxResponse.changeAddr,
+          certificate: undefined,
+        },
+        undefined,
+        {
+          ChainNetworkId: Number.parseInt(config.ChainNetworkId, 10),
+          KeyDeposit: new BigNumber(config.KeyDeposit),
+          PoolDeposit: new BigNumber(config.PoolDeposit),
+        },
+      );
     } catch (error) {
       Logger.error(
         `${nameof(AdaApi)}::${nameof(this.createWithdrawalTx)} error: ` + stringifyError(error)

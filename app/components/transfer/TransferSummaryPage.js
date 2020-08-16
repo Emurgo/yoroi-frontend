@@ -56,7 +56,7 @@ type Props = {|
   +unitOfAccountSetting: UnitOfAccountSettingType,
   +coinPrice: ?number,
   +addressToDisplayString: string => string,
-  +addressLookup: ReturnType<typeof genAddressLookup>, 
+  +addressLookup: ReturnType<typeof genAddressLookup>,
 |};
 
 /** Show user what the transfer would do to get final confirmation */
@@ -86,7 +86,7 @@ export default class TransferSummaryPage extends Component<Props> {
     ];
     return (
       <Dialog
-        styleOveride={{ '--theme-modal-min-max-width-cmn': '680px' }}
+        styleOverride={{ '--theme-modal-min-max-width-cmn': '680px' }}
         title={this.props.dialogTitle}
         actions={actions}
         closeButton={<DialogCloseButton />}
@@ -98,19 +98,50 @@ export default class TransferSummaryPage extends Component<Props> {
     );
   }
 
-  render(): Node {
+  getHeader: void => Node = () => {
     const { intl } = this.context;
-    const { transferTx, isSubmitting, error, unitOfAccountSetting, coinPrice, } = this.props;
+    const { transferTx, } = this.props;
 
-    const recoveredBalance = this.props.formattedWalletAmount(transferTx.recoveredBalance);
-    const transactionFee = this.props.formattedWalletAmount(transferTx.fee);
-    const finalBalance = this.props.formattedWalletAmount(
-      transferTx.recoveredBalance.minus(transferTx.fee)
-    );
+    if (transferTx.withdrawals != null) {
+      const { withdrawals } = transferTx;
+      return (
+        <div className={styles.addressLabelWrapper}>
+          <div className={styles.addressLabel}>
+            {intl.formatMessage(messages.addressFromLabel)}
+          </div>
+          {
+            withdrawals.map((withdrawal, index) => {
+              const addressesClasses = classnames([
+                'withdrawal-' + (index + 1),
+                styles.address
+              ]);
 
-    return this.wrapInDialog(
-      <div className={styles.body}>
-
+              return (
+                <div
+                  key={index /* eslint-disable-line react/no-array-index-key */}
+                >
+                  <div className={styles.addressSubLabel} />
+                  <ExplorableHashContainer
+                    selectedExplorer={this.props.selectedExplorer}
+                    light
+                    hash={this.props.addressToDisplayString(withdrawal.address)}
+                    linkType="address"
+                  >
+                    <RawHash light>
+                      <span className={addressesClasses}>
+                        {truncateAddress(this.props.addressToDisplayString(withdrawal.address))}
+                      </span>
+                    </RawHash>
+                  </ExplorableHashContainer>
+                </div>
+              );
+            })
+          }
+        </div>
+      );
+    }
+    return (
+      <>
         <div className={styles.addressLabelWrapper}>
           <div className={styles.addressLabel}>
             {intl.formatMessage(messages.addressFromLabel)}
@@ -144,7 +175,6 @@ export default class TransferSummaryPage extends Component<Props> {
             })
           }
         </div>
-
         <div className={styles.addressLabelWrapper}>
           <div className={styles.addressLabel}>
             {intl.formatMessage(globalMessages.walletSendConfirmationAddressToLabel)}
@@ -176,7 +206,23 @@ export default class TransferSummaryPage extends Component<Props> {
             })
           }
         </div>
+      </>
+    );
+  }
 
+  render(): Node {
+    const { intl } = this.context;
+    const { transferTx, isSubmitting, error, unitOfAccountSetting, coinPrice, } = this.props;
+
+    const recoveredBalance = this.props.formattedWalletAmount(transferTx.recoveredBalance);
+    const transactionFee = this.props.formattedWalletAmount(transferTx.fee);
+    const finalBalance = this.props.formattedWalletAmount(
+      transferTx.recoveredBalance.minus(transferTx.fee)
+    );
+
+    return this.wrapInDialog(
+      <div className={styles.body}>
+        {this.getHeader()}
         {transferTx.id != null && (this._getTxIdNode(transferTx.id))}
 
         <div className={styles.amountFeesWrapper}>

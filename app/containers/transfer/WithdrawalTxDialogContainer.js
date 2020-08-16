@@ -1,16 +1,15 @@
 // @flow
 import React, { Component } from 'react';
+import BigNumber from 'bignumber.js';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { computed, } from 'mobx';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
-import type { ConfigType } from '../../../config/config-types';
 import LocalizableError from '../../i18n/LocalizableError';
 import type { ISignRequest } from '../../api/common/lib/transactions/ISignRequest';
 import TransferSendPage from './TransferSendPage';
 import type { GeneratedData as TransferSendData } from './TransferSendPage';
-
-declare var CONFIG: ConfigType;
+import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 
 export type GeneratedData = typeof WithdrawalTxDialogContainer.prototype.generated;
 
@@ -29,14 +28,27 @@ export default class WithdrawalTxDialogContainer extends Component<Props> {
         {...this.generated.TransferSendProps}
         onClose={this.props.onClose}
         transactionRequest={createWithdrawalTx}
-        toTransferTx={tentativeTx => ({
-          recoveredBalance: tentativeTx.totalInput(true),
-          fee: tentativeTx.fee(true),
-          senders: tentativeTx
-            .uniqueSenderAddresses(),
-          receivers: tentativeTx
-            .receivers(true),
-        })}
+        toTransferTx={tentativeTx => {
+          if (!(tentativeTx instanceof HaskellShelleyTxSignRequest)) {
+            throw new Error(`${nameof(WithdrawalTxDialogContainer)} incorrect tx type`);
+          }
+
+          const deregistrations = new Map(tentativeTx.keyDeregistrations(true).map(key => [
+            key.rewardAddress, key.refund
+          ]));
+          return {
+            recoveredBalance: tentativeTx.totalInput(true),
+            fee: tentativeTx.fee(true),
+            senders: tentativeTx
+              .uniqueSenderAddresses(),
+            receivers: tentativeTx
+              .receivers(true),
+            withdrawals: tentativeTx.withdrawals(true).map(withdrawal => ({
+              ...withdrawal,
+              refund: deregistrations.get(withdrawal.address) ?? new BigNumber(0),
+            })),
+          };
+        }}
       />
     );
   }

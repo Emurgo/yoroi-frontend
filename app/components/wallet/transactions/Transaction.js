@@ -9,7 +9,6 @@ import type {
 } from 'react-intl';
 import moment from 'moment';
 import classnames from 'classnames';
-import { uniq } from 'lodash';
 import styles from './Transaction.scss';
 import AdaSymbol from '../../../assets/images/ada-symbol.inline.svg';
 import AddMemoSvg from '../../../assets/images/add-memo.inline.svg';
@@ -35,6 +34,7 @@ import { splitAmount, truncateAddressShort } from '../../../utils/formatters';
 import type { TxMemoTableRow } from '../../../api/ada/lib/storage/database/memos/tables';
 import CopyableAddress from '../../widgets/CopyableAddress';
 import type { Notification } from '../../../types/notificationType';
+import { genAddressLookup } from '../../../stores/stateless/addressStores';
 
 const messages = defineMessages({
   type: {
@@ -200,10 +200,7 @@ type Props = {|
     +primaryTicker: string,
     +priceInfo: void | $ReadOnly<PriceDataRow>
   |},
-  +addressLookup: string => void | {|
-    goToRoute: void => void,
-    name: string,
-  |},
+  +addressLookup: ReturnType<typeof genAddressLookup>,
   +onCopyAddressTooltip: (string, string) => void,
   +notification: ?Notification,
   +decimalPlaces: number, // TODO: this should be tied to individual values, not the currency itself
@@ -244,7 +241,11 @@ export default class Transaction extends Component<Props, State> {
       return intl.formatMessage(messages.intrawallet, { currency });
     }
     if (type === transactionTypes.MULTI) {
-      Logger.error('MULTI type transaction detected.');
+      // can happen for example in Cardano
+      // if you claim a reward from an account doesn't belong to you
+      // you have an input to pay the tx fee
+      // there is an input you don't own (the withdrawal)
+      // you have an output to receive change + withdrawal amount
       return intl.formatMessage(messages.multiparty, { currency });
     }
     // unused
@@ -459,7 +460,7 @@ export default class Transaction extends Component<Props, State> {
                     <h2>
                       {intl.formatMessage(messages.fromAddresses)}:
                       <span className={styles.addressCount}>
-                        {uniq(data.addresses.from).length}
+                        {data.addresses.from.length}
                       </span>
                     </h2>
                     <h2>{intl.formatMessage(messages.addressType)}</h2>
@@ -468,7 +469,7 @@ export default class Transaction extends Component<Props, State> {
                     </h2>
                   </div>
                   <div className={styles.addressList}>
-                    {uniq(data.addresses.from).map((address, addressIndex) => {
+                    {data.addresses.from.map((address, addressIndex) => {
 
                       const notificationElementId = `address-${addressIndex}-copyNotification`;
                       return (
@@ -512,7 +513,7 @@ export default class Transaction extends Component<Props, State> {
                   <div className={styles.addressHeader}>
                     <h2>
                       {intl.formatMessage(messages.toAddresses)}:
-                      <span className={styles.addressCount}>{uniq(data.addresses.to).length}</span>
+                      <span className={styles.addressCount}>{data.addresses.to.length}</span>
                     </h2>
                     <h2>{intl.formatMessage(messages.addressType)}</h2>
                     <h2 className={styles.fee}>
@@ -649,19 +650,6 @@ export default class Transaction extends Component<Props, State> {
       this.props.addressToDisplayString(address)
     );
     if (addressInfo == null) {
-      // this can happen in three main case:
-      // 1) When user launches the app:
-      // Tx history finishes loading but address stores are still loading
-      // Therefore we show the tx history but don't know which store the address belongs to yet
-      // 2) The transaction is pending and uses an address we don't know we own yet
-      // recall: a transaction shouldn't change wallet state until it's confirmed
-      // so if a pending transaction uses an external address that is
-      // A) beyond the display cutoff
-      // B) within bip44 gap
-      // then the address store will not contain this address yet
-      // but it will once the transaction confirms
-      // 3) A bug and/of unsupported address kind
-
       return (
         <div className={classnames([styles.status, styles.typeAddress])}>
           {intl.formatMessage(globalMessages.processingLabel)}
@@ -719,33 +707,97 @@ export default class Transaction extends Component<Props, State> {
 
   getWithdrawals: WalletTransaction => ?Node = (data) => {
     const { intl } = this.context;
-    if (data instanceof CardanoShelleyTransaction) {
-      const wrapWithdrawalsText = (node) => (
-        <>
-          <h2>
-            {intl.formatMessage(messages.withdrawals)}
-          </h2>
-          <span className={styles.rowData}>
-            {node}
-          </span>
-        </>
-      );
-      const withdrawalBlock = data.withdrawals.reduce(
-        (acc, curr, idx) => {
-          const newElem = (
-            // eslint-disable-next-line react/no-array-index-key
-            <span key={idx}>
-              {acc.length !== 0 ? (<br />) : undefined}
-              {curr.address}
-            </span>
-          );
-          acc.push(newElem);
-          return acc;
-        },
-        ([]: Array<Node>)
-      );
-      return wrapWithdrawalsText(withdrawalBlock);
+    if (!(data instanceof CardanoShelleyTransaction)) {
+      return null;
     }
+    return (
+      <div className={styles.addressContent}>
+        <div>
+          <div className={styles.addressHeader}>
+            <h2>
+              {intl.formatMessage(messages.withdrawals)}:
+              <span className={styles.addressCount}>
+                {data.withdrawals.length}
+              </span>
+            </h2>
+            <h2>{intl.formatMessage(messages.addressType)}</h2>
+            <h2 className={styles.fee}>
+              {intl.formatMessage(globalMessages.amountLabel)}
+            </h2>
+          </div>
+          <div className={styles.addressList}>
+            {data.withdrawals.map((withdrawal, addressIndex) => {
+              const notificationElementId = `withdrawal-${addressIndex}-copyNotification`;
+              return (
+                // eslint-disable-next-line react/no-array-index-key
+                <div key={`${data.txid}-from-${withdrawal.address}-${addressIndex}`} className={styles.addressItem}>
+                  <CopyableAddress
+                    hash={this.props.addressToDisplayString(withdrawal.address)}
+                    elementId={notificationElementId}
+                    onCopyAddress={
+                      () => this.props.onCopyAddressTooltip(
+                        withdrawal.address,
+                        notificationElementId
+                      )
+                    }
+                    notification={this.props.notification}
+                  >
+                    <ExplorableHashContainer
+                      selectedExplorer={this.props.selectedExplorer}
+                      hash={this.props.addressToDisplayString(withdrawal.address)}
+                      light
+                      linkType="address"
+                    >
+                      <span className={classnames([styles.rowData, styles.hash])}>
+                        {truncateAddressShort(
+                          this.props.addressToDisplayString(withdrawal.address)
+                        )}
+                      </span>
+                    </ExplorableHashContainer>
+                  </CopyableAddress>
+                  {this.generateAddressButton(withdrawal.address)}
+                  <div className={styles.fee}>
+                    {this.renderAmountDisplay({
+                      amount: withdrawal.value,
+                      decimalPlaces: this.props.decimalPlaces,
+                    })} {this.props.unitOfAccount.primaryTicker}
+                  </div>
+                </div>
+              );
+            })
+            }
+          </div>
+        </div>
+        <div />
+      </div>
+    );
+    // if (data instanceof CardanoShelleyTransaction) {
+    //   const wrapWithdrawalsText = (node) => (
+    //     <>
+    //       <h2>
+    //         {intl.formatMessage(messages.withdrawals)}
+    //       </h2>
+    //       <span className={styles.rowData}>
+    //         {node}
+    //       </span>
+    //     </>
+    //   );
+    //   const withdrawalBlock = data.withdrawals.reduce(
+    //     (acc, curr, idx) => {
+    //       const newElem = (
+    //         // eslint-disable-next-line react/no-array-index-key
+    //         <span key={idx}>
+    //           {acc.length !== 0 ? (<br />) : undefined}
+    //           {curr.address}
+    //         </span>
+    //       );
+    //       acc.push(newElem);
+    //       return acc;
+    //     },
+    //     ([]: Array<Node>)
+    //   );
+    //   return wrapWithdrawalsText(withdrawalBlock);
+    // }
   }
 
   getCertificate: WalletTransaction => ?Node = (data) => {

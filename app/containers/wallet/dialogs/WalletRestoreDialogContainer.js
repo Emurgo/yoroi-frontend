@@ -37,7 +37,6 @@ import type {
 } from '../../../api/ada/lib/storage/database/primitives/tables';
 import { isJormungandr } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import { addressToDisplayString, } from '../../../api/ada/lib/storage/bridge/utils';
-import { genAddressLookup } from '../../../stores/stateless/addressStores';
 
 const messages = defineMessages({
   walletUpgradeNoop: {

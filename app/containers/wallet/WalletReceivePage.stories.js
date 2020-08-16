@@ -224,6 +224,9 @@ const genBaseProps: {|
               },
             },
             stores: {
+              addresses: {
+                addressSubgroupMap: request.addressSubgroupMap,
+              },
               coinPriceStore: {
                 getCurrentPrice: (_from, _to) => 5,
               },

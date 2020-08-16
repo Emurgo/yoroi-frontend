@@ -28,6 +28,7 @@ import type {
   TransferTx,
 } from '../../types/TransferTypes';
 import { genAddressLookup } from '../../stores/stateless/addressStores';
+import type { IAddressTypeStore, IAddressTypeUiSubset } from '../../stores/stateless/addressStores';
 
 declare var CONFIG: ConfigType;
 
@@ -165,7 +166,12 @@ export default class TransferSendPage extends Component<Props> {
         dialogTitle={intl.formatMessage(globalMessages.walletSendConfirmationDialogTitle)}
         coinPrice={coinPrice}
         unitOfAccountSetting={this.generated.stores.profile.unitOfAccount}
-        addressLookup={genAddressLookup(selected, intl)}
+        addressLookup={genAddressLookup(
+          selected,
+          intl,
+          undefined, // don't want to go to route from within a dialog
+          this.generated.stores.addresses.addressSubgroupMap,
+        )}
         addressToDisplayString={
           addr => addressToDisplayString(addr, selected.getParent().getNetworkInfo())
         }
@@ -186,6 +192,9 @@ export default class TransferSendPage extends Component<Props> {
       |},
     |},
     stores: {|
+      addresses: {|
+        addressSubgroupMap: $ReadOnlyMap<Class<IAddressTypeStore>, IAddressTypeUiSubset>,
+      |},
       coinPriceStore: {|
         getCurrentPrice: (from: string, to: string) => ?number
       |},
@@ -215,6 +224,9 @@ export default class TransferSendPage extends Component<Props> {
     const { stores, actions } = this.props;
     return Object.freeze({
       stores: {
+        addresses: {
+          addressSubgroupMap: stores.addresses.addressSubgroupMap,
+        },
         explorers: {
           selectedExplorer: stores.explorers.selectedExplorer,
         },

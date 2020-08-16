@@ -7,18 +7,33 @@ import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 import { getAdaCurrencyMeta } from '../../currencyInfo';
 import { toHexOrBase58 } from '../../lib/storage/bridge/utils';
 
+/**
+ * We take a copy of these parameters instead of re-evaluating them from the network
+ * because calculating the value of the network parameter at the time a transaction happens
+ * may require a database access
+ * and it doesn't make sense that this class be aware of the database or take any locks
+*/
+type NetworkSettingSnapshot = {|
+  // there is no way given just a transaction body to 100% know which network it belongs to
+  +ChainNetworkId: number,
+  +PoolDeposit: BigNumber,
+  +KeyDeposit: BigNumber,
+|};
 export class HaskellShelleyTxSignRequest
 implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
 
   signRequest: BaseSignRequest<RustModule.WalletV4.TransactionBuilder>;
   metadata: void | RustModule.WalletV4.TransactionMetadata; // TODO: shouldn't need this
+  networkSettingSnapshot: NetworkSettingSnapshot;
 
   constructor(
     signRequest: BaseSignRequest<RustModule.WalletV4.TransactionBuilder>,
     metadata: void | RustModule.WalletV4.TransactionMetadata,
+    networkSettingSnapshot: NetworkSettingSnapshot,
   ) {
     this.signRequest = signRequest;
     this.metadata = metadata;
+    this.networkSettingSnapshot = networkSettingSnapshot;
   }
 
   txId(): string {
@@ -67,21 +82,56 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
     return fee;
   }
 
-  withdrawalSum(shift: boolean): BigNumber {
+  withdrawals(shift: boolean): Array<{|
+    address: string,
+    amount: BigNumber,
+  |}> {
     const withdrawals = this.signRequest.unsignedTx.build().withdrawals();
-    if (withdrawals == null) return new BigNumber(0);
+    if (withdrawals == null) return [];
 
     const withdrawalKeys = withdrawals.keys();
-    let sum = new BigNumber(0);
+    const result = [];
     for (let i = 0; i < withdrawalKeys.len(); i++) {
-      const withdrawal = withdrawals.get(withdrawalKeys.get(i))?.to_str();
-      if (withdrawal == null) continue;
-      sum = sum.plus(withdrawal);
+      const withdrawalAmount = withdrawals.get(withdrawalKeys.get(i))?.to_str();
+      if (withdrawalAmount == null) continue;
+
+      const amount = shift
+        ? new BigNumber(withdrawalAmount).shiftedBy(-getAdaCurrencyMeta().decimalPlaces.toNumber())
+        : new BigNumber(withdrawalAmount);
+      result.push({
+        address: Buffer.from(withdrawalKeys.to_bytes()).toString('hex'),
+        amount,
+      });
     }
-    if (shift) {
-      return sum.shiftedBy(-getAdaCurrencyMeta().decimalPlaces.toNumber());
+    return result;
+  }
+
+  keyDeregistrations(shift: boolean): Array<{|
+    rewardAddress: string,
+    refund: BigNumber,
+  |}> {
+    const certs = this.signRequest.unsignedTx.build().certs();
+    if (certs == null) return [];
+
+    const result = [];
+    for (let i = 0; i < certs.len(); i++) {
+      const cert = certs.get(i).as_stake_deregistration();
+      if (cert == null) continue;
+
+      const address = RustModule.WalletV4.RewardAddress.new(
+        this.networkSettingSnapshot.ChainNetworkId,
+        cert.stake_credential(),
+      );
+      result.push({
+        rewardAddress: Buffer.from(address.to_address().to_bytes()).toString('hex'),
+        // recall: for now you get the full deposit back. May change in the future
+        refund: shift
+          ? this.networkSettingSnapshot.KeyDeposit
+            .shiftedBy(-getAdaCurrencyMeta().decimalPlaces.toNumber())
+          : this.networkSettingSnapshot.KeyDeposit,
+      });
     }
-    return sum;
+    return result;
   }
 
   receivers(includeChange: boolean): Array<string> {

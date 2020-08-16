@@ -1,6 +1,7 @@
 // @flow
 
 import '../../lib/test-config';
+import BigNumber from 'bignumber.js';
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 import {
   createTrezorSignTxPayload,
@@ -17,6 +18,8 @@ import {
 beforeAll(async () => {
   await RustModule.load();
 });
+
+const network = networks.ByronMainnet;
 
 function getProtocolParams(): {|
   linearFee: RustModule.WalletV4.LinearFee,
@@ -187,18 +190,24 @@ test('Create Trezor transaction', async () => {
   txBuilder.set_fee(RustModule.WalletV4.BigNum.from_str('1000'));
   txBuilder.set_ttl(500);
 
-  const baseConfig = networks.ByronMainnet.BaseConfig[0];
-  if (baseConfig.ByronNetworkId == null) {
-    throw new Error(`missing Byron network id`);
-  }
+  const baseConfig = network.BaseConfig
+    .reduce((acc, next) => Object.assign(acc, next), {});
   const { ByronNetworkId, ChainNetworkId } = baseConfig;
   const response = await createTrezorSignTxPayload(
-    new HaskellShelleyTxSignRequest({
-      unsignedTx: txBuilder,
-      changeAddr: [],
-      senderUtxos,
-      certificate: undefined,
-    }, undefined),
+    new HaskellShelleyTxSignRequest(
+      {
+        unsignedTx: txBuilder,
+        changeAddr: [],
+        senderUtxos,
+        certificate: undefined,
+      },
+      undefined,
+      {
+        ChainNetworkId: Number.parseInt(baseConfig.ChainNetworkId, 10),
+        PoolDeposit: new BigNumber(baseConfig.PoolDeposit),
+        KeyDeposit: new BigNumber(baseConfig.KeyDeposit),
+      },
+    ),
     ByronNetworkId,
     Number.parseInt(ChainNetworkId, 10),
   );

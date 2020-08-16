@@ -33,6 +33,8 @@ import {
   NotEnoughMoneyToSendError,
 } from '../../api/common/errors';
 import AdaApi from '../../api/ada/index';
+import type { IAddressTypeStore, IAddressTypeUiSubset } from '../../stores/stateless/addressStores';
+import { allAddressSubgroups } from '../../stores/stateless/addressStores';
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -40,11 +42,29 @@ export default {
   decorators: [withScreenshot],
 };
 
+const genDefaultGroupMap: (
+  void => Map<Class<IAddressTypeStore>, IAddressTypeUiSubset>
+) = () => {
+  return new Map(
+    allAddressSubgroups.map(type => [
+      type.class,
+      {
+        all: [],
+        wasExecuted: true,
+      },
+    ])
+  );
+};
+
+
 const genBaseProps: {|
   wallet: null | PublicDeriver<>,
   daedalusTransfer: InexactSubset<MockDaedalusTransferStore>,
 |} => * = (request) => ({
   stores: {
+    addresses: {
+      addressSubgroupMap: genDefaultGroupMap(),
+    },
     explorers: {
       selectedExplorer: defaultToSelectedExplorer(),
     },

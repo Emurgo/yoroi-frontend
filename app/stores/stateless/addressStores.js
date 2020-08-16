@@ -9,6 +9,7 @@ import {
   BaseExternalAddressesSubgroup,
   BaseInternalAddressesSubgroup,
   BaseMangledAddressesSubgroup,
+  RewardAddressesSubgroup,
   GroupExternalAddressesSubgroup,
   GroupInternalAddressesSubgroup,
   GroupMangledAddressesSubgroup,
@@ -202,6 +203,22 @@ export const BASE_MANGLED: AddressSubgroupMeta<
   },
   isHidden: request => request.result == null || request.result.length === 0,
 });
+export const REWARD_ADDRESS: AddressSubgroupMeta<
+  RewardAddressesSubgroup
+> = registerAddressSubgroup({
+  isRelated: request => (
+    matchParent(request.selected, parent => parent instanceof Cip1852Wallet) &&
+    matchCoinType(request.selected, coinType => coinType === CoinTypes.CARDANO) &&
+    matchForkType(request.selected, fork => fork === CardanoForks.Haskell)
+  ),
+  class: RewardAddressesSubgroup,
+  validFilters: standardFilter,
+  name: {
+    subgroup: AddressSubgroup.all,
+    group: AddressGroupTypes.reward,
+  },
+  isHidden: request => request.result == null || request.result.length === 0,
+});
 export const GROUP_EXTERNAL: AddressSubgroupMeta<
   GroupExternalAddressesSubgroup
 > = registerAddressSubgroup({
@@ -337,28 +354,46 @@ export const routeForStore = (name: AddressTypeName): string => buildRoute(
 export function genAddressLookup(
   publicDeriver: PublicDeriver<>,
   intl: $npm$ReactIntl$IntlFormat,
-): (string => void | {| goToRoute: void => void, name: string |}) {
+  goToRoute: void | (string => void),
+  addressSubgroupMap: $ReadOnlyMap<Class<IAddressTypeStore>, IAddressTypeUiSubset>,
+): (string => (
+  void |
+  {|
+    goToRoute: void | (void => void),
+    name: string,
+  |}
+)) {
   return (address) => {
     for (const addressStore of allAddressSubgroups) {
       if (!addressStore.isRelated({ selected: publicDeriver })) {
         continue;
       }
-      const request = this.generated.stores.addresses.addressSubgroupMap.get(
-        addressStore.class
-      );
+      const request = addressSubgroupMap.get(addressStore.class);
       if (request == null) throw new Error('Should never happen');
       if (request.all.some(addressInStore => addressInStore.address === address)) {
         const name = addressStore.name.subgroup === AddressSubgroup.all
           ? intl.formatMessage(addressGroupName[addressStore.name.group])
           : `${intl.formatMessage(addressGroupName[addressStore.name.group])} - ${intl.formatMessage(addressSubgroupName[addressStore.name.subgroup])}`;
         return {
-          goToRoute: () => this.generated.actions.router.goToRoute.trigger({
-            route: routeForStore(addressStore.name)
-          }),
+          goToRoute: goToRoute == null
+            ? goToRoute
+            : () => goToRoute(routeForStore(addressStore.name)),
           name,
         };
       }
     }
+    // this can happen in three main case:
+    // 1) When user launches the app:
+    // Tx history finishes loading but address stores are still loading
+    // Therefore we show the tx history but don't know which store the address belongs to yet
+    // 2) The transaction is pending and uses an address we don't know we own yet
+    // recall: a transaction shouldn't change wallet state until it's confirmed
+    // so if a pending transaction uses an external address that is
+    // A) beyond the display cutoff
+    // B) within bip44 gap
+    // then the address store will not contain this address yet
+    // but it will once the transaction confirms
+    // 3) A bug and/or unsupported address kind
     return undefined;
   };
 }

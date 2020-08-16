@@ -313,19 +313,30 @@ export const genTentativeShelleyTx = (
 
   txBuilder.set_fee(RustModule.WalletV4.BigNum.from_str(fee.toString()));
   txBuilder.set_ttl(5);
+
+  const baseConfig = getCardanoHaskellBaseConfig(publicDeriver.getParent().getNetworkInfo())
+    .reduce((acc, next) => Object.assign(acc, next), {});
   return {
-    tentativeTx: new HaskellShelleyTxSignRequest({
-      senderUtxos: [{
-        ...remoteUnspentUtxo,
-        addressing: {
-          path: [],
-          startLevel: 0,
-        },
-      }],
-      unsignedTx: txBuilder,
-      changeAddr: [],
-      certificate: undefined,
-    }),
+    tentativeTx: new HaskellShelleyTxSignRequest(
+      {
+        senderUtxos: [{
+          ...remoteUnspentUtxo,
+          addressing: {
+            path: [],
+            startLevel: 0,
+          },
+        }],
+        unsignedTx: txBuilder,
+        changeAddr: [],
+        certificate: undefined,
+      },
+      undefined,
+      {
+        ChainNetworkId: Number.parseInt(config.ChainNetworkId, 10),
+        KeyDeposit: new BigNumber(config.KeyDeposit),
+        PoolDeposit: new BigNumber(config.PoolDeposit),
+      },
+    ),
     inputAmount,
     fee,
   };
@@ -394,16 +405,27 @@ export const genWithdrawalTx = (
 
   txBuilder.set_fee(RustModule.WalletV4.BigNum.from_str(fee.toString()));
   txBuilder.set_ttl(5);
-  return new HaskellShelleyTxSignRequest({
-    senderUtxos: [{
-      ...remoteUnspentUtxo,
-      addressing: {
-        path: [],
-        startLevel: 0,
-      },
-    }],
-    unsignedTx: txBuilder,
-    changeAddr: [],
-    certificate: undefined,
-  });
+
+  const baseConfig = getCardanoHaskellBaseConfig(publicDeriver.getParent().getNetworkInfo())
+    .reduce((acc, next) => Object.assign(acc, next), {});
+  return new HaskellShelleyTxSignRequest(
+    {
+      senderUtxos: [{
+        ...remoteUnspentUtxo,
+        addressing: {
+          path: [],
+          startLevel: 0,
+        },
+      }],
+      unsignedTx: txBuilder,
+      changeAddr: [],
+      certificate: undefined,
+    },
+    undefined,
+    {
+      ChainNetworkId: Number.parseInt(baseConfig.ChainNetworkId, 10),
+      PoolDeposit: new BigNumber(baseConfig.PoolDeposit),
+      KeyDeposit: new BigNumber(baseConfig.KeyDeposit),
+    }
+  );
 };

@@ -46,7 +46,7 @@ import LessThanExpectedDialog from '../../../components/wallet/staking/dashboard
 import UnmangleTxDialogContainer from '../../transfer/UnmangleTxDialogContainer';
 import PoolWarningDialog from '../../../components/wallet/staking/dashboard/PoolWarningDialog';
 import UndelegateDialog from '../../../components/wallet/staking/dashboard/UndelegateDialog';
-import { GROUP_MANGLED } from '../../../stores/stateless/addressStores';
+import { GROUP_MANGLED, allAddressSubgroups } from '../../../stores/stateless/addressStores';
 import type { StandardAddress } from '../../../types/AddressFilterTypes';
 import {
   TransactionType,
@@ -54,11 +54,26 @@ import {
 import type {
   JormungandrTransactionInsert, NetworkRow,
 } from '../../../api/ada/lib/storage/database/primitives/tables';
+import type { IAddressTypeStore, IAddressTypeUiSubset } from '../../../stores/stateless/addressStores';
 
 export default {
   title: `${__filename.split('.')[0]}`,
   component: StakingDashboardPage,
   decorators: [withScreenshot],
+};
+
+const genDefaultGroupMap: (
+  void => Map<Class<IAddressTypeStore>, IAddressTypeUiSubset>
+) = () => {
+  return new Map(
+    allAddressSubgroups.map(type => [
+      type.class,
+      {
+        all: [],
+        wasExecuted: true,
+      },
+    ])
+  );
 };
 
 const getRoute = (id) => buildRoute(
@@ -219,6 +234,9 @@ const genBaseProps: {|
               },
             },
             stores: {
+              addresses: {
+                addressSubgroupMap: genDefaultGroupMap(),
+              },
               coinPriceStore: {
                 getCurrentPrice: (_from, _to) => 5,
               },

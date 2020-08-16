@@ -26,6 +26,7 @@ import { ROUTES } from '../../routes-config';
 import { ApiOptions, getApiForNetwork, getApiMeta } from '../../api/common/utils';
 import { addressToDisplayString, } from '../../api/ada/lib/storage/bridge/utils';
 import { genAddressLookup } from '../../stores/stateless/addressStores';
+import type { IAddressTypeStore, IAddressTypeUiSubset } from '../../stores/stateless/addressStores';
 
 export type MockDaedalusTransferStore = {|
   +status: TransferStatusT,
@@ -199,7 +200,12 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
             error={daedalusTransfer.error}
             dialogTitle={intl.formatMessage(globalMessages.walletSendConfirmationDialogTitle)}
             coinPrice={coinPrice}
-            addressLookup={genAddressLookup(publicDeriver, intl)}
+            addressLookup={genAddressLookup(
+              publicDeriver,
+              intl,
+              undefined, // don't want to go to route from within a dialog
+              this.generated.stores.addresses.addressSubgroupMap,
+            )}
             unitOfAccountSetting={this.generated.stores.profile.unitOfAccount}
             addressToDisplayString={
               addr => addressToDisplayString(addr, publicDeriver.getParent().getNetworkInfo())
@@ -260,6 +266,9 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
       |}
     |},
     stores: {|
+      addresses: {|
+        addressSubgroupMap: $ReadOnlyMap<Class<IAddressTypeStore>, IAddressTypeUiSubset>,
+      |},
       coinPriceStore: {|
         getCurrentPrice: (from: string, to: string) => ?number
       |},
@@ -299,6 +308,9 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
     const { stores, actions } = this.props;
     return Object.freeze({
       stores: {
+        addresses: {
+          addressSubgroupMap: stores.addresses.addressSubgroupMap,
+        },
         explorers: {
           selectedExplorer: stores.explorers.selectedExplorer,
         },

@@ -37,6 +37,7 @@ import { ChainDerivations } from '../../config/numbersConfig';
 import WithdrawalTxDialogContainer from './WithdrawalTxDialogContainer';
 import type { GeneratedData as WithdrawalTxDialogContainerData } from './WithdrawalTxDialogContainer';
 import { genAddressLookup } from '../../stores/stateless/addressStores';
+import type { IAddressTypeStore, IAddressTypeUiSubset } from '../../stores/stateless/addressStores';
 
 // Stay this long on the success page, then jump to the wallet transactions page
 const SUCCESS_PAGE_STAY_TIME = 5 * 1000;
@@ -248,7 +249,12 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
             error={yoroiTransfer.error}
             dialogTitle={intl.formatMessage(globalMessages.walletSendConfirmationDialogTitle)}
             coinPrice={coinPrice}
-            addressLookup={genAddressLookup(publicDeriver, intl)}
+            addressLookup={genAddressLookup(
+              publicDeriver,
+              intl,
+              undefined, // don't want to go to route from within a dialog
+              this.generated.stores.addresses.addressSubgroupMap,
+            )}
             unitOfAccountSetting={stores.profile.unitOfAccount}
             addressToDisplayString={
               addr => addressToDisplayString(addr, publicDeriver.getParent().getNetworkInfo())
@@ -323,6 +329,9 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
       |}
     |},
     stores: {|
+      addresses: {|
+        addressSubgroupMap: $ReadOnlyMap<Class<IAddressTypeStore>, IAddressTypeUiSubset>,
+      |},
       coinPriceStore: {|
         getCurrentPrice: (from: string, to: string) => ?number
       |},
@@ -369,6 +378,9 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
     const { stores, actions } = this.props;
     return Object.freeze({
       stores: {
+        addresses: {
+          addressSubgroupMap: stores.addresses.addressSubgroupMap,
+        },
         explorers: {
           selectedExplorer: stores.explorers.selectedExplorer,
         },

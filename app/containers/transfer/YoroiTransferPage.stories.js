@@ -41,11 +41,27 @@ import type { RestoreModeType } from '../../actions/common/wallet-restore-action
 import config from '../../config';
 import type { TransferStatusT, TransferTx } from '../../types/TransferTypes';
 import LocalizableError from '../../i18n/LocalizableError';
+import type { IAddressTypeStore, IAddressTypeUiSubset } from '../../stores/stateless/addressStores';
+import { allAddressSubgroups } from '../../stores/stateless/addressStores';
 
 export default {
   title: `${__filename.split('.')[0]}`,
   component: YoroiTransferPage,
   decorators: [withScreenshot],
+};
+
+const genDefaultGroupMap: (
+  void => Map<Class<IAddressTypeStore>, IAddressTypeUiSubset>
+) = () => {
+  return new Map(
+    allAddressSubgroups.map(type => [
+      type.class,
+      {
+        all: [],
+        wasExecuted: true,
+      },
+    ])
+  );
 };
 
 const genBaseProps: {|
@@ -65,6 +81,9 @@ const genBaseProps: {|
   openDialog?: boolean,
 |} => * = (request) => ({
   stores: {
+    addresses: {
+      addressSubgroupMap: genDefaultGroupMap(),
+    },
     explorers: {
       selectedExplorer: defaultToSelectedExplorer(),
     },
@@ -124,6 +143,9 @@ const genBaseProps: {|
       TransferSendProps: {
         generated: {
           stores: {
+            addresses: {
+              addressSubgroupMap: genDefaultGroupMap(),
+            },
             explorers: {
               selectedExplorer: defaultToSelectedExplorer(),
             },

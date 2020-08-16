@@ -161,7 +161,12 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
               primaryTicker: apiMeta.primaryTicker,
               settings: profile.unitOfAccount,
             }}
-            addressLookup={genAddressLookup(publicDeriver, intl)}
+            addressLookup={genAddressLookup(
+              publicDeriver,
+              intl,
+              (route) => this.generated.actions.router.goToRoute.trigger({ route }),
+              this.generated.stores.addresses.addressSubgroupMap,
+            )}
             onCopyAddressTooltip={onCopyAddressTooltip}
             notification={notificationToolTip}
             decimalPlaces={apiMeta.decimalPlaces.toNumber()}

@@ -19,6 +19,7 @@ export const TransferStatus = Object.freeze({
 export type TransferStatusT = $Values<typeof TransferStatus>;
 
 /** Contains all information necessary to send and display the transfer transaction */
+// TODO: should probably delete this entire and just use ISignRequest for everything
 export type TransferTx = {|
   +recoveredBalance: BigNumber, // TODO: remove
   +fee: BigNumber,
