@@ -12,26 +12,19 @@ type Props = {|
   +className?: string,
   +icon?: string,
   +isToplevel?: boolean,
-  +tooltip: Node,
+  +tooltip?: Node,
 |};
 
 @observer
 export default class ReceiveNavButton extends Component<Props> {
-  static defaultProps: {| className: void, icon: void, isToplevel:void |} = {
+  static defaultProps: {| className: void, icon: void, isToplevel:void, tooltip: void |} = {
     className: undefined,
     icon: undefined,
     isToplevel: undefined,
+    tooltip: undefined,
   };
 
-  render(): Node {
-    const { isActive, onClick, className, label } = this.props;
-
-    const componentClasses = classnames([
-      className,
-      styles.wrapper,
-      isActive && styles.active,
-    ]);
-
+  renderButton: void => Node = () => {
     const buttonClass = classnames([
       styles.button,
       this.props.isToplevel === true
@@ -39,14 +32,35 @@ export default class ReceiveNavButton extends Component<Props> {
         : styles.notTopLevel,
     ]);
 
+    if (this.props.tooltip == null) {
+      return (
+        <button type="button" className={buttonClass} onClick={this.props.onClick}>
+          <span className={styles.label}>{this.props.label}</span>
+        </button>
+      );
+    }
+    return (
+      <button type="button" className={buttonClass} onClick={this.props.onClick}>
+        <div className={styles.label}>
+          {this.props.label}
+          {this.props.tooltip}
+        </div>
+      </button>
+    );
+  }
+
+  render(): Node {
+    const componentClasses = classnames([
+      this.props.className,
+      styles.wrapper,
+      this.props.isActive && styles.active,
+    ]);
+
     const IconComponent = this.props.icon;
 
     return (
       <div className={componentClasses}>
-        <button type="button" className={buttonClass} onClick={onClick}>
-          <span className={styles.label}>{label}</span>
-          {this.props.tooltip}
-        </button>
+        {this.renderButton()}
         {IconComponent != null &&
           <div className={styles.icon}>
             <IconComponent />

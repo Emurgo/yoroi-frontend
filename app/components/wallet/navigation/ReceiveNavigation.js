@@ -53,7 +53,7 @@ export default class ReceiveNavigation extends Component<Props, State> {
     intl: intlShape.isRequired,
   };
   contentRef: ?ElementRef<*>;
-  accordionTooltipRefs: Map<string, ElementRef<*>>;
+  tooltipIconRefs: Map<string, ElementRef<*>>;
 
   state: State = {
     accordionScrollHeight: null,
@@ -62,8 +62,11 @@ export default class ReceiveNavigation extends Component<Props, State> {
 
   constructor(props: Props) {
     super(props);
-    this.accordionTooltipRefs = new Map();
+    this.tooltipIconRefs = new Map();
     this.contentRef = React.createRef();
+  }
+
+  componentDidMount(): void {
     this.resize();
   }
 
@@ -79,16 +82,20 @@ export default class ReceiveNavigation extends Component<Props, State> {
     if (current == null) return;
 
     const groupsToHide = new Set();
-    for (const [groupName, accordion] of this.accordionTooltipRefs.entries()) {
-      const { bottom, top } = accordion.getBoundingClientRect();
-      const insetCut = current.getBoundingClientRect().top - top;
+    for (const [groupName, tooltipIconWrapper] of this.tooltipIconRefs.entries()) {
+      const tooltipIcon = tooltipIconWrapper.children[0];
+      const { bottom, top } = tooltipIcon.getBoundingClientRect();
+      const insetCutTop = current.getBoundingClientRect().top - top;
+      const insetCutBottom = bottom - current.getBoundingClientRect().bottom;
 
-      if (insetCut >= (bottom - top)) {
+      const infoIconHeight = (bottom - top);
+
+      if (insetCutTop >= infoIconHeight || insetCutBottom >= infoIconHeight) {
         groupsToHide.add(groupName);
       } else {
         // we hide the info icon progressively with the scrollbar
         // ex: if only 50% of the element is visible, this will properly mask 50% of the icon
-        accordion.style.clipPath = `inset(${insetCut}px 0% 0% 0%)`;
+        tooltipIcon.style.clipPath = `inset(${insetCutTop}px 0% ${insetCutBottom}px 0%)`;
       }
     }
 
@@ -96,6 +103,40 @@ export default class ReceiveNavigation extends Component<Props, State> {
       accordionScrollHeight: current.scrollTop,
       groupsToHide,
     });
+  }
+
+  genTooltip: AddressStoreSubset => Node = (store) => {
+    const { intl } = this.context;
+    return (
+      <Tooltip
+        className={classNames([
+          styles.Tooltip,
+          // if tooltip scrolls out of view, we need to manually hide it
+          // note: this is different than hiding the "info" icon
+          // since even if the info icon is hidden,
+          // hovering it over it still triggers the tooltip unless we hide the tooltip also
+          this.state.groupsToHide.has(store.name.group)
+            ? styles.hidden
+            : null,
+        ])}
+        style={{
+          // need the tooltip to be absolute position in order to appear above other content
+          // however, it also needs to properly sync its y position with the scrollbar
+          marginTop: `-${this.state.accordionScrollHeight || 0}px`,
+        }}
+        skin={TooltipSkin}
+        tip={intl.formatMessage(addressGroupsTooltip[store.name.group])}
+      >
+        <span
+          className={styles.infoIcon}
+          ref={(tooltipIconWrapper) => {
+            this.tooltipIconRefs.set(store.name.group, tooltipIconWrapper);
+          }}
+        >
+          <InfoIcon />
+        </span>
+      </Tooltip>
+    );
   }
 
   createAccordionForGroup: $PropertyType<Props, 'addressStores'> => Node = (stores) => {
@@ -119,6 +160,7 @@ export default class ReceiveNavigation extends Component<Props, State> {
             isActive={store.isActiveStore}
             onClick={store.setAsActiveStore}
             isToplevel
+            tooltip={this.genTooltip(stores[0])}
           />
         </div>
       );
@@ -130,34 +172,7 @@ export default class ReceiveNavigation extends Component<Props, State> {
         header={
           <div>
             {intl.formatMessage(addressGroupName[stores[0].name.group])}
-            <Tooltip
-              className={classNames([
-                styles.Tooltip,
-                // if tooltip scrolls out of view, we need to manually hide it
-                // note: this is different than hiding the "info" icon
-                // since even if the info icon is hidden,
-                // hovering it over it still triggers the tooltip unless we hide the tooltip also
-                this.state.groupsToHide.has(stores[0].name.group)
-                  ? styles.hidden
-                  : null,
-              ])}
-              style={{
-                // need the tooltip to be absolute position in order to appear above other content
-                // however, it also needs to properly sync its y position with the scrollbar
-                marginTop: `-${this.state.accordionScrollHeight || 0}px`,
-              }}
-              skin={TooltipSkin}
-              tip={intl.formatMessage(addressGroupsTooltip[stores[0].name.group])}
-            >
-              <span
-                className={styles.infoIcon}
-                ref={(accordionTooltip) => {
-                  this.accordionTooltipRefs.set(stores[0].name.group, accordionTooltip);
-                }}
-              >
-                <InfoIcon />
-              </span>
-            </Tooltip>
+            {this.genTooltip(stores[0])}
           </div>
         }
         activeHeader={stores.some(address => address.isActiveStore)}
