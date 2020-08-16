@@ -207,7 +207,7 @@ export type CreateAdaPaperPdfFunc = (
 // getAllAddressesForDisplay
 
 export type GetAllAddressesForDisplayRequest = {|
-  publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetAllUtxos,
+  publicDeriver: IPublicDeriver<>,
   type: CoreAddressT,
 |};
 export type GetAllAddressesForDisplayResponse = Array<{|

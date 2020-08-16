@@ -134,14 +134,8 @@ export default class AddressesStore extends Store {
   |} => Promise<$ReadOnlyArray<$ReadOnly<StandardAddress>>> = async (request) => {
     const apiType = getApiForNetwork(request.publicDeriver.getParent().getNetworkInfo());
 
-    const withUtxos = asGetAllUtxos(request.publicDeriver);
-    if (withUtxos == null) {
-      Logger.error(`${nameof(this._wrapForAllAddresses)} incorrect public deriver`);
-      return Promise.resolve([]);
-    }
-
     const allAddresses = await this.api[apiType].getAllAddressesForDisplay({
-      publicDeriver: withUtxos,
+      publicDeriver: request.publicDeriver,
       type: request.type,
     });
 

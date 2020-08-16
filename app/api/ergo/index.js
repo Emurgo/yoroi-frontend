@@ -93,7 +93,7 @@ export type GetChainAddressesForDisplayFunc = (
 // getAllAddressesForDisplay
 
 export type GetAllAddressesForDisplayRequest = {|
-  publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetAllUtxos,
+  publicDeriver: IPublicDeriver<ConceptualWallet>,
   type: CoreAddressT,
 |};
 export type GetAllAddressesForDisplayResponse = Array<{|

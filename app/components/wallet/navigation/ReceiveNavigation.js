@@ -10,7 +10,14 @@ import ReceiveNavButton from './ReceiveNavButton';
 import type {
   $npm$ReactIntl$IntlFormat,
 } from 'react-intl';
-import { addressGroupName, addressSubgroupName, addressGroupsTooltip, addressFilter, AddressSubgroup } from '../../../types/AddressFilterTypes';
+import {
+  addressGroupName,
+  addressSubgroupName,
+  addressGroupsTooltip,
+  addressFilter,
+  AddressGroupTypes,
+  AddressSubgroup,
+} from '../../../types/AddressFilterTypes';
 import Accordion from '../../widgets/Accordion';
 import InfoIcon from '../../../assets/images/attention-big-light.inline.svg';
 
@@ -97,12 +104,17 @@ export default class ReceiveNavigation extends Component<Props, State> {
     if (stores.length === 1 && stores[0].name.subgroup === AddressSubgroup.all) {
       const store = stores[0];
       return (
-        <div className={styles.addressBook}>
+        <div className={stores[0].name.group}>
           <ReceiveNavButton
             className={classNames([
               store.name.subgroup,
               store.name.group,
             ])}
+            icon={
+              stores[0].name.group === AddressGroupTypes.reward
+                ? AttentionIcon
+                : undefined
+            }
             label={intl.formatMessage(addressGroupName[stores[0].name.group])}
             isActive={store.isActiveStore}
             onClick={store.setAsActiveStore}

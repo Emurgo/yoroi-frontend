@@ -12,6 +12,7 @@ type Props = {|
   +className?: string,
   +icon?: string,
   +isToplevel?: boolean,
+  +tooltip: Node,
 |};
 
 @observer
@@ -44,6 +45,7 @@ export default class ReceiveNavButton extends Component<Props> {
       <div className={componentClasses}>
         <button type="button" className={buttonClass} onClick={onClick}>
           <span className={styles.label}>{label}</span>
+          {this.props.tooltip}
         </button>
         {IconComponent != null &&
           <div className={styles.icon}>
