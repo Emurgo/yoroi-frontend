@@ -16,6 +16,7 @@ import {
 } from 'semver';
 import { truncateLongName, } from '../../app/utils/formatters';
 import stableStringify from 'json-stable-stringify';
+import type { RestorationInput } from '../mock-chain/TestWallets';
 
 const { promisify } = require('util');
 const fs = require('fs');
@@ -140,7 +141,51 @@ async function takeScreenshot(driver, name) {
   await writeFile(path, screenshot, 'base64');
 }
 
-Given(/^There is a wallet stored named ([^"]*)$/, async function (walletName) {
+async function inputMnemonicForWallet(
+  customWorld: any,
+  walletName: string,
+  restoreInfo: RestorationInput,
+): Promise<void> {
+  await customWorld.input("input[name='walletName']", restoreInfo.name);
+  await enterRecoveryPhrase(
+    customWorld,
+    restoreInfo.mnemonic,
+  );
+  await customWorld.input("input[name='walletPassword']", restoreInfo.password);
+  await customWorld.input("input[name='repeatPassword']", restoreInfo.password);
+  await customWorld.click('.WalletRestoreDialog .primary');
+
+  const plateElements = await getPlates(customWorld);
+  const plateText = await plateElements[0].getText();
+  expect(plateText).to.be.equal(restoreInfo.plate);
+
+  await customWorld.click('.confirmButton');
+  await customWorld.waitUntilText('.NavPlate_name', truncateLongName(walletName));
+}
+
+Given(/^There is a Shelley wallet stored named ([^"]*)$/, async function (walletName) {
+  const restoreInfo = testWallets[walletName];
+  expect(restoreInfo).to.not.equal(undefined);
+
+  await this.click('.WalletAdd_btnRestoreWallet');
+
+  await this.waitForElement('.PickCurrencyOptionDialog');
+  await this.click('.PickCurrencyOptionDialog_cardano');
+
+  await this.waitForElement('.WalletRestoreOptionDialog');
+
+  await this.click('.WalletRestoreOptionDialog_restoreNormalWallet');
+  await this.click('.WalletEraOptionDialog_bgShelleyMainnet');
+  await this.waitForElement('.WalletRestoreDialog');
+
+  await inputMnemonicForWallet(
+    this,
+    walletName,
+    restoreInfo,
+  );
+});
+
+Given(/^There is a Byron wallet stored named ([^"]*)$/, async function (walletName) {
   const restoreInfo = testWallets[walletName];
   expect(restoreInfo).to.not.equal(undefined);
 
@@ -155,21 +200,11 @@ Given(/^There is a wallet stored named ([^"]*)$/, async function (walletName) {
   await this.click('.WalletEraOptionDialog_bgByronMainnet');
   await this.waitForElement('.WalletRestoreDialog');
 
-  await this.input("input[name='walletName']", restoreInfo.name);
-  await enterRecoveryPhrase(
+  await inputMnemonicForWallet(
     this,
-    restoreInfo.mnemonic,
+    walletName,
+    restoreInfo,
   );
-  await this.input("input[name='walletPassword']", restoreInfo.password);
-  await this.input("input[name='repeatPassword']", restoreInfo.password);
-  await this.click('.WalletRestoreDialog .primary');
-
-  const plateElements = await getPlates(this);
-  const plateText = await plateElements[0].getText();
-  expect(plateText).to.be.equal(restoreInfo.plate);
-
-  await this.click('.confirmButton');
-  await this.waitUntilText('.NavPlate_name', truncateLongName(walletName));
 });
 
 Given(/^I have completed the basic setup$/, async function () {

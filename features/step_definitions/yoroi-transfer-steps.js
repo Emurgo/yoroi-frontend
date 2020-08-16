@@ -16,6 +16,9 @@ Given(/^I am on the transfer start screen$/, async function () {
   await waitUntilUrlEquals.call(this, '/transfer');
 });
 
+When(/^I click on the shelley button on the transfer screen$/, async function () {
+  await this.click('.TransferCards_shelleyEra');
+});
 When(/^I click on the byron button on the transfer screen$/, async function () {
   await this.click('.TransferCards_byronEra');
 });

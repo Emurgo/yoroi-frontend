@@ -79,7 +79,7 @@ export default class WalletTransferPage extends Component<Props> {
       <>
         <TransferTypeSelect
           onByron={() => actions.dialogs.open.trigger({ dialog: ByronEraOptionDialogContainer })}
-          onShelleyItn={
+          onShelley={
             () => actions.dialogs.open.trigger({ dialog: ShelleyEraOptionDialogContainer })
           }
         />

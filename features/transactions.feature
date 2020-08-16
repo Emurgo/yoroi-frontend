@@ -6,7 +6,7 @@ Feature: Send transaction
 
   @it-54
   Scenario Outline: User can send funds from one Yoroi wallet to another (IT-54)
-    Given There is a wallet stored named many-tx-wallet
+    Given There is a Byron wallet stored named many-tx-wallet
     And I have a wallet with funds
     When I go to the send transaction screen
     And I fill the form:
@@ -29,7 +29,7 @@ Feature: Send transaction
 
   @it-90
   Scenario Outline: Spending Password should be case-sensitive [Transaction confirmation] (IT-90)
-    Given There is a wallet stored named many-tx-wallet
+    Given There is a Byron wallet stored named many-tx-wallet
     And I have a wallet with funds
     When I go to the send transaction screen
     And I fill the form:
@@ -51,7 +51,7 @@ Feature: Send transaction
 
   @it-48
   Scenario Outline: CONFIRM TRANSACTION Pop up displays properly (IT-48)
-    Given There is a wallet stored named many-tx-wallet
+    Given There is a Byron wallet stored named many-tx-wallet
     And I have a wallet with funds
     When I go to the send transaction screen
     And I fill the form:
@@ -69,7 +69,7 @@ Feature: Send transaction
 
   @it-46
   Scenario: User can't send funds to the invalid address (IT-46)
-    Given There is a wallet stored named many-tx-wallet
+    Given There is a Byron wallet stored named many-tx-wallet
     And I have a wallet with funds
     When I go to the send transaction screen
     And I fill the form:
@@ -80,7 +80,7 @@ Feature: Send transaction
 
   @it-47
   Scenario: User can't send more funds than he has (IT-47)
-    Given There is a wallet stored named many-tx-wallet
+    Given There is a Byron wallet stored named many-tx-wallet
     And I have a wallet with funds
     When I go to the send transaction screen
     And I fill the form:
@@ -91,7 +91,7 @@ Feature: Send transaction
 
   @it-55
   Scenario Outline: User can send all funds from one Yoroi wallet to another (IT-55)
-    Given There is a wallet stored named many-tx-wallet
+    Given There is a Byron wallet stored named many-tx-wallet
     And I have a wallet with funds
     When I go to the send transaction screen
 	And I click on "Send all my ADA" checkbox
@@ -113,7 +113,7 @@ Feature: Send transaction
 
   @invalidWitnessTest @it-20
   Scenario: Sending a Tx and receiving from the server an invalid signature error (IT-20)
-    Given There is a wallet stored named many-tx-wallet
+    Given There is a Byron wallet stored named many-tx-wallet
     And I have a wallet with funds
     When I go to the send transaction screen
     And I fill the form:
@@ -130,7 +130,7 @@ Feature: Send transaction
 
   @it-42
   Scenario: User can't send funds with incorrect Spending password (IT-42)
-    Given There is a wallet stored named many-tx-wallet
+    Given There is a Byron wallet stored named many-tx-wallet
     And I have a wallet with funds
     When I go to the send transaction screen
     And I fill the form:
@@ -147,7 +147,7 @@ Feature: Send transaction
 
   @it-53
   Scenario: Sending a Tx changing a valid address for an invalid one (IT-53)
-    Given There is a wallet stored named many-tx-wallet
+    Given There is a Byron wallet stored named many-tx-wallet
     And I have a wallet with funds
     When I go to the send transaction screen
     And I fill the form:
@@ -164,7 +164,7 @@ Feature: Send transaction
 
   @it-89
   Scenario: Try to make a transactions from the empty wallet (IT-89)
-    Given There is a wallet stored named empty-wallet
+    Given There is a Byron wallet stored named empty-wallet
     When I go to the send transaction screen
     And I fill the form:
       | address                                                     | amount   |
@@ -173,7 +173,7 @@ Feature: Send transaction
 
   @it-59
   Scenario: Display warning if wallet changes during confirmation (IT-59)
-    Given There is a wallet stored named many-tx-wallet
+    Given There is a Byron wallet stored named many-tx-wallet
     And I have a wallet with funds
     When I go to the send transaction screen
     And I fill the form:
@@ -197,7 +197,7 @@ Feature: Send transaction
 
   @it-60
   Scenario: User can send a tx after invalid password attempt (IT-60)
-    Given There is a wallet stored named many-tx-wallet
+    Given There is a Byron wallet stored named many-tx-wallet
     And I have a wallet with funds
     When I go to the send transaction screen
     And I fill the form:
@@ -220,7 +220,7 @@ Feature: Send transaction
 
   @it-61
   Scenario: Display warning if wallet changes during send screen (IT-61)
-    Given There is a wallet stored named many-tx-wallet
+    Given There is a Byron wallet stored named many-tx-wallet
     And I have a wallet with funds
     When I go to the send transaction screen
     And I fill the form:

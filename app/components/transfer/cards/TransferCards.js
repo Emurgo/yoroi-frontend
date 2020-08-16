@@ -23,7 +23,7 @@ const messages = defineMessages({
 
 type Props = {|
   +onByron: void => void,
-  +onShelleyItn: void => void,
+  +onShelley: void => void,
 |};
 
 @observer
@@ -62,8 +62,8 @@ export default class TransferCards extends Component<Props> {
         {/* shelley-itn wallet */}
         <button
           type="button"
-          className="TransferCards_shelleyItn"
-          onClick={this.props.onShelleyItn}
+          className="TransferCards_shelleyEra"
+          onClick={this.props.onShelley}
         >
           <div className={styles.heroCardsItem}>
             <div className={classnames([styles.heroCardsItemBg, styles.bgShelleyMainnet])} />

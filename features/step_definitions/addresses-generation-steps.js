@@ -25,6 +25,10 @@ When(/^I click on the address book tab$/, async function () {
   await this.click(`//div[contains(text(), "Address book") and contains(@class, "ReceiveNavButton_label")]`, By.xpath);
 });
 
+When(/^I click on the reward address tab$/, async function () {
+  await this.click(`//div[contains(text(), "Reward") and contains(@class, "ReceiveNavButton_label")]`, By.xpath);
+});
+
 When(/^I click on the All addresses button$/, async function () {
   const hideUsedText = await i18n.formatMessage(this.driver, { id: 'wallet.receive.navigation.allLabel' });
   await this.click(`//span[contains(text(), "${hideUsedText}")]`, By.xpath);

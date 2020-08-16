@@ -7,7 +7,7 @@ Feature: Transfer Yoroi Wallet funds
 
   @it-114
   Scenario: Yoroi transfer fails when user transfers from an empty wallet (IT-114)
-    Given There is a wallet stored named empty-wallet
+    Given There is a Byron wallet stored named empty-wallet
     And I am on the transfer start screen
     When I click on the byron button on the transfer screen
     When I click on the icarus tab
@@ -25,7 +25,7 @@ Feature: Transfer Yoroi Wallet funds
     # The recovery phrase and its balance(s) are defined in 
     # /features/mock-chain/TestWallets.js and
     # /features/mock-chain/mockImporter.js
-    Given There is a wallet stored named empty-wallet
+    Given There is a Byron wallet stored named empty-wallet
     And I am on the transfer start screen
     When I click on the byron button on the transfer screen
     When I click on the icarus tab
@@ -49,7 +49,7 @@ Feature: Transfer Yoroi Wallet funds
 
   @it-113
   Scenario: Wallet changes after transaction is generated (IT-113)
-    Given There is a wallet stored named empty-wallet
+    Given There is a Byron wallet stored named empty-wallet
     And I am on the transfer start screen
     When I click on the byron button on the transfer screen
     When I click on the icarus tab
@@ -83,7 +83,7 @@ Feature: Transfer Yoroi Wallet funds
 
   @it-115
   Scenario: User can transfer funds from a trezor wallet (IT-115)
-    Given There is a wallet stored named empty-wallet
+    Given There is a Byron wallet stored named empty-wallet
     And I am on the transfer start screen
     When I click on the byron button on the transfer screen
     When I click on the icarus tab
@@ -105,7 +105,7 @@ Feature: Transfer Yoroi Wallet funds
     # The recovery phrase and its balance(s) are defined in 
     # /features/mock-chain/TestWallets.js and
     # /features/mock-chain/mockImporter.js
-    Given There is a wallet stored named empty-wallet
+    Given There is a Byron wallet stored named empty-wallet
     And I am on the transfer start screen
     When I click on the byron button on the transfer screen
     When I click on the icarus tab
