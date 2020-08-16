@@ -344,8 +344,8 @@ export const genWithdrawalTx = (
   publicDeriver: PublicDeriver<>,
   unregister: boolean,
 ): HaskellShelleyTxSignRequest => {
-  const inputAmount = '2000001';
-  const ouputAmount = '1000000';
+  const inputAmount = '2000000';
+  const ouputAmount = '1500000';
   const fee = new BigNumber(inputAmount).minus(new BigNumber(ouputAmount));
 
   const networkInfo = publicDeriver.getParent().getNetworkInfo();

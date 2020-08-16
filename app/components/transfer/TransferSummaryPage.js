@@ -221,15 +221,25 @@ export default class TransferSummaryPage extends Component<Props> {
     );
   }
 
+  getTotalBalance: void => BigNumber = () => {
+    const baseTotal = this.props.transferTx.recoveredBalance.minus(this.props.transferTx.fee);
+    if (this.props.transferTx.withdrawals == null) {
+      return baseTotal;
+    }
+    const refundSum = this.props.transferTx.withdrawals.reduce(
+      (sum, curr) => (curr.refund == null ? sum : sum.plus(curr.refund)),
+      new BigNumber(0)
+    );
+    return baseTotal.plus(refundSum);
+  }
+
   render(): Node {
     const { intl } = this.context;
     const { transferTx, isSubmitting, error, unitOfAccountSetting, coinPrice, } = this.props;
 
     const recoveredBalance = this.props.formattedWalletAmount(transferTx.recoveredBalance);
     const transactionFee = this.props.formattedWalletAmount(transferTx.fee);
-    const finalBalance = this.props.formattedWalletAmount(
-      transferTx.recoveredBalance.minus(transferTx.fee)
-    );
+    const finalBalance = this.props.formattedWalletAmount(this.getTotalBalance());
 
     return this.wrapInDialog(
       <div className={styles.body}>

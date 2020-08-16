@@ -33,7 +33,7 @@ export default class WithdrawalTxDialogContainer extends Component<Props> {
             throw new Error(`${nameof(WithdrawalTxDialogContainer)} incorrect tx type`);
           }
 
-          const deregistrations = new Map(tentativeTx.keyDeregistrations(true).map(key => [
+          const deregistrationsMap = new Map(tentativeTx.keyDeregistrations(true).map(key => [
             key.rewardAddress, key.refund
           ]));
           const withdrawals = tentativeTx.withdrawals(true);
@@ -49,7 +49,7 @@ export default class WithdrawalTxDialogContainer extends Component<Props> {
               .receivers(true),
             withdrawals: withdrawals.map(withdrawal => ({
               ...withdrawal,
-              refund: deregistrations.get(withdrawal.address) ?? new BigNumber(0),
+              refund: deregistrationsMap.get(withdrawal.address) ?? new BigNumber(0),
             })),
           };
         }}
