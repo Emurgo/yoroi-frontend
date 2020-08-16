@@ -767,33 +767,6 @@ export default class Transaction extends Component<Props, State> {
         <div />
       </div>
     );
-    // if (data instanceof CardanoShelleyTransaction) {
-    //   const wrapWithdrawalsText = (node) => (
-    //     <>
-    //       <h2>
-    //         {intl.formatMessage(messages.withdrawals)}
-    //       </h2>
-    //       <span className={styles.rowData}>
-    //         {node}
-    //       </span>
-    //     </>
-    //   );
-    //   const withdrawalBlock = data.withdrawals.reduce(
-    //     (acc, curr, idx) => {
-    //       const newElem = (
-    //         // eslint-disable-next-line react/no-array-index-key
-    //         <span key={idx}>
-    //           {acc.length !== 0 ? (<br />) : undefined}
-    //           {curr.address}
-    //         </span>
-    //       );
-    //       acc.push(newElem);
-    //       return acc;
-    //     },
-    //     ([]: Array<Node>)
-    //   );
-    //   return wrapWithdrawalsText(withdrawalBlock);
-    // }
   }
 
   getCertificate: WalletTransaction => ?Node = (data) => {
