@@ -21,7 +21,7 @@ type Props = {|
 |};
 
 @observer
-export default class InternalHeader extends Component<Props> {
+export default class RewardHeader extends Component<Props> {
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
