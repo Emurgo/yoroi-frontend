@@ -11,7 +11,7 @@ import {
   globalKnobs,
 } from '../../../../stories/helpers/StoryWrapper';
 import {
-  genShelleyCip1852DummyWithCache, genSigningWalletWithCache,
+  genShelleyCip1852DummyWithCache, genShelleyCIP1852SigningWalletWithCache,
 } from '../../../../stories/helpers/cardano/ShelleyCip1852Mocks';
 import {
   walletLookup,
@@ -167,7 +167,7 @@ export const PasswordUpdateTime = (): Node => {
       lastUpdateCases,
       lastUpdateCases.Never,
     );
-    const wallet = genSigningWalletWithCache();
+    const wallet = genShelleyCIP1852SigningWalletWithCache();
     wallet.getSigningKeyCache = (publicDeriver) => ({
       publicDeriver,
       signingKeyUpdateDate: lastUpdateValue() === lastUpdateCases.Never
@@ -299,7 +299,7 @@ const defaultChangeWalletPasswordDialogContainerProps: void => * = (_request) =>
 });
 
 export const EditPassword = (): Node => {
-  const wallet = genSigningWalletWithCache();
+  const wallet = genShelleyCIP1852SigningWalletWithCache();
   const lookup = walletLookup([wallet]);
   return wrapSettings(
     mockSettingsProps({

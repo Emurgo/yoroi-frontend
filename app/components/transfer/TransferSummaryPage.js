@@ -39,7 +39,7 @@ const messages = defineMessages({
   },
   unregisterExplanation: {
     id: 'wallet.withdrawal.transaction.unregister',
-    defaultMessage: '!!!This transaction will unregister the staking key, giving you back your {refundAmount} ADA from your deposit',
+    defaultMessage: '!!!This transaction will unregister one or more staking keys, giving you back your {refundAmount} ADA from your deposit',
   },
 });
 
@@ -104,10 +104,14 @@ export default class TransferSummaryPage extends Component<Props> {
 
     if (transferTx.withdrawals != null) {
       const { withdrawals } = transferTx;
+      const refundSum = withdrawals.reduce(
+        (sum, curr) => (curr.refund == null ? sum : sum.plus(curr.refund)),
+        new BigNumber(0)
+      );
       return (
         <div className={styles.addressLabelWrapper}>
           <div className={styles.addressLabel}>
-            {intl.formatMessage(messages.addressFromLabel)}
+            {intl.formatMessage(globalMessages.withdrawalsLabel)}
           </div>
           {
             withdrawals.map((withdrawal, index) => {
@@ -137,6 +141,13 @@ export default class TransferSummaryPage extends Component<Props> {
               );
             })
           }
+          {refundSum.gt(0) && (
+            <div className={styles.refund}>
+              {intl.formatMessage(messages.unregisterExplanation, {
+                refundAmount: refundSum.toString()
+              })}
+            </div>
+          )}
         </div>
       );
     }

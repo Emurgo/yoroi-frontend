@@ -101,10 +101,6 @@ const messages = defineMessages({
     id: 'wallet.transaction.certificatesLabel',
     defaultMessage: '!!!Certificates',
   },
-  withdrawals: {
-    id: 'wallet.transaction.withdrawalsLabel',
-    defaultMessage: '!!!Withdrawals',
-  },
   transactionAmount: {
     id: 'wallet.transaction.transactionAmount',
     defaultMessage: '!!!Transaction amount',
@@ -715,7 +711,7 @@ export default class Transaction extends Component<Props, State> {
         <div>
           <div className={styles.addressHeader}>
             <h2>
-              {intl.formatMessage(messages.withdrawals)}:
+              {intl.formatMessage(globalMessages.withdrawalsLabel)}:
               <span className={styles.addressCount}>
                 {data.withdrawals.length}
               </span>

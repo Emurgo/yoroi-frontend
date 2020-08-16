@@ -465,7 +465,10 @@ export const WithdrawalTxPage = (): Node => {
               delegationTransaction: {
                 createWithdrawalTx: {
                   error: undefined,
-                  result: genWithdrawalTx(wallet.publicDeriver),
+                  result: genWithdrawalTx(
+                    wallet.publicDeriver,
+                    boolean('deregister', true)
+                  ),
                   reset: action('createWithdrawalTx reset'),
                 },
               },

@@ -233,7 +233,7 @@ export function genShelleyCip1852SigningWallet(
   return self;
 }
 
-export function genSigningWalletWithCache(
+export function genShelleyCIP1852SigningWalletWithCache(
   genHardwareInfo?: number => HwWalletMetaRow,
 ): ShelleyCip1852CacheValue {
   const dummyWallet = genShelleyCip1852SigningWallet(genHardwareInfo);
@@ -294,7 +294,7 @@ export const genTentativeShelleyTx = (
   );
   txBuilder.add_key_input(
     RustModule.WalletV4.Ed25519KeyHash.from_bytes(
-      Buffer.from('', 'hex')
+      Buffer.from('00000000000000000000000000000000000000000000000000000000', 'hex')
     ),
     RustModule.WalletV4.TransactionInput.new(
       RustModule.WalletV4.TransactionHash.from_bytes(
@@ -314,8 +314,6 @@ export const genTentativeShelleyTx = (
   txBuilder.set_fee(RustModule.WalletV4.BigNum.from_str(fee.toString()));
   txBuilder.set_ttl(5);
 
-  const baseConfig = getCardanoHaskellBaseConfig(publicDeriver.getParent().getNetworkInfo())
-    .reduce((acc, next) => Object.assign(acc, next), {});
   return {
     tentativeTx: new HaskellShelleyTxSignRequest(
       {
@@ -344,6 +342,7 @@ export const genTentativeShelleyTx = (
 
 export const genWithdrawalTx = (
   publicDeriver: PublicDeriver<>,
+  unregister: boolean,
 ): HaskellShelleyTxSignRequest => {
   const inputAmount = '2000001';
   const ouputAmount = '1000000';
@@ -402,6 +401,16 @@ export const genWithdrawalTx = (
     RustModule.WalletV4.BigNum.from_str('1000000'),
   );
   txBuilder.set_withdrawals(withdrawals);
+
+  if (unregister) {
+    const certs = RustModule.WalletV4.Certificates.new();
+    certs.add(RustModule.WalletV4.Certificate.new_stake_deregistration(
+      RustModule.WalletV4.StakeDeregistration.new(
+        rewardAddr.payment_cred()
+      )
+    ));
+    txBuilder.set_certs(certs);
+  }
 
   txBuilder.set_fee(RustModule.WalletV4.BigNum.from_str(fee.toString()));
   txBuilder.set_ttl(5);

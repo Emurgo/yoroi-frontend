@@ -191,7 +191,7 @@ function genMockByronBip44Cache(dummyWallet: PublicDeriver<>) {
   };
 }
 
-export function getByronSigningWalletWithCache(
+export function genByronSigningWalletWithCache(
   genHardwareInfo?: number => HwWalletMetaRow,
 ): ByronCacheValue {
   const dummyWallet = genByronSigningWallet(genHardwareInfo);

@@ -11,7 +11,7 @@ import {
   genUnitOfAccount,
 } from '../../../../stories/helpers/StoryWrapper';
 import {
-  genSigningWalletWithCache,
+  genJormungandrSigningWalletWithCache,
   genJormungandrUndelegateTx,
   genTentativeJormungandrTx,
 } from '../../../../stories/helpers/jormungandr/JormungandrMocks';
@@ -517,7 +517,7 @@ function getStakingInfo(
 
 export const Loading = (): Node => {
   const genWallet = () => {
-    const wallet = genSigningWalletWithCache();
+    const wallet = genJormungandrSigningWalletWithCache();
     const getDelegatedBalance: CachedRequest<GetDelegatedBalanceFunc> = new CachedRequest(
       _request => Promise.resolve({
         utxoPart: new BigNumber(0),
@@ -626,7 +626,7 @@ export const Loading = (): Node => {
 
 export const DelegationCases = (): Node => {
   const genWallet = () => {
-    const wallet = genSigningWalletWithCache();
+    const wallet = genJormungandrSigningWalletWithCache();
     const getStakingKeyValue = () => select(
       'stakingKeyCases',
       stakingKeyCases,
@@ -680,7 +680,7 @@ export const DelegationCases = (): Node => {
 
 export const Errors = (): Node => {
   const genWallet = () => {
-    const wallet = genSigningWalletWithCache();
+    const wallet = genJormungandrSigningWalletWithCache();
     {
       const requests = wallet.getTimeCalcRequests(wallet.publicDeriver).requests;
       Object.keys(requests).map(key => requests[key]).forEach(request => request.execute());
@@ -751,7 +751,7 @@ export const Errors = (): Node => {
 
 // wallet we can reuse for multiple tests
 const genBaseWallet = () => {
-  const wallet = genSigningWalletWithCache();
+  const wallet = genJormungandrSigningWalletWithCache();
   {
     const requests = wallet.getTimeCalcRequests(wallet.publicDeriver).requests;
     Object.keys(requests).map(key => requests[key]).forEach(request => request.execute());

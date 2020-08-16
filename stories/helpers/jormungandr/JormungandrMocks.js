@@ -234,7 +234,7 @@ function genSigningWallet(
   return self;
 }
 
-export function genSigningWalletWithCache(
+export function genJormungandrSigningWalletWithCache(
   genHardwareInfo?: number => HwWalletMetaRow,
 ): JormungandrCacheValue {
   const dummyWallet = genSigningWallet(genHardwareInfo);

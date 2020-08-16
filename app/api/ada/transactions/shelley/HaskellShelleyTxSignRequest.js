@@ -9,9 +9,13 @@ import { toHexOrBase58 } from '../../lib/storage/bridge/utils';
 
 /**
  * We take a copy of these parameters instead of re-evaluating them from the network
- * because calculating the value of the network parameter at the time a transaction happens
- * may require a database access
- * and it doesn't make sense that this class be aware of the database or take any locks
+ * There are two reasons for this
+ * 1) In Cardano, the protocol parameters used for transaction validation
+ *    are the ones active the slot the transaction gets inserted it, and not the TTL slot
+ *    Since a sign request isn't a slot yet, we need to keep track of which parameters we used
+ * 2) Attempting to calculate the value of the network parameter at the time a transaction happens
+ *    may require a database access
+ *    and it doesn't make sense that this class be aware of the database or take any locks
 */
 type NetworkSettingSnapshot = {|
   // there is no way given just a transaction body to 100% know which network it belongs to
@@ -92,14 +96,15 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
     const withdrawalKeys = withdrawals.keys();
     const result = [];
     for (let i = 0; i < withdrawalKeys.len(); i++) {
-      const withdrawalAmount = withdrawals.get(withdrawalKeys.get(i))?.to_str();
+      const rewardAddress = withdrawalKeys.get(i);
+      const withdrawalAmount = withdrawals.get(rewardAddress)?.to_str();
       if (withdrawalAmount == null) continue;
 
       const amount = shift
         ? new BigNumber(withdrawalAmount).shiftedBy(-getAdaCurrencyMeta().decimalPlaces.toNumber())
         : new BigNumber(withdrawalAmount);
       result.push({
-        address: Buffer.from(withdrawalKeys.to_bytes()).toString('hex'),
+        address: Buffer.from(rewardAddress.to_address().to_bytes()).toString('hex'),
         amount,
       });
     }

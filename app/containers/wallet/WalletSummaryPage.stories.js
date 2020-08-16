@@ -14,7 +14,7 @@ import {
   walletLookup,
 } from '../../../stories/helpers/WalletCache';
 import {
-  getByronSigningWalletWithCache,
+  genByronSigningWalletWithCache,
 } from '../../../stories/helpers/cardano/ByronMocks';
 import type {
   PossibleCacheTypes,
@@ -100,7 +100,7 @@ const actions = {
 
 export const Loading = (): Node => {
   const genWallet = () => {
-    const wallet = getByronSigningWalletWithCache();
+    const wallet = genByronSigningWalletWithCache();
     return wallet;
   };
   const wallet = genWallet();
@@ -315,7 +315,7 @@ const genPropsForTransactions: {|
 
 export const Transaction = (): Node => {
   const genWallet = () => {
-    const wallet = getByronSigningWalletWithCache();
+    const wallet = genByronSigningWalletWithCache();
     return wallet;
   };
   const wallet = genWallet();
@@ -444,7 +444,7 @@ export const Transaction = (): Node => {
 
 export const TransactionWithMemo = (): Node => {
   const genWallet = () => {
-    const wallet = getByronSigningWalletWithCache();
+    const wallet = genByronSigningWalletWithCache();
     return wallet;
   };
   const wallet = genWallet();
@@ -523,7 +523,7 @@ export const TransactionWithMemo = (): Node => {
 
 export const MemoDialog = (): Node => {
   const genWallet = () => {
-    const wallet = getByronSigningWalletWithCache();
+    const wallet = genByronSigningWalletWithCache();
     return wallet;
   };
   const wallet = genWallet();
@@ -616,7 +616,7 @@ export const MemoDialog = (): Node => {
 
 export const NoTransactions = (): Node => {
   const genWallet = () => {
-    const wallet = getByronSigningWalletWithCache();
+    const wallet = genByronSigningWalletWithCache();
     return wallet;
   };
   const wallet = genWallet();
@@ -651,7 +651,7 @@ export const NoTransactions = (): Node => {
 
 export const ManyTransactions = (): Node => {
   const genWallet = () => {
-    const wallet = getByronSigningWalletWithCache();
+    const wallet = genByronSigningWalletWithCache();
     return wallet;
   };
   const wallet = genWallet();
@@ -718,7 +718,7 @@ export const ManyTransactions = (): Node => {
 
 export const TxHistoryExport = (): Node => {
   const genWallet = () => {
-    const wallet = getByronSigningWalletWithCache();
+    const wallet = genByronSigningWalletWithCache();
     return wallet;
   };
   const wallet = genWallet();
@@ -791,7 +791,7 @@ export const TxHistoryExport = (): Node => {
 
 export const DebugWalletWarning = (): Node => {
   const genWallet = () => {
-    const wallet = getByronSigningWalletWithCache();
+    const wallet = genByronSigningWalletWithCache();
     return wallet;
   };
   const wallet = genWallet();

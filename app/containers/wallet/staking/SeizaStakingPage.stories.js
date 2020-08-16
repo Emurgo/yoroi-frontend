@@ -10,7 +10,7 @@ import {
   globalKnobs,
 } from '../../../../stories/helpers/StoryWrapper';
 import {
-  genSigningWalletWithCache,
+  genJormungandrSigningWalletWithCache,
   genJormungandrUndelegateTx,
 } from '../../../../stories/helpers/jormungandr/JormungandrMocks';
 import {
@@ -183,7 +183,7 @@ function getStakingInfo(
 
 export const Frame = (): Node => {
   const genWallet = () => {
-    const wallet = genSigningWalletWithCache();
+    const wallet = genJormungandrSigningWalletWithCache();
     const computedDelegation = getStakingInfo(
       wallet.publicDeriver,
     );
@@ -210,7 +210,7 @@ export const Frame = (): Node => {
 
 export const PendingTransaction = (): Node => {
   const genWallet = () => {
-    const wallet = genSigningWalletWithCache();
+    const wallet = genJormungandrSigningWalletWithCache();
     const computedDelegation = getStakingInfo(
       wallet.publicDeriver,
     );
@@ -238,7 +238,7 @@ export const PendingTransaction = (): Node => {
 
 export const TransactionIsExecuting = (): Node => {
   const genWallet = () => {
-    const wallet = genSigningWalletWithCache();
+    const wallet = genJormungandrSigningWalletWithCache();
     const computedDelegation = getStakingInfo(
       wallet.publicDeriver,
     );
@@ -270,7 +270,7 @@ export const TransactionIsExecuting = (): Node => {
 
 export const TransactionError = (): Node => {
   const genWallet = () => {
-    const wallet = genSigningWalletWithCache();
+    const wallet = genJormungandrSigningWalletWithCache();
     const computedDelegation = getStakingInfo(
       wallet.publicDeriver,
     );
@@ -302,7 +302,7 @@ export const TransactionError = (): Node => {
 
 export const Transaction = (): Node => {
   const genWallet = () => {
-    const wallet = genSigningWalletWithCache();
+    const wallet = genJormungandrSigningWalletWithCache();
     const computedDelegation = getStakingInfo(
       wallet.publicDeriver,
     );
@@ -369,7 +369,7 @@ export const Transaction = (): Node => {
 
 export const DelegationSuccess = (): Node => {
   const genWallet = () => {
-    const wallet = genSigningWalletWithCache();
+    const wallet = genJormungandrSigningWalletWithCache();
     const computedDelegation = getStakingInfo(
       wallet.publicDeriver,
     );

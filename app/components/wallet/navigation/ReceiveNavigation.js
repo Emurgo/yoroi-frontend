@@ -25,6 +25,7 @@ import type { AddressTypeName, AddressFilterKind } from '../../../types/AddressF
 import classNames from 'classnames';
 import { Tooltip } from 'react-polymorph/lib/components/Tooltip';
 import { TooltipSkin } from 'react-polymorph/lib/skins/simple/TooltipSkin';
+import ReactResizeDetector from 'react-resize-detector';
 
 type AddressStoreSubset = {
     +isActiveStore: boolean,
@@ -247,19 +248,26 @@ export default class ReceiveNavigation extends Component<Props, State> {
 
   render(): Node {
     return (
-      <div className={styles.wrapper}>
-        <div className={styles.content}>
-          <div
-            ref={this.contentRef}
-            onScroll={this.resize}
-            className={styles.accordions}
-          >
-            {this.createAccordions()}
+      <ReactResizeDetector
+        handleHeight
+        onResize={this.resize}
+      >
+        {() => (
+          <div className={styles.wrapper}>
+            <div className={styles.content}>
+              <div
+                ref={this.contentRef}
+                onScroll={this.resize}
+                className={styles.accordions}
+              >
+                {this.createAccordions()}
+              </div>
+              {/* Section filtered button */}
+              {this.generateFilterSection()}
+            </div>
           </div>
-          {/* Section filtered button */}
-          {this.generateFilterSection()}
-        </div>
-      </div>
+        )}
+      </ReactResizeDetector>
     );
   }
 }

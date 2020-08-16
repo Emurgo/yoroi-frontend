@@ -190,6 +190,7 @@
     "react-intl": "2.9.0",
     "react-markdown": "4.3.1",
     "react-polymorph": "git+https://github.com/rcmorano/react-polymorph-fix.git",
+    "react-resize-detector": "^5.0.7",
     "react-router": "5.2.0",
     "react-router-dom": "5.2.0",
     "recharts": "1.8.5",

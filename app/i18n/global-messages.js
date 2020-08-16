@@ -597,6 +597,10 @@ const globalMessages: * = defineMessages({
     id: 'transfer.summary.finalBalance.label',
     defaultMessage: '!!!Final balance',
   },
+  withdrawalsLabel: {
+    id: 'wallet.transaction.withdrawalsLabel',
+    defaultMessage: '!!!Withdrawals',
+  },
 });
 export default globalMessages;
 

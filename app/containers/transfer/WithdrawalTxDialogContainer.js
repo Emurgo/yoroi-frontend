@@ -36,14 +36,18 @@ export default class WithdrawalTxDialogContainer extends Component<Props> {
           const deregistrations = new Map(tentativeTx.keyDeregistrations(true).map(key => [
             key.rewardAddress, key.refund
           ]));
+          const withdrawals = tentativeTx.withdrawals(true);
           return {
-            recoveredBalance: tentativeTx.totalInput(true),
+            recoveredBalance: withdrawals.reduce(
+              (sum, curr) => sum.plus(curr.amount),
+              new BigNumber(0)
+            ),
             fee: tentativeTx.fee(true),
             senders: tentativeTx
               .uniqueSenderAddresses(),
             receivers: tentativeTx
               .receivers(true),
-            withdrawals: tentativeTx.withdrawals(true).map(withdrawal => ({
+            withdrawals: withdrawals.map(withdrawal => ({
               ...withdrawal,
               refund: deregistrations.get(withdrawal.address) ?? new BigNumber(0),
             })),

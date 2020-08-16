@@ -281,7 +281,7 @@ export async function rawGetChainAddressesForDisplay(
       }
     }
     addressResponse = addressResponse.filter(address => (
-      address.addressing.path[address.addressing.path.length - 1] <= bestUsed + 1
+      address.addressing.path[address.addressing.path.length - 1] <= 10 + 1
     ));
   }
   return addressResponse;

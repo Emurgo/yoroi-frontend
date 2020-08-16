@@ -7,7 +7,7 @@ import { select, } from '@storybook/addon-knobs';
 import { action } from '@storybook/addon-actions';
 import { withScreenshot } from 'storycap';
 import {
-  genSigningWalletWithCache,
+  genShelleyCIP1852SigningWalletWithCache,
 } from '../../../stories/helpers/cardano/ShelleyCip1852Mocks';
 import {
   walletLookup,
@@ -27,7 +27,7 @@ export default {
 export const Wallets = (): Node => {
 
   const genWallet = () => {
-    const wallet = genSigningWalletWithCache();
+    const wallet = genShelleyCIP1852SigningWalletWithCache();
 
     const balance: CachedRequest<GetBalanceFunc> = new CachedRequest(_request => Promise.resolve(
       new BigNumber(3),
