@@ -37,7 +37,6 @@ import Transfer from './containers/transfer/Transfer';
 import Receive from './containers/wallet/Receive';
 import type { GeneratedData as ReceiveData } from './containers/wallet/Receive';
 import StakingDashboardPage from './containers/wallet/staking/StakingDashboardPage';
-import SeizaStakingPage from './containers/wallet/staking/SeizaStakingPage';
 import CardanoStakingPage from './containers/wallet/staking/CardanoStakingPage';
 import NoticeBoardPage from './containers/notice-board/NoticeBoardPage';
 
@@ -171,8 +170,8 @@ const WalletsSubpages = (stores, actions) => (
     />
     <Route
       exact
-      path={ROUTES.WALLETS.SEIZA_DELEGATION_SIMPLE}
-      component={(props) => <SeizaStakingPage {...props} stores={stores} actions={actions} urlTemplate={CONFIG.seiza.simpleTemplate} />}
+      path={ROUTES.WALLETS.ADAPOOL_DELEGATION_SIMPLE}
+      component={(props) => <CardanoStakingPage {...props} stores={stores} actions={actions} urlTemplate={CONFIG.seiza.simpleTemplate} />}
     />
     <Route
       exact

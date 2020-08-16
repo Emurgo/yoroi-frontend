@@ -1,11 +1,11 @@
 {
   "network": {
-    "backendUrl": "https://iohk-mainnet.yoroiwallet.com",
-    "websocketUrl": "wss://iohk-mainnet.yoroiwallet.com:443",
+    "backendUrl": "https://backend.yoroiwallet.com",
+    "websocketUrl": "wss://bakcend.yoroiwallet.com:443",
     "name": "mainnet"
   },
   "seiza": {
-    "simpleTemplate": ""
+    "simpleTemplate": "https://adapools.yoroiwallet.com/?source=$$BROWSER$$"
   },
   "app": {
     "walletRefreshInterval": 20000,
