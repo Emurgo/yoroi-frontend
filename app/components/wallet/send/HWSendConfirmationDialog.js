@@ -22,6 +22,7 @@ import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import styles from './HWSendConfirmationDialog.scss';
+import { truncateAddress } from '../../../utils/formatters';
 
 type ExpectedMessages = {|
   infoLine1: MessageDescriptor,
@@ -103,7 +104,7 @@ export default class HWSendConfirmationDialog extends Component<Props> {
           >
             <RawHash light>
               <span className={styles.addressTo}>
-                {this.props.addressToDisplayString(receiver)}
+                {truncateAddress(this.props.addressToDisplayString(receiver))}
               </span>
             </RawHash>
           </ExplorableHashContainer>

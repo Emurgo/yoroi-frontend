@@ -3,6 +3,7 @@
 import { Given, Then } from 'cucumber';
 import { By } from 'selenium-webdriver';
 import { expect } from 'chai';
+import { truncateAddress, } from '../../app/utils/formatters';
 
 // ========== Paper wallet ==========
 
@@ -55,6 +56,6 @@ Then(/^I should see two addresses displayed$/, async function () {
   expect(addressesElem.length).to.be.equal(fakeAddresses.length);
   for (let i = 0; i < fakeAddresses.length; i++) {
     const address = await addressesElem[i].getText();
-    expect(address).to.be.equal(fakeAddresses[i]);
+    expect(address).to.be.equal(truncateAddress(fakeAddresses[i]));
   }
 });

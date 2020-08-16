@@ -212,7 +212,7 @@ export const REWARD_ADDRESS: AddressSubgroupMeta<
     matchForkType(request.selected, fork => fork === CardanoForks.Haskell)
   ),
   class: RewardAddressesSubgroup,
-  validFilters: standardFilter,
+  validFilters: [AddressFilter.None],
   name: {
     subgroup: AddressSubgroup.all,
     group: AddressGroupTypes.reward,

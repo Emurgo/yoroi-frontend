@@ -2,6 +2,7 @@
 
 import { When, Then, } from 'cucumber';
 import { testWallets } from '../mock-chain/TestWallets';
+import { truncateAddress, } from '../../app/utils/formatters';
 
 When(/^I restore a Ledger device$/, async function () {
   await this.click('.WalletAdd_btnConnectHW');
@@ -67,7 +68,7 @@ When(/^I click on the verify address button$/, async function () {
 });
 
 When(/^I see the verification address "([^"]*)"$/, async function (address) {
-  await this.waitUntilText('.verificationAddress', address);
+  await this.waitUntilText('.verificationAddress', truncateAddress(address));
 });
 
 When(/^I see the derivation path "([^"]*)"$/, async function (path) {

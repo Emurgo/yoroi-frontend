@@ -25,6 +25,7 @@ import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType'
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 import WarningBox from '../../widgets/WarningBox';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { truncateAddress } from '../../../utils/formatters';
 
 type Props = {|
   +staleTx: boolean,
@@ -165,7 +166,7 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
               >
                 <RawHash light>
                   <span className={styles.addressTo}>
-                    {this.props.addressToDisplayString(receiver)}
+                    {truncateAddress(this.props.addressToDisplayString(receiver))}
                   </span>
                 </RawHash>
               </ExplorableHashContainer>
