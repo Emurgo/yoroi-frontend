@@ -108,7 +108,7 @@ describe('Jormungandr tx format tests', () => {
         Buffer.from(addr1.address, 'hex')
       ).to_string(Bech32Prefix.ADDRESS)
     ]);
-    expect(transferInfo.receivers[0]).toBe(bech32Addr);
+    expect(transferInfo.receivers[0]).toBe(outAddress);
 
     // check tx itself
     if (!transferInfo.encodedTx) throw new Error(`Tx not signed`);
