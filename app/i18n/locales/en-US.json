@@ -293,6 +293,8 @@
   "transfer.legacy.daedalus.12word": "12-word Daedalus wallet",
   "transfer.legacy.daedalus.title": "Legacy Daedalus Wallet",
   "transfer.legacy.icarus.title": "Icarus/Yoroi Wallet",
+  "transfer.rewards.paper.label": "Rewards from paper wallet",
+  "transfer.rewards.regular.label": "Rewards from recovery phrase",
   "transfer.summary.addressFrom.label": "From",
   "transfer.summary.finalBalance.label": "Final balance",
   "transfer.summary.recoveredBalance.label": "Recovered balance",

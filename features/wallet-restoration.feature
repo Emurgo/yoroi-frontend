@@ -387,6 +387,7 @@ Feature: Restore Wallet
     And I go to the receive screen
     And I should see the addresses exactly list them
     | address                                                     |
+    | addr1qy245684mdhpwzs0p37jz8pymn5g9v37rqjy78c59f06xau4tr5knj4fu4adelzqhxg8adu5xca4jra0gtllfrpcawyqdqef6t |
     | addr1qyv7qlaucathxkwkc503ujw0rv9lfj2rkj96feyst2rs9ey4tr5knj4fu4adelzqhxg8adu5xca4jra0gtllfrpcawyqzajfkn |
 
   @it-133

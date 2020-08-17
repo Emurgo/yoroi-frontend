@@ -35,6 +35,8 @@ Feature: Generate Addresses
 
   @it-34
   Scenario: Ensure every generated wallet address is unique (IT-34)
+    Given There is a Byron wallet stored named small-single-tx
+    And I go to the receive screen
     When I click on the Generate new address button 20 times
     Then I see every generated address is unique
 
