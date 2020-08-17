@@ -679,7 +679,7 @@
   "wallet.undelegation.transaction.explanationLine2": "Cela prendra 2 époques après la fin de l'époque courante pour que votre choix d'arrêter de déléguer soit effectif",
   "wallet.unsupported.subtitle": "Le portefeuille sélectionné ne prend pas en charge cette fonctionnalité",
   "wallet.unsupported.title": "Type de portefeuille non supporté",
-  "wallet.withdrawal.transaction.unregister": "This transaction will unregister one or more staking keys, giving you back your {refundAmount} ADA from your deposit",
+  "wallet.withdrawal.transaction.unregister": "Cette opération va désinscrire une ou plusieurs clés de staking, ce qui vous permettra de récupérer votre dépôt de {refundAmount} ADA",
   "widgets.copyableaddress.addressCopyTooltipMessage": "Copier dans le presse-papier",
   "widgets.explorer.tooltip": "Aller sur {websiteName}",
   "widgets.warningBox.headerText": "ATTENTION :",
