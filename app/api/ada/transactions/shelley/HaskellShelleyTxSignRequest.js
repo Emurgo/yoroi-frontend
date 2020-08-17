@@ -29,15 +29,25 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
   signRequest: BaseSignRequest<RustModule.WalletV4.TransactionBuilder>;
   metadata: void | RustModule.WalletV4.TransactionMetadata; // TODO: shouldn't need this
   networkSettingSnapshot: NetworkSettingSnapshot;
+  // TODO: this should be provided by WASM in some SignedTxBuilder interface of some kind
+  neededStakingKeyHashes: {|
+    neededHashes: Set<string>, // StakeCredential
+    wits: Set<string>, // Vkeywitness
+  |};
 
   constructor(
     signRequest: BaseSignRequest<RustModule.WalletV4.TransactionBuilder>,
     metadata: void | RustModule.WalletV4.TransactionMetadata,
     networkSettingSnapshot: NetworkSettingSnapshot,
+    neededStakingKeyHashes: {|
+      neededHashes: Set<string>, // StakeCredential
+      wits: Set<string>, // Vkeywitness
+    |},
   ) {
     this.signRequest = signRequest;
     this.metadata = metadata;
     this.networkSettingSnapshot = networkSettingSnapshot;
+    this.neededStakingKeyHashes = neededStakingKeyHashes;
   }
 
   txId(): string {

@@ -334,6 +334,10 @@ export const genTentativeShelleyTx = (
         KeyDeposit: new BigNumber(config.KeyDeposit),
         PoolDeposit: new BigNumber(config.PoolDeposit),
       },
+      {
+        neededHashes: new Set(),
+        wits: new Set(),
+      },
     ),
     inputAmount,
     fee,
@@ -435,6 +439,10 @@ export const genWithdrawalTx = (
       ChainNetworkId: Number.parseInt(baseConfig.ChainNetworkId, 10),
       PoolDeposit: new BigNumber(baseConfig.PoolDeposit),
       KeyDeposit: new BigNumber(baseConfig.KeyDeposit),
-    }
+    },
+    {
+      neededHashes: new Set([Buffer.from(rewardAddr.payment_cred().to_bytes()).toString('hex')]),
+      wits: new Set(), // TODO: should be present, but probably doesn't matter for UI tests
+    },
   );
 };

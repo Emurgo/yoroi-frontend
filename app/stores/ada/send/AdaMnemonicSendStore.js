@@ -9,12 +9,14 @@ import {
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 import {
   asGetSigningKey,
+  asGetAllAccounting,
 } from '../../../api/ada/lib/storage/models/PublicDeriver/traits';
-import { RustModule } from '../../../api/ada/lib/cardanoCrypto/rustLoader';
 import { ROUTES } from '../../../routes-config';
 import type { ISignRequest } from '../../../api/common/lib/transactions/ISignRequest';
 import { getApiForNetwork, ApiOptions } from '../../../api/common/utils';
 import { buildCheckAndCall } from '../../lib/check';
+import { genOwnStakingKey } from '../../../api/ada/index';
+import { RustModule } from '../../../api/ada/lib/cardanoCrypto/rustLoader';
 
 export default class AdaMnemonicSendStore extends Store {
 
@@ -46,7 +48,6 @@ export default class AdaMnemonicSendStore extends Store {
         normal: {
           publicDeriver: request.publicDeriver,
           password: request.password,
-          getStakingWitnesses: () => Promise.resolve(() => []),
           signRequest: request.signRequest,
         },
       },
@@ -61,9 +62,6 @@ export default class AdaMnemonicSendStore extends Store {
   signAndBroadcast: {|
     signRequest: HaskellShelleyTxSignRequest,
     password: string,
-    getStakingWitnesses: void => Promise<(
-      RustModule.WalletV4.TransactionHash => Array<RustModule.WalletV4.Vkeywitness>
-    )>,
     publicDeriver: PublicDeriver<>,
   |} => Promise<{| txId: string |}> = async (request) => {
     try {
@@ -72,10 +70,42 @@ export default class AdaMnemonicSendStore extends Store {
         throw new Error(`${nameof(this.signAndBroadcast)} public deriver missing signing functionality.`);
       }
 
+      const { neededStakingKeyHashes } = request.signRequest;
+      if (neededStakingKeyHashes.neededHashes.size - neededStakingKeyHashes.wits.size >= 2) {
+        throw new Error(`${nameof(this.signAndBroadcast)} Too many missing witnesses`);
+      }
+      if (neededStakingKeyHashes.neededHashes.size !== neededStakingKeyHashes.wits.size) {
+        const withStakingKey = asGetAllAccounting(withSigning);
+        if (withStakingKey == null) {
+          throw new Error(`${nameof(this.signAndBroadcast)} missing staking key functionality`);
+        }
+        const stakingKey = await genOwnStakingKey({
+          publicDeriver: withStakingKey,
+          password: request.password,
+        });
+        if (request.signRequest.neededStakingKeyHashes.neededHashes.has(
+          Buffer.from(
+            RustModule.WalletV4.StakeCredential.from_keyhash(
+              stakingKey.to_public().hash()
+            ).to_bytes()
+          ).toString('hex')
+        )) {
+          neededStakingKeyHashes.wits.add(
+            Buffer.from(RustModule.WalletV4.make_vkey_witness(
+              RustModule.WalletV4.hash_transaction(
+                request.signRequest.signRequest.unsignedTx.build()
+              ),
+              stakingKey
+            ).to_bytes()).toString('hex')
+          );
+        } else {
+          throw new Error(`${nameof(this.signAndBroadcast)} Missing witness but it was not ours`);
+        }
+      }
+
       return await this.api.ada.signAndBroadcast({
         publicDeriver: withSigning,
         password: request.password,
-        getStakingWitnesses: request.getStakingWitnesses,
         signRequest: request.signRequest,
         sendTx: this.stores.substores.ada.stateFetchStore.fetcher.sendTx,
       });

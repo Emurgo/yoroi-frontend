@@ -128,6 +128,7 @@ export default class AdaYoroiTransferStore extends Store {
         getAccountState: this.stores.substores.ada.stateFetchStore.fetcher.getAccountState,
         absSlotNumber,
         withdrawals: [{
+          privateKey: stakeKey.to_raw_key(),
           rewardAddress: rewardHex,
           shouldDeregister: true,
         }],

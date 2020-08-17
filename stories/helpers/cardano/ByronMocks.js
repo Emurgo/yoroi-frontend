@@ -289,6 +289,10 @@ export const genTentativeByronTx = (
         PoolDeposit: new BigNumber(baseConfig.PoolDeposit),
         KeyDeposit: new BigNumber(baseConfig.KeyDeposit),
       },
+      {
+        neededHashes: new Set(),
+        wits: new Set(),
+      },
     ),
     inputAmount,
     fee,

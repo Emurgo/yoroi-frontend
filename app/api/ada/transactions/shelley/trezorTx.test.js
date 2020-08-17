@@ -176,15 +176,15 @@ test('Create Trezor transaction', async () => {
     )
   );
   const certs = RustModule.WalletV4.Certificates.new();
+
+  const stakeCredential = RustModule.WalletV4.StakeCredential.from_keyhash(
+    RustModule.WalletV4.PrivateKey.from_extended_bytes(
+      // note: this key doesn't belong to the wallet sending the transaction
+      Buffer.from('40f11e8501f0695cebdb9e980e007c3979a7dc958af16693d62c45e849d507589029b318010a87ad66465b1384afe4d70573a24eaf2ede273aa1e6a6177d5196', 'hex')
+    ).to_public().hash()
+  );
   certs.add(RustModule.WalletV4.Certificate.new_stake_registration(
-    RustModule.WalletV4.StakeRegistration.new(
-      RustModule.WalletV4.StakeCredential.from_keyhash(
-        // note: this key doesn't belong to the wallet sending the transaction
-        RustModule.WalletV4.PrivateKey.from_extended_bytes(
-          Buffer.from('40f11e8501f0695cebdb9e980e007c3979a7dc958af16693d62c45e849d507589029b318010a87ad66465b1384afe4d70573a24eaf2ede273aa1e6a6177d5196', 'hex')
-        ).to_public().hash()
-      )
-    )
+    RustModule.WalletV4.StakeRegistration.new(stakeCredential)
   ));
   txBuilder.set_certs(certs);
   txBuilder.set_fee(RustModule.WalletV4.BigNum.from_str('1000'));
@@ -206,6 +206,10 @@ test('Create Trezor transaction', async () => {
         ChainNetworkId: Number.parseInt(baseConfig.ChainNetworkId, 10),
         PoolDeposit: new BigNumber(baseConfig.PoolDeposit),
         KeyDeposit: new BigNumber(baseConfig.KeyDeposit),
+      },
+      {
+        neededHashes: new Set([Buffer.from(stakeCredential.to_bytes()).toString('hex')]),
+        wits: new Set() // not needed for this test, but something should be here
       },
     ),
     ByronNetworkId,

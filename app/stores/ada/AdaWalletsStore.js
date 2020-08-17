@@ -41,9 +41,6 @@ export default class AdaWalletsStore extends Store {
         publicDeriver: PublicDeriver<>,
         signRequest: HaskellShelleyTxSignRequest,
         password: string,
-        getStakingWitnesses: void => Promise<(
-          RustModule.WalletV4.TransactionHash => Array<RustModule.WalletV4.Vkeywitness>
-        )>,
       |}
     |} | {|
      trezor: {|

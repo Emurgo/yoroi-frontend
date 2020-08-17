@@ -23,7 +23,6 @@ import {
 import {
   getRegistrationHistory,
 } from '../../api/ada/lib/storage/bridge/delegationUtils';
-import { genOwnStakingKey } from '../../api/ada/index';
 import {
   isLedgerNanoWallet,
   isTrezorTWallet,
@@ -150,11 +149,6 @@ export default class AdaDelegationTransactionStore extends Store {
     password?: string,
     publicDeriver: PublicDeriver<>,
   |} => Promise<void> = async (request) => {
-    const withStakingKey = asGetAllAccounting(request.publicDeriver);
-    if (withStakingKey == null) {
-      throw new Error(`${nameof(this._signTransaction)} missing staking key functionality`);
-    }
-
     const result = this.createDelegationTx.result;
     if (result == null) {
       throw new Error(`${nameof(this._signTransaction)} no tx to broadcast`);
@@ -185,23 +179,14 @@ export default class AdaDelegationTransactionStore extends Store {
     }
 
     // normal password-based wallet
-    const withSigning = (asGetSigningKey(withStakingKey));
-    if (withSigning == null) {
-      throw new Error(`${nameof(this._signTransaction)} public deriver missing signing functionality.`);
-    }
     if (request.password == null) {
       throw new Error(`${nameof(this._signTransaction)} missing password for non-hardware signing`);
     }
-    const { password } = request;
     await this.stores.substores.ada.wallets.adaSendAndRefresh({
       broadcastRequest: {
         normal: {
           publicDeriver: request.publicDeriver,
           password: request.password,
-          getStakingWitnesses: async () => await genOwnStakingKey({
-            publicDeriver: withSigning,
-            password,
-          }),
           signRequest: result.signTxRequest,
         },
       },
