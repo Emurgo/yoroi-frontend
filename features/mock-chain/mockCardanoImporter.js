@@ -1321,9 +1321,6 @@ export function resetChain(
     addTransaction(txs.manyTx4);
     addTransaction(txs.useChange);
   }
-
-  // need this so that the TTL is the same on all transactions
-  MockDate.set('1/30/2100');
 }
 
 // =========================
