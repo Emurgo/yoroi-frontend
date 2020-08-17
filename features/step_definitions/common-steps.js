@@ -1,7 +1,7 @@
 // @flow
 
 import { Before, BeforeAll, Given, Then, After, AfterAll, setDefinitionFunctionWrapper, setDefaultTimeout } from 'cucumber';
-import { getMockServer, closeMockServer } from '../mock-chain/mockCardanoServer';
+import { getMockServer, closeMockServer, setExpectedTx } from '../mock-chain/mockCardanoServer';
 import { By } from 'selenium-webdriver';
 import { enterRecoveryPhrase, getPlates } from './wallet-restoration-steps';
 import { testWallets } from '../mock-chain/TestWallets';
@@ -45,6 +45,7 @@ AfterAll(() => {
 });
 
 Before((scenario) => {
+  setExpectedTx(undefined);
   // cleanup scenario name so it is folder-name friendly
   testProgress.scenarioName = scenario.pickle.name.replace(/[^0-9a-z_ ]/gi, '');
   testProgress.lineNum = scenario.sourceLocation.line;

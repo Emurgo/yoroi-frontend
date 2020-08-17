@@ -5,6 +5,7 @@ import { By } from 'selenium-webdriver';
 import { expect } from 'chai';
 import i18n from '../support/helpers/i18n-helpers';
 import { addTransaction, generateTransaction, } from '../mock-chain/mockCardanoImporter';
+import { setExpectedTx, } from '../mock-chain/mockCardanoServer';
 import { truncateAddress, } from '../../app/utils/formatters';
 
 Given(/^I have a wallet with funds$/, async function () {
@@ -28,6 +29,10 @@ When(/^I fill the form:$/, async function (table) {
 When(/^I fill the address of the form:$/, async function (table) {
   const fields = table.hashes()[0];
   await this.input("input[name='receiver']", fields.address);
+});
+
+Given(/^The expected transaction is "([^"]*)"$/, (base64Tx) => {
+  setExpectedTx(base64Tx);
 });
 
 When(/^I see CONFIRM TRANSACTION Pop up:$/, async function (table) {

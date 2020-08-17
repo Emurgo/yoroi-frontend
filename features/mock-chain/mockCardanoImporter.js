@@ -1,6 +1,5 @@
 // @flow
 
-import cryptoRandomString from 'crypto-random-string';
 import type {
   SignedRequestInternal, SignedResponse,
   RemoteTransaction,
@@ -81,7 +80,7 @@ export const generateTransaction = (): {|
   shelleySimple15: RemoteTransaction,
 |} => {
   const genesisTx = {
-    hash: cryptoRandomString({ length: 64 }),
+    hash: 'b713cc0d63106c3806b5a7077cc37a294fcca5e479f26aac64e51e09ae808d75',
     inputs: [
       {
         address: genesisAddress,
@@ -104,7 +103,7 @@ export const generateTransaction = (): {|
     tx_state: 'Successful'
   };
   const distributorTx = {
-    hash: cryptoRandomString({ length: 64 }),
+    hash: 'b713cc0d63106c3806b5a7077cc37a294fcca0e479f26aac64e51e04ae808d75',
     inputs: [
       {
         address: genesisTxReceiver,
@@ -351,7 +350,7 @@ export const generateTransaction = (): {|
   // =========================
 
   const pendingTx1 = {
-    hash: cryptoRandomString({ length: 64 }),
+    hash: 'a713cc0d63106c3806b5a7077cc37a294fcca0e479f26aac64e51e09ae808d79',
     inputs: [
       {
         // Ae2tdPwUPEZ9ySSM18e2QGFnCgL8ViDqp8K3wU4i5DYTSf5w6e1cT2aGdSJ
@@ -448,7 +447,7 @@ export const generateTransaction = (): {|
   // ==================
 
   const manyTx1 = {
-    hash: cryptoRandomString({ length: 64 }),
+    hash: 'b713cc0d63106c3806b1a7077cc37a294fcca0e479f26aac64e51e09ae808d75',
     inputs: [
       {
         // Ae2tdPwUPEZ9uHfzhw3vXUrTFLowct5hMMHeNjfsrkQv5XSi5PhSs2yRNUb
@@ -568,7 +567,7 @@ export const generateTransaction = (): {|
     tx_state: 'Successful'
   };
   const manyTx3 = {
-    hash: cryptoRandomString({ length: 64 }),
+    hash: 'b713cc0d63106c3806b5a7077cc37a294fcca0e479f26aac64e51e09ae808d71',
     inputs: [
       {
         // Ae2tdPwUPEYwBZD5hPWCm3PUDYdMBfnLHsQmgUiexnkvDMTFCQ4gzRkgAEQ
@@ -628,7 +627,7 @@ export const generateTransaction = (): {|
     tx_state: 'Successful'
   };
   const manyTx4 = {
-    hash: cryptoRandomString({ length: 64 }),
+    hash: 'b713cc0d63106c3806b5a7077cc37a294fcca0e479f26aac64e51e09ae808d75',
     inputs: [
       {
         // Ae2tdPwUPEYvzFpWJEGmSjLdz3DNY9WL5CbPjsouuM5M6YMsYWB1vsCS8j4
@@ -1322,6 +1321,9 @@ export function resetChain(
     addTransaction(txs.manyTx4);
     addTransaction(txs.useChange);
   }
+
+  // need this so that the TTL is the same on all transactions
+  MockDate.set('1/30/2100');
 }
 
 // =========================
@@ -1394,7 +1396,7 @@ const sendTx = (request: SignedRequestInternal): SignedResponse => {
 const getPoolInfo: PoolInfoFunc = genGetPoolInfo(transactions);
 const getRewardHistory: RewardHistoryFunc = genGetRewardHistory();
 
-const getAccountState: AccountStateFunc = async (request) => {
+const getAccountState: AccountStateFunc = async (_request) => {
   const totalRewards = new BigNumber(5000000);
   const totalWithdrawals = new BigNumber(0);
   return {
