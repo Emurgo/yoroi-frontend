@@ -5,7 +5,7 @@ Feature: Memos
     
   @it-97
   Scenario: Create and edit transaction memo (IT-97)
-    Given There is a wallet stored named small-single-tx
+    Given There is a Byron wallet stored named small-single-tx
     Given I expand the top transaction
     # test add
     When I add a memo that says "my awesome memo"
@@ -23,7 +23,7 @@ Feature: Memos
 
   @it-135
   Scenario: Create a transaction with a memo (IT-135)
-    Given There is a wallet stored named many-tx-wallet
+    Given There is a Byron wallet stored named many-tx-wallet
     And I have a wallet with funds
     When I go to the send transaction screen
     And I fill the form:

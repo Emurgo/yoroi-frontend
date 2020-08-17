@@ -11,20 +11,30 @@ import { THEMES } from '../../themes';
 import { withScreenshot } from 'storycap';
 import {
   globalKnobs,
-  walletLookup,
-  genSigningWalletWithCache,
   ledgerErrorCases,
   mockLedgerMeta,
-  genTentativeTx,
   genUnitOfAccount,
 } from '../../../stories/helpers/StoryWrapper';
+import {
+  walletLookup,
+} from '../../../stories/helpers/WalletCache';
+import {
+  genShelleyCIP1852SigningWalletWithCache,
+  genTentativeShelleyTx,
+} from '../../../stories/helpers/cardano/ShelleyCip1852Mocks';
+import {
+  genJormungandrSigningWalletWithCache,
+} from '../../../stories/helpers/jormungandr/JormungandrMocks';
+import {
+  genByronSigningWalletWithCache,
+} from '../../../stories/helpers/cardano/ByronMocks';
 import { GenericApiError, } from '../../api/common/errors';
-import type { CacheValue } from '../../../stories/helpers/StoryWrapper';
+import type { PossibleCacheTypes } from '../../../stories/helpers/WalletCache';
 import { wrapReceive, wrapWallet } from '../../Routes';
 import { mockWalletProps } from './Wallet.mock';
 import { mockReceiveProps } from './Receive.mock';
 import { defaultToSelectedExplorer } from '../../domain/SelectedExplorer';
-import type { StandardAddress, AddressFilterKind, } from '../../types/AddressFilterTypes';
+import type {AddressFilterKind, } from '../../types/AddressFilterTypes';
 import URIGenerateDialog from '../../components/uri/URIGenerateDialog';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import URIDisplayDialog from '../../components/uri/URIDisplayDialog';
@@ -35,9 +45,12 @@ import {
   allAddressSubgroups,
   routeForStore,
   ADDRESS_BOOK,
+  BYRON_EXTERNAL,
   GROUP_EXTERNAL,
-  GROUP_INTERNAL,
-  GROUP_MANGLED,
+  BASE_EXTERNAL,
+  BASE_INTERNAL,
+  BASE_MANGLED,
+  REWARD_ADDRESS,
 } from '../../stores/stateless/addressStores';
 import type { IAddressTypeStore, IAddressTypeUiSubset } from '../../stores/stateless/addressStores';
 
@@ -47,54 +60,39 @@ export default {
   decorators: [withScreenshot],
 };
 
-const genAddresses: (
-  'byron' | 'jormungandr'
-) => $ReadOnlyArray<$ReadOnly<StandardAddress>> = (type: "byron" | "jormungandr") => {
-  const unusedProps = (address) => ({
-    address,
-    value: undefined,
-    addressing: {
-      path: [2147483692, 2147485463, 2147483648, 13, 0, 0],
-      startLevel: 0,
-    },
-    isUsed: false,
-  });
-  const noUtxoProps = (address) => ({
-    address,
-    value: undefined,
-    addressing: {
-      path: [],
-      startLevel: 0,
-    },
-    isUsed: true,
-  });
-  const withUtxo = (address) => ({
-    address,
-    value: new BigNumber(100),
-    addressing: {
-      path: [],
-      startLevel: 0,
-    },
-    isUsed: true,
-  });
-  if (type === 'jormungandr') {
-    return [
-      unusedProps('addr1ssuvzjs82mshgvyp4r4lmwgknvgjswnm7mpcq3wycjj7v2nk393e6qwqr79etp5e4emf5frwj7zakknsuq3ewl4yhptdlt8j8s3ngm9078ssez'),
-      noUtxoProps('addr1ssruckcp4drq2cj8nul8lhmc9vgkxmz2rdepcxdec9sfh3ekpdgcuqwqr79etp5e4emf5frwj7zakknsuq3ewl4yhptdlt8j8s3ngm90lfrsm9'),
-      withUtxo('addr1sjruv2a8v7g38w57ff2ffhwgk6jg93erv7txdvgnyjnl2ncnfakqvqwqr79etp5e4emf5frwj7zakknsuq3ewl4yhptdlt8j8s3ngm90dlxwna'),
-    ];
-  }
-  return [
-    unusedProps('Ae2tdPwUPEZCfyggUgSxD1E5UCx5f5hrXCdvQjJszxE7epyZ4ox9vRNUbHf'),
-    noUtxoProps('Ae2tdPwUPEZCfyggUgSxD1E5UCx5f5hrXCdvQjJszxE7epyZ4ox9vRNUbHf'),
-    withUtxo('Ae2tdPwUPEZ8gpDazyi8VtcGMnMrkpKxts6ppCT45mdT6WMZEwHXs7pP8Tg'),
-  ];
-};
+
+const unusedProps = (address) => ({
+  address,
+  value: undefined,
+  addressing: {
+    path: [2147483692, 2147485463, 2147483648, 13, 0, 0],
+    startLevel: 0,
+  },
+  isUsed: false,
+});
+const noUtxoProps = (address) => ({
+  address,
+  value: undefined,
+  addressing: {
+    path: [],
+    startLevel: 0,
+  },
+  isUsed: true,
+});
+const withUtxo = (address) => ({
+  address,
+  value: new BigNumber(100),
+  addressing: {
+    path: [],
+    startLevel: 0,
+  },
+  isUsed: true,
+});
 
 const genBaseProps: {|
   location: string,
   addressBook?: boolean,
-  wallet: CacheValue,
+  wallet: PossibleCacheTypes,
   dialog?: any,
   addressSubgroupMap: $ReadOnlyMap<Class<IAddressTypeStore>, IAddressTypeUiSubset>,
   addressFilter: AddressFilterKind,
@@ -208,32 +206,51 @@ const genBaseProps: {|
     },
     UnmangleTxDialogContainerProps: {
       generated: {
+        TransferSendProps: {
+          generated: {
+            actions: {
+              wallets: {
+                sendMoney: {
+                  trigger: async (req) => action('sendMoney')(req),
+                },
+              },
+            },
+            stores: {
+              addresses: {
+                addressSubgroupMap: request.addressSubgroupMap,
+              },
+              coinPriceStore: {
+                getCurrentPrice: (_from, _to) => 5,
+              },
+              explorers: {
+                selectedExplorer: defaultToSelectedExplorer(),
+              },
+              profile: {
+                isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
+                unitOfAccount: genUnitOfAccount(),
+              },
+              wallets: {
+                selected: request.wallet.publicDeriver,
+                sendMoneyRequest: request.transactionBuilderStore == null
+                  ? {
+                    reset: action('reset'),
+                    error: undefined,
+                    isExecuting: false,
+                  }
+                  : {
+                    reset: action('reset'),
+                    error: sendErrorValue() === sendErrorCases.None
+                      ? undefined
+                      : sendErrorValue(),
+                    isExecuting: boolean('isExecuting', false),
+                  },
+              },
+            },
+          },
+        },
         stores: {
-          explorers: {
-            selectedExplorer: defaultToSelectedExplorer(),
-          },
-          profile: {
-            isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
-            unitOfAccount: genUnitOfAccount(),
-          },
           wallets: {
             selected: request.wallet.publicDeriver,
-            sendMoneyRequest: request.transactionBuilderStore == null
-              ? {
-                reset: action('reset'),
-                error: undefined,
-                isExecuting: false,
-              }
-              : {
-                reset: action('reset'),
-                error: sendErrorValue() === sendErrorCases.None
-                  ? undefined
-                  : sendErrorValue(),
-                isExecuting: boolean('isExecuting', false),
-              },
-          },
-          coinPriceStore: {
-            getCurrentPrice: (_from, _to) => 5,
           },
           addresses: {
             addressSubgroupMap: request.addressSubgroupMap,
@@ -245,11 +262,6 @@ const genBaseProps: {|
             initialize: { trigger: async (req) => action('initialize')(req), },
             reset: {
               trigger: action('reset'),
-            },
-          },
-          wallets: {
-            sendMoney: {
-              trigger: async (req) => action('sendMoney')(req),
             },
           },
         },
@@ -273,10 +285,10 @@ const genDefaultGroupMap: (
 };
 
 export const Loading = (): Node => {
-  const wallet = genSigningWalletWithCache();
+  const wallet = genShelleyCIP1852SigningWalletWithCache();
   const lookup = walletLookup([wallet]);
 
-  const location = routeForStore(GROUP_EXTERNAL.name);
+  const location = routeForStore(BASE_EXTERNAL.name);
   const addressFilter = AddressFilter.None;
   const addressSubgroupMap = genDefaultGroupMap(false);
 
@@ -306,15 +318,17 @@ export const Loading = (): Node => {
 };
 
 export const NoMatchFilter = (): Node => {
-  const wallet = genSigningWalletWithCache();
+  const wallet = genShelleyCIP1852SigningWalletWithCache();
   const lookup = walletLookup([wallet]);
 
-  const location = routeForStore(GROUP_EXTERNAL.name);
+  const location = routeForStore(BASE_EXTERNAL.name);
   const addressFilter = AddressFilter.Used;
   const addressSubgroupMap = genDefaultGroupMap(true);
 
-  addressSubgroupMap.set(GROUP_EXTERNAL.class, {
-    all: [genAddresses('byron')[0]],
+  addressSubgroupMap.set(BASE_EXTERNAL.class, {
+    all: [
+      unusedProps('addr1q8gpjmyy8zk9nuza24a0f4e7mgp9gd6h3uayp0rqnjnkl54v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqphf76y'),
+    ],
     wasExecuted: true,
   });
   return wrapWallet(
@@ -342,8 +356,8 @@ export const NoMatchFilter = (): Node => {
   );
 };
 
-export const ExternalTab = (): Node => {
-  const wallet = genSigningWalletWithCache();
+export const JormungandrExternalTab = (): Node => {
+  const wallet = genJormungandrSigningWalletWithCache();
   const lookup = walletLookup([wallet]);
   const addressCases = {
     No: 0,
@@ -360,7 +374,119 @@ export const ExternalTab = (): Node => {
 
   const addressSubgroupMap = genDefaultGroupMap(true);
   addressSubgroupMap.set(GROUP_EXTERNAL.class, {
-    all: genAddresses('jormungandr'),
+    all: [
+      unusedProps('addr1ssuvzjs82mshgvyp4r4lmwgknvgjswnm7mpcq3wycjj7v2nk393e6qwqr79etp5e4emf5frwj7zakknsuq3ewl4yhptdlt8j8s3ngm9078ssez'),
+      noUtxoProps('addr1ssruckcp4drq2cj8nul8lhmc9vgkxmz2rdepcxdec9sfh3ekpdgcuqwqr79etp5e4emf5frwj7zakknsuq3ewl4yhptdlt8j8s3ngm90lfrsm9'),
+      withUtxo('addr1sjruv2a8v7g38w57ff2ffhwgk6jg93erv7txdvgnyjnl2ncnfakqvqwqr79etp5e4emf5frwj7zakknsuq3ewl4yhptdlt8j8s3ngm90dlxwna'),
+    ],
+    wasExecuted: true,
+  });
+
+  return wrapWallet(
+    mockWalletProps({
+      location,
+      selected: wallet.publicDeriver,
+      ...lookup,
+    }),
+    wrapReceive(
+      mockReceiveProps({
+        selected: wallet.publicDeriver,
+        addressSubgroupMap,
+        addressFilter,
+        location,
+      }),
+      (<WalletReceivePage
+        generated={genBaseProps({
+          location,
+          wallet,
+          dialog: getAddressGenerationValue() === addressCases.Yes
+            ? LoadingSpinner
+            : undefined,
+          addressFilter,
+          addressSubgroupMap,
+        })}
+      />)
+    )
+  );
+};
+
+export const ByronExternalTab = (): Node => {
+  const wallet = genByronSigningWalletWithCache();
+  const lookup = walletLookup([wallet]);
+  const addressCases = {
+    No: 0,
+    Yes: 1,
+  };
+  const getAddressGenerationValue = () => select(
+    'generatingAddress',
+    addressCases,
+    addressCases.No,
+  );
+
+  const addressFilter = select('AddressFilter', AddressFilter, AddressFilter.None);
+  const location = routeForStore(BYRON_EXTERNAL.name);
+
+  const addressSubgroupMap = genDefaultGroupMap(true);
+  addressSubgroupMap.set(BYRON_EXTERNAL.class, {
+    all: [
+      unusedProps('Ae2tdPwUPEZCfyggUgSxD1E5UCx5f5hrXCdvQjJszxE7epyZ4ox9vRNUbHf'),
+      noUtxoProps('Ae2tdPwUPEZCfyggUgSxD1E5UCx5f5hrXCdvQjJszxE7epyZ4ox9vRNUbHf'),
+      withUtxo('Ae2tdPwUPEZ8gpDazyi8VtcGMnMrkpKxts6ppCT45mdT6WMZEwHXs7pP8Tg'),
+    ],
+    wasExecuted: true,
+  });
+
+  return wrapWallet(
+    mockWalletProps({
+      location,
+      selected: wallet.publicDeriver,
+      ...lookup,
+    }),
+    wrapReceive(
+      mockReceiveProps({
+        selected: wallet.publicDeriver,
+        addressSubgroupMap,
+        addressFilter,
+        location,
+      }),
+      (<WalletReceivePage
+        generated={genBaseProps({
+          location,
+          wallet,
+          dialog: getAddressGenerationValue() === addressCases.Yes
+            ? LoadingSpinner
+            : undefined,
+          addressFilter,
+          addressSubgroupMap,
+        })}
+      />)
+    )
+  );
+};
+
+export const ExternalTab = (): Node => {
+  const wallet = genShelleyCIP1852SigningWalletWithCache();
+  const lookup = walletLookup([wallet]);
+  const addressCases = {
+    No: 0,
+    Yes: 1,
+  };
+  const getAddressGenerationValue = () => select(
+    'generatingAddress',
+    addressCases,
+    addressCases.No,
+  );
+
+  const addressFilter = select('AddressFilter', AddressFilter, AddressFilter.None);
+  const location = routeForStore(BASE_EXTERNAL.name);
+
+  const addressSubgroupMap = genDefaultGroupMap(true);
+  addressSubgroupMap.set(BASE_EXTERNAL.class, {
+    all: [
+      unusedProps('addr1q8gpjmyy8zk9nuza24a0f4e7mgp9gd6h3uayp0rqnjnkl54v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqphf76y'),
+      noUtxoProps('addr1q99u7t32p2sf9tx87t35pmjyd82qh3877fuha28jddpcus9v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqxra3as'),
+      withUtxo('addr1qxacxugp8h6snaap4w9j430zpsgyve50ypmn8pz0cz9v484v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqamgwnn'),
+    ],
     wasExecuted: true,
   });
 
@@ -394,15 +520,19 @@ export const ExternalTab = (): Node => {
 
 
 export const InternalTab = (): Node => {
-  const wallet = genSigningWalletWithCache();
+  const wallet = genShelleyCIP1852SigningWalletWithCache();
   const lookup = walletLookup([wallet]);
 
   const addressFilter = select('AddressFilter', AddressFilter, AddressFilter.None);
-  const location = routeForStore(GROUP_INTERNAL.name);
+  const location = routeForStore(BASE_INTERNAL.name);
 
   const addressSubgroupMap = genDefaultGroupMap(true);
-  addressSubgroupMap.set(GROUP_INTERNAL.class, {
-    all: genAddresses('jormungandr'),
+  addressSubgroupMap.set(BASE_INTERNAL.class, {
+    all: [
+      unusedProps('addr1q8xly58xcq3qrv5cc8wukme7thyv22ewaj0p5mkumuuvz9dv4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqamuuv5'),
+      noUtxoProps('addr1q9m4edmwq9lzy3vys9guq7ca9mpcd44xyfu85kc3hjzdlkav4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqay5kcc'),
+      withUtxo('addr1qyavcydjctjl5z8dss56zuqzw6gv42cu96pmh9hfmyz425dv4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqlzgdcc'),
+    ],
     wasExecuted: true,
   });
 
@@ -432,11 +562,11 @@ export const InternalTab = (): Node => {
 };
 
 export const MangledTab = (): Node => {
-  const wallet = genSigningWalletWithCache();
+  const wallet = genShelleyCIP1852SigningWalletWithCache();
   const lookup = walletLookup([wallet]);
 
   const addressFilter = select('AddressFilter', AddressFilter, AddressFilter.None);
-  const location = routeForStore(GROUP_MANGLED.name);
+  const location = routeForStore(BASE_MANGLED.name);
 
   const mangledCases = {
     NoMangled: 0,
@@ -449,8 +579,12 @@ export const MangledTab = (): Node => {
   );
 
   const addressSubgroupMap = genDefaultGroupMap(true);
-  addressSubgroupMap.set(GROUP_MANGLED.class, {
-    all: genAddresses('jormungandr').map(addr => ({
+  addressSubgroupMap.set(BASE_MANGLED.class, {
+    all: [
+      unusedProps('addr1q8gpjmyy8zk9nuza24a0f4e7mgp9gd6h3uayp0rqnjnkl54v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqphf76y'),
+      noUtxoProps('addr1q99u7t32p2sf9tx87t35pmjyd82qh3877fuha28jddpcus9v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqxra3as'),
+      withUtxo('addr1qxacxugp8h6snaap4w9j430zpsgyve50ypmn8pz0cz9v484v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqamgwnn'),
+    ].map(addr => ({
       ...addr,
       value: new BigNumber(getMangledValue()),
     })),
@@ -481,8 +615,50 @@ export const MangledTab = (): Node => {
     )
   );
 };
+
+export const RewardTab = (): Node => {
+  const wallet = genShelleyCIP1852SigningWalletWithCache();
+  const lookup = walletLookup([wallet]);
+
+  const addressFilter = select('AddressFilter', AddressFilter, AddressFilter.None);
+  const location = routeForStore(REWARD_ADDRESS.name);
+
+  const addressSubgroupMap = genDefaultGroupMap(true);
+  addressSubgroupMap.set(REWARD_ADDRESS.class, {
+    all: [
+      unusedProps('addr1uxk2kljf8m8yc8n2ucn7l86l0jd3qcl9n8j24y0c0ux43tsxdwp4w')
+    ],
+    wasExecuted: true,
+  });
+
+  return wrapWallet(
+    mockWalletProps({
+      location,
+      selected: wallet.publicDeriver,
+      ...lookup,
+    }),
+    wrapReceive(
+      mockReceiveProps({
+        selected: wallet.publicDeriver,
+        addressSubgroupMap,
+        addressFilter,
+        location
+      }),
+      (<WalletReceivePage
+        generated={genBaseProps({
+          location,
+          wallet,
+          addressFilter,
+          addressSubgroupMap,
+        })}
+      />)
+    )
+  );
+};
+
+
 export const AddressBookTab = (): Node => {
-  const wallet = genSigningWalletWithCache();
+  const wallet = genShelleyCIP1852SigningWalletWithCache();
   const lookup = walletLookup([wallet]);
 
   const addressFilter = AddressFilter.None;
@@ -490,7 +666,11 @@ export const AddressBookTab = (): Node => {
 
   const addressSubgroupMap = genDefaultGroupMap(true);
   addressSubgroupMap.set(ADDRESS_BOOK.class, {
-    all: genAddresses('jormungandr'),
+    all: [
+      unusedProps('addr1q8gpjmyy8zk9nuza24a0f4e7mgp9gd6h3uayp0rqnjnkl54v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqphf76y'),
+      noUtxoProps('addr1q99u7t32p2sf9tx87t35pmjyd82qh3877fuha28jddpcus9v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqxra3as'),
+      withUtxo('addr1qxacxugp8h6snaap4w9j430zpsgyve50ypmn8pz0cz9v484v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqamgwnn'),
+    ],
     wasExecuted: true,
   });
 
@@ -520,15 +700,22 @@ export const AddressBookTab = (): Node => {
 };
 
 export const UnmangleDialogLoading = (): Node => {
-  const wallet = genSigningWalletWithCache();
+  const wallet = genShelleyCIP1852SigningWalletWithCache();
   const lookup = walletLookup([wallet]);
 
   const addressFilter = AddressFilter.None;
-  const location = routeForStore(GROUP_MANGLED.name);
+  const location = routeForStore(BASE_MANGLED.name);
 
   const addressSubgroupMap = genDefaultGroupMap(true);
-  addressSubgroupMap.set(GROUP_MANGLED.class, {
-    all: genAddresses('jormungandr'),
+  addressSubgroupMap.set(BASE_MANGLED.class, {
+    all: [
+      unusedProps('addr1q8gpjmyy8zk9nuza24a0f4e7mgp9gd6h3uayp0rqnjnkl54v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqphf76y'),
+      noUtxoProps('addr1q99u7t32p2sf9tx87t35pmjyd82qh3877fuha28jddpcus9v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqxra3as'),
+      withUtxo('addr1qxacxugp8h6snaap4w9j430zpsgyve50ypmn8pz0cz9v484v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqamgwnn'),
+    ].map(addr => ({
+      ...addr,
+      value: new BigNumber(1000000),
+    })),
     wasExecuted: true,
   });
 
@@ -565,15 +752,22 @@ export const UnmangleDialogLoading = (): Node => {
 };
 
 export const UnmangleDialogError = (): Node => {
-  const wallet = genSigningWalletWithCache();
+  const wallet = genShelleyCIP1852SigningWalletWithCache();
   const lookup = walletLookup([wallet]);
 
   const addressFilter = AddressFilter.None;
-  const location = routeForStore(GROUP_MANGLED.name);
+  const location = routeForStore(BASE_MANGLED.name);
 
   const addressSubgroupMap = genDefaultGroupMap(true);
-  addressSubgroupMap.set(GROUP_MANGLED.class, {
-    all: genAddresses('jormungandr'),
+  addressSubgroupMap.set(BASE_MANGLED.class, {
+    all: [
+      unusedProps('addr1q8gpjmyy8zk9nuza24a0f4e7mgp9gd6h3uayp0rqnjnkl54v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqphf76y'),
+      noUtxoProps('addr1q99u7t32p2sf9tx87t35pmjyd82qh3877fuha28jddpcus9v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqxra3as'),
+      withUtxo('addr1qxacxugp8h6snaap4w9j430zpsgyve50ypmn8pz0cz9v484v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqamgwnn'),
+    ].map(addr => ({
+      ...addr,
+      value: new BigNumber(1000000),
+    })),
     wasExecuted: true,
   });
 
@@ -610,16 +804,24 @@ export const UnmangleDialogError = (): Node => {
 };
 
 export const UnmangleDialogConfirm = (): Node => {
-  const wallet = genSigningWalletWithCache();
+  const wallet = genShelleyCIP1852SigningWalletWithCache();
   const lookup = walletLookup([wallet]);
-  const { tentativeTx } = genTentativeTx(wallet.publicDeriver);
+  // TODO: wrong transaction type
+  const { tentativeTx } = genTentativeShelleyTx(wallet.publicDeriver);
 
   const addressFilter = AddressFilter.None;
-  const location = routeForStore(GROUP_MANGLED.name);
+  const location = routeForStore(BASE_MANGLED.name);
 
   const addressSubgroupMap = genDefaultGroupMap(true);
-  addressSubgroupMap.set(GROUP_MANGLED.class, {
-    all: genAddresses('jormungandr'),
+  addressSubgroupMap.set(BASE_MANGLED.class, {
+    all: [
+      unusedProps('addr1q8gpjmyy8zk9nuza24a0f4e7mgp9gd6h3uayp0rqnjnkl54v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqphf76y'),
+      noUtxoProps('addr1q99u7t32p2sf9tx87t35pmjyd82qh3877fuha28jddpcus9v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqxra3as'),
+      withUtxo('addr1qxacxugp8h6snaap4w9j430zpsgyve50ypmn8pz0cz9v484v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqamgwnn'),
+    ].map(addr => ({
+      ...addr,
+      value: new BigNumber(1000000),
+    })),
     wasExecuted: true,
   });
 
@@ -656,15 +858,19 @@ export const UnmangleDialogConfirm = (): Node => {
 };
 
 export const UriGenerateDialog = (): Node => {
-  const wallet = genSigningWalletWithCache();
+  const wallet = genShelleyCIP1852SigningWalletWithCache();
   const lookup = walletLookup([wallet]);
 
   const addressFilter = AddressFilter.None;
-  const location = routeForStore(GROUP_EXTERNAL.name);
+  const location = routeForStore(BASE_EXTERNAL.name);
 
   const addressSubgroupMap = genDefaultGroupMap(true);
-  const addresses = genAddresses('jormungandr');
-  addressSubgroupMap.set(GROUP_EXTERNAL.class, {
+  const addresses = [
+    unusedProps('addr1q8gpjmyy8zk9nuza24a0f4e7mgp9gd6h3uayp0rqnjnkl54v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqphf76y'),
+    noUtxoProps('addr1q99u7t32p2sf9tx87t35pmjyd82qh3877fuha28jddpcus9v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqxra3as'),
+    withUtxo('addr1qxacxugp8h6snaap4w9j430zpsgyve50ypmn8pz0cz9v484v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqamgwnn'),
+  ];
+  addressSubgroupMap.set(BASE_EXTERNAL.class, {
     all: addresses,
     wasExecuted: true,
   });
@@ -701,15 +907,19 @@ export const UriGenerateDialog = (): Node => {
 };
 
 export const UriDisplayDialog = (): Node => {
-  const wallet = genSigningWalletWithCache();
+  const wallet = genShelleyCIP1852SigningWalletWithCache();
   const lookup = walletLookup([wallet]);
 
   const addressFilter = AddressFilter.None;
-  const location = routeForStore(GROUP_EXTERNAL.name);
+  const location = routeForStore(BASE_EXTERNAL.name);
 
-  const addresses = genAddresses('jormungandr');
+  const addresses = [
+    unusedProps('addr1q8gpjmyy8zk9nuza24a0f4e7mgp9gd6h3uayp0rqnjnkl54v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqphf76y'),
+    noUtxoProps('addr1q99u7t32p2sf9tx87t35pmjyd82qh3877fuha28jddpcus9v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqxra3as'),
+    withUtxo('addr1qxacxugp8h6snaap4w9j430zpsgyve50ypmn8pz0cz9v484v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqamgwnn'),
+  ];
   const addressSubgroupMap = genDefaultGroupMap(true);
-  addressSubgroupMap.set(GROUP_EXTERNAL.class, {
+  addressSubgroupMap.set(BASE_EXTERNAL.class, {
     all: addresses,
     wasExecuted: true,
   });
@@ -749,15 +959,19 @@ export const UriDisplayDialog = (): Node => {
 };
 
 export const VerifyRegularAddress = (): Node => {
-  const wallet = genSigningWalletWithCache();
+  const wallet = genShelleyCIP1852SigningWalletWithCache();
   const lookup = walletLookup([wallet]);
 
   const addressFilter = AddressFilter.None;
-  const location = routeForStore(GROUP_EXTERNAL.name);
+  const location = routeForStore(BASE_EXTERNAL.name);
 
   const addressSubgroupMap = genDefaultGroupMap(true);
-  addressSubgroupMap.set(GROUP_EXTERNAL.class, {
-    all: genAddresses('jormungandr'),
+  addressSubgroupMap.set(BASE_EXTERNAL.class, {
+    all: [
+      unusedProps('addr1q8gpjmyy8zk9nuza24a0f4e7mgp9gd6h3uayp0rqnjnkl54v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqphf76y'),
+      noUtxoProps('addr1q99u7t32p2sf9tx87t35pmjyd82qh3877fuha28jddpcus9v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqxra3as'),
+      withUtxo('addr1qxacxugp8h6snaap4w9j430zpsgyve50ypmn8pz0cz9v484v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqamgwnn'),
+    ],
     wasExecuted: true,
   });
 
@@ -788,7 +1002,7 @@ export const VerifyRegularAddress = (): Node => {
 };
 
 export const VerifyLedgerAddress = (): Node => {
-  const wallet = genSigningWalletWithCache(ConceptualWalletId => ({
+  const wallet = genShelleyCIP1852SigningWalletWithCache(ConceptualWalletId => ({
     ConceptualWalletId,
     ...mockLedgerMeta
   }));
@@ -800,11 +1014,15 @@ export const VerifyLedgerAddress = (): Node => {
   const lookup = walletLookup([wallet]);
 
   const addressFilter = AddressFilter.None;
-  const location = routeForStore(GROUP_EXTERNAL.name);
+  const location = routeForStore(BASE_EXTERNAL.name);
 
   const addressSubgroupMap = genDefaultGroupMap(true);
-  addressSubgroupMap.set(GROUP_EXTERNAL.class, {
-    all: genAddresses('jormungandr'),
+  addressSubgroupMap.set(BASE_EXTERNAL.class, {
+    all: [
+      unusedProps('addr1q8gpjmyy8zk9nuza24a0f4e7mgp9gd6h3uayp0rqnjnkl54v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqphf76y'),
+      noUtxoProps('addr1q99u7t32p2sf9tx87t35pmjyd82qh3877fuha28jddpcus9v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqxra3as'),
+      withUtxo('addr1qxacxugp8h6snaap4w9j430zpsgyve50ypmn8pz0cz9v484v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqamgwnn'),
+    ],
     wasExecuted: true,
   });
 

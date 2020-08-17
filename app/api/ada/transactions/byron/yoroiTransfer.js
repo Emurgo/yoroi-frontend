@@ -67,7 +67,7 @@ export async function buildYoroiTransferTx(payload: {|
       }: BaseSignRequest<RustModule.WalletV4.TransactionBuilder>),
       payload.keyLevel,
       payload.signingKey,
-      () => [],
+      new Set(),
       undefined,
     );
 
@@ -82,7 +82,7 @@ export async function buildYoroiTransferTx(payload: {|
       encodedTx: signedTx.to_bytes(),
       // only display unique addresses
       senders: Array.from(new Set(senderUtxos.map(utxo => utxo.receiver))),
-      receiver: outputAddr,
+      receivers: [outputAddr],
     };
   } catch (error) {
     Logger.error(`transfer::${nameof(buildYoroiTransferTx)} ${stringifyError(error)}`);

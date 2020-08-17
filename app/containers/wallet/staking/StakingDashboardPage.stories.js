@@ -8,15 +8,19 @@ import { action } from '@storybook/addon-actions';
 import { withScreenshot } from 'storycap';
 import {
   globalKnobs,
-  walletLookup,
-  genSigningWalletWithCache,
-  genUndelegateTx,
-  genTentativeTx,
   genUnitOfAccount,
 } from '../../../../stories/helpers/StoryWrapper';
+import {
+  genJormungandrSigningWalletWithCache,
+  genJormungandrUndelegateTx,
+  genTentativeJormungandrTx,
+} from '../../../../stories/helpers/jormungandr/JormungandrMocks';
+import {
+  walletLookup
+} from '../../../../stories/helpers/WalletCache';
 import type {
-  CacheValue
-} from '../../../../stories/helpers/StoryWrapper';
+  PossibleCacheTypes
+} from '../../../../stories/helpers/WalletCache';
 import CachedRequest from '../../../stores/lib/LocalizedCachedRequest';
 import type { GetBalanceFunc } from '../../../api/common/types';
 import StakingDashboardPage from './StakingDashboardPage';
@@ -42,7 +46,7 @@ import LessThanExpectedDialog from '../../../components/wallet/staking/dashboard
 import UnmangleTxDialogContainer from '../../transfer/UnmangleTxDialogContainer';
 import PoolWarningDialog from '../../../components/wallet/staking/dashboard/PoolWarningDialog';
 import UndelegateDialog from '../../../components/wallet/staking/dashboard/UndelegateDialog';
-import { GROUP_MANGLED } from '../../../stores/stateless/addressStores';
+import { GROUP_MANGLED, allAddressSubgroups } from '../../../stores/stateless/addressStores';
 import type { StandardAddress } from '../../../types/AddressFilterTypes';
 import {
   TransactionType,
@@ -50,11 +54,26 @@ import {
 import type {
   JormungandrTransactionInsert, NetworkRow,
 } from '../../../api/ada/lib/storage/database/primitives/tables';
+import type { IAddressTypeStore, IAddressTypeUiSubset } from '../../../stores/stateless/addressStores';
 
 export default {
   title: `${__filename.split('.')[0]}`,
   component: StakingDashboardPage,
   decorators: [withScreenshot],
+};
+
+const genDefaultGroupMap: (
+  void => Map<Class<IAddressTypeStore>, IAddressTypeUiSubset>
+) = () => {
+  return new Map(
+    allAddressSubgroups.map(type => [
+      type.class,
+      {
+        all: [],
+        wasExecuted: true,
+      },
+    ])
+  );
 };
 
 const getRoute = (id) => buildRoute(
@@ -63,10 +82,11 @@ const getRoute = (id) => buildRoute(
 );
 
 const genBaseProps: {|
-  wallet: CacheValue,
+  wallet: PossibleCacheTypes,
   lookup: *,
   transactionBuilderStore?: *,
   openDialog?: *,
+  sendMoneyRequest?: *,
   delegationTransaction?: *,
   allowToggleHidden?: *,
   mangledInfo?: {|
@@ -98,6 +118,10 @@ const genBaseProps: {|
         unitOfAccount: genUnitOfAccount(),
       },
       wallets: {
+        sendMoneyRequest: request.sendMoneyRequest || {
+          error: undefined,
+          isExecuting: false,
+        },
         selected: request.wallet.publicDeriver,
       },
       coinPriceStore: {
@@ -143,10 +167,6 @@ const genBaseProps: {|
               isExecuting: false,
               error: undefined,
               result: undefined,
-            },
-            signAndBroadcastDelegationTx: {
-              error: undefined,
-              isExecuting: false,
             },
           },
         },
@@ -204,35 +224,54 @@ const genBaseProps: {|
     },
     UnmangleTxDialogContainerProps: {
       generated: {
+        TransferSendProps: {
+          generated: {
+            actions: {
+              wallets: {
+                sendMoney: {
+                  trigger: async (req) => action('sendMoney')(req),
+                },
+              },
+            },
+            stores: {
+              addresses: {
+                addressSubgroupMap: genDefaultGroupMap(),
+              },
+              coinPriceStore: {
+                getCurrentPrice: (_from, _to) => 5,
+              },
+              wallets: {
+                selected: request.wallet.publicDeriver,
+                sendMoneyRequest: (
+                  request.transactionBuilderStore == null
+                  || request.transactionBuilderStore.tentativeTx == null
+                )
+                  ? {
+                    reset: action('reset'),
+                    error: undefined,
+                    isExecuting: false,
+                  }
+                  : {
+                    reset: action('reset'),
+                    error: sendErrorValue() === sendErrorCases.None
+                      ? undefined
+                      : sendErrorValue(),
+                    isExecuting: boolean('isExecuting', false),
+                  },
+              },
+              explorers: {
+                selectedExplorer: defaultToSelectedExplorer(),
+              },
+              profile: {
+                isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
+                unitOfAccount: genUnitOfAccount(),
+              },
+            },
+          },
+        },
         stores: {
-          explorers: {
-            selectedExplorer: defaultToSelectedExplorer(),
-          },
-          profile: {
-            isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
-            unitOfAccount: genUnitOfAccount(),
-          },
           wallets: {
             selected: request.wallet.publicDeriver,
-            sendMoneyRequest: (
-              request.transactionBuilderStore == null
-              || request.transactionBuilderStore.tentativeTx == null
-            )
-              ? {
-                reset: action('reset'),
-                error: undefined,
-                isExecuting: false,
-              }
-              : {
-                reset: action('reset'),
-                error: sendErrorValue() === sendErrorCases.None
-                  ? undefined
-                  : sendErrorValue(),
-                isExecuting: boolean('isExecuting', false),
-              },
-          },
-          coinPriceStore: {
-            getCurrentPrice: (_from, _to) => 5,
           },
           addresses: {
             addressSubgroupMap: new Map([[
@@ -252,11 +291,6 @@ const genBaseProps: {|
             },
             reset: {
               trigger: action('reset'),
-            },
-          },
-          wallets: {
-            sendMoney: {
-              trigger: async (req) => action('sendMoney')(req),
             },
           },
         },
@@ -483,7 +517,7 @@ function getStakingInfo(
 
 export const Loading = (): Node => {
   const genWallet = () => {
-    const wallet = genSigningWalletWithCache();
+    const wallet = genJormungandrSigningWalletWithCache();
     const getDelegatedBalance: CachedRequest<GetDelegatedBalanceFunc> = new CachedRequest(
       _request => Promise.resolve({
         utxoPart: new BigNumber(0),
@@ -592,7 +626,7 @@ export const Loading = (): Node => {
 
 export const DelegationCases = (): Node => {
   const genWallet = () => {
-    const wallet = genSigningWalletWithCache();
+    const wallet = genJormungandrSigningWalletWithCache();
     const getStakingKeyValue = () => select(
       'stakingKeyCases',
       stakingKeyCases,
@@ -646,7 +680,7 @@ export const DelegationCases = (): Node => {
 
 export const Errors = (): Node => {
   const genWallet = () => {
-    const wallet = genSigningWalletWithCache();
+    const wallet = genJormungandrSigningWalletWithCache();
     {
       const requests = wallet.getTimeCalcRequests(wallet.publicDeriver).requests;
       Object.keys(requests).map(key => requests[key]).forEach(request => request.execute());
@@ -717,7 +751,7 @@ export const Errors = (): Node => {
 
 // wallet we can reuse for multiple tests
 const genBaseWallet = () => {
-  const wallet = genSigningWalletWithCache();
+  const wallet = genJormungandrSigningWalletWithCache();
   {
     const requests = wallet.getTimeCalcRequests(wallet.publicDeriver).requests;
     Object.keys(requests).map(key => requests[key]).forEach(request => request.execute());
@@ -810,19 +844,19 @@ export const UndelegateExecuting = (): Node => {
         lookup,
         getLocalPoolInfo: mockGetPoolInfo,
         openDialog: UndelegateDialog,
+        sendMoneyRequest: {
+          error: undefined,
+          isExecuting: false,
+        },
         delegationTransaction: {
           isStale: false,
           createDelegationTx: {
             isExecuting: true,
             error: undefined,
             result: {
-              unsignedTx: genUndelegateTx(wallet.publicDeriver),
+              signTxRequest: genJormungandrUndelegateTx(wallet.publicDeriver),
               totalAmountToDelegate: new BigNumber(0),
             },
-          },
-          signAndBroadcastDelegationTx: {
-            error: undefined,
-            isExecuting: false,
           },
         },
       })}
@@ -845,19 +879,19 @@ export const UndelegateError = (): Node => {
         lookup,
         getLocalPoolInfo: mockGetPoolInfo,
         openDialog: UndelegateDialog,
+        sendMoneyRequest: {
+          error: undefined,
+          isExecuting: false,
+        },
         delegationTransaction: {
           isStale: false,
           createDelegationTx: {
             isExecuting: true,
             error: new GenericApiError(),
             result: {
-              unsignedTx: genUndelegateTx(wallet.publicDeriver),
+              signTxRequest: genJormungandrUndelegateTx(wallet.publicDeriver),
               totalAmountToDelegate: new BigNumber(0),
             },
-          },
-          signAndBroadcastDelegationTx: {
-            error: undefined,
-            isExecuting: false,
           },
         },
       })}
@@ -889,21 +923,21 @@ export const UndelegateDialogShown = (): Node => {
         lookup,
         getLocalPoolInfo: mockGetPoolInfo,
         openDialog: UndelegateDialog,
+        sendMoneyRequest: {
+          error: getError() === errorCases.NoError
+            ? undefined
+            : new GenericApiError(),
+          isExecuting: boolean('isExecuting', false),
+        },
         delegationTransaction: {
           isStale: boolean('isStale', false),
           createDelegationTx: {
             isExecuting: false,
             error: undefined,
             result: {
-              unsignedTx: genUndelegateTx(wallet.publicDeriver),
+              signTxRequest: genJormungandrUndelegateTx(wallet.publicDeriver),
               totalAmountToDelegate: new BigNumber(0),
             },
-          },
-          signAndBroadcastDelegationTx: {
-            error: getError() === errorCases.NoError
-              ? undefined
-              : new GenericApiError(),
-            isExecuting: boolean('isExecuting', false),
           },
         },
       })}
@@ -1087,7 +1121,7 @@ export const UnmangleDialogError = (): Node => {
 export const UnmangleDialogConfirm = (): Node => {
   const wallet = genBaseWallet();
   const lookup = walletLookup([wallet]);
-  const { tentativeTx } = genTentativeTx(wallet.publicDeriver);
+  const { tentativeTx } = genTentativeJormungandrTx();
   return wrapWallet(
     mockWalletProps({
       location: getRoute(wallet.publicDeriver.getPublicDeriverId()),

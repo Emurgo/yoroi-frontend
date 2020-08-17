@@ -22,6 +22,7 @@ import type { PriceDataRow } from '../../../api/ada/lib/storage/database/prices/
 import { getPriceKey } from '../../../api/common/lib/storage/bridge/prices';
 import type { $npm$ReactIntl$IntlFormat, } from 'react-intl';
 import type { Notification } from '../../../types/notificationType';
+import { genAddressLookup } from '../../../stores/stateless/addressStores';
 
 const messages = defineMessages({
   showMoreTransactionsButtonLabel: {
@@ -49,10 +50,7 @@ type Props = {|
     +primaryTicker: string,
     +settings: UnitOfAccountSettingType,
   |},
-  +addressLookup: string => void | {|
-    goToRoute: void => void,
-    name: string,
-  |},
+  +addressLookup: ReturnType<typeof genAddressLookup>,
   +onCopyAddressTooltip: (string, string) => void,
   +notification: ?Notification,
   +decimalPlaces: number, // TODO: this should be tied to individual values, not the currency itself

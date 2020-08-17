@@ -17,16 +17,11 @@
     margin-bottom: 20px;
   }
 
-  .addressLabel,
-  .addressSubLabel {
+  .addressLabel {
     font-size: 12px;
     font-weight: 600;
     letter-spacing: 0.5px;
     line-height: 1.38;
-  }
-
-  .addressSubLabel {
-    margin-top: 6px;
   }
 
   .address {
@@ -100,6 +95,10 @@
   .totalAmountSmall {
     @extend .totalAmount;
     font-size: 12px;
+  }
+
+  .refund {
+    margin-top: 20px;
   }
 
   .form {

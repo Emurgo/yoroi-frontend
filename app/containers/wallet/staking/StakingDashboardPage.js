@@ -262,7 +262,7 @@ export default class StakingDashboardPage extends Component<Props> {
     return (<UndelegateDialog
       onCancel={cancel}
       classicTheme={this.generated.stores.profile.isClassicTheme}
-      error={delegationTxStore.signAndBroadcastDelegationTx.error}
+      error={this.generated.stores.wallets.sendMoneyRequest.error}
       onSubmit={async request => {
         await this.generated.actions.jormungandr
           .delegationTransaction
@@ -276,8 +276,8 @@ export default class StakingDashboardPage extends Component<Props> {
           .createDelegationTx
           .isExecuting
       }
-      isSubmitting={delegationTxStore.signAndBroadcastDelegationTx.isExecuting}
-      transactionFee={getJormungandrTxFee(delegationTx.unsignedTx.IOs, true)}
+      isSubmitting={this.generated.stores.wallets.sendMoneyRequest.isExecuting}
+      transactionFee={getJormungandrTxFee(delegationTx.signTxRequest.self().unsignedTx, true)}
       staleTx={delegationTxStore.isStale}
       decimalPlaces={apiMeta.decimalPlaces.toNumber()}
     />);
@@ -857,10 +857,6 @@ export default class StakingDashboardPage extends Component<Props> {
               result: ?PromisslessReturnType<CreateDelegationTxFunc>
             |},
             isStale: boolean,
-            signAndBroadcastDelegationTx: {|
-              error: ?LocalizableError,
-              isExecuting: boolean
-            |}
           |},
         |}
       |},
@@ -876,7 +872,13 @@ export default class StakingDashboardPage extends Component<Props> {
         getTooltipActiveNotification: string => ?Notification,
         isOpen: string => boolean
       |},
-      wallets: {| selected: null | PublicDeriver<> |}
+      wallets: {|
+        sendMoneyRequest: {|
+          error: ?LocalizableError,
+          isExecuting: boolean,
+        |},
+        selected: null | PublicDeriver<>,
+      |}
     |}
     |} {
     if (this.props.generated !== undefined) {
@@ -924,6 +926,10 @@ export default class StakingDashboardPage extends Component<Props> {
         },
         wallets: {
           selected: stores.wallets.selected,
+          sendMoneyRequest: {
+            error: stores.wallets.sendMoneyRequest.error,
+            isExecuting: stores.wallets.sendMoneyRequest.isExecuting,
+          },
         },
         coinPriceStore: {
           getCurrentPrice: stores.coinPriceStore.getCurrentPrice,
@@ -954,11 +960,6 @@ export default class StakingDashboardPage extends Component<Props> {
                 isExecuting: jormungandrStore.delegationTransaction.createDelegationTx.isExecuting,
                 error: jormungandrStore.delegationTransaction.createDelegationTx.error,
                 result: jormungandrStore.delegationTransaction.createDelegationTx.result,
-              },
-              signAndBroadcastDelegationTx: {
-                error: jormungandrStore.delegationTransaction.signAndBroadcastDelegationTx.error,
-                isExecuting:
-                  jormungandrStore.delegationTransaction.signAndBroadcastDelegationTx.isExecuting,
               },
             },
           },

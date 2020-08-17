@@ -20,6 +20,7 @@ export type RestoreModeType = {|
 |} | {|
   type: 'cip1852',
   extra: void,
+  chain?: number,
   length: (
     typeof config.wallets.WALLET_RECOVERY_PHRASE_WORD_COUNT |
     typeof config.wallets.DAEDALUS_SHELLEY_RECOVERY_PHRASE_WORD_COUNT
@@ -33,6 +34,7 @@ export type RestoreModeType = {|
     typeof config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT |
     typeof config.wallets.DAEDALUS_PAPER_RECOVERY_PHRASE_WORD_COUNT
   ),
+  chain?: number,
 |} | {|
   type: 'bip44' | 'cip1852',
   extra: 'ledger' | 'trezor',

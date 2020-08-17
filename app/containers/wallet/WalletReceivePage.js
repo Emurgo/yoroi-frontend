@@ -8,6 +8,7 @@ import config from '../../config';
 import WalletReceive from '../../components/wallet/WalletReceive';
 import StandardHeader from '../../components/wallet/receive/StandardHeader';
 import InternalHeader from '../../components/wallet/receive/InternalHeader';
+import RewardHeader from '../../components/wallet/receive/RewardHeader';
 import MangledHeader from '../../components/wallet/receive/MangledHeader';
 import VerticalFlexContainer from '../../components/layout/VerticalFlexContainer';
 import VerifyAddressDialog from '../../components/wallet/receive/VerifyAddressDialog';
@@ -162,6 +163,9 @@ export default class WalletReceivePage extends Component<Props> {
       if (addressTypeStore.meta.name.subgroup === AddressSubgroup.internal) {
         return (<InternalHeader />);
       }
+      if (addressTypeStore.meta.name.group === AddressGroupTypes.reward) {
+        return (<RewardHeader />);
+      }
       if (addressTypeStore.meta.name.subgroup === AddressSubgroup.mangled) {
         return (
           <MangledHeader
@@ -224,7 +228,9 @@ export default class WalletReceivePage extends Component<Props> {
             this.openVerifyAddressDialog();
           }}
           onGeneratePaymentURI={
-            !isCardanoHaskell(publicDeriver.getParent().getNetworkInfo()) || (
+            !isCardanoHaskell(publicDeriver.getParent().getNetworkInfo()) ||
+            addressTypeStore.meta.name.group === AddressGroupTypes.reward ||
+            (
               addressTypeStore.meta.name.subgroup !== AddressSubgroup.external &&
               addressTypeStore.meta.name.subgroup !== AddressSubgroup.all
             )
@@ -313,6 +319,21 @@ export default class WalletReceivePage extends Component<Props> {
             error={hwVerifyAddress.error}
             walletAddress={hwVerifyAddress.selectedAddress.address}
             walletPath={hwVerifyAddress.selectedAddress.path}
+            onCopyAddressTooltip={(elementId) => {
+              if (!uiNotifications.isOpen(elementId)) {
+                runInAction(() => {
+                  this.notificationElementId = elementId;
+                });
+                actions.notifications.open.trigger({
+                  id: elementId,
+                  duration: tooltipNotification.duration,
+                  message: tooltipNotification.message,
+                });
+              }
+            }}
+            notification={uiNotifications.getTooltipActiveNotification(
+              this.notificationElementId
+            )}
             isHardware={isHwWallet}
             verify={() => actions.ada.hwVerifyAddress.verifyAddress.trigger(publicDeriver)}
             cancel={actions.ada.hwVerifyAddress.closeAddressDetailDialog.trigger}

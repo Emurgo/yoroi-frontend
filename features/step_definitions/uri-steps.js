@@ -3,6 +3,7 @@
 import { When, Then } from 'cucumber';
 import { By } from 'selenium-webdriver';
 import { expect } from 'chai';
+import { truncateAddress, } from '../../app/utils/formatters';
 
 When(/^I click on "generate payment URL" button$/, async function () {
   await this.click('.WalletReceive_generateURIIcon');
@@ -44,7 +45,7 @@ Then(/^I should see and accept a warning dialog$/, async function () {
 Then(/^I should see a dialog with the transaction details$/, async function (table) {
   const fields = table.hashes()[0];
   await this.waitForElement('.URIVerifyDialog');
-  await this.waitUntilContainsText('.URIVerifyDialog_address', fields.address);
+  await this.waitUntilContainsText('.URIVerifyDialog_address', truncateAddress(fields.address));
   await this.waitUntilContainsText('.URIVerifyDialog_amount', fields.amount);
 });
 

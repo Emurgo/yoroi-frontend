@@ -8,9 +8,14 @@ import WalletSettingsPage from './WalletSettingsPage';
 import { withScreenshot } from 'storycap';
 import { THEMES } from '../../../themes';
 import {
-  globalKnobs, genDummyWithCache, genSigningWalletWithCache,
-  walletLookup,
+  globalKnobs,
 } from '../../../../stories/helpers/StoryWrapper';
+import {
+  genShelleyCip1852DummyWithCache, genShelleyCIP1852SigningWalletWithCache,
+} from '../../../../stories/helpers/cardano/ShelleyCip1852Mocks';
+import {
+  walletLookup,
+} from '../../../../stories/helpers/WalletCache';
 import { IncorrectWalletPasswordError } from '../../../api/common/errors';
 import ChangeWalletPasswordDialogContainer from '../../wallet/dialogs/ChangeWalletPasswordDialogContainer';
 import RemoveWalletDialogContainer from './RemoveWalletDialogContainer';
@@ -104,7 +109,7 @@ export const NoWallet = (): Node => {
 };
 
 export const EditName = (): Node => {
-  const wallet = genDummyWithCache();
+  const wallet = genShelleyCip1852DummyWithCache();
   const lookup = walletLookup([wallet]);
   return wrapSettings(
     mockSettingsProps({
@@ -162,7 +167,7 @@ export const PasswordUpdateTime = (): Node => {
       lastUpdateCases,
       lastUpdateCases.Never,
     );
-    const wallet = genSigningWalletWithCache();
+    const wallet = genShelleyCIP1852SigningWalletWithCache();
     wallet.getSigningKeyCache = (publicDeriver) => ({
       publicDeriver,
       signingKeyUpdateDate: lastUpdateValue() === lastUpdateCases.Never
@@ -206,7 +211,7 @@ export const PasswordUpdateTime = (): Node => {
 };
 
 export const ResyncWallet = (): Node => {
-  const wallet = genDummyWithCache();
+  const wallet = genShelleyCip1852DummyWithCache();
   const lookup = walletLookup([wallet]);
   return wrapSettings(
     mockSettingsProps({
@@ -294,7 +299,7 @@ const defaultChangeWalletPasswordDialogContainerProps: void => * = (_request) =>
 });
 
 export const EditPassword = (): Node => {
-  const wallet = genSigningWalletWithCache();
+  const wallet = genShelleyCIP1852SigningWalletWithCache();
   const lookup = walletLookup([wallet]);
   return wrapSettings(
     mockSettingsProps({
@@ -401,7 +406,7 @@ export const EditPassword = (): Node => {
 };
 
 export const RemoveWallet = (): Node => {
-  const wallet = genDummyWithCache();
+  const wallet = genShelleyCip1852DummyWithCache();
   const lookup = walletLookup([wallet]);
   return wrapSettings(
     mockSettingsProps({

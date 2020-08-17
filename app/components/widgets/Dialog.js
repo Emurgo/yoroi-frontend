@@ -27,7 +27,7 @@ type Props = {|
   +closeButton?: Element<any>,
   +backButton?: Node,
   +className?: string,
-  +styleOveride?: {...},
+  +styleOverride?: {...},
   +onClose?: ?(void => PossiblyAsync<void>),
   +closeOnOverlayClick?: boolean,
 |};
@@ -42,7 +42,7 @@ export default class Dialog extends Component<Props> {
     closeButton: void,
     closeOnOverlayClick: void,
     onClose: void,
-    styleOveride: void,
+    styleOverride: void,
     title: void,
   |} = {
     title: undefined,
@@ -51,7 +51,7 @@ export default class Dialog extends Component<Props> {
     closeButton: undefined,
     backButton: undefined,
     className: undefined,
-    styleOveride: undefined,
+    styleOverride: undefined,
     onClose: undefined,
     closeOnOverlayClick: undefined,
   };
@@ -82,7 +82,7 @@ export default class Dialog extends Component<Props> {
 
         <div
           className={classnames([styles.component, className])}
-          style={this.props.styleOveride}
+          style={this.props.styleOverride}
         >
           {(title != null && title !== '')
             ? (

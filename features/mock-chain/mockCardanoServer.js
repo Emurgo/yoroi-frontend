@@ -5,6 +5,7 @@ import type {
   AddressUtxoRequest, AddressUtxoResponse,
   UtxoSumRequest, UtxoSumResponse,
   HistoryRequest, HistoryResponse,
+  AccountStateRequest, AccountStateResponse,
   BestBlockRequest, BestBlockResponse,
   SignedResponse,
   SignedRequestInternal,
@@ -41,6 +42,17 @@ function _defaultSignedTransaction(
 ): void {
   const response = mockImporter.sendTx(req.body);
   res.send(response);
+}
+
+const expectedTxBase64 = [];
+
+export function setExpectedTx(signedTx: void | string): void {
+  if (signedTx == null) {
+    // remove all elements from the array
+    expectedTxBase64.splice(0, expectedTxBase64.length);
+  } else {
+    expectedTxBase64[0] = signedTx;
+  }
 }
 
 // TODO: no type from json-server
@@ -113,11 +125,24 @@ export function getMockServer(
         ...
       }
     ): void => {
+      // note: don't use this in practice because ttl makes the tx hash computer-time-sensitive
+      if (expectedTxBase64.length !== 0 && expectedTxBase64[0] !== req.body.signedTx) {
+        throw new Error(`Wrong transaction payload. Expected ${expectedTxBase64[0]} and found ${req.body.signedTx}`);
+      }
       if (settings.signedTransaction) {
         settings.signedTransaction(req, res);
       } else {
         _defaultSignedTransaction(req, res);
       }
+    });
+
+    server.post('/api/getAccountState', async (
+      req: { body: AccountStateRequest, ... },
+      res: { send(arg: AccountStateResponse): any, ... }
+    ): Promise<void> => {
+      chai.assert.isTrue(_validateAddressesReq(req.body));
+      const accountState = await mockImporter.getAccountState(req.body);
+      res.send(accountState);
     });
 
     server.post('/api/v2/addresses/filterUsed', async (

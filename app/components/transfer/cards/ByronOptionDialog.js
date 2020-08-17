@@ -34,7 +34,7 @@ const daedalusMessages = defineMessages({
   },
 });
 
-export const icarusMessages: * = defineMessages({
+const icarusMessages: * = defineMessages({
   transferText: {
     id: 'transfer.legacy.icarus.title',
     defaultMessage: '!!!Icarus/Yoroi Wallet',
@@ -145,7 +145,7 @@ export default class ByronOptionDialog extends Component<Props, State> {
           parentName="fromDaedalusWallet12Word"
           type="legacyDaedalus"
           title={intl.formatMessage(daedalusMessages.fromLegacyDaedalus)}
-          learnMoreText={intl.formatMessage(globalMessages.legacyAttentionText)}
+          learnMoreText={intl.formatMessage(globalMessages.restoreByronEraWalletDescription)}
           onSubmit={this.props.daedalus.onStandard}
         />
         <OptionBlock
@@ -153,14 +153,14 @@ export default class ByronOptionDialog extends Component<Props, State> {
           type="legacyDaedalus"
           onSubmit={this.props.daedalus.onPaper}
           title={intl.formatMessage(daedalusMessages.transferPaperText)}
-          learnMoreText={intl.formatMessage(globalMessages.legacyAttentionText)}
+          learnMoreText={intl.formatMessage(globalMessages.restoreByronEraWalletDescription)}
         />
         <OptionBlock
           parentName="fromDaedalusMasterKey"
           type="legacyDaedalus"
           onSubmit={this.props.daedalus.onMaster}
           title={intl.formatMessage(daedalusMessages.transferMasterKeyText)}
-          learnMoreText={intl.formatMessage(globalMessages.legacyAttentionText)}
+          learnMoreText={intl.formatMessage(globalMessages.restoreByronEraWalletDescription)}
         />
       </>
     );
@@ -174,7 +174,7 @@ export default class ByronOptionDialog extends Component<Props, State> {
           parentName="fromIcarusWallet15Word"
           type="restoreNormalWallet"
           title={intl.formatMessage(icarusMessages.mnemonicLabel15)}
-          learnMoreText={intl.formatMessage(globalMessages.legacyAttentionText)}
+          learnMoreText={intl.formatMessage(globalMessages.restoreByronEraWalletDescription)}
           onSubmit={this.props.icarus.onStandard}
         />
         <OptionBlock
@@ -182,7 +182,7 @@ export default class ByronOptionDialog extends Component<Props, State> {
           type="restorePaperWallet"
           onSubmit={this.props.icarus.onPaper}
           title={intl.formatMessage(icarusMessages.yoroiPaperLabel)}
-          learnMoreText={intl.formatMessage(globalMessages.legacyAttentionText)}
+          learnMoreText={intl.formatMessage(globalMessages.restoreByronEraWalletDescription)}
         />
         {this.props.complexityLevel === ComplexityLevels.Advanced && (
           <>
@@ -191,14 +191,14 @@ export default class ByronOptionDialog extends Component<Props, State> {
               type="connectLedger"
               onSubmit={this.props.icarus.onLedger}
               title={intl.formatMessage(icarusMessages.legacyLedgerTitle)}
-              learnMoreText={intl.formatMessage(globalMessages.legacyAttentionText)}
+              learnMoreText={intl.formatMessage(globalMessages.restoreByronEraWalletDescription)}
             />
             <OptionBlock
               parentName="fromTrezor"
               type="connectTrezor"
               onSubmit={this.props.icarus.onTrezor}
               title={intl.formatMessage(icarusMessages.legacyTrezorTitle)}
-              learnMoreText={intl.formatMessage(globalMessages.legacyAttentionText)}
+              learnMoreText={intl.formatMessage(globalMessages.restoreByronEraWalletDescription)}
             />
           </>
         )}

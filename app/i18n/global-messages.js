@@ -449,13 +449,17 @@ const globalMessages: * = defineMessages({
     id: 'wallet.summary.page.yesterdayLabel',
     defaultMessage: '!!!Yesterday',
   },
-  legacyAttentionText: {
-    id: 'transfer.instructions.attention.legacy',
-    defaultMessage: '!!!Legacy wallets created during the Byron-era (before November 29th, 2019) can no longer be used. However, you can transfer your legacy funds to your current wallet to access your funds.',
-  },
   uriLandingDialogConfirmLabel: {
     id: 'uri.landing.dialog.confirm.label',
     defaultMessage: '!!!I understand',
+  },
+  restoreByronEraWalletDescription: {
+    id: 'wallet.add.optionDialog.walletEra.byronEra.description',
+    defaultMessage: '!!!Wallets created before July 29th, 2020 are Byron-era wallets and cannot delegate.',
+  },
+  restoreShelleyEraWalletDescription: {
+    id: 'wallet.add.optionDialog.walletEra.shelleyEra.description',
+    defaultMessage: '!!!Shelley-era wallets support delegation to stake pools.',
   },
   hardwareTransferInstructions: {
     id: 'transfer.instructions.hardware.disclaimer.instructions1',
@@ -588,6 +592,14 @@ const globalMessages: * = defineMessages({
   stakePoolHash: {
     id: 'wallet.delegation.transaction.stakePoolHash',
     defaultMessage: '!!!Stake pool id',
+  },
+  finalBalanceLabel: {
+    id: 'transfer.summary.finalBalance.label',
+    defaultMessage: '!!!Final balance',
+  },
+  withdrawalsLabel: {
+    id: 'wallet.transaction.withdrawalsLabel',
+    defaultMessage: '!!!Withdrawals',
   },
 });
 export default globalMessages;

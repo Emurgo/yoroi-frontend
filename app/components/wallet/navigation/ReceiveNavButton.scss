@@ -1,7 +1,6 @@
 // ========= LAYOUT =========
 
 .wrapper {
-  position: relative;
   display: flex;
   font-family: var(--font-light);
   color: var(--theme-wallet-plate-secondary-text-color);
@@ -42,7 +41,7 @@
 
 
 .icon {
-  position: absolute;
+  position: relative;
   right: 24px;
   top: 7px;
 

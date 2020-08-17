@@ -41,7 +41,7 @@ export function convertToLocalizableError(error: Error): LocalizableError {
       default:
         /** we are not able to figure out why Error is thrown
           * make it, Something unexpected happened */
-        Logger.error(`TrezorSendStore::_convertToLocalizableError::error: ${error.message}`);
+        Logger.error(`TrezorLocalizedError::${nameof(convertToLocalizableError)}::error: ${error.message}`);
         localizableError = new UnexpectedError();
         break;
     }

@@ -12,6 +12,7 @@ import { generateWalletRootKey, generateLedgerWalletRootKey, } from '../../api/a
 import {
   HARD_DERIVATION_START,
   WalletTypePurpose,
+  ChainDerivations,
   CoinTypes,
 } from '../../config/numbersConfig';
 import type { RestoreWalletForTransferResponse, RestoreWalletForTransferFunc } from '../../api/ada/index';
@@ -22,7 +23,9 @@ import { getCardanoHaskellBaseConfig } from '../../api/ada/lib/storage/database/
 import {
   genTimeToSlot,
 } from '../../api/ada/lib/storage/bridge/timeUtils';
-import { ApiMethodNotYetImplementedError } from '../lib/Request';
+import {
+  asGetAllUtxos, asHasUtxoChains,
+} from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 
 export default class AdaYoroiTransferStore extends Store {
 
@@ -78,20 +81,71 @@ export default class AdaYoroiTransferStore extends Store {
     recoveryPhrase: string,
     updateStatusCallback: void => void,
     getDestinationAddress: void => Promise<string>,
-  |} => Promise<TransferTx> = async (_request) => {
-    // const rootPk = this.stores.yoroiTransfer.mode?.extra === 'ledger'
-    //   ? generateLedgerWalletRootKey(request.recoveryPhrase)
-    //   : generateWalletRootKey(request.recoveryPhrase);
+  |} => Promise<TransferTx> = async (request) => {
+    const { createWithdrawalTx } = this.stores.substores.ada.delegationTransaction;
+    createWithdrawalTx.reset();
 
-    // const accountIndex = 0 + HARD_DERIVATION_START; // TODO: don't hardcode index
-    // const stakeKey = rootPk
-    //   .derive(WalletTypePurpose.BIP44)
-    //   .derive(CoinTypes.CARDANO)
-    //   .derive(accountIndex)
-    //   .derive(ChainDerivations.CHIMERIC_ACCOUNT)
-    //   .derive(0);
+    // recall: all ITN rewards were on account path 0
+    const accountIndex = 0 + HARD_DERIVATION_START;
+    // recall: Hardware wallets weren't supported during the ITN
+    const stakeKey = generateWalletRootKey(request.recoveryPhrase)
+      .derive(WalletTypePurpose.CIP1852)
+      .derive(CoinTypes.CARDANO)
+      .derive(accountIndex)
+      .derive(ChainDerivations.CHIMERIC_ACCOUNT)
+      .derive(0);
+    const stakeCredential = RustModule.WalletV4.StakeCredential.from_keyhash(
+      stakeKey.to_raw_key().to_public().hash()
+    );
 
-    throw new ApiMethodNotYetImplementedError();
+    const { selected } = this.stores.wallets;
+    if (selected == null) {
+      throw new Error(`${nameof(AdaYoroiTransferStore)}::${nameof(this._restoreWalletForTransfer)} no wallet selected`);
+    }
+    const withUtxos = asGetAllUtxos(selected);
+    if (withUtxos == null) {
+      throw new Error(`${nameof(AdaYoroiTransferStore)}::${nameof(this._restoreWalletForTransfer)} missing utxo functionality`);
+    }
+    const withHasUtxoChains = asHasUtxoChains(withUtxos);
+    if (withHasUtxoChains == null) {
+      throw new Error(`${nameof(AdaYoroiTransferStore)}::${nameof(this._restoreWalletForTransfer)} missing chains functionality`);
+    }
+
+    const fullConfig = getCardanoHaskellBaseConfig(
+      selected.getParent().getNetworkInfo()
+    );
+    const config = fullConfig.reduce((acc, next) => Object.assign(acc, next), {});
+    const timeToSlot = await genTimeToSlot(fullConfig);
+    const absSlotNumber = new BigNumber(timeToSlot({ time: new Date() }).slot);
+
+    const rewardHex = Buffer.from(RustModule.WalletV4.RewardAddress.new(
+      Number.parseInt(config.ChainNetworkId, 10),
+      stakeCredential
+    ).to_address().to_bytes()).toString('hex');
+    const unsignedTx = await createWithdrawalTx.execute(async () => {
+      return await this.api.ada.createWithdrawalTx({
+        publicDeriver: withHasUtxoChains,
+        getAccountState: this.stores.substores.ada.stateFetchStore.fetcher.getAccountState,
+        absSlotNumber,
+        withdrawals: [{
+          privateKey: stakeKey.to_raw_key(),
+          rewardAddress: rewardHex,
+          shouldDeregister: true,
+        }],
+      });
+    }).promise;
+    if (unsignedTx == null) throw new Error(`Should never happen`);
+
+    // TODO: this isn't actually used anywhere. Should probably remove it
+    return {
+      encodedTx: Uint8Array.from([]),
+      fee: unsignedTx.fee(true),
+      id: unsignedTx.txId(),
+      receivers: unsignedTx.receivers(true),
+      recoveredBalance: new BigNumber(0),
+      senders: unsignedTx
+        .uniqueSenderAddresses(),
+    };
   }
 
   generateTransferTxForByron: {|

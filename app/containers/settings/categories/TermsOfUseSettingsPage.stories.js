@@ -10,8 +10,10 @@ import { wrapSettings } from '../../../Routes';
 import { mockSettingsProps } from '../Settings.mock';
 import {
   globalKnobs,
-  walletLookup,
 } from '../../../../stories/helpers/StoryWrapper';
+import {
+  walletLookup,
+} from '../../../../stories/helpers/WalletCache';
 import { ROUTES } from '../../../routes-config';
 
 export default {

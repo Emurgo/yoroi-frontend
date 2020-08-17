@@ -1,6 +1,6 @@
 // @flow
 
-type RestorationInput = {|
+export type RestorationInput = {|
   name: string,
   password: string,
   mnemonic: string,
@@ -26,6 +26,7 @@ function createWallet(payload: {|
 
 type WalletNames =
   'shelley-simple-24' |
+  'shelley-simple-15' |
   'small-single-tx' |
   'failed-single-tx' |
   'many-tx-wallet' |
@@ -96,5 +97,10 @@ export const testWallets: { [key: WalletNames]: RestorationInput, ... } = Object
     name: ('shelley-simple-24': WalletNames),
     mnemonic: 'reunion walnut update express purse defense slice barrel estate olympic february flock give team alert coast luggage exhaust notable bag december split furnace sponsor',
     plate: 'DSKC-9213',
+  }),
+  createWallet({
+    name: ('shelley-simple-15': WalletNames),
+    mnemonic: 'eight country switch draw meat scout mystery blade tip drift useless good keep usage title',
+    plate: 'ZDDC-9858',
   }),
 );

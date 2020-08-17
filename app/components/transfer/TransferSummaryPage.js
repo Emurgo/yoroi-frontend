@@ -16,15 +16,14 @@ import { calculateAndFormatValue } from '../../utils/unit-of-account';
 import globalMessages from '../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { SelectedExplorer } from '../../domain/SelectedExplorer';
+import { truncateAddress } from '../../utils/formatters';
+import type { TransferTx } from '../../types/TransferTypes';
+import { genAddressLookup } from '../../stores/stateless/addressStores';
 
 const messages = defineMessages({
   addressFromLabel: {
     id: 'transfer.summary.addressFrom.label',
     defaultMessage: '!!!From',
-  },
-  addressToLabel: {
-    id: 'transfer.summary.addressTo.label',
-    defaultMessage: '!!!To',
   },
   recoveredBalanceLabel: {
     id: 'transfer.summary.recoveredBalance.label',
@@ -34,32 +33,21 @@ const messages = defineMessages({
     id: 'transfer.summary.transactionFee.label',
     defaultMessage: '!!!Transaction fees',
   },
-  finalBalanceLabel: {
-    id: 'transfer.summary.finalBalance.label',
-    defaultMessage: '!!!Final balance',
-  },
   transferButtonLabel: {
     id: 'transfer.summary.transferButton.label',
     defaultMessage: '!!!Transfer Funds',
   },
-  addressFromSubLabel: {
-    id: 'yoroiTransfer.summary.addressFrom.subLabel',
-    defaultMessage: '!!!Wallet Addresses',
-  }
+  unregisterExplanation: {
+    id: 'wallet.withdrawal.transaction.unregister',
+    defaultMessage: '!!!This transaction will unregister one or more staking keys, giving you back your {refundAmount} ADA from your deposit',
+  },
 });
 
 type Props = {|
   +dialogTitle: string,
   +formattedWalletAmount: BigNumber => string,
   +selectedExplorer: SelectedExplorer,
-  +transferTx: {|
-    +recoveredBalance: BigNumber,
-    +fee: BigNumber,
-    +id?: string,
-    +senders: Array<string>,
-    +receiver: string,
-    +encodedTx?: Uint8Array,
-  |},
+  +transferTx: TransferTx,
   +onSubmit: void => PossiblyAsync<void>,
   +isSubmitting: boolean,
   +onCancel: void => void,
@@ -67,6 +55,8 @@ type Props = {|
   +form: ?Node,
   +unitOfAccountSetting: UnitOfAccountSettingType,
   +coinPrice: ?number,
+  +addressToDisplayString: string => string,
+  +addressLookup: ReturnType<typeof genAddressLookup>,
 |};
 
 /** Show user what the transfer would do to get final confirmation */
@@ -96,7 +86,7 @@ export default class TransferSummaryPage extends Component<Props> {
     ];
     return (
       <Dialog
-        styleOveride={{ '--theme-modal-min-max-width-cmn': '680px' }}
+        styleOverride={{ '--theme-modal-min-max-width-cmn': '680px' }}
         title={this.props.dialogTitle}
         actions={actions}
         closeButton={<DialogCloseButton />}
@@ -108,26 +98,64 @@ export default class TransferSummaryPage extends Component<Props> {
     );
   }
 
-  render(): Node {
+  getHeader: void => Node = () => {
     const { intl } = this.context;
-    const { transferTx, isSubmitting, error, unitOfAccountSetting, coinPrice, } = this.props;
+    const { transferTx, } = this.props;
 
-    const receiver = transferTx.receiver;
-    const recoveredBalance = this.props.formattedWalletAmount(transferTx.recoveredBalance);
-    const transactionFee = this.props.formattedWalletAmount(transferTx.fee);
-    const finalBalance = this.props.formattedWalletAmount(
-      transferTx.recoveredBalance.minus(transferTx.fee)
-    );
+    if (transferTx.withdrawals != null) {
+      const { withdrawals } = transferTx;
+      const refundSum = withdrawals.reduce(
+        (sum, curr) => (curr.refund == null ? sum : sum.plus(curr.refund)),
+        new BigNumber(0)
+      );
+      return (
+        <div className={styles.addressLabelWrapper}>
+          <div className={styles.addressLabel}>
+            {intl.formatMessage(globalMessages.withdrawalsLabel)}
+          </div>
+          {
+            withdrawals.map((withdrawal, index) => {
+              const addressesClasses = classnames([
+                'withdrawal-' + (index + 1),
+                styles.address
+              ]);
 
-    return this.wrapInDialog(
-      <div className={styles.body}>
-
+              return (
+                <div
+                  key={index /* eslint-disable-line react/no-array-index-key */}
+                >
+                  <div className={styles.addressSubLabel} />
+                  <ExplorableHashContainer
+                    selectedExplorer={this.props.selectedExplorer}
+                    light
+                    hash={this.props.addressToDisplayString(withdrawal.address)}
+                    linkType="address"
+                  >
+                    <RawHash light>
+                      <span className={addressesClasses}>
+                        {truncateAddress(this.props.addressToDisplayString(withdrawal.address))}
+                      </span>
+                    </RawHash>
+                  </ExplorableHashContainer>
+                </div>
+              );
+            })
+          }
+          {refundSum.gt(0) && (
+            <div className={styles.refund}>
+              {intl.formatMessage(messages.unregisterExplanation, {
+                refundAmount: refundSum.toString()
+              })}
+            </div>
+          )}
+        </div>
+      );
+    }
+    return (
+      <>
         <div className={styles.addressLabelWrapper}>
           <div className={styles.addressLabel}>
             {intl.formatMessage(messages.addressFromLabel)}
-          </div>
-          <div className={styles.addressSubLabel}>
-            {intl.formatMessage(messages.addressFromSubLabel)}
           </div>
           {
             transferTx.senders.map((sender, index) => {
@@ -144,11 +172,13 @@ export default class TransferSummaryPage extends Component<Props> {
                   <ExplorableHashContainer
                     selectedExplorer={this.props.selectedExplorer}
                     light
-                    hash={sender}
+                    hash={this.props.addressToDisplayString(sender)}
                     linkType="address"
                   >
                     <RawHash light>
-                      <span className={addressesClasses}>{sender}</span>
+                      <span className={addressesClasses}>
+                        {truncateAddress(this.props.addressToDisplayString(sender))}
+                      </span>
                     </RawHash>
                   </ExplorableHashContainer>
                 </div>
@@ -156,23 +186,64 @@ export default class TransferSummaryPage extends Component<Props> {
             })
           }
         </div>
-
         <div className={styles.addressLabelWrapper}>
           <div className={styles.addressLabel}>
-            {intl.formatMessage(messages.addressToLabel)}
+            {intl.formatMessage(globalMessages.walletSendConfirmationAddressToLabel)}
           </div>
-          <ExplorableHashContainer
-            selectedExplorer={this.props.selectedExplorer}
-            light
-            hash={receiver}
-            linkType="address"
-          >
-            <RawHash light>
-              <span className={styles.address}>{receiver}</span>
-            </RawHash>
-          </ExplorableHashContainer>
+          {
+            transferTx.receivers.map((receiver, index) => {
+              const addressesClasses = classnames([
+                'to-' + (index + 1),
+                styles.address
+              ]);
+              return (
+                <div
+                  key={index /* eslint-disable-line react/no-array-index-key */}
+                >
+                  <ExplorableHashContainer
+                    selectedExplorer={this.props.selectedExplorer}
+                    light
+                    hash={this.props.addressToDisplayString(receiver)}
+                    linkType="address"
+                  >
+                    <RawHash light>
+                      <span className={addressesClasses}>
+                        {truncateAddress(this.props.addressToDisplayString(receiver))}
+                      </span>
+                    </RawHash>
+                  </ExplorableHashContainer>
+                </div>
+              );
+            })
+          }
         </div>
+      </>
+    );
+  }
 
+  getTotalBalance: void => BigNumber = () => {
+    const baseTotal = this.props.transferTx.recoveredBalance.minus(this.props.transferTx.fee);
+    if (this.props.transferTx.withdrawals == null) {
+      return baseTotal;
+    }
+    const refundSum = this.props.transferTx.withdrawals.reduce(
+      (sum, curr) => (curr.refund == null ? sum : sum.plus(curr.refund)),
+      new BigNumber(0)
+    );
+    return baseTotal.plus(refundSum);
+  }
+
+  render(): Node {
+    const { intl } = this.context;
+    const { transferTx, isSubmitting, error, unitOfAccountSetting, coinPrice, } = this.props;
+
+    const recoveredBalance = this.props.formattedWalletAmount(transferTx.recoveredBalance);
+    const transactionFee = this.props.formattedWalletAmount(transferTx.fee);
+    const finalBalance = this.props.formattedWalletAmount(this.getTotalBalance());
+
+    return this.wrapInDialog(
+      <div className={styles.body}>
+        {this.getHeader()}
         {transferTx.id != null && (this._getTxIdNode(transferTx.id))}
 
         <div className={styles.amountFeesWrapper}>
@@ -192,12 +263,16 @@ export default class TransferSummaryPage extends Component<Props> {
                   </span>
                 </div>
                 <div className={styles.amountSmall}>{recoveredBalance}
-                  <span className={styles.currencySymbol}>&nbsp;ADA</span>
+                  <span className={styles.currencySymbol}>
+                    &nbsp;{unitOfAccountSetting.currency}
+                  </span>
                 </div>
               </>
             ) : (
               <div className={styles.amount}>{recoveredBalance}
-                <span className={styles.currencySymbol}>&nbsp;ADA</span>
+                <span className={styles.currencySymbol}>
+                  &nbsp;ADA
+                </span>
               </div>
             )}
           </div>
@@ -218,12 +293,16 @@ export default class TransferSummaryPage extends Component<Props> {
                   </span>
                 </div>
                 <div className={styles.feesSmall}>+{transactionFee}
-                  <span className={styles.currencySymbol}>&nbsp;ADA</span>
+                  <span className={styles.currencySymbol}>
+                    &nbsp;{unitOfAccountSetting.currency}
+                  </span>
                 </div>
               </>
             ) : (
               <div className={styles.fees}>+{transactionFee}
-                <span className={styles.currencySymbol}>&nbsp;ADA</span>
+                <span className={styles.currencySymbol}>
+                  &nbsp;ADA
+                </span>
               </div>
             )}
           </div>
@@ -231,7 +310,7 @@ export default class TransferSummaryPage extends Component<Props> {
 
         <div className={styles.totalAmountWrapper}>
           <div className={styles.totalAmountLabel}>
-            {intl.formatMessage(messages.finalBalanceLabel)}
+            {intl.formatMessage(globalMessages.finalBalanceLabel)}
           </div>
           {unitOfAccountSetting.enabled ? (
             <>
@@ -248,12 +327,16 @@ export default class TransferSummaryPage extends Component<Props> {
                 </span>
               </div>
               <div className={styles.totalAmountSmall}>{finalBalance}
-                <span className={styles.currencySymbol}>&nbsp;ADA</span>
+                <span className={styles.currencySymbol}>
+                  &nbsp;{unitOfAccountSetting.currency}
+                </span>
               </div>
             </>
           ) : (
             <div className={styles.totalAmount}>{finalBalance}
-              <span className={styles.currencySymbol}>&nbsp;ADA</span>
+              <span className={styles.currencySymbol}>
+                &nbsp;ADA
+              </span>
             </div>
           )}
         </div>

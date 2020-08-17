@@ -126,7 +126,7 @@ import type { NetworkRow } from '../ada/lib/storage/database/primitives/tables';
 // getAllAddressesForDisplay
 
 export type GetAllAddressesForDisplayRequest = {|
-  publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetAllUtxos,
+  publicDeriver: IPublicDeriver<>,
   type: CoreAddressT,
 |};
 export type GetAllAddressesForDisplayResponse = Array<{|
@@ -205,7 +205,7 @@ export type CreateDelegationTxRequest = {|
   valueInAccount: BigNumber,
 |};
 export type CreateDelegationTxResponse = {|
-  unsignedTx: V3UnsignedTxAddressedUtxoResponse,
+  signTxRequest: JormungandrTxSignRequest,
   totalAmountToDelegate: BigNumber,
 |};
 
@@ -583,8 +583,14 @@ export default class JormungandrApi {
       .plus(differenceAfterTx) // subtract any part of the fee that comes from UTXO
       .plus(request.valueInAccount); // recall: Jormungandr rewards are compounding
 
+    const signTxRequest = new JormungandrTxSignRequest({
+      senderUtxos: unsignedTx.senderUtxos,
+      unsignedTx: unsignedTx.IOs,
+      changeAddr: unsignedTx.changeAddr,
+      certificate: unsignedTx.certificate,
+    });
     return {
-      unsignedTx,
+      signTxRequest,
       totalAmountToDelegate
     };
   }

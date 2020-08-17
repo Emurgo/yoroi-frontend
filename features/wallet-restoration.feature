@@ -336,12 +336,12 @@ Feature: Restore Wallet
   @it-117
   Scenario: Switch wallets (IT-117)
     # wallet 1
-    Given There is a wallet stored named many-tx-wallet
+    Given There is a Byron wallet stored named many-tx-wallet
     # prep adding 2nd wallet
     Then I unselect the wallet
     And I click to add an additional wallet
     # wallet 2 (same as wallet 1)
-    Given There is a wallet stored named small-single-tx
+    Given There is a Byron wallet stored named small-single-tx
     # switch to wallet #1
     Then I switch to "many-tx-wallet" from the dropdown
     Then I should see the opened wallet with name "many-tx-wallet"
@@ -387,6 +387,7 @@ Feature: Restore Wallet
     And I go to the receive screen
     And I should see the addresses exactly list them
     | address                                                     |
+    | addr1qy245684mdhpwzs0p37jz8pymn5g9v37rqjy78c59f06xau4tr5knj4fu4adelzqhxg8adu5xca4jra0gtllfrpcawyqdqef6t |
     | addr1qyv7qlaucathxkwkc503ujw0rv9lfj2rkj96feyst2rs9ey4tr5knj4fu4adelzqhxg8adu5xca4jra0gtllfrpcawyqzajfkn |
 
   @it-133

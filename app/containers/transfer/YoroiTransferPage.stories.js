@@ -7,16 +7,20 @@ import { boolean, select, } from '@storybook/addon-knobs';
 import { action } from '@storybook/addon-actions';
 import {
   globalKnobs,
-  walletLookup,
-  genDummyWithCache,
   genUnitOfAccount,
 } from '../../../stories/helpers/StoryWrapper';
+import {
+  walletLookup,
+} from '../../../stories/helpers/WalletCache';
+import {
+  genShelleyCip1852DummyWithCache,
+  genWithdrawalTx,
+} from '../../../stories/helpers/cardano/ShelleyCip1852Mocks';
 import { mockTransferProps, wrapTransfer, } from './Transfer.mock';
 import { THEMES } from '../../themes';
 import { defaultToSelectedExplorer } from '../../domain/SelectedExplorer';
 import { ROUTES } from '../../routes-config';
 import YoroiTransferPage from './YoroiTransferPage';
-import type { MockYoroiTransferStore } from './YoroiTransferPage';
 import { TransferStatus, } from '../../types/TransferTypes';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import {
@@ -31,9 +35,14 @@ import {
 import AdaApi from '../../api/ada/index';
 import {
   HARD_DERIVATION_START,
+  ChainDerivations,
 } from '../../config/numbersConfig';
 import type { RestoreModeType } from '../../actions/common/wallet-restore-actions';
 import config from '../../config';
+import type { TransferStatusT, TransferTx } from '../../types/TransferTypes';
+import LocalizableError from '../../i18n/LocalizableError';
+import type { IAddressTypeStore, IAddressTypeUiSubset } from '../../stores/stateless/addressStores';
+import { allAddressSubgroups } from '../../stores/stateless/addressStores';
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -41,15 +50,40 @@ export default {
   decorators: [withScreenshot],
 };
 
+const genDefaultGroupMap: (
+  void => Map<Class<IAddressTypeStore>, IAddressTypeUiSubset>
+) = () => {
+  return new Map(
+    allAddressSubgroups.map(type => [
+      type.class,
+      {
+        all: [],
+        wasExecuted: true,
+      },
+    ])
+  );
+};
+
 const genBaseProps: {|
   wallet: null | PublicDeriver<>,
+  sendMoneyRequest?: *,
+  withdrawalProps?: *,
   yoroiTransfer: {|
-    ...InexactSubset<MockYoroiTransferStore>,
+    ...InexactSubset<{|
+      +status: TransferStatusT,
+      +error: ?LocalizableError,
+      +transferTx: ?TransferTx,
+      +nextInternalAddress: PublicDeriver<> => (void => Promise<string>),
+      +recoveryPhrase: string,
+    |}>,
   |},
   mode?: RestoreModeType,
   openDialog?: boolean,
 |} => * = (request) => ({
   stores: {
+    addresses: {
+      addressSubgroupMap: genDefaultGroupMap(),
+    },
     explorers: {
       selectedExplorer: defaultToSelectedExplorer(),
     },
@@ -73,17 +107,18 @@ const genBaseProps: {|
     wallets: {
       selected: request.wallet,
       refreshWalletFromRemote: async () => action('refreshWalletFromRemote')(),
+      sendMoneyRequest: request.sendMoneyRequest ?? Object.freeze({
+        isExecuting: false,
+      })
     },
     coinPriceStore: {
       getCurrentPrice: (_from, _to) => 5,
     },
     yoroiTransfer: {
+      mode: request.mode,
       status: TransferStatus.UNINITIALIZED,
       error: undefined,
       transferTx: undefined,
-      transferFundsRequest: Object.freeze({
-        isExecuting: false,
-      }),
       nextInternalAddress: (_publicDeriver) => (async () => 'Ae2tdPwUPEZ5PxKxoyZDgjsKgMWMpTRa4PH3sVgARSGBsWwNBH3qg7cMFsP'),
       recoveryPhrase: '',
       ...request.yoroiTransfer,
@@ -101,6 +136,47 @@ const genBaseProps: {|
       checkAddresses: { trigger: async (req) => action('checkAddresses')(req) },
       setupTransferFundsWithPaperMnemonic: { trigger: action('setupTransferFundsWithPaperMnemonic') },
       setupTransferFundsWithMnemonic: { trigger: action('setupTransferFundsWithMnemonic') },
+    },
+  },
+  WithdrawalTxDialogContainerProps: {
+    generated: {
+      TransferSendProps: {
+        generated: {
+          stores: {
+            addresses: {
+              addressSubgroupMap: genDefaultGroupMap(),
+            },
+            explorers: {
+              selectedExplorer: defaultToSelectedExplorer(),
+            },
+            profile: {
+              isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
+              unitOfAccount: genUnitOfAccount(),
+            },
+            wallets: {
+              selected: request.wallet,
+              sendMoneyRequest: {
+                ...(request.sendMoneyRequest ?? Object.freeze({
+                  isExecuting: false,
+                })),
+                error: undefined,
+                reset: action('sendMoneyRequest reset'),
+              },
+            },
+            coinPriceStore: {
+              getCurrentPrice: (_from, _to) => 5,
+            },
+          },
+          actions: {
+            wallets: {
+              sendMoney: {
+                trigger: async (req) => action('sendMoney')(req),
+              },
+            },
+          },
+        },
+      },
+      ...(request.withdrawalProps ?? ({}: any)),
     },
   },
   YoroiPlateProps: {
@@ -135,7 +211,7 @@ const genBaseProps: {|
 });
 
 export const GettingMnemonics = (): Node => {
-  const wallet = genDummyWithCache();
+  const wallet = genShelleyCip1852DummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
     const baseProps = genBaseProps({
@@ -143,6 +219,7 @@ export const GettingMnemonics = (): Node => {
       yoroiTransfer: {
         status: TransferStatus.GETTING_MNEMONICS,
       },
+      mode: { type: 'bip44', extra: undefined, length: config.wallets.WALLET_RECOVERY_PHRASE_WORD_COUNT },
     });
     return wrapTransfer(
       mockTransferProps({
@@ -156,7 +233,7 @@ export const GettingMnemonics = (): Node => {
 };
 
 export const GettingPaperMnemonics = (): Node => {
-  const wallet = genDummyWithCache();
+  const wallet = genShelleyCip1852DummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
     const baseProps = genBaseProps({
@@ -164,6 +241,7 @@ export const GettingPaperMnemonics = (): Node => {
       yoroiTransfer: {
         status: TransferStatus.GETTING_PAPER_MNEMONICS,
       },
+      mode: { type: 'bip44', extra: 'paper', length: config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT },
     });
     return wrapTransfer(
       mockTransferProps({
@@ -177,7 +255,7 @@ export const GettingPaperMnemonics = (): Node => {
 };
 
 export const HardwareDisclaimer = (): Node => {
-  const wallet = genDummyWithCache();
+  const wallet = genShelleyCip1852DummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
     const baseProps = genBaseProps({
@@ -198,7 +276,7 @@ export const HardwareDisclaimer = (): Node => {
 };
 
 export const HardwareMnemonic = (): Node => {
-  const wallet = genDummyWithCache();
+  const wallet = genShelleyCip1852DummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
     const baseProps = genBaseProps({
@@ -219,13 +297,13 @@ export const HardwareMnemonic = (): Node => {
 };
 
 export const Checksum = (): Node => {
-  const wallet = genDummyWithCache();
+  const wallet = genShelleyCip1852DummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
     const modeOptions: {| [key: string]: RestoreModeType |} = {
       BYRON: { type: 'bip44', extra: undefined, length: 15 },
-      'SHELLEY-15': { type: 'cip1852', extra: undefined, length: 15 },
-      'SHELLEY-24': { type: 'cip1852', extra: undefined, length: 24 },
+      SHELLEY15: { type: 'cip1852', extra: undefined, length: 15 },
+      SHELLEY24: { type: 'cip1852', extra: undefined, length: 24 },
       PAPER: { type: 'bip44', extra: 'paper', length: config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT },
       TREZOR: { type: 'bip44', extra: 'trezor', },
     };
@@ -256,7 +334,7 @@ export const Checksum = (): Node => {
 };
 
 export const RestoringAddresses = (): Node => {
-  const wallet = genDummyWithCache();
+  const wallet = genShelleyCip1852DummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
     const baseProps = genBaseProps({
@@ -277,7 +355,7 @@ export const RestoringAddresses = (): Node => {
 };
 
 export const CheckingAddresses = (): Node => {
-  const wallet = genDummyWithCache();
+  const wallet = genShelleyCip1852DummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
     const baseProps = genBaseProps({
@@ -298,7 +376,7 @@ export const CheckingAddresses = (): Node => {
 };
 
 export const GeneratingTx = (): Node => {
-  const wallet = genDummyWithCache();
+  const wallet = genShelleyCip1852DummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
     const baseProps = genBaseProps({
@@ -318,8 +396,8 @@ export const GeneratingTx = (): Node => {
   })();
 };
 
-export const TransferTx = (): Node => {
-  const wallet = genDummyWithCache();
+export const TransferTxPage = (): Node => {
+  const wallet = genShelleyCip1852DummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
     const errorCases = {
@@ -333,7 +411,11 @@ export const TransferTx = (): Node => {
     );
     const error = errorValue();
     const baseProps = genBaseProps({
+      mode: { type: 'bip44', extra: undefined, length: config.wallets.WALLET_RECOVERY_PHRASE_WORD_COUNT },
       wallet: wallet.publicDeriver,
+      sendMoneyRequest: {
+        isExecuting: boolean('isExecuting', false)
+      },
       yoroiTransfer: {
         status: TransferStatus.READY_TO_TRANSFER,
         error: error === errorCases.NoError
@@ -345,10 +427,77 @@ export const TransferTx = (): Node => {
           id: 'b65ae37bcc560e323ea8922de6573004299b6646e69ab9fac305f62f0c94c3ab',
           encodedTx: new Uint8Array([]),
           senders: ['Ae2tdPwUPEZE9RAm3d3zuuh22YjqDxhR1JF6G93uJsRrk51QGHzRUzLvDjL'],
-          receiver: 'Ae2tdPwUPEZ5PxKxoyZDgjsKgMWMpTRa4PH3sVgARSGBsWwNBH3qg7cMFsP',
+          receivers: ['Ae2tdPwUPEZ5PxKxoyZDgjsKgMWMpTRa4PH3sVgARSGBsWwNBH3qg7cMFsP'],
         },
-        transferFundsRequest: {
-          isExecuting: boolean('isExecuting', false),
+      },
+    });
+    return wrapTransfer(
+      mockTransferProps({
+        currentRoute: ROUTES.TRANSFER.YOROI,
+        selected: wallet.publicDeriver,
+        ...lookup,
+        YoroiTransferPageProps: baseProps,
+      }),
+    );
+  })();
+};
+
+export const WithdrawalTxPage = (): Node => {
+  const wallet = genShelleyCip1852DummyWithCache();
+  const lookup = walletLookup([wallet]);
+  return (() => {
+    const errorCases = {
+      NoError: 0,
+      WalletChangedError: 1,
+    };
+    const errorValue = () => select(
+      'errorCases',
+      errorCases,
+      errorCases.NoError,
+    );
+    const error = errorValue();
+    const baseProps = genBaseProps({
+      withdrawalProps: {
+        actions: Object.freeze({}),
+        stores: {
+          substores: {
+            ada: {
+              delegationTransaction: {
+                createWithdrawalTx: {
+                  error: undefined,
+                  result: genWithdrawalTx(
+                    wallet.publicDeriver,
+                    boolean('deregister', true)
+                  ),
+                  reset: action('createWithdrawalTx reset'),
+                },
+              },
+            },
+          },
+        },
+      },
+      mode: {
+        type: 'cip1852',
+        extra: undefined,
+        length: config.wallets.WALLET_RECOVERY_PHRASE_WORD_COUNT,
+        chain: ChainDerivations.CHIMERIC_ACCOUNT,
+      },
+      wallet: wallet.publicDeriver,
+      sendMoneyRequest: {
+        isExecuting: boolean('isExecuting', false)
+      },
+      yoroiTransfer: {
+        status: TransferStatus.READY_TO_TRANSFER,
+        error: error === errorCases.NoError
+          ? undefined
+          : new WalletChangedError(),
+        transferTx: {
+          recoveredBalance: new BigNumber(1),
+          fee: new BigNumber(0.1),
+          id: 'b65ae37bcc560e323ea8922de6573004299b6646e69ab9fac305f62f0c94c3ab',
+          encodedTx: new Uint8Array([]),
+          senders: ['Ae2tdPwUPEZE9RAm3d3zuuh22YjqDxhR1JF6G93uJsRrk51QGHzRUzLvDjL'],
+          receivers: ['Ae2tdPwUPEZ5PxKxoyZDgjsKgMWMpTRa4PH3sVgARSGBsWwNBH3qg7cMFsP'],
         },
       },
     });
@@ -364,7 +513,7 @@ export const TransferTx = (): Node => {
 };
 
 export const ErrorPage = (): Node => {
-  const wallet = genDummyWithCache();
+  const wallet = genShelleyCip1852DummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
     const errorCases = {
@@ -397,7 +546,7 @@ export const ErrorPage = (): Node => {
 };
 
 export const Success = (): Node => {
-  const wallet = genDummyWithCache();
+  const wallet = genShelleyCip1852DummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
     const baseProps = genBaseProps({

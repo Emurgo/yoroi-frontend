@@ -65,9 +65,25 @@ export const formattedAmountWithoutTrailingZeros = (amount: string): string => (
   amount.replace(/0+$/, '').replace(/\.$/, '')
 );
 
-export function truncateAddress(addr: string): string {
-  if (addr.length <= 20) {
+function truncateFormatter(addr: string, cutoff: number): string {
+  const shortener = '...';
+
+  if (addr.length + shortener.length <= cutoff) {
     return addr;
   }
-  return addr.substring(0, 10) + '...' + addr.substring(addr.length - 10, addr.length);
+  return addr.substring(0, cutoff / 2) + '...' + addr.substring(addr.length - (cutoff / 2), addr.length);
+}
+
+export function truncateAddress(addr: string): string {
+  // needs to be enough for any bech32 prefix & header and bech32 checksum
+  // 40 empirically works well with bech32 and still fits in small spaces and dialogs
+  return truncateFormatter(addr, 40);
+}
+
+/**
+ * Avoid using this when possible
+ * Since the length is too small for some bech32 prefixes
+ */
+export function truncateAddressShort(addr: string): string {
+  return truncateFormatter(addr, 20);
 }

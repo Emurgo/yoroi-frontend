@@ -1,5 +1,5 @@
 // @flow
-import { computed, observable, action } from 'mobx';
+import { computed, observable, action, } from 'mobx';
 import Store from '../base/Store';
 
 type DialogEntry = {|
@@ -13,14 +13,14 @@ type DialogEntry = {|
    *    Ex: When a field updates, it updates this field
    *    So that the parent can react to the data change
    */
-  dataForActiveDialog: {...},
+  dataForActiveDialog: Map<string | number, any>,
   /**
   * Arbitrary data set at dialog-open-time
   * IS inherited when opening a new dialog (ex: 2nd dialog has shallow copy of data of 1st dialog)
   * This can be used to set the context in which this dialog was opened
   * ex: chose this option in a menu dialog
   */
-  paramsForActiveDialog: {...}
+  paramsForActiveDialog: Map<string | number, any>,
 |};
 
 /** Manages the open dialog window in Yoroi.
@@ -60,15 +60,15 @@ export default class UiDialogsStore extends Store {
     key: (number | string)
   ): (void | T) => (
     // flowlint-next-line unnecessary-optional-chain:off
-    this.dialogList[this.dialogList.length - 1]?.paramsForActiveDialog[key]
+    this.dialogList[this.dialogList.length - 1]?.paramsForActiveDialog.get(key)
   );
 
   getActiveData: <T>(number | string) => (void | T) = <T>(
     key: (number | string)
   ): (void | T) => (
     // flowlint-next-line unnecessary-optional-chain:off
-    this.dialogList[this.dialogList.length - 1]?.dataForActiveDialog[key]
-  )
+    this.dialogList[this.dialogList.length - 1]?.dataForActiveDialog.get(key)
+  );
 
   countdownSinceDialogOpened: number => number = (
     countDownTo: number
@@ -77,14 +77,15 @@ export default class UiDialogsStore extends Store {
   );
 
   @action _onPush: {| dialog : any, params?: {...} |} => void = ({ dialog, params }) => {
-    const prevEntry = this.dialogList[this.dialogList.length - 1] ?? {};
+    const prevEntry = this.dialogList[this.dialogList.length - 1];
+
+    const newMap = observable.map();
+    newMap.merge(prevEntry);
+    newMap.merge(params);
     this.dialogList.push({
       dialog,
-      paramsForActiveDialog: {
-        ...prevEntry.paramsForActiveDialog,
-        ...params,
-      },
-      dataForActiveDialog: observable.box(dialog.defaultProps),
+      paramsForActiveDialog: newMap,
+      dataForActiveDialog: observable.map(),
     });
     this.secondsSinceActiveDialogIsOpen = 0;
     if (this._secondsTimerInterval) clearInterval(this._secondsTimerInterval);
@@ -109,12 +110,10 @@ export default class UiDialogsStore extends Store {
     this.secondsSinceActiveDialogIsOpen += 1;
   };
 
-  @action _onUpdateDataForActiveDialog: { [key: string]: any, ... } => void = ({ data }) => {
+  @action _onUpdateDataForActiveDialog: {| [key: string]: any, |} => void = (data) => {
     if (this.dialogList.length === 0) return;
-    Object.assign(
-      this.dialogList[this.dialogList.length - 1].dataForActiveDialog,
-      data
-    );
+    // $FlowExpectedError[prop-missing] this is a mobx property -- not part of es6
+    this.dialogList[this.dialogList.length - 1].dataForActiveDialog.merge(data);
   };
 
   @action _reset: void => void = () => {

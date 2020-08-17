@@ -8,6 +8,7 @@ import {
 import i18n from '../support/helpers/i18n-helpers';
 import {
   checkAddressesRecoveredAreCorrect,
+  checkWithdrawalAddressesRecoveredAreCorrect,
   checkTotalAmountIsCorrect
 } from '../support/helpers/transfer-helpers';
 
@@ -16,17 +17,26 @@ Given(/^I am on the transfer start screen$/, async function () {
   await waitUntilUrlEquals.call(this, '/transfer');
 });
 
+When(/^I click on the shelley button on the transfer screen$/, async function () {
+  await this.click('.TransferCards_shelleyEra');
+});
 When(/^I click on the byron button on the transfer screen$/, async function () {
   await this.click('.TransferCards_byronEra');
 });
 Then(/^I click on the icarus tab$/, async function () {
   await this.click('.IcarusTab');
 });
-Then(/^I select the 15-word option$/, async function () {
+Then(/^I select the Byron 15-word option$/, async function () {
   await this.click('.fromIcarusWallet15Word_restoreNormalWallet');
+});
+Then(/^I select the Shelley 15-word option$/, async function () {
+  await this.click('.ShelleyOptionDialog_restoreNormalWallet');
 });
 Then(/^I select the yoroi paper wallet option$/, async function () {
   await this.click('.fromIcarusPaperWallet_restorePaperWallet');
+});
+Then(/^I accept the prompt$/, async function () {
+  await this.click('.primary');
 });
 Then(/^I select the trezor option$/, async function () {
   await this.click('.fromTrezor_connectTrezor');
@@ -46,6 +56,12 @@ Then(/^I should see the Yoroi transfer error screen$/, async function () {
 Then(/^I should see on the Yoroi transfer summary screen:$/, async function (table) {
   const rows = table.hashes();
   await checkAddressesRecoveredAreCorrect(rows, this);
+  await checkTotalAmountIsCorrect(rows, this);
+});
+
+Then(/^I should see on the Yoroi withdrawal transfer summary screen:$/, async function (table) {
+  const rows = table.hashes();
+  await checkWithdrawalAddressesRecoveredAreCorrect(rows, this);
   await checkTotalAmountIsCorrect(rows, this);
 });
 

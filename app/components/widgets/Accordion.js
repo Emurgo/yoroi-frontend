@@ -25,7 +25,7 @@ export default class Accordion extends Component<Props, State> {
     isToggle: true,
   };
 
-  toggleActive() {
+  toggleActive: void => void = () => {
     this.setState(prevState => ({ isToggle: !prevState.isToggle }));
   }
 

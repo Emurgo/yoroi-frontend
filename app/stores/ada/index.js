@@ -9,9 +9,9 @@ import AddressesStore from './AdaAddressesStore';
 import AdaDaedalusTransferStore from './AdaDaedalusTransferStore';
 import AdaYoroiTransferStore from './AdaYoroiTransferStore';
 import TrezorConnectStore from './TrezorConnectStore';
-import TrezorSendStore from './TrezorSendStore';
+import TrezorSendStore from './send/TrezorSendStore';
 import LedgerConnectStore from './LedgerConnectStore';
-import LedgerSendStore from './LedgerSendStore';
+import LedgerSendStore from './send/LedgerSendStore';
 import HWVerifyAddressStore from './HWVerifyAddressStore';
 import PaperWalletCreateStore from './PaperWalletCreateStore';
 import AdaStateFetchStore from './AdaStateFetchStore';
@@ -19,6 +19,7 @@ import AdaWalletRestoreStore from './AdaWalletRestoreStore';
 import AdaDelegationTransactionStore from './AdaDelegationTransactionStore';
 import AdaDelegationStore from './AdaDelegationStore';
 import AdaTimeStore from './AdaTimeStore';
+import AdaMnemonicSendStore from './send/AdaMnemonicSendStore';
 import type { ActionsMap } from '../../actions/index';
 import type { Api } from '../../api/index';
 import type { StoresMap } from '../index';
@@ -40,6 +41,7 @@ export const adaStoreClasses = Object.freeze({
   walletRestore: AdaWalletRestoreStore,
   delegation: AdaDelegationStore,
   time: AdaTimeStore,
+  mnemonicSend: AdaMnemonicSendStore,
 });
 
 export type AdaStoresMap = {|
@@ -59,6 +61,7 @@ export type AdaStoresMap = {|
   walletRestore: AdaWalletRestoreStore,
   delegation: AdaDelegationStore,
   time: AdaTimeStore,
+  mnemonicSend: AdaMnemonicSendStore,
 |};
 
 const adaStores: WithNullableFields<AdaStoresMap> = observable({
@@ -78,6 +81,7 @@ const adaStores: WithNullableFields<AdaStoresMap> = observable({
   walletRestore: null,
   delegation: null,
   time: null,
+  mnemonicSend: null,
 });
 
 /** See `stores` index for description of this weird behavior

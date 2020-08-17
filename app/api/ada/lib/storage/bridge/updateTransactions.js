@@ -1930,12 +1930,13 @@ async function certificateToDb(
           Relation: CertificateRelationType,
         |}> = [];
 
-        const stakeCredentials = RustModule.WalletV4.RewardAddress.from_address(
+        const rewardAddress = RustModule.WalletV4.RewardAddress.from_address(
           RustModule.WalletV4.Address.from_bytes(
             Buffer.from(cert.rewardAddress, 'hex')
           )
-        )?.payment_cred();
-        if (stakeCredentials == null) throw new Error(`${nameof(certificateToDb)} not a valid reward account`);
+        );
+        if (rewardAddress == null) throw new Error(`${nameof(certificateToDb)} not a valid reward account`);
+        const stakeCredentials = rewardAddress.payment_cred();
         const poolKeyHash = RustModule.WalletV4.Ed25519KeyHash.from_bytes(
           Buffer.from(cert.poolKeyHash, 'hex')
         );
@@ -1957,12 +1958,7 @@ async function certificateToDb(
         }
 
         { // delegator
-          const address = RustModule.WalletV4.RewardAddress.new(
-            request.network,
-            stakeCredentials
-          );
-
-          const addrBytes = Buffer.from(address.to_address().to_bytes()).toString('hex');
+          const addrBytes = Buffer.from(rewardAddress.to_address().to_bytes()).toString('hex');
           const addressId = await addressToId(addrBytes);
           relatedAddressesInfo.push({
             AddressId: addressId,

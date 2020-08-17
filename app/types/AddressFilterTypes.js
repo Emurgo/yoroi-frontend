@@ -54,6 +54,7 @@ export type AddressTypeName = {|
 
 export const AddressGroupTypes = Object.freeze({
   base: 'base',
+  reward: 'reward',
   byron: 'byron',
   addressBook: 'addressBook',
   group: 'group',
@@ -71,6 +72,10 @@ export const addressGroupsTooltip: $ObjMap<typeof AddressGroupTypes, ToMessage> 
   group: commonDescriptions.group,
   base: commonDescriptions.group,
   ...defineMessages({
+    reward: {
+      id: 'wallet.address.category.reward',
+      defaultMessage: '!!!Address for your staking key',
+    },
     byron: {
       id: 'wallet.address.category.byron',
       defaultMessage: '!!!Addresses created using the Byron-era address format',
@@ -89,6 +94,10 @@ export const addressGroupName: $ObjMap<typeof AddressGroupTypes, ToMessage> = de
   base: {
     id: 'wallet.receive.navigation.baseLabel',
     defaultMessage: '!!!Base'
+  },
+  reward: {
+    id: 'wallet.receive.navigation.rewardLabel',
+    defaultMessage: '!!!Reward'
   },
   group: {
     id: 'wallet.receive.navigation.groupLabel',

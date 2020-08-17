@@ -7,15 +7,14 @@ import type {
 import {
   asDisplayCutoff,
   asGetAllUtxos,
-  asGetAllAccounting
+  asGetAllAccounting,
+  asHasLevels,
 } from '../models/PublicDeriver/traits';
 import type {
   IPublicDeriver,
-  IGetAllUtxos,
   Address, Value, Addressing, UsedStatus,
 } from '../models/PublicDeriver/interfaces';
 import { ConceptualWallet } from '../models/ConceptualWallet/index';
-import type { IHasLevels } from '../models/ConceptualWallet/interfaces';
 
 import {
   getAllSchemaTables,
@@ -38,7 +37,6 @@ import {
 import {
   GetUtxoTxOutputsWithTx,
 } from '../database/transactionModels/utxo/api/read';
-
 import {
   rawGetAddressesForDisplay,
 } from '../models/utils';
@@ -52,21 +50,40 @@ export async function rawGetAllAddressesForDisplay(
     GetDerivationSpecific: Class<GetDerivationSpecific>,
   |},
   request: {|
-    publicDeriver: IPublicDeriver<> & IGetAllUtxos,
+    publicDeriver: IPublicDeriver<>,
     type: CoreAddressT,
    |},
   derivationTables: Map<number, string>,
 ): Promise<Array<{| ...Address, ...Value, ...Addressing, ...UsedStatus |}>> {
-  let addresses = await request.publicDeriver.rawGetAllUtxoAddresses(
-    tx,
-    {
-      GetAddress: deps.GetAddress,
-      GetPathWithSpecific: deps.GetPathWithSpecific,
-      GetDerivationSpecific: deps.GetDerivationSpecific,
-    },
-    undefined,
-    derivationTables,
-  );
+
+  const withUtxos = asGetAllUtxos(request.publicDeriver);
+  let utxoAddresses = withUtxos != null
+    ? await withUtxos.rawGetAllUtxoAddresses(
+      tx,
+      {
+        GetAddress: deps.GetAddress,
+        GetPathWithSpecific: deps.GetPathWithSpecific,
+        GetDerivationSpecific: deps.GetDerivationSpecific,
+      },
+      undefined,
+      derivationTables,
+    )
+    : [];
+
+  const withAccounting = asGetAllAccounting(request.publicDeriver);
+  const accountingAddresses = withAccounting != null
+    ? await withAccounting.rawGetAllAccountingAddresses(
+      tx,
+      {
+        GetPathWithSpecific: deps.GetPathWithSpecific,
+        GetAddress: deps.GetAddress,
+        GetDerivationSpecific: deps.GetDerivationSpecific,
+      },
+      undefined,
+      derivationTables,
+    )
+    : [];
+
   // when public deriver level = chain we still have a display cutoff
   const hasCutoff = asDisplayCutoff(request.publicDeriver);
   if (hasCutoff != null) {
@@ -79,10 +96,16 @@ export async function rawGetAllAddressesForDisplay(
       undefined,
       derivationTables,
     );
-    addresses = addresses.filter(address => (
+    utxoAddresses = utxoAddresses.filter(address => (
       address.addressing.path[address.addressing.path.length - 1] <= cutoff
     ));
   }
+
+  const addresses = [
+    ...utxoAddresses,
+    ...accountingAddresses,
+  ];
+
   return await rawGetAddressesForDisplay(
     request.publicDeriver.getDb(), tx,
     { GetUtxoTxOutputsWithTx: deps.GetUtxoTxOutputsWithTx },
@@ -95,11 +118,14 @@ export async function rawGetAllAddressesForDisplay(
 
 export async function getAllAddressesForDisplay(
   request: {|
-    publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetAllUtxos,
+    publicDeriver: IPublicDeriver<ConceptualWallet>,
     type: CoreAddressT,
   |},
 ): Promise<Array<{| ...Address, ...Value, ...Addressing, ...UsedStatus |}>> {
-  const derivationTables = request.publicDeriver.getParent().getDerivationTables();
+  const withLevels = asHasLevels<ConceptualWallet>(request.publicDeriver);
+  const derivationTables = withLevels == null
+    ? new Map()
+    : withLevels.getParent().getDerivationTables();
   const deps = Object.freeze({
     GetUtxoTxOutputsWithTx,
     GetAddress,
@@ -114,7 +140,10 @@ export async function getAllAddressesForDisplay(
     request.publicDeriver.getDb(),
     [
       ...depTables,
-      ...mapToTables(request.publicDeriver.getDb(), derivationTables),
+      ...mapToTables(
+        request.publicDeriver.getDb(),
+        derivationTables
+      ),
     ],
     async tx => await rawGetAllAddressesForDisplay(
       tx,

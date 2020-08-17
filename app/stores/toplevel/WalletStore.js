@@ -99,8 +99,6 @@ export type PublicKeyCache = {|
   plate: WalletChecksum,
 |};
 
-type DeferredCall<T> = (() => Promise<T>) => Promise<T>;
-
 /**
  * The base wallet store that contains the shared logic
  * dealing with wallets / accounts.
@@ -134,8 +132,8 @@ export default class WalletStore extends Store {
     });
   @observable isImportActive: boolean = false;
 
-  @observable sendMoneyRequest: Request<typeof WalletStore.prototype.sendAndRefresh>
-    = new Request<typeof WalletStore.prototype.sendAndRefresh>(this.sendAndRefresh);
+  @observable sendMoneyRequest: Request<DeferredCall<{| txId: string |}>>
+    = new Request<DeferredCall<{| txId: string |}>>(request => request());
 
   @observable signingKeyCache: Array<SigningKeyCache> = [];
   getSigningKeyCache: IGetSigningKey => SigningKeyCache = (
@@ -510,17 +508,42 @@ export default class WalletStore extends Store {
   }
 
   sendAndRefresh: {|
+    publicDeriver: void | PublicDeriver<>,
     broadcastRequest: void => Promise<{| txId: string |}>,
     refreshWallet: () => Promise<void>,
   |} => Promise<{| txId: string |}> = async (request) => {
-    const result = await request.broadcastRequest();
-    try {
-      await request.refreshWallet();
-    } catch (_e) {
-      // even if refreshing the wallet fails, we don't want to fail the tx
-      // otherwise user may try and re-send the tx
-    }
-    return result;
+    this.sendMoneyRequest.reset();
+    const tx = await this.sendMoneyRequest.execute(async () => {
+      const result = await request.broadcastRequest();
+
+      if (request.publicDeriver != null) {
+        const memo = this.stores.transactionBuilderStore.memo;
+        if (memo !== '' && memo !== undefined) {
+          try {
+            await this.actions.memos.saveTxMemo.trigger({
+              publicDeriver: request.publicDeriver,
+              memo: {
+                Content: memo,
+                TransactionHash: result.txId,
+                LastUpdated: new Date(),
+              },
+            });
+          } catch (error) {
+            Logger.error(`${nameof(WalletStore)}::${nameof(this.sendAndRefresh)} error: ` + stringifyError(error));
+            throw new Error('An error has ocurred when saving the transaction memo.');
+          }
+        }
+      }
+      try {
+        await request.refreshWallet();
+      } catch (_e) {
+        // even if refreshing the wallet fails, we don't want to fail the tx
+        // otherwise user may try and re-send the tx
+      }
+      return result;
+    }).promise;
+    if (tx == null) throw new Error(`Should never happen`);
+    return tx;
   }
 }
 

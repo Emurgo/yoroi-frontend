@@ -9,7 +9,7 @@ import styles from './TransferTypeSelect.scss';
 
 type Props = {|
   +onByron: void => void,
-  +onShelleyItn: void => void,
+  +onShelley: void => void,
 |};
 
 const messages = defineMessages({
@@ -32,7 +32,7 @@ export default class TransferTypeSelect extends Component<Props> {
         <div className={styles.hero}>
           <TransferCards
             onByron={this.props.onByron}
-            onShelleyItn={this.props.onShelleyItn}
+            onShelley={this.props.onShelley}
           />
           <div className={styles.instructions}>
             {intl.formatMessage(messages.instruction)}

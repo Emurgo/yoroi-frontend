@@ -43,7 +43,7 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
   }
 
   componentWillUnmount() {
-    this.generated.stores.substores.ada.wallets.sendMoneyRequest.reset();
+    this.generated.stores.wallets.sendMoneyRequest.reset();
   }
 
   render(): Node {
@@ -62,8 +62,7 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
     if (apiMeta == null) throw new Error(`${nameof(WalletSendConfirmationDialogContainer)} no API selected`);
 
     const { sendMoney } = actions[selectedApiType].wallets;
-    const { wallets } = stores.substores[selectedApiType];
-    const { sendMoneyRequest } = wallets;
+    const { sendMoneyRequest } = stores.wallets;
 
     const totalInput = signRequest.totalInput(true);
     const fee = signRequest.fee(true);
@@ -138,18 +137,14 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
       profile: {|
         isClassicTheme: boolean,
       |},
-      substores: {|
-        ada: {|
-          wallets: {|
-            sendMoneyRequest: {|
-              error: ?LocalizableError,
-              isExecuting: boolean,
-              reset: () => void
-            |}
-          |}
-        |}
-      |},
-      wallets: {| selected: null | PublicDeriver<> |}
+      wallets: {|
+        sendMoneyRequest: {|
+          error: ?LocalizableError,
+          isExecuting: boolean,
+          reset: () => void
+        |},
+        selected: null | PublicDeriver<>
+      |}
     |}
     |} {
     if (this.props.generated !== undefined) {
@@ -169,16 +164,10 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
         },
         wallets: {
           selected: stores.wallets.selected,
-        },
-        substores: {
-          ada: {
-            wallets: {
-              sendMoneyRequest: {
-                isExecuting: stores.wallets.sendMoneyRequest.isExecuting,
-                reset: stores.wallets.sendMoneyRequest.reset,
-                error: stores.wallets.sendMoneyRequest.error,
-              },
-            },
+          sendMoneyRequest: {
+            isExecuting: stores.wallets.sendMoneyRequest.isExecuting,
+            reset: stores.wallets.sendMoneyRequest.reset,
+            error: stores.wallets.sendMoneyRequest.error,
           },
         },
       },

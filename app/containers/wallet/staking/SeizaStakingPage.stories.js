@@ -8,13 +8,17 @@ import { action } from '@storybook/addon-actions';
 import { withScreenshot } from 'storycap';
 import {
   globalKnobs,
-  walletLookup,
-  genSigningWalletWithCache,
-  genUndelegateTx,
 } from '../../../../stories/helpers/StoryWrapper';
+import {
+  genJormungandrSigningWalletWithCache,
+  genJormungandrUndelegateTx,
+} from '../../../../stories/helpers/jormungandr/JormungandrMocks';
+import {
+  walletLookup
+} from '../../../../stories/helpers/WalletCache';
 import type {
-  CacheValue
-} from '../../../../stories/helpers/StoryWrapper';
+  PossibleCacheTypes
+} from '../../../../stories/helpers/WalletCache';
 import CachedRequest from '../../../stores/lib/LocalizedCachedRequest';
 import SeizaStakingPage from './SeizaStakingPage';
 import { mockWalletProps } from '../Wallet.mock';
@@ -45,10 +49,10 @@ const getRoute = (id) => buildRoute(
 );
 
 const genBaseProps: {|
-  wallet: CacheValue,
+  wallet: PossibleCacheTypes,
   lookup: *,
   hasPending?: boolean,
-  signAndBroadcastDelegationTx?: *,
+  sendMoneyRequest?: *,
   createDelegationTx?: *,
   selectedPools?: *,
 |} => * = (request) => {
@@ -59,6 +63,15 @@ const genBaseProps: {|
       },
       wallets: {
         selected: request.wallet.publicDeriver,
+        sendMoneyRequest: request.sendMoneyRequest == null
+          ? {
+            isExecuting: false,
+            wasExecuted: false,
+          }
+          : {
+            isExecuting: request.sendMoneyRequest.isExecuting,
+            wasExecuted: request.sendMoneyRequest.wasExecuted,
+          },
       },
       transactions: {
         getTxRequests: request.lookup.getTransactions,
@@ -66,21 +79,6 @@ const genBaseProps: {|
       },
       delegation: {
         getDelegationRequests: request.lookup.getDelegation,
-      },
-      substores: {
-        jormungandr: {
-          delegationTransaction: {
-            signAndBroadcastDelegationTx: request.signAndBroadcastDelegationTx == null
-              ? {
-                isExecuting: false,
-                wasExecuted: false,
-              }
-              : {
-                isExecuting: request.signAndBroadcastDelegationTx.isExecuting,
-                wasExecuted: request.signAndBroadcastDelegationTx.wasExecuted,
-              },
-          },
-        },
       },
     },
     actions: {
@@ -101,6 +99,13 @@ const genBaseProps: {|
           },
           wallets: {
             selected: request.wallet.publicDeriver,
+            sendMoneyRequest: request.sendMoneyRequest == null
+              ? {
+                error: undefined,
+                isExecuting: false,
+                wasExecuted: false,
+              }
+              : request.sendMoneyRequest,
           },
           substores: {
             jormungandr: {
@@ -108,7 +113,7 @@ const genBaseProps: {|
                 selectedPools: request.selectedPools != null ? request.selectedPools : [],
                 isStale: request.createDelegationTx == null
                   || request.createDelegationTx.result == null
-                  || request.signAndBroadcastDelegationTx?.wasExecuted === true
+                  || request.sendMoneyRequest?.wasExecuted === true
                   ? false
                   : boolean('isStale', false),
                 createDelegationTx: request.createDelegationTx == null
@@ -118,13 +123,6 @@ const genBaseProps: {|
                     isExecuting: false,
                   }
                   : request.createDelegationTx,
-                signAndBroadcastDelegationTx: request.signAndBroadcastDelegationTx == null
-                  ? {
-                    error: undefined,
-                    isExecuting: false,
-                    wasExecuted: false,
-                  }
-                  : request.signAndBroadcastDelegationTx,
               }
             },
           },
@@ -185,7 +183,7 @@ function getStakingInfo(
 
 export const Frame = (): Node => {
   const genWallet = () => {
-    const wallet = genSigningWalletWithCache();
+    const wallet = genJormungandrSigningWalletWithCache();
     const computedDelegation = getStakingInfo(
       wallet.publicDeriver,
     );
@@ -212,7 +210,7 @@ export const Frame = (): Node => {
 
 export const PendingTransaction = (): Node => {
   const genWallet = () => {
-    const wallet = genSigningWalletWithCache();
+    const wallet = genJormungandrSigningWalletWithCache();
     const computedDelegation = getStakingInfo(
       wallet.publicDeriver,
     );
@@ -240,7 +238,7 @@ export const PendingTransaction = (): Node => {
 
 export const TransactionIsExecuting = (): Node => {
   const genWallet = () => {
-    const wallet = genSigningWalletWithCache();
+    const wallet = genJormungandrSigningWalletWithCache();
     const computedDelegation = getStakingInfo(
       wallet.publicDeriver,
     );
@@ -272,7 +270,7 @@ export const TransactionIsExecuting = (): Node => {
 
 export const TransactionError = (): Node => {
   const genWallet = () => {
-    const wallet = genSigningWalletWithCache();
+    const wallet = genJormungandrSigningWalletWithCache();
     const computedDelegation = getStakingInfo(
       wallet.publicDeriver,
     );
@@ -304,7 +302,7 @@ export const TransactionError = (): Node => {
 
 export const Transaction = (): Node => {
   const genWallet = () => {
-    const wallet = genSigningWalletWithCache();
+    const wallet = genJormungandrSigningWalletWithCache();
     const computedDelegation = getStakingInfo(
       wallet.publicDeriver,
     );
@@ -343,7 +341,7 @@ export const Transaction = (): Node => {
       generated={genBaseProps({
         wallet,
         lookup,
-        signAndBroadcastDelegationTx: {
+        sendMoneyRequest: {
           error: errorValue === errorCases.NoError
             ? undefined
             : new GenericApiError(),
@@ -358,7 +356,7 @@ export const Transaction = (): Node => {
         }],
         createDelegationTx: {
           result: {
-            unsignedTx: genUndelegateTx(wallet.publicDeriver),
+            signTxRequest: genJormungandrUndelegateTx(wallet.publicDeriver),
             totalAmountToDelegate: new BigNumber(1000000),
           },
           error: undefined,
@@ -371,7 +369,7 @@ export const Transaction = (): Node => {
 
 export const DelegationSuccess = (): Node => {
   const genWallet = () => {
-    const wallet = genSigningWalletWithCache();
+    const wallet = genJormungandrSigningWalletWithCache();
     const computedDelegation = getStakingInfo(
       wallet.publicDeriver,
     );
@@ -391,7 +389,7 @@ export const DelegationSuccess = (): Node => {
       generated={genBaseProps({
         wallet,
         lookup,
-        signAndBroadcastDelegationTx: {
+        sendMoneyRequest: {
           error: undefined,
           isExecuting: false,
           wasExecuted: true,
@@ -399,7 +397,7 @@ export const DelegationSuccess = (): Node => {
         selectedPools: [],
         createDelegationTx: {
           result: {
-            unsignedTx: genUndelegateTx(wallet.publicDeriver),
+            signTxRequest: genJormungandrUndelegateTx(wallet.publicDeriver),
             totalAmountToDelegate: new BigNumber(100),
           },
           error: undefined,

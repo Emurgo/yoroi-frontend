@@ -56,7 +56,7 @@ export default class WalletPaperDialogContainer
     printAccountPlate: boolean,
   |}) => void) = (data) => {
     this.generated.actions.dialogs.open.trigger({ dialog: UserPasswordDialog });
-    this.generated.actions.dialogs.updateDataForActiveDialog.trigger({ data });
+    this.generated.actions.dialogs.updateDataForActiveDialog.trigger(data);
   };
 
   render(): Node {

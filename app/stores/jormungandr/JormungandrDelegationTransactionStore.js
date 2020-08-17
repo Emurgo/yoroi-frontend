@@ -6,7 +6,6 @@ import Store from '../base/Store';
 import LocalizedRequest from '../lib/LocalizedRequest';
 import type {
   CreateDelegationTxFunc,
-  SignAndBroadcastDelegationTxRequest, SignAndBroadcastDelegationTxResponse,
 } from '../../api/jormungandr';
 import { buildRoute } from '../../utils/routing';
 import { ROUTES } from '../../routes-config';
@@ -25,12 +24,6 @@ export default class JormungandrDelegationTransactionStore extends Store {
 
   @observable createDelegationTx: LocalizedRequest<CreateDelegationTxFunc>
     = new LocalizedRequest<CreateDelegationTxFunc>(this.api.jormungandr.createDelegationTx);
-
-  @observable signAndBroadcastDelegationTx: LocalizedRequest<
-    typeof JormungandrDelegationTransactionStore.prototype.sendAndRefresh
-  > = new LocalizedRequest<typeof JormungandrDelegationTransactionStore.prototype.sendAndRefresh>(
-    this.sendAndRefresh
-  );
 
   /** tracks if wallet balance changed during confirmation screen */
   @observable isStale: boolean = false;
@@ -122,8 +115,6 @@ export default class JormungandrDelegationTransactionStore extends Store {
     if (withStakingKey == null) {
       throw new Error(`${nameof(this._signTransaction)} missing staking key functionality`);
     }
-    const basePubDeriver = withStakingKey;
-
     const result = this.createDelegationTx.result;
     if (result == null) {
       throw new Error(`${nameof(this._signTransaction)} no tx to broadcast`);
@@ -131,22 +122,16 @@ export default class JormungandrDelegationTransactionStore extends Store {
     if (request.password == null) {
       throw new Error(`${nameof(this._signTransaction)} missing password for non-hardware signing`);
     }
-    await this.signAndBroadcastDelegationTx.execute({
+    await this.stores.substores.jormungandr.wallets.jormungandrSendAndRefresh({
       broadcastRequest: {
-        publicDeriver: basePubDeriver,
-        signRequest: {
-          certificate: result.unsignedTx.certificate,
-          changeAddr: result.unsignedTx.changeAddr,
-          senderUtxos: result.unsignedTx.senderUtxos,
-          unsignedTx: result.unsignedTx.IOs,
+        normal: {
+          publicDeriver: request.publicDeriver,
+          password: request.password,
+          signRequest: result.signTxRequest,
         },
-        password: request.password,
-        sendTx: this.stores.substores.jormungandr.stateFetchStore.fetcher.sendTx,
       },
-      refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(
-        request.publicDeriver
-      ),
-    }).promise;
+      refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.publicDeriver),
+    });
   }
 
   _complete: void => void = () => {
@@ -159,25 +144,9 @@ export default class JormungandrDelegationTransactionStore extends Store {
     this.actions.router.goToRoute.trigger({ route });
   }
 
-  sendAndRefresh: {|
-    broadcastRequest: SignAndBroadcastDelegationTxRequest,
-    refreshWallet: () => Promise<void>,
-  |} => Promise<SignAndBroadcastDelegationTxResponse> = async (request) => {
-    const result = await this.api.jormungandr.signAndBroadcastDelegationTx(
-      request.broadcastRequest
-    );
-    try {
-      await request.refreshWallet();
-    } catch (_e) {
-      // even if refreshing the wallet fails, we don't want to fail the tx
-      // otherwise user may try and re-send the tx
-    }
-    return result;
-  }
-
   @action.bound
   reset(): void {
-    this.signAndBroadcastDelegationTx.reset();
+    this.stores.wallets.sendMoneyRequest.reset();
     this.createDelegationTx.reset();
     this.isStale = false;
     this.selectedPools = [];

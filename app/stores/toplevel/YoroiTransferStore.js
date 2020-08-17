@@ -7,7 +7,6 @@ import {
   stringifyError
 } from '../../utils/logging';
 import Store from '../base/Store';
-import Request from '../lib/LocalizedRequest';
 import LocalizableError, {
   localizedError
 } from '../../i18n/LocalizableError';
@@ -26,12 +25,11 @@ import {
 import config from '../../config';
 import { getApiForNetwork } from '../../api/common/utils';
 import type { RestoreModeType } from '../../actions/common/wallet-restore-actions';
+import { SendTransactionApiError } from '../../api/common/errors';
 
 export default class YoroiTransferStore extends Store {
 
   @observable status: TransferStatusT = TransferStatus.UNINITIALIZED;
-  @observable transferFundsRequest: Request<typeof YoroiTransferStore.prototype._checkAndTransfer>
-    = new Request<typeof YoroiTransferStore.prototype._checkAndTransfer>(this._checkAndTransfer);
   @observable error: ?LocalizableError = null;
   @observable transferTx: ?TransferTx = null;
   @observable recoveryPhrase: string = '';
@@ -218,7 +216,7 @@ export default class YoroiTransferStore extends Store {
     runInAction(() => {
       this.error = null;
     });
-    const oldTx = (() => {
+    const oldTx: TransferTx = (() => {
       const tx = this.transferTx;
       if (tx == null) {
         throw new NoTransferTxError();
@@ -226,7 +224,7 @@ export default class YoroiTransferStore extends Store {
       return tx;
     })();
 
-    const getTransferTx = async () => {
+    const getTransferTx = async (): Promise<TransferTx> => {
       if (!payload.rebuildTx) {
         return oldTx;
       }
@@ -237,16 +235,48 @@ export default class YoroiTransferStore extends Store {
       });
       if (this._isWalletChanged(oldTx, newTx)) {
         this._handleWalletChanged(newTx);
-        return null;
       }
       return newTx;
     };
 
     const { next } = payload;
 
-    await this.transferFundsRequest.execute({
-      getTransferTx,
-    });
+
+    try {
+      await this.stores.wallets.sendAndRefresh({
+        publicDeriver: undefined,
+        broadcastRequest: async () => {
+          const transferTx = await getTransferTx();
+          if (transferTx.id == null || transferTx.encodedTx == null) {
+            throw new Error(`${nameof(YoroiTransferStore)} transaction not signed`);
+          }
+          try {
+            const txId = await this.stores.substores.ada.stateFetchStore.fetcher.sendTx({
+              id: transferTx.id,
+              encodedTx: transferTx.encodedTx,
+            });
+            return txId;
+          } catch (error) {
+            if (error instanceof SendTransactionApiError) {
+              /* See if the error is due to wallet change since last recovery.
+                This should be very rare because the window is short.
+              */
+              await getTransferTx(); // will update the tx if something changed
+            }
+
+            throw new TransferFundsError();
+          }
+        },
+        refreshWallet: async () => {
+          const selected = this.stores.wallets.selected;
+          if (selected == null) return;
+          await this.stores.wallets.refreshWalletFromRemote(selected);
+        }
+      });
+    } catch (e) {
+      Logger.error(`${nameof(YoroiTransferStore)}::${nameof(this._transferFunds)} ${stringifyError(e)}`);
+      runInAction(() => { this.error = e; });
+    }
     if (this.error == null) {
       this._updateStatus(TransferStatus.SUCCESS);
       await next();
@@ -262,8 +292,8 @@ export default class YoroiTransferStore extends Store {
   _handleWalletChanged(newTransferTx: TransferTx): void {
     runInAction(() => {
       this.transferTx = newTransferTx;
-      this.error = new WalletChangedError();
     });
+    throw new WalletChangedError();
   }
 
   @action.bound
@@ -271,38 +301,9 @@ export default class YoroiTransferStore extends Store {
     this.status = TransferStatus.UNINITIALIZED;
     this.error = null;
     this.transferTx = null;
-    this.transferFundsRequest.reset();
+    this.stores.wallets.sendMoneyRequest.reset();
     this.recoveryPhrase = '';
     this.mode = undefined;
-  }
-
-  _checkAndTransfer: {|
-    getTransferTx: void => Promise<?TransferTx>,
-  |} => Promise<void> = async (request) => {
-    const transferTx = await request.getTransferTx();
-    if (transferTx == null) return;
-
-    try {
-      await this.stores.substores.ada.stateFetchStore.fetcher.sendTx({
-        id: transferTx.id,
-        encodedTx: transferTx.encodedTx,
-      });
-    } catch (error) {
-      if (error.id === 'api.errors.sendTransactionApiError') {
-        /* See if the error is due to wallet change since last recovery.
-           This should be very rare because the window is short.
-        */
-        const newTx = await request.getTransferTx(); // will update the tx if something changed
-        if (newTx == null) {
-          return;
-        }
-      }
-
-      Logger.error(`${nameof(YoroiTransferStore)}::${nameof(this._checkAndTransfer)} ${stringifyError(error)}`);
-      runInAction(() => {
-        this.error = new TransferFundsError();
-      });
-    }
   }
 }
 

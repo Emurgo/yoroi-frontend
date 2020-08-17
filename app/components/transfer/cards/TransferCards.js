@@ -5,7 +5,6 @@ import { observer } from 'mobx-react';
 import { defineMessages, intlShape, } from 'react-intl';
 import classnames from 'classnames';
 import globalMessages from '../../../i18n/global-messages';
-import environment from '../../../environment';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import CustomTooltip from '../../widgets/CustomTooltip';
 
@@ -16,15 +15,15 @@ const messages = defineMessages({
     id: 'wallet.transfer.cards.byron',
     defaultMessage: '!!!Byron-era wallet',
   },
-  shelleyItnWallet: {
-    id: 'wallet.transfer.cards.shelleyItn',
-    defaultMessage: '!!!Shelley testnet',
+  shelleyEraWallet: {
+    id: 'wallet.transfer.cards.shelley',
+    defaultMessage: '!!!Shelley-era wallet',
   },
 });
 
 type Props = {|
   +onByron: void => void,
-  +onShelleyItn: void => void,
+  +onShelley: void => void,
 |};
 
 @observer
@@ -52,7 +51,7 @@ export default class TransferCards extends Component<Props> {
                 <CustomTooltip
                   toolTip={
                     <div className={styles.tooltipSize}>
-                      {intl.formatMessage(globalMessages.legacyAttentionText)}
+                      {intl.formatMessage(globalMessages.restoreByronEraWalletDescription)}
                     </div>
                   }
                 />
@@ -63,18 +62,18 @@ export default class TransferCards extends Component<Props> {
         {/* shelley-itn wallet */}
         <button
           type="button"
-          className="TransferCards_shelleyItn"
-          onClick={this.props.onShelleyItn}
+          className="TransferCards_shelleyEra"
+          onClick={this.props.onShelley}
         >
           <div className={styles.heroCardsItem}>
-            <div className={classnames([styles.heroCardsItemBg, styles.bgShelleyTestnet])} />
+            <div className={classnames([styles.heroCardsItemBg, styles.bgShelleyMainnet])} />
             <div className={styles.heroCardsItemTitle}>
-              {intl.formatMessage(messages.shelleyItnWallet)}
+              {intl.formatMessage(messages.shelleyEraWallet)}
               <div className={styles.tooltip}>
                 <CustomTooltip
                   toolTip={
                     <div className={styles.tooltipSize}>
-                      {intl.formatMessage(globalMessages.legacyAttentionText)}
+                      {intl.formatMessage(globalMessages.restoreShelleyEraWalletDescription)}
                     </div>
                   }
                 />

@@ -7,9 +7,11 @@ import { select, } from '@storybook/addon-knobs';
 import { action } from '@storybook/addon-actions';
 import { withScreenshot } from 'storycap';
 import {
+  genShelleyCIP1852SigningWalletWithCache,
+} from '../../../stories/helpers/cardano/ShelleyCip1852Mocks';
+import {
   walletLookup,
-  genSigningWalletWithCache,
-} from '../../../stories/helpers/StoryWrapper';
+} from '../../../stories/helpers/WalletCache';
 import CachedRequest from '../../stores/lib/LocalizedCachedRequest';
 import type { GetBalanceFunc } from '../../api/common/types';
 import MyWalletsPage from './MyWalletsPage';
@@ -25,7 +27,7 @@ export default {
 export const Wallets = (): Node => {
 
   const genWallet = () => {
-    const wallet = genSigningWalletWithCache();
+    const wallet = genShelleyCIP1852SigningWalletWithCache();
 
     const balance: CachedRequest<GetBalanceFunc> = new CachedRequest(_request => Promise.resolve(
       new BigNumber(3),

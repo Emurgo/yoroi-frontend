@@ -17,6 +17,7 @@ import WalletStore from '../../stores/toplevel/WalletStore';
 import type { GeneratedData } from './Transfer';
 import Transfer from './Transfer';
 import { ComplexityLevels } from '../../types/complexityLevelType';
+import { DisclaimerStatus } from './options/ShelleyEraOptionDialogContainer';
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -30,6 +31,7 @@ export const mockTransferProps: {
   YoroiTransferPageProps?: YoroiTransferPageData,
   DaedalusTransferPageProps?: DaedalusTransferPageData,
   publicDerivers: Array<PublicDeriver<>>,
+  shelleyRewardDisclaimer?: void | $Values<typeof DisclaimerStatus>,
   getConceptualWalletSettingsCache:
     typeof WalletSettingsStore.prototype.getConceptualWalletSettingsCache,
   getPublicKeyCache:
@@ -157,12 +159,25 @@ export const mockTransferProps: {
             },
           },
         },
-        ItnEraOptionDialogContainerProps: {
+        ShelleyEraOptionDialogContainerProps: {
           generated: {
-            stores: Object.freeze({}),
+            stores: {
+              wallets: {
+                selected: request.selected,
+              },
+              uiDialogs: {
+                getActiveData: (key) => ({
+                  disclaimer: request.shelleyRewardDisclaimer,
+                  continuation: () => {},
+                }[key]),
+              },
+            },
             actions: {
               yoroiTransfer: {
                 startTransferFunds: { trigger: action('startTransferFunds') },
+              },
+              dialogs: {
+                updateDataForActiveDialog: { trigger: action('updateDataForActiveDialog') },
               },
             },
           },

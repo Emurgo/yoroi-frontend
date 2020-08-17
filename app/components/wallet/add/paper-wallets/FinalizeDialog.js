@@ -17,6 +17,7 @@ import ExplorableHashContainer from '../../../../containers/widgets/ExplorableHa
 import { SelectedExplorer } from '../../../../domain/SelectedExplorer';
 import type { Notification } from '../../../../types/notificationType';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { truncateAddress } from '../../../../utils/formatters';
 
 const messages = defineMessages({
   dialogTitleFinalizePaper: {
@@ -146,7 +147,7 @@ export default class FinalizeDialog extends Component<Props> {
                   linkType="address"
                 >
                   <RawHash light>
-                    {address}
+                    {truncateAddress(address)}
                   </RawHash>
                 </ExplorableHashContainer>
               </CopyableAddress>

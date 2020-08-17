@@ -261,6 +261,9 @@ export default class DaedalusTransferStore extends Store {
       if (!this.transferTx) {
         throw new NoTransferTxError();
       }
+      if (this.transferTx.id == null || this.transferTx.encodedTx == null) {
+        throw new Error(`${nameof(DaedalusTransferStore)} transaction not signed`);
+      }
       await this.transferFundsRequest.execute({
         id: this.transferTx.id,
         encodedTx: this.transferTx.encodedTx,

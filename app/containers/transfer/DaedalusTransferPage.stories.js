@@ -7,10 +7,14 @@ import { boolean, select, } from '@storybook/addon-knobs';
 import { action } from '@storybook/addon-actions';
 import {
   globalKnobs,
-  walletLookup,
-  genDummyWithCache,
   genUnitOfAccount,
 } from '../../../stories/helpers/StoryWrapper';
+import {
+  walletLookup,
+} from '../../../stories/helpers/WalletCache';
+import {
+  genShelleyCip1852DummyWithCache,
+} from '../../../stories/helpers/cardano/ShelleyCip1852Mocks';
 import { mockTransferProps, wrapTransfer } from './Transfer.mock';
 import { THEMES } from '../../themes';
 import { defaultToSelectedExplorer } from '../../domain/SelectedExplorer';
@@ -29,6 +33,8 @@ import {
   NotEnoughMoneyToSendError,
 } from '../../api/common/errors';
 import AdaApi from '../../api/ada/index';
+import type { IAddressTypeStore, IAddressTypeUiSubset } from '../../stores/stateless/addressStores';
+import { allAddressSubgroups } from '../../stores/stateless/addressStores';
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -36,11 +42,29 @@ export default {
   decorators: [withScreenshot],
 };
 
+const genDefaultGroupMap: (
+  void => Map<Class<IAddressTypeStore>, IAddressTypeUiSubset>
+) = () => {
+  return new Map(
+    allAddressSubgroups.map(type => [
+      type.class,
+      {
+        all: [],
+        wasExecuted: true,
+      },
+    ])
+  );
+};
+
+
 const genBaseProps: {|
   wallet: null | PublicDeriver<>,
   daedalusTransfer: InexactSubset<MockDaedalusTransferStore>,
 |} => * = (request) => ({
   stores: {
+    addresses: {
+      addressSubgroupMap: genDefaultGroupMap(),
+    },
     explorers: {
       selectedExplorer: defaultToSelectedExplorer(),
     },
@@ -92,7 +116,7 @@ const genBaseProps: {|
 });
 
 export const GettingMnemonics = (): Node => {
-  const wallet = genDummyWithCache();
+  const wallet = genShelleyCip1852DummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
     const baseProps = genBaseProps({
@@ -113,7 +137,7 @@ export const GettingMnemonics = (): Node => {
 };
 
 export const GettingPaperMnemonics = (): Node => {
-  const wallet = genDummyWithCache();
+  const wallet = genShelleyCip1852DummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
     const baseProps = genBaseProps({
@@ -134,7 +158,7 @@ export const GettingPaperMnemonics = (): Node => {
 };
 
 export const GettingMasterKey = (): Node => {
-  const wallet = genDummyWithCache();
+  const wallet = genShelleyCip1852DummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
     const baseProps = genBaseProps({
@@ -155,7 +179,7 @@ export const GettingMasterKey = (): Node => {
 };
 
 export const RestoringAddresses = (): Node => {
-  const wallet = genDummyWithCache();
+  const wallet = genShelleyCip1852DummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
     const baseProps = genBaseProps({
@@ -176,7 +200,7 @@ export const RestoringAddresses = (): Node => {
 };
 
 export const CheckingAddresses = (): Node => {
-  const wallet = genDummyWithCache();
+  const wallet = genShelleyCip1852DummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
     const baseProps = genBaseProps({
@@ -197,7 +221,7 @@ export const CheckingAddresses = (): Node => {
 };
 
 export const GeneratingTx = (): Node => {
-  const wallet = genDummyWithCache();
+  const wallet = genShelleyCip1852DummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
     const baseProps = genBaseProps({
@@ -218,7 +242,7 @@ export const GeneratingTx = (): Node => {
 };
 
 export const ReadyToTransfer = (): Node => {
-  const wallet = genDummyWithCache();
+  const wallet = genShelleyCip1852DummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
     const baseProps = genBaseProps({
@@ -232,7 +256,7 @@ export const ReadyToTransfer = (): Node => {
           id: 'b65ae37bcc560e323ea8922de6573004299b6646e69ab9fac305f62f0c94c3ab',
           encodedTx: new Uint8Array([]),
           senders: ['DdzFFzCqrhsmcx7z25PRkdbeUNqNNW4brhznpVxbm1EknAahjaCFEjYXg9KJRqkixjgGyz8D9GSX3CFDRoNrZyfJsi61N2FxCnq9yWBy'],
-          receiver: 'Ae2tdPwUPEZ5PxKxoyZDgjsKgMWMpTRa4PH3sVgARSGBsWwNBH3qg7cMFsP',
+          receivers: ['Ae2tdPwUPEZ5PxKxoyZDgjsKgMWMpTRa4PH3sVgARSGBsWwNBH3qg7cMFsP'],
         },
         transferFundsRequest: {
           isExecuting: boolean('isExecuting', false),
@@ -251,7 +275,7 @@ export const ReadyToTransfer = (): Node => {
 };
 
 export const ErrorPage = (): Node => {
-  const wallet = genDummyWithCache();
+  const wallet = genShelleyCip1852DummyWithCache();
   const lookup = walletLookup([wallet]);
   return (() => {
     const errorCases = {

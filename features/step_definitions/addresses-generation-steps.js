@@ -7,7 +7,7 @@ import { expect } from 'chai';
 import {
   checkIfElementsInArrayAreUnique,
 } from '../support/helpers/helpers';
-import { truncateAddress } from '../../app/utils/formatters';
+import { truncateAddress, truncateAddressShort } from '../../app/utils/formatters';
 
 Given(/^I go to the receive screen$/, async function () {
   await this.click('.receive');
@@ -22,7 +22,11 @@ When(/^I click on the internal tab$/, async function () {
 });
 
 When(/^I click on the address book tab$/, async function () {
-  await this.click(`//span[contains(text(), "Address book") and contains(@class, "ReceiveNavButton_label")]`, By.xpath);
+  await this.click(`//div[contains(text(), "Address book") and contains(@class, "ReceiveNavButton_label")]`, By.xpath);
+});
+
+When(/^I click on the reward address tab$/, async function () {
+  await this.click(`//div[contains(text(), "Reward") and contains(@class, "ReceiveNavButton_label")]`, By.xpath);
 });
 
 When(/^I click on the All addresses button$/, async function () {
@@ -50,7 +54,7 @@ When(/^I click on the Generate new address button ([0-9]+) times$/, async functi
 });
 
 Then(/^I should see my latest address "([^"]*)" at the top$/, async function (address) {
-  await this.waitUntilText('.StandardHeader_copyableHash', address);
+  await this.waitUntilText('.StandardHeader_copyableHash', truncateAddress(address));
 });
 Then(/^I should see ([^"]*) addresses with address "([^"]*)" at the top$/, async function (numAddresses, address) {
   const rows = await this.driver.findElements(By.css('.WalletReceive_walletAddress'));
@@ -58,7 +62,7 @@ Then(/^I should see ([^"]*) addresses with address "([^"]*)" at the top$/, async
 
   const topAddrElem = await rows[0].findElement(By.css('.WalletReceive_addressHash'));
   const topAddr = await topAddrElem.getText();
-  expect(topAddr).to.equal(truncateAddress(address));
+  expect(topAddr).to.equal(truncateAddressShort(address));
 });
 
 Then(/^I see every generated address is unique$/, async function () {
@@ -86,7 +90,7 @@ Then(/^I should see the addresses exactly list them$/, async function (table) {
   const waitUntilAddressesAppeared = rows.map((row, index) => (
     this.waitUntilText(
       `.generatedAddress-${index + 1} .RawHash_hash`,
-      truncateAddress(row.address)
+      truncateAddressShort(row.address)
     )
   ));
   const noMoreAddressAppeared = this.waitForElementNotPresent(
@@ -97,7 +101,7 @@ Then(/^I should see the addresses exactly list them$/, async function (table) {
 });
 
 Then(/^I shouldn't see the address "([^"]*)"$/, async function (address) {
-  await this.waitForElementNotPresent(`//div[contains(text(), "${truncateAddress(address)}")]`, By.xpath);
+  await this.waitForElementNotPresent(`//div[contains(text(), "${truncateAddressShort(address)}")]`, By.xpath);
 });
 
 Then(/I should see an error about max unused addresses/, async function () {

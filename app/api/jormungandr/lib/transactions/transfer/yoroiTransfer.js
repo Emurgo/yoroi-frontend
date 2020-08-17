@@ -6,7 +6,6 @@ import {
   Logger,
   stringifyError,
 } from '../../../../../utils/logging';
-import { Bech32Prefix } from '../../../../../config/stringConfig';
 import { addressToDisplayString } from '../../../../ada/lib/storage/bridge/utils';
 import {
   GenerateTransferTxError
@@ -84,9 +83,7 @@ export async function buildYoroiTransferTx(payload: {|
       encodedTx: fragment.as_bytes(),
       // recall: some addresses may be legacy, some may be Shelley
       senders: uniqueSenders.map(addr => addressToDisplayString(addr, networks.JormungandrMainnet)),
-      receiver: RustModule.WalletV3.Address.from_bytes(
-        Buffer.from(outputAddr, 'hex')
-      ).to_string(Bech32Prefix.ADDRESS)
+      receivers: [outputAddr],
     };
   } catch (error) {
     Logger.error(`transfer::${nameof(buildYoroiTransferTx)} ${stringifyError(error)}`);

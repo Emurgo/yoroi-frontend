@@ -119,6 +119,7 @@ import {
   WalletAlreadyRestoredError,
   InvalidWitnessError,
   HardwareUnsupportedError,
+  NoInputsError,
 } from '../common/errors';
 import LocalizableError from '../../i18n/LocalizableError';
 import { scanBip44Account, } from '../common/lib/restoration/bip44';
@@ -206,7 +207,7 @@ export type CreateAdaPaperPdfFunc = (
 // getAllAddressesForDisplay
 
 export type GetAllAddressesForDisplayRequest = {|
-  publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetAllUtxos,
+  publicDeriver: IPublicDeriver<>,
   type: CoreAddressT,
 |};
 export type GetAllAddressesForDisplayResponse = Array<{|
@@ -255,10 +256,6 @@ export type GetNoticesFunc = (
 export type SignAndBroadcastRequest = {|
   publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetSigningKey,
   signRequest: HaskellShelleyTxSignRequest,
-  /** note: this should include your own staking key too if it's needed to sign the transaction */
-  getStakingWitnesses: void => Promise<(
-    RustModule.WalletV4.TransactionHash => Array<RustModule.WalletV4.Vkeywitness>
-  )>,
   password: string,
   sendTx: SendFunc,
 |};
@@ -365,6 +362,7 @@ export type CreateWithdrawalTxRequest = {|
   absSlotNumber: BigNumber,
   getAccountState: AccountStateFunc,
   withdrawals: Array<{|
+    privateKey?: RustModule.WalletV4.PrivateKey,
     rewardAddress: string, // address you're withdrawing from
     /**
      * you need to withdraw all ADA before deregistering
@@ -740,7 +738,7 @@ export default class AdaApi {
         RustModule.WalletV4.Bip32PrivateKey.from_bytes(
           Buffer.from(normalizedKey.prvKeyHex, 'hex')
         ),
-        await request.getStakingWitnesses(),
+        request.signRequest.neededStakingKeyHashes.wits,
         undefined,
       );
 
@@ -933,12 +931,24 @@ export default class AdaApi {
       Logger.debug(
         `${nameof(AdaApi)}::${nameof(this.createUnsignedTx)} success: ` + stringifyData(unsignedTxResponse)
       );
-      return new HaskellShelleyTxSignRequest({
-        senderUtxos: unsignedTxResponse.senderUtxos,
-        unsignedTx: unsignedTxResponse.txBuilder,
-        changeAddr: unsignedTxResponse.changeAddr,
-        certificate: undefined,
-      });
+      return new HaskellShelleyTxSignRequest(
+        {
+          senderUtxos: unsignedTxResponse.senderUtxos,
+          unsignedTx: unsignedTxResponse.txBuilder,
+          changeAddr: unsignedTxResponse.changeAddr,
+          certificate: undefined,
+        },
+        undefined,
+        {
+          ChainNetworkId: Number.parseInt(config.ChainNetworkId, 10),
+          KeyDeposit: new BigNumber(config.KeyDeposit),
+          PoolDeposit: new BigNumber(config.PoolDeposit),
+        },
+        {
+          neededHashes: new Set(),
+          wits: new Set(),
+        },
+      );
     } catch (error) {
       Logger.error(
         `${nameof(AdaApi)}::${nameof(this.createUnsignedTx)} error: ` + stringifyError(error)
@@ -1033,12 +1043,28 @@ export default class AdaApi {
         .plus(differenceAfterTx) // subtract any part of the fee that comes from UTXO
         .plus(request.valueInAccount); // recall: rewards are compounding
 
-      const signTxRequest = new HaskellShelleyTxSignRequest({
-        senderUtxos: unsignedTx.senderUtxos,
-        unsignedTx: unsignedTx.txBuilder,
-        changeAddr: unsignedTx.changeAddr,
-        certificate: undefined,
-      });
+      const signTxRequest = new HaskellShelleyTxSignRequest(
+        {
+          senderUtxos: unsignedTx.senderUtxos,
+          unsignedTx: unsignedTx.txBuilder,
+          changeAddr: unsignedTx.changeAddr,
+          certificate: undefined,
+        },
+        undefined,
+        {
+          ChainNetworkId: Number.parseInt(config.ChainNetworkId, 10),
+          KeyDeposit: new BigNumber(config.KeyDeposit),
+          PoolDeposit: new BigNumber(config.PoolDeposit),
+        },
+        {
+          neededHashes: new Set([Buffer.from(
+            RustModule.WalletV4.StakeCredential
+              .from_keyhash(stakingKey.hash())
+              .to_bytes()
+          ).toString('hex')]),
+          wits: new Set(),
+        },
+      );
       return {
         signTxRequest,
         totalAmountToDelegate
@@ -1079,6 +1105,7 @@ export default class AdaApi {
       const changeAddr = nextUnusedInternal.addressInfo;
 
       const certificates = [];
+      const requiredWits: Array<RustModule.WalletV4.Ed25519KeyHash> = [];
       for (const withdrawal of request.withdrawals) {
         if (withdrawal.shouldDeregister) {
           const wasmAddr = RustModule.WalletV4.RewardAddress.from_address(
@@ -1087,24 +1114,53 @@ export default class AdaApi {
             )
           );
           if (wasmAddr == null) throw new Error(`${nameof(AdaApi)}::${nameof(this.createUnsignedTx)} withdrawal not a reward address`);
+          const paymentCred = wasmAddr.payment_cred();
+          {
+            const keyHash = paymentCred.to_keyhash();
+            if (keyHash == null) throw new Error(`Unexpected: withdrawal from a script hash`);
+            requiredWits.push(keyHash);
+          }
           certificates.push(RustModule.WalletV4.Certificate.new_stake_deregistration(
-            RustModule.WalletV4.StakeDeregistration.new(wasmAddr.payment_cred())
+            RustModule.WalletV4.StakeDeregistration.new(paymentCred)
           ));
         }
       }
       const accountStates = await request.getAccountState({
         addresses: request.withdrawals.map(withdrawal => withdrawal.rewardAddress)
       });
-      const finalWithdrawals = Object.keys(accountStates).map(address => ({
-        address: RustModule.WalletV4.RewardAddress.from_address(
+      const neededKeys = {
+        neededHashes: new Set(),
+        wits: new Set(),
+      };
+      const finalWithdrawals = Object.keys(accountStates).map(address => {
+        const rewardForAddress = accountStates[address];
+        if (rewardForAddress == null) {
+          throw new NoInputsError();
+        }
+        const rewardBalance = new BigNumber(rewardForAddress.remainingAmount);
+        // TODO: this is actually incorrect
+        // since you may want to unregister your staking key even if the balance is 0
+        // to get back your deposit
+        if (rewardBalance.eq(0)) {
+          throw new NoInputsError();
+        }
+        const rewardAddress = RustModule.WalletV4.RewardAddress.from_address(
           RustModule.WalletV4.Address.from_bytes(
             Buffer.from(address, 'hex')
           )
-        ) ?? (() => { throw new Error(`${nameof(AdaApi)}::${nameof(this.createUnsignedTx)} withdrawal not a reward address`); })(),
-        amount: accountStates[address] == null
-          ? RustModule.WalletV4.BigNum.from_str('0')
-          : RustModule.WalletV4.BigNum.from_str(accountStates[address].remainingAmount),
-      }));
+        );
+        if (rewardAddress == null) {
+          throw new Error(`${nameof(AdaApi)}::${nameof(this.createUnsignedTx)} withdrawal not a reward address`);
+        }
+        {
+          const stakeCredential = rewardAddress.payment_cred();
+          neededKeys.neededHashes.add(Buffer.from(stakeCredential.to_bytes()).toString('hex'));
+        }
+        return {
+          address: rewardAddress,
+          amount: RustModule.WalletV4.BigNum.from_str(rewardForAddress.remainingAmount)
+        };
+      });
       const unsignedTxResponse = shelleyNewAdaUnsignedTx(
         [],
         {
@@ -1117,15 +1173,43 @@ export default class AdaApi {
         certificates,
         finalWithdrawals
       );
+      // there wasn't enough in the withdrawal to send anything to us
+      if (unsignedTxResponse.changeAddr.length === 0) {
+        throw new NoInputsError();
+      }
       Logger.debug(
         `${nameof(AdaApi)}::${nameof(this.createWithdrawalTx)} success: ` + stringifyData(unsignedTxResponse)
       );
-      return new HaskellShelleyTxSignRequest({
-        senderUtxos: unsignedTxResponse.senderUtxos,
-        unsignedTx: unsignedTxResponse.txBuilder,
-        changeAddr: unsignedTxResponse.changeAddr,
-        certificate: undefined,
-      });
+
+      {
+        const body = unsignedTxResponse.txBuilder.build();
+        for (const withdrawal of request.withdrawals) {
+          if (withdrawal.privateKey != null) {
+            const { privateKey } = withdrawal;
+            neededKeys.wits.add(
+              Buffer.from(RustModule.WalletV4.make_vkey_witness(
+                RustModule.WalletV4.hash_transaction(body),
+                privateKey
+              ).to_bytes()).toString('hex')
+            );
+          }
+        }
+      }
+      return new HaskellShelleyTxSignRequest(
+        {
+          senderUtxos: unsignedTxResponse.senderUtxos,
+          unsignedTx: unsignedTxResponse.txBuilder,
+          changeAddr: unsignedTxResponse.changeAddr,
+          certificate: undefined,
+        },
+        undefined,
+        {
+          ChainNetworkId: Number.parseInt(config.ChainNetworkId, 10),
+          KeyDeposit: new BigNumber(config.KeyDeposit),
+          PoolDeposit: new BigNumber(config.PoolDeposit),
+        },
+        neededKeys,
+      );
     } catch (error) {
       Logger.error(
         `${nameof(AdaApi)}::${nameof(this.createWithdrawalTx)} error: ` + stringifyError(error)
@@ -1556,9 +1640,7 @@ function getDifferenceAfterTx(
 export async function genOwnStakingKey(request: {|
   publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetSigningKey & IGetStakingKey,
   password: string,
-|}): Promise<(
-  RustModule.WalletV4.TransactionHash => Array<RustModule.WalletV4.Vkeywitness>
-)> {
+|}): Promise<RustModule.WalletV4.PrivateKey> {
   const signingKeyFromStorage = await request.publicDeriver.getSigningKey();
   const stakingAddr = await request.publicDeriver.getStakingKey();
   const normalizedKey = await request.publicDeriver.normalizeKey({
@@ -1576,10 +1658,5 @@ export async function genOwnStakingKey(request: {|
     },
   }).to_raw_key();
 
-  return (txHash) => {
-    return [RustModule.WalletV4.make_vkey_witness(
-      txHash,
-      normalizedStakingKey,
-    )];
-  };
+  return normalizedStakingKey;
 }

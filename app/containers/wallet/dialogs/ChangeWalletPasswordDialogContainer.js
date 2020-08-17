@@ -48,7 +48,7 @@ export default class ChangeWalletPasswordDialogContainer extends Component<Props
           changeSigningKeyRequest.reset();
         }}
         onDataChange={data => {
-          updateDataForActiveDialog.trigger({ data });
+          updateDataForActiveDialog.trigger(data);
         }}
         isSubmitting={changeSigningKeyRequest.isExecuting}
         error={changeSigningKeyRequest.error}
@@ -64,10 +64,9 @@ export default class ChangeWalletPasswordDialogContainer extends Component<Props
           trigger: (params: void) => void
         |},
         updateDataForActiveDialog: {|
-          trigger: (params: {
+          trigger: (params: {|
             [key: string]: any,
-            ...
-          }) => void
+          |}) => void
         |}
       |},
       walletSettings: {|

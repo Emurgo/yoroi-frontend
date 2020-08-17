@@ -7,11 +7,11 @@ Feature: Transfer Yoroi Wallet funds
 
   @it-114
   Scenario: Yoroi transfer fails when user transfers from an empty wallet (IT-114)
-    Given There is a wallet stored named empty-wallet
+    Given There is a Byron wallet stored named empty-wallet
     And I am on the transfer start screen
     When I click on the byron button on the transfer screen
     When I click on the icarus tab
-    Then I select the 15-word option
+    Then I select the Byron 15-word option
     And I enter the recovery phrase:
     | recoveryPhrase                                                                                           |
     | remind style lunch result accuse upgrade atom eight limit glance frequent eternal fashion borrow monster |
@@ -25,11 +25,11 @@ Feature: Transfer Yoroi Wallet funds
     # The recovery phrase and its balance(s) are defined in 
     # /features/mock-chain/TestWallets.js and
     # /features/mock-chain/mockImporter.js
-    Given There is a wallet stored named empty-wallet
+    Given There is a Byron wallet stored named empty-wallet
     And I am on the transfer start screen
     When I click on the byron button on the transfer screen
     When I click on the icarus tab
-    Then I select the 15-word option
+    Then I select the Byron 15-word option
     And I enter the recovery phrase:
     | recoveryPhrase                                                                                           |
     | dragon mango general very inmate idea rabbit pencil element bleak term cart critic kite pill |
@@ -49,11 +49,11 @@ Feature: Transfer Yoroi Wallet funds
 
   @it-113
   Scenario: Wallet changes after transaction is generated (IT-113)
-    Given There is a wallet stored named empty-wallet
+    Given There is a Byron wallet stored named empty-wallet
     And I am on the transfer start screen
     When I click on the byron button on the transfer screen
     When I click on the icarus tab
-    Then I select the 15-word option
+    Then I select the Byron 15-word option
     And I enter the recovery phrase:
     | recoveryPhrase                                                                            |
     | final autumn bacon fold horse scissors act pole country focus task blush basket move view |
@@ -83,7 +83,7 @@ Feature: Transfer Yoroi Wallet funds
 
   @it-115
   Scenario: User can transfer funds from a trezor wallet (IT-115)
-    Given There is a wallet stored named empty-wallet
+    Given There is a Byron wallet stored named empty-wallet
     And I am on the transfer start screen
     When I click on the byron button on the transfer screen
     When I click on the icarus tab
@@ -105,7 +105,7 @@ Feature: Transfer Yoroi Wallet funds
     # The recovery phrase and its balance(s) are defined in 
     # /features/mock-chain/TestWallets.js and
     # /features/mock-chain/mockImporter.js
-    Given There is a wallet stored named empty-wallet
+    Given There is a Byron wallet stored named empty-wallet
     And I am on the transfer start screen
     When I click on the byron button on the transfer screen
     When I click on the icarus tab
@@ -122,3 +122,25 @@ Feature: Transfer Yoroi Wallet funds
     | Ae2tdPwUPEZ7TQpzbJZCbA5BjW4zWYFn47jKo43ouvfe4EABoCfvEjwYvJr | 2000000    |
     When I confirm Yoroi transfer funds
     Then I should see the Yoroi transfer success screen
+
+  @it-146
+  Scenario: User can claim Shelley rewards (IT-146)
+    Given There is a Shelley wallet stored named shelley-simple-15
+    And I am on the transfer start screen
+    When I click on the shelley button on the transfer screen
+    Then I select the Shelley 15-word option
+    Then I accept the prompt
+    And I enter the recovery phrase:
+    | recoveryPhrase                                                                                           |
+    | eight country switch draw meat scout mystery blade tip drift useless good keep usage title |
+    And I proceed with the recovery
+    Then I should see a plate ZDDC-9858
+    Then I click the next button
+    Then I should see on the Yoroi withdrawal transfer summary screen:
+    | fromAddress                                                | amount           |
+    | addr1ux2436tfe25727kul3qtnyr7k72rvw6ep7h59ll53suwhzqfv6jjh | 5000000    |
+    And I enter the wallet password:
+      | password   |
+      | asdfasdfasdf |
+    When I confirm Yoroi transfer funds
+    Then I should see the summary screen

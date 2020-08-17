@@ -5,6 +5,8 @@ import { By } from 'selenium-webdriver';
 import { expect } from 'chai';
 import i18n from '../support/helpers/i18n-helpers';
 import { addTransaction, generateTransaction, } from '../mock-chain/mockCardanoImporter';
+import { setExpectedTx, } from '../mock-chain/mockCardanoServer';
+import { truncateAddress, } from '../../app/utils/formatters';
 
 Given(/^I have a wallet with funds$/, async function () {
   const amountWithCurrency = await this.driver.findElements(By.xpath("//div[@class='WalletTopbarTitle_walletAmount']"));
@@ -29,10 +31,14 @@ When(/^I fill the address of the form:$/, async function (table) {
   await this.input("input[name='receiver']", fields.address);
 });
 
+Given(/^The expected transaction is "([^"]*)"$/, (base64Tx) => {
+  setExpectedTx(base64Tx);
+});
+
 When(/^I see CONFIRM TRANSACTION Pop up:$/, async function (table) {
   const fields = table.hashes()[0];
   const total = parseFloat(fields.amount) + parseFloat(fields.fee);
-  await this.waitUntilText('.WalletSendConfirmationDialog_addressTo', fields.address);
+  await this.waitUntilText('.WalletSendConfirmationDialog_addressTo', truncateAddress(fields.address));
   await this.waitUntilContainsText('.WalletSendConfirmationDialog_fees', fields.fee);
   await this.waitUntilContainsText('.WalletSendConfirmationDialog_amount', fields.amount);
   await this.waitUntilContainsText('.WalletSendConfirmationDialog_totalAmount', total);

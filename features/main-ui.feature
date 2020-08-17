@@ -6,13 +6,13 @@ Feature: Main UI
   @it-81
   Scenario: Restore wallet and get balance with many addresses (IT-81)
     Given I have completed the basic setup
-    And There is a wallet stored named many-tx-wallet
+    And There is a Byron wallet stored named many-tx-wallet
     Then I should see the balance number "3.110005 ADA"
 
   @it-15
   Scenario: Main Screen Tabs Switching (IT-15)
     Given I have completed the basic setup
-    When There is a wallet stored named empty-wallet
+    When There is a Byron wallet stored named empty-wallet
     And I go to the send transaction screen
     Then I should see send transaction screen
     When I go to the receive screen
@@ -23,7 +23,7 @@ Feature: Main UI
   @it-21
   Scenario: Yoroi Wallet "Home Button" Test (IT-21)
     Given I have completed the basic setup
-    When There is a wallet stored named empty-wallet
+    When There is a Byron wallet stored named empty-wallet
     And I am on the transfer start screen
     And I go to the main screen
     Then I should see the transactions screen
@@ -34,7 +34,7 @@ Feature: Main UI
   @it-25
   Scenario: Ensure user can copy Wallet address to Windows clipboard via "Copy address" buttons (IT-25)
     Given I have completed the basic setup
-    When There is a wallet stored named empty-wallet
+    When There is a Byron wallet stored named empty-wallet
     When I go to the receive screen
     Then I should see the Receive screen
     When I click on "copy to clipboard" button
@@ -57,7 +57,7 @@ Feature: Main UI
   @it-110
   Scenario: Ensure user can hide balance (IT-110)
     Given I have completed the basic setup
-    And There is a wallet stored named many-tx-wallet
+    And There is a Byron wallet stored named many-tx-wallet
     And I click on hide balance button
     Then I should see my balance hidden
     When I refresh the page

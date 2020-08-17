@@ -6,7 +6,7 @@ import Store from '../base/Store';
 import LocalizedRequest from '../lib/LocalizedRequest';
 import type {
   CreateDelegationTxFunc,
-  SignAndBroadcastRequest,
+  CreateWithdrawalTxResponse,
 } from '../../api/ada';
 import { buildRoute } from '../../utils/routing';
 import { ROUTES } from '../../routes-config';
@@ -23,25 +23,20 @@ import {
 import {
   getRegistrationHistory,
 } from '../../api/ada/lib/storage/bridge/delegationUtils';
-import { genOwnStakingKey } from '../../api/ada/index';
 import {
-  // isLedgerNanoWallet,
+  isLedgerNanoWallet,
   isTrezorTWallet,
 } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
-import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 
 export default class AdaDelegationTransactionStore extends Store {
 
   @observable selectedPools: Array<string>;
 
+  @observable createWithdrawalTx: LocalizedRequest<DeferredCall<CreateWithdrawalTxResponse>>
+    = new LocalizedRequest<DeferredCall<CreateWithdrawalTxResponse>>(request => request());
+
   @observable createDelegationTx: LocalizedRequest<CreateDelegationTxFunc>
     = new LocalizedRequest<CreateDelegationTxFunc>(this.api.ada.createDelegationTx);
-
-  @observable signAndBroadcastDelegationTx: LocalizedRequest<
-    typeof AdaDelegationTransactionStore.prototype.sendAndRefresh
-  > = new LocalizedRequest<typeof AdaDelegationTransactionStore.prototype.sendAndRefresh>(
-    this.sendAndRefresh
-  );
 
   /** tracks if wallet balance changed during confirmation screen */
   @observable isStale: boolean = false;
@@ -154,55 +149,49 @@ export default class AdaDelegationTransactionStore extends Store {
     password?: string,
     publicDeriver: PublicDeriver<>,
   |} => Promise<void> = async (request) => {
-    const withStakingKey = asGetAllAccounting(request.publicDeriver);
-    if (withStakingKey == null) {
-      throw new Error(`${nameof(this._signTransaction)} missing staking key functionality`);
-    }
-
     const result = this.createDelegationTx.result;
     if (result == null) {
       throw new Error(`${nameof(this._signTransaction)} no tx to broadcast`);
     }
-    if (isTrezorTWallet(request.publicDeriver.getParent())) {
-      await this.signAndBroadcastDelegationTx.execute({
+    if (isLedgerNanoWallet(request.publicDeriver.getParent())) {
+      await this.stores.substores.ada.wallets.adaSendAndRefresh({
         broadcastRequest: {
-          trezor: {
-            publicDeriver: withStakingKey,
+          ledger: {
             signRequest: result.signTxRequest,
-          }
+            publicDeriver: request.publicDeriver,
+          },
         },
-        refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(
-          request.publicDeriver
-        ),
-      }).promise;
+        refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.publicDeriver),
+      });
       return;
     }
-    // normal password-based wallet
-    const withSigning = (asGetSigningKey(withStakingKey));
-    if (withSigning == null) {
-      throw new Error(`${nameof(this._signTransaction)} public deriver missing signing functionality.`);
+    if (isTrezorTWallet(request.publicDeriver.getParent())) {
+      await this.stores.substores.ada.wallets.adaSendAndRefresh({
+        broadcastRequest: {
+          trezor: {
+            signRequest: result.signTxRequest,
+            publicDeriver: request.publicDeriver,
+          },
+        },
+        refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.publicDeriver),
+      });
+      return;
     }
+
+    // normal password-based wallet
     if (request.password == null) {
       throw new Error(`${nameof(this._signTransaction)} missing password for non-hardware signing`);
     }
-    const { password } = request;
-    await this.signAndBroadcastDelegationTx.execute({
+    await this.stores.substores.ada.wallets.adaSendAndRefresh({
       broadcastRequest: {
         normal: {
-          publicDeriver: withSigning,
-          signRequest: result.signTxRequest,
-          getStakingWitnesses: async () => await genOwnStakingKey({
-            publicDeriver: withSigning,
-            password,
-          }),
+          publicDeriver: request.publicDeriver,
           password: request.password,
-          sendTx: this.stores.substores.ada.stateFetchStore.fetcher.sendTx,
-        }
+          signRequest: result.signTxRequest,
+        },
       },
-      refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(
-        request.publicDeriver
-      ),
-    }).promise;
+      refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.publicDeriver),
+    });
   }
 
   _complete: void => void = () => {
@@ -215,47 +204,9 @@ export default class AdaDelegationTransactionStore extends Store {
     this.actions.router.goToRoute.trigger({ route });
   }
 
-  sendAndRefresh: {|
-    broadcastRequest: {|
-      normal: SignAndBroadcastRequest,
-    |} | {|
-     trezor: {|
-        publicDeriver: PublicDeriver<>,
-        signRequest: HaskellShelleyTxSignRequest,
-     |},
-    |},
-    refreshWallet: () => Promise<void>,
-  |} => Promise<void> = async (request) => {
-    const refresh = async () => {
-      try {
-        await request.refreshWallet();
-      } catch (_e) {
-        // even if refreshing the wallet fails, we don't want to fail the tx
-        // otherwise user may try and re-send the tx
-      }
-    };
-    if (request.broadcastRequest.trezor) {
-      await this.actions.ada.trezorSend.sendUsingTrezor.trigger({
-        params: { signRequest: request.broadcastRequest.trezor.signRequest },
-        publicDeriver: request.broadcastRequest.trezor.publicDeriver,
-      });
-      const { error } = this.stores.substores.ada.trezorSend;
-      this.actions.ada.trezorSend.reset.trigger();
-      if (error) {
-        throw error;
-      }
-    }
-    if (request.broadcastRequest.normal) {
-      await this.api.ada.signAndBroadcast(
-        request.broadcastRequest.normal
-      );
-    }
-    await refresh();
-  }
-
   @action.bound
   reset(request: {| justTransaction: boolean |}): void {
-    this.signAndBroadcastDelegationTx.reset();
+    this.stores.wallets.sendMoneyRequest.reset();
     this.createDelegationTx.reset();
     if (!request.justTransaction) {
       this.isStale = false;

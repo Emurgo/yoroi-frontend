@@ -76,7 +76,7 @@ export async function buildDaedalusTransferTx(payload: {|
       ).toString('hex'),
       encodedTx: signedTx.to_bytes(),
       senders: Object.keys(addressKeys), // recall: js keys are unique so need to dedupe
-      receiver: outputAddr,
+      receivers: [outputAddr],
     };
   } catch (error) {
     Logger.error(`daedalusTransfer::${nameof(buildDaedalusTransferTx)} ${stringifyError(error)}`);

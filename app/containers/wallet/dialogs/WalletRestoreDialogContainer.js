@@ -36,6 +36,7 @@ import type {
   NetworkRow,
 } from '../../../api/ada/lib/storage/database/primitives/tables';
 import { isJormungandr } from '../../../api/ada/lib/storage/database/prepackaged/networks';
+import { addressToDisplayString, } from '../../../api/ada/lib/storage/bridge/utils';
 
 const messages = defineMessages({
   walletUpgradeNoop: {
@@ -247,12 +248,19 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
             .get(this.getSelectedNetwork().NetworkId) ?? (() => { throw new Error('No explorer for wallet network'); })()
           }
           onSubmit={adaWalletRestoreActions.transferFromLegacy.trigger}
-          isSubmitting={yoroiTransfer.transferFundsRequest.isExecuting}
+          isSubmitting={this.generated.stores.wallets.sendMoneyRequest.isExecuting}
           onCancel={this.onCancel}
           error={yoroiTransfer.error}
+          addressLookup={
+            /** no wallet is created yet so we can't know this information */
+            () => undefined
+          }
           dialogTitle={intl.formatMessage(globalMessages.walletUpgrade)}
           coinPrice={coinPrice}
           unitOfAccountSetting={this.generated.stores.profile.unitOfAccount}
+          addressToDisplayString={
+              addr => addressToDisplayString(addr, this.getSelectedNetwork())
+            }
         />);
       }
       case TransferStatus.ERROR: {
@@ -350,7 +358,6 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
       yoroiTransfer: {|
         error: ?LocalizableError,
         status: TransferStatusT,
-        transferFundsRequest: {| isExecuting: boolean |},
         transferTx: ?TransferTx
       |},
       uiNotifications: {|
@@ -358,6 +365,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
         isOpen: string => boolean
       |},
       wallets: {|
+        sendMoneyRequest: {| isExecuting: boolean |},
         restoreRequest: {|
           error: ?LocalizableError,
           isExecuting: boolean,
@@ -393,6 +401,9 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
             error: stores.wallets.restoreRequest.error,
             reset: stores.wallets.restoreRequest.reset,
           },
+          sendMoneyRequest: {
+            isExecuting: stores.wallets.sendMoneyRequest.isExecuting,
+          },
         },
         coinPriceStore: {
           getCurrentPrice: stores.coinPriceStore.getCurrentPrice,
@@ -407,9 +418,6 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
           status: stores.yoroiTransfer.status,
           error: stores.yoroiTransfer.error,
           transferTx: stores.yoroiTransfer.transferTx,
-          transferFundsRequest: {
-            isExecuting: stores.yoroiTransfer.transferFundsRequest.isExecuting,
-          },
         },
       },
       actions: {

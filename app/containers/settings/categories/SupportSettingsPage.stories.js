@@ -10,7 +10,7 @@ import { mockSettingsProps } from '../Settings.mock';
 import { ROUTES } from '../../../routes-config';
 import {
   walletLookup,
-} from '../../../../stories/helpers/StoryWrapper';
+} from '../../../../stories/helpers/WalletCache';
 
 export default {
   title: `${__filename.split('.')[0]}`,
