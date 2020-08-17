@@ -17,7 +17,7 @@ const Ports = {
 };
 
 const Servers = {
-  ShelleyMainnet: 'backend.yoroiwallet.com',
+  ShelleyMainnet: 'iohk-mainnet.yoroiwallet.com',
   ByronTestnet: 'testnet-yoroi-backend.yoroiwallet.com',
   ShelleyITN: 'shelley-itn-yoroi-backend.yoroiwallet.com'
 };

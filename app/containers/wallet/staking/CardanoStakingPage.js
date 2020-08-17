@@ -160,7 +160,7 @@ export default class CardanoStakingPage extends Component<Props> {
         purpose="delegation"
         poolName={selectedPoolInfo.info?.name
             ?? intl.formatMessage(globalMessages.unknownPoolLabel)
-            }
+        }
         data={{
           description: selectedPoolInfo.info?.description ?? undefined,
           /* TODO: fill once we know this from the backend */
@@ -188,7 +188,7 @@ export default class CardanoStakingPage extends Component<Props> {
           : this.generated.stores.uiNotifications.getTooltipActiveNotification(
             this.notificationElementId
           )
-            }
+        }
         undelegate={undefined}
         reputationInfo={selectedPoolInfo.reputation}
         openReputationDialog={() => this.generated.actions.dialogs.open.trigger({
@@ -316,8 +316,8 @@ export default class CardanoStakingPage extends Component<Props> {
         <DelegationTxDialog
           staleTx={delegationTransaction.isStale}
           poolName={selectedPoolInfo.info?.name
-              ?? intl.formatMessage(globalMessages.unknownPoolLabel)
-              }
+            ?? intl.formatMessage(globalMessages.unknownPoolLabel)
+          }
           poolHash={delegationTransaction.selectedPools[0]}
           transactionFee={delegationTx.signTxRequest.fee(true)}
           amountToDelegate={delegationTx.totalAmountToDelegate}
@@ -341,7 +341,7 @@ export default class CardanoStakingPage extends Component<Props> {
             .get(
               selectedWallet.getParent().getNetworkInfo().NetworkId
             ) ?? (() => { throw new Error('No explorer for wallet network'); })()
-              }
+          }
           meta={{
             decimalPlaces: apiMeta.decimalPlaces.toNumber(),
             totalSupply: apiMeta.totalSupply,
