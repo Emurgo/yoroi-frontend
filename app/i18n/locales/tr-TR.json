@@ -260,7 +260,7 @@
   "settings.support.logs.downloadLogsLink": "buradan indirebilirsiniz",
   "settings.support.logs.title": "Kayıtlar",
   "settings.support.reportProblem.content": "Eğer SSS bölümü, sorununuzu çözemiyorsa, lütfen {supportRequestLink} bölümünü kullanın.",
-  "settings.support.reportProblem.link": "Destek talebi",
+  "settings.support.reportProblem.link": "Destek",
   "settings.support.reportProblem.title": "Sorun bildir",
   "settings.unitOfAccount.currency.btc": "Bitcoin",
   "settings.unitOfAccount.currency.cny": "Çin Yuanı",
