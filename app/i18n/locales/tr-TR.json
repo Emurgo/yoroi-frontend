@@ -495,7 +495,7 @@
   "wallet.nav.type.trezor": "Trezor cüzdan",
   "wallet.navigation.delegationDashboard": "Kontrol Paneli",
   "wallet.navigation.delegationSimple": "Delegasyon",
-  "wallet.navigation.receive": "Alıcı",
+  "wallet.navigation.receive": "Al",
   "wallet.navigation.send": "Gönder",
   "wallet.navigation.transactions": "İşlemler",
   "wallet.nowallet.subtitle": "Lütfen sağ-üst açılır menüden bir cüzdan seçin",
