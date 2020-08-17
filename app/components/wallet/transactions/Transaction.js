@@ -706,6 +706,9 @@ export default class Transaction extends Component<Props, State> {
     if (!(data instanceof CardanoShelleyTransaction)) {
       return null;
     }
+    if (data.withdrawals.length === 0) {
+      return null;
+    }
     return (
       <div className={styles.addressContent}>
         <div>
