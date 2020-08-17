@@ -9,17 +9,38 @@ type TransferSourceType = Array<{|
   amount: string | number
 |}>;
 
-export async function checkAddressesRecoveredAreCorrect(
+export async function baseCheckAddressesRecoveredAreCorrect(
   rows: TransferSourceType,
-  world: Object
+  world: Object,
+  fieldName: string,
 ):Promise<void> {
   const waitUntilAddressesRecoveredAppeared = rows.map((row, index) => (
     world.waitUntilText(
-      `.addressRecovered-${index + 1}`,
+      `.${fieldName}-${index + 1}`,
       truncateAddress(row.fromAddress)
     )
   ));
   await Promise.all(waitUntilAddressesRecoveredAppeared);
+}
+export async function checkAddressesRecoveredAreCorrect(
+  rows: TransferSourceType,
+  world: Object
+):Promise<void> {
+  return baseCheckAddressesRecoveredAreCorrect(
+    rows,
+    world,
+    'addressRecovered'
+  );
+}
+export async function checkWithdrawalAddressesRecoveredAreCorrect(
+  rows: TransferSourceType,
+  world: Object
+):Promise<void> {
+  return baseCheckAddressesRecoveredAreCorrect(
+    rows,
+    world,
+    'withdrawal'
+  );
 }
 
 export async function checkTotalAmountIsCorrect(

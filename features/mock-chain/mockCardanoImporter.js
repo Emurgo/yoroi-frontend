@@ -8,6 +8,7 @@ import type {
   PoolInfoFunc,
   AddressUtxoFunc,
   RewardHistoryFunc,
+  AccountStateFunc,
   HistoryFunc,
   BestBlockFunc,
 } from '../../app/api/ada/lib/state-fetch/types';
@@ -17,6 +18,7 @@ import type {
 import type {
   ServerStatusResponse,
 } from '../../app/api/common/lib/state-fetch/types';
+import BigNumber from 'bignumber.js';
 import {
   genGetTransactionsHistoryForAddresses,
   genGetRewardHistory,
@@ -76,6 +78,7 @@ export const generateTransaction = (): {|
   bip44TrezorTx2: RemoteTransaction,
   bip44TrezorTx3: RemoteTransaction,
   cip1852TrezorTx1: RemoteTransaction,
+  shelleySimple15: RemoteTransaction,
 |} => {
   const genesisTx = {
     hash: cryptoRandomString({ length: 64 }),
@@ -317,6 +320,20 @@ export const generateTransaction = (): {|
           ],
         ),
         amount: '7000000'
+      },
+      {
+        // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
+        address: getSingleAddressString(
+          testWallets['dump-wallet'].mnemonic,
+          [
+            WalletTypePurpose.BIP44,
+            CoinTypes.CARDANO,
+            0 + HARD_DERIVATION_START,
+            ChainDerivations.EXTERNAL,
+            1
+          ],
+        ),
+        amount: '10000000'
       },
     ],
     height: 1,
@@ -1165,6 +1182,64 @@ export const generateTransaction = (): {|
     tx_state: 'Successful'
   };
 
+  // =====================
+  //   shelley-simple-15
+  // =====================
+
+  const shelleySimple15 = {
+    hash: '3677e75c7ba699bfdc6cd57d42f246f86f63aefd76025006ac78313fad2bba21',
+    inputs: [
+      {
+        // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
+        address: getSingleAddressString(
+          testWallets['dump-wallet'].mnemonic,
+          [
+            WalletTypePurpose.BIP44,
+            CoinTypes.CARDANO,
+            0 + HARD_DERIVATION_START,
+            ChainDerivations.EXTERNAL,
+            1
+          ]
+        ),
+        txHash: distributorTx.hash,
+        id: distributorTx.hash + '16',
+        index: 16,
+        amount: '10000000'
+      }
+    ],
+    outputs: [
+      {
+        // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
+        address: getSingleAddressString(
+          testWallets['dump-wallet'].mnemonic,
+          [
+            WalletTypePurpose.BIP44,
+            CoinTypes.CARDANO,
+            0 + HARD_DERIVATION_START,
+            ChainDerivations.EXTERNAL,
+            1
+          ]
+        ),
+        amount: '1'
+      },
+      {
+        // 0'/0/0
+        // eslint-disable-next-line max-len
+        // addr1qyv7qlaucathxkwkc503ujw0rv9lfj2rkj96feyst2rs9ey4tr5knj4fu4adelzqhxg8adu5xca4jra0gtllfrpcawyqzajfkn
+        address: '0119e07fbcc7577359d6c51f1e49cf1b0bf4c943b48ba4e4905a8702e49558e969caa9e57adcfc40b9907eb794363b590faf42fff48c38eb88',
+        amount: '5500000'
+      },
+    ],
+    height: 304,
+    block_hash: '304',
+    tx_ordinal: 0,
+    time: '2019-04-20T15:16:53.000Z',
+    epoch: 0,
+    slot: 304,
+    last_update: '2019-05-20T23:18:11.899Z',
+    tx_state: 'Successful'
+  };
+
   return {
     genesisTx,
     distributorTx,
@@ -1182,7 +1257,8 @@ export const generateTransaction = (): {|
     bip44TrezorTx1,
     bip44TrezorTx2,
     bip44TrezorTx3,
-    cip1852TrezorTx1
+    cip1852TrezorTx1,
+    shelleySimple15,
   };
 };
 
@@ -1232,6 +1308,8 @@ export function resetChain(
     addTransaction(txs.bip44TrezorTx2);
     addTransaction(txs.bip44TrezorTx3);
     addTransaction(txs.cip1852TrezorTx1);
+    // shelley-simple-15
+    addTransaction(txs.shelleySimple15);
   } else if (chainToUse === MockChain.TestAssurance) {
     // test setup
     addTransaction(txs.genesisTx);
@@ -1316,6 +1394,20 @@ const sendTx = (request: SignedRequestInternal): SignedResponse => {
 const getPoolInfo: PoolInfoFunc = genGetPoolInfo(transactions);
 const getRewardHistory: RewardHistoryFunc = genGetRewardHistory();
 
+const getAccountState: AccountStateFunc = async (request) => {
+  const totalRewards = new BigNumber(5000000);
+  const totalWithdrawals = new BigNumber(0);
+  return {
+    // shelley-simple-15
+    e19558e969caa9e57adcfc40b9907eb794363b590faf42fff48c38eb88: {
+      poolOperator: null,
+      remainingAmount: totalRewards.minus(totalWithdrawals).toString(),
+      rewards: totalRewards.toString(),
+      withdrawals: totalWithdrawals.toString(),
+    }
+  };
+};
+
 export default {
   utxoForAddresses,
   utxoSumForAddresses,
@@ -1325,5 +1417,6 @@ export default {
   getBestBlock,
   sendTx,
   getPoolInfo,
-  getRewardHistory
+  getRewardHistory,
+  getAccountState,
 };

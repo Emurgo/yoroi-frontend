@@ -5,6 +5,7 @@ import type {
   AddressUtxoRequest, AddressUtxoResponse,
   UtxoSumRequest, UtxoSumResponse,
   HistoryRequest, HistoryResponse,
+  AccountStateRequest, AccountStateResponse,
   BestBlockRequest, BestBlockResponse,
   SignedResponse,
   SignedRequestInternal,
@@ -118,6 +119,15 @@ export function getMockServer(
       } else {
         _defaultSignedTransaction(req, res);
       }
+    });
+
+    server.post('/api/getAccountState', async (
+      req: { body: AccountStateRequest, ... },
+      res: { send(arg: AccountStateResponse): any, ... }
+    ): Promise<void> => {
+      chai.assert.isTrue(_validateAddressesReq(req.body));
+      const accountState = await mockImporter.getAccountState(req.body);
+      res.send(accountState);
     });
 
     server.post('/api/v2/addresses/filterUsed', async (

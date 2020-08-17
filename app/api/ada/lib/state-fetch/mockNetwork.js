@@ -412,7 +412,11 @@ function getByronInputs(
     }
     const pointedOutput = pointedTx.outputs[input.index];
     const addressKind = addressToKind(pointedOutput.address, 'bytes', networks.ByronMainnet);
-    if (addressKind === CoreAddressTypes.CARDANO_LEGACY) {
+    if (
+      addressKind === CoreAddressTypes.CARDANO_LEGACY ||
+      addressKind === CoreAddressTypes.CARDANO_BASE ||
+      addressKind === CoreAddressTypes.CARDANO_PTR
+    ) {
       result.push({
         address: pointedOutput.address,
         amount: pointedOutput.amount,
