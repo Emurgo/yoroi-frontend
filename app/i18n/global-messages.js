@@ -601,6 +601,14 @@ const globalMessages: * = defineMessages({
     id: 'wallet.transaction.withdrawalsLabel',
     defaultMessage: '!!!Withdrawals',
   },
+  byronLabel: {
+    id: 'wallet.receive.navigation.byronLabel',
+    defaultMessage: '!!!Byron'
+  },
+  shelleyLabel: {
+    id: 'global.labels.shelleyLabel',
+    defaultMessage: '!!!Shelley'
+  },
 });
 export default globalMessages;
 

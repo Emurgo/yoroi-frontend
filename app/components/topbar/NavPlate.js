@@ -6,14 +6,18 @@ import { intlShape, defineMessages } from 'react-intl';
 import styles from './NavPlate.scss';
 import WalletAccountIcon from './WalletAccountIcon';
 import ConceptualIcon from '../../assets/images/wallet-nav/conceptual-wallet.inline.svg';
-import PaperIcon from '../../assets/images/wallet-nav/paper-wallet.inline.svg';
 import TrezorIcon from '../../assets/images/wallet-nav/trezor-wallet.inline.svg';
 import LedgerIcon from '../../assets/images/wallet-nav/ledger-wallet.inline.svg';
 import { Tooltip } from 'react-polymorph/lib/components/Tooltip';
 import { TooltipSkin } from 'react-polymorph/lib/skins/simple/TooltipSkin';
 import { truncateLongName, maxNameLengthBeforeTruncation } from '../../utils/formatters';
 import type { WalletChecksum } from '@emurgo/cip4-js';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type { $npm$ReactIntl$IntlFormat, $npm$ReactIntl$MessageDescriptor } from 'react-intl';
+import type { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
+import { isCardanoHaskell } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { Bip44Wallet, } from '../../api/ada/lib/storage/models/Bip44Wallet/wrapper';
+import globalMessages from '../../i18n/global-messages';
+import { isLedgerNanoWallet, isTrezorTWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 
 const messages = defineMessages({
   standardWallet: {
@@ -35,9 +39,11 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  +walletName: string,
   +plate: null | WalletChecksum,
-  +walletType: 'standard' | 'paper' | 'trezor' | 'ledger',
+  +wallet: {|
+    conceptualWallet: ConceptualWallet,
+    conceptualWalletName: string
+  |},
 |};
 
 function constructPlate(
@@ -63,46 +69,61 @@ export default class NavPlate extends Component<Props> {
     intl: intlShape.isRequired,
   };
 
+  getEra: ConceptualWallet => (void | $Exact<$npm$ReactIntl$MessageDescriptor>) = (wallet) => {
+    if (!isCardanoHaskell(wallet.getNetworkInfo())) {
+      return undefined;
+    }
+    if (wallet instanceof Bip44Wallet) {
+      return globalMessages.byronLabel;
+    }
+    return globalMessages.shelleyLabel;
+  }
+
+  getType: ConceptualWallet => $Exact<$npm$ReactIntl$MessageDescriptor> = (wallet) => {
+    if (isLedgerNanoWallet(wallet)) {
+      return messages.ledgerWallet;
+    }
+    if (isTrezorTWallet(wallet)) {
+      return messages.trezorWallet;
+    }
+    return messages.standardWallet;
+  }
+
+  getIcon: ConceptualWallet => string = (wallet) => {
+    if (isLedgerNanoWallet(wallet)) {
+      return LedgerIcon;
+    }
+    if (isTrezorTWallet(wallet)) {
+      return TrezorIcon;
+    }
+    return ConceptualIcon;
+  }
+
   render(): Node {
-    const { plate, walletName, walletType } = this.props;
     const { intl } = this.context;
 
-    const [accountPlateId, iconComponent] = (plate) ?
-      constructPlate(plate, 0, styles.icon)
+    const [accountPlateId, iconComponent] = (this.props.plate) ?
+      constructPlate(this.props.plate, 0, styles.icon)
       : [];
 
-    let typeText;
-    let TypeIcon;
+    const TypeIcon = this.getIcon(this.props.wallet.conceptualWallet);
 
-    switch (walletType) {
-      case 'standard':
-        typeText = messages.standardWallet;
-        TypeIcon = ConceptualIcon;
-        break;
-      case 'paper':
-        typeText = messages.paperWallet;
-        TypeIcon = PaperIcon;
-        break;
-      case 'trezor':
-        typeText = messages.trezorWallet;
-        TypeIcon = TrezorIcon;
-        break;
-      case 'ledger':
-        typeText = messages.ledgerWallet;
-        TypeIcon = LedgerIcon;
-        break;
-      default:
-        typeText = '';
-        TypeIcon = undefined;
-        break;
-    }
+    const typeText = [
+      this.getEra(this.props.wallet.conceptualWallet),
+      this.getType(this.props.wallet.conceptualWallet),
+    ]
+      .filter(text => text != null)
+      .map(text => intl.formatMessage(text))
+      .join(' - ');
 
     return (
       <div className={styles.wrapper}>
         {iconComponent}
         <div className={styles.content}>
           <div className={styles.head}>
-            <h3 className={styles.name}>{this.generateNameElem(walletName)}</h3>
+            <h3 className={styles.name}>
+              {this.generateNameElem(this.props.wallet.conceptualWalletName)}
+            </h3>
             <div className={styles.plate}>{accountPlateId}</div>
           </div>
           <div className={styles.type}>
@@ -111,7 +132,7 @@ export default class NavPlate extends Component<Props> {
                 <TypeIcon />
               </span>
             }
-            {intl.formatMessage(typeText)}
+            {typeText}
           </div>
         </div>
       </div>

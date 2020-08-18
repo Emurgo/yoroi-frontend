@@ -28,7 +28,7 @@ import moment from 'moment';
 import NavBarAddButton from '../../components/topbar/NavBarAddButton';
 import NavWalletDetails from '../../components/topbar/NavWalletDetails';
 import globalMessages from '../../i18n/global-messages';
-import { ConceptualWallet, isLedgerNanoWallet, isTrezorTWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
+import { ConceptualWallet, } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import {
   asGetPublicKey,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
@@ -204,8 +204,7 @@ export default class MyWalletsPage extends Component<Props> {
         walletPlate={
           <NavPlate
             plate={plate}
-            walletName={settingsCache.conceptualWalletName}
-            walletType={getWalletType(publicDeriver)}
+            wallet={settingsCache}
           />
         }
         walletSync={
@@ -386,15 +385,4 @@ export default class MyWalletsPage extends Component<Props> {
       BannerContainerProps: ({ actions, stores }: InjectedOrGenerated<BannerContainerData>),
     });
   }
-}
-
-function getWalletType(publicDeriver: PublicDeriver<>) {
-  const conceptualWallet = publicDeriver.getParent();
-  if (isLedgerNanoWallet(conceptualWallet)) {
-    return 'ledger';
-  }
-  if (isTrezorTWallet(conceptualWallet)) {
-    return 'trezor';
-  }
-  return 'standard';
 }

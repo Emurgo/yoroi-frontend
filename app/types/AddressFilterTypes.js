@@ -90,31 +90,30 @@ export const addressGroupsTooltip: $ObjMap<typeof AddressGroupTypes, ToMessage> 
     },
   })
 });
-export const addressGroupName: $ObjMap<typeof AddressGroupTypes, ToMessage> = defineMessages({
-  base: {
-    id: 'wallet.receive.navigation.baseLabel',
-    defaultMessage: '!!!Base'
-  },
-  reward: {
-    id: 'wallet.receive.navigation.rewardLabel',
-    defaultMessage: '!!!Reward'
-  },
-  group: {
-    id: 'wallet.receive.navigation.groupLabel',
-    defaultMessage: '!!!Group'
-  },
-  byron: {
-    id: 'wallet.receive.navigation.byronLabel',
-    defaultMessage: '!!!Byron'
-  },
-  p2pk: {
-    id: 'wallet.receive.navigation.p2pkLabel',
-    defaultMessage: '!!!P2PK'
-  },
-  addressBook: {
-    id: 'wallet.receive.navigation.AddressBook',
-    defaultMessage: '!!!Address book'
-  },
+export const addressGroupName: $ObjMap<typeof AddressGroupTypes, ToMessage> = Object.freeze({
+  byron: globalMessages.byronLabel,
+  ...defineMessages({
+    base: {
+      id: 'wallet.receive.navigation.baseLabel',
+      defaultMessage: '!!!Base'
+    },
+    reward: {
+      id: 'wallet.receive.navigation.rewardLabel',
+      defaultMessage: '!!!Reward'
+    },
+    group: {
+      id: 'wallet.receive.navigation.groupLabel',
+      defaultMessage: '!!!Group'
+    },
+    p2pk: {
+      id: 'wallet.receive.navigation.p2pkLabel',
+      defaultMessage: '!!!P2PK'
+    },
+    addressBook: {
+      id: 'wallet.receive.navigation.AddressBook',
+      defaultMessage: '!!!Address book'
+    },
+  })
 });
 
 

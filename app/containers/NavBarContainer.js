@@ -120,8 +120,7 @@ export default class NavBarContainer extends Component<Props> {
           key={wallet.getPublicDeriverId()}
           plateComponent={<NavPlate
             plate={plate}
-            walletName={settingsCache.conceptualWalletName}
-            walletType={getWalletType(wallet)}
+            wallet={settingsCache}
           />}
           onSelect={() => this.switchToNewWallet(wallet)}
           isCurrentWallet={wallet === this.generated.stores.wallets.selected}
@@ -224,8 +223,7 @@ export default class NavBarContainer extends Component<Props> {
       return (
         <NavPlate
           plate={plate}
-          walletName={settingsCache.conceptualWalletName}
-          walletType={getWalletType(publicDeriver)}
+          wallet={settingsCache}
         />
       );
     });
@@ -351,15 +349,4 @@ export default class NavBarContainer extends Component<Props> {
       },
     });
   }
-}
-
-function getWalletType(publicDeriver: PublicDeriver<>) {
-  const conceptualWallet = publicDeriver.getParent();
-  if (isLedgerNanoWallet(conceptualWallet)) {
-    return 'ledger';
-  }
-  if (isTrezorTWallet(conceptualWallet)) {
-    return 'trezor';
-  }
-  return 'standard';
 }
