@@ -26,6 +26,10 @@ export type RewardHistoryForWallet = string => Promise<Array<RewardTuple>>;
 
 export type DelegationRequests = {|
   publicDeriver: PublicDeriver<>,
+  /** Note: this says nothing about what this is delegated to
+   * Notably, it could be delegated to nothing!
+   * use getCurrentDelegation if you want to know what (if any) pool is being delegated to
+   */
   getDelegatedBalance: CachedRequest<GetDelegatedBalanceFunc>,
   getCurrentDelegation: CachedRequest<GetCurrentDelegationFunc>,
   rewardHistory: CachedRequest<RewardHistoryForWallet>,
