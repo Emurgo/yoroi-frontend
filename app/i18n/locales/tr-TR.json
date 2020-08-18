@@ -46,7 +46,7 @@
   "app.errors.unknowError": "Bilinmeyen hata.",
   "daedalusTransfer.error.noTransferTxError": "Gönderilecek işlem yok.",
   "daedalusTransfer.error.transferFundsError": "Para aktarılamıyor.",
-  "daedalusTransfer.error.webSocketRestoreError": "Blokzincir adresleri yeniden yüklenirken hata oluştu.",
+  "daedalusTransfer.error.webSocketRestoreError": "Blokzincir adresleri geri yüklenirken hata oluştu.",
   "daedalusTransfer.errorPage.title.label": "Daedalus cüzdanı geri yüklenemedi.",
   "daedalusTransfer.form.instructions.step0.text": "Bakiyeyi yeniden yüklemek ve Daedalus'tan Yoroi'ye tüm fonu aktarmak için Daedalus cüzdanınızı yedeklemek için kullanılan 12 kelimeden oluşan kurtarma sözcüklerinizi girin.",
   "daedalusTransfer.form.instructions.step0MasterKey.text": "Bakiyeyi yeniden yüklemek ve tüm fonları Daedalus cüzdanından Yoroi cüzdanına aktarmak için Daedalus cüzdanınızın şifrelenmemiş ana anahtarı girin.",
