@@ -530,7 +530,7 @@
   "wallet.receive.page.noResultsFoundLabel": "Δεν βρέθηκαν αποτελέσματα",
   "wallet.receive.page.notFoundAnyAddresses": "Δεν μπορέσαμε να βρούμε διευθύνσεις που να ταιριάζουν στα φίλτρα σας.",
   "wallet.receive.page.outputAmountUTXO": "Υπόλοιπο (UTXO sum)",
-  "wallet.receive.page.rewardAddressLine1": "Your reward holds your rewards and is used to validate any changes to your delegation preference",
+  "wallet.receive.page.rewardAddressLine1": "Your reward address holds your rewards and is used to validate any changes to your delegation preference",
   "wallet.receive.page.rewardAddressLine2": "You cannot send ADA to reward addresses, but we show it for personal auditing purposes",
   "wallet.receive.page.unmangeLabel": "Correct delegation preference",
   "wallet.receive.page.verifyAddressLabel": "Επιβεβαίωση διεύθυνσης",
