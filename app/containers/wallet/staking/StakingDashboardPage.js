@@ -643,6 +643,10 @@ export default class StakingDashboardPage extends Component<Props> {
     if (apiMeta == null) throw new Error(`${nameof(StakingDashboardPage)} no API selected`);
     const amountPerUnit = new BigNumber(10).pow(apiMeta.decimalPlaces);
 
+    const currentlyDelegating = (
+      request.delegationRequests.getCurrentDelegation.result?.currEpoch?.pools ?? []
+    ).length > 0;
+
     return (
       <UserSummary
         meta={{
@@ -675,9 +679,11 @@ export default class StakingDashboardPage extends Component<Props> {
           !showRewardAmount || request.delegationRequests.getDelegatedBalance.result == null
             ? undefined
             : this.hideOrFormat(
-              request.delegationRequests.getDelegatedBalance.result.utxoPart.plus(
-                request.delegationRequests.getDelegatedBalance.result.accountPart
-              ).dividedBy(amountPerUnit),
+              currentlyDelegating
+                ? request.delegationRequests.getDelegatedBalance.result.utxoPart.plus(
+                  request.delegationRequests.getDelegatedBalance.result.accountPart
+                ).dividedBy(amountPerUnit)
+                : new BigNumber(0),
               apiMeta
             )}
       />

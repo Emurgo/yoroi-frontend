@@ -69,7 +69,7 @@ export default class EpochProgressContainer extends Component<Props> {
         percentage={Math.floor(100 * currTimeRequests.currentSlot / epochLength)}
         endTime={{
           d: hasDays
-            ? this._leftPadDate(timeLeftInEpoch.getUTCDate())
+            ? this._leftPadDate(timeLeftInEpoch.getUTCDate() - 1)
             : undefined,
           h: this._leftPadDate(timeLeftInEpoch.getUTCHours()),
           m: this._leftPadDate(timeLeftInEpoch.getUTCMinutes()),

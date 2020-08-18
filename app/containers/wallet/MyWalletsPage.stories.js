@@ -96,12 +96,8 @@ export const Wallets = (): Node => {
         walletSettings: {
           getConceptualWalletSettingsCache: lookup.getConceptualWalletSettingsCache,
         },
-        substores: {
-          jormungandr: {
-            delegation: {
-              getDelegationRequests: lookup.getDelegation
-            },
-          },
+        delegation: {
+          getDelegationRequests: lookup.getDelegation
         },
       },
       actions: {

@@ -284,7 +284,7 @@ export default class MyWalletsPage extends Component<Props> {
   getRewardBalance: PublicDeriver<> => null | void | BigNumber = (
     publicDeriver
   ) => {
-    const delegationRequest = this.generated.stores.substores.jormungandr
+    const delegationRequest = this.generated.stores
       .delegation
       .getDelegationRequests(
         publicDeriver
@@ -325,14 +325,10 @@ export default class MyWalletsPage extends Component<Props> {
     |},
     stores: {|
       profile: {| shouldHideBalance: boolean |},
-      substores: {|
-        jormungandr: {|
-          delegation: {|
-            getDelegationRequests: (
-              PublicDeriver<>
-            ) => void | DelegationRequests
-          |}
-        |}
+      delegation: {|
+        getDelegationRequests: (
+          PublicDeriver<>
+        ) => void | DelegationRequests
       |},
       transactions: {|
         getTxRequests: (PublicDeriver<>) => TxRequests
@@ -369,12 +365,8 @@ export default class MyWalletsPage extends Component<Props> {
           getConceptualWalletSettingsCache:
             stores.walletSettings.getConceptualWalletSettingsCache,
         },
-        substores: {
-          jormungandr: {
-            delegation: {
-              getDelegationRequests: stores.delegation.getDelegationRequests,
-            },
-          },
+        delegation: {
+          getDelegationRequests: stores.delegation.getDelegationRequests,
         },
       },
       actions: {

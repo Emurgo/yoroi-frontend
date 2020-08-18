@@ -9,7 +9,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 const messages = defineMessages({
   rewardAddressLine1: {
     id: 'wallet.receive.page.rewardAddressLine1',
-    defaultMessage: '!!!Your reward holds your rewards and is used to validate any changes to your delegation preference'
+    defaultMessage: '!!!Your reward address holds your rewards and is used to validate any changes to your delegation preference'
   },
   rewardAddressLine2: {
     id: 'wallet.receive.page.rewardAddressLine2',
