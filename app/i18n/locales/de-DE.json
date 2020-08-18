@@ -530,7 +530,7 @@
   "wallet.receive.page.noResultsFoundLabel": "Keine Ergebnisse gefunden",
   "wallet.receive.page.notFoundAnyAddresses": "Keine Adresse gefunden der diesem Filter entspricht.",
   "wallet.receive.page.outputAmountUTXO": "Saldo (UTXO Summe)",
-  "wallet.receive.page.rewardAddressLine1": "Deine Ertragsadresse enthält deine Erträge und wird zum Überprüfen von Änderungen deiner Delegation verwendet",
+  "wallet.receive.page.rewardAddressLine1": "Your reward address holds your rewards and is used to validate any changes to your delegation preference",
   "wallet.receive.page.rewardAddressLine2": "Du kannst keine ADA an Ertragsadressen schicken. Wir zeigen sie nur für persönliche Überprüfungen an",
   "wallet.receive.page.unmangeLabel": "Korrigiere die Delegationseinstellung",
   "wallet.receive.page.verifyAddressLabel": "Überprüfe die Adresse",
