@@ -29,9 +29,38 @@ export default class SeizaFetcher extends Component<Props> {
 
   @action
   messageHandler: any => Promise<void> = async (event: any) => {
-    if (event.origin !== process.env.POOLS_UI_URL_FOR_YOROI) return;
-    const pools: Array<string> = JSON.parse(decodeURI(event.data));
-    this.props.stakepoolSelectedAction(pools[0]);
+    if (this.iframe == null) return;
+    /**
+     * We want to ignore messages that come from any source that is not our pool selection iframe
+     * Usually, this would be done by doing something like
+     * event.origin !== our-iframe-url-here
+     * However, you cannot access event.origin unless you set allow-same-origin for the iframe
+     * But we don't want to treat the iframe as same-origin as a safety precaution.
+     *
+     * Therefore, instead, we check the source of the origin is the same window as our iframe
+     *
+     * For more information, see https://www.html5rocks.com/en/tutorials/security/sandboxed-iframes/
+     */
+    if (!(
+      event.origin === 'null' && /* message from a different origin implies event.origin is "null" */
+      event.source === this.iframe.contentWindow /* check it belongs to our iframe */
+    )) {
+      return;
+    }
+    const response = JSON.parse(decodeURI(event.data));
+    if (!Array.isArray(response)) {
+      throw new Error(`${nameof(SeizaFetcher)} Server response is not an array`);
+    }
+    const pool = response[0];
+    if (typeof pool !== 'string') {
+      throw new Error(`${nameof(SeizaFetcher)} Server response is not a string`);
+    }
+    const poolId: string = pool;
+    if (poolId.length !== 56) {
+      throw new Error(`${nameof(SeizaFetcher)} Server response has incorrect pool length. Expected 56, got ${poolId.length}`);
+    }
+
+    this.props.stakepoolSelectedAction(pool);
   }
 
   @action setFrame: (null | HTMLIFrameElement) => void = (frame) => {
@@ -73,9 +102,18 @@ export default class SeizaFetcher extends Component<Props> {
       );
     }
 
+    // TODO: look into iframe's CSP policy once our backend implement a CSP
     return (
       <iframe
-        sandbox="allow-scripts allow-same-origin"
+        /**
+          * Rationale for allowing the following:
+          *
+          * allow-scripts:
+          * The iframe uses javascript for:
+          *   - General UI
+          *   - Communicate with the extension (ex: postMessage)
+        */
+        sandbox="allow-scripts"
         referrerPolicy="no-referrer"
         ref={this.setFrame}
         title="Staking"
