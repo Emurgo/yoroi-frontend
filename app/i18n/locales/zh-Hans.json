@@ -530,7 +530,7 @@
   "wallet.receive.page.noResultsFoundLabel": "未发现结果",
   "wallet.receive.page.notFoundAnyAddresses": "无法找到复合您的搜索条件的任何地址",
   "wallet.receive.page.outputAmountUTXO": "余额（UTXO总和）",
-  "wallet.receive.page.rewardAddressLine1": "Your reward holds your rewards and is used to validate any changes to your delegation preference",
+  "wallet.receive.page.rewardAddressLine1": "Your reward address holds your rewards and is used to validate any changes to your delegation preference",
   "wallet.receive.page.rewardAddressLine2": "您无法将ADA发送至奖励地址",
   "wallet.receive.page.unmangeLabel": "纠正授权偏好",
   "wallet.receive.page.verifyAddressLabel": "校验地址",
