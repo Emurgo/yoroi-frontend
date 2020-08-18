@@ -530,7 +530,7 @@
   "wallet.receive.page.noResultsFoundLabel": "Pas de résultats trouvés",
   "wallet.receive.page.notFoundAnyAddresses": "Nous n'avons trouvé aucune adresse correspondant à vos critères.",
   "wallet.receive.page.outputAmountUTXO": "Solde (somme des UTXO)",
-  "wallet.receive.page.rewardAddressLine1": "Votre adresse de récompense contient vos récompenses et est utilisée pour valider tout changement dans vos préférences de délégation",
+  "wallet.receive.page.rewardAddressLine1": "Your reward address holds your rewards and is used to validate any changes to your delegation preference",
   "wallet.receive.page.rewardAddressLine2": "Vous ne pouvez pas envoyer d'ADA sur des adresses de récompenses, mais nous vous le montrons à des fins d'audit personnel",
   "wallet.receive.page.unmangeLabel": "Corriger la préférence de délégation",
   "wallet.receive.page.verifyAddressLabel": "Vérifier l'adresse",
