@@ -25,7 +25,7 @@
   "api.errors.getTxsBodiesForUTXOsError": "Errore ricevuto dalla chiamata al metodo api durante il recupero TxBodies.",
   "api.errors.getUtxosForAddressesApiError": "Errore ricevuto dal server durante l'acquisizione UTxOs.",
   "api.errors.getUtxosSumsForAddressesApiError": "Errore ricevuto dal server durante il recupero del saldo.",
-  "api.errors.hardwareUnsupportedError": "This action is not supported for the currently selected hardware.",
+  "api.errors.hardwareUnsupportedError": "Questa azione non è supportata per l'hardware attualmente selezionato.",
   "api.errors.histoicalCoinPriceError": "I dati storici sul prezzo delle monete non sono al momento disponibili.",
   "api.errors.invalidMnemonicError": "La frase inserita non è valida, si prega di controllare.",
   "api.errors.invalidWitnessError": "La firma non è valida.",
