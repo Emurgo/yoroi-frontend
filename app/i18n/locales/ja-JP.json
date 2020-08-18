@@ -530,7 +530,7 @@
   "wallet.receive.page.noResultsFoundLabel": "結果がありません",
   "wallet.receive.page.notFoundAnyAddresses": "フィルターに一致するアドレスがありません",
   "wallet.receive.page.outputAmountUTXO": "残高（UTXO合計）",
-  "wallet.receive.page.rewardAddressLine1": "Your reward holds your rewards and is used to validate any changes to your delegation preference",
+  "wallet.receive.page.rewardAddressLine1": "Your reward address holds your rewards and is used to validate any changes to your delegation preference",
   "wallet.receive.page.rewardAddressLine2": "You cannot send ADA to reward addresses, but we show it for personal auditing purposes",
   "wallet.receive.page.unmangeLabel": "委任設定を修正する",
   "wallet.receive.page.verifyAddressLabel": "アドレスを確認する",
