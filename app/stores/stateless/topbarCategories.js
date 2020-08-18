@@ -30,9 +30,13 @@ const messages = defineMessages({
     id: 'wallet.navigation.delegationDashboard',
     defaultMessage: '!!!Dashboard',
   },
-  delegationSimple: {
-    id: 'wallet.navigation.delegationSimple',
-    defaultMessage: '!!!Delegation',
+  delegationById: {
+    id: 'wallet.navigation.delegationById',
+    defaultMessage: '!!!Delegation by Id',
+  },
+  delegationList: {
+    id: 'wallet.navigation.delegationList',
+    defaultMessage: '!!!Delegation List',
   },
 });
 
@@ -91,19 +95,19 @@ export const STAKE_DASHBOARD: TopbarCategory = registerCategory({
 });
 export const SEIZA_STAKE_SIMULATOR: TopbarCategory = registerCategory({
   className: 'stakeSimulator',
-  route: ROUTES.WALLETS.SEIZA_DELEGATION_SIMPLE,
+  route: ROUTES.WALLETS.ADAPOOL_DELEGATION_SIMPLE,
   icon: undefined,
-  label: messages.delegationSimple,
+  label: messages.delegationList,
   isVisible: request => (
     asGetStakingKey(request.selected) != null &&
-    isJormungandr(request.selected.getParent().getNetworkInfo())
+    isCardanoHaskell(request.selected.getParent().getNetworkInfo())
   ),
 });
 export const CARDANO_DELEGATION: TopbarCategory = registerCategory({
   className: 'cardanoStake',
   route: ROUTES.WALLETS.CARDANO_DELEGATION,
   icon: undefined,
-  label: messages.delegationSimple,
+  label: messages.delegationById,
   isVisible: request => (
     asGetStakingKey(request.selected) != null &&
     isCardanoHaskell(request.selected.getParent().getNetworkInfo())

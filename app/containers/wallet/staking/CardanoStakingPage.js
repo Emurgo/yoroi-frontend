@@ -27,20 +27,22 @@ import AnnotatedLoader from '../../../components/transfer/AnnotatedLoader';
 import DelegationSuccessDialog from '../../../components/wallet/staking/DelegationSuccessDialog';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import { getApiForNetwork, getApiMeta } from '../../../api/common/utils';
-import type { PoolMeta } from '../../../stores/toplevel/DelegationStore';
+import type { PoolMeta, DelegationRequests } from '../../../stores/toplevel/DelegationStore';
+import { WalletTypeOption } from '../../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import DelegationTxDialog from '../../../components/wallet/staking/DelegationTxDialog';
 import StakePool from '../../../components/wallet/staking/dashboard/StakePool';
+import SeizaFetcher from './SeizaFetcher';
 import PoolWarningDialog from '../../../components/wallet/staking/dashboard/PoolWarningDialog';
 import type { Notification } from '../../../types/notificationType';
-import type { ReputationObject, } from '../../../api/jormungandr/lib/state-fetch/types';
+import type { ReputationObject } from '../../../api/jormungandr/lib/state-fetch/types';
 import config from '../../../config';
 import { handleExternalLinkClick } from '../../../utils/routing';
-import { WalletTypeOption, } from '../../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 
 export type GeneratedData = typeof CardanoStakingPage.prototype.generated;
 
 type Props = {|
   ...InjectedOrGenerated<GeneratedData>,
+  urlTemplate: ?string,
 |};
 
 @observer
@@ -60,7 +62,39 @@ export default class CardanoStakingPage extends Component<Props> {
     this.generated.stores.delegation.poolInfoQuery.reset();
   }
 
-  render(): Node {
+  render(): null | Node {
+    const { urlTemplate } = this.props;
+
+    const selectedWallet = this.generated.stores.wallets.selected;
+    if (selectedWallet == null) {
+      return null;
+    }
+    const delegationRequests = this.generated.stores.delegation.getDelegationRequests(
+      selectedWallet
+    );
+    if (delegationRequests == null) {
+      throw new Error(`${nameof(SeizaFetcher)} opened for non-reward wallet`);
+    }
+
+    if (urlTemplate != null) {
+      const locale = this.generated.stores.profile.currentLocale;
+      return (
+        <div>
+          {this.getDialog()}
+          <SeizaFetcher
+            urlTemplate={urlTemplate}
+            locale={locale}
+            poolList={delegationRequests.getCurrentDelegation.result?.currEpoch?.pools.map(
+              tuple => tuple[0]
+            ) ?? []}
+            stakepoolSelectedAction={async (poolId) => {
+              await this._updatePool(poolId);
+              await this._next();
+            }}
+          />
+        </div>
+      );
+    }
     return (
       <div>
         {this.getDialog()}
@@ -68,31 +102,36 @@ export default class CardanoStakingPage extends Component<Props> {
           hasAnyPending={this.generated.stores.transactions.hasAnyPending}
           poolQueryError={this.generated.stores.delegation.poolInfoQuery.error}
           isProcessing={this.generated.stores.delegation.poolInfoQuery.isExecuting}
-          updatePool={async (poolId) => {
-            this.generated.stores.delegation.poolInfoQuery.reset();
-            if (poolId == null) {
-              await this.generated.actions.ada.delegationTransaction.setPools.trigger([]);
-              return;
-            }
-            await this.generated.actions.ada.delegationTransaction.setPools.trigger([poolId]);
-          }}
-          onNext={async () => {
-            const selectedWallet = this.generated.stores.wallets.selected;
-            if (selectedWallet == null) {
-              return;
-            }
-            const { delegationTransaction } = this.generated.stores.substores.ada;
-            if (delegationTransaction.selectedPools.length === 0) {
-              return;
-            }
-            await this.generated.actions.ada.delegationTransaction.createTransaction.trigger({
-              poolRequest: delegationTransaction.selectedPools[0],
-              publicDeriver: selectedWallet,
-            });
-          }}
+          updatePool={async (poolId) => (this._updatePool(poolId))}
+          onNext={async () => (this._next())}
         />
         {this._displayPoolInfo()}
       </div>);
+
+  }
+
+  _updatePool: ?string => Promise<void> = async (poolId) => {
+    this.generated.stores.delegation.poolInfoQuery.reset();
+    if (poolId == null) {
+      await this.generated.actions.ada.delegationTransaction.setPools.trigger([]);
+      return;
+    }
+    await this.generated.actions.ada.delegationTransaction.setPools.trigger([poolId]);
+  }
+
+  _next: void => Promise<void> = async () => {
+    const selectedWallet = this.generated.stores.wallets.selected;
+    if (selectedWallet == null) {
+      return;
+    }
+    const { delegationTransaction } = this.generated.stores.substores.ada;
+    if (delegationTransaction.selectedPools.length === 0) {
+      return;
+    }
+    await this.generated.actions.ada.delegationTransaction.createTransaction.trigger({
+      poolRequest: delegationTransaction.selectedPools[0],
+      publicDeriver: selectedWallet,
+    });
   }
 
   _displayPoolInfo: void => (void | Node) = () => {
@@ -364,6 +403,9 @@ export default class CardanoStakingPage extends Component<Props> {
     stores: {|
       transactions: {| hasAnyPending: boolean |},
       delegation: {|
+        getDelegationRequests: (
+          PublicDeriver<>
+        ) => void | DelegationRequests,
         getLocalPoolInfo: ($ReadOnly<NetworkRow>, string) => (void | PoolMeta),
         poolInfoQuery: {|
           error: ?LocalizableError,
@@ -376,6 +418,7 @@ export default class CardanoStakingPage extends Component<Props> {
       |},
       profile: {|
         isClassicTheme: boolean,
+        currentLocale: string,
       |},
       substores: {|
         ada: {|
@@ -431,11 +474,13 @@ export default class CardanoStakingPage extends Component<Props> {
         },
         profile: {
           isClassicTheme: stores.profile.isClassicTheme,
+          currentLocale: stores.profile.currentLocale,
         },
         transactions: {
           hasAnyPending: stores.transactions.hasAnyPending,
         },
         delegation: {
+          getDelegationRequests: stores.delegation.getDelegationRequests,
           getLocalPoolInfo: stores.delegation.getLocalPoolInfo,
           poolInfoQuery: {
             isExecuting: stores.delegation.poolInfoQuery.isExecuting,

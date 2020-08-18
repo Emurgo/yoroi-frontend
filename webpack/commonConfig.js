@@ -180,7 +180,7 @@ const definePlugin = (
     COMMIT: JSON.stringify(shell.exec('git rev-parse HEAD', { silent: true }).trim()),
     BRANCH: JSON.stringify(shell.exec('git rev-parse --abbrev-ref HEAD', { silent: true }).trim()),
     NIGHTLY: isNightly,
-    SEIZA_FOR_YOROI_URL: JSON.stringify(manifestEnvs.SEIZA_FOR_YOROI_URL),
+    POOLS_UI_URL_FOR_YOROI: JSON.stringify(manifestEnvs.POOLS_UI_URL_FOR_YOROI),
   }
 });
 

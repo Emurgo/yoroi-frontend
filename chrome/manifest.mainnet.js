@@ -10,6 +10,8 @@ import {
   genCSP,
 } from './constants';
 
+import { POOLS_UI_URL_FOR_YOROI } from './manifestEnvs';
+
 export default (isDebug: boolean): * => buildManifest({
   description: 'A simple, secure and fast Cardano ADA wallet.',
   defaultTitle: 'Yoroi',
@@ -18,6 +20,9 @@ export default (isDebug: boolean): * => buildManifest({
     isDev: isDebug,
     additional: {
       'connect-src': [serverToPermission(Servers.ShelleyMainnet)],
+      'frame-src': [
+        POOLS_UI_URL_FOR_YOROI,
+      ],
     },
   }),
   version: Version.Byron,
