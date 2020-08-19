@@ -674,7 +674,7 @@
   "wallet.transaction.type.multiparty": "{currency} çok parçalı işlem",
   "wallet.transaction.withdrawalsLabel": "Çekim",
   "wallet.transfer.cards.byron": "Byron-era cüzdan",
-  "wallet.transfer.cards.shelley": "Shelley-era wallet",
+  "wallet.transfer.cards.shelley": "Shelley-era cüzdan",
   "wallet.transfer.deregister.deregister": "Deregister",
   "wallet.transfer.deregister.keep": "Keep registered",
   "wallet.transfer.deregister.line1": "When withdrawing rewards, you also have the option to deregister the staking key",
