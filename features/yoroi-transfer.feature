@@ -124,12 +124,14 @@ Feature: Transfer Yoroi Wallet funds
     Then I should see the Yoroi transfer success screen
 
   @it-146
-  Scenario: User can claim Shelley rewards (IT-146)
+  Scenario: User can claim Shelley rewards w/ deregister (IT-146)
     Given There is a Shelley wallet stored named shelley-simple-15
     And I am on the transfer start screen
     When I click on the shelley button on the transfer screen
     Then I select the Shelley 15-word option
     Then I accept the prompt
+    Then I click on the checkbox
+    And I click the next button
     And I enter the recovery phrase:
     | recoveryPhrase                                                                                           |
     | eight country switch draw meat scout mystery blade tip drift useless good keep usage title |
@@ -139,6 +141,31 @@ Feature: Transfer Yoroi Wallet funds
     Then I should see on the Yoroi withdrawal transfer summary screen:
     | fromAddress                                                | amount           |
     | addr1ux2436tfe25727kul3qtnyr7k72rvw6ep7h59ll53suwhzqfv6jjh | 5000000    |
+    And I see the deregistration for the transaction
+    And I enter the wallet password:
+      | password   |
+      | asdfasdfasdf |
+    When I confirm Yoroi transfer funds
+    Then I should see the summary screen
+
+  @it-147
+  Scenario: User can claim Shelley rewards w/ keep (IT-147)
+    Given There is a Shelley wallet stored named shelley-simple-15
+    And I am on the transfer start screen
+    When I click on the shelley button on the transfer screen
+    Then I select the Shelley 15-word option
+    Then I accept the prompt
+    Then I keep the staking key
+    And I enter the recovery phrase:
+    | recoveryPhrase                                                                                           |
+    | eight country switch draw meat scout mystery blade tip drift useless good keep usage title |
+    And I proceed with the recovery
+    Then I should see a plate ZDDC-9858
+    Then I click the next button
+    Then I should see on the Yoroi withdrawal transfer summary screen:
+    | fromAddress                                                | amount           |
+    | addr1ux2436tfe25727kul3qtnyr7k72rvw6ep7h59ll53suwhzqfv6jjh | 5000000    |
+    And I do not see the deregistration for the transaction
     And I enter the wallet password:
       | password   |
       | asdfasdfasdf |

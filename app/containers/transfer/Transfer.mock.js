@@ -162,6 +162,13 @@ export const mockTransferProps: {
         ShelleyEraOptionDialogContainerProps: {
           generated: {
             stores: {
+              profile: {
+                selectedComplexityLevel: select(
+                  'complexityLevel',
+                  ComplexityLevels,
+                  ComplexityLevels.Advanced
+                ),
+              },
               wallets: {
                 selected: request.selected,
               },
@@ -173,11 +180,35 @@ export const mockTransferProps: {
               },
             },
             actions: {
+              ada: {
+                delegationTransaction: {
+                  setShouldDeregister: {
+                    trigger: action('setShouldDeregister'),
+                  },
+                },
+              },
               yoroiTransfer: {
                 startTransferFunds: { trigger: action('startTransferFunds') },
               },
               dialogs: {
                 updateDataForActiveDialog: { trigger: action('updateDataForActiveDialog') },
+              },
+            },
+            DeregisterDialogContainerProps: {
+              generated: {
+                stores: Object.freeze({}),
+                actions: {
+                  ada: {
+                    delegationTransaction: {
+                      setShouldDeregister: {
+                        trigger: action('setShouldDeregister'),
+                      },
+                    },
+                  },
+                  dialogs: {
+                    closeActiveDialog: { trigger: action('closeActiveDialog') },
+                  },
+                },
               },
             },
           },

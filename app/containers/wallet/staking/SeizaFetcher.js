@@ -112,8 +112,26 @@ export default class SeizaFetcher extends Component<Props> {
           * The iframe uses javascript for:
           *   - General UI
           *   - Communicate with the extension (ex: postMessage)
+          *
+          * allow-popups:
+          * The stake pool list contains list for things like
+          *   - Accessing the stake pool website
+          *   - Seeing more information on an explorer
+          * Instead of opening these links inside the iframe, we open these as new tabs
+          * This requires "allows-popups"
+          * TODO: we can get rid of this in the future by making that instead,
+          *       links pass a website URL back through postMessage
+          *       Then, Yoroi opens a dialog asking "You're about to visit https://foo.com are you sure?
+          *
+          * allow-popups-to-escape-sandbox:
+          * (see above for why we need popups at all)
+          * Popups from an iframe inherit the sandbox behavior
+          * We need popups to escape the sandbox
+          * Otherwise it will block sites from standard web behavior like
+          *     - Playing media
+          *     - Storing cookies on the website
         */
-        sandbox="allow-scripts"
+        sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox"
         referrerPolicy="no-referrer"
         ref={this.setFrame}
         title="Staking"

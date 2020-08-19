@@ -105,7 +105,7 @@ export default class StakingDashboard extends Component<Props> {
       ? null
       : (
         <div className={styles.graphsWrapper}>
-          {this._displayGraph(graphData.rewardsGraphData)}
+          {/* {this._displayGraph(graphData.rewardsGraphData)} */}
           {/* <GraphWrapper
             themeVars={themeVars}
             tabs={[

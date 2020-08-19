@@ -12,6 +12,7 @@ export default class DelegationTransactionActions {
     password?: string,
     publicDeriver: PublicDeriver<>,
   |}> = new AsyncAction();
+  setShouldDeregister: Action<boolean> = new Action();
   complete: Action<void> = new Action();
   reset: Action<{| justTransaction: boolean |}> = new Action();
 }

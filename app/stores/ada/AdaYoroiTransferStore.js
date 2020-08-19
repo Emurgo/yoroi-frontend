@@ -130,7 +130,7 @@ export default class AdaYoroiTransferStore extends Store {
         withdrawals: [{
           privateKey: stakeKey.to_raw_key(),
           rewardAddress: rewardHex,
-          shouldDeregister: true,
+          shouldDeregister: this.stores.substores.ada.delegationTransaction.shouldDeregister,
         }],
       });
     }).promise;

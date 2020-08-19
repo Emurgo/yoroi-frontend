@@ -59,7 +59,7 @@ export default class ComplexityLevelPage extends Component<InjectedOrGenerated<G
         banner={displayedBanner}
       >
         <ComplexityLevel
-          complexityLevel={this.generated.stores.profile.complexityLevel}
+          complexityLevel={this.generated.stores.profile.selectedComplexityLevel}
           onSubmit={this.generated.actions.profile.selectComplexityLevel.trigger}
           isSubmitting={this.generated.stores.profile.setComplexityLevelRequest.isExecuting}
           error={this.generated.stores.profile.setComplexityLevelRequest.error}
@@ -78,7 +78,7 @@ export default class ComplexityLevelPage extends Component<InjectedOrGenerated<G
     stores: {|
       wallets: {| selected: null | PublicDeriver<> |},
       profile: {|
-        complexityLevel: ?ComplexityLevelType,
+        selectedComplexityLevel: ?ComplexityLevelType,
         setComplexityLevelRequest: {|
           error: ?LocalizableError,
           isExecuting: boolean
@@ -111,7 +111,7 @@ export default class ComplexityLevelPage extends Component<InjectedOrGenerated<G
             error: profileStore.setComplexityLevelRequest.error,
             isExecuting: profileStore.setComplexityLevelRequest.isExecuting,
           },
-          complexityLevel: profileStore.selectedComplexityLevel
+          selectedComplexityLevel: profileStore.selectedComplexityLevel
         },
       },
       actions: {

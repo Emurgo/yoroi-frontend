@@ -59,15 +59,20 @@ export default class RemoveWalletDialogContainer extends Component<Props> {
       <DangerousActionDialog
         title={intl.formatMessage(messages.titleLabel)}
         checkboxAcknowledge={intl.formatMessage(dialogMessages.accept)}
-        buttonLabel={intl.formatMessage(globalMessages.remove)}
         isChecked={this.isChecked}
         toggleCheck={this.toggleCheck}
-        onSubmit={() => this.props.publicDeriver && settingsActions.removeWallet.trigger({
-          publicDeriver: this.props.publicDeriver,
-        })}
         isSubmitting={settingsStore.removeWalletRequest.isExecuting}
-        onCancel={this.generated.actions.dialogs.closeActiveDialog.trigger}
         error={settingsStore.removeWalletRequest.error}
+        onCancel={this.generated.actions.dialogs.closeActiveDialog.trigger}
+        primaryButton={{
+          label: intl.formatMessage(globalMessages.remove),
+          onClick: () => this.props.publicDeriver && settingsActions.removeWallet.trigger({
+            publicDeriver: this.props.publicDeriver,
+          })
+        }}
+        secondaryButton={{
+          onClick: this.generated.actions.dialogs.closeActiveDialog.trigger
+        }}
       >
         <p>{intl.formatMessage(messages.removeExplanation)}</p>
         <p>{intl.formatMessage(dialogMessages.warning2)}</p>

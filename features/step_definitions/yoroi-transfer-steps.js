@@ -1,6 +1,7 @@
 // @flow
 
 import { Given, When, Then } from 'cucumber';
+import { By } from 'selenium-webdriver';
 import {
   navigateTo,
   waitUntilUrlEquals
@@ -91,4 +92,15 @@ Then(/^I should see wallet changed notice$/, async function () {
   const walletChangedError = await i18n.formatMessage(this.driver,
     { id: 'yoroiTransfer.error.walletChangedError' });
   await this.waitUntilText('.TransferSummaryPage_error', walletChangedError);
+});
+
+When(/^I keep the staking key$/, async function () {
+  await this.click(`//button[contains(text(), "Keep registered")]`, By.xpath);
+});
+
+Then(/^I see the deregistration for the transaction$/, async function () {
+  await this.waitForElement('.TransferSummaryPage_refund');
+});
+Then(/^I do not see the deregistration for the transaction$/, async function () {
+  await this.waitForElementNotPresent('.TransferSummaryPage_refund');
 });
