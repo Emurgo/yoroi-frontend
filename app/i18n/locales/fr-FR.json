@@ -675,7 +675,7 @@
   "wallet.transaction.withdrawalsLabel": "Retraits",
   "wallet.transfer.cards.byron": "Wallet de l'ère Byron",
   "wallet.transfer.cards.shelley": "Wallet de type Shelley",
-  "wallet.transfer.deregister.deregister": "Deregister",
+  "wallet.transfer.deregister.deregister": "Désenregistrer",
   "wallet.transfer.deregister.keep": "Keep registered",
   "wallet.transfer.deregister.line1": "When withdrawing rewards, you also have the option to deregister the staking key",
   "wallet.transfer.deregister.line2": "Deregistering the staking key will give you back your deposit and undelegate the key from any pool",
