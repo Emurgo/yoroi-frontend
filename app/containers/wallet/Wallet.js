@@ -26,7 +26,7 @@ export type GeneratedData = typeof Wallet.prototype.generated;
 
 type Props = {|
   ...InjectedOrGenerated<GeneratedData>,
-  +children?: Node,
+  +children: Node,
 |};
 
 const messages = defineMessages({
@@ -39,15 +39,23 @@ const messages = defineMessages({
 @observer
 export default class Wallet extends Component<Props> {
 
-  static defaultProps: {|children: void|} = {
-    children: undefined
-  };
-
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
   componentDidMount() {
+    // reroute to the default path for the wallet
+    const newRoute = this.checkRoute();
+    if (newRoute != null) {
+      this.generated.actions.router.redirect.trigger({
+        route: newRoute,
+      });
+    }
+  }
+
+  checkRoute(): (void | string) {
+    // void -> this route is fine for this wallet type
+    // string -> what you should be redirected to
     const publicDeriver = this.generated.stores.wallets.selected;
     if (publicDeriver == null) throw new Error(`${nameof(Wallet)} no public deriver`);
 
@@ -55,6 +63,9 @@ export default class Wallet extends Component<Props> {
       category => this.generated.stores.app.currentRoute.startsWith(category.route)
     );
     if (activeCategory == null) return;
+
+    // if we're on a page that isn't applicable for the currently selected wallet
+    // ex: a cardano-only page for an Ergo wallet
     if (!activeCategory.isVisible({ selected: publicDeriver })) {
       const firstValidCategory = allCategories.find(
         category => category.isVisible({ selected: publicDeriver })
@@ -62,10 +73,9 @@ export default class Wallet extends Component<Props> {
       if (firstValidCategory == null) {
         throw new Error(`Selected wallet has no valid category`);
       }
-      this.generated.actions.router.redirect.trigger({
-        route: firstValidCategory.route,
-      });
+      return firstValidCategory.route;
     }
+    return undefined;
   }
 
   navigateToWallets: string => void = (destination) => {
@@ -73,6 +83,10 @@ export default class Wallet extends Component<Props> {
   }
 
   render(): Node {
+    // abort rendering if the page isn't valid for this wallet
+    if (this.checkRoute() != null) {
+      return null;
+    }
     const { intl } = this.context;
     const { wallets, } = this.generated.stores;
     const sidebarContainer = (<SidebarContainer {...this.generated.SidebarContainerProps} />);
