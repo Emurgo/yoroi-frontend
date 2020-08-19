@@ -678,7 +678,7 @@
   "wallet.transfer.deregister.deregister": "Désenregistrer",
   "wallet.transfer.deregister.keep": "Maintenir l'enregistrement",
   "wallet.transfer.deregister.line1": "Lors du retrait des récompenses, vous avez également la possibilité de révoquer la clé de mise en jeu",
-  "wallet.transfer.deregister.line2": "En désenregistrant la clé de mise en jeu, vous récupérerez votre dépôt et indéleguez la clé de tout pool",
+  "wallet.transfer.deregister.line2": "En désinscrivant la clé de mise en jeu, vous récupérerez votre dépôt et révoquez toute délégation en cours",
   "wallet.transfer.deregister.line3": "En conservant la clé de mise en jeu, vous pourrez retirer les récompenses, mais continuer à déléguer au même pool",
   "wallet.transfer.deregister.line4": "Vous ne devez PAS désinscrire si cette clé de mise est utilisée comme compte de récompense d'un pool, car cela entraînera l'envoi direct de toutes les récompenses de l'opérateur du pool à la trésorerie",
   "wallet.transfer.deregister.title": "Désenregistrer également la clé de mise en jeu ?",
