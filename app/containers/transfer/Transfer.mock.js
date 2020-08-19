@@ -194,6 +194,23 @@ export const mockTransferProps: {
                 updateDataForActiveDialog: { trigger: action('updateDataForActiveDialog') },
               },
             },
+            DeregisterDialogContainerProps: {
+              generated: {
+                stores: Object.freeze({}),
+                actions: {
+                  ada: {
+                    delegationTransaction: {
+                      setShouldDeregister: {
+                        trigger: action('setShouldDeregister'),
+                      },
+                    },
+                  },
+                  dialogs: {
+                    closeActiveDialog: { trigger: action('closeActiveDialog') },
+                  },
+                },
+              },
+            },
           },
         },
         YoroiTransferPageProps: request.YoroiTransferPageProps

@@ -78,7 +78,35 @@ export const ShelleyRewardDialog = (): Node => {
   const lookup = walletLookup([wallet]);
   return (<Transfer
     {...mockTransferProps({
-      shelleyRewardDisclaimer: DisclaimerStatus.Seeing,
+      shelleyRewardDisclaimer: undefined,
+      currentRoute: ROUTES.TRANSFER.YOROI,
+      dialog: ShelleyEraOptionDialogContainer,
+      selected: wallet.publicDeriver,
+      ...lookup,
+    })}
+  />);
+};
+
+export const ShelleyFeeDisclaimerDialog = (): Node => {
+  const wallet = genShelleyCip1852DummyWithCache();
+  const lookup = walletLookup([wallet]);
+  return (<Transfer
+    {...mockTransferProps({
+      shelleyRewardDisclaimer: DisclaimerStatus.FeeDisclaimer,
+      currentRoute: ROUTES.TRANSFER.YOROI,
+      dialog: ShelleyEraOptionDialogContainer,
+      selected: wallet.publicDeriver,
+      ...lookup,
+    })}
+  />);
+};
+
+export const ShelleyDeregisterDisclaimerDialog = (): Node => {
+  const wallet = genShelleyCip1852DummyWithCache();
+  const lookup = walletLookup([wallet]);
+  return (<Transfer
+    {...mockTransferProps({
+      shelleyRewardDisclaimer: DisclaimerStatus.DeregisterDisclaimer,
       currentRoute: ROUTES.TRANSFER.YOROI,
       dialog: ShelleyEraOptionDialogContainer,
       selected: wallet.publicDeriver,
