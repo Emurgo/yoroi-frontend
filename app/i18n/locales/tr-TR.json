@@ -506,7 +506,7 @@
   "wallet.receive.confirmationDialog.addressDetailsTitleLabel": "Adresi doğrula",
   "wallet.receive.confirmationDialog.addressLabel": "Adres",
   "wallet.receive.confirmationDialog.addressesLabel": "Adresler",
-  "wallet.receive.confirmationDialog.derivationPathLabel": "Türetme Yolu",
+  "wallet.receive.confirmationDialog.derivationPathLabel": "Türetim Yolu",
   "wallet.receive.confirmationDialog.verifyAddressButtonLabel": "Donanım cüzdanını doğrula",
   "wallet.receive.nav.external": "Harici",
   "wallet.receive.nav.internal": "Dahili",
