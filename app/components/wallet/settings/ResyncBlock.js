@@ -18,7 +18,7 @@ export const messages: * = defineMessages({
     id: 'wallet.settings.resync.explanation',
     defaultMessage: '!!!If you are experiencing issues with your wallet, or think you have an incorrect balance or transaction history, you can delete the local data stored by Yoroi and resync with the blockchain.',
   },
-  resyncButtonlabel: {
+  resyncButtonLabel: {
     id: 'wallet.settings.resync.buttonLabel',
     defaultMessage: '!!!Resync wallet',
   },
@@ -52,7 +52,7 @@ export default class ResyncBlock extends Component<Props> {
 
         <Button
           className={buttonClassNames}
-          label={this.context.intl.formatMessage(messages.resyncButtonlabel)}
+          label={this.context.intl.formatMessage(messages.resyncButtonLabel)}
           skin={ButtonSkin}
           onClick={this.props.openDialog}
         />

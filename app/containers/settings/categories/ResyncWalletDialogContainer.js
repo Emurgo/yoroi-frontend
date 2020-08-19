@@ -54,18 +54,23 @@ export default class ResyncWalletDialogContainer extends Component<Props> {
       <DangerousActionDialog
         title={intl.formatMessage(messages.titleLabel)}
         checkboxAcknowledge={intl.formatMessage(globalMessages.uriLandingDialogConfirmLabel)}
-        buttonLabel={intl.formatMessage(messages.resyncButtonlabel)}
         isChecked={this.isChecked}
         toggleCheck={this.toggleCheck}
-        onSubmit={async () => {
-          await this.generated.actions.walletSettings.resyncHistory.trigger({
-            publicDeriver: this.props.publicDeriver,
-          });
-          this.generated.actions.dialogs.closeActiveDialog.trigger();
-        }}
         isSubmitting={settingsStore.clearHistory.isExecuting}
-        onCancel={this.generated.actions.dialogs.closeActiveDialog.trigger}
         error={settingsStore.clearHistory.error}
+        primaryButton={{
+          label: intl.formatMessage(globalMessages.resyncButtonLabel),
+          onClick: async () => {
+            await this.generated.actions.walletSettings.resyncHistory.trigger({
+              publicDeriver: this.props.publicDeriver,
+            });
+            this.generated.actions.dialogs.closeActiveDialog.trigger();
+          }
+        }}
+        onCancel={this.generated.actions.dialogs.closeActiveDialog.trigger}
+        secondaryButton={{
+          onClick: this.generated.actions.dialogs.closeActiveDialog.trigger
+        }}
       >
         <p>{intl.formatMessage(messages.resyncExplanation)}</p>
         <p>{intl.formatMessage(dialogMessages.warning)}</p>

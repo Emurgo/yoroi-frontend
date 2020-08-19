@@ -27,7 +27,7 @@ export const Generic = (): Node => (
             isExecuting: boolean('isExecuting', false),
             error: null,
           },
-          complexityLevel: undefined,
+          selectedComplexityLevel: undefined,
         },
         serverConnectionStore: {
           checkAdaServerStatus: select(

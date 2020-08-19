@@ -17,14 +17,21 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 type Props = {|
   +title: string,
   +checkboxAcknowledge: string,
-  +buttonLabel: string,
-  +onSubmit: void => PossiblyAsync<void>,
   +isSubmitting: boolean,
-  +onCancel: void => void,
   +isChecked: boolean,
   +toggleCheck: void => void,
   +error: ?LocalizableError,
   +children: Node,
+  +onCancel: void => void,
+  +primaryButton: {|
+    +label: string,
+    +onClick: void => PossiblyAsync<void>,
+  |},
+  +secondaryButton: {|
+    label?: string,
+    onClick: void => void,
+    primary?: boolean,
+  |},
 |};
 
 @observer
@@ -36,7 +43,6 @@ export default class DangerousActionDialog extends Component<Props> {
   render(): Node {
     const { intl } = this.context;
     const {
-      onCancel,
       isSubmitting,
       error,
     } = this.props;
@@ -52,18 +58,17 @@ export default class DangerousActionDialog extends Component<Props> {
     const actions = [
       {
         label: intl.formatMessage(globalMessages.cancel),
-        onClick: this.props.onCancel,
         primary: false,
         disabled: this.props.isSubmitting,
+        ...(this.props.secondaryButton ?? Object.freeze({})),
       },
       {
-        label: this.props.buttonLabel,
-        onClick: this.props.onSubmit,
         primary: true,
         className: confirmButtonClasses,
         disabled: !this.props.isChecked ? true : undefined,
         themeOverrides: dangerousButtonStyles,
-        isSubmitting: this.props.isSubmitting
+        isSubmitting: this.props.isSubmitting,
+        ...(this.props.primaryButton ?? Object.freeze({})),
       },
     ];
 
@@ -72,9 +77,9 @@ export default class DangerousActionDialog extends Component<Props> {
         title={this.props.title}
         actions={actions}
         closeOnOverlayClick={false}
-        onClose={onCancel}
+        onClose={this.props.onCancel}
         className={dialogClasses}
-        closeButton={<DialogCloseButton onClose={onCancel} />}
+        closeButton={<DialogCloseButton onClose={this.props.onCancel} />}
       >
 
         {this.props.children}

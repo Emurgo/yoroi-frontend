@@ -38,6 +38,8 @@ export default class AdaDelegationTransactionStore extends Store {
   @observable createDelegationTx: LocalizedRequest<CreateDelegationTxFunc>
     = new LocalizedRequest<CreateDelegationTxFunc>(this.api.ada.createDelegationTx);
 
+  @observable shouldDeregister: boolean = false;
+
   /** tracks if wallet balance changed during confirmation screen */
   @observable isStale: boolean = false;
 
@@ -78,7 +80,13 @@ export default class AdaDelegationTransactionStore extends Store {
     ada.delegationTransaction.signTransaction.listen(this._signTransaction);
     ada.delegationTransaction.complete.listen(this._complete);
     ada.delegationTransaction.setPools.listen(this._setPools);
+    ada.delegationTransaction.setShouldDeregister.listen(this._setShouldDeregister);
     ada.delegationTransaction.reset.listen(this.reset);
+  }
+
+  @action
+  _setShouldDeregister: boolean => void = (shouldDeregister) => {
+    this.shouldDeregister = shouldDeregister;
   }
 
   @action

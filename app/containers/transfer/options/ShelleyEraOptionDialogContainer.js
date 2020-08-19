@@ -16,6 +16,10 @@ import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver
 import { WalletTypeOption, } from '../../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import RewardClaimDisclaimer from '../../../components/transfer/RewardClaimDisclaimer';
 import { ChainDerivations } from '../../../config/numbersConfig';
+import type { ComplexityLevelType } from '../../../types/complexityLevelType';
+import DeregisterDialogContainer from '../DeregisterDialogContainer';
+import type { GeneratedData as DeregisterDialogContainerData } from '../DeregisterDialogContainer';
+import { ComplexityLevels } from '../../../types/complexityLevelType';
 
 export type GeneratedData = typeof ShelleyEraOptionDialogContainer.prototype.generated;
 
@@ -25,9 +29,11 @@ type Props = {|
 |};
 
 export const DisclaimerStatus = Object.freeze({
-  Seeing: 1,
-  Accepted: 2,
+  FeeDisclaimer: 1,
+  DeregisterDisclaimer: 2,
+  Done: 3,
 });
+
 
 @observer
 export default class ShelleyEraOptionDialogContainer extends Component<Props> {
@@ -35,6 +41,10 @@ export default class ShelleyEraOptionDialogContainer extends Component<Props> {
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired
   };
+
+  componentDidMount() {
+    this.generated.actions.ada.delegationTransaction.setShouldDeregister.trigger(false);
+  }
 
   startTransferIcarusRewards: void => void = () => {
     this.generated.actions.yoroiTransfer.startTransferFunds.trigger({
@@ -58,6 +68,12 @@ export default class ShelleyEraOptionDialogContainer extends Component<Props> {
     });
   }
 
+  callContinuation: void => void = () => {
+    const continuation = this.generated.stores.uiDialogs.getActiveData<void => void>('continuation');
+    if (continuation == null) throw new Error(`${nameof(ShelleyEraOptionDialogContainer)} empty continuation`);
+    continuation();
+  }
+
   render(): Node {
     const { intl } = this.context;
 
@@ -77,7 +93,7 @@ export default class ShelleyEraOptionDialogContainer extends Component<Props> {
 
     const disclaimerStatus = this.generated.stores.uiDialogs.getActiveData<number>('disclaimer');
 
-    if (disclaimerStatus === DisclaimerStatus.Seeing) {
+    if (disclaimerStatus === DisclaimerStatus.FeeDisclaimer) {
       return (
         <RewardClaimDisclaimer
           onBack={() => this.generated.actions.dialogs.updateDataForActiveDialog.trigger({
@@ -85,32 +101,46 @@ export default class ShelleyEraOptionDialogContainer extends Component<Props> {
             continuation: undefined,
           })}
           onNext={() => {
-            const continuation = this.generated.stores.uiDialogs.getActiveData<void => void>('continuation');
-            if (continuation == null) throw new Error(`${nameof(ShelleyEraOptionDialogContainer)} empty continuation`);
+            const nextStatus = (
+              this.generated.stores.profile.selectedComplexityLevel === ComplexityLevels.Advanced
+            )
+              ? DisclaimerStatus.DeregisterDisclaimer
+              : DisclaimerStatus.Done;
             this.generated.actions.dialogs.updateDataForActiveDialog.trigger({
-              disclaimer: DisclaimerStatus.Accepted,
+              disclaimer: nextStatus,
             });
-            continuation();
+            if (nextStatus === DisclaimerStatus.Done) {
+              this.callContinuation();
+            }
           }}
         />
       );
     }
-    if (disclaimerStatus === DisclaimerStatus.Accepted) {
+    if (disclaimerStatus === DisclaimerStatus.DeregisterDisclaimer) {
+      return (
+        <DeregisterDialogContainer
+          {...this.generated.DeregisterDialogContainerProps}
+          onNext={() => {
+            this.generated.actions.dialogs.updateDataForActiveDialog.trigger({
+              disclaimer: DisclaimerStatus.Done,
+            });
+            this.callContinuation();
+          }}
+        />
+      );
+    }
+    if (disclaimerStatus === DisclaimerStatus.Done) {
       return null;
     }
-    // avoid re-showing the disclaimer
-    // if the person presses the back button and selects a different wallet type
-    const nextDisclaimerStatus = disclaimerStatus == null
-      ? DisclaimerStatus.Seeing
-      : DisclaimerStatus.Accepted;
+
     return (
       <ShelleyOptionDialog
         onRegular={() => this.generated.actions.dialogs.updateDataForActiveDialog.trigger({
-          disclaimer: nextDisclaimerStatus,
+          disclaimer: DisclaimerStatus.FeeDisclaimer,
           continuation: this.startTransferIcarusRewards
         })}
         onPaper={() => this.generated.actions.dialogs.updateDataForActiveDialog.trigger({
-          disclaimer: nextDisclaimerStatus,
+          disclaimer: DisclaimerStatus.FeeDisclaimer,
           continuation: this.startTransferYoroiPaperRewards
         })}
         onCancel={this.props.onCancel}
@@ -120,6 +150,9 @@ export default class ShelleyEraOptionDialogContainer extends Component<Props> {
 
   @computed get generated(): {|
     stores: {|
+      profile: {|
+        selectedComplexityLevel: ?ComplexityLevelType,
+      |},
       wallets: {|
         selected: null | PublicDeriver<>,
       |},
@@ -128,6 +161,13 @@ export default class ShelleyEraOptionDialogContainer extends Component<Props> {
       |},
     |},
     actions: {|
+      ada: {|
+        delegationTransaction: {|
+          setShouldDeregister: {|
+            trigger: boolean => void,
+          |},
+        |},
+      |},
       yoroiTransfer: {|
         startTransferFunds: {|
           trigger: (params: {|
@@ -142,7 +182,8 @@ export default class ShelleyEraOptionDialogContainer extends Component<Props> {
           |}) => void
         |}
       |},
-    |}
+    |},
+    DeregisterDialogContainerProps: InjectedOrGenerated<DeregisterDialogContainerData>,
     |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
@@ -154,6 +195,9 @@ export default class ShelleyEraOptionDialogContainer extends Component<Props> {
     const { yoroiTransfer } = actions;
     return Object.freeze({
       stores: {
+        profile: {
+          selectedComplexityLevel: stores.profile.selectedComplexityLevel,
+        },
         wallets: {
           selected: stores.wallets.selected,
         },
@@ -162,6 +206,13 @@ export default class ShelleyEraOptionDialogContainer extends Component<Props> {
         },
       },
       actions: {
+        ada: {
+          delegationTransaction: {
+            setShouldDeregister: {
+              trigger: actions.ada.delegationTransaction.setShouldDeregister.trigger,
+            },
+          },
+        },
         dialogs: {
           updateDataForActiveDialog: { trigger: actions.dialogs.updateDataForActiveDialog.trigger },
         },
@@ -169,6 +220,9 @@ export default class ShelleyEraOptionDialogContainer extends Component<Props> {
           startTransferFunds: { trigger: yoroiTransfer.startTransferFunds.trigger },
         },
       },
+      DeregisterDialogContainerProps: (
+        { actions, stores, }: InjectedOrGenerated<DeregisterDialogContainerData>
+      ),
     });
   }
 }

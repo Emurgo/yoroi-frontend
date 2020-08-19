@@ -38,7 +38,7 @@ export const Generic = (): Node => {
               isExecuting: boolean('isExecuting', false),
               error: null,
             },
-            complexityLevel: select('complexityLevel', ComplexityLevels, ComplexityLevels.Simple),
+            selectedComplexityLevel: select('complexityLevel', ComplexityLevels, ComplexityLevels.Simple),
           },
           serverConnectionStore: {
             checkAdaServerStatus: select(

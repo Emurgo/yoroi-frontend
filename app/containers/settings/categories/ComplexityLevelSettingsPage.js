@@ -27,7 +27,7 @@ export default class ComplexityLevelSettingsPage
     |},
     stores: {|
       profile: {|
-        complexityLevel: ?ComplexityLevelType,
+        selectedComplexityLevel: ?ComplexityLevelType,
         setComplexityLevelRequest: {|
           error: ?LocalizableError,
           isExecuting: boolean
@@ -57,7 +57,7 @@ export default class ComplexityLevelSettingsPage
             error: profileStore.setComplexityLevelRequest.error,
             isExecuting: profileStore.setComplexityLevelRequest.isExecuting,
           },
-          complexityLevel: profileStore.selectedComplexityLevel
+          selectedComplexityLevel: profileStore.selectedComplexityLevel
         },
       },
       actions: {
@@ -71,7 +71,7 @@ export default class ComplexityLevelSettingsPage
   render(): Node {
     return (
       <ComplexityLevel
-        complexityLevel={this.generated.stores.profile.complexityLevel}
+        complexityLevel={this.generated.stores.profile.selectedComplexityLevel}
         onSubmit={this.generated.actions.profile.selectComplexityLevel.trigger}
         isSubmitting={this.generated.stores.profile.setComplexityLevelRequest.isExecuting}
         error={this.generated.stores.profile.setComplexityLevelRequest.error}
