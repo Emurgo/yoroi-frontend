@@ -33,7 +33,7 @@ const dialogMessages = defineMessages({
   },
   deregisterExplanationLine1: {
     id: 'wallet.transfer.deregister.line1',
-    defaultMessage: '!!!When withdrawing rewards, you also have the option to deregister your staking key',
+    defaultMessage: '!!!When withdrawing rewards, you also have the option to deregister the staking key',
   },
   deregisterExplanationLine2: {
     id: 'wallet.transfer.deregister.line2',
@@ -41,7 +41,7 @@ const dialogMessages = defineMessages({
   },
   deregisterExplanationLine3: {
     id: 'wallet.transfer.deregister.line3',
-    defaultMessage: '!!!Keeping your staking key will allow you to withdraw the rewards, but continue delegating to the same pool',
+    defaultMessage: '!!!Keeping the staking key will allow you to withdraw the rewards, but continue delegating to the same pool',
   },
   deregisterExplanationLine4: {
     id: 'wallet.transfer.deregister.line4',
