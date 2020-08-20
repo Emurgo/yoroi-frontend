@@ -348,7 +348,7 @@
   "wallet.add.page.restore.tooltip": "Mevcut bir Yoroi cüzdanını <br/>yeniden yüklemek için 15 kelimelik bir kurtarma metni girin <br/>veya varolan bir Yoroi kağıt cüzdanını indirin.",
   "wallet.add.page.subtitle.label": "Cardano için Yoroi light wallet",
   "wallet.add.page.title": "Finans dünyasına giriş kapınız",
-  "wallet.address.category.addressBook": "Size ait olmayan, ancak cüzdanınızla alakalı adresler",
+  "wallet.address.category.addressBook": "Size ait olmayan ancak cüzdanınızla alakalı adresler",
   "wallet.address.category.byron": "Byron-era adres biçimi kullanılarak oluşturulan adresler",
   "wallet.address.category.group": "Bir harcama anahtarı ve bir bahis anahtarı kombinasyonu ile oluşturulan adresler",
   "wallet.address.category.p2pk": "Doğrudan bir ortak anahtardan oluşturulan adresler",
