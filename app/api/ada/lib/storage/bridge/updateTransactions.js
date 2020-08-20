@@ -1987,7 +1987,7 @@ async function certificateToDb(
         |}> = [];
 
         const operatorKey = RustModule.WalletV4.Ed25519KeyHash.from_bytes(
-          Buffer.from(cert.pool_params.operator, 'hex')
+          Buffer.from(cert.poolParams.operator, 'hex')
         );
         { // operator
           const operatorId = await tryGetKey(
@@ -2003,10 +2003,10 @@ async function certificateToDb(
 
         // reward_account
         const rewardAddress = RustModule.WalletV4.Address.from_bytes(
-          Buffer.from(cert.pool_params.rewardAccount, 'hex')
+          Buffer.from(cert.poolParams.rewardAccount, 'hex')
         );
         {
-          const addressId = await addressToId(cert.pool_params.rewardAccount);
+          const addressId = await addressToId(cert.poolParams.rewardAccount);
           relatedAddressesInfo.push({
             AddressId: addressId,
             Relation: CertificateRelation.REWARD_ADDRESS
@@ -2017,8 +2017,8 @@ async function certificateToDb(
 
         // pool owners
         const owners = RustModule.WalletV4.Ed25519KeyHashes.new();
-        for (let j = 0; j < cert.pool_params.poolOwners.length; j++) {
-          const owner = cert.pool_params.poolOwners[j];
+        for (let j = 0; j < cert.poolParams.poolOwners.length; j++) {
+          const owner = cert.poolParams.poolOwners[j];
           const ownerKey = RustModule.WalletV4.Ed25519KeyHash.from_bytes(
             Buffer.from(owner, 'hex')
           );
@@ -2035,9 +2035,9 @@ async function certificateToDb(
         }
 
         const relays = RustModule.WalletV4.Relays.new();
-        for (let j = 0; j < cert.pool_params.relays.length; j++) {
+        for (let j = 0; j < cert.poolParams.relays.length; j++) {
           // TODO: skip for now -- not really important
-          // const relay = cert.pool_params.relays[i];
+          // const relay = cert.poolParams.relays[i];
           // if (relay.ipv4 != null || relay.ipv6 != null) {
           //   relays.add(RustModule.WalletV4.Relay.new_single_host_addr(
           //     RustModule.WalletV4.SingleHostAddr.new(
@@ -2072,26 +2072,26 @@ async function certificateToDb(
           RustModule.WalletV4.PoolParams.new(
             operatorKey,
             RustModule.WalletV4.VRFKeyHash.from_bytes(
-              Buffer.from(cert.pool_params.vrfKeyHash, 'hex')
+              Buffer.from(cert.poolParams.vrfKeyHash, 'hex')
             ),
-            RustModule.WalletV4.BigNum.from_str(cert.pool_params.pledge),
-            RustModule.WalletV4.BigNum.from_str(cert.pool_params.cost),
+            RustModule.WalletV4.BigNum.from_str(cert.poolParams.pledge),
+            RustModule.WalletV4.BigNum.from_str(cert.poolParams.cost),
             RustModule.WalletV4.UnitInterval.new(
               // TODO: dummy data since db-sync doesn't support this yet
               RustModule.WalletV4.BigNum.from_str('1'),
               RustModule.WalletV4.BigNum.from_str('1'),
-              // RustModule.WalletV4.BigNum.from_str(cert.pool_params.margin.numerator),
-              // RustModule.WalletV4.BigNum.from_str(cert.pool_params.margin.denominator),
+              // RustModule.WalletV4.BigNum.from_str(cert.poolParams.margin.numerator),
+              // RustModule.WalletV4.BigNum.from_str(cert.poolParams.margin.denominator),
             ),
             wasmRewardAddress,
             owners,
             relays,
-            cert.pool_params.poolMetadata == null
+            cert.poolParams.poolMetadata == null
               ? undefined
               : RustModule.WalletV4.PoolMetadata.new(
-                cert.pool_params.poolMetadata.url,
+                cert.poolParams.poolMetadata.url,
                 RustModule.WalletV4.MetadataHash.from_bytes(
-                  Buffer.from(cert.pool_params.poolMetadata.metadataHash, 'hex')
+                  Buffer.from(cert.poolParams.poolMetadata.metadataHash, 'hex')
                 )
               )
           )

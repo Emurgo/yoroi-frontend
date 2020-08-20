@@ -160,7 +160,7 @@ export type RemoteStakeDelegationCert = {|
   +poolKeyHash: string, // hex
 |};
 export type RemotePoolRegistrationCert = {|
-  +pool_params: {|
+  +poolParams: {|
     +operator: string,
     +vrfKeyHash: string,
     +pledge: string,
