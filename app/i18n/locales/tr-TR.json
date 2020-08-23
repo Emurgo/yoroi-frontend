@@ -494,7 +494,7 @@
   "wallet.nav.type.paper": "Kağıt cüzdan",
   "wallet.nav.type.standard": "Standart cüzdan",
   "wallet.nav.type.trezor": "Trezor cüzdan",
-  "wallet.navigation.delegationById": "Kimliğe göre Delegasyon",
+  "wallet.navigation.delegationById": "Delegation by Id",
   "wallet.navigation.delegationDashboard": "Kontrol Paneli",
   "wallet.navigation.delegationList": "Delegasyon Listesi",
   "wallet.navigation.receive": "Al",
