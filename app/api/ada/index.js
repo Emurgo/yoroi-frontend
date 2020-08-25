@@ -65,7 +65,6 @@ import type {
   IDisplayCutoff,
   IGetAllUtxosResponse,
   IHasUtxoChains, IHasUtxoChainsRequest,
-  IGetPublicResponse,
   Address, Addressing, UsedStatus, Value,
 } from './lib/storage/models/PublicDeriver/interfaces';
 import type {
@@ -100,45 +99,35 @@ import {
   isValidEnglishAdaPaperMnemonic,
   unscramblePaperAdaMnemonic,
 } from './lib/cardanoCrypto/paperWallet';
-import type {
-  LedgerSignTxPayload,
-} from '../../domain/HWSignTx';
 import Notice from '../../domain/Notice';
 import type { CardanoSignTransaction } from 'trezor-connect/lib/types/networks/cardano';
 import {
   createTrezorSignTxPayload,
-  broadcastTrezorSignedTx,
 } from './transactions/shelley/trezorTx';
-// import {
-// createLedgerSignTxPayload,
-// prepareAndBroadcastLedgerSignedTx,
-// } from './transactions/shelley/ledgerTx';
+import {
+  createLedgerSignTxPayload,
+} from './transactions/shelley/ledgerTx';
 import {
   GenericApiError,
   IncorrectWalletPasswordError,
   WalletAlreadyRestoredError,
   InvalidWitnessError,
-  HardwareUnsupportedError,
   NoInputsError,
 } from '../common/errors';
 import LocalizableError from '../../i18n/LocalizableError';
 import { scanBip44Account, } from '../common/lib/restoration/bip44';
 import { v2genAddressBatchFunc, } from './restoration/byron/scan';
 import type {
-  BaseSignRequest,
   V4UnsignedTxAddressedUtxoResponse,
 } from './transactions/types';
 import { HaskellShelleyTxSignRequest, } from './transactions/shelley/HaskellShelleyTxSignRequest';
-import type {
-  SignTransactionResponse as LedgerSignTxResponse
-} from '@cardano-foundation/ledgerjs-hw-app-cardano';
+import type { SignTransactionRequest } from '@emurgo/ledger-connect-handler';
 import { WrongPassphraseError } from './lib/cardanoCrypto/cryptoErrors';
 
 import type {
   HistoryFunc,
   SendFunc,
   SignedResponse,
-  TxBodiesFunc,
   BestBlockFunc,
   SignedRequest,
   AccountStateFunc,
@@ -292,27 +281,26 @@ export type BroadcastTrezorSignedTxFunc = (
 // createLedgerSignTxData
 
 export type CreateLedgerSignTxDataRequest = {|
-  signRequest: BaseSignRequest<RustModule.WalletV4.TransactionBuilder>,
-  getTxsBodiesForUTXOs: TxBodiesFunc,
+  signRequest: HaskellShelleyTxSignRequest,
+  network: $ReadOnly<NetworkRow>,
 |};
-export type CreateLedgerSignTxDataResponse = {| ledgerSignTxPayload: LedgerSignTxPayload, |};
+export type CreateLedgerSignTxDataResponse = {|
+  ledgerSignTxPayload: SignTransactionRequest,
+|};
 export type CreateLedgerSignTxDataFunc = (
   request: CreateLedgerSignTxDataRequest
 ) => Promise<CreateLedgerSignTxDataResponse>;
 
-// prepareAndBroadcastLedgerSignedTx
+// broadcastLedgerSignedTx
 
-export type PrepareAndBroadcastLedgerSignedTxRequest = {|
-  getPublicKey: () => Promise<IGetPublicResponse>,
-  keyLevel: number,
-  ledgerSignTxResp: LedgerSignTxResponse,
-  unsignedTx: RustModule.WalletV4.TransactionBody,
+export type BroadcastLedgerSignedTxRequest = {|
+  signedTxRequest: SignedRequest,
   sendTx: SendFunc,
 |};
-export type PrepareAndBroadcastLedgerSignedTxResponse = SignedResponse;
-export type PrepareAndBroadcastLedgerSignedTxFunc = (
-  request: PrepareAndBroadcastLedgerSignedTxRequest
-) => Promise<PrepareAndBroadcastLedgerSignedTxResponse>;
+export type BroadcastLedgerSignedTxResponse = SignedResponse;
+export type BroadcastLedgerSignedTxFunc = (
+  request: BroadcastLedgerSignedTxRequest
+) => Promise<BroadcastLedgerSignedTxResponse>;
 
 // createUnsignedTx
 
@@ -797,13 +785,12 @@ export default class AdaApi {
   ): Promise<BroadcastTrezorSignedTxResponse> {
     Logger.debug(`${nameof(AdaApi)}::${nameof(this.broadcastTrezorSignedTx)} called`);
     try {
-      const response = await broadcastTrezorSignedTx(
-        request.signedTxRequest,
-        request.sendTx
-      );
-      Logger.debug(`${nameof(AdaApi)}::${nameof(this.broadcastTrezorSignedTx)} success: ` + stringifyData(response));
+      Logger.debug(`trezorTx::${nameof(this.broadcastTrezorSignedTx)}: called`);
+      const backendResponse = await request.sendTx(request.signedTxRequest);
 
-      return response;
+      Logger.debug(`${nameof(AdaApi)}::${nameof(this.broadcastTrezorSignedTx)} success: ` + stringifyData(backendResponse));
+
+      return backendResponse;
     } catch (error) {
       Logger.error(`${nameof(AdaApi)}::${nameof(this.broadcastTrezorSignedTx)} error: ` + stringifyError(error));
 
@@ -822,18 +809,20 @@ export default class AdaApi {
     try {
       Logger.debug(`${nameof(AdaApi)}::${nameof(this.createLedgerSignTxData)} called`);
 
-      throw new HardwareUnsupportedError();
-      // const { signRequest, getTxsBodiesForUTXOs } = request;
+      const config = getCardanoHaskellBaseConfig(
+        request.network
+      ).reduce((acc, next) => Object.assign(acc, next), {});
 
-      // const ledgerSignTxPayload = await createLedgerSignTxPayload(
-      //   signRequest,
-      //   getTxsBodiesForUTXOs,
-      // );
+      const ledgerSignTxPayload = await createLedgerSignTxPayload(
+        request.signRequest,
+        config.ByronNetworkId,
+        Number.parseInt(config.ChainNetworkId, 10),
+      );
 
-      // Logger.debug(`${nameof(AdaApi)}::${nameof(this.createLedgerSignTxData)} success: ` + stringifyData(ledgerSignTxPayload));
-      // return {
-      //   ledgerSignTxPayload,
-      // };
+      Logger.debug(`${nameof(AdaApi)}::${nameof(this.createLedgerSignTxData)} success: ` + stringifyData(ledgerSignTxPayload));
+      return {
+        ledgerSignTxPayload
+      };
     } catch (error) {
       Logger.error(`${nameof(AdaApi)}::${nameof(this.createLedgerSignTxData)} error: ` + stringifyError(error));
 
@@ -842,31 +831,23 @@ export default class AdaApi {
     }
   }
 
-  async prepareAndBroadcastLedgerSignedTx(
-    request: PrepareAndBroadcastLedgerSignedTxRequest
-  ): Promise<PrepareAndBroadcastLedgerSignedTxResponse> {
+  async broadcastLedgerSignedTx(
+    request: BroadcastLedgerSignedTxRequest
+  ): Promise<BroadcastLedgerSignedTxResponse> {
+    Logger.debug(`${nameof(AdaApi)}::${nameof(this.broadcastLedgerSignedTx)} called`);
     try {
-      Logger.debug(`${nameof(AdaApi)}::${nameof(this.prepareAndBroadcastLedgerSignedTx)} called`);
+      Logger.debug(`ledgerTx::${nameof(this.broadcastLedgerSignedTx)}: called`);
+      const backendResponse = await request.sendTx(request.signedTxRequest);
 
-      throw new HardwareUnsupportedError();
-      // const publicKeyRow = await request.getPublicKey();
-      // if (publicKeyRow.IsEncrypted) {
-      //   throw new Error(`${nameof(AdaApi)}::${nameof(this.prepareAndBroadcastLedgerSignedTx)} unexpected encrypted public key`);
-      // }
-      // const publicKey = RustModule.WalletV2.PublicKey.from_hex(publicKeyRow.Hash);
-      // const { ledgerSignTxResp, unsignedTx, sendTx } = request;
-      // const response = await prepareAndBroadcastLedgerSignedTx(
-      //   ledgerSignTxResp,
-      //   unsignedTx,
-      //   publicKey,
-      //   request.keyLevel,
-      //   sendTx,
-      // );
-      // Logger.debug(`${nameof(AdaApi)}::${nameof(this.prepareAndBroadcastLedgerSignedTx)} success: ` + stringifyData(response));
+      Logger.debug(`${nameof(AdaApi)}::${nameof(this.broadcastLedgerSignedTx)} success: ` + stringifyData(backendResponse));
 
-      // return response;
+      return backendResponse;
     } catch (error) {
-      Logger.error(`${nameof(AdaApi)}::${nameof(this.prepareAndBroadcastLedgerSignedTx)} error: ` + stringifyError(error));
+      Logger.error(`${nameof(AdaApi)}::${nameof(this.broadcastLedgerSignedTx)} error: ` + stringifyError(error));
+
+      if (error instanceof InvalidWitnessError) {
+        throw new InvalidWitnessError();
+      }
 
       if (error instanceof LocalizableError) throw error;
       throw new GenericApiError();

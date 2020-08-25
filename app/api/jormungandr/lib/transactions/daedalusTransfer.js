@@ -8,7 +8,6 @@ import {
   Logger,
   stringifyError,
 } from '../../../../utils/logging';
-import { Bech32Prefix } from '../../../../config/stringConfig';
 import {
   GenerateTransferTxError
 } from '../../../common/errors';

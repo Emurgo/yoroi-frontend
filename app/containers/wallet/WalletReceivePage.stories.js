@@ -34,7 +34,7 @@ import { wrapReceive, wrapWallet } from '../../Routes';
 import { mockWalletProps } from './Wallet.mock';
 import { mockReceiveProps } from './Receive.mock';
 import { defaultToSelectedExplorer } from '../../domain/SelectedExplorer';
-import type {AddressFilterKind, } from '../../types/AddressFilterTypes';
+import type { AddressFilterKind, } from '../../types/AddressFilterTypes';
 import URIGenerateDialog from '../../components/uri/URIGenerateDialog';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import URIDisplayDialog from '../../components/uri/URIDisplayDialog';

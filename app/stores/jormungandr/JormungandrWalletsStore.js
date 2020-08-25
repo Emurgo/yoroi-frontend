@@ -2,23 +2,14 @@
 import { observable, } from 'mobx';
 
 import Store from '../base/Store';
-import {
-  Logger,
-  stringifyError
-} from '../../utils/logging';
 import Request from '../lib/LocalizedRequest';
 import type {
   GenerateWalletRecoveryPhraseFunc
 } from '../../api/jormungandr/index';
-import {
-  asGetSigningKey,
-} from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import { JormungandrTxSignRequest } from '../../api/jormungandr/lib/transactions/JormungandrTxSignRequest';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import { ROUTES } from '../../routes-config';
 import { buildCheckAndCall } from '../lib/check';
 import { getApiForNetwork, ApiOptions } from '../../api/common/utils';
-import type { ISignRequest } from '../../api/common/lib/transactions/ISignRequest';
 
 export default class JormungandrWalletsStore extends Store {
 

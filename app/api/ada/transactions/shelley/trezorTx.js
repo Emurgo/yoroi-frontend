@@ -1,23 +1,8 @@
 // // @flow
-import {
-  Logger,
-  stringifyError,
-} from '../../../../utils/logging';
 import type {
   AddressedUtxo,
 } from '../types';
 import { verifyFromBip44Root }  from '../utils';
-import type {
-  SendFunc,
-  SignedRequest,
-} from '../../lib/state-fetch/types';
-import {
-  SendTransactionError,
-  InvalidWitnessError,
-} from '../../../common/errors';
-import type {
-  BroadcastTrezorSignedTxResponse,
-} from '../../index';
 import { toDerivationPathString } from '../../../common/lib/crypto/keys/path';
 import type {
   CardanoSignTransaction,
@@ -46,8 +31,8 @@ import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 import { range } from 'lodash';
 import { toHexOrBase58 } from '../../lib/storage/bridge/utils';
 
-// // ==================== TREZOR ==================== //
-// /** Generate a payload for Trezor SignTx */
+// ==================== TREZOR ==================== //
+/** Generate a payload for Trezor SignTx */
 export async function createTrezorSignTxPayload(
   signRequest: HaskellShelleyTxSignRequest,
   byronNetworkMagic: number,
@@ -77,13 +62,12 @@ export async function createTrezorSignTxPayload(
 
   // withdrawals
   const withdrawals = txBody.withdrawals();
+
   const getStakingKeyPath = () => {
     // TODO: this entire block is super hacky
     // need to instead pass in a mapping from wallet addresses to addressing
     // or add something similar to the sign request
-    if (withdrawals != null && withdrawals.len() > 1) {
-      throw new Error(`${nameof(createTrezorSignTxPayload)} don't support multiple staking keys for one wallet`);
-    }
+
     // assume the withdrawal is the same path as the UTXOs being spent
     // so just take the first UTXO arbitrarily and change it to the staking key path
     const firstUtxo = signRequest.self().senderUtxos[0];
@@ -138,21 +122,20 @@ function formatTrezorWithdrawals(
     // TODO: this is a problem with our CDDL library
     // since it saves withdrawals as a BTreeMap
     // which may not be the same order as present in the original tx binary
-    // so we don't know which order the list we pass to Trezor should be
+    // so we don't know which order the list we pass should be
     throw new Error(`${nameof(formatTrezorWithdrawals)} only 1 withdrawal per tx supported`);
   }
-  if (withdrawals.len() === 1) {
-    // TODO: this is a problem with our CDDL library
-    // since it only exposes a "get" function and no way to iterate over keys
-    // and we don't know what reward address will be here before-hand
-    throw new Error(`${nameof(formatTrezorWithdrawals)} withdrawals not supported`);
+  const withdrawalKeys = withdrawals.keys();
+  for (let i = 0; i < withdrawalKeys.len(); i++) {
+    const withdrawalAmount = withdrawals.get(withdrawalKeys.get(i));
+    if (withdrawalAmount == null) {
+      throw new Error(`${nameof(formatTrezorWithdrawals)} should never happen`);
+    }
+    result.push({
+      amount: withdrawalAmount.to_str(),
+      path: path[i],
+    });
   }
-  // for (let i = 0; i < withdrawals.len(); i++) {
-  //   result.push({
-  //     amount: withdrawals.get(i).to_str(),
-  //     path: path[i],
-  //   });
-  // }
   return result;
 }
 function formatTrezorCertificates(
@@ -188,26 +171,6 @@ function formatTrezorCertificates(
     throw new Error(`${nameof(formatTrezorCertificates)} Trezor doesn't support this certificate type`);
   }
   return result;
-}
-
-// /** Send a transaction and save the new change address */
-export async function broadcastTrezorSignedTx(
-  signedTxRequest: SignedRequest,
-  sendTx: SendFunc,
-): Promise<BroadcastTrezorSignedTxResponse> {
-  Logger.debug(`trezorTx::${nameof(broadcastTrezorSignedTx)}: called`);
-  try {
-    const backendResponse = await sendTx(signedTxRequest);
-    Logger.debug(`trezorTx::${nameof(broadcastTrezorSignedTx)}: success`);
-
-    return backendResponse;
-  } catch (sendTxError) {
-    Logger.error(`trezorTx::${nameof(broadcastTrezorSignedTx)} error: ` + stringifyError(sendTxError));
-    if (sendTxError instanceof InvalidWitnessError) {
-      throw new InvalidWitnessError();
-    }
-    throw new SendTransactionError();
-  }
 }
 
 function _transformToTrezorInputs(
@@ -280,6 +243,8 @@ export function toTrezorAddressParameters(
       return {
         addressType: ADDRESS_TYPE.Base,
         path: toDerivationPathString(path),
+        // can't always know staking key path since address may not belong to the wallet
+        // (mangled addresss)
         stakingKeyHash: Buffer.from(hash.to_bytes()).toString('hex'),
       };
     }
@@ -303,7 +268,7 @@ export function toTrezorAddressParameters(
     const enterpriseAddr = RustModule.WalletV4.EnterpriseAddress.from_address(address);
     if (enterpriseAddr) {
       return {
-        addressType: ADDRESS_TYPE.Reward,
+        addressType: ADDRESS_TYPE.Enterprise,
         path: toDerivationPathString(path),
       };
     }
@@ -312,7 +277,7 @@ export function toTrezorAddressParameters(
     const rewardAddr = RustModule.WalletV4.RewardAddress.from_address(address);
     if (rewardAddr) {
       return {
-        addressType: ADDRESS_TYPE.Enterprise,
+        addressType: ADDRESS_TYPE.Reward,
         path: toDerivationPathString(path),
       };
     }

@@ -11,7 +11,7 @@ import {
   PublicDeriver,
 } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import {
-  asGetAllUtxos, asHasUtxoChains, asDisplayCutoff, asHasLevels,
+  asHasUtxoChains, asDisplayCutoff, asHasLevels,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import type {
   IHasUtxoChainsRequest,

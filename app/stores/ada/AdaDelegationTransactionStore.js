@@ -11,7 +11,7 @@ import type {
 import { buildRoute } from '../../utils/routing';
 import { ROUTES } from '../../routes-config';
 import {
-  asGetAllUtxos, asHasUtxoChains, asGetAllAccounting, asGetSigningKey, asGetPublicKey,
+  asGetAllUtxos, asHasUtxoChains, asGetAllAccounting, asGetPublicKey,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import {
   PublicDeriver,

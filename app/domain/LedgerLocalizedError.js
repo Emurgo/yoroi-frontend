@@ -42,6 +42,8 @@ export function convertToLocalizableError(error: Error): LocalizableError {
   } else if (error && error.message) {
     // Ledger device related error happened, convert then to LocalizableError
     switch (error.message) {
+      // TODO: add serial error
+      // TODO: add version mismatch error
       case 'TransportError: Failed to sign with Ledger device: U2F TIMEOUT':
         // Showing - Failed to connect. Please check your ledger device and retry.
         localizableError = new LocalizableError(globalMessages.ledgerError101);

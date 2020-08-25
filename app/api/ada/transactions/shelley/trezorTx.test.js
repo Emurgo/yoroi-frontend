@@ -14,6 +14,10 @@ import {
   getCardanoAddrKeyHash,
   normalizeToAddress,
 } from '../../lib/storage/bridge/utils';
+import {
+  CERTIFICATE_TYPE,
+  ADDRESS_TYPE,
+} from 'trezor-connect/lib/constants/cardano';
 
 beforeAll(async () => {
   await RustModule.load();
@@ -47,7 +51,7 @@ test('Generate address parameters', async () => {
     const wasmAddr = normalizeToAddress(addr);
     if (wasmAddr == null) throw new Error(`Unknown address`);
     expect(toTrezorAddressParameters(wasmAddr, path)).toEqual({
-      addressType: 8,
+      addressType: ADDRESS_TYPE.Byron,
       path: "m/44'/1815'/0'/1/1",
     });
   }
@@ -58,7 +62,7 @@ test('Generate address parameters', async () => {
     const wasmAddr = normalizeToAddress(addr);
     if (wasmAddr == null) throw new Error(`Unknown address`);
     expect(toTrezorAddressParameters(wasmAddr, path)).toEqual({
-      addressType: 0,
+      addressType: ADDRESS_TYPE.Base,
       path: "m/44'/1815'/0'/1/1",
       stakingKeyHash: '63073aa639558af724c96fbd1d01f35d087823e1e14b7d4e0fdb2132'
     });
@@ -70,7 +74,7 @@ test('Generate address parameters', async () => {
     const wasmAddr = normalizeToAddress(addr);
     if (wasmAddr == null) throw new Error(`Unknown address`);
     expect(toTrezorAddressParameters(wasmAddr, path)).toEqual({
-      addressType: 14,
+      addressType: ADDRESS_TYPE.Enterprise,
       path: "m/44'/1815'/0'/1/1",
     });
   }
@@ -81,13 +85,25 @@ test('Generate address parameters', async () => {
     const wasmAddr = normalizeToAddress(addr);
     if (wasmAddr == null) throw new Error(`Unknown address`);
     expect(toTrezorAddressParameters(wasmAddr, path)).toEqual({
-      addressType: 4,
+      addressType: ADDRESS_TYPE.Pointer,
       path: "m/44'/1815'/0'/1/1",
       certificatePointer: {
         blockIndex: 1,
         certificateIndex: 3,
         txIndex: 2,
       }
+    });
+  }
+
+  // reward
+  {
+    const addr = 'stake1u8pcjgmx7962w6hey5hhsd502araxp26kdtgagakhaqtq8squng76';
+    const stakingKeyPath = [2147483692, 2147485463, 2147483648, 2, 0];
+    const wasmAddr = normalizeToAddress(addr);
+    if (wasmAddr == null) throw new Error(`Unknown address`);
+    expect(toTrezorAddressParameters(wasmAddr, stakingKeyPath)).toEqual({
+      addressType: ADDRESS_TYPE.Reward,
+      path: "m/44'/1815'/0'/2/0",
     });
   }
 });
@@ -249,7 +265,7 @@ test('Create Trezor transaction', async () => {
         2,
         0,
       ],
-      type: 0,
+      type: CERTIFICATE_TYPE.StakeRegistration,
     }],
   });
 });

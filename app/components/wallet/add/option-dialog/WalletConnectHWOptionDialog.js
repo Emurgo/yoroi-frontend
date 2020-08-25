@@ -53,13 +53,13 @@ export default class WalletConnectHWOptionDialog extends Component<Props> {
       >
         <div className={styles.component}>
           <ul className={styles.optionBlockList}>
-            {/* <OptionBlock
+            <OptionBlock
               parentName="WalletConnectHWOptionDialog"
               type="connectLedger"
               title={intl.formatMessage(globalMessages.ledgerTitle)}
               learnMoreText={intl.formatMessage(messages.ledgerDescription)}
               onSubmit={onLedger}
-            /> */}
+            />
             <OptionBlock
               parentName="WalletConnectHWOptionDialog"
               type="connectTrezor"

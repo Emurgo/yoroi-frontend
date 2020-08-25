@@ -8,19 +8,8 @@ import type {
 
 import Store from '../../base/Store';
 
-import LocalizedRequest from '../../lib/LocalizedRequest';
 import LocalizableError from '../../../i18n/LocalizableError';
 
-import type {
-  CreateLedgerSignTxDataFunc,
-  PrepareAndBroadcastLedgerSignedTxResponse,
-} from '../../../api/ada';
-import {
-  asGetPublicKey, asHasLevels,
-} from '../../../api/ada/lib/storage/models/PublicDeriver/traits';
-import {
-  ConceptualWallet
-} from '../../../api/ada/lib/storage/models/ConceptualWallet/index';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 import type {
   SendUsingLedgerParams
@@ -37,11 +26,14 @@ import {
 } from '../../../utils/logging';
 
 import {
+  buildSignedTransaction,
+} from '../../../api/ada/transactions/shelley/ledgerTx';
+
+import {
   prepareLedgerConnect,
 } from '../../../utils/hwConnectHandler';
 import { ROUTES } from '../../../routes-config';
 import { RustModule } from '../../../api/ada/lib/cardanoCrypto/rustLoader';
-import { HardwareUnsupportedError } from '../../../api/common/errors';
 
 /** Note: Handles Ledger Signing */
 export default class LedgerSendStore extends Store {
@@ -103,7 +95,7 @@ export default class LedgerSendStore extends Store {
       this.actions.dialogs.closeActiveDialog.trigger();
       this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ROOT });
 
-      Logger.info('SUCCESS: ADA sent using Trezor SignTx');
+      Logger.info('SUCCESS: ADA sent using Ledger SignTx');
     } catch (e) {
       this._setError(e);
     } finally {
@@ -123,48 +115,46 @@ export default class LedgerSendStore extends Store {
         locale: this.stores.profile.currentLocale
       });
 
-      throw new HardwareUnsupportedError();
+      const { ledgerSignTxPayload } = await this.api.ada.createLedgerSignTxData({
+        ...request.params,
+        network: request.publicDeriver.getParent().getNetworkInfo(),
+      });
 
-      // const stateFetcher = this.stores.substores.ada.stateFetchStore.fetcher;
-      // const ledgerSignTxDataResp = await this.api.ada.createLedgerSignTxData({
-      //   ...request.params,
-      //   getTxsBodiesForUTXOs: stateFetcher.getTxsBodiesForUTXOs,
-      // });
+      await prepareLedgerConnect(ledgerConnect);
 
-      // await prepareLedgerConnect(ledgerConnect);
+      const ledgerSignTxResp: LedgerSignTxResponse =
+        await ledgerConnect.signTransaction({
+          serial: undefined, // TODO
+          params: ledgerSignTxPayload,
+        });
 
-      // const ledgerSignTxResp: LedgerSignTxResponse =
-      //   await ledgerConnect.signTransaction(
-      //     ledgerSignTxDataResp.ledgerSignTxPayload.inputs,
-      //     ledgerSignTxDataResp.ledgerSignTxPayload.outputs,
-      //   );
+      // There is no need of ledgerConnect after this line.
+      // UI was getting blocked for few seconds
+      // because _prepareAndBroadcastSignedTx takes time.
+      // Disposing here will fix the UI issue.
+      ledgerConnect.dispose();
 
-      // // There is no need of ledgerConnect after this line.
-      // // UI was getting blocked for few seconds
-      // // because _prepareAndBroadcastSignedTx takes time.
-      // // Disposing here will fix the UI issue.
-      // ledgerConnect.dispose();
+      const txBody = request.params.signRequest.self().unsignedTx.build();
+      const txId = Buffer.from(RustModule.WalletV4.hash_transaction(txBody).to_bytes()).toString('hex');
+      const signedTx = buildSignedTransaction(
+        txBody,
+        ledgerSignTxResp.witnesses,
+        request.params.signRequest.txMetadata(),
+      );
 
-      // {
-      //   const withPublicKey = asGetPublicKey(request.publicDeriver);
-      //   if (withPublicKey == null) {
-      //     throw new Error(`${nameof(this.signAndBroadcast)} public deriver has no public key.`);
-      //   }
-      //   const withLevels = asHasLevels<ConceptualWallet>(withPublicKey);
-      //   if (withLevels == null) {
-      //     throw new Error(`${nameof(this.signAndBroadcast)} public deriver has no levels`);
-      //   }
+      await this.api.ada.broadcastLedgerSignedTx({
+        signedTxRequest: {
+          id: txId,
+          encodedTx: signedTx.to_bytes(),
+        },
+        sendTx: this.stores.substores.ada.stateFetchStore.fetcher.sendTx,
+      });
 
-      //   const signedTxResponse = await this.api.ada.prepareAndBroadcastLedgerSignedTx({
-      //     getPublicKey: withPublicKey.getPublicKey,
-      //     keyLevel: withLevels.getParent().getPublicDeriverLevel(),
-      //     ledgerSignTxResp,
-      //     unsignedTx: request.params.signRequest.signRequest.unsignedTx.build(),
-      //     sendTx: this.stores.substores.ada.stateFetchStore.fetcher.sendTx,
-      //   });
+      Logger.info('SUCCESS: ADA sent using Ledger SignTx');
 
-      //   Logger.info('SUCCESS: ADA sent using Ledger SignTx');
-      // }
+      return {
+        txId,
+      };
     } catch (error) {
       Logger.error(`${nameof(LedgerSendStore)}::${nameof(this.signAndBroadcast)} error: ` + stringifyError(error));
       throw new convertToLocalizableError(error);

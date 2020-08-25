@@ -14,7 +14,7 @@ import NoWalletsDropdown from '../components/topbar/NoWalletsDropdown';
 import NavDropdown from '../components/topbar/NavDropdown';
 import NavDropdownRow from '../components/topbar/NavDropdownRow';
 import { ROUTES } from '../routes-config';
-import { ConceptualWallet, isLedgerNanoWallet, isTrezorTWallet } from '../api/ada/lib/storage/models/ConceptualWallet/index';
+import { ConceptualWallet, } from '../api/ada/lib/storage/models/ConceptualWallet/index';
 import {
   asGetPublicKey,
 } from '../api/ada/lib/storage/models/PublicDeriver/traits';

@@ -4,7 +4,7 @@ import { When, Then, } from 'cucumber';
 import { testWallets } from '../mock-chain/TestWallets';
 import { truncateAddress, } from '../../app/utils/formatters';
 
-When(/^I restore a Ledger device$/, async function () {
+When(/^I restore a Byron-era Ledger device$/, async function () {
   await this.click('.WalletAdd_btnConnectHW');
 
   await this.waitForElement('.PickCurrencyOptionDialog');
@@ -13,6 +13,9 @@ When(/^I restore a Ledger device$/, async function () {
   await this.waitForElement('.WalletConnectHWOptionDialog');
 
   await this.click('.WalletConnectHWOptionDialog_connectLedger');
+  await this.click('.WalletEraOptionDialog_bgByronMainnet');
+});
+When(/^I restore the Ledger device$/, async function () {
   await this.waitForElement('.CheckDialog_component');
   await this.click('.primary');
   await this.click('.primary');
@@ -22,6 +25,7 @@ When(/^I restore a Ledger device$/, async function () {
   await this.waitForElement('.SaveDialog');
   await this.click('.primary');
 });
+
 
 When(/^I select a Byron-era Trezor device$/, async function () {
   await this.click('.WalletAdd_btnConnectHW');
