@@ -5,7 +5,7 @@ import { defineMessages } from 'react-intl';
 import type { MessageDescriptor } from 'react-intl';
 
 const messages = defineMessages({
-  unknowError: {
+  unknownError: {
     id: 'app.errors.unknowError',
     defaultMessage: '!!!Unknow error.',
   },
@@ -44,8 +44,8 @@ class LocalizableError extends ExtendableError {
 class UnknownError extends LocalizableError {
   constructor() {
     super({
-      id: messages.unknowError.id,
-      defaultMessage: messages.unknowError.defaultMessage || '',
+      id: messages.unknownError.id,
+      defaultMessage: messages.unknownError.defaultMessage || '',
     });
   }
 }

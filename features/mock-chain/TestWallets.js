@@ -86,12 +86,12 @@ export const testWallets: { [key: WalletNames]: RestorationInput, ... } = Object
   createWallet({
     name: ('ledger-wallet': WalletNames),
     mnemonic: 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art',
-    plate: 'JSKA-2258',
+    plate: 'JSKA-2258', // shelley plate KHDC-5476
   }),
   createWallet({
     name: ('trezor-wallet': WalletNames),
     mnemonic: 'lyrics tray aunt muffin brisk ensure wedding cereal capital path replace weasel',
-    plate: 'CZSA-2051',
+    plate: 'CZSA-2051', // shelley plate PXCA-2349
   }),
   createWallet({
     name: ('shelley-simple-24': WalletNames),

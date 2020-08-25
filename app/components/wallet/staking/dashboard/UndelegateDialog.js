@@ -184,7 +184,11 @@ export default class UndelegateDialog extends Component<Props> {
           </p>
         </div>
         {this.props.error
-          ? <p className={styles.error}>{intl.formatMessage(this.props.error)}</p>
+          ? (
+            <p className={styles.error}>
+              {intl.formatMessage(this.props.error, this.props.error.values)}
+            </p>
+          )
           : null
         }
 

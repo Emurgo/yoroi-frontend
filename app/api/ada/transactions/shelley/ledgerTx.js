@@ -28,6 +28,7 @@ import {
   WalletTypePurpose,
   ChainDerivations,
 } from '../../../../config/numbersConfig';
+import { derivePublicByAddressing } from '../../lib/cardanoCrypto/utils';
 import { range } from 'lodash';
 
 // ==================== LEDGER ==================== //
@@ -303,8 +304,15 @@ export function toLedgerAddressParameters(
 export function buildSignedTransaction(
   txBody: RustModule.WalletV4.TransactionBody,
   witnesses: Array<Witness>,
+  publicKey: {|
+    keyLevel: number,
+    key: RustModule.WalletV4.Bip32PublicKey,
+  |},
   metadata: RustModule.WalletV4.TransactionMetadata | void
 ): RustModule.WalletV4.Transaction {
+  // TODO: I don't know if Ledger de-duplicates witnesses, so I deduplicate myself
+  const seenWitnesses = new Set<string>();
+
   const witSet = RustModule.WalletV4.TransactionWitnessSet.new();
   const bootstrapWitnesses: Array<RustModule.WalletV4.BootstrapWitness> = [];
   const vkeys: Array<RustModule.WalletV4.Vkeywitness> = [];
@@ -316,13 +324,29 @@ export function buildSignedTransaction(
       continue;
     }
     // TODO: handle script witnesses
-    vkeys.push(RustModule.WalletV4.Vkeywitness.from_bytes(
-      Buffer.from(witness.witnessSignatureHex, 'hex')
+    const finalKey = derivePublicByAddressing({
+      addressing: {
+        startLevel: 1, // full path
+        path: witness.path
+      },
+      startingFrom: {
+        level: publicKey.keyLevel,
+        key: publicKey.key,
+      }
+    });
+    vkeys.push(RustModule.WalletV4.Vkeywitness.new(
+      RustModule.WalletV4.Vkey.new(finalKey.to_raw_key()),
+      RustModule.WalletV4.Ed25519Signature.from_bytes(Buffer.from(witness.witnessSignatureHex, 'hex')),
     ));
   }
   if (bootstrapWitnesses.length > 0) {
     const bootstrapWitWasm = RustModule.WalletV4.BootstrapWitnesses.new();
     for (const bootstrapWit of bootstrapWitnesses) {
+      const bootstrapWitString = Buffer.from(bootstrapWit.to_bytes()).toString('hex');
+      if (seenWitnesses.has(bootstrapWitString)) {
+        continue;
+      }
+      seenWitnesses.add(bootstrapWitString);
       bootstrapWitWasm.add(bootstrapWit);
     }
     witSet.set_bootstraps(bootstrapWitWasm);
@@ -330,6 +354,11 @@ export function buildSignedTransaction(
   if (vkeys.length > 0) {
     const vkeyWitWasm = RustModule.WalletV4.Vkeywitnesses.new();
     for (const vkey of vkeys) {
+      const vkeyWitString = Buffer.from(vkey.to_bytes()).toString('hex');
+      if (seenWitnesses.has(vkeyWitString)) {
+        continue;
+      }
+      seenWitnesses.add(vkeyWitString);
       vkeyWitWasm.add(vkey);
     }
     witSet.set_vkeys(vkeyWitWasm);

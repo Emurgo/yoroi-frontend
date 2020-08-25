@@ -34,6 +34,10 @@ import {
 } from '../../../utils/hwConnectHandler';
 import { ROUTES } from '../../../routes-config';
 import { RustModule } from '../../../api/ada/lib/cardanoCrypto/rustLoader';
+import { asGetPublicKey, asHasLevels } from '../../../api/ada/lib/storage/models/PublicDeriver/traits';
+import {
+  ConceptualWallet
+} from '../../../api/ada/lib/storage/models/ConceptualWallet/index';
 
 /** Note: Handles Ledger Signing */
 export default class LedgerSendStore extends Store {
@@ -111,6 +115,15 @@ export default class LedgerSendStore extends Store {
     let ledgerConnect: LedgerConnect;
     try {
       Logger.debug(`${nameof(LedgerSendStore)}::${nameof(this.signAndBroadcast)} called: ` + stringifyData(request.params));
+
+      const withLevels = asHasLevels<ConceptualWallet>(request.publicDeriver);
+      if (withLevels == null) {
+        throw new Error(`${nameof(this.signAndBroadcast)} No public deriver level for this public deriver`);
+      }
+      const withPublicKey = asGetPublicKey(withLevels);
+      if (withPublicKey == null) throw new Error(`${nameof(this.signAndBroadcast)} No public key for this public deriver`);
+      const publicKey = await withPublicKey.getPublicKey();
+
       ledgerConnect = new LedgerConnect({
         locale: this.stores.profile.currentLocale
       });
@@ -139,6 +152,12 @@ export default class LedgerSendStore extends Store {
       const signedTx = buildSignedTransaction(
         txBody,
         ledgerSignTxResp.witnesses,
+        {
+          key: RustModule.WalletV4.Bip32PublicKey.from_bytes(
+            Buffer.from(publicKey.Hash, 'hex')
+          ),
+          keyLevel: withLevels.getParent().getPublicDeriverLevel(),
+        },
         request.params.signRequest.txMetadata(),
       );
 

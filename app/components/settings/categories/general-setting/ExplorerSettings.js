@@ -73,7 +73,11 @@ export default class ExplorerSettings extends Component<Props> {
           onChange={this.selectExplorer}
           skin={SelectSkin}
         />
-        {error && <p className={styles.error}>{intl.formatMessage(error)}</p>}
+        {error && (
+          <p className={styles.error}>
+            {intl.formatMessage(error, error.values)}
+          </p>
+        )}
       </div>
     );
   }

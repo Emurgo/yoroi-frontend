@@ -127,7 +127,11 @@ export default class PaperWalletDialog extends Component<Props> {
           description={this.context.intl.formatMessage(messages.printIdentificationMessage)}
         />
 
-        {error && <p className={styles.error}>{intl.formatMessage(error)}</p>}
+        {error && (
+          <p className={styles.error}>
+            {intl.formatMessage(error, error.values)}
+          </p>
+        )}
 
       </Dialog>
     );

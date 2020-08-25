@@ -73,7 +73,11 @@ export default class WalletNameSetting extends Component<Props> {
           successfullyUpdated={!isSubmitting && lastUpdatedField === 'name' && !isInvalid}
           classicTheme={classicTheme}
         />
-        {error && <p className={styles.error}>{intl.formatMessage(error)}</p>}
+        {error && (
+          <p className={styles.error}>
+            {intl.formatMessage(error, error.values)}
+          </p>
+        )}
       </>
     );
   }

@@ -93,7 +93,14 @@ export default class DangerousActionDialog extends Component<Props> {
           />
         </div>
 
-        {error ? <p className={styles.error}>{intl.formatMessage(error)}</p> : null}
+        {error
+          ? (
+            <p className={styles.error}>
+              {intl.formatMessage(error, error.values)}
+            </p>
+          )
+          : null
+        }
 
       </Dialog>
     );

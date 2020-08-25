@@ -48,16 +48,24 @@ console.debug('[CS-LEDGER] Loading');
     if(event.origin === ORIGIN && event.data) {
       const { data } = event;
       if (data.action === 'ledger-get-extended-public-key') {
+        const byronKey = {
+          // from ledger-wallet mnemonic
+          publicKeyHex: 'd54844edc8ffe0f41ec686a2199f4d182dd477450ec2d5b251d877178f366b81',
+          chainCodeHex: 'd8b2aa0ca5ed670a252387c9d4c2f41946c2f760d118bec9b70b5fbabfef7fc6',
+        };
+        const shelleyKey = {
+          // from ledger-wallet mnemonic
+          publicKeyHex: 'a849fc88a55ceb3ee00bb22511448556fb6a0fc1f981e9e82d002f4a1906a7a5',
+          chainCodeHex: '6e7759167a1e1cbd0b2aac7aef423a4ea9ce0f5eae829b111b619fb1c38f4b08',
+        };
         const payload /*: ExtendedPublicKeyResp */ = {
-          response: {
-            // from ledger-wallet mnemonic
-            publicKeyHex: 'd54844edc8ffe0f41ec686a2199f4d182dd477450ec2d5b251d877178f366b81',
-            chainCodeHex: 'd8b2aa0ca5ed670a252387c9d4c2f41946c2f760d118bec9b70b5fbabfef7fc6',
-          },
+          response: data.params.path[0] === 2147483692 // BIP44
+            ? byronKey
+            : shelleyKey,
           deviceVersion: {
-            major: '1',
+            major: '2',
             minor: '0',
-            patch: '0',
+            patch: '4',
             flags: {
               isDebug: false,
             }
@@ -73,6 +81,8 @@ console.debug('[CS-LEDGER] Loading');
         };
         browserPort.postMessage(postData)
       } if (data.action === 'ledger-sign-transaction') {
+        // note: this is the same bip44 tx for bip44 and cip1852
+        // should be an if/else in the future
         const payload /*: SignTransactionResponse */ = {
           txHashHex: 'a2831b89854114f706eb8cc9aa3c9ba49cd76f7d2863aa74ac15e0e755e1d524',
           witnesses: [{
@@ -108,9 +118,9 @@ console.debug('[CS-LEDGER] Loading');
         browserPort.postMessage(postData)
       } if (data.action === 'ledger-get-version') {
         const payload /*: GetVersionResponse */ = {
-          major: '1',
+          major: '2',
           minor: '0',
-          patch: '0',
+          patch: '4',
           flags: {
             isDebug: false,
           }

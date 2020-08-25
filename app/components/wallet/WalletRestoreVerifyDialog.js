@@ -303,7 +303,11 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
 
         <div className={styles.postCopyMargin} />
 
-        {error && <p className={styles.error}>{intl.formatMessage(error)}</p>}
+        {error && (
+          <p className={styles.error}>
+            {intl.formatMessage(error, error.values)}
+          </p>
+        )}
 
       </Dialog>
     );

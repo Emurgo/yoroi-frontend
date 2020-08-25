@@ -320,9 +320,33 @@ test('Create Ledger transaction', async () => {
     metadataHashHex: undefined,
   });
 
+  // note: key doesn't belong to the account signing. Just used to test witness generation
+  const accountKey = RustModule.WalletV4.Bip32PrivateKey.from_bytes(
+    Buffer.from(
+      '408a1cb637d615c49e8696c30dd54883302a20a7b9b8a9d1c307d2ed3cd50758c9402acd000461a8fc0f25728666e6d3b86d031b8eea8d2f69b21e8aa6ba2b153e3ec212cc8a36ed9860579dfe1e3ef4d6de778c5dbdd981623b48727cd96247',
+      'hex',
+    ),
+  ).to_public();
   buildSignedTransaction(
     txBuilder.build(),
-    [],
+    [
+      // vkey witness
+      {
+        // this witness doesn't belong to the transaction / key. Just used to test wit generation
+        path: [2147485500, 2147485463, 2147483648, 0, 0],
+        witnessSignatureHex: 'e396b6e18369269d53a53a7c12a9d4d902d796aec0f958a61f250c70a2d417b9ec78995abacdd496968a649034831dfc706644f373735795c564f74267580509',
+      },
+      // bootstrap witness
+      {
+        // this witness doesn't belong to the transaction / key. Just used to test wit generation
+        path: [2147483692, 2147485463, 2147483648, 0, 0],
+        witnessSignatureHex: '8458208fb03c3aa052f51c086c54bd4059ead2d2e426ac89fa4b3ce41cbfd8800b51c05840d4da0fe3615f90581926281be0510df5f6616ebed5a6d6831cceab4dd9935f7f5b6150d43b918d79e8db7cd3e17b9de91fdfbaed7cdab18818331942852fd10b58202623fceb96b07408531a5cb259f53845a38d6b68928e7c0c7e390f07545d0e6241a0',
+      },
+    ],
+    {
+      keyLevel: 3,
+      key: accountKey,
+    },
     undefined,
   );
 });

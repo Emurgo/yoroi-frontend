@@ -291,7 +291,10 @@ export default class WalletSendForm extends Component<Props> {
       transactionFeeError = this.context.intl.formatMessage(messages.calculatingFee);
     }
     if (this.props.error) {
-      transactionFeeError = this.context.intl.formatMessage(this.props.error);
+      transactionFeeError = this.context.intl.formatMessage(
+        this.props.error,
+        this.props.error.values
+      );
     }
 
     return (
