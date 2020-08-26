@@ -49,7 +49,6 @@ export async function createLedgerSignTxPayload(
   const ledgerOutputs = _transformToLedgerOutputs(
     txBody.outputs(),
     signRequest.self().changeAddr,
-    byronNetworkMagic,
   );
 
   // withdrawals
@@ -112,7 +111,6 @@ function _transformToLedgerInputs(
 function _transformToLedgerOutputs(
   txOutputs: RustModule.WalletV4.TransactionOutputs,
   changeAddrs: Array<{| ...Address, ...Value, ...Addressing |}>,
-  byronNetworkMagic: number,
 ): Array<OutputTypeAddress | OutputTypeAddressParams> {
   const result = [];
   for (let i = 0; i < txOutputs.len(); i++) {
@@ -126,7 +124,6 @@ function _transformToLedgerOutputs(
       const addressParams = toLedgerAddressParameters(
         address,
         changeAddr.addressing.path,
-        byronNetworkMagic
       );
       result.push({
         addressTypeNibble: addressParams.addressTypeNibble,
@@ -212,7 +209,6 @@ function formatLedgerCertificates(
 export function toLedgerAddressParameters(
   address: RustModule.WalletV4.Address,
   path: Array<number>,
-  byronNetworkMagic: number,
 ): {|
   addressTypeNibble: $Values<typeof AddressTypeNibbles>,
   networkIdOrProtocolMagic: number,
@@ -226,7 +222,7 @@ export function toLedgerAddressParameters(
     if (byronAddr) {
       return {
         addressTypeNibble: AddressTypeNibbles.BYRON,
-        networkIdOrProtocolMagic: byronNetworkMagic,
+        networkIdOrProtocolMagic: byronAddr.byron_protocol_magic(),
         spendingPath: path,
         stakingPath: undefined,
         stakingKeyHashHex: undefined,

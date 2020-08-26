@@ -238,6 +238,7 @@ export function newAdaUnsignedTx(
 }
 
 function getFeeForChange(
+  txBuilder: RustModule.WalletV4.TransactionBuilder,
   changeAdaAddr: {| ...Address, ...Addressing |},
   protocolParams: {
     linearFee: RustModule.WalletV4.LinearFee,
@@ -250,15 +251,14 @@ function getFeeForChange(
   if (wasmChange == null) {
     throw new Error(`${nameof(getFeeForChange)} change not a valid Shelley address`);
   }
-  const changeOutput = RustModule.WalletV4.TransactionOutput.new(
+  const feeForChange = txBuilder.fee_for_output(RustModule.WalletV4.TransactionOutput.new(
     wasmChange,
     // largest possible CBOR value
     // note: this slightly over-estimates by a few bytes
     RustModule.WalletV4.BigNum.from_str(0x1_00_00_00_00.toString()),
-  );
-  const feeForChange = new BigNumber(protocolParams.linearFee.coefficient().to_str())
-    .times(changeOutput.to_bytes().length);
-  const minimumNeededForChange = feeForChange.plus(protocolParams.minimumUtxoVal.to_str());
+  )).to_str();
+  const minimumNeededForChange = new BigNumber(feeForChange)
+    .plus(protocolParams.minimumUtxoVal.to_str());
   return minimumNeededForChange;
 }
 
@@ -369,6 +369,7 @@ export function newAdaUnsignedTxFromUtxo(
       if (shouldForceChange) {
         if (changeAdaAddr == null) throw new NoOutputsError();
         const minimumNeededForChange = getFeeForChange(
+          txBuilder,
           changeAdaAddr,
           protocolParams
         );
@@ -392,6 +393,7 @@ export function newAdaUnsignedTxFromUtxo(
       if (shouldForceChange) {
         if (changeAdaAddr == null) throw new NoOutputsError();
         const minimumNeededForChange = getFeeForChange(
+          txBuilder,
           changeAdaAddr,
           protocolParams
         );
