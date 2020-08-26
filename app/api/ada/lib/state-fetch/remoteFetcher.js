@@ -220,29 +220,28 @@ export class RemoteFetcher implements IFetcher {
 
   sendTx: SignedRequest => Promise<SignedResponse> = (body) => {
     const signedTx64 = Buffer.from(body.encodedTx).toString('base64');
-    return Promise.resolve({ txId: body.id });
-    // return axios(
-    //   `${backendUrl}/api/txs/signed`,
-    //   {
-    //     method: 'post',
-    //     data: ({
-    //       signedTx: signedTx64
-    //     }: SignedRequestInternal),
-    //     headers: {
-    //       'yoroi-version': this.getLastLaunchVersion(),
-    //       'yoroi-locale': this.getCurrentLocale()
-    //     }
-    //   }
-    // ).then(() => ({
-    //   txId: body.id
-    // }))
-    //   .catch((error) => {
-    //     Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.sendTx)} error: ` + stringifyError(error));
-    //     if (error.request.response.includes('Invalid witness')) {
-    //       throw new InvalidWitnessError();
-    //     }
-    //     throw new SendTransactionApiError();
-    //   });
+    return axios(
+      `${backendUrl}/api/txs/signed`,
+      {
+        method: 'post',
+        data: ({
+          signedTx: signedTx64
+        }: SignedRequestInternal),
+        headers: {
+          'yoroi-version': this.getLastLaunchVersion(),
+          'yoroi-locale': this.getCurrentLocale()
+        }
+      }
+    ).then(() => ({
+      txId: body.id
+    }))
+      .catch((error) => {
+        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.sendTx)} error: ` + stringifyError(error));
+        if (error.request.response.includes('Invalid witness')) {
+          throw new InvalidWitnessError();
+        }
+        throw new SendTransactionApiError();
+      });
   }
 
   checkAddressesInUse: FilterUsedRequest => Promise<FilterUsedResponse> = (body) => (
