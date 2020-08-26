@@ -482,7 +482,7 @@
   "wallet.deprecation.byronLine1": "La actualización del protocolo de Shelley añade un nuevo tipo de billetera de Shelley que permite la delegación.",
   "wallet.deprecation.byronLine2": "Para delegar tus ADA deberás actualizar tu billetera a una de Shelley.",
   "wallet.hw.common.error.101": "Los permisos necesarios no fueron concedidos por el usuario. Por favor, inténtalo de nuevo.",
-  "wallet.hw.incorrectDevice": "Incorrect device detected. Expected device {expectedDeviceId}, but got device {responseDeviceId}. Please plug in the correct device",
+  "wallet.hw.incorrectDevice": "Dispositivo incorrecto detectado. Dispositivo esperado {expectedDeviceId}, pero obtuve el dispositivo {responseDeviceId}. Por favor conecte el dispositivo correcto",
   "wallet.hw.incorrectVersion": "Incorrect device version detected. We support version {supportedVersions} but you have version {responseVersion}.",
   "wallet.hw.ledger.common.error.101": "Operación cancelada en el dispositivo Ledger.",
   "wallet.hw.ledger.common.error.102": "Operación cancelada por el usuario.",
