@@ -135,7 +135,11 @@ export default class UnitOfAccountSettings extends Component<Props> {
           optionRenderer={optionRenderer}
         />
 
-        {error && <p className={styles.error}>{intl.formatMessage(error)}</p>}
+        {error && (
+          <p className={styles.error}>
+            {intl.formatMessage(error, error.values)}
+          </p>
+        )}
       </div>
     );
   }

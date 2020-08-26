@@ -12,9 +12,9 @@ import type { Manifest } from 'trezor-connect';
  * Some TrezorConnect functions depend on this iframe existing, while others don't
  * Goal: want to only keep the Trezor iframe open for the least amount of time for safety & privacy
  *
- * To do this safely, do this, we disallow the usage of TrezorConnect in the whole codebase
- * except for this function that exposes to wrapper functions
- * that forces the user to explicitly decide to initialize the iframe or not
+ * To do this safely, we disallow the usage of TrezorConnect in the whole codebase
+ * except for this function that exposes wrapper functions
+ * that forces the programmer to explicitly decide to initialize the iframe or not
 */
 
 export function getTrezorManifest(): Manifest {

@@ -37,6 +37,7 @@ import { normalizeToAddress, } from '../../api/ada/lib/storage/bridge/utils';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import { getCardanoHaskellBaseConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { toTrezorAddressParameters } from '../../api/ada/transactions/shelley/trezorTx';
+import { toLedgerAddressParameters } from '../../api/ada/transactions/shelley/ledgerTx';
 
 export default class HWVerifyAddressStore extends Store {
   @observable isActionProcessing: boolean = false;
@@ -75,7 +76,7 @@ export default class HWVerifyAddressStore extends Store {
     this._setActionProcessing(true);
 
     if (isLedgerNanoWallet(conceptualWallet)) {
-      await this.ledgerVerifyAddress(path, address);
+      await this.ledgerVerifyAddress(path, address, publicDeriver.getParent().getNetworkInfo());
     } else if (isTrezorTWallet(conceptualWallet)) {
       await this.trezorVerifyAddress(path, address, publicDeriver.getParent().getNetworkInfo());
     } else {
@@ -113,10 +114,11 @@ export default class HWVerifyAddressStore extends Store {
     }
   }
 
-  ledgerVerifyAddress: (BIP32Path, string) => Promise<void> = async (
-    path: BIP32Path,
-    address: string,
-  ): Promise<void> => {
+  ledgerVerifyAddress: (BIP32Path, string, $ReadOnly<NetworkRow>) => Promise<void> = async (
+    path,
+    address,
+    network,
+  ) => {
     try {
       this.ledgerConnect = new LedgerConnect({
         locale: this.stores.profile.currentLocale
@@ -124,8 +126,25 @@ export default class HWVerifyAddressStore extends Store {
       await prepareLedgerConnect(this.ledgerConnect);
 
       Logger.info(`${nameof(HWVerifyAddressStore)}::${nameof(this.ledgerVerifyAddress)} show path ` + JSON.stringify(path));
+
+      const config = getCardanoHaskellBaseConfig(network)
+        .reduce((acc, next) => Object.assign(acc, next), {});
+
+      const wasmAddr = normalizeToAddress(address);
+      if (wasmAddr == null) throw new Error(`${nameof(HWVerifyAddressStore)}::${nameof(this.ledgerVerifyAddress)} invalid address ${address}`);
+      const addressParams = toLedgerAddressParameters(
+        wasmAddr,
+        path,
+        config.ByronNetworkId,
+      );
       if (this.ledgerConnect) {
-        await this.ledgerConnect.showAddress(path, address);
+        await this.ledgerConnect.showAddress({
+          params: {
+            address,
+            ...addressParams,
+          },
+          serial: undefined, // TODO
+        });
       }
     } catch (error) {
       this._setError(ledgerErrorToLocalized(error));

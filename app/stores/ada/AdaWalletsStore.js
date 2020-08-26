@@ -10,7 +10,6 @@ import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import { buildCheckAndCall } from '../lib/check';
 import { getApiForNetwork, ApiOptions } from '../../api/common/utils';
-import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 
 export default class AdaWalletsStore extends Store {
 
@@ -58,7 +57,7 @@ export default class AdaWalletsStore extends Store {
 
     const broadcastRequest = async () => {
       if (request.broadcastRequest.ledger) {
-        return await this.stores.substores.ada.trezorSend.signAndBroadcast({
+        return await this.stores.substores.ada.ledgerSend.signAndBroadcast({
           params: { signRequest: request.broadcastRequest.ledger.signRequest },
           publicDeriver: request.broadcastRequest.ledger.publicDeriver,
         });

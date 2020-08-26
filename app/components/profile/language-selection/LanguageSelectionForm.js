@@ -90,7 +90,11 @@ export default class LanguageSelectionForm extends Component<Props> {
             )}
           />
 
-          {error && <p className={styles.error}>{intl.formatMessage(error)}</p>}
+          {error && (
+            <p className={styles.error}>
+              {intl.formatMessage(error, error.values)}
+            </p>
+          )}
 
           <Button
             className={buttonClasses}

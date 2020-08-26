@@ -1,24 +1,13 @@
 // @flow
 
-import { action, runInAction, } from 'mobx';
+import { action, } from 'mobx';
 import Store from '../base/Store';
 
 import type { RestoreModeType } from '../../actions/common/wallet-restore-actions';
-import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
-import {
-  WalletTypePurpose,
-  CoinTypes,
-  ChainDerivations,
-  STAKING_KEY_INDEX,
-} from '../../config/numbersConfig';
-import {
-  generateWalletRootKey,
-} from '../../api/ada/lib/cardanoCrypto/cryptoWallet';
 import {
   buildCheckAndCall,
 } from '../lib/check';
 import { ApiOptions, getApiForNetwork } from '../../api/common/utils';
-import { getCardanoHaskellBaseConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { ApiMethodNotYetImplementedError } from '../lib/Request';
 
 export default class AdaWalletRestoreStore extends Store {

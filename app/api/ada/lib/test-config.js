@@ -3,7 +3,6 @@ import type { ConfigType } from '../../../../config/config-types';
 
 const CONFIG: ConfigType = {
   network: {
-    protocolMagic: 764824073,
     backendUrl: '',
     websocketUrl: '',
     name: 'mainnet',

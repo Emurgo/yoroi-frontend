@@ -1,6 +1,7 @@
 // @flow
 
 import LocalizableError, { UnexpectedError } from '../i18n/LocalizableError';
+import { IncorrectDeviceError, IncorrectVersionError } from './ExternalDeviceCommon';
 import globalMessages from '../i18n/global-messages';
 import { defineMessages } from 'react-intl';
 
@@ -40,8 +41,31 @@ export function convertToLocalizableError(error: Error): LocalizableError {
     // It means some API Error has been thrown
     localizableError = error;
   } else if (error && error.message) {
+    {
+      const serialRegex = new RegExp('Error: Incorrect hardware wallet. This wallet was created with a device with serial ID ([0-9a-fA-F]+), but you are currently using ([0-9a-fA-F]+).');
+      const serialRegexMatch = serialRegex.exec(error.message);
+      if (serialRegexMatch) {
+        return new IncorrectDeviceError({
+          responseDeviceId: serialRegexMatch[1],
+          expectedDeviceId: serialRegexMatch[2],
+        });
+      }
+    }
+    {
+      // note: match all for supported version because it can be any semver expression
+      const versionRegex = new RegExp('Incorrect Cardano app version. Supports version (.*) but you have version ([0-9.]\\.[0-9.]\\.[0-9.])');
+      const versionRegexMatch = versionRegex.exec(error.message);
+      if (versionRegexMatch) {
+        return new IncorrectVersionError({
+          supportedVersions: versionRegexMatch[1],
+          responseVersion: versionRegexMatch[2],
+        });
+      }
+    }
     // Ledger device related error happened, convert then to LocalizableError
     switch (error.message) {
+      // TODO: add serial error
+      // TODO: add version mismatch error
       case 'TransportError: Failed to sign with Ledger device: U2F TIMEOUT':
         // Showing - Failed to connect. Please check your ledger device and retry.
         localizableError = new LocalizableError(globalMessages.ledgerError101);

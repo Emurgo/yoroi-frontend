@@ -997,7 +997,7 @@ export const generateTransaction = (): {|
           ],
           true
         ),
-        amount: '638497'
+        amount: '1638497'
       },
     ],
     height: 300,

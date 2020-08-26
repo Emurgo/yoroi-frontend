@@ -75,7 +75,11 @@ export default class GeneralSettings extends Component<Props> {
             <FlagLabel svg={option.svg} label={option.label} />
           )}
         />
-        {error && <p className={styles.error}>{intl.formatMessage(error)}</p>}
+        {error && (
+          <p className={styles.error}>
+            {intl.formatMessage(error, error.values)}
+          </p>
+        )}
 
         {!tier1Languages.includes(languageId.value) &&
           <div className={styles.info}>

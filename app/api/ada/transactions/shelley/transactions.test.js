@@ -16,6 +16,7 @@ import {
 } from './transactions';
 import {
   NotEnoughMoneyToSendError,
+  NoOutputsError,
 } from '../../../common/errors';
 
 import {
@@ -162,6 +163,7 @@ describe('Create unsigned TX from UTXO', () => {
       getProtocolParams(),
       [],
       [],
+      true,
     )).toThrow(NotEnoughMoneyToSendError);
   });
 
@@ -177,6 +179,7 @@ describe('Create unsigned TX from UTXO', () => {
       getProtocolParams(),
       [],
       [],
+      true,
     )).toThrow(NotEnoughMoneyToSendError);
   });
 
@@ -194,7 +197,72 @@ describe('Create unsigned TX from UTXO', () => {
       getProtocolParams(),
       [],
       [],
+      true,
     )).toThrow(NotEnoughMoneyToSendError);
+  });
+
+  it('Should fail due to insufficient funds (no outputs disallowed)', () => {
+    const sampleUtxos = genSampleUtxos();
+    const sampleAdaAddresses = genSampleAdaAddresses();
+    const utxos: Array<RemoteUnspentOutput> = [sampleUtxos[1]];
+
+    // should fail because we disallow burning extra ADA in fees
+    expect(() => newAdaUnsignedTxFromUtxo(
+      [],
+      sampleAdaAddresses[0],
+      utxos,
+      new BigNumber(0),
+      {
+        ...getProtocolParams(),
+        minimumUtxoVal: RustModule.WalletV4.BigNum.from_str('999000'),
+      },
+      [],
+      [],
+      false,
+    )).toThrow(NotEnoughMoneyToSendError);
+    // should avoid failing by consuming the second UTXO
+    expect(() => newAdaUnsignedTxFromUtxo(
+      [],
+      sampleAdaAddresses[0],
+      [sampleUtxos[1], sampleUtxos[0]],
+      new BigNumber(0),
+      {
+        ...getProtocolParams(),
+        minimumUtxoVal: RustModule.WalletV4.BigNum.from_str('999000'),
+      },
+      [],
+      [],
+      false,
+    )).not.toThrow(NotEnoughMoneyToSendError);
+    // should pass because we can add a change
+    expect(() => newAdaUnsignedTxFromUtxo(
+      [],
+      sampleAdaAddresses[0],
+      utxos,
+      new BigNumber(0),
+      {
+        ...getProtocolParams(),
+        minimumUtxoVal: RustModule.WalletV4.BigNum.from_str('998500'),
+      },
+      [],
+      [],
+      false,
+    )).not.toThrow(NotEnoughMoneyToSendError);
+  });
+
+  it('Should fail due to no outputs', () => {
+    const sampleUtxos = genSampleUtxos();
+    const utxos: Array<RemoteUnspentOutput> = [sampleUtxos[1]];
+    expect(() => newAdaUnsignedTxFromUtxo(
+      [],
+      undefined,
+      utxos,
+      new BigNumber(0),
+      getProtocolParams(),
+      [],
+      [],
+      false,
+    )).toThrow(NoOutputsError);
   });
 
   it('Should pick inputs when using input selection', () => {
@@ -211,6 +279,7 @@ describe('Create unsigned TX from UTXO', () => {
       getProtocolParams(),
       [],
       [],
+      true,
     );
     // input selection will only take 2 of the 3 inputs
     // it takes 2 inputs because input selection algorithm
@@ -235,6 +304,7 @@ describe('Create unsigned TX from addresses', () => {
       getProtocolParams(),
       [],
       [],
+      true,
     );
     expect(unsignedTxResponse.senderUtxos).toEqual([addressedUtxos[0], addressedUtxos[1]]);
 
@@ -264,6 +334,7 @@ describe('Create signed transactions', () => {
       getProtocolParams(),
       [],
       [],
+      true,
     );
     const signRequest: BaseSignRequest<RustModule.WalletV4.TransactionBuilder> = {
       changeAddr: unsignedTxResponse.changeAddr,
@@ -414,6 +485,7 @@ describe('Create signed transactions', () => {
         ),
       ],
       [],
+      true,
     );
     const signRequest: BaseSignRequest<RustModule.WalletV4.TransactionBuilder> = {
       changeAddr: unsignedTxResponse.changeAddr,
@@ -493,6 +565,7 @@ describe('Create signed transactions', () => {
         ),
         amount: RustModule.WalletV4.BigNum.from_str(withdrawAmount)
       }],
+      true,
     );
     const signRequest: BaseSignRequest<RustModule.WalletV4.TransactionBuilder> = {
       changeAddr: unsignedTxResponse.changeAddr,

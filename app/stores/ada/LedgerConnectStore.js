@@ -4,9 +4,7 @@
 import { observable, action, runInAction } from 'mobx';
 
 import type { ExtendedPublicKeyResp } from '@emurgo/ledger-connect-handler';
-import LedgerConnect, {
-  makeCardanoAccountBIP44Path,
-} from '@emurgo/ledger-connect-handler';
+import LedgerConnect from '@emurgo/ledger-connect-handler';
 
 import Config from '../../config';
 
@@ -160,7 +158,7 @@ export default class LedgerConnectStore
       });
       await prepareLedgerConnect(this.ledgerConnect);
 
-      const accountPath = makeCardanoAccountBIP44Path(this.derivationIndex - HARD_DERIVATION_START);
+      const accountPath = this.getPath();
       // https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki#examples
       Logger.debug(stringifyData(accountPath));
 
@@ -168,12 +166,14 @@ export default class LedgerConnectStore
       // i.e hdPath = [2147483692, 2147485463, 2147483648]
       let extendedPublicKeyResp: ExtendedPublicKeyResp;
       if (this.ledgerConnect) {
-        extendedPublicKeyResp = await this.ledgerConnect.getExtendedPublicKey(accountPath);
-
-        this.hwDeviceInfo = this._normalizeHWResponse({
-          ePublicKey: extendedPublicKeyResp.ePublicKey,
-          deviceVersion: extendedPublicKeyResp.deviceVersion
+        extendedPublicKeyResp = await this.ledgerConnect.getExtendedPublicKey({
+          params: {
+            path: accountPath,
+          },
+          serial: undefined,
         });
+
+        this.hwDeviceInfo = this._normalizeHWResponse(extendedPublicKeyResp);
       }
 
       this._goToSaveLoad();
@@ -191,14 +191,14 @@ export default class LedgerConnectStore
   ) => {
     this._validateHWResponse(resp);
 
-    const { ePublicKey, } = resp;
+    const { response, } = resp;
 
     return {
-      publicMasterKey: ePublicKey.publicKeyHex + ePublicKey.chainCodeHex,
+      publicMasterKey: response.publicKeyHex + response.chainCodeHex,
       hwFeatures: {
         Vendor: Config.wallets.hardwareWallet.ledgerNano.VENDOR,
         Model: '', // Ledger does not provide device model info up till now
-        DeviceId: '',
+        DeviceId: resp.deriveSerial.serial,
       },
       defaultName: '',
     };
@@ -207,13 +207,10 @@ export default class LedgerConnectStore
   _validateHWResponse: ExtendedPublicKeyResp => boolean = (
     resp,
   ) => {
-    const { ePublicKey, deviceVersion } = resp;
-
-    if (deviceVersion == null) {
+    if (resp.deviceVersion == null) {
       throw new Error('Ledger device version response is undefined');
     }
-
-    if (ePublicKey == null) {
+    if (resp.response == null) {
       throw new Error('Ledger device extended public key response is undefined');
     }
 
@@ -304,7 +301,7 @@ export default class LedgerConnectStore
       || this.hwDeviceInfo.hwFeatures == null) {
       throw new Error('Ledger device hardware info not valid');
     }
-    const { publicMasterKey, hwFeatures} = this.hwDeviceInfo;
+    const { publicMasterKey, hwFeatures } = this.hwDeviceInfo;
 
     const persistentDb = this.stores.loading.loadPersistentDbRequest.result;
     if (persistentDb == null) {

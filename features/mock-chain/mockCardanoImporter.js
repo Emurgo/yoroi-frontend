@@ -73,6 +73,7 @@ export const generateTransaction = (): {|
   postLaunchPendingTx: RemoteTransaction,
   failedTx: RemoteTransaction,
   ledgerTx1: RemoteTransaction,
+  cip1852LedgerTx1: RemoteTransaction,
   bip44TrezorTx1: RemoteTransaction,
   bip44TrezorTx2: RemoteTransaction,
   bip44TrezorTx3: RemoteTransaction,
@@ -116,6 +117,7 @@ export const generateTransaction = (): {|
     outputs: [
       // small-single-tx
       {
+        // index: 0
         // Ae2tdPwUPEZGLVbFwK5EnWiFxwWwLjVtV3CNzy7Hu7tB5nqFxS31uGjjhoc
         address: getSingleAddressString(
           testWallets['small-single-tx'].mnemonic,
@@ -131,6 +133,7 @@ export const generateTransaction = (): {|
       },
       // tx-big-input-wallet
       {
+        // index: 1
         // Ae2tdPwUPEYx2dK1AMzRN1GqNd2eY7GCd7Z6aikMPJL3EkqqugoFQComQnV
         address: getSingleAddressString(
           testWallets['tx-big-input-wallet'].mnemonic,
@@ -146,6 +149,7 @@ export const generateTransaction = (): {|
       },
       // simple-pending-wallet
       {
+        // index: 2
         // Ae2tdPwUPEZ9ySSM18e2QGFnCgL8ViDqp8K3wU4i5DYTSf5w6e1cT2aGdSJ
         address: getSingleAddressString(
           testWallets['simple-pending-wallet'].mnemonic,
@@ -160,6 +164,7 @@ export const generateTransaction = (): {|
         amount: '1000000'
       },
       {
+        // index: 3
         // Ae2tdPwUPEZ9ySSM18e2QGFnCgL8ViDqp8K3wU4i5DYTSf5w6e1cT2aGdSJ
         address: getSingleAddressString(
           testWallets['simple-pending-wallet'].mnemonic,
@@ -174,6 +179,7 @@ export const generateTransaction = (): {|
         amount: '1000000'
       },
       {
+        // index: 4
         // Ae2tdPwUPEZ9uHfzhw3vXUrTFLowct5hMMHeNjfsrkQv5XSi5PhSs2yRNUb
         address: getSingleAddressString(
           testWallets['many-tx-wallet'].mnemonic,
@@ -188,6 +194,7 @@ export const generateTransaction = (): {|
         amount: '1000000'
       },
       {
+        // index: 5
         // Ae2tdPwUPEZEXbmLnQ22Rxhv8a6hQ3C2673nkGsXKAgzqnuC1vqne9EtBkK
         address: getSingleAddressString(
           testWallets['many-tx-wallet'].mnemonic,
@@ -202,6 +209,7 @@ export const generateTransaction = (): {|
         amount: '1000000'
       },
       {
+        // index: 6
         // Ae2tdPwUPEYwBZD5hPWCm3PUDYdMBfnLHsQmgUiexnkvDMTFCQ4gzRkgAEQ
         address: getSingleAddressString(
           testWallets['many-tx-wallet'].mnemonic,
@@ -216,6 +224,7 @@ export const generateTransaction = (): {|
         amount: '1000000'
       },
       {
+        // index: 7
         // Ae2tdPwUPEYvzFpWJEGmSjLdz3DNY9WL5CbPjsouuM5M6YMsYWB1vsCS8j4
         address: getSingleAddressString(
           testWallets['many-tx-wallet'].mnemonic,
@@ -231,6 +240,7 @@ export const generateTransaction = (): {|
       },
       // failed-single-tx
       {
+        // index: 8
         // Ae2tdPwUPEYw8ScZrAvKbxai1TzG7BGC4n8PoF9JzE1abgHc3gBfkkDNBNv
         address: getSingleAddressString(
           testWallets['failed-single-tx'].mnemonic,
@@ -245,12 +255,16 @@ export const generateTransaction = (): {|
         amount: '1000000'
       },
       // daedalus addresses
+      // index: 9
       { address: 'DdzFFzCqrhstBgE23pfNLvukYhpTPUKgZsXWLN5GsawqFZd4Fq3aVuGEHk11LhfMfmfBCFCBGrdZHVExjiB4FY5Jkjj1EYcqfTTNcczb', amount: '2000000' },
+      // index: 10
       { address: 'DdzFFzCqrht74dr7DYmiyCobGFQcfLCsHJCCM6nEBTztrsEk5kwv48EWKVMFU9pswAkLX9CUs4yVhVxqZ7xCVDX1TdatFwX5W39cohvm', amount: '2000000' },
       // paper wallet
+      // index: 11
       { address: 'Ae2tdPwUPEZ7TQpzbJZCbA5BjW4zWYFn47jKo43ouvfe4EABoCfvEjwYvJr', amount: '2000000' },
       // dump-wallet
       {
+        // index: 12
         // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
         address: getSingleAddressString(
           testWallets['dump-wallet'].mnemonic,
@@ -265,6 +279,7 @@ export const generateTransaction = (): {|
         amount: '2000000'
       },
       {
+        // index: 13
         // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
         address: getSingleAddressString(
           testWallets['dump-wallet'].mnemonic,
@@ -279,6 +294,7 @@ export const generateTransaction = (): {|
         amount: '3000000'
       },
       {
+        // index: 14
         // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
         address: getSingleAddressString(
           testWallets['dump-wallet'].mnemonic,
@@ -293,6 +309,7 @@ export const generateTransaction = (): {|
         amount: '2000000'
       },
       {
+        // index: 15
         // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
         address: getSingleAddressString(
           testWallets['dump-wallet'].mnemonic,
@@ -307,6 +324,7 @@ export const generateTransaction = (): {|
         amount: '2000000'
       },
       {
+        // index: 16
         // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
         address: getSingleAddressString(
           testWallets['dump-wallet'].mnemonic,
@@ -321,6 +339,22 @@ export const generateTransaction = (): {|
         amount: '7000000'
       },
       {
+        // index: 17
+        // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
+        address: getSingleAddressString(
+          testWallets['dump-wallet'].mnemonic,
+          [
+            WalletTypePurpose.BIP44,
+            CoinTypes.CARDANO,
+            0 + HARD_DERIVATION_START,
+            ChainDerivations.EXTERNAL,
+            1
+          ],
+        ),
+        amount: '10000000'
+      },
+      {
+        // index: 18
         // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
         address: getSingleAddressString(
           testWallets['dump-wallet'].mnemonic,
@@ -946,7 +980,7 @@ export const generateTransaction = (): {|
           ],
           true
         ),
-        amount: '638497'
+        amount: '1638497'
       },
     ],
     height: 300,
@@ -956,6 +990,60 @@ export const generateTransaction = (): {|
     epoch: 0,
     slot: 300,
     last_update: '2019-05-20T23:16:51.899Z',
+    tx_state: 'Successful'
+  };
+
+  const cip1852LedgerTx1 = {
+    hash: '3677e75c7ba699afdc6cd57d42f246f86f69aefd76025006ac78313fad2bba21',
+    inputs: [
+      {
+        // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
+        address: getSingleAddressString(
+          testWallets['dump-wallet'].mnemonic,
+          [
+            WalletTypePurpose.BIP44,
+            CoinTypes.CARDANO,
+            0 + HARD_DERIVATION_START,
+            ChainDerivations.EXTERNAL,
+            1
+          ]
+        ),
+        txHash: distributorTx.hash,
+        id: distributorTx.hash + '18',
+        index: 18,
+        amount: '8500000'
+      }
+    ],
+    outputs: [
+      {
+        // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
+        address: getSingleAddressString(
+          testWallets['dump-wallet'].mnemonic,
+          [
+            WalletTypePurpose.BIP44,
+            CoinTypes.CARDANO,
+            0 + HARD_DERIVATION_START,
+            ChainDerivations.EXTERNAL,
+            1
+          ]
+        ),
+        amount: '1'
+      },
+      {
+        // ledger-wallet base address index 0'/0/0
+        // eslint-disable-next-line max-len
+        // addr1q9mvu42dtppagyyy3l0m36vr7qvefgt9ka2nyt8efzeewpc0vckke6cmv4en56dpa4e0smct43dpv5z6q2yf0tcmudzs8tsuf0
+        address: '0176ce554d5843d410848fdfb8e983f01994a165b755322cf948b397070f662d6ceb1b65733a69a1ed72f86f0bac5a16505a028897af1be345',
+        amount: '5500000'
+      },
+    ],
+    height: 301,
+    block_hash: '301',
+    tx_ordinal: 3,
+    time: '2019-04-20T15:15:53.000Z',
+    epoch: 0,
+    slot: 301,
+    last_update: '2019-05-20T23:17:11.899Z',
     tx_state: 'Successful'
   };
 
@@ -1253,6 +1341,7 @@ export const generateTransaction = (): {|
     postLaunchPendingTx,
     failedTx,
     ledgerTx1,
+    cip1852LedgerTx1,
     bip44TrezorTx1,
     bip44TrezorTx2,
     bip44TrezorTx3,
@@ -1302,6 +1391,7 @@ export function resetChain(
     addTransaction(txs.failedTx);
     // ledger-wallet
     addTransaction(txs.ledgerTx1);
+    addTransaction(txs.cip1852LedgerTx1);
     // trezor-wallet
     addTransaction(txs.bip44TrezorTx1);
     addTransaction(txs.bip44TrezorTx2);

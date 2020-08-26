@@ -89,7 +89,11 @@ export default class TermsOfUseForm extends Component<Props, State> {
             />
           </div>
 
-          {error && <p className={styles.error}>{intl.formatMessage(error)}</p>}
+          {error && (
+            <p className={styles.error}>
+              {intl.formatMessage(error, error.values)}
+            </p>
+          )}
         </div>
       </div>
     );
