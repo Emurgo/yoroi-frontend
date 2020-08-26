@@ -76,7 +76,7 @@ export default class HWVerifyAddressStore extends Store {
     this._setActionProcessing(true);
 
     if (isLedgerNanoWallet(conceptualWallet)) {
-      await this.ledgerVerifyAddress(path, address, publicDeriver.getParent().getNetworkInfo());
+      await this.ledgerVerifyAddress(path, address);
     } else if (isTrezorTWallet(conceptualWallet)) {
       await this.trezorVerifyAddress(path, address, publicDeriver.getParent().getNetworkInfo());
     } else {
@@ -114,10 +114,9 @@ export default class HWVerifyAddressStore extends Store {
     }
   }
 
-  ledgerVerifyAddress: (BIP32Path, string, $ReadOnly<NetworkRow>) => Promise<void> = async (
+  ledgerVerifyAddress: (BIP32Path, string) => Promise<void> = async (
     path,
     address,
-    network,
   ) => {
     try {
       this.ledgerConnect = new LedgerConnect({
@@ -127,15 +126,11 @@ export default class HWVerifyAddressStore extends Store {
 
       Logger.info(`${nameof(HWVerifyAddressStore)}::${nameof(this.ledgerVerifyAddress)} show path ` + JSON.stringify(path));
 
-      const config = getCardanoHaskellBaseConfig(network)
-        .reduce((acc, next) => Object.assign(acc, next), {});
-
       const wasmAddr = normalizeToAddress(address);
       if (wasmAddr == null) throw new Error(`${nameof(HWVerifyAddressStore)}::${nameof(this.ledgerVerifyAddress)} invalid address ${address}`);
       const addressParams = toLedgerAddressParameters(
         wasmAddr,
         path,
-        config.ByronNetworkId,
       );
       if (this.ledgerConnect) {
         await this.ledgerConnect.showAddress({

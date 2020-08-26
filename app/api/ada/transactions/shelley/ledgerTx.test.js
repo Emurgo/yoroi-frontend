@@ -54,7 +54,7 @@ test('Generate address parameters', async () => {
     const addr = 'Ae2tdPwUPEZLmqiKtMQ4kKL38emRfkyPqBsHqL64pf8uRz6uzsQCd7GAu9R';
     const wasmAddr = normalizeToAddress(addr);
     if (wasmAddr == null) throw new Error(`Unknown address`);
-    expect(toLedgerAddressParameters(wasmAddr, path, ByronNetworkId)).toEqual({
+    expect(toLedgerAddressParameters(wasmAddr, path)).toEqual({
       addressTypeNibble: AddressTypeNibbles.BYRON,
       networkIdOrProtocolMagic: ByronNetworkId,
       spendingPath: path,
@@ -69,7 +69,7 @@ test('Generate address parameters', async () => {
     const addr = 'addr1q8v42wjda8r6mpfj40d36znlgfdcqp7jtj03ah8skh6u8wnrqua2vw243tmjfjt0h5wsru6appuz8c0pfd75ur7myyeqsx9990';
     const wasmAddr = normalizeToAddress(addr);
     if (wasmAddr == null) throw new Error(`Unknown address`);
-    expect(toLedgerAddressParameters(wasmAddr, path, ByronNetworkId)).toEqual({
+    expect(toLedgerAddressParameters(wasmAddr, path)).toEqual({
       addressTypeNibble: AddressTypeNibbles.BASE,
       networkIdOrProtocolMagic: Number.parseInt(ChainNetworkId, 10),
       spendingPath: path,
@@ -84,7 +84,7 @@ test('Generate address parameters', async () => {
     const addr = 'addr1vxq0nckg3ekgzuqg7w5p9mvgnd9ym28qh5grlph8xd2z92su77c6m';
     const wasmAddr = normalizeToAddress(addr);
     if (wasmAddr == null) throw new Error(`Unknown address`);
-    expect(toLedgerAddressParameters(wasmAddr, path, ByronNetworkId)).toEqual({
+    expect(toLedgerAddressParameters(wasmAddr, path)).toEqual({
       addressTypeNibble: AddressTypeNibbles.ENTERPRISE,
       networkIdOrProtocolMagic: Number.parseInt(ChainNetworkId, 10),
       spendingPath: path,
@@ -99,7 +99,7 @@ test('Generate address parameters', async () => {
     const addr = 'addr1gxq0nckg3ekgzuqg7w5p9mvgnd9ym28qh5grlph8xd2z92spqgpsl97q83';
     const wasmAddr = normalizeToAddress(addr);
     if (wasmAddr == null) throw new Error(`Unknown address`);
-    expect(toLedgerAddressParameters(wasmAddr, path, ByronNetworkId)).toEqual({
+    expect(toLedgerAddressParameters(wasmAddr, path)).toEqual({
       addressTypeNibble: AddressTypeNibbles.POINTER,
       networkIdOrProtocolMagic: Number.parseInt(ChainNetworkId, 10),
       spendingPath: path,
@@ -119,7 +119,7 @@ test('Generate address parameters', async () => {
     const stakingKeyPath = [2147483692, 2147485463, 2147483648, 2, 0];
     const wasmAddr = normalizeToAddress(addr);
     if (wasmAddr == null) throw new Error(`Unknown address`);
-    expect(toLedgerAddressParameters(wasmAddr, stakingKeyPath, ByronNetworkId)).toEqual({
+    expect(toLedgerAddressParameters(wasmAddr, stakingKeyPath)).toEqual({
       addressTypeNibble: AddressTypeNibbles.REWARD,
       networkIdOrProtocolMagic: Number.parseInt(ChainNetworkId, 10),
       spendingPath: stakingKeyPath,

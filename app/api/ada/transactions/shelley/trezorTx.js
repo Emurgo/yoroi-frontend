@@ -244,7 +244,7 @@ export function toTrezorAddressParameters(
         addressType: ADDRESS_TYPE.Base,
         path: toDerivationPathString(path),
         // can't always know staking key path since address may not belong to the wallet
-        // (mangled addresss)
+        // (mangled address)
         stakingKeyHash: Buffer.from(hash.to_bytes()).toString('hex'),
       };
     }
