@@ -482,6 +482,8 @@
   "wallet.deprecation.byronLine1": "The Shelley protocol upgrade adds a new Shelley wallet type which supports delegation.",
   "wallet.deprecation.byronLine2": "To delegate your ADA you will need to upgrade to a Shelley wallet.",
   "wallet.hw.common.error.101": "アクセス許可が得られませんでした。再試行してください。",
+  "wallet.hw.incorrectDevice": "Incorrect device detected. Expected device {expectedDeviceId}, but got device {responseDeviceId}. Please plug in the correct device",
+  "wallet.hw.incorrectVersion": "Incorrect device version detected. We support version {supportedVersions} but you have version {responseVersion}.",
   "wallet.hw.ledger.common.error.101": "Ledgerデバイス上で操作がキャンセルされました。",
   "wallet.hw.ledger.common.error.102": "操作はユーザーによってキャンセルされました。",
   "wallet.hw.ledger.common.error.103": "Ledgerデバイスのロックを解除し、再度操作を行ってください。",
