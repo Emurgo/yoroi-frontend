@@ -12,6 +12,7 @@ import type {
 import type { RemoteUnspentOutput, } from '../../lib/state-fetch/types';
 import {
   NotEnoughMoneyToSendError,
+  NoOutputsError,
 } from '../../../common/errors';
 
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
@@ -195,6 +196,7 @@ export function newAdaUnsignedTx(
     address: RustModule.WalletV4.RewardAddress,
     amount: RustModule.WalletV4.BigNum,
   |}>,
+  allowNoOutputs: boolean,
 ): V4UnsignedTxAddressedUtxoResponse {
   const addressingMap = new Map<RemoteUnspentOutput, AddressedUtxo>();
   for (const utxo of allUtxos) {
@@ -213,7 +215,8 @@ export function newAdaUnsignedTx(
     absSlotNumber,
     protocolParams,
     certificates,
-    withdrawals
+    withdrawals,
+    allowNoOutputs,
   );
 
   const addressedUtxos = unsignedTxResponse.senderUtxos.map(
@@ -232,6 +235,31 @@ export function newAdaUnsignedTx(
     changeAddr: unsignedTxResponse.changeAddr,
     certificates,
   };
+}
+
+function getFeeForChange(
+  changeAdaAddr: {| ...Address, ...Addressing |},
+  protocolParams: {
+    linearFee: RustModule.WalletV4.LinearFee,
+    minimumUtxoVal: RustModule.WalletV4.BigNum,
+    ...,
+  },
+): BigNumber {
+  if (changeAdaAddr == null) throw new NoOutputsError();
+  const wasmChange = normalizeToAddress(changeAdaAddr.address);
+  if (wasmChange == null) {
+    throw new Error(`${nameof(getFeeForChange)} change not a valid Shelley address`);
+  }
+  const changeOutput = RustModule.WalletV4.TransactionOutput.new(
+    wasmChange,
+    // largest possible CBOR value
+    // note: this slightly over-estimates by a few bytes
+    RustModule.WalletV4.BigNum.from_str(0x1_00_00_00_00.toString()),
+  );
+  const feeForChange = new BigNumber(protocolParams.linearFee.coefficient().to_str())
+    .times(changeOutput.to_bytes().length);
+  const minimumNeededForChange = feeForChange.plus(protocolParams.minimumUtxoVal.to_str());
+  return minimumNeededForChange;
 }
 
 /**
@@ -256,7 +284,23 @@ export function newAdaUnsignedTxFromUtxo(
     address: RustModule.WalletV4.RewardAddress,
     amount: RustModule.WalletV4.BigNum,
   |}>,
+  allowNoOutputs: boolean,
 ): V4UnsignedTxUtxoResponse {
+  /**
+   * Shelley supports transactions with no outputs by simply burning any leftover ADA as fee
+   * This is can happen in the following:
+   * - if you have a 3ADA UTXO and you register a staking key, there will be 0 outputs
+   * However, if there is no output, there is no way to tell the network of the transaction
+   * This allows for replay attacks of 0-output transactions on testnets that use a mainnet snapshot
+   * To protect against this, we can choose to force that there is always even one output
+   * by simply enforcing a change address if no outputs are specified for the transaction
+   * This is actually enforced by hardware wallets at the moment (will error on 0 outputs)
+   */
+  const shouldForceChange = !allowNoOutputs && outputs.length === 0;
+  if (shouldForceChange && changeAdaAddr == null) {
+    throw new NoOutputsError();
+  }
+
   const txBuilder = RustModule.WalletV4.TransactionBuilder.new(
     protocolParams.linearFee,
     protocolParams.minimumUtxoVal,
@@ -313,6 +357,7 @@ export function newAdaUnsignedTxFromUtxo(
       usedUtxos.push(utxo); // note: this ensure we have at least one UTXO in the tx
       currentInputSum = currentInputSum.plus(utxo.amount);
       addUtxoInput(txBuilder, utxo);
+      // need to recalculate each time because fee changes
       const output = new BigNumber(
         txBuilder
           .get_explicit_output()
@@ -321,7 +366,17 @@ export function newAdaUnsignedTxFromUtxo(
           .to_str()
       );
 
-      if (currentInputSum.gte(output)) {
+      if (shouldForceChange) {
+        if (changeAdaAddr == null) throw new NoOutputsError();
+        const minimumNeededForChange = getFeeForChange(
+          changeAdaAddr,
+          protocolParams
+        );
+        if (currentInputSum.gte(minimumNeededForChange.plus(output))) {
+          break;
+        }
+      }
+      if (!shouldForceChange && currentInputSum.gte(output)) {
         break;
       }
     }
@@ -334,7 +389,17 @@ export function newAdaUnsignedTxFromUtxo(
           .checked_add(txBuilder.get_deposit())
           .to_str()
       );
-      if (currentInputSum.lt(output)) {
+      if (shouldForceChange) {
+        if (changeAdaAddr == null) throw new NoOutputsError();
+        const minimumNeededForChange = getFeeForChange(
+          changeAdaAddr,
+          protocolParams
+        );
+        if (currentInputSum.lt(minimumNeededForChange.plus(output))) {
+          throw new NotEnoughMoneyToSendError();
+        }
+      }
+      if (!shouldForceChange && currentInputSum.lt(output)) {
         throw new NotEnoughMoneyToSendError();
       }
     }
@@ -342,6 +407,9 @@ export function newAdaUnsignedTxFromUtxo(
 
   const changeAddr = (() => {
     if (changeAdaAddr == null) {
+      if (shouldForceChange) {
+        throw new NoOutputsError();
+      }
       const totalInput = txBuilder.get_explicit_input().checked_add(txBuilder.get_implicit_input());
       const totalOutput = txBuilder.get_explicit_output();
       const deposit = txBuilder.get_deposit();
@@ -367,6 +435,10 @@ export function newAdaUnsignedTxFromUtxo(
       throw new Error(`${nameof(newAdaUnsignedTxFromUtxo)} change not a valid Shelley address`);
     }
     const changeWasAdded = txBuilder.add_change_if_needed(wasmChange);
+    if (shouldForceChange && !changeWasAdded) {
+      // note: this should never happened since it should have been handled by earlier code
+      throw new Error(`No change added even though it should be forced`);
+    }
     const changeValue = new BigNumber(
       txBuilder.get_explicit_output().checked_sub(oldOutput).to_str()
     );

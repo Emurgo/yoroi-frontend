@@ -905,6 +905,7 @@ export default class AdaApi {
           protocolParams,
           [],
           [],
+          false,
         );
       } else {
         throw new Error(`${nameof(this.createUnsignedTx)} unknown param`);
@@ -1002,6 +1003,7 @@ export default class AdaApi {
         protocolParams,
         stakeDelegationCert,
         [],
+        false,
       );
 
       const allUtxosForKey = filterAddressesByStakingKey(
@@ -1152,7 +1154,8 @@ export default class AdaApi {
         request.absSlotNumber,
         protocolParams,
         certificates,
-        finalWithdrawals
+        finalWithdrawals,
+        false,
       );
       // there wasn't enough in the withdrawal to send anything to us
       if (unsignedTxResponse.changeAddr.length === 0) {

@@ -76,6 +76,10 @@ const messages = defineMessages({
     id: 'api.errors.noInputsError',
     defaultMessage: '!!!The wallet restored from your recovery phrase is empty. Please check your recovery phrase and attempt restoration again.',
   },
+  noOutputsError: {
+    id: 'api.errors.noOutputsError',
+    defaultMessage: '!!!Transaction requires at least 1 output, but no output was added',
+  },
   generateTransferTxError: {
     id: 'api.errors.generateTransferTxError',
     defaultMessage: '!!!Error while generating transfer transaction.',
@@ -302,6 +306,15 @@ export class NoInputsError extends LocalizableError {
     super({
       id: messages.noInputsError.id,
       defaultMessage: messages.noInputsError.defaultMessage || '',
+    });
+  }
+}
+
+export class NoOutputsError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.noOutputsError.id,
+      defaultMessage: messages.noOutputsError.defaultMessage || '',
     });
   }
 }
