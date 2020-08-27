@@ -6,6 +6,7 @@ import type {
   UtxoSumRequest, UtxoSumResponse,
   HistoryRequest, HistoryResponse,
   AccountStateRequest, AccountStateResponse,
+  PoolInfoRequest, PoolInfoResponse,
   BestBlockRequest, BestBlockResponse,
   SignedResponse,
   SignedRequestInternal,
@@ -134,6 +135,14 @@ export function getMockServer(
       } else {
         _defaultSignedTransaction(req, res);
       }
+    });
+
+    server.post('/api/getPoolInfo', async (
+      req: { body: PoolInfoRequest, ... },
+      res: { send(arg: PoolInfoResponse): any, ... }
+    ): Promise<void> => {
+      const poolsInfo = await mockImporter.getPoolInfo(req.body);
+      res.send(poolsInfo);
     });
 
     server.post('/api/getAccountState', async (
