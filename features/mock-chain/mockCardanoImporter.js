@@ -1480,7 +1480,7 @@ const sendTx = (request: SignedRequestInternal): SignedResponse => {
   return { txId: remoteTx.hash };
 };
 
-const getPoolInfo: PoolInfoFunc = genGetPoolInfo(transactions);
+const getPoolInfo: PoolInfoFunc = genGetPoolInfo();
 const getRewardHistory: RewardHistoryFunc = genGetRewardHistory();
 
 const getAccountState: AccountStateFunc = async (_request) => {

@@ -512,7 +512,6 @@ export function genGetRewardHistory(
 }
 
 export function genGetPoolInfo(
-  _blockchain: Array<RemoteTransaction>,
 ): PoolInfoFunc {
   return async (
     body: PoolInfoRequest,
@@ -520,7 +519,7 @@ export function genGetPoolInfo(
     // TODO: scan the chain properly for this information
     const mockPoolId = 'df1750df9b2df285fcfb50f4740657a18ee3af42727d410c37b86207';
     const result: PoolInfoResponse = {};
-    for (const poolId of body.ids) {
+    for (const poolId of body.poolIds) {
       if (poolId === mockPoolId) {
         result[mockPoolId] = {
           info: {
