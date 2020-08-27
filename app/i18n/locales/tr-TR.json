@@ -483,7 +483,7 @@
   "wallet.deprecation.byronLine2": "ADA'nıza yetki vermek için Shelley cüzdanına geçmeniz gerekecektir.",
   "wallet.hw.common.error.101": "Kullanıcı tarafından gerekli izinler verilmedi. Lütfen tekrar deneyiniz.",
   "wallet.hw.incorrectDevice": "Geçersiz aygıt algılandı. Beklenen aygıt {expectedDeviceId}, bu aygıt takılı {responseDeviceId}. Lütfen doğru aygıtı takın",
-  "wallet.hw.incorrectVersion": "Incorrect device version detected. We support version {supportedVersions} but you have version {responseVersion}.",
+  "wallet.hw.incorrectVersion": "Geçersiz aygıt sürümü. {supportedVersions} sürümlerini destekliyoruz aygıtınızın sürümü {responseVersion}.",
   "wallet.hw.ledger.common.error.101": "Operasyon Ledger aygıtında iptal edildi.",
   "wallet.hw.ledger.common.error.102": "Operasyon kullanıcı tarafından iptal edildi.",
   "wallet.hw.ledger.common.error.103": "Ledger aygıtı kilitli, lütfen kilidini açın ve tekrar deneyin.",
