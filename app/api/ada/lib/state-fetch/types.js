@@ -253,7 +253,7 @@ export type RewardHistoryResponse = { [address: string]: Array<RewardTuple>, ...
 export type RewardHistoryFunc = (body: RewardHistoryRequest) => Promise<RewardHistoryResponse>;
 
 export type PoolInfoRequest = {|
-  ids: Array<string>
+  poolIds: Array<string>
 |};
 export type RemotePoolInfo = {|
   // from pool metadata (off chain)

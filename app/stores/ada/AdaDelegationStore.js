@@ -183,7 +183,7 @@ export default class AdaDelegationStore extends Store {
     );
     const stateFetcher = this.stores.substores.ada.stateFetchStore.fetcher;
     const poolInfoResp = await stateFetcher.getPoolInfo({
-      ids: poolsToQuery,
+      poolIds: poolsToQuery,
     });
     runInAction(() => {
       for (const poolId of Object.keys(poolInfoResp)) {

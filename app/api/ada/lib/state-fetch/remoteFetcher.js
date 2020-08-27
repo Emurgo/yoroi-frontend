@@ -290,7 +290,7 @@ export class RemoteFetcher implements IFetcher {
       {
         method: 'post',
         data: {
-          poolIds: body.ids
+          poolIds: body.poolIds
         },
         headers: {
           'yoroi-version': this.getLastLaunchVersion(),

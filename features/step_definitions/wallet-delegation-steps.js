@@ -20,7 +20,7 @@ When(/^I click on the next button in the delegation by id$/, async function () {
   await this.click('.DelegationSendForm_nextButton');
 });
 
-When(/^I see the hardware delegation confirmation dialog$/, async function () {
+When(/^I see the delegation confirmation dialog$/, async function () {
   await this.waitForElement('.DelegationTxDialog_dialog');
 });
 

@@ -58,7 +58,6 @@ Feature: Hardware device
 
    @it-100
    Scenario: Test Shelley Ledger delegation (IT-100)
-     # test restoration
      When I select a Shelley-era Ledger device
      And I restore the Ledger device
      Then I should see the summary screen
@@ -70,7 +69,7 @@ Feature: Hardware device
        | df1750df9b2df285fcfb50f4740657a18ee3af42727d410c37b86207 |
      Then I see the stakepool ticker "YOROI"
      And I click on the next button in the delegation by id
-     Then I see the hardware delegation confirmation dialog
+     Then I see the delegation confirmation dialog
      Then I submit the wallet send form
      Given I click on see dashboard
      Then I should see the dashboard screen
@@ -127,5 +126,20 @@ Feature: Hardware device
     And I see the derivation path "m/1852'/1815'/0'/0/3"
     Then I verify the address on my trezor device
 
-
-
+  @it-134
+   Scenario: Test Shelley Trezor delegation (IT-134)
+     When I select a Shelley-era Trezor device
+     And I restore the Trezor device
+     Then I should see the summary screen
+     Then I should see a plate PXCA-2349
+     # test delegation
+     Given I go to the delegation by id screen
+     And I fill the delegation id form:
+       | stakePoolId                                              |
+       | df1750df9b2df285fcfb50f4740657a18ee3af42727d410c37b86207 |
+     Then I see the stakepool ticker "YOROI"
+     And I click on the next button in the delegation by id
+     Then I see the delegation confirmation dialog
+     Then I submit the wallet send form
+     Given I click on see dashboard
+     Then I should see the dashboard screen
