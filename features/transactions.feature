@@ -229,3 +229,20 @@ Feature: Send transaction
     And The transaction fees are "0.460004"
     Then A pending tx gets sent from my wallet from another client
     Then I should see a warning block
+
+  @it-137
+   Scenario: Test Shelley Trezor delegation (IT-137)
+     Given There is a Shelley wallet stored named shelley-simple-15
+     Given I go to the delegation by id screen
+     And I fill the delegation id form:
+       | stakePoolId                                              |
+       | df1750df9b2df285fcfb50f4740657a18ee3af42727d410c37b86207 |
+     Then I see the stakepool ticker "YOROI"
+     And I click on the next button in the delegation by id
+     And I enter the wallet password:
+      | password   |
+      | asdfasdfasdf |
+     Then I see the delegation confirmation dialog
+     Then I submit the wallet send form
+     Given I click on see dashboard
+     Then I should see the dashboard screen

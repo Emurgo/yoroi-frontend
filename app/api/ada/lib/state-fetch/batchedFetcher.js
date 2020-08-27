@@ -390,9 +390,9 @@ export function batchGetPoolInfo(
 ): PoolInfoFunc {
   return async function (body: PoolInfoRequest): Promise<PoolInfoResponse> {
     try {
-      const poolIds = chunk(body.ids, addressesLimit);
+      const poolIds = chunk(body.poolIds, addressesLimit);
       const poolInfoPromises = poolIds.map(
-        addr => getPoolInfo({ ids: addr })
+        poolId => getPoolInfo({ poolIds: poolId })
       );
       const poolInfos = await Promise.all(poolInfoPromises);
       return Object.assign({}, ...poolInfos);
