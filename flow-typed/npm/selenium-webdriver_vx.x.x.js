@@ -757,9 +757,11 @@ declare class webdriver$Builder {
   getCapabilities(): webdriver$Capabilities;
   getServerUrl(): string;
   setAlertBehavior(behavior: string): webdriver$Builder;
+  // $FlowFixMe[value-as-type] this should come from selenium-webdriver/chrome
   setChromeOptions(options: webdriver$Capabilities.chrome.Options): webdriver$Builder;
   setControlFlow(flow: webdriver$ControlFlow): webdriver$Builder;
   setEnableNativeEvents(enabled: boolean): webdriver$Builder;
+  // $FlowFixMe[value-as-type] this should come from selenium-webdriver/firefox
   setFirefoxOptions(options: webdriver$Capabilities.firefox.Options): webdriver$Builder;
   setLoggingPrefs(prefs: webdriver$LoggingPreferences): webdriver$Builder;
   setLoggingPrefs(prefs: { [key: string]: string, ... }): webdriver$Builder;

@@ -5,7 +5,7 @@ import type { lf$Database } from 'lovefield';
 import AdaApi from './index';
 import { RustModule } from './lib/cardanoCrypto/rustLoader';
 import { generateWalletRootKey } from './lib/cardanoCrypto/cryptoWallet';
-import { HARD_DERIVATION_START, } from '../../config/numbersConfig';
+import { HARD_DERIVATION_START, WalletTypePurpose, } from '../../config/numbersConfig';
 import {
   silenceLogsForTesting,
 } from '../../utils/logging';
@@ -62,10 +62,14 @@ test('Restore wallet for transfer', async () => {
 
   const recoveryPhrase = TX_TEST_MNEMONIC_1;
 
+  const accountIndex = HARD_DERIVATION_START + 0;
   const response  = await AdaApi.prototype.restoreWalletForTransfer({
-    rootPk: generateWalletRootKey(recoveryPhrase),
+    accountPubKey: generateWalletRootKey(recoveryPhrase)
+      .derive(WalletTypePurpose.BIP44)
+      .derive(accountIndex)
+      .to_public(),
     checkAddressesInUse,
-    accountIndex: HARD_DERIVATION_START + 0,
+    accountIndex,
     transferSource: 'bip44',
     network: networks.ByronMainnet,
   });

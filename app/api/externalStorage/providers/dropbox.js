@@ -108,7 +108,7 @@ export default class DropboxApi implements IProvider {
         return {
           tag: response['.tag'],
           lastUpdated: Object.prototype.hasOwnProperty.call(response, 'server_modified')
-            // $FlowFixMe
+            // $FlowFixMe[incompatible-use]
             && response.server_modified != null
             ? moment(response.server_modified, 'YYYY-MM-DDTHH:mm:ssZ').toDate()
             : new Date(0)
@@ -197,7 +197,7 @@ export default class DropboxApi implements IProvider {
               tx: entry.name.substr(0, entry.name.length - this.memoExt.length),
               deleted: entry['.tag'] === 'deleted',
               lastUpdated: Object.prototype.hasOwnProperty.call(entry, 'server_modified')
-                // $FlowFixMe
+                // $FlowFixMe[incompatible-use]
                 && entry.server_modified != null
                 ? moment(entry.server_modified, 'YYYY-MM-DDTHH:mm:ssZ').toDate()
                 : new Date(0),

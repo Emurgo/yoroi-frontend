@@ -12,6 +12,7 @@ import type {
   PoolInfoRequest, PoolInfoResponse,
   SignedRequestInternal,
   RemoteTransaction,
+  RemoteUnspentOutput,
 } from './types';
 import type {
   FilterUsedRequest, FilterUsedResponse,
@@ -78,7 +79,17 @@ export class RemoteFetcher implements IFetcher {
           'yoroi-locale': this.getCurrentLocale()
         }
       }
-    ).then(response => response.data)
+    ).then(response => response.data.map((utxo: RemoteUnspentOutput) => ({
+      utxo_id: '', // NOTE: this is broken in the backend right now
+      tx_hash: typeof utxo.tx_hash === 'string'
+        ? utxo.tx_hash
+        // TODO: remove this once the bug in the backend is fixed
+        : Buffer.from(utxo.tx_hash.data).toString('hex'),
+      tx_index: utxo.tx_index,
+      receiver: utxo.receiver,
+      amount: utxo.amount,
+      block_num: utxo.block_num,
+    })))
       .catch((error) => {
         Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getUTXOsForAddresses)} error: ` + stringifyError(error));
         throw new GetUtxosForAddressesApiError();

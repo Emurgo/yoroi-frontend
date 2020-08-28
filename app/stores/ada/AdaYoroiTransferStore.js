@@ -40,17 +40,26 @@ export default class AdaYoroiTransferStore extends Store {
       ? generateLedgerWalletRootKey(recoveryPhrase)
       : generateWalletRootKey(recoveryPhrase);
 
-    if (this.stores.profile.selectedNetwork == null) {
-      throw new Error(`${nameof(AdaYoroiTransferStore)}::${nameof(this._restoreWalletForTransfer)} no network selected`);
-    }
     if (!this.stores.yoroiTransfer.mode) {
       throw new Error(`${nameof(AdaYoroiTransferStore)}::${nameof(this._restoreWalletForTransfer)} no mode specified`);
     }
     const { mode } = this.stores.yoroiTransfer;
 
+    const accountPubKey = rootPk
+      .derive(mode.type === 'cip1852'
+        ? WalletTypePurpose.CIP1852
+        : WalletTypePurpose.BIP44)
+      .derive(CoinTypes.CARDANO)
+      .derive(accountIndex)
+      .to_public();
+
+    if (this.stores.profile.selectedNetwork == null) {
+      throw new Error(`${nameof(AdaYoroiTransferStore)}::${nameof(this._restoreWalletForTransfer)} no network selected`);
+    }
+
     const stateFetcher = this.stores.substores.ada.stateFetchStore.fetcher;
     const restoreResult = await this.restoreForTransferRequest.execute({
-      rootPk,
+      accountPubKey,
       accountIndex,
       checkAddressesInUse: stateFetcher.checkAddressesInUse,
       transferSource: mode.type,
@@ -158,7 +167,7 @@ export default class AdaYoroiTransferStore extends Store {
 
     // 2) Perform restoration
     const accountIndex = 0 + HARD_DERIVATION_START; // TODO: don't hardcode index
-    const { masterKey, addresses } = await this._restoreWalletForTransfer(
+    const { addresses } = await this._restoreWalletForTransfer(
       request.recoveryPhrase,
       accountIndex,
     );
@@ -166,8 +175,12 @@ export default class AdaYoroiTransferStore extends Store {
     request.updateStatusCallback();
 
     // 3) Calculate private keys for restored wallet utxo
-    const accountKey = RustModule.WalletV4.Bip32PrivateKey
-      .from_bytes(Buffer.from(masterKey, 'hex'))
+
+    const rootPk = this.stores.yoroiTransfer.mode?.extra === 'ledger'
+      ? generateLedgerWalletRootKey(request.recoveryPhrase)
+      : generateWalletRootKey(request.recoveryPhrase);
+
+    const accountKey = rootPk
       .derive(WalletTypePurpose.BIP44)
       .derive(CoinTypes.CARDANO)
       .derive(accountIndex);

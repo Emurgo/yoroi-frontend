@@ -66,22 +66,24 @@ export async function getAccountDefaultDerivations(
       .derive(ChainDerivations.EXTERNAL)
       .derive(i)
       .to_raw_key();
-    const addr = RustModule.WalletV4.EnterpriseAddress.new(
+    const addr = RustModule.WalletV4.BaseAddress.new(
       chainNetworkId,
-      RustModule.WalletV4.StakeCredential.from_keyhash(key.hash())
+      RustModule.WalletV4.StakeCredential.from_keyhash(key.hash()),
+      RustModule.WalletV4.StakeCredential.from_keyhash(stakingKey.hash())
     );
-    return Buffer.from(addr.to_address().to_bytes()).toString('hex');
+    return addr.to_address().to_bech32();
   });
   const internalAddrs = addressesIndex.map(i => {
     const key = accountPublicKey
       .derive(ChainDerivations.INTERNAL)
       .derive(i)
       .to_raw_key();
-    const addr = RustModule.WalletV4.EnterpriseAddress.new(
+    const addr = RustModule.WalletV4.BaseAddress.new(
       chainNetworkId,
-      RustModule.WalletV4.StakeCredential.from_keyhash(key.hash())
+      RustModule.WalletV4.StakeCredential.from_keyhash(key.hash()),
+      RustModule.WalletV4.StakeCredential.from_keyhash(stakingKey.hash())
     );
-    return Buffer.from(addr.to_address().to_bytes()).toString('hex');
+    return addr.to_address().to_bech32();
   });
   /**
    * Even if the user has no internet connection and scanning fails,

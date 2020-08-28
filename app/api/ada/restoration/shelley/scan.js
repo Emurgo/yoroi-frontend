@@ -14,7 +14,6 @@ import type { FilterFunc } from '../../../common/lib/state-fetch/currencySpecifi
 import {
   ChainDerivations, BIP44_SCAN_SIZE,
 } from '../../../../config/numbersConfig';
-import environment from '../../../../environment';
 
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 
@@ -22,7 +21,6 @@ import type {
   TreeInsert, InsertRequest,
 } from '../../lib/storage/database/walletTypes/common/utils';
 import type { AddByHashFunc, } from '../../../common/lib/storage/bridge/hashMapper';
-import type { AddressDiscriminationType } from '@emurgo/js-chain-libs/js_chain_libs';
 import type { CanonicalAddressInsert } from '../../lib/storage/database/primitives/tables';
 import { CoreAddressTypes } from '../../lib/storage/database/primitives/enums';
 import type { Bip44ChainInsert } from '../../lib/storage/database/walletTypes/common/tables';
@@ -30,6 +28,7 @@ import type { Bip44ChainInsert } from '../../lib/storage/database/walletTypes/co
 declare var CONFIG: ConfigType;
 const addressRequestSize = CONFIG.app.addressRequestSize;
 
+// TODO: delete this function eventually once we support payment addresses in the backend
 function genEnterpriseAddressBatchFunc(
   addressChain: RustModule.WalletV4.Bip32PublicKey,
   chainNetworkId: number,
@@ -48,6 +47,29 @@ function genEnterpriseAddressBatchFunc(
     });
   };
 }
+
+// TODO: delete this function eventually once we support payment addresses in the backend
+function genBaseAddressBatchFunc(
+  addressChain: RustModule.WalletV4.Bip32PublicKey,
+  stakingKey: RustModule.WalletV4.PublicKey,
+  chainNetworkId: number,
+): GenerateAddressFunc {
+  return (
+    indices: Array<number>
+  ) => {
+    return indices.map(i => {
+      const addressKey = addressChain.derive(i).to_raw_key();
+      const addr = RustModule.WalletV4.BaseAddress.new(
+        chainNetworkId,
+        RustModule.WalletV4.StakeCredential.from_keyhash(addressKey.hash()),
+        RustModule.WalletV4.StakeCredential.from_keyhash(stakingKey.hash())
+      );
+      const bech32 = addr.to_address().to_bech32();
+      return bech32;
+    });
+  };
+}
+
 
 export async function addShelleyChimericAccountAddress(
   addByHash: AddByHashFunc,
@@ -78,33 +100,31 @@ export async function addShelleyUtxoAddress(
   addByHash: AddByHashFunc,
   insertRequest: InsertRequest,
   stakingKey: RustModule.WalletV4.PublicKey,
-  enterpriseAddress: string,
+  baseAddresses: string, // bech32
 ): Promise<{|
   KeyDerivationId: number,
 |}> {
-  const wasmAddr = RustModule.WalletV4.Address.from_bytes(Buffer.from(enterpriseAddress, 'hex'));
-  const wasmEnterpriseAddr = RustModule.WalletV4.EnterpriseAddress.from_address(wasmAddr);
-  if (wasmEnterpriseAddr == null) {
+  const wasmAddr = RustModule.WalletV4.Address.from_bech32(baseAddresses);
+  const wasmBaseAddr = RustModule.WalletV4.BaseAddress.from_address(wasmAddr);
+  if (wasmBaseAddr == null) {
     throw new Error(`${nameof(addShelleyUtxoAddress)} address is not an enterprise address`);
   }
-  const paymentKey = wasmEnterpriseAddr.payment_cred();
-  await addByHash({
-    ...insertRequest,
-    address: {
-      type: CoreAddressTypes.CARDANO_ENTERPRISE,
-      data: enterpriseAddress,
-    },
-  });
-  const baseAddr = RustModule.WalletV4.BaseAddress.new(
+  const baseAddr = RustModule.WalletV4.EnterpriseAddress.new(
     wasmAddr.network_id(),
-    paymentKey,
-    RustModule.WalletV4.StakeCredential.from_keyhash(stakingKey.hash())
+    wasmBaseAddr.payment_cred()
   );
   await addByHash({
     ...insertRequest,
     address: {
-      type: CoreAddressTypes.CARDANO_BASE,
+      type: CoreAddressTypes.CARDANO_ENTERPRISE,
       data: Buffer.from(baseAddr.to_address().to_bytes()).toString('hex'),
+    },
+  });
+  await addByHash({
+    ...insertRequest,
+    address: {
+      type: CoreAddressTypes.CARDANO_BASE,
+      data: Buffer.from(wasmBaseAddr.to_address().to_bytes()).toString('hex'),
     },
   });
   return {
@@ -156,27 +176,29 @@ export async function scanShelleyCip1852Account(request: {|
   checkAddressesInUse: FilterFunc,
   addByHash: AddByHashFunc,
   stakingKey: RustModule.WalletV4.PublicKey,
+  chainNetworkId: number,
 |}): Promise<TreeInsert<Bip44ChainInsert>> {
   const key = RustModule.WalletV4.Bip32PublicKey.from_bytes(
     Buffer.from(request.accountPublicKey, 'hex'),
   );
-  const discrimination = environment.getDiscriminant();
 
   const insert = await scanAccount({
-    generateInternalAddresses: genEnterpriseAddressBatchFunc(
+    generateInternalAddresses: genBaseAddressBatchFunc(
       key.derive(ChainDerivations.INTERNAL),
-      discrimination,
+      request.stakingKey,
+      request.chainNetworkId,
     ),
-    generateExternalAddresses: genEnterpriseAddressBatchFunc(
+    generateExternalAddresses: genBaseAddressBatchFunc(
       key.derive(ChainDerivations.EXTERNAL),
-      discrimination,
+      request.stakingKey,
+      request.chainNetworkId,
     ),
     lastUsedInternal: request.lastUsedInternal,
     lastUsedExternal: request.lastUsedExternal,
     checkAddressesInUse: request.checkAddressesInUse,
     addByHash: request.addByHash,
     stakingKey: request.stakingKey,
-    discrimination,
+    chainNetworkId: request.chainNetworkId,
   });
   return insert;
 }
@@ -188,7 +210,7 @@ async function scanAccount(request: {|
   checkAddressesInUse: FilterFunc,
   addByHash: AddByHashFunc,
   stakingKey: RustModule.WalletV4.PublicKey,
-  discrimination: AddressDiscriminationType,
+  chainNetworkId: number,
 |}): Promise<TreeInsert<Bip44ChainInsert>> {
   const externalAddresses = await scanChain({
     generateAddressFunc: request.generateExternalAddresses,
@@ -212,7 +234,7 @@ async function scanAccount(request: {|
         request.addByHash,
         insertRequest,
         request.stakingKey,
-        request.discrimination
+        request.chainNetworkId
       );
     },
   }));

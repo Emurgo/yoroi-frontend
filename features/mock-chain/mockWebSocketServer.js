@@ -8,6 +8,7 @@ const toMessage = JSON.stringify;
 
 let wss = null;
 
+// $FlowFixMe[value-as-type]
 export function getMockWebSocketServer(server: any): WebSocket.Server {
   if (!wss) {
     wss = new WebSocket.Server({ server });

@@ -88,6 +88,7 @@ export type StoresMap = {|
     jormungandr: JormungandrStoresMap,
     ergo: ErgoStoresMap,
   |},
+  // $FlowFixMe[value-as-type]
   router: RouterStore,
 |};
 
@@ -134,6 +135,7 @@ export default (action(
   (
     api: Api,
     actions: ActionsMap,
+    // $FlowFixMe[value-as-type]
     router: RouterStore
   ): StoresMap => {
     /** Note: `stores` sets all values to null to start
@@ -178,4 +180,5 @@ export default (action(
 
     return loadedStores;
   }
+  // $FlowFixMe[value-as-type]
 ): (Api, ActionsMap, RouterStore) => StoresMap);

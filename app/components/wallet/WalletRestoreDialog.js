@@ -262,6 +262,7 @@ export default class WalletRestoreDialog extends Component<Props> {
     });
   }
 
+  // $FlowFixMe[value-as-type]
   walletNameInput: Input;
   // Refer: https://github.com/Emurgo/yoroi-frontend/pull/1009
   // recoveryPhraseInput: Autocomplete;

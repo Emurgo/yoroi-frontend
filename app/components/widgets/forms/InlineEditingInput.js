@@ -130,6 +130,7 @@ export default class InlineEditingInput extends Component<Props, State> {
     }
   }
 
+  // $FlowFixMe[value-as-type]
   inputField: Input;
 
   render(): Node {

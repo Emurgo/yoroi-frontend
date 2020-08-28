@@ -11,6 +11,7 @@ import { handleExternalLinkClick } from '../../../utils/routing';
 import CheckDialog from '../../../components/wallet/hwConnect/ledger/CheckDialog';
 import ConnectDialog from '../../../components/wallet/hwConnect/ledger/ConnectDialog';
 import SaveDialog from '../../../components/wallet/hwConnect/ledger/SaveDialog';
+import UpgradeTxDialogContainer from '../../transfer/UpgradeTxDialogContainer';
 
 import { ProgressStep, ProgressInfo } from '../../../types/HWConnectStoreTypes';
 import { getApiForNetwork, ApiOptions } from '../../../api/common/utils';
@@ -92,6 +93,19 @@ export default class WalletLedgerConnectDialogContainer extends Component<Props>
             classicTheme={profile.isClassicTheme}
           />);
         break;
+      case ProgressStep.TRANSFER:
+        component = (
+          <UpgradeTxDialogContainer
+            progressInfo={ledgerConnectStore.progressInfo}
+            isActionProcessing={ledgerConnectStore.isActionProcessing}
+            error={ledgerConnectStore.error}
+            onExternalLinkClick={handleExternalLinkClick}
+            goBack={hwConnectActions.goBackToCheck.trigger}
+            submit={hwConnectActions.submitConnect.trigger}
+            cancel={this.cancel}
+            classicTheme={profile.isClassicTheme}
+          />);
+        break;
       case ProgressStep.SAVE:
         component = (
           <SaveDialog
@@ -106,7 +120,7 @@ export default class WalletLedgerConnectDialogContainer extends Component<Props>
           />);
         break;
       default:
-        Logger.error('WalletLedgerConnectDialogContainer::render: something unexpected happened');
+        Logger.error(`${nameof(WalletLedgerConnectDialogContainer)}::${nameof(this.render)}: something unexpected happened`);
         break;
     }
 

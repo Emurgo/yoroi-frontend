@@ -131,7 +131,8 @@ export type RemoteUnspentOutput = {|
   +tx_hash: string,
   +tx_index: number,
   +receiver: string,
-  +amount: string
+  +amount: string,
+  +block_num: number,
 |};
 
 export type RemoteWithdrawal = {|
