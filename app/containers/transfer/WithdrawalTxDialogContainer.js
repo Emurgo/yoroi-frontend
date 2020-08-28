@@ -10,6 +10,9 @@ import type { ISignRequest } from '../../api/common/lib/transactions/ISignReques
 import TransferSendPage from './TransferSendPage';
 import type { GeneratedData as TransferSendData } from './TransferSendPage';
 import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
+import globalMessages from '../../i18n/global-messages';
+import { intlShape, } from 'react-intl';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 export type GeneratedData = typeof WithdrawalTxDialogContainer.prototype.generated;
 
@@ -21,12 +24,20 @@ type Props = {|
 @observer
 export default class WithdrawalTxDialogContainer extends Component<Props> {
 
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+    intl: intlShape.isRequired,
+  };
+
   render(): Node {
+    const { intl } = this.context;
     const { createWithdrawalTx } = this.generated.stores.substores.ada.delegationTransaction;
     return (
       <TransferSendPage
         {...this.generated.TransferSendProps}
-        onClose={this.props.onClose}
+        onClose={{
+          trigger: this.props.onClose,
+          label: intl.formatMessage(globalMessages.cancel),
+        }}
         transactionRequest={createWithdrawalTx}
         toTransferTx={tentativeTx => {
           if (!(tentativeTx instanceof HaskellShelleyTxSignRequest)) {

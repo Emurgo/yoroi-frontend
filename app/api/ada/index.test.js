@@ -5,7 +5,7 @@ import type { lf$Database } from 'lovefield';
 import AdaApi from './index';
 import { RustModule } from './lib/cardanoCrypto/rustLoader';
 import { generateWalletRootKey } from './lib/cardanoCrypto/cryptoWallet';
-import { HARD_DERIVATION_START, WalletTypePurpose, } from '../../config/numbersConfig';
+import { HARD_DERIVATION_START, WalletTypePurpose, CoinTypes, } from '../../config/numbersConfig';
 import {
   silenceLogsForTesting,
 } from '../../utils/logging';
@@ -66,6 +66,7 @@ test('Restore wallet for transfer', async () => {
   const response  = await AdaApi.prototype.restoreWalletForTransfer({
     accountPubKey: generateWalletRootKey(recoveryPhrase)
       .derive(WalletTypePurpose.BIP44)
+      .derive(CoinTypes.CARDANO)
       .derive(accountIndex)
       .to_public(),
     checkAddressesInUse,
@@ -80,7 +81,6 @@ test('Restore wallet for transfer', async () => {
 const TX_TEST_MNEMONIC_1 = 'prevent company field green slot measure chief hero apple task eagle sunset endorse dress seed';
 
 const RESTORED_ADDRESSES = {
-  masterKey: 'c8bf95a562d0f668340b0dc383860596225422eaf69c592c66b70c19b5e59744d8eed3ad296a0e3335d9dbe7d2200d525653d2c3ff4be10d4a96e14eb1a503d66238b3b8cf2ab4e2df16f6e49a0f86dff6c9ed409e91492071624781bcaa12d5',
   addresses: [{
     address: 'Ae2tdPwUPEZCfyggUgSxD1E5UCx5f5hrXCdvQjJszxE7epyZ4ox9vRNUbHf',
     addressing: {

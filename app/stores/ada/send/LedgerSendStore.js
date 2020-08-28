@@ -38,6 +38,9 @@ import { asGetPublicKey, asHasLevels } from '../../../api/ada/lib/storage/models
 import {
   ConceptualWallet
 } from '../../../api/ada/lib/storage/models/ConceptualWallet/index';
+import { buildCheckAndCall } from '../../lib/check';
+import { getApiForNetwork, ApiOptions } from '../../../api/common/utils';
+import { HaskellShelleyTxSignRequest } from '../../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 
 /** Note: Handles Ledger Signing */
 export default class LedgerSendStore extends Store {
@@ -50,9 +53,17 @@ export default class LedgerSendStore extends Store {
   setup(): void {
     super.setup();
     const ledgerSendAction = this.actions.ada.ledgerSend;
-    ledgerSendAction.init.listen(this._init);
-    ledgerSendAction.sendUsingLedger.listen(this._sendWrapper);
-    ledgerSendAction.cancel.listen(this._cancel);
+
+    const { syncCheck, asyncCheck } = buildCheckAndCall(
+      ApiOptions.ada,
+      () => {
+        if (this.stores.profile.selectedNetwork == null) return undefined;
+        return getApiForNetwork(this.stores.profile.selectedNetwork);
+      }
+    );
+    ledgerSendAction.init.listen(syncCheck(this._init));
+    ledgerSendAction.sendUsingLedger.listen(asyncCheck(this._sendWrapper));
+    ledgerSendAction.cancel.listen(syncCheck(this._cancel));
   }
 
   /** setup() is called when stores are being created
@@ -82,6 +93,10 @@ export default class LedgerSendStore extends Store {
         // this Error will be converted to LocalizableError()
         throw new Error('Can’t send another transaction if one transaction is in progress.');
       }
+      if (!(request.params.signRequest instanceof HaskellShelleyTxSignRequest)) {
+        throw new Error(`${nameof(this._sendWrapper)} wrong tx sign request`);
+      }
+      const { signRequest } = request.params;
 
       this._setError(null);
       this._setActionProcessing(true);
@@ -89,7 +104,7 @@ export default class LedgerSendStore extends Store {
       await this.stores.substores.ada.wallets.adaSendAndRefresh({
         broadcastRequest: {
           ledger: {
-            signRequest: request.params.signRequest,
+            signRequest,
             publicDeriver: request.publicDeriver,
           },
         },
@@ -109,7 +124,9 @@ export default class LedgerSendStore extends Store {
 
   /** Generates a payload with Ledger format and tries Send ADA using Ledger signing */
   signAndBroadcast: {|
-    params: SendUsingLedgerParams,
+    params: {|
+      signRequest: HaskellShelleyTxSignRequest,
+    |},
     publicDeriver: PublicDeriver<>,
   |} => Promise<{| txId: string |}> = async (request) => {
     let ledgerConnect: LedgerConnect;

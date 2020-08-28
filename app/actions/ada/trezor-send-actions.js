@@ -1,10 +1,10 @@
 // @flow
 import { AsyncAction, Action } from '../lib/Action';
-import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
+import type { ISignRequest } from '../../api/common/lib/transactions/ISignRequest';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 
 export type SendUsingTrezorParams = {|
-  signRequest: HaskellShelleyTxSignRequest,
+  signRequest: ISignRequest<any>,
 |};
 
 // ======= Sending ADA using Trezor ACTIONS =======

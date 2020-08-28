@@ -51,7 +51,7 @@ export default class AdaTransactionBuilderStore extends Store {
   // REQUESTS
   @observable createUnsignedTx: LocalizedRequest<CreateUnsignedTxFunc>
     // TODO: This should not be ADA-specific
-    = new LocalizedRequest<CreateUnsignedTxFunc>(this.api.ada.createUnsignedTx);
+    = new LocalizedRequest<CreateUnsignedTxFunc>(this.api.ada.createUnsignedTx.bind(this.api.ada));
 
   @observable memo: void | string;
 

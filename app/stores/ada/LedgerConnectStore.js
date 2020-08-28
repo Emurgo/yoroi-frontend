@@ -10,11 +10,11 @@ import Config from '../../config';
 
 import Store from '../base/Store';
 import LocalizedRequest from '../lib/LocalizedRequest';
+import { ROUTES } from '../../routes-config';
 
 import type {
   CreateHardwareWalletRequest,
   CreateHardwareWalletFunc,
-  TransferToCip1852Func,
 } from '../../api/ada';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 
@@ -68,10 +68,6 @@ export default class LedgerConnectStore
   @observable progressInfo: ProgressInfo;
   @observable derivationIndex: number = HARD_DERIVATION_START + 0; // assume single account
   @observable mode: void | RestoreModeType;
-  @observable transferRequest: LocalizedRequest<TransferToCip1852Func>
-    = new LocalizedRequest<TransferToCip1852Func>(
-      this.api.ada.transferToCip1852.bind(this.api.ada)
-    );
   error: ?LocalizableError;
   hwDeviceInfo: ?HWDeviceInfo;
   ledgerConnect: ?LedgerConnect;
@@ -105,6 +101,7 @@ export default class LedgerConnectStore
     ledgerConnectAction.goBackToCheck.listen(this._goBackToCheck);
     ledgerConnectAction.submitConnect.listen(this._submitConnect);
     ledgerConnectAction.submitSave.listen(this._submitSave);
+    ledgerConnectAction.finishTransfer.listen(this._finishTransfer);
     ledgerConnectAction.setMode.listen((mode) => runInAction(() => { this.mode = mode; }));
   }
 
@@ -118,7 +115,6 @@ export default class LedgerConnectStore
     this.teardown();
     this.ledgerConnect && this.ledgerConnect.dispose();
     this.ledgerConnect = undefined;
-    this.transferRequest.reset();
   };
 
   teardown(): void {
@@ -135,7 +131,13 @@ export default class LedgerConnectStore
 
     this.error = undefined;
     this.hwDeviceInfo = undefined;
-    this.transferRequest.reset();
+    this.stores.substores.ada.yoroiTransfer.transferRequest.reset();
+  };
+
+  @action _openTransferDialog: void => void = () => {
+    this.error = undefined;
+    this.progressInfo.currentStep = ProgressStep.TRANSFER;
+    this.progressInfo.stepState = StepState.PROCESS;
   };
 
   // =================== CHECK =================== //
@@ -208,24 +210,28 @@ export default class LedgerConnectStore
     );
     const timeToSlot = await genTimeToSlot(fullConfig);
 
-    const transferTx = await this.transferRequest.execute({
-      cip1852AccountPubKey,
-      bip44AccountPubKey,
-      accountIndex: this.derivationIndex,
-      checkAddressesInUse: stateFetcher.checkAddressesInUse,
-      getUTXOsForAddresses: stateFetcher.getUTXOsForAddresses,
-      absSlotNumber: new BigNumber(timeToSlot({ time: new Date() }).slot),
-      network: selectedNetwork,
-    }).promise;
-    if (!transferTx) throw new Error('Restored wallet was not received correctly');
+    try {
+      await this.stores.substores.ada.yoroiTransfer.transferRequest.execute({
+        cip1852AccountPubKey,
+        bip44AccountPubKey,
+        accountIndex: this.derivationIndex,
+        checkAddressesInUse: stateFetcher.checkAddressesInUse,
+        getUTXOsForAddresses: stateFetcher.getUTXOsForAddresses,
+        absSlotNumber: new BigNumber(timeToSlot({ time: new Date() }).slot),
+        network: selectedNetwork,
+      }).promise;
+    } catch (_e) {
+      // usually this means no internet connection or not enough ADA to upgrade
+      // so we just ignore this case
+    }
   }
 
   _checkAndStoreHWDeviceInfo: void => Promise<void> = async () => {
-    this.transferRequest.reset();
+    this.stores.substores.ada.yoroiTransfer.transferRequest.reset();
     const accountPath = this.getPath();
     try {
-      const cip1852Response = await this._getPublicKey({ path: accountPath });
-      this.hwDeviceInfo = cip1852Response;
+      const pubKeyResponse = await this._getPublicKey({ path: accountPath });
+      this.hwDeviceInfo = pubKeyResponse;
 
       // if restoring a Shelley wallet, check if there is any Byron balance
       if (accountPath[0] === WalletTypePurpose.CIP1852) {
@@ -235,15 +241,14 @@ export default class LedgerConnectStore
         const bip44Response = await this._getPublicKey({ path: bip44Path });
         await this._generateTransferTx(
           bip44Response.publicMasterKey,
-          cip1852Response.publicMasterKey,
+          pubKeyResponse.publicMasterKey, // cip1852
         );
       }
+      this._goToSaveLoad();
+      Logger.info('Ledger device OK');
     } catch (error) {
       this._handleConnectError(error);
     }
-
-    this._goToSaveLoad();
-    Logger.info('Ledger device OK');
   };
 
   _normalizeHWResponse: ExtendedPublicKeyResp => HWDeviceInfo = (
@@ -408,14 +413,34 @@ export default class LedgerConnectStore
 
   async _onSaveSuccess(publicDeriver: PublicDeriver<>): Promise<void> {
     // close the active dialog
-    Logger.debug(`${nameof(LedgerConnectStore)}::${nameof(this._onSaveSuccess)} success, closing dialog`);
-    this.actions.dialogs.closeActiveDialog.trigger();
+    Logger.debug(`${nameof(LedgerConnectStore)}::${nameof(this._onSaveSuccess)} success`);
+    if (this.stores.substores.ada.yoroiTransfer.transferRequest.result == null) {
+      this.actions.dialogs.closeActiveDialog.trigger();
+    }
 
-    const { wallets } = this.stores;
-    await wallets.addHwWallet(publicDeriver);
+    await this.stores.wallets.addHwWallet(publicDeriver);
+    this.actions.wallets.setActiveWallet.trigger({
+      wallet: publicDeriver
+    });
+    if (this.stores.substores.ada.yoroiTransfer.transferRequest.result == null) {
+      this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ROOT });
+
+      // show success notification
+      this.stores.wallets.showLedgerWalletIntegratedNotification();
+
+      this.teardown();
+      Logger.info('SUCCESS: Ledger Connected Wallet created and loaded');
+    } else {
+      this._openTransferDialog();
+    }
+  }
+
+  _finishTransfer: void => void = () => {
+    this.actions.dialogs.closeActiveDialog.trigger();
+    this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ROOT });
 
     // show success notification
-    wallets.showLedgerWalletIntegratedNotification();
+    this.stores.wallets.showLedgerWalletIntegratedNotification();
 
     this.teardown();
     Logger.info('SUCCESS: Ledger Connected Wallet created and loaded');

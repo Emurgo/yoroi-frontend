@@ -287,10 +287,6 @@ export default class WalletStore extends Store {
     this._queueWarningIfNeeded(withCache);
     runInAction(() => {
       this.publicDerivers.push(withCache);
-      this._setActiveWallet({
-        wallet: withCache
-      });
-      this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ROOT });
     });
   }
 

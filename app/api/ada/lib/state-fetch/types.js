@@ -132,7 +132,7 @@ export type RemoteUnspentOutput = {|
   +tx_index: number,
   +receiver: string,
   +amount: string,
-  +block_num: number,
+  // +block_num: number,
 |};
 
 export type RemoteWithdrawal = {|

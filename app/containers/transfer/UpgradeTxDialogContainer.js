@@ -3,12 +3,15 @@ import React, { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { computed, } from 'mobx';
+import { defineMessages, intlShape } from 'react-intl';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import LocalizableError from '../../i18n/LocalizableError';
 import type { ISignRequest } from '../../api/common/lib/transactions/ISignRequest';
 import TransferSendPage from './TransferSendPage';
 import type { GeneratedData as TransferSendData } from './TransferSendPage';
 import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
+import globalMessages from '../../i18n/global-messages';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 export type GeneratedData = typeof UpgradeTxDialogContainer.prototype.generated;
 
@@ -17,15 +20,38 @@ type Props = {|
   +onClose: void => void,
 |};
 
+const messages = defineMessages({
+  explanation: {
+    id: 'upgradetx.explanation',
+    defaultMessage: '!!!We found some ADA in your Byron-era wallet. Would you like to transfer it to your new Shelley wallet?',
+  },
+});
+
 @observer
 export default class UpgradeTxDialogContainer extends Component<Props> {
 
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+    intl: intlShape.isRequired,
+  };
+
   render(): Node {
-    const { transferRequest } = this.generated.stores.substores.ada.ledgerConnect;
+    const { intl } = this.context;
+    const { transferRequest } = this.generated.stores.substores.ada.yoroiTransfer;
+
+    const header = (
+      <div>
+        {intl.formatMessage(messages.explanation)}
+        <br /><br />
+      </div>
+    );
     return (
       <TransferSendPage
         {...this.generated.TransferSendProps}
-        onClose={this.props.onClose}
+        header={header}
+        onClose={{
+          trigger: this.props.onClose,
+          label: intl.formatMessage(globalMessages.skipLabel),
+        }}
         transactionRequest={transferRequest}
         toTransferTx={tentativeTx => {
           if (!(tentativeTx instanceof HaskellShelleyTxSignRequest)) {
@@ -51,7 +77,7 @@ export default class UpgradeTxDialogContainer extends Component<Props> {
     stores: {|
       substores: {|
         ada: {|
-          ledgerConnect: {|
+          yoroiTransfer: {|
             transferRequest: {|
               reset: void => void,
               error: ?LocalizableError,
@@ -76,11 +102,11 @@ export default class UpgradeTxDialogContainer extends Component<Props> {
       stores: {
         substores: {
           ada: {
-            ledgerConnect: {
+            yoroiTransfer: {
               transferRequest: {
-                error: stores.substores.ada.ledgerConnect.transferRequest.error,
-                result: stores.substores.ada.ledgerConnect.transferRequest.result,
-                reset: stores.substores.ada.ledgerConnect.transferRequest.reset,
+                error: stores.substores.ada.yoroiTransfer.transferRequest.error,
+                result: stores.substores.ada.yoroiTransfer.transferRequest.result,
+                reset: stores.substores.ada.yoroiTransfer.transferRequest.reset,
               },
             },
           },

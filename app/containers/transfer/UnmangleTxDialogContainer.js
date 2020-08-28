@@ -17,6 +17,9 @@ import type { IAddressTypeStore, IAddressTypeUiSubset } from '../../stores/state
 import type { ISignRequest } from '../../api/common/lib/transactions/ISignRequest';
 import TransferSendPage from './TransferSendPage';
 import type { GeneratedData as TransferSendData } from './TransferSendPage';
+import globalMessages from '../../i18n/global-messages';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { intlShape, } from 'react-intl';
 
 declare var CONFIG: ConfigType;
 
@@ -29,6 +32,10 @@ type Props = {|
 
 @observer
 export default class UnmangleTxDialogContainer extends Component<Props> {
+
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+    intl: intlShape.isRequired,
+  };
 
   componentDidMount() {
     const selected = this.generated.stores.wallets.selected;
@@ -64,11 +71,15 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
   }
 
   render(): Node {
+    const { intl } = this.context;
     const txBuilder = this.generated.stores.transactionBuilderStore;
     return (
       <TransferSendPage
         {...this.generated.TransferSendProps}
-        onClose={this.props.onClose}
+        onClose={{
+          trigger: this.props.onClose,
+          label: intl.formatMessage(globalMessages.cancel),
+        }}
         transactionRequest={{
           error: txBuilder.setupSelfTx.error,
           result: txBuilder.tentativeTx,

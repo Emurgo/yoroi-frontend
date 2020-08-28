@@ -50,13 +50,17 @@ type Props = {|
   +transferTx: TransferTx,
   +onSubmit: void => PossiblyAsync<void>,
   +isSubmitting: boolean,
-  +onCancel: void => void,
+  +onCancel: {|
+    +trigger: void => void,
+    +label: string,
+  |},
   +error: ?LocalizableError,
   +form: ?Node,
   +unitOfAccountSetting: UnitOfAccountSettingType,
   +coinPrice: ?number,
   +addressToDisplayString: string => string,
   +addressLookup: ReturnType<typeof genAddressLookup>,
+  +header?: Node,
 |};
 
 /** Show user what the transfer would do to get final confirmation */
@@ -67,12 +71,16 @@ export default class TransferSummaryPage extends Component<Props> {
     intl: intlShape.isRequired
   };
 
+  static defaultProps: {|header: void|} = {
+    header: undefined
+  };
+
   wrapInDialog: Node => Node = (content) => {
     const { intl } = this.context;
     const actions = [
       {
-        label: intl.formatMessage(globalMessages.backButtonLabel),
-        onClick: this.props.onCancel,
+        label: this.props.onCancel.label,
+        onClick: this.props.onCancel.trigger,
         className: classnames(['cancelTransferButton']),
         disabled: this.props.isSubmitting,
       },
@@ -90,7 +98,7 @@ export default class TransferSummaryPage extends Component<Props> {
         title={this.props.dialogTitle}
         actions={actions}
         closeButton={<DialogCloseButton />}
-        onClose={this.props.onCancel}
+        onClose={this.props.onCancel.trigger}
         closeOnOverlayClick={false}
       >
         {content}
@@ -243,6 +251,7 @@ export default class TransferSummaryPage extends Component<Props> {
 
     return this.wrapInDialog(
       <div className={styles.body}>
+        {this.props.header}
         {this.getHeader()}
         {transferTx.id != null && (this._getTxIdNode(transferTx.id))}
 

@@ -15,7 +15,11 @@ import {
   ChainDerivations,
   CoinTypes,
 } from '../../config/numbersConfig';
-import type { RestoreWalletForTransferResponse, RestoreWalletForTransferFunc } from '../../api/ada/index';
+import type {
+  RestoreWalletForTransferResponse,
+  RestoreWalletForTransferFunc,
+  TransferToCip1852Func,
+} from '../../api/ada/index';
 import {
   Bip44DerivationLevels,
 } from '../../api/ada/lib/storage/database/walletTypes/bip44/api/utils';
@@ -31,6 +35,10 @@ export default class AdaYoroiTransferStore extends Store {
 
   @observable restoreForTransferRequest: Request<RestoreWalletForTransferFunc>
     = new Request(this.api.ada.restoreWalletForTransfer);
+  @observable transferRequest: Request<TransferToCip1852Func>
+    = new Request<TransferToCip1852Func>(
+      this.api.ada.transferToCip1852.bind(this.api.ada)
+    );
 
   _restoreWalletForTransfer: (string, number) => Promise<RestoreWalletForTransferResponse> = async (
     recoveryPhrase,

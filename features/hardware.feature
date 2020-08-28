@@ -36,6 +36,7 @@ Feature: Hardware device
     # test restoration
     When I select a Shelley-era Ledger device
     And I restore the Ledger device
+    And I click skip the transfer
     Then I should see the summary screen
     Then I should see a plate KHDC-5476
     # test sending
@@ -55,6 +56,15 @@ Feature: Hardware device
     Then I see the verification address "addr1qx7ef2pmnrl3ejempwfnn920ukm2rftj7untkcgsvulrgzc0vckke6cmv4en56dpa4e0smct43dpv5z6q2yf0tcmudzst5ydks"
     And I see the derivation path "m/1852'/1815'/0'/0/1"
     Then I verify the address on my ledger device
+
+  @it-138
+  Scenario: Test Shelley Ledger upgrade transaction (IT-138)
+    # test restoration
+    When I select a Shelley-era Ledger device
+    And I restore the Ledger device
+    And I accept the prompt
+    Then I should see the summary screen
+    And I should see 1 pending transactions
 
    @it-100
    Scenario: Test Shelley Ledger delegation (IT-100)

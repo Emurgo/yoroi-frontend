@@ -245,7 +245,10 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
             }
             onSubmit={this.transferFunds}
             isSubmitting={stores.wallets.sendMoneyRequest.isExecuting}
-            onCancel={this.cancelTransferFunds}
+            onCancel={{
+              label: intl.formatMessage(globalMessages.cancel),
+              trigger: this.cancelTransferFunds
+            }}
             error={yoroiTransfer.error}
             dialogTitle={intl.formatMessage(globalMessages.walletSendConfirmationDialogTitle)}
             coinPrice={coinPrice}

@@ -17,6 +17,9 @@ import {
 import LocalizableError from '../../../i18n/LocalizableError';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 import { ROUTES } from '../../../routes-config';
+import { buildCheckAndCall } from '../../lib/check';
+import { getApiForNetwork, ApiOptions } from '../../../api/common/utils';
+import { HaskellShelleyTxSignRequest } from '../../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 
 /** Note: Handles Trezor Signing */
 export default class TrezorSendStore extends Store {
@@ -31,9 +34,18 @@ export default class TrezorSendStore extends Store {
   setup(): void {
     super.setup();
     const trezorSendAction = this.actions.ada.trezorSend;
-    trezorSendAction.sendUsingTrezor.listen(this._sendWrapper);
-    trezorSendAction.cancel.listen(this._cancel);
-    trezorSendAction.reset.listen(this._reset);
+
+    const { syncCheck, asyncCheck } = buildCheckAndCall(
+      ApiOptions.ada,
+      () => {
+        if (this.stores.profile.selectedNetwork == null) return undefined;
+        return getApiForNetwork(this.stores.profile.selectedNetwork);
+      }
+    );
+
+    trezorSendAction.sendUsingTrezor.listen(asyncCheck(this._sendWrapper));
+    trezorSendAction.cancel.listen(syncCheck(this._cancel));
+    trezorSendAction.reset.listen(syncCheck(this._reset));
   }
 
   _reset: void => void = () => {
@@ -50,6 +62,10 @@ export default class TrezorSendStore extends Store {
         // this Error will be converted to LocalizableError()
         throw new Error('Can’t send another transaction if one transaction is in progress.');
       }
+      if (!(request.params.signRequest instanceof HaskellShelleyTxSignRequest)) {
+        throw new Error(`${nameof(this._sendWrapper)} wrong tx sign request`);
+      }
+      const { signRequest } = request.params;
 
       this._setError(null);
       this._setActionProcessing(true);
@@ -57,7 +73,7 @@ export default class TrezorSendStore extends Store {
       await this.stores.substores.ada.wallets.adaSendAndRefresh({
         broadcastRequest: {
           trezor: {
-            signRequest: request.params.signRequest,
+            signRequest,
             publicDeriver: request.publicDeriver,
           },
         },
@@ -77,7 +93,9 @@ export default class TrezorSendStore extends Store {
   }
 
   signAndBroadcast: {|
-    params: SendUsingTrezorParams,
+    params: {|
+      signRequest: HaskellShelleyTxSignRequest,
+    |},
     publicDeriver: PublicDeriver<>,
   |} => Promise<{| txId: string |}> = async (request) => {
     try {

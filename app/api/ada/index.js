@@ -12,6 +12,7 @@ import CardanoShelleyTransaction from '../../domain/CardanoShelleyTransaction';
 import {
   HARD_DERIVATION_START,
   WalletTypePurpose,
+  CoinTypes,
   ChainDerivations,
   STAKING_KEY_INDEX,
 } from '../../config/numbersConfig';
@@ -1540,64 +1541,78 @@ export default class AdaApi {
   async transferToCip1852(
     request: TransferToCip1852Request
   ): Promise<TransferToCip1852Response> {
-    const bip44Addresses = await this.restoreWalletForTransfer({
-      accountPubKey: request.bip44AccountPubKey,
-      accountIndex: request.accountIndex,
-      checkAddressesInUse: request.checkAddressesInUse,
-      transferSource: 'bip44',
-      network: request.network,
-    });
+    try {
+      const bip44Addresses = await this.restoreWalletForTransfer({
+        accountPubKey: request.bip44AccountPubKey,
+        accountIndex: request.accountIndex,
+        checkAddressesInUse: request.checkAddressesInUse,
+        transferSource: 'bip44',
+        network: request.network,
+      });
 
-    // it's possible that wallet software created the Shelley wallet off the bip44 path
-    // instead of the cip1852 path like required in the CIP1852 spec
-    // so just in case, we check these addresses also
-    const wrongCip1852Addresses = await this.restoreWalletForTransfer({
-      accountPubKey: request.bip44AccountPubKey,
-      accountIndex: request.accountIndex,
-      checkAddressesInUse: request.checkAddressesInUse,
-      transferSource: 'cip1852',
-      network: request.network,
-    });
+      // it's possible that wallet software created the Shelley wallet off the bip44 path
+      // instead of the cip1852 path like required in the CIP1852 spec
+      // so just in case, we check these addresses also
+      const wrongCip1852Addresses = await this.restoreWalletForTransfer({
+        accountPubKey: request.bip44AccountPubKey,
+        accountIndex: request.accountIndex,
+        checkAddressesInUse: request.checkAddressesInUse,
+        transferSource: 'cip1852',
+        network: request.network,
+      });
 
-    const firstInternalPayment = request
-      .cip1852AccountPubKey
-      .derive(ChainDerivations.INTERNAL)
-      .derive(0)
-      .to_raw_key()
-      .hash();
-    const stakingKey = request
-      .cip1852AccountPubKey
-      .derive(ChainDerivations.CHIMERIC_ACCOUNT)
-      .derive(0)
-      .to_raw_key()
-      .hash();
+      const firstInternalPayment = request
+        .cip1852AccountPubKey
+        .derive(ChainDerivations.INTERNAL)
+        .derive(0)
+        .to_raw_key()
+        .hash();
+      const stakingKey = request
+        .cip1852AccountPubKey
+        .derive(ChainDerivations.CHIMERIC_ACCOUNT)
+        .derive(0)
+        .to_raw_key()
+        .hash();
 
-    const config = getCardanoHaskellBaseConfig(
-      request.network
-    ).reduce((acc, next) => Object.assign(acc, next), {});
+      const config = getCardanoHaskellBaseConfig(
+        request.network
+      ).reduce((acc, next) => Object.assign(acc, next), {});
 
-    const chainNetworkId = Number.parseInt(config.ChainNetworkId, 10);
-    const receiveAddress = RustModule.WalletV4.BaseAddress.new(
-      chainNetworkId,
-      RustModule.WalletV4.StakeCredential.from_keyhash(firstInternalPayment),
-      RustModule.WalletV4.StakeCredential.from_keyhash(stakingKey),
-    );
+      const chainNetworkId = Number.parseInt(config.ChainNetworkId, 10);
+      const receiveAddress = RustModule.WalletV4.BaseAddress.new(
+        chainNetworkId,
+        RustModule.WalletV4.StakeCredential.from_keyhash(firstInternalPayment),
+        RustModule.WalletV4.StakeCredential.from_keyhash(stakingKey),
+      );
 
-    const utxos = await toSenderUtxos({
-      addresses: [
+      const addresses = [
         ...bip44Addresses.addresses,
         ...wrongCip1852Addresses.addresses,
-      ],
-      getUTXOsForAddresses: request.getUTXOsForAddresses,
-    });
+      ].map(address => ({
+        address: address.address,
+        addressing: {
+          // add the missing addressing information
+          path: [WalletTypePurpose.BIP44, CoinTypes.CARDANO, ...address.addressing.path],
+          startLevel: Bip44DerivationLevels.PURPOSE.level,
+        }
+      }));
+      const utxos = await toSenderUtxos({
+        addresses,
+        getUTXOsForAddresses: request.getUTXOsForAddresses,
+      });
 
-    return this.createUnsignedTxForUtxos({
-      absSlotNumber: request.absSlotNumber,
-      receiver: Buffer.from(receiveAddress.to_address().to_bytes()).toString('hex'),
-      network: request.network,
-      shouldSendAll: true,
-      utxos,
-    });
+      return this.createUnsignedTxForUtxos({
+        absSlotNumber: request.absSlotNumber,
+        receiver: Buffer.from(receiveAddress.to_address().to_bytes()).toString('hex'),
+        network: request.network,
+        shouldSendAll: true,
+        utxos,
+      });
+    } catch (error) {
+      Logger.error(`${nameof(this.transferToCip1852)} error: ` + stringifyError(error));
+      if (error instanceof LocalizableError) throw error;
+      throw new GenericApiError();
+    }
   }
 
   async createHardwareWallet(
