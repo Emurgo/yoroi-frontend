@@ -232,6 +232,13 @@ const genBaseProps: {|
                   trigger: async (req) => action('sendMoney')(req),
                 },
               },
+              ada: {
+                ledgerSend: {
+                  sendUsingLedger: {
+                    trigger: async (req) => action('sendUsingLedger')(req),
+                  },
+                },
+              },
             },
             stores: {
               addresses: {

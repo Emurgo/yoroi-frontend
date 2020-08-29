@@ -150,7 +150,7 @@ export default class SeizaFetcher extends Component<Props> {
         return 'firefox&mozId=' + location.hostname;
       }
       // otherwise assume Chrome
-      // $FlowFixMe
+      // $FlowFixMe[cannot-resolve-name]
       return 'chrome&chromeId=' + chrome.runtime.id;
     }
 

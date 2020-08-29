@@ -13,6 +13,8 @@ import {
   HARD_DERIVATION_START,
   WalletTypePurpose,
   CoinTypes,
+  ChainDerivations,
+  STAKING_KEY_INDEX,
 } from '../../config/numbersConfig';
 import type {
   Network,
@@ -66,6 +68,7 @@ import type {
   IGetAllUtxosResponse,
   IHasUtxoChains, IHasUtxoChainsRequest,
   Address, Addressing, UsedStatus, Value,
+  BaseSingleAddressPath,
 } from './lib/storage/models/PublicDeriver/interfaces';
 import type {
   BaseGetTransactionsRequest,
@@ -117,8 +120,10 @@ import {
 import LocalizableError from '../../i18n/LocalizableError';
 import { scanBip44Account, } from '../common/lib/restoration/bip44';
 import { v2genAddressBatchFunc, } from './restoration/byron/scan';
+import { scanShelleyCip1852Account } from './restoration/shelley/scan';
 import type {
   V4UnsignedTxAddressedUtxoResponse,
+  AddressedUtxo,
 } from './transactions/types';
 import { HaskellShelleyTxSignRequest, } from './transactions/shelley/HaskellShelleyTxSignRequest';
 import type { SignTransactionRequest } from '@emurgo/ledger-connect-handler';
@@ -131,9 +136,11 @@ import type {
   BestBlockFunc,
   SignedRequest,
   AccountStateFunc,
+  AddressUtxoFunc,
 } from './lib/state-fetch/types';
 import type {
   FilterFunc,
+
 } from '../common/lib/state-fetch/currencySpecificTypes';
 import {
   getChainAddressesForDisplay,
@@ -160,6 +167,9 @@ import type { NetworkRow } from './lib/storage/database/primitives/tables';
 import {
   getCardanoHaskellBaseConfig,
 } from './lib/storage/database/prepackaged/networks';
+import {
+  toSenderUtxos,
+} from './transactions/transfer/utils';
 
 // ADA specific Request / Response params
 
@@ -316,10 +326,31 @@ export type CreateUnsignedTxRequest = {|
   |}),
 |};
 export type CreateUnsignedTxResponse = HaskellShelleyTxSignRequest;
-
 export type CreateUnsignedTxFunc = (
   request: CreateUnsignedTxRequest
 ) => Promise<CreateUnsignedTxResponse>;
+
+// createUnsignedTxForUtxos
+
+export type CreateUnsignedTxForUtxosRequest = {|
+  absSlotNumber: BigNumber,
+  receiver: string,
+  network: $ReadOnly<NetworkRow>,
+  ...{|
+    amount: string,
+    internal: {|
+      addressInfo: BaseSingleAddressPath,
+      index: number
+    |},
+  |} | {|
+    shouldSendAll: true,
+  |},
+  utxos: Array<AddressedUtxo>,
+|};
+export type CreateUnsignedTxForUtxosResponse = HaskellShelleyTxSignRequest;
+export type CreateUnsignedTxForUtxosFunc = (
+  request: CreateUnsignedTxForUtxosRequest
+) => Promise<CreateUnsignedTxForUtxosResponse>;
 
 // createDelegationTx
 
@@ -412,19 +443,35 @@ export type GenerateWalletRecoveryPhraseFunc = (
 // restoreWalletForTransfer
 
 export type RestoreWalletForTransferRequest = {|
-  rootPk: RustModule.WalletV4.Bip32PrivateKey,
+  accountPubKey: RustModule.WalletV4.Bip32PublicKey,
   transferSource: 'cip1852' | 'bip44',
   accountIndex: number,
   checkAddressesInUse: FilterFunc,
   network: $ReadOnly<NetworkRow>,
 |};
 export type RestoreWalletForTransferResponse = {|
-  masterKey: string,
   addresses: Array<{| ...Address, ...Addressing |}>,
 |};
 export type RestoreWalletForTransferFunc = (
   request: RestoreWalletForTransferRequest
 ) => Promise<RestoreWalletForTransferResponse>;
+
+// transferToCip1852
+
+export type TransferToCip1852Request = {|
+  cip1852AccountPubKey: RustModule.WalletV4.Bip32PublicKey,
+  bip44AccountPubKey: RustModule.WalletV4.Bip32PublicKey,
+  accountIndex: number,
+  checkAddressesInUse: FilterFunc,
+  absSlotNumber: BigNumber,
+  getUTXOsForAddresses: AddressUtxoFunc,
+  network: $ReadOnly<NetworkRow>,
+|};
+export type TransferToCip1852Response = CreateUnsignedTxResponse;
+export type TransferToCip1852Func = (
+  request: TransferToCip1852Request
+) => Promise<TransferToCip1852Response>;
+
 
 // createHardwareWallet
 
@@ -854,14 +901,14 @@ export default class AdaApi {
     }
   }
 
-  async createUnsignedTx(
-    request: CreateUnsignedTxRequest
-  ): Promise<CreateUnsignedTxResponse> {
-    Logger.debug(`${nameof(AdaApi)}::${nameof(this.createUnsignedTx)} called`);
+  async createUnsignedTxForUtxos(
+    request: CreateUnsignedTxForUtxosRequest
+  ): Promise<CreateUnsignedTxForUtxosResponse> {
+    Logger.debug(`${nameof(AdaApi)}::${nameof(this.createUnsignedTxForUtxos)} called`);
     const { receiver, } = request;
     try {
       const config = getCardanoHaskellBaseConfig(
-        request.publicDeriver.getParent().getNetworkInfo()
+        request.network
       ).reduce((acc, next) => Object.assign(acc, next), {});
 
       const protocolParams = {
@@ -874,25 +921,17 @@ export default class AdaApi {
         poolDeposit: RustModule.WalletV4.BigNum.from_str(config.PoolDeposit),
       };
 
-      const utxos = await request.publicDeriver.getAllUtxos();
-      const filteredUtxos = utxos.filter(utxo => request.filter(utxo));
-
-      const addressedUtxo = shelleyAsAddressedUtxo(filteredUtxos);
-
       let unsignedTxResponse;
-      if (request.shouldSendAll != null) {
+      if (request.shouldSendAll) {
         unsignedTxResponse = shelleySendAllUnsignedTx(
           receiver,
-          addressedUtxo,
+          request.utxos,
           request.absSlotNumber,
           protocolParams
         );
-      } else if (request.amount != null) {
+      } else {
         const amount = request.amount;
-        const nextUnusedInternal = await request.publicDeriver.nextInternal();
-        if (nextUnusedInternal.addressInfo == null) {
-          throw new Error(`${nameof(this.createUnsignedTx)} no internal addresses left. Should never happen`);
-        }
+        const nextUnusedInternal = request.internal;
         const changeAddr = nextUnusedInternal.addressInfo;
         unsignedTxResponse = shelleyNewAdaUnsignedTx(
           [{ address: receiver, amount }],
@@ -900,18 +939,16 @@ export default class AdaApi {
             address: changeAddr.addr.Hash,
             addressing: changeAddr.addressing,
           },
-          addressedUtxo,
+          request.utxos,
           request.absSlotNumber,
           protocolParams,
           [],
           [],
           false,
         );
-      } else {
-        throw new Error(`${nameof(this.createUnsignedTx)} unknown param`);
       }
       Logger.debug(
-        `${nameof(AdaApi)}::${nameof(this.createUnsignedTx)} success: ` + stringifyData(unsignedTxResponse)
+        `${nameof(AdaApi)}::${nameof(this.createUnsignedTxForUtxos)} success: ` + stringifyData(unsignedTxResponse)
       );
       return new HaskellShelleyTxSignRequest(
         {
@@ -933,11 +970,43 @@ export default class AdaApi {
       );
     } catch (error) {
       Logger.error(
-        `${nameof(AdaApi)}::${nameof(this.createUnsignedTx)} error: ` + stringifyError(error)
+        `${nameof(AdaApi)}::${nameof(this.createUnsignedTxForUtxos)} error: ` + stringifyError(error)
       );
       if (error instanceof LocalizableError) throw error;
       throw new GenericApiError();
     }
+  }
+
+  async createUnsignedTx(
+    request: CreateUnsignedTxRequest
+  ): Promise<CreateUnsignedTxResponse> {
+    const utxos = await request.publicDeriver.getAllUtxos();
+    const filteredUtxos = utxos.filter(utxo => request.filter(utxo));
+
+    const addressedUtxo = shelleyAsAddressedUtxo(filteredUtxos);
+
+    const amountInfo = request.shouldSendAll
+      ? { shouldSendAll: request.shouldSendAll }
+      : await (async () => {
+        const internal = await request.publicDeriver.nextInternal();
+        if (internal.addressInfo == null) {
+          throw new Error(`${nameof(this.createUnsignedTx)} no internal addresses left. Should never happen`);
+        }
+        return {
+          amount: request.amount,
+          internal: {
+            addressInfo: internal.addressInfo,
+            index: internal.index,
+          },
+        };
+      })();
+    return this.createUnsignedTxForUtxos({
+      absSlotNumber: request.absSlotNumber,
+      receiver: request.receiver,
+      network: request.publicDeriver.getParent().getNetworkInfo(),
+      utxos: addressedUtxo,
+      ...amountInfo,
+    });
   }
 
   async createDelegationTx(
@@ -1354,7 +1423,7 @@ export default class AdaApi {
     request: RestoreWalletForTransferRequest
   ): Promise<RestoreWalletForTransferResponse> {
     Logger.debug(`${nameof(AdaApi)}::${nameof(this.restoreWalletForTransfer)} called`);
-    const { rootPk, checkAddressesInUse } = request;
+    const { checkAddressesInUse } = request;
 
     const config = getCardanoHaskellBaseConfig(
       request.network
@@ -1366,13 +1435,6 @@ export default class AdaApi {
       // and we need keep a globally unique index
       const reverseAddressLookup = new Map<number, Array<string>>();
       const foundAddresses = new Set<string>();
-
-      const accountKey = rootPk
-        .derive(request.transferSource === 'cip1852'
-          ? WalletTypePurpose.CIP1852
-          : WalletTypePurpose.BIP44)
-        .derive(CoinTypes.CARDANO)
-        .derive(request.accountIndex);
 
       const addByHash = (address) => {
         if (!foundAddresses.has(address.address.data)) {
@@ -1390,7 +1452,7 @@ export default class AdaApi {
       let insertTree;
       if (request.transferSource === 'bip44') {
         const key = RustModule.WalletV2.Bip44AccountPublic.new(
-          v4PublicToV2(accountKey.to_public()),
+          v4PublicToV2(request.accountPubKey),
           RustModule.WalletV2.DerivationScheme.v2(),
         );
         insertTree = await scanBip44Account({
@@ -1408,6 +1470,25 @@ export default class AdaApi {
           addByHash,
           type: CoreAddressTypes.CARDANO_LEGACY,
         });
+      } else if (request.transferSource === 'cip1852') {
+        const stakingKey = request.accountPubKey
+          .derive(ChainDerivations.CHIMERIC_ACCOUNT)
+          .derive(STAKING_KEY_INDEX)
+          .to_raw_key();
+
+        const cip1852InsertTree = await scanShelleyCip1852Account({
+          accountPublicKey: Buffer.from(request.accountPubKey.as_bytes()).toString('hex'),
+          lastUsedInternal: -1,
+          lastUsedExternal: -1,
+          checkAddressesInUse,
+          addByHash,
+          stakingKey,
+          chainNetworkId: Number.parseInt(config.ChainNetworkId, 10),
+        });
+
+        insertTree = cip1852InsertTree.filter(child => (
+          child.index === ChainDerivations.EXTERNAL || child.index === ChainDerivations.INTERNAL
+        ));
       } else {
         throw new Error(`${nameof(this.restoreWalletForTransfer)} unexpected wallet type ${request.transferSource}`);
       }
@@ -1439,7 +1520,6 @@ export default class AdaApi {
       Logger.debug(`${nameof(this.restoreWalletForTransfer)} success`);
 
       return {
-        masterKey: Buffer.from(rootPk.as_bytes()).toString('hex'),
         addresses: addressResult,
       };
     } catch (error) {
@@ -1453,6 +1533,83 @@ export default class AdaApi {
       if (error.message.includes('Wallet with that mnemonics already exists')) {
         throw new WalletAlreadyRestoredError();
       }
+      if (error instanceof LocalizableError) throw error;
+      throw new GenericApiError();
+    }
+  }
+
+  async transferToCip1852(
+    request: TransferToCip1852Request
+  ): Promise<TransferToCip1852Response> {
+    try {
+      const bip44Addresses = await this.restoreWalletForTransfer({
+        accountPubKey: request.bip44AccountPubKey,
+        accountIndex: request.accountIndex,
+        checkAddressesInUse: request.checkAddressesInUse,
+        transferSource: 'bip44',
+        network: request.network,
+      });
+
+      // it's possible that wallet software created the Shelley wallet off the bip44 path
+      // instead of the cip1852 path like required in the CIP1852 spec
+      // so just in case, we check these addresses also
+      const wrongCip1852Addresses = await this.restoreWalletForTransfer({
+        accountPubKey: request.bip44AccountPubKey,
+        accountIndex: request.accountIndex,
+        checkAddressesInUse: request.checkAddressesInUse,
+        transferSource: 'cip1852',
+        network: request.network,
+      });
+
+      const firstInternalPayment = request
+        .cip1852AccountPubKey
+        .derive(ChainDerivations.INTERNAL)
+        .derive(0)
+        .to_raw_key()
+        .hash();
+      const stakingKey = request
+        .cip1852AccountPubKey
+        .derive(ChainDerivations.CHIMERIC_ACCOUNT)
+        .derive(0)
+        .to_raw_key()
+        .hash();
+
+      const config = getCardanoHaskellBaseConfig(
+        request.network
+      ).reduce((acc, next) => Object.assign(acc, next), {});
+
+      const chainNetworkId = Number.parseInt(config.ChainNetworkId, 10);
+      const receiveAddress = RustModule.WalletV4.BaseAddress.new(
+        chainNetworkId,
+        RustModule.WalletV4.StakeCredential.from_keyhash(firstInternalPayment),
+        RustModule.WalletV4.StakeCredential.from_keyhash(stakingKey),
+      );
+
+      const addresses = [
+        ...bip44Addresses.addresses,
+        ...wrongCip1852Addresses.addresses,
+      ].map(address => ({
+        address: address.address,
+        addressing: {
+          // add the missing addressing information
+          path: [WalletTypePurpose.BIP44, CoinTypes.CARDANO, ...address.addressing.path],
+          startLevel: Bip44DerivationLevels.PURPOSE.level,
+        }
+      }));
+      const utxos = await toSenderUtxos({
+        addresses,
+        getUTXOsForAddresses: request.getUTXOsForAddresses,
+      });
+
+      return this.createUnsignedTxForUtxos({
+        absSlotNumber: request.absSlotNumber,
+        receiver: Buffer.from(receiveAddress.to_address().to_bytes()).toString('hex'),
+        network: request.network,
+        shouldSendAll: true,
+        utxos,
+      });
+    } catch (error) {
+      Logger.error(`${nameof(this.transferToCip1852)} error: ` + stringifyError(error));
       if (error instanceof LocalizableError) throw error;
       throw new GenericApiError();
     }

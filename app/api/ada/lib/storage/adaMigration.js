@@ -24,11 +24,13 @@ import {
 import { migrateFromStorageV1 } from './bridge/walletBuilder/byron';
 import { RustModule } from '../cardanoCrypto/rustLoader';
 import { removeAllTransactions } from './bridge/updateTransactions';
+import { removePublicDeriver } from './bridge/walletBuilder/remove';
 import {
   asHasLevels,
 } from './models/PublicDeriver/traits';
 import {
-  ConceptualWallet
+  ConceptualWallet,
+  isLedgerNanoWallet,
 } from './models/ConceptualWallet/index';
 import { loadWalletsFromStorage } from './models/load';
 import environment from '../../../../environment';
@@ -77,10 +79,21 @@ export async function migrateToLatest(
       return applied;
     }],
     ['<1.4.0', async () => await bip44Migration()],
-    ['<1.10.0', async () => await storagev2Migation(persistentDb)],
+    ['<1.10.0', async () => await storageV2Migration(persistentDb)],
     ['=1.10.0', async () => await cardanoTxHistoryReset(persistentDb)],
     ['>=2.0.0 <2.4.0', async () => await cardanoTxHistoryReset(persistentDb)],
     ['<3.0.0', async () => await removeLocalItem(legacyStorageKeys.SELECTED_EXPLORER_KEY)],
+    ['<3.3.0', async () => {
+      const txHistoryWasReset = await cardanoTxHistoryReset(persistentDb);
+      /**
+       * We remove all Ledger wallets for two reasons:
+       * 1) Some Ledger wallets were accidentally created as CIP1852 wallets using the BIP44 key
+       * 2) All Ledger wallets didn't have a serial number associated with them,
+       *    but now we can add one on wallet creation
+       */
+      const ledgerDeviceWasRemove = await removeLedgerDevices(persistentDb);
+      return txHistoryWasReset || ledgerDeviceWasRemove;
+    }],
   ];
 
   let appliedMigration = false;
@@ -179,12 +192,12 @@ async function bip44Migration(
  * This migrates to a new storage format to allow multiple wallets and different kinds of wallets
  * see v2 storage spec for more details
  */
-export async function storagev2Migation(
+export async function storageV2Migration(
   persistentDb: lf$Database,
 ): Promise<boolean> {
-  // all information in the v1 indexdb can be inferred from the blockchain
+  // all information in the v1 indexedDb can be inferred from the blockchain
   const hasEntries = await resetLegacy();
-  // in test environment we don't have historic indexdb values before this version
+  // in test environment we don't have historic indexedDb values before this version
   if (!hasEntries && !environment.isTest()) {
     return false;
   }
@@ -258,4 +271,27 @@ export async function cardanoTxHistoryReset(
   }
 
   return true;
+}
+
+async function removeLedgerDevices(
+  persistentDb: lf$Database,
+): Promise<boolean> {
+  const wallets = await loadWalletsFromStorage(persistentDb);
+  if (wallets.length === 0) {
+    return false;
+  }
+
+  let removedAWallet = false;
+  for (const publicDeriver of wallets) {
+    if (!isLedgerNanoWallet(publicDeriver.getParent())) {
+      continue;
+    }
+    // recall: at this time we didn't support multi-account
+    await removePublicDeriver({
+      publicDeriver,
+      conceptualWallet: publicDeriver.getParent(),
+    });
+    removedAWallet = true;
+  }
+  return removedAWallet;
 }

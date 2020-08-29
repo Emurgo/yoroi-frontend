@@ -1,9 +1,9 @@
 // @flow
 import React, { Component } from 'react';
-import BigNumber from 'bignumber.js';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { computed, } from 'mobx';
+import { defineMessages, intlShape } from 'react-intl';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import LocalizableError from '../../i18n/LocalizableError';
 import type { ISignRequest } from '../../api/common/lib/transactions/ISignRequest';
@@ -11,18 +11,25 @@ import TransferSendPage from './TransferSendPage';
 import type { GeneratedData as TransferSendData } from './TransferSendPage';
 import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 import globalMessages from '../../i18n/global-messages';
-import { intlShape, } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
-export type GeneratedData = typeof WithdrawalTxDialogContainer.prototype.generated;
+export type GeneratedData = typeof UpgradeTxDialogContainer.prototype.generated;
 
 type Props = {|
   ...InjectedOrGenerated<GeneratedData>,
   +onClose: void => void,
+  +onSubmit: void => void,
 |};
 
+const messages = defineMessages({
+  explanation: {
+    id: 'upgradetx.explanation',
+    defaultMessage: '!!!We found some ADA in your Byron-era wallet. Would you like to transfer it to your new Shelley wallet?',
+  },
+});
+
 @observer
-export default class WithdrawalTxDialogContainer extends Component<Props> {
+export default class UpgradeTxDialogContainer extends Component<Props> {
 
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
@@ -30,42 +37,39 @@ export default class WithdrawalTxDialogContainer extends Component<Props> {
 
   render(): Node {
     const { intl } = this.context;
-    const { createWithdrawalTx } = this.generated.stores.substores.ada.delegationTransaction;
+    const { transferRequest } = this.generated.stores.substores.ada.yoroiTransfer;
+
+    const header = (
+      <div>
+        {intl.formatMessage(messages.explanation)}
+        <br /><br />
+      </div>
+    );
     return (
       <TransferSendPage
         {...this.generated.TransferSendProps}
+        header={header}
+        onSubmit={{
+          trigger: this.props.onSubmit,
+          label: intl.formatMessage(globalMessages.upgradeLabel),
+        }}
         onClose={{
           trigger: this.props.onClose,
-          label: intl.formatMessage(globalMessages.cancel),
+          label: intl.formatMessage(globalMessages.skipLabel),
         }}
-        onSubmit={{
-          trigger: () => {}, // nothing extra to do
-          label: intl.formatMessage(globalMessages.confirm),
-        }}
-        transactionRequest={createWithdrawalTx}
+        transactionRequest={transferRequest}
         toTransferTx={tentativeTx => {
           if (!(tentativeTx instanceof HaskellShelleyTxSignRequest)) {
-            throw new Error(`${nameof(WithdrawalTxDialogContainer)} incorrect tx type`);
+            throw new Error(`${nameof(UpgradeTxDialogContainer)} incorrect tx type`);
           }
 
-          const deregistrationsMap = new Map(tentativeTx.keyDeregistrations(true).map(key => [
-            key.rewardAddress, key.refund
-          ]));
-          const withdrawals = tentativeTx.withdrawals(true);
           return {
-            recoveredBalance: withdrawals.reduce(
-              (sum, curr) => sum.plus(curr.amount),
-              new BigNumber(0)
-            ),
+            recoveredBalance: tentativeTx.totalInput(true),
             fee: tentativeTx.fee(true),
             senders: tentativeTx
               .uniqueSenderAddresses(),
             receivers: tentativeTx
               .receivers(true),
-            withdrawals: withdrawals.map(withdrawal => ({
-              ...withdrawal,
-              refund: deregistrationsMap.get(withdrawal.address) ?? new BigNumber(0),
-            })),
           };
         }}
       />
@@ -78,8 +82,8 @@ export default class WithdrawalTxDialogContainer extends Component<Props> {
     stores: {|
       substores: {|
         ada: {|
-          delegationTransaction: {|
-            createWithdrawalTx: {|
+          yoroiTransfer: {|
+            transferRequest: {|
               reset: void => void,
               error: ?LocalizableError,
               result: ?ISignRequest<any>
@@ -93,7 +97,7 @@ export default class WithdrawalTxDialogContainer extends Component<Props> {
       return this.props.generated;
     }
     if (this.props.stores == null || this.props.actions == null) {
-      throw new Error(`${nameof(WithdrawalTxDialogContainer)} no way to generated props`);
+      throw new Error(`${nameof(UpgradeTxDialogContainer)} no way to generated props`);
     }
     const { stores, actions } = this.props;
     return Object.freeze({
@@ -103,11 +107,11 @@ export default class WithdrawalTxDialogContainer extends Component<Props> {
       stores: {
         substores: {
           ada: {
-            delegationTransaction: {
-              createWithdrawalTx: {
-                error: stores.substores.ada.delegationTransaction.createWithdrawalTx.error,
-                result: stores.substores.ada.delegationTransaction.createWithdrawalTx.result,
-                reset: stores.substores.ada.delegationTransaction.createWithdrawalTx.reset,
+            yoroiTransfer: {
+              transferRequest: {
+                error: stores.substores.ada.yoroiTransfer.transferRequest.error,
+                result: stores.substores.ada.yoroiTransfer.transferRequest.result,
+                reset: stores.substores.ada.yoroiTransfer.transferRequest.reset,
               },
             },
           },

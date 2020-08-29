@@ -9,7 +9,7 @@ import oldStorageTrezor from '../../../../../../features/yoroi_snapshots/histori
 import oldStorageLedger from '../../../../../../features/yoroi_snapshots/historical-versions/1_9_0/ledger/localStorage.json';
 import { RustModule } from '../../cardanoCrypto/rustLoader';
 import { dumpByVersion, loadLovefieldDB } from '../database/index';
-import { storagev2Migation } from '../adaMigration';
+import { storageV2Migration } from '../adaMigration';
 import { mockDate, filterDbSnapshot } from '../../../../jestUtils';
 
 beforeAll(async () => {
@@ -26,7 +26,7 @@ async function baseTest(
   // need to fake having data in the legacy DB format for migration to trigger
   dumpByVersion.test = [];
 
-  await storagev2Migation(db);
+  await storageV2Migration(db);
 
   const keysForTest = [
     'ConceptualWallet',

@@ -54,6 +54,7 @@ export default class AddMemoDialog extends Component<Props, State> {
     isSubmitting: false,
   };
 
+  // $FlowFixMe[value-as-type]
   memoContentInput: Input;
 
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm({

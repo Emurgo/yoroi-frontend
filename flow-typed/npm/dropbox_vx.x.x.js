@@ -1152,13 +1152,13 @@ declare module 'dropbox' {
 //   * of templates will be returned).
 //   */
   declare interface DropboxTypes$file_properties$TemplateFilterBaseFilterSome {
-    // $FlowFixMe
+    // $FlowFixMe[unsupported-syntax]
     ".tag": "filter_some";
     filter_some: Array<DropboxTypes$file_properties$TemplateId>;
   }
 
   declare interface DropboxTypes$file_properties$TemplateFilterBaseOther {
-    // $FlowFixMe
+    // $FlowFixMe[unsupported-syntax]
     ".tag": "other";
   }
 
@@ -3003,7 +3003,7 @@ declare module 'dropbox' {
 //   * available yet.
 //   */
   declare interface DropboxTypes$files$MediaInfoPending {
-    // $FlowFixMe
+    // $FlowFixMe[unsupported-syntax]
     ".tag": "pending";
   }
 
@@ -3011,7 +3011,7 @@ declare module 'dropbox' {
 //   * The metadata for the photo/video.
 //   */
   declare interface DropboxTypes$files$MediaInfoMetadata {
-    // $FlowFixMe
+    // $FlowFixMe[unsupported-syntax]
     ".tag": "metadata";
     metadata:
       | DropboxTypes$files$PhotoMetadataReference
@@ -4552,7 +4552,7 @@ declare module 'dropbox' {
 //   * "document.txt" might become "document (2).txt".
 //   */
   declare interface DropboxTypes$files$WriteModeAdd {
-    // $FlowFixMe
+    // $FlowFixMe[unsupported-syntax]
     ".tag": "add";
   }
 
@@ -4561,7 +4561,7 @@ declare module 'dropbox' {
 //   * as it is for add.
 //   */
   declare interface DropboxTypes$files$WriteModeOverwrite {
-    // $FlowFixMe
+    // $FlowFixMe[unsupported-syntax]
     ".tag": "overwrite";
   }
 
@@ -4572,7 +4572,7 @@ declare module 'dropbox' {
 //   * copy).txt" or "document (Panda's conflicted copy).txt".
 //   */
   declare interface DropboxTypes$files$WriteModeUpdate {
-    // $FlowFixMe
+    // $FlowFixMe[unsupported-syntax]
     ".tag": "update";
     update: DropboxTypes$files$Rev;
   }

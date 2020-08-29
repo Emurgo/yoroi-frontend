@@ -11,6 +11,8 @@ import { handleExternalLinkClick } from '../../../utils/routing';
 import CheckDialog from '../../../components/wallet/hwConnect/ledger/CheckDialog';
 import ConnectDialog from '../../../components/wallet/hwConnect/ledger/ConnectDialog';
 import SaveDialog from '../../../components/wallet/hwConnect/ledger/SaveDialog';
+import UpgradeTxDialogContainer from '../../transfer/UpgradeTxDialogContainer';
+import type { GeneratedData as UpgradeTxDialogContainerData } from '../../transfer/UpgradeTxDialogContainer';
 
 import { ProgressStep, ProgressInfo } from '../../../types/HWConnectStoreTypes';
 import { getApiForNetwork, ApiOptions } from '../../../api/common/utils';
@@ -92,6 +94,14 @@ export default class WalletLedgerConnectDialogContainer extends Component<Props>
             classicTheme={profile.isClassicTheme}
           />);
         break;
+      case ProgressStep.TRANSFER:
+        component = (
+          <UpgradeTxDialogContainer
+            {...this.generated.UpgradeTxDialogContainerProps}
+            onClose={hwConnectActions.finishTransfer.trigger}
+            onSubmit={hwConnectActions.finishTransfer.trigger}
+          />);
+        break;
       case ProgressStep.SAVE:
         component = (
           <SaveDialog
@@ -106,7 +116,7 @@ export default class WalletLedgerConnectDialogContainer extends Component<Props>
           />);
         break;
       default:
-        Logger.error('WalletLedgerConnectDialogContainer::render: something unexpected happened');
+        Logger.error(`${nameof(WalletLedgerConnectDialogContainer)}::${nameof(this.render)}: something unexpected happened`);
         break;
     }
 
@@ -130,7 +140,10 @@ export default class WalletLedgerConnectDialogContainer extends Component<Props>
           |},
           submitSave: {|
             trigger: (params: string) => Promise<void>
-          |}
+          |},
+          finishTransfer: {|
+            trigger: (params: void) => void
+          |},
         |}
       |}
     |},
@@ -149,7 +162,8 @@ export default class WalletLedgerConnectDialogContainer extends Component<Props>
           |}
         |}
       |}
-    |}
+    |},
+    UpgradeTxDialogContainerProps: InjectedOrGenerated<UpgradeTxDialogContainerData>,
     |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
@@ -193,12 +207,17 @@ export default class WalletLedgerConnectDialogContainer extends Component<Props>
             submitSave: {
               trigger: actions.ada.ledgerConnect.submitSave.trigger,
             },
+            finishTransfer: {
+              trigger: actions.ada.ledgerConnect.finishTransfer.trigger,
+            },
             cancel: {
               trigger: actions.ada.ledgerConnect.cancel.trigger,
             },
           },
         },
       },
+      UpgradeTxDialogContainerProps:
+        ({ actions, stores, }: InjectedOrGenerated<UpgradeTxDialogContainerData>),
     });
   }
 }

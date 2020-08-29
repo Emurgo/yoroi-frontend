@@ -14,6 +14,7 @@ export const ProgressStep = Object.freeze({
   CHECK: 0,
   CONNECT: 1,
   SAVE: 2,
+  TRANSFER: 3,
 });
 export type ProgressStepEnum = $Values<typeof ProgressStep>;
 

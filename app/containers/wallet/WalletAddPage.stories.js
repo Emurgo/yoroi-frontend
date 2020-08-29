@@ -20,7 +20,11 @@ import {
   ledgerErrorCases,
   genUnitOfAccount,
   getValidationMnemonicCases,
+  mockLedgerMeta,
 } from '../../../stories/helpers/StoryWrapper';
+import {
+  walletLookup,
+} from '../../../stories/helpers/WalletCache';
 import { THEMES } from '../../themes';
 import AdaApi from '../../api/ada/index';
 import {
@@ -50,6 +54,14 @@ import { ROUTES } from '../../routes-config';
 import { networks, isJormungandr, } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import type { RestoreModeType } from '../../actions/common/wallet-restore-actions';
 import config from '../../config';
+import {
+  genShelleyCIP1852SigningWalletWithCache,
+  genTentativeShelleyTx,
+} from '../../../stories/helpers/cardano/ShelleyCip1852Mocks';
+import {
+  allAddressSubgroups,
+} from '../../stores/stateless/addressStores';
+import type { IAddressTypeStore, IAddressTypeUiSubset } from '../../stores/stateless/addressStores';
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -68,6 +80,7 @@ const defaultProps: {|
   WalletRestoreDialogContainerProps?: *,
   WalletTrezorConnectDialogContainerProps?: *,
   WalletLedgerConnectDialogContainerProps?: *,
+  UpgradeTxDialogContainerProps?: *,
 |} => * = (request) => ({
   stores: {
     profile: {
@@ -1018,6 +1031,7 @@ export const TrezorSave = (): Node => {
 const ledgerProps: {|
   ledgerConnect: *,
   selectedNetwork: *,
+  UpgradeTxDialogContainerProps?: *,
 |} => * = (request) => ({
   stores: {
     profile: {
@@ -1051,9 +1065,13 @@ const ledgerProps: {|
         cancel: {
           trigger: action('cancel'),
         },
+        finishTransfer: {
+          trigger: action('finishTransfer'),
+        },
       },
     },
   },
+  UpgradeTxDialogContainerProps: request.UpgradeTxDialogContainerProps || (null: any),
 });
 
 export const LedgerCheck = (): Node => {
@@ -1173,6 +1191,111 @@ export const LedgerSave = (): Node => {
                 : getErrorValue(),
               defaultWalletName: select('defaultWalletName', nameCases, nameCases.None),
             }
+          })
+        },
+      }))}
+    />
+  );
+};
+
+const genDefaultGroupMap: (
+  boolean => Map<Class<IAddressTypeStore>, IAddressTypeUiSubset>
+) = (wasExecuted) => {
+  return new Map(
+    allAddressSubgroups.map(type => [
+      type.class,
+      {
+        all: [],
+        wasExecuted,
+      },
+    ])
+  );
+};
+
+export const LedgerUpgrade = (): Node => {
+  const selectedNetwork = networks.ByronMainnet;
+  const wallet = genShelleyCIP1852SigningWalletWithCache(ConceptualWalletId => ({
+    ConceptualWalletId,
+    ...mockLedgerMeta
+  }));
+  return (
+    <WalletAddPage
+      generated={defaultProps(Object.freeze({
+        openDialog: WalletLedgerConnectDialogContainer,
+        selectedNetwork,
+        // eslint-disable-next-line no-unused-vars
+        getParam: <T>() => ({ type: 'bip44', extra: 'ledger', }),
+        WalletLedgerConnectDialogContainerProps: {
+          generated: ledgerProps({
+            selectedNetwork,
+            ledgerConnect: {
+              progressInfo: {
+                currentStep: ProgressStep.TRANSFER,
+                stepState: StepState.PROCESS,
+              },
+              isActionProcessing: false,
+              error: undefined,
+              defaultWalletName: 'Test wallet',
+            },
+            UpgradeTxDialogContainerProps: {
+              generated: {
+                TransferSendProps: {
+                  generated: {
+                    stores: {
+                      addresses: {
+                        addressSubgroupMap: genDefaultGroupMap(true),
+                      },
+                      explorers: {
+                        selectedExplorer: defaultToSelectedExplorer(),
+                      },
+                      profile: {
+                        isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
+                        unitOfAccount: genUnitOfAccount(),
+                      },
+                      wallets: {
+                        selected: wallet.publicDeriver,
+                        sendMoneyRequest: {
+                          isExecuting: false,
+                          error: undefined,
+                          reset: action('sendMoneyRequest reset'),
+                        },
+                      },
+                      coinPriceStore: {
+                        getCurrentPrice: (_from, _to) => 5,
+                      },
+                    },
+                    actions: {
+                      wallets: {
+                        sendMoney: {
+                          trigger: async (req) => action('sendMoney')(req),
+                        },
+                      },
+                      ada: {
+                        ledgerSend: {
+                          sendUsingLedger: {
+                            trigger: async (req) => action('sendUsingLedger')(req),
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+                stores: {
+                  substores: {
+                    ada: {
+                      yoroiTransfer: {
+                        transferRequest: {
+                          error: undefined,
+                          reset: action('transferRequest reset'),
+                          result: genTentativeShelleyTx(wallet.publicDeriver).tentativeTx,
+                        },
+                      },
+                    },
+                  },
+                },
+                actions: Object.freeze({}),
+              },
+            },
           })
         },
       }))}

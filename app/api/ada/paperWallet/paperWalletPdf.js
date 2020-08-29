@@ -125,6 +125,7 @@ export const generateAdaPaperPdf = async (
 };
 
 function printPasswordMessage(
+  // $FlowFixMe[value-as-type]
   doc: Pdf,
 ): void {
   doc.setFontSize(11);
@@ -134,6 +135,7 @@ function printPasswordMessage(
 }
 
 function printTestnetLabel(
+  // $FlowFixMe[value-as-type]
   doc: Pdf,
   network: string,
   y: number,
@@ -149,6 +151,7 @@ function printTestnetLabel(
 }
 
 function printAddresses(
+  // $FlowFixMe[value-as-type]
   doc: Pdf,
   addresses: Array<string>,
 ): boolean {
@@ -205,6 +208,7 @@ function printAddresses(
   return true;
 }
 
+// $FlowFixMe[value-as-type]
 function printMnemonics(doc: Pdf, words: Array<string>): void {
   doc.setFont('courier');
   doc.setFontSize(7);
@@ -230,6 +234,7 @@ type AddImageParams = {
 }
 
 function textCenter(
+  // $FlowFixMe[value-as-type]
   doc: Pdf,
   y: number,
   text: string,
@@ -249,10 +254,12 @@ function textCenter(
   doc.text(textOffset + (xShift || 0), y, text, m, r);
 }
 
+// $FlowFixMe[value-as-type]
 async function addImage(doc: Pdf, url: string, params?: AddImageParams): Promise<void> {
   return addImageBase64(doc, await loadImage(url), params);
 }
 
+// $FlowFixMe[value-as-type]
 function addImageBase64(doc: Pdf, img: string, params?: AddImageParams): void {
   const { x, y, w, h, r } = params || {};
   doc.addImage(img, 'png', x || 0, y || 0, w, h, '', 'FAST', r);

@@ -4,7 +4,7 @@ import UAParser from 'ua-parser-js';
 
 export class UserAgentInfo {
   // Refer: https://www.npmjs.com/package/ua-parser-js
-  ua: UAParser.getResult;
+  ua: { ... };
 
   isChrome: boolean;
   isFirefox: boolean;

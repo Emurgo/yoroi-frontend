@@ -72,7 +72,7 @@ export const buildRoute = (pattern: string, params: ParamsT): string => {
         // - '/path(/:param/:another_param)'
         const paramRegex = new RegExp('(/|\\(|\\)|^):' + paramName + '(/|\\)|\\(|$)');
         routePath = routePath.replace(paramRegex, (match, g1, g2) => {
-          // $FlowFixMe
+          // $FlowFixMe[incompatible-call]
           tokens[paramName] = encodeURIComponent(paramValue);
           return `${g1}<${paramName}>${g2}`;
         });

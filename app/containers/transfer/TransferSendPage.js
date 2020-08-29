@@ -29,6 +29,10 @@ import type {
 } from '../../types/TransferTypes';
 import { genAddressLookup } from '../../stores/stateless/addressStores';
 import type { IAddressTypeStore, IAddressTypeUiSubset } from '../../stores/stateless/addressStores';
+import {
+  asGetSigningKey,
+} from '../../api/ada/lib/storage/models/PublicDeriver/traits';
+import type { SendUsingLedgerParams } from '../../actions/ada/ledger-send-actions';
 
 declare var CONFIG: ConfigType;
 
@@ -36,13 +40,21 @@ export type GeneratedData = typeof TransferSendPage.prototype.generated;
 
 type Props = {|
   ...InjectedOrGenerated<GeneratedData>,
-  +onClose: void => void,
+  +onClose: {|
+    +trigger: void => void,
+    +label: string,
+  |},
+  +onSubmit: {|
+    +trigger: void => void,
+    +label: string,
+  |},
   +toTransferTx: ISignRequest<any> => TransferTx,
   +transactionRequest: {|
     +error: ?LocalizableError,
     +result: ?ISignRequest<any>,
     +reset: void => void,
-  |}
+  |},
+  +header?: Node,
 |};
 
 @observer
@@ -50,6 +62,10 @@ export default class TransferSendPage extends Component<Props> {
 
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
+  };
+
+  static defaultProps: {|header: void|} = {
+    header: undefined
   };
 
   @observable spendingPasswordForm: void | ReactToolboxMobxForm;
@@ -70,21 +86,34 @@ export default class TransferSendPage extends Component<Props> {
       throw new Error(`${nameof(TransferSendPage)} no wallet selected`);
     }
     if (this.spendingPasswordForm == null) {
-      throw new Error(`${nameof(TransferSendPage)} form not set`);
-    }
-    this.spendingPasswordForm.submit({
-      onSuccess: async (form) => {
-        const { walletPassword } = form.values();
-
-        if (this.props.transactionRequest.result == null) return;
-        await this.generated.actions.wallets.sendMoney.trigger({
+      if (this.props.transactionRequest.result == null) return;
+      await this.generated.actions.ada.ledgerSend.sendUsingLedger.trigger({
+        params: {
           signRequest: this.props.transactionRequest.result,
-          password: walletPassword,
-          publicDeriver: selected,
-        });
-      },
-      onError: () => {}
-    });
+        },
+        publicDeriver: selected,
+      });
+      if (this.generated.stores.wallets.sendMoneyRequest.error == null) {
+        this.props.onSubmit.trigger();
+      }
+    } else {
+      this.spendingPasswordForm.submit({
+        onSuccess: async (form) => {
+          const { walletPassword } = form.values();
+
+          if (this.props.transactionRequest.result == null) return;
+          await this.generated.actions.wallets.sendMoney.trigger({
+            signRequest: this.props.transactionRequest.result,
+            password: walletPassword,
+            publicDeriver: selected,
+          });
+          if (this.generated.stores.wallets.sendMoneyRequest.error == null) {
+            this.props.onSubmit.trigger();
+          }
+        },
+        onError: () => {}
+      });
+    }
   };
 
   render(): Node {
@@ -92,7 +121,7 @@ export default class TransferSendPage extends Component<Props> {
       return (
         <YoroiTransferErrorPage
           error={this.props.transactionRequest.error}
-          onCancel={this.props.onClose}
+          onCancel={this.props.onClose.trigger}
           classicTheme={this.generated.stores.profile.isClassicTheme}
         />
       );
@@ -139,17 +168,21 @@ export default class TransferSendPage extends Component<Props> {
         )
       )
       : null;
+    const withSigning = asGetSigningKey(selected);
 
-    const spendingPasswordForm = (<SpendingPasswordInput
-      setForm={(form) => this.setSpendingPasswordForm(form)}
-      classicTheme={this.generated.stores.profile.isClassicTheme}
-      isSubmitting={this.generated.stores.wallets.sendMoneyRequest.isExecuting}
-    />);
+    const spendingPasswordForm = withSigning == null
+      ? undefined
+      : (<SpendingPasswordInput
+        setForm={(form) => this.setSpendingPasswordForm(form)}
+        classicTheme={this.generated.stores.profile.isClassicTheme}
+        isSubmitting={this.generated.stores.wallets.sendMoneyRequest.isExecuting}
+      />);
 
     const { intl } = this.context;
 
     return (
       <TransferSummaryPage
+        header={this.props.header}
         form={spendingPasswordForm}
         formattedWalletAmount={amount => formattedWalletAmount(
           amount,
@@ -159,7 +192,10 @@ export default class TransferSendPage extends Component<Props> {
           .get(selected.getParent().getNetworkInfo().NetworkId) ?? (() => { throw new Error('No explorer for wallet network'); })()
         }
         transferTx={this.props.toTransferTx(tentativeTx)}
-        onSubmit={this.submit}
+        onSubmit={{
+          label: this.props.onSubmit.label,
+          trigger: this.submit,
+        }}
         isSubmitting={this.generated.stores.wallets.sendMoneyRequest.isExecuting}
         onCancel={this.props.onClose}
         error={this.generated.stores.wallets.sendMoneyRequest.error}
@@ -181,6 +217,16 @@ export default class TransferSendPage extends Component<Props> {
 
   @computed get generated(): {|
     actions: {|
+      ada: {|
+        ledgerSend: {|
+          sendUsingLedger: {|
+            trigger: (params: {|
+              params: SendUsingLedgerParams,
+              publicDeriver: PublicDeriver<>
+            |}) => Promise<void>
+          |}
+        |},
+      |},
       wallets: {|
         sendMoney: {|
           trigger: (params: {|
@@ -250,6 +296,11 @@ export default class TransferSendPage extends Component<Props> {
         wallets: {
           sendMoney: {
             trigger: actions.wallets.sendMoney.trigger
+          },
+        },
+        ada: {
+          ledgerSend: {
+            sendUsingLedger: { trigger: actions.ada.ledgerSend.sendUsingLedger.trigger },
           },
         },
       },

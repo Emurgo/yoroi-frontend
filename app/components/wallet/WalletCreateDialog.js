@@ -67,6 +67,7 @@ export default class WalletCreateDialog extends Component<Props, State> {
     setTimeout(() => { this.walletNameInput.focus(); });
   }
 
+  // $FlowFixMe[value-as-type]
   walletNameInput: Input;
 
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm({

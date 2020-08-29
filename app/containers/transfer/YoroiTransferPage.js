@@ -243,9 +243,15 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
             selectedExplorer={this.generated.stores.explorers.selectedExplorer
               .get(publicDeriver.getParent().getNetworkInfo().NetworkId) ?? (() => { throw new Error('No explorer for wallet network'); })()
             }
-            onSubmit={this.transferFunds}
+            onSubmit={{
+              label: intl.formatMessage(globalMessages.nextButtonLabel),
+              trigger: this.transferFunds,
+            }}
             isSubmitting={stores.wallets.sendMoneyRequest.isExecuting}
-            onCancel={this.cancelTransferFunds}
+            onCancel={{
+              label: intl.formatMessage(globalMessages.cancel),
+              trigger: this.cancelTransferFunds
+            }}
             error={yoroiTransfer.error}
             dialogTitle={intl.formatMessage(globalMessages.walletSendConfirmationDialogTitle)}
             coinPrice={coinPrice}

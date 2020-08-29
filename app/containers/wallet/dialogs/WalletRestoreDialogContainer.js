@@ -247,9 +247,15 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
           selectedExplorer={this.generated.stores.explorers.selectedExplorer
             .get(this.getSelectedNetwork().NetworkId) ?? (() => { throw new Error('No explorer for wallet network'); })()
           }
-          onSubmit={adaWalletRestoreActions.transferFromLegacy.trigger}
+          onSubmit={{
+            label: intl.formatMessage(globalMessages.nextButtonLabel),
+            trigger: adaWalletRestoreActions.transferFromLegacy.trigger,
+          }}
           isSubmitting={this.generated.stores.wallets.sendMoneyRequest.isExecuting}
-          onCancel={this.onCancel}
+          onCancel={{
+            label: intl.formatMessage(globalMessages.cancel),
+            trigger: this.onCancel
+          }}
           error={yoroiTransfer.error}
           addressLookup={
             /** no wallet is created yet so we can't know this information */

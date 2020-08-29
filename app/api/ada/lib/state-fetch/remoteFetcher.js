@@ -38,6 +38,7 @@ import {
   InvalidWitnessError,
   RollbackApiError,
 } from '../../../common/errors';
+import { RustModule } from '../cardanoCrypto/rustLoader';
 
 import type { ConfigType } from '../../../../../config/config-types';
 import { fromWords, decode, } from 'bech32';
@@ -65,13 +66,25 @@ export class RemoteFetcher implements IFetcher {
     this.getPlatform = getPlatform;
   }
 
-  getUTXOsForAddresses: AddressUtxoRequest => Promise<AddressUtxoResponse> = (body) => (
-    axios(
+  getUTXOsForAddresses: AddressUtxoRequest => Promise<AddressUtxoResponse> = async (body) => {
+    const mappedAddresses = body.addresses.map(addr => {
+      if (RustModule.WalletV4.ByronAddress.is_valid(addr)) {
+        return addr;
+      }
+      // TODO: backend doesn't support querying by payment keys, so we convert to bech32
+      if (!addr.startsWith('addr')) {
+        return RustModule.WalletV4.Address.from_bytes(
+          Buffer.from(addr, 'hex')
+        ).to_bech32();
+      }
+      return addr;
+    });
+    const result: AddressUtxoResponse = await axios(
       `${backendUrl}/api/txs/utxoForAddresses`,
       {
         method: 'post',
         data: {
-          addresses: body.addresses
+          addresses: mappedAddresses
         },
         headers: {
           'yoroi-version': this.getLastLaunchVersion(),
@@ -82,8 +95,20 @@ export class RemoteFetcher implements IFetcher {
       .catch((error) => {
         Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getUTXOsForAddresses)} error: ` + stringifyError(error));
         throw new GetUtxosForAddressesApiError();
-      })
-  )
+      });
+    return result.map(utxo => {
+      if (utxo.receiver.startsWith('addr')) {
+        const fixedAddr = Buffer.from(
+          RustModule.WalletV4.Address.from_bech32(utxo.receiver).to_bytes()
+        ).toString('hex');
+        return {
+          ...utxo,
+          receiver: fixedAddr,
+        };
+      }
+      return utxo;
+    });
+  }
 
   getTxsBodiesForUTXOs: TxBodiesRequest => Promise<TxBodiesResponse> = (body) => (
     axios(

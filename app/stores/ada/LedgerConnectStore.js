@@ -2,7 +2,7 @@
 // Handles Connect to Ledger Hardware Wallet dialog
 
 import { observable, action, runInAction } from 'mobx';
-
+import BigNumber from 'bignumber.js';
 import type { ExtendedPublicKeyResp } from '@emurgo/ledger-connect-handler';
 import LedgerConnect from '@emurgo/ledger-connect-handler';
 
@@ -10,6 +10,7 @@ import Config from '../../config';
 
 import Store from '../base/Store';
 import LocalizedRequest from '../lib/LocalizedRequest';
+import { ROUTES } from '../../routes-config';
 
 import type {
   CreateHardwareWalletRequest,
@@ -53,6 +54,11 @@ import {
 import type {
   RestoreModeType,
 } from '../../actions/common/wallet-restore-actions';
+import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
+import {
+  genTimeToSlot,
+} from '../../api/ada/lib/storage/bridge/timeUtils';
+import { getCardanoHaskellBaseConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 export default class LedgerConnectStore
   extends Store
@@ -95,6 +101,7 @@ export default class LedgerConnectStore
     ledgerConnectAction.goBackToCheck.listen(this._goBackToCheck);
     ledgerConnectAction.submitConnect.listen(this._submitConnect);
     ledgerConnectAction.submitSave.listen(this._submitSave);
+    ledgerConnectAction.finishTransfer.listen(this._finishTransfer);
     ledgerConnectAction.setMode.listen((mode) => runInAction(() => { this.mode = mode; }));
   }
 
@@ -124,6 +131,14 @@ export default class LedgerConnectStore
 
     this.error = undefined;
     this.hwDeviceInfo = undefined;
+    this.stores.substores.ada.yoroiTransfer.transferRequest.reset();
+    this.stores.wallets.sendMoneyRequest.reset();
+  };
+
+  @action _openTransferDialog: void => void = () => {
+    this.error = undefined;
+    this.progressInfo.currentStep = ProgressStep.TRANSFER;
+    this.progressInfo.stepState = StepState.PROCESS;
   };
 
   // =================== CHECK =================== //
@@ -151,38 +166,89 @@ export default class LedgerConnectStore
     await this._checkAndStoreHWDeviceInfo();
   };
 
-  _checkAndStoreHWDeviceInfo: void => Promise<void> = async () => {
+  _getPublicKey: {|
+    path: Array<number>
+  |} => Promise<HWDeviceInfo> = async (request) => {
+    Logger.debug(stringifyData(request));
     try {
-      this.ledgerConnect = new LedgerConnect({
+      const ledgerConnect = new LedgerConnect({
         locale: this.stores.profile.currentLocale
       });
-      await prepareLedgerConnect(this.ledgerConnect);
+      this.ledgerConnect = ledgerConnect;
+      await prepareLedgerConnect(ledgerConnect);
 
-      const accountPath = this.getPath();
-      // https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki#examples
-      Logger.debug(stringifyData(accountPath));
+      const extendedPublicKeyResp = await ledgerConnect.getExtendedPublicKey({
+        params: {
+          path: request.path,
+        },
+        serial: undefined,
+      });
 
-      // get Cardano's first account's
-      // i.e hdPath = [2147483692, 2147485463, 2147483648]
-      let extendedPublicKeyResp: ExtendedPublicKeyResp;
-      if (this.ledgerConnect) {
-        extendedPublicKeyResp = await this.ledgerConnect.getExtendedPublicKey({
-          params: {
-            path: accountPath,
-          },
-          serial: undefined,
-        });
+      return this._normalizeHWResponse(extendedPublicKeyResp);
+    } finally {
+      this.ledgerConnect && this.ledgerConnect.dispose();
+      this.ledgerConnect = undefined;
+    }
+  }
 
-        this.hwDeviceInfo = this._normalizeHWResponse(extendedPublicKeyResp);
+  _generateTransferTx: (string, string) => Promise<void> = async (
+    bip44Key,
+    cip1852Key,
+  ) => {
+    const bip44AccountPubKey = RustModule.WalletV4.Bip32PublicKey.from_bytes(
+      Buffer.from(bip44Key, 'hex')
+    );
+    const cip1852AccountPubKey = RustModule.WalletV4.Bip32PublicKey.from_bytes(
+      Buffer.from(cip1852Key, 'hex')
+    );
+    const stateFetcher = this.stores.substores.ada.stateFetchStore.fetcher;
+    if (this.stores.profile.selectedNetwork == null) {
+      throw new Error(`${nameof(LedgerConnectStore)}::${nameof(this._checkAndStoreHWDeviceInfo)} no network selected`);
+    }
+    const { selectedNetwork } = this.stores.profile;
+    const fullConfig = getCardanoHaskellBaseConfig(
+      selectedNetwork
+    );
+    const timeToSlot = await genTimeToSlot(fullConfig);
+
+    try {
+      await this.stores.substores.ada.yoroiTransfer.transferRequest.execute({
+        cip1852AccountPubKey,
+        bip44AccountPubKey,
+        accountIndex: this.derivationIndex,
+        checkAddressesInUse: stateFetcher.checkAddressesInUse,
+        getUTXOsForAddresses: stateFetcher.getUTXOsForAddresses,
+        absSlotNumber: new BigNumber(timeToSlot({ time: new Date() }).slot),
+        network: selectedNetwork,
+      }).promise;
+    } catch (_e) {
+      // usually this means no internet connection or not enough ADA to upgrade
+      // so we just ignore this case
+    }
+  }
+
+  _checkAndStoreHWDeviceInfo: void => Promise<void> = async () => {
+    this.stores.substores.ada.yoroiTransfer.transferRequest.reset();
+    const accountPath = this.getPath();
+    try {
+      const pubKeyResponse = await this._getPublicKey({ path: accountPath });
+      this.hwDeviceInfo = pubKeyResponse;
+
+      // if restoring a Shelley wallet, check if there is any Byron balance
+      if (accountPath[0] === WalletTypePurpose.CIP1852) {
+        const bip44Path = [...accountPath];
+        bip44Path[0] = WalletTypePurpose.BIP44;
+
+        const bip44Response = await this._getPublicKey({ path: bip44Path });
+        await this._generateTransferTx(
+          bip44Response.publicMasterKey,
+          pubKeyResponse.publicMasterKey, // cip1852
+        );
       }
-
       this._goToSaveLoad();
       Logger.info('Ledger device OK');
     } catch (error) {
       this._handleConnectError(error);
-    } finally {
-      this.ledgerConnect && this.ledgerConnect.dispose();
-      this.ledgerConnect = undefined;
     }
   };
 
@@ -232,6 +298,12 @@ export default class LedgerConnectStore
 
   // =================== SAVE =================== //
   @action _goToSaveLoad: void => void = () => {
+    this.error = null;
+    this.progressInfo.currentStep = ProgressStep.SAVE;
+    this.progressInfo.stepState = StepState.LOAD;
+  };
+
+  @action _goToTransfer: void => void = () => {
     this.error = null;
     this.progressInfo.currentStep = ProgressStep.SAVE;
     this.progressInfo.stepState = StepState.LOAD;
@@ -342,14 +414,34 @@ export default class LedgerConnectStore
 
   async _onSaveSuccess(publicDeriver: PublicDeriver<>): Promise<void> {
     // close the active dialog
-    Logger.debug('LedgerConnectStore::_onSaveSuccess success, closing dialog');
-    this.actions.dialogs.closeActiveDialog.trigger();
+    Logger.debug(`${nameof(LedgerConnectStore)}::${nameof(this._onSaveSuccess)} success`);
+    if (this.stores.substores.ada.yoroiTransfer.transferRequest.result == null) {
+      this.actions.dialogs.closeActiveDialog.trigger();
+    }
 
-    const { wallets } = this.stores;
-    await wallets.addHwWallet(publicDeriver);
+    await this.stores.wallets.addHwWallet(publicDeriver);
+    this.actions.wallets.setActiveWallet.trigger({
+      wallet: publicDeriver
+    });
+    if (this.stores.substores.ada.yoroiTransfer.transferRequest.result == null) {
+      this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ROOT });
+
+      // show success notification
+      this.stores.wallets.showLedgerWalletIntegratedNotification();
+
+      this.teardown();
+      Logger.info('SUCCESS: Ledger Connected Wallet created and loaded');
+    } else {
+      this._openTransferDialog();
+    }
+  }
+
+  _finishTransfer: void => void = () => {
+    this.actions.dialogs.closeActiveDialog.trigger();
+    this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ROOT });
 
     // show success notification
-    wallets.showLedgerWalletIntegratedNotification();
+    this.stores.wallets.showLedgerWalletIntegratedNotification();
 
     this.teardown();
     Logger.info('SUCCESS: Ledger Connected Wallet created and loaded');

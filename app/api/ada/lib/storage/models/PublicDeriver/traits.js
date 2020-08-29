@@ -1607,6 +1607,12 @@ const ScanShelleyUtxoMixin = (
       },
     });
 
+    const network = this.getParent().getNetworkInfo();
+    if (network.BaseConfig[0].ByronNetworkId == null) {
+      throw new Error(`${nameof(ScanLegacyCardanoUtxo)}::${nameof(this.rawScanAccount)} missing Byron network id`);
+    }
+    const { ChainNetworkId } = network.BaseConfig[0];
+
     return await scanShelleyCip1852Account({
       accountPublicKey: body.accountPublicKey,
       lastUsedInternal: body.lastUsedInternal,
@@ -1619,6 +1625,7 @@ const ScanShelleyUtxoMixin = (
         ])
       ),
       stakingKey: stakingKey.to_raw_key(),
+      chainNetworkId: Number.parseInt(ChainNetworkId, 10),
     });
   }
 });

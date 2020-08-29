@@ -16,6 +16,7 @@ import globalMessages from '../../i18n/global-messages';
 import LocalizableError, { UnexpectedError } from '../../i18n/LocalizableError';
 import { CheckAddressesInUseApiError } from '../../api/common/errors';
 import { getTrezorManifest, wrapWithFrame, wrapWithoutFrame } from '../lib/TrezorWrapper';
+import { ROUTES } from '../../routes-config';
 
 // This is actually just an interface
 import {
@@ -453,6 +454,10 @@ export default class TrezorConnectStore
 
     const { wallets } = this.stores;
     await wallets.addHwWallet(publicDeriver);
+    this.actions.wallets.setActiveWallet.trigger({
+      wallet: publicDeriver
+    });
+    this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ROOT });
 
     // show success notification
     wallets.showTrezorTWalletIntegratedNotification();
