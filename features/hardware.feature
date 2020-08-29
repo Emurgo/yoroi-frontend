@@ -70,6 +70,7 @@ Feature: Hardware device
    Scenario: Test Shelley Ledger delegation (IT-100)
      When I select a Shelley-era Ledger device
      And I restore the Ledger device
+     And I click skip the transfer
      Then I should see the summary screen
      Then I should see a plate KHDC-5476
      # test delegation

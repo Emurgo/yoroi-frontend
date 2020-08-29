@@ -87,7 +87,7 @@ export default class TransferSendPage extends Component<Props> {
     }
     if (this.spendingPasswordForm == null) {
       if (this.props.transactionRequest.result == null) return;
-      await this.generated.actions.ada.ledgerSend.sendUsingLedger.trigger({
+      await this.generated.actions.ada.ledgerSend.sendUsingLedgerWallet.trigger({
         params: {
           signRequest: this.props.transactionRequest.result,
         },
@@ -219,7 +219,7 @@ export default class TransferSendPage extends Component<Props> {
     actions: {|
       ada: {|
         ledgerSend: {|
-          sendUsingLedger: {|
+          sendUsingLedgerWallet: {|
             trigger: (params: {|
               params: SendUsingLedgerParams,
               publicDeriver: PublicDeriver<>
@@ -300,7 +300,9 @@ export default class TransferSendPage extends Component<Props> {
         },
         ada: {
           ledgerSend: {
-            sendUsingLedger: { trigger: actions.ada.ledgerSend.sendUsingLedger.trigger },
+            sendUsingLedgerWallet: {
+              trigger: actions.ada.ledgerSend.sendUsingLedgerWallet.trigger,
+            },
           },
         },
       },

@@ -297,7 +297,7 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
           isSubmitting={ledgerSendStore.isActionProcessing}
           error={ledgerSendStore.error}
           onSubmit={
-            () => ledgerSendAction.sendUsingLedger.trigger({
+            () => ledgerSendAction.sendUsingLedgerWallet.trigger({
               params: { signRequest },
               publicDeriver,
             })
@@ -390,7 +390,7 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
         ledgerSend: {|
           cancel: {| trigger: (params: void) => void |},
           init: {| trigger: (params: void) => void |},
-          sendUsingLedger: {|
+          sendUsingLedgerWallet: {|
             trigger: (params: {|
               params: SendUsingLedgerParams,
               publicDeriver: PublicDeriver<>
@@ -587,7 +587,9 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
           ledgerSend: {
             init: { trigger: actions.ada.ledgerSend.init.trigger },
             cancel: { trigger: actions.ada.ledgerSend.cancel.trigger },
-            sendUsingLedger: { trigger: actions.ada.ledgerSend.sendUsingLedger.trigger },
+            sendUsingLedgerWallet: {
+              trigger: actions.ada.ledgerSend.sendUsingLedgerWallet.trigger
+            },
           },
           trezorSend: {
             cancel: { trigger: actions.ada.trezorSend.cancel.trigger },

@@ -467,7 +467,13 @@ export type TransferToCip1852Request = {|
   getUTXOsForAddresses: AddressUtxoFunc,
   network: $ReadOnly<NetworkRow>,
 |};
-export type TransferToCip1852Response = CreateUnsignedTxResponse;
+export type TransferToCip1852Response = {|
+  signRequest: CreateUnsignedTxResponse,
+  publicKey: {|
+    key: RustModule.WalletV4.Bip32PublicKey,
+    keyLevel: number,
+  |},
+|};
 export type TransferToCip1852Func = (
   request: TransferToCip1852Request
 ) => Promise<TransferToCip1852Response>;
@@ -1601,13 +1607,19 @@ export default class AdaApi {
         getUTXOsForAddresses: request.getUTXOsForAddresses,
       });
 
-      return this.createUnsignedTxForUtxos({
-        absSlotNumber: request.absSlotNumber,
-        receiver: Buffer.from(receiveAddress.to_address().to_bytes()).toString('hex'),
-        network: request.network,
-        shouldSendAll: true,
-        utxos,
-      });
+      return {
+        publicKey: {
+          key: request.bip44AccountPubKey,
+          keyLevel: Bip44DerivationLevels.ACCOUNT.level,
+        },
+        signRequest: await this.createUnsignedTxForUtxos({
+          absSlotNumber: request.absSlotNumber,
+          receiver: Buffer.from(receiveAddress.to_address().to_bytes()).toString('hex'),
+          network: request.network,
+          shouldSendAll: true,
+          utxos,
+        })
+      };
     } catch (error) {
       Logger.error(`${nameof(this.transferToCip1852)} error: ` + stringifyError(error));
       if (error instanceof LocalizableError) throw error;

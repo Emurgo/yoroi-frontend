@@ -148,7 +148,7 @@ const genBaseProps: {|
       ledgerSend: {
         init: { trigger: action('init') },
         cancel: { trigger: action('cancel') },
-        sendUsingLedger: { trigger: async (req) => action('sendUsingLedger')(req) },
+        sendUsingLedgerWallet: { trigger: async (req) => action('sendUsingLedgerWallet')(req) },
       },
       trezorSend: {
         cancel: { trigger: action('cancel') },
