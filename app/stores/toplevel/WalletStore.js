@@ -35,7 +35,7 @@ import type {
   IGetSigningKey,
   IGetPublic,
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
-import { isLedgerNanoWallet, ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
+import { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import { Logger, stringifyError } from '../../utils/logging';
 import { assuranceModes, } from '../../config/transactionAssuranceConfig';
 import type { WalletChecksum } from '@emurgo/cip4-js';
@@ -44,9 +44,6 @@ import { createDebugWalletDialog } from '../../containers/wallet/dialogs/DebugWa
 import { createProblematicWalletDialog } from '../../containers/wallet/dialogs/ProblematicWalletDialogContainer';
 import { getApiForNetwork } from '../../api/common/utils';
 import { Bip44Wallet } from '../../api/ada/lib/storage/models/Bip44Wallet/wrapper';
-import {
-  Cip1852Wallet,
-} from '../../api/ada/lib/storage/models/Cip1852Wallet/wrapper';
 
 type GroupedWallets = {|
   publicDerivers: Array<PublicDeriver<>>;
@@ -484,14 +481,13 @@ export default class WalletStore extends Store {
       const existingWarnings = this.stores.walletSettings.getWalletWarnings(
         publicDeriver
       );
-      if (publicDeriver.getParent() instanceof Cip1852Wallet) {
-        if (isLedgerNanoWallet(publicDeriver.getParent())) {
-          existingWarnings.dialogs.push(createProblematicWalletDialog(
-            plate.TextPart,
-            action(() => { existingWarnings.dialogs.pop(); }),
-            { stores: this.stores, actions: this.actions },
-          ));
-        }
+      // bring this back if we ever need it. Removing this code deletes the i18n strings.
+      if (false) { // eslint-disable-line no-constant-condition
+        existingWarnings.dialogs.push(createProblematicWalletDialog(
+          plate.TextPart,
+          action(() => { existingWarnings.dialogs.pop(); }),
+          { stores: this.stores, actions: this.actions },
+        ));
       }
       if (debugWalletChecksums.find(elem => elem === plate.TextPart) != null) {
         existingWarnings.dialogs.push(createDebugWalletDialog(
