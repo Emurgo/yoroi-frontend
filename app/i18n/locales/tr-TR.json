@@ -302,7 +302,7 @@
   "transfer.summary.recoveredBalance.label": "Kurtarılan bakiye",
   "transfer.summary.transactionFee.label": "İşlem ücretleri",
   "transfer.summary.transferButton.label": "Para Transferi",
-  "upgradetx.explanation": "We found some ADA in your Byron-era wallet. Would you like to transfer it to your new Shelley wallet?",
+  "upgradetx.explanation": "Byron dönemi cüzdanınızda bir miktar ADA bulduk. Yeni Shelley cüzdanınıza aktarmak ister misiniz?",
   "uri.display.dialog.copy.notification": "URL başarıyla kopyalandı",
   "uri.display.dialog.title": "Oluşturulan URL",
   "uri.display.dialog.usabilityWarning": "Bu bağlantı yalnızca tarayıcılarında Yoroi yüklü kullanıcılar tarafından açılabilir",
