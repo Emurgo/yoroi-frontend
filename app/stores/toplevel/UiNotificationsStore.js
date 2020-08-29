@@ -41,17 +41,17 @@ export default class UiNotificationsStore extends Store {
     this.activeNotifications.find(notification => notification.id === id)
   );
 
-  @action _onOpen: Notification => void = ({ id, message, duration }) => {
+  @action _onOpen: Notification => void = (newNotification) => {
     const notification: Notification = {
-      id,
-      message,
-      duration: duration != null ? duration : null,
-      secondsTimerInterval: duration != null ? setInterval(this._updateSeconds, 1000, id) : null,
+      ...newNotification,
+      secondsTimerInterval: newNotification.duration != null
+        ? setInterval(this._updateSeconds, 1000, newNotification.id)
+        : null,
     };
 
-    if (this.isOpen(id)) {
+    if (this.isOpen(notification.id)) {
       // if notification is currently active close and reopen it
-      this._onClose({ id });
+      this._onClose({ id: notification.id });
       setTimeout(() => this._set(notification), 200);
     } else {
       this._set(notification);

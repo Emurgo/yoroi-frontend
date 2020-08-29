@@ -41,6 +41,7 @@ import {
 import { buildCheckAndCall } from '../../lib/check';
 import { getApiForNetwork, ApiOptions } from '../../../api/common/utils';
 import { HaskellShelleyTxSignRequest } from '../../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
+import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 
 /** Note: Handles Ledger Signing */
 export default class LedgerSendStore extends Store {
@@ -62,7 +63,11 @@ export default class LedgerSendStore extends Store {
       }
     );
     ledgerSendAction.init.listen(syncCheck(this._init));
-    ledgerSendAction.sendUsingLedger.listen(asyncCheck(this._sendWrapper));
+    ledgerSendAction.sendUsingLedgerWallet.listen(asyncCheck(this._sendWrapper));
+    ledgerSendAction.sendUsingLedgerKey.listen(
+      // drop the return type
+      asyncCheck(async (request) => { await this.signAndBroadcast(request); })
+    );
     ledgerSendAction.cancel.listen(syncCheck(this._cancel));
   }
 
@@ -124,13 +129,12 @@ export default class LedgerSendStore extends Store {
   }
 
   /** Generates a payload with Ledger format and tries Send ADA using Ledger signing */
-  signAndBroadcast: {|
+  signAndBroadcastFromWallet: {|
     params: {|
       signRequest: HaskellShelleyTxSignRequest,
     |},
     publicDeriver: PublicDeriver<>,
   |} => Promise<{| txId: string |}> = async (request) => {
-    let ledgerConnect: LedgerConnect;
     try {
       Logger.debug(`${nameof(LedgerSendStore)}::${nameof(this.signAndBroadcast)} called: ` + stringifyData(request.params));
 
@@ -142,13 +146,41 @@ export default class LedgerSendStore extends Store {
       if (withPublicKey == null) throw new Error(`${nameof(this.signAndBroadcast)} No public key for this public deriver`);
       const publicKey = await withPublicKey.getPublicKey();
 
+      return this.signAndBroadcast({
+        ...request.params,
+        publicKey: {
+          key: RustModule.WalletV4.Bip32PublicKey.from_bytes(
+            Buffer.from(publicKey.Hash, 'hex')
+          ),
+          keyLevel: withLevels.getParent().getPublicDeriverLevel(),
+        },
+        network: request.publicDeriver.getParent().getNetworkInfo(),
+      });
+    } catch (error) {
+      Logger.error(`${nameof(LedgerSendStore)}::${nameof(this.signAndBroadcast)} error: ` + stringifyError(error));
+      throw new convertToLocalizableError(error);
+    }
+  };
+
+  signAndBroadcast: {|
+    signRequest: HaskellShelleyTxSignRequest,
+    publicKey: {|
+      key: RustModule.WalletV4.Bip32PublicKey,
+      keyLevel: number,
+    |},
+    network: $ReadOnly<NetworkRow>,
+  |} => Promise<{| txId: string |}> = async (request) => {
+    let ledgerConnect: LedgerConnect;
+    try {
+      Logger.debug(`${nameof(LedgerSendStore)}::${nameof(this.signAndBroadcast)} called: ` + stringifyData(request));
+
       ledgerConnect = new LedgerConnect({
         locale: this.stores.profile.currentLocale
       });
 
       const { ledgerSignTxPayload } = await this.api.ada.createLedgerSignTxData({
-        ...request.params,
-        network: request.publicDeriver.getParent().getNetworkInfo(),
+        signRequest: request.signRequest,
+        network: request.network,
       });
 
       await prepareLedgerConnect(ledgerConnect);
@@ -165,19 +197,14 @@ export default class LedgerSendStore extends Store {
       // Disposing here will fix the UI issue.
       ledgerConnect.dispose();
 
-      const txBody = request.params.signRequest.self().unsignedTx.build();
+      const txBody = request.signRequest.self().unsignedTx.build();
       const txId = Buffer.from(RustModule.WalletV4.hash_transaction(txBody).to_bytes()).toString('hex');
       const signedTx = buildSignedTransaction(
         txBody,
-        request.params.signRequest.signRequest.senderUtxos,
+        request.signRequest.signRequest.senderUtxos,
         ledgerSignTxResp.witnesses,
-        {
-          key: RustModule.WalletV4.Bip32PublicKey.from_bytes(
-            Buffer.from(publicKey.Hash, 'hex')
-          ),
-          keyLevel: withLevels.getParent().getPublicDeriverLevel(),
-        },
-        request.params.signRequest.txMetadata(),
+        request.publicKey,
+        request.signRequest.txMetadata(),
       );
 
       await this.api.ada.broadcastLedgerSignedTx({

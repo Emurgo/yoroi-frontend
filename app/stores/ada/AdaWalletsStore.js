@@ -57,7 +57,7 @@ export default class AdaWalletsStore extends Store {
 
     const broadcastRequest = async () => {
       if (request.broadcastRequest.ledger) {
-        return await this.stores.substores.ada.ledgerSend.signAndBroadcast({
+        return await this.stores.substores.ada.ledgerSend.signAndBroadcastFromWallet({
           params: { signRequest: request.broadcastRequest.ledger.signRequest },
           publicDeriver: request.broadcastRequest.ledger.publicDeriver,
         });

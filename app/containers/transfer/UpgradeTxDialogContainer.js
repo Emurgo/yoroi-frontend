@@ -6,12 +6,28 @@ import { computed, } from 'mobx';
 import { defineMessages, intlShape } from 'react-intl';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import LocalizableError from '../../i18n/LocalizableError';
-import type { ISignRequest } from '../../api/common/lib/transactions/ISignRequest';
 import TransferSendPage from './TransferSendPage';
-import type { GeneratedData as TransferSendData } from './TransferSendPage';
 import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 import globalMessages from '../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { formattedWalletAmount } from '../../utils/formatters';
+import { addressToDisplayString, } from '../../api/ada/lib/storage/bridge/utils';
+import type { IAddressTypeStore, IAddressTypeUiSubset } from '../../stores/stateless/addressStores';
+import { SelectedExplorer } from '../../domain/SelectedExplorer';
+import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
+import type {
+  TransferTx,
+} from '../../types/TransferTypes';
+import { getApiForNetwork, getApiMeta } from '../../api/common/utils';
+import { genAddressLookup } from '../../stores/stateless/addressStores';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import TransferSummaryPage from '../../components/transfer/TransferSummaryPage';
+import Dialog from '../../components/widgets/Dialog';
+import LegacyTransferLayout from '../../components/transfer/LegacyTransferLayout';
+import VerticallyCenteredLayout from '../../components/layout/VerticallyCenteredLayout';
+import LoadingSpinner from '../../components/widgets/LoadingSpinner';
+import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
+import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 
 export type GeneratedData = typeof UpgradeTxDialogContainer.prototype.generated;
 
@@ -28,6 +44,7 @@ const messages = defineMessages({
   },
 });
 
+// TODO: probably a lot of this can be de-duplicated with TransferSendPage
 @observer
 export default class UpgradeTxDialogContainer extends Component<Props> {
 
@@ -35,58 +52,190 @@ export default class UpgradeTxDialogContainer extends Component<Props> {
     intl: intlShape.isRequired,
   };
 
+  submit: {|
+    signRequest: HaskellShelleyTxSignRequest,
+    publicKey: {|
+      key: RustModule.WalletV4.Bip32PublicKey,
+      keyLevel: number,
+    |},
+    network: $ReadOnly<NetworkRow>,
+  |} => Promise<void> = async (request) => {
+    await this.generated.actions.ada.ledgerSend.sendUsingLedgerKey.trigger({
+      ...request,
+    });
+    this.props.onSubmit();
+  }
+
   render(): Node {
-    const { intl } = this.context;
     const { transferRequest } = this.generated.stores.substores.ada.yoroiTransfer;
 
+    if (transferRequest.result == null) {
+      return this.getSpinner();
+    }
+    return this.getContent(transferRequest.result);
+  }
+
+  getSpinner: void => Node = () => {
+    const { intl } = this.context;
+    return (
+      <Dialog
+        title={intl.formatMessage(globalMessages.processingLabel)}
+        closeOnOverlayClick={false}
+      >
+        <LegacyTransferLayout>
+          <VerticallyCenteredLayout>
+            <LoadingSpinner />
+          </VerticallyCenteredLayout>
+        </LegacyTransferLayout>
+      </Dialog>
+    );
+  }
+
+  toTransferTx: HaskellShelleyTxSignRequest => TransferTx = (
+    tentativeTx
+  ) => {
+    if (!(tentativeTx instanceof HaskellShelleyTxSignRequest)) {
+      throw new Error(`${nameof(UpgradeTxDialogContainer)} incorrect tx type`);
+    }
+
+    return {
+      recoveredBalance: tentativeTx.totalInput(true),
+      fee: tentativeTx.fee(true),
+      senders: tentativeTx
+        .uniqueSenderAddresses(),
+      receivers: tentativeTx
+        .receivers(true),
+    };
+  };
+
+  getContent: {|
+    signRequest: HaskellShelleyTxSignRequest,
+    publicKey: {|
+      key: RustModule.WalletV4.Bip32PublicKey,
+      keyLevel: number,
+    |}
+  |} => Node = (
+    tentativeTx
+  ) => {
+    const transferTx = this.toTransferTx(tentativeTx.signRequest);
+
+    const selected = this.generated.stores.wallets.selected;
+    if (selected == null) {
+      throw new Error(`${nameof(TransferSendPage)} no wallet selected`);
+    }
+    const network = selected.getParent().getNetworkInfo();
+
+    const api = getApiForNetwork(network);
+    const apiMeta = getApiMeta(api);
+    if (apiMeta == null) throw new Error(`${nameof(TransferSendPage)} no API selected`);
+
+    const coinPrice: ?number = this.generated.stores.profile.unitOfAccount.enabled
+      ? (
+        this.generated.stores.coinPriceStore.getCurrentPrice(
+          apiMeta.meta.primaryTicker,
+          this.generated.stores.profile.unitOfAccount.currency
+        )
+      )
+      : null;
+
+    const { intl } = this.context;
     const header = (
       <div>
         {intl.formatMessage(messages.explanation)}
         <br /><br />
       </div>
     );
+
     return (
-      <TransferSendPage
-        {...this.generated.TransferSendProps}
+      <TransferSummaryPage
         header={header}
+        form={undefined}
+        formattedWalletAmount={amount => formattedWalletAmount(
+          amount,
+          apiMeta.meta.decimalPlaces.toNumber(),
+        )}
+        selectedExplorer={this.generated.stores.explorers.selectedExplorer
+          .get(network.NetworkId) ?? (() => { throw new Error('No explorer for wallet network'); })()
+        }
+        transferTx={transferTx}
         onSubmit={{
-          trigger: this.props.onSubmit,
+          trigger: async () => await this.submit({ network, ...tentativeTx }),
           label: intl.formatMessage(globalMessages.upgradeLabel),
         }}
-        onClose={{
+        isSubmitting={this.generated.stores.wallets.sendMoneyRequest.isExecuting}
+        onCancel={{
           trigger: this.props.onClose,
           label: intl.formatMessage(globalMessages.skipLabel),
         }}
-        transactionRequest={transferRequest}
-        toTransferTx={tentativeTx => {
-          if (!(tentativeTx instanceof HaskellShelleyTxSignRequest)) {
-            throw new Error(`${nameof(UpgradeTxDialogContainer)} incorrect tx type`);
-          }
-
-          return {
-            recoveredBalance: tentativeTx.totalInput(true),
-            fee: tentativeTx.fee(true),
-            senders: tentativeTx
-              .uniqueSenderAddresses(),
-            receivers: tentativeTx
-              .receivers(true),
-          };
-        }}
+        error={this.generated.stores.wallets.sendMoneyRequest.error}
+        dialogTitle={intl.formatMessage(globalMessages.walletSendConfirmationDialogTitle)}
+        coinPrice={coinPrice}
+        unitOfAccountSetting={this.generated.stores.profile.unitOfAccount}
+        addressLookup={genAddressLookup(
+          selected,
+          intl,
+          undefined, // don't want to go to route from within a dialog
+          this.generated.stores.addresses.addressSubgroupMap,
+        )}
+        addressToDisplayString={
+          addr => addressToDisplayString(addr, selected.getParent().getNetworkInfo())
+        }
       />
     );
   }
 
   @computed get generated(): {|
-    TransferSendProps: InjectedOrGenerated<TransferSendData>,
-    actions: {||},
+    actions: {|
+      ada: {|
+        ledgerSend: {|
+          sendUsingLedgerKey: {|
+            trigger: {|
+              signRequest: HaskellShelleyTxSignRequest,
+              publicKey: {|
+                key: RustModule.WalletV4.Bip32PublicKey,
+                keyLevel: number,
+              |},
+              network: $ReadOnly<NetworkRow>,
+            |} => Promise<void>,
+          |},
+        |},
+      |},
+    |},
     stores: {|
+      addresses: {|
+        addressSubgroupMap: $ReadOnlyMap<Class<IAddressTypeStore>, IAddressTypeUiSubset>,
+      |},
+      coinPriceStore: {|
+        getCurrentPrice: (from: string, to: string) => ?number
+      |},
+      explorers: {|
+        selectedExplorer: Map<number, SelectedExplorer>,
+      |},
+      profile: {|
+        isClassicTheme: boolean,
+        unitOfAccount: UnitOfAccountSettingType
+      |},
+      wallets: {|
+        selected: null | PublicDeriver<>,
+        sendMoneyRequest: {|
+          error: ?LocalizableError,
+          isExecuting: boolean,
+          reset: () => void
+        |},
+      |},
       substores: {|
         ada: {|
           yoroiTransfer: {|
             transferRequest: {|
               reset: void => void,
               error: ?LocalizableError,
-              result: ?ISignRequest<any>
+              result: ?{|
+                publicKey: {|
+                  key: RustModule.WalletV4.Bip32PublicKey,
+                  keyLevel: number,
+                |},
+                signRequest: HaskellShelleyTxSignRequest,
+              |}
             |},
           |},
         |},
@@ -101,10 +250,37 @@ export default class UpgradeTxDialogContainer extends Component<Props> {
     }
     const { stores, actions } = this.props;
     return Object.freeze({
-      TransferSendProps: ({ actions, stores, }: InjectedOrGenerated<TransferSendData>),
-      actions: Object.freeze({
-      }),
+      actions: {
+        ada: {
+          ledgerSend: {
+            sendUsingLedgerKey: {
+              trigger: actions.ada.ledgerSend.sendUsingLedgerKey.trigger,
+            },
+          },
+        },
+      },
       stores: {
+        addresses: {
+          addressSubgroupMap: stores.addresses.addressSubgroupMap,
+        },
+        explorers: {
+          selectedExplorer: stores.explorers.selectedExplorer,
+        },
+        wallets: {
+          selected: stores.wallets.selected,
+          sendMoneyRequest: {
+            reset: stores.wallets.sendMoneyRequest.reset,
+            error: stores.wallets.sendMoneyRequest.error,
+            isExecuting: stores.wallets.sendMoneyRequest.isExecuting,
+          },
+        },
+        profile: {
+          isClassicTheme: stores.profile.isClassicTheme,
+          unitOfAccount: stores.profile.unitOfAccount,
+        },
+        coinPriceStore: {
+          getCurrentPrice: stores.coinPriceStore.getCurrentPrice,
+        },
         substores: {
           ada: {
             yoroiTransfer: {

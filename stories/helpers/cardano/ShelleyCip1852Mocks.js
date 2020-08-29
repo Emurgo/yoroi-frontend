@@ -265,7 +265,7 @@ export type ShelleyCip1852CacheValue = {|
 export const genTentativeShelleyTx = (
   publicDeriver: PublicDeriver<>,
 ): {|
-  tentativeTx: null | ISignRequest<any>,
+  tentativeTx: ISignRequest<any>,
   inputAmount: string,
   fee: BigNumber,
 |} => {

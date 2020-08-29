@@ -216,8 +216,8 @@ const genBaseProps: {|
               },
               ada: {
                 ledgerSend: {
-                  sendUsingLedger: {
-                    trigger: async (req) => action('sendUsingLedger')(req),
+                  sendUsingLedgerWallet: {
+                    trigger: async (req) => action('sendUsingLedgerWallet')(req),
                   },
                 },
               },

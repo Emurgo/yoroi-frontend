@@ -22,9 +22,6 @@ import {
   getValidationMnemonicCases,
   mockLedgerMeta,
 } from '../../../stories/helpers/StoryWrapper';
-import {
-  walletLookup,
-} from '../../../stories/helpers/WalletCache';
 import { THEMES } from '../../themes';
 import AdaApi from '../../api/ada/index';
 import {
@@ -62,6 +59,7 @@ import {
   allAddressSubgroups,
 } from '../../stores/stateless/addressStores';
 import type { IAddressTypeStore, IAddressTypeUiSubset } from '../../stores/stateless/addressStores';
+import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -1218,6 +1216,12 @@ export const LedgerUpgrade = (): Node => {
     ConceptualWalletId,
     ...mockLedgerMeta
   }));
+
+  const tentativeTx = genTentativeShelleyTx(wallet.publicDeriver).tentativeTx;
+  if (!(tentativeTx instanceof HaskellShelleyTxSignRequest)) {
+    throw new Error(`Not ${nameof(HaskellShelleyTxSignRequest)}`);
+  }
+  const signRequest = tentativeTx;
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
@@ -1239,61 +1243,55 @@ export const LedgerUpgrade = (): Node => {
             },
             UpgradeTxDialogContainerProps: {
               generated: {
-                TransferSendProps: {
-                  generated: {
-                    stores: {
-                      addresses: {
-                        addressSubgroupMap: genDefaultGroupMap(true),
-                      },
-                      explorers: {
-                        selectedExplorer: defaultToSelectedExplorer(),
-                      },
-                      profile: {
-                        isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
-                        unitOfAccount: genUnitOfAccount(),
-                      },
-                      wallets: {
-                        selected: wallet.publicDeriver,
-                        sendMoneyRequest: {
-                          isExecuting: false,
-                          error: undefined,
-                          reset: action('sendMoneyRequest reset'),
-                        },
-                      },
-                      coinPriceStore: {
-                        getCurrentPrice: (_from, _to) => 5,
-                      },
-                    },
-                    actions: {
-                      wallets: {
-                        sendMoney: {
-                          trigger: async (req) => action('sendMoney')(req),
-                        },
-                      },
-                      ada: {
-                        ledgerSend: {
-                          sendUsingLedger: {
-                            trigger: async (req) => action('sendUsingLedger')(req),
-                          },
-                        },
-                      },
+                stores: {
+                  addresses: {
+                    addressSubgroupMap: genDefaultGroupMap(true),
+                  },
+                  explorers: {
+                    selectedExplorer: defaultToSelectedExplorer(),
+                  },
+                  profile: {
+                    isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
+                    unitOfAccount: genUnitOfAccount(),
+                  },
+                  wallets: {
+                    selected: wallet.publicDeriver,
+                    sendMoneyRequest: {
+                      isExecuting: false,
+                      error: undefined,
+                      reset: action('sendMoneyRequest reset'),
                     },
                   },
-                },
-                stores: {
+                  coinPriceStore: {
+                    getCurrentPrice: (_from, _to) => 5,
+                  },
                   substores: {
                     ada: {
                       yoroiTransfer: {
                         transferRequest: {
                           error: undefined,
                           reset: action('transferRequest reset'),
-                          result: genTentativeShelleyTx(wallet.publicDeriver).tentativeTx,
+                          result: {
+                            publicKey: {
+                              keyLevel: 3,
+                              key: (null: any),
+                            },
+                            signRequest,
+                          },
                         },
                       },
                     },
                   },
                 },
-                actions: Object.freeze({}),
+                actions: {
+                  ada: {
+                    ledgerSend: {
+                      sendUsingLedgerKey: {
+                        trigger: async (req) => action('sendUsingLedgerKey')(req),
+                      },
+                    },
+                  },
+                },
               },
             },
           })
