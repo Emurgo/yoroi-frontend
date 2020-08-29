@@ -232,25 +232,27 @@ test('Create Ledger transaction', async () => {
   const baseConfig = network.BaseConfig
     .reduce((acc, next) => Object.assign(acc, next), {});
   const { ByronNetworkId, ChainNetworkId } = baseConfig;
+
+  const signRequest = new HaskellShelleyTxSignRequest(
+    {
+      unsignedTx: txBuilder,
+      changeAddr: [],
+      senderUtxos,
+      certificate: undefined,
+    },
+    undefined,
+    {
+      ChainNetworkId: Number.parseInt(baseConfig.ChainNetworkId, 10),
+      PoolDeposit: new BigNumber(baseConfig.PoolDeposit),
+      KeyDeposit: new BigNumber(baseConfig.KeyDeposit),
+    },
+    {
+      neededHashes: new Set([Buffer.from(stakeCredential.to_bytes()).toString('hex')]),
+      wits: new Set() // not needed for this test, but something should be here
+    },
+  );
   const response = await createLedgerSignTxPayload(
-    new HaskellShelleyTxSignRequest(
-      {
-        unsignedTx: txBuilder,
-        changeAddr: [],
-        senderUtxos,
-        certificate: undefined,
-      },
-      undefined,
-      {
-        ChainNetworkId: Number.parseInt(baseConfig.ChainNetworkId, 10),
-        PoolDeposit: new BigNumber(baseConfig.PoolDeposit),
-        KeyDeposit: new BigNumber(baseConfig.KeyDeposit),
-      },
-      {
-        neededHashes: new Set([Buffer.from(stakeCredential.to_bytes()).toString('hex')]),
-        wits: new Set() // not needed for this test, but something should be here
-      },
-    ),
+    signRequest,
     ByronNetworkId,
     Number.parseInt(ChainNetworkId, 10),
   );
@@ -329,18 +331,28 @@ test('Create Ledger transaction', async () => {
   ).to_public();
   buildSignedTransaction(
     txBuilder.build(),
+    signRequest.signRequest.senderUtxos,
     [
-      // vkey witness
+      // this witnesses doesn't belong to the transaction / key. Just used to test wit generation
       {
-        // this witness doesn't belong to the transaction / key. Just used to test wit generation
-        path: [2147485500, 2147485463, 2147483648, 0, 0],
-        witnessSignatureHex: 'e396b6e18369269d53a53a7c12a9d4d902d796aec0f958a61f250c70a2d417b9ec78995abacdd496968a649034831dfc706644f373735795c564f74267580509',
+        path: [2147485500, 2147485463, 2147483648, 1, 1],
+        witnessSignatureHex: 'dc273ee8929c240f95b27b29b53043eb31dc1a5d8c1ba4a44b678bc97bb84db34c05144b50df954e1ac73dec1d33df06e4d95c3c7874458e7fea873c90614207',
       },
-      // bootstrap witness
       {
-        // this witness doesn't belong to the transaction / key. Just used to test wit generation
-        path: [2147483692, 2147485463, 2147483648, 0, 0],
-        witnessSignatureHex: '8458208fb03c3aa052f51c086c54bd4059ead2d2e426ac89fa4b3ce41cbfd8800b51c05840d4da0fe3615f90581926281be0510df5f6616ebed5a6d6831cceab4dd9935f7f5b6150d43b918d79e8db7cd3e17b9de91fdfbaed7cdab18818331942852fd10b58202623fceb96b07408531a5cb259f53845a38d6b68928e7c0c7e390f07545d0e6241a0',
+        path: [2147483692, 2147485463, 2147483648, 1, 1],
+        witnessSignatureHex: 'dc273ee8929c240f95b27b29b53043eb31dc1a5d8c1ba4a44b678bc97bb84db34c05144b50df954e1ac73dec1d33df06e4d95c3c7874458e7fea873c90614207',
+      },
+      {
+        path: [2147483692, 2147485463, 2147483648, 1, 2],
+        witnessSignatureHex: 'dc273ee8929c240f95b27b29b53043eb31dc1a5d8c1ba4a44b678bc97bb84db34c05144b50df954e1ac73dec1d33df06e4d95c3c7874458e7fea873c90614207',
+      },
+      {
+        path: [2147483692, 2147485463, 2147483648, 0, 7],
+        witnessSignatureHex: 'dc273ee8929c240f95b27b29b53043eb31dc1a5d8c1ba4a44b678bc97bb84db34c05144b50df954e1ac73dec1d33df06e4d95c3c7874458e7fea873c90614207',
+      },
+      {
+        path: [2147483692, 2147485463, 2147483648, 2, 0],
+        witnessSignatureHex: 'dc273ee8929c240f95b27b29b53043eb31dc1a5d8c1ba4a44b678bc97bb84db34c05144b50df954e1ac73dec1d33df06e4d95c3c7874458e7fea873c90614207',
       },
     ],
     {

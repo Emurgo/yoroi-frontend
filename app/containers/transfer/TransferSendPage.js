@@ -44,6 +44,10 @@ type Props = {|
     +trigger: void => void,
     +label: string,
   |},
+  +onSubmit: {|
+    +trigger: void => void,
+    +label: string,
+  |},
   +toTransferTx: ISignRequest<any> => TransferTx,
   +transactionRequest: {|
     +error: ?LocalizableError,
@@ -89,6 +93,9 @@ export default class TransferSendPage extends Component<Props> {
         },
         publicDeriver: selected,
       });
+      if (this.generated.stores.wallets.sendMoneyRequest.error == null) {
+        this.props.onSubmit.trigger();
+      }
     } else {
       this.spendingPasswordForm.submit({
         onSuccess: async (form) => {
@@ -100,6 +107,9 @@ export default class TransferSendPage extends Component<Props> {
             password: walletPassword,
             publicDeriver: selected,
           });
+          if (this.generated.stores.wallets.sendMoneyRequest.error == null) {
+            this.props.onSubmit.trigger();
+          }
         },
         onError: () => {}
       });
@@ -182,7 +192,10 @@ export default class TransferSendPage extends Component<Props> {
           .get(selected.getParent().getNetworkInfo().NetworkId) ?? (() => { throw new Error('No explorer for wallet network'); })()
         }
         transferTx={this.props.toTransferTx(tentativeTx)}
-        onSubmit={this.submit}
+        onSubmit={{
+          label: this.props.onSubmit.label,
+          trigger: this.submit,
+        }}
         isSubmitting={this.generated.stores.wallets.sendMoneyRequest.isExecuting}
         onCancel={this.props.onClose}
         error={this.generated.stores.wallets.sendMoneyRequest.error}

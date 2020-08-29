@@ -81,6 +81,7 @@ export default class TrezorSendStore extends Store {
       });
 
       this.actions.dialogs.closeActiveDialog.trigger();
+      this.stores.wallets.sendMoneyRequest.reset();
       this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ROOT });
       this._reset();
 

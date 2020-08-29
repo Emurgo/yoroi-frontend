@@ -55,9 +55,6 @@ export default class WalletLedgerConnectDialogContainer extends Component<Props>
       : this.props.actions.ada;
     ledgerConnect.setMode.trigger(this.props.mode);
   }
-  componentWillUnmount() {
-    this.generated.actions[ApiOptions.ada].ledgerConnect.cancel.trigger();
-  }
 
   render(): null | Node {
     const api = getApiForNetwork(this.getSelectedNetwork());
@@ -102,6 +99,7 @@ export default class WalletLedgerConnectDialogContainer extends Component<Props>
           <UpgradeTxDialogContainer
             {...this.generated.UpgradeTxDialogContainerProps}
             onClose={hwConnectActions.finishTransfer.trigger}
+            onSubmit={hwConnectActions.finishTransfer.trigger}
           />);
         break;
       case ProgressStep.SAVE:

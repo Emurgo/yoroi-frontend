@@ -194,7 +194,10 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
             selectedExplorer={this.generated.stores.explorers.selectedExplorer
               .get(publicDeriver.getParent().getNetworkInfo().NetworkId) ?? (() => { throw new Error('No explorer for wallet network'); })()
             }
-            onSubmit={this.transferFunds}
+            onSubmit={{
+              label: intl.formatMessage(globalMessages.nextButtonLabel),
+              trigger: this.transferFunds,
+            }}
             isSubmitting={daedalusTransfer.transferFundsRequest.isExecuting}
             onCancel={{
               label: intl.formatMessage(globalMessages.cancel),

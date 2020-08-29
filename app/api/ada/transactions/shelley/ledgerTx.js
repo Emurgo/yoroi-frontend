@@ -25,7 +25,6 @@ import {
   Bip44DerivationLevels,
 } from '../../lib/storage/database/walletTypes/bip44/api/utils';
 import {
-  WalletTypePurpose,
   ChainDerivations,
 } from '../../../../config/numbersConfig';
 import { derivePublicByAddressing } from '../../lib/cardanoCrypto/utils';
@@ -299,6 +298,7 @@ export function toLedgerAddressParameters(
 
 export function buildSignedTransaction(
   txBody: RustModule.WalletV4.TransactionBody,
+  senderUtxos: Array<AddressedUtxo>,
   witnesses: Array<Witness>,
   publicKey: {|
     keyLevel: number,
@@ -306,43 +306,104 @@ export function buildSignedTransaction(
   |},
   metadata: RustModule.WalletV4.TransactionMetadata | void
 ): RustModule.WalletV4.Transaction {
-  // TODO: I don't know if Ledger de-duplicates witnesses, so I deduplicate myself
-  const seenWitnesses = new Set<string>();
+  const isSameArray = (array1: Array<number>, array2: Array<number>) => (
+    array1.length === array2.length && array1.every((value, index) => value === array2[index])
+  );
+  const findWitness = (path: Array<number>) => {
+    for (const witness of witnesses) {
+      if (isSameArray(witness.path, path)) {
+        return witness.witnessSignatureHex;
+      }
+    }
+    throw new Error(`${nameof(buildSignedTransaction)} no witness for ${JSON.stringify(path)}`);
+  };
 
   const witSet = RustModule.WalletV4.TransactionWitnessSet.new();
   const bootstrapWitnesses: Array<RustModule.WalletV4.BootstrapWitness> = [];
   const vkeys: Array<RustModule.WalletV4.Vkeywitness> = [];
-  for (const witness of witnesses) {
-    if (witness.path[Bip44DerivationLevels.PURPOSE.level - 1] === WalletTypePurpose.BIP44) {
-      bootstrapWitnesses.push(RustModule.WalletV4.BootstrapWitness.from_bytes(
-        Buffer.from(witness.witnessSignatureHex, 'hex')
-      ));
-      continue;
-    }
-    // TODO: handle script witnesses
-    const finalKey = derivePublicByAddressing({
-      addressing: {
-        startLevel: 1, // full path
-        path: witness.path
-      },
+
+  // Note: Ledger removes duplicate witnesses
+  // but there may be a one-to-many relationship
+  // ex: same witness is used in both a bootstrap witness and a vkey witness
+  const seenVKeyWit = new Set<string>();
+  const seenBootstrapWit = new Set<string>();
+
+  for (const utxo of senderUtxos) {
+    verifyFromBip44Root(utxo.addressing);
+
+    const witness = findWitness(utxo.addressing.path);
+    const addressKey = derivePublicByAddressing({
+      addressing: utxo.addressing,
       startingFrom: {
         level: publicKey.keyLevel,
         key: publicKey.key,
       }
     });
-    vkeys.push(RustModule.WalletV4.Vkeywitness.new(
-      RustModule.WalletV4.Vkey.new(finalKey.to_raw_key()),
-      RustModule.WalletV4.Ed25519Signature.from_bytes(Buffer.from(witness.witnessSignatureHex, 'hex')),
-    ));
+
+    if (RustModule.WalletV4.ByronAddress.is_valid(utxo.receiver)) {
+
+      const byronAddr = RustModule.WalletV4.ByronAddress.from_base58(utxo.receiver);
+      const bootstrapWit = RustModule.WalletV4.BootstrapWitness.new(
+        RustModule.WalletV4.Vkey.new(addressKey.to_raw_key()),
+        RustModule.WalletV4.Ed25519Signature.from_bytes(
+          Buffer.from(witness, 'hex')
+        ),
+        addressKey.chaincode(),
+        byronAddr.attributes(),
+      );
+      const asString = Buffer.from(bootstrapWit.to_bytes()).toString('hex');
+      if (seenBootstrapWit.has(asString)) {
+        continue;
+      }
+      seenBootstrapWit.add(asString);
+      bootstrapWitnesses.push(bootstrapWit);
+      continue;
+    }
+
+    const vkeyWit = RustModule.WalletV4.Vkeywitness.new(
+      RustModule.WalletV4.Vkey.new(addressKey.to_raw_key()),
+      RustModule.WalletV4.Ed25519Signature.from_bytes(
+        Buffer.from(witness, 'hex')
+      ),
+    );
+    const asString = Buffer.from(vkeyWit.to_bytes()).toString('hex');
+    if (seenVKeyWit.has(asString)) {
+      continue;
+    }
+    seenVKeyWit.add(asString);
+    vkeys.push(vkeyWit);
+  }
+
+  // add any staking key needed
+  for (const witness of witnesses) {
+    const addressing = {
+      path: witness.path,
+      startLevel: 1,
+    };
+    verifyFromBip44Root(addressing);
+    if (witness.path[Bip44DerivationLevels.CHAIN.level - 1] === ChainDerivations.CHIMERIC_ACCOUNT) {
+      const stakingKey = derivePublicByAddressing({
+        addressing,
+        startingFrom: {
+          level: publicKey.keyLevel,
+          key: publicKey.key,
+        }
+      });
+      const vkeyWit = RustModule.WalletV4.Vkeywitness.new(
+        RustModule.WalletV4.Vkey.new(stakingKey.to_raw_key()),
+        RustModule.WalletV4.Ed25519Signature.from_bytes(Buffer.from(witness.witnessSignatureHex, 'hex')),
+      );
+      const asString = Buffer.from(vkeyWit.to_bytes()).toString('hex');
+      if (seenVKeyWit.has(asString)) {
+        continue;
+      }
+      seenVKeyWit.add(asString);
+      vkeys.push(vkeyWit);
+    }
   }
   if (bootstrapWitnesses.length > 0) {
     const bootstrapWitWasm = RustModule.WalletV4.BootstrapWitnesses.new();
     for (const bootstrapWit of bootstrapWitnesses) {
-      const bootstrapWitString = Buffer.from(bootstrapWit.to_bytes()).toString('hex');
-      if (seenWitnesses.has(bootstrapWitString)) {
-        continue;
-      }
-      seenWitnesses.add(bootstrapWitString);
       bootstrapWitWasm.add(bootstrapWit);
     }
     witSet.set_bootstraps(bootstrapWitWasm);
@@ -350,11 +411,6 @@ export function buildSignedTransaction(
   if (vkeys.length > 0) {
     const vkeyWitWasm = RustModule.WalletV4.Vkeywitnesses.new();
     for (const vkey of vkeys) {
-      const vkeyWitString = Buffer.from(vkey.to_bytes()).toString('hex');
-      if (seenWitnesses.has(vkeyWitString)) {
-        continue;
-      }
-      seenWitnesses.add(vkeyWitString);
       vkeyWitWasm.add(vkey);
     }
     witSet.set_vkeys(vkeyWitWasm);

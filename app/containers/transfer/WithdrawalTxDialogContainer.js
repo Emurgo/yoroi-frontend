@@ -38,6 +38,10 @@ export default class WithdrawalTxDialogContainer extends Component<Props> {
           trigger: this.props.onClose,
           label: intl.formatMessage(globalMessages.cancel),
         }}
+        onSubmit={{
+          trigger: () => {}, // nothing extra to do
+          label: intl.formatMessage(globalMessages.confirm),
+        }}
         transactionRequest={createWithdrawalTx}
         toTransferTx={tentativeTx => {
           if (!(tentativeTx instanceof HaskellShelleyTxSignRequest)) {

@@ -48,7 +48,10 @@ type Props = {|
   +formattedWalletAmount: BigNumber => string,
   +selectedExplorer: SelectedExplorer,
   +transferTx: TransferTx,
-  +onSubmit: void => PossiblyAsync<void>,
+  +onSubmit: {|
+    +trigger: void => PossiblyAsync<void>,
+    +label: string,
+  |},
   +isSubmitting: boolean,
   +onCancel: {|
     +trigger: void => void,
@@ -76,7 +79,6 @@ export default class TransferSummaryPage extends Component<Props> {
   };
 
   wrapInDialog: Node => Node = (content) => {
-    const { intl } = this.context;
     const actions = [
       {
         label: this.props.onCancel.label,
@@ -85,8 +87,8 @@ export default class TransferSummaryPage extends Component<Props> {
         disabled: this.props.isSubmitting,
       },
       {
-        label: intl.formatMessage(globalMessages.nextButtonLabel),
-        onClick: this.props.onSubmit,
+        label: this.props.onSubmit.label,
+        onClick: this.props.onSubmit.trigger,
         primary: true,
         className: classnames(['transferButton']),
         isSubmitting: this.props.isSubmitting,

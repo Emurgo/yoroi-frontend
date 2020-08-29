@@ -80,6 +80,10 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
           trigger: this.props.onClose,
           label: intl.formatMessage(globalMessages.cancel),
         }}
+        onSubmit={{
+          trigger: () => {}, // nothing extra to do
+          label: intl.formatMessage(globalMessages.confirm),
+        }}
         transactionRequest={{
           error: txBuilder.setupSelfTx.error,
           result: txBuilder.tentativeTx,

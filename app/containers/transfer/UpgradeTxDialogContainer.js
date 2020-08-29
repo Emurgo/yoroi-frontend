@@ -18,6 +18,7 @@ export type GeneratedData = typeof UpgradeTxDialogContainer.prototype.generated;
 type Props = {|
   ...InjectedOrGenerated<GeneratedData>,
   +onClose: void => void,
+  +onSubmit: void => void,
 |};
 
 const messages = defineMessages({
@@ -48,6 +49,10 @@ export default class UpgradeTxDialogContainer extends Component<Props> {
       <TransferSendPage
         {...this.generated.TransferSendProps}
         header={header}
+        onSubmit={{
+          trigger: this.props.onSubmit,
+          label: intl.formatMessage(globalMessages.upgradeLabel),
+        }}
         onClose={{
           trigger: this.props.onClose,
           label: intl.formatMessage(globalMessages.skipLabel),

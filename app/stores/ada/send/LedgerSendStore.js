@@ -112,6 +112,7 @@ export default class LedgerSendStore extends Store {
       });
 
       this.actions.dialogs.closeActiveDialog.trigger();
+      this.stores.wallets.sendMoneyRequest.reset();
       this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ROOT });
 
       Logger.info('SUCCESS: ADA sent using Ledger SignTx');
@@ -168,6 +169,7 @@ export default class LedgerSendStore extends Store {
       const txId = Buffer.from(RustModule.WalletV4.hash_transaction(txBody).to_bytes()).toString('hex');
       const signedTx = buildSignedTransaction(
         txBody,
+        request.params.signRequest.signRequest.senderUtxos,
         ledgerSignTxResp.witnesses,
         {
           key: RustModule.WalletV4.Bip32PublicKey.from_bytes(
