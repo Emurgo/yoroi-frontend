@@ -65,6 +65,20 @@ Feature: Txs History
     Then I see the transactions summary
     And I should see that the number of transactions is 3
 
+  @it-139
+  Scenario: Open the tx history of an already loaded wallet (IT-139)
+    Given There is a Byron wallet stored named simple-pending-wallet
+    Then I see the transactions summary
+    And I should see that the number of transactions is 3
+    Then I navigate to the general settings screen
+    And I click on secondary menu "wallet" item
+    When I click on resync wallet
+    Then I click on the checkbox
+    And I click the next button
+    Then I navigate to wallet transactions screen
+    # should be same number of transactions after the resync
+    And I should see that the number of transactions is 3
+
   @it-96
   Scenario: Tx from other client updates tx history (IT-96)
     Given There is a Byron wallet stored named many-tx-wallet

@@ -8,6 +8,7 @@ import { observer } from 'mobx-react';
 import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import globalMessages from '../../../i18n/global-messages';
 
 export const messages: * = defineMessages({
   titleLabel: {
@@ -17,10 +18,6 @@ export const messages: * = defineMessages({
   resyncExplanation: {
     id: 'wallet.settings.resync.explanation',
     defaultMessage: '!!!If you are experiencing issues with your wallet, or think you have an incorrect balance or transaction history, you can delete the local data stored by Yoroi and resync with the blockchain.',
-  },
-  resyncButtonLabel: {
-    id: 'wallet.settings.resync.buttonLabel',
-    defaultMessage: '!!!Resync wallet',
   },
 });
 
@@ -52,7 +49,7 @@ export default class ResyncBlock extends Component<Props> {
 
         <Button
           className={buttonClassNames}
-          label={this.context.intl.formatMessage(messages.resyncButtonLabel)}
+          label={this.context.intl.formatMessage(globalMessages.resyncButtonLabel)}
           skin={ButtonSkin}
           onClick={this.props.openDialog}
         />
