@@ -99,7 +99,7 @@
   "global.labels.rewardsLabel": "Recompensas",
   "global.labels.save": "Guardar",
   "global.labels.shelleyLabel": "Shelley",
-  "global.labels.spendingKey": "Contraseña de gasto",
+  "global.labels.spendingKey": "Clave de gastos",
   "global.labels.spendingKeyHash": "Hash de contraseña de gasto",
   "global.labels.stakingKey": "Clave de Staking",
   "global.labels.stakingKeyHash": "Hash de contraseña de Staking",
