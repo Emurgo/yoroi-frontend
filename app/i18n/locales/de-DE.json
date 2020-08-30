@@ -102,7 +102,7 @@
   "global.labels.spendingKey": "Ausgabenschlüssel",
   "global.labels.spendingKeyHash": "Ausgabenschlüssel Prüfsumme",
   "global.labels.stakingKey": "Staking Schlüssel",
-  "global.labels.stakingKeyHash": "Staking key hash",
+  "global.labels.stakingKeyHash": "Staking Schlüssel Prüfsumme",
   "global.labels.upgrade": "Aktualisieren",
   "global.language.chinese.simplified": "简体中文",
   "global.language.chinese.traditional": "繁體中文",
