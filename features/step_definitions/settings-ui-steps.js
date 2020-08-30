@@ -124,6 +124,10 @@ When(/^I click on remove wallet$/, async function () {
   await this.click('.removeWallet');
 });
 
+When(/^I click on resync wallet$/, async function () {
+  await this.click('.resyncButton');
+});
+
 Then(/^I click on the checkbox$/, async function () {
   await this.click('.DangerousActionDialog_checkbox > .SimpleCheckbox_root');
 });

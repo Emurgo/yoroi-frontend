@@ -629,6 +629,10 @@ const globalMessages: * = defineMessages({
     id: 'global.labels.keyRegistrationPointer',
     defaultMessage: '!!!Key registration pointer',
   },
+  resyncButtonLabel: {
+    id: 'wallet.settings.resync.buttonLabel',
+    defaultMessage: '!!!Resync wallet',
+  },
 });
 export default globalMessages;
 
