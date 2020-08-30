@@ -625,9 +625,9 @@ const globalMessages: * = defineMessages({
     id: 'global.labels.stakingKeyHash',
     defaultMessage: '!!!Staking key hash',
   },
-  stakingKeyPointer: {
-    id: 'global.labels.stakingKeyPointer',
-    defaultMessage: '!!!Staking key pointer',
+  keyRegistrationPointer: {
+    id: 'global.labels.keyRegistrationPointer',
+    defaultMessage: '!!!Key registration pointer',
   },
 });
 export default globalMessages;

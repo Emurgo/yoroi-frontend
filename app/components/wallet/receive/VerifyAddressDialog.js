@@ -275,7 +275,7 @@ export default class VerifyAddressDialog extends Component<Props> {
     return (
       <>
         <span className={this.getLabelStyle()}>
-          {intl.formatMessage(globalMessages.stakingKeyPointer)}
+          {intl.formatMessage(globalMessages.keyRegistrationPointer)}
         </span>
         <div className="keyPointer">
           <RawHash light={false} className={styles.hash}>
