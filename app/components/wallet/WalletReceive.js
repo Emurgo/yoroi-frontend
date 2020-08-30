@@ -15,9 +15,6 @@ import type { AddressFilterKind, StandardAddress } from '../../types/AddressFilt
 import { addressFilter, AddressFilter, } from '../../types/AddressFilterTypes';
 import environment from '../../environment';
 import type { Notification } from '../../types/notificationType';
-import type {
-  BIP32Path
-} from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import BigNumber from 'bignumber.js';
 import { truncateAddressShort, splitAmount } from '../../utils/formatters';
@@ -71,7 +68,7 @@ type Props = {|
   +walletAddresses: $ReadOnlyArray<$ReadOnly<StandardAddress>>,
   +onCopyAddressTooltip: (string, string) => void,
   +notification: ?Notification,
-  +onVerifyAddress: {| address: string, path: void | BIP32Path |} => Promise<void>,
+  +onVerifyAddress: $ReadOnly<StandardAddress> => Promise<void>,
   +onGeneratePaymentURI: void | (string => void),
   +shouldHideBalance: boolean,
   +unitOfAccountSetting: UnitOfAccountSettingType,
@@ -284,10 +281,7 @@ export default class WalletReceive extends Component<Props> {
                 <button
                   type="button"
                   onClick={
-                    onVerifyAddress.bind(this, {
-                      address: address.address,
-                      path: address.addressing?.path
-                    })
+                    onVerifyAddress.bind(this, address)
                   }
                 >
                   <div>

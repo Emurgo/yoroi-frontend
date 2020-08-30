@@ -40,7 +40,7 @@ import CardanoByronTransaction from '../../domain/CardanoByronTransaction';
 import JormungandrTransaction from '../../domain/JormungandrTransaction';
 import { transactionTypes } from '../../api/ada/transactions/types';
 import type { LastSyncInfoRow, } from '../../api/ada/lib/storage/database/walletTypes/core/tables';
-import { TxStatusCodes } from '../../api/ada/lib/storage/database/primitives/enums';
+import { TxStatusCodes, CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
 import { assuranceModes, } from '../../config/transactionAssuranceConfig';
 import WalletSettingsStore from '../../stores/toplevel/WalletSettingsStore';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
@@ -293,7 +293,7 @@ const genPropsForTransactions: {|
         BYRON_EXTERNAL.class,
         {
           all: [
-            { address: 'Ae2tdPwUPEZCfyggUgSxD1E5UCx5f5hrXCdvQjJszxE7epyZ4ox9vRNUbHf', }
+            { address: 'Ae2tdPwUPEZCfyggUgSxD1E5UCx5f5hrXCdvQjJszxE7epyZ4ox9vRNUbHf', type: CoreAddressTypes.CARDANO_LEGACY }
           ],
           wasExecuted: true,
         }
@@ -301,7 +301,7 @@ const genPropsForTransactions: {|
       defaultMap.set(
         BYRON_INTERNAL.class,
         {
-          all: [{ address: 'Ae2tdPwUPEZFXnw5T5aXoaP28yw4mRLeYomaG9mPGCFbPUtw368ZWYKp1zM', }],
+          all: [{ address: 'Ae2tdPwUPEZFXnw5T5aXoaP28yw4mRLeYomaG9mPGCFbPUtw368ZWYKp1zM', type: CoreAddressTypes.CARDANO_LEGACY }],
           wasExecuted: true,
         }
       );

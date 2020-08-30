@@ -102,7 +102,7 @@ implements IPublicDeriver<Parent>, IRename, IGetLastSyncInfo {
       .keys(deps)
       .map(key => deps[key])
       .flatMap(table => getAllSchemaTables(this.getDb(), table));
-    return await raii(
+    return await raii<$ReadOnly<PublicDeriverRow>>(
       this.getDb(),
       depTables,
       async tx => {
@@ -139,7 +139,7 @@ implements IPublicDeriver<Parent>, IRename, IGetLastSyncInfo {
       .keys(deps)
       .map(key => deps[key])
       .flatMap(table => getAllSchemaTables(this.getDb(), table));
-    return await raii(
+    return await raii<IRenameResponse>(
       this.getDb(),
       depTables,
       async tx => this.rawRename(tx, deps, body)

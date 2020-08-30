@@ -1,7 +1,7 @@
 // @flow
 
 import type {
-  Address, Addressing, UsedStatus, Value,
+  Address, AddressType, Addressing, UsedStatus, Value,
 } from '../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import { defineMessages } from 'react-intl';
 import type { $npm$ReactIntl$MessageDescriptor } from 'react-intl';
@@ -15,6 +15,7 @@ type ToMessage = <K>(K) => $Exact<$npm$ReactIntl$MessageDescriptor>;
 
 export type StandardAddress = {|
   ...Address,
+  ...AddressType,
   ...InexactSubset<Label>,
   ...InexactSubset<Value>,
   ...InexactSubset<Addressing>,

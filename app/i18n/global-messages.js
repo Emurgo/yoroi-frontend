@@ -609,6 +609,26 @@ const globalMessages: * = defineMessages({
     id: 'global.labels.shelleyLabel',
     defaultMessage: '!!!Shelley'
   },
+  spendingKeyLabel: {
+    id: 'global.labels.spendingKey',
+    defaultMessage: '!!!Spending key',
+  },
+  stakingKeyLabel: {
+    id: 'global.labels.stakingKey',
+    defaultMessage: '!!!Staking key',
+  },
+  spendingKeyHashLabel: {
+    id: 'global.labels.spendingKeyHash',
+    defaultMessage: '!!!Spending key hash',
+  },
+  stakingKeyHashLabel: {
+    id: 'global.labels.stakingKeyHash',
+    defaultMessage: '!!!Staking key hash',
+  },
+  stakingKeyPointer: {
+    id: 'global.labels.stakingKeyPointer',
+    defaultMessage: '!!!Staking key pointer',
+  },
 });
 export default globalMessages;
 

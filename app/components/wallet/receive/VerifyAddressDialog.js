@@ -8,9 +8,6 @@ import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { defineMessages, intlShape } from 'react-intl';
 import QRCode from 'qrcode.react';
-import type {
-  BIP32Path
-} from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { toDerivationPathString } from '../../../api/common/lib/crypto/keys/path';
 
 import Dialog from '../../widgets/Dialog';
@@ -27,6 +24,18 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { truncateAddress } from '../../../utils/formatters';
 import CopyableAddress from '../../widgets/CopyableAddress';
 import type { Notification } from '../../../types/notificationType';
+import type { StandardAddress, } from '../../../types/AddressFilterTypes';
+import type { Addressing } from '../../../api/ada/lib/storage/models/PublicDeriver/interfaces';
+import { CoreAddressTypes } from '../../../api/ada/lib/storage/database/primitives/enums';
+import { RustModule } from '../../../api/ada/lib/cardanoCrypto/rustLoader';
+import {
+  isJormungandrAddress,
+  isCardanoHaskellAddress,
+  getCardanoSpendingKeyHash,
+  getJormungandrSpendingKey,
+} from '../../../api/ada/lib/storage/bridge/utils';
+import type { ComplexityLevelType } from '../../../types/complexityLevelType';
+import { ComplexityLevels } from '../../../types/complexityLevelType';
 
 const messages = defineMessages({
   addressDetailsTitleLabel: {
@@ -52,9 +61,9 @@ type Props = {|
   +notification: ?Notification,
   +onCopyAddressTooltip: string => void,
   +isHardware: boolean,
-  +walletAddress: string,
-  +walletPath: void | BIP32Path,
+  +addressInfo: $ReadOnly<StandardAddress>,
   +classicTheme: boolean,
+  +complexityLevel: ?ComplexityLevelType,
 |};
 
 @observer
@@ -64,42 +73,23 @@ export default class VerifyAddressDialog extends Component<Props> {
     intl: intlShape.isRequired,
   };
 
+  getLabelStyle: void => string = () => {
+    return this.props.classicTheme ?
+      'SimpleFormField_label FormFieldOverridesClassic_label' :
+      styles.label;
+  }
+
   render(): Node {
     const { intl } = this.context;
-    const {
-      isActionProcessing,
-      error,
-      verify,
-      walletAddress,
-      walletPath,
-      cancel,
-      isHardware,
-      classicTheme,
-    } = this.props;
 
-    const dialogActions = !isHardware
+    const dialogActions = !this.props.isHardware
       ? []
       : [{
         label: intl.formatMessage(messages.verifyAddressButtonLabel),
         primary: true,
-        isSubmitting: isActionProcessing,
-        onClick: verify,
+        isSubmitting: this.props.isActionProcessing,
+        onClick: this.props.verify,
       }];
-
-    const notificationId = 'verify-address-notification';
-
-    // TODO: This should be refactored somehow so it’s not duplicated in multiple files.
-    // Get QRCode color value from active theme's CSS variable
-    const qrCodeBackgroundColor = document.documentElement ?
-      document.documentElement.style.getPropertyValue('--theme-receive-qr-code-background-color') : 'transparent';
-    const qrCodeForegroundColor = document.documentElement ?
-      document.documentElement.style.getPropertyValue('--theme-receive-qr-code-foreground-color') : '#000';
-
-    const labelStyle = classicTheme ?
-      'SimpleFormField_label FormFieldOverridesClassic_label' :
-      styles.label;
-
-    const derivationClasses = classnames([styles.infoBlock, styles.derivation]);
 
     return (
       <Dialog
@@ -108,60 +98,211 @@ export default class VerifyAddressDialog extends Component<Props> {
         actions={dialogActions}
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
-        onClose={cancel}
+        onClose={this.props.cancel}
       >
-        {walletAddress ? (
-          <div>
-            <div align="center">
-              <QRCode
-                value={walletAddress}
-                bgColor={qrCodeBackgroundColor}
-                fgColor={qrCodeForegroundColor}
-                size={152}
-              />
-            </div>
-            <br />
-            <br />
-            <span className={labelStyle}>
-              {intl.formatMessage(globalMessages.addressLabel)}
-            </span>
-            <div className="verificationAddress">
-              <CopyableAddress
-                hash={walletAddress}
-                elementId={notificationId}
-                onCopyAddress={
-                  () => this.props.onCopyAddressTooltip(notificationId)
-                }
-                notification={this.props.notification}
-              >
-                <ExplorableHashContainer
-                  light={false}
-                  selectedExplorer={this.props.selectedExplorer}
-                  hash={walletAddress}
-                  linkType="address"
-                >
-                  <RawHash light={false} className={styles.hash}>
-                    {truncateAddress(walletAddress)}
-                  </RawHash>
-                </ExplorableHashContainer>
-              </CopyableAddress>
-            </div>
-            <br />
-            {walletPath != null && (
-              <>
-                <span className={labelStyle}>
-                  {intl.formatMessage(messages.derivationPathLabel)}
-                </span>
-                <div className={derivationClasses}>
-                  <div className={styles.hash}>
-                    {toDerivationPathString(walletPath)}
-                  </div>
-                </div>
-              </>
-            )}
-          </div>
-        ) : null}
-        { error ? (<ErrorBlock error={error} />) : null }
+        {this.renderQrCode()}
+        {this.renderAddressBlock()}
+        {this.renderPath(this.props.addressInfo.addressing)}
+        {this.renderStakingKey()}
+        {this.renderSpendingKey()}
+        {this.renderPointer()}
+        { this.props.error ? (<ErrorBlock error={this.props.error} />) : null }
       </Dialog>);
+  }
+
+  renderAddressBlock: void => Node = () => {
+    const { intl } = this.context;
+    const notificationId = 'verify-address-notification';
+    return (
+      <>
+        <span className={this.getLabelStyle()}>
+          {intl.formatMessage(globalMessages.addressLabel)}
+        </span>
+        <div className="verificationAddress">
+          <CopyableAddress
+            hash={this.props.addressInfo.address}
+            elementId={notificationId}
+            onCopyAddress={
+              () => this.props.onCopyAddressTooltip(notificationId)
+            }
+            notification={this.props.notification}
+          >
+            <ExplorableHashContainer
+              light={false}
+              selectedExplorer={this.props.selectedExplorer}
+              hash={this.props.addressInfo.address}
+              linkType="address"
+            >
+              <RawHash light={false} className={styles.hash}>
+                {truncateAddress(this.props.addressInfo.address)}
+              </RawHash>
+            </ExplorableHashContainer>
+          </CopyableAddress>
+        </div>
+        <br />
+      </>
+    );
+  }
+
+  renderQrCode: void => Node = () => {
+    // TODO: This should be refactored somehow so it’s not duplicated in multiple files.
+    // Get QRCode color value from active theme's CSS variable
+    const qrCodeBackgroundColor = document.documentElement ?
+      document.documentElement.style.getPropertyValue('--theme-receive-qr-code-background-color') : 'transparent';
+    const qrCodeForegroundColor = document.documentElement ?
+      document.documentElement.style.getPropertyValue('--theme-receive-qr-code-foreground-color') : '#000';
+
+    return (
+      <>
+        <div align="center">
+          <QRCode
+            value={this.props.addressInfo.address}
+            bgColor={qrCodeBackgroundColor}
+            fgColor={qrCodeForegroundColor}
+            size={152}
+          />
+        </div>
+        <br />
+        <br />
+      </>
+    );
+  }
+
+  /** we always show the staking key
+   *  because hardware wallets will display the staking key on the device
+   */
+  renderStakingKey: (void) => Node = () => {
+    const { intl } = this.context;
+
+    const getStakingKey = () => {
+      if (this.props.addressInfo.type === CoreAddressTypes.JORMUNGANDR_GROUP) {
+        const wasmAddr = RustModule.WalletV3.Address.from_string(
+          this.props.addressInfo.address
+        ).to_group_address();
+        if (wasmAddr == null) return null; // should never happen
+        return Buffer.from(wasmAddr.get_account_key().as_bytes()).toString('hex');
+      }
+      if (this.props.addressInfo.type === CoreAddressTypes.CARDANO_BASE) {
+        const wasmAddr = RustModule.WalletV4.BaseAddress.from_address(
+          RustModule.WalletV4.Address.from_bech32(this.props.addressInfo.address)
+        )?.stake_cred();
+        if (wasmAddr == null) return null; // should never happen
+        const hash = wasmAddr.to_keyhash() ?? wasmAddr.to_scripthash();
+        if (hash == null) return null; // should never happen
+        return Buffer.from(hash.to_bytes()).toString('hex');
+      }
+    };
+
+    const stakingKey = getStakingKey();
+    if (stakingKey == null) return null;
+    return (
+      <>
+        <span className={this.getLabelStyle()}>
+          {intl.formatMessage(
+            isJormungandrAddress(this.props.addressInfo.type)
+              ? globalMessages.stakingKeyLabel
+              : globalMessages.stakingKeyHashLabel
+          )}
+        </span>
+        <div className="stakingKey">
+          <RawHash light={false} className={styles.hash}>
+            {stakingKey}
+          </RawHash>
+        </div>
+        <br />
+      </>
+    );
+  }
+
+  renderSpendingKey: (void) => Node = () => {
+    const { intl } = this.context;
+
+    // this is useful for querying servers & debugging. Not so useful for the average user.
+    if (this.props.complexityLevel !== ComplexityLevels.Advanced) {
+      return null;
+    }
+    const getSpendingKey = () => {
+      if (isJormungandrAddress(this.props.addressInfo.type)) {
+        const wasmAddr = RustModule.WalletV3.Address.from_string(
+          this.props.addressInfo.address
+        );
+        const spendingKey = getJormungandrSpendingKey(wasmAddr);
+        if (spendingKey == null) return null; // should never happen
+        return Buffer.from(spendingKey.as_bytes()).toString('hex');
+      }
+      if (isCardanoHaskellAddress(this.props.addressInfo.type)) {
+        const wasmAddr = RustModule.WalletV4.Address.from_bech32(this.props.addressInfo.address);
+        const spendingKey = getCardanoSpendingKeyHash(wasmAddr);
+        if (spendingKey === null) return null; // legacy address ignored
+        if (spendingKey === undefined) return null; // TODO: handle script outputs
+        return Buffer.from(spendingKey.to_bytes()).toString('hex');
+      }
+    };
+
+    const spendingKey = getSpendingKey();
+    if (spendingKey == null) return null;
+    return (
+      <>
+        <span className={this.getLabelStyle()}>
+          {intl.formatMessage(
+            isJormungandrAddress(this.props.addressInfo.type)
+              ? globalMessages.spendingKeyLabel
+              : globalMessages.spendingKeyHashLabel
+          )}
+        </span>
+        <div className="spendingKey">
+          <RawHash light={false} className={styles.hash}>
+            {spendingKey}
+          </RawHash>
+        </div>
+        <br />
+      </>
+    );
+  }
+
+  /** hardware wallets display the pointer information on the device */
+  renderPointer: (void) => Node = () => {
+    const { intl } = this.context;
+
+    if (this.props.addressInfo.type !== CoreAddressTypes.CARDANO_PTR) {
+      return null;
+    }
+    const wasmAddr = RustModule.WalletV4.PointerAddress.from_address(
+      RustModule.WalletV4.Address.from_bech32(this.props.addressInfo.address)
+    )?.stake_pointer();
+    if (wasmAddr == null) return null; // should never happen
+
+    return (
+      <>
+        <span className={this.getLabelStyle()}>
+          {intl.formatMessage(globalMessages.stakingKeyPointer)}
+        </span>
+        <div className="keyPointer">
+          <RawHash light={false} className={styles.hash}>
+            ({wasmAddr.slot()}, {wasmAddr.tx_index()}, {wasmAddr.cert_index()})
+          </RawHash>
+        </div>
+        <br />
+      </>
+    );
+  }
+
+  renderPath: (void | $PropertyType<Addressing, 'addressing'>) => Node = (addressing) => {
+    if (addressing == null) return null;
+    const { intl } = this.context;
+    const derivationClasses = classnames([styles.infoBlock, styles.derivation]);
+    return (
+      <>
+        <span className={this.getLabelStyle()}>
+          {intl.formatMessage(messages.derivationPathLabel)}
+        </span>
+        <div className={derivationClasses}>
+          <div className={styles.hash}>
+            {toDerivationPathString(addressing.path)}
+          </div>
+        </div>
+        <br />
+      </>
+    );
   }
 }

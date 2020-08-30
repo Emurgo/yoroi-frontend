@@ -84,7 +84,7 @@ export async function upsertTxMemo(
     .keys(deps)
     .map(key => deps[key])
     .flatMap(table => getAllSchemaTables(request.db, table));
-  return await raii(
+  return await raii<UpsertTxMemoResponse>(
     request.db,
     depTables,
     async tx => deps.ModifyTxMemo.upsertMemo(
@@ -104,7 +104,7 @@ export async function deleteTxMemo(
     .keys(deps)
     .map(key => deps[key])
     .flatMap(table => getAllSchemaTables(request.db, table));
-  return await raii(
+  return await raii<DeleteTxMemoResponse>(
     request.db,
     depTables,
     async tx => deps.ModifyTxMemo.deleteMemo(
@@ -124,7 +124,7 @@ export async function getAllTxMemo(
     .keys(deps)
     .map(key => deps[key])
     .flatMap(table => getAllSchemaTables(request.db, table));
-  return await raii(
+  return await raii<GetAllTxMemoResponse>(
     request.db,
     depTables,
     async tx => deps.GetTxMemo.getAllMemos(

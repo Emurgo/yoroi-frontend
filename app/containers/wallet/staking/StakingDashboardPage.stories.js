@@ -55,6 +55,9 @@ import type {
   JormungandrTransactionInsert, NetworkRow,
 } from '../../../api/ada/lib/storage/database/primitives/tables';
 import type { IAddressTypeStore, IAddressTypeUiSubset } from '../../../stores/stateless/addressStores';
+import {
+  CoreAddressTypes,
+} from '../../../api/ada/lib/storage/database/primitives/enums';
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -1027,21 +1030,25 @@ export const MangledDashboardWarning = (): Node => {
       return [{
         address: 'addr1sj045dheysyptfekdyqa508nuzdzmh82vkda9hcwqwysrja6d8d66f0cfsfk50hhuqjymr08drnm2kdf0r2337l6kl7mtm0z44vv4jexkqhz5w',
         value: new BigNumber(1),
+        type: CoreAddressTypes.JORMUNGANDR_GROUP,
       }];
     }
     if (mangledValue === mangledCases.CanUnmangleSome) {
       return [{
         address: 'addr1sj045dheysyptfekdyqa508nuzdzmh82vkda9hcwqwysrja6d8d66f0cfsfk50hhuqjymr08drnm2kdf0r2337l6kl7mtm0z44vv4jexkqhz5w',
         value: new BigNumber(1),
+        type: CoreAddressTypes.JORMUNGANDR_GROUP,
       }, {
         address: 'addr1sj045dheysyptfekdyqa508nuzdzmh82vkda9hcwqwysrja6d8d66f0cfsfk50hhuqjymr08drnm2kdf0r2337l6kl7mtm0z44vv4jexkqhz5w',
         value: new BigNumber(1000000),
+        type: CoreAddressTypes.JORMUNGANDR_GROUP,
       }];
     }
     if (mangledValue === mangledCases.CanUnmangleAll) {
       return [{
         address: 'addr1sj045dheysyptfekdyqa508nuzdzmh82vkda9hcwqwysrja6d8d66f0cfsfk50hhuqjymr08drnm2kdf0r2337l6kl7mtm0z44vv4jexkqhz5w',
         value: new BigNumber(1000000),
+        type: CoreAddressTypes.JORMUNGANDR_GROUP,
       }];
     }
     throw new Error(`Unhandled mangled case ${mangledValue}`);

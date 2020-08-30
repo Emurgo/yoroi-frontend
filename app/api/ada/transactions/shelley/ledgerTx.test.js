@@ -10,7 +10,7 @@ import {
 } from './ledgerTx';
 import {
   byronAddrToHex,
-  getCardanoAddrKeyHash,
+  getCardanoSpendingKeyHash,
   normalizeToAddress,
 } from '../../lib/storage/bridge/utils';
 import { HaskellShelleyTxSignRequest } from './HaskellShelleyTxSignRequest';
@@ -186,7 +186,7 @@ test('Create Ledger transaction', async () => {
   for (const utxo of senderUtxos) {
     const wasmAddr = normalizeToAddress(utxo.receiver);
     if (wasmAddr == null) throw new Error(`Unknown address ${utxo.receiver}`);
-    const keyHash = getCardanoAddrKeyHash(wasmAddr);
+    const keyHash = getCardanoSpendingKeyHash(wasmAddr);
     if (keyHash === undefined) throw new Error(`Unexpected script address ${utxo.receiver}`);
     if (keyHash == null) {
       txBuilder.add_bootstrap_input(

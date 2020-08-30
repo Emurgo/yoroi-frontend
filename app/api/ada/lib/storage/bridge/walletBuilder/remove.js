@@ -44,7 +44,7 @@ export async function removePublicDeriver(request: {|
   publicDeriver: IPublicDeriver<>,
   /** removes parent if specified */
   conceptualWallet: void | IConceptualWallet,
-|}): Promise<number> {
+|}): Promise<void> {
   const deps = Object.freeze({
     RemovePublicDeriver,
     ModifyConceptualWallet,
@@ -68,7 +68,7 @@ export async function removePublicDeriver(request: {|
     .map(key => deps[key])
     .flatMap(table => getAllSchemaTables(db, table));
 
-  return await raii(
+  return await raii<PromisslessReturnType<typeof removePublicDeriver>>(
     db,
     [
       // need a lock on all tables to delete

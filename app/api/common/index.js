@@ -42,6 +42,7 @@ import type {
   IChangePasswordRequestFunc, IChangePasswordRequest, IChangePasswordResponse,
 } from '../ada/lib/storage/models/common/interfaces';
 import { WrongPassphraseError } from '../ada/lib/cardanoCrypto/cryptoErrors';
+import type { CoreAddressT } from '../ada/lib/storage/database/primitives/enums';
 
 // getWallets
 
@@ -92,7 +93,10 @@ export type RemoveAllTransactionsFunc = (
 export type GetForeignAddressesRequest = {|
   publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels>,
 |};
-export type GetForeignAddressesResponse = Array<string>;
+export type GetForeignAddressesResponse = Array<{|
+  address: string,
+  type: CoreAddressT,
+|}>;
 export type GetForeignAddressesFunc = (
   request: GetForeignAddressesRequest
 ) => Promise<GetForeignAddressesResponse>;

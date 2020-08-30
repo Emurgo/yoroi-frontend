@@ -21,13 +21,10 @@ import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/in
 import Dialog from '../../components/widgets/Dialog';
 import globalMessages from '../../i18n/global-messages';
 import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
-import type { AddressFilterKind, } from '../../types/AddressFilterTypes';
+import type { AddressFilterKind, StandardAddress, } from '../../types/AddressFilterTypes';
 import UnmangleTxDialogContainer from '../transfer/UnmangleTxDialogContainer';
 import type { GeneratedData as UnmangleTxDialogContainerData } from '../transfer/UnmangleTxDialogContainer';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import type {
-  BIP32Path
-} from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { addressGroupName, addressSubgroupName, AddressFilter, AddressSubgroup, AddressGroupTypes } from '../../types/AddressFilterTypes';
 import LocalizableError from '../../i18n/LocalizableError';
 import { SelectedExplorer } from '../../domain/SelectedExplorer';
@@ -42,6 +39,7 @@ import { getUnmangleAmounts, } from '../../stores/stateless/mangledAddresses';
 import {
   isCardanoHaskell,
 } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import type { ComplexityLevelType } from '../../types/complexityLevelType';
 
 export type GeneratedData = typeof WalletReceivePage.prototype.generated;
 
@@ -223,7 +221,7 @@ export default class WalletReceivePage extends Component<Props> {
           }).slice().reverse()}
           onCopyAddressTooltip={onCopyAddressTooltip}
           notification={notification}
-          onVerifyAddress={async (request: {| address: string, path: void | BIP32Path, |}) => {
+          onVerifyAddress={async (request: $ReadOnly<StandardAddress>) => {
             await actions.ada.hwVerifyAddress.selectAddress.trigger(request);
             this.openVerifyAddressDialog();
           }}
@@ -317,8 +315,7 @@ export default class WalletReceivePage extends Component<Props> {
             isActionProcessing={hwVerifyAddress.isActionProcessing}
             selectedExplorer={selectedExplorerForNetwork}
             error={hwVerifyAddress.error}
-            walletAddress={hwVerifyAddress.selectedAddress.address}
-            walletPath={hwVerifyAddress.selectedAddress.path}
+            addressInfo={hwVerifyAddress.selectedAddress}
             onCopyAddressTooltip={(elementId) => {
               if (!uiNotifications.isOpen(elementId)) {
                 runInAction(() => {
@@ -338,6 +335,7 @@ export default class WalletReceivePage extends Component<Props> {
             verify={() => actions.ada.hwVerifyAddress.verifyAddress.trigger(publicDeriver)}
             cancel={actions.ada.hwVerifyAddress.closeAddressDetailDialog.trigger}
             classicTheme={profile.isClassicTheme}
+            complexityLevel={profile.selectedComplexityLevel}
           />
         ) : null}
 
@@ -397,10 +395,7 @@ export default class WalletReceivePage extends Component<Props> {
             trigger: (params: void) => void
           |},
           selectAddress: {|
-            trigger: (params: {|
-              address: string,
-              path: void | BIP32Path
-            |}) => Promise<void>
+            trigger: (params: $ReadOnly<StandardAddress>) => Promise<void>,
           |},
           verifyAddress: {|
             trigger: (
@@ -449,6 +444,7 @@ export default class WalletReceivePage extends Component<Props> {
         selectedExplorer: Map<number, SelectedExplorer>,
       |},
       profile: {|
+        selectedComplexityLevel: ?ComplexityLevelType,
         isClassicTheme: boolean,
         shouldHideBalance: boolean,
         unitOfAccount: UnitOfAccountSettingType,
@@ -458,10 +454,7 @@ export default class WalletReceivePage extends Component<Props> {
           hwVerifyAddress: {|
             error: ?LocalizableError,
             isActionProcessing: boolean,
-            selectedAddress: ?{|
-              address: string,
-              path: void | BIP32Path
-            |}
+            selectedAddress: ?$ReadOnly<StandardAddress>,
           |}
         |}
       |},
@@ -504,6 +497,7 @@ export default class WalletReceivePage extends Component<Props> {
           isClassicTheme: stores.profile.isClassicTheme,
           shouldHideBalance: stores.profile.shouldHideBalance,
           unitOfAccount: stores.profile.unitOfAccount,
+          selectedComplexityLevel: stores.profile.selectedComplexityLevel,
         },
         wallets: {
           selected: stores.wallets.selected,

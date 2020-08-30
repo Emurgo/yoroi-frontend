@@ -41,6 +41,9 @@ import {
   GetKey,
   GetAddress,
 } from '../../database/primitives/api/read';
+import type {
+  CoreAddressT,
+} from '../../database/primitives/enums';
 import {
   ModifyDisplayCutoff,
 } from '../../database/walletTypes/bip44/api/write';
@@ -81,6 +84,10 @@ export type Addressing = {|
 
 export type UsedStatus = {|
   isUsed: boolean,
+|};
+
+export type AddressType = {|
+  type: CoreAddressT,
 |};
 
 
