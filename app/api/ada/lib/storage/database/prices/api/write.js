@@ -20,7 +20,7 @@ export class ModifyPriceData {
     db: lf$Database,
     dbTx: lf$Transaction,
     prices: $ReadOnlyArray<PriceDataInsert | PriceDataRow>,
-  ): Promise<$ReadOnly<PriceDataRow>> {
+  ): Promise<$ReadOnlyArray<PriceDataRow>> {
     return await addOrReplaceRows<{ ...PriceDataInsert, ... }, PriceDataRow>(
       db, dbTx,
       prices,

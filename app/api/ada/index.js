@@ -67,7 +67,7 @@ import type {
   IDisplayCutoff,
   IGetAllUtxosResponse,
   IHasUtxoChains, IHasUtxoChainsRequest,
-  Address, Addressing, UsedStatus, Value,
+  Address, Addressing, UsedStatus, Value, AddressType,
   BaseSingleAddressPath,
 } from './lib/storage/models/PublicDeriver/interfaces';
 import type {
@@ -210,7 +210,7 @@ export type GetAllAddressesForDisplayRequest = {|
   type: CoreAddressT,
 |};
 export type GetAllAddressesForDisplayResponse = Array<{|
-  ...Address, ...Value, ...Addressing, ...UsedStatus
+  ...Address, ...Value, ...Addressing, ...UsedStatus, ...AddressType,
 |}>;
 export type GetAllAddressesForDisplayFunc = (
   request: GetAllAddressesForDisplayRequest
@@ -224,7 +224,7 @@ export type GetChainAddressesForDisplayRequest = {|
   type: CoreAddressT,
 |};
 export type GetChainAddressesForDisplayResponse = Array<{|
-  ...Address, ...Value, ...Addressing, ...UsedStatus
+  ...Address, ...AddressType, ...Value, ...Addressing, ...UsedStatus
 |}>;
 export type GetChainAddressesForDisplayFunc = (
   request: GetChainAddressesForDisplayRequest

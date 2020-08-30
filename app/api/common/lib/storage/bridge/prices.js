@@ -69,7 +69,7 @@ export async function upsertPrices(
     .keys(deps)
     .map(key => deps[key])
     .flatMap(table => getAllSchemaTables(request.db, table));
-  return await raii(
+  return await raii<UpsertPriceResponse>(
     request.db,
     depTables,
     async tx => deps.ModifyPriceData.upsertPrices(
@@ -89,7 +89,7 @@ export async function getAllPrices(
     .keys(deps)
     .map(key => deps[key])
     .flatMap(table => getAllSchemaTables(request.db, table));
-  return await raii(
+  return await raii<GetAllPricesResponse>(
     request.db,
     depTables,
     async tx => deps.GetPriceData.getAllPrices(

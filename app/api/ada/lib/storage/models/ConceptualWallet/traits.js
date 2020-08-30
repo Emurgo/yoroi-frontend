@@ -282,7 +282,7 @@ const GetPrivateDeriverKeyMixin = (
       .keys(deps)
       .map(key => deps[key])
       .flatMap(table => getAllSchemaTables(super.getDb(), table));
-    return await raii(
+    return await raii<IChangePasswordResponse>(
       super.getDb(),
       depTables,
       async tx => this.rawChangePrivateDeriverPassword(tx, deps, body)

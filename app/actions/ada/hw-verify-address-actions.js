@@ -1,15 +1,13 @@
 // @flow
 import { AsyncAction, Action } from '../lib/Action';
 
-import type {
-  BIP32Path
-} from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import type { StandardAddress } from '../../types/AddressFilterTypes';
 
 // ======= ADDRESSES ACTIONS =======
 
 export default class HWVerifyAddressActions {
   closeAddressDetailDialog: Action<void> = new Action();
-  selectAddress: AsyncAction<{| address: string, path: void | BIP32Path |}> = new AsyncAction();
+  selectAddress: AsyncAction<$ReadOnly<StandardAddress>> = new AsyncAction();
   verifyAddress: AsyncAction<PublicDeriver<>> = new AsyncAction();
 }

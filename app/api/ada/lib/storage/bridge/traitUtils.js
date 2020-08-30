@@ -12,7 +12,7 @@ import {
 } from '../models/PublicDeriver/traits';
 import type {
   IPublicDeriver,
-  Address, Value, Addressing, UsedStatus,
+  Address, AddressType, Value, Addressing, UsedStatus,
 } from '../models/PublicDeriver/interfaces';
 import { ConceptualWallet } from '../models/ConceptualWallet/index';
 
@@ -54,7 +54,7 @@ export async function rawGetAllAddressesForDisplay(
     type: CoreAddressT,
    |},
   derivationTables: Map<number, string>,
-): Promise<Array<{| ...Address, ...Value, ...Addressing, ...UsedStatus |}>> {
+): Promise<Array<{| ...Address, ...AddressType, ...Value, ...Addressing, ...UsedStatus |}>> {
 
   const withUtxos = asGetAllUtxos(request.publicDeriver);
   let utxoAddresses = withUtxos != null
@@ -121,7 +121,7 @@ export async function getAllAddressesForDisplay(
     publicDeriver: IPublicDeriver<ConceptualWallet>,
     type: CoreAddressT,
   |},
-): Promise<Array<{| ...Address, ...Value, ...Addressing, ...UsedStatus |}>> {
+): Promise<Array<{| ...Address, ...AddressType, ...Value, ...Addressing, ...UsedStatus |}>> {
   const withLevels = asHasLevels<ConceptualWallet>(request.publicDeriver);
   const derivationTables = withLevels == null
     ? new Map()
@@ -136,7 +136,7 @@ export async function getAllAddressesForDisplay(
     .keys(deps)
     .map(key => deps[key])
     .flatMap(table => getAllSchemaTables(request.publicDeriver.getDb(), table));
-  return await raii(
+  return await raii<PromisslessReturnType<typeof getAllAddressesForDisplay>>(
     request.publicDeriver.getDb(),
     [
       ...depTables,

@@ -27,7 +27,7 @@ import type {
   IGetAllUtxos,
   IDisplayCutoff,
   IHasUtxoChains, IHasUtxoChainsRequest,
-  Address, Addressing, UsedStatus, Value,
+  Address, AddressType, Addressing, UsedStatus, Value,
 } from '../ada/lib/storage/models/PublicDeriver/interfaces';
 import { ConceptualWallet } from '../ada/lib/storage/models/ConceptualWallet/index';
 import type { IHasLevels } from '../ada/lib/storage/models/ConceptualWallet/interfaces';
@@ -84,7 +84,7 @@ export type GetChainAddressesForDisplayRequest = {|
   type: CoreAddressT,
 |};
 export type GetChainAddressesForDisplayResponse = Array<{|
-  ...Address, ...Value, ...Addressing, ...UsedStatus
+  ...Address, ...AddressType, ...Value, ...Addressing, ...UsedStatus
 |}>;
 export type GetChainAddressesForDisplayFunc = (
   request: GetChainAddressesForDisplayRequest
@@ -97,7 +97,7 @@ export type GetAllAddressesForDisplayRequest = {|
   type: CoreAddressT,
 |};
 export type GetAllAddressesForDisplayResponse = Array<{|
-  ...Address, ...Value, ...Addressing, ...UsedStatus
+  ...Address, ...Value, ...Addressing, ...UsedStatus, ...AddressType,
 |}>;
 export type GetAllAddressesForDisplayFunc = (
   request: GetAllAddressesForDisplayRequest

@@ -21,7 +21,7 @@ import type {
   IHasUtxoChains,
   IDisplayCutoff,
   BaseAddressPath,
-  Address, Value, Addressing, UsedStatus,
+  Address, AddressType, Value, Addressing, UsedStatus,
 } from './PublicDeriver/interfaces';
 
 import { ConceptualWallet } from './ConceptualWallet/index';
@@ -194,7 +194,7 @@ export async function rawGetAddressesForDisplay(
     addresses: Array<UtxoAddressPath>,
     type: CoreAddressT,
   |},
-): Promise<Array<{| ...Address, ...Value, ...Addressing, ...UsedStatus |}>> {
+): Promise<Array<{| ...Address, ...AddressType, ...Value, ...Addressing, ...UsedStatus |}>> {
   const addressIds = request.addresses
     .flatMap(family => family.addrs)
     .filter(addr => addr.Type === request.type)
@@ -218,6 +218,7 @@ export async function rawGetAddressesForDisplay(
         value: balanceForAddresses[addr.AddressId],
         addressing: family.addressing,
         isUsed: utxosForAddresses.has(addr.AddressId),
+        type: request.type,
       };
     }));
 }
@@ -236,7 +237,7 @@ export async function rawGetChainAddressesForDisplay(
     type: CoreAddressT,
   |},
   derivationTables: Map<number, string>,
-): Promise<Array<{| ...Address, ...Value, ...Addressing, ...UsedStatus |}>> {
+): Promise<Array<{| ...Address, ...AddressType, ...Value, ...Addressing, ...UsedStatus |}>> {
   const addresses = await request.publicDeriver.rawGetAddressesForChain(
     tx,
     {
@@ -292,7 +293,7 @@ export async function getChainAddressesForDisplay(
     chainsRequest: IHasUtxoChainsRequest,
     type: CoreAddressT,
   |},
-): Promise<Array<{| ...Address, ...Value, ...Addressing, ...UsedStatus |}>> {
+): Promise<Array<{| ...Address, ...AddressType, ...Value, ...Addressing, ...UsedStatus |}>> {
   const derivationTables = request.publicDeriver.getParent().getDerivationTables();
   const deps = Object.freeze({
     GetUtxoTxOutputsWithTx,
@@ -304,7 +305,7 @@ export async function getChainAddressesForDisplay(
     .keys(deps)
     .map(key => deps[key])
     .flatMap(table => getAllSchemaTables(request.publicDeriver.getDb(), table));
-  return await raii(
+  return await raii<PromisslessReturnType<typeof getChainAddressesForDisplay>>(
     request.publicDeriver.getDb(),
     [
       ...depTables,
@@ -449,7 +450,7 @@ export async function getCertificates(
     .keys(deps)
     .map(key => deps[key])
     .flatMap(table => getAllSchemaTables(db, table));
-  return await raii(
+  return await raii<PromisslessReturnType<typeof getCertificates>>(
     db,
     depTables,
     async dbTx => await deps.GetCertificates.forAddress(db, dbTx, { addressIds })

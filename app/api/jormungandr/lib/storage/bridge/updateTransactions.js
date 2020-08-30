@@ -323,7 +323,7 @@ export async function getAllTransactions(
     .map(key => deps[key])
     .flatMap(table => getAllSchemaTables(request.publicDeriver.getDb(), table));
 
-  return await raii(
+  return await raii<PromisslessReturnType<typeof getAllTransactions>>(
     request.publicDeriver.getDb(),
     [
       ...depTables,
@@ -383,7 +383,7 @@ export async function getPendingTransactions(
     .map(key => deps[key])
     .flatMap(table => getAllSchemaTables(request.publicDeriver.getDb(), table));
 
-  return await raii(
+  return await raii<PromisslessReturnType<typeof getPendingTransactions>>(
     request.publicDeriver.getDb(),
     [
       ...depTables,
@@ -495,7 +495,7 @@ export async function getForeignAddresses(
     .map(key => deps[key])
     .flatMap(table => getAllSchemaTables(db, table));
 
-  return await raii(
+  return await raii<PromisslessReturnType<typeof getForeignAddresses>>(
     db,
     [
       // need a lock on all tables to delete
@@ -611,7 +611,7 @@ export async function removeAllTransactions(
     .map(key => deps[key])
     .flatMap(table => getAllSchemaTables(db, table));
 
-  return await raii(
+  return await raii<PromisslessReturnType<typeof removeAllTransactions>>(
     db,
     [
       // need a lock on all tables to delete

@@ -103,7 +103,7 @@ export class ConceptualWallet implements IConceptualWallet, IRename {
       .keys(deps)
       .map(key => deps[key])
       .flatMap(table => getAllSchemaTables(this.db, table));
-    return await raii(
+    return await raii<$ReadOnly<ConceptualWalletRow>>(
       this.db,
       depTables,
       async tx => {

@@ -163,8 +163,12 @@ export default class AddressesStore extends Store {
     return this.storewiseFilter({
       publicDeriver: request.publicDeriver,
       storeName: request.storeName,
-      addresses: allAddresses.map(hash => ({
-        address: addressToDisplayString(hash, request.publicDeriver.getParent().getNetworkInfo()),
+      addresses: allAddresses.map(addrInfo => ({
+        type: addrInfo.type,
+        address: addressToDisplayString(
+          addrInfo.address,
+          request.publicDeriver.getParent().getNetworkInfo()
+        ),
         label: 'asdf',
       })),
     });

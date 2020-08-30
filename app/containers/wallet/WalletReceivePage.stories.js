@@ -53,6 +53,10 @@ import {
   REWARD_ADDRESS,
 } from '../../stores/stateless/addressStores';
 import type { IAddressTypeStore, IAddressTypeUiSubset } from '../../stores/stateless/addressStores';
+import {
+  CoreAddressTypes,
+} from '../../api/ada/lib/storage/database/primitives/enums';
+import { ComplexityLevels } from '../../types/complexityLevelType';
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -61,7 +65,7 @@ export default {
 };
 
 
-const unusedProps = (address) => ({
+const unusedProps = (address, type) => ({
   address,
   value: undefined,
   addressing: {
@@ -69,8 +73,9 @@ const unusedProps = (address) => ({
     startLevel: 0,
   },
   isUsed: false,
+  type,
 });
-const noUtxoProps = (address) => ({
+const noUtxoProps = (address, type) => ({
   address,
   value: undefined,
   addressing: {
@@ -78,8 +83,9 @@ const noUtxoProps = (address) => ({
     startLevel: 0,
   },
   isUsed: true,
+  type,
 });
-const withUtxo = (address) => ({
+const withUtxo = (address, type) => ({
   address,
   value: new BigNumber(100),
   addressing: {
@@ -87,6 +93,7 @@ const withUtxo = (address) => ({
     startLevel: 0,
   },
   isUsed: true,
+  type,
 });
 
 const genBaseProps: {|
@@ -128,7 +135,8 @@ const genBaseProps: {|
       profile: {
         isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
         shouldHideBalance: false,
-        unitOfAccount: genUnitOfAccount()
+        unitOfAccount: genUnitOfAccount(),
+        selectedComplexityLevel: select('complexityLevel', ComplexityLevels, ComplexityLevels.Simple),
       },
       wallets: {
         selected: request.wallet.publicDeriver,
@@ -155,10 +163,7 @@ const genBaseProps: {|
                 if (firstAddress?.addressing == null) {
                   throw new Error('Expected addressing');
                 }
-                return Object.freeze({
-                  address: firstAddress.address,
-                  path: firstAddress.addressing.path,
-                });
+                return firstAddress;
               })(),
               isActionProcessing: request.verifyError == null ? false : boolean('isActionProcessing', false),
               error: request.verifyError,
@@ -334,7 +339,7 @@ export const NoMatchFilter = (): Node => {
 
   addressSubgroupMap.set(BASE_EXTERNAL.class, {
     all: [
-      unusedProps('addr1q8gpjmyy8zk9nuza24a0f4e7mgp9gd6h3uayp0rqnjnkl54v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqphf76y'),
+      unusedProps('addr1q8gpjmyy8zk9nuza24a0f4e7mgp9gd6h3uayp0rqnjnkl54v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqphf76y', CoreAddressTypes.CARDANO_BASE),
     ],
     wasExecuted: true,
   });
@@ -382,9 +387,9 @@ export const JormungandrExternalTab = (): Node => {
   const addressSubgroupMap = genDefaultGroupMap(true);
   addressSubgroupMap.set(GROUP_EXTERNAL.class, {
     all: [
-      unusedProps('addr1ssuvzjs82mshgvyp4r4lmwgknvgjswnm7mpcq3wycjj7v2nk393e6qwqr79etp5e4emf5frwj7zakknsuq3ewl4yhptdlt8j8s3ngm9078ssez'),
-      noUtxoProps('addr1ssruckcp4drq2cj8nul8lhmc9vgkxmz2rdepcxdec9sfh3ekpdgcuqwqr79etp5e4emf5frwj7zakknsuq3ewl4yhptdlt8j8s3ngm90lfrsm9'),
-      withUtxo('addr1sjruv2a8v7g38w57ff2ffhwgk6jg93erv7txdvgnyjnl2ncnfakqvqwqr79etp5e4emf5frwj7zakknsuq3ewl4yhptdlt8j8s3ngm90dlxwna'),
+      unusedProps('addr1ssuvzjs82mshgvyp4r4lmwgknvgjswnm7mpcq3wycjj7v2nk393e6qwqr79etp5e4emf5frwj7zakknsuq3ewl4yhptdlt8j8s3ngm9078ssez', CoreAddressTypes.JORMUNGANDR_GROUP),
+      noUtxoProps('addr1ssruckcp4drq2cj8nul8lhmc9vgkxmz2rdepcxdec9sfh3ekpdgcuqwqr79etp5e4emf5frwj7zakknsuq3ewl4yhptdlt8j8s3ngm90lfrsm9', CoreAddressTypes.JORMUNGANDR_GROUP),
+      withUtxo('addr1sjruv2a8v7g38w57ff2ffhwgk6jg93erv7txdvgnyjnl2ncnfakqvqwqr79etp5e4emf5frwj7zakknsuq3ewl4yhptdlt8j8s3ngm90dlxwna', CoreAddressTypes.JORMUNGANDR_GROUP),
     ],
     wasExecuted: true,
   });
@@ -436,9 +441,9 @@ export const ByronExternalTab = (): Node => {
   const addressSubgroupMap = genDefaultGroupMap(true);
   addressSubgroupMap.set(BYRON_EXTERNAL.class, {
     all: [
-      unusedProps('Ae2tdPwUPEZCfyggUgSxD1E5UCx5f5hrXCdvQjJszxE7epyZ4ox9vRNUbHf'),
-      noUtxoProps('Ae2tdPwUPEZCfyggUgSxD1E5UCx5f5hrXCdvQjJszxE7epyZ4ox9vRNUbHf'),
-      withUtxo('Ae2tdPwUPEZ8gpDazyi8VtcGMnMrkpKxts6ppCT45mdT6WMZEwHXs7pP8Tg'),
+      unusedProps('Ae2tdPwUPEZCfyggUgSxD1E5UCx5f5hrXCdvQjJszxE7epyZ4ox9vRNUbHf', CoreAddressTypes.CARDANO_LEGACY),
+      noUtxoProps('Ae2tdPwUPEZCfyggUgSxD1E5UCx5f5hrXCdvQjJszxE7epyZ4ox9vRNUbHf', CoreAddressTypes.CARDANO_LEGACY),
+      withUtxo('Ae2tdPwUPEZ8gpDazyi8VtcGMnMrkpKxts6ppCT45mdT6WMZEwHXs7pP8Tg', CoreAddressTypes.CARDANO_LEGACY),
     ],
     wasExecuted: true,
   });
@@ -490,9 +495,9 @@ export const ExternalTab = (): Node => {
   const addressSubgroupMap = genDefaultGroupMap(true);
   addressSubgroupMap.set(BASE_EXTERNAL.class, {
     all: [
-      unusedProps('addr1q8gpjmyy8zk9nuza24a0f4e7mgp9gd6h3uayp0rqnjnkl54v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqphf76y'),
-      noUtxoProps('addr1q99u7t32p2sf9tx87t35pmjyd82qh3877fuha28jddpcus9v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqxra3as'),
-      withUtxo('addr1qxacxugp8h6snaap4w9j430zpsgyve50ypmn8pz0cz9v484v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqamgwnn'),
+      unusedProps('addr1q8gpjmyy8zk9nuza24a0f4e7mgp9gd6h3uayp0rqnjnkl54v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqphf76y', CoreAddressTypes.CARDANO_BASE),
+      noUtxoProps('addr1q99u7t32p2sf9tx87t35pmjyd82qh3877fuha28jddpcus9v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqxra3as', CoreAddressTypes.CARDANO_BASE),
+      withUtxo('addr1qxacxugp8h6snaap4w9j430zpsgyve50ypmn8pz0cz9v484v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqamgwnn', CoreAddressTypes.CARDANO_BASE),
     ],
     wasExecuted: true,
   });
@@ -536,9 +541,9 @@ export const InternalTab = (): Node => {
   const addressSubgroupMap = genDefaultGroupMap(true);
   addressSubgroupMap.set(BASE_INTERNAL.class, {
     all: [
-      unusedProps('addr1q8xly58xcq3qrv5cc8wukme7thyv22ewaj0p5mkumuuvz9dv4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqamuuv5'),
-      noUtxoProps('addr1q9m4edmwq9lzy3vys9guq7ca9mpcd44xyfu85kc3hjzdlkav4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqay5kcc'),
-      withUtxo('addr1qyavcydjctjl5z8dss56zuqzw6gv42cu96pmh9hfmyz425dv4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqlzgdcc'),
+      unusedProps('addr1q8xly58xcq3qrv5cc8wukme7thyv22ewaj0p5mkumuuvz9dv4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqamuuv5', CoreAddressTypes.CARDANO_BASE),
+      noUtxoProps('addr1q9m4edmwq9lzy3vys9guq7ca9mpcd44xyfu85kc3hjzdlkav4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqay5kcc', CoreAddressTypes.CARDANO_BASE),
+      withUtxo('addr1qyavcydjctjl5z8dss56zuqzw6gv42cu96pmh9hfmyz425dv4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqlzgdcc', CoreAddressTypes.CARDANO_BASE),
     ],
     wasExecuted: true,
   });
@@ -588,9 +593,9 @@ export const MangledTab = (): Node => {
   const addressSubgroupMap = genDefaultGroupMap(true);
   addressSubgroupMap.set(BASE_MANGLED.class, {
     all: [
-      unusedProps('addr1q8gpjmyy8zk9nuza24a0f4e7mgp9gd6h3uayp0rqnjnkl54v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqphf76y'),
-      noUtxoProps('addr1q99u7t32p2sf9tx87t35pmjyd82qh3877fuha28jddpcus9v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqxra3as'),
-      withUtxo('addr1qxacxugp8h6snaap4w9j430zpsgyve50ypmn8pz0cz9v484v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqamgwnn'),
+      unusedProps('addr1q8gpjmyy8zk9nuza24a0f4e7mgp9gd6h3uayp0rqnjnkl54v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqphf76y', CoreAddressTypes.CARDANO_BASE),
+      noUtxoProps('addr1q99u7t32p2sf9tx87t35pmjyd82qh3877fuha28jddpcus9v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqxra3as', CoreAddressTypes.CARDANO_BASE),
+      withUtxo('addr1qxacxugp8h6snaap4w9j430zpsgyve50ypmn8pz0cz9v484v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqamgwnn', CoreAddressTypes.CARDANO_BASE),
     ].map(addr => ({
       ...addr,
       value: new BigNumber(getMangledValue()),
@@ -633,7 +638,8 @@ export const RewardTab = (): Node => {
   const addressSubgroupMap = genDefaultGroupMap(true);
   addressSubgroupMap.set(REWARD_ADDRESS.class, {
     all: [
-      unusedProps('addr1uxk2kljf8m8yc8n2ucn7l86l0jd3qcl9n8j24y0c0ux43tsxdwp4w')
+      // TODO: wrong bech32 prefix
+      unusedProps('addr1uxk2kljf8m8yc8n2ucn7l86l0jd3qcl9n8j24y0c0ux43tsxdwp4w', CoreAddressTypes.CARDANO_REWARD)
     ],
     wasExecuted: true,
   });
@@ -674,9 +680,9 @@ export const AddressBookTab = (): Node => {
   const addressSubgroupMap = genDefaultGroupMap(true);
   addressSubgroupMap.set(ADDRESS_BOOK.class, {
     all: [
-      unusedProps('addr1q8gpjmyy8zk9nuza24a0f4e7mgp9gd6h3uayp0rqnjnkl54v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqphf76y'),
-      noUtxoProps('addr1q99u7t32p2sf9tx87t35pmjyd82qh3877fuha28jddpcus9v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqxra3as'),
-      withUtxo('addr1qxacxugp8h6snaap4w9j430zpsgyve50ypmn8pz0cz9v484v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqamgwnn'),
+      unusedProps('addr1q8gpjmyy8zk9nuza24a0f4e7mgp9gd6h3uayp0rqnjnkl54v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqphf76y', CoreAddressTypes.CARDANO_BASE),
+      noUtxoProps('addr1q99u7t32p2sf9tx87t35pmjyd82qh3877fuha28jddpcus9v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqxra3as', CoreAddressTypes.CARDANO_BASE),
+      withUtxo('addr1qxacxugp8h6snaap4w9j430zpsgyve50ypmn8pz0cz9v484v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqamgwnn', CoreAddressTypes.CARDANO_BASE),
     ],
     wasExecuted: true,
   });
@@ -716,9 +722,9 @@ export const UnmangleDialogLoading = (): Node => {
   const addressSubgroupMap = genDefaultGroupMap(true);
   addressSubgroupMap.set(BASE_MANGLED.class, {
     all: [
-      unusedProps('addr1q8gpjmyy8zk9nuza24a0f4e7mgp9gd6h3uayp0rqnjnkl54v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqphf76y'),
-      noUtxoProps('addr1q99u7t32p2sf9tx87t35pmjyd82qh3877fuha28jddpcus9v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqxra3as'),
-      withUtxo('addr1qxacxugp8h6snaap4w9j430zpsgyve50ypmn8pz0cz9v484v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqamgwnn'),
+      unusedProps('addr1q8gpjmyy8zk9nuza24a0f4e7mgp9gd6h3uayp0rqnjnkl54v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqphf76y', CoreAddressTypes.CARDANO_BASE),
+      noUtxoProps('addr1q99u7t32p2sf9tx87t35pmjyd82qh3877fuha28jddpcus9v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqxra3as', CoreAddressTypes.CARDANO_BASE),
+      withUtxo('addr1qxacxugp8h6snaap4w9j430zpsgyve50ypmn8pz0cz9v484v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqamgwnn', CoreAddressTypes.CARDANO_BASE),
     ].map(addr => ({
       ...addr,
       value: new BigNumber(1000000),
@@ -768,9 +774,9 @@ export const UnmangleDialogError = (): Node => {
   const addressSubgroupMap = genDefaultGroupMap(true);
   addressSubgroupMap.set(BASE_MANGLED.class, {
     all: [
-      unusedProps('addr1q8gpjmyy8zk9nuza24a0f4e7mgp9gd6h3uayp0rqnjnkl54v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqphf76y'),
-      noUtxoProps('addr1q99u7t32p2sf9tx87t35pmjyd82qh3877fuha28jddpcus9v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqxra3as'),
-      withUtxo('addr1qxacxugp8h6snaap4w9j430zpsgyve50ypmn8pz0cz9v484v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqamgwnn'),
+      unusedProps('addr1q8gpjmyy8zk9nuza24a0f4e7mgp9gd6h3uayp0rqnjnkl54v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqphf76y', CoreAddressTypes.CARDANO_BASE),
+      noUtxoProps('addr1q99u7t32p2sf9tx87t35pmjyd82qh3877fuha28jddpcus9v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqxra3as', CoreAddressTypes.CARDANO_BASE),
+      withUtxo('addr1qxacxugp8h6snaap4w9j430zpsgyve50ypmn8pz0cz9v484v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqamgwnn', CoreAddressTypes.CARDANO_BASE),
     ].map(addr => ({
       ...addr,
       value: new BigNumber(1000000),
@@ -822,9 +828,9 @@ export const UnmangleDialogConfirm = (): Node => {
   const addressSubgroupMap = genDefaultGroupMap(true);
   addressSubgroupMap.set(BASE_MANGLED.class, {
     all: [
-      unusedProps('addr1q8gpjmyy8zk9nuza24a0f4e7mgp9gd6h3uayp0rqnjnkl54v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqphf76y'),
-      noUtxoProps('addr1q99u7t32p2sf9tx87t35pmjyd82qh3877fuha28jddpcus9v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqxra3as'),
-      withUtxo('addr1qxacxugp8h6snaap4w9j430zpsgyve50ypmn8pz0cz9v484v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqamgwnn'),
+      unusedProps('addr1q8gpjmyy8zk9nuza24a0f4e7mgp9gd6h3uayp0rqnjnkl54v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqphf76y', CoreAddressTypes.CARDANO_BASE),
+      noUtxoProps('addr1q99u7t32p2sf9tx87t35pmjyd82qh3877fuha28jddpcus9v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqxra3as', CoreAddressTypes.CARDANO_BASE),
+      withUtxo('addr1qxacxugp8h6snaap4w9j430zpsgyve50ypmn8pz0cz9v484v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqamgwnn', CoreAddressTypes.CARDANO_BASE),
     ].map(addr => ({
       ...addr,
       value: new BigNumber(1000000),
@@ -873,9 +879,9 @@ export const UriGenerateDialog = (): Node => {
 
   const addressSubgroupMap = genDefaultGroupMap(true);
   const addresses = [
-    unusedProps('addr1q8gpjmyy8zk9nuza24a0f4e7mgp9gd6h3uayp0rqnjnkl54v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqphf76y'),
-    noUtxoProps('addr1q99u7t32p2sf9tx87t35pmjyd82qh3877fuha28jddpcus9v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqxra3as'),
-    withUtxo('addr1qxacxugp8h6snaap4w9j430zpsgyve50ypmn8pz0cz9v484v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqamgwnn'),
+    unusedProps('addr1q8gpjmyy8zk9nuza24a0f4e7mgp9gd6h3uayp0rqnjnkl54v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqphf76y', CoreAddressTypes.CARDANO_BASE),
+    noUtxoProps('addr1q99u7t32p2sf9tx87t35pmjyd82qh3877fuha28jddpcus9v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqxra3as', CoreAddressTypes.CARDANO_BASE),
+    withUtxo('addr1qxacxugp8h6snaap4w9j430zpsgyve50ypmn8pz0cz9v484v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqamgwnn', CoreAddressTypes.CARDANO_BASE),
   ];
   addressSubgroupMap.set(BASE_EXTERNAL.class, {
     all: addresses,
@@ -921,9 +927,9 @@ export const UriDisplayDialog = (): Node => {
   const location = routeForStore(BASE_EXTERNAL.name);
 
   const addresses = [
-    unusedProps('addr1q8gpjmyy8zk9nuza24a0f4e7mgp9gd6h3uayp0rqnjnkl54v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqphf76y'),
-    noUtxoProps('addr1q99u7t32p2sf9tx87t35pmjyd82qh3877fuha28jddpcus9v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqxra3as'),
-    withUtxo('addr1qxacxugp8h6snaap4w9j430zpsgyve50ypmn8pz0cz9v484v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqamgwnn'),
+    unusedProps('addr1q8gpjmyy8zk9nuza24a0f4e7mgp9gd6h3uayp0rqnjnkl54v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqphf76y', CoreAddressTypes.CARDANO_BASE),
+    noUtxoProps('addr1q99u7t32p2sf9tx87t35pmjyd82qh3877fuha28jddpcus9v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqxra3as', CoreAddressTypes.CARDANO_BASE),
+    withUtxo('addr1qxacxugp8h6snaap4w9j430zpsgyve50ypmn8pz0cz9v484v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqamgwnn', CoreAddressTypes.CARDANO_BASE),
   ];
   const addressSubgroupMap = genDefaultGroupMap(true);
   addressSubgroupMap.set(BASE_EXTERNAL.class, {
@@ -965,7 +971,7 @@ export const UriDisplayDialog = (): Node => {
   );
 };
 
-export const VerifyRegularAddress = (): Node => {
+export const VerifyBaseAddress = (): Node => {
   const wallet = genShelleyCIP1852SigningWalletWithCache();
   const lookup = walletLookup([wallet]);
 
@@ -975,9 +981,53 @@ export const VerifyRegularAddress = (): Node => {
   const addressSubgroupMap = genDefaultGroupMap(true);
   addressSubgroupMap.set(BASE_EXTERNAL.class, {
     all: [
-      unusedProps('addr1q8gpjmyy8zk9nuza24a0f4e7mgp9gd6h3uayp0rqnjnkl54v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqphf76y'),
-      noUtxoProps('addr1q99u7t32p2sf9tx87t35pmjyd82qh3877fuha28jddpcus9v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqxra3as'),
-      withUtxo('addr1qxacxugp8h6snaap4w9j430zpsgyve50ypmn8pz0cz9v484v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqamgwnn'),
+      unusedProps('addr1q8gpjmyy8zk9nuza24a0f4e7mgp9gd6h3uayp0rqnjnkl54v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqphf76y', CoreAddressTypes.CARDANO_BASE),
+      noUtxoProps('addr1q99u7t32p2sf9tx87t35pmjyd82qh3877fuha28jddpcus9v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqxra3as', CoreAddressTypes.CARDANO_BASE),
+      withUtxo('addr1qxacxugp8h6snaap4w9j430zpsgyve50ypmn8pz0cz9v484v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqamgwnn', CoreAddressTypes.CARDANO_BASE),
+    ],
+    wasExecuted: true,
+  });
+
+  return wrapWallet(
+    mockWalletProps({
+      location,
+      selected: wallet.publicDeriver,
+      ...lookup,
+    }),
+    wrapReceive(
+      mockReceiveProps({
+        selected: wallet.publicDeriver,
+        addressSubgroupMap,
+        addressFilter,
+        location
+      }),
+      (<WalletReceivePage
+        generated={genBaseProps({
+          location,
+          wallet,
+          dialog: VerifyAddressDialog,
+          addressFilter,
+          addressSubgroupMap,
+        })}
+      />)
+    )
+  );
+};
+
+export const VerifyPointerAddress = (): Node => {
+  const wallet = genShelleyCIP1852SigningWalletWithCache();
+  const lookup = walletLookup([wallet]);
+
+  const addressFilter = AddressFilter.None;
+  const location = routeForStore(BASE_EXTERNAL.name);
+
+  const addressSubgroupMap = genDefaultGroupMap(true);
+  addressSubgroupMap.set(BASE_EXTERNAL.class, {
+    all: [
+      // slot = 0, tx_index = 1, cert_index = 2
+      unusedProps('addr1g8gpjmyy8zk9nuza24a0f4e7mgp9gd6h3uayp0rqnjnkl5sqqypqwh8ers', CoreAddressTypes.CARDANO_PTR),
+      noUtxoProps('addr1g99u7t32p2sf9tx87t35pmjyd82qh3877fuha28jddpcusqqqypq3nujfz', CoreAddressTypes.CARDANO_PTR),
+      withUtxo('addr1gxacxugp8h6snaap4w9j430zpsgyve50ypmn8pz0cz9v48sqqypq0jxjgx', CoreAddressTypes.CARDANO_PTR),
     ],
     wasExecuted: true,
   });
@@ -1026,9 +1076,9 @@ export const VerifyLedgerAddress = (): Node => {
   const addressSubgroupMap = genDefaultGroupMap(true);
   addressSubgroupMap.set(BASE_EXTERNAL.class, {
     all: [
-      unusedProps('addr1q8gpjmyy8zk9nuza24a0f4e7mgp9gd6h3uayp0rqnjnkl54v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqphf76y'),
-      noUtxoProps('addr1q99u7t32p2sf9tx87t35pmjyd82qh3877fuha28jddpcus9v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqxra3as'),
-      withUtxo('addr1qxacxugp8h6snaap4w9j430zpsgyve50ypmn8pz0cz9v484v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqamgwnn'),
+      unusedProps('addr1q8gpjmyy8zk9nuza24a0f4e7mgp9gd6h3uayp0rqnjnkl54v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqphf76y', CoreAddressTypes.CARDANO_BASE),
+      noUtxoProps('addr1q99u7t32p2sf9tx87t35pmjyd82qh3877fuha28jddpcus9v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqxra3as', CoreAddressTypes.CARDANO_BASE),
+      withUtxo('addr1qxacxugp8h6snaap4w9j430zpsgyve50ypmn8pz0cz9v484v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqamgwnn', CoreAddressTypes.CARDANO_BASE),
     ],
     wasExecuted: true,
   });

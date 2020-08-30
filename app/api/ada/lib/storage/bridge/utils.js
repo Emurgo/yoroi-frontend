@@ -69,7 +69,7 @@ export function addressToKind(
         const rewardAddr = RustModule.WalletV4.RewardAddress.from_address(wasmAddr);
         if (rewardAddr) return CoreAddressTypes.CARDANO_REWARD;
       }
-      throw new Error(`${nameof(getCardanoAddrKeyHash)} unknown address type`);
+      throw new Error(`${nameof(addressToKind)} unknown address type`);
     }
     throw new Error(`${nameof(addressToKind)} not implemented for network ${network.NetworkId}`);
   } catch (e1) {
@@ -191,6 +191,7 @@ export function normalizeToAddress(
 export function isJormungandrAddress(
   kind: CoreAddressT
 ): boolean {
+  // note: excluding legacy byron addresses
   if (kind === CoreAddressTypes.JORMUNGANDR_SINGLE) return true;
   if (kind === CoreAddressTypes.JORMUNGANDR_GROUP) return true;
   if (kind === CoreAddressTypes.JORMUNGANDR_ACCOUNT) return true;
@@ -228,7 +229,7 @@ export function isCardanoHaskellAddress(
   return false;
 }
 
-export function getCardanoAddrKeyHash(
+export function getCardanoSpendingKeyHash(
   addr: RustModule.WalletV4.Address,
 ): (
   // null -> legacy address (no key hash)
@@ -255,7 +256,32 @@ export function getCardanoAddrKeyHash(
     const rewardAddr = RustModule.WalletV4.RewardAddress.from_address(addr);
     if (rewardAddr) return rewardAddr.payment_cred().to_keyhash();
   }
-  throw new Error(`${nameof(getCardanoAddrKeyHash)} unknown address type`);
+  throw new Error(`${nameof(getCardanoSpendingKeyHash)} unknown address type`);
+}
+
+export function getJormungandrSpendingKey(
+  addr: RustModule.WalletV3.Address,
+): (
+  // null -> legacy address (no key hash)
+  RustModule.WalletV3.PublicKey | null
+) {
+  {
+    const groupAddr = addr.to_group_address();
+    if (groupAddr) return groupAddr.get_spending_key();
+  }
+  {
+    const multisig = addr.to_multisig_address();
+    if (multisig) throw new Error(`${nameof(getJormungandrSpendingKey)} multisig not supported`);
+  }
+  {
+    const singleAddr = addr.to_single_address();
+    if (singleAddr) return singleAddr.get_spending_key();
+  }
+  {
+    const accountAddr = addr.to_account_address();
+    if (accountAddr) return accountAddr.get_account_key();
+  }
+  throw new Error(`${nameof(getJormungandrSpendingKey)} unknown address type`);
 }
 
 export function addressToDisplayString(

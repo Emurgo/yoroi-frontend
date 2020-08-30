@@ -26,6 +26,7 @@ import {
 import type {
   TxStatusCodesType,
   CertificateRelationType,
+  CoreAddressT,
 } from '../database/primitives/enums';
 import {
   GetAddress,
@@ -396,7 +397,7 @@ export async function getAllTransactions(
     .map(key => deps[key])
     .flatMap(table => getAllSchemaTables(request.publicDeriver.getDb(), table));
 
-  return await raii(
+  return await raii<PromisslessReturnType<typeof getAllTransactions>>(
     request.publicDeriver.getDb(),
     [
       ...depTables,
@@ -460,7 +461,7 @@ export async function getPendingTransactions(
     .map(key => deps[key])
     .flatMap(table => getAllSchemaTables(request.publicDeriver.getDb(), table));
 
-  return await raii(
+  return await raii<PromisslessReturnType<typeof getPendingTransactions>>(
     request.publicDeriver.getDb(),
     [
       ...depTables,
@@ -571,7 +572,10 @@ export async function rawGetForeignAddresses(
 }
 export async function getForeignAddresses(
   request: {| publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels>, |},
-): Promise<Array<string>> {
+): Promise<Array<{|
+  address: string,
+  type: CoreAddressT,
+|}>> {
   const derivationTables = request.publicDeriver.getParent().getDerivationTables();
   const deps = Object.freeze({
     GetPathWithSpecific,
@@ -590,7 +594,7 @@ export async function getForeignAddresses(
     .map(key => deps[key])
     .flatMap(table => getAllSchemaTables(db, table));
 
-  return await raii(
+  return await raii<PromisslessReturnType<typeof getForeignAddresses>>(
     db,
     [
       // need a lock on all tables to delete
@@ -609,9 +613,21 @@ export async function getForeignAddresses(
         db, dbTx,
         addressIds
       );
-      const result = addressRows.map(row => row.Hash);
+      const result = [];
+      const seenAddresses = new Set<string>();
+
       // remove duplicates
-      return Array.from(new Set(result));
+      for (const row of addressRows) {
+        if (seenAddresses.has(row.Hash)) {
+          continue;
+        }
+        seenAddresses.add(row.Hash);
+        result.push({
+          address: row.Hash,
+          type: row.Type,
+        });
+      }
+      return result;
     }
   );
 }
@@ -713,7 +729,7 @@ export async function removeAllTransactions(
     .map(key => deps[key])
     .flatMap(table => getAllSchemaTables(db, table));
 
-  return await raii(
+  return await raii<PromisslessReturnType<typeof removeAllTransactions>>(
     db,
     [
       // need a lock on all tables to delete

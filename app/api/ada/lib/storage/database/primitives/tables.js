@@ -5,6 +5,7 @@ import type { lf$schema$Builder } from 'lovefield';
 import type {
   TxStatusCodesType,
   CertificateRelationType,
+  CoreAddressT,
 } from './enums';
 import type { CertificateKindType } from '@emurgo/js-chain-libs/js_chain_libs';
 import typeof { CertificateKind } from '@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib';
@@ -163,7 +164,7 @@ export const KeySchema: {|
 
 export type AddressInsert = {|
   Digest: number,
-  Type: number,
+  Type: CoreAddressT,
   Hash: string,
 |};
 export type AddressRow = {|

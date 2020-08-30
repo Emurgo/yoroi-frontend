@@ -26,7 +26,7 @@ import type {
   IGetAllUtxosResponse,
 } from '../../lib/storage/models/PublicDeriver/interfaces';
 import {
-  getCardanoAddrKeyHash, normalizeToAddress,
+  getCardanoSpendingKeyHash, normalizeToAddress,
 } from '../../lib/storage/bridge/utils';
 
 /**
@@ -94,7 +94,7 @@ function addUtxoInput(
   if (wasmInput == null) {
     throw new Error(`${nameof(addUtxoInput)} input not a valid Shelley address`);
   }
-  const keyHash = getCardanoAddrKeyHash(wasmInput);
+  const keyHash = getCardanoSpendingKeyHash(wasmInput);
   if (keyHash === null) {
     const byronAddr = RustModule.WalletV4.ByronAddress.from_address(wasmInput);
     if (byronAddr == null) {
@@ -475,7 +475,7 @@ export function signTransaction(
     if (wasmAddr == null) {
       throw new Error(`${nameof(signTransaction)} utxo not a valid Shelley address`);
     }
-    const keyHash = getCardanoAddrKeyHash(wasmAddr);
+    const keyHash = getCardanoSpendingKeyHash(wasmAddr);
     const addrHex = Buffer.from(wasmAddr.to_bytes()).toString('hex');
     if (keyHash === null) {
       if (!seenByronKeys.has(addrHex)) {

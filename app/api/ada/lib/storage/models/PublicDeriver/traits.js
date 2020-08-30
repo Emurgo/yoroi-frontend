@@ -347,7 +347,7 @@ const GetAllUtxosMixin = (
       .keys(deps)
       .map(key => deps[key])
       .flatMap(table => getAllSchemaTables(super.getDb(), table));
-    return await raii(
+    return await raii<IGetAllUtxoAddressesResponse>(
       super.getDb(),
       [
         ...depTables,
@@ -430,7 +430,7 @@ const GetAllAccountingMixin = (
       .keys(deps)
       .map(key => deps[key])
       .flatMap(table => getAllSchemaTables(super.getDb(), table));
-    return await raii(
+    return await raii<IGetAllAccountingAddressesResponse>(
       super.getDb(),
       [
         ...depTables,
@@ -485,7 +485,7 @@ const GetAllAccountingMixin = (
       .keys(deps)
       .map(key => deps[key])
       .flatMap(table => getAllSchemaTables(super.getDb(), table));
-    return await raii(
+    return await raii<IGetStakingKeyResponse>(
       super.getDb(),
       [
         ...depTables,
@@ -1045,7 +1045,7 @@ const HasUtxoChainsMixin = (
       .keys(deps)
       .map(key => deps[key])
       .flatMap(table => getAllSchemaTables(super.getDb(), table));
-    return await raii(
+    return await raii<IHasUtxoChainsResponse>(
       super.getDb(),
       [
         ...depTables,
@@ -1118,7 +1118,7 @@ const HasUtxoChainsMixin = (
       .keys(deps)
       .map(key => deps[key])
       .flatMap(table => getAllSchemaTables(super.getDb(), table));
-    return await raii(
+    return await raii<IGetNextUnusedForChainResponse>(
       super.getDb(),
       depTables,
       async tx => this.rawNextInternal(tx, deps, body, derivationTables)
@@ -1175,7 +1175,7 @@ const GetPublicKeyMixin = (
       .keys(deps)
       .map(key => deps[key])
       .flatMap(table => getAllSchemaTables(super.getDb(), table));
-    return await raii(
+    return await raii<IGetPublicResponse>(
       super.getDb(),
       depTables,
       async tx => this.rawGetPublicKey(tx, deps, body)
@@ -1215,7 +1215,7 @@ const GetPublicKeyMixin = (
       .keys(deps)
       .map(key => deps[key])
       .flatMap(table => getAllSchemaTables(super.getDb(), table));
-    return await raii(
+    return await raii<IChangePasswordResponse>(
       super.getDb(),
       depTables,
       async tx => this.rawChangePubDeriverPassword(tx, deps, body)
@@ -1378,7 +1378,7 @@ const GetSigningKeyMixin = (
       .keys(deps)
       .map(key => deps[key])
       .flatMap(table => getAllSchemaTables(super.getDb(), table));
-    return await raii(
+    return await raii<IChangePasswordResponse>(
       super.getDb(),
       depTables,
       async tx => this.rawChangeSigningKeyPassword(tx, deps, body)
@@ -1840,7 +1840,7 @@ const ScanUtxoAccountAddressesMixin = (
       .keys(deps)
       .map(key => deps[key])
       .flatMap(table => getAllSchemaTables(super.getDb(), table));
-    return await raii(
+    return await raii<IScanAddressesResponse>(
       super.getDb(),
       [
         ...depTables,

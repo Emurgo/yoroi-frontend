@@ -415,6 +415,7 @@ function getByronInputs(
     if (
       addressKind === CoreAddressTypes.CARDANO_LEGACY ||
       addressKind === CoreAddressTypes.CARDANO_BASE ||
+      addressKind === CoreAddressTypes.CARDANO_ENTERPRISE ||
       addressKind === CoreAddressTypes.CARDANO_PTR
     ) {
       result.push({

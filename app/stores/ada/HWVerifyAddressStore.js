@@ -38,14 +38,12 @@ import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/t
 import { getCardanoHaskellBaseConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { toTrezorAddressParameters } from '../../api/ada/transactions/shelley/trezorTx';
 import { toLedgerAddressParameters } from '../../api/ada/transactions/shelley/ledgerTx';
+import type { StandardAddress } from '../../types/AddressFilterTypes';
 
 export default class HWVerifyAddressStore extends Store {
   @observable isActionProcessing: boolean = false;
   @observable error: ?LocalizableError = null;
-  @observable selectedAddress: ?{|
-    address: string,
-    path: void | BIP32Path,
-  |} = null;
+  @observable selectedAddress: ?$ReadOnly<StandardAddress> = null;
   ledgerConnect: ?LedgerConnect;
 
   setup(): void {
@@ -66,8 +64,12 @@ export default class HWVerifyAddressStore extends Store {
     }
     // remove null/undefined type to satisfy Flow
     const selectedAddress = this.selectedAddress;
+    if (!selectedAddress.addressing) {
+      throw new Error(`${nameof(HWVerifyAddressStore)}::${nameof(this._verifyAddress)} called with no addressing information`);
+    }
+
     // need to unwrap observable otherwise bridge will fail
-    const path = toJS(selectedAddress.path);
+    const path = toJS(selectedAddress.addressing.path);
     const address = toJS(selectedAddress.address);
 
     const conceptualWallet = publicDeriver.getParent();
@@ -150,12 +152,9 @@ export default class HWVerifyAddressStore extends Store {
     }
   }
 
-  @action _selectAddress: {|
-    address: string,
-    path: void | BIP32Path,
-  |} => Promise<void> = async (params) => {
+  @action _selectAddress: $ReadOnly<StandardAddress> => Promise<void> = async (params) => {
     Logger.info(`${nameof(HWVerifyAddressStore)}::${nameof(this._selectAddress)} called: ` + params.address);
-    this.selectedAddress = { address: params.address, path: params.path };
+    this.selectedAddress = params;
   }
 
   @action _setActionProcessing: boolean => void = (processing) => {
