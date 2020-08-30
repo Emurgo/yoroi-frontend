@@ -30,11 +30,12 @@ console.debug('[CS-LEDGER] Loading');
   browserPort.onDisconnect.addListener(d => {
     console.debug(`[CS-LEDGER] Closing WebPage window!!`);
     window.postMessage(closeWindowMsg, window.location.origin);
+    browserPort = null;
   });
   
   // Passing messages from WebPage ==> Extension
   window.addEventListener('message', event => {
-    if(event.origin === ORIGIN && event.data) {
+    if(event.origin === ORIGIN && event.source === window && event.data) {
       const { data } = event;
       // As this listener, listens to events that needs to be passed to WebPage as well,
       // but here we are only interested in passing result to the Extension
