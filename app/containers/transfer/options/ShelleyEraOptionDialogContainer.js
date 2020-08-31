@@ -20,6 +20,9 @@ import type { ComplexityLevelType } from '../../../types/complexityLevelType';
 import DeregisterDialogContainer from '../DeregisterDialogContainer';
 import type { GeneratedData as DeregisterDialogContainerData } from '../DeregisterDialogContainer';
 import { ComplexityLevels } from '../../../types/complexityLevelType';
+import {
+  Bip44DerivationLevels,
+} from '../../../api/ada/lib/storage/database/walletTypes/bip44/api/utils';
 
 export type GeneratedData = typeof ShelleyEraOptionDialogContainer.prototype.generated;
 
@@ -64,6 +67,16 @@ export default class ShelleyEraOptionDialogContainer extends Component<Props> {
         extra: 'paper',
         length: config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT,
         chain: ChainDerivations.CHIMERIC_ACCOUNT,
+      },
+    });
+  }
+
+  startTransferPrivateKey: void => void = () => {
+    this.generated.actions.yoroiTransfer.startTransferFunds.trigger({
+      source: {
+        type: 'cip1852',
+        extra: 'privateKey',
+        derivationLevel: Bip44DerivationLevels.ADDRESS.level,
       },
     });
   }
@@ -142,6 +155,10 @@ export default class ShelleyEraOptionDialogContainer extends Component<Props> {
         onPaper={() => this.generated.actions.dialogs.updateDataForActiveDialog.trigger({
           disclaimer: DisclaimerStatus.FeeDisclaimer,
           continuation: this.startTransferYoroiPaperRewards
+        })}
+        onPrivateKey={() => this.generated.actions.dialogs.updateDataForActiveDialog.trigger({
+          disclaimer: DisclaimerStatus.FeeDisclaimer,
+          continuation: this.startTransferPrivateKey,
         })}
         onCancel={this.props.onCancel}
       />

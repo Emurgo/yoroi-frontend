@@ -109,6 +109,10 @@ export default class YoroiTransferStore extends Store {
       this._updateStatus(TransferStatus.HARDWARE_DISCLAIMER);
       return;
     }
+    if (payload.source.extra === 'privateKey') {
+      this._updateStatus(TransferStatus.GETTING_MASTER_KEY);
+      return;
+    }
     this._updateStatus(TransferStatus.GETTING_MNEMONICS);
   }
 

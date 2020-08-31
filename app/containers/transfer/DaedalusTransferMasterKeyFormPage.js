@@ -38,7 +38,7 @@ export default class DaedalusTransferMasterKeyFormPage extends Component<Props> 
 
   submit: (() => Promise<void>) = async () => {
     if (this.masterKeyForm == null) {
-      throw new Error('DaedalusTransferMasterKeyFormPage form not set');
+      throw new Error(`${nameof(DaedalusTransferMasterKeyFormPage)} form not set`);
     }
     this.masterKeyForm.submit({
       onSuccess: async (form) => {

@@ -9,17 +9,23 @@ import DialogBackButton from '../widgets/DialogBackButton';
 import Dialog from '../widgets/Dialog';
 import styles from './BaseTransferPage.scss';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import LocalizableError from '../../i18n/LocalizableError';
 
 type Props = {|
   +children: Node,
   +onSubmit: void => Promise<void>,
   +onBack: void => void,
   +step0: string,
-  +isDisabled: boolean
+  +isDisabled: boolean,
+  +error?: ?LocalizableError,
 |};
 
 @observer
 export default class BaseTransferPage extends Component<Props> {
+
+  static defaultProps: {|error: void|} = {
+    error: undefined
+  };
 
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired
@@ -68,6 +74,11 @@ export default class BaseTransferPage extends Component<Props> {
               </ul>
             </div>
             {this.props.children}
+            {this.props.error && (
+              <p className={styles.error}>
+                {intl.formatMessage(this.props.error, this.props.error.values)}
+              </p>
+            )}
           </div>
         </div>
       </Dialog>

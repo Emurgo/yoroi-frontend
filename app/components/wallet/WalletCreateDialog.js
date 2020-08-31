@@ -199,7 +199,7 @@ export default class WalletCreateDialog extends Component<Props, State> {
           onKeyPress={this.checkForEnterKey.bind(this)}
           inputRef={(input) => { this.walletNameInput = input; }}
           {...walletNameField.bind()}
-          done={isValidWalletName(walletName)}
+          done={walletNameField.isValid}
           error={walletNameField.error}
           skin={InputOwnSkin}
         />
@@ -209,14 +209,14 @@ export default class WalletCreateDialog extends Component<Props, State> {
             <Input
               className="walletPassword"
               {...walletPasswordField.bind()}
-              done={isValidWalletPassword(walletPassword)}
+              done={walletPasswordField.isValid}
               error={walletPasswordField.error}
               skin={InputOwnSkin}
             />
             <Input
               className="repeatedPassword"
               {...repeatedPasswordField.bind()}
-              done={repeatPassword && isValidRepeatPassword(walletPassword, repeatPassword)}
+              done={repeatPassword && repeatedPasswordField.isValid}
               error={repeatedPasswordField.error}
               skin={InputOwnSkin}
             />

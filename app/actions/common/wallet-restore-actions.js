@@ -38,6 +38,10 @@ export type RestoreModeType = {|
 |} | {|
   type: 'bip44' | 'cip1852',
   extra: 'ledger' | 'trezor',
+|} | {|
+  type: 'cip1852',
+  extra: 'privateKey',
+  derivationLevel: number,
 |};
 
 export default class WalletRestoreActions {

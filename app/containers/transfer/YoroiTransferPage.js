@@ -14,6 +14,7 @@ import HardwareDisclaimerPage from './HardwareDisclaimerPage';
 import YoroiTransferFormPage from './YoroiTransferFormPage';
 import YoroiPaperWalletFormPage from './YoroiPaperWalletFormPage';
 import HardwareTransferFormPage from './HardwareTransferFormPage';
+import YoroiTransferKeyFormPage from './YoroiTransferKeyFormPage';
 import YoroiPlatePage from './YoroiPlatePage';
 import YoroiTransferWaitingPage from './YoroiTransferWaitingPage';
 import YoroiTransferErrorPage from './YoroiTransferErrorPage';
@@ -73,6 +74,21 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
     this.generated.actions.yoroiTransfer.setupTransferFundsWithPaperMnemonic.trigger({
       ...payload,
     });
+  };
+
+  setupTransferFundsWithKey: {|
+    key: string,
+  |} => Promise<void> = async (payload) => {
+    const walletsStore = this.generated.stores.wallets;
+    const publicDeriver = walletsStore.selected;
+    if (publicDeriver == null) {
+      throw new Error(`${nameof(this.setupTransferFundsWithKey)} no wallet selected`);
+    }
+    console.log(payload);
+    // await this.generated.actions.daedalusTransfer.setupTransferFundsWithMasterKey.trigger({
+    //   ...payload,
+    //   publicDeriver
+    // });
   };
 
   checkAddresses: void => Promise<void> = async () => {
@@ -165,6 +181,14 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
             })}
             validWords={validWords}
             mnemonicLength={config.wallets.WALLET_RECOVERY_PHRASE_WORD_COUNT}
+            classicTheme={profile.isClassicTheme}
+          />
+        );
+      case TransferStatus.GETTING_MASTER_KEY:
+        return (
+          <YoroiTransferKeyFormPage
+            onSubmit={this.setupTransferFundsWithKey}
+            onBack={this.backToUninitialized}
             classicTheme={profile.isClassicTheme}
           />
         );

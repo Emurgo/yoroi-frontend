@@ -20,12 +20,17 @@ const messages = defineMessages({
     id: 'transfer.rewards.paper.label',
     defaultMessage: '!!!Rewards from paper wallet',
   },
+  privateKey: {
+    id: 'transfer.rewards.key.label',
+    defaultMessage: '!!!Rewards from private key',
+  },
 });
 
 type Props = {|
   +onCancel: void => void,
   +onRegular: void => void,
   +onPaper: void => void,
+  +onPrivateKey: void => void,
 |};
 
 @observer
@@ -61,6 +66,13 @@ export default class ShelleyOptionDialog extends Component<Props> {
               title={intl.formatMessage(messages.paperWallet)}
               learnMoreText={intl.formatMessage(globalMessages.restoreShelleyEraWalletDescription)}
               onSubmit={this.props.onPaper}
+            />
+            <OptionBlock
+              parentName={`${nameof(ShelleyOptionDialog)}`}
+              type="masterKey"
+              title={intl.formatMessage(messages.privateKey)}
+              learnMoreText={intl.formatMessage(globalMessages.restoreShelleyEraWalletDescription)}
+              onSubmit={this.props.onPrivateKey}
             />
           </ul>
         </div>

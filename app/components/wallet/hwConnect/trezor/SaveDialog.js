@@ -133,7 +133,7 @@ export default class SaveDialog extends Component<Props> {
           {...walletNameField.bind()}
           error={walletNameField.error}
           skin={InputOwnSkin}
-          done={isValidWalletName(walletName)}
+          done={walletNameField.isValid}
         />
       </div>);
 

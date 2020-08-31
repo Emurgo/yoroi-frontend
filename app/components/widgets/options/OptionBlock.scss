@@ -141,6 +141,8 @@
           }
           &.masterKey {
             background-image: url(../../../assets/images/add-wallet/option-dialog/Master_key.inline.svg);
+            background-position: center 15px !important;
+            background-size: 50px;
           }
           // CONNECT HARDWARE WALLET
           &.connectLedger {
@@ -202,6 +204,8 @@
           }
           &.masterKey {
             background-image: url(../../../assets/images/add-wallet/option-dialog/Master_key.inline.svg);
+            background-position: center 15px !important;
+            background-size: 50px;
           }
           // CONNECT HARDWARE WALLET
           &.connectLedger {

@@ -140,7 +140,7 @@ export default class AddMemoDialog extends Component<Props, State> {
           className={styles.memoContent}
           inputRef={(input) => { this.memoContentInput = input; }}
           {...memoContentField.bind()}
-          done={isValidMemo(memoContent)}
+          done={memoContentField.isValid}
           error={memoContentField.error}
           skin={InputOwnSkin}
         />

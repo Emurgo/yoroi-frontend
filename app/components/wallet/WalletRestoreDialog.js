@@ -383,7 +383,7 @@ export default class WalletRestoreDialog extends Component<Props> {
               className={styles.walletName}
               inputRef={(input) => { this.walletNameInput = input; }}
               {...walletNameField.bind()}
-              done={isValidWalletName(walletName)}
+              done={walletNameField.isValid}
               error={walletNameField.error}
               skin={InputOwnSkin}
             />
@@ -396,7 +396,7 @@ export default class WalletRestoreDialog extends Component<Props> {
           // Refer: https://github.com/Emurgo/yoroi-frontend/pull/1009
           // inputRef={(input) => { this.recoveryPhraseInput = input; }}
           {...recoveryPhraseField.bind()}
-          done={mnemonicValidator(join(recoveryPhrase, ' '))}
+          done={recoveryPhraseField.isValid}
           error={recoveryPhraseField.error}
           maxVisibleOptions={5}
           noResultsMessage={intl.formatMessage(globalMessages.recoveryPhraseNoResults)}
@@ -429,14 +429,14 @@ export default class WalletRestoreDialog extends Component<Props> {
               <Input
                 className="walletPassword"
                 {...walletPasswordField.bind()}
-                done={isValidWalletPassword(walletPassword)}
+                done={walletPasswordField.isValid}
                 error={walletPasswordField.error}
                 skin={InputOwnSkin}
               />
               <Input
                 className="repeatedPassword"
                 {...repeatedPasswordField.bind()}
-                done={repeatPassword && isValidRepeatPassword(walletPassword, repeatPassword)}
+                done={repeatPassword && repeatedPasswordField.isValid}
                 error={repeatedPasswordField.error}
                 skin={InputOwnSkin}
               />
