@@ -11,7 +11,6 @@ const ByronExplorers: Array<$ReadOnly<ExplorerRow>> = [
     Endpoints: {
       address: 'https://adaex.org/',
       transaction: 'https://adaex.org/',
-      pool: 'https://adaex.org/',
     },
     Name: 'ADAex.org',
   },
@@ -40,7 +39,6 @@ const ByronExplorers: Array<$ReadOnly<ExplorerRow>> = [
     NetworkId: networks.ByronMainnet.NetworkId,
     IsBackup: false,
     Endpoints: {
-      address: 'https://clio.one/tracker/address/',
     },
     Name: 'Clio.1',
   },
@@ -57,13 +55,32 @@ const ByronExplorers: Array<$ReadOnly<ExplorerRow>> = [
   {
     ExplorerId: 1_05,
     NetworkId: networks.ByronMainnet.NetworkId,
-    IsBackup: true,
+    IsBackup: false,
     Endpoints: {
-      address: 'https://adapools.org/address/',
       transaction: 'https://adapools.org/transactions/',
       pool: 'https://adapools.org/pool/',
     },
     Name: 'AdaPools',
+  },
+  {
+    ExplorerId: 1_06,
+    NetworkId: networks.ByronMainnet.NetworkId,
+    IsBackup: true,
+    Endpoints: {
+      address: 'https://cardanoscan.io/address/',
+      transaction: 'https://cardanoscan.io/transaction/',
+      pool: 'https://cardanoscan.io/pool/',
+    },
+    Name: 'CardanoScan',
+  },
+  {
+    ExplorerId: 1_07,
+    NetworkId: networks.ByronMainnet.NetworkId,
+    IsBackup: false,
+    Endpoints: {
+      pool: 'https://pooltool.io/pool/',
+    },
+    Name: 'PoolTool',
   },
 ];
 

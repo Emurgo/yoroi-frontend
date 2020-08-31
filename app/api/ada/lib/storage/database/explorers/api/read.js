@@ -82,6 +82,10 @@ export class GetExplorers {
 
     // 3) override backup entries with user preference
     for (const preferred of preferredExplorers) {
+      // skip explorers with no endpoints
+      if (Object.keys(preferred.Explorer.Endpoints).length === 0) {
+        continue;
+      }
       explorerMap.set(preferred.Explorer.NetworkId, preferred.Explorer);
     }
     return explorerMap;
