@@ -61,7 +61,7 @@
   "daedalusTransfer.waiting.progressInfo.restoringAddresses": "Adressen ophalen",
   "daedalusTransfer.waiting.title.label": "De Daedalus portemonnee wordt hersteld",
   "daedalusTransfer.waiting.warning": "Dit kan lang duren of zelfs mislukken bij een slechte internetverbinding",
-  "global.blog.learnMore": "You can read our {blogLink} to learn more.",
+  "global.blog.learnMore": "U kunt onze {blogLink} lezen voor meer informatie.",
   "global.contact": "Ondersteuningscontact",
   "global.copyTooltipMessage": "Gekopieerd",
   "global.errors.fieldIsRequired": "Verplicht veld.",
