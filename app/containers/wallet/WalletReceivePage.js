@@ -40,6 +40,7 @@ import {
   isCardanoHaskell,
 } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import type { ComplexityLevelType } from '../../types/complexityLevelType';
+import { handleExternalLinkClick } from '../../utils/routing';
 
 export type GeneratedData = typeof WalletReceivePage.prototype.generated;
 
@@ -159,7 +160,9 @@ export default class WalletReceivePage extends Component<Props> {
         />);
       }
       if (addressTypeStore.meta.name.subgroup === AddressSubgroup.internal) {
-        return (<InternalHeader />);
+        return (<InternalHeader
+          onExternalLinkClick={handleExternalLinkClick}
+        />);
       }
       if (addressTypeStore.meta.name.group === AddressGroupTypes.reward) {
         return (<RewardHeader />);

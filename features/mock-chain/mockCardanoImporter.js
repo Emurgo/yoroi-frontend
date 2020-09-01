@@ -1439,11 +1439,7 @@ export function serverIssue() {
   });
 }
 export function serverFixed() {
-  setServerStatus({
-    isServerOk: true,
-    isMaintenance: false,
-    serverTime: new Date().getTime(),
-  });
+  setServerStatus(initialServerOk);
 }
 
 export function appMaintenance() {
@@ -1454,11 +1450,7 @@ export function appMaintenance() {
   });
 }
 export function appMaintenanceFinish() {
-  setServerStatus({
-    isServerOk: true,
-    isMaintenance: false,
-    serverTime: new Date().getTime(),
-  });
+  setServerStatus(initialServerOk);
 }
 
 function getApiStatus(): ServerStatusResponse {
