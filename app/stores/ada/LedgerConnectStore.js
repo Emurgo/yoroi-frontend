@@ -218,7 +218,10 @@ export default class LedgerConnectStore
         accountIndex: this.derivationIndex,
         checkAddressesInUse: stateFetcher.checkAddressesInUse,
         getUTXOsForAddresses: stateFetcher.getUTXOsForAddresses,
-        absSlotNumber: new BigNumber(timeToSlot({ time: new Date() }).slot),
+        absSlotNumber: new BigNumber(timeToSlot({
+          // use server time for TTL if connected to server
+          time: this.stores.serverConnectionStore.serverTime ?? new Date(),
+        }).slot),
         network: selectedNetwork,
       }).promise;
     } catch (_e) {

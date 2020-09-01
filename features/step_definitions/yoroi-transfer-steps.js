@@ -47,6 +47,11 @@ Then(/^I select the trezor option$/, async function () {
   await this.click('.SimpleCheckbox_check');
   await this.click('.primary');
 });
+Then(/^I select the ledger option$/, async function () {
+  await this.click('.fromLedger_connectLedger');
+  await this.click('.SimpleCheckbox_check');
+  await this.click('.primary');
+});
 When(/^I click on the yoroiPaper button on the Yoroi Transfer start screen$/, async function () {
   await this.click('.yoroiPaper');
 });

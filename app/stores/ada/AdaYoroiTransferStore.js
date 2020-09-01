@@ -133,7 +133,10 @@ export default class AdaYoroiTransferStore extends Store {
     );
     const config = fullConfig.reduce((acc, next) => Object.assign(acc, next), {});
     const timeToSlot = await genTimeToSlot(fullConfig);
-    const absSlotNumber = new BigNumber(timeToSlot({ time: new Date() }).slot);
+    const absSlotNumber = new BigNumber(timeToSlot({
+      // use server time for TTL if connected to server
+      time: this.stores.serverConnectionStore.serverTime ?? new Date(),
+    }).slot);
 
     const rewardHex = Buffer.from(RustModule.WalletV4.RewardAddress.new(
       Number.parseInt(config.ChainNetworkId, 10),
@@ -222,7 +225,10 @@ export default class AdaYoroiTransferStore extends Store {
         minimumUtxoVal: RustModule.WalletV4.BigNum.from_str(config.MinimumUtxoVal),
         poolDeposit: RustModule.WalletV4.BigNum.from_str(config.PoolDeposit),
       },
-      absSlotNumber: new BigNumber(timeToSlot({ time: new Date() }).slot),
+      absSlotNumber: new BigNumber(timeToSlot({
+        // use server time for TTL if connected to server
+        time: this.stores.serverConnectionStore.serverTime ?? new Date(),
+      }).slot),
     });
     // Possible exception: NotEnoughMoneyToSendError
     return transferTx;

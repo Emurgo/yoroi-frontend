@@ -114,6 +114,7 @@ export const mockSettingsProps: {
               ServerStatusErrors,
               ServerStatusErrors.Healthy,
             ),
+            serverTime: undefined,
           },
           wallets: {
             selected: null,

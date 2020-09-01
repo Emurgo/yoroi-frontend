@@ -124,7 +124,10 @@ export default class AdaDelegationTransactionStore extends Store {
     );
     const toRelativeSlotNumber = await genToRelativeSlotNumber(fullConfig);
     const timeToSlot = await genTimeToSlot(fullConfig);
-    const absSlotNumber = new BigNumber(timeToSlot({ time: new Date() }).slot);
+    const absSlotNumber = new BigNumber(timeToSlot({
+      // use server time for TTL if connected to server
+      time: this.stores.serverConnectionStore.serverTime ?? new Date(),
+    }).slot);
     const currentEpoch = toRelativeSlotNumber(
       timeToSlot({
         time: new Date(),

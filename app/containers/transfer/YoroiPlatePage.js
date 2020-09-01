@@ -42,7 +42,7 @@ export default class YoroiPlatePage extends Component<Props> {
       throw new Error(`${nameof(YoroiPlatePage)} no mode selected`);
     }
 
-    const rootPk = yoroiTransfer.mode.type === 'ledger'
+    const rootPk = yoroiTransfer.mode.extra === 'ledger'
       ? generateLedgerWalletRootKey(yoroiTransfer.recoveryPhrase)
       : generateWalletRootKey(yoroiTransfer.recoveryPhrase);
 

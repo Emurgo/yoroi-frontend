@@ -203,7 +203,10 @@ export default class AdaTransactionBuilderStore extends Store {
     );
     const timeToSlot = await genTimeToSlot(fullConfig);
     // TODO: should not be ADA-specific
-    const absSlotNumber = new BigNumber(timeToSlot({ time: new Date() }).slot);
+    const absSlotNumber = new BigNumber(timeToSlot({
+      // use server time for TTL if connected to server
+      time: this.stores.serverConnectionStore.serverTime ?? new Date(),
+    }).slot);
 
     if (amount == null && shouldSendAll === true) {
       await this.createUnsignedTx.execute({

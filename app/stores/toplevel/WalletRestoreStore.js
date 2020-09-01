@@ -27,7 +27,7 @@ import {
 } from '../../api/jormungandr/lib/crypto/utils';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import {
-  generateWalletRootKey,
+  generateWalletRootKey, generateLedgerWalletRootKey,
 } from '../../api/ada/lib/cardanoCrypto/cryptoWallet';
 import { getApiForNetwork } from '../../api/common/utils';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
@@ -114,7 +114,10 @@ export default class AdaWalletRestoreStore extends Store {
       }
       resolvedRecoveryPhrase = newPhrase;
     }
-    const rootPk = generateWalletRootKey(resolvedRecoveryPhrase);
+
+    const rootPk = this.stores.yoroiTransfer.mode?.extra === 'ledger'
+      ? generateLedgerWalletRootKey(resolvedRecoveryPhrase)
+      : generateWalletRootKey(resolvedRecoveryPhrase);
     const { selectedNetwork } = this.stores.profile;
     if (selectedNetwork == null) throw new Error(`${nameof(this._processRestoreMeta)} no network selected`);
     const { byronPlate, shelleyPlate, jormungandrPlate } = generatePlates(

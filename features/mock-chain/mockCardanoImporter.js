@@ -1425,6 +1425,8 @@ const setServerStatus = (serverStatus: ServerStatusResponse) => {
 const initialServerOk: ServerStatusResponse = {
   isServerOk: true,
   isMaintenance: false,
+  // set the server time far into the future so that TTL is consistent
+  serverTime: 1893456000 * 1000,
 };
 
 setServerStatus(initialServerOk);
@@ -1433,12 +1435,14 @@ export function serverIssue() {
   setServerStatus({
     isServerOk: false,
     isMaintenance: false,
+    serverTime: new Date().getTime(),
   });
 }
 export function serverFixed() {
   setServerStatus({
     isServerOk: true,
     isMaintenance: false,
+    serverTime: new Date().getTime(),
   });
 }
 
@@ -1446,12 +1450,14 @@ export function appMaintenance() {
   setServerStatus({
     isServerOk: true,
     isMaintenance: true,
+    serverTime: new Date().getTime(),
   });
 }
 export function appMaintenanceFinish() {
   setServerStatus({
     isServerOk: true,
     isMaintenance: false,
+    serverTime: new Date().getTime(),
   });
 }
 
