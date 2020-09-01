@@ -39,11 +39,11 @@ export default class IncorrectTimeBanner extends Component<Props> {
 
     const currentTime = moment(new Date());
 
-    // in seconds
-    const timeDifference = Math.abs(currentTime - this.props.serverTime.getTime()) / 1000;
+    // in milliseconds
+    const timeDifference = Math.abs(currentTime - this.props.serverTime.getTime());
 
     // don't render an error if less than 2 minutes difference with the server
-    if (timeDifference < 60 * 2) {
+    if (timeDifference < 1000 * 60 * 2) {
       return null;
     }
 

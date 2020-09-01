@@ -1425,7 +1425,8 @@ const setServerStatus = (serverStatus: ServerStatusResponse) => {
 const initialServerOk: ServerStatusResponse = {
   isServerOk: true,
   isMaintenance: false,
-  serverTime: new Date().getTime(),
+  // set the server time far into the future so that TTL is consistent
+  serverTime: 1893456000 * 1000,
 };
 
 setServerStatus(initialServerOk);
