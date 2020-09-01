@@ -61,7 +61,7 @@
   "daedalusTransfer.waiting.progressInfo.restoringAddresses": "Obtention des adresses",
   "daedalusTransfer.waiting.title.label": "Le wallet Daedalus est en cours de récupération",
   "daedalusTransfer.waiting.warning": "Cela peut prendre du temps ou échouer si vous avez une mauvaise connexion internet",
-  "global.blog.learnMore": "You can read our {blogLink} to learn more.",
+  "global.blog.learnMore": "Pour en savoir plus, vous pouvez lire notre {blogLink}.",
   "global.contact": "contacter l'assistance",
   "global.copyTooltipMessage": "Copié",
   "global.errors.fieldIsRequired": "Veuillez remplir ce champ.",
