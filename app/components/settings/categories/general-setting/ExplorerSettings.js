@@ -59,10 +59,14 @@ export default class ExplorerSettings extends Component<Props> {
       styles.explorer,
       isSubmitting ? styles.submitExplorerSpinner : null,
     ]);
-    const options = this.props.explorers.map(explorer => ({
-      value: explorer,
-      label: explorer.Name,
-    }));
+    const options = this.props.explorers
+      .map(explorer => ({
+        value: explorer,
+        label: explorer.Name,
+      }))
+      // if the explorer has no working pages, exclude it from the list
+      .filter(explorer => Object.keys(explorer.value.Endpoints).length !== 0);
+
     return (
       <div className={componentClassNames}>
         <Select
