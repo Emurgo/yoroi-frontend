@@ -627,7 +627,9 @@ describe('Create sendAll unsigned TX from UTXO', () => {
       const sampleUtxos = genSampleUtxos();
       const utxos: Array<RemoteUnspentOutput> = [sampleUtxos[1], sampleUtxos[2]];
       const sendAllResponse = sendAllUnsignedTxFromUtxo(
-        byronAddrToHex('Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4'),
+        {
+          address: byronAddrToHex('Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4')
+        },
         utxos,
         new BigNumber(0),
         getProtocolParams(),
@@ -648,7 +650,9 @@ describe('Create sendAll unsigned TX from UTXO', () => {
 
   it('Should fail due to insufficient funds (no inputs)', () => {
     expect(() => sendAllUnsignedTxFromUtxo(
-      byronAddrToHex('Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4'),
+      {
+        address: byronAddrToHex('Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4'),
+      },
       [],
       new BigNumber(0),
       getProtocolParams(),
@@ -659,7 +663,9 @@ describe('Create sendAll unsigned TX from UTXO', () => {
     const sampleUtxos = genSampleUtxos();
     const utxos: Array<RemoteUnspentOutput> = [sampleUtxos[0]];
     expect(() => sendAllUnsignedTxFromUtxo(
-      byronAddrToHex('Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4'),
+      {
+        address: byronAddrToHex('Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4'),
+      },
       utxos,
       new BigNumber(0),
       getProtocolParams(),

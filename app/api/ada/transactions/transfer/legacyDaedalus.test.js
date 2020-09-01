@@ -98,7 +98,9 @@ describe('Byron era tx format tests', () => {
     const transferInfo = await daedalusTransferTxFromAddresses({
       addressKeys: addressMap,
       getUTXOsForAddresses: (_addresses) => Promise.resolve([utxo]),
-      outputAddr: outAddress,
+      outputAddr: {
+        address: outAddress
+      },
       absSlotNumber: new BigNumber(1),
       protocolParams: getProtocolParams(),
     });
@@ -155,7 +157,9 @@ describe('Byron era tx format tests', () => {
     expect(daedalusTransferTxFromAddresses({
       addressKeys: addressMap,
       getUTXOsForAddresses: (_addresses) => Promise.resolve([utxo]),
-      outputAddr: outAddress,
+      outputAddr: {
+        address: outAddress
+      },
       absSlotNumber: new BigNumber(1),
       protocolParams: getProtocolParams(),
     })).rejects.toThrow(NotEnoughMoneyToSendError);
@@ -191,7 +195,9 @@ describe('Byron era tx format tests', () => {
     const transferInfo = await daedalusTransferTxFromAddresses({
       addressKeys: addressMap,
       getUTXOsForAddresses: (_addresses) => Promise.resolve(utxo),
-      outputAddr: outAddress,
+      outputAddr: {
+        address: outAddress
+      },
       absSlotNumber: new BigNumber(1),
       protocolParams: getProtocolParams(),
     });

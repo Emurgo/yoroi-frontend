@@ -30,6 +30,9 @@ import {
 import {
   asGetAllUtxos, asHasUtxoChains,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
+import type {
+  Address, Addressing
+} from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 
 export default class AdaYoroiTransferStore extends Store {
 
@@ -80,7 +83,7 @@ export default class AdaYoroiTransferStore extends Store {
   generateTransferTxFromMnemonic: {|
     recoveryPhrase: string,
     updateStatusCallback: void => void,
-    getDestinationAddress: void => Promise<string>,
+    getDestinationAddress: void => Promise<{| ...Address, ...InexactSubset<Addressing> |}>,
   |} => Promise<TransferTx> = async (request) => {
     if (!this.stores.yoroiTransfer.mode) {
       throw new Error(`${nameof(AdaYoroiTransferStore)}::${nameof(this.generateTransferTxFromMnemonic)} no mode specified`);
@@ -97,7 +100,7 @@ export default class AdaYoroiTransferStore extends Store {
   generateTransferTxForRewardAccount: {|
     recoveryPhrase: string,
     updateStatusCallback: void => void,
-    getDestinationAddress: void => Promise<string>,
+    getDestinationAddress: void => Promise<{| ...Address, ...InexactSubset<Addressing> |}>,
   |} => Promise<TransferTx> = async (request) => {
     const { createWithdrawalTx } = this.stores.substores.ada.delegationTransaction;
     createWithdrawalTx.reset();
@@ -171,7 +174,7 @@ export default class AdaYoroiTransferStore extends Store {
   generateTransferTxForByron: {|
     recoveryPhrase: string,
     updateStatusCallback: void => void,
-    getDestinationAddress: void => Promise<string>,
+    getDestinationAddress: void => Promise<{| ...Address, ...InexactSubset<Addressing> |}>,
   |} => Promise<TransferTx> = async (request) => {
     // 1) get receive address
     const destinationAddress = await request.getDestinationAddress();

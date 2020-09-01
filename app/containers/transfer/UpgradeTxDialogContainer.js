@@ -99,7 +99,7 @@ export default class UpgradeTxDialogContainer extends Component<Props> {
     }
 
     return {
-      recoveredBalance: tentativeTx.totalInput(true),
+      recoveredBalance: tentativeTx.totalOutput(true).plus(tentativeTx.fee(true)),
       fee: tentativeTx.fee(true),
       senders: tentativeTx
         .uniqueSenderAddresses(),

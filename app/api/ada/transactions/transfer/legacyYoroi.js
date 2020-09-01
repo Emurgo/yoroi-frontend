@@ -16,7 +16,10 @@ import { toSenderUtxos } from './utils';
 
 export async function yoroiTransferTxFromAddresses(payload: {|
   addresses: Array<{| ...Address, ...Addressing |}>,
-  outputAddr: string,
+  outputAddr: {|
+    ...Address,
+    ...InexactSubset<Addressing>,
+  |},
   keyLevel: number,
   signingKey: RustModule.WalletV4.Bip32PrivateKey,
   getUTXOsForAddresses: AddressUtxoFunc,

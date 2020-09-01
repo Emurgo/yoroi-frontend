@@ -21,6 +21,9 @@ import {
 import {
   getJormungandrBaseConfig,
 } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import type {
+  Address, Addressing
+} from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 
 export default class JormungandrYoroiTransferStore extends Store {
 
@@ -57,7 +60,7 @@ export default class JormungandrYoroiTransferStore extends Store {
   generateTransferTxFromMnemonic: {|
     recoveryPhrase: string,
     updateStatusCallback: void => void,
-    getDestinationAddress: void => Promise<string>,
+    getDestinationAddress: void => Promise<{| ...Address, ...InexactSubset<Addressing> |}>,
   |} => Promise<TransferTx> = async (request) => {
     // 1) get receive address
     const destinationAddress = await request.getDestinationAddress();
@@ -96,7 +99,7 @@ export default class JormungandrYoroiTransferStore extends Store {
 
     const transferTx = await yoroiTransferTxFromAddresses({
       addresses,
-      outputAddr: destinationAddress,
+      outputAddr: destinationAddress.address,
       keyLevel: Bip44DerivationLevels.ACCOUNT.level,
       signingKey: accountKey,
       getUTXOsForAddresses:

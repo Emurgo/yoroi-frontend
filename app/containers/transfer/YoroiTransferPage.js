@@ -38,6 +38,9 @@ import WithdrawalTxDialogContainer from './WithdrawalTxDialogContainer';
 import type { GeneratedData as WithdrawalTxDialogContainerData } from './WithdrawalTxDialogContainer';
 import { genAddressLookup } from '../../stores/stateless/addressStores';
 import type { IAddressTypeStore, IAddressTypeUiSubset } from '../../stores/stateless/addressStores';
+import type {
+  Address, Addressing
+} from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 
 // Stay this long on the success page, then jump to the wallet transactions page
 const SUCCESS_PAGE_STAY_TIME = 5 * 1000;
@@ -299,7 +302,7 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
         |},
         checkAddresses: {|
           trigger: (params: {|
-            getDestinationAddress: void => Promise<string>
+            getDestinationAddress: void => Promise<{| ...Address, ...InexactSubset<Addressing> |}>
           |}) => Promise<void>
         |},
         setupTransferFundsWithMnemonic: {|
@@ -318,7 +321,7 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
         |},
         transferFunds: {|
           trigger: (params: {|
-            getDestinationAddress: void => Promise<string>,
+            getDestinationAddress: void => Promise<{| ...Address, ...InexactSubset<Addressing> |}>,
             next: void => Promise<void>,
             rebuildTx: boolean
           |}) => Promise<void>
@@ -352,7 +355,7 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
         error: ?LocalizableError,
         nextInternalAddress: (
           PublicDeriver<>
-        ) => void => Promise<string>,
+        ) => void => Promise<{| ...Address, ...InexactSubset<Addressing> |}>,
         recoveryPhrase: string,
         status: TransferStatusT,
         transferTx: ?TransferTx,

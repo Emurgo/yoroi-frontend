@@ -43,6 +43,9 @@ import type { TransferStatusT, TransferTx } from '../../types/TransferTypes';
 import LocalizableError from '../../i18n/LocalizableError';
 import type { IAddressTypeStore, IAddressTypeUiSubset } from '../../stores/stateless/addressStores';
 import { allAddressSubgroups } from '../../stores/stateless/addressStores';
+import type {
+  Address, Addressing
+} from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -73,7 +76,9 @@ const genBaseProps: {|
       +status: TransferStatusT,
       +error: ?LocalizableError,
       +transferTx: ?TransferTx,
-      +nextInternalAddress: PublicDeriver<> => (void => Promise<string>),
+      +nextInternalAddress: (
+        PublicDeriver<>
+       ) => (void => Promise<{| ...Address, ...InexactSubset<Addressing> |}>),
       +recoveryPhrase: string,
     |}>,
   |},
@@ -119,7 +124,9 @@ const genBaseProps: {|
       status: TransferStatus.UNINITIALIZED,
       error: undefined,
       transferTx: undefined,
-      nextInternalAddress: (_publicDeriver) => (async () => 'Ae2tdPwUPEZ5PxKxoyZDgjsKgMWMpTRa4PH3sVgARSGBsWwNBH3qg7cMFsP'),
+      nextInternalAddress: (_publicDeriver) => (async () => ({
+        address: 'Ae2tdPwUPEZ5PxKxoyZDgjsKgMWMpTRa4PH3sVgARSGBsWwNBH3qg7cMFsP'
+      })),
       recoveryPhrase: '',
       ...request.yoroiTransfer,
     },

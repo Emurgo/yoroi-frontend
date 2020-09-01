@@ -20,7 +20,7 @@ export default class JormungandrDaedalusTransferStore extends Store {
     ).reduce((acc, next) => Object.assign(acc, next), {});
     return await daedalusTransferTxFromAddresses({
       addressKeys: request.addressKeys,
-      outputAddr: request.outputAddr,
+      outputAddr: request.outputAddr.address,
       getUTXOsForAddresses:
         this.stores.substores.ada.stateFetchStore.fetcher.getUTXOsForAddresses,
       genesisHash: config.ChainNetworkId,

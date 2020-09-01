@@ -36,12 +36,12 @@ import {
 const defaultTtlOffset = 7200;
 
 type TxOutput = {|
-  address: string,
+  ...Address,
   amount: string,
 |};
 
 export function sendAllUnsignedTx(
-  receiver: string,
+  receiver: {| ...Address, ...InexactSubset<Addressing> |},
   allUtxos: Array<AddressedUtxo>,
   absSlotNumber: BigNumber,
   protocolParams: {|
@@ -118,7 +118,7 @@ function addUtxoInput(
 }
 
 export function sendAllUnsignedTxFromUtxo(
-  receiver: string,
+  receiver: {| ...Address, ...InexactSubset<Addressing> |},
   allUtxos: Array<RemoteUnspentOutput>,
   absSlotNumber: BigNumber,
   protocolParams: {|
@@ -154,7 +154,7 @@ export function sendAllUnsignedTxFromUtxo(
     throw new NotEnoughMoneyToSendError();
   }
   {
-    const wasmReceiver = normalizeToAddress(receiver);
+    const wasmReceiver = normalizeToAddress(receiver.address);
     if (wasmReceiver == null) {
       throw new Error(`${nameof(sendAllUnsignedTxFromUtxo)} receiver not a valid Shelley address`);
     }
@@ -170,10 +170,18 @@ export function sendAllUnsignedTxFromUtxo(
     }
   }
 
+  const output = new BigNumber(txBuilder.get_explicit_output().to_str());
+
   return {
     senderUtxos: allUtxos,
     txBuilder,
-    changeAddr: [], // no change for sendAll
+    changeAddr: receiver.addressing
+      ? [{
+        addressing: receiver.addressing,
+        address: receiver.address,
+        value: output,
+      }]
+      : [],
   };
 }
 

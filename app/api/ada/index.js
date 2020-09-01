@@ -68,7 +68,6 @@ import type {
   IGetAllUtxosResponse,
   IHasUtxoChains, IHasUtxoChainsRequest,
   Address, Addressing, UsedStatus, Value, AddressType,
-  BaseSingleAddressPath,
 } from './lib/storage/models/PublicDeriver/interfaces';
 import type {
   BaseGetTransactionsRequest,
@@ -334,14 +333,13 @@ export type CreateUnsignedTxFunc = (
 
 export type CreateUnsignedTxForUtxosRequest = {|
   absSlotNumber: BigNumber,
-  receiver: string,
+  receivers: Array<{|
+    ...Address,
+    ...InexactSubset<Addressing>,
+  |}>,
   network: $ReadOnly<NetworkRow>,
   ...{|
     amount: string,
-    internal: {|
-      addressInfo: BaseSingleAddressPath,
-      index: number
-    |},
   |} | {|
     shouldSendAll: true,
   |},
@@ -911,7 +909,6 @@ export default class AdaApi {
     request: CreateUnsignedTxForUtxosRequest
   ): Promise<CreateUnsignedTxForUtxosResponse> {
     Logger.debug(`${nameof(AdaApi)}::${nameof(this.createUnsignedTxForUtxos)} called`);
-    const { receiver, } = request;
     try {
       const config = getCardanoHaskellBaseConfig(
         request.network
@@ -929,6 +926,10 @@ export default class AdaApi {
 
       let unsignedTxResponse;
       if (request.shouldSendAll) {
+        if (request.receivers.length !== 1) {
+          throw new Error(`${nameof(this.createUnsignedTxForUtxos)} wrong output size for sendAll`);
+        }
+        const receiver = request.receivers[0];
         unsignedTxResponse = shelleySendAllUnsignedTx(
           receiver,
           request.utxos,
@@ -937,12 +938,42 @@ export default class AdaApi {
         );
       } else {
         const amount = request.amount;
-        const nextUnusedInternal = request.internal;
-        const changeAddr = nextUnusedInternal.addressInfo;
+        const changeAddresses = request.receivers.reduce(
+          (arr, next) => {
+            if (next.addressing != null) {
+              arr.push({
+                address: next.address,
+                addressing: next.addressing,
+              });
+              return arr;
+            }
+            return arr;
+          },
+          ([]: Array<{| ...Address, ...Addressing |}>)
+        );
+        if (changeAddresses.length !== 1) {
+          throw new Error(`${nameof(this.createUnsignedTxForUtxos)} needs exactly one change address`);
+        }
+        const changeAddr = changeAddresses[0];
+        const otherAddresses: Array<{| ...Address, |}> = request.receivers.reduce(
+          (arr, next) => {
+            if (next.addressing == null) {
+              arr.push({ address: next.address });
+              return arr;
+            }
+            return arr;
+          },
+          ([]: Array<{| ...Address, |}>)
+        );
+        if (otherAddresses.length > 1) {
+          throw new Error(`${nameof(this.createUnsignedTxForUtxos)} can't send to more than one address`);
+        }
         unsignedTxResponse = shelleyNewAdaUnsignedTx(
-          [{ address: receiver, amount }],
+          otherAddresses.length === 1
+            ? [{ address: otherAddresses[0].address, amount }]
+            : [],
           {
-            address: changeAddr.addr.Hash,
+            address: changeAddr.address,
             addressing: changeAddr.addressing,
           },
           request.utxos,
@@ -991,24 +1022,25 @@ export default class AdaApi {
 
     const addressedUtxo = shelleyAsAddressedUtxo(filteredUtxos);
 
+    const receivers = [{
+      address: request.receiver
+    }];
+    if (!request.shouldSendAll) {
+      const internal = await request.publicDeriver.nextInternal();
+      if (internal.addressInfo == null) {
+        throw new Error(`${nameof(this.createUnsignedTx)} no internal addresses left. Should never happen`);
+      }
+      receivers.push({
+        address: internal.addressInfo.addr.Hash,
+        addressing: internal.addressInfo.addressing,
+      });
+    }
     const amountInfo = request.shouldSendAll
       ? { shouldSendAll: request.shouldSendAll }
-      : await (async () => {
-        const internal = await request.publicDeriver.nextInternal();
-        if (internal.addressInfo == null) {
-          throw new Error(`${nameof(this.createUnsignedTx)} no internal addresses left. Should never happen`);
-        }
-        return {
-          amount: request.amount,
-          internal: {
-            addressInfo: internal.addressInfo,
-            index: internal.index,
-          },
-        };
-      })();
+      : { amount: request.amount, };
     return this.createUnsignedTxForUtxos({
       absSlotNumber: request.absSlotNumber,
-      receiver: request.receiver,
+      receivers,
       network: request.publicDeriver.getParent().getNetworkInfo(),
       utxos: addressedUtxo,
       ...amountInfo,
@@ -1614,7 +1646,19 @@ export default class AdaApi {
         },
         signRequest: await this.createUnsignedTxForUtxos({
           absSlotNumber: request.absSlotNumber,
-          receiver: Buffer.from(receiveAddress.to_address().to_bytes()).toString('hex'),
+          receivers: [{
+            address: Buffer.from(receiveAddress.to_address().to_bytes()).toString('hex'),
+            addressing: {
+              path: [
+                WalletTypePurpose.CIP1852,
+                CoinTypes.CARDANO,
+                request.accountIndex,
+                ChainDerivations.INTERNAL,
+                0,
+              ],
+              startLevel: 1,
+            },
+          }],
           network: request.network,
           shouldSendAll: true,
           utxos,

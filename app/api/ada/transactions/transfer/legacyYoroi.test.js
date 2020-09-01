@@ -119,7 +119,9 @@ describe('Haskell Shelley era tx format tests', () => {
       getUTXOsForAddresses: (_addresses) => Promise.resolve([utxo]),
       keyLevel: Bip44DerivationLevels.ACCOUNT.level,
       signingKey: accountPrivateKey,
-      outputAddr: outAddress,
+      outputAddr: {
+        address: outAddress
+      },
       absSlotNumber: new BigNumber(1),
       protocolParams: getProtocolParams(),
     });
