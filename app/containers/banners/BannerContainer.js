@@ -8,6 +8,7 @@ import TestnetWarningBanner from '../../components/topbar/banners/TestnetWarning
 import ByronDeprecationBanner from './ByronDeprecationBanner';
 import NotProductionBanner from '../../components/topbar/banners/NotProductionBanner';
 import ServerErrorBanner from '../../components/topbar/banners/ServerErrorBanner';
+import IncorrectTimeBanner from '../../components/topbar/banners/IncorrectTimeBanner';
 import environment from '../../environment';
 import { ServerStatusErrors } from '../../types/serverStatusErrorType';
 import type { ServerStatusErrorType } from '../../types/serverStatusErrorType';
@@ -39,6 +40,9 @@ export default class BannerContainer extends Component<InjectedOrGenerated<Gener
       : undefined;
     return (
       <>
+        <IncorrectTimeBanner
+          serverTime={this.generated.stores.serverConnectionStore.serverTime}
+        />
         {serverStatus !== ServerStatusErrors.Healthy && (
           <ServerErrorBanner errorType={serverStatus} />
         )}
@@ -53,6 +57,7 @@ export default class BannerContainer extends Component<InjectedOrGenerated<Gener
     stores: {|
       serverConnectionStore: {|
         checkAdaServerStatus: ServerStatusErrorType,
+        serverTime: number,
       |},
       wallets: {| selected: null | PublicDeriver<> |},
     |},
@@ -69,6 +74,7 @@ export default class BannerContainer extends Component<InjectedOrGenerated<Gener
       stores: {
         serverConnectionStore: {
           checkAdaServerStatus: stores.serverConnectionStore.checkAdaServerStatus,
+          serverTime: stores.serverConnectionStore.serverTime,
         },
         wallets: {
           selected: stores.wallets.selected,

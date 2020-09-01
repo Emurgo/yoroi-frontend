@@ -6,6 +6,7 @@ export type ServerStatusRequest = void;
 export type ServerStatusResponse = {|
   isServerOk: boolean,
   isMaintenance: boolean,
+  serverTime: number, // in milliseconds
 |};
 export type ServerStatusFunc = (body: ServerStatusRequest) => Promise<ServerStatusResponse>;
 

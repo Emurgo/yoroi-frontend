@@ -1,0 +1,23 @@
+.component {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: var(--theme-banner-warning-background-color);
+  .warningIcon {
+    margin-right: 9px;
+  }
+  .text {
+    margin: 20px 0px;
+    text-transform: uppercase;
+    color: var(--cmn-color-white);
+    font-size: 13px;
+    font-weight: bold;
+    font-family: var(--font-regular);
+    letter-spacing: 1px;
+    line-height: 20px;
+    .preTime {
+      width: 200px;
+      display: inline-block;
+    }
+  }
+}

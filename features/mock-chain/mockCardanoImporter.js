@@ -1425,6 +1425,7 @@ const setServerStatus = (serverStatus: ServerStatusResponse) => {
 const initialServerOk: ServerStatusResponse = {
   isServerOk: true,
   isMaintenance: false,
+  serverTime: new Date().getTime(),
 };
 
 setServerStatus(initialServerOk);
@@ -1433,12 +1434,14 @@ export function serverIssue() {
   setServerStatus({
     isServerOk: false,
     isMaintenance: false,
+    serverTime: new Date().getTime(),
   });
 }
 export function serverFixed() {
   setServerStatus({
     isServerOk: true,
     isMaintenance: false,
+    serverTime: new Date().getTime(),
   });
 }
 
@@ -1446,12 +1449,14 @@ export function appMaintenance() {
   setServerStatus({
     isServerOk: true,
     isMaintenance: true,
+    serverTime: new Date().getTime(),
   });
 }
 export function appMaintenanceFinish() {
   setServerStatus({
     isServerOk: true,
     isMaintenance: false,
+    serverTime: new Date().getTime(),
   });
 }
 
