@@ -11,6 +11,7 @@ import { THEMES } from '../../../../themes';
 import type { Theme } from '../../../../themes';
 import ThemeThumbnail from '../display/ThemeThumbnail';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import globalMessages from '../../../../i18n/global-messages';
 
 const messages = defineMessages({
   themeLabel: {
@@ -44,10 +45,6 @@ const messages = defineMessages({
   blogLinkUrl: {
     id: 'settings.support.faq.blogLinkUrl',
     defaultMessage: '!!!https://emurgo.io/en/blog/yoroi-custom-themes',
-  },
-  blogLinkWrapper: {
-    id: 'settings.support.faq.blogLinkWrapper',
-    defaultMessage: '!!!blog post',
   },
 });
 
@@ -99,7 +96,7 @@ export default class ThemeSettingsBlock extends Component<Props> {
         href={intl.formatMessage(messages.blogLinkUrl)}
         onClick={event => onExternalLinkClick(event)}
       >
-        {intl.formatMessage(messages.blogLinkWrapper)}
+        {intl.formatMessage(globalMessages.blogLinkWrapper)}
       </a>
     );
 

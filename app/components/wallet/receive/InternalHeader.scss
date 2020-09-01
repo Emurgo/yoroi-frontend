@@ -1,0 +1,10 @@
+@import '../../../themes/mixins/underline';
+
+.component {
+  a {
+    color: var(--theme-support-settings-text-color);
+  }
+  .link {
+    @include underline(var(--theme-underline-dark-color));
+  }
+}

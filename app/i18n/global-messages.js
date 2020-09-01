@@ -633,6 +633,14 @@ const globalMessages: * = defineMessages({
     id: 'wallet.settings.resync.buttonLabel',
     defaultMessage: '!!!Resync wallet',
   },
+  blogLinkWrapper: {
+    id: 'settings.support.faq.blogLinkWrapper',
+    defaultMessage: '!!!blog post',
+  },
+  blogLearnMore: {
+    id: 'global.blog.learnMore',
+    defaultMessage: '!!!You can read our {blogLink} to learn more.'
+  },
 });
 export default globalMessages;
 
