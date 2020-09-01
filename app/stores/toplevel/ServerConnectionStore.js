@@ -11,7 +11,11 @@ export default class ServerConnectionStore extends Store {
   SERVER_STATUS_REFRESH_INTERVAL: number = environment.serverStatusRefreshInterval;
 
   @observable serverStatus: ServerStatusErrorType = ServerStatusErrors.Healthy;
-  @observable isMaintenance: boolean;
+  @observable isMaintenance: boolean = false;
+
+  // set to undefined as a starting value
+  // to detect if we've never managed to connect to the server (Yoroi running in offline mode)
+  @observable serverTime: void | Date = undefined;
 
   setup(): void {
     super.setup();
@@ -35,6 +39,7 @@ export default class ServerConnectionStore extends Store {
           ? ServerStatusErrors.Healthy
           : ServerStatusErrors.Server;
         this.isMaintenance = response.isMaintenance || false;
+        this.serverTime = new Date(response.serverTime);
       });
     } catch (err) {
       runInAction('refresh server status', () => {

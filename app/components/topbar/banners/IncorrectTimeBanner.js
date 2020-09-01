@@ -24,7 +24,7 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  serverTime: number,
+  serverTime: Date,
 |};
 
 @observer
@@ -40,7 +40,7 @@ export default class IncorrectTimeBanner extends Component<Props> {
     const currentTime = moment(new Date());
 
     // in seconds
-    const timeDifference = Math.abs(currentTime - this.props.serverTime) / 1000;
+    const timeDifference = Math.abs(currentTime - this.props.serverTime.getTime()) / 1000;
 
     // don't render an error if less than 2 minutes difference with the server
     if (timeDifference < 60 * 2) {

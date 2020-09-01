@@ -40,9 +40,12 @@ export default class BannerContainer extends Component<InjectedOrGenerated<Gener
       : undefined;
     return (
       <>
-        <IncorrectTimeBanner
-          serverTime={this.generated.stores.serverConnectionStore.serverTime}
-        />
+        {/* if running in offline mode, don't render an error */}
+        {this.generated.stores.serverConnectionStore.serverTime != null && (
+          <IncorrectTimeBanner
+            serverTime={this.generated.stores.serverConnectionStore.serverTime}
+          />
+        )}
         {serverStatus !== ServerStatusErrors.Healthy && (
           <ServerErrorBanner errorType={serverStatus} />
         )}
@@ -57,7 +60,7 @@ export default class BannerContainer extends Component<InjectedOrGenerated<Gener
     stores: {|
       serverConnectionStore: {|
         checkAdaServerStatus: ServerStatusErrorType,
-        serverTime: number,
+        serverTime: void | Date,
       |},
       wallets: {| selected: null | PublicDeriver<> |},
     |},

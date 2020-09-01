@@ -230,6 +230,7 @@ export const mockTransferProps: {
               ServerStatusErrors,
               ServerStatusErrors.Healthy,
             ),
+            serverTime: undefined,
           },
           wallets: {
             selected: request.selected,
