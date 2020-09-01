@@ -22,6 +22,9 @@ import {
   buildCheckAndCall,
 } from '../lib/check';
 import { ApiOptions, getApiForNetwork } from '../../api/common/utils';
+import type {
+  Address, Addressing
+} from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 
 export default class JormungandrWalletRestoreStore extends Store {
 
@@ -55,7 +58,7 @@ export default class JormungandrWalletRestoreStore extends Store {
     });
   }
 
-  _getFirstCip1852InternalAddr: void => string = () => {
+  _getFirstCip1852InternalAddr: void => {| ...Address, ...InexactSubset<Addressing> |} = () => {
     const phrase = this.stores.walletRestore.recoveryResult?.phrase;
     if (phrase == null) {
       throw new Error(`${nameof(this._getFirstCip1852InternalAddr)} no recovery phrase set. Should never happen`);
@@ -82,7 +85,9 @@ export default class JormungandrWalletRestoreStore extends Store {
       environment.getDiscriminant(),
     );
     const internalAddrHash = Buffer.from(internalAddr.as_bytes()).toString('hex');
-    return internalAddrHash;
+    return {
+      address: internalAddrHash,
+    };
   }
 
   _restoreToDb: void => Promise<void> = async () => {

@@ -20,6 +20,9 @@ import type {
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 import type { AddressKeyMap } from '../types';
 import { buildDaedalusTransferTx } from '../byron/daedalusTransfer';
+import type {
+  Address, Addressing,
+} from '../../lib/storage/models/PublicDeriver/interfaces';
 
 /**
  * Go through the whole UTXO and find the addresses that belong to the user along with the keys
@@ -67,7 +70,10 @@ export async function toSenderUtxos(payload: {|
 
 export async function daedalusTransferTxFromAddresses(payload: {|
   addressKeys: AddressKeyMap,
-  outputAddr: string,
+  outputAddr: {|
+    ...Address,
+    ...InexactSubset<Addressing>,
+  |},
   getUTXOsForAddresses: AddressUtxoFunc,
   absSlotNumber: BigNumber,
   protocolParams: {|

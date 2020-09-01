@@ -31,10 +31,11 @@ import { getVarsForTheme } from '../../app/stores/toplevel/ProfileStore';
 import { withKnobs, select, boolean } from '@storybook/addon-knobs';
 import { addDecorator } from '@storybook/react';
 
-import LocalizableError from '../../app/i18n/LocalizableError';
+import LocalizableError, { UnexpectedError } from '../../app/i18n/LocalizableError';
 import globalMessages from '../../app/i18n/global-messages';
 import { ledgerErrors } from '../../app/domain/LedgerLocalizedError';
 import type { UnitOfAccountSettingType } from '../../app/types/unitOfAccountType';
+import { IncorrectVersionError, IncorrectDeviceError } from '../../app/domain/ExternalDeviceCommon';
 
 /**
  * This whole file is meant to mirror code in App.js
@@ -239,6 +240,9 @@ export const ledgerErrorCases: {|
   UserRejected: LocalizableError,
   Locked: LocalizableError,
   NotAllowed: LocalizableError,
+  Unexpected: LocalizableError,
+  IncorrectSerial: LocalizableError,
+  IncorrectVersion: LocalizableError,
 |} = Object.freeze({
   None: undefined,
   U2fTimeout: new LocalizableError(globalMessages.ledgerError101),
@@ -247,6 +251,15 @@ export const ledgerErrorCases: {|
   UserRejected: new LocalizableError(ledgerErrors.cancelOnLedgerConnectError102),
   Locked: new LocalizableError(ledgerErrors.deviceLockedError103),
   NotAllowed: new LocalizableError(ledgerErrors.deviceLockedError104),
+  Unexpected: new UnexpectedError(),
+  IncorrectSerial: new IncorrectDeviceError({
+    expectedDeviceId: '707fa118bf6b83',
+    responseDeviceId: '118db063477019',
+  }),
+  IncorrectVersion: new IncorrectVersionError({
+    supportedVersions: `2.0.4`,
+    responseVersion: '2.0.3',
+  }),
 });
 
 export const mockLedgerMeta = {

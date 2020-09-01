@@ -19,13 +19,19 @@ import type {
 } from '../../../../types/TransferTypes';
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 import { getAdaCurrencyMeta } from '../../currencyInfo';
+import type {
+  Address, Addressing,
+} from '../../lib/storage/models/PublicDeriver/interfaces';
 
 /**
  * Generate transaction including all addresses with no change.
 */
 export async function buildYoroiTransferTx(payload: {|
   senderUtxos: Array<AddressedUtxo>,
-  outputAddr: string,
+  outputAddr: {|
+    ...Address,
+    ...InexactSubset<Addressing>,
+  |},
   keyLevel: number,
   signingKey: RustModule.WalletV4.Bip32PrivateKey,
   absSlotNumber: BigNumber,
@@ -37,7 +43,7 @@ export async function buildYoroiTransferTx(payload: {|
   |}
 |}): Promise<TransferTx> {
   try {
-    const { senderUtxos, outputAddr, } = payload;
+    const { senderUtxos, } = payload;
 
     const totalBalance = senderUtxos
       .map(utxo => new BigNumber(utxo.amount))
@@ -48,7 +54,7 @@ export async function buildYoroiTransferTx(payload: {|
 
     // first build a transaction to see what the fee will be
     const unsignedTxResponse = sendAllUnsignedTx(
-      outputAddr,
+      payload.outputAddr,
       senderUtxos,
       payload.absSlotNumber,
       payload.protocolParams,
@@ -82,7 +88,7 @@ export async function buildYoroiTransferTx(payload: {|
       encodedTx: signedTx.to_bytes(),
       // only display unique addresses
       senders: Array.from(new Set(senderUtxos.map(utxo => utxo.receiver))),
-      receivers: [outputAddr],
+      receivers: [payload.outputAddr.address],
     };
   } catch (error) {
     Logger.error(`transfer::${nameof(buildYoroiTransferTx)} ${stringifyError(error)}`);

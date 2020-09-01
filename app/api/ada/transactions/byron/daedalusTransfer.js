@@ -23,6 +23,9 @@ import type {
 import type { AddressKeyMap } from '../types';
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 import { getAdaCurrencyMeta } from '../../currencyInfo';
+import type {
+  Address, Addressing,
+} from '../../lib/storage/models/PublicDeriver/interfaces';
 
 /**
  * Generate transaction including all addresses with no change.
@@ -30,7 +33,10 @@ import { getAdaCurrencyMeta } from '../../currencyInfo';
 export async function buildDaedalusTransferTx(payload: {|
   addressKeys: AddressKeyMap,
   senderUtxos: Array<RemoteUnspentOutput>,
-  outputAddr: string,
+  outputAddr: {|
+    ...Address,
+    ...InexactSubset<Addressing>,
+  |},
   absSlotNumber: BigNumber,
   protocolParams: {|
     keyDeposit: RustModule.WalletV4.BigNum,
@@ -40,7 +46,7 @@ export async function buildDaedalusTransferTx(payload: {|
   |}
 |}): Promise<TransferTx> {
   try {
-    const { addressKeys, senderUtxos, outputAddr } = payload;
+    const { addressKeys, senderUtxos, } = payload;
 
     const totalBalance = senderUtxos
       .map(utxo => new BigNumber(utxo.amount))
@@ -51,7 +57,7 @@ export async function buildDaedalusTransferTx(payload: {|
 
     // build tx
     const unsignedTxResponse = sendAllUnsignedTxFromUtxo(
-      outputAddr,
+      payload.outputAddr,
       senderUtxos,
       payload.absSlotNumber,
       payload.protocolParams,
@@ -76,7 +82,7 @@ export async function buildDaedalusTransferTx(payload: {|
       ).toString('hex'),
       encodedTx: signedTx.to_bytes(),
       senders: Object.keys(addressKeys), // recall: js keys are unique so need to dedupe
-      receivers: [outputAddr],
+      receivers: [payload.outputAddr.address],
     };
   } catch (error) {
     Logger.error(`daedalusTransfer::${nameof(buildDaedalusTransferTx)} ${stringifyError(error)}`);

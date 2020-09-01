@@ -26,6 +26,9 @@ import config from '../../config';
 import { getApiForNetwork } from '../../api/common/utils';
 import type { RestoreModeType } from '../../actions/common/wallet-restore-actions';
 import { SendTransactionApiError } from '../../api/common/errors';
+import type {
+  Address, Addressing
+} from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 
 export default class YoroiTransferStore extends Store {
 
@@ -113,7 +116,9 @@ export default class YoroiTransferStore extends Store {
     this._updateStatus(TransferStatus.GETTING_HARDWARE_MNEMONIC);
   }
 
-  nextInternalAddress: PublicDeriver<> => (void => Promise<string>) = (
+  nextInternalAddress: (
+    PublicDeriver<>
+  ) => (void => Promise<{| ...Address, ...InexactSubset<Addressing> |}>) = (
     publicDeriver
   ) => {
     return async () => {
@@ -123,8 +128,10 @@ export default class YoroiTransferStore extends Store {
       if (nextInternal.addressInfo == null) {
         throw new Error(`${nameof(this.nextInternalAddress)} no internal addresses left. Should never happen`);
       }
-      const nextInternalAddress = nextInternal.addressInfo.addr.Hash;
-      return nextInternalAddress;
+      return {
+        address: nextInternal.addressInfo.addr.Hash,
+        addressing: nextInternal.addressInfo.addressing,
+      };
     };
   }
 
@@ -160,7 +167,7 @@ export default class YoroiTransferStore extends Store {
   generateTransferTxFromMnemonic: {|
     recoveryPhrase: string,
     updateStatusCallback: void => void,
-    getDestinationAddress: void => Promise<string>,
+    getDestinationAddress: void => Promise<{| ...Address, ...InexactSubset<Addressing> |}>,
   |} => Promise<TransferTx> = async (request) => {
     if (this.stores.profile.selectedNetwork == null) {
       throw new Error(`${nameof(YoroiTransferStore)}::${nameof(this.generateTransferTxFromMnemonic)} no network selected`);
@@ -176,7 +183,7 @@ export default class YoroiTransferStore extends Store {
   }
 
   checkAddresses: {|
-    getDestinationAddress: void => Promise<string>,
+    getDestinationAddress: void => Promise<{| ...Address, ...InexactSubset<Addressing> |}>,
   |} => Promise<void> = async (
     payload
   ): Promise<void> => {
@@ -206,7 +213,7 @@ export default class YoroiTransferStore extends Store {
   /** Broadcast the transfer transaction if one exists and proceed to continuation */
   _transferFunds: {|
     next: void => Promise<void>,
-    getDestinationAddress: void => Promise<string>,
+    getDestinationAddress: void => Promise<{| ...Address, ...InexactSubset<Addressing> |}>,
     /*
      re-recover from the mnemonics to reduce the chance that the wallet
      changes before the tx is submit (we can't really eliminate it).

@@ -9,6 +9,9 @@ import {
 } from '../lib/check';
 import { ApiOptions, getApiForNetwork } from '../../api/common/utils';
 import { ApiMethodNotYetImplementedError } from '../lib/Request';
+import type {
+  Address, Addressing
+} from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 
 export default class AdaWalletRestoreStore extends Store {
 
@@ -42,7 +45,7 @@ export default class AdaWalletRestoreStore extends Store {
     });
   }
 
-  _getFirstCip1852InternalAddr: void => string = () => {
+  _getFirstCip1852InternalAddr: void => {| ...Address, ...InexactSubset<Addressing> |} = () => {
     throw new ApiMethodNotYetImplementedError();
     // const phrase = this.stores.walletRestore.recoveryResult?.phrase;
     // if (phrase == null) {

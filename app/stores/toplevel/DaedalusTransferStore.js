@@ -33,6 +33,9 @@ import { getApiForNetwork } from '../../api/common/utils';
 import type { AddressKeyMap } from '../../api/ada/transactions/types';
 import { isCardanoHaskell } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { normalizeToBase58 } from '../../api/ada/lib/storage/bridge/utils';
+import type {
+  Address, Addressing
+} from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 
 declare var CONFIG: ConfigType;
 const websocketUrl = CONFIG.network.websocketUrl;
@@ -41,7 +44,7 @@ const WS_CODE_NORMAL_CLOSURE = 1000;
 
 export type BuildTxFunc = {|
   addressKeys: AddressKeyMap,
-  outputAddr: string,
+  outputAddr: {| ...Address, ...InexactSubset<Addressing> |},
 |} => Promise<TransferTx>;
 
 export default class DaedalusTransferStore extends Store {
@@ -111,7 +114,10 @@ export default class DaedalusTransferStore extends Store {
     if (nextInternal.addressInfo == null) {
       throw new Error(`${nameof(this._setupTransferWebSocket)} no internal addresses left. Should never happen`);
     }
-    const nextInternalAddress = nextInternal.addressInfo.addr.Hash;
+    const nextInternalAddress = {
+      address: nextInternal.addressInfo.addr.Hash,
+      addressing: nextInternal.addressInfo.addressing,
+    };
 
     this._updateStatus(TransferStatus.RESTORING_ADDRESSES);
     runInAction(() => {
