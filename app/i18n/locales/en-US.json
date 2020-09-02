@@ -438,7 +438,6 @@
   "wallet.dashboard.lessthan.header": "There are many reasons why you could be getting less rewards than you expected. We list some common ones here",
   "wallet.dashboard.lessthan.reason1": "A stake pool you are delegating to either was or is offline so it did not make any blocks",
   "wallet.dashboard.lessthan.reason2": "Not enough time has passed since you delegated",
-  "wallet.dashboard.lessthan.reason3": "The amount earned was rounded down to 0 (if you delegated a very small amount)",
   "wallet.dashboard.lessthan.reason4": "A stake pool you are delegating to charges a flat fee greater than the pool's total reward",
   "wallet.dashboard.lessthan.reason5": "A stake pool you are delegating to was or is saturated",
   "wallet.dashboard.lessthan.title": "Missing Reward Explanation",
