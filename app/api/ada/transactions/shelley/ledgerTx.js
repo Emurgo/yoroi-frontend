@@ -36,6 +36,10 @@ export async function createLedgerSignTxPayload(
   signRequest: HaskellShelleyTxSignRequest,
   byronNetworkMagic: number,
   networkId: number,
+  stakingKey: ?{|
+    path: Array<number>, // from root
+    key: RustModule.WalletV4.PublicKey,
+  |}
 ): Promise<SignTransactionRequest> {
   const txBody = signRequest.self().unsignedTx.build();
 
@@ -53,42 +57,34 @@ export async function createLedgerSignTxPayload(
   // withdrawals
   const withdrawals = txBody.withdrawals();
 
-  const getStakingKeyPath = () => {
-    // TODO: this entire block is super hacky
-    // need to instead pass in a mapping from wallet addresses to addressing
-    // or add something similar to the sign request
-
-    // assume the withdrawal is the same path as the UTXOs being spent
-    // so just take the first UTXO arbitrarily and change it to the staking key path
-    const firstUtxo = signRequest.self().senderUtxos[0];
-    if (firstUtxo.addressing.startLevel !== Bip44DerivationLevels.PURPOSE.level) {
-      throw new Error(`${nameof(createLedgerSignTxPayload)} unexpected addressing start level`);
-    }
-    const stakingKeyPath = [...firstUtxo.addressing.path];
-    stakingKeyPath[Bip44DerivationLevels.CHAIN.level - 1] = ChainDerivations.CHIMERIC_ACCOUNT;
-    stakingKeyPath[Bip44DerivationLevels.ADDRESS.level - 1] = 0;
-    return stakingKeyPath;
-  };
-
   const certificates = txBody.certs();
+
+  const ledgerWithdrawal = [];
+  if (withdrawals != null && withdrawals.len() > 0) {
+    if (stakingKey == null) throw new Error(`${nameof(createLedgerSignTxPayload)} withdrawal present but no staking key`);
+    ledgerWithdrawal.push(...formatLedgerWithdrawals(
+      withdrawals,
+      [stakingKey.path],
+    ));
+  }
+
+  const ledgerCertificates = [];
+  if (certificates != null && certificates.len() > 0) {
+    if (stakingKey == null) throw new Error(`${nameof(createLedgerSignTxPayload)} withdrawal present but no staking key`);
+    ledgerCertificates.push(...formatLedgerCertificates(
+      certificates,
+      range(0, certificates.len()).map(_i => stakingKey.path),
+    ));
+  }
+
   return {
     inputs: ledgerInputs,
     outputs: ledgerOutputs,
     feeStr: txBody.fee().to_str(),
     ttlStr: txBody.ttl().toString(),
     protocolMagic: byronNetworkMagic,
-    withdrawals: withdrawals == null
-      ? []
-      : formatLedgerWithdrawals(
-        withdrawals,
-        [getStakingKeyPath()],
-      ),
-    certificates: certificates == null
-      ? []
-      : formatLedgerCertificates(
-        certificates,
-        range(0, certificates.len()).map(_i => getStakingKeyPath()),
-      ),
+    withdrawals: ledgerWithdrawal,
+    certificates: ledgerCertificates,
     metadataHashHex: undefined,
     networkId,
   };
@@ -208,6 +204,10 @@ function formatLedgerCertificates(
 export function toLedgerAddressParameters(
   address: RustModule.WalletV4.Address,
   path: Array<number>,
+  stakingKey: ?{|
+    path: Array<number>,
+    key: RustModule.WalletV4.PublicKey,
+  |}
 ): {|
   addressTypeNibble: $Values<typeof AddressTypeNibbles>,
   networkIdOrProtocolMagic: number,
@@ -233,18 +233,32 @@ export function toLedgerAddressParameters(
     const baseAddr = RustModule.WalletV4.BaseAddress.from_address(address);
     if (baseAddr) {
       const stakeCred = baseAddr.stake_cred();
-      const hash = stakeCred.to_keyhash() ?? stakeCred.to_scripthash();
-      if (hash == null) {
+      const wasmHash = stakeCred.to_keyhash() ?? stakeCred.to_scripthash();
+      if (wasmHash == null) {
         throw new Error(`${nameof(toLedgerAddressParameters)} unknown hash type`);
+      }
+      const hashInAddress = Buffer.from(wasmHash.to_bytes()).toString('hex');
+
+      let stakingKeyInfo = {
+        stakingPath: undefined,
+        // can't always know staking key path since address may not belong to the wallet
+        // (mangled address)
+        stakingKeyHashHex: hashInAddress,
+      };
+      if (stakingKey != null) {
+        const ourKeyHex = Buffer.from(stakingKey.key.hash().to_bytes()).toString('hex');
+        if (ourKeyHex === hashInAddress) {
+          stakingKeyInfo = {
+            stakingPath: stakingKey.path,
+            stakingKeyHashHex: undefined,
+          };
+        }
       }
       return {
         addressTypeNibble: AddressTypeNibbles.BASE,
         networkIdOrProtocolMagic: baseAddr.to_address().network_id(),
         spendingPath: path,
-        stakingPath: undefined,
-        // can't always know staking key path since address may not belong to the wallet
-        // (mangled addresss)
-        stakingKeyHashHex: Buffer.from(hash.to_bytes()).toString('hex'),
+        ...stakingKeyInfo,
         stakingBlockchainPointer: undefined,
       };
     }

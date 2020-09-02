@@ -16,7 +16,7 @@ import {
 import { HaskellShelleyTxSignRequest } from './HaskellShelleyTxSignRequest';
 import { AddressTypeNibbles, CertTypes } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { networks } from '../../lib/storage/database/prepackaged/networks';
-import { HARD_DERIVATION_START } from '../../../../config/numbersConfig';
+import { HARD_DERIVATION_START, WalletTypePurpose, CoinTypes, ChainDerivations } from '../../../../config/numbersConfig';
 
 beforeAll(async () => {
   await RustModule.load();
@@ -64,7 +64,7 @@ test('Generate address parameters', async () => {
     });
   }
 
-  // base
+  // base (staking key)
   {
     const addr = 'addr1q8v42wjda8r6mpfj40d36znlgfdcqp7jtj03ah8skh6u8wnrqua2vw243tmjfjt0h5wsru6appuz8c0pfd75ur7myyeqsx9990';
     const wasmAddr = normalizeToAddress(addr);
@@ -76,6 +76,21 @@ test('Generate address parameters', async () => {
       stakingBlockchainPointer: undefined,
       stakingKeyHashHex: '63073aa639558af724c96fbd1d01f35d087823e1e14b7d4e0fdb2132',
       stakingPath: undefined,
+    });
+  }
+
+  // base (path)
+  {
+    const addr = 'addr1q8v42wjda8r6mpfj40d36znlgfdcqp7jtj03ah8skh6u8wnrqua2vw243tmjfjt0h5wsru6appuz8c0pfd75ur7myyeqsx9990';
+    const wasmAddr = normalizeToAddress(addr);
+    if (wasmAddr == null) throw new Error(`Unknown address`);
+    expect(toLedgerAddressParameters(wasmAddr, path)).toEqual({
+      addressTypeNibble: AddressTypeNibbles.BASE,
+      networkIdOrProtocolMagic: Number.parseInt(ChainNetworkId, 10),
+      spendingPath: path,
+      stakingBlockchainPointer: undefined,
+      stakingKeyHashHex: undefined,
+      stakingPath: [2147483692, 2147485463, 2147483648, 2, 0],
     });
   }
 
@@ -216,11 +231,17 @@ test('Create Ledger transaction', async () => {
   );
   const certs = RustModule.WalletV4.Certificates.new();
 
+  // note: key doesn't belong to the account signing. Just used to test witness generation
+  const accountKey = RustModule.WalletV4.Bip32PrivateKey.from_bytes(
+    Buffer.from(
+      '408a1cb637d615c49e8696c30dd54883302a20a7b9b8a9d1c307d2ed3cd50758c9402acd000461a8fc0f25728666e6d3b86d031b8eea8d2f69b21e8aa6ba2b153e3ec212cc8a36ed9860579dfe1e3ef4d6de778c5dbdd981623b48727cd96247',
+      'hex',
+    ),
+  );
+  const stakingKey = accountKey.derive(ChainDerivations.CHIMERIC_ACCOUNT).derive(0);
+
   const stakeCredential = RustModule.WalletV4.StakeCredential.from_keyhash(
-    RustModule.WalletV4.PrivateKey.from_extended_bytes(
-      // note: this key doesn't belong to the wallet sending the transaction
-      Buffer.from('40f11e8501f0695cebdb9e980e007c3979a7dc958af16693d62c45e849d507589029b318010a87ad66465b1384afe4d70573a24eaf2ede273aa1e6a6177d5196', 'hex')
-    ).to_public().hash()
+    stakingKey.to_raw_key().to_public().hash()
   );
   certs.add(RustModule.WalletV4.Certificate.new_stake_registration(
     RustModule.WalletV4.StakeRegistration.new(stakeCredential)
@@ -255,6 +276,16 @@ test('Create Ledger transaction', async () => {
     signRequest,
     ByronNetworkId,
     Number.parseInt(ChainNetworkId, 10),
+    {
+      key: stakingKey.to_raw_key().to_public(),
+      path: [
+        WalletTypePurpose.CIP1852,
+        CoinTypes.CARDANO,
+        0 + HARD_DERIVATION_START,
+        ChainDerivations.CHIMERIC_ACCOUNT,
+        0
+      ],
+    },
   );
 
   expect(response).toStrictEqual({
@@ -322,13 +353,6 @@ test('Create Ledger transaction', async () => {
     metadataHashHex: undefined,
   });
 
-  // note: key doesn't belong to the account signing. Just used to test witness generation
-  const accountKey = RustModule.WalletV4.Bip32PrivateKey.from_bytes(
-    Buffer.from(
-      '408a1cb637d615c49e8696c30dd54883302a20a7b9b8a9d1c307d2ed3cd50758c9402acd000461a8fc0f25728666e6d3b86d031b8eea8d2f69b21e8aa6ba2b153e3ec212cc8a36ed9860579dfe1e3ef4d6de778c5dbdd981623b48727cd96247',
-      'hex',
-    ),
-  ).to_public();
   buildSignedTransaction(
     txBuilder.build(),
     signRequest.signRequest.senderUtxos,
@@ -357,7 +381,7 @@ test('Create Ledger transaction', async () => {
     ],
     {
       keyLevel: 3,
-      key: accountKey,
+      key: accountKey.to_public(),
     },
     undefined,
   );
