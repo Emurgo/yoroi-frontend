@@ -41,6 +41,7 @@ import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import type {
   ToRealTimeFunc,
   ToAbsoluteSlotNumberFunc,
+  CurrentEpochLengthFunc,
   TimeSinceGenesisFunc,
 } from '../../../api/common/lib/storage/bridge/timeUtils';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
@@ -296,6 +297,8 @@ export default class StakingDashboardPage extends Component<Props> {
     if (toRealTime == null) return undefined;
     const timeSinceGenesis = timeCalcRequests.requests.timeSinceGenesis.result;
     if (timeSinceGenesis == null) return undefined;
+    const getEpochLength = timeCalcRequests.requests.currentEpochLength.result;
+    if (getEpochLength == null) return undefined;
 
     const delegationStore = this.generated.stores.delegation;
     const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
@@ -312,6 +315,7 @@ export default class StakingDashboardPage extends Component<Props> {
         rewardInfo = {
           rewardPopup: (
             <UpcomingRewards
+              useEndOfEpoch={!isJormungandr(publicDeriver.getParent().getNetworkInfo())}
               content={[
                 this.generateUpcomingRewardInfo({
                   epoch: currTimeRequests.currentEpoch + 1,
@@ -319,6 +323,8 @@ export default class StakingDashboardPage extends Component<Props> {
                   toAbsoluteSlot,
                   toRealTime,
                   timeSinceGenesis,
+                  getEpochLength,
+                  publicDeriver,
                 }),
                 this.generateUpcomingRewardInfo({
                   epoch: currTimeRequests.currentEpoch + 2,
@@ -326,6 +332,8 @@ export default class StakingDashboardPage extends Component<Props> {
                   toAbsoluteSlot,
                   toRealTime,
                   timeSinceGenesis,
+                  getEpochLength,
+                  publicDeriver,
                 }),
                 this.generateUpcomingRewardInfo({
                   epoch: currTimeRequests.currentEpoch + 3,
@@ -333,6 +341,8 @@ export default class StakingDashboardPage extends Component<Props> {
                   toAbsoluteSlot,
                   toRealTime,
                   timeSinceGenesis,
+                  getEpochLength,
+                  publicDeriver,
                 }),
               ]}
               showWarning={false}
@@ -356,6 +366,8 @@ export default class StakingDashboardPage extends Component<Props> {
             toAbsoluteSlot,
             toRealTime,
             timeSinceGenesis,
+            getEpochLength,
+            publicDeriver,
           }));
         }
         if (result.prevEpoch) {
@@ -365,6 +377,8 @@ export default class StakingDashboardPage extends Component<Props> {
             toAbsoluteSlot,
             toRealTime,
             timeSinceGenesis,
+            getEpochLength,
+            publicDeriver,
           }));
         }
         if (result.prevPrevEpoch) {
@@ -374,6 +388,8 @@ export default class StakingDashboardPage extends Component<Props> {
             toAbsoluteSlot,
             toRealTime,
             timeSinceGenesis,
+            getEpochLength,
+            publicDeriver,
           }));
         }
 
@@ -384,6 +400,7 @@ export default class StakingDashboardPage extends Component<Props> {
         const upcomingTuples = ((upcomingRewards.slice(0, 3): any): [?BoxInfo, ?BoxInfo, ?BoxInfo]);
         const rewardPopup = (
           <UpcomingRewards
+            useEndOfEpoch={!isJormungandr(publicDeriver.getParent().getNetworkInfo())}
             content={upcomingTuples}
             showWarning={upcomingRewards.length === 3}
             onExternalLinkClick={handleExternalLinkClick}
@@ -400,6 +417,7 @@ export default class StakingDashboardPage extends Component<Props> {
     return rewardInfo ?? ({
       rewardPopup: (
         <UpcomingRewards
+          useEndOfEpoch={!isJormungandr(publicDeriver.getParent().getNetworkInfo())}
           content={[null, null, null]}
           showWarning={false}
           onExternalLinkClick={handleExternalLinkClick}
@@ -411,17 +429,22 @@ export default class StakingDashboardPage extends Component<Props> {
   }
 
   generateUpcomingRewardInfo: {|
+    publicDeriver: PublicDeriver<>,
     epoch: number,
     pools: Array<PoolTuples>,
     toRealTime: ToRealTimeFunc,
+    getEpochLength: CurrentEpochLengthFunc,
     toAbsoluteSlot: ToAbsoluteSlotNumberFunc,
     timeSinceGenesis: TimeSinceGenesisFunc,
   |} => BoxInfo = (request) => {
-
     const endEpochTime = request.toRealTime({
       absoluteSlotNum: request.toAbsoluteSlot({
         epoch: request.epoch,
-        slot: 0,
+        // in Jormungandr, rewards were distributed at the start of the epoch
+        // in Haskell, rewards are calculated at the start of the epoch but distributed at the end
+        slot: isJormungandr(request.publicDeriver.getParent().getNetworkInfo())
+          ? 0
+          : request.getEpochLength(),
       }),
       timeSinceGenesisFunc: request.timeSinceGenesis,
     });

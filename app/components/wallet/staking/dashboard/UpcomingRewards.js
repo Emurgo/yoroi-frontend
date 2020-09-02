@@ -24,6 +24,10 @@ const messages = defineMessages({
     id: 'wallet.dashboard.upcomingRewards.at',
     defaultMessage: '!!!at',
   },
+  endOfEpoch: {
+    id: 'wallet.dashboard.upcomingRewards.endOfEpoch',
+    defaultMessage: '!!!End of epoch',
+  },
   noRewards: {
     id: 'wallet.dashboard.upcomingRewards.noRewards',
     defaultMessage: '!!!no rewards will be earned on this epoch',
@@ -43,6 +47,7 @@ type Props = {|
   +content: [?BoxInfo, ?BoxInfo, ?BoxInfo],
   +showWarning: boolean,
   +baseUrl: string,
+  +useEndOfEpoch: boolean, // Haskell uses end-of-epoch but Jormungandr doesn't
   +onExternalLinkClick: MouseEvent => void,
 |};
 
@@ -90,7 +95,9 @@ export default class UpcomingRewards extends Component<Props> {
         <div className={classnames([styles.column, styles.noDelegation])}>
           <div className={styles.header}>
             <div className={styles.label}>
-              {intl.formatMessage(globalMessages.epochLabel)}:&nbsp;
+              {this.props.useEndOfEpoch
+                ? intl.formatMessage(messages.endOfEpoch)
+                : intl.formatMessage(globalMessages.epochLabel)}&nbsp;
               {info.epoch}
             </div>
           </div>
@@ -104,7 +111,9 @@ export default class UpcomingRewards extends Component<Props> {
       <div className={styles.column}>
         <div className={styles.header}>
           <h3 className={styles.label}>
-            {intl.formatMessage(globalMessages.epochLabel)}:&nbsp;
+            {this.props.useEndOfEpoch
+              ? intl.formatMessage(messages.endOfEpoch)
+              : intl.formatMessage(globalMessages.epochLabel)}&nbsp;
             {info.epoch}
           </h3>
           {additional}
