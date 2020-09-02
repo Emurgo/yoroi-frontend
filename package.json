@@ -89,7 +89,7 @@
     "@storybook/source-loader": "5.3.19",
     "autoprefixer": "9.8.6",
     "babel-eslint": "11.0.0-beta.2",
-    "babel-jest": "26.2.2",
+    "babel-jest": "26.3.0",
     "babel-loader": "8.1.0",
     "babel-plugin-add-module-exports": "1.0.2",
     "babel-plugin-dynamic-import-node": "2.3.3",
