@@ -5,6 +5,9 @@ import type { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/she
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
+import type {
+  Addressing,
+} from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 
 export type SendUsingLedgerParams = {|
   signRequest: ISignRequest<any>,
@@ -24,6 +27,10 @@ export default class LedgerSendActions {
     publicKey: {|
       key: RustModule.WalletV4.Bip32PublicKey,
       keyLevel: number,
+    |},
+    stakingKey: ?{|
+      ...Addressing,
+      keyHash: RustModule.WalletV4.Ed25519KeyHash,
     |},
     network: $ReadOnly<NetworkRow>,
   |}> = new AsyncAction();

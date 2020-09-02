@@ -34,7 +34,7 @@ import {
 } from '../../../utils/hwConnectHandler';
 import { ROUTES } from '../../../routes-config';
 import { RustModule } from '../../../api/ada/lib/cardanoCrypto/rustLoader';
-import { asGetPublicKey, asHasLevels } from '../../../api/ada/lib/storage/models/PublicDeriver/traits';
+import { asGetPublicKey, asHasLevels, asGetAllAccounting } from '../../../api/ada/lib/storage/models/PublicDeriver/traits';
 import {
   ConceptualWallet
 } from '../../../api/ada/lib/storage/models/ConceptualWallet/index';
@@ -42,6 +42,13 @@ import { buildCheckAndCall } from '../../lib/check';
 import { getApiForNetwork, ApiOptions } from '../../../api/common/utils';
 import { HaskellShelleyTxSignRequest } from '../../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
+import {
+  derivePublicByAddressing,
+} from '../../../api/ada/lib/cardanoCrypto/utils';
+import { verifyFromBip44Root }  from '../../../api/ada/transactions/utils';
+import type {
+  Addressing,
+} from '../../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 
 /** Note: Handles Ledger Signing */
 export default class LedgerSendStore extends Store {
@@ -142,19 +149,49 @@ export default class LedgerSendStore extends Store {
       if (withLevels == null) {
         throw new Error(`${nameof(this.signAndBroadcast)} No public deriver level for this public deriver`);
       }
+
       const withPublicKey = asGetPublicKey(withLevels);
       if (withPublicKey == null) throw new Error(`${nameof(this.signAndBroadcast)} No public key for this public deriver`);
       const publicKey = await withPublicKey.getPublicKey();
 
+      const publicKeyInfo = {
+        key: RustModule.WalletV4.Bip32PublicKey.from_bytes(
+          Buffer.from(publicKey.Hash, 'hex')
+        ),
+        keyLevel: withLevels.getParent().getPublicDeriverLevel(),
+      };
+
+      const stakingKeyInfo = await (async () => {
+        const withStakingKey = asGetAllAccounting(withLevels);
+        if (withStakingKey == null) {
+          return undefined;
+        }
+        const stakingKeyDbRow = await withStakingKey.getStakingKey();
+        const stakingKey = derivePublicByAddressing({
+          addressing: stakingKeyDbRow.addressing,
+          startingFrom: {
+            level: withStakingKey.getParent().getPublicDeriverLevel(),
+            key: RustModule.WalletV4.Bip32PublicKey.from_bytes(
+              Buffer.from(stakingKeyDbRow.addr.Hash, 'hex')
+            ),
+          },
+        }).to_raw_key();
+
+        verifyFromBip44Root(stakingKeyDbRow.addressing);
+        return {
+          keyHash: stakingKey.hash(),
+          addressing: {
+            path: stakingKeyDbRow.addressing.path,
+            startLevel: 1,
+          },
+        };
+      })();
+
       return this.signAndBroadcast({
         ...request.params,
-        publicKey: {
-          key: RustModule.WalletV4.Bip32PublicKey.from_bytes(
-            Buffer.from(publicKey.Hash, 'hex')
-          ),
-          keyLevel: withLevels.getParent().getPublicDeriverLevel(),
-        },
+        publicKey: publicKeyInfo,
         network: request.publicDeriver.getParent().getNetworkInfo(),
+        stakingKey: stakingKeyInfo,
       });
     } catch (error) {
       Logger.error(`${nameof(LedgerSendStore)}::${nameof(this.signAndBroadcast)} error: ` + stringifyError(error));
@@ -167,6 +204,10 @@ export default class LedgerSendStore extends Store {
     publicKey: {|
       key: RustModule.WalletV4.Bip32PublicKey,
       keyLevel: number,
+    |},
+    stakingKey: ?{|
+      keyHash: RustModule.WalletV4.Ed25519KeyHash,
+      ...Addressing,
     |},
     network: $ReadOnly<NetworkRow>,
   |} => Promise<{| txId: string |}> = async (request) => {
@@ -181,6 +222,7 @@ export default class LedgerSendStore extends Store {
       const { ledgerSignTxPayload } = await this.api.ada.createLedgerSignTxData({
         signRequest: request.signRequest,
         network: request.network,
+        stakingKey: request.stakingKey,
       });
 
       await prepareLedgerConnect(ledgerConnect);

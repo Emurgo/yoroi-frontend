@@ -292,6 +292,10 @@ export type BroadcastTrezorSignedTxFunc = (
 export type CreateLedgerSignTxDataRequest = {|
   signRequest: HaskellShelleyTxSignRequest,
   network: $ReadOnly<NetworkRow>,
+  stakingKey: ?{|
+    keyHash: RustModule.WalletV4.Ed25519KeyHash,
+    ...Addressing,
+  |}
 |};
 export type CreateLedgerSignTxDataResponse = {|
   ledgerSignTxPayload: SignTransactionRequest,
@@ -864,11 +868,12 @@ export default class AdaApi {
         request.network
       ).reduce((acc, next) => Object.assign(acc, next), {});
 
-      const ledgerSignTxPayload = await createLedgerSignTxPayload(
-        request.signRequest,
-        config.ByronNetworkId,
-        Number.parseInt(config.ChainNetworkId, 10),
-      );
+      const ledgerSignTxPayload = await createLedgerSignTxPayload({
+        signRequest: request.signRequest,
+        byronNetworkMagic: config.ByronNetworkId,
+        networkId: Number.parseInt(config.ChainNetworkId, 10),
+        stakingKey: request.stakingKey,
+      });
 
       Logger.debug(`${nameof(AdaApi)}::${nameof(this.createLedgerSignTxData)} success: ` + stringifyData(ledgerSignTxPayload));
       return {

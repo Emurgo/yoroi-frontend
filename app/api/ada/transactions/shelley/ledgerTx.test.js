@@ -47,7 +47,7 @@ test('Generate address parameters', async () => {
     .reduce((acc, next) => Object.assign(acc, next), {});
   const { ByronNetworkId, ChainNetworkId } = baseConfig;
 
-  const path = [2147483692, 2147485463, 2147483648, 1, 1];
+  const path = [WalletTypePurpose.BIP44, CoinTypes.CARDANO, HARD_DERIVATION_START, 1, 1];
 
   // byron
   {
@@ -90,7 +90,7 @@ test('Generate address parameters', async () => {
       spendingPath: path,
       stakingBlockchainPointer: undefined,
       stakingKeyHashHex: undefined,
-      stakingPath: [2147483692, 2147485463, 2147483648, 2, 0],
+      stakingPath: [WalletTypePurpose.BIP44, CoinTypes.CARDANO, HARD_DERIVATION_START, 2, 0],
     });
   }
 
@@ -131,7 +131,13 @@ test('Generate address parameters', async () => {
   // reward
   {
     const addr = 'stake1u8pcjgmx7962w6hey5hhsd502araxp26kdtgagakhaqtq8squng76';
-    const stakingKeyPath = [2147483692, 2147485463, 2147483648, 2, 0];
+    const stakingKeyPath = [
+      WalletTypePurpose.CIP1852,
+      CoinTypes.CARDANO,
+      HARD_DERIVATION_START,
+      2,
+      0
+    ];
     const wasmAddr = normalizeToAddress(addr);
     if (wasmAddr == null) throw new Error(`Unknown address`);
     expect(toLedgerAddressParameters(wasmAddr, stakingKeyPath)).toEqual({
@@ -154,7 +160,7 @@ test('Create Ledger transaction', async () => {
     tx_index: 1,
     utxo_id: '058405892f66075d83abd1b7fe341d2d5bfd2f6122b2f874700039e5078e0dd51',
     addressing: {
-      path: [2147483692, 2147485463, 2147483648, 1, 1],
+      path: [WalletTypePurpose.BIP44, CoinTypes.CARDANO, HARD_DERIVATION_START, 1, 1],
       startLevel: 1
     }
   }, {
@@ -165,7 +171,7 @@ test('Create Ledger transaction', async () => {
     tx_index: 1,
     utxo_id: '3677e75c7ba699bfdc6cd57d42f246f86f69aefd76025006ac78313fad2bba201',
     addressing: {
-      path: [2147483692, 2147485463, 2147483648, 1, 2],
+      path: [WalletTypePurpose.BIP44, CoinTypes.CARDANO, HARD_DERIVATION_START, 1, 2],
       startLevel: 1
     }
   }, {
@@ -176,7 +182,7 @@ test('Create Ledger transaction', async () => {
     tx_index: 0,
     utxo_id: '1029eef5bb0f06979ab0b9530a62bac11e180797d08cab980fe39389d42b36570',
     addressing: {
-      path: [2147483692, 2147485463, 2147483648, 0, 7],
+      path: [WalletTypePurpose.BIP44, CoinTypes.CARDANO, HARD_DERIVATION_START, 0, 7],
       startLevel: 1
     }
   }, {
@@ -187,7 +193,7 @@ test('Create Ledger transaction', async () => {
     tx_index: 0,
     utxo_id: '2029eef5bb0f06979ab0b9530a62bac11e180797d08cab980fe39389d42b36571',
     addressing: {
-      path: [2147483692, 2147485463, 2147483648, 0, 7],
+      path: [WalletTypePurpose.BIP44, CoinTypes.CARDANO, HARD_DERIVATION_START, 0, 7],
       startLevel: 1
     }
   }];
@@ -273,11 +279,24 @@ test('Create Ledger transaction', async () => {
     },
     [],
   );
-  const response = await createLedgerSignTxPayload(
+  const response = await createLedgerSignTxPayload({
     signRequest,
-    ByronNetworkId,
-    Number.parseInt(ChainNetworkId, 10),
-  );
+    byronNetworkMagic: ByronNetworkId,
+    networkId: Number.parseInt(ChainNetworkId, 10),
+    stakingKey: {
+      keyHash: stakingKey.to_public().to_raw_key().hash(),
+      addressing: {
+        startLevel: 1,
+        path: [
+          WalletTypePurpose.CIP1852,
+          CoinTypes.CARDANO,
+          HARD_DERIVATION_START,
+          2,
+          0,
+        ],
+      },
+    },
+  });
 
   expect(response).toStrictEqual({
     feeStr: '1000',
@@ -332,9 +351,9 @@ test('Create Ledger transaction', async () => {
     withdrawals: [],
     certificates: [{
       path: [
-        2147485500,
-        2147485463,
-        2147483648,
+        WalletTypePurpose.CIP1852,
+        CoinTypes.CARDANO,
+        HARD_DERIVATION_START,
         2,
         0,
       ],
@@ -350,23 +369,23 @@ test('Create Ledger transaction', async () => {
     [
       // this witnesses doesn't belong to the transaction / key. Just used to test wit generation
       {
-        path: [2147485500, 2147485463, 2147483648, 1, 1],
+        path: [WalletTypePurpose.CIP1852, CoinTypes.CARDANO, HARD_DERIVATION_START, 1, 1],
         witnessSignatureHex: 'dc273ee8929c240f95b27b29b53043eb31dc1a5d8c1ba4a44b678bc97bb84db34c05144b50df954e1ac73dec1d33df06e4d95c3c7874458e7fea873c90614207',
       },
       {
-        path: [2147483692, 2147485463, 2147483648, 1, 1],
+        path: [WalletTypePurpose.BIP44, CoinTypes.CARDANO, HARD_DERIVATION_START, 1, 1],
         witnessSignatureHex: 'dc273ee8929c240f95b27b29b53043eb31dc1a5d8c1ba4a44b678bc97bb84db34c05144b50df954e1ac73dec1d33df06e4d95c3c7874458e7fea873c90614207',
       },
       {
-        path: [2147483692, 2147485463, 2147483648, 1, 2],
+        path: [WalletTypePurpose.BIP44, CoinTypes.CARDANO, HARD_DERIVATION_START, 1, 2],
         witnessSignatureHex: 'dc273ee8929c240f95b27b29b53043eb31dc1a5d8c1ba4a44b678bc97bb84db34c05144b50df954e1ac73dec1d33df06e4d95c3c7874458e7fea873c90614207',
       },
       {
-        path: [2147483692, 2147485463, 2147483648, 0, 7],
+        path: [WalletTypePurpose.BIP44, CoinTypes.CARDANO, HARD_DERIVATION_START, 0, 7],
         witnessSignatureHex: 'dc273ee8929c240f95b27b29b53043eb31dc1a5d8c1ba4a44b678bc97bb84db34c05144b50df954e1ac73dec1d33df06e4d95c3c7874458e7fea873c90614207',
       },
       {
-        path: [2147483692, 2147485463, 2147483648, 2, 0],
+        path: [WalletTypePurpose.BIP44, CoinTypes.CARDANO, HARD_DERIVATION_START, 2, 0],
         witnessSignatureHex: 'dc273ee8929c240f95b27b29b53043eb31dc1a5d8c1ba4a44b678bc97bb84db34c05144b50df954e1ac73dec1d33df06e4d95c3c7874458e7fea873c90614207',
       },
     ],

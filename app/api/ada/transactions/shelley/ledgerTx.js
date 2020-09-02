@@ -32,22 +32,26 @@ import { range } from 'lodash';
 
 // ==================== LEDGER ==================== //
 /** Generate a payload for Ledger SignTx */
-export async function createLedgerSignTxPayload(
+export async function createLedgerSignTxPayload(request: {|
   signRequest: HaskellShelleyTxSignRequest,
   byronNetworkMagic: number,
   networkId: number,
-): Promise<SignTransactionRequest> {
-  const txBody = signRequest.self().unsignedTx.build();
+  stakingKey: ?{|
+    keyHash: RustModule.WalletV4.Ed25519KeyHash,
+    ...Addressing,
+  |}
+|}): Promise<SignTransactionRequest> {
+  const txBody = request.signRequest.self().unsignedTx.build();
 
   // Inputs
   const ledgerInputs = _transformToLedgerInputs(
-    signRequest.self().senderUtxos
+    request.signRequest.self().senderUtxos
   );
 
   // Output
   const ledgerOutputs = _transformToLedgerOutputs(
     txBody.outputs(),
-    signRequest.self().changeAddr,
+    request.signRequest.self().changeAddr,
   );
 
   // withdrawals
@@ -59,7 +63,7 @@ export async function createLedgerSignTxPayload(
   if (withdrawals != null && withdrawals.len() > 0) {
     ledgerWithdrawal.push(...formatLedgerWithdrawals(
       withdrawals,
-      signRequest.ownWithdrawals,
+      request.signRequest.ownWithdrawals,
     ));
   }
 
@@ -73,8 +77,7 @@ export async function createLedgerSignTxPayload(
         0 + 2147483648,
         2,
         0
-      ],
-      ),
+      ]),
     ));
   }
 
@@ -83,11 +86,11 @@ export async function createLedgerSignTxPayload(
     outputs: ledgerOutputs,
     feeStr: txBody.fee().to_str(),
     ttlStr: txBody.ttl().toString(),
-    protocolMagic: byronNetworkMagic,
+    protocolMagic: request.byronNetworkMagic,
     withdrawals: ledgerWithdrawal,
     certificates: ledgerCertificates,
     metadataHashHex: undefined,
-    networkId,
+    networkId: request.networkId,
   };
 }
 
