@@ -467,7 +467,7 @@ export default class Transaction extends Component<Props, State> {
                   <div className={styles.addressList}>
                     {data.addresses.from.map((address, addressIndex) => {
 
-                      const notificationElementId = `address-${addressIndex}-copyNotification`;
+                      const notificationElementId = `in-address-${addressIndex}-${data.txid}-copyNotification`;
                       return (
                         // eslint-disable-next-line react/no-array-index-key
                         <div key={`${data.txid}-from-${address.address}-${addressIndex}`} className={styles.addressItem}>
@@ -519,7 +519,7 @@ export default class Transaction extends Component<Props, State> {
                   <div className={styles.addressList}>
                     {data.addresses.to.map((address, addressIndex) => {
 
-                      const notificationElementId = `address-${addressIndex}-copyNotification`;
+                      const notificationElementId = `out-address-${addressIndex}-${data.txid}-copyNotification`;
                       return (
                         <div // eslint-disable-next-line react/no-array-index-key
                           key={`${data.txid}-to-${address.address}-${addressIndex}`}
@@ -726,7 +726,7 @@ export default class Transaction extends Component<Props, State> {
           </div>
           <div className={styles.addressList}>
             {data.withdrawals.map((withdrawal, addressIndex) => {
-              const notificationElementId = `withdrawal-${addressIndex}-copyNotification`;
+              const notificationElementId = `withdrawal-${addressIndex}-${data.txid}-copyNotification`;
               return (
                 // eslint-disable-next-line react/no-array-index-key
                 <div key={`${data.txid}-from-${withdrawal.address}-${addressIndex}`} className={styles.addressItem}>
