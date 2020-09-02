@@ -461,5 +461,14 @@ export default class LedgerConnectStore
     this.isCreateHWActive = active;
   };
 
+  // this is used to inject test data
+  setSelectedMockWallet: string => Promise<void> = async (serial) => {
+    // $FlowExpectedError[prop-missing] only added in tests
+    if (LedgerConnect.setSelectedWallet != null) {
+      // $FlowExpectedError[not-a-function] only added in tests
+      await LedgerConnect.setSelectedWallet(serial);
+    }
+  }
+
   // =================== API =================== //
 }

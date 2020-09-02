@@ -33,6 +33,7 @@ import {
   isCardanoHaskellAddress,
   getCardanoSpendingKeyHash,
   getJormungandrSpendingKey,
+  normalizeToAddress,
 } from '../../../api/ada/lib/storage/bridge/utils';
 import type { ComplexityLevelType } from '../../../types/complexityLevelType';
 import { ComplexityLevels } from '../../../types/complexityLevelType';
@@ -231,7 +232,8 @@ export default class VerifyAddressDialog extends Component<Props> {
         return Buffer.from(spendingKey.as_bytes()).toString('hex');
       }
       if (isCardanoHaskellAddress(this.props.addressInfo.type)) {
-        const wasmAddr = RustModule.WalletV4.Address.from_bech32(this.props.addressInfo.address);
+        const wasmAddr = normalizeToAddress(this.props.addressInfo.address);
+        if (wasmAddr == null) throw new Error('Should never happen');
         const spendingKey = getCardanoSpendingKeyHash(wasmAddr);
         if (spendingKey === null) return null; // legacy address ignored
         if (spendingKey === undefined) return null; // TODO: handle script outputs
