@@ -115,7 +115,7 @@
     "eslint-plugin-no-floating-promise": "git+https://github.com/SebastienGllmt/eslint-plugin-no-floating-promise.git",
     "eslint-plugin-promise": "4.2.1",
     "eslint-plugin-react": "7.20.6",
-    "file-loader": "6.0.0",
+    "file-loader": "6.1.0",
     "flow-bin": "0.132.0",
     "flow-typed": "3.2.1",
     "geckodriver": "1.20.0",
