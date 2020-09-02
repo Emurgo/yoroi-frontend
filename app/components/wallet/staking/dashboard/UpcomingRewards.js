@@ -38,10 +38,15 @@ const messages = defineMessages({
   },
 });
 
+export type MiniPoolInfo = {|
+  ticker?: ?string,
+  id: PoolTuples,
+|};
+
 export type BoxInfo = {|
   epoch: number,
   time: [string, string, string, string, string],
-  pools: Array<PoolTuples>,
+  pools: Array<MiniPoolInfo>,
 |};
 type Props = {|
   +content: [?BoxInfo, ?BoxInfo, ?BoxInfo],
@@ -144,26 +149,28 @@ export default class UpcomingRewards extends Component<Props> {
     );
   }
 
-  getAvatars: PoolTuples => Node = (pool) => {
-    const avatarSource = jdenticon.toSvg(pool[0], 36, { padding: 0 });
+  getAvatars: MiniPoolInfo => Node = (pool) => {
+    const avatarSource = jdenticon.toSvg(pool.id[0], 36, { padding: 0 });
 
     // Taken from Seiza (dangerouslyEmbedIntoDataURI())
     const avatar = `data:image/svg+xml;utf8,${encodeURIComponent(avatarSource)}`;
 
-
+    const tooltip = pool.ticker == null
+      ? pool.id[0]
+      : (<>{pool.ticker}<br />{pool.id[0]}</>);
     return (
       <CustomTooltip
-        key={pool[0] + pool[1]}
-        toolTip={<div className={styles.poolInfo}>{pool[0]}</div>}
+        key={pool.id[0] + pool.id[1]}
+        toolTip={<div className={styles.poolInfo}>{tooltip}</div>}
         isOpeningUpward={false}
       >
         <a
           className={styles.url}
-          href={this.props.baseUrl + pool[0]}
+          href={this.props.baseUrl + pool.id[0]}
           onClick={event => this.props.onExternalLinkClick(event)}
         >
           <img
-            alt="User avatar"
+            alt="Pool avatar"
             src={avatar}
             className={styles.avatar}
           />

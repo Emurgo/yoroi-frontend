@@ -19,7 +19,7 @@ import DialogCloseButton from '../../../components/widgets/DialogCloseButton';
 import ErrorBlock from '../../../components/widgets/ErrorBlock';
 import InvalidURIImg from '../../../assets/images/uri/invalid-uri.inline.svg';
 import UpcomingRewards from '../../../components/wallet/staking/dashboard/UpcomingRewards';
-import type { BoxInfo } from '../../../components/wallet/staking/dashboard/UpcomingRewards';
+import type { BoxInfo, } from '../../../components/wallet/staking/dashboard/UpcomingRewards';
 import LessThanExpectedDialog from '../../../components/wallet/staking/dashboard/LessThanExpectedDialog';
 import PoolWarningDialog from '../../../components/wallet/staking/dashboard/PoolWarningDialog';
 import { digestForHash } from '../../../api/ada/lib/storage/database/primitives/api/utils';
@@ -449,8 +449,19 @@ export default class StakingDashboardPage extends Component<Props> {
       timeSinceGenesisFunc: request.timeSinceGenesis,
     });
     const endEpochMoment = moment(endEpochTime);
+
+    const miniPoolInfo = request.pools.map(pool => {
+      const meta = this.generated.stores.delegation.getLocalPoolInfo(
+        request.publicDeriver.getParent().getNetworkInfo(),
+        pool[0],
+      );
+      if (meta == null) {
+        return { id: pool, };
+      }
+      return { id: pool, ticker: meta.info?.ticker };
+    });
     return {
-      pools: request.pools,
+      pools: miniPoolInfo,
       epoch: request.epoch,
       time: [
         endEpochMoment.format('MMM Do'),
