@@ -284,6 +284,28 @@ Given(/^I import a snapshot named ([^"]*)$/, async function (snapshotName) {
   await this.waitForElement('.YoroiClassic');
 });
 
+async function setLedgerWallet(client, serial) {
+  await client.driver.executeAsyncScript((data, done) => {
+    window.yoroi.stores.substores.ada.ledgerConnect.setSelectedMockWallet(data)
+      .then(done)
+      .catch(err => done(err));
+  }, serial);
+}
+Given(/^I connected Ledger device ([^"]*)$/, async function (serial) {
+  await setLedgerWallet(this, serial);
+});
+
+async function setTrezorWallet(client, deviceId) {
+  await client.driver.executeAsyncScript((data, done) => {
+    window.yoroi.stores.substores.ada.trezorConnect.setSelectedMockWallet(data)
+      .then(done)
+      .catch(err => done(err));
+  }, deviceId);
+}
+Given(/^I connected Trezor device ([^"]*)$/, async function (deviceId) {
+  await setTrezorWallet(this, deviceId);
+});
+
 async function restoreWalletsFromStorage(client) {
   await client.driver.executeAsyncScript((done) => {
     window.yoroi.stores.wallets.restoreWalletsFromStorage()

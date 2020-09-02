@@ -5,12 +5,14 @@ export type RestorationInput = {|
   password: string,
   mnemonic: string,
   plate: string,
+  deviceId?: ?string,
 |};
 
 function createWallet(payload: {|
   name: string,
   mnemonic: string,
   plate: string,
+  deviceId?: ?string,
 |}) {
   const { name, mnemonic, plate } = payload;
   return { [name]: {
@@ -18,6 +20,7 @@ function createWallet(payload: {|
     mnemonic,
     plate,
     password: 'asdfasdfasdf',
+    deviceId: payload.deviceId,
   } };
 }
 
@@ -87,11 +90,13 @@ export const testWallets: { [key: WalletNames]: RestorationInput, ... } = Object
     name: ('ledger-wallet': WalletNames),
     mnemonic: 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art',
     plate: 'JSKA-2258', // shelley plate KHDC-5476
+    deviceId: '707fa118bf6b83',
   }),
   createWallet({
     name: ('trezor-wallet': WalletNames),
     mnemonic: 'lyrics tray aunt muffin brisk ensure wedding cereal capital path replace weasel',
     plate: 'CZSA-2051', // shelley plate PXCA-2349
+    deviceId: '6495958994A4025BB5EE1DB0',
   }),
   createWallet({
     name: ('shelley-simple-24': WalletNames),

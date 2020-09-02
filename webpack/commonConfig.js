@@ -163,6 +163,7 @@ const resolve = (networkName /*: string */) /*: * */ => ({
   alias: (networkName === 'test')
     ? {
       'trezor-connect': path.resolve(__dirname, '../features/mock-trezor-connect/'),
+      '@emurgo/ledger-connect-handler': path.resolve(__dirname, '../features/mock-ledger-connect/'),
     }
     : {},
 });

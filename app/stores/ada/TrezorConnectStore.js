@@ -471,5 +471,14 @@ export default class TrezorConnectStore
   @action _setIsCreateHWActive: boolean => void = (active) => {
     this.isCreateHWActive = active;
   };
+
+  // this is used to inject test data
+  setSelectedMockWallet: string => Promise<void> = async (serial) => {
+    // $FlowExpectedError[prop-missing] only added in tests
+    if (TrezorConnect.setSelectedWallet != null) { // eslint-disable-line no-restricted-properties
+      // $FlowExpectedError[not-a-function] only added in tests
+      await TrezorConnect.setSelectedWallet(serial); // eslint-disable-line no-restricted-properties
+    }
+  }
   // =================== API =================== //
 }

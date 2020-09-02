@@ -10,10 +10,11 @@ import type {
   CardanoPublicKey,
   CardanoSignedTx,
   CardanoGetPublicKey,
+  CardanoAddressParameters,
   CardanoGetAddress,
 } from 'trezor-connect/lib/types/networks/cardano';
 import type { Success, } from 'trezor-connect/lib/types/params';
-import { ADDRESS_TYPE } from './lib/constants/cardano';
+import { ADDRESS_TYPE, CERTIFICATE_TYPE } from './lib/constants/cardano';
 import {
   bip32StringToPath, toDerivationPathString,
 } from '../../app/api/common/lib/crypto/keys/path';
@@ -21,57 +22,199 @@ import {
   WalletTypePurpose,
   ChainDerivations,
 } from '../../app/config/numbersConfig';
+import { RustModule } from '../../app/api/ada/lib/cardanoCrypto/rustLoader';
+import {
+  generateWalletRootKey,
+} from '../../app/api/ada/lib/cardanoCrypto/cryptoWallet';
+import { testWallets } from '../mock-chain/TestWallets';
+import { IncorrectDeviceError } from '../../app/domain/ExternalDeviceCommon';
 
 const UI_EVENT: 'UI_EVENT' = 'UI_EVENT';
 const DEVICE_EVENT: 'DEVICE_EVENT' = 'DEVICE_EVENT';
+
+type WalletInfo = {|
+  rootKey: RustModule.WalletV4.Bip32PrivateKey;
+  deviceId: string,
+  version: {|
+    major_version: number,
+    minor_version: number,
+    patch_version: number,
+  |},
+|};
+
+const mockVersion = {
+  major_version: 2,
+  minor_version: 3,
+  patch_version: 0,
+};
+async function genWalletInfo(deviceId: string): Promise<WalletInfo> {
+  const wallets = Object.keys(testWallets).map(walletName => testWallets[walletName]);
+  for (const wallet of wallets) {
+    if (wallet.deviceId === deviceId) {
+      const rootKey = generateWalletRootKey(wallet.mnemonic);
+      return {
+        rootKey,
+        deviceId,
+        version: mockVersion,
+      };
+    }
+  }
+  throw new Error(`Unknown test deviceId ${deviceId}`);
+}
+
+function derivePath(
+  rootKey: RustModule.WalletV4.Bip32PrivateKey,
+  path: Array<number>
+): RustModule.WalletV4.Bip32PrivateKey {
+  let finalKey = rootKey;
+  for (const index of path) {
+    finalKey = finalKey.derive(index);
+  }
+  return finalKey;
+}
+
+function toPath(path: string | Array<number>): Array<number> {
+  return typeof path === 'string'
+    ? bip32StringToPath(path)
+    : path;
+}
+
+function deriveAddress(
+  rootKey: RustModule.WalletV4.Bip32PrivateKey,
+  request: CardanoGetAddress,
+): RustModule.WalletV4.Address {
+  const spendingKey = derivePath(rootKey, toPath(request.addressParameters.path));
+
+  if (request.addressParameters.addressType === ADDRESS_TYPE.Byron) {
+    return RustModule.WalletV4.ByronAddress.from_icarus_key(
+      spendingKey.to_public(),
+      request.networkId
+    ).to_address();
+  }
+  if (request.addressParameters.addressType === ADDRESS_TYPE.Enterprise) {
+    return RustModule.WalletV4.EnterpriseAddress.new(
+      request.networkId,
+      RustModule.WalletV4.StakeCredential.from_keyhash(
+        spendingKey.to_public().to_raw_key().hash()
+      ),
+    ).to_address();
+  }
+  if (request.addressParameters.addressType === ADDRESS_TYPE.Pointer) {
+    if (request.addressParameters.certificatePointer == null) {
+      throw new Error(`Missing pointer information`);
+    }
+    const pointer = RustModule.WalletV4.Pointer.new(
+      request.addressParameters.certificatePointer.blockIndex,
+      request.addressParameters.certificatePointer.txIndex,
+      request.addressParameters.certificatePointer.certificateIndex
+    );
+    return RustModule.WalletV4.PointerAddress.new(
+      request.networkId,
+      RustModule.WalletV4.StakeCredential.from_keyhash(
+        spendingKey.to_public().to_raw_key().hash()
+      ),
+      pointer,
+    ).to_address();
+  }
+  if (request.addressParameters.addressType === ADDRESS_TYPE.Reward) {
+    return RustModule.WalletV4.RewardAddress.new(
+      request.networkId,
+      RustModule.WalletV4.StakeCredential.from_keyhash(
+        spendingKey.to_public().to_raw_key().hash()
+      ),
+    ).to_address();
+  }
+  if (request.addressParameters.addressType === ADDRESS_TYPE.Base) {
+    let stakingKeyHash;
+    if (request.addressParameters.stakingKeyHash != null) {
+      stakingKeyHash = RustModule.WalletV4.Ed25519KeyHash.from_bytes(
+        Buffer.from(request.addressParameters.stakingKeyHash, 'hex')
+      );
+    }
+    if (request.addressParameters.stakingPath != null) {
+      stakingKeyHash = derivePath(
+        rootKey,
+        toPath(request.addressParameters.stakingPath)
+      ).to_raw_key().to_public().hash();
+    }
+    if (stakingKeyHash == null) {
+      throw new Error(`Missing staking key information`);
+    }
+    return RustModule.WalletV4.BaseAddress.new(
+      request.networkId,
+      RustModule.WalletV4.StakeCredential.from_keyhash(
+        spendingKey.to_public().to_raw_key().hash()
+      ),
+      RustModule.WalletV4.StakeCredential.from_keyhash(stakingKeyHash),
+    ).to_address();
+  }
+  throw new Error(`Unrecognized address type ${JSON.stringify(request)}`);
+}
 
 class MockTrezorConnect {
 
   static deviceEventListeners: Array<DeviceEvent => void> = [];
   static uiEventListeners: Array<UiEvent => void> = [];
 
+  static selectedWallet: void | WalletInfo;
+
+  checkDeviceId: ?string => void = (deviceId) => {
+    if (deviceId == null) return;
+
+    if (MockTrezorConnect.selectedWallet == null) {
+      throw new Error(`No mock Ledger wallet selected`);
+    }
+    const selectedWallet = MockTrezorConnect.selectedWallet;
+
+    if (selectedWallet.deviceId !== deviceId) {
+      throw new IncorrectDeviceError({
+        expectedDeviceId: deviceId,
+        responseDeviceId: selectedWallet.deviceId,
+      });
+    }
+  }
+
+  static setSelectedWallet: string => Promise<void> = async (deviceId) => {
+    MockTrezorConnect.selectedWallet = await genWalletInfo(deviceId);
+  }
+
   static cardanoGetAddress: $PropertyType<API, 'cardanoGetAddress'> = async (params) => {
     MockTrezorConnect.mockConnectDevice();
 
     const genPayload = (request: CardanoGetAddress): CardanoAddress => {
-      const arrayPath = typeof request.addressParameters.path === 'string'
-        ? bip32StringToPath(request.addressParameters.path)
-        : request.addressParameters.path;
+      // this.checkSerial;
+      if (MockTrezorConnect.selectedWallet == null) {
+        throw new Error(`No mock Ledger wallet selected`);
+      }
+      const selectedWallet = MockTrezorConnect.selectedWallet;
+      const address = deriveAddress(selectedWallet.rootKey, request);
+
+      const arrayPath = toPath(request.addressParameters.path);
       const serializedPath = typeof request.addressParameters.path === 'string'
         ? request.addressParameters.path
         : toDerivationPathString(request.addressParameters.path);
 
-      const serializedStakingPath = (() => {
-        const copy = [...arrayPath];
-        copy[3] = ChainDerivations.CHIMERIC_ACCOUNT;
-        return toDerivationPathString(copy);
-      })();
+      const serializedStakingPath = request.addressParameters.stakingPath != null
+        ? toDerivationPathString(toPath(request.addressParameters.stakingPath))
+        : (() => {
+          const copy = [...arrayPath];
+          copy[3] = ChainDerivations.CHIMERIC_ACCOUNT;
+          return toDerivationPathString(copy);
+        })();
 
-      const result = arrayPath[0] === WalletTypePurpose.BIP44
-        ? {
-          addressParameters: {
-            addressType: ADDRESS_TYPE.Byron,
-            path: serializedPath,
-          },
-          protocolMagic: 764824073,
-          networkId: 1,
-          serializedStakingPath,
-          serializedPath,
-          address: 'Ae2tdPwUPEZAVDjkPPpwDhXMSAjH53CDmd2xMwuR9tZMAZWxLhFphrHKHXe',
-        }
-        : {
-          addressParameters: {
-            addressType: ADDRESS_TYPE.Base,
-            path: serializedPath,
-          },
-          protocolMagic: 764824073,
-          networkId: 1,
-          serializedStakingPath,
-          serializedPath,
-          address: 'addr1qye3dmfedpm024cggelrazpjzu80a72qapuynzlrj4t40eryyw9u88yk923gz44ytfrpyymhpkydszyfv7zljtp65nfqkkpfp9',
-        };
+      const addressStr = request.addressParameters.addressType === ADDRESS_TYPE.Byron
+        ? RustModule.WalletV4.ByronAddress.from_address(address)?.to_base58()
+        : address.to_bech32();
+      if (addressStr == null) throw new Error(`Address type mismatch ${JSON.stringify(request)}`);
 
-      return result;
+      return {
+        addressParameters: request.addressParameters,
+        protocolMagic: request.protocolMagic,
+        networkId: request.networkId,
+        serializedStakingPath,
+        serializedPath,
+        address: addressStr,
+      };
     };
 
     const result = ({
@@ -88,41 +231,31 @@ class MockTrezorConnect {
     MockTrezorConnect.mockConnectDevice();
 
     const genPayload = (key: CardanoGetPublicKey): CardanoPublicKey => {
-      const path = typeof key.path === 'string'
-        ? bip32StringToPath(key.path)
-        : key.path;
+      // this.checkSerial;
+      if (MockTrezorConnect.selectedWallet == null) {
+        throw new Error(`No mock Ledger wallet selected`);
+      }
+      const selectedWallet = MockTrezorConnect.selectedWallet;
+
+      const path = toPath(key.path);
       const serializedPath = typeof key.path === 'string'
         ? key.path
         : toDerivationPathString(key.path);
 
-      const rest = path[0] === WalletTypePurpose.BIP44
-        ? {
-          publicKey: 'd79d217e4dda6bd6ded1ae91221ab49752ae29906a2551bfb829b21187797a285a9b9c083feb3c6411779928d4264776c46065c46507f416a771ce39ecab4a9b',
-          node: {
-            depth: 3,
-            fingerprint: 3586099367,
-            child_num: 2147483648,
-            chain_code: '5a9b9c083feb3c6411779928d4264776c46065c46507f416a771ce39ecab4a9b',
-            private_key: null,
-            public_key: 'd79d217e4dda6bd6ded1ae91221ab49752ae29906a2551bfb829b21187797a28'
-          }
-        }
-        : {
-          publicKey: '791e4af898d3a21ba35c19721466ce0df532d67736f75f9b86070d5c868e9dc9c29f93a6d869a3047343725e11473a49715b4a2a82e2d2882c42a0a59b1eb373',
-          node: {
-            depth: 3,
-            fingerprint: 786977236,
-            child_num: 2147483648,
-            chain_code: 'c29f93a6d869a3047343725e11473a49715b4a2a82e2d2882c42a0a59b1eb373',
-            private_key: null,
-            public_key: '791e4af898d3a21ba35c19721466ce0df532d67736f75f9b86070d5c868e9dc9'
-          }
-        };
+      const accountKey = derivePath(selectedWallet.rootKey, path).to_public();
 
       return {
         path,
         serializedPath,
-        ...rest,
+        publicKey: Buffer.from(accountKey.as_bytes()).toString('hex'),
+        node: {
+          depth: path.length,
+          fingerprint: 3586099367,
+          child_num: path[path.length - 1],
+          chain_code: Buffer.from(accountKey.chaincode()).toString('hex'),
+          private_key: null,
+          public_key: Buffer.from(accountKey.as_bytes()).toString('hex'),
+        },
       };
     };
     const result = ({
@@ -135,16 +268,193 @@ class MockTrezorConnect {
     return (result: Success<any>);
   };
 
-  static cardanoSignTransaction: $PropertyType<API, 'cardanoSignTransaction'> = async (_params) => {
+  static cardanoSignTransaction: $PropertyType<API, 'cardanoSignTransaction'> = async (request) => {
     MockTrezorConnect.mockConnectDevice();
+
+    if (MockTrezorConnect.selectedWallet == null) {
+      throw new Error(`No mock Ledger wallet selected`);
+    }
+    const selectedWallet = MockTrezorConnect.selectedWallet;
+
+    const witGens: Array<RustModule.WalletV4.TransactionHash => void> = [];
+
+    const seenBootstrapKeys = new Set<string>();
+    const bootstrapWits = RustModule.WalletV4.BootstrapWitnesses.new();
+    const seenVkeyWits = new Set<string>();
+    const vkeyWits = RustModule.WalletV4.Vkeywitnesses.new();
+
+    const addWitness: (
+      Array<number>,
+      RustModule.WalletV4.Bip32PrivateKey,
+      RustModule.WalletV4.TransactionHash
+    ) => void = (path, key, hash) => {
+      const vkey = RustModule.WalletV4.Vkey.new(key.to_raw_key().to_public());
+      const sig = key.to_raw_key().sign(Buffer.from(hash.to_bytes()));
+      if (path[0] === WalletTypePurpose.BIP44) {
+        const byronAddress = RustModule.WalletV4.ByronAddress.from_icarus_key(
+          key.to_public(),
+          request.networkId
+        );
+        const bootstrapWit = RustModule.WalletV4.BootstrapWitness.new(
+          vkey,
+          sig,
+          key.chaincode(),
+          byronAddress.attributes(),
+        );
+        const asString = Buffer.from(bootstrapWit.to_bytes()).toString('hex');
+        if (seenBootstrapKeys.has(asString)) {
+          return;
+        }
+        seenBootstrapKeys.add(asString);
+        bootstrapWits.add(bootstrapWit);
+        return;
+      }
+      const witness = RustModule.WalletV4.Vkeywitness.new(
+        vkey,
+        sig,
+      );
+      const witAsStr = Buffer.from(witness.to_bytes()).toString('hex');
+      if (seenVkeyWits.has(witAsStr)) {
+        return;
+      }
+      seenVkeyWits.add(witAsStr);
+      vkeyWits.add(witness);
+    };
+
+    const inputs = RustModule.WalletV4.TransactionInputs.new();
+    for (const input of request.inputs) {
+      inputs.add(
+        RustModule.WalletV4.TransactionInput.new(
+          RustModule.WalletV4.TransactionHash.from_bytes(Buffer.from(input.prev_hash, 'hex')),
+          input.prev_index
+        )
+      );
+      const spendingKey = derivePath(selectedWallet.rootKey, toPath(input.path));
+      witGens.push((hash) => addWitness(toPath(input.path), spendingKey, hash));
+    }
+    const outputs = RustModule.WalletV4.TransactionOutputs.new();
+    for (const output of request.outputs) {
+      let address;
+      if (output.addressParameters != null) {
+        const coercedParams = ((output.addressParameters: any): CardanoAddressParameters);
+        address = deriveAddress(
+          selectedWallet.rootKey,
+          {
+            addressParameters: coercedParams,
+            protocolMagic: request.protocolMagic,
+            networkId: request.networkId,
+          }
+        );
+      }
+      if (output.address != null) {
+        const coercedAddress = ((output.address: any): string);
+        address = RustModule.WalletV4.ByronAddress.is_valid(coercedAddress)
+          ? RustModule.WalletV4.ByronAddress.from_base58(coercedAddress).to_address()
+          : RustModule.WalletV4.Address.from_bech32(coercedAddress);
+      }
+      if (address == null) throw new Error(`Missing output address information ${JSON.stringify(output)}`);
+      outputs.add(
+        RustModule.WalletV4.TransactionOutput.new(
+          address,
+          RustModule.WalletV4.BigNum.from_str(output.amount)
+        )
+      );
+    }
+
+    const body = RustModule.WalletV4.TransactionBody.new(
+      inputs,
+      outputs,
+      RustModule.WalletV4.BigNum.from_str(request.fee),
+      Number.parseInt(request.ttl, 10),
+    );
+    if (request.certificates != null && request.certificates.length > 0) {
+      const certRequest = request.certificates;
+      const certs = RustModule.WalletV4.Certificates.new();
+      for (const cert of certRequest) {
+        const stakingKey = derivePath(selectedWallet.rootKey, toPath(cert.path));
+        const stakeCredential = RustModule.WalletV4.StakeCredential.from_keyhash(
+          stakingKey.to_public().to_raw_key().hash()
+        );
+        if (cert.type === CERTIFICATE_TYPE.StakeRegistration) {
+          certs.add(RustModule.WalletV4.Certificate.new_stake_registration(
+            RustModule.WalletV4.StakeRegistration.new(stakeCredential)
+          ));
+        }
+        if (cert.type === CERTIFICATE_TYPE.StakeDeregistration) {
+          witGens.push((hash) => addWitness(toPath(cert.path), stakingKey, hash));
+          certs.add(RustModule.WalletV4.Certificate.new_stake_deregistration(
+            RustModule.WalletV4.StakeDeregistration.new(stakeCredential)
+          ));
+        }
+        if (cert.type === CERTIFICATE_TYPE.StakeDelegation) {
+          witGens.push((hash) => addWitness(toPath(cert.path), stakingKey, hash));
+
+          if (cert.pool == null) throw new Error('Missing pool key hash');
+          certs.add(RustModule.WalletV4.Certificate.new_stake_delegation(
+            RustModule.WalletV4.StakeDelegation.new(
+              stakeCredential,
+              RustModule.WalletV4.Ed25519KeyHash.from_bytes(Buffer.from(cert.pool, 'hex'))
+            )
+          ));
+        }
+      }
+      body.set_certs(certs);
+    }
+
+    const metadata = request.metadata != null
+      ? RustModule.WalletV4.TransactionMetadata.from_bytes(
+        Buffer.from(request.metadata, 'hex')
+      )
+      : undefined;
+    if (metadata != null) {
+      body.set_metadata_hash(RustModule.WalletV4.hash_metadata(metadata));
+    }
+    if (request.withdrawals != null && request.withdrawals.length > 0) {
+      const withdrawalRequest = request.withdrawals;
+      const withdrawals = RustModule.WalletV4.Withdrawals.new();
+      for (const withdrawal of withdrawalRequest) {
+        const stakingKey = derivePath(selectedWallet.rootKey, toPath(withdrawal.path));
+        witGens.push((hash) => addWitness(toPath(withdrawal.path), stakingKey, hash));
+
+        const rewardAddress = RustModule.WalletV4.RewardAddress.new(
+          request.networkId,
+          RustModule.WalletV4.StakeCredential.from_keyhash(
+            stakingKey.to_public().to_raw_key().hash()
+          )
+        );
+        withdrawals.insert(
+          rewardAddress,
+          RustModule.WalletV4.BigNum.from_str(withdrawal.amount)
+        );
+      }
+      body.set_withdrawals(withdrawals);
+    }
+
+    const txBodyHash = RustModule.WalletV4.hash_transaction(body);
+    for (const witGen of witGens) {
+      witGen(txBodyHash);
+    }
+
+    const witSet = RustModule.WalletV4.TransactionWitnessSet.new();
+    if (bootstrapWits.len() > 0) {
+      witSet.set_bootstraps(bootstrapWits);
+    }
+    if (vkeyWits.len() > 0) {
+      witSet.set_vkeys(vkeyWits);
+    }
+    // TODO: handle scripts
+
+    const fullTx = RustModule.WalletV4.Transaction.new(
+      body,
+      witSet,
+      metadata,
+    );
     const result = ({
       success: (true: true),
       id: 0,
       payload: {
-        // note: this is the same bip44 tx for bip44 and cip1852
-        // should be an if/else in the future
-        hash: '36cc16cef021460f142589839c29e88f9c42ae2bd346e25d4d9d15dd195d942c',
-        serializedTx: '83a40083825820058405892f66075d83abd1b7fe341d2d5bfd2f6122b2f874700039e5078e0dd5018258203677e75c7ba699bfdc6cd57d42f246f86f69aefd76025006ac78313fad2bba20018258201029eef5bb0f06979ab0b9530a62bac11e180797d08cab980fe39389d42b365700018182582b82d818582183581c891ac9abaac999b097c81ea3c0450b0fbb693d0bd232bebc0f4a391fa0001af2ff7e211a005620dd021a0002ae89031a000641a5a1028384582073fea80d424276ad0978d4fe5310e8bc2d485f5f6bb3bf87612989f112ad5a7d5840c8b042a7af2de6f10c991de1fc7ce42e437550bb810482028eb188d5f4470bd43d540b8a2e9e9bf2207ad674c6bbaf82fece10f3641f9b3b58551f2b06847d055820dd75e154da417becec55cdd249327454138f082110297d5e87ab25e15fad150f41a0845820f626ab887eb5f40b502463ccf2ec5a7311676ee9e5d55c492059a366c0b4d4a15840674080739c7e4f097ab0133bd341adafe5d51e141da68afb3d396654f6c5b10c75a5f709e843d4c80e0dfc1195956c52e38c8128150daefb5b306b605c1159075820f7ab126f2884db9059fa09ca83be6b8bd0250426aeb62191bdd9861457b8bc9141a084582086e8a3880767e1ed521a47de1e031d47f33d5a8095be467bffbbd3295e27258e5840fa27413636aaf44834348a56cbf469851dbb183440f13e162e3297cb3d0505479ac922e2cae8c368c276d03427b59b004227666b927600f5eae87a3536ee660d5820580bba4bb0b9c56974e16a6998322a91e857e2fac28674404da993f6197fd29f41a0f6',
+        hash: Buffer.from(txBodyHash.to_bytes()).toString('hex'),
+        serializedTx: Buffer.from(fullTx.to_bytes()).toString('hex'),
       },
     }: Success<CardanoSignedTx>);
     return result;
@@ -177,6 +487,11 @@ class MockTrezorConnect {
   }
 
   static mockConnectDevice: void => void = () => {
+    if (MockTrezorConnect.selectedWallet == null) {
+      throw new Error(`No mock Ledger wallet selected`);
+    }
+    const selectedWallet = MockTrezorConnect.selectedWallet;
+
     this.deviceEventListeners.forEach(func => func({
       event: DEVICE_EVENT,
       type: 'device-changed',
@@ -193,11 +508,9 @@ class MockTrezorConnect {
         unavailableCapabilities: {},
         features: {
           vendor: 'trezor.io',
-          major_version: 2,
-          minor_version: 3,
-          patch_version: 0,
+          ...selectedWallet.version,
           bootloader_mode: (null: any),
-          device_id: '6495958994A4025BB5EE1DB0',
+          device_id: selectedWallet.deviceId,
           pin_protection: false,
           passphrase_protection: false,
           language: 'en-US',
