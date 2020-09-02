@@ -164,7 +164,7 @@ Feature: Transfer Yoroi Wallet funds
     Then I click the next button
     Then I should see on the Yoroi withdrawal transfer summary screen:
     | fromAddress                                                | amount           |
-    | addr1ux2436tfe25727kul3qtnyr7k72rvw6ep7h59ll53suwhzqfv6jjh | 5000000    |
+    | stake1ux2436tfe25727kul3qtnyr7k72rvw6ep7h59ll53suwhzq05v5j9 | 5000000    |
     And I see the deregistration for the transaction
     And I enter the wallet password:
       | password   |
@@ -189,7 +189,7 @@ Feature: Transfer Yoroi Wallet funds
     Then I click the next button
     Then I should see on the Yoroi withdrawal transfer summary screen:
     | fromAddress                                                | amount           |
-    | addr1ux2436tfe25727kul3qtnyr7k72rvw6ep7h59ll53suwhzqfv6jjh | 5000000    |
+    | stake1ux2436tfe25727kul3qtnyr7k72rvw6ep7h59ll53suwhzq05v5j9 | 5000000    |
     And I do not see the deregistration for the transaction
     And I enter the wallet password:
       | password   |
