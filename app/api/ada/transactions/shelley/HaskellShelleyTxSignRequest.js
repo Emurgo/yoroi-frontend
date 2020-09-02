@@ -6,6 +6,9 @@ import type { BaseSignRequest } from '../types';
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 import { getAdaCurrencyMeta } from '../../currencyInfo';
 import { toHexOrBase58 } from '../../lib/storage/bridge/utils';
+import type {
+  Addressing
+} from '../../lib/storage/models/PublicDeriver/interfaces';
 
 /**
  * We take a copy of these parameters instead of re-evaluating them from the network
@@ -23,6 +26,20 @@ type NetworkSettingSnapshot = {|
   +PoolDeposit: BigNumber,
   +KeyDeposit: BigNumber,
 |};
+
+type OwnWithdrawal = {|
+  keyHash: RustModule.WalletV4.Ed25519KeyHash,
+  ...Addressing,
+|};
+
+/**
+ * Note: you don't actually need a key for stake registration certificates
+ * But Ledger & Trezor require it anyway
+ */
+type OwnCertificate = {|
+  keyHash: RustModule.WalletV4.Ed25519KeyHash,
+  ...Addressing,
+|};
 export class HaskellShelleyTxSignRequest
 implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
 
@@ -34,6 +51,8 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
     neededHashes: Set<string>, // StakeCredential
     wits: Set<string>, // Vkeywitness
   |};
+  ownWithdrawals: Array<OwnWithdrawal>;
+  ownCertificates: Array<OwnCertificate>;
 
   constructor(
     signRequest: BaseSignRequest<RustModule.WalletV4.TransactionBuilder>,
@@ -43,11 +62,15 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
       neededHashes: Set<string>, // StakeCredential
       wits: Set<string>, // Vkeywitness
     |},
+    ownWithdrawals: Array<OwnWithdrawal>,
+    ownCertificates: Array<OwnCertificate>,
   ) {
     this.signRequest = signRequest;
     this.metadata = metadata;
     this.networkSettingSnapshot = networkSettingSnapshot;
     this.neededStakingKeyHashes = neededStakingKeyHashes;
+    this.ownWithdrawals = ownWithdrawals;
+    this.ownCertificates = ownCertificates;
   }
 
   txId(): string {

@@ -293,6 +293,8 @@ export const genTentativeByronTx = (
         neededHashes: new Set(),
         wits: new Set(),
       },
+      [],
+      [],
     ),
     inputAmount,
     fee,

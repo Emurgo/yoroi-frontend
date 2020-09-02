@@ -1274,7 +1274,10 @@ export const LedgerUpgrade = (): Node => {
                           reset: action('transferRequest reset'),
                           result: {
                             publicKey: {
-                              keyLevel: 3,
+                              addressing: {
+                                startLevel: 1,
+                                path: wallet.publicDeriver.getPathToPublic()
+                              },
                               key: (null: any),
                             },
                             signRequest,

@@ -39,6 +39,12 @@ import { getCardanoHaskellBaseConfig } from '../../api/ada/lib/storage/database/
 import { toTrezorAddressParameters } from '../../api/ada/transactions/shelley/trezorTx';
 import { toLedgerAddressParameters } from '../../api/ada/transactions/shelley/ledgerTx';
 import type { StandardAddress } from '../../types/AddressFilterTypes';
+import {
+  asGetAllAccounting,
+} from '../../api/ada/lib/storage/models/PublicDeriver/traits';
+import { derivePublicByAddressing } from '../../api/ada/lib/cardanoCrypto/utils';
+import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
+import { verifyFromBip44Root } from '../../api/ada/transactions/utils';
 
 export default class HWVerifyAddressStore extends Store {
   @observable isActionProcessing: boolean = false;
@@ -78,7 +84,7 @@ export default class HWVerifyAddressStore extends Store {
     this._setActionProcessing(true);
 
     if (isLedgerNanoWallet(conceptualWallet)) {
-      await this.ledgerVerifyAddress(path, address);
+      await this.ledgerVerifyAddress(path, address, publicDeriver);
     } else if (isTrezorTWallet(conceptualWallet)) {
       await this.trezorVerifyAddress(path, address, publicDeriver.getParent().getNetworkInfo());
     } else {
@@ -116,9 +122,10 @@ export default class HWVerifyAddressStore extends Store {
     }
   }
 
-  ledgerVerifyAddress: (BIP32Path, string) => Promise<void> = async (
+  ledgerVerifyAddress: (BIP32Path, string, PublicDeriver<>) => Promise<void> = async (
     path,
     address,
+    publicDeriver,
   ) => {
     try {
       this.ledgerConnect = new LedgerConnect({
@@ -128,12 +135,34 @@ export default class HWVerifyAddressStore extends Store {
 
       Logger.info(`${nameof(HWVerifyAddressStore)}::${nameof(this.ledgerVerifyAddress)} show path ` + JSON.stringify(path));
 
+      const stakingKeyInfo = await (async () => {
+        const withStakingKey = asGetAllAccounting(publicDeriver);
+        if (withStakingKey == null) {
+          return undefined;
+        }
+        const stakingKeyDbRow = await withStakingKey.getStakingKey();
+        const wasmAddr = RustModule.WalletV4.Address.from_bytes(Buffer.from(stakingKeyDbRow.addr.Hash, 'hex'));
+        const keyHash = RustModule.WalletV4.RewardAddress.from_address(wasmAddr)
+          ?.payment_cred()
+          .to_keyhash();
+        if (keyHash == null) {
+          throw new Error(`${nameof(HWVerifyAddressStore)}::${nameof(this.ledgerVerifyAddress)} staking key not a staking address`);
+        }
+
+        verifyFromBip44Root(stakingKeyDbRow.addressing);
+        return {
+          keyHash,
+          addressing: stakingKeyDbRow.addressing,
+        };
+      })();
+
       const wasmAddr = normalizeToAddress(address);
       if (wasmAddr == null) throw new Error(`${nameof(HWVerifyAddressStore)}::${nameof(this.ledgerVerifyAddress)} invalid address ${address}`);
-      const addressParams = toLedgerAddressParameters(
-        wasmAddr,
+      const addressParams = toLedgerAddressParameters({
+        address: wasmAddr,
         path,
-      );
+        stakingKey: stakingKeyInfo,
+      });
       if (this.ledgerConnect) {
         await this.ledgerConnect.showAddress({
           params: {

@@ -18,6 +18,7 @@ import {
   CERTIFICATE_TYPE,
   ADDRESS_TYPE,
 } from 'trezor-connect/lib/constants/cardano';
+import { HARD_DERIVATION_START, WalletTypePurpose, CoinTypes, ChainDerivations } from '../../../../config/numbersConfig';
 
 beforeAll(async () => {
   await RustModule.load();
@@ -193,11 +194,16 @@ test('Create Trezor transaction', async () => {
   );
   const certs = RustModule.WalletV4.Certificates.new();
 
+  // note: key doesn't belong to the account signing. Just used to test witness generation
+  const accountKey = RustModule.WalletV4.Bip32PrivateKey.from_bytes(
+    Buffer.from(
+      '408a1cb637d615c49e8696c30dd54883302a20a7b9b8a9d1c307d2ed3cd50758c9402acd000461a8fc0f25728666e6d3b86d031b8eea8d2f69b21e8aa6ba2b153e3ec212cc8a36ed9860579dfe1e3ef4d6de778c5dbdd981623b48727cd96247',
+      'hex',
+    ),
+  );
+  const stakingKey = accountKey.derive(ChainDerivations.CHIMERIC_ACCOUNT).derive(0);
   const stakeCredential = RustModule.WalletV4.StakeCredential.from_keyhash(
-    RustModule.WalletV4.PrivateKey.from_extended_bytes(
-      // note: this key doesn't belong to the wallet sending the transaction
-      Buffer.from('40f11e8501f0695cebdb9e980e007c3979a7dc958af16693d62c45e849d507589029b318010a87ad66465b1384afe4d70573a24eaf2ede273aa1e6a6177d5196', 'hex')
-    ).to_public().hash()
+    stakingKey.to_raw_key().to_public().hash()
   );
   certs.add(RustModule.WalletV4.Certificate.new_stake_registration(
     RustModule.WalletV4.StakeRegistration.new(stakeCredential)
@@ -209,6 +215,20 @@ test('Create Trezor transaction', async () => {
   const baseConfig = network.BaseConfig
     .reduce((acc, next) => Object.assign(acc, next), {});
   const { ByronNetworkId, ChainNetworkId } = baseConfig;
+
+  const stakingKeyInfo = {
+    keyHash: stakingKey.to_public().to_raw_key().hash(),
+    addressing: {
+      startLevel: 1,
+      path: [
+        WalletTypePurpose.CIP1852,
+        CoinTypes.CARDANO,
+        HARD_DERIVATION_START,
+        2,
+        0,
+      ],
+    },
+  };
   const response = await createTrezorSignTxPayload(
     new HaskellShelleyTxSignRequest(
       {
@@ -227,6 +247,8 @@ test('Create Trezor transaction', async () => {
         neededHashes: new Set([Buffer.from(stakeCredential.to_bytes()).toString('hex')]),
         wits: new Set() // not needed for this test, but something should be here
       },
+      [],
+      [stakingKeyInfo],
     ),
     ByronNetworkId,
     Number.parseInt(ChainNetworkId, 10),

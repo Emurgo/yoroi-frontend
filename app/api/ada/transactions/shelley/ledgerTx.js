@@ -28,69 +28,63 @@ import {
   ChainDerivations,
 } from '../../../../config/numbersConfig';
 import { derivePublicByAddressing } from '../../lib/cardanoCrypto/utils';
-import { range } from 'lodash';
 
 // ==================== LEDGER ==================== //
 /** Generate a payload for Ledger SignTx */
-export async function createLedgerSignTxPayload(
+export async function createLedgerSignTxPayload(request: {|
   signRequest: HaskellShelleyTxSignRequest,
   byronNetworkMagic: number,
   networkId: number,
-): Promise<SignTransactionRequest> {
-  const txBody = signRequest.self().unsignedTx.build();
+  stakingKey: ?{|
+    keyHash: RustModule.WalletV4.Ed25519KeyHash,
+    ...Addressing,
+  |}
+|}): Promise<SignTransactionRequest> {
+  const txBody = request.signRequest.self().unsignedTx.build();
 
   // Inputs
   const ledgerInputs = _transformToLedgerInputs(
-    signRequest.self().senderUtxos
+    request.signRequest.self().senderUtxos
   );
 
   // Output
-  const ledgerOutputs = _transformToLedgerOutputs(
-    txBody.outputs(),
-    signRequest.self().changeAddr,
-  );
+  const ledgerOutputs = _transformToLedgerOutputs({
+    txOutputs: txBody.outputs(),
+    changeAddrs: request.signRequest.self().changeAddr,
+    stakingKey: request.stakingKey,
+  });
 
   // withdrawals
   const withdrawals = txBody.withdrawals();
 
-  const getStakingKeyPath = () => {
-    // TODO: this entire block is super hacky
-    // need to instead pass in a mapping from wallet addresses to addressing
-    // or add something similar to the sign request
-
-    // assume the withdrawal is the same path as the UTXOs being spent
-    // so just take the first UTXO arbitrarily and change it to the staking key path
-    const firstUtxo = signRequest.self().senderUtxos[0];
-    if (firstUtxo.addressing.startLevel !== Bip44DerivationLevels.PURPOSE.level) {
-      throw new Error(`${nameof(createLedgerSignTxPayload)} unexpected addressing start level`);
-    }
-    const stakingKeyPath = [...firstUtxo.addressing.path];
-    stakingKeyPath[Bip44DerivationLevels.CHAIN.level - 1] = ChainDerivations.CHIMERIC_ACCOUNT;
-    stakingKeyPath[Bip44DerivationLevels.ADDRESS.level - 1] = 0;
-    return stakingKeyPath;
-  };
-
   const certificates = txBody.certs();
+
+  const ledgerWithdrawal = [];
+  if (withdrawals != null && withdrawals.len() > 0) {
+    ledgerWithdrawal.push(...formatLedgerWithdrawals(
+      withdrawals,
+      request.signRequest.ownWithdrawals,
+    ));
+  }
+
+  const ledgerCertificates = [];
+  if (certificates != null && certificates.len() > 0) {
+    ledgerCertificates.push(...formatLedgerCertificates(
+      certificates,
+      request.signRequest.ownCertificates,
+    ));
+  }
+
   return {
     inputs: ledgerInputs,
     outputs: ledgerOutputs,
     feeStr: txBody.fee().to_str(),
     ttlStr: txBody.ttl().toString(),
-    protocolMagic: byronNetworkMagic,
-    withdrawals: withdrawals == null
-      ? []
-      : formatLedgerWithdrawals(
-        withdrawals,
-        [getStakingKeyPath()],
-      ),
-    certificates: certificates == null
-      ? []
-      : formatLedgerCertificates(
-        certificates,
-        range(0, certificates.len()).map(_i => getStakingKeyPath()),
-      ),
+    protocolMagic: request.byronNetworkMagic,
+    withdrawals: ledgerWithdrawal,
+    certificates: ledgerCertificates,
     metadataHashHex: undefined,
-    networkId,
+    networkId: request.networkId,
   };
 }
 
@@ -107,23 +101,28 @@ function _transformToLedgerInputs(
   }));
 }
 
-function _transformToLedgerOutputs(
+function _transformToLedgerOutputs(request: {|
   txOutputs: RustModule.WalletV4.TransactionOutputs,
   changeAddrs: Array<{| ...Address, ...Value, ...Addressing |}>,
-): Array<OutputTypeAddress | OutputTypeAddressParams> {
+  stakingKey: ?{|
+    ...Addressing,
+    keyHash: RustModule.WalletV4.Ed25519KeyHash,
+  |}
+|}): Array<OutputTypeAddress | OutputTypeAddressParams> {
   const result = [];
-  for (let i = 0; i < txOutputs.len(); i++) {
-    const output = txOutputs.get(i);
+  for (let i = 0; i < request.txOutputs.len(); i++) {
+    const output = request.txOutputs.get(i);
     const address = output.address();
     const jsAddr = toHexOrBase58(output.address());
 
-    const changeAddr = changeAddrs.find(change => jsAddr === change.address);
+    const changeAddr = request.changeAddrs.find(change => jsAddr === change.address);
     if (changeAddr != null) {
       verifyFromBip44Root(changeAddr.addressing);
-      const addressParams = toLedgerAddressParameters(
+      const addressParams = toLedgerAddressParameters({
         address,
-        changeAddr.addressing.path,
-      );
+        path: changeAddr.addressing.path,
+        stakingKey: request.stakingKey,
+      });
       result.push({
         addressTypeNibble: addressParams.addressTypeNibble,
         spendingPath: addressParams.spendingPath,
@@ -144,49 +143,96 @@ function _transformToLedgerOutputs(
 
 function formatLedgerWithdrawals(
   withdrawals: RustModule.WalletV4.Withdrawals,
-  path: Array<Array<number>>,
+  ownWithdrawals: Array<{|
+    keyHash: RustModule.WalletV4.Ed25519KeyHash,
+    ...Addressing,
+  |}>
 ): Array<Withdrawal> {
+  if (ownWithdrawals.length !== withdrawals.len()) {
+    throw new Error(`${nameof(formatLedgerWithdrawals)} Ledger can only withdraw from own wallet`);
+  }
+  const ownWithdrawalMap = new Map<string, Addressing>(
+    ownWithdrawals.map(entry => [
+      Buffer.from(entry.keyHash.to_bytes()).toString('hex'),
+      { addressing: entry.addressing }
+    ])
+  );
+
   const result = [];
 
-  if (withdrawals.len() > 1) {
-    // TODO: this is a problem with our CDDL library
-    // since it saves withdrawals as a BTreeMap
-    // which may not be the same order as present in the original tx binary
-    // so we don't know which order the list we pass should be
-    throw new Error(`${nameof(formatLedgerWithdrawals)} only 1 withdrawal per tx supported`);
-  }
   const withdrawalKeys = withdrawals.keys();
   for (let i = 0; i < withdrawalKeys.len(); i++) {
-    const withdrawalAmount = withdrawals.get(withdrawalKeys.get(i));
+    const rewardAddress = withdrawalKeys.get(i);
+    const withdrawalAmount = withdrawals.get(rewardAddress);
     if (withdrawalAmount == null) {
       throw new Error(`${nameof(formatLedgerWithdrawals)} should never happen`);
     }
+
+    const rewardKeyHash = rewardAddress.payment_cred().to_keyhash();
+    if (rewardKeyHash == null) {
+      throw new Error(`${nameof(formatLedgerWithdrawals)} unexpected script hash withdrawal`);
+    }
+    const keyHash = Buffer.from(rewardKeyHash.to_bytes()).toString('hex');
+    const addressing = ownWithdrawalMap.get(keyHash);
+    if (addressing == null) {
+      throw new Error(`${nameof(formatLedgerWithdrawals)} no addressing information for ${keyHash}`);
+    }
     result.push({
       amountStr: withdrawalAmount.to_str(),
-      path: path[i],
+      path: addressing.addressing.path,
     });
   }
   return result;
 }
 function formatLedgerCertificates(
   certificates: RustModule.WalletV4.Certificates,
-  path: Array<Array<number>>,
+  ownCertificates: Array<{|
+    keyHash: RustModule.WalletV4.Ed25519KeyHash,
+    ...Addressing,
+  |}>
 ): Array<Certificate> {
+  if (ownCertificates.length < certificates.len()) {
+    throw new Error(`${nameof(formatLedgerWithdrawals)} Ledger can only create certificates from own wallet`);
+  }
+  const ownCertificatesMap = new Map<string, Addressing>(
+    ownCertificates.map(entry => [
+      Buffer.from(entry.keyHash.to_bytes()).toString('hex'),
+      { addressing: entry.addressing }
+    ])
+  );
+
+  const getPath = (
+    wasmKeyHash: RustModule.WalletV4.Ed25519KeyHash | void
+  ): Array<number> => {
+    if (wasmKeyHash == null) {
+      throw new Error(`${nameof(getPath)} unexpected script hash certificate`);
+    }
+    const keyHash = Buffer.from(wasmKeyHash.to_bytes()).toString('hex');
+    const addressing = ownCertificatesMap.get(keyHash);
+    if (addressing == null) {
+      throw new Error(`${nameof(getPath)} no addressing information for ${keyHash}`);
+    }
+    return addressing.addressing.path;
+  };
+
   const result = [];
   for (let i = 0; i < certificates.len(); i++) {
     const cert = certificates.get(i);
-    if (cert.as_stake_registration() != null) {
+
+    const registrationCert = cert.as_stake_registration();
+    if (registrationCert != null) {
       result.push({
         type: CertTypes.staking_key_registration,
-        path: path[i],
+        path: getPath(registrationCert.stake_credential().to_keyhash()),
         poolKeyHashHex: undefined,
       });
       continue;
     }
-    if (cert.as_stake_deregistration() != null) {
+    const deregistrationCert = cert.as_stake_deregistration();
+    if (deregistrationCert != null) {
       result.push({
         type: CertTypes.staking_key_deregistration,
-        path: path[i],
+        path: getPath(deregistrationCert.stake_credential().to_keyhash()),
         poolKeyHashHex: undefined,
       });
       continue;
@@ -195,7 +241,7 @@ function formatLedgerCertificates(
     if (delegationCert != null) {
       result.push({
         type: CertTypes.delegation,
-        path: path[i],
+        path: getPath(delegationCert.stake_credential().to_keyhash()),
         poolKeyHashHex: Buffer.from(delegationCert.pool_keyhash().to_bytes()).toString('hex'),
       });
       continue;
@@ -205,10 +251,14 @@ function formatLedgerCertificates(
   return result;
 }
 
-export function toLedgerAddressParameters(
+export function toLedgerAddressParameters(request: {|
   address: RustModule.WalletV4.Address,
   path: Array<number>,
-): {|
+  stakingKey: ?{|
+    ...Addressing,
+    keyHash: RustModule.WalletV4.Ed25519KeyHash,
+  |}
+|}): {|
   addressTypeNibble: $Values<typeof AddressTypeNibbles>,
   networkIdOrProtocolMagic: number,
   spendingPath: BIP32Path,
@@ -217,12 +267,12 @@ export function toLedgerAddressParameters(
   stakingBlockchainPointer: ?StakingBlockchainPointer
 |} {
   {
-    const byronAddr = RustModule.WalletV4.ByronAddress.from_address(address);
+    const byronAddr = RustModule.WalletV4.ByronAddress.from_address(request.address);
     if (byronAddr) {
       return {
         addressTypeNibble: AddressTypeNibbles.BYRON,
         networkIdOrProtocolMagic: byronAddr.byron_protocol_magic(),
-        spendingPath: path,
+        spendingPath: request.path,
         stakingPath: undefined,
         stakingKeyHashHex: undefined,
         stakingBlockchainPointer: undefined,
@@ -230,33 +280,48 @@ export function toLedgerAddressParameters(
     }
   }
   {
-    const baseAddr = RustModule.WalletV4.BaseAddress.from_address(address);
+    const baseAddr = RustModule.WalletV4.BaseAddress.from_address(request.address);
     if (baseAddr) {
       const stakeCred = baseAddr.stake_cred();
-      const hash = stakeCred.to_keyhash() ?? stakeCred.to_scripthash();
-      if (hash == null) {
+      const wasmHash = stakeCred.to_keyhash() ?? stakeCred.to_scripthash();
+      if (wasmHash == null) {
         throw new Error(`${nameof(toLedgerAddressParameters)} unknown hash type`);
+      }
+      const hashInAddress = Buffer.from(wasmHash.to_bytes()).toString('hex');
+
+      let stakingKeyInfo = {
+        stakingPath: undefined,
+        // can't always know staking key path since address may not belong to the wallet
+        // (mangled address)
+        stakingKeyHashHex: hashInAddress,
+      };
+      if (request.stakingKey != null) {
+        const { stakingKey } = request;
+        const ourKeyHex = Buffer.from(request.stakingKey.keyHash.to_bytes()).toString('hex');
+        if (ourKeyHex === hashInAddress) {
+          stakingKeyInfo = {
+            stakingPath: stakingKey.addressing.path,
+            stakingKeyHashHex: undefined,
+          };
+        }
       }
       return {
         addressTypeNibble: AddressTypeNibbles.BASE,
         networkIdOrProtocolMagic: baseAddr.to_address().network_id(),
-        spendingPath: path,
-        stakingPath: undefined,
-        // can't always know staking key path since address may not belong to the wallet
-        // (mangled addresss)
-        stakingKeyHashHex: Buffer.from(hash.to_bytes()).toString('hex'),
+        spendingPath: request.path,
+        ...stakingKeyInfo,
         stakingBlockchainPointer: undefined,
       };
     }
   }
   {
-    const ptrAddr = RustModule.WalletV4.PointerAddress.from_address(address);
+    const ptrAddr = RustModule.WalletV4.PointerAddress.from_address(request.address);
     if (ptrAddr) {
       const pointer = ptrAddr.stake_pointer();
       return {
         addressTypeNibble: AddressTypeNibbles.POINTER,
         networkIdOrProtocolMagic: ptrAddr.to_address().network_id(),
-        spendingPath: path,
+        spendingPath: request.path,
         stakingPath: undefined,
         stakingKeyHashHex: undefined,
         stakingBlockchainPointer: {
@@ -268,12 +333,12 @@ export function toLedgerAddressParameters(
     }
   }
   {
-    const enterpriseAddr = RustModule.WalletV4.EnterpriseAddress.from_address(address);
+    const enterpriseAddr = RustModule.WalletV4.EnterpriseAddress.from_address(request.address);
     if (enterpriseAddr) {
       return {
         addressTypeNibble: AddressTypeNibbles.ENTERPRISE,
         networkIdOrProtocolMagic: enterpriseAddr.to_address().network_id(),
-        spendingPath: path,
+        spendingPath: request.path,
         stakingPath: undefined,
         stakingKeyHashHex: undefined,
         stakingBlockchainPointer: undefined,
@@ -281,12 +346,12 @@ export function toLedgerAddressParameters(
     }
   }
   {
-    const rewardAddr = RustModule.WalletV4.RewardAddress.from_address(address);
+    const rewardAddr = RustModule.WalletV4.RewardAddress.from_address(request.address);
     if (rewardAddr) {
       return {
         addressTypeNibble: AddressTypeNibbles.REWARD,
         networkIdOrProtocolMagic: rewardAddr.to_address().network_id(),
-        spendingPath: path, // reward addresses use spending path
+        spendingPath: request.path, // reward addresses use spending path
         stakingPath: undefined,
         stakingKeyHashHex: undefined,
         stakingBlockchainPointer: undefined,
@@ -301,7 +366,7 @@ export function buildSignedTransaction(
   senderUtxos: Array<AddressedUtxo>,
   witnesses: Array<Witness>,
   publicKey: {|
-    keyLevel: number,
+    ...Addressing,
     key: RustModule.WalletV4.Bip32PublicKey,
   |},
   metadata: RustModule.WalletV4.TransactionMetadata | void
@@ -317,6 +382,8 @@ export function buildSignedTransaction(
     }
     throw new Error(`${nameof(buildSignedTransaction)} no witness for ${JSON.stringify(path)}`);
   };
+
+  const keyLevel = publicKey.addressing.startLevel + publicKey.addressing.path.length - 1;
 
   const witSet = RustModule.WalletV4.TransactionWitnessSet.new();
   const bootstrapWitnesses: Array<RustModule.WalletV4.BootstrapWitness> = [];
@@ -335,7 +402,7 @@ export function buildSignedTransaction(
     const addressKey = derivePublicByAddressing({
       addressing: utxo.addressing,
       startingFrom: {
-        level: publicKey.keyLevel,
+        level: keyLevel,
         key: publicKey.key,
       }
     });
@@ -385,7 +452,7 @@ export function buildSignedTransaction(
       const stakingKey = derivePublicByAddressing({
         addressing,
         startingFrom: {
-          level: publicKey.keyLevel,
+          level: keyLevel,
           key: publicKey.key,
         }
       });

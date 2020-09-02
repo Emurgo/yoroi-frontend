@@ -34,7 +34,7 @@ import {
 } from '../../../utils/hwConnectHandler';
 import { ROUTES } from '../../../routes-config';
 import { RustModule } from '../../../api/ada/lib/cardanoCrypto/rustLoader';
-import { asGetPublicKey, asHasLevels } from '../../../api/ada/lib/storage/models/PublicDeriver/traits';
+import { asGetPublicKey, asHasLevels, asGetAllAccounting } from '../../../api/ada/lib/storage/models/PublicDeriver/traits';
 import {
   ConceptualWallet
 } from '../../../api/ada/lib/storage/models/ConceptualWallet/index';
@@ -42,6 +42,19 @@ import { buildCheckAndCall } from '../../lib/check';
 import { getApiForNetwork, ApiOptions } from '../../../api/common/utils';
 import { HaskellShelleyTxSignRequest } from '../../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
+import {
+  derivePublicByAddressing,
+} from '../../../api/ada/lib/cardanoCrypto/utils';
+import { verifyFromBip44Root }  from '../../../api/ada/transactions/utils';
+import type {
+  Addressing,
+} from '../../../api/ada/lib/storage/models/PublicDeriver/interfaces';
+import {
+  Bip44DerivationLevels,
+} from '../../../api/ada/lib/storage/database/walletTypes/bip44/api/utils';
+import {
+  ChainDerivations,
+} from '../../../config/numbersConfig';
 
 /** Note: Handles Ledger Signing */
 export default class LedgerSendStore extends Store {
@@ -142,18 +155,24 @@ export default class LedgerSendStore extends Store {
       if (withLevels == null) {
         throw new Error(`${nameof(this.signAndBroadcast)} No public deriver level for this public deriver`);
       }
+
       const withPublicKey = asGetPublicKey(withLevels);
       if (withPublicKey == null) throw new Error(`${nameof(this.signAndBroadcast)} No public key for this public deriver`);
       const publicKey = await withPublicKey.getPublicKey();
 
+      const publicKeyInfo = {
+        key: RustModule.WalletV4.Bip32PublicKey.from_bytes(
+          Buffer.from(publicKey.Hash, 'hex')
+        ),
+        addressing: {
+          startLevel: 1,
+          path: withLevels.getPathToPublic(),
+        },
+      };
+
       return this.signAndBroadcast({
         ...request.params,
-        publicKey: {
-          key: RustModule.WalletV4.Bip32PublicKey.from_bytes(
-            Buffer.from(publicKey.Hash, 'hex')
-          ),
-          keyLevel: withLevels.getParent().getPublicDeriverLevel(),
-        },
+        publicKey: publicKeyInfo,
         network: request.publicDeriver.getParent().getNetworkInfo(),
       });
     } catch (error) {
@@ -166,7 +185,7 @@ export default class LedgerSendStore extends Store {
     signRequest: HaskellShelleyTxSignRequest,
     publicKey: {|
       key: RustModule.WalletV4.Bip32PublicKey,
-      keyLevel: number,
+      ...Addressing,
     |},
     network: $ReadOnly<NetworkRow>,
   |} => Promise<{| txId: string |}> = async (request) => {
@@ -178,9 +197,28 @@ export default class LedgerSendStore extends Store {
         locale: this.stores.profile.currentLocale
       });
 
+      if (
+        (request.publicKey.addressing.startLevel + request.publicKey.addressing.path.length - 1)
+          !== Bip44DerivationLevels.ACCOUNT.level
+      ) {
+        throw new Error(`${nameof(this.signAndBroadcast)} expected key to be at the account level`);
+      }
+      const stakingKey = {
+        keyHash: request.publicKey.key
+          .derive(ChainDerivations.CHIMERIC_ACCOUNT)
+          .derive(0)
+          .to_raw_key()
+          .hash(),
+        addressing: {
+          startLevel: request.publicKey.addressing.startLevel,
+          path: [...request.publicKey.addressing.path, ChainDerivations.CHIMERIC_ACCOUNT, 0],
+        }
+      };
+
       const { ledgerSignTxPayload } = await this.api.ada.createLedgerSignTxData({
         signRequest: request.signRequest,
         network: request.network,
+        stakingKey,
       });
 
       await prepareLedgerConnect(ledgerConnect);

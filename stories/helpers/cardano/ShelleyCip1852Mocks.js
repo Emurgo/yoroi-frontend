@@ -19,6 +19,7 @@ import {
   GetAllAccounting,
   GetStakingKey,
   HasUtxoChains,
+  asGetAllAccounting,
 } from '../../../app/api/ada/lib/storage/models/PublicDeriver/traits';
 import {
   genToAbsoluteSlotNumber,
@@ -46,6 +47,7 @@ import type { HwWalletMetaRow, } from '../../../app/api/ada/lib/storage/database
 import type { ISignRequest } from '../../../app/api/common/lib/transactions/ISignRequest';
 import { RustModule } from '../../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import { HaskellShelleyTxSignRequest } from '../../../app/api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
+import { verifyFromBip44Root } from '../../../app/api/ada/transactions/utils';
 
 function genMockShelleyCip1852Cache(dummyWallet: PublicDeriver<>) {
   const pendingRequest = new CachedRequest(_publicDeriver => Promise.resolve([]));
@@ -338,19 +340,21 @@ export const genTentativeShelleyTx = (
         neededHashes: new Set(),
         wits: new Set(),
       },
+      [],
+      [],
     ),
     inputAmount,
     fee,
   };
 };
 
-export const genWithdrawalTx = (
+export const genWithdrawalTx = async (
   publicDeriver: PublicDeriver<>,
   unregister: boolean,
-): HaskellShelleyTxSignRequest => {
+): Promise<HaskellShelleyTxSignRequest> => {
   const inputAmount = '2000000';
-  const ouputAmount = '1500000';
-  const fee = new BigNumber(inputAmount).minus(new BigNumber(ouputAmount));
+  const outputAmount = '1500000';
+  const fee = new BigNumber(inputAmount).minus(new BigNumber(outputAmount));
 
   const networkInfo = publicDeriver.getParent().getNetworkInfo();
   const config = getCardanoHaskellBaseConfig(networkInfo)
@@ -387,8 +391,29 @@ export const genWithdrawalTx = (
     RustModule.WalletV4.Address.from_bytes(
       Buffer.from('01d2d1d233e88e9c8428b68ada19acbdc9ced7e3b4ab6ca5d470376ea4c3892366f174a76af9252f78368f5747d3055ab3568ea3b6bf40b01e', 'hex')
     ),
-    RustModule.WalletV4.BigNum.from_str(ouputAmount)
+    RustModule.WalletV4.BigNum.from_str(outputAmount)
   ));
+
+  const stakingKeyInfo = await (async () => {
+    const withStakingKey = asGetAllAccounting(publicDeriver);
+    if (withStakingKey == null) {
+      throw new Error(`${nameof(genWithdrawalTx)} no staking key`);
+    }
+    const stakingKeyDbRow = await withStakingKey.getStakingKey();
+    const wasmAddr = RustModule.WalletV4.Address.from_bytes(Buffer.from(stakingKeyDbRow.addr.Hash, 'hex'));
+    const keyHash = RustModule.WalletV4.RewardAddress.from_address(wasmAddr)
+      ?.payment_cred()
+      .to_keyhash();
+    if (keyHash == null) {
+      throw new Error(`${nameof(genWithdrawalTx)} staking key not a staking address`);
+    }
+
+    verifyFromBip44Root(stakingKeyDbRow.addressing);
+    return {
+      keyHash,
+      addressing: stakingKeyDbRow.addressing,
+    };
+  })();
 
   const rewardAddr = RustModule.WalletV4.RewardAddress.from_address(
     RustModule.WalletV4.Address.from_bytes(
@@ -444,5 +469,7 @@ export const genWithdrawalTx = (
       neededHashes: new Set([Buffer.from(rewardAddr.payment_cred().to_bytes()).toString('hex')]),
       wits: new Set(), // TODO: should be present, but probably doesn't matter for UI tests
     },
+    [stakingKeyInfo],
+    [stakingKeyInfo],
   );
 };

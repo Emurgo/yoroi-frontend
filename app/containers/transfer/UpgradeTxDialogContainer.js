@@ -28,6 +28,9 @@ import VerticallyCenteredLayout from '../../components/layout/VerticallyCentered
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
+import type {
+  Addressing,
+} from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 
 export type GeneratedData = typeof UpgradeTxDialogContainer.prototype.generated;
 
@@ -56,7 +59,7 @@ export default class UpgradeTxDialogContainer extends Component<Props> {
     signRequest: HaskellShelleyTxSignRequest,
     publicKey: {|
       key: RustModule.WalletV4.Bip32PublicKey,
-      keyLevel: number,
+      ...Addressing,
     |},
     network: $ReadOnly<NetworkRow>,
   |} => Promise<void> = async (request) => {
@@ -112,7 +115,7 @@ export default class UpgradeTxDialogContainer extends Component<Props> {
     signRequest: HaskellShelleyTxSignRequest,
     publicKey: {|
       key: RustModule.WalletV4.Bip32PublicKey,
-      keyLevel: number,
+      ...Addressing,
     |}
   |} => Node = (
     tentativeTx
@@ -193,7 +196,7 @@ export default class UpgradeTxDialogContainer extends Component<Props> {
               signRequest: HaskellShelleyTxSignRequest,
               publicKey: {|
                 key: RustModule.WalletV4.Bip32PublicKey,
-                keyLevel: number,
+                ...Addressing,
               |},
               network: $ReadOnly<NetworkRow>,
             |} => Promise<void>,
@@ -232,7 +235,7 @@ export default class UpgradeTxDialogContainer extends Component<Props> {
               result: ?{|
                 publicKey: {|
                   key: RustModule.WalletV4.Bip32PublicKey,
-                  keyLevel: number,
+                  ...Addressing,
                 |},
                 signRequest: HaskellShelleyTxSignRequest,
               |}

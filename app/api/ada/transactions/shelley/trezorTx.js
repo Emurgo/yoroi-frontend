@@ -118,13 +118,6 @@ function formatTrezorWithdrawals(
 ): Array<CardanoWithdrawal> {
   const result = [];
 
-  if (withdrawals.len() > 1) {
-    // TODO: this is a problem with our CDDL library
-    // since it saves withdrawals as a BTreeMap
-    // which may not be the same order as present in the original tx binary
-    // so we don't know which order the list we pass should be
-    throw new Error(`${nameof(formatTrezorWithdrawals)} only 1 withdrawal per tx supported`);
-  }
   const withdrawalKeys = withdrawals.keys();
   for (let i = 0; i < withdrawalKeys.len(); i++) {
     const withdrawalAmount = withdrawals.get(withdrawalKeys.get(i));

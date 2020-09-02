@@ -292,6 +292,10 @@ export type BroadcastTrezorSignedTxFunc = (
 export type CreateLedgerSignTxDataRequest = {|
   signRequest: HaskellShelleyTxSignRequest,
   network: $ReadOnly<NetworkRow>,
+  stakingKey: ?{|
+    keyHash: RustModule.WalletV4.Ed25519KeyHash,
+    ...Addressing,
+  |}
 |};
 export type CreateLedgerSignTxDataResponse = {|
   ledgerSignTxPayload: SignTransactionRequest,
@@ -379,7 +383,7 @@ export type CreateWithdrawalTxRequest = {|
   absSlotNumber: BigNumber,
   getAccountState: AccountStateFunc,
   withdrawals: Array<{|
-    privateKey?: RustModule.WalletV4.PrivateKey,
+    ...({| privateKey: RustModule.WalletV4.PrivateKey |} | {| ...Addressing |}),
     rewardAddress: string, // address you're withdrawing from
     /**
      * you need to withdraw all ADA before deregistering
@@ -469,7 +473,7 @@ export type TransferToCip1852Response = {|
   signRequest: CreateUnsignedTxResponse,
   publicKey: {|
     key: RustModule.WalletV4.Bip32PublicKey,
-    keyLevel: number,
+    ...Addressing,
   |},
 |};
 export type TransferToCip1852Func = (
@@ -864,11 +868,12 @@ export default class AdaApi {
         request.network
       ).reduce((acc, next) => Object.assign(acc, next), {});
 
-      const ledgerSignTxPayload = await createLedgerSignTxPayload(
-        request.signRequest,
-        config.ByronNetworkId,
-        Number.parseInt(config.ChainNetworkId, 10),
-      );
+      const ledgerSignTxPayload = await createLedgerSignTxPayload({
+        signRequest: request.signRequest,
+        byronNetworkMagic: config.ByronNetworkId,
+        networkId: Number.parseInt(config.ChainNetworkId, 10),
+        stakingKey: request.stakingKey,
+      });
 
       Logger.debug(`${nameof(AdaApi)}::${nameof(this.createLedgerSignTxData)} success: ` + stringifyData(ledgerSignTxPayload));
       return {
@@ -1004,6 +1009,8 @@ export default class AdaApi {
           neededHashes: new Set(),
           wits: new Set(),
         },
+        [],
+        [],
       );
     } catch (error) {
       Logger.error(
@@ -1154,6 +1161,11 @@ export default class AdaApi {
           ).toString('hex')]),
           wits: new Set(),
         },
+        [],
+        stakeDelegationCert.map(_entry => ({
+          keyHash: stakingKey.hash(),
+          addressing: stakingKeyDbRow.addressing,
+        }))
       );
       return {
         signTxRequest,
@@ -1195,24 +1207,39 @@ export default class AdaApi {
       const changeAddr = nextUnusedInternal.addressInfo;
 
       const certificates = [];
+
+      const ourWithdrawals = [];
+      const ourCertificates = [];
       const requiredWits: Array<RustModule.WalletV4.Ed25519KeyHash> = [];
       for (const withdrawal of request.withdrawals) {
+        const wasmAddr = RustModule.WalletV4.RewardAddress.from_address(
+          RustModule.WalletV4.Address.from_bytes(
+            Buffer.from(withdrawal.rewardAddress, 'hex')
+          )
+        );
+        if (wasmAddr == null) throw new Error(`${nameof(AdaApi)}::${nameof(this.createUnsignedTx)} withdrawal not a reward address`);
+        const paymentCred = wasmAddr.payment_cred();
+
+        const keyHash = paymentCred.to_keyhash();
+        if (keyHash == null) throw new Error(`Unexpected: withdrawal from a script hash`);
+        requiredWits.push(keyHash);
+
+        if (withdrawal.addressing) {
+          ourWithdrawals.push({
+            keyHash,
+            addressing: withdrawal.addressing,
+          });
+        }
         if (withdrawal.shouldDeregister) {
-          const wasmAddr = RustModule.WalletV4.RewardAddress.from_address(
-            RustModule.WalletV4.Address.from_bytes(
-              Buffer.from(withdrawal.rewardAddress, 'hex')
-            )
-          );
-          if (wasmAddr == null) throw new Error(`${nameof(AdaApi)}::${nameof(this.createUnsignedTx)} withdrawal not a reward address`);
-          const paymentCred = wasmAddr.payment_cred();
-          {
-            const keyHash = paymentCred.to_keyhash();
-            if (keyHash == null) throw new Error(`Unexpected: withdrawal from a script hash`);
-            requiredWits.push(keyHash);
-          }
           certificates.push(RustModule.WalletV4.Certificate.new_stake_deregistration(
             RustModule.WalletV4.StakeDeregistration.new(paymentCred)
           ));
+          if (withdrawal.addressing) {
+            ourCertificates.push({
+              keyHash,
+              addressing: withdrawal.addressing,
+            });
+          }
         }
       }
       const accountStates = await request.getAccountState({
@@ -1300,6 +1327,8 @@ export default class AdaApi {
           PoolDeposit: new BigNumber(config.PoolDeposit),
         },
         neededKeys,
+        ourWithdrawals,
+        ourCertificates,
       );
     } catch (error) {
       Logger.error(
@@ -1642,7 +1671,14 @@ export default class AdaApi {
       return {
         publicKey: {
           key: request.bip44AccountPubKey,
-          keyLevel: Bip44DerivationLevels.ACCOUNT.level,
+          addressing: {
+            startLevel: 1,
+            path: [
+              WalletTypePurpose.CIP1852,
+              CoinTypes.CARDANO,
+              request.accountIndex,
+            ],
+          },
         },
         signRequest: await this.createUnsignedTxForUtxos({
           absSlotNumber: request.absSlotNumber,
