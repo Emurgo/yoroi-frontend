@@ -49,6 +49,12 @@ import { verifyFromBip44Root }  from '../../../api/ada/transactions/utils';
 import type {
   Addressing,
 } from '../../../api/ada/lib/storage/models/PublicDeriver/interfaces';
+import {
+  Bip44DerivationLevels,
+} from '../../../api/ada/lib/storage/database/walletTypes/bip44/api/utils';
+import {
+  ChainDerivations,
+} from '../../../config/numbersConfig';
 
 /** Note: Handles Ledger Signing */
 export default class LedgerSendStore extends Store {
@@ -158,40 +164,16 @@ export default class LedgerSendStore extends Store {
         key: RustModule.WalletV4.Bip32PublicKey.from_bytes(
           Buffer.from(publicKey.Hash, 'hex')
         ),
-        keyLevel: withLevels.getParent().getPublicDeriverLevel(),
+        addressing: {
+          startLevel: 1,
+          path: withLevels.getPathToPublic(),
+        },
       };
-
-      const stakingKeyInfo = await (async () => {
-        const withStakingKey = asGetAllAccounting(withLevels);
-        if (withStakingKey == null) {
-          return undefined;
-        }
-        const stakingKeyDbRow = await withStakingKey.getStakingKey();
-        const stakingKey = derivePublicByAddressing({
-          addressing: stakingKeyDbRow.addressing,
-          startingFrom: {
-            level: withStakingKey.getParent().getPublicDeriverLevel(),
-            key: RustModule.WalletV4.Bip32PublicKey.from_bytes(
-              Buffer.from(stakingKeyDbRow.addr.Hash, 'hex')
-            ),
-          },
-        }).to_raw_key();
-
-        verifyFromBip44Root(stakingKeyDbRow.addressing);
-        return {
-          keyHash: stakingKey.hash(),
-          addressing: {
-            path: stakingKeyDbRow.addressing.path,
-            startLevel: 1,
-          },
-        };
-      })();
 
       return this.signAndBroadcast({
         ...request.params,
         publicKey: publicKeyInfo,
         network: request.publicDeriver.getParent().getNetworkInfo(),
-        stakingKey: stakingKeyInfo,
       });
     } catch (error) {
       Logger.error(`${nameof(LedgerSendStore)}::${nameof(this.signAndBroadcast)} error: ` + stringifyError(error));
@@ -203,10 +185,6 @@ export default class LedgerSendStore extends Store {
     signRequest: HaskellShelleyTxSignRequest,
     publicKey: {|
       key: RustModule.WalletV4.Bip32PublicKey,
-      keyLevel: number,
-    |},
-    stakingKey: ?{|
-      keyHash: RustModule.WalletV4.Ed25519KeyHash,
       ...Addressing,
     |},
     network: $ReadOnly<NetworkRow>,
@@ -219,10 +197,28 @@ export default class LedgerSendStore extends Store {
         locale: this.stores.profile.currentLocale
       });
 
+      if (
+        (request.publicKey.addressing.startLevel + request.publicKey.addressing.path.length - 1)
+          !== Bip44DerivationLevels.ACCOUNT.level
+      ) {
+        throw new Error(`${nameof(this.signAndBroadcast)} expected key to be at the account level`);
+      }
+      const stakingKey = {
+        keyHash: request.publicKey.key
+          .derive(ChainDerivations.CHIMERIC_ACCOUNT)
+          .derive(0)
+          .to_raw_key()
+          .hash(),
+        addressing: {
+          startLevel: request.publicKey.addressing.startLevel,
+          path: [...request.publicKey.addressing.path, ChainDerivations.CHIMERIC_ACCOUNT, 0],
+        }
+      };
+
       const { ledgerSignTxPayload } = await this.api.ada.createLedgerSignTxData({
         signRequest: request.signRequest,
         network: request.network,
-        stakingKey: request.stakingKey,
+        stakingKey,
       });
 
       await prepareLedgerConnect(ledgerConnect);

@@ -26,11 +26,7 @@ export default class LedgerSendActions {
     signRequest: HaskellShelleyTxSignRequest,
     publicKey: {|
       key: RustModule.WalletV4.Bip32PublicKey,
-      keyLevel: number,
-    |},
-    stakingKey: ?{|
       ...Addressing,
-      keyHash: RustModule.WalletV4.Ed25519KeyHash,
     |},
     network: $ReadOnly<NetworkRow>,
   |}> = new AsyncAction();

@@ -473,7 +473,7 @@ export type TransferToCip1852Response = {|
   signRequest: CreateUnsignedTxResponse,
   publicKey: {|
     key: RustModule.WalletV4.Bip32PublicKey,
-    keyLevel: number,
+    ...Addressing,
   |},
 |};
 export type TransferToCip1852Func = (
@@ -1658,7 +1658,14 @@ export default class AdaApi {
       return {
         publicKey: {
           key: request.bip44AccountPubKey,
-          keyLevel: Bip44DerivationLevels.ACCOUNT.level,
+          addressing: {
+            startLevel: 1,
+            path: [
+              WalletTypePurpose.CIP1852,
+              CoinTypes.CARDANO,
+              request.accountIndex,
+            ],
+          },
         },
         signRequest: await this.createUnsignedTxForUtxos({
           absSlotNumber: request.absSlotNumber,

@@ -54,7 +54,7 @@ test('Generate address parameters', async () => {
     const addr = 'Ae2tdPwUPEZLmqiKtMQ4kKL38emRfkyPqBsHqL64pf8uRz6uzsQCd7GAu9R';
     const wasmAddr = normalizeToAddress(addr);
     if (wasmAddr == null) throw new Error(`Unknown address`);
-    expect(toLedgerAddressParameters(wasmAddr, path)).toEqual({
+    expect(toLedgerAddressParameters({ address: wasmAddr, path, stakingKey: undefined })).toEqual({
       addressTypeNibble: AddressTypeNibbles.BYRON,
       networkIdOrProtocolMagic: ByronNetworkId,
       spendingPath: path,
@@ -69,7 +69,7 @@ test('Generate address parameters', async () => {
     const addr = 'addr1q8v42wjda8r6mpfj40d36znlgfdcqp7jtj03ah8skh6u8wnrqua2vw243tmjfjt0h5wsru6appuz8c0pfd75ur7myyeqsx9990';
     const wasmAddr = normalizeToAddress(addr);
     if (wasmAddr == null) throw new Error(`Unknown address`);
-    expect(toLedgerAddressParameters(wasmAddr, path)).toEqual({
+    expect(toLedgerAddressParameters({ address: wasmAddr, path, stakingKey: undefined })).toEqual({
       addressTypeNibble: AddressTypeNibbles.BASE,
       networkIdOrProtocolMagic: Number.parseInt(ChainNetworkId, 10),
       spendingPath: path,
@@ -81,16 +81,33 @@ test('Generate address parameters', async () => {
 
   // base (path)
   {
+    const stakingKeyPath = [
+      WalletTypePurpose.CIP1852,
+      CoinTypes.CARDANO,
+      HARD_DERIVATION_START,
+      2,
+      0
+    ];
     const addr = 'addr1q8v42wjda8r6mpfj40d36znlgfdcqp7jtj03ah8skh6u8wnrqua2vw243tmjfjt0h5wsru6appuz8c0pfd75ur7myyeqsx9990';
     const wasmAddr = normalizeToAddress(addr);
     if (wasmAddr == null) throw new Error(`Unknown address`);
-    expect(toLedgerAddressParameters(wasmAddr, path)).toEqual({
+    expect(toLedgerAddressParameters({
+      address: wasmAddr,
+      path,
+      stakingKey: {
+        keyHash: RustModule.WalletV4.Ed25519KeyHash.from_bytes(Buffer.from('63073aa639558af724c96fbd1d01f35d087823e1e14b7d4e0fdb2132', 'hex')),
+        addressing: {
+          startLevel: 1,
+          path: stakingKeyPath,
+        },
+      }
+    })).toEqual({
       addressTypeNibble: AddressTypeNibbles.BASE,
       networkIdOrProtocolMagic: Number.parseInt(ChainNetworkId, 10),
       spendingPath: path,
       stakingBlockchainPointer: undefined,
       stakingKeyHashHex: undefined,
-      stakingPath: [WalletTypePurpose.BIP44, CoinTypes.CARDANO, HARD_DERIVATION_START, 2, 0],
+      stakingPath: stakingKeyPath,
     });
   }
 
@@ -99,7 +116,7 @@ test('Generate address parameters', async () => {
     const addr = 'addr1vxq0nckg3ekgzuqg7w5p9mvgnd9ym28qh5grlph8xd2z92su77c6m';
     const wasmAddr = normalizeToAddress(addr);
     if (wasmAddr == null) throw new Error(`Unknown address`);
-    expect(toLedgerAddressParameters(wasmAddr, path)).toEqual({
+    expect(toLedgerAddressParameters({ address: wasmAddr, path, stakingKey: undefined })).toEqual({
       addressTypeNibble: AddressTypeNibbles.ENTERPRISE,
       networkIdOrProtocolMagic: Number.parseInt(ChainNetworkId, 10),
       spendingPath: path,
@@ -114,7 +131,7 @@ test('Generate address parameters', async () => {
     const addr = 'addr1gxq0nckg3ekgzuqg7w5p9mvgnd9ym28qh5grlph8xd2z92spqgpsl97q83';
     const wasmAddr = normalizeToAddress(addr);
     if (wasmAddr == null) throw new Error(`Unknown address`);
-    expect(toLedgerAddressParameters(wasmAddr, path)).toEqual({
+    expect(toLedgerAddressParameters({ address: wasmAddr, path, stakingKey: undefined })).toEqual({
       addressTypeNibble: AddressTypeNibbles.POINTER,
       networkIdOrProtocolMagic: Number.parseInt(ChainNetworkId, 10),
       spendingPath: path,
@@ -140,7 +157,11 @@ test('Generate address parameters', async () => {
     ];
     const wasmAddr = normalizeToAddress(addr);
     if (wasmAddr == null) throw new Error(`Unknown address`);
-    expect(toLedgerAddressParameters(wasmAddr, stakingKeyPath)).toEqual({
+    expect(toLedgerAddressParameters({
+      address: wasmAddr,
+      path: stakingKeyPath,
+      stakingKey: undefined
+    })).toEqual({
       addressTypeNibble: AddressTypeNibbles.REWARD,
       networkIdOrProtocolMagic: Number.parseInt(ChainNetworkId, 10),
       spendingPath: stakingKeyPath,
@@ -390,7 +411,14 @@ test('Create Ledger transaction', async () => {
       },
     ],
     {
-      keyLevel: 3,
+      addressing: {
+        startLevel: 1,
+        path: [
+          WalletTypePurpose.CIP1852,
+          CoinTypes.CARDANO,
+          HARD_DERIVATION_START,
+        ],
+      },
       key: accountKey.to_public(),
     },
     undefined,

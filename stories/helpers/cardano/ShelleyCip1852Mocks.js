@@ -400,19 +400,17 @@ export const genWithdrawalTx = async (
       throw new Error(`${nameof(genWithdrawalTx)} no staking key`);
     }
     const stakingKeyDbRow = await withStakingKey.getStakingKey();
-    const stakingKey = derivePublicByAddressing({
-      addressing: stakingKeyDbRow.addressing,
-      startingFrom: {
-        level: withStakingKey.getParent().getPublicDeriverLevel(),
-        key: RustModule.WalletV4.Bip32PublicKey.from_bytes(
-          Buffer.from(stakingKeyDbRow.addr.Hash, 'hex')
-        ),
-      },
-    }).to_raw_key();
+    const wasmAddr = RustModule.WalletV4.Address.from_bytes(Buffer.from(stakingKeyDbRow.addr.Hash, 'hex'));
+    const keyHash = RustModule.WalletV4.RewardAddress.from_address(wasmAddr)
+      ?.payment_cred()
+      .to_keyhash();
+    if (keyHash == null) {
+      throw new Error(`${nameof(genWithdrawalTx)} staking key not a staking address`);
+    }
 
     verifyFromBip44Root(stakingKeyDbRow.addressing);
     return {
-      keyHash: stakingKey.hash(),
+      keyHash,
       addressing: stakingKeyDbRow.addressing,
     };
   })();

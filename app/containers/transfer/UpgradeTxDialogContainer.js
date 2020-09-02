@@ -59,11 +59,7 @@ export default class UpgradeTxDialogContainer extends Component<Props> {
     signRequest: HaskellShelleyTxSignRequest,
     publicKey: {|
       key: RustModule.WalletV4.Bip32PublicKey,
-      keyLevel: number,
-    |},
-    stakingKey: ?{|
       ...Addressing,
-      keyHash: RustModule.WalletV4.Ed25519KeyHash,
     |},
     network: $ReadOnly<NetworkRow>,
   |} => Promise<void> = async (request) => {
@@ -119,7 +115,7 @@ export default class UpgradeTxDialogContainer extends Component<Props> {
     signRequest: HaskellShelleyTxSignRequest,
     publicKey: {|
       key: RustModule.WalletV4.Bip32PublicKey,
-      keyLevel: number,
+      ...Addressing,
     |}
   |} => Node = (
     tentativeTx
@@ -200,11 +196,7 @@ export default class UpgradeTxDialogContainer extends Component<Props> {
               signRequest: HaskellShelleyTxSignRequest,
               publicKey: {|
                 key: RustModule.WalletV4.Bip32PublicKey,
-                keyLevel: number,
-              |},
-              stakingKey: ?{|
                 ...Addressing,
-                keyHash: RustModule.WalletV4.Ed25519KeyHash,
               |},
               network: $ReadOnly<NetworkRow>,
             |} => Promise<void>,
@@ -243,7 +235,7 @@ export default class UpgradeTxDialogContainer extends Component<Props> {
               result: ?{|
                 publicKey: {|
                   key: RustModule.WalletV4.Bip32PublicKey,
-                  keyLevel: number,
+                  ...Addressing,
                 |},
                 signRequest: HaskellShelleyTxSignRequest,
               |}
