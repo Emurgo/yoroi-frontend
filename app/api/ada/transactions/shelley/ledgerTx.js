@@ -36,10 +36,6 @@ export async function createLedgerSignTxPayload(
   signRequest: HaskellShelleyTxSignRequest,
   byronNetworkMagic: number,
   networkId: number,
-  stakingKey: ?{|
-    path: Array<number>, // from root
-    key: RustModule.WalletV4.PublicKey,
-  |}
 ): Promise<SignTransactionRequest> {
   const txBody = signRequest.self().unsignedTx.build();
 
@@ -61,19 +57,24 @@ export async function createLedgerSignTxPayload(
 
   const ledgerWithdrawal = [];
   if (withdrawals != null && withdrawals.len() > 0) {
-    if (stakingKey == null) throw new Error(`${nameof(createLedgerSignTxPayload)} withdrawal present but no staking key`);
     ledgerWithdrawal.push(...formatLedgerWithdrawals(
       withdrawals,
-      [stakingKey.path],
+      signRequest.ownWithdrawals,
     ));
   }
 
   const ledgerCertificates = [];
   if (certificates != null && certificates.len() > 0) {
-    if (stakingKey == null) throw new Error(`${nameof(createLedgerSignTxPayload)} withdrawal present but no staking key`);
     ledgerCertificates.push(...formatLedgerCertificates(
       certificates,
-      range(0, certificates.len()).map(_i => stakingKey.path),
+      range(0, certificates.len()).map(_i => [
+        2147485500,
+        2147485463,
+        0 + 2147483648,
+        2,
+        0
+      ],
+      ),
     ));
   }
 
@@ -140,26 +141,43 @@ function _transformToLedgerOutputs(
 
 function formatLedgerWithdrawals(
   withdrawals: RustModule.WalletV4.Withdrawals,
-  path: Array<Array<number>>,
+  ownWithdrawals: Array<{|
+    keyHash: RustModule.WalletV4.Ed25519KeyHash,
+    ...Addressing,
+  |}>
 ): Array<Withdrawal> {
+  if (ownWithdrawals.length !== withdrawals.len()) {
+    throw new Error(`${nameof(formatLedgerWithdrawals)} Ledger can only withdraw from own wallet`);
+  }
+  const ownWithdrawalMap = new Map<string, Addressing>(
+    ownWithdrawals.map(entry => [
+      Buffer.from(entry.keyHash.to_bytes()).toString('hex'),
+      { addressing: entry.addressing }
+    ])
+  );
+
   const result = [];
 
-  if (withdrawals.len() > 1) {
-    // TODO: this is a problem with our CDDL library
-    // since it saves withdrawals as a BTreeMap
-    // which may not be the same order as present in the original tx binary
-    // so we don't know which order the list we pass should be
-    throw new Error(`${nameof(formatLedgerWithdrawals)} only 1 withdrawal per tx supported`);
-  }
   const withdrawalKeys = withdrawals.keys();
   for (let i = 0; i < withdrawalKeys.len(); i++) {
-    const withdrawalAmount = withdrawals.get(withdrawalKeys.get(i));
+    const rewardAddress = withdrawalKeys.get(i);
+    const withdrawalAmount = withdrawals.get(rewardAddress);
     if (withdrawalAmount == null) {
       throw new Error(`${nameof(formatLedgerWithdrawals)} should never happen`);
     }
+
+    const rewardKeyHash = rewardAddress.payment_cred().to_keyhash();
+    if (rewardKeyHash == null) {
+      throw new Error(`${nameof(formatLedgerWithdrawals)} unexpected script hash withdrawal`);
+    }
+    const keyHash = Buffer.from(rewardKeyHash.to_bytes()).toString('hex');
+    const addressing = ownWithdrawalMap.get(keyHash);
+    if (addressing == null) {
+      throw new Error(`${nameof(formatLedgerWithdrawals)} no addressing information for ${keyHash}`);
+    }
     result.push({
       amountStr: withdrawalAmount.to_str(),
-      path: path[i],
+      path: addressing.addressing.path,
     });
   }
   return result;

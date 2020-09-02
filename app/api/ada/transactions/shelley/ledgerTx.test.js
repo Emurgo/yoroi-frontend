@@ -271,21 +271,12 @@ test('Create Ledger transaction', async () => {
       neededHashes: new Set([Buffer.from(stakeCredential.to_bytes()).toString('hex')]),
       wits: new Set() // not needed for this test, but something should be here
     },
+    [],
   );
   const response = await createLedgerSignTxPayload(
     signRequest,
     ByronNetworkId,
     Number.parseInt(ChainNetworkId, 10),
-    {
-      key: stakingKey.to_raw_key().to_public(),
-      path: [
-        WalletTypePurpose.CIP1852,
-        CoinTypes.CARDANO,
-        0 + HARD_DERIVATION_START,
-        ChainDerivations.CHIMERIC_ACCOUNT,
-        0
-      ],
-    },
   );
 
   expect(response).toStrictEqual({
@@ -341,7 +332,7 @@ test('Create Ledger transaction', async () => {
     withdrawals: [],
     certificates: [{
       path: [
-        2147483692,
+        2147485500,
         2147485463,
         2147483648,
         2,

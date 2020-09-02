@@ -379,7 +379,7 @@ export type CreateWithdrawalTxRequest = {|
   absSlotNumber: BigNumber,
   getAccountState: AccountStateFunc,
   withdrawals: Array<{|
-    privateKey?: RustModule.WalletV4.PrivateKey,
+    ...({| privateKey: RustModule.WalletV4.PrivateKey |} | {| ...Addressing |}),
     rewardAddress: string, // address you're withdrawing from
     /**
      * you need to withdraw all ADA before deregistering
@@ -1004,6 +1004,7 @@ export default class AdaApi {
           neededHashes: new Set(),
           wits: new Set(),
         },
+        [],
       );
     } catch (error) {
       Logger.error(
@@ -1154,6 +1155,7 @@ export default class AdaApi {
           ).toString('hex')]),
           wits: new Set(),
         },
+        [],
       );
       return {
         signTxRequest,
@@ -1195,21 +1197,29 @@ export default class AdaApi {
       const changeAddr = nextUnusedInternal.addressInfo;
 
       const certificates = [];
+
+      const ourWithdrawals = [];
       const requiredWits: Array<RustModule.WalletV4.Ed25519KeyHash> = [];
       for (const withdrawal of request.withdrawals) {
+        const wasmAddr = RustModule.WalletV4.RewardAddress.from_address(
+          RustModule.WalletV4.Address.from_bytes(
+            Buffer.from(withdrawal.rewardAddress, 'hex')
+          )
+        );
+        if (wasmAddr == null) throw new Error(`${nameof(AdaApi)}::${nameof(this.createUnsignedTx)} withdrawal not a reward address`);
+        const paymentCred = wasmAddr.payment_cred();
+
+        const keyHash = paymentCred.to_keyhash();
+        if (keyHash == null) throw new Error(`Unexpected: withdrawal from a script hash`);
+        requiredWits.push(keyHash);
+
+        if (withdrawal.addressing) {
+          ourWithdrawals.push({
+            keyHash,
+            addressing: withdrawal.addressing,
+          });
+        }
         if (withdrawal.shouldDeregister) {
-          const wasmAddr = RustModule.WalletV4.RewardAddress.from_address(
-            RustModule.WalletV4.Address.from_bytes(
-              Buffer.from(withdrawal.rewardAddress, 'hex')
-            )
-          );
-          if (wasmAddr == null) throw new Error(`${nameof(AdaApi)}::${nameof(this.createUnsignedTx)} withdrawal not a reward address`);
-          const paymentCred = wasmAddr.payment_cred();
-          {
-            const keyHash = paymentCred.to_keyhash();
-            if (keyHash == null) throw new Error(`Unexpected: withdrawal from a script hash`);
-            requiredWits.push(keyHash);
-          }
           certificates.push(RustModule.WalletV4.Certificate.new_stake_deregistration(
             RustModule.WalletV4.StakeDeregistration.new(paymentCred)
           ));
@@ -1300,6 +1310,7 @@ export default class AdaApi {
           PoolDeposit: new BigNumber(config.PoolDeposit),
         },
         neededKeys,
+        ourWithdrawals,
       );
     } catch (error) {
       Logger.error(

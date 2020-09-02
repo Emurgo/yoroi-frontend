@@ -27,9 +27,9 @@ type NetworkSettingSnapshot = {|
   +KeyDeposit: BigNumber,
 |};
 
-type OwnWithdrawals = {|
-  publicKey: RustModule.WalletV4.PublicKey,
-  ... Addressing,
+type OwnWithdrawal = {|
+  keyHash: RustModule.WalletV4.Ed25519KeyHash,
+  ...Addressing,
 |};
 export class HaskellShelleyTxSignRequest
 implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
@@ -42,7 +42,7 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
     neededHashes: Set<string>, // StakeCredential
     wits: Set<string>, // Vkeywitness
   |};
-  ownWithdrawals: Array<OwnWithdrawals>;
+  ownWithdrawals: Array<OwnWithdrawal>;
 
   constructor(
     signRequest: BaseSignRequest<RustModule.WalletV4.TransactionBuilder>,
@@ -52,7 +52,7 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
       neededHashes: Set<string>, // StakeCredential
       wits: Set<string>, // Vkeywitness
     |},
-    ownWithdrawals: Array<OwnWithdrawals>,
+    ownWithdrawals: Array<OwnWithdrawal>,
   ) {
     this.signRequest = signRequest;
     this.metadata = metadata;
