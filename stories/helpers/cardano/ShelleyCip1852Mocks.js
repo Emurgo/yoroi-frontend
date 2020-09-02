@@ -338,6 +338,7 @@ export const genTentativeShelleyTx = (
         neededHashes: new Set(),
         wits: new Set(),
       },
+      [],
     ),
     inputAmount,
     fee,
@@ -349,8 +350,8 @@ export const genWithdrawalTx = (
   unregister: boolean,
 ): HaskellShelleyTxSignRequest => {
   const inputAmount = '2000000';
-  const ouputAmount = '1500000';
-  const fee = new BigNumber(inputAmount).minus(new BigNumber(ouputAmount));
+  const outputAmount = '1500000';
+  const fee = new BigNumber(inputAmount).minus(new BigNumber(outputAmount));
 
   const networkInfo = publicDeriver.getParent().getNetworkInfo();
   const config = getCardanoHaskellBaseConfig(networkInfo)
@@ -387,7 +388,7 @@ export const genWithdrawalTx = (
     RustModule.WalletV4.Address.from_bytes(
       Buffer.from('01d2d1d233e88e9c8428b68ada19acbdc9ced7e3b4ab6ca5d470376ea4c3892366f174a76af9252f78368f5747d3055ab3568ea3b6bf40b01e', 'hex')
     ),
-    RustModule.WalletV4.BigNum.from_str(ouputAmount)
+    RustModule.WalletV4.BigNum.from_str(outputAmount)
   ));
 
   const rewardAddr = RustModule.WalletV4.RewardAddress.from_address(
@@ -444,5 +445,6 @@ export const genWithdrawalTx = (
       neededHashes: new Set([Buffer.from(rewardAddr.payment_cred().to_bytes()).toString('hex')]),
       wits: new Set(), // TODO: should be present, but probably doesn't matter for UI tests
     },
+    [],
   );
 };
