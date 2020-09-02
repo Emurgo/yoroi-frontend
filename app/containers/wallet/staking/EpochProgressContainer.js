@@ -10,6 +10,7 @@ import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { CurrentTimeRequests, TimeCalcRequests } from '../../../stores/base/BaseCardanoTimeStore';
 import { ApiOptions, getApiForNetwork } from '../../../api/common/utils';
+import { isJormungandr } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 
 export type GeneratedData = typeof EpochProgressContainer.prototype.generated;
 
@@ -76,6 +77,7 @@ export default class EpochProgressContainer extends Component<Props> {
           s: this._leftPadDate(timeLeftInEpoch.getUTCSeconds()),
         }}
         showTooltip={this.props.showTooltip}
+        useEndOfEpoch={!isJormungandr(this.props.publicDeriver.getParent().getNetworkInfo())}
       />
     );
   }

@@ -91,5 +91,5 @@ Feature: Generate Addresses
     Given There is a Shelley wallet stored named shelley-simple-15
     And I go to the receive screen
     When I click on the reward address tab
-    Then I should see 1 addresses with address "addr1ux2436tfe25727kul3qtnyr7k72rvw6ep7h59ll53suwhzqfv6jjh" at the top
+    Then I should see 1 addresses with address "stake1ux2436tfe25727kul3qtnyr7k72rvw6ep7h59ll53suwhzq05v5j9" at the top
 

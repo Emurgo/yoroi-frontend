@@ -328,30 +328,29 @@ export async function rawGetTransactions(
             ) {
               continue;
             }
-            // TODO: uncomment once this works in the WASM side
-            // const mir = RustModule.WalletV4.MoveInstantaneousRewardsCert.from_bytes(
-            //   Buffer.from(cert.certificate.Payload, 'hex')
-            // ).move_instantaneous_reward();
+            const mir = RustModule.WalletV4.MoveInstantaneousRewardsCert.from_bytes(
+              Buffer.from(cert.certificate.Payload, 'hex')
+            ).move_instantaneous_reward();
 
-            // for (const relatedAddr of cert.relatedAddresses) {
-            //   // recall: length of this list is usually just 1
-            //   for (const addr of addresses.accountingAddresses) {
-            //     if (relatedAddr.AddressId === addr.AddressId) {
-            //       // this address got some rewards inside the cert
-            //       const rewardAddr = RustModule.WalletV4.RewardAddress.from_address(
-            //         RustModule.WalletV4.Address.from_bytes(
-            //           Buffer.from(addr.Hash, 'hex')
-            //         )
-            //       );
-            //       if (rewardAddr == null) continue; // should never happen
-            //       const rewardAmount = mir.get(rewardAddr.payment_cred());
-            //       if (rewardAmount == null) continue; // should never happen
-            //       implicitOutputSum = implicitOutputSum.plus(
-            //         rewardAmount.to_str()
-            //       );
-            //     }
-            //   }
-            // }
+            for (const relatedAddr of cert.relatedAddresses) {
+              // recall: length of this list is usually just 1
+              for (const addr of addresses.accountingAddresses) {
+                if (relatedAddr.AddressId === addr.AddressId) {
+                  // this address got some rewards inside the cert
+                  const rewardAddr = RustModule.WalletV4.RewardAddress.from_address(
+                    RustModule.WalletV4.Address.from_bytes(
+                      Buffer.from(addr.Hash, 'hex')
+                    )
+                  );
+                  if (rewardAddr == null) continue; // should never happen
+                  const rewardAmount = mir.get(rewardAddr.payment_cred());
+                  if (rewardAmount == null) continue; // should never happen
+                  implicitOutputSum = implicitOutputSum.plus(
+                    rewardAmount.to_str()
+                  );
+                }
+              }
+            }
           }
           return implicitOutputSum;
         }

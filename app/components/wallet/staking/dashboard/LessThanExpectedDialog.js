@@ -27,10 +27,6 @@ const messages = defineMessages({
     id: 'wallet.dashboard.lessthan.reason2',
     defaultMessage: '!!!Not enough time has passed since you delegated',
   },
-  reason3: {
-    id: 'wallet.dashboard.lessthan.reason3',
-    defaultMessage: '!!!The amount earned was rounded down to 0 (if you delegated a very small amount)',
-  },
   reason4: {
     id: 'wallet.dashboard.lessthan.reason4',
     defaultMessage: '!!!A stake pool you are delegating to charges a flat fee greater than the pool\'s total reward',
@@ -69,7 +65,6 @@ export default class LessThanExpectedDialog extends Component<Props> {
         <ul>
           <li key="1">{intl.formatMessage(messages.reason1)}</li>
           <li key="2">{intl.formatMessage(messages.reason2)}</li>
-          <li key="3">{intl.formatMessage(messages.reason3)}</li>
           <li key="4">{intl.formatMessage(messages.reason4)}</li>
           <li key="5">{intl.formatMessage(messages.reason5)}</li>
         </ul>

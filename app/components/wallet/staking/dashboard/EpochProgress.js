@@ -22,7 +22,7 @@ const messages = defineMessages({
   },
   tooltip: {
     id: 'wallet.dashboard.epochTooltip',
-    defaultMessage: '!!!Note: only the first reward after delegating will take 2 epochs. Afterwards, rewards come every epoch.'
+    defaultMessage: '!!!Note: only the first reward after delegating will take {numEpochs} epochs. Afterwards, rewards come every epoch.'
   },
   endTitle: {
     id: 'wallet.dashboard.epochEndTitle',
@@ -32,17 +32,18 @@ const messages = defineMessages({
 
 
 type Props = {|
-  loading: true,
+  +loading: true,
 |} | {|
-  percentage: number,
-  currentEpoch: number,
-  endTime: {|
+  +percentage: number,
+  +currentEpoch: number,
+  +endTime: {|
     d?: string,
     h: string,
     m: string,
     s: string,
   |},
-  showTooltip: boolean,
+  +useEndOfEpoch: boolean, // Haskell uses end-of-epoch but Jormungandr doesn't
+  +showTooltip: boolean,
 |};
 
 @observer
@@ -88,7 +89,13 @@ export default class EpochProgress extends Component<Props> {
               <div className={styles.timer}><Timer time={endTime} /></div>
               {this.props.showTooltip === true && (
                 <div className={styles.tooltip}>
-                  <FirstRewardTooltip text={intl.formatMessage(messages.tooltip)} />
+                  <FirstRewardTooltip
+                    text={intl.formatMessage(messages.tooltip, {
+                      numEpochs: this.props.useEndOfEpoch === true
+                        ? 3
+                        : 2
+                    })}
+                  />
                 </div>
               )}
             </div>
