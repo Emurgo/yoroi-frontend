@@ -31,6 +31,15 @@ type OwnWithdrawal = {|
   keyHash: RustModule.WalletV4.Ed25519KeyHash,
   ...Addressing,
 |};
+
+/**
+ * Note: you don't actually need a key for stake registration certificates
+ * But Ledger & Trezor require it anyway
+ */
+type OwnCertificate = {|
+  keyHash: RustModule.WalletV4.Ed25519KeyHash,
+  ...Addressing,
+|};
 export class HaskellShelleyTxSignRequest
 implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
 
@@ -43,6 +52,7 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
     wits: Set<string>, // Vkeywitness
   |};
   ownWithdrawals: Array<OwnWithdrawal>;
+  ownCertificates: Array<OwnCertificate>;
 
   constructor(
     signRequest: BaseSignRequest<RustModule.WalletV4.TransactionBuilder>,
@@ -53,12 +63,14 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
       wits: Set<string>, // Vkeywitness
     |},
     ownWithdrawals: Array<OwnWithdrawal>,
+    ownCertificates: Array<OwnCertificate>,
   ) {
     this.signRequest = signRequest;
     this.metadata = metadata;
     this.networkSettingSnapshot = networkSettingSnapshot;
     this.neededStakingKeyHashes = neededStakingKeyHashes;
     this.ownWithdrawals = ownWithdrawals;
+    this.ownCertificates = ownCertificates;
   }
 
   txId(): string {

@@ -294,6 +294,7 @@ export const genTentativeByronTx = (
         wits: new Set(),
       },
       [],
+      [],
     ),
     inputAmount,
     fee,

@@ -28,7 +28,6 @@ import {
   ChainDerivations,
 } from '../../../../config/numbersConfig';
 import { derivePublicByAddressing } from '../../lib/cardanoCrypto/utils';
-import { range } from 'lodash';
 
 // ==================== LEDGER ==================== //
 /** Generate a payload for Ledger SignTx */
@@ -72,13 +71,7 @@ export async function createLedgerSignTxPayload(request: {|
   if (certificates != null && certificates.len() > 0) {
     ledgerCertificates.push(...formatLedgerCertificates(
       certificates,
-      range(0, certificates.len()).map(_i => [
-        2147485500,
-        2147485463,
-        0 + 2147483648,
-        2,
-        0
-      ]),
+      request.signRequest.ownCertificates,
     ));
   }
 
@@ -193,23 +186,53 @@ function formatLedgerWithdrawals(
 }
 function formatLedgerCertificates(
   certificates: RustModule.WalletV4.Certificates,
-  path: Array<Array<number>>,
+  ownCertificates: Array<{|
+    keyHash: RustModule.WalletV4.Ed25519KeyHash,
+    ...Addressing,
+  |}>
 ): Array<Certificate> {
+  if (ownCertificates.length < certificates.len()) {
+    throw new Error(`${nameof(formatLedgerWithdrawals)} Ledger can only create certificates from own wallet`);
+  }
+  const ownCertificatesMap = new Map<string, Addressing>(
+    ownCertificates.map(entry => [
+      Buffer.from(entry.keyHash.to_bytes()).toString('hex'),
+      { addressing: entry.addressing }
+    ])
+  );
+
+  const getPath = (
+    wasmKeyHash: RustModule.WalletV4.Ed25519KeyHash | void
+  ): Array<number> => {
+    if (wasmKeyHash == null) {
+      throw new Error(`${nameof(getPath)} unexpected script hash certificate`);
+    }
+    const keyHash = Buffer.from(wasmKeyHash.to_bytes()).toString('hex');
+    const addressing = ownCertificatesMap.get(keyHash);
+    if (addressing == null) {
+      throw new Error(`${nameof(getPath)} no addressing information for ${keyHash}`);
+    }
+    return addressing.addressing.path;
+  };
+
   const result = [];
   for (let i = 0; i < certificates.len(); i++) {
     const cert = certificates.get(i);
-    if (cert.as_stake_registration() != null) {
+
+    const registrationCert = cert.as_stake_registration();
+    if (registrationCert != null) {
       result.push({
         type: CertTypes.staking_key_registration,
-        path: path[i],
+        path: getPath(registrationCert.stake_credential().to_keyhash()),
         poolKeyHashHex: undefined,
       });
       continue;
     }
-    if (cert.as_stake_deregistration() != null) {
+    const deregistrationCert = cert.as_stake_deregistration();
+    if (deregistrationCert != null) {
       result.push({
         type: CertTypes.staking_key_deregistration,
-        path: path[i],
+        path: getPath(deregistrationCert.stake_credential().to_keyhash()),
         poolKeyHashHex: undefined,
       });
       continue;
@@ -218,7 +241,7 @@ function formatLedgerCertificates(
     if (delegationCert != null) {
       result.push({
         type: CertTypes.delegation,
-        path: path[i],
+        path: getPath(delegationCert.stake_credential().to_keyhash()),
         poolKeyHashHex: Buffer.from(delegationCert.pool_keyhash().to_bytes()).toString('hex'),
       });
       continue;

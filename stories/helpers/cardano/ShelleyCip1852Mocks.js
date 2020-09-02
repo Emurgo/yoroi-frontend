@@ -47,7 +47,6 @@ import type { HwWalletMetaRow, } from '../../../app/api/ada/lib/storage/database
 import type { ISignRequest } from '../../../app/api/common/lib/transactions/ISignRequest';
 import { RustModule } from '../../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import { HaskellShelleyTxSignRequest } from '../../../app/api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
-import { derivePublicByAddressing } from '../../../app/api/ada/lib/cardanoCrypto/utils';
 import { verifyFromBip44Root } from '../../../app/api/ada/transactions/utils';
 
 function genMockShelleyCip1852Cache(dummyWallet: PublicDeriver<>) {
@@ -342,6 +341,7 @@ export const genTentativeShelleyTx = (
         wits: new Set(),
       },
       [],
+      [],
     ),
     inputAmount,
     fee,
@@ -469,6 +469,7 @@ export const genWithdrawalTx = async (
       neededHashes: new Set([Buffer.from(rewardAddr.payment_cred().to_bytes()).toString('hex')]),
       wits: new Set(), // TODO: should be present, but probably doesn't matter for UI tests
     },
+    [stakingKeyInfo],
     [stakingKeyInfo],
   );
 };

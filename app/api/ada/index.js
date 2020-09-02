@@ -1010,6 +1010,7 @@ export default class AdaApi {
           wits: new Set(),
         },
         [],
+        [],
       );
     } catch (error) {
       Logger.error(
@@ -1161,6 +1162,10 @@ export default class AdaApi {
           wits: new Set(),
         },
         [],
+        stakeDelegationCert.map(_entry => ({
+          keyHash: stakingKey.hash(),
+          addressing: stakingKeyDbRow.addressing,
+        }))
       );
       return {
         signTxRequest,
@@ -1204,6 +1209,7 @@ export default class AdaApi {
       const certificates = [];
 
       const ourWithdrawals = [];
+      const ourCertificates = [];
       const requiredWits: Array<RustModule.WalletV4.Ed25519KeyHash> = [];
       for (const withdrawal of request.withdrawals) {
         const wasmAddr = RustModule.WalletV4.RewardAddress.from_address(
@@ -1228,6 +1234,12 @@ export default class AdaApi {
           certificates.push(RustModule.WalletV4.Certificate.new_stake_deregistration(
             RustModule.WalletV4.StakeDeregistration.new(paymentCred)
           ));
+          if (withdrawal.addressing) {
+            ourCertificates.push({
+              keyHash,
+              addressing: withdrawal.addressing,
+            });
+          }
         }
       }
       const accountStates = await request.getAccountState({
@@ -1316,6 +1328,7 @@ export default class AdaApi {
         },
         neededKeys,
         ourWithdrawals,
+        ourCertificates,
       );
     } catch (error) {
       Logger.error(

@@ -281,6 +281,19 @@ test('Create Ledger transaction', async () => {
     .reduce((acc, next) => Object.assign(acc, next), {});
   const { ByronNetworkId, ChainNetworkId } = baseConfig;
 
+  const stakingKeyInfo = {
+    keyHash: stakingKey.to_public().to_raw_key().hash(),
+    addressing: {
+      startLevel: 1,
+      path: [
+        WalletTypePurpose.CIP1852,
+        CoinTypes.CARDANO,
+        HARD_DERIVATION_START,
+        2,
+        0,
+      ],
+    },
+  };
   const signRequest = new HaskellShelleyTxSignRequest(
     {
       unsignedTx: txBuilder,
@@ -299,24 +312,13 @@ test('Create Ledger transaction', async () => {
       wits: new Set() // not needed for this test, but something should be here
     },
     [],
+    [stakingKeyInfo],
   );
   const response = await createLedgerSignTxPayload({
     signRequest,
     byronNetworkMagic: ByronNetworkId,
     networkId: Number.parseInt(ChainNetworkId, 10),
-    stakingKey: {
-      keyHash: stakingKey.to_public().to_raw_key().hash(),
-      addressing: {
-        startLevel: 1,
-        path: [
-          WalletTypePurpose.CIP1852,
-          CoinTypes.CARDANO,
-          HARD_DERIVATION_START,
-          2,
-          0,
-        ],
-      },
-    },
+    stakingKey: stakingKeyInfo,
   });
 
   expect(response).toStrictEqual({
