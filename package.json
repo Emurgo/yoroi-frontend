@@ -123,7 +123,7 @@
     "html-webpack-harddisk-plugin": "1.0.2",
     "html-webpack-plugin": "4.4.1",
     "husky": "4.2.5",
-    "jest": "26.2.2",
+    "jest": "26.4.2",
     "jest-canvas-mock": "2.2.0",
     "json-server": "0.16.1",
     "json-stable-stringify": "1.0.1",
