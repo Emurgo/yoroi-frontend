@@ -154,7 +154,7 @@
     "@emurgo/cardano-serialization-lib-browser": "3.0.0",
     "@emurgo/cip4-js": "1.0.5",
     "@emurgo/js-chain-libs": "0.7.1",
-    "@emurgo/ledger-connect-handler": "3.0.0",
+    "@emurgo/ledger-connect-handler": "3.0.1",
     "@svgr/webpack": "5.4.0",
     "axios": "0.20.0",
     "bech32": "1.1.4",
@@ -198,7 +198,7 @@
     "route-parser": "0.0.5",
     "semver": "7.3.2",
     "tinycolor2": "1.4.1",
-    "trezor-connect": "8.1.10",
+    "trezor-connect": "8.1.13",
     "ua-parser-js": "0.7.21",
     "unorm": "1.6.0",
     "validator": "13.1.1"

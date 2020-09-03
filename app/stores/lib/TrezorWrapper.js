@@ -2,8 +2,10 @@
 
 import Config from '../../config';
 import environment from '../../environment';
-import TrezorConnect from 'trezor-connect';
+import TrezorConnect, { UI_EVENT, DEVICE_EVENT } from 'trezor-connect';
 import type { Manifest } from 'trezor-connect';
+import type { DeviceEvent } from 'trezor-connect/lib/types/trezor/device';
+import type { UiEvent } from 'trezor-connect/lib/types/events';
 
 /* eslint-disable no-restricted-properties */
 
@@ -39,13 +41,27 @@ export function getTrezorManifest(): Manifest {
 }
 
 export async function wrapWithFrame<T>(
-  func: (typeof TrezorConnect) => Promise<T>
+  func: (typeof TrezorConnect) => Promise<T>,
+  onDeviceEvent?: DeviceEvent => void,
+  onUiEvent?: UiEvent => void,
 ): Promise<T> {
   const trezorManifest = getTrezorManifest();
   await TrezorConnect.init({
     manifest: trezorManifest,
   });
+  if (onDeviceEvent) {
+    TrezorConnect.on(DEVICE_EVENT, onDeviceEvent);
+  }
+  if (onUiEvent) {
+    TrezorConnect.on(UI_EVENT, onUiEvent);
+  }
   const result = await func(TrezorConnect);
+  if (onDeviceEvent) {
+    TrezorConnect.off(DEVICE_EVENT, onDeviceEvent);
+  }
+  if (onUiEvent) {
+    TrezorConnect.off(UI_EVENT, onUiEvent);
+  }
   await TrezorConnect.dispose();
   return result;
 }
