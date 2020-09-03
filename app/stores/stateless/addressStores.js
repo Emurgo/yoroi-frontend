@@ -23,6 +23,7 @@ import {
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import { Bip44Wallet } from '../../api/ada/lib/storage/models/Bip44Wallet/wrapper';
 import { Cip1852Wallet } from '../../api/ada/lib/storage/models/Cip1852Wallet/wrapper';
+import { getAddressPayload } from '../../api/ada/lib/storage/bridge/utils';
 import type { AddressFilterKind, StandardAddress, AddressTypeName } from '../../types/AddressFilterTypes';
 import {
   AddressFilter,
@@ -40,6 +41,9 @@ import { ROUTES } from '../../routes-config';
 import { buildRoute } from '../../utils/routing';
 import { CardanoForks } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import type { $npm$ReactIntl$IntlFormat, } from 'react-intl';
+import type {
+  Addressing,
+} from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 
 export type SubgroupCtorData = {|
   stores: StoresMap,
@@ -349,36 +353,34 @@ export const routeForStore = (name: AddressTypeName): string => buildRoute(
 
 /**
  * Creates a function that returns information about whether or not
- * a given address belongs to the wallet
+ * a given address belongs to the wallet and which store it belongs to
  */
-export function genAddressLookup(
+export function genAddressStoreLookup(
   publicDeriver: PublicDeriver<>,
-  intl: $npm$ReactIntl$IntlFormat,
-  goToRoute: void | (string => void),
   addressSubgroupMap: $ReadOnlyMap<Class<IAddressTypeStore>, IAddressTypeUiSubset>,
-): (string => (
+): (string /* payload - not presentational */ => (
   void |
   {|
-    goToRoute: void | (void => void),
-    name: string,
+    store: AddressSubgroupMeta<IAddressTypeStore>,
+    address: $ReadOnly<StandardAddress>,
   |}
 )) {
   return (address) => {
+    const networkInfo = publicDeriver.getParent().getNetworkInfo();
     for (const addressStore of allAddressSubgroups) {
       if (!addressStore.isRelated({ selected: publicDeriver })) {
         continue;
       }
       const request = addressSubgroupMap.get(addressStore.class);
       if (request == null) throw new Error('Should never happen');
-      if (request.all.some(addressInStore => addressInStore.address === address)) {
-        const name = addressStore.name.subgroup === AddressSubgroup.all
-          ? intl.formatMessage(addressGroupName[addressStore.name.group])
-          : `${intl.formatMessage(addressGroupName[addressStore.name.group])} - ${intl.formatMessage(addressSubgroupName[addressStore.name.subgroup])}`;
+
+      const addressInfo = request.all.find(
+        addressInStore => getAddressPayload(addressInStore.address, networkInfo) === address
+      );
+      if (addressInfo != null) {
         return {
-          goToRoute: goToRoute == null
-            ? goToRoute
-            : () => goToRoute(routeForStore(addressStore.name)),
-          name,
+          store: addressStore,
+          address: addressInfo,
         };
       }
     }
@@ -395,5 +397,58 @@ export function genAddressLookup(
     // but it will once the transaction confirms
     // 3) A bug and/or unsupported address kind
     return undefined;
+  };
+}
+
+/**
+ * Creates a function that returns information about whether or not
+ * a given address belongs to the wallet and which store it belongs to
+ */
+export function genAddressingLookup(
+  publicDeriver: PublicDeriver<>,
+  addressSubgroupMap: $ReadOnlyMap<Class<IAddressTypeStore>, IAddressTypeUiSubset>,
+): (
+  string /* payload - not presentational */
+) => (void | $PropertyType<Addressing, 'addressing'>) {
+  const addressStoreLookup = genAddressStoreLookup(publicDeriver, addressSubgroupMap);
+  return (address) => {
+    const lookupResult = addressStoreLookup(address);
+    if (lookupResult == null) return undefined;
+
+    return lookupResult.address.addressing;
+  };
+}
+
+/**
+ * Creates a function that returns information about whether or not
+ * a given address belongs to the wallet with some extra information about the store
+ */
+export function genAddressLookup(
+  publicDeriver: PublicDeriver<>,
+  intl: $npm$ReactIntl$IntlFormat,
+  goToRoute: void | (string => void),
+  addressSubgroupMap: $ReadOnlyMap<Class<IAddressTypeStore>, IAddressTypeUiSubset>,
+): (string /* payload - not presentational */ => (
+  void |
+  {|
+    goToRoute: void | (void => void),
+    name: string,
+    address: $ReadOnly<StandardAddress>,
+  |}
+)) {
+  const addressStoreLookup = genAddressStoreLookup(publicDeriver, addressSubgroupMap);
+  return (address) => {
+    const lookupResult = addressStoreLookup(address);
+    if (lookupResult == null) return undefined;
+    const name = lookupResult.store.name.subgroup === AddressSubgroup.all
+      ? intl.formatMessage(addressGroupName[lookupResult.store.name.group])
+      : `${intl.formatMessage(addressGroupName[lookupResult.store.name.group])} - ${intl.formatMessage(addressSubgroupName[lookupResult.store.name.subgroup])}`;
+    return {
+      goToRoute: goToRoute == null
+        ? goToRoute
+        : () => goToRoute(routeForStore(lookupResult.store.name)),
+      name,
+      address: lookupResult.address,
+    };
   };
 }

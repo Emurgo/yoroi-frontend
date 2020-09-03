@@ -39,12 +39,7 @@ import { getCardanoHaskellBaseConfig } from '../../api/ada/lib/storage/database/
 import { toTrezorAddressParameters } from '../../api/ada/transactions/shelley/trezorTx';
 import { toLedgerAddressParameters } from '../../api/ada/transactions/shelley/ledgerTx';
 import type { StandardAddress } from '../../types/AddressFilterTypes';
-import {
-  asGetAllAccounting,
-} from '../../api/ada/lib/storage/models/PublicDeriver/traits';
-import { derivePublicByAddressing } from '../../api/ada/lib/cardanoCrypto/utils';
-import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
-import { verifyFromBip44Root } from '../../api/ada/transactions/utils';
+import { genAddressingLookup } from '../stateless/addressStores';
 
 export default class HWVerifyAddressStore extends Store {
   @observable isActionProcessing: boolean = false;
@@ -135,33 +130,17 @@ export default class HWVerifyAddressStore extends Store {
 
       Logger.info(`${nameof(HWVerifyAddressStore)}::${nameof(this.ledgerVerifyAddress)} show path ` + JSON.stringify(path));
 
-      const stakingKeyInfo = await (async () => {
-        const withStakingKey = asGetAllAccounting(publicDeriver);
-        if (withStakingKey == null) {
-          return undefined;
-        }
-        const stakingKeyDbRow = await withStakingKey.getStakingKey();
-        const wasmAddr = RustModule.WalletV4.Address.from_bytes(Buffer.from(stakingKeyDbRow.addr.Hash, 'hex'));
-        const keyHash = RustModule.WalletV4.RewardAddress.from_address(wasmAddr)
-          ?.payment_cred()
-          .to_keyhash();
-        if (keyHash == null) {
-          throw new Error(`${nameof(HWVerifyAddressStore)}::${nameof(this.ledgerVerifyAddress)} staking key not a staking address`);
-        }
-
-        verifyFromBip44Root(stakingKeyDbRow.addressing);
-        return {
-          keyHash,
-          addressing: stakingKeyDbRow.addressing,
-        };
-      })();
+      const config = getCardanoHaskellBaseConfig(
+        publicDeriver.getParent().getNetworkInfo()
+      ).reduce((acc, next) => Object.assign(acc, next), {});
 
       const wasmAddr = normalizeToAddress(address);
       if (wasmAddr == null) throw new Error(`${nameof(HWVerifyAddressStore)}::${nameof(this.ledgerVerifyAddress)} invalid address ${address}`);
       const addressParams = toLedgerAddressParameters({
         address: wasmAddr,
         path,
-        stakingKey: stakingKeyInfo,
+        networkId: Number.parseInt(config.ChainNetworkId, 10),
+        addressingMap: genAddressingLookup(publicDeriver, this.stores.addresses.addressSubgroupMap),
       });
       if (this.ledgerConnect) {
         await this.ledgerConnect.showAddress({

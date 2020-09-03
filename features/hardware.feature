@@ -68,6 +68,7 @@ Feature: Hardware device
     When I select a Shelley-era Ledger device
     And I restore the Ledger device
     Given The expected transaction is "g6QAgYJYIBZt/eWxg7fglIOvu/zntB59b+00tAXMEEG0XyfosF1HAAGBglg5AXU/qJHPfuF4AaA3RBmWAEAnGtmf6+kXwe182LUPZi1s6xtlczppoe1y+G8LrFoWUFoCiJevG+NFGgAWc1wCGgACjQUDGhH+lM2hAoGEWCDx6UFmXgFAaVr5OWLg5eyxk744q7Rri4T3RlSU+o6MClhAzzQjzgs5Iikq3JI2azPV+yjzOXFMB8dUrvEaCaC5kfI7bmDtmsvSsEnzmkdU1dvvJzhBVEiV5rgknF3erup6CFgg01PmywZvwdTIA5P2TmF2Ukb40rM9KdYwTzthpuJ1ieNBoPY="
+    Then I see the transfer transaction
     And I accept the prompt
     Then I should see the summary screen
     And I should see that the number of transactions is 2
