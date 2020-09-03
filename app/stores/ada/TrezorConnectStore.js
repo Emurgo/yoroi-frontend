@@ -3,7 +3,7 @@
 
 import { observable, action, runInAction } from 'mobx';
 
-import TrezorConnect, { UI_EVENT, DEVICE_EVENT } from 'trezor-connect';
+import TrezorConnect from 'trezor-connect';
 import type { DeviceEvent } from 'trezor-connect/lib/types/trezor/device';
 import type { UiEvent } from 'trezor-connect/lib/types/events';
 import type { CardanoPublicKey } from 'trezor-connect/lib/types/networks/cardano';
@@ -132,8 +132,6 @@ export default class TrezorConnectStore
       this.createHWRequest.reset();
     }
 
-    this._removeTrezorConnectEventListeners();
-
     this._reset();
     super.teardown();
   }
@@ -158,8 +156,6 @@ export default class TrezorConnectStore
   @action _submitCheck: void => void = () => {
     this.error = undefined;
     this.trezorEventDevice = undefined;
-    this._removeTrezorConnectEventListeners();
-    this._addTrezorConnectEventListeners();
     this.progressInfo.currentStep = ProgressStep.CONNECT;
     this.progressInfo.stepState = StepState.LOAD;
   };
@@ -190,10 +186,14 @@ export default class TrezorConnectStore
     try {
       this.hwDeviceInfo = undefined;
 
-      const trezorResp = await wrapWithFrame(trezor => trezor.cardanoGetPublicKey({
-        path: this.getPath(),
-        showOnTrezor: false
-      }));
+      const trezorResp = await wrapWithFrame(
+        trezor => trezor.cardanoGetPublicKey({
+          path: this.getPath(),
+          showOnTrezor: false
+        }),
+        this._onTrezorDeviceEvent,
+        this._onTrezorUIEvent,
+      );
 
       if (this.trezorEventDevice == null) {
         throw new Error(`${nameof(this._checkAndStoreHWDeviceInfo)} no ${nameof(this.trezorEventDevice)}`);
@@ -209,7 +209,6 @@ export default class TrezorConnectStore
 
       /** TODO: [TREZOR] handle when user forcefully close Connect to Trezor Hardware Wallet
         * while connection in is progress */
-      this._removeTrezorConnectEventListeners();
       Logger.info('Trezor device OK');
     } catch (error) {
       this._handleConnectError(error);
@@ -293,22 +292,6 @@ export default class TrezorConnectStore
     }
 
     this._goToConnectError();
-  };
-
-  _addTrezorConnectEventListeners: void => void = () => {
-    if (TrezorConnect) {
-      wrapWithoutFrame(trezor => trezor.on(DEVICE_EVENT, this._onTrezorDeviceEvent));
-      wrapWithoutFrame(trezor => trezor.on(UI_EVENT, this._onTrezorUIEvent));
-    } else {
-      Logger.error(`${nameof(TrezorConnectStore)}::${nameof(this._addTrezorConnectEventListeners)}:: TrezorConnect not installed`);
-    }
-  };
-
-  _removeTrezorConnectEventListeners: void => void = () => {
-    if (TrezorConnect) {
-      wrapWithoutFrame(trezor => trezor.off(DEVICE_EVENT, this._onTrezorDeviceEvent));
-      wrapWithoutFrame(trezor => trezor.off(UI_EVENT, this._onTrezorUIEvent));
-    }
   };
 
   _onTrezorDeviceEvent: DeviceEvent => void = (event) => {
