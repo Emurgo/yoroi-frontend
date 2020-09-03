@@ -23,6 +23,7 @@ import {
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import { Bip44Wallet } from '../../api/ada/lib/storage/models/Bip44Wallet/wrapper';
 import { Cip1852Wallet } from '../../api/ada/lib/storage/models/Cip1852Wallet/wrapper';
+import { getAddressPayload } from '../../api/ada/lib/storage/bridge/utils';
 import type { AddressFilterKind, StandardAddress, AddressTypeName } from '../../types/AddressFilterTypes';
 import {
   AddressFilter,
@@ -356,21 +357,27 @@ export function genAddressLookup(
   intl: $npm$ReactIntl$IntlFormat,
   goToRoute: void | (string => void),
   addressSubgroupMap: $ReadOnlyMap<Class<IAddressTypeStore>, IAddressTypeUiSubset>,
-): (string => (
+): (string /* payload - not presentational */ => (
   void |
   {|
     goToRoute: void | (void => void),
     name: string,
+    address: $ReadOnly<StandardAddress>,
   |}
 )) {
   return (address) => {
+    const networkInfo = publicDeriver.getParent().getNetworkInfo();
     for (const addressStore of allAddressSubgroups) {
       if (!addressStore.isRelated({ selected: publicDeriver })) {
         continue;
       }
       const request = addressSubgroupMap.get(addressStore.class);
       if (request == null) throw new Error('Should never happen');
-      if (request.all.some(addressInStore => addressInStore.address === address)) {
+
+      const addressInfo = request.all.find(
+        addressInStore => getAddressPayload(addressInStore.address, networkInfo) === address
+      );
+      if (addressInfo != null) {
         const name = addressStore.name.subgroup === AddressSubgroup.all
           ? intl.formatMessage(addressGroupName[addressStore.name.group])
           : `${intl.formatMessage(addressGroupName[addressStore.name.group])} - ${intl.formatMessage(addressSubgroupName[addressStore.name.subgroup])}`;
@@ -379,6 +386,7 @@ export function genAddressLookup(
             ? goToRoute
             : () => goToRoute(routeForStore(addressStore.name)),
           name,
+          address: addressInfo,
         };
       }
     }

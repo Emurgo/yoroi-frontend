@@ -331,19 +331,24 @@ export function getAddressPayload(
   address: string,
   network: $ReadOnly<NetworkRow>,
 ): string {
-  // Need to try parsing as a legacy address first
-  // Since parsing as bech32 directly may give a wrong result if the address contains a 1
-  if (RustModule.WalletV4.ByronAddress.is_valid(address)) {
-    return address;
-  }
   try {
     if (isJormungandr(network)) {
+      // Need to try parsing as a legacy address first
+      // Since parsing as bech32 directly may give a wrong result if the address contains a 1
+      if (RustModule.WalletV4.ByronAddress.is_valid(address)) {
+        return address;
+      }
       return Buffer.from(
         // bech32
         RustModule.WalletV3.Address.from_string(address).as_bytes()
       ).toString('hex');
     }
     if (isCardanoHaskell(network)) {
+      // Need to try parsing as a legacy address first
+      // Since parsing as bech32 directly may give a wrong result if the address contains a 1
+      if (RustModule.WalletV4.ByronAddress.is_valid(address)) {
+        return address;
+      }
       const wasmAddr = RustModule.WalletV4.Address.from_bech32(address);
       const byronAddr = RustModule.WalletV4.ByronAddress.from_address(wasmAddr);
       if (byronAddr == null) {

@@ -642,9 +642,7 @@ export default class Transaction extends Component<Props, State> {
 
   generateAddressButton: string => ?Node = (address) => {
     const { intl } = this.context;
-    const addressInfo = this.props.addressLookup(
-      this.props.addressToDisplayString(address)
-    );
+    const addressInfo = this.props.addressLookup(address);
     if (addressInfo == null) {
       return (
         <div className={classnames([styles.status, styles.typeAddress])}>
