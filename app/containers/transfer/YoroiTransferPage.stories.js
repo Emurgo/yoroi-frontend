@@ -456,10 +456,10 @@ export const TransferTxPage = (): Node => {
   })();
 };
 
-export const WithdrawalTxPage = async (): Promise<Node> => {
+export const WithdrawalTxPage = (): Node => {
   const wallet = genShelleyCip1852DummyWithCache();
   const lookup = walletLookup([wallet]);
-  return await (async () => {
+  return (() => {
     const errorCases = {
       NoError: 0,
       WalletChangedError: 1,
@@ -479,7 +479,7 @@ export const WithdrawalTxPage = async (): Promise<Node> => {
               delegationTransaction: {
                 createWithdrawalTx: {
                   error: undefined,
-                  result: await genWithdrawalTx(
+                  result: genWithdrawalTx(
                     wallet.publicDeriver,
                     boolean('deregister', true)
                   ),

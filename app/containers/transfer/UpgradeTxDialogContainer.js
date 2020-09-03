@@ -19,7 +19,7 @@ import type {
   TransferTx,
 } from '../../types/TransferTypes';
 import { getApiForNetwork, getApiMeta } from '../../api/common/utils';
-import { genAddressLookup } from '../../stores/stateless/addressStores';
+import { genAddressLookup, genAddressingLookup, allAddressSubgroups } from '../../stores/stateless/addressStores';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import TransferSummaryPage from '../../components/transfer/TransferSummaryPage';
 import Dialog from '../../components/widgets/Dialog';
@@ -62,6 +62,7 @@ export default class UpgradeTxDialogContainer extends Component<Props> {
       ...Addressing,
     |},
     network: $ReadOnly<NetworkRow>,
+    addressingMap: string => (void | $PropertyType<Addressing, 'addressing'>),
   |} => Promise<void> = async (request) => {
     await this.generated.actions.ada.ledgerSend.sendUsingLedgerKey.trigger({
       ...request,
@@ -72,6 +73,22 @@ export default class UpgradeTxDialogContainer extends Component<Props> {
   render(): Node {
     const { transferRequest } = this.generated.stores.substores.ada.yoroiTransfer;
 
+    const selected = this.generated.stores.wallets.selected;
+    if (selected == null) {
+      throw new Error(`${nameof(UpgradeTxDialogContainer)} no wallet selected`);
+    }
+
+    // only display the upgrade dialog once we've populated the address info for the wallet
+    for (const addressStore of allAddressSubgroups) {
+      if (!addressStore.isRelated({ selected })) {
+        continue;
+      }
+      const store = this.generated.stores.addresses.addressSubgroupMap.get(addressStore.class);
+      if (store == null) continue;
+      if (!store.wasExecuted) {
+        return this.getSpinner();
+      }
+    }
     if (transferRequest.result == null) {
       return this.getSpinner();
     }
@@ -124,13 +141,13 @@ export default class UpgradeTxDialogContainer extends Component<Props> {
 
     const selected = this.generated.stores.wallets.selected;
     if (selected == null) {
-      throw new Error(`${nameof(TransferSendPage)} no wallet selected`);
+      throw new Error(`${nameof(UpgradeTxDialogContainer)} no wallet selected`);
     }
     const network = selected.getParent().getNetworkInfo();
 
     const api = getApiForNetwork(network);
     const apiMeta = getApiMeta(api);
-    if (apiMeta == null) throw new Error(`${nameof(TransferSendPage)} no API selected`);
+    if (apiMeta == null) throw new Error(`${nameof(UpgradeTxDialogContainer)} no API selected`);
 
     const coinPrice: ?number = this.generated.stores.profile.unitOfAccount.enabled
       ? (
@@ -162,7 +179,14 @@ export default class UpgradeTxDialogContainer extends Component<Props> {
         }
         transferTx={transferTx}
         onSubmit={{
-          trigger: async () => await this.submit({ network, ...tentativeTx }),
+          trigger: async () => await this.submit({
+            network,
+            addressingMap: genAddressingLookup(
+              selected,
+              this.generated.stores.addresses.addressSubgroupMap
+            ),
+            ...tentativeTx
+          }),
           label: intl.formatMessage(globalMessages.upgradeLabel),
         }}
         isSubmitting={this.generated.stores.wallets.sendMoneyRequest.isExecuting}
@@ -198,6 +222,7 @@ export default class UpgradeTxDialogContainer extends Component<Props> {
                 key: RustModule.WalletV4.Bip32PublicKey,
                 ...Addressing,
               |},
+              addressingMap: string => (void | $PropertyType<Addressing, 'addressing'>),
               network: $ReadOnly<NetworkRow>,
             |} => Promise<void>,
           |},

@@ -247,8 +247,6 @@ test('Create Trezor transaction', async () => {
         neededHashes: new Set([Buffer.from(stakeCredential.to_bytes()).toString('hex')]),
         wits: new Set() // not needed for this test, but something should be here
       },
-      [],
-      [stakingKeyInfo],
     ),
     ByronNetworkId,
     Number.parseInt(ChainNetworkId, 10),

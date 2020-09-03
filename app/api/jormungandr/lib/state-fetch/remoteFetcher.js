@@ -68,6 +68,7 @@ export class RemoteFetcher implements IFetcher {
     axios(
       `${backendUrl}/api/txs/utxoForAddresses`,
       {
+        timeout: CONFIG.app.walletRefreshInterval,
         method: 'post',
         data: {
           addresses: body.addresses
@@ -89,6 +90,7 @@ export class RemoteFetcher implements IFetcher {
       `${backendUrl}/api/txs/utxoSumForAddresses`,
       {
         method: 'post',
+        timeout: CONFIG.app.walletRefreshInterval,
         data: {
           addresses: body.addresses
         },
@@ -109,6 +111,7 @@ export class RemoteFetcher implements IFetcher {
       `${backendUrl}/api/v2/txs/history`,
       {
         method: 'post',
+        timeout: CONFIG.app.walletRefreshInterval,
         data: body,
         headers: {
           'yoroi-version': this.getLastLaunchVersion(),
@@ -160,6 +163,7 @@ export class RemoteFetcher implements IFetcher {
       `${backendUrl}/api/v2/account/rewards`,
       {
         method: 'post',
+        timeout: CONFIG.app.walletRefreshInterval,
         data: body,
         headers: {
           'yoroi-version': this.getLastLaunchVersion(),
@@ -178,6 +182,7 @@ export class RemoteFetcher implements IFetcher {
       `${backendUrl}/api/v2/bestblock`,
       {
         method: 'get',
+        timeout: CONFIG.app.walletRefreshInterval,
         headers: {
           'yoroi-version': this.getLastLaunchVersion(),
           'yoroi-locale': this.getCurrentLocale()
@@ -196,6 +201,7 @@ export class RemoteFetcher implements IFetcher {
       `${backendUrl}/api/txs/signed`,
       {
         method: 'post',
+        timeout: CONFIG.app.walletRefreshInterval,
         data: ({
           signedTx: signedTx64
         }: SignedRequestInternal),
@@ -221,6 +227,7 @@ export class RemoteFetcher implements IFetcher {
       `${backendUrl}/api/v2/addresses/filterUsed`,
       {
         method: 'post',
+        timeout: CONFIG.app.walletRefreshInterval,
         data: {
           addresses: body.addresses
         },
@@ -241,6 +248,7 @@ export class RemoteFetcher implements IFetcher {
       `${backendUrl}/api/v2/account/state`,
       {
         method: 'post',
+        timeout: CONFIG.app.walletRefreshInterval,
         data: {
           addresses: body.addresses
         },
@@ -277,6 +285,7 @@ export class RemoteFetcher implements IFetcher {
       `${backendUrl}/api/v2/pool/info`,
       {
         method: 'post',
+        timeout: CONFIG.app.walletRefreshInterval,
         data: {
           ids: body.ids
         },
@@ -297,6 +306,7 @@ export class RemoteFetcher implements IFetcher {
       `${backendUrl}/api/v2/pool/reputation`,
       {
         method: 'get',
+        timeout: CONFIG.app.walletRefreshInterval,
         headers: {
           'yoroi-version': this.getLastLaunchVersion(),
           'yoroi-locale': this.getCurrentLocale()

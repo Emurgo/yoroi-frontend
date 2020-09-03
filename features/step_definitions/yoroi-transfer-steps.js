@@ -39,6 +39,9 @@ Then(/^I select the Shelley 15-word option$/, async function () {
 Then(/^I select the yoroi paper wallet option$/, async function () {
   await this.click('.fromIcarusPaperWallet_restorePaperWallet');
 });
+Then(/^I see the transfer transaction$/, async function () {
+  await this.waitForElement('.TransferSummaryPage_body');
+});
 Then(/^I accept the prompt$/, async function () {
   await this.click('.primary');
 });
