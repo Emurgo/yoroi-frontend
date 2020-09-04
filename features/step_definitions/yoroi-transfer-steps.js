@@ -33,8 +33,21 @@ Then(/^I click on the icarus tab$/, async function () {
 Then(/^I select the Byron 15-word option$/, async function () {
   await this.click('.fromIcarusWallet15Word_restoreNormalWallet');
 });
+
 Then(/^I select the Shelley 15-word option$/, async function () {
   await this.click('.ShelleyOptionDialog_restoreNormalWallet');
+});
+Then(/^I select the Shelley paper wallet option$/, async function () {
+  await this.click('.ShelleyOptionDialog_restorePaperWallet');
+});
+When(/^I enter the key "([^"]*)"$/, async function (password) {
+  await this.input("input[name='key']", password);
+});
+When(/^I enter the decryption password "([^"]*)"$/, async function (password) {
+  await this.input("input[name='decryptionPassword']", password);
+});
+Then(/^I select the private key option$/, async function () {
+  await this.click('.ShelleyOptionDialog_masterKey');
 });
 Then(/^I select the yoroi paper wallet option$/, async function () {
   await this.click('.fromIcarusPaperWallet_restorePaperWallet');
