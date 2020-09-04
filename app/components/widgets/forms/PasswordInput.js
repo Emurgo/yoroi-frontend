@@ -23,15 +23,24 @@ type Props = {|
   +allowEmptyInput: boolean,
   +initValues?: string,
   +disclaimer?: Node,
+  +done?: boolean,
 |};
 
 @observer
 export default class PasswordInput extends Component<Props> {
 
-  static defaultProps: {|initValues: void, disclaimer: void, onChange: void|} = {
+  static defaultProps: {|
+    initValues: void,
+    disclaimer: void,
+    onChange: void,
+    done: void,
+  |} = {
     initValues: undefined,
     disclaimer: undefined,
     onChange: undefined,
+    // note: no "done" by default since we are strict on setting password but loose on validation
+    // also "done" tricks into thinking the password is correct instead of just a length check
+    done: undefined,
   };
 
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
@@ -84,8 +93,6 @@ export default class PasswordInput extends Component<Props> {
 
     const passwordField = form.$(this.props.fieldName);
 
-    // note: no "done" property since we are strict on setting password but loose on validation
-    // also "done" tricks into thinking the password is correct instead of just a length check
     return (
       <div>
         {this.props.disclaimer}
@@ -95,6 +102,7 @@ export default class PasswordInput extends Component<Props> {
           disabled={this.props.disabled}
           error={passwordField.error}
           skin={InputOwnSkin}
+          done={this.props.done}
         />
       </div>
     );

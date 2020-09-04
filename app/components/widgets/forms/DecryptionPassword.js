@@ -46,6 +46,7 @@ export default class DecryptionPassword extends Component<Props> {
       placeholder={this.context.intl.formatMessage(messages.decryptionKey)}
       allowEmptyInput
       initValues={this.props.initValues}
+      done={/* done if no need for a password */ this.props.isDisabled}
     />);
   }
 }

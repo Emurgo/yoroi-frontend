@@ -34,7 +34,12 @@ import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import type { RestoreModeType } from '../../actions/common/wallet-restore-actions';
 import { ApiOptions, getApiMeta, getApiForNetwork, } from '../../api/common/utils';
 import { addressToDisplayString, } from '../../api/ada/lib/storage/bridge/utils';
-import { ChainDerivations } from '../../config/numbersConfig';
+import {
+  HARD_DERIVATION_START,
+  WalletTypePurpose,
+  CoinTypes,
+  ChainDerivations,
+} from '../../config/numbersConfig';
 import WithdrawalTxDialogContainer from './WithdrawalTxDialogContainer';
 import type { GeneratedData as WithdrawalTxDialogContainerData } from './WithdrawalTxDialogContainer';
 import { genAddressLookup } from '../../stores/stateless/addressStores';
@@ -42,6 +47,9 @@ import type { IAddressTypeStore, IAddressTypeUiSubset } from '../../stores/state
 import type {
   Address, Addressing
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
+import {
+  Bip44DerivationLevels,
+} from '../../api/ada/lib/storage/database/walletTypes/bip44/api/utils';
 
 // Stay this long on the success page, then jump to the wallet transactions page
 const SUCCESS_PAGE_STAY_TIME = 5 * 1000;
@@ -84,11 +92,8 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
     if (publicDeriver == null) {
       throw new Error(`${nameof(this.setupTransferFundsWithKey)} no wallet selected`);
     }
-    console.log(payload);
-    // await this.generated.actions.daedalusTransfer.setupTransferFundsWithMasterKey.trigger({
-    //   ...payload,
-    //   publicDeriver
-    // });
+    this.generated.actions.yoroiTransfer.setPrivateKey.trigger(payload.key);
+    await this.checkAddresses();
   };
 
   checkAddresses: void => Promise<void> = async () => {
@@ -184,12 +189,21 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
             classicTheme={profile.isClassicTheme}
           />
         );
-      case TransferStatus.GETTING_MASTER_KEY:
+      case TransferStatus.GETTING_WITHDRAWAL_KEY:
         return (
           <YoroiTransferKeyFormPage
             onSubmit={this.setupTransferFundsWithKey}
             onBack={this.backToUninitialized}
             classicTheme={profile.isClassicTheme}
+            derivationPath={[
+              WalletTypePurpose.CIP1852,
+              CoinTypes.CARDANO,
+              // note: we hard-code account #0 because the ITN only supported account #0
+              // which is the main time people would put in a full key with chaincode
+              HARD_DERIVATION_START + 0,
+              ChainDerivations.CHIMERIC_ACCOUNT,
+              0
+            ]}
           />
         );
       case TransferStatus.GETTING_PAPER_MNEMONICS:
@@ -251,7 +265,11 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
         if (this.generated.stores.yoroiTransfer.mode == null) {
           throw new Error(`${nameof(YoroiTransferPage)} unknown mode`);
         }
-        if (this.generated.stores.yoroiTransfer.mode.chain === ChainDerivations.CHIMERIC_ACCOUNT) {
+        const { mode } = this.generated.stores.yoroiTransfer;
+        if (
+          mode.chain === ChainDerivations.CHIMERIC_ACCOUNT ||
+          mode.derivationLevel === Bip44DerivationLevels.ADDRESS.level
+        ) {
           return (
             <WithdrawalTxDialogContainer
               {...this.generated.WithdrawalTxDialogContainerProps}
@@ -339,6 +357,9 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
             paperPassword: string,
             recoveryPhrase: string
           |}) => void
+        |},
+        setPrivateKey: {|
+          trigger: string => void
         |},
         startHardwareMnemonic: {|
           trigger: (params: void) => void
@@ -452,6 +473,7 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
           backToUninitialized: { trigger: actions.yoroiTransfer.backToUninitialized.trigger },
           cancelTransferFunds: { trigger: actions.yoroiTransfer.cancelTransferFunds.trigger },
           startHardwareMnemonic: { trigger: actions.yoroiTransfer.startHardwareMnemonic.trigger },
+          setPrivateKey: { trigger: actions.yoroiTransfer.setPrivateKey.trigger },
           transferFunds: { trigger: actions.yoroiTransfer.transferFunds.trigger },
           checkAddresses: { trigger: actions.yoroiTransfer.checkAddresses.trigger },
           setupTransferFundsWithPaperMnemonic: {

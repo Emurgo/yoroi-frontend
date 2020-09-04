@@ -28,6 +28,7 @@ type Props = {|
   +onSubmit: {| key: string, |} => PossiblyAsync<void>,
   +onBack: void => void,
   +classicTheme: boolean,
+  +derivationPath: Array<number>,
 |};
 
 // times 2 because it's hex encoding (2 letters per byte)
@@ -107,8 +108,12 @@ export default class YoroiTransferKeyFormPage extends Component<Props> {
       const wasmKey = RustModule.WalletV4.Bip32PrivateKey.from_bytes(
         Buffer.from(key, 'hex')
       );
+      let finalKey = wasmKey;
+      for (const index of this.props.derivationPath) {
+        finalKey = finalKey.derive(index);
+      }
       return Buffer.from(
-        wasmKey.to_raw_key().as_bytes()
+        finalKey.to_raw_key().as_bytes()
       ).toString('hex');
     }
     return key;
@@ -132,7 +137,9 @@ export default class YoroiTransferKeyFormPage extends Component<Props> {
   @action
   clearPassword: string => void = (key) => {
     if (!this.isEncrypted(key) && this.passwordForm != null) {
-      this.passwordForm.value = '';
+      // console.log(this.passwordForm.value);
+      this.passwordForm.clear();
+      // console.log(this.passwordForm.value);
     }
   }
 

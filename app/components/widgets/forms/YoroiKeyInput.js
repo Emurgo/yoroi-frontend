@@ -40,7 +40,7 @@ export default class YoroiKeyInput extends Component<Props> {
             return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
           }
           if (!isHexadecimal(value)) {
-            return [false, this.context.intl.formatMessage(globalMessages.invalidMasterKey)];
+            return [false, this.context.intl.formatMessage(globalMessages.invalidKeyFormatLabel)];
           }
           if (this.props.validLengths.find(validLength => validLength === value.length)) {
             this.props.onUpdate(value);

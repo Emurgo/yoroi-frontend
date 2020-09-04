@@ -29,6 +29,9 @@ import { SendTransactionApiError } from '../../api/common/errors';
 import type {
   Address, Addressing
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
+import {
+  Bip44DerivationLevels,
+} from '../../api/ada/lib/storage/database/walletTypes/bip44/api/utils';
 
 export default class YoroiTransferStore extends Store {
 
@@ -36,6 +39,7 @@ export default class YoroiTransferStore extends Store {
   @observable error: ?LocalizableError = null;
   @observable transferTx: ?TransferTx = null;
   @observable recoveryPhrase: string = '';
+  @observable privateKey: void | string = undefined;
   @observable mode: RestoreModeType | void = undefined;
 
   // eslint-disable-next-line no-restricted-syntax
@@ -78,6 +82,7 @@ export default class YoroiTransferStore extends Store {
     const actions = this.actions.yoroiTransfer;
     actions.startTransferFunds.listen(this._startTransferFunds);
     actions.startHardwareMnemonic.listen(this._startHardwareMnemonic);
+    actions.setPrivateKey.listen(this._setPrivateKey);
     actions.setupTransferFundsWithMnemonic.listen(this.setupTransferFundsWithMnemonic);
     actions.setupTransferFundsWithPaperMnemonic.listen(
       this._errorWrapper(this._setupTransferFundsWithPaperMnemonic)
@@ -110,7 +115,14 @@ export default class YoroiTransferStore extends Store {
       return;
     }
     if (payload.source.extra === 'privateKey') {
-      this._updateStatus(TransferStatus.GETTING_MASTER_KEY);
+      const { derivationLevel } = payload.source;
+      if (derivationLevel === 0) {
+        this._updateStatus(TransferStatus.GETTING_MASTER_KEY);
+      } else if (derivationLevel === Bip44DerivationLevels.ADDRESS.level) {
+        this._updateStatus(TransferStatus.GETTING_WITHDRAWAL_KEY);
+      } else {
+        throw new Error(`${nameof(this._startTransferFunds)} unexpected level ${derivationLevel}`);
+      }
       return;
     }
     this._updateStatus(TransferStatus.GETTING_MNEMONICS);
@@ -118,6 +130,11 @@ export default class YoroiTransferStore extends Store {
 
   _startHardwareMnemonic: void => void = () => {
     this._updateStatus(TransferStatus.GETTING_HARDWARE_MNEMONIC);
+  }
+
+  @action
+  _setPrivateKey: string => void = (key) => {
+    this.privateKey = key;
   }
 
   nextInternalAddress: (
@@ -168,20 +185,20 @@ export default class YoroiTransferStore extends Store {
     this._updateStatus(TransferStatus.DISPLAY_CHECKSUM);
   }
 
-  generateTransferTxFromMnemonic: {|
-    recoveryPhrase: string,
+  generateTransferTx: {|
+    ...({| recoveryPhrase: string, |} | {| privateKey: string |}),
     updateStatusCallback: void => void,
     getDestinationAddress: void => Promise<{| ...Address, ...InexactSubset<Addressing> |}>,
   |} => Promise<TransferTx> = async (request) => {
     if (this.stores.profile.selectedNetwork == null) {
-      throw new Error(`${nameof(YoroiTransferStore)}::${nameof(this.generateTransferTxFromMnemonic)} no network selected`);
+      throw new Error(`${nameof(YoroiTransferStore)}::${nameof(this.generateTransferTx)} no network selected`);
     }
     const selectedApiType = getApiForNetwork(this.stores.profile.selectedNetwork);
     if (!this.stores.substores[selectedApiType].yoroiTransfer) {
       throw new Error(`${nameof(YoroiTransferStore)}::${nameof(this.checkAddresses)} currency doesn't support Yoroi transfer`);
     }
     const { yoroiTransfer } = this.stores.substores[selectedApiType];
-    return await yoroiTransfer.generateTransferTxFromMnemonic(
+    return await yoroiTransfer.generateTransferTx(
       request,
     );
   }
@@ -192,8 +209,11 @@ export default class YoroiTransferStore extends Store {
     payload
   ): Promise<void> => {
     this._updateStatus(TransferStatus.CHECKING_ADDRESSES);
-    const transferTx = await this.generateTransferTxFromMnemonic({
-      recoveryPhrase: this.recoveryPhrase,
+    const keyInfo = this.privateKey != null
+      ? { privateKey: this.privateKey }
+      : { recoveryPhrase: this.recoveryPhrase };
+    const transferTx = await this.generateTransferTx({
+      ...keyInfo,
       updateStatusCallback: () => this._updateStatus(TransferStatus.GENERATING_TX),
       getDestinationAddress: payload.getDestinationAddress,
     });
@@ -239,8 +259,11 @@ export default class YoroiTransferStore extends Store {
       if (!payload.rebuildTx) {
         return oldTx;
       }
-      const newTx = await this.generateTransferTxFromMnemonic({
-        recoveryPhrase: this.recoveryPhrase,
+      const keyInfo = this.privateKey != null
+        ? { privateKey: this.privateKey }
+        : { recoveryPhrase: this.recoveryPhrase };
+      const newTx = await this.generateTransferTx({
+        ...keyInfo,
         updateStatusCallback: () => {},
         getDestinationAddress: payload.getDestinationAddress,
       });
@@ -312,9 +335,17 @@ export default class YoroiTransferStore extends Store {
     this.status = TransferStatus.UNINITIALIZED;
     this.error = null;
     this.transferTx = null;
+    this.privateKey = undefined;
     this.stores.wallets.sendMoneyRequest.reset();
     this.recoveryPhrase = '';
     this.mode = undefined;
+
+    if (this.stores.profile.selectedNetwork != null) {
+      const selectedApiType = getApiForNetwork(this.stores.profile.selectedNetwork);
+      if (this.stores.substores[selectedApiType].yoroiTransfer) {
+        this.stores.substores[selectedApiType].yoroiTransfer.reset();
+      }
+    }
   }
 }
 
