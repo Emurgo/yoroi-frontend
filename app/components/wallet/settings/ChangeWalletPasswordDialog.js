@@ -205,7 +205,7 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
             value={dialogData.newPasswordValue}
             onChange={(value) => this.handleDataChange('newPasswordValue', value)}
             {...newPasswordField.bind()}
-            done={isValidWalletPassword(newPassword)}
+            done={newPasswordField.isValid}
             error={newPasswordField.error}
             skin={InputOwnSkin}
           />
@@ -216,7 +216,7 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
             value={dialogData.repeatedPasswordValue}
             onChange={(value) => this.handleDataChange('repeatedPasswordValue', value)}
             {...repeatedPasswordField.bind()}
-            done={repeatedPassword && isValidRepeatPassword(newPassword, repeatedPassword)}
+            done={repeatedPassword && repeatedPasswordField.isValid}
             error={repeatedPasswordField.error}
             skin={InputOwnSkin}
           />

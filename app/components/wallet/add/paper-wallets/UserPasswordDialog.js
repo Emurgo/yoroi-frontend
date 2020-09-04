@@ -186,7 +186,7 @@ export default class UserPasswordDialog extends Component<Props> {
             value={dialogData.passwordValue}
             onChange={(value) => this.handleDataChange('passwordValue', value)}
             {...paperPasswordField.bind()}
-            done={isValidPaperPassword(paperPassword)}
+            done={paperPasswordField.isValid}
             error={paperPasswordField.error}
             skin={InputOwnSkin}
           />
@@ -197,7 +197,7 @@ export default class UserPasswordDialog extends Component<Props> {
             className={styles.repeatedPassword}
             value={dialogData.repeatedPasswordValue}
             onChange={(value) => this.handleDataChange('repeatedPasswordValue', value)}
-            done={repeatPassword && isValidRepeatPassword(paperPassword, repeatPassword)}
+            done={repeatPassword && repeatedPasswordField.isValid}
             {...repeatedPasswordField.bind()}
             error={repeatedPasswordField.error}
             skin={InputOwnSkin}

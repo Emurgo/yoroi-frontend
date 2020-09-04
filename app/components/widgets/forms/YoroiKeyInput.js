@@ -2,7 +2,7 @@
 import type { Node } from 'react';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
+import { intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
 import globalMessages from '../../../i18n/global-messages';
@@ -12,22 +12,15 @@ import { Input } from 'react-polymorph/lib/components/Input';
 import isHexadecimal from 'validator/lib/isHexadecimal';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
-const messages = defineMessages({
-  masterKeyInputLabel: {
-    id: 'transfer.form.masterkey.input.label',
-    defaultMessage: '!!!Master key',
-  },
-});
-
-const daedalusMasterKeyLength = 192; // 96 bytes (2x because of hex representation)
-
 type Props = {|
   +setForm: ReactToolboxMobxForm => void,
+  +validLengths: Array<number>,
+  +onUpdate: string => void,
   +classicTheme: boolean,
 |};
 
 @observer
-export default class DaedalusMasterKeyInput extends Component<Props> {
+export default class YoroiKeyInput extends Component<Props> {
 
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired
@@ -35,28 +28,31 @@ export default class DaedalusMasterKeyInput extends Component<Props> {
 
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
     fields: {
-      masterKey: {
-        label: this.context.intl.formatMessage(messages.masterKeyInputLabel),
+      key: {
+        label: this.context.intl.formatMessage(globalMessages.keyLabel),
         placeholder: this.props.classicTheme ?
-          this.context.intl.formatMessage(messages.masterKeyInputLabel) : '',
+          this.context.intl.formatMessage(globalMessages.keyLabel) : '',
         value: '',
+        type: 'password',
         validators: [({ field }) => {
           const value = field.value;
           if (value === '') {
             return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
           }
-          if (value.length !== daedalusMasterKeyLength) {
-            return [
-              false,
-              this.context.intl.formatMessage(globalMessages.invalidKeyLengthLabel, {
-                length: daedalusMasterKeyLength,
-              })
-            ];
-          }
           if (!isHexadecimal(value)) {
             return [false, this.context.intl.formatMessage(globalMessages.invalidKeyFormatLabel)];
           }
-          return true;
+          if (this.props.validLengths.find(validLength => validLength === value.length)) {
+            this.props.onUpdate(value);
+            return [true];
+          }
+          return [
+            false,
+            this.context.intl.formatMessage(globalMessages.invalidKeyLength2Label, {
+              // add spacing around , to avoid it looking like a decimal separator
+              lengths: `[${this.props.validLengths.join(' , ')}]`,
+            })
+          ];
         }],
       },
     },
@@ -77,16 +73,16 @@ export default class DaedalusMasterKeyInput extends Component<Props> {
   render(): Node {
     const { form } = this;
 
-    const masterKeyField = form.$('masterKey');
+    const keyField = form.$('key');
 
     return (
       <Input
-        className="masterKey"
+        className="key"
         autoComplete="off"
-        {...masterKeyField.bind()}
-        error={masterKeyField.error}
+        {...keyField.bind()}
+        error={keyField.error}
         skin={InputOwnSkin}
-        done={masterKeyField.isValid}
+        done={keyField.isValid}
       />
     );
   }

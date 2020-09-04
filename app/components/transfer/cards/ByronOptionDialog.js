@@ -157,7 +157,7 @@ export default class ByronOptionDialog extends Component<Props, State> {
         />
         <OptionBlock
           parentName="fromDaedalusMasterKey"
-          type="legacyDaedalus"
+          type="masterKey"
           onSubmit={this.props.daedalus.onMaster}
           title={intl.formatMessage(daedalusMessages.transferMasterKeyText)}
           learnMoreText={intl.formatMessage(globalMessages.restoreByronEraWalletDescription)}

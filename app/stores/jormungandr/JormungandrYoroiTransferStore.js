@@ -30,17 +30,16 @@ export default class JormungandrYoroiTransferStore extends Store {
   @observable restoreForTransferRequest: Request<RestoreWalletForTransferFunc>
     = new Request(this.api.jormungandr.restoreWalletForTransfer);
 
-  _restoreWalletForTransfer: (string, number) => Promise<RestoreWalletForTransferResponse> = async (
-    recoveryPhrase,
-    accountIndex,
+  _restoreWalletForTransfer: {|
+    rootPk: RustModule.WalletV4.Bip32PrivateKey,
+    accountIndex: number,
+  |} => Promise<RestoreWalletForTransferResponse> = async (
+    request
   ) => {
-    const rootPk = this.stores.yoroiTransfer.mode?.extra === 'ledger'
-      ? generateLedgerWalletRootKey(recoveryPhrase)
-      : generateWalletRootKey(recoveryPhrase);
     const stateFetcher = this.stores.substores.jormungandr.stateFetchStore.fetcher;
 
     if (this.stores.profile.selectedNetwork == null) {
-      throw new Error(`${nameof(JormungandrYoroiTransferStore)}::${nameof(this.generateTransferTxFromMnemonic)} no network selected`);
+      throw new Error(`${nameof(JormungandrYoroiTransferStore)}::${nameof(this._restoreWalletForTransfer)} no network selected`);
     }
     if (!this.stores.yoroiTransfer.mode) {
       throw new Error(`${nameof(JormungandrYoroiTransferStore)}::${nameof(this._restoreWalletForTransfer)} no mode specified`);
@@ -48,8 +47,8 @@ export default class JormungandrYoroiTransferStore extends Store {
     const { mode } = this.stores.yoroiTransfer;
     const restoreResult = await this.restoreForTransferRequest.execute({
       network: this.stores.profile.selectedNetwork,
-      rootPk: v4Bip32PrivateToV3(rootPk),
-      accountIndex,
+      rootPk: v4Bip32PrivateToV3(request.rootPk),
+      accountIndex: request.accountIndex,
       checkAddressesInUse: stateFetcher.checkAddressesInUse,
       transferSource: mode.type,
     }).promise;
@@ -57,25 +56,39 @@ export default class JormungandrYoroiTransferStore extends Store {
     return restoreResult;
   };
 
-  generateTransferTxFromMnemonic: {|
-    recoveryPhrase: string,
+  generateTransferTx: {|
+    ...({| recoveryPhrase: string, |} | {| privateKey: string |}),
     updateStatusCallback: void => void,
     getDestinationAddress: void => Promise<{| ...Address, ...InexactSubset<Addressing> |}>,
   |} => Promise<TransferTx> = async (request) => {
+    const rootPk = (() => {
+      if (request.privateKey != null) {
+        return RustModule.WalletV4.Bip32PrivateKey.from_bytes(
+          Buffer.from(request.privateKey, 'hex')
+        );
+      }
+      if (request.recoveryPhrase != null) {
+        return this.stores.yoroiTransfer.mode?.extra === 'ledger'
+          ? generateLedgerWalletRootKey(request.recoveryPhrase)
+          : generateWalletRootKey(request.recoveryPhrase);
+      }
+      throw new Error(`${nameof(JormungandrYoroiTransferStore)}::${nameof(this.generateTransferTx)} no key specified`);
+    })();
+
     // 1) get receive address
     const destinationAddress = await request.getDestinationAddress();
 
     // 2) Perform restoration
     const accountIndex = 0 + HARD_DERIVATION_START;
-    const { masterKey, addresses } = await this._restoreWalletForTransfer(
-      request.recoveryPhrase,
+    const { masterKey, addresses } = await this._restoreWalletForTransfer({
+      rootPk,
       accountIndex,
-    );
+    });
 
     request.updateStatusCallback();
 
     if (!this.stores.yoroiTransfer.mode) {
-      throw new Error(`${nameof(JormungandrYoroiTransferStore)}::${nameof(this.generateTransferTxFromMnemonic)} no mode specified`);
+      throw new Error(`${nameof(JormungandrYoroiTransferStore)}::${nameof(this.generateTransferTx)} no mode specified`);
     }
     const { mode } = this.stores.yoroiTransfer;
 
@@ -91,7 +104,7 @@ export default class JormungandrYoroiTransferStore extends Store {
     // 4) generate transaction
 
     if (this.stores.profile.selectedNetwork == null) {
-      throw new Error(`${nameof(JormungandrYoroiTransferStore)}::${nameof(this.generateTransferTxFromMnemonic)} no network selected`);
+      throw new Error(`${nameof(JormungandrYoroiTransferStore)}::${nameof(this.generateTransferTx)} no network selected`);
     }
     const config = getJormungandrBaseConfig(
       this.stores.profile.selectedNetwork
@@ -110,5 +123,9 @@ export default class JormungandrYoroiTransferStore extends Store {
     });
     // Possible exception: NotEnoughMoneyToSendError
     return transferTx;
+  }
+
+  reset(): void {
+    this.restoreForTransferRequest.reset();
   }
 }

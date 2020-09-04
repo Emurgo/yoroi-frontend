@@ -74,10 +74,8 @@ export default class MnemonicInput extends Component<Props> {
     const { form } = this;
     const {
       validWords,
-      mnemonicValidator,
       mnemonicLength,
     } = this.props;
-    const { recoveryPhrase } = form.values();
 
     const recoveryPhraseField = form.$('recoveryPhrase');
 
@@ -87,7 +85,7 @@ export default class MnemonicInput extends Component<Props> {
         options={validWords}
         maxSelections={mnemonicLength ?? config.wallets.MAX_RECOVERY_PHRASE_WORD_COUNT}
         {...recoveryPhraseField.bind()}
-        done={mnemonicValidator(join(recoveryPhrase, ' '))}
+        done={recoveryPhraseField.isValid}
         error={recoveryPhraseField.error}
         maxVisibleOptions={5}
         noResultsMessage={intl.formatMessage(globalMessages.recoveryPhraseNoResults)}

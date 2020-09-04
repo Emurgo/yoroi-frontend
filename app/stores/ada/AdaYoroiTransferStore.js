@@ -43,25 +43,23 @@ export default class AdaYoroiTransferStore extends Store {
       this.api.ada.transferToCip1852.bind(this.api.ada)
     );
 
-  _restoreWalletForTransfer: (string, number) => Promise<RestoreWalletForTransferResponse> = async (
-    recoveryPhrase,
-    accountIndex,
+  _restoreWalletForTransfer: {|
+    rootPk: RustModule.WalletV4.Bip32PrivateKey,
+    accountIndex: number,
+  |} => Promise<RestoreWalletForTransferResponse> = async (
+    request
   ) => {
-    const rootPk = this.stores.yoroiTransfer.mode?.extra === 'ledger'
-      ? generateLedgerWalletRootKey(recoveryPhrase)
-      : generateWalletRootKey(recoveryPhrase);
-
     if (!this.stores.yoroiTransfer.mode) {
       throw new Error(`${nameof(AdaYoroiTransferStore)}::${nameof(this._restoreWalletForTransfer)} no mode specified`);
     }
     const { mode } = this.stores.yoroiTransfer;
 
-    const accountPubKey = rootPk
+    const accountPubKey = request.rootPk
       .derive(mode.type === 'cip1852'
         ? WalletTypePurpose.CIP1852
         : WalletTypePurpose.BIP44)
       .derive(CoinTypes.CARDANO)
-      .derive(accountIndex)
+      .derive(request.accountIndex)
       .to_public();
 
     if (this.stores.profile.selectedNetwork == null) {
@@ -71,7 +69,7 @@ export default class AdaYoroiTransferStore extends Store {
     const stateFetcher = this.stores.substores.ada.stateFetchStore.fetcher;
     const restoreResult = await this.restoreForTransferRequest.execute({
       accountPubKey,
-      accountIndex,
+      accountIndex: request.accountIndex,
       checkAddressesInUse: stateFetcher.checkAddressesInUse,
       transferSource: mode.type,
       network: this.stores.profile.selectedNetwork,
@@ -80,13 +78,13 @@ export default class AdaYoroiTransferStore extends Store {
     return restoreResult;
   };
 
-  generateTransferTxFromMnemonic: {|
-    recoveryPhrase: string,
+  generateTransferTx: {|
+    ...({| recoveryPhrase: string, |} | {| privateKey: string |}),
     updateStatusCallback: void => void,
     getDestinationAddress: void => Promise<{| ...Address, ...InexactSubset<Addressing> |}>,
   |} => Promise<TransferTx> = async (request) => {
     if (!this.stores.yoroiTransfer.mode) {
-      throw new Error(`${nameof(AdaYoroiTransferStore)}::${nameof(this.generateTransferTxFromMnemonic)} no mode specified`);
+      throw new Error(`${nameof(AdaYoroiTransferStore)}::${nameof(this.generateTransferTx)} no mode specified`);
     }
     if (this.stores.yoroiTransfer.mode.type === 'bip44') {
       return this.generateTransferTxForByron(request);
@@ -94,11 +92,11 @@ export default class AdaYoroiTransferStore extends Store {
     if (this.stores.yoroiTransfer.mode.type === 'cip1852') {
       return this.generateTransferTxForRewardAccount(request);
     }
-    throw new Error(`${nameof(AdaYoroiTransferStore)}::${nameof(this.generateTransferTxFromMnemonic)} unknown restore type ${this.stores.yoroiTransfer.mode?.type || ''}`);
+    throw new Error(`${nameof(AdaYoroiTransferStore)}::${nameof(this.generateTransferTx)} unknown restore type ${this.stores.yoroiTransfer.mode?.type || ''}`);
   }
 
   generateTransferTxForRewardAccount: {|
-    recoveryPhrase: string,
+    ...({| recoveryPhrase: string, |} | {| privateKey: string |}),
     updateStatusCallback: void => void,
     getDestinationAddress: void => Promise<{| ...Address, ...InexactSubset<Addressing> |}>,
   |} => Promise<TransferTx> = async (request) => {
@@ -106,29 +104,46 @@ export default class AdaYoroiTransferStore extends Store {
     createWithdrawalTx.reset();
 
     // recall: all ITN rewards were on account path 0
+    // TODO: don't hardcode this
     const accountIndex = 0 + HARD_DERIVATION_START;
-    // recall: Hardware wallets weren't supported during the ITN
-    const stakeKey = generateWalletRootKey(request.recoveryPhrase)
-      .derive(WalletTypePurpose.CIP1852)
-      .derive(CoinTypes.CARDANO)
-      .derive(accountIndex)
-      .derive(ChainDerivations.CHIMERIC_ACCOUNT)
-      .derive(0);
+
+    const stakingKey = (() => {
+      if (request.privateKey != null) {
+        return RustModule.WalletV4.PrivateKey.from_extended_bytes(
+          Buffer.from(request.privateKey, 'hex')
+        );
+      }
+      if (request.recoveryPhrase != null) {
+        const rootKey = this.stores.yoroiTransfer.mode?.extra === 'ledger'
+          ? generateLedgerWalletRootKey(request.recoveryPhrase)
+          : generateWalletRootKey(request.recoveryPhrase);
+
+        return rootKey
+          .derive(WalletTypePurpose.CIP1852)
+          .derive(CoinTypes.CARDANO)
+          .derive(accountIndex)
+          .derive(ChainDerivations.CHIMERIC_ACCOUNT)
+          .derive(0)
+          .to_raw_key();
+      }
+      throw new Error(`${nameof(AdaYoroiTransferStore)}::${nameof(this.generateTransferTxForRewardAccount)} no key specified`);
+    })();
+
     const stakeCredential = RustModule.WalletV4.StakeCredential.from_keyhash(
-      stakeKey.to_raw_key().to_public().hash()
+      stakingKey.to_public().hash()
     );
 
     const { selected } = this.stores.wallets;
     if (selected == null) {
-      throw new Error(`${nameof(AdaYoroiTransferStore)}::${nameof(this._restoreWalletForTransfer)} no wallet selected`);
+      throw new Error(`${nameof(AdaYoroiTransferStore)}::${nameof(this.generateTransferTxForRewardAccount)} no wallet selected`);
     }
     const withUtxos = asGetAllUtxos(selected);
     if (withUtxos == null) {
-      throw new Error(`${nameof(AdaYoroiTransferStore)}::${nameof(this._restoreWalletForTransfer)} missing utxo functionality`);
+      throw new Error(`${nameof(AdaYoroiTransferStore)}::${nameof(this.generateTransferTxForRewardAccount)} missing utxo functionality`);
     }
     const withHasUtxoChains = asHasUtxoChains(withUtxos);
     if (withHasUtxoChains == null) {
-      throw new Error(`${nameof(AdaYoroiTransferStore)}::${nameof(this._restoreWalletForTransfer)} missing chains functionality`);
+      throw new Error(`${nameof(AdaYoroiTransferStore)}::${nameof(this.generateTransferTxForRewardAccount)} missing chains functionality`);
     }
 
     const fullConfig = getCardanoHaskellBaseConfig(
@@ -151,7 +166,7 @@ export default class AdaYoroiTransferStore extends Store {
         getAccountState: this.stores.substores.ada.stateFetchStore.fetcher.getAccountState,
         absSlotNumber,
         withdrawals: [{
-          privateKey: stakeKey.to_raw_key(),
+          privateKey: stakingKey,
           rewardAddress: rewardHex,
           shouldDeregister: this.stores.substores.ada.delegationTransaction.shouldDeregister,
         }],
@@ -172,27 +187,37 @@ export default class AdaYoroiTransferStore extends Store {
   }
 
   generateTransferTxForByron: {|
-    recoveryPhrase: string,
+    ...({| recoveryPhrase: string, |} | {| privateKey: string |}),
     updateStatusCallback: void => void,
     getDestinationAddress: void => Promise<{| ...Address, ...InexactSubset<Addressing> |}>,
   |} => Promise<TransferTx> = async (request) => {
+    const rootPk = (() => {
+      if (request.privateKey != null) {
+        return RustModule.WalletV4.Bip32PrivateKey.from_bytes(
+          Buffer.from(request.privateKey, 'hex')
+        );
+      }
+      if (request.recoveryPhrase != null) {
+        return this.stores.yoroiTransfer.mode?.extra === 'ledger'
+          ? generateLedgerWalletRootKey(request.recoveryPhrase)
+          : generateWalletRootKey(request.recoveryPhrase);
+      }
+      throw new Error(`${nameof(AdaYoroiTransferStore)}::${nameof(this.generateTransferTx)} no key specified`);
+    })();
+
     // 1) get receive address
     const destinationAddress = await request.getDestinationAddress();
 
     // 2) Perform restoration
     const accountIndex = 0 + HARD_DERIVATION_START; // TODO: don't hardcode index
-    const { addresses } = await this._restoreWalletForTransfer(
-      request.recoveryPhrase,
+    const { addresses } = await this._restoreWalletForTransfer({
+      rootPk,
       accountIndex,
-    );
+    });
 
     request.updateStatusCallback();
 
     // 3) Calculate private keys for restored wallet utxo
-
-    const rootPk = this.stores.yoroiTransfer.mode?.extra === 'ledger'
-      ? generateLedgerWalletRootKey(request.recoveryPhrase)
-      : generateWalletRootKey(request.recoveryPhrase);
 
     const accountKey = rootPk
       .derive(WalletTypePurpose.BIP44)
@@ -235,5 +260,10 @@ export default class AdaYoroiTransferStore extends Store {
     });
     // Possible exception: NotEnoughMoneyToSendError
     return transferTx;
+  }
+
+  reset(): void {
+    this.restoreForTransferRequest.reset();
+    this.transferRequest.reset();
   }
 }

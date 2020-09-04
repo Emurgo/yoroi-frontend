@@ -1,3 +1,5 @@
+@import '../../themes/mixins/error-message';
+
 .component {
   
   .body {
@@ -17,6 +19,15 @@
       list-style-position: inside;
       margin-bottom: 10px;
     }
+  }
+
+  .error {
+    @include error-message;
+    font-size: 16px;
+    line-height: 22px;
+    margin-bottom: 12px;
+    word-break: break-word;
+    text-align: center;
   }
 }
 

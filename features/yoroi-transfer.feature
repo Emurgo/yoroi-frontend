@@ -197,3 +197,117 @@ Feature: Transfer Yoroi Wallet funds
     Given The expected transaction is "g6UAgYJYIDZ351x7ppm/3GzVfULyRvhvY679dgJQBqx4MT+tK7ohAQGBglg5Aceyi86pDUQLVFWmoConylm4aW8Gf8GWf0f5M+eVWOlpyqnletz8QLmQfreUNjtZD69C//SMOOuIGgCdmOcCGgACnrkDGhH+lM0FoVgd4ZVY6WnKqeV63PxAuZB+t5Q2O1kPr0L/9Iw464gaAExLQKEAgoJYIMyYCZRBUMAPORPNKxA+m0L+YkP8NqdvnrgAaS4r2j8uWECtpqZgzGT59YcufXB7lapcXnXV6vhAwVcOWAwJ1ETU1fYHXCu1L18h08N8G36qNKEXFYxtWkhohVpD4Q2FXIENglggYWJ2UyDJOtPILMKLlXi+MaeR8Do33K4FY0PMJbvLOzFYQEChQ6M2dwJDq/Hjjy6Wm4X16lJuvmFbVFalNvqRC/i4uamx+5ygq1sS32gdscAwi05wfkpEJ/r7ZUK1vx63BAH2"
     When I confirm Yoroi transfer funds
     Then I should see the summary screen
+
+  @it-150
+  Scenario: User can claim Shelley rewards w/ unencrypted root key (IT-150)
+    Given There is a Shelley wallet stored named shelley-simple-15
+    And I am on the transfer start screen
+    When I click on the shelley button on the transfer screen
+    Then I select the private key option
+    Then I accept the prompt
+    Then I keep the staking key
+    Given I enter the key "c065afd2832cd8b087c4d9ab7011f481ee1e0721e78ea5dd609f3ab3f156d245d176bd8fd4ec60b4731c3918a2a72a0226c0cd119ec35b47e4d55884667f552a23f7fdcd4a10c6cd2c7393ac61d877873e248f417634aa3d812af327ffe9d620"
+    # And I enter the decryption password
+    And I proceed with the recovery
+    Then I should see on the Yoroi withdrawal transfer summary screen:
+    | fromAddress                                                | amount           |
+    | stake1ux2436tfe25727kul3qtnyr7k72rvw6ep7h59ll53suwhzq05v5j9 | 5000000    |
+    And I do not see the deregistration for the transaction
+    And I enter the wallet password:
+      | password   |
+      | asdfasdfasdf |
+    Given The expected transaction is "g6UAgYJYIDZ351x7ppm/3GzVfULyRvhvY679dgJQBqx4MT+tK7ohAQGBglg5Aceyi86pDUQLVFWmoConylm4aW8Gf8GWf0f5M+eVWOlpyqnletz8QLmQfreUNjtZD69C//SMOOuIGgCdmOcCGgACnrkDGhH+lM0FoVgd4ZVY6WnKqeV63PxAuZB+t5Q2O1kPr0L/9Iw464gaAExLQKEAgoJYIMyYCZRBUMAPORPNKxA+m0L+YkP8NqdvnrgAaS4r2j8uWECtpqZgzGT59YcufXB7lapcXnXV6vhAwVcOWAwJ1ETU1fYHXCu1L18h08N8G36qNKEXFYxtWkhohVpD4Q2FXIENglggYWJ2UyDJOtPILMKLlXi+MaeR8Do33K4FY0PMJbvLOzFYQEChQ6M2dwJDq/Hjjy6Wm4X16lJuvmFbVFalNvqRC/i4uamx+5ygq1sS32gdscAwi05wfkpEJ/r7ZUK1vx63BAH2"
+    When I confirm Yoroi transfer funds
+    Then I should see the summary screen
+
+  @it-151
+  Scenario: User can claim Shelley rewards w/ encrypted root key (IT-151)
+    Given There is a Shelley wallet stored named shelley-simple-15
+    And I am on the transfer start screen
+    When I click on the shelley button on the transfer screen
+    Then I select the private key option
+    Then I accept the prompt
+    Then I keep the staking key
+    Given I enter the key "ea8241c2cc3de36d6f4d297332b2859f13335872ea7dae1638ecae1df7bcc211f658c9fa1673241800714e24681bd11e625a332ecb6bd8db06c941c3b0f3cc43c84bb7ce44bcf3c0069e7bdc62aa4154cd93d5313af4fd2a51d95fa4861fcb193f9ccf411e282569e72ace40d2a8f666c4ce692930863a53a1222173a82b71ef63adb5a75cad388edff07d41e059b7458e09d1e596edd48d4c86d40f"
+    And I enter the decryption password "asdfasdfasdf"
+    And I proceed with the recovery
+    Then I should see on the Yoroi withdrawal transfer summary screen:
+    | fromAddress                                                | amount           |
+    | stake1ux2436tfe25727kul3qtnyr7k72rvw6ep7h59ll53suwhzq05v5j9 | 5000000    |
+    And I do not see the deregistration for the transaction
+    And I enter the wallet password:
+      | password   |
+      | asdfasdfasdf |
+    Given The expected transaction is "g6UAgYJYIDZ351x7ppm/3GzVfULyRvhvY679dgJQBqx4MT+tK7ohAQGBglg5Aceyi86pDUQLVFWmoConylm4aW8Gf8GWf0f5M+eVWOlpyqnletz8QLmQfreUNjtZD69C//SMOOuIGgCdmOcCGgACnrkDGhH+lM0FoVgd4ZVY6WnKqeV63PxAuZB+t5Q2O1kPr0L/9Iw464gaAExLQKEAgoJYIMyYCZRBUMAPORPNKxA+m0L+YkP8NqdvnrgAaS4r2j8uWECtpqZgzGT59YcufXB7lapcXnXV6vhAwVcOWAwJ1ETU1fYHXCu1L18h08N8G36qNKEXFYxtWkhohVpD4Q2FXIENglggYWJ2UyDJOtPILMKLlXi+MaeR8Do33K4FY0PMJbvLOzFYQEChQ6M2dwJDq/Hjjy6Wm4X16lJuvmFbVFalNvqRC/i4uamx+5ygq1sS32gdscAwi05wfkpEJ/r7ZUK1vx63BAH2"
+    When I confirm Yoroi transfer funds
+    Then I should see the summary screen
+
+  @it-152
+  Scenario: User can claim Shelley rewards w/ unencrypted staking key (IT-152)
+    Given There is a Shelley wallet stored named shelley-simple-15
+    And I am on the transfer start screen
+    When I click on the shelley button on the transfer screen
+    Then I select the private key option
+    Then I accept the prompt
+    Then I keep the staking key
+    Given I enter the key "f874f575cb9b7dabfd5487e9151c759fffc66d6915f86f8b08a4e21f0957d245cd81a43dc6716e6d7fd574b31e7e91c1b3a6968e4aa69e880712f196500a2713"
+    # And I enter the decryption password "asdfasdfasdf"
+    And I proceed with the recovery
+    Then I should see on the Yoroi withdrawal transfer summary screen:
+    | fromAddress                                                | amount           |
+    | stake1ux2436tfe25727kul3qtnyr7k72rvw6ep7h59ll53suwhzq05v5j9 | 5000000    |
+    And I do not see the deregistration for the transaction
+    And I enter the wallet password:
+      | password   |
+      | asdfasdfasdf |
+    Given The expected transaction is "g6UAgYJYIDZ351x7ppm/3GzVfULyRvhvY679dgJQBqx4MT+tK7ohAQGBglg5Aceyi86pDUQLVFWmoConylm4aW8Gf8GWf0f5M+eVWOlpyqnletz8QLmQfreUNjtZD69C//SMOOuIGgCdmOcCGgACnrkDGhH+lM0FoVgd4ZVY6WnKqeV63PxAuZB+t5Q2O1kPr0L/9Iw464gaAExLQKEAgoJYIMyYCZRBUMAPORPNKxA+m0L+YkP8NqdvnrgAaS4r2j8uWECtpqZgzGT59YcufXB7lapcXnXV6vhAwVcOWAwJ1ETU1fYHXCu1L18h08N8G36qNKEXFYxtWkhohVpD4Q2FXIENglggYWJ2UyDJOtPILMKLlXi+MaeR8Do33K4FY0PMJbvLOzFYQEChQ6M2dwJDq/Hjjy6Wm4X16lJuvmFbVFalNvqRC/i4uamx+5ygq1sS32gdscAwi05wfkpEJ/r7ZUK1vx63BAH2"
+    When I confirm Yoroi transfer funds
+    Then I should see the summary screen
+
+  @it-153
+  Scenario: User can claim Shelley rewards w/ encrypted staking key (IT-153)
+    Given There is a Shelley wallet stored named shelley-simple-15
+    And I am on the transfer start screen
+    When I click on the shelley button on the transfer screen
+    Then I select the private key option
+    Then I accept the prompt
+    Then I keep the staking key
+    Given I enter the key "2bdf5cef8eda749f705f18607adbc3ff8e5d0b5bcd92513108b9006370ccaff67fbc9935dfe2deeb8e9a445476150990c526f5d1a653bb323c1d4e309fbcaadbfa0bb19cbeaf36cdc940df1249713d7037654689d16bf3b3b681d66fa8398d954124185fb51f5cbac9530df068b29ebe59936d5e07a2595f092c16ad"
+    And I enter the decryption password "asdfasdfasdf"
+    And I proceed with the recovery
+    Then I should see on the Yoroi withdrawal transfer summary screen:
+    | fromAddress                                                | amount           |
+    | stake1ux2436tfe25727kul3qtnyr7k72rvw6ep7h59ll53suwhzq05v5j9 | 5000000    |
+    And I do not see the deregistration for the transaction
+    And I enter the wallet password:
+      | password   |
+      | asdfasdfasdf |
+    Given The expected transaction is "g6UAgYJYIDZ351x7ppm/3GzVfULyRvhvY679dgJQBqx4MT+tK7ohAQGBglg5Aceyi86pDUQLVFWmoConylm4aW8Gf8GWf0f5M+eVWOlpyqnletz8QLmQfreUNjtZD69C//SMOOuIGgCdmOcCGgACnrkDGhH+lM0FoVgd4ZVY6WnKqeV63PxAuZB+t5Q2O1kPr0L/9Iw464gaAExLQKEAgoJYIMyYCZRBUMAPORPNKxA+m0L+YkP8NqdvnrgAaS4r2j8uWECtpqZgzGT59YcufXB7lapcXnXV6vhAwVcOWAwJ1ETU1fYHXCu1L18h08N8G36qNKEXFYxtWkhohVpD4Q2FXIENglggYWJ2UyDJOtPILMKLlXi+MaeR8Do33K4FY0PMJbvLOzFYQEChQ6M2dwJDq/Hjjy6Wm4X16lJuvmFbVFalNvqRC/i4uamx+5ygq1sS32gdscAwi05wfkpEJ/r7ZUK1vx63BAH2"
+    When I confirm Yoroi transfer funds
+    Then I should see the summary screen
+
+  @it-154
+  Scenario: User can claim Shelley rewards w/ paper wallet (IT-154)
+    Given There is a Shelley wallet stored named shelley-simple-15
+    And I am on the transfer start screen
+    When I click on the shelley button on the transfer screen
+    Then I select the Shelley paper wallet option
+    Then I accept the prompt
+    Then I keep the staking key
+    And I enter the recovery phrase:
+    | recoveryPhrase                                                                                           |
+    | insane shaft lava open minute kitten record oil discover capital slogan room crane child happy join razor company nephew usage air |
+    And I enter the paper wallet password "paper-password"
+    And I proceed with the recovery
+    Then I should see a plate ZDDC-9858
+    Then I click the next button
+    Then I should see on the Yoroi withdrawal transfer summary screen:
+    | fromAddress                                                | amount           |
+    | stake1ux2436tfe25727kul3qtnyr7k72rvw6ep7h59ll53suwhzq05v5j9 | 5000000    |
+    And I do not see the deregistration for the transaction
+    And I enter the wallet password:
+      | password   |
+      | asdfasdfasdf |
+    Given The expected transaction is "g6UAgYJYIDZ351x7ppm/3GzVfULyRvhvY679dgJQBqx4MT+tK7ohAQGBglg5Aceyi86pDUQLVFWmoConylm4aW8Gf8GWf0f5M+eVWOlpyqnletz8QLmQfreUNjtZD69C//SMOOuIGgCdmOcCGgACnrkDGhH+lM0FoVgd4ZVY6WnKqeV63PxAuZB+t5Q2O1kPr0L/9Iw464gaAExLQKEAgoJYIMyYCZRBUMAPORPNKxA+m0L+YkP8NqdvnrgAaS4r2j8uWECtpqZgzGT59YcufXB7lapcXnXV6vhAwVcOWAwJ1ETU1fYHXCu1L18h08N8G36qNKEXFYxtWkhohVpD4Q2FXIENglggYWJ2UyDJOtPILMKLlXi+MaeR8Do33K4FY0PMJbvLOzFYQEChQ6M2dwJDq/Hjjy6Wm4X16lJuvmFbVFalNvqRC/i4uamx+5ygq1sS32gdscAwi05wfkpEJ/r7ZUK1vx63BAH2"
+    When I confirm Yoroi transfer funds
+    Then I should see the summary screen

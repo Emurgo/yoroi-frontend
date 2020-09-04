@@ -8,10 +8,6 @@ import { defineMessages } from 'react-intl';
 */
 
 const globalMessages: * = defineMessages({
-  invalidMasterKey: {
-    id: 'global.errors.invalidMasterKey',
-    defaultMessage: '!!!Invalid master key entered, please check.',
-  },
   fieldIsRequired: {
     id: 'global.errors.fieldIsRequired',
     defaultMessage: '!!!This field is required.',
@@ -640,6 +636,22 @@ const globalMessages: * = defineMessages({
   blogLearnMore: {
     id: 'global.blog.learnMore',
     defaultMessage: '!!!You can read our {blogLink} to learn more.'
+  },
+  keyLabel: {
+    id: 'global.key.label',
+    defaultMessage: '!!!Key',
+  },
+  invalidKeyLengthLabel: {
+    id: 'global.invalidKeyLength.label',
+    defaultMessage: '!!!Invalid key. Should be {length} characters long.',
+  },
+  invalidKeyLength2Label: {
+    id: 'global.invalidKeyLength2.label',
+    defaultMessage: '!!!Invalid key. Should one of {lengths}.',
+  },
+  invalidKeyFormatLabel: {
+    id: 'global.invalidKeyFormat.label',
+    defaultMessage: '!!!Invalid key. Should be hexadecimal-encoded.',
   },
 });
 export default globalMessages;

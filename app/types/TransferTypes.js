@@ -15,6 +15,7 @@ export const TransferStatus = Object.freeze({
   DISPLAY_CHECKSUM: 10,
   HARDWARE_DISCLAIMER: 11,
   GETTING_HARDWARE_MNEMONIC: 12,
+  GETTING_WITHDRAWAL_KEY: 13,
 });
 export type TransferStatusT = $Values<typeof TransferStatus>;
 
