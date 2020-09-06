@@ -182,6 +182,11 @@ const genBaseProps: {|
               },
             },
             ada: {
+              trezorSend: {
+                sendUsingTrezor: {
+                  trigger: async (req) => action('sendUsingTrezor')(req),
+                },
+              },
               ledgerSend: {
                 sendUsingLedgerWallet: {
                   trigger: async (req) => action('sendUsingLedgerWallet')(req),

@@ -33,6 +33,8 @@ import {
   asGetSigningKey,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import type { SendUsingLedgerParams } from '../../actions/ada/ledger-send-actions';
+import type { SendUsingTrezorParams } from '../../actions/ada/trezor-send-actions';
+import { isLedgerNanoWallet, isTrezorTWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 
 declare var CONFIG: ConfigType;
 
@@ -87,12 +89,24 @@ export default class TransferSendPage extends Component<Props> {
     }
     if (this.spendingPasswordForm == null) {
       if (this.props.transactionRequest.result == null) return;
-      await this.generated.actions.ada.ledgerSend.sendUsingLedgerWallet.trigger({
-        params: {
-          signRequest: this.props.transactionRequest.result,
-        },
-        publicDeriver: selected,
-      });
+      const signRequest = this.props.transactionRequest.result;
+
+      if (isTrezorTWallet(selected.getParent())) {
+        await this.generated.actions.ada.trezorSend.sendUsingTrezor.trigger({
+          params: {
+            signRequest,
+          },
+          publicDeriver: selected,
+        });
+      }
+      if (isLedgerNanoWallet(selected.getParent())) {
+        await this.generated.actions.ada.ledgerSend.sendUsingLedgerWallet.trigger({
+          params: {
+            signRequest,
+          },
+          publicDeriver: selected,
+        });
+      }
       if (this.generated.stores.wallets.sendMoneyRequest.error == null) {
         this.props.onSubmit.trigger();
       }
@@ -226,6 +240,14 @@ export default class TransferSendPage extends Component<Props> {
             |}) => Promise<void>
           |}
         |},
+        trezorSend: {|
+          sendUsingTrezor: {|
+            trigger: (params: {|
+              params: SendUsingTrezorParams,
+              publicDeriver: PublicDeriver<>
+            |}) => Promise<void>
+          |}
+        |},
       |},
       wallets: {|
         sendMoney: {|
@@ -302,6 +324,11 @@ export default class TransferSendPage extends Component<Props> {
           ledgerSend: {
             sendUsingLedgerWallet: {
               trigger: actions.ada.ledgerSend.sendUsingLedgerWallet.trigger,
+            },
+          },
+          trezorSend: {
+            sendUsingTrezor: {
+              trigger: actions.ada.trezorSend.sendUsingTrezor.trigger,
             },
           },
         },
