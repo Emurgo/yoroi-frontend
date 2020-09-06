@@ -38,6 +38,8 @@ export type CertificateForEpoch = {|
   pools: Array<PoolTuples>,
 |};
 export type GetCurrentDelegationResponse = {|
+  // careful: void -> never delegated at this time
+  // empty delegation -> undelegated at some point
   currEpoch: void | CertificateForEpoch,
   prevEpoch: void | CertificateForEpoch,
   prevPrevEpoch: void | CertificateForEpoch,

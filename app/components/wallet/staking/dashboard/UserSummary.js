@@ -72,6 +72,7 @@ type Props = {|
     +primaryTicker: string,
     +decimalPlaces: number,
   |},
+  +withdrawRewards: void | (void => void),
 |};
 
 type State = {|
@@ -157,15 +158,28 @@ export default class UserSummary extends Component<Props, State> {
               <p className={styles.value}>
                 {totalRewards.ADA} {this.props.meta.primaryTicker}
               </p>
-              <span
-                className={styles.note}
-                role="button"
-                tabIndex={0}
-                onKeyPress={() => null}
-                onClick={this.props.openLearnMore}
-              >
-                {intl.formatMessage(messages.note)}
-              </span>
+              <div className={styles.sectionActions}>
+                {this.props.withdrawRewards != null && (
+                  <div
+                    className={styles.note}
+                    role="button"
+                    tabIndex={0}
+                    onKeyPress={() => null}
+                    onClick={this.props.withdrawRewards}
+                  >
+                    {intl.formatMessage(globalMessages.withdrawnLabel)}
+                  </div>
+                )}
+                <div
+                  className={styles.note}
+                  role="button"
+                  tabIndex={0}
+                  onKeyPress={() => null}
+                  onClick={this.props.openLearnMore}
+                >
+                  {intl.formatMessage(messages.note)}
+                </div>
+              </div>
             </>
           )
           : (<LoadingSpinner small />)

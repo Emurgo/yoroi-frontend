@@ -58,6 +58,8 @@ import type { IAddressTypeStore, IAddressTypeUiSubset } from '../../../stores/st
 import {
   CoreAddressTypes,
 } from '../../../api/ada/lib/storage/database/primitives/enums';
+import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
+import { ComplexityLevels } from '../../../types/complexityLevelType';
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -79,6 +81,23 @@ const genDefaultGroupMap: (
   );
 };
 
+const isRegistered: {|
+  delegationRequests: (PublicDeriver<>) => (void | DelegationRequests),
+  publicDeriver: PublicDeriver<>,
+  forceRegistration?: boolean,
+|} => (void | boolean) = (request) => {
+  const delegationRequests = request.delegationRequests(request.publicDeriver);
+  if (delegationRequests == null) return undefined;
+  if (delegationRequests.getCurrentDelegation.result == null) return undefined;
+  if (delegationRequests.getCurrentDelegation.result.currEpoch == null) {
+    return request.forceRegistration ?? false;
+  }
+  if (delegationRequests.getCurrentDelegation.result.currEpoch.pools.length === 0) {
+    return request.forceRegistration ?? false;
+  }
+  return true;
+};
+
 const getRoute = (id) => buildRoute(
   ROUTES.WALLETS.DELEGATION_DASHBOARD,
   { id, }
@@ -96,6 +115,8 @@ const genBaseProps: {|
     addresses: $ReadOnlyArray<$ReadOnly<StandardAddress>>,
   |},
   getLocalPoolInfo: *,
+  forceRegistration?: (void | boolean),
+  withdrawalTxProps?: *,
   getParam?: <T>(number | string) => T,
 |} => * = (request) => {
   const sendErrorCases = {
@@ -163,6 +184,15 @@ const genBaseProps: {|
         getCurrentTimeRequests: request.lookup.getCurrentTimeRequests,
       },
       substores: {
+        ada: {
+          delegation: {
+            isRegistered: isRegistered({
+              publicDeriver: request.wallet.publicDeriver,
+              forceRegistration: request.forceRegistration,
+              delegationRequests: request.lookup.getDelegation,
+            }),
+          },
+        },
         jormungandr: {
           delegationTransaction: request.delegationTransaction || {
             isStale: false,
@@ -199,6 +229,9 @@ const genBaseProps: {|
           reset: {
             trigger: action('closeActiveDialog'),
           },
+          createWithdrawalTxForWallet: {
+            trigger: async (req) => action('createWithdrawalTxForWallet')(req),
+          },
         },
       },
       jormungandr: {
@@ -221,6 +254,32 @@ const genBaseProps: {|
           time: {
             getTimeCalcRequests: request.lookup.getTimeCalcRequests,
             getCurrentTimeRequests: request.lookup.getCurrentTimeRequests,
+          },
+        },
+      },
+    },
+    WithdrawalTxDialogContainerProps: request.withdrawalTxProps ?? (null: any),
+    DeregisterDialogContainerProps: {
+      generated: {
+        stores: {
+          profile: {
+            selectedComplexityLevel: select(
+              'complexityLevel',
+              ComplexityLevels,
+              ComplexityLevels.Advanced
+            ),
+          },
+        },
+        actions: {
+          ada: {
+            delegationTransaction: {
+              setShouldDeregister: {
+                trigger: action('setShouldDeregister'),
+              },
+            },
+          },
+          dialogs: {
+            closeActiveDialog: { trigger: action('closeActiveDialog') },
           },
         },
       },

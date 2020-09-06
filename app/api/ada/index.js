@@ -359,8 +359,7 @@ export type CreateDelegationTxRequest = {|
     IGetPublic & IGetAllUtxos & IHasUtxoChains & IGetStakingKey
   ),
   absSlotNumber: BigNumber,
-  // TODO: maybe this probably be a trait of public deriver instead?
-  computeRegistrationStatus: void => Promise<boolean>,
+  registrationStatus: boolean,
   poolRequest: void | string,
   valueInAccount: BigNumber,
 |};
@@ -381,7 +380,7 @@ export type CreateWithdrawalTxRequest = {|
   getAccountState: AccountStateFunc,
   withdrawals: Array<{|
     ...({| privateKey: RustModule.WalletV4.PrivateKey |} | {| ...Addressing |}),
-    rewardAddress: string, // address you're withdrawing from
+    rewardAddress: string, // address you're withdrawing from (hex)
     /**
      * you need to withdraw all ADA before deregistering
      * but you don't need to deregister in order to withdraw
@@ -1055,8 +1054,6 @@ export default class AdaApi {
     Logger.debug(`${nameof(AdaApi)}::${nameof(this.createDelegationTx)} called`);
 
     try {
-      const registrationStatus = await request.computeRegistrationStatus();
-
       const config = getCardanoHaskellBaseConfig(
         request.publicDeriver.getParent().getNetworkInfo()
       ).reduce((acc, next) => Object.assign(acc, next), {});
@@ -1090,7 +1087,7 @@ export default class AdaApi {
 
       const stakeDelegationCert = createCertificate(
         stakingKey,
-        registrationStatus,
+        request.registrationStatus,
         request.poolRequest
       );
 

@@ -16,10 +16,9 @@ import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver
 import { WalletTypeOption, } from '../../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import RewardClaimDisclaimer from '../../../components/transfer/RewardClaimDisclaimer';
 import { ChainDerivations } from '../../../config/numbersConfig';
-import type { ComplexityLevelType } from '../../../types/complexityLevelType';
 import DeregisterDialogContainer from '../DeregisterDialogContainer';
 import type { GeneratedData as DeregisterDialogContainerData } from '../DeregisterDialogContainer';
-import { ComplexityLevels } from '../../../types/complexityLevelType';
+
 import {
   Bip44DerivationLevels,
 } from '../../../api/ada/lib/storage/database/walletTypes/bip44/api/utils';
@@ -44,10 +43,6 @@ export default class ShelleyEraOptionDialogContainer extends Component<Props> {
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired
   };
-
-  componentDidMount() {
-    this.generated.actions.ada.delegationTransaction.setShouldDeregister.trigger(false);
-  }
 
   startTransferIcarusRewards: void => void = () => {
     this.generated.actions.yoroiTransfer.startTransferFunds.trigger({
@@ -114,11 +109,7 @@ export default class ShelleyEraOptionDialogContainer extends Component<Props> {
             continuation: undefined,
           })}
           onNext={() => {
-            const nextStatus = (
-              this.generated.stores.profile.selectedComplexityLevel === ComplexityLevels.Advanced
-            )
-              ? DisclaimerStatus.DeregisterDisclaimer
-              : DisclaimerStatus.Done;
+            const nextStatus = DisclaimerStatus.DeregisterDisclaimer;
             this.generated.actions.dialogs.updateDataForActiveDialog.trigger({
               disclaimer: nextStatus,
             });
@@ -167,9 +158,6 @@ export default class ShelleyEraOptionDialogContainer extends Component<Props> {
 
   @computed get generated(): {|
     stores: {|
-      profile: {|
-        selectedComplexityLevel: ?ComplexityLevelType,
-      |},
       wallets: {|
         selected: null | PublicDeriver<>,
       |},
@@ -212,9 +200,6 @@ export default class ShelleyEraOptionDialogContainer extends Component<Props> {
     const { yoroiTransfer } = actions;
     return Object.freeze({
       stores: {
-        profile: {
-          selectedComplexityLevel: stores.profile.selectedComplexityLevel,
-        },
         wallets: {
           selected: stores.wallets.selected,
         },

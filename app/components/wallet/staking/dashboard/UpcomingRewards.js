@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import type { Node } from 'react';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
-import jdenticon from 'jdenticon';
+import { toSvg } from 'jdenticon';
 import { defineMessages, intlShape } from 'react-intl';
 import globalMessages from '../../../../i18n/global-messages';
 import type { PoolTuples } from '../../../../api/jormungandr/lib/state-fetch/types';
@@ -150,7 +150,7 @@ export default class UpcomingRewards extends Component<Props> {
   }
 
   getAvatars: MiniPoolInfo => Node = (pool) => {
-    const avatarSource = jdenticon.toSvg(pool.id[0], 36, { padding: 0 });
+    const avatarSource = toSvg(pool.id[0], 36, { padding: 0 });
 
     // Taken from Seiza (dangerouslyEmbedIntoDataURI())
     const avatar = `data:image/svg+xml;utf8,${encodeURIComponent(avatarSource)}`;

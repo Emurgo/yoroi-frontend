@@ -18,11 +18,8 @@ import {
 } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import { getCardanoHaskellBaseConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import {
-  genTimeToSlot, genToRelativeSlotNumber,
+  genTimeToSlot,
 } from '../../api/ada/lib/storage/bridge/timeUtils';
-import {
-  getRegistrationHistory,
-} from '../../api/ada/lib/storage/bridge/delegationUtils';
 import {
   isLedgerNanoWallet,
   isTrezorTWallet,
@@ -81,6 +78,7 @@ export default class AdaDelegationTransactionStore extends Store {
     ada.delegationTransaction.complete.listen(this._complete);
     ada.delegationTransaction.setPools.listen(this._setPools);
     ada.delegationTransaction.setShouldDeregister.listen(this._setShouldDeregister);
+    ada.delegationTransaction.createWithdrawalTxForWallet.listen(this._createWithdrawalTxForWallet);
     ada.delegationTransaction.reset.listen(this.reset);
   }
 
@@ -115,34 +113,26 @@ export default class AdaDelegationTransactionStore extends Store {
     const delegationRequests = this.stores.delegation.getDelegationRequests(
       request.publicDeriver
     );
-    if (delegationRequests == null) {
+    const adaDelegationRequests = this.stores.substores.ada.delegation.getDelegationRequests(
+      request.publicDeriver
+    );
+    if (delegationRequests == null || adaDelegationRequests == null) {
       throw new Error(`${nameof(AdaDelegationTransactionStore)}::${nameof(this._createTransaction)} called for non-reward wallet`);
     }
 
     const fullConfig = getCardanoHaskellBaseConfig(
       withHasUtxoChains.getParent().getNetworkInfo(),
     );
-    const toRelativeSlotNumber = await genToRelativeSlotNumber(fullConfig);
     const timeToSlot = await genTimeToSlot(fullConfig);
     const absSlotNumber = new BigNumber(timeToSlot({
       // use server time for TTL if connected to server
       time: this.stores.serverConnectionStore.serverTime ?? new Date(),
     }).slot);
-    const currentEpoch = toRelativeSlotNumber(
-      timeToSlot({
-        time: new Date(),
-      }).slot
-    ).epoch;
 
     const delegationTxPromise = this.createDelegationTx.execute({
       publicDeriver: basePubDeriver,
       poolRequest: request.poolRequest,
-      computeRegistrationStatus: async () => (await getRegistrationHistory({
-        publicDeriver: basePubDeriver,
-        stakingKeyAddressId: (await withStakingKey.getStakingKey()).addr.AddressId,
-        toRelativeSlotNumber,
-        currentEpoch,
-      })).currEpoch,
+      registrationStatus: adaDelegationRequests.getRegistrationHistory.result?.currEpoch ?? false,
       valueInAccount: delegationRequests.getDelegatedBalance.result?.accountPart
         ?? new BigNumber(0),
       absSlotNumber,
@@ -153,6 +143,51 @@ export default class AdaDelegationTransactionStore extends Store {
     await delegationTxPromise;
 
     this.markStale(false);
+  }
+
+  @action
+  _createWithdrawalTxForWallet: {|
+    publicDeriver: PublicDeriver<>,
+  |} => Promise<void> = async (request) => {
+    this.createWithdrawalTx.reset();
+
+    const withUtxos = asGetAllUtxos(request.publicDeriver);
+    if (withUtxos == null) {
+      throw new Error(`${nameof(this._createWithdrawalTxForWallet)} missing utxo functionality`);
+    }
+    const withHasUtxoChains = asHasUtxoChains(withUtxos);
+    if (withHasUtxoChains == null) {
+      throw new Error(`${nameof(this._createWithdrawalTxForWallet)} missing chains functionality`);
+    }
+    const withStakingKey = asGetAllAccounting(withHasUtxoChains);
+    if (withStakingKey == null) {
+      throw new Error(`${nameof(this._createWithdrawalTxForWallet)} missing staking key functionality`);
+    }
+
+    const stakingKeyDbRow = await withStakingKey.getStakingKey();
+
+    const fullConfig = getCardanoHaskellBaseConfig(
+      request.publicDeriver.getParent().getNetworkInfo()
+    );
+    const timeToSlot = await genTimeToSlot(fullConfig);
+    const absSlotNumber = new BigNumber(timeToSlot({
+      // use server time for TTL if connected to server
+      time: this.stores.serverConnectionStore.serverTime ?? new Date(),
+    }).slot);
+
+    const unsignedTx = await this.createWithdrawalTx.execute(async () => {
+      return await this.api.ada.createWithdrawalTx({
+        publicDeriver: withHasUtxoChains,
+        getAccountState: this.stores.substores.ada.stateFetchStore.fetcher.getAccountState,
+        absSlotNumber,
+        withdrawals: [{
+          addressing: stakingKeyDbRow.addressing,
+          rewardAddress: stakingKeyDbRow.addr.Hash,
+          shouldDeregister: this.shouldDeregister,
+        }],
+      });
+    }).promise;
+    if (unsignedTx == null) throw new Error(`Should never happen`);
   }
 
   @action
