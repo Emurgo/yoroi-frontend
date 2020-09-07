@@ -689,6 +689,7 @@
   "wallet.transaction.type.exchange": "Ανταλλαγή",
   "wallet.transaction.type.intrawallet": "{currency} εντός πορτοφολιού συναλλαγή",
   "wallet.transaction.type.multiparty": "{currency} πολυμερείς συναλλαγή",
+  "wallet.transaction.withdraw": "Withdraw",
   "wallet.transaction.withdrawalsLabel": "Withdrawals",
   "wallet.transfer.cards.byron": "Byron-era wallet",
   "wallet.transfer.cards.shelley": "Shelley-era wallet",
