@@ -63,7 +63,7 @@ export type SendFunc = (body: SignedRequest) => Promise<SignedResponse>;
 export type RemoteTxState = 'Successful' | 'Failed' | 'Pending';
 
 export type RemoteTransactionShelley = {|
-  +ttl?: string,
+  +ttl: string,
   +fee: string,
   +certificates: $ReadOnlyArray<RemoteCertificate>,
   +withdrawals: Array<RemoteWithdrawal>,

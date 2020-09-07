@@ -30,6 +30,8 @@ function createWallet(payload: {|
 type WalletNames =
   'shelley-simple-24' |
   'shelley-simple-15' |
+  'shelley-delegated' |
+  'shelley-ledger-delegated' |
   'small-single-tx' |
   'failed-single-tx' |
   'many-tx-wallet' |
@@ -107,5 +109,17 @@ export const testWallets: { [key: WalletNames]: RestorationInput, ... } = Object
     name: ('shelley-simple-15': WalletNames),
     mnemonic: 'eight country switch draw meat scout mystery blade tip drift useless good keep usage title',
     plate: 'ZDDC-9858',
+  }),
+  createWallet({
+    name: ('shelley-delegated': WalletNames),
+    mnemonic: 'parrot offer switch thank film high drop salute task train squirrel coral consider coyote evolve',
+    plate: 'PALP-0076',
+    deviceId: '6495958994A4025BB5EE1DB1',
+  }),
+  createWallet({
+    name: ('shelley-ledger-delegated': WalletNames),
+    mnemonic: 'parrot offer switch thank film high drop salute task train squirrel coral consider coyote evolve',
+    plate: 'PALP-0076',
+    deviceId: '707fa118bf6b84',
   }),
 );

@@ -8,8 +8,12 @@ import type {
   AddressUtxoFunc,
   RewardHistoryFunc,
   AccountStateFunc,
+  RemoteAccountState,
   HistoryFunc,
   BestBlockFunc,
+} from '../../app/api/ada/lib/state-fetch/types';
+import {
+  ShelleyCertificateTypes
 } from '../../app/api/ada/lib/state-fetch/types';
 import type {
   FilterFunc,
@@ -79,6 +83,10 @@ export const generateTransaction = (): {|
   bip44TrezorTx3: RemoteTransaction,
   cip1852TrezorTx1: RemoteTransaction,
   shelleySimple15: RemoteTransaction,
+  shelleyDelegatedTx1: RemoteTransaction,
+  shelleyDelegatedTx2: RemoteTransaction,
+  shelleyLedgerDelegatedTx1: RemoteTransaction,
+  shelleyLedgerDelegatedTx2: RemoteTransaction,
 |} => {
   const genesisTx = {
     hash: 'b713cc0d63106c3806b5a7077cc37a294fcca5e479f26aac64e51e09ae808d75',
@@ -368,6 +376,36 @@ export const generateTransaction = (): {|
         ),
         amount: '10000000'
       },
+      {
+        // index: 19
+        // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
+        address: getSingleAddressString(
+          testWallets['dump-wallet'].mnemonic,
+          [
+            WalletTypePurpose.BIP44,
+            CoinTypes.CARDANO,
+            0 + HARD_DERIVATION_START,
+            ChainDerivations.EXTERNAL,
+            1
+          ],
+        ),
+        amount: '10000000'
+      },
+      {
+        // index: 20
+        // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
+        address: getSingleAddressString(
+          testWallets['dump-wallet'].mnemonic,
+          [
+            WalletTypePurpose.BIP44,
+            CoinTypes.CARDANO,
+            0 + HARD_DERIVATION_START,
+            ChainDerivations.EXTERNAL,
+            1
+          ],
+        ),
+        amount: '10000000'
+      },
     ],
     height: 1,
     epoch: 0,
@@ -593,7 +631,7 @@ export const generateTransaction = (): {|
     ],
     height: 100,
     block_hash: '100',
-    tx_ordinal: 0,
+    tx_ordinal: 1,
     time: '2019-04-20T15:15:33.000Z',
     epoch: 0,
     slot: 100,
@@ -653,7 +691,7 @@ export const generateTransaction = (): {|
     ],
     height: 100,
     block_hash: '100',
-    tx_ordinal: 1,
+    tx_ordinal: 2,
     time: '2019-04-20T15:15:33.000Z',
     epoch: 0,
     slot: 100,
@@ -713,7 +751,7 @@ export const generateTransaction = (): {|
     ],
     height: 100,
     block_hash: '100',
-    tx_ordinal: 2,
+    tx_ordinal: 3,
     time: '2019-04-20T15:15:33.000Z',
     epoch: 0,
     slot: 100,
@@ -1327,6 +1365,222 @@ export const generateTransaction = (): {|
     tx_state: 'Successful'
   };
 
+  // =====================
+  //   shelley-delegated
+  // =====================
+
+  const shelleyDelegatedTx1 = {
+    hash: '3677e76c7ba699afdc6cd57d42f246f86f69aefd76025006ac78313fad2bba21',
+    inputs: [
+      {
+        // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
+        address: getSingleAddressString(
+          testWallets['dump-wallet'].mnemonic,
+          [
+            WalletTypePurpose.BIP44,
+            CoinTypes.CARDANO,
+            0 + HARD_DERIVATION_START,
+            ChainDerivations.EXTERNAL,
+            1
+          ]
+        ),
+        txHash: distributorTx.hash,
+        id: distributorTx.hash + '19',
+        index: 19,
+        amount: '8500000'
+      }
+    ],
+    outputs: [
+      {
+        // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
+        address: getSingleAddressString(
+          testWallets['dump-wallet'].mnemonic,
+          [
+            WalletTypePurpose.BIP44,
+            CoinTypes.CARDANO,
+            0 + HARD_DERIVATION_START,
+            ChainDerivations.EXTERNAL,
+            1
+          ]
+        ),
+        amount: '1'
+      },
+      {
+        // shelley-delegated base address index 0'/0/0
+        // eslint-disable-next-line max-len
+        // addr1qymwxh8y7pkdea6dyvrldnh6rtt5u9qxp0nd43dzn6c5y06kmdwdfzyussgs6n0fpsx4qw63hpzdk0n0mpuezgufjkas3clf5j
+        address: '0136e35ce4f06cdcf74d2307f6cefa1ad74e14060be6dac5a29eb1423f56db5cd4889c84110d4de90c0d503b51b844db3e6fd87991238995bb',
+        amount: '5500000'
+      },
+    ],
+    height: 100,
+    block_hash: '100',
+    tx_ordinal: 4,
+    time: '2019-04-20T15:15:33.000Z',
+    epoch: 0,
+    slot: 100,
+    last_update: '2019-05-20T23:16:51.899Z',
+    tx_state: 'Successful'
+  };
+  const shelleyDelegatedTx2 = {
+    hash: '3677e86c7ba699afdc1cd57d42f246f86f69aefd76025006ac78313fad2bba21',
+    type: 'shelley',
+    inputs: [
+      {
+        // shelley-delegated base address index 0'/0/0
+        // eslint-disable-next-line max-len
+        // addr1qymwxh8y7pkdea6dyvrldnh6rtt5u9qxp0nd43dzn6c5y06kmdwdfzyussgs6n0fpsx4qw63hpzdk0n0mpuezgufjkas3clf5j
+        address: '0136e35ce4f06cdcf74d2307f6cefa1ad74e14060be6dac5a29eb1423f56db5cd4889c84110d4de90c0d503b51b844db3e6fd87991238995bb',
+        txHash: shelleyDelegatedTx1.hash,
+        id: shelleyDelegatedTx1.hash + '1',
+        index: 1,
+        amount: '5500000'
+      }
+    ],
+    outputs: [
+      {
+        // shelley-delegated base address index 0'/1/0
+        // eslint-disable-next-line max-len
+        // addr1qxnhwn2yw8utcxprcqxl0hx0v2wq2g304tc5wyzmhx6cvgzkmdwdfzyussgs6n0fpsx4qw63hpzdk0n0mpuezgufjkaswuh3qd
+        address: '01a7774d4471f8bc1823c00df7dccf629c05222faaf147105bb9b5862056db5cd4889c84110d4de90c0d503b51b844db3e6fd87991238995bb',
+        amount: '3000000'
+      },
+    ],
+    ttl: '500',
+    fee: '500000',
+    certificates: [
+      {
+        certIndex: 0,
+        kind: (ShelleyCertificateTypes.StakeRegistration: 'StakeRegistration'),
+        rewardAddress: 'e156db5cd4889c84110d4de90c0d503b51b844db3e6fd87991238995bb',
+      },
+      {
+        certIndex: 1,
+        kind: ShelleyCertificateTypes.StakeDelegation,
+        rewardAddress: 'e156db5cd4889c84110d4de90c0d503b51b844db3e6fd87991238995bb',
+        poolKeyHash: 'df1750df9b2df285fcfb50f4740657a18ee3af42727d410c37b86207', // YOROI
+      },
+    ],
+    withdrawals: [],
+    metadata: null,
+    height: 200,
+    block_hash: '200',
+    tx_ordinal: 1,
+    time: '2019-04-21T15:13:33.000Z',
+    epoch: 0,
+    slot: 200,
+    last_update: '2019-05-21T23:14:51.899Z',
+    tx_state: 'Successful'
+  };
+
+  // ============================
+  //   shelley-ledger-delegated
+  // ============================
+
+  const shelleyLedgerDelegatedTx1 = {
+    hash: '3699e76c7ba699afdc6cd57d42f246f86f69aefd76025006ac78313fad2bba21',
+    inputs: [
+      {
+        // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
+        address: getSingleAddressString(
+          testWallets['dump-wallet'].mnemonic,
+          [
+            WalletTypePurpose.BIP44,
+            CoinTypes.CARDANO,
+            0 + HARD_DERIVATION_START,
+            ChainDerivations.EXTERNAL,
+            1
+          ]
+        ),
+        txHash: distributorTx.hash,
+        id: distributorTx.hash + '20',
+        index: 20,
+        amount: '8500000'
+      }
+    ],
+    outputs: [
+      {
+        // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
+        address: getSingleAddressString(
+          testWallets['dump-wallet'].mnemonic,
+          [
+            WalletTypePurpose.BIP44,
+            CoinTypes.CARDANO,
+            0 + HARD_DERIVATION_START,
+            ChainDerivations.EXTERNAL,
+            1
+          ]
+        ),
+        amount: '1'
+      },
+      {
+        // shelley-ledger-delegated base address index 0'/0/0
+        // eslint-disable-next-line max-len
+        // addr1q82e70f6t2v5va99t2mvc894235wz5kfc32vhs5khf0c9xw7kz7vewkwsezwewajhr4el3axkrnnsr50qx05gdjd6psq4wu69r
+        address: '01d59f3d3a5a994674a55ab6cc1cb55468e152c9c454cbc296ba5f8299deb0bcccbace8644ecbbb2b8eb9fc7a6b0e7380e8f019f44364dd060',
+        amount: '5500000'
+      },
+    ],
+    height: 100,
+    block_hash: '100',
+    tx_ordinal: 5,
+    time: '2019-04-20T15:15:33.000Z',
+    epoch: 0,
+    slot: 100,
+    last_update: '2019-05-20T23:16:51.899Z',
+    tx_state: 'Successful'
+  };
+  const shelleyLedgerDelegatedTx2 = {
+    hash: '3688e86c7ba699afdc1cd57d42f246f86f69aefd76025006ac78313fad2bba21',
+    type: 'shelley',
+    inputs: [
+      {
+        // shelley-ledger-delegated base address index 0'/0/0
+        // eslint-disable-next-line max-len
+        // addr1q82e70f6t2v5va99t2mvc894235wz5kfc32vhs5khf0c9xw7kz7vewkwsezwewajhr4el3axkrnnsr50qx05gdjd6psq4wu69r
+        address: '01d59f3d3a5a994674a55ab6cc1cb55468e152c9c454cbc296ba5f8299deb0bcccbace8644ecbbb2b8eb9fc7a6b0e7380e8f019f44364dd060',
+        txHash: shelleyLedgerDelegatedTx1.hash,
+        id: shelleyLedgerDelegatedTx1.hash + '1',
+        index: 1,
+        amount: '5500000'
+      }
+    ],
+    outputs: [
+      {
+        // shelley-ledger-delegated base address index 0'/1/0
+        // eslint-disable-next-line max-len
+        // addr1q9mhtwlxextzp4kqe04ycj7gus5j8gd5jaz42xsklslcdzx7kz7vewkwsezwewajhr4el3axkrnnsr50qx05gdjd6psq62plmk
+        address: '017775bbe6c99620d6c0cbea4c4bc8e42923a1b49745551a16fc3f8688deb0bcccbace8644ecbbb2b8eb9fc7a6b0e7380e8f019f44364dd060',
+        amount: '3000000'
+      },
+    ],
+    ttl: '500',
+    fee: '500000',
+    certificates: [
+      {
+        certIndex: 0,
+        kind: (ShelleyCertificateTypes.StakeRegistration: 'StakeRegistration'),
+        rewardAddress: 'e1deb0bcccbace8644ecbbb2b8eb9fc7a6b0e7380e8f019f44364dd060',
+      },
+      {
+        certIndex: 1,
+        kind: ShelleyCertificateTypes.StakeDelegation,
+        rewardAddress: 'e1deb0bcccbace8644ecbbb2b8eb9fc7a6b0e7380e8f019f44364dd060',
+        poolKeyHash: 'df1750df9b2df285fcfb50f4740657a18ee3af42727d410c37b86207', // YOROI
+      },
+    ],
+    withdrawals: [],
+    metadata: null,
+    height: 200,
+    block_hash: '200',
+    tx_ordinal: 2,
+    time: '2019-04-21T15:13:33.000Z',
+    epoch: 0,
+    slot: 200,
+    last_update: '2019-05-21T23:14:51.899Z',
+    tx_state: 'Successful'
+  };
+
   return {
     genesisTx,
     distributorTx,
@@ -1347,6 +1601,10 @@ export const generateTransaction = (): {|
     bip44TrezorTx3,
     cip1852TrezorTx1,
     shelleySimple15,
+    shelleyDelegatedTx1,
+    shelleyDelegatedTx2,
+    shelleyLedgerDelegatedTx1,
+    shelleyLedgerDelegatedTx2,
   };
 };
 
@@ -1357,7 +1615,34 @@ export const generateTransaction = (): {|
 const transactions: Array<MockTx> = [];
 
 export function addTransaction(tx: MockTx): void {
-  transactions.push(tx);
+  // need to insert txs in order they appear in the blockchain
+  // note: pending transactions always go at the end
+  if (tx.epoch == null || tx.slot == null || tx.tx_ordinal == null) {
+    transactions.push(tx);
+    return;
+  }
+  const newTxEpoch = tx.epoch;
+  const newTxSlot = tx.slot;
+  const newTxOrdinal = tx.tx_ordinal;
+
+  const insertionIndex = transactions.findIndex(mockChainTx => {
+    const epoch = mockChainTx.epoch;
+    const slot = mockChainTx.slot;
+    const txOrdinal = mockChainTx.tx_ordinal;
+
+    if (epoch == null) return true;
+    if (epoch > newTxEpoch) return true;
+    if (slot == null) return true;
+    if (slot > newTxSlot) return true;
+    if (txOrdinal == null) return true;
+    if (txOrdinal > newTxOrdinal) return true;
+    return false;
+  });
+  if (insertionIndex === -1) {
+    transactions.push(tx);
+    return;
+  }
+  transactions.splice(insertionIndex, 0, tx);
 }
 
 export const MockChain = Object.freeze({
@@ -1399,6 +1684,12 @@ export function resetChain(
     addTransaction(txs.cip1852TrezorTx1);
     // shelley-simple-15
     addTransaction(txs.shelleySimple15);
+    // shelley-delegated
+    addTransaction(txs.shelleyDelegatedTx1);
+    addTransaction(txs.shelleyDelegatedTx2);
+    // shelley-ledger-delegated
+    addTransaction(txs.shelleyLedgerDelegatedTx1);
+    addTransaction(txs.shelleyLedgerDelegatedTx2);
   } else if (chainToUse === MockChain.TestAssurance) {
     // test setup
     addTransaction(txs.genesisTx);
@@ -1481,18 +1772,51 @@ const sendTx = (request: SignedRequestInternal): SignedResponse => {
 const getPoolInfo: PoolInfoFunc = genGetPoolInfo();
 const getRewardHistory: RewardHistoryFunc = genGetRewardHistory();
 
-const getAccountState: AccountStateFunc = async (_request) => {
+const getAccountState: AccountStateFunc = async (request) => {
   const totalRewards = new BigNumber(5000000);
   const totalWithdrawals = new BigNumber(0);
-  return {
-    // shelley-simple-15
-    e19558e969caa9e57adcfc40b9907eb794363b590faf42fff48c38eb88: {
-      poolOperator: null,
-      remainingAmount: totalRewards.minus(totalWithdrawals).toString(),
-      rewards: totalRewards.toString(),
-      withdrawals: totalWithdrawals.toString(),
-    }
-  };
+
+  // no good way to mock this since it's not implicitly stored in the chain
+  // with the exception of MIR certificates
+  const accountStateMap = new Map<string, RemoteAccountState>([
+    [
+      // shelley-simple-15
+      'e19558e969caa9e57adcfc40b9907eb794363b590faf42fff48c38eb88',
+      {
+        poolOperator: null,
+        remainingAmount: totalRewards.minus(totalWithdrawals).toString(),
+        rewards: totalRewards.toString(),
+        withdrawals: totalWithdrawals.toString(),
+      },
+    ],
+    [
+      // shelley-delegated
+      'e156db5cd4889c84110d4de90c0d503b51b844db3e6fd87991238995bb',
+      {
+        poolOperator: null,
+        remainingAmount: totalRewards.minus(totalWithdrawals).toString(),
+        rewards: totalRewards.toString(),
+        withdrawals: totalWithdrawals.toString(),
+      },
+    ],
+    [
+      // shelley-ledger-delegated
+      'e1deb0bcccbace8644ecbbb2b8eb9fc7a6b0e7380e8f019f44364dd060',
+      {
+        poolOperator: null,
+        remainingAmount: totalRewards.minus(totalWithdrawals).toString(),
+        rewards: totalRewards.toString(),
+        withdrawals: totalWithdrawals.toString(),
+      },
+    ],
+  ]);
+
+  const result: {| [key: string]: (null | RemoteAccountState) |} = {};
+  for (const addr of request.addresses) {
+    result[addr] = accountStateMap.get(addr) ?? null;
+  }
+
+  return result;
 };
 
 export default {

@@ -2,6 +2,7 @@
 import React, { Component } from 'react';
 import type { Node } from 'react';
 import BigNumber from 'bignumber.js';
+import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape, FormattedMessage, } from 'react-intl';
 import type { $npm$ReactIntl$MessageDescriptor, $npm$ReactIntl$IntlFormat } from 'react-intl';
@@ -161,13 +162,13 @@ export default class UserSummary extends Component<Props, State> {
               <div className={styles.sectionActions}>
                 {this.props.withdrawRewards != null && (
                   <div
-                    className={styles.note}
+                    className={classnames([styles.note, 'withdrawButton'])}
                     role="button"
                     tabIndex={0}
                     onKeyPress={() => null}
                     onClick={this.props.withdrawRewards}
                   >
-                    {intl.formatMessage(globalMessages.withdrawnLabel)}
+                    {intl.formatMessage(globalMessages.withdrawLabel)}
                   </div>
                 )}
                 <div

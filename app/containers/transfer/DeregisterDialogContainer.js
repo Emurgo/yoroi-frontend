@@ -17,6 +17,7 @@ export type GeneratedData = typeof DeregisterDialogContainer.prototype.generated
 type Props = {|
   ...InjectedOrGenerated<GeneratedData>,
   +onNext: void => void,
+  +alwaysShowDeregister: boolean,
 |};
 
 const dialogMessages = defineMessages({
@@ -58,7 +59,10 @@ export default class DeregisterDialogContainer extends Component<Props> {
 
   componentDidMount() {
     this.generated.actions.ada.delegationTransaction.setShouldDeregister.trigger(false);
-    if (this.generated.stores.profile.selectedComplexityLevel !== ComplexityLevels.Advanced) {
+    if (
+      this.props.alwaysShowDeregister === false &&
+      this.generated.stores.profile.selectedComplexityLevel !== ComplexityLevels.Advanced
+    ) {
       this.props.onNext();
     }
   }

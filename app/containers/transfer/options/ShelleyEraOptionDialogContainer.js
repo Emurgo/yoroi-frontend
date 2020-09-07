@@ -124,6 +124,16 @@ export default class ShelleyEraOptionDialogContainer extends Component<Props> {
       return (
         <DeregisterDialogContainer
           {...this.generated.DeregisterDialogContainerProps}
+          alwaysShowDeregister={
+            /* very easy for the user to not understand what is going on
+             * and enter their current wallet's recovery phrase in the claim / transfer page
+             * ex: using this thinking it will claim just ITN rewards in their current wallet
+             * not realizing this will undelegate their funds if they choose to deregister
+             * so by default, the claim / transfer page will hide the deregistration dialog
+             * unless the person considers themselves an "advanced" user
+             */
+             false
+          }
           onNext={() => {
             this.generated.actions.dialogs.updateDataForActiveDialog.trigger({
               disclaimer: DisclaimerStatus.Done,

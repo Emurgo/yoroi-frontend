@@ -646,6 +646,7 @@ export default class StakingDashboardPage extends Component<Props> {
       return (
         <DeregisterDialogContainer
           {...this.generated.DeregisterDialogContainerProps}
+          alwaysShowDeregister
           onNext={() => {
             // note: purposely don't await since the next dialog will properly render the spinner
             this.generated.actions.ada.delegationTransaction.createWithdrawalTxForWallet.trigger({

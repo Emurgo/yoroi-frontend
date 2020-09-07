@@ -597,7 +597,7 @@ const globalMessages: * = defineMessages({
     id: 'wallet.transaction.withdrawalsLabel',
     defaultMessage: '!!!Withdrawals',
   },
-  withdrawnLabel: {
+  withdrawLabel: {
     id: 'wallet.transaction.withdraw',
     defaultMessage: '!!!Withdraw',
   },
