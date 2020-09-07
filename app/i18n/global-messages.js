@@ -597,6 +597,10 @@ const globalMessages: * = defineMessages({
     id: 'wallet.transaction.withdrawalsLabel',
     defaultMessage: '!!!Withdrawals',
   },
+  withdrawLabel: {
+    id: 'wallet.transaction.withdraw',
+    defaultMessage: '!!!Withdraw',
+  },
   byronLabel: {
     id: 'wallet.receive.navigation.byronLabel',
     defaultMessage: '!!!Byron'

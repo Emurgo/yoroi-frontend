@@ -6,8 +6,9 @@ import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import globalMessages from '../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-
+import type { ComplexityLevelType } from '../../types/complexityLevelType';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
+import { ComplexityLevels } from '../../types/complexityLevelType';
 
 import DangerousActionDialog from '../../components/widgets/DangerousActionDialog';
 
@@ -16,6 +17,7 @@ export type GeneratedData = typeof DeregisterDialogContainer.prototype.generated
 type Props = {|
   ...InjectedOrGenerated<GeneratedData>,
   +onNext: void => void,
+  +alwaysShowDeregister: boolean,
 |};
 
 const dialogMessages = defineMessages({
@@ -54,6 +56,16 @@ export default class DeregisterDialogContainer extends Component<Props> {
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
+
+  componentDidMount() {
+    this.generated.actions.ada.delegationTransaction.setShouldDeregister.trigger(false);
+    if (
+      this.props.alwaysShowDeregister === false &&
+      this.generated.stores.profile.selectedComplexityLevel !== ComplexityLevels.Advanced
+    ) {
+      this.props.onNext();
+    }
+  }
 
   @observable isChecked: boolean = false;
 
@@ -114,6 +126,9 @@ export default class DeregisterDialogContainer extends Component<Props> {
       |},
     |},
     stores: {|
+      profile: {|
+        selectedComplexityLevel: ?ComplexityLevelType,
+      |},
     |}
     |} {
     if (this.props.generated !== undefined) {
@@ -122,9 +137,13 @@ export default class DeregisterDialogContainer extends Component<Props> {
     if (this.props.stores == null || this.props.actions == null) {
       throw new Error(`${nameof(DeregisterDialogContainer)} no way to generated props`);
     }
-    const { actions, } = this.props;
+    const { actions, stores, } = this.props;
     return Object.freeze({
-      stores: Object.freeze({}),
+      stores: Object.freeze({
+        profile: {
+          selectedComplexityLevel: stores.profile.selectedComplexityLevel,
+        },
+      }),
       actions: {
         ada: {
           delegationTransaction: {

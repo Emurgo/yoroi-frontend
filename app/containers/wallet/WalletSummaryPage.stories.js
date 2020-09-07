@@ -348,6 +348,7 @@ export const Transaction = (): Node => {
         CertificateId: 0,
         TransactionId: 0,
         Kind: certificateSelect,
+        Ordinal: 0,
         Payload: ''
       },
     }];

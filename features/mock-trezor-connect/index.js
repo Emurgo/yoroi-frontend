@@ -162,7 +162,7 @@ class MockTrezorConnect {
     if (deviceId == null) return;
 
     if (MockTrezorConnect.selectedWallet == null) {
-      throw new Error(`No mock Ledger wallet selected`);
+      throw new Error(`No mock Trezor wallet selected`);
     }
     const selectedWallet = MockTrezorConnect.selectedWallet;
 
@@ -184,7 +184,7 @@ class MockTrezorConnect {
     const genPayload = (request: CardanoGetAddress): CardanoAddress => {
       // this.checkSerial;
       if (MockTrezorConnect.selectedWallet == null) {
-        throw new Error(`No mock Ledger wallet selected`);
+        throw new Error(`No mock Trezor wallet selected`);
       }
       const selectedWallet = MockTrezorConnect.selectedWallet;
       const address = deriveAddress(selectedWallet.rootKey, request);
@@ -233,7 +233,7 @@ class MockTrezorConnect {
     const genPayload = (key: CardanoGetPublicKey): CardanoPublicKey => {
       // this.checkSerial;
       if (MockTrezorConnect.selectedWallet == null) {
-        throw new Error(`No mock Ledger wallet selected`);
+        throw new Error(`No mock Trezor wallet selected`);
       }
       const selectedWallet = MockTrezorConnect.selectedWallet;
 
@@ -272,7 +272,7 @@ class MockTrezorConnect {
     MockTrezorConnect.mockConnectDevice();
 
     if (MockTrezorConnect.selectedWallet == null) {
-      throw new Error(`No mock Ledger wallet selected`);
+      throw new Error(`No mock Trezor wallet selected`);
     }
     const selectedWallet = MockTrezorConnect.selectedWallet;
 
@@ -488,7 +488,7 @@ class MockTrezorConnect {
 
   static mockConnectDevice: void => void = () => {
     if (MockTrezorConnect.selectedWallet == null) {
-      throw new Error(`No mock Ledger wallet selected`);
+      throw new Error(`No mock Trezor wallet selected`);
     }
     const selectedWallet = MockTrezorConnect.selectedWallet;
 

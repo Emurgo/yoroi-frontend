@@ -2,6 +2,7 @@
 import React, { Component } from 'react';
 import type { Node } from 'react';
 import BigNumber from 'bignumber.js';
+import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape, FormattedMessage, } from 'react-intl';
 import type { $npm$ReactIntl$MessageDescriptor, $npm$ReactIntl$IntlFormat } from 'react-intl';
@@ -72,6 +73,7 @@ type Props = {|
     +primaryTicker: string,
     +decimalPlaces: number,
   |},
+  +withdrawRewards: void | (void => void),
 |};
 
 type State = {|
@@ -157,15 +159,28 @@ export default class UserSummary extends Component<Props, State> {
               <p className={styles.value}>
                 {totalRewards.ADA} {this.props.meta.primaryTicker}
               </p>
-              <span
-                className={styles.note}
-                role="button"
-                tabIndex={0}
-                onKeyPress={() => null}
-                onClick={this.props.openLearnMore}
-              >
-                {intl.formatMessage(messages.note)}
-              </span>
+              <div className={styles.sectionActions}>
+                {this.props.withdrawRewards != null && (
+                  <div
+                    className={classnames([styles.note, 'withdrawButton'])}
+                    role="button"
+                    tabIndex={0}
+                    onKeyPress={() => null}
+                    onClick={this.props.withdrawRewards}
+                  >
+                    {intl.formatMessage(globalMessages.withdrawLabel)}
+                  </div>
+                )}
+                <div
+                  className={styles.note}
+                  role="button"
+                  tabIndex={0}
+                  onKeyPress={() => null}
+                  onClick={this.props.openLearnMore}
+                >
+                  {intl.formatMessage(messages.note)}
+                </div>
+              </div>
             </>
           )
           : (<LoadingSpinner small />)

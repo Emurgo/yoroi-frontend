@@ -25,13 +25,14 @@ import type {
   GetDelegatedBalanceFunc,
   GetCurrentDelegationFunc,
   GetCurrentDelegationResponse,
+  RewardHistoryFunc,
 } from '../../api/common/lib/storage/bridge/delegationUtils';
 import {
   genToRelativeSlotNumber,
   genTimeToSlot,
 } from '../../api/jormungandr/lib/storage/bridge/timeUtils';
 import { isJormungandr, getJormungandrBaseConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
-import type { DelegationRequests, RewardHistoryForWallet } from '../toplevel/DelegationStore';
+import type { DelegationRequests } from '../toplevel/DelegationStore';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 
 export default class JormungandrDelegationStore extends Store {
@@ -45,7 +46,7 @@ export default class JormungandrDelegationStore extends Store {
       publicDeriver,
       getDelegatedBalance: new CachedRequest<GetDelegatedBalanceFunc>(getDelegatedBalance),
       getCurrentDelegation: new CachedRequest<GetCurrentDelegationFunc>(getCurrentDelegation),
-      rewardHistory: new CachedRequest<RewardHistoryForWallet>(async (address) => {
+      rewardHistory: new CachedRequest<RewardHistoryFunc>(async (address) => {
         // we need to defer this call because the store may not be initialized yet
         // by the time this constructor is called
         const stateFetcher = this.stores.substores.jormungandr.stateFetchStore.fetcher;

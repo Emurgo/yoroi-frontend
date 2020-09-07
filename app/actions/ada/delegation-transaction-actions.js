@@ -8,6 +8,9 @@ export default class DelegationTransactionActions {
     publicDeriver: PublicDeriver<>,
     poolRequest: string | void,
   |}> = new AsyncAction();
+  createWithdrawalTxForWallet: AsyncAction<{|
+    publicDeriver: PublicDeriver<>,
+  |}> = new AsyncAction();
   signTransaction: AsyncAction<{|
     password?: string,
     publicDeriver: PublicDeriver<>,

@@ -16,6 +16,10 @@ import {
   genTentativeJormungandrTx,
 } from '../../../../stories/helpers/jormungandr/JormungandrMocks';
 import {
+  genShelleyCIP1852SigningWalletWithCache,
+  genWithdrawalTx,
+} from '../../../../stories/helpers/cardano/ShelleyCip1852Mocks';
+import {
   walletLookup
 } from '../../../../stories/helpers/WalletCache';
 import type {
@@ -35,12 +39,18 @@ import type {
   GetDelegatedBalanceFunc,
   CertificateForEpoch,
   GetCurrentDelegationFunc,
+  RewardHistoryFunc,
 } from '../../../api/common/lib/storage/bridge/delegationUtils';
 import type {
-  RewardHistoryForWallet,
+  GetRegistrationHistoryFunc,
+} from '../../../api/ada/lib/storage/bridge/delegationUtils';
+import type {
   DelegationRequests,
   PoolMeta,
 } from '../../../stores/toplevel/DelegationStore';
+import type {
+  AdaDelegationRequests,
+} from '../../../stores/ada/AdaDelegationStore';
 import { GenericApiError, GetAccountStateApiError, GetPoolInfoApiError } from '../../../api/common/errors';
 import LessThanExpectedDialog from '../../../components/wallet/staking/dashboard/LessThanExpectedDialog';
 import UnmangleTxDialogContainer from '../../transfer/UnmangleTxDialogContainer';
@@ -58,6 +68,10 @@ import type { IAddressTypeStore, IAddressTypeUiSubset } from '../../../stores/st
 import {
   CoreAddressTypes,
 } from '../../../api/ada/lib/storage/database/primitives/enums';
+import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
+import { ComplexityLevels } from '../../../types/complexityLevelType';
+import DeregisterDialogContainer from '../../transfer/DeregisterDialogContainer';
+import WithdrawalTxDialogContainer from '../../transfer/WithdrawalTxDialogContainer';
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -79,6 +93,23 @@ const genDefaultGroupMap: (
   );
 };
 
+const isRegistered: {|
+  delegationRequests: (PublicDeriver<>) => (void | DelegationRequests),
+  publicDeriver: PublicDeriver<>,
+  forceRegistration?: boolean,
+|} => (void | boolean) = (request) => {
+  const delegationRequests = request.delegationRequests(request.publicDeriver);
+  if (delegationRequests == null) return undefined;
+  if (delegationRequests.getCurrentDelegation.result == null) return undefined;
+  if (delegationRequests.getCurrentDelegation.result.currEpoch == null) {
+    return request.forceRegistration ?? false;
+  }
+  if (delegationRequests.getCurrentDelegation.result.currEpoch.pools.length === 0) {
+    return request.forceRegistration ?? false;
+  }
+  return true;
+};
+
 const getRoute = (id) => buildRoute(
   ROUTES.WALLETS.DELEGATION_DASHBOARD,
   { id, }
@@ -96,6 +127,8 @@ const genBaseProps: {|
     addresses: $ReadOnlyArray<$ReadOnly<StandardAddress>>,
   |},
   getLocalPoolInfo: *,
+  forceRegistration?: (void | boolean),
+  withdrawalTxProps?: *,
   getParam?: <T>(number | string) => T,
 |} => * = (request) => {
   const sendErrorCases = {
@@ -163,6 +196,11 @@ const genBaseProps: {|
         getCurrentTimeRequests: request.lookup.getCurrentTimeRequests,
       },
       substores: {
+        ada: {
+          delegation: {
+            getDelegationRequests: request.lookup.getAdaDelegation,
+          },
+        },
         jormungandr: {
           delegationTransaction: request.delegationTransaction || {
             isStale: false,
@@ -199,6 +237,9 @@ const genBaseProps: {|
           reset: {
             trigger: action('closeActiveDialog'),
           },
+          createWithdrawalTxForWallet: {
+            trigger: async (req) => action('createWithdrawalTxForWallet')(req),
+          },
         },
       },
       jormungandr: {
@@ -225,6 +266,32 @@ const genBaseProps: {|
         },
       },
     },
+    WithdrawalTxDialogContainerProps: request.withdrawalTxProps ?? (null: any),
+    DeregisterDialogContainerProps: {
+      generated: {
+        stores: {
+          profile: {
+            selectedComplexityLevel: select(
+              'complexityLevel',
+              ComplexityLevels,
+              ComplexityLevels.Advanced
+            ),
+          },
+        },
+        actions: {
+          ada: {
+            delegationTransaction: {
+              setShouldDeregister: {
+                trigger: action('setShouldDeregister'),
+              },
+            },
+          },
+          dialogs: {
+            closeActiveDialog: { trigger: action('closeActiveDialog') },
+          },
+        },
+      },
+    },
     UnmangleTxDialogContainerProps: {
       generated: {
         TransferSendProps: {
@@ -236,6 +303,11 @@ const genBaseProps: {|
                 },
               },
               ada: {
+                trezorSend: {
+                  sendUsingTrezor: {
+                    trigger: async (req) => action('sendUsingTrezor')(req),
+                  },
+                },
                 ledgerSend: {
                   sendUsingLedgerWallet: {
                     trigger: async (req) => action('sendUsingLedgerWallet')(req),
@@ -504,7 +576,7 @@ function getStakingInfo(
       )),
     })
   );
-  const rewardHistory: CachedRequest<RewardHistoryForWallet> = new CachedRequest(
+  const rewardHistory: CachedRequest<RewardHistoryFunc> = new CachedRequest(
     _request => (
       stakingCase === stakingKeyCases.LongAgoDelegation ||
       stakingCase === stakingKeyCases.ManuallyUndelegate ||
@@ -522,6 +594,46 @@ function getStakingInfo(
     getCurrentDelegation,
     rewardHistory,
     error: undefined,
+  };
+}
+
+function getAdaStakingInfo(
+  publicDeriver: *,
+  delegationRequests: void | DelegationRequests,
+): AdaDelegationRequests {
+  const getRegistrationHistory: CachedRequest<GetRegistrationHistoryFunc> = new CachedRequest(
+    async _request => {
+      const result = {
+        currEpoch: false,
+        prevEpoch: false,
+        prevPrevEpoch: false,
+        fullHistory: [],
+      };
+      if (delegationRequests == null) return result;
+      await delegationRequests.getCurrentDelegation;
+      if (delegationRequests.getCurrentDelegation.result == null) return result;
+      const currDeleg = delegationRequests.getCurrentDelegation.result;
+
+      const hasPools = (certForEpoch) => {
+        if (certForEpoch == null) return false;
+        return certForEpoch.pools.length > 0;
+      };
+      if (hasPools(currDeleg.currEpoch)) {
+        result.currEpoch = true;
+      }
+      if (hasPools(currDeleg.prevEpoch)) {
+        result.prevEpoch = true;
+      }
+      if (hasPools(currDeleg.prevPrevEpoch)) {
+        result.prevPrevEpoch = true;
+      }
+      return result;
+    }
+  );
+  getRegistrationHistory.execute((null: any));
+  return {
+    publicDeriver,
+    getRegistrationHistory,
   };
 }
 
@@ -543,7 +655,7 @@ export const Loading = (): Node => {
         allPoolIds: [],
       })
     );
-    const rewardHistory: CachedRequest<RewardHistoryForWallet> = new CachedRequest(
+    const rewardHistory: CachedRequest<RewardHistoryFunc> = new CachedRequest(
       _request => Promise.resolve([
       ])
     );
@@ -634,7 +746,7 @@ export const Loading = (): Node => {
   );
 };
 
-export const DelegationCases = (): Node => {
+export const JormungandrDelegationCases = (): Node => {
   const genWallet = () => {
     const wallet = genJormungandrSigningWalletWithCache();
     const getStakingKeyValue = () => select(
@@ -688,6 +800,176 @@ export const DelegationCases = (): Node => {
   );
 };
 
+export const AdaDelegationCases = (): Node => {
+  const genWallet = () => {
+    const wallet = genShelleyCIP1852SigningWalletWithCache();
+    const getStakingKeyValue = () => select(
+      'stakingKeyCases',
+      stakingKeyCases,
+      stakingKeyCases.NeverDelegated
+    );
+    {
+      const requests = wallet.getTimeCalcRequests(wallet.publicDeriver).requests;
+      Object.keys(requests).map(key => requests[key]).forEach(request => request.execute());
+      wallet.getTimeCalcRequests = (_req) => ({
+        publicDeriver: wallet.publicDeriver,
+        requests
+      });
+    }
+    const computedDelegation = getStakingInfo(
+      wallet.publicDeriver,
+      getStakingKeyValue()
+    );
+    wallet.getDelegation = (_publicDeriver) => computedDelegation;
+    const balance: CachedRequest<GetBalanceFunc> = new CachedRequest(_request => Promise.resolve(
+      utxoBalance,
+    ));
+    balance.execute((null: any));
+    const oldResults = wallet.getTransactions(wallet.publicDeriver);
+    wallet.getTransactions = (_req) => ({
+      ...oldResults,
+      requests: {
+        ...oldResults.requests,
+        getBalanceRequest: balance,
+      },
+    });
+    const computedAdaDelegation = getAdaStakingInfo(
+      wallet.publicDeriver,
+      computedDelegation
+    );
+    wallet.getAdaDelegation = (_publicDeriver) => computedAdaDelegation;
+
+    return wallet;
+  };
+
+  const wallet = genWallet();
+  const lookup = walletLookup([wallet]);
+  return wrapWallet(
+    mockWalletProps({
+      location: getRoute(wallet.publicDeriver.getPublicDeriverId()),
+      selected: wallet.publicDeriver,
+      ...lookup,
+    }),
+    (<StakingDashboardPage
+      generated={genBaseProps({
+        wallet,
+        lookup,
+        allowToggleHidden: true,
+        getLocalPoolInfo: mockGetPoolInfo,
+      })}
+    />)
+  );
+};
+
+export const AdaDeregistrationDialog = (): Node => {
+  const wallet = genBaseAdaWallet();
+  const lookup = walletLookup([wallet]);
+  return wrapWallet(
+    mockWalletProps({
+      location: getRoute(wallet.publicDeriver.getPublicDeriverId()),
+      selected: wallet.publicDeriver,
+      ...lookup,
+    }),
+    (<StakingDashboardPage
+      generated={genBaseProps({
+        wallet,
+        lookup,
+        openDialog: DeregisterDialogContainer,
+        allowToggleHidden: true,
+        getLocalPoolInfo: mockGetPoolInfo,
+      })}
+    />)
+  );
+};
+
+export const AdaWithdrawDialog = (): Node => {
+  const wallet = genBaseAdaWallet();
+  const lookup = walletLookup([wallet]);
+  return wrapWallet(
+    mockWalletProps({
+      location: getRoute(wallet.publicDeriver.getPublicDeriverId()),
+      selected: wallet.publicDeriver,
+      ...lookup,
+    }),
+    (<StakingDashboardPage
+      generated={genBaseProps({
+        wallet,
+        lookup,
+        openDialog: WithdrawalTxDialogContainer,
+        allowToggleHidden: true,
+        getLocalPoolInfo: mockGetPoolInfo,
+        withdrawalTxProps: {
+          generated: {
+            TransferSendProps: {
+              generated: {
+                stores: {
+                  addresses: {
+                    addressSubgroupMap: genDefaultGroupMap(),
+                  },
+                  explorers: {
+                    selectedExplorer: defaultToSelectedExplorer(),
+                  },
+                  profile: {
+                    isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
+                    unitOfAccount: genUnitOfAccount(),
+                  },
+                  wallets: {
+                    selected: wallet.publicDeriver,
+                    sendMoneyRequest: {
+                      isExecuting: boolean('isExecuting', false),
+                      error: undefined,
+                      reset: action('sendMoneyRequest reset'),
+                    },
+                  },
+                  coinPriceStore: {
+                    getCurrentPrice: (_from, _to) => 5,
+                  },
+                },
+                actions: {
+                  wallets: {
+                    sendMoney: {
+                      trigger: async (req) => action('sendMoney')(req),
+                    },
+                  },
+                  ada: {
+                    trezorSend: {
+                      sendUsingTrezor: {
+                        trigger: async (req) => action('sendUsingTrezor')(req),
+                      },
+                    },
+                    ledgerSend: {
+                      sendUsingLedgerWallet: {
+                        trigger: async (req) => action('sendUsingLedgerWallet')(req),
+                      },
+                    },
+                  },
+                },
+              },
+            },
+            actions: Object.freeze({}),
+            stores: {
+              substores: {
+                ada: {
+                  delegationTransaction: {
+                    createWithdrawalTx: {
+                      error: undefined,
+                      result: genWithdrawalTx(
+                        wallet.publicDeriver,
+                        boolean('deregister', true)
+                      ),
+                      reset: action('createWithdrawalTx reset'),
+                    },
+                  },
+                },
+              },
+            },
+          },
+        }
+      })}
+    />)
+  );
+};
+
 export const Errors = (): Node => {
   const genWallet = () => {
     const wallet = genJormungandrSigningWalletWithCache();
@@ -715,7 +997,7 @@ export const Errors = (): Node => {
       errorCases.Both
     );
     if (error === errorCases.PoolInfo || error === errorCases.Both) {
-      const rewardHistory: CachedRequest<RewardHistoryForWallet> = new CachedRequest(
+      const rewardHistory: CachedRequest<RewardHistoryFunc> = new CachedRequest(
         async _request => { throw new GetPoolInfoApiError(); }
       );
       rewardHistory.execute((null: any));
@@ -760,7 +1042,7 @@ export const Errors = (): Node => {
 };
 
 // wallet we can reuse for multiple tests
-const genBaseWallet = () => {
+const genBaseJormungandrWallet = () => {
   const wallet = genJormungandrSigningWalletWithCache();
   {
     const requests = wallet.getTimeCalcRequests(wallet.publicDeriver).requests;
@@ -789,9 +1071,43 @@ const genBaseWallet = () => {
   });
   return wallet;
 };
+const genBaseAdaWallet = () => {
+  const wallet = genShelleyCIP1852SigningWalletWithCache();
+  {
+    const requests = wallet.getTimeCalcRequests(wallet.publicDeriver).requests;
+    Object.keys(requests).map(key => requests[key]).forEach(request => request.execute());
+    wallet.getTimeCalcRequests = (_req) => ({
+      publicDeriver: wallet.publicDeriver,
+      requests
+    });
+  }
+  const computedDelegation = getStakingInfo(
+    wallet.publicDeriver,
+    stakingKeyCases.LongAgoDelegation
+  );
+  wallet.getDelegation = (_publicDeriver) => computedDelegation;
+  const computedAdaDelegation = getAdaStakingInfo(
+    wallet.publicDeriver,
+    computedDelegation
+  );
+  wallet.getAdaDelegation = (_publicDeriver) => computedAdaDelegation;
+  const balance: CachedRequest<GetBalanceFunc> = new CachedRequest(_request => Promise.resolve(
+    utxoBalance,
+  ));
+  balance.execute((null: any));
+  const oldResults = wallet.getTransactions(wallet.publicDeriver);
+  wallet.getTransactions = (_req) => ({
+    ...oldResults,
+    requests: {
+      ...oldResults.requests,
+      getBalanceRequest: balance,
+    },
+  });
+  return wallet;
+};
 
 export const LessThanExpected = (): Node => {
-  const wallet = genBaseWallet();
+  const wallet = genBaseJormungandrWallet();
   const lookup = walletLookup([wallet]);
   return wrapWallet(
     mockWalletProps({
@@ -811,7 +1127,7 @@ export const LessThanExpected = (): Node => {
 };
 
 export const UnknownPool = (): Node => {
-  const wallet = genBaseWallet();
+  const wallet = genBaseJormungandrWallet();
 
   // setup a map that doesn't have the metadata for a pool (a private pool)
   const newMockPoolInfo = (network, poolId) => {
@@ -840,7 +1156,7 @@ export const UnknownPool = (): Node => {
 };
 
 export const UndelegateExecuting = (): Node => {
-  const wallet = genBaseWallet();
+  const wallet = genBaseJormungandrWallet();
   const lookup = walletLookup([wallet]);
   return wrapWallet(
     mockWalletProps({
@@ -875,7 +1191,7 @@ export const UndelegateExecuting = (): Node => {
 };
 
 export const UndelegateError = (): Node => {
-  const wallet = genBaseWallet();
+  const wallet = genBaseJormungandrWallet();
   const lookup = walletLookup([wallet]);
   return wrapWallet(
     mockWalletProps({
@@ -910,7 +1226,7 @@ export const UndelegateError = (): Node => {
 };
 
 export const UndelegateDialogShown = (): Node => {
-  const wallet = genBaseWallet();
+  const wallet = genBaseJormungandrWallet();
   const lookup = walletLookup([wallet]);
   const errorCases = {
     NoError: 0,
@@ -956,7 +1272,7 @@ export const UndelegateDialogShown = (): Node => {
 };
 
 export const Reputation = (): Node => {
-  const wallet = genBaseWallet();
+  const wallet = genBaseJormungandrWallet();
   const lookup = walletLookup([wallet]);
   const flagCases = {
     Forks: 1,
@@ -1053,7 +1369,7 @@ export const MangledDashboardWarning = (): Node => {
     }
     throw new Error(`Unhandled mangled case ${mangledValue}`);
   })();
-  const wallet = genBaseWallet();
+  const wallet = genBaseJormungandrWallet();
   const lookup = walletLookup([wallet]);
   return wrapWallet(
     mockWalletProps({
@@ -1075,7 +1391,7 @@ export const MangledDashboardWarning = (): Node => {
 };
 
 export const UnmangleDialogLoading = (): Node => {
-  const wallet = genBaseWallet();
+  const wallet = genBaseJormungandrWallet();
   const lookup = walletLookup([wallet]);
   return wrapWallet(
     mockWalletProps({
@@ -1104,7 +1420,7 @@ export const UnmangleDialogLoading = (): Node => {
 };
 
 export const UnmangleDialogError = (): Node => {
-  const wallet = genBaseWallet();
+  const wallet = genBaseJormungandrWallet();
   const lookup = walletLookup([wallet]);
   return wrapWallet(
     mockWalletProps({
@@ -1133,7 +1449,7 @@ export const UnmangleDialogError = (): Node => {
 };
 
 export const UnmangleDialogConfirm = (): Node => {
-  const wallet = genBaseWallet();
+  const wallet = genBaseJormungandrWallet();
   const lookup = walletLookup([wallet]);
   const { tentativeTx } = genTentativeJormungandrTx();
   return wrapWallet(

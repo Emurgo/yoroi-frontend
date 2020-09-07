@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
-import jdenticon from 'jdenticon';
+import { toSvg } from 'jdenticon';
 import classnames from 'classnames';
 
 import { Button } from 'react-polymorph/lib/components/Button';
@@ -115,7 +115,7 @@ export default class StakePool extends Component<Props> {
 
     const { hash, poolName } = this.props;
 
-    const avatarSource = jdenticon.toSvg(hash, 36, { padding: 0 });
+    const avatarSource = toSvg(hash, 36, { padding: 0 });
 
     // Taken from Seiza (dangerouslyEmbedIntoDataURI())
     const avatar = `data:image/svg+xml;utf8,${encodeURIComponent(avatarSource)}`;

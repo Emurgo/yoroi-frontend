@@ -31,6 +31,7 @@ import config from '../../../config';
 import { formattedWalletAmount } from '../../../utils/formatters';
 import type { PoolTuples, ReputationObject, } from '../../../api/jormungandr/lib/state-fetch/types';
 import type { PoolMeta, DelegationRequests } from '../../../stores/toplevel/DelegationStore';
+import type { AdaDelegationRequests } from '../../../stores/ada/AdaDelegationStore';
 import EpochProgressContainer from './EpochProgressContainer';
 import type { GeneratedData as EpochProgressContainerData } from './EpochProgressContainer';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
@@ -58,7 +59,11 @@ import { getUnmangleAmounts, } from '../../../stores/stateless/mangledAddresses'
 import type { IAddressTypeStore, IAddressTypeUiSubset } from '../../../stores/stateless/addressStores';
 import { GROUP_MANGLED } from '../../../stores/stateless/addressStores';
 import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
-import { isJormungandr } from '../../../api/ada/lib/storage/database/prepackaged/networks';
+import { isJormungandr, isCardanoHaskell } from '../../../api/ada/lib/storage/database/prepackaged/networks';
+import DeregisterDialogContainer from '../../transfer/DeregisterDialogContainer';
+import type { GeneratedData as DeregisterDialogContainerData } from '../../transfer/DeregisterDialogContainer';
+import type { GeneratedData as WithdrawalTxDialogContainerData } from '../../transfer/WithdrawalTxDialogContainer';
+import WithdrawalTxDialogContainer from '../../transfer/WithdrawalTxDialogContainer';
 
 export type GeneratedData = typeof StakingDashboardPage.prototype.generated;
 
@@ -88,7 +93,7 @@ export default class StakingDashboardPage extends Component<Props> {
 
   componentWillUnmount() {
     this.generated.actions.jormungandr.delegationTransaction.reset.trigger();
-    this.generated.actions.ada.delegationTransaction.reset.trigger();
+    this.generated.actions.ada.delegationTransaction.reset.trigger({ justTransaction: false });
   }
 
   hideOrFormat: (BigNumber, $PropertyType<SelectedApiType, 'meta'>) => {|
@@ -191,7 +196,7 @@ export default class StakingDashboardPage extends Component<Props> {
     return (
       <>
         {popup}
-        {this.getDialog()}
+        {this.getDialog(publicDeriver)}
         {dashboard}
       </>);
   }
@@ -608,7 +613,7 @@ export default class StakingDashboardPage extends Component<Props> {
     };
   }
 
-  getDialog: void => Node = () => {
+  getDialog: PublicDeriver<> => Node = (publicDeriver) => {
     const uiDialogs = this.generated.stores.uiDialogs;
 
     if (uiDialogs.isOpen(LessThanExpectedDialog)) {
@@ -633,6 +638,35 @@ export default class StakingDashboardPage extends Component<Props> {
         <UnmangleTxDialogContainer
           {...this.generated.UnmangleTxDialogContainerProps}
           onClose={() => this.generated.actions.dialogs.closeActiveDialog.trigger()}
+        />
+      );
+    }
+
+    if (uiDialogs.isOpen(DeregisterDialogContainer)) {
+      return (
+        <DeregisterDialogContainer
+          {...this.generated.DeregisterDialogContainerProps}
+          alwaysShowDeregister
+          onNext={() => {
+            // note: purposely don't await since the next dialog will properly render the spinner
+            this.generated.actions.ada.delegationTransaction.createWithdrawalTxForWallet.trigger({
+              publicDeriver,
+            });
+            this.generated.actions.dialogs.open.trigger({ dialog: WithdrawalTxDialogContainer });
+          }}
+        />
+      );
+    }
+    if (uiDialogs.isOpen(WithdrawalTxDialogContainer)) {
+      return (
+        <WithdrawalTxDialogContainer
+          {...this.generated.WithdrawalTxDialogContainerProps}
+          onClose={() => {
+            this.generated.actions.ada.delegationTransaction.reset.trigger({
+              justTransaction: false
+            });
+            this.generated.actions.dialogs.closeActiveDialog.trigger();
+          }}
         />
       );
     }
@@ -681,6 +715,18 @@ export default class StakingDashboardPage extends Component<Props> {
       request.delegationRequests.getCurrentDelegation.result?.currEpoch?.pools ?? []
     ).length > 0;
 
+    const isRegistered = (() => {
+      if (!isCardanoHaskell(request.publicDeriver.getParent().getNetworkInfo())) {
+        return undefined;
+      }
+      const adaDelegationRequests = this.generated.stores.substores
+        .ada.delegation.getDelegationRequests(
+          request.publicDeriver
+        );
+      if (adaDelegationRequests == null) return undefined;
+      return adaDelegationRequests.getRegistrationHistory.result?.currEpoch;
+    })();
+
     return (
       <UserSummary
         meta={{
@@ -709,6 +755,13 @@ export default class StakingDashboardPage extends Component<Props> {
         openLearnMore={() => this.generated.actions.dialogs.open.trigger({
           dialog: LessThanExpectedDialog,
         })}
+        withdrawRewards={
+          isRegistered === true
+            ? () => {
+              this.generated.actions.dialogs.open.trigger({ dialog: DeregisterDialogContainer });
+            }
+            : undefined
+        }
         totalDelegated={
           !showRewardAmount || request.delegationRequests.getDelegatedBalance.result == null
             ? undefined
@@ -811,10 +864,15 @@ export default class StakingDashboardPage extends Component<Props> {
   @computed get generated(): {|
     EpochProgressContainerProps: InjectedOrGenerated<EpochProgressContainerData>,
     UnmangleTxDialogContainerProps: InjectedOrGenerated<UnmangleTxDialogContainerData>,
+    DeregisterDialogContainerProps: InjectedOrGenerated<DeregisterDialogContainerData>,
+    WithdrawalTxDialogContainerProps: InjectedOrGenerated<WithdrawalTxDialogContainerData>,
     actions: {|
       ada: {|
         delegationTransaction: {|
-          reset: {| trigger: (params: void) => void |},
+          reset: {| trigger: (params: {| justTransaction: boolean |}) => void |},
+          createWithdrawalTxForWallet: {|
+            trigger: (params: {| publicDeriver: PublicDeriver<>, |}) => Promise<void>
+          |},
         |},
       |},
       jormungandr: {|
@@ -878,7 +936,7 @@ export default class StakingDashboardPage extends Component<Props> {
         getLocalPoolInfo: ($ReadOnly<NetworkRow>, string) => (void | PoolMeta),
         getDelegationRequests: (
           PublicDeriver<>
-        ) => void | DelegationRequests,
+        ) => (void | DelegationRequests),
       |},
       time: {|
         getCurrentTimeRequests: (
@@ -889,6 +947,13 @@ export default class StakingDashboardPage extends Component<Props> {
         ) => TimeCalcRequests
       |},
       substores: {|
+        ada: {|
+          delegation: {|
+            getDelegationRequests: (
+              PublicDeriver<>
+            ) => (void | AdaDelegationRequests),
+          |},
+        |},
         jormungandr: {|
           delegationTransaction: {|
             createDelegationTx: {|
@@ -993,6 +1058,11 @@ export default class StakingDashboardPage extends Component<Props> {
         },
         time,
         substores: {
+          ada: {
+            delegation: {
+              getDelegationRequests: stores.substores.ada.delegation.getDelegationRequests,
+            },
+          },
           jormungandr: {
             delegationTransaction: {
               isStale: jormungandrStore.delegationTransaction.isStale,
@@ -1027,7 +1097,10 @@ export default class StakingDashboardPage extends Component<Props> {
         ada: {
           delegationTransaction: {
             reset: {
-              trigger: actions.jormungandr.delegationTransaction.reset.trigger,
+              trigger: actions.ada.delegationTransaction.reset.trigger,
+            },
+            createWithdrawalTxForWallet: {
+              trigger: actions.ada.delegationTransaction.createWithdrawalTxForWallet.trigger,
             },
           },
         },
@@ -1050,6 +1123,12 @@ export default class StakingDashboardPage extends Component<Props> {
       ),
       UnmangleTxDialogContainerProps: (
         { stores, actions }: InjectedOrGenerated<UnmangleTxDialogContainerData>
+      ),
+      WithdrawalTxDialogContainerProps: (
+        { stores, actions }: InjectedOrGenerated<WithdrawalTxDialogContainerData>
+      ),
+      DeregisterDialogContainerProps: (
+        { stores, actions }: InjectedOrGenerated<DeregisterDialogContainerData>
       ),
     });
   }

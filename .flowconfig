@@ -25,7 +25,6 @@ unnecessary-optional-chain=warn
 ambiguous-object-type=error
 unnecessary-invariant=warn
 deprecated-utility=error
-unsafe-addition=error
 # re-enable this if it's ever shipped as part of Flow
 # no-floating-promises=warn
 

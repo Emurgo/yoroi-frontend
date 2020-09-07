@@ -16,10 +16,9 @@ import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver
 import { WalletTypeOption, } from '../../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import RewardClaimDisclaimer from '../../../components/transfer/RewardClaimDisclaimer';
 import { ChainDerivations } from '../../../config/numbersConfig';
-import type { ComplexityLevelType } from '../../../types/complexityLevelType';
 import DeregisterDialogContainer from '../DeregisterDialogContainer';
 import type { GeneratedData as DeregisterDialogContainerData } from '../DeregisterDialogContainer';
-import { ComplexityLevels } from '../../../types/complexityLevelType';
+
 import {
   Bip44DerivationLevels,
 } from '../../../api/ada/lib/storage/database/walletTypes/bip44/api/utils';
@@ -44,10 +43,6 @@ export default class ShelleyEraOptionDialogContainer extends Component<Props> {
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired
   };
-
-  componentDidMount() {
-    this.generated.actions.ada.delegationTransaction.setShouldDeregister.trigger(false);
-  }
 
   startTransferIcarusRewards: void => void = () => {
     this.generated.actions.yoroiTransfer.startTransferFunds.trigger({
@@ -114,11 +109,7 @@ export default class ShelleyEraOptionDialogContainer extends Component<Props> {
             continuation: undefined,
           })}
           onNext={() => {
-            const nextStatus = (
-              this.generated.stores.profile.selectedComplexityLevel === ComplexityLevels.Advanced
-            )
-              ? DisclaimerStatus.DeregisterDisclaimer
-              : DisclaimerStatus.Done;
+            const nextStatus = DisclaimerStatus.DeregisterDisclaimer;
             this.generated.actions.dialogs.updateDataForActiveDialog.trigger({
               disclaimer: nextStatus,
             });
@@ -133,6 +124,16 @@ export default class ShelleyEraOptionDialogContainer extends Component<Props> {
       return (
         <DeregisterDialogContainer
           {...this.generated.DeregisterDialogContainerProps}
+          alwaysShowDeregister={
+            /* very easy for the user to not understand what is going on
+             * and enter their current wallet's recovery phrase in the claim / transfer page
+             * ex: using this thinking it will claim just ITN rewards in their current wallet
+             * not realizing this will undelegate their funds if they choose to deregister
+             * so by default, the claim / transfer page will hide the deregistration dialog
+             * unless the person considers themselves an "advanced" user
+             */
+             false
+          }
           onNext={() => {
             this.generated.actions.dialogs.updateDataForActiveDialog.trigger({
               disclaimer: DisclaimerStatus.Done,
@@ -167,9 +168,6 @@ export default class ShelleyEraOptionDialogContainer extends Component<Props> {
 
   @computed get generated(): {|
     stores: {|
-      profile: {|
-        selectedComplexityLevel: ?ComplexityLevelType,
-      |},
       wallets: {|
         selected: null | PublicDeriver<>,
       |},
@@ -212,9 +210,6 @@ export default class ShelleyEraOptionDialogContainer extends Component<Props> {
     const { yoroiTransfer } = actions;
     return Object.freeze({
       stores: {
-        profile: {
-          selectedComplexityLevel: stores.profile.selectedComplexityLevel,
-        },
         wallets: {
           selected: stores.wallets.selected,
         },

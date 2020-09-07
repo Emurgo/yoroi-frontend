@@ -182,6 +182,11 @@ const genBaseProps: {|
               },
             },
             ada: {
+              trezorSend: {
+                sendUsingTrezor: {
+                  trigger: async (req) => action('sendUsingTrezor')(req),
+                },
+              },
               ledgerSend: {
                 sendUsingLedgerWallet: {
                   trigger: async (req) => action('sendUsingLedgerWallet')(req),
@@ -456,6 +461,28 @@ export const TransferTxPage = (): Node => {
     );
   })();
 };
+
+export const WithdrawalKeyInput = (): Node => {
+  const wallet = genShelleyCip1852DummyWithCache();
+  const lookup = walletLookup([wallet]);
+  return (() => {
+    const baseProps = genBaseProps({
+      wallet: wallet.publicDeriver,
+      yoroiTransfer: {
+        status: TransferStatus.GETTING_WITHDRAWAL_KEY,
+      },
+    });
+    return wrapTransfer(
+      mockTransferProps({
+        currentRoute: ROUTES.TRANSFER.YOROI,
+        selected: wallet.publicDeriver,
+        ...lookup,
+        YoroiTransferPageProps: baseProps,
+      }),
+    );
+  })();
+};
+
 
 export const WithdrawalTxPage = (): Node => {
   const wallet = genShelleyCip1852DummyWithCache();

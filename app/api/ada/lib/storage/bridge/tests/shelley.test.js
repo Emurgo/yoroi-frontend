@@ -117,6 +117,7 @@ const nextRegularSpend: number => RemoteTransaction = (purpose) => ({
   tx_ordinal: 0,
   epoch: 10,
   slot: 3651,
+  ttl: '99999999',
   inputs: [
     {
       // 'Ae2tdPwUPEZ6tzHKyuMLL6bh1au5DETgb53PTmJAN9aaCLtaUTWHvrS2mxo'

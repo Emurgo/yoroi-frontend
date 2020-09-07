@@ -12,8 +12,8 @@ const CONFIG: ConfigType = {
     simpleTemplate: '',
   },
   app: {
-    walletRefreshInterval: 10,
-    serverStatusRefreshInterval: 10,
+    walletRefreshInterval: 200000,
+    serverStatusRefreshInterval: 200000,
     logsBufferSize: 10,
     logsFileSuffix: 'log',
     addressRequestSize: 50,

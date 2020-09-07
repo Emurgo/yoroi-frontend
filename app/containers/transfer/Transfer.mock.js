@@ -162,13 +162,6 @@ export const mockTransferProps: {
         ShelleyEraOptionDialogContainerProps: {
           generated: {
             stores: {
-              profile: {
-                selectedComplexityLevel: select(
-                  'complexityLevel',
-                  ComplexityLevels,
-                  ComplexityLevels.Advanced
-                ),
-              },
               wallets: {
                 selected: request.selected,
               },
@@ -196,7 +189,15 @@ export const mockTransferProps: {
             },
             DeregisterDialogContainerProps: {
               generated: {
-                stores: Object.freeze({}),
+                stores: {
+                  profile: {
+                    selectedComplexityLevel: select(
+                      'complexityLevel',
+                      ComplexityLevels,
+                      ComplexityLevels.Advanced
+                    ),
+                  },
+                },
                 actions: {
                   ada: {
                     delegationTransaction: {

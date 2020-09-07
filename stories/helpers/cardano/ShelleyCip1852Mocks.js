@@ -46,6 +46,7 @@ import type { HwWalletMetaRow, } from '../../../app/api/ada/lib/storage/database
 import type { ISignRequest } from '../../../app/api/common/lib/transactions/ISignRequest';
 import { RustModule } from '../../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import { HaskellShelleyTxSignRequest } from '../../../app/api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
+import AdaDelegationStore from '../../../app/stores/ada/AdaDelegationStore';
 
 function genMockShelleyCip1852Cache(dummyWallet: PublicDeriver<>) {
   const pendingRequest = new CachedRequest(_publicDeriver => Promise.resolve([]));
@@ -73,6 +74,7 @@ function genMockShelleyCip1852Cache(dummyWallet: PublicDeriver<>) {
       },
     }),
     getDelegation: (_wallet) => (undefined),
+    getAdaDelegation: (_wallet) => (undefined),
     getTransactions: (wallet) => ({
       publicDeriver: wallet,
       lastSyncInfo: {
@@ -252,6 +254,8 @@ export type ShelleyCip1852CacheValue = {|
     typeof TransactionsStore.prototype.getTxRequests,
   getDelegation:
     typeof DelegationStore.prototype.getDelegationRequests,
+  getAdaDelegation:
+    typeof AdaDelegationStore.prototype.getDelegationRequests,
   getSigningKeyCache:
     typeof WalletStore.prototype.getSigningKeyCache,
   getPublicDeriverSettingsCache:

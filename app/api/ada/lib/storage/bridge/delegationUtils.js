@@ -204,14 +204,26 @@ export async function getCurrentDelegation(
     allPoolIds: Array.from(seenPools)
   };
 }
-export async function getRegistrationHistory(
-  request: GetCurrentDelegationRequest,
-): Promise<{|
+
+export type GetRegistrationHistoryRequest = {|
   currEpoch: boolean,
   prevEpoch: boolean,
   prevPrevEpoch: boolean,
   fullHistory: Array<CertificateForKey>,
-|}> {
+|};
+export type GetRegistrationHistoryResponse = {|
+  currEpoch: boolean,
+  prevEpoch: boolean,
+  prevPrevEpoch: boolean,
+  fullHistory: Array<CertificateForKey>,
+|};
+export type GetRegistrationHistoryFunc = (
+  request: GetCurrentDelegationRequest
+) => Promise<GetRegistrationHistoryResponse>;
+
+export async function getRegistrationHistory(
+  request: GetCurrentDelegationRequest,
+): Promise<GetRegistrationHistoryResponse> {
   const delegations = await getCertificateHistory({
     publicDeriver: request.publicDeriver,
     stakingKeyAddressId: request.stakingKeyAddressId,

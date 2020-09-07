@@ -10,19 +10,18 @@ import LocalizedRequest from '../lib/LocalizedRequest';
 import Store from '../base/Store';
 import type {
   GetDelegatedBalanceFunc,
+  RewardHistoryFunc,
   GetCurrentDelegationFunc,
 } from '../../api/common/lib/storage/bridge/delegationUtils';
 import CachedRequest from '../lib/LocalizedCachedRequest';
 import LocalizableError from '../../i18n/LocalizableError';
 import type {
-  RewardTuple, ReputationObject,
+  ReputationObject,
 } from '../../api/jormungandr/lib/state-fetch/types';
 import { getApiForNetwork } from '../../api/common/utils';
 import {
   PoolMissingApiError,
 } from '../../api/common/errors';
-
-export type RewardHistoryForWallet = string => Promise<Array<RewardTuple>>;
 
 export type DelegationRequests = {|
   publicDeriver: PublicDeriver<>,
@@ -32,7 +31,7 @@ export type DelegationRequests = {|
    */
   getDelegatedBalance: CachedRequest<GetDelegatedBalanceFunc>,
   getCurrentDelegation: CachedRequest<GetCurrentDelegationFunc>,
-  rewardHistory: CachedRequest<RewardHistoryForWallet>,
+  rewardHistory: CachedRequest<RewardHistoryFunc>,
   error: LocalizableError | any;
 |};
 
