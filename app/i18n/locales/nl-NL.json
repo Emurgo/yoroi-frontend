@@ -689,7 +689,7 @@
   "wallet.transaction.type.exchange": "Exchange",
   "wallet.transaction.type.intrawallet": "{currency} transactie tussen Portemonnees",
   "wallet.transaction.type.multiparty": "{currency} transacties tussen meerdere partijen",
-  "wallet.transaction.withdraw": "Withdraw",
+  "wallet.transaction.withdraw": "Opname",
   "wallet.transaction.withdrawalsLabel": "Opnames",
   "wallet.transfer.cards.byron": "Byron-tijdperk Portemonnee",
   "wallet.transfer.cards.shelley": "Shelley-tijdperk portemonnee",
