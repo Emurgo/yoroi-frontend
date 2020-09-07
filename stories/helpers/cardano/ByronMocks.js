@@ -44,6 +44,7 @@ import { HaskellShelleyTxSignRequest } from '../../../app/api/ada/transactions/s
 import { RustModule } from '../../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import type { ISignRequest } from '../../../app/api/common/lib/transactions/ISignRequest';
 import DelegationStore from '../../../app/stores/toplevel/DelegationStore';
+import AdaDelegationStore from '../../../app/stores/ada/AdaDelegationStore';
 
 function genByronSigningWallet(
   genHardwareInfo?: number => HwWalletMetaRow,
@@ -117,6 +118,7 @@ function genMockByronBip44Cache(dummyWallet: PublicDeriver<>) {
       },
     }),
     getDelegation: (_wallet) => (undefined),
+    getAdaDelegation: (_wallet) => (undefined),
     getTransactions: (wallet) => ({
       publicDeriver: wallet,
       lastSyncInfo: {
@@ -210,6 +212,8 @@ export type ByronCacheValue = {|
     typeof TransactionsStore.prototype.getTxRequests,
   getDelegation:
     typeof DelegationStore.prototype.getDelegationRequests,
+  getAdaDelegation:
+    typeof AdaDelegationStore.prototype.getDelegationRequests,
   getSigningKeyCache:
     typeof WalletStore.prototype.getSigningKeyCache,
   getPublicDeriverSettingsCache:

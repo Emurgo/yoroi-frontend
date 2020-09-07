@@ -4,6 +4,7 @@ import type { ConceptualWalletSettingsCache } from '../../app/stores/toplevel/Wa
 import WalletSettingsStore from '../../app/stores/toplevel/WalletSettingsStore';
 import TransactionsStore from '../../app/stores/toplevel/TransactionsStore';
 import DelegationStore from '../../app/stores/toplevel/DelegationStore';
+import AdaDelegationStore from '../../app/stores/ada/AdaDelegationStore';
 import WalletStore from '../../app/stores/toplevel/WalletStore';
 import BaseCardanoTimeStore from '../../app/stores/base/BaseCardanoTimeStore';
 import { PublicDeriver } from '../../app/api/ada/lib/storage/models/PublicDeriver';
@@ -20,6 +21,8 @@ export type CardanoCacheValue = {|
     typeof TransactionsStore.prototype.getTxRequests,
   getDelegation:
     typeof DelegationStore.prototype.getDelegationRequests,
+  getAdaDelegation:
+    typeof AdaDelegationStore.prototype.getDelegationRequests,
   getSigningKeyCache:
     typeof WalletStore.prototype.getSigningKeyCache,
   getPublicDeriverSettingsCache:
@@ -45,6 +48,8 @@ export function walletLookup(wallets: $ReadOnlyArray<PossibleCacheTypes>): {|
     typeof TransactionsStore.prototype.getTxRequests,
   getDelegation:
     typeof DelegationStore.prototype.getDelegationRequests,
+  getAdaDelegation:
+    typeof AdaDelegationStore.prototype.getDelegationRequests,
   getSigningKeyCache:
     typeof WalletStore.prototype.getSigningKeyCache,
   getPublicDeriverSettingsCache:
@@ -60,6 +65,7 @@ export function walletLookup(wallets: $ReadOnlyArray<PossibleCacheTypes>): {|
       getConceptualWalletSettingsCache: (_conceptualWallet) => (null: any),
       getTransactions: (_publicDeriver) => (null: any),
       getDelegation: (_publicDeriver) => (null: any),
+      getAdaDelegation: (_publicDeriver) => (null: any),
       getPublicKeyCache: (_publicDeriver) => (null: any),
       getSigningKeyCache: (_publicDeriver) => (null: any),
       getPublicDeriverSettingsCache: (_publicDeriver) => (null: any),
@@ -95,6 +101,14 @@ export function walletLookup(wallets: $ReadOnlyArray<PossibleCacheTypes>): {|
       for (const wallet of wallets) {
         if (wallet.publicDeriver === publicDeriver && wallet.getDelegation) {
           return wallet.getDelegation(publicDeriver);
+        }
+      }
+      throw new Error(`Missing cache entry for delegation`);
+    },
+    getAdaDelegation: (publicDeriver) => {
+      for (const wallet of wallets) {
+        if (wallet.publicDeriver === publicDeriver && wallet.getAdaDelegation) {
+          return wallet.getAdaDelegation(publicDeriver);
         }
       }
       throw new Error(`Missing cache entry for delegation`);

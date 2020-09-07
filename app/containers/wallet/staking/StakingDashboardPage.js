@@ -31,6 +31,7 @@ import config from '../../../config';
 import { formattedWalletAmount } from '../../../utils/formatters';
 import type { PoolTuples, ReputationObject, } from '../../../api/jormungandr/lib/state-fetch/types';
 import type { PoolMeta, DelegationRequests } from '../../../stores/toplevel/DelegationStore';
+import type { AdaDelegationRequests } from '../../../stores/ada/AdaDelegationStore';
 import EpochProgressContainer from './EpochProgressContainer';
 import type { GeneratedData as EpochProgressContainerData } from './EpochProgressContainer';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
@@ -713,6 +714,18 @@ export default class StakingDashboardPage extends Component<Props> {
       request.delegationRequests.getCurrentDelegation.result?.currEpoch?.pools ?? []
     ).length > 0;
 
+    const isRegistered = (() => {
+      if (!isCardanoHaskell(request.publicDeriver.getParent().getNetworkInfo())) {
+        return undefined;
+      }
+      const adaDelegationRequests = this.generated.stores.substores
+        .ada.delegation.getDelegationRequests(
+          request.publicDeriver
+        );
+      if (adaDelegationRequests == null) return undefined;
+      return adaDelegationRequests.getRegistrationHistory.result?.currEpoch;
+    })();
+
     return (
       <UserSummary
         meta={{
@@ -742,7 +755,7 @@ export default class StakingDashboardPage extends Component<Props> {
           dialog: LessThanExpectedDialog,
         })}
         withdrawRewards={
-          this.generated.stores.substores.ada.delegation.isRegistered === true
+          isRegistered === true
             ? () => {
               this.generated.actions.dialogs.open.trigger({ dialog: DeregisterDialogContainer });
             }
@@ -935,7 +948,9 @@ export default class StakingDashboardPage extends Component<Props> {
       substores: {|
         ada: {|
           delegation: {|
-            isRegistered: ?boolean,
+            getDelegationRequests: (
+              PublicDeriver<>
+            ) => (void | AdaDelegationRequests),
           |},
         |},
         jormungandr: {|
@@ -1044,16 +1059,7 @@ export default class StakingDashboardPage extends Component<Props> {
         substores: {
           ada: {
             delegation: {
-              isRegistered: (() => {
-                if (!isCardanoHaskell(selected.getParent().getNetworkInfo())) {
-                  return undefined;
-                }
-                const adaDelegationRequests = stores.substores.ada.delegation.getDelegationRequests(
-                  selected
-                );
-                if (adaDelegationRequests == null) return undefined;
-                return adaDelegationRequests.getRegistrationHistory.result?.currEpoch;
-              })(),
+              getDelegationRequests: stores.substores.ada.delegation.getDelegationRequests,
             },
           },
           jormungandr: {
