@@ -1,0 +1,50 @@
+@import '../../themes/mixins/underline';
+
+.component {
+  background-color: var(--theme-maintenance-background-color);
+  width: 100%;
+  height: 100%;
+}
+
+.dialog {
+  position: absolute;
+  left: 0;
+  right: 0;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 90px;
+  width: 485px;
+  padding-bottom: 40px;
+  background-color: #ffffff;
+
+  box-sizing: border-box;
+  border: 1px solid var(--theme-maintenance-border-color);
+  border-radius: 8px;
+  background-color: #FFFFFF;
+  box-shadow: 0 13px 20px -1px rgba(0,0,0,0.15);
+
+  display: flex;
+  flex-direction: column;
+
+  .header {
+    background-color: var(--theme-default-color-red);
+    border-radius: 7.5px 7.5px 0 0;
+    width: 100%;
+    height: 65px;
+
+    .title {
+      font-family: var(--font-medium);
+      font-size: 16px;
+      line-height: 19px;
+      text-align: center;
+      color: white;
+    }
+  }
+
+  .errorLogo {
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 38px;
+    margin-bottom: 30px;
+  }
+}

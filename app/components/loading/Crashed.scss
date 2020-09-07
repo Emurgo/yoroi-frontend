@@ -1,0 +1,22 @@
+@import '../../themes/mixins/underline';
+
+.body {
+  padding-left: 40px;
+  padding-right: 40px;
+
+  .attention {
+    color: var(--theme-dialog-title-color);
+    font-family: var(--font-medium);
+    font-size: 16px;
+    line-height: 19px;
+    text-align: center;
+  }
+
+  .explanation {
+    color: var(--theme-dialog-title-color);
+    font-family: var(--font-regular);
+    font-size: 14px;
+    line-height: 22px;
+    text-align: center;
+  }
+}

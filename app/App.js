@@ -29,6 +29,8 @@ import { changeToplevelTheme } from './themes';
 import ThemeManager from './ThemeManager';
 import environment from './environment';
 import MaintenancePage from './containers/MaintenancePage';
+import CrashPage from './containers/CrashPage';
+import { Logger, } from './utils/logging';
 
 // https://github.com/yahoo/react-intl/wiki#loading-locale-data
 addLocaleData([
@@ -52,9 +54,26 @@ type Props = {|
   +actions: ActionsMap,
   +history: Object,
 |};
+type State = {|
+  crashed: boolean,
+|};
 
 @observer
-class App extends Component<Props> {
+class App extends Component<Props, State> {
+
+  state: State = {
+    crashed: false,
+  };
+
+  static getDerivedStateFromError(_error: any): State {
+    // Update state so the next render will show the fallback UI.
+    return { crashed: true };
+  }
+
+  componentDidCatch(error: any, errorInfo: any): void {
+    Logger.error(errorInfo.componentStack);
+  }
+
   render(): Node {
     const { stores, } = this.props;
     const locale = stores.profile.currentLocale;
@@ -102,6 +121,9 @@ class App extends Component<Props> {
 
   getContent: void => ?Node = () => {
     const { stores, actions, history } = this.props;
+    if (this.state.crashed === true) {
+      return (<CrashPage stores={stores} actions={actions} />);
+    }
     if (stores.serverConnectionStore.isMaintenance) {
       return (<MaintenancePage stores={stores} actions={actions} />);
     }

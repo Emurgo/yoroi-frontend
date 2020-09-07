@@ -17,10 +17,6 @@ const messages = defineMessages({
     id: 'loading.screen.loading',
     defaultMessage: '!!!loading components',
   },
-  error: {
-    id: 'loading.screen.error',
-    defaultMessage: '!!!For more help, you can {supportRequestLink}',
-  },
 });
 
 type Props = {|
@@ -122,7 +118,7 @@ export default class Loading extends Component<Props> {
     return (
       <p>
         <FormattedMessage {...globalMessages.logsContent} values={{ downloadLogsLink }} /><br />
-        <FormattedMessage {...messages.error} values={{ supportRequestLink }} />
+        <FormattedMessage {...globalMessages.forMoreHelp} values={{ supportRequestLink }} />
       </p>
     );
   };
