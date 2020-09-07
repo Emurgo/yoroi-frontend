@@ -45,6 +45,7 @@
   "app.errors.unableToLoad": "ロードできませんでした。",
   "app.errors.unexpectedError": "予期せぬエラーが発生しました。再試行してください。",
   "app.errors.unknowError": "不明なエラー。",
+  "crash.screen.title": "Yoroi crashed",
   "daedalusTransfer.error.noTransferTxError": "送信するトランザクションはありません。",
   "daedalusTransfer.error.transferFundsError": "送金できません。",
   "daedalusTransfer.error.webSocketRestoreError": "ブロックチェーンアドレスの復元中にエラーが発生しました。",
