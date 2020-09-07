@@ -35,9 +35,9 @@ import type {
   GetDelegatedBalanceFunc,
   CertificateForEpoch,
   GetCurrentDelegationFunc,
+  RewardHistoryFunc,
 } from '../../../api/common/lib/storage/bridge/delegationUtils';
 import type {
-  RewardHistoryForWallet,
   DelegationRequests,
   PoolMeta,
 } from '../../../stores/toplevel/DelegationStore';
@@ -568,7 +568,7 @@ function getStakingInfo(
       )),
     })
   );
-  const rewardHistory: CachedRequest<RewardHistoryForWallet> = new CachedRequest(
+  const rewardHistory: CachedRequest<RewardHistoryFunc> = new CachedRequest(
     _request => (
       stakingCase === stakingKeyCases.LongAgoDelegation ||
       stakingCase === stakingKeyCases.ManuallyUndelegate ||
@@ -607,7 +607,7 @@ export const Loading = (): Node => {
         allPoolIds: [],
       })
     );
-    const rewardHistory: CachedRequest<RewardHistoryForWallet> = new CachedRequest(
+    const rewardHistory: CachedRequest<RewardHistoryFunc> = new CachedRequest(
       _request => Promise.resolve([
       ])
     );
@@ -779,7 +779,7 @@ export const Errors = (): Node => {
       errorCases.Both
     );
     if (error === errorCases.PoolInfo || error === errorCases.Both) {
-      const rewardHistory: CachedRequest<RewardHistoryForWallet> = new CachedRequest(
+      const rewardHistory: CachedRequest<RewardHistoryFunc> = new CachedRequest(
         async _request => { throw new GetPoolInfoApiError(); }
       );
       rewardHistory.execute((null: any));

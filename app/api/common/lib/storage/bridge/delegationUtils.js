@@ -49,3 +49,12 @@ export type GetCurrentDelegationResponse = {|
 export type GetCurrentDelegationFunc = (
   request: GetCurrentDelegationRequest
 ) => Promise<GetCurrentDelegationResponse>;
+
+export type RewardHistoryRequest = string;
+export type RewardHistoryResponse = Array<[
+  number, // epoch
+  number, // amount
+]>;
+export type RewardHistoryFunc = (
+  request: RewardHistoryRequest
+) => Promise<RewardHistoryResponse>;

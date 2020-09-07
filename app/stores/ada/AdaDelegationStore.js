@@ -27,13 +27,14 @@ import type {
   GetDelegatedBalanceFunc,
   GetCurrentDelegationFunc,
   GetCurrentDelegationResponse,
+  RewardHistoryFunc
 } from '../../api/common/lib/storage/bridge/delegationUtils';
 import {
   genToRelativeSlotNumber,
   genTimeToSlot,
 } from '../../api/ada/lib/storage/bridge/timeUtils';
 import { isCardanoHaskell, getCardanoHaskellBaseConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
-import type { DelegationRequests, RewardHistoryForWallet } from '../toplevel/DelegationStore';
+import type { DelegationRequests, } from '../toplevel/DelegationStore';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import type { GetRegistrationHistoryResponse, GetRegistrationHistoryFunc } from '../../api/ada/lib/storage/bridge/delegationUtils';
 
@@ -55,7 +56,7 @@ export default class AdaDelegationStore extends Store {
       publicDeriver,
       getDelegatedBalance: new CachedRequest<GetDelegatedBalanceFunc>(getDelegatedBalance),
       getCurrentDelegation: new CachedRequest<GetCurrentDelegationFunc>(getCurrentDelegation),
-      rewardHistory: new CachedRequest<RewardHistoryForWallet>(async (address) => {
+      rewardHistory: new CachedRequest<RewardHistoryFunc>(async (address) => {
         // we need to defer this call because the store may not be initialized yet
         // by the time this constructor is called
         const stateFetcher = this.stores.substores.ada.stateFetchStore.fetcher;
