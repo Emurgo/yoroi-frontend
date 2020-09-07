@@ -45,6 +45,7 @@
   "app.errors.unableToLoad": "無法加載",
   "app.errors.unexpectedError": "意想不到的事情發生了。請重試。",
   "app.errors.unknowError": "未知錯誤。",
+  "crash.screen.title": "Yoroi crashed",
   "daedalusTransfer.error.noTransferTxError": "無交易傳送。",
   "daedalusTransfer.error.transferFundsError": "無法轉移資金。",
   "daedalusTransfer.error.webSocketRestoreError": "還原區塊鏈結時出現錯誤。",
