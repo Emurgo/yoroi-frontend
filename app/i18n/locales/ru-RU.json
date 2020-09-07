@@ -45,6 +45,7 @@
   "app.errors.unableToLoad": "Не удалось загрузить!",
   "app.errors.unexpectedError": "Случилось что-то непредвиденное. Пожалуйста, повторите попытку.",
   "app.errors.unknowError": "Неизвестная ошибка.",
+  "crash.screen.title": "Yoroi crashed",
   "daedalusTransfer.error.noTransferTxError": "Нет транзакций для отправки.",
   "daedalusTransfer.error.transferFundsError": "Не удается перевести средства.",
   "daedalusTransfer.error.webSocketRestoreError": "Ошибка при востановлении блокчейн адресов.",
