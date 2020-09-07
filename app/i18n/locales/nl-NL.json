@@ -45,6 +45,7 @@
   "app.errors.unableToLoad": "Het ophalen is niet mogelijk!",
   "app.errors.unexpectedError": "Er heeft zich een onverwachte storing voorgedaan, Probeer het alstublieft opnieuw.",
   "app.errors.unknowError": "Onbekende fout.",
+  "crash.screen.title": "Yoroi crashed",
   "daedalusTransfer.error.noTransferTxError": "Er is geen transactie om te versturen.",
   "daedalusTransfer.error.transferFundsError": "Het is niet mogelijk om fondsen te versturen.",
   "daedalusTransfer.error.webSocketRestoreError": "Fout tijdens het herstellen van \"Blockchain\" adressen.",
