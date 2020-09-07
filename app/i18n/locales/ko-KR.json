@@ -45,6 +45,7 @@
   "app.errors.unableToLoad": "로드할 수 없음!",
   "app.errors.unexpectedError": "예상치 못한 일이 발생했습니다. 다시 시도해 주십시오.",
   "app.errors.unknowError": "알 수 없는 오류.",
+  "crash.screen.title": "Yoroi crashed",
   "daedalusTransfer.error.noTransferTxError": "전송할 거래가 없습니다.",
   "daedalusTransfer.error.transferFundsError": "자금을 이체할 수 없습니다.",
   "daedalusTransfer.error.webSocketRestoreError": "블록체인 주소를 복원하는 중 오류가 발생했습니다.",
