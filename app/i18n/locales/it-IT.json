@@ -45,6 +45,7 @@
   "app.errors.unableToLoad": "Impossibile caricare!",
   "app.errors.unexpectedError": "E' successo qualcosa di inaspettato. Riprovare, per favore.",
   "app.errors.unknowError": "Errore sconosciuto.",
+  "crash.screen.title": "Yoroi crashed",
   "daedalusTransfer.error.noTransferTxError": "Non c'è nessuna transazione da inviare.",
   "daedalusTransfer.error.transferFundsError": "Impossibile trasferire fondi.",
   "daedalusTransfer.error.webSocketRestoreError": "Errore durante il ripristino degli indirizzi blockchain.",
