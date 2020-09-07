@@ -55,6 +55,7 @@ export default class ErgoWalletsStore extends Store {
     }
     // const { signRequest } = transactionDetails;
     // if (!(signRequest instanceof ByronTxSignRequest)) {
+    // eslint-disable-next-line max-len
     //   throw new Error(`${nameof(ErgoWalletsStore)}::${nameof(this._sendMoney)} wrong tx sign request`);
     // }
     // await this.stores.wallets.sendMoneyRequest.execute({

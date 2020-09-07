@@ -216,19 +216,6 @@ test('Create Trezor transaction', async () => {
     .reduce((acc, next) => Object.assign(acc, next), {});
   const { ByronNetworkId, ChainNetworkId } = baseConfig;
 
-  const stakingKeyInfo = {
-    keyHash: stakingKey.to_public().to_raw_key().hash(),
-    addressing: {
-      startLevel: 1,
-      path: [
-        WalletTypePurpose.CIP1852,
-        CoinTypes.CARDANO,
-        HARD_DERIVATION_START,
-        2,
-        0,
-      ],
-    },
-  };
   const response = await createTrezorSignTxPayload(
     new HaskellShelleyTxSignRequest(
       {

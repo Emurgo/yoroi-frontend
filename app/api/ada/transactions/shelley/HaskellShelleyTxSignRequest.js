@@ -6,9 +6,6 @@ import type { BaseSignRequest } from '../types';
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 import { getAdaCurrencyMeta } from '../../currencyInfo';
 import { toHexOrBase58 } from '../../lib/storage/bridge/utils';
-import type {
-  Addressing
-} from '../../lib/storage/models/PublicDeriver/interfaces';
 
 /**
  * We take a copy of these parameters instead of re-evaluating them from the network

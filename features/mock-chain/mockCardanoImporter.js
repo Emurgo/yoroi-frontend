@@ -1632,11 +1632,14 @@ export function addTransaction(tx: MockTx): void {
 
     if (epoch == null) return true;
     if (epoch > newTxEpoch) return true;
+    if (epoch < newTxEpoch) return false;
     if (slot == null) return true;
     if (slot > newTxSlot) return true;
+    if (slot < newTxSlot) return false;
     if (txOrdinal == null) return true;
     if (txOrdinal > newTxOrdinal) return true;
-    return false;
+    if (txOrdinal < newTxOrdinal) return false;
+    throw new Error(`Transaction ${tx.hash} occurs at same position as an existing transactions`);
   });
   if (insertionIndex === -1) {
     transactions.push(tx);

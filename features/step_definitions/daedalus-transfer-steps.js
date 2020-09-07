@@ -52,7 +52,7 @@ Then(/^I select the 12-word option$/, async function () {
 });
 
 When(/^I click on the transfer funds from Daedalus master key button$/, async function () {
-  await this.click('.fromDaedalusMasterKey_legacyDaedalus');
+  await this.click('.fromDaedalusMasterKey_masterKey');
 });
 
 When(/^I proceed with the recovery$/, async function () {

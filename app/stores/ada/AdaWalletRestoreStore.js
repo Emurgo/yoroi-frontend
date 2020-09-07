@@ -49,6 +49,7 @@ export default class AdaWalletRestoreStore extends Store {
     throw new ApiMethodNotYetImplementedError();
     // const phrase = this.stores.walletRestore.recoveryResult?.phrase;
     // if (phrase == null) {
+    // eslint-disable-next-line max-len
     //   throw new Error(`${nameof(this._getFirstCip1852InternalAddr)} no recovery phrase set. Should never happen`);
     // }
 

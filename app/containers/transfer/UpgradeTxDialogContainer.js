@@ -6,7 +6,6 @@ import { computed, } from 'mobx';
 import { defineMessages, intlShape } from 'react-intl';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import LocalizableError from '../../i18n/LocalizableError';
-import TransferSendPage from './TransferSendPage';
 import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 import globalMessages from '../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';

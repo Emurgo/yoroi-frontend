@@ -93,23 +93,6 @@ const genDefaultGroupMap: (
   );
 };
 
-const isRegistered: {|
-  delegationRequests: (PublicDeriver<>) => (void | DelegationRequests),
-  publicDeriver: PublicDeriver<>,
-  forceRegistration?: boolean,
-|} => (void | boolean) = (request) => {
-  const delegationRequests = request.delegationRequests(request.publicDeriver);
-  if (delegationRequests == null) return undefined;
-  if (delegationRequests.getCurrentDelegation.result == null) return undefined;
-  if (delegationRequests.getCurrentDelegation.result.currEpoch == null) {
-    return request.forceRegistration ?? false;
-  }
-  if (delegationRequests.getCurrentDelegation.result.currEpoch.pools.length === 0) {
-    return request.forceRegistration ?? false;
-  }
-  return true;
-};
-
 const getRoute = (id) => buildRoute(
   ROUTES.WALLETS.DELEGATION_DASHBOARD,
   { id, }
