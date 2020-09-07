@@ -45,6 +45,7 @@
   "app.errors.unableToLoad": "Tidak bisa memuat!",
   "app.errors.unexpectedError": "Sesuatu yang tak terduga terjadi. Coba lagi.",
   "app.errors.unknowError": "Terjadi kesalahan yang tidak diketahui.",
+  "crash.screen.title": "Yoroi crashed",
   "daedalusTransfer.error.noTransferTxError": "Tidak ada transaksi untuk dikirim.",
   "daedalusTransfer.error.transferFundsError": "Transfer dana tidak berhasil.",
   "daedalusTransfer.error.webSocketRestoreError": "Terjadi kesalahan saat memulihkan address blockchain.",
