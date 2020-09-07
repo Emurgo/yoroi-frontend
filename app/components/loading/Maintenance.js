@@ -4,11 +4,10 @@ import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape, } from 'react-intl';
 import ExternalLinkSVG from '../../assets/images/link-external.inline.svg';
-import ErrorInfo from '../../assets/images/error-info.inline.svg';
 import styles from './Maintenance.scss';
 import globalMessages from '../../i18n/global-messages';
-import VerticallyCenteredLayout from '../layout/VerticallyCenteredLayout';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import UnavailableDialog from '../widgets/UnavailableDialog';
 
 const messages = defineMessages({
   title: {
@@ -36,36 +35,28 @@ export default class Maintenance extends Component<Props> {
     const { intl } = this.context;
 
     return (
-      <div className={styles.component}>
-        <div className={styles.dialog}>
-          <div className={styles.header}>
-            <VerticallyCenteredLayout>
-              <div className={styles.title}>{intl.formatMessage(messages.title)}</div>
-            </VerticallyCenteredLayout>
+      <UnavailableDialog
+        title={intl.formatMessage(messages.title)}
+      >
+        <div className={styles.body}>
+          <div className={styles.attention}>
+            {intl.formatMessage(globalMessages.attentionHeaderText)}
           </div>
-          <div className={styles.errorLogo}>
-            <ErrorInfo />
+          <br />
+          <div className={styles.explanation}>
+            {intl.formatMessage(messages.explanation)}
           </div>
-          <div className={styles.body}>
-            <div className={styles.attention}>
-              {intl.formatMessage(globalMessages.attentionHeaderText)}
-            </div>
-            <br />
-            <div className={styles.explanation}>
-              {intl.formatMessage(messages.explanation)}
-            </div>
-            <div className={styles.learnMore}>
-              <a
-                href="https://twitter.com/YoroiWallet"
-                onClick={event => this.props.onExternalLinkClick(event)}
-              >
-                {intl.formatMessage(globalMessages.learnMore) + ' '}
-                <ExternalLinkSVG />
-              </a>
-            </div>
+          <div className={styles.learnMore}>
+            <a
+              href="https://twitter.com/YoroiWallet"
+              onClick={event => this.props.onExternalLinkClick(event)}
+            >
+              {intl.formatMessage(globalMessages.learnMore) + ' '}
+              <ExternalLinkSVG />
+            </a>
           </div>
         </div>
-      </div>
+      </UnavailableDialog>
     );
   }
 }
