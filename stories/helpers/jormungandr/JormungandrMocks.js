@@ -69,9 +69,10 @@ function genMockJormungandrCache(dummyWallet: PublicDeriver<>) {
     getPublicKeyCache: (wallet) => ({
       publicDeriver: wallet,
       plate: {
-        ImagePart: '8e4e2f11b6ac2a269913286e26339779ab8767579d18d173cdd324929d94e2c43e3ec212cc8a36ed9860579dfe1e3ef4d6de778c5dbdd981623b48727cd96247',
-        TextPart: 'DNKO-8098',
+        ImagePart: '1dda96f3e8a39341da9549bef4be416c173eeb940f092cfc98d5c63a06c6007d326c77a599b1fd36ddf57507b8ea52537f129dac7bceb18c674bc3baab90411f',
+        TextPart: 'ATPE-6458',
       },
+      publicKey: '8e4e2f11b6ac2a269913286e26339779ab8767579d18d173cdd324929d94e2c43e3ec212cc8a36ed9860579dfe1e3ef4d6de778c5dbdd981623b48727cd96247',
     }),
     getDelegation: (_wallet) => (undefined),
     getTransactions: (wallet) => ({

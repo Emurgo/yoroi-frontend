@@ -68,7 +68,6 @@ import type { IAddressTypeStore, IAddressTypeUiSubset } from '../../../stores/st
 import {
   CoreAddressTypes,
 } from '../../../api/ada/lib/storage/database/primitives/enums';
-import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 import { ComplexityLevels } from '../../../types/complexityLevelType';
 import DeregisterDialogContainer from '../../transfer/DeregisterDialogContainer';
 import WithdrawalTxDialogContainer from '../../transfer/WithdrawalTxDialogContainer';
