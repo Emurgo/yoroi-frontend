@@ -45,6 +45,7 @@
   "app.errors.unableToLoad": "无法加载！",
   "app.errors.unexpectedError": "发生意外错误。请重试。",
   "app.errors.unknowError": "未知错误。",
+  "crash.screen.title": "Yoroi crashed",
   "daedalusTransfer.error.noTransferTxError": "没有要发送的交易。",
   "daedalusTransfer.error.transferFundsError": "无法转账。",
   "daedalusTransfer.error.webSocketRestoreError": "恢复区块链地址时发生错误。",
