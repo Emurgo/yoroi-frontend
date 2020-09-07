@@ -689,6 +689,7 @@
   "wallet.transaction.type.exchange": "Échange",
   "wallet.transaction.type.intrawallet": "Transaction entre wallets {currency}",
   "wallet.transaction.type.multiparty": "Transaction multiparties {currency}",
+  "wallet.transaction.withdraw": "Withdraw",
   "wallet.transaction.withdrawalsLabel": "Retraits",
   "wallet.transfer.cards.byron": "Wallet de l'ère Byron",
   "wallet.transfer.cards.shelley": "Wallet de type Shelley",
