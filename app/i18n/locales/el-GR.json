@@ -45,6 +45,7 @@
   "app.errors.unableToLoad": "Αδυναμία φόρτωσης!",
   "app.errors.unexpectedError": "Κάτι αναπάντεχο συνέβη. Παρακαλώ προσπαθήστε ξανά.",
   "app.errors.unknowError": "Άγνωστο σφάλμα.",
+  "crash.screen.title": "Yoroi crashed",
   "daedalusTransfer.error.noTransferTxError": "Δεν υπάρχει καμία συναλλαγή προς αποστολή.",
   "daedalusTransfer.error.transferFundsError": "Αδυναμία μεταφοράς χρημάτων.",
   "daedalusTransfer.error.webSocketRestoreError": "Σφάλμα τη στιγμή επαναφοράς διευθύνσεων από την αλυσίδα των μπλοκ.",
