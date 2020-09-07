@@ -43,8 +43,8 @@ export const silenceLogsForTesting = () => {
   Logger.warn = () => {};
 };
 
-export const downloadLogs = () => {
-  const header = generateLogHeader();
+export const downloadLogs = (publicKey?: string) => {
+  const header = generateLogHeader(publicKey);
   let errorLogs = logs.peekN(logs.size());
   if (errorLogs.length === 0) {
     errorLogs = [`[${moment().format()}] No errors logged.`];
@@ -56,13 +56,19 @@ export const downloadLogs = () => {
 
 // ========== STRINGIFY =========
 
-export const generateLogHeader = (): string => (
+export const generateLogHeader = (publicKey?: string): string => {
+  let header =
   `[INFO] Yoroi v.${environment.version}\r\n`
   + `[INFO] Commit: ${environment.commit}\r\n`
   + `[INFO] Network: ${environment.NETWORK}\r\n`
-  + `[INFO] User Agent: ${stringifyData(environment.userAgentInfo.ua)}\r\n`
-  + `----\r\n` // this like should be always the last line of the header block
-);
+  + `[INFO] User Agent: ${stringifyData(environment.userAgentInfo.ua)}\r\n`;
+
+  if (publicKey != null) {
+    header += `[INFO] Wallet public key: ${publicKey}\r\n`;
+  }
+  return header
+    + `----\r\n`; // this like should be always the last line of the header block
+};
 
 export const stringifyData = (data : any): string => inspect(data);
 

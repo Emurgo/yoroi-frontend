@@ -94,6 +94,7 @@ export type SigningKeyCache = {|
 export type PublicKeyCache = {|
   publicDeriver: IGetPublic,
   plate: WalletChecksum,
+  publicKey: string,
 |};
 
 /**
@@ -422,6 +423,7 @@ export default class WalletStore extends Store {
         this.publicKeyCache.push({
           publicDeriver: withPubKey,
           plate: checksum,
+          publicKey: publicKey.Hash,
         });
       });
     }

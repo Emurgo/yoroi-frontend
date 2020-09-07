@@ -116,6 +116,7 @@ function genMockByronBip44Cache(dummyWallet: PublicDeriver<>) {
         ImagePart: '8e4e2f11b6ac2a269913286e26339779ab8767579d18d173cdd324929d94e2c43e3ec212cc8a36ed9860579dfe1e3ef4d6de778c5dbdd981623b48727cd96247',
         TextPart: 'DNKO-8098',
       },
+      publicKey: '79b20a54d343785933f467e5ff212ad9d161be456127842d303434b06ff90cf9022da398bd785addbd78d46b6a085d8c14d1d5f010def1bb97111f5c00597e08',
     }),
     getDelegation: (_wallet) => (undefined),
     getAdaDelegation: (_wallet) => (undefined),

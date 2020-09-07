@@ -563,7 +563,7 @@ export default class AdaApi {
   async getAllAddressesForDisplay(
     request: GetAllAddressesForDisplayRequest
   ): Promise<GetAllAddressesForDisplayResponse> {
-    Logger.debug(`${nameof(AdaApi)}::${nameof(this.getAllAddressesForDisplay)} called: ` + stringifyData(request));
+    Logger.debug(`${nameof(AdaApi)}::${nameof(this.getAllAddressesForDisplay)} called`);
     try {
       return await getAllAddressesForDisplay(request);
     } catch (error) {
@@ -580,7 +580,7 @@ export default class AdaApi {
   async getChainAddressesForDisplay(
     request: GetChainAddressesForDisplayRequest
   ): Promise<GetChainAddressesForDisplayResponse> {
-    Logger.debug(`${nameof(AdaApi)}::${nameof(this.getChainAddressesForDisplay)} called: ` + stringifyData(request));
+    Logger.debug(`${nameof(AdaApi)}::${nameof(this.getChainAddressesForDisplay)} called`);
     try {
       return await getChainAddressesForDisplay(request);
     } catch (error) {
@@ -596,7 +596,7 @@ export default class AdaApi {
       ...AdaGetTransactionsRequest,
     |},
   ): Promise<GetTransactionsResponse> {
-    Logger.debug(`${nameof(AdaApi)}::${nameof(this.refreshTransactions)} called: ${stringifyData(request)}`);
+    Logger.debug(`${nameof(AdaApi)}::${nameof(this.refreshTransactions)} called`);
     const { skip = 0, limit } = request;
     try {
       if (!request.isLocalRequest) {
@@ -713,7 +713,7 @@ export default class AdaApi {
   async getNotices(
     request: GetNoticesRequestOptions
   ): Promise<GetNoticesResponse> {
-    Logger.debug(`${nameof(AdaApi)}::${nameof(this.getNotices)} called: ` + stringifyData(request));
+    Logger.debug(`${nameof(AdaApi)}::${nameof(this.getNotices)} called`);
     try {
       let next = 0;
       const dummyNotices =  [

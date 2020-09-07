@@ -69,9 +69,10 @@ function genMockShelleyCip1852Cache(dummyWallet: PublicDeriver<>) {
     getPublicKeyCache: (wallet) => ({
       publicDeriver: wallet,
       plate: {
-        ImagePart: '8e4e2f11b6ac2a269913286e26339779ab8767579d18d173cdd324929d94e2c43e3ec212cc8a36ed9860579dfe1e3ef4d6de778c5dbdd981623b48727cd96247',
-        TextPart: 'DNKO-8098',
+        ImagePart: 'b04dc22991594170974bbbb5908cc50b48f236d680a9ebfe6c1d00f52f8f4813341943eb66dec48cfe7f3be5beec705b91300a07641e668ff19dfa2fbeccbfba',
+        TextPart: 'JHKT-8080',
       },
+      publicKey: '8e4e2f11b6ac2a269913286e26339779ab8767579d18d173cdd324929d94e2c43e3ec212cc8a36ed9860579dfe1e3ef4d6de778c5dbdd981623b48727cd96247',
     }),
     getDelegation: (_wallet) => (undefined),
     getAdaDelegation: (_wallet) => (undefined),
