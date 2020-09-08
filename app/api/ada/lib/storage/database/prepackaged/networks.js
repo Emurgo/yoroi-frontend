@@ -19,49 +19,31 @@ export const ErgoForks = Object.freeze({
   Primary: 0,
 });
 
-const isMC4 = false;
-
 export const networks = Object.freeze({
-  ByronMainnet: ({
+  CardanoMainnet: ({
     NetworkId: 0,
     BaseConfig: ([
       Object.freeze({
         StartAt: 0,
         ChainNetworkId: '1',
         ByronNetworkId: 764824073,
-        GenesisDate: isMC4
-          ? '1595682000000'
-          : '1506203091000',
+        GenesisDate: '1506203091000',
         SlotsPerEpoch: 21600,
         SlotDuration: 20,
       }),
-      isMC4 ?
-        Object.freeze({
-          StartAt: 1, // no idea if this is correct
-          SlotsPerEpoch: 432000,
-          SlotDuration: 1,
-          PerEpochPercentageReward: 69344,
-          LinearFee: {
-            coefficient: '44',
-            constant: '155381',
-          },
-          MinimumUtxoVal: '1000000',
-          PoolDeposit: '500000000',
-          KeyDeposit: '2000000',
-        })
-        : Object.freeze({
-          StartAt: 208,
-          SlotsPerEpoch: 432000,
-          SlotDuration: 1,
-          PerEpochPercentageReward: 69344,
-          LinearFee: {
-            coefficient: '44',
-            constant: '155381',
-          },
-          MinimumUtxoVal: '1000000',
-          PoolDeposit: '500000000',
-          KeyDeposit: '2000000',
-        })
+      Object.freeze({
+        StartAt: 208,
+        SlotsPerEpoch: 432000,
+        SlotDuration: 1,
+        PerEpochPercentageReward: 69344,
+        LinearFee: {
+          coefficient: '44',
+          constant: '155381',
+        },
+        MinimumUtxoVal: '1000000',
+        PoolDeposit: '500000000',
+        KeyDeposit: '2000000',
+      })
     ]: CardanoHaskellBaseConfig),
     CoinType: CoinTypes.CARDANO,
     Fork: CardanoForks.Haskell,
@@ -97,6 +79,34 @@ export const networks = Object.freeze({
     })]: ErgoBaseConfig),
     CoinType: CoinTypes.ERGO,
     Fork: ErgoForks.Primary,
+  }: NetworkRow),
+  CardanoTestnet: ({
+    NetworkId: 3_00,
+    BaseConfig: ([
+      Object.freeze({
+        StartAt: 0,
+        ChainNetworkId: '0',
+        ByronNetworkId: 1097911063,
+        GenesisDate: '1563999616000',
+        SlotsPerEpoch: 21600,
+        SlotDuration: 20,
+      }),
+      Object.freeze({
+        StartAt: 74,
+        SlotsPerEpoch: 432000,
+        SlotDuration: 1,
+        PerEpochPercentageReward: 69344,
+        LinearFee: {
+          coefficient: '44',
+          constant: '155381',
+        },
+        MinimumUtxoVal: '1000000',
+        PoolDeposit: '500000000',
+        KeyDeposit: '2000000',
+      })
+    ]: CardanoHaskellBaseConfig),
+    CoinType: CoinTypes.CARDANO,
+    Fork: CardanoForks.Haskell,
   }: NetworkRow),
 });
 

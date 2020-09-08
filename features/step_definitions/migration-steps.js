@@ -1,14 +1,12 @@
 // @flow
 
 import { Then } from 'cucumber';
-import {
-  Version,
-} from '../../chrome/constants';
+import { version } from '../../package.json';
 
 Then(/^Last launch version is updated$/, async function () {
   await this.driver.wait(async () => {
     const lastLaunchVersion = await getLastLaunchVersion(this.driver);
-    return lastLaunchVersion === Version.Byron;
+    return lastLaunchVersion === version;
   });
 });
 
@@ -25,8 +23,9 @@ async function getLastLaunchVersion(client: any) {
   return await client.executeScript(() => yoroi.stores.profile.lastLaunchVersion);
 }
 
-async function setLastLaunchVersion(client: any, version: string) {
+async function setLastLaunchVersion(client: any, newVersion: string) {
   return await client.executeScript(
-    (ver) => yoroi.stores.profile.setLastLaunchVersion(ver), version
+    (ver) => yoroi.stores.profile.setLastLaunchVersion(ver),
+    newVersion
   );
 }

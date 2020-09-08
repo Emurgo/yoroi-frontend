@@ -279,7 +279,7 @@ async function baseTest(
   const db = await loadLovefieldDB(schema.DataStoreType.MEMORY);
   const publicDeriver = await setup(db, TX_TEST_MNEMONIC_1, purposeForTest);
 
-  const network = networks.ByronMainnet;
+  const network = networks.CardanoMainnet;
   const networkTransactions: Array<RemoteTransaction> = [initialPendingTx(type, purposeForTest)];
   const checkAddressesInUse = genCheckAddressesInUse(networkTransactions, network);
   const getTransactionsHistoryForAddresses = genGetTransactionsHistoryForAddresses(
@@ -771,7 +771,7 @@ async function pendingDropped(
     pointlessTx(purposeForTest),
     initialPendingTx('Pending', purposeForTest)
   ];
-  const network = networks.ByronMainnet;
+  const network = networks.CardanoMainnet;
   const checkAddressesInUse = genCheckAddressesInUse(networkTransactions, network);
   const getTransactionsHistoryForAddresses = genGetTransactionsHistoryForAddresses(
     networkTransactions,

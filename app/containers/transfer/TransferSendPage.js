@@ -36,6 +36,7 @@ import type { SendUsingLedgerParams } from '../../actions/ada/ledger-send-action
 import type { SendUsingTrezorParams } from '../../actions/ada/trezor-send-actions';
 import { isLedgerNanoWallet, isTrezorTWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 
+// populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
 
 export type GeneratedData = typeof TransferSendPage.prototype.generated;

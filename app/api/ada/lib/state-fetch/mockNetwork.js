@@ -232,7 +232,7 @@ export function genUtxoForAddresses(
       for (let j = 0; j < tx.outputs.length; j++) {
         const address = tx.outputs[j].address;
         if (ourAddressSet.has(address)) {
-          const kind = addressToKind(address, 'bytes', networks.ByronMainnet);
+          const kind = addressToKind(address, 'bytes', networks.CardanoMainnet);
           if (
             kind === CoreAddressTypes.CARDANO_REWARD
           ) {
@@ -302,7 +302,7 @@ export function getSingleAddressString(
     );
   const derivedKey = derivePath(rootKey, path);
 
-  const baseConfig = getCardanoHaskellBaseConfig(networks.ByronMainnet)
+  const baseConfig = getCardanoHaskellBaseConfig(networks.CardanoMainnet)
     .reduce((acc, next) => Object.assign(acc, next), {});
 
   if (path[0] === WalletTypePurpose.BIP44) {
@@ -341,7 +341,7 @@ export function getAddressForType(
   );
   const derivedKey = derivePath(rootKey, path);
 
-  const baseConfig = getCardanoHaskellBaseConfig(networks.ByronMainnet)
+  const baseConfig = getCardanoHaskellBaseConfig(networks.CardanoMainnet)
     .reduce((acc, next) => Object.assign(acc, next), {});
 
   switch (type) {
@@ -411,7 +411,7 @@ function getByronInputs(
       throw new Error(`${nameof(getByronInputs)} no tx found ${input.id}`);
     }
     const pointedOutput = pointedTx.outputs[input.index];
-    const addressKind = addressToKind(pointedOutput.address, 'bytes', networks.ByronMainnet);
+    const addressKind = addressToKind(pointedOutput.address, 'bytes', networks.CardanoMainnet);
     if (
       addressKind === CoreAddressTypes.CARDANO_LEGACY ||
       addressKind === CoreAddressTypes.CARDANO_BASE ||

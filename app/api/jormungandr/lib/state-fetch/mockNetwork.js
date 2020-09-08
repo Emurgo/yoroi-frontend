@@ -224,7 +224,7 @@ export function genUtxoForAddresses(
       for (let j = 0; j < tx.outputs.length; j++) {
         const address = tx.outputs[j].address;
         if (ourAddressSet.has(address)) {
-          const kind = addressToKind(address, 'bytes', networks.ByronMainnet);
+          const kind = addressToKind(address, 'bytes', networks.CardanoMainnet);
           if (
             kind !== CoreAddressTypes.CARDANO_LEGACY &&
             kind !== CoreAddressTypes.JORMUNGANDR_SINGLE &&
@@ -547,7 +547,7 @@ function getByronInputs(
       throw new Error(`${nameof(getByronInputs)} no tx found ${input.id}`);
     }
     const pointedOutput = pointedTx.outputs[input.index];
-    const addressKind = addressToKind(pointedOutput.address, 'bytes', networks.ByronMainnet);
+    const addressKind = addressToKind(pointedOutput.address, 'bytes', networks.CardanoMainnet);
     if (addressKind === CoreAddressTypes.CARDANO_LEGACY) {
       result.push({
         address: pointedOutput.address,

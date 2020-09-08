@@ -3,10 +3,10 @@
 import { networks } from './networks';
 import type { ExplorerRow } from '../explorers/tables';
 
-const ByronExplorers: Array<$ReadOnly<ExplorerRow>> = [
+const CardanoMainnetExplorers: Array<$ReadOnly<ExplorerRow>> = [
   {
     ExplorerId: 1_00,
-    NetworkId: networks.ByronMainnet.NetworkId,
+    NetworkId: networks.CardanoMainnet.NetworkId,
     IsBackup: false,
     Endpoints: {
       address: 'https://adaex.org/',
@@ -16,7 +16,7 @@ const ByronExplorers: Array<$ReadOnly<ExplorerRow>> = [
   },
   {
     ExplorerId: 1_01,
-    NetworkId: networks.ByronMainnet.NetworkId,
+    NetworkId: networks.CardanoMainnet.NetworkId,
     IsBackup: false,
     Endpoints: {
       address: 'https://adascan.net/address/',
@@ -26,7 +26,7 @@ const ByronExplorers: Array<$ReadOnly<ExplorerRow>> = [
   },
   {
     ExplorerId: 1_02,
-    NetworkId: networks.ByronMainnet.NetworkId,
+    NetworkId: networks.CardanoMainnet.NetworkId,
     IsBackup: false,
     Endpoints: {
       address: 'https://blockchair.com/cardano/address/',
@@ -36,7 +36,7 @@ const ByronExplorers: Array<$ReadOnly<ExplorerRow>> = [
   },
   {
     ExplorerId: 1_03,
-    NetworkId: networks.ByronMainnet.NetworkId,
+    NetworkId: networks.CardanoMainnet.NetworkId,
     IsBackup: false,
     Endpoints: {
     },
@@ -44,7 +44,7 @@ const ByronExplorers: Array<$ReadOnly<ExplorerRow>> = [
   },
   {
     ExplorerId: 1_04,
-    NetworkId: networks.ByronMainnet.NetworkId,
+    NetworkId: networks.CardanoMainnet.NetworkId,
     IsBackup: false,
     Endpoints: {
       address: 'https://cardanoexplorer.com/address/',
@@ -54,7 +54,7 @@ const ByronExplorers: Array<$ReadOnly<ExplorerRow>> = [
   },
   {
     ExplorerId: 1_05,
-    NetworkId: networks.ByronMainnet.NetworkId,
+    NetworkId: networks.CardanoMainnet.NetworkId,
     IsBackup: false,
     Endpoints: {
       transaction: 'https://adapools.org/transactions/',
@@ -64,7 +64,7 @@ const ByronExplorers: Array<$ReadOnly<ExplorerRow>> = [
   },
   {
     ExplorerId: 1_06,
-    NetworkId: networks.ByronMainnet.NetworkId,
+    NetworkId: networks.CardanoMainnet.NetworkId,
     IsBackup: true,
     Endpoints: {
       address: 'https://cardanoscan.io/address/',
@@ -75,7 +75,7 @@ const ByronExplorers: Array<$ReadOnly<ExplorerRow>> = [
   },
   {
     ExplorerId: 1_07,
-    NetworkId: networks.ByronMainnet.NetworkId,
+    NetworkId: networks.CardanoMainnet.NetworkId,
     IsBackup: false,
     Endpoints: {
       pool: 'https://pooltool.io/pool/',
@@ -121,8 +121,22 @@ const ErgoExplorers: Array<$ReadOnly<ExplorerRow>> = [
   },
 ];
 
+const CardanoTestnetExplorers: Array<$ReadOnly<ExplorerRow>> = [
+  {
+    ExplorerId: 4_00,
+    NetworkId: networks.CardanoTestnet.NetworkId,
+    IsBackup: true,
+    Endpoints: {
+      address: 'https://explorer.cardano-testnet.iohkdev.io/address/',
+      transaction: 'https://explorer.cardano-testnet.iohkdev.io/en/transaction/',
+    },
+    Name: 'CardanoExplorer',
+  },
+];
+
 export const prepackagedExplorers: Map<number, $ReadOnlyArray<$ReadOnly<ExplorerRow>>> = new Map([
-  [networks.ByronMainnet.NetworkId, ByronExplorers],
+  [networks.CardanoMainnet.NetworkId, CardanoMainnetExplorers],
+  [networks.CardanoTestnet.NetworkId, CardanoTestnetExplorers],
   [networks.JormungandrMainnet.NetworkId, JormungandrExplorers],
   [networks.ErgoMainnet.NetworkId, ErgoExplorers],
 ]);
@@ -132,8 +146,11 @@ const getOrThrow = function<T> (input: ?T): T {
 };
 export const prepackagedDefaultExplorers:
   Map<number, $ReadOnly<ExplorerRow>> = new Map([
-    [networks.ByronMainnet.NetworkId, getOrThrow(
-      ByronExplorers.find(explorer => explorer.IsBackup)
+    [networks.CardanoMainnet.NetworkId, getOrThrow(
+      CardanoMainnetExplorers.find(explorer => explorer.IsBackup)
+    )],
+    [networks.CardanoTestnet.NetworkId, getOrThrow(
+      CardanoTestnetExplorers.find(explorer => explorer.IsBackup)
     )],
     [networks.JormungandrMainnet.NetworkId, getOrThrow(
       JormungandrExplorers.find(explorer => explorer.IsBackup)

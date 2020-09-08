@@ -22,7 +22,7 @@ beforeAll(async () => {
   await RustModule.load();
 });
 
-const network = networks.ByronMainnet;
+const network = networks.CardanoMainnet;
 
 function getProtocolParams(): {|
   linearFee: RustModule.WalletV4.LinearFee,

@@ -43,6 +43,7 @@ import { RustModule } from '../cardanoCrypto/rustLoader';
 import type { ConfigType } from '../../../../../config/config-types';
 import { fromWords, decode, } from 'bech32';
 
+// populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
 const backendUrl = CONFIG.network.backendUrl;
 

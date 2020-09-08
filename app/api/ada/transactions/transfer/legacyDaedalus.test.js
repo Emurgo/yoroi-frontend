@@ -26,7 +26,7 @@ import {
 
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 
-const network = networks.ByronMainnet;
+const network = networks.CardanoMainnet;
 
 beforeAll(async () => {
   await RustModule.load();

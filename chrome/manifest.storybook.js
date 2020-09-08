@@ -2,13 +2,9 @@
 
 import buildManifest from './manifest.template';
 import {
-  Servers,
-  serverToPermission,
-} from '../scripts/connections';
-import {
-  Version,
   genCSP,
 } from './constants';
+import { version } from '../package.json';
 
 export default (): * => buildManifest({
   description: 'A simple, secure and fast Cardano ADA wallet.',
@@ -16,9 +12,8 @@ export default (): * => buildManifest({
   titleOverride: true,
   contentSecurityPolicy: genCSP({
     isDev: true,
-    additional: {
-      'connect-src': [serverToPermission(Servers.ShelleyITN)],
-    },
+    additional: Object.freeze({
+    }),
   }),
   iconOverride: {
     /* eslint-disable quote-props */
@@ -27,7 +22,7 @@ export default (): * => buildManifest({
     '128': 'img/shelley-128.png',
     /* eslint-enable quote-props */
   },
-  version: Version.Shelley,
+  version,
   geckoKey: '{842ae5af-a7ff-4e99-afb6-bd6c4043bcfa}',
   enableProtocolHandlers: false,
 });

@@ -41,6 +41,7 @@ import {
 
 import type { ConfigType } from '../../../../../config/config-types';
 
+// populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
 const backendUrl = CONFIG.network.backendUrl;
 

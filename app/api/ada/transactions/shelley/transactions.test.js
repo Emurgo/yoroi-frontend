@@ -43,7 +43,7 @@ import {
   networks,
 } from '../../lib/storage/database/prepackaged/networks';
 
-const network = networks.ByronMainnet;
+const network = networks.CardanoMainnet;
 
 const genSampleUtxos: void => Array<RemoteUnspentOutput> = () => [
   {

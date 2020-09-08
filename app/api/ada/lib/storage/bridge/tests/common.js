@@ -28,7 +28,7 @@ export async function setup(
   purposeForTest: WalletTypePurposeT,
 ): Promise<PublicDeriver<>> {
   if (purposeForTest === WalletTypePurpose.BIP44) {
-    return setupBip44(db, walletMnemonic, networks.ByronMainnet);
+    return setupBip44(db, walletMnemonic, networks.CardanoMainnet);
   }
   throw new Error(`${nameof(setup)} Unexpected purpose ` + purposeForTest);
 }

@@ -208,7 +208,7 @@ export async function storageV2Migration(
     const lastReceiveIndex = await legacyGetLastReceiveAddressIndex();
 
     // all wallets used this at the time
-    const network = networks.ByronMainnet;
+    const network = networks.CardanoMainnet;
     if (network.BaseConfig[0].ByronNetworkId == null) {
       throw new Error(`missing Byron network id`);
     }

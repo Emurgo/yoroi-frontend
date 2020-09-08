@@ -59,7 +59,7 @@ beforeAll(async () => {
 });
 
 test('Can add and fetch address in wallet', async (done) => {
-  const network =  networks.ByronMainnet;
+  const network =  networks.CardanoMainnet;
 
   if (network.BaseConfig[0].ByronNetworkId == null) {
     throw new Error('Should never happen');

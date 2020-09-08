@@ -26,9 +26,10 @@ import {
   networks,
 } from '../storage/database/prepackaged/networks';
 
+// populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
 
-const network = networks.ByronMainnet;
+const network = networks.CardanoMainnet;
 
 beforeAll(async () => {
   await RustModule.load();

@@ -18,13 +18,13 @@ import {
   CERTIFICATE_TYPE,
   ADDRESS_TYPE,
 } from 'trezor-connect/lib/constants/cardano';
-import { HARD_DERIVATION_START, WalletTypePurpose, CoinTypes, ChainDerivations } from '../../../../config/numbersConfig';
+import { ChainDerivations } from '../../../../config/numbersConfig';
 
 beforeAll(async () => {
   await RustModule.load();
 });
 
-const network = networks.ByronMainnet;
+const network = networks.CardanoMainnet;
 
 function getProtocolParams(): {|
   linearFee: RustModule.WalletV4.LinearFee,

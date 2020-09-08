@@ -32,7 +32,7 @@ beforeAll(async () => {
   silenceLogsForTesting();
 });
 
-const network = networks.ByronMainnet;
+const network = networks.CardanoMainnet;
 
 function getProtocolParams(): {|
   keyDeposit: RustModule.WalletV4.BigNum,
@@ -109,7 +109,7 @@ describe('Haskell Shelley era tx format tests', () => {
       amount: inputAmount
     };
 
-    const baseConfig = networks.ByronMainnet.BaseConfig[0];
+    const baseConfig = networks.CardanoMainnet.BaseConfig[0];
     if (baseConfig.ByronNetworkId == null) {
       throw new Error(`missing Byron network id`);
     }

@@ -27,6 +27,7 @@ import type { CanonicalAddressInsert } from '../../../ada/lib/storage/database/p
 import { CoreAddressTypes } from '../../../ada/lib/storage/database/primitives/enums';
 import type { Bip44ChainInsert } from '../../../ada/lib/storage/database/walletTypes/common/tables';
 
+// populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
 const addressRequestSize = CONFIG.app.addressRequestSize;
 

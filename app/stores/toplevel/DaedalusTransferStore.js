@@ -37,6 +37,7 @@ import type {
   Address, Addressing
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 
+// populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
 const websocketUrl = CONFIG.network.websocketUrl;
 const MSG_TYPE_RESTORE = 'RESTORE';

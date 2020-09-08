@@ -191,7 +191,7 @@ const defaultProps: {|
 export const MainPage = (): Node => (
   <WalletAddPage
     generated={defaultProps(Object.freeze({
-      selectedNetwork: networks.ByronMainnet,
+      selectedNetwork: networks.CardanoMainnet,
     }))}
   />
 );
@@ -227,7 +227,7 @@ export const CreateWalletOptions = (): Node => {
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
-        selectedNetwork: networks.ByronMainnet,
+        selectedNetwork: networks.CardanoMainnet,
         openDialog: WalletCreateOptionDialog,
       }))}
     />
@@ -237,7 +237,7 @@ export const CreateWalletOptions = (): Node => {
 export const CreateWalletStart = (): Node => (
   <WalletAddPage
     generated={defaultProps(Object.freeze({
-      selectedNetwork: networks.ByronMainnet,
+      selectedNetwork: networks.CardanoMainnet,
       openDialog: WalletCreateDialog,
       WalletCreateDialogContainerProps: {
         generated: {
@@ -313,7 +313,7 @@ export const CreateWalletPrivacyDialog = (): Node => {
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
-        selectedNetwork: networks.ByronMainnet,
+        selectedNetwork: networks.CardanoMainnet,
         openDialog: WalletBackupDialog,
         WalletBackupDialogContainerProps: {
           generated: walletBackupProps({
@@ -347,7 +347,7 @@ export const CreateWalletRecoveryPhraseDisplay = (): Node => {
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
-        selectedNetwork: networks.ByronMainnet,
+        selectedNetwork: networks.CardanoMainnet,
         openDialog: WalletBackupDialog,
         WalletBackupDialogContainerProps: {
           generated: walletBackupProps({
@@ -412,7 +412,7 @@ export const CreateWalletRecoveryPhraseEnter = (): Node => {
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
-        selectedNetwork: networks.ByronMainnet,
+        selectedNetwork: networks.CardanoMainnet,
         openDialog: WalletBackupDialog,
         WalletBackupDialogContainerProps: {
           generated: walletBackupProps({
@@ -439,7 +439,7 @@ export const CreateWalletFinalConfirm = (): Node => {
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
-        selectedNetwork: networks.ByronMainnet,
+        selectedNetwork: networks.CardanoMainnet,
         openDialog: WalletBackupDialog,
         WalletBackupDialogContainerProps: {
           generated: walletBackupProps({
@@ -569,7 +569,7 @@ export const CardanoRestoreOptions = (): Node => {
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
-        selectedNetwork: networks.ByronMainnet,
+        selectedNetwork: networks.CardanoMainnet,
         openDialog: WalletRestoreOptionDialog,
       }))}
     />
@@ -591,7 +591,7 @@ export const CardanoEraSelect = (): Node => {
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
-        selectedNetwork: networks.ByronMainnet,
+        selectedNetwork: networks.CardanoMainnet,
         openDialog: WalletEraOptionDialogContainer,
       }))}
     />
@@ -612,7 +612,7 @@ export const RestoreWalletStart = (): Node => {
   const password = getPasswordCreationCases();
   const paperPassword = getPasswordValidationCases('paper_password');
 
-  const selectedNetwork = networks.ByronMainnet;
+  const selectedNetwork = networks.CardanoMainnet;
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
@@ -663,7 +663,7 @@ export const RestoreVerify = (): Node => {
   );
   const recoveryPhrase = creationRecoveryPhrase.join(' ');
   const rootPk = generateWalletRootKey(recoveryPhrase);
-  const selectedNetwork = networks.ByronMainnet;
+  const selectedNetwork = networks.CardanoMainnet;
   const { byronPlate, shelleyPlate, jormungandrPlate } = generatePlates(
     rootPk,
     0, // 0th account
@@ -699,7 +699,7 @@ export const RestoreVerify = (): Node => {
 };
 
 export const RestoreLegacyExplanation = (): Node => {
-  const selectedNetwork = networks.ByronMainnet;
+  const selectedNetwork = networks.CardanoMainnet;
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
@@ -724,7 +724,7 @@ export const RestoreLegacyExplanation = (): Node => {
 };
 
 export const RestoreUpgradeRestoringAddresses = (): Node => {
-  const selectedNetwork = networks.ByronMainnet;
+  const selectedNetwork = networks.CardanoMainnet;
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
@@ -745,7 +745,7 @@ export const RestoreUpgradeRestoringAddresses = (): Node => {
 };
 
 export const RestoreUpgradeCheckingAddresses = (): Node => {
-  const selectedNetwork = networks.ByronMainnet;
+  const selectedNetwork = networks.CardanoMainnet;
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
@@ -766,7 +766,7 @@ export const RestoreUpgradeCheckingAddresses = (): Node => {
 };
 
 export const RestoreUpgradeGeneratingTx = (): Node => {
-  const selectedNetwork = networks.ByronMainnet;
+  const selectedNetwork = networks.CardanoMainnet;
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
@@ -787,7 +787,7 @@ export const RestoreUpgradeGeneratingTx = (): Node => {
 };
 
 export const RestoreUpgradeReadyToTransfer = (): Node => {
-  const selectedNetwork = networks.ByronMainnet;
+  const selectedNetwork = networks.CardanoMainnet;
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
@@ -808,7 +808,7 @@ export const RestoreUpgradeReadyToTransfer = (): Node => {
 };
 
 export const RestoreUpgradeError = (): Node => {
-  const selectedNetwork = networks.ByronMainnet;
+  const selectedNetwork = networks.CardanoMainnet;
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
@@ -830,7 +830,7 @@ export const RestoreUpgradeError = (): Node => {
 };
 
 export const RestoreUpgradeNoNeed = (): Node => {
-  const selectedNetwork = networks.ByronMainnet;
+  const selectedNetwork = networks.CardanoMainnet;
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
@@ -856,7 +856,7 @@ export const HardwareOptions = (): Node => {
     <WalletAddPage
       generated={defaultProps(Object.freeze({
         openDialog: WalletConnectHWOptionDialog,
-        selectedNetwork: networks.ByronMainnet,
+        selectedNetwork: networks.CardanoMainnet,
       }))}
     />
   );
@@ -904,7 +904,7 @@ const trezorPops: {|
 });
 
 export const TrezorCheck = (): Node => {
-  const selectedNetwork = networks.ByronMainnet;
+  const selectedNetwork = networks.CardanoMainnet;
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
@@ -948,7 +948,7 @@ export const TrezorConnect = (): Node => {
     }
     return StepState.LOAD;
   });
-  const selectedNetwork = networks.ByronMainnet;
+  const selectedNetwork = networks.CardanoMainnet;
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
@@ -998,7 +998,7 @@ export const TrezorSave = (): Node => {
     return StepState.LOAD;
   });
   const nameCases = getWalletNameCases();
-  const selectedNetwork = networks.ByronMainnet;
+  const selectedNetwork = networks.CardanoMainnet;
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
@@ -1074,7 +1074,7 @@ const ledgerProps: {|
 });
 
 export const LedgerCheck = (): Node => {
-  const selectedNetwork = networks.ByronMainnet;
+  const selectedNetwork = networks.CardanoMainnet;
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
@@ -1118,7 +1118,7 @@ export const LedgerConnect = (): Node => {
     }
     return StepState.LOAD;
   });
-  const selectedNetwork = networks.ByronMainnet;
+  const selectedNetwork = networks.CardanoMainnet;
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
@@ -1168,7 +1168,7 @@ export const LedgerSave = (): Node => {
     return StepState.LOAD;
   });
   const nameCases = getWalletNameCases();
-  const selectedNetwork = networks.ByronMainnet;
+  const selectedNetwork = networks.CardanoMainnet;
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
@@ -1212,7 +1212,7 @@ const genDefaultGroupMap: (
 };
 
 export const LedgerUpgrade = (): Node => {
-  const selectedNetwork = networks.ByronMainnet;
+  const selectedNetwork = networks.CardanoMainnet;
   const wallet = genShelleyCIP1852SigningWalletWithCache(ConceptualWalletId => ({
     ConceptualWalletId,
     ...mockLedgerMeta
@@ -1309,7 +1309,7 @@ export const LedgerUpgrade = (): Node => {
 export const PaperWalletCreate = (): Node => (
   <WalletAddPage
     generated={defaultProps(Object.freeze({
-      selectedNetwork: networks.ByronMainnet,
+      selectedNetwork: networks.CardanoMainnet,
       openDialog: WalletPaperDialog,
       WalletPaperDialogContainerProps: {
         generated: {
@@ -1376,7 +1376,7 @@ export const PaperWalletUserPasswordDialog = (): Node => {
     if (val === passwordCases.TooShort) return 'a';
     return '';
   };
-  const selectedNetwork = networks.ByronMainnet;
+  const selectedNetwork = networks.CardanoMainnet;
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
@@ -1442,7 +1442,7 @@ export const PaperWalletCreateDialog = (): Node => {
     }
     return extendedSteps();
   };
-  const selectedNetwork = networks.ByronMainnet;
+  const selectedNetwork = networks.CardanoMainnet;
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
@@ -1520,7 +1520,7 @@ export const PaperWalletVerifyDialog = (): Node => {
     passwordCases,
     passwordCases.Empty,
   );
-  const selectedNetwork = networks.ByronMainnet;
+  const selectedNetwork = networks.CardanoMainnet;
   return (
     <WalletAddPage
       generated={defaultProps(Object.freeze({
@@ -1575,7 +1575,7 @@ export const PaperWalletVerifyDialog = (): Node => {
 };
 
 export const PaperWalletFinalizeDialog = (): Node => {
-  const selectedNetwork = networks.ByronMainnet;
+  const selectedNetwork = networks.CardanoMainnet;
   return (<WalletAddPage
     generated={defaultProps(Object.freeze({
       openDialog: UserPasswordDialog,

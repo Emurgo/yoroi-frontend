@@ -16,7 +16,7 @@ beforeAll(async () => {
 });
 
 const getAddressForLedgerMnemonic = (mnemonic: string): string => {
-  const baseConfig = getCardanoHaskellBaseConfig(networks.ByronMainnet)
+  const baseConfig = getCardanoHaskellBaseConfig(networks.CardanoMainnet)
     .reduce((acc, next) => Object.assign(acc, next), {});
   const settings = RustModule.WalletV2.BlockchainSettings.from_json({
     protocol_magic: baseConfig.ByronNetworkId,

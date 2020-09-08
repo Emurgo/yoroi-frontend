@@ -107,7 +107,6 @@ import {
 } from '../ada/lib/storage/bridge/traitUtils';
 import { convertAdaTransactionsToExportRows } from '../ada/transactions/utils';
 import { v3PublicToV2, v4Bip32PrivateToV3, derivePrivateByAddressing } from './lib/crypto/utils';
-import { migrateToLatest } from '../ada/lib/storage/adaMigration';
 import type { TransactionExportRow } from '../export';
 
 import { RustModule } from '../ada/lib/cardanoCrypto/rustLoader';
@@ -912,16 +911,6 @@ export default class JormungandrApi {
       if (error instanceof LocalizableError) throw error;
       throw new GenericApiError();
     }
-  }
-
-  async migrate(
-    localstorageApi: LocalStorageApi,
-    persistentDb: lf$Database,
-  ): Promise<boolean> {
-    return await migrateToLatest(
-      localstorageApi,
-      persistentDb,
-    );
   }
 }
 // ========== End of class JormungandrApi =========

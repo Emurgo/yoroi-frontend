@@ -9,6 +9,8 @@ import type { ConfigType } from '../../config/config-types';
 import environment from '../environment';
 
 const logger = console;
+
+// populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
 const { logsBufferSize, logsFileSuffix } = CONFIG.app;
 const logs = new RingBuffer(logsBufferSize);

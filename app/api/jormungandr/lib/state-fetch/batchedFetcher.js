@@ -45,6 +45,7 @@ import {
 import type { ConfigType } from '../../../../../config/config-types';
 import config from '../../../../config';
 
+// populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
 const addressesLimit = CONFIG.app.addressRequestSize;
 
