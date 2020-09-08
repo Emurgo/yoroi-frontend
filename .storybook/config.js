@@ -53,6 +53,7 @@ addParameters({
   },
 });
 
+// note: purposely don't await
 RustModule.load().then(() => {
   // Global Decorator
   addDecorator(story => {

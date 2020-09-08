@@ -306,7 +306,7 @@ export default class TrezorConnectStore
     //   this.progressState === ProgressStateOption.CONNECT_START &&
     //   this.publicKeyInfo.valid === false) {
     //   this.progressState = ProgressStateOption.CONNECT_ERROR;
-    //   this.publicKeyInfo.errorId = 'trezord forcefully stopped';
+    //   this.publicKeyInfo.errorId = 'trezor forcefully stopped';
     //   this._updateState();
     // }
   };

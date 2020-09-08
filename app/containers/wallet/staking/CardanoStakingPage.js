@@ -56,9 +56,9 @@ export default class CardanoStakingPage extends Component<Props> {
   cancel: void => void = () => {
     this.generated.actions.ada.delegationTransaction.reset.trigger({ justTransaction: true });
   }
-  componentWillUnmount() {
+  async componentWillUnmount() {
     this.generated.actions.ada.delegationTransaction.reset.trigger({ justTransaction: false });
-    this.generated.actions.ada.delegationTransaction.setPools.trigger([]);
+    await this.generated.actions.ada.delegationTransaction.setPools.trigger([]);
     this.generated.stores.delegation.poolInfoQuery.reset();
   }
 
@@ -102,7 +102,10 @@ export default class CardanoStakingPage extends Component<Props> {
           hasAnyPending={this.generated.stores.transactions.hasAnyPending}
           poolQueryError={this.generated.stores.delegation.poolInfoQuery.error}
           isProcessing={this.generated.stores.delegation.poolInfoQuery.isExecuting}
-          updatePool={async (poolId) => (this._updatePool(poolId))}
+          updatePool={poolId => {
+            /* note: it's okay for triggering a pool update to be async, so we don't await  */
+            this._updatePool(poolId);
+          }}
           onNext={async () => (this._next())}
         />
         {this._displayPoolInfo()}
