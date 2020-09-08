@@ -505,7 +505,7 @@
   "wallet.hw.ledger.common.error.104": "Tiempo de espera del dispositivo Ledger agotado. Por favor, inténtalo nuevamente.",
   "wallet.hw.ledger.common.error.105": "Error de red. Por favor, comprueba tu conexión a Internet.",
   "wallet.includeKey.explanationLine1": "¿Quieres incluir la clave <strong>pública</strong> de tu billetera en los registros de errores?",
-  "wallet.includeKey.explanationLine2": "Permitirá al personal de apoyo ver el historial de transacciones de tu cartera, pero <strong>no</strong> podrán gastar o mover tus fondos de ninguna manera (la clave privada <strong>no</strong> está incluida)",
+  "wallet.includeKey.explanationLine2": "Permitirá al personal de soporte ver el historial de transacciones de tu billetera, pero <strong>no</strong> podrá gastar o mover tus fondos de ninguna manera (la clave privada <strong>no</strong> está incluida)",
   "wallet.includeKey.withKeyLabel": "Con la clave",
   "wallet.includeKey.withoutKeyLabel": "Sin la clave",
   "wallet.nav.addButton": "Añadir billetera",
