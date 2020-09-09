@@ -33,7 +33,7 @@
   "api.errors.noOutputsError": "Die Transaktion benötigt mindestens eine Ausgabe, es wurde aber keine angegeben",
   "api.errors.pendingTransactionError": "Fehler beim Aktualisieren der ausstehenden Transaktionen.",
   "api.errors.poolMissingApiError": "Pool nicht auffindbar. Überprüfe bitte noch einmal die ID und vergewissere dich, dass der Pool nicht de-registriert wurde.",
-  "api.errors.rewardAddressEmpty": "Reward address is empty.",
+  "api.errors.rewardAddressEmpty": "Die Ertragsadresse ist leer.",
   "api.errors.rollbackApiError": "Ein Rollback wurde erkannt.",
   "api.errors.sendTransactionApiError": "Fehler vom Server beim Senden der Transaktion.",
   "api.errors.sendTransactionError": "Fehler von der API beim Senden der Transaktion.",
