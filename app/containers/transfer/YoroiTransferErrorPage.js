@@ -2,18 +2,12 @@
 import type { Node } from 'react';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
+import { intlShape } from 'react-intl';
 import LocalizableError from '../../i18n/LocalizableError';
 import ErrorPage from '../../components/transfer/ErrorPage';
 import globalMessages from '../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-
-const messages = defineMessages({
-  title: {
-    id: 'yoroiTransfer.errorPage.title.label',
-    defaultMessage: '!!!Unable to transfer from another wallet',
-  },
-});
+import { GenerateTransferTxError } from '../../api/common/errors';
 
 type Props = {|
   +error?: ?LocalizableError,
@@ -36,7 +30,7 @@ export default class YoroiTransferErrorPage extends Component<Props> {
     const { error, onCancel, classicTheme } = this.props;
 
     return (<ErrorPage
-      title={intl.formatMessage(messages.title)}
+      title={intl.formatMessage(new GenerateTransferTxError())}
       backButtonLabel={intl.formatMessage(globalMessages.cancel)}
       onCancel={onCancel}
       error={error}

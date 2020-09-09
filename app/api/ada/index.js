@@ -114,7 +114,8 @@ import {
   IncorrectWalletPasswordError,
   WalletAlreadyRestoredError,
   InvalidWitnessError,
-  NoInputsError,
+  NotEnoughMoneyToSendError,
+  RewardAddressEmptyError,
 } from '../common/errors';
 import LocalizableError from '../../i18n/LocalizableError';
 import { scanBip44Account, } from '../common/lib/restoration/bip44';
@@ -1266,7 +1267,7 @@ export default class AdaApi {
       );
       // if the end result is no withdrawals and no deregistrations, throw an error
       if (finalWithdrawals.length === 0 && certificates.length === 0) {
-        throw new NoInputsError();
+        throw new RewardAddressEmptyError();
       }
       const unsignedTxResponse = shelleyNewAdaUnsignedTx(
         [],
@@ -1283,7 +1284,7 @@ export default class AdaApi {
       );
       // there wasn't enough in the withdrawal to send anything to us
       if (unsignedTxResponse.changeAddr.length === 0) {
-        throw new NoInputsError();
+        throw new NotEnoughMoneyToSendError();
       }
       Logger.debug(
         `${nameof(AdaApi)}::${nameof(this.createWithdrawalTx)} success: ` + stringifyData(unsignedTxResponse)

@@ -51,7 +51,7 @@ import type {
 import type {
   AdaDelegationRequests,
 } from '../../../stores/ada/AdaDelegationStore';
-import { GenericApiError, GetAccountStateApiError, GetPoolInfoApiError } from '../../../api/common/errors';
+import { RewardAddressEmptyError, GenericApiError, GetAccountStateApiError, GetPoolInfoApiError } from '../../../api/common/errors';
 import LessThanExpectedDialog from '../../../components/wallet/staking/dashboard/LessThanExpectedDialog';
 import UnmangleTxDialogContainer from '../../transfer/UnmangleTxDialogContainer';
 import PoolWarningDialog from '../../../components/wallet/staking/dashboard/PoolWarningDialog';
@@ -867,6 +867,16 @@ export const AdaDeregistrationDialog = (): Node => {
 export const AdaWithdrawDialog = (): Node => {
   const wallet = genBaseAdaWallet();
   const lookup = walletLookup([wallet]);
+
+  const errorCases = {
+    None: 0,
+    NoInput: 1,
+  };
+  const error = select(
+    'withdrawalError',
+    errorCases,
+    errorCases.None
+  );
   return wrapWallet(
     mockWalletProps({
       location: getRoute(wallet.publicDeriver.getPublicDeriverId()),
@@ -934,7 +944,9 @@ export const AdaWithdrawDialog = (): Node => {
                 ada: {
                   delegationTransaction: {
                     createWithdrawalTx: {
-                      error: undefined,
+                      error: error === errorCases.NoInput
+                        ? new RewardAddressEmptyError()
+                        : undefined,
                       result: genWithdrawalTx(
                         wallet.publicDeriver,
                         boolean('deregister', true)
