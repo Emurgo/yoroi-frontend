@@ -51,7 +51,7 @@ Then(/^I should see the serverError banner$/, async function () {
 });
 
 Then(/^I should see the app maintenance page$/, async function () {
-  await this.waitForElement('.Maintenance_component');
+  await this.waitForElement('.Maintenance_body');
 });
 
 Then(/^I click on hide balance button$/, async function () {
