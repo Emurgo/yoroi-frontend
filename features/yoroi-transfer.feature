@@ -311,3 +311,19 @@ Feature: Transfer Yoroi Wallet funds
     Given The expected transaction is "g6UAgYJYIDZ351x7ppm/3GzVfULyRvhvY679dgJQBqx4MT+tK7ohAQGBglg5Aceyi86pDUQLVFWmoConylm4aW8Gf8GWf0f5M+eVWOlpyqnletz8QLmQfreUNjtZD69C//SMOOuIGgCdmOcCGgACnrkDGhH+lM0FoVgd4ZVY6WnKqeV63PxAuZB+t5Q2O1kPr0L/9Iw464gaAExLQKEAgoJYIMyYCZRBUMAPORPNKxA+m0L+YkP8NqdvnrgAaS4r2j8uWECtpqZgzGT59YcufXB7lapcXnXV6vhAwVcOWAwJ1ETU1fYHXCu1L18h08N8G36qNKEXFYxtWkhohVpD4Q2FXIENglggYWJ2UyDJOtPILMKLlXi+MaeR8Do33K4FY0PMJbvLOzFYQEChQ6M2dwJDq/Hjjy6Wm4X16lJuvmFbVFalNvqRC/i4uamx+5ygq1sS32gdscAwi05wfkpEJ/r7ZUK1vx63BAH2"
     When I confirm Yoroi transfer funds
     Then I should see the summary screen
+
+  @it-158
+  Scenario: Claiming Shelley rewards fails if no rewards in wallet (IT-158)
+    Given There is a Shelley wallet stored named shelley-simple-15
+    And I am on the transfer start screen
+    When I click on the shelley button on the transfer screen
+    Then I select the Shelley 15-word option
+    Then I accept the prompt
+    Then I keep the staking key
+    And I enter the recovery phrase:
+    | recoveryPhrase                                                                                           |
+    | cup casino sign casual north still envelope rack avocado sadness motor problem lunar east monitor |
+    And I proceed with the recovery
+    Then I should see a plate TNHH-3713
+    Then I click the next button
+    Then I should see the Yoroi transfer error screen

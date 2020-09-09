@@ -1194,6 +1194,10 @@ export default class AdaApi {
       const changeAddr = nextUnusedInternal.addressInfo;
 
       const certificates = [];
+      const neededKeys = {
+        neededHashes: new Set(),
+        wits: new Set(),
+      };
 
       const requiredWits: Array<RustModule.WalletV4.Ed25519KeyHash> = [];
       for (const withdrawal of request.withdrawals) {
@@ -1213,44 +1217,57 @@ export default class AdaApi {
           certificates.push(RustModule.WalletV4.Certificate.new_stake_deregistration(
             RustModule.WalletV4.StakeDeregistration.new(paymentCred)
           ));
+          neededKeys.neededHashes.add(Buffer.from(paymentCred.to_bytes()).toString('hex'));
         }
       }
       const accountStates = await request.getAccountState({
         addresses: request.withdrawals.map(withdrawal => withdrawal.rewardAddress)
       });
-      const neededKeys = {
-        neededHashes: new Set(),
-        wits: new Set(),
-      };
-      const finalWithdrawals = Object.keys(accountStates).map(address => {
-        const rewardForAddress = accountStates[address];
-        if (rewardForAddress == null) {
-          throw new NoInputsError();
-        }
-        const rewardBalance = new BigNumber(rewardForAddress.remainingAmount);
-        // TODO: this is actually incorrect
-        // since you may want to unregister your staking key even if the balance is 0
-        // to get back your deposit
-        if (rewardBalance.eq(0)) {
-          throw new NoInputsError();
-        }
-        const rewardAddress = RustModule.WalletV4.RewardAddress.from_address(
-          RustModule.WalletV4.Address.from_bytes(
-            Buffer.from(address, 'hex')
-          )
-        );
-        if (rewardAddress == null) {
-          throw new Error(`${nameof(AdaApi)}::${nameof(this.createUnsignedTx)} withdrawal not a reward address`);
-        }
-        {
-          const stakeCredential = rewardAddress.payment_cred();
-          neededKeys.neededHashes.add(Buffer.from(stakeCredential.to_bytes()).toString('hex'));
-        }
-        return {
-          address: rewardAddress,
-          amount: RustModule.WalletV4.BigNum.from_str(rewardForAddress.remainingAmount)
-        };
-      });
+      const finalWithdrawals = Object.keys(accountStates).reduce(
+        (list, address) => {
+          const rewardForAddress = accountStates[address];
+          // if key is not registered, we just skip this withdrawal
+          if (rewardForAddress == null) {
+            return list;
+          }
+
+          const rewardBalance = new BigNumber(rewardForAddress.remainingAmount);
+
+          // if the reward address is empty, we filter it out of the withdrawal list
+          // although the protocol allows withdrawals of 0 ADA, it's pointless to do
+          // recall: you may want to undelegate the ADA even if there is 0 ADA in the reward address
+          // since you may want to get back your deposit
+          if (rewardBalance.eq(0)) {
+            return list;
+          }
+
+          const rewardAddress = RustModule.WalletV4.RewardAddress.from_address(
+            RustModule.WalletV4.Address.from_bytes(
+              Buffer.from(address, 'hex')
+            )
+          );
+          if (rewardAddress == null) {
+            throw new Error(`${nameof(AdaApi)}::${nameof(this.createUnsignedTx)} withdrawal not a reward address`);
+          }
+          {
+            const stakeCredential = rewardAddress.payment_cred();
+            neededKeys.neededHashes.add(Buffer.from(stakeCredential.to_bytes()).toString('hex'));
+          }
+          list.push({
+            address: rewardAddress,
+            amount: RustModule.WalletV4.BigNum.from_str(rewardForAddress.remainingAmount)
+          });
+          return list;
+        },
+        ([]: Array<{|
+          address:RustModule.WalletV4. RewardAddress,
+          amount: RustModule.WalletV4.BigNum,
+        |}>)
+      );
+      // if the end result is no withdrawals and no deregistrations, throw an error
+      if (finalWithdrawals.length === 0 && certificates.length === 0) {
+        throw new NoInputsError();
+      }
       const unsignedTxResponse = shelleyNewAdaUnsignedTx(
         [],
         {
@@ -1286,7 +1303,7 @@ export default class AdaApi {
           }
         }
       }
-      return new HaskellShelleyTxSignRequest(
+      const result = new HaskellShelleyTxSignRequest(
         {
           senderUtxos: unsignedTxResponse.senderUtxos,
           unsignedTx: unsignedTxResponse.txBuilder,
@@ -1301,6 +1318,7 @@ export default class AdaApi {
         },
         neededKeys,
       );
+      return result;
     } catch (error) {
       Logger.error(
         `${nameof(AdaApi)}::${nameof(this.createWithdrawalTx)} error: ` + stringifyError(error)

@@ -112,53 +112,88 @@ export default class TransferSummaryPage extends Component<Props> {
     const { intl } = this.context;
     const { transferTx, } = this.props;
 
-    if (transferTx.withdrawals != null) {
-      const { withdrawals } = transferTx;
-      const refundSum = withdrawals.reduce(
-        (sum, curr) => (curr.refund == null ? sum : sum.plus(curr.refund)),
-        new BigNumber(0)
-      );
+    if (transferTx.withdrawals != null || transferTx.deregistrations != null) {
+      const { withdrawals, deregistrations } = transferTx;
       return (
-        <div className={styles.addressLabelWrapper}>
-          <div className={styles.addressLabel}>
-            {intl.formatMessage(globalMessages.withdrawalsLabel)}
-          </div>
-          {
-            withdrawals.map((withdrawal, index) => {
-              const addressesClasses = classnames([
-                'withdrawal-' + (index + 1),
-                styles.address
-              ]);
+        <>
+          {withdrawals != null && withdrawals.length > 0 && (
+            <div className={styles.addressLabelWrapper}>
+              <div className={styles.addressLabel}>
+                {intl.formatMessage(globalMessages.withdrawalsLabel)}
+              </div>
+              {withdrawals.map((withdrawal, index) => {
+                const addressesClasses = classnames([
+                  'withdrawal-' + (index + 1),
+                  styles.address
+                ]);
 
-              return (
-                <div
-                  key={index /* eslint-disable-line react/no-array-index-key */}
-                >
-                  <div className={styles.addressSubLabel} />
-                  <ExplorableHashContainer
-                    selectedExplorer={this.props.selectedExplorer}
-                    light
-                    hash={this.props.addressToDisplayString(withdrawal.address)}
-                    linkType="address"
+                return (
+                  <div
+                    key={index /* eslint-disable-line react/no-array-index-key */}
                   >
-                    <RawHash light>
-                      <span className={addressesClasses}>
-                        {truncateAddress(this.props.addressToDisplayString(withdrawal.address))}
-                      </span>
-                    </RawHash>
-                  </ExplorableHashContainer>
-                </div>
-              );
-            })
-          }
-          {refundSum.gt(0) && (
-            <div className={styles.refund}>
-              {intl.formatMessage(messages.unregisterExplanation, {
-                refundAmount: refundSum.toString()
+                    <div className={styles.addressSubLabel} />
+                    <ExplorableHashContainer
+                      selectedExplorer={this.props.selectedExplorer}
+                      light
+                      hash={this.props.addressToDisplayString(withdrawal.address)}
+                      linkType="address"
+                    >
+                      <RawHash light>
+                        <span className={addressesClasses}>
+                          {truncateAddress(this.props.addressToDisplayString(withdrawal.address))}
+                        </span>
+                      </RawHash>
+                    </ExplorableHashContainer>
+                  </div>
+                );
               })}
             </div>
           )}
-        </div>
+          {deregistrations != null && deregistrations.length > 0 && (
+            <div className={styles.addressLabelWrapper}>
+              <div className={styles.addressLabel}>
+                {intl.formatMessage(globalMessages.StakeDeregistration)}
+              </div>
+              {deregistrations.map((deregistration, index) => {
+                const addressesClasses = classnames([
+                  'deregistration-' + (index + 1),
+                  styles.address
+                ]);
+
+                return (
+                  <div
+                    key={index /* eslint-disable-line react/no-array-index-key */}
+                  >
+                    <div className={styles.addressSubLabel} />
+                    <ExplorableHashContainer
+                      selectedExplorer={this.props.selectedExplorer}
+                      light
+                      hash={this.props.addressToDisplayString(deregistration.rewardAddress)}
+                      linkType="address"
+                    >
+                      <RawHash light>
+                        <span className={addressesClasses}>
+                          {truncateAddress(
+                            this.props.addressToDisplayString(deregistration.rewardAddress)
+                          )}
+                        </span>
+                      </RawHash>
+                    </ExplorableHashContainer>
+                    {}
+                  </div>
+                );
+              })}
+              <div className={styles.refund}>
+                {intl.formatMessage(messages.unregisterExplanation, {
+                  refundAmount: deregistrations.reduce(
+                    (sum, curr) => (curr.refund == null ? sum : sum.plus(curr.refund)),
+                    new BigNumber(0)
+                  ).toString()
+                })}
+              </div>
+            </div>
+          )}
+        </>
       );
     }
     return (
@@ -233,10 +268,10 @@ export default class TransferSummaryPage extends Component<Props> {
 
   getTotalBalance: void => BigNumber = () => {
     const baseTotal = this.props.transferTx.recoveredBalance.minus(this.props.transferTx.fee);
-    if (this.props.transferTx.withdrawals == null) {
+    if (this.props.transferTx.deregistrations == null) {
       return baseTotal;
     }
-    const refundSum = this.props.transferTx.withdrawals.reduce(
+    const refundSum = this.props.transferTx.deregistrations.reduce(
       (sum, curr) => (curr.refund == null ? sum : sum.plus(curr.refund)),
       new BigNumber(0)
     );
@@ -303,14 +338,14 @@ export default class TransferSummaryPage extends Component<Props> {
                     {unitOfAccountSetting.currency}
                   </span>
                 </div>
-                <div className={styles.feesSmall}>+{transactionFee}
+                <div className={styles.feesSmall}>{transactionFee}
                   <span className={styles.currencySymbol}>
                     &nbsp;{unitOfAccountSetting.currency}
                   </span>
                 </div>
               </>
             ) : (
-              <div className={styles.fees}>+{transactionFee}
+              <div className={styles.fees}>{transactionFee}
                 <span className={styles.currencySymbol}>
                   &nbsp;ADA
                 </span>

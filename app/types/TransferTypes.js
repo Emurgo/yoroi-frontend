@@ -31,7 +31,9 @@ export type TransferTx = {|
   +withdrawals?: Array<{|
     +address: string,
     +amount: BigNumber,
-    // transaction may not be unregistering staking key
-    +refund?: BigNumber,
+  |}>,
+  deregistrations?: Array<{|
+    +rewardAddress: string,
+    +refund: BigNumber,
   |}>,
 |}

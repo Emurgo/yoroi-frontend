@@ -98,8 +98,8 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
   }
 
   withdrawals(shift: boolean): Array<{|
-    address: string,
-    amount: BigNumber,
+    +address: string,
+    +amount: BigNumber,
   |}> {
     const withdrawals = this.signRequest.unsignedTx.build().withdrawals();
     if (withdrawals == null) return [];
@@ -123,8 +123,8 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
   }
 
   keyDeregistrations(shift: boolean): Array<{|
-    rewardAddress: string,
-    refund: BigNumber,
+    +rewardAddress: string,
+    +refund: BigNumber,
   |}> {
     const certs = this.signRequest.unsignedTx.build().certs();
     if (certs == null) return [];

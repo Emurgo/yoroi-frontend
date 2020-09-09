@@ -134,14 +134,11 @@ const shelleyCertificateKinds = {
   PoolRegistration: jormungandrCertificateKinds.PoolRegistration,
   PoolRetirement: jormungandrCertificateKinds.PoolRetirement,
   StakeDelegation: jormungandrCertificateKinds.StakeDelegation,
+  StakeDeregistration: globalMessages.StakeDeregistration,
   ...defineMessages({
     StakeRegistration: {
       id: 'wallet.transaction.certificate.StakeRegistration',
       defaultMessage: '!!!Staking key registration',
-    },
-    StakeDeregistration: {
-      id: 'wallet.transaction.certificate.StakeDeregistration',
-      defaultMessage: '!!!Staking key deregistration',
     },
     GenesisKeyDelegation: {
       id: 'wallet.transaction.certificate.GenesisKeyDelegation',
