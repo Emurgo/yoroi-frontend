@@ -33,7 +33,7 @@
   "api.errors.noOutputsError": "Transactie vereist minimaal 1 bestemming, maar er is geen bestemming toegevoegd",
   "api.errors.pendingTransactionError": "Fout tijdens het vernieuwen van lopende transacties.",
   "api.errors.poolMissingApiError": "Kon deze Stakepool niet vinden. Controleer de ID nogmaals en controleer of de Stakepool niet is afgemeld.",
-  "api.errors.rewardAddressEmpty": "Reward address is empty.",
+  "api.errors.rewardAddressEmpty": "Vergoedingenadres is leeg.",
   "api.errors.rollbackApiError": "Terugdraaien is gedetecteerd.",
   "api.errors.sendTransactionApiError": "Serverfout tijdens het verzenden van een transactie.",
   "api.errors.sendTransactionError": "Fout ontvangen van de API methode tijdens het zenden van een transactie.",
