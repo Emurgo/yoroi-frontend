@@ -87,6 +87,8 @@ export const generateTransaction = (): {|
   shelleyDelegatedTx2: RemoteTransaction,
   shelleyLedgerDelegatedTx1: RemoteTransaction,
   shelleyLedgerDelegatedTx2: RemoteTransaction,
+  shelleyOnlyRegisteredTx1: RemoteTransaction,
+  shelleyOnlyRegisteredTx2: RemoteTransaction,
 |} => {
   const genesisTx = {
     hash: 'b713cc0d63106c3806b5a7077cc37a294fcca5e479f26aac64e51e09ae808d75',
@@ -393,6 +395,21 @@ export const generateTransaction = (): {|
       },
       {
         // index: 20
+        // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
+        address: getSingleAddressString(
+          testWallets['dump-wallet'].mnemonic,
+          [
+            WalletTypePurpose.BIP44,
+            CoinTypes.CARDANO,
+            0 + HARD_DERIVATION_START,
+            ChainDerivations.EXTERNAL,
+            1
+          ],
+        ),
+        amount: '10000000'
+      },
+      {
+        // index: 21
         // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
         address: getSingleAddressString(
           testWallets['dump-wallet'].mnemonic,
@@ -1581,6 +1598,108 @@ export const generateTransaction = (): {|
     tx_state: 'Successful'
   };
 
+  // ============================
+  //   shelley-just-registered
+  // ============================
+
+  const shelleyOnlyRegisteredTx1 = {
+    hash: '3699e76c7b3456afdc6cd57d42f246f86f69aefd76025006ac78313fad2bba21',
+    inputs: [
+      {
+        // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
+        address: getSingleAddressString(
+          testWallets['dump-wallet'].mnemonic,
+          [
+            WalletTypePurpose.BIP44,
+            CoinTypes.CARDANO,
+            0 + HARD_DERIVATION_START,
+            ChainDerivations.EXTERNAL,
+            1
+          ]
+        ),
+        txHash: distributorTx.hash,
+        id: distributorTx.hash + '21',
+        index: 21,
+        amount: '8500000'
+      }
+    ],
+    outputs: [
+      {
+        // Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj
+        address: getSingleAddressString(
+          testWallets['dump-wallet'].mnemonic,
+          [
+            WalletTypePurpose.BIP44,
+            CoinTypes.CARDANO,
+            0 + HARD_DERIVATION_START,
+            ChainDerivations.EXTERNAL,
+            1
+          ]
+        ),
+        amount: '1'
+      },
+      {
+        // shelley-just-registered base address index 0'/0/0
+        // eslint-disable-next-line max-len
+        // addr1q97p5s9fuhlymrqe2kr94krdfh6fujuvfyy67z53g7cmwrr4dsev5marcxj472jrtwfl5qqfzkc3udfwpckx66qyqp2q0j0e6c
+        address: '017c1a40a9e5fe4d8c1955865ad86d4df49e4b8c4909af0a9147b1b70c756c32ca6fa3c1a55f2a435b93fa000915b11e352e0e2c6d68040054',
+        amount: '5500000'
+      },
+    ],
+    height: 100,
+    block_hash: '100',
+    tx_ordinal: 6,
+    time: '2019-04-20T15:15:33.000Z',
+    epoch: 0,
+    slot: 100,
+    last_update: '2019-05-20T23:16:51.899Z',
+    tx_state: 'Successful'
+  };
+  const shelleyOnlyRegisteredTx2 = {
+    hash: '3456e86c7ba699afdc1cd57d42f246f86f69aefd76025006ac78313fad2bba21',
+    type: 'shelley',
+    inputs: [
+      {
+        // shelley-only-registered base address index 0'/0/0
+        // eslint-disable-next-line max-len
+        // addr1q97p5s9fuhlymrqe2kr94krdfh6fujuvfyy67z53g7cmwrr4dsev5marcxj472jrtwfl5qqfzkc3udfwpckx66qyqp2q0j0e6c
+        address: '017c1a40a9e5fe4d8c1955865ad86d4df49e4b8c4909af0a9147b1b70c756c32ca6fa3c1a55f2a435b93fa000915b11e352e0e2c6d68040054',
+        txHash: shelleyOnlyRegisteredTx1.hash,
+        id: shelleyOnlyRegisteredTx1.hash + '1',
+        index: 1,
+        amount: '5500000'
+      }
+    ],
+    outputs: [
+      {
+        // shelley-only-registered base address index 0'/1/0
+        // eslint-disable-next-line max-len
+        // addr1qxzjfpfhwq4474fk7ruxsjh59s9g2n504jm6reug68zwx2t4dsev5marcxj472jrtwfl5qqfzkc3udfwpckx66qyqp2qgde07v
+        address: '0185248537702b5f5536f0f8684af42c0a854e8facb7a1e788d1c4e329756c32ca6fa3c1a55f2a435b93fa000915b11e352e0e2c6d68040054',
+        amount: '3000000'
+      },
+    ],
+    ttl: '500',
+    fee: '500000',
+    certificates: [
+      {
+        certIndex: 0,
+        kind: (ShelleyCertificateTypes.StakeRegistration: 'StakeRegistration'),
+        rewardAddress: 'e1756c32ca6fa3c1a55f2a435b93fa000915b11e352e0e2c6d68040054',
+      },
+    ],
+    withdrawals: [],
+    metadata: null,
+    height: 200,
+    block_hash: '200',
+    tx_ordinal: 3,
+    time: '2019-04-21T15:13:33.000Z',
+    epoch: 0,
+    slot: 200,
+    last_update: '2019-05-21T23:14:51.899Z',
+    tx_state: 'Successful'
+  };
+
   return {
     genesisTx,
     distributorTx,
@@ -1605,6 +1724,8 @@ export const generateTransaction = (): {|
     shelleyDelegatedTx2,
     shelleyLedgerDelegatedTx1,
     shelleyLedgerDelegatedTx2,
+    shelleyOnlyRegisteredTx1,
+    shelleyOnlyRegisteredTx2,
   };
 };
 
@@ -1693,6 +1814,9 @@ export function resetChain(
     // shelley-ledger-delegated
     addTransaction(txs.shelleyLedgerDelegatedTx1);
     addTransaction(txs.shelleyLedgerDelegatedTx2);
+    // shelley-only-registered
+    addTransaction(txs.shelleyOnlyRegisteredTx1);
+    addTransaction(txs.shelleyOnlyRegisteredTx2);
   } else if (chainToUse === MockChain.TestAssurance) {
     // test setup
     addTransaction(txs.genesisTx);
