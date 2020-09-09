@@ -1,5 +1,5 @@
 {
-  "api.errors.ApiMethodNotYetImplementedError": "Este método de la API no esta implementado aún.",
+  "api.errors.ApiMethodNotYetImplementedError": "Este método de la API no ha sido implementado todavía.",
   "api.errors.GenericApiError": "Se ha producido un error, inténtalo de nuevo más tarde.",
   "api.errors.IncorrectPasswordError": "Contraseña de billetera incorrecta.",
   "api.errors.NotEnoughMoneyToSendError": "No hay suficiente ADA para hacer esta transacción.",
@@ -64,7 +64,7 @@
   "daedalusTransfer.waiting.title.label": "La billetera de Daedalus está siendo restaurada",
   "daedalusTransfer.waiting.warning": "Esto puede tomar algo de tiempo (o fallar) si la conexión a Internet es deficiente",
   "decryption.label": "Contraseña de descifrado",
-  "global.blog.learnMore": "You can read our {blogLink} to learn more.",
+  "global.blog.learnMore": "Puedes leer nuestro {blogLink} para conocer más.",
   "global.contact": "contactar con el soporte",
   "global.copyTooltipMessage": "Copiado",
   "global.errors.fieldIsRequired": "Este campo es obligatorio.",
