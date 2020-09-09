@@ -60,7 +60,7 @@ export default class SeizaFetcher extends Component<Props> {
       throw new Error(`${nameof(SeizaFetcher)} Server response has incorrect pool length. Expected 56, got ${poolId.length}`);
     }
 
-    this.props.stakepoolSelectedAction(pool);
+    await this.props.stakepoolSelectedAction(pool);
   }
 
   @action setFrame: (null | HTMLIFrameElement) => void = (frame) => {

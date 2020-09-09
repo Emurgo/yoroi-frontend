@@ -32,6 +32,7 @@ type WalletNames =
   'shelley-simple-15' |
   'shelley-delegated' |
   'shelley-ledger-delegated' |
+  'shelley-only-registered' |
   'small-single-tx' |
   'failed-single-tx' |
   'many-tx-wallet' |
@@ -121,5 +122,10 @@ export const testWallets: { [key: WalletNames]: RestorationInput, ... } = Object
     mnemonic: 'parrot offer switch thank film high drop salute task train squirrel coral consider coyote evolve',
     plate: 'PALP-0076',
     deviceId: '707fa118bf6b84',
+  }),
+  createWallet({
+    name: ('shelley-only-registered': WalletNames),
+    mnemonic: 'pig organ result afraid abstract arrest brass kangaroo hub cube crunch return vibrant core make',
+    plate: 'TDDO-4310',
   }),
 );

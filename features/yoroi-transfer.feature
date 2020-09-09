@@ -311,3 +311,58 @@ Feature: Transfer Yoroi Wallet funds
     Given The expected transaction is "g6UAgYJYIDZ351x7ppm/3GzVfULyRvhvY679dgJQBqx4MT+tK7ohAQGBglg5Aceyi86pDUQLVFWmoConylm4aW8Gf8GWf0f5M+eVWOlpyqnletz8QLmQfreUNjtZD69C//SMOOuIGgCdmOcCGgACnrkDGhH+lM0FoVgd4ZVY6WnKqeV63PxAuZB+t5Q2O1kPr0L/9Iw464gaAExLQKEAgoJYIMyYCZRBUMAPORPNKxA+m0L+YkP8NqdvnrgAaS4r2j8uWECtpqZgzGT59YcufXB7lapcXnXV6vhAwVcOWAwJ1ETU1fYHXCu1L18h08N8G36qNKEXFYxtWkhohVpD4Q2FXIENglggYWJ2UyDJOtPILMKLlXi+MaeR8Do33K4FY0PMJbvLOzFYQEChQ6M2dwJDq/Hjjy6Wm4X16lJuvmFbVFalNvqRC/i4uamx+5ygq1sS32gdscAwi05wfkpEJ/r7ZUK1vx63BAH2"
     When I confirm Yoroi transfer funds
     Then I should see the summary screen
+
+  @it-158
+  Scenario: Claiming Shelley rewards fails if no rewards and unregistered (IT-158)
+    Given There is a Shelley wallet stored named shelley-simple-15
+    And I am on the transfer start screen
+    When I click on the shelley button on the transfer screen
+    Then I select the Shelley 15-word option
+    Then I accept the prompt
+    Then I keep the staking key
+    And I enter the recovery phrase:
+    | recoveryPhrase                                                                                           |
+    | cup casino sign casual north still envelope rack avocado sadness motor problem lunar east monitor |
+    And I proceed with the recovery
+    Then I should see a plate TNHH-3713
+    Then I click the next button
+    Then I should see the Yoroi transfer error screen
+
+  @it-159
+  Scenario: Claiming Shelley rewards fails if no rewards but registered w/ keep (IT-159)
+    Given There is a Shelley wallet stored named shelley-simple-15
+    And I am on the transfer start screen
+    When I click on the shelley button on the transfer screen
+    Then I select the Shelley 15-word option
+    Then I accept the prompt
+    Then I keep the staking key
+    And I enter the recovery phrase:
+    | recoveryPhrase                                                                                           |
+    | pig organ result afraid abstract arrest brass kangaroo hub cube crunch return vibrant core make |
+    And I proceed with the recovery
+    Then I should see a plate TDDO-4310
+    Then I click the next button
+    Then I should see the Yoroi transfer error screen
+
+  @it-160
+  Scenario: Claiming Shelley rewards fails if no rewards but registered w/ deregister (IT-160)
+    Given There is a Shelley wallet stored named shelley-simple-15
+    And I am on the transfer start screen
+    When I click on the shelley button on the transfer screen
+    Then I select the Shelley 15-word option
+    Then I accept the prompt
+    Then I click on the checkbox
+    And I click the next button
+    And I enter the recovery phrase:
+    | recoveryPhrase                                                                                           |
+    | pig organ result afraid abstract arrest brass kangaroo hub cube crunch return vibrant core make |
+    And I proceed with the recovery
+    Then I should see a plate TDDO-4310
+    Then I click the next button
+    And I see the deregistration for the transaction
+    And I enter the wallet password:
+      | password   |
+      | asdfasdfasdf |
+    Given The expected transaction is "g6UAgYJYIDZ351x7ppm/3GzVfULyRvhvY679dgJQBqx4MT+tK7ohAQGBglg5Aceyi86pDUQLVFWmoConylm4aW8Gf8GWf0f5M+eVWOlpyqnletz8QLmQfreUNjtZD69C//SMOOuIGgBv0n8CGgACnmEDGhH+lM0EgYIBggBYHHVsMspvo8GlXypDW5P6AAkVsR41Lg4sbWgEAFShAIKCWCDMmAmUQVDADzkTzSsQPptC/mJD/Danb564AGkuK9o/LlhArA2Id/4V04BNncOIhWd1GMRLlX9q1lTmWTcQBsB7S7R0JvOV0u/2jMcBxIlFLkTSyvAywveQzAfc2uY+frBWB4JYIPOlcWS3t2uMM0elCy5Y8VhUv0SFmwE0b4nY9XZQ10F2WEDkGBk00hf2bU2gT2OVc5It9XVPa0BPF2QmpmOebAmHbBapE7xpMDPWckfUEBsNZ+B1OjHBtwIWOdI69y5PmWQJ9g=="
+    When I confirm Yoroi transfer funds
+    Then I should see the summary screen

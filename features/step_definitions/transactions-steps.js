@@ -124,6 +124,12 @@ Then(/^I should see an incorrect wallet password error message$/, async function
   await this.waitUntilText('.WalletSendConfirmationDialog_error', errorMessage);
 });
 
+Then(/^I should see an delegation incorrect wallet password error message$/, async function () {
+  const errorMessage = await i18n.formatMessage(this.driver, { id: 'api.errors.IncorrectPasswordError' });
+  await this.waitUntilText('.DelegationTxDialog_error', errorMessage);
+});
+
+
 Then(/^A successful tx gets sent from my wallet from another client$/, () => {
   const txs = generateTransaction();
   addTransaction(txs.postLaunchSuccessfulTx);

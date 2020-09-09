@@ -48,10 +48,9 @@ export default class WithdrawalTxDialogContainer extends Component<Props> {
             throw new Error(`${nameof(WithdrawalTxDialogContainer)} incorrect tx type`);
           }
 
-          const deregistrationsMap = new Map(tentativeTx.keyDeregistrations(true).map(key => [
-            key.rewardAddress, key.refund
-          ]));
+          const deregistrations = tentativeTx.keyDeregistrations(true);
           const withdrawals = tentativeTx.withdrawals(true);
+
           return {
             recoveredBalance: withdrawals.reduce(
               (sum, curr) => sum.plus(curr.amount),
@@ -62,10 +61,8 @@ export default class WithdrawalTxDialogContainer extends Component<Props> {
               .uniqueSenderAddresses(),
             receivers: tentativeTx
               .receivers(true),
-            withdrawals: withdrawals.map(withdrawal => ({
-              ...withdrawal,
-              refund: deregistrationsMap.get(withdrawal.address) ?? new BigNumber(0),
-            })),
+            withdrawals,
+            deregistrations,
           };
         }}
       />

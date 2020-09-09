@@ -235,7 +235,7 @@ Feature: Send transaction
     Then I should see a warning block
 
   @it-137
-   Scenario: Test Shelley wallet delegation (IT-137)
+  Scenario: Test Shelley wallet delegation (IT-137)
      Given There is a Shelley wallet stored named shelley-simple-15
      Given I go to the delegation by id screen
      And I fill the delegation id form:
@@ -251,3 +251,19 @@ Feature: Send transaction
      Then I submit the wallet send form
      Given I click on see dashboard
      Then I should see the dashboard screen
+
+  @it-161
+  Scenario: Test Shelley wallet delegations with incorrect Spending password (IT-161)
+    Given There is a Shelley wallet stored named shelley-simple-15
+    Given I go to the delegation by id screen
+    And I fill the delegation id form:
+      | stakePoolId                                              |
+      | df1750df9b2df285fcfb50f4740657a18ee3af42727d410c37b86207 |
+    Then I see the stakepool ticker "YOROI"
+    And I click on the next button in the delegation by id
+    And I enter the wallet password:
+    | password   |
+    | qwerqwerqwer |
+    Then I see the delegation confirmation dialog
+    Then I submit the wallet send form
+    Then I should see an delegation incorrect wallet password error message

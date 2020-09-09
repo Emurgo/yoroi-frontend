@@ -27,7 +27,7 @@ const messages = defineMessages({
 
 type Props = {|
   +hasAnyPending: boolean,
-  +updatePool: (void | string) => Promise<void>,
+  +updatePool: (void | string) => void,
   +poolQueryError: ?LocalizableError,
   +onNext: void => Promise<void>,
   +isProcessing: boolean,

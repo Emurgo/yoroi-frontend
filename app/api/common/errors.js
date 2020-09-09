@@ -76,6 +76,10 @@ const messages = defineMessages({
     id: 'api.errors.noInputsError',
     defaultMessage: '!!!The wallet restored from your recovery phrase is empty. Please check your recovery phrase and attempt restoration again.',
   },
+  rewardAddressEmptyError: {
+    id: 'api.errors.rewardAddressEmpty',
+    defaultMessage: '!!!Reward address is empty.',
+  },
   noOutputsError: {
     id: 'api.errors.noOutputsError',
     defaultMessage: '!!!Transaction requires at least 1 output, but no output was added',
@@ -306,6 +310,15 @@ export class NoInputsError extends LocalizableError {
     super({
       id: messages.noInputsError.id,
       defaultMessage: messages.noInputsError.defaultMessage || '',
+    });
+  }
+}
+
+export class RewardAddressEmptyError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.rewardAddressEmptyError.id,
+      defaultMessage: messages.rewardAddressEmptyError.defaultMessage || '',
     });
   }
 }

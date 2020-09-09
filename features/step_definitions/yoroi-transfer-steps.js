@@ -74,7 +74,7 @@ When(/^I click on the yoroiPaper button on the Yoroi Transfer start screen$/, as
 
 Then(/^I should see the Yoroi transfer error screen$/, async function () {
   const errorPageTitle = await i18n.formatMessage(this.driver,
-    { id: 'yoroiTransfer.errorPage.title.label' });
+    { id: 'api.errors.generateTransferTxError' });
   await this.waitUntilText('.ErrorPage_title', errorPageTitle);
 });
 

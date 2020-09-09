@@ -597,6 +597,10 @@ const globalMessages: * = defineMessages({
     id: 'transfer.summary.finalBalance.label',
     defaultMessage: '!!!Final balance',
   },
+  StakeDeregistration: {
+    id: 'wallet.transaction.certificate.StakeDeregistration',
+    defaultMessage: '!!!Staking key deregistration',
+  },
   withdrawalsLabel: {
     id: 'wallet.transaction.withdrawalsLabel',
     defaultMessage: '!!!Withdrawals',
