@@ -43,7 +43,6 @@ import type { ConfigType } from '../../../../../config/config-types';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
-const backendUrl = CONFIG.network.backendUrl;
 
 /**
  * Makes calls to Yoroi backend service
@@ -54,20 +53,23 @@ export class RemoteFetcher implements IFetcher {
   getLastLaunchVersion: () => string;
   getCurrentLocale: () => string;
   getPlatform: () => string;
+  getBackendUrl: () => string;
 
   constructor(
     getLastLaunchVersion: () => string,
     getCurrentLocale: () => string,
     getPlatform: () => string,
+    getBackendUrl: () => string,
   ) {
     this.getLastLaunchVersion = getLastLaunchVersion;
     this.getCurrentLocale = getCurrentLocale;
     this.getPlatform = getPlatform;
+    this.getBackendUrl = getBackendUrl;
   }
 
   getUTXOsForAddresses: AddressUtxoRequest => Promise<AddressUtxoResponse> = (body) => (
     axios(
-      `${backendUrl}/api/txs/utxoForAddresses`,
+      `${this.getBackendUrl()}/api/txs/utxoForAddresses`,
       {
         timeout: CONFIG.app.walletRefreshInterval,
         method: 'post',
@@ -88,7 +90,7 @@ export class RemoteFetcher implements IFetcher {
 
   getUTXOsSumsForAddresses: UtxoSumRequest => Promise<UtxoSumResponse> = (body) => (
     axios(
-      `${backendUrl}/api/txs/utxoSumForAddresses`,
+      `${this.getBackendUrl()}/api/txs/utxoSumForAddresses`,
       {
         method: 'post',
         timeout: CONFIG.app.walletRefreshInterval,
@@ -109,7 +111,7 @@ export class RemoteFetcher implements IFetcher {
 
   getTransactionsHistoryForAddresses: HistoryRequest => Promise<HistoryResponse> = (body) => (
     axios(
-      `${backendUrl}/api/v2/txs/history`,
+      `${this.getBackendUrl()}/api/v2/txs/history`,
       {
         method: 'post',
         timeout: CONFIG.app.walletRefreshInterval,
@@ -161,7 +163,7 @@ export class RemoteFetcher implements IFetcher {
 
   getRewardHistory: RewardHistoryRequest => Promise<RewardHistoryResponse> = (body) => (
     axios(
-      `${backendUrl}/api/v2/account/rewards`,
+      `${this.getBackendUrl()}/api/v2/account/rewards`,
       {
         method: 'post',
         timeout: CONFIG.app.walletRefreshInterval,
@@ -180,7 +182,7 @@ export class RemoteFetcher implements IFetcher {
 
   getBestBlock: BestBlockRequest => Promise<BestBlockResponse> = (_body) => (
     axios(
-      `${backendUrl}/api/v2/bestblock`,
+      `${this.getBackendUrl()}/api/v2/bestblock`,
       {
         method: 'get',
         timeout: CONFIG.app.walletRefreshInterval,
@@ -199,7 +201,7 @@ export class RemoteFetcher implements IFetcher {
   sendTx: SignedRequest => Promise<SignedResponse> = (body) => {
     const signedTx64 = Buffer.from(body.encodedTx).toString('base64');
     return axios(
-      `${backendUrl}/api/txs/signed`,
+      `${this.getBackendUrl()}/api/txs/signed`,
       {
         method: 'post',
         timeout: CONFIG.app.walletRefreshInterval,
@@ -225,7 +227,7 @@ export class RemoteFetcher implements IFetcher {
 
   checkAddressesInUse: FilterUsedRequest => Promise<FilterUsedResponse> = (body) => (
     axios(
-      `${backendUrl}/api/v2/addresses/filterUsed`,
+      `${this.getBackendUrl()}/api/v2/addresses/filterUsed`,
       {
         method: 'post',
         timeout: CONFIG.app.walletRefreshInterval,
@@ -246,7 +248,7 @@ export class RemoteFetcher implements IFetcher {
 
   getAccountState: AccountStateRequest => Promise<AccountStateResponse> = (body) => (
     axios(
-      `${backendUrl}/api/v2/account/state`,
+      `${this.getBackendUrl()}/api/v2/account/state`,
       {
         method: 'post',
         timeout: CONFIG.app.walletRefreshInterval,
@@ -283,7 +285,7 @@ export class RemoteFetcher implements IFetcher {
 
   getPoolInfo: PoolInfoRequest => Promise<PoolInfoResponse> = (body) => (
     axios(
-      `${backendUrl}/api/v2/pool/info`,
+      `${this.getBackendUrl()}/api/v2/pool/info`,
       {
         method: 'post',
         timeout: CONFIG.app.walletRefreshInterval,
@@ -304,7 +306,7 @@ export class RemoteFetcher implements IFetcher {
 
   getReputation: ReputationRequest => Promise<ReputationResponse> = (_body) => (
     axios(
-      `${backendUrl}/api/v2/pool/reputation`,
+      `${this.getBackendUrl()}/api/v2/pool/reputation`,
       {
         method: 'get',
         timeout: CONFIG.app.walletRefreshInterval,

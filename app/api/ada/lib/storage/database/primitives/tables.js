@@ -102,6 +102,10 @@ export type ErgoConfig = $ReadOnly<InexactSubset<{|
 export type NetworkInsert = {|
   NetworkId: number,
   CoinType: CoinTypesT,
+  Backend: {|
+    BackendService?: string,
+    WebSocket?: string,
+  |},
   /**
    * Starting configuration for the wallet.
    * This is meant for protocol parameters that rarely change
@@ -133,6 +137,7 @@ export const NetworkSchema: {|
   properties: {
     NetworkId: 'NetworkId',
     CoinType: 'CoinType',
+    Backend: 'Backend',
     BaseConfig: 'BaseConfig',
     Fork: 'Fork',
   }
@@ -463,6 +468,7 @@ export const populatePrimitivesDb = (schemaBuilder: lf$schema$Builder) => {
   schemaBuilder.createTable(NetworkSchema.name)
     .addColumn(NetworkSchema.properties.NetworkId, Type.INTEGER)
     .addColumn(NetworkSchema.properties.CoinType, Type.NUMBER)
+    .addColumn(NetworkSchema.properties.Backend, Type.OBJECT)
     .addColumn(NetworkSchema.properties.BaseConfig, Type.OBJECT)
     .addColumn(NetworkSchema.properties.Fork, Type.INTEGER)
     .addPrimaryKey(

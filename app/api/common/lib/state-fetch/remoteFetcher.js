@@ -23,7 +23,6 @@ import type { ConfigType } from '../../../../../config/config-types';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
-const backendUrl = CONFIG.network.backendUrl;
 const priceBackendUrl = CONFIG.network.priceBackendUrl;
 
 /**
@@ -35,20 +34,23 @@ export class RemoteFetcher implements IFetcher {
   getLastLaunchVersion: () => string;
   getCurrentLocale: () => string;
   getPlatform: () => string;
+  getBackendUrl: () => string;
 
   constructor(
     getLastLaunchVersion: () => string,
     getCurrentLocale: () => string,
     getPlatform: () => string,
+    getBackendUrl: () => string,
   ) {
     this.getLastLaunchVersion = getLastLaunchVersion;
     this.getCurrentLocale = getCurrentLocale;
     this.getPlatform = getPlatform;
+    this.getBackendUrl = getBackendUrl;
   }
 
   checkServerStatus: ServerStatusRequest => Promise<ServerStatusResponse> = (_body) => (
     axios(
-      `${backendUrl}/api/status`,
+      `${this.getBackendUrl()}/api/status`,
       {
         method: 'get',
         timeout: CONFIG.app.walletRefreshInterval,

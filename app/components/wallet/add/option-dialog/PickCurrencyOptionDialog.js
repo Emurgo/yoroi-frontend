@@ -22,6 +22,10 @@ const messages = defineMessages({
     id: 'wallet.currency.pick.cardano',
     defaultMessage: '!!!Cardano is the first provably secure proof of stake protocol',
   },
+  testnetDescription: {
+    id: 'wallet.currency.pick.testnetDescription',
+    defaultMessage: '!!!Testnet are alternative chain to be used for testing. This allows application developers or testers to experiment, without having to use real coins.',
+  },
   ergoDescription: {
     id: 'wallet.currency.pick.ergo',
     defaultMessage: '!!!Ergo builds advanced cryptographic features and radically new DeFi functionality on the rock-solid foundations laid by a decade of blockchain theory and development',
@@ -31,6 +35,7 @@ const messages = defineMessages({
 type Props = {|
   +onCancel: void => void,
   +onCardano: void => void,
+  +onCardanoTestnet: void => void,
   +onErgo: void | (void => void),
   +onExternalLinkClick: MouseEvent => void,
 |};
@@ -70,6 +75,24 @@ export default class PickCurrencyOptionDialog extends Component<Props> {
                 </>}
               onSubmit={this.props.onCardano}
             />
+            {(!environment.isProduction() || environment.isNightly() || environment.isTest()) &&
+              <OptionBlock
+                parentName="PickCurrencyOptionDialog"
+                type="cardanoTestnet"
+                title="Cardano Testnet"
+                onSubmit={this.props.onCardanoTestnet}
+                learnMoreText={
+                  <>
+                    {intl.formatMessage(messages.testnetDescription)}<br />
+                    <a
+                      href="https://testnets.cardano.org/"
+                      onClick={event => this.props.onExternalLinkClick(event)}
+                    >
+                      {intl.formatMessage(globalMessages.learnMore)}
+                    </a>
+                  </>}
+              />
+            }
             {this.props.onErgo != null && (
               !environment.isProduction() || environment.isNightly() || environment.isTest()
             ) &&

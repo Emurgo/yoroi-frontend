@@ -143,7 +143,7 @@ export const HasPrivateDeriver: * = Mixin<
 >(HasPrivateDeriverMixin);
 export function asHasPrivateDeriver<Wrapper: ConceptualWallet, Rest=Empty>(
   obj: IPublicDeriver<Wrapper> & Rest
-): void | (IPublicDeriver<Wrapper & IHasLevels> & Rest) {
+): void | (IPublicDeriver<Wrapper & IHasPrivateDeriver> & Rest) {
   if (obj instanceof HasPrivateDeriver) {
     return obj;
   }

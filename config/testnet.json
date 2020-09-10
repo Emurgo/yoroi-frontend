@@ -1,7 +1,5 @@
 {
   "network": {
-    "backendUrl": "https://testnet-yoroi-backend.yoroiwallet.com",
-    "websocketUrl": "wss://testnet-yoroi-backend.yoroiwallet.com:443",
     "name": "testnet",
     "priceBackendUrl": "https://testnet-yoroi-coin-price-feed.yoroiwallet.com"
   },

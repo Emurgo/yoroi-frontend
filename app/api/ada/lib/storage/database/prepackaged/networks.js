@@ -10,6 +10,7 @@ import type {
   ErgoBaseConfig,
   JormungandrBaseConfig,
 } from '../primitives/tables';
+import environment from '../../../../../../environment';
 
 export const CardanoForks = Object.freeze({
   Haskell: 0,
@@ -22,6 +23,14 @@ export const ErgoForks = Object.freeze({
 export const networks = Object.freeze({
   CardanoMainnet: ({
     NetworkId: 0,
+    Backend: {
+      BackendService: environment.isTest()
+        ? 'http://localhost:8080'
+        : 'https://iohk-mainnet.yoroiwallet.com',
+      WebSocket: environment.isTest()
+        ? 'ws://localhost:8080'
+        : 'wss://iohk-mainnet.yoroiwallet.com:443',
+    },
     BaseConfig: ([
       Object.freeze({
         StartAt: 0,
@@ -50,6 +59,14 @@ export const networks = Object.freeze({
   }: NetworkRow),
   JormungandrMainnet: ({
     NetworkId: 1_00,
+    Backend: {
+      BackendService: environment.isTest()
+        ? 'http://localhost:21000' // TODO: pick a port for test
+        : 'https://shelley-itn-yoroi-backend.yoroiwallet.com',
+      WebSocket: environment.isTest()
+        ? 'ws://localhost:21000' // TODO: pick a port for test
+        : 'wss://shelley-itn-yoroi-backend.yoroiwallet.com:443',
+    },
     BaseConfig: ([Object.freeze({
       StartAt: 0,
       ChainNetworkId: '8e4d2a343f3dcf9330ad9035b3e8d168e6728904262f2c434a4f8f934ec7b676',
@@ -73,6 +90,11 @@ export const networks = Object.freeze({
   }: NetworkRow),
   ErgoMainnet: ({
     NetworkId: 2_00,
+    Backend: {
+      BackendService: environment.isTest()
+        ? 'http://localhost:21001'
+        : 'https://ergo-backend.yoroiwallet.com', // TODO
+    },
     BaseConfig: ([Object.freeze({
       StartAt: 0,
       ChainNetworkId: (Network.Mainnet.toString(): string),
@@ -82,6 +104,14 @@ export const networks = Object.freeze({
   }: NetworkRow),
   CardanoTestnet: ({
     NetworkId: 3_00,
+    Backend: {
+      BackendService: environment.isTest()
+        ? 'http://localhost:8080'
+        : 'https://testnet-backend.yoroiwallet.com',
+      WebSocket: environment.isTest()
+        ? 'ws://localhost:8080'
+        : 'wss://testnet-backend.yoroiwallet.com:443',
+    },
     BaseConfig: ([
       Object.freeze({
         StartAt: 0,
