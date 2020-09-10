@@ -34,6 +34,10 @@ export const mockWalletProps: {
       },
       wallets: {
         selected: request.selected,
+        getPrivateKeyCache: (conceptualWallet) => ({
+          conceptualWallet,
+          privateKey: '001122',
+        }),
       },
       walletSettings: {
         getWalletWarnings: request.getWalletWarnings ?? ((publicDeriver) => ({
