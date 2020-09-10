@@ -13,7 +13,7 @@ const messages = defineMessages({
   },
   itnDeprecationLine2: {
     id: 'wallet.deprecation.itnLine2',
-    defaultMessage: '!!!Rewards can be claimed on mainnet once Shelley is released on mainnet.'
+    defaultMessage: '!!!Rewards can be claimed on mainnet.'
   }
 });
 

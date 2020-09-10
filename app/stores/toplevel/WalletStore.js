@@ -28,12 +28,16 @@ import {
   asGetSigningKey,
   asGetPublicKey,
   asGetStakingKey,
+  asHasPrivateDeriver,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import type {
   IGetLastSyncInfoResponse,
   IGetSigningKey,
   IGetPublic,
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
+import type {
+  IGetPrivateDeriverKey,
+} from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import { Logger, stringifyError } from '../../utils/logging';
 import { assuranceModes, } from '../../config/transactionAssuranceConfig';
@@ -41,6 +45,9 @@ import type { WalletChecksum } from '@emurgo/cip4-js';
 import { legacyWalletChecksum } from '@emurgo/cip4-js';
 import { createDebugWalletDialog } from '../../containers/wallet/dialogs/DebugWalletDialogContainer';
 import { getApiForCoinType } from '../../api/common/utils';
+import {
+  asGetPrivateDeriverKey,
+} from '../../api/ada/lib/storage/models/ConceptualWallet/traits';
 
 type GroupedWallets = {|
   publicDerivers: Array<PublicDeriver<>>;
@@ -91,6 +98,11 @@ export type SigningKeyCache = {|
 export type PublicKeyCache = {|
   publicDeriver: IGetPublic,
   plate: WalletChecksum,
+|};
+
+export type PrivateKeyCache = {|
+  conceptualWallet: IGetPrivateDeriverKey,
+  privateKey: string, // note: possible encrypted
 |};
 
 type DeferredCall<T> = (() => Promise<T>) => Promise<T>;
@@ -146,6 +158,16 @@ export default class WalletStore extends Store {
     if (foundRequest) return foundRequest;
 
     throw new Error(`${nameof(WalletStore)}::${nameof(this.getPublicKeyCache)} no public key in cache`);
+  }
+
+  @observable privateKeyCache: Array<PrivateKeyCache> = [];
+  getPrivateKeyCache: IGetPrivateDeriverKey => PrivateKeyCache = (
+    conceptualWallet
+  ) => {
+    const foundRequest = find(this.privateKeyCache, { conceptualWallet });
+    if (foundRequest) return foundRequest;
+
+    throw new Error(`${nameof(WalletStore)}::${nameof(this.getPrivateKeyCache)} no public key in cache`);
   }
 
   setup(): void {
@@ -420,6 +442,20 @@ export default class WalletStore extends Store {
           plate: legacyWalletChecksum(publicKey.Hash),
         });
       });
+    }
+
+    const withPrivateDeriver = asHasPrivateDeriver(publicDeriver);
+    if (withPrivateDeriver != null) {
+      const withPrivateKey = asGetPrivateDeriverKey(withPrivateDeriver.getParent());
+      if (withPrivateKey != null) {
+        const privateKey = await withPrivateKey.getPrivateDeriverKey();
+        runInAction(() => {
+          this.privateKeyCache.push({
+            conceptualWallet: withPrivateKey,
+            privateKey: privateKey.keyRow.Hash,
+          });
+        });
+      }
     }
 
     const publicDeriverInfo = await publicDeriver.getFullPublicDeriverInfo();

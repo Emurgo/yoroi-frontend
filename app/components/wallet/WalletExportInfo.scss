@@ -1,0 +1,34 @@
+.component {
+  margin-top: 100px;
+  margin-bottom: 100px;
+  margin-left: 24px;
+  margin-right: 24px;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  font-size: 18px;
+  .title {
+    text-align: center;
+    font-family: var(--font-light);
+    font-size: 24px;
+    margin-bottom: 72px;
+  }
+
+  code {
+    margin-top: 72px;
+    background: #f4f4f4;
+    border: 1px solid #ddd;
+    border-left: 3px solid #f36d33;
+    color: #666;
+    page-break-inside: avoid;
+    font-family: monospace;
+    font-size: 15px;
+    line-height: 1.6;
+    margin-bottom: 1.6em;
+    max-width: 100%;
+    overflow: auto;
+    padding: 1em 1.5em;
+    display: block;
+    word-wrap: break-word;
+  }
+}

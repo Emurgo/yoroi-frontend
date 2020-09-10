@@ -7,7 +7,7 @@ import {
 } from '../scripts/connections';
 
 export const Version = {
-  Shelley: '2.7.14',
+  Shelley: '2.8.0',
   Byron: '1.10.8',
 };
 

@@ -12,7 +12,6 @@ import type { GeneratedData as SidebarContainerData } from '../SidebarContainer'
 import type { GeneratedData as NavBarContainerData } from '../NavBarContainer';
 import BannerContainer from '../banners/BannerContainer';
 import type { GeneratedData as BannerContainerData } from '../banners/BannerContainer';
-import WalletWithNavigation from '../../components/wallet/layouts/WalletWithNavigation';
 import NavBarBack from '../../components/topbar/NavBarBack';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import { ROUTES } from '../../routes-config';
@@ -21,6 +20,19 @@ import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import type { WarningList } from '../../stores/toplevel/WalletSettingsStore';
 import { allCategories } from '../../stores/stateless/topbarCategories';
+import WalletExportInfo from '../../components/wallet/WalletExportInfo';
+import {
+  asHasPrivateDeriver,
+} from '../../api/ada/lib/storage/models/PublicDeriver/traits';
+import {
+  asGetPrivateDeriverKey,
+} from '../../api/ada/lib/storage/models/ConceptualWallet/traits';
+import type {
+  IGetPrivateDeriverKey,
+} from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
+import type {
+  PrivateKeyCache,
+} from '../../stores/toplevel/WalletStore';
 
 export type GeneratedData = typeof Wallet.prototype.generated;
 
@@ -106,6 +118,15 @@ export default class Wallet extends Component<Props> {
     const selectedWallet = wallets.selected;
     const warning = this.getWarning(selectedWallet);
 
+    let privateKey = undefined;
+    const withPrivateDeriver = asHasPrivateDeriver(selectedWallet);
+    if (withPrivateDeriver != null) {
+      const withPrivateKey = asGetPrivateDeriverKey(withPrivateDeriver.getParent());
+      if (withPrivateKey != null) {
+        const cacheEntry = this.generated.stores.wallets.getPrivateKeyCache(withPrivateKey);
+        privateKey = cacheEntry.privateKey;
+      }
+    }
     return (
       <TopBarLayout
         banner={(<BannerContainer {...this.generated.BannerContainerProps} />)}
@@ -115,23 +136,9 @@ export default class Wallet extends Component<Props> {
         showAsCard
       >
         {warning}
-        <WalletWithNavigation
-          categories={
-            allCategories
-              .filter(category => category.isVisible({ selected: selectedWallet }))
-              .map(category => ({
-                className: category.className,
-                icon: category.icon,
-                label: category.label,
-                isActive: this.generated.stores.app.currentRoute.startsWith(category.route),
-                onClick: () => this.generated.actions.router.goToRoute.trigger({
-                  route: category.route,
-                }),
-              }))
-          }
-        >
-          {this.props.children}
-        </WalletWithNavigation>
+        <WalletExportInfo
+          privateKey={privateKey}
+        />
       </TopBarLayout>
     );
   }
@@ -170,7 +177,10 @@ export default class Wallet extends Component<Props> {
       walletSettings: {|
         getWalletWarnings: (PublicDeriver<>) => WarningList
       |},
-      wallets: {| selected: null | PublicDeriver<> |}
+      wallets: {|
+        getPrivateKeyCache: IGetPrivateDeriverKey => PrivateKeyCache,
+        selected: null | PublicDeriver<>
+      |}
     |}
     |} {
     if (this.props.generated !== undefined) {
@@ -188,6 +198,7 @@ export default class Wallet extends Component<Props> {
         },
         wallets: {
           selected: stores.wallets.selected,
+          getPrivateKeyCache: stores.wallets.getPrivateKeyCache,
         },
         walletSettings: {
           getWalletWarnings: settingStore.getWalletWarnings,
