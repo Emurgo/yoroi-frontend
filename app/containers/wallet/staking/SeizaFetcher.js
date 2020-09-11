@@ -145,8 +145,8 @@ export default class SeizaFetcher extends Component<Props> {
 
   _getBrowserReplacement(): string {
     // 1) handle Yoroi running as an extension
-    if (environment.userAgentInfo.isExtension) {
-      if (environment.userAgentInfo.isFirefox) {
+    if (environment.userAgentInfo.isExtension()) {
+      if (environment.userAgentInfo.isFirefox()) {
         return 'firefox&mozId=' + location.hostname;
       }
       // otherwise assume Chrome
@@ -155,7 +155,7 @@ export default class SeizaFetcher extends Component<Props> {
     }
 
     // 2) Handle Yoroi running as a website
-    if (environment.userAgentInfo.isFirefox) {
+    if (environment.userAgentInfo.isFirefox()) {
       return 'firefox&host' + location.host;
     }
     // otherwise assume Chrome

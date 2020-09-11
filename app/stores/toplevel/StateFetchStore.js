@@ -14,13 +14,13 @@ export default class StateFetchStore extends Store {
   setup(): void {
     super.setup();
     this.fetcher = new BatchedFetcher(new RemoteFetcher(
-      () => environment.version,
+      () => environment.getVersion(),
       () => this.stores.profile.currentLocale,
       () => {
-        if (environment.userAgentInfo.isFirefox) {
+        if (environment.userAgentInfo.isFirefox()) {
           return 'firefox';
         }
-        if (environment.userAgentInfo.isChrome) {
+        if (environment.userAgentInfo.isChrome()) {
           return 'chrome';
         }
         return '-';

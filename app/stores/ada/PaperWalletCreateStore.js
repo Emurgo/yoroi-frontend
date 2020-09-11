@@ -114,7 +114,7 @@ export default class PaperWalletCreateStore extends Store {
     if (this.paper) {
       pdf = await this.api.ada.createAdaPaperPdf({
         paper: this.paper,
-        network: environment.NETWORK,
+        network: environment.getNetworkName(),
         printAccountPlate: this.printAccountPlate,
         updateStatus: status => {
           this.actions.ada.paperWallets.setPdfRenderStatus.trigger({ status });

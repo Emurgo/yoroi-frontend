@@ -26,7 +26,7 @@ import type {
 
 export default class DropboxApi implements IProvider {
   authorizeUrl: string = `https://www.dropbox.com/oauth2/authorize?client_id=${DROPBOX_CLIENT_ID}&response_type=token&redirect_uri=${ROUTES.ROOT}#/`;
-  baseFolderPath: string = `/cardano/${environment.NETWORK}/transaction-memos`;
+  baseFolderPath: string = `/cardano/${environment.getNetworkName()}/transaction-memos`;
   memoExt: string = '.txt';
   @observable errorMessage: string = '';
   @observable errorCode: string = '';

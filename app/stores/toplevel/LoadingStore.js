@@ -74,7 +74,7 @@ export default class LoadingStore extends Store {
         await this.migrationRequest.execute({
           api: this.api,
           persistentDb,
-          currVersion: environment.version,
+          currVersion: environment.getVersion(),
         }).promise;
         await this.validateUriPath();
         runInAction(() => {

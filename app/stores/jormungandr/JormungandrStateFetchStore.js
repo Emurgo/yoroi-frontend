@@ -6,7 +6,6 @@ import type { IFetcher } from '../../api/jormungandr/lib/state-fetch/IFetcher';
 import { RemoteFetcher } from '../../api/jormungandr/lib/state-fetch/remoteFetcher';
 import { BatchedFetcher } from '../../api/jormungandr/lib/state-fetch/batchedFetcher';
 import environment from '../../environment';
-import { isJormungandr } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 export default class JormungandrStateFetchStore extends Store {
 
@@ -15,13 +14,13 @@ export default class JormungandrStateFetchStore extends Store {
   setup(): void {
     super.setup();
     this.fetcher = new BatchedFetcher(new RemoteFetcher(
-      () => environment.version,
+      () => environment.getVersion(),
       () => this.stores.profile.currentLocale,
       () => {
-        if (environment.userAgentInfo.isFirefox) {
+        if (environment.userAgentInfo.isFirefox()) {
           return 'firefox';
         }
-        if (environment.userAgentInfo.isChrome) {
+        if (environment.userAgentInfo.isChrome()) {
           return 'chrome';
         }
         return '-';

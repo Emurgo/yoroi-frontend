@@ -62,7 +62,7 @@ export const generateLogHeader = (publicKey?: string): string => {
   let header =
   `[INFO] Yoroi v.${environment.version}\r\n`
   + `[INFO] Commit: ${environment.commit}\r\n`
-  + `[INFO] Network: ${environment.NETWORK}\r\n`
+  + `[INFO] Network: ${environment.getNetworkName()}\r\n`
   + `[INFO] User Agent: ${stringifyData(environment.userAgentInfo.ua)}\r\n`;
 
   if (publicKey != null) {

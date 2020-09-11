@@ -61,7 +61,7 @@ export default class TestnetWarningBanner extends Component<Props> {
           <div className={styles.text}>
             <FormattedMessage
               {...messages.nightlyLabel}
-              values={{ network: environment.NETWORK }}
+              values={{ network: environment.getNetworkName() }}
               key="1"
             />
           </div>
@@ -75,7 +75,7 @@ export default class TestnetWarningBanner extends Component<Props> {
           <div className={styles.text}>
             <FormattedMessage
               {...messages.shelleyTestnetLabel}
-              values={{ network: environment.NETWORK }}
+              values={{ network: environment.getNetworkName() }}
               key="1"
             />
           </div>
@@ -88,7 +88,7 @@ export default class TestnetWarningBanner extends Component<Props> {
           <span key="0" className={styles.warningIcon}><WarningSvg /></span>
           <FormattedMessage
             {...messages.testnetLabel}
-            values={{ faqLink, network: environment.NETWORK }}
+            values={{ faqLink, network: environment.getNetworkName() }}
             key="1"
           />
         </div>

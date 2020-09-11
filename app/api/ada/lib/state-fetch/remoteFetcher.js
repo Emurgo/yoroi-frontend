@@ -160,14 +160,15 @@ export class RemoteFetcher implements IFetcher {
   }
 
   getTransactionsHistoryForAddresses: HistoryRequest => Promise<HistoryResponse> = (body) => {
-    const { BackendService } = body.network.Backend;
+    const { network, ...rest } = body;
+    const { BackendService } = network.Backend;
     if (BackendService == null) throw new Error(`${nameof(this.getUTXOsForAddresses)} missing backend url`);
     return axios(
       `${BackendService}/api/v2/txs/history`,
       {
         method: 'post',
         timeout: CONFIG.app.walletRefreshInterval,
-        data: body,
+        data: rest,
         headers: {
           'yoroi-version': this.getLastLaunchVersion(),
           'yoroi-locale': this.getCurrentLocale()
@@ -220,13 +221,14 @@ export class RemoteFetcher implements IFetcher {
   }
 
   getRewardHistory: RewardHistoryRequest => Promise<RewardHistoryResponse> = (body) => {
-    const { BackendService } = body.network.Backend;
+    const { network, ...rest } = body;
+    const { BackendService } = network.Backend;
     if (BackendService == null) throw new Error(`${nameof(this.getUTXOsForAddresses)} missing backend url`);
     // return axios(
     //   `${BackendService}/api/v2/account/rewards`,
     //   {
     //     method: 'post',
-    //     data: body,
+    //     data: rest,
     //     timeout: CONFIG.app.walletRefreshInterval,
     //     headers: {
     //       'yoroi-version': this.getLastLaunchVersion(),
