@@ -4,19 +4,26 @@ import type { CertificateKindType } from '@emurgo/js-chain-libs/js_chain_libs';
 
 // getUTXOsForAddresses
 
-export type AddressUtxoRequest = {| addresses: Array<string>, |};
+export type AddressUtxoRequest = {|
+  backendUrl: string,
+  addresses: Array<string>,
+|};
 export type AddressUtxoResponse = Array<RemoteUnspentOutput>;
 export type AddressUtxoFunc = (body: AddressUtxoRequest) => Promise<AddressUtxoResponse>;
 
 // getUTXOsSumsForAddresses
 
-export type UtxoSumRequest = {| addresses: Array<string>, |};
+export type UtxoSumRequest = {|
+  backendUrl: string,
+  addresses: Array<string>,
+|};
 export type UtxoSumResponse = {| sum: ?string, |};
 export type UtxoSumFunc = (body: UtxoSumRequest) => Promise<UtxoSumResponse>;
 
 // getTransactionsHistoryForAddresses
 
 export type HistoryRequest = {|
+  backendUrl: string,
   addresses: Array<string>,
   after?: {|
     block: string,
@@ -30,6 +37,7 @@ export type HistoryFunc = (body: HistoryRequest) => Promise<HistoryResponse>;
 // getRewardHistory
 
 export type RewardHistoryRequest = {|
+  backendUrl: string,
   addresses: Array<string>,
 |};
 export type RewardTuple = [
@@ -41,7 +49,9 @@ export type RewardHistoryFunc = (body: RewardHistoryRequest) => Promise<RewardHi
 
 // getBestBlock
 
-export type BestBlockRequest = void;
+export type BestBlockRequest = {|
+  backendUrl: string,
+|};
 export type BestBlockResponse = {|
   // 0 if no blocks in db
   height: number,
@@ -58,6 +68,7 @@ export type SignedRequestInternal = {|
   signedTx: string,
 |};
 export type SignedRequest = {|
+  backendUrl: string,
   id: string,
   encodedTx: Uint8Array,
 |};
@@ -67,6 +78,7 @@ export type SendFunc = (body: SignedRequest) => Promise<SignedResponse>;
 // getAccountState
 
 export type AccountStateRequest = {|
+  backendUrl: string,
   addresses: Array<string>
 |};
 export type PoolTuples = [
@@ -93,6 +105,7 @@ export type AccountStateFunc = (body: AccountStateRequest) => Promise<AccountSta
 // getPoolInfo
 
 export type PoolInfoRequest = {|
+  backendUrl: string,
   ids: Array<string>
 |};
 export type RemotePoolMetaSuccess = {|
@@ -131,7 +144,9 @@ export type ReputationObject = {
   // note: could be more metrics that are not handled
   ...
 };
-export type ReputationRequest = void;
+export type ReputationRequest = {|
+  backendUrl: string,
+|};
 export type ReputationResponse = {| [poolId: string]: ReputationObject, |};
 export type ReputationFunc = (body: ReputationRequest) => Promise<ReputationResponse>;
 

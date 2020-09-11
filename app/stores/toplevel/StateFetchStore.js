@@ -25,18 +25,6 @@ export default class StateFetchStore extends Store {
         }
         return '-';
       },
-      () => {
-        if (this.stores.wallets.selected == null) {
-          throw new Error(`${nameof(StateFetchStore)} no selected wallet`);
-        }
-        const { selected } = this.stores.wallets;
-        const networkInfo = selected.getParent().getNetworkInfo();
-        const backendUrl = networkInfo.Backend.BackendService;
-        if (backendUrl == null) {
-          throw new Error(`${nameof(StateFetchStore)} no ${nameof(backendUrl)} for wallet`);
-        }
-        return backendUrl;
-      },
     ));
   }
 }

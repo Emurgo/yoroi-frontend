@@ -1,6 +1,5 @@
 // @flow
 import BigNumber from 'bignumber.js';
-import type { lf$Database } from 'lovefield';
 import {
   Logger,
   stringifyError,
@@ -89,7 +88,6 @@ import type {
 } from '../ada/transactions/types';
 import { JormungandrTxSignRequest } from './lib/transactions/JormungandrTxSignRequest';
 import { WrongPassphraseError } from '../ada/lib/cardanoCrypto/cryptoErrors';
-import LocalStorageApi from '../localStorage/index';
 import type {
   HistoryFunc,
   SendFunc,
@@ -447,7 +445,12 @@ export default class JormungandrApi {
         undefined,
         config.ChainNetworkId,
       );
+
+      const { BackendService } = request.publicDeriver.getParent().getNetworkInfo().Backend;
+      if (BackendService == null) throw new Error(`${nameof(this.signAndBroadcast)} missing backend url`);
+
       const response = request.sendTx({
+        backendUrl: BackendService,
         id: Buffer.from(signedTx.id().as_bytes()).toString('hex'),
         encodedTx: signedTx.as_bytes(),
       });
@@ -644,7 +647,12 @@ export default class JormungandrApi {
       );
       const id = Buffer.from(signedTx.id().as_bytes()).toString('hex');
       const encodedTx = signedTx.as_bytes();
+
+      const { BackendService } = request.publicDeriver.getParent().getNetworkInfo().Backend;
+      if (BackendService == null) throw new Error(`${nameof(this.signAndBroadcastDelegationTx)} missing backend url`);
+
       const response = request.sendTx({
+        backendUrl: BackendService,
         id,
         encodedTx,
       });

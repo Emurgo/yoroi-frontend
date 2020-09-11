@@ -119,9 +119,10 @@ function batchUTXOsForAddresses(
 
       // convert chunks into list of Promises that call the backend-service
       const promises = groupsOfAddresses
-        .map(groupOfAddresses => getUTXOsForAddresses(
-          { addresses: groupOfAddresses }
-        ));
+        .map(groupOfAddresses => getUTXOsForAddresses({
+          addresses: groupOfAddresses,
+          backendUrl: body.backendUrl,
+        }));
 
       // Sum up all the utxo
       return Promise.all(promises)
@@ -147,7 +148,10 @@ function batchTxsBodiesForInputs(
 
       // convert chunks into list of Promises that call the backend-service
       const promises = groupsOfTxsHashes
-        .map(groupOfTxsHashes => getTxsBodiesForUTXOs({ txsHashes: groupOfTxsHashes }));
+        .map(groupOfTxsHashes => getTxsBodiesForUTXOs({
+          backendUrl: body.backendUrl,
+          txsHashes: groupOfTxsHashes,
+        }));
 
       // Sum up all the utxo
       return Promise.all(promises)
@@ -175,9 +179,10 @@ export function batchGetUTXOsSumsForAddresses(
       // batch all addresses into chunks for API
       const groupsOfAddresses = chunk(body.addresses, addressesLimit);
       const promises =
-        groupsOfAddresses.map(groupOfAddresses => getUTXOsSumsForAddresses(
-          { addresses: groupOfAddresses }
-        ));
+        groupsOfAddresses.map(groupOfAddresses => getUTXOsSumsForAddresses({
+          backendUrl: body.backendUrl,
+          addresses: groupOfAddresses,
+        }));
       const partialAmounts: Array<UtxoSumResponse> = await Promise.all(promises);
 
       // sum all chunks together
@@ -210,7 +215,10 @@ export function batchGetRewardHistory(
     try {
       const chimericAccountAddresses = chunk(body.addresses, addressesLimit);
       const chimericAccountPromises = chimericAccountAddresses.map(
-        addr => getRewardHistory({ addresses: addr })
+        addr => getRewardHistory({
+          backendUrl: body.backendUrl,
+          addresses: addr,
+        })
       );
       const rewardHistories = await Promise.all(chimericAccountPromises);
       return Object.assign({}, ...rewardHistories);
@@ -316,7 +324,10 @@ export function batchCheckAddressesInUse(
     try {
       const groupsOfAddresses = chunk(body.addresses, addressesLimit);
       const groupedAddrPromises = groupsOfAddresses.map(
-        addr => checkAddressesInUse({ addresses: addr })
+        addr => checkAddressesInUse({
+          backendUrl: body.backendUrl,
+          addresses: addr,
+        })
       );
       const groupedAddresses = await Promise.all(groupedAddrPromises);
       return groupedAddresses.reduce((accum, chunkAddrs) => accum.concat(chunkAddrs), []);
@@ -374,7 +385,10 @@ export function batchGetAccountState(
     try {
       const chimericAccountAddresses = chunk(body.addresses, addressesLimit);
       const chimericAccountPromises = chimericAccountAddresses.map(
-        addr => getAccountState({ addresses: addr })
+        addr => getAccountState({
+          backendUrl: body.backendUrl,
+          addresses: addr,
+        })
       );
       const chimericAccountStates = await Promise.all(chimericAccountPromises);
       return Object.assign({}, ...chimericAccountStates);
@@ -393,7 +407,10 @@ export function batchGetPoolInfo(
     try {
       const poolIds = chunk(body.poolIds, addressesLimit);
       const poolInfoPromises = poolIds.map(
-        poolId => getPoolInfo({ poolIds: poolId })
+        poolId => getPoolInfo({
+          backendUrl: body.backendUrl,
+          poolIds: poolId,
+        })
       );
       const poolInfos = await Promise.all(poolInfoPromises);
       return Object.assign({}, ...poolInfos);

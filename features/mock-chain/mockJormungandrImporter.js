@@ -1326,6 +1326,7 @@ const getBestBlock: BestBlockFunc = genGetBestBlock(transactions);
 const utxoForAddresses: AddressUtxoFunc = genUtxoForAddresses(
   history,
   getBestBlock,
+  networks.JormungandrMainnet,
 );
 const utxoSumForAddresses: UtxoSumFunc = genUtxoSumForAddresses(utxoForAddresses);
 const sendTx = (request: SignedRequestInternal): SignedResponse => {

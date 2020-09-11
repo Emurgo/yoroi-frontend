@@ -100,9 +100,12 @@ export default class TrezorSendStore extends Store {
     publicDeriver: PublicDeriver<>,
   |} => Promise<{| txId: string |}> = async (request) => {
     try {
+      const network = request.publicDeriver.getParent().getNetworkInfo();
+      const { BackendService } = network.Backend;
+      if (BackendService == null) throw new Error(`${nameof(this.signAndBroadcast)} missing backend url`);
       const trezorSignTxDataResp = await this.api.ada.createTrezorSignTxData({
         ...request.params,
-        network: request.publicDeriver.getParent().getNetworkInfo(),
+        network,
       });
 
       const trezorSignTxResp = await wrapWithFrame(trezor => trezor.cardanoSignTransaction(
@@ -119,6 +122,7 @@ export default class TrezorSendStore extends Store {
 
       return await this.api.ada.broadcastTrezorSignedTx({
         signedTxRequest: {
+          backendUrl: BackendService,
           id: trezorSignTxResp.payload.hash,
           encodedTx: Buffer.from(trezorSignTxResp.payload.serializedTx, 'hex'),
         },

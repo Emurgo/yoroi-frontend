@@ -116,6 +116,7 @@ export async function addJormungandrUtxoAddress(
 async function scanChain(request: {|
   generateAddressFunc: GenerateAddressFunc,
   lastUsedIndex: number,
+  backendUrl: string,
   checkAddressesInUse: FilterFunc,
   stakingKey: RustModule.WalletV3.PublicKey,
   addByHash: AddByHashFunc,
@@ -126,6 +127,7 @@ async function scanChain(request: {|
     BIP44_SCAN_SIZE,
     addressRequestSize,
     request.checkAddressesInUse,
+    request.backendUrl,
   );
 
   return addresses
@@ -180,6 +182,7 @@ async function scanAccount(request: {|
   generateExternalAddresses: GenerateAddressFunc,
   lastUsedInternal: number,
   lastUsedExternal: number,
+  backendUrl: string,
   checkAddressesInUse: FilterFunc,
   addByHash: AddByHashFunc,
   stakingKey: RustModule.WalletV3.PublicKey,
@@ -189,6 +192,7 @@ async function scanAccount(request: {|
     generateAddressFunc: request.generateExternalAddresses,
     lastUsedIndex: request.lastUsedExternal,
     checkAddressesInUse: request.checkAddressesInUse,
+    backendUrl: request.backendUrl,
     addByHash: request.addByHash,
     stakingKey: request.stakingKey,
   });
@@ -196,6 +200,7 @@ async function scanAccount(request: {|
     generateAddressFunc: request.generateInternalAddresses,
     lastUsedIndex: request.lastUsedInternal,
     checkAddressesInUse: request.checkAddressesInUse,
+    backendUrl: request.backendUrl,
     addByHash: request.addByHash,
     stakingKey: request.stakingKey,
   });

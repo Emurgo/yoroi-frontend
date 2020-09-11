@@ -273,9 +273,13 @@ export default class DaedalusTransferStore extends Store {
       if (this.transferTx.id == null || this.transferTx.encodedTx == null) {
         throw new Error(`${nameof(DaedalusTransferStore)} transaction not signed`);
       }
+      const { id, encodedTx } = this.transferTx;
+      const { BackendService } = payload.publicDeriver.getParent().getNetworkInfo().Backend;
+      if (BackendService == null) throw new Error(`${nameof(this._transferFunds)} missing backend url`);
       await this.transferFundsRequest.execute({
-        id: this.transferTx.id,
-        encodedTx: this.transferTx.encodedTx,
+        backendUrl: BackendService,
+        id,
+        encodedTx,
       });
       next();
       this._reset();

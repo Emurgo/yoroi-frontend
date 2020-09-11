@@ -53,9 +53,11 @@ export function getAddressesKeys(payload: {|
 
 export async function toSenderUtxos(payload: {|
   addressKeys: AddressKeyMap,
+  backendUrl: string,
   getUTXOsForAddresses: AddressUtxoFunc,
 |}): Promise<AddressUtxoResponse> {
   const senderUtxos = await payload.getUTXOsForAddresses({
+    backendUrl: payload.backendUrl,
     addresses: Object.keys(payload.addressKeys)
   });
 
@@ -74,6 +76,7 @@ export async function daedalusTransferTxFromAddresses(payload: {|
     ...Address,
     ...InexactSubset<Addressing>,
   |},
+  backendUrl: string,
   getUTXOsForAddresses: AddressUtxoFunc,
   absSlotNumber: BigNumber,
   protocolParams: {|
@@ -84,6 +87,7 @@ export async function daedalusTransferTxFromAddresses(payload: {|
   |}
 |}): Promise<TransferTx> {
   const senderUtxos = await toSenderUtxos({
+    backendUrl: payload.backendUrl,
     addressKeys: payload.addressKeys,
     getUTXOsForAddresses: payload.getUTXOsForAddresses,
   });

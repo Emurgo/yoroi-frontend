@@ -1612,12 +1612,15 @@ const ScanShelleyUtxoMixin = (
       throw new Error(`${nameof(ScanLegacyCardanoUtxo)}::${nameof(this.rawScanAccount)} missing Byron network id`);
     }
     const { ChainNetworkId } = network.BaseConfig[0];
+    const { BackendService } = network.Backend;
+    if (BackendService == null) throw new Error(`${nameof(this.rawScanAccount)} missing backend url`);
 
     return await scanShelleyCip1852Account({
       accountPublicKey: body.accountPublicKey,
       lastUsedInternal: body.lastUsedInternal,
       lastUsedExternal: body.lastUsedExternal,
       checkAddressesInUse: body.checkAddressesInUse,
+      backendUrl: BackendService,
       addByHash: rawGenAddByHash(
         new Set([
           ...body.internalAddresses,

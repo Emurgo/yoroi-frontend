@@ -49,8 +49,13 @@ export default class JormungandrWalletRestoreStore extends Store {
     if (phrase == null) {
       throw new Error(`${nameof(this._transferFromLegacy)} no recovery phrase set. Should never happen`);
     }
+    const network = this.stores.profile.selectedNetwork;
+    if (network == null) {
+      throw new Error(`${nameof(this._transferFromLegacy)} no network selected`);
+    }
     await this.actions.yoroiTransfer.transferFunds.trigger({
       next: async () => { await this._restoreToDb(); },
+      network,
       getDestinationAddress: () => Promise.resolve(this._getFirstCip1852InternalAddr()),
       // funds in genesis block should be either entirely claimed or not claimed
       // so if another wallet instance claims the funds, it's not a big deal

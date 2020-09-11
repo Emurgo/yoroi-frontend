@@ -26,21 +26,6 @@ export default class JormungandrStateFetchStore extends Store {
         }
         return '-';
       },
-      () => {
-        if (this.stores.wallets.selected == null) {
-          throw new Error(`${nameof(JormungandrStateFetchStore)} no selected wallet`);
-        }
-        const { selected } = this.stores.wallets;
-        const networkInfo = selected.getParent().getNetworkInfo();
-        if (!isJormungandr(networkInfo)) {
-          throw new Error(`${nameof(JormungandrStateFetchStore)} selected wallet is not a Jormungandr wallet`);
-        }
-        const backendUrl = networkInfo.Backend.BackendService;
-        if (backendUrl == null) {
-          throw new Error(`${nameof(JormungandrStateFetchStore)} no ${nameof(backendUrl)} for wallet`);
-        }
-        return backendUrl;
-      },
     ));
   }
 }

@@ -1071,7 +1071,11 @@ async function rawUpdateTransactions(
   );
   // 1) Check if backend is synced (avoid rollbacks if backend has to resync from block 1)
 
-  const bestBlock = await getBestBlock();
+  const { BackendService } = publicDeriver.getParent().getNetworkInfo().Backend;
+  if (BackendService == null) throw new Error(`${nameof(rawUpdateTransactions)} missing backend url`);
+  const bestBlock = await getBestBlock({
+    backendUrl: BackendService,
+  });
   const slotInRemote = (bestBlock.epoch == null || bestBlock.slot == null)
     ? null
     : toAbsoluteSlotNumber({
@@ -1147,6 +1151,7 @@ async function rawUpdateTransactions(
       };
     const txsFromNetwork = await getTransactionsHistoryForAddresses({
       ...requestKind,
+      backendUrl: BackendService,
       addresses: [
         ...addresses.utxoAddresses
           // Note: don't send base/ptr keys

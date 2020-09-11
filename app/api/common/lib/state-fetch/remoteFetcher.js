@@ -18,12 +18,22 @@ import {
   CurrentCoinPriceError,
   HistoricalCoinPriceError,
 } from '../../errors';
+import { networks } from '../../../ada/lib/storage/database/prepackaged/networks';
 
 import type { ConfigType } from '../../../../../config/config-types';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
 const priceBackendUrl = CONFIG.network.priceBackendUrl;
+
+function getEndpoint(): string {
+  // TODO: some currency-independent endpoint
+  const endpoint = networks.CardanoMainnet.Backend.BackendService;
+  if (endpoint == null) {
+    throw new Error();
+  }
+  return endpoint;
+}
 
 /**
  * Makes calls to Yoroi backend service
@@ -34,23 +44,20 @@ export class RemoteFetcher implements IFetcher {
   getLastLaunchVersion: () => string;
   getCurrentLocale: () => string;
   getPlatform: () => string;
-  getBackendUrl: () => string;
 
   constructor(
     getLastLaunchVersion: () => string,
     getCurrentLocale: () => string,
     getPlatform: () => string,
-    getBackendUrl: () => string,
   ) {
     this.getLastLaunchVersion = getLastLaunchVersion;
     this.getCurrentLocale = getCurrentLocale;
     this.getPlatform = getPlatform;
-    this.getBackendUrl = getBackendUrl;
   }
 
   checkServerStatus: ServerStatusRequest => Promise<ServerStatusResponse> = (_body) => (
     axios(
-      `${this.getBackendUrl()}/api/status`,
+      `${getEndpoint()}/api/status`,
       {
         method: 'get',
         timeout: CONFIG.app.walletRefreshInterval,

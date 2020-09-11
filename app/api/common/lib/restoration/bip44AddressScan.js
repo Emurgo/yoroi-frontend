@@ -25,6 +25,7 @@ export async function discoverAllAddressesFrom(
   scanSize: number,
   requestSize: number,
   checkAddressesInUse: FilterFunc,
+  backendUrl: string,
 ): Promise<Array<string>> {
   let fetchedAddressesInfo: Array<AddressInfo> = [];
   let highestUsedIndex = initialHighestUsedIndex;
@@ -42,6 +43,7 @@ export async function discoverAllAddressesFrom(
         scanSize,
         requestSize,
         checkAddressesInUse,
+        backendUrl,
       );
 
     const newHighestUsedIndex = _findNewHighestIndex(
@@ -107,6 +109,7 @@ async function _scanNextBatch(
   scanSize: number,
   requestSize: number,
   checkAddressesInUse: FilterFunc,
+  backendUrl: string,
 ): Promise<Array<AddressInfo>> {
   /* Optimization: use `requestSize` to batch calls to crypto backend and to backend-service api
    * Allows us to make more than `scanSize` calls at a time
@@ -132,7 +135,10 @@ async function _scanNextBatch(
   );
 
   // batch to backend API
-  const usedAddresses = await checkAddressesInUse({ addresses: newAddresses });
+  const usedAddresses = await checkAddressesInUse({
+    backendUrl,
+    addresses: newAddresses,
+  });
 
   // Update metadata for new addresses
   const newFetchedAddressesInfo = _addFetchedAddressesInfo(

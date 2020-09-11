@@ -32,6 +32,7 @@ import type {
 import {
   Bip44DerivationLevels,
 } from '../../api/ada/lib/storage/database/walletTypes/bip44/api/utils';
+import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 
 export default class YoroiTransferStore extends Store {
 
@@ -237,6 +238,7 @@ export default class YoroiTransferStore extends Store {
   /** Broadcast the transfer transaction if one exists and proceed to continuation */
   _transferFunds: {|
     next: void => Promise<void>,
+    network: $ReadOnly<NetworkRow>,
     getDestinationAddress: void => Promise<{| ...Address, ...InexactSubset<Addressing> |}>,
     /*
      re-recover from the mnemonics to reduce the chance that the wallet
@@ -275,7 +277,6 @@ export default class YoroiTransferStore extends Store {
 
     const { next } = payload;
 
-
     try {
       await this.stores.wallets.sendAndRefresh({
         publicDeriver: undefined,
@@ -284,10 +285,14 @@ export default class YoroiTransferStore extends Store {
           if (transferTx.id == null || transferTx.encodedTx == null) {
             throw new Error(`${nameof(YoroiTransferStore)} transaction not signed`);
           }
+          const { id, encodedTx } = transferTx;
           try {
+            const { BackendService } = payload.network.Backend;
+            if (BackendService == null) throw new Error(`${nameof(this._transferFunds)} missing backend url`);
             const txId = await this.stores.substores.ada.stateFetchStore.fetcher.sendTx({
-              id: transferTx.id,
-              encodedTx: transferTx.encodedTx,
+              backendUrl: BackendService,
+              id,
+              encodedTx,
             });
             return txId;
           } catch (error) {

@@ -4,25 +4,35 @@ import typeof { MIRPot } from '@emurgo/cardano-serialization-lib-browser/cardano
 
 // getUTXOsForAddresses
 
-export type AddressUtxoRequest = {| addresses: Array<string>, |};
+export type AddressUtxoRequest = {|
+  backendUrl: string,
+  addresses: Array<string>,
+|};
 export type AddressUtxoResponse = Array<RemoteUnspentOutput>;
 export type AddressUtxoFunc = (body: AddressUtxoRequest) => Promise<AddressUtxoResponse>;
 
 // getTxsBodiesForUTXOs
 
-export type TxBodiesRequest = {| txsHashes: Array<string>, |};
+export type TxBodiesRequest = {|
+  backendUrl: string,
+  txsHashes: Array<string>,
+|};
 export type TxBodiesResponse = { [key: string]:string, ... };
 export type TxBodiesFunc = (body: TxBodiesRequest) => Promise<TxBodiesResponse>;
 
 // getUTXOsSumsForAddresses
 
-export type UtxoSumRequest = {| addresses: Array<string>, |};
+export type UtxoSumRequest = {|
+  backendUrl: string,
+  addresses: Array<string>,
+|};
 export type UtxoSumResponse = {| sum: ?string, |};
 export type UtxoSumFunc = (body: UtxoSumRequest) => Promise<UtxoSumResponse>;
 
 // getTransactionsHistoryForAddresses
 
 export type HistoryRequest = {|
+  backendUrl: string,
   addresses: Array<string>,
   after?: {|
     block: string,
@@ -35,7 +45,9 @@ export type HistoryFunc = (body: HistoryRequest) => Promise<HistoryResponse>;
 
 // getBestBlock
 
-export type BestBlockRequest = void;
+export type BestBlockRequest = {|
+  backendUrl: string,
+|};
 export type BestBlockResponse = {|
   // 0 if no blocks in db
   height: number,
@@ -52,6 +64,7 @@ export type SignedRequestInternal = {|
   signedTx: string,
 |};
 export type SignedRequest = {|
+  backendUrl: string,
   id: string,
   encodedTx: Uint8Array,
 |};
@@ -228,6 +241,7 @@ export type RemoteCertificate = {|
 // getAccountState
 
 export type AccountStateRequest = {|
+  backendUrl: string,
   addresses: Array<string>
 |};
 export type RemoteAccountState = {|
@@ -244,6 +258,7 @@ export type AccountStateFunc = (body: AccountStateRequest) => Promise<AccountSta
 // getRewardHistory
 
 export type RewardHistoryRequest = {|
+  backendUrl: string,
   addresses: Array<string>,
 |};
 export type RewardTuple = [
@@ -254,6 +269,7 @@ export type RewardHistoryResponse = { [address: string]: Array<RewardTuple>, ...
 export type RewardHistoryFunc = (body: RewardHistoryRequest) => Promise<RewardHistoryResponse>;
 
 export type PoolInfoRequest = {|
+  backendUrl: string,
   poolIds: Array<string>
 |};
 export type RemotePoolInfo = {|

@@ -139,6 +139,7 @@ async function scanChain(request: {|
   checkAddressesInUse: FilterFunc,
   stakingKey: RustModule.WalletV4.PublicKey,
   addByHash: AddByHashFunc,
+  backendUrl: string,
 |}): Promise<TreeInsert<CanonicalAddressInsert>> {
   const addresses = await discoverAllAddressesFrom(
     request.generateAddressFunc,
@@ -146,6 +147,7 @@ async function scanChain(request: {|
     BIP44_SCAN_SIZE,
     addressRequestSize,
     request.checkAddressesInUse,
+    request.backendUrl,
   );
 
   /**
@@ -174,6 +176,7 @@ export async function scanShelleyCip1852Account(request: {|
   accountPublicKey: string,
   lastUsedInternal: number,
   lastUsedExternal: number,
+  backendUrl: string,
   checkAddressesInUse: FilterFunc,
   addByHash: AddByHashFunc,
   stakingKey: RustModule.WalletV4.PublicKey,
@@ -196,6 +199,7 @@ export async function scanShelleyCip1852Account(request: {|
     ),
     lastUsedInternal: request.lastUsedInternal,
     lastUsedExternal: request.lastUsedExternal,
+    backendUrl: request.backendUrl,
     checkAddressesInUse: request.checkAddressesInUse,
     addByHash: request.addByHash,
     stakingKey: request.stakingKey,
@@ -208,6 +212,7 @@ async function scanAccount(request: {|
   generateExternalAddresses: GenerateAddressFunc,
   lastUsedInternal: number,
   lastUsedExternal: number,
+  backendUrl: string,
   checkAddressesInUse: FilterFunc,
   addByHash: AddByHashFunc,
   stakingKey: RustModule.WalletV4.PublicKey,
@@ -216,6 +221,7 @@ async function scanAccount(request: {|
   const externalAddresses = await scanChain({
     generateAddressFunc: request.generateExternalAddresses,
     lastUsedIndex: request.lastUsedExternal,
+    backendUrl: request.backendUrl,
     checkAddressesInUse: request.checkAddressesInUse,
     addByHash: request.addByHash,
     stakingKey: request.stakingKey,
@@ -223,6 +229,7 @@ async function scanAccount(request: {|
   const internalAddresses = await scanChain({
     generateAddressFunc: request.generateInternalAddresses,
     lastUsedIndex: request.lastUsedInternal,
+    backendUrl: request.backendUrl,
     checkAddressesInUse: request.checkAddressesInUse,
     addByHash: request.addByHash,
     stakingKey: request.stakingKey,
