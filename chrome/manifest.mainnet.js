@@ -4,6 +4,10 @@ import buildManifest from './manifest.template';
 import {
   genCSP,
 } from './constants';
+import {
+  Servers,
+  serverToPermission,
+} from '../scripts/connections';
 import { version } from '../package.json';
 
 import { POOLS_UI_URL_FOR_YOROI } from './manifestEnvs';
@@ -15,6 +19,9 @@ export default (isDebug: boolean): * => buildManifest({
   contentSecurityPolicy: genCSP({
     isDev: isDebug,
     additional: {
+      'connect-src': [
+        serverToPermission(Servers.Primary),
+      ],
       'frame-src': [
         POOLS_UI_URL_FOR_YOROI,
       ],

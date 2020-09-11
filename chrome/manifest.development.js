@@ -4,6 +4,10 @@ import buildManifest from './manifest.template';
 import {
   genCSP,
 } from './constants';
+import {
+  Servers,
+  serverToPermission,
+} from '../scripts/connections';
 import { version } from '../package.json';
 
 export default (isDebug: boolean): * => buildManifest({
@@ -11,8 +15,11 @@ export default (isDebug: boolean): * => buildManifest({
   defaultTitle: '[dev] Yoroi',
   contentSecurityPolicy: genCSP({
     isDev: isDebug,
-    additional: Object.freeze({
-    }),
+    additional: {
+      'connect-src': [
+        serverToPermission(Servers.Primary),
+      ],
+    },
   }),
   version,
   extensionKey: 'pojejnpjgcacmnpkdiklhlnlbkjechfh',

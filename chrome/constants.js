@@ -42,9 +42,6 @@ export function genCSP(request: {|
     imgSrc.push(portToPermission(Ports.WebpackDev));
   }
 
-  // this allows connecting to multiple different backends for different currencies
-  connectSrc.push(serverToPermission('*.yoroiwallet.com'));
-
   // connectSrc.push('https://api.dropboxapi.com');
   // connectSrc.push('https://content.dropboxapi.com');
 

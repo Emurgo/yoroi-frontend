@@ -35,15 +35,13 @@ export type NetworkConfigType = {|
   priceBackendUrl: string,
 |};
 
-export type Network =  'development' | 'mainnet' | 'testnet' | 'test';
+export type Network =  'development' | 'mainnet' | 'test';
 export const NetworkType: {|
   DEVELOPMENT: Network,
   MAINNET: Network,
-  TESTNET: Network,
   TEST: Network,
 |} = {
   DEVELOPMENT: 'development',
   MAINNET: 'mainnet',
-  TESTNET: 'testnet',
   TEST: 'test',
 };

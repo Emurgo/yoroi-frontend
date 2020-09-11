@@ -17,9 +17,8 @@ const Ports = {
 };
 
 const Servers = {
-  CardanoMainnet: 'iohk-mainnet.yoroiwallet.com',
-  CardanoTestnet: 'testnet-backend.yoroiwallet.com',
-  ShelleyITN: 'shelley-itn-yoroi-backend.yoroiwallet.com'
+  // this allows connecting to multiple different backends for different currencies
+  Primary: '*.yoroiwallet.com',
 };
 
 module.exports = {
