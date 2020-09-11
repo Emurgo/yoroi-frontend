@@ -17,7 +17,7 @@ export class SelectedExplorer {
     this.backup = data.backup;
   }
 
-  getOrDefault: LinkType => {|
+  getOrDefault: LinkType => void | {|
     name: string,
     baseUrl: string,
   |} = (type) => {
@@ -35,7 +35,7 @@ export class SelectedExplorer {
         baseUrl: backupLink,
       };
     }
-    throw new Error(`Endpoint ${type} not in either selected or backup`);
+    return undefined;
   }
 }
 

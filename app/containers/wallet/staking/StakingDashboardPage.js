@@ -400,7 +400,7 @@ export default class StakingDashboardPage extends Component<Props> {
 
         const poolExplorerLink = this.generated.stores.explorers.selectedExplorer
           .get(publicDeriver.getParent().getNetworkInfo().NetworkId)
-          ?.getOrDefault('pool') ?? (() => { throw new Error('No explorer for wallet network'); })();
+          ?.getOrDefault('pool');
 
         const upcomingTuples = ((upcomingRewards.slice(0, 3): any): [?BoxInfo, ?BoxInfo, ?BoxInfo]);
         const rewardPopup = (
@@ -409,7 +409,7 @@ export default class StakingDashboardPage extends Component<Props> {
             content={upcomingTuples}
             showWarning={upcomingRewards.length === 3}
             onExternalLinkClick={handleExternalLinkClick}
-            baseUrl={poolExplorerLink.baseUrl}
+            baseUrl={poolExplorerLink?.baseUrl}
           />
         );
         rewardInfo = {
