@@ -33,7 +33,7 @@
   "api.errors.noOutputsError": "A transação necessita de pelo menos uma saída, mas nenhuma foi adicionada",
   "api.errors.pendingTransactionError": "Erro ao atualizar transações pendentes.",
   "api.errors.poolMissingApiError": "Não foi possível encontrar este pool. Verifique duas vezes o ID e verifique se o pool não foi cancelado o registro.",
-  "api.errors.rewardAddressEmpty": "Reward address is empty.",
+  "api.errors.rewardAddressEmpty": "Endereço de recompensa está vazio.",
   "api.errors.rollbackApiError": "Uma reversão foi detectada.",
   "api.errors.sendTransactionApiError": "Erro recebido do servidor durante o envio da transação.",
   "api.errors.sendTransactionError": "Erro recebido na chamada do método da API durante o envio da transação.",
