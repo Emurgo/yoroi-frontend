@@ -94,6 +94,10 @@ export function isValidReceiveAddress(
       id: 'wallet.send.form.cannotSendToReward',
       defaultMessage: '!!!You cannot send to a reward account',
     },
+    wrongNetwork: {
+      id: 'global.wrongNetwork.address',
+      defaultMessage: '!!!Wrong network for address.',
+    },
   });
 
   const kind = tryAddressToKind(bech32, 'bech32', network);
@@ -114,6 +118,13 @@ export function isValidReceiveAddress(
       return [false, messages.cannotSendToReward];
     }
     if (isCardanoHaskellAddress(kind)) {
+      const addr = normalizeToAddress(bech32);
+      if (addr == null) throw new Error('Should never happen');
+
+      const expectedNetworkId = Number.parseInt(network.BaseConfig[0].ChainNetworkId, 10);
+      if (addr.network_id() !== expectedNetworkId) {
+        return [false, messages.wrongNetwork];
+      }
       return true;
     }
     return [false, messages.invalidAddress];

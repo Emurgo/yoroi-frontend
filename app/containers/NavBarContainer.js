@@ -27,6 +27,7 @@ import type { TxRequests } from '../stores/toplevel/TransactionsStore';
 import type { IGetPublic } from '../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import { getApiForNetwork, getApiMeta } from '../api/common/utils';
 import type { SelectedApiType } from '../api/common/utils';
+import { networks } from '../api/ada/lib/storage/database/prepackaged/networks';
 
 const messages = defineMessages({
   allWalletsLabel: {
@@ -135,7 +136,11 @@ export default class NavBarContainer extends Component<Props> {
               shouldHideBalance={profile.shouldHideBalance}
               rewards={this.getRewardBalance(wallet)}
               meta={{
-                primaryTicker: apiMeta.primaryTicker,
+                primaryTicker:
+                  // TODO: proper per-network currency meta
+                  parent.getNetworkInfo().NetworkId === networks.CardanoTestnet.NetworkId
+                    ? 'TADA'
+                    : apiMeta.primaryTicker,
                 decimalPlaces: apiMeta.decimalPlaces.toNumber(),
               }}
             />
@@ -176,6 +181,7 @@ export default class NavBarContainer extends Component<Props> {
         }
 
         const apiMeta = this.getMeta(publicDeriver);
+        const network = publicDeriver.getParent().getNetworkInfo();
 
         const txRequests = this.generated.stores.transactions.getTxRequests(publicDeriver);
         const balance = txRequests.requests.getBalanceRequest.result
@@ -188,7 +194,10 @@ export default class NavBarContainer extends Component<Props> {
             rewards={this.getRewardBalance(publicDeriver)}
             walletAmount={balance}
             meta={{
-              primaryTicker: apiMeta.primaryTicker,
+              primaryTicker: // TODO: proper per-network currency meta
+                network.NetworkId === networks.CardanoTestnet.NetworkId
+                  ? 'TADA'
+                  : apiMeta.primaryTicker,
               decimalPlaces: apiMeta.decimalPlaces.toNumber(),
             }}
           />

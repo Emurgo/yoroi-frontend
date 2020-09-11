@@ -40,6 +40,7 @@ import type { PublicKeyCache } from '../../stores/toplevel/WalletStore';
 import type { TxRequests } from '../../stores/toplevel/TransactionsStore';
 import type { IGetPublic } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import { getApiForNetwork, getApiMeta } from '../../api/common/utils';
+import { networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 const messages = defineMessages({
   walletSumInfo: {
@@ -163,14 +164,19 @@ export default class MyWalletsPage extends Component<Props> {
     const settingsCache = this.generated.stores.walletSettings
       .getConceptualWalletSettingsCache(parent);
 
-    const apiMeta = getApiMeta(getApiForNetwork(publicDeriver.getParent().getNetworkInfo()))?.meta;
+    const network = publicDeriver.getParent().getNetworkInfo();
+    const apiMeta = getApiMeta(getApiForNetwork(network))?.meta;
     if (apiMeta == null) throw new Error(`${nameof(MyWalletsPage)} no API selected`);
     const amountPerUnit = new BigNumber(10).pow(apiMeta.decimalPlaces);
 
     const walletSumCurrencies = (
       <>
         <WalletCurrency
-          currency={apiMeta.primaryTicker}
+          // TODO: proper per-network api meta
+          currency={
+            network.NetworkId === networks.CardanoTestnet.NetworkId
+              ? 'TADA'
+              : apiMeta.primaryTicker}
           tooltipText={undefined /* TODO */}
         />
       </>
@@ -223,7 +229,8 @@ export default class MyWalletsPage extends Component<Props> {
   createSubrow: PublicDeriver<> => Node = (publicDeriver) => {
     const { intl } = this.context;
 
-    const apiMeta = getApiMeta(getApiForNetwork(publicDeriver.getParent().getNetworkInfo()))?.meta;
+    const network = publicDeriver.getParent().getNetworkInfo();
+    const apiMeta = getApiMeta(getApiForNetwork(network))?.meta;
     if (apiMeta == null) throw new Error(`${nameof(MyWalletsPage)} no API selected`);
 
     // TODO: replace with wallet addresses
@@ -266,7 +273,11 @@ export default class MyWalletsPage extends Component<Props> {
         walletNumber={1}
         walletAddresses={walletAddresses /* TODO: replace with proper hashes */}
         walletCurrencies={<WalletCurrency
-          currency={apiMeta.primaryTicker}
+          // TODO: proper per-network api meta
+          currency={
+            network.NetworkId === networks.CardanoTestnet.NetworkId
+              ? 'TADA'
+              : apiMeta.primaryTicker}
           tooltipText="0.060" // TODO
         />}
       />

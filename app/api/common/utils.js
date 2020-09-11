@@ -1,11 +1,10 @@
 // @flow
 
-import { CoinTypes } from '../../config/numbersConfig';
 import { getAdaCurrencyMeta } from '../ada/currencyInfo';
 import { getErgoCurrencyMeta } from '../ergo/currencyInfo';
 import { getJormungandrCurrencyMeta } from '../jormungandr/currencyInfo';
 import type { NetworkRow } from '../ada/lib/storage/database/primitives/tables';
-import { isCardanoHaskell, isJormungandr } from '../ada/lib/storage/database/prepackaged/networks';
+import { isErgo, isCardanoHaskell, isJormungandr } from '../ada/lib/storage/database/prepackaged/networks';
 
 export const ApiOptions = Object.freeze({
   ada: 'ada',
@@ -21,7 +20,7 @@ export const getApiForNetwork: $ReadOnly<NetworkRow> => ApiOptionType = (type) =
   if (isJormungandr(type)) {
     return ApiOptions.jormungandr;
   }
-  if (type.CoinType === CoinTypes.ERGO) {
+  if (isErgo(type)) {
     return ApiOptions.ergo;
   }
   throw new Error(`${nameof(getApiForNetwork)} missing entry for type ${JSON.stringify(type)}`);
