@@ -36,6 +36,9 @@ export default class ExplorableHashContainer extends Component<Props> {
     const { intl } = this.context;
 
     const explorerInfo = this.props.selectedExplorer.getOrDefault(this.props.linkType);
+    if (explorerInfo == null) {
+      return this.props.children ?? null;
+    }
 
     const displayName = explorerInfo.name + ' ' + intl.formatMessage(globalMessages.blockchainExplorer);
 

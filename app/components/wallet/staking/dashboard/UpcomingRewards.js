@@ -51,7 +51,7 @@ export type BoxInfo = {|
 type Props = {|
   +content: [?BoxInfo, ?BoxInfo, ?BoxInfo],
   +showWarning: boolean,
-  +baseUrl: string,
+  +baseUrl: void | string,
   +useEndOfEpoch: boolean, // Haskell uses end-of-epoch but Jormungandr doesn't
   +onExternalLinkClick: MouseEvent => void,
 |};
@@ -158,23 +158,32 @@ export default class UpcomingRewards extends Component<Props> {
     const tooltip = pool.ticker == null
       ? pool.id[0]
       : (<>{pool.ticker}<br />{pool.id[0]}</>);
+
+    const img = (
+      <img
+        alt="Pool avatar"
+        src={avatar}
+        className={styles.avatar}
+      />
+    );
     return (
       <CustomTooltip
         key={pool.id[0] + pool.id[1]}
         toolTip={<div className={styles.poolInfo}>{tooltip}</div>}
         isOpeningUpward={false}
       >
-        <a
-          className={styles.url}
-          href={this.props.baseUrl + pool.id[0]}
-          onClick={event => this.props.onExternalLinkClick(event)}
-        >
-          <img
-            alt="Pool avatar"
-            src={avatar}
-            className={styles.avatar}
-          />
-        </a>
+        {this.props.baseUrl != null
+          ? (
+            <a
+              className={styles.url}
+              href={this.props.baseUrl + pool.id[0]}
+              onClick={event => this.props.onExternalLinkClick(event)}
+            >
+              {img}
+            </a>
+          )
+          : img
+        }
       </CustomTooltip>
     );
   }
