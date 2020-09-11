@@ -3,7 +3,6 @@
 import { action, } from 'mobx';
 import Store from '../base/Store';
 
-import environment from '../../environment';
 import type { RestoreModeType } from '../../actions/common/wallet-restore-actions';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import {
@@ -25,6 +24,10 @@ import { ApiOptions, getApiForNetwork } from '../../api/common/utils';
 import type {
   Address, Addressing
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
+import type {
+  NetworkRow,
+} from '../../api/ada/lib/storage/database/primitives/tables';
+import { getJormungandrBaseConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 export default class JormungandrWalletRestoreStore extends Store {
 
@@ -49,16 +52,23 @@ export default class JormungandrWalletRestoreStore extends Store {
     if (phrase == null) {
       throw new Error(`${nameof(this._transferFromLegacy)} no recovery phrase set. Should never happen`);
     }
+    const network = this.stores.profile.selectedNetwork;
+    if (network == null) {
+      throw new Error(`${nameof(this._transferFromLegacy)} no network selected`);
+    }
     await this.actions.yoroiTransfer.transferFunds.trigger({
       next: async () => { await this._restoreToDb(); },
-      getDestinationAddress: () => Promise.resolve(this._getFirstCip1852InternalAddr()),
+      network,
+      getDestinationAddress: () => Promise.resolve(this._getFirstCip1852InternalAddr(network)),
       // funds in genesis block should be either entirely claimed or not claimed
       // so if another wallet instance claims the funds, it's not a big deal
       rebuildTx: false,
     });
   }
 
-  _getFirstCip1852InternalAddr: void => {| ...Address, ...InexactSubset<Addressing> |} = () => {
+  _getFirstCip1852InternalAddr: (
+    $ReadOnly<NetworkRow>
+  ) => {| ...Address, ...InexactSubset<Addressing> |} = (network) => {
     const phrase = this.stores.walletRestore.recoveryResult?.phrase;
     if (phrase == null) {
       throw new Error(`${nameof(this._getFirstCip1852InternalAddr)} no recovery phrase set. Should never happen`);
@@ -79,10 +89,14 @@ export default class JormungandrWalletRestoreStore extends Store {
       .derive(STAKING_KEY_INDEX)
       .to_public()
       .to_raw_key();
+
+    const config = getJormungandrBaseConfig(
+      network
+    ).reduce((acc, next) => Object.assign(acc, next), {});
     const internalAddr = RustModule.WalletV3.Address.delegation_from_public_key(
       internalKey,
       stakingKey,
-      environment.getDiscriminant(),
+      config.Discriminant,
     );
     const internalAddrHash = Buffer.from(internalAddr.as_bytes()).toString('hex');
     return {

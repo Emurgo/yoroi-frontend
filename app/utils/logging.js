@@ -9,6 +9,8 @@ import type { ConfigType } from '../../config/config-types';
 import environment from '../environment';
 
 const logger = console;
+
+// populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
 const { logsBufferSize, logsFileSuffix } = CONFIG.app;
 const logs = new RingBuffer(logsBufferSize);
@@ -58,9 +60,9 @@ export const downloadLogs = (publicKey?: string) => {
 
 export const generateLogHeader = (publicKey?: string): string => {
   let header =
-  `[INFO] Yoroi v.${environment.version}\r\n`
+  `[INFO] Yoroi v.${environment.getVersion()}\r\n`
   + `[INFO] Commit: ${environment.commit}\r\n`
-  + `[INFO] Network: ${environment.NETWORK}\r\n`
+  + `[INFO] Network: ${environment.getNetworkName()}\r\n`
   + `[INFO] User Agent: ${stringifyData(environment.userAgentInfo.ua)}\r\n`;
 
   if (publicKey != null) {

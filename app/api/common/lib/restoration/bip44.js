@@ -19,10 +19,11 @@ import type {
   TreeInsert, InsertRequest,
 } from '../../../ada/lib/storage/database/walletTypes/common/utils';
 import type { AddByHashFunc, } from '../storage/bridge/hashMapper';
-import type { CanonicalAddressInsert } from '../../../ada/lib/storage/database/primitives/tables';
+import type { NetworkRow, CanonicalAddressInsert } from '../../../ada/lib/storage/database/primitives/tables';
 import type { CoreAddressT } from '../../../ada/lib/storage/database/primitives/enums';
 import type { Bip44ChainInsert } from '../../../ada/lib/storage/database/walletTypes/common/tables';
 
+// populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
 const addressRequestSize = CONFIG.app.addressRequestSize;
 
@@ -50,6 +51,7 @@ async function scanChain(request: {|
   generateAddressFunc: GenerateAddressFunc,
   lastUsedIndex: number,
   checkAddressesInUse: FilterFunc,
+  network: $ReadOnly<NetworkRow>,
   addByHash: AddByHashFunc,
   type: CoreAddressT,
 |}): Promise<TreeInsert<CanonicalAddressInsert>> {
@@ -59,6 +61,7 @@ async function scanChain(request: {|
     BIP44_SCAN_SIZE,
     addressRequestSize,
     request.checkAddressesInUse,
+    request.network,
   );
 
   return addresses
@@ -83,6 +86,7 @@ export async function scanBip44Account(request: {|
   lastUsedInternal: number,
   lastUsedExternal: number,
   checkAddressesInUse: FilterFunc,
+  network: $ReadOnly<NetworkRow>,
   addByHash: AddByHashFunc,
   type: CoreAddressT,
 |}): Promise<TreeInsert<Bip44ChainInsert>> {
@@ -90,6 +94,7 @@ export async function scanBip44Account(request: {|
     generateAddressFunc: request.generateInternalAddresses,
     lastUsedIndex: request.lastUsedExternal,
     checkAddressesInUse: request.checkAddressesInUse,
+    network: request.network,
     addByHash: request.addByHash,
     type: request.type,
   });
@@ -97,6 +102,7 @@ export async function scanBip44Account(request: {|
     generateAddressFunc: request.generateExternalAddresses,
     lastUsedIndex: request.lastUsedInternal,
     checkAddressesInUse: request.checkAddressesInUse,
+    network: request.network,
     addByHash: request.addByHash,
     type: request.type,
   });

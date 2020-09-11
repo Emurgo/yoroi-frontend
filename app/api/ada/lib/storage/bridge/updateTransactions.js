@@ -1065,13 +1065,17 @@ async function rawUpdateTransactions(
   getBestBlock: BestBlockFunc,
   derivationTables: Map<number, string>,
 ): Promise<void> {
+  const network = publicDeriver.getParent().getNetworkInfo();
+
   // TODO: consider passing this function in as an argument instead of generating it here
   const toAbsoluteSlotNumber = await genToAbsoluteSlotNumber(
-    getCardanoHaskellBaseConfig(publicDeriver.getParent().getNetworkInfo())
+    getCardanoHaskellBaseConfig(network)
   );
   // 1) Check if backend is synced (avoid rollbacks if backend has to resync from block 1)
 
-  const bestBlock = await getBestBlock();
+  const bestBlock = await getBestBlock({
+    network,
+  });
   const slotInRemote = (bestBlock.epoch == null || bestBlock.slot == null)
     ? null
     : toAbsoluteSlotNumber({
@@ -1147,6 +1151,7 @@ async function rawUpdateTransactions(
       };
     const txsFromNetwork = await getTransactionsHistoryForAddresses({
       ...requestKind,
+      network,
       addresses: [
         ...addresses.utxoAddresses
           // Note: don't send base/ptr keys

@@ -38,7 +38,7 @@ test('Restore wallet', async () => {
     recoveryPhrase: TX_TEST_MNEMONIC_1,
     walletName: 'mywallet',
     walletPassword: '123',
-    network: networks.ByronMainnet,
+    network: networks.CardanoMainnet,
     accountIndex: HARD_DERIVATION_START + 0,
     mode: 'bip44',
   };
@@ -72,7 +72,7 @@ test('Restore wallet for transfer', async () => {
     checkAddressesInUse,
     accountIndex,
     transferSource: 'bip44',
-    network: networks.ByronMainnet,
+    network: networks.CardanoMainnet,
   });
 
   expect(response).toEqual(RESTORED_ADDRESSES);

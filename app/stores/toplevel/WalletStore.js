@@ -103,7 +103,7 @@ export type PublicKeyCache = {|
  */
 export default class WalletStore extends Store {
 
-  WALLET_REFRESH_INTERVAL: number = environment.walletRefreshInterval;
+  WALLET_REFRESH_INTERVAL: number = environment.getWalletRefreshInterval();
   ON_VISIBLE_DEBOUNCE_WAIT: number = 1000;
 
   @observable publicDerivers: Array<PublicDeriver<>>;

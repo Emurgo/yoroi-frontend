@@ -1,28 +1,39 @@
 // @flow
 
 import typeof { MIRPot } from '@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib';
+import type { NetworkRow } from '../storage/database/primitives/tables';
 
 // getUTXOsForAddresses
 
-export type AddressUtxoRequest = {| addresses: Array<string>, |};
+export type AddressUtxoRequest = {|
+  network: $ReadOnly<NetworkRow>,
+  addresses: Array<string>,
+|};
 export type AddressUtxoResponse = Array<RemoteUnspentOutput>;
 export type AddressUtxoFunc = (body: AddressUtxoRequest) => Promise<AddressUtxoResponse>;
 
 // getTxsBodiesForUTXOs
 
-export type TxBodiesRequest = {| txsHashes: Array<string>, |};
+export type TxBodiesRequest = {|
+  network: $ReadOnly<NetworkRow>,
+  txsHashes: Array<string>,
+|};
 export type TxBodiesResponse = { [key: string]:string, ... };
 export type TxBodiesFunc = (body: TxBodiesRequest) => Promise<TxBodiesResponse>;
 
 // getUTXOsSumsForAddresses
 
-export type UtxoSumRequest = {| addresses: Array<string>, |};
+export type UtxoSumRequest = {|
+  network: $ReadOnly<NetworkRow>,
+  addresses: Array<string>,
+|};
 export type UtxoSumResponse = {| sum: ?string, |};
 export type UtxoSumFunc = (body: UtxoSumRequest) => Promise<UtxoSumResponse>;
 
 // getTransactionsHistoryForAddresses
 
 export type HistoryRequest = {|
+  network: $ReadOnly<NetworkRow>,
   addresses: Array<string>,
   after?: {|
     block: string,
@@ -35,7 +46,9 @@ export type HistoryFunc = (body: HistoryRequest) => Promise<HistoryResponse>;
 
 // getBestBlock
 
-export type BestBlockRequest = void;
+export type BestBlockRequest = {|
+  network: $ReadOnly<NetworkRow>,
+|};
 export type BestBlockResponse = {|
   // 0 if no blocks in db
   height: number,
@@ -52,6 +65,7 @@ export type SignedRequestInternal = {|
   signedTx: string,
 |};
 export type SignedRequest = {|
+  network: $ReadOnly<NetworkRow>,
   id: string,
   encodedTx: Uint8Array,
 |};
@@ -228,6 +242,7 @@ export type RemoteCertificate = {|
 // getAccountState
 
 export type AccountStateRequest = {|
+  network: $ReadOnly<NetworkRow>,
   addresses: Array<string>
 |};
 export type RemoteAccountState = {|
@@ -244,6 +259,7 @@ export type AccountStateFunc = (body: AccountStateRequest) => Promise<AccountSta
 // getRewardHistory
 
 export type RewardHistoryRequest = {|
+  network: $ReadOnly<NetworkRow>,
   addresses: Array<string>,
 |};
 export type RewardTuple = [
@@ -254,6 +270,7 @@ export type RewardHistoryResponse = { [address: string]: Array<RewardTuple>, ...
 export type RewardHistoryFunc = (body: RewardHistoryRequest) => Promise<RewardHistoryResponse>;
 
 export type PoolInfoRequest = {|
+  network: $ReadOnly<NetworkRow>,
   poolIds: Array<string>
 |};
 export type RemotePoolInfo = {|

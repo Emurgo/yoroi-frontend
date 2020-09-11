@@ -80,7 +80,7 @@ export const globalKnobs: {|
 
 export const isFirefoxKnob: void => boolean = () => {
   const firefox = boolean('isFirefox', false);
-  environment.userAgentInfo.isFirefox = firefox;
+  environment.userAgentInfo.isFirefox = () => firefox;
   return firefox;
 };
 

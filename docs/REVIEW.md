@@ -10,10 +10,6 @@ If you want to know the exact version & commit used for the build you've receive
 
 ![image](https://user-images.githubusercontent.com/2608559/84115683-6d48d880-aa69-11ea-92b3-f36954f1227f.png)
 
-### Picking the right build command
-
-There are multiple "networks" that Yoroi can connect to and each network has a build command that packages different functionality. If you are not sure what network to use, you can ask us or look look at the in-app settings.
-
 ### How to do I get an account for review purposes?
 
 Yoroi connects to network(s) called "blockchains". These blockchains are decentralized networks that we have no control over. Wallets are just a way for users to easily view and manage assets their own on the network. That means there is no way to "credit" a tester account for you.
@@ -76,9 +72,9 @@ export NVM_DIR="$HOME/.nvm"
 nvm install
 npm install
 
-# build (note: be sure to pick the right network for the version you want to review)
+# build
 
-npm run prod:byron
+npm run prod:stable
 ```
 
 If you need to access the build from your host machine, you can use the following command to copy the build folder out of the docker container and into your host machine. (**note**: you must run this command from the host machine and not from inside the docker image)

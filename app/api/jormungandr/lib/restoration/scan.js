@@ -14,7 +14,6 @@ import type { FilterFunc } from '../../../common/lib/state-fetch/currencySpecifi
 import {
   ChainDerivations, BIP44_SCAN_SIZE,
 } from '../../../../config/numbersConfig';
-import environment from '../../../../environment';
 
 import { RustModule } from '../../../ada/lib/cardanoCrypto/rustLoader';
 
@@ -23,10 +22,13 @@ import type {
 } from '../../../ada/lib/storage/database/walletTypes/common/utils';
 import type { AddByHashFunc, } from '../../../common/lib/storage/bridge/hashMapper';
 import type { AddressDiscriminationType } from '@emurgo/js-chain-libs/js_chain_libs';
-import type { CanonicalAddressInsert } from '../../../ada/lib/storage/database/primitives/tables';
+import type { NetworkRow, CanonicalAddressInsert } from '../../../ada/lib/storage/database/primitives/tables';
+import { getJormungandrBaseConfig } from '../../../ada/lib/storage/database/prepackaged/networks';
 import { CoreAddressTypes } from '../../../ada/lib/storage/database/primitives/enums';
 import type { Bip44ChainInsert } from '../../../ada/lib/storage/database/walletTypes/common/tables';
 
+
+// populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
 const addressRequestSize = CONFIG.app.addressRequestSize;
 
@@ -115,6 +117,7 @@ export async function addJormungandrUtxoAddress(
 async function scanChain(request: {|
   generateAddressFunc: GenerateAddressFunc,
   lastUsedIndex: number,
+  network: $ReadOnly<NetworkRow>,
   checkAddressesInUse: FilterFunc,
   stakingKey: RustModule.WalletV3.PublicKey,
   addByHash: AddByHashFunc,
@@ -125,6 +128,7 @@ async function scanChain(request: {|
     BIP44_SCAN_SIZE,
     addressRequestSize,
     request.checkAddressesInUse,
+    request.network,
   );
 
   return addresses
@@ -148,29 +152,34 @@ export async function scanJormungandrCip1852Account(request: {|
   lastUsedInternal: number,
   lastUsedExternal: number,
   checkAddressesInUse: FilterFunc,
+  network: $ReadOnly<NetworkRow>,
   addByHash: AddByHashFunc,
   stakingKey: RustModule.WalletV3.PublicKey,
 |}): Promise<TreeInsert<Bip44ChainInsert>> {
   const key = RustModule.WalletV3.Bip32PublicKey.from_bytes(
     Buffer.from(request.accountPublicKey, 'hex'),
   );
-  const discrimination = environment.getDiscriminant();
+
+  const config = getJormungandrBaseConfig(
+    request.network
+  ).reduce((acc, next) => Object.assign(acc, next), {});
 
   const insert = await scanAccount({
     generateInternalAddresses: genSingleAddressBatchFunc(
       key.derive(ChainDerivations.INTERNAL),
-      discrimination,
+      config.Discrimination,
     ),
     generateExternalAddresses: genSingleAddressBatchFunc(
       key.derive(ChainDerivations.EXTERNAL),
-      discrimination,
+      config.Discrimination,
     ),
     lastUsedInternal: request.lastUsedInternal,
     lastUsedExternal: request.lastUsedExternal,
+    network: request.network,
     checkAddressesInUse: request.checkAddressesInUse,
     addByHash: request.addByHash,
     stakingKey: request.stakingKey,
-    discrimination,
+    discrimination: config.Discrimination,
   });
   return insert;
 }
@@ -179,6 +188,7 @@ async function scanAccount(request: {|
   generateExternalAddresses: GenerateAddressFunc,
   lastUsedInternal: number,
   lastUsedExternal: number,
+  network: $ReadOnly<NetworkRow>,
   checkAddressesInUse: FilterFunc,
   addByHash: AddByHashFunc,
   stakingKey: RustModule.WalletV3.PublicKey,
@@ -188,6 +198,7 @@ async function scanAccount(request: {|
     generateAddressFunc: request.generateExternalAddresses,
     lastUsedIndex: request.lastUsedExternal,
     checkAddressesInUse: request.checkAddressesInUse,
+    network: request.network,
     addByHash: request.addByHash,
     stakingKey: request.stakingKey,
   });
@@ -195,6 +206,7 @@ async function scanAccount(request: {|
     generateAddressFunc: request.generateInternalAddresses,
     lastUsedIndex: request.lastUsedInternal,
     checkAddressesInUse: request.checkAddressesInUse,
+    network: request.network,
     addByHash: request.addByHash,
     stakingKey: request.stakingKey,
   });

@@ -1,4 +1,5 @@
 // @flow
+import '../../../test-config';
 import { prepackagedExplorers } from './explorers';
 
 test('Only one backup per network', async () => {

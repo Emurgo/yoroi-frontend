@@ -356,7 +356,7 @@ async function syncingSimpleTransaction(
   const publicDeriver2 = await setup(db, TX_TEST_MNEMONIC_2, purposeForTest);
 
   const txHistory = networkTransactions(purposeForTest);
-  const network = networks.ByronMainnet;
+  const network = networks.CardanoMainnet;
   const checkAddressesInUse = genCheckAddressesInUse(txHistory, network);
   const getTransactionsHistoryForAddresses = genGetTransactionsHistoryForAddresses(
     txHistory,

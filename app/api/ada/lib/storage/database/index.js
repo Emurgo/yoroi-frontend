@@ -263,7 +263,7 @@ async function onUpgrade(
       'ConceptualWallet',
       'NetworkId',
       // recall: at the time we only supported 1 currency per Yoroi install
-      networks.ByronMainnet.NetworkId
+      networks.CardanoMainnet.NetworkId
     );
   }
   if (version >= 3 && version <= 12) {

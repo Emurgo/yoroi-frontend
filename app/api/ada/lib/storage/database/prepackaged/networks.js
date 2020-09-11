@@ -10,6 +10,7 @@ import type {
   ErgoBaseConfig,
   JormungandrBaseConfig,
 } from '../primitives/tables';
+import environment from '../../../../../../environment';
 
 export const CardanoForks = Object.freeze({
   Haskell: 0,
@@ -19,57 +20,58 @@ export const ErgoForks = Object.freeze({
   Primary: 0,
 });
 
-const isMC4 = false;
-
 export const networks = Object.freeze({
-  ByronMainnet: ({
+  CardanoMainnet: ({
     NetworkId: 0,
+    Backend: {
+      BackendService: environment.isTest()
+        ? 'http://localhost:8080'
+        : 'https://iohk-mainnet.yoroiwallet.com',
+      WebSocket: environment.isTest()
+        ? 'ws://localhost:8080'
+        : 'wss://iohk-mainnet.yoroiwallet.com:443',
+    },
     BaseConfig: ([
       Object.freeze({
         StartAt: 0,
         ChainNetworkId: '1',
         ByronNetworkId: 764824073,
-        GenesisDate: isMC4
-          ? '1595682000000'
-          : '1506203091000',
+        GenesisDate: '1506203091000',
         SlotsPerEpoch: 21600,
         SlotDuration: 20,
       }),
-      isMC4 ?
-        Object.freeze({
-          StartAt: 1, // no idea if this is correct
-          SlotsPerEpoch: 432000,
-          SlotDuration: 1,
-          PerEpochPercentageReward: 69344,
-          LinearFee: {
-            coefficient: '44',
-            constant: '155381',
-          },
-          MinimumUtxoVal: '1000000',
-          PoolDeposit: '500000000',
-          KeyDeposit: '2000000',
-        })
-        : Object.freeze({
-          StartAt: 208,
-          SlotsPerEpoch: 432000,
-          SlotDuration: 1,
-          PerEpochPercentageReward: 69344,
-          LinearFee: {
-            coefficient: '44',
-            constant: '155381',
-          },
-          MinimumUtxoVal: '1000000',
-          PoolDeposit: '500000000',
-          KeyDeposit: '2000000',
-        })
+      Object.freeze({
+        StartAt: 208,
+        SlotsPerEpoch: 432000,
+        SlotDuration: 1,
+        PerEpochPercentageReward: 69344,
+        LinearFee: {
+          coefficient: '44',
+          constant: '155381',
+        },
+        MinimumUtxoVal: '1000000',
+        PoolDeposit: '500000000',
+        KeyDeposit: '2000000',
+      })
     ]: CardanoHaskellBaseConfig),
     CoinType: CoinTypes.CARDANO,
     Fork: CardanoForks.Haskell,
   }: NetworkRow),
   JormungandrMainnet: ({
     NetworkId: 1_00,
+    Backend: {
+      BackendService: environment.isTest()
+        ? 'http://localhost:21000' // TODO: pick a port for test
+        : 'https://shelley-itn-yoroi-backend.yoroiwallet.com',
+      WebSocket: environment.isTest()
+        ? 'ws://localhost:21000' // TODO: pick a port for test
+        : 'wss://shelley-itn-yoroi-backend.yoroiwallet.com:443',
+    },
     BaseConfig: ([Object.freeze({
       StartAt: 0,
+      Discriminant: (environment.isTest() || environment.isJest())
+        ? 0 // RustModule.WalletV3.AddressDiscrimination.Production
+        : 1, // RustModule.WalletV3.AddressDiscrimination.Test
       ChainNetworkId: '8e4d2a343f3dcf9330ad9035b3e8d168e6728904262f2c434a4f8f934ec7b676',
       ByronNetworkId: 764824073,
       GenesisDate: '1576264417000',
@@ -91,12 +93,53 @@ export const networks = Object.freeze({
   }: NetworkRow),
   ErgoMainnet: ({
     NetworkId: 2_00,
+    Backend: {
+      BackendService: environment.isTest()
+        ? 'http://localhost:21001'
+        : 'https://ergo-backend.yoroiwallet.com', // TODO
+    },
     BaseConfig: ([Object.freeze({
       StartAt: 0,
       ChainNetworkId: (Network.Mainnet.toString(): string),
     })]: ErgoBaseConfig),
     CoinType: CoinTypes.ERGO,
     Fork: ErgoForks.Primary,
+  }: NetworkRow),
+  CardanoTestnet: ({
+    NetworkId: 3_00,
+    Backend: {
+      BackendService: environment.isTest()
+        ? 'http://localhost:8080'
+        : 'https://testnet-backend.yoroiwallet.com',
+      WebSocket: environment.isTest()
+        ? 'ws://localhost:8080'
+        : 'wss://testnet-backend.yoroiwallet.com:443',
+    },
+    BaseConfig: ([
+      Object.freeze({
+        StartAt: 0,
+        ChainNetworkId: '0',
+        ByronNetworkId: 1097911063,
+        GenesisDate: '1563999616000',
+        SlotsPerEpoch: 21600,
+        SlotDuration: 20,
+      }),
+      Object.freeze({
+        StartAt: 74,
+        SlotsPerEpoch: 432000,
+        SlotDuration: 1,
+        PerEpochPercentageReward: 69344,
+        LinearFee: {
+          coefficient: '44',
+          constant: '155381',
+        },
+        MinimumUtxoVal: '1000000',
+        PoolDeposit: '500000000',
+        KeyDeposit: '2000000',
+      })
+    ]: CardanoHaskellBaseConfig),
+    CoinType: CoinTypes.CARDANO,
+    Fork: CardanoForks.Haskell,
   }: NetworkRow),
 });
 

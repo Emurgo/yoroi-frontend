@@ -45,7 +45,7 @@ const getStorageItemInWeb = async (
 
 /** passing undefined gives you the whole storage as a JSON string */
 export async function getLocalItem(key: string | void): Promise<?string> {
-  const isExtension = environment.userAgentInfo.isExtension;
+  const isExtension = environment.userAgentInfo.isExtension();
   if (isExtension) {
     return await getStorageItemInExtension(key);
   }
@@ -57,7 +57,7 @@ export async function getLocalItem(key: string | void): Promise<?string> {
 // =====
 
 export async function setLocalItem(key: string, value: string): Promise<void> {
-  const isExtension = environment.userAgentInfo.isExtension;
+  const isExtension = environment.userAgentInfo.isExtension();
   if (isExtension) {
     await new Promise((resolve, reject) => {
       chrome.storage.local.set(
@@ -78,7 +78,7 @@ export async function setLocalItem(key: string, value: string): Promise<void> {
 // ========
 
 export async function removeLocalItem(key: string): Promise<void> {
-  const isExtension = environment.userAgentInfo.isExtension;
+  const isExtension = environment.userAgentInfo.isExtension();
 
   if (isExtension) {
     await new Promise((resolve, reject) => {
@@ -96,7 +96,7 @@ export async function removeLocalItem(key: string): Promise<void> {
 }
 
 export async function clear(): Promise<void> {
-  const isExtension = environment.userAgentInfo.isExtension;
+  const isExtension = environment.userAgentInfo.isExtension();
   if (isExtension) {
     await new Promise((resolve, reject) => {
       chrome.storage.local.clear(
@@ -134,7 +134,7 @@ type StorageChange = { [key: string]: {|
 export function addListener(
   listener: StorageChange => void,
 ): void {
-  const isExtension = environment.userAgentInfo.isExtension;
+  const isExtension = environment.userAgentInfo.isExtension();
   if (isExtension) {
     chrome.storage.onChanged.addListener((changes, _area) => {
       listener(changes);
@@ -166,7 +166,7 @@ export function addListener(
 // =======
 
 export async function isEmptyStorage(): Promise<boolean> {
-  const isExtension = environment.userAgentInfo.isExtension;
+  const isExtension = environment.userAgentInfo.isExtension();
   if (isExtension) {
     const isEmpty = await getStorageItemInExtension().then(
       (data: Object) => Object.keys(data).length === 0

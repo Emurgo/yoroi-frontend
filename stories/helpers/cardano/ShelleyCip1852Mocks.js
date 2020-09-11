@@ -159,7 +159,7 @@ function genShelleyCip1852DummyWallet(): PublicDeriver<> {
       conceptualWalletId,
       walletType: WalletTypeOption.WEB_WALLET,
       hardwareInfo: null,
-      networkInfo: networks.ByronMainnet,
+      networkInfo: networks.CardanoMainnet,
     },
     {
       ConceptualWalletId: conceptualWalletId,
@@ -209,7 +209,7 @@ export function genShelleyCip1852SigningWallet(
         return WalletTypeOption.WEB_WALLET;
       })(),
       hardwareInfo,
-      networkInfo: networks.ByronMainnet,
+      networkInfo: networks.CardanoMainnet,
     },
     {
       ConceptualWalletId: conceptualWalletId,

@@ -41,8 +41,8 @@ import {
 
 import type { ConfigType } from '../../../../../config/config-types';
 
+// populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
-const backendUrl = CONFIG.network.backendUrl;
 
 /**
  * Makes calls to Yoroi backend service
@@ -64,9 +64,11 @@ export class RemoteFetcher implements IFetcher {
     this.getPlatform = getPlatform;
   }
 
-  getUTXOsForAddresses: AddressUtxoRequest => Promise<AddressUtxoResponse> = (body) => (
-    axios(
-      `${backendUrl}/api/txs/utxoForAddresses`,
+  getUTXOsForAddresses: AddressUtxoRequest => Promise<AddressUtxoResponse> = (body) => {
+    const { BackendService } = body.network.Backend;
+    if (BackendService == null) throw new Error(`${nameof(this.getUTXOsForAddresses)} missing backend url`);
+    return axios(
+      `${BackendService}/api/txs/utxoForAddresses`,
       {
         timeout: CONFIG.app.walletRefreshInterval,
         method: 'post',
@@ -82,12 +84,14 @@ export class RemoteFetcher implements IFetcher {
       .catch((error) => {
         Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getUTXOsForAddresses)} error: ` + stringifyError(error));
         throw new GetUtxosForAddressesApiError();
-      })
-  )
+      });
+  }
 
-  getUTXOsSumsForAddresses: UtxoSumRequest => Promise<UtxoSumResponse> = (body) => (
-    axios(
-      `${backendUrl}/api/txs/utxoSumForAddresses`,
+  getUTXOsSumsForAddresses: UtxoSumRequest => Promise<UtxoSumResponse> = (body) => {
+    const { BackendService } = body.network.Backend;
+    if (BackendService == null) throw new Error(`${nameof(this.getUTXOsForAddresses)} missing backend url`);
+    return axios(
+      `${BackendService}/api/txs/utxoSumForAddresses`,
       {
         method: 'post',
         timeout: CONFIG.app.walletRefreshInterval,
@@ -103,16 +107,19 @@ export class RemoteFetcher implements IFetcher {
       .catch((error) => {
         Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getUTXOsSumsForAddresses)} error: ` + stringifyError(error));
         throw new GetUtxosSumsForAddressesApiError();
-      })
-  )
+      });
+  }
 
-  getTransactionsHistoryForAddresses: HistoryRequest => Promise<HistoryResponse> = (body) => (
-    axios(
-      `${backendUrl}/api/v2/txs/history`,
+  getTransactionsHistoryForAddresses: HistoryRequest => Promise<HistoryResponse> = (body) => {
+    const { network, ...rest } = body;
+    const { BackendService } = network.Backend;
+    if (BackendService == null) throw new Error(`${nameof(this.getUTXOsForAddresses)} missing backend url`);
+    return axios(
+      `${BackendService}/api/v2/txs/history`,
       {
         method: 'post',
         timeout: CONFIG.app.walletRefreshInterval,
-        data: body,
+        data: rest,
         headers: {
           'yoroi-version': this.getLastLaunchVersion(),
           'yoroi-locale': this.getCurrentLocale()
@@ -155,16 +162,19 @@ export class RemoteFetcher implements IFetcher {
           throw new RollbackApiError();
         }
         throw new GetTxHistoryForAddressesApiError();
-      })
-  )
+      });
+  }
 
-  getRewardHistory: RewardHistoryRequest => Promise<RewardHistoryResponse> = (body) => (
-    axios(
-      `${backendUrl}/api/v2/account/rewards`,
+  getRewardHistory: RewardHistoryRequest => Promise<RewardHistoryResponse> = (body) => {
+    const { network, ...rest } = body;
+    const { BackendService } = network.Backend;
+    if (BackendService == null) throw new Error(`${nameof(this.getUTXOsForAddresses)} missing backend url`);
+    return axios(
+      `${BackendService}/api/v2/account/rewards`,
       {
         method: 'post',
         timeout: CONFIG.app.walletRefreshInterval,
-        data: body,
+        data: rest,
         headers: {
           'yoroi-version': this.getLastLaunchVersion(),
           'yoroi-locale': this.getCurrentLocale()
@@ -174,12 +184,14 @@ export class RemoteFetcher implements IFetcher {
       .catch((error) => {
         Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getRewardHistory)} error: ` + stringifyError(error));
         throw new GetRewardHistoryApiError();
-      })
-  )
+      });
+  }
 
-  getBestBlock: BestBlockRequest => Promise<BestBlockResponse> = (_body) => (
-    axios(
-      `${backendUrl}/api/v2/bestblock`,
+  getBestBlock: BestBlockRequest => Promise<BestBlockResponse> = (body) => {
+    const { BackendService } = body.network.Backend;
+    if (BackendService == null) throw new Error(`${nameof(this.getUTXOsForAddresses)} missing backend url`);
+    return axios(
+      `${BackendService}/api/v2/bestblock`,
       {
         method: 'get',
         timeout: CONFIG.app.walletRefreshInterval,
@@ -192,13 +204,15 @@ export class RemoteFetcher implements IFetcher {
       .catch((error) => {
         Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getBestBlock)} error: ` + stringifyError(error));
         throw new GetBestBlockError();
-      })
-  )
+      });
+  }
 
   sendTx: SignedRequest => Promise<SignedResponse> = (body) => {
     const signedTx64 = Buffer.from(body.encodedTx).toString('base64');
+    const { BackendService } = body.network.Backend;
+    if (BackendService == null) throw new Error(`${nameof(this.getUTXOsForAddresses)} missing backend url`);
     return axios(
-      `${backendUrl}/api/txs/signed`,
+      `${BackendService}/api/txs/signed`,
       {
         method: 'post',
         timeout: CONFIG.app.walletRefreshInterval,
@@ -222,9 +236,11 @@ export class RemoteFetcher implements IFetcher {
       });
   }
 
-  checkAddressesInUse: FilterUsedRequest => Promise<FilterUsedResponse> = (body) => (
-    axios(
-      `${backendUrl}/api/v2/addresses/filterUsed`,
+  checkAddressesInUse: FilterUsedRequest => Promise<FilterUsedResponse> = (body) => {
+    const { BackendService } = body.network.Backend;
+    if (BackendService == null) throw new Error(`${nameof(this.getUTXOsForAddresses)} missing backend url`);
+    return axios(
+      `${BackendService}/api/v2/addresses/filterUsed`,
       {
         method: 'post',
         timeout: CONFIG.app.walletRefreshInterval,
@@ -240,12 +256,14 @@ export class RemoteFetcher implements IFetcher {
       .catch((error) => {
         Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.checkAddressesInUse)} error: ` + stringifyError(error));
         throw new CheckAddressesInUseApiError();
-      })
-  )
+      });
+  }
 
-  getAccountState: AccountStateRequest => Promise<AccountStateResponse> = (body) => (
-    axios(
-      `${backendUrl}/api/v2/account/state`,
+  getAccountState: AccountStateRequest => Promise<AccountStateResponse> = (body) => {
+    const { BackendService } = body.network.Backend;
+    if (BackendService == null) throw new Error(`${nameof(this.getUTXOsForAddresses)} missing backend url`);
+    return axios(
+      `${BackendService}/api/v2/account/state`,
       {
         method: 'post',
         timeout: CONFIG.app.walletRefreshInterval,
@@ -277,12 +295,14 @@ export class RemoteFetcher implements IFetcher {
       .catch((error) => {
         Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getAccountState)} error: ` + stringifyError(error));
         throw new GetAccountStateApiError();
-      })
-  )
+      });
+  }
 
-  getPoolInfo: PoolInfoRequest => Promise<PoolInfoResponse> = (body) => (
-    axios(
-      `${backendUrl}/api/v2/pool/info`,
+  getPoolInfo: PoolInfoRequest => Promise<PoolInfoResponse> = (body) => {
+    const { BackendService } = body.network.Backend;
+    if (BackendService == null) throw new Error(`${nameof(this.getUTXOsForAddresses)} missing backend url`);
+    return axios(
+      `${BackendService}/api/v2/pool/info`,
       {
         method: 'post',
         timeout: CONFIG.app.walletRefreshInterval,
@@ -298,12 +318,14 @@ export class RemoteFetcher implements IFetcher {
       .catch((error) => {
         Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getPoolInfo)} error: ` + stringifyError(error));
         throw new GetPoolInfoApiError();
-      })
-  )
+      });
+  }
 
-  getReputation: ReputationRequest => Promise<ReputationResponse> = (_body) => (
-    axios(
-      `${backendUrl}/api/v2/pool/reputation`,
+  getReputation: ReputationRequest => Promise<ReputationResponse> = (body) => {
+    const { BackendService } = body.network.Backend;
+    if (BackendService == null) throw new Error(`${nameof(this.getUTXOsForAddresses)} missing backend url`);
+    return axios(
+      `${BackendService}/api/v2/pool/reputation`,
       {
         method: 'get',
         timeout: CONFIG.app.walletRefreshInterval,
@@ -316,6 +338,6 @@ export class RemoteFetcher implements IFetcher {
       .catch((error) => {
         Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getReputation)} error: ` + stringifyError(error));
         throw new GetReputationError();
-      })
-  )
+      });
+  }
 }

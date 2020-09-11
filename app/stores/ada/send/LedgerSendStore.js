@@ -225,6 +225,7 @@ export default class LedgerSendStore extends Store {
 
       await this.api.ada.broadcastLedgerSignedTx({
         signedTxRequest: {
+          network: request.network,
           id: txId,
           encodedTx: signedTx.to_bytes(),
         },

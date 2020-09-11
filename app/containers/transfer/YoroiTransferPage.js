@@ -50,6 +50,7 @@ import type {
 import {
   Bip44DerivationLevels,
 } from '../../api/ada/lib/storage/database/walletTypes/bip44/api/utils';
+import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 
 // Stay this long on the success page, then jump to the wallet transactions page
 const SUCCESS_PAGE_STAY_TIME = 5 * 1000;
@@ -118,6 +119,7 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
       throw new Error(`${nameof(this.transferFunds)} no wallet selected`);
     }
     await this.generated.actions.yoroiTransfer.transferFunds.trigger({
+      network: publicDeriver.getParent().getNetworkInfo(),
       next: async () => {
         const preRefreshTime = new Date().getTime();
         try {
@@ -367,6 +369,7 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
         transferFunds: {|
           trigger: (params: {|
             getDestinationAddress: void => Promise<{| ...Address, ...InexactSubset<Addressing> |}>,
+            network: $ReadOnly<NetworkRow>,
             next: void => Promise<void>,
             rebuildTx: boolean
           |}) => Promise<void>

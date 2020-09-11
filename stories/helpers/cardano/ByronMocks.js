@@ -65,7 +65,7 @@ function genByronSigningWallet(
         return WalletTypeOption.WEB_WALLET;
       })(),
       hardwareInfo,
-      networkInfo: networks.ByronMainnet,
+      networkInfo: networks.CardanoMainnet,
     },
     {
       ConceptualWalletId: conceptualWalletId,

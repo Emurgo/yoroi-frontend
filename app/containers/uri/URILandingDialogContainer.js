@@ -57,7 +57,7 @@ export default class URILandingDialogContainer extends Component<Props> {
     // assert not null
     const uriParams = this.generated.stores.loading.uriParams;
 
-    const network = networks.ByronMainnet; // todo: uri scheme for other networks
+    const network = networks.CardanoMainnet; // todo: uri scheme for other networks
     const selectedApiType = getApiForNetwork(network);
 
     const apiMeta = getApiMeta(selectedApiType);

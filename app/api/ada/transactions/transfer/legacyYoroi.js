@@ -13,6 +13,7 @@ import type {
 } from '../../lib/storage/models/PublicDeriver/interfaces';
 import { buildYoroiTransferTx as legacyFormatYoroiTx } from '../byron/yoroiTransfer';
 import { toSenderUtxos } from './utils';
+import type { NetworkRow } from '../../lib/storage/database/primitives/tables';
 
 export async function yoroiTransferTxFromAddresses(payload: {|
   addresses: Array<{| ...Address, ...Addressing |}>,
@@ -23,6 +24,7 @@ export async function yoroiTransferTxFromAddresses(payload: {|
   keyLevel: number,
   signingKey: RustModule.WalletV4.Bip32PrivateKey,
   getUTXOsForAddresses: AddressUtxoFunc,
+  network: $ReadOnly<NetworkRow>,
   absSlotNumber: BigNumber,
   protocolParams: {|
     keyDeposit: RustModule.WalletV4.BigNum,
@@ -33,6 +35,7 @@ export async function yoroiTransferTxFromAddresses(payload: {|
 |}): Promise<TransferTx> {
   const senderUtxos = await toSenderUtxos({
     addresses: payload.addresses,
+    network: payload.network,
     getUTXOsForAddresses: payload.getUTXOsForAddresses,
   });
   return legacyFormatYoroiTx({

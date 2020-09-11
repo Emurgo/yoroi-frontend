@@ -106,8 +106,9 @@ export default class JormungandrYoroiTransferStore extends Store {
     if (this.stores.profile.selectedNetwork == null) {
       throw new Error(`${nameof(JormungandrYoroiTransferStore)}::${nameof(this.generateTransferTx)} no network selected`);
     }
+    const { selectedNetwork } = this.stores.profile;
     const config = getJormungandrBaseConfig(
-      this.stores.profile.selectedNetwork
+      selectedNetwork
     ).reduce((acc, next) => Object.assign(acc, next), {});
 
     const transferTx = await yoroiTransferTxFromAddresses({
@@ -115,6 +116,7 @@ export default class JormungandrYoroiTransferStore extends Store {
       outputAddr: destinationAddress.address,
       keyLevel: Bip44DerivationLevels.ACCOUNT.level,
       signingKey: accountKey,
+      network: selectedNetwork,
       getUTXOsForAddresses:
         this.stores.substores.jormungandr.stateFetchStore.fetcher.getUTXOsForAddresses,
       useLegacyWitness: mode.type === 'bip44',

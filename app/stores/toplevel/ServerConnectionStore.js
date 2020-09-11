@@ -8,7 +8,7 @@ import environment from '../../environment';
 import type { ServerStatusResponse } from '../../api/common/lib/state-fetch/types';
 
 export default class ServerConnectionStore extends Store {
-  SERVER_STATUS_REFRESH_INTERVAL: number = environment.serverStatusRefreshInterval;
+  SERVER_STATUS_REFRESH_INTERVAL: number = environment.getServerStatusRefreshInterval();
 
   @observable serverStatus: ServerStatusErrorType = ServerStatusErrors.Healthy;
   @observable isMaintenance: boolean = false;

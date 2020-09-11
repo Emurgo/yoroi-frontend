@@ -37,8 +37,8 @@ import type {
   Address, Addressing
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 
+// populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
-const websocketUrl = CONFIG.network.websocketUrl;
 const MSG_TYPE_RESTORE = 'RESTORE';
 const WS_CODE_NORMAL_CLOSURE = 1000;
 
@@ -120,6 +120,9 @@ export default class DaedalusTransferStore extends Store {
     };
 
     this._updateStatus(TransferStatus.RESTORING_ADDRESSES);
+
+    const websocketUrl = publicDeriver.getParent().getNetworkInfo().Backend.WebSocket;
+    if (websocketUrl == null) throw new Error(`${nameof(this._setupTransferWebSocket)} no websocket backend for wallet`);
     runInAction(() => {
       this.ws = new WebSocket(websocketUrl);
     });
@@ -270,9 +273,11 @@ export default class DaedalusTransferStore extends Store {
       if (this.transferTx.id == null || this.transferTx.encodedTx == null) {
         throw new Error(`${nameof(DaedalusTransferStore)} transaction not signed`);
       }
+      const { id, encodedTx } = this.transferTx;
       await this.transferFundsRequest.execute({
-        id: this.transferTx.id,
-        encodedTx: this.transferTx.encodedTx,
+        network: payload.publicDeriver.getParent().getNetworkInfo(),
+        id,
+        encodedTx,
       });
       next();
       this._reset();

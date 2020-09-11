@@ -15,6 +15,7 @@ import type {
 import type {
   Address, Addressing
 } from '../../lib/storage/models/PublicDeriver/interfaces';
+import type { NetworkRow } from '../../lib/storage/database/primitives/tables';
 
 /**
  * merge in remote UTXO information into an address list
@@ -22,10 +23,12 @@ import type {
 export async function toSenderUtxos(payload: {|
   addresses: Array<{| ...Address, ...Addressing |}>,
   getUTXOsForAddresses: AddressUtxoFunc,
+  network: $ReadOnly<NetworkRow>
 |}): Promise<Array<AddressedUtxo>> {
   // fetch UTXO
   const utxos = await payload.getUTXOsForAddresses({
-    addresses: payload.addresses.map(addr => addr.address)
+    addresses: payload.addresses.map(addr => addr.address),
+    network: payload.network,
   });
 
   // add addressing info to the UTXO

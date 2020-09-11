@@ -21,6 +21,7 @@ import globalMessages from '../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { intlShape, } from 'react-intl';
 
+// populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
 
 export type GeneratedData = typeof UnmangleTxDialogContainer.prototype.generated;

@@ -31,8 +31,6 @@ export type AppConfigType = {|
 |}
 
 export type NetworkConfigType = {|
-  backendUrl: string,
-  websocketUrl: string,
   name: Network,
   priceBackendUrl: string,
 |};

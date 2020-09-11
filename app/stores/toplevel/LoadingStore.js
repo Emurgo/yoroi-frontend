@@ -74,7 +74,7 @@ export default class LoadingStore extends Store {
         await this.migrationRequest.execute({
           api: this.api,
           persistentDb,
-          currVersion: environment.version,
+          currVersion: environment.getVersion(),
         }).promise;
         await this.validateUriPath();
         runInAction(() => {
@@ -125,7 +125,7 @@ export default class LoadingStore extends Store {
         decodeURIComponent(this._originRoute.location),
         address => {
           // TODO: validation should be done based on wallet type
-          const addressKind = tryAddressToKind(address, 'bech32', networks.ByronMainnet);
+          const addressKind = tryAddressToKind(address, 'bech32', networks.CardanoMainnet);
           const valid = addressKind != null && addressKind === CoreAddressTypes.CARDANO_LEGACY;
           return Promise.resolve(valid);
         },

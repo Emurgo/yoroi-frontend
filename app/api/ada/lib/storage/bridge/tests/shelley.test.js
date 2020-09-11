@@ -201,7 +201,7 @@ async function syncingSimpleTransaction(
   const db = await loadLovefieldDB(schema.DataStoreType.MEMORY);
   const publicDeriver = await setup(db, TX_TEST_MNEMONIC_1, purposeForTest);
 
-  const network = networks.ByronMainnet;
+  const network = networks.CardanoMainnet;
   const txHistory = networkTransactions(purposeForTest);
   const checkAddressesInUse = genCheckAddressesInUse(txHistory, network);
   const getTransactionsHistoryForAddresses = genGetTransactionsHistoryForAddresses(

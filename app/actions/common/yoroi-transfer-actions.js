@@ -4,6 +4,7 @@ import type { RestoreModeType } from './wallet-restore-actions';
 import type {
   Address, Addressing
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
+import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 
 export default class YoroiTransferActions {
   startTransferFunds: Action<{|
@@ -24,6 +25,7 @@ export default class YoroiTransferActions {
   backToUninitialized: Action<void> = new Action();
   transferFunds: AsyncAction<{|
     next: void => Promise<void>,
+    network: $ReadOnly<NetworkRow>,
     getDestinationAddress: void => Promise<{| ...Address, ...InexactSubset<Addressing> |}>,
     rebuildTx: boolean,
   |}> = new AsyncAction();

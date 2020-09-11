@@ -5,12 +5,14 @@ import type { Node } from 'react';
 import styles from './WalletCurrency.scss';
 
 import SymbolADA from '../../../assets/images/my-wallets/symbol_ada.inline.svg';
+import SymbolTADA from '../../../assets/images/my-wallets/symbol_adaTestnet.inline.svg';
 import SymbolERG from '../../../assets/images/my-wallets/symbol_ergo.inline.svg';
 import SymbolBTC from '../../../assets/images/my-wallets/symbol_bitcoin.inline.svg';
 import SymbolETH from '../../../assets/images/my-wallets/symbol_ethereum.inline.svg';
 
 type Props = {|
   +currency: string,
+
   +tooltipText?: string | null,
 |};
 
@@ -28,6 +30,9 @@ export default class WalletCurrency extends Component<Props> {
     switch (currency) {
       case 'ADA':
         Icon = SymbolADA;
+        break;
+      case 'TADA':
+        Icon = SymbolTADA;
         break;
       case 'ERG':
         Icon = SymbolERG;

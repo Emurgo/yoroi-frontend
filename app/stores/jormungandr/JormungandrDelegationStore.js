@@ -49,8 +49,13 @@ export default class JormungandrDelegationStore extends Store {
       rewardHistory: new CachedRequest<RewardHistoryFunc>(async (address) => {
         // we need to defer this call because the store may not be initialized yet
         // by the time this constructor is called
+        const { BackendService } = publicDeriver.getParent().getNetworkInfo().Backend;
+        if (BackendService == null) throw new Error(`rewardHistory missing backend url`);
         const stateFetcher = this.stores.substores.jormungandr.stateFetchStore.fetcher;
-        const result = await stateFetcher.getRewardHistory({ addresses: [address] });
+        const result = await stateFetcher.getRewardHistory({
+          network: publicDeriver.getParent().getNetworkInfo(),
+          addresses: [address]
+        });
         return result[address] ?? [];
       }),
       error: undefined,
@@ -88,6 +93,7 @@ export default class JormungandrDelegationStore extends Store {
         try {
           const stateFetcher = this.stores.substores.jormungandr.stateFetchStore.fetcher;
           const accountStateResp = await stateFetcher.getAccountState({
+            network: publicDeriver.getParent().getNetworkInfo(),
             addresses: [stakingKeyResp.addr.Hash],
           });
           const stateForStakingKey = accountStateResp[stakingKeyResp.addr.Hash];
@@ -185,9 +191,12 @@ export default class JormungandrDelegationStore extends Store {
     );
     const stateFetcher = this.stores.substores.jormungandr.stateFetchStore.fetcher;
     const poolInfoResp = await stateFetcher.getPoolInfo({
+      network: request.network,
       ids: poolsToQuery,
     });
-    const reputation = await stateFetcher.getReputation();
+    const reputation = await stateFetcher.getReputation({
+      network: request.network,
+    });
     runInAction(() => {
       for (const poolId of Object.keys(poolInfoResp)) {
         const poolInfo = poolInfoResp[poolId];

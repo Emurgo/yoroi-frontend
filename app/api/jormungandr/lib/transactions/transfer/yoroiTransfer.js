@@ -29,7 +29,7 @@ import type {
   Address, Addressing
 } from '../../../../ada/lib/storage/models/PublicDeriver/interfaces';
 import { toSenderUtxos } from '../../../../ada/transactions/transfer/utils';
-import type { JormungandrFeeConfig } from '../../../../ada/lib/storage/database/primitives/tables';
+import type { NetworkRow, JormungandrFeeConfig } from '../../../../ada/lib/storage/database/primitives/tables';
 
 /**
  * Generate transaction including all addresses with no change.
@@ -100,12 +100,14 @@ export async function yoroiTransferTxFromAddresses(payload: {|
   outputAddr: string,
   keyLevel: number,
   signingKey: RustModule.WalletV3.Bip32PrivateKey,
+  network: $ReadOnly<NetworkRow>,
   getUTXOsForAddresses: AddressUtxoFunc,
   useLegacyWitness: boolean,
   genesisHash: string,
   feeConfig: JormungandrFeeConfig,
 |}): Promise<TransferTx> {
   const senderUtxos = await toSenderUtxos({
+    network: payload.network,
     addresses: payload.addresses,
     getUTXOsForAddresses: payload.getUTXOsForAddresses,
   });

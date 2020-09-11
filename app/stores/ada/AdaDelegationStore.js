@@ -60,7 +60,10 @@ export default class AdaDelegationStore extends Store {
         // we need to defer this call because the store may not be initialized yet
         // by the time this constructor is called
         const stateFetcher = this.stores.substores.ada.stateFetchStore.fetcher;
-        const result = await stateFetcher.getRewardHistory({ addresses: [address] });
+        const result = await stateFetcher.getRewardHistory({
+          network: publicDeriver.getParent().getNetworkInfo(),
+          addresses: [address],
+        });
         return result[address] ?? [];
       }),
       error: undefined,
@@ -101,6 +104,7 @@ export default class AdaDelegationStore extends Store {
         try {
           const stateFetcher = this.stores.substores.ada.stateFetchStore.fetcher;
           const accountStateResp = await stateFetcher.getAccountState({
+            network: publicDeriver.getParent().getNetworkInfo(),
             addresses: [stakingKeyResp.addr.Hash],
           });
           const stateForStakingKey = accountStateResp[stakingKeyResp.addr.Hash];
@@ -238,6 +242,7 @@ export default class AdaDelegationStore extends Store {
     );
     const stateFetcher = this.stores.substores.ada.stateFetchStore.fetcher;
     const poolInfoResp = await stateFetcher.getPoolInfo({
+      network: request.network,
       poolIds: poolsToQuery,
     });
     runInAction(() => {

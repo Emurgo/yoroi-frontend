@@ -27,7 +27,7 @@ export function getTrezorManifest(): Manifest {
   const trezorManifest: Manifest = {
     email: manifest.EMAIL,
     appUrl: (() => {
-      if (environment.userAgentInfo.isFirefox) {
+      if (environment.userAgentInfo.isFirefox()) {
         // Set appUrl for `moz-extension:` protocol using browser (like Firefox)
         return manifest.appURL.FIREFOX;
       }

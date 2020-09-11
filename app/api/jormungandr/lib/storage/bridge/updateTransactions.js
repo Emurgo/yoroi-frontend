@@ -124,7 +124,7 @@ import type {
 } from '../../../../common/lib/state-fetch/currencySpecificTypes';
 import { addressToKind } from '../../../../ada/lib/storage/bridge/utils';
 import { getFromUserPerspective, } from '../../../../ada/transactions/utils';
-import environment from '../../../../../environment';
+import type { AddressDiscriminationType, } from '@emurgo/js-chain-libs/js_chain_libs';
 import { getJormungandrBaseConfig, } from '../../../../ada/lib/storage/database/prepackaged/networks';
 
 async function rawGetAllTxIds(
@@ -948,7 +948,11 @@ async function rawUpdateTransactions(
   );
   // 1) Check if backend is synced (avoid rollbacks if backend has to resync from block 1)
 
-  const bestBlock = await getBestBlock();
+  const { BackendService } = publicDeriver.getParent().getNetworkInfo().Backend;
+  if (BackendService == null) throw new Error(`${nameof(rawUpdateTransactions)} missing backend url`);
+  const bestBlock = await getBestBlock({
+    network: publicDeriver.getParent().getNetworkInfo(),
+  });
   const slotInRemote = (bestBlock.epoch == null || bestBlock.slot == null)
     ? null
     : toAbsoluteSlotNumber({
@@ -1034,6 +1038,7 @@ async function rawUpdateTransactions(
       };
     const txsFromNetwork = await getTransactionsHistoryForAddresses({
       ...requestKind,
+      network: publicDeriver.getParent().getNetworkInfo(),
       addresses: [
         ...utxoAddresses
           // Note: don't send group keys
@@ -1330,6 +1335,10 @@ async function networkTxToDbTx(
     return id;
   };
 
+  const config = getJormungandrBaseConfig(
+    network
+  ).reduce((acc, next) => Object.assign(acc, next), {});
+
   const result = [];
   for (const networkTx of newTxs) {
     const { block, transaction } = networkTxHeaderToDb(
@@ -1346,6 +1355,7 @@ async function networkTxToDbTx(
       : [await certificateToDb(
         db, dbTx,
         {
+          discriminant: config.Discriminant,
           certificate: networkTx.certificate,
           hashToIds,
           derivationTables,
@@ -1547,6 +1557,7 @@ async function certificateToDb(
   db: lf$Database,
   dbTx: lf$Transaction,
   request: {|
+    discriminant: AddressDiscriminationType,
     certificate: RemoteCertificate,
     hashToIds: HashToIdsFunc,
     derivationTables: Map<number, string>,
@@ -1555,8 +1566,7 @@ async function certificateToDb(
 ): Promise<number => AddCertificateRequest> {
   const accountToId = async (account: RustModule.WalletV3.Account): Promise<number> => {
     const address = account.to_address(
-      // TODO: should come from the public deriver, not environment
-      environment.getDiscriminant(),
+      request.discriminant,
     );
     const hash = Buffer.from(address.as_bytes()).toString('hex');
     const idMap = await request.hashToIds({

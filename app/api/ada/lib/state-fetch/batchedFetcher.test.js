@@ -26,9 +26,10 @@ import {
   networks,
 } from '../storage/database/prepackaged/networks';
 
+// populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
 
-const network = networks.ByronMainnet;
+const network = networks.CardanoMainnet;
 
 beforeAll(async () => {
   await RustModule.load();
@@ -109,6 +110,7 @@ test('Batched history pagination', async (done) => {
     genGetTransactionsHistoryForAddresses(transactions, network)
   );
   const result = await getTransactionsHistoryForAddresses({
+    network,
     addresses,
     untilBlock: transactions[transactions.length - 1].block_hash || ''
   });
@@ -203,6 +205,7 @@ test('Batched history edge case: full response with a pending transaction', asyn
     genGetTransactionsHistoryForAddresses(transactions, network)
   );
   const result = await getTransactionsHistoryForAddresses({
+    network,
     addresses,
     untilBlock: transactions.filter(tx => tx.block_hash != null).slice(-1)[0].block_hash || ''
   });

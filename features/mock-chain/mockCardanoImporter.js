@@ -1877,16 +1877,17 @@ function getApiStatus(): ServerStatusResponse {
 
 const usedAddresses: FilterFunc = genCheckAddressesInUse(
   transactions,
-  networks.ByronMainnet,
+  networks.CardanoMainnet,
 );
 const history: HistoryFunc = genGetTransactionsHistoryForAddresses(
   transactions,
-  networks.ByronMainnet,
+  networks.CardanoMainnet,
 );
 const getBestBlock: BestBlockFunc = genGetBestBlock(transactions);
 const utxoForAddresses: AddressUtxoFunc = genUtxoForAddresses(
   history,
   getBestBlock,
+  networks.CardanoMainnet,
 );
 const utxoSumForAddresses: UtxoSumFunc = genUtxoSumForAddresses(utxoForAddresses);
 const sendTx = (request: SignedRequestInternal): SignedResponse => {

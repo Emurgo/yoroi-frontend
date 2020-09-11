@@ -229,9 +229,8 @@ export default class AdaYoroiTransferStore extends Store {
     if (this.stores.profile.selectedNetwork == null) {
       throw new Error(`${nameof(AdaYoroiTransferStore)}::${nameof(this._restoreWalletForTransfer)} no network selected`);
     }
-    const fullConfig = getCardanoHaskellBaseConfig(
-      this.stores.profile.selectedNetwork
-    );
+    const { selectedNetwork } = this.stores.profile;
+    const fullConfig = getCardanoHaskellBaseConfig(selectedNetwork);
     const config = fullConfig.reduce((acc, next) => Object.assign(acc, next), {});
 
     // note: no wallet selected so we call this directly
@@ -242,6 +241,7 @@ export default class AdaYoroiTransferStore extends Store {
       outputAddr: destinationAddress,
       keyLevel: Bip44DerivationLevels.ACCOUNT.level,
       signingKey: accountKey,
+      network: selectedNetwork,
       getUTXOsForAddresses:
         this.stores.substores.ada.stateFetchStore.fetcher.getUTXOsForAddresses,
       protocolParams: {

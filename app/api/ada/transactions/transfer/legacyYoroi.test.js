@@ -32,7 +32,7 @@ beforeAll(async () => {
   silenceLogsForTesting();
 });
 
-const network = networks.ByronMainnet;
+const network = networks.CardanoMainnet;
 
 function getProtocolParams(): {|
   keyDeposit: RustModule.WalletV4.BigNum,
@@ -109,13 +109,14 @@ describe('Haskell Shelley era tx format tests', () => {
       amount: inputAmount
     };
 
-    const baseConfig = networks.ByronMainnet.BaseConfig[0];
+    const baseConfig = networks.CardanoMainnet.BaseConfig[0];
     if (baseConfig.ByronNetworkId == null) {
       throw new Error(`missing Byron network id`);
     }
 
     const transferInfo = await yoroiTransferTxFromAddresses({
       addresses: [addr1, addr2],
+      network,
       getUTXOsForAddresses: (_addresses) => Promise.resolve([utxo]),
       keyLevel: Bip44DerivationLevels.ACCOUNT.level,
       signingKey: accountPrivateKey,

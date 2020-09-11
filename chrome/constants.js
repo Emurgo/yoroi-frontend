@@ -4,12 +4,8 @@ import {
   Ports,
   portToPermission,
   portToSocketPermission,
+  serverToPermission
 } from '../scripts/connections';
-
-export const Version = {
-  Shelley: '2.7.15',
-  Byron: '3.5.1',
-};
 
 export function genCSP(request: {|
   isDev: boolean,
@@ -45,6 +41,9 @@ export function genCSP(request: {|
 
     imgSrc.push(portToPermission(Ports.WebpackDev));
   }
+
+  // this allows connecting to multiple different backends for different currencies
+  connectSrc.push(serverToPermission('*.yoroiwallet.com'));
 
   // connectSrc.push('https://api.dropboxapi.com');
   // connectSrc.push('https://content.dropboxapi.com');

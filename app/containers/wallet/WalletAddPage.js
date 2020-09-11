@@ -134,7 +134,8 @@ export default class WalletAddPage extends Component<Props> {
     if (uiDialogs.hasOpen && selectedNetwork == null) {
       activeDialog = (<PickCurrencyDialogContainer
         onClose={this.onClose}
-        onCardano={() => actions.profile.setSelectedNetwork.trigger(networks.ByronMainnet)}
+        onCardano={() => actions.profile.setSelectedNetwork.trigger(networks.CardanoMainnet)}
+        onCardanoTestnet={() => actions.profile.setSelectedNetwork.trigger(networks.CardanoTestnet)}
         onErgo={uiDialogs.isOpen(WalletConnectHWOptionDialog)
           ? undefined
           : () => actions.profile.setSelectedNetwork.trigger(networks.ErgoMainnet)}

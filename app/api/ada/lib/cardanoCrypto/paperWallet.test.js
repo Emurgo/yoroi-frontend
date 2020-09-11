@@ -141,7 +141,7 @@ test('Unscramble Yoroi paper matches expected address', async () => {
     VALID_YOROI_PAPER.password
   );
 
-  const baseConfig = networks.ByronMainnet.BaseConfig[0];
+  const baseConfig = networks.CardanoMainnet.BaseConfig[0];
   if (baseConfig.ByronNetworkId == null) {
     throw new Error(`missing Byron network id`);
   }

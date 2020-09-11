@@ -46,6 +46,7 @@ import ComplexityLevelPage from './containers/profile/ComplexityLevelPage';
 import BlockchainSettingsPage from './containers/settings/categories/BlockchainSettingsPage';
 import WalletSwitch from './containers/WalletSwitch';
 
+// populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
 
 /* eslint-disable max-len */

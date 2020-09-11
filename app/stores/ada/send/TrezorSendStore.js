@@ -100,9 +100,10 @@ export default class TrezorSendStore extends Store {
     publicDeriver: PublicDeriver<>,
   |} => Promise<{| txId: string |}> = async (request) => {
     try {
+      const network = request.publicDeriver.getParent().getNetworkInfo();
       const trezorSignTxDataResp = await this.api.ada.createTrezorSignTxData({
         ...request.params,
-        network: request.publicDeriver.getParent().getNetworkInfo(),
+        network,
       });
 
       const trezorSignTxResp = await wrapWithFrame(trezor => trezor.cardanoSignTransaction(
@@ -119,6 +120,7 @@ export default class TrezorSendStore extends Store {
 
       return await this.api.ada.broadcastTrezorSignedTx({
         signedTxRequest: {
+          network,
           id: trezorSignTxResp.payload.hash,
           encodedTx: Buffer.from(trezorSignTxResp.payload.serializedTx, 'hex'),
         },

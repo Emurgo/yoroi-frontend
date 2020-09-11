@@ -21,10 +21,12 @@ import type {
   TreeInsert, InsertRequest,
 } from '../../lib/storage/database/walletTypes/common/utils';
 import type { AddByHashFunc, } from '../../../common/lib/storage/bridge/hashMapper';
-import type { CanonicalAddressInsert } from '../../lib/storage/database/primitives/tables';
+import type { NetworkRow, CanonicalAddressInsert } from '../../lib/storage/database/primitives/tables';
 import { CoreAddressTypes } from '../../lib/storage/database/primitives/enums';
 import type { Bip44ChainInsert } from '../../lib/storage/database/walletTypes/common/tables';
+import { getCardanoHaskellBaseConfig } from '../../lib/storage/database/prepackaged/networks';
 
+// populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
 const addressRequestSize = CONFIG.app.addressRequestSize;
 
@@ -138,6 +140,7 @@ async function scanChain(request: {|
   checkAddressesInUse: FilterFunc,
   stakingKey: RustModule.WalletV4.PublicKey,
   addByHash: AddByHashFunc,
+  network: $ReadOnly<NetworkRow>,
 |}): Promise<TreeInsert<CanonicalAddressInsert>> {
   const addresses = await discoverAllAddressesFrom(
     request.generateAddressFunc,
@@ -145,6 +148,7 @@ async function scanChain(request: {|
     BIP44_SCAN_SIZE,
     addressRequestSize,
     request.checkAddressesInUse,
+    request.network,
   );
 
   /**
@@ -173,32 +177,37 @@ export async function scanShelleyCip1852Account(request: {|
   accountPublicKey: string,
   lastUsedInternal: number,
   lastUsedExternal: number,
+  network: $ReadOnly<NetworkRow>,
   checkAddressesInUse: FilterFunc,
   addByHash: AddByHashFunc,
   stakingKey: RustModule.WalletV4.PublicKey,
-  chainNetworkId: number,
 |}): Promise<TreeInsert<Bip44ChainInsert>> {
   const key = RustModule.WalletV4.Bip32PublicKey.from_bytes(
     Buffer.from(request.accountPublicKey, 'hex'),
   );
 
+  const config = getCardanoHaskellBaseConfig(
+    request.network
+  ).reduce((acc, next) => Object.assign(acc, next), {});
+
   const insert = await scanAccount({
     generateInternalAddresses: genBaseAddressBatchFunc(
       key.derive(ChainDerivations.INTERNAL),
       request.stakingKey,
-      request.chainNetworkId,
+      Number.parseInt(config.ChainNetworkId, 10),
     ),
     generateExternalAddresses: genBaseAddressBatchFunc(
       key.derive(ChainDerivations.EXTERNAL),
       request.stakingKey,
-      request.chainNetworkId,
+      Number.parseInt(config.ChainNetworkId, 10),
     ),
     lastUsedInternal: request.lastUsedInternal,
     lastUsedExternal: request.lastUsedExternal,
+    network: request.network,
     checkAddressesInUse: request.checkAddressesInUse,
     addByHash: request.addByHash,
     stakingKey: request.stakingKey,
-    chainNetworkId: request.chainNetworkId,
+    chainNetworkId: Number.parseInt(config.ChainNetworkId, 10),
   });
   return insert;
 }
@@ -207,6 +216,7 @@ async function scanAccount(request: {|
   generateExternalAddresses: GenerateAddressFunc,
   lastUsedInternal: number,
   lastUsedExternal: number,
+  network: $ReadOnly<NetworkRow>,
   checkAddressesInUse: FilterFunc,
   addByHash: AddByHashFunc,
   stakingKey: RustModule.WalletV4.PublicKey,
@@ -215,6 +225,7 @@ async function scanAccount(request: {|
   const externalAddresses = await scanChain({
     generateAddressFunc: request.generateExternalAddresses,
     lastUsedIndex: request.lastUsedExternal,
+    network: request.network,
     checkAddressesInUse: request.checkAddressesInUse,
     addByHash: request.addByHash,
     stakingKey: request.stakingKey,
@@ -222,6 +233,7 @@ async function scanAccount(request: {|
   const internalAddresses = await scanChain({
     generateAddressFunc: request.generateInternalAddresses,
     lastUsedIndex: request.lastUsedInternal,
+    network: request.network,
     checkAddressesInUse: request.checkAddressesInUse,
     addByHash: request.addByHash,
     stakingKey: request.stakingKey,

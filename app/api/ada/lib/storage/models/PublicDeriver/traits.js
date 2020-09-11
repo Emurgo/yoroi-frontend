@@ -143,7 +143,7 @@ export const HasPrivateDeriver: * = Mixin<
 >(HasPrivateDeriverMixin);
 export function asHasPrivateDeriver<Wrapper: ConceptualWallet, Rest=Empty>(
   obj: IPublicDeriver<Wrapper> & Rest
-): void | (IPublicDeriver<Wrapper & IHasLevels> & Rest) {
+): void | (IPublicDeriver<Wrapper & IHasPrivateDeriver> & Rest) {
   if (obj instanceof HasPrivateDeriver) {
     return obj;
   }
@@ -1462,6 +1462,7 @@ const ScanLegacyCardanoUtxoMixin = (
         key.bip44_chain(true),
         ByronNetworkId,
       ),
+      network,
       lastUsedInternal: body.lastUsedInternal,
       lastUsedExternal: body.lastUsedExternal,
       checkAddressesInUse: body.checkAddressesInUse,
@@ -1535,6 +1536,7 @@ const ScanJormungandrUtxoMixin = (
       accountPublicKey: body.accountPublicKey,
       lastUsedInternal: body.lastUsedInternal,
       lastUsedExternal: body.lastUsedExternal,
+      network: this.getParent().getNetworkInfo(),
       checkAddressesInUse: body.checkAddressesInUse,
       addByHash: rawGenAddByHash(
         new Set([
@@ -1608,16 +1610,13 @@ const ScanShelleyUtxoMixin = (
     });
 
     const network = this.getParent().getNetworkInfo();
-    if (network.BaseConfig[0].ByronNetworkId == null) {
-      throw new Error(`${nameof(ScanLegacyCardanoUtxo)}::${nameof(this.rawScanAccount)} missing Byron network id`);
-    }
-    const { ChainNetworkId } = network.BaseConfig[0];
 
     return await scanShelleyCip1852Account({
       accountPublicKey: body.accountPublicKey,
       lastUsedInternal: body.lastUsedInternal,
       lastUsedExternal: body.lastUsedExternal,
       checkAddressesInUse: body.checkAddressesInUse,
+      network,
       addByHash: rawGenAddByHash(
         new Set([
           ...body.internalAddresses,
@@ -1625,7 +1624,6 @@ const ScanShelleyUtxoMixin = (
         ])
       ),
       stakingKey: stakingKey.to_raw_key(),
-      chainNetworkId: Number.parseInt(ChainNetworkId, 10),
     });
   }
 });
@@ -1681,6 +1679,7 @@ const ScanErgoUtxoMixin = (
       ),
       lastUsedInternal: body.lastUsedInternal,
       lastUsedExternal: body.lastUsedExternal,
+      network: this.getParent().getNetworkInfo(),
       checkAddressesInUse: body.checkAddressesInUse,
       addByHash: rawGenAddByHash(
         new Set([

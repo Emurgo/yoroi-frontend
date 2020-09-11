@@ -120,7 +120,7 @@ export default class AboutYoroiSettingsBlock extends Component<{||}> {
 
         <p className={styles.aboutLine}>
           <strong>{intl.formatMessage(messages.networkLabel)}</strong>&nbsp;
-          {environment.NETWORK}
+          {environment.getNetworkName()}
         </p>
         <div className={styles.aboutLine}>
           <strong>{intl.formatMessage(messages.versionLabel)}</strong>&nbsp;
@@ -132,7 +132,7 @@ export default class AboutYoroiSettingsBlock extends Component<{||}> {
             onExternalLinkClick={handleExternalLinkClick}
           >
             <RawHash light={false}>
-              {environment.version}
+              {environment.getVersion()}
             </RawHash>
           </ExplorableHash>
         </div>

@@ -95,7 +95,7 @@ export default class BlockchainSettingsPage extends Component<InjectedOrGenerate
       ? (
         <UriSettingsBlock
           registerUriScheme={() => registerProtocols()}
-          isFirefox={environment.userAgentInfo.isFirefox}
+          isFirefox={environment.userAgentInfo.isFirefox()}
         />
       )
       : null;
