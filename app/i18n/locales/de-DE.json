@@ -131,7 +131,7 @@
   "global.unit.ada": "Ada",
   "global.uriExplanation": "Diese ermöglichen es Dir sehr einfach Rechnungen mit Freunden und Geschäftspartnern durch einfaches Klicken auf eine URL zu teilen.",
   "global.uriSchemeTitleLabel": "Cardano Zahlungs-URLs",
-  "global.wrongNetwork.address": "Wrong network for address.",
+  "global.wrongNetwork.address": "Falsches Netzwerk für diese Adresse.",
   "incorrectTime.line1": "ACHTUNG: Die Zeit deines Computers stimmt nicht mit der des Servers überein. Das kann unerwartete Ergebnisse haben",
   "incorrectTime.line2": "Zeitdifferenz: ",
   "incorrectTime.line3": "Synchronisiere die Zeit auf Deinem Gerät um das Problem zu beheben",
