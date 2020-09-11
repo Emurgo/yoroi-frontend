@@ -60,7 +60,7 @@ export class RemoteFetcher implements IFetcher {
       `${getEndpoint()}/api/status`,
       {
         method: 'get',
-        timeout: CONFIG.app.walletRefreshInterval,
+        timeout: 2 * CONFIG.app.walletRefreshInterval,
         headers: {
           'yoroi-version': `${this.getPlatform()} / ${this.getLastLaunchVersion()}`,
           'yoroi-locale': this.getCurrentLocale(),
@@ -77,7 +77,7 @@ export class RemoteFetcher implements IFetcher {
     axios(`${priceBackendUrl}/price/${body.from}/current`,
       {
         method: 'get',
-        timeout: CONFIG.app.walletRefreshInterval,
+        timeout: 2 * CONFIG.app.walletRefreshInterval,
         headers: {
           'yoroi-version': this.getLastLaunchVersion(),
           'yoroi-locale': this.getCurrentLocale()
@@ -95,7 +95,7 @@ export class RemoteFetcher implements IFetcher {
     axios(`${priceBackendUrl}/price/${body.from}/${body.timestamps.join(',')}`,
       {
         method: 'get',
-        timeout: CONFIG.app.walletRefreshInterval,
+        timeout: 2 * CONFIG.app.walletRefreshInterval,
         headers: {
           'yoroi-version': this.getLastLaunchVersion(),
           'yoroi-locale': this.getCurrentLocale()
