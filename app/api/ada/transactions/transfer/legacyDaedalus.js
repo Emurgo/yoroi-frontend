@@ -23,6 +23,7 @@ import { buildDaedalusTransferTx } from '../byron/daedalusTransfer';
 import type {
   Address, Addressing,
 } from '../../lib/storage/models/PublicDeriver/interfaces';
+import type { NetworkRow } from '../../lib/storage/database/primitives/tables';
 
 /**
  * Go through the whole UTXO and find the addresses that belong to the user along with the keys
@@ -53,11 +54,11 @@ export function getAddressesKeys(payload: {|
 
 export async function toSenderUtxos(payload: {|
   addressKeys: AddressKeyMap,
-  backendUrl: string,
+  network: $ReadOnly<NetworkRow>,
   getUTXOsForAddresses: AddressUtxoFunc,
 |}): Promise<AddressUtxoResponse> {
   const senderUtxos = await payload.getUTXOsForAddresses({
-    backendUrl: payload.backendUrl,
+    network: payload.network,
     addresses: Object.keys(payload.addressKeys)
   });
 
@@ -76,7 +77,7 @@ export async function daedalusTransferTxFromAddresses(payload: {|
     ...Address,
     ...InexactSubset<Addressing>,
   |},
-  backendUrl: string,
+  network: $ReadOnly<NetworkRow>,
   getUTXOsForAddresses: AddressUtxoFunc,
   absSlotNumber: BigNumber,
   protocolParams: {|
@@ -87,7 +88,7 @@ export async function daedalusTransferTxFromAddresses(payload: {|
   |}
 |}): Promise<TransferTx> {
   const senderUtxos = await toSenderUtxos({
-    backendUrl: payload.backendUrl,
+    network: payload.network,
     addressKeys: payload.addressKeys,
     getUTXOsForAddresses: payload.getUTXOsForAddresses,
   });

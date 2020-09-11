@@ -783,6 +783,7 @@ export default class AdaApi {
       );
 
       const response = request.sendTx({
+        network: request.publicDeriver.getParent().getNetworkInfo(),
         id: Buffer.from(
           RustModule.WalletV4.hash_transaction(signedTx.body()).to_bytes()
         ).toString('hex'),
@@ -1222,6 +1223,7 @@ export default class AdaApi {
         }
       }
       const accountStates = await request.getAccountState({
+        network: request.publicDeriver.getParent().getNetworkInfo(),
         addresses: request.withdrawals.map(withdrawal => withdrawal.rewardAddress)
       });
       const finalWithdrawals = Object.keys(accountStates).reduce(
@@ -1513,6 +1515,7 @@ export default class AdaApi {
           RustModule.WalletV2.DerivationScheme.v2(),
         );
         insertTree = await scanBip44Account({
+          network: request.network,
           generateInternalAddresses: v2genAddressBatchFunc(
             key.bip44_chain(false),
             config.ByronNetworkId,
@@ -1534,13 +1537,13 @@ export default class AdaApi {
           .to_raw_key();
 
         const cip1852InsertTree = await scanShelleyCip1852Account({
+          network: request.network,
           accountPublicKey: Buffer.from(request.accountPubKey.as_bytes()).toString('hex'),
           lastUsedInternal: -1,
           lastUsedExternal: -1,
           checkAddressesInUse,
           addByHash,
           stakingKey,
-          chainNetworkId: Number.parseInt(config.ChainNetworkId, 10),
         });
 
         insertTree = cip1852InsertTree.filter(child => (
@@ -1654,6 +1657,7 @@ export default class AdaApi {
         }
       }));
       const utxos = await toSenderUtxos({
+        network: request.network,
         addresses,
         getUTXOsForAddresses: request.getUTXOsForAddresses,
       });

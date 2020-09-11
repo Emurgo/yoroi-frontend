@@ -287,10 +287,8 @@ export default class YoroiTransferStore extends Store {
           }
           const { id, encodedTx } = transferTx;
           try {
-            const { BackendService } = payload.network.Backend;
-            if (BackendService == null) throw new Error(`${nameof(this._transferFunds)} missing backend url`);
             const txId = await this.stores.substores.ada.stateFetchStore.fetcher.sendTx({
-              backendUrl: BackendService,
+              network: payload.network,
               id,
               encodedTx,
             });

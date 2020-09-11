@@ -9,16 +9,18 @@ import type {
 import type { AddressKeyMap } from '../../../../ada/transactions/types';
 import { buildDaedalusTransferTx } from '../daedalusTransfer';
 import { toSenderUtxos } from '../../../../ada/transactions/transfer/legacyDaedalus';
-import type { JormungandrFeeConfig } from '../../../../ada/lib/storage/database/primitives/tables';
+import type { NetworkRow, JormungandrFeeConfig } from '../../../../ada/lib/storage/database/primitives/tables';
 
 export async function daedalusTransferTxFromAddresses(payload: {|
   addressKeys: AddressKeyMap,
   outputAddr: string,
+  network: $ReadOnly<NetworkRow>,
   getUTXOsForAddresses: AddressUtxoFunc,
   genesisHash: string,
   feeConfig: JormungandrFeeConfig,
 |}): Promise<TransferTx> {
   const senderUtxos = await toSenderUtxos({
+    network: payload.network,
     addressKeys: payload.addressKeys,
     getUTXOsForAddresses: payload.getUTXOsForAddresses,
   });

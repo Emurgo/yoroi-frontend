@@ -59,11 +59,9 @@ export default class AdaDelegationStore extends Store {
       rewardHistory: new CachedRequest<RewardHistoryFunc>(async (address) => {
         // we need to defer this call because the store may not be initialized yet
         // by the time this constructor is called
-        const { BackendService } = publicDeriver.getParent().getNetworkInfo().Backend;
-        if (BackendService == null) throw new Error(`rewardHistory missing backend url`);
         const stateFetcher = this.stores.substores.ada.stateFetchStore.fetcher;
         const result = await stateFetcher.getRewardHistory({
-          backendUrl: BackendService,
+          network: publicDeriver.getParent().getNetworkInfo(),
           addresses: [address],
         });
         return result[address] ?? [];
@@ -87,8 +85,6 @@ export default class AdaDelegationStore extends Store {
   ) => {
     const delegationRequest = this.stores.delegation.getDelegationRequests(publicDeriver);
     if (delegationRequest == null) return;
-    const { BackendService } = publicDeriver.getParent().getNetworkInfo().Backend;
-    if (BackendService == null) throw new Error(`${nameof(this.refreshDelegation)} missing backend url`);
 
     try {
       delegationRequest.getDelegatedBalance.reset();
@@ -108,7 +104,7 @@ export default class AdaDelegationStore extends Store {
         try {
           const stateFetcher = this.stores.substores.ada.stateFetchStore.fetcher;
           const accountStateResp = await stateFetcher.getAccountState({
-            backendUrl: BackendService,
+            network: publicDeriver.getParent().getNetworkInfo(),
             addresses: [stakingKeyResp.addr.Hash],
           });
           const stateForStakingKey = accountStateResp[stakingKeyResp.addr.Hash];
@@ -244,11 +240,9 @@ export default class AdaDelegationStore extends Store {
     const poolsToQuery = request.allPoolIds.filter(
       pool => !poolsCachedForNetwork.has(pool)
     );
-    const { BackendService } = request.network.Backend;
-    if (BackendService == null) throw new Error(`${nameof(this.updatePoolInfo)} missing backend url`);
     const stateFetcher = this.stores.substores.ada.stateFetchStore.fetcher;
     const poolInfoResp = await stateFetcher.getPoolInfo({
-      backendUrl: BackendService,
+      network: request.network,
       poolIds: poolsToQuery,
     });
     runInAction(() => {

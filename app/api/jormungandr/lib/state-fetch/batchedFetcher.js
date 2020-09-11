@@ -122,7 +122,7 @@ function batchUTXOsForAddresses(
       // convert chunks into list of Promises that call the backend-service
       const promises = groupsOfAddresses
         .map(groupOfAddresses => getUTXOsForAddresses({
-          backendUrl: body.backendUrl,
+          network: body.network,
           addresses: groupOfAddresses,
         }));
 
@@ -148,7 +148,7 @@ export function batchGetUTXOsSumsForAddresses(
       const groupsOfAddresses = chunk(body.addresses, addressesLimit);
       const promises =
         groupsOfAddresses.map(groupOfAddresses => getUTXOsSumsForAddresses({
-          backendUrl: body.backendUrl,
+          network: body.network,
           addresses: groupOfAddresses,
         }));
       const partialAmounts: Array<UtxoSumResponse> = await Promise.all(promises);
@@ -184,7 +184,7 @@ export function batchGetRewardHistory(
       const chimericAccountAddresses = chunk(body.addresses, addressesLimit);
       const chimericAccountPromises = chimericAccountAddresses.map(
         addr => getRewardHistory({
-          backendUrl: body.backendUrl,
+          network: body.network,
           addresses: addr,
         })
       );
@@ -293,7 +293,7 @@ export function batchCheckAddressesInUse(
       const groupsOfAddresses = chunk(body.addresses, addressesLimit);
       const groupedAddrPromises = groupsOfAddresses.map(
         addr => checkAddressesInUse({
-          backendUrl: body.backendUrl,
+          network: body.network,
           addresses: addr,
         })
       );
@@ -315,7 +315,7 @@ export function batchGetAccountState(
       const chimericAccountAddresses = chunk(body.addresses, addressesLimit);
       const chimericAccountPromises = chimericAccountAddresses.map(
         addr => getAccountState({
-          backendUrl: body.backendUrl,
+          network: body.network,
           addresses: addr,
         })
       );
@@ -337,7 +337,7 @@ export function batchGetPoolInfo(
       const poolIds = chunk(body.ids, addressesLimit);
       const poolInfoPromises = poolIds.map(
         addr => getPoolInfo({
-          backendUrl: body.backendUrl,
+          network: body.network,
           ids: addr,
         })
       );

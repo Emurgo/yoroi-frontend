@@ -3,7 +3,6 @@
 import { observable, action, runInAction, } from 'mobx';
 import Store from '../base/Store';
 
-import environment from '../../environment';
 import type {
   WalletRestoreMeta,
   RestoreModeType,
@@ -265,7 +264,8 @@ export function generatePlates(
       v4Bip32PrivateToV3(rootPk),
       accountIndex - HARD_DERIVATION_START,
       addressCount,
-      environment.getDiscriminant(),
+      // recall: ITN used the test discriminant
+      RustModule.WalletV3.AddressDiscrimination.Test,
     )
     : undefined;
 

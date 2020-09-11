@@ -5,6 +5,7 @@ import { range } from 'lodash';
 import type {
   FilterFunc,
 } from '../state-fetch/currencySpecificTypes';
+import type { NetworkRow } from '../../../ada/lib/storage/database/primitives/tables';
 
 type AddressInfo = {|
   address: string,
@@ -25,7 +26,7 @@ export async function discoverAllAddressesFrom(
   scanSize: number,
   requestSize: number,
   checkAddressesInUse: FilterFunc,
-  backendUrl: string,
+  network: $ReadOnly<NetworkRow>,
 ): Promise<Array<string>> {
   let fetchedAddressesInfo: Array<AddressInfo> = [];
   let highestUsedIndex = initialHighestUsedIndex;
@@ -43,7 +44,7 @@ export async function discoverAllAddressesFrom(
         scanSize,
         requestSize,
         checkAddressesInUse,
-        backendUrl,
+        network,
       );
 
     const newHighestUsedIndex = _findNewHighestIndex(
@@ -109,7 +110,7 @@ async function _scanNextBatch(
   scanSize: number,
   requestSize: number,
   checkAddressesInUse: FilterFunc,
-  backendUrl: string,
+  network: $ReadOnly<NetworkRow>,
 ): Promise<Array<AddressInfo>> {
   /* Optimization: use `requestSize` to batch calls to crypto backend and to backend-service api
    * Allows us to make more than `scanSize` calls at a time
@@ -136,7 +137,7 @@ async function _scanNextBatch(
 
   // batch to backend API
   const usedAddresses = await checkAddressesInUse({
-    backendUrl,
+    network,
     addresses: newAddresses,
   });
 

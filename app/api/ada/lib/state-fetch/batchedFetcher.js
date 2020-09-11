@@ -121,7 +121,7 @@ function batchUTXOsForAddresses(
       const promises = groupsOfAddresses
         .map(groupOfAddresses => getUTXOsForAddresses({
           addresses: groupOfAddresses,
-          backendUrl: body.backendUrl,
+          network: body.network,
         }));
 
       // Sum up all the utxo
@@ -149,7 +149,7 @@ function batchTxsBodiesForInputs(
       // convert chunks into list of Promises that call the backend-service
       const promises = groupsOfTxsHashes
         .map(groupOfTxsHashes => getTxsBodiesForUTXOs({
-          backendUrl: body.backendUrl,
+          network: body.network,
           txsHashes: groupOfTxsHashes,
         }));
 
@@ -180,7 +180,7 @@ export function batchGetUTXOsSumsForAddresses(
       const groupsOfAddresses = chunk(body.addresses, addressesLimit);
       const promises =
         groupsOfAddresses.map(groupOfAddresses => getUTXOsSumsForAddresses({
-          backendUrl: body.backendUrl,
+          network: body.network,
           addresses: groupOfAddresses,
         }));
       const partialAmounts: Array<UtxoSumResponse> = await Promise.all(promises);
@@ -216,7 +216,7 @@ export function batchGetRewardHistory(
       const chimericAccountAddresses = chunk(body.addresses, addressesLimit);
       const chimericAccountPromises = chimericAccountAddresses.map(
         addr => getRewardHistory({
-          backendUrl: body.backendUrl,
+          network: body.network,
           addresses: addr,
         })
       );
@@ -325,7 +325,7 @@ export function batchCheckAddressesInUse(
       const groupsOfAddresses = chunk(body.addresses, addressesLimit);
       const groupedAddrPromises = groupsOfAddresses.map(
         addr => checkAddressesInUse({
-          backendUrl: body.backendUrl,
+          network: body.network,
           addresses: addr,
         })
       );
@@ -386,7 +386,7 @@ export function batchGetAccountState(
       const chimericAccountAddresses = chunk(body.addresses, addressesLimit);
       const chimericAccountPromises = chimericAccountAddresses.map(
         addr => getAccountState({
-          backendUrl: body.backendUrl,
+          network: body.network,
           addresses: addr,
         })
       );
@@ -408,7 +408,7 @@ export function batchGetPoolInfo(
       const poolIds = chunk(body.poolIds, addressesLimit);
       const poolInfoPromises = poolIds.map(
         poolId => getPoolInfo({
-          backendUrl: body.backendUrl,
+          network: body.network,
           poolIds: poolId,
         })
       );

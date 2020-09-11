@@ -4,8 +4,6 @@ import type { ConfigType, Network } from '../config/config-types';
 import { NetworkType } from '../config/config-types';
 import type { UserAgentInfo } from './utils/userAgentInfo';
 import userAgentInfo from './utils/userAgentInfo';
-import type { AddressDiscriminationType } from '@emurgo/js-chain-libs/js_chain_libs';
-import { RustModule } from './api/ada/lib/cardanoCrypto/rustLoader';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
@@ -33,12 +31,6 @@ export const environment = ((
     isMainnet: () => environment.NETWORK === NetworkType.MAINNET,
     /** Environment used during webpack build */
     isProduction: () => process.env.NODE_ENV === 'production',
-    getDiscriminant: () => {
-      if (CONFIG.network.name === NetworkType.TEST || process.env.NODE_ENV === 'jest' || process.env.NODE_ENV === 'test') {
-        return RustModule.WalletV3.AddressDiscrimination.Production;
-      }
-      return RustModule.WalletV3.AddressDiscrimination.Test;
-    },
     walletRefreshInterval: CONFIG.app.walletRefreshInterval,
     serverStatusRefreshInterval: CONFIG.app.serverStatusRefreshInterval,
     userAgentInfo,
@@ -54,7 +46,6 @@ export const environment = ((
     isTest: void => boolean,
     isMainnet: void => boolean,
     isProduction: void => boolean,
-    getDiscriminant: void => AddressDiscriminationType,
     walletRefreshInterval: number,
     serverStatusRefreshInterval: number,
     userAgentInfo: UserAgentInfo,

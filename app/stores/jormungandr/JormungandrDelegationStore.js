@@ -53,7 +53,7 @@ export default class JormungandrDelegationStore extends Store {
         if (BackendService == null) throw new Error(`rewardHistory missing backend url`);
         const stateFetcher = this.stores.substores.jormungandr.stateFetchStore.fetcher;
         const result = await stateFetcher.getRewardHistory({
-          backendUrl: BackendService,
+          network: publicDeriver.getParent().getNetworkInfo(),
           addresses: [address]
         });
         return result[address] ?? [];
@@ -74,8 +74,6 @@ export default class JormungandrDelegationStore extends Store {
   ) => {
     const delegationRequest = this.stores.delegation.getDelegationRequests(publicDeriver);
     if (delegationRequest == null) return;
-    const { BackendService } = publicDeriver.getParent().getNetworkInfo().Backend;
-    if (BackendService == null) throw new Error(`${nameof(this.refreshDelegation)} missing backend url`);
 
     try {
       delegationRequest.getDelegatedBalance.reset();
@@ -95,7 +93,7 @@ export default class JormungandrDelegationStore extends Store {
         try {
           const stateFetcher = this.stores.substores.jormungandr.stateFetchStore.fetcher;
           const accountStateResp = await stateFetcher.getAccountState({
-            backendUrl: BackendService,
+            network: publicDeriver.getParent().getNetworkInfo(),
             addresses: [stakingKeyResp.addr.Hash],
           });
           const stateForStakingKey = accountStateResp[stakingKeyResp.addr.Hash];
@@ -191,15 +189,13 @@ export default class JormungandrDelegationStore extends Store {
     const poolsToQuery = request.allPoolIds.filter(
       pool => !poolsCachedForNetwork.has(pool)
     );
-    const { BackendService } = request.network.Backend;
-    if (BackendService == null) throw new Error(`${nameof(this.updatePoolInfo)} missing backend url`);
     const stateFetcher = this.stores.substores.jormungandr.stateFetchStore.fetcher;
     const poolInfoResp = await stateFetcher.getPoolInfo({
-      backendUrl: BackendService,
+      network: request.network,
       ids: poolsToQuery,
     });
     const reputation = await stateFetcher.getReputation({
-      backendUrl: BackendService,
+      network: request.network,
     });
     runInAction(() => {
       for (const poolId of Object.keys(poolInfoResp)) {

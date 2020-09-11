@@ -24,6 +24,7 @@ import {
 } from '../../../../ada/lib/storage/database/index';
 
 import { RustModule } from '../../../../ada/lib/cardanoCrypto/rustLoader';
+import { networks } from '../../../../ada/lib/storage/database/prepackaged/networks';
 
 const linearFeeConfig = {
   constant: '155381',
@@ -92,6 +93,7 @@ describe('Jormungandr tx format tests', () => {
 
     const transferInfo = await yoroiTransferTxFromAddresses({
       addresses: [addr1, addr2],
+      network: networks.JormungandrMainnet,
       getUTXOsForAddresses: (_addresses) => Promise.resolve([utxo]),
       keyLevel: Bip44DerivationLevels.ACCOUNT.level,
       signingKey: accountPrivateKey,

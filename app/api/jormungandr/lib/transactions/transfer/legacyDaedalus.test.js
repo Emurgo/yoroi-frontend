@@ -23,6 +23,7 @@ import {
 } from '../../../../ada/lib/storage/database/index';
 
 import { RustModule } from '../../../../ada/lib/cardanoCrypto/rustLoader';
+import { networks } from '../../../../ada/lib/storage/database/prepackaged/networks';
 
 const linearFeeConfig = {
   constant: '155381',
@@ -69,6 +70,7 @@ describe('Jormungandr tx format tests', () => {
 
     const transferInfo = await daedalusTransferTxFromAddresses({
       addressKeys: addressMap,
+      network: networks.JormungandrMainnet,
       getUTXOsForAddresses: (_addresses) => Promise.resolve([utxo]),
       outputAddr: outAddress,
       genesisHash: 'adbdd5ede31637f6c9bad5c271eec0bc3d0cb9efb86a5b913bb55cba549d0770',
@@ -130,6 +132,7 @@ describe('Jormungandr tx format tests', () => {
 
     expect(daedalusTransferTxFromAddresses({
       addressKeys: addressMap,
+      network: networks.JormungandrMainnet,
       getUTXOsForAddresses: (_addresses) => Promise.resolve([utxo]),
       outputAddr: outAddress,
       genesisHash: 'adbdd5ede31637f6c9bad5c271eec0bc3d0cb9efb86a5b913bb55cba549d0770',
@@ -169,6 +172,7 @@ describe('Jormungandr tx format tests', () => {
 
     const transferInfo = await daedalusTransferTxFromAddresses({
       addressKeys: addressMap,
+      network: networks.JormungandrMainnet,
       getUTXOsForAddresses: (_addresses) => Promise.resolve(utxo),
       outputAddr: outAddress,
       genesisHash: 'adbdd5ede31637f6c9bad5c271eec0bc3d0cb9efb86a5b913bb55cba549d0770',

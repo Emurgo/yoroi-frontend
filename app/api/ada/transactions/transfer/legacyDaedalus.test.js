@@ -97,6 +97,7 @@ describe('Byron era tx format tests', () => {
 
     const transferInfo = await daedalusTransferTxFromAddresses({
       addressKeys: addressMap,
+      network,
       getUTXOsForAddresses: (_addresses) => Promise.resolve([utxo]),
       outputAddr: {
         address: outAddress
@@ -156,6 +157,7 @@ describe('Byron era tx format tests', () => {
 
     expect(daedalusTransferTxFromAddresses({
       addressKeys: addressMap,
+      network,
       getUTXOsForAddresses: (_addresses) => Promise.resolve([utxo]),
       outputAddr: {
         address: outAddress
@@ -194,6 +196,7 @@ describe('Byron era tx format tests', () => {
 
     const transferInfo = await daedalusTransferTxFromAddresses({
       addressKeys: addressMap,
+      network,
       getUTXOsForAddresses: (_addresses) => Promise.resolve(utxo),
       outputAddr: {
         address: outAddress

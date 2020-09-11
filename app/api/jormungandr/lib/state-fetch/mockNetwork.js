@@ -205,20 +205,18 @@ export function genUtxoForAddresses(
   getBestBlock: BestBlockFunc,
   network: $ReadOnly<NetworkRow>,
 ): AddressUtxoFunc {
-  const { BackendService } = network.Backend;
-  if (BackendService == null) throw new Error(`${nameof(genUtxoForAddresses)} missing backend url`);
   return async (
     body: AddressUtxoRequest,
   ): Promise<AddressUtxoResponse> => {
     const bestBlock = await getBestBlock({
-      backendUrl: BackendService,
+      network,
     });
     if (bestBlock.hash == null) {
       return [];
     }
     const until = bestBlock.hash;
     const history = await getHistory({
-      backendUrl: BackendService,
+      network,
       addresses: body.addresses,
       untilBlock: until,
     });

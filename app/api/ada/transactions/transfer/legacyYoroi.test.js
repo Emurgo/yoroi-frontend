@@ -116,6 +116,7 @@ describe('Haskell Shelley era tx format tests', () => {
 
     const transferInfo = await yoroiTransferTxFromAddresses({
       addresses: [addr1, addr2],
+      network,
       getUTXOsForAddresses: (_addresses) => Promise.resolve([utxo]),
       keyLevel: Bip44DerivationLevels.ACCOUNT.level,
       signingKey: accountPrivateKey,

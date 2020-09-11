@@ -7,7 +7,7 @@ import type {
   CertificateRelationType,
   CoreAddressT,
 } from './enums';
-import type { CertificateKindType } from '@emurgo/js-chain-libs/js_chain_libs';
+import type { AddressDiscriminationType, CertificateKindType } from '@emurgo/js-chain-libs/js_chain_libs';
 import typeof { CertificateKind } from '@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib';
 import type { KeyKindType } from '../../../../../common/lib/crypto/keys/types';
 import type { CoinTypesT } from '../../../../../../config/numbersConfig';
@@ -72,6 +72,7 @@ export type JormungandrGenesisBaseConfig = {|
   * Therefore, the Byron network ID is only used to generate legacy addresses
   */
   +ByronNetworkId: number,
+  +Discriminant: AddressDiscriminationType,
   +GenesisDate: string, // start of the network
   +SlotsPerEpoch: number,
   +SlotDuration: number,

@@ -18,14 +18,7 @@ export default class AdaDaedalusTransferStore extends Store {
     const selectedNetwork = this.stores.profile.selectedNetwork;
     if (selectedNetwork == null) throw new Error(`${nameof(AdaDaedalusTransferStore)} transfer tx no selected network`);
 
-    if (this.stores.profile.selectedNetwork == null) {
-      throw new Error(`${nameof(AdaDaedalusTransferStore)}::${nameof(this.buildTx)} no network selected`);
-    }
-    const { BackendService } = this.stores.profile.selectedNetwork.Backend;
-    if (BackendService == null) throw new Error(`${nameof(this.buildTx)} missing backend url`);
-    const fullConfig = getCardanoHaskellBaseConfig(
-      this.stores.profile.selectedNetwork
-    );
+    const fullConfig = getCardanoHaskellBaseConfig(selectedNetwork);
     const config = fullConfig.reduce((acc, next) => Object.assign(acc, next), {});
 
     // note: no wallet selected so we call this directly
@@ -34,7 +27,7 @@ export default class AdaDaedalusTransferStore extends Store {
     return await daedalusTransferTxFromAddresses({
       addressKeys: request.addressKeys,
       outputAddr: request.outputAddr,
-      backendUrl: BackendService,
+      network: selectedNetwork,
       getUTXOsForAddresses:
         this.stores.substores.ada.stateFetchStore.fetcher.getUTXOsForAddresses,
       protocolParams: {

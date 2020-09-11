@@ -108,7 +108,6 @@ import { v3PublicToV2, v4Bip32PrivateToV3, derivePrivateByAddressing } from './l
 import type { TransactionExportRow } from '../export';
 
 import { RustModule } from '../ada/lib/cardanoCrypto/rustLoader';
-import environment from '../../environment';
 import { Cip1852Wallet } from '../ada/lib/storage/models/Cip1852Wallet/wrapper';
 import type {
   IsValidMnemonicRequest,
@@ -446,11 +445,8 @@ export default class JormungandrApi {
         config.ChainNetworkId,
       );
 
-      const { BackendService } = request.publicDeriver.getParent().getNetworkInfo().Backend;
-      if (BackendService == null) throw new Error(`${nameof(this.signAndBroadcast)} missing backend url`);
-
       const response = request.sendTx({
-        backendUrl: BackendService,
+        network: request.publicDeriver.getParent().getNetworkInfo(),
         id: Buffer.from(signedTx.id().as_bytes()).toString('hex'),
         encodedTx: signedTx.as_bytes(),
       });
@@ -648,11 +644,8 @@ export default class JormungandrApi {
       const id = Buffer.from(signedTx.id().as_bytes()).toString('hex');
       const encodedTx = signedTx.as_bytes();
 
-      const { BackendService } = request.publicDeriver.getParent().getNetworkInfo().Backend;
-      if (BackendService == null) throw new Error(`${nameof(this.signAndBroadcastDelegationTx)} missing backend url`);
-
       const response = request.sendTx({
-        backendUrl: BackendService,
+        network: request.publicDeriver.getParent().getNetworkInfo(),
         id,
         encodedTx,
       });
@@ -729,9 +722,13 @@ export default class JormungandrApi {
       const rootPk = v4Bip32PrivateToV3(generateWalletRootKey(recoveryPhrase));
       const newPubDerivers = [];
 
+      const config = getJormungandrBaseConfig(
+        request.network
+      ).reduce((acc, next) => Object.assign(acc, next), {});
+
       const wallet = await createStandardCip1852Wallet({
         db: request.db,
-        discrimination: environment.getDiscriminant(),
+        discrimination: config.Discriminant,
         rootPk,
         password: walletPassword,
         accountIndex,
@@ -823,6 +820,7 @@ export default class JormungandrApi {
             key.bip44_chain(true),
             config.ByronNetworkId
           ),
+          network: request.network,
           lastUsedInternal: -1,
           lastUsedExternal: -1,
           checkAddressesInUse,
@@ -840,6 +838,7 @@ export default class JormungandrApi {
           accountPublicKey: Buffer.from(accountKey.to_public().as_bytes()).toString('hex'),
           lastUsedInternal: -1,
           lastUsedExternal: -1,
+          network: request.network,
           checkAddressesInUse,
           addByHash,
           stakingKey,

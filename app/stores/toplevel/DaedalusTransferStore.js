@@ -274,10 +274,8 @@ export default class DaedalusTransferStore extends Store {
         throw new Error(`${nameof(DaedalusTransferStore)} transaction not signed`);
       }
       const { id, encodedTx } = this.transferTx;
-      const { BackendService } = payload.publicDeriver.getParent().getNetworkInfo().Backend;
-      if (BackendService == null) throw new Error(`${nameof(this._transferFunds)} missing backend url`);
       await this.transferFundsRequest.execute({
-        backendUrl: BackendService,
+        network: payload.publicDeriver.getParent().getNetworkInfo(),
         id,
         encodedTx,
       });

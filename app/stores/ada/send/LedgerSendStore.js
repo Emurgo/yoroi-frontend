@@ -189,9 +189,6 @@ export default class LedgerSendStore extends Store {
     try {
       Logger.debug(`${nameof(LedgerSendStore)}::${nameof(this.signAndBroadcast)} called: ` + stringifyData(request));
 
-      const { BackendService } = request.network.Backend;
-      if (BackendService == null) throw new Error(`${nameof(this.signAndBroadcast)} missing backend url`);
-
       ledgerConnect = new LedgerConnect({
         locale: this.stores.profile.currentLocale
       });
@@ -228,7 +225,7 @@ export default class LedgerSendStore extends Store {
 
       await this.api.ada.broadcastLedgerSignedTx({
         signedTxRequest: {
-          backendUrl: BackendService,
+          network: request.network,
           id: txId,
           encodedTx: signedTx.to_bytes(),
         },

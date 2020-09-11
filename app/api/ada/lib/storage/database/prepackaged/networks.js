@@ -11,6 +11,7 @@ import type {
   JormungandrBaseConfig,
 } from '../primitives/tables';
 import environment from '../../../../../../environment';
+import { RustModule } from '../../../cardanoCrypto/rustLoader';
 
 export const CardanoForks = Object.freeze({
   Haskell: 0,
@@ -69,6 +70,9 @@ export const networks = Object.freeze({
     },
     BaseConfig: ([Object.freeze({
       StartAt: 0,
+      Discriminant: (environment.isTest() || environment.isJest())
+        ? RustModule.WalletV3.AddressDiscrimination.Production
+        : RustModule.WalletV3.AddressDiscrimination.Test,
       ChainNetworkId: '8e4d2a343f3dcf9330ad9035b3e8d168e6728904262f2c434a4f8f934ec7b676',
       ByronNetworkId: 764824073,
       GenesisDate: '1576264417000',
