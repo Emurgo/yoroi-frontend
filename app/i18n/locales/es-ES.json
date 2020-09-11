@@ -430,7 +430,7 @@
   "wallet.currency.pick.cardano": "Cardano es el primer protocolo de prueba de participación probadamente seguro",
   "wallet.currency.pick.ergo": "Ergo construye características criptográficas avanzadas y una funcionalidad DeFi radicalmente nueva sobre los sólidos cimientos de una década de teoría y desarrollo de la blockchain",
   "wallet.currency.pick.header": "Selecciona una moneda o plataforma",
-  "wallet.currency.pick.testnetDescription": "Las testnets son cadenas alternativas que se utilizan para las pruebas. Esto permite a los desarrolladores de aplicaciones o probadores experimentar, sin tener que usar monedas reales.",
+  "wallet.currency.pick.testnetDescription": "Las testnets son cadenas alternativas que se utilizan exclusivamente para pruebas. Esto permite a los desarrolladores de aplicaciones o testers experimentar sin tener que usar monedas reales.",
   "wallet.dashboard.empty.text": "Dirígete a la sección de delegación para elegir el stake pool al que quieres delegar.",
   "wallet.dashboard.empty.title": "No has delegado tus ADA aún",
   "wallet.dashboard.epochEndTitle": "Finaliza en",
