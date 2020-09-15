@@ -39,7 +39,7 @@ const messages = defineMessages({
   },
   unregisteredWarning: {
     id: 'wallet.dashboard.rewards.unregistered',
-    defaultMessage: `!!!Staking key isn't registered, so reward will be go to the treasury.`,
+    defaultMessage: `!!!Staking key isn't registered, so you won't get rewards`,
   },
 });
 

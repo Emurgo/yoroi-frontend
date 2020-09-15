@@ -52,7 +52,7 @@ const dialogMessages = defineMessages({
   },
   deregisterExplanationLine4: {
     id: 'wallet.transfer.deregister.line4',
-    defaultMessage: `!!!You should NOT deregister if this staking key is used as a stake pool's reward account, as this will cause all pool operator rewards to be sent directly to the treasury`,
+    defaultMessage: `!!!You should NOT deregister if this staking key is used as a stake pool's reward account, as this will cause all pool operator rewards to be sent back to the reserved`,
   },
   deregisterExplanationLine5: {
     id: 'wallet.transfer.deregister.line5',
