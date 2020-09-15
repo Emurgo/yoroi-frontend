@@ -96,7 +96,7 @@ export const networks = Object.freeze({
     Backend: {
       BackendService: environment.isTest()
         ? 'http://localhost:21001'
-        : 'https://ergo-backend.yoroiwallet.com', // TODO
+        : 'https://ergo-backend.yoroiwallet.com',
     },
     BaseConfig: ([Object.freeze({
       StartAt: 0,

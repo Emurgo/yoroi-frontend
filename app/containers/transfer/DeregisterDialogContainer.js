@@ -9,6 +9,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { ComplexityLevelType } from '../../types/complexityLevelType';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import { ComplexityLevels } from '../../types/complexityLevelType';
+import WarningBox from '../../components/widgets/WarningBox';
 
 import DangerousActionDialog from '../../components/widgets/DangerousActionDialog';
 
@@ -45,9 +46,17 @@ const dialogMessages = defineMessages({
     id: 'wallet.transfer.deregister.line3',
     defaultMessage: '!!!Keeping the staking key will allow you to withdraw the rewards, but continue delegating to the same pool',
   },
+  noNeedToDeregister: {
+    id: 'wallet.transfer.deregister.noNeedToDeregister',
+    defaultMessage: `!!!You do NOT need to deregister to delegate to a different stake pool. You can change your delegation preference at any time`,
+  },
   deregisterExplanationLine4: {
     id: 'wallet.transfer.deregister.line4',
     defaultMessage: `!!!You should NOT deregister if this staking key is used as a stake pool's reward account, as this will cause all pool operator rewards to be sent directly to the treasury`,
+  },
+  deregisterExplanationLine5: {
+    id: 'wallet.transfer.deregister.line5',
+    defaultMessage: `!!!Deregistering means this key will no longer receive rewards until you re-register the staking key (usually by delegating to a pool again)`,
   },
 });
 
@@ -103,9 +112,18 @@ export default class DeregisterDialogContainer extends Component<Props> {
         error={undefined}
       >
         <p>{intl.formatMessage(dialogMessages.deregisterExplanationLine1)}</p>
-        <p>{intl.formatMessage(dialogMessages.deregisterExplanationLine2)}</p>
         <p>{intl.formatMessage(dialogMessages.deregisterExplanationLine3)}</p>
-        <p>{intl.formatMessage(dialogMessages.deregisterExplanationLine4)}</p>
+        <p>{intl.formatMessage(dialogMessages.deregisterExplanationLine2)}</p>
+        <WarningBox>
+          <ol>
+            <br />
+            <li>{intl.formatMessage(dialogMessages.noNeedToDeregister)}</li>
+            <br />
+            <li>{intl.formatMessage(dialogMessages.deregisterExplanationLine4)}</li>
+            <br />
+            <li>{intl.formatMessage(dialogMessages.deregisterExplanationLine5)}</li>
+          </ol>
+        </WarningBox><br /><br />
       </DangerousActionDialog>
     );
   }

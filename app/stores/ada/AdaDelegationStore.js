@@ -169,23 +169,9 @@ export default class AdaDelegationStore extends Store {
     stakingKeyAddressId: number,
     delegationRequest: AdaDelegationRequests,
   |} => Promise<GetRegistrationHistoryResponse> = async (request) => {
-    const adaConfig = getCardanoHaskellBaseConfig(
-      request.publicDeriver.getParent().getNetworkInfo()
-    );
-    // TODO: use time store instead?
-    const toRelativeSlotNumber = await genToRelativeSlotNumber(adaConfig);
-    const timeToSlot = await genTimeToSlot(adaConfig);
-    const currentEpoch = toRelativeSlotNumber(
-      timeToSlot({
-        time: new Date(),
-      }).slot
-    ).epoch;
-
     const currentDelegation = await request.delegationRequest.getRegistrationHistory.execute({
       publicDeriver: request.publicDeriver,
       stakingKeyAddressId: request.stakingKeyAddressId,
-      toRelativeSlotNumber,
-      currentEpoch,
     }).promise;
     if (currentDelegation == null) throw new Error('Should never happen');
     return currentDelegation;

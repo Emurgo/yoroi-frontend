@@ -586,9 +586,7 @@ function getAdaStakingInfo(
   const getRegistrationHistory: CachedRequest<GetRegistrationHistoryFunc> = new CachedRequest(
     async _request => {
       const result = {
-        currEpoch: false,
-        prevEpoch: false,
-        prevPrevEpoch: false,
+        current: false,
         fullHistory: [],
       };
       if (delegationRequests == null) return result;
@@ -601,13 +599,7 @@ function getAdaStakingInfo(
         return certForEpoch.pools.length > 0;
       };
       if (hasPools(currDeleg.currEpoch)) {
-        result.currEpoch = true;
-      }
-      if (hasPools(currDeleg.prevEpoch)) {
-        result.prevEpoch = true;
-      }
-      if (hasPools(currDeleg.prevPrevEpoch)) {
-        result.prevPrevEpoch = true;
+        result.current = true;
       }
       return result;
     }

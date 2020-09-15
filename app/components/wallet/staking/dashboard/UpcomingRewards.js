@@ -11,6 +11,7 @@ import Timer from '../../../widgets/Timer';
 import CustomTooltip from '../../../widgets/CustomTooltip';
 import LoadingSpinner from '../../../widgets/LoadingSpinner';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import AttentionIcon from '../../../../assets/images/attention-modern.inline.svg';
 
 import Card from './Card';
 import styles from './UpcomingRewards.scss';
@@ -36,6 +37,10 @@ const messages = defineMessages({
     id: 'wallet.dashboard.rewards.note',
     defaultMessage: '!!!The first reward is slower.',
   },
+  unregisteredWarning: {
+    id: 'wallet.dashboard.rewards.unregistered',
+    defaultMessage: `!!!Staking key isn't registered, so reward will be go to the treasury.`,
+  },
 });
 
 export type MiniPoolInfo = {|
@@ -54,6 +59,7 @@ type Props = {|
   +baseUrl: void | string,
   +useEndOfEpoch: boolean, // Haskell uses end-of-epoch but Jormungandr doesn't
   +onExternalLinkClick: MouseEvent => void,
+  +unregistered: void | boolean,
 |};
 
 @observer
@@ -72,12 +78,36 @@ export default class UpcomingRewards extends Component<Props> {
       />]
       : [];
 
+    const genUnregisteredWarning = (info: ?BoxInfo): Array<Node> => {
+      if (this.props.unregistered !== true) return [];
+      if (info == null) return [];
+      if (info.pools.length === 0) return [];
+      return [
+        <CustomTooltip
+          key="unregisteredWarning"
+          isAligningRight
+          toolTip={<div>{intl.formatMessage(messages.unregisteredWarning)}</div>}
+        >
+          <AttentionIcon />
+        </CustomTooltip>
+      ];
+    };
+
     return (
       <Card title={intl.formatMessage(messages.title)}>
         <div className={styles.wrapper}>
-          {this.infoToNode(this.props.content[0], firstRewardWarning)}
-          {this.infoToNode(this.props.content[1], [])}
-          {this.infoToNode(this.props.content[2], [])}
+          {this.infoToNode(
+            this.props.content[0],
+            [...genUnregisteredWarning(this.props.content[0]), ...firstRewardWarning]
+          )}
+          {this.infoToNode(
+            this.props.content[1],
+            genUnregisteredWarning(this.props.content[1])
+          )}
+          {this.infoToNode(
+            this.props.content[2],
+            genUnregisteredWarning(this.props.content[2])
+          )}
         </div>
       </Card>
     );

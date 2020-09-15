@@ -4,13 +4,14 @@ import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { Tooltip } from 'react-polymorph/lib/components/Tooltip';
 import { TooltipSkin } from 'react-polymorph/lib/skins/simple/TooltipSkin';
-
 import InfoIcon from '../../assets/images/info-icon.inline.svg';
 import styles from './CustomTooltip.scss';
+import classnames from 'classnames';
 
 type Props = {|
   +toolTip: Node,
   +children?: Node,
+  +isAligningRight?: boolean,
   +isOpeningUpward?: boolean,
 |};
 
@@ -18,10 +19,12 @@ type Props = {|
 export default class CustomTooltip extends Component<Props> {
   static defaultProps: {|
     children: void,
-    isOpeningUpward: boolean
+    isOpeningUpward: boolean,
+    isAligningRight: boolean,
   |} = {
     children: undefined,
-    isOpeningUpward: true
+    isOpeningUpward: true,
+    isAligningRight: false,
   }
 
   render(): Node {
@@ -31,12 +34,19 @@ export default class CustomTooltip extends Component<Props> {
     return (
       <div className={styles.component}>
         <Tooltip
-          className={styles.SimpleTooltip}
+          className={classnames([
+            this.props.isAligningRight === true
+              ? null
+              : styles.SimpleCenteredTooltip
+          ])}
           skin={TooltipSkin}
+          isAligningRight={this.props.isAligningRight}
           tip={toolTip}
           isOpeningUpward={this.props.isOpeningUpward}
         >
-          {child}
+          <span className={styles.infoIcon}>
+            {child}
+          </span>
         </Tooltip>
       </div>
     );
@@ -44,9 +54,7 @@ export default class CustomTooltip extends Component<Props> {
 
   makeDefaultChild: (() => Node) = () => {
     return (
-      <span className={styles.infoIcon}>
-        <InfoIcon width="14" height="14" />
-      </span>
+      <InfoIcon width="14" height="14" />
     );
   }
 }
