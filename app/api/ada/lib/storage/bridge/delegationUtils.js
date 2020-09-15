@@ -116,7 +116,7 @@ export async function getCertificateHistory(request: {|
   stakingKeyAddressId: number,
   kindFilter: Array<$Values<CertificateKind>>,
 |}): Promise<Array<CertificateForKey>> {
-  // recall: results are sorted by block & cert index order
+  // recall: results are sorted by block & tx & cert index order (DESC)
   const allDelegations = await getCertificates(
     request.publicDeriver.getDb(),
     [request.stakingKeyAddressId]
@@ -206,23 +206,19 @@ export async function getCurrentDelegation(
 }
 
 export type GetRegistrationHistoryRequest = {|
-  currEpoch: boolean,
-  prevEpoch: boolean,
-  prevPrevEpoch: boolean,
-  fullHistory: Array<CertificateForKey>,
+  publicDeriver: PublicDeriver<> & IGetStakingKey,
+  stakingKeyAddressId: number,
 |};
 export type GetRegistrationHistoryResponse = {|
-  currEpoch: boolean,
-  prevEpoch: boolean,
-  prevPrevEpoch: boolean,
+  current: boolean,
   fullHistory: Array<CertificateForKey>,
 |};
 export type GetRegistrationHistoryFunc = (
-  request: GetCurrentDelegationRequest
+  request: GetRegistrationHistoryRequest
 ) => Promise<GetRegistrationHistoryResponse>;
 
 export async function getRegistrationHistory(
-  request: GetCurrentDelegationRequest,
+  request: GetRegistrationHistoryRequest,
 ): Promise<GetRegistrationHistoryResponse> {
   const delegations = await getCertificateHistory({
     publicDeriver: request.publicDeriver,
@@ -234,34 +230,12 @@ export async function getRegistrationHistory(
   });
 
   const result = {
-    currEpoch: false,
-    prevEpoch: false,
-    prevPrevEpoch: false,
+    current: (
+      delegations[0].certificate.Kind === RustModule.WalletV4.CertificateKind.StakeRegistration
+    ),
     fullHistory: delegations,
   };
-  for (const delegation of delegations) {
-    const block = delegation.block;
-    if (block == null) continue; // should never happen
-    const relativeSlot = request.toRelativeSlotNumber(block.SlotNum);
 
-    // calculate which certificate was active at the end of each epoch
-    if (result.currEpoch === false && relativeSlot.epoch <= request.currentEpoch) {
-      result.currEpoch = (
-        delegation.certificate.Kind === RustModule.WalletV4.CertificateKind.StakeRegistration
-      );
-    }
-    if (result.prevEpoch === false && relativeSlot.epoch <= request.currentEpoch - 1) {
-      result.prevEpoch = (
-        delegation.certificate.Kind === RustModule.WalletV4.CertificateKind.StakeRegistration
-      );
-    }
-    if (result.prevPrevEpoch === false && relativeSlot.epoch <= request.currentEpoch - 2) {
-      result.prevPrevEpoch = (
-        delegation.certificate.Kind === RustModule.WalletV4.CertificateKind.StakeRegistration
-      );
-      break;
-    }
-  }
   return result;
 }
 

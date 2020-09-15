@@ -132,7 +132,7 @@ export default class AdaDelegationTransactionStore extends Store {
     const delegationTxPromise = this.createDelegationTx.execute({
       publicDeriver: basePubDeriver,
       poolRequest: request.poolRequest,
-      registrationStatus: adaDelegationRequests.getRegistrationHistory.result?.currEpoch ?? false,
+      registrationStatus: adaDelegationRequests.getRegistrationHistory.result?.current ?? false,
       valueInAccount: delegationRequests.getDelegatedBalance.result?.accountPart
         ?? new BigNumber(0),
       absSlotNumber,

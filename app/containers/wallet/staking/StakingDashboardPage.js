@@ -310,6 +310,9 @@ export default class StakingDashboardPage extends Component<Props> {
     if (delegationRequests == null) {
       throw new Error(`${nameof(StakingDashboardPage)} opened for non-reward wallet`);
     }
+
+    const isRegistered = this._isRegistered(publicDeriver);
+
     let rewardInfo = undefined;
     if (!(
       !delegationRequests.getCurrentDelegation.wasExecuted ||
@@ -320,6 +323,7 @@ export default class StakingDashboardPage extends Component<Props> {
         rewardInfo = {
           rewardPopup: (
             <UpcomingRewards
+              unregistered={isRegistered === false}
               useEndOfEpoch={!isJormungandr(publicDeriver.getParent().getNetworkInfo())}
               content={[
                 this.generateUpcomingRewardInfo({
@@ -405,6 +409,7 @@ export default class StakingDashboardPage extends Component<Props> {
         const upcomingTuples = ((upcomingRewards.slice(0, 3): any): [?BoxInfo, ?BoxInfo, ?BoxInfo]);
         const rewardPopup = (
           <UpcomingRewards
+            unregistered={isRegistered === false}
             useEndOfEpoch={!isJormungandr(publicDeriver.getParent().getNetworkInfo())}
             content={upcomingTuples}
             showWarning={upcomingRewards.length === 3}
@@ -422,6 +427,7 @@ export default class StakingDashboardPage extends Component<Props> {
     return rewardInfo ?? ({
       rewardPopup: (
         <UpcomingRewards
+          unregistered={isRegistered === false}
           useEndOfEpoch={!isJormungandr(publicDeriver.getParent().getNetworkInfo())}
           content={[null, null, null]}
           showWarning={false}
@@ -715,18 +721,6 @@ export default class StakingDashboardPage extends Component<Props> {
       request.delegationRequests.getCurrentDelegation.result?.currEpoch?.pools ?? []
     ).length > 0;
 
-    const isRegistered = (() => {
-      if (!isCardanoHaskell(request.publicDeriver.getParent().getNetworkInfo())) {
-        return undefined;
-      }
-      const adaDelegationRequests = this.generated.stores.substores
-        .ada.delegation.getDelegationRequests(
-          request.publicDeriver
-        );
-      if (adaDelegationRequests == null) return undefined;
-      return adaDelegationRequests.getRegistrationHistory.result?.currEpoch;
-    })();
-
     return (
       <UserSummary
         meta={{
@@ -756,7 +750,7 @@ export default class StakingDashboardPage extends Component<Props> {
           dialog: LessThanExpectedDialog,
         })}
         withdrawRewards={
-          isRegistered === true
+          this._isRegistered(request.publicDeriver) === true
             ? () => {
               this.generated.actions.dialogs.open.trigger({ dialog: DeregisterDialogContainer });
             }
@@ -776,6 +770,20 @@ export default class StakingDashboardPage extends Component<Props> {
       />
     );
   }
+
+  _isRegistered: PublicDeriver<> => ?boolean = (
+    publicDeriver
+  ) => {
+    if (!isCardanoHaskell(publicDeriver.getParent().getNetworkInfo())) {
+      return undefined;
+    }
+    const adaDelegationRequests = this.generated.stores.substores
+      .ada.delegation.getDelegationRequests(
+        publicDeriver
+      );
+    if (adaDelegationRequests == null) return undefined;
+    return adaDelegationRequests.getRegistrationHistory.result?.current;
+  };
 
   _generateRewardGraphData: {|
     delegationRequests: DelegationRequests,
