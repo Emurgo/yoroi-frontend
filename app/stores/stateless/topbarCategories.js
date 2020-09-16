@@ -61,9 +61,7 @@ export const SUMMARY: TopbarCategory = registerCategory({
   route: ROUTES.WALLETS.TRANSACTIONS,
   icon: transactionsIcon,
   label: messages.transactions,
-  isVisible: request => (
-    request.selected.getParent().getNetworkInfo().CoinType !== CoinTypes.ERGO
-  ),
+  isVisible: _request => true,
 });
 export const SEND: TopbarCategory = registerCategory({
   className: 'send',

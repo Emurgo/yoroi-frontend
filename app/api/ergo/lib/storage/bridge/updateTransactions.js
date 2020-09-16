@@ -10,24 +10,22 @@ import {
   getAllSchemaTables,
   raii,
   mapToTables,
-} from '../database/utils';
+} from '../../../../ada/lib/storage/database/utils';
 import type {
   BlockInsert, BlockRow,
   TransactionInsert, TransactionRow,
-  CardanoByronTransactionInsert,
-  CardanoShelleyTransactionInsert,
   NetworkRow,
   DbBlock,
   AddressRow,
-} from '../database/primitives/tables';
+  ErgoTransactionInsert,
+} from '../../../../ada/lib/storage/database/primitives/tables';
 import {
   TransactionType,
-} from '../database/primitives/tables';
+} from '../../../../ada/lib/storage/database/primitives/tables';
 import type {
   TxStatusCodesType,
-  CertificateRelationType,
   CoreAddressT,
-} from '../database/primitives/enums';
+} from '../../../../ada/lib/storage/database/primitives/enums';
 import {
   GetAddress,
   GetBlock,
@@ -36,101 +34,81 @@ import {
   GetDerivationsByPath,
   GetTransaction,
   GetTxAndBlock,
-  GetCertificates,
-} from '../database/primitives/api/read';
+} from '../../../../ada/lib/storage/database/primitives/api/read';
 import {
   ModifyAddress,
   ModifyTransaction,
   FreeBlocks,
-} from '../database/primitives/api/write';
-import type { AddCertificateRequest } from '../database/primitives/api/write';
-import { ModifyCardanoByronTx, ModifyCardanoShelleyTx } from  '../database/transactionModels/multipart/api/write';
-import { digestForHash, } from '../database/primitives/api/utils';
+} from '../../../../ada/lib/storage/database/primitives/api/write';
+import { ModifyErgoTx, } from  '../../../../ada/lib/storage/database/transactionModels/multipart/api/write';
+import { digestForHash, } from '../../../../ada/lib/storage/database/primitives/api/utils';
 import {
   MarkUtxo,
-} from '../database/transactionModels/utxo/api/write';
+} from '../../../../ada/lib/storage/database/transactionModels/utxo/api/write';
 import {
   GetUtxoTxOutputsWithTx,
   GetUtxoInputs,
   AssociateTxWithUtxoIOs,
-} from '../database/transactionModels/utxo/api/read';
+} from '../../../../ada/lib/storage/database/transactionModels/utxo/api/read';
 import {
-  AssociateTxWithAccountingIOs,
-} from '../database/transactionModels/account/api/read';
-import {
-  CardanoByronAssociateTxWithIOs, CardanoShelleyAssociateTxWithIOs,
-} from '../database/transactionModels/multipart/api/read';
+  ErgoAssociateTxWithIOs,
+} from '../../../../ada/lib/storage/database/transactionModels/multipart/api/read';
 import type {
   UserAnnotation,
-} from '../../../transactions/types';
+} from '../../../../ada/transactions/types';
 import type {
   ToAbsoluteSlotNumberFunc,
 } from '../../../../common/lib/storage/bridge/timeUtils';
 import type {
   UtxoTransactionInputInsert, UtxoTransactionOutputInsert,
-} from '../database/transactionModels/utxo/tables';
-import type {
-  AccountingTransactionInputInsert,
-} from '../database/transactionModels/account/tables';
+} from '../../../../ada/lib/storage/database/transactionModels/utxo/tables';
 import {
   TxStatusCodes,
   CoreAddressTypes,
-  CertificateRelation,
-} from '../database/primitives/enums';
+} from '../../../../ada/lib/storage/database/primitives/enums';
 import {
   asScanAddresses, asHasLevels,
-} from '../models/PublicDeriver/traits';
-import type { IHasLevels } from '../models/ConceptualWallet/interfaces';
-import { ConceptualWallet } from '../models/ConceptualWallet/index';
+} from '../../../../ada/lib/storage/models/PublicDeriver/traits';
+import type { IHasLevels } from '../../../../ada/lib/storage/models/ConceptualWallet/interfaces';
+import { ConceptualWallet } from '../../../../ada/lib/storage/models/ConceptualWallet/index';
 import type {
   IPublicDeriver,
-} from '../models/PublicDeriver/interfaces';
+} from '../../../../ada/lib/storage/models/PublicDeriver/interfaces';
 import {
   GetLastSyncForPublicDeriver,
   GetPublicDeriver,
   GetKeyForPublicDeriver,
-} from '../database/walletTypes/core/api/read';
-import { ModifyDisplayCutoff, } from '../database/walletTypes/bip44/api/write';
-import { AddDerivationTree, } from '../database/walletTypes/common/api/write';
-import { GetDerivationSpecific, } from '../database/walletTypes/common/api/read';
-import { getCardanoHaskellBaseConfig, } from '../database/prepackaged/networks';
+} from '../../../../ada/lib/storage/database/walletTypes/core/api/read';
+import { ModifyDisplayCutoff, } from '../../../../ada/lib/storage/database/walletTypes/bip44/api/write';
+import { AddDerivationTree, } from '../../../../ada/lib/storage/database/walletTypes/common/api/write';
+import { GetDerivationSpecific, } from '../../../../ada/lib/storage/database/walletTypes/common/api/read';
+import { getErgoBaseConfig, } from '../../../../ada/lib/storage/database/prepackaged/networks';
 import {
   ModifyLastSyncInfo,
   DeleteAllTransactions,
-} from '../database/walletTypes/core/api/write';
-import type { LastSyncInfoRow, } from '../database/walletTypes/core/tables';
-import type { CardanoByronTxIO, CardanoShelleyTxIO } from '../database/transactionModels/multipart/tables';
+} from '../../../../ada/lib/storage/database/walletTypes/core/api/write';
+import type { LastSyncInfoRow, } from '../../../../ada/lib/storage/database/walletTypes/core/tables';
+import type { ErgoTxIO } from '../../../../ada/lib/storage/database/transactionModels/multipart/tables';
 import {
   rawGetAddressRowsForWallet,
-} from  './traitUtils';
-import {
-  genToAbsoluteSlotNumber,
-} from './timeUtils';
+} from  '../../../../ada/lib/storage/bridge/traitUtils';
 import {
   rawGenHashToIdsFunc, rawGenFindOwnAddress,
 } from '../../../../common/lib/storage/bridge/hashMapper';
 import type {
   HashToIdsFunc, FindOwnAddressFunc,
 } from '../../../../common/lib/storage/bridge/hashMapper';
-import { CARDANO_STABLE_SIZE } from '../../../../../config/numbersConfig';
+import { ERGO_STABLE_SIZE } from '../../../../../config/numbersConfig';
 import { RollbackApiError } from '../../../../common/errors';
-import { getFromUserPerspective, } from '../../../transactions/utils';
+import { getFromUserPerspective, } from '../../../../ada/transactions/utils';
 
 import type {
-  HistoryFunc, BestBlockFunc,
-  RemoteTxState,
-  RemoteTransaction,
-  RemoteCertificate,
-} from '../../state-fetch/types';
-import {
-  ShelleyCertificateTypes,
-  RemoteTransactionTypes,
+  HistoryFunc, RemoteErgoTransaction, BestBlockFunc, RemoteTxState,
 } from '../../state-fetch/types';
 import type {
   FilterFunc,
 } from '../../../../common/lib/state-fetch/currencySpecificTypes';
-import { addressToKind, addressToDisplayString } from './utils';
-import { RustModule } from '../../cardanoCrypto/rustLoader';
+import { addressToKind, addressToDisplayString } from '../../../../ada/lib/storage/bridge/utils';
 
 async function rawGetAllTxIds(
   db: lf$Database,
@@ -140,8 +118,6 @@ async function rawGetAllTxIds(
     GetAddress: Class<GetAddress>,
     GetDerivationSpecific: Class<GetDerivationSpecific>,
     AssociateTxWithUtxoIOs: Class<AssociateTxWithUtxoIOs>,
-    AssociateTxWithAccountingIOs: Class<AssociateTxWithAccountingIOs>,
-    GetCertificates: Class<GetCertificates>,
   |},
   request: {| publicDeriver: IPublicDeriver<ConceptualWallet>, |},
   derivationTables: Map<number, string>,
@@ -149,12 +125,10 @@ async function rawGetAllTxIds(
   txIds: Array<number>,
   addresses: {|
     utxoAddresses: Array<$ReadOnly<AddressRow>>,
-    accountingAddresses: Array<$ReadOnly<AddressRow>>,
   |}
 |}> {
   const {
     utxoAddresses,
-    accountingAddresses,
   } = await rawGetAddressRowsForWallet(
     dbTx,
     {
@@ -167,29 +141,16 @@ async function rawGetAllTxIds(
   );
 
   const utxoAddressIds = utxoAddresses.map(row => row.AddressId);
-  const accountingAddressIds = accountingAddresses.map(row => row.AddressId);
-
-  const certificateTransactions = await deps.GetCertificates.forAddress(db, dbTx, {
-    addressIds: [
-      ...accountingAddressIds,
-      ...utxoAddressIds,
-    ],
-  });
 
   const txIds = Array.from(new Set([
-    ...(await deps.AssociateTxWithAccountingIOs.getTxIdsForAddresses(
-      db, dbTx, { addressIds: accountingAddressIds },
-    )),
     ...(await deps.AssociateTxWithUtxoIOs.getTxIdsForAddresses(
       db, dbTx, { addressIds: utxoAddressIds },
     )),
-    ...certificateTransactions.map(certTx => certTx.transaction.TransactionId),
   ]));
   return {
     txIds,
     addresses: {
       utxoAddresses,
-      accountingAddresses,
     },
   };
 }
@@ -200,13 +161,10 @@ export async function rawGetTransactions(
   deps: {|
     GetPathWithSpecific: Class<GetPathWithSpecific>,
     GetAddress: Class<GetAddress>,
-    CardanoByronAssociateTxWithIOs: Class<CardanoByronAssociateTxWithIOs>,
-    CardanoShelleyAssociateTxWithIOs: Class<CardanoShelleyAssociateTxWithIOs>,
+    ErgoAssociateTxWithIOs: Class<ErgoAssociateTxWithIOs>,
     AssociateTxWithUtxoIOs: Class<AssociateTxWithUtxoIOs>,
-    AssociateTxWithAccountingIOs: Class<AssociateTxWithAccountingIOs>,
     GetTxAndBlock: Class<GetTxAndBlock>,
     GetDerivationSpecific: Class<GetDerivationSpecific>,
-    GetCertificates: Class<GetCertificates>,
   |},
   request: {|
     publicDeriver: IPublicDeriver<ConceptualWallet>,
@@ -221,7 +179,7 @@ export async function rawGetTransactions(
 ): Promise<{|
   addressLookupMap: Map<number, string>,
   txs: Array<{|
-  ...(CardanoByronTxIO | CardanoShelleyTxIO),
+  ...ErgoTxIO,
   ...WithNullableFields<DbBlock>,
   ...UserAnnotation,
 |}>,
@@ -235,9 +193,7 @@ export async function rawGetTransactions(
       GetPathWithSpecific: deps.GetPathWithSpecific,
       GetAddress: deps.GetAddress,
       AssociateTxWithUtxoIOs: deps.AssociateTxWithUtxoIOs,
-      AssociateTxWithAccountingIOs: deps.AssociateTxWithAccountingIOs,
       GetDerivationSpecific: deps.GetDerivationSpecific,
-      GetCertificates: deps.GetCertificates,
     },
     { publicDeriver: request.publicDeriver },
     derivationTables,
@@ -247,24 +203,13 @@ export async function rawGetTransactions(
   for (const tx of txs) {
     blockMap.set(tx.Transaction.TransactionId, tx.Block);
   }
-  const byronWithIOs = await deps.CardanoByronAssociateTxWithIOs.getIOsForTx(
+  const txsWithIOs = await deps.ErgoAssociateTxWithIOs.getIOsForTx(
     db, dbTx,
     { txs: txs
       .map(txWithBlock => txWithBlock.Transaction)
-      .filter(tx => tx.Type === TransactionType.CardanoByron)
+      .filter(tx => tx.Type === TransactionType.Ergo)
     }
   );
-  const shelleyWithIOs = await deps.CardanoShelleyAssociateTxWithIOs.getIOsForTx(
-    db, dbTx,
-    { txs: txs
-      .map(txWithBlock => txWithBlock.Transaction)
-      .filter(tx => tx.Type === TransactionType.CardanoShelley)
-    }
-  );
-  const txsWithIOs = [
-    ...byronWithIOs,
-    ...shelleyWithIOs,
-  ];
 
   // we need to build a lookup map of AddressId => Hash
   // note: some inputs or outputs may not belong to us
@@ -274,16 +219,6 @@ export async function rawGetTransactions(
     const allAddressIds = txsWithIOs.flatMap(txWithIO => [
       ...txWithIO.utxoInputs.map(input => input.AddressId),
       ...txWithIO.utxoOutputs.map(output => output.AddressId),
-      ...(txWithIO.accountingInputs == null
-        ? []
-        : txWithIO.accountingInputs.map(output => output.AddressId)
-      ),
-      ...(txWithIO.certificates == null
-        ? []
-        : txWithIO.certificates.flatMap(
-          cert => cert.relatedAddresses.map(relation => relation.AddressId)
-        )
-      ),
     ]);
     const addressRows = await GetAddress.getById(
       db, dbTx,
@@ -295,67 +230,17 @@ export async function rawGetTransactions(
     }
   }
 
-  const result = txsWithIOs.map((tx: CardanoByronTxIO | CardanoShelleyTxIO) => ({
+  const result = txsWithIOs.map((tx: ErgoTxIO) => ({
     ...tx,
     block: blockMap.get(tx.transaction.TransactionId) || null,
     ...getFromUserPerspective({
       utxoInputs: tx.utxoInputs,
       utxoOutputs: tx.utxoOutputs,
-      accountingInputs: tx.accountingInputs == null ? undefined : tx.accountingInputs,
       allOwnedAddressIds: new Set(
         Object.keys(addresses).flatMap(key => addresses[key]).map(addrRow => addrRow.AddressId)
       ),
-      /**
-        * Note: we don't consider certificate refunds as belonging to you.
-        * Rationale:
-        * 1) It's very unclear who the refund "belongs to" in the case of a pool registration.
-        *    Does it belong to the owner? Operators? Some weird split?
-        *    Better to just say it's just bonus ADA to whoever gets it in the tx outputs
-        * 2) For stake deregistration, it's tempting to say it belongs to the owner of the stake key
-        *    But the protocol allows other people to pay to register your staking key
-        *    (no staking key witness required for registration)
-        *    So that wouldn't be quite accurate either.
-        *    Again, it's easier to say it's just whoever gets it
-      */
       ownImplicitInput: new BigNumber(0),
-      ownImplicitOutput: (() => {
-        if (tx.txType === TransactionType.CardanoShelley) {
-          let implicitOutputSum = new BigNumber(0);
-          for (const cert of tx.certificates) {
-            if (
-              cert.certificate.Kind !==
-              RustModule.WalletV4.CertificateKind.MoveInstantaneousRewardsCert
-            ) {
-              continue;
-            }
-            const mir = RustModule.WalletV4.MoveInstantaneousRewardsCert.from_bytes(
-              Buffer.from(cert.certificate.Payload, 'hex')
-            ).move_instantaneous_reward();
-
-            for (const relatedAddr of cert.relatedAddresses) {
-              // recall: length of this list is usually just 1
-              for (const addr of addresses.accountingAddresses) {
-                if (relatedAddr.AddressId === addr.AddressId) {
-                  // this address got some rewards inside the cert
-                  const rewardAddr = RustModule.WalletV4.RewardAddress.from_address(
-                    RustModule.WalletV4.Address.from_bytes(
-                      Buffer.from(addr.Hash, 'hex')
-                    )
-                  );
-                  if (rewardAddr == null) continue; // should never happen
-                  const rewardAmount = mir.get(rewardAddr.payment_cred());
-                  if (rewardAmount == null) continue; // should never happen
-                  implicitOutputSum = implicitOutputSum.plus(
-                    rewardAmount.to_str()
-                  );
-                }
-              }
-            }
-          }
-          return implicitOutputSum;
-        }
-        return new BigNumber(0);
-      })(),
+      ownImplicitOutput: new BigNumber(0),
     })
   }));
 
@@ -374,7 +259,7 @@ export async function getAllTransactions(
 ): Promise<{|
   addressLookupMap: Map<number, string>,
   txs: Array<{|
-  ...(CardanoByronTxIO | CardanoShelleyTxIO),
+  ...ErgoTxIO,
   ...WithNullableFields<DbBlock>,
   ...UserAnnotation,
 |}>,
@@ -383,13 +268,10 @@ export async function getAllTransactions(
   const deps = Object.freeze({
     GetPathWithSpecific,
     GetAddress,
-    CardanoByronAssociateTxWithIOs,
-    CardanoShelleyAssociateTxWithIOs,
+    ErgoAssociateTxWithIOs,
     AssociateTxWithUtxoIOs,
-    AssociateTxWithAccountingIOs,
     GetTxAndBlock,
     GetDerivationSpecific,
-    GetCertificates,
   });
   const depTables = Object
     .keys(deps)
@@ -408,13 +290,10 @@ export async function getAllTransactions(
         {
           GetPathWithSpecific: deps.GetPathWithSpecific,
           GetAddress: deps.GetAddress,
-          CardanoByronAssociateTxWithIOs: deps.CardanoByronAssociateTxWithIOs,
-          CardanoShelleyAssociateTxWithIOs: deps.CardanoShelleyAssociateTxWithIOs,
+          ErgoAssociateTxWithIOs: deps.ErgoAssociateTxWithIOs,
           AssociateTxWithUtxoIOs: deps.AssociateTxWithUtxoIOs,
-          AssociateTxWithAccountingIOs: deps.AssociateTxWithAccountingIOs,
           GetTxAndBlock: deps.GetTxAndBlock,
           GetDerivationSpecific: deps.GetDerivationSpecific,
-          GetCertificates: deps.GetCertificates,
         },
         {
           ...request,
@@ -438,7 +317,7 @@ export async function getPendingTransactions(
 ): Promise<{|
   addressLookupMap: Map<number, string>,
   txs: Array<{|
-  ...(CardanoByronTxIO | CardanoShelleyTxIO),
+  ...ErgoTxIO,
   ...WithNullableFields<DbBlock>,
   ...UserAnnotation,
 |}>,
@@ -447,13 +326,10 @@ export async function getPendingTransactions(
   const deps = Object.freeze({
     GetPathWithSpecific,
     GetAddress,
-    CardanoByronAssociateTxWithIOs,
-    CardanoShelleyAssociateTxWithIOs,
+    ErgoAssociateTxWithIOs,
     AssociateTxWithUtxoIOs,
-    AssociateTxWithAccountingIOs,
     GetTxAndBlock,
     GetDerivationSpecific,
-    GetCertificates,
   });
   const depTables = Object
     .keys(deps)
@@ -472,13 +348,10 @@ export async function getPendingTransactions(
         {
           GetPathWithSpecific: deps.GetPathWithSpecific,
           GetAddress: deps.GetAddress,
-          CardanoByronAssociateTxWithIOs: deps.CardanoByronAssociateTxWithIOs,
-          CardanoShelleyAssociateTxWithIOs: deps.CardanoShelleyAssociateTxWithIOs,
+          ErgoAssociateTxWithIOs: deps.ErgoAssociateTxWithIOs,
           AssociateTxWithUtxoIOs: deps.AssociateTxWithUtxoIOs,
-          AssociateTxWithAccountingIOs: deps.AssociateTxWithAccountingIOs,
           GetTxAndBlock: deps.GetTxAndBlock,
           GetDerivationSpecific: deps.GetDerivationSpecific,
-          GetCertificates: deps.GetCertificates,
         },
         {
           ...request,
@@ -502,13 +375,10 @@ export async function rawGetForeignAddresses(
   deps: {|
     GetPathWithSpecific: Class<GetPathWithSpecific>,
     GetAddress: Class<GetAddress>,
-    CardanoByronAssociateTxWithIOs: Class<CardanoByronAssociateTxWithIOs>,
-    CardanoShelleyAssociateTxWithIOs: Class<CardanoShelleyAssociateTxWithIOs>,
+    ErgoAssociateTxWithIOs: Class<ErgoAssociateTxWithIOs>,
     AssociateTxWithUtxoIOs: Class<AssociateTxWithUtxoIOs>,
-    AssociateTxWithAccountingIOs: Class<AssociateTxWithAccountingIOs>,
     GetDerivationSpecific: Class<GetDerivationSpecific>,
     GetTransaction: Class<GetTransaction>,
-    GetCertificates: Class<GetCertificates>,
   |},
   derivationTables: Map<number, string>,
   request: {|
@@ -521,9 +391,7 @@ export async function rawGetForeignAddresses(
       GetPathWithSpecific: deps.GetPathWithSpecific,
       GetAddress: deps.GetAddress,
       AssociateTxWithUtxoIOs: deps.AssociateTxWithUtxoIOs,
-      AssociateTxWithAccountingIOs: deps.AssociateTxWithAccountingIOs,
       GetDerivationSpecific: deps.GetDerivationSpecific,
-      GetCertificates: deps.GetCertificates,
     },
     { publicDeriver: request.publicDeriver },
     derivationTables,
@@ -534,27 +402,14 @@ export async function rawGetForeignAddresses(
     { ids: relatedIds.txIds }
   );
 
-  const byronWithIOs = await deps.CardanoByronAssociateTxWithIOs.getIOsForTx(
+  const txsWithIOs = await deps.ErgoAssociateTxWithIOs.getIOsForTx(
     db, dbTx,
-    { txs: fullTxs.filter(tx => tx.Type === TransactionType.CardanoByron) }
+    { txs: fullTxs.filter(tx => tx.Type === TransactionType.Ergo) }
   );
-  const shelleyWithIOs = await deps.CardanoShelleyAssociateTxWithIOs.getIOsForTx(
-    db, dbTx,
-    { txs: fullTxs.filter(tx => tx.Type === TransactionType.CardanoShelley) }
-  );
-  const txsWithIOs = [
-    ...byronWithIOs,
-    ...shelleyWithIOs,
-  ];
 
   const allAddressIds = txsWithIOs.flatMap(txWithIO => [
     ...txWithIO.utxoInputs.map(input => input.AddressId),
     ...txWithIO.utxoOutputs.map(output => output.AddressId),
-    ...(txWithIO.accountingInputs == null
-      ? []
-      : txWithIO.accountingInputs.map(input => input.AddressId)
-    ),
-    // note: we don't show other addresses in a certificate as unknown addresses
   ]);
 
   const ourIds = new Set(
@@ -579,13 +434,10 @@ export async function getForeignAddresses(
   const deps = Object.freeze({
     GetPathWithSpecific,
     GetAddress,
-    CardanoByronAssociateTxWithIOs,
-    CardanoShelleyAssociateTxWithIOs,
+    ErgoAssociateTxWithIOs,
     AssociateTxWithUtxoIOs,
-    AssociateTxWithAccountingIOs,
     GetDerivationSpecific,
     GetTransaction,
-    GetCertificates,
   });
   const db = request.publicDeriver.getDb();
   const depTables = Object
@@ -637,16 +489,13 @@ export async function rawRemoveAllTransactions(
   deps: {|
     GetPathWithSpecific: Class<GetPathWithSpecific>,
     GetAddress: Class<GetAddress>,
-    CardanoByronAssociateTxWithIOs: Class<CardanoByronAssociateTxWithIOs>,
-    CardanoShelleyAssociateTxWithIOs: Class<CardanoShelleyAssociateTxWithIOs>,
+    ErgoAssociateTxWithIOs: Class<ErgoAssociateTxWithIOs>,
     AssociateTxWithUtxoIOs: Class<AssociateTxWithUtxoIOs>,
-    AssociateTxWithAccountingIOs: Class<AssociateTxWithAccountingIOs>,
     GetDerivationSpecific: Class<GetDerivationSpecific>,
     DeleteAllTransactions: Class<DeleteAllTransactions>,
     GetTransaction: Class<GetTransaction>,
     ModifyAddress: Class<ModifyAddress>,
     FreeBlocks: Class<FreeBlocks>,
-    GetCertificates: Class<GetCertificates>,
   |},
   derivationTables: Map<number, string>,
   request: {|
@@ -658,13 +507,10 @@ export async function rawRemoveAllTransactions(
     {
       GetPathWithSpecific: deps.GetPathWithSpecific,
       GetAddress: deps.GetAddress,
-      CardanoByronAssociateTxWithIOs: deps.CardanoByronAssociateTxWithIOs,
-      CardanoShelleyAssociateTxWithIOs: deps.CardanoShelleyAssociateTxWithIOs,
+      ErgoAssociateTxWithIOs: deps.ErgoAssociateTxWithIOs,
       AssociateTxWithUtxoIOs: deps.AssociateTxWithUtxoIOs,
-      AssociateTxWithAccountingIOs: deps.AssociateTxWithAccountingIOs,
       GetDerivationSpecific: deps.GetDerivationSpecific,
       GetTransaction: deps.GetTransaction,
-      GetCertificates: deps.GetCertificates,
     },
     derivationTables,
     request,
@@ -675,9 +521,7 @@ export async function rawRemoveAllTransactions(
       GetPathWithSpecific: deps.GetPathWithSpecific,
       GetAddress: deps.GetAddress,
       AssociateTxWithUtxoIOs: deps.AssociateTxWithUtxoIOs,
-      AssociateTxWithAccountingIOs: deps.AssociateTxWithAccountingIOs,
       GetDerivationSpecific: deps.GetDerivationSpecific,
-      GetCertificates: deps.GetCertificates,
     },
     { publicDeriver: request.publicDeriver },
     derivationTables,
@@ -711,16 +555,13 @@ export async function removeAllTransactions(
   const deps = Object.freeze({
     GetPathWithSpecific,
     GetAddress,
-    CardanoByronAssociateTxWithIOs,
-    CardanoShelleyAssociateTxWithIOs,
+    ErgoAssociateTxWithIOs,
     AssociateTxWithUtxoIOs,
-    AssociateTxWithAccountingIOs,
     GetDerivationSpecific,
     DeleteAllTransactions,
     ModifyAddress,
     GetTransaction,
     FreeBlocks,
-    GetCertificates,
   });
   const db = request.publicDeriver.getDb();
   const depTables = Object
@@ -777,13 +618,9 @@ export async function updateTransactions(
       GetTxAndBlock,
       GetDerivationSpecific,
       ModifyTransaction,
-      ModifyCardanoByronTx,
-      ModifyCardanoShelleyTx,
-      CardanoByronAssociateTxWithIOs,
-      CardanoShelleyAssociateTxWithIOs,
+      ModifyErgoTx,
+      ErgoAssociateTxWithIOs,
       AssociateTxWithUtxoIOs,
-      AssociateTxWithAccountingIOs,
-      GetCertificates,
     });
     const updateTables = Object
       .keys(updateDepTables)
@@ -839,9 +676,8 @@ export async function updateTransactions(
       GetUtxoInputs,
       GetEncryptionMeta,
       GetDerivationSpecific,
-      CardanoByronAssociateTxWithIOs,
+      ErgoAssociateTxWithIOs,
       AssociateTxWithUtxoIOs,
-      AssociateTxWithAccountingIOs,
     });
     const rollbackTables = Object
       .keys(rollbackDepTables)
@@ -885,9 +721,8 @@ async function rollback(
   deps: {|
     GetPathWithSpecific: Class<GetPathWithSpecific>,
     GetAddress: Class<GetAddress>,
-    CardanoByronAssociateTxWithIOs: Class<CardanoByronAssociateTxWithIOs>,
+    ErgoAssociateTxWithIOs: Class<ErgoAssociateTxWithIOs>,
     AssociateTxWithUtxoIOs: Class<AssociateTxWithUtxoIOs>,
-    AssociateTxWithAccountingIOs: Class<AssociateTxWithAccountingIOs>,
     GetLastSyncForPublicDeriver: Class<GetLastSyncForPublicDeriver>,
     ModifyLastSyncInfo: Class<ModifyLastSyncInfo>,
     GetBlock: Class<GetBlock>,
@@ -908,15 +743,14 @@ async function rollback(
   const { TransactionSeed, } = await deps.GetEncryptionMeta.get(db, dbTx);
 
   // if we've never successfully synced from the server, no need to rollback
-  const lastSyncSlotNum = request.lastSyncInfo.SlotNum;
-  if (lastSyncSlotNum === null) {
+  const lastSyncHeight = request.lastSyncInfo.Height;
+  if (lastSyncHeight === 0) {
     return;
   }
 
   // 1) Get all transactions
   const {
     utxoAddresses,
-    accountingAddresses,
   } = await rawGetAddressRowsForWallet(
     dbTx,
     {
@@ -928,11 +762,7 @@ async function rollback(
     derivationTables,
   );
   const utxoAddressIds = utxoAddresses.map(address => address.AddressId);
-  const accountingAddressIds = accountingAddresses.map(address => address.AddressId);
   const txIds = Array.from(new Set([
-    ...(await deps.AssociateTxWithAccountingIOs.getTxIdsForAddresses(
-      db, dbTx, { addressIds: accountingAddressIds },
-    )),
     ...(await deps.AssociateTxWithUtxoIOs.getTxIdsForAddresses(
       db, dbTx, { addressIds: utxoAddressIds },
     )),
@@ -955,7 +785,7 @@ async function rollback(
 
   const txsToRevert = await deps.GetTxAndBlock.gteSlot(
     db, dbTx,
-    { txIds, slot: bestInStorage.Block.SlotNum - CARDANO_STABLE_SIZE }
+    { txIds, slot: bestInStorage.Block.Height - ERGO_STABLE_SIZE }
   );
 
   // 4) mark rollback transactions as failed
@@ -1013,7 +843,7 @@ async function rollback(
   // 7) Rollback LastSyncTable
   const bestStillIncluded = await deps.GetTxAndBlock.firstSuccessTxBefore(
     db, dbTx,
-    { txIds, slot: bestInStorage.Block.SlotNum - CARDANO_STABLE_SIZE }
+    { txIds, slot: bestInStorage.Block.Height - ERGO_STABLE_SIZE }
   );
   await deps.ModifyLastSyncInfo.overrideLastSyncInfo(
     db, dbTx,
@@ -1050,13 +880,9 @@ async function rawUpdateTransactions(
     GetTxAndBlock: Class<GetTxAndBlock>,
     GetDerivationSpecific: Class<GetDerivationSpecific>,
     ModifyTransaction: Class<ModifyTransaction>,
-    ModifyCardanoByronTx: Class<ModifyCardanoByronTx>,
-    ModifyCardanoShelleyTx: Class<ModifyCardanoShelleyTx>,
-    CardanoByronAssociateTxWithIOs: Class<CardanoByronAssociateTxWithIOs>,
-    CardanoShelleyAssociateTxWithIOs: Class<CardanoShelleyAssociateTxWithIOs>,
+    ModifyErgoTx: Class<ModifyErgoTx>,
+    ErgoAssociateTxWithIOs: Class<ErgoAssociateTxWithIOs>,
     AssociateTxWithUtxoIOs: Class<AssociateTxWithUtxoIOs>,
-    AssociateTxWithAccountingIOs: Class<AssociateTxWithAccountingIOs>,
-    GetCertificates: Class<GetCertificates>,
   |},
   publicDeriver: IPublicDeriver<>,
   lastSyncInfo: $ReadOnly<LastSyncInfoRow>,
@@ -1067,26 +893,16 @@ async function rawUpdateTransactions(
 ): Promise<void> {
   const network = publicDeriver.getParent().getNetworkInfo();
 
-  // TODO: consider passing this function in as an argument instead of generating it here
-  const toAbsoluteSlotNumber = await genToAbsoluteSlotNumber(
-    getCardanoHaskellBaseConfig(network)
-  );
   // 1) Check if backend is synced (avoid rollbacks if backend has to resync from block 1)
 
   const bestBlock = await getBestBlock({
     network,
   });
-  const slotInRemote = (bestBlock.epoch == null || bestBlock.slot == null)
-    ? null
-    : toAbsoluteSlotNumber({
-      epoch: bestBlock.epoch,
-      slot: bestBlock.slot,
-    });
-  if (lastSyncInfo.SlotNum !== null) {
-    const lastSlotSeen = lastSyncInfo.SlotNum;
-    const inRemote = (slotInRemote != null ? slotInRemote : 0);
+  if (lastSyncInfo.Height !== 0) {
+    const lastSeen = lastSyncInfo.Height;
+    const inRemote = bestBlock.height;
     // if we're K slots ahead of remote
-    if (lastSlotSeen - inRemote > CARDANO_STABLE_SIZE) {
+    if (lastSeen - inRemote > ERGO_STABLE_SIZE) {
       return;
     }
   }
@@ -1127,8 +943,6 @@ async function rawUpdateTransactions(
         GetAddress: deps.GetAddress,
         GetDerivationSpecific: deps.GetDerivationSpecific,
         AssociateTxWithUtxoIOs: deps.AssociateTxWithUtxoIOs,
-        AssociateTxWithAccountingIOs: deps.AssociateTxWithAccountingIOs,
-        GetCertificates: deps.GetCertificates,
       },
       { publicDeriver },
       derivationTables,
@@ -1164,10 +978,6 @@ async function rawUpdateTransactions(
           .map(address => address.Hash)
           // TODO: remove this when we properly support passing payment keys
           .map(addr => addressToDisplayString(addr, publicDeriver.getParent().getNetworkInfo())),
-        // note: sending account addresses is required
-        // since for example, the staking key registration certificate doesn't need a witness
-        // so a tx where no input/output belongs to you could register your staking key
-        ...addresses.accountingAddresses.map(address => address.Hash),
       ],
       untilBlock,
     });
@@ -1185,14 +995,12 @@ async function rawUpdateTransactions(
       dbTx,
       {
         MarkUtxo: deps.MarkUtxo,
-        CardanoByronAssociateTxWithIOs: deps.CardanoByronAssociateTxWithIOs,
-        CardanoShelleyAssociateTxWithIOs: deps.CardanoShelleyAssociateTxWithIOs,
+        ErgoAssociateTxWithIOs: deps.ErgoAssociateTxWithIOs,
         GetEncryptionMeta: deps.GetEncryptionMeta,
         GetTransaction: deps.GetTransaction,
         GetUtxoInputs: deps.GetUtxoInputs,
         ModifyTransaction: deps.ModifyTransaction,
-        ModifyCardanoByronTx: deps.ModifyCardanoByronTx,
-        ModifyCardanoShelleyTx: deps.ModifyCardanoShelleyTx,
+        ModifyErgoTx: deps.ModifyErgoTx,
       },
       {
         network: publicDeriver.getParent().getNetworkInfo(),
@@ -1205,7 +1013,6 @@ async function rawUpdateTransactions(
         findOwnAddress: rawGenFindOwnAddress(
           ourIds
         ),
-        toAbsoluteSlotNumber,
         derivationTables,
       }
     );
@@ -1217,7 +1024,7 @@ async function rawUpdateTransactions(
     {
       LastSyncInfoId: lastSyncInfo.LastSyncInfoId,
       Time: new Date(Date.now()),
-      SlotNum: slotInRemote,
+      SlotNum: bestBlock.slot,
       BlockHash: bestBlock.hash,
       Height: bestBlock.height,
     }
@@ -1233,31 +1040,28 @@ export async function updateTransactionBatch(
   dbTx: lf$Transaction,
   deps: {|
     MarkUtxo: Class<MarkUtxo>,
-    CardanoByronAssociateTxWithIOs: Class<CardanoByronAssociateTxWithIOs>,
-    CardanoShelleyAssociateTxWithIOs: Class<CardanoShelleyAssociateTxWithIOs>,
+    ErgoAssociateTxWithIOs: Class<ErgoAssociateTxWithIOs>,
     GetEncryptionMeta: Class<GetEncryptionMeta>,
     GetTransaction: Class<GetTransaction>,
     GetUtxoInputs: Class<GetUtxoInputs>,
     ModifyTransaction: Class<ModifyTransaction>,
-    ModifyCardanoByronTx: Class<ModifyCardanoByronTx>,
-    ModifyCardanoShelleyTx: Class<ModifyCardanoShelleyTx>,
+    ModifyErgoTx: Class<ModifyErgoTx>,
   |},
   request: {|
     network: $ReadOnly<NetworkRow>,
-    toAbsoluteSlotNumber: ToAbsoluteSlotNumberFunc,
     txIds: Array<number>,
-    txsFromNetwork: Array<RemoteTransaction>,
+    txsFromNetwork: Array<RemoteErgoTransaction>,
     hashToIds: HashToIdsFunc,
     findOwnAddress: FindOwnAddressFunc,
     derivationTables: Map<number, string>,
   |}
 ): Promise<Array<{|
-  ...(CardanoByronTxIO | CardanoShelleyTxIO),
+  ...ErgoTxIO,
   ...DbBlock,
 |}>> {
   const { TransactionSeed, BlockSeed } = await deps.GetEncryptionMeta.get(db, dbTx);
 
-  const matchesInDb = new Map<string, CardanoByronTxIO | CardanoShelleyTxIO>();
+  const matchesInDb = new Map<string, ErgoTxIO>();
   {
     const digestsForNew = request.txsFromNetwork.map(tx => digestForHash(tx.hash, TransactionSeed));
     const matchByDigest = await deps.GetTransaction.byDigest(db, dbTx, {
@@ -1265,26 +1069,18 @@ export async function updateTransactionBatch(
       txIds: request.txIds,
     });
     const txs: Array<$ReadOnly<TransactionRow>> = Array.from(matchByDigest.values());
-    const byronWithIOs = await deps.CardanoByronAssociateTxWithIOs.getIOsForTx(
+    const txsWithIOs = await deps.ErgoAssociateTxWithIOs.getIOsForTx(
       db, dbTx,
-      { txs: txs.filter(tx => tx.Type === TransactionType.CardanoByron) }
+      { txs: txs.filter(tx => tx.Type === TransactionType.Ergo) }
     );
-    const shelleyWithIOs = await deps.CardanoShelleyAssociateTxWithIOs.getIOsForTx(
-      db, dbTx,
-      { txs: txs.filter(tx => tx.Type === TransactionType.CardanoShelley) }
-    );
-    const txsWithIOs = [
-      ...byronWithIOs,
-      ...shelleyWithIOs,
-    ];
     for (const tx of txsWithIOs) {
       matchesInDb.set(tx.transaction.Hash, tx);
     }
   }
 
-  const unseenNewTxs: Array<RemoteTransaction> = [];
+  const unseenNewTxs: Array<RemoteErgoTransaction> = [];
   const txsAddedToBlock: Array<{|
-    ...(CardanoByronTxIO | CardanoShelleyTxIO),
+    ...ErgoTxIO,
     ...DbBlock,
   |}> = [];
   const modifiedTxIds = new Set<number>();
@@ -1308,7 +1104,6 @@ export async function updateTransactionBatch(
      */
     const modifiedTxForDb = networkTxHeaderToDb(
       txFromNetwork,
-      request.toAbsoluteSlotNumber,
       TransactionSeed,
       BlockSeed
     );
@@ -1332,7 +1127,7 @@ export async function updateTransactionBatch(
     }
     if (result.block !== null) {
       txsAddedToBlock.push({
-        ...(matchInDb: (CardanoByronTxIO | CardanoShelleyTxIO)),
+        ...(matchInDb: ErgoTxIO),
         // override with updated
         block: result.block,
         transaction: result.transaction,
@@ -1341,7 +1136,7 @@ export async function updateTransactionBatch(
   }
 
   // 2) Add new transactions
-  const { byronTxs, shelleyTxs, } = await networkTxToDbTx(
+  const { ergoTxs, } = await networkTxToDbTx(
     db,
     dbTx,
     request.network,
@@ -1349,13 +1144,12 @@ export async function updateTransactionBatch(
     unseenNewTxs,
     request.hashToIds,
     request.findOwnAddress,
-    request.toAbsoluteSlotNumber,
     TransactionSeed,
     BlockSeed,
   );
   const newsTxsIdSet = new Set();
-  for (const newTx of byronTxs) {
-    const result = await deps.ModifyCardanoByronTx.addTxWithIOs(
+  for (const newTx of ergoTxs) {
+    const result = await deps.ModifyErgoTx.addTxWithIOs(
       db,
       dbTx,
       newTx,
@@ -1368,25 +1162,6 @@ export async function updateTransactionBatch(
         transaction: result.transaction,
         utxoInputs: result.utxoInputs,
         utxoOutputs: result.utxoOutputs,
-      });
-    }
-  }
-  for (const newTx of shelleyTxs) {
-    const result = await deps.ModifyCardanoShelleyTx.addTxWithIOs(
-      db,
-      dbTx,
-      newTx,
-    );
-    newsTxsIdSet.add(result.transaction.TransactionId);
-    if (result.block !== null) {
-      txsAddedToBlock.push({
-        txType: result.txType,
-        block: result.block,
-        transaction: result.transaction,
-        certificates: result.certificates,
-        utxoInputs: result.utxoInputs,
-        utxoOutputs: result.utxoOutputs,
-        accountingInputs: result.accountingInputs,
       });
     }
   }
@@ -1446,37 +1221,34 @@ export async function updateTransactionBatch(
   return txsAddedToBlock;
 }
 
-function genByronIOGen(
-  byronTx: RemoteTransaction,
+function genErgoIOGen(
+  remoteTx: RemoteErgoTransaction,
   getIdOrThrow: string => number,
 ): (number => {|
   utxoInputs: Array<UtxoTransactionInputInsert>,
   utxoOutputs: Array<UtxoTransactionOutputInsert>,
 |}) {
-  if (!(byronTx.type == null || byronTx.type === RemoteTransactionTypes.byron)) {
-    throw new Error(`${nameof(genByronIOGen)} not a byron transaction`);
-  }
   return (txRowId) => {
     const utxoInputs = [];
     const utxoOutputs = [];
-    for (let i = 0; i < byronTx.inputs.length; i++) {
-      const input = byronTx.inputs[i];
+    for (let i = 0; i < remoteTx.inputs.length; i++) {
+      const input = remoteTx.inputs[i];
       utxoInputs.push({
         TransactionId: txRowId,
         AddressId: getIdOrThrow(input.address),
-        ParentTxHash: input.txHash,
+        ParentTxHash: input.outputTransactionId,
         IndexInParentTx: input.index,
         IndexInOwnTx: i,
-        Amount: input.amount,
+        Amount: input.value.toString(),
       });
     }
-    for (let i = 0; i < byronTx.outputs.length; i++) {
-      const output = byronTx.outputs[i];
+    for (let i = 0; i < remoteTx.outputs.length; i++) {
+      const output = remoteTx.outputs[i];
       utxoOutputs.push({
         TransactionId: txRowId,
         AddressId: getIdOrThrow(output.address),
         OutputIndex: i,
-        Amount: output.amount,
+        Amount: output.value.toString(),
         /**
           * we assume unspent for now but it will be updated after if necessary
           * Note: if this output doesn't belong to you, it will be true forever
@@ -1492,124 +1264,28 @@ function genByronIOGen(
     };
   };
 }
-function genShelleyIOGen(
-  shelleyTx: RemoteTransaction,
-  getIdOrThrow: string => number,
-  network: $ReadOnly<NetworkRow>,
-): (number => {|
-  utxoInputs: Array<UtxoTransactionInputInsert>,
-  utxoOutputs: Array<UtxoTransactionOutputInsert>,
-  accountingInputs: Array<AccountingTransactionInputInsert>,
-|}) {
-  if (shelleyTx.type !== RemoteTransactionTypes.shelley) {
-    throw new Error(`${nameof(genShelleyIOGen)} not a shelley transaction`);
-  }
-  return (txRowId) => {
-    const utxoInputs = [];
-    const utxoOutputs = [];
-    const accountingInputs = [];
-    for (let i = 0; i < shelleyTx.inputs.length; i++) {
-      const input = shelleyTx.inputs[i];
-      utxoInputs.push({
-        TransactionId: txRowId,
-        AddressId: getIdOrThrow(input.address),
-        ParentTxHash: input.txHash,
-        IndexInParentTx: input.index,
-        IndexInOwnTx: i,
-        Amount: input.amount,
-      });
-    }
-    for (let i = 0; i < shelleyTx.withdrawals.length; i++) {
-      accountingInputs.push({
-        TransactionId: txRowId,
-        AddressId: getIdOrThrow(shelleyTx.withdrawals[i].address),
-        /**
-         * Withdrawal transactions don't increase the spending counter
-         * Replay protection is achieved by forcing all transactions to also include a UTXO input
-         * And requiring that the full balance is transferred in a withdrawal
-         */
-        SpendingCounter: 0,
-        /**
-         * Note: the index for a withdrawal starts at 0 (independent of UTXO inputs)
-         */
-        IndexInOwnTx: i,
-        Amount: shelleyTx.withdrawals[i].amount,
-      });
-    }
-    for (let i = 0; i < shelleyTx.outputs.length; i++) {
-      const output = shelleyTx.outputs[i];
-      const outputType = addressToKind(output.address, 'bytes', network);
-      // consider a group address as a UTXO output
-      // since the payment (UTXO) key is the one that signs
-      if (
-        outputType === CoreAddressTypes.CARDANO_LEGACY ||
-        outputType === CoreAddressTypes.CARDANO_ENTERPRISE ||
-        outputType === CoreAddressTypes.CARDANO_BASE ||
-        outputType === CoreAddressTypes.CARDANO_PTR
-      ) {
-        utxoOutputs.push({
-          TransactionId: txRowId,
-          AddressId: getIdOrThrow(output.address),
-          OutputIndex: i,
-          Amount: output.amount,
-          /**
-            * we assume unspent for now but it will be updated after if necessary
-            * Note: if this output doesn't belong to you, it will be true forever
-            * This is slightly misleading, but using null would require null-checks everywhere
-            */
-          IsUnspent: true,
-        });
-      } else if (
-        outputType === CoreAddressTypes.CARDANO_REWARD
-      ) {
-        throw new Error(`${nameof(networkTxToDbTx)} cannot send to a reward address`);
-      } else {
-        // TODO: handle multisig
-        throw new Error(`${nameof(networkTxToDbTx)} Unhandled output type`);
-      }
-    }
-
-    return {
-      utxoInputs,
-      utxoOutputs,
-      accountingInputs,
-    };
-  };
-}
-
 
 async function networkTxToDbTx(
   db: lf$Database,
   dbTx: lf$Transaction,
   network: $ReadOnly<NetworkRow>,
   derivationTables: Map<number, string>,
-  newTxs: Array<RemoteTransaction>,
+  newTxs: Array<RemoteErgoTransaction>,
   hashToIds: HashToIdsFunc,
   findOwnAddress: FindOwnAddressFunc,
-  toAbsoluteSlotNumber: ToAbsoluteSlotNumberFunc,
   TransactionSeed: number,
   BlockSeed: number,
 ): Promise<{|
-  byronTxs: Array<{|
+  ergoTxs: Array<{|
     block: null | BlockInsert,
     transaction: (blockId: null | number) => TransactionInsert,
-    ioGen: ReturnType<typeof genByronIOGen>,
-  |}>,
-  shelleyTxs: Array<{|
-    block: null | BlockInsert,
-    transaction: (blockId: null | number) => TransactionInsert,
-    certificates: $ReadOnlyArray<number => (void | AddCertificateRequest)>,
-    ioGen: ReturnType<typeof genShelleyIOGen>,
+    ioGen: ReturnType<typeof genErgoIOGen>,
   |}>,
 |}> {
   const allAddresses = Array.from(new Set(
     newTxs.flatMap(tx => [
       ...tx.inputs.map(input => input.address),
       ...tx.outputs.map(output => output.address),
-      ...(tx.withdrawals
-        ? tx.withdrawals.map(withdrawal => withdrawal.address)
-        : []
-      ),
     ]),
   ));
   const idMapping = await hashToIds({
@@ -1631,54 +1307,24 @@ async function networkTxToDbTx(
     return id;
   };
 
-  const byronTxs = [];
-  const shelleyTxs = [];
+  const ergoTxs = [];
 
   for (const networkTx of newTxs) {
     const { block, transaction } = networkTxHeaderToDb(
       networkTx,
-      toAbsoluteSlotNumber,
       TransactionSeed,
       BlockSeed,
     );
 
-    if (networkTx.type == null || networkTx.type === RemoteTransactionTypes.byron) {
-      byronTxs.push({
-        block,
-        transaction,
-        ioGen: genByronIOGen(networkTx, getIdOrThrow),
-      });
-    } else if (networkTx.type === RemoteTransactionTypes.shelley) {
-      const baseConfig = getCardanoHaskellBaseConfig(network)
-        .reduce((acc, next) => Object.assign(acc, next), {});
-      const certificates: $ReadOnlyArray<
-        number => (void | AddCertificateRequest)
-      > = networkTx.certificates == null
-        ? [(_txId) => undefined]
-        : await certificateToDb(
-          db, dbTx,
-          {
-            certificates: networkTx.certificates,
-            hashToIds,
-            findOwnAddress,
-            derivationTables,
-            network: Number.parseInt(baseConfig.ChainNetworkId, 10)
-          }
-        );
-      shelleyTxs.push({
-        block,
-        transaction,
-        certificates,
-        ioGen: genShelleyIOGen(networkTx, getIdOrThrow, network),
-      });
-    } else {
-      throw new Error(`${nameof(networkTxToDbTx)} Unhandled tx type ${networkTx.type ?? ''}`);
-    }
+    ergoTxs.push({
+      block,
+      transaction,
+      ioGen: genErgoIOGen(networkTx, getIdOrThrow),
+    });
   }
 
   return {
-    byronTxs,
-    shelleyTxs,
+    ergoTxs,
   };
 }
 
@@ -1749,8 +1395,7 @@ export function statusStringToCode(
 }
 
 export function networkTxHeaderToDb(
-  tx: RemoteTransaction,
-  toAbsoluteSlotNumber: ToAbsoluteSlotNumberFunc,
+  tx: RemoteErgoTransaction,
   TransactionSeed: number,
   BlockSeed: number,
 ): {
@@ -1759,8 +1404,6 @@ export function networkTxHeaderToDb(
   ...
 } {
   const block =
-    tx.epoch != null &&
-    tx.slot != null &&
     tx.block_hash != null &&
     tx.time != null &&
     tx.height != null
@@ -1768,7 +1411,6 @@ export function networkTxHeaderToDb(
         Hash: tx.block_hash,
         BlockTime: new Date(tx.time),
         Height: tx.height,
-        SlotNum: toAbsoluteSlotNumber({ epoch: tx.epoch, slot: tx.slot }),
         Digest: digestForHash(tx.hash, BlockSeed),
       }
       : null;
@@ -1785,463 +1427,13 @@ export function networkTxHeaderToDb(
     ErrorMessage: null, // TODO: add error message from backend if present
   };
 
-  if (tx.type == null || tx.type === RemoteTransactionTypes.byron) {
-    return {
-      block,
-      transaction: (blockId) => ({
-        Type: TransactionType.CardanoByron,
-        Extra: null,
-        BlockId: blockId,
-        ...baseTx,
-      }: CardanoByronTransactionInsert),
-    };
-  }
-  if (tx.type === RemoteTransactionTypes.shelley) {
-    return {
-      block,
-      transaction: (blockId) => ({
-        Type: TransactionType.CardanoShelley,
-        Extra: {
-          Fee: tx.fee,
-          Metadata: tx.metadata,
-        },
-        BlockId: blockId,
-        ...baseTx,
-      }: CardanoShelleyTransactionInsert),
-    };
-  }
-  throw new Error(`${nameof(networkTxHeaderToDb)} Unhandled tx type ${tx.type ?? ''}`);
-}
-
-async function certificateToDb(
-  db: lf$Database,
-  dbTx: lf$Transaction,
-  request: {|
-    network: number,
-    certificates: $ReadOnlyArray<RemoteCertificate>,
-    hashToIds: HashToIdsFunc,
-    findOwnAddress: FindOwnAddressFunc,
-    derivationTables: Map<number, string>,
-  |},
-): Promise<$ReadOnlyArray<number => AddCertificateRequest>> {
-  const findOwnAddress = async (addr: string) => await request.findOwnAddress({
-    db,
-    tx: dbTx,
-    lockedTables: Array.from(request.derivationTables.values()),
-    hash: addr
-  });
-  const addressToId = async (bytes: string): Promise<number> => {
-    const idMap = await request.hashToIds({
-      db,
-      tx: dbTx,
-      lockedTables: Array.from(request.derivationTables.values()),
-      hashes: [bytes]
-    });
-    const id = idMap.get(bytes);
-    if (id === undefined) {
-      throw new Error(`${nameof(certificateToDb)} should never happen id === undefined`);
-    }
-    return id;
+  return {
+    block,
+    transaction: (blockId) => ({
+      Type: TransactionType.Ergo,
+      Extra: null,
+      BlockId: blockId,
+      ...baseTx,
+    }: ErgoTransactionInsert),
   };
-  const tryGetKey = async (
-    stakeCredentials: RustModule.WalletV4.StakeCredential
-  ): Promise<void | number> => {
-    // an operator/owner key might belong to the wallet
-    // however, these keys are plain ED25519 hashes
-    // there there is no way of knowing what address it corresponds to
-    // so we just try both and see if one of them matches
-    // note: if there is no match, we don't add these addresses to the DB
-    // since we don't know what address it would be
-    // and in most cases, people generate these addresses through the CLI anyway
-    {
-      const rewardAddress = RustModule.WalletV4.RewardAddress.new(
-        request.network,
-        stakeCredentials
-      );
-      const ownAddress = await findOwnAddress(
-        Buffer.from(rewardAddress.to_address().to_bytes()).toString('hex')
-      );
-      if (ownAddress != null) {
-        return ownAddress;
-      }
-    }
-    {
-      const enterpriseAddress = RustModule.WalletV4.EnterpriseAddress.new(
-        request.network,
-        stakeCredentials
-      );
-      const ownAddress = await findOwnAddress((
-        Buffer.from(enterpriseAddress.to_address().to_bytes()).toString('hex')
-      ));
-      if (ownAddress != null) return ownAddress;
-    }
-    return undefined;
-  };
-
-  const result = [];
-  for (let i = 0; i < request.certificates.length; i++) {
-    const cert = request.certificates[i];
-    switch (cert.kind) {
-      case ShelleyCertificateTypes.StakeRegistration: {
-        const stakeCredentials = RustModule.WalletV4.RewardAddress.from_address(
-          RustModule.WalletV4.Address.from_bytes(
-            Buffer.from(cert.rewardAddress, 'hex')
-          )
-        )?.payment_cred();
-        if (stakeCredentials == null) throw new Error(`${nameof(certificateToDb)} not a valid reward account`);
-        const certificate = RustModule.WalletV4.StakeRegistration.new(
-          stakeCredentials
-        );
-        const address = RustModule.WalletV4.RewardAddress.new(
-          request.network,
-          stakeCredentials
-        );
-        const addrBytes = Buffer.from(address.to_address().to_bytes()).toString('hex');
-        const addressId = await addressToId(addrBytes);
-        result.push((txId: number) => ({
-          certificate: {
-            Ordinal: cert.certIndex,
-            Kind: RustModule.WalletV4.CertificateKind.StakeRegistration,
-            Payload: Buffer.from(certificate.to_bytes()).toString('hex'),
-            TransactionId: txId,
-          },
-          relatedAddresses: (certId: number) => [{
-            CertificateId: certId,
-            AddressId: addressId,
-            Relation: CertificateRelation.SIGNER,
-          }]
-        }));
-        break;
-      }
-      case ShelleyCertificateTypes.StakeDeregistration: {
-        const stakeCredentials = RustModule.WalletV4.RewardAddress.from_address(
-          RustModule.WalletV4.Address.from_bytes(
-            Buffer.from(cert.rewardAddress, 'hex')
-          )
-        )?.payment_cred();
-        if (stakeCredentials == null) throw new Error(`${nameof(certificateToDb)} not a valid reward account`);
-        const certificate = RustModule.WalletV4.StakeRegistration.new(
-          stakeCredentials
-        );
-        const address = RustModule.WalletV4.RewardAddress.new(
-          request.network,
-          stakeCredentials
-        );
-        const addrBytes = Buffer.from(address.to_address().to_bytes()).toString('hex');
-        const addressId = await addressToId(addrBytes);
-        result.push((txId: number) => ({
-          certificate: {
-            Ordinal: cert.certIndex,
-            Kind: RustModule.WalletV4.CertificateKind.StakeDeregistration,
-            Payload: Buffer.from(certificate.to_bytes()).toString('hex'),
-            TransactionId: txId,
-          },
-          relatedAddresses: (certId: number) => [{
-            CertificateId: certId,
-            AddressId: addressId,
-            Relation: CertificateRelation.SIGNER,
-          }]
-        }));
-        break;
-      }
-      case ShelleyCertificateTypes.StakeDelegation: {
-        const relatedAddressesInfo: Array<{|
-          AddressId: number,
-          Relation: CertificateRelationType,
-        |}> = [];
-
-        const rewardAddress = RustModule.WalletV4.RewardAddress.from_address(
-          RustModule.WalletV4.Address.from_bytes(
-            Buffer.from(cert.rewardAddress, 'hex')
-          )
-        );
-        if (rewardAddress == null) throw new Error(`${nameof(certificateToDb)} not a valid reward account`);
-        const stakeCredentials = rewardAddress.payment_cred();
-        const poolKeyHash = RustModule.WalletV4.Ed25519KeyHash.from_bytes(
-          Buffer.from(cert.poolKeyHash, 'hex')
-        );
-        const certificate = RustModule.WalletV4.StakeDelegation.new(
-          stakeCredentials,
-          poolKeyHash
-        );
-
-        { // pool key
-          const poolKeyId = await tryGetKey(
-            RustModule.WalletV4.StakeCredential.from_keyhash(poolKeyHash)
-          );
-          if (poolKeyId != null) {
-            relatedAddressesInfo.push({
-              AddressId: poolKeyId,
-              Relation: CertificateRelation.POOL_KEY
-            });
-          }
-        }
-
-        { // delegator
-          const addrBytes = Buffer.from(rewardAddress.to_address().to_bytes()).toString('hex');
-          const addressId = await addressToId(addrBytes);
-          relatedAddressesInfo.push({
-            AddressId: addressId,
-            Relation: CertificateRelation.SIGNER
-          });
-        }
-
-        result.push((txId: number) => ({
-          certificate: {
-            Ordinal: cert.certIndex,
-            Kind: RustModule.WalletV4.CertificateKind.StakeDelegation,
-            Payload: Buffer.from(certificate.to_bytes()).toString('hex'),
-            TransactionId: txId,
-          },
-          relatedAddresses: (certId: number) => relatedAddressesInfo.map(info => ({
-            ...info,
-            CertificateId: certId,
-          }))
-        }));
-        break;
-      }
-      case ShelleyCertificateTypes.PoolRegistration: {
-        const relatedAddressesInfo: Array<{|
-          AddressId: number,
-          Relation: CertificateRelationType,
-        |}> = [];
-
-        const operatorKey = RustModule.WalletV4.Ed25519KeyHash.from_bytes(
-          Buffer.from(cert.poolParams.operator, 'hex')
-        );
-        { // operator
-          const operatorId = await tryGetKey(
-            RustModule.WalletV4.StakeCredential.from_keyhash(operatorKey)
-          );
-          if (operatorId != null) {
-            relatedAddressesInfo.push({
-              AddressId: operatorId,
-              Relation: CertificateRelation.OPERATOR
-            });
-          }
-        }
-
-        // reward_account
-        const rewardAddress = RustModule.WalletV4.Address.from_bytes(
-          Buffer.from(cert.poolParams.rewardAccount, 'hex')
-        );
-        {
-          const addressId = await addressToId(cert.poolParams.rewardAccount);
-          relatedAddressesInfo.push({
-            AddressId: addressId,
-            Relation: CertificateRelation.REWARD_ADDRESS
-          });
-        }
-        const wasmRewardAddress = RustModule.WalletV4.RewardAddress.from_address(rewardAddress);
-        if (wasmRewardAddress == null) throw new Error(`${nameof(certificateToDb)} registration address not a reward address`);
-
-        // pool owners
-        const owners = RustModule.WalletV4.Ed25519KeyHashes.new();
-        for (let j = 0; j < cert.poolParams.poolOwners.length; j++) {
-          const owner = cert.poolParams.poolOwners[j];
-          const ownerKey = RustModule.WalletV4.Ed25519KeyHash.from_bytes(
-            Buffer.from(owner, 'hex')
-          );
-          owners.add(ownerKey);
-          const ownerId = await tryGetKey(
-            RustModule.WalletV4.StakeCredential.from_keyhash(ownerKey)
-          );
-          if (ownerId != null) {
-            relatedAddressesInfo.push({
-              AddressId: ownerId,
-              Relation: CertificateRelation.OWNER
-            });
-          }
-        }
-
-        const relays = RustModule.WalletV4.Relays.new();
-        for (let j = 0; j < cert.poolParams.relays.length; j++) {
-          // TODO: skip for now -- not really important
-          // const relay = cert.poolParams.relays[i];
-          // if (relay.ipv4 != null || relay.ipv6 != null) {
-          //   relays.add(RustModule.WalletV4.Relay.new_single_host_addr(
-          //     RustModule.WalletV4.SingleHostAddr.new(
-          //       relay.port == null ? undefined : Number.parseInt(relay.port, 10),
-          //       relay.ipv4, // TODO: how to encode?
-          //       relay.ipv6,
-          //     )
-          //   ));
-          //   continue;
-          // }
-          // if (relay.dnsName != null && relay.port != null) {
-          //   relays.add(RustModule.WalletV4.Relay.new_single_host_name(
-          //     RustModule.WalletV4.SingleHostName.new(
-          //       relay.port == null ? undefined : Number.parseInt(relay.port, 10),
-          //       relay.dnsName,
-          //     )
-          //   ));
-          //   continue;
-          // }
-          // if (relay.dnsName != null) {
-          //   relays.add(RustModule.WalletV4.Relay.new_multi_host_name(
-          //     RustModule.WalletV4.MultiHostName.new(
-          //       relay.dnsName,
-          //     )
-          //   ));
-          //   continue;
-          // }
-          // TODO: what to do about dnsSrvName ?
-        }
-
-        const certificate = RustModule.WalletV4.PoolRegistration.new(
-          RustModule.WalletV4.PoolParams.new(
-            operatorKey,
-            RustModule.WalletV4.VRFKeyHash.from_bytes(
-              Buffer.from(cert.poolParams.vrfKeyHash, 'hex')
-            ),
-            RustModule.WalletV4.BigNum.from_str(cert.poolParams.pledge),
-            RustModule.WalletV4.BigNum.from_str(cert.poolParams.cost),
-            RustModule.WalletV4.UnitInterval.new(
-              // TODO: dummy data since db-sync doesn't support this yet
-              RustModule.WalletV4.BigNum.from_str('1'),
-              RustModule.WalletV4.BigNum.from_str('1'),
-              // RustModule.WalletV4.BigNum.from_str(cert.poolParams.margin.numerator),
-              // RustModule.WalletV4.BigNum.from_str(cert.poolParams.margin.denominator),
-            ),
-            wasmRewardAddress,
-            owners,
-            relays,
-            cert.poolParams.poolMetadata == null
-              ? undefined
-              : RustModule.WalletV4.PoolMetadata.new(
-                cert.poolParams.poolMetadata.url,
-                RustModule.WalletV4.MetadataHash.from_bytes(
-                  Buffer.from(cert.poolParams.poolMetadata.metadataHash, 'hex')
-                )
-              )
-          )
-        );
-
-        result.push((txId: number) => ({
-          certificate: {
-            Ordinal: cert.certIndex,
-            Kind: RustModule.WalletV4.CertificateKind.PoolRegistration,
-            Payload: Buffer.from(certificate.to_bytes()).toString('hex'),
-            TransactionId: txId,
-          },
-          relatedAddresses: (certId: number) => relatedAddressesInfo.map(info => ({
-            ...info,
-            CertificateId: certId,
-          }))
-        }));
-        break;
-      }
-      case ShelleyCertificateTypes.PoolRetirement: {
-        const relatedAddressesInfo: Array<{|
-          AddressId: number,
-          Relation: CertificateRelationType,
-        |}> = [];
-
-        const poolKeyHash = RustModule.WalletV4.Ed25519KeyHash.from_bytes(
-          Buffer.from(cert.poolKeyHash, 'hex')
-        );
-        const certificate = RustModule.WalletV4.PoolRetirement.new(
-          poolKeyHash,
-          cert.epoch
-        );
-
-        const poolKeyId = await tryGetKey(
-          RustModule.WalletV4.StakeCredential.from_keyhash(poolKeyHash)
-        );
-        if (poolKeyId != null) {
-          relatedAddressesInfo.push({
-            AddressId: poolKeyId,
-            Relation: CertificateRelation.POOL_KEY
-          });
-        }
-
-        result.push((txId: number) => ({
-          certificate: {
-            Ordinal: cert.certIndex,
-            Kind: RustModule.WalletV4.CertificateKind.PoolRetirement,
-            Payload: Buffer.from(certificate.to_bytes()).toString('hex'),
-            TransactionId: txId,
-          },
-          relatedAddresses: (certId: number) => relatedAddressesInfo.map(info => ({
-            ...info,
-            CertificateId: certId,
-          }))
-        }));
-        break;
-      }
-      case ShelleyCertificateTypes.GenesisKeyDelegation: {
-        const genesisKeyHash = RustModule.WalletV4.GenesisDelegateHash.from_bytes(
-          Buffer.from(cert.genesisDelegateHash, 'hex')
-        );
-        const certificate = RustModule.WalletV4.GenesisKeyDelegation.new(
-          RustModule.WalletV4.GenesisHash.from_bytes(
-            Buffer.from(cert.genesishash, 'hex')
-          ),
-          genesisKeyHash,
-          RustModule.WalletV4.VRFKeyHash.from_bytes(
-            Buffer.from(cert.vrfKeyHash, 'hex')
-          ),
-        );
-
-        result.push((txId: number) => ({
-          certificate: {
-            Ordinal: cert.certIndex,
-            Kind: RustModule.WalletV4.CertificateKind.GenesisKeyDelegation,
-            Payload: Buffer.from(certificate.to_bytes()).toString('hex'),
-            TransactionId: txId,
-          },
-          relatedAddresses: (_certId: number) => []
-        }));
-        break;
-      }
-      case ShelleyCertificateTypes.MoveInstantaneousRewardsCert: {
-        const relatedAddressesInfo: Array<{|
-          AddressId: number,
-          Relation: CertificateRelationType,
-        |}> = [];
-
-        const certPot = RustModule.WalletV4.MoveInstantaneousReward.new(cert.pot);
-        for (const key of Object.keys(cert.rewards)) {
-          const rewardAddress = RustModule.WalletV4.RewardAddress.from_address(
-            RustModule.WalletV4.Address.from_bytes(
-              Buffer.from(key, 'hex')
-            )
-          );
-          if (rewardAddress == null) throw new Error(`${nameof(certificateToDb)} not a valid reward account`);
-          const stakeCredentials = rewardAddress.payment_cred();
-          if (stakeCredentials == null) throw new Error(`${nameof(certificateToDb)} not a valid reward account`);
-          certPot.insert(
-            stakeCredentials,
-            RustModule.WalletV4.BigNum.from_str(cert.rewards[key])
-          );
-
-          const rewardAddrKey = await findOwnAddress(
-            Buffer.from(rewardAddress.to_address().to_bytes()).toString('hex')
-          );
-          if (rewardAddrKey != null) {
-            relatedAddressesInfo.push({
-              AddressId: rewardAddrKey,
-              Relation: CertificateRelation.REWARD_ADDRESS
-            });
-          }
-        }
-        const certificate = RustModule.WalletV4.MoveInstantaneousRewardsCert.new(certPot);
-        result.push((txId: number) => ({
-          certificate: {
-            Ordinal: cert.certIndex,
-            Kind: RustModule.WalletV4.CertificateKind.MoveInstantaneousRewardsCert,
-            Payload: Buffer.from(certificate.to_bytes()).toString('hex'),
-            TransactionId: txId,
-          },
-          relatedAddresses: (certId: number) => relatedAddressesInfo.map(info => ({
-            ...info,
-            CertificateId: certId,
-          }))
-        }));
-        break;
-      }
-      default: throw new Error(`${nameof(certificateToDb)} unknown cert kind ` + cert.kind);
-    }
-  }
-  return result;
 }

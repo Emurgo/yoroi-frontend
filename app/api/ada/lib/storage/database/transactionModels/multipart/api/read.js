@@ -9,7 +9,7 @@ import type {
 } from '../../../primitives/tables';
 import { TransactionType } from '../../../primitives/tables';
 import { GetCertificates, } from '../../../primitives/api/read';
-import type { CardanoByronTxIO, CardanoShelleyTxIO, JormungandrTxIO } from '../tables';
+import type { CardanoByronTxIO, CardanoShelleyTxIO, JormungandrTxIO, ErgoTxIO } from '../tables';
 
 import {
   AssociateTxWithAccountingIOs,
@@ -125,6 +125,32 @@ export class CardanoShelleyAssociateTxWithIOs {
       certificates: certsForTxs.get(transaction.TransactionId) ?? [],
       ...getOrThrow(utxo.get(transaction)),
       accountingInputs: getOrThrow(accounting.get(transaction)).accountingInputs,
+    }));
+    return fullTx;
+  }
+}
+
+export class ErgoAssociateTxWithIOs {
+  static ownTables: {||} = Object.freeze({});
+  static depTables: {|
+    AssociateTxWithUtxoIOs: typeof AssociateTxWithUtxoIOs,
+  |} = Object.freeze({
+    AssociateTxWithUtxoIOs,
+  });
+
+  static async getIOsForTx(
+    db: lf$Database,
+    tx: lf$Transaction,
+    request: {| txs: $ReadOnlyArray<$ReadOnly<TransactionRow>>, |},
+  ): Promise<Array<ErgoTxIO>> {
+    const utxo = await ErgoAssociateTxWithIOs.depTables.AssociateTxWithUtxoIOs.getIOsForTx(
+      db, tx, request
+    );
+
+    const fullTx = request.txs.map(transaction  => ({
+      txType: TransactionType.Ergo,
+      transaction,
+      ...getOrThrow(utxo.get(transaction)),
     }));
     return fullTx;
   }

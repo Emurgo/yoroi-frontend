@@ -132,14 +132,22 @@ export default class ErgoApi {
     |},
   ): Promise<GetTransactionsResponse> {
     Logger.debug(`${nameof(ErgoApi)}::${nameof(this.refreshTransactions)} called: ${stringifyData(request)}`);
+    const { skip = 0, limit } = request;
     try {
       if (!request.isLocalRequest) {
-        // TODO: implement tx syncing
+        await updateTransactions(
+          request.publicDeriver.getDb(),
+          request.publicDeriver,
+          request.checkAddressesInUse,
+          request.getTransactionsHistoryForAddresses,
+          request.getBestBlock,
+        );
       }
-      const fetchedTxs = {
-        txs: [], // not implemented yet
-        addressLookupMap: new Map(),
-      };
+      const fetchedTxs = await getAllTransactions({
+        publicDeriver: request.publicDeriver,
+        skip,
+        limit,
+      },);
       Logger.debug(`${nameof(ErgoApi)}::${nameof(this.refreshTransactions)} success: ` + stringifyData(fetchedTxs));
 
       const mappedTransactions = fetchedTxs.txs.map(tx => {

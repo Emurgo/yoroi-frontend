@@ -108,7 +108,7 @@ import {
 import type {
   HashToIdsFunc,
 } from '../../../../common/lib/storage/bridge/hashMapper';
-import { STABLE_SIZE } from '../../../../../config/numbersConfig';
+import { CARDANO_STABLE_SIZE } from '../../../../../config/numbersConfig';
 import { RollbackApiError } from '../../../../common/errors';
 import { RustModule } from '../../../../ada/lib/cardanoCrypto/rustLoader';
 
@@ -835,7 +835,7 @@ async function rollback(
 
   const txsToRevert = await deps.GetTxAndBlock.gteSlot(
     db, dbTx,
-    { txIds, slot: bestInStorage.Block.SlotNum - STABLE_SIZE }
+    { txIds, slot: bestInStorage.Block.SlotNum - CARDANO_STABLE_SIZE }
   );
 
   // 4) mark rollback transactions as failed
@@ -893,7 +893,7 @@ async function rollback(
   // 7) Rollback LastSyncTable
   const bestStillIncluded = await deps.GetTxAndBlock.firstSuccessTxBefore(
     db, dbTx,
-    { txIds, slot: bestInStorage.Block.SlotNum - STABLE_SIZE }
+    { txIds, slot: bestInStorage.Block.SlotNum - CARDANO_STABLE_SIZE }
   );
   await deps.ModifyLastSyncInfo.overrideLastSyncInfo(
     db, dbTx,
@@ -963,7 +963,7 @@ async function rawUpdateTransactions(
     const lastSlotSeen = lastSyncInfo.SlotNum;
     const inRemote = (slotInRemote != null ? slotInRemote : 0);
     // if we're K slots ahead of remote
-    if (lastSlotSeen - inRemote > STABLE_SIZE) {
+    if (lastSlotSeen - inRemote > CARDANO_STABLE_SIZE) {
       return;
     }
   }
