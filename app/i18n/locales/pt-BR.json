@@ -709,7 +709,7 @@
   "wallet.transfer.deregister.line3": "Manter a chave de staking permitirá que você retire as recompensas, mas continue delegando para o mesmo pool",
   "wallet.transfer.deregister.line4": "Você NÃO deve desaverbar se essa chave de stake está sendo usada como uma conta de recompensas de sua pool, pois, isso irá causar que todas as recompensas do operador da pool irá ser enviada de volta para o tesouro",
   "wallet.transfer.deregister.line5": "Desaverbar significa que está chave não receberá recompensas até que você registre a chave de stake novamente, (normalmente isso é feito delegando para uma pool novamente)",
-  "wallet.transfer.deregister.noNeedToDeregister": "You do NOT need to deregister to delegate to a different stake pool. You can change your delegation preference at any time",
+  "wallet.transfer.deregister.noNeedToDeregister": "Você NÃO precisa desaverbar sua chave para delegar para uma pool diferente. Você pode mudar sua escolha a qualquer momento",
   "wallet.transfer.deregister.title": "Também desregistrar a chave de staking?",
   "wallet.transfer.instruction": "Toda ADA solicitada será transferida para sua carteira selecionada recentemente",
   "wallet.undelegation.transaction.explanationLine1": "Você NÃO precisa desfazer a delegação para mudar de stake pool",
