@@ -86,9 +86,9 @@ function deriveAddress(
   const spendingKey = derivePath(rootKey, toPath(request.addressParameters.path));
 
   if (request.addressParameters.addressType === ADDRESS_TYPE.Byron) {
-    return RustModule.WalletV4.ByronAddress.from_icarus_key(
+    return RustModule.WalletV4.ByronAddress.icarus_from_key(
       spendingKey.to_public(),
-      request.networkId
+      request.protocolMagic
     ).to_address();
   }
   if (request.addressParameters.addressType === ADDRESS_TYPE.Enterprise) {
@@ -291,9 +291,9 @@ class MockTrezorConnect {
       const vkey = RustModule.WalletV4.Vkey.new(key.to_raw_key().to_public());
       const sig = key.to_raw_key().sign(Buffer.from(hash.to_bytes()));
       if (path[0] === WalletTypePurpose.BIP44) {
-        const byronAddress = RustModule.WalletV4.ByronAddress.from_icarus_key(
+        const byronAddress = RustModule.WalletV4.ByronAddress.icarus_from_key(
           key.to_public(),
-          request.networkId
+          request.protocolMagic
         );
         const bootstrapWit = RustModule.WalletV4.BootstrapWitness.new(
           vkey,

@@ -77,12 +77,9 @@ function deriveAddress(
   const spendingKey = derivePath(rootKey, request.spendingPath);
 
   if (request.addressTypeNibble === AddressTypeNibbles.BYRON) {
-    const networkId = request.networkIdOrProtocolMagic === 764824073
-      ? 1
-      : 0;
-    return RustModule.WalletV4.ByronAddress.from_icarus_key(
+    return RustModule.WalletV4.ByronAddress.icarus_from_key(
       spendingKey.to_public(),
-      networkId
+      request.networkIdOrProtocolMagic
     ).to_address();
   }
   if (request.addressTypeNibble === AddressTypeNibbles.ENTERPRISE) {
