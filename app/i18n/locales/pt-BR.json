@@ -455,7 +455,7 @@
   "wallet.dashboard.poolWarnings.suggested": "Nós sugerimos que você entre em contato com o proprietário da pool através do website para questionar o seu comportamento. Lembre-se, você pode mudar a sua delegação a qualquer momento sem nenhuma interrupção nas suas recompensas.",
   "wallet.dashboard.poolWarnings.unknown": "Causa algum problema desconhecido (procure on-line para obter mais informações)",
   "wallet.dashboard.rewards.note": "A primeira recompensa é lenta.",
-  "wallet.dashboard.rewards.unregistered": "Staking key isn't registered, so you won't get rewards",
+  "wallet.dashboard.rewards.unregistered": "Chave de stake não está registrada. Você não receberá recompensas",
   "wallet.dashboard.stakePool.age": "Idade",
   "wallet.dashboard.stakePool.circleText": "Receita",
   "wallet.dashboard.stakePool.cost": "Custo",
