@@ -33,7 +33,7 @@
   "api.errors.noOutputsError": "La transaction nécessite au moins une sortie, mais aucune sortie n'a été ajoutée",
   "api.errors.pendingTransactionError": "Erreur lors de la mise à jour des transactions en cours.",
   "api.errors.poolMissingApiError": "Nous n'avons pas pu trouver ce groupe d'enjeu. Veuillez vérifier l'identifiant (ID) et assurez-vous qu'il ne s'est pas désinscrit.",
-  "api.errors.rewardAddressEmpty": "Reward address is empty.",
+  "api.errors.rewardAddressEmpty": "L' adresse de récompenses est vide.",
   "api.errors.rollbackApiError": "Un retour en arrière a été détecté.",
   "api.errors.sendTransactionApiError": "Erreur reçue du serveur lors de l'envoi de la transaction.",
   "api.errors.sendTransactionError": "Erreur reçue de l'API lors de l'envoi de la transaction.",
