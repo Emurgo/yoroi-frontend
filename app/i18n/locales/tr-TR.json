@@ -131,7 +131,7 @@
   "global.unit.ada": "Ada",
   "global.uriExplanation": "Bunlar, yalnızca bir URL'yi tıklayarak faturaları arkadaşlarınızla ve işletmelerinizle kolayca paylaşmanıza olanak tanır.",
   "global.uriSchemeTitleLabel": "Cardano Ödeme Adresleri",
-  "global.wrongNetwork.address": "Wrong network for address.",
+  "global.wrongNetwork.address": "Adres için yanlış ağ.",
   "incorrectTime.line1": "WARNING: time on your computer does not match the server. This can cause unexpected results",
   "incorrectTime.line2": "Zaman farkı:",
   "incorrectTime.line3": "Synchronize time on your device to resolve this issue",
