@@ -34,10 +34,10 @@ export const STAKING_KEY_INDEX = 0;
 
 /**
  * Constant K as defined in Ouroboros Classic
- * which says no reorg should be longer than 2160/active_coefficient slots
+ * which says no reorg should be longer than 2160 blocks
  * TODO: value for Ouroboros Genesis
  */
-export const CARDANO_STABLE_SIZE = 21600;
+export const CARDANO_STABLE_SIZE = 2160;
 
 /**
  * no safe reorg size of PoW cryptocurrencies

@@ -1,4 +1,5 @@
 // @flow
+import { action } from 'mobx';
 import BigNumber from 'bignumber.js';
 import type {
   UserAnnotation,
@@ -15,6 +16,7 @@ import WalletTransaction, { toAddr } from './WalletTransaction';
 
 export default class ErgoTransaction extends WalletTransaction {
 
+  @action
   static fromAnnotatedTx(request: {|
     tx: {|
       ...ErgoTxIO,

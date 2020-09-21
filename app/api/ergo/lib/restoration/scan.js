@@ -23,7 +23,7 @@ export function ergoGenAddressBatchFunc(
     return indices.map(i => {
       const bip32Addr = chain.derive(i);
       const addr = Address.fromPk(bip32Addr.publicKey.toString('hex'));
-      return addr.address;
+      return addr.addrBytes.toString('hex');
     });
   };
 }

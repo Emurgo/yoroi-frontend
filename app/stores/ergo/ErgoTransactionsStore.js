@@ -8,8 +8,12 @@ import type {
 
 export default class ErgoTransactionsStore extends Store {
   refreshTransactions: GetTransactionsFunc = (request) => {
+    const stateFetcher = this.stores.substores.ergo.stateFetchStore.fetcher;
     return this.api.ergo.refreshTransactions({
       ...request,
+      getTransactionsHistoryForAddresses: stateFetcher.getTransactionsHistoryForAddresses,
+      checkAddressesInUse: stateFetcher.checkAddressesInUse,
+      getBestBlock: stateFetcher.getBestBlock,
     });
   }
 

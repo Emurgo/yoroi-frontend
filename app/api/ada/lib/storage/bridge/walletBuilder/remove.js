@@ -21,6 +21,7 @@ import {
 } from '../../models/PublicDeriver/traits';
 import { rawRemoveAllTransactions as cardanoRawRemoveAllTransactions } from '../updateTransactions';
 import { rawRemoveAllTransactions as jormungandrRawRemoveAllTransactions } from '../../../../../jormungandr/lib/storage/bridge/updateTransactions';
+import { rawRemoveAllTransactions as ergoRawRemoveAllTransactions } from '../../../../../ergo/lib/storage/bridge/updateTransactions';
 import {
   GetAddress,
   GetPathWithSpecific,
@@ -34,10 +35,11 @@ import {
   CardanoByronAssociateTxWithIOs,
   CardanoShelleyAssociateTxWithIOs,
   JormungandrAssociateTxWithIOs,
+  ErgoAssociateTxWithIOs,
 } from '../../database/transactionModels/multipart/api/read';
 import { GetDerivationSpecific, } from '../../database/walletTypes/common/api/read';
 import { rawGetAddressRowsForWallet } from '../traitUtils';
-import { isCardanoHaskell, isJormungandr, } from '../../database/prepackaged/networks';
+import { isCardanoHaskell, isJormungandr, isErgo } from '../../database/prepackaged/networks';
 
 
 export async function removePublicDeriver(request: {|
@@ -52,6 +54,7 @@ export async function removePublicDeriver(request: {|
     GetAddress,
     CardanoByronAssociateTxWithIOs,
     JormungandrAssociateTxWithIOs,
+    ErgoAssociateTxWithIOs,
     CardanoShelleyAssociateTxWithIOs,
     AssociateTxWithAccountingIOs,
     AssociateTxWithUtxoIOs,
@@ -111,6 +114,25 @@ export async function removePublicDeriver(request: {|
               GetAddress: deps.GetAddress,
               JormungandrAssociateTxWithIOs: deps.JormungandrAssociateTxWithIOs,
               AssociateTxWithAccountingIOs: deps.AssociateTxWithAccountingIOs,
+              AssociateTxWithUtxoIOs: deps.AssociateTxWithUtxoIOs,
+              GetDerivationSpecific: deps.GetDerivationSpecific,
+              DeleteAllTransactions: deps.DeleteAllTransactions,
+              ModifyAddress: deps.ModifyAddress,
+              GetTransaction: deps.GetTransaction,
+              FreeBlocks: deps.FreeBlocks,
+            },
+            withLevels.getParent().getDerivationTables(),
+            {
+              publicDeriver: withLevels,
+            }
+          );
+        }  else if (isErgo(network)) {
+          await ergoRawRemoveAllTransactions(
+            db, dbTx,
+            {
+              GetPathWithSpecific: deps.GetPathWithSpecific,
+              GetAddress: deps.GetAddress,
+              ErgoAssociateTxWithIOs: deps.ErgoAssociateTxWithIOs,
               AssociateTxWithUtxoIOs: deps.AssociateTxWithUtxoIOs,
               GetDerivationSpecific: deps.GetDerivationSpecific,
               DeleteAllTransactions: deps.DeleteAllTransactions,

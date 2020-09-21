@@ -11,12 +11,14 @@ import ErgoWalletsStore from './ErgoWalletsStore';
 import ErgoTransactionsStore from './ErgoTransactionsStore';
 import ErgoAddressesStore from './ErgoAddressesStore';
 import ErgoTimeStore from './ErgoTimeStore';
+import ErgoStateFetchStore from './ErgoStateFetchStore';
 
 export const ergoStoreClasses = Object.freeze({
   addresses: ErgoAddressesStore,
   transactions: ErgoTransactionsStore,
   wallets: ErgoWalletsStore,
   walletRestore: ErgoRestoreStore,
+  stateFetchStore: ErgoStateFetchStore,
   time: ErgoTimeStore,
 });
 
@@ -25,6 +27,7 @@ export type ErgoStoresMap = {|
   transactions: ErgoTransactionsStore,
   wallets: ErgoWalletsStore,
   walletRestore: ErgoRestoreStore,
+  stateFetchStore: ErgoStateFetchStore,
   time: ErgoTimeStore,
 |};
 
@@ -32,6 +35,7 @@ const ergoStores: WithNullableFields<ErgoStoresMap> = observable({
   addresses: null,
   transactions: null,
   wallets: null,
+  stateFetchStore: null,
   walletRestore: null,
   time: null,
 });

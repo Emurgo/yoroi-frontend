@@ -3,10 +3,12 @@ import '../lib/test-config';
 import BigNumber from 'bignumber.js';
 import {
   convertAdaTransactionsToExportRows,
-  formatBigNumberToFloatString,
   sumInputsOutputs,
   getFromUserPerspective,
 } from './utils';
+import {
+  formatBigNumberToFloatString,
+} from '../../../utils/formatters';
 import type {
   TransactionExportRow,
 } from '../../export';

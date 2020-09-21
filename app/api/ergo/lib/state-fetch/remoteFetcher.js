@@ -33,6 +33,8 @@ import {
 
 import type { ConfigType } from '../../../../../config/config-types';
 
+import { decode, encode } from 'bs58';
+
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
 
@@ -65,14 +67,17 @@ export class RemoteFetcher implements IFetcher {
         method: 'post',
         timeout: 2 * CONFIG.app.walletRefreshInterval,
         data: {
-          addresses: body.addresses
+          addresses: body.addresses.map(addr => encode(Buffer.from(addr, 'hex')))
         },
         headers: {
           'yoroi-version': this.getLastLaunchVersion(),
           'yoroi-locale': this.getCurrentLocale()
         }
       }
-    ).then(response => response.data)
+    ).then(response => response.data.map((resp: ElementOf<AddressUtxoResponse>) => ({
+      ...resp,
+      receiver: decode(resp.receiver).toString('hex'),
+    })))
       .catch((error) => {
         Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getUTXOsForAddresses)} error: ` + stringifyError(error));
         throw new GetUtxosForAddressesApiError();
@@ -111,7 +116,7 @@ export class RemoteFetcher implements IFetcher {
         method: 'post',
         timeout: 2 * CONFIG.app.walletRefreshInterval,
         data: {
-          addresses: body.addresses
+          addresses: body.addresses.map(addr => encode(Buffer.from(addr, 'hex')))
         },
         headers: {
           'yoroi-version': this.getLastLaunchVersion(),
@@ -134,13 +139,30 @@ export class RemoteFetcher implements IFetcher {
       {
         method: 'post',
         timeout: 2 * CONFIG.app.walletRefreshInterval,
-        data: rest,
+        data: {
+          ...rest,
+          addresses: rest.addresses.map(addr => encode(Buffer.from(addr, 'hex'))),
+        },
         headers: {
           'yoroi-version': this.getLastLaunchVersion(),
           'yoroi-locale': this.getCurrentLocale()
         }
       }
-    ).then(response => response.data)
+    ).then(response => response.data.map((resp: ElementOf<HistoryResponse>) => ({
+      ...resp,
+      inputs: resp.inputs.map(input => ({
+        ...input,
+        address: decode(input.address).toString('hex'),
+      })),
+      dataInputs: resp.dataInputs.map(input => ({
+        ...input,
+        address: decode(input.address).toString('hex'),
+      })),
+      outputs: resp.outputs.map(output => ({
+        ...output,
+        address: decode(output.address).toString('hex'),
+      })),
+    })))
       .catch((error) => {
         Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getTransactionsHistoryForAddresses)} error: ` + stringifyError(error));
         if (
@@ -208,14 +230,16 @@ export class RemoteFetcher implements IFetcher {
         method: 'post',
         timeout: 2 * CONFIG.app.walletRefreshInterval,
         data: {
-          addresses: body.addresses
+          addresses: body.addresses.map(addr => encode(Buffer.from(addr, 'hex')))
         },
         headers: {
           'yoroi-version': this.getLastLaunchVersion(),
           'yoroi-locale': this.getCurrentLocale()
         }
       }
-    ).then(response => response.data)
+    ).then(response => response.data.map((resp: ElementOf<FilterUsedResponse>) => (
+      decode(resp).toString('hex')
+    )))
       .catch((error) => {
         Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.checkAddressesInUse)} error: ` + stringifyError(error));
         throw new CheckAddressesInUseApiError();

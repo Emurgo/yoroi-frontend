@@ -60,7 +60,7 @@ export async function getAccountDefaultDerivations(
         .derivePath(`${ChainDerivations.EXTERNAL}/${i}`)
         .publicKey
         .toString('hex')
-    ).address
+    ).addrBytes.toString('hex')
   ));
   const internalAddrs = addressesIndex.map(i => (
     Address.fromPk(
@@ -68,7 +68,7 @@ export async function getAccountDefaultDerivations(
         .derivePath(`${ChainDerivations.INTERNAL}/${i}`)
         .publicKey
         .toString('hex')
-    ).address
+    ).addrBytes.toString('hex')
   ));
   /**
    * Even if the user has no internet connection and scanning fails,

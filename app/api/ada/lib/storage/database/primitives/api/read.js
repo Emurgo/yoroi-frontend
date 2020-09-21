@@ -735,12 +735,12 @@ export class GetTxAndBlock {
   });
   static depTables: {||} = Object.freeze({});
 
-  static async gteSlot(
+  static async gteHeight(
     db: lf$Database,
     tx: lf$Transaction,
     request: {|
       txIds: Array<number>,
-      slot: number,
+      height: number,
     |},
   ): Promise<$ReadOnlyArray<{|
     Block: $ReadOnly<BlockRow>,
@@ -761,7 +761,7 @@ export class GetTxAndBlock {
         )
       )
       .where(op.and(
-        blockTable[Tables.BlockSchema.properties.SlotNum].gte(request.slot),
+        blockTable[Tables.BlockSchema.properties.Height].gte(request.height),
         txTable[Tables.TransactionSchema.properties.TransactionId].in(request.txIds)
       ));
 
@@ -778,7 +778,7 @@ export class GetTxAndBlock {
     tx: lf$Transaction,
     request: {|
       txIds: Array<number>,
-      slot: number,
+      height: number,
     |},
   ): Promise<void | {|
     Block: $ReadOnly<BlockRow>,
@@ -798,10 +798,10 @@ export class GetTxAndBlock {
           blockTable[Tables.BlockSchema.properties.BlockId]
         )
       )
-      .orderBy(blockTable[Tables.BlockSchema.properties.SlotNum], lf.Order.DESC)
+      .orderBy(blockTable[Tables.BlockSchema.properties.Height], lf.Order.DESC)
       .orderBy(txTable[Tables.TransactionSchema.properties.Ordinal], lf.Order.DESC)
       .where(op.and(
-        blockTable[Tables.BlockSchema.properties.SlotNum].lt(request.slot),
+        blockTable[Tables.BlockSchema.properties.Height].lt(request.height),
         txTable[Tables.TransactionSchema.properties.TransactionId].in(request.txIds),
         txTable[Tables.TransactionSchema.properties.Status].eq(TxStatusCodes.IN_BLOCK),
       ))

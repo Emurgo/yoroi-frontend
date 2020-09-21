@@ -44,20 +44,31 @@ export type HistoryRequest = {|
   untilBlock: string, // block hash - inclusive
 |};
 
-export type RemoteTxState = 'Successful' | 'Failed' | 'Pending';
-
 export type RemoteErgoTransaction = {|
-  block_hash: string,
-  block_num: number,
+  block_hash: null | string,
+  block_num: null | number,
+  tx_ordinal: null | number,
   hash: string,
   inputs: Array<{
     address: string,
     id: string,
     outputTransactionId: string,
+    index: number,
+    outputIndex: number, // index in tx that created the output we're consuming
     spendingProof: string,
     transactionId: string,
     value: number,
     ...
+  }>,
+  dataInputs: Array<{
+    id: string,
+    value: number,
+    transactionId: string,
+    index: number,
+    outputIndex: number,
+    outputTransactionId: string,
+    address: string,
+    ...,
   }>,
   outputs: Array<{
     additionalRegisters: { ... },
@@ -73,7 +84,7 @@ export type RemoteErgoTransaction = {|
     txId: string,
     index: number,
     mainChain: boolean,
-    spentTransactionId: string,
+    spentTransactionId: null | string,
     value: number,
     ...
   }>,
@@ -89,8 +100,8 @@ export type BestBlockRequest = {|
   network: $ReadOnly<NetworkRow>,
 |};
 export type BestBlockResponse = {|
-  // epoch: 0, // TODO
-  // slot: 0, // TODO
+  epoch: 0, // TODO
+  slot: 0, // TODO
   hash: string,
   height: number,
 |};
@@ -134,3 +145,4 @@ export type SendFunc = (body: SignedRequest) => Promise<SignedResponse>;
 /* Backend service data types */
 
 export type RemoteTxState = 'Successful' | 'Failed' | 'Pending';
+

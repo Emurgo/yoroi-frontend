@@ -125,11 +125,11 @@ import type {
 import { ConceptualWallet } from '../ConceptualWallet/index';
 import { RustModule } from '../../../cardanoCrypto/rustLoader';
 import { derivePublicByAddressing } from '../../../cardanoCrypto/utils';
-import { fromBase58 } from 'bip32';
 import {
   isCardanoHaskell,
   isJormungandr,
 } from '../../database/prepackaged/networks';
+import { BIP32PublicKey, deriveKey } from '../../../../../common/lib/crypto/keys/keyRepository';
 
 interface Empty {}
 type HasPrivateDeriverDependencies = IPublicDeriver<ConceptualWallet & IHasPrivateDeriver>;
@@ -1669,13 +1669,13 @@ const ScanErgoUtxoMixin = (
     body,
     _derivationTables,
   ): Promise<IScanAccountResponse> => {
-    const key = fromBase58(body.accountPublicKey);
+    const key = BIP32PublicKey.fromBuffer(Buffer.from(body.accountPublicKey, 'hex'));
     return await scanBip44Account({
       generateInternalAddresses: ergoGenAddressBatchFunc(
-        key.derive(ChainDerivations.INTERNAL)
+        deriveKey(key, ChainDerivations.INTERNAL).key
       ),
       generateExternalAddresses: ergoGenAddressBatchFunc(
-        key.derive(ChainDerivations.EXTERNAL)
+        deriveKey(key, ChainDerivations.EXTERNAL).key
       ),
       lastUsedInternal: body.lastUsedInternal,
       lastUsedExternal: body.lastUsedExternal,

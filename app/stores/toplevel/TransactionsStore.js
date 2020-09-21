@@ -13,14 +13,13 @@ import type {
   GetTransactionsFunc,
   BaseGetTransactionsRequest, GetTransactionsRequestOptions,
   RefreshPendingTransactionsFunc,
-  ExportTransactionsRequest,
   ExportTransactionsFunc,
 } from '../../api/common/index';
 import {
   PublicDeriver,
 } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import {
-  asGetBalance, asHasLevels,
+  asGetBalance, asHasLevels, asGetPublicKey,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import type {
   IPublicDeriver,
@@ -488,14 +487,25 @@ export default class TransactionsStore extends Store {
       throw new LocalizableError(globalMessages.noTransactionsFound);
     }
 
+    const withPubKey = asGetPublicKey(request.publicDeriver);
+    const plate = withPubKey == null
+      ? null
+      : this.stores.wallets.getPublicKeyCache(withPubKey).plate.TextPart;
+
+    const network = request.publicDeriver.getParent().getNetworkInfo();
+    const apiMeta = getApiMeta(getApiForNetwork(network))?.meta;
+    if (apiMeta == null) throw new Error(`${nameof(this.exportTransactionsToFile)} no API selected`);
+
     const meta = getApiMeta(apiType)?.meta;
     if (meta == null) throw new Error(`${nameof(this.exportTransactionsToFile)} missing API`);
-    const req: ExportTransactionsRequest = {
-      ticker: meta.primaryTicker,
-      rows: respTxRows
-    };
     return async () => {
-      await this.stores.transactions.exportTransactions.execute(req).promise;
+      await this.stores.transactions.exportTransactions.execute({
+        ticker: meta.primaryTicker,
+        rows: respTxRows,
+        nameSuffix: plate == null
+          ? apiMeta.primaryTicker
+          : `${apiMeta.primaryTicker}-${plate}`,
+      }).promise;
     };
   }
 }

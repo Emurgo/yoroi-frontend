@@ -142,7 +142,13 @@ export default class AddressesStore extends Store {
     return this.storewiseFilter({
       publicDeriver: request.publicDeriver,
       storeName: request.storeName,
-      addresses: allAddresses,
+      addresses: allAddresses.map(addrInfo => ({
+        ...addrInfo,
+        address: addressToDisplayString(
+          addrInfo.address,
+          request.publicDeriver.getParent().getNetworkInfo()
+        ),
+      })),
     });
   }
 
@@ -198,7 +204,13 @@ export default class AddressesStore extends Store {
     return this.storewiseFilter({
       publicDeriver: request.publicDeriver,
       storeName: request.storeName,
-      addresses,
+      addresses: addresses.map(addrInfo => ({
+        ...addrInfo,
+        address: addressToDisplayString(
+          addrInfo.address,
+          request.publicDeriver.getParent().getNetworkInfo()
+        ),
+      })),
     });
   }
 

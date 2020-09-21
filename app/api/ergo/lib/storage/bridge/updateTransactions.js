@@ -1,6 +1,5 @@
 // @flow
 
-import BigNumber from 'bignumber.js';
 import { isEqual } from 'lodash';
 import type {
   lf$Database, lf$Transaction,
@@ -57,14 +56,10 @@ import type {
   UserAnnotation,
 } from '../../../../ada/transactions/types';
 import type {
-  ToAbsoluteSlotNumberFunc,
-} from '../../../../common/lib/storage/bridge/timeUtils';
-import type {
   UtxoTransactionInputInsert, UtxoTransactionOutputInsert,
 } from '../../../../ada/lib/storage/database/transactionModels/utxo/tables';
 import {
   TxStatusCodes,
-  CoreAddressTypes,
 } from '../../../../ada/lib/storage/database/primitives/enums';
 import {
   asScanAddresses, asHasLevels,
@@ -82,7 +77,6 @@ import {
 import { ModifyDisplayCutoff, } from '../../../../ada/lib/storage/database/walletTypes/bip44/api/write';
 import { AddDerivationTree, } from '../../../../ada/lib/storage/database/walletTypes/common/api/write';
 import { GetDerivationSpecific, } from '../../../../ada/lib/storage/database/walletTypes/common/api/read';
-import { getErgoBaseConfig, } from '../../../../ada/lib/storage/database/prepackaged/networks';
 import {
   ModifyLastSyncInfo,
   DeleteAllTransactions,
@@ -108,7 +102,6 @@ import type {
 import type {
   FilterFunc,
 } from '../../../../common/lib/state-fetch/currencySpecificTypes';
-import { addressToKind, addressToDisplayString } from '../../../../ada/lib/storage/bridge/utils';
 
 async function rawGetAllTxIds(
   db: lf$Database,
@@ -239,8 +232,6 @@ export async function rawGetTransactions(
       allOwnedAddressIds: new Set(
         Object.keys(addresses).flatMap(key => addresses[key]).map(addrRow => addrRow.AddressId)
       ),
-      ownImplicitInput: new BigNumber(0),
-      ownImplicitOutput: new BigNumber(0),
     })
   }));
 
@@ -773,7 +764,7 @@ async function rollback(
     db, dbTx,
     {
       txIds,
-      slot: Number.MAX_SAFE_INTEGER,
+      height: Number.MAX_SAFE_INTEGER,
     }
   );
   if (bestInStorage == null) {
@@ -783,9 +774,9 @@ async function rollback(
 
   // 3) Get latest k transactions
 
-  const txsToRevert = await deps.GetTxAndBlock.gteSlot(
+  const txsToRevert = await deps.GetTxAndBlock.gteHeight(
     db, dbTx,
-    { txIds, slot: bestInStorage.Block.Height - ERGO_STABLE_SIZE }
+    { txIds, height: bestInStorage.Block.Height - ERGO_STABLE_SIZE }
   );
 
   // 4) mark rollback transactions as failed
@@ -843,7 +834,7 @@ async function rollback(
   // 7) Rollback LastSyncTable
   const bestStillIncluded = await deps.GetTxAndBlock.firstSuccessTxBefore(
     db, dbTx,
-    { txIds, slot: bestInStorage.Block.Height - ERGO_STABLE_SIZE }
+    { txIds, height: bestInStorage.Block.Height - ERGO_STABLE_SIZE }
   );
   await deps.ModifyLastSyncInfo.overrideLastSyncInfo(
     db, dbTx,
@@ -951,7 +942,7 @@ async function rawUpdateTransactions(
       db, dbTx,
       {
         txIds,
-        slot: Number.MAX_SAFE_INTEGER,
+        height: Number.MAX_SAFE_INTEGER,
       }
     );
 
@@ -967,17 +958,7 @@ async function rawUpdateTransactions(
       ...requestKind,
       network,
       addresses: [
-        ...addresses.utxoAddresses
-          // Note: don't send base/ptr keys
-          // Since the payment key is duplicated inside the enterprise addresses
-          // .filter(address => (
-          //   address.Type !== CoreAddressTypes.CARDANO_BASE &&
-          //   address.Type !== CoreAddressTypes.CARDANO_PTR
-          // ))
-          // TODO: get rid of this once backend supports querying by payment key
-          .map(address => address.Hash)
-          // TODO: remove this when we properly support passing payment keys
-          .map(addr => addressToDisplayString(addr, publicDeriver.getParent().getNetworkInfo())),
+        ...addresses.utxoAddresses.map(address => address.Hash)
       ],
       untilBlock,
     });
@@ -1237,7 +1218,7 @@ function genErgoIOGen(
         TransactionId: txRowId,
         AddressId: getIdOrThrow(input.address),
         ParentTxHash: input.outputTransactionId,
-        IndexInParentTx: input.index,
+        IndexInParentTx: input.outputIndex,
         IndexInOwnTx: i,
         Amount: input.value.toString(),
       });
@@ -1406,11 +1387,12 @@ export function networkTxHeaderToDb(
   const block =
     tx.block_hash != null &&
     tx.time != null &&
-    tx.height != null
+    tx.block_num != null
       ? {
         Hash: tx.block_hash,
         BlockTime: new Date(tx.time),
-        Height: tx.height,
+        Height: tx.block_num,
+        SlotNum: 0, // TODO
         Digest: digestForHash(tx.hash, BlockSeed),
       }
       : null;
@@ -1420,8 +1402,8 @@ export function networkTxHeaderToDb(
     Hash: tx.hash,
     Digest: digest,
     Ordinal: tx.tx_ordinal,
-    LastUpdateTime: block == null || tx.time == null
-      ? new Date(tx.last_update).getTime() // this is out best guess for txs not in a block
+    LastUpdateTime: block == null
+      ? new Date().getTime()
       : new Date(tx.time).getTime(),
     Status: statusStringToCode(tx.tx_state),
     ErrorMessage: null, // TODO: add error message from backend if present
