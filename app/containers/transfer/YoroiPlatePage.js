@@ -7,12 +7,8 @@ import globalMessages from '../../i18n/global-messages';
 import WalletRestoreVerifyDialog from '../../components/wallet/WalletRestoreVerifyDialog';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import config from '../../config';
-import {
-  generateLedgerWalletRootKey,
-  generateWalletRootKey,
-} from '../../api/ada/lib/cardanoCrypto/cryptoWallet';
-import type { PlateResponse } from '../../api/common/lib/crypto/plate';
 import { generatePlates } from '../../stores/toplevel/WalletRestoreStore';
+import type { PlateWithMeta } from '../../stores/toplevel/WalletRestoreStore';
 import { SelectedExplorer } from '../../domain/SelectedExplorer';
 import type { Notification } from '../../types/notificationType';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
@@ -26,11 +22,6 @@ type Props = {|
   +onNext: void => PossiblyAsync<void>,
   +onCancel: void => void,
 |};
-type WalletRestoreDialogContainerState = {|
-  byronPlate: void | PlateResponse,
-  jormungandrPlate: void | PlateResponse,
-  shelleyPlate: void | PlateResponse,
-|}
 
 @observer
 export default class YoroiPlatePage extends Component<Props> {
@@ -42,28 +33,20 @@ export default class YoroiPlatePage extends Component<Props> {
       throw new Error(`${nameof(YoroiPlatePage)} no mode selected`);
     }
 
-    const rootPk = yoroiTransfer.mode.extra === 'ledger'
-      ? generateLedgerWalletRootKey(yoroiTransfer.recoveryPhrase)
-      : generateWalletRootKey(yoroiTransfer.recoveryPhrase);
-
-    const { byronPlate, shelleyPlate, jormungandrPlate } = generatePlates(
-      rootPk,
+    const plates = generatePlates(
+      yoroiTransfer.recoveryPhrase,
       this.props.accountIndex,
       yoroiTransfer.mode,
       this.getSelectedNetwork(),
     );
     runInAction(() => {
-      this.plates = {
-        byronPlate,
-        jormungandrPlate,
-        shelleyPlate,
-      };
+      this.plates = plates;
     });
   }
 
   @observable notificationElementId: string = '';
 
-  @observable plates: void | WalletRestoreDialogContainerState;
+  @observable plates: void | Array<PlateWithMeta>;
 
   getSelectedNetwork: void => $ReadOnly<NetworkRow> = () => {
     const { selectedNetwork } = this.generated.stores.profile;
@@ -82,12 +65,9 @@ export default class YoroiPlatePage extends Component<Props> {
       duration: config.wallets.ADDRESS_COPY_TOOLTIP_NOTIFICATION_DURATION,
       message: globalMessages.copyTooltipMessage,
     };
-    const { byronPlate, shelleyPlate, jormungandrPlate } = this.plates;
     return (
       <WalletRestoreVerifyDialog
-        shelleyPlate={shelleyPlate}
-        byronPlate={byronPlate}
-        jormungandrPlate={jormungandrPlate}
+        plates={this.plates}
         selectedExplorer={this.generated.stores.explorers.selectedExplorer
           .get(this.getSelectedNetwork().NetworkId) ?? (() => { throw new Error('No explorer for wallet network'); })()
         }

@@ -24,6 +24,8 @@ import { decode, encode } from 'bs58check';
 
 export class BIP32ED25519PublicKey implements IKey, IKeyDerivation, IPublic {
   key: RustModule.WalletV3.Bip32PublicKey;
+
+  // warning: don't use this function as it's won't decorate the object correctly
   constructor(key: RustModule.WalletV3.Bip32PublicKey) {
     this.key = key;
   }
@@ -57,6 +59,8 @@ function annotateBIP32ED25519PublicKey(
 
 export class BIP32ED25519PrivateKey implements IKey, IKeyDerivation, IPrivate {
   key: RustModule.WalletV3.Bip32PrivateKey;
+
+  // warning: don't use this function as it's won't decorate the object correctly
   constructor(key: RustModule.WalletV3.Bip32PrivateKey) {
     this.key = key;
   }
@@ -70,7 +74,7 @@ export class BIP32ED25519PrivateKey implements IKey, IKeyDerivation, IPrivate {
   sign(data: Buffer): Buffer {
     return Buffer.from(this.key.to_raw_key().sign(data).to_hex(), 'hex');
   }
-  toPublic(): IKey & IPublic {
+  toPublic(): BIP32ED25519PublicKey {
     const pubKey = this.key.to_public();
     return BIP32ED25519PublicKey.fromV3Key(pubKey);
   }
@@ -95,6 +99,8 @@ function annotateBIP32ED25519PrivateKey(
 
 export class BIP32PublicKey implements IKey, IKeyDerivation, IPublic {
   key: BIP32Interface;
+
+  // warning: don't use this function as it's won't decorate the object correctly
   constructor(key: BIP32Interface) {
     this.key = key;
   }
@@ -128,6 +134,8 @@ function annotateBIP32PublicKey(
 
 export class BIP32PrivateKey implements IKey, IKeyDerivation, IPrivate {
   key: BIP32Interface;
+
+  // warning: don't use this function as it's won't decorate the object correctly
   constructor(key: BIP32Interface) {
     this.key = key;
   }
@@ -141,7 +149,7 @@ export class BIP32PrivateKey implements IKey, IKeyDerivation, IPrivate {
   sign(data: Buffer): Buffer {
     return this.key.sign(data);
   }
-  toPublic(): IKey & IPublic {
+  toPublic(): BIP32PublicKey {
     const pubKey = fromPublicKey(this.key.publicKey, this.key.chainCode);
     return BIP32PublicKey.fromBip32(pubKey);
   }

@@ -1,7 +1,8 @@
 // @flow
 
 import { Before, BeforeAll, Given, Then, After, AfterAll, setDefinitionFunctionWrapper, setDefaultTimeout } from 'cucumber';
-import { getMockServer, closeMockServer, setExpectedTx } from '../mock-chain/mockCardanoServer';
+import * as CardanoServer from '../mock-chain/mockCardanoServer';
+import * as ErgoServer from '../mock-chain/mockErgoServer';
 import { By } from 'selenium-webdriver';
 import { enterRecoveryPhrase, getPlates } from './wallet-restoration-steps';
 import { testWallets } from '../mock-chain/TestWallets';
@@ -37,15 +38,18 @@ BeforeAll(() => {
   fs.mkdirSync(screenshotsDir);
   setDefaultTimeout(60 * 1000);
 
-  getMockServer({});
+  CardanoServer.getMockServer({});
+  ErgoServer.getMockServer({});
 });
 
 AfterAll(() => {
-  closeMockServer();
+  CardanoServer.closeMockServer();
+  ErgoServer.closeMockServer();
 });
 
 Before((scenario) => {
-  setExpectedTx(undefined);
+  CardanoServer.setExpectedTx(undefined);
+  ErgoServer.setExpectedTx(undefined);
   // cleanup scenario name so it is folder-name friendly
   testProgress.scenarioName = scenario.pickle.name.replace(/[^0-9a-z_ ]/gi, '');
   testProgress.lineNum = scenario.sourceLocation.line;
@@ -60,10 +64,12 @@ Before({ tags: '@TestAssuranceChain' }, () => {
 });
 
 Before({ tags: '@serverDown' }, () => {
-  closeMockServer();
+  CardanoServer.closeMockServer();
+  ErgoServer.closeMockServer();
 });
 After({ tags: '@serverDown' }, () => {
-  getMockServer({});
+  CardanoServer.getMockServer({});
+  ErgoServer.getMockServer({});
 });
 
 Before({ tags: '@serverMaintenance' }, () => {
@@ -81,8 +87,8 @@ After({ tags: '@appMaintenance' }, () => {
 });
 
 Before({ tags: '@invalidWitnessTest' }, () => {
-  closeMockServer();
-  getMockServer({
+  CardanoServer.closeMockServer();
+  CardanoServer.getMockServer({
     signedTransaction: (req, res) => {
       res.status(400).jsonp({
         message: 'Invalid witness'
@@ -92,8 +98,8 @@ Before({ tags: '@invalidWitnessTest' }, () => {
 });
 
 After({ tags: '@invalidWitnessTest' }, () => {
-  closeMockServer();
-  getMockServer({});
+  CardanoServer.closeMockServer();
+  CardanoServer.getMockServer({});
 });
 
 After(async function () {

@@ -16,11 +16,11 @@ import LocalizableError from '../../i18n/LocalizableError';
 import ExplorableHashContainer from '../../containers/widgets/ExplorableHashContainer';
 import { SelectedExplorer } from '../../domain/SelectedExplorer';
 import type { Notification } from '../../types/notificationType';
-import type { PlateResponse } from '../../api/common/lib/crypto/plate';
 import CenteredLayout from '../layout/CenteredLayout';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { truncateAddress } from '../../utils/formatters';
+import type { PlateWithMeta } from '../../stores/toplevel/WalletRestoreStore';
 
 const messages = defineMessages({
   dialogTitleVerifyWalletRestoration: {
@@ -44,44 +44,10 @@ const messages = defineMessages({
     defaultMessage: '!!!If you\'ve entered wrong mnemonics or a wrong paper wallet password -' +
       ' you will just open another empty wallet with wrong account checksum and wrong addresses!',
   },
-  walletRestoreVerifyAccountIdLabel: {
-    id: 'wallet.restore.dialog.verify.accountId.label',
-    defaultMessage: '!!!Your Wallet Account checksum:',
-  },
-  walletRestoreVerifyByronAccountIdLabel: {
-    id: 'wallet.restore.dialog.verify.accountId.byron.label',
-    defaultMessage: '!!!Byron account checksum:',
-  },
-  walletRestoreVerifyShelleyAccountIdLabel: {
-    id: 'wallet.restore.dialog.verify.accountId.shelley.label',
-    defaultMessage: '!!!Shelley account checksum:',
-  },
-  walletRestoreVerifyJormungandrAccountIdLabel: {
-    id: 'wallet.restore.dialog.verify.accountId.itn.label',
-    defaultMessage: '!!!ITN account checksum:',
-  },
-  walletRestoreVerifyAddressesLabel: {
-    id: 'wallet.restore.dialog.verify.addressesLabel',
-    defaultMessage: '!!!Your Wallet address[es]:',
-  },
-  walletRestoreVerifyByronAddressesLabel: {
-    id: 'wallet.restore.dialog.verify.byron.addressesLabel',
-    defaultMessage: '!!!Byron Wallet address[es]:',
-  },
-  walletRestoreVerifyShelleyAddressesLabel: {
-    id: 'wallet.restore.dialog.verify.shelley.addressesLabel',
-    defaultMessage: '!!!Shelley Wallet address[es]:',
-  },
-  walletRestoreVerifyJormungandrAddressesLabel: {
-    id: 'wallet.restore.dialog.verify.itn.addressesLabel',
-    defaultMessage: '!!!ITN Wallet address[es]:',
-  },
 });
 
 type Props = {|
-  +shelleyPlate: void | PlateResponse,
-  +byronPlate: void | PlateResponse,
-  +jormungandrPlate: void | PlateResponse,
+  +plates: Array<PlateWithMeta>,
   +selectedExplorer: SelectedExplorer,
   +onCopyAddressTooltip: (string, string) => void,
   +notification: ?Notification,
@@ -106,7 +72,7 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
     plate: WalletChecksum,
   ): Node {
     return (
-      <div>
+      <div key={title}>
         <h2 className={styles.addressLabel}>
           {title}
         </h2>
@@ -163,9 +129,6 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
   render(): Node {
     const { intl } = this.context;
     const {
-      shelleyPlate,
-      byronPlate,
-      jormungandrPlate,
       error,
       isSubmitting,
       onCancel,
@@ -208,67 +171,18 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
       </div>
     );
 
-    const byronPlateElem = byronPlate == null
-      ? undefined
-      : this.generatePlate(
-        jormungandrPlate == null
-          ? intl.formatMessage(messages.walletRestoreVerifyAccountIdLabel)
-          : intl.formatMessage(messages.walletRestoreVerifyByronAccountIdLabel),
-        byronPlate.accountPlate
-      );
+    const plateElems = this.props.plates.map(plate => this.generatePlate(
+      intl.formatMessage(plate.checksumTitle),
+      plate.accountPlate,
+    ));
 
-    const shelleyPlateElem = shelleyPlate == null
-      ? undefined
-      : this.generatePlate(
-        intl.formatMessage(messages.walletRestoreVerifyShelleyAccountIdLabel),
-        shelleyPlate.accountPlate
-      );
+    const addressElems = this.props.plates.map(plate => this.generateAddresses(
+      intl.formatMessage(plate.addressMessage),
+      plate.addresses,
+      onCopyAddressTooltip,
+      notification
+    ));
 
-    const jormungandrPlateElem = jormungandrPlate == null
-      ? undefined
-      : this.generatePlate(
-        byronPlate == null
-          ? intl.formatMessage(messages.walletRestoreVerifyAccountIdLabel)
-          : intl.formatMessage(messages.walletRestoreVerifyJormungandrAccountIdLabel),
-        jormungandrPlate.accountPlate
-      );
-
-    const byronAddressesElem = byronPlate == null
-      ? undefined
-      : this.generateAddresses(
-        jormungandrPlate == null
-          ? intl.formatMessage(messages.walletRestoreVerifyAddressesLabel)
-          : intl.formatMessage(messages.walletRestoreVerifyByronAddressesLabel),
-        byronPlate.addresses,
-        onCopyAddressTooltip,
-        notification,
-      );
-
-    const jormungandrAddressesElem = jormungandrPlate == null
-      ? undefined
-      : this.generateAddresses(
-        byronPlate == null
-          ? intl.formatMessage(messages.walletRestoreVerifyAddressesLabel)
-          : intl.formatMessage(messages.walletRestoreVerifyJormungandrAddressesLabel),
-        jormungandrPlate.addresses,
-        onCopyAddressTooltip,
-        notification,
-      );
-
-    const shelleyAddressesElem = shelleyPlate == null
-      ? undefined
-      : this.generateAddresses(
-        intl.formatMessage(messages.walletRestoreVerifyShelleyAddressesLabel),
-        shelleyPlate.addresses,
-        onCopyAddressTooltip,
-        notification,
-      );
-
-    const addressElems: Array<React$Node> = [
-      ...(shelleyAddressesElem != null ? [shelleyAddressesElem] : []),
-      ...(byronAddressesElem != null ? [byronAddressesElem] : []),
-      ...(jormungandrAddressesElem  != null ? [jormungandrAddressesElem] : []),
-    ];
     return (
       <Dialog
         title={intl.formatMessage(messages.dialogTitleVerifyWalletRestoration)}
@@ -284,9 +198,7 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
 
         <DialogTextBlock>
           <CenteredLayout>
-            {shelleyPlateElem}
-            {byronPlateElem}
-            {jormungandrPlateElem}
+            {plateElems}
           </CenteredLayout>
         </DialogTextBlock>
 

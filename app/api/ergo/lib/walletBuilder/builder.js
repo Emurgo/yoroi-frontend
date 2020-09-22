@@ -11,8 +11,6 @@ import {
   BIP44_SCAN_SIZE,
   ChainDerivations,
 } from '../../../../config/numbersConfig';
-import { fromBase58 } from 'bip32';
-import type { BIP32Interface } from 'bip32';
 import { Address } from '@coinbarn/ergo-ts';
 
 import { encryptWithPassword } from '../../../../utils/passwordCipher';
@@ -36,8 +34,8 @@ import type {
 import type { AddByHashFunc } from '../../../common/lib/storage/bridge/hashMapper';
 import { rawGenAddByHash } from '../../../common/lib/storage/bridge/hashMapper';
 import { addErgoP2PK } from '../restoration/scan';
-import { decode } from 'bs58check';
 import { KeyKind } from '../../../common/lib/crypto/keys/types';
+import { derivePath, BIP32PublicKey, BIP32PrivateKey } from '../../../common/lib/crypto/keys/keyRepository';
 
 // TODO: maybe move this inside walletBuilder somehow so it's all done in the same transaction
 /**
@@ -46,7 +44,7 @@ import { KeyKind } from '../../../common/lib/crypto/keys/types';
  * But we need to ensure the address maintains the BIP44 gap regardless of internet connection
  */
 export async function getAccountDefaultDerivations(
-  bip32Account: BIP32Interface,
+  bip32Account: BIP32PublicKey,
   addByHash: AddByHashFunc,
 ): Promise<TreeInsert<Bip44ChainInsert>> {
   const addressesIndex = range(
@@ -56,16 +54,28 @@ export async function getAccountDefaultDerivations(
 
   const externalAddrs = addressesIndex.map(i => (
     Address.fromPk(
-      bip32Account
-        .derivePath(`${ChainDerivations.EXTERNAL}/${i}`)
+      derivePath(
+        bip32Account,
+        [
+          ChainDerivations.EXTERNAL,
+          i,
+        ]
+      )
+        .key
         .publicKey
         .toString('hex')
     ).addrBytes.toString('hex')
   ));
   const internalAddrs = addressesIndex.map(i => (
     Address.fromPk(
-      bip32Account
-        .derivePath(`${ChainDerivations.INTERNAL}/${i}`)
+      derivePath(
+        bip32Account,
+        [
+          ChainDerivations.INTERNAL,
+          i,
+        ]
+      )
+        .key
         .publicKey
         .toString('hex')
     ).addrBytes.toString('hex')
@@ -124,7 +134,7 @@ export async function getAccountDefaultDerivations(
 
 export async function createStandardBip44Wallet(request: {|
   db: lf$Database,
-  rootPk: string,
+  rootPk: BIP32PrivateKey,
   password: string,
   accountIndex: number,
   walletName: string,
@@ -137,12 +147,17 @@ export async function createStandardBip44Wallet(request: {|
 
   const encryptedRoot = encryptWithPassword(
     request.password,
-    decode(request.rootPk),
+    request.rootPk.toBuffer(),
   );
 
-  const accountKey = fromBase58(
-    request.rootPk
-  ).derivePath(`${WalletTypePurpose.BIP44 - HARD_DERIVATION_START}'/${CoinTypes.ERGO - HARD_DERIVATION_START}'/${request.accountIndex - HARD_DERIVATION_START}'`);
+  const accountKey = derivePath(
+    request.rootPk,
+    [
+      WalletTypePurpose.BIP44,
+      CoinTypes.ERGO,
+      request.accountIndex,
+    ]
+  ).toPublic();
 
   const initialDerivations = await getAccountDefaultDerivations(
     accountKey,
