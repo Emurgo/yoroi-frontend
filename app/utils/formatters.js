@@ -87,3 +87,11 @@ export function truncateAddress(addr: string): string {
 export function truncateAddressShort(addr: string): string {
   return truncateFormatter(addr, 20);
 }
+
+/**
+ * If specified number is integer - append `.0` to it.
+ * Otherwise - just float representation.
+ */
+export function formatBigNumberToFloatString(x: BigNumber): string {
+  return x.isInteger() ? x.toFixed(1) : x.toString();
+}

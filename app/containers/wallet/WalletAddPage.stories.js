@@ -24,9 +24,6 @@ import {
 } from '../../../stories/helpers/StoryWrapper';
 import { THEMES } from '../../themes';
 import AdaApi from '../../api/ada/index';
-import {
-  generateWalletRootKey,
-} from '../../api/ada/lib/cardanoCrypto/cryptoWallet';
 import { NoInputsError, GenericApiError, } from '../../api/common/errors';
 import { withScreenshot } from 'storycap';
 import { defaultToSelectedExplorer } from '../../domain/SelectedExplorer';
@@ -662,10 +659,9 @@ export const RestoreVerify = (): Node => {
     modeOptions.SHELLEY15
   );
   const recoveryPhrase = creationRecoveryPhrase.join(' ');
-  const rootPk = generateWalletRootKey(recoveryPhrase);
   const selectedNetwork = networks.CardanoMainnet;
-  const { byronPlate, shelleyPlate, jormungandrPlate } = generatePlates(
-    rootPk,
+  const plates = generatePlates(
+    recoveryPhrase,
     0, // 0th account
     getRestoreMode(),
     selectedNetwork,
@@ -687,9 +683,7 @@ export const RestoreVerify = (): Node => {
             },
             recoveryResult: {
               phrase: recoveryPhrase,
-              byronPlate,
-              jormungandrPlate,
-              shelleyPlate,
+              plates,
             },
           })
         },

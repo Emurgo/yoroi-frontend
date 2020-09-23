@@ -4,7 +4,6 @@ import {
   Ports,
   portToPermission,
   portToSocketPermission,
-  serverToPermission
 } from '../scripts/connections';
 
 export function genCSP(request: {|

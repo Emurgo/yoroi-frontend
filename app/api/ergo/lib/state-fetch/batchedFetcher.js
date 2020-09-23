@@ -6,16 +6,13 @@ import type {
   TxBodiesRequest, TxBodiesResponse,
   UtxoSumRequest, UtxoSumResponse,
   HistoryRequest, HistoryResponse,
-  RewardHistoryFunc, RewardHistoryRequest, RewardHistoryResponse,
-  PoolInfoFunc, PoolInfoRequest, PoolInfoResponse,
-  AccountStateFunc, AccountStateRequest, AccountStateResponse,
   SignedRequest, SignedResponse,
   BestBlockRequest, BestBlockResponse,
   AddressUtxoFunc,
   HistoryFunc,
   TxBodiesFunc,
   UtxoSumFunc,
-  RemoteTransaction,
+  RemoteErgoTransaction,
 } from './types';
 import type {
   FilterFunc, FilterUsedRequest, FilterUsedResponse,
@@ -31,9 +28,6 @@ import {
   GetTxsBodiesForUTXOsError,
   GetUtxosSumsForAddressesApiError,
   GetTxHistoryForAddressesApiError,
-  GetRewardHistoryApiError,
-  GetAccountStateApiError,
-  GetPoolInfoApiError,
 } from '../../../common/errors';
 import {
   Logger,
@@ -49,7 +43,7 @@ const addressesLimit = CONFIG.app.addressRequestSize;
 
 /**
  * Makes calls to Yoroi backend service
- * https://github.com/Emurgo/yoroi-graphql-migration-backend
+ * https://github.com/Emurgo/yoroi-ergo-backend
  */
 export class BatchedFetcher implements IFetcher {
 
@@ -77,12 +71,6 @@ export class BatchedFetcher implements IFetcher {
     )(body)
   )
 
-  getRewardHistory: RewardHistoryRequest => Promise<RewardHistoryResponse> = (body) => (
-    batchGetRewardHistory(
-      this.baseFetcher.getRewardHistory
-    )(body)
-  )
-
   getBestBlock: BestBlockRequest => Promise<BestBlockResponse> = (body) => (
     // We don't batch transaction sending (it's just a single request)
     this.baseFetcher.getBestBlock(body)
@@ -94,17 +82,10 @@ export class BatchedFetcher implements IFetcher {
     this.baseFetcher.sendTx(body)
   )
 
-  getAccountState: AccountStateRequest => Promise<AccountStateResponse> = (body) => (
-    batchGetAccountState(this.baseFetcher.getAccountState)(body)
-  )
-
   checkAddressesInUse: FilterUsedRequest => Promise<FilterUsedResponse> = (body) => (
     batchCheckAddressesInUse(this.baseFetcher.checkAddressesInUse)(body)
   )
 
-  getPoolInfo: PoolInfoRequest => Promise<PoolInfoResponse> = (body) => (
-    batchGetPoolInfo(this.baseFetcher.getPoolInfo)(body)
-  )
 }
 
 /** Sum up the UTXO for a list of addresses by batching backend requests */
@@ -144,13 +125,13 @@ function batchTxsBodiesForInputs(
   return async function (body: TxBodiesRequest): Promise<TxBodiesResponse> {
     try {
       // split up all txs into chunks of equal size
-      const groupsOfTxsHashes = chunk(body.txsHashes, CONFIG.app.txsBodiesRequestSize);
+      const groupsOfTxsHashes = chunk(body.txHashes, CONFIG.app.txsBodiesRequestSize);
 
       // convert chunks into list of Promises that call the backend-service
       const promises = groupsOfTxsHashes
         .map(groupOfTxsHashes => getTxsBodiesForUTXOs({
           network: body.network,
-          txsHashes: groupOfTxsHashes,
+          txHashes: groupOfTxsHashes,
         }));
 
       // Sum up all the utxo
@@ -158,7 +139,7 @@ function batchTxsBodiesForInputs(
         .then(groupsOfTxBodies => {
           const bodies = groupsOfTxBodies
             .reduce((acc, groupOfTxBodies) => Object.assign(acc, groupOfTxBodies), {});
-          if (body.txsHashes.length !== Object.keys(bodies).length) {
+          if (body.txHashes.length !== Object.keys(bodies).length) {
             throw new GetTxsBodiesForUTXOsError();
           }
           return bodies;
@@ -196,36 +177,11 @@ export function batchGetUTXOsSumsForAddresses(
         ),
         new BigNumber(0)
       );
-      if (sum.isZero()) {
-        return { sum: null };
-      }
       return { sum: sum.toString() };
     } catch (error) {
       Logger.error(`batchedFetcher::${nameof(batchGetUTXOsSumsForAddresses)} error: ` + stringifyError(error));
       if (error instanceof LocalizableError) throw error;
       throw new GetUtxosSumsForAddressesApiError();
-    }
-  };
-}
-
-export function batchGetRewardHistory(
-  getRewardHistory: RewardHistoryFunc,
-): RewardHistoryFunc {
-  return async function (body: RewardHistoryRequest): Promise<RewardHistoryResponse> {
-    try {
-      const chimericAccountAddresses = chunk(body.addresses, addressesLimit);
-      const chimericAccountPromises = chimericAccountAddresses.map(
-        addr => getRewardHistory({
-          network: body.network,
-          addresses: addr,
-        })
-      );
-      const rewardHistories = await Promise.all(chimericAccountPromises);
-      return Object.assign({}, ...rewardHistories);
-    } catch (error) {
-      Logger.error(`batchedFetcher::${nameof(batchGetRewardHistory)} error: ` + stringifyError(error));
-      if (error instanceof LocalizableError) throw error;
-      throw new GetRewardHistoryApiError();
     }
   };
 }
@@ -270,7 +226,7 @@ export function batchGetTransactionsHistoryForAddresses(
 async function _batchHistoryByAddresses(
   addresses: Array<string>,
   apiCall: (Array<string>) => Promise<HistoryResponse>,
-): Promise<Array<RemoteTransaction>> {
+): Promise<Array<RemoteErgoTransaction>> {
   const groupsOfAddresses = chunk(addresses, addressesLimit);
   const groupedTxsPromises = groupsOfAddresses.map(apiCall);
   const groupedTxs = await Promise.all(groupedTxsPromises);
@@ -279,7 +235,7 @@ async function _batchHistoryByAddresses(
 }
 
 async function _batchHistoryByTransaction(
-  previousTxs: Array<RemoteTransaction>,
+  previousTxs: Array<RemoteErgoTransaction>,
   request: HistoryRequest,
   getTransactionsHistoryForAddresses: HistoryFunc,
 ): Promise<HistoryResponse> {
@@ -346,16 +302,16 @@ export type TimeForTx = {|
   txOrdinal: number
 |};
 function getLatestTransaction(
-  txs: Array<RemoteTransaction>,
+  txs: Array<RemoteErgoTransaction>,
 ): void | TimeForTx {
   const blockInfo : Array<TimeForTx> = [];
   for (const tx of txs) {
-    if (tx.block_hash != null && tx.tx_ordinal != null && tx.height != null) {
+    if (tx.block_hash != null && tx.tx_ordinal != null && tx.block_num != null) {
       blockInfo.push({
         blockHash: tx.block_hash,
         txHash: tx.hash,
         txOrdinal: tx.tx_ordinal,
-        height: tx.height,
+        height: tx.block_num,
       });
     }
   }
@@ -376,48 +332,4 @@ function getLatestTransaction(
     }
   }
   return best;
-}
-
-export function batchGetAccountState(
-  getAccountState: AccountStateFunc,
-): AccountStateFunc {
-  return async function (body: AccountStateRequest): Promise<AccountStateResponse> {
-    try {
-      const chimericAccountAddresses = chunk(body.addresses, addressesLimit);
-      const chimericAccountPromises = chimericAccountAddresses.map(
-        addr => getAccountState({
-          network: body.network,
-          addresses: addr,
-        })
-      );
-      const chimericAccountStates = await Promise.all(chimericAccountPromises);
-      return Object.assign({}, ...chimericAccountStates);
-    } catch (error) {
-      Logger.error(`batchedFetcher::${nameof(batchGetAccountState)} error: ` + stringifyError(error));
-      if (error instanceof LocalizableError) throw error;
-      throw new GetAccountStateApiError();
-    }
-  };
-}
-
-export function batchGetPoolInfo(
-  getPoolInfo: PoolInfoFunc,
-): PoolInfoFunc {
-  return async function (body: PoolInfoRequest): Promise<PoolInfoResponse> {
-    try {
-      const poolIds = chunk(body.poolIds, addressesLimit);
-      const poolInfoPromises = poolIds.map(
-        poolId => getPoolInfo({
-          network: body.network,
-          poolIds: poolId,
-        })
-      );
-      const poolInfos = await Promise.all(poolInfoPromises);
-      return Object.assign({}, ...poolInfos);
-    } catch (error) {
-      Logger.error(`batchedFetcher::${nameof(batchGetPoolInfo)} error: ` + stringifyError(error));
-      if (error instanceof LocalizableError) throw error;
-      throw new GetPoolInfoApiError();
-    }
-  };
 }

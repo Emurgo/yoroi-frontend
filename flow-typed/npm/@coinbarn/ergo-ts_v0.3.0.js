@@ -11,14 +11,16 @@ declare module '@coinbarn/ergo-ts' {
     +P2S: 3, // 3
   |};
   declare export class Address {
-    get publicKey(): string;
+    get publicKey(): Buffer;
     get ergoTree(): string;
     static fromErgoTree(ergoTree: string, network?: $Values<typeof Network>): Address;
     static fromPk(pk: string, network?: $Values<typeof Network>): Address;
     static fromSk(sk: string, network?: $Values<typeof Network>): Address;
     address: string;
-    addrBytes: any;
+    addrBytes: Buffer;
     constructor(address: string): this;
+    static fromBase58(address: string): Address;
+    static fromBytes(bytes: Buffer): Address;
     isValid(): boolean;
     getNetwork(): $Values<typeof Network>;
     getType(): $Values<typeof AddressKind>;

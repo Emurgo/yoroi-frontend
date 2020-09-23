@@ -27,8 +27,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { ApiOptions, getApiForNetwork, getApiMeta } from '../../../api/common/utils';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
-import type { PlateResponse } from '../../../api/common/lib/crypto/plate';
-import type { RestoreStepsType } from '../../../stores/toplevel/WalletRestoreStore';
+import type { RestoreStepsType, PlateWithMeta } from '../../../stores/toplevel/WalletRestoreStore';
 import LocalizableError from '../../../i18n/LocalizableError';
 import type { TransferStatusT, TransferTx } from '../../../types/TransferTypes';
 import type { Notification } from '../../../types/notificationType';
@@ -153,9 +152,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
           (restoreRequest.error instanceof CheckAddressesInUseApiError);
         return (
           <WalletRestoreVerifyDialog
-            byronPlate={walletRestore.recoveryResult?.byronPlate}
-            shelleyPlate={walletRestore.recoveryResult?.shelleyPlate}
-            jormungandrPlate={walletRestore.recoveryResult?.jormungandrPlate}
+            plates={walletRestore.recoveryResult?.plates ?? []}
             selectedExplorer={this.generated.stores.explorers.selectedExplorer
               .get(this.getSelectedNetwork().NetworkId) ?? (() => { throw new Error('No explorer for wallet network'); })()
             }
@@ -349,10 +346,8 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
       |},
       walletRestore: {|
         recoveryResult: void | {|
-          shelleyPlate: void | PlateResponse,
-          byronPlate: void | PlateResponse,
+          plates: Array<PlateWithMeta>,
           phrase: string,
-          jormungandrPlate: void | PlateResponse
         |},
         step: RestoreStepsType,
         walletRestoreMeta: void | WalletRestoreMeta,

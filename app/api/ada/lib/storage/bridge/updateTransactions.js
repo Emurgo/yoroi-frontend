@@ -112,7 +112,7 @@ import {
 import type {
   HashToIdsFunc, FindOwnAddressFunc,
 } from '../../../../common/lib/storage/bridge/hashMapper';
-import { STABLE_SIZE } from '../../../../../config/numbersConfig';
+import { CARDANO_STABLE_SIZE } from '../../../../../config/numbersConfig';
 import { RollbackApiError } from '../../../../common/errors';
 import { getFromUserPerspective, } from '../../../transactions/utils';
 
@@ -943,7 +943,7 @@ async function rollback(
     db, dbTx,
     {
       txIds,
-      slot: Number.MAX_SAFE_INTEGER,
+      height: Number.MAX_SAFE_INTEGER,
     }
   );
   if (bestInStorage == null) {
@@ -953,9 +953,9 @@ async function rollback(
 
   // 3) Get latest k transactions
 
-  const txsToRevert = await deps.GetTxAndBlock.gteSlot(
+  const txsToRevert = await deps.GetTxAndBlock.gteHeight(
     db, dbTx,
-    { txIds, slot: bestInStorage.Block.SlotNum - STABLE_SIZE }
+    { txIds, height: bestInStorage.Block.Height - CARDANO_STABLE_SIZE }
   );
 
   // 4) mark rollback transactions as failed
@@ -1013,7 +1013,7 @@ async function rollback(
   // 7) Rollback LastSyncTable
   const bestStillIncluded = await deps.GetTxAndBlock.firstSuccessTxBefore(
     db, dbTx,
-    { txIds, slot: bestInStorage.Block.SlotNum - STABLE_SIZE }
+    { txIds, height: bestInStorage.Block.Height - CARDANO_STABLE_SIZE }
   );
   await deps.ModifyLastSyncInfo.overrideLastSyncInfo(
     db, dbTx,
@@ -1066,7 +1066,6 @@ async function rawUpdateTransactions(
   derivationTables: Map<number, string>,
 ): Promise<void> {
   const network = publicDeriver.getParent().getNetworkInfo();
-
   // TODO: consider passing this function in as an argument instead of generating it here
   const toAbsoluteSlotNumber = await genToAbsoluteSlotNumber(
     getCardanoHaskellBaseConfig(network)
@@ -1076,17 +1075,11 @@ async function rawUpdateTransactions(
   const bestBlock = await getBestBlock({
     network,
   });
-  const slotInRemote = (bestBlock.epoch == null || bestBlock.slot == null)
-    ? null
-    : toAbsoluteSlotNumber({
-      epoch: bestBlock.epoch,
-      slot: bestBlock.slot,
-    });
-  if (lastSyncInfo.SlotNum !== null) {
-    const lastSlotSeen = lastSyncInfo.SlotNum;
-    const inRemote = (slotInRemote != null ? slotInRemote : 0);
-    // if we're K slots ahead of remote
-    if (lastSlotSeen - inRemote > STABLE_SIZE) {
+  if (lastSyncInfo.Height !== null) {
+    const lastBlockSeen = lastSyncInfo.Height;
+    const inRemote = (bestBlock.height != null ? bestBlock.height : 0);
+    // if we're K blocks ahead of remote
+    if (lastBlockSeen - inRemote > CARDANO_STABLE_SIZE) {
       return;
     }
   }
@@ -1137,7 +1130,7 @@ async function rawUpdateTransactions(
       db, dbTx,
       {
         txIds,
-        slot: Number.MAX_SAFE_INTEGER,
+        height: Number.MAX_SAFE_INTEGER,
       }
     );
 
@@ -1177,7 +1170,9 @@ async function rawUpdateTransactions(
         .flatMap(key => addresses[key])
         .map(addrRow => addrRow.AddressId)
     );
+
     // 4) save data to local DB
+
     // WARNING: this can also modify the address set
     // ex: a new group address is found
     await updateTransactionBatch(
@@ -1212,6 +1207,13 @@ async function rawUpdateTransactions(
   }
 
   // 5) update last sync
+  const slotInRemote = (bestBlock.epoch == null || bestBlock.slot == null)
+    ? null
+    : toAbsoluteSlotNumber({
+      epoch: bestBlock.epoch,
+      slot: bestBlock.slot,
+    });
+
   await deps.ModifyLastSyncInfo.overrideLastSyncInfo(
     db, dbTx,
     {
@@ -1454,7 +1456,7 @@ function genByronIOGen(
   utxoOutputs: Array<UtxoTransactionOutputInsert>,
 |}) {
   if (!(byronTx.type == null || byronTx.type === RemoteTransactionTypes.byron)) {
-    throw new Error(`${nameof(genShelleyIOGen)} not a byron transaction`);
+    throw new Error(`${nameof(genByronIOGen)} not a byron transaction`);
   }
   return (txRowId) => {
     const utxoInputs = [];

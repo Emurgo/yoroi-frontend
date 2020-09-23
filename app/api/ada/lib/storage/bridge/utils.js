@@ -5,9 +5,10 @@ import { CoreAddressTypes } from '../database/primitives/enums';
 import { Bech32Prefix } from '../../../../../config/stringConfig';
 import { RustModule } from '../../cardanoCrypto/rustLoader';
 import type { NetworkRow } from '../database/primitives/tables';
-import { isJormungandr, isCardanoHaskell } from '../database/prepackaged/networks';
+import { isJormungandr, isCardanoHaskell, isErgo } from '../database/prepackaged/networks';
 import { defineMessages, } from 'react-intl';
 import type { $npm$ReactIntl$MessageDescriptor, } from 'react-intl';
+import { Address, AddressKind } from '@coinbarn/ergo-ts';
 
 export function tryAddressToKind(
   address: string,
@@ -26,13 +27,13 @@ export function addressToKind(
   parseAs: 'bech32' | 'bytes',
   network: $ReadOnly<NetworkRow>,
 ): CoreAddressT {
-  // Need to try parsing as a legacy address first
-  // Since parsing as bech32 directly may give a wrong result if the address contains a 1
-  if (RustModule.WalletV4.ByronAddress.is_valid(address)) {
-    return CoreAddressTypes.CARDANO_LEGACY;
-  }
   try {
     if (isJormungandr(network)) {
+      // Need to try parsing as a legacy address first
+      // Since parsing as bech32 directly may give a wrong result if the address contains a 1
+      if (RustModule.WalletV4.ByronAddress.is_valid(address)) {
+        return CoreAddressTypes.CARDANO_LEGACY;
+      }
       const wasmAddr = parseAs === 'bytes'
         ? RustModule.WalletV3.Address.from_bytes(Buffer.from(address, 'hex'))
         : RustModule.WalletV3.Address.from_string(address);
@@ -46,6 +47,11 @@ export function addressToKind(
       }
     }
     if (isCardanoHaskell(network)) {
+      // Need to try parsing as a legacy address first
+      // Since parsing as bech32 directly may give a wrong result if the address contains a 1
+      if (RustModule.WalletV4.ByronAddress.is_valid(address)) {
+        return CoreAddressTypes.CARDANO_LEGACY;
+      }
       const wasmAddr = parseAs === 'bytes'
         ? RustModule.WalletV4.Address.from_bytes(Buffer.from(address, 'hex'))
         : RustModule.WalletV4.Address.from_bech32(address);
@@ -71,9 +77,26 @@ export function addressToKind(
       }
       throw new Error(`${nameof(addressToKind)} unknown address type`);
     }
+    if (isErgo(network)) {
+      const ergoAddress = parseAs === 'bytes'
+        ? Address.fromBytes(Buffer.from(address, 'hex'))
+        : Address.fromBase58(address);
+      return ergoAddressToType(ergoAddress);
+    }
     throw new Error(`${nameof(addressToKind)} not implemented for network ${network.NetworkId}`);
   } catch (e1) {
     throw new Error(`${nameof(addressToKind)} failed to parse address type ${e1} ${address}`);
+  }
+}
+
+export function ergoAddressToType(
+  address: Address,
+): CoreAddressT {
+  switch (address.getType()) {
+    case AddressKind.P2PK: return CoreAddressTypes.ERGO_P2PK;
+    case AddressKind.P2SH: return CoreAddressTypes.ERGO_P2SH;
+    case AddressKind.P2S: return CoreAddressTypes.ERGO_P2S;
+    default: throw new Error(`${nameof(ergoAddressToType)} unknown Ergo address type ${address.address}`);
   }
 }
 
@@ -102,6 +125,12 @@ export function isValidReceiveAddress(
 
   const kind = tryAddressToKind(bech32, 'bech32', network);
   if (kind == null) {
+    return [false, messages.invalidAddress];
+  }
+  if (isErgo(network)) {
+    if (isErgoAddress(kind)) {
+      return true;
+    }
     return [false, messages.invalidAddress];
   }
   if (isJormungandr(network)) {
@@ -210,6 +239,15 @@ export function isJormungandrAddress(
   return false;
 }
 
+export function isErgoAddress(
+  kind: CoreAddressT
+): boolean {
+  if (kind === CoreAddressTypes.ERGO_P2PK) return true;
+  if (kind === CoreAddressTypes.ERGO_P2SH) return true;
+  if (kind === CoreAddressTypes.ERGO_P2S) return true;
+  return false;
+}
+
 export function baseToEnterprise(
   baseAddress: string
 ): string {
@@ -299,19 +337,24 @@ export function addressToDisplayString(
   address: string,
   network: $ReadOnly<NetworkRow>,
 ): string {
-  // Need to try parsing as a legacy address first
-  // Since parsing as bech32 directly may give a wrong result if the address contains a 1
-  if (RustModule.WalletV4.ByronAddress.is_valid(address)) {
-    return address;
-  }
   try {
     if (isJormungandr(network)) {
+      // Need to try parsing as a legacy address first
+      // Since parsing as bech32 directly may give a wrong result if the address contains a 1
+      if (RustModule.WalletV4.ByronAddress.is_valid(address)) {
+        return address;
+      }
       const wasmAddr = RustModule.WalletV3.Address.from_bytes(
         Buffer.from(address, 'hex')
       );
       return wasmAddr.to_string(Bech32Prefix.ADDRESS);
     }
     if (isCardanoHaskell(network)) {
+      // Need to try parsing as a legacy address first
+      // Since parsing as bech32 directly may give a wrong result if the address contains a 1
+      if (RustModule.WalletV4.ByronAddress.is_valid(address)) {
+        return address;
+      }
       const wasmAddr = RustModule.WalletV4.Address.from_bytes(
         Buffer.from(address, 'hex')
       );
@@ -320,6 +363,12 @@ export function addressToDisplayString(
         return wasmAddr.to_bech32();
       }
       return byronAddr.to_base58();
+    }
+    if (isErgo(network)) {
+      const ergoAddr = Address.fromBytes(
+        Buffer.from(address, 'hex')
+      );
+      return ergoAddr.address;
     }
     throw new Error(`${nameof(addressToDisplayString)} not implemented for network ${network.NetworkId}`);
   } catch (_e2) {
@@ -366,6 +415,10 @@ export function getAddressPayload(
         return Buffer.from(wasmAddr.to_bytes()).toString('hex');
       }
       return byronAddr.to_base58();
+    }
+    if (isErgo(network)) {
+      const ergoAddr = new Address(address);
+      return ergoAddr.addrBytes.toString('hex');
     }
     throw new Error(`${nameof(getAddressPayload)} not implemented for network ${network.NetworkId}`);
   } catch (_e2) {

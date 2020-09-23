@@ -140,7 +140,6 @@ import type {
 } from './lib/state-fetch/types';
 import type {
   FilterFunc,
-
 } from '../common/lib/state-fetch/currencySpecificTypes';
 import {
   getChainAddressesForDisplay,

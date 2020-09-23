@@ -16,6 +16,9 @@ import {
   generateShelleyPlate,
 } from '../../api/ada/lib/cardanoCrypto/plate';
 import {
+  generateErgoPlate,
+} from '../../api/ergo/lib/crypto/plate';
+import {
   generateJormungandrPlate,
 } from '../../api/jormungandr/lib/crypto/plate';
 import {
@@ -26,11 +29,53 @@ import {
 } from '../../api/jormungandr/lib/crypto/utils';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import {
-  generateWalletRootKey, generateLedgerWalletRootKey,
+  generateWalletRootKey as generateAdaWalletRootKey,
+  generateLedgerWalletRootKey,
 } from '../../api/ada/lib/cardanoCrypto/cryptoWallet';
+import {
+  generateWalletRootKey as generateErgoWalletRootKey,
+} from '../../api/ergo/lib/crypto/wallet';
 import { getApiForNetwork } from '../../api/common/utils';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
-import { isJormungandr, isCardanoHaskell } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { isJormungandr, isCardanoHaskell, isErgo } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { defineMessages, } from 'react-intl';
+import type { $npm$ReactIntl$MessageDescriptor } from 'react-intl';
+
+const messages = defineMessages({
+  walletRestoreVerifyAccountIdLabel: {
+    id: 'wallet.restore.dialog.verify.accountId.label',
+    defaultMessage: '!!!Your Wallet Account checksum:',
+  },
+  walletRestoreVerifyByronAccountIdLabel: {
+    id: 'wallet.restore.dialog.verify.accountId.byron.label',
+    defaultMessage: '!!!Byron account checksum:',
+  },
+  walletRestoreVerifyShelleyAccountIdLabel: {
+    id: 'wallet.restore.dialog.verify.accountId.shelley.label',
+    defaultMessage: '!!!Shelley account checksum:',
+  },
+  walletRestoreVerifyJormungandrAccountIdLabel: {
+    id: 'wallet.restore.dialog.verify.accountId.itn.label',
+    defaultMessage: '!!!ITN account checksum:',
+  },
+  walletRestoreVerifyAddressesLabel: {
+    id: 'wallet.restore.dialog.verify.addressesLabel',
+    defaultMessage: '!!!Your Wallet address[es]:',
+  },
+  walletRestoreVerifyByronAddressesLabel: {
+    id: 'wallet.restore.dialog.verify.byron.addressesLabel',
+    defaultMessage: '!!!Byron Wallet address[es]:',
+  },
+  walletRestoreVerifyShelleyAddressesLabel: {
+    id: 'wallet.restore.dialog.verify.shelley.addressesLabel',
+    defaultMessage: '!!!Shelley Wallet address[es]:',
+  },
+  walletRestoreVerifyJormungandrAddressesLabel: {
+    id: 'wallet.restore.dialog.verify.itn.addressesLabel',
+    defaultMessage: '!!!ITN Wallet address[es]:',
+  },
+});
+
 
 export const NUMBER_OF_VERIFIED_ADDRESSES = 1;
 export const NUMBER_OF_VERIFIED_ADDRESSES_PAPER = 5;
@@ -42,6 +87,11 @@ export const RestoreSteps = Object.freeze({
   TRANSFER_TX_GEN: 3,
 });
 export type RestoreStepsType = $Values<typeof RestoreSteps>;
+export type PlateWithMeta = {|
+  ...PlateResponse,
+  checksumTitle: $Exact<$npm$ReactIntl$MessageDescriptor>,
+  addressMessage: $Exact<$npm$ReactIntl$MessageDescriptor>,
+|};
 
 export default class AdaWalletRestoreStore extends Store {
 
@@ -56,9 +106,7 @@ export default class AdaWalletRestoreStore extends Store {
 
   @observable recoveryResult: void | {|
     phrase: string,
-    shelleyPlate: void | PlateResponse,
-    byronPlate: void | PlateResponse,
-    jormungandrPlate: void | PlateResponse,
+    plates: Array<PlateWithMeta>,
   |};
 
   setup(): void {
@@ -114,13 +162,10 @@ export default class AdaWalletRestoreStore extends Store {
       resolvedRecoveryPhrase = newPhrase;
     }
 
-    const rootPk = this.stores.yoroiTransfer.mode?.extra === 'ledger'
-      ? generateLedgerWalletRootKey(resolvedRecoveryPhrase)
-      : generateWalletRootKey(resolvedRecoveryPhrase);
     const { selectedNetwork } = this.stores.profile;
     if (selectedNetwork == null) throw new Error(`${nameof(this._processRestoreMeta)} no network selected`);
-    const { byronPlate, shelleyPlate, jormungandrPlate } = generatePlates(
-      rootPk,
+    const plates = generatePlates(
+      resolvedRecoveryPhrase,
       this.selectedAccount,
       mode,
       selectedNetwork,
@@ -129,9 +174,7 @@ export default class AdaWalletRestoreStore extends Store {
     runInAction(() => {
       this.recoveryResult = {
         phrase: resolvedRecoveryPhrase,
-        byronPlate,
-        jormungandrPlate,
-        shelleyPlate,
+        plates,
       };
     });
   }
@@ -174,21 +217,25 @@ export default class AdaWalletRestoreStore extends Store {
 }
 
 export function generatePlates(
-  rootPk: RustModule.WalletV4.Bip32PrivateKey,
+  recoveryPhrase: string,
   accountIndex: number,
   mode: RestoreModeType,
   network: $ReadOnly<NetworkRow>,
-): {|
-  byronPlate: void | PlateResponse,
-  shelleyPlate: void | PlateResponse,
-  jormungandrPlate: void | PlateResponse,
-|} {
+): Array<PlateWithMeta> {
   if (mode == null) throw new Error(`${nameof(generatePlates)} restore mode unset`);
   const addressCount = mode.extra === 'paper'
     ? NUMBER_OF_VERIFIED_ADDRESSES_PAPER
     : NUMBER_OF_VERIFIED_ADDRESSES;
 
-  const shouldShowByronPlate = () => {
+  const plates = [];
+
+  const getCardanoKey = () => {
+    return mode.extra === 'ledger'
+      ? generateLedgerWalletRootKey(recoveryPhrase)
+      : generateAdaWalletRootKey(recoveryPhrase);
+  };
+
+  const shouldShowByronPlate = (() => {
     if (
       // generically show byron checksum if length is 15
       // since 15-word wallets were supported in Byron
@@ -202,40 +249,17 @@ export function generatePlates(
       return true;
     }
     return false;
-  };
-  const byronPlate = shouldShowByronPlate()
-    ? generateByronPlate(
-      rootPk,
-      accountIndex - HARD_DERIVATION_START,
-      addressCount,
-      (() => {
-        if (network.BaseConfig[0].ByronNetworkId != null) {
-          return network.BaseConfig[0].ByronNetworkId;
-        }
-        throw new Error(`${nameof(generatePlates)} missing Byron network id`);
-      })()
-    )
-    : undefined;
+  })();
 
-  const shelleyPlate = (
-    isCardanoHaskell(network) &&
-    !isJormungandr(network) &&
-    mode.type === 'cip1852'
-  )
-    ? generateShelleyPlate(
-      rootPk,
-      accountIndex - HARD_DERIVATION_START,
-      addressCount,
-      (() => {
-        if (network.BaseConfig[0].ChainNetworkId != null) {
-          return Number.parseInt(network.BaseConfig[0].ChainNetworkId, 10);
-        }
-        throw new Error(`${nameof(generatePlates)} missing chain network id`);
-      })()
-    )
-    : undefined;
+  const shouldShowShelleyPlate = (() => {
+    return (
+      isCardanoHaskell(network) &&
+      !isJormungandr(network) &&
+      mode.type === 'cip1852'
+    );
+  })();
 
-  const shouldShowJormungandrPlate = () => {
+  const shouldShowJormungandrPlate = (() => {
     // TODO: we disable shelley restoration information for paper wallet restoration
     // this is because we've temporarily disabled paper wallet creation for Shelley
     // so no point in showing the Shelley checksum
@@ -258,20 +282,80 @@ export function generatePlates(
     }
 
     return false;
-  };
-  const jormungandrPlate = shouldShowJormungandrPlate()
-    ? generateJormungandrPlate(
-      v4Bip32PrivateToV3(rootPk),
+  })();
+
+  if (shouldShowShelleyPlate) {
+    const shelleyPlate = generateShelleyPlate(
+      getCardanoKey(),
+      accountIndex - HARD_DERIVATION_START,
+      addressCount,
+      (() => {
+        if (network.BaseConfig[0].ChainNetworkId != null) {
+          return Number.parseInt(network.BaseConfig[0].ChainNetworkId, 10);
+        }
+        throw new Error(`${nameof(generatePlates)} missing chain network id`);
+      })()
+    );
+    plates.push({
+      ...shelleyPlate,
+      checksumTitle: messages.walletRestoreVerifyShelleyAccountIdLabel,
+      addressMessage: messages.walletRestoreVerifyShelleyAddressesLabel,
+    });
+  }
+  if (shouldShowByronPlate) {
+    const byronPlate = generateByronPlate(
+      getCardanoKey(),
+      accountIndex - HARD_DERIVATION_START,
+      addressCount,
+      (() => {
+        if (network.BaseConfig[0].ByronNetworkId != null) {
+          return network.BaseConfig[0].ByronNetworkId;
+        }
+        throw new Error(`${nameof(generatePlates)} missing Byron network id`);
+      })()
+    );
+    plates.push({
+      ...byronPlate,
+      checksumTitle: shouldShowJormungandrPlate == null
+        ? messages.walletRestoreVerifyAccountIdLabel
+        : messages.walletRestoreVerifyByronAccountIdLabel,
+      addressMessage: shouldShowJormungandrPlate == null
+        ? messages.walletRestoreVerifyAddressesLabel
+        : messages.walletRestoreVerifyByronAddressesLabel,
+    });
+  }
+  if (shouldShowJormungandrPlate) {
+    const jormungandrPlate = generateJormungandrPlate(
+      v4Bip32PrivateToV3(getCardanoKey()),
       accountIndex - HARD_DERIVATION_START,
       addressCount,
       // recall: ITN used the test discriminant
       RustModule.WalletV3.AddressDiscrimination.Test,
-    )
-    : undefined;
+    );
+    plates.push({
+      ...jormungandrPlate,
+      checksumTitle: shouldShowByronPlate == null
+        ? messages.walletRestoreVerifyAccountIdLabel
+        : messages.walletRestoreVerifyJormungandrAccountIdLabel,
+      addressMessage: shouldShowByronPlate == null
+        ? messages.walletRestoreVerifyAddressesLabel
+        : messages.walletRestoreVerifyJormungandrAddressesLabel,
+    });
+  }
 
-  return {
-    byronPlate,
-    shelleyPlate,
-    jormungandrPlate,
-  };
+  if (isErgo(network)) {
+    const rootKey = generateErgoWalletRootKey(recoveryPhrase);
+    const plate = generateErgoPlate(
+      rootKey,
+      accountIndex - HARD_DERIVATION_START,
+      addressCount,
+    );
+    plates.push({
+      ...plate,
+      checksumTitle: messages.walletRestoreVerifyAccountIdLabel,
+      addressMessage: messages.walletRestoreVerifyAddressesLabel,
+    });
+  }
+
+  return plates;
 }

@@ -63,17 +63,17 @@ export default class ExportApi {
     request
   ) => {
     try {
-      Logger.debug('ExportApi::exportTransactions: called');
+      Logger.debug(`ExportApi::${nameof(this.exportTransactions)}: called`);
 
-      const { ticker, rows, format, fileType, fileName } = request;
-      const dlFileName = fileName != null ? fileName : ExportApi.createDefaultFileName();
+      const { ticker, rows, format, fileType } = request;
+      const dlFileName = ExportApi.createDefaultFileName(request.nameSuffix);
       const data = ExportApi.convertExportRowsToCsv(ticker, rows, format);
       const fileResponse = ExportApi.convertCsvDataToFile(data, fileType);
 
-      Logger.debug('ExportApi::exportTransactions: success');
+      Logger.debug(`ExportApi::${nameof(this.exportTransactions)}: success`);
       return await this.sendFileToUser(fileResponse.data, `${dlFileName}.${fileResponse.fileType}`);
     } catch (error) {
-      Logger.error('ExportApi::exportTransactions: ' + stringifyError(error));
+      Logger.error(`ExportApi::${nameof(this.exportTransactions)}: ` + stringifyError(error));
 
       if (error instanceof LocalizableError) {
         // we found it as a LocalizableError, so could throw it as it is.
@@ -120,8 +120,10 @@ export default class ExportApi {
   /** Creates a default export file name
     * SYNTAX: Yoroi-Transaction-History_YYYY-MM-DD
     * TODO: https://github.com/Emurgo/yoroi-frontend/issues/250 */
-  static createDefaultFileName: void => string = () => (
+  static createDefaultFileName: string => string = (suffix) => (
     DEFAULT_FILE_NAME_PREFIX
+    + FN_SEPARATOR
+    + suffix
     + FN_SEPARATOR
     + moment().format(FN_TIME_FORMAT));
 

@@ -14,6 +14,7 @@ import type {
   JormungandrTxIO,
   CardanoByronTxIO,
   CardanoShelleyTxIO,
+  ErgoTxIO,
 } from '../tables';
 import type {
   UtxoTransactionInputInsert,
@@ -232,6 +233,57 @@ export class ModifyCardanoShelleyTx {
       certificates,
       ...utxo,
       accountingInputs: accounting.accountingInputs,
+    };
+  }
+}
+
+export class ModifyErgoTx {
+  static ownTables: {||} = Object.freeze({});
+  static depTables: {|
+    ModifyTransaction: typeof ModifyTransaction,
+    ModifyUtxoTransaction: typeof ModifyUtxoTransaction,
+  |} = Object.freeze({
+    ModifyTransaction,
+    ModifyUtxoTransaction,
+  });
+
+  static async addTxWithIOs(
+    db: lf$Database,
+    tx: lf$Transaction,
+    request: {|
+      block: null | BlockInsert,
+      transaction: (blockId: null | number) => TransactionInsert,
+      ioGen: (txRowId: number) => {|
+        utxoInputs: Array<UtxoTransactionInputInsert>,
+        utxoOutputs: Array<UtxoTransactionOutputInsert>,
+      |},
+    |},
+  ): Promise<{|
+    ...WithNullableFields<DbBlock>,
+    ...ErgoTxIO,
+  |}> {
+    const {
+      block, transaction,
+    } = request;
+
+    const newTx = await ModifyErgoTx.depTables.ModifyTransaction.addNew(
+      db, tx,
+      { block, transaction, }
+    );
+
+    const {
+      utxoInputs, utxoOutputs,
+    } = request.ioGen(newTx.transaction.TransactionId);
+
+    const utxo = await ModifyErgoTx.depTables.ModifyUtxoTransaction.addIOsToTx(
+      db, tx, {
+        utxoInputs, utxoOutputs,
+      }
+    );
+    return {
+      txType: TransactionType.Ergo,
+      ...newTx,
+      ...utxo,
     };
   }
 }

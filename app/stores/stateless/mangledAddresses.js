@@ -9,9 +9,6 @@ import {
   unwrapStakingKey,
 } from '../../api/jormungandr/lib/storage/bridge/utils';
 import {
-  addressToDisplayString,
-} from '../../api/ada/lib/storage/bridge/utils';
-import {
   PublicDeriver,
 } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import type { StandardAddress, } from '../../types/AddressFilterTypes';
@@ -26,10 +23,7 @@ export async function filterMangledAddresses(request: {|
     if (request.invertFilter) return [];
     return request.baseAddresses.map(info => ({
       ...info,
-      address: addressToDisplayString(
-        info.address,
-        request.publicDeriver.getParent().getNetworkInfo()
-      ),
+      address: info.address
     }));
   }
 
@@ -53,10 +47,7 @@ export async function filterMangledAddresses(request: {|
 
   return result.map(info => ({
     ...info,
-    address: addressToDisplayString(
-      info.address,
-      request.publicDeriver.getParent().getNetworkInfo()
-    ),
+    address: info.address,
   }));
 }
 

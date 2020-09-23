@@ -34,6 +34,7 @@ import {
   Bip44DerivationLevels,
 } from '../lib/storage/database/walletTypes/bip44/api/utils';
 import { getAdaCurrencyMeta } from '../currencyInfo';
+import { formatBigNumberToFloatString } from '../../../utils/formatters';
 
 export function getFromUserPerspective(data: {|
   utxoInputs: $ReadOnlyArray<$ReadOnly<UtxoTransactionInputRow>>,
@@ -140,14 +141,6 @@ export function sumInputsOutputs(
     new BigNumber(0)
   );
   return total;
-}
-
-/**
- * If specified number is integer - append `.0` to it.
- * Otherwise - just float representation.
- */
-export function formatBigNumberToFloatString(x: BigNumber): string {
-  return x.isInteger() ? x.toFixed(1) : x.toString();
 }
 
 export type UtxoLookupMap = { [string]: { [number]: RemoteUnspentOutput, ... }, ... };

@@ -24,7 +24,6 @@ import {
 } from '../common/lib/crypto/wallet';
 import type {
   IPublicDeriver,
-  IGetAllUtxos,
   IDisplayCutoff,
   IHasUtxoChains, IHasUtxoChainsRequest,
   Address, AddressType, Addressing, UsedStatus, Value,
@@ -43,6 +42,13 @@ import type { CoreAddressT } from '../ada/lib/storage/database/primitives/enums'
 import {
   getChainAddressesForDisplay,
 } from '../ada/lib/storage/models/utils';
+import type {
+  HistoryFunc,
+  BestBlockFunc,
+} from './lib/state-fetch/types';
+import type {
+  FilterFunc,
+} from '../common/lib/state-fetch/currencySpecificTypes';
 import {
   getAllAddressesForDisplay,
 } from '../ada/lib/storage/bridge/traitUtils';
@@ -58,8 +64,16 @@ import {
 } from '../ada/lib/storage/models/PublicDeriver/index';
 import { createStandardBip44Wallet } from './lib/walletBuilder/builder';
 import {
+  getPendingTransactions,
+  getAllTransactions,
+  updateTransactions,
+  removeAllTransactions,
+  getForeignAddresses,
+} from './lib/storage/bridge/updateTransactions';
+import {
   generateAdaMnemonic,
 } from '../ada/lib/cardanoCrypto/cryptoWallet';
+import { convertErgoTransactionsToExportRows } from './lib/transactions/utils';
 
 // getTransactionRowsToExport
 
@@ -74,6 +88,9 @@ export type GetTransactionRowsToExportFunc = (
 // ergo refreshTransactions
 
 export type ErgoGetTransactionsRequest = {|
+  getTransactionsHistoryForAddresses: HistoryFunc,
+  checkAddressesInUse: FilterFunc,
+  getBestBlock: BestBlockFunc,
 |};
 
 // getChainAddressesForDisplay
@@ -120,9 +137,20 @@ export default class ErgoApi {
   }
 
   async getTransactionRowsToExport(
-    _request: GetTransactionRowsToExportRequest
+    request: GetTransactionRowsToExportRequest
   ): Promise<GetTransactionRowsToExportResponse> {
-    throw new Error(`${nameof(this.getTransactionRowsToExport)} TODO`);
+    try {
+      const fetchedTxs = await getAllTransactions({
+        publicDeriver: request.publicDeriver,
+      });
+      Logger.debug(`${nameof(ErgoApi)}::${nameof(this.getTransactionRowsToExport)}: success`);
+      return convertErgoTransactionsToExportRows(fetchedTxs.txs);
+    } catch (error) {
+      Logger.error(`${nameof(ErgoApi)}::${nameof(this.getTransactionRowsToExport)}: ` + stringifyError(error));
+
+      if (error instanceof LocalizableError) throw error;
+      throw new GenericApiError();
+    }
   }
 
   async refreshTransactions(
@@ -132,14 +160,22 @@ export default class ErgoApi {
     |},
   ): Promise<GetTransactionsResponse> {
     Logger.debug(`${nameof(ErgoApi)}::${nameof(this.refreshTransactions)} called: ${stringifyData(request)}`);
+    const { skip = 0, limit } = request;
     try {
       if (!request.isLocalRequest) {
-        // TODO: implement tx syncing
+        await updateTransactions(
+          request.publicDeriver.getDb(),
+          request.publicDeriver,
+          request.checkAddressesInUse,
+          request.getTransactionsHistoryForAddresses,
+          request.getBestBlock,
+        );
       }
-      const fetchedTxs = {
-        txs: [], // not implemented yet
-        addressLookupMap: new Map(),
-      };
+      const fetchedTxs = await getAllTransactions({
+        publicDeriver: request.publicDeriver,
+        skip,
+        limit,
+      },);
       Logger.debug(`${nameof(ErgoApi)}::${nameof(this.refreshTransactions)} success: ` + stringifyData(fetchedTxs));
 
       const mappedTransactions = fetchedTxs.txs.map(tx => {
@@ -161,42 +197,60 @@ export default class ErgoApi {
   }
 
   async refreshPendingTransactions(
-    _request: RefreshPendingTransactionsRequest
+    request: RefreshPendingTransactionsRequest
   ): Promise<RefreshPendingTransactionsResponse> {
-    return []; // not implemented yet
-    // Logger.debug(`${nameof(ErgoApi)}::${nameof(this.refreshPendingTransactions)} called`);
-    // try {
-    //   const fetchedTxs = await getPendingTransactions({
-    //     publicDeriver: request.publicDeriver,
-    //   });
-    //   Logger.debug(`${nameof(ErgoApi)}::${nameof(this.refreshPendingTransactions)} success: ` + stringifyData(fetchedTxs));
+    Logger.debug(`${nameof(ErgoApi)}::${nameof(this.refreshPendingTransactions)} called`);
+    try {
+      const fetchedTxs = await getPendingTransactions({
+        publicDeriver: request.publicDeriver,
+      });
+      Logger.debug(`${nameof(ErgoApi)}::${nameof(this.refreshPendingTransactions)} success: ` + stringifyData(fetchedTxs));
 
-    //   const mappedTransactions = fetchedTxs.txs.map(tx => {
-    //     return ErgoTransaction.fromAnnotatedTx({
-    //       tx,
-    //       addressLookupMap: fetchedTxs.addressLookupMap,
-    //       api: getApiForNetwork(request.publicDeriver.getParent().getNetworkInfo()),
-    //     });
-    //   });
-    //   return mappedTransactions;
-    // } catch (error) {
-    //   Logger.error(`${nameof(ErgoApi)}::${nameof(this.refreshPendingTransactions)} error: ` + stringifyError(error));
-    //   if (error instanceof LocalizableError) throw error;
-    //   throw new GenericApiError();
-    // }
+      const mappedTransactions = fetchedTxs.txs.map(tx => {
+        return ErgoTransaction.fromAnnotatedTx({
+          tx,
+          addressLookupMap: fetchedTxs.addressLookupMap,
+          api: getApiForNetwork(request.publicDeriver.getParent().getNetworkInfo()),
+        });
+      });
+      return mappedTransactions;
+    } catch (error) {
+      Logger.error(`${nameof(ErgoApi)}::${nameof(this.refreshPendingTransactions)} error: ` + stringifyError(error));
+      if (error instanceof LocalizableError) throw error;
+      throw new GenericApiError();
+    }
   }
 
   async removeAllTransactions(
-    _request: RemoveAllTransactionsRequest
+    request: RemoveAllTransactionsRequest
   ): Promise<RemoveAllTransactionsResponse> {
-    throw new Error(`${nameof(ErgoApi)}::${nameof(this.getForeignAddresses)} not implemented yet`);
+    try {
+      // 1) clear existing history
+      await removeAllTransactions({ publicDeriver: request.publicDeriver });
+
+      // 2) trigger a history sync
+      try {
+        await request.refreshWallet();
+      } catch (_e) {
+        Logger.warn(`${nameof(this.removeAllTransactions)} failed to connect to remote to resync. Data was still cleared locally`);
+      }
+    } catch (error) {
+      Logger.error(`${nameof(ErgoApi)}::${nameof(this.removeAllTransactions)} error: ` + stringifyError(error));
+      if (error instanceof LocalizableError) throw error;
+      throw new GenericApiError();
+    }
   }
 
   async getForeignAddresses(
-    _request: GetForeignAddressesRequest
+    request: GetForeignAddressesRequest
   ): Promise<GetForeignAddressesResponse> {
-    // TODO: implement
-    return [];
+    try {
+      return await getForeignAddresses({ publicDeriver: request.publicDeriver });
+    } catch (error) {
+      Logger.error(`${nameof(ErgoApi)}::${nameof(this.getForeignAddresses)} error: ` + stringifyError(error));
+      if (error instanceof LocalizableError) throw error;
+      throw new GenericApiError();
+    }
   }
 
   /**

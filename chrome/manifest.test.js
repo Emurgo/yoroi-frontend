@@ -20,6 +20,8 @@ export default (isDebug: boolean): * => buildManifest({
       'connect-src': [
         portToPermission(Ports.DevBackendServe),
         portToSocketPermission(Ports.DevBackendServe),
+        portToPermission(Ports.ErgoMockServer),
+        portToSocketPermission(Ports.ErgoMockServer),
       ],
     },
   }),

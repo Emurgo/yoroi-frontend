@@ -3,9 +3,8 @@
 import '../../ada/lib/test-config';
 import type { lf$Database } from 'lovefield';
 import { schema } from 'lovefield';
-import { fromBase58 } from 'bip32';
 import { RustModule } from '../../ada/lib/cardanoCrypto/rustLoader';
-import { CoinTypes, HARD_DERIVATION_START } from '../../../config/numbersConfig';
+import { CoinTypes, WalletTypePurpose, HARD_DERIVATION_START } from '../../../config/numbersConfig';
 import { Address, } from '@coinbarn/ergo-ts';
 import { legacyWalletChecksum } from '@emurgo/cip4-js';
 import {
@@ -19,6 +18,7 @@ import { generateWalletRootKey } from './crypto/wallet';
 import {
   networks,
 } from '../../ada/lib/storage/database/prepackaged/networks';
+import { derivePath, } from '../../common/lib/crypto/keys/keyRepository';
 
 let db: lf$Database;
 
@@ -44,8 +44,17 @@ beforeAll(async () => {
 
 test('Derive Ergo address', async () => {
   const rootKey = generateWalletRootKey(recoveryPhrase);
-  const address = fromBase58(rootKey).derivePath(`44'/${CoinTypes.ERGO - HARD_DERIVATION_START}'/0'/0/0`);
-  const ergoAddr = Address.fromPk(address.publicKey.toString('hex'));
+  const address = derivePath(
+    rootKey,
+    [
+      WalletTypePurpose.BIP44,
+      CoinTypes.ERGO,
+      HARD_DERIVATION_START + 0,
+      0,
+      0
+    ]
+  );
+  const ergoAddr = Address.fromPk(address.toPublic().key.publicKey.toString('hex'));
   expect(ergoAddr.address).toEqual('9hzFPHkkhATNUeaT9pJGVJqkrbUL523HRt6j5R8ok1ck3JduvCY');
 });
 

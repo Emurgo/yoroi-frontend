@@ -13,15 +13,17 @@ import {
 import type {
   BlockInsert, BlockRow,
   TransactionInsert, TransactionRow,
-  JormungandrTransactionInsert,
   NetworkRow,
   DbBlock,
+  AddressRow,
+  ErgoTransactionInsert,
 } from '../../../../ada/lib/storage/database/primitives/tables';
 import {
   TransactionType,
 } from '../../../../ada/lib/storage/database/primitives/tables';
 import type {
   TxStatusCodesType,
+  CoreAddressT,
 } from '../../../../ada/lib/storage/database/primitives/enums';
 import {
   GetAddress,
@@ -37,8 +39,7 @@ import {
   ModifyTransaction,
   FreeBlocks,
 } from '../../../../ada/lib/storage/database/primitives/api/write';
-import type { AddCertificateRequest } from '../../../../ada/lib/storage/database/primitives/api/write';
-import { ModifyJormungandrTx } from  '../../../../ada/lib/storage/database/transactionModels/multipart/api/write';
+import { ModifyErgoTx, } from  '../../../../ada/lib/storage/database/transactionModels/multipart/api/write';
 import { digestForHash, } from '../../../../ada/lib/storage/database/primitives/api/utils';
 import {
   MarkUtxo,
@@ -49,33 +50,19 @@ import {
   AssociateTxWithUtxoIOs,
 } from '../../../../ada/lib/storage/database/transactionModels/utxo/api/read';
 import {
-  AssociateTxWithAccountingIOs,
-} from '../../../../ada/lib/storage/database/transactionModels/account/api/read';
-import {
-  JormungandrAssociateTxWithIOs
+  ErgoAssociateTxWithIOs,
 } from '../../../../ada/lib/storage/database/transactionModels/multipart/api/read';
-import {
-  InputTypes,
-} from '../../state-fetch/types';
 import type {
   UserAnnotation,
 } from '../../../../ada/transactions/types';
 import type {
-  ToAbsoluteSlotNumberFunc,
-} from '../../../../common/lib/storage/bridge/timeUtils';
-import type {
   UtxoTransactionInputInsert, UtxoTransactionOutputInsert,
 } from '../../../../ada/lib/storage/database/transactionModels/utxo/tables';
-import type {
-  AccountingTransactionInputInsert, AccountingTransactionOutputInsert,
-} from '../../../../ada/lib/storage/database/transactionModels/account/tables';
 import {
   TxStatusCodes,
-  CoreAddressTypes,
-  CertificateRelation,
 } from '../../../../ada/lib/storage/database/primitives/enums';
 import {
-  asScanAddresses, asHasLevels, asGetAllUtxos, asGetAllAccounting,
+  asScanAddresses, asHasLevels,
 } from '../../../../ada/lib/storage/models/PublicDeriver/traits';
 import type { IHasLevels } from '../../../../ada/lib/storage/models/ConceptualWallet/interfaces';
 import { ConceptualWallet } from '../../../../ada/lib/storage/models/ConceptualWallet/index';
@@ -95,37 +82,26 @@ import {
   DeleteAllTransactions,
 } from '../../../../ada/lib/storage/database/walletTypes/core/api/write';
 import type { LastSyncInfoRow, } from '../../../../ada/lib/storage/database/walletTypes/core/tables';
-import type { JormungandrTxIO } from '../../../../ada/lib/storage/database/transactionModels/multipart/tables';
+import type { ErgoTxIO } from '../../../../ada/lib/storage/database/transactionModels/multipart/tables';
 import {
   rawGetAddressRowsForWallet,
 } from  '../../../../ada/lib/storage/bridge/traitUtils';
 import {
-  genToAbsoluteSlotNumber,
-} from './timeUtils';
-import {
-  rawGenHashToIdsFunc,
+  rawGenHashToIdsFunc, rawGenFindOwnAddress,
 } from '../../../../common/lib/storage/bridge/hashMapper';
 import type {
-  HashToIdsFunc,
+  HashToIdsFunc, FindOwnAddressFunc,
 } from '../../../../common/lib/storage/bridge/hashMapper';
-import { CARDANO_STABLE_SIZE } from '../../../../../config/numbersConfig';
+import { ERGO_STABLE_SIZE } from '../../../../../config/numbersConfig';
 import { RollbackApiError } from '../../../../common/errors';
-import { RustModule } from '../../../../ada/lib/cardanoCrypto/rustLoader';
+import { getFromUserPerspective, } from '../../../../ada/transactions/utils';
 
 import type {
-  HistoryFunc, BestBlockFunc,
-  RemoteTxState,
-  RemoteTransaction,
-  RemoteTransactionInput,
-  RemoteCertificate,
+  HistoryFunc, RemoteErgoTransaction, BestBlockFunc, RemoteTxState,
 } from '../../state-fetch/types';
 import type {
   FilterFunc,
 } from '../../../../common/lib/state-fetch/currencySpecificTypes';
-import { addressToKind } from '../../../../ada/lib/storage/bridge/utils';
-import { getFromUserPerspective, } from '../../../../ada/transactions/utils';
-import type { AddressDiscriminationType, } from '@emurgo/js-chain-libs/js_chain_libs';
-import { getJormungandrBaseConfig, } from '../../../../ada/lib/storage/database/prepackaged/networks';
 
 async function rawGetAllTxIds(
   db: lf$Database,
@@ -133,64 +109,41 @@ async function rawGetAllTxIds(
   deps: {|
     GetPathWithSpecific: Class<GetPathWithSpecific>,
     GetAddress: Class<GetAddress>,
-    AssociateTxWithAccountingIOs: Class<AssociateTxWithAccountingIOs>,
-    AssociateTxWithUtxoIOs: Class<AssociateTxWithUtxoIOs>,
     GetDerivationSpecific: Class<GetDerivationSpecific>,
+    AssociateTxWithUtxoIOs: Class<AssociateTxWithUtxoIOs>,
   |},
   request: {| publicDeriver: IPublicDeriver<ConceptualWallet>, |},
   derivationTables: Map<number, string>,
 ): Promise<{|
   txIds: Array<number>,
-  addressIds: {|
-    utxoAddressIds: Array<number>,
-    accountingAddressIds: Array<number>,
+  addresses: {|
+    utxoAddresses: Array<$ReadOnly<AddressRow>>,
   |}
 |}> {
-  const utxoAddressIds = [];
-  const withUtxos = asGetAllUtxos(request.publicDeriver);
-  if (withUtxos != null) {
-    const foundAddresses = await withUtxos.rawGetAllUtxoAddresses(
-      dbTx,
-      {
-        GetPathWithSpecific: deps.GetPathWithSpecific,
-        GetAddress: deps.GetAddress,
-        GetDerivationSpecific: deps.GetDerivationSpecific,
-      },
-      undefined,
-      derivationTables,
-    );
-    const ids = foundAddresses.flatMap(address => address.addrs.map(addr => addr.AddressId));
-    utxoAddressIds.push(...ids);
-  }
-  const accountingAddressIds = [];
-  const withAccounting = asGetAllAccounting(request.publicDeriver);
-  if (withAccounting != null) {
-    const foundAddresses = await withAccounting.rawGetAllAccountingAddresses(
-      dbTx,
-      {
-        GetPathWithSpecific: deps.GetPathWithSpecific,
-        GetAddress: deps.GetAddress,
-        GetDerivationSpecific: deps.GetDerivationSpecific,
-      },
-      undefined,
-      derivationTables,
-    );
-    const ids = foundAddresses.flatMap(address => address.addrs.map(addr => addr.AddressId));
-    accountingAddressIds.push(...ids);
-  }
+  const {
+    utxoAddresses,
+  } = await rawGetAddressRowsForWallet(
+    dbTx,
+    {
+      GetPathWithSpecific: deps.GetPathWithSpecific,
+      GetAddress: deps.GetAddress,
+      GetDerivationSpecific: deps.GetDerivationSpecific,
+    },
+    request,
+    derivationTables,
+  );
+
+  const utxoAddressIds = utxoAddresses.map(row => row.AddressId);
+
   const txIds = Array.from(new Set([
-    ...(await deps.AssociateTxWithAccountingIOs.getTxIdsForAddresses(
-      db, dbTx, { addressIds: accountingAddressIds },
-    )),
     ...(await deps.AssociateTxWithUtxoIOs.getTxIdsForAddresses(
       db, dbTx, { addressIds: utxoAddressIds },
     )),
   ]));
   return {
     txIds,
-    addressIds: {
-      utxoAddressIds,
-      accountingAddressIds,
+    addresses: {
+      utxoAddresses,
     },
   };
 }
@@ -201,9 +154,8 @@ export async function rawGetTransactions(
   deps: {|
     GetPathWithSpecific: Class<GetPathWithSpecific>,
     GetAddress: Class<GetAddress>,
-    AssociateTxWithAccountingIOs: Class<AssociateTxWithAccountingIOs>,
+    ErgoAssociateTxWithIOs: Class<ErgoAssociateTxWithIOs>,
     AssociateTxWithUtxoIOs: Class<AssociateTxWithUtxoIOs>,
-    JormungandrAssociateTxWithIOs: Class<JormungandrAssociateTxWithIOs>,
     GetTxAndBlock: Class<GetTxAndBlock>,
     GetDerivationSpecific: Class<GetDerivationSpecific>,
   |},
@@ -220,20 +172,19 @@ export async function rawGetTransactions(
 ): Promise<{|
   addressLookupMap: Map<number, string>,
   txs: Array<{|
-  ...JormungandrTxIO,
+  ...ErgoTxIO,
   ...WithNullableFields<DbBlock>,
   ...UserAnnotation,
 |}>,
 |}> {
   const {
-    addressIds,
+    addresses,
     txIds,
   } = await rawGetAllTxIds(
     db, dbTx,
     {
       GetPathWithSpecific: deps.GetPathWithSpecific,
       GetAddress: deps.GetAddress,
-      AssociateTxWithAccountingIOs: deps.AssociateTxWithAccountingIOs,
       AssociateTxWithUtxoIOs: deps.AssociateTxWithUtxoIOs,
       GetDerivationSpecific: deps.GetDerivationSpecific,
     },
@@ -245,9 +196,12 @@ export async function rawGetTransactions(
   for (const tx of txs) {
     blockMap.set(tx.Transaction.TransactionId, tx.Block);
   }
-  const txsWithIOs = await deps.JormungandrAssociateTxWithIOs.getIOsForTx(
+  const txsWithIOs = await deps.ErgoAssociateTxWithIOs.getIOsForTx(
     db, dbTx,
-    { txs: txs.map(txWithBlock => txWithBlock.Transaction) }
+    { txs: txs
+      .map(txWithBlock => txWithBlock.Transaction)
+      .filter(tx => tx.Type === TransactionType.Ergo)
+    }
   );
 
   // we need to build a lookup map of AddressId => Hash
@@ -258,11 +212,6 @@ export async function rawGetTransactions(
     const allAddressIds = txsWithIOs.flatMap(txWithIO => [
       ...txWithIO.utxoInputs.map(input => input.AddressId),
       ...txWithIO.utxoOutputs.map(output => output.AddressId),
-      ...txWithIO.accountingInputs.map(input => input.AddressId),
-      ...txWithIO.accountingOutputs.map(output => output.AddressId),
-      ...txWithIO.certificates.flatMap(
-        cert => cert.relatedAddresses.map(relation => relation.AddressId)
-      )
     ]);
     const addressRows = await GetAddress.getById(
       db, dbTx,
@@ -274,16 +223,14 @@ export async function rawGetTransactions(
     }
   }
 
-  const result = txsWithIOs.map(tx => ({
+  const result = txsWithIOs.map((tx: ErgoTxIO) => ({
     ...tx,
     block: blockMap.get(tx.transaction.TransactionId) || null,
     ...getFromUserPerspective({
       utxoInputs: tx.utxoInputs,
       utxoOutputs: tx.utxoOutputs,
-      accountingInputs: tx.accountingInputs,
-      accountingOutputs: tx.accountingOutputs,
       allOwnedAddressIds: new Set(
-        Object.keys(addressIds).flatMap(key => addressIds[key])
+        Object.keys(addresses).flatMap(key => addresses[key]).map(addrRow => addrRow.AddressId)
       ),
     })
   }));
@@ -303,7 +250,7 @@ export async function getAllTransactions(
 ): Promise<{|
   addressLookupMap: Map<number, string>,
   txs: Array<{|
-  ...JormungandrTxIO,
+  ...ErgoTxIO,
   ...WithNullableFields<DbBlock>,
   ...UserAnnotation,
 |}>,
@@ -312,8 +259,7 @@ export async function getAllTransactions(
   const deps = Object.freeze({
     GetPathWithSpecific,
     GetAddress,
-    JormungandrAssociateTxWithIOs,
-    AssociateTxWithAccountingIOs,
+    ErgoAssociateTxWithIOs,
     AssociateTxWithUtxoIOs,
     GetTxAndBlock,
     GetDerivationSpecific,
@@ -335,8 +281,7 @@ export async function getAllTransactions(
         {
           GetPathWithSpecific: deps.GetPathWithSpecific,
           GetAddress: deps.GetAddress,
-          JormungandrAssociateTxWithIOs: deps.JormungandrAssociateTxWithIOs,
-          AssociateTxWithAccountingIOs: deps.AssociateTxWithAccountingIOs,
+          ErgoAssociateTxWithIOs: deps.ErgoAssociateTxWithIOs,
           AssociateTxWithUtxoIOs: deps.AssociateTxWithUtxoIOs,
           GetTxAndBlock: deps.GetTxAndBlock,
           GetDerivationSpecific: deps.GetDerivationSpecific,
@@ -363,7 +308,7 @@ export async function getPendingTransactions(
 ): Promise<{|
   addressLookupMap: Map<number, string>,
   txs: Array<{|
-  ...JormungandrTxIO,
+  ...ErgoTxIO,
   ...WithNullableFields<DbBlock>,
   ...UserAnnotation,
 |}>,
@@ -372,8 +317,7 @@ export async function getPendingTransactions(
   const deps = Object.freeze({
     GetPathWithSpecific,
     GetAddress,
-    JormungandrAssociateTxWithIOs,
-    AssociateTxWithAccountingIOs,
+    ErgoAssociateTxWithIOs,
     AssociateTxWithUtxoIOs,
     GetTxAndBlock,
     GetDerivationSpecific,
@@ -395,8 +339,7 @@ export async function getPendingTransactions(
         {
           GetPathWithSpecific: deps.GetPathWithSpecific,
           GetAddress: deps.GetAddress,
-          JormungandrAssociateTxWithIOs: deps.JormungandrAssociateTxWithIOs,
-          AssociateTxWithAccountingIOs: deps.AssociateTxWithAccountingIOs,
+          ErgoAssociateTxWithIOs: deps.ErgoAssociateTxWithIOs,
           AssociateTxWithUtxoIOs: deps.AssociateTxWithUtxoIOs,
           GetTxAndBlock: deps.GetTxAndBlock,
           GetDerivationSpecific: deps.GetDerivationSpecific,
@@ -423,8 +366,7 @@ export async function rawGetForeignAddresses(
   deps: {|
     GetPathWithSpecific: Class<GetPathWithSpecific>,
     GetAddress: Class<GetAddress>,
-    JormungandrAssociateTxWithIOs: Class<JormungandrAssociateTxWithIOs>,
-    AssociateTxWithAccountingIOs: Class<AssociateTxWithAccountingIOs>,
+    ErgoAssociateTxWithIOs: Class<ErgoAssociateTxWithIOs>,
     AssociateTxWithUtxoIOs: Class<AssociateTxWithUtxoIOs>,
     GetDerivationSpecific: Class<GetDerivationSpecific>,
     GetTransaction: Class<GetTransaction>,
@@ -439,7 +381,6 @@ export async function rawGetForeignAddresses(
     {
       GetPathWithSpecific: deps.GetPathWithSpecific,
       GetAddress: deps.GetAddress,
-      AssociateTxWithAccountingIOs: deps.AssociateTxWithAccountingIOs,
       AssociateTxWithUtxoIOs: deps.AssociateTxWithUtxoIOs,
       GetDerivationSpecific: deps.GetDerivationSpecific,
     },
@@ -452,22 +393,20 @@ export async function rawGetForeignAddresses(
     { ids: relatedIds.txIds }
   );
 
-  const txsWithIOs = await deps.JormungandrAssociateTxWithIOs.getIOsForTx(
+  const txsWithIOs = await deps.ErgoAssociateTxWithIOs.getIOsForTx(
     db, dbTx,
-    { txs: fullTxs }
+    { txs: fullTxs.filter(tx => tx.Type === TransactionType.Ergo) }
   );
 
   const allAddressIds = txsWithIOs.flatMap(txWithIO => [
     ...txWithIO.utxoInputs.map(input => input.AddressId),
     ...txWithIO.utxoOutputs.map(output => output.AddressId),
-    ...txWithIO.accountingInputs.map(input => input.AddressId),
-    ...txWithIO.accountingOutputs.map(output => output.AddressId),
-    // note: we don't show other addresses in a certificate as unknown addresses
   ]);
 
   const ourIds = new Set(
-    Object.keys(relatedIds.addressIds)
-      .flatMap(key => relatedIds.addressIds[key])
+    Object.keys(relatedIds.addresses)
+      .flatMap(key => relatedIds.addresses[key])
+      .map(addrRow => addrRow.AddressId)
   );
   // recall: we store addresses that don't belong to our wallet in the DB
   // if they're in a tx that belongs to us
@@ -478,13 +417,15 @@ export async function rawGetForeignAddresses(
 }
 export async function getForeignAddresses(
   request: {| publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels>, |},
-): Promise<Array<string>> {
+): Promise<Array<{|
+  address: string,
+  type: CoreAddressT,
+|}>> {
   const derivationTables = request.publicDeriver.getParent().getDerivationTables();
   const deps = Object.freeze({
     GetPathWithSpecific,
     GetAddress,
-    JormungandrAssociateTxWithIOs,
-    AssociateTxWithAccountingIOs,
+    ErgoAssociateTxWithIOs,
     AssociateTxWithUtxoIOs,
     GetDerivationSpecific,
     GetTransaction,
@@ -514,9 +455,21 @@ export async function getForeignAddresses(
         db, dbTx,
         addressIds
       );
-      const result = addressRows.map(row => row.Hash);
+      const result = [];
+      const seenAddresses = new Set<string>();
+
       // remove duplicates
-      return Array.from(new Set(result));
+      for (const row of addressRows) {
+        if (seenAddresses.has(row.Hash)) {
+          continue;
+        }
+        seenAddresses.add(row.Hash);
+        result.push({
+          address: row.Hash,
+          type: row.Type,
+        });
+      }
+      return result;
     }
   );
 }
@@ -527,8 +480,7 @@ export async function rawRemoveAllTransactions(
   deps: {|
     GetPathWithSpecific: Class<GetPathWithSpecific>,
     GetAddress: Class<GetAddress>,
-    JormungandrAssociateTxWithIOs: Class<JormungandrAssociateTxWithIOs>,
-    AssociateTxWithAccountingIOs: Class<AssociateTxWithAccountingIOs>,
+    ErgoAssociateTxWithIOs: Class<ErgoAssociateTxWithIOs>,
     AssociateTxWithUtxoIOs: Class<AssociateTxWithUtxoIOs>,
     GetDerivationSpecific: Class<GetDerivationSpecific>,
     DeleteAllTransactions: Class<DeleteAllTransactions>,
@@ -546,8 +498,7 @@ export async function rawRemoveAllTransactions(
     {
       GetPathWithSpecific: deps.GetPathWithSpecific,
       GetAddress: deps.GetAddress,
-      JormungandrAssociateTxWithIOs: deps.JormungandrAssociateTxWithIOs,
-      AssociateTxWithAccountingIOs: deps.AssociateTxWithAccountingIOs,
+      ErgoAssociateTxWithIOs: deps.ErgoAssociateTxWithIOs,
       AssociateTxWithUtxoIOs: deps.AssociateTxWithUtxoIOs,
       GetDerivationSpecific: deps.GetDerivationSpecific,
       GetTransaction: deps.GetTransaction,
@@ -560,7 +511,6 @@ export async function rawRemoveAllTransactions(
     {
       GetPathWithSpecific: deps.GetPathWithSpecific,
       GetAddress: deps.GetAddress,
-      AssociateTxWithAccountingIOs: deps.AssociateTxWithAccountingIOs,
       AssociateTxWithUtxoIOs: deps.AssociateTxWithUtxoIOs,
       GetDerivationSpecific: deps.GetDerivationSpecific,
     },
@@ -596,8 +546,7 @@ export async function removeAllTransactions(
   const deps = Object.freeze({
     GetPathWithSpecific,
     GetAddress,
-    JormungandrAssociateTxWithIOs,
-    AssociateTxWithAccountingIOs,
+    ErgoAssociateTxWithIOs,
     AssociateTxWithUtxoIOs,
     GetDerivationSpecific,
     DeleteAllTransactions,
@@ -660,9 +609,8 @@ export async function updateTransactions(
       GetTxAndBlock,
       GetDerivationSpecific,
       ModifyTransaction,
-      ModifyJormungandrTx,
-      JormungandrAssociateTxWithIOs,
-      AssociateTxWithAccountingIOs,
+      ModifyErgoTx,
+      ErgoAssociateTxWithIOs,
       AssociateTxWithUtxoIOs,
     });
     const updateTables = Object
@@ -719,8 +667,7 @@ export async function updateTransactions(
       GetUtxoInputs,
       GetEncryptionMeta,
       GetDerivationSpecific,
-      JormungandrAssociateTxWithIOs,
-      AssociateTxWithAccountingIOs,
+      ErgoAssociateTxWithIOs,
       AssociateTxWithUtxoIOs,
     });
     const rollbackTables = Object
@@ -765,8 +712,7 @@ async function rollback(
   deps: {|
     GetPathWithSpecific: Class<GetPathWithSpecific>,
     GetAddress: Class<GetAddress>,
-    JormungandrAssociateTxWithIOs: Class<JormungandrAssociateTxWithIOs>,
-    AssociateTxWithAccountingIOs: Class<AssociateTxWithAccountingIOs>,
+    ErgoAssociateTxWithIOs: Class<ErgoAssociateTxWithIOs>,
     AssociateTxWithUtxoIOs: Class<AssociateTxWithUtxoIOs>,
     GetLastSyncForPublicDeriver: Class<GetLastSyncForPublicDeriver>,
     ModifyLastSyncInfo: Class<ModifyLastSyncInfo>,
@@ -788,15 +734,14 @@ async function rollback(
   const { TransactionSeed, } = await deps.GetEncryptionMeta.get(db, dbTx);
 
   // if we've never successfully synced from the server, no need to rollback
-  const lastSyncSlotNum = request.lastSyncInfo.SlotNum;
-  if (lastSyncSlotNum === null) {
+  const lastSyncHeight = request.lastSyncInfo.Height;
+  if (lastSyncHeight === 0) {
     return;
   }
 
   // 1) Get all transactions
   const {
     utxoAddresses,
-    accountingAddresses,
   } = await rawGetAddressRowsForWallet(
     dbTx,
     {
@@ -808,11 +753,7 @@ async function rollback(
     derivationTables,
   );
   const utxoAddressIds = utxoAddresses.map(address => address.AddressId);
-  const accountingAddressIds = accountingAddresses.map(address => address.AddressId);
   const txIds = Array.from(new Set([
-    ...(await deps.AssociateTxWithAccountingIOs.getTxIdsForAddresses(
-      db, dbTx, { addressIds: accountingAddressIds },
-    )),
     ...(await deps.AssociateTxWithUtxoIOs.getTxIdsForAddresses(
       db, dbTx, { addressIds: utxoAddressIds },
     )),
@@ -835,7 +776,7 @@ async function rollback(
 
   const txsToRevert = await deps.GetTxAndBlock.gteHeight(
     db, dbTx,
-    { txIds, height: bestInStorage.Block.Height - CARDANO_STABLE_SIZE }
+    { txIds, height: bestInStorage.Block.Height - ERGO_STABLE_SIZE }
   );
 
   // 4) mark rollback transactions as failed
@@ -893,7 +834,7 @@ async function rollback(
   // 7) Rollback LastSyncTable
   const bestStillIncluded = await deps.GetTxAndBlock.firstSuccessTxBefore(
     db, dbTx,
-    { txIds, height: bestInStorage.Block.Height - CARDANO_STABLE_SIZE }
+    { txIds, height: bestInStorage.Block.Height - ERGO_STABLE_SIZE }
   );
   await deps.ModifyLastSyncInfo.overrideLastSyncInfo(
     db, dbTx,
@@ -930,9 +871,8 @@ async function rawUpdateTransactions(
     GetTxAndBlock: Class<GetTxAndBlock>,
     GetDerivationSpecific: Class<GetDerivationSpecific>,
     ModifyTransaction: Class<ModifyTransaction>,
-    ModifyJormungandrTx: Class<ModifyJormungandrTx>,
-    JormungandrAssociateTxWithIOs: Class<JormungandrAssociateTxWithIOs>,
-    AssociateTxWithAccountingIOs: Class<AssociateTxWithAccountingIOs>,
+    ModifyErgoTx: Class<ModifyErgoTx>,
+    ErgoAssociateTxWithIOs: Class<ErgoAssociateTxWithIOs>,
     AssociateTxWithUtxoIOs: Class<AssociateTxWithUtxoIOs>,
   |},
   publicDeriver: IPublicDeriver<>,
@@ -942,22 +882,18 @@ async function rawUpdateTransactions(
   getBestBlock: BestBlockFunc,
   derivationTables: Map<number, string>,
 ): Promise<void> {
-  // TODO: consider passing this function in as an argument instead of generating it here
-  const toAbsoluteSlotNumber = await genToAbsoluteSlotNumber(
-    getJormungandrBaseConfig(publicDeriver.getParent().getNetworkInfo())
-  );
+  const network = publicDeriver.getParent().getNetworkInfo();
+
   // 1) Check if backend is synced (avoid rollbacks if backend has to resync from block 1)
 
-  const { BackendService } = publicDeriver.getParent().getNetworkInfo().Backend;
-  if (BackendService == null) throw new Error(`${nameof(rawUpdateTransactions)} missing backend url`);
   const bestBlock = await getBestBlock({
-    network: publicDeriver.getParent().getNetworkInfo(),
+    network,
   });
-  if (lastSyncInfo.SlotNum !== null) {
-    const lastBlockSeen = lastSyncInfo.Height;
-    const inRemote = (bestBlock.height != null ? bestBlock.height : 0);
-    // if we're K blocks ahead of remote
-    if (lastBlockSeen - inRemote > CARDANO_STABLE_SIZE) {
+  if (lastSyncInfo.Height !== 0) {
+    const lastSeen = lastSyncInfo.Height;
+    const inRemote = bestBlock.height;
+    // if we're K slots ahead of remote
+    if (lastSeen - inRemote > ERGO_STABLE_SIZE) {
       return;
     }
   }
@@ -991,29 +927,17 @@ async function rawUpdateTransactions(
     // 3) get new txs from fetcher
 
     // important: get addresses for our wallet AFTER scanning for new addresses
-    const {
-      utxoAddresses,
-      accountingAddresses,
-    } = await rawGetAddressRowsForWallet(
-      dbTx,
+    const { txIds, addresses } = await rawGetAllTxIds(
+      db, dbTx,
       {
         GetPathWithSpecific: deps.GetPathWithSpecific,
         GetAddress: deps.GetAddress,
         GetDerivationSpecific: deps.GetDerivationSpecific,
+        AssociateTxWithUtxoIOs: deps.AssociateTxWithUtxoIOs,
       },
       { publicDeriver },
       derivationTables,
     );
-    const utxoAddressIds = utxoAddresses.map(address => address.AddressId);
-    const accountingAddressIds = accountingAddresses.map(address => address.AddressId);
-    const txIds = Array.from(new Set([
-      ...(await deps.AssociateTxWithAccountingIOs.getTxIdsForAddresses(
-        db, dbTx, { addressIds: accountingAddressIds },
-      )),
-      ...(await deps.AssociateTxWithUtxoIOs.getTxIdsForAddresses(
-        db, dbTx, { addressIds: utxoAddressIds },
-      )),
-    ]));
     const bestInStorage = await deps.GetTxAndBlock.firstSuccessTxBefore(
       db, dbTx,
       {
@@ -1032,20 +956,19 @@ async function rawUpdateTransactions(
       };
     const txsFromNetwork = await getTransactionsHistoryForAddresses({
       ...requestKind,
-      network: publicDeriver.getParent().getNetworkInfo(),
+      network,
       addresses: [
-        ...utxoAddresses
-          // Note: don't send group keys
-          // Okay to filter them because the payment key is duplicated inside the single addresses
-          .filter(address => address.Type !== CoreAddressTypes.JORMUNGANDR_GROUP)
-          .map(address => address.Hash),
-        ...accountingAddresses.map(address => address.Hash),
+        ...addresses.utxoAddresses.map(address => address.Hash)
       ],
       untilBlock,
     });
 
+    const ourIds = new Set(
+      Object.keys(addresses)
+        .flatMap(key => addresses[key])
+        .map(addrRow => addrRow.AddressId)
+    );
     // 4) save data to local DB
-
     // WARNING: this can also modify the address set
     // ex: a new group address is found
     await updateTransactionBatch(
@@ -1053,44 +976,36 @@ async function rawUpdateTransactions(
       dbTx,
       {
         MarkUtxo: deps.MarkUtxo,
-        JormungandrAssociateTxWithIOs: deps.JormungandrAssociateTxWithIOs,
+        ErgoAssociateTxWithIOs: deps.ErgoAssociateTxWithIOs,
         GetEncryptionMeta: deps.GetEncryptionMeta,
         GetTransaction: deps.GetTransaction,
         GetUtxoInputs: deps.GetUtxoInputs,
         ModifyTransaction: deps.ModifyTransaction,
-        ModifyJormungandrTx: deps.ModifyJormungandrTx,
+        ModifyErgoTx: deps.ModifyErgoTx,
       },
       {
         network: publicDeriver.getParent().getNetworkInfo(),
         txIds,
         txsFromNetwork,
         hashToIds: rawGenHashToIdsFunc(
-          new Set([
-            ...utxoAddressIds,
-            ...accountingAddressIds,
-          ]),
+          ourIds,
           publicDeriver.getParent().getNetworkInfo()
         ),
-        toAbsoluteSlotNumber,
+        findOwnAddress: rawGenFindOwnAddress(
+          ourIds
+        ),
         derivationTables,
       }
     );
   }
 
   // 5) update last sync
-  const slotInRemote = (bestBlock.epoch == null || bestBlock.slot == null)
-    ? null
-    : toAbsoluteSlotNumber({
-      epoch: bestBlock.epoch,
-      slot: bestBlock.slot,
-    });
-
   await deps.ModifyLastSyncInfo.overrideLastSyncInfo(
     db, dbTx,
     {
       LastSyncInfoId: lastSyncInfo.LastSyncInfoId,
       Time: new Date(Date.now()),
-      SlotNum: slotInRemote,
+      SlotNum: bestBlock.slot,
       BlockHash: bestBlock.hash,
       Height: bestBlock.height,
     }
@@ -1106,28 +1021,28 @@ export async function updateTransactionBatch(
   dbTx: lf$Transaction,
   deps: {|
     MarkUtxo: Class<MarkUtxo>,
-    JormungandrAssociateTxWithIOs: Class<JormungandrAssociateTxWithIOs>,
+    ErgoAssociateTxWithIOs: Class<ErgoAssociateTxWithIOs>,
     GetEncryptionMeta: Class<GetEncryptionMeta>,
     GetTransaction: Class<GetTransaction>,
     GetUtxoInputs: Class<GetUtxoInputs>,
     ModifyTransaction: Class<ModifyTransaction>,
-    ModifyJormungandrTx: Class<ModifyJormungandrTx>,
+    ModifyErgoTx: Class<ModifyErgoTx>,
   |},
   request: {|
     network: $ReadOnly<NetworkRow>,
-    toAbsoluteSlotNumber: ToAbsoluteSlotNumberFunc,
     txIds: Array<number>,
-    txsFromNetwork: Array<RemoteTransaction>,
+    txsFromNetwork: Array<RemoteErgoTransaction>,
     hashToIds: HashToIdsFunc,
+    findOwnAddress: FindOwnAddressFunc,
     derivationTables: Map<number, string>,
   |}
 ): Promise<Array<{|
-  ...JormungandrTxIO,
+  ...ErgoTxIO,
   ...DbBlock,
 |}>> {
   const { TransactionSeed, BlockSeed } = await deps.GetEncryptionMeta.get(db, dbTx);
 
-  const matchesInDb = new Map<string, JormungandrTxIO>();
+  const matchesInDb = new Map<string, ErgoTxIO>();
   {
     const digestsForNew = request.txsFromNetwork.map(tx => digestForHash(tx.hash, TransactionSeed));
     const matchByDigest = await deps.GetTransaction.byDigest(db, dbTx, {
@@ -1135,18 +1050,18 @@ export async function updateTransactionBatch(
       txIds: request.txIds,
     });
     const txs: Array<$ReadOnly<TransactionRow>> = Array.from(matchByDigest.values());
-    const txsWithIOs = await deps.JormungandrAssociateTxWithIOs.getIOsForTx(
+    const txsWithIOs = await deps.ErgoAssociateTxWithIOs.getIOsForTx(
       db, dbTx,
-      { txs }
+      { txs: txs.filter(tx => tx.Type === TransactionType.Ergo) }
     );
     for (const tx of txsWithIOs) {
       matchesInDb.set(tx.transaction.Hash, tx);
     }
   }
 
-  const unseenNewTxs: Array<RemoteTransaction> = [];
+  const unseenNewTxs: Array<RemoteErgoTransaction> = [];
   const txsAddedToBlock: Array<{|
-    ...JormungandrTxIO,
+    ...ErgoTxIO,
     ...DbBlock,
   |}> = [];
   const modifiedTxIds = new Set<number>();
@@ -1170,7 +1085,6 @@ export async function updateTransactionBatch(
      */
     const modifiedTxForDb = networkTxHeaderToDb(
       txFromNetwork,
-      request.toAbsoluteSlotNumber,
       TransactionSeed,
       BlockSeed
     );
@@ -1194,7 +1108,7 @@ export async function updateTransactionBatch(
     }
     if (result.block !== null) {
       txsAddedToBlock.push({
-        ...matchInDb,
+        ...(matchInDb: ErgoTxIO),
         // override with updated
         block: result.block,
         transaction: result.transaction,
@@ -1203,20 +1117,20 @@ export async function updateTransactionBatch(
   }
 
   // 2) Add new transactions
-  const newTxsForDb = await networkTxToDbTx(
+  const { ergoTxs, } = await networkTxToDbTx(
     db,
     dbTx,
     request.network,
     request.derivationTables,
     unseenNewTxs,
     request.hashToIds,
-    request.toAbsoluteSlotNumber,
+    request.findOwnAddress,
     TransactionSeed,
     BlockSeed,
   );
   const newsTxsIdSet = new Set();
-  for (const newTx of newTxsForDb) {
-    const result = await deps.ModifyJormungandrTx.addTxWithIOs(
+  for (const newTx of ergoTxs) {
+    const result = await deps.ModifyErgoTx.addTxWithIOs(
       db,
       dbTx,
       newTx,
@@ -1227,11 +1141,8 @@ export async function updateTransactionBatch(
         txType: result.txType,
         block: result.block,
         transaction: result.transaction,
-        certificates: result.certificates,
         utxoInputs: result.utxoInputs,
         utxoOutputs: result.utxoOutputs,
-        accountingInputs: result.accountingInputs,
-        accountingOutputs: result.accountingOutputs,
       });
     }
   }
@@ -1291,27 +1202,67 @@ export async function updateTransactionBatch(
   return txsAddedToBlock;
 }
 
+function genErgoIOGen(
+  remoteTx: RemoteErgoTransaction,
+  getIdOrThrow: string => number,
+): (number => {|
+  utxoInputs: Array<UtxoTransactionInputInsert>,
+  utxoOutputs: Array<UtxoTransactionOutputInsert>,
+|}) {
+  return (txRowId) => {
+    const utxoInputs = [];
+    const utxoOutputs = [];
+    for (let i = 0; i < remoteTx.inputs.length; i++) {
+      const input = remoteTx.inputs[i];
+      utxoInputs.push({
+        TransactionId: txRowId,
+        AddressId: getIdOrThrow(input.address),
+        ParentTxHash: input.outputTransactionId,
+        IndexInParentTx: input.outputIndex,
+        IndexInOwnTx: i,
+        Amount: input.value.toString(),
+      });
+    }
+    for (let i = 0; i < remoteTx.outputs.length; i++) {
+      const output = remoteTx.outputs[i];
+      utxoOutputs.push({
+        TransactionId: txRowId,
+        AddressId: getIdOrThrow(output.address),
+        OutputIndex: i,
+        Amount: output.value.toString(),
+        /**
+          * we assume unspent for now but it will be updated after if necessary
+          * Note: if this output doesn't belong to you, it will be true forever
+          * This is slightly misleading, but using null would require null-checks everywhere
+          */
+        IsUnspent: true,
+      });
+    }
+
+    return {
+      utxoInputs,
+      utxoOutputs,
+    };
+  };
+}
+
 async function networkTxToDbTx(
   db: lf$Database,
   dbTx: lf$Transaction,
   network: $ReadOnly<NetworkRow>,
   derivationTables: Map<number, string>,
-  newTxs: Array<RemoteTransaction>,
+  newTxs: Array<RemoteErgoTransaction>,
   hashToIds: HashToIdsFunc,
-  toAbsoluteSlotNumber: ToAbsoluteSlotNumberFunc,
+  findOwnAddress: FindOwnAddressFunc,
   TransactionSeed: number,
   BlockSeed: number,
-): Promise<Array<{|
-  block: null | BlockInsert,
-  transaction: (blockId: null | number) => TransactionInsert,
-  certificates: $ReadOnlyArray<number => (void | AddCertificateRequest)>,
-  ioGen: number => {|
-    utxoInputs: Array<UtxoTransactionInputInsert>,
-    utxoOutputs: Array<UtxoTransactionOutputInsert>,
-    accountingInputs: Array<AccountingTransactionInputInsert>,
-    accountingOutputs: Array<AccountingTransactionOutputInsert>,
-  |},
-|}>> {
+): Promise<{|
+  ergoTxs: Array<{|
+    block: null | BlockInsert,
+    transaction: (blockId: null | number) => TransactionInsert,
+    ioGen: ReturnType<typeof genErgoIOGen>,
+  |}>,
+|}> {
   const allAddresses = Array.from(new Set(
     newTxs.flatMap(tx => [
       ...tx.inputs.map(input => input.address),
@@ -1337,113 +1288,25 @@ async function networkTxToDbTx(
     return id;
   };
 
-  const config = getJormungandrBaseConfig(
-    network
-  ).reduce((acc, next) => Object.assign(acc, next), {});
+  const ergoTxs = [];
 
-  const result = [];
   for (const networkTx of newTxs) {
     const { block, transaction } = networkTxHeaderToDb(
       networkTx,
-      toAbsoluteSlotNumber,
       TransactionSeed,
       BlockSeed,
     );
 
-    const certificates: Array<
-      number => (void | AddCertificateRequest)
-    > = networkTx.certificate == null
-      ? [(_txId) => undefined]
-      : [await certificateToDb(
-        db, dbTx,
-        {
-          discriminant: config.Discriminant,
-          certificate: networkTx.certificate,
-          hashToIds,
-          derivationTables,
-          firstInput: networkTx.inputs[0],
-        }
-      )];
-    result.push({
+    ergoTxs.push({
       block,
       transaction,
-      certificates,
-      ioGen: (txRowId) => {
-        const utxoInputs = [];
-        const utxoOutputs = [];
-        const accountingInputs = [];
-        const accountingOutputs = [];
-        for (let i = 0; i < networkTx.inputs.length; i++) {
-          const input = networkTx.inputs[i];
-          if (input.type === InputTypes.utxo || input.type === InputTypes.legacyUtxo) {
-            utxoInputs.push({
-              TransactionId: txRowId,
-              AddressId: getIdOrThrow(input.address),
-              ParentTxHash: input.txHash,
-              IndexInParentTx: input.index,
-              IndexInOwnTx: i,
-              Amount: input.amount,
-            });
-          } else if (input.type === InputTypes.account) {
-            accountingInputs.push({
-              TransactionId: txRowId,
-              AddressId: getIdOrThrow(input.address),
-              SpendingCounter: input.spendingCounter,
-              IndexInOwnTx: i,
-              Amount: input.amount,
-            });
-          } else {
-            throw new Error(`${nameof(networkTxToDbTx)} Unhandled input type`);
-          }
-        }
-        for (let i = 0; i < networkTx.outputs.length; i++) {
-          const output = networkTx.outputs[i];
-          const outputType = addressToKind(output.address, 'bytes', network);
-          // consider a group address as a UTXO output
-          // since the payment (UTXO) key is the one that signs
-          if (
-            outputType === CoreAddressTypes.CARDANO_LEGACY ||
-            outputType === CoreAddressTypes.JORMUNGANDR_SINGLE ||
-            outputType === CoreAddressTypes.JORMUNGANDR_GROUP
-          ) {
-            utxoOutputs.push({
-              TransactionId: txRowId,
-              AddressId: getIdOrThrow(output.address),
-              OutputIndex: i,
-              Amount: output.amount,
-              /**
-               * we assume unspent for now but it will be updated after if necessary
-               * Note: if this output doesn't belong to you, it will be true forever
-               * This is slightly misleading, but using null would require null-checks everywhere
-               */
-              IsUnspent: true,
-            });
-          } else if (
-            outputType === CoreAddressTypes.JORMUNGANDR_ACCOUNT
-          ) {
-            accountingOutputs.push({
-              TransactionId: txRowId,
-              AddressId: getIdOrThrow(output.address),
-              OutputIndex: i,
-              Amount: output.amount,
-            });
-          } else {
-            // TODO: handle multisig
-            throw new Error(`${nameof(networkTxToDbTx)} Unhandled output type`);
-          }
-        }
-
-        return {
-          utxoInputs,
-          utxoOutputs,
-          accountingInputs,
-          accountingOutputs,
-        };
-      },
+      ioGen: genErgoIOGen(networkTx, getIdOrThrow),
     });
   }
 
-  return result;
+  return {
+    ergoTxs,
+  };
 }
 
 async function markAllInputs(
@@ -1513,8 +1376,7 @@ export function statusStringToCode(
 }
 
 export function networkTxHeaderToDb(
-  tx: RemoteTransaction,
-  toAbsoluteSlotNumber: ToAbsoluteSlotNumberFunc,
+  tx: RemoteErgoTransaction,
   TransactionSeed: number,
   BlockSeed: number,
 ): {
@@ -1523,171 +1385,37 @@ export function networkTxHeaderToDb(
   ...
 } {
   const block =
-    tx.epoch != null &&
-    tx.slot != null &&
     tx.block_hash != null &&
     tx.time != null &&
-    tx.height != null
+    tx.block_num != null
       ? {
         Hash: tx.block_hash,
         BlockTime: new Date(tx.time),
-        Height: tx.height,
-        SlotNum: toAbsoluteSlotNumber({ epoch: tx.epoch, slot: tx.slot }),
+        Height: tx.block_num,
+        SlotNum: 0, // TODO
         Digest: digestForHash(tx.hash, BlockSeed),
       }
       : null;
   const digest = digestForHash(tx.hash, TransactionSeed);
+
+  const baseTx = {
+    Hash: tx.hash,
+    Digest: digest,
+    Ordinal: tx.tx_ordinal,
+    LastUpdateTime: block == null
+      ? new Date().getTime()
+      : new Date(tx.time).getTime(),
+    Status: statusStringToCode(tx.tx_state),
+    ErrorMessage: null, // TODO: add error message from backend if present
+  };
+
   return {
     block,
     transaction: (blockId) => ({
-      Type: TransactionType.Jormungandr,
-      Hash: tx.hash,
-      Digest: digest,
-      BlockId: blockId,
-      Ordinal: tx.tx_ordinal,
-      LastUpdateTime: block == null || tx.time == null
-        ? new Date(tx.last_update).getTime() // this is out best guess for txs not in a block
-        : new Date(tx.time).getTime(),
-      Status: statusStringToCode(tx.tx_state),
-      ErrorMessage: null, // TODO: add error message from backend if present
+      Type: TransactionType.Ergo,
       Extra: null,
-    }: JormungandrTransactionInsert),
+      BlockId: blockId,
+      ...baseTx,
+    }: ErgoTransactionInsert),
   };
-}
-
-async function certificateToDb(
-  db: lf$Database,
-  dbTx: lf$Transaction,
-  request: {|
-    discriminant: AddressDiscriminationType,
-    certificate: RemoteCertificate,
-    hashToIds: HashToIdsFunc,
-    derivationTables: Map<number, string>,
-    firstInput: RemoteTransactionInput,
-  |},
-): Promise<number => AddCertificateRequest> {
-  const accountToId = async (account: RustModule.WalletV3.Account): Promise<number> => {
-    const address = account.to_address(
-      request.discriminant,
-    );
-    const hash = Buffer.from(address.as_bytes()).toString('hex');
-    const idMap = await request.hashToIds({
-      db,
-      tx: dbTx,
-      lockedTables: Array.from(request.derivationTables.values()),
-      hashes: [hash]
-    });
-    const id = idMap.get(hash);
-    if (id === undefined) {
-      throw new Error(`${nameof(certificateToDb)} should never happen id === undefined`);
-    }
-    return id;
-  };
-
-  const kind = request.certificate.payloadKindId;
-  switch (kind) {
-    case RustModule.WalletV3.CertificateKind.StakeDelegation: {
-      const cert = RustModule.WalletV3.StakeDelegation.from_bytes(
-        Buffer.from(request.certificate.payloadHex, 'hex')
-      );
-      const accountIdentifier = cert.account();
-      // TODO: this could be a multi sig instead of a single account
-      // you can differentiate by looking at the witness type
-      // but we don't have access to the witness right now
-      const account = accountIdentifier.to_account_single();
-      const addressId = await accountToId(account);
-
-      return (txId: number) => ({
-        certificate: {
-          Ordinal: 0, // only one cert per tx in Jormungandr
-          Kind: kind,
-          Payload: request.certificate.payloadHex,
-          TransactionId: txId,
-        },
-        relatedAddresses: (certId: number) => [{
-          CertificateId: certId,
-          AddressId: addressId,
-          Relation: CertificateRelation.SIGNER,
-        }]
-      });
-    }
-    case RustModule.WalletV3.CertificateKind.OwnerStakeDelegation: {
-      const idMap = await request.hashToIds({
-        db,
-        tx: dbTx,
-        lockedTables: Array.from(request.derivationTables.values()),
-        hashes: [request.firstInput.address]
-      });
-      const addressId = idMap.get(request.firstInput.address);
-      if (addressId === undefined) {
-        throw new Error(`${nameof(certificateToDb)} should never happen id === undefined`);
-      }
-      return (txId: number) => ({
-        certificate: {
-          Ordinal: 0, // only one cert per tx in Jormungandr
-          Kind: kind,
-          Payload: request.certificate.payloadHex,
-          TransactionId: txId,
-        },
-        relatedAddresses: (certId: number) => [{
-          CertificateId: certId,
-          AddressId: addressId,
-          Relation: CertificateRelation.SIGNER,
-        }]
-      });
-    }
-    case RustModule.WalletV3.CertificateKind.PoolRegistration: {
-      const cert = RustModule.WalletV3.PoolRegistration.from_bytes(
-        Buffer.from(request.certificate.payloadHex, 'hex')
-      );
-      const accountIdentifier = cert.reward_account();
-      const rewardAccountId = accountIdentifier == null
-        ? null
-        : await accountToId(accountIdentifier);
-
-      return (txId: number) => ({
-        certificate: {
-          Ordinal: 0, // only one cert per tx in Jormungandr
-          Kind: kind,
-          Payload: request.certificate.payloadHex,
-          TransactionId: txId,
-        },
-        // TODO - can't know signer
-        relatedAddresses: (certId: number) => [
-          ...(rewardAccountId != null
-            ? [{
-              CertificateId: certId,
-              AddressId: rewardAccountId,
-              Relation: CertificateRelation.REWARD_ADDRESS,
-            }]
-            : [])
-        ]
-      });
-    }
-    case RustModule.WalletV3.CertificateKind.PoolRetirement: {
-      return (txId: number) => ({
-        certificate: {
-          Ordinal: 0, // only one cert per tx in Jormungandr
-          Kind: kind,
-          Payload: request.certificate.payloadHex,
-          TransactionId: txId,
-        },
-        // TODO - can't know signer
-        relatedAddresses: (_certId: number) => []
-      });
-    }
-    case RustModule.WalletV3.CertificateKind.PoolUpdate: {
-      return (txId: number) => ({
-        certificate: {
-          Ordinal: 0, // only one cert per tx in Jormungandr
-          Kind: kind,
-          Payload: request.certificate.payloadHex,
-          TransactionId: txId,
-        },
-        // TODO - can't know signer
-        relatedAddresses: (_certId: number) => []
-      });
-    }
-    default: throw new Error('unknown cert type ' + kind);
-  }
 }

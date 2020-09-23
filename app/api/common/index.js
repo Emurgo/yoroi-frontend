@@ -134,9 +134,9 @@ export type GetTransactionsFunc = (
 export type ExportTransactionsRequest = {|
   ticker: string,
   rows: Array<TransactionExportRow>,
+  nameSuffix: string,
   format?: TransactionExportDataFormat,
   fileType?: TransactionExportFileType,
-  fileName?: string,
 |};
 export type ExportTransactionsResponse = void;  // TODO: Implement in the Next iteration
 export type ExportTransactionsFunc = (
