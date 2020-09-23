@@ -47,7 +47,7 @@ export async function addAddrForType(
   };
 }
 
-async function scanChain(request: {|
+export async function scanBip44Chain(request: {|
   generateAddressFunc: GenerateAddressFunc,
   lastUsedIndex: number,
   checkAddressesInUse: FilterFunc,
@@ -90,7 +90,7 @@ export async function scanBip44Account(request: {|
   addByHash: AddByHashFunc,
   type: CoreAddressT,
 |}): Promise<TreeInsert<Bip44ChainInsert>> {
-  const externalAddresses = await scanChain({
+  const externalAddresses = await scanBip44Chain({
     generateAddressFunc: request.generateInternalAddresses,
     lastUsedIndex: request.lastUsedExternal,
     checkAddressesInUse: request.checkAddressesInUse,
@@ -98,7 +98,7 @@ export async function scanBip44Account(request: {|
     addByHash: request.addByHash,
     type: request.type,
   });
-  const internalAddresses = await scanChain({
+  const internalAddresses = await scanBip44Chain({
     generateAddressFunc: request.generateExternalAddresses,
     lastUsedIndex: request.lastUsedInternal,
     checkAddressesInUse: request.checkAddressesInUse,

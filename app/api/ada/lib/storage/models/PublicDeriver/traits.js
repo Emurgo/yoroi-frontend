@@ -28,7 +28,8 @@ import type {
   IScanAddresses, IScanAddressesRequest, IScanAddressesResponse,
   IGetPublic, IGetPublicRequest, IGetPublicResponse,
   IGetUtxoBalance, IGetUtxoBalanceRequest, IGetUtxoBalanceResponse,
-  IScanAccountRequest, IScanAccountResponse, IScanUtxo,
+  IScanAccountRequest, IScanAccountResponse, IScanAccountUtxo,
+  IScanChainRequest, IScanChainResponse, IScanChainUtxo,
   IGetBalance, IGetBalanceRequest, IGetBalanceResponse,
   IGetAllAccountingAddressesRequest, IGetAllAccountingAddressesResponse,
   IGetAllAccounting,
@@ -107,7 +108,7 @@ import { ModifyKey, ModifyAddress, } from '../../database/primitives/api/write';
 
 import { v2genAddressBatchFunc, } from '../../../../restoration/byron/scan';
 import { ergoGenAddressBatchFunc, } from '../../../../../ergo/lib/restoration/scan';
-import { scanBip44Account, } from '../../../../../common/lib/restoration/bip44';
+import { scanBip44Chain, scanBip44Account, } from '../../../../../common/lib/restoration/bip44';
 import { scanJormungandrCip1852Account } from '../../../../../jormungandr/lib/restoration/scan';
 import { scanShelleyCip1852Account } from '../../../../restoration/shelley/scan';
 
@@ -1043,7 +1044,6 @@ const HasUtxoChainsMixin = (
     derivationTables,
   ) => {
     if (this.getParent().getPublicDeriverLevel() !== Bip44DerivationLevels.ACCOUNT.level) {
-      // we only allow this on accounts instead of any level < ACCOUNT.level to simplify the code
       throw new Error(`${nameof(HasUtxoChains)}::${nameof(this.rawGetAddressesForChain)} incorrect pubderiver level`);
     }
     return rawGetBip44AddressesByPath(
@@ -1445,14 +1445,14 @@ export function asGetSigningKey<T: IPublicDeriver<any>>(
   return undefined;
 }
 
-// =========================
-//   ScanLegacyCardanoUtxo
-// =========================
+// ================================
+//   ScanLegacyCardanoAccountUtxo
+// ================================
 
-type ScanLegacyCardanoUtxoDependencies = IPublicDeriver<ConceptualWallet>;
-const ScanLegacyCardanoUtxoMixin = (
-  superclass: Class<ScanLegacyCardanoUtxoDependencies>,
-) => (class ScanLegacyCardanoUtxo extends superclass implements IScanUtxo {
+type ScanLegacyCardanoAccountUtxoDependencies = IPublicDeriver<ConceptualWallet>;
+const ScanLegacyCardanoAccountUtxoMixin = (
+  superclass: Class<ScanLegacyCardanoAccountUtxoDependencies>,
+) => (class ScanLegacyCardanoAccountUtxo extends superclass implements IScanAccountUtxo {
   rawScanAccount: (
     lf$Transaction,
     {|
@@ -1475,7 +1475,7 @@ const ScanLegacyCardanoUtxoMixin = (
 
     const network = this.getParent().getNetworkInfo();
     if (network.BaseConfig[0].ByronNetworkId == null) {
-      throw new Error(`${nameof(ScanLegacyCardanoUtxo)}::${nameof(this.rawScanAccount)} missing Byron network id`);
+      throw new Error(`${nameof(ScanLegacyCardanoAccountUtxo)}::${nameof(this.rawScanAccount)} missing Byron network id`);
     }
     const { ByronNetworkId } = network.BaseConfig[0];
 
@@ -1503,32 +1503,32 @@ const ScanLegacyCardanoUtxoMixin = (
   }
 });
 
-const ScanLegacyCardanoUtxo: * = Mixin<
-  ScanLegacyCardanoUtxoDependencies,
-  IScanUtxo,
->(ScanLegacyCardanoUtxoMixin);
-const ScanLegacyCardanoUtxoInstance = (
-  (ScanLegacyCardanoUtxo: any): ReturnType<typeof ScanLegacyCardanoUtxoMixin>
+const ScanLegacyCardanoAccountUtxo: * = Mixin<
+  ScanLegacyCardanoAccountUtxoDependencies,
+  IScanAccountUtxo,
+>(ScanLegacyCardanoAccountUtxoMixin);
+const ScanLegacyCardanoAccountUtxoInstance = (
+  (ScanLegacyCardanoAccountUtxo: any): ReturnType<typeof ScanLegacyCardanoAccountUtxoMixin>
 );
-export function asScanLegacyCardanoUtxoInstance<
+export function asScanLegacyCardanoAccountUtxoInstance<
   T: IPublicDeriver<any>
 >(
   obj: T
-): void | (IScanUtxo & ScanLegacyCardanoUtxoDependencies & T) {
-  if (obj instanceof ScanLegacyCardanoUtxoInstance) {
+): void | (IScanAccountUtxo & ScanLegacyCardanoAccountUtxoDependencies & T) {
+  if (obj instanceof ScanLegacyCardanoAccountUtxoInstance) {
     return obj;
   }
   return undefined;
 }
 
-// =======================
-//   ScanJormungandrUtxo
-// =======================
+// ==============================
+//   ScanJormungandrAccountUtxo
+// ==============================
 
-type ScanJormungandrUtxoDependencies = IPublicDeriver<> & IGetStakingKey;
-const ScanJormungandrUtxoMixin = (
-  superclass: Class<ScanJormungandrUtxoDependencies>,
-) => (class ScanJormungandrUtxo extends superclass implements IScanUtxo {
+type ScanJormungandrAccountUtxoDependencies = IPublicDeriver<> & IGetStakingKey;
+const ScanJormungandrAccountUtxoMixin = (
+  superclass: Class<ScanJormungandrAccountUtxoDependencies>,
+) => (class ScanJormungandrAccountUtxo extends superclass implements IScanAccountUtxo {
   rawScanAccount: (
     lf$Transaction,
     {|
@@ -1556,7 +1556,7 @@ const ScanJormungandrUtxoMixin = (
     );
     const stakingAddress = address.to_account_address();
     if (stakingAddress == null) {
-      throw new StaleStateError(`${nameof(ScanJormungandrUtxo)}::${nameof(this.rawScanAccount)} Could non-account hash in staking key derivation`);
+      throw new StaleStateError(`${nameof(ScanJormungandrAccountUtxo)}::${nameof(this.rawScanAccount)} Could non-account hash in staking key derivation`);
     }
     return await scanJormungandrCip1852Account({
       accountPublicKey: body.accountPublicKey,
@@ -1575,32 +1575,33 @@ const ScanJormungandrUtxoMixin = (
   }
 });
 
-const ScanJormungandrUtxo: * = Mixin<
-  ScanJormungandrUtxoDependencies,
-  IScanUtxo,
->(ScanJormungandrUtxoMixin);
-const ScanJormungandrUtxoInstance = (
-  (ScanJormungandrUtxo: any): ReturnType<typeof ScanJormungandrUtxoMixin>
+const ScanJormungandrAccountUtxo: * = Mixin<
+  ScanJormungandrAccountUtxoDependencies,
+  IScanAccountUtxo,
+>(ScanJormungandrAccountUtxoMixin);
+const ScanJormungandrAccountUtxoInstance = (
+  (ScanJormungandrAccountUtxo: any): ReturnType<typeof ScanJormungandrAccountUtxoMixin>
 );
-export function asScanJormungandrUtxoInstance<
+export function asScanJormungandrAccountUtxoInstance<
   T: IPublicDeriver<any>
 >(
   obj: T
-): void | (IScanUtxo & ScanJormungandrUtxoDependencies & T) {
-  if (obj instanceof ScanJormungandrUtxoInstance) {
+): void | (IScanAccountUtxo & ScanJormungandrAccountUtxoDependencies & T) {
+  if (obj instanceof ScanJormungandrAccountUtxoInstance) {
     return obj;
   }
   return undefined;
 }
 
-// ===================
-//   ScanShelleyUtxo
-// ===================
+// ==========================
+//   ScanShelleyAccountUtxo
+// ==========================
 
-type ScanShelleyUtxoDependencies = IPublicDeriver<ConceptualWallet & IHasLevels> & IGetStakingKey;
-const ScanShelleyUtxoMixin = (
-  superclass: Class<ScanShelleyUtxoDependencies>,
-) => (class ScanShelleyUtxo extends superclass implements IScanUtxo {
+type ScanShelleyAccountUtxoDependencies =
+  IPublicDeriver<ConceptualWallet & IHasLevels> & IGetStakingKey;
+const ScanShelleyAccountUtxoMixin = (
+  superclass: Class<ScanShelleyAccountUtxoDependencies>,
+) => (class ScanShelleyAccountUtxo extends superclass implements IScanAccountUtxo {
   rawScanAccount: (
     lf$Transaction,
     {|
@@ -1654,32 +1655,32 @@ const ScanShelleyUtxoMixin = (
   }
 });
 
-const ScanShelleyUtxo: * = Mixin<
-  ScanShelleyUtxoDependencies,
-  IScanUtxo,
->(ScanShelleyUtxoMixin);
-const ScanShelleyUtxoInstance = (
-  (ScanShelleyUtxo: any): ReturnType<typeof ScanShelleyUtxoMixin>
+const ScanShelleyAccountUtxo: * = Mixin<
+  ScanShelleyAccountUtxoDependencies,
+  IScanAccountUtxo,
+>(ScanShelleyAccountUtxoMixin);
+const ScanShelleyAccountUtxoInstance = (
+  (ScanShelleyAccountUtxo: any): ReturnType<typeof ScanShelleyAccountUtxoMixin>
 );
-export function asScanShelleyUtxoInstance<
+export function asScanShelleyAccountUtxoInstance<
   T: IPublicDeriver<any>
 >(
   obj: T
-): void | (IScanUtxo & ScanShelleyUtxoDependencies & T) {
-  if (obj instanceof ScanShelleyUtxoInstance) {
+): void | (IScanAccountUtxo & ScanShelleyAccountUtxoDependencies & T) {
+  if (obj instanceof ScanShelleyAccountUtxoInstance) {
     return obj;
   }
   return undefined;
 }
 
-// =========================
-//   ScanErgoUtxo
-// =========================
+// =======================
+//   ScanErgoAccountUtxo
+// =======================
 
-type ScanErgoUtxoDependencies = IPublicDeriver<>;
-const ScanErgoUtxoMixin = (
-  superclass: Class<ScanErgoUtxoDependencies>,
-) => (class ScanErgoUtxo extends superclass implements IScanUtxo {
+type ScanErgoAccountUtxoDependencies = IPublicDeriver<>;
+const ScanErgoAccountUtxoMixin = (
+  superclass: Class<ScanErgoAccountUtxoDependencies>,
+) => (class ScanErgoAccountUtxo extends superclass implements IScanAccountUtxo {
   rawScanAccount: (
     lf$Transaction,
     {|
@@ -1718,19 +1719,78 @@ const ScanErgoUtxoMixin = (
   }
 });
 
-const ScanErgoUtxo: * = Mixin<
-  ScanErgoUtxoDependencies,
-  IScanUtxo,
->(ScanErgoUtxoMixin);
-const ScanErgoUtxoInstance = (
-  (ScanErgoUtxo: any): ReturnType<typeof ScanErgoUtxoMixin>
+const ScanErgoAccountUtxo: * = Mixin<
+  ScanErgoAccountUtxoDependencies,
+  IScanAccountUtxo,
+>(ScanErgoAccountUtxoMixin);
+const ScanErgoAccountUtxoInstance = (
+  (ScanErgoAccountUtxo: any): ReturnType<typeof ScanErgoAccountUtxoMixin>
 );
-export function asScanErgoUtxoInstance<
+export function asScanErgoAccountUtxoInstance<
   T: IPublicDeriver<any>
 >(
   obj: T
-): void | (IScanUtxo & ScanErgoUtxoDependencies & T) {
-  if (obj instanceof ScanErgoUtxoInstance) {
+): void | (IScanAccountUtxo & ScanErgoAccountUtxoDependencies & T) {
+  if (obj instanceof ScanErgoAccountUtxoInstance) {
+    return obj;
+  }
+  return undefined;
+}
+
+// ======================
+//   ScanErgoChainUtxo
+// ======================
+
+type ScanErgoChainUtxoDependencies = IPublicDeriver<ConceptualWallet & IHasLevels>;
+const ScanErgoChainUtxoMixin = (
+  superclass: Class<ScanErgoChainUtxoDependencies>,
+) => (class ScanErgoChainUtxo extends superclass implements IScanChainUtxo {
+  rawScanChain: (
+    lf$Transaction,
+    {|
+      GetPathWithSpecific: Class<GetPathWithSpecific>,
+      GetAddress: Class<GetAddress>,
+      GetDerivationSpecific: Class<GetDerivationSpecific>,
+    |},
+    IScanChainRequest,
+    Map<number, string>,
+  ) => Promise<IScanChainResponse> = async (
+    _tx,
+    _deps,
+    body,
+    _derivationTables,
+  ): Promise<IScanChainResponse> => {
+    const key = BIP32PublicKey.fromBuffer(Buffer.from(body.chainPublicKey, 'hex'));
+    return await scanBip44Chain({
+      generateAddressFunc: ergoGenAddressBatchFunc(
+        key.key
+      ),
+      lastUsedIndex: body.lastUsedIndex,
+      network: this.getParent().getNetworkInfo(),
+      checkAddressesInUse: body.checkAddressesInUse,
+      addByHash: rawGenAddByHash(
+        new Set([
+          ...body.addresses,
+        ])
+      ),
+      type: CoreAddressTypes.ERGO_P2PK,
+    });
+  }
+});
+
+const ScanErgoChainUtxo: * = Mixin<
+  ScanErgoChainUtxoDependencies,
+  IScanChainUtxo,
+>(ScanErgoChainUtxoMixin);
+const ScanErgoChainUtxoInstance = (
+  (ScanErgoChainUtxo: any): ReturnType<typeof ScanErgoChainUtxoMixin>
+);
+export function asScanErgoChainUtxoInstance<
+  T: IPublicDeriver<any>
+>(
+  obj: T
+): void | (IScanChainUtxo & ScanErgoChainUtxoDependencies & T) {
+  if (obj instanceof ScanErgoChainUtxoInstance) {
     return obj;
   }
   return undefined;
@@ -1742,7 +1802,7 @@ export function asScanErgoUtxoInstance<
 
 // Abstract way to scan for new addresses given wallet has functionality to scan UTXOs
 type ScanUtxoAccountAddressesDependencies = IPublicDeriver<ConceptualWallet & IHasLevels> &
-  IHasUtxoChains & IGetPublic & IScanUtxo & IAddBip44FromPublic;
+  IHasUtxoChains & IGetPublic & IScanAccountUtxo & IAddBip44FromPublic;
 const ScanUtxoAccountAddressesMixin = (
   superclass: Class<ScanUtxoAccountAddressesDependencies>,
 ) => (class ScanUtxoAccountAddresses extends superclass implements IScanAddresses {
@@ -1897,6 +1957,158 @@ export function asScanUtxoAccountAddressesInstance<
   obj: T
 ): void | (IScanAddresses & ScanUtxoAccountAddressesDependencies & T) {
   if (obj instanceof ScanUtxoAccountAddressesInstance) {
+    return obj;
+  }
+  return undefined;
+}
+
+// ==================
+//   ScanUtxoChain
+// ==================
+
+// Abstract way to scan for new addresses given wallet has functionality to scan UTXOs
+type ScanUtxoChainAddressesDependencies = IPublicDeriver<ConceptualWallet & IHasLevels> &
+  IGetPublic & IScanChainUtxo & IAddBip44FromPublic;
+const ScanUtxoChainAddressesMixin = (
+  superclass: Class<ScanUtxoChainAddressesDependencies>,
+) => (class ScanUtxoChainAddresses extends superclass implements IScanAddresses {
+  rawScanAddresses: (
+    lf$Transaction,
+    {|
+      GetKeyForPublicDeriver: Class<GetKeyForPublicDeriver>,
+      GetAddress: Class<GetAddress>,
+      GetPathWithSpecific: Class<GetPathWithSpecific>,
+      GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
+      ModifyAddress: Class<ModifyAddress>,
+      GetPublicDeriver: Class<GetPublicDeriver>,
+      AddDerivationTree: Class<AddDerivationTree>,
+      ModifyDisplayCutoff: Class<ModifyDisplayCutoff>,
+      GetDerivationsByPath: Class<GetDerivationsByPath>,
+      GetDerivationSpecific: Class<GetDerivationSpecific>,
+      GetKeyDerivation: Class<GetKeyDerivation>,
+    |},
+    IScanAddressesRequest,
+    Map<number, string>,
+  ) => Promise<IScanAddressesResponse> = async (
+    tx,
+    deps,
+    body,
+    derivationTables,
+  ): Promise<IScanAddressesResponse> => {
+    const pubKey = await this.rawGetPublicKey(
+      tx,
+      { GetKeyForPublicDeriver: deps.GetKeyForPublicDeriver },
+      undefined
+    );
+    const decryptedKey = decryptKey(
+      pubKey,
+      null
+    );
+
+    const addresses = await rawGetBip44AddressesByPath(
+      super.getDb(), tx,
+      {
+        GetAddress: deps.GetAddress,
+        GetPathWithSpecific: deps.GetPathWithSpecific,
+        GetDerivationSpecific: deps.GetDerivationSpecific,
+      },
+      {
+        startingDerivation: super.getDerivationId(),
+        derivationLevel: this.getParent().getPublicDeriverLevel(),
+        commonPrefix: super.getPathToPublic(),
+        queryPath: [null],
+      },
+      derivationTables,
+    );
+    const lastUsedIndex = await rawGetNextUnusedIndex(
+      super.getDb(), tx,
+      { GetUtxoTxOutputsWithTx: deps.GetUtxoTxOutputsWithTx, },
+      { addressesForChain: addresses },
+    );
+
+    const newToInsert = await this.rawScanChain(
+      tx,
+      {
+        GetAddress: deps.GetAddress,
+        GetPathWithSpecific: deps.GetPathWithSpecific,
+        GetDerivationSpecific: deps.GetDerivationSpecific,
+      },
+      {
+        chainPublicKey: decryptedKey,
+        lastUsedIndex: lastUsedIndex.index - 1,
+        checkAddressesInUse: body.checkAddressesInUse,
+        addresses: addresses.flatMap(
+          address => address.addrs.map(addr => addr.AddressId)
+        ),
+      },
+      derivationTables,
+    );
+
+    await this.rawAddBip44FromPublic(
+      tx,
+      {
+        GetPublicDeriver: deps.GetPublicDeriver,
+        AddDerivationTree: deps.AddDerivationTree,
+        ModifyDisplayCutoff: deps.ModifyDisplayCutoff,
+        GetDerivationsByPath: deps.GetDerivationsByPath,
+        GetPathWithSpecific: deps.GetPathWithSpecific,
+        GetDerivationSpecific: deps.GetDerivationSpecific,
+        GetKeyDerivation: deps.GetKeyDerivation,
+      },
+      { tree: newToInsert },
+      derivationTables,
+    );
+  }
+  scanAddresses: IScanAddressesRequest => Promise<IScanAddressesResponse> = async (
+    body,
+  ) => {
+    const derivationTables = this.getParent().getDerivationTables();
+    const deps = Object.freeze({
+      GetKeyForPublicDeriver,
+      GetAddress,
+      GetPathWithSpecific,
+      GetUtxoTxOutputsWithTx,
+      ModifyAddress,
+      GetPublicDeriver,
+      AddDerivationTree,
+      GetDerivationsByPath,
+      ModifyDisplayCutoff,
+      GetDerivationSpecific,
+      GetKeyDerivation,
+    });
+    const depTables = Object
+      .keys(deps)
+      .map(key => deps[key])
+      .flatMap(table => getAllSchemaTables(super.getDb(), table));
+    return await raii<IScanAddressesResponse>(
+      super.getDb(),
+      [
+        ...depTables,
+        ...mapToTables(super.getDb(), derivationTables),
+      ],
+      async tx => this.rawScanAddresses(
+        tx,
+        deps,
+        body,
+        derivationTables,
+      )
+    );
+  }
+});
+
+export const ScanUtxoChainAddresses: * = Mixin<
+  ScanUtxoChainAddressesDependencies,
+  IScanAddresses,
+>(ScanUtxoChainAddressesMixin);
+const ScanUtxoChainAddressesInstance = (
+  (ScanUtxoChainAddresses: any): ReturnType<typeof ScanUtxoChainAddressesMixin>
+);
+export function asScanUtxoChainAddressesInstance<
+  T: IPublicDeriver<any>
+>(
+  obj: T
+): void | (IScanAddresses & ScanUtxoChainAddressesDependencies & T) {
+  if (obj instanceof ScanUtxoChainAddressesInstance) {
     return obj;
   }
   return undefined;
@@ -2110,7 +2322,7 @@ export async function addTraitsForCardanoBip44(
     currClass = HasUtxoChains(Bip44PickInternal(currClass));
     if (publicKey !== null) {
       currClass = GetPublicKey(currClass);
-      currClass = ScanLegacyCardanoUtxo(currClass);
+      currClass = ScanLegacyCardanoAccountUtxo(currClass);
       currClass = ScanUtxoAccountAddresses(currClass);
       currClass = ScanAddresses(currClass);
     }
@@ -2172,14 +2384,22 @@ export async function addTraitsForErgoBip44(
 
   if (request.conceptualWallet.getPublicDeriverLevel() === Bip44DerivationLevels.CHAIN.level) {
     currClass = DisplayCutoff(currClass);
-  }
-  if (request.conceptualWallet.getPublicDeriverLevel() === Bip44DerivationLevels.ACCOUNT.level) {
+
+    if (publicKey !== null) {
+      currClass = GetPublicKey(currClass);
+      currClass = ScanErgoChainUtxo(currClass);
+      currClass = ScanUtxoChainAddresses(currClass);
+      currClass = ScanAddresses(currClass);
+    }
+  } else if (
+    request.conceptualWallet.getPublicDeriverLevel() === Bip44DerivationLevels.ACCOUNT.level
+  ) {
     currClass = DisplayCutoff(currClass);
 
     currClass = HasUtxoChains(Bip44PickInternal(currClass));
     if (publicKey !== null) {
       currClass = GetPublicKey(currClass);
-      currClass = ScanErgoUtxo(currClass);
+      currClass = ScanErgoAccountUtxo(currClass);
       currClass = ScanUtxoAccountAddresses(currClass);
       currClass = ScanAddresses(currClass);
     }
@@ -2314,9 +2534,9 @@ export async function addTraitsForCip1852Child(
     if (publicKey !== null) {
       currClass = GetPublicKey(currClass);
       if (isJormungandr(conceptualWallet.getNetworkInfo())) {
-        currClass = ScanJormungandrUtxo(currClass);
+        currClass = ScanJormungandrAccountUtxo(currClass);
       } else if (isCardanoHaskell(conceptualWallet.getNetworkInfo())) {
-        currClass = ScanShelleyUtxo(currClass);
+        currClass = ScanShelleyAccountUtxo(currClass);
       } else {
         throw new Error(`${nameof(addTraitsForCip1852Child)} don't know how to scan for network`);
       }
