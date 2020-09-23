@@ -25,14 +25,14 @@ export const generateErgoPlate = (
       accountIndex + HARD_DERIVATION_START,
       ChainDerivations.EXTERNAL,
     ]
-  );
+  ).toPublic();
 
-  const accountPlate = walletChecksum(
+  const plate = walletChecksum(
     chainKey.toBuffer().toString('hex')
   );
 
   const baseAddressGen = ergoGenAddressBatchFunc(
-    chainKey.toPublic().key,
+    chainKey.key,
   );
   const generateAddressFunc = (indices: Array<number>) => (
     baseAddressGen(indices)
@@ -42,5 +42,5 @@ export const generateErgoPlate = (
       .map(addr => addr.address)
   );
   const addresses = generateAddressFunc([...Array(count).keys()]);
-  return { addresses, accountPlate };
+  return { addresses, plate };
 };

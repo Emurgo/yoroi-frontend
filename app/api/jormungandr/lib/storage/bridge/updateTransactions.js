@@ -31,6 +31,7 @@ import {
   GetDerivationsByPath,
   GetTransaction,
   GetTxAndBlock,
+  GetKeyDerivation,
 } from '../../../../ada/lib/storage/database/primitives/api/read';
 import {
   ModifyAddress,
@@ -664,6 +665,7 @@ export async function updateTransactions(
       JormungandrAssociateTxWithIOs,
       AssociateTxWithAccountingIOs,
       AssociateTxWithUtxoIOs,
+      GetKeyDerivation,
     });
     const updateTables = Object
       .keys(updateDepTables)
@@ -934,6 +936,7 @@ async function rawUpdateTransactions(
     JormungandrAssociateTxWithIOs: Class<JormungandrAssociateTxWithIOs>,
     AssociateTxWithAccountingIOs: Class<AssociateTxWithAccountingIOs>,
     AssociateTxWithUtxoIOs: Class<AssociateTxWithUtxoIOs>,
+    GetKeyDerivation: Class<GetKeyDerivation>,
   |},
   publicDeriver: IPublicDeriver<>,
   lastSyncInfo: $ReadOnly<LastSyncInfoRow>,
@@ -981,6 +984,7 @@ async function rawUpdateTransactions(
           ModifyDisplayCutoff: deps.ModifyDisplayCutoff,
           GetDerivationsByPath: deps.GetDerivationsByPath,
           GetDerivationSpecific: deps.GetDerivationSpecific,
+          GetKeyDerivation: deps.GetKeyDerivation,
         },
         // TODO: race condition because we don't pass in best block here
         { checkAddressesInUse },

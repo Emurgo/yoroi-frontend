@@ -173,7 +173,7 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
 
     const plateElems = this.props.plates.map(plate => this.generatePlate(
       intl.formatMessage(plate.checksumTitle),
-      plate.accountPlate,
+      plate.plate,
     ));
 
     const addressElems = this.props.plates.map(plate => this.generateAddresses(

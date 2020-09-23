@@ -234,7 +234,8 @@ export interface IDisplayCutoff {
     IDisplayCutoffSetFunc,
     {|
       ModifyDisplayCutoff: Class<ModifyDisplayCutoff>,
-      GetDerivationsByPath: Class<GetDerivationsByPath>
+      GetDerivationsByPath: Class<GetDerivationsByPath>,
+      GetKeyDerivation: Class<GetKeyDerivation>,
     |},
     IDisplayCutoffSetRequest
   >;
@@ -386,6 +387,7 @@ export interface IScanAddresses {
       ModifyDisplayCutoff: Class<ModifyDisplayCutoff>,
       GetDerivationsByPath: Class<GetDerivationsByPath>,
       GetDerivationSpecific: Class<GetDerivationSpecific>,
+      GetKeyDerivation: Class<GetKeyDerivation>,
     |},
     IScanAddressesRequest
   >;
@@ -486,6 +488,7 @@ export interface IAddBip44FromPublic {
       GetDerivationsByPath: Class<GetDerivationsByPath>,
       GetPathWithSpecific: Class<GetPathWithSpecific>,
       GetDerivationSpecific: Class<GetDerivationSpecific>,
+      GetKeyDerivation: Class<GetKeyDerivation>,
     |},
     IAddBip44FromPublicRequest
   >;

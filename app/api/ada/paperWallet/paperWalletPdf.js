@@ -12,7 +12,7 @@ import { createIcon as blockiesIcon } from '@download/blockies';
 export type PaperRequest = {|
   words: Array<string>,
   addresses: Array<string>,
-  accountPlate: ?WalletChecksum,
+  plate: ?WalletChecksum,
   network: Network,
 |}
 
@@ -33,7 +33,7 @@ export const generateAdaPaperPdf = async (
 ): Promise<?Blob> => {
   // Prepare params
   // eslint-disable-next-line no-unused-vars
-  const { network, addresses, words, accountPlate } = request;
+  const { network, addresses, words, plate } = request;
 
   updateStatus(PdfGenSteps.initializing);
 
@@ -56,10 +56,10 @@ export const generateAdaPaperPdf = async (
       printTestnetLabel(doc, network, 172);
     }
 
-    if (accountPlate) {
+    if (plate) {
       // print account plate ID bottom-left corner of main front section
       doc.setFontSize(12);
-      doc.text(145, 180, accountPlate.TextPart);
+      doc.text(145, 180, plate.TextPart);
     }
 
     updateStatus(PdfGenSteps.frontpage);
@@ -83,11 +83,11 @@ export const generateAdaPaperPdf = async (
       printTestnetLabel(doc, network, 75, 180);
     }
 
-    if (accountPlate) {
+    if (plate) {
 
       // Generate account plate icon
       const icon = blockiesIcon({
-        seed: accountPlate.ImagePart,
+        seed: plate.ImagePart,
         size: 7,
         scale: 5,
         bgcolor: '#fff',
@@ -106,7 +106,7 @@ export const generateAdaPaperPdf = async (
 
       // Print account plate ID under the plate icon on backside
       doc.setFontSize(12);
-      textCenter(doc, 130, accountPlate.TextPart, null, 180, true);
+      textCenter(doc, 130, plate.TextPart, null, 180, true);
     }
 
     await addImage(doc, paperWalletPage2Path, pageSize);

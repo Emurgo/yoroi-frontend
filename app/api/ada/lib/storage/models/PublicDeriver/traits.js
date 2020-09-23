@@ -556,6 +556,7 @@ const AddBip44FromPublicMixin = (
       GetDerivationsByPath: Class<GetDerivationsByPath>,
       GetPathWithSpecific: Class<GetPathWithSpecific>,
       GetDerivationSpecific: Class<GetDerivationSpecific>,
+      GetKeyDerivation: Class<GetKeyDerivation>,
     |},
     IAddBip44FromPublicRequest,
     Map<number, string>,
@@ -590,6 +591,7 @@ const AddBip44FromPublicMixin = (
           GetDerivationSpecific: deps.GetDerivationSpecific,
           GetDerivationsByPath: deps.GetDerivationsByPath,
           ModifyDisplayCutoff: deps.ModifyDisplayCutoff,
+          GetKeyDerivation: deps.GetKeyDerivation,
         },
         {
           publicDeriverLevel: this.getParent().getPublicDeriverLevel(),
@@ -611,6 +613,7 @@ const AddBip44FromPublicMixin = (
       GetDerivationsByPath,
       GetPathWithSpecific,
       GetDerivationSpecific,
+      GetKeyDerivation,
     });
     const depTables = Object
       .keys(deps)
@@ -665,14 +668,11 @@ const DisplayCutoffMixin = (
     _body,
     derivationTables,
   ): Promise<IDisplayCutoffPopResponse> => {
-    if (this.getParent().getPublicDeriverLevel() !== Bip44DerivationLevels.ACCOUNT.level) {
-      // we only allow this on accounts instead of any level < ACCOUNT.level to simplify the code
-      throw new Error(`${nameof(DisplayCutoffMixin)}::${nameof(this.popAddress)} incorrect pubderiver level`);
-    }
     const nextAddr = await deps.ModifyDisplayCutoff.pop(
       super.getDb(), tx,
       {
         pubDeriverKeyDerivationId: super.getDerivationId(),
+        derivationLevel: this.getParent().getPublicDeriverLevel(),
         pathToLevel: [0],
       },
       derivationTables,
@@ -731,39 +731,55 @@ const DisplayCutoffMixin = (
     _body,
     derivationTables,
   ): Promise<IDisplayCutoffGetResponse> => {
-    if (this.getParent().getPublicDeriverLevel() !== Bip44DerivationLevels.ACCOUNT.level) {
-      // we only allow this on accounts instead of any level < ACCOUNT.level to simplify the code
-      throw new Error(`${nameof(DisplayCutoffMixin)}::${nameof(this.getCutoff)} incorrect pubderiver level`);
-    }
-    const chain = await deps.GetPathWithSpecific.getPath<$ReadOnly<Bip44ChainRow>>(
-      super.getDb(), tx,
-      {
-        pubDeriverKeyDerivationId: super.getDerivationId(),
-        pathToLevel: [0],
-        level: Bip44DerivationLevels.CHAIN.level,
-      },
-      async (derivationId) => {
-        const result = await GetDerivationSpecific.get<
+    const derivationLevel = this.getParent().getPublicDeriverLevel();
+    const chain = await (async () => {
+      if (derivationLevel === Bip44DerivationLevels.CHAIN.level) {
+        const result = await deps.GetDerivationSpecific.get<
           Bip44ChainRow
         >(
           super.getDb(), tx,
-          [derivationId],
+          [super.getDerivationId()],
           Bip44DerivationLevels.CHAIN.level,
           derivationTables,
         );
         const chainDerivation = result[0];
         if (chainDerivation === undefined) {
+          // we know this level exists since we fetched it in GetChildIfExists
           throw new Error(`${nameof(DisplayCutoffMixin)}::${nameof(this.rawGetCutoff)} missing chain. Should never happen`);
         }
         return chainDerivation;
       }
-    );
-    if (chain === undefined) {
-      throw new Error(`${nameof(DisplayCutoffMixin)}::${nameof(this.getCutoff)} no chain found`);
-    }
-    const cutoff = chain.levelSpecific.DisplayCutoff;
+      if (derivationLevel === Bip44DerivationLevels.ACCOUNT.level) {
+        return (await deps.GetPathWithSpecific.getPath<Bip44ChainRow>(
+          super.getDb(), tx,
+          {
+            pubDeriverKeyDerivationId: super.getDerivationId(),
+            pathToLevel: [0],
+            level: Bip44DerivationLevels.CHAIN.level,
+          },
+          async (derivationId) => {
+            const result = await deps.GetDerivationSpecific.get<
+              Bip44ChainRow
+            >(
+              super.getDb(), tx,
+              [derivationId],
+              Bip44DerivationLevels.CHAIN.level,
+              derivationTables,
+            );
+            const chainDerivation = result[0];
+            if (chainDerivation === undefined) {
+              // we know this level exists since we fetched it in GetChildIfExists
+              throw new Error(`${nameof(DisplayCutoffMixin)}::${nameof(this.rawGetCutoff)} missing chain. Should never happen`);
+            }
+            return chainDerivation;
+          },
+        )).levelSpecific;
+      }
+      throw new Error(`${nameof(DisplayCutoffMixin)}::${nameof(this.rawGetCutoff)} incorrect pubderiver level`);
+    })();
+    const cutoff = chain.DisplayCutoff;
     if (cutoff == null) {
-      throw new Error(`${nameof(DisplayCutoffMixin)}::${nameof(this.getCutoff)} null cutoff`);
+      throw new Error(`${nameof(DisplayCutoffMixin)}::${nameof(this.rawGetCutoff)} null cutoff`);
     }
     return cutoff;
   }
@@ -794,6 +810,7 @@ const DisplayCutoffMixin = (
     {|
       ModifyDisplayCutoff: Class<ModifyDisplayCutoff>,
       GetDerivationsByPath: Class<GetDerivationsByPath>,
+      GetKeyDerivation: Class<GetKeyDerivation>,
     |},
     IDisplayCutoffSetRequest,
   ) => Promise<IDisplayCutoffSetResponse> = async (
@@ -801,16 +818,24 @@ const DisplayCutoffMixin = (
     deps,
     body,
   ): Promise<IDisplayCutoffSetResponse> => {
-    if (this.getParent().getPublicDeriverLevel() !== Bip44DerivationLevels.ACCOUNT.level) {
-      // we only allow this on accounts instead of any level < ACCOUNT.level to simplify the code
-      throw new Error(`${nameof(DisplayCutoffMixin)}::${nameof(this.popAddress)} incorrect pubderiver level`);
-    }
-    const path = await deps.GetDerivationsByPath.getSinglePath(
-      super.getDb(), tx,
-      super.getDerivationId(),
-      [0]
-    );
-    const chain = path[path.length - 1];
+    const derivationLevel = this.getParent().getPublicDeriverLevel();
+    const chain = await (async () => {
+      if (derivationLevel === Bip44DerivationLevels.CHAIN.level) {
+        return await deps.GetKeyDerivation.get(
+          super.getDb(), tx,
+          super.getDerivationId(),
+        );
+      }
+      if (derivationLevel === Bip44DerivationLevels.ACCOUNT.level) {
+        const path = await deps.GetDerivationsByPath.getSinglePath(
+          super.getDb(), tx,
+          super.getDerivationId(),
+          [0]
+        );
+        return path[path.length - 1];
+      }
+      throw new Error(`${nameof(ModifyDisplayCutoff)}::${nameof(ModifyDisplayCutoff.pop)} incorrect pubderiver level`);
+    })();
 
     await deps.ModifyDisplayCutoff.set(
       super.getDb(), tx,
@@ -826,6 +851,7 @@ const DisplayCutoffMixin = (
     const deps = Object.freeze({
       ModifyDisplayCutoff,
       GetDerivationsByPath,
+      GetKeyDerivation,
     });
     const depTables = Object
       .keys(deps)
@@ -1733,6 +1759,7 @@ const ScanUtxoAccountAddressesMixin = (
       ModifyDisplayCutoff: Class<ModifyDisplayCutoff>,
       GetDerivationsByPath: Class<GetDerivationsByPath>,
       GetDerivationSpecific: Class<GetDerivationSpecific>,
+      GetKeyDerivation: Class<GetKeyDerivation>,
     |},
     IScanAddressesRequest,
     Map<number, string>,
@@ -1814,6 +1841,7 @@ const ScanUtxoAccountAddressesMixin = (
         GetDerivationsByPath: deps.GetDerivationsByPath,
         GetPathWithSpecific: deps.GetPathWithSpecific,
         GetDerivationSpecific: deps.GetDerivationSpecific,
+        GetKeyDerivation: deps.GetKeyDerivation,
       },
       { tree: newToInsert },
       derivationTables,
@@ -1834,6 +1862,7 @@ const ScanUtxoAccountAddressesMixin = (
       GetDerivationsByPath,
       ModifyDisplayCutoff,
       GetDerivationSpecific,
+      GetKeyDerivation,
     });
     const depTables = Object
       .keys(deps)
@@ -2072,6 +2101,9 @@ export async function addTraitsForCardanoBip44(
 
   currClass = AddBip44FromPublic(currClass);
 
+  if (request.conceptualWallet.getPublicDeriverLevel() === Bip44DerivationLevels.CHAIN.level) {
+    currClass = DisplayCutoff(currClass);
+  }
   if (request.conceptualWallet.getPublicDeriverLevel() === Bip44DerivationLevels.ACCOUNT.level) {
     currClass = DisplayCutoff(currClass);
 
@@ -2138,6 +2170,9 @@ export async function addTraitsForErgoBip44(
 
   currClass = AddBip44FromPublic(currClass);
 
+  if (request.conceptualWallet.getPublicDeriverLevel() === Bip44DerivationLevels.CHAIN.level) {
+    currClass = DisplayCutoff(currClass);
+  }
   if (request.conceptualWallet.getPublicDeriverLevel() === Bip44DerivationLevels.ACCOUNT.level) {
     currClass = DisplayCutoff(currClass);
 
@@ -2262,6 +2297,9 @@ export async function addTraitsForCip1852Child(
   // recall: adding addresses to public deriver in cip1852 is same as bip44
   currClass = AddBip44FromPublic(currClass);
 
+  if (conceptualWallet.getPublicDeriverLevel() === Bip44DerivationLevels.CHAIN.level) {
+    currClass = DisplayCutoff(currClass);
+  }
   if (conceptualWallet.getPublicDeriverLevel() === Bip44DerivationLevels.ACCOUNT.level) {
     currClass = DisplayCutoff(currClass);
 

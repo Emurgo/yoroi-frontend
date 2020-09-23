@@ -182,7 +182,7 @@ export type CreateAdaPaperRequest = {|
 export type AdaPaper = {|
   addresses: Array<string>,
   scrambledWords: Array<string>,
-  accountPlate: WalletChecksum,
+  plate: WalletChecksum,
 |};
 export type CreateAdaPaperFunc = (
   request: CreateAdaPaperRequest
@@ -524,13 +524,13 @@ export default class AdaApi {
       request.network
     ).reduce((acc, next) => Object.assign(acc, next), {});
 
-    const { addresses, accountPlate } = generateByronPlate(
+    const { addresses, plate } = generateByronPlate(
       rootPk,
       0, // paper wallets always use account 0
       request.numAddresses != null ? request.numAddresses : DEFAULT_ADDRESSES_PER_PAPER,
       config.ByronNetworkId
     );
-    return { addresses, scrambledWords, accountPlate };
+    return { addresses, scrambledWords, plate };
   }
 
   async createAdaPaperPdf(
@@ -541,12 +541,12 @@ export default class AdaApi {
       updateStatus
     }: CreateAdaPaperPdfRequest
   ): Promise<CreateAdaPaperPdfResponse> {
-    const { addresses, scrambledWords, accountPlate } = paper;
+    const { addresses, scrambledWords, plate } = paper;
     // noinspection UnnecessaryLocalVariableJS
     const res : Promise<CreateAdaPaperPdfResponse> = generateAdaPaperPdf({
       words: scrambledWords,
       addresses,
-      accountPlate: printAccountPlate === true ? accountPlate : undefined,
+      plate: printAccountPlate === true ? plate : undefined,
       network,
     }, s => {
       Logger.info('[PaperWalletRender] ' + s);

@@ -132,6 +132,6 @@ export const testWallets: { [key: WalletNames]: RestorationInput, ... } = Object
   createWallet({
     name: ('ergo-simple-wallet': WalletNames),
     mnemonic: 'eight country switch draw meat scout mystery blade tip drift useless good keep usage title',
-    plate: 'DXSD-7186',
+    plate: 'CXTP-1821',
   }),
 );

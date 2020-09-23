@@ -43,6 +43,7 @@ import {
   GetPathWithSpecific,
   GetDerivationsByPath,
   GetCertificates,
+  GetKeyDerivation,
 } from '../database/primitives/api/read';
 import {
   getAllSchemaTables,
@@ -394,6 +395,7 @@ export async function updateCutoffFromInsert(
     GetDerivationSpecific: Class<GetDerivationSpecific>,
     GetDerivationsByPath: Class<GetDerivationsByPath>,
     ModifyDisplayCutoff: Class<ModifyDisplayCutoff>,
+    GetKeyDerivation: Class<GetKeyDerivation>,
   |},
   request: {|
     publicDeriverLevel: number,
@@ -432,6 +434,7 @@ export async function updateCutoffFromInsert(
         {
           ModifyDisplayCutoff: deps.ModifyDisplayCutoff,
           GetDerivationsByPath: deps.GetDerivationsByPath,
+          GetKeyDerivation: deps.GetKeyDerivation,
         },
         { newIndex: bestNewCutoff - BIP44_SCAN_SIZE },
       );
