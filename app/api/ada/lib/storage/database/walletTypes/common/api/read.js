@@ -29,7 +29,7 @@ export class GetDerivationSpecific {
   ): Promise<$ReadOnlyArray<$ReadOnly<Row>>> {
     const tableName = derivationTables.get(level);
     if (tableName == null) {
-      throw new Error('GetDerivationSpecific::get Unknown table queried');
+      throw new Error(`${nameof(GetDerivationSpecific)}::get Unknown table queried`);
     }
     return await getRowIn<Row>(
       db, tx,

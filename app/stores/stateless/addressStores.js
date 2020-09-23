@@ -13,6 +13,7 @@ import {
   GroupExternalAddressesSubgroup,
   GroupInternalAddressesSubgroup,
   GroupMangledAddressesSubgroup,
+  P2PKAllAddressesSubgroup,
   P2PKExternalAddressesSubgroup,
   P2PKInternalAddressesSubgroup,
 } from '../base/AddressSubgroupStore';
@@ -115,7 +116,8 @@ export const BYRON_ALL: AddressSubgroupMeta<
 > = registerAddressSubgroup({
   isRelated: request => (
     matchParent(request.selected, parent => parent instanceof Bip44Wallet) &&
-    asHasUtxoChains(request.selected) == null
+    asHasUtxoChains(request.selected) == null &&
+    matchCoinType(request.selected, coinType => coinType === CoinTypes.CARDANO)
   ),
   class: ByronAllAddressesSubgroup,
   validFilters: standardFilter,
@@ -272,6 +274,22 @@ export const GROUP_MANGLED: AddressSubgroupMeta<
     group: AddressGroupTypes.group,
   },
   isHidden: request => request.result == null || request.result.length === 0,
+});
+export const P2PK_ALL: AddressSubgroupMeta<
+  P2PKAllAddressesSubgroup
+> = registerAddressSubgroup({
+  isRelated: request => (
+    matchParent(request.selected, parent => parent instanceof Bip44Wallet) &&
+    asHasUtxoChains(request.selected) == null &&
+    matchCoinType(request.selected, coinType => coinType === CoinTypes.ERGO)
+  ),
+  class: P2PKAllAddressesSubgroup,
+  validFilters: standardFilter,
+  name: {
+    subgroup: AddressSubgroup.all,
+    group: AddressGroupTypes.p2pk,
+  },
+  isHidden: _request => false,
 });
 export const P2PK_EXTERNAL: AddressSubgroupMeta<
   P2PKExternalAddressesSubgroup

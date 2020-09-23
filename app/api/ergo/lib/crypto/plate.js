@@ -1,7 +1,7 @@
 // @flow
 
 import { ergoGenAddressBatchFunc } from '../restoration/scan';
-import { BIP32PrivateKey, deriveKey, derivePath } from '../../../common/lib/crypto/keys/keyRepository';
+import { BIP32PrivateKey, derivePath } from '../../../common/lib/crypto/keys/keyRepository';
 import {
   HARD_DERIVATION_START,
   CoinTypes,
@@ -17,23 +17,22 @@ export const generateErgoPlate = (
   accountIndex: number,
   count: number,
 ): PlateResponse => {
-  const accountKey = derivePath(
+  const chainKey = derivePath(
     rootPk,
     [
       WalletTypePurpose.BIP44,
       CoinTypes.ERGO,
       accountIndex + HARD_DERIVATION_START,
+      ChainDerivations.EXTERNAL,
     ]
   );
-  const accountPublic = accountKey.toPublic();
-  const chainKey = deriveKey(accountPublic, ChainDerivations.EXTERNAL);
 
   const accountPlate = walletChecksum(
-    accountPublic.toBuffer().toString('hex')
+    chainKey.toBuffer().toString('hex')
   );
 
   const baseAddressGen = ergoGenAddressBatchFunc(
-    chainKey.key,
+    chainKey.toPublic().key,
   );
   const generateAddressFunc = (indices: Array<number>) => (
     baseAddressGen(indices)

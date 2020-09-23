@@ -75,7 +75,7 @@ export async function derivePublicDeriver<Row>(
     {
       publicDeriverMeta: body.publicDeriverMeta,
       pathToPublic: privateKeyRow => {
-        const accountKey = normalizeToPubDeriverLevel({
+        const pubDeriverKey = normalizeToPubDeriverLevel({
           privateKeyRow,
           password: body.decryptPrivateDeriverPassword,
           path: body.path,
@@ -98,17 +98,17 @@ export async function derivePublicDeriver<Row>(
               ? null
               : {
                 Hash: body.encryptPublicDeriverPassword === null
-                  ? accountKey.prvKeyHex
+                  ? pubDeriverKey.prvKeyHex
                   : encryptWithPassword(
                     body.encryptPublicDeriverPassword,
-                    Buffer.from(accountKey.prvKeyHex, 'hex')
+                    Buffer.from(pubDeriverKey.prvKeyHex, 'hex')
                   ),
                 IsEncrypted: true,
                 PasswordLastUpdate: null,
                 Type: privateKeyRow.Type, // type doesn't change with derivations
               },
             publicKey: {
-              Hash: accountKey.pubKeyHex,
+              Hash: pubDeriverKey.pubKeyHex,
               IsEncrypted: false,
               PasswordLastUpdate: null,
               Type: privateKeyRow.Type, // type doesn't change with derivations
