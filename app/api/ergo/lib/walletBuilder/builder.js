@@ -182,10 +182,24 @@ export async function createStandardBip44Wallet(request: {|
                 name: request.accountName,
               },
               path: [
-                WalletTypePurpose.BIP44,
-                CoinTypes.ERGO,
-                request.accountIndex,
-                ChainDerivations.EXTERNAL
+                {
+                  index: WalletTypePurpose.BIP44,
+                  insert: {},
+                },
+                {
+                  index: CoinTypes.ERGO,
+                  insert: {},
+                },
+                {
+                  index: request.accountIndex,
+                  insert: {},
+                },
+                {
+                  index: ChainDerivations.EXTERNAL,
+                  insert: {
+                    DisplayCutoff: 0,
+                  },
+                },
               ],
               initialDerivations,
             },

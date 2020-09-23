@@ -76,6 +76,6 @@ test('Restore Ergo wallet', async () => {
   if (asGetPublicKeyInstance != null) {
     const pubKey = await asGetPublicKeyInstance.getPublicKey();
     const plate = legacyWalletChecksum(pubKey.Hash);
-    expect(plate.TextPart).toEqual('TNSS-9933');
+    expect(plate.TextPart).toEqual('NTOA-0222');
   }
 });

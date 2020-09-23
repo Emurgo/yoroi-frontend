@@ -78,21 +78,23 @@ export async function derivePublicDeriver<Row>(
         const pubDeriverKey = normalizeToPubDeriverLevel({
           privateKeyRow,
           password: body.decryptPrivateDeriverPassword,
-          path: body.path,
+          path: body.path.map(entry => entry.index),
         });
         return [
-          ...body.path.slice(0, body.path.length - 1).map(index => ({
-            index,
+          ...body.path.slice(0, body.path.length - 1).map(pathEntry => ({
+            index: pathEntry.index,
             insert: insertRequest => Promise.resolve({
               KeyDerivationId: insertRequest.keyDerivationId,
+              ...pathEntry.insert,
             }),
             privateKey: null,
             publicKey: null,
           })),
           {
-            index: body.path[body.path.length - 1],
+            index: body.path[body.path.length - 1].index,
             insert: insertRequest => Promise.resolve({
               KeyDerivationId: insertRequest.keyDerivationId,
+              ...body.path[body.path.length - 1].insert,
             }),
             privateKey: body.encryptPublicDeriverPassword === undefined
               ? null
