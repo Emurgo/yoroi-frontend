@@ -284,6 +284,24 @@ export function generatePlates(
     return false;
   })();
 
+  if (shouldShowShelleyPlate) {
+    const shelleyPlate = generateShelleyPlate(
+      getCardanoKey(),
+      accountIndex - HARD_DERIVATION_START,
+      addressCount,
+      (() => {
+        if (network.BaseConfig[0].ChainNetworkId != null) {
+          return Number.parseInt(network.BaseConfig[0].ChainNetworkId, 10);
+        }
+        throw new Error(`${nameof(generatePlates)} missing chain network id`);
+      })()
+    );
+    plates.push({
+      ...shelleyPlate,
+      checksumTitle: messages.walletRestoreVerifyShelleyAccountIdLabel,
+      addressMessage: messages.walletRestoreVerifyShelleyAddressesLabel,
+    });
+  }
   if (shouldShowByronPlate) {
     const byronPlate = generateByronPlate(
       getCardanoKey(),
@@ -304,24 +322,6 @@ export function generatePlates(
       addressMessage: shouldShowJormungandrPlate == null
         ? messages.walletRestoreVerifyAddressesLabel
         : messages.walletRestoreVerifyByronAddressesLabel,
-    });
-  }
-  if (shouldShowShelleyPlate) {
-    const shelleyPlate = generateShelleyPlate(
-      getCardanoKey(),
-      accountIndex - HARD_DERIVATION_START,
-      addressCount,
-      (() => {
-        if (network.BaseConfig[0].ChainNetworkId != null) {
-          return Number.parseInt(network.BaseConfig[0].ChainNetworkId, 10);
-        }
-        throw new Error(`${nameof(generatePlates)} missing chain network id`);
-      })()
-    );
-    plates.push({
-      ...shelleyPlate,
-      checksumTitle: messages.walletRestoreVerifyShelleyAccountIdLabel,
-      addressMessage: messages.walletRestoreVerifyShelleyAddressesLabel,
     });
   }
   if (shouldShowJormungandrPlate) {
