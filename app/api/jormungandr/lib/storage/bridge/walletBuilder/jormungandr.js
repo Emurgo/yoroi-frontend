@@ -253,7 +253,20 @@ export async function createStandardCip1852Wallet(request: {|
               publicDeriverMeta: {
                 name: request.accountName,
               },
-              path: [WalletTypePurpose.CIP1852, CoinTypes.CARDANO, request.accountIndex],
+              path: [
+                {
+                  index: WalletTypePurpose.CIP1852,
+                  insert: {},
+                },
+                {
+                  index: CoinTypes.CARDANO,
+                  insert: {},
+                },
+                {
+                  index: request.accountIndex,
+                  insert: {},
+                },
+              ],
               initialDerivations,
             },
             privateDeriverKeyDerivationId: id,

@@ -43,6 +43,7 @@ import {
   GetPathWithSpecific,
   GetDerivationsByPath,
   GetCertificates,
+  GetKeyDerivation,
 } from '../database/primitives/api/read';
 import {
   getAllSchemaTables,
@@ -394,6 +395,7 @@ export async function updateCutoffFromInsert(
     GetDerivationSpecific: Class<GetDerivationSpecific>,
     GetDerivationsByPath: Class<GetDerivationsByPath>,
     ModifyDisplayCutoff: Class<ModifyDisplayCutoff>,
+    GetKeyDerivation: Class<GetKeyDerivation>,
   |},
   request: {|
     publicDeriverLevel: number,
@@ -403,15 +405,21 @@ export async function updateCutoffFromInsert(
   derivationTables: Map<number, string>,
 ): Promise<void> {
   if (request.displayCutoffInstance != null) {
-    if (request.publicDeriverLevel !== Bip44DerivationLevels.ACCOUNT.level) {
+    const newEntries = (() => {
+      if (request.publicDeriverLevel === Bip44DerivationLevels.ACCOUNT.level) {
+        const external = request.tree.find(node => node.index === ChainDerivations.EXTERNAL);
+        if (external == null || external.children == null) {
+          throw new Error(`${nameof(updateCutoffFromInsert)} should never happen`);
+        }
+        return external.children;
+      }
+      if (request.publicDeriverLevel === Bip44DerivationLevels.CHAIN.level) {
+        return request.tree;
+      }
       throw new Error(`${nameof(updateCutoffFromInsert)} incorrect pubderiver level`);
-    }
-    const external = request.tree.find(node => node.index === ChainDerivations.EXTERNAL);
-    if (external == null || external.children == null) {
-      throw new Error(`${nameof(updateCutoffFromInsert)} should never happen`);
-    }
+    })();
     let bestNewCutoff = 0;
-    for (const child of external.children) {
+    for (const child of newEntries) {
       if (child.index > bestNewCutoff) {
         bestNewCutoff = child.index;
       }
@@ -432,6 +440,7 @@ export async function updateCutoffFromInsert(
         {
           ModifyDisplayCutoff: deps.ModifyDisplayCutoff,
           GetDerivationsByPath: deps.GetDerivationsByPath,
+          GetKeyDerivation: deps.GetKeyDerivation,
         },
         { newIndex: bestNewCutoff - BIP44_SCAN_SIZE },
       );

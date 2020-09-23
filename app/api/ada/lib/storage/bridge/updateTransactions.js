@@ -37,6 +37,7 @@ import {
   GetTransaction,
   GetTxAndBlock,
   GetCertificates,
+  GetKeyDerivation,
 } from '../database/primitives/api/read';
 import {
   ModifyAddress,
@@ -784,6 +785,7 @@ export async function updateTransactions(
       AssociateTxWithUtxoIOs,
       AssociateTxWithAccountingIOs,
       GetCertificates,
+      GetKeyDerivation,
     });
     const updateTables = Object
       .keys(updateDepTables)
@@ -1057,6 +1059,7 @@ async function rawUpdateTransactions(
     AssociateTxWithUtxoIOs: Class<AssociateTxWithUtxoIOs>,
     AssociateTxWithAccountingIOs: Class<AssociateTxWithAccountingIOs>,
     GetCertificates: Class<GetCertificates>,
+    GetKeyDerivation: Class<GetKeyDerivation>,
   |},
   publicDeriver: IPublicDeriver<>,
   lastSyncInfo: $ReadOnly<LastSyncInfoRow>,
@@ -1103,6 +1106,7 @@ async function rawUpdateTransactions(
           ModifyDisplayCutoff: deps.ModifyDisplayCutoff,
           GetDerivationsByPath: deps.GetDerivationsByPath,
           GetDerivationSpecific: deps.GetDerivationSpecific,
+          GetKeyDerivation: deps.GetKeyDerivation,
         },
         // TODO: race condition because we don't pass in best block here
         { checkAddressesInUse },

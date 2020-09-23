@@ -112,6 +112,7 @@ export class ModifyDisplayCutoff {
     tx: lf$Transaction,
     request: {|
       pubDeriverKeyDerivationId: number,
+      derivationLevel: number,
       pathToLevel: Array<number>,
     |},
     derivationTables: Map<number, string>,
@@ -119,33 +120,55 @@ export class ModifyDisplayCutoff {
     index: number,
     row: $ReadOnly<CanonicalAddressRow>,
   |}> {
-    const path = await ModifyDisplayCutoff.depTables.GetPathWithSpecific.getPath<Bip44ChainRow>(
-      db, tx,
-      {
-        ...request,
-        level: Bip44DerivationLevels.CHAIN.level,
-      },
-      async (derivationId) => {
+    const { derivationLevel, ...rest } = request;
+
+    const oldChain = await (async () => {
+      if (derivationLevel === Bip44DerivationLevels.CHAIN.level) {
         const result = await ModifyDisplayCutoff.depTables.GetDerivationSpecific.get<
           Bip44ChainRow
         >(
           db, tx,
-          [derivationId],
+          [request.pubDeriverKeyDerivationId],
           Bip44DerivationLevels.CHAIN.level,
           derivationTables,
         );
         const chainDerivation = result[0];
         if (chainDerivation === undefined) {
           // we know this level exists since we fetched it in GetChildIfExists
-          throw new Error('ModifyDisplayCutoff::get missing chain. Should never happen');
+          throw new Error(`${nameof(ModifyDisplayCutoff)}::${nameof(ModifyDisplayCutoff.pop)} missing chain. Should never happen`);
         }
         return chainDerivation;
-      },
-    );
-    const oldChain = path.levelSpecific;
+      }
+      if (derivationLevel === Bip44DerivationLevels.ACCOUNT.level) {
+        return (await ModifyDisplayCutoff.depTables.GetPathWithSpecific.getPath<Bip44ChainRow>(
+          db, tx,
+          {
+            ...rest,
+            level: Bip44DerivationLevels.CHAIN.level,
+          },
+          async (derivationId) => {
+            const result = await ModifyDisplayCutoff.depTables.GetDerivationSpecific.get<
+              Bip44ChainRow
+            >(
+              db, tx,
+              [derivationId],
+              Bip44DerivationLevels.CHAIN.level,
+              derivationTables,
+            );
+            const chainDerivation = result[0];
+            if (chainDerivation === undefined) {
+              // we know this level exists since we fetched it in GetChildIfExists
+              throw new Error(`${nameof(ModifyDisplayCutoff)}::${nameof(ModifyDisplayCutoff.pop)} missing chain. Should never happen`);
+            }
+            return chainDerivation;
+          },
+        )).levelSpecific;
+      }
+      throw new Error(`${nameof(ModifyDisplayCutoff)}::${nameof(ModifyDisplayCutoff.pop)} incorrect pubderiver level`);
+    })();
 
     if (oldChain.DisplayCutoff === null) {
-      throw new Error('DisplayCutoffRequest::pop should DisplayCutoff==null');
+      throw new Error(`${nameof(ModifyDisplayCutoff)}::${nameof(ModifyDisplayCutoff.pop)} should DisplayCutoff==null`);
     }
 
     const newIndex = oldChain.DisplayCutoff + 1;
@@ -168,7 +191,7 @@ export class ModifyDisplayCutoff {
         const addressDerivation = result[0];
         if (addressDerivation === undefined) {
           // we know this level exists since we fetched it in GetChildIfExists
-          throw new Error('ModifyDisplayCutoff::get missing address. Should never happen');
+          throw new Error(`${nameof(ModifyDisplayCutoff)}::${nameof(ModifyDisplayCutoff.pop)} missing address. Should never happen`);
         }
         return addressDerivation;
       },

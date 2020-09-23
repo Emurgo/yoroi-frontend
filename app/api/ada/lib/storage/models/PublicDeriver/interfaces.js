@@ -19,6 +19,7 @@ import type { UtxoTxOutput } from '../../database/transactionModels/utxo/api/rea
 import type {
   AddressRow,
   KeyRow,
+  CanonicalAddressInsert,
   CanonicalAddressRow,
   KeyDerivationRow,
 } from '../../database/primitives/tables';
@@ -234,7 +235,8 @@ export interface IDisplayCutoff {
     IDisplayCutoffSetFunc,
     {|
       ModifyDisplayCutoff: Class<ModifyDisplayCutoff>,
-      GetDerivationsByPath: Class<GetDerivationsByPath>
+      GetDerivationsByPath: Class<GetDerivationsByPath>,
+      GetKeyDerivation: Class<GetKeyDerivation>,
     |},
     IDisplayCutoffSetRequest
   >;
@@ -386,6 +388,7 @@ export interface IScanAddresses {
       ModifyDisplayCutoff: Class<ModifyDisplayCutoff>,
       GetDerivationsByPath: Class<GetDerivationsByPath>,
       GetDerivationSpecific: Class<GetDerivationSpecific>,
+      GetKeyDerivation: Class<GetKeyDerivation>,
     |},
     IScanAddressesRequest
   >;
@@ -414,7 +417,7 @@ export type IScanAccountFunc = (
   body: IScanAccountRequest
 ) => Promise<IScanAccountResponse>;
 
-export interface IScanUtxo {
+export interface IScanAccountUtxo {
   +rawScanAccount: RawTableVariation<
     IScanAccountFunc,
     {|
@@ -423,6 +426,28 @@ export interface IScanUtxo {
       GetDerivationSpecific: Class<GetDerivationSpecific>,
     |},
     IScanAccountRequest
+  >;
+}
+
+export type IScanChainRequest = {|
+  chainPublicKey: string,
+  lastUsedIndex: number,
+  addresses: Array<number>,
+  checkAddressesInUse: FilterFunc,
+|};
+export type IScanChainResponse = TreeInsert<CanonicalAddressInsert>;
+export type IScanChainFunc = (
+  body: IScanChainRequest
+) => Promise<IScanChainResponse>;
+export interface IScanChainUtxo {
+  +rawScanChain: RawTableVariation<
+    IScanChainFunc,
+    {|
+      GetPathWithSpecific: Class<GetPathWithSpecific>,
+      GetAddress: Class<GetAddress>,
+      GetDerivationSpecific: Class<GetDerivationSpecific>,
+    |},
+    IScanChainRequest
   >;
 }
 
@@ -486,6 +511,7 @@ export interface IAddBip44FromPublic {
       GetDerivationsByPath: Class<GetDerivationsByPath>,
       GetPathWithSpecific: Class<GetPathWithSpecific>,
       GetDerivationSpecific: Class<GetDerivationSpecific>,
+      GetKeyDerivation: Class<GetKeyDerivation>,
     |},
     IAddBip44FromPublicRequest
   >;

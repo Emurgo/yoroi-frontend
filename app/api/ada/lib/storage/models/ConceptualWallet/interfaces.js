@@ -81,7 +81,10 @@ export type IDerivePublicFromPrivateRequest = {|
    */
   encryptPublicDeriverPassword?: null | string,
   initialDerivations: TreeInsert<any>,
-  path: Array<number>,
+  path: Array<{|
+    index: number,
+    insert: any,
+  |}>,
 |};
 export type IDerivePublicFromPrivateResponse<Row> = AddPublicDeriverResponse<Row>;
 export type IDerivePublicFromPrivateFunc<Row> = (

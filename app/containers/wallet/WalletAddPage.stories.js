@@ -1494,7 +1494,7 @@ const constructedPaperWallet = {
     'Ae2tdPwUPEZAPUqpvUgoBB7QjrfAbu1RXbFRoLcdYYV8r4FaSJrq4oowAhv',
   ],
   scrambledWords: getValidationMnemonicCases(21).Correct.split(' '),
-  accountPlate: {
+  plate: {
     ImagePart: '7b9bf637f341bed7933c8673f9fb7e405097746115f24ec7d192f80fb6efb219da8bc1902dab99fc070f156b7877f29dd8e581da616ff7fdad28493d084a0db9',
     TextPart: 'XLBS-6706',
   },

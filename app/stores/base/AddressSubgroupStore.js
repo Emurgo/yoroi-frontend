@@ -259,6 +259,20 @@ export class GroupMangledAddressesSubgroup extends AddressTypeStore implements I
     return this;
   }
 }
+export class P2PKAllAddressesSubgroup extends AddressTypeStore implements IAddressTypeStore {
+  constructor(data: SubgroupCtorData): IAddressTypeStore {
+    super({
+      stores: data.stores,
+      actions: data.actions,
+      request: (request) => data.stores.addresses._wrapForAllAddresses({
+        ...request,
+        storeName: data.name,
+        type: CoreAddressTypes.ERGO_P2PK,
+      }),
+    });
+    return this;
+  }
+}
 export class P2PKExternalAddressesSubgroup extends AddressTypeStore implements IAddressTypeStore {
   constructor(data: SubgroupCtorData): IAddressTypeStore {
     super({

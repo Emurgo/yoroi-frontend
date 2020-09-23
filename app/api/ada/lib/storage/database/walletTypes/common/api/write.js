@@ -53,7 +53,7 @@ export class AddDerivationTree {
     for (let i = 0; i < tree.children.length; i++) {
       const tableName = derivationTables.get(level + 1);
       if (tableName == null) {
-        throw new Error('AddDerivationTree::excludingParent Unknown table queried');
+        throw new Error(`${nameof(AddDerivationTree)}::${nameof(AddDerivationTree.excludingParent)} Unknown table queried`);
       }
       const child = await AddDerivationTree.depTables.GetOrAddDerivation.getOrAdd(
         db, tx,
@@ -107,7 +107,7 @@ export class AddDerivationTree {
   ): Promise<TreeResultStart<Row>> {
     const tableName = derivationTables.get(startingLevel);
     if (tableName == null) {
-      throw new Error('AddDerivationTree::includingParent Unknown table queried');
+      throw new Error(`${nameof(AddDerivationTree)}::${nameof(AddDerivationTree.includingParent)} Unknown table queried`);
     }
     const root = await AddDerivationTree.depTables.AddDerivation.add(
       db, tx,
@@ -143,7 +143,7 @@ export class AddDerivationTree {
     for (let i = 0; i < request.path.length; i++) {
       const tableName = derivationTables.get(request.pathStartLevel + i);
       if (tableName == null) {
-        throw new Error('AddDerivationTree::fromSinglePath Unknown table queried');
+        throw new Error(`${nameof(AddDerivationTree)}::${nameof(AddDerivationTree.fromSinglePath)} Unknown table queried`);
       }
       const levelResult = await AddDerivationTree.depTables.GetOrAddDerivation.getOrAdd(
         db, tx,
@@ -221,7 +221,7 @@ export class DerivePublicDeriverFromKey {
       true,
     );
     if (derivationAndKey.privateKey == null) {
-      throw new StaleStateError('DerivePublicDeriverFromKey::add privateKey');
+      throw new StaleStateError(`${nameof(DerivePublicDeriverFromKey)}::${nameof(DerivePublicDeriverFromKey.add)} privateKey`);
     }
     const derivedPath = body.pathToPublic(
       derivationAndKey.privateKey,
@@ -229,7 +229,7 @@ export class DerivePublicDeriverFromKey {
 
     // TODO: refactor to use fromSinglePathWithKey ?
     if (derivedPath.length === 0) {
-      throw new Error('DerivePublicDeriverFromKey::add derivedPath');
+      throw new Error(`${nameof(DerivePublicDeriverFromKey)}::${nameof(DerivePublicDeriverFromKey.add)} derivedPath`);
     }
     const pathResult = await DerivePublicDeriverFromKey.depTables.AddDerivationTree.fromSinglePath(
       db, tx,
@@ -252,7 +252,7 @@ export class DerivePublicDeriverFromKey {
         privateDeriverLevel + derivedPath.length
       );
       if (tableName == null) {
-        throw new Error('AddDerivation::add Unknown table queried');
+        throw new Error(`${nameof(DerivePublicDeriverFromKey)}::${nameof(DerivePublicDeriverFromKey.add)} Unknown table queried`);
       }
       pubDeriver = await DerivePublicDeriverFromKey.depTables.AddPublicDeriver.add(
         db, tx,
@@ -356,7 +356,7 @@ export class AddAdhocPublicDeriver {
       request.pathStartLevel + request.pathToPublic.length - 1
     );
     if (tableName == null) {
-      throw new Error('AddDerivation::add Unknown table queried');
+      throw new Error(`${nameof(AddAdhocPublicDeriver)}::${nameof(DerivePublicDeriverFromKey.add)} Unknown table queried`);
     }
 
     const existingWallets = await AddAdhocPublicDeriver.depTables.GetPublicDeriver.forWallet(

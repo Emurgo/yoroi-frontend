@@ -218,7 +218,20 @@ export async function createStandardBip44Wallet(request: {|
               publicDeriverMeta: {
                 name: request.accountName,
               },
-              path: [WalletTypePurpose.BIP44, CoinTypes.CARDANO, request.accountIndex],
+              path: [
+                {
+                  index: WalletTypePurpose.BIP44,
+                  insert: {},
+                },
+                {
+                  index: CoinTypes.CARDANO,
+                  insert: {},
+                },
+                {
+                  index: request.accountIndex,
+                  insert: {},
+                },
+              ],
               initialDerivations,
             },
             privateDeriverKeyDerivationId: id,

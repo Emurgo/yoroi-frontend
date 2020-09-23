@@ -32,7 +32,7 @@ export const generateJormungandrPlate = (
     .derive(STAKING_KEY_INDEX)
     .to_raw_key();
 
-  const accountPlate = legacyWalletChecksum(
+  const plate = legacyWalletChecksum(
     Buffer.from(accountPublic.as_bytes()).toString('hex')
   );
   const generateAddressFunc = genGroupAddressBatchFunc(
@@ -41,7 +41,7 @@ export const generateJormungandrPlate = (
     discrimination,
   );
   const addresses = generateAddressFunc([...Array(count).keys()]);
-  return { addresses, accountPlate };
+  return { addresses, plate };
 };
 
 export function genGroupAddressBatchFunc(

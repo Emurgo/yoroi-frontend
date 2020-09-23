@@ -35,7 +35,7 @@ import type { AddByHashFunc } from '../../../common/lib/storage/bridge/hashMappe
 import { rawGenAddByHash } from '../../../common/lib/storage/bridge/hashMapper';
 import { addErgoP2PK } from '../restoration/scan';
 import { KeyKind } from '../../../common/lib/crypto/keys/types';
-import { derivePath, BIP32PublicKey, BIP32PrivateKey } from '../../../common/lib/crypto/keys/keyRepository';
+import { derivePath, deriveKey, BIP32PublicKey, BIP32PrivateKey } from '../../../common/lib/crypto/keys/keyRepository';
 
 // TODO: maybe move this inside walletBuilder somehow so it's all done in the same transaction
 /**
@@ -43,7 +43,7 @@ import { derivePath, BIP32PublicKey, BIP32PrivateKey } from '../../../common/lib
  * This is because scanning depends on having an internet connection
  * But we need to ensure the address maintains the BIP44 gap regardless of internet connection
  */
-export async function getAccountDefaultDerivations(
+export async function getChainDefaultDerivations(
   bip32Account: BIP32PublicKey,
   addByHash: AddByHashFunc,
 ): Promise<TreeInsert<Bip44ChainInsert>> {
@@ -54,27 +54,7 @@ export async function getAccountDefaultDerivations(
 
   const externalAddrs = addressesIndex.map(i => (
     Address.fromPk(
-      derivePath(
-        bip32Account,
-        [
-          ChainDerivations.EXTERNAL,
-          i,
-        ]
-      )
-        .key
-        .publicKey
-        .toString('hex')
-    ).addrBytes.toString('hex')
-  ));
-  const internalAddrs = addressesIndex.map(i => (
-    Address.fromPk(
-      derivePath(
-        bip32Account,
-        [
-          ChainDerivations.INTERNAL,
-          i,
-        ]
-      )
+      deriveKey(bip32Account, i)
         .key
         .publicKey
         .toString('hex')
@@ -101,35 +81,8 @@ export async function getAccountDefaultDerivations(
       );
     },
   }));
-  const internalAddresses = addressesIndex.map(i => ({
-    index: i,
-    insert: async insertRequest => {
-      return await addErgoP2PK(
-        addByHash,
-        insertRequest,
-        internalAddrs[i]
-      );
-    },
-  }));
 
-  return [
-    {
-      index: 0,
-      insert: insertRequest => Promise.resolve({
-        KeyDerivationId: insertRequest.keyDerivationId,
-        DisplayCutoff: 0
-      }),
-      children: externalAddresses,
-    },
-    {
-      index: 1,
-      insert: insertRequest => Promise.resolve({
-        KeyDerivationId: insertRequest.keyDerivationId,
-        DisplayCutoff: null,
-      }),
-      children: internalAddresses,
-    }
-  ];
+  return externalAddresses;
 }
 
 export async function createStandardBip44Wallet(request: {|
@@ -150,17 +103,18 @@ export async function createStandardBip44Wallet(request: {|
     request.rootPk.toBuffer(),
   );
 
-  const accountKey = derivePath(
+  const chainKey = derivePath(
     request.rootPk,
     [
       WalletTypePurpose.BIP44,
       CoinTypes.ERGO,
       request.accountIndex,
+      ChainDerivations.EXTERNAL,
     ]
   ).toPublic();
 
-  const initialDerivations = await getAccountDefaultDerivations(
-    accountKey,
+  const initialDerivations = await getChainDefaultDerivations(
+    chainKey,
     rawGenAddByHash(new Set()),
   );
 
@@ -208,7 +162,7 @@ export async function createStandardBip44Wallet(request: {|
         finalState => ({
           ConceptualWalletId: finalState.conceptualWalletRow.ConceptualWalletId,
           SignerLevel: Bip44DerivationLevels.ROOT.level,
-          PublicDeriverLevel: Bip44DerivationLevels.ACCOUNT.level,
+          PublicDeriverLevel: Bip44DerivationLevels.CHAIN.level,
           PrivateDeriverKeyDerivationId: finalState.root.root.KeyDerivation.KeyDerivationId,
           PrivateDeriverLevel: pathToPrivate.length,
           RootKeyDerivationId: finalState.root.root.KeyDerivation.KeyDerivationId,
@@ -227,7 +181,26 @@ export async function createStandardBip44Wallet(request: {|
               publicDeriverMeta: {
                 name: request.accountName,
               },
-              path: [WalletTypePurpose.BIP44, CoinTypes.ERGO, request.accountIndex],
+              path: [
+                {
+                  index: WalletTypePurpose.BIP44,
+                  insert: {},
+                },
+                {
+                  index: CoinTypes.ERGO,
+                  insert: {},
+                },
+                {
+                  index: request.accountIndex,
+                  insert: {},
+                },
+                {
+                  index: ChainDerivations.EXTERNAL,
+                  insert: {
+                    DisplayCutoff: 0,
+                  },
+                },
+              ],
               initialDerivations,
             },
             privateDeriverKeyDerivationId: id,

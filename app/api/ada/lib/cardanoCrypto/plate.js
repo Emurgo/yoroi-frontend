@@ -26,7 +26,7 @@ export const generateByronPlate = (
   const accountPublic = accountKey.to_public();
   const chainKey = accountPublic.derive(ChainDerivations.EXTERNAL);
 
-  const accountPlate = legacyWalletChecksum(
+  const plate = legacyWalletChecksum(
     Buffer.from(accountPublic.as_bytes()).toString('hex')
   );
   const generateAddressFunc = v2genAddressBatchFunc(
@@ -39,7 +39,7 @@ export const generateByronPlate = (
     byronNetworkMagic
   );
   const addresses = generateAddressFunc([...Array(count).keys()]);
-  return { addresses, accountPlate };
+  return { addresses, plate };
 };
 
 export const generateShelleyPlate = (
@@ -60,7 +60,7 @@ export const generateShelleyPlate = (
     .derive(STAKING_KEY_INDEX)
     .to_raw_key();
 
-  const accountPlate = walletChecksum(
+  const plate = walletChecksum(
     Buffer.from(accountPublic.as_bytes()).toString('hex')
   );
   const generateAddressFunc = genBaseAddressBatchFunc(
@@ -69,7 +69,7 @@ export const generateShelleyPlate = (
     chainNetworkId,
   );
   const addresses = generateAddressFunc([...Array(count).keys()]);
-  return { addresses, accountPlate };
+  return { addresses, plate };
 };
 
 export function genBaseAddressBatchFunc(

@@ -75,40 +75,42 @@ export async function derivePublicDeriver<Row>(
     {
       publicDeriverMeta: body.publicDeriverMeta,
       pathToPublic: privateKeyRow => {
-        const accountKey = normalizeToPubDeriverLevel({
+        const pubDeriverKey = normalizeToPubDeriverLevel({
           privateKeyRow,
           password: body.decryptPrivateDeriverPassword,
-          path: body.path,
+          path: body.path.map(entry => entry.index),
         });
         return [
-          ...body.path.slice(0, body.path.length - 1).map(index => ({
-            index,
+          ...body.path.slice(0, body.path.length - 1).map(pathEntry => ({
+            index: pathEntry.index,
             insert: insertRequest => Promise.resolve({
               KeyDerivationId: insertRequest.keyDerivationId,
+              ...pathEntry.insert,
             }),
             privateKey: null,
             publicKey: null,
           })),
           {
-            index: body.path[body.path.length - 1],
+            index: body.path[body.path.length - 1].index,
             insert: insertRequest => Promise.resolve({
               KeyDerivationId: insertRequest.keyDerivationId,
+              ...body.path[body.path.length - 1].insert,
             }),
             privateKey: body.encryptPublicDeriverPassword === undefined
               ? null
               : {
                 Hash: body.encryptPublicDeriverPassword === null
-                  ? accountKey.prvKeyHex
+                  ? pubDeriverKey.prvKeyHex
                   : encryptWithPassword(
                     body.encryptPublicDeriverPassword,
-                    Buffer.from(accountKey.prvKeyHex, 'hex')
+                    Buffer.from(pubDeriverKey.prvKeyHex, 'hex')
                   ),
                 IsEncrypted: true,
                 PasswordLastUpdate: null,
                 Type: privateKeyRow.Type, // type doesn't change with derivations
               },
             publicKey: {
-              Hash: accountKey.pubKeyHex,
+              Hash: pubDeriverKey.pubKeyHex,
               IsEncrypted: false,
               PasswordLastUpdate: null,
               Type: privateKeyRow.Type, // type doesn't change with derivations

@@ -110,7 +110,20 @@ test('Can add and fetch address in wallet', async (done) => {
           publicDeriverMeta: {
             name: 'Checking account',
           },
-          path: [WalletTypePurpose.BIP44, CoinTypes.CARDANO, accountIndex],
+          path: [
+            {
+              index: WalletTypePurpose.BIP44,
+              insert: {},
+            },
+            {
+              index: CoinTypes.CARDANO,
+              insert: {},
+            },
+            {
+              index: accountIndex,
+              insert: {},
+            },
+          ],
           decryptPrivateDeriverPassword: privateDeriverPassword,
           initialDerivations: [
             {
