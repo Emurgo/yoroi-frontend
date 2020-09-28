@@ -75,28 +75,17 @@ declare module '@coinbarn/ergo-ts' {
       value: number,
       creationHeight: number,
       address: Address,
-      assets?: any[],
+      assets?: Array<{
+        tokenId: string,
+        amount: number,
+        ...,
+      }>,
       additionalRegisters?: { ... }
     ): this;
     toInput(): Input;
   }
   declare export interface IIdObject {
     id?: ?string;
-  }
-  declare export class Input {
-    static formObject(obj: any): Input;
-    outputTransactionId?: string;
-    value?: number;
-    address?: string;
-    boxId: string;
-    spendingProof: SpendingProof;
-    constructor(
-      boxId: string,
-      spendingProof?: SpendingProof,
-      address?: string,
-      value?: number,
-      outputTransactionId?: string
-    ): this;
   }
   declare export class Transaction implements IIdObject {
     /**
@@ -190,14 +179,14 @@ declare module '@coinbarn/ergo-ts' {
     ): Promise<$PropertyType<$Exports<"axios">, "AxiosResponse">>;
   }
   declare export class Serializer {
-    static outputToBytes(out: ErgoBox, tokenIds: any): string;
-    static inputToBytes(input: Input): any;
-    static transactionToBytes(tx: Transaction): string;
+    static outputToBytes(out: ErgoBox, tokenIds: any): Buffer;
+    static inputToBytes(input: Input): Buffer;
+    static transactionToBytes(tx: Transaction): Buffer;
     static intToVlq(num: number): string;
-    static stringToHex(str: string): any;
-    static stringFromHex(str: string): any;
+    static stringToHex(str: string): string;
+    static stringFromHex(str: string): string;
     static distinctTokenList(outputs: ErgoBox[]): string[];
-    static valueSerialize(v: string): any;
+    static valueSerialize(v: string): Buffer;
   }
   declare export var feeErgoTree: string; // "1005040004000e36100204a00b08cd0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798ea02d192a39a8cc7a701730073011001020402d19683030193a38cc7b2a57300000193c2b2a57301007473027303830108cdeeac93b1a57304"
   declare export var feeMainnetAddress: Address;
@@ -207,6 +196,6 @@ declare module '@coinbarn/ergo-ts' {
   declare export var unitsInOneErgo: number; // 1000000000
   declare export var heightDelta: number; // 720
 
-  declare export var sign: (msgBytes: any, sk: any) => any;
-  declare export var verify: (msgBytes: any, sigBytes: any, pkBytes: any) => any;
+  declare export var sign: (msgBytes: Buffer, sk: any) => Buffer;
+  declare export var verify: (msgBytes: Buffer, sigBytes: Buffer, pkBytes: Buffer) => boolean;
 }

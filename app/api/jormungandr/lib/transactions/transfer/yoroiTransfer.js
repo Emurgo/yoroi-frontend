@@ -15,7 +15,7 @@ import {
   sendAllUnsignedTx,
   signTransaction,
 } from '../utxoTransactions';
-import type { AddressedUtxo } from '../../../../ada/transactions/types';
+import type { CardanoAddressedUtxo } from '../../../../ada/transactions/types';
 import type {
   TransferTx
 } from '../../../../../types/TransferTypes';
@@ -35,7 +35,7 @@ import type { NetworkRow, JormungandrFeeConfig } from '../../../../ada/lib/stora
  * Generate transaction including all addresses with no change.
 */
 export async function buildYoroiTransferTx(payload: {|
-  senderUtxos: Array<AddressedUtxo>,
+  senderUtxos: Array<CardanoAddressedUtxo>,
   outputAddr: string,
   keyLevel: number,
   signingKey: RustModule.WalletV3.Bip32PrivateKey,

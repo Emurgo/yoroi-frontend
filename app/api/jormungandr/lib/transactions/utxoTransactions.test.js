@@ -2,7 +2,7 @@
 import '../../../ada/lib/test-config';
 import { schema } from 'lovefield';
 import type {
-  AddressedUtxo,
+  CardanoAddressedUtxo,
 } from '../../../ada/transactions/types';
 import type {
   RemoteUnspentOutput,
@@ -123,7 +123,7 @@ const addresssingMap = new Map<string, Addressing>();
 for (const address of sampleAdaAddresses) {
   addresssingMap.set(address.address, { addressing: address.addressing });
 }
-const addressedUtxos: Array<AddressedUtxo> = sampleUtxos.map(utxo => {
+const addressedUtxos: Array<CardanoAddressedUtxo> = sampleUtxos.map(utxo => {
   const addressing = addresssingMap.get(utxo.receiver);
   if (addressing == null) throw new Error('Should never happen');
   return {
@@ -223,7 +223,7 @@ describe('Create unsigned TX from UTXO', () => {
 });
 
 describe('Create unsigned TX from addressed UTXOs', () => {
-  it('Should create a valid transaction withhout selection', () => {
+  it('Should create a valid transaction without selection', () => {
     const unsignedTxResponse = newAdaUnsignedTx(
       [{
         address: keys[0].bechAddress,

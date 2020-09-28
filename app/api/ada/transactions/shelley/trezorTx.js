@@ -1,6 +1,6 @@
 // // @flow
 import type {
-  AddressedUtxo,
+  CardanoAddressedUtxo,
 } from '../types';
 import { verifyFromBip44Root }  from '../utils';
 import { toDerivationPathString } from '../../../common/lib/crypto/keys/path';
@@ -38,17 +38,17 @@ export async function createTrezorSignTxPayload(
   byronNetworkMagic: number,
   networkId: number,
 ): Promise<$Exact<CardanoSignTransaction>> {
-  const txBody = signRequest.self().unsignedTx.build();
+  const txBody = signRequest.signRequest.unsignedTx.build();
 
   // Inputs
   const trezorInputs = _transformToTrezorInputs(
-    signRequest.self().senderUtxos
+    signRequest.signRequest.senderUtxos
   );
 
   // Output
   const trezorOutputs = _generateTrezorOutputs(
     txBody.outputs(),
-    signRequest.self().changeAddr
+    signRequest.signRequest.changeAddr
   );
 
   let request = {
@@ -70,7 +70,7 @@ export async function createTrezorSignTxPayload(
 
     // assume the withdrawal is the same path as the UTXOs being spent
     // so just take the first UTXO arbitrarily and change it to the staking key path
-    const firstUtxo = signRequest.self().senderUtxos[0];
+    const firstUtxo = signRequest.signRequest.senderUtxos[0];
     if (firstUtxo.addressing.startLevel !== Bip44DerivationLevels.PURPOSE.level) {
       throw new Error(`${nameof(createTrezorSignTxPayload)} unexpected addressing start level`);
     }
@@ -167,7 +167,7 @@ function formatTrezorCertificates(
 }
 
 function _transformToTrezorInputs(
-  inputs: Array<AddressedUtxo>
+  inputs: Array<CardanoAddressedUtxo>
 ): Array<CardanoInput> {
   for (const input of inputs) {
     verifyFromBip44Root(input.addressing);

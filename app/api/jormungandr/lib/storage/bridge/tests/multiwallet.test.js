@@ -220,7 +220,10 @@ async function checkPub1HasTx(
           IsUnspent: true,
           OutputIndex: 0,
           TransactionId: 1,
-          UtxoTransactionOutputId: 1
+          UtxoTransactionOutputId: 1,
+          ErgoBoxId: null,
+          ErgoCreationHeight: null,
+          ErgoTree: null,
         }
       }
     }]);
@@ -330,7 +333,10 @@ async function checkPub2HasTx(
           IsUnspent: true,
           OutputIndex: 1,
           TransactionId: 2,
-          UtxoTransactionOutputId: 4
+          UtxoTransactionOutputId: 4,
+          ErgoBoxId: null,
+          ErgoCreationHeight: null,
+          ErgoTree: null,
         }
       }
     }]);

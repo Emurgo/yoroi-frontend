@@ -213,7 +213,7 @@ export default class LedgerSendStore extends Store {
       // Disposing here will fix the UI issue.
       ledgerConnect.dispose();
 
-      const txBody = request.signRequest.self().unsignedTx.build();
+      const txBody = request.signRequest.self().build();
       const txId = Buffer.from(RustModule.WalletV4.hash_transaction(txBody).to_bytes()).toString('hex');
       const signedTx = buildSignedTransaction(
         txBody,

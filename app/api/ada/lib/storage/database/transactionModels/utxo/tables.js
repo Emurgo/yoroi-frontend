@@ -40,12 +40,18 @@ export const UtxoTransactionInputSchema: {|
   }
 };
 
+type ErgoFields = {|
+  ErgoBoxId: string,
+  ErgoCreationHeight: number,
+  ErgoTree: string,
+|};
 export type UtxoTransactionOutputInsert = {|
   TransactionId: number,
   AddressId: number,
   OutputIndex: number,
   Amount: string,
   IsUnspent: boolean,
+  ...WithNullableFields<ErgoFields>,
 |};
 export type UtxoTransactionOutputRow = {|
   UtxoTransactionOutputId: number,
@@ -68,6 +74,9 @@ export const UtxoTransactionOutputSchema: {|
     OutputIndex: 'OutputIndex',
     Amount: 'Amount',
     IsUnspent: 'IsUnspent',
+    ErgoBoxId: 'ErgoBoxId',
+    ErgoCreationHeight: 'ErgoCreationHeight',
+    ErgoTree: 'ErgoTree',
   }
 };
 
@@ -110,6 +119,9 @@ export const populateUtxoTransactionsDb = (schemaBuilder: lf$schema$Builder) => 
     .addColumn(UtxoTransactionOutputSchema.properties.OutputIndex, Type.INTEGER)
     .addColumn(UtxoTransactionOutputSchema.properties.Amount, Type.STRING)
     .addColumn(UtxoTransactionOutputSchema.properties.IsUnspent, Type.BOOLEAN)
+    .addColumn(UtxoTransactionOutputSchema.properties.ErgoBoxId, Type.STRING)
+    .addColumn(UtxoTransactionOutputSchema.properties.ErgoCreationHeight, Type.NUMBER)
+    .addColumn(UtxoTransactionOutputSchema.properties.ErgoTree, Type.STRING)
     .addPrimaryKey(
       ([UtxoTransactionOutputSchema.properties.UtxoTransactionOutputId]: Array<string>),
       true
@@ -122,5 +134,10 @@ export const populateUtxoTransactionsDb = (schemaBuilder: lf$schema$Builder) => 
     .addForeignKey('UtxoTransactionOutput_Address', {
       local: UtxoTransactionOutputSchema.properties.AddressId,
       ref: `${AddressSchema.name}.${AddressSchema.properties.AddressId}`,
-    });
+    })
+    .addNullable([
+      UtxoTransactionOutputSchema.properties.ErgoBoxId,
+      UtxoTransactionOutputSchema.properties.ErgoCreationHeight,
+      UtxoTransactionOutputSchema.properties.ErgoTree,
+    ]);
 };

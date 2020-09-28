@@ -1,6 +1,6 @@
 // @flow
 import type {
-  AddressedUtxo,
+  CardanoAddressedUtxo,
 } from '../types';
 import { verifyFromBip44Root }  from '../utils';
 import type {
@@ -37,18 +37,18 @@ export async function createLedgerSignTxPayload(request: {|
   networkId: number,
   addressingMap: string => (void | $PropertyType<Addressing, 'addressing'>),
 |}): Promise<SignTransactionRequest> {
-  const txBody = request.signRequest.self().unsignedTx.build();
+  const txBody = request.signRequest.signRequest.unsignedTx.build();
 
   // Inputs
   const ledgerInputs = _transformToLedgerInputs(
-    request.signRequest.self().senderUtxos
+    request.signRequest.signRequest.senderUtxos
   );
 
   // Output
   const ledgerOutputs = _transformToLedgerOutputs({
     networkId: request.networkId,
     txOutputs: txBody.outputs(),
-    changeAddrs: request.signRequest.self().changeAddr,
+    changeAddrs: request.signRequest.signRequest.changeAddr,
     addressingMap: request.addressingMap,
   });
 
@@ -88,7 +88,7 @@ export async function createLedgerSignTxPayload(request: {|
 }
 
 function _transformToLedgerInputs(
-  inputs: Array<AddressedUtxo>
+  inputs: Array<CardanoAddressedUtxo>
 ): Array<InputTypeUTxO> {
   for (const input of inputs) {
     verifyFromBip44Root(input.addressing);
@@ -336,7 +336,7 @@ export function toLedgerAddressParameters(request: {|
 
 export function buildSignedTransaction(
   txBody: RustModule.WalletV4.TransactionBody,
-  senderUtxos: Array<AddressedUtxo>,
+  senderUtxos: Array<CardanoAddressedUtxo>,
   witnesses: Array<Witness>,
   publicKey: {|
     ...Addressing,

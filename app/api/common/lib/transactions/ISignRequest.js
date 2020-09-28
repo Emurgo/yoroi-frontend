@@ -1,7 +1,6 @@
 // @flow
 
 import BigNumber from 'bignumber.js';
-import type { BaseSignRequest } from '../../../ada/transactions/types';
 
 export interface ISignRequest<T> {
   totalInput(shift: boolean): BigNumber;
@@ -11,5 +10,5 @@ export interface ISignRequest<T> {
   receivers(includeChange: boolean): Array<string>;
   isEqual(tx: ?mixed): boolean;
 
-  self(): BaseSignRequest<T>;
+  self(): T;
 }

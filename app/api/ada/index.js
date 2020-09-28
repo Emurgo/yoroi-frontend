@@ -123,7 +123,7 @@ import { v2genAddressBatchFunc, } from './restoration/byron/scan';
 import { scanShelleyCip1852Account } from './restoration/shelley/scan';
 import type {
   V4UnsignedTxAddressedUtxoResponse,
-  AddressedUtxo,
+  CardanoAddressedUtxo,
 } from './transactions/types';
 import { HaskellShelleyTxSignRequest, } from './transactions/shelley/HaskellShelleyTxSignRequest';
 import type { SignTransactionRequest } from '@emurgo/ledger-connect-handler';
@@ -344,7 +344,7 @@ export type CreateUnsignedTxForUtxosRequest = {|
   |} | {|
     shouldSendAll: true,
   |},
-  utxos: Array<AddressedUtxo>,
+  utxos: Array<CardanoAddressedUtxo>,
 |};
 export type CreateUnsignedTxForUtxosResponse = HaskellShelleyTxSignRequest;
 export type CreateUnsignedTxForUtxosFunc = (
@@ -772,7 +772,7 @@ export default class AdaApi {
         password,
       });
       const signedTx = shelleySignTransaction(
-        request.signRequest.self(),
+        request.signRequest.signRequest,
         request.publicDeriver.getParent().getPublicDeriverLevel(),
         RustModule.WalletV4.Bip32PrivateKey.from_bytes(
           Buffer.from(normalizedKey.prvKeyHex, 'hex')

@@ -1240,6 +1240,9 @@ function genErgoIOGen(
           * This is slightly misleading, but using null would require null-checks everywhere
           */
         IsUnspent: true,
+        ErgoBoxId: output.id,
+        ErgoCreationHeight: output.creationHeight,
+        ErgoTree: output.ergoTree,
       });
     }
 

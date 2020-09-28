@@ -180,8 +180,8 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
     );
   }
 
-  self(): BaseSignRequest<RustModule.WalletV4.TransactionBuilder> {
-    return this.signRequest;
+  self(): RustModule.WalletV4.TransactionBuilder {
+    return this.signRequest.unsignedTx;
   }
 }
 

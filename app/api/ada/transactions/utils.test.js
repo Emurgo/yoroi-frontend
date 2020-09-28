@@ -55,6 +55,9 @@ const _output = (
   OutputIndex: 0,
   Amount: x.toString(),
   IsUnspent: true,
+  ErgoBoxId: null,
+  ErgoCreationHeight: null,
+  ErgoTree: null,
 });
 
 const testInputs = [

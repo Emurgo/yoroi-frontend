@@ -13,7 +13,7 @@ import {
   sendAllUnsignedTx,
   signTransaction,
 } from '../shelley/transactions';
-import type { AddressedUtxo, BaseSignRequest } from '../types';
+import type { CardanoAddressedUtxo, BaseSignRequest } from '../types';
 import type {
   TransferTx
 } from '../../../../types/TransferTypes';
@@ -27,7 +27,7 @@ import type {
  * Generate transaction including all addresses with no change.
 */
 export async function buildYoroiTransferTx(payload: {|
-  senderUtxos: Array<AddressedUtxo>,
+  senderUtxos: Array<CardanoAddressedUtxo>,
   outputAddr: {|
     ...Address,
     ...InexactSubset<Addressing>,
