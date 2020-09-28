@@ -319,7 +319,7 @@ export default class AdaTransactionBuilderStore extends Store {
       return this.txMismatch;
     }
 
-    return !this.tentativeTx.isEqual(this.plannedTx.self().unsignedTx);
+    return !this.tentativeTx.isEqual(this.plannedTx.self());
   }
 
   _setupSelfTx: SetupSelfTxFunc = async (request): Promise<void> => {

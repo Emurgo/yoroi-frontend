@@ -534,6 +534,9 @@ Array [
       Object {
         "AddressId": 5,
         "Amount": "2100000",
+        "ErgoBoxId": null,
+        "ErgoCreationHeight": null,
+        "ErgoTree": null,
         "IsUnspent": true,
         "OutputIndex": 0,
         "TransactionId": 1,
@@ -542,6 +545,9 @@ Array [
       Object {
         "AddressId": 47,
         "Amount": "1731391",
+        "ErgoBoxId": null,
+        "ErgoCreationHeight": null,
+        "ErgoTree": null,
         "IsUnspent": true,
         "OutputIndex": 1,
         "TransactionId": 1,
@@ -550,6 +556,9 @@ Array [
       Object {
         "AddressId": 21,
         "Amount": "1100000",
+        "ErgoBoxId": null,
+        "ErgoCreationHeight": null,
+        "ErgoTree": null,
         "IsUnspent": true,
         "OutputIndex": 0,
         "TransactionId": 2,
@@ -558,6 +567,9 @@ Array [
       Object {
         "AddressId": 20,
         "Amount": "900000",
+        "ErgoBoxId": null,
+        "ErgoCreationHeight": null,
+        "ErgoTree": null,
         "IsUnspent": true,
         "OutputIndex": 1,
         "TransactionId": 2,
@@ -566,6 +578,9 @@ Array [
       Object {
         "AddressId": 64,
         "Amount": "900000",
+        "ErgoBoxId": null,
+        "ErgoCreationHeight": null,
+        "ErgoTree": null,
         "IsUnspent": true,
         "OutputIndex": 0,
         "TransactionId": 3,
@@ -574,6 +589,9 @@ Array [
       Object {
         "AddressId": 64,
         "Amount": "700000",
+        "ErgoBoxId": null,
+        "ErgoCreationHeight": null,
+        "ErgoTree": null,
         "IsUnspent": true,
         "OutputIndex": 0,
         "TransactionId": 4,
@@ -1490,6 +1508,9 @@ Array [
       Object {
         "AddressId": 9,
         "Amount": "2100000",
+        "ErgoBoxId": null,
+        "ErgoCreationHeight": null,
+        "ErgoTree": null,
         "IsUnspent": true,
         "OutputIndex": 0,
         "TransactionId": 1,
@@ -1498,6 +1519,9 @@ Array [
       Object {
         "AddressId": 93,
         "Amount": "1731391",
+        "ErgoBoxId": null,
+        "ErgoCreationHeight": null,
+        "ErgoTree": null,
         "IsUnspent": true,
         "OutputIndex": 1,
         "TransactionId": 1,
@@ -1506,6 +1530,9 @@ Array [
       Object {
         "AddressId": 41,
         "Amount": "1100000",
+        "ErgoBoxId": null,
+        "ErgoCreationHeight": null,
+        "ErgoTree": null,
         "IsUnspent": true,
         "OutputIndex": 0,
         "TransactionId": 2,
@@ -1514,6 +1541,9 @@ Array [
       Object {
         "AddressId": 39,
         "Amount": "900000",
+        "ErgoBoxId": null,
+        "ErgoCreationHeight": null,
+        "ErgoTree": null,
         "IsUnspent": true,
         "OutputIndex": 1,
         "TransactionId": 2,
@@ -1522,6 +1552,9 @@ Array [
       Object {
         "AddressId": 126,
         "Amount": "900000",
+        "ErgoBoxId": null,
+        "ErgoCreationHeight": null,
+        "ErgoTree": null,
         "IsUnspent": true,
         "OutputIndex": 0,
         "TransactionId": 3,
@@ -1530,6 +1563,9 @@ Array [
       Object {
         "AddressId": 126,
         "Amount": "700000",
+        "ErgoBoxId": null,
+        "ErgoCreationHeight": null,
+        "ErgoTree": null,
         "IsUnspent": true,
         "OutputIndex": 0,
         "TransactionId": 4,

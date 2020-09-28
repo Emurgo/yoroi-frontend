@@ -85,6 +85,8 @@ export type JormungandrBaseConfig = [$ReadOnly<JormungandrGenesisBaseConfig>];
 
 export type ErgoGenesisBaseConfig = {|
   ...CommonBaseConfig,
+  MinimumBoxValue: string,
+  FeeAddress: string,
 |};
 export type ErgoBaseConfig = [$ReadOnly<ErgoGenesisBaseConfig>];
 

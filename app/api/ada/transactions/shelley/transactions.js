@@ -7,7 +7,7 @@ import type {
   BaseSignRequest,
   V4UnsignedTxUtxoResponse,
   V4UnsignedTxAddressedUtxoResponse,
-  AddressedUtxo,
+  CardanoAddressedUtxo,
 } from '../types';
 import type { RemoteUnspentOutput, } from '../../lib/state-fetch/types';
 import {
@@ -42,7 +42,7 @@ type TxOutput = {|
 
 export function sendAllUnsignedTx(
   receiver: {| ...Address, ...InexactSubset<Addressing> |},
-  allUtxos: Array<AddressedUtxo>,
+  allUtxos: Array<CardanoAddressedUtxo>,
   absSlotNumber: BigNumber,
   protocolParams: {|
     linearFee: RustModule.WalletV4.LinearFee,
@@ -51,7 +51,7 @@ export function sendAllUnsignedTx(
     keyDeposit: RustModule.WalletV4.BigNum,
   |},
 ): V4UnsignedTxAddressedUtxoResponse {
-  const addressingMap = new Map<RemoteUnspentOutput, AddressedUtxo>();
+  const addressingMap = new Map<RemoteUnspentOutput, CardanoAddressedUtxo>();
   for (const utxo of allUtxos) {
     addressingMap.set({
       amount: utxo.amount,
@@ -191,7 +191,7 @@ export function sendAllUnsignedTxFromUtxo(
 export function newAdaUnsignedTx(
   outputs: Array<TxOutput>,
   changeAdaAddr: void | {| ...Address, ...Addressing |},
-  allUtxos: Array<AddressedUtxo>,
+  allUtxos: Array<CardanoAddressedUtxo>,
   absSlotNumber: BigNumber,
   protocolParams: {|
     linearFee: RustModule.WalletV4.LinearFee,
@@ -206,7 +206,7 @@ export function newAdaUnsignedTx(
   |}>,
   allowNoOutputs: boolean,
 ): V4UnsignedTxAddressedUtxoResponse {
-  const addressingMap = new Map<RemoteUnspentOutput, AddressedUtxo>();
+  const addressingMap = new Map<RemoteUnspentOutput, CardanoAddressedUtxo>();
   for (const utxo of allUtxos) {
     addressingMap.set({
       amount: utxo.amount,
@@ -254,7 +254,6 @@ function getFeeForChange(
     ...,
   },
 ): BigNumber {
-  if (changeAdaAddr == null) throw new NoOutputsError();
   const wasmChange = normalizeToAddress(changeAdaAddr.address);
   if (wasmChange == null) {
     throw new Error(`${nameof(getFeeForChange)} change not a valid Shelley address`);
@@ -477,7 +476,7 @@ export function signTransaction(
 ): RustModule.WalletV4.Transaction {
   const seenByronKeys: Set<string> = new Set();
   const seenKeyHashes: Set<string> = new Set();
-  const deduped: Array<AddressedUtxo> = [];
+  const deduped: Array<CardanoAddressedUtxo> = [];
   for (const senderUtxo of signRequest.senderUtxos) {
     const wasmAddr = normalizeToAddress(senderUtxo.receiver);
     if (wasmAddr == null) {
@@ -558,7 +557,7 @@ function utxoToTxInput(
 
 function addWitnesses(
   txHash: RustModule.WalletV4.TransactionHash,
-  uniqueUtxos: Array<AddressedUtxo>, // pre-req: does not contain duplicate keys
+  uniqueUtxos: Array<CardanoAddressedUtxo>, // pre-req: does not contain duplicate keys
   keyLevel: number,
   signingKey: RustModule.WalletV4.Bip32PrivateKey,
   vkeyWits: RustModule.WalletV4.Vkeywitnesses,
@@ -606,7 +605,7 @@ function addWitnesses(
 // TODO: should go in a utility class somewhere instead of being copy-pasted in multiple places
 export function asAddressedUtxo(
   utxos: IGetAllUtxosResponse,
-): Array<AddressedUtxo> {
+): Array<CardanoAddressedUtxo> {
   return utxos.map(utxo => {
     return {
       amount: utxo.output.UtxoTransactionOutput.Amount,

@@ -56,8 +56,8 @@ export class JormungandrTxSignRequest implements ISignRequest<RustModule.WalletV
     return jormungandrTxEqual(this.signRequest.unsignedTx, tx);
   }
 
-  self(): BaseSignRequest<RustModule.WalletV3.InputOutput> {
-    return this.signRequest;
+  self(): RustModule.WalletV3.InputOutput {
+    return this.signRequest.unsignedTx;
   }
 }
 

@@ -344,7 +344,10 @@ async function syncingSimpleTransaction(
             IsUnspent: true,
             OutputIndex: 0,
             TransactionId: 1,
-            UtxoTransactionOutputId: 1
+            UtxoTransactionOutputId: 1,
+            ErgoBoxId: null,
+            ErgoCreationHeight: null,
+            ErgoTree: null,
           }
         }
       }]);
@@ -455,7 +458,10 @@ async function syncingSimpleTransaction(
             IsUnspent: true,
             OutputIndex: 0,
             TransactionId: 2,
-            UtxoTransactionOutputId: 3
+            UtxoTransactionOutputId: 3,
+            ErgoBoxId: null,
+            ErgoCreationHeight: null,
+            ErgoTree: null,
           }
         }
       },
@@ -490,7 +496,10 @@ async function syncingSimpleTransaction(
             IsUnspent: true,
             OutputIndex: 1,
             TransactionId: 2,
-            UtxoTransactionOutputId: 4
+            UtxoTransactionOutputId: 4,
+            ErgoBoxId: null,
+            ErgoCreationHeight: null,
+            ErgoTree: null,
           }
         },
       }
@@ -710,7 +719,10 @@ async function utxoCreatedAndUsed(
             IsUnspent: true,
             OutputIndex: 0,
             TransactionId: 2,
-            UtxoTransactionOutputId: 3
+            UtxoTransactionOutputId: 3,
+            ErgoBoxId: null,
+            ErgoCreationHeight: null,
+            ErgoTree: null,
           }
         }
       },
@@ -745,7 +757,10 @@ async function utxoCreatedAndUsed(
             IsUnspent: true,
             OutputIndex: 1,
             TransactionId: 2,
-            UtxoTransactionOutputId: 4
+            UtxoTransactionOutputId: 4,
+            ErgoBoxId: null,
+            ErgoCreationHeight: null,
+            ErgoTree: null,
           }
         }
       },

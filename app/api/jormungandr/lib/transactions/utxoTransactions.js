@@ -6,7 +6,7 @@ import BigNumber from 'bignumber.js';
 import type {
   V3UnsignedTxAddressedUtxoResponse,
   V3UnsignedTxUtxoResponse,
-  AddressedUtxo,
+  CardanoAddressedUtxo,
 } from '../../../ada/transactions/types';
 import type { RemoteUnspentOutput, } from '../state-fetch/types';
 import {
@@ -35,11 +35,11 @@ type TxOutput = {|
 
 export function sendAllUnsignedTx(
   receiver: string,
-  allUtxos: Array<AddressedUtxo>,
+  allUtxos: Array<CardanoAddressedUtxo>,
   certificate: void | RustModule.WalletV3.Certificate,
   feeConfig: JormungandrFeeConfig,
 ): V3UnsignedTxAddressedUtxoResponse {
-  const addressingMap = new Map<RemoteUnspentOutput, AddressedUtxo>();
+  const addressingMap = new Map<RemoteUnspentOutput, CardanoAddressedUtxo>();
   for (const utxo of allUtxos) {
     addressingMap.set({
       amount: utxo.amount,
@@ -136,11 +136,11 @@ export function sendAllUnsignedTxFromUtxo(
 export function newAdaUnsignedTx(
   outputs: Array<TxOutput>,
   changeAdaAddr: Array<{| ...Address, ...Addressing |}>,
-  allUtxos: Array<AddressedUtxo>,
+  allUtxos: Array<CardanoAddressedUtxo>,
   certificate: void | RustModule.WalletV3.Certificate,
   feeConfig: JormungandrFeeConfig,
 ): V3UnsignedTxAddressedUtxoResponse {
-  const addressingMap = new Map<RemoteUnspentOutput, AddressedUtxo>();
+  const addressingMap = new Map<RemoteUnspentOutput, CardanoAddressedUtxo>();
   for (const utxo of allUtxos) {
     addressingMap.set({
       amount: utxo.amount,
@@ -351,7 +351,7 @@ export function signTransaction(
 
 function addWitnesses(
   builderSetWitnesses: RustModule.WalletV3.TransactionBuilderSetWitness,
-  senderUtxos: Array<AddressedUtxo>,
+  senderUtxos: Array<CardanoAddressedUtxo>,
   keyLevel: number,
   signingKey: RustModule.WalletV3.Bip32PrivateKey,
   useLegacy: boolean,
@@ -386,7 +386,7 @@ function addWitnesses(
 // TODO: should go in a utility class somewhere instead of being copy-pasted in multiple places
 export function asAddressedUtxo(
   utxos: IGetAllUtxosResponse,
-): Array<AddressedUtxo> {
+): Array<CardanoAddressedUtxo> {
   return utxos.map(utxo => {
     return {
       amount: utxo.output.UtxoTransactionOutput.Amount,

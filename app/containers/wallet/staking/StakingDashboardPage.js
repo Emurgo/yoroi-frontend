@@ -283,7 +283,7 @@ export default class StakingDashboardPage extends Component<Props> {
           .isExecuting
       }
       isSubmitting={this.generated.stores.wallets.sendMoneyRequest.isExecuting}
-      transactionFee={getJormungandrTxFee(delegationTx.signTxRequest.self().unsignedTx, true)}
+      transactionFee={getJormungandrTxFee(delegationTx.signTxRequest.self(), true)}
       staleTx={delegationTxStore.isStale}
       decimalPlaces={apiMeta.decimalPlaces.toNumber()}
     />);

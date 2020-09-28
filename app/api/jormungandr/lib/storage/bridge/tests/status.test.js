@@ -391,7 +391,10 @@ async function baseTest(
             IsUnspent: true,
             OutputIndex: 0,
             TransactionId: 2,
-            UtxoTransactionOutputId: 3
+            UtxoTransactionOutputId: 3,
+            ErgoBoxId: null,
+            ErgoCreationHeight: null,
+            ErgoTree: null,
           }
         }
       }]);
@@ -491,6 +494,9 @@ async function baseTest(
             OutputIndex: 0,
             TransactionId: 1,
             UtxoTransactionOutputId: 1,
+            ErgoBoxId: null,
+            ErgoCreationHeight: null,
+            ErgoTree: null,
           }
         }
       },
@@ -531,7 +537,10 @@ async function baseTest(
             IsUnspent: true,
             OutputIndex: 0,
             TransactionId: 2,
-            UtxoTransactionOutputId: 3
+            UtxoTransactionOutputId: 3,
+            ErgoBoxId: null,
+            ErgoCreationHeight: null,
+            ErgoTree: null,
           }
         }
       }]);
@@ -619,6 +628,9 @@ async function baseTest(
             OutputIndex: 0,
             TransactionId: 1,
             UtxoTransactionOutputId: 1,
+            ErgoBoxId: null,
+            ErgoCreationHeight: null,
+            ErgoTree: null,
           }
         }
       },
@@ -659,7 +671,10 @@ async function baseTest(
             IsUnspent: true,
             OutputIndex: 0,
             TransactionId: 2,
-            UtxoTransactionOutputId: 3
+            UtxoTransactionOutputId: 3,
+            ErgoBoxId: null,
+            ErgoCreationHeight: null,
+            ErgoTree: null,
           }
         }
       }]);

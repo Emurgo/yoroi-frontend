@@ -11,6 +11,7 @@ import type {
   JormungandrBaseConfig,
 } from '../primitives/tables';
 import environment from '../../../../../../environment';
+import { decode, } from 'bs58';
 
 export const CardanoForks = Object.freeze({
   Haskell: 0,
@@ -101,6 +102,11 @@ export const networks = Object.freeze({
     BaseConfig: ([Object.freeze({
       StartAt: 0,
       ChainNetworkId: (Network.Mainnet.toString(): string),
+      // TODO: it's more complicated than this since the min value depends on the # of bytes
+      MinimumBoxValue: '100000',
+      FeeAddress: decode(
+        '2iHkR7CWvD1R4j1yZg5bkeDRQavjAaVPeTDFGGLZduHyfWMuYpmhHocX8GJoaieTx78FntzJbCBVL6rf96ocJoZdmWBL2fci7NqWgAirppPQmZ7fN9V6z13Ay6brPriBKYqLp1bT2Fk4FkFLCfdPpe'
+      ).toString('hex'),
     })]: ErgoBaseConfig),
     CoinType: CoinTypes.ERGO,
     Fork: ErgoForks.Primary,

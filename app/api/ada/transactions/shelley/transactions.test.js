@@ -4,7 +4,7 @@ import '../../lib/test-config';
 import { schema } from 'lovefield';
 import BigNumber from 'bignumber.js';
 import type {
-  AddressedUtxo,
+  CardanoAddressedUtxo,
   BaseSignRequest,
 } from '../types';
 import type { RemoteUnspentOutput } from '../../lib/state-fetch/types';
@@ -111,7 +111,7 @@ const genSampleAdaAddresses: void => Array<{| ...Address, ...Addressing |}> = ()
     },
   },
 ];
-const genAddressedUtxos: void => Array<AddressedUtxo> = () => {
+const genAddressedUtxos: void => Array<CardanoAddressedUtxo> = () => {
   const addressingMap = new Map<string, Addressing>();
   for (const address of genSampleAdaAddresses()) {
     addressingMap.set(address.address, { addressing: address.addressing });

@@ -2,21 +2,34 @@
 
 import type { NetworkRow } from '../../../ada/lib/storage/database/primitives/tables';
 
-export type AddressUtxoRequest = {|
+export type BackendNetworkInfo = {|
   network: $ReadOnly<NetworkRow>,
+|};
+
+export type AddressUtxoRequest = {|
+  ...BackendNetworkInfo,
   addresses: Array<string>,
 |};
-export type AddressUtxoResponse = Array<{|
-  amount: string,
-  receiver: string,
-  tx_hash: string,
-  tx_index: number,
-  utxo_id: string, // concat(tx_hash, tx_index)
-|}>;
+export type RemoteUnspentOutput = {|
+  +amount: string,
+  +receiver: string,
+  +tx_hash: string,
+  +tx_index: number,
+  +creationHeight: number,
+  +boxId: string,
+  +assets?: Array<{
+    amount: number,
+    tokenId: string,
+    ...
+  }>,
+  +additionalRegisters?: {...},
+  +ergoTree: string,
+|};
+export type AddressUtxoResponse = Array<RemoteUnspentOutput>;
 export type AddressUtxoFunc = (body: AddressUtxoRequest) => Promise<AddressUtxoResponse>;
 
 export type TxBodiesRequest = {|
-  network: $ReadOnly<NetworkRow>,
+  ...BackendNetworkInfo,
   txHashes: Array<string>,
 |};
 export type TxBodiesResponse = {|
@@ -25,7 +38,7 @@ export type TxBodiesResponse = {|
 export type TxBodiesFunc = (body: TxBodiesRequest) => Promise<TxBodiesResponse>;
 
 export type UtxoSumRequest = {|
-  network: $ReadOnly<NetworkRow>,
+  ...BackendNetworkInfo,
   addresses: Array<string>,
 |};
 export type UtxoSumResponse = {|
@@ -34,7 +47,7 @@ export type UtxoSumResponse = {|
 export type UtxoSumFunc = (body: UtxoSumRequest) => Promise<UtxoSumResponse>;
 
 export type HistoryRequest = {|
-  network: $ReadOnly<NetworkRow>,
+  ...BackendNetworkInfo,
   addresses: Array<string>,
   // omitting "after" means you query starting from the genesis block
   after?: {|
@@ -97,7 +110,7 @@ export type HistoryResponse = Array<RemoteErgoTransaction>;
 export type HistoryFunc = (body: HistoryRequest) => Promise<HistoryResponse>;
 
 export type BestBlockRequest = {|
-  network: $ReadOnly<NetworkRow>,
+  ...BackendNetworkInfo,
 |};
 export type BestBlockResponse = {|
   epoch: 0, // TODO
@@ -108,7 +121,7 @@ export type BestBlockResponse = {|
 export type BestBlockFunc = (body: BestBlockRequest) => Promise<BestBlockResponse>;
 
 export type SignedRequest = {|
-  network: $ReadOnly<NetworkRow>,
+  ...BackendNetworkInfo,
   id?: string, // hex
   inputs: Array<{|
     boxId: string, // hex

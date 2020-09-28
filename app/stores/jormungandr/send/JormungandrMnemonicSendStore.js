@@ -70,7 +70,7 @@ export default class JormungandrMnemonicSendStore extends Store {
       return await this.api.jormungandr.signAndBroadcast({
         publicDeriver: withSigning,
         password: request.password,
-        signRequest: request.signRequest.self(),
+        signRequest: request.signRequest.signRequest,
         sendTx: this.stores.substores.ada.stateFetchStore.fetcher.sendTx,
       });
     } catch (error) {

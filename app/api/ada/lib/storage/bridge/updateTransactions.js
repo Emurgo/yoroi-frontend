@@ -1489,6 +1489,9 @@ function genByronIOGen(
           * This is slightly misleading, but using null would require null-checks everywhere
           */
         IsUnspent: true,
+        ErgoBoxId: null,
+        ErgoCreationHeight: null,
+        ErgoTree: null,
       });
     }
 
@@ -1564,6 +1567,9 @@ function genShelleyIOGen(
             * This is slightly misleading, but using null would require null-checks everywhere
             */
           IsUnspent: true,
+          ErgoBoxId: null,
+          ErgoCreationHeight: null,
+          ErgoTree: null,
         });
       } else if (
         outputType === CoreAddressTypes.CARDANO_REWARD
