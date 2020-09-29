@@ -6,6 +6,7 @@ import type { lf$schema$Builder } from 'lovefield';
 import {
   TransactionSchema,
   AddressSchema,
+  TokenSchema,
 } from '../../primitives/tables';
 
 export type UtxoTransactionInputInsert = {|
@@ -80,6 +81,35 @@ export const UtxoTransactionOutputSchema: {|
   }
 };
 
+export type TokenListInsert = {|
+  TokenId: number,
+  UtxoTransactionOutputId: number,
+  Index: number,
+  Amount: string,
+|};
+export type TokenListRow = {|
+  TokenListItemId: number,
+  ...TokenListInsert,
+|};
+/**
+ * For outputs that belong to you,
+ * utxo outputs are a super-set of inputs because for an address to be an input,
+ * it must have received coins (been an output) previously
+ */
+export const TokenListSchema: {|
+  +name: 'TokenList',
+  properties: $ObjMapi<TokenListRow, ToSchemaProp>,
+|} = {
+  name: 'TokenList',
+  properties: {
+    TokenListItemId: 'TokenListItemId',
+    TokenId: 'TokenId',
+    UtxoTransactionOutputId: 'UtxoTransactionOutputId',
+    Index: 'Index',
+    Amount: 'Amount',
+  }
+};
+
 export type DbUtxoInputs = {|
   +utxoInputs: $ReadOnlyArray<$ReadOnly<UtxoTransactionInputRow>>;
 |};
@@ -139,5 +169,29 @@ export const populateUtxoTransactionsDb = (schemaBuilder: lf$schema$Builder) => 
       UtxoTransactionOutputSchema.properties.ErgoBoxId,
       UtxoTransactionOutputSchema.properties.ErgoCreationHeight,
       UtxoTransactionOutputSchema.properties.ErgoTree,
+    ]);
+
+  // UtxoTransactionOutput Table
+  schemaBuilder.createTable(TokenListSchema.name)
+    .addColumn(TokenListSchema.properties.TokenListItemId, Type.INTEGER)
+    .addColumn(TokenListSchema.properties.TokenId, Type.INTEGER)
+    .addColumn(TokenListSchema.properties.UtxoTransactionOutputId, Type.INTEGER)
+    .addColumn(TokenListSchema.properties.Index, Type.INTEGER)
+    .addColumn(TokenListSchema.properties.Amount, Type.STRING)
+    .addPrimaryKey(
+      ([TokenListSchema.properties.TokenListItemId]: Array<string>),
+      true
+    )
+    .addForeignKey('UtxoTransactionOutputAsset_UtxoTransactionOutput', {
+      local: TokenListSchema.properties.UtxoTransactionOutputId,
+      ref: `${UtxoTransactionOutputSchema.name}.${UtxoTransactionOutputSchema.properties.UtxoTransactionOutputId}`,
+      action: ConstraintAction.CASCADE,
+    })
+    .addForeignKey('TokenList_Token', {
+      local: TokenListSchema.properties.TokenId,
+      ref: `${TokenSchema.name}.${TokenSchema.properties.TokenId}`,
+    })
+    .addNullable([
+      TokenListSchema.properties.UtxoTransactionOutputId,
     ]);
 };

@@ -201,6 +201,7 @@ export type EncryptionMetaInsert = {|
   AddressSeed: number,
   TransactionSeed: number,
   BlockSeed: number,
+  TokenSeed: number,
 |};
 export type EncryptionMetaRow = {|
   ...EncryptionMetaInsert,
@@ -215,6 +216,7 @@ export const EncryptionMetaSchema: {|
     AddressSeed: 'AddressSeed',
     TransactionSeed: 'TransactionSeed',
     BlockSeed: 'BlockSeed',
+    TokenSeed: 'TokenSeed',
   }
 };
 
@@ -465,6 +467,7 @@ export const AddressMappingSchema: {|
 export type TokenInsert = {|
   /** different blockchains can support native multi-asset */
   NetworkId: number,
+  Digest: number,
   Identifier: string,
 |};
 export type TokenRow = {|
@@ -479,6 +482,7 @@ export const TokenSchema: {|
   properties: {
     TokenId: 'TokenId',
     NetworkId: 'NetworkId',
+    Digest: 'Digest',
     Identifier: 'Identifier',
   }
 };
@@ -547,6 +551,7 @@ export const populatePrimitivesDb = (schemaBuilder: lf$schema$Builder) => {
     .addColumn(EncryptionMetaSchema.properties.AddressSeed, Type.INTEGER)
     .addColumn(EncryptionMetaSchema.properties.TransactionSeed, Type.INTEGER)
     .addColumn(EncryptionMetaSchema.properties.BlockSeed, Type.INTEGER)
+    .addColumn(EncryptionMetaSchema.properties.TokenSeed, Type.INTEGER)
     .addPrimaryKey(
       ([EncryptionMetaSchema.properties.EncryptionMetaId]: Array<string>),
       false,
@@ -732,6 +737,7 @@ export const populatePrimitivesDb = (schemaBuilder: lf$schema$Builder) => {
     .addColumn(TokenSchema.properties.TokenId, Type.INTEGER)
     .addColumn(TokenSchema.properties.NetworkId, Type.INTEGER)
     .addColumn(TokenSchema.properties.Identifier, Type.STRING)
+    .addColumn(BlockSchema.properties.Digest, Type.NUMBER)
     .addPrimaryKey(
       ([TokenSchema.properties.TokenId]: Array<string>),
       true

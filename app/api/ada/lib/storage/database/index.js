@@ -56,21 +56,19 @@ const populateEncryptionDefault = async (
     db,
     depTables,
     async tx => {
-      const hasMeta = await deps.GetEncryptionMeta.exists(
+      const EncryptionMetaId = 0;
+      const initial = getInitialSeeds();
+      const metaRow = await deps.GetEncryptionMeta.getOrInitial(
         db, tx,
+        { ...initial, EncryptionMetaId },
       );
-      if (!hasMeta) {
-        const { AddressSeed, TransactionSeed, BlockSeed } = getInitialSeeds();
-        await deps.ModifyEncryptionMeta.setInitial(
-          db, tx,
-          {
-            EncryptionMetaId: 0,
-            AddressSeed,
-            TransactionSeed,
-            BlockSeed,
-          }
-        );
-      }
+      await deps.ModifyEncryptionMeta.upsert(
+        db, tx,
+        {
+          ...metaRow,
+          EncryptionMetaId
+        }
+      );
     }
   );
 };

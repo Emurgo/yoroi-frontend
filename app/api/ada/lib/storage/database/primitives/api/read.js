@@ -13,7 +13,7 @@ import type {
   AddressRow,
   KeyDerivationRow,
   BlockRow,
-  EncryptionMetaRow,
+  EncryptionMetaInsert, EncryptionMetaRow,
   KeyRow,
   TransactionRow,
   AddressMappingRow,
@@ -42,17 +42,26 @@ export class GetEncryptionMeta {
   });
   static depTables: {||} = Object.freeze({});
 
-  static async exists(
+  static async getOrInitial(
     db: lf$Database,
     tx: lf$Transaction,
-  ): Promise<boolean> {
+    initial: EncryptionMetaInsert,
+  ): Promise<EncryptionMetaRow> {
     const row = await getRowFromKey<EncryptionMetaRow>(
       db, tx,
       0,
       GetEncryptionMeta.ownTables[Tables.EncryptionMetaSchema.name].name,
       GetEncryptionMeta.ownTables[Tables.EncryptionMetaSchema.name].properties.EncryptionMetaId,
     );
-    return row !== undefined;
+    if (row == null) return initial;
+
+    const rowCopy = { ...row }; // DB result is read-only, but we need to remove results
+    Object.keys(rowCopy).forEach(key => {
+      if (rowCopy[key] == null) {
+        rowCopy[key] = initial[key];
+      }
+    });
+    return rowCopy;
   }
 
   static async get(
@@ -66,7 +75,7 @@ export class GetEncryptionMeta {
       GetEncryptionMeta.ownTables[Tables.EncryptionMetaSchema.name].properties.EncryptionMetaId,
     );
     if (row === undefined) {
-      throw new Error('GetEncryptionMeta::get no encryption meta found');
+      throw new Error(`${nameof(GetEncryptionMeta)}::${nameof(GetEncryptionMeta.get)} no encryption meta found`);
     }
     return row;
   }

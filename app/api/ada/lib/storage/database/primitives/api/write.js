@@ -19,6 +19,7 @@ import type {
   CertificateAddressInsert, CertificateAddressRow,
   DbBlock,
   NetworkInsert, NetworkRow,
+  TokenInsert, TokenRow,
 } from '../tables';
 import type {
   CoreAddressT,
@@ -208,14 +209,14 @@ export class ModifyEncryptionMeta {
   });
   static depTables: {||} = Object.freeze({});
 
-  static async setInitial(
+  static async upsert(
     db: lf$Database,
     tx: lf$Transaction,
     initialData: EncryptionMetaInsert,
   ): Promise<$ReadOnly<EncryptionMetaRow>> {
-    return await addNewRowToTable<EncryptionMetaInsert, EncryptionMetaRow>(
+    return await addOrReplaceRows<EncryptionMetaInsert, EncryptionMetaRow>(
       db, tx,
-      initialData,
+      [initialData],
       ModifyEncryptionMeta.ownTables[Tables.EncryptionMetaSchema.name].name,
     );
   }
@@ -618,6 +619,37 @@ export class ModifyNetworks {
       db, tx,
       rows,
       ModifyNetworks.ownTables[Tables.NetworkSchema.name].name,
+    );
+
+    return result;
+  }
+}
+
+export class ModifyToken {
+  static ownTables: {|
+    Token: typeof Tables.TokenSchema,
+  |} = Object.freeze({
+    [Tables.TokenSchema.name]: Tables.TokenSchema,
+  });
+  static depTables: {|GetEncryptionMeta: typeof GetEncryptionMeta|} = Object.freeze({
+    GetEncryptionMeta,
+  });
+
+  static async upsert(
+    db: lf$Database,
+    tx: lf$Transaction,
+    rows: $ReadOnlyArray<$Diff<TokenInsert, {| Digest: number |}>>,
+  ): Promise<void> {
+    const { TokenSeed } = await ModifyToken.depTables.GetEncryptionMeta.get(db, tx);
+    const rowsWithDigest = rows.map(row => ({
+      Digest: digestForHash(row.Identifier, TokenSeed),
+      ...row,
+    }));
+
+    const result = await addOrReplaceRows<TokenInsert, TokenRow>(
+      db, tx,
+      rowsWithDigest,
+      ModifyToken.ownTables[Tables.TokenSchema.name].name,
     );
 
     return result;

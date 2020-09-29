@@ -674,6 +674,7 @@ Object {
       "AddressSeed": 1690513609,
       "BlockSeed": 371536492,
       "EncryptionMetaId": 0,
+      "TokenSeed": 493718318,
       "TransactionSeed": 769388545,
     },
   ],
@@ -1327,10 +1328,10 @@ Object {
     },
   ],
   "Token": Array [],
+  "TokenList": Array [],
   "Transaction": Array [],
   "TxMemo": Array [],
   "UtxoTransactionInput": Array [],
   "UtxoTransactionOutput": Array [],
-  "UtxoTransactionOutputAsset": Array [],
 }
 `;
