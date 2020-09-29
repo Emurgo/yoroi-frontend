@@ -1326,9 +1326,11 @@ Object {
       "RootDerivationId": 1,
     },
   ],
+  "Token": Array [],
   "Transaction": Array [],
   "TxMemo": Array [],
   "UtxoTransactionInput": Array [],
   "UtxoTransactionOutput": Array [],
+  "UtxoTransactionOutputAsset": Array [],
 }
 `;

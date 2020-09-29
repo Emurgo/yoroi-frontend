@@ -462,6 +462,27 @@ export const AddressMappingSchema: {|
   }
 };
 
+export type TokenInsert = {|
+  /** different blockchains can support native multi-asset */
+  NetworkId: number,
+  Identifier: string,
+|};
+export type TokenRow = {|
+  TokenId: number,
+  ...TokenInsert,
+|};
+export const TokenSchema: {|
+  +name: 'Token',
+  properties: $ObjMapi<TokenRow, ToSchemaProp>,
+|} = {
+  name: 'Token',
+  properties: {
+    TokenId: 'TokenId',
+    NetworkId: 'NetworkId',
+    Identifier: 'Identifier',
+  }
+};
+
 export type DbTransaction = {|
   +transaction: $ReadOnly<TransactionRow>,
 |};
@@ -703,6 +724,30 @@ export const populatePrimitivesDb = (schemaBuilder: lf$schema$Builder) => {
     .addIndex(
       'Address_Transaction_Index',
       ([CertificateAddressSchema.properties.AddressId]: Array<string>),
+      false
+    );
+
+  // Token Table
+  schemaBuilder.createTable(TokenSchema.name)
+    .addColumn(TokenSchema.properties.TokenId, Type.INTEGER)
+    .addColumn(TokenSchema.properties.NetworkId, Type.INTEGER)
+    .addColumn(TokenSchema.properties.Identifier, Type.STRING)
+    .addPrimaryKey(
+      ([TokenSchema.properties.TokenId]: Array<string>),
+      true
+    )
+    .addForeignKey('Token_Network', {
+      local: TokenSchema.properties.NetworkId,
+      ref: `${NetworkSchema.name}.${NetworkSchema.properties.NetworkId}`,
+      action: ConstraintAction.CASCADE,
+    })
+    .addIndex(
+      'Token_Identifier',
+      ([TokenSchema.properties.Identifier]: Array<string>),
+      /**
+       * not unique since different networks can have the same token
+       * easiest to achieve by using a testnet for the same blockchain
+       */
       false
     );
 };
