@@ -8,8 +8,9 @@ import type {
   BlockInsert,
   TransactionInsert,
   DbBlock,
+  TokenInsert, TokenRow,
 } from '../../../primitives/tables';
-import { TransactionType } from '../../../primitives/tables';
+import { TransactionType, } from '../../../primitives/tables';
 import type {
   JormungandrTxIO,
   CardanoByronTxIO,
@@ -19,14 +20,15 @@ import type {
 import type {
   UtxoTransactionInputInsert,
   UtxoTransactionOutputInsert,
+  TokenListInsert,
 } from '../../utxo/tables';
 import type {
   AccountingTransactionInputInsert,
   AccountingTransactionOutputInsert,
 } from '../../account/tables';
-import { ModifyTransaction, ModifyCertificate, } from '../../../primitives/api/write';
+import { ModifyTransaction, ModifyCertificate, ModifyToken, } from '../../../primitives/api/write';
 import type { AddCertificateRequest } from '../../../primitives/api/write';
-import { ModifyUtxoTransaction } from '../../utxo/api/write';
+import { ModifyUtxoTransaction, ModifyTokenList } from '../../utxo/api/write';
 import { ModifyAccountingTransaction } from '../../account/api/write';
 
 export class ModifyJormungandrTx {
@@ -242,20 +244,37 @@ export class ModifyErgoTx {
   static depTables: {|
     ModifyTransaction: typeof ModifyTransaction,
     ModifyUtxoTransaction: typeof ModifyUtxoTransaction,
+    ModifyToken: typeof ModifyToken,
+    ModifyTokenList: typeof ModifyTokenList,
   |} = Object.freeze({
     ModifyTransaction,
     ModifyUtxoTransaction,
+    ModifyToken,
+    ModifyTokenList,
   });
 
   static async addTxWithIOs(
     db: lf$Database,
     tx: lf$Transaction,
     request: {|
+      networkId: number,
       block: null | BlockInsert,
       transaction: (blockId: null | number) => TransactionInsert,
       ioGen: (txRowId: number) => {|
-        utxoInputs: Array<UtxoTransactionInputInsert>,
-        utxoOutputs: Array<UtxoTransactionOutputInsert>,
+        utxoInputs: Array<{|
+          input: UtxoTransactionInputInsert,
+          tokens: Array<$Diff<TokenInsert, {| Digest: number |}>>,
+          tokenList: Array<
+            {| TokenId: number, UtxoTransactionInputId: number |} => TokenListInsert
+          >,
+        |}>,
+        utxoOutputs: Array<{|
+          utxo: UtxoTransactionOutputInsert,
+          tokens: Array<$Diff<TokenInsert, {| Digest: number |}>>,
+          tokenList: Array<
+            {| TokenId: number, UtxoTransactionOutputId: number |} => TokenListInsert
+          >,
+        |}>,
       |},
     |},
   ): Promise<{|
@@ -277,9 +296,55 @@ export class ModifyErgoTx {
 
     const utxo = await ModifyErgoTx.depTables.ModifyUtxoTransaction.addIOsToTx(
       db, tx, {
-        utxoInputs, utxoOutputs,
+        utxoInputs: utxoInputs.map(input => input.input),
+        utxoOutputs: utxoOutputs.map(output => output.utxo),
       }
     );
+
+    const tokenRows = await ModifyErgoTx.depTables.ModifyToken.upsert(
+      db, tx,
+      [
+        ...utxoInputs.flatMap(input => input.tokens),
+        ...utxoOutputs.flatMap(output => output.tokens),
+      ],
+    );
+    const tokenLookup = new Map<string, $ReadOnly<TokenRow>>(
+      tokenRows.map(row => [row.Identifier, row])
+    );
+
+    const tokenListInserts: Array<TokenListInsert> = [];
+    // add tokens for inputs
+    for (let i = 0; i < utxoInputs.length; i++) {
+      for (let listIndex = 0; listIndex < utxoInputs[i].tokenList.length; listIndex++) {
+        const tokenInfo = tokenLookup.get(utxoInputs[i].tokens[listIndex].Identifier);
+        if (tokenInfo == null) {
+          throw new Error(`${nameof(ModifyErgoTx)}::${nameof(ModifyErgoTx.addTxWithIOs)} no token info found`);
+        }
+        tokenListInserts.push(utxoInputs[i].tokenList[listIndex]({
+          TokenId: tokenInfo.TokenId,
+          UtxoTransactionInputId: utxo.utxoInputs[i].UtxoTransactionInputId
+        }));
+      }
+    }
+    // add tokens for outputs
+    for (let i = 0; i < utxoOutputs.length; i++) {
+      for (let listIndex = 0; listIndex < utxoOutputs[i].tokenList.length; listIndex++) {
+        const tokenInfo = tokenLookup.get(utxoOutputs[i].tokens[listIndex].Identifier);
+        if (tokenInfo == null) {
+          throw new Error(`${nameof(ModifyErgoTx)}::${nameof(ModifyErgoTx.addTxWithIOs)} no token info found`);
+        }
+        tokenListInserts.push(utxoOutputs[i].tokenList[listIndex]({
+          TokenId: tokenInfo.TokenId,
+          UtxoTransactionOutputId: utxo.utxoOutputs[i].UtxoTransactionOutputId
+        }));
+      }
+    }
+
+    await ModifyErgoTx.depTables.ModifyTokenList.upsert(
+      db, tx,
+      tokenListInserts
+    );
+
     return {
       txType: TransactionType.Ergo,
       ...newTx,

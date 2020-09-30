@@ -21,6 +21,7 @@ import type {
   CertificateAddressRow,
   CertificatePart,
   NetworkRow,
+  TokenRow,
 } from '../tables';
 import type {
   TxStatusCodesType,
@@ -1101,5 +1102,34 @@ export class GetNetworks {
       GetNetworks.ownTables[Tables.NetworkSchema.name].name,
     );
     return rows;
+  }
+}
+
+export class GetToken {
+  static ownTables: {|
+    Token: typeof Tables.TokenSchema,
+  |} = Object.freeze({
+    [Tables.TokenSchema.name]: Tables.TokenSchema,
+  });
+  static depTables: {|GetEncryptionMeta: typeof GetEncryptionMeta|} = Object.freeze({
+    GetEncryptionMeta,
+  });
+
+  static async get(
+    db: lf$Database,
+    tx: lf$Transaction,
+    tokenIds: Array<string>,
+  ): Promise<$ReadOnlyArray<$ReadOnly<TokenRow>>> {
+    const { TokenSeed } = await GetToken.depTables.GetEncryptionMeta.get(db, tx);
+    const digests = tokenIds.map<number>(hash => digestForHash(hash, TokenSeed));
+
+    const tokenRows = await getRowIn<AddressRow>(
+      db, tx,
+      GetToken.ownTables[Tables.TokenSchema.name].name,
+      GetToken.ownTables[Tables.TokenSchema.name].properties.Digest,
+      digests
+    );
+
+    return tokenRows;
   }
 }

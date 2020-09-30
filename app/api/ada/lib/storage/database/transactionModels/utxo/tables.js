@@ -83,7 +83,8 @@ export const UtxoTransactionOutputSchema: {|
 
 export type TokenListInsert = {|
   TokenId: number,
-  UtxoTransactionOutputId: number,
+  UtxoTransactionOutputId: null | number,
+  UtxoTransactionInputId: null | number,
   Index: number,
   Amount: string,
 |};
@@ -105,6 +106,7 @@ export const TokenListSchema: {|
     TokenListItemId: 'TokenListItemId',
     TokenId: 'TokenId',
     UtxoTransactionOutputId: 'UtxoTransactionOutputId',
+    UtxoTransactionInputId: 'UtxoTransactionInputId',
     Index: 'Index',
     Amount: 'Amount',
   }
@@ -187,11 +189,17 @@ export const populateUtxoTransactionsDb = (schemaBuilder: lf$schema$Builder) => 
       ref: `${UtxoTransactionOutputSchema.name}.${UtxoTransactionOutputSchema.properties.UtxoTransactionOutputId}`,
       action: ConstraintAction.CASCADE,
     })
+    .addForeignKey('UtxoTransactionOutputAsset_UtxoTransactionInput', {
+      local: TokenListSchema.properties.UtxoTransactionInputId,
+      ref: `${UtxoTransactionInputSchema.name}.${UtxoTransactionInputSchema.properties.UtxoTransactionInputId}`,
+      action: ConstraintAction.CASCADE,
+    })
     .addForeignKey('TokenList_Token', {
       local: TokenListSchema.properties.TokenId,
       ref: `${TokenSchema.name}.${TokenSchema.properties.TokenId}`,
     })
     .addNullable([
+      TokenListSchema.properties.UtxoTransactionInputId,
       TokenListSchema.properties.UtxoTransactionOutputId,
     ]);
 };

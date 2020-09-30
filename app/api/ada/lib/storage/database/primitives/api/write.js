@@ -639,7 +639,7 @@ export class ModifyToken {
     db: lf$Database,
     tx: lf$Transaction,
     rows: $ReadOnlyArray<$Diff<TokenInsert, {| Digest: number |}>>,
-  ): Promise<void> {
+  ): Promise<$ReadOnlyArray<$ReadOnly<TokenRow>>> {
     const { TokenSeed } = await ModifyToken.depTables.GetEncryptionMeta.get(db, tx);
     const rowsWithDigest = rows.map(row => ({
       Digest: digestForHash(row.Identifier, TokenSeed),

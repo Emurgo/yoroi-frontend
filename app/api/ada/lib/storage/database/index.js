@@ -14,13 +14,14 @@ import {
   promisifyDbCall,
 } from './utils';
 import { GetEncryptionMeta, } from './primitives/api/read';
-import { ModifyEncryptionMeta, ModifyNetworks, } from './primitives/api/write';
+import { ModifyEncryptionMeta, ModifyNetworks, ModifyToken } from './primitives/api/write';
 import { ModifyExplorers, } from './explorers/api/write';
 import { populatePrimitivesDb, TransactionType } from './primitives/tables';
 import { populateCommonDb } from './walletTypes/common/tables';
 import { populateBip44Db } from './walletTypes/bip44/tables';
 import { populateCip1852Db } from './walletTypes/cip1852/tables';
 import { populateUtxoTransactionsDb } from './transactionModels/utxo/tables';
+import { ModifyTokenList } from './transactionModels/utxo/api/write';
 import { populateAccountingTransactionsDb } from './transactionModels/account/tables';
 import { populateMultipartTransactionsDb } from './transactionModels/multipart/tables';
 import { populateWalletDb } from './walletTypes/core/tables';
@@ -116,6 +117,7 @@ const populateExplorerDefaults = async (
     )
   );
 };
+
 
 export const loadLovefieldDB = async (
   storeType: $Values<typeof schema.DataStoreType>
