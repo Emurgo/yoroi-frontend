@@ -17,6 +17,7 @@ import type {
   UtxoTransactionInputRow,
   UtxoTransactionOutputRow,
   DbUtxoInputs, DbUtxoOutputs,
+  TokenListRow,
 } from '../tables';
 import { TransactionSchema, } from '../../../primitives/tables';
 import { TxStatusCodes } from '../../../primitives/enums';
@@ -322,5 +323,61 @@ export class AssociateTxWithUtxoIOs {
       });
     }
     return txMap;
+  }
+}
+
+export class AssociateToken {
+  static ownTables: {|
+    TokenList: typeof Tables.TokenListSchema,
+  |} = Object.freeze({
+    [Tables.TokenListSchema.name]: Tables.TokenListSchema,
+  });
+  static depTables: {||} = Object.freeze({});
+
+  static async forUtxoInput(
+    db: lf$Database,
+    tx: lf$Transaction,
+    request: {| utxoInputIds: Array<number>, |},
+  ): Promise<Map<number, Array<$ReadOnly<TokenListRow>>>> {
+    const rows = await getRowIn<TokenListRow>(
+      db, tx,
+      AssociateToken.ownTables[Tables.TokenListSchema.name].name,
+      AssociateToken.ownTables[Tables.TokenListSchema.name].properties.UtxoTransactionInputId,
+      request.utxoInputIds,
+    );
+
+    const result = new Map<number, Array<$ReadOnly<TokenListRow>>>();
+    for (const row of rows) {
+      const { UtxoTransactionInputId } = row;
+      if (UtxoTransactionInputId == null) continue;
+      const entries = result.get(UtxoTransactionInputId) ?? [];
+      entries.push(row);
+      result.set(UtxoTransactionInputId, entries);
+    }
+
+    return result;
+  }
+  static async forUtxoOutput(
+    db: lf$Database,
+    tx: lf$Transaction,
+    request: {| utxoOutputIds: Array<number>, |},
+  ): Promise<Map<number, Array<$ReadOnly<TokenListRow>>>> {
+    const rows = await getRowIn<TokenListRow>(
+      db, tx,
+      AssociateToken.ownTables[Tables.TokenListSchema.name].name,
+      AssociateToken.ownTables[Tables.TokenListSchema.name].properties.UtxoTransactionOutputId,
+      request.utxoOutputIds,
+    );
+
+    const result = new Map<number, Array<$ReadOnly<TokenListRow>>>();
+    for (const row of rows) {
+      const { UtxoTransactionOutputId } = row;
+      if (UtxoTransactionOutputId == null) continue;
+      const entries = result.get(UtxoTransactionOutputId) ?? [];
+      entries.push(row);
+      result.set(UtxoTransactionOutputId, entries);
+    }
+
+    return result;
   }
 }

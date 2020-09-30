@@ -13,7 +13,7 @@ import type {
   AddressRow,
   KeyDerivationRow,
   BlockRow,
-  EncryptionMetaRow,
+  EncryptionMetaInsert, EncryptionMetaRow,
   KeyRow,
   TransactionRow,
   AddressMappingRow,
@@ -21,6 +21,7 @@ import type {
   CertificateAddressRow,
   CertificatePart,
   NetworkRow,
+  TokenRow,
 } from '../tables';
 import type {
   TxStatusCodesType,
@@ -42,17 +43,26 @@ export class GetEncryptionMeta {
   });
   static depTables: {||} = Object.freeze({});
 
-  static async exists(
+  static async getOrInitial(
     db: lf$Database,
     tx: lf$Transaction,
-  ): Promise<boolean> {
+    initial: EncryptionMetaInsert,
+  ): Promise<EncryptionMetaRow> {
     const row = await getRowFromKey<EncryptionMetaRow>(
       db, tx,
       0,
       GetEncryptionMeta.ownTables[Tables.EncryptionMetaSchema.name].name,
       GetEncryptionMeta.ownTables[Tables.EncryptionMetaSchema.name].properties.EncryptionMetaId,
     );
-    return row !== undefined;
+    if (row == null) return initial;
+
+    const rowCopy = { ...row }; // DB result is read-only, but we need to remove results
+    Object.keys(rowCopy).forEach(key => {
+      if (rowCopy[key] == null) {
+        rowCopy[key] = initial[key];
+      }
+    });
+    return rowCopy;
   }
 
   static async get(
@@ -66,7 +76,7 @@ export class GetEncryptionMeta {
       GetEncryptionMeta.ownTables[Tables.EncryptionMetaSchema.name].properties.EncryptionMetaId,
     );
     if (row === undefined) {
-      throw new Error('GetEncryptionMeta::get no encryption meta found');
+      throw new Error(`${nameof(GetEncryptionMeta)}::${nameof(GetEncryptionMeta.get)} no encryption meta found`);
     }
     return row;
   }
@@ -1092,5 +1102,40 @@ export class GetNetworks {
       GetNetworks.ownTables[Tables.NetworkSchema.name].name,
     );
     return rows;
+  }
+}
+
+export class GetToken {
+  static ownTables: {|
+    Token: typeof Tables.TokenSchema,
+  |} = Object.freeze({
+    [Tables.TokenSchema.name]: Tables.TokenSchema,
+  });
+  static depTables: {|GetEncryptionMeta: typeof GetEncryptionMeta|} = Object.freeze({
+    GetEncryptionMeta,
+  });
+
+  static async fromIds(
+    db: lf$Database,
+    tx: lf$Transaction,
+    tokenIds: Array<string>,
+  ): Promise<$ReadOnlyArray<$ReadOnly<TokenRow>>> {
+    const { TokenSeed } = await GetToken.depTables.GetEncryptionMeta.get(db, tx);
+    const digests = tokenIds.map<number>(hash => digestForHash(hash, TokenSeed));
+    return GetToken.fromDigest(db, tx, digests);
+  }
+  static async fromDigest(
+    db: lf$Database,
+    tx: lf$Transaction,
+    digests: Array<number>,
+  ): Promise<$ReadOnlyArray<$ReadOnly<TokenRow>>> {
+    const tokenRows = await getRowIn<AddressRow>(
+      db, tx,
+      GetToken.ownTables[Tables.TokenSchema.name].name,
+      GetToken.ownTables[Tables.TokenSchema.name].properties.Digest,
+      digests
+    );
+
+    return tokenRows;
   }
 }

@@ -13,6 +13,7 @@ import type {
   UtxoTransactionInputInsert, UtxoTransactionInputRow,
   UtxoTransactionOutputInsert, UtxoTransactionOutputRow,
   DbUtxoInputs, DbUtxoOutputs,
+  TokenListInsert, TokenListRow,
 } from '../tables';
 import type {
   TransactionRow,
@@ -20,6 +21,7 @@ import type {
 
 import {
   addBatchToTable,
+  addOrReplaceRows,
 } from '../../../utils';
 
 import {
@@ -129,5 +131,28 @@ export class ModifyUtxoTransaction {
       utxoInputs: newInputs,
       utxoOutputs: newOutputs,
     };
+  }
+}
+
+export class ModifyTokenList {
+  static ownTables: {|
+    TokenList: typeof Tables.TokenListSchema,
+  |} = Object.freeze({
+    [Tables.TokenListSchema.name]: Tables.TokenListSchema,
+  });
+  static depTables: {||} = Object.freeze({});
+
+  static async upsert(
+    db: lf$Database,
+    tx: lf$Transaction,
+    rows: $ReadOnlyArray<TokenListInsert>,
+  ): Promise<$ReadOnlyArray<$ReadOnly<TokenListRow>>> {
+    const result = await addOrReplaceRows<TokenListInsert, TokenListRow>(
+      db, tx,
+      rows,
+      ModifyTokenList.ownTables[Tables.TokenListSchema.name].name,
+    );
+
+    return result;
   }
 }

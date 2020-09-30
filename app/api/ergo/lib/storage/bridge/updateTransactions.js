@@ -17,6 +17,7 @@ import type {
   DbBlock,
   AddressRow,
   ErgoTransactionInsert,
+  TokenInsert,
 } from '../../../../ada/lib/storage/database/primitives/tables';
 import {
   TransactionType,
@@ -58,6 +59,7 @@ import type {
 } from '../../../../ada/transactions/types';
 import type {
   UtxoTransactionInputInsert, UtxoTransactionOutputInsert,
+  TokenListInsert,
 } from '../../../../ada/lib/storage/database/transactionModels/utxo/tables';
 import {
   TxStatusCodes,
@@ -1124,11 +1126,10 @@ export async function updateTransactionBatch(
   const { ergoTxs, } = await networkTxToDbTx(
     db,
     dbTx,
-    request.network,
     request.derivationTables,
+    request.network.NetworkId,
     unseenNewTxs,
     request.hashToIds,
-    request.findOwnAddress,
     TransactionSeed,
     BlockSeed,
   );
@@ -1147,6 +1148,8 @@ export async function updateTransactionBatch(
         transaction: result.transaction,
         utxoInputs: result.utxoInputs,
         utxoOutputs: result.utxoOutputs,
+        utxoTokenInputs: result.utxoTokenInputs,
+        utxoTokenOutputs: result.utxoTokenOutputs,
       });
     }
   }
@@ -1208,28 +1211,59 @@ export async function updateTransactionBatch(
 
 function genErgoIOGen(
   remoteTx: RemoteErgoTransaction,
+  networkId: number,
   getIdOrThrow: string => number,
 ): (number => {|
-  utxoInputs: Array<UtxoTransactionInputInsert>,
-  utxoOutputs: Array<UtxoTransactionOutputInsert>,
+  utxoInputs: Array<{|
+    input: UtxoTransactionInputInsert,
+    tokens: Array<$Diff<TokenInsert, {| Digest: number |}>>,
+    tokenList: Array<{| TokenId: number, UtxoTransactionInputId: number |} => TokenListInsert>,
+  |}>,
+  utxoOutputs: Array<{|
+    utxo: UtxoTransactionOutputInsert,
+    tokens: Array<$Diff<TokenInsert, {| Digest: number |}>>,
+    tokenList: Array<{| TokenId: number, UtxoTransactionOutputId: number |} => TokenListInsert>,
+  |}>,
 |}) {
   return (txRowId) => {
     const utxoInputs = [];
     const utxoOutputs = [];
     for (let i = 0; i < remoteTx.inputs.length; i++) {
-      const input = remoteTx.inputs[i];
-      utxoInputs.push({
+      const input = {
         TransactionId: txRowId,
-        AddressId: getIdOrThrow(input.address),
-        ParentTxHash: input.outputTransactionId,
-        IndexInParentTx: input.outputIndex,
+        AddressId: getIdOrThrow(remoteTx.inputs[i].address),
+        ParentTxHash: remoteTx.inputs[i].outputTransactionId,
+        IndexInParentTx: remoteTx.inputs[i].outputIndex,
         IndexInOwnTx: i,
-        Amount: input.value.toString(),
+        Amount: remoteTx.inputs[i].value.toString(),
+      };
+
+      const tokens = [];
+      const tokenList = [];
+      // TODO: re-enable once this is part of the explorer
+      // for (let tokenIndex = 0; tokenIndex < input.assets.length; tokenIndex++) {
+      //   tokens.push(({ NetworkId }) => ({
+      //     NetworkId,
+      //     Identifier: input.assets[tokenIndex].tokenId,
+      //   });
+      //   tokenList.push(({ TokenId, UtxoTransactionInputId }) => ({
+      //     UtxoTransactionOutputId: null,
+      //     UtxoTransactionInputId,
+      //     Amount: input.assets[tokenIndex].amount.toString(),
+      //     Index: tokenIndex,
+      //     TokenId,
+      //   }));
+      // }
+      utxoInputs.push({
+        input,
+        tokens,
+        tokenList,
       });
     }
     for (let i = 0; i < remoteTx.outputs.length; i++) {
       const output = remoteTx.outputs[i];
-      utxoOutputs.push({
+
+      const utxo = {
         TransactionId: txRowId,
         AddressId: getIdOrThrow(output.address),
         OutputIndex: i,
@@ -1243,6 +1277,27 @@ function genErgoIOGen(
         ErgoBoxId: output.id,
         ErgoCreationHeight: output.creationHeight,
         ErgoTree: output.ergoTree,
+      };
+
+      const tokens = [];
+      const tokenList = [];
+      for (let tokenIndex = 0; tokenIndex < output.assets.length; tokenIndex++) {
+        tokens.push({
+          NetworkId: networkId,
+          Identifier: output.assets[tokenIndex].tokenId,
+        });
+        tokenList.push(({ TokenId, UtxoTransactionOutputId }) => ({
+          UtxoTransactionOutputId,
+          UtxoTransactionInputId: null,
+          Amount: output.assets[tokenIndex].amount.toString(),
+          Index: tokenIndex,
+          TokenId,
+        }));
+      }
+      utxoOutputs.push({
+        utxo,
+        tokens,
+        tokenList,
       });
     }
 
@@ -1256,15 +1311,15 @@ function genErgoIOGen(
 async function networkTxToDbTx(
   db: lf$Database,
   dbTx: lf$Transaction,
-  network: $ReadOnly<NetworkRow>,
   derivationTables: Map<number, string>,
+  networkId: number,
   newTxs: Array<RemoteErgoTransaction>,
   hashToIds: HashToIdsFunc,
-  findOwnAddress: FindOwnAddressFunc,
   TransactionSeed: number,
   BlockSeed: number,
 ): Promise<{|
   ergoTxs: Array<{|
+    networkId: number,
     block: null | BlockInsert,
     transaction: (blockId: null | number) => TransactionInsert,
     ioGen: ReturnType<typeof genErgoIOGen>,
@@ -1305,9 +1360,10 @@ async function networkTxToDbTx(
     );
 
     ergoTxs.push({
+      networkId,
       block,
       transaction,
-      ioGen: genErgoIOGen(networkTx, getIdOrThrow),
+      ioGen: genErgoIOGen(networkTx, networkId, getIdOrThrow),
     });
   }
 
