@@ -1148,6 +1148,8 @@ export async function updateTransactionBatch(
         transaction: result.transaction,
         utxoInputs: result.utxoInputs,
         utxoOutputs: result.utxoOutputs,
+        utxoTokenInputs: result.utxoTokenInputs,
+        utxoTokenOutputs: result.utxoTokenOutputs,
       });
     }
   }

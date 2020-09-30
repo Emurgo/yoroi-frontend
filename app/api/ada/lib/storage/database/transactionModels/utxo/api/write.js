@@ -146,7 +146,7 @@ export class ModifyTokenList {
     db: lf$Database,
     tx: lf$Transaction,
     rows: $ReadOnlyArray<TokenListInsert>,
-  ): Promise<void> {
+  ): Promise<$ReadOnlyArray<$ReadOnly<TokenListRow>>> {
     const result = await addOrReplaceRows<TokenListInsert, TokenListRow>(
       db, tx,
       rows,

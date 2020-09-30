@@ -4,7 +4,10 @@ import type { lf$schema$Builder } from 'lovefield';
 
 import type { DbTransaction, CertificatePart, } from '../../primitives/tables';
 import { TransactionType } from '../../primitives/tables';
-import type { DbUtxoInputs, DbUtxoOutputs, } from '../utxo/tables';
+import type {
+  DbUtxoInputs, DbUtxoOutputs,
+  DbUtxoTokenInputs, DbUtxoTokenOutputs,
+} from '../utxo/tables';
 import type { DbAccountingInputs, DbAccountingOutputs, } from '../account/tables';
 
 export type CardanoByronTxIO = {|
@@ -32,6 +35,7 @@ export type ErgoTxIO = {|
     +Type: $PropertyType<typeof TransactionType, "Ergo">,
   |}>,
   ...DbUtxoInputs, ...DbUtxoOutputs,
+  ...DbUtxoTokenInputs, ...DbUtxoTokenOutputs,
 |};
 export type JormungandrTxIO = {|
   +txType: $PropertyType<typeof TransactionType, "Jormungandr">,

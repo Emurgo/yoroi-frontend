@@ -118,6 +118,12 @@ export type DbUtxoInputs = {|
 export type DbUtxoOutputs = {|
   +utxoOutputs: $ReadOnlyArray<$ReadOnly<UtxoTransactionOutputRow>>;
 |};
+export type DbUtxoTokenInputs = {|
+  +utxoTokenInputs: $ReadOnlyArray<$ReadOnly<TokenListRow>>;
+|};
+export type DbUtxoTokenOutputs = {|
+  +utxoTokenOutputs: $ReadOnlyArray<$ReadOnly<TokenListRow>>;
+|};
 
 export const populateUtxoTransactionsDb = (schemaBuilder: lf$schema$Builder) => {
   // UtxoTransactionInput Table

@@ -340,7 +340,7 @@ export class ModifyErgoTx {
       }
     }
 
-    await ModifyErgoTx.depTables.ModifyTokenList.upsert(
+    const newTokenListEntries = await ModifyErgoTx.depTables.ModifyTokenList.upsert(
       db, tx,
       tokenListInserts
     );
@@ -349,6 +349,8 @@ export class ModifyErgoTx {
       txType: TransactionType.Ergo,
       ...newTx,
       ...utxo,
+      utxoTokenInputs: newTokenListEntries.filter(entry => entry.UtxoTransactionInputId != null),
+      utxoTokenOutputs: newTokenListEntries.filter(entry => entry.UtxoTransactionOutputId != null),
     };
   }
 }

@@ -15,7 +15,7 @@ import {
   AssociateTxWithAccountingIOs,
 } from '../../account/api/read';
 import {
-  AssociateTxWithUtxoIOs,
+  AssociateTxWithUtxoIOs, AssociateToken,
 } from '../../utxo/api/read';
 
 const getOrThrow = function<T> (input: T | void): T {
@@ -134,8 +134,10 @@ export class ErgoAssociateTxWithIOs {
   static ownTables: {||} = Object.freeze({});
   static depTables: {|
     AssociateTxWithUtxoIOs: typeof AssociateTxWithUtxoIOs,
+    AssociateToken: typeof AssociateToken,
   |} = Object.freeze({
     AssociateTxWithUtxoIOs,
+    AssociateToken,
   });
 
   static async getIOsForTx(
@@ -147,11 +149,35 @@ export class ErgoAssociateTxWithIOs {
       db, tx, request
     );
 
-    const fullTx = request.txs.map(transaction  => ({
-      txType: TransactionType.Ergo,
-      transaction,
-      ...getOrThrow(utxo.get(transaction)),
-    }));
+    const inputIds = [];
+    const outputIds = [];
+    utxo.forEach(entry => {
+      entry.utxoInputs.forEach(input => inputIds.push(input.UtxoTransactionInputId));
+      entry.utxoOutputs.forEach(output => outputIds.push(output.UtxoTransactionOutputId));
+    });
+    const utxoInputTokens = await ErgoAssociateTxWithIOs.depTables.AssociateToken.forUtxoInput(
+      db, tx,
+      { utxoInputIds: inputIds }
+    );
+    const utxoOutputTokens = await ErgoAssociateTxWithIOs.depTables.AssociateToken.forUtxoOutput(
+      db, tx,
+      { utxoOutputIds: outputIds }
+    );
+
+    const fullTx = request.txs.map(transaction  => {
+      const txRow = getOrThrow(utxo.get(transaction));
+      return {
+        txType: TransactionType.Ergo,
+        transaction,
+        ...txRow,
+        utxoTokenInputs: txRow.utxoInputs.flatMap(
+          input => utxoInputTokens.get(input.UtxoTransactionInputId) || []
+        ),
+        utxoTokenOutputs: txRow.utxoOutputs.flatMap(
+          output => utxoOutputTokens.get(output.UtxoTransactionOutputId) || []
+        ),
+      };
+    });
     return fullTx;
   }
 }
