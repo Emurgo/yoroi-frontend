@@ -43,6 +43,7 @@ import {
   GetBlock,
   GetEncryptionMeta,
   GetDerivationsByPath,
+  GetToken,
 } from './read';
 import type { InsertRequest } from '../../walletTypes/common/utils';
 
@@ -631,8 +632,12 @@ export class ModifyToken {
   |} = Object.freeze({
     [Tables.TokenSchema.name]: Tables.TokenSchema,
   });
-  static depTables: {|GetEncryptionMeta: typeof GetEncryptionMeta|} = Object.freeze({
+  static depTables: {|
+    GetEncryptionMeta: typeof GetEncryptionMeta,
+    GetToken: typeof GetToken,
+  |} = Object.freeze({
     GetEncryptionMeta,
+    GetToken,
   });
 
   static async upsert(
@@ -640,18 +645,65 @@ export class ModifyToken {
     tx: lf$Transaction,
     rows: $ReadOnlyArray<$Diff<TokenInsert, {| Digest: number |}>>,
   ): Promise<$ReadOnlyArray<$ReadOnly<TokenRow>>> {
-    const { TokenSeed } = await ModifyToken.depTables.GetEncryptionMeta.get(db, tx);
-    const rowsWithDigest = rows.map(row => ({
-      Digest: digestForHash(row.Identifier, TokenSeed),
-      ...row,
-    }));
+    // de-duplicate function argument
+    const deduplicatedRows: Array<$ReadOnly<TokenInsert>> = [];
+    {
+      const { TokenSeed } = await ModifyToken.depTables.GetEncryptionMeta.get(db, tx);
+      const rowsWithDigest = rows.map(row => ({
+        Digest: digestForHash(row.Identifier, TokenSeed),
+        ...row,
+      }));
 
-    const result = await addOrReplaceRows<TokenInsert, TokenRow>(
+      // keep track of which rows we've seen before
+      const lookupMap = new Map<number, Map<number, boolean>>();
+      for (const row of rowsWithDigest) {
+        const entry = lookupMap.get(row.Digest) ?? new Map();
+        if (entry.get(row.NetworkId) == null) {
+          deduplicatedRows.push(row);
+        }
+        entry.set(row.NetworkId, true);
+        lookupMap.set(row.Digest, entry);
+      }
+    }
+
+    const knownTokens: Array<$ReadOnly<TokenRow>> = [];
+    const toQuery: Array<$ReadOnly<TokenInsert>> = []; // new tokens we haven't added to the DB yet
+
+    // filter out rows that are already in the DB
+    const lookupMap = new Map<number, Map<number, $ReadOnly<TokenRow>>>();
+    {
+      const existingTokens = await ModifyToken.depTables.GetToken.fromDigest(
+        db, tx,
+        deduplicatedRows.map(row => row.Digest)
+      );
+      for (const token of existingTokens) {
+        const entry = lookupMap.get(token.Digest) ?? new Map();
+        entry.set(token.NetworkId, token);
+        lookupMap.set(token.Digest, entry);
+      }
+    }
+
+    // figure out what we need to query, and what we already know
+    {
+      for (const row of deduplicatedRows) {
+        const item = lookupMap.get(row.Digest)?.get(row.NetworkId);
+        if (item == null) {
+          toQuery.push(row);
+        } else {
+          knownTokens.push(item);
+        }
+      }
+    }
+
+    const newlyAdded = await addOrReplaceRows<TokenInsert, TokenRow>(
       db, tx,
-      rowsWithDigest,
+      toQuery,
       ModifyToken.ownTables[Tables.TokenSchema.name].name,
     );
 
-    return result;
+    return [
+      ...knownTokens,
+      ...newlyAdded,
+    ];
   }
 }

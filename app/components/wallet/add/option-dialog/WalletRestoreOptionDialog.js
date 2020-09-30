@@ -18,19 +18,11 @@ const messages = defineMessages({
   },
   restoreNormalTitle: {
     id: 'wallet.add.optionDialog.restore.normalWallet.title',
-    defaultMessage: '!!!Enter a 15-word recovery phrase',
+    defaultMessage: '!!!Enter a {length}-word recovery phrase',
   },
   restoreNormalDescription: {
     id: 'wallet.add.optionDialog.restore.normalWallet.description',
-    defaultMessage: '!!!If you have a Yoroi recovery phrase consisting of 15 words generated when you created a Yoroi Wallet, choose this option to restore your wallet.',
-  },
-  restoreNormal24Title: {
-    id: 'wallet.add.optionDialog.restore.normal24Wallet.title',
-    defaultMessage: '!!!Enter a 24-word recovery phrase',
-  },
-  restoreNormal24Description: {
-    id: 'wallet.add.optionDialog.restore.normal24Wallet.description',
-    defaultMessage: '!!!If you have a recovery phrase consisting of 24 words, choose this option to restore your wallet.',
+    defaultMessage: '!!!If you have a recovery phrase consisting of {length} words, choose this option to restore your wallet.',
   },
   restorePaperWalletDescription: {
     id: 'wallet.add.optionDialog.restore.paperWallet.description',
@@ -40,6 +32,7 @@ const messages = defineMessages({
 
 type Props = {|
   +onCancel: void => void,
+  +onRestore12: void | (void => void),
   +onRestore15: void => void,
   +onRestore24: void | (void => void),
   +onPaperRestore: void | (void => void),
@@ -53,7 +46,7 @@ export default class WalletRestoreOptionDialog extends Component<Props> {
 
   render(): Node {
     const { intl } = this.context;
-    const { onCancel, onRestore15, onRestore24, onPaperRestore, } = this.props;
+    const { onCancel, onRestore12, onRestore15, onRestore24, onPaperRestore, } = this.props;
 
     return (
       <Dialog
@@ -65,19 +58,32 @@ export default class WalletRestoreOptionDialog extends Component<Props> {
       >
         <div className={styles.component}>
           <ul className={styles.optionBlockList}>
+            {onRestore12 != null && (
+              <OptionBlock
+                parentName="WalletRestoreOptionDialog"
+                type="normal24WordWallet"
+                title={intl.formatMessage(messages.restoreNormalTitle, { length: 12 })}
+                learnMoreText={intl.formatMessage(
+                  messages.restoreNormalDescription, { length: 12 }
+                )}
+                onSubmit={onRestore12}
+              />
+            )}
             <OptionBlock
               parentName="WalletRestoreOptionDialog"
               type="restoreNormalWallet"
-              title={intl.formatMessage(messages.restoreNormalTitle)}
-              learnMoreText={intl.formatMessage(messages.restoreNormalDescription)}
+              title={intl.formatMessage(messages.restoreNormalTitle, { length: 15 })}
+              learnMoreText={intl.formatMessage(messages.restoreNormalDescription, { length: 15 })}
               onSubmit={onRestore15}
             />
             {onRestore24 != null && (
               <OptionBlock
                 parentName="WalletRestoreOptionDialog"
                 type="normal24WordWallet"
-                title={intl.formatMessage(messages.restoreNormal24Title)}
-                learnMoreText={intl.formatMessage(messages.restoreNormal24Description)}
+                title={intl.formatMessage(messages.restoreNormalTitle, { length: 24 })}
+                learnMoreText={intl.formatMessage(
+                  messages.restoreNormalDescription, { length: 24 }
+                )}
                 onSubmit={onRestore24}
               />
             )}

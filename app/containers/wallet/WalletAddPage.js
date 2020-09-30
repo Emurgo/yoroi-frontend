@@ -62,7 +62,7 @@ import type {
   NetworkRow,
 } from '../../api/ada/lib/storage/database/primitives/tables';
 import {
-  networks, isJormungandr, isCardanoHaskell,
+  networks, isJormungandr, isCardanoHaskell, isErgo,
 } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 export type GeneratedData = typeof WalletAddPage.prototype.generated;
@@ -149,7 +149,7 @@ export default class WalletAddPage extends Component<Props> {
           onClose={this.onClose}
           onCreate={() => actions.dialogs.push.trigger({ dialog: WalletCreateDialog })}
           onPaper={/* re-enable paper wallets once we have a good way to do them in Shelley */
-            false // eslint-disable-line
+            !isCardanoHaskell(selectedNetwork)
               ? undefined
               : () => actions.dialogs.push.trigger({ dialog: WalletPaperDialog })
           }
@@ -189,6 +189,16 @@ export default class WalletAddPage extends Component<Props> {
       activeDialog = (
         <WalletRestoreOptionDialogContainer
           onClose={this.onClose}
+          onRestore12={
+            !isErgo(selectedNetwork)
+              ? undefined
+              : () => {
+                return actions.dialogs.push.trigger({
+                  dialog: WalletRestoreDialog,
+                  params: { restoreType: { type: 'bip44', extra: undefined, length: 12 } }
+                });
+              }
+          }
           onRestore15={() => {
             if (isCardanoHaskell(selectedNetwork)) {
               return actions.dialogs.push.trigger({

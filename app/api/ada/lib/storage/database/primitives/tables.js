@@ -748,8 +748,8 @@ export const populatePrimitivesDb = (schemaBuilder: lf$schema$Builder) => {
       action: ConstraintAction.CASCADE,
     })
     .addIndex(
-      'Token_Identifier',
-      ([TokenSchema.properties.Identifier]: Array<string>),
+      'Token_Digest',
+      ([TokenSchema.properties.Digest]: Array<string>),
       /**
        * not unique since different networks can have the same token
        * easiest to achieve by using a testnet for the same blockchain

@@ -1115,14 +1115,20 @@ export class GetToken {
     GetEncryptionMeta,
   });
 
-  static async get(
+  static async fromIds(
     db: lf$Database,
     tx: lf$Transaction,
     tokenIds: Array<string>,
   ): Promise<$ReadOnlyArray<$ReadOnly<TokenRow>>> {
     const { TokenSeed } = await GetToken.depTables.GetEncryptionMeta.get(db, tx);
     const digests = tokenIds.map<number>(hash => digestForHash(hash, TokenSeed));
-
+    return GetToken.fromDigest(db, tx, digests);
+  }
+  static async fromDigest(
+    db: lf$Database,
+    tx: lf$Transaction,
+    digests: Array<number>,
+  ): Promise<$ReadOnlyArray<$ReadOnly<TokenRow>>> {
     const tokenRows = await getRowIn<AddressRow>(
       db, tx,
       GetToken.ownTables[Tables.TokenSchema.name].name,

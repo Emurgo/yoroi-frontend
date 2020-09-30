@@ -184,6 +184,7 @@ export const populateUtxoTransactionsDb = (schemaBuilder: lf$schema$Builder) => 
     .addColumn(TokenListSchema.properties.TokenListItemId, Type.INTEGER)
     .addColumn(TokenListSchema.properties.TokenId, Type.INTEGER)
     .addColumn(TokenListSchema.properties.UtxoTransactionOutputId, Type.INTEGER)
+    .addColumn(TokenListSchema.properties.UtxoTransactionInputId, Type.INTEGER)
     .addColumn(TokenListSchema.properties.Index, Type.INTEGER)
     .addColumn(TokenListSchema.properties.Amount, Type.STRING)
     .addPrimaryKey(
