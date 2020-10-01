@@ -17,11 +17,11 @@ export type RemoteUnspentOutput = {|
   +tx_index: number,
   +creationHeight: number,
   +boxId: string,
-  +assets?: Array<$ReadOnly<{
+  +assets?: Array<{
     amount: number,
     tokenId: string,
     ...
-  }>>,
+  }>,
   +additionalRegisters?: {...},
   +ergoTree: string,
 |};

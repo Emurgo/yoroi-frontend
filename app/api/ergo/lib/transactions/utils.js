@@ -46,11 +46,11 @@ export function convertErgoTransactionsToExportRows(
 
 export function asAddressedUtxo(
   utxos: IGetAllUtxosResponse,
-  tokenMap: Map<number, Array<$ReadOnly<{
+  tokenMap: Map<number, Array<{
     amount: number,
     tokenId: string,
     ...
-  }>>>,
+  }>>,
 ): Array<ErgoAddressedUtxo> {
   return utxos.map(utxo => {
     const output = utxo.output.UtxoTransactionOutput;

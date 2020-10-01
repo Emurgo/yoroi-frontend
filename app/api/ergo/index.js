@@ -439,11 +439,11 @@ export default class ErgoApi {
     });
     const tokenMap = new Map<
       number,
-      Array<$ReadOnly<{
+      Array<{
         amount: number,
         tokenId: string,
         ...
-      }>>
+      }>
     >();
     for (const output of tokensForOutputs) {
       if (output.TokenList.UtxoTransactionOutputId != null) {
