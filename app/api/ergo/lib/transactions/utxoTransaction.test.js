@@ -281,6 +281,7 @@ describe('Create unsigned TX from addresses', () => {
 
 describe('Create signed transactions', () => {
   it('Witness should match on valid private key', () => {
+    const params = getProtocolParams();
     const addressedUtxos = genAddressedUtxos();
     const unsignedTxResponse = newErgoUnsignedTx({
       outputs: [{
@@ -297,12 +298,15 @@ describe('Create signed transactions', () => {
       utxos: [addressedUtxos[0], addressedUtxos[2]],
       currentHeight: 100,
       txFee: new BigNumber('500'),
-      protocolParams: getProtocolParams(),
+      protocolParams: params,
     });
     const signRequest = new ErgoTxSignRequest({
       changeAddr: unsignedTxResponse.changeAddr,
       senderUtxos: unsignedTxResponse.senderUtxos,
       unsignedTx: unsignedTxResponse.unsignedTx,
+      networkSettingSnapshot: {
+        FeeAddress: params.FeeAddress,
+      },
     });
 
     const rootPk = generateWalletRootKey(

@@ -568,6 +568,9 @@ export default class ErgoApi {
         senderUtxos: unsignedTxResponse.senderUtxos,
         unsignedTx: unsignedTxResponse.unsignedTx,
         changeAddr: unsignedTxResponse.changeAddr,
+        networkSettingSnapshot: {
+          FeeAddress: config.FeeAddress
+        },
       });
     } catch (error) {
       Logger.error(
