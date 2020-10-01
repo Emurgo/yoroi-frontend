@@ -383,7 +383,6 @@ function addWitnesses(
   return builderSetWitnesses.set_witnesses(witnesses);
 }
 
-// TODO: should go in a utility class somewhere instead of being copy-pasted in multiple places
 export function asAddressedUtxo(
   utxos: IGetAllUtxosResponse,
 ): Array<CardanoAddressedUtxo> {

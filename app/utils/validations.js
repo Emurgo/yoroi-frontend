@@ -6,7 +6,7 @@ import { getApiForNetwork, getApiMeta } from '../api/common/utils';
 import type { $npm$ReactIntl$IntlFormat, } from 'react-intl';
 import { defineMessages, } from 'react-intl';
 import type { NetworkRow } from '../api/ada/lib/storage/database/primitives/tables';
-import { isCardanoHaskell, isErgo, getCardanoHaskellBaseConfig } from '../api/ada/lib/storage/database/prepackaged/networks';
+import { isCardanoHaskell, isErgo, getCardanoHaskellBaseConfig, getErgoBaseConfig } from '../api/ada/lib/storage/database/prepackaged/networks';
 
 export const isValidWalletName: string => boolean = (walletName) => {
   const nameLength = walletName.length;
@@ -76,7 +76,7 @@ export async function validateAmount(
     },
     tooSmallBox: {
       id: 'wallet.send.form.errors.tooSmallBox',
-      defaultMessage: '!!!Cannot send less than {minUtxo} ERGO.',
+      defaultMessage: '!!!Cannot send less than {minUtxo} ERG.',
     },
   });
 
@@ -100,10 +100,10 @@ export async function validateAmount(
       }
     }
     if (isErgo(network)) {
-      const config = getCardanoHaskellBaseConfig(network)
+      const config = getErgoBaseConfig(network)
         .reduce((acc, next) => Object.assign(acc, next), {});
 
-      const minUtxo = new BigNumber(config.MinimumUtxoVal);
+      const minUtxo = new BigNumber(config.MinimumBoxValue);
       if (new BigNumber(amount).lt(minUtxo)) {
         return [
           false,

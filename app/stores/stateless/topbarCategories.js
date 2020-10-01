@@ -9,9 +9,6 @@ import { networks, isCardanoHaskell, } from '../../api/ada/lib/storage/database/
 import transactionsIcon from '../../assets/images/wallet-nav/tab-transactions.inline.svg';
 import sendIcon from '../../assets/images/wallet-nav/tab-send.inline.svg';
 import receiveIcon from '../../assets/images/wallet-nav/tab-receive.inline.svg';
-import {
-  CoinTypes,
-} from '../../config/numbersConfig';
 
 const messages = defineMessages({
   transactions: {
@@ -68,12 +65,7 @@ export const SEND: TopbarCategory = registerCategory({
   route: ROUTES.WALLETS.SEND,
   icon: sendIcon,
   label: messages.send,
-  isVisible: request => {
-    if (request.selected.getParent().getNetworkInfo().CoinType !== CoinTypes.ERGO) {
-      return true;
-    }
-    return false;
-  },
+  isVisible: _request => true,
 });
 export const RECEIVE: TopbarCategory = registerCategory({
   className: 'receive',

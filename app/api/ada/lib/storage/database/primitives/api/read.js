@@ -1118,6 +1118,18 @@ export class GetToken {
   static async fromIds(
     db: lf$Database,
     tx: lf$Transaction,
+    tokenIds: Array<number>,
+  ): Promise<$ReadOnlyArray<$ReadOnly<TokenRow>>> {
+    return getRowIn(
+      db, tx,
+      GetToken.ownTables[Tables.TokenSchema.name].name,
+      GetToken.ownTables[Tables.TokenSchema.name].properties.TokenId,
+      tokenIds
+    );
+  }
+  static async fromIdentifier(
+    db: lf$Database,
+    tx: lf$Transaction,
     tokenIds: Array<string>,
   ): Promise<$ReadOnlyArray<$ReadOnly<TokenRow>>> {
     const { TokenSeed } = await GetToken.depTables.GetEncryptionMeta.get(db, tx);

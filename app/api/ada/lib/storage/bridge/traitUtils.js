@@ -24,9 +24,11 @@ import {
 import {
   GetAddress,
   GetPathWithSpecific,
+  GetToken,
 } from '../database/primitives/api/read';
 import type {
   AddressRow,
+  TokenRow,
 } from '../database/primitives/tables';
 import type {
   CoreAddressT
@@ -36,7 +38,11 @@ import {
 } from '../database/walletTypes/common/api/read';
 import {
   GetUtxoTxOutputsWithTx,
+  AssociateToken,
 } from '../database/transactionModels/utxo/api/read';
+import type {
+  TokenListRow,
+} from '../database/transactionModels/utxo/tables';
 import {
   rawGetAddressesForDisplay,
 } from '../models/utils';
@@ -213,4 +219,34 @@ export async function rawGetAddressRowsForWallet(
     utxoAddresses,
     accountingAddresses,
   };
+}
+
+export async function buildTokenMap(
+  request: {|
+    publicDeriver: IPublicDeriver<ConceptualWallet>,
+    utxoOutputs: Array<number>,
+  |},
+): Promise<$ReadOnlyArray<{|
+  TokenList: $ReadOnly<TokenListRow>,
+  Token: $ReadOnly<TokenRow>,
+|}>> {
+  const deps = Object.freeze({
+    AssociateToken,
+    GetToken,
+  });
+  const depTables = Object
+    .keys(deps)
+    .map(key => deps[key])
+    .flatMap(table => getAllSchemaTables(request.publicDeriver.getDb(), table));
+  return await raii<PromisslessReturnType<typeof buildTokenMap>>(
+    request.publicDeriver.getDb(),
+    depTables,
+    async tx => await deps.AssociateToken.join(
+      request.publicDeriver.getDb(), tx,
+      {
+        utxoOutputIds: request.utxoOutputs,
+        networkId: request.publicDeriver.getParent().getNetworkInfo().NetworkId,
+      }
+    )
+  );
 }

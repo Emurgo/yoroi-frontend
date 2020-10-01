@@ -200,25 +200,27 @@ export class RemoteFetcher implements IFetcher {
     const { network, ...rest } = body;
     const { BackendService } = network.Backend;
     if (BackendService == null) throw new Error(`${nameof(this.getUTXOsForAddresses)} missing backend url`);
-    return axios(
-      `${BackendService}/api/txs/signed`,
-      {
-        method: 'post',
-        timeout: 2 * CONFIG.app.walletRefreshInterval,
-        data: rest,
-        headers: {
-          'yoroi-version': this.getLastLaunchVersion(),
-          'yoroi-locale': this.getCurrentLocale()
-        }
-      }
-    ).then(response => response.data.id)
-      .catch((error) => {
-        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.sendTx)} error: ` + stringifyError(error));
-        if (error.request.response.includes('Invalid witness')) {
-          throw new InvalidWitnessError();
-        }
-        throw new SendTransactionApiError();
-      });
+    console.log(body);
+    return Promise.resolve({ id: '' });
+    // return axios(
+    //   `${BackendService}/api/txs/signed`,
+    //   {
+    //     method: 'post',
+    //     timeout: 2 * CONFIG.app.walletRefreshInterval,
+    //     data: rest,
+    //     headers: {
+    //       'yoroi-version': this.getLastLaunchVersion(),
+    //       'yoroi-locale': this.getCurrentLocale()
+    //     }
+    //   }
+    // ).then(response => response.data.id)
+    //   .catch((error) => {
+    //     Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.sendTx)} error: ` + stringifyError(error));
+    //     if (error.request.response.includes('Invalid witness')) {
+    //       throw new InvalidWitnessError();
+    //     }
+    //     throw new SendTransactionApiError();
+    //   });
   }
 
   checkAddressesInUse: FilterUsedRequest => Promise<FilterUsedResponse> = (body) => {

@@ -90,28 +90,12 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
     this.generated.actions.memos.closeMemoDialog.trigger();
   };
 
-  getApiType: PublicDeriver<> => 'ada' = (_publicDeriver) => {
-    return 'ada'; // TODO: eventually make send page work for multiple currencies
-  }
-
-  shouldDisable: PublicDeriver<> => boolean = (publicDeriver) => {
-    // we disable in the non-ADA case instead of throwing an error
-    // since the Wallets page should take care of correctly redirecting away from the send page
-    // for currency types that don't support it.
-    const selectedApiType = getApiForNetwork(publicDeriver.getParent().getNetworkInfo());
-    if (selectedApiType !== ApiOptions.ada) {
-      return true;
-    }
-    return false;
-  }
-
   render(): Node {
     const publicDeriver = this.generated.stores.wallets.selected;
     // Guard against potential null values
     if (!publicDeriver) throw new Error(`Active wallet required for ${nameof(WalletSendPage)}.`);
-    if (this.shouldDisable(publicDeriver)) return null;
 
-    const selectedApiType = this.getApiType(publicDeriver);
+    const selectedApiType = getApiForNetwork(publicDeriver.getParent().getNetworkInfo());
     const apiMeta = getApiMeta(selectedApiType)?.meta;
     if (apiMeta == null) throw new Error(`${nameof(WalletSendPage)} no API selected`);
 
@@ -203,7 +187,7 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
 
     const publicDeriver = this.generated.stores.wallets.selected;
     if (!publicDeriver) throw new Error(`Active wallet required for ${nameof(this.webWalletDoConfirmation)}.`);
-    const selectedApiType = this.getApiType(publicDeriver);
+    const selectedApiType = getApiForNetwork(publicDeriver.getParent().getNetworkInfo());
     const apiMeta = getApiMeta(selectedApiType)?.meta;
     if (apiMeta == null) throw new Error(`${nameof(this.hardwareWalletDoConfirmation)} no API selected`);
 

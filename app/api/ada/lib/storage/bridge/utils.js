@@ -117,6 +117,10 @@ export function isValidReceiveAddress(
       id: 'wallet.send.form.cannotSendToReward',
       defaultMessage: '!!!You cannot send to a reward account',
     },
+    cannotSendToP2SH: {
+      id: 'wallet.send.form.cannotSendToP2SH',
+      defaultMessage: '!!!You cannot send to pay-to-script-hash addresses',
+    },
     wrongNetwork: {
       id: 'global.wrongNetwork.address',
       defaultMessage: '!!!Wrong network for address.',
@@ -128,6 +132,9 @@ export function isValidReceiveAddress(
     return [false, messages.invalidAddress];
   }
   if (isErgo(network)) {
+    if (kind === CoreAddressTypes.ERGO_P2SH) {
+      return [false, messages.cannotSendToP2SH];
+    }
     if (isErgoAddress(kind)) {
       return true;
     }

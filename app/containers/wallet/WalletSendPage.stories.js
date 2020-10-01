@@ -178,11 +178,9 @@ const genBaseProps: {|
             trigger: action('closeActiveDialog'),
           },
         },
-        ada: {
-          wallets: {
-            sendMoney: {
-              trigger: async (req) => action('sendMoney')(req),
-            },
+        wallets: {
+          sendMoney: {
+            trigger: async (req) => action('sendMoney')(req),
           },
         },
       },
