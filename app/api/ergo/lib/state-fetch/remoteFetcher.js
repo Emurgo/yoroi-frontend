@@ -201,7 +201,7 @@ export class RemoteFetcher implements IFetcher {
     const { BackendService } = network.Backend;
     if (BackendService == null) throw new Error(`${nameof(this.getUTXOsForAddresses)} missing backend url`);
     console.log(body);
-    return Promise.resolve({ id: '' });
+    return Promise.resolve({ txId: '' });
     // return axios(
     //   `${BackendService}/api/txs/signed`,
     //   {

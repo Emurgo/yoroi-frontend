@@ -30,6 +30,7 @@ import type {
   Address, AddressType, Addressing, UsedStatus, Value,
   IGetAllUtxos,
   IGetAllUtxosResponse,
+  IGetSigningKey,
 } from '../ada/lib/storage/models/PublicDeriver/interfaces';
 import { ErgoTxSignRequest, } from './lib/transactions/ErgoTxSignRequest';
 import { ConceptualWallet } from '../ada/lib/storage/models/ConceptualWallet/index';
@@ -40,6 +41,8 @@ import { getApiForNetwork } from '../common/utils';
 import {
   GenericApiError,
   WalletAlreadyRestoredError,
+  IncorrectWalletPasswordError,
+  InvalidWitnessError,
 } from '../common/errors';
 import LocalizableError from '../../i18n/LocalizableError';
 import type { CoreAddressT } from '../ada/lib/storage/database/primitives/enums';
@@ -49,6 +52,7 @@ import {
 import type {
   HistoryFunc,
   BestBlockFunc,
+  SendFunc, SignedResponse,
 } from './lib/state-fetch/types';
 import type {
   FilterFunc,
@@ -95,6 +99,8 @@ import {
   getErgoBaseConfig,
 } from '../ada/lib/storage/database/prepackaged/networks';
 import { CoreAddressTypes } from '../ada/lib/storage/database/primitives/enums';
+import { BIP32PrivateKey, } from '../common/lib/crypto/keys/keyRepository';
+import { WrongPassphraseError } from '../ada/lib/cardanoCrypto/cryptoErrors';
 
 // getTransactionRowsToExport
 
@@ -189,6 +195,19 @@ export type CreateUnsignedTxForUtxosResponse = ErgoTxSignRequest;
 export type CreateUnsignedTxForUtxosFunc = (
   request: CreateUnsignedTxForUtxosRequest
 ) => Promise<CreateUnsignedTxForUtxosResponse>;
+
+// signAndBroadcast
+
+export type SignAndBroadcastRequest = {|
+  publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetSigningKey,
+  signRequest: ErgoTxSignRequest,
+  password: string,
+  sendTx: SendFunc,
+|};
+export type SignAndBroadcastResponse = SignedResponse;
+export type SignAndBroadcastFunc = (
+  request: SignAndBroadcastRequest
+) => Promise<SignAndBroadcastResponse>;
 
 export default class ErgoApi {
 
@@ -576,6 +595,48 @@ export default class ErgoApi {
       Logger.error(
         `${nameof(ErgoApi)}::${nameof(this.createUnsignedTxForUtxos)} error: ` + stringifyError(error)
       );
+      if (error instanceof LocalizableError) throw error;
+      throw new GenericApiError();
+    }
+  }
+
+  async signAndBroadcast(
+    request: SignAndBroadcastRequest
+  ): Promise<SignAndBroadcastResponse> {
+    Logger.debug(`${nameof(ErgoApi)}::${nameof(this.signAndBroadcast)} called`);
+    const { password } = request;
+    try {
+      const signingKey = await request.publicDeriver.getSigningKey();
+      const normalizedKey = await request.publicDeriver.normalizeKey({
+        ...signingKey,
+        password,
+      });
+      const signedTx = signTransaction({
+        signRequest: request.signRequest,
+        keyLevel: request.publicDeriver.getParent().getPublicDeriverLevel(),
+        signingKey: BIP32PrivateKey.fromBuffer(
+          Buffer.from(normalizedKey.prvKeyHex, 'hex')
+        ),
+      });
+
+      const response = request.sendTx({
+        network: request.publicDeriver.getParent().getNetworkInfo(),
+        inputs: signedTx.inputs,
+        dataInputs: signedTx.dataInputs,
+        outputs: signedTx.outputs,
+      });
+      Logger.debug(
+        `${nameof(ErgoApi)}::${nameof(this.signAndBroadcast)} success: ` + stringifyData(response)
+      );
+      return response;
+    } catch (error) {
+      if (error instanceof WrongPassphraseError) {
+        throw new IncorrectWalletPasswordError();
+      }
+      Logger.error(`${nameof(ErgoApi)}::${nameof(this.signAndBroadcast)} error: ` + stringifyError(error));
+      if (error instanceof InvalidWitnessError) {
+        throw new InvalidWitnessError();
+      }
       if (error instanceof LocalizableError) throw error;
       throw new GenericApiError();
     }

@@ -151,7 +151,7 @@ export type SignedRequest = {|
   size?: number,
 |};
 export type SignedResponse = {|
-  id: string, // hex
+  txId: string, // hex
 |};
 export type SendFunc = (body: SignedRequest) => Promise<SignedResponse>;
 

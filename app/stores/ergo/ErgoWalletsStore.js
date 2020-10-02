@@ -2,10 +2,10 @@
 import { observable, } from 'mobx';
 
 import Store from '../base/Store';
-// import {
-//   Logger,
-//   stringifyError
-// } from '../../utils/logging';
+import {
+  Logger,
+  stringifyError
+} from '../../utils/logging';
 import Request from '../lib/LocalizedRequest';
 import type {
   GenerateWalletRecoveryPhraseFunc
@@ -18,6 +18,7 @@ import { ROUTES } from '../../routes-config';
 import { buildCheckAndCall } from '../lib/check';
 import { getApiForNetwork, ApiOptions } from '../../api/common/utils';
 import type { ISignRequest } from '../../api/common/lib/transactions/ISignRequest';
+import { ErgoTxSignRequest } from '../../api/ergo/lib/transactions/ErgoTxSignRequest';
 
 export default class ErgoWalletsStore extends Store {
 
@@ -53,44 +54,43 @@ export default class ErgoWalletsStore extends Store {
     if (withSigning == null) {
       throw new Error(`${nameof(ErgoWalletsStore)}::${nameof(this._sendMoney)} public deriver missing signing functionality.`);
     }
-    // const { signRequest } = transactionDetails;
-    // if (!(signRequest instanceof ByronTxSignRequest)) {
-    // eslint-disable-next-line max-len
-    //   throw new Error(`${nameof(ErgoWalletsStore)}::${nameof(this._sendMoney)} wrong tx sign request`);
-    // }
-    // await this.stores.wallets.sendMoneyRequest.execute({
-    //   broadcastRequest: async () => await this.api.ergo.signAndBroadcast({
-    //     publicDeriver: withSigning,
-    //     password: transactionDetails.password,
-    //     signRequest: signRequest.self(),
-    //     sendTx: this.stores.substores.ergo.stateFetchStore.fetcher.sendTx,
-    //   }),
-    //   refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(
-    //     transactionDetails.publicDeriver
-    //   ),
-    // })
-    //   .then(async (response) => {
-    //     const memo = this.stores.transactionBuilderStore.memo;
-    //     if (memo !== '' && memo !== undefined) {
-    //       try {
-    //         await this.actions.memos.saveTxMemo.trigger({
-    //           publicDeriver: transactionDetails.publicDeriver,
-    //           memo: {
-    //             Content: memo,
-    //             TransactionHash: response.txId,
-    //             LastUpdated: new Date(),
-    //           },
-    //         });
-    //       } catch (error) {
-    //         Logger.error(
-    //           `${nameof(ErgoWalletsStore)}::${nameof(this._sendMoney)} error: `
-    //             + stringifyError(error)
-    //         );
-    //         throw new Error('An error has ocurred when saving the transaction memo.');
-    //       }
-    //     }
-    //     return response;
-    //   });
+    const { signRequest } = transactionDetails;
+    if (!(signRequest instanceof ErgoTxSignRequest)) {
+      throw new Error(`${nameof(ErgoWalletsStore)}::${nameof(this._sendMoney)} wrong tx sign request`);
+    }
+    await this.stores.wallets.sendMoneyRequest.execute({
+      broadcastRequest: async () => await this.api.ergo.signAndBroadcast({
+        publicDeriver: withSigning,
+        password: transactionDetails.password,
+        signRequest,
+        sendTx: this.stores.substores.ergo.stateFetchStore.fetcher.sendTx,
+      }),
+      refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(
+        transactionDetails.publicDeriver
+      ),
+    })
+      .then(async (response) => {
+        const memo = this.stores.transactionBuilderStore.memo;
+        if (memo !== '' && memo !== undefined) {
+          try {
+            await this.actions.memos.saveTxMemo.trigger({
+              publicDeriver: transactionDetails.publicDeriver,
+              memo: {
+                Content: memo,
+                TransactionHash: response.txId,
+                LastUpdated: new Date(),
+              },
+            });
+          } catch (error) {
+            Logger.error(
+              `${nameof(ErgoWalletsStore)}::${nameof(this._sendMoney)} error: `
+                + stringifyError(error)
+            );
+            throw new Error('An error has ocurred when saving the transaction memo.');
+          }
+        }
+        return response;
+      });
 
     this.actions.dialogs.closeActiveDialog.trigger();
     this.stores.wallets.sendMoneyRequest.reset();
