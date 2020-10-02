@@ -225,7 +225,7 @@ export default class TransactionBuilderStore extends Store {
         }));
       }
     } else if (isErgo(network)) {
-      const lastSync = await publicDeriver.getLastSyncInfo();
+      const lastSync = this.stores.transactions.getTxRequests(publicDeriver).lastSyncInfo;
       if (amount == null && shouldSendAll === true) {
         await this.createUnsignedTx.execute(() => this.api.ergo.createUnsignedTx({
           publicDeriver: withUtxos,
