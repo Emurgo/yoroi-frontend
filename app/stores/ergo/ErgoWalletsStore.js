@@ -2,22 +2,13 @@
 import { observable, } from 'mobx';
 
 import Store from '../base/Store';
-import {
-  Logger,
-  stringifyError
-} from '../../utils/logging';
 import Request from '../lib/LocalizedRequest';
 import type {
   GenerateWalletRecoveryPhraseFunc
 } from '../../api/ada/index';
-import {
-  asGetSigningKey,
-} from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import { ROUTES } from '../../routes-config';
 import { buildCheckAndCall } from '../lib/check';
 import { getApiForNetwork, ApiOptions } from '../../api/common/utils';
-import type { ISignRequest } from '../../api/common/lib/transactions/ISignRequest';
 import { ErgoTxSignRequest } from '../../api/ergo/lib/transactions/ErgoTxSignRequest';
 
 export default class ErgoWalletsStore extends Store {
@@ -29,7 +20,7 @@ export default class ErgoWalletsStore extends Store {
 
   setup(): void {
     super.setup();
-    const { ergo, wallets, walletBackup } = this.actions;
+    const { ergo, walletBackup } = this.actions;
     const { asyncCheck } = buildCheckAndCall(
       ApiOptions.ergo,
       () => {
@@ -39,65 +30,39 @@ export default class ErgoWalletsStore extends Store {
     );
     walletBackup.finishWalletBackup.listen(asyncCheck(this._createInDb));
     ergo.wallets.createWallet.listen(this._startWalletCreation);
-    wallets.sendMoney.listen(asyncCheck(this._sendMoney));
   }
 
   // =================== SEND MONEY ==================== //
 
-  /** Send money and then return to transaction screen */
-  _sendMoney:  {|
-    signRequest: ISignRequest<any>,
-    password: string,
-    publicDeriver: PublicDeriver<>,
-  |} => Promise<void> = async (transactionDetails) => {
-    const withSigning = (asGetSigningKey(transactionDetails.publicDeriver));
-    if (withSigning == null) {
-      throw new Error(`${nameof(ErgoWalletsStore)}::${nameof(this._sendMoney)} public deriver missing signing functionality.`);
-    }
-    const { signRequest } = transactionDetails;
-    if (!(signRequest instanceof ErgoTxSignRequest)) {
-      throw new Error(`${nameof(ErgoWalletsStore)}::${nameof(this._sendMoney)} wrong tx sign request`);
-    }
-    await this.stores.wallets.sendMoneyRequest.execute({
-      broadcastRequest: async () => await this.api.ergo.signAndBroadcast({
-        publicDeriver: withSigning,
-        password: transactionDetails.password,
-        signRequest,
-        sendTx: this.stores.substores.ergo.stateFetchStore.fetcher.sendTx,
-      }),
-      refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(
-        transactionDetails.publicDeriver
-      ),
-    })
-      .then(async (response) => {
-        const memo = this.stores.transactionBuilderStore.memo;
-        if (memo !== '' && memo !== undefined) {
-          try {
-            await this.actions.memos.saveTxMemo.trigger({
-              publicDeriver: transactionDetails.publicDeriver,
-              memo: {
-                Content: memo,
-                TransactionHash: response.txId,
-                LastUpdated: new Date(),
-              },
-            });
-          } catch (error) {
-            Logger.error(
-              `${nameof(ErgoWalletsStore)}::${nameof(this._sendMoney)} error: `
-                + stringifyError(error)
-            );
-            throw new Error('An error has ocurred when saving the transaction memo.');
-          }
-        }
-        return response;
-      });
+  ergoSendAndRefresh: {|
+    broadcastRequest: {|
+      normal: {|
+        publicDeriver: PublicDeriver<>,
+        signRequest: ErgoTxSignRequest,
+        password: string,
+      |}
+    |},
+    refreshWallet: () => Promise<void>,
+  |} => Promise<void> = async (request) => {
 
-    this.actions.dialogs.closeActiveDialog.trigger();
-    this.stores.wallets.sendMoneyRequest.reset();
-    this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ROOT });
-
-    throw new Error(`${nameof(ErgoWalletsStore)}::${nameof(this._sendMoney)} not implemented yet`);
-  };
+    const broadcastRequest = async () => {
+      if (request.broadcastRequest.normal) {
+        return await this.stores.substores.ergo.mnemonicSend.signAndBroadcast(
+          request.broadcastRequest.normal
+        );
+      }
+      throw new Error(`${nameof(ErgoWalletsStore)}::${nameof(this.ergoSendAndRefresh)} unhandled wallet type`);
+    };
+    const publicDeriver = (() => {
+      if (request.broadcastRequest.normal) return request.broadcastRequest.normal.publicDeriver;
+      throw new Error(`${nameof(ErgoWalletsStore)}::${nameof(this.ergoSendAndRefresh)} unhandled wallet type`);
+    })();
+    await this.stores.wallets.sendAndRefresh({
+      publicDeriver,
+      broadcastRequest,
+      refreshWallet: request.refreshWallet,
+    });
+  }
 
   // =================== WALLET RESTORATION ==================== //
 

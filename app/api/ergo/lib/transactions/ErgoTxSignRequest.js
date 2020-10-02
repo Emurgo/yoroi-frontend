@@ -43,7 +43,7 @@ export class ErgoTxSignRequest implements ISignRequest<Transaction> {
   }
 
   totalInput(shift: boolean): BigNumber {
-    return getTxInputTotal(this.unsignedTx, shift);
+    return getTxInputTotal(this.unsignedTx, this.changeAddr, shift);
   }
 
   totalOutput(shift: boolean): BigNumber {
@@ -96,6 +96,7 @@ export class ErgoTxSignRequest implements ISignRequest<Transaction> {
 
 export function getTxInputTotal(
   tx: Transaction,
+  changeAddr: Array<{| ...Address, ...Value, ...Addressing |}>,
   shift: boolean
 ): BigNumber {
   let sum = new BigNumber(0);
@@ -106,6 +107,12 @@ export function getTxInputTotal(
     const value = new BigNumber(input.value ?? 0);
     sum = sum.plus(value);
   }
+
+  const change = changeAddr
+    .map(val => new BigNumber(val.value || new BigNumber(0)))
+    .reduce((changeSum, val) => changeSum.plus(val), new BigNumber(0));
+
+  sum = sum.minus(change);
   if (shift) {
     return sum.shiftedBy(-getErgoCurrencyMeta().decimalPlaces.toNumber());
   }

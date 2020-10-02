@@ -465,12 +465,14 @@ export default class ErgoApi {
       }>
     >();
     for (const output of tokensForOutputs) {
-      if (output.TokenList.UtxoTransactionOutputId != null) {
-        const list = tokenMap.get(output.TokenList.UtxoTransactionOutputId) ?? [];
+      const { UtxoTransactionOutputId } = output.TokenList;
+      if (UtxoTransactionOutputId != null) {
+        const list = tokenMap.get(UtxoTransactionOutputId) ?? [];
         list.push({
           amount: Number.parseInt(output.TokenList.Amount, 10),
           tokenId: output.Token.Identifier,
         });
+        tokenMap.set(UtxoTransactionOutputId, list);
       }
     }
     const addressedUtxo = asAddressedUtxo(

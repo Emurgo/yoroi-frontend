@@ -155,9 +155,8 @@ export function sendAllUnsignedTxFromUtxo(request: {|
       .map(entry => ({ tokenId: entry[0], amount: entry[1].toNumber(), }))
   );
 
-  const foo = inputs.map(input => input.box.toInput());
   const unsignedTx = new Transaction(
-    foo,
+    inputs.map(input => input.box.toInput()),
     [fee, output],
     [],
   );
