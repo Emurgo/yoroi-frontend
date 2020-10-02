@@ -19,6 +19,7 @@ import {
 import {
   genTimeToSlot,
 } from '../../api/ada/lib/storage/bridge/timeUtils';
+import { feeValue } from '@coinbarn/ergo-ts';
 
 export type SetupSelfTxRequest = {|
   publicDeriver: IHasUtxoChains,
@@ -224,14 +225,15 @@ export default class TransactionBuilderStore extends Store {
         }));
       }
     } else if (isErgo(network)) {
+      const lastSync = await publicDeriver.getLastSyncInfo();
       if (amount == null && shouldSendAll === true) {
         await this.createUnsignedTx.execute(() => this.api.ergo.createUnsignedTx({
           publicDeriver: withUtxos,
           receiver,
           shouldSendAll,
           filter: this.filter,
-          currentHeight: 0, // TODO
-          txFee: new  BigNumber(10000), // TODO
+          currentHeight: lastSync.Height,
+          txFee: new  BigNumber(feeValue),
         }));
       } else if (amount != null) {
         await this.createUnsignedTx.execute(() => this.api.ergo.createUnsignedTx({
@@ -239,8 +241,8 @@ export default class TransactionBuilderStore extends Store {
           receiver,
           amount,
           filter: this.filter,
-          currentHeight: 0, // TODO
-          txFee: new  BigNumber(10000), // TODO
+          currentHeight: lastSync.Height,
+          txFee: new  BigNumber(feeValue),
         }));
       }
     } else {

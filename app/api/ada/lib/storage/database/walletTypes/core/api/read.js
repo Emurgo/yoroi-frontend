@@ -183,7 +183,7 @@ export class GetLastSyncForPublicDeriver {
       publicDeriverId
     );
     if (pubDeriverRow === undefined) {
-      throw new StaleStateError('GetLastSyncForPublicDeriver::forId pubDeriverRow');
+      throw new StaleStateError(`${nameof(GetLastSyncForPublicDeriver)}::${nameof(GetLastSyncForPublicDeriver.forId)} pubDeriverRow`);
     }
 
     const syncInfo = await GetLastSyncForPublicDeriver.depTables.ReadLastSyncInfo.getLastSyncInfo(
@@ -191,7 +191,7 @@ export class GetLastSyncForPublicDeriver {
       pubDeriverRow.LastSyncInfoId
     );
     if (syncInfo === undefined) {
-      throw new StaleStateError('GetLastSyncForPublicDeriver::forId syncInfo');
+      throw new StaleStateError(`${nameof(GetLastSyncForPublicDeriver)}::${nameof(GetLastSyncForPublicDeriver.forId)} syncInfo`);
     }
     return syncInfo;
   }

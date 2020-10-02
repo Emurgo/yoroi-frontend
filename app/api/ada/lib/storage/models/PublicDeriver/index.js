@@ -111,7 +111,7 @@ implements IPublicDeriver<Parent>, IRename, IGetLastSyncInfo {
           this.publicDeriverId,
         );
         if (row == null) {
-          throw new StaleStateError('getFullPublicDeriverInfo PublicDeriver==null');
+          throw new StaleStateError(`${nameof(this.getFullPublicDeriverInfo)} PublicDeriver==null`);
         }
         return row;
       }
@@ -217,7 +217,7 @@ export async function refreshPublicDeriverFunctionality(
     return instance;
   }
 
-  throw new Error('refreshPublicDeriverFunctionality unknown wallet type');
+  throw new Error(`${nameof(refreshPublicDeriverFunctionality)} unknown wallet type`);
 }
 
 async function getKeyDerivation(
@@ -240,7 +240,7 @@ async function getKeyDerivation(
         keyDerivationId,
       );
       if (keyDerivationRow === undefined) {
-        throw new StaleStateError('PublicDeriver::getKeyDerivation keyDerivationRow');
+        throw new StaleStateError(`${nameof(getKeyDerivation)} keyDerivationRow`);
       }
       return keyDerivationRow;
     }
