@@ -350,7 +350,9 @@ describe('Create sendAll unsigned TX from UTXO', () => {
       const sampleUtxos = genSampleUtxos();
       const utxos: Array<RemoteUnspentOutput> = [sampleUtxos[1], sampleUtxos[3]];
       const sendAllResponse = sendAllUnsignedTxFromUtxo({
-        receiver: decode('9egNKTzQDH658qcdiPEoQfVM1SBxQNxnyF8BCw57aNWerRhhHBQ').toString('hex'),
+        receiver: {
+          address: decode('9egNKTzQDH658qcdiPEoQfVM1SBxQNxnyF8BCw57aNWerRhhHBQ').toString('hex')
+        },
         utxos,
         currentHeight: 100,
         txFee: new BigNumber('500'),
@@ -373,7 +375,9 @@ describe('Create sendAll unsigned TX from UTXO', () => {
 
   it('Should fail due to insufficient funds (no inputs)', () => {
     expect(() => sendAllUnsignedTxFromUtxo({
-      receiver: decode('9egNKTzQDH658qcdiPEoQfVM1SBxQNxnyF8BCw57aNWerRhhHBQ').toString('hex'),
+      receiver: {
+        address: decode('9egNKTzQDH658qcdiPEoQfVM1SBxQNxnyF8BCw57aNWerRhhHBQ').toString('hex')
+      },
       utxos: [],
       currentHeight: 100,
       txFee: new BigNumber('500'),
@@ -385,7 +389,9 @@ describe('Create sendAll unsigned TX from UTXO', () => {
     const sampleUtxos = genSampleUtxos();
     const utxos: Array<RemoteUnspentOutput> = [sampleUtxos[0]];
     expect(() => sendAllUnsignedTxFromUtxo({
-      receiver: decode('9egNKTzQDH658qcdiPEoQfVM1SBxQNxnyF8BCw57aNWerRhhHBQ').toString('hex'),
+      receiver: {
+        address: decode('9egNKTzQDH658qcdiPEoQfVM1SBxQNxnyF8BCw57aNWerRhhHBQ').toString('hex')
+      },
       utxos,
       currentHeight: 100,
       txFee: new BigNumber('100000'),
