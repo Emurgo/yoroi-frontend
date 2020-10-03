@@ -211,7 +211,9 @@ export class RemoteFetcher implements IFetcher {
           'yoroi-locale': this.getCurrentLocale()
         }
       }
-    ).then(response => response.data.id)
+    ).then(response => ({
+      txId: response.data.id,
+    }))
       .catch((error) => {
         Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.sendTx)} error: ` + stringifyError(error));
         if (error.request.response.includes('Invalid witness')) {

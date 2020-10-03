@@ -34,14 +34,6 @@ type Props = {|
 @observer
 export default class WalletSendConfirmationDialogContainer extends Component<Props> {
 
-  getApiType: PublicDeriver<> => 'ada' = (publicDeriver) => {
-    const selectedApiType = getApiForNetwork(publicDeriver.getParent().getNetworkInfo());
-    if (selectedApiType !== ApiOptions.ada) {
-      throw new Error(`${nameof(WalletSendConfirmationDialogContainer)} sending only supported for ADA`);
-    }
-    return (selectedApiType: any);
-  }
-
   componentWillUnmount() {
     this.generated.stores.wallets.sendMoneyRequest.reset();
   }
@@ -57,11 +49,11 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
     const { profile } = stores;
 
     if (publicDeriver == null) throw new Error(`Active wallet required for ${nameof(WalletSendConfirmationDialogContainer)}`);
-    const selectedApiType = this.getApiType(publicDeriver);
+    const selectedApiType =  getApiForNetwork(publicDeriver.getParent().getNetworkInfo());
     const apiMeta = getApiMeta(selectedApiType)?.meta;
     if (apiMeta == null) throw new Error(`${nameof(WalletSendConfirmationDialogContainer)} no API selected`);
 
-    const { sendMoney } = actions[selectedApiType].wallets;
+    const { sendMoney } = actions.wallets;
     const { sendMoneyRequest } = stores.wallets;
 
     const totalInput = signRequest.totalInput(true);
@@ -113,16 +105,14 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
 
   @computed get generated(): {|
     actions: {|
-      ada: {|
-        wallets: {|
-          sendMoney: {|
-            trigger: (params: {|
-              password: string,
-              publicDeriver: PublicDeriver<>,
-              signRequest: ISignRequest<any>,
-            |}) => Promise<void>
-          |}
-        |}
+      wallets: {|
+        sendMoney: {|
+          trigger: (params: {|
+            password: string,
+            publicDeriver: PublicDeriver<>,
+            signRequest: ISignRequest<any>,
+          |}) => Promise<void>
+        |},
       |},
       dialogs: {|
         closeActiveDialog: {|
@@ -177,11 +167,9 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
             trigger: actions.dialogs.closeActiveDialog.trigger,
           },
         },
-        ada: {
-          wallets: {
-            sendMoney: {
-              trigger: actions.wallets.sendMoney.trigger,
-            },
+        wallets: {
+          sendMoney: {
+            trigger: actions.wallets.sendMoney.trigger,
           },
         },
       },

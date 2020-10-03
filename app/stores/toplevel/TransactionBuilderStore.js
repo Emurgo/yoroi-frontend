@@ -4,9 +4,6 @@ import BigNumber from 'bignumber.js';
 import { action, computed, observable, reaction, runInAction, toJS } from 'mobx';
 import Store from '../base/Store';
 import LocalizedRequest from '../lib/LocalizedRequest';
-import type {
-  CreateUnsignedTxFunc,
-} from '../../api/ada';
 
 import type { ISignRequest } from '../../api/common/lib/transactions/ISignRequest';
 import {
@@ -15,10 +12,14 @@ import {
 import type {
   IGetAllUtxosResponse, IHasUtxoChains,
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
-import { getCardanoHaskellBaseConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import {
+  isCardanoHaskell, getCardanoHaskellBaseConfig,
+  isErgo,
+} from '../../api/ada/lib/storage/database/prepackaged/networks';
 import {
   genTimeToSlot,
 } from '../../api/ada/lib/storage/bridge/timeUtils';
+import { feeValue } from '@coinbarn/ergo-ts';
 
 export type SetupSelfTxRequest = {|
   publicDeriver: IHasUtxoChains,
@@ -33,7 +34,7 @@ export type SetupSelfTxFunc = SetupSelfTxRequest => Promise<void>;
  *
  * These can be loosened later to create a manual UTXO selection feature
  */
-export default class AdaTransactionBuilderStore extends Store {
+export default class TransactionBuilderStore extends Store {
 
   @observable shouldSendAll: boolean;
   /** Stores the tx information as the user is building it */
@@ -49,10 +50,9 @@ export default class AdaTransactionBuilderStore extends Store {
   @observable txMismatch: boolean = false;
 
   // REQUESTS
-  @observable createUnsignedTx: LocalizedRequest<CreateUnsignedTxFunc>
-    // TODO: This should not be ADA-specific
-    = new LocalizedRequest<CreateUnsignedTxFunc>(this.api.ada.createUnsignedTx.bind(this.api.ada));
-
+  @observable createUnsignedTx: LocalizedRequest<DeferredCall<ISignRequest<any>>>
+    = new LocalizedRequest<DeferredCall<ISignRequest<any>>>(async func => await func());
+  // this.api.ada.createUnsignedTx.bind(this.api.ada)
   @observable memo: void | string;
 
   @observable setupSelfTx: LocalizedRequest<SetupSelfTxFunc>
@@ -192,38 +192,64 @@ export default class AdaTransactionBuilderStore extends Store {
     if (withUtxos == null) {
       throw new Error(`${nameof(this._updateTxBuilder)} missing utxo functionality`);
     }
-    const withHasUtxoChains = asHasUtxoChains(withUtxos);
-    if (withHasUtxoChains == null) {
-      throw new Error(`${nameof(this._updateTxBuilder)} missing chains functionality`);
-    }
 
-    // TODO: should not be ADA-specific
-    const fullConfig = getCardanoHaskellBaseConfig(
-      withHasUtxoChains.getParent().getNetworkInfo(),
-    );
-    const timeToSlot = await genTimeToSlot(fullConfig);
-    // TODO: should not be ADA-specific
-    const absSlotNumber = new BigNumber(timeToSlot({
-      // use server time for TTL if connected to server
-      time: this.stores.serverConnectionStore.serverTime ?? new Date(),
-    }).slot);
+    const network = withUtxos.getParent().getNetworkInfo();
+    if (isCardanoHaskell(network)) {
+      const withHasUtxoChains = asHasUtxoChains(withUtxos);
+      if (withHasUtxoChains == null) {
+        throw new Error(`${nameof(this._updateTxBuilder)} missing chains functionality`);
+      }
 
-    if (amount == null && shouldSendAll === true) {
-      await this.createUnsignedTx.execute({
-        publicDeriver: withHasUtxoChains,
-        receiver,
-        shouldSendAll,
-        filter: this.filter,
-        absSlotNumber,
-      });
-    } else if (amount != null) {
-      await this.createUnsignedTx.execute({
-        publicDeriver: withHasUtxoChains,
-        receiver,
-        amount,
-        filter: this.filter,
-        absSlotNumber,
-      });
+      const fullConfig = getCardanoHaskellBaseConfig(network);
+      const timeToSlot = await genTimeToSlot(fullConfig);
+      const absSlotNumber = new BigNumber(timeToSlot({
+        // use server time for TTL if connected to server
+        time: this.stores.serverConnectionStore.serverTime ?? new Date(),
+      }).slot);
+
+      if (amount == null && shouldSendAll === true) {
+        await this.createUnsignedTx.execute(() => this.api.ada.createUnsignedTx({
+          publicDeriver: withHasUtxoChains,
+          receiver,
+          shouldSendAll,
+          filter: this.filter,
+          absSlotNumber,
+        }));
+      } else if (amount != null) {
+        await this.createUnsignedTx.execute(() => this.api.ada.createUnsignedTx({
+          publicDeriver: withHasUtxoChains,
+          receiver,
+          amount,
+          filter: this.filter,
+          absSlotNumber,
+        }));
+      }
+    } else if (isErgo(network)) {
+      const lastSync = this.stores.transactions.getTxRequests(publicDeriver).lastSyncInfo;
+
+      const txFee = new BigNumber(feeValue).plus(100000); // slightly higher than default fee
+
+      if (amount == null && shouldSendAll === true) {
+        await this.createUnsignedTx.execute(() => this.api.ergo.createUnsignedTx({
+          publicDeriver: withUtxos,
+          receiver,
+          shouldSendAll,
+          filter: this.filter,
+          currentHeight: lastSync.Height,
+          txFee,
+        }));
+      } else if (amount != null) {
+        await this.createUnsignedTx.execute(() => this.api.ergo.createUnsignedTx({
+          publicDeriver: withUtxos,
+          receiver,
+          amount,
+          filter: this.filter,
+          currentHeight: lastSync.Height,
+          txFee,
+        }));
+      }
+    } else {
+      throw new Error(`${nameof(TransactionBuilderStore)}::${nameof(this._updateTxBuilder)} network not supported`);
     }
   }
 

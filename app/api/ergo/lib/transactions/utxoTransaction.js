@@ -41,7 +41,7 @@ type TxOutput = {|
 |};
 
 export function sendAllUnsignedTx(request: {|
-  receiver: string,
+  receiver: {| ...Address, ...InexactSubset<Addressing> |},
   currentHeight: number,
   utxos: Array<ErgoAddressedUtxo>,
   txFee: BigNumber,
@@ -90,7 +90,7 @@ export function sendAllUnsignedTx(request: {|
 }
 
 export function sendAllUnsignedTxFromUtxo(request: {|
-  receiver: string,
+  receiver: {| ...Address, ...InexactSubset<Addressing> |},
   currentHeight: number,
   utxos: Array<RemoteUnspentOutput>,
   txFee: BigNumber,
@@ -146,7 +146,7 @@ export function sendAllUnsignedTxFromUtxo(request: {|
     inputAmountSum.minus(fee.value).toNumber(),
     request.currentHeight,
     ErgoAddress.fromBytes(
-      Buffer.from(request.receiver, 'hex')
+      Buffer.from(request.receiver.address, 'hex')
     ),
     // include all the tokens as well
     Array.from(
@@ -155,9 +155,8 @@ export function sendAllUnsignedTxFromUtxo(request: {|
       .map(entry => ({ tokenId: entry[0], amount: entry[1].toNumber(), }))
   );
 
-  const foo = inputs.map(input => input.box.toInput());
   const unsignedTx = new Transaction(
-    foo,
+    inputs.map(input => input.box.toInput()),
     [fee, output],
     [],
   );
@@ -165,7 +164,13 @@ export function sendAllUnsignedTxFromUtxo(request: {|
   return {
     senderUtxos: inputs.map(input => input.self),
     unsignedTx,
-    changeAddr: [],
+    changeAddr: request.receiver.addressing
+      ? [{
+        addressing: request.receiver.addressing,
+        address: request.receiver.address,
+        value: new BigNumber(output.value),
+      }]
+      : [],
   };
 }
 

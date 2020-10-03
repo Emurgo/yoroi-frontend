@@ -8,40 +8,57 @@ import type {
   Address, Value, Addressing,
 } from '../../../ada/lib/storage/models/PublicDeriver/interfaces';
 import type { ErgoAddressedUtxo } from './types';
+import { encode } from 'bs58';
+
+type NetworkSettingSnapshot = {|
+  +FeeAddress: string,
+|};
 
 export class ErgoTxSignRequest implements ISignRequest<Transaction> {
 
   senderUtxos: Array<ErgoAddressedUtxo>;
   unsignedTx: Transaction;
   changeAddr: Array<{| ...Address, ...Value, ...Addressing |}>;
+  networkSettingSnapshot: NetworkSettingSnapshot;
 
   constructor(signRequest: {|
     senderUtxos: Array<ErgoAddressedUtxo>,
     unsignedTx: Transaction,
     changeAddr: Array<{| ...Address, ...Value, ...Addressing |}>,
+    networkSettingSnapshot: NetworkSettingSnapshot,
   |}) {
     this.senderUtxos = signRequest.senderUtxos;
     this.unsignedTx = signRequest.unsignedTx;
     this.changeAddr = signRequest.changeAddr;
+    this.networkSettingSnapshot = signRequest.networkSettingSnapshot;
+
+    // note: ergo-ts drops the value information from transaction inputs
+    // so we manually re-add it
+    for (const utxo of signRequest.senderUtxos) {
+      const inputInTx = signRequest.unsignedTx.inputs.find(input => input.boxId === utxo.boxId);
+      if (inputInTx == null) throw new Error(`Should never happen`);
+      inputInTx.value = Number.parseInt(utxo.amount, 10);
+      inputInTx.address = encode(Buffer.from(utxo.receiver, 'hex'));
+    }
   }
 
   totalInput(shift: boolean): BigNumber {
-    return getTxInputTotal(this.unsignedTx, shift);
+    return getTxInputTotal(this.unsignedTx, this.changeAddr, shift);
   }
 
   totalOutput(shift: boolean): BigNumber {
-    return getTxOutputTotal(this.unsignedTx, shift);
+    return getTxOutputTotal(this.unsignedTx, shift, this.networkSettingSnapshot.FeeAddress);
   }
 
   fee(shift: boolean): BigNumber {
-    return getErgoTxFee(this.unsignedTx, shift);
+    return getErgoTxFee(this.unsignedTx, shift, this.networkSettingSnapshot.FeeAddress);
   }
 
   uniqueSenderAddresses(): Array<string> {
     return Array.from(new Set(this.senderUtxos.map(utxo => utxo.receiver)));
   }
 
-  receivers(includeChange: boolean): Array<string> {
+  receivers(includeChangeAndFee: boolean): Array<string> {
     const receivers: Array<string> = [];
 
     const changeAddrs = new Set(this.changeAddr.map(change => change.address));
@@ -49,8 +66,13 @@ export class ErgoTxSignRequest implements ISignRequest<Transaction> {
     for (let i = 0; i < outputs.length; i++) {
       const output = outputs[i];
       const addr = Buffer.from(output.address.addrBytes).toString('hex');
-      if (!includeChange) {
+      if (!includeChangeAndFee) {
         if (changeAddrs.has(addr)) {
+          continue;
+        }
+      }
+      if (!includeChangeAndFee) {
+        if (addr === this.networkSettingSnapshot.FeeAddress) {
           continue;
         }
       }
@@ -74,6 +96,7 @@ export class ErgoTxSignRequest implements ISignRequest<Transaction> {
 
 export function getTxInputTotal(
   tx: Transaction,
+  changeAddr: Array<{| ...Address, ...Value, ...Addressing |}>,
   shift: boolean
 ): BigNumber {
   let sum = new BigNumber(0);
@@ -84,6 +107,12 @@ export function getTxInputTotal(
     const value = new BigNumber(input.value ?? 0);
     sum = sum.plus(value);
   }
+
+  const change = changeAddr
+    .map(val => new BigNumber(val.value || new BigNumber(0)))
+    .reduce((changeSum, val) => changeSum.plus(val), new BigNumber(0));
+
+  sum = sum.minus(change);
   if (shift) {
     return sum.shiftedBy(-getErgoCurrencyMeta().decimalPlaces.toNumber());
   }
@@ -92,13 +121,15 @@ export function getTxInputTotal(
 
 export function getTxOutputTotal(
   tx: Transaction,
-  shift: boolean
+  shift: boolean,
+  feeAddress: string,
 ): BigNumber {
   let sum = new BigNumber(0);
 
-  const outputs = tx.outputs;
-  for (let i = 0; i < outputs.length; i++) {
-    const output = outputs[i];
+  for (const output of tx.outputs) {
+    if (output.address.addrBytes.toString('hex') === feeAddress) {
+      continue;
+    }
     const value = new BigNumber(output.value);
     sum = sum.plus(value);
   }
@@ -111,10 +142,15 @@ export function getTxOutputTotal(
 export function getErgoTxFee(
   tx: Transaction,
   shift: boolean,
+  feeAddress: string,
 ): BigNumber {
-  const out = getTxOutputTotal(tx, false);
-  const ins = getTxInputTotal(tx, false);
-  const result = ins.minus(out);
+  const feeBox = tx.outputs.find(output => (
+    output.address.addrBytes.toString('hex') === feeAddress
+  ));
+  if (feeBox == null) {
+    throw new Error(`${nameof(getErgoTxFee)} no fee output found for transaction`);
+  }
+  const result = new BigNumber(feeBox.value);
   if (shift) {
     return result.shiftedBy(-getErgoCurrencyMeta().decimalPlaces.toNumber());
   }

@@ -14,6 +14,12 @@ import { formatBigNumberToFloatString } from '../../../../utils/formatters';
 import {
   transactionTypes,
 } from '../../../ada/transactions/types';
+import type {
+  IGetAllUtxosResponse,
+} from '../../../ada/lib/storage/models/PublicDeriver/interfaces';
+import type {
+  ErgoAddressedUtxo,
+} from './types';
 
 export function convertErgoTransactionsToExportRows(
   transactions: $ReadOnlyArray<$ReadOnly<{
@@ -36,4 +42,37 @@ export function convertErgoTransactionsToExportRows(
     }
   }
   return result;
+}
+
+export function asAddressedUtxo(
+  utxos: IGetAllUtxosResponse,
+  tokenMap: Map<number, Array<{
+    amount: number,
+    tokenId: string,
+    ...
+  }>>,
+): Array<ErgoAddressedUtxo> {
+  return utxos.map(utxo => {
+    const output = utxo.output.UtxoTransactionOutput;
+    const tokens = tokenMap.get(output.UtxoTransactionOutputId);
+    if (
+      output.ErgoCreationHeight == null ||
+      output.ErgoBoxId == null ||
+      output.ErgoTree == null
+    ) {
+      throw new Error(`${nameof(asAddressedUtxo)} missing Ergo fields for Ergo UTXO`);
+    }
+    return {
+      amount: output.Amount,
+      receiver: utxo.address,
+      tx_hash: utxo.output.Transaction.Hash,
+      tx_index: utxo.output.UtxoTransactionOutput.OutputIndex,
+      addressing: utxo.addressing,
+      creationHeight: output.ErgoCreationHeight,
+      boxId: output.ErgoBoxId,
+      assets: tokens,
+      additionalRegisters: undefined, // TODO
+      ergoTree: output.ErgoTree,
+    };
+  });
 }

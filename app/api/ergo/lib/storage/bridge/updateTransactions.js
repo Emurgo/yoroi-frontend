@@ -105,6 +105,8 @@ import type {
 import type {
   FilterFunc,
 } from '../../../../common/lib/state-fetch/currencySpecificTypes';
+import { Address } from '@coinbarn/ergo-ts';
+import { getErgoBaseConfig, } from '../../../../ada/lib/storage/database/prepackaged/networks';
 
 async function rawGetAllTxIds(
   db: lf$Database,
@@ -226,16 +228,29 @@ export async function rawGetTransactions(
     }
   }
 
+  const network = request.publicDeriver.getParent().getNetworkInfo();
+  const config = getErgoBaseConfig(network)
+    .reduce((acc, next) => Object.assign(acc, next), {});
+
+  const feeErgoTree = Address.fromBytes(
+    Buffer.from(config.FeeAddress, 'hex')
+  ).ergoTree;
   const result = txsWithIOs.map((tx: ErgoTxIO) => ({
     ...tx,
     block: blockMap.get(tx.transaction.TransactionId) || null,
     ...getFromUserPerspective({
       utxoInputs: tx.utxoInputs,
-      utxoOutputs: tx.utxoOutputs,
+      utxoOutputs: tx.utxoOutputs.filter(output => (
+        // in Ergo, fees are explicit as an output
+        // so the sum of transactions is always 0
+        // therefore, if we filter out the fee output
+        // this function call will calculate the right thing
+        output.ErgoTree !== feeErgoTree
+      )),
       allOwnedAddressIds: new Set(
         Object.keys(addresses).flatMap(key => addresses[key]).map(addrRow => addrRow.AddressId)
       ),
-    })
+    }),
   }));
 
   return {

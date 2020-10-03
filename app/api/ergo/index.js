@@ -1,5 +1,6 @@
 // @flow
 
+import BigNumber from 'bignumber.js';
 import {
   Logger,
   stringifyError,
@@ -27,7 +28,11 @@ import type {
   IDisplayCutoff,
   IHasUtxoChains, IHasUtxoChainsRequest,
   Address, AddressType, Addressing, UsedStatus, Value,
+  IGetAllUtxos,
+  IGetAllUtxosResponse,
+  IGetSigningKey,
 } from '../ada/lib/storage/models/PublicDeriver/interfaces';
+import { ErgoTxSignRequest, } from './lib/transactions/ErgoTxSignRequest';
 import { ConceptualWallet } from '../ada/lib/storage/models/ConceptualWallet/index';
 import type { IHasLevels } from '../ada/lib/storage/models/ConceptualWallet/interfaces';
 import type { TransactionExportRow } from '../export';
@@ -36,6 +41,8 @@ import { getApiForNetwork } from '../common/utils';
 import {
   GenericApiError,
   WalletAlreadyRestoredError,
+  IncorrectWalletPasswordError,
+  InvalidWitnessError,
 } from '../common/errors';
 import LocalizableError from '../../i18n/LocalizableError';
 import type { CoreAddressT } from '../ada/lib/storage/database/primitives/enums';
@@ -45,12 +52,14 @@ import {
 import type {
   HistoryFunc,
   BestBlockFunc,
+  SendFunc, SignedResponse,
 } from './lib/state-fetch/types';
 import type {
   FilterFunc,
 } from '../common/lib/state-fetch/currencySpecificTypes';
 import {
   getAllAddressesForDisplay,
+  buildTokenMap,
 } from '../ada/lib/storage/bridge/traitUtils';
 import {
   HARD_DERIVATION_START,
@@ -73,7 +82,25 @@ import {
 import {
   generateAdaMnemonic,
 } from '../ada/lib/cardanoCrypto/cryptoWallet';
-import { convertErgoTransactionsToExportRows } from './lib/transactions/utils';
+import {
+  convertErgoTransactionsToExportRows,
+  asAddressedUtxo,
+} from './lib/transactions/utils';
+import {
+  sendAllUnsignedTx,
+  newErgoUnsignedTx,
+  signTransaction,
+} from './lib/transactions/utxoTransaction';
+import type {
+  ErgoAddressedUtxo,
+} from './lib/transactions/types';
+import type { NetworkRow } from '../ada/lib/storage/database/primitives/tables';
+import {
+  getErgoBaseConfig,
+} from '../ada/lib/storage/database/prepackaged/networks';
+import { CoreAddressTypes } from '../ada/lib/storage/database/primitives/enums';
+import { BIP32PrivateKey, } from '../common/lib/crypto/keys/keyRepository';
+import { WrongPassphraseError } from '../ada/lib/cardanoCrypto/cryptoErrors';
 
 // getTransactionRowsToExport
 
@@ -127,6 +154,60 @@ export type GenerateWalletRecoveryPhraseResponse = Array<string>;
 export type GenerateWalletRecoveryPhraseFunc = (
   request: GenerateWalletRecoveryPhraseRequest
 ) => Promise<GenerateWalletRecoveryPhraseResponse>;
+
+// createUnsignedTx
+
+export type CreateUnsignedTxRequest = {|
+  publicDeriver: IPublicDeriver<ConceptualWallet> & IGetAllUtxos,
+  receiver: string,
+  filter: ElementOf<IGetAllUtxosResponse> => boolean,
+  ...({|
+    amount: string, // in lovelaces
+  |} | {|
+    shouldSendAll: true,
+  |}),
+  currentHeight: number,
+  txFee: BigNumber,
+|};
+export type CreateUnsignedTxResponse = ErgoTxSignRequest;
+export type CreateUnsignedTxFunc = (
+  request: CreateUnsignedTxRequest
+) => Promise<CreateUnsignedTxResponse>;
+
+// createUnsignedTxForUtxos
+
+export type CreateUnsignedTxForUtxosRequest = {|
+  receivers: Array<{|
+    ...Address,
+    ...InexactSubset<Addressing>,
+  |}>,
+  network: $ReadOnly<NetworkRow>,
+  ...{|
+    amount: string,
+  |} | {|
+    shouldSendAll: true,
+  |},
+  utxos: Array<ErgoAddressedUtxo>,
+  currentHeight: number,
+  txFee: BigNumber,
+|};
+export type CreateUnsignedTxForUtxosResponse = ErgoTxSignRequest;
+export type CreateUnsignedTxForUtxosFunc = (
+  request: CreateUnsignedTxForUtxosRequest
+) => Promise<CreateUnsignedTxForUtxosResponse>;
+
+// signAndBroadcast
+
+export type SignAndBroadcastRequest = {|
+  publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetSigningKey,
+  signRequest: ErgoTxSignRequest,
+  password: string,
+  sendTx: SendFunc,
+|};
+export type SignAndBroadcastResponse = SignedResponse;
+export type SignAndBroadcastFunc = (
+  request: SignAndBroadcastRequest
+) => Promise<SignAndBroadcastResponse>;
 
 export default class ErgoApi {
 
@@ -358,6 +439,206 @@ export default class ErgoApi {
       Logger.error(
         `${nameof(ErgoApi)}::${nameof(this.generateWalletRecoveryPhrase)} error: ` + stringifyError(error)
       );
+      if (error instanceof LocalizableError) throw error;
+      throw new GenericApiError();
+    }
+  }
+
+  async createUnsignedTx(
+    request: CreateUnsignedTxRequest
+  ): Promise<CreateUnsignedTxResponse> {
+    const utxos = await request.publicDeriver.getAllUtxos();
+    const filteredUtxos = utxos.filter(utxo => request.filter(utxo));
+
+    const tokensForOutputs = await buildTokenMap({
+      publicDeriver: request.publicDeriver,
+      utxoOutputs: filteredUtxos.map(
+        utxo => utxo.output.UtxoTransactionOutput.UtxoTransactionOutputId
+      ),
+    });
+    const tokenMap = new Map<
+      number,
+      Array<{
+        amount: number,
+        tokenId: string,
+        ...
+      }>
+    >();
+    for (const output of tokensForOutputs) {
+      const { UtxoTransactionOutputId } = output.TokenList;
+      if (UtxoTransactionOutputId != null) {
+        const list = tokenMap.get(UtxoTransactionOutputId) ?? [];
+        list.push({
+          amount: Number.parseInt(output.TokenList.Amount, 10),
+          tokenId: output.Token.Identifier,
+        });
+        tokenMap.set(UtxoTransactionOutputId, list);
+      }
+    }
+    const addressedUtxo = asAddressedUtxo(
+      filteredUtxos,
+      tokenMap,
+    );
+
+    const receivers = [{
+      address: request.receiver
+    }];
+    if (!request.shouldSendAll) {
+      const allAddresses = await request.publicDeriver.getAllUtxoAddresses();
+      const change = allAddresses[0]; // send change to 0th address
+
+      const p2pkHash = change.addrs.find(addr => addr.Type === CoreAddressTypes.ERGO_P2PK);
+      if (p2pkHash == null) {
+        throw new Error(`${nameof(this.createUnsignedTx)} no p2pk address found. Should never happen`);
+      }
+      receivers.push({
+        address: p2pkHash.Hash,
+        addressing: change.addressing,
+      });
+    }
+    const amountInfo = request.shouldSendAll
+      ? { shouldSendAll: request.shouldSendAll }
+      : { amount: request.amount, };
+    return this.createUnsignedTxForUtxos({
+      receivers,
+      network: request.publicDeriver.getParent().getNetworkInfo(),
+      utxos: addressedUtxo,
+      ...amountInfo,
+      txFee: request.txFee,
+      currentHeight: request.currentHeight,
+    });
+  }
+
+  async createUnsignedTxForUtxos(
+    request: CreateUnsignedTxForUtxosRequest
+  ): Promise<CreateUnsignedTxForUtxosResponse> {
+    Logger.debug(`${nameof(ErgoApi)}::${nameof(this.createUnsignedTxForUtxos)} called`);
+    try {
+      const config = getErgoBaseConfig(
+        request.network
+      ).reduce((acc, next) => Object.assign(acc, next), {});
+
+      const protocolParams = {
+        FeeAddress: config.FeeAddress,
+        MinimumBoxValue: config.MinimumBoxValue,
+      };
+
+      let unsignedTxResponse;
+      if (request.shouldSendAll) {
+        if (request.receivers.length !== 1) {
+          throw new Error(`${nameof(this.createUnsignedTxForUtxos)} wrong output size for sendAll`);
+        }
+        const receiver = request.receivers[0];
+        unsignedTxResponse = sendAllUnsignedTx({
+          receiver,
+          utxos: request.utxos,
+          currentHeight: request.currentHeight,
+          txFee: request.txFee,
+          protocolParams,
+        });
+      } else {
+        const amount = request.amount;
+        const changeAddresses = request.receivers.reduce(
+          (arr, next) => {
+            if (next.addressing != null) {
+              arr.push({
+                address: next.address,
+                addressing: next.addressing,
+              });
+              return arr;
+            }
+            return arr;
+          },
+          ([]: Array<{| ...Address, ...Addressing |}>)
+        );
+        if (changeAddresses.length !== 1) {
+          throw new Error(`${nameof(this.createUnsignedTxForUtxos)} needs exactly one change address`);
+        }
+        const changeAddr = changeAddresses[0];
+        const otherAddresses: Array<{| ...Address, |}> = request.receivers.reduce(
+          (arr, next) => {
+            if (next.addressing == null) {
+              arr.push({ address: next.address });
+              return arr;
+            }
+            return arr;
+          },
+          ([]: Array<{| ...Address, |}>)
+        );
+        if (otherAddresses.length > 1) {
+          throw new Error(`${nameof(this.createUnsignedTxForUtxos)} can't send to more than one address`);
+        }
+        unsignedTxResponse = newErgoUnsignedTx({
+          outputs: otherAddresses.length === 1
+            ? [{ address: otherAddresses[0].address, amount }]
+            : [],
+          changeAddr: {
+            address: changeAddr.address,
+            addressing: changeAddr.addressing,
+          },
+          utxos: request.utxos,
+          txFee: request.txFee,
+          currentHeight: request.currentHeight,
+          protocolParams,
+        });
+      }
+      Logger.debug(
+        `${nameof(ErgoApi)}::${nameof(this.createUnsignedTxForUtxos)} success: ` + stringifyData(unsignedTxResponse)
+      );
+      return new ErgoTxSignRequest({
+        senderUtxos: unsignedTxResponse.senderUtxos,
+        unsignedTx: unsignedTxResponse.unsignedTx,
+        changeAddr: unsignedTxResponse.changeAddr,
+        networkSettingSnapshot: {
+          FeeAddress: config.FeeAddress
+        },
+      });
+    } catch (error) {
+      Logger.error(
+        `${nameof(ErgoApi)}::${nameof(this.createUnsignedTxForUtxos)} error: ` + stringifyError(error)
+      );
+      if (error instanceof LocalizableError) throw error;
+      throw new GenericApiError();
+    }
+  }
+
+  async signAndBroadcast(
+    request: SignAndBroadcastRequest
+  ): Promise<SignAndBroadcastResponse> {
+    Logger.debug(`${nameof(ErgoApi)}::${nameof(this.signAndBroadcast)} called`);
+    const { password } = request;
+    try {
+      const signingKey = await request.publicDeriver.getSigningKey();
+      const normalizedKey = await request.publicDeriver.normalizeKey({
+        ...signingKey,
+        password,
+      });
+      const signedTx = signTransaction({
+        signRequest: request.signRequest,
+        keyLevel: request.publicDeriver.getParent().getPublicDeriverLevel(),
+        signingKey: BIP32PrivateKey.fromBuffer(
+          Buffer.from(normalizedKey.prvKeyHex, 'hex')
+        ),
+      });
+
+      const response = request.sendTx({
+        network: request.publicDeriver.getParent().getNetworkInfo(),
+        inputs: signedTx.inputs,
+        dataInputs: signedTx.dataInputs,
+        outputs: signedTx.outputs,
+      });
+      Logger.debug(
+        `${nameof(ErgoApi)}::${nameof(this.signAndBroadcast)} success: ` + stringifyData(response)
+      );
+      return response;
+    } catch (error) {
+      if (error instanceof WrongPassphraseError) {
+        throw new IncorrectWalletPasswordError();
+      }
+      Logger.error(`${nameof(ErgoApi)}::${nameof(this.signAndBroadcast)} error: ` + stringifyError(error));
+      if (error instanceof InvalidWitnessError) {
+        throw new InvalidWitnessError();
+      }
       if (error instanceof LocalizableError) throw error;
       throw new GenericApiError();
     }

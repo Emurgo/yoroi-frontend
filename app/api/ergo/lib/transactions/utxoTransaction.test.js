@@ -281,6 +281,7 @@ describe('Create unsigned TX from addresses', () => {
 
 describe('Create signed transactions', () => {
   it('Witness should match on valid private key', () => {
+    const params = getProtocolParams();
     const addressedUtxos = genAddressedUtxos();
     const unsignedTxResponse = newErgoUnsignedTx({
       outputs: [{
@@ -297,12 +298,15 @@ describe('Create signed transactions', () => {
       utxos: [addressedUtxos[0], addressedUtxos[2]],
       currentHeight: 100,
       txFee: new BigNumber('500'),
-      protocolParams: getProtocolParams(),
+      protocolParams: params,
     });
     const signRequest = new ErgoTxSignRequest({
       changeAddr: unsignedTxResponse.changeAddr,
       senderUtxos: unsignedTxResponse.senderUtxos,
       unsignedTx: unsignedTxResponse.unsignedTx,
+      networkSettingSnapshot: {
+        FeeAddress: params.FeeAddress,
+      },
     });
 
     const rootPk = generateWalletRootKey(
@@ -346,7 +350,9 @@ describe('Create sendAll unsigned TX from UTXO', () => {
       const sampleUtxos = genSampleUtxos();
       const utxos: Array<RemoteUnspentOutput> = [sampleUtxos[1], sampleUtxos[3]];
       const sendAllResponse = sendAllUnsignedTxFromUtxo({
-        receiver: decode('9egNKTzQDH658qcdiPEoQfVM1SBxQNxnyF8BCw57aNWerRhhHBQ').toString('hex'),
+        receiver: {
+          address: decode('9egNKTzQDH658qcdiPEoQfVM1SBxQNxnyF8BCw57aNWerRhhHBQ').toString('hex')
+        },
         utxos,
         currentHeight: 100,
         txFee: new BigNumber('500'),
@@ -369,7 +375,9 @@ describe('Create sendAll unsigned TX from UTXO', () => {
 
   it('Should fail due to insufficient funds (no inputs)', () => {
     expect(() => sendAllUnsignedTxFromUtxo({
-      receiver: decode('9egNKTzQDH658qcdiPEoQfVM1SBxQNxnyF8BCw57aNWerRhhHBQ').toString('hex'),
+      receiver: {
+        address: decode('9egNKTzQDH658qcdiPEoQfVM1SBxQNxnyF8BCw57aNWerRhhHBQ').toString('hex')
+      },
       utxos: [],
       currentHeight: 100,
       txFee: new BigNumber('500'),
@@ -381,7 +389,9 @@ describe('Create sendAll unsigned TX from UTXO', () => {
     const sampleUtxos = genSampleUtxos();
     const utxos: Array<RemoteUnspentOutput> = [sampleUtxos[0]];
     expect(() => sendAllUnsignedTxFromUtxo({
-      receiver: decode('9egNKTzQDH658qcdiPEoQfVM1SBxQNxnyF8BCw57aNWerRhhHBQ').toString('hex'),
+      receiver: {
+        address: decode('9egNKTzQDH658qcdiPEoQfVM1SBxQNxnyF8BCw57aNWerRhhHBQ').toString('hex')
+      },
       utxos,
       currentHeight: 100,
       txFee: new BigNumber('100000'),

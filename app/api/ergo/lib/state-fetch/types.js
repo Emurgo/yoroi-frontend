@@ -86,11 +86,11 @@ export type RemoteErgoTransaction = {|
   outputs: Array<{
     additionalRegisters: { ... },
     address: string,
-    assets: Array<{
+    assets: Array<$ReadOnly<{
       amount: number,
       tokenId: string,
       ...
-    }>,
+    }>>,
     creationHeight: number,
     ergoTree: string,
     id: string,
@@ -140,10 +140,10 @@ export type SignedRequest = {|
     value: number,
     ergoTree: string, // hex
     creationHeight: number,
-    assets?: Array<{|
+    assets?: Array<$ReadOnly<{|
       tokenId: string, // hex
       amount: number,
-    |}>,
+    |}>>,
     additionalRegisters: {| [key: string]: string /* hex */ |},
     transactionId?: string, // hex
     index?: number,
@@ -151,7 +151,7 @@ export type SignedRequest = {|
   size?: number,
 |};
 export type SignedResponse = {|
-  id: string, // hex
+  txId: string, // hex
 |};
 export type SendFunc = (body: SignedRequest) => Promise<SignedResponse>;
 

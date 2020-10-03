@@ -19,10 +19,11 @@ import type {
   DbUtxoInputs, DbUtxoOutputs,
   TokenListRow,
 } from '../tables';
-import { TransactionSchema, } from '../../../primitives/tables';
+import { TransactionSchema, TokenSchema, } from '../../../primitives/tables';
 import { TxStatusCodes } from '../../../primitives/enums';
 import type {
   TransactionRow,
+  TokenRow,
 } from '../../../primitives/tables';
 import type { TxStatusCodesType } from '../../../primitives/enums';
 import { getRowIn, } from '../../../utils';
@@ -329,8 +330,10 @@ export class AssociateTxWithUtxoIOs {
 export class AssociateToken {
   static ownTables: {|
     TokenList: typeof Tables.TokenListSchema,
+    Token: typeof TokenSchema,
   |} = Object.freeze({
     [Tables.TokenListSchema.name]: Tables.TokenListSchema,
+    [TokenSchema.name]: TokenSchema,
   });
   static depTables: {||} = Object.freeze({});
 
@@ -377,6 +380,45 @@ export class AssociateToken {
       entries.push(row);
       result.set(UtxoTransactionOutputId, entries);
     }
+
+    return result;
+  }
+
+  static async join(
+    db: lf$Database,
+    tx: lf$Transaction,
+    request: {|
+      utxoOutputIds: Array<number>,
+      networkId: number,
+    |},
+  ): Promise<$ReadOnlyArray<{|
+    TokenList: $ReadOnly<TokenListRow>,
+    Token: $ReadOnly<TokenRow>,
+  |}>> {
+    const tokenListTableMeta = AssociateToken.ownTables[Tables.TokenListSchema.name];
+    const tokenTableMeta = AssociateToken.ownTables[TokenSchema.name];
+
+    const tokenListTable = db.getSchema().table(tokenListTableMeta.name);
+    const tokenTable = db.getSchema().table(tokenTableMeta.name);
+    const query = db
+      .select()
+      .from(tokenListTable)
+      .innerJoin(
+        tokenTable,
+        tokenListTable[tokenListTableMeta.properties.TokenId].eq(
+          tokenTable[tokenTableMeta.properties.TokenId]
+        )
+      )
+      .where(op.and(
+        tokenListTable[tokenListTableMeta.properties.UtxoTransactionOutputId].in(
+          request.utxoOutputIds
+        ),
+        tokenTable[tokenTableMeta.properties.NetworkId].eq(request.networkId)
+      ));
+    const result: $ReadOnlyArray<{|
+      TokenList: $ReadOnly<TokenListRow>,
+      Token: $ReadOnly<TokenRow>,
+    |}> = await tx.attach(query);
 
     return result;
   }

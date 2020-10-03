@@ -12,6 +12,7 @@ import ErgoTransactionsStore from './ErgoTransactionsStore';
 import ErgoAddressesStore from './ErgoAddressesStore';
 import ErgoTimeStore from './ErgoTimeStore';
 import ErgoStateFetchStore from './ErgoStateFetchStore';
+import ErgoMnemonicSendStore from './send/ErgoMnemonicSendStore';
 
 export const ergoStoreClasses = Object.freeze({
   addresses: ErgoAddressesStore,
@@ -20,6 +21,7 @@ export const ergoStoreClasses = Object.freeze({
   walletRestore: ErgoRestoreStore,
   stateFetchStore: ErgoStateFetchStore,
   time: ErgoTimeStore,
+  mnemonicSend: ErgoMnemonicSendStore,
 });
 
 export type ErgoStoresMap = {|
@@ -29,6 +31,7 @@ export type ErgoStoresMap = {|
   walletRestore: ErgoRestoreStore,
   stateFetchStore: ErgoStateFetchStore,
   time: ErgoTimeStore,
+  mnemonicSend: ErgoMnemonicSendStore,
 |};
 
 const ergoStores: WithNullableFields<ErgoStoresMap> = observable({
@@ -38,6 +41,7 @@ const ergoStores: WithNullableFields<ErgoStoresMap> = observable({
   stateFetchStore: null,
   walletRestore: null,
   time: null,
+  mnemonicSend: null,
 });
 
 /** See `stores` index for description of this weird behavior
