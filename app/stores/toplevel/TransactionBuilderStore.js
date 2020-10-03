@@ -226,6 +226,9 @@ export default class TransactionBuilderStore extends Store {
       }
     } else if (isErgo(network)) {
       const lastSync = this.stores.transactions.getTxRequests(publicDeriver).lastSyncInfo;
+
+      const txFee = new BigNumber(feeValue).plus(100000); // slightly higher than default fee
+
       if (amount == null && shouldSendAll === true) {
         await this.createUnsignedTx.execute(() => this.api.ergo.createUnsignedTx({
           publicDeriver: withUtxos,
@@ -233,7 +236,7 @@ export default class TransactionBuilderStore extends Store {
           shouldSendAll,
           filter: this.filter,
           currentHeight: lastSync.Height,
-          txFee: new  BigNumber(feeValue),
+          txFee,
         }));
       } else if (amount != null) {
         await this.createUnsignedTx.execute(() => this.api.ergo.createUnsignedTx({
@@ -242,7 +245,7 @@ export default class TransactionBuilderStore extends Store {
           amount,
           filter: this.filter,
           currentHeight: lastSync.Height,
-          txFee: new  BigNumber(feeValue),
+          txFee,
         }));
       }
     } else {
