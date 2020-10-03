@@ -39,7 +39,7 @@ import {
   removeLocalItem,
 } from '../../../localStorage/primitives';
 import {
-  isCardanoHaskell, networks
+  isCardanoHaskell, isErgo, networks
 } from './database/prepackaged/networks';
 
 export async function migrateToLatest(
@@ -93,6 +93,9 @@ export async function migrateToLatest(
        */
       const ledgerDeviceWasRemove = await removeLedgerDevices(persistentDb);
       return txHistoryWasReset || ledgerDeviceWasRemove;
+    }],
+    ['<3.7.0', async () => {
+      return await removeErgoDevices(persistentDb);
     }],
   ];
 
@@ -287,6 +290,29 @@ async function removeLedgerDevices(
       continue;
     }
     // recall: at this time we didn't support multi-account
+    await removePublicDeriver({
+      publicDeriver,
+      conceptualWallet: publicDeriver.getParent(),
+    });
+    removedAWallet = true;
+  }
+  return removedAWallet;
+}
+
+async function removeErgoDevices(
+  persistentDb: lf$Database,
+): Promise<boolean> {
+  const wallets = await loadWalletsFromStorage(persistentDb);
+  if (wallets.length === 0) {
+    return false;
+  }
+
+  let removedAWallet = false;
+  for (const publicDeriver of wallets) {
+    if (!isErgo(publicDeriver.getParent().getNetworkInfo())) {
+      continue;
+    }
+    // recall: at this point, we only supported Ergo on nightly
     await removePublicDeriver({
       publicDeriver,
       conceptualWallet: publicDeriver.getParent(),
