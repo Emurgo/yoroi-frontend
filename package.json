@@ -1,6 +1,6 @@
 {
   "name": "yoroi",
-  "version": "3.7.1",
+  "version": "3.7.2",
   "description": "Cardano ADA wallet",
   "scripts": {
     "dev:build": "rimraf dev/ && babel-node scripts/build --type=debug",
@@ -150,7 +150,7 @@
   },
   "dependencies": {
     "@cardano-foundation/ledgerjs-hw-app-cardano": "2.0.1",
-    "@coinbarn/ergo-ts": "0.3.0",
+    "@coinbarn/ergo-ts": "git+https://github.com/Emurgo/ergo-ts-temp.git",
     "@download/blockies": "1.0.3",
     "@emurgo/cardano-serialization-lib-browser": "4.0.0",
     "@emurgo/cip4-js": "1.0.5",
