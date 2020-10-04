@@ -347,7 +347,7 @@
   "wallet.add.optionDialog.restore.normal24Wallet.description": "Se você tiver uma frase de recuperação composta por 24 palavras, escolha esta opção para restaurar sua carteira.",
   "wallet.add.optionDialog.restore.normal24Wallet.title": "Insira sua frase de recuperação constituída de 24 palavras",
   "wallet.add.optionDialog.restore.normalWallet.description": "Se você possui uma frase de recuperação consistindo de {lengh} palavras, escolha essa opção para restaurar sua carteira.",
-  "wallet.add.optionDialog.restore.normalWallet.title": "Enter a {length}-word recovery phrase",
+  "wallet.add.optionDialog.restore.normalWallet.title": "Digite as {length} palavras",
   "wallet.add.optionDialog.restore.paperWallet.description": "Se você possui uma Yoroi paper wallet, a qual é usualmente imprimida e mantida offline, você pode escolher esta opção para importar os fundos da mesma.",
   "wallet.add.optionDialog.restore.paperWallet.title": "Paper Wallet",
   "wallet.add.optionDialog.walletEra.byronEra.description": "As carteiras criadas antes de 29 de julho de 2020 são carteiras da era Byron e não podem delegar.",
