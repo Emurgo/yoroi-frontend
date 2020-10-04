@@ -613,7 +613,7 @@
   "wallet.send.form.errors.tooSmallUtxo": "Não é possível enviar menos de {minUtxo} ADA.",
   "wallet.send.form.receiver.hint": "Endereço da Wallet",
   "wallet.send.form.receiver.label": "Receptor",
-  "wallet.send.form.sendAll.checkboxLabel": "Vender todas {currency}",
+  "wallet.send.form.sendAll.checkboxLabel": "Enviar todas {currency}",
   "wallet.send.form.sendingIsDisabled": "Não é possível realizar uma nova transação enquanto outra ainda está pendente.",
   "wallet.send.form.transactionFeeError": "Ada insuficiente para suprir as taxas. Tente o envio de uma quantia menor.",
   "wallet.send.ledger.confirmationDialog.info.line.1": "Após conectar o dispositivo Ledger à porta USB do computador, pressione o botão Send na própria Ledger.",
