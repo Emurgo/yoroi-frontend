@@ -18,9 +18,8 @@ import { encryptWithPassword } from '../../../../utils/passwordCipher';
 import type {
   TreeInsert,
 } from '../../../ada/lib/storage/database/walletTypes/common/utils';
-import type { Bip44ChainInsert } from '../../../ada/lib/storage/database/walletTypes/common/tables';
 import { WalletBuilder } from '../../../ada/lib/storage/bridge/walletBuilder/builder';
-import type { NetworkRow } from '../../../ada/lib/storage/database/primitives/tables';
+import type { CanonicalAddressInsert, NetworkRow } from '../../../ada/lib/storage/database/primitives/tables';
 import {
   Bip44DerivationLevels,
   Bip44TableMap,
@@ -46,7 +45,7 @@ import { derivePath, deriveKey, BIP32PublicKey, BIP32PrivateKey } from '../../..
 export async function getChainDefaultDerivations(
   bip32Account: BIP32PublicKey,
   addByHash: AddByHashFunc,
-): Promise<TreeInsert<Bip44ChainInsert>> {
+): Promise<TreeInsert<CanonicalAddressInsert>> {
   const addressesIndex = range(
     0,
     BIP44_SCAN_SIZE
