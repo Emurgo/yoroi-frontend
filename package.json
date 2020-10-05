@@ -125,7 +125,7 @@
     "html-webpack-plugin": "4.5.0",
     "husky": "4.2.5",
     "jest": "26.4.2",
-    "jest-canvas-mock": "2.2.0",
+    "jest-canvas-mock": "2.3.0",
     "json-server": "0.16.1",
     "json-stable-stringify": "1.0.1",
     "markdown-loader": "6.0.0",
