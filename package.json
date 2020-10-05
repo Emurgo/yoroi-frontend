@@ -142,7 +142,7 @@
     "storycap": "2.3.5",
     "style-loader": "1.2.1",
     "url-loader": "4.1.0",
-    "webpack": "4.44.1",
+    "webpack": "4.44.2",
     "webpack-cli": "3.3.12",
     "webpack-hot-middleware": "2.25.0",
     "webpack-httpolyglot-server": "0.3.0",
