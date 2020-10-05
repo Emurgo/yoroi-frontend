@@ -822,10 +822,14 @@ const DisplayCutoffMixin = (
     const derivationLevel = this.getParent().getPublicDeriverLevel();
     const chain = await (async () => {
       if (derivationLevel === Bip44DerivationLevels.CHAIN.level) {
-        return await deps.GetKeyDerivation.get(
+        const derivation = await deps.GetKeyDerivation.get(
           super.getDb(), tx,
           super.getDerivationId(),
         );
+        if (derivation == null) {
+          throw new Error(`${nameof(ModifyDisplayCutoff)}::${nameof(ModifyDisplayCutoff.pop)} no derivation row found for chain`);
+        }
+        return derivation;
       }
       if (derivationLevel === Bip44DerivationLevels.ACCOUNT.level) {
         const path = await deps.GetDerivationsByPath.getSinglePath(
