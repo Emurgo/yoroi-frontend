@@ -72,11 +72,7 @@ export async function validateAmount(
     },
     tooSmallUtxo: {
       id: 'wallet.send.form.errors.tooSmallUtxo',
-      defaultMessage: '!!!Cannot send less than {minUtxo} ADA.',
-    },
-    tooSmallBox: {
-      id: 'wallet.send.form.errors.tooSmallBox',
-      defaultMessage: '!!!Cannot send less than {minUtxo} ERG.',
+      defaultMessage: '!!!Cannot send less than {minUtxo} {ticker}.',
     },
   });
 
@@ -94,7 +90,8 @@ export async function validateAmount(
         return [
           false,
           formatter.formatMessage(messages.tooSmallUtxo, {
-            minUtxo: minUtxo.div(new BigNumber(10).pow(meta.meta.decimalPlaces))
+            minUtxo: minUtxo.div(new BigNumber(10).pow(meta.meta.decimalPlaces)),
+            ticker: meta.meta.primaryTicker,
           })
         ];
       }
@@ -108,7 +105,8 @@ export async function validateAmount(
         return [
           false,
           formatter.formatMessage(messages.tooSmallUtxo, {
-            minUtxo: minUtxo.div(new BigNumber(10).pow(meta.meta.decimalPlaces))
+            minUtxo: minUtxo.div(new BigNumber(10).pow(meta.meta.decimalPlaces)),
+            ticker: meta.meta.primaryTicker,
           })
         ];
       }
