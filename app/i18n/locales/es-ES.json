@@ -711,7 +711,7 @@
   "wallet.undelegation.transaction.explanationLine2": "Tomará 2 epochs, a partir del final del epoch actual, para que la des-delegación se haga efectiva",
   "wallet.unsupported.subtitle": "La billetera seleccionada no soporta esta funcionalidad",
   "wallet.unsupported.title": "Tipo de billetera no soportada",
-  "wallet.withdrawal.transaction.unregister": "This transaction will unregister one or more staking keys, giving you back your {refundAmount} {ticker} from your deposit",
+  "wallet.withdrawal.transaction.unregister": "Esta transacción desregistrará una o más llaves de staking, devolviéndole su {refundAmount} {ticker} de su depósito",
   "widgets.copyableaddress.addressCopyTooltipMessage": "Copiar al portapapeles",
   "widgets.explorer.tooltip": "Ir a {websiteName}",
   "widgets.warningBox.headerText": "ATENCIÓN:",
