@@ -180,8 +180,6 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
   /** Web Wallet Send Confirmation dialog
     * Callback that creates a container to avoid the component knowing about actions/stores */
   webWalletDoConfirmation: (() => Node) = () => {
-    const { intl } = this.context;
-
     const publicDeriver = this.generated.stores.wallets.selected;
     if (!publicDeriver) throw new Error(`Active wallet required for ${nameof(this.webWalletDoConfirmation)}.`);
     const selectedApiType = getApiForNetwork(publicDeriver.getParent().getNetworkInfo());

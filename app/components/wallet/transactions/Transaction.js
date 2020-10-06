@@ -10,7 +10,6 @@ import type {
 import moment from 'moment';
 import classnames from 'classnames';
 import styles from './Transaction.scss';
-import AdaSymbol from '../../../assets/images/ada-symbol.inline.svg';
 import AddMemoSvg from '../../../assets/images/add-memo.inline.svg';
 import EditSvg from '../../../assets/images/edit.inline.svg';
 import WalletTransaction from '../../../domain/WalletTransaction';

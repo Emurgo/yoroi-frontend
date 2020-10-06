@@ -50,7 +50,7 @@ export default class MangledHeader extends Component<Props> {
               <p>
                 {intl.formatMessage(
                   messages.warning1,
-                  { ticker: this.props.ticker}
+                  { ticker: this.props.ticker }
                 )}
               </p><br />
               <p>
