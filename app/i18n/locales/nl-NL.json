@@ -146,7 +146,7 @@
   "myWallets.wallets.sumInfoText": "Totaal saldo",
   "networkError.label.message": "WAARSCHIWING: Geen verbinding met de server.<br>Controleer uw internetverbinding of bezoek ons op: <a target='blank' href='https://twitter.com/YoroiWallet'> Twitter </a>.<br>De balans en transactiegeschiedenis kunnen afwijkingen vertonen tot onze servers weer normaal functioneren. Uw balans is niet aangetast.",
   "nightly.banner.label.message": "U BENT OP \"YOROI NIGHTLY\" ({network}).",
-  "noticeBoard.noNoticeText.chooseAPool": "To view notifications here, first <strong>choose a stake pool</strong> and delegate your {ticker}.",
+  "noticeBoard.noNoticeText.chooseAPool": "Om hier meldingen te bekijken, moet u eerst <strong> een pool kiezen </strong> en uw {ticker} delegeren.",
   "noticeBoard.noNoticeText.notDelegatedYet": "U heeft nog geen stemmen gedelegeerd.",
   "noticeBoard.notice.costChanged.subMessage": "Oude kosten {oldCost} {currency}, nieuwe kosten zijn {newCost} {currency}",
   "noticeBoard.notice.costChanged.title": "De kosten van de Stakepool zijn veranderd",
