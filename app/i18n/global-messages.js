@@ -160,10 +160,6 @@ const globalMessages: * = defineMessages({
     id: 'wallet.nav.addButton',
     defaultMessage: '!!!Add new wallet',
   },
-  unitAda: {
-    id: 'global.unit.ada',
-    defaultMessage: '!!!Ada',
-  },
   attentionHeaderText: {
     id: 'widgets.warningBox.headerText',
     defaultMessage: '!!!ATTENTION:',

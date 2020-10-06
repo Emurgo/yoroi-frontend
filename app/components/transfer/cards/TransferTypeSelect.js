@@ -10,12 +10,13 @@ import styles from './TransferTypeSelect.scss';
 type Props = {|
   +onByron: void => void,
   +onShelley: void => void,
+  +ticker: string,
 |};
 
 const messages = defineMessages({
   instruction: {
     id: 'wallet.transfer.instruction',
-    defaultMessage: '!!!Any ADA claimed will be transferred to your currently selected wallet',
+    defaultMessage: '!!!Any {ticker} claimed will be transferred to your currently selected wallet',
   },
 });
 
@@ -35,7 +36,10 @@ export default class TransferTypeSelect extends Component<Props> {
             onShelley={this.props.onShelley}
           />
           <div className={styles.instructions}>
-            {intl.formatMessage(messages.instruction)}
+            {intl.formatMessage(
+              messages.instruction,
+              { ticker: this.props.ticker }
+            )}
           </div>
         </div>
       </div>

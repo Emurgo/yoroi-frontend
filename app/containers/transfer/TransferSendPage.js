@@ -226,6 +226,7 @@ export default class TransferSendPage extends Component<Props> {
         addressToDisplayString={
           addr => addressToDisplayString(addr, selected.getParent().getNetworkInfo())
         }
+        ticker={apiMeta.meta.primaryTicker}
       />
     );
   }

@@ -65,6 +65,7 @@ type Props = {|
   +meta: {|
     +totalSupply: BigNumber,
     +decimalPlaces: number,
+    +ticker: string,
   |},
 |};
 
@@ -194,7 +195,7 @@ export default class DelegationTxDialog extends Component<Props> {
             maxAfterDot={this.props.meta.decimalPlaces}
             disabled
             // AmountInputSkin props
-            currency={intl.formatMessage(globalMessages.unitAda)}
+            currency={this.props.meta.ticker}
             fees={this.props.transactionFee.toFormat(this.props.meta.decimalPlaces)}
             // note: we purposely don't put "total" since it doesn't really make sense here
             // since the fee is unrelated to the amount you're about to stake
@@ -214,7 +215,7 @@ export default class DelegationTxDialog extends Component<Props> {
           <p className={styles.header}>{intl.formatMessage(messages.approximateLabel)}</p>
           <p className={styles.rewardAmount}>
             {this.props.approximateReward.toFormat(this.props.meta.decimalPlaces)}&nbsp;
-            {intl.formatMessage(globalMessages.unitAda).toUpperCase()}
+            {this.props.meta.ticker}
           </p>
         </div>
         {this.props.error

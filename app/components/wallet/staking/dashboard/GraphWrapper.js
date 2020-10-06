@@ -12,11 +12,6 @@ import globalMessages from '../../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
-  // total ADA sent to the pool
-  tooltipEpoch: {
-    id: 'wallet.dashboard.graph.tooltip.epoch',
-    defaultMessage: '!!!Total ADA Sent',
-  },
   epochAxisLabel: {
     id: 'wallet.dashboard.graph.epochAxisLabel',
     defaultMessage: '!!!Epoch ({epochLength} days)',

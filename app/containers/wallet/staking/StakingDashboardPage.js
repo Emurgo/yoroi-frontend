@@ -138,6 +138,10 @@ export default class StakingDashboardPage extends Component<Props> {
     if (publicDeriver == null) {
       throw new Error(`${nameof(StakingDashboardPage)} no public deriver. Should never happen`);
     }
+    const apiMeta = getApiMeta(
+      getApiForNetwork(publicDeriver.getParent().getNetworkInfo())
+    )?.meta;
+    if (apiMeta == null) throw new Error(`${nameof(StakingDashboardPage)} no API selected`);
 
     const delegationStore = this.generated.stores.delegation;
     const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
@@ -189,6 +193,7 @@ export default class StakingDashboardPage extends Component<Props> {
         })}
         delegationHistory={delegationRequests.getCurrentDelegation.result?.fullHistory}
         epochLength={this.getEpochLengthInDays(publicDeriver)}
+        ticker={apiMeta.primaryTicker}
       />
     );
 
@@ -285,7 +290,10 @@ export default class StakingDashboardPage extends Component<Props> {
       isSubmitting={this.generated.stores.wallets.sendMoneyRequest.isExecuting}
       transactionFee={getJormungandrTxFee(delegationTx.signTxRequest.self(), true)}
       staleTx={delegationTxStore.isStale}
-      decimalPlaces={apiMeta.decimalPlaces.toNumber()}
+      meta={{
+        decimalPlaces: apiMeta.decimalPlaces.toNumber(),
+        ticker: apiMeta.primaryTicker,
+      }}
     />);
   }
 

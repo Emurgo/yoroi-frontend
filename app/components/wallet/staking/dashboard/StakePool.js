@@ -139,19 +139,19 @@ export default class StakePool extends Component<Props> {
     //   },
     //   {
     //     label: intl.formatMessage(messages.cost),
-    //     value: data.cost + ' ADA',
+    //     value: `${data.cost} ${ticker}`,
     //   },
     //   {
     //     label: intl.formatMessage(messages.stake),
-    //     value: data.stake + ' ADA',
+    //     value: `${data.stake} ${ticker}`,
     //   },
     //   {
     //     label: intl.formatMessage(messages.pledge),
-    //     value: data.pledge + ' ADA',
+    //     value: `${data.pledge} ${ticker}`,
     //   },
     //   {
     //     label: intl.formatMessage(globalMessages.rewardsLabel),
-    //     value: data.rewards + ' ADA',
+    //     value: `${data.reward} ${ticker}`,
     //   },
     //   {
     //     label: intl.formatMessage(messages.age),

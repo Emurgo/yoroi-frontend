@@ -42,7 +42,7 @@ type Props = {|
 const messages = defineMessages({
   explanation: {
     id: 'upgradetx.explanation',
-    defaultMessage: '!!!We found some ADA in your Byron-era wallet. Would you like to transfer it to your new Shelley wallet?',
+    defaultMessage: '!!!We found some {ticker} in your Byron-era wallet. Would you like to transfer it to your new Shelley wallet?',
   },
 });
 
@@ -160,7 +160,10 @@ export default class UpgradeTxDialogContainer extends Component<Props> {
     const { intl } = this.context;
     const header = (
       <div>
-        {intl.formatMessage(messages.explanation)}
+        {intl.formatMessage(
+          messages.explanation,
+          { ticker: apiMeta.meta.primaryTicker }
+        )}
         <br /><br />
       </div>
     );
@@ -206,6 +209,7 @@ export default class UpgradeTxDialogContainer extends Component<Props> {
         addressToDisplayString={
           addr => addressToDisplayString(addr, selected.getParent().getNetworkInfo())
         }
+        ticker={apiMeta.meta.primaryTicker}
       />
     );
   }

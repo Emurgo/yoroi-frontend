@@ -153,6 +153,7 @@ export function isTestnet(
   network: $ReadOnly<NetworkRow>,
 ): boolean {
   if (network.NetworkId === networks.JormungandrMainnet.NetworkId) return true;
+  if (network.NetworkId === networks.CardanoTestnet.NetworkId) return true;
   return false;
 }
 

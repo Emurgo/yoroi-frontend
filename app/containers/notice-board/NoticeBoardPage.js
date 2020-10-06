@@ -16,6 +16,8 @@ import NoNotice from '../../components/notice-board/NoNotice';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import Notice from '../../domain/Notice';
 import type { GetNoticesRequestOptions } from '../../api/ada/index';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
+import { getApiForNetwork, getApiMeta } from '../../api/common/utils';
 
 const messages = defineMessages({
   title: {
@@ -63,7 +65,20 @@ export default class NoticeBoardPage extends Component<InjectedOrGenerated<Gener
           />
         );
       } else  {
-        noticeComp = (<NoNotice classicTheme={this.generated.stores.profile.isClassicTheme} />);
+        const { selected } = this.generated.stores.wallets;
+        if (selected == null) {
+          throw new Error(`${nameof(NoticeBoardPage)} not handled yet`);
+        }
+        const apiMeta = getApiMeta(
+          getApiForNetwork(selected.getParent().getNetworkInfo())
+        )?.meta;
+        if (apiMeta == null) throw new Error(`${nameof(NoticeBoardPage)} no API selected`);
+        noticeComp = (
+          <NoNotice
+            classicTheme={this.generated.stores.profile.isClassicTheme}
+            ticker={apiMeta.primaryTicker}
+          />
+        );
       }
     }
 
@@ -87,6 +102,9 @@ export default class NoticeBoardPage extends Component<InjectedOrGenerated<Gener
       |},
     |},
     stores: {|
+      wallets: {|
+        selected: null | PublicDeriver<>
+      |},
       noticeBoard: {|
         hasMoreToLoad: boolean,
         isLoading: boolean,
@@ -114,6 +132,9 @@ export default class NoticeBoardPage extends Component<InjectedOrGenerated<Gener
           searchOptions: stores.noticeBoard.searchOptions,
           isLoading: stores.noticeBoard.isLoading,
           hasMoreToLoad: stores.noticeBoard.hasMoreToLoad,
+        },
+        wallets: {
+          selected: stores.wallets.selected,
         },
       },
       actions: {

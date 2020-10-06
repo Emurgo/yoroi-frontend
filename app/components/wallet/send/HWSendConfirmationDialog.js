@@ -37,7 +37,7 @@ type Props = {|
   +receivers: Array<string>,
   +totalAmount: BigNumber,
   +transactionFee: BigNumber,
-  +currencyUnit: string,
+  +ticker: string,
   +messages: ExpectedMessages,
   +isSubmitting: boolean,
   +error: ?LocalizableError,
@@ -63,7 +63,7 @@ export default class HWSendConfirmationDialog extends Component<Props> {
       receivers,
       totalAmount,
       transactionFee,
-      currencyUnit,
+      ticker,
       isSubmitting,
       messages,
       error,
@@ -124,12 +124,12 @@ export default class HWSendConfirmationDialog extends Component<Props> {
                 &nbsp;{unitOfAccountSetting.currency}
               </div>
               <div className={styles.amountSmall}>{this.props.formattedWalletAmount(amount)}
-                <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
+                <span className={styles.currencySymbol}>&nbsp;{ticker}</span>
               </div>
             </>
           ) : (
             <div className={styles.amount}>{this.props.formattedWalletAmount(amount)}
-              <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
+              <span className={styles.currencySymbol}>&nbsp;{ticker}</span>
             </div>
           )}
         </div>
@@ -145,12 +145,12 @@ export default class HWSendConfirmationDialog extends Component<Props> {
                 &nbsp;{unitOfAccountSetting.currency}
               </div>
               <div className={styles.feesSmall}>+{this.props.formattedWalletAmount(transactionFee)}
-                <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
+                <span className={styles.currencySymbol}>&nbsp;{ticker}</span>
               </div>
             </>
           ) : (
             <div className={styles.fees}>+{this.props.formattedWalletAmount(transactionFee)}
-              <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
+              <span className={styles.currencySymbol}>&nbsp;{ticker}</span>
             </div>
           )}
         </div>
@@ -168,12 +168,12 @@ export default class HWSendConfirmationDialog extends Component<Props> {
               &nbsp;{unitOfAccountSetting.currency}
             </div>
             <div className={styles.totalAmountSmall}>{this.props.formattedWalletAmount(totalAmount)}
-              <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
+              <span className={styles.currencySymbol}>&nbsp;{ticker}</span>
             </div>
           </>
         ) : (
           <div className={styles.totalAmount}>{this.props.formattedWalletAmount(totalAmount)}
-            <span className={styles.currencySymbol}>&nbsp;{currencyUnit}</span>
+            <span className={styles.currencySymbol}>&nbsp;{ticker}</span>
           </div>
         )}
       </div>);

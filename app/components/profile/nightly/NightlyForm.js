@@ -36,7 +36,7 @@ const messages = defineMessages({
   },
   recommendation1: {
     id: 'profile.nightly.recommendation1',
-    defaultMessage: '!!!You only use wallets with a small amount of ADA to minimize risk.',
+    defaultMessage: '!!!You only use wallets with a small balance to minimize risk.',
   },
   recommendation2: {
     id: 'profile.nightly.recommendation2',

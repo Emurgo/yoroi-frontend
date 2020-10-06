@@ -171,8 +171,10 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
 
     const coinPrice: ?number = this.generated.stores.profile.unitOfAccount.enabled
       ? (
-        this.generated.stores.coinPriceStore
-          .getCurrentPrice('ADA', this.generated.stores.profile.unitOfAccount.currency)
+        this.generated.stores.coinPriceStore.getCurrentPrice(
+          apiMeta.meta.primaryTicker,
+          this.generated.stores.profile.unitOfAccount.currency
+        )
       )
       : null;
 
@@ -312,6 +314,7 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
             addressToDisplayString={
               addr => addressToDisplayString(addr, publicDeriver.getParent().getNetworkInfo())
             }
+            ticker={apiMeta.meta.primaryTicker}
           />
         );
       }

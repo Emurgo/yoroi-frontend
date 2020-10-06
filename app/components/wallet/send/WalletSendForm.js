@@ -44,10 +44,6 @@ const messages = defineMessages({
     id: 'wallet.send.form.receiver.hint',
     defaultMessage: '!!!Wallet Address',
   },
-  equalsAdaHint: {
-    id: 'wallet.send.form.amount.equalsAda',
-    defaultMessage: '!!!equals {amount} ADA',
-  },
   checkboxLabel: {
     id: 'wallet.send.form.sendAll.checkboxLabel',
     defaultMessage: '!!!Send all {coinName}',
@@ -71,9 +67,7 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  +currencyUnit: {|
-    primaryTicker: string,
-  |},
+  +ticker: string,
   +selectedNetwork: $ReadOnly<NetworkRow>,
   +currencyMaxIntegerDigits: number,
   +currencyMaxFractionalDigits: number,
@@ -259,7 +253,7 @@ export default class WalletSendForm extends Component<Props> {
     const { intl } = this.context;
     const { memo } = this.form.values();
     const {
-      currencyUnit,
+      ticker,
       currencyMaxIntegerDigits,
       currencyMaxFractionalDigits,
       hasAnyPending,
@@ -324,7 +318,7 @@ export default class WalletSendForm extends Component<Props> {
               disabled={this.props.shouldSendAll}
               error={(transactionFeeError || amountField.error)}
               // AmountInputSkin props
-              currency={currencyUnit.primaryTicker}
+              currency={ticker}
               fees={transactionFee.toFormat(currencyMaxFractionalDigits)}
               total={totalAmount.toFormat(currencyMaxFractionalDigits)}
               skin={AmountInputSkin}
@@ -334,7 +328,7 @@ export default class WalletSendForm extends Component<Props> {
           <div className={styles.checkbox}>
             <Checkbox
               label={intl.formatMessage(messages.checkboxLabel, {
-                currency: currencyUnit.primaryTicker
+                currency: ticker
               })}
               onChange={() => {
                 this.props.toggleSendAll();

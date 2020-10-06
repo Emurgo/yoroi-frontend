@@ -39,7 +39,7 @@ const messages = defineMessages({
 const emptyDashboardMessages = defineMessages({
   title: {
     id: 'wallet.dashboard.empty.title',
-    defaultMessage: '!!!You have not delegated your ADA yet',
+    defaultMessage: '!!!You have not delegated your {ticker} yet',
   },
   text: {
     id: 'wallet.dashboard.empty.text',
@@ -74,6 +74,7 @@ type Props = {|
   |},
   +delegationHistory: ?Array<CertificateForKey>,
   +epochLength: ?number,
+  +ticker: string,
 |};
 
 @observer
@@ -229,7 +230,10 @@ export default class StakingDashboard extends Component<Props> {
       return (
         <div className={width}>
           <InformativeError
-            title={intl.formatMessage(emptyDashboardMessages.title)}
+            title={intl.formatMessage(
+              emptyDashboardMessages.title,
+              { ticker: this.props.ticker }
+            )}
             text={!hideGraph
               // no need to explain to user how to delegate their ADA if they've done it before
               ? null

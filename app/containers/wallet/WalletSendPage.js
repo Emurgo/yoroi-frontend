@@ -7,7 +7,6 @@ import type { Node } from 'react';
 import { defineMessages, intlShape } from 'react-intl';
 import { ROUTES } from '../../routes-config';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
-import globalMessages from '../../i18n/global-messages';
 
 import WalletSendForm from '../../components/wallet/send/WalletSendForm';
 // Web Wallet Confirmation
@@ -127,9 +126,7 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
       <>
         <WalletSendForm
           selectedNetwork={publicDeriver.getParent().getNetworkInfo()}
-          currencyUnit={{
-            primaryTicker: apiMeta.primaryTicker,
-          }}
+          ticker={apiMeta.primaryTicker}
           currencyMaxIntegerDigits={
             apiMeta.totalSupply.div(apiMeta.decimalPlaces).toFixed().length
           }
@@ -183,8 +180,6 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
   /** Web Wallet Send Confirmation dialog
     * Callback that creates a container to avoid the component knowing about actions/stores */
   webWalletDoConfirmation: (() => Node) = () => {
-    const { intl } = this.context;
-
     const publicDeriver = this.generated.stores.wallets.selected;
     if (!publicDeriver) throw new Error(`Active wallet required for ${nameof(this.webWalletDoConfirmation)}.`);
     const selectedApiType = getApiForNetwork(publicDeriver.getParent().getNetworkInfo());
@@ -210,7 +205,7 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
       {...this.generated.WalletSendConfirmationDialogContainerProps}
       signRequest={signRequest}
       staleTx={transactionBuilderStore.txMismatch}
-      currencyUnit={intl.formatMessage(globalMessages.unitAda)}
+      ticker={apiMeta.primaryTicker}
       unitOfAccountSetting={this.generated.stores.profile.unitOfAccount}
       coinPrice={coinPrice}
     />);
@@ -231,7 +226,6 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
     }
     const adaApi = ApiOptions.ada;
 
-    const { intl } = this.context;
     const { transactionBuilderStore } = this.generated.stores;
     // Guard against potential null values
     if (!publicDeriver) throw new Error('Active wallet required for hardwareWalletDoConfirmation.');
@@ -276,7 +270,7 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
           receivers={receivers}
           totalAmount={totalInput}
           transactionFee={fee}
-          currencyUnit={intl.formatMessage(globalMessages.unitAda)}
+          ticker={apiMeta.primaryTicker}
           messages={messagesLedger}
           isSubmitting={ledgerSendStore.isActionProcessing}
           error={ledgerSendStore.error}
@@ -308,7 +302,7 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
           receivers={receivers}
           totalAmount={totalInput}
           transactionFee={fee}
-          currencyUnit={intl.formatMessage(globalMessages.unitAda)}
+          ticker={apiMeta.primaryTicker}
           messages={messagesTrezor}
           isSubmitting={trezorSendStore.isActionProcessing}
           error={trezorSendStore.error}

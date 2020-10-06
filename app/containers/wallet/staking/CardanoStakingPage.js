@@ -348,6 +348,7 @@ export default class CardanoStakingPage extends Component<Props> {
           meta={{
             decimalPlaces: apiMeta.decimalPlaces.toNumber(),
             totalSupply: apiMeta.totalSupply,
+            ticker: apiMeta.primaryTicker,
           }}
         />
       );
