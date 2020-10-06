@@ -22,7 +22,10 @@ type Props = {|
     +rewards: null | void | BigNumber,
     +walletAmount: null | BigNumber,
     +infoText?: string,
-    +decimalPlaces: number,
+    +meta: {|
+      +ticker: string,
+      +decimalPlaces: number,
+    |}
 |};
 
 @observer
@@ -63,7 +66,7 @@ export default class WalletDetails extends Component<Props> {
             {this.renderAmountDisplay({
               shouldHideBalance,
               amount: walletAmount,
-              decimalPlaces: this.props.decimalPlaces,
+              decimalPlaces: this.props.meta.decimalPlaces,
             })}
             <span className={styles.amountLabel}>
               {intl.formatMessage(globalMessages.walletLabel)}
@@ -113,8 +116,6 @@ export default class WalletDetails extends Component<Props> {
       );
     }
 
-    const currency = ' ADA'; // TODO: get from variable
-
-    return (<>{balanceDisplay} {currency}</>);
+    return (<>{balanceDisplay} {this.props.meta.ticker}</>);
   }
 }

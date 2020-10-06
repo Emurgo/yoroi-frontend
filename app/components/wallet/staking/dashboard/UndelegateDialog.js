@@ -43,7 +43,10 @@ type Props = {|
   +classicTheme: boolean,
   +error: ?LocalizableError,
   +generatingTx: boolean,
-  +decimalPlaces: number,
+  +meta: {|
+    +decimalPlaces: number,
+    +ticker: string,
+  |},
 |};
 
 @observer
@@ -179,8 +182,8 @@ export default class UndelegateDialog extends Component<Props> {
             {intl.formatMessage(globalMessages.walletSendConfirmationFeesLabel)}
           </p>
           <p className={styles.rewardAmount}>
-            {this.props.transactionFee.toFormat(this.props.decimalPlaces)}&nbsp;
-            {intl.formatMessage(globalMessages.unitAda).toUpperCase()}
+            {this.props.transactionFee.toFormat(this.props.meta.decimalPlaces)}&nbsp;
+            {this.props.meta.ticker}
           </p>
         </div>
         {this.props.error

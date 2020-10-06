@@ -203,7 +203,10 @@ export default class MyWalletsPage extends Component<Props> {
           // TODO: This should be probably bound to an individual wallet
           onUpdateHideBalance={this.updateHideBalance}
           shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
-          decimalPlaces={apiMeta.decimalPlaces.toNumber()}
+          meta={{
+            decimalPlaces: apiMeta.decimalPlaces.toNumber(),
+            ticker: apiMeta.primaryTicker,
+          }}
         />}
         walletSumCurrencies={walletSumCurrencies}
         walletSubRow={() => this.createSubrow(publicDeriver)}
@@ -268,7 +271,10 @@ export default class MyWalletsPage extends Component<Props> {
           shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
           rewards={null /* TODO */}
           walletAmount={null /* TODO */}
-          decimalPlaces={apiMeta.decimalPlaces.toNumber()}
+          meta={{
+            decimalPlaces: apiMeta.decimalPlaces.toNumber(),
+            ticker: apiMeta.primaryTicker,
+          }}
         />}
         walletNumber={1}
         walletAddresses={walletAddresses /* TODO: replace with proper hashes */}

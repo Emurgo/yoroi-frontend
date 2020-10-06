@@ -13,12 +13,13 @@ const messages = defineMessages({
   },
   byronDeprecationLine2: {
     id: 'wallet.deprecation.byronLine2',
-    defaultMessage: '!!!To delegate your ADA you will need to upgrade to a Shelley wallet.'
+    defaultMessage: '!!!To delegate your {ticker} you will need to upgrade to a Shelley wallet.'
   }
 });
 
 type Props = {|
   onUpgrade: void | (void => void),
+  ticker: string,
 |};
 
 @observer
@@ -36,7 +37,10 @@ export default class ByronDeprecationBanner extends Component<Props> {
       >
         <>
           {intl.formatMessage(messages.byronDeprecationLine1)}<br />
-          {intl.formatMessage(messages.byronDeprecationLine2)}
+          {intl.formatMessage(
+            messages.byronDeprecationLine2,
+            { ticker: this.props.ticker }
+          )}
         </>
       </DeprecatedCurrencyBanner>
     );

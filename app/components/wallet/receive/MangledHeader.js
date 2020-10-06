@@ -15,7 +15,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 const messages = defineMessages({
   warning1: {
     id: 'wallet.receive.page.mangledWarning1',
-    defaultMessage: '!!!Mangled addresses contribute to your ADA balance but have the incorrect delegation preference'
+    defaultMessage: '!!!Mangled addresses contribute to your {ticker} balance but have the incorrect delegation preference'
   },
   fixLabel: {
     id: 'wallet.receive.page.unmangeLabel',
@@ -26,6 +26,7 @@ const messages = defineMessages({
 type Props = {|
   +hasMangledUtxo: boolean;
   +onClick: void => void,
+  +ticker: string,
 |};
 
 @observer
@@ -46,7 +47,12 @@ export default class MangledHeader extends Component<Props> {
         <WarningHeader
           message={(
             <>
-              <p>{intl.formatMessage(messages.warning1)}</p><br />
+              <p>
+                {intl.formatMessage(
+                  messages.warning1,
+                  { ticker: this.props.ticker}
+                )}
+              </p><br />
               <p>
                 {intl.formatMessage(addressSubgroupName.mangled)}&nbsp;
                 <FormattedHTMLMessage {...globalMessages.auditAddressWarning} />

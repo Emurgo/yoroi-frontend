@@ -13,7 +13,7 @@ import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType'
 import LocalizableError from '../../../i18n/LocalizableError';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
-import { ApiOptions, getApiForNetwork, getApiMeta } from '../../../api/common/utils';
+import { getApiForNetwork, getApiMeta } from '../../../api/common/utils';
 import { addressToDisplayString } from '../../../api/ada/lib/storage/bridge/utils';
 import type { ISignRequest } from '../../../api/common/lib/transactions/ISignRequest';
 
@@ -21,7 +21,7 @@ export type GeneratedData = typeof WalletSendConfirmationDialogContainer.prototy
 
 type DialogProps = {|
   +signRequest: ISignRequest<any>,
-  +currencyUnit: string,
+  +ticker: string,
   +staleTx: boolean,
   +unitOfAccountSetting: UnitOfAccountSettingType,
   +coinPrice: ?number,
@@ -40,7 +40,7 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
 
   render(): Node {
     const {
-      currencyUnit,
+      ticker,
       signRequest,
       unitOfAccountSetting, coinPrice,
     } = this.props;
@@ -92,7 +92,7 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
           sendMoneyRequest.reset();
         }}
         error={sendMoneyRequest.error}
-        currencyUnit={currencyUnit}
+        ticker={ticker}
         classicTheme={profile.isClassicTheme}
         unitOfAccountSetting={unitOfAccountSetting}
         coinPrice={coinPrice}

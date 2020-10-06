@@ -39,7 +39,7 @@ const messages = defineMessages({
   },
   unregisterExplanation: {
     id: 'wallet.withdrawal.transaction.unregister',
-    defaultMessage: '!!!This transaction will unregister one or more staking keys, giving you back your {refundAmount} ADA from your deposit',
+    defaultMessage: '!!!This transaction will unregister one or more staking keys, giving you back your {refundAmount} {ticer} from your deposit',
   },
 });
 
@@ -60,6 +60,7 @@ type Props = {|
   +error: ?LocalizableError,
   +form: ?Node,
   +unitOfAccountSetting: UnitOfAccountSettingType,
+  +ticker: string,
   +coinPrice: ?number,
   +addressToDisplayString: string => string,
   +addressLookup: ReturnType<typeof genAddressLookup>,
@@ -185,6 +186,7 @@ export default class TransferSummaryPage extends Component<Props> {
               })}
               <div className={styles.refund}>
                 {intl.formatMessage(messages.unregisterExplanation, {
+                  ticker: this.props.ticker,
                   refundAmount: deregistrations.reduce(
                     (sum, curr) => (curr.refund == null ? sum : sum.plus(curr.refund)),
                     new BigNumber(0)
@@ -317,7 +319,7 @@ export default class TransferSummaryPage extends Component<Props> {
             ) : (
               <div className={styles.amount}>{recoveredBalance}
                 <span className={styles.currencySymbol}>
-                  &nbsp;ADA
+                  &nbsp;{this.props.ticker}
                 </span>
               </div>
             )}
@@ -347,7 +349,7 @@ export default class TransferSummaryPage extends Component<Props> {
             ) : (
               <div className={styles.fees}>{transactionFee}
                 <span className={styles.currencySymbol}>
-                  &nbsp;ADA
+                  &nbsp;{this.props.ticker}
                 </span>
               </div>
             )}
@@ -381,7 +383,7 @@ export default class TransferSummaryPage extends Component<Props> {
           ) : (
             <div className={styles.totalAmount}>{finalBalance}
               <span className={styles.currencySymbol}>
-                &nbsp;ADA
+                &nbsp;{this.props.ticker}
               </span>
             </div>
           )}

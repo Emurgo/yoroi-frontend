@@ -13,11 +13,12 @@ const messages = defineMessages({
   },
   rewardAddressLine2: {
     id: 'wallet.receive.page.rewardAddressLine2',
-    defaultMessage: '!!!You cannot send ADA to reward addresses, but we show it for personal auditing purposes'
+    defaultMessage: '!!!You cannot send {ticker} to reward addresses, but we show it for personal auditing purposes'
   },
 });
 
 type Props = {|
+  +ticker: string,
 |};
 
 @observer
@@ -33,7 +34,13 @@ export default class RewardHeader extends Component<Props> {
         message={(
           <>
             <p>{intl.formatMessage(messages.rewardAddressLine1)}</p><br />
-            <p>{intl.formatMessage(messages.rewardAddressLine2)}</p><br />
+            <p>
+              {intl.formatMessage(
+                messages.rewardAddressLine2,
+                { ticker: this.props.ticker }
+              )}
+            </p>
+            <br />
           </>
         )}
       />

@@ -262,8 +262,9 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
           coinPrice={coinPrice}
           unitOfAccountSetting={this.generated.stores.profile.unitOfAccount}
           addressToDisplayString={
-              addr => addressToDisplayString(addr, this.getSelectedNetwork())
-            }
+            addr => addressToDisplayString(addr, this.getSelectedNetwork())
+          }
+          ticker={apiMeta.meta.primaryTicker}
         />);
       }
       case TransferStatus.ERROR: {

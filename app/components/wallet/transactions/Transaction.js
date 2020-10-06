@@ -421,9 +421,6 @@ export default class Transaction extends Component<Props, State> {
                   amount: data.amount,
                   decimalPlaces: this.props.decimalPlaces,
                 })}
-                {this.props.unitOfAccount.primaryTicker === 'ADA' && (
-                  <span className={styles.currencySymbol}><AdaSymbol /></span>
-                )}
               </div>
             </div>
             <div className={styles.expandArrowBox}>

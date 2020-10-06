@@ -47,7 +47,7 @@ const messages = defineMessages({
     id: 'noticeBoard.notice.feeChanged.title',
     defaultMessage: '!!!Stake pool fee has changed',
   },
-  subMessagefeeChanged: {
+  subMessageFeeChanged: {
     id: 'noticeBoard.notice.feeChanged.subMessage',
     defaultMessage: '!!!Old fee was {oldFee} {currency} and new fee is {newFee} {currency}',
   },
@@ -144,7 +144,7 @@ export default class NoticeBlock extends Component<Props> {
         title = intl.formatMessage(messages.titlefeeChanged);
         subMessage =  (
           <FormattedHTMLMessage
-            {...messages.subMessagefeeChanged}
+            {...messages.subMessageFeeChanged}
             values={{ oldFee: notice.oldFee, newFee: notice.newFee, currency: 'ADA' }}
           />);
         icon = (<span><FeeChangedIcon /></span>);

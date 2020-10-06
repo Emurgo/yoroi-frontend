@@ -32,19 +32,19 @@ const messages = defineMessages({
   },
   mangledPopupDialogLine1: {
     id: 'wallet.dashboard.summary.mangled.line1',
-    defaultMessage: '!!!Your wallet has {adaAmount} ADA with a different delegation preferences.',
+    defaultMessage: '!!!Your wallet has {adaAmount} {ticker} with a different delegation preferences.',
   },
   canUnmangleLine: {
     id: 'wallet.dashboard.summary.mangled.can',
-    defaultMessage: '!!!{adaAmount} ADA can be corrected',
+    defaultMessage: '!!!{adaAmount} {ticker} can be corrected',
   },
   cannotUnmangleLine: {
     id: 'wallet.dashboard.summary.mangled.cannot',
-    defaultMessage: '!!!{adaAmount} ADA cannot be corrected',
+    defaultMessage: '!!!{adaAmount} {ticker} cannot be corrected',
   },
   mangledPopupDialogLine2: {
     id: 'wallet.dashboard.summary.mangled.line2',
-    defaultMessage: '!!!We recommend to {transactionMessage} to delegate the ADA',
+    defaultMessage: '!!!We recommend to {transactionMessage} to delegate the {ticker}',
   },
   makeTransaction: {
     id: 'wallet.dashboard.summary.mangled.makeTx',
@@ -249,6 +249,7 @@ export default class UserSummary extends Component<Props, State> {
                     <FormattedMessage
                       {...messages.mangledPopupDialogLine2}
                       values={{
+                        ticker: this.props.meta.primaryTicker,
                         transactionMessage: (
                           <span
                             className={styles.link}
@@ -298,6 +299,7 @@ export default class UserSummary extends Component<Props, State> {
     return (<FormattedMessage
       {...message}
       values={{
+        ticker: this.props.meta.primaryTicker,
         adaAmount: amount
           .shiftedBy(-decimalPlaces)
           .toFormat(decimalPlaces),

@@ -15,6 +15,7 @@ import type { ServerStatusErrorType } from '../../types/serverStatusErrorType';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import { isTestnet, isCardanoHaskell } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { Bip44Wallet } from '../../api/ada/lib/storage/models/Bip44Wallet/wrapper';
+import { getApiForNetwork, getApiMeta } from '../../api/common/utils';
 
 export type GeneratedData = typeof BannerContainer.prototype.generated;
 
@@ -29,15 +30,7 @@ export default class BannerContainer extends Component<InjectedOrGenerated<Gener
       ? false
       : isTestnet(selected.getParent().getNetworkInfo());
 
-    const deprecationBanner = (
-      selected != null &&
-      isCardanoHaskell(selected.getParent().getNetworkInfo()) &&
-      selected.getParent() instanceof Bip44Wallet
-    )
-      ? <ByronDeprecationBanner
-        onUpgrade={undefined}
-      />
-      : undefined;
+    const deprecationBanner = this.getDeprecationBanner();
     return (
       <>
         {/* if running in offline mode, don't render an error */}
@@ -53,6 +46,29 @@ export default class BannerContainer extends Component<InjectedOrGenerated<Gener
         {!environment.isProduction() && <NotProductionBanner />}
         {deprecationBanner}
       </>
+    );
+  }
+
+  getDeprecationBanner: void => Node = () => {
+    const { selected } = this.generated.stores.wallets;
+    if (selected == null) {
+      return null;
+    }
+    if (!isCardanoHaskell(selected.getParent().getNetworkInfo())) {
+      return null;
+    }
+    if (!(selected.getParent() instanceof Bip44Wallet)) {
+      return null;
+    }
+    const api = getApiForNetwork(selected.getParent().getNetworkInfo());
+    const apiMeta = getApiMeta(api);
+    if (apiMeta == null) throw new Error(`${nameof(BannerContainer)} no API selected`);
+
+    return (
+      <ByronDeprecationBanner
+        onUpgrade={undefined}
+        ticker={apiMeta.meta.primaryTicker}
+      />
     );
   }
 

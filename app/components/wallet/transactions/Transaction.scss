@@ -158,13 +158,6 @@
     .status {
       color: var(--theme-transactions-state-pending-text-color);
     }
-    .currencySymbol {
-      & > svg {
-        & > g {
-          stroke: var(--theme-icon-transactions-ada-symbol-pending-color);
-        }
-      }
-    }
   }
  
   .expandArrowBox {
@@ -361,19 +354,5 @@
   
   .conversionRate {
     margin-left: 76px;
-  }
-
-  .currencySymbol {
-    margin-left: 12px;
-    vertical-align: middle;
-    display: inline-block;
-    margin-left: 4px;
-    & > svg {
-      width: 21px;
-      height: 21px;
-      & > g {
-        stroke: var(--theme-icon-transactions-ada-symbol-color);
-      }
-    }
   }
 }

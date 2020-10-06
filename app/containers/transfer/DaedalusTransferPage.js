@@ -216,6 +216,7 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
             addressToDisplayString={
               addr => addressToDisplayString(addr, publicDeriver.getParent().getNetworkInfo())
             }
+            ticker={apiMeta.meta.primaryTicker}
           />
         );
       }

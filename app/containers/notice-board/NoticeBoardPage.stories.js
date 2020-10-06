@@ -65,6 +65,9 @@ export const Generic = (): Node => {
     <NoticeBoardPage
       generated={{
         stores: {
+          wallets: {
+            selected: null,
+          },
           profile: {
             isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
           },

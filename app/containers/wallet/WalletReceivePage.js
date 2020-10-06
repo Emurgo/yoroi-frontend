@@ -165,7 +165,7 @@ export default class WalletReceivePage extends Component<Props> {
         />);
       }
       if (addressTypeStore.meta.name.group === AddressGroupTypes.reward) {
-        return (<RewardHeader />);
+        return (<RewardHeader ticker={apiMeta.primaryTicker} />);
       }
       if (addressTypeStore.meta.name.subgroup === AddressSubgroup.mangled) {
         return (
@@ -174,6 +174,7 @@ export default class WalletReceivePage extends Component<Props> {
             onClick={() => this.generated.actions.dialogs.open.trigger({
               dialog: UnmangleTxDialogContainer,
             })}
+            ticker={apiMeta.primaryTicker}
           />
         );
       }

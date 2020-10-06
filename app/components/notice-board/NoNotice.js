@@ -17,12 +17,13 @@ const messages = defineMessages({
   },
   chooseAPool: {
     id: 'noticeBoard.noNoticeText.chooseAPool',
-    defaultMessage: '!!!To view notifications here, first choose a stake pool and delegate your ADA.',
+    defaultMessage: '!!!To view notifications here, first choose a stake pool and delegate your {ticker}.',
   },
 });
 
 type Props = {|
   +classicTheme: boolean,
+  +ticker: string,
 |};
 
 @observer
@@ -42,7 +43,12 @@ export default class NoNotice extends Component<Props> {
           <div className={styles.notDelegatedYet}>
             {intl.formatMessage(messages.notDelegatedYet)}
           </div>
-          <div><FormattedHTMLMessage {...messages.chooseAPool} /></div>
+          <div>
+            <FormattedHTMLMessage
+              {...messages.chooseAPool}
+              values={{ ticker: this.props.ticker }}
+            />
+          </div>
         </div>
       </div>
     );
