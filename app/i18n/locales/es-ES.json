@@ -177,7 +177,7 @@
   "profile.languageSelect.title": "Selección de idioma",
   "profile.nightly.acknowledgedRisks": "Comprendo el riesgo",
   "profile.nightly.header": "<strong>Yoroi Nightly se actualiza automáticamente cada noche</strong> con las últimas características en desarrollo. Aunque nunca lanzaremos intencionalmente versiones con bugs o con código roto, las características pueden estar todavía en progreso y contener errores.",
-  "profile.nightly.recommendation1": "Sólo se usan billeteras con saldo pequeño para minimizar el riesgo.",
+  "profile.nightly.recommendation1": "Usa billeteras con poco saldo para minimizar el riesgo.",
   "profile.nightly.recommendation2": "Reporta cualquier problema a EMURGO a través del canal Yoroi Nightly.",
   "profile.nightly.recommendationHeader": "Recomendamos:",
   "profile.nightly.title": "Yoroi Nightly",
