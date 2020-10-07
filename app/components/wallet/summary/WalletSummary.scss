@@ -72,10 +72,15 @@ $rightBlockWidth: $leftBlockWidth;
         line-height: 21px;
         font-weight: 500;
         color: var(--cmn-default-color-grey-3);
-        span {
-          font-family: var(--font-medium);
-          margin-left: 8px;
+        .amount {
           color: var(--theme-transactions-list-text-color);
+          font-family: var(--font-medium);
+          margin-right: 8px;
+          
+          .afterDecimal {
+            font-family: var(--font-regular);
+            font-size: 10px;
+          }
         }
         & > .currencySymbolSmallest {
           display: inline-block;

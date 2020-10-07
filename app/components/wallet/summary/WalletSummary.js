@@ -1,10 +1,10 @@
 // @flow
 import React, { Component, } from 'react';
+import BigNumber from 'bignumber.js';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { defineMessages, intlShape } from 'react-intl';
-import AdaSymbolSmallest from '../../../assets/images/ada-symbol-smallest-dark.inline.svg';
 import ExportTxToFileSvg from '../../../assets/images/transaction/export-tx-to-file.inline.svg';
 import BorderedBox from '../../widgets/BorderedBox';
 import type { UnconfirmedAmount } from '../../../types/unconfirmedAmountType';
@@ -13,6 +13,7 @@ import styles from './WalletSummary.scss';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import { formatValue } from '../../../utils/unit-of-account';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { splitAmount } from '../../../utils/formatters';
 
 const messages = defineMessages({
   pendingOutgoingConfirmationLabel: {
@@ -47,8 +48,12 @@ const messages = defineMessages({
 
 type Props = {|
   +numberOfTransactions: number,
+  +shouldHideBalance: boolean,
   +pendingAmount: UnconfirmedAmount,
-  +decimalPlaces: number,
+  +meta: {|
+    +decimalPlaces: number,
+    +primaryTicker: string,
+  |},
   +isLoadingTransactions: boolean,
   +openExportTxToFileDialog: void => void,
   +unitOfAccountSetting: UnitOfAccountSettingType,
@@ -60,6 +65,30 @@ export default class WalletSummary extends Component<Props> {
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
+
+  renderAmountDisplay: {|
+    shouldHideBalance: boolean,
+    amount: BigNumber
+  |} => Node = (request) => {
+    let balanceDisplay;
+    if (request.shouldHideBalance) {
+      balanceDisplay = (<span>******</span>);
+    } else {
+      const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
+        request.amount,
+        this.props.meta.decimalPlaces,
+      );
+
+      balanceDisplay = (
+        <>
+          {beforeDecimalRewards}
+          <span className={styles.afterDecimal}>{afterDecimalRewards}</span>
+        </>
+      );
+    }
+
+    return (<>{balanceDisplay} {this.props.meta.primaryTicker}</>);
+  }
 
   render(): Node {
     const {
@@ -90,17 +119,17 @@ export default class WalletSummary extends Component<Props> {
                         {pendingAmount.incomingInSelectedCurrency &&
                         unitOfAccountSetting.enabled
                           ? (
-                            <span>
+                            <span className={styles.amount}>
                               {formatValue(pendingAmount.incomingInSelectedCurrency)}
                               {' ' + unitOfAccountSetting.currency}
                             </span>
                           ) : (
                             <>
-                              <span>
-                                {pendingAmount.incoming.toFormat(this.props.decimalPlaces)}
-                              </span>
-                              <span className={styles.currencySymbolSmallest}>
-                                <AdaSymbolSmallest />
+                              <span className={styles.amount}>
+                                {this.renderAmountDisplay({
+                                  shouldHideBalance: this.props.shouldHideBalance,
+                                  amount: pendingAmount.incoming,
+                                })}
                               </span>
                             </>
                           )}
@@ -113,17 +142,17 @@ export default class WalletSummary extends Component<Props> {
                         {pendingAmount.outgoingInSelectedCurrency &&
                           unitOfAccountSetting.enabled
                           ? (
-                            <span>
+                            <span className={styles.amount}>
                               {formatValue(pendingAmount.outgoingInSelectedCurrency)}
                               {' ' + unitOfAccountSetting.currency}
                             </span>
                           ) : (
                             <>
-                              <span>
-                                {pendingAmount.outgoing.toFormat(this.props.decimalPlaces)}
-                              </span>
-                              <span className={styles.currencySymbolSmallest}>
-                                <AdaSymbolSmallest />
+                              <span className={styles.amount}>
+                                {this.renderAmountDisplay({
+                                  shouldHideBalance: this.props.shouldHideBalance,
+                                  amount: pendingAmount.outgoing,
+                                })}
                               </span>
                             </>
                           )}
