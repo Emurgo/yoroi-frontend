@@ -255,7 +255,7 @@ async function _batchHistoryByTransaction(
     if (newBest === undefined) {
       // if we don't have a single tx in a block
       // we can't advance in pagination
-      throw new Error('_batchHistoryByTransaction only pending/failed tx returned');
+      throw new Error(`${nameof(_batchHistoryByAddresses)} only pending/failed tx returned`);
     }
     return await _batchHistoryByTransaction(
       transactions,
