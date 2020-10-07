@@ -97,6 +97,9 @@ export async function migrateToLatest(
     ['<3.7.0', async () => {
       return await removeErgoDevices(persistentDb);
     }],
+    ['>=3.7.0 <3.7.3', async () => {
+      return await ergoTxHistoryReset(persistentDb);
+    }],
   ];
 
   let appliedMigration = false;
@@ -320,4 +323,30 @@ async function removeErgoDevices(
     removedAWallet = true;
   }
   return removedAWallet;
+}
+
+/**
+ * clear the transaction history for all wallets
+ * useful if there was a bug in transaction processing
+ */
+export async function ergoTxHistoryReset(
+  persistentDb: lf$Database,
+): Promise<boolean> {
+  const wallets = await loadWalletsFromStorage(persistentDb);
+  if (wallets.length === 0) {
+    return false;
+  }
+
+  for (const publicDeriver of wallets) {
+    const withLevels = asHasLevels<ConceptualWallet>(publicDeriver);
+    if (!isErgo(publicDeriver.getParent().getNetworkInfo())) {
+      continue;
+    }
+    if (withLevels == null) {
+      throw new Error(`${nameof(ergoTxHistoryReset)} missing levels`);
+    }
+    await removeAllTransactions({ publicDeriver: withLevels });
+  }
+
+  return true;
 }
