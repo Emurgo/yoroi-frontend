@@ -206,6 +206,7 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
         <WalletSummary
           numberOfTransactions={totalAvailable}
           pendingAmount={unconfirmedAmount}
+          shouldHideBalance={profile.shouldHideBalance}
           isLoadingTransactions={
             /**
              * only use first load
@@ -215,7 +216,10 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
           }
           openExportTxToFileDialog={this.openExportTransactionDialog}
           unitOfAccountSetting={profile.unitOfAccount}
-          decimalPlaces={apiMeta.decimalPlaces.toNumber()}
+          meta={{
+            decimalPlaces: apiMeta.decimalPlaces.toNumber(),
+            primaryTicker: apiMeta.primaryTicker,
+          }}
         />
 
         {walletTransactions}

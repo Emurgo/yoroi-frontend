@@ -46,7 +46,7 @@ const messages = defineMessages({
   },
   notEnoughMoneyToSendError: {
     id: 'api.errors.NotEnoughMoneyToSendError',
-    defaultMessage: '!!!Not enough money to make this transaction.',
+    defaultMessage: '!!!Not enough funds to make this transaction.',
   },
   updateAdaWalletError: {
     id: 'api.errors.updateAdaWalletError',

@@ -114,7 +114,10 @@ export default class UserSummary extends Component<Props, State> {
           </div>
         </div>
         <h3 className={styles.label}>
-          {intl.formatMessage(globalMessages.totalAdaLabel)}:
+          {intl.formatMessage(
+            globalMessages.totalAdaLabel,
+            { ticker: this.props.meta.primaryTicker }
+          )}:
         </h3>
         {totalAdaSum != null
           ? (

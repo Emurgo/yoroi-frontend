@@ -495,7 +495,7 @@ const globalMessages: * = defineMessages({
   },
   totalAdaLabel: {
     id: 'wallet.dashboard.summary.adaTitle',
-    defaultMessage: '!!!Total ADA',
+    defaultMessage: '!!!Total {ticker}',
   },
   marginsLabel: {
     id: 'wallet.dashboard.stakePool.margins',
