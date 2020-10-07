@@ -2,9 +2,22 @@
 
 import type {
   RemoteErgoTransaction,
+  SignedRequest, SignedResponse,
+  UtxoSumFunc,
+  AddressUtxoFunc,
+  HistoryFunc,
+  BestBlockFunc,
 } from '../../app/api/ergo/lib/state-fetch/types';
 import { Address as ErgoAddress } from '@coinbarn/ergo-ts';
-import { getErgoAddress } from '../../app/api/ergo/lib/state-fetch/mockNetwork';
+import {
+  getErgoAddress,
+  genGetTransactionsHistoryForAddresses,
+  genGetBestBlock,
+  genCheckAddressesInUse,
+  genUtxoForAddresses,
+  genUtxoSumForAddresses,
+  toRemoteErgoTx,
+} from '../../app/api/ergo/lib/state-fetch/mockNetwork';
 import { testWallets } from './TestWallets';
 import {
   HARD_DERIVATION_START,
@@ -12,6 +25,9 @@ import {
   CoinTypes,
   ChainDerivations,
 } from '../../app/config/numbersConfig';
+import type {
+  FilterFunc,
+} from '../../app/api/common/lib/state-fetch/currencySpecificTypes';
 
 // based on abandon x 14 + share
 const genesisTransaction = '7d4b41a1256f93989aa7e1782989dbbb9ec222c3f6b98e216b676c589b5ecece';
@@ -127,3 +143,82 @@ export const generateTransaction = (): {|
   };
 };
 
+// =================
+//   Manage state
+// =================
+
+const transactions: Array<RemoteErgoTransaction> = [];
+
+export function addTransaction(tx: RemoteErgoTransaction): void {
+  // need to insert txs in order they appear in the blockchain
+  // note: pending transactions always go at the end
+  if (tx.block_num == null || tx.tx_ordinal == null) {
+    transactions.push(tx);
+    return;
+  }
+  const newTxBlock = tx.block_num;
+  const newTxOrdinal = tx.tx_ordinal;
+
+  const insertionIndex = transactions.findIndex(mockChainTx => {
+    const blockNum = mockChainTx.block_num;
+    const txOrdinal = mockChainTx.tx_ordinal;
+
+    if (blockNum == null) return true;
+    if (blockNum > newTxBlock) return true;
+    if (blockNum < newTxBlock) return false;
+    if (txOrdinal == null) return true;
+    if (txOrdinal > newTxOrdinal) return true;
+    if (txOrdinal < newTxOrdinal) return false;
+    throw new Error(`Transaction ${tx.hash} occurs at same position as an existing transactions`);
+  });
+  if (insertionIndex === -1) {
+    transactions.push(tx);
+    return;
+  }
+  transactions.splice(insertionIndex, 0, tx);
+}
+
+export const MockChain = Object.freeze({
+  Standard: 0,
+  TestAssurance: 1,
+});
+export function resetChain(): void {
+  // want to keep reference the same
+  while (transactions.length > 0) {
+    transactions.pop();
+  }
+
+  const txs = generateTransaction();
+
+  // test setup
+  addTransaction(txs.genesisTx);
+  addTransaction(txs.distributorTx);
+}
+
+const usedAddresses: FilterFunc = genCheckAddressesInUse(
+  transactions,
+);
+const history: HistoryFunc = genGetTransactionsHistoryForAddresses(
+  transactions,
+);
+const getBestBlock: BestBlockFunc = genGetBestBlock(transactions);
+const utxoForAddresses: AddressUtxoFunc = genUtxoForAddresses(
+  history,
+  getBestBlock,
+);
+const utxoSumForAddresses: UtxoSumFunc = genUtxoSumForAddresses(utxoForAddresses);
+const sendTx = (request: SignedRequest): SignedResponse => {
+  const remoteTx = toRemoteErgoTx(transactions, request);
+
+  addTransaction(remoteTx);
+  return { txId: remoteTx.hash };
+};
+
+export default {
+  utxoForAddresses,
+  utxoSumForAddresses,
+  usedAddresses,
+  history,
+  getBestBlock,
+  sendTx,
+};

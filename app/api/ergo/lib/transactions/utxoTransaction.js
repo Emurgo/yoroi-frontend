@@ -118,7 +118,9 @@ export function sendAllUnsignedTxFromUtxo(request: {|
         ErgoAddress.fromBytes(
           Buffer.from(utxo.receiver, 'hex')
         ),
-        utxo.assets,
+        utxo.assets == null
+          ? undefined
+          : utxo.assets.map(asset => ({ ...asset })),
         utxo.additionalRegisters
       )
     });
@@ -290,7 +292,9 @@ export function newErgoUnsignedTxFromUtxo(request: {|
         ErgoAddress.fromBytes(
           Buffer.from(utxo.receiver, 'hex')
         ),
-        utxo.assets,
+        utxo.assets == null
+          ? undefined
+          : utxo.assets.map(asset => ({ ...asset })),
         utxo.additionalRegisters
       )
     });

@@ -347,7 +347,7 @@ Feature: Restore Wallet
     Then I should see the opened wallet with name "many-tx-wallet"
 
   @it-130
-  Scenario: Restoring an empty ergo wallet (IT-130)
+  Scenario: Restoring an ergo wallet (IT-130)
     When I click the restore button for ergo
     Then I select bip44 15-word wallet
     And I enter the name "Restored Wallet"

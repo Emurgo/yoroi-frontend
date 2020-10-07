@@ -17,11 +17,11 @@ export type RemoteUnspentOutput = {|
   +tx_index: number,
   +creationHeight: number,
   +boxId: string,
-  +assets?: Array<{
+  +assets?: $ReadOnlyArray<$ReadOnly<{
     amount: number,
     tokenId: string,
     ...
-  }>,
+  }>>,
   +additionalRegisters?: {...},
   +ergoTree: string,
 |};
@@ -86,7 +86,7 @@ export type RemoteErgoTransaction = {|
   outputs: Array<{
     additionalRegisters: { ... },
     address: string,
-    assets: Array<$ReadOnly<{
+    assets: $ReadOnlyArray<$ReadOnly<{
       amount: number,
       tokenId: string,
       ...
@@ -115,7 +115,9 @@ export type BestBlockRequest = {|
 export type BestBlockResponse = {|
   epoch: 0, // TODO
   slot: 0, // TODO
-  hash: string,
+  // null when no blocks in db
+  hash: null | string,
+  // 0 if no blocks in db
   height: number,
 |};
 export type BestBlockFunc = (body: BestBlockRequest) => Promise<BestBlockResponse>;
@@ -140,7 +142,7 @@ export type SignedRequest = {|
     value: number,
     ergoTree: string, // hex
     creationHeight: number,
-    assets?: Array<$ReadOnly<{|
+    assets?: $ReadOnlyArray<$ReadOnly<{|
       tokenId: string, // hex
       amount: number,
     |}>>,
