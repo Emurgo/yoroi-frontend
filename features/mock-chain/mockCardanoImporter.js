@@ -56,13 +56,6 @@ const genesisTxReceiver = 'Ae2tdPwUPEZ4YjgvykNpoFeYUxoyhNj2kg8KfKWN2FizsSpLUPv68
 
 type MockTx = RemoteTransaction;
 
-/**
- * To simplify, our genesis is a single address which gives all its ada to a "distributor"
- * The distributor gives ADA to a bunch of addresses to setup the tests
- *
- * You can generate more data for these tests using the Cardano-Wallet WASM library
- */
-
 export const generateTransaction = (): {|
   genesisTx: RemoteTransaction,
   distributorTx: RemoteTransaction,
@@ -90,8 +83,14 @@ export const generateTransaction = (): {|
   shelleyOnlyRegisteredTx1: RemoteTransaction,
   shelleyOnlyRegisteredTx2: RemoteTransaction,
 |} => {
+  /**
+  * To simplify, our genesis is a single address which gives all its ada to a "distributor"
+  * The distributor gives ADA to a bunch of addresses to setup the tests
+  *
+  * You can generate more data for these tests using the Cardano-Wallet WASM library
+  */
   const genesisTx = {
-    hash: 'b713cc0d63106c3806b5a7077cc37a294fcca5e479f26aac64e51e09ae808d75',
+    hash: genesisTransaction,
     inputs: [
       {
         address: genesisAddress,

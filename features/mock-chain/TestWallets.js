@@ -87,7 +87,7 @@ export const testWallets: { [key: WalletNames]: RestorationInput, ... } = Object
   }),
   createWallet({
     name: ('jormungandr-test': WalletNames),
-    mnemonic: 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon address',
+    mnemonic: '',
     plate: 'XXXX-1111',
   }),
   createWallet({
