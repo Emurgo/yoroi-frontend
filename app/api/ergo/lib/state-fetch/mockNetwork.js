@@ -281,9 +281,8 @@ export function toRemoteErgoTx(
   request: SignedRequest,
   network: $ReadOnly<NetworkRow>,
 ): RemoteErgoTransaction {
-  const txHash = request.id ?? '';
   // ergo-ts doesn't support calculating the ID for a transaction, so we just leave it blank
-  if (request.id == null) console.log(`${nameof(toRemoteErgoTx)} No ID set for broadcasted tx`);
+  const txHash = request.id ?? '';
 
   const baseConfig = getErgoBaseConfig(network)
     .reduce((acc, next) => Object.assign(acc, next), {});

@@ -60,12 +60,12 @@ export type RemoteErgoTransaction = {|
   hash: string,
   inputs: Array<{
     address: string,
-    id: string,
-    outputTransactionId: string,
-    index: number,
+    id: string, // boxId
+    outputTransactionId: string, // txHash of tx that created the output we're consuming
+    index: number, // index of this input in this tx
     outputIndex: number, // index in tx that created the output we're consuming
     spendingProof: string,
-    transactionId: string,
+    transactionId: string, // txHash of this tx
     value: number,
     ...
   }>,
@@ -87,11 +87,12 @@ export type RemoteErgoTransaction = {|
       tokenId: string,
       ...
     }>>,
+    // any height <= the height the tx was included in (used for rent calculation, etc)
     creationHeight: number,
     ergoTree: string,
-    id: string,
-    txId: string,
-    index: number,
+    id: string, // boxId
+    txId: string, // txhash of this
+    index: number, // index of this output in this tx
     mainChain: boolean,
     spentTransactionId: null | string,
     value: number,
