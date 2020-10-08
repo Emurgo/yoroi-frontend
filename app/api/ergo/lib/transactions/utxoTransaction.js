@@ -11,8 +11,10 @@ import type {
 import type {
   RemoteUnspentOutput,
   SignedRequest,
-  BackendNetworkInfo,
 } from '../state-fetch/types';
+import type {
+  BackendNetworkInfo,
+} from '../../../common/lib/state-fetch/types';
 import {
   NotEnoughMoneyToSendError,
 } from '../../../common/errors';
