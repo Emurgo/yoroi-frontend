@@ -93,9 +93,7 @@ export default class PickCurrencyOptionDialog extends Component<Props> {
                   </>}
               />
             }
-            {this.props.onErgo != null && (
-              !environment.isProduction() || environment.isNightly() || environment.isTest()
-            ) &&
+            {this.props.onErgo != null &&
               <OptionBlock
                 parentName="PickCurrencyOptionDialog"
                 type="ergo"
