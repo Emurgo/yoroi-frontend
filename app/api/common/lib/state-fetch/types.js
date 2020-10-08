@@ -1,5 +1,11 @@
 // @flow
 
+import type { NetworkRow } from '../../../ada/lib/storage/database/primitives/tables';
+
+export type BackendNetworkInfo = {|
+  network: $ReadOnly<NetworkRow>,
+|};
+
 // checkServer
 
 export type ServerStatusRequest = void;

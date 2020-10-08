@@ -1,10 +1,6 @@
 // @flow
 
-import type { NetworkRow } from '../../../ada/lib/storage/database/primitives/tables';
-
-export type BackendNetworkInfo = {|
-  network: $ReadOnly<NetworkRow>,
-|};
+import type { BackendNetworkInfo } from '../../../common/lib/state-fetch/types';
 
 export type AddressUtxoRequest = {|
   ...BackendNetworkInfo,
