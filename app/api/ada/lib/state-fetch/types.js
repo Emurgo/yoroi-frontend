@@ -101,8 +101,8 @@ export const RemoteTransactionTypes: RemoteTransactionTypeT = Object.freeze({
 });
 export type RemoteTransactionInput = {|
   +id: string,
-  +index: number,
-  +txHash: string,
+  +index: number, // index of output we're consuming
+  +txHash: string, // tx that created output we're consuming
   +address: string,
   +amount: string,
 |};

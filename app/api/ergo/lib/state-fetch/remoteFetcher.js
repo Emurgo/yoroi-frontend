@@ -4,12 +4,12 @@ import type {
   AddressUtxoRequest, AddressUtxoResponse,
   TxBodiesRequest, TxBodiesResponse,
   UtxoSumRequest, UtxoSumResponse,
-  HistoryRequest, HistoryResponse,
+  HistoryFunc, HistoryRequest, HistoryResponse,
   BestBlockRequest, BestBlockResponse,
   SignedRequest, SignedResponse,
 } from './types';
 import type {
-  FilterUsedRequest, FilterUsedResponse,
+  FilterFunc, FilterUsedRequest, FilterUsedResponse,
 } from '../../../common/lib/state-fetch/currencySpecificTypes';
 
 import type { IFetcher } from './IFetcher';
@@ -130,50 +130,39 @@ export class RemoteFetcher implements IFetcher {
       });
   }
 
-  getTransactionsHistoryForAddresses: HistoryRequest => Promise<HistoryResponse> = (body) => {
-    const { network, ...rest } = body;
+  getTransactionsHistoryForAddresses: HistoryRequest => Promise<HistoryResponse> = (request) => {
+    const { network, ...rest } = request;
     const { BackendService } = network.Backend;
     if (BackendService == null) throw new Error(`${nameof(this.getUTXOsForAddresses)} missing backend url`);
-    return axios(
-      `${BackendService}/api/v2/txs/history`,
-      {
-        method: 'post',
-        timeout: 2 * CONFIG.app.walletRefreshInterval,
-        data: {
-          ...rest,
-          addresses: rest.addresses.map(addr => encode(Buffer.from(addr, 'hex'))),
-        },
-        headers: {
-          'yoroi-version': this.getLastLaunchVersion(),
-          'yoroi-locale': this.getCurrentLocale()
+
+    return fixHistoryFunc(async body => {
+      return axios(
+        `${BackendService}/api/v2/txs/history`,
+        {
+          method: 'post',
+          timeout: 2 * CONFIG.app.walletRefreshInterval,
+          data: {
+            ...rest,
+            addresses: body.addresses,
+          },
+          headers: {
+            'yoroi-version': this.getLastLaunchVersion(),
+            'yoroi-locale': this.getCurrentLocale()
+          }
         }
-      }
-    ).then(response => response.data.map((resp: ElementOf<HistoryResponse>) => ({
-      ...resp,
-      inputs: resp.inputs.map(input => ({
-        ...input,
-        address: decode(input.address).toString('hex'),
-      })),
-      dataInputs: resp.dataInputs.map(input => ({
-        ...input,
-        address: decode(input.address).toString('hex'),
-      })),
-      outputs: resp.outputs.map(output => ({
-        ...output,
-        address: decode(output.address).toString('hex'),
-      })),
-    })))
-      .catch((error) => {
-        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getTransactionsHistoryForAddresses)} error: ` + stringifyError(error));
-        if (
-          error?.response === 'REFERENCE_BLOCK_MISMATCH' ||
-          error?.response === 'REFERENCE_TX_NOT_FOUND' ||
-          error?.response === 'REFERENCE_BEST_BLOCK_MISMATCH'
-        ) {
-          throw new RollbackApiError();
-        }
-        throw new GetTxHistoryForAddressesApiError();
-      });
+      ).then(response => response.data)
+        .catch((error) => {
+          Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getTransactionsHistoryForAddresses)} error: ` + stringifyError(error));
+          if (
+            error?.response === 'REFERENCE_BLOCK_MISMATCH' ||
+            error?.response === 'REFERENCE_TX_NOT_FOUND' ||
+            error?.response === 'REFERENCE_BEST_BLOCK_MISMATCH'
+          ) {
+            throw new RollbackApiError();
+          }
+          throw new GetTxHistoryForAddressesApiError();
+        });
+    })(request);
   }
 
   getBestBlock: BestBlockRequest => Promise<BestBlockResponse> = (body) => {
@@ -223,28 +212,70 @@ export class RemoteFetcher implements IFetcher {
       });
   }
 
-  checkAddressesInUse: FilterUsedRequest => Promise<FilterUsedResponse> = (body) => {
-    const { BackendService } = body.network.Backend;
+  checkAddressesInUse: FilterUsedRequest => Promise<FilterUsedResponse> = (request) => {
+    const { BackendService } = request.network.Backend;
     if (BackendService == null) throw new Error(`${nameof(this.getUTXOsForAddresses)} missing backend url`);
-    return axios(
-      `${BackendService}/api/v2/addresses/filterUsed`,
-      {
-        method: 'post',
-        timeout: 2 * CONFIG.app.walletRefreshInterval,
-        data: {
-          addresses: body.addresses.map(addr => encode(Buffer.from(addr, 'hex')))
-        },
-        headers: {
-          'yoroi-version': this.getLastLaunchVersion(),
-          'yoroi-locale': this.getCurrentLocale()
+    return fixFilterFunc(body => {
+      return axios(
+        `${BackendService}/api/v2/addresses/filterUsed`,
+        {
+          method: 'post',
+          timeout: 2 * CONFIG.app.walletRefreshInterval,
+          data: {
+            addresses: body.addresses
+          },
+          headers: {
+            'yoroi-version': this.getLastLaunchVersion(),
+            'yoroi-locale': this.getCurrentLocale()
+          }
         }
-      }
-    ).then(response => response.data.map((resp: ElementOf<FilterUsedResponse>) => (
-      decode(resp).toString('hex')
-    )))
-      .catch((error) => {
-        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.checkAddressesInUse)} error: ` + stringifyError(error));
-        throw new CheckAddressesInUseApiError();
-      });
+      ).then(response => response.data)
+        .catch((error) => {
+          Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.checkAddressesInUse)} error: ` + stringifyError(error));
+          throw new CheckAddressesInUseApiError();
+        });
+    })(request);
   }
+}
+
+export function fixHistoryFunc(func: HistoryFunc): HistoryFunc {
+  return async (request) => {
+    const fixedAddresses = request.addresses.map(addr => encode(Buffer.from(addr, 'hex')));
+
+    const result = await func({
+      network: request.network,
+      addresses: fixedAddresses,
+      untilBlock: request.untilBlock,
+      ...(request.after ? { after: request.after } : null)
+    });
+
+    return result.map(resp => ({
+      ...resp,
+      inputs: resp.inputs.map(input => ({
+        ...input,
+        address: decode(input.address).toString('hex'),
+      })),
+      dataInputs: resp.dataInputs.map(input => ({
+        ...input,
+        address: decode(input.address).toString('hex'),
+      })),
+      outputs: resp.outputs.map(output => ({
+        ...output,
+        address: decode(output.address).toString('hex'),
+      })),
+    }));
+  };
+}
+
+export function fixFilterFunc(func: FilterFunc): FilterFunc {
+  return async (request) => {
+    const fixedAddresses = request.addresses.map(addr => encode(Buffer.from(addr, 'hex')));
+
+    const result = await func({
+      network: request.network,
+      addresses: fixedAddresses,
+    });
+
+    return result.map(resp => decode(resp).toString('hex'));
+  };
 }
