@@ -6,11 +6,8 @@ import * as ErgoServer from '../mock-chain/mockErgoServer';
 import { By } from 'selenium-webdriver';
 import { enterRecoveryPhrase, getPlates } from './wallet-restoration-steps';
 import { testWallets } from '../mock-chain/TestWallets';
-import {
-  resetChain, MockChain,
-  serverIssue, serverFixed,
-  appMaintenance, appMaintenanceFinish,
-} from '../mock-chain/mockCardanoImporter';
+import * as ErgoImporter from '../mock-chain/mockErgoImporter';
+import * as CardanoImporter from '../mock-chain/mockCardanoImporter';
 import { expect } from 'chai';
 import {
   satisfies,
@@ -57,10 +54,11 @@ Before((scenario) => {
 });
 
 Before({ tags: 'not @TestAssuranceChain' }, () => {
-  resetChain(MockChain.Standard);
+  CardanoImporter.resetChain(CardanoImporter.MockChain.Standard);
+  ErgoImporter.resetChain();
 });
 Before({ tags: '@TestAssuranceChain' }, () => {
-  resetChain(MockChain.TestAssurance);
+  CardanoImporter.resetChain(CardanoImporter.MockChain.TestAssurance);
 });
 
 Before({ tags: '@serverDown' }, () => {
@@ -73,17 +71,17 @@ After({ tags: '@serverDown' }, () => {
 });
 
 Before({ tags: '@serverMaintenance' }, () => {
-  serverIssue();
+  CardanoImporter.serverIssue();
 });
 After({ tags: '@serverMaintenance' }, () => {
-  serverFixed();
+  CardanoImporter.serverFixed();
 });
 
 Before({ tags: '@appMaintenance' }, () => {
-  appMaintenance();
+  CardanoImporter.appMaintenance();
 });
 After({ tags: '@appMaintenance' }, () => {
-  appMaintenanceFinish();
+  CardanoImporter.appMaintenanceFinish();
 });
 
 Before({ tags: '@invalidWitnessTest' }, () => {

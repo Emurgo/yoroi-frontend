@@ -27,20 +27,21 @@ import { getErgoBaseConfig } from '../../../ada/lib/storage/database/prepackaged
 export function getErgoAddress(
   mnemonic: string,
   path: Array<number>,
-): string {
+): Address {
   const rootKey = generateWalletRootKey(mnemonic);
   const derivedKey = derivePath(rootKey, path);
 
   if (path[0] === WalletTypePurpose.BIP44) {
     return Address.fromPk(
       derivedKey.toPublic().key.publicKey.toString('hex')
-    ).addrBytes.toString('hex');
+    );
   }
   throw new Error('Unexpected purpose');
 }
 
 export function genCheckAddressesInUse(
   blockchain: Array<RemoteErgoTransaction>,
+  network: $ReadOnly<NetworkRow>,
 ): FilterFunc {
   return async (
     body: FilterUsedRequest,
@@ -51,7 +52,7 @@ export function genCheckAddressesInUse(
       if (tx.tx_state !== 'Successful') {
         continue;
       }
-      const oursInTx = ourAddressesInTx(tx, addressSet, body.network);
+      const oursInTx = ourAddressesInTx(tx, addressSet, network);
       for (const found of oursInTx) {
         usedSet.add(found);
       }
@@ -95,6 +96,7 @@ function filterForOwn(
 
 export function genGetTransactionsHistoryForAddresses(
   blockchain: Array<RemoteErgoTransaction>,
+  network: $ReadOnly<NetworkRow>,
 ): HistoryFunc {
   return async (
     body: HistoryRequest,
@@ -112,7 +114,7 @@ export function genGetTransactionsHistoryForAddresses(
     }
     const ownAddresses = new Set(body.addresses);
     if (body.after == null)  {
-      const filtered = filterForOwn(subChain, ownAddresses, body.network);
+      const filtered = filterForOwn(subChain, ownAddresses, network);
       return filtered;
     }
     const after = body.after;
@@ -154,7 +156,7 @@ export function genGetTransactionsHistoryForAddresses(
         }
       }
     }
-    const filtered = filterForOwn(txsToInclude, ownAddresses, body.network);
+    const filtered = filterForOwn(txsToInclude, ownAddresses, network);
     return filtered;
   };
 }
@@ -196,19 +198,20 @@ export function genGetBestBlock(
 export function genUtxoForAddresses(
   getHistory: HistoryFunc,
   getBestBlock: BestBlockFunc,
+  network: $ReadOnly<NetworkRow>,
 ): AddressUtxoFunc {
   return async (
     body: AddressUtxoRequest,
   ): Promise<AddressUtxoResponse> => {
     const bestBlock = await getBestBlock({
-      network: body.network,
+      network,
     });
     if (bestBlock.hash == null) {
       return [];
     }
     const until = bestBlock.hash;
     const history = await getHistory({
-      network: body.network,
+      network,
       addresses: body.addresses,
       untilBlock: until,
     });
@@ -276,18 +279,18 @@ export function genUtxoSumForAddresses(
 export function toRemoteErgoTx(
   blockchain: Array<RemoteErgoTransaction>,
   request: SignedRequest,
+  network: $ReadOnly<NetworkRow>,
 ): RemoteErgoTransaction {
-  const txHash = request.id;
-  if (txHash == null) throw new Error(`${nameof(toRemoteErgoTx)} No ID set for broadcasted tx`);
+  const txHash = request.id ?? '';
+  // ergo-ts doesn't support calculating the ID for a transaction, so we just leave it blank
+  if (request.id == null) console.log(`${nameof(toRemoteErgoTx)} No ID set for broadcasted tx`);
 
-  const baseConfig = getErgoBaseConfig(request.network)
+  const baseConfig = getErgoBaseConfig(network)
     .reduce((acc, next) => Object.assign(acc, next), {});
 
   const mappedOutputs = [];
   for (let i = 0; i < request.outputs.length; i++) {
     const output = request.outputs[i];
-    const transactionId = output.transactionId;
-    if (transactionId == null) throw new Error(`${nameof(toRemoteErgoTx)} No txId set for broadcasted tx output`);
 
     mappedOutputs.push({
       additionalRegisters: output.additionalRegisters,
@@ -299,7 +302,7 @@ export function toRemoteErgoTx(
       creationHeight: output.creationHeight,
       ergoTree: output.ergoTree,
       id: output.boxId ?? '', // TODO: calculate if undefined
-      txId: transactionId,
+      txId: txHash,
       index: i,
       mainChain: true,
       spentTransactionId: null,

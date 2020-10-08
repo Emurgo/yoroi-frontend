@@ -137,9 +137,7 @@ export default class YoroiTransferKeyFormPage extends Component<Props> {
   @action
   clearPassword: string => void = (key) => {
     if (!this.isEncrypted(key) && this.passwordForm != null) {
-      // console.log(this.passwordForm.value);
       this.passwordForm.clear();
-      // console.log(this.passwordForm.value);
     }
   }
 

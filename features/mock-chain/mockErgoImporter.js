@@ -28,6 +28,7 @@ import {
 import type {
   FilterFunc,
 } from '../../app/api/common/lib/state-fetch/currencySpecificTypes';
+import { networks } from '../../app/api/ada/lib/storage/database/prepackaged/networks';
 
 // based on abandon x 14 + share
 const genesisTransaction = '7d4b41a1256f93989aa7e1782989dbbb9ec222c3f6b98e216b676c589b5ecece';
@@ -115,11 +116,11 @@ export const generateTransaction = (): {|
         {
           // index: 0
           additionalRegisters: Object.freeze({}),
-          address,
+          address: address.address,
           assets: [],
           creationHeight: height,
-          ergoTree: ErgoAddress.fromBytes(
-            Buffer.from(genesisTxReceiver, 'hex')
+          ergoTree: ErgoAddress.fromBase58(
+            genesisTxReceiver
           ).ergoTree,
           id: '33a35e15af1a83fa188673a2bd63007b07e119a0eaaf40b890b2081c2864f12a',
           txId: hash,
@@ -197,18 +198,21 @@ export function resetChain(): void {
 
 const usedAddresses: FilterFunc = genCheckAddressesInUse(
   transactions,
+  networks.ErgoMainnet,
 );
 const history: HistoryFunc = genGetTransactionsHistoryForAddresses(
   transactions,
+  networks.ErgoMainnet
 );
 const getBestBlock: BestBlockFunc = genGetBestBlock(transactions);
 const utxoForAddresses: AddressUtxoFunc = genUtxoForAddresses(
   history,
   getBestBlock,
+  networks.ErgoMainnet
 );
 const utxoSumForAddresses: UtxoSumFunc = genUtxoSumForAddresses(utxoForAddresses);
 const sendTx = (request: SignedRequest): SignedResponse => {
-  const remoteTx = toRemoteErgoTx(transactions, request);
+  const remoteTx = toRemoteErgoTx(transactions, request, networks.ErgoMainnet);
 
   addTransaction(remoteTx);
   return { txId: remoteTx.hash };

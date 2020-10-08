@@ -267,3 +267,31 @@ Feature: Send transaction
     Then I see the delegation confirmation dialog
     Then I submit the wallet send form
     Then I should see an delegation incorrect wallet password error message
+
+  @it-162
+  Scenario: Restoring an ergo wallet (IT-162)
+    When I click the restore button for ergo
+    Then I select bip44 15-word wallet
+    And I enter the name "Restored Wallet"
+    And I enter the recovery phrase:
+    | recoveryPhrase                                                                             |
+    | eight country switch draw meat scout mystery blade tip drift useless good keep usage title |
+    And I enter the restored wallet password:
+    | password   | repeatedPassword |
+    | asdfasdfasdf | asdfasdfasdf       |
+    And I click the "Restore Wallet" button
+    Then I should see a plate CXTP-1821
+    Then I click the next button
+    Then I should see the opened wallet with name "Restored Wallet"
+    When I go to the send transaction screen
+    And I fill the form:
+      | address                                                     | amount   |
+      | 9guxMsa2S1Z4xzr5JHUHZesznThjZ4BMM9Ra5Lfx2E9duAnxEmv         | 5.000000 |
+    And The transaction fees are "0.001100000"
+    And I click on the next button in the wallet send form
+    And I see send money confirmation dialog
+    And I enter the wallet password:
+      | password   |
+      | asdfasdfasdf |
+    And I submit the wallet send form
+    Then I should see the summary screen
