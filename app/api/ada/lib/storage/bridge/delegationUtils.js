@@ -231,7 +231,9 @@ export async function getRegistrationHistory(
 
   const result = {
     current: (
-      delegations[0].certificate.Kind === RustModule.WalletV4.CertificateKind.StakeRegistration
+      delegations.length === 0
+        ? false
+        : delegations[0].certificate.Kind === RustModule.WalletV4.CertificateKind.StakeRegistration
     ),
     fullHistory: delegations,
   };
