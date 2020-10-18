@@ -15,7 +15,7 @@ const messages = defineMessages({
   },
   nightlyLabel: {
     id: 'nightly.banner.label.message',
-    defaultMessage: '!!!YOU ARE ON YOROI NIGHTLY ({network}).',
+    defaultMessage: '!!!YOU ARE ON YOROI NIGHTLY.',
   },
 });
 
@@ -38,7 +38,6 @@ export default class TestnetWarningBanner extends Component<Props> {
           <div className={styles.text}>
             <FormattedMessage
               {...messages.nightlyLabel}
-              values={{ network: environment.getNetworkName() }}
               key="1"
             />
           </div>
@@ -52,7 +51,6 @@ export default class TestnetWarningBanner extends Component<Props> {
           <div className={styles.text}>
             <FormattedMessage
               {...messages.testnetLabel}
-              values={{ network: environment.getNetworkName() }}
               key="1"
             />
           </div>
