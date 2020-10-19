@@ -755,7 +755,7 @@ export default class JormungandrApi {
     } catch (error) {
       Logger.error(`${nameof(JormungandrApi)}::${nameof(this.restoreWallet)} error: ` + stringifyError(error));
       // TODO: handle case where wallet already exists (this if case is never hit)
-      if (error.message.includes('Wallet with that mnemonics already exists')) {
+      if (error.message != null && error.message.includes('Wallet with that mnemonics already exists')) {
         throw new WalletAlreadyRestoredError();
       }
 
@@ -893,7 +893,7 @@ export default class JormungandrApi {
       // where not imported/restored if some where. if no wallets are imported
       // we will error out completely with throw block below
       // TODO: use error ID instead of error message
-      if (error.message.includes('Wallet with that mnemonics already exists')) {
+      if (error.message != null && error.message.includes('Wallet with that mnemonics already exists')) {
         throw new WalletAlreadyRestoredError();
       }
       if (error instanceof LocalizableError) throw error;

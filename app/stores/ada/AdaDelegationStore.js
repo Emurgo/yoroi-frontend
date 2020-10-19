@@ -60,11 +60,17 @@ export default class AdaDelegationStore extends Store {
         // we need to defer this call because the store may not be initialized yet
         // by the time this constructor is called
         const stateFetcher = this.stores.substores.ada.stateFetchStore.fetcher;
-        const result = await stateFetcher.getRewardHistory({
+        const historyResult = await stateFetcher.getRewardHistory({
           network: publicDeriver.getParent().getNetworkInfo(),
           addresses: [address],
         });
-        return result[address] ?? [];
+        // flowlint-next-line unnecessary-optional-chain:off
+        const addressRewards = historyResult[address]?.map(info => (
+          ([info.epoch, new BigNumber(info.reward)]: [number, BigNumber])
+        ));
+        return addressRewards != null
+          ? addressRewards
+          : [];
       }),
       error: undefined,
     });

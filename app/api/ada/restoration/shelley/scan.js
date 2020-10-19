@@ -30,7 +30,6 @@ import { getCardanoHaskellBaseConfig } from '../../lib/storage/database/prepacka
 declare var CONFIG: ConfigType;
 const addressRequestSize = CONFIG.app.addressRequestSize;
 
-// TODO: delete this function eventually once we support payment addresses in the backend
 function genEnterpriseAddressBatchFunc(
   addressChain: RustModule.WalletV4.Bip32PublicKey,
   chainNetworkId: number,
@@ -49,29 +48,6 @@ function genEnterpriseAddressBatchFunc(
     });
   };
 }
-
-// TODO: delete this function eventually once we support payment addresses in the backend
-function genBaseAddressBatchFunc(
-  addressChain: RustModule.WalletV4.Bip32PublicKey,
-  stakingKey: RustModule.WalletV4.PublicKey,
-  chainNetworkId: number,
-): GenerateAddressFunc {
-  return (
-    indices: Array<number>
-  ) => {
-    return indices.map(i => {
-      const addressKey = addressChain.derive(i).to_raw_key();
-      const addr = RustModule.WalletV4.BaseAddress.new(
-        chainNetworkId,
-        RustModule.WalletV4.StakeCredential.from_keyhash(addressKey.hash()),
-        RustModule.WalletV4.StakeCredential.from_keyhash(stakingKey.hash())
-      );
-      const bech32 = addr.to_address().to_bech32();
-      return bech32;
-    });
-  };
-}
-
 
 export async function addShelleyChimericAccountAddress(
   addByHash: AddByHashFunc,
@@ -102,31 +78,32 @@ export async function addShelleyUtxoAddress(
   addByHash: AddByHashFunc,
   insertRequest: InsertRequest,
   stakingKey: RustModule.WalletV4.PublicKey,
-  baseAddresses: string, // bech32
+  enterpriseAddr: Buffer,
 ): Promise<{|
   KeyDerivationId: number,
 |}> {
-  const wasmAddr = RustModule.WalletV4.Address.from_bech32(baseAddresses);
-  const wasmBaseAddr = RustModule.WalletV4.BaseAddress.from_address(wasmAddr);
-  if (wasmBaseAddr == null) {
+  const wasmAddr = RustModule.WalletV4.Address.from_bytes(enterpriseAddr);
+  const wasmEnterpriseAddr = RustModule.WalletV4.EnterpriseAddress.from_address(wasmAddr);
+  if (wasmEnterpriseAddr == null) {
     throw new Error(`${nameof(addShelleyUtxoAddress)} address is not an enterprise address`);
   }
-  const baseAddr = RustModule.WalletV4.EnterpriseAddress.new(
+  const baseAddr = RustModule.WalletV4.BaseAddress.new(
     wasmAddr.network_id(),
-    wasmBaseAddr.payment_cred()
+    wasmEnterpriseAddr.payment_cred(),
+    RustModule.WalletV4.StakeCredential.from_keyhash(stakingKey.hash())
   );
   await addByHash({
     ...insertRequest,
     address: {
       type: CoreAddressTypes.CARDANO_ENTERPRISE,
-      data: Buffer.from(baseAddr.to_address().to_bytes()).toString('hex'),
+      data: Buffer.from(wasmEnterpriseAddr.to_address().to_bytes()).toString('hex'),
     },
   });
   await addByHash({
     ...insertRequest,
     address: {
       type: CoreAddressTypes.CARDANO_BASE,
-      data: Buffer.from(wasmBaseAddr.to_address().to_bytes()).toString('hex'),
+      data: Buffer.from(baseAddr.to_address().to_bytes()).toString('hex'),
     },
   });
   return {
@@ -166,7 +143,7 @@ async function scanChain(request: {|
             request.addByHash,
             insertRequest,
             request.stakingKey,
-            address
+            Buffer.from(address, 'hex')
           );
         },
       };
@@ -191,14 +168,12 @@ export async function scanShelleyCip1852Account(request: {|
   ).reduce((acc, next) => Object.assign(acc, next), {});
 
   const insert = await scanAccount({
-    generateInternalAddresses: genBaseAddressBatchFunc(
+    generateInternalAddresses: genEnterpriseAddressBatchFunc(
       key.derive(ChainDerivations.INTERNAL),
-      request.stakingKey,
       Number.parseInt(config.ChainNetworkId, 10),
     ),
-    generateExternalAddresses: genBaseAddressBatchFunc(
+    generateExternalAddresses: genEnterpriseAddressBatchFunc(
       key.derive(ChainDerivations.EXTERNAL),
-      request.stakingKey,
       Number.parseInt(config.ChainNetworkId, 10),
     ),
     lastUsedInternal: request.lastUsedInternal,

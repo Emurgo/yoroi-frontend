@@ -106,13 +106,13 @@ export default class StakingDashboard extends Component<Props> {
       ? null
       : (
         <div className={styles.graphsWrapper}>
-          {/* {this._displayGraph(graphData.rewardsGraphData)} */}
+          {this._displayGraph(graphData.rewardsGraphData)}
           {/* <GraphWrapper
-            themeVars={themeVars}
+            themeVars={this.props.themeVars}
             tabs={[
-              intl.formatMessage(messages.positionsLabel),
-              intl.formatMessage(globalMessages.marginsLabel),
-              intl.formatMessage(messages.costsLabel),
+              this.context.intl.formatMessage(messages.positionsLabel),
+              this.context.intl.formatMessage(globalMessages.marginsLabel),
+              this.context.intl.formatMessage(messages.costsLabel),
             ]}
             graphName="positions"
             data={graphData.positionsGraphData}
