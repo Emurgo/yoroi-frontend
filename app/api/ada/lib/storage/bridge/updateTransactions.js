@@ -130,7 +130,7 @@ import {
 import type {
   FilterFunc,
 } from '../../../../common/lib/state-fetch/currencySpecificTypes';
-import { addressToKind, addressToDisplayString } from './utils';
+import { addressToKind, } from './utils';
 import { RustModule } from '../../cardanoCrypto/rustLoader';
 
 async function rawGetAllTxIds(
