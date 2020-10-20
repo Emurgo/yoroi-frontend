@@ -145,7 +145,7 @@
   "myWallets.wallets.neverSync": "동기화 된 적 없음",
   "myWallets.wallets.sumInfoText": "총 지갑 잔고",
   "networkError.label.message": "경고: 서버와의 연결에 실패했습니다. <br> 당신의 인터넷 연결 상태 또는  <a target='blank' href='https://twitter.com/YoroiWallet'> 저희의 트위터 계정 </a>을 참고해주세요.. <br> 현재 표시되어있는 잔액이나 거래 내역은 서버 연결이 성공할 때 까지는 정확하지 않을 수도 있지만, 실제 잔액에는 영향을 끼치지 않습니다.",
-  "nightly.banner.label.message": "당신은 현재 YOROI NIGHTLY ({network})를 사용하고 있습니다.",
+  "nightly.banner.label.message": "YOU ARE ON YOROI NIGHTLY.",
   "noticeBoard.noNoticeText.chooseAPool": "To view notifications here, first <strong>choose a stake pool</strong> and delegate your {ticker}.",
   "noticeBoard.noNoticeText.notDelegatedYet": "아직 위임을 하지 않은 상태입니다.",
   "noticeBoard.notice.costChanged.subMessage": "이전의 비용은 {oldCost} {currency} 이며, 새로운 비용은 {newCost} {currency} 입니다.",

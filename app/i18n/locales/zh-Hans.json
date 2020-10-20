@@ -145,7 +145,7 @@
   "myWallets.wallets.neverSync": "未同步",
   "myWallets.wallets.sumInfoText": "钱包总余额",
   "networkError.label.message": "警告：与服务器的连接失败。<br>请检查您的互联网连接或<a target='blank' href='https://twitter.com/YoroiWallet'>我们的Twitter帐户</a>。<br> 在我们的服务器恢复正常之前，显示的余额和交易记录可能不正确，但您的实际余额不受影响。",
-  "nightly.banner.label.message": "你正在使用YOROI NIGHTLY({network}).",
+  "nightly.banner.label.message": "YOU ARE ON YOROI NIGHTLY.",
   "noticeBoard.noNoticeText.chooseAPool": "To view notifications here, first <strong>choose a stake pool</strong> and delegate your {ticker}.",
   "noticeBoard.noNoticeText.notDelegatedYet": "你尚未委托你的ADA.",
   "noticeBoard.notice.costChanged.subMessage": "原有的费用为{oldCost}{currency}，新的费用为{newCost}{currency}",
