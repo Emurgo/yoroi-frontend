@@ -758,6 +758,17 @@ Object {
     },
     Object {
       "Endpoints": Object {
+        "address": "https://adastat.net/addresses/",
+        "pool": "https://adastat.net/pools/",
+        "transaction": "https://adastat.net/transactions/",
+      },
+      "ExplorerId": 108,
+      "IsBackup": false,
+      "Name": "AdaStat",
+      "NetworkId": 0,
+    },
+    Object {
+      "Endpoints": Object {
         "address": "https://explorer.cardano-testnet.iohkdev.io/address/",
         "transaction": "https://explorer.cardano-testnet.iohkdev.io/en/transaction/",
       },

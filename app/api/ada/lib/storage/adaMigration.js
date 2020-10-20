@@ -100,6 +100,9 @@ export async function migrateToLatest(
     ['>=3.7.0 <3.7.3', async () => {
       return await ergoTxHistoryReset(persistentDb);
     }],
+    ['<3.8.0', async () => {
+      return await cardanoTxHistoryReset(persistentDb);
+    }],
   ];
 
   let appliedMigration = false;
