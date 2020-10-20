@@ -145,7 +145,7 @@
   "myWallets.wallets.neverSync": "Nunca sincronizou",
   "myWallets.wallets.sumInfoText": "Saldo total da carteira",
   "networkError.label.message": "AVISO: Falha na conexão com o servidor. <br> Por favor, verifique sua conexão com a internet ou <a target='blank' href='https://twitter.com/YoroiWallet'> nossa conta no Twitter </a>. <br> O saldo exibido e o histórico de transações podem parecer incorretos até que nossos servidores voltem ao normal, mas seu saldo real não é afetado.",
-  "nightly.banner.label.message": "YOU ARE ON YOROI NIGHTLY.",
+  "nightly.banner.label.message": "VOCÊ ESTÁ USANDO YOROI NIGHTLY.",
   "noticeBoard.noNoticeText.chooseAPool": "Para visualizar notificações aqui, primeiro <strong> escolha uma piscina de participação e delegue sua {ticker}.",
   "noticeBoard.noNoticeText.notDelegatedYet": "Você ainda não delegou o seu stake.",
   "noticeBoard.notice.costChanged.subMessage": "O custo anterior era {oldCost} {currency} e o novo custo será {newCost} {currency}",
