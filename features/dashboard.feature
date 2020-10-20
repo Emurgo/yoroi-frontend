@@ -11,6 +11,7 @@ Feature: Yoroi delegation dashboard
     Given There is a Shelley wallet stored named shelley-delegated
     And I have a wallet with funds
     And I go to the dashboard screen
+    Then I should rewards in the history
     When I click on the withdraw button
     Then I click on the checkbox
     And I click the next button

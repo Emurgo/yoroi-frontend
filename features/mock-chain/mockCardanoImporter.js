@@ -6,7 +6,7 @@ import type {
   UtxoSumFunc,
   PoolInfoFunc,
   AddressUtxoFunc,
-  RewardHistoryFunc,
+  RewardHistoryRequest, RewardHistoryResponse, RewardHistoryFunc,
   AccountStateFunc,
   RemoteAccountState,
   HistoryFunc,
@@ -24,7 +24,6 @@ import type {
 import BigNumber from 'bignumber.js';
 import {
   genGetTransactionsHistoryForAddresses,
-  genGetRewardHistory,
   genGetPoolInfo,
   genGetBestBlock,
   genCheckAddressesInUse,
@@ -1897,7 +1896,24 @@ const sendTx = (request: SignedRequestInternal): SignedResponse => {
 };
 
 const getPoolInfo: PoolInfoFunc = genGetPoolInfo();
-const getRewardHistory: RewardHistoryFunc = genGetRewardHistory();
+const getRewardHistory: RewardHistoryFunc = async (
+  _body: RewardHistoryRequest,
+): Promise<RewardHistoryResponse> => {
+  return {
+    e19558e969caa9e57adcfc40b9907eb794363b590faf42fff48c38eb88: [{
+      epoch: 210,
+      reward: '5000000',
+    }],
+    e156db5cd4889c84110d4de90c0d503b51b844db3e6fd87991238995bb: [{
+      epoch: 210,
+      reward: '5000000',
+    }],
+    e1deb0bcccbace8644ecbbb2b8eb9fc7a6b0e7380e8f019f44364dd060: [{
+      epoch: 210,
+      reward: '5000000',
+    }],
+  };
+};
 
 const getAccountState: AccountStateFunc = async (request) => {
   const totalRewards = new BigNumber(5000000);

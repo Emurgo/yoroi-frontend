@@ -6,7 +6,7 @@ import type {
   BestBlockRequest, BestBlockResponse, BestBlockFunc,
   AddressUtxoRequest, AddressUtxoResponse, AddressUtxoFunc,
   UtxoSumRequest, UtxoSumResponse, UtxoSumFunc,
-  RewardHistoryRequest, RewardHistoryResponse, RewardHistoryFunc,
+  RewardHistoryFunc,
   AccountStateRequest, AccountStateResponse, AccountStateFunc,
   PoolInfoRequest, PoolInfoResponse, PoolInfoFunc,
   RemoteTransaction, RemoteUnspentOutput,
@@ -17,7 +17,7 @@ import type {
   FilterUsedRequest, FilterUsedResponse, FilterFunc,
 } from '../../../common/lib/state-fetch/currencySpecificTypes';
 import { RollbackApiError, } from '../../../common/errors';
-import { baseToEnterprise, addressToKind, toHexOrBase58, } from '../storage/bridge/utils';
+import { toEnterprise, addressToKind, toHexOrBase58, } from '../storage/bridge/utils';
 import { CoreAddressTypes } from '../storage/database/primitives/enums';
 import type { CoreAddressT } from '../storage/database/primitives/enums';
 import {
@@ -45,7 +45,7 @@ function fixAddresses(address: string): string {
 }
 export function genCheckAddressesInUse(
   blockchain: Array<RemoteTransaction>,
-  network: $ReadOnly<NetworkRow>,
+  _network: $ReadOnly<NetworkRow>,
 ): FilterFunc {
   return async (
     body: FilterUsedRequest,
@@ -53,36 +53,53 @@ export function genCheckAddressesInUse(
     const addresses = body.addresses.map(addr => fixAddresses(addr));
     const addressSet = new Set(addresses);
     const usedSet = new Set();
+
     for (const tx of blockchain) {
       if (tx.tx_state !== 'Successful') {
         continue;
       }
-      const oursInTx = ourAddressesInTx(tx, addressSet, network);
+      const oursInTx = ourAddressesInTx(tx, addressSet);
       for (const found of oursInTx) {
         usedSet.add(found);
       }
     }
+
     return Array.from(usedSet);
   };
+}
+
+function isOurAddress(
+  address: string,
+  ownAddresses: Set<string>,
+): boolean {
+  if (ownAddresses.has(address)) {
+    return true;
+  }
+  const enterpriseWasm = toEnterprise(address);
+  if (enterpriseWasm != null) {
+    const enterprise = Buffer.from(enterpriseWasm.to_address().to_bytes()).toString('hex');
+    if (ownAddresses.has(enterprise)) {
+      return true;
+    }
+  }
+  return false;
 }
 
 function ourAddressesInTx(
   tx: RemoteTransaction,
   ownAddresses: Set<string>,
-  network: $ReadOnly<NetworkRow>,
 ): Set<string> {
   const addresses = [
     ...tx.inputs.map(input => input.address),
-    ...tx.outputs.map(output => output.address)
+    ...tx.outputs.map(output => output.address),
   ];
+  if (tx.type === 'shelley') {
+    addresses.push(...tx.withdrawals.map(withdrawal => withdrawal.address));
+  }
   const addressesUsed = new Set();
   for (const addr of addresses) {
-    const kind = addressToKind(addr, 'bytes', network);
-    const payload = kind === CoreAddressTypes.CARDANO_BASE
-      ? baseToEnterprise(addr)
-      : addr;
-    if (ownAddresses.has(payload)) {
-      addressesUsed.add(payload);
+    if (isOurAddress(addr, ownAddresses)) {
+      addressesUsed.add(addr);
     }
   }
   return addressesUsed;
@@ -91,11 +108,11 @@ function ourAddressesInTx(
 function filterForOwn(
   txs: Array<RemoteTransaction>,
   ownAddresses: Set<string>,
-  network: $ReadOnly<NetworkRow>,
+  _network: $ReadOnly<NetworkRow>,
 ): Array<RemoteTransaction> {
   const ownTxs = [];
   for (const tx of txs) {
-    const oursInTx = ourAddressesInTx(tx, ownAddresses, network);
+    const oursInTx = ourAddressesInTx(tx, ownAddresses);
     if (oursInTx.size > 0) {
       ownTxs.push(tx);
     }
@@ -235,7 +252,7 @@ export function genUtxoForAddresses(
     for (const tx of inBlockHistory) {
       for (let j = 0; j < tx.outputs.length; j++) {
         const address = tx.outputs[j].address;
-        if (ourAddressSet.has(address)) {
+        if (isOurAddress(address, ourAddressSet)) {
           const kind = addressToKind(address, 'bytes', networks.CardanoMainnet);
           if (
             kind === CoreAddressTypes.CARDANO_REWARD
@@ -487,32 +504,62 @@ export function toRemoteByronTx(
 }
 
 export function genGetAccountState(
-  _blockchain: Array<RemoteTransaction>,
+  blockchain: Array<RemoteTransaction>,
+  getRewardHistory: RewardHistoryFunc,
 ): AccountStateFunc {
   return async (
     body: AccountStateRequest,
   ): Promise<AccountStateResponse> => {
+    const rewardHistory = await getRewardHistory(body);
+
+    // 1) calculate the reward for each address
+    const resultMap = new Map<string, {|
+      rewards: BigNumber,
+      withdrawals: BigNumber,
+    |}>();
+    for (const key of Object.keys(rewardHistory)) {
+      for (const reward of rewardHistory[key]) {
+        const currVal = resultMap.get(key) ?? {
+          rewards: new BigNumber(0),
+          withdrawals: new BigNumber(0),
+        };
+
+        currVal.rewards = currVal.rewards.plus(reward.reward);
+      }
+    }
+
+    const addressSet = new Set(body.addresses);
+    // 2) calculate the withdrawal for each address
+    for (const tx of blockchain) {
+      if (tx.type !== 'shelley') continue;
+      for (const withdrawal of tx.withdrawals) {
+        if (addressSet.has(withdrawal.address)) {
+          const currVal = resultMap.get(withdrawal.address) ?? {
+            rewards: new BigNumber(0),
+            withdrawals: new BigNumber(0),
+          };
+
+          currVal.withdrawals = currVal.withdrawals.plus(withdrawal.amount);
+        }
+      }
+    }
+
+    // 3) gather up the result
+
     const result: AccountStateResponse = {};
     for (const address of body.addresses) {
-      // TODO: this is harder to mock since rewards are implicit
-      const state = {
-        poolOperator: null,
-        remainingAmount: '0',
-        rewards: '0',
-        withdrawals: '0'
+      const stateForAddr = resultMap.get(address) ?? {
+        rewards: new BigNumber(0),
+        withdrawals: new BigNumber(0),
       };
-      result[address] = state;
+      result[address] = {
+        poolOperator: null, // TODO
+        remainingAmount: stateForAddr.rewards.minus(stateForAddr.withdrawals).toString(),
+        rewards: stateForAddr.rewards.toString(),
+        withdrawals: stateForAddr.withdrawals.toString(),
+      };
     }
     return result;
-  };
-}
-
-export function genGetRewardHistory(
-): RewardHistoryFunc {
-  return async (
-    _body: RewardHistoryRequest,
-  ): Promise<RewardHistoryResponse> => {
-    return {};
   };
 }
 
