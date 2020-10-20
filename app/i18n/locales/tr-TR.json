@@ -145,7 +145,7 @@
   "myWallets.wallets.neverSync": "Asla senkronize edilmedi",
   "myWallets.wallets.sumInfoText": "Toplam cüzdan bakiyesi",
   "networkError.label.message": "UYARI: Sunucuya bağlantı kurulamadı.<br>Lütfen internet bağlantınızı kontrol edin veya <a target='blank' href='https://twitter.com/YoroiWallet'>Twitter hesabımız</a>.<br>Görüntülenen geçmiş bakiye ve işlemleriniz , sunucu normale dönene kadar yanlış görünebilir, ama gerçek bakiyeniz etkilenmez.",
-  "nightly.banner.label.message": "YOU ARE ON YOROI NIGHTLY.",
+  "nightly.banner.label.message": "SİZ YOROI NIGHTLY ÜZERİNDESİNİZ.",
   "noticeBoard.noNoticeText.chooseAPool": "To view notifications here, first <strong>choose a stake pool</strong> and delegate your {ticker}.",
   "noticeBoard.noNoticeText.notDelegatedYet": "Hissenizi henüz devretmediniz.",
   "noticeBoard.notice.costChanged.subMessage": "Eski masraf {oldCost} {currency} ve yeni masraf {newCost} {currency}",
