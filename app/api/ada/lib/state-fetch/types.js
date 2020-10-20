@@ -262,10 +262,10 @@ export type RewardHistoryRequest = {|
   ...BackendNetworkInfo,
   addresses: Array<string>,
 |};
-export type RewardTuple = [
-  number, /* epoch */
-  number /* amount in lovelaces */
-];
+export type RewardTuple = {|
+  epoch: number,
+  reward: string,
+|};
 export type RewardHistoryResponse = { [address: string]: Array<RewardTuple>, ... };
 export type RewardHistoryFunc = (body: RewardHistoryRequest) => Promise<RewardHistoryResponse>;
 

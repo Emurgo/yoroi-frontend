@@ -53,7 +53,7 @@ export type GetCurrentDelegationFunc = (
 export type RewardHistoryRequest = string;
 export type RewardHistoryResponse = Array<[
   number, // epoch
-  number, // amount
+  BigNumber, // amount
 ]>;
 export type RewardHistoryFunc = (
   request: RewardHistoryRequest

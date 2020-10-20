@@ -563,7 +563,7 @@ function getStakingInfo(
       stakingCase === stakingKeyCases.LongAgoDelegation ||
       stakingCase === stakingKeyCases.ManuallyUndelegate ||
       stakingCase === stakingKeyCases.ChangePools
-        ? Promise.resolve([[99, 1000], [100, 500]])
+        ? Promise.resolve([[99, new BigNumber(1000)], [100, new BigNumber(500)]])
         : Promise.resolve([])
     )
   );

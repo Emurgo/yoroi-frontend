@@ -52,11 +52,17 @@ export default class JormungandrDelegationStore extends Store {
         const { BackendService } = publicDeriver.getParent().getNetworkInfo().Backend;
         if (BackendService == null) throw new Error(`rewardHistory missing backend url`);
         const stateFetcher = this.stores.substores.jormungandr.stateFetchStore.fetcher;
-        const result = await stateFetcher.getRewardHistory({
+        const historyResult = await stateFetcher.getRewardHistory({
           network: publicDeriver.getParent().getNetworkInfo(),
           addresses: [address]
         });
-        return result[address] ?? [];
+        // flowlint-next-line unnecessary-optional-chain:off
+        const addressRewards = historyResult[address]?.map(info => (
+          ([info[0], new BigNumber(info[1])]: [number, BigNumber])
+        ));
+        return addressRewards != null
+          ? addressRewards
+          : [];
       }),
       error: undefined,
     };

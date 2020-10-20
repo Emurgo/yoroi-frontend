@@ -59,7 +59,7 @@ import { getUnmangleAmounts, } from '../../../stores/stateless/mangledAddresses'
 import type { IAddressTypeStore, IAddressTypeUiSubset } from '../../../stores/stateless/addressStores';
 import { GROUP_MANGLED } from '../../../stores/stateless/addressStores';
 import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
-import { isJormungandr, isCardanoHaskell } from '../../../api/ada/lib/storage/database/prepackaged/networks';
+import { isJormungandr, isCardanoHaskell, getCardanoHaskellBaseConfig } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import DeregisterDialogContainer from '../../transfer/DeregisterDialogContainer';
 import type { GeneratedData as DeregisterDialogContainerData } from '../../transfer/DeregisterDialogContainer';
 import type { GeneratedData as WithdrawalTxDialogContainerData } from '../../transfer/WithdrawalTxDialogContainer';
@@ -822,28 +822,39 @@ export default class StakingDashboardPage extends Component<Props> {
     // so we need to insert these manually
     const totalRewards: Array<GraphItems> = [];
     const perEpochRewards: Array<GraphItems> = [];
-    let adaSum = new BigNumber(0);
+    let amountSum = new BigNumber(0);
+
+    const startEpoch = (() => {
+      if (isCardanoHaskell(request.publicDeriver.getParent().getNetworkInfo())) {
+        const shelleyConfig = getCardanoHaskellBaseConfig(
+          request.publicDeriver.getParent().getNetworkInfo()
+        )[1];
+        return shelleyConfig.StartAt;
+      }
+      return 0;
+    })();
+
     // note: reward history includes the current epoch
     // since it tells you the reward you got at slot 0 of the new epoch
-    for (let i = 0; i <= request.currentEpoch; i++) {
+    for (let i = startEpoch; i <= request.currentEpoch; i++) {
       if (historyIterator < history.length && i === history[historyIterator][0]) {
         // exists a reward for this epoch
         const nextReward = history[historyIterator][1];
-        adaSum = adaSum.plus(nextReward);
+        amountSum = amountSum.plus(nextReward);
         totalRewards.push({
           name: i,
-          primary: adaSum.dividedBy(amountPerUnit).toNumber(),
+          primary: amountSum.dividedBy(amountPerUnit).toNumber(),
         });
         perEpochRewards.push({
           name: i,
-          primary: nextReward / amountPerUnit.toNumber(),
+          primary: nextReward.div(amountPerUnit.toNumber()).toNumber(),
         });
         historyIterator++;
       } else {
         // no reward for this epoch
         totalRewards.push({
           name: i,
-          primary: adaSum.dividedBy(amountPerUnit).toNumber(),
+          primary: amountSum.dividedBy(amountPerUnit).toNumber(),
         });
         perEpochRewards.push({
           name: i,

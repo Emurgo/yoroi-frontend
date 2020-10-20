@@ -7,6 +7,7 @@ import type {
   HistoryRequest, HistoryResponse,
   AccountStateRequest, AccountStateResponse,
   PoolInfoRequest, PoolInfoResponse,
+  RewardHistoryRequest, RewardHistoryResponse,
   BestBlockRequest, BestBlockResponse,
   SignedResponse,
   SignedRequestInternal,
@@ -137,7 +138,7 @@ export function getMockServer(
       }
     });
 
-    server.post('/api/getPoolInfo', async (
+    server.post('/api/pool/info', async (
       req: { body: PoolInfoRequest, ... },
       res: { send(arg: PoolInfoResponse): any, ... }
     ): Promise<void> => {
@@ -145,7 +146,15 @@ export function getMockServer(
       res.send(poolsInfo);
     });
 
-    server.post('/api/getAccountState', async (
+    server.post('/api/account/rewardHistory', async (
+      req: { body: RewardHistoryRequest, ... },
+      res: { send(arg: RewardHistoryResponse): any, ... }
+    ): Promise<void> => {
+      const poolsInfo = await mockImporter.getRewardHistory(req.body);
+      res.send(poolsInfo);
+    });
+
+    server.post('/api/account/state', async (
       req: { body: AccountStateRequest, ... },
       res: { send(arg: AccountStateResponse): any, ... }
     ): Promise<void> => {

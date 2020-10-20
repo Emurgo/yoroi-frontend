@@ -417,7 +417,7 @@ export default class ErgoApi {
     } catch (error) {
       Logger.error(`${nameof(ErgoApi)}::${nameof(this.restoreWallet)} error: ` + stringifyError(error));
       // TODO: handle case where wallet already exists (this if case is never hit)
-      if (error.message.includes('Wallet with that mnemonics already exists')) {
+      if (error.message != null && error.message.includes('Wallet with that mnemonics already exists')) {
         throw new WalletAlreadyRestoredError();
       }
 

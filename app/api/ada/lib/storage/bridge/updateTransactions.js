@@ -130,7 +130,7 @@ import {
 import type {
   FilterFunc,
 } from '../../../../common/lib/state-fetch/currencySpecificTypes';
-import { addressToKind, addressToDisplayString } from './utils';
+import { addressToKind, } from './utils';
 import { RustModule } from '../../cardanoCrypto/rustLoader';
 
 async function rawGetAllTxIds(
@@ -1151,16 +1151,13 @@ async function rawUpdateTransactions(
       network,
       addresses: [
         ...addresses.utxoAddresses
-          // Note: don't send base/ptr keys
-          // Since the payment key is duplicated inside the enterprise addresses
-          // .filter(address => (
-          //   address.Type !== CoreAddressTypes.CARDANO_BASE &&
-          //   address.Type !== CoreAddressTypes.CARDANO_PTR
-          // ))
-          // TODO: get rid of this once backend supports querying by payment key
-          .map(address => address.Hash)
-          // TODO: remove this when we properly support passing payment keys
-          .map(addr => addressToDisplayString(addr, publicDeriver.getParent().getNetworkInfo())),
+          .filter(address => (
+            // enterprise address will get the history for any address that has the same payment key
+            address.Type === CoreAddressTypes.CARDANO_ENTERPRISE ||
+            // needs to send legacy addresses directly since they don't use the payment key method
+            address.Type === CoreAddressTypes.CARDANO_LEGACY
+          ))
+          .map(address => address.Hash),
         // note: sending account addresses is required
         // since for example, the staking key registration certificate doesn't need a witness
         // so a tx where no input/output belongs to you could register your staking key

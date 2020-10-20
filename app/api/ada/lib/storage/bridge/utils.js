@@ -255,23 +255,25 @@ export function isErgoAddress(
   return false;
 }
 
-export function baseToEnterprise(
-  baseAddress: string
-): string {
-  const wasmAddr = RustModule.WalletV4.Address.from_bytes(
-    Buffer.from(baseAddress, 'hex')
-  );
-  const baseAddr = RustModule.WalletV4.BaseAddress.from_address(wasmAddr);
-  if (baseAddr == null) {
-    throw new Error(`${nameof(baseToEnterprise)} not a base address ` + baseAddress);
+export function toEnterprise(
+  address: string
+): (void | RustModule.WalletV4.EnterpriseAddress) {
+  if (RustModule.WalletV4.ByronAddress.is_valid(address)) {
+    return undefined;
   }
+  const wasmAddr = RustModule.WalletV4.Address.from_bytes(
+    Buffer.from(address, 'hex')
+  );
+  const spendingKey = getCardanoSpendingKeyHash(wasmAddr);
+  if (spendingKey == null) return undefined;
+
   const singleAddr = RustModule.WalletV4.EnterpriseAddress.new(
     wasmAddr.network_id(),
-    baseAddr.payment_cred(),
+    RustModule.WalletV4.StakeCredential.from_keyhash(
+      spendingKey
+    ),
   );
-  const asString = Buffer.from(singleAddr.to_address().to_bytes()).toString('hex');
-
-  return asString;
+  return singleAddr;
 }
 
 export function isCardanoHaskellAddress(
