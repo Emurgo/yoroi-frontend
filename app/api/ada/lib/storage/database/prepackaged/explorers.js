@@ -82,6 +82,17 @@ const CardanoMainnetExplorers: Array<$ReadOnly<ExplorerRow>> = [
     },
     Name: 'PoolTool',
   },
+  {
+    ExplorerId: 1_08,
+    NetworkId: networks.CardanoMainnet.NetworkId,
+    IsBackup: false,
+    Endpoints: {
+      address: 'https://adastat.net/addresses/',
+      transaction: 'https://adastat.net/transactions/',
+      pool: 'https://adastat.net/pools/',
+    },
+    Name: 'AdaStat',
+  },
 ];
 
 const JormungandrExplorers: Array<$ReadOnly<ExplorerRow>> = [
