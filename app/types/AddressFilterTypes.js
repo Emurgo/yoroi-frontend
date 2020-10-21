@@ -55,6 +55,7 @@ export type AddressTypeName = {|
 
 export const AddressGroupTypes = Object.freeze({
   base: 'base',
+  enterprise: 'enterprise',
   reward: 'reward',
   byron: 'byron',
   addressBook: 'addressBook',
@@ -66,12 +67,17 @@ const commonDescriptions = defineMessages({
   group: {
     id: 'wallet.address.category.group',
     defaultMessage: '!!!Addresses formed by the combination of a spending key and a staking key',
-  }
+  },
+  single: {
+    id: 'wallet.address.category.single',
+    defaultMessage: '!!!Addresses containing only a spending key and no staking key',
+  },
 });
 export type AddressGroupKind = $Values<typeof AddressGroupTypes>;
 export const addressGroupsTooltip: $ObjMap<typeof AddressGroupTypes, ToMessage> = Object.freeze({
   group: commonDescriptions.group,
   base: commonDescriptions.group,
+  enterprise: commonDescriptions.single,
   ...defineMessages({
     reward: {
       id: 'wallet.address.category.reward',
@@ -97,6 +103,10 @@ export const addressGroupName: $ObjMap<typeof AddressGroupTypes, ToMessage> = Ob
     base: {
       id: 'wallet.receive.navigation.baseLabel',
       defaultMessage: '!!!Base'
+    },
+    enterprise: {
+      id: 'wallet.receive.navigation.enterpriseLabel',
+      defaultMessage: '!!!Enterprise'
     },
     reward: {
       id: 'wallet.receive.navigation.rewardLabel',

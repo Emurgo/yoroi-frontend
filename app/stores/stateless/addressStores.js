@@ -9,6 +9,8 @@ import {
   BaseExternalAddressesSubgroup,
   BaseInternalAddressesSubgroup,
   BaseMangledAddressesSubgroup,
+  EnterpriseExternalAddressesSubgroup,
+  EnterpriseInternalAddressesSubgroup,
   RewardAddressesSubgroup,
   GroupExternalAddressesSubgroup,
   GroupInternalAddressesSubgroup,
@@ -208,6 +210,46 @@ export const BASE_MANGLED: AddressSubgroupMeta<
     group: AddressGroupTypes.base,
   },
   isHidden: request => request.result == null || request.result.length === 0,
+});
+export const ENTERPRISE_EXTERNAL: AddressSubgroupMeta<
+  EnterpriseExternalAddressesSubgroup
+> = registerAddressSubgroup({
+  isRelated: request => (
+    matchParent(request.selected, parent => parent instanceof Cip1852Wallet) &&
+    asHasUtxoChains(request.selected) != null &&
+    matchCoinType(request.selected, coinType => coinType === CoinTypes.CARDANO) &&
+    matchForkType(request.selected, fork => fork === CardanoForks.Haskell)
+  ),
+  class: EnterpriseExternalAddressesSubgroup,
+  validFilters: standardFilter,
+  name: {
+    subgroup: AddressSubgroup.external,
+    group: AddressGroupTypes.enterprise,
+  },
+  // don't show to the user unless they've actually received tokens for this address
+  isHidden: request => (
+    request.result == null || request.result.filter(addr => addr.isUsed).length === 0
+  ),
+});
+export const ENTERPRISE_INTERNAL: AddressSubgroupMeta<
+  EnterpriseInternalAddressesSubgroup
+> = registerAddressSubgroup({
+  isRelated: request => (
+    matchParent(request.selected, parent => parent instanceof Cip1852Wallet) &&
+    asHasUtxoChains(request.selected) != null &&
+    matchCoinType(request.selected, coinType => coinType === CoinTypes.CARDANO) &&
+    matchForkType(request.selected, fork => fork === CardanoForks.Haskell)
+  ),
+  class: EnterpriseInternalAddressesSubgroup,
+  validFilters: standardFilter,
+  name: {
+    subgroup: AddressSubgroup.internal,
+    group: AddressGroupTypes.enterprise,
+  },
+  // don't show to the user unless they've actually received tokens for this address
+  isHidden: request => (
+    request.result == null || request.result.filter(addr => addr.isUsed).length === 0
+  ),
 });
 export const REWARD_ADDRESS: AddressSubgroupMeta<
   RewardAddressesSubgroup
