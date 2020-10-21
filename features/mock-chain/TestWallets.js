@@ -43,7 +43,8 @@ type WalletNames =
   'jormungandr-test' |
   'ledger-wallet' |
   'trezor-wallet' |
-  'ergo-simple-wallet';
+  'ergo-simple-wallet' |
+  'shelley-enterprise';
 
 // eslint-disable-next-line prefer-object-spread
 export const testWallets: { [key: WalletNames]: RestorationInput, ... } = Object.assign(
@@ -128,6 +129,11 @@ export const testWallets: { [key: WalletNames]: RestorationInput, ... } = Object
     name: ('shelley-only-registered': WalletNames),
     mnemonic: 'pig organ result afraid abstract arrest brass kangaroo hub cube crunch return vibrant core make',
     plate: 'TDDO-4310',
+  }),
+  createWallet({
+    name: ('shelley-enterprise': WalletNames),
+    mnemonic: 'much million increase spot visa domain grow brother chief mechanic innocent envelope vacant bundle coyote',
+    plate: 'HBDZ-9545',
   }),
   createWallet({
     name: ('ergo-simple-wallet': WalletNames),

@@ -17,8 +17,8 @@ When(/^I click on the Generate new address button$/, async function () {
   await this.click('.generateAddressButton');
 });
 
-When(/^I click on the internal tab$/, async function () {
-  await this.click('div.internal.ReceiveNavButton_wrapper');
+When(/^I click on the ([^ ]*) ([^ ]*) tab$/, async function (kind, chain) {
+  await this.click(`div.${chain}.${kind}.ReceiveNavButton_wrapper`);
 });
 
 When(/^I click on the address book tab$/, async function () {
