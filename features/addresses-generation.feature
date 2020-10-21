@@ -74,7 +74,7 @@ Feature: Generate Addresses
   Scenario: Ensure user can see internal address in "Receive tab" (IT-88)
     Given There is a Byron wallet stored named small-single-tx
     And I go to the receive screen
-    When I click on the internal tab
+    When I click on the byron internal tab
     And I should see the addresses exactly list them
     | address                                                     |
     | Ae2tdPwUPEZ3o8HadjafhGnNEqxwQm4V98Nm3kADDsfTv8QE2Ytpe2L8TSL |

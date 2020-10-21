@@ -197,6 +197,44 @@ export class BaseMangledAddressesSubgroup extends AddressTypeStore implements IA
     return this;
   }
 }
+export class EnterpriseExternalAddressesSubgroup
+  extends AddressTypeStore implements IAddressTypeStore {
+  constructor(data: SubgroupCtorData): IAddressTypeStore {
+    super({
+      stores: data.stores,
+      actions: data.actions,
+      request: (request) => data.stores.addresses._createAddressIfNeeded({
+        publicDeriver: request.publicDeriver,
+        genAddresses: () => data.stores.addresses._wrapForChainAddresses({
+          ...request,
+          storeName: data.name,
+          type: CoreAddressTypes.CARDANO_ENTERPRISE,
+          chainsRequest: { chainId: ChainDerivations.EXTERNAL },
+        }),
+      }),
+    });
+    return this;
+  }
+}
+export class EnterpriseInternalAddressesSubgroup
+  extends AddressTypeStore implements IAddressTypeStore {
+  constructor(data: SubgroupCtorData): IAddressTypeStore {
+    super({
+      stores: data.stores,
+      actions: data.actions,
+      request: (request) => data.stores.addresses._createAddressIfNeeded({
+        publicDeriver: request.publicDeriver,
+        genAddresses: () => data.stores.addresses._wrapForChainAddresses({
+          ...request,
+          storeName: data.name,
+          type: CoreAddressTypes.CARDANO_ENTERPRISE,
+          chainsRequest: { chainId: ChainDerivations.INTERNAL },
+        }),
+      }),
+    });
+    return this;
+  }
+}
 export class RewardAddressesSubgroup extends AddressTypeStore implements IAddressTypeStore {
   constructor(data: SubgroupCtorData): IAddressTypeStore {
     super({

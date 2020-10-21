@@ -331,3 +331,32 @@ Feature: Send transaction
       | asdfasdfasdf |
     And I submit the wallet send form
     Then I should see the summary screen
+
+  @it-164
+  Scenario Outline: Can receive & send funds from enterprise address (IT-164)
+    Given There is a Shelley wallet stored named shelley-enterprise
+    And I have a wallet with funds
+    And I go to the receive screen
+    When I click on the enterprise external tab
+    And I should see the addresses exactly list them
+    | address                                                    |
+    | addr1vyhs6c286p4eanrech8876gkhqdy98pd3rdqr0u69p24hyq75uyuw |
+    | addr1vxmlzg3gg6tc9fgkqw2ymj09axadhjkc0kkk7whuu9fkrvqpdrama |
+    When I go to the send transaction screen
+    And I fill the form:
+      | address                                                     | amount   |
+      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | <amount> |
+    And The transaction fees are "<fee>"
+    And I click on the next button in the wallet send form
+    And I see send money confirmation dialog
+    Then I should see no warning block
+    And I enter the wallet password:
+      | password   |
+      | asdfasdfasdf |
+    Given The expected transaction is <expectedTx>
+    And I submit the wallet send form
+    Then I should see the summary screen
+
+    Examples:
+      | amount              | fee       | expectedTx |
+      | 1.000000            | 0.167833  | "g6QAgYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgSugI11FgGCglgrgtgYWCGDWBxA66wjgpZH9bPPW9JExWBcIUqKGMmxBlNBcCzWoAAa8oZfOxoAD0JAglg5Af0wLcvG6+RrU5YfLU0x/8kfm6HbRxOuVhSWZr6F4UOa5bEdhsrcaqLcJ6I+wLsaSX6JnAGqOfdrGgCGxKcCGgACj5kDGhH+lM2hAIGCWCAosn+8mv+rxG+osiOOtkzZqx67+DrT7IF+s0fWbhA6bFhARoefmMDg363oeCLxKyJbZI115/Lref2ZleBk7xpQgv3F4JEvqP+7D0p+6Oi8m0+UOaEREqwotQeDWSe/olRFC/Y=" |
