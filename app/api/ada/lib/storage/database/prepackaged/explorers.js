@@ -47,8 +47,8 @@ const CardanoMainnetExplorers: Array<$ReadOnly<ExplorerRow>> = [
     NetworkId: networks.CardanoMainnet.NetworkId,
     IsBackup: false,
     Endpoints: {
-      address: 'https://cardanoexplorer.com/address/',
-      transaction: 'https://explorer.cardano.org/en/transaction/',
+      address: 'https://explorer.cardano.org/en/address?address=',
+      transaction: 'https://explorer.cardano.org/en/transaction?id=',
     },
     Name: 'CardanoExplorer',
   },
@@ -138,8 +138,8 @@ const CardanoTestnetExplorers: Array<$ReadOnly<ExplorerRow>> = [
     NetworkId: networks.CardanoTestnet.NetworkId,
     IsBackup: true,
     Endpoints: {
-      address: 'https://explorer.cardano-testnet.iohkdev.io/address/',
-      transaction: 'https://explorer.cardano-testnet.iohkdev.io/en/transaction/',
+      address: 'https://explorer.cardano-testnet.iohkdev.io/en/address?address=',
+      transaction: 'https://explorer.cardano-testnet.iohkdev.io/en/transaction?id=',
     },
     Name: 'CardanoExplorer',
   },
