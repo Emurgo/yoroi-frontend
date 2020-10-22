@@ -7,7 +7,7 @@
 # Motivation
 
 1. Since private key never leave the hardware wallet so it's considered as one of the most secured way of using cryptocurrency wallets.
-2. No need to remember spending passowrd, so its easy to use(although need to remember a pincode for screen unlocking).
+2. No need to remember spending passowrd, so it is easy to use(although need to remember a pincode for screen unlocking).
 
 # Background
 
