@@ -718,8 +718,8 @@ Object {
     },
     Object {
       "Endpoints": Object {
-        "address": "https://cardanoexplorer.com/address/",
-        "transaction": "https://explorer.cardano.org/en/transaction/",
+        "address": "https://explorer.cardano.org/en/address?address=",
+        "transaction": "https://explorer.cardano.org/en/transaction?id=",
       },
       "ExplorerId": 104,
       "IsBackup": false,
@@ -769,8 +769,8 @@ Object {
     },
     Object {
       "Endpoints": Object {
-        "address": "https://explorer.cardano-testnet.iohkdev.io/address/",
-        "transaction": "https://explorer.cardano-testnet.iohkdev.io/en/transaction/",
+        "address": "https://explorer.cardano-testnet.iohkdev.io/en/address?address=",
+        "transaction": "https://explorer.cardano-testnet.iohkdev.io/en/transaction?id=",
       },
       "ExplorerId": 400,
       "IsBackup": true,
