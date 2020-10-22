@@ -33,11 +33,29 @@ import { RustModule } from '../cardanoCrypto/rustLoader';
 import { generateLedgerWalletRootKey } from '../cardanoCrypto/cryptoWallet';
 import { networks, getCardanoHaskellBaseConfig } from '../storage/database/prepackaged/networks';
 import { decode, fromWords } from 'bech32';
+import { Bech32Prefix } from '../../../../config/stringConfig';
 
 /** convert bech32 address to bytes */
-function fixAddresses(address: string): string {
+function fixAddresses(
+  address: string,
+  network: $ReadOnly<NetworkRow>,
+): string {
   try {
-    const payload = fromWords(decode(address, 1000).words);
+    const bech32Info = decode(address, 1000);
+    if (bech32Info.prefix === Bech32Prefix.PAYMENT_KEY_HASH) {
+      const config = getCardanoHaskellBaseConfig(
+        network
+      ).reduce((acc, next) => Object.assign(acc, next), {});
+
+      const enterpriseAddr = RustModule.WalletV4.EnterpriseAddress.new(
+        Number.parseInt(config.ChainNetworkId, 10),
+        RustModule.WalletV4.StakeCredential.from_keyhash(
+          RustModule.WalletV4.Ed25519KeyHash.from_bech32(address)
+        )
+      );
+      return Buffer.from(enterpriseAddr.to_address().to_bytes()).toString('hex');
+    }
+    const payload = fromWords(bech32Info.words);
     return Buffer.from(payload).toString('hex');
   } catch (_e) {
     return address;
@@ -45,12 +63,12 @@ function fixAddresses(address: string): string {
 }
 export function genCheckAddressesInUse(
   blockchain: Array<RemoteTransaction>,
-  _network: $ReadOnly<NetworkRow>,
+  network: $ReadOnly<NetworkRow>,
 ): FilterFunc {
   return async (
     body: FilterUsedRequest,
   ): Promise<FilterUsedResponse> => {
-    const addresses = body.addresses.map(addr => fixAddresses(addr));
+    const addresses = body.addresses.map(addr => fixAddresses(addr, network));
     const addressSet = new Set(addresses);
     const usedSet = new Set();
 
@@ -127,7 +145,7 @@ export function genGetTransactionsHistoryForAddresses(
   return async (
     body: HistoryRequest,
   ): Promise<HistoryResponse> => {
-    const addresses = body.addresses.map(addr => fixAddresses(addr));
+    const addresses = body.addresses.map(addr => fixAddresses(addr, network));
     const untilBlockIndex = blockchain.map(tx => tx.block_hash).lastIndexOf(body.untilBlock);
     if (untilBlockIndex === -1) {
       throw new RollbackApiError();
@@ -232,7 +250,7 @@ export function genUtxoForAddresses(
   return async (
     body: AddressUtxoRequest,
   ): Promise<AddressUtxoResponse> => {
-    const addresses = body.addresses.map(addr => fixAddresses(addr));
+    const addresses = body.addresses.map(addr => fixAddresses(addr, network));
     const bestBlock = await getBestBlock({
       network,
     });

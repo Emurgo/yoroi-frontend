@@ -132,6 +132,7 @@ import type {
 } from '../../../../common/lib/state-fetch/currencySpecificTypes';
 import { addressToKind, } from './utils';
 import { RustModule } from '../../cardanoCrypto/rustLoader';
+import { Bech32Prefix } from '../../../../../config/stringConfig';
 
 async function rawGetAllTxIds(
   db: lf$Database,
@@ -1150,14 +1151,25 @@ async function rawUpdateTransactions(
       ...requestKind,
       network,
       addresses: [
+        // needs to send legacy addresses directly since they don't use the payment key method
         ...addresses.utxoAddresses
-          .filter(address => (
-            // enterprise address will get the history for any address that has the same payment key
-            address.Type === CoreAddressTypes.CARDANO_ENTERPRISE ||
-            // needs to send legacy addresses directly since they don't use the payment key method
-            address.Type === CoreAddressTypes.CARDANO_LEGACY
-          ))
+          .filter(address => address.Type === CoreAddressTypes.CARDANO_LEGACY)
           .map(address => address.Hash),
+        // payment keys will fetch all addresses with the same payment key
+        ...addresses.utxoAddresses
+          .filter(address => address.Type === CoreAddressTypes.CARDANO_ENTERPRISE)
+          .reduce(
+            (list, next) => {
+              const wasmAddr = RustModule.WalletV4.Address.from_bytes(Buffer.from(next.Hash, 'hex'));
+              const enterpriseWasm = RustModule.WalletV4.EnterpriseAddress.from_address(wasmAddr);
+              if (enterpriseWasm == null) return list;
+              const keyHash = enterpriseWasm.payment_cred().to_keyhash();
+              if (keyHash == null) return list;
+              list.push(keyHash.to_bech32(Bech32Prefix.PAYMENT_KEY_HASH));
+              return list;
+            },
+            []
+          ),
         // note: sending account addresses is required
         // since for example, the staking key registration certificate doesn't need a witness
         // so a tx where no input/output belongs to you could register your staking key

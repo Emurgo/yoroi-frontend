@@ -25,26 +25,21 @@ import type { NetworkRow, CanonicalAddressInsert } from '../../lib/storage/datab
 import { CoreAddressTypes } from '../../lib/storage/database/primitives/enums';
 import type { Bip44ChainInsert } from '../../lib/storage/database/walletTypes/common/tables';
 import { getCardanoHaskellBaseConfig } from '../../lib/storage/database/prepackaged/networks';
+import { Bech32Prefix } from '../../../../config/stringConfig';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
 const addressRequestSize = CONFIG.app.addressRequestSize;
 
-function genEnterpriseAddressBatchFunc(
+function genKeyhashBatchFunc(
   addressChain: RustModule.WalletV4.Bip32PublicKey,
-  chainNetworkId: number,
 ): GenerateAddressFunc {
   return (
     indices: Array<number>
   ) => {
     return indices.map(i => {
       const addressKey = addressChain.derive(i).to_raw_key();
-      const addr = RustModule.WalletV4.EnterpriseAddress.new(
-        chainNetworkId,
-        RustModule.WalletV4.StakeCredential.from_keyhash(addressKey.hash())
-      );
-      const asHex = Buffer.from(addr.to_address().to_bytes()).toString('hex');
-      return asHex;
+      return addressKey.hash().to_bech32(Bech32Prefix.PAYMENT_KEY_HASH);
     });
   };
 }
@@ -78,17 +73,20 @@ export async function addShelleyUtxoAddress(
   addByHash: AddByHashFunc,
   insertRequest: InsertRequest,
   stakingKey: RustModule.WalletV4.PublicKey,
-  enterpriseAddr: Buffer,
+  keyHash: RustModule.WalletV4.Ed25519KeyHash,
+  networkId: number,
 ): Promise<{|
   KeyDerivationId: number,
 |}> {
-  const wasmAddr = RustModule.WalletV4.Address.from_bytes(enterpriseAddr);
-  const wasmEnterpriseAddr = RustModule.WalletV4.EnterpriseAddress.from_address(wasmAddr);
+  const wasmEnterpriseAddr = RustModule.WalletV4.EnterpriseAddress.new(
+    networkId,
+    RustModule.WalletV4.StakeCredential.from_keyhash(keyHash)
+  );
   if (wasmEnterpriseAddr == null) {
     throw new Error(`${nameof(addShelleyUtxoAddress)} address is not an enterprise address`);
   }
   const baseAddr = RustModule.WalletV4.BaseAddress.new(
-    wasmAddr.network_id(),
+    networkId,
     wasmEnterpriseAddr.payment_cred(),
     RustModule.WalletV4.StakeCredential.from_keyhash(stakingKey.hash())
   );
@@ -128,6 +126,10 @@ async function scanChain(request: {|
     request.network,
   );
 
+  const config = getCardanoHaskellBaseConfig(
+    request.network
+  ).reduce((acc, next) => Object.assign(acc, next), {});
+
   /**
    * TODO: we need an endpoint here that
    * gets all the certificates ever registered with the staking key
@@ -143,7 +145,8 @@ async function scanChain(request: {|
             request.addByHash,
             insertRequest,
             request.stakingKey,
-            Buffer.from(address, 'hex')
+            RustModule.WalletV4.Ed25519KeyHash.from_bech32(address),
+            Number.parseInt(config.ChainNetworkId, 10),
           );
         },
       };
@@ -168,13 +171,11 @@ export async function scanShelleyCip1852Account(request: {|
   ).reduce((acc, next) => Object.assign(acc, next), {});
 
   const insert = await scanAccount({
-    generateInternalAddresses: genEnterpriseAddressBatchFunc(
+    generateInternalAddresses: genKeyhashBatchFunc(
       key.derive(ChainDerivations.INTERNAL),
-      Number.parseInt(config.ChainNetworkId, 10),
     ),
-    generateExternalAddresses: genEnterpriseAddressBatchFunc(
+    generateExternalAddresses: genKeyhashBatchFunc(
       key.derive(ChainDerivations.EXTERNAL),
-      Number.parseInt(config.ChainNetworkId, 10),
     ),
     lastUsedInternal: request.lastUsedInternal,
     lastUsedExternal: request.lastUsedExternal,
