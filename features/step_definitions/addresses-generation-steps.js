@@ -21,11 +21,11 @@ When(/^I click on the ([^ ]*) ([^ ]*) tab$/, async function (kind, chain) {
   await this.click(`div.${chain}.${kind}.ReceiveNavButton_wrapper`);
 });
 
-When(/^I click on the address book tab$/, async function () {
+When(/^I click on the top-level address book tab$/, async function () {
   await this.click(`//div[contains(text(), "Address book") and contains(@class, "ReceiveNavButton_label")]`, By.xpath);
 });
 
-When(/^I click on the reward address tab$/, async function () {
+When(/^I click on the top-level reward address tab$/, async function () {
   await this.click(`//div[contains(text(), "Reward") and contains(@class, "ReceiveNavButton_label")]`, By.xpath);
 });
 
@@ -55,6 +55,10 @@ When(/^I click on the Generate new address button ([0-9]+) times$/, async functi
 
 Then(/^I should see my latest address "([^"]*)" at the top$/, async function (address) {
   await this.waitUntilText('.StandardHeader_copyableHash', truncateAddress(address));
+});
+Then(/^I should see at least ([^"]*) addresses$/, async function (numAddresses) {
+  const rows = await this.driver.findElements(By.css('.WalletReceive_walletAddress'));
+  expect(rows.length).be.at.least(Number.parseInt(numAddresses, 10));
 });
 Then(/^I should see ([^"]*) addresses with address "([^"]*)" at the top$/, async function (numAddresses, address) {
   const rows = await this.driver.findElements(By.css('.WalletReceive_walletAddress'));

@@ -83,13 +83,13 @@ Feature: Generate Addresses
   Scenario: Ensure user can see address book in "Receive tab" (IT-122)
     Given There is a Byron wallet stored named small-single-tx
     And I go to the receive screen
-    When I click on the address book tab
-    Then I should see 12 addresses with address "Ae2tdPwUPEZ2y4rAdJG2coM4MXeNNAAKDztXXztz8LrcYRZ8waYoa7pWXgj" at the top
+    When I click on the top-level address book tab
+    Then I should see at least 13 addresses
 
   @it-145
   Scenario: Ensure user can see reward address in "Receive tab" (IT-145)
     Given There is a Shelley wallet stored named shelley-simple-15
     And I go to the receive screen
-    When I click on the reward address tab
+    When I click on the top-level reward address tab
     Then I should see 1 addresses with address "stake1ux2436tfe25727kul3qtnyr7k72rvw6ep7h59ll53suwhzq05v5j9" at the top
 
