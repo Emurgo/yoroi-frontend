@@ -293,7 +293,7 @@
   "sidebar.settings": "Настройки",
   "sidebar.transfer": "Заявить / Перевести",
   "sidebar.wallets": "Мои кошельки",
-  "testnet.shelley.label.message": "ВЫ В ТЕСТНЕТЕ ({network}).",
+  "testnet.shelley.label.message": "YOU ARE ON TESTNET NETWORK.",
   "transfer.form.instructions.step1.text": "Восстановление Вашего баланса займет около 1 минуты. На следующем этапе Вам будет показана транзакция, которая переместит все Ваши средства. Пожалуйста, тщательно просмотрите детали транзакции. Вам потребуется оплатить стандартную комиссию в сети Cardano за проведение транзакции.",
   "transfer.form.masterkey.input.label": "Мастер-ключ",
   "transfer.instructions.attention.title.label": "Внимание",
