@@ -293,7 +293,7 @@
   "sidebar.settings": "Ayarlar",
   "sidebar.transfer": "Talep / Aktar",
   "sidebar.wallets": "Cüzdanlarım",
-  "testnet.shelley.label.message": "TESTNET ({network}) AĞINDASINIZ.",
+  "testnet.shelley.label.message": "YOU ARE ON TESTNET NETWORK.",
   "transfer.form.instructions.step1.text": "Bakiyenizi geri yüklemek yaklaşık 1 dakika sürecektir. Bir sonraki adımda, tüm paranızı taşıyacak bir işlem sunulacak. Lütfen işlemin ayrıntılarını dikkatlice gözden geçirin. İşlemi yapmak için Cardano ağında standart bir işlem ücreti ödemeniz gerekecektir.",
   "transfer.form.masterkey.input.label": "Ana anahtar",
   "transfer.instructions.attention.title.label": "Dikkat",
