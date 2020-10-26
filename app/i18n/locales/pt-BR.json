@@ -293,7 +293,7 @@
   "sidebar.settings": "Configurações",
   "sidebar.transfer": "Reivindicar / Transferir",
   "sidebar.wallets": "Minhas carteiras",
-  "testnet.shelley.label.message": "VOCÊ ESTA NA REDE DE TESTES ({network}).",
+  "testnet.shelley.label.message": "YOU ARE ON TESTNET NETWORK.",
   "transfer.form.instructions.step1.text": "Demora cerca de 1 minuto para restaurar o seu saldo. Na próxima etapa, você será apresentado a uma transação que movimentará todos os seus fundos. Por favor, revise os detalhes da transação com cuidado. Você precisará pagar uma taxa de transação padrão na rede Cardano para realizar a transação.",
   "transfer.form.masterkey.input.label": "Chave mestra",
   "transfer.instructions.attention.title.label": "Atenção",
