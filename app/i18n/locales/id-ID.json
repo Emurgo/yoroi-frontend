@@ -293,7 +293,7 @@
   "sidebar.settings": "Settings",
   "sidebar.transfer": "Claim / Transfer",
   "sidebar.wallets": "My wallets",
-  "testnet.shelley.label.message": "YOU ARE ON TESTNET NETWORK ({network}).",
+  "testnet.shelley.label.message": "YOU ARE ON TESTNET NETWORK.",
   "transfer.form.instructions.step1.text": "Diperlukan sekitar 1 menit untuk mengembalikan saldo Anda. Pada langkah berikutnya, Anda akan diberikan transaksi yang akan memindahkan semua dana Anda. Harap tinjau detail transaksi dengan cermat. Anda harus membayar biaya transaksi standar pada jaringan Cardano untuk melakukan transaksi.",
   "transfer.form.masterkey.input.label": "Master key",
   "transfer.instructions.attention.title.label": "Perhatian",
