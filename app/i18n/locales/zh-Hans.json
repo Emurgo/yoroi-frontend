@@ -293,7 +293,7 @@
   "sidebar.settings": "设置",
   "sidebar.transfer": "获取/转移",
   "sidebar.wallets": "我的钱包",
-  "testnet.shelley.label.message": "您正在使用测试网网络({network})。",
+  "testnet.shelley.label.message": "YOU ARE ON TESTNET NETWORK.",
   "transfer.form.instructions.step1.text": "恢复余额大约需要1分钟。 在下一步，您将看到一笔交易，该交易将移动您的所有资金。 请仔细阅读交易细节。 您需要在Cardano网络上支付标准交易费用才能进行交易。",
   "transfer.form.masterkey.input.label": "主密钥",
   "transfer.instructions.attention.title.label": "注意",
