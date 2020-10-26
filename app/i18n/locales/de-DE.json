@@ -293,7 +293,7 @@
   "sidebar.settings": "Einstellungen",
   "sidebar.transfer": "Einfordern / Übertragen",
   "sidebar.wallets": "Meine Wallets",
-  "testnet.shelley.label.message": "DU BIST IM TESTNETZ NETZWERK ({network}).",
+  "testnet.shelley.label.message": "YOU ARE ON TESTNET NETWORK.",
   "transfer.form.instructions.step1.text": "Es wird ungefähr eine Minute dauern, um deinen Kontostand wiederherzustellen. Im nächsten Schritt wird eine Transaktion angezeigt, die dein gesamtes Guthaben transferiert. Bitte überprüfe die Details der Transaktion sehr sorgfältig. Es ist notwendig, für diese Transaktion eine Standard-Transaktionsgebühr im Cardano-Netzwerk zu bezahlen.",
   "transfer.form.masterkey.input.label": "Generalschlüssel",
   "transfer.instructions.attention.title.label": "Achtung",
