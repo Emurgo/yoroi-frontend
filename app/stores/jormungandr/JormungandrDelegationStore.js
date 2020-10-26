@@ -34,6 +34,8 @@ import {
 import { isJormungandr, getJormungandrBaseConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import type { DelegationRequests } from '../toplevel/DelegationStore';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
+import type { MangledAmountFunc } from '../stateless/mangledAddresses';
+import { getUnmangleAmounts } from '../stateless/mangledAddresses';
 
 export default class JormungandrDelegationStore extends Store {
 
@@ -44,6 +46,7 @@ export default class JormungandrDelegationStore extends Store {
   ) => {
     const newObserved = {
       publicDeriver,
+      mangledAmounts: new CachedRequest<MangledAmountFunc>(getUnmangleAmounts),
       getDelegatedBalance: new CachedRequest<GetDelegatedBalanceFunc>(getDelegatedBalance),
       getCurrentDelegation: new CachedRequest<GetCurrentDelegationFunc>(getCurrentDelegation),
       rewardHistory: new CachedRequest<RewardHistoryFunc>(async (address) => {
@@ -82,6 +85,10 @@ export default class JormungandrDelegationStore extends Store {
     if (delegationRequest == null) return;
 
     try {
+      await delegationRequest.mangledAmounts.execute({
+        publicDeriver,
+      }).promise;
+
       delegationRequest.getDelegatedBalance.reset();
       delegationRequest.getCurrentDelegation.reset();
       runInAction(() => {

@@ -7,6 +7,7 @@ import i18n from '../support/helpers/i18n-helpers';
 import { addTransaction, generateTransaction, } from '../mock-chain/mockCardanoImporter';
 import { setExpectedTx, } from '../mock-chain/mockCardanoServer';
 import { truncateAddress, } from '../../app/utils/formatters';
+import { getAdaCurrencyMeta } from '../../app/api/ada/currencyInfo';
 
 Given(/^I have a wallet with funds$/, async function () {
   const amountWithCurrency = await this.driver.findElements(By.xpath("//div[@class='WalletTopbarTitle_walletAmount']"));
@@ -38,10 +39,11 @@ Given(/^The expected transaction is "([^"]*)"$/, (base64Tx) => {
 When(/^I see CONFIRM TRANSACTION Pop up:$/, async function (table) {
   const fields = table.hashes()[0];
   const total = parseFloat(fields.amount) + parseFloat(fields.fee);
+  const { decimalPlaces } = getAdaCurrencyMeta();
   await this.waitUntilText('.WalletSendConfirmationDialog_addressTo', truncateAddress(fields.address));
   await this.waitUntilContainsText('.WalletSendConfirmationDialog_fees', fields.fee);
   await this.waitUntilContainsText('.WalletSendConfirmationDialog_amount', fields.amount);
-  await this.waitUntilContainsText('.WalletSendConfirmationDialog_totalAmount', total);
+  await this.waitUntilContainsText('.WalletSendConfirmationDialog_totalAmount', total.toFixed(decimalPlaces.toNumber()));
 });
 
 When(/^I clear the receiver$/, async function () {
@@ -146,4 +148,8 @@ Then(/^I should see a warning block$/, async function () {
 
 Then(/^I should see no warning block$/, async function () {
   await this.waitForElementNotPresent('.WarningBox_warning');
+});
+
+When(/^I click on the unmangle button$/, async function () {
+  await this.click('.MangledHeader_submitButton ');
 });

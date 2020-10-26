@@ -35,7 +35,6 @@ import { validateAmount } from '../../utils/validations';
 import { Logger, } from '../../utils/logging';
 import type { AddressSubgroupMeta, IAddressTypeUiSubset, IAddressTypeStore } from '../../stores/stateless/addressStores';
 import { routeForStore, allAddressSubgroups, applyAddressFilter, } from '../../stores/stateless/addressStores';
-import { getUnmangleAmounts, } from '../../stores/stateless/mangledAddresses';
 import {
   isCardanoHaskell,
 } from '../../api/ada/lib/storage/database/prepackaged/networks';
@@ -170,7 +169,7 @@ export default class WalletReceivePage extends Component<Props> {
       if (addressTypeStore.meta.name.subgroup === AddressSubgroup.mangled) {
         return (
           <MangledHeader
-            hasMangledUtxo={getUnmangleAmounts(addressTypeStore.request.all).canUnmangle.length > 0}
+            hasMangledUtxo={this.generated.canUnmangle}
             onClick={() => this.generated.actions.dialogs.open.trigger({
               dialog: UnmangleTxDialogContainer,
             })}
@@ -436,6 +435,7 @@ export default class WalletReceivePage extends Component<Props> {
         open: {| trigger: (params: Notification) => void |}
       |}
     |},
+    canUnmangle: boolean,
     stores: {|
       app: {| currentRoute: string |},
       addresses: {|
@@ -481,7 +481,19 @@ export default class WalletReceivePage extends Component<Props> {
     }
     const { stores, actions } = this.props;
     const adaStore = stores.substores.ada;
+
+    const canUnmangle = (() => {
+      const selected = stores.wallets.selected;
+      if (selected == null) return false;
+      const requests = stores.delegation.getDelegationRequests(selected);
+      if (requests == null) return false;
+      const { result } = requests.mangledAmounts;
+      if (result == null) return false;
+      return result.canUnmangle.gt(0);
+    })();
+
     return Object.freeze({
+      canUnmangle,
       stores: {
         app: {
           currentRoute: stores.app.currentRoute,

@@ -12,8 +12,8 @@ import type { ConfigType } from '../../../config/config-types';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import LocalizableError from '../../i18n/LocalizableError';
 import type { SetupSelfTxRequest } from '../../stores/toplevel/TransactionBuilderStore';
-import { GROUP_MANGLED } from '../../stores/stateless/addressStores';
 import type { IAddressTypeStore, IAddressTypeUiSubset } from '../../stores/stateless/addressStores';
+import { getMangledFilter, } from '../../stores/stateless/mangledAddresses';
 import type { ISignRequest } from '../../api/common/lib/transactions/ISignRequest';
 import TransferSendPage from './TransferSendPage';
 import type { GeneratedData as TransferSendData } from './TransferSendPage';
@@ -48,18 +48,19 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
       throw new Error(`${nameof(UnmangleTxDialogContainer)} no chains`);
     }
 
-    const request = this.generated.stores.addresses.addressSubgroupMap.get(GROUP_MANGLED.class);
-    if (request == null) throw new Error('No request. Should never happen');
+    const getAddresses = (clazz) => {
+      const entries = this.generated.stores.addresses.addressSubgroupMap.get(clazz)?.all ?? [];
+      const payloadList = entries.map(
+        info => getAddressPayload(info.address, selected.getParent().getNetworkInfo())
+      );
+      return new Set(payloadList);
+    };
 
-    const filterTo = new Set(
-      request.all
-        // we don't want to include any UTXO that would do nothing but increase the tx fee
-        .filter(info => info.value != null)
-        // TODO: filtering in Haskell Shelley is more complicated unfortunately
-        // .filter(info => info.value.gt(CONFIG.genesis.linearFee.coefficient))
-        .map(info => getAddressPayload(info.address, selected.getParent().getNetworkInfo()))
+
+    const filter = getMangledFilter(
+      getAddresses,
+      selected,
     );
-
     // note: don't await
     this.generated.actions.txBuilderActions.initialize.trigger({
       publicDeriver: withChains,
@@ -67,7 +68,7 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
        * We filter to only UTXOs of mangled addresses
        * this ensures that the tx fee is also paid by a UTXO of a mangled address
        */
-      filter: utxo => filterTo.has(utxo.address),
+      filter: utxo => filter(utxo),
     });
   }
 

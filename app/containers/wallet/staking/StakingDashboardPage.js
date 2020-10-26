@@ -55,9 +55,6 @@ import globalMessages from '../../../i18n/global-messages';
 import { computed, observable, runInAction } from 'mobx';
 import { ApiOptions, getApiForNetwork, getApiMeta } from '../../../api/common/utils';
 import type { SelectedApiType, } from '../../../api/common/utils';
-import { getUnmangleAmounts, } from '../../../stores/stateless/mangledAddresses';
-import type { IAddressTypeStore, IAddressTypeUiSubset } from '../../../stores/stateless/addressStores';
-import { GROUP_MANGLED } from '../../../stores/stateless/addressStores';
 import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import { isJormungandr, isCardanoHaskell, getCardanoHaskellBaseConfig } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import DeregisterDialogContainer from '../../transfer/DeregisterDialogContainer';
@@ -697,23 +694,7 @@ export default class StakingDashboardPage extends Component<Props> {
       request.delegationRequests.getDelegatedBalance.wasExecuted &&
       request.errorIfPresent == null;
 
-    const mangledAddrRequest = this.generated.stores.addresses.addressSubgroupMap.get(
-      GROUP_MANGLED.class
-    );
-    if (mangledAddrRequest == null) throw new Error('No request. Should never happen');
-    const {
-      canUnmangle,
-      cannotUnmangle,
-    } = getUnmangleAmounts(mangledAddrRequest.all);
-
-    const canUnmangleSum = canUnmangle.reduce(
-      (sum, val) => sum.plus(val),
-      new BigNumber(0)
-    );
-    const cannotUnmangleSum = cannotUnmangle.reduce(
-      (sum, val) => sum.plus(val),
-      new BigNumber(0)
-    );
+    const unmangledAmountsRequest = request.delegationRequests.mangledAmounts.result;
 
     const txRequests = this.generated.stores.transactions
       .getTxRequests(request.publicDeriver);
@@ -735,8 +716,8 @@ export default class StakingDashboardPage extends Component<Props> {
           decimalPlaces: apiMeta.decimalPlaces.toNumber(),
           primaryTicker: apiMeta.primaryTicker,
         }}
-        canUnmangleSum={canUnmangleSum}
-        cannotUnmangleSum={cannotUnmangleSum}
+        canUnmangleSum={unmangledAmountsRequest?.canUnmangle ?? new BigNumber(0)}
+        cannotUnmangleSum={unmangledAmountsRequest?.cannotUnmangle ?? new BigNumber(0)}
         onUnmangle={() => this.generated.actions.dialogs.open.trigger({
           dialog: UnmangleTxDialogContainer,
         })}
@@ -940,9 +921,6 @@ export default class StakingDashboardPage extends Component<Props> {
       |}
     |},
     stores: {|
-      addresses: {|
-        addressSubgroupMap: $ReadOnlyMap<Class<IAddressTypeStore>, IAddressTypeUiSubset>,
-      |},
       coinPriceStore: {|
         getCurrentPrice: (from: string, to: string) => ?number
       |},
@@ -1052,9 +1030,6 @@ export default class StakingDashboardPage extends Component<Props> {
           shouldHideBalance: stores.profile.shouldHideBalance,
           getThemeVars: stores.profile.getThemeVars,
           unitOfAccount: stores.profile.unitOfAccount,
-        },
-        addresses: {
-          addressSubgroupMap: stores.addresses.addressSubgroupMap,
         },
         wallets: {
           selected: stores.wallets.selected,

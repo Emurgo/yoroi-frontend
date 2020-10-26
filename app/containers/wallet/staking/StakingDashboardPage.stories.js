@@ -57,6 +57,7 @@ import UnmangleTxDialogContainer from '../../transfer/UnmangleTxDialogContainer'
 import PoolWarningDialog from '../../../components/wallet/staking/dashboard/PoolWarningDialog';
 import UndelegateDialog from '../../../components/wallet/staking/dashboard/UndelegateDialog';
 import { GROUP_MANGLED, allAddressSubgroups } from '../../../stores/stateless/addressStores';
+import type { MangledAmountFunc } from '../../../stores/stateless/mangledAddresses';
 import type { StandardAddress } from '../../../types/AddressFilterTypes';
 import {
   TransactionType,
@@ -64,7 +65,7 @@ import {
 import type {
   JormungandrTransactionInsert, NetworkRow,
 } from '../../../api/ada/lib/storage/database/primitives/tables';
-import type { IAddressTypeStore, IAddressTypeUiSubset } from '../../../stores/stateless/addressStores';
+import type { IAddressTypeStore, IAddressTypeUiSubset, } from '../../../stores/stateless/addressStores';
 import {
   CoreAddressTypes,
 } from '../../../api/ada/lib/storage/database/primitives/enums';
@@ -158,15 +159,6 @@ const genBaseProps: {|
           ? boolean('hasAnyPending', false)
           : false,
         getTxRequests: request.lookup.getTransactions,
-      },
-      addresses: {
-        addressSubgroupMap: new Map([[
-          GROUP_MANGLED.class,
-          {
-            all: request.mangledInfo?.addresses ?? [],
-            wasExecuted: true,
-          },
-        ]]),
       },
       delegation: {
         selectedPage: 0,
@@ -498,7 +490,8 @@ const stakingKeyCases = {
 };
 function getStakingInfo(
   publicDeriver: *,
-  stakingCase: $Values<typeof stakingKeyCases>
+  stakingCase: $Values<typeof stakingKeyCases>,
+  canUnmangleAmount: BigNumber,
 ): DelegationRequests {
   const accountBalance = new BigNumber(3);
   const getDelegatedBalance: CachedRequest<GetDelegatedBalanceFunc> = new CachedRequest(
@@ -570,8 +563,18 @@ function getStakingInfo(
   getDelegatedBalance.execute((null: any));
   getCurrentDelegation.execute((null: any));
   rewardHistory.execute((null: any));
+
+  const mangledAmounts: CachedRequest<MangledAmountFunc> = new CachedRequest(
+    _request => Promise.resolve({
+      canUnmangle: canUnmangleAmount,
+      cannotUnmangle:
+        getDelegatedBalance.result?.utxoPart.minus(canUnmangleAmount) ?? new BigNumber(0),
+    })
+  );
+  mangledAmounts.execute((null: any));
   return {
     publicDeriver,
+    mangledAmounts,
     getDelegatedBalance,
     getCurrentDelegation,
     rewardHistory,
@@ -618,6 +621,12 @@ export const Loading = (): Node => {
       _request => Promise.resolve({
         utxoPart: new BigNumber(0),
         accountPart: new BigNumber(0),
+      })
+    );
+    const mangledAmounts: CachedRequest<MangledAmountFunc> = new CachedRequest(
+      _request => Promise.resolve({
+        canUnmangle: new BigNumber(0),
+        cannotUnmangle: new BigNumber(0),
       })
     );
     const getCurrentDelegation: CachedRequest<GetCurrentDelegationFunc> = new CachedRequest(
@@ -687,6 +696,7 @@ export const Loading = (): Node => {
     }
     wallet.getDelegation = (publicDeriver) => ({
       publicDeriver,
+      mangledAmounts,
       getDelegatedBalance,
       getCurrentDelegation,
       rewardHistory,
@@ -738,7 +748,8 @@ export const JormungandrDelegationCases = (): Node => {
     }
     const computedDelegation = getStakingInfo(
       wallet.publicDeriver,
-      getStakingKeyValue()
+      getStakingKeyValue(),
+      new BigNumber(0),
     );
     wallet.getDelegation = (_publicDeriver) => computedDelegation;
     const balance: CachedRequest<GetBalanceFunc> = new CachedRequest(_request => Promise.resolve(
@@ -792,7 +803,8 @@ export const AdaDelegationCases = (): Node => {
     }
     const computedDelegation = getStakingInfo(
       wallet.publicDeriver,
-      getStakingKeyValue()
+      getStakingKeyValue(),
+      new BigNumber(0),
     );
     wallet.getDelegation = (_publicDeriver) => computedDelegation;
     const balance: CachedRequest<GetBalanceFunc> = new CachedRequest(_request => Promise.resolve(
@@ -969,7 +981,8 @@ export const Errors = (): Node => {
     }
     const computedDelegation = getStakingInfo(
       wallet.publicDeriver,
-      stakingKeyCases.LongAgoDelegation
+      stakingKeyCases.LongAgoDelegation,
+      new BigNumber(0),
     );
 
     const errorCases = {
@@ -1028,7 +1041,9 @@ export const Errors = (): Node => {
 };
 
 // wallet we can reuse for multiple tests
-const genBaseJormungandrWallet = () => {
+const genBaseJormungandrWallet = (
+  canUnmangleAmount: BigNumber,
+) => {
   const wallet = genJormungandrSigningWalletWithCache();
   {
     const requests = wallet.getTimeCalcRequests(wallet.publicDeriver).requests;
@@ -1040,7 +1055,8 @@ const genBaseJormungandrWallet = () => {
   }
   const computedDelegation = getStakingInfo(
     wallet.publicDeriver,
-    stakingKeyCases.LongAgoDelegation
+    stakingKeyCases.LongAgoDelegation,
+    canUnmangleAmount,
   );
   wallet.getDelegation = (_publicDeriver) => computedDelegation;
   const balance: CachedRequest<GetBalanceFunc> = new CachedRequest(_request => Promise.resolve(
@@ -1069,7 +1085,8 @@ const genBaseAdaWallet = () => {
   }
   const computedDelegation = getStakingInfo(
     wallet.publicDeriver,
-    stakingKeyCases.LongAgoDelegation
+    stakingKeyCases.LongAgoDelegation,
+    new BigNumber(0),
   );
   wallet.getDelegation = (_publicDeriver) => computedDelegation;
   const computedAdaDelegation = getAdaStakingInfo(
@@ -1093,7 +1110,7 @@ const genBaseAdaWallet = () => {
 };
 
 export const LessThanExpected = (): Node => {
-  const wallet = genBaseJormungandrWallet();
+  const wallet = genBaseJormungandrWallet(new BigNumber(0));
   const lookup = walletLookup([wallet]);
   return wrapWallet(
     mockWalletProps({
@@ -1113,7 +1130,7 @@ export const LessThanExpected = (): Node => {
 };
 
 export const UnknownPool = (): Node => {
-  const wallet = genBaseJormungandrWallet();
+  const wallet = genBaseJormungandrWallet(new BigNumber(0));
 
   // setup a map that doesn't have the metadata for a pool (a private pool)
   const newMockPoolInfo = (network, poolId) => {
@@ -1142,7 +1159,7 @@ export const UnknownPool = (): Node => {
 };
 
 export const UndelegateExecuting = (): Node => {
-  const wallet = genBaseJormungandrWallet();
+  const wallet = genBaseJormungandrWallet(new BigNumber(0));
   const lookup = walletLookup([wallet]);
   return wrapWallet(
     mockWalletProps({
@@ -1177,7 +1194,7 @@ export const UndelegateExecuting = (): Node => {
 };
 
 export const UndelegateError = (): Node => {
-  const wallet = genBaseJormungandrWallet();
+  const wallet = genBaseJormungandrWallet(new BigNumber(0));
   const lookup = walletLookup([wallet]);
   return wrapWallet(
     mockWalletProps({
@@ -1212,7 +1229,7 @@ export const UndelegateError = (): Node => {
 };
 
 export const UndelegateDialogShown = (): Node => {
-  const wallet = genBaseJormungandrWallet();
+  const wallet = genBaseJormungandrWallet(new BigNumber(0));
   const lookup = walletLookup([wallet]);
   const errorCases = {
     NoError: 0,
@@ -1258,7 +1275,7 @@ export const UndelegateDialogShown = (): Node => {
 };
 
 export const Reputation = (): Node => {
-  const wallet = genBaseJormungandrWallet();
+  const wallet = genBaseJormungandrWallet(new BigNumber(0));
   const lookup = walletLookup([wallet]);
   const flagCases = {
     Forks: 1,
@@ -1327,35 +1344,43 @@ export const MangledDashboardWarning = (): Node => {
     mangledCases.CanUnmangleAll
   );
 
+  const mangleValues = {
+    canUnmangle: new BigNumber(1000000),
+    cannotUnmangle: new BigNumber(1),
+  };
   const addresses = (() => {
     if (mangledValue === mangledCases.CannotUnmangle) {
       return [{
         address: 'addr1sj045dheysyptfekdyqa508nuzdzmh82vkda9hcwqwysrja6d8d66f0cfsfk50hhuqjymr08drnm2kdf0r2337l6kl7mtm0z44vv4jexkqhz5w',
-        value: new BigNumber(1),
+        value: mangleValues.cannotUnmangle,
         type: CoreAddressTypes.JORMUNGANDR_GROUP,
       }];
     }
     if (mangledValue === mangledCases.CanUnmangleSome) {
       return [{
         address: 'addr1sj045dheysyptfekdyqa508nuzdzmh82vkda9hcwqwysrja6d8d66f0cfsfk50hhuqjymr08drnm2kdf0r2337l6kl7mtm0z44vv4jexkqhz5w',
-        value: new BigNumber(1),
+        value: mangleValues.cannotUnmangle,
         type: CoreAddressTypes.JORMUNGANDR_GROUP,
       }, {
         address: 'addr1sj045dheysyptfekdyqa508nuzdzmh82vkda9hcwqwysrja6d8d66f0cfsfk50hhuqjymr08drnm2kdf0r2337l6kl7mtm0z44vv4jexkqhz5w',
-        value: new BigNumber(1000000),
+        value: mangleValues.canUnmangle,
         type: CoreAddressTypes.JORMUNGANDR_GROUP,
       }];
     }
     if (mangledValue === mangledCases.CanUnmangleAll) {
       return [{
         address: 'addr1sj045dheysyptfekdyqa508nuzdzmh82vkda9hcwqwysrja6d8d66f0cfsfk50hhuqjymr08drnm2kdf0r2337l6kl7mtm0z44vv4jexkqhz5w',
-        value: new BigNumber(1000000),
+        value: mangleValues.canUnmangle,
         type: CoreAddressTypes.JORMUNGANDR_GROUP,
       }];
     }
     throw new Error(`Unhandled mangled case ${mangledValue}`);
   })();
-  const wallet = genBaseJormungandrWallet();
+  const wallet = genBaseJormungandrWallet(
+    mangledValue === mangledCases.CanUnmangleSome || mangledValue === mangledCases.CanUnmangleAll
+      ? mangleValues.canUnmangle
+      : new BigNumber(0)
+  );
   const lookup = walletLookup([wallet]);
   return wrapWallet(
     mockWalletProps({
@@ -1377,7 +1402,7 @@ export const MangledDashboardWarning = (): Node => {
 };
 
 export const UnmangleDialogLoading = (): Node => {
-  const wallet = genBaseJormungandrWallet();
+  const wallet = genBaseJormungandrWallet(new BigNumber(1000000));
   const lookup = walletLookup([wallet]);
   return wrapWallet(
     mockWalletProps({
@@ -1406,7 +1431,7 @@ export const UnmangleDialogLoading = (): Node => {
 };
 
 export const UnmangleDialogError = (): Node => {
-  const wallet = genBaseJormungandrWallet();
+  const wallet = genBaseJormungandrWallet(new BigNumber(1000000));
   const lookup = walletLookup([wallet]);
   return wrapWallet(
     mockWalletProps({
@@ -1435,7 +1460,7 @@ export const UnmangleDialogError = (): Node => {
 };
 
 export const UnmangleDialogConfirm = (): Node => {
-  const wallet = genBaseJormungandrWallet();
+  const wallet = genBaseJormungandrWallet(new BigNumber(1000000));
   const lookup = walletLookup([wallet]);
   const { tentativeTx } = genTentativeJormungandrTx();
   return wrapWallet(
