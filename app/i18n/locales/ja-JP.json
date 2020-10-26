@@ -293,7 +293,7 @@
   "sidebar.settings": "設定",
   "sidebar.transfer": "復元/送金",
   "sidebar.wallets": "マイ・ウォレット",
-  "testnet.shelley.label.message": "テストネットのネットワークを使用しています ({network})",
+  "testnet.shelley.label.message": "YOU ARE ON TESTNET NETWORK.",
   "transfer.form.instructions.step1.text": "残高が復元されるまで1分程度かかります。復元後、ダイダロスウォレットからヨロイウォレットへの送金取引が表示されます。トランザクションの詳細を慎重に確認してください。 トランザクションを行うには、Cardanoネットワークの標準トランザクション手数料を支払う必要があります。",
   "transfer.form.masterkey.input.label": "マスターキー",
   "transfer.instructions.attention.title.label": "注意",
