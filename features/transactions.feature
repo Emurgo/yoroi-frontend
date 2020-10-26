@@ -25,8 +25,8 @@ Feature: Send transaction
 
     Examples:
       | amount              | fee       | expectedTx |
-      | 1.000000            | 0.640003  | "g6QAhYJYILcTzA1jEGw4BrGnB3zDeilPzKDkefJqrGTlHgmugI11AIJYIGBJO/JuYLC5jxQ2R2E74uwcb1C9X8FaFKL/UY9fo2vgAIJYIGBJO/JuYLC5jxQ2R2E74uwcb1C9X8FaFKL/UY9fo2vgAYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI1xAIJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI1xAQGBglgrgtgYWCGDWBxA66wjgpZH9bPPW9JExWBcIUqKGMmxBlNBcCzWoAAa8oZfOxoAD0JAAhoACcQDAxoR/pTNoQKDhFggXnGsSYUyhwTHwB1G9f7mkd9iHoKwNvA477DkhDTXmX5YQGysuAsWMrUoYD6f5n5k2vmnVr2jWdoeFuanaxW8pk/F2kBfv7IPOpOwIvTVWuUknxJtJ11amUkNnHpX5GSRMQRYIO23hdKX7dxt3V0Cchr8MLvy1UwjID2hIegQ0F2VF6vHQaCEWCCPBkfbIHjkWa3BQgOfZnSx2uNRXSeHf/3Dr6sioCh8qlhANGxtDeRnQfiiCPFaWuvN/hiItSZxBk0NSGaQ5k4GPG3nFQdYatQrUqBCgqTcLz+3OG935IbMoHAIAnNlbcNeBlggRYcsb5A2HZ+Idr1h/VYzDe7f0Gt4E0SVRIi2VqWKcA5BoIRYIOx7+AYOSniTUHVqDkzhtFF7b1HM/9BBkw6++m8Q+/SzWEDqP1LXZUyJhvy/JouWNtcm8m9Ot0yejTfqvC7Wcjl4LXB7j+KJEl5DrLIXHij4ZBPHxOJc1n/bC7PJb7nRJ4APWCBWM2zqwExuk/gcTouvBpcmhtN2NEKb5aluF5K/hwZh2EGg9g==" |
-      | 2.000000            | 0.460004  | "g6QAh4JYILcTzA1jEGw4BrGnB3zDeilPzKDkefJqrGTlHgmugI11AIJYIGBJO/JuYLC5jxQ2R2E74uwcb1C9X8FaFKL/UY9fo2vgAIJYIGBJO/JuYLC5jxQ2R2E74uwcb1C9X8FaFKL/UY9fo2vgAYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI1xAIJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI1xAYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI11AIJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI11AQGBglgrgtgYWCGDWBxA66wjgpZH9bPPW9JExWBcIUqKGMmxBlNBcCzWoAAa8oZfOxoAHoSAAhoABwTkAxoR/pTNoQKEhFggXnGsSYUyhwTHwB1G9f7mkd9iHoKwNvA477DkhDTXmX5YQPWw5EUQVR9Y0dpzBWAYt0qh24YUZDGLVyjx7xro2LUHyrY0OY6cIxzaxMfYKa0mtABRJnaMvfxZWoP8NBVKxghYIO23hdKX7dxt3V0Cchr8MLvy1UwjID2hIegQ0F2VF6vHQaCEWCCPBkfbIHjkWa3BQgOfZnSx2uNRXSeHf/3Dr6sioCh8qlhAE6jTe/dfPba0aRJ8UdimHG6quEaw3FfCSInH8RAz1SZqRN16ZbbHHKXmxwKxDxEqc4zUZGEnOjXFjnmFt9ynA1ggRYcsb5A2HZ+Idr1h/VYzDe7f0Gt4E0SVRIi2VqWKcA5BoIRYIOx7+AYOSniTUHVqDkzhtFF7b1HM/9BBkw6++m8Q+/SzWEDepjjJbs6tU03PMrQMi+pFuq/trlwj0XK5m/pAncaCWEe7zRl0fEz1y4I/PgUzVZD0IuasCqKtcO/wEWZh0MwLWCBWM2zqwExuk/gcTouvBpcmhtN2NEKb5aluF5K/hwZh2EGghFggzHvtZR+ntErMZIIgbq2uQ2B/jHt0TTIZ2j1JzMH2HTtYQOzHvkEeFMuENCAvK2BcEeduNcIteaV+ptOBphyadkg2102rQPi1VZF2wzyTWjWk6hC4FDb7wbk5J2jsi43xOA1YIFiANkZLmGZ3Oe+LI3Q8iACb9dHcrlZN4L/sajTg+7+/QaD2" |
+      | 1.000000            | 0.640000  | "g6QAgoJYIGBJO/JuYLC5jxQ2R2E74uwcb1C9X8FaFKL/UY9fo2vgAYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI1xAQGBglgrgtgYWCGDWBxA66wjgpZH9bPPW9JExWBcIUqKGMmxBlNBcCzWoAAa8oZfOxoAD0JAAhoACcQAAxoR/pTNoQKChFggjwZH2yB45FmtwUIDn2Z0sdrjUV0nh3/9w6+rIqAofKpYQJnz4URZfjl5AOpaEjMTWdF1lsFXPE+IKC0puBMdBjkWaqk6BIzW8VZ7pu7f8J/Mv8E3lRFiBVX7BnDQNYlT7g1YIEWHLG+QNh2fiHa9Yf1WMw3u39BreBNElUSItlalinAOQaCEWCDse/gGDkp4k1B1ag5M4bRRe29RzP/QQZMOvvpvEPv0s1hASaHptgaRcfgiyLBN80gqUIAueQBKkwSLu9iAd+UIN7PELThmN5ItmVzMeZIevE/7eS7wFX15sax9ap5ihK/1ClggVjNs6sBMbpP4HE6LrwaXJobTdjRCm+WpbheSv4cGYdhBoPY=" |
+      | 2.000000            | 0.460000  | "g6QAg4JYIGBJO/JuYLC5jxQ2R2E74uwcb1C9X8FaFKL/UY9fo2vgAYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI1xAYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI11AQGBglgrgtgYWCGDWBxA66wjgpZH9bPPW9JExWBcIUqKGMmxBlNBcCzWoAAa8oZfOxoAHoSAAhoABwTgAxoR/pTNoQKDhFggjwZH2yB45FmtwUIDn2Z0sdrjUV0nh3/9w6+rIqAofKpYQLM12LTh1NoxSUm0bbVTQfygHhTVh6bLYXlVC4cnlUPGu45AojcnGEqZTE/+vItV7EvsBBlKTapopZofryrXrA5YIEWHLG+QNh2fiHa9Yf1WMw3u39BreBNElUSItlalinAOQaCEWCDse/gGDkp4k1B1ag5M4bRRe29RzP/QQZMOvvpvEPv0s1hAwPcLKhKTeclUAgVMRh7EHv2F+jv6zQ7fpsQwbSucHpESYz+8QamNsB45zU8ocp5K4WDesTR7nxE7I9lvBc0jAlggVjNs6sBMbpP4HE6LrwaXJobTdjRCm+WpbheSv4cGYdhBoIRYIMx77WUfp7RKzGSCIG6trkNgf4x7dE0yGdo9SczB9h07WEBwOJ1TbOoaNh9Uf+erO5luL5/5sIvddiala/3VB2vFJXbohZnvvrJvQoi5Cc0AthRftjupDgna8dmSt25s7WYFWCBYgDZGS5hmdznviyN0PIgAm/XR3K5WTeC/7Go04Pu/v0Gg9g==" |
 
   @it-90
   Scenario Outline: Spending Password should be case-sensitive [Transaction confirmation] (IT-90)
@@ -58,7 +58,7 @@ Feature: Send transaction
     And I fill the form:
       | address                        | amount   |
       | <address>                      | <amount> |
-    And The transaction fees are "<fee>"
+    And The transaction fees are "0.640000"
     And I click on the next button in the wallet send form
     And I see CONFIRM TRANSACTION Pop up:
       | address   | amount    |fee      |
@@ -66,7 +66,7 @@ Feature: Send transaction
 
   Examples:
       | address                                                     | amount    |fee      |
-      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 1.000000  |0.640003 | 
+      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 1.000000  |0.640000 | 
 
   @it-46
   Scenario: User can't send funds to the invalid address (IT-46)
@@ -138,7 +138,7 @@ Feature: Send transaction
     And I fill the form:
       | address                                                     | amount   |
       | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 1.000000 |
-    And The transaction fees are "0.640003"
+    And The transaction fees are "0.640000"
     And I click on the next button in the wallet send form
     And I see send money confirmation dialog
     And I enter the wallet password:
@@ -181,7 +181,7 @@ Feature: Send transaction
     And I fill the form:
       | address                                                     | amount   |
       | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 2.000000 |
-    And The transaction fees are "0.460004"
+    And The transaction fees are "0.460000"
     And I click on the next button in the wallet send form
     And I see send money confirmation dialog
     Then A successful tx gets sent from my wallet from another client
@@ -194,7 +194,7 @@ Feature: Send transaction
     And I enter the wallet password:
       | password   |
       | asdfasdfasdf |
-    Given The expected transaction is "g6QAiIJYILcTzA1jEGw4BrGnB3zDeilPzKDkefJqrGTlHgmugI11AIJYIGBJO/JuYLC5jxQ2R2E74uwcb1C9X8FaFKL/UY9fo2vgAIJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI1xAIJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI1xAYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI11AIJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI11AYJYIAoHNmmEX+pK6DzUQYoLT9VmEAl6iWAagWtYkfZn40lsAIJYIAoHNmmEX+pK6DzUQYoLT9VmEAl6iWAagWtYkfZn40lsAQGBglgrgtgYWCGDWBxA66wjgpZH9bPPW9JExWBcIUqKGMmxBlNBcCzWoAAa8oZfOxoAHoSAAhoABGzVAxoR/pTNoQKFhFggXnGsSYUyhwTHwB1G9f7mkd9iHoKwNvA477DkhDTXmX5YQEeb8ZgfkuchaWdmsZDIgu9Ne7EJVqJXuuI42ZKVxMRj91gmestk6pmBB32kKNj0GcLrynJ/McozqJJ4Vqp10AtYIO23hdKX7dxt3V0Cchr8MLvy1UwjID2hIegQ0F2VF6vHQaCEWCDse/gGDkp4k1B1ag5M4bRRe29RzP/QQZMOvvpvEPv0s1hAuN3MeNWhhiHRPMfQtVjdDUjLodew3LHPulO8TSjqxlfjLGl39sfmQ55tRDjZg79jDfLaAkxzWbXJ6WMaPmrWDVggVjNs6sBMbpP4HE6LrwaXJobTdjRCm+WpbheSv4cGYdhBoIRYIMx77WUfp7RKzGSCIG6trkNgf4x7dE0yGdo9SczB9h07WEAJTFdcHXI7gUmQmE1L/iO5MUNHHGjX3IqWk90nIKtuEzZWzcnsZC4/c8XLFclp++Zt++VffPyDWUkibAstP34EWCBYgDZGS5hmdznviyN0PIgAm/XR3K5WTeC/7Go04Pu/v0GghFggq89sIniqpRC9CbEInMd52i6wG9KoB+AjifwBNwGbwndYQBfx8lWIAaMnuv8fYEnZ7V5knrDaCPLfMzxkqhIPbQNRAfK5SIrlCh4PYdsFTpZOTrjKvoAz+ZDYESdn5I4cvgVYIF7CeZr1rkg9Mv//7NfE+OX8w46WodL6lwd3q57SNCDRQaCEWCC5TTZuZiJW+mD46uJ/IIwwoYvtsvdGnWfNR4HzHKY/BlhAo8VaQ1EYi/XnNGyr7sHCYADHCLv8sl7Vqge3qoS2bZ3oLMfDVXt1zVyOwvywfVVRTNYRosp35AhV/YClViAdCFggrsddVEovzNzpsw4Y3PHrjzmP9bkBd+LCRWEJPOQv66VBoPY="
+    Given The expected transaction is "g6QAg4JYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI1xAYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI11AYJYIAoHNmmEX+pK6DzUQYoLT9VmEAl6iWAagWtYkfZn40lsAQGBglgrgtgYWCGDWBxA66wjgpZH9bPPW9JExWBcIUqKGMmxBlNBcCzWoAAa8oZfOxoAHoSAAhoABGzQAxoR/pTNoQKDhFgg7Hv4Bg5KeJNQdWoOTOG0UXtvUcz/0EGTDr76bxD79LNYQJgmViCF11mg1pQBlxk5WmjKSs335DeKn3nsuX34oYLm25fA7GEios1jIGV+DVc5TCvhR9taKi5BImTCR56izgNYIFYzbOrATG6T+BxOi68GlyaG03Y0QpvlqW4Xkr+HBmHYQaCEWCDMe+1lH6e0SsxkgiBura5DYH+Me3RNMhnaPUnMwfYdO1hA2eLKUK3aour0AVVuH9n8iplfXanW6IR4KpRrPT03y0a5wCR9LBoyZKIvAI0VhZChXHZUqm7wxy6O5eD6mLpICFggWIA2RkuYZnc574sjdDyIAJv10dyuVk3gv+xqNOD7v79BoIRYILlNNm5mIlb6YPjq4n8gjDChi+2y90adZ81HgfMcpj8GWEAdrzsYU4XXFWKVSukTrZoSKmwL9O5BFooOSPuLB3XUpVQz9jW4TIa1jRIPBnfiVzvASIzc+7YdJ4EPfEhkjPgKWCCux11USi/M3OmzDhjc8euPOY/1uQF34sJFYQk85C/rpUGg9g=="
     And I submit the wallet send form
     Then I should see the summary screen
 
@@ -206,7 +206,7 @@ Feature: Send transaction
     And I fill the form:
       | address                                                     | amount   |
       | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 1.000000 |
-    And The transaction fees are "0.640003"
+    And The transaction fees are "0.640000"
     And I click on the next button in the wallet send form
     And I see send money confirmation dialog
     And I enter the wallet password:
@@ -218,7 +218,7 @@ Feature: Send transaction
     And I enter the wallet password:
       | password      |
       | asdfasdfasdf |
-    Given The expected transaction is "g6QAhYJYILcTzA1jEGw4BrGnB3zDeilPzKDkefJqrGTlHgmugI11AIJYIGBJO/JuYLC5jxQ2R2E74uwcb1C9X8FaFKL/UY9fo2vgAIJYIGBJO/JuYLC5jxQ2R2E74uwcb1C9X8FaFKL/UY9fo2vgAYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI1xAIJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI1xAQGBglgrgtgYWCGDWBxA66wjgpZH9bPPW9JExWBcIUqKGMmxBlNBcCzWoAAa8oZfOxoAD0JAAhoACcQDAxoR/pTNoQKDhFggXnGsSYUyhwTHwB1G9f7mkd9iHoKwNvA477DkhDTXmX5YQGysuAsWMrUoYD6f5n5k2vmnVr2jWdoeFuanaxW8pk/F2kBfv7IPOpOwIvTVWuUknxJtJ11amUkNnHpX5GSRMQRYIO23hdKX7dxt3V0Cchr8MLvy1UwjID2hIegQ0F2VF6vHQaCEWCCPBkfbIHjkWa3BQgOfZnSx2uNRXSeHf/3Dr6sioCh8qlhANGxtDeRnQfiiCPFaWuvN/hiItSZxBk0NSGaQ5k4GPG3nFQdYatQrUqBCgqTcLz+3OG935IbMoHAIAnNlbcNeBlggRYcsb5A2HZ+Idr1h/VYzDe7f0Gt4E0SVRIi2VqWKcA5BoIRYIOx7+AYOSniTUHVqDkzhtFF7b1HM/9BBkw6++m8Q+/SzWEDqP1LXZUyJhvy/JouWNtcm8m9Ot0yejTfqvC7Wcjl4LXB7j+KJEl5DrLIXHij4ZBPHxOJc1n/bC7PJb7nRJ4APWCBWM2zqwExuk/gcTouvBpcmhtN2NEKb5aluF5K/hwZh2EGg9g=="
+    Given The expected transaction is "g6QAgoJYIGBJO/JuYLC5jxQ2R2E74uwcb1C9X8FaFKL/UY9fo2vgAYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI1xAQGBglgrgtgYWCGDWBxA66wjgpZH9bPPW9JExWBcIUqKGMmxBlNBcCzWoAAa8oZfOxoAD0JAAhoACcQAAxoR/pTNoQKChFggjwZH2yB45FmtwUIDn2Z0sdrjUV0nh3/9w6+rIqAofKpYQJnz4URZfjl5AOpaEjMTWdF1lsFXPE+IKC0puBMdBjkWaqk6BIzW8VZ7pu7f8J/Mv8E3lRFiBVX7BnDQNYlT7g1YIEWHLG+QNh2fiHa9Yf1WMw3u39BreBNElUSItlalinAOQaCEWCDse/gGDkp4k1B1ag5M4bRRe29RzP/QQZMOvvpvEPv0s1hASaHptgaRcfgiyLBN80gqUIAueQBKkwSLu9iAd+UIN7PELThmN5ItmVzMeZIevE/7eS7wFX15sax9ap5ihK/1ClggVjNs6sBMbpP4HE6LrwaXJobTdjRCm+WpbheSv4cGYdhBoPY="
     And I submit the wallet send form
     Then I should see the summary screen
 
@@ -230,7 +230,7 @@ Feature: Send transaction
     And I fill the form:
       | address                                                     | amount   |
       | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 2.000000 |
-    And The transaction fees are "0.460004"
+    And The transaction fees are "0.460000"
     Then A pending tx gets sent from my wallet from another client
     Then I should see a warning block
 
@@ -360,3 +360,24 @@ Feature: Send transaction
     Examples:
       | amount              | fee       | expectedTx |
       | 1.000000            | 0.167833  | "g6QAgYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgSugI11FgGCglgrgtgYWCGDWBxA66wjgpZH9bPPW9JExWBcIUqKGMmxBlNBcCzWoAAa8oZfOxoAD0JAglg5Af0wLcvG6+RrU5YfLU0x/8kfm6HbRxOuVhSWZr6F4UOa5bEdhsrcaqLcJ6I+wLsaSX6JnAGqOfdrGgCGxKcCGgACj5kDGhH+lM2hAIGCWCAosn+8mv+rxG+osiOOtkzZqx67+DrT7IF+s0fWbhA6bFhARoefmMDg363oeCLxKyJbZI115/Lref2ZleBk7xpQgv3F4JEvqP+7D0p+6Oi8m0+UOaEREqwotQeDWSe/olRFC/Y=" |
+
+  @it-165
+  Scenario: Can receive & unmangle utxo entries (IT-165)
+    Given There is a Shelley wallet stored named shelley-mangled
+    And I have a wallet with funds
+    And I go to the receive screen
+    When I click on the base mangled tab
+    And I should see the addresses exactly list them
+    | address                                                    |
+    | addr1q8sm64ehfue7m7xrlh2zfu4uj9tn3z3yrzfdaly52gs667qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqhzdk70 |
+    When I click on the unmangle button
+    Then I should see on the Yoroi transfer summary screen:
+    | fromAddress                                                 | amount           |   
+    | addr1q8sm64ehfue7m7xrlh2zfu4uj9tn3z3yrzfdaly52gs667qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqhzdk70 | 10000000    |
+    And I enter the wallet password:
+      | password   |
+      | asdfasdfasdf |
+    Given The expected transaction is "g6QAgYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgSugI11FwGBglg5ATFf/lO+USTb83qMl8g53oV7XmMSuklF3gfHb8kex9YZS/n0WTCduT05oFTkplWcw+TU0UvasV/VGgCWD6sCGgAChtUDGhH+lM2hAIGCWCCxG2517QHEmTBkk1BC3zBriToLyq4PxNikr8LCc0V+jFhAUiMjVxyfTJcGdgg9q914adTdNaD7+DW+eMviv5if69KbiPhAxWcIGldT8kDaG2uiyjtePEnGLd9fXRa3unVuBPY="
+    When I confirm Yoroi transfer funds
+    Then I should see the summary screen
+    And I should see 1 pending transactions

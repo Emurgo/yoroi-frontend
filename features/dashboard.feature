@@ -65,3 +65,20 @@ Feature: Yoroi delegation dashboard
     Given The expected transaction is "g6YAgYJYIDZ36Gx7ppmv3BzVfULyRvhvaa79dgJQBqx4MT+tK7ohAAGBglg5AfiMMmOcqBWRIjRN6CEig4T8YKJcOWtIDaUVnSFW21zUiJyEEQ1N6QwNUDtRuETbPm/YeZEjiZW7GgCV8ZcCGgACpOkDGhH+lM0EgYIBggBYHFbbXNSInIQRDU3pDA1QO1G4RNs+b9h5kSOJlbsFoVgd4VbbXNSInIQRDU3pDA1QO1G4RNs+b9h5kSOJlbsaAExLQKEAgoJYIDHFsozgC4AMMNymh4uSd8Xls6VSRnf9Dxv6kiJPzsubWEDeymxh6IEQKI51A9krNH9zkI8E6r+yQhyKpgVMn318UvFlJ7PWkEA/UN5ttCRe+/8lHy6Vl9Dhu4RBHZ47Mu0Hglgg6cWNnhkPKitPspqy3T6+Lqi2VU1F/s8JE36FUprlBHBYQCyphTpHmP5U443IIuVOntgb8KaXTjazElk9hm6GFMebbuNWYuv907Ci+JvN7kk9wbO0R6ZKcA9pEgbbmlBYrA32"
     When I confirm Yoroi transfer funds
     Then I should see the dashboard screen
+
+  @it-166
+  Scenario: Can unmangled from the dashboard (IT-166)
+    Given There is a Shelley wallet stored named shelley-mangled
+    And I have a wallet with funds
+    And I go to the dashboard screen
+    When I click on the unmangle warning
+    Then I should see on the Yoroi transfer summary screen:
+    | fromAddress                                                 | amount           |   
+    | addr1q8sm64ehfue7m7xrlh2zfu4uj9tn3z3yrzfdaly52gs667qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqhzdk70 | 10000000    |
+    And I enter the wallet password:
+      | password   |
+      | asdfasdfasdf |
+    Given The expected transaction is "g6QAgYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgSugI11FwGBglg5ATFf/lO+USTb83qMl8g53oV7XmMSuklF3gfHb8kex9YZS/n0WTCduT05oFTkplWcw+TU0UvasV/VGgCWD6sCGgAChtUDGhH+lM2hAIGCWCCxG2517QHEmTBkk1BC3zBriToLyq4PxNikr8LCc0V+jFhAUiMjVxyfTJcGdgg9q914adTdNaD7+DW+eMviv5if69KbiPhAxWcIGldT8kDaG2uiyjtePEnGLd9fXRa3unVuBPY="
+    When I confirm Yoroi transfer funds
+    Then I should see the summary screen
+    And I should see 1 pending transactions

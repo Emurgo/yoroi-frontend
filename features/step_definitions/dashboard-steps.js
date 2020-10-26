@@ -13,3 +13,8 @@ When(/^I click on the withdraw button$/, async function () {
 Then(/^I should rewards in the history$/, async function () {
   await this.waitForElement('.recharts-bar');
 });
+
+When(/^I click on the unmangle warning$/, async function () {
+  await this.click('.UserSummary_mangledWarningIcon');
+  await this.click('.UserSummary_link');
+});

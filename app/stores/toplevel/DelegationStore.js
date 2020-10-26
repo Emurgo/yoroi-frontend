@@ -1,6 +1,7 @@
 // @flow
 
 import { observable, action, } from 'mobx';
+import BigNumber from 'bignumber.js';
 import { find } from 'lodash';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import {
@@ -22,6 +23,7 @@ import { getApiForNetwork } from '../../api/common/utils';
 import {
   PoolMissingApiError,
 } from '../../api/common/errors';
+import type { MangledAmountFunc } from '../stateless/mangledAddresses';
 
 export type DelegationRequests = {|
   publicDeriver: PublicDeriver<>,
@@ -32,6 +34,7 @@ export type DelegationRequests = {|
   getDelegatedBalance: CachedRequest<GetDelegatedBalanceFunc>,
   getCurrentDelegation: CachedRequest<GetCurrentDelegationFunc>,
   rewardHistory: CachedRequest<RewardHistoryFunc>,
+  mangledAmounts: CachedRequest<MangledAmountFunc>,
   error: LocalizableError | any;
 |};
 

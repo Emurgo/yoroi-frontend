@@ -89,32 +89,34 @@ export function sendAllUnsignedTx(
 function addUtxoInput(
   txBuilder: RustModule.WalletV4.TransactionBuilder,
   input: RemoteUnspentOutput,
-): void {
-  const wasmInput = normalizeToAddress(input.receiver);
-  if (wasmInput == null) {
+  /* don't add the input if the amount is smaller than the fee to add it to the tx */
+  excludeIfSmall: boolean,
+): boolean {
+  const wasmAddr = normalizeToAddress(input.receiver);
+  if (wasmAddr == null) {
     throw new Error(`${nameof(addUtxoInput)} input not a valid Shelley address`);
   }
-  const keyHash = getCardanoSpendingKeyHash(wasmInput);
-  if (keyHash === null) {
-    const byronAddr = RustModule.WalletV4.ByronAddress.from_address(wasmInput);
-    if (byronAddr == null) {
-      throw new Error(`${nameof(addUtxoInput)} should never happen: non-byron address without key hash`);
-    }
-    txBuilder.add_bootstrap_input(
-      byronAddr,
-      utxoToTxInput(input),
-      RustModule.WalletV4.BigNum.from_str(input.amount)
+  const txInput = utxoToTxInput(input);
+  const wasmAmount = RustModule.WalletV4.BigNum.from_str(input.amount);
+
+  if (excludeIfSmall) {
+    const feeForInput = new BigNumber(
+      txBuilder.fee_for_input(
+        wasmAddr,
+        txInput,
+        wasmAmount
+      ).to_str()
     );
-    return;
+    if (feeForInput.gt(input.amount)) {
+      return false;
+    }
   }
-  if (keyHash === undefined) {
-    throw new Error(`${nameof(addUtxoInput)} script inputs not expected`);
-  }
-  txBuilder.add_key_input(
-    keyHash,
-    utxoToTxInput(input),
-    RustModule.WalletV4.BigNum.from_str(input.amount)
+  txBuilder.add_input(
+    wasmAddr,
+    txInput,
+    wasmAmount
   );
+  return true;
 }
 
 export function sendAllUnsignedTxFromUtxo(
@@ -146,7 +148,7 @@ export function sendAllUnsignedTxFromUtxo(
   );
   txBuilder.set_ttl(absSlotNumber.plus(defaultTtlOffset).toNumber());
   for (const input of allUtxos) {
-    addUtxoInput(txBuilder, input);
+    addUtxoInput(txBuilder, input, false);
   }
 
   if (totalBalance.lt(txBuilder.min_fee().to_str())) {
@@ -356,14 +358,14 @@ export function newAdaUnsignedTxFromUtxo(
     // recall: we might have some implicit input to start with from deposit refunds
     let currentInputSum = new BigNumber(txBuilder.get_explicit_input().to_str());
 
-    if (utxos.length === 0) {
-      throw new NotEnoughMoneyToSendError();
-    }
     // add utxos until we have enough to send the transaction
     for (const utxo of utxos) {
-      usedUtxos.push(utxo); // note: this ensure we have at least one UTXO in the tx
+      const added = addUtxoInput(txBuilder, utxo, true);
+      if (!added) continue;
+
+      usedUtxos.push(utxo);
       currentInputSum = currentInputSum.plus(utxo.amount);
-      addUtxoInput(txBuilder, utxo);
+
       // need to recalculate each time because fee changes
       const output = new BigNumber(
         txBuilder
@@ -387,6 +389,9 @@ export function newAdaUnsignedTxFromUtxo(
       if (!shouldForceChange && currentInputSum.gte(output)) {
         break;
       }
+    }
+    if (usedUtxos.length === 0) {
+      throw new NotEnoughMoneyToSendError();
     }
     // check to see if we have enough balance in the wallet to cover the transaction
     {
@@ -616,4 +621,35 @@ export function asAddressedUtxo(
       addressing: utxo.addressing,
     };
   });
+}
+
+export function genFilterSmallUtxo(request: {|
+  protocolParams: {|
+    linearFee: RustModule.WalletV4.LinearFee,
+  |},
+|}): (
+  RemoteUnspentOutput => boolean
+) {
+  const txBuilder = RustModule.WalletV4.TransactionBuilder.new(
+    request.protocolParams.linearFee,
+    // no need for the following parameters just to calculate the fee of adding a UTXO
+    RustModule.WalletV4.BigNum.from_str('0'),
+    RustModule.WalletV4.BigNum.from_str('0'),
+    RustModule.WalletV4.BigNum.from_str('0'),
+  );
+
+  return (utxo) => {
+    const wasmAddr = normalizeToAddress(utxo.receiver);
+    if (wasmAddr == null) {
+      throw new Error(`${nameof(addUtxoInput)} input not a valid Shelley address`);
+    }
+    const feeForInput = new BigNumber(
+      txBuilder.fee_for_input(
+        wasmAddr,
+        utxoToTxInput(utxo),
+        RustModule.WalletV4.BigNum.from_str(utxo.amount)
+      ).to_str()
+    );
+    return feeForInput.lte(utxo.amount);
+  };
 }

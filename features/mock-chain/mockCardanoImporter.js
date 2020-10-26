@@ -30,6 +30,8 @@ import {
   genUtxoForAddresses,
   genUtxoSumForAddresses,
   getSingleAddressString,
+  getAddressForType,
+  getMangledAddressString,
   toRemoteByronTx,
 } from '../../app/api/ada/lib/state-fetch/mockNetwork';
 import {
@@ -42,6 +44,7 @@ import {
   ChainDerivations,
 } from '../../app/config/numbersConfig';
 import { testWallets } from './TestWallets';
+import { CoreAddressTypes } from '../../app/api/ada/lib/storage/database/primitives/enums';
 
 // based on abandon x 14 + share
 const genesisTransaction = '52929ce6f1ab83b439e65f6613bad9590bd264c0d6c4f910e36e2369bb987b35';
@@ -79,6 +82,7 @@ export const generateTransaction = (): {|
   shelleyLedgerDelegatedTx2: RemoteTransaction,
   shelleyOnlyRegisteredTx1: RemoteTransaction,
   shelleyOnlyRegisteredTx2: RemoteTransaction,
+  delegateMangledWallet: RemoteTransaction,
 |} => {
   /**
   * To simplify, our genesis is a single address which gives all its ada to a "distributor"
@@ -430,9 +434,66 @@ export const generateTransaction = (): {|
             0 + HARD_DERIVATION_START,
             ChainDerivations.EXTERNAL,
             0
-          ],
+          ]
         ),
         amount: '10000000'
+      },
+      {
+        // index: 23
+        // eslint-disable-next-line max-len
+        // addr1q8sm64ehfue7m7xrlh2zfu4uj9tn3z3yrzfdaly52gs667qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqhzdk70
+        address: getMangledAddressString(
+          testWallets['shelley-mangled'].mnemonic,
+          [
+            WalletTypePurpose.CIP1852,
+            CoinTypes.CARDANO,
+            0 + HARD_DERIVATION_START,
+            ChainDerivations.EXTERNAL,
+            0
+          ],
+          Buffer.from(
+            '00000000000000000000000000000000000000000000000000000000',
+            'hex'
+          )
+        ),
+        amount: '10000000' // enough that it can be unmangled
+      },
+      {
+        // index: 24
+        // eslint-disable-next-line max-len
+        // addr1q8sm64ehfue7m7xrlh2zfu4uj9tn3z3yrzfdaly52gs667qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqhzdk70
+        address: getMangledAddressString(
+          testWallets['shelley-mangled'].mnemonic,
+          [
+            WalletTypePurpose.CIP1852,
+            CoinTypes.CARDANO,
+            0 + HARD_DERIVATION_START,
+            ChainDerivations.EXTERNAL,
+            0
+          ],
+          Buffer.from(
+            '00000000000000000000000000000000000000000000000000000000',
+            'hex'
+          )
+        ),
+        amount: '1' // too little to unmangle
+      },
+      {
+        // index: 25
+        // eslint-disable-next-line max-len
+        // TODO
+        address: getAddressForType(
+          testWallets['shelley-mangled'].mnemonic,
+          [
+            WalletTypePurpose.CIP1852,
+            CoinTypes.CARDANO,
+            0 + HARD_DERIVATION_START,
+            ChainDerivations.EXTERNAL,
+            0
+          ],
+          CoreAddressTypes.CARDANO_BASE
+        ),
+        amount: '3500000'
       },
     ],
     height: 1,
@@ -1711,6 +1772,102 @@ export const generateTransaction = (): {|
     tx_state: 'Successful'
   };
 
+  // ===================
+  //   shelley-mangled
+  // ===================
+
+  const delegateMangledWallet = {
+    hash: '3456e86c7ba799afda1cd57d425946f86f69aefd76025006ac78313fad2bba21',
+    type: 'shelley',
+    inputs: [
+      {
+        // eslint-disable-next-line max-len
+        // TODO
+        address: getAddressForType(
+          testWallets['shelley-mangled'].mnemonic,
+          [
+            WalletTypePurpose.CIP1852,
+            CoinTypes.CARDANO,
+            0 + HARD_DERIVATION_START,
+            ChainDerivations.EXTERNAL,
+            0
+          ],
+          CoreAddressTypes.CARDANO_BASE
+        ),
+        txHash: distributorTx.hash,
+        id: distributorTx.hash + '25',
+        index: 25,
+        amount: '3500000'
+      }
+    ],
+    outputs: [
+      {
+        // eslint-disable-next-line max-len
+        // TODO
+        address: getAddressForType(
+          testWallets['shelley-mangled'].mnemonic,
+          [
+            WalletTypePurpose.CIP1852,
+            CoinTypes.CARDANO,
+            0 + HARD_DERIVATION_START,
+            ChainDerivations.INTERNAL,
+            1
+          ],
+          CoreAddressTypes.CARDANO_BASE
+        ),
+        amount: '1000000'
+      },
+    ],
+    ttl: '500',
+    fee: '500000',
+    certificates: [
+      {
+        certIndex: 0,
+        kind: (ShelleyCertificateTypes.StakeRegistration: 'StakeRegistration'),
+        // TODO: bech32 address
+        rewardAddress: getAddressForType(
+          testWallets['shelley-mangled'].mnemonic,
+          [
+            WalletTypePurpose.CIP1852,
+            CoinTypes.CARDANO,
+            0 + HARD_DERIVATION_START,
+            ChainDerivations.CHIMERIC_ACCOUNT,
+            0
+          ],
+          CoreAddressTypes.CARDANO_REWARD
+        ),
+      },
+      {
+        certIndex: 1,
+        kind: ShelleyCertificateTypes.StakeDelegation,
+        // TODO: bech32 address
+        rewardAddress: getAddressForType(
+          testWallets['shelley-mangled'].mnemonic,
+          [
+            WalletTypePurpose.CIP1852,
+            CoinTypes.CARDANO,
+            0 + HARD_DERIVATION_START,
+            ChainDerivations.CHIMERIC_ACCOUNT,
+            0
+          ],
+          CoreAddressTypes.CARDANO_REWARD
+        ),
+        poolKeyHash: 'df1750df9b2df285fcfb50f4740657a18ee3af42727d410c37b86207', // YOROI
+      },
+    ],
+    withdrawals: [],
+    metadata: null,
+    height: 200,
+    block_hash: '200',
+    tx_ordinal: 4,
+    time: '2019-04-21T15:13:33.000Z',
+    epoch: 0,
+    slot: 200,
+    last_update: '2019-05-21T23:14:51.899Z',
+    tx_state: 'Successful'
+  };
+
+
   return {
     genesisTx,
     distributorTx,
@@ -1737,6 +1894,7 @@ export const generateTransaction = (): {|
     shelleyLedgerDelegatedTx2,
     shelleyOnlyRegisteredTx1,
     shelleyOnlyRegisteredTx2,
+    delegateMangledWallet,
   };
 };
 
@@ -1828,6 +1986,8 @@ export function resetChain(
     // shelley-only-registered
     addTransaction(txs.shelleyOnlyRegisteredTx1);
     addTransaction(txs.shelleyOnlyRegisteredTx2);
+    // shelley-mangled
+    addTransaction(txs.delegateMangledWallet);
   } else if (chainToUse === MockChain.TestAssurance) {
     // test setup
     addTransaction(txs.genesisTx);

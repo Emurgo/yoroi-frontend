@@ -512,3 +512,5 @@ export function genAddressLookup(
     };
   };
 }
+
+export const mangledStores = [GROUP_MANGLED, BASE_MANGLED];

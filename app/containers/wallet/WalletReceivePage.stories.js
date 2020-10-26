@@ -51,6 +51,7 @@ import {
   BASE_INTERNAL,
   BASE_MANGLED,
   REWARD_ADDRESS,
+  mangledStores,
 } from '../../stores/stateless/addressStores';
 import type { IAddressTypeStore, IAddressTypeUiSubset } from '../../stores/stateless/addressStores';
 import {
@@ -116,7 +117,22 @@ const genBaseProps: {|
     sendErrorCases,
     sendErrorCases.None
   );
+
+  const canUnmangle = (() => {
+    for (const store of mangledStores) {
+      const subgroup = request.addressSubgroupMap.get(store.class);
+      if (subgroup == null) continue;
+      for (const address of subgroup.all) {
+        // for the purposes of testing, consider any > 0 as unmangle-able
+        if (address.value != null && address.value.gt(0)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  })();
   return {
+    canUnmangle,
     stores: {
       app: {
         currentRoute: request.location,

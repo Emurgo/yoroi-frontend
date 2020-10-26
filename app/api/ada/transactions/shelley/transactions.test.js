@@ -288,6 +288,41 @@ describe('Create unsigned TX from UTXO', () => {
     expect(unsignedTxResponse.txBuilder.get_explicit_output().to_str()).toEqual('999528');
     expect(unsignedTxResponse.txBuilder.min_fee().to_str()).toEqual('1166');
   });
+
+  it('Should exclude inputs smaller than fee to include them', () => {
+    const utxos: Array<RemoteUnspentOutput> = genSampleUtxos();
+    const sampleAdaAddresses = genSampleAdaAddresses();
+    const unsignedTxResponse = newAdaUnsignedTxFromUtxo(
+      [{
+        address: byronAddrToHex('Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4'),
+        amount: '1001', // smaller than input
+      }],
+      sampleAdaAddresses[0],
+      [utxos[0], utxos[1]],
+      new BigNumber(0),
+      {
+        linearFee: RustModule.WalletV4.LinearFee.new(
+          // make sure the 1st utxo is excluded since it's too small
+          RustModule.WalletV4.BigNum.from_str(
+            new BigNumber(utxos[0].amount).plus(1).toString()
+          ),
+          RustModule.WalletV4.BigNum.from_str('500'),
+        ),
+        minimumUtxoVal: RustModule.WalletV4.BigNum.from_str('1'),
+        poolDeposit: RustModule.WalletV4.BigNum.from_str('500'),
+        keyDeposit: RustModule.WalletV4.BigNum.from_str('500'),
+      },
+      [],
+      [],
+      true,
+    );
+    // input selection will only take 2 of the 3 inputs
+    // it takes 2 inputs because input selection algorithm
+    expect(unsignedTxResponse.senderUtxos).toEqual([utxos[1]]);
+    expect(unsignedTxResponse.txBuilder.get_explicit_input().to_str()).toEqual('1000001');
+    expect(unsignedTxResponse.txBuilder.get_explicit_output().to_str()).toEqual('788199');
+    expect(unsignedTxResponse.txBuilder.min_fee().to_str()).toEqual('208994');
+  });
 });
 
 describe('Create unsigned TX from addresses', () => {

@@ -367,6 +367,42 @@ export function getSingleAddressString(
   throw new Error('Unexpected purpose');
 }
 
+export function getMangledAddressString(
+  mnemonic: string,
+  path: Array<number>,
+  stakingKey: Buffer,
+  isLedger?: boolean = false,
+): string {
+  const bip39entropy = mnemonicToEntropy(mnemonic);
+  const EMPTY_PASSWORD = Buffer.from('');
+  const rootKey = isLedger
+    ? generateLedgerWalletRootKey(mnemonic)
+    : RustModule.WalletV4.Bip32PrivateKey.from_bip39_entropy(
+      Buffer.from(bip39entropy, 'hex'),
+      EMPTY_PASSWORD
+    );
+  const derivedKey = derivePath(rootKey, path);
+
+  const baseConfig = getCardanoHaskellBaseConfig(networks.CardanoMainnet)
+    .reduce((acc, next) => Object.assign(acc, next), {});
+
+  if (path[0] === WalletTypePurpose.CIP1852) {
+    const addr = RustModule.WalletV4.BaseAddress.new(
+      Number.parseInt(baseConfig.ChainNetworkId, 10),
+      RustModule.WalletV4.StakeCredential.from_keyhash(
+        derivedKey.to_public().to_raw_key().hash()
+      ),
+      RustModule.WalletV4.StakeCredential.from_keyhash(
+        RustModule.WalletV4.Ed25519KeyHash.from_bytes(
+          stakingKey
+        )
+      )
+    );
+    return Buffer.from(addr.to_address().to_bytes()).toString('hex');
+  }
+  throw new Error('Unexpected purpose');
+}
+
 export function getAddressForType(
   mnemonic: string,
   path: Array<number>,

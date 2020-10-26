@@ -7,7 +7,50 @@ import {
 
 import type { StandardAddress, AddressTypeName, } from '../../types/AddressFilterTypes';
 import { AddressGroupTypes, AddressSubgroup } from '../../types/AddressFilterTypes';
-import { filterMangledAddresses } from '../stateless/mangledAddresses';
+import {
+  asGetStakingKey,
+} from '../../api/ada/lib/storage/models/PublicDeriver/traits';
+import {
+  unwrapStakingKey,
+} from '../../api/ada/lib/storage/bridge/utils';
+import {
+  filterAddressesByStakingKey,
+} from '../../api/ada/lib/storage/bridge/delegationUtils';
+
+export async function filterMangledAddresses(request: {|
+  publicDeriver: PublicDeriver<>,
+  baseAddresses: $ReadOnlyArray<$ReadOnly<StandardAddress>>,
+  invertFilter: boolean,
+|}): Promise<$ReadOnlyArray<$ReadOnly<StandardAddress>>> {
+  const withStakingKey = asGetStakingKey(request.publicDeriver);
+  if (withStakingKey == null) {
+    if (request.invertFilter) return [];
+    return request.baseAddresses.map(info => ({
+      ...info,
+      address: info.address
+    }));
+  }
+
+  const stakingKeyResp = await withStakingKey.getStakingKey();
+
+  const stakingKey = unwrapStakingKey(stakingKeyResp.addr.Hash);
+
+  const filterResult = filterAddressesByStakingKey(
+    stakingKey,
+    request.baseAddresses,
+    false,
+  );
+
+  const nonMangledSet = new Set(filterResult);
+  const result = request.baseAddresses.filter(
+    info => (request.invertFilter ? !nonMangledSet.has(info) : nonMangledSet.has(info))
+  );
+
+  return result.map(info => ({
+    ...info,
+    address: info.address,
+  }));
+}
 
 export default class AdaAddressesStore extends Store {
 
@@ -19,7 +62,7 @@ export default class AdaAddressesStore extends Store {
     if (request.storeName.group === AddressGroupTypes.addressBook) {
       return request.addresses;
     }
-    if (request.storeName.subgroup === AddressSubgroup.all) {
+    if (request.storeName.subgroup === AddressGroupTypes.base) {
       return filterMangledAddresses({
         publicDeriver: request.publicDeriver,
         baseAddresses: request.addresses,
@@ -33,10 +76,6 @@ export default class AdaAddressesStore extends Store {
         invertFilter: true,
       });
     }
-    return filterMangledAddresses({
-      publicDeriver: request.publicDeriver,
-      baseAddresses: request.addresses,
-      invertFilter: false,
-    });
+    return request.addresses;
   }
 }

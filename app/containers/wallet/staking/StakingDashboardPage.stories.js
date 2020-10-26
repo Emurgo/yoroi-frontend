@@ -57,6 +57,7 @@ import UnmangleTxDialogContainer from '../../transfer/UnmangleTxDialogContainer'
 import PoolWarningDialog from '../../../components/wallet/staking/dashboard/PoolWarningDialog';
 import UndelegateDialog from '../../../components/wallet/staking/dashboard/UndelegateDialog';
 import { GROUP_MANGLED, allAddressSubgroups } from '../../../stores/stateless/addressStores';
+import type { MangledAmountFunc } from '../../../stores/stateless/mangledAddresses';
 import type { StandardAddress } from '../../../types/AddressFilterTypes';
 import {
   TransactionType,
@@ -64,7 +65,7 @@ import {
 import type {
   JormungandrTransactionInsert, NetworkRow,
 } from '../../../api/ada/lib/storage/database/primitives/tables';
-import type { IAddressTypeStore, IAddressTypeUiSubset } from '../../../stores/stateless/addressStores';
+import type { IAddressTypeStore, IAddressTypeUiSubset, } from '../../../stores/stateless/addressStores';
 import {
   CoreAddressTypes,
 } from '../../../api/ada/lib/storage/database/primitives/enums';
@@ -158,15 +159,6 @@ const genBaseProps: {|
           ? boolean('hasAnyPending', false)
           : false,
         getTxRequests: request.lookup.getTransactions,
-      },
-      addresses: {
-        addressSubgroupMap: new Map([[
-          GROUP_MANGLED.class,
-          {
-            all: request.mangledInfo?.addresses ?? [],
-            wasExecuted: true,
-          },
-        ]]),
       },
       delegation: {
         selectedPage: 0,
@@ -498,7 +490,8 @@ const stakingKeyCases = {
 };
 function getStakingInfo(
   publicDeriver: *,
-  stakingCase: $Values<typeof stakingKeyCases>
+  stakingCase: $Values<typeof stakingKeyCases>,
+  canUnmangleAmount: BigNumber,
 ): DelegationRequests {
   const accountBalance = new BigNumber(3);
   const getDelegatedBalance: CachedRequest<GetDelegatedBalanceFunc> = new CachedRequest(
@@ -570,8 +563,18 @@ function getStakingInfo(
   getDelegatedBalance.execute((null: any));
   getCurrentDelegation.execute((null: any));
   rewardHistory.execute((null: any));
+
+  const mangledAmounts: CachedRequest<MangledAmountFunc> = new CachedRequest(
+    _request => Promise.resolve({
+      canUnmangle: canUnmangleAmount,
+      cannotUnmangle:
+        getDelegatedBalance.result?.utxoPart.minus(canUnmangleAmount) ?? new BigNumber(0),
+    })
+  );
+  mangledAmounts.execute((null: any));
   return {
     publicDeriver,
+    mangledAmounts,
     getDelegatedBalance,
     getCurrentDelegation,
     rewardHistory,
@@ -618,6 +621,12 @@ export const Loading = (): Node => {
       _request => Promise.resolve({
         utxoPart: new BigNumber(0),
         accountPart: new BigNumber(0),
+      })
+    );
+    const mangledAmounts: CachedRequest<MangledAmountFunc> = new CachedRequest(
+      _request => Promise.resolve({
+        canUnmangle: new BigNumber(0),
+        cannotUnmangle: new BigNumber(0),
       })
     );
     const getCurrentDelegation: CachedRequest<GetCurrentDelegationFunc> = new CachedRequest(
@@ -687,6 +696,7 @@ export const Loading = (): Node => {
     }
     wallet.getDelegation = (publicDeriver) => ({
       publicDeriver,
+      mangledAmounts,
       getDelegatedBalance,
       getCurrentDelegation,
       rewardHistory,
@@ -738,7 +748,8 @@ export const JormungandrDelegationCases = (): Node => {
     }
     const computedDelegation = getStakingInfo(
       wallet.publicDeriver,
-      getStakingKeyValue()
+      getStakingKeyValue(),
+      new BigNumber(0),
     );
     wallet.getDelegation = (_publicDeriver) => computedDelegation;
     const balance: CachedRequest<GetBalanceFunc> = new CachedRequest(_request => Promise.resolve(
@@ -792,7 +803,8 @@ export const AdaDelegationCases = (): Node => {
     }
     const computedDelegation = getStakingInfo(
       wallet.publicDeriver,
-      getStakingKeyValue()
+      getStakingKeyValue(),
+      new BigNumber(0),
     );
     wallet.getDelegation = (_publicDeriver) => computedDelegation;
     const balance: CachedRequest<GetBalanceFunc> = new CachedRequest(_request => Promise.resolve(
@@ -969,7 +981,8 @@ export const Errors = (): Node => {
     }
     const computedDelegation = getStakingInfo(
       wallet.publicDeriver,
-      stakingKeyCases.LongAgoDelegation
+      stakingKeyCases.LongAgoDelegation,
+      new BigNumber(0),
     );
 
     const errorCases = {
@@ -1040,7 +1053,8 @@ const genBaseJormungandrWallet = () => {
   }
   const computedDelegation = getStakingInfo(
     wallet.publicDeriver,
-    stakingKeyCases.LongAgoDelegation
+    stakingKeyCases.LongAgoDelegation,
+    new BigNumber(0),
   );
   wallet.getDelegation = (_publicDeriver) => computedDelegation;
   const balance: CachedRequest<GetBalanceFunc> = new CachedRequest(_request => Promise.resolve(
@@ -1069,7 +1083,8 @@ const genBaseAdaWallet = () => {
   }
   const computedDelegation = getStakingInfo(
     wallet.publicDeriver,
-    stakingKeyCases.LongAgoDelegation
+    stakingKeyCases.LongAgoDelegation,
+    new BigNumber(0),
   );
   wallet.getDelegation = (_publicDeriver) => computedDelegation;
   const computedAdaDelegation = getAdaStakingInfo(

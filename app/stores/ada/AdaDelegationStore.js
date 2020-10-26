@@ -37,6 +37,8 @@ import { isCardanoHaskell, getCardanoHaskellBaseConfig } from '../../api/ada/lib
 import type { DelegationRequests, } from '../toplevel/DelegationStore';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import type { GetRegistrationHistoryResponse, GetRegistrationHistoryFunc } from '../../api/ada/lib/storage/bridge/delegationUtils';
+import type { MangledAmountFunc } from '../stateless/mangledAddresses';
+import { getUnmangleAmounts } from '../stateless/mangledAddresses';
 
 export type AdaDelegationRequests = {|
   publicDeriver: PublicDeriver<>,
@@ -54,6 +56,7 @@ export default class AdaDelegationStore extends Store {
   ) => {
     this.stores.delegation.delegationRequests.push({
       publicDeriver,
+      mangledAmounts: new CachedRequest<MangledAmountFunc>(getUnmangleAmounts),
       getDelegatedBalance: new CachedRequest<GetDelegatedBalanceFunc>(getDelegatedBalance),
       getCurrentDelegation: new CachedRequest<GetCurrentDelegationFunc>(getCurrentDelegation),
       rewardHistory: new CachedRequest<RewardHistoryFunc>(async (address) => {
@@ -93,6 +96,10 @@ export default class AdaDelegationStore extends Store {
     if (delegationRequest == null) return;
 
     try {
+      await delegationRequest.mangledAmounts.execute({
+        publicDeriver,
+      }).promise;
+
       delegationRequest.getDelegatedBalance.reset();
       delegationRequest.getCurrentDelegation.reset();
       runInAction(() => {
