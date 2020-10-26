@@ -293,7 +293,7 @@
   "sidebar.settings": "Settings",
   "sidebar.transfer": "Claim / Transfer",
   "sidebar.wallets": "My wallets",
-  "testnet.shelley.label.message": "YOU ARE ON TESTNET NETWORK ({network}).",
+  "testnet.shelley.label.message": "YOU ARE ON TESTNET NETWORK.",
   "transfer.form.instructions.step1.text": "Θα χρειαστεί περίπου 1 λεπτό για επαναφορά του υπολοίπου σας. Στο επόμενο βήμα, θα σας παρουσιαστεί μία συναλλαγή που θα μεταφέρει όλα τα χρήματα σας. Παρακαλώ εξετάστε τις λεπτομέρειες συναλλαγής προσεκτικά. Θα χρειαστεί να πληρώσετε μία προδιαγεγραμμένη προμήθεια συναλλαγής στο δίκτυο του Cardano για να κάνετε τη συναλλαγή.",
   "transfer.form.masterkey.input.label": "Αντικλείδι (Master key) ",
   "transfer.instructions.attention.title.label": "Προσοχη",
