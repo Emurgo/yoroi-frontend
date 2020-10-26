@@ -293,7 +293,7 @@
   "sidebar.settings": "설정",
   "sidebar.transfer": "복구 / 전송",
   "sidebar.wallets": "내 지갑",
-  "testnet.shelley.label.message": "당신은 현재 테스트넷 네트워크 ({network})에 있습니다.",
+  "testnet.shelley.label.message": "YOU ARE ON TESTNET NETWORK.",
   "transfer.form.instructions.step1.text": "잔고가 복원될 때까지 1분 정도 소요됩니다. 복원 후, 다이달로스 지갑에서 요로이 지갑으로 모든 자금을 이동시키는 전송이 표시됩니다. 전송 상세내역을 신중히 확인해 주십시오. 전송을 하기 위해서는 카르다노의 네트워크 표준 전송 수수료 지불이 필요합니다.",
   "transfer.form.masterkey.input.label": "마스터키",
   "transfer.instructions.attention.title.label": "주의사항",
