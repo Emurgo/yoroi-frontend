@@ -1,7 +1,6 @@
 // @flow
 
 import { observable, action, } from 'mobx';
-import BigNumber from 'bignumber.js';
 import { find } from 'lodash';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import {

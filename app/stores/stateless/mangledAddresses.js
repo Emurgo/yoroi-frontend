@@ -1,7 +1,6 @@
 // @flow
 
 import BigNumber from 'bignumber.js';
-import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import {
   isCardanoHaskell,
   getCardanoHaskellBaseConfig,
