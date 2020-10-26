@@ -1041,7 +1041,9 @@ export const Errors = (): Node => {
 };
 
 // wallet we can reuse for multiple tests
-const genBaseJormungandrWallet = () => {
+const genBaseJormungandrWallet = (
+  canUnmangleAmount: BigNumber,
+) => {
   const wallet = genJormungandrSigningWalletWithCache();
   {
     const requests = wallet.getTimeCalcRequests(wallet.publicDeriver).requests;
@@ -1054,7 +1056,7 @@ const genBaseJormungandrWallet = () => {
   const computedDelegation = getStakingInfo(
     wallet.publicDeriver,
     stakingKeyCases.LongAgoDelegation,
-    new BigNumber(0),
+    canUnmangleAmount,
   );
   wallet.getDelegation = (_publicDeriver) => computedDelegation;
   const balance: CachedRequest<GetBalanceFunc> = new CachedRequest(_request => Promise.resolve(
@@ -1108,7 +1110,7 @@ const genBaseAdaWallet = () => {
 };
 
 export const LessThanExpected = (): Node => {
-  const wallet = genBaseJormungandrWallet();
+  const wallet = genBaseJormungandrWallet(new BigNumber(0));
   const lookup = walletLookup([wallet]);
   return wrapWallet(
     mockWalletProps({
@@ -1128,7 +1130,7 @@ export const LessThanExpected = (): Node => {
 };
 
 export const UnknownPool = (): Node => {
-  const wallet = genBaseJormungandrWallet();
+  const wallet = genBaseJormungandrWallet(new BigNumber(0));
 
   // setup a map that doesn't have the metadata for a pool (a private pool)
   const newMockPoolInfo = (network, poolId) => {
@@ -1157,7 +1159,7 @@ export const UnknownPool = (): Node => {
 };
 
 export const UndelegateExecuting = (): Node => {
-  const wallet = genBaseJormungandrWallet();
+  const wallet = genBaseJormungandrWallet(new BigNumber(0));
   const lookup = walletLookup([wallet]);
   return wrapWallet(
     mockWalletProps({
@@ -1192,7 +1194,7 @@ export const UndelegateExecuting = (): Node => {
 };
 
 export const UndelegateError = (): Node => {
-  const wallet = genBaseJormungandrWallet();
+  const wallet = genBaseJormungandrWallet(new BigNumber(0));
   const lookup = walletLookup([wallet]);
   return wrapWallet(
     mockWalletProps({
@@ -1227,7 +1229,7 @@ export const UndelegateError = (): Node => {
 };
 
 export const UndelegateDialogShown = (): Node => {
-  const wallet = genBaseJormungandrWallet();
+  const wallet = genBaseJormungandrWallet(new BigNumber(0));
   const lookup = walletLookup([wallet]);
   const errorCases = {
     NoError: 0,
@@ -1273,7 +1275,7 @@ export const UndelegateDialogShown = (): Node => {
 };
 
 export const Reputation = (): Node => {
-  const wallet = genBaseJormungandrWallet();
+  const wallet = genBaseJormungandrWallet(new BigNumber(0));
   const lookup = walletLookup([wallet]);
   const flagCases = {
     Forks: 1,
@@ -1342,35 +1344,43 @@ export const MangledDashboardWarning = (): Node => {
     mangledCases.CanUnmangleAll
   );
 
+  const mangleValues = {
+    canUnmangle: new BigNumber(1000000),
+    cannotUnmangle: new BigNumber(1),
+  };
   const addresses = (() => {
     if (mangledValue === mangledCases.CannotUnmangle) {
       return [{
         address: 'addr1sj045dheysyptfekdyqa508nuzdzmh82vkda9hcwqwysrja6d8d66f0cfsfk50hhuqjymr08drnm2kdf0r2337l6kl7mtm0z44vv4jexkqhz5w',
-        value: new BigNumber(1),
+        value: mangleValues.cannotUnmangle,
         type: CoreAddressTypes.JORMUNGANDR_GROUP,
       }];
     }
     if (mangledValue === mangledCases.CanUnmangleSome) {
       return [{
         address: 'addr1sj045dheysyptfekdyqa508nuzdzmh82vkda9hcwqwysrja6d8d66f0cfsfk50hhuqjymr08drnm2kdf0r2337l6kl7mtm0z44vv4jexkqhz5w',
-        value: new BigNumber(1),
+        value: mangleValues.cannotUnmangle,
         type: CoreAddressTypes.JORMUNGANDR_GROUP,
       }, {
         address: 'addr1sj045dheysyptfekdyqa508nuzdzmh82vkda9hcwqwysrja6d8d66f0cfsfk50hhuqjymr08drnm2kdf0r2337l6kl7mtm0z44vv4jexkqhz5w',
-        value: new BigNumber(1000000),
+        value: mangleValues.canUnmangle,
         type: CoreAddressTypes.JORMUNGANDR_GROUP,
       }];
     }
     if (mangledValue === mangledCases.CanUnmangleAll) {
       return [{
         address: 'addr1sj045dheysyptfekdyqa508nuzdzmh82vkda9hcwqwysrja6d8d66f0cfsfk50hhuqjymr08drnm2kdf0r2337l6kl7mtm0z44vv4jexkqhz5w',
-        value: new BigNumber(1000000),
+        value: mangleValues.canUnmangle,
         type: CoreAddressTypes.JORMUNGANDR_GROUP,
       }];
     }
     throw new Error(`Unhandled mangled case ${mangledValue}`);
   })();
-  const wallet = genBaseJormungandrWallet();
+  const wallet = genBaseJormungandrWallet(
+    mangledValue === mangledCases.CanUnmangleSome || mangledValue === mangledCases.CanUnmangleAll
+      ? mangleValues.canUnmangle
+      : new BigNumber(0)
+  );
   const lookup = walletLookup([wallet]);
   return wrapWallet(
     mockWalletProps({
@@ -1392,7 +1402,7 @@ export const MangledDashboardWarning = (): Node => {
 };
 
 export const UnmangleDialogLoading = (): Node => {
-  const wallet = genBaseJormungandrWallet();
+  const wallet = genBaseJormungandrWallet(new BigNumber(1000000));
   const lookup = walletLookup([wallet]);
   return wrapWallet(
     mockWalletProps({
@@ -1421,7 +1431,7 @@ export const UnmangleDialogLoading = (): Node => {
 };
 
 export const UnmangleDialogError = (): Node => {
-  const wallet = genBaseJormungandrWallet();
+  const wallet = genBaseJormungandrWallet(new BigNumber(1000000));
   const lookup = walletLookup([wallet]);
   return wrapWallet(
     mockWalletProps({
@@ -1450,7 +1460,7 @@ export const UnmangleDialogError = (): Node => {
 };
 
 export const UnmangleDialogConfirm = (): Node => {
-  const wallet = genBaseJormungandrWallet();
+  const wallet = genBaseJormungandrWallet(new BigNumber(1000000));
   const lookup = walletLookup([wallet]);
   const { tentativeTx } = genTentativeJormungandrTx();
   return wrapWallet(
