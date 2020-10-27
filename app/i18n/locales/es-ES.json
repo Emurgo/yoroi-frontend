@@ -293,7 +293,7 @@
   "sidebar.settings": "Configuración",
   "sidebar.transfer": "Reclamar / Transferir",
   "sidebar.wallets": "Mis billeteras",
-  "testnet.shelley.label.message": "YOU ARE ON TESTNET NETWORK.",
+  "testnet.shelley.label.message": "ESTÁS EN LA RED DE PRUEBA.",
   "transfer.form.instructions.step1.text": "Tardará aproximadamente 1 minuto en restablecer tu saldo. En el siguiente paso, se presentará una transacción que moverá todos tus fondos. Por favor, revisa los detalles de la transacción cuidadosamente. Para realizar dicha transacción, deberás pagar una comisión por transacción estándar en la red de Cardano.",
   "transfer.form.masterkey.input.label": "Clave Maestra",
   "transfer.instructions.attention.title.label": "Atención",
