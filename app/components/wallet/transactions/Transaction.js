@@ -682,12 +682,14 @@ export default class Transaction extends Component<Props, State> {
         return intl.formatMessage(shelleyCertificateKinds.StakeDelegation);
       case RustModule.WalletV4.CertificateKind.PoolRegistration:
         return intl.formatMessage(shelleyCertificateKinds.PoolRegistration);
+      case RustModule.WalletV4.CertificateKind.PoolRetirement:
+        return intl.formatMessage(shelleyCertificateKinds.PoolRetirement);
       case RustModule.WalletV4.CertificateKind.GenesisKeyDelegation:
         return intl.formatMessage(shelleyCertificateKinds.GenesisKeyDelegation);
       case RustModule.WalletV4.CertificateKind.MoveInstantaneousRewardsCert:
         return intl.formatMessage(shelleyCertificateKinds.MoveInstantaneousRewardsCert);
       default: {
-        throw new Error(`${nameof(this.jormungandrCertificateToText)} unexpected kind ${kind}`);
+        throw new Error(`${nameof(this.shelleyCertificateToText)} unexpected kind ${kind}`);
       }
     }
   }
