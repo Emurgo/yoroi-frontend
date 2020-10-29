@@ -403,7 +403,7 @@ async function importIndexedDB(client, importDir: string) {
     return;
   }
   await client.driver.executeAsyncScript((data, done) => {
-    window.yoroi.stores.loading.importLocalDatabase(
+    window.yoroi.stores.loading.importOldDatabase(
       data
     )
       .then(done)

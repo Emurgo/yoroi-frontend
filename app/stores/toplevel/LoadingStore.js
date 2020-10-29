@@ -98,7 +98,9 @@ export default class LoadingStore extends Store {
   importOldDatabase: (
     lf$lovefieldExport,
   ) => Promise<void> = async (data) => {
-    await importOldDb(data);
+    const db = this.loadPersistentDbRequest.result;
+    if (db == null) throw new Error(`${nameof(this.importOldDatabase)} db not loaded yet`);
+    await importOldDb(db, data);
     window.location.reload();
   }
 

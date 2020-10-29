@@ -35,9 +35,10 @@ import environment from '../../../../../environment';
 
 // global var from window.indexedDB
 declare var indexedDB: IDBFactory;
+const schemaName = 'yoroi-schema';
 
 const deleteDb = () => new Promise(resolve => {
-  const deleteRequest = indexedDB.deleteDatabase('yoroi-schema');
+  const deleteRequest = indexedDB.deleteDatabase(schemaName);
   deleteRequest.onsuccess = () => resolve();
   deleteRequest.onerror = () => resolve();
 });
@@ -131,23 +132,26 @@ export const loadLovefieldDB = async (
   return db;
 };
 
-const schemaName = 'yoroi-schema';
-
 /** deletes the old database and returns the new database to use */
 export async function importOldDb(
+  oldDb: lf$Database,
   data: lf$lovefieldExport,
 ): Promise<lf$Database> {
   // we need to delete the database before we import
   // because indexedDB uses schema versions
   // and you can't import an old schema.
-  await deleteDb();
+  console.log(1);
+  await oldDb.delete();
+  console.log(2);
   const schemaBuilder = schema.create(data.name, data.version);
+  console.log(3);
 
   const db = await schemaBuilder.connect({
     storeType: schema.DataStoreType.INDEXED_DB,
-    onUpgrade,
   });
+  console.log(4);
   await db.import(data);
+  console.log(5);
 
   return db;
 }
