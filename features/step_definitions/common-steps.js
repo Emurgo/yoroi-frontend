@@ -168,6 +168,10 @@ async function inputMnemonicForWallet(
   await customWorld.waitUntilText('.NavPlate_name', truncateLongName(walletName));
 }
 
+Then(/^I pause the test to debug$/, async function () {
+  await this.waitForElement('.element_that_does_not_exist');
+});
+
 Given(/^There is a Shelley wallet stored named ([^"]*)$/, async function (walletName) {
   const restoreInfo = testWallets[walletName];
   expect(restoreInfo).to.not.equal(undefined);
@@ -390,17 +394,21 @@ async function importLocalStorage(client, importDir: string) {
 
 async function importIndexedDB(client, importDir: string) {
   const indexedDBPath = `${importDir}/indexedDB.json`;
+
+  let indexedDBData;
   try {
-    const indexedDBData = fs.readFileSync(indexedDBPath).toString();
-    await client.driver.executeAsyncScript((data, done) => {
-      window.yoroi.api.common.importLocalDatabase(
-        window.yoroi.stores.loading.loadPersistentDbRequest.result,
-        data
-      )
-        .then(done)
-        .catch(err => done(err));
-    }, JSON.parse(indexedDBData));
-  } catch (e) {} // eslint-disable-line no-empty
+    // some tests check for behavior based on local storage only and don't require IndexedDb
+    indexedDBData = fs.readFileSync(indexedDBPath).toString();
+  } catch (e) {
+    return;
+  }
+  await client.driver.executeAsyncScript((data, done) => {
+    window.yoroi.stores.loading.importOldDatabase(
+      data
+    )
+      .then(done)
+      .catch(err => done(err));
+  }, JSON.parse(indexedDBData));
 }
 
 let capturedDbState = undefined;

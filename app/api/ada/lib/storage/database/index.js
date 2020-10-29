@@ -7,6 +7,7 @@ import {
 import type {
   lf$Database,
   lf$raw$BackStore,
+  lf$lovefieldExport,
 } from 'lovefield';
 import {
   getAllSchemaTables,
@@ -34,9 +35,10 @@ import environment from '../../../../../environment';
 
 // global var from window.indexedDB
 declare var indexedDB: IDBFactory;
+const schemaName = 'yoroi-schema';
 
 const deleteDb = () => new Promise(resolve => {
-  const deleteRequest = indexedDB.deleteDatabase('yoroi-schema');
+  const deleteRequest = indexedDB.deleteDatabase(schemaName);
   deleteRequest.onsuccess = () => resolve();
   deleteRequest.onerror = () => resolve();
 });
@@ -130,10 +132,28 @@ export const loadLovefieldDB = async (
   return db;
 };
 
+/** deletes the old database and returns the new database to use */
+export async function importOldDb(
+  oldDb: lf$Database,
+  data: lf$lovefieldExport,
+): Promise<lf$Database> {
+  // we need to delete the database before we import
+  // because indexedDB uses schema versions
+  // and you can't import an old schema.
+  await oldDb.delete();
+  const schemaBuilder = schema.create(data.name, data.version);
+
+  const db = await schemaBuilder.connect({
+    storeType: schema.DataStoreType.INDEXED_DB,
+  });
+  await db.import(data);
+
+  return db;
+}
+
 const populateAndCreate = async (
   storeType: $Values<typeof schema.DataStoreType>
 ): Promise<lf$Database> => {
-  const schemaName = 'yoroi-schema';
   const schemaVersion = 15;
   const schemaBuilder = schema.create(schemaName, schemaVersion);
 

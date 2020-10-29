@@ -46,6 +46,7 @@ export async function migrateToLatest(
   localStorageApi: LocalStorageApi,
   persistentDb: lf$Database,
 ): Promise<boolean> {
+  // recall: last launch was only added in Yoroi 1.4.0 and returns 0.0.0 before that
   let lastLaunchVersion = await localStorageApi.getLastLaunchVersion();
   Logger.info(`Starting migration for ${lastLaunchVersion}`);
   /**
