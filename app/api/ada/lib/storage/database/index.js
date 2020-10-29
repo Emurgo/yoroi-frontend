@@ -7,6 +7,7 @@ import {
 import type {
   lf$Database,
   lf$raw$BackStore,
+  lf$lovefieldExport,
 } from 'lovefield';
 import {
   getAllSchemaTables,
@@ -130,10 +131,30 @@ export const loadLovefieldDB = async (
   return db;
 };
 
+const schemaName = 'yoroi-schema';
+
+/** deletes the old database and returns the new database to use */
+export async function importOldDb(
+  data: lf$lovefieldExport,
+): Promise<lf$Database> {
+  // we need to delete the database before we import
+  // because indexedDB uses schema versions
+  // and you can't import an old schema.
+  await deleteDb();
+  const schemaBuilder = schema.create(data.name, data.version);
+
+  const db = await schemaBuilder.connect({
+    storeType: schema.DataStoreType.INDEXED_DB,
+    onUpgrade,
+  });
+  await db.import(data);
+
+  return db;
+}
+
 const populateAndCreate = async (
   storeType: $Values<typeof schema.DataStoreType>
 ): Promise<lf$Database> => {
-  const schemaName = 'yoroi-schema';
   const schemaVersion = 15;
   const schemaBuilder = schema.create(schemaName, schemaVersion);
 
@@ -179,7 +200,6 @@ async function onUpgrade(
   rawDb: lf$raw$BackStore,
 ): Promise<void> {
   const version = rawDb.getVersion();
-  console.log(`Starting IndexedDB migration for version ${version}`);
   if (version === 0) {
     // defaults to 0 when first time launching ever
     return;

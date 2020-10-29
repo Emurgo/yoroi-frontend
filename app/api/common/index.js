@@ -36,7 +36,6 @@ import type {
   GetBalanceRequest, GetBalanceResponse,
 } from './types';
 import LocalStorageApi from '../localStorage/index';
-import { clear } from '../ada/lib/storage/database/index';
 import type {
   IRenameFunc, IRenameRequest, IRenameResponse,
   IChangePasswordRequestFunc, IChangePasswordRequest, IChangePasswordResponse,
@@ -224,14 +223,6 @@ export default class CommonApi {
       localstorageApi,
       persistentDb,
     );
-  }
-
-  async importLocalDatabase(
-    db: lf$Database,
-    data: {...},
-  ): Promise<void> {
-    await clear(db);
-    await db.import(data);
   }
 
   async exportLocalDatabase(

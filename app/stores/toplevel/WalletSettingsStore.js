@@ -234,9 +234,13 @@ export default class WalletSettingsStore extends Store {
         : undefined
     }).promise;
     // note: it's possible some other function was waiting for a DB lock
-    // and so it may fail if it runs now since underlying data was deleted
-    // to avoid this causing an issue, we just refresh the page
+    //       and so it may fail if it runs now since underlying data was deleted
+    //       to avoid this causing an issue, we just refresh the page
     // note: redirect logic will handle going to the right page after reloading
+    // note: there is a slight gap between the removeWallet releasing the DB lock
+    //       and actually reloading the page.
+    //       theoretically, a crash could happen in between these
+    //       but the chance is low and we need to release the DB lock to commit the deletion
     window.location.reload();
   };
 }

@@ -1,5 +1,5 @@
 // @flow
-import type { lf$Database, } from 'lovefield';
+import type { lf$Database, lf$lovefieldExport, } from 'lovefield';
 import { schema, } from 'lovefield';
 import { action, observable, computed, when, runInAction } from 'mobx';
 import { pathToRegexp } from 'path-to-regexp';
@@ -16,13 +16,12 @@ import type { MigrationRequest } from '../../api';
 import { migrate } from '../../api';
 import { Logger, stringifyError } from '../../utils/logging';
 import { closeOtherInstances } from '../../utils/tabManager';
-import { loadLovefieldDB, } from '../../api/ada/lib/storage/database/index';
+import { loadLovefieldDB, importOldDb, } from '../../api/ada/lib/storage/database/index';
 import { tryAddressToKind } from '../../api/ada/lib/storage/bridge/utils';
 import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
 import { ApiOptions, getApiMeta } from '../../api/common/utils';
 import { isWithinSupply } from '../../utils/validations';
 import { networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
-
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 
 /** Load dependencies before launching the app */
@@ -94,6 +93,13 @@ export default class LoadingStore extends Store {
           });
         }
       });
+  }
+
+  importOldDatabase: (
+    lf$lovefieldExport,
+  ) => Promise<void> = async (data) => {
+    await importOldDb(data);
+    window.location.reload();
   }
 
   @computed get isLoading(): boolean {

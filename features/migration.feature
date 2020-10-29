@@ -28,7 +28,7 @@ Feature: Migration
     # make sure all major functionality work
     # even if user hasn't launched Yoroi since the very first version
     Given I import a snapshot named historical-versions/1_0_4/software
-    Then I select the most complex level simplest level
+    Then I select the most complex level
     Then I accept uri registration
     Then I should see the summary screen
     Then I should see a plate EDAO-9229
@@ -61,12 +61,13 @@ Feature: Migration
       | amount              | fee       |
       | 1.000000            | 0.168801  |
 
-  @it-116
-  Scenario: Upgrade from version that adds bip44 support (IT-116)
+  @it-140
+  Scenario: Upgrade from version that adds bip44 support (IT-140)
     Then I am on the language selection screen
     # make sure all major functionality work
     # even if user hasn't launched Yoroi since the very first version
     Given I import a snapshot named historical-versions/1_4_0/software
+    Then I select the most complex level
     Then I accept uri registration
     Then I should see the summary screen
     Then I should see a plate EDAO-9229

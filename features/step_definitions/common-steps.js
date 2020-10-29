@@ -403,12 +403,11 @@ async function importIndexedDB(client, importDir: string) {
     return;
   }
   await client.driver.executeAsyncScript((data, done) => {
-    window.yoroi.api.common.importLocalDatabase(
-      window.yoroi.stores.loading.loadPersitentDbRequest.result,
+    window.yoroi.stores.loading.importLocalDatabase(
       data
     )
       .then(done)
-      .catch(err => { console.log(err); throw err; });
+      .catch(err => done(err));
   }, JSON.parse(indexedDBData));
 }
 

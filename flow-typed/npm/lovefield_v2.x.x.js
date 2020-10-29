@@ -7,6 +7,11 @@
  */
 
 declare module 'lovefield' {
+  declare type lf$lovefieldExport = {|
+    name: string,
+    version: number,
+    tables: {| [key: string]: Array<Object> |},
+  |}
   declare var lf: typeof npm$namespace$lf;
 
   declare var npm$namespace$lf: {
@@ -111,8 +116,8 @@ declare module 'lovefield' {
     delete(): lf$query$Delete;
     declare(): Promise<Object>;
     getSchema(): lf$schema$Database;
-    import(data: Object): Promise<void>;
-    export(): Promise<Object>;
+    import(data: lf$lovefieldExport): Promise<void>;
+    export(): Promise<lf$lovefieldExport>;
     insertOrReplace(): lf$query$Insert;
     insert(): lf$query$Insert;
     observe(query: lf$query$Select, callback: Function): void;
