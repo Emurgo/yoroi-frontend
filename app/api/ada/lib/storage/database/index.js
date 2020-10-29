@@ -140,18 +140,13 @@ export async function importOldDb(
   // we need to delete the database before we import
   // because indexedDB uses schema versions
   // and you can't import an old schema.
-  console.log(1);
   await oldDb.delete();
-  console.log(2);
   const schemaBuilder = schema.create(data.name, data.version);
-  console.log(3);
 
   const db = await schemaBuilder.connect({
     storeType: schema.DataStoreType.INDEXED_DB,
   });
-  console.log(4);
   await db.import(data);
-  console.log(5);
 
   return db;
 }
