@@ -11,12 +11,22 @@ import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { genFilterSmallUtxo } from '../../api/ada/transactions/shelley/transactions';
 import type { IGetAllUtxosResponse } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import {
-  asGetAllUtxos,
+  asGetAllUtxos, asGetStakingKey,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import {
   PublicDeriver,
 } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import { BASE_MANGLED, GROUP_MANGLED } from './addressStores';
+import {
+  unwrapStakingKey as CardanoUnwrapStakingKey,
+} from '../../api/ada/lib/storage/bridge/utils';
+import {
+  addrContainsAccountKey,
+} from '../../api/ada/lib/storage/bridge/delegationUtils';
+import {
+  groupAddrContainsAccountKey,
+  unwrapStakingKey as JormungandrUnwrapStakingKey,
+} from '../../api/jormungandr/lib/storage/bridge/utils';
 
 export type MangledAmountsRequest = {|
   publicDeriver: PublicDeriver<>,
@@ -42,12 +52,35 @@ export async function getUnmangleAmounts(
   }
   const utxos = await withUtxos.getAllUtxos();
 
+  const withStakingKey = asGetStakingKey(request.publicDeriver);
+  if (withStakingKey == null) {
+    return {
+      canUnmangle: new BigNumber(0),
+      cannotUnmangle: new BigNumber(0),
+    };
+  }
+
+  const stakingKeyResp = await withStakingKey.getStakingKey();
+
   const network = request.publicDeriver.getParent().getNetworkInfo();
   if (isJormungandr(network)) {
     const config = getJormungandrBaseConfig(
       network
     ).reduce((acc, next) => Object.assign(acc, next), {});
+
+    const stakingKey = JormungandrUnwrapStakingKey(stakingKeyResp.addr.Hash);
+    const stakingKeyString = Buffer.from(stakingKey.as_bytes()).toString('hex');
+
     for (const utxo of utxos) {
+      // filter out addresses that contain your staking key
+      // since if it contains your key, it's not mangled
+      if (groupAddrContainsAccountKey(
+        utxo.address,
+        stakingKeyString,
+        false
+      )) {
+        continue;
+      }
       const value = new BigNumber(utxo.output.UtxoTransactionOutput.Amount);
       if (value.gt(config.LinearFee.coefficient)) {
         canUnmangle.push(value);
@@ -84,7 +117,19 @@ export async function getUnmangleAmounts(
       },
     });
 
+    const stakingKey = CardanoUnwrapStakingKey(stakingKeyResp.addr.Hash);
+
     for (const utxo of utxos) {
+      // filter out addresses that contain your staking key
+      // since if it contains your key, it's not mangled
+      if (addrContainsAccountKey(
+        utxo.address,
+        stakingKey,
+        false,
+      )) {
+        continue;
+      }
+
       const txIndex = utxo.output.Transaction.Ordinal;
       // only null for pending transactions, which shouldn't happen
       if (txIndex == null) throw new Error(`${nameof(getUnmangleAmounts)} unexpected pending tx`);
