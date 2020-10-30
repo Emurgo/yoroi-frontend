@@ -293,7 +293,7 @@
   "sidebar.settings": "Instellingen",
   "sidebar.transfer": "Claim / Overdracht",
   "sidebar.wallets": "Mijn Portemonnees",
-  "testnet.shelley.label.message": "YOU ARE ON TESTNET NETWORK.",
+  "testnet.shelley.label.message": "U bent op het TESTNET netwerk.",
   "transfer.form.instructions.step1.text": "Het kost ongeveer 1 minuut om uw balans te controleren. In de volgende stap wordt u een transactie getoond dat all uw fondsen zal verplaatsen. Controleer de gegevens van de transactie zorgvuldig. U dient een standaard transactievergoeding te betalen op het Cardano netwerk om de transactie uit te voeren.",
   "transfer.form.masterkey.input.label": "Hoofdsleutel",
   "transfer.instructions.attention.title.label": "Opletten",
