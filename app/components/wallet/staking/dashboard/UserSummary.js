@@ -32,7 +32,7 @@ const messages = defineMessages({
   },
   mangledPopupDialogLine1: {
     id: 'wallet.dashboard.summary.mangled.line1',
-    defaultMessage: '!!!Your wallet has {adaAmount} {ticker} with a different delegation preferences.',
+    defaultMessage: '!!!Your wallet has {adaAmount} {ticker} with a different delegation preference.',
   },
   canUnmangleLine: {
     id: 'wallet.dashboard.summary.mangled.can',
