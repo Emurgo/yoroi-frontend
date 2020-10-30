@@ -814,10 +814,20 @@ export default class StakingDashboardPage extends Component<Props> {
       }
       return 0;
     })();
+    const endEpoch = (() => {
+      if (isCardanoHaskell(request.publicDeriver.getParent().getNetworkInfo())) {
+        // TODO: -1 since cardano-db-sync doesn't expose this information for some reason
+        return request.currentEpoch - 1;
+      }
+      if (isJormungandr(request.publicDeriver.getParent().getNetworkInfo())) {
+        // note: reward history includes the current epoch
+        // since it tells you the reward you got at slot 0 of the new epoch
+        return request.currentEpoch + 1;
+      }
+      throw new Error(`${nameof(this._generateRewardGraphData)} can't compute endEpoch for rewards`);
+    })();
 
-    // note: reward history includes the current epoch
-    // since it tells you the reward you got at slot 0 of the new epoch
-    for (let i = startEpoch; i <= request.currentEpoch; i++) {
+    for (let i = startEpoch; i < endEpoch; i++) {
       if (historyIterator < history.length && i === history[historyIterator][0]) {
         // exists a reward for this epoch
         const nextReward = history[historyIterator][1];
