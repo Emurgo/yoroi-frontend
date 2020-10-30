@@ -2,7 +2,7 @@
   "api.errors.ApiMethodNotYetImplementedError": "Este método de API ainda não está implementado.",
   "api.errors.GenericApiError": "Ocorreu um erro. Por favor tente novamente mais tarde.",
   "api.errors.IncorrectPasswordError": "Senha incorreta",
-  "api.errors.NotEnoughMoneyToSendError": "Not enough funds to make this transaction.",
+  "api.errors.NotEnoughMoneyToSendError": "Saldo insuficiente para realizar essa transação.",
   "api.errors.PromiseNotCalledYetError": "Resultado acessado antes da conclusão da execução.",
   "api.errors.ReportRequestError": "Houve um problema ao enviar a solicitação para o suporte.",
   "api.errors.WalletAlreadyImportedError": "A carteira que você está tentando importar já existe.",
