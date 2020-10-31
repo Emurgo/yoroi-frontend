@@ -468,7 +468,7 @@
   "wallet.dashboard.summary.delegatedTitle": "Total Delegado",
   "wallet.dashboard.summary.mangled.can": "{adaAmount} {ticker} pode ser corrigido",
   "wallet.dashboard.summary.mangled.cannot": "{adaAmount} {ticker} não pode ser corrigido",
-  "wallet.dashboard.summary.mangled.line1": "Your wallet has {adaAmount} {ticker} with a different delegation preference.",
+  "wallet.dashboard.summary.mangled.line1": "Sua carteira tem {adaAmount} {ticker} com preferências de delegações diferentes.",
   "wallet.dashboard.summary.mangled.line2": "Nós recomendamos {transactionMessage} para delegar a {ticker}",
   "wallet.dashboard.summary.mangled.makeTx": "fazer uma transação",
   "wallet.dashboard.summary.note": "Menos do que o esperado?",
