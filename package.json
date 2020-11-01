@@ -79,7 +79,7 @@
     "@babel/runtime-corejs3": "7.11.2",
     "@emurgo/cardano-serialization-lib-nodejs": "4.2.0",
     "@emurgo/js-chain-libs-node": "0.7.1",
-    "@storybook/addon-actions": "5.3.19",
+    "@storybook/addon-actions": "6.0.28",
     "@storybook/addon-knobs": "5.3.19",
     "@storybook/addon-links": "5.3.19",
     "@storybook/addon-notes": "5.3.19",
