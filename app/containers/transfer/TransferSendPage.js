@@ -187,11 +187,13 @@ export default class TransferSendPage extends Component<Props> {
 
     const spendingPasswordForm = withSigning == null
       ? undefined
-      : (<SpendingPasswordInput
-        setForm={(form) => this.setSpendingPasswordForm(form)}
-        classicTheme={this.generated.stores.profile.isClassicTheme}
-        isSubmitting={this.generated.stores.wallets.sendMoneyRequest.isExecuting}
-      />);
+      : (
+        <SpendingPasswordInput
+          setForm={(form) => this.setSpendingPasswordForm(form)}
+          classicTheme={this.generated.stores.profile.isClassicTheme}
+          isSubmitting={this.generated.stores.wallets.sendMoneyRequest.isExecuting}
+        />
+      );
 
     const { intl } = this.context;
 
