@@ -72,10 +72,12 @@ export default class UpcomingRewards extends Component<Props> {
     const { intl } = this.context;
 
     const firstRewardWarning = this.props.showWarning
-      ? [<CustomTooltip
-        key="firstRewardWarning"
-        toolTip={<div>{intl.formatMessage(messages.firstRewardInfo)}</div>}
-      />]
+      ? [
+        <CustomTooltip
+          key="firstRewardWarning"
+          toolTip={<div>{intl.formatMessage(messages.firstRewardInfo)}</div>}
+        />
+      ]
       : [];
 
     const genUnregisteredWarning = (info: ?BoxInfo): Array<Node> => {

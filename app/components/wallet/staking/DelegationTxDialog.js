@@ -102,11 +102,13 @@ export default class DelegationTxDialog extends Component<Props> {
 
     const spendingPasswordForm = this.props.isHardware
       ? undefined
-      : (<SpendingPasswordInput
-        setForm={(form) => this.setSpendingPasswordForm(form)}
-        classicTheme={this.props.classicTheme}
-        isSubmitting={this.props.isSubmitting}
-      />);
+      : (
+        <SpendingPasswordInput
+          setForm={(form) => this.setSpendingPasswordForm(form)}
+          classicTheme={this.props.classicTheme}
+          isSubmitting={this.props.isSubmitting}
+        />
+      );
 
     const staleTxWarning = (
       <div className={styles.warningBox}>

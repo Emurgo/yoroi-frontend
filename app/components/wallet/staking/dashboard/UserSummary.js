@@ -299,15 +299,16 @@ export default class UserSummary extends Component<Props, State> {
     BigNumber,
     number
   ) => Node = (message, amount, decimalPlaces) => {
-    return (<FormattedMessage
-      {...message}
-      values={{
-        ticker: this.props.meta.primaryTicker,
-        adaAmount: amount
-          .shiftedBy(-decimalPlaces)
-          .toFormat(decimalPlaces),
-      }}
-    />
+    return (
+      <FormattedMessage
+        {...message}
+        values={{
+          ticker: this.props.meta.primaryTicker,
+          adaAmount: amount
+            .shiftedBy(-decimalPlaces)
+            .toFormat(decimalPlaces),
+        }}
+      />
     );
   }
 }
