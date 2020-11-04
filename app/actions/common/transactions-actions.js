@@ -1,6 +1,7 @@
 // @flow
 import { AsyncAction, Action, } from '../lib/Action';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import type { DelegationRequests } from '../../stores/toplevel/DelegationStore';
 
 // ======= TRANSACTIONS ACTIONS =======
 
@@ -11,6 +12,7 @@ export default class TransactionsActions {
   exportTransactionsToFile: AsyncAction<{|
     publicDeriver: PublicDeriver<>,
     exportRequest: TransactionRowsToExportRequest,
+    delegationRequests: DelegationRequests,
   |}> = new AsyncAction();
   closeExportTransactionDialog: Action<void> = new Action();
 }

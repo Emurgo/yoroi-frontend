@@ -853,6 +853,9 @@ export default class StakingDashboardPage extends Component<Props> {
         });
       }
     }
+    console.log(totalRewards);
+    console.log("*******");
+    console.log(perEpochRewards);
     return {
       totalRewards,
       perEpochRewards,

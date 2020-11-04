@@ -40,6 +40,7 @@ import type { TransactionRowsToExportRequest } from '../../actions/common/transa
 import { isWithinSupply } from '../../utils/validations';
 import globalMessages from '../../i18n/global-messages';
 import type { IHasLevels } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
+import { DelegationRequests } from './DelegationStore';
 
 export type TxRequests = {|
   publicDeriver: PublicDeriver<>,
@@ -413,6 +414,7 @@ export default class TransactionsStore extends Store {
   @action _exportTransactionsToFile: {|
     publicDeriver: PublicDeriver<>,
     exportRequest: TransactionRowsToExportRequest,
+    delegationRequests: DelegationRequests,
   |} => Promise<void> = async (request) => {
     try {
       this._setExporting(true);
@@ -426,6 +428,7 @@ export default class TransactionsStore extends Store {
       const continuation = await this.exportTransactionsToFile({
         publicDeriver: withLevels,
         exportRequest: request.exportRequest,
+        delegationRequests: request.delegationRequests,
       });
 
       /** Intentionally added delay to feel smooth flow */
@@ -469,6 +472,7 @@ export default class TransactionsStore extends Store {
   exportTransactionsToFile: {|
     publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels>,
     exportRequest: TransactionRowsToExportRequest,
+    delegationRequests: DelegationRequests,
   |} => Promise<void => Promise<void>> = async (request) => {
     const txStore = this.stores.transactions;
     const respTxRows = [];

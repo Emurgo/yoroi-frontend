@@ -34,6 +34,7 @@ import type { TransactionRowsToExportRequest } from '../../actions/common/transa
 import type { PriceDataRow } from '../../api/ada/lib/storage/database/prices/tables';
 import LocalizableError from '../../i18n/LocalizableError';
 import type { MemosForWallet } from '../../stores/toplevel/MemosStore';
+import type { DelegationRequests } from '../../stores/toplevel/DelegationStore';
 import type { PublicDeriverSettingsCache } from '../../stores/toplevel/WalletSettingsStore';
 import { SelectedExplorer } from '../../domain/SelectedExplorer';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
@@ -83,6 +84,9 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
       Logger.error('[WalletSummaryPage::render] Active wallet required');
       return null;
     }
+
+    const delegationStore = this.generated.stores.delegation;
+    const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
 
     const apiMeta = getApiMeta(
       getApiForNetwork(publicDeriver.getParent().getNetworkInfo())
@@ -230,7 +234,8 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
             error={exportError}
             submit={exportRequest => exportTransactionsToFile.trigger({
               exportRequest,
-              publicDeriver
+              publicDeriver,
+              delegationRequests,
             })}
             cancel={closeExportTransactionDialog.trigger}
           />
@@ -463,7 +468,12 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
           PublicDeriver<>
         ) => PublicDeriverSettingsCache
       |},
-      wallets: {| selected: null | PublicDeriver<> |}
+      wallets: {| selected: null | PublicDeriver<> |},
+      delegation: {|
+        getDelegationRequests: (
+          PublicDeriver<>
+        ) => (void | DelegationRequests),
+      |},
     |}
     |} {
     if (this.props.generated !== undefined) {
@@ -524,6 +534,9 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
         },
         walletSettings: {
           getPublicDeriverSettingsCache: stores.walletSettings.getPublicDeriverSettingsCache,
+        },
+        delegation: {
+          getDelegationRequests: stores.delegation.getDelegationRequests,
         },
       },
       actions: {
