@@ -41,7 +41,7 @@ import { isWithinSupply } from '../../utils/validations';
 import globalMessages from '../../i18n/global-messages';
 import type { IHasLevels } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import * as timeUtils from '../../api/ada/lib/storage/bridge/timeUtils';
-import {getCardanoHaskellBaseConfig} from '../../api/ada/lib/storage/database/prepackaged/networks'
+import { getCardanoHaskellBaseConfig, isCardanoHaskell } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 
 export type TxRequests = {|
@@ -473,7 +473,7 @@ export default class TransactionsStore extends Store {
     exportRequest: TransactionRowsToExportRequest,
   |} => Promise<void => Promise<void>> = async (request) => {
     const txStore = this.stores.transactions;
-    const respTxRows = [];
+    let respTxRows = [];
 
     const apiType = getApiForNetwork(request.publicDeriver.getParent().getNetworkInfo());
     const delegationStore = this.stores.delegation;
@@ -488,9 +488,12 @@ export default class TransactionsStore extends Store {
         ...request.exportRequest,
       });
 
-      if (delegationRequests) {
+      /**
+       * NOTE: The rewards export currently supports only Haskell Shelley
+       */
+      if (isCardanoHaskell(selectedNetwork) && delegationRequests) {
         const rewards = await delegationRequests.rewardHistory.promise;
-        if(rewards != null){
+        if (rewards != null) {
           const apiMeta = getApiMeta(
             getApiForNetwork(selectedNetwork)
           )?.meta;
@@ -501,8 +504,7 @@ export default class TransactionsStore extends Store {
           const absSlotFunc = await timeUtils.genToAbsoluteSlotNumber(fullConfig);
           const timeSinceGenFunc = await timeUtils.genTimeSinceGenesis(fullConfig);
           const realTimeFunc = await timeUtils.genToRealTime(fullConfig);
-          
-          const rewardRows = rewards.map(item=>{
+          const rewardRows = rewards.map(item => {
             const absSlot = absSlotFunc({
               epoch: item[0],
               slot: 0
@@ -510,21 +512,25 @@ export default class TransactionsStore extends Store {
             const epochStartDate = realTimeFunc({
               absoluteSlotNum: absSlot,
               timeSinceGenesisFunc: timeSinceGenFunc
-            })
+            });
             return {
               type: 'in',
               amount: item[1].div(amountPerUnit).toString(),
               fee: '0',
-              date: epochStartDate
-            }
-           }
-          )
+              date: epochStartDate,
+              comment: 'Staking Reward'
+            };
+          });
           respTxRows.push(...rewardRows);
         }
       }
 
       respTxRows.push(...rows);
     }).promise;
+
+    respTxRows = respTxRows.sort((a, b) => {
+      return b.date - a.date;
+    });
 
     if (respTxRows.length < 1) {
       throw new LocalizableError(globalMessages.noTransactionsFound);
