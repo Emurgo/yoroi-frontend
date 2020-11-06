@@ -518,7 +518,7 @@ export default class TransactionsStore extends Store {
               amount: item[1].div(amountPerUnit).toString(),
               fee: '0',
               date: epochStartDate,
-              comment: 'Staking Reward'
+              comment: `Staking Reward Epoch ${item[0]}`
             };
           });
           respTxRows.push(...rewardRows);
