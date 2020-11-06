@@ -10,7 +10,7 @@ module.exports = {
       legacyDecorators: true
     }
   },
-  extends: 'airbnb',
+  extends: ['airbnb', 'prettier'],
   env: {
     browser: true,
     mocha: true,
@@ -89,7 +89,7 @@ module.exports = {
     'prefer-const': 1,
     'object-curly-spacing': 1,
     'spaced-comment': 1,
-    quotes: ['error', 'single', {avoidEscape: true, allowTemplateLiterals: true}],
+    quotes: ['error', 'single', { avoidEscape: true, allowTemplateLiterals: true }],
     'import/imports-first': 1,
     'react/jsx-indent': 1,
     'flowtype/define-flow-type': 1,
@@ -113,7 +113,8 @@ module.exports = {
     'promise',
     'react',
     'flowtype',
-    'no-floating-promise'
+    'no-floating-promise',
+    'prettier'
   ],
   globals: {
     chrome: true,
