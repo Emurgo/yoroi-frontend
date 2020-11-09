@@ -40,6 +40,9 @@ import type { TransactionRowsToExportRequest } from '../../actions/common/transa
 import { isWithinSupply } from '../../utils/validations';
 import globalMessages from '../../i18n/global-messages';
 import type { IHasLevels } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
+import * as timeUtils from '../../api/ada/lib/storage/bridge/timeUtils';
+import { getCardanoHaskellBaseConfig, isCardanoHaskell } from '../../api/ada/lib/storage/database/prepackaged/networks';
+
 
 export type TxRequests = {|
   publicDeriver: PublicDeriver<>,
@@ -420,13 +423,12 @@ export default class TransactionsStore extends Store {
       this.getTransactionRowsToExportRequest.reset();
       this.exportTransactions.reset();
 
-      const withLevels = asHasLevels<ConceptualWallet>(request.publicDeriver);
-      if (!withLevels) return;
-
       const continuation = await this.exportTransactionsToFile({
-        publicDeriver: withLevels,
+        publicDeriver: request.publicDeriver,
         exportRequest: request.exportRequest,
       });
+
+
 
       /** Intentionally added delay to feel smooth flow */
       setTimeout(async () => {
@@ -467,21 +469,68 @@ export default class TransactionsStore extends Store {
   }
 
   exportTransactionsToFile: {|
-    publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels>,
+    publicDeriver: PublicDeriver<ConceptualWallet>,
     exportRequest: TransactionRowsToExportRequest,
   |} => Promise<void => Promise<void>> = async (request) => {
     const txStore = this.stores.transactions;
-    const respTxRows = [];
+    let respTxRows = [];
 
     const apiType = getApiForNetwork(request.publicDeriver.getParent().getNetworkInfo());
+    const delegationStore = this.stores.delegation;
+    const delegationRequests = delegationStore.getDelegationRequests(request.publicDeriver);
 
     await txStore.getTransactionRowsToExportRequest.execute(async () => {
+      const selectedNetwork = request.publicDeriver.getParent().getNetworkInfo();
+      const withLevels = asHasLevels<ConceptualWallet>(request.publicDeriver);
+      if (!withLevels) return;
       const rows = await this.api[apiType].getTransactionRowsToExport({
-        publicDeriver: request.publicDeriver,
+        publicDeriver: withLevels,
         ...request.exportRequest,
       });
+
+      /**
+       * NOTE: The rewards export currently supports only Haskell Shelley
+       */
+      if (isCardanoHaskell(selectedNetwork) && delegationRequests) {
+        const rewards = await delegationRequests.rewardHistory.promise;
+        if (rewards != null) {
+          const apiMeta = getApiMeta(
+            getApiForNetwork(selectedNetwork)
+          )?.meta;
+          if (apiMeta == null) throw new Error(`${nameof(TransactionsStore)} no API selected`);
+          const amountPerUnit = new BigNumber(10).pow(apiMeta.decimalPlaces);
+          const fullConfig = getCardanoHaskellBaseConfig(selectedNetwork);
+
+          const absSlotFunc = await timeUtils.genToAbsoluteSlotNumber(fullConfig);
+          const timeSinceGenFunc = await timeUtils.genTimeSinceGenesis(fullConfig);
+          const realTimeFunc = await timeUtils.genToRealTime(fullConfig);
+          const rewardRows = rewards.map(item => {
+            const absSlot = absSlotFunc({
+              epoch: item[0],
+              slot: 0
+            });
+            const epochStartDate = realTimeFunc({
+              absoluteSlotNum: absSlot,
+              timeSinceGenesisFunc: timeSinceGenFunc
+            });
+            return {
+              type: 'in',
+              amount: item[1].div(amountPerUnit).toString(),
+              fee: '0',
+              date: epochStartDate,
+              comment: `Staking Reward Epoch ${item[0]}`
+            };
+          });
+          respTxRows.push(...rewardRows);
+        }
+      }
+
       respTxRows.push(...rows);
     }).promise;
+
+    respTxRows = respTxRows.sort((a, b) => {
+      return b.date - a.date;
+    });
 
     if (respTxRows.length < 1) {
       throw new LocalizableError(globalMessages.noTransactionsFound);

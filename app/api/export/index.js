@@ -19,6 +19,7 @@ export type TransactionExportRow = {|
   amount: string,
   fee: string,
   date: Date,
+  comment?: string
 |}
 
 export type CsvData = {|
@@ -167,7 +168,7 @@ function _formatExportRowsIntoCoinTrackingFormat(
       r.type === 'out' ? ticker : '',
       '',
       '',
-      '',
+      r.comment != null ? r.comment : '',
       moment(r.date).format('YYYY-MM-DD HH:mm:ss')
     ])
   };

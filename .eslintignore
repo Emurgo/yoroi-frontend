@@ -1,2 +1,3 @@
-
+node_modules
 /chrome/content-scripts
+flow-typed

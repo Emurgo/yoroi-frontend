@@ -176,6 +176,9 @@ export const Loading = (): Node => {
             isExporting: false,
             exportError: undefined,
           },
+          delegation: {
+            getDelegationRequests: lookup.getDelegation,
+          },
           walletSettings: {
             getPublicDeriverSettingsCache: lookup.getPublicDeriverSettingsCache,
           },
@@ -310,6 +313,9 @@ const genPropsForTransactions: {|
   },
   walletSettings: {
     getPublicDeriverSettingsCache: request.getPublicDeriverSettingsCache,
+  },
+  delegation: {
+    getDelegationRequests: request.wallet.getDelegation,
   },
 });
 
