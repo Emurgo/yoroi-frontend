@@ -7,6 +7,8 @@ import { intlShape, FormattedHTMLMessage } from 'react-intl';
 import { ROUTES } from '../../routes-config';
 import type { Notification } from '../../types/notificationType';
 import NotificationMessage from '../../components/widgets/NotificationMessage';
+import Dialog from '../../components/widgets/Dialog';
+import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import globalMessages from '../../i18n/global-messages';
 import successIcon from '../../assets/images/success-small.inline.svg';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
@@ -34,6 +36,7 @@ import type { TransactionRowsToExportRequest } from '../../actions/common/transa
 import type { PriceDataRow } from '../../api/ada/lib/storage/database/prices/tables';
 import LocalizableError from '../../i18n/LocalizableError';
 import type { MemosForWallet } from '../../stores/toplevel/MemosStore';
+import type { DelegationRequests } from '../../stores/toplevel/DelegationStore';
 import type { PublicDeriverSettingsCache } from '../../stores/toplevel/WalletSettingsStore';
 import { SelectedExplorer } from '../../domain/SelectedExplorer';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
@@ -187,6 +190,35 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
 
     const notification = this._getThisPageActiveNotification();
 
+    let exportDialog;
+
+    const delegationStore = this.generated.stores.delegation;
+    const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
+
+    if(!this.readyToExportHistory({ delegationRequests, publicDeriver })){
+      exportDialog = (
+        <Dialog
+          title={intl.formatMessage(globalMessages.processingLabel)}
+          closeOnOverlayClick={false}
+        >
+          <VerticalFlexContainer>
+            <LoadingSpinner />
+          </VerticalFlexContainer>
+        </Dialog>)
+    }else{
+      exportDialog = (
+        <ExportTransactionDialog
+          isActionProcessing={isExporting}
+          error={exportError}
+          submit={exportRequest => exportTransactionsToFile.trigger({
+            exportRequest,
+            publicDeriver
+          })}
+          cancel={closeExportTransactionDialog.trigger}
+        />
+      )
+    }
+
     return (
       <VerticalFlexContainer>
 
@@ -225,15 +257,7 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
         {walletTransactions}
 
         {uiDialogs.isOpen(ExportTransactionDialog) ? (
-          <ExportTransactionDialog
-            isActionProcessing={isExporting}
-            error={exportError}
-            submit={exportRequest => exportTransactionsToFile.trigger({
-              exportRequest,
-              publicDeriver
-            })}
-            cancel={closeExportTransactionDialog.trigger}
-          />
+          exportDialog
         ) : null}
 
         {uiDialogs.isOpen(AddMemoDialog) ? (
@@ -351,6 +375,23 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
     actions.dialogs.push.trigger({ dialog: DeleteMemoDialog });
   }
 
+  readyToExportHistory: {|
+    delegationRequests: DelegationRequests | null,
+    publicDeriver: PublicDeriver<>,
+  |} => (boolean) = (
+    request
+  ) => {
+    if(request.delegationRequests == null){
+      // there aren't supposed to be any rewards
+      return true;
+    }
+    const history = request.delegationRequests.rewardHistory.result;
+    if(history !== null) {
+      return true;
+    }
+    return false;
+  }
+
   @computed get generated(): {|
     actions: {|
       dialogs: {|
@@ -463,7 +504,12 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
           PublicDeriver<>
         ) => PublicDeriverSettingsCache
       |},
-      wallets: {| selected: null | PublicDeriver<> |}
+      wallets: {| selected: null | PublicDeriver<> |},
+      delegation: {|
+        getDelegationRequests: (
+          PublicDeriver<>
+        ) => (void | DelegationRequests),
+      |},
     |}
     |} {
     if (this.props.generated !== undefined) {
@@ -525,6 +571,9 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
         walletSettings: {
           getPublicDeriverSettingsCache: stores.walletSettings.getPublicDeriverSettingsCache,
         },
+        delegation: {
+          getDelegationRequests: stores.delegation.getDelegationRequests,
+        }
       },
       actions: {
         notifications: {
