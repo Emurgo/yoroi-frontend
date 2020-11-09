@@ -8,7 +8,7 @@ import type { NetworkRow } from '../database/primitives/tables';
 import { isJormungandr, isCardanoHaskell, isErgo } from '../database/prepackaged/networks';
 import { defineMessages, } from 'react-intl';
 import type { $npm$ReactIntl$MessageDescriptor, } from 'react-intl';
-import { Address, AddressKind } from '@coinbarn/ergo-ts';
+import { AddressKind } from '@coinbarn/ergo-ts';
 
 export function tryAddressToKind(
   address: string,
