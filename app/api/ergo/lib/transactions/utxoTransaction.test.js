@@ -41,7 +41,8 @@ import { decode, } from 'bs58';
 import { ErgoTxSignRequest } from './ErgoTxSignRequest';
 import { derivePath } from '../../../common/lib/crypto/keys/keyRepository';
 import { generateWalletRootKey } from '../crypto/wallet';
-import { Address as ErgoAddress, verify, Serializer } from '@coinbarn/ergo-ts';
+import { verify, Serializer } from '@coinbarn/ergo-ts';
+import { RustModule } from '../../../ada/lib/cardanoCrypto/rustLoader';
 
 const network = networks.ErgoMainnet;
 
@@ -53,7 +54,9 @@ const genSampleUtxos: void => Array<RemoteUnspentOutput> = () => [
     tx_index: 0,
     creationHeight: 1,
     boxId: '05ec4a4a7f4645fa66886cef2e34706907a3a7f9d88e0d48b313ad2cdf76fb5f0',
-    ergoTree: ErgoAddress.fromBase58('9egNKTzQDH658qcdiPEoQfVM1SBxQNxnyF8BCw57aNWerRhhHBQ').ergoTree,
+    ergoTree: Buffer.from(RustModule.SigmaRust.Address.from_base58(
+      '9egNKTzQDH658qcdiPEoQfVM1SBxQNxnyF8BCw57aNWerRhhHBQ'
+    ).to_ergo_tree().to_bytes()).toString('hex'),
   },
   {
     amount: '1000001',
@@ -62,7 +65,9 @@ const genSampleUtxos: void => Array<RemoteUnspentOutput> = () => [
     tx_index: 0,
     creationHeight: 2,
     boxId: '6930f123df83e4178b0324ae617b2028c0b38c6ff4660583a2abf1f7b08195fe0',
-    ergoTree: ErgoAddress.fromBase58('9egNKTzQDH658qcdiPEoQfVM1SBxQNxnyF8BCw57aNWerRhhHBQ').ergoTree,
+    ergoTree: Buffer.from(RustModule.SigmaRust.Address.from_base58(
+      '9egNKTzQDH658qcdiPEoQfVM1SBxQNxnyF8BCw57aNWerRhhHBQ'
+    ).to_ergo_tree().to_bytes()).toString('hex'),
   },
   {
     amount: '10000001',
@@ -71,7 +76,9 @@ const genSampleUtxos: void => Array<RemoteUnspentOutput> = () => [
     tx_index: 0,
     creationHeight: 3,
     boxId: '0df0273e382739f8b4ae3783d81168093e78e0b48ec2c5430ff03d444806a1730',
-    ergoTree: ErgoAddress.fromBase58('9iEqML45XncjkVtkrMFysY6qdKWhJs6fd3BNy7ExAVhTsaZemdF').ergoTree,
+    ergoTree: Buffer.from(RustModule.SigmaRust.Address.from_base58(
+      '9iEqML45XncjkVtkrMFysY6qdKWhJs6fd3BNy7ExAVhTsaZemdF'
+    ).to_ergo_tree().to_bytes()).toString('hex'),
   },
   {
     amount: '20000000',
@@ -80,7 +87,9 @@ const genSampleUtxos: void => Array<RemoteUnspentOutput> = () => [
     tx_index: 0,
     creationHeight: 4,
     boxId: '0df0273e382739f8b4ae3783d81168093e78e0b48ec2c5430ff04d444806a1730',
-    ergoTree: ErgoAddress.fromBase58('9hkTdcLcWqQxYQ3qexRb7MpZniDusrUr6R2Hp48cJU6H4Npq6jC').ergoTree,
+    ergoTree: Buffer.from(RustModule.SigmaRust.Address.from_base58(
+      '9hkTdcLcWqQxYQ3qexRb7MpZniDusrUr6R2Hp48cJU6H4Npq6jC'
+    ).to_ergo_tree().to_bytes()).toString('hex'),
     assets: [{
       tokenId: '13d24a67432d447e53118d920100c747abb52da8da646bc193f03b47b64a8ac5',
       amount: 10000,
@@ -133,6 +142,7 @@ const genAddressedUtxos: void => Array<ErgoAddressedUtxo> = () => {
 };
 
 beforeAll(async () => {
+  await RustModule.load();
   await loadLovefieldDB(schema.DataStoreType.MEMORY);
 });
 

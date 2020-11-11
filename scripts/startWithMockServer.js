@@ -38,7 +38,6 @@ RustModule._wasmv2 = wasmv2;
 RustModule._wasmv3 = wasmv3;
 // $FlowExpectedError[incompatible-type] nodejs & browser API have same interface so it's okay
 RustModule._wasmv4 = wasmv4;
-// $FlowExpectedError[incompatible-type] nodejs & browser API have same interface so it's okay
 RustModule._ergo = ergo;
 
 const { getMockServer } = require('../features/mock-chain/mockCardanoServer');

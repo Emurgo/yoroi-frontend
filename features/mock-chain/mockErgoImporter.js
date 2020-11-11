@@ -8,7 +8,6 @@ import type {
   HistoryFunc,
   BestBlockFunc,
 } from '../../app/api/ergo/lib/state-fetch/types';
-import { Address as ErgoAddress } from '@coinbarn/ergo-ts';
 import {
   getErgoAddress,
   genGetTransactionsHistoryForAddresses,
@@ -29,6 +28,7 @@ import type {
   FilterFunc,
 } from '../../app/api/common/lib/state-fetch/currencySpecificTypes';
 import { networks } from '../../app/api/ada/lib/storage/database/prepackaged/networks';
+import { RustModule } from '../../app/api/ada/lib/cardanoCrypto/rustLoader';
 
 // based on abandon x 14 + share
 const genesisTransaction = '7d4b41a1256f93989aa7e1782989dbbb9ec222c3f6b98e216b676c589b5ecece';
@@ -69,7 +69,7 @@ export const generateTransaction = (): {|
         address,
         assets: [],
         creationHeight: height,
-        ergoTree: ErgoAddress.fromBase58(address).ergoTree,
+        ergoTree: Buffer.from(RustModule.SigmaRust.Address.from_base58(address).to_ergo_tree().to_bytes()).toString('hex'),
         id: '33a35e15ae1a83fa188673a2bd53007b07e119a0eaaf40b890b2081c2864f12a',
         txId: hash,
         index: 0,
@@ -116,12 +116,10 @@ export const generateTransaction = (): {|
         {
           // index: 0
           additionalRegisters: Object.freeze({}),
-          address: address.address,
+          address: address.to_base58(),
           assets: [],
           creationHeight: height,
-          ergoTree: ErgoAddress.fromBase58(
-            genesisTxReceiver
-          ).ergoTree,
+          ergoTree: Buffer.from(RustModule.SigmaRust.Address.from_base58(genesisTxReceiver).to_ergo_tree().to_bytes()).toString('hex'),
           id: '33a35e15af1a83fa188673a2bd63007b07e119a0eaaf40b890b2081c2864f12a',
           txId: hash,
           index: 0,

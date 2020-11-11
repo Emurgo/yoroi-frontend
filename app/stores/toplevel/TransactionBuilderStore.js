@@ -19,7 +19,7 @@ import {
 import {
   genTimeToSlot,
 } from '../../api/ada/lib/storage/bridge/timeUtils';
-import { feeValue } from '@coinbarn/ergo-ts';
+import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 
 export type SetupSelfTxRequest = {|
   publicDeriver: IHasUtxoChains,
@@ -227,7 +227,9 @@ export default class TransactionBuilderStore extends Store {
     } else if (isErgo(network)) {
       const lastSync = this.stores.transactions.getTxRequests(publicDeriver).lastSyncInfo;
 
-      const txFee = new BigNumber(feeValue).plus(100000); // slightly higher than default fee
+      const txFee = new BigNumber(
+        RustModule.SigmaRust.BoxValue.SAFE_USER_MIN().as_i64().to_str()
+      ).plus(100000); // slightly higher than default fee
 
       if (amount == null && shouldSendAll === true) {
         await this.createUnsignedTx.execute(() => this.api.ergo.createUnsignedTx({

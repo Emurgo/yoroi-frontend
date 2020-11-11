@@ -10,12 +10,13 @@ import {
 } from '../../../../config/numbersConfig';
 import { walletChecksum, } from '@emurgo/cip4-js';
 import type { PlateResponse } from '../../../common/lib/crypto/plate';
-import { Address, } from '@coinbarn/ergo-ts';
+import { RustModule } from '../../../ada/lib/cardanoCrypto/rustLoader';
 
 export const generateErgoPlate = (
   rootPk: BIP32PrivateKey,
   accountIndex: number,
   count: number,
+  network: $Values<typeof RustModule.SigmaRust.NetworkPrefix>,
 ): PlateResponse => {
   const chainKey = derivePath(
     rootPk,
@@ -33,13 +34,14 @@ export const generateErgoPlate = (
 
   const baseAddressGen = ergoGenAddressBatchFunc(
     chainKey.key,
+    network,
   );
   const generateAddressFunc = (indices: Array<number>) => (
     baseAddressGen(indices)
-      .map(addrBytes => Address.fromBytes(
+      .map(addrBytes => RustModule.SigmaRust.NetworkAddress.from_bytes(
         Buffer.from(addrBytes, 'hex')
       ))
-      .map(addr => addr.address)
+      .map(addr => addr.to_base58())
   );
   const addresses = generateAddressFunc([...Array(count).keys()]);
   return { addresses, plate };

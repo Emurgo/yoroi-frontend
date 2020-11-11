@@ -97,6 +97,7 @@ import type {
 } from '../../../../common/lib/storage/bridge/hashMapper';
 import { ERGO_STABLE_SIZE } from '../../../../../config/numbersConfig';
 import { RollbackApiError } from '../../../../common/errors';
+import { RustModule } from '../../../../ada/lib/cardanoCrypto/rustLoader';
 import { getFromUserPerspective, } from '../../../../ada/transactions/utils';
 
 import type {
@@ -105,7 +106,6 @@ import type {
 import type {
   FilterFunc,
 } from '../../../../common/lib/state-fetch/currencySpecificTypes';
-import { Address } from '@coinbarn/ergo-ts';
 import { getErgoBaseConfig, } from '../../../../ada/lib/storage/database/prepackaged/networks';
 
 async function rawGetAllTxIds(
@@ -232,9 +232,9 @@ export async function rawGetTransactions(
   const config = getErgoBaseConfig(network)
     .reduce((acc, next) => Object.assign(acc, next), {});
 
-  const feeErgoTree = Address.fromBytes(
+  const feeErgoTree = Buffer.from(RustModule.SigmaRust.Address.from_bytes(
     Buffer.from(config.FeeAddress, 'hex')
-  ).ergoTree;
+  ).to_ergo_tree().to_bytes()).toString('hex');
   const result = txsWithIOs.map((tx: ErgoTxIO) => ({
     ...tx,
     block: blockMap.get(tx.transaction.TransactionId) || null,

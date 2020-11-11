@@ -20,20 +20,24 @@ import {
   generateWalletRootKey,
 } from '../crypto/wallet';
 import { derivePath } from '../../../common/lib/crypto/keys/keyRepository';
-import { Address } from '@coinbarn/ergo-ts';
 import { RollbackApiError, } from '../../../common/errors';
 import { getErgoBaseConfig } from '../../../ada/lib/storage/database/prepackaged/networks';
+import { RustModule } from '../../../ada/lib/cardanoCrypto/rustLoader';
 
+// note: this function assumes mainnet
 export function getErgoAddress(
   mnemonic: string,
   path: Array<number>,
-): Address {
+): RustModule.SigmaRust.NetworkAddress {
   const rootKey = generateWalletRootKey(mnemonic);
   const derivedKey = derivePath(rootKey, path);
 
   if (path[0] === WalletTypePurpose.BIP44) {
-    return Address.fromPk(
-      derivedKey.toPublic().key.publicKey.toString('hex')
+    return RustModule.SigmaRust.NetworkAddress.new(
+      RustModule.SigmaRust.NetworkPrefix.Mainnet,
+      RustModule.SigmaRust.Address.from_public_key(
+        derivedKey.toPublic().key.publicKey
+      )
     );
   }
   throw new Error('Unexpected purpose');
@@ -293,10 +297,12 @@ export function toRemoteErgoTx(
 
     mappedOutputs.push({
       additionalRegisters: output.additionalRegisters,
-      address: Address.fromErgoTree(
-        output.ergoTree,
+      address: RustModule.SigmaRust.NetworkAddress.new(
         (Number.parseInt(baseConfig.ChainNetworkId, 10): any),
-      ).address,
+        RustModule.SigmaRust.Address.new_p2pk(
+          RustModule.SigmaRust.ErgoTree.from_base16_bytes(output.ergoTree)
+        )
+      ).to_base58(),
       assets: output.assets ?? [],
       creationHeight: output.creationHeight,
       ergoTree: output.ergoTree,

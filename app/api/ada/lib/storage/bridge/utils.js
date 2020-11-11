@@ -8,7 +8,6 @@ import type { NetworkRow } from '../database/primitives/tables';
 import { isJormungandr, isCardanoHaskell, isErgo } from '../database/prepackaged/networks';
 import { defineMessages, } from 'react-intl';
 import type { $npm$ReactIntl$MessageDescriptor, } from 'react-intl';
-import { AddressKind } from '@coinbarn/ergo-ts';
 
 export function tryAddressToKind(
   address: string,
@@ -79,8 +78,8 @@ export function addressToKind(
     }
     if (isErgo(network)) {
       const ergoAddress = parseAs === 'bytes'
-        ? Address.fromBytes(Buffer.from(address, 'hex'))
-        : Address.fromBase58(address);
+        ? RustModule.SigmaRust.NetworkAddress.from_bytes(Buffer.from(address, 'hex'))
+        : RustModule.SigmaRust.NetworkAddress.from_base58(address);
       return ergoAddressToType(ergoAddress);
     }
     throw new Error(`${nameof(addressToKind)} not implemented for network ${network.NetworkId}`);
@@ -90,13 +89,13 @@ export function addressToKind(
 }
 
 export function ergoAddressToType(
-  address: Address,
+  address: RustModule.SigmaRust.NetworkAddress,
 ): CoreAddressT {
-  switch (address.getType()) {
-    case AddressKind.P2PK: return CoreAddressTypes.ERGO_P2PK;
-    case AddressKind.P2SH: return CoreAddressTypes.ERGO_P2SH;
-    case AddressKind.P2S: return CoreAddressTypes.ERGO_P2S;
-    default: throw new Error(`${nameof(ergoAddressToType)} unknown Ergo address type ${address.address}`);
+  switch (address.address().address_type_prefix()) {
+    case RustModule.SigmaRust.AddressTypePrefix.P2PK: return CoreAddressTypes.ERGO_P2PK;
+    case RustModule.SigmaRust.AddressTypePrefix.Pay2SH: return CoreAddressTypes.ERGO_P2SH;
+    case RustModule.SigmaRust.AddressTypePrefix.Pay2S: return CoreAddressTypes.ERGO_P2S;
+    default: throw new Error(`${nameof(ergoAddressToType)} unknown Ergo address type ${address.to_base58()}`);
   }
 }
 
@@ -374,10 +373,10 @@ export function addressToDisplayString(
       return byronAddr.to_base58();
     }
     if (isErgo(network)) {
-      const ergoAddr = Address.fromBytes(
+      const ergoAddr = RustModule.SigmaRust.NetworkAddress.from_bytes(
         Buffer.from(address, 'hex')
       );
-      return ergoAddr.address;
+      return ergoAddr.to_base58();
     }
     throw new Error(`${nameof(addressToDisplayString)} not implemented for network ${network.NetworkId}`);
   } catch (_e2) {
@@ -426,8 +425,8 @@ export function getAddressPayload(
       return byronAddr.to_base58();
     }
     if (isErgo(network)) {
-      const ergoAddr = new Address(address);
-      return ergoAddr.addrBytes.toString('hex');
+      const ergoAddr = RustModule.SigmaRust.NetworkAddress.from_base58(address);
+      return Buffer.from(ergoAddr.to_bytes()).toString('hex');
     }
     throw new Error(`${nameof(getAddressPayload)} not implemented for network ${network.NetworkId}`);
   } catch (_e2) {

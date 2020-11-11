@@ -12,12 +12,31 @@ declare module 'ergo-lib-wasm-browser' { // need to wrap flowgen output into mod
   */
 
   declare export var NonMandatoryRegisterId: {|
-    +R4: 0, // 0
-    +R5: 1, // 1
-    +R6: 2, // 2
-    +R7: 3, // 3
-    +R8: 4, // 4
-    +R9: 5, // 5
+    +R4: 4,
+    +R5: 5,
+    +R6: 6,
+    +R7: 7,
+    +R8: 8,
+    +R9: 9,
+  |};
+
+  /**
+  * Network type
+  */
+
+  declare export var NetworkPrefix: {|
+    +Mainnet: 0,
+    +Testnet: 16,
+  |};
+
+  /**
+  * Address types
+  */
+
+  declare export var AddressTypePrefix: {|
+    +P2PK: 1,
+    +Pay2SH: 2,
+    +Pay2S: 3,
   |};
 
   /**
@@ -67,11 +86,72 @@ declare module 'ergo-lib-wasm-browser' { // need to wrap flowgen output into mod
     free(): void;
 
     /**
+    * Create a P2PK address from an ergo tree if ProveDlog is the root of the tree, otherwise returns an error
+    * @param {ErgoTree} ergo_tree
+    * @returns {Address}
+    */
+    static new_p2pk(ergo_tree: ErgoTree): Address;
+
+    /**
     * Decode (base58) testnet address from string
     * @param {string} s
     * @returns {Address}
     */
     static from_testnet_str(s: string): Address;
+
+    /**
+    * Decode (base58) mainnet address from string
+    * @param {string} s
+    * @returns {Address}
+    */
+    static from_mainnet_str(s: string): Address;
+
+    /**
+    * Decode (base58) address from string without checking the network prefix
+    * @param {string} s
+    * @returns {Address}
+    */
+    static from_base58(s: string): Address;
+
+    /**
+    * Encode (base58) address
+    * @param {number} network_prefix
+    * @returns {string}
+    */
+    to_base58(network_prefix: number): string;
+
+    /**
+    * Decode from a serialized address (that includes the network prefix)
+    * @param {Uint8Array} data
+    * @returns {Address}
+    */
+    static from_bytes(data: Uint8Array): Address;
+
+    /**
+    * Encode address as serialized bytes (that includes the network prefix)
+    * @param {number} network_prefix
+    * @returns {Uint8Array}
+    */
+    to_bytes(network_prefix: number): Uint8Array;
+
+    /**
+    * Get the type of the address
+    * @returns {number}
+    */
+    address_type_prefix(): $Values<typeof AddressTypePrefix>;
+
+    /**
+    * Create an address from a public key
+    * @param {Uint8Array} bytes
+    * @returns {Address}
+    */
+    static from_public_key(bytes: Uint8Array): Address;
+
+    /**
+    * Creates an ErgoTree script from the address
+    * @returns {ErgoTree}
+    */
+    to_ergo_tree(): ErgoTree;
   }
   /**
   * Box id (32-byte digest)
@@ -266,6 +346,24 @@ declare module 'ergo-lib-wasm-browser' { // need to wrap flowgen output into mod
     box_id(): BoxId;
 
     /**
+    * Get box creation height
+    * @returns {number}
+    */
+    creation_height(): number;
+
+    /**
+    * Get tokens for box
+    * @returns {Tokens}
+    */
+    tokens(): Tokens;
+
+    /**
+    * Get ergo tree for box
+    * @returns {ErgoTree}
+    */
+    ergo_tree(): ErgoTree;
+
+    /**
     * Get box value in nanoERGs
     * @returns {BoxValue}
     */
@@ -412,6 +510,19 @@ declare module 'ergo-lib-wasm-browser' { // need to wrap flowgen output into mod
     * @param {ErgoBoxCandidate} box_candidate
     */
     constructor(box_candidate: ErgoBoxCandidate): this;
+
+    /**
+    * Returns the number of elements in the collection
+    * @returns {number}
+    */
+    len(): number;
+
+    /**
+    * Returns the element of the collection with a given index
+    * @param {number} index
+    * @returns {ErgoBoxCandidate}
+    */
+    get(index: number): ErgoBoxCandidate;
   }
   /**
   * Collection of ErgoBox'es
@@ -431,6 +542,12 @@ declare module 'ergo-lib-wasm-browser' { // need to wrap flowgen output into mod
     * @param {ErgoBox} b
     */
     constructor(b: ErgoBox): this;
+
+    /**
+    * Returns the number of elements in the collection
+    * @returns {number}
+    */
+    len(): number;
 
     /**
     * Add an element to the collection
@@ -458,6 +575,32 @@ declare module 'ergo-lib-wasm-browser' { // need to wrap flowgen output into mod
     static dummy(): ErgoStateContext;
   }
   /**
+  * The root of ErgoScript IR. Serialized instances of this class are self sufficient and can be passed around.
+  */
+  declare export class ErgoTree {
+    free(): void;
+
+    /**
+    * Decode from base16 encoded serialized ErgoTree
+    * @param {string} s
+    * @returns {ErgoTree}
+    */
+    static from_base16_bytes(s: string): ErgoTree;
+
+    /**
+    * Decode from encoded serialized ErgoTree
+    * @param {Uint8Array} data
+    * @returns {ErgoTree}
+    */
+    static from_bytes(data: Uint8Array): ErgoTree;
+
+    /**
+    * Encode Ergo tree as serialized bytes
+    * @returns {Uint8Array}
+    */
+    to_bytes(): Uint8Array;
+  }
+  /**
   * Wrapper for i64 for JS/TS
   */
   declare export class I64 {
@@ -481,6 +624,95 @@ declare module 'ergo-lib-wasm-browser' { // need to wrap flowgen output into mod
     * @returns {number}
     */
     as_num(): number;
+  }
+  /**
+  * Signed inputs used in signed transactions
+  */
+  declare export class Input {
+    free(): void;
+
+    /**
+    * Get box id
+    * @returns {BoxId}
+    */
+    box_id(): BoxId;
+  }
+  /**
+  * Collection of signed inputs
+  */
+  declare export class Inputs {
+    free(): void;
+
+    /**
+    * Create empty Inputs
+    */
+    constructor(): this;
+
+    /**
+    * Returns the number of elements in the collection
+    * @returns {number}
+    */
+    len(): number;
+
+    /**
+    * Returns the element of the collection with a given index
+    * @param {number} index
+    * @returns {Input}
+    */
+    get(index: number): Input;
+  }
+  /**
+  * Combination of an Address with a network
+  * These two combined together form a base58 encoding
+  */
+  declare export class NetworkAddress {
+    free(): void;
+
+    /**
+    * create a new AddressEncoder for a given network type
+    * @param {number} network
+    * @param {Address} address
+    * @returns {NetworkAddress}
+    */
+    static new(network: $Values<typeof NetworkPrefix>, address: Address): NetworkAddress;
+
+    /**
+    * Decode (base58) address from string without checking the network prefix
+    * @param {string} s
+    * @returns {NetworkAddress}
+    */
+    static from_base58(s: string): NetworkAddress;
+
+    /**
+    * Encode (base58) address
+    * @returns {string}
+    */
+    to_base58(): string;
+
+    /**
+    * Decode from a serialized address
+    * @param {Uint8Array} data
+    * @returns {NetworkAddress}
+    */
+    static from_bytes(data: Uint8Array): NetworkAddress;
+
+    /**
+    * Encode address as serialized bytes
+    * @returns {Uint8Array}
+    */
+    to_bytes(): Uint8Array;
+
+    /**
+    * Network for the address
+    * @returns {number}
+    */
+    network(): $Values<typeof NetworkPrefix>;
+
+    /**
+    * Get address without network information
+    * @returns {Address}
+    */
+    address(): Address;
   }
   /**
   * Secret key for the prover
@@ -514,7 +746,7 @@ declare module 'ergo-lib-wasm-browser' { // need to wrap flowgen output into mod
     free(): void;
 
     /**
-    * Create empty DataInputs
+    * Create empty SimpleBoxSelector
     */
     constructor(): this;
 
@@ -547,6 +779,18 @@ declare module 'ergo-lib-wasm-browser' { // need to wrap flowgen output into mod
     * @param {TokenAmount} amount
     */
     constructor(token_id: TokenId, amount: TokenAmount): this;
+
+    /**
+    * Get token id
+    * @returns {TokenId}
+    */
+    id(): TokenId;
+
+    /**
+    * Get token amount
+    * @returns {TokenAmount}
+    */
+    amount(): TokenAmount;
   }
   /**
   * Token amount with bound checks
@@ -631,10 +875,34 @@ declare module 'ergo-lib-wasm-browser' { // need to wrap flowgen output into mod
     free(): void;
 
     /**
+    * Get id for transaction
+    * @returns {TxId}
+    */
+    id(): TxId;
+
+    /**
     * JSON representation
     * @returns {any}
     */
     to_json(): any;
+
+    /**
+    * Inputs for transaction
+    * @returns {Inputs}
+    */
+    inputs(): Inputs;
+
+    /**
+    * Data inputs for transaction
+    * @returns {DataInputs}
+    */
+    data_inputs(): DataInputs;
+
+    /**
+    * Outputs for transaction
+    * @returns {ErgoBoxCandidates}
+    */
+    outputs(): ErgoBoxCandidates;
   }
   /**
   * Unsigned transaction builder
@@ -697,12 +965,78 @@ declare module 'ergo-lib-wasm-browser' { // need to wrap flowgen output into mod
     * @returns {TxId}
     */
     static zero(): TxId;
+
+    /**
+    * get the tx id as bytes
+    * @returns {string}
+    */
+    to_hex(): string;
+  }
+  /**
+  * Unsigned inputs used in constructing unsigned transactions
+  */
+  declare export class UnsignedInput {
+    free(): void;
+
+    /**
+    * Get box id
+    * @returns {BoxId}
+    */
+    box_id(): BoxId;
+  }
+  /**
+  * Collection of unsigned signed inputs
+  */
+  declare export class UnsignedInputs {
+    free(): void;
+
+    /**
+    * Create empty UnsignedInputs
+    */
+    constructor(): this;
+
+    /**
+    * Returns the number of elements in the collection
+    * @returns {number}
+    */
+    len(): number;
+
+    /**
+    * Returns the element of the collection with a given index
+    * @param {number} index
+    * @returns {UnsignedInput}
+    */
+    get(index: number): UnsignedInput;
   }
   /**
   * Unsigned (inputs without proofs) transaction
   */
   declare export class UnsignedTransaction {
     free(): void;
+
+    /**
+    * Get id for transaction
+    * @returns {TxId}
+    */
+    id(): TxId;
+
+    /**
+    * Inputs for transaction
+    * @returns {UnsignedInputs}
+    */
+    inputs(): UnsignedInputs;
+
+    /**
+    * Data inputs for transaction
+    * @returns {DataInputs}
+    */
+    data_inputs(): DataInputs;
+
+    /**
+    * Outputs for transaction
+    * @returns {ErgoBoxCandidates}
+    */
+    outputs(): ErgoBoxCandidates;
   }
   /**
   * TBD

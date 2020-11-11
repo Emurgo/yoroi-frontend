@@ -11,7 +11,6 @@ import {
   BIP44_SCAN_SIZE,
   ChainDerivations,
 } from '../../../../config/numbersConfig';
-import { Address } from '@coinbarn/ergo-ts';
 
 import { encryptWithPassword } from '../../../../utils/passwordCipher';
 
@@ -35,6 +34,7 @@ import { rawGenAddByHash } from '../../../common/lib/storage/bridge/hashMapper';
 import { addErgoP2PK } from '../restoration/scan';
 import { KeyKind } from '../../../common/lib/crypto/keys/types';
 import { derivePath, deriveKey, BIP32PublicKey, BIP32PrivateKey } from '../../../common/lib/crypto/keys/keyRepository';
+import { RustModule } from '../../../ada/lib/cardanoCrypto/rustLoader';
 
 // TODO: maybe move this inside walletBuilder somehow so it's all done in the same transaction
 /**
@@ -44,6 +44,7 @@ import { derivePath, deriveKey, BIP32PublicKey, BIP32PrivateKey } from '../../..
  */
 export async function getChainDefaultDerivations(
   bip32Account: BIP32PublicKey,
+  network: $Values<typeof RustModule.SigmaRust.NetworkPrefix>,
   addByHash: AddByHashFunc,
 ): Promise<TreeInsert<CanonicalAddressInsert>> {
   const addressesIndex = range(
@@ -52,12 +53,13 @@ export async function getChainDefaultDerivations(
   );
 
   const externalAddrs = addressesIndex.map(i => (
-    Address.fromPk(
-      deriveKey(bip32Account, i)
-        .key
-        .publicKey
-        .toString('hex')
-    ).addrBytes.toString('hex')
+    Buffer.from(
+      RustModule.SigmaRust.Address.from_public_key(
+        deriveKey(bip32Account, i)
+          .key
+          .publicKey
+      ).to_bytes(network)
+    ).toString('hex')
   ));
   /**
    * Even if the user has no internet connection and scanning fails,
@@ -112,8 +114,13 @@ export async function createStandardBip44Wallet(request: {|
     ]
   ).toPublic();
 
+  const networkId = ((
+    Number.parseInt(request.network.BaseConfig[0].ChainNetworkId, 10): any
+  ): $Values<typeof RustModule.SigmaRust.NetworkPrefix>);
+
   const initialDerivations = await getChainDefaultDerivations(
     chainKey,
+    networkId,
     rawGenAddByHash(new Set()),
   );
 

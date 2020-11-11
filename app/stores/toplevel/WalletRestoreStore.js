@@ -289,12 +289,7 @@ export function generatePlates(
       getCardanoKey(),
       accountIndex - HARD_DERIVATION_START,
       addressCount,
-      (() => {
-        if (network.BaseConfig[0].ChainNetworkId != null) {
-          return Number.parseInt(network.BaseConfig[0].ChainNetworkId, 10);
-        }
-        throw new Error(`${nameof(generatePlates)} missing chain network id`);
-      })()
+      Number.parseInt(network.BaseConfig[0].ChainNetworkId, 10)
     );
     plates.push({
       ...shelleyPlate,
@@ -349,6 +344,9 @@ export function generatePlates(
       rootKey,
       accountIndex - HARD_DERIVATION_START,
       addressCount,
+      ((
+        Number.parseInt(network.BaseConfig[0].ChainNetworkId, 10): any
+      ): $Values<typeof RustModule.SigmaRust.NetworkPrefix>)
     );
     plates.push({
       ...plate,
