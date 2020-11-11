@@ -136,7 +136,7 @@ declare module 'ergo-lib-wasm-browser' { // need to wrap flowgen output into mod
 
     /**
     * Get the type of the address
-    * @returns {number}
+    * @returns {$Values<typeof AddressTypePrefix>}
     */
     address_type_prefix(): $Values<typeof AddressTypePrefix>;
 
@@ -192,9 +192,9 @@ declare module 'ergo-lib-wasm-browser' { // need to wrap flowgen output into mod
 
     /**
     * Number of units inside one ERGO (i.e. one ERG using nano ERG representation)
-    * @returns {U64}
+    * @returns {I64}
     */
-    static UNITS_PER_ERGO(): U64;
+    static UNITS_PER_ERGO(): I64;
 
     /**
     * Create from u32 with bounds check
@@ -266,6 +266,31 @@ declare module 'ergo-lib-wasm-browser' { // need to wrap flowgen output into mod
     * @returns {Uint8Array}
     */
     to_byte_array(): Uint8Array;
+  }
+  /**
+  * Proof of correctness of tx spending
+  */
+  declare export class ContextExtension {
+    free(): void;
+
+    /**
+    * Returns the number of elements in the collection
+    * @returns {number}
+    */
+    len(): number;
+
+    /**
+    * get from map or fail if key is missing
+    * @param {number} key
+    * @returns {Constant}
+    */
+    get(key: number): Constant;
+
+    /**
+    * Returns all keys in the map
+    * @returns {Uint8Array}
+    */
+    keys(): Uint8Array;
   }
   /**
   * Defines the contract(script) that will be guarding box contents
@@ -642,6 +667,12 @@ declare module 'ergo-lib-wasm-browser' { // need to wrap flowgen output into mod
     * @returns {BoxId}
     */
     box_id(): BoxId;
+
+    /**
+    * Get the spending proof
+    * @returns {ProverResult}
+    */
+    spending_proof(): ProverResult;
   }
   /**
   * Collection of signed inputs
@@ -694,7 +725,7 @@ declare module 'ergo-lib-wasm-browser' { // need to wrap flowgen output into mod
 
     /**
     * create a new AddressEncoder for a given network type
-    * @param {number} network
+    * @param {$Values<typeof NetworkPrefix>} network
     * @param {Address} address
     * @returns {NetworkAddress}
     */
@@ -728,7 +759,7 @@ declare module 'ergo-lib-wasm-browser' { // need to wrap flowgen output into mod
 
     /**
     * Network for the address
-    * @returns {number}
+    * @returns {$Values<typeof NetworkPrefix>}
     */
     network(): $Values<typeof NetworkPrefix>;
 
@@ -737,6 +768,30 @@ declare module 'ergo-lib-wasm-browser' { // need to wrap flowgen output into mod
     * @returns {Address}
     */
     address(): Address;
+  }
+  /**
+  * Proof of correctness of tx spending
+  */
+  declare export class ProverResult {
+    free(): void;
+
+    /**
+    * Get proof
+    * @returns {Uint8Array}
+    */
+    proof(): Uint8Array;
+
+    /**
+    * Get extension
+    * @returns {ContextExtension}
+    */
+    extension(): ContextExtension;
+
+    /**
+    * JSON representation
+    * @returns {any}
+    */
+    to_json(): any;
   }
   /**
   * Secret key for the prover
@@ -1007,6 +1062,12 @@ declare module 'ergo-lib-wasm-browser' { // need to wrap flowgen output into mod
     * @returns {BoxId}
     */
     box_id(): BoxId;
+
+    /**
+    * Get extension
+    * @returns {ContextExtension}
+    */
+    extension(): ContextExtension;
   }
   /**
   * Collection of unsigned signed inputs
