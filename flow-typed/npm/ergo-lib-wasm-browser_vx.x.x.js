@@ -191,6 +191,12 @@ declare module 'ergo-lib-wasm-browser' { // need to wrap flowgen output into mod
     static SAFE_USER_MIN(): BoxValue;
 
     /**
+    * Number of units inside one ERGO (i.e. one ERG using nano ERG representation)
+    * @returns {U64}
+    */
+    static UNITS_PER_ERGO(): U64;
+
+    /**
     * Create from u32 with bounds check
     * @param {number} v
     * @returns {BoxValue}
@@ -662,6 +668,24 @@ declare module 'ergo-lib-wasm-browser' { // need to wrap flowgen output into mod
     get(index: number): Input;
   }
   /**
+  * helper methods to get the fee address for various networks
+  */
+  declare export class MinerAddress {
+    free(): void;
+
+    /**
+    * address to use in mainnet for the fee
+    * @returns {string}
+    */
+    static mainnet_fee_address(): string;
+
+    /**
+    * address to use in testnet for the fee
+    * @returns {string}
+    */
+    static testnet_fee_address(): string;
+  }
+  /**
   * Combination of an Address with a network
   * These two combined together form a base58 encoding
   */
@@ -971,6 +995,25 @@ declare module 'ergo-lib-wasm-browser' { // need to wrap flowgen output into mod
     * @returns {string}
     */
     to_hex(): string;
+  }
+  /**
+  * Wrapper for u64 for JS/TS
+  */
+  declare export class U64 {
+    free(): void;
+
+    /**
+    * Create from a standard rust string representation
+    * @param {string} string
+    * @returns {U64}
+    */
+    static from_str(string: string): U64;
+
+    /**
+    * String representation of the value for use from environments that don't support u64
+    * @returns {string}
+    */
+    to_str(): string;
   }
   /**
   * Unsigned inputs used in constructing unsigned transactions
