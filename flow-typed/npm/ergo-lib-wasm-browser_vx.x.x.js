@@ -997,25 +997,6 @@ declare module 'ergo-lib-wasm-browser' { // need to wrap flowgen output into mod
     to_hex(): string;
   }
   /**
-  * Wrapper for u64 for JS/TS
-  */
-  declare export class U64 {
-    free(): void;
-
-    /**
-    * Create from a standard rust string representation
-    * @param {string} string
-    * @returns {U64}
-    */
-    static from_str(string: string): U64;
-
-    /**
-    * String representation of the value for use from environments that don't support u64
-    * @returns {string}
-    */
-    to_str(): string;
-  }
-  /**
   * Unsigned inputs used in constructing unsigned transactions
   */
   declare export class UnsignedInput {
