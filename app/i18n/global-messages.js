@@ -56,6 +56,10 @@ const globalMessages: * = defineMessages({
     id: 'global.labels.continue',
     defaultMessage: '!!!Continue',
   },
+  current: {
+    id: 'global.labels.current',
+    defaultMessage: '!!!Current',
+  },
   finish: {
     id: 'global.labels.finish',
     defaultMessage: '!!!Finish',
