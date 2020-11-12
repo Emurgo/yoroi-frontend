@@ -310,6 +310,12 @@ declare module 'ergo-lib-wasm-browser' { // need to wrap flowgen output into mod
   */
   declare export class DataInput {
     free(): void;
+
+    /**
+    * Get box id
+    * @returns {BoxId}
+    */
+    box_id(): BoxId;
   }
   /**
   * DataInput collection
@@ -407,9 +413,6 @@ declare module 'ergo-lib-wasm-browser' { // need to wrap flowgen output into mod
     */
     register_value(register_id: number): Constant | void;
   }
-  /**
-  * ErgoBox candidate not yet included in any transaction on the chain
-  */
   declare export class ErgoBoxCandidate {
     free(): void;
 
@@ -419,6 +422,30 @@ declare module 'ergo-lib-wasm-browser' { // need to wrap flowgen output into mod
     * @returns {Constant | void}
     */
     register_value(register_id: number): Constant | void;
+
+    /**
+    * Get box creation height
+    * @returns {number}
+    */
+    creation_height(): number;
+
+    /**
+    * Get tokens for box
+    * @returns {Tokens}
+    */
+    tokens(): Tokens;
+
+    /**
+    * Get ergo tree for box
+    * @returns {ErgoTree}
+    */
+    ergo_tree(): ErgoTree;
+
+    /**
+    * Get box value in nanoERGs
+    * @returns {BoxValue}
+    */
+    value(): BoxValue;
   }
   /**
   * ErgoBoxCandidate builder
@@ -819,6 +846,36 @@ declare module 'ergo-lib-wasm-browser' { // need to wrap flowgen output into mod
     get_address(): Address;
   }
   /**
+  * SecretKey collection
+  */
+  declare export class SecretKeys {
+    free(): void;
+
+    /**
+    * Create empty SecretKeys
+    */
+    constructor(): this;
+
+    /**
+    * Returns the number of elements in the collection
+    * @returns {number}
+    */
+    len(): number;
+
+    /**
+    * Returns the element of the collection with a given index
+    * @param {number} index
+    * @returns {SecretKey}
+    */
+    get(index: number): SecretKey;
+
+    /**
+    * Adds an elements to the collection
+    * @param {SecretKey} elem
+    */
+    add(elem: SecretKey): void;
+  }
+  /**
   * Naive box selector, collects inputs until target balance is reached
   */
   declare export class SimpleBoxSelector {
@@ -963,7 +1020,34 @@ declare module 'ergo-lib-wasm-browser' { // need to wrap flowgen output into mod
     * JSON representation
     * @returns {any}
     */
-    to_json(): any;
+    to_json(): {|
+      id: string,
+      inputs: Array<{|
+        boxId: string, // hex
+        spendingProof: {|
+          proofBytes: string, // hex
+          extension: {| [key: string]: string /* hex */ |},
+        |},
+        extension?: {| [key: string]: string /* hex */ |},
+      |}>,
+      dataInputs: Array<{|
+        boxId: string, // hex
+        extension?: {| [key: string]: string /* hex */ |},
+      |}>,
+      outputs: Array<{|
+        boxId: string,
+        value: number,
+        ergoTree: string,
+        assets: Array<{|
+          tokenId: string, // hex
+          amount: number,
+        |}>,
+        additionalRegisters: {| [key: string]: string /* hex */ |},
+        creationHeight: number,
+        transactionId: string,
+        index: number,
+      |}>,
+    |};
 
     /**
     * Inputs for transaction
@@ -1032,6 +1116,48 @@ declare module 'ergo-lib-wasm-browser' { // need to wrap flowgen output into mod
     * @returns {UnsignedTransaction}
     */
     build(): UnsignedTransaction;
+
+    /**
+    * Get inputs
+    * @returns {BoxSelection}
+    */
+    box_selection(): BoxSelection;
+
+    /**
+    * Get data inputs
+    * @returns {DataInputs}
+    */
+    data_inputs(): DataInputs;
+
+    /**
+    * Get outputs
+    * @returns {ErgoBoxCandidates}
+    */
+    output_candidates(): ErgoBoxCandidates;
+
+    /**
+    * Get current height
+    * @returns {number}
+    */
+    current_height(): number;
+
+    /**
+    * Get fee amount
+    * @returns {BoxValue}
+    */
+    fee_amount(): BoxValue;
+
+    /**
+    * Get change
+    * @returns {Address}
+    */
+    change_address(): Address;
+
+    /**
+    * Get min change value
+    * @returns {BoxValue}
+    */
+    min_change_value(): BoxValue;
   }
   /**
   * Transaction id
@@ -1122,6 +1248,34 @@ declare module 'ergo-lib-wasm-browser' { // need to wrap flowgen output into mod
     * @returns {ErgoBoxCandidates}
     */
     outputs(): ErgoBoxCandidates;
+
+    /**
+    * JSON representation
+    * @returns {any}
+    */
+    to_json(): {|
+      id: string,
+      inputs: Array<{|
+        boxId: string,
+        extension: {| [key: string]: string /* hex */ |},
+      |}>,
+      dataInputs: Array<{|
+        boxId: string,
+      |}>,
+      outputs: Array<{|
+        boxId: string,
+        value: number,
+        ergoTree: string,
+        assets: Array<{|
+          tokenId: string, // hex
+          amount: number,
+        |}>,
+        additionalRegisters: {| [key: string]: string /* hex */ |},
+        creationHeight: number,
+        transactionId: string,
+        index: number,
+      |}>,
+    |};
   }
   /**
   * TBD
@@ -1142,10 +1296,10 @@ declare module 'ergo-lib-wasm-browser' { // need to wrap flowgen output into mod
 
     /**
     * Create wallet using provided secret key
-    * @param {SecretKey} secret
+    * @param {SecretKeys} secret
     * @returns {Wallet}
     */
-    static from_secret(secret: SecretKey): Wallet;
+    static from_secrets(secret: SecretKeys): Wallet;
 
     /**
     * Sign a transaction:

@@ -3,27 +3,28 @@
 import BigNumber from 'bignumber.js';
 import { ISignRequest } from '../../../common/lib/transactions/ISignRequest';
 import { getErgoCurrencyMeta } from '../../currencyInfo';
-import { Transaction } from '@coinbarn/ergo-ts';
 import type {
   Address, Value, Addressing,
 } from '../../../ada/lib/storage/models/PublicDeriver/interfaces';
 import type { ErgoAddressedUtxo } from './types';
-import { encode } from 'bs58';
+import { RustModule } from '../../../ada/lib/cardanoCrypto/rustLoader';
 
 type NetworkSettingSnapshot = {|
+  // there is no way given just an unsigned transaction body to know which network it belongs to
+  +ChainNetworkId: $Values<typeof RustModule.SigmaRust.NetworkPrefix>,
   +FeeAddress: string,
 |};
 
-export class ErgoTxSignRequest implements ISignRequest<Transaction> {
+export class ErgoTxSignRequest implements ISignRequest<RustModule.SigmaRust.TxBuilder> {
 
   senderUtxos: Array<ErgoAddressedUtxo>;
-  unsignedTx: Transaction;
+  unsignedTx: RustModule.SigmaRust.TxBuilder;
   changeAddr: Array<{| ...Address, ...Value, ...Addressing |}>;
   networkSettingSnapshot: NetworkSettingSnapshot;
 
   constructor(signRequest: {|
     senderUtxos: Array<ErgoAddressedUtxo>,
-    unsignedTx: Transaction,
+    unsignedTx: RustModule.SigmaRust.TxBuilder,
     changeAddr: Array<{| ...Address, ...Value, ...Addressing |}>,
     networkSettingSnapshot: NetworkSettingSnapshot,
   |}) {
@@ -31,15 +32,6 @@ export class ErgoTxSignRequest implements ISignRequest<Transaction> {
     this.unsignedTx = signRequest.unsignedTx;
     this.changeAddr = signRequest.changeAddr;
     this.networkSettingSnapshot = signRequest.networkSettingSnapshot;
-
-    // note: ergo-ts drops the value information from transaction inputs
-    // so we manually re-add it
-    for (const utxo of signRequest.senderUtxos) {
-      const inputInTx = signRequest.unsignedTx.inputs.find(input => input.boxId === utxo.boxId);
-      if (inputInTx == null) throw new Error(`Should never happen`);
-      inputInTx.value = Number.parseInt(utxo.amount, 10);
-      inputInTx.address = encode(Buffer.from(utxo.receiver, 'hex'));
-    }
   }
 
   totalInput(shift: boolean): BigNumber {
@@ -47,11 +39,19 @@ export class ErgoTxSignRequest implements ISignRequest<Transaction> {
   }
 
   totalOutput(shift: boolean): BigNumber {
-    return getTxOutputTotal(this.unsignedTx, shift, this.networkSettingSnapshot.FeeAddress);
+    return getTxOutputTotal(
+      this.unsignedTx,
+      shift,
+      this.networkSettingSnapshot.ChainNetworkId,
+      this.networkSettingSnapshot.FeeAddress
+    );
   }
 
   fee(shift: boolean): BigNumber {
-    return getErgoTxFee(this.unsignedTx, shift, this.networkSettingSnapshot.FeeAddress);
+    return getErgoTxFee(
+      this.unsignedTx,
+      shift,
+    );
   }
 
   uniqueSenderAddresses(): Array<string> {
@@ -62,10 +62,16 @@ export class ErgoTxSignRequest implements ISignRequest<Transaction> {
     const receivers: Array<string> = [];
 
     const changeAddrs = new Set(this.changeAddr.map(change => change.address));
-    const outputs = this.unsignedTx.outputs;
-    for (let i = 0; i < outputs.length; i++) {
-      const output = outputs[i];
-      const addr = Buffer.from(output.address.addrBytes).toString('hex');
+    const outputs = this.unsignedTx.output_candidates();
+    for (let i = 0; i < outputs.len(); i++) {
+      const output = outputs.get(i);
+      const address = RustModule.SigmaRust.NetworkAddress.new(
+        this.networkSettingSnapshot.ChainNetworkId,
+        RustModule.SigmaRust.Address.new_p2pk(
+          output.ergo_tree()
+        )
+      );
+      const addr = Buffer.from(address.to_bytes()).toString('hex');
       if (!includeChangeAndFee) {
         if (changeAddrs.has(addr)) {
           continue;
@@ -81,30 +87,30 @@ export class ErgoTxSignRequest implements ISignRequest<Transaction> {
     return receivers;
   }
 
-  isEqual(tx: ?(mixed| Transaction)): boolean {
+  isEqual(tx: ?(mixed| RustModule.SigmaRust.TxBuilder)): boolean {
     if (tx == null) return false;
-    if (!(tx instanceof Transaction)) {
+    if (!(tx instanceof RustModule.SigmaRust.TxBuilder)) {
       return false;
     }
     return ergoTxEqual(this.unsignedTx, tx);
   }
 
-  self(): Transaction {
+  self(): RustModule.SigmaRust.TxBuilder {
     return this.unsignedTx;
   }
 }
 
 export function getTxInputTotal(
-  tx: Transaction,
+  tx: RustModule.SigmaRust.TxBuilder,
   changeAddr: Array<{| ...Address, ...Value, ...Addressing |}>,
   shift: boolean
 ): BigNumber {
   let sum = new BigNumber(0);
 
-  const inputs = tx.inputs;
-  for (let i = 0; i < inputs.length; i++) {
-    const input = inputs[i];
-    const value = new BigNumber(input.value ?? 0);
+  const inputs = tx.box_selection().boxes();
+  for (let i = 0; i < inputs.len(); i++) {
+    const input = inputs.get(i);
+    const value = new BigNumber(input.value().as_i64().to_str());
     sum = sum.plus(value);
   }
 
@@ -120,17 +126,27 @@ export function getTxInputTotal(
 }
 
 export function getTxOutputTotal(
-  tx: Transaction,
+  tx: RustModule.SigmaRust.TxBuilder,
   shift: boolean,
+  networkId: $Values<typeof RustModule.SigmaRust.NetworkPrefix>,
   feeAddress: string,
 ): BigNumber {
   let sum = new BigNumber(0);
 
-  for (const output of tx.outputs) {
-    if (output.address.addrBytes.toString('hex') === feeAddress) {
+  const outputs = tx.output_candidates();
+  for (let i = 0; i < outputs.len(); i++) {
+    const output = outputs.get(i);
+    const address = RustModule.SigmaRust.NetworkAddress.new(
+      networkId,
+      RustModule.SigmaRust.Address.new_p2pk(
+        output.ergo_tree()
+      )
+    );
+    const addr = Buffer.from(address.to_bytes()).toString('hex');
+    if (addr === feeAddress) {
       continue;
     }
-    const value = new BigNumber(output.value);
+    const value = new BigNumber(output.value().as_i64().to_str());
     sum = sum.plus(value);
   }
   if (shift) {
@@ -140,17 +156,10 @@ export function getTxOutputTotal(
 }
 
 export function getErgoTxFee(
-  tx: Transaction,
+  tx: RustModule.SigmaRust.TxBuilder,
   shift: boolean,
-  feeAddress: string,
 ): BigNumber {
-  const feeBox = tx.outputs.find(output => (
-    output.address.addrBytes.toString('hex') === feeAddress
-  ));
-  if (feeBox == null) {
-    throw new Error(`${nameof(getErgoTxFee)} no fee output found for transaction`);
-  }
-  const result = new BigNumber(feeBox.value);
+  const result = new BigNumber(tx.fee_amount().as_i64().to_str());
   if (shift) {
     return result.shiftedBy(-getErgoCurrencyMeta().decimalPlaces.toNumber());
   }
@@ -158,31 +167,10 @@ export function getErgoTxFee(
 }
 
 export function ergoTxEqual(
-  req1: Transaction,
-  req2: Transaction,
+  req1: RustModule.SigmaRust.TxBuilder,
+  req2: RustModule.SigmaRust.TxBuilder,
 ): boolean {
-  const inputs1 = req1.inputs;
-  const inputs2 = req2.inputs;
-  if (inputs1.length !== inputs2.length) {
-    return false;
-  }
-
-  const outputs1 = req1.outputs;
-  const outputs2 = req2.outputs;
-  if (outputs1.length !== outputs2.length) {
-    return false;
-  }
-
-  for (let i = 0; i < inputs1.length; i++) {
-    if (inputs1[i].boxId !== inputs2[i].boxId) {
-      return false;
-    }
-  }
-  for (let i = 0; i < outputs1.length; i++) {
-    if (outputs1[i].id !== outputs2[i].id) {
-      return false;
-    }
-  }
-
-  return true;
+  const tx1 = req1.build().to_json();
+  const tx2 = req2.build().to_json();
+  return tx1 === tx2;
 }

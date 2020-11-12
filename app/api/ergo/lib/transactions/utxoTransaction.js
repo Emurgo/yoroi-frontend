@@ -29,13 +29,11 @@ import {
   Address as ErgoAddress,
   ErgoBox,
   Transaction,
-  Serializer,
-  sign,
 } from '@coinbarn/ergo-ts';
 import { BIP32PrivateKey } from '../../../common/lib/crypto/keys/keyRepository';
 import { deriveByAddressing } from '../../../common/lib/crypto/keys/utils';
 import { ErgoTxSignRequest } from './ErgoTxSignRequest';
-import { BN } from 'bn.js';
+import { RustModule } from '../../../ada/lib/cardanoCrypto/rustLoader';
 
 type TxOutput = {|
   ...Address,
@@ -390,20 +388,32 @@ export function signTransaction(request: {|
   keyLevel: number,
   signingKey: BIP32PrivateKey
 |}): $Diff<SignedRequest, BackendNetworkInfo> {
+  const unsignedTx = request.signRequest.unsignedTx.build();
 
-  const inputs = addWitnesses({
+  const wasmKeys = generateKeys({
     senderUtxos: request.signRequest.senderUtxos,
-    unsignedTx: request.signRequest.unsignedTx,
     keyLevel: request.keyLevel,
     signingKey: request.signingKey,
   });
 
+  if (request.signRequest.unsignedTx.data_inputs().len() > 0) {
+    throw new Error(`${nameof(signTransaction)} data inputs not supported by sigma rust`);
+  }
+
+  const signedTx = RustModule.SigmaRust.Wallet
+    .from_secrets(wasmKeys)
+    .sign_transaction(
+      RustModule.SigmaRust.ErgoStateContext.dummy(), // TODO ?
+      unsignedTx,
+      request.signRequest.unsignedTx.box_selection().boxes(),
+      RustModule.SigmaRust.ErgoBoxes.from_boxes_json([]), // TODO: not supported by sigma-rust
+    );
+
+  const json = signedTx.to_json();
   return {
-    inputs,
-    dataInputs: request.signRequest.unsignedTx.dataInputs.map(input => ({
-      boxId: input.boxId,
-    })),
-    outputs: request.signRequest.unsignedTx.outputs.map(output => ({
+    inputs: json.inputs,
+    dataInputs: json.dataInputs,
+    outputs: json.outputs.map(output => ({
       value: output.value,
       ergoTree: output.ergoTree,
       creationHeight: output.creationHeight,
@@ -413,25 +423,17 @@ export function signTransaction(request: {|
   };
 }
 
-function addWitnesses(request: {|
+function generateKeys(request: {|
   senderUtxos: Array<ErgoAddressedUtxo>,
-  unsignedTx: Transaction,
   keyLevel: number,
   signingKey: BIP32PrivateKey
-|}): Array<{|
-    boxId: string, // hex
-    spendingProof: {|
-      proofBytes: string, // hex
-      extension: {| [key: string]: string /* hex */ |},
-    |},
-    extension?: {| [key: string]: string /* hex */ |},
-  |}> {
-  const serializeTransaction = Serializer.transactionToBytes(request.unsignedTx);
+|}): RustModule.SigmaRust.SecretKeys {
+  const secretKeys = new RustModule.SigmaRust.SecretKeys();
 
-  return request.senderUtxos.map(utxo => {
+  for (const utxo of request.senderUtxos) {
     const lastLevelSpecified = utxo.addressing.startLevel + utxo.addressing.path.length - 1;
     if (lastLevelSpecified !== Bip44DerivationLevels.ADDRESS.level) {
-      throw new Error(`${nameof(addWitnesses)} incorrect addressing size`);
+      throw new Error(`${nameof(generateKeys)} incorrect addressing size`);
     }
     const key = deriveByAddressing({
       addressing: utxo.addressing,
@@ -442,30 +444,15 @@ function addWitnesses(request: {|
     });
     const privateKey = key.key.privateKey;
     if (privateKey == null) {
-      throw new Error(`${nameof(addWitnesses)} private key not found (should never happen)`);
+      throw new Error(`${nameof(generateKeys)} private key not found (should never happen)`);
     }
-    const proofBytes = sign(
-      serializeTransaction,
-      new BN(privateKey.toString('hex'), 16)
-    );
-    return {
-      boxId: utxo.boxId,
-      spendingProof: {
-        proofBytes: proofBytes.toString('hex'),
-        // TODO: what is extension?
-        extension: Object.freeze({}),
-      },
-      // TODO: what is extension?
-    };
-  });
 
-  // sign the transactions
-  // for (let i = 0; i < senderUtxos.length; i++) {
-  //   const witness = RustModule.WalletV2.Witness.new_extended_key(
-  //     setting,
-  //     privateKeys[i],
-  //     txFinalizer.id()
-  //   );
-  //   txFinalizer.add_witness(witness);
-  // }
+    const wasmKey = RustModule.SigmaRust.SecretKey.dlog_from_bytes(
+      privateKey
+    );
+    // recall: duplicates are fine
+    secretKeys.add(wasmKey);
+  }
+
+  return secretKeys;
 }

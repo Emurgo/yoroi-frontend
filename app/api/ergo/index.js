@@ -590,7 +590,8 @@ export default class ErgoApi {
         unsignedTx: unsignedTxResponse.unsignedTx,
         changeAddr: unsignedTxResponse.changeAddr,
         networkSettingSnapshot: {
-          FeeAddress: config.FeeAddress
+          FeeAddress: config.FeeAddress,
+          ChainNetworkId: (Number.parseInt(config.ChainNetworkId, 10): any),
         },
       });
     } catch (error) {
