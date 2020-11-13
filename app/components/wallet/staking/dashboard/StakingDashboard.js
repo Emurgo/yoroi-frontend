@@ -124,9 +124,9 @@ export default class StakingDashboard extends Component<Props> {
         <div className={styles.contentWrap}>
           {pendingTxWarningComponent}
           <div className={styles.statsWrapper}>
-            <div>
+            {/* <div>
               {this.props.epochProgress}
-            </div>
+            </div> */}
             <div className={styles.summary}>
               <div className={styles.summaryItem}>
                 {this.props.userSummary}

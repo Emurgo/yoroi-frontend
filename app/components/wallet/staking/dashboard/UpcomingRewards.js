@@ -52,9 +52,10 @@ export type BoxInfo = {|
   epoch: number,
   time: [string, string, string, string, string],
   pools: Array<MiniPoolInfo>,
+  isCurrentEpoch?: boolean
 |};
 type Props = {|
-  +content: [?BoxInfo, ?BoxInfo, ?BoxInfo],
+  +content: [?BoxInfo, ?BoxInfo, ?BoxInfo, ?BoxInfo],
   +showWarning: boolean,
   +baseUrl: void | string,
   +useEndOfEpoch: boolean, // Haskell uses end-of-epoch but Jormungandr doesn't
@@ -110,6 +111,10 @@ export default class UpcomingRewards extends Component<Props> {
             this.props.content[2],
             genUnregisteredWarning(this.props.content[2])
           )}
+          {this.infoToNode(
+            this.props.content[3],
+            genUnregisteredWarning(this.props.content[3])
+          )}
         </div>
       </Card>
     );
@@ -135,7 +140,7 @@ export default class UpcomingRewards extends Component<Props> {
               {this.props.useEndOfEpoch
                 ? intl.formatMessage(messages.endOfEpoch)
                 : intl.formatMessage(globalMessages.epochLabel)}&nbsp;
-              {info.epoch}
+              {info.isCurrentEpoch === true ? `${info.epoch} (${intl.formatMessage(globalMessages.current)})` : info.epoch}
             </div>
           </div>
           <div className={styles.message}>
@@ -151,7 +156,7 @@ export default class UpcomingRewards extends Component<Props> {
             {this.props.useEndOfEpoch
               ? intl.formatMessage(messages.endOfEpoch)
               : intl.formatMessage(globalMessages.epochLabel)}&nbsp;
-            {info.epoch}
+            {info.isCurrentEpoch === true ? `${info.epoch} (${intl.formatMessage(globalMessages.current)})` : info.epoch}
           </h3>
           {additional}
         </div>

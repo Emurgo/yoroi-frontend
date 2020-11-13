@@ -163,6 +163,7 @@ export async function getCurrentDelegation(
     currEpoch: undefined,
     prevEpoch: undefined,
     prevPrevEpoch: undefined,
+    prevPrevPrevEpoch: undefined,
     fullHistory: delegations,
   };
   const seenPools = new Set<string>();
@@ -191,8 +192,14 @@ export async function getCurrentDelegation(
         pools,
       };
     }
-    if (result.prevPrevEpoch == null && relativeSlot.epoch <= request.currentEpoch - 2) {
-      result.prevPrevEpoch = {
+    if (result.prevEpoch == null && relativeSlot.epoch <= request.currentEpoch - 2) {
+      result.prevEpoch = {
+        ...delegation,
+        pools,
+      };
+    }
+    if (result.prevPrevEpoch == null && relativeSlot.epoch <= request.currentEpoch - 3) {
+      result.prevPrevPrevEpoch = {
         ...delegation,
         pools,
       };

@@ -534,11 +534,21 @@ function getStakingInfo(
     }
     return delegateCert1;
   })();
+  const prevPrevPrevEpochCert = (() => {
+    if (stakingCase === stakingKeyCases.NeverDelegated) {
+      return undefined;
+    }
+    if (stakingCase === stakingKeyCases.JustDelegated) {
+      return undefined;
+    }
+    return delegateCert1;
+  })();
   const getCurrentDelegation: CachedRequest<GetCurrentDelegationFunc> = new CachedRequest(
     _request => Promise.resolve({
       currEpoch: currEpochCert,
       prevEpoch: prevEpochCert,
       prevPrevEpoch: prevPrevEpochCert,
+      prevPrevPrevEpoch: prevPrevPrevEpochCert,
       fullHistory: [
         ...(currEpochCert == null ? [] : [getChainInfo(currEpochCert)]),
         ...(prevEpochCert == null ? [] : [getChainInfo(prevEpochCert)]),
@@ -634,6 +644,7 @@ export const Loading = (): Node => {
         currEpoch: undefined,
         prevEpoch: undefined,
         prevPrevEpoch: undefined,
+        prevPrevPrevEpoch: undefined,
         fullHistory: [],
         allPoolIds: [],
       })

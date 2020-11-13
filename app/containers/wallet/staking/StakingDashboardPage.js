@@ -9,7 +9,7 @@ import BigNumber from 'bignumber.js';
 import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 import StakingDashboard from '../../../components/wallet/staking/dashboard/StakingDashboard';
 import type { GraphData } from '../../../components/wallet/staking/dashboard/StakingDashboard';
-import type { GraphItems, } from '../../../components/wallet/staking/dashboard/GraphWrapper';
+import type { GraphItems } from '../../../components/wallet/staking/dashboard/GraphWrapper';
 import UserSummary from '../../../components/wallet/staking/dashboard/UserSummary';
 import StakePool from '../../../components/wallet/staking/dashboard/StakePool';
 import UndelegateDialog from '../../../components/wallet/staking/dashboard/UndelegateDialog';
@@ -19,7 +19,7 @@ import DialogCloseButton from '../../../components/widgets/DialogCloseButton';
 import ErrorBlock from '../../../components/widgets/ErrorBlock';
 import InvalidURIImg from '../../../assets/images/uri/invalid-uri.inline.svg';
 import UpcomingRewards from '../../../components/wallet/staking/dashboard/UpcomingRewards';
-import type { BoxInfo, } from '../../../components/wallet/staking/dashboard/UpcomingRewards';
+import type { BoxInfo } from '../../../components/wallet/staking/dashboard/UpcomingRewards';
 import LessThanExpectedDialog from '../../../components/wallet/staking/dashboard/LessThanExpectedDialog';
 import PoolWarningDialog from '../../../components/wallet/staking/dashboard/PoolWarningDialog';
 import { digestForHash } from '../../../api/ada/lib/storage/database/primitives/api/utils';
@@ -29,7 +29,7 @@ import UnmangleTxDialogContainer from '../../transfer/UnmangleTxDialogContainer'
 import type { GeneratedData as UnmangleTxDialogContainerData } from '../../transfer/UnmangleTxDialogContainer';
 import config from '../../../config';
 import { formattedWalletAmount } from '../../../utils/formatters';
-import type { PoolTuples, ReputationObject, } from '../../../api/jormungandr/lib/state-fetch/types';
+import type { PoolTuples, ReputationObject } from '../../../api/jormungandr/lib/state-fetch/types';
 import type { PoolMeta, DelegationRequests } from '../../../stores/toplevel/DelegationStore';
 import type { AdaDelegationRequests } from '../../../stores/ada/AdaDelegationStore';
 import EpochProgressContainer from './EpochProgressContainer';
@@ -47,16 +47,23 @@ import type {
 } from '../../../api/common/lib/storage/bridge/timeUtils';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import type { CreateDelegationTxFunc } from '../../../api/jormungandr/index';
-import type { CurrentTimeRequests, TimeCalcRequests } from '../../../stores/base/BaseCardanoTimeStore';
+import type {
+  CurrentTimeRequests,
+  TimeCalcRequests,
+} from '../../../stores/base/BaseCardanoTimeStore';
 import type { TxRequests } from '../../../stores/toplevel/TransactionsStore';
 import type { Notification } from '../../../types/notificationType';
 
 import globalMessages from '../../../i18n/global-messages';
 import { computed, observable, runInAction } from 'mobx';
 import { ApiOptions, getApiForNetwork, getApiMeta } from '../../../api/common/utils';
-import type { SelectedApiType, } from '../../../api/common/utils';
+import type { SelectedApiType } from '../../../api/common/utils';
 import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
-import { isJormungandr, isCardanoHaskell, getCardanoHaskellBaseConfig } from '../../../api/ada/lib/storage/database/prepackaged/networks';
+import {
+  isJormungandr,
+  isCardanoHaskell,
+  getCardanoHaskellBaseConfig,
+} from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import DeregisterDialogContainer from '../../transfer/DeregisterDialogContainer';
 import type { GeneratedData as DeregisterDialogContainerData } from '../../transfer/DeregisterDialogContainer';
 import type { GeneratedData as WithdrawalTxDialogContainerData } from '../../transfer/WithdrawalTxDialogContainer';
@@ -68,7 +75,7 @@ type Props = InjectedOrGenerated<GeneratedData>;
 
 @observer
 export default class StakingDashboardPage extends Component<Props> {
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
@@ -93,7 +100,10 @@ export default class StakingDashboardPage extends Component<Props> {
     this.generated.actions.ada.delegationTransaction.reset.trigger({ justTransaction: false });
   }
 
-  hideOrFormat: (BigNumber, $PropertyType<SelectedApiType, 'meta'>) => {|
+  hideOrFormat: (
+    BigNumber,
+    $PropertyType<SelectedApiType, 'meta'>
+  ) => {|
     +ADA: string,
     +unitOfAccount: void | {| currency: string, amount: string |},
   |} = (amount, apiMeta) => {
@@ -105,25 +115,19 @@ export default class StakingDashboardPage extends Component<Props> {
     }
 
     const coinPrice: ?number = this.generated.stores.profile.unitOfAccount.enabled
-      ? (
-        this.generated.stores.coinPriceStore.getCurrentPrice(
+      ? this.generated.stores.coinPriceStore.getCurrentPrice(
           apiMeta.primaryTicker,
           this.generated.stores.profile.unitOfAccount.currency
         )
-      )
       : null;
 
     const unitOfAccount =
-      coinPrice == null
-      || this.generated.stores.profile.unitOfAccount.currency == null
+      coinPrice == null || this.generated.stores.profile.unitOfAccount.currency == null
         ? undefined
         : {
-          currency: this.generated.stores.profile.unitOfAccount.currency,
-          amount: calculateAndFormatValue(
-            new BigNumber(amount),
-            coinPrice
-          )
-        };
+            currency: this.generated.stores.profile.unitOfAccount.currency,
+            amount: calculateAndFormatValue(new BigNumber(amount), coinPrice),
+          };
     return {
       ADA: formattedWalletAmount(amount, apiMeta.decimalPlaces.toNumber()),
       unitOfAccount,
@@ -135,9 +139,7 @@ export default class StakingDashboardPage extends Component<Props> {
     if (publicDeriver == null) {
       throw new Error(`${nameof(StakingDashboardPage)} no public deriver. Should never happen`);
     }
-    const apiMeta = getApiMeta(
-      getApiForNetwork(publicDeriver.getParent().getNetworkInfo())
-    )?.meta;
+    const apiMeta = getApiMeta(getApiForNetwork(publicDeriver.getParent().getNetworkInfo()))?.meta;
     if (apiMeta == null) throw new Error(`${nameof(StakingDashboardPage)} no API selected`);
 
     const delegationStore = this.generated.stores.delegation;
@@ -149,9 +151,7 @@ export default class StakingDashboardPage extends Component<Props> {
     const rewardInfo = this.getRewardInfo(publicDeriver);
 
     const errorIfPresent = this.getErrorInFetch(publicDeriver);
-    const stakePools = errorIfPresent == null
-      ? this.getStakePools(publicDeriver)
-      : errorIfPresent;
+    const stakePools = errorIfPresent == null ? this.getStakePools(publicDeriver) : errorIfPresent;
 
     const { getThemeVars } = this.generated.stores.profile;
 
@@ -162,22 +162,27 @@ export default class StakingDashboardPage extends Component<Props> {
           delegationRequests.getCurrentDelegation.isExecuting
             ? undefined
             : {
-              currentPage: this.generated.stores.delegation.selectedPage,
-              numPages: Array.from(new Set(
-                delegationRequests.getCurrentDelegation.result?.currEpoch?.pools.map(
-                  tuple => tuple[0]
-                )
-              ) ?? []).length,
-              goToPage: page => this.generated.actions.delegation.setSelectedPage.trigger(page),
-            }}
+                currentPage: this.generated.stores.delegation.selectedPage,
+                numPages: Array.from(
+                  new Set(
+                    delegationRequests.getCurrentDelegation.result?.currEpoch?.pools.map(
+                      tuple => tuple[0]
+                    )
+                  ) ?? []
+                ).length,
+                goToPage: page => this.generated.actions.delegation.setSelectedPage.trigger(page),
+              }
+        }
         hasAnyPending={this.generated.stores.transactions.hasAnyPending}
         themeVars={getThemeVars({ theme: 'YoroiModern' })}
         stakePools={stakePools}
-        epochProgress={<EpochProgressContainer
-          {...this.generated.EpochProgressContainerProps}
-          publicDeriver={publicDeriver}
-          showTooltip={rewardInfo != null && rewardInfo.showWarning}
-        />}
+        epochProgress={
+          <EpochProgressContainer
+            {...this.generated.EpochProgressContainerProps}
+            publicDeriver={publicDeriver}
+            showTooltip={rewardInfo != null && rewardInfo.showWarning}
+          />
+        }
         userSummary={this._generateUserSummary({
           delegationRequests,
           publicDeriver,
@@ -200,10 +205,11 @@ export default class StakingDashboardPage extends Component<Props> {
         {popup}
         {this.getDialog(publicDeriver)}
         {dashboard}
-      </>);
+      </>
+    );
   }
 
-  getEpochLengthInDays: PublicDeriver<> => ?number = (publicDeriver) => {
+  getEpochLengthInDays: (PublicDeriver<>) => ?number = publicDeriver => {
     const timeStore = this.generated.stores.time;
     const timeCalcRequests = timeStore.getTimeCalcRequests(publicDeriver);
     const getEpochLength = timeCalcRequests.requests.currentEpochLength.result;
@@ -215,20 +221,17 @@ export default class StakingDashboardPage extends Component<Props> {
     const epochLengthInSeconds = getEpochLength() * getSlotLength();
     const epochLengthInDays = epochLengthInSeconds / (60 * 60 * 24);
     return epochLengthInDays;
-  }
+  };
 
-  generatePopupDialog: PublicDeriver<> => (null | Node) = (publicDeriver) => {
+  generatePopupDialog: (PublicDeriver<>) => null | Node = publicDeriver => {
     if (!isJormungandr(publicDeriver.getParent().getNetworkInfo())) {
       return null; // TODO
     }
-    const apiMeta = getApiMeta(
-      getApiForNetwork(publicDeriver.getParent().getNetworkInfo())
-    )?.meta;
+    const apiMeta = getApiMeta(getApiForNetwork(publicDeriver.getParent().getNetworkInfo()))?.meta;
     if (apiMeta == null) throw new Error(`${nameof(StakingDashboardPage)} no API selected`);
 
     const { uiDialogs } = this.generated.stores;
-    const delegationTxStore = this.generated.stores.substores.jormungandr
-      .delegationTransaction;
+    const delegationTxStore = this.generated.stores.substores.jormungandr.delegationTransaction;
 
     const cancel = () => {
       this.generated.actions.dialogs.closeActiveDialog.trigger();
@@ -243,17 +246,19 @@ export default class StakingDashboardPage extends Component<Props> {
           closeOnOverlayClick={false}
           onClose={cancel}
           closeButton={<DialogCloseButton onClose={cancel} />}
-          actions={[{
-            label: intl.formatMessage(globalMessages.backButtonLabel),
-            onClick: cancel,
-            primary: true,
-          }]}
+          actions={[
+            {
+              label: intl.formatMessage(globalMessages.backButtonLabel),
+              onClick: cancel,
+              primary: true,
+            },
+          ]}
         >
           <>
-            <center><InvalidURIImg /></center>
-            <ErrorBlock
-              error={delegationTxStore.createDelegationTx.error}
-            />
+            <center>
+              <InvalidURIImg />
+            </center>
+            <ErrorBlock error={delegationTxStore.createDelegationTx.error} />
           </>
         </Dialog>
       );
@@ -267,37 +272,39 @@ export default class StakingDashboardPage extends Component<Props> {
       return null;
     }
 
-    return (<UndelegateDialog
-      onCancel={cancel}
-      classicTheme={this.generated.stores.profile.isClassicTheme}
-      error={this.generated.stores.wallets.sendMoneyRequest.error}
-      onSubmit={async request => {
-        await this.generated.actions.jormungandr
-          .delegationTransaction
-          .signTransaction
-          .trigger({ password: request.password, publicDeriver, });
-        cancel();
-      }}
-      generatingTx={
-        this.generated.stores.substores.jormungandr
-          .delegationTransaction
-          .createDelegationTx
-          .isExecuting
-      }
-      isSubmitting={this.generated.stores.wallets.sendMoneyRequest.isExecuting}
-      transactionFee={getJormungandrTxFee(delegationTx.signTxRequest.self(), true)}
-      staleTx={delegationTxStore.isStale}
-      meta={{
-        decimalPlaces: apiMeta.decimalPlaces.toNumber(),
-        ticker: apiMeta.primaryTicker,
-      }}
-    />);
-  }
+    return (
+      <UndelegateDialog
+        onCancel={cancel}
+        classicTheme={this.generated.stores.profile.isClassicTheme}
+        error={this.generated.stores.wallets.sendMoneyRequest.error}
+        onSubmit={async request => {
+          await this.generated.actions.jormungandr.delegationTransaction.signTransaction.trigger({
+            password: request.password,
+            publicDeriver,
+          });
+          cancel();
+        }}
+        generatingTx={
+          this.generated.stores.substores.jormungandr.delegationTransaction.createDelegationTx
+            .isExecuting
+        }
+        isSubmitting={this.generated.stores.wallets.sendMoneyRequest.isExecuting}
+        transactionFee={getJormungandrTxFee(delegationTx.signTxRequest.self(), true)}
+        staleTx={delegationTxStore.isStale}
+        meta={{
+          decimalPlaces: apiMeta.decimalPlaces.toNumber(),
+          ticker: apiMeta.primaryTicker,
+        }}
+      />
+    );
+  };
 
-  getRewardInfo: PublicDeriver<> => (void | {|
+  getRewardInfo: (
+    PublicDeriver<>
+  ) => void | {|
     rewardPopup: Node,
     showWarning: boolean,
-  |}) = (publicDeriver) => {
+  |} = publicDeriver => {
     const timeStore = this.generated.stores.time;
     const timeCalcRequests = timeStore.getTimeCalcRequests(publicDeriver);
     const currTimeRequests = timeStore.getCurrentTimeRequests(publicDeriver);
@@ -319,11 +326,14 @@ export default class StakingDashboardPage extends Component<Props> {
     const isRegistered = this._isRegistered(publicDeriver);
 
     let rewardInfo = undefined;
-    if (!(
-      !delegationRequests.getCurrentDelegation.wasExecuted ||
-      delegationRequests.getCurrentDelegation.isExecuting
-    )) {
+    if (
+      !(
+        !delegationRequests.getCurrentDelegation.wasExecuted ||
+        delegationRequests.getCurrentDelegation.isExecuting
+      )
+    ) {
       const { result } = delegationRequests.getCurrentDelegation;
+
       if (result == null || result.currEpoch == null) {
         rewardInfo = {
           rewardPopup: (
@@ -331,6 +341,16 @@ export default class StakingDashboardPage extends Component<Props> {
               unregistered={isRegistered === false}
               useEndOfEpoch={!isJormungandr(publicDeriver.getParent().getNetworkInfo())}
               content={[
+                this.generateUpcomingRewardInfo({
+                  epoch: currTimeRequests.currentEpoch,
+                  pools: [],
+                  toAbsoluteSlot,
+                  toRealTime,
+                  timeSinceGenesis,
+                  getEpochLength,
+                  publicDeriver,
+                  isCurrentEpoch: true
+                }),
                 this.generateUpcomingRewardInfo({
                   epoch: currTimeRequests.currentEpoch + 1,
                   pools: [],
@@ -373,78 +393,106 @@ export default class StakingDashboardPage extends Component<Props> {
         // it takes 2 epochs for stake delegation to update
         // then after the start of the 3rd epoch, you get the reward
         const upcomingRewards: Array<BoxInfo> = [];
-        for (let i = 4; i >= 2; i--) {
-          upcomingRewards.unshift(this.generateUpcomingRewardInfo({
-            epoch: currTimeRequests.currentEpoch + i + 1,
-            pools: currEpochCert.pools,
-            toAbsoluteSlot,
-            toRealTime,
-            timeSinceGenesis,
-            getEpochLength,
-            publicDeriver,
-          }));
+        for (let i = 5; i >= 2; i--) {
+          upcomingRewards.unshift(
+            this.generateUpcomingRewardInfo({
+              epoch: currTimeRequests.currentEpoch + i + 1,
+              pools: currEpochCert.pools,
+              toAbsoluteSlot,
+              toRealTime,
+              timeSinceGenesis,
+              getEpochLength,
+              publicDeriver,
+            })
+          );
         }
         if (result.prevEpoch) {
-          upcomingRewards.unshift(this.generateUpcomingRewardInfo({
-            epoch: currTimeRequests.currentEpoch + 2,
-            pools: result.prevEpoch.pools,
-            toAbsoluteSlot,
-            toRealTime,
-            timeSinceGenesis,
-            getEpochLength,
-            publicDeriver,
-          }));
+          upcomingRewards.unshift(
+            this.generateUpcomingRewardInfo({
+              epoch: currTimeRequests.currentEpoch + 2,
+              pools: result.prevEpoch.pools,
+              toAbsoluteSlot,
+              toRealTime,
+              timeSinceGenesis,
+              getEpochLength,
+              publicDeriver,
+            })
+          );
         }
         if (result.prevPrevEpoch) {
-          upcomingRewards.unshift(this.generateUpcomingRewardInfo({
-            epoch: currTimeRequests.currentEpoch + 1,
-            pools: result.prevPrevEpoch.pools,
-            toAbsoluteSlot,
-            toRealTime,
-            timeSinceGenesis,
-            getEpochLength,
-            publicDeriver,
-          }));
+          upcomingRewards.unshift(
+            this.generateUpcomingRewardInfo({
+              epoch: currTimeRequests.currentEpoch + 1,
+              pools: result.prevPrevEpoch.pools,
+              toAbsoluteSlot,
+              toRealTime,
+              timeSinceGenesis,
+              getEpochLength,
+              publicDeriver,
+            })
+          );
+        }
+
+        if (result.prevPrevPrevEpoch) {
+          upcomingRewards.unshift(
+            this.generateUpcomingRewardInfo({
+              epoch: currTimeRequests.currentEpoch,
+              pools: result.prevPrevPrevEpoch.pools,
+              toAbsoluteSlot,
+              toRealTime,
+              timeSinceGenesis,
+              getEpochLength,
+              publicDeriver,
+              isCurrentEpoch: true
+            })
+          );
         }
 
         const poolExplorerLink = this.generated.stores.explorers.selectedExplorer
           .get(publicDeriver.getParent().getNetworkInfo().NetworkId)
           ?.getOrDefault('pool');
 
-        const upcomingTuples = ((upcomingRewards.slice(0, 3): any): [?BoxInfo, ?BoxInfo, ?BoxInfo]);
+        const upcomingTuples = ((upcomingRewards.slice(0, 4): any): [
+          ?BoxInfo,
+          ?BoxInfo,
+          ?BoxInfo,
+          ?BoxInfo
+        ]);
         const rewardPopup = (
           <UpcomingRewards
             unregistered={isRegistered === false}
             useEndOfEpoch={!isJormungandr(publicDeriver.getParent().getNetworkInfo())}
             content={upcomingTuples}
-            showWarning={upcomingRewards.length === 3}
+            showWarning={upcomingRewards.length === 4}
             onExternalLinkClick={handleExternalLinkClick}
             baseUrl={poolExplorerLink?.baseUrl}
           />
         );
         rewardInfo = {
           rewardPopup,
-          showWarning: upcomingRewards.length === 3,
+          showWarning: upcomingRewards.length === 4,
         };
       }
     }
 
-    return rewardInfo ?? ({
-      rewardPopup: (
-        <UpcomingRewards
-          unregistered={isRegistered === false}
-          useEndOfEpoch={!isJormungandr(publicDeriver.getParent().getNetworkInfo())}
-          content={[null, null, null]}
-          showWarning={false}
-          onExternalLinkClick={handleExternalLinkClick}
-          baseUrl=""
-        />
-      ),
-      showWarning: false,
-    });
-  }
+    return (
+      rewardInfo ?? {
+        rewardPopup: (
+          <UpcomingRewards
+            unregistered={isRegistered === false}
+            useEndOfEpoch={!isJormungandr(publicDeriver.getParent().getNetworkInfo())}
+            content={[null, null, null, null]}
+            showWarning={false}
+            onExternalLinkClick={handleExternalLinkClick}
+            baseUrl=""
+          />
+        ),
+        showWarning: false,
+      }
+    );
+  };
 
-  generateUpcomingRewardInfo: {|
+  generateUpcomingRewardInfo: ({|
     publicDeriver: PublicDeriver<>,
     epoch: number,
     pools: Array<PoolTuples>,
@@ -452,7 +500,8 @@ export default class StakingDashboardPage extends Component<Props> {
     getEpochLength: CurrentEpochLengthFunc,
     toAbsoluteSlot: ToAbsoluteSlotNumberFunc,
     timeSinceGenesis: TimeSinceGenesisFunc,
-  |} => BoxInfo = (request) => {
+    isCurrentEpoch?: boolean
+  |}) => BoxInfo = request => {
     const endEpochTime = request.toRealTime({
       absoluteSlotNum: request.toAbsoluteSlot({
         epoch: request.epoch,
@@ -469,10 +518,10 @@ export default class StakingDashboardPage extends Component<Props> {
     const miniPoolInfo = request.pools.map(pool => {
       const meta = this.generated.stores.delegation.getLocalPoolInfo(
         request.publicDeriver.getParent().getNetworkInfo(),
-        pool[0],
+        pool[0]
       );
       if (meta == null) {
-        return { id: pool, };
+        return { id: pool };
       }
       return { id: pool, ticker: meta.info?.ticker };
     });
@@ -486,12 +535,11 @@ export default class StakingDashboardPage extends Component<Props> {
         endEpochMoment.format('ss'),
         endEpochMoment.format('A'),
       ],
+      isCurrentEpoch: request.isCurrentEpoch
     };
-  }
+  };
 
-  getErrorInFetch: PublicDeriver<> => void | {| error: LocalizableError, |} = (
-    publicDeriver
-  ) => {
+  getErrorInFetch: (PublicDeriver<>) => void | {| error: LocalizableError |} = publicDeriver => {
     const delegationStore = this.generated.stores.delegation;
     const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
     if (delegationRequests == null) {
@@ -508,11 +556,9 @@ export default class StakingDashboardPage extends Component<Props> {
       }
     }
     return undefined;
-  }
+  };
 
-  getStakePools: PublicDeriver<> => {| pools: null | Array<Node | void> |} = (
-    publicDeriver
-  ) => {
+  getStakePools: (PublicDeriver<>) => {| pools: null | Array<Node | void> |} = publicDeriver => {
     const delegationStore = this.generated.stores.delegation;
     const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
     if (delegationRequests == null) {
@@ -535,13 +581,13 @@ export default class StakingDashboardPage extends Component<Props> {
       message: globalMessages.copyTooltipMessage,
     };
 
-    const { uiNotifications, } = this.generated.stores;
+    const { uiNotifications } = this.generated.stores;
     const { intl } = this.context;
     return {
       pools: currentPools.map(pool => {
         const meta = this.generated.stores.delegation.getLocalPoolInfo(
           publicDeriver.getParent().getNetworkInfo(),
-          pool[0],
+          pool[0]
         );
         if (meta == null) {
           // server hasn't returned information about the stake pool yet
@@ -549,12 +595,13 @@ export default class StakingDashboardPage extends Component<Props> {
         }
         const name = meta.info?.name ?? intl.formatMessage(globalMessages.unknownPoolLabel);
 
-        const moreInfo = meta.info?.homepage != null
-          ? {
-            openPoolPage: handleExternalLinkClick,
-            url: meta.info.homepage,
-          }
-          : undefined;
+        const moreInfo =
+          meta.info?.homepage != null
+            ? {
+                openPoolPage: handleExternalLinkClick,
+                url: meta.info.homepage,
+              }
+            : undefined;
 
         // TODO: implement this eventually
         const stakePoolMeta = {
@@ -574,9 +621,14 @@ export default class StakingDashboardPage extends Component<Props> {
             poolName={name}
             key={digestForHash(JSON.stringify(meta), 0)}
             data={stakePoolMeta}
-            selectedExplorer={this.generated.stores.explorers.selectedExplorer.get(
-              publicDeriver.getParent().getNetworkInfo().NetworkId
-            ) ?? (() => { throw new Error('No explorer for wallet network'); })()}
+            selectedExplorer={
+              this.generated.stores.explorers.selectedExplorer.get(
+                publicDeriver.getParent().getNetworkInfo().NetworkId
+              ) ??
+              (() => {
+                throw new Error('No explorer for wallet network');
+              })()
+            }
             hash={pool[0]}
             moreInfo={moreInfo}
             classicTheme={this.generated.stores.profile.isClassicTheme}
@@ -592,39 +644,39 @@ export default class StakingDashboardPage extends Component<Props> {
                 });
               }
             }}
-            notification={this.notificationElementId == null
-              ? null
-              : uiNotifications.getTooltipActiveNotification(
-                this.notificationElementId
-              )
+            notification={
+              this.notificationElementId == null
+                ? null
+                : uiNotifications.getTooltipActiveNotification(this.notificationElementId)
             }
             undelegate={
               // don't support undelegation for ratio stake since it's a less intuitive UX
               currentPools.length === 1 && isJormungandr(publicDeriver.getParent().getNetworkInfo())
                 ? async () => {
-                  this.generated.actions.dialogs.open.trigger({ dialog: UndelegateDialog });
-                  await this.generated.actions.jormungandr
-                    .delegationTransaction
-                    .createTransaction
-                    .trigger({
-                      publicDeriver,
-                      poolRequest: undefined,
-                    });
-                }
+                    this.generated.actions.dialogs.open.trigger({ dialog: UndelegateDialog });
+                    await this.generated.actions.jormungandr.delegationTransaction.createTransaction.trigger(
+                      {
+                        publicDeriver,
+                        poolRequest: undefined,
+                      }
+                    );
+                  }
                 : undefined
             }
             reputationInfo={meta.reputation}
-            openReputationDialog={() => this.generated.actions.dialogs.open.trigger({
-              dialog: PoolWarningDialog,
-              params: { reputation: meta.reputation },
-            })}
+            openReputationDialog={() =>
+              this.generated.actions.dialogs.open.trigger({
+                dialog: PoolWarningDialog,
+                params: { reputation: meta.reputation },
+              })
+            }
           />
         );
-      })
+      }),
     };
-  }
+  };
 
-  getDialog: PublicDeriver<> => Node = (publicDeriver) => {
+  getDialog: (PublicDeriver<>) => Node = publicDeriver => {
     const uiDialogs = this.generated.stores.uiDialogs;
 
     if (uiDialogs.isOpen(LessThanExpectedDialog)) {
@@ -674,7 +726,7 @@ export default class StakingDashboardPage extends Component<Props> {
           {...this.generated.WithdrawalTxDialogContainerProps}
           onClose={() => {
             this.generated.actions.ada.delegationTransaction.reset.trigger({
-              justTransaction: false
+              justTransaction: false,
             });
             this.generated.actions.dialogs.closeActiveDialog.trigger();
           }}
@@ -683,32 +735,30 @@ export default class StakingDashboardPage extends Component<Props> {
     }
 
     return null;
-  }
+  };
 
-  _generateUserSummary: {|
+  _generateUserSummary: ({|
     delegationRequests: DelegationRequests,
     publicDeriver: PublicDeriver<>,
-    errorIfPresent: void | {| error: LocalizableError |}
-  |} => Node = (request) => {
-    const showRewardAmount = request.delegationRequests.getCurrentDelegation.wasExecuted &&
+    errorIfPresent: void | {| error: LocalizableError |},
+  |}) => Node = request => {
+    const showRewardAmount =
+      request.delegationRequests.getCurrentDelegation.wasExecuted &&
       request.delegationRequests.getDelegatedBalance.wasExecuted &&
       request.errorIfPresent == null;
 
     const unmangledAmountsRequest = request.delegationRequests.mangledAmounts.result;
 
-    const txRequests = this.generated.stores.transactions
-      .getTxRequests(request.publicDeriver);
+    const txRequests = this.generated.stores.transactions.getTxRequests(request.publicDeriver);
     const balance = txRequests.requests.getBalanceRequest.result;
 
-    const apiMeta = getApiMeta(
-      getApiForNetwork(request.publicDeriver.getParent().getNetworkInfo())
-    )?.meta;
+    const apiMeta = getApiMeta(getApiForNetwork(request.publicDeriver.getParent().getNetworkInfo()))
+      ?.meta;
     if (apiMeta == null) throw new Error(`${nameof(StakingDashboardPage)} no API selected`);
     const amountPerUnit = new BigNumber(10).pow(apiMeta.decimalPlaces);
 
-    const currentlyDelegating = (
-      request.delegationRequests.getCurrentDelegation.result?.currEpoch?.pools ?? []
-    ).length > 0;
+    const currentlyDelegating =
+      (request.delegationRequests.getCurrentDelegation.result?.currEpoch?.pools ?? []).length > 0;
 
     return (
       <UserSummary
@@ -718,75 +768,73 @@ export default class StakingDashboardPage extends Component<Props> {
         }}
         canUnmangleSum={unmangledAmountsRequest?.canUnmangle ?? new BigNumber(0)}
         cannotUnmangleSum={unmangledAmountsRequest?.cannotUnmangle ?? new BigNumber(0)}
-        onUnmangle={() => this.generated.actions.dialogs.open.trigger({
-          dialog: UnmangleTxDialogContainer,
-        })}
-        totalAdaSum={balance == null
-          ? undefined
-          : this.hideOrFormat(balance.dividedBy(amountPerUnit), apiMeta)
+        onUnmangle={() =>
+          this.generated.actions.dialogs.open.trigger({
+            dialog: UnmangleTxDialogContainer,
+          })
+        }
+        totalAdaSum={
+          balance == null ? undefined : this.hideOrFormat(balance.dividedBy(amountPerUnit), apiMeta)
         }
         totalRewards={
           !showRewardAmount || request.delegationRequests.getDelegatedBalance.result == null
             ? undefined
             : this.hideOrFormat(
-              request.delegationRequests.getDelegatedBalance.result
-                .accountPart
-                .dividedBy(amountPerUnit),
-              apiMeta
-            )
+                request.delegationRequests.getDelegatedBalance.result.accountPart.dividedBy(
+                  amountPerUnit
+                ),
+                apiMeta
+              )
         }
-        openLearnMore={() => this.generated.actions.dialogs.open.trigger({
-          dialog: LessThanExpectedDialog,
-        })}
+        openLearnMore={() =>
+          this.generated.actions.dialogs.open.trigger({
+            dialog: LessThanExpectedDialog,
+          })
+        }
         withdrawRewards={
           this._isRegistered(request.publicDeriver) === true
             ? () => {
-              this.generated.actions.dialogs.open.trigger({ dialog: DeregisterDialogContainer });
-            }
+                this.generated.actions.dialogs.open.trigger({ dialog: DeregisterDialogContainer });
+              }
             : undefined
         }
         totalDelegated={
           !showRewardAmount || request.delegationRequests.getDelegatedBalance.result == null
             ? undefined
             : this.hideOrFormat(
-              currentlyDelegating
-                ? request.delegationRequests.getDelegatedBalance.result.utxoPart.plus(
-                  request.delegationRequests.getDelegatedBalance.result.accountPart
-                ).dividedBy(amountPerUnit)
-                : new BigNumber(0),
-              apiMeta
-            )}
+                currentlyDelegating
+                  ? request.delegationRequests.getDelegatedBalance.result.utxoPart
+                      .plus(request.delegationRequests.getDelegatedBalance.result.accountPart)
+                      .dividedBy(amountPerUnit)
+                  : new BigNumber(0),
+                apiMeta
+              )
+        }
       />
     );
-  }
+  };
 
-  _isRegistered: PublicDeriver<> => ?boolean = (
-    publicDeriver
-  ) => {
+  _isRegistered: (PublicDeriver<>) => ?boolean = publicDeriver => {
     if (!isCardanoHaskell(publicDeriver.getParent().getNetworkInfo())) {
       return undefined;
     }
-    const adaDelegationRequests = this.generated.stores.substores
-      .ada.delegation.getDelegationRequests(
-        publicDeriver
-      );
+    const adaDelegationRequests = this.generated.stores.substores.ada.delegation.getDelegationRequests(
+      publicDeriver
+    );
     if (adaDelegationRequests == null) return undefined;
     return adaDelegationRequests.getRegistrationHistory.result?.current;
   };
 
-  _generateRewardGraphData: {|
+  _generateRewardGraphData: ({|
     delegationRequests: DelegationRequests,
     currentEpoch: number,
     publicDeriver: PublicDeriver<>,
-  |} => (?{|
+  |}) => ?{|
     totalRewards: Array<GraphItems>,
     perEpochRewards: Array<GraphItems>,
-  |}) = (
-    request
-  ) => {
-    const apiMeta = getApiMeta(
-      getApiForNetwork(request.publicDeriver.getParent().getNetworkInfo())
-    )?.meta;
+  |} = request => {
+    const apiMeta = getApiMeta(getApiForNetwork(request.publicDeriver.getParent().getNetworkInfo()))
+      ?.meta;
     if (apiMeta == null) throw new Error(`${nameof(StakingDashboardPage)} no API selected`);
     const amountPerUnit = new BigNumber(10).pow(apiMeta.decimalPlaces);
 
@@ -824,7 +872,9 @@ export default class StakingDashboardPage extends Component<Props> {
         // since it tells you the reward you got at slot 0 of the new epoch
         return request.currentEpoch + 1;
       }
-      throw new Error(`${nameof(this._generateRewardGraphData)} can't compute endEpoch for rewards`);
+      throw new Error(
+        `${nameof(this._generateRewardGraphData)} can't compute endEpoch for rewards`
+      );
     })();
 
     for (let i = startEpoch; i < endEpoch; i++) {
@@ -857,12 +907,12 @@ export default class StakingDashboardPage extends Component<Props> {
       totalRewards,
       perEpochRewards,
     };
-  }
+  };
 
-  _generateGraphData: {|
+  _generateGraphData: ({|
     delegationRequests: DelegationRequests,
     publicDeriver: PublicDeriver<>,
-  |} => GraphData = (request) => {
+  |}) => GraphData = request => {
     const timeStore = this.generated.stores.time;
     const currTimeRequests = timeStore.getCurrentTimeRequests(request.publicDeriver);
 
@@ -874,10 +924,10 @@ export default class StakingDashboardPage extends Component<Props> {
           currentEpoch: currTimeRequests.currentEpoch,
           publicDeriver: request.publicDeriver,
         }),
-        hideYAxis: this.generated.stores.profile.shouldHideBalance
-      }
+        hideYAxis: this.generated.stores.profile.shouldHideBalance,
+      },
     };
-  }
+  };
 
   @computed get generated(): {|
     EpochProgressContainerProps: InjectedOrGenerated<EpochProgressContainerData>,
@@ -889,7 +939,7 @@ export default class StakingDashboardPage extends Component<Props> {
         delegationTransaction: {|
           reset: {| trigger: (params: {| justTransaction: boolean |}) => void |},
           createWithdrawalTxForWallet: {|
-            trigger: (params: {| publicDeriver: PublicDeriver<>, |}) => Promise<void>
+            trigger: (params: {| publicDeriver: PublicDeriver<> |}) => Promise<void>,
           |},
         |},
       |},
@@ -898,41 +948,41 @@ export default class StakingDashboardPage extends Component<Props> {
           createTransaction: {|
             trigger: (params: {|
               poolRequest: PoolRequest,
-              publicDeriver: PublicDeriver<>
-            |}) => Promise<void>
+              publicDeriver: PublicDeriver<>,
+            |}) => Promise<void>,
           |},
           reset: {| trigger: (params: void) => void |},
           signTransaction: {|
             trigger: (params: {|
               password?: string,
-              publicDeriver: PublicDeriver<>
-            |}) => Promise<void>
-          |}
-        |}
+              publicDeriver: PublicDeriver<>,
+            |}) => Promise<void>,
+          |},
+        |},
       |},
       delegation: {|
         setSelectedPage: {|
-          trigger: (params: number) => void
+          trigger: (params: number) => void,
         |},
       |},
       dialogs: {|
         closeActiveDialog: {|
-          trigger: (params: void) => void
+          trigger: (params: void) => void,
         |},
         open: {|
           trigger: (params: {|
             dialog: any,
-            params?: any
-          |}) => void
-        |}
+            params?: any,
+          |}) => void,
+        |},
       |},
       notifications: {|
-        open: {| trigger: (params: Notification) => void |}
-      |}
+        open: {| trigger: (params: Notification) => void |},
+      |},
     |},
     stores: {|
       coinPriceStore: {|
-        getCurrentPrice: (from: string, to: string) => ?number
+        getCurrentPrice: (from: string, to: string) => ?number,
       |},
       explorers: {|
         selectedExplorer: Map<number, SelectedExplorer>,
@@ -944,29 +994,21 @@ export default class StakingDashboardPage extends Component<Props> {
         },
         isClassicTheme: boolean,
         shouldHideBalance: boolean,
-        unitOfAccount: UnitOfAccountSettingType
+        unitOfAccount: UnitOfAccountSettingType,
       |},
       delegation: {|
         selectedPage: number,
-        getLocalPoolInfo: ($ReadOnly<NetworkRow>, string) => (void | PoolMeta),
-        getDelegationRequests: (
-          PublicDeriver<>
-        ) => (void | DelegationRequests),
+        getLocalPoolInfo: ($ReadOnly<NetworkRow>, string) => void | PoolMeta,
+        getDelegationRequests: (PublicDeriver<>) => void | DelegationRequests,
       |},
       time: {|
-        getCurrentTimeRequests: (
-          PublicDeriver<>
-        ) => CurrentTimeRequests,
-        getTimeCalcRequests: (
-          PublicDeriver<>
-        ) => TimeCalcRequests
+        getCurrentTimeRequests: (PublicDeriver<>) => CurrentTimeRequests,
+        getTimeCalcRequests: (PublicDeriver<>) => TimeCalcRequests,
       |},
       substores: {|
         ada: {|
           delegation: {|
-            getDelegationRequests: (
-              PublicDeriver<>
-            ) => (void | AdaDelegationRequests),
+            getDelegationRequests: (PublicDeriver<>) => void | AdaDelegationRequests,
           |},
         |},
         jormungandr: {|
@@ -974,23 +1016,23 @@ export default class StakingDashboardPage extends Component<Props> {
             createDelegationTx: {|
               error: ?LocalizableError,
               isExecuting: boolean,
-              result: ?PromisslessReturnType<CreateDelegationTxFunc>
+              result: ?PromisslessReturnType<CreateDelegationTxFunc>,
             |},
             isStale: boolean,
           |},
-        |}
+        |},
       |},
       transactions: {|
         getTxRequests: (PublicDeriver<>) => TxRequests,
-        hasAnyPending: boolean
+        hasAnyPending: boolean,
       |},
       uiDialogs: {|
         getParam: <T>(number | string) => T,
-        isOpen: any => boolean
+        isOpen: any => boolean,
       |},
       uiNotifications: {|
         getTooltipActiveNotification: string => ?Notification,
-        isOpen: string => boolean
+        isOpen: string => boolean,
       |},
       wallets: {|
         sendMoneyRequest: {|
@@ -998,9 +1040,9 @@ export default class StakingDashboardPage extends Component<Props> {
           isExecuting: boolean,
         |},
         selected: null | PublicDeriver<>,
-      |}
-    |}
-    |} {
+      |},
+    |},
+  |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }
@@ -1130,18 +1172,22 @@ export default class StakingDashboardPage extends Component<Props> {
           },
         },
       },
-      EpochProgressContainerProps: (
-        { stores, actions }: InjectedOrGenerated<EpochProgressContainerData>
-      ),
-      UnmangleTxDialogContainerProps: (
-        { stores, actions }: InjectedOrGenerated<UnmangleTxDialogContainerData>
-      ),
-      WithdrawalTxDialogContainerProps: (
-        { stores, actions }: InjectedOrGenerated<WithdrawalTxDialogContainerData>
-      ),
-      DeregisterDialogContainerProps: (
-        { stores, actions }: InjectedOrGenerated<DeregisterDialogContainerData>
-      ),
+      EpochProgressContainerProps: ({
+        stores,
+        actions,
+      }: InjectedOrGenerated<EpochProgressContainerData>),
+      UnmangleTxDialogContainerProps: ({
+        stores,
+        actions,
+      }: InjectedOrGenerated<UnmangleTxDialogContainerData>),
+      WithdrawalTxDialogContainerProps: ({
+        stores,
+        actions,
+      }: InjectedOrGenerated<WithdrawalTxDialogContainerData>),
+      DeregisterDialogContainerProps: ({
+        stores,
+        actions,
+      }: InjectedOrGenerated<DeregisterDialogContainerData>),
     });
   }
 }

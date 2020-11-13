@@ -43,6 +43,7 @@ export type GetCurrentDelegationResponse = {|
   currEpoch: void | CertificateForEpoch,
   prevEpoch: void | CertificateForEpoch,
   prevPrevEpoch: void | CertificateForEpoch,
+  prevPrevPrevEpoch: void | CertificateForEpoch,
   fullHistory: Array<CertificateForKey>,
   allPoolIds: Array<string>
 |};
