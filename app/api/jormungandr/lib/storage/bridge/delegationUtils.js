@@ -120,13 +120,13 @@ export async function getCurrentDelegation(
       };
     }
     if (result.prevPrevEpoch == null && relativeSlot.epoch <= request.currentEpoch - 2) {
-      result.prevEpoch = {
+      result.prevPrevEpoch = {
         ...delegation,
         pools,
       };
     }
     if (result.prevPrevPrevEpoch == null && relativeSlot.epoch <= request.currentEpoch - 3) {
-      result.prevPrevEpoch = {
+      result.prevPrevPrevEpoch = {
         ...delegation,
         pools,
       };
