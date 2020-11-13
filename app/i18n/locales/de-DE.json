@@ -111,6 +111,7 @@
   "global.labels.stakingKey": "Staking Schlüssel",
   "global.labels.stakingKeyHash": "Staking Schlüssel Prüfsumme",
   "global.labels.upgrade": "Aktualisieren",
+  "global.labels.current": "Current",
   "global.language.chinese.simplified": "简体中文",
   "global.language.chinese.traditional": "繁體中文",
   "global.language.dutch": "Nederlands",
