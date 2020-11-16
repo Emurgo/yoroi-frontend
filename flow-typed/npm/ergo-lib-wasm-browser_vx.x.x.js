@@ -402,7 +402,7 @@ declare module 'ergo-lib-wasm-browser' { // need to wrap flowgen output into mod
       contract: Contract,
       tx_id: TxId,
       index: number,
-      tokens: Tokens,
+      tokens: Tokens
     ): this;
 
     /**
@@ -442,6 +442,10 @@ declare module 'ergo-lib-wasm-browser' { // need to wrap flowgen output into mod
     */
     register_value(register_id: number): Constant | void;
 
+    /**
+    * JSON representation
+    * @returns {ErgoBoxJson}
+    */
     to_json(): ErgoBoxJson;
   }
   /**
@@ -499,6 +503,9 @@ declare module 'ergo-lib-wasm-browser' { // need to wrap flowgen output into mod
     */
     add(elem: ErgoBoxAssetsData): void;
   }
+  /**
+  * ErgoBox candidate not yet included in any transaction on the chain
+  */
   declare export class ErgoBoxCandidate {
     free(): void;
 
@@ -675,7 +682,10 @@ declare module 'ergo-lib-wasm-browser' { // need to wrap flowgen output into mod
     */
     get(index: number): ErgoBoxCandidate;
 
-    /// Add an element to the collection
+    /**
+    * Add an element to the collection
+    * @param {ErgoBoxCandidate} b
+    */
     add(b: ErgoBoxCandidate): void;
   }
   /**
@@ -686,7 +696,7 @@ declare module 'ergo-lib-wasm-browser' { // need to wrap flowgen output into mod
 
     /**
     * parse ErgoBox array from json
-    * @param {any[]} boxes
+    * @param {Array<ErgoBoxJson>} boxes
     * @returns {ErgoBoxes}
     */
     static from_boxes_json(boxes: Array<ErgoBoxJson>): ErgoBoxes;
@@ -1397,7 +1407,7 @@ declare module 'ergo-lib-wasm-browser' { // need to wrap flowgen output into mod
     |};
   }
   /**
-  * TBD
+  * A collection of secret keys. This simplified signing by matching the secret keys to the correct inputs automatically.
   */
   declare export class Wallet {
     free(): void;
