@@ -62,13 +62,14 @@ export class ErgoTxSignRequest implements ISignRequest<RustModule.SigmaRust.TxBu
     const receivers: Array<string> = [];
 
     const changeAddrs = new Set(this.changeAddr.map(change => change.address));
-    const outputs = this.unsignedTx.output_candidates();
+    const outputs = this.unsignedTx.build().outputs();
     for (let i = 0; i < outputs.len(); i++) {
       const output = outputs.get(i);
+      const ergoTree = output.ergo_tree();
       const address = RustModule.SigmaRust.NetworkAddress.new(
         this.networkSettingSnapshot.ChainNetworkId,
         RustModule.SigmaRust.Address.new_p2pk(
-          output.ergo_tree()
+          ergoTree
         )
       );
       const addr = Buffer.from(address.to_bytes()).toString('hex');
@@ -133,7 +134,7 @@ export function getTxOutputTotal(
 ): BigNumber {
   let sum = new BigNumber(0);
 
-  const outputs = tx.output_candidates();
+  const outputs = tx.build().outputs();
   for (let i = 0; i < outputs.len(); i++) {
     const output = outputs.get(i);
     const address = RustModule.SigmaRust.NetworkAddress.new(
@@ -172,5 +173,5 @@ export function ergoTxEqual(
 ): boolean {
   const tx1 = req1.build().to_json();
   const tx2 = req2.build().to_json();
-  return tx1 === tx2;
+  return JSON.stringify(tx1) === JSON.stringify(tx2);
 }

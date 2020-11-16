@@ -1,10 +1,10 @@
 // @flow
 
 import type { RemoteUnspentOutput } from '../state-fetch/types';
-import { Transaction } from '@coinbarn/ergo-ts';
 import type {
   Address, Value, Addressing,
 } from '../../../ada/lib/storage/models/PublicDeriver/interfaces';
+import { RustModule } from '../../../ada/lib/cardanoCrypto/rustLoader';
 
 export type ErgoAddressedUtxo = {|
   ...RemoteUnspentOutput,
@@ -13,11 +13,11 @@ export type ErgoAddressedUtxo = {|
 
 export type ErgoUnsignedTxUtxoResponse = {|
   senderUtxos: Array<RemoteUnspentOutput>,
-  unsignedTx: Transaction,
+  unsignedTx: RustModule.SigmaRust.TxBuilder,
   changeAddr: Array<{| ...Address, ...Value, ...Addressing |}>,
 |};
 export type ErgoUnsignedTxAddressedUtxoResponse = {|
   senderUtxos: Array<ErgoAddressedUtxo>,
-  unsignedTx: Transaction,
+  unsignedTx: RustModule.SigmaRust.TxBuilder,
   changeAddr: Array<{| ...Address, ...Value, ...Addressing |}>,
 |};

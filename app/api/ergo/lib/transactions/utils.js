@@ -20,6 +20,8 @@ import type {
 import type {
   ErgoAddressedUtxo,
 } from './types';
+import { RustModule } from '../../../ada/lib/cardanoCrypto/rustLoader';
+import type { RemoteUnspentOutput } from '../state-fetch/types';
 
 export function convertErgoTransactionsToExportRows(
   transactions: $ReadOnlyArray<$ReadOnly<{
@@ -75,4 +77,36 @@ export function asAddressedUtxo(
       ergoTree: output.ErgoTree,
     };
   });
+}
+
+export function replaceMockBoxId(utxo: RemoteUnspentOutput): RemoteUnspentOutput {
+  const tokens = new RustModule.SigmaRust.Tokens();
+  for (const token of (utxo.assets ?? [])) {
+    tokens.add(new RustModule.SigmaRust.Token(
+      RustModule.SigmaRust.TokenId.from_str(token.tokenId),
+      RustModule.SigmaRust.TokenAmount.from_i64(
+        RustModule.SigmaRust.I64.from_str(token.amount.toString())
+      )
+    ));
+  }
+
+  const box = new RustModule.SigmaRust.ErgoBox(
+    RustModule.SigmaRust.BoxValue.from_i64(
+      RustModule.SigmaRust.I64.from_str(utxo.amount)
+    ),
+    utxo.creationHeight,
+    RustModule.SigmaRust.Contract.pay_to_address(
+      RustModule.SigmaRust.Address.from_bytes(
+        Buffer.from(utxo.receiver, 'hex')
+      )
+    ),
+    RustModule.SigmaRust.TxId.from_hex(utxo.tx_hash),
+    utxo.tx_index,
+    tokens
+  );
+
+  return {
+    ...utxo,
+    boxId: box.box_id().to_str()
+  };
 }

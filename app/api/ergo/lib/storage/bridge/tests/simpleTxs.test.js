@@ -271,10 +271,10 @@ async function syncingSimpleTransaction(): Promise<void> {
       const response = await basePubDeriver.getAllUtxos();
       expect(response).toEqual([{
         // 9gYJPYdfSuMz3YxcQTFJ8sTYMKgrABeoFiLpFrkkDM1YPHaXzHD
-        address: getErgoAddress(
+        address: Buffer.from(getErgoAddress(
           TX_TEST_MNEMONIC_1,
           expectedAddressing
-        ).to_bytes.toString('hex'),
+        ).to_bytes()).toString('hex'),
         addressing: {
           path: expectedAddressing,
           startLevel: 1,
@@ -364,10 +364,10 @@ async function syncingSimpleTransaction(): Promise<void> {
       const response = await basePubDeriver.getAllUtxos();
       expect(response).toEqual([{
         // 9f6CoekmariCyqfJm97zBSn2D7WT3AQhXana7tuyh8jZbNDhCuV
-        address: getErgoAddress(
+        address: Buffer.from(getErgoAddress(
           TX_TEST_MNEMONIC_1,
           expectedAddressing1,
-        ).to_bytes.toString('hex'),
+        ).to_bytes()).toString('hex'),
         addressing: {
           path: expectedAddressing1,
           startLevel: 1,
@@ -400,10 +400,10 @@ async function syncingSimpleTransaction(): Promise<void> {
       },
       {
         // 9gzsdG5W1J1g8SaTW8qfNs219vsNUEYQFqoZakx6T3dGgXmyxRN
-        address: getErgoAddress(
+        address: Buffer.from(getErgoAddress(
           TX_TEST_MNEMONIC_1,
           expectedAddressing2
-        ).to_bytes.toString('hex'),
+        ).to_bytes()).toString('hex'),
         addressing: {
           path: expectedAddressing2,
           startLevel: 1,

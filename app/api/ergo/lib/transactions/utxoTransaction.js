@@ -1,6 +1,6 @@
 // @flow
 
-// Handles interfacing w/ ergo-ts to create transaction
+// Handles creating transactions
 
 import BigNumber from 'bignumber.js';
 import type {
@@ -25,11 +25,6 @@ import {
 import type {
   Address, Addressing,
 } from '../../../ada/lib/storage/models/PublicDeriver/interfaces';
-import {
-  Address as ErgoAddress,
-  ErgoBox,
-  Transaction,
-} from '@coinbarn/ergo-ts';
 import { BIP32PrivateKey } from '../../../common/lib/crypto/keys/keyRepository';
 import { deriveByAddressing } from '../../../common/lib/crypto/keys/utils';
 import { ErgoTxSignRequest } from './ErgoTxSignRequest';
@@ -103,74 +98,93 @@ export function sendAllUnsignedTxFromUtxo(request: {|
     // Ergo requires at least 1 input per transaction
     throw new NotEnoughMoneyToSendError();
   }
-  const inputs: Array<{|
-    self: RemoteUnspentOutput,
-    box: ErgoBox,
-  |}> = [];
-  let inputAmountSum = new BigNumber(0);
-  for (const utxo of request.utxos) {
-    inputs.push({
-      self: utxo,
-      box: new ErgoBox(
-        utxo.boxId,
-        Number.parseInt(utxo.amount, 10),
-        utxo.creationHeight,
-        ErgoAddress.fromBytes(
-          Buffer.from(utxo.receiver, 'hex')
-        ),
-        utxo.assets == null
-          ? undefined
-          : utxo.assets.map(asset => ({ ...asset })),
-        utxo.additionalRegisters
-      )
-    });
-    inputAmountSum = inputAmountSum.plus(utxo.amount);
-  }
 
-  const outputSum = request.txFee
-    .plus(request.protocolParams.MinimumBoxValue); // min value for the output
+  const wasmInputs = RustModule.SigmaRust.ErgoBoxes.from_boxes_json(
+    request.utxos.map(utxo => {
+      return {
+        boxId: utxo.boxId,
+        value: Number.parseInt(utxo.amount, 10),
+        ergoTree: utxo.ergoTree,
+        assets: (utxo.assets ?? []).map(asset => ({
+          amount: asset.amount,
+          tokenId: asset.tokenId,
+        })),
+        creationHeight: utxo.creationHeight,
+        additionalRegisters: utxo.additionalRegisters || Object.freeze({}),
+        transactionId: utxo.tx_hash,
+        index: utxo.tx_index,
+      };
+    })
+  );
 
-  if (inputAmountSum.lt(outputSum)) {
+  const inputAmountSum = request.utxos.reduce(
+    (prev, next) => prev.plus(next.amount),
+    new BigNumber(0)
+  );
+  if (inputAmountSum.minus(request.txFee).lt(
+    request.protocolParams.MinimumBoxValue
+  )) {
     throw new NotEnoughMoneyToSendError();
   }
 
-  const fee = new ErgoBox(
-    '',
-    request.txFee.toNumber(),
+  const assets = getAssets(request.utxos);
+
+  // recall: sendall is equivalent to sending all the ERG to the change address
+  const change = (() => {
+    const changeList = new RustModule.SigmaRust.ErgoBoxAssetsDataList();
+
+    const tokens = new RustModule.SigmaRust.Tokens();
+    for (const entry of assets.entries()) {
+      tokens.add(new RustModule.SigmaRust.Token(
+        RustModule.SigmaRust.TokenId.from_str(entry[0]),
+        RustModule.SigmaRust.TokenAmount.from_i64(
+          RustModule.SigmaRust.I64.from_str(entry[1].toString())
+        )
+      ));
+    }
+    const value = RustModule.SigmaRust.BoxValue.from_i64(
+      RustModule.SigmaRust.I64.from_str(
+        inputAmountSum.minus(request.txFee).toString()
+      )
+    );
+    changeList.add(
+      new RustModule.SigmaRust.ErgoBoxAssetsData(
+        value,
+        tokens
+      )
+    );
+    return changeList;
+  })();
+
+  const allUtxoSelection = new RustModule.SigmaRust.BoxSelection(
+    wasmInputs,
+    change
+  );
+
+  const txBuilder = RustModule.SigmaRust.TxBuilder.new(
+    allUtxoSelection,
+    RustModule.SigmaRust.ErgoBoxCandidates.empty(),
     request.currentHeight,
-    ErgoAddress.fromBytes(
+    RustModule.SigmaRust.BoxValue.from_i64(
+      RustModule.SigmaRust.I64.from_str(request.txFee.toString())
+    ),
+    RustModule.SigmaRust.Address.from_bytes(
       Buffer.from(request.protocolParams.FeeAddress, 'hex')
     ),
-  );
-
-  const output = new ErgoBox(
-    '', // TODO: do we need this for outputs?
-    inputAmountSum.minus(fee.value).toNumber(),
-    request.currentHeight,
-    ErgoAddress.fromBytes(
-      Buffer.from(request.receiver.address, 'hex')
+    RustModule.SigmaRust.BoxValue.from_i64(
+      RustModule.SigmaRust.I64.from_str(request.protocolParams.MinimumBoxValue.toString())
     ),
-    // include all the tokens as well
-    Array.from(
-      getAssets(request.utxos).entries()
-    )
-      .map(entry => ({ tokenId: entry[0], amount: entry[1].toNumber(), }))
-  );
-
-  const unsignedTx = new Transaction(
-    inputs.map(input => input.box.toInput()),
-    [fee, output],
-    [],
   );
 
   return {
-    senderUtxos: inputs.map(input => input.self),
-    unsignedTx,
+    senderUtxos: request.utxos,
+    unsignedTx: txBuilder,
     changeAddr: request.receiver.addressing
       ? [{
         addressing: request.receiver.addressing,
         address: request.receiver.address,
-        value: new BigNumber(output.value),
+        value: new BigNumber(change.get(0).value().as_i64().to_str()),
+        // TODO: add tokens
       }]
       : [],
   };
@@ -266,120 +280,122 @@ export function newErgoUnsignedTxFromUtxo(request: {|
     MinimumBoxValue: string,
   |},
 |}): ErgoUnsignedTxUtxoResponse {
-  const explicitOutputs = request.outputs.reduce(
-    (sum, next) => sum.plus(next.amount),
-    new BigNumber(0),
-  );
-
-  const inputs: Array<{|
-    self: RemoteUnspentOutput,
-    box: ErgoBox,
-  |}> = [];
-  let inputAmountSum = new BigNumber(0);
-  const outputSum =
-    explicitOutputs
-      .plus(request.txFee)
-      .plus(request.protocolParams.MinimumBoxValue); // note: always need to create change box
-
-  // input selection
-  for (const utxo of request.utxos) {
-    inputs.push({
-      self: utxo,
-      box: new ErgoBox(
-        utxo.boxId,
-        Number.parseInt(utxo.amount, 10),
-        utxo.creationHeight,
-        ErgoAddress.fromBytes(
-          Buffer.from(utxo.receiver, 'hex')
-        ),
-        utxo.assets == null
-          ? undefined
-          : utxo.assets.map(asset => ({ ...asset })),
-        utxo.additionalRegisters
-      )
-    });
-    inputAmountSum = inputAmountSum.plus(utxo.amount);
-
-    if (inputAmountSum.gte(outputSum)) break;
-  }
-
-  if (inputAmountSum.lt(outputSum)) {
-    throw new NotEnoughMoneyToSendError();
-  }
-  if (inputs.length === 0) {
+  if (request.utxos.length === 0) {
     // Ergo requires at least 1 input per transaction
     throw new NotEnoughMoneyToSendError();
   }
 
-  const outputs = request.outputs.map(output => new ErgoBox(
-    '', // TODO: do we need this for outputs?
-    Number.parseInt(output.amount, 10),
+  const boxCandidates = (() => {
+    let candidates = null;
+    for (const output of request.outputs) {
+      // TODO: currently we don't handle tokens in the output
+      // so it all gets sent back as change
+      const wasmOutput = new RustModule.SigmaRust.ErgoBoxCandidateBuilder(
+        RustModule.SigmaRust.BoxValue.from_i64(
+          RustModule.SigmaRust.I64.from_str(output.amount)
+        ),
+        RustModule.SigmaRust.Contract.pay_to_address(
+          RustModule.SigmaRust.Address.from_bytes(
+            Buffer.from(output.address, 'hex')
+          )
+        ),
+        request.currentHeight
+      );
+
+      const candidate = wasmOutput.build();
+      if (candidates == null) {
+        candidates = new RustModule.SigmaRust.ErgoBoxCandidates(candidate);
+      } else {
+        candidates.add(candidate);
+      }
+    }
+    if (candidates == null) {
+      throw new Error(`${nameof(newErgoUnsignedTxFromUtxo)} Ergo txs require at least one output`);
+    }
+    return candidates;
+  })();
+
+  const outputs = request.outputs.reduce(
+    (sum, next) => sum.plus(next.amount),
+    new BigNumber(0),
+  ).plus(request.txFee);
+
+  const wasmInputs = RustModule.SigmaRust.ErgoBoxes.from_boxes_json(
+    request.utxos.map(utxo => {
+      return {
+        boxId: utxo.boxId,
+        value: Number.parseInt(utxo.amount, 10),
+        ergoTree: utxo.ergoTree,
+        assets: (utxo.assets ?? []).map(asset => ({
+          amount: asset.amount,
+          tokenId: asset.tokenId,
+        })),
+        creationHeight: utxo.creationHeight,
+        additionalRegisters: utxo.additionalRegisters || Object.freeze({}),
+        transactionId: utxo.tx_hash,
+        index: utxo.tx_index,
+      };
+    })
+  );
+
+  const selectedInputs = (() => {
+    const boxSelectors = new RustModule.SigmaRust.SimpleBoxSelector();
+    try {
+      return boxSelectors.select(
+        wasmInputs,
+        RustModule.SigmaRust.BoxValue.from_i64(
+          RustModule.SigmaRust.I64.from_str(outputs.toString())
+        ),
+        new RustModule.SigmaRust.Tokens() // TODO: handle tokens in output
+      );
+    } catch (e) {
+      throw new NotEnoughMoneyToSendError();
+    }
+  })();
+
+  const txBuilder = RustModule.SigmaRust.TxBuilder.new(
+    selectedInputs,
+    boxCandidates,
     request.currentHeight,
-    ErgoAddress.fromBytes(
-      Buffer.from(output.address, 'hex')
-    )
-  ));
-
-  // note: when explicitly adding the fee
-  // ergo-ts will not re-add the fee automatically (it checks if the fee is present)
-  // we explicitly add the fee since ergo-ts is hardcoded to set the fee as a mainnet fee
-  // but we want to support the testnet also
-  outputs.push(
-    new ErgoBox(
-      '',
-      request.txFee.toNumber(),
-      request.currentHeight,
-      ErgoAddress.fromBytes(
-        Buffer.from(request.protocolParams.FeeAddress, 'hex')
-      ),
-    )
-  );
-
-  // note: this does input selection for you & adds fee + change also
-  // warning: if you don't have enough for the min UTXO value, it won't create a change
-  // this is dangerous since it could burn any multi-asset tokens
-  // we avoid this happening by making sure we have enough for the change min utxo value
-  // when doing the input selection above
-  // warning: this is hardcoded for mainnet
-  const unsignedTx = Transaction.fromOutputs(
-    inputs.map(input => input.box),
-    outputs,
-    request.txFee.toNumber(),
-  );
-
-  // warning: this assumes the following behavior from ergo-ts:
-  //  inputs are added in the following order
-  //  1) explicit outputs
-  //  2) one box for the fee
-  //  3) any change boxes (or none)
-  const changeBoxIndex = outputs.length;
-  const changeBox = unsignedTx.outputs[changeBoxIndex];
-  // throw if no change address was added since this could be burning multi-asset tokens
-  if (changeBox == null) {
-    throw new Error(`${nameof(newErgoUnsignedTxFromUtxo)} no change was found`);
-  }
-
-  // ergo-ts always sends the change to the first input in the list
-  // but we want to instead send it to whatever address specified
-  unsignedTx.outputs[changeBoxIndex] = new ErgoBox(
-    '', // TODO: do we need this for outputs?
-    changeBox.value,
-    changeBox.creationHeight,
-    ErgoAddress.fromBytes(
+    RustModule.SigmaRust.BoxValue.from_i64(
+      RustModule.SigmaRust.I64.from_str(request.txFee.toString())
+    ),
+    RustModule.SigmaRust.Address.from_bytes(
       Buffer.from(request.changeAddr.address, 'hex')
     ),
-    changeBox.assets,
-    changeBox.additionalRegisters
+    RustModule.SigmaRust.BoxValue.from_i64(
+      RustModule.SigmaRust.I64.from_str(request.protocolParams.MinimumBoxValue.toString())
+    ),
   );
 
+  const changeAddr = (() => {
+    const result = [];
+    const selectedChange = selectedInputs.change();
+    for (let i = 0; i < selectedChange.len(); i++) {
+      const change = selectedChange.get(i);
+      // TODO: token information is dropped
+      result.push({
+        address: request.changeAddr.address,
+        value: new BigNumber(change.value().as_i64().to_str()),
+        addressing: request.changeAddr.addressing,
+      });
+    }
+    return result;
+  })();
+
+  const includedBoxes = (() => {
+    const selectedBoxes = selectedInputs.boxes();
+    const idSet = new Set<string>();
+    for (let i = 0; i < selectedBoxes.len(); i++) {
+      const box = selectedBoxes.get(i);
+      idSet.add(box.box_id().to_str());
+    }
+    return idSet;
+  })();
   return {
-    changeAddr: [{
-      address: request.changeAddr.address,
-      value: new BigNumber(changeBox.value),
-      addressing: request.changeAddr.addressing,
-    }],
-    senderUtxos: inputs.map(input => input.self),
-    unsignedTx,
+    changeAddr,
+    senderUtxos: request.utxos.filter(utxo => includedBoxes.has(utxo.boxId)),
+    unsignedTx: txBuilder,
   };
 }
 
@@ -388,6 +404,10 @@ export function signTransaction(request: {|
   keyLevel: number,
   signingKey: BIP32PrivateKey
 |}): $Diff<SignedRequest, BackendNetworkInfo> {
+  if (request.signRequest.unsignedTx.data_inputs().len() > 0) {
+    throw new Error(`${nameof(signTransaction)} data inputs not supported by sigma rust`);
+  }
+
   const unsignedTx = request.signRequest.unsignedTx.build();
 
   const wasmKeys = generateKeys({
@@ -395,10 +415,6 @@ export function signTransaction(request: {|
     keyLevel: request.keyLevel,
     signingKey: request.signingKey,
   });
-
-  if (request.signRequest.unsignedTx.data_inputs().len() > 0) {
-    throw new Error(`${nameof(signTransaction)} data inputs not supported by sigma rust`);
-  }
 
   const signedTx = RustModule.SigmaRust.Wallet
     .from_secrets(wasmKeys)

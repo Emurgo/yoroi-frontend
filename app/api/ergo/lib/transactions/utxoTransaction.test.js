@@ -41,52 +41,52 @@ import { decode, } from 'bs58';
 import { ErgoTxSignRequest } from './ErgoTxSignRequest';
 import { derivePath } from '../../../common/lib/crypto/keys/keyRepository';
 import { generateWalletRootKey } from '../crypto/wallet';
-import { verify, Serializer } from '@coinbarn/ergo-ts';
 import { RustModule } from '../../../ada/lib/cardanoCrypto/rustLoader';
+import { replaceMockBoxId } from './utils';
 
 const network = networks.ErgoMainnet;
 
 const genSampleUtxos: void => Array<RemoteUnspentOutput> = () => [
-  {
+  replaceMockBoxId({
     amount: '100001',
     receiver: decode('9egNKTzQDH658qcdiPEoQfVM1SBxQNxnyF8BCw57aNWerRhhHBQ').toString('hex'),
     tx_hash: '05ec4a4a7f4645fa66886cef2e34706907a3a7f9d88e0d48b313ad2cdf76fb5f',
     tx_index: 0,
     creationHeight: 1,
-    boxId: '05ec4a4a7f4645fa66886cef2e34706907a3a7f9d88e0d48b313ad2cdf76fb5f0',
+    boxId: '05ec4a4a7f4645fa66886cef2e34706907a3a7f9d88e0d48b313ad2cdf76fb5f',
     ergoTree: Buffer.from(RustModule.SigmaRust.Address.from_base58(
       '9egNKTzQDH658qcdiPEoQfVM1SBxQNxnyF8BCw57aNWerRhhHBQ'
     ).to_ergo_tree().to_bytes()).toString('hex'),
-  },
-  {
+  }),
+  replaceMockBoxId({
     amount: '1000001',
     receiver: decode('9egNKTzQDH658qcdiPEoQfVM1SBxQNxnyF8BCw57aNWerRhhHBQ').toString('hex'),
     tx_hash: '6930f123df83e4178b0324ae617b2028c0b38c6ff4660583a2abf1f7b08195fe',
     tx_index: 0,
     creationHeight: 2,
-    boxId: '6930f123df83e4178b0324ae617b2028c0b38c6ff4660583a2abf1f7b08195fe0',
+    boxId: '6930f123df83e4178b0324ae617b2028c0b38c6ff4660583a2abf1f7b08195fe',
     ergoTree: Buffer.from(RustModule.SigmaRust.Address.from_base58(
       '9egNKTzQDH658qcdiPEoQfVM1SBxQNxnyF8BCw57aNWerRhhHBQ'
     ).to_ergo_tree().to_bytes()).toString('hex'),
-  },
-  {
+  }),
+  replaceMockBoxId({
     amount: '10000001',
     receiver: decode('9iEqML45XncjkVtkrMFysY6qdKWhJs6fd3BNy7ExAVhTsaZemdF').toString('hex'),
     tx_hash: '0df0273e382739f8b4ae3783d81168093e78e0b48ec2c5430ff03d444806a173',
     tx_index: 0,
     creationHeight: 3,
-    boxId: '0df0273e382739f8b4ae3783d81168093e78e0b48ec2c5430ff03d444806a1730',
+    boxId: '0df0273e382739f8b4ae3783d81168093e78e0b48ec2c5430ff03d444806a173',
     ergoTree: Buffer.from(RustModule.SigmaRust.Address.from_base58(
       '9iEqML45XncjkVtkrMFysY6qdKWhJs6fd3BNy7ExAVhTsaZemdF'
     ).to_ergo_tree().to_bytes()).toString('hex'),
-  },
-  {
+  }),
+  replaceMockBoxId({
     amount: '20000000',
     receiver: decode('9hkTdcLcWqQxYQ3qexRb7MpZniDusrUr6R2Hp48cJU6H4Npq6jC').toString('hex'),
     tx_hash: '0df0273e382739f8b4ae3783d81168093e78e0b49ec2c5430ff03d444806a173',
     tx_index: 0,
     creationHeight: 4,
-    boxId: '0df0273e382739f8b4ae3783d81168093e78e0b48ec2c5430ff04d444806a1730',
+    boxId: '0df0273e382739f8b4ae3783d81168093e78e0b48ec2c5430ff04d444806a173',
     ergoTree: Buffer.from(RustModule.SigmaRust.Address.from_base58(
       '9hkTdcLcWqQxYQ3qexRb7MpZniDusrUr6R2Hp48cJU6H4Npq6jC'
     ).to_ergo_tree().to_bytes()).toString('hex'),
@@ -94,7 +94,7 @@ const genSampleUtxos: void => Array<RemoteUnspentOutput> = () => [
       tokenId: '13d24a67432d447e53118d920100c747abb52da8da646bc193f03b47b64a8ac5',
       amount: 10000,
     }],
-  },
+  }),
 ];
 const genSampleErgoAddresses: void => Array<{| ...Address, ...Addressing |}> = () => [
   {
@@ -185,7 +185,7 @@ describe('Create unsigned TX from UTXO', () => {
     expect(() => newErgoUnsignedTxFromUtxo({
       outputs: [{
         address: decode('9egNKTzQDH658qcdiPEoQfVM1SBxQNxnyF8BCw57aNWerRhhHBQ').toString('hex'),
-        amount: '1', // bigger than input including fees
+        amount: '1',
       }],
       changeAddr: {
         address: decode('9emv7LAtw7U6xMs4JrJP8NTPvwQjNRaSWpgSTGEM6947fFofBWd').toString('hex'),
@@ -207,7 +207,7 @@ describe('Create unsigned TX from UTXO', () => {
     expect(() => newErgoUnsignedTxFromUtxo({
       outputs: [{
         address: decode('9egNKTzQDH658qcdiPEoQfVM1SBxQNxnyF8BCw57aNWerRhhHBQ').toString('hex'),
-        amount: '1', // bigger than input including fees
+        amount: '100000', // less than input
       }],
       changeAddr: {
         address: decode('9emv7LAtw7U6xMs4JrJP8NTPvwQjNRaSWpgSTGEM6947fFofBWd').toString('hex'),
@@ -218,43 +218,75 @@ describe('Create unsigned TX from UTXO', () => {
       },
       utxos,
       currentHeight: 100,
-      txFee: new BigNumber('500'),
+      txFee: new BigNumber('50000'),
       protocolParams: getProtocolParams(),
     })).toThrow(NotEnoughMoneyToSendError);
   });
 
   it('Should pick inputs when using input selection', () => {
+    const output = 50002;
+    const txFee = 50000;
+
     const utxos: Array<RemoteUnspentOutput> = genSampleUtxos();
     const sampleErgoAddresses = genSampleErgoAddresses();
     const unsignedTxResponse = newErgoUnsignedTxFromUtxo({
       outputs: [{
         address: decode('9egNKTzQDH658qcdiPEoQfVM1SBxQNxnyF8BCw57aNWerRhhHBQ').toString('hex'),
-        amount: '1001', // smaller than input
+        amount: output.toString(), // smaller than input
       }],
       changeAddr: sampleErgoAddresses[0],
       utxos,
       currentHeight: 100,
-      txFee: new BigNumber('500'),
+      txFee: new BigNumber(txFee),
       protocolParams: getProtocolParams(),
     });
 
     // input selection will only take 2 of the 3 inputs
     // it takes 2 inputs because input selection algorithm
     expect(unsignedTxResponse.senderUtxos).toEqual([utxos[0], utxos[1]]);
-    expect(unsignedTxResponse.unsignedTx.inputs[0].boxId).toEqual('05ec4a4a7f4645fa66886cef2e34706907a3a7f9d88e0d48b313ad2cdf76fb5f0');
-    expect(unsignedTxResponse.unsignedTx.inputs[1].boxId).toEqual('6930f123df83e4178b0324ae617b2028c0b38c6ff4660583a2abf1f7b08195fe0');
+    expect(
+      unsignedTxResponse.unsignedTx
+        .box_selection().boxes()
+        .get(0)
+        .box_id()
+        .to_str()
+    ).toEqual('1123a25bed49beafcc3e08b99c24882a9fa70dc0525a6ec367af50d5b6d1bdb9');
+    expect(
+      unsignedTxResponse.unsignedTx
+        .box_selection().boxes()
+        .get(1)
+        .box_id()
+        .to_str()
+    ).toEqual('4a995b3c6ade538b71418b7a2a39d2773140df869e491a670b8502b7b6f0da1b');
 
-    const output1 = 1001;
-    const output2 = 500;
-    expect(unsignedTxResponse.unsignedTx.outputs.length).toEqual(3);
-    expect(unsignedTxResponse.unsignedTx.outputs[0].value).toEqual(output1); // output of tx
-    expect(unsignedTxResponse.unsignedTx.outputs[1].value).toEqual(output2); // fee
+    const unsignedTx = unsignedTxResponse.unsignedTx.build();
+    expect(unsignedTx.outputs().len()).toEqual(3);
+    expect(
+      unsignedTx
+        .outputs()
+        .get(0)
+        .value().as_i64()
+        .to_str()
+    ).toEqual(output.toString()); // output of tx
+    expect(
+      unsignedTx
+        .outputs()
+        .get(2)
+        .value().as_i64()
+        .to_str()
+    ).toEqual(txFee.toString()); // fee
 
     const expectedReturn = unsignedTxResponse.senderUtxos.reduce(
       (sum, utxo) => sum.plus(utxo.amount),
       new BigNumber(0)
-    ).toNumber() - output1 - output2;
-    expect(unsignedTxResponse.unsignedTx.outputs[2].value).toEqual(expectedReturn);
+    ).toNumber() - output - txFee;
+    expect(
+      unsignedTx
+        .outputs()
+        .get(1)
+        .value().as_i64()
+        .to_str()
+    ).toEqual(expectedReturn.toString()); // change
   });
 });
 
@@ -264,7 +296,7 @@ describe('Create unsigned TX from addresses', () => {
     const unsignedTxResponse = newErgoUnsignedTx({
       outputs: [{
         address: decode('9egNKTzQDH658qcdiPEoQfVM1SBxQNxnyF8BCw57aNWerRhhHBQ').toString('hex'),
-        amount: '5001', // smaller than input
+        amount: '50001', // smaller than input
       }],
       changeAddr: {
         address: decode('9emv7LAtw7U6xMs4JrJP8NTPvwQjNRaSWpgSTGEM6947fFofBWd').toString('hex'),
@@ -275,17 +307,25 @@ describe('Create unsigned TX from addresses', () => {
       },
       utxos: [addressedUtxos[3]],
       currentHeight: 100,
-      txFee: new BigNumber('500'),
+      txFee: new BigNumber('50000'),
       protocolParams: getProtocolParams(),
     });
     expect(unsignedTxResponse.senderUtxos).toEqual([addressedUtxos[3]]);
 
-    expect(unsignedTxResponse.unsignedTx.outputs.length).toEqual(3);
+    expect(unsignedTxResponse.unsignedTx.output_candidates().len()).toEqual(1);
     // make sure the assets are sent back to us in the change
-    expect(unsignedTxResponse.unsignedTx.outputs[2].assets).toEqual([{
+    expect(
+      unsignedTxResponse.unsignedTx
+        .box_selection()
+        .change()
+        .get(0)
+        .tokens()
+        .get(0)
+        .to_json()
+    ).toEqual({
       tokenId: '13d24a67432d447e53118d920100c747abb52da8da646bc193f03b47b64a8ac5',
       amount: 10000,
-    }]);
+    });
   });
 });
 
@@ -296,7 +336,7 @@ describe('Create signed transactions', () => {
     const unsignedTxResponse = newErgoUnsignedTx({
       outputs: [{
         address: decode('9egNKTzQDH658qcdiPEoQfVM1SBxQNxnyF8BCw57aNWerRhhHBQ').toString('hex'),
-        amount: '5001', // smaller than input
+        amount: '50000', // smaller than input
       }],
       changeAddr: {
         address: decode('9emv7LAtw7U6xMs4JrJP8NTPvwQjNRaSWpgSTGEM6947fFofBWd').toString('hex'),
@@ -307,7 +347,7 @@ describe('Create signed transactions', () => {
       },
       utxos: [addressedUtxos[0], addressedUtxos[2]],
       currentHeight: 100,
-      txFee: new BigNumber('500'),
+      txFee: new BigNumber('50000'),
       protocolParams: params,
     });
     const signRequest = new ErgoTxSignRequest({
@@ -316,6 +356,9 @@ describe('Create signed transactions', () => {
       unsignedTx: unsignedTxResponse.unsignedTx,
       networkSettingSnapshot: {
         FeeAddress: params.FeeAddress,
+        ChainNetworkId: (
+          Number.parseInt(getErgoBaseConfig(network)[0].ChainNetworkId, 10): any
+        ),
       },
     });
 
@@ -336,21 +379,15 @@ describe('Create signed transactions', () => {
       keyLevel: Bip44DerivationLevels.CHAIN.level,
       signingKey: chainKey,
     });
-    const serializeTransaction = Serializer.transactionToBytes(signRequest.unsignedTx);
-
     // note: the proofBytes includes random data so we can't just compare against the proof
     // so we have to instead use the verification function
     expect(signedTx.inputs.length).toEqual(2);
-    expect(verify(
-      serializeTransaction,
-      Buffer.from('1653bbe49ebc43d6c1c2d16f83036869aeed0140b280654c97ce03ec8bb5e5b3a138b99849e763104c2c29c976ce6b22fdf3c02ea9dd5b3b', 'hex'),
-      derivePath(chainKey, addressedUtxos[0].addressing.path).toPublic().key.publicKey
-    )).toEqual(true);
-    expect(verify(
-      serializeTransaction,
-      Buffer.from('4ef149a11c9d67e9965b7dc8b55f42c16da451391024f82c349d22438ee3d04361fb43f7d34bdf1404aa87c77e4a7ae6396d1ba42900dd63', 'hex'),
-      derivePath(chainKey, addressedUtxos[2].addressing.path).toPublic().key.publicKey
-    )).toEqual(true);
+    expect(signedTx.inputs[0].spendingProof.proofBytes).toEqual(
+      '1653bbe49ebc43d6c1c2d16f83036869aeed0140b280654c97ce03ec8bb5e5b3a138b99849e763104c2c29c976ce6b22fdf3c02ea9dd5b3b'
+    );
+    expect(signedTx.inputs[1].spendingProof.proofBytes).toEqual(
+      '4ef149a11c9d67e9965b7dc8b55f42c16da451391024f82c349d22438ee3d04361fb43f7d34bdf1404aa87c77e4a7ae6396d1ba42900dd63'
+    );
   });
 });
 
@@ -365,21 +402,41 @@ describe('Create sendAll unsigned TX from UTXO', () => {
         },
         utxos,
         currentHeight: 100,
-        txFee: new BigNumber('500'),
+        txFee: new BigNumber('50000'),
         protocolParams: getProtocolParams(),
       });
 
       expect(sendAllResponse.senderUtxos).toEqual(utxos);
-      expect(sendAllResponse.unsignedTx.inputs.length).toEqual(2);
+      expect(sendAllResponse.unsignedTx.box_selection().boxes().len()).toEqual(2);
 
-      expect(sendAllResponse.unsignedTx.outputs.length).toEqual(2);
-      expect(sendAllResponse.unsignedTx.outputs[0].value).toEqual(500); // fee
-      expect(sendAllResponse.unsignedTx.outputs[1].value).toEqual(20999501); // output
+      const unsignedTx = sendAllResponse.unsignedTx.build();
+      expect(unsignedTx.outputs().len()).toEqual(2);
+      expect(
+        unsignedTx
+          .outputs()
+          .get(0)
+          .value().as_i64()
+          .to_str()
+      ).toEqual('20950001'); // output
+      expect(
+        unsignedTx
+          .outputs()
+          .get(1)
+          .value().as_i64()
+          .to_str()
+      ).toEqual('50000'); // fee
       // make sure the assets are also sent
-      expect(sendAllResponse.unsignedTx.outputs[1].assets).toEqual([{
+      expect(
+        unsignedTx
+          .outputs()
+          .get(0)
+          .tokens()
+          .get(0)
+          .to_json()
+      ).toEqual({
         tokenId: '13d24a67432d447e53118d920100c747abb52da8da646bc193f03b47b64a8ac5',
         amount: 10000,
-      }]); // output
+      }); // output
     });
   });
 
