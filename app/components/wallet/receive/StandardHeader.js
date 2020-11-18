@@ -4,12 +4,12 @@ import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import classnames from 'classnames';
-import QRCode from 'qrcode.react';
 import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import LocalizableError from '../../../i18n/LocalizableError';
 import styles from './StandardHeader.scss';
 import CopyableAddress from '../../widgets/CopyableAddress';
+import QrCodeWrapper from '../../widgets/QrCodeWrapper';
 import RawHash from '../../widgets/hashWrappers/RawHash';
 import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
@@ -88,12 +88,6 @@ export default class StandardHeader extends Component<Props> {
       styles.copyableHash,
     ]);
 
-    // Get QRCode color value from active theme's CSS variable
-    const qrCodeBackgroundColor = document.documentElement ?
-      document.documentElement.style.getPropertyValue('--theme-receive-qr-code-background-color') : 'transparent';
-    const qrCodeForegroundColor = document.documentElement ?
-      document.documentElement.style.getPropertyValue('--theme-receive-qr-code-foreground-color') : '#000';
-
     const walletHeader = (
       <div className={styles.qrCodeAndInstructions}>
         <div className={styles.instructions}>
@@ -130,10 +124,8 @@ export default class StandardHeader extends Component<Props> {
             : <p className={styles.error}>&nbsp;</p>}
         </div>
         <div className={styles.qrCode}>
-          <QRCode
+          <QrCodeWrapper
             value={walletAddress}
-            bgColor={qrCodeBackgroundColor}
-            fgColor={qrCodeForegroundColor}
             size={152}
           />
         </div>

@@ -8,8 +8,11 @@ import NoWalletMessage from '../../wallet/NoWalletMessage';
 import SpendingPasswordSetting from '../../../components/wallet/settings/SpendingPasswordSetting';
 import ResyncBlock from '../../../components/wallet/settings/ResyncBlock';
 import RemoveWallet from '../../../components/wallet/settings/RemoveWallet';
+import ExportWallet from '../../../components/wallet/settings/ExportWallet';
 import type { GeneratedData as RemoveWalletDialogContainerData } from './RemoveWalletDialogContainer';
 import RemoveWalletDialogContainer from './RemoveWalletDialogContainer';
+import type { GeneratedData as ExportWalletDialogContainerData } from './ExportWalletDialogContainer';
+import ExportWalletDialogContainer from './ExportWalletDialogContainer';
 import type { GeneratedData as ResyncWalletDialogContainerData } from './ResyncWalletDialogContainer';
 import ResyncWalletDialogContainer from './ResyncWalletDialogContainer';
 import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
@@ -110,6 +113,11 @@ export default class WalletSettingsPage extends Component<InjectedOrGenerated<Ge
             dialog: RemoveWalletDialogContainer,
           })}
         />
+        <ExportWallet
+          openDialog={() => actions.dialogs.open.trigger({
+            dialog: ExportWalletDialogContainer,
+          })}
+        />
       </>
     );
   }
@@ -122,6 +130,14 @@ export default class WalletSettingsPage extends Component<InjectedOrGenerated<Ge
       return (
         <ChangeWalletPasswordDialogContainer
           {...this.generated.ChangeWalletPasswordDialogContainerProps}
+          publicDeriver={publicDeriver}
+        />
+      );
+    }
+    if (publicDeriver != null && isOpen(ExportWalletDialogContainer)) {
+      return (
+        <ExportWalletDialogContainer
+          {...this.generated.ExportWalletDialogContainerProps}
           publicDeriver={publicDeriver}
         />
       );
@@ -149,6 +165,7 @@ export default class WalletSettingsPage extends Component<InjectedOrGenerated<Ge
   @computed get generated(): {|
     ChangeWalletPasswordDialogContainerProps:
       InjectedOrGenerated<ChangeWalletPasswordDialogContainerData>,
+    ExportWalletDialogContainerProps: InjectedOrGenerated<ExportWalletDialogContainerData>,
     RemoveWalletDialogContainerProps: InjectedOrGenerated<RemoveWalletDialogContainerData>,
     ResyncWalletDialogContainerProps: InjectedOrGenerated<ResyncWalletDialogContainerData>,
     actions: {|
@@ -244,6 +261,9 @@ export default class WalletSettingsPage extends Component<InjectedOrGenerated<Ge
       },
       ChangeWalletPasswordDialogContainerProps: (
         { actions, stores, }: InjectedOrGenerated<ChangeWalletPasswordDialogContainerData>
+      ),
+      ExportWalletDialogContainerProps: (
+        { actions, stores, }: InjectedOrGenerated<ExportWalletDialogContainerData>
       ),
       RemoveWalletDialogContainerProps: (
         { actions, stores, }: InjectedOrGenerated<RemoveWalletDialogContainerData>

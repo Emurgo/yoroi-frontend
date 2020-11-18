@@ -19,6 +19,7 @@ import {
 import { IncorrectWalletPasswordError } from '../../../api/common/errors';
 import ChangeWalletPasswordDialogContainer from '../../wallet/dialogs/ChangeWalletPasswordDialogContainer';
 import RemoveWalletDialogContainer from './RemoveWalletDialogContainer';
+import ExportWalletDialogContainer from './ExportWalletDialogContainer';
 import ResyncWalletDialogContainer from './ResyncWalletDialogContainer';
 import { wrapSettings } from '../../../Routes';
 import { mockSettingsProps } from '../Settings.mock';
@@ -99,6 +100,7 @@ export const NoWallet = (): Node => {
             ...settingPageProps,
             // dialog is close so no need to give props
             ChangeWalletPasswordDialogContainerProps: (null: any),
+            ExportWalletDialogContainerProps: (null: any),
             RemoveWalletDialogContainerProps: (null: any),
             ResyncWalletDialogContainerProps: (null: any),
           }}
@@ -147,6 +149,7 @@ export const EditName = (): Node => {
             },
             // dialog is close so no need to give props
             ChangeWalletPasswordDialogContainerProps: (null: any),
+            ExportWalletDialogContainerProps: (null: any),
             RemoveWalletDialogContainerProps: (null: any),
             ResyncWalletDialogContainerProps: (null: any),
           }}
@@ -200,6 +203,7 @@ export const PasswordUpdateTime = (): Node => {
               },
               // dialog is close so no need to give props
               ChangeWalletPasswordDialogContainerProps: (null: any),
+              ExportWalletDialogContainerProps: (null: any),
               RemoveWalletDialogContainerProps: (null: any),
               ResyncWalletDialogContainerProps: (null: any),
             }}
@@ -238,6 +242,7 @@ export const ResyncWallet = (): Node => {
             },
             // dialog is close so no need to give props
             ChangeWalletPasswordDialogContainerProps: (null: any),
+            ExportWalletDialogContainerProps: (null: any),
             RemoveWalletDialogContainerProps: (null: any),
             ResyncWalletDialogContainerProps: {
               generated: {
@@ -396,6 +401,7 @@ export const EditPassword = (): Node => {
                 },
               },
             },
+            ExportWalletDialogContainerProps: (null: any),
             RemoveWalletDialogContainerProps: (null: any),
             ResyncWalletDialogContainerProps: (null: any),
           }}
@@ -432,6 +438,7 @@ export const RemoveWallet = (): Node => {
               },
             },
             ChangeWalletPasswordDialogContainerProps: (null: any),
+            ExportWalletDialogContainerProps: (null: any),
             RemoveWalletDialogContainerProps: {
               generated: {
                 stores: {
@@ -453,6 +460,53 @@ export const RemoveWallet = (): Node => {
                 },
               },
             },
+            ResyncWalletDialogContainerProps: (null: any),
+          }}
+        />
+      );
+    })()
+  );
+};
+
+export const ExportWallet = (): Node => {
+  const wallet = genShelleyCip1852DummyWithCache();
+  const lookup = walletLookup([wallet]);
+  return wrapSettings(
+    mockSettingsProps({
+      location: ROUTES.SETTINGS.WALLET,
+      selected: wallet.publicDeriver,
+      ...lookup,
+    }),
+    (() => {
+      const settingPageProps = defaultSettingsPageProps({
+        selected: wallet.publicDeriver,
+        getConceptualWalletSettingsCache: lookup.getConceptualWalletSettingsCache,
+        getSigningKeyCache: lookup.getSigningKeyCache,
+      });
+      return (
+        <WalletSettingsPage
+          generated={{
+            ...settingPageProps,
+            stores: {
+              ...settingPageProps.stores,
+              uiDialogs: {
+                ...settingPageProps.stores.uiDialogs,
+                isOpen: (clazz) => clazz === ExportWalletDialogContainer,
+              },
+            },
+            ChangeWalletPasswordDialogContainerProps: (null: any),
+            ExportWalletDialogContainerProps: {
+              generated: {
+                stores: Object.freeze({
+                }),
+                actions: {
+                  dialogs: {
+                    closeActiveDialog: { trigger: action('closeActiveDialog') },
+                  },
+                },
+              },
+            },
+            RemoveWalletDialogContainerProps: (null: any),
             ResyncWalletDialogContainerProps: (null: any),
           }}
         />
