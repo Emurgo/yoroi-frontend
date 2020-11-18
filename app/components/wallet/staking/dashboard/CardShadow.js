@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import type { Node } from 'react';
 
-import styles from './Card.scss';
+import styles from './CardShadow.scss';
 
 type Props = {|
   children?: Node,
@@ -27,7 +27,9 @@ export default class Card extends Component<Props> {
             {title}
           </h2>
         }
-        {children}
+        <div className={styles.inner}>
+          {children}
+        </div>
       </div>
     );
   }

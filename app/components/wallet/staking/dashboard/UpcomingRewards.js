@@ -113,19 +113,20 @@ export default class UpcomingRewards extends Component<Props> {
           )}
           {this.infoToNode(
             this.props.content[3],
-            genUnregisteredWarning(this.props.content[3])
+            genUnregisteredWarning(this.props.content[3]),
+            true
           )}
         </div>
       </Card>
     );
   }
 
-  infoToNode: (?BoxInfo, Array<Node>) => Node = (info, additional) => {
+  infoToNode: (?BoxInfo, Array<Node>, ?boolean) => Node = (info, additional, isLast = false) => {
     const { intl } = this.context;
 
     if (info == null) {
       return (
-        <div className={styles.column}>
+        <div className={classnames([styles.card, isLast === false ? styles.mr15 : ''])}>
           <div className={styles.loading}>
             <LoadingSpinner />
           </div>
@@ -134,7 +135,7 @@ export default class UpcomingRewards extends Component<Props> {
     }
     if (info.pools.length === 0) {
       return (
-        <div className={classnames([styles.column, styles.noDelegation])}>
+        <div className={classnames([styles.card, styles.noDelegation, isLast === false ? styles.mr15 : ''])}>
           <div className={styles.header}>
             <div className={styles.label}>
               {this.props.useEndOfEpoch
@@ -150,7 +151,7 @@ export default class UpcomingRewards extends Component<Props> {
       );
     }
     return (
-      <div className={styles.column}>
+      <div className={classnames([styles.card, isLast === false ? styles.mr15 : ''])}>
         <div className={styles.header}>
           <h3 className={styles.label}>
             {this.props.useEndOfEpoch

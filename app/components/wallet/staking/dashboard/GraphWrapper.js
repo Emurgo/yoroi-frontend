@@ -7,7 +7,7 @@ import classnames from 'classnames';
 import { defineMessages, intlShape } from 'react-intl';
 
 import styles from './GraphWrapper.scss';
-import Card from './Card';
+import CardShadow from './CardShadow';
 import globalMessages from '../../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
@@ -274,7 +274,7 @@ export default class GraphWrapper extends Component<Props, State> {
           selected={this.state.selectedTab}
           setSelected={tab => this.setState({ selectedTab: tab })}
         />
-        <Card>
+        <CardShadow>
           <div className={styles.graphContainer}>
             {/*
             <GraphToggles
@@ -293,7 +293,7 @@ export default class GraphWrapper extends Component<Props, State> {
               hideYAxis={tabs[this.state.selectedTab].hideYAxis}
             />
           </div>
-        </Card>
+        </CardShadow>
       </div>
     );
   }

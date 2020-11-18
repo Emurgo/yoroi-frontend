@@ -5,7 +5,7 @@ import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 
-import Card from './Card';
+import Card from './CardShadow';
 import FirstRewardTooltip from './FirstRewardTooltip';
 import ProgressCircle from './ProgressCircle';
 import styles from './EpochProgress.scss';

@@ -11,6 +11,17 @@
     border-right: 1px solid var(--theme-dashboard-card-vertical-separator-color);
 }
 
+.card {
+    padding: 20px 20px;
+    flex: 1;
+    border-radius: 6px;
+    background-color: #F8F8F8;
+
+    .sectionActions {
+        flex: 1;
+    }
+}
+
 .loading {
     position: relative;
     transform: translateY(50%);
@@ -105,4 +116,8 @@
     color: var(--theme-dashboard-tooltip-text-color);
     font-size: 11px;
     line-height: 14px;
+}
+
+.mr15 {
+    margin-right: 15px;
 }
