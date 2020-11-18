@@ -68,7 +68,7 @@ export class ErgoTxSignRequest implements ISignRequest<RustModule.SigmaRust.TxBu
       const ergoTree = output.ergo_tree();
       const address = RustModule.SigmaRust.NetworkAddress.new(
         this.networkSettingSnapshot.ChainNetworkId,
-        RustModule.SigmaRust.Address.new_p2pk(
+        RustModule.SigmaRust.Address.recreate_from_ergo_tree(
           ergoTree
         )
       );
@@ -139,7 +139,7 @@ export function getTxOutputTotal(
     const output = outputs.get(i);
     const address = RustModule.SigmaRust.NetworkAddress.new(
       networkId,
-      RustModule.SigmaRust.Address.new_p2pk(
+      RustModule.SigmaRust.Address.recreate_from_ergo_tree(
         output.ergo_tree()
       )
     );

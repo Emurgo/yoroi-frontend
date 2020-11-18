@@ -100,21 +100,32 @@ declare module 'ergo-lib-wasm-browser' { // need to wrap flowgen output into mod
     free(): void;
 
     /**
-    * Create a P2PK address from an ergo tree if ProveDlog is the root of the tree, otherwise returns an error
+    * Re-create the address from ErgoTree that was built from the address
+    *
+    * At some point in the past a user entered an address from which the ErgoTree was built.
+    * Re-create the address from this ErgoTree.
+    * `tree` - ErgoTree that was created from an Address
     * @param {ErgoTree} ergo_tree
     * @returns {Address}
     */
-    static new_p2pk(ergo_tree: ErgoTree): Address;
+    static recreate_from_ergo_tree(ergo_tree: ErgoTree): Address;
 
     /**
-    * Decode (base58) testnet address from string
+    * Create a P2PK address from serialized PK bytes(EcPoint/GroupElement)
+    * @param {Uint8Array} bytes
+    * @returns {Address}
+    */
+    static p2pk_from_pk_bytes(bytes: Uint8Array): Address;
+
+    /**
+    * Decode (base58) testnet address from string, checking that address is from the testnet
     * @param {string} s
     * @returns {Address}
     */
     static from_testnet_str(s: string): Address;
 
     /**
-    * Decode (base58) mainnet address from string
+    * Decode (base58) mainnet address from string, checking that address is from the mainnet
     * @param {string} s
     * @returns {Address}
     */
@@ -864,7 +875,7 @@ declare module 'ergo-lib-wasm-browser' { // need to wrap flowgen output into mod
     free(): void;
 
     /**
-    * create a new AddressEncoder for a given network type
+    * create a new NetworkAddress(address + network prefix) for a given network type
     * @param {$Values<typeof NetworkPrefix>} network
     * @param {Address} address
     * @returns {NetworkAddress}
@@ -872,7 +883,7 @@ declare module 'ergo-lib-wasm-browser' { // need to wrap flowgen output into mod
     static new(network: $Values<typeof NetworkPrefix>, address: Address): NetworkAddress;
 
     /**
-    * Decode (base58) address from string without checking the network prefix
+    * Decode (base58) a NetworkAddress (address + network prefix) from string
     * @param {string} s
     * @returns {NetworkAddress}
     */
@@ -957,6 +968,12 @@ declare module 'ergo-lib-wasm-browser' { // need to wrap flowgen output into mod
     * @returns {Address}
     */
     get_address(): Address;
+
+    /**
+    * Encode from a serialized key
+    * @returns {Uint8Array}
+    */
+    to_bytes(): Uint8Array;
   }
   /**
   * SecretKey collection
@@ -1297,14 +1314,14 @@ declare module 'ergo-lib-wasm-browser' { // need to wrap flowgen output into mod
     * get the tx id as bytes
     * @returns {string}
     */
-    to_hex(): string;
+    to_str(): string;
 
     /**
     * convert a hex string into a TxId
     * @param {string} s
     * @returns {TxId}
     */
-    static from_hex(s: string): TxId;
+    static from_str(s: string): TxId;
   }
   /**
   * Unsigned inputs used in constructing unsigned transactions
@@ -1432,7 +1449,9 @@ declare module 'ergo-lib-wasm-browser' { // need to wrap flowgen output into mod
 
     /**
     * Sign a transaction:
-    * `boxes_to_spend` - unspent boxes [`ErgoBoxCandidate`] used as inputs in the transaction
+    * `tx` - transaction to sign
+    * `boxes_to_spend` - boxes corresponding to [`UnsignedTransaction::inputs`]
+    * `data_boxes` - boxes corresponding to [`UnsignedTransaction::data_inputs`]
     * @param {ErgoStateContext} _state_context
     * @param {UnsignedTransaction} tx
     * @param {ErgoBoxes} boxes_to_spend

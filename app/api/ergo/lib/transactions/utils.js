@@ -100,7 +100,7 @@ export function replaceMockBoxId(utxo: RemoteUnspentOutput): RemoteUnspentOutput
         Buffer.from(utxo.receiver, 'hex')
       )
     ),
-    RustModule.SigmaRust.TxId.from_hex(utxo.tx_hash),
+    RustModule.SigmaRust.TxId.from_str(utxo.tx_hash),
     utxo.tx_index,
     tokens
   );

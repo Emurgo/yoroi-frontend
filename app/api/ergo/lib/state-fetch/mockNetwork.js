@@ -299,7 +299,7 @@ export function toRemoteErgoTx(
       additionalRegisters: output.additionalRegisters,
       address: RustModule.SigmaRust.NetworkAddress.new(
         (Number.parseInt(baseConfig.ChainNetworkId, 10): any),
-        RustModule.SigmaRust.Address.new_p2pk(
+        RustModule.SigmaRust.Address.recreate_from_ergo_tree(
           RustModule.SigmaRust.ErgoTree.from_base16_bytes(output.ergoTree)
         )
       ).to_base58(),
