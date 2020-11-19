@@ -285,7 +285,7 @@ export function toRemoteErgoTx(
   request: SignedRequest,
   network: $ReadOnly<NetworkRow>,
 ): RemoteErgoTransaction {
-  // ergo-ts didn't support calculating the ID for a transaction, so we just leave it blank
+  // TODO: ergo-ts didn't support calculating the ID for a transaction, so we just leave it blank
   const txHash = request.id ?? '';
 
   const baseConfig = getErgoBaseConfig(network)
