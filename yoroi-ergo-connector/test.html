@@ -12,14 +12,14 @@
                     window.addEventListener("ergo_wallet_disconnected", function(event) {
                         alert("wallet disconnected");
                     });
-                    _ergo_rpc_call("test", [1, 2, 3]).catch(function(result) {
+                    ergo._ergo_rpc_call("test", [1, 2, 3]).catch(function(result) {
                         console.log("_ergo_rpc_call(\"test\"(1, 2, 3)) = " + JSON.stringify(result));
                     });
                     ergo.get_balance().then(function(result) {
-                        console.log("ergo.get_balance() = " + result);
+                        alert("ergo.get_balance() = " + result);
                     });
                     ergo.get_balance("ADA").then(function(result) {
-                        console.log("ergo.get_balance(ADA) = " + result);
+                        alert("ergo.get_balance(ADA) = " + result);
                     });
                     ergo.sign_tx({}).then(function(result) {
                         console.log("ergo.sign_tx() = " + result);
