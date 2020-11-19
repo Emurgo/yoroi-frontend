@@ -11,7 +11,7 @@ import {
   newErgoUnsignedTx,
   newErgoUnsignedTxFromUtxo,
   sendAllUnsignedTxFromUtxo,
-  signTransaction,
+  // signTransaction,
 } from './utxoTransaction';
 import {
   NotEnoughMoneyToSendError,
@@ -27,20 +27,20 @@ import type {
   Address, Addressing
 } from '../../../ada/lib/storage/models/PublicDeriver/interfaces';
 
-import {
-  HARD_DERIVATION_START,
-  CoinTypes,
-  WalletTypePurpose,
-  ChainDerivations,
-} from '../../../../config/numbersConfig';
+// import {
+//   HARD_DERIVATION_START,
+//   CoinTypes,
+//   WalletTypePurpose,
+//   ChainDerivations,
+// } from '../../../../config/numbersConfig';
 import {
   networks,
   getErgoBaseConfig,
 } from '../../../ada/lib/storage/database/prepackaged/networks';
 import { decode, } from 'bs58';
-import { ErgoTxSignRequest } from './ErgoTxSignRequest';
-import { derivePath } from '../../../common/lib/crypto/keys/keyRepository';
-import { generateWalletRootKey } from '../crypto/wallet';
+// import { ErgoTxSignRequest } from './ErgoTxSignRequest';
+// import { derivePath } from '../../../common/lib/crypto/keys/keyRepository';
+// import { generateWalletRootKey } from '../crypto/wallet';
 import { RustModule } from '../../../ada/lib/cardanoCrypto/rustLoader';
 import { replaceMockBoxId } from './utils';
 
@@ -363,6 +363,7 @@ describe('Create unsigned TX from addresses', () => {
 //     });
 
 //     const rootPk = generateWalletRootKey(
+// eslint-disable-next-line max-len
 //       'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon share'
 //     );
 //     const chainKey = derivePath(
