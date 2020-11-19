@@ -10,7 +10,7 @@ export type RemoteUnspentOutput = {|
   +amount: string,
   +receiver: string,
   +tx_hash: string,
-  +tx_index: number,
+  +tx_index: number, // index of output in tx
   +creationHeight: number,
   +boxId: string,
   +assets?: $ReadOnlyArray<$ReadOnly<{
@@ -18,7 +18,7 @@ export type RemoteUnspentOutput = {|
     tokenId: string,
     ...
   }>>,
-  +additionalRegisters?: {...},
+  +additionalRegisters?: {| [key: string]: string /* hex */ |},
   +ergoTree: string,
 |};
 export type AddressUtxoResponse = Array<RemoteUnspentOutput>;
@@ -53,6 +53,25 @@ export type HistoryRequest = {|
   untilBlock: string, // block hash - inclusive
 |};
 
+export type ErgoTxOutput = {
+  additionalRegisters: { ... },
+  address: string,
+  assets: $ReadOnlyArray<$ReadOnly<{
+    amount: number,
+    tokenId: string,
+    ...
+  }>>,
+  // any height <= the height the tx was included in (used for rent calculation, etc)
+  creationHeight: number,
+  ergoTree: string,
+  id: string, // boxId
+  txId: string, // txhash of this
+  index: number, // index of this output in this tx
+  mainChain: boolean,
+  spentTransactionId: null | string,
+  value: number,
+  ...
+};
 export type RemoteErgoTransaction = {|
   block_hash: null | string,
   block_num: null | number,
@@ -79,25 +98,7 @@ export type RemoteErgoTransaction = {|
     address: string,
     ...,
   }>,
-  outputs: Array<{
-    additionalRegisters: { ... },
-    address: string,
-    assets: $ReadOnlyArray<$ReadOnly<{
-      amount: number,
-      tokenId: string,
-      ...
-    }>>,
-    // any height <= the height the tx was included in (used for rent calculation, etc)
-    creationHeight: number,
-    ergoTree: string,
-    id: string, // boxId
-    txId: string, // txhash of this
-    index: number, // index of this output in this tx
-    mainChain: boolean,
-    spentTransactionId: null | string,
-    value: number,
-    ...
-  }>,
+  outputs: Array<ErgoTxOutput>,
   // epoch: 0, // TODO
   // slot: 0, // TODO
   time: string, // ISO string

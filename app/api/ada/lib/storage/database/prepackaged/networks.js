@@ -3,7 +3,6 @@
 import {
   CoinTypes,
 } from '../../../../../../config/numbersConfig';
-import { Network } from '@coinbarn/ergo-ts';
 import type {
   NetworkRow,
   CardanoHaskellBaseConfig,
@@ -101,7 +100,9 @@ export const networks = Object.freeze({
     },
     BaseConfig: ([Object.freeze({
       StartAt: 0,
-      ChainNetworkId: (Network.Mainnet.toString(): string),
+      ChainNetworkId: (
+        '0' // RustModule.SigmaRust.NetworkPrefix.Mainnet
+      ),
       // TODO: it's more complicated than this since the min value depends on the # of bytes
       MinimumBoxValue: '100000',
       FeeAddress: decode(

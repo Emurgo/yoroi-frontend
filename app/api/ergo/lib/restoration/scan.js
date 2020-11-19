@@ -10,20 +10,22 @@ import type {
 } from '../../../ada/lib/storage/database/walletTypes/common/utils';
 import type { AddByHashFunc, } from '../../../common/lib/storage/bridge/hashMapper';
 import { CoreAddressTypes } from '../../../ada/lib/storage/database/primitives/enums';
-import { Address, } from '@coinbarn/ergo-ts';
 import type { BIP32Interface } from 'bip32';
-
+import { RustModule } from '../../../ada/lib/cardanoCrypto/rustLoader';
 
 export function ergoGenAddressBatchFunc(
   chain: BIP32Interface,
+  network: $Values<typeof RustModule.SigmaRust.NetworkPrefix>
 ): GenerateAddressFunc {
   return (
     indices: Array<number>
   ) => {
     return indices.map(i => {
       const bip32Addr = chain.derive(i);
-      const addr = Address.fromPk(bip32Addr.publicKey.toString('hex'));
-      return addr.addrBytes.toString('hex');
+      const ergoAddr = RustModule.SigmaRust.Address.from_public_key(
+        bip32Addr.publicKey
+      );
+      return Buffer.from(ergoAddr.to_bytes(network)).toString('hex');
     });
   };
 }

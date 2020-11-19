@@ -1701,12 +1701,20 @@ const ScanErgoAccountUtxoMixin = (
     _derivationTables,
   ): Promise<IScanAccountResponse> => {
     const key = BIP32PublicKey.fromBuffer(Buffer.from(body.accountPublicKey, 'hex'));
+
+    const network = this.getParent().getNetworkInfo();
+    const networkId = ((
+      Number.parseInt(network.BaseConfig[0].ChainNetworkId, 10): any
+    ): $Values<typeof RustModule.SigmaRust.NetworkPrefix>);
+
     return await scanBip44Account({
       generateInternalAddresses: ergoGenAddressBatchFunc(
-        deriveKey(key, ChainDerivations.INTERNAL).key
+        deriveKey(key, ChainDerivations.INTERNAL).key,
+        networkId
       ),
       generateExternalAddresses: ergoGenAddressBatchFunc(
-        deriveKey(key, ChainDerivations.EXTERNAL).key
+        deriveKey(key, ChainDerivations.EXTERNAL).key,
+        networkId
       ),
       lastUsedInternal: body.lastUsedInternal,
       lastUsedExternal: body.lastUsedExternal,
@@ -1765,9 +1773,16 @@ const ScanErgoChainUtxoMixin = (
     _derivationTables,
   ): Promise<IScanChainResponse> => {
     const key = BIP32PublicKey.fromBuffer(Buffer.from(body.chainPublicKey, 'hex'));
+
+    const network = this.getParent().getNetworkInfo();
+    const networkId = ((
+      Number.parseInt(network.BaseConfig[0].ChainNetworkId, 10): any
+    ): $Values<typeof RustModule.SigmaRust.NetworkPrefix>);
+
     return await scanBip44Chain({
       generateAddressFunc: ergoGenAddressBatchFunc(
-        key.key
+        key.key,
+        networkId
       ),
       lastUsedIndex: body.lastUsedIndex,
       network: this.getParent().getNetworkInfo(),

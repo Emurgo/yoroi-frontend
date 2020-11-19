@@ -7,8 +7,8 @@ import type {
   AddressUtxoFunc,
   HistoryFunc,
   BestBlockFunc,
+  ErgoTxOutput,
 } from '../../app/api/ergo/lib/state-fetch/types';
-import { Address as ErgoAddress } from '@coinbarn/ergo-ts';
 import {
   getErgoAddress,
   genGetTransactionsHistoryForAddresses,
@@ -29,6 +29,8 @@ import type {
   FilterFunc,
 } from '../../app/api/common/lib/state-fetch/currencySpecificTypes';
 import { networks } from '../../app/api/ada/lib/storage/database/prepackaged/networks';
+import { RustModule } from '../../app/api/ada/lib/cardanoCrypto/rustLoader';
+import { replaceMockBoxId } from '../../app/api/ergo/lib/transactions/utils';
 
 // based on abandon x 14 + share
 const genesisTransaction = '7d4b41a1256f93989aa7e1782989dbbb9ec222c3f6b98e216b676c589b5ecece';
@@ -37,6 +39,29 @@ const genesisTxValue = 200000_000000000; // 200K ERG
 
 // based on abandon x14 + address
 const genesisTxReceiver = '9emv7LAtw7U6xMs4JrJP8NTPvwQjNRaSWpgSTGEM6947fFofBWd';
+
+export function replaceMockOutputBoxId(
+  output: ErgoTxOutput
+): ErgoTxOutput {
+  const box = replaceMockBoxId({
+    amount: output.value.toString(),
+    receiver: Buffer.from(
+      RustModule.SigmaRust.NetworkAddress.from_base58(output.address).to_bytes()
+    ).toString('hex'),
+    tx_hash: output.txId,
+    tx_index: output.index,
+    creationHeight: output.creationHeight,
+    boxId: '', // this will get calculated and updated to the correct value
+    assets: output.assets,
+    additionalRegisters: output.additionalRegisters,
+    ergoTree: output.ergoTree,
+  });
+
+  return {
+    ...output,
+    id: box.boxId,
+  };
+}
 
 /**
  * To simplify, our genesis is a single address which gives all its ada to a "distributor"
@@ -64,19 +89,19 @@ export const generateTransaction = (): {|
         value: genesisTxValue,
       }],
       dataInputs: [],
-      outputs: [{
+      outputs: [replaceMockOutputBoxId({
         additionalRegisters: Object.freeze({}),
         address,
         assets: [],
         creationHeight: height,
-        ergoTree: ErgoAddress.fromBase58(address).ergoTree,
-        id: '33a35e15ae1a83fa188673a2bd53007b07e119a0eaaf40b890b2081c2864f12a',
+        ergoTree: Buffer.from(RustModule.SigmaRust.Address.from_base58(address).to_ergo_tree().to_bytes()).toString('hex'),
+        id: '',
         txId: hash,
         index: 0,
         mainChain: true,
         spentTransactionId: null,
         value: genesisTxValue,
-      }],
+      })],
       block_num: height,
       tx_ordinal: 0,
       block_hash: '1',
@@ -113,22 +138,20 @@ export const generateTransaction = (): {|
       dataInputs: [],
       outputs: [
         // ergo-simple-wallet
-        {
+        replaceMockOutputBoxId({
           // index: 0
           additionalRegisters: Object.freeze({}),
-          address: address.address,
+          address: address.to_base58(),
           assets: [],
           creationHeight: height,
-          ergoTree: ErgoAddress.fromBase58(
-            genesisTxReceiver
-          ).ergoTree,
-          id: '33a35e15af1a83fa188673a2bd63007b07e119a0eaaf40b890b2081c2864f12a',
+          ergoTree: Buffer.from(address.address().to_ergo_tree().to_bytes()).toString('hex'),
+          id: '',
           txId: hash,
           index: 0,
           mainChain: true,
           spentTransactionId: null,
           value: 20_000000000,
-        }
+        })
       ],
       block_num: height,
       tx_ordinal: 1,

@@ -68,7 +68,7 @@ const networkTransactions: void => Array<RemoteErgoTransaction> = () => [{
           ChainDerivations.EXTERNAL,
           7
         ]
-      ).address,
+      ).to_base58(),
       value: 4000000,
       id: '33a35e15ae1a83fa188674a2bd53007b07e119a0eaaf40b890b2081c2864f12a',
       index: 0,
@@ -93,12 +93,12 @@ const networkTransactions: void => Array<RemoteErgoTransaction> = () => [{
         ]
       );
       return {
-        address: addr.address,
+        address: addr.to_base58(),
         value: 2100000,
         additionalRegisters: Object.freeze({}),
         assets: [],
         creationHeight: 1,
-        ergoTree: addr.ergoTree,
+        ergoTree: Buffer.from(addr.address().to_ergo_tree().to_bytes()).toString('hex'),
         id: '66a35e15ae1a83fa188674a2bd53137b07e119a0eaaf40b890b2081c2864f12a',
         txId: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed545',
         index: 0,
@@ -119,12 +119,12 @@ const networkTransactions: void => Array<RemoteErgoTransaction> = () => [{
         ]
       );
       return {
-        address: addr.address,
+        address: addr.to_base58(),
         value: 1731391,
         additionalRegisters: Object.freeze({}),
         assets: [],
         creationHeight: 1,
-        ergoTree: addr.ergoTree,
+        ergoTree: Buffer.from(addr.address().to_ergo_tree().to_bytes()).toString('hex'),
         id: '76a35e15ae1a83aa188674a2bd53137b07e119a0eaaf40b890b2081c2864f12a',
         txId: '39f2fe214ec2d9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed545',
         index: 1,
@@ -154,7 +154,7 @@ const nextRegularSpend: void => RemoteErgoTransaction = () => ({
           ChainDerivations.EXTERNAL,
           4
         ]
-      ).address,
+      ).to_base58(),
       value: 2100000,
       id: 'aca35e15ae1a83ff188674a2bd53007b07e119a0eaaf40b890b2081c2864f12a',
       index: 0,
@@ -179,12 +179,12 @@ const nextRegularSpend: void => RemoteErgoTransaction = () => ({
         ]
       );
       return {
-        address: addr.address,
+        address: addr.to_base58(),
         value: 1100000,
         additionalRegisters: Object.freeze({}),
         assets: [],
         creationHeight: 1,
-        ergoTree: addr.ergoTree,
+        ergoTree: Buffer.from(addr.address().to_ergo_tree().to_bytes()).toString('hex'),
         id: '18335e15ae1a83fa188674a2bd53137839e119a0eaaf40b890b2081c2864f12a',
         txId: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546',
         index: 0,
@@ -205,12 +205,12 @@ const nextRegularSpend: void => RemoteErgoTransaction = () => ({
         ]
       );
       return {
-        address: addr.address,
+        address: addr.to_base58(),
         value: 900000,
         additionalRegisters: Object.freeze({}),
         assets: [],
         creationHeight: 1,
-        ergoTree: addr.ergoTree,
+        ergoTree: Buffer.from(addr.address().to_ergo_tree().to_bytes()).toString('hex'),
         id: 'ff735e15ae1a83fa188674a21749137839e119a0eaaf40b890b2081c2864f12a',
         txId: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546',
         index: 1,
@@ -271,10 +271,10 @@ async function syncingSimpleTransaction(): Promise<void> {
       const response = await basePubDeriver.getAllUtxos();
       expect(response).toEqual([{
         // 9gYJPYdfSuMz3YxcQTFJ8sTYMKgrABeoFiLpFrkkDM1YPHaXzHD
-        address: getErgoAddress(
+        address: Buffer.from(getErgoAddress(
           TX_TEST_MNEMONIC_1,
           expectedAddressing
-        ).addrBytes.toString('hex'),
+        ).to_bytes()).toString('hex'),
         addressing: {
           path: expectedAddressing,
           startLevel: 1,
@@ -364,10 +364,10 @@ async function syncingSimpleTransaction(): Promise<void> {
       const response = await basePubDeriver.getAllUtxos();
       expect(response).toEqual([{
         // 9f6CoekmariCyqfJm97zBSn2D7WT3AQhXana7tuyh8jZbNDhCuV
-        address: getErgoAddress(
+        address: Buffer.from(getErgoAddress(
           TX_TEST_MNEMONIC_1,
           expectedAddressing1,
-        ).addrBytes.toString('hex'),
+        ).to_bytes()).toString('hex'),
         addressing: {
           path: expectedAddressing1,
           startLevel: 1,
@@ -400,10 +400,10 @@ async function syncingSimpleTransaction(): Promise<void> {
       },
       {
         // 9gzsdG5W1J1g8SaTW8qfNs219vsNUEYQFqoZakx6T3dGgXmyxRN
-        address: getErgoAddress(
+        address: Buffer.from(getErgoAddress(
           TX_TEST_MNEMONIC_1,
           expectedAddressing2
-        ).addrBytes.toString('hex'),
+        ).to_bytes()).toString('hex'),
         addressing: {
           path: expectedAddressing2,
           startLevel: 1,

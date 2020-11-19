@@ -265,7 +265,10 @@ export default class ProfileStore extends Store {
   }
 
   _setBigNumberFormat: void => void = () => {
-    BigNumber.config({ FORMAT: this.bigNumberDecimalFormat });
+    BigNumber.config({
+      EXPONENTIAL_AT: (1e+9: any),
+      FORMAT: this.bigNumberDecimalFormat
+    });
   };
 
 

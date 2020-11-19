@@ -5,7 +5,6 @@ import type { lf$Database } from 'lovefield';
 import { schema } from 'lovefield';
 import { RustModule } from '../../ada/lib/cardanoCrypto/rustLoader';
 import { CoinTypes, WalletTypePurpose, HARD_DERIVATION_START } from '../../../config/numbersConfig';
-import { Address, } from '@coinbarn/ergo-ts';
 import { legacyWalletChecksum } from '@emurgo/cip4-js';
 import {
   asGetPublicKey
@@ -44,7 +43,7 @@ beforeAll(async () => {
 
 test('Derive Ergo address', async () => {
   const rootKey = generateWalletRootKey(recoveryPhrase);
-  const address = derivePath(
+  const addressKey = derivePath(
     rootKey,
     [
       WalletTypePurpose.BIP44,
@@ -54,8 +53,12 @@ test('Derive Ergo address', async () => {
       0
     ]
   );
-  const ergoAddr = Address.fromPk(address.toPublic().key.publicKey.toString('hex'));
-  expect(ergoAddr.address).toEqual('9hzFPHkkhATNUeaT9pJGVJqkrbUL523HRt6j5R8ok1ck3JduvCY');
+  const ergoAddr = RustModule.SigmaRust.Address.from_public_key(
+    addressKey.toPublic().key.publicKey
+  );
+  expect(
+    ergoAddr.to_base58(RustModule.SigmaRust.NetworkPrefix.Mainnet)
+  ).toEqual('9hzFPHkkhATNUeaT9pJGVJqkrbUL523HRt6j5R8ok1ck3JduvCY');
 });
 
 test('Restore Ergo wallet', async () => {

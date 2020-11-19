@@ -1,14 +1,16 @@
 // @flow
 
 import BigNumber from 'bignumber.js';
-import { unitsInOneErgo } from '@coinbarn/ergo-ts/dist/constants';
+import { RustModule } from '../ada/lib/cardanoCrypto/rustLoader';
 
 export function getErgoCurrencyMeta(_request: void): {|
   primaryTicker: string,
   decimalPlaces: BigNumber,
   totalSupply: BigNumber,
 |} {
-  const decimalPlaces = new BigNumber(unitsInOneErgo.toString().length - 1);
+  const decimalPlaces = new BigNumber(
+    RustModule.SigmaRust.BoxValue.UNITS_PER_ERGO().to_str().length - 1
+  );
   return {
     primaryTicker: 'ERG',
     decimalPlaces,
