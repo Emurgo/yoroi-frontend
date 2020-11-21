@@ -523,7 +523,7 @@ export default class StakingDashboardPage extends Component<Props> {
       if (meta == null) {
         return { id: pool };
       }
-      return { id: pool, ticker: meta.info?.ticker,  name: meta.info?.name };
+      return { id: pool, ticker: meta.info?.ticker, name: meta.info?.name };
     });
     return {
       pools: miniPoolInfo,
@@ -654,7 +654,8 @@ export default class StakingDashboardPage extends Component<Props> {
               currentPools.length === 1 && isJormungandr(publicDeriver.getParent().getNetworkInfo())
                 ? async () => {
                     this.generated.actions.dialogs.open.trigger({ dialog: UndelegateDialog });
-                    await this.generated.actions.jormungandr.delegationTransaction.createTransaction.trigger(
+                    await this.generated.actions.jormungandr.delegationTransaction.
+                    createTransaction.trigger(
                       {
                         publicDeriver,
                         poolRequest: undefined,
@@ -824,7 +825,8 @@ export default class StakingDashboardPage extends Component<Props> {
     if (!isCardanoHaskell(publicDeriver.getParent().getNetworkInfo())) {
       return undefined;
     }
-    const adaDelegationRequests = this.generated.stores.substores.ada.delegation.getDelegationRequests(
+    const adaDelegationRequests = this.generated.stores.substores.ada.
+      delegation.getDelegationRequests(
       publicDeriver
     );
     if (adaDelegationRequests == null) return undefined;

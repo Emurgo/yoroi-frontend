@@ -185,7 +185,7 @@ export default class UserSummary extends Component<Props, State> {
               <div className={styles.sectionActions}>
                 {this.props.withdrawRewards != null && (
                   <Button
-                    className='secondary'
+                    className="secondary"
                     label={intl.formatMessage(globalMessages.withdrawLabel)}
                     onClick={this.props.withdrawRewards}
                     skin={ButtonSkin}
@@ -246,60 +246,60 @@ export default class UserSummary extends Component<Props, State> {
             </div>
           )}
           <div className={styles.mangledSection}>
-          {mangledWarningIcon}
-          {this.state.mangledPopupOpen && (
-            <div className={styles.mangledPopup}>
-              <TooltipBox onClose={() => this.setState(() => ({ mangledPopupOpen: false }))}>
-                <p>
-                  {this.formatWithAmount(
-                    messages.mangledPopupDialogLine1,
-                    this.props.canUnmangleSum.plus(this.props.cannotUnmangleSum),
-                    this.props.meta.decimalPlaces
-                  )}
-                </p>
-                {this.props.cannotUnmangleSum.gt(0) && (
-                  <ul>
-                    <li>
-                      {this.formatWithAmount(
-                        messages.canUnmangleLine,
-                        this.props.canUnmangleSum,
-                        this.props.meta.decimalPlaces
-                      )}
-                    </li>
-                    <li>
-                      {this.formatWithAmount(
-                        messages.cannotUnmangleLine,
-                        this.props.cannotUnmangleSum,
-                        this.props.meta.decimalPlaces
-                      )}
-                    </li>
-                  </ul>
-                )}
-                {this.props.canUnmangleSum.gt(0) && (
+            {mangledWarningIcon}
+            {this.state.mangledPopupOpen && (
+              <div className={styles.mangledPopup}>
+                <TooltipBox onClose={() => this.setState(() => ({ mangledPopupOpen: false }))}>
                   <p>
-                    <FormattedMessage
-                      {...messages.mangledPopupDialogLine2}
-                      values={{
-                        ticker: this.props.meta.primaryTicker,
-                        transactionMessage: (
-                          <span
-                            className={styles.link}
-                            onClick={this.props.onUnmangle}
-                            role="button"
-                            tabIndex={0}
-                            onKeyPress={this.props.onUnmangle}
-                          >
-                            {intl.formatMessage(messages.makeTransaction)}
-                          </span>
-                        ),
-                      }}
-                    />
+                    {this.formatWithAmount(
+                      messages.mangledPopupDialogLine1,
+                      this.props.canUnmangleSum.plus(this.props.cannotUnmangleSum),
+                      this.props.meta.decimalPlaces
+                    )}
                   </p>
-                )}
-              </TooltipBox>
-            </div>
-          )}
-        </div>
+                  {this.props.cannotUnmangleSum.gt(0) && (
+                    <ul>
+                      <li>
+                        {this.formatWithAmount(
+                          messages.canUnmangleLine,
+                          this.props.canUnmangleSum,
+                          this.props.meta.decimalPlaces
+                        )}
+                      </li>
+                      <li>
+                        {this.formatWithAmount(
+                          messages.cannotUnmangleLine,
+                          this.props.cannotUnmangleSum,
+                          this.props.meta.decimalPlaces
+                        )}
+                      </li>
+                    </ul>
+                  )}
+                  {this.props.canUnmangleSum.gt(0) && (
+                    <p>
+                      <FormattedMessage
+                        {...messages.mangledPopupDialogLine2}
+                        values={{
+                          ticker: this.props.meta.primaryTicker,
+                          transactionMessage: (
+                            <span
+                              className={styles.link}
+                              onClick={this.props.onUnmangle}
+                              role="button"
+                              tabIndex={0}
+                              onKeyPress={this.props.onUnmangle}
+                            >
+                              {intl.formatMessage(messages.makeTransaction)}
+                            </span>
+                          ),
+                        }}
+                      />
+                    </p>
+                  )}
+                </TooltipBox>
+              </div>
+            )}
+          </div>
         </div>
         <div className={styles.icon}>
           <IconDelegated />
@@ -328,7 +328,8 @@ export default class UserSummary extends Component<Props, State> {
     const adaAmount = adaValue.split('.');
     return (
       <span>
-        {adaAmount[0]}<span className={styles.decimal}>.{adaAmount[1]} </span>{' '}
+        {adaAmount[0]}
+        <span className={styles.decimal}>.{adaAmount[1]} </span>{' '}
       </span>
     );
   };
