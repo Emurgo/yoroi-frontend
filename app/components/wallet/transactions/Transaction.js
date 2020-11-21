@@ -184,7 +184,6 @@ type Props = {|
   +state: TxStatusCodesType,
   +selectedExplorer: SelectedExplorer,
   +assuranceLevel: AssuranceLevel,
-  +isLastInList: boolean,
   +shouldHideBalance: boolean,
   +onAddMemo: WalletTransaction => void,
   +onEditMemo: WalletTransaction => void,
@@ -343,7 +342,6 @@ export default class Transaction extends Component<Props, State> {
   render(): Node {
     const data = this.props.data;
     const {
-      isLastInList,
       state,
       assuranceLevel,
       onAddMemo,
@@ -364,7 +362,6 @@ export default class Transaction extends Component<Props, State> {
 
     const contentStyles = classnames([
       styles.content,
-      isLastInList ? styles.last : styles.notLast,
       isExpanded ? styles.shadow : null,
     ]);
 

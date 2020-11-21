@@ -7,7 +7,6 @@ import { toSvg } from 'jdenticon';
 import { defineMessages, intlShape } from 'react-intl';
 import globalMessages from '../../../../i18n/global-messages';
 import type { PoolTuples } from '../../../../api/jormungandr/lib/state-fetch/types';
-import Timer from '../../../widgets/Timer';
 import CustomTooltip from '../../../widgets/CustomTooltip';
 import LoadingSpinner from '../../../widgets/LoadingSpinner';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
@@ -21,13 +20,19 @@ const messages = defineMessages({
     id: 'wallet.dashboard.upcomingRewards.title',
     defaultMessage: '!!!Upcoming Rewards',
   },
+
+  delegatedTitle: {
+    id: 'wallet.dashboard.upcomingRewards.delegatedTitle',
+    defaultMessage: '!!!Stake Pool Delegated',
+  },
+
   at: {
     id: 'wallet.dashboard.upcomingRewards.at',
     defaultMessage: '!!!at',
   },
   endOfEpoch: {
     id: 'wallet.dashboard.upcomingRewards.endOfEpoch',
-    defaultMessage: '!!!End of epoch',
+    defaultMessage: '!!!End of Epoch',
   },
   noRewards: {
     id: 'wallet.dashboard.upcomingRewards.noRewards',
@@ -46,13 +51,14 @@ const messages = defineMessages({
 export type MiniPoolInfo = {|
   ticker?: ?string,
   id: PoolTuples,
+  name?: ?string,
 |};
 
 export type BoxInfo = {|
   epoch: number,
   time: [string, string, string, string, string],
   pools: Array<MiniPoolInfo>,
-  isCurrentEpoch?: boolean
+  isCurrentEpoch?: boolean,
 |};
 type Props = {|
   +content: [?BoxInfo, ?BoxInfo, ?BoxInfo, ?BoxInfo],
@@ -65,7 +71,7 @@ type Props = {|
 
 @observer
 export default class UpcomingRewards extends Component<Props> {
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
@@ -77,8 +83,8 @@ export default class UpcomingRewards extends Component<Props> {
         <CustomTooltip
           key="firstRewardWarning"
           toolTip={<div>{intl.formatMessage(messages.firstRewardInfo)}</div>}
-        />
-      ]
+        />,
+        ]
       : [];
 
     const genUnregisteredWarning = (info: ?BoxInfo): Array<Node> => {
@@ -92,25 +98,19 @@ export default class UpcomingRewards extends Component<Props> {
           toolTip={<div>{intl.formatMessage(messages.unregisteredWarning)}</div>}
         >
           <AttentionIcon />
-        </CustomTooltip>
+        </CustomTooltip>,
       ];
     };
 
     return (
       <Card title={intl.formatMessage(messages.title)}>
-        <div className={styles.wrapper}>
-          {this.infoToNode(
-            this.props.content[0],
-            [...genUnregisteredWarning(this.props.content[0]), ...firstRewardWarning]
-          )}
-          {this.infoToNode(
-            this.props.content[1],
-            genUnregisteredWarning(this.props.content[1])
-          )}
-          {this.infoToNode(
-            this.props.content[2],
-            genUnregisteredWarning(this.props.content[2])
-          )}
+        <div className={classnames([styles.wrapper, styles.epochCards])}>
+          {this.infoToNode(this.props.content[0], [
+            ...genUnregisteredWarning(this.props.content[0]),
+            ...firstRewardWarning,
+          ])}
+          {this.infoToNode(this.props.content[1], genUnregisteredWarning(this.props.content[1]))}
+          {this.infoToNode(this.props.content[2], genUnregisteredWarning(this.props.content[2]))}
           {this.infoToNode(
             this.props.content[3],
             genUnregisteredWarning(this.props.content[3]),
@@ -121,12 +121,12 @@ export default class UpcomingRewards extends Component<Props> {
     );
   }
 
-  infoToNode: (?BoxInfo, Array<Node>, ?boolean) => Node = (info, additional, isLast = false) => {
+  infoToNode: (?BoxInfo, Array<Node>, ?boolean) => Node = (info, additional) => {
     const { intl } = this.context;
 
     if (info == null) {
       return (
-        <div className={classnames([styles.card, isLast === false ? styles.mr15 : ''])}>
+        <div className={styles.card}>
           <div className={styles.loading}>
             <LoadingSpinner />
           </div>
@@ -135,83 +135,75 @@ export default class UpcomingRewards extends Component<Props> {
     }
     if (info.pools.length === 0) {
       return (
-        <div className={classnames([styles.card, styles.noDelegation, isLast === false ? styles.mr15 : ''])}>
+        <div className={classnames([styles.card, styles.noDelegation])}>
           <div className={styles.header}>
             <div className={styles.label}>
               {this.props.useEndOfEpoch
                 ? intl.formatMessage(messages.endOfEpoch)
-                : intl.formatMessage(globalMessages.epochLabel)}&nbsp;
-              {info.isCurrentEpoch === true ? `${info.epoch} (${intl.formatMessage(globalMessages.current)})` : info.epoch}
+                : intl.formatMessage(globalMessages.epochLabel)}
+              &nbsp;
+              {info.isCurrentEpoch === true
+                ? `${info.epoch}: (${intl.formatMessage(globalMessages.current)})`
+                : info.epoch}
             </div>
           </div>
-          <div className={styles.message}>
-            {intl.formatMessage(messages.noRewards)}
-          </div>
+          <div className={styles.message}>{intl.formatMessage(messages.noRewards)}</div>
         </div>
       );
     }
     return (
-      <div className={classnames([styles.card, isLast === false ? styles.mr15 : ''])}>
+      <div className={styles.card}>
         <div className={styles.header}>
           <h3 className={styles.label}>
             {this.props.useEndOfEpoch
               ? intl.formatMessage(messages.endOfEpoch)
-              : intl.formatMessage(globalMessages.epochLabel)}&nbsp;
-            {info.isCurrentEpoch === true ? `${info.epoch} (${intl.formatMessage(globalMessages.current)})` : info.epoch}
+              : intl.formatMessage(globalMessages.epochLabel)}
+            &nbsp;
+            {info.isCurrentEpoch === true
+              ? `${info.epoch}: (${intl.formatMessage(globalMessages.current)})`
+              : info.epoch}
           </h3>
           {additional}
         </div>
         <div className={styles.time}>
           <div className={styles.broad}>
-            <div className={styles.monthDay}>
-              {info.time[0]} {intl.formatMessage(messages.at)}
+            <div>
+              {`${info.time[0]} ${intl.formatMessage(messages.at)} ${info.time[1]}:${
+                info.time[2]
+              }:${info.time[3]} ${info.time[4]}`}
             </div>
           </div>
-          <div className={styles.specific}>
-            <div className={styles.timer}>
-              <Timer
-                time={{
-                  h: info.time[1],
-                  m: info.time[2],
-                  s: info.time[3],
-                }}
-              />
-            </div>
-            <div className={styles.ampm}>{info.time[4]}</div>
-          </div>
         </div>
-        <div className={styles.pools}>
-          {info.pools.map(pool => this.getAvatars(pool))}
-        </div>
+
+        <h3 className={classnames([styles.label, styles.mt20])}>
+          {intl.formatMessage(messages.delegatedTitle)}:
+        </h3>
+        <div className={styles.pools}>{info.pools.map(pool => this.getAvatars(pool))}</div>
       </div>
     );
-  }
+  };
 
-  getAvatars: MiniPoolInfo => Node = (pool) => {
+  getAvatars: MiniPoolInfo => Node = pool => {
     const avatarSource = toSvg(pool.id[0], 36, { padding: 0 });
 
     // Taken from Seiza (dangerouslyEmbedIntoDataURI())
     const avatar = `data:image/svg+xml;utf8,${encodeURIComponent(avatarSource)}`;
 
-    const tooltip = pool.ticker == null
-      ? pool.id[0]
-      : (<>{pool.ticker}<br />{pool.id[0]}</>);
+    const poolInfo =
+      pool.ticker == null ? (
+        pool.id[0]
+      ) : (
+        <div>
+          [{pool.ticker}] {pool.name}
+        </div>
+      );
 
-    const img = (
-      <img
-        alt="Pool avatar"
-        src={avatar}
-        className={styles.avatar}
-      />
-    );
+    const img = <img alt="Pool avatar" src={avatar} className={styles.avatar} />;
     return (
-      <CustomTooltip
-        key={pool.id[0] + pool.id[1]}
-        toolTip={<div className={styles.poolInfo}>{tooltip}</div>}
-        isOpeningUpward={false}
-      >
-        {this.props.baseUrl != null
-          ? (
+      // toolTip={<div className={styles.poolInfo}>{tooltip}</div>}
+      <div className={styles.poolBox} key={pool.id[0] + pool.id[1]}>
+        <div>
+          {this.props.baseUrl != null ? (
             <a
               className={styles.url}
               href={this.props.baseUrl + pool.id[0]}
@@ -219,10 +211,12 @@ export default class UpcomingRewards extends Component<Props> {
             >
               {img}
             </a>
-          )
-          : img
-        }
-      </CustomTooltip>
+          ) : (
+            img
+          )}
+        </div>
+        {poolInfo}
+      </div>
     );
-  }
+  };
 }
