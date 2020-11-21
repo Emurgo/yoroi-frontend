@@ -33,11 +33,11 @@ const messages = defineMessages({
   },
   adaAmountNote1: {
     id: 'wallet.dashboard.summary.adaAmountNote1',
-    defaultMessage: '!!!To be able to send this amount',
+    defaultMessage: '!!!This balance includes rewards',
   },
   adaAmountNote2: {
     id: 'wallet.dashboard.summary.adaAmountNote2',
-    defaultMessage: '!!!you should withdraw Rewards first',
+    defaultMessage: '!!!(withdrawal required to be able to send this full amount)',
   },
   mangledPopupDialogLine1: {
     id: 'wallet.dashboard.summary.mangled.line1',
@@ -118,34 +118,37 @@ export default class UserSummary extends Component<Props, State> {
     const { totalAdaSum } = this.props;
     return (
       <div className={classnames([styles.card, styles.mr20])}>
-        <h3 className={styles.label}>
-          {intl.formatMessage(globalMessages.totalAdaLabel, {
-            ticker: this.props.meta.primaryTicker,
-          })}
-          :
-        </h3>
-        {totalAdaSum != null ? (
-          <>
-            {totalAdaSum.unitOfAccount && (
+        <div className={styles.cardContent}>
+          <h3 className={styles.label}>
+            {intl.formatMessage(globalMessages.totalAdaLabel, {
+              ticker: this.props.meta.primaryTicker,
+            })}
+            :
+          </h3>
+          {totalAdaSum != null ? (
+            <>
+              {totalAdaSum.unitOfAccount && (
+                <p className={styles.value}>
+                  {totalAdaSum.unitOfAccount.amount} {totalAdaSum.unitOfAccount.currency}
+                </p>
+              )}
               <p className={styles.value}>
-                {totalAdaSum.unitOfAccount.amount} {totalAdaSum.unitOfAccount.currency}
+                {this.formatAdaValue(totalAdaSum.ADA)} {this.props.meta.primaryTicker}
               </p>
-            )}
-            <p className={styles.value}>
-              {this.formatAdaValue(totalAdaSum.ADA)} {this.props.meta.primaryTicker}
-            </p>
-            <div className={styles.sectionActions}>
-              <div className={styles.amountNote}>
-                {intl.formatMessage(messages.adaAmountNote1)}
+              <div className={styles.sectionActions}>
+                <div className={styles.amountNote}>
+                  {intl.formatMessage(messages.adaAmountNote1)}
+                </div>
+                <div className={styles.amountNote}>
+                  {intl.formatMessage(messages.adaAmountNote2)}
+                </div>
+                <div />
               </div>
-              <div className={styles.amountNote}>
-                {intl.formatMessage(messages.adaAmountNote2)}
-              </div>
-            </div>
-          </>
-        ) : (
-          <LoadingSpinner small />
-        )}
+            </>
+          ) : (
+            <LoadingSpinner small />
+          )}
+        </div>
         <div className={styles.icon}>
           <IconAda />
         </div>
@@ -158,27 +161,19 @@ export default class UserSummary extends Component<Props, State> {
     const { totalRewards } = this.props;
     return (
       <div className={classnames([styles.card, styles.mr20])}>
-        <h3 className={styles.label}>{intl.formatMessage(globalMessages.totalRewardsLabel)}:</h3>
-        {totalRewards != null ? (
-          <>
-            {totalRewards.unitOfAccount && (
-              <p className={styles.value}>
-                {totalRewards.unitOfAccount.amount} {totalRewards.unitOfAccount.currency}
-              </p>
-            )}
-            <p className={styles.value}>
-              {this.formatAdaValue(totalRewards.ADA)} {this.props.meta.primaryTicker}
-            </p>
-            <div className={styles.sectionActions}>
-              {this.props.withdrawRewards != null && (
-                <Button
-                  className='secondary'
-                  label={intl.formatMessage(globalMessages.withdrawLabel)}
-                  onClick={this.props.withdrawRewards}
-                  skin={ButtonSkin}
-                />
+        <div className={styles.cardContent}>
+          <h3 className={styles.label}>{intl.formatMessage(globalMessages.totalRewardsLabel)}:</h3>
+          {totalRewards != null ? (
+            <>
+              {totalRewards.unitOfAccount && (
+                <p className={styles.value}>
+                  {totalRewards.unitOfAccount.amount} {totalRewards.unitOfAccount.currency}
+                </p>
               )}
-              {/* <div
+              <p className={styles.value}>
+                {this.formatAdaValue(totalRewards.ADA)} {this.props.meta.primaryTicker}
+              </p>
+              <div
                 className={styles.note}
                 role="button"
                 tabIndex={0}
@@ -186,12 +181,22 @@ export default class UserSummary extends Component<Props, State> {
                 onClick={this.props.openLearnMore}
               >
                 {intl.formatMessage(messages.note)}
-              </div> */}
-            </div>
-          </>
-        ) : (
-          <LoadingSpinner small />
-        )}
+              </div>
+              <div className={styles.sectionActions}>
+                {this.props.withdrawRewards != null && (
+                  <Button
+                    className='secondary'
+                    label={intl.formatMessage(globalMessages.withdrawLabel)}
+                    onClick={this.props.withdrawRewards}
+                    skin={ButtonSkin}
+                  />
+                )}
+              </div>
+            </>
+          ) : (
+            <LoadingSpinner small />
+          )}
+        </div>
         <div className={styles.icon}>
           <IconRewards />
         </div>
@@ -222,24 +227,25 @@ export default class UserSummary extends Component<Props, State> {
 
     return (
       <div className={styles.card}>
-        <h3 className={styles.label}>{intl.formatMessage(messages.delegatedLabel)}:</h3>
-        {totalDelegated != null ? (
-          <>
-            {totalDelegated.unitOfAccount && (
+        <div className={styles.cardContent}>
+          <h3 className={styles.label}>{intl.formatMessage(messages.delegatedLabel)}:</h3>
+          {totalDelegated != null ? (
+            <>
+              {totalDelegated.unitOfAccount && (
+                <p className={styles.value}>
+                  {totalDelegated.unitOfAccount.amount} {totalDelegated.unitOfAccount.currency}
+                </p>
+              )}
               <p className={styles.value}>
-                {totalDelegated.unitOfAccount.amount} {totalDelegated.unitOfAccount.currency}
+                {this.formatAdaValue(totalDelegated.ADA)} {this.props.meta.primaryTicker}
               </p>
-            )}
-            <p className={styles.value}>
-              {this.formatAdaValue(totalDelegated.ADA)} {this.props.meta.primaryTicker}
-            </p>
-          </>
-        ) : (
-          <div>
-            <LoadingSpinner small />
-          </div>
-        )}
-        <div className={styles.mangledSection}>
+            </>
+          ) : (
+            <div>
+              <LoadingSpinner small />
+            </div>
+          )}
+          <div className={styles.mangledSection}>
           {mangledWarningIcon}
           {this.state.mangledPopupOpen && (
             <div className={styles.mangledPopup}>
@@ -293,6 +299,7 @@ export default class UserSummary extends Component<Props, State> {
               </TooltipBox>
             </div>
           )}
+        </div>
         </div>
         <div className={styles.icon}>
           <IconDelegated />

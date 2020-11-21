@@ -16,16 +16,21 @@
   .sectionActions {
     flex: 1;
     margin-top: 15px;
-
     button {
       width: 50%;
     }
+  }
+
+  .cardContent {
+    position: relative;
+    z-index: 1;
   }
 
   .icon {
     position: absolute;
     right: -30px;
     bottom: -15px;
+    z-index: 0;
   }
 }
 
@@ -77,12 +82,9 @@
 }
 
 .note {
-  margin-top: 12px;
   font-size: 12px;
   line-height: 14px;
   color: var(--theme-dashboard-link-color);
-  margin-left: auto;
-  margin-right: 0px;
   width: max-content;
   &:hover {
     @include underline(var(--theme-dashboard-link-color));
@@ -92,9 +94,8 @@
 .amountNote {
   margin-top: 12px;
   font-size: 12px;
-  line-height: 8px;
+  line-height: normal;
   color: var(--theme-dashboard-link-color);
-  width: max-content;
 }
 
 .mr20 {
