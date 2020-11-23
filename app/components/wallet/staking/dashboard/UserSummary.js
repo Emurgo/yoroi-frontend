@@ -119,23 +119,31 @@ export default class UserSummary extends Component<Props, State> {
     return (
       <div className={classnames([styles.card, styles.mr20])}>
         <div className={styles.cardContent}>
-          <h3 className={styles.label}>
-            {intl.formatMessage(globalMessages.totalAdaLabel, {
-              ticker: this.props.meta.primaryTicker,
-            })}
-            :
-          </h3>
-          {totalAdaSum != null ? (
-            <>
-              {totalAdaSum.unitOfAccount && (
+          <div>
+            <h3 className={styles.label}>
+              {intl.formatMessage(globalMessages.totalAdaLabel, {
+                ticker: this.props.meta.primaryTicker,
+              })}
+              :
+            </h3>
+            {totalAdaSum != null ? (
+              <>
+                {totalAdaSum.unitOfAccount && (
+                  <p className={styles.value}>
+                    {totalAdaSum.unitOfAccount.amount} {totalAdaSum.unitOfAccount.currency}
+                  </p>
+                )}
                 <p className={styles.value}>
-                  {totalAdaSum.unitOfAccount.amount} {totalAdaSum.unitOfAccount.currency}
+                  {this.formatAdaValue(totalAdaSum.ADA)} {this.props.meta.primaryTicker}
                 </p>
-              )}
-              <p className={styles.value}>
-                {this.formatAdaValue(totalAdaSum.ADA)} {this.props.meta.primaryTicker}
-              </p>
-              <div className={styles.sectionActions}>
+              </>
+            ) : (
+              <LoadingSpinner small />
+            )}
+          </div>
+          <div>
+            {totalAdaSum != null ? (
+              <>
                 <div className={styles.amountNote}>
                   {intl.formatMessage(messages.adaAmountNote1)}
                 </div>
@@ -143,11 +151,11 @@ export default class UserSummary extends Component<Props, State> {
                   {intl.formatMessage(messages.adaAmountNote2)}
                 </div>
                 <div />
-              </div>
-            </>
-          ) : (
-            <LoadingSpinner small />
-          )}
+              </>
+            ) : (
+              ''
+            )}
+          </div>
         </div>
         <div className={styles.icon}>
           <IconAda />
@@ -162,40 +170,48 @@ export default class UserSummary extends Component<Props, State> {
     return (
       <div className={classnames([styles.card, styles.mr20])}>
         <div className={styles.cardContent}>
-          <h3 className={styles.label}>{intl.formatMessage(globalMessages.totalRewardsLabel)}:</h3>
-          {totalRewards != null ? (
-            <>
-              {totalRewards.unitOfAccount && (
+          <div>
+            <h3 className={styles.label}>
+              {intl.formatMessage(globalMessages.totalRewardsLabel)}:
+            </h3>
+            {totalRewards != null ? (
+              <>
+                {totalRewards.unitOfAccount && (
+                  <p className={styles.value}>
+                    {totalRewards.unitOfAccount.amount} {totalRewards.unitOfAccount.currency}
+                  </p>
+                )}
                 <p className={styles.value}>
-                  {totalRewards.unitOfAccount.amount} {totalRewards.unitOfAccount.currency}
+                  {this.formatAdaValue(totalRewards.ADA)} {this.props.meta.primaryTicker}
                 </p>
-              )}
-              <p className={styles.value}>
-                {this.formatAdaValue(totalRewards.ADA)} {this.props.meta.primaryTicker}
-              </p>
-              <div
-                className={styles.note}
-                role="button"
-                tabIndex={0}
-                onKeyPress={() => null}
-                onClick={this.props.openLearnMore}
-              >
-                {intl.formatMessage(messages.note)}
-              </div>
-              <div className={styles.sectionActions}>
+              </>
+            ) : (
+              <LoadingSpinner small />
+            )}
+          </div>
+          <div className={styles.footer}>
+            {totalRewards != null ? (
+              <>
                 {this.props.withdrawRewards != null && (
                   <Button
-                    className="secondary"
+                    className={classnames(styles.actionButton, 'secondary')}
                     label={intl.formatMessage(globalMessages.withdrawLabel)}
                     onClick={this.props.withdrawRewards}
                     skin={ButtonSkin}
                   />
                 )}
-              </div>
-            </>
-          ) : (
-            <LoadingSpinner small />
-          )}
+                <div
+                  className={styles.note}
+                  role="button"
+                  tabIndex={0}
+                  onKeyPress={() => null}
+                  onClick={this.props.openLearnMore}
+                >
+                  {intl.formatMessage(messages.note)}
+                </div>
+              </>
+              ) : ''}
+          </div>
         </div>
         <div className={styles.icon}>
           <IconRewards />

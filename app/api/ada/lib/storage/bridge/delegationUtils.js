@@ -192,13 +192,13 @@ export async function getCurrentDelegation(
         pools,
       };
     }
-    if (result.prevEpoch == null && relativeSlot.epoch <= request.currentEpoch - 2) {
-      result.prevEpoch = {
+    if (result.prevPrevEpoch == null && relativeSlot.epoch <= request.currentEpoch - 2) {
+      result.prevPrevEpoch = {
         ...delegation,
         pools,
       };
     }
-    if (result.prevPrevEpoch == null && relativeSlot.epoch <= request.currentEpoch - 3) {
+    if (result.prevPrevPrevEpoch == null && relativeSlot.epoch <= request.currentEpoch - 3) {
       result.prevPrevPrevEpoch = {
         ...delegation,
         pools,

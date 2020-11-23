@@ -13,17 +13,28 @@
   box-shadow: 0px 0px 7px 3px var(--theme-dashboard-card-shadow-color);
   position: relative;
   overflow: hidden;
-  .sectionActions {
-    flex: 1;
-    margin-top: 15px;
-    button {
-      width: 50%;
-    }
-  }
 
   .cardContent {
+    height: 100%;
     position: relative;
     z-index: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    .footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 8px;
+      .actionButton {
+        height: 46px;
+        width: 144px;
+      }
+      .note {
+        color: #6B7384;
+      }
+    }
   }
 
   .icon {
@@ -92,7 +103,7 @@
 }
 
 .amountNote {
-  margin-top: 12px;
+  margin-top: 5px;
   font-size: 12px;
   line-height: normal;
   color: var(--theme-dashboard-link-color);
