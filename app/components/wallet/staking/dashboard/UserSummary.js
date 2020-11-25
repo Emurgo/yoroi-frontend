@@ -242,83 +242,92 @@ export default class UserSummary extends Component<Props, State> {
       );
 
     return (
-      <div className={styles.card}>
-        <div className={styles.cardContent}>
-          <h3 className={styles.label}>{intl.formatMessage(messages.delegatedLabel)}:</h3>
-          {totalDelegated != null ? (
-            <>
-              {totalDelegated.unitOfAccount && (
-                <p className={styles.value}>
-                  {totalDelegated.unitOfAccount.amount} {totalDelegated.unitOfAccount.currency}
-                </p>
-              )}
-              <p className={styles.value}>
-                {this.formatAdaValue(totalDelegated.ADA)} {this.props.meta.primaryTicker}
-              </p>
-            </>
-          ) : (
+      <div className={styles.wrapperCard}>
+        <div className={styles.card}>
+          <div className={styles.cardContent}>
             <div>
-              <LoadingSpinner small />
-            </div>
-          )}
-          <div className={styles.mangledSection}>
-            {mangledWarningIcon}
-            {this.state.mangledPopupOpen && (
-              <div className={styles.mangledPopup}>
-                <TooltipBox onClose={() => this.setState(() => ({ mangledPopupOpen: false }))}>
-                  <p>
-                    {this.formatWithAmount(
-                      messages.mangledPopupDialogLine1,
-                      this.props.canUnmangleSum.plus(this.props.cannotUnmangleSum),
-                      this.props.meta.decimalPlaces
-                    )}
-                  </p>
-                  {this.props.cannotUnmangleSum.gt(0) && (
-                    <ul>
-                      <li>
-                        {this.formatWithAmount(
-                          messages.canUnmangleLine,
-                          this.props.canUnmangleSum,
-                          this.props.meta.decimalPlaces
-                        )}
-                      </li>
-                      <li>
-                        {this.formatWithAmount(
-                          messages.cannotUnmangleLine,
-                          this.props.cannotUnmangleSum,
-                          this.props.meta.decimalPlaces
-                        )}
-                      </li>
-                    </ul>
-                  )}
-                  {this.props.canUnmangleSum.gt(0) && (
-                    <p>
-                      <FormattedMessage
-                        {...messages.mangledPopupDialogLine2}
-                        values={{
-                          ticker: this.props.meta.primaryTicker,
-                          transactionMessage: (
-                            <span
-                              className={styles.link}
-                              onClick={this.props.onUnmangle}
-                              role="button"
-                              tabIndex={0}
-                              onKeyPress={this.props.onUnmangle}
-                            >
-                              {intl.formatMessage(messages.makeTransaction)}
-                            </span>
-                          ),
-                        }}
-                      />
+              <h3 className={styles.label}>{intl.formatMessage(messages.delegatedLabel)}:</h3>
+              {totalDelegated != null ? (
+                <>
+                  {totalDelegated.unitOfAccount && (
+                    <p className={styles.value}>
+                      {totalDelegated.unitOfAccount.amount} {totalDelegated.unitOfAccount.currency}
                     </p>
                   )}
-                </TooltipBox>
+                  <p className={styles.value}>
+                    {this.formatAdaValue(totalDelegated.ADA)} {this.props.meta.primaryTicker}
+                  </p>
+                </>
+              ) : (
+                <div>
+                  <LoadingSpinner small />
+                </div>
+              )}
+            </div>
+            <div>
+              <div className={styles.mangledSection}>
+                {mangledWarningIcon}
               </div>
-            )}
+            </div>
+          </div>
+          <div className={styles.icon}>
+            <IconDelegated />
           </div>
         </div>
-        <div className={styles.icon}>
-          <IconDelegated />
+        <div className={styles.popupSection}>
+          <div />
+          {this.state.mangledPopupOpen && (
+            <div className={styles.mangledPopup}>
+              <TooltipBox onClose={() => this.setState(() => ({ mangledPopupOpen: false }))}>
+                <p>
+                  {this.formatWithAmount(
+                    messages.mangledPopupDialogLine1,
+                    this.props.canUnmangleSum.plus(this.props.cannotUnmangleSum),
+                    this.props.meta.decimalPlaces
+                  )}
+                </p>
+                {this.props.cannotUnmangleSum.gt(0) && (
+                  <ul>
+                    <li>
+                      {this.formatWithAmount(
+                        messages.canUnmangleLine,
+                        this.props.canUnmangleSum,
+                        this.props.meta.decimalPlaces
+                      )}
+                    </li>
+                    <li>
+                      {this.formatWithAmount(
+                        messages.cannotUnmangleLine,
+                        this.props.cannotUnmangleSum,
+                        this.props.meta.decimalPlaces
+                      )}
+                    </li>
+                  </ul>
+                )}
+                {this.props.canUnmangleSum.gt(0) && (
+                  <p>
+                    <FormattedMessage
+                      {...messages.mangledPopupDialogLine2}
+                      values={{
+                        ticker: this.props.meta.primaryTicker,
+                        transactionMessage: (
+                          <span
+                            className={styles.link}
+                            onClick={this.props.onUnmangle}
+                            role="button"
+                            tabIndex={0}
+                            onKeyPress={this.props.onUnmangle}
+                          >
+                            {intl.formatMessage(messages.makeTransaction)}
+                          </span>
+                        ),
+                      }}
+                    />
+                  </p>
+                )}
+              </TooltipBox>
+            </div>
+          )}
         </div>
       </div>
     );

@@ -48,30 +48,9 @@
 .mangledSection {
   display: flex;
   justify-content: flex-end;
-  margin-top: 20px;
   .mangledWarningIcon {
     height: fit-content;
     cursor: pointer;
-  }
-  .mangledPopup {
-    @include unordered-list;
-
-    p,
-    ul {
-      font-family: var(--font-regular);
-      color: var(--cmn-default-color-grey-6);
-      font-size: 14px;
-      line-height: 22px;
-
-      .link {
-        @include underline(var(--theme-dashboard-link-color));
-      }
-    }
-
-    ul {
-      margin-top: 8px;
-      margin-bottom: 8px;
-    }
   }
 }
 
@@ -111,4 +90,41 @@
 
 .mr20 {
   margin-right: 20px;
+}
+
+.wrapperCard {
+  flex: 1;
+  
+  .card {
+    height: 100%;
+  }
+
+  .popupSection {
+    display: flex;
+    justify-content: space-between;
+
+    .mangledPopup {
+
+      margin-top: -50px;
+      margin-right: 20px;
+      @include unordered-list;
+  
+      p,
+      ul {
+        font-family: var(--font-regular);
+        color: var(--cmn-default-color-grey-6);
+        font-size: 14px;
+        line-height: 22px;
+  
+        .link {
+          @include underline(var(--theme-dashboard-link-color));
+        }
+      }
+  
+      ul {
+        margin-top: 8px;
+        margin-bottom: 8px;
+      }
+    }
+  }
 }
