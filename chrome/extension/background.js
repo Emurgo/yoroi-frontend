@@ -1,7 +1,6 @@
 // @flow
 import debounce from 'lodash/debounce';
 
-import { setupApi } from '../../app/api/index';
 import { schema } from 'lovefield';
 import type {
   lf$Database,
@@ -18,15 +17,12 @@ import {
 import {
   asGetBalance,
 } from '../../app/api/ada/lib/storage/models/PublicDeriver/traits';
-import type {
-  IPublicDeriver,
-} from '../../app/api/ada/lib/storage/models/PublicDeriver/interfaces';
 
 /*::
 declare var chrome;
 */
 
-const connectorId = "knfkinkbmgjefmeaddmkgpgmbggdllcp";
+const connectorId = 'knfkinkbmgjefmeaddmkgpgmbggdllcp';
 
 const onYoroiIconClicked = () => {
   chrome.tabs.create({ url: 'main_window.html' });
@@ -39,33 +35,30 @@ let db: ?lf$Database = null;
 async function connectHandler(message, sender, sendResponse) {
   async function firstWallet(): Promise<PublicDeriver<>> {
     if (db != null) {
-      const wallets = await getWallets({db: db});
+      const wallets = await getWallets({ db });
       return new Promise.resolve(wallets[0]);
-    } else {
-      throw Promise.reject("Database not loaded");
     }
+    throw Promise.reject(new Error('Database not loaded for connector RPCs'));
   }
-  if (sender.id == connectorId) {
-    console.log("REAL(background.js)-yoroi received: " + JSON.stringify(message))
-    if (message.type == "yoroi_connect_request") {
+  if (sender.id === connectorId) {
+    if (message.type === 'yoroi_connect_request') {
       db = await loadLovefieldDB(schema.DataStoreType.INDEXED_DB);
       chrome.runtime.sendMessage(
 		    connectorId,
-		    {type: "yoroi_connected"},
+		    { type: 'yoroi_connected' },
 		  );
 		  sendResponse(true);
     }
-  } if (message.type == "connector_rpc_request") {
+  } if (message.type === 'connector_rpc_request') {
     switch (message.function) {
-      case "get_balance":
-        if (message.params[0] == "ERG") {
+      case 'get_balance':
+        if (message.params[0] === 'ERG') {
           const wallet = await firstWallet();
           const canGetBalance = asGetBalance(wallet);
           if (canGetBalance != null) {
-            canGetBalance.getBalance().then(x => {
-              sendResponse({
-                ok: x
-              });
+            const balance = await canGetBalance.getBalance();
+            sendResponse({
+              ok: balance
             });
           }
         } else {
@@ -82,25 +75,25 @@ async function connectHandler(message, sender, sendResponse) {
       //     });
       //   });
       //   break;
-      case "sign_tx":
+      case 'sign_tx':
         sendResponse({
           err: {
             code: 2,
-            info: "User rejected",
+            info: 'User rejected',
           }
         });
-      case "ping":
+        break;
+      case 'ping':
         sendResponse({
           ok: true,
         });
+        break;
       default:
         sendResponse({
-          err: "unknown RPC: " + message.function + "(" + message.params + ")"
+          err: `unknown RPC: ${message.function}(${message.params})`
         })
         break;
     }
-  } else {
-    console.log("received message \"" + message + "\" from other sender: " + sender.id);
   }
 }
 
