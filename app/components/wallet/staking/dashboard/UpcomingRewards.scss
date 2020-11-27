@@ -3,6 +3,7 @@
 .wrapper {
   display: flex;
   min-height: 143px;
+  flex-wrap: wrap;
 }
 
 .epochCards {
@@ -22,6 +23,9 @@
   flex: 1;
   border-radius: 6px;
   background-color: #f8f8f8;
+  min-width: 234px;
+  max-width: 234px;
+  margin-bottom: 10px;
 
   .sectionActions {
     flex: 1;
@@ -42,7 +46,7 @@
 
 .header {
   display: flex;
-  justify-content: flex-end;
+  align-items: center;
 }
 
 .label {
@@ -51,6 +55,8 @@
   font-family: var(--font-regular);
   font-size: 14px;
   line-height: 22px;
+  height: 23px;
+  overflow: hidden;
 }
 
 .time {
@@ -107,7 +113,6 @@
 
   .poolBox {
     display: flex;
-    flex-wrap: wrap;
     align-items: center;
     .avatar {
       width: 24px;
@@ -118,12 +123,19 @@
   }
 }
 
-.poolInfo {
+.poolInfoToolTip {
   padding: 4px 0px;
   font-family: var(--font-light);
   color: var(--theme-dashboard-tooltip-text-color);
   font-size: 11px;
   line-height: 14px;
+}
+
+.poolInfo {
+  max-width: 160px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .mr15 {

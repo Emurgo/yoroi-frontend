@@ -94,7 +94,6 @@ export default class UpcomingRewards extends Component<Props> {
       return [
         <CustomTooltip
           key="unregisteredWarning"
-          isAligningRight
           toolTip={<div>{intl.formatMessage(messages.unregisteredWarning)}</div>}
         >
           <AttentionIcon />
@@ -113,15 +112,14 @@ export default class UpcomingRewards extends Component<Props> {
           {this.infoToNode(this.props.content[2], genUnregisteredWarning(this.props.content[2]))}
           {this.infoToNode(
             this.props.content[3],
-            genUnregisteredWarning(this.props.content[3]),
-            true
+            genUnregisteredWarning(this.props.content[3])
           )}
         </div>
       </Card>
     );
   }
 
-  infoToNode: (?BoxInfo, Array<Node>, ?boolean) => Node = (info, additional) => {
+  infoToNode: (?BoxInfo, Array<Node>) => Node = (info, additional) => {
     const { intl } = this.context;
 
     if (info == null) {
@@ -133,34 +131,17 @@ export default class UpcomingRewards extends Component<Props> {
         </div>
       );
     }
-    if (info.pools.length === 0) {
-      return (
-        <div className={classnames([styles.card, styles.noDelegation])}>
-          <div className={styles.header}>
-            <div className={styles.label}>
-              {this.props.useEndOfEpoch
-                ? intl.formatMessage(messages.endOfEpoch)
-                : intl.formatMessage(globalMessages.epochLabel)}
-              &nbsp;
-              {info.isCurrentEpoch === true
-                ? `${info.epoch}: (${intl.formatMessage(globalMessages.current)})`
-                : info.epoch}
-            </div>
-          </div>
-          <div className={styles.message}>{intl.formatMessage(messages.noRewards)}</div>
-        </div>
-      );
-    }
+
     return (
       <div className={styles.card}>
         <div className={styles.header}>
           <h3 className={styles.label}>
             {this.props.useEndOfEpoch
               ? intl.formatMessage(messages.endOfEpoch)
-              : intl.formatMessage(globalMessages.epochLabel)}
+              : intl.formatMessage(globalMessages.epochLabel)}:
             &nbsp;
             {info.isCurrentEpoch === true
-              ? `${info.epoch}: (${intl.formatMessage(globalMessages.current)})`
+              ? `${info.epoch} (${intl.formatMessage(globalMessages.current)})`
               : info.epoch}
           </h3>
           {additional}
@@ -178,7 +159,11 @@ export default class UpcomingRewards extends Component<Props> {
         <h3 className={classnames([styles.label, styles.mt20])}>
           {intl.formatMessage(messages.delegatedTitle)}:
         </h3>
-        <div className={styles.pools}>{info.pools.map(pool => this.getAvatars(pool))}</div>
+        { (info.pools.length === 0) ?
+          <div>—</div>
+          :
+          <div className={styles.pools}>{info.pools.map(pool => this.getAvatars(pool))}</div>
+        }
       </div>
     );
   };
@@ -189,34 +174,47 @@ export default class UpcomingRewards extends Component<Props> {
     // Taken from Seiza (dangerouslyEmbedIntoDataURI())
     const avatar = `data:image/svg+xml;utf8,${encodeURIComponent(avatarSource)}`;
 
+    const tooltip = pool.ticker == null
+      ? pool.id[0]
+      : (<>[{pool.ticker}] {pool.name}<br />{pool.id[0]}</>);
+
     const poolInfo =
       pool.ticker == null ? (
-        pool.id[0]
+        <div className={styles.poolInfo}>
+          {pool.id[0]}
+        </div>
       ) : (
-        <div>
+        <div className={styles.poolInfo}>
           [{pool.ticker}] {pool.name}
         </div>
       );
 
     const img = <img alt="Pool avatar" src={avatar} className={styles.avatar} />;
     return (
-      // toolTip={<div className={styles.poolInfo}>{tooltip}</div>}
-      <div className={styles.poolBox} key={pool.id[0] + pool.id[1]}>
-        <div>
-          {this.props.baseUrl != null ? (
-            <a
-              className={styles.url}
-              href={this.props.baseUrl + pool.id[0]}
-              onClick={event => this.props.onExternalLinkClick(event)}
-            >
-              {img}
-            </a>
-          ) : (
-            img
-          )}
+
+      <CustomTooltip
+        key={pool.id[0] + pool.id[1]}
+        toolTip={<div className={styles.poolInfoToolTip}>{tooltip}</div>}
+        isOpeningUpward={false}
+        isPoolAvatar
+      >
+        <div className={styles.poolBox} key={pool.id[0] + pool.id[1]}>
+          <div>
+            {this.props.baseUrl != null ? (
+              <a
+                className={styles.url}
+                href={this.props.baseUrl + pool.id[0]}
+                onClick={event => this.props.onExternalLinkClick(event)}
+              >
+                {img}
+              </a>
+            ) : (
+              img
+            )}
+          </div>
+          {poolInfo}
         </div>
-        {poolInfo}
-      </div>
+      </CustomTooltip>
     );
   };
 }
