@@ -138,23 +138,19 @@ export default class UserSummary extends Component<Props, State> {
                 </p>
               </>
             ) : (
-              <LoadingSpinner small />
+              <div className={styles.loadingSpinner}>
+                <LoadingSpinner small />
+              </div>
             )}
           </div>
           <div>
-            {totalAdaSum != null ? (
-              <>
-                <div className={styles.amountNote}>
-                  {intl.formatMessage(messages.adaAmountNote1)}
-                </div>
-                <div className={styles.amountNote}>
-                  {intl.formatMessage(messages.adaAmountNote2)}
-                </div>
-                <div />
-              </>
-            ) : (
-              ''
-            )}
+            <div className={styles.amountNote}>
+              {intl.formatMessage(messages.adaAmountNote1)}
+            </div>
+            <div className={styles.amountNote}>
+              {intl.formatMessage(messages.adaAmountNote2)}
+            </div>
+            <div />
           </div>
         </div>
         <div className={styles.icon}>
@@ -186,31 +182,29 @@ export default class UserSummary extends Component<Props, State> {
                 </p>
               </>
             ) : (
-              <LoadingSpinner small />
+              <div className={styles.loadingSpinner}>
+                <LoadingSpinner small />
+              </div>
             )}
           </div>
           <div className={styles.footer}>
-            {totalRewards != null ? (
-              <>
-                {this.props.withdrawRewards != null && (
-                  <Button
-                    className={classnames(styles.actionButton, 'secondary')}
-                    label={intl.formatMessage(globalMessages.withdrawLabel)}
-                    onClick={this.props.withdrawRewards}
-                    skin={ButtonSkin}
-                  />
-                )}
-                <div
-                  className={styles.note}
-                  role="button"
-                  tabIndex={0}
-                  onKeyPress={() => null}
-                  onClick={this.props.openLearnMore}
-                >
-                  {intl.formatMessage(messages.note)}
-                </div>
-              </>
-              ) : ''}
+            {this.props.withdrawRewards != null && (
+              <Button
+                className={classnames(styles.actionButton, 'secondary')}
+                label={intl.formatMessage(globalMessages.withdrawLabel)}
+                onClick={this.props.withdrawRewards}
+                skin={ButtonSkin}
+              />
+            )}
+            <div
+              className={styles.note}
+              role="button"
+              tabIndex={0}
+              onKeyPress={() => null}
+              onClick={this.props.openLearnMore}
+            >
+              {intl.formatMessage(messages.note)}
+            </div>
           </div>
         </div>
         <div className={styles.icon}>
@@ -243,39 +237,7 @@ export default class UserSummary extends Component<Props, State> {
 
     return (
       <div className={styles.wrapperCard}>
-        <div className={styles.card}>
-          <div className={styles.cardContent}>
-            <div>
-              <h3 className={styles.label}>{intl.formatMessage(messages.delegatedLabel)}:</h3>
-              {totalDelegated != null ? (
-                <>
-                  {totalDelegated.unitOfAccount && (
-                    <p className={styles.value}>
-                      {totalDelegated.unitOfAccount.amount} {totalDelegated.unitOfAccount.currency}
-                    </p>
-                  )}
-                  <p className={styles.value}>
-                    {this.formatAdaValue(totalDelegated.ADA)} {this.props.meta.primaryTicker}
-                  </p>
-                </>
-              ) : (
-                <div>
-                  <LoadingSpinner small />
-                </div>
-              )}
-            </div>
-            <div>
-              <div className={styles.mangledSection}>
-                {mangledWarningIcon}
-              </div>
-            </div>
-          </div>
-          <div className={styles.icon}>
-            <IconDelegated />
-          </div>
-        </div>
         <div className={styles.popupSection}>
-          <div />
           {this.state.mangledPopupOpen && (
             <div className={styles.mangledPopup}>
               <TooltipBox onClose={() => this.setState(() => ({ mangledPopupOpen: false }))}>
@@ -328,6 +290,38 @@ export default class UserSummary extends Component<Props, State> {
               </TooltipBox>
             </div>
           )}
+        </div>
+        <div className={styles.subCard}>
+          <div className={styles.cardContent}>
+            <div>
+              <div className={styles.delegatedHeader}>
+                <h3 className={styles.label}>{intl.formatMessage(messages.delegatedLabel)}:</h3>
+                <div className={styles.mangledSection}>
+                  {mangledWarningIcon}
+                </div>
+              </div>
+              {totalDelegated != null ? (
+                <>
+                  {totalDelegated.unitOfAccount && (
+                    <p className={styles.value}>
+                      {totalDelegated.unitOfAccount.amount} {totalDelegated.unitOfAccount.currency}
+                    </p>
+                  )}
+                  <p className={styles.value}>
+                    {this.formatAdaValue(totalDelegated.ADA)} {this.props.meta.primaryTicker}
+                  </p>
+                </>
+              ) : (
+                <div className={styles.loadingSpinner}>
+                  <LoadingSpinner small />
+                </div>
+              )}
+            </div>
+            <div />
+          </div>
+          <div className={styles.icon}>
+            <IconDelegated />
+          </div>
         </div>
       </div>
     );
