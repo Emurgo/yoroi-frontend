@@ -478,7 +478,7 @@
   "wallet.dashboard.summary.rewardsTitle": "Toplam Ödüller",
   "wallet.dashboard.summary.title": "Toplam Ödül",
   "wallet.dashboard.upcomingRewards.at": "saat",
-  "wallet.dashboard.upcomingRewards.endOfEpoch": "End of Epoch",
+  "wallet.dashboard.upcomingRewards.endOfEpoch": "Dönem Sonu",
   "wallet.dashboard.upcomingRewards.noRewards": "bu dönemde ödül kazanılmayacak",
   "wallet.dashboard.upcomingRewards.title": "Gelecek Ödül",
   "wallet.dashboard.upcomingRewards.delegatedTitle": "Yetkilendirilmiş Bahis Hazuvu",
