@@ -13,6 +13,7 @@ type Props = {|
   +children?: Node,
   +isAligningRight?: boolean,
   +isOpeningUpward?: boolean,
+  +isPoolAvatar?: boolean,
 |};
 
 @observer
@@ -21,10 +22,12 @@ export default class CustomTooltip extends Component<Props> {
     children: void,
     isOpeningUpward: boolean,
     isAligningRight: boolean,
+    isPoolAvatar: boolean,
   |} = {
     children: undefined,
     isOpeningUpward: true,
     isAligningRight: false,
+    isPoolAvatar: false,
   }
 
   render(): Node {
@@ -37,7 +40,10 @@ export default class CustomTooltip extends Component<Props> {
           className={classnames([
             this.props.isAligningRight === true
               ? null
-              : styles.SimpleCenteredTooltip
+              : styles.SimpleCenteredTooltip,
+            this.props.isPoolAvatar === true
+            ? styles.PoolAvatarTooltip
+            : null
           ])}
           skin={TooltipSkin}
           isAligningRight={this.props.isAligningRight}

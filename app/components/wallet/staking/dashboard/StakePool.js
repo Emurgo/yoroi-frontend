@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 
-import Card from './Card';
+import CardShadow from './CardShadow';
 // import ProgressCircle from './ProgressCircle';
 import type { Notification } from '../../../../types/notificationType';
 import CopyableAddress from '../../../widgets/CopyableAddress';
@@ -170,7 +170,7 @@ export default class StakePool extends Component<Props> {
       );
 
     return (
-      <Card title={
+      <CardShadow title={
         this.props.purpose === 'dashboard'
           ? intl.formatMessage(messages.title)
           : undefined}
@@ -232,7 +232,7 @@ export default class StakePool extends Component<Props> {
           }
           {this.getMoreInfoButton(this.props.moreInfo)}
         </div>
-      </Card>
+      </CardShadow>
     );
   }
 

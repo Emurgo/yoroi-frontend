@@ -349,7 +349,7 @@ export default class StakingDashboardPage extends Component<Props> {
                   timeSinceGenesis,
                   getEpochLength,
                   publicDeriver,
-                  isCurrentEpoch: true
+                  isCurrentEpoch: true,
                 }),
                 this.generateUpcomingRewardInfo({
                   epoch: currTimeRequests.currentEpoch + 1,
@@ -443,7 +443,7 @@ export default class StakingDashboardPage extends Component<Props> {
               timeSinceGenesis,
               getEpochLength,
               publicDeriver,
-              isCurrentEpoch: true
+              isCurrentEpoch: true,
             })
           );
         }
@@ -500,7 +500,7 @@ export default class StakingDashboardPage extends Component<Props> {
     getEpochLength: CurrentEpochLengthFunc,
     toAbsoluteSlot: ToAbsoluteSlotNumberFunc,
     timeSinceGenesis: TimeSinceGenesisFunc,
-    isCurrentEpoch?: boolean
+    isCurrentEpoch?: boolean,
   |}) => BoxInfo = request => {
     const endEpochTime = request.toRealTime({
       absoluteSlotNum: request.toAbsoluteSlot({
@@ -523,7 +523,7 @@ export default class StakingDashboardPage extends Component<Props> {
       if (meta == null) {
         return { id: pool };
       }
-      return { id: pool, ticker: meta.info?.ticker };
+      return { id: pool, ticker: meta.info?.ticker, name: meta.info?.name };
     });
     return {
       pools: miniPoolInfo,
@@ -535,7 +535,7 @@ export default class StakingDashboardPage extends Component<Props> {
         endEpochMoment.format('ss'),
         endEpochMoment.format('A'),
       ],
-      isCurrentEpoch: request.isCurrentEpoch
+      isCurrentEpoch: request.isCurrentEpoch,
     };
   };
 
@@ -654,7 +654,8 @@ export default class StakingDashboardPage extends Component<Props> {
               currentPools.length === 1 && isJormungandr(publicDeriver.getParent().getNetworkInfo())
                 ? async () => {
                     this.generated.actions.dialogs.open.trigger({ dialog: UndelegateDialog });
-                    await this.generated.actions.jormungandr.delegationTransaction.createTransaction.trigger(
+                    await this.generated.actions.jormungandr.delegationTransaction.
+                    createTransaction.trigger(
                       {
                         publicDeriver,
                         poolRequest: undefined,
@@ -751,6 +752,10 @@ export default class StakingDashboardPage extends Component<Props> {
 
     const txRequests = this.generated.stores.transactions.getTxRequests(request.publicDeriver);
     const balance = txRequests.requests.getBalanceRequest.result;
+    const rewardBalance =
+      request.delegationRequests.getDelegatedBalance.result == null
+        ? 0
+        : request.delegationRequests.getDelegatedBalance.result.accountPart;
 
     const apiMeta = getApiMeta(getApiForNetwork(request.publicDeriver.getParent().getNetworkInfo()))
       ?.meta;
@@ -774,7 +779,9 @@ export default class StakingDashboardPage extends Component<Props> {
           })
         }
         totalAdaSum={
-          balance == null ? undefined : this.hideOrFormat(balance.dividedBy(amountPerUnit), apiMeta)
+          balance == null
+            ? undefined
+            : this.hideOrFormat(balance.plus(rewardBalance).dividedBy(amountPerUnit), apiMeta)
         }
         totalRewards={
           !showRewardAmount || request.delegationRequests.getDelegatedBalance.result == null
@@ -818,7 +825,8 @@ export default class StakingDashboardPage extends Component<Props> {
     if (!isCardanoHaskell(publicDeriver.getParent().getNetworkInfo())) {
       return undefined;
     }
-    const adaDelegationRequests = this.generated.stores.substores.ada.delegation.getDelegationRequests(
+    const adaDelegationRequests = this.generated.stores.substores.ada.
+      delegation.getDelegationRequests(
       publicDeriver
     );
     if (adaDelegationRequests == null) return undefined;

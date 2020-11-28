@@ -22,7 +22,6 @@ import {
   asGetBalance, asHasLevels, asGetPublicKey,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import type {
-  IPublicDeriver,
   IGetLastSyncInfo,
   IGetLastSyncInfoResponse,
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
@@ -37,9 +36,7 @@ import {
   stringifyError
 } from '../../utils/logging';
 import type { TransactionRowsToExportRequest } from '../../actions/common/transactions-actions';
-import { isWithinSupply } from '../../utils/validations';
 import globalMessages from '../../i18n/global-messages';
-import type { IHasLevels } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import * as timeUtils from '../../api/ada/lib/storage/bridge/timeUtils';
 import { getCardanoHaskellBaseConfig, isCardanoHaskell } from '../../api/ada/lib/storage/database/prepackaged/networks';
 

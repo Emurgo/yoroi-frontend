@@ -124,9 +124,6 @@ export default class StakingDashboard extends Component<Props> {
         <div className={styles.contentWrap}>
           {pendingTxWarningComponent}
           <div className={styles.statsWrapper}>
-            {/* <div>
-              {this.props.epochProgress}
-            </div> */}
             <div className={styles.summary}>
               <div className={styles.summaryItem}>
                 {this.props.userSummary}
@@ -135,15 +132,6 @@ export default class StakingDashboard extends Component<Props> {
                 {this.props.upcomingRewards}
               </div>
             </div>
-          </div>
-          <div className={styles.pageSelect}>
-            <CenteredBarDecoration>
-              <PageSelect
-                currentPage={this.props.pageInfo?.currentPage ?? 0}
-                numPages={this.props.pageInfo?.numPages ?? 0}
-                goToPage={this.props.pageInfo?.goToPage ?? (() => {})}
-              />
-            </CenteredBarDecoration>
           </div>
           <div className={styles.bodyWrapper}>
             {graphs}

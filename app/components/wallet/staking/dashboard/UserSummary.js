@@ -4,14 +4,15 @@ import type { Node } from 'react';
 import BigNumber from 'bignumber.js';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape, FormattedMessage, } from 'react-intl';
+import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
 import type { $npm$ReactIntl$MessageDescriptor, $npm$ReactIntl$IntlFormat } from 'react-intl';
-
+import { Button } from 'react-polymorph/lib/components/Button';
+import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import Card from './Card';
 import styles from './UserSummary.scss';
-import IconAda from '../../../../assets/images/dashboard/total-ada.inline.svg';
-import IconRewards from '../../../../assets/images/dashboard/total-rewards.inline.svg';
-import IconDelegated from '../../../../assets/images/dashboard/total-delegated.inline.svg';
+import IconAda from '../../../../assets/images/dashboard/grey-total-ada.inline.svg';
+import IconRewards from '../../../../assets/images/dashboard/grey-total-reward.inline.svg';
+import IconDelegated from '../../../../assets/images/dashboard/grey-total-delegated.inline.svg';
 import globalMessages from '../../../../i18n/global-messages';
 import TooltipBox from '../../../widgets/TooltipBox';
 import WarningIcon from '../../../../assets/images/attention-modern.inline.svg';
@@ -30,9 +31,18 @@ const messages = defineMessages({
     id: 'wallet.dashboard.summary.note',
     defaultMessage: '!!!Less than you expected?',
   },
+  adaAmountNote1: {
+    id: 'wallet.dashboard.summary.adaAmountNote1',
+    defaultMessage: '!!!This balance includes rewards',
+  },
+  adaAmountNote2: {
+    id: 'wallet.dashboard.summary.adaAmountNote2',
+    defaultMessage: '!!!(withdrawal required to be able to send this full amount)',
+  },
   mangledPopupDialogLine1: {
     id: 'wallet.dashboard.summary.mangled.line1',
-    defaultMessage: '!!!Your wallet has {adaAmount} {ticker} with a different delegation preference.',
+    defaultMessage:
+      '!!!Your wallet has {adaAmount} {ticker} with a different delegation preference.',
   },
   canUnmangleLine: {
     id: 'wallet.dashboard.summary.mangled.can',
@@ -82,7 +92,7 @@ type State = {|
 
 @observer
 export default class UserSummary extends Component<Props, State> {
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
@@ -107,126 +117,135 @@ export default class UserSummary extends Component<Props, State> {
     const { intl } = this.context;
     const { totalAdaSum } = this.props;
     return (
-      <div className={styles.column}>
-        <div className={styles.header}>
-          <div className={styles.icon}>
-            <IconAda />
+      <div className={classnames([styles.card, styles.mr20])}>
+        <div className={styles.cardContent}>
+          <div>
+            <h3 className={styles.label}>
+              {intl.formatMessage(globalMessages.totalAdaLabel, {
+                ticker: this.props.meta.primaryTicker,
+              })}
+              :
+            </h3>
+            {totalAdaSum != null ? (
+              <>
+                {totalAdaSum.unitOfAccount && (
+                  <p className={styles.value}>
+                    {totalAdaSum.unitOfAccount.amount} {totalAdaSum.unitOfAccount.currency}
+                  </p>
+                )}
+                <p className={styles.value}>
+                  {this.formatAdaValue(totalAdaSum.ADA)} {this.props.meta.primaryTicker}
+                </p>
+              </>
+            ) : (
+              <div className={styles.loadingSpinner}>
+                <LoadingSpinner small />
+              </div>
+            )}
+          </div>
+          <div>
+            <div className={styles.amountNote}>
+              {intl.formatMessage(messages.adaAmountNote1)}
+            </div>
+            <div className={styles.amountNote}>
+              {intl.formatMessage(messages.adaAmountNote2)}
+            </div>
+            <div />
           </div>
         </div>
-        <h3 className={styles.label}>
-          {intl.formatMessage(
-            globalMessages.totalAdaLabel,
-            { ticker: this.props.meta.primaryTicker }
-          )}:
-        </h3>
-        {totalAdaSum != null
-          ? (
-            <>
-              {totalAdaSum.unitOfAccount && (
-                <p className={styles.value}>
-                  {totalAdaSum.unitOfAccount.amount} {totalAdaSum.unitOfAccount.currency}
-                </p>
-              )}
-              <p className={styles.value}>
-                {totalAdaSum.ADA} {this.props.meta.primaryTicker}
-              </p>
-            </>
-          )
-          : (<LoadingSpinner small />)
-        }
+        <div className={styles.icon}>
+          <IconAda />
+        </div>
       </div>
     );
-  }
+  };
 
   getTotalRewards: void => Node = () => {
     const { intl } = this.context;
     const { totalRewards } = this.props;
     return (
-      <div className={styles.column}>
-        <div className={styles.header}>
-          <div className={styles.icon}>
-            <IconRewards />
+      <div className={classnames([styles.card, styles.mr20])}>
+        <div className={styles.cardContent}>
+          <div>
+            <h3 className={styles.label}>
+              {intl.formatMessage(globalMessages.totalRewardsLabel)}:
+            </h3>
+            {totalRewards != null ? (
+              <>
+                {totalRewards.unitOfAccount && (
+                  <p className={styles.value}>
+                    {totalRewards.unitOfAccount.amount} {totalRewards.unitOfAccount.currency}
+                  </p>
+                )}
+                <p className={styles.value}>
+                  {this.formatAdaValue(totalRewards.ADA)} {this.props.meta.primaryTicker}
+                </p>
+              </>
+            ) : (
+              <div className={styles.loadingSpinner}>
+                <LoadingSpinner small />
+              </div>
+            )}
+          </div>
+          <div className={styles.footer}>
+            {this.props.withdrawRewards != null && (
+              <Button
+                className={classnames(styles.actionButton, 'secondary')}
+                label={intl.formatMessage(globalMessages.withdrawLabel)}
+                onClick={this.props.withdrawRewards}
+                skin={ButtonSkin}
+              />
+            )}
+            <div
+              className={styles.note}
+              role="button"
+              tabIndex={0}
+              onKeyPress={() => null}
+              onClick={this.props.openLearnMore}
+            >
+              {intl.formatMessage(messages.note)}
+            </div>
           </div>
         </div>
-        <h3 className={styles.label}>
-          {intl.formatMessage(globalMessages.totalRewardsLabel)}:
-        </h3>
-        {totalRewards != null
-          ? (
-            <>
-              {totalRewards.unitOfAccount && (
-                <p className={styles.value}>
-                  {totalRewards.unitOfAccount.amount} {totalRewards.unitOfAccount.currency}
-                </p>
-              )}
-              <p className={styles.value}>
-                {totalRewards.ADA} {this.props.meta.primaryTicker}
-              </p>
-              <div className={styles.sectionActions}>
-                {this.props.withdrawRewards != null && (
-                  <div
-                    className={classnames([styles.note, 'withdrawButton'])}
-                    role="button"
-                    tabIndex={0}
-                    onKeyPress={() => null}
-                    onClick={this.props.withdrawRewards}
-                  >
-                    {intl.formatMessage(globalMessages.withdrawLabel)}
-                  </div>
-                )}
-                <div
-                  className={styles.note}
-                  role="button"
-                  tabIndex={0}
-                  onKeyPress={() => null}
-                  onClick={this.props.openLearnMore}
-                >
-                  {intl.formatMessage(messages.note)}
-                </div>
-              </div>
-            </>
-          )
-          : (<LoadingSpinner small />)
-        }
+        <div className={styles.icon}>
+          <IconRewards />
+        </div>
       </div>
     );
-  }
+  };
 
   getTotalDelegated: void => Node = () => {
     const { intl } = this.context;
     const { totalDelegated } = this.props;
 
-    const mangledWarningIcon = this.props.canUnmangleSum.gt(0) || this.props.cannotUnmangleSum.gt(0)
-      ? (
+    const mangledWarningIcon =
+      this.props.canUnmangleSum.gt(0) || this.props.cannotUnmangleSum.gt(0) ? (
         <div className={styles.mangledWarningIcon}>
           <WarningIcon
             width="24"
             height="24"
-            onClick={() => this.setState(prevState => ({
-              mangledPopupOpen: !prevState.mangledPopupOpen
-            }))}
+            onClick={() =>
+              this.setState(prevState => ({
+                mangledPopupOpen: !prevState.mangledPopupOpen,
+              }))
+            }
           />
         </div>
-      )
-      : [];
+      ) : (
+        []
+      );
 
     return (
-      <div className={styles.column}>
-        <div className={styles.header}>
-          <div className={styles.icon}>
-            <IconDelegated />
-          </div>
-          {mangledWarningIcon}
-          <div className={styles.mangledPopup}>
-            {this.state.mangledPopupOpen && (
-              <TooltipBox
-                onClose={() => this.setState(() => ({ mangledPopupOpen: false }))}
-              >
+      <div className={styles.wrapperCard}>
+        <div className={styles.popupSection}>
+          {this.state.mangledPopupOpen && (
+            <div className={styles.mangledPopup}>
+              <TooltipBox onClose={() => this.setState(() => ({ mangledPopupOpen: false }))}>
                 <p>
                   {this.formatWithAmount(
                     messages.mangledPopupDialogLine1,
                     this.props.canUnmangleSum.plus(this.props.cannotUnmangleSum),
-                    this.props.meta.decimalPlaces,
+                    this.props.meta.decimalPlaces
                   )}
                 </p>
                 {this.props.cannotUnmangleSum.gt(0) && (
@@ -235,14 +254,14 @@ export default class UserSummary extends Component<Props, State> {
                       {this.formatWithAmount(
                         messages.canUnmangleLine,
                         this.props.canUnmangleSum,
-                        this.props.meta.decimalPlaces,
+                        this.props.meta.decimalPlaces
                       )}
                     </li>
                     <li>
                       {this.formatWithAmount(
                         messages.cannotUnmangleLine,
                         this.props.cannotUnmangleSum,
-                        this.props.meta.decimalPlaces,
+                        this.props.meta.decimalPlaces
                       )}
                     </li>
                   </ul>
@@ -269,46 +288,68 @@ export default class UserSummary extends Component<Props, State> {
                   </p>
                 )}
               </TooltipBox>
-            )}
+            </div>
+          )}
+        </div>
+        <div className={styles.subCard}>
+          <div className={styles.cardContent}>
+            <div>
+              <div className={styles.delegatedHeader}>
+                <h3 className={styles.label}>{intl.formatMessage(messages.delegatedLabel)}:</h3>
+                <div className={styles.mangledSection}>
+                  {mangledWarningIcon}
+                </div>
+              </div>
+              {totalDelegated != null ? (
+                <>
+                  {totalDelegated.unitOfAccount && (
+                    <p className={styles.value}>
+                      {totalDelegated.unitOfAccount.amount} {totalDelegated.unitOfAccount.currency}
+                    </p>
+                  )}
+                  <p className={styles.value}>
+                    {this.formatAdaValue(totalDelegated.ADA)} {this.props.meta.primaryTicker}
+                  </p>
+                </>
+              ) : (
+                <div className={styles.loadingSpinner}>
+                  <LoadingSpinner small />
+                </div>
+              )}
+            </div>
+            <div />
+          </div>
+          <div className={styles.icon}>
+            <IconDelegated />
           </div>
         </div>
-        <h3 className={styles.label}>
-          {intl.formatMessage(messages.delegatedLabel)}:
-        </h3>
-        {totalDelegated != null
-          ? (
-            <>
-              {totalDelegated.unitOfAccount && (
-                <p className={styles.value}>
-                  {totalDelegated.unitOfAccount.amount} {totalDelegated.unitOfAccount.currency}
-                </p>
-              )}
-              <p className={styles.value}>
-                {totalDelegated.ADA} {this.props.meta.primaryTicker}
-              </p>
-            </>
-          )
-          : (<div><LoadingSpinner small /></div>)
-        }
       </div>
     );
-  }
+  };
 
-  formatWithAmount: (
-    $npm$ReactIntl$MessageDescriptor,
-    BigNumber,
-    number
-  ) => Node = (message, amount, decimalPlaces) => {
+  formatWithAmount: ($npm$ReactIntl$MessageDescriptor, BigNumber, number) => Node = (
+    message,
+    amount,
+    decimalPlaces
+  ) => {
     return (
       <FormattedMessage
         {...message}
         values={{
           ticker: this.props.meta.primaryTicker,
-          adaAmount: amount
-            .shiftedBy(-decimalPlaces)
-            .toFormat(decimalPlaces),
+          adaAmount: amount.shiftedBy(-decimalPlaces).toFormat(decimalPlaces),
         }}
       />
     );
-  }
+  };
+
+  formatAdaValue: string => Node = adaValue => {
+    const adaAmount = adaValue.split('.');
+    return (
+      <span>
+        {adaAmount[0]}
+        <span className={styles.decimal}>.{adaAmount[1]} </span>{' '}
+      </span>
+    );
+  };
 }

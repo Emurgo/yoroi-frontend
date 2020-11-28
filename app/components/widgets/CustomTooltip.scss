@@ -13,6 +13,18 @@
       margin-left: 20px; // offset = horizontal padding of icon and tooltip
     }
   }
+
+  .PoolAvatarTooltip {
+    
+    div[data-bubble-container] {
+      margin-left: 210px;
+      margin-top: 20px !important;
+    }
+
+    span[data-bubble-arrow] {
+      top: 16px;
+    }
+  }
   
   :global(.SimpleBubble_bubble) {
     font-size: 13px;

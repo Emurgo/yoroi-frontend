@@ -2,82 +2,176 @@
 @import '../../../../themes/mixins/unordered-list';
 
 .wrapper {
-    display: flex;
+  display: flex;
+  height: 100%;
+  flex-wrap: wrap;
+}
+
+.card {
+  padding: 20px 20px;
+  flex: 1;
+  border-radius: 6px;
+  box-shadow: 0px 0px 7px 3px var(--theme-dashboard-card-shadow-color);
+  position: relative;
+  overflow: hidden;
+  min-width: 342px;
+  max-width: 342px;
+  min-height: 164px;
+  margin-bottom: 10px;
+
+  .cardContent {
     height: 100%;
-}
-
-.column {
-    padding: 20px 24px;
-    flex: 1;
-    border-right: 1px solid var(--theme-dashboard-card-vertical-separator-color);
-
-    .sectionActions {
-        flex: 1;
-    }
-}
-
-.header {
-    margin-bottom: 19.5px;
+    position: relative;
+    z-index: 1;
     display: flex;
-    justify-content: flex-end;
+    flex-direction: column;
+    justify-content: space-between;
 
-    .icon {
-        margin-right: auto;
-        width: 44px;
-        height: 44px;
-        margin-bottom: 11px;
+    .footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 8px;
+      flex-wrap: wrap;
+      .actionButton {
+        height: 46px;
+        width: 144px;
+      }
+      .note {
+        color: #6b7384;
+      }
     }
+  }
 
-    .mangledWarningIcon {
-        height: fit-content;
-        cursor: pointer;
-    }
+  .icon {
+    position: absolute;
+    right: -30px;
+    bottom: -15px;
+    z-index: 0;
+  }
+}
 
-    .mangledPopup {
-        margin-top: calc(24px + 5px);
-        @include unordered-list;
-
-        p, ul {
-            font-family: var(--font-regular);
-            color: var(--cmn-default-color-grey-6);
-            font-size: 14px;
-            line-height: 22px;
-
-            .link {
-                @include underline(var(--theme-dashboard-link-color));
-            }
-        }
-
-        ul {
-            margin-top: 8px;
-            margin-bottom: 8px;
-        }
-    }
+.mangledSection {
+  display: flex;
+  justify-content: flex-end;
+  .mangledWarningIcon {
+    height: fit-content;
+    cursor: pointer;
+  }
 }
 
 .label {
-    color: var(--theme-dashboard-label-color);
-    font-size: 14px;
-    line-height: 22px;
-    margin-bottom: 1px;
-    width: max-content;
+  color: var(--theme-dashboard-label-color);
+  font-size: 14px;
+  line-height: 32px;
+  margin-bottom: 1px;
+  width: max-content;
 }
 
 .value {
-    font-family: var(--font-medium);
-    font-size: 18px;
-    line-height: 22px;
+  font-size: 30px;
+  line-height: 45px;
+
+  .decimal {
+    font-size: 24px;
+  }
 }
 
 .note {
-    margin-top: 12px;
-    font-size: 12px;
-    line-height: 14px;
-    color: var(--theme-dashboard-link-color);
-    margin-left: auto;
-    margin-right: 0px;
-    width: max-content;
-    &:hover {
-        @include underline(var(--theme-dashboard-link-color));
+  font-size: 12px;
+  line-height: 14px;
+  color: var(--theme-dashboard-link-color);
+  width: max-content;
+  &:hover {
+    @include underline(var(--theme-dashboard-link-color));
+  }
+}
+
+.amountNote {
+  margin-top: 5px;
+  font-size: 12px;
+  line-height: normal;
+  color: var(--theme-dashboard-link-color);
+}
+
+.mr20 {
+  margin-right: 20px;
+}
+
+.wrapperCard {
+  flex: 1;
+  min-width: 342px;
+  max-width: 342px;
+  min-height: 164px;
+  margin-bottom: 10px;
+  position: relative;
+
+  .subCard {
+    height: 100%;
+    padding: 20px 20px;
+    flex: 1;
+    border-radius: 6px;
+    box-shadow: 0px 0px 7px 3px var(--theme-dashboard-card-shadow-color);
+    position: relative;
+    overflow: hidden;
+
+    .cardContent {
+      height: 100%;
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+
+      .delegatedHeader {
+        display: flex;
+      }
+
+      .label {
+        margin-right: 10px;
+      }
     }
+
+    .icon {
+      position: absolute;
+      right: -30px;
+      bottom: -15px;
+      z-index: 0;
+    }
+  }
+
+
+  .popupSection {
+    display: flex;
+    justify-content: center;
+
+    .mangledPopup {
+      @include unordered-list;
+
+      div {
+        top: 50px;
+      }
+      p,
+      ul {
+        font-family: var(--font-regular);
+        color: var(--cmn-default-color-grey-6);
+        font-size: 14px;
+        line-height: 22px;
+
+        .link {
+          @include underline(var(--theme-dashboard-link-color));
+        }
+      }
+
+      ul {
+        margin-top: 8px;
+        margin-bottom: 8px;
+      }
+    }
+  }
+}
+
+.loadingSpinner {
+  width: 22px;
+  margin-top: 5px;
 }

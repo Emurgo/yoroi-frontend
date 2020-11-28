@@ -184,7 +184,7 @@ type Props = {|
   +state: TxStatusCodesType,
   +selectedExplorer: SelectedExplorer,
   +assuranceLevel: AssuranceLevel,
-  +isLastInList: boolean,
+  isLastInList: boolean,
   +shouldHideBalance: boolean,
   +onAddMemo: WalletTransaction => void,
   +onEditMemo: WalletTransaction => void,

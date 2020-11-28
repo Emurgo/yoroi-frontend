@@ -1,6 +1,6 @@
 .page {
   background-color: var(--theme-dashboard-page-background-color);
-  padding: 12px 16px 26px 16px;
+  padding: 40px 30px 26px 30px;
   font-family: var(--font-regular);
   color: var(--theme-dashboard-text-color);
   min-height: 100%;
@@ -31,14 +31,13 @@
 }
 
 .statsWrapper {
-  margin-bottom: 25px;
+  margin-bottom: 40px;
   margin-top: 4px;
   display: flex;
 }
 
 .summary {
   flex-direction: row;
-  margin-left: 32px;
   height: 100%;
   width: 100%;
 
