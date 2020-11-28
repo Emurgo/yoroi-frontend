@@ -180,6 +180,7 @@ export default class WalletTransactionsList extends Component<Props> {
                   })()}
                   selectedExplorer={this.props.selectedExplorer}
                   data={transaction}
+                  isLastInList={transactionIndex === group.transactions.length - 1}
                   state={transaction.state}
                   numberOfConfirmations={transaction.block == null
                     ? null
