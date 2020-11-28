@@ -63,7 +63,7 @@
 .label {
   color: var(--theme-dashboard-label-color);
   font-size: 14px;
-  line-height: 22px;
+  line-height: 32px;
   margin-bottom: 1px;
   width: max-content;
 }
@@ -125,7 +125,6 @@
 
       .delegatedHeader {
         display: flex;
-        align-items: center;
       }
 
       .label {
@@ -149,6 +148,9 @@
     .mangledPopup {
       @include unordered-list;
 
+      div {
+        top: 50px;
+      }
       p,
       ul {
         font-family: var(--font-regular);

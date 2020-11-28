@@ -54,7 +54,7 @@
   color: var(--theme-dashboard-label-color);
   font-family: var(--font-regular);
   font-size: 14px;
-  line-height: 22px;
+  line-height: 27px;
   height: 23px;
   overflow: hidden;
 }
@@ -125,10 +125,13 @@
 
 .poolInfoToolTip {
   padding: 4px 0px;
-  font-family: var(--font-light);
   color: var(--theme-dashboard-tooltip-text-color);
   font-size: 11px;
   line-height: 14px;
+
+  span {
+    font-family: var(--font-light);
+  }
 }
 
 .poolInfo {

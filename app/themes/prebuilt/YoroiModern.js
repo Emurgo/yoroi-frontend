@@ -442,7 +442,7 @@ const YoroiModern = {
   '--theme-dashboard-text-color': '#38393D',
   '--theme-dashboard-label-color': '#676970',
   '--theme-dashboard-label-underline-color': 'rgba(135, 145, 173, 0.8)',
-  '--theme-dashboard-card-shadow-color': 'rgba(65, 37, 150, 0.07)',
+  '--theme-dashboard-card-shadow-color': 'rgba(24, 26, 30, 0.08)',
   '--theme-dashboard-card-border-color': 'rgba(77, 32, 192, 0.08)',
   '--theme-dashboard-card-vertical-separator-color': '#E6E6E6',
   '--theme-dashboard-card-nodelegation-background-color': '#F9FBFF',

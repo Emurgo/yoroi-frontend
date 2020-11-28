@@ -176,7 +176,7 @@ export default class UpcomingRewards extends Component<Props> {
 
     const tooltip = pool.ticker == null
       ? pool.id[0]
-      : (<>[{pool.ticker}] {pool.name}<br />{pool.id[0]}</>);
+      : (<>[{pool.ticker}] {pool.name}<br /><span>{pool.id[0]}</span></>);
 
     const poolInfo =
       pool.ticker == null ? (
