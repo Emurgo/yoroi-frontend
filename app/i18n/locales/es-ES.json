@@ -478,7 +478,7 @@
   "wallet.dashboard.summary.rewardsTitle": "Total recompensas",
   "wallet.dashboard.summary.title": "Tu resumen",
   "wallet.dashboard.upcomingRewards.at": "a las",
-  "wallet.dashboard.upcomingRewards.endOfEpoch": "End of Epoch",
+  "wallet.dashboard.upcomingRewards.endOfEpoch": "Fin de la Época",
   "wallet.dashboard.upcomingRewards.noRewards": "no se obtendrán recompensas en este epoch",
   "wallet.dashboard.upcomingRewards.title": "Próximas recompensas",
   "wallet.dashboard.upcomingRewards.delegatedTitle": "Stake pool delegado",
