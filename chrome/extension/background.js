@@ -32,70 +32,70 @@ chrome.browserAction.onClicked.addListener(debounce(onYoroiIconClicked, 500, { l
 
 let db: ?lf$Database = null;
 
-async function connectHandler(message, sender, sendResponse) {
-  async function firstWallet(): Promise<PublicDeriver<>> {
-    if (db != null) {
-      const wallets = await getWallets({ db });
-      return new Promise.resolve(wallets[0]);
+chrome.runtime.onConnectExternal.addListener(port => {
+  port.onMessage.addListener(async message => {
+    async function firstWallet(): Promise<PublicDeriver<>> {
+      if (db != null) {
+        const wallets = await getWallets({ db });
+        return Promise.resolve(wallets[0]);
+      }
+      throw Promise.reject(new Error('Database not loaded for connector RPCs'));
     }
-    throw Promise.reject(new Error('Database not loaded for connector RPCs'));
-  }
-  if (sender.id === connectorId) {
+    function rpcResponse(response) {
+      port.postMessage({
+        type: 'connector_rpc_response',
+        uid: message.uid,
+        return: response
+      });
+    }
     if (message.type === 'yoroi_connect_request') {
-      db = await loadLovefieldDB(schema.DataStoreType.INDEXED_DB);
-      chrome.runtime.sendMessage(
-		    connectorId,
-		    { type: 'yoroi_connected' },
-		  );
-		  sendResponse(true);
-    }
-  } if (message.type === 'connector_rpc_request') {
-    switch (message.function) {
-      case 'get_balance':
-        if (message.params[0] === 'ERG') {
-          const wallet = await firstWallet();
-          const canGetBalance = asGetBalance(wallet);
-          if (canGetBalance != null) {
-            const balance = await canGetBalance.getBalance();
-            sendResponse({
-              ok: balance
-            });
+      if (db == null) {
+        db = await loadLovefieldDB(schema.DataStoreType.INDEXED_DB);
+      }
+      port.postMessage(
+        { type: 'yoroi_connected' },
+      );
+    } else if (message.type === 'connector_rpc_request') {
+      switch (message.function) {
+        case 'get_balance':
+          if (message.params[0] === 'ERG') {
+            const wallet = await firstWallet();
+            const canGetBalance = asGetBalance(wallet);
+            if (canGetBalance != null) {
+              const balance = await canGetBalance.getBalance();
+              rpcResponse({ ok: balance });
+            }
+          } else {
+            rpcResponse({ ok: 5 });
           }
-        } else {
-          sendResponse({
-              ok: 5
+          break;
+        // case "get_utxos":
+        //   const wallet = await firstWallet();
+        //   wallet.getAllUtxos().then(x => {
+        //     rpcResponse({
+        //       ok: x
+        //     });
+        //   });
+        //   break;
+        case 'sign_tx':
+          rpcResponse({
+            err: {
+              code: 2,
+              info: 'User rejected',
+            }
           });
-        }
-        break;
-      // case "get_utxos":
-      //   const wallet = await firstWallet();
-      //   wallet.getAllUtxos().then(x => {
-      //     sendResponse({
-      //       ok: x
-      //     });
-      //   });
-      //   break;
-      case 'sign_tx':
-        sendResponse({
-          err: {
-            code: 2,
-            info: 'User rejected',
-          }
-        });
-        break;
-      case 'ping':
-        sendResponse({
-          ok: true,
-        });
-        break;
-      default:
-        sendResponse({
-          err: `unknown RPC: ${message.function}(${message.params})`
-        })
-        break;
+          break;
+        case 'ping':
+          rpcResponse({
+            ok: true,
+          });
+          break;
+        default:
+          rpcResponse({
+            err: `unknown RPC: ${message.function}(${message.params})`
+          })
+          break;
+      }
     }
-  }
-}
-
-chrome.runtime.onMessageExternal.addListener(connectHandler);
-
+  });
+});

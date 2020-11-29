@@ -1,8 +1,5 @@
 // replace "*" with location.origin before committing on all postMessage calls
 
-//const yoroiExtensionId = "eegbdfmlofnpgiiilnlboaamccblbobe";
-const yoroiExtensionId = "bgihpbbhciffmelcfbccneidnnmkcdhl";
-
 // sets up RPC communication with the connector + access check/request functions
 const initialInject = `
 var timeout = 0;
@@ -76,6 +73,10 @@ class ErgoAPI {
         return this._ergo_rpc_call("get_balance", [token_id]);
     }
 
+    get_utxos(amount = undefined, token_id = 'ERG', paginate) {
+        return this._ergo_rpc_call("get_utxos", [amount, token_id, paginate]);
+    }
+
     sign_tx(tx) {
         return this._ergo_rpc_call("sign_tx", [tx]);
     }
@@ -115,9 +116,13 @@ function injectIntoPage(code) {
 
 injectIntoPage(initialInject);
 
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)  {
-    //alert("content script message: " + JSON.stringify(request));
-    if (request.type == "yoroi_connected") {
+const yoroiExtensionId = "bgihpbbhciffmelcfbccneidnnmkcdhl";
+let yoroiPort = chrome.runtime.connect(yoroiExtensionId);
+yoroiPort.onMessage.addListener(message => {
+    //alert("content script message: " + JSON.stringify(message));
+    if (message.type == "connector_rpc_response") {
+        window.postMessage(message, "*");
+    } else if (message.type == "yoroi_connected") {
         // inject full API here
         if (injectIntoPage(apiInject)) {
             chrome.runtime.sendMessage({type: "init_page_action"});
@@ -135,17 +140,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)  {
 window.addEventListener("message", function(event) {
     if (event.data.type == "connector_rpc_request") {
         console.log("connector received from page: " + JSON.stringify(event.data) + " with source = " + event.source + " and origin = " + event.origin);
-        chrome.runtime.sendMessage(
-            yoroiExtensionId,
-            event.data,
-            {},
-            function(response) {
-                window.postMessage({
-                    type: "connector_rpc_response",
-                    uid: event.data.uid,
-                    return: response
-                }, "*");
-            });
+        yoroiPort.postMessage(event.data);
     } else if (event.data.type == "connector_connect_request") {
         // TODO: add timeout somehow?
         chrome.storage.local.get("whitelist", function(result) {
@@ -156,7 +151,7 @@ window.addEventListener("message", function(event) {
                         whitelist.push(location.hostname);
                         chrome.storage.local.set({whitelist: whitelist});
                     }
-                    chrome.runtime.sendMessage(yoroiExtensionId, {type: "yoroi_connect_request"});
+                    yoroiPort.postMessage({type: "yoroi_connect_request"});
                 } else {
                     // user refused - skip communication with Yoroi
                     window.postMessage({
@@ -166,7 +161,7 @@ window.addEventListener("message", function(event) {
                 }
             } else {
                 // already in whitelist
-                chrome.runtime.sendMessage(yoroiExtensionId, {type: "yoroi_connect_request"});
+                yoroiPort.postMessage({type: "yoroi_connect_request"});
             }
         });
     }
