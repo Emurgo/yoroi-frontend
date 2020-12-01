@@ -39,7 +39,7 @@ const extractAddress: (
   addressValidator,
 ) => {
   // consider use of URLSearchParams
-  const addressRegex = new RegExp('cardano:([A-HJ-NP-Za-km-z1-9]+)');
+  const addressRegex = new RegExp('cardano:([A-Za-z0-9]+)');
   const addressMatch = addressRegex.exec(uri);
   if (addressMatch && addressMatch[1]) {
     if (!await addressValidator(addressMatch[1])) {

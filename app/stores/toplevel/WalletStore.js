@@ -221,10 +221,8 @@ export default class WalletStore extends Store {
     );
   }
 
-  @computed get first(): null | PublicDeriver<> {
-    return this.publicDerivers.length === 0
-      ? null
-      : this.publicDerivers[0];
+  @computed get allWallets(): Array<PublicDeriver<>> {
+    return this.publicDerivers;
   }
 
   refreshWalletFromRemote: PublicDeriver<> => Promise<void> = async (

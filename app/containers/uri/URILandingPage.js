@@ -9,6 +9,7 @@ import URILandingDialogContainer from './URILandingDialogContainer';
 import type { GeneratedData as URILandingDialogContainerData } from './URILandingDialogContainer';
 import type { UriParams } from '../../utils/URIHandling';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import { isCardanoHaskell } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 export type GeneratedData = typeof URILandingPage.prototype.generated;
 
@@ -23,10 +24,17 @@ export default class URILandingPage extends Component<InjectedOrGenerated<Genera
 
   onConfirm: void => void = () => {
     const { wallets } = this.generated.stores;
+
+    const firstShelley = wallets.allWallets.find(publicDeriver => {
+      if(isCardanoHaskell(publicDeriver.getParent().getNetworkInfo())){
+        return true;
+      }
+      return false;
+    })
     // this will automatically reroute to the right page if no wallet exists
     this.generated.actions.router.goToRoute.trigger({
       route: ROUTES.WALLETS.SEND,
-      publicDeriver: wallets.first,
+      publicDeriver: firstShelley,
     });
   }
 
@@ -65,8 +73,8 @@ export default class URILandingPage extends Component<InjectedOrGenerated<Genera
       |},
       profile: {| isClassicTheme: boolean |},
       wallets: {|
-        first: null | PublicDeriver<>,
-        hasAnyWallets: boolean
+        allWallets: Array<PublicDeriver<>>,
+        hasAnyWallets: boolean,
       |}
     |}
     |} {
@@ -88,7 +96,7 @@ export default class URILandingPage extends Component<InjectedOrGenerated<Genera
         },
         wallets: {
           hasAnyWallets: stores.wallets.hasAnyWallets,
-          first: stores.wallets.first,
+          allWallets: stores.wallets.allWallets,
         },
       },
       actions: {

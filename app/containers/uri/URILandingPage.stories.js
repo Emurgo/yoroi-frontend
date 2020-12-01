@@ -53,7 +53,7 @@ export const GettingMnemonics = (): Node => {
           },
           wallets: {
             hasAnyWallets: false,
-            first: null,
+            allWallets: [],
           },
         },
         actions: {

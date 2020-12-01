@@ -121,7 +121,7 @@ export default class ProfileStore extends Store {
         if (wallets.hasAnyWallets && this.stores.loading.fromUriScheme) {
           this.actions.router.goToRoute.trigger({ route: ROUTES.SEND_FROM_URI.ROOT });
         } else {
-          const firstWallet = wallets.first;
+          const firstWallet = wallets.allWallets.length !== 0 ? wallets.allWallets[0] : null;
           if (firstWallet == null) {
             this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD });
           } else if (wallets.publicDerivers.length === 1) {
