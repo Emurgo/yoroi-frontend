@@ -10,9 +10,7 @@ import type { Theme } from '../../themes';
 import { ROUTES } from '../../routes-config';
 import { LANGUAGES } from '../../i18n/translations';
 import type { LanguageType } from '../../i18n/translations';
-import type {
-  SetCustomUserThemeRequest
-} from '../../api/localStorage/index';
+import type { SetCustomUserThemeRequest } from '../../api/localStorage/index';
 import { unitOfAccountDisabledValue } from '../../types/unitOfAccountType';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import { SUPPORTED_CURRENCIES } from '../../config/unitOfAccount';
@@ -20,14 +18,13 @@ import type { ComplexityLevelType } from '../../types/complexityLevelType';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 
 export default class ProfileStore extends Store {
-
   LANGUAGE_OPTIONS: Array<LanguageType> = [
     ...LANGUAGES,
     ...(!environment.isProduction()
       ? [
-        // add any language that's mid-translation here
-      ]
-      : [])
+          // add any language that's mid-translation here
+        ]
+      : []),
   ];
 
   UNIT_OF_ACCOUNT_OPTIONS: typeof SUPPORTED_CURRENCIES = SUPPORTED_CURRENCIES;
@@ -54,7 +51,7 @@ export default class ProfileStore extends Store {
   @observable
   SETUP_STEPS: Array<{| isDone: void => boolean, action: void => Promise<void> |}> = [
     {
-      isDone: () => (this.isCurrentLocaleSet),
+      isDone: () => this.isCurrentLocaleSet,
       action: async () => {
         const route = ROUTES.PROFILE.LANGUAGE_SELECTION;
         if (this.stores.app.currentRoute === route) {
@@ -94,10 +91,7 @@ export default class ProfileStore extends Store {
       },
     },
     {
-      isDone: () => (
-        !environment.userAgentInfo.canRegisterProtocol() ||
-        this.isUriSchemeAccepted
-      ),
+      isDone: () => !environment.userAgentInfo.canRegisterProtocol() || this.isUriSchemeAccepted,
       action: async () => {
         const route = ROUTES.PROFILE.URI_PROMPT;
         if (this.stores.app.currentRoute === route) {
@@ -121,7 +115,8 @@ export default class ProfileStore extends Store {
         if (wallets.hasAnyWallets && this.stores.loading.fromUriScheme) {
           this.actions.router.goToRoute.trigger({ route: ROUTES.SEND_FROM_URI.ROOT });
         } else {
-          const firstWallet = wallets.allWallets.length !== 0 ? wallets.allWallets[0] : null;
+          const firstWallet =
+            wallets.publicDerivers.length !== 0 ? wallets.publicDerivers[0] : null;
           if (firstWallet == null) {
             this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD });
           } else if (wallets.publicDerivers.length === 1) {
@@ -142,7 +137,7 @@ export default class ProfileStore extends Store {
         runInAction(() => {
           this.hasRedirected = true;
         });
-      }
+      },
     },
   ];
 
@@ -159,79 +154,104 @@ export default class ProfileStore extends Store {
     groupSize: 3,
     secondaryGroupSize: 0,
     fractionGroupSeparator: ' ',
-    fractionGroupSize: 0
+    fractionGroupSize: 0,
   };
 
-  @observable getProfileLocaleRequest: Request<void => Promise<?string>>
-    = new Request<void => Promise<?string>>(this.api.localStorage.getUserLocale);
+  @observable getProfileLocaleRequest: Request<(void) => Promise<?string>> = new Request<
+    (void) => Promise<?string>
+  >(this.api.localStorage.getUserLocale);
 
-  @observable setProfileLocaleRequest: Request<string => Promise<void>>
-    = new Request<string => Promise<void>>(this.api.localStorage.setUserLocale);
+  @observable setProfileLocaleRequest: Request<(string) => Promise<void>> = new Request<
+    (string) => Promise<void>
+  >(this.api.localStorage.setUserLocale);
 
-  @observable unsetProfileLocaleRequest: Request<void => Promise<void>>
-    = new Request<void => Promise<void>>(this.api.localStorage.unsetUserLocale);
+  @observable unsetProfileLocaleRequest: Request<(void) => Promise<void>> = new Request<
+    (void) => Promise<void>
+  >(this.api.localStorage.unsetUserLocale);
 
-  @observable getThemeRequest: Request<void => Promise<?string>>
-    = new Request<void => Promise<?string>>(this.api.localStorage.getUserTheme);
+  @observable getThemeRequest: Request<(void) => Promise<?string>> = new Request<
+    (void) => Promise<?string>
+  >(this.api.localStorage.getUserTheme);
 
-  @observable setThemeRequest: Request<string => Promise<void>>
-    = new Request<string => Promise<void>>(this.api.localStorage.setUserTheme);
+  @observable setThemeRequest: Request<(string) => Promise<void>> = new Request<
+    (string) => Promise<void>
+  >(this.api.localStorage.setUserTheme);
 
-  @observable getCustomThemeRequest: Request<void => Promise<?string>>
-    = new Request<void => Promise<?string>>(this.api.localStorage.getCustomUserTheme);
+  @observable getCustomThemeRequest: Request<(void) => Promise<?string>> = new Request<
+    (void) => Promise<?string>
+  >(this.api.localStorage.getCustomUserTheme);
 
-  @observable setCustomThemeRequest: Request<SetCustomUserThemeRequest => Promise<void>>
-    = new Request<SetCustomUserThemeRequest => Promise<void>>(
-      this.api.localStorage.setCustomUserTheme
-    );
+  @observable setCustomThemeRequest: Request<
+    (SetCustomUserThemeRequest) => Promise<void>
+  > = new Request<(SetCustomUserThemeRequest) => Promise<void>>(
+    this.api.localStorage.setCustomUserTheme
+  );
 
-  @observable unsetCustomThemeRequest: Request<void => Promise<void>>
-    = new Request<void => Promise<void>>(this.api.localStorage.unsetCustomUserTheme);
+  @observable unsetCustomThemeRequest: Request<(void) => Promise<void>> = new Request<
+    (void) => Promise<void>
+  >(this.api.localStorage.unsetCustomUserTheme);
 
-  @observable getTermsOfUseAcceptanceRequest: Request<void => Promise<boolean>>
-  = new Request<void => Promise<boolean>>(this.api.localStorage.getTermsOfUseAcceptance);
+  @observable getTermsOfUseAcceptanceRequest: Request<(void) => Promise<boolean>> = new Request<
+    (void) => Promise<boolean>
+  >(this.api.localStorage.getTermsOfUseAcceptance);
 
-  @observable setTermsOfUseAcceptanceRequest: Request<void => Promise<void>>
-    = new Request<void => Promise<void>>(this.api.localStorage.setTermsOfUseAcceptance);
+  @observable setTermsOfUseAcceptanceRequest: Request<(void) => Promise<void>> = new Request<
+    (void) => Promise<void>
+  >(this.api.localStorage.setTermsOfUseAcceptance);
 
-  @observable getUriSchemeAcceptanceRequest: Request<void => Promise<boolean>>
-  = new Request<void => Promise<boolean>>(this.api.localStorage.getUriSchemeAcceptance);
+  @observable getUriSchemeAcceptanceRequest: Request<(void) => Promise<boolean>> = new Request<
+    (void) => Promise<boolean>
+  >(this.api.localStorage.getUriSchemeAcceptance);
 
-  @observable setUriSchemeAcceptanceRequest: Request<void => Promise<void>>
-    = new Request<void => Promise<void>>(this.api.localStorage.setUriSchemeAcceptance);
+  @observable setUriSchemeAcceptanceRequest: Request<(void) => Promise<void>> = new Request<
+    (void) => Promise<void>
+  >(this.api.localStorage.setUriSchemeAcceptance);
 
-  @observable getComplexityLevelRequest: Request<void => Promise<?ComplexityLevelType>>
-  = new Request<void => Promise<?ComplexityLevelType>>(this.api.localStorage.getComplexityLevel);
+  @observable getComplexityLevelRequest: Request<
+    (void) => Promise<?ComplexityLevelType>
+  > = new Request<(void) => Promise<?ComplexityLevelType>>(
+    this.api.localStorage.getComplexityLevel
+  );
 
-  @observable setComplexityLevelRequest: Request<ComplexityLevelType => Promise<void>>
-    = new Request<ComplexityLevelType => Promise<void>>(this.api.localStorage.setComplexityLevel);
+  @observable setComplexityLevelRequest: Request<
+    (ComplexityLevelType) => Promise<void>
+  > = new Request<(ComplexityLevelType) => Promise<void>>(this.api.localStorage.setComplexityLevel);
 
-  @observable unsetComplexityLevelRequest: Request<void => Promise<void>>
-    = new Request<void => Promise<void>>(this.api.localStorage.unsetComplexityLevel);
+  @observable unsetComplexityLevelRequest: Request<(void) => Promise<void>> = new Request<
+    (void) => Promise<void>
+  >(this.api.localStorage.unsetComplexityLevel);
 
-  @observable getLastLaunchVersionRequest: Request<void => Promise<string>>
-    = new Request<void => Promise<string>>(this.api.localStorage.getLastLaunchVersion);
+  @observable getLastLaunchVersionRequest: Request<(void) => Promise<string>> = new Request<
+    (void) => Promise<string>
+  >(this.api.localStorage.getLastLaunchVersion);
 
-  @observable setLastLaunchVersionRequest: Request<string => Promise<void>>
-    = new Request<string => Promise<void>>(this.api.localStorage.setLastLaunchVersion);
+  @observable setLastLaunchVersionRequest: Request<(string) => Promise<void>> = new Request<
+    (string) => Promise<void>
+  >(this.api.localStorage.setLastLaunchVersion);
 
-  @observable getHideBalanceRequest: Request<void => Promise<boolean>>
-    = new Request<void => Promise<boolean>>(this.api.localStorage.getHideBalance);
+  @observable getHideBalanceRequest: Request<(void) => Promise<boolean>> = new Request<
+    (void) => Promise<boolean>
+  >(this.api.localStorage.getHideBalance);
 
-  @observable setHideBalanceRequest: Request<boolean => Promise<void>>
-    = new Request<boolean => Promise<void>>(this.api.localStorage.setHideBalance);
+  @observable setHideBalanceRequest: Request<(boolean) => Promise<void>> = new Request<
+    (boolean) => Promise<void>
+  >(this.api.localStorage.setHideBalance);
 
-  @observable setUnitOfAccountRequest: Request<UnitOfAccountSettingType => Promise<void>>
-    = new Request(this.api.localStorage.setUnitOfAccount);
+  @observable setUnitOfAccountRequest: Request<
+    (UnitOfAccountSettingType) => Promise<void>
+  > = new Request(this.api.localStorage.setUnitOfAccount);
 
-  @observable getUnitOfAccountRequest: Request<void => Promise<UnitOfAccountSettingType>>
-    = new Request(this.api.localStorage.getUnitOfAccount);
+  @observable getUnitOfAccountRequest: Request<
+    (void) => Promise<UnitOfAccountSettingType>
+  > = new Request(this.api.localStorage.getUnitOfAccount);
 
-  @observable getToggleSidebarRequest: Request<void => Promise<boolean>>
-    = new Request<void => Promise<boolean>>(this.api.localStorage.getToggleSidebar);
+  @observable getToggleSidebarRequest: Request<(void) => Promise<boolean>> = new Request<
+    (void) => Promise<boolean>
+  >(this.api.localStorage.getToggleSidebar);
 
-  @observable setToggleSidebarRequest: Request<boolean => Promise<void>>
-    = new Request<boolean => Promise<void>>(this.api.localStorage.setToggleSidebar);
+  @observable setToggleSidebarRequest: Request<(boolean) => Promise<void>> = new Request<
+    (boolean) => Promise<void>
+  >(this.api.localStorage.setToggleSidebar);
 
   setup(): void {
     super.setup();
@@ -266,11 +286,10 @@ export default class ProfileStore extends Store {
 
   _setBigNumberFormat: void => void = () => {
     BigNumber.config({
-      EXPONENTIAL_AT: (1e+9: any),
-      FORMAT: this.bigNumberDecimalFormat
+      EXPONENTIAL_AT: (1e9: any),
+      FORMAT: this.bigNumberDecimalFormat,
     });
   };
-
 
   static getDefaultLocale(): string {
     return 'en-US';
@@ -293,25 +312,22 @@ export default class ProfileStore extends Store {
   }
 
   @computed get hasLoadedCurrentLocale(): boolean {
-    return (
-      this.getProfileLocaleRequest.wasExecuted && this.getProfileLocaleRequest.result !== null
-    );
+    return this.getProfileLocaleRequest.wasExecuted && this.getProfileLocaleRequest.result !== null;
   }
 
   @computed get isCurrentLocaleSet(): boolean {
     return (
-      this.getProfileLocaleRequest.result !== null
-      &&
+      this.getProfileLocaleRequest.result !== null &&
       this.getProfileLocaleRequest.result !== undefined
     );
   }
 
   @action
-  _updateTentativeLocale: {| locale: string |} => void = (request) => {
+  _updateTentativeLocale: ({| locale: string |}) => void = request => {
     this.inMemoryLanguage = request.locale;
   };
 
-  _updateLocale: {| locale: string |} => Promise<void> = async ({ locale }) => {
+  _updateLocale: ({| locale: string |}) => Promise<void> = async ({ locale }) => {
     await this.setProfileLocaleRequest.execute(locale);
     await this.getProfileLocaleRequest.execute(); // eagerly cache
   };
@@ -324,22 +340,20 @@ export default class ProfileStore extends Store {
   _acceptLocale: void => Promise<void> = async () => {
     // commit in-memory language to storage
     await this.setProfileLocaleRequest.execute(
-      this.inMemoryLanguage != null
-        ? this.inMemoryLanguage
-        : ProfileStore.getDefaultLocale()
+      this.inMemoryLanguage != null ? this.inMemoryLanguage : ProfileStore.getDefaultLocale()
     );
     await this.getProfileLocaleRequest.execute(); // eagerly cache
     runInAction(() => {
       this.inMemoryLanguage = null;
     });
-  }
+  };
 
   _updateMomentJsLocaleAfterLocaleChange: void => void = () => {
     moment.locale(this._convertLocaleKeyToMomentJSLocalKey(this.currentLocale));
     // moment.relativeTimeThreshold('ss', -1);
   };
 
-  _convertLocaleKeyToMomentJSLocalKey: string => string = (localeKey) => {
+  _convertLocaleKeyToMomentJSLocalKey: string => string = localeKey => {
     // REF -> https://github.com/moment/moment/tree/develop/locale
     let momentJSLocalKey;
     switch (localeKey) {
@@ -354,7 +368,7 @@ export default class ProfileStore extends Store {
         break;
     }
     return momentJSLocalKey;
-  }
+  };
 
   // ========== Current/Custom Theme ========== //
 
@@ -402,20 +416,14 @@ export default class ProfileStore extends Store {
   }
 
   @computed get isCurrentThemeSet(): boolean {
-    return (
-      this.getThemeRequest.result !== null &&
-      this.getThemeRequest.result !== undefined
-    );
+    return this.getThemeRequest.result !== null && this.getThemeRequest.result !== undefined;
   }
 
   @computed get hasLoadedCurrentTheme(): boolean {
-    return (
-      this.getThemeRequest.wasExecuted &&
-      this.getThemeRequest.result !== null
-    );
+    return this.getThemeRequest.wasExecuted && this.getThemeRequest.result !== null;
   }
 
-  _updateTheme: {| theme: string |} => Promise<void> = async ({ theme }) => {
+  _updateTheme: ({| theme: string |}) => Promise<void> = async ({ theme }) => {
     // Unset / Clear the Customized Theme from LocalStorage
     await this.unsetCustomThemeRequest.execute();
     await this.getCustomThemeRequest.execute(); // eagerly cache
@@ -432,13 +440,13 @@ export default class ProfileStore extends Store {
       await this.unsetCustomThemeRequest.execute();
       await this.setCustomThemeRequest.execute({
         customThemeVars: (attributes.style.value: string),
-        currentThemeVars: this.getThemeVars({ theme: this.currentTheme })
+        currentThemeVars: this.getThemeVars({ theme: this.currentTheme }),
       });
       await this.getCustomThemeRequest.execute(); // eagerly cache
     }
   };
 
-  getThemeVars: {| theme: string |} => { [key: string]: string, ... } = (request) => {
+  getThemeVars: ({| theme: string |}) => { [key: string]: string, ... } = request => {
     return getVarsForTheme(request);
   };
 
@@ -456,17 +464,14 @@ export default class ProfileStore extends Store {
     return this.__selectedNetwork;
   }
 
-  @action _setSelectedNetwork: ($ReadOnly<NetworkRow> | void) => void  = (type) => {
+  @action _setSelectedNetwork: ($ReadOnly<NetworkRow> | void) => void = type => {
     this.__selectedNetwork = type;
-  }
+  };
 
   // ========== Paper Wallets ========== //
 
   @computed get paperWalletsIntro(): string {
-    return getPaperWalletIntro(
-      this.currentLocale,
-      ProfileStore.getDefaultLocale()
-    );
+    return getPaperWalletIntro(this.currentLocale, ProfileStore.getDefaultLocale());
   }
 
   // ========== Terms of Use ========== //
@@ -511,10 +516,10 @@ export default class ProfileStore extends Store {
 
   _selectComplexityLevel: ComplexityLevelType => Promise<void> = async (
     level: ComplexityLevelType
-  ) :Promise<void> => {
+  ): Promise<void> => {
     await this.setComplexityLevelRequest.execute(level);
     await this.getComplexityLevelRequest.execute();
-  }
+  };
   _getSelectComplexityLevel: void => void = () => {
     this.getComplexityLevelRequest.execute();
   };
@@ -551,9 +556,7 @@ export default class ProfileStore extends Store {
     return result != null ? result : '0.0.0';
   }
 
-  setLastLaunchVersion: string => Promise<void> = async (
-    version: string
-  ): Promise<void> => {
+  setLastLaunchVersion: string => Promise<void> = async (version: string): Promise<void> => {
     await this.setLastLaunchVersionRequest.execute(version);
     await this.getLastLaunchVersionRequest.execute(); // eagerly cache
   };
@@ -600,7 +603,7 @@ export default class ProfileStore extends Store {
   @action
   _acceptNightly: void => void = () => {
     this.acceptedNightly = true;
-  }
+  };
 
   // ========== Redirect Logic ========== //
 
@@ -615,7 +618,7 @@ export default class ProfileStore extends Store {
         return;
       }
     }
-  }
+  };
 
   // ========== Coin Price Currency ========== //
 
@@ -627,7 +630,7 @@ export default class ProfileStore extends Store {
     return result || unitOfAccountDisabledValue;
   }
 
-  _updateUnitOfAccount: UnitOfAccountSettingType => Promise<void> = async (currency) => {
+  _updateUnitOfAccount: UnitOfAccountSettingType => Promise<void> = async currency => {
     await this.setUnitOfAccountRequest.execute(currency);
     await this.getUnitOfAccountRequest.execute(); // eagerly cache
 
@@ -635,30 +638,24 @@ export default class ProfileStore extends Store {
   };
 
   @computed get hasLoadedUnitOfAccount(): boolean {
-    return (
-      this.getUnitOfAccountRequest.wasExecuted &&
-      this.getUnitOfAccountRequest.result !== null
-    );
+    return this.getUnitOfAccountRequest.wasExecuted && this.getUnitOfAccountRequest.result !== null;
   }
-
 }
 
-export const getVarsForTheme: {|
-  theme: string
-|} => { [key: string]: string, ... } = ({ theme }) => {
+export const getVarsForTheme: ({|
+  theme: string,
+|}) => { [key: string]: string, ... } = ({ theme }) => {
   const { getThemeVars } = require(`../../themes/prebuilt/${theme}.js`);
   // we used this theme for the Shelley version of the Yoroi extension
   // however, going forward, Yoroi will be a mono-project containing all sub-networks
-  if (false) { // eslint-disable-line no-constant-condition
+  if (false) {
+    // eslint-disable-line no-constant-condition
     return getThemeVars('shelley');
   }
   return getThemeVars(undefined);
 };
 
-export function getPaperWalletIntro(
-  currentLocale: string,
-  defaultLocale: string,
-): string {
+export function getPaperWalletIntro(currentLocale: string, defaultLocale: string): string {
   try {
     return require(`../../i18n/locales/paper-wallets/intro/${currentLocale}.md`);
   } catch {
@@ -666,10 +663,7 @@ export function getPaperWalletIntro(
   }
 }
 
-export function getTermsOfUse(
-  api: 'ada',
-  currentLocale: string,
-): string {
+export function getTermsOfUse(api: 'ada', currentLocale: string): string {
   const tos = require(`../../i18n/locales/terms-of-use/${api}/${currentLocale}.md`);
   const stakingTerms = require(`../../i18n/locales/terms-of-use/itn/${currentLocale}.md`);
   return tos + '\n\n' + stakingTerms;

@@ -131,12 +131,9 @@ export default class LoadingStore extends Store {
     if (this.fromUriScheme) {
       const uriParams = await getURIParameters(
         decodeURIComponent(this._originRoute.location),
-        address => {
-          // TODO: validation should be done based on wallet type
-          const addressKind = tryAddressToKind(address, 'bech32', networks.CardanoMainnet);
-          const valid = addressKind != null &&
-          ( addressKind === CoreAddressTypes.CARDANO_LEGACY ||
-            addressKind === CoreAddressTypes.CARDANO_BASE);
+        currency => {
+          // check only currency type from URL, supports only Cardano URL currently
+          const valid = currency === 'cardano';
           return Promise.resolve(valid);
         },
         amount => isWithinSupply(amount, meta.meta.totalSupply),
