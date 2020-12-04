@@ -713,6 +713,7 @@
   "wallet.transfer.deregister.noNeedToDeregister": "NO es necesario que te desregistres para delegar en otro stake pool. Puedes cambiar tu preferencia de delegación en cualquier momento",
   "wallet.transfer.deregister.title": "¿También desregistrar la clave de delegación?",
   "wallet.transfer.instruction": "Cualquier {ticker} reclamada será transferida a la billetera actualmente seleccionada",
+  "wallet.transfer.subInstruction": "Learn more about Byron and Shelley eras and how to claim ADA on our",
   "wallet.undelegation.transaction.explanationLine1": "NO es necesario que canceles la delegación antes de cambiar de stake pool",
   "wallet.undelegation.transaction.explanationLine2": "Tomará 2 epochs, a partir del final del epoch actual, para que la des-delegación se haga efectiva",
   "wallet.unsupported.subtitle": "La billetera seleccionada no soporta esta funcionalidad",
