@@ -713,6 +713,7 @@
   "wallet.transfer.deregister.noNeedToDeregister": "You do NOT need to deregister to delegate to a different stake pool. You can change your delegation preference at any time",
   "wallet.transfer.deregister.title": "Also deregister the staking key?",
   "wallet.transfer.instruction": "Any {ticker} claimed will be transferred to your currently selected wallet",
+  "wallet.transfer.subInstruction": "Learn more about Byron and Shelley eras and how to claim ADA on our",
   "wallet.undelegation.transaction.explanationLine1": "You do NOT need to undelegate before switching stake pools",
   "wallet.undelegation.transaction.explanationLine2": "It will take 2 epochs after the end of the current epoch for undelegation to take effect",
   "wallet.unsupported.subtitle": "The selected wallet does not support this functionality",
