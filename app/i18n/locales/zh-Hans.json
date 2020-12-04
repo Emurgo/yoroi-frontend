@@ -327,6 +327,8 @@
   "uri.invalid.dialog.title": "无效的链接地址",
   "uri.invalid.dialog.warning.text1": "你所点击的链接无效",
   "uri.invalid.dialog.warning.text2": "请咨询收款方核验格式",
+  "uri.invalid.dialog.warning.invalidAddressText1": "Couldn't find a wallet that supports this address type.",
+  "uri.invalid.dialog.warning.invalidAddressText2": "Please ask the receiver to check the address and make sure you have at least one wallet that supports this address type.",
   "uri.landing.dialog.confirm.label": "我理解",
   "uri.landing.dialog.title": "使用Cardano付款链接发起交易",
   "uri.landing.dialog.warning.line1": "请确保：",
