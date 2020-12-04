@@ -9,12 +9,12 @@ import URILandingDialogContainer from './URILandingDialogContainer';
 import type { GeneratedData as URILandingDialogContainerData } from './URILandingDialogContainer';
 import type { UriParams } from '../../utils/URIHandling';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import { isValidReceiveAddress } from '../../api/ada/lib/storage/bridge/utils';
 
 export type GeneratedData = typeof URILandingPage.prototype.generated;
 
 @observer
 export default class URILandingPage extends Component<InjectedOrGenerated<GeneratedData>> {
-
   onClose: void => void = () => {
     this.generated.actions.dialogs.closeActiveDialog.trigger();
     this.generated.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ROOT });
@@ -22,13 +22,14 @@ export default class URILandingPage extends Component<InjectedOrGenerated<Genera
   };
 
   onConfirm: void => void = () => {
-    const { wallets } = this.generated.stores;
+    const firstSelectedWallet = this.firstSelectedWallet();
+
     // this will automatically reroute to the right page if no wallet exists
     this.generated.actions.router.goToRoute.trigger({
       route: ROUTES.WALLETS.SEND,
-      publicDeriver: wallets.first,
+      publicDeriver: firstSelectedWallet,
     });
-  }
+  };
 
   render(): Node {
     return (
@@ -36,6 +37,7 @@ export default class URILandingPage extends Component<InjectedOrGenerated<Genera
         {...this.generated.URILandingDialogContainerProps}
         onConfirm={this.onConfirm}
         onClose={this.onClose}
+        firstSelectedWallet={this.firstSelectedWallet()}
       />
     );
   }
@@ -45,38 +47,38 @@ export default class URILandingPage extends Component<InjectedOrGenerated<Genera
     actions: {|
       dialogs: {|
         closeActiveDialog: {|
-          trigger: (params: void) => void
-        |}
+          trigger: (params: void) => void,
+        |},
       |},
       router: {|
         goToRoute: {|
           trigger: (params: {|
             publicDeriver?: null | PublicDeriver<>,
             params?: ?any,
-            route: string
-          |}) => void
-        |}
-      |}
+            route: string,
+          |}) => void,
+        |},
+      |},
     |},
     stores: {|
       loading: {|
         resetUriParams: void => void,
-        uriParams: ?UriParams
+        uriParams: ?UriParams,
       |},
       profile: {| isClassicTheme: boolean |},
       wallets: {|
-        first: null | PublicDeriver<>,
-        hasAnyWallets: boolean
-      |}
-    |}
-    |} {
+        hasAnyWallets: boolean,
+        publicDerivers: Array<PublicDeriver<>>,
+      |},
+    |},
+  |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }
     if (this.props.stores == null || this.props.actions == null) {
       throw new Error(`${nameof(URILandingDialogContainer)} no way to generated props`);
     }
-    const { actions, stores, } = this.props;
+    const { actions, stores } = this.props;
     return Object.freeze({
       stores: {
         profile: {
@@ -88,7 +90,7 @@ export default class URILandingPage extends Component<InjectedOrGenerated<Genera
         },
         wallets: {
           hasAnyWallets: stores.wallets.hasAnyWallets,
-          first: stores.wallets.first,
+          publicDerivers: stores.wallets.publicDerivers,
         },
       },
       actions: {
@@ -103,10 +105,27 @@ export default class URILandingPage extends Component<InjectedOrGenerated<Genera
           },
         },
       },
-      URILandingDialogContainerProps: (
-        { stores, actions }: InjectedOrGenerated<URILandingDialogContainerData>
-      )
+      URILandingDialogContainerProps: ({
+        stores,
+        actions,
+      }: InjectedOrGenerated<URILandingDialogContainerData>),
     });
   }
 
+  firstSelectedWallet: void => null | PublicDeriver<> = () => {
+    const wallets = this.generated.stores.wallets.publicDerivers;
+    const firstCardanoWallet = wallets.find(publicDeriver => {
+      if ( this.generated.stores.loading.uriParams?.address &&
+        isValidReceiveAddress(
+          this.generated.stores.loading.uriParams.address,
+          publicDeriver.getParent().getNetworkInfo()
+        ) === true
+      ) {
+        return true;
+      }
+      return false;
+    });
+
+    return firstCardanoWallet !== undefined ? firstCardanoWallet : null;
+  }
 }

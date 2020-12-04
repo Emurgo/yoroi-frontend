@@ -53,7 +53,7 @@ export const GettingMnemonics = (): Node => {
           },
           wallets: {
             hasAnyWallets: false,
-            first: null,
+            publicDerivers: []
           },
         },
         actions: {
@@ -81,6 +81,7 @@ export const GettingMnemonics = (): Node => {
                 uriParams,
               },
             },
+            firstSelectedWallet: null,
           },
         },
       }}

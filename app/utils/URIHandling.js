@@ -16,12 +16,12 @@ export const getURIParameters: (
   number
 ) => Promise<?UriParams> = async (
   uri,
-  addressValidator,
+  currencyValidator,
   amountValidator,
   decimalPlaces,
 ) => {
   if (!uri) uri = decodeURIComponent(window.location.href);
-  const address = await extractAddress(uri, addressValidator);
+  const address = await extractAddress(uri, currencyValidator);
   if (address == null) return null;
   const amount = extractAmount(uri, decimalPlaces, amountValidator);
   if (amount == null) return null;
@@ -36,13 +36,15 @@ const extractAddress: (
   string => Promise<boolean>,
 ) => Promise<?string> = async (
   uri,
-  addressValidator,
+  currencyValidator,
 ) => {
   // consider use of URLSearchParams
-  const addressRegex = new RegExp('cardano:([A-HJ-NP-Za-km-z1-9]+)');
+  const addressRegex = new RegExp('cardano:([A-Za-z0-9]+)');
+  const currencyRegex = new RegExp('(cardano+):');
   const addressMatch = addressRegex.exec(uri);
-  if (addressMatch && addressMatch[1]) {
-    if (!await addressValidator(addressMatch[1])) {
+  const currencyMatch = currencyRegex.exec(uri);
+  if (currencyMatch && currencyMatch[1] && addressMatch && addressMatch[1]) {
+    if (!await currencyValidator(currencyMatch[1])) {
       return null;
     }
     return addressMatch[1];
