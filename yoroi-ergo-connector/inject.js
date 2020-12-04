@@ -17,12 +17,16 @@ window.addEventListener("message", function(event) {
 });
 
 function ergo_request_read_access() {
-    return new Promise(function(resolve, reject) {
-        window.postMessage({
-            type: "connector_connect_request",
-        }, "*");
-        connectRequests.push({ resolve: resolve, reject: reject });
-    });
+    if (typeof ergo !== "undefined") {
+        return Promise.resolve(true);
+    } else {
+        return new Promise(function(resolve, reject) {
+            window.postMessage({
+                type: "connector_connect_request",
+            }, "*");
+            connectRequests.push({ resolve: resolve, reject: reject });
+        });
+    }
 }
 
 // TODO: fix or change back how RPCs work
@@ -89,6 +93,7 @@ class ErgoAPI {
                 function: func,
                 params: params
             }, "*");
+            console.log("rpcUid = " + rpcUid);
             rpcResolver.set(rpcUid, { resolve: resolve, reject: reject });
             rpcUid += 1;
         });
@@ -114,55 +119,66 @@ function injectIntoPage(code) {
     }
 }
 
-injectIntoPage(initialInject);
+function shouldInject() {
+    const documentElement = document.documentElement.nodeName
+    const docElemCheck = documentElement ? documentElement.toLowerCase() === 'html' : true;
+    const { docType } = window.document;
+    const docTypeCheck = docType ? docType.name === 'html' : true;
+    return docElemCheck && docTypeCheck;
+}
 
-const yoroiExtensionId = "bgihpbbhciffmelcfbccneidnnmkcdhl";
-let yoroiPort = chrome.runtime.connect(yoroiExtensionId);
-yoroiPort.onMessage.addListener(message => {
-    //alert("content script message: " + JSON.stringify(message));
-    if (message.type == "connector_rpc_response") {
-        window.postMessage(message, "*");
-    } else if (message.type == "yoroi_connected") {
-        // inject full API here
-        if (injectIntoPage(apiInject)) {
-            chrome.runtime.sendMessage({type: "init_page_action"});
-        } else {
-            alert("failed to inject Ergo API");
-            // TODO: return an error instead here if injection fails?
-        }
-        window.postMessage({
-            type: "connector_connected",
-            success: true
-        }, "*");
-    }
-});
+if (shouldInject()) {
+    console.log(`content script injected into ${location.hostname}`);
+    injectIntoPage(initialInject);
 
-window.addEventListener("message", function(event) {
-    if (event.data.type == "connector_rpc_request") {
-        console.log("connector received from page: " + JSON.stringify(event.data) + " with source = " + event.source + " and origin = " + event.origin);
-        yoroiPort.postMessage(event.data);
-    } else if (event.data.type == "connector_connect_request") {
-        // TODO: add timeout somehow?
-        chrome.storage.local.get("whitelist", function(result) {
-            let whitelist = Object.keys(result).length === 0 ? [] : result.whitelist;
-            if (!whitelist.includes(location.hostname)) {
-                if (confirm(`Allow access of ${location.hostname} to Ergo-Yoroi connector?`)) {
-                    if (confirm(`Save ${location.hostname} to whitelist?`)) {
-                        whitelist.push(location.hostname);
-                        chrome.storage.local.set({whitelist: whitelist});
-                    }
-                    yoroiPort.postMessage({type: "yoroi_connect_request"});
-                } else {
-                    // user refused - skip communication with Yoroi
-                    window.postMessage({
-                        type: "connector_connected",
-                        success: false
-                    }, "*");
-                }
+    const yoroiExtensionId = "bgihpbbhciffmelcfbccneidnnmkcdhl";
+    let yoroiPort = chrome.runtime.connect(yoroiExtensionId);
+    yoroiPort.onMessage.addListener(message => {
+        //alert("content script message: " + JSON.stringify(message));
+        if (message.type == "connector_rpc_response") {
+            window.postMessage(message, "*");
+        } else if (message.type == "yoroi_connected") {
+            // inject full API here
+            if (injectIntoPage(apiInject)) {
+                chrome.runtime.sendMessage({type: "init_page_action"});
             } else {
-                // already in whitelist
-                yoroiPort.postMessage({type: "yoroi_connect_request"});
+                alert("failed to inject Ergo API");
+                // TODO: return an error instead here if injection fails?
             }
-        });
-    }
-});
+            window.postMessage({
+                type: "connector_connected",
+                success: true
+            }, "*");
+        }
+    });
+
+    window.addEventListener("message", function(event) {
+        if (event.data.type == "connector_rpc_request") {
+            console.log("connector received from page: " + JSON.stringify(event.data) + " with source = " + event.source + " and origin = " + event.origin);
+            yoroiPort.postMessage(event.data);
+        } else if (event.data.type == "connector_connect_request") {
+            // TODO: add timeout somehow?
+            chrome.storage.local.get("whitelist", function(result) {
+                let whitelist = Object.keys(result).length === 0 ? [] : result.whitelist;
+                if (!whitelist.includes(location.hostname)) {
+                    if (confirm(`Allow access of ${location.hostname} to Ergo-Yoroi connector?`)) {
+                        if (confirm(`Save ${location.hostname} to whitelist?`)) {
+                            whitelist.push(location.hostname);
+                            chrome.storage.local.set({whitelist: whitelist});
+                        }
+                        yoroiPort.postMessage({type: "yoroi_connect_request"});
+                    } else {
+                        // user refused - skip communication with Yoroi
+                        window.postMessage({
+                            type: "connector_connected",
+                            success: false
+                        }, "*");
+                    }
+                } else {
+                    // already in whitelist
+                    yoroiPort.postMessage({type: "yoroi_connect_request"});
+                }
+            });
+        }
+    });
+}
