@@ -33,6 +33,11 @@ chrome.browserAction.onClicked.addListener(debounce(onYoroiIconClicked, 500, { l
 
 let db: ?lf$Database = null;
 
+// for mocking out network delay
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 chrome.runtime.onConnectExternal.addListener(port => {
   port.onMessage.addListener(async message => {
     async function firstWallet(): Promise<PublicDeriver<>> {
@@ -70,11 +75,12 @@ chrome.runtime.onConnectExternal.addListener(port => {
             rpcResponse({ ok: 5 });
           }
           break;
-        case "get_utxos":
-          const wallet = await firstWallet();
-          const canGetAllUtxos = asGetAllUtxos(wallet);
-          if (canGetAllUtxos != null) {
-            canGetAllUtxos.getAllUtxos().then(utxos => {
+        case 'get_utxos':
+          {
+            const wallet = await firstWallet();
+            const canGetAllUtxos = await asGetAllUtxos(wallet);
+            if (canGetAllUtxos != null) {
+              let utxos = await canGetAllUtxos.getAllUtxos();
               // TODO: more intelligently choose values?
               const valueExpected = message.params[0];
               if (typeof valueExpected !== 'undefined') {
@@ -82,7 +88,7 @@ chrome.runtime.onConnectExternal.addListener(port => {
                 let valueAcc = 0;
                 let utxosToUse = [];
                 for (let i = 0; i < utxos.length && valueAcc < valueExpected; i += 1) {
-                  const val = parseInt(utxos[i].output.UtxoTransactionOutput.Amount);
+                  const val = parseInt(utxos[i].output.UtxoTransactionOutput.Amount, 10);
                   console.log(`get_utxos[1]: at ${valueAcc} of ${valueExpected} requested - trying to add ${val}`);
                   valueAcc += val;
                   utxosToUse.push(utxos[i]);
@@ -107,15 +113,65 @@ chrome.runtime.onConnectExternal.addListener(port => {
               rpcResponse({
                 ok: utxosFormatted
               });
-            });
+            }
           }
           break;
         case 'sign_tx':
+          {
+            const tx = message.params[0];
+            let mockSignedTx = tx;
+            mockSignedTx.inputs = tx.inputs.map(input => {
+              return {
+                boxId: input.boxId,
+                spendingProof: {
+                  proofBytes: '0x267272632abddfb172',
+                  extension: {}
+                },
+                extension: {}
+              }
+            });
+            mockSignedTx.size = 0;
+            rpcResponse({
+              ok: mockSignedTx
+            });
+          }
+          break;
+        case 'sign_tx_input':
+          // const input = params[0];
+          // mock signing
           rpcResponse({
             err: {
-              code: 2,
-              info: 'User rejected',
+              code: 1,
+              info: 'mock proof generation error - tx not signed',
             }
+          });
+          break;
+        case 'sign_data':
+          // mock signing
+          rpcResponse({
+            ok: '0x82cd23b432afab24343f'
+          });
+          break;
+        case 'get_used_addresses':
+          rpcResponse({
+            ok: ['mockUsedAddress1', 'mockUsedAddress2']
+          });
+          break;
+        case `get_unused_addresses`:
+          rpcResponse({
+            ok: ['mockUnusedAddress1']
+          });
+          break;
+        case 'submit_tx':
+          // mock send
+          await sleep(5000);
+          rpcResponse({
+            ok: message.params[0].id
+          });
+          break;
+        case 'add_external_box':
+          rpcResponse({
+            ok: true
           });
           break;
         case 'ping':
