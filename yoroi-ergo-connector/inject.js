@@ -77,12 +77,40 @@ class ErgoAPI {
         return this._ergo_rpc_call("get_balance", [token_id]);
     }
 
-    get_utxos(amount = undefined, token_id = 'ERG', paginate) {
+    get_utxos(amount = undefined, token_id = 'ERG', paginate = undefined) {
         return this._ergo_rpc_call("get_utxos", [amount, token_id, paginate]);
     }
 
     sign_tx(tx) {
         return this._ergo_rpc_call("sign_tx", [tx]);
+    }
+
+    get_used_addresses(paginate = undefined) {
+        return this._ergo_rpc_call("get_used_addresses", [paginate]);
+    }
+
+    get_unused_addresses() {
+        return this._ergo_rpc_call("get_unused_addresses", []);
+    }
+
+    sign_tx(tx) {
+        return this._ergo_rpc_call("sign_tx", [tx]);
+    }
+
+    sign_tx_input(tx, index) {
+        return this._ergo_rpc_call("sign_tx_input", [tx, index]);
+    }
+
+    sign_data(addr, message) {
+        return this._ergo_rpc_call("sign_data", [addr, message]);
+    }
+
+    submit_tx(tx) {
+        return this._ergo_rpc_call("submit_tx", [tx]);
+    }
+
+    add_external_box(box_id) {
+        return this._ergo_rpc_call("add_external_box", [box_id]);
     }
 
     _ergo_rpc_call(func, params) {

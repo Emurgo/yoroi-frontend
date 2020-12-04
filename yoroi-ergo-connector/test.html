@@ -1,4 +1,6 @@
 <body>
+    <div id = 'balance'>Balance: n/a</div>
+    <div id = 'status'>Wallet not connected</div>
     <script type="text/javascript">
         if (typeof ergo_request_read_access === "undefined") {
             alert("ergo not found");
@@ -8,23 +10,65 @@
                 if (!access_granted) {
                     alert("ergo access denied");
                 } else {
+                    const status = document.getElementById("status");
+                    status.innerHTML = "Wallet successfully connected"
                     console.log("ergo access given");
                     window.addEventListener("ergo_wallet_disconnected", function(event) {
                         alert("wallet disconnected");
                     });
-                    ergo._ergo_rpc_call("test", [1, 2, 3]).catch(function(result) {
-                        console.log("_ergo_rpc_call(\"test\"(1, 2, 3)) = " + JSON.stringify(result));
-                    });
-                    ergo.get_balance().then(function(result) {
-                        alert("ergo.get_balance() = " + result);
-                    });
-                    ergo.get_balance("ADA").then(function(result) {
-                        alert("ergo.get_balance(ADA) = " + result);
-                    });
-                    ergo.sign_tx({}).then(function(result) {
-                        console.log("ergo.sign_tx() = " + result);
-                    }).catch(function(err) {
-                        console.log("ergo.sign_tx() produced an error: " + JSON.stringify(err));
+                    ergo.get_balance().then(async function(result) {
+                        const div = document.getElementById("balance");
+                        div.innerHTML = "Balance: " + result;
+                        const valueEntry = document.createElement("input");
+                        valueEntry.setAttribute("type", "number");
+                        valueEntry.setAttribute("value", Math.floor(result / 2));
+                        const button = document.createElement("button");
+                        button.textContent = "Send";
+                        button.onclick = async function() {
+                            status.innerHTML = "Creating transaction";
+                            const amountToSend = valueEntry.value;
+                            const utxos = await ergo.get_utxos(amountToSend);
+                            //alert(utxos.map(utxo => parseInt(utxo.value)));
+                            const utxosValue = utxos.map(utxo => parseInt(utxo.value)).reduce((a, b) => a + b, 0);
+                            const changeValue = utxosValue - amountToSend;
+                            const changeAddr = await ergo.get_unused_addresses()[0];
+                            const tx = {
+                                id: "0xff43214b234c11a1232d1212b1c1",
+                                inputs: utxos.map(utxo => utxo.boxId),
+                                dataInputs: [],
+                                outputCandidates: [
+                                    {
+                                        boxId: "0xbb122244ccdd322ada35678",
+                                        value: amountToSend,
+                                        ergoTree: "0x1bbc12353988aacc5465",
+                                        assets: [],
+                                        additionalRegisters: {},
+                                        creationHeight: 0
+                                    },
+                                    {
+                                        boxId: "77acde977f0xb1111",
+                                        value: changeValue,
+                                        ergoTree: "0x5ad5db5fa4173973ba7ffd",
+                                        assets: [],
+                                        additionalRegisters: {},
+                                        creationHeight: 0
+                                    },
+                                ]
+                            };
+                            status.innerHTML = "Awaiting transaction signing";
+                            ergo
+                                .sign_tx(tx)
+                                .then(async signedTx => {
+                                    status.innerHTML = "Transaction signed - awaiting submission"
+                                    const sentTxId = await ergo.submit_tx(signedTx);
+                                    status.innerHTML = "Transaction submitted - thank you for your donation!";
+                                })
+                                .catch(err => {
+                                    status.innerHTML = "You must accept signing the transaction to donate. Please click send again and accept."
+                                });
+                        }
+                        div.appendChild(valueEntry);
+                        div.appendChild(button);
                     });
                 }
             });
