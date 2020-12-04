@@ -715,7 +715,7 @@
   "wallet.transfer.deregister.noNeedToDeregister": "U hoeft zich NIET af te melden om te delegeren naar een andere Stakepool. U kunt uw delegatievoorkeur op elk moment wijzigen",
   "wallet.transfer.deregister.title": "Ook de Stakepool sleutel uitschrijven?",
   "wallet.transfer.instruction": "Elke geclaimde {ticker} wordt overgebracht naar de portemonnee die nu door u gekozen is",
-  "wallet.transfer.subInstruction": "Learn more about Byron and Shelley eras and how to claim ADA on our",
+  "wallet.transfer.subInstruction": "Meer informatie over de Byron en Shelley tijdperken en hoe ada te claimen op onze",
   "wallet.undelegation.transaction.explanationLine1": "U hoeft de delegatie NIET ongedaan te maken om van Stakepool te wisselen",
   "wallet.undelegation.transaction.explanationLine2": "Het duurt 2 periodes na het einde van het huidige tijdvak om de delegatie in werking te laten treden",
   "wallet.unsupported.subtitle": "De gekozen portemonnee ondersteunt deze functionaliteit niet",
