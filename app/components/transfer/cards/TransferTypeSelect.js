@@ -6,6 +6,7 @@ import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import TransferCards from './TransferCards';
 import styles from './TransferTypeSelect.scss';
+import { handleExternalLinkClick } from '../../../utils/routing';
 
 type Props = {|
   +onByron: void => void,
@@ -47,7 +48,7 @@ export default class TransferTypeSelect extends Component<Props> {
                 messages.subInstruction,
                 { ticker: this.props.ticker }
               )}
-              <a target="_blank" rel="noreferrer" href="https://yoroi-wallet.com/#/faq/1"> FAQ</a>
+              <a onClick={event => handleExternalLinkClick(event)} href="https://yoroi-wallet.com/#/faq/1"> FAQ</a>
             </span>
           </div>
           <TransferCards
