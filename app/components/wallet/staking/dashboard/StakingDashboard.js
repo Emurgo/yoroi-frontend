@@ -12,8 +12,6 @@ import globalMessages from '../../../../i18n/global-messages';
 import WarningBox from '../../../widgets/WarningBox';
 import InformativeError from '../../../widgets/InformativeError';
 import LoadingSpinner from '../../../widgets/LoadingSpinner';
-import CenteredBarDecoration from '../../../widgets/CenteredBarDecoration';
-import PageSelect from '../../../widgets/PageSelect';
 import VerticallyCenteredLayout from '../../../layout/VerticallyCenteredLayout';
 import LocalizableError from '../../../../i18n/LocalizableError';
 import InvalidURIImg from '../../../../assets/images/uri/invalid-uri.inline.svg';

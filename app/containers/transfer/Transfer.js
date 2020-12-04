@@ -24,6 +24,7 @@ import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/in
 import {
   CoinTypes,
 } from '../../config/numbersConfig';
+import HorizontalLine from '../../components/widgets/HorizontalLine';
 
 export type GeneratedData = typeof Transfer.prototype.generated;
 
@@ -77,12 +78,15 @@ export default class Transfer extends Component<Props> {
       return (<UnsupportedWallet />);
     }
     return (
-      <BackgroundColoredLayout>
-        <WalletTransferPage
-          {...this.generated.WalletTransferPageProps}
-          publicDeriver={wallet}
-        />
-      </BackgroundColoredLayout>
+      <>
+        <HorizontalLine />
+        <BackgroundColoredLayout>
+          <WalletTransferPage
+            {...this.generated.WalletTransferPageProps}
+            publicDeriver={wallet}
+          />
+        </BackgroundColoredLayout>
+      </>
     );
   }
 

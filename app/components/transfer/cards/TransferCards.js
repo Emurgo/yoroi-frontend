@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape, } from 'react-intl';
+import { defineMessages, intlShape } from 'react-intl';
 import classnames from 'classnames';
 import globalMessages from '../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
@@ -28,7 +28,7 @@ type Props = {|
 
 @observer
 export default class TransferCards extends Component<Props> {
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
@@ -43,8 +43,13 @@ export default class TransferCards extends Component<Props> {
           className="TransferCards_byronEra"
           onClick={this.props.onByron}
         >
-          <div className={styles.heroCardsItem}>
-            <div className={classnames([styles.heroCardsItemBg, styles.bgByronMainnet])} />
+          <div
+            className={classnames([
+              styles.heroCardsItem,
+              styles.heroCardsItemBg,
+              styles.bgByronMainnet,
+            ])}
+          >
             <div className={styles.heroCardsItemTitle}>
               {intl.formatMessage(messages.byronWallet)}
               <div className={styles.tooltip}>
@@ -57,6 +62,9 @@ export default class TransferCards extends Component<Props> {
                 />
               </div>
             </div>
+            <div className={styles.heroCardsItemDate}>
+              2017-2020
+            </div>
           </div>
         </button>
         {/* shelley-itn wallet */}
@@ -65,8 +73,13 @@ export default class TransferCards extends Component<Props> {
           className="TransferCards_shelleyEra"
           onClick={this.props.onShelley}
         >
-          <div className={styles.heroCardsItem}>
-            <div className={classnames([styles.heroCardsItemBg, styles.bgShelleyMainnet])} />
+          <div
+            className={classnames([
+              styles.heroCardsItem,
+              styles.heroCardsItemBg,
+              styles.bgShelleyMainnet,
+            ])}
+          >
             <div className={styles.heroCardsItemTitle}>
               {intl.formatMessage(messages.shelleyEraWallet)}
               <div className={styles.tooltip}>
@@ -78,6 +91,9 @@ export default class TransferCards extends Component<Props> {
                   }
                 />
               </div>
+            </div>
+            <div className={styles.heroCardsItemDate}>
+              2020
             </div>
           </div>
         </button>
