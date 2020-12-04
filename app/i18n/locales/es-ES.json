@@ -327,6 +327,8 @@
   "uri.invalid.dialog.title": "URL inválida",
   "uri.invalid.dialog.warning.text1": "El enlace al que has accedido es inválido.",
   "uri.invalid.dialog.warning.text2": "Por favor, verifica el formato con el receptor.",
+  "uri.invalid.dialog.warning.invalidAddressText1": "Couldn't find a wallet that supports this address type.",
+  "uri.invalid.dialog.warning.invalidAddressText2": "Please ask the receiver to check the address and make sure you have at least one wallet that supports this address type.",
   "uri.landing.dialog.confirm.label": "Entiendo",
   "uri.landing.dialog.title": "Ejecutar una transacción desde una URL de Cardano",
   "uri.landing.dialog.warning.line1": "Asegúrate de:",
