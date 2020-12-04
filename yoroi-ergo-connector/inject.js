@@ -159,6 +159,7 @@ if (shouldInject()) {
     console.log(`content script injected into ${location.hostname}`);
     injectIntoPage(initialInject);
 
+    // events from Yoroi
     const yoroiExtensionId = "bgihpbbhciffmelcfbccneidnnmkcdhl";
     let yoroiPort = chrome.runtime.connect(yoroiExtensionId);
     yoroiPort.onMessage.addListener(message => {
@@ -180,10 +181,28 @@ if (shouldInject()) {
         }
     });
 
+    // events from background script
+    // Temporary code to see how a possible notifications flow can work
+    chrome.runtime.onMessage.addListener(
+        function(request, sender, sendResponse) {
+            if (request.type === "sign_tx_confirm") {
+                yoroiPort.postMessage(request.rpcRequest);
+            }
+        }
+    );
+
+    // events from page (injected code)
     window.addEventListener("message", function(event) {
-        if (event.data.type == "connector_rpc_request") {
+        if (event.data.type === "connector_rpc_request") {
             console.log("connector received from page: " + JSON.stringify(event.data) + " with source = " + event.source + " and origin = " + event.origin);
-            yoroiPort.postMessage(event.data);
+            if (event.data.function === "sign_tx") {
+                chrome.runtime.sendMessage({
+                    type: "sign_tx_notification",
+                    rpcRequest: event.data
+                });
+            } else {
+                yoroiPort.postMessage(event.data);
+            }
         } else if (event.data.type == "connector_connect_request") {
             // TODO: add timeout somehow?
             chrome.storage.local.get("whitelist", function(result) {
