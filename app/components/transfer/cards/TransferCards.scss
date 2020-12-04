@@ -6,13 +6,13 @@
 
 .heroCardsItem {
   @include card-mixin;
+}
 
-  .heroCardsItemBg {
-    flex: 1 0 auto;
-    background-repeat: no-repeat;
-    background-position: center center;
-    background-size: contain;
-  }
+.heroCardsItemBg {
+  flex: 1 0 auto;
+  background-repeat: no-repeat;
+  background-position: top center;
+  background-size: contain;
 }
 
 .heroCardsItemBg {

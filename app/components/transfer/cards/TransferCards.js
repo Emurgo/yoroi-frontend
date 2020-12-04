@@ -43,8 +43,7 @@ export default class TransferCards extends Component<Props> {
           className="TransferCards_byronEra"
           onClick={this.props.onByron}
         >
-          <div className={styles.heroCardsItem}>
-            <div className={classnames([styles.heroCardsItemBg, styles.bgByronMainnet])} />
+          <div className={classnames([styles.heroCardsItem, styles.heroCardsItemBg, styles.bgByronMainnet])}>
             <div className={styles.heroCardsItemTitle}>
               {intl.formatMessage(messages.byronWallet)}
               <div className={styles.tooltip}>
@@ -57,6 +56,9 @@ export default class TransferCards extends Component<Props> {
                 />
               </div>
             </div>
+            <div className={styles.heroCardsItemDate}>
+              2017-2020
+            </div>
           </div>
         </button>
         {/* shelley-itn wallet */}
@@ -65,8 +67,7 @@ export default class TransferCards extends Component<Props> {
           className="TransferCards_shelleyEra"
           onClick={this.props.onShelley}
         >
-          <div className={styles.heroCardsItem}>
-            <div className={classnames([styles.heroCardsItemBg, styles.bgShelleyMainnet])} />
+          <div className={classnames([styles.heroCardsItem, styles.heroCardsItemBg, styles.bgShelleyMainnet])}>
             <div className={styles.heroCardsItemTitle}>
               {intl.formatMessage(messages.shelleyEraWallet)}
               <div className={styles.tooltip}>
@@ -78,6 +79,9 @@ export default class TransferCards extends Component<Props> {
                   }
                 />
               </div>
+            </div>
+            <div className={styles.heroCardsItemDate}>
+              2020
             </div>
           </div>
         </button>

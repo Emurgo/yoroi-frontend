@@ -18,6 +18,10 @@ const messages = defineMessages({
     id: 'wallet.transfer.instruction',
     defaultMessage: '!!!Any {ticker} claimed will be transferred to your currently selected wallet',
   },
+  subInstruction: {
+    id: 'wallet.transfer.subInstruction',
+    defaultMessage: '!!!Learn more about Byron and Shelley eras and how to claim ADA on our',
+  }
 });
 
 @observer
@@ -31,16 +35,25 @@ export default class TransferTypeSelect extends Component<Props> {
     return (
       <div className={styles.component}>
         <div className={styles.hero}>
+          <div className={styles.instructions}>
+            <div className={styles.headerText}>
+              {intl.formatMessage(
+                messages.instruction,
+                { ticker: this.props.ticker }
+              )}
+            </div>
+            <span>
+              {intl.formatMessage(
+                messages.subInstruction,
+                { ticker: this.props.ticker }
+              )}
+              <a href="https://yoroi-wallet.com/#/faq"> FAQ</a>
+            </span>
+          </div>
           <TransferCards
             onByron={this.props.onByron}
             onShelley={this.props.onShelley}
           />
-          <div className={styles.instructions}>
-            {intl.formatMessage(
-              messages.instruction,
-              { ticker: this.props.ticker }
-            )}
-          </div>
         </div>
       </div>
     );
