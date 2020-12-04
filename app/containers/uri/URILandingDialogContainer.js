@@ -14,6 +14,7 @@ import { SelectedExplorer } from '../../domain/SelectedExplorer';
 import type { UriParams } from '../../utils/URIHandling';
 import { getApiForNetwork, getApiMeta, } from '../../api/common/utils';
 import { networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 
 export type GeneratedData = typeof URILandingDialogContainer.prototype.generated;
 
@@ -21,6 +22,7 @@ type Props = {|
   ...InjectedOrGenerated<GeneratedData>,
   +onClose: void => void,
   +onConfirm: void => void,
+  +firstSelectedWallet: null | PublicDeriver<>,
 |};
 
 @observer
@@ -46,11 +48,12 @@ export default class URILandingDialogContainer extends Component<Props> {
   }
 
   render(): Node {
-    if (!this.generated.stores.loading.uriParams) {
+    if (!this.generated.stores.loading.uriParams || this.generated.firstSelectedWallet == null) {
       return (
         <URIInvalidDialog
           onClose={this.onCancel}
           onSubmit={this.onCancel}
+          address={this.generated.stores.loading.uriParams ? this.generated.stores.loading.uriParams.address : null}
         />
       );
     }
@@ -113,8 +116,9 @@ export default class URILandingDialogContainer extends Component<Props> {
       profile: {|
         isClassicTheme: boolean,
         unitOfAccount: UnitOfAccountSettingType
-      |}
-    |}
+      |},
+    |},
+    firstSelectedWallet: null | PublicDeriver<>
     |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
@@ -122,7 +126,7 @@ export default class URILandingDialogContainer extends Component<Props> {
     if (this.props.stores == null || this.props.actions == null) {
       throw new Error(`${nameof(URILandingDialogContainer)} no way to generated props`);
     }
-    const { stores, } = this.props;
+    const { stores, firstSelectedWallet } = this.props;
     return Object.freeze({
       stores: {
         explorers: {
@@ -139,6 +143,7 @@ export default class URILandingDialogContainer extends Component<Props> {
           uriParams: stores.loading.uriParams,
         },
       },
+      firstSelectedWallet,
     });
   }
 }

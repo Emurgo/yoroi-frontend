@@ -9,6 +9,14 @@
     margin-bottom: 20px;
   }
 
+  .address {
+    letter-spacing: 0px;
+    font-family: var(--font-mono-regular);
+    word-break: break-all;
+    font-size: 16px;
+    line-height: 23px;
+  }
+
   .continueButton {
     display: block !important;
     margin: 30px auto 0;

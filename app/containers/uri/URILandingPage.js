@@ -22,23 +22,12 @@ export default class URILandingPage extends Component<InjectedOrGenerated<Genera
   };
 
   onConfirm: void => void = () => {
-    const { wallets } = this.generated.stores;
+    const firstSelectedWallet = this.firstSelectedWallet();
 
-    const firstCardanoWallet = wallets.allWallets.find(publicDeriver => {
-      if ( this.generated.stores.loading.uriParams?.address &&
-        isValidReceiveAddress(
-          this.generated.stores.loading.uriParams.address,
-          publicDeriver.getParent().getNetworkInfo()
-        ) === true
-      ) {
-        return true;
-      }
-      return false;
-    });
     // this will automatically reroute to the right page if no wallet exists
     this.generated.actions.router.goToRoute.trigger({
       route: ROUTES.WALLETS.SEND,
-      publicDeriver: firstCardanoWallet,
+      publicDeriver: firstSelectedWallet,
     });
   };
 
@@ -48,6 +37,7 @@ export default class URILandingPage extends Component<InjectedOrGenerated<Genera
         {...this.generated.URILandingDialogContainerProps}
         onConfirm={this.onConfirm}
         onClose={this.onClose}
+        firstSelectedWallet={this.firstSelectedWallet()}
       />
     );
   }
@@ -77,8 +67,8 @@ export default class URILandingPage extends Component<InjectedOrGenerated<Genera
       |},
       profile: {| isClassicTheme: boolean |},
       wallets: {|
-        allWallets: Array<PublicDeriver<>>,
         hasAnyWallets: boolean,
+        publicDerivers: Array<PublicDeriver<>>,
       |},
     |},
   |} {
@@ -100,7 +90,7 @@ export default class URILandingPage extends Component<InjectedOrGenerated<Genera
         },
         wallets: {
           hasAnyWallets: stores.wallets.hasAnyWallets,
-          allWallets: stores.wallets.publicDerivers,
+          publicDerivers: stores.wallets.publicDerivers,
         },
       },
       actions: {
@@ -120,5 +110,22 @@ export default class URILandingPage extends Component<InjectedOrGenerated<Genera
         actions,
       }: InjectedOrGenerated<URILandingDialogContainerData>),
     });
+  }
+
+  firstSelectedWallet: void => null | PublicDeriver<> = () => {
+    const wallets = this.generated.stores.wallets.publicDerivers;
+    const firstCardanoWallet = wallets.find(publicDeriver => {
+      if ( this.generated.stores.loading.uriParams?.address &&
+        isValidReceiveAddress(
+          this.generated.stores.loading.uriParams.address,
+          publicDeriver.getParent().getNetworkInfo()
+        ) === true
+      ) {
+        return true;
+      }
+      return false;
+    });
+
+    return firstCardanoWallet !== undefined ? firstCardanoWallet : null;
   }
 }
