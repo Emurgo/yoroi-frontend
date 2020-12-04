@@ -47,7 +47,7 @@ export default class TransferTypeSelect extends Component<Props> {
                 messages.subInstruction,
                 { ticker: this.props.ticker }
               )}
-              <a href="https://yoroi-wallet.com/#/faq"> FAQ</a>
+              <a target="_blank" rel="noreferrer" href="https://yoroi-wallet.com/#/faq/1"> FAQ</a>
             </span>
           </div>
           <TransferCards
