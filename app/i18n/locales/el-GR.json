@@ -327,6 +327,8 @@
   "uri.invalid.dialog.title": "Άνευ ισχύος Ενιαίος Εντοπιστής Πόρων (URL)",
   "uri.invalid.dialog.warning.text1": "Ο σύνδεσμος που κάνατε κλικ δεν ισχύει.",
   "uri.invalid.dialog.warning.text2": "Παρακαλώ ζητήστε από τον αποδέκτη να ελέγξει καλα τη μορφή.",
+  "uri.invalid.dialog.warning.invalidAddressText1": "Couldn't find a wallet that supports this address type.",
+  "uri.invalid.dialog.warning.invalidAddressText2": "Please ask the receiver to check the address and make sure you have at least one wallet that supports this address type.",
   "uri.landing.dialog.confirm.label": "Καταλαβαίνω",
   "uri.landing.dialog.title": "Εκτελέστε μία συναλλαγή από Ενιαίο Εντοπιστή Πόρων (URL) Cardano",
   "uri.landing.dialog.warning.line1": "Να είστε σίγουροι:",
