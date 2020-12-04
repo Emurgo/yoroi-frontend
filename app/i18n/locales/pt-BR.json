@@ -713,6 +713,7 @@
   "wallet.transfer.deregister.noNeedToDeregister": "Você NÃO precisa desaverbar sua chave para delegar para uma pool diferente. Você pode mudar sua escolha a qualquer momento",
   "wallet.transfer.deregister.title": "Também desregistrar a chave de staking?",
   "wallet.transfer.instruction": "Toda {ticker} retirada será transferida sua carteira selecionada",
+  "wallet.transfer.subInstruction": "Learn more about Byron and Shelley eras and how to claim ADA on our",
   "wallet.undelegation.transaction.explanationLine1": "Você NÃO precisa desfazer a delegação para mudar de stake pool",
   "wallet.undelegation.transaction.explanationLine2": "Levará duas épocas após o final da época atual para que a remoção da delegação entre em vigor",
   "wallet.unsupported.subtitle": "A carteira selecionada não suporta esta funcionalidade",
