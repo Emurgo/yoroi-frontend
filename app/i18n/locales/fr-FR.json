@@ -713,6 +713,7 @@
   "wallet.transfer.deregister.noNeedToDeregister": "Vous n'avez PAS besoin de vous désinscrire pour déléguer à un autre pool. Vous pouvez modifier votre préférence de délégation à tout moment",
   "wallet.transfer.deregister.title": "Désinscrire également la clé de mise en jeu ?",
   "wallet.transfer.instruction": "Tout {ticker} réclamé sera transféré dans votre portefeuille actuellement sélectionné",
+  "wallet.transfer.subInstruction": "Learn more about Byron and Shelley eras and how to claim ADA on our",
   "wallet.undelegation.transaction.explanationLine1": "Vous n'avez PAS besoin d'arrêter une délégation avant de changer de groupe d'enjeu (pool)",
   "wallet.undelegation.transaction.explanationLine2": "Cela prendra 2 époques après la fin de l'époque courante pour que votre choix d'arrêter de déléguer soit effectif",
   "wallet.unsupported.subtitle": "Le portefeuille sélectionné ne prend pas en charge cette fonctionnalité",
