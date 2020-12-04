@@ -15,6 +15,7 @@ import {
   PublicDeriver,
 } from '../../app/api/ada/lib/storage/models/PublicDeriver/index';
 import {
+  asGetAllUtxos,
   asGetBalance,
 } from '../../app/api/ada/lib/storage/models/PublicDeriver/traits';
 
@@ -69,14 +70,46 @@ chrome.runtime.onConnectExternal.addListener(port => {
             rpcResponse({ ok: 5 });
           }
           break;
-        // case "get_utxos":
-        //   const wallet = await firstWallet();
-        //   wallet.getAllUtxos().then(x => {
-        //     rpcResponse({
-        //       ok: x
-        //     });
-        //   });
-        //   break;
+        case "get_utxos":
+          const wallet = await firstWallet();
+          const canGetAllUtxos = asGetAllUtxos(wallet);
+          if (canGetAllUtxos != null) {
+            canGetAllUtxos.getAllUtxos().then(utxos => {
+              // TODO: more intelligently choose values?
+              const valueExpected = message.params[0];
+              if (typeof valueExpected !== 'undefined') {
+                // TODO: use bigint/whatever yoroi uses for values
+                let valueAcc = 0;
+                let utxosToUse = [];
+                for (let i = 0; i < utxos.length && valueAcc < valueExpected; i += 1) {
+                  const val = parseInt(utxos[i].output.UtxoTransactionOutput.Amount);
+                  console.log(`get_utxos[1]: at ${valueAcc} of ${valueExpected} requested - trying to add ${val}`);
+                  valueAcc += val;
+                  utxosToUse.push(utxos[i]);
+                  console.log(`get_utxos[2]: at ${valueAcc} of ${valueExpected} requested`);
+                }
+                utxos = utxosToUse;
+              }
+              let utxosFormatted = utxos.map(utxo => {
+                let tx = utxo.output.Transaction;
+                let box = utxo.output.UtxoTransactionOutput;
+                return {
+                  boxId: box.ErgoBoxId,
+                  value: box.Amount,
+                  ergoTree: box.ErgoTree,
+                  assets: [],
+                  additionalRegisters: {},
+                  creationHeight: box.ErgoCreationHeight,
+                  transactionId: tx.TransactionId,
+                  index: box.OutputIndex
+                }
+              });
+              rpcResponse({
+                ok: utxosFormatted
+              });
+            });
+          }
+          break;
         case 'sign_tx':
           rpcResponse({
             err: {
