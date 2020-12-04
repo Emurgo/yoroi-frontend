@@ -713,6 +713,7 @@
   "wallet.transfer.deregister.noNeedToDeregister": "You do NOT need to deregister to delegate to a different stake pool. You can change your delegation preference at any time",
   "wallet.transfer.deregister.title": "Also deregister the staking key?",
   "wallet.transfer.instruction": "Any {ticker} claimed will be transferred to your currently selected wallet",
+  "wallet.transfer.subInstruction": "Learn more about Byron and Shelley eras and how to claim ADA on our",
   "wallet.undelegation.transaction.explanationLine1": "위임할 풀을 바꾸기 위해서 위임 취소를 할 필요는 없습니다.",
   "wallet.undelegation.transaction.explanationLine2": "위임 취소는 해당 에포크 종료 후 2개 에포크가 지나야 처리됩니다.",
   "wallet.unsupported.subtitle": "The selected wallet does not support this functionality",
