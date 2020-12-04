@@ -327,6 +327,8 @@
   "uri.invalid.dialog.title": "유효하지 않은 URL",
   "uri.invalid.dialog.warning.text1": "유효하지 않은 링크입니다.",
   "uri.invalid.dialog.warning.text2": "수신자에게 포맷이 정확한지 이중 확인하세요.",
+  "uri.invalid.dialog.warning.invalidAddressText1": "Couldn't find a wallet that supports this address type.",
+  "uri.invalid.dialog.warning.invalidAddressText2": "Please ask the receiver to check the address and make sure you have at least one wallet that supports this address type.",
   "uri.landing.dialog.confirm.label": "내용을 확인했습니다",
   "uri.landing.dialog.title": "카르다노 URL에서 전송 수행하기",
   "uri.landing.dialog.warning.line1": "필수 확인:",
