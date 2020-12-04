@@ -713,6 +713,7 @@
   "wallet.transfer.deregister.noNeedToDeregister": "You do NOT need to deregister to delegate to a different stake pool. You can change your delegation preference at any time",
   "wallet.transfer.deregister.title": "Also deregister the staking key?",
   "wallet.transfer.instruction": "Any {ticker} claimed will be transferred to your currently selected wallet",
+  "wallet.transfer.subInstruction": "Learn more about Byron and Shelley eras and how to claim ADA on our",
   "wallet.undelegation.transaction.explanationLine1": "Bahis havuzlarını değiştirmeden önce yetkilendirmenizi kaldırmanız GEREKMEZ",
   "wallet.undelegation.transaction.explanationLine2": "Yetkilendirmenin yürürlüğe girmesi, mevcut dönemin sona ermesinden sonra 2 dönem alacaktır",
   "wallet.unsupported.subtitle": "Seçilen cüzdan bu işlevi desteklemiyor",
