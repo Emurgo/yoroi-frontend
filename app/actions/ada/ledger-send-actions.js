@@ -30,5 +30,6 @@ export default class LedgerSendActions {
     |},
     network: $ReadOnly<NetworkRow>,
     addressingMap: string => (void | $PropertyType<Addressing, 'addressing'>),
+    expectedSerial: string | void,
   |}> = new AsyncAction();
 }
