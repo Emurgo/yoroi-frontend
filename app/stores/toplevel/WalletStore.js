@@ -466,8 +466,8 @@ export default class WalletStore extends Store {
       const { plate } = this.getPublicKeyCache(withPubKey);
       const existingWarnings = this.stores.walletSettings.getWalletWarnings(publicDeriver);
       // bring this back if we ever need it. Removing this code deletes the i18n strings.
+      // eslint-disable-next-line no-constant-condition
       if (false) {
-        // eslint-disable-line no-constant-condition
         existingWarnings.dialogs.push(
           createProblematicWalletDialog(
             plate.TextPart,
