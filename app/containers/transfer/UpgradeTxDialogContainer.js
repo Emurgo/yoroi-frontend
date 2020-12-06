@@ -62,6 +62,7 @@ export default class UpgradeTxDialogContainer extends Component<Props> {
     |},
     network: $ReadOnly<NetworkRow>,
     addressingMap: string => (void | $PropertyType<Addressing, 'addressing'>),
+    expectedSerial: string | void,
   |} => Promise<void> = async (request) => {
     await this.generated.actions.ada.ledgerSend.sendUsingLedgerKey.trigger({
       ...request,
@@ -168,6 +169,8 @@ export default class UpgradeTxDialogContainer extends Component<Props> {
       </div>
     );
 
+    const expectedSerial = selected.getParent().hardwareInfo?.DeviceId || '';
+
     return (
       <TransferSummaryPage
         header={header}
@@ -187,7 +190,8 @@ export default class UpgradeTxDialogContainer extends Component<Props> {
               selected,
               this.generated.stores.addresses.addressSubgroupMap
             ),
-            ...tentativeTx
+            ...tentativeTx,
+            expectedSerial,
           }),
           label: intl.formatMessage(globalMessages.upgradeLabel),
         }}
@@ -227,6 +231,7 @@ export default class UpgradeTxDialogContainer extends Component<Props> {
               |},
               addressingMap: string => (void | $PropertyType<Addressing, 'addressing'>),
               network: $ReadOnly<NetworkRow>,
+              expectedSerial: string | void,
             |} => Promise<void>,
           |},
         |},

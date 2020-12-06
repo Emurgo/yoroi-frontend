@@ -181,6 +181,8 @@ export default class LedgerConnectStore
         params: {
           path: request.path,
         },
+        // don't pass serial
+        // since we use the request to fetch the public key to get the serial # in the first place
         serial: undefined,
       });
 

@@ -17,11 +17,8 @@ import { migrate } from '../../api';
 import { Logger, stringifyError } from '../../utils/logging';
 import { closeOtherInstances } from '../../utils/tabManager';
 import { loadLovefieldDB, importOldDb, } from '../../api/ada/lib/storage/database/index';
-import { tryAddressToKind } from '../../api/ada/lib/storage/bridge/utils';
-import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
 import { ApiOptions, getApiMeta } from '../../api/common/utils';
 import { isWithinSupply } from '../../utils/validations';
-import { networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 
 /** Load dependencies before launching the app */

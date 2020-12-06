@@ -142,13 +142,15 @@ export default class HWVerifyAddressStore extends Store {
         networkId: Number.parseInt(config.ChainNetworkId, 10),
         addressingMap: genAddressingLookup(publicDeriver, this.stores.addresses.addressSubgroupMap),
       });
+
+      const expectedSerial = publicDeriver.getParent().hardwareInfo?.DeviceId || '';
       if (this.ledgerConnect) {
         await this.ledgerConnect.showAddress({
           params: {
             address,
             ...addressParams,
           },
-          serial: undefined, // TODO
+          serial: expectedSerial,
         });
       }
     } catch (error) {

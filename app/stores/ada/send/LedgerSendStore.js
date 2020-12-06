@@ -70,7 +70,13 @@ export default class LedgerSendStore extends Store {
     ledgerSendAction.sendUsingLedgerWallet.listen(asyncCheck(this._sendWrapper));
     ledgerSendAction.sendUsingLedgerKey.listen(
       // drop the return type
-      asyncCheck(async (request) => { await this.signAndBroadcast(request); })
+      asyncCheck(async (request) => {
+        await this.stores.wallets.sendAndRefresh({
+          publicDeriver: undefined,
+          broadcastRequest: async () => await this.signAndBroadcast(request),
+          refreshWallet: async () => {}
+        })
+      })
     );
     ledgerSendAction.cancel.listen(syncCheck(this._cancel));
   }
@@ -161,6 +167,7 @@ export default class LedgerSendStore extends Store {
         },
       };
 
+      const expectedSerial = request.publicDeriver.getParent().hardwareInfo?.DeviceId || '';
       return this.signAndBroadcast({
         ...request.params,
         publicKey: publicKeyInfo,
@@ -169,6 +176,7 @@ export default class LedgerSendStore extends Store {
           request.publicDeriver,
           this.stores.addresses.addressSubgroupMap
         ),
+        expectedSerial,
       });
     } catch (error) {
       Logger.error(`${nameof(LedgerSendStore)}::${nameof(this.signAndBroadcast)} error: ` + stringifyError(error));
@@ -184,6 +192,7 @@ export default class LedgerSendStore extends Store {
     |},
     addressingMap: string => (void | $PropertyType<Addressing, 'addressing'>),
     network: $ReadOnly<NetworkRow>,
+    expectedSerial: string | void,
   |} => Promise<{| txId: string |}> = async (request) => {
     let ledgerConnect: LedgerConnect;
     try {
@@ -203,7 +212,7 @@ export default class LedgerSendStore extends Store {
 
       const ledgerSignTxResp: LedgerSignTxResponse =
         await ledgerConnect.signTransaction({
-          serial: undefined, // TODO
+          serial: request.expectedSerial,
           params: ledgerSignTxPayload,
         });
 

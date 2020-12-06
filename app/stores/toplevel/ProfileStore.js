@@ -648,8 +648,8 @@ export const getVarsForTheme: ({|
   const { getThemeVars } = require(`../../themes/prebuilt/${theme}.js`);
   // we used this theme for the Shelley version of the Yoroi extension
   // however, going forward, Yoroi will be a mono-project containing all sub-networks
+  // eslint-disable-next-line no-constant-condition
   if (false) {
-    // eslint-disable-line no-constant-condition
     return getThemeVars('shelley');
   }
   return getThemeVars(undefined);
