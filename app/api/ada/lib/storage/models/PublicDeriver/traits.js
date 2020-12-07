@@ -583,7 +583,9 @@ const AddBip44FromPublicMixin = (
       derivationTables,
       this.getParent().getPublicDeriverLevel(),
     );
-    const asDisplayCutoffInstance = asDisplayCutoff(this);
+    const asDisplayCutoffInstance: (
+      void | (IDisplayCutoff & DisplayCutoffDependencies & AddBip44FromPublic)
+    ) = asDisplayCutoff(this);
     if (asDisplayCutoffInstance != null) {
       await updateCutoffFromInsert(
         tx,

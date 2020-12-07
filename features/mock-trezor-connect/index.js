@@ -468,16 +468,16 @@ class MockTrezorConnect {
   static dispose: $PropertyType<API, 'dispose'> = (): void => {
   }
 
-  static on: $PropertyType<API, 'on'> = (type, fn): void => {
+  static on: $PropertyType<API, 'on'> = (type, fn: any): void => {
     if (type === DEVICE_EVENT) {
-      this.deviceEventListeners.push((fn: any));
+      this.deviceEventListeners.push(fn);
     }
     if (type === UI_EVENT) {
-      this.uiEventListeners.push((fn: any));
+      this.uiEventListeners.push(fn);
     }
   }
 
-  static off: $PropertyType<API, 'off'> = (type, fn): void => {
+  static off: $PropertyType<API, 'off'> = (type, fn: any): void => {
     if (type === DEVICE_EVENT) {
       this.deviceEventListeners = this.deviceEventListeners.filter(event => event !== fn);
     }
