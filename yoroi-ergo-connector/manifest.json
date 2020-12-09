@@ -26,11 +26,12 @@
   },
   "permissions": [
     "activeTab",
-    "notifications",
     "storage"
   ],
   "web_accessible_resources": [
     "main.html",
-    "main.js"
+    "main.js",
+    "sign.html",
+    "sign.js"
   ]
 }

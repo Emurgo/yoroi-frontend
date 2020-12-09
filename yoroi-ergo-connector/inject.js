@@ -183,13 +183,13 @@ if (shouldInject()) {
 
     // events from background script
     // Temporary code to see how a possible notifications flow can work
-    chrome.runtime.onMessage.addListener(
-        function(request, sender, sendResponse) {
-            if (request.type === "sign_tx_confirm") {
-                yoroiPort.postMessage(request.rpcRequest);
-            }
-        }
-    );
+    // chrome.runtime.onMessage.addListener(
+    //     function(request, sender, sendResponse) {
+    //         if (request.type === "sign_tx_confirm") {
+    //             yoroiPort.postMessage(request.rpcRequest);
+    //         }
+    //     }
+    // );
 
     // events from page (injected code)
     window.addEventListener("message", function(event) {

@@ -38,7 +38,34 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+let yoroiPort = null;
+
+// TODO: refactor ports out of content script and send via those instead of postMessage
+chrome.runtime.onMessageExternal.addListener(request => {
+  if (request.type === 'yoroi_sign_tx') {
+    const tx = request.tx;
+    let mockSignedTx = tx;
+    mockSignedTx.inputs = tx.inputs.map(input => {
+      return {
+        boxId: input.boxId,
+        spendingProof: {
+          proofBytes: '0x267272632abddfb172',
+          extension: {}
+        },
+        extension: {}
+      }
+    });
+    mockSignedTx.size = 0;
+    yoroiPort.postMessage({
+      type: 'connector_rpc_response',
+      uid: request.uid,
+      return: { ok: mockSignedTx }
+    });
+  }
+});
+
 chrome.runtime.onConnectExternal.addListener(port => {
+  yoroiPort = port;
   port.onMessage.addListener(async message => {
     async function firstWallet(): Promise<PublicDeriver<>> {
       if (db != null) {
@@ -114,26 +141,6 @@ chrome.runtime.onConnectExternal.addListener(port => {
                 ok: utxosFormatted
               });
             }
-          }
-          break;
-        case 'sign_tx':
-          {
-            const tx = message.params[0];
-            let mockSignedTx = tx;
-            mockSignedTx.inputs = tx.inputs.map(input => {
-              return {
-                boxId: input.boxId,
-                spendingProof: {
-                  proofBytes: '0x267272632abddfb172',
-                  extension: {}
-                },
-                extension: {}
-              }
-            });
-            mockSignedTx.size = 0;
-            rpcResponse({
-              ok: mockSignedTx
-            });
           }
           break;
         case 'sign_tx_input':
