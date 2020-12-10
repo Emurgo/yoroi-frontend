@@ -195,14 +195,7 @@ if (shouldInject()) {
     window.addEventListener("message", function(event) {
         if (event.data.type === "connector_rpc_request") {
             console.log("connector received from page: " + JSON.stringify(event.data) + " with source = " + event.source + " and origin = " + event.origin);
-            if (event.data.function === "sign_tx") {
-                chrome.runtime.sendMessage({
-                    type: "sign_tx_notification",
-                    rpcRequest: event.data
-                });
-            } else {
-                yoroiPort.postMessage(event.data);
-            }
+            yoroiPort.postMessage(event.data);
         } else if (event.data.type == "connector_connect_request") {
             // TODO: add timeout somehow?
             chrome.storage.local.get("whitelist", function(result) {

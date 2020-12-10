@@ -30,7 +30,12 @@ const baseDevConfig = (
       customPath,
       hotScript,
       path.join(__dirname, '../chrome/extension/background')
-    ]
+    ],
+    sign: [
+      customPath,
+      hotScript,
+      path.join(__dirname, '../chrome/extension/sign')
+    ],
   },
   devMiddleware: {
     publicPath: `http://${host}:${connections.Ports.WebpackDev}/js`,
