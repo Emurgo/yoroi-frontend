@@ -1,6 +1,6 @@
 <body>
-    <div id = 'balance'>Balance: n/a</div>
-    <div id = 'status'>Wallet not connected</div>
+    <div id = "balance">Balance: n/a</div>
+    <div id = "status">Wallet not connected</div>
     <script type="text/javascript">
         if (typeof ergo_request_read_access === "undefined") {
             alert("ergo not found");
@@ -8,24 +8,26 @@
             console.log("ergo found")
             ergo_request_read_access().then(function(access_granted) {
                 if (!access_granted) {
-                    alert("ergo access denied");
+                    //alert("ergo access denied");
+                    const status = document.getElementById("status");
+                    status.innerText = "Wallet access denied";
                 } else {
                     const status = document.getElementById("status");
-                    status.innerHTML = "Wallet successfully connected"
+                    status.innerText = "Wallet successfully connected"
                     console.log("ergo access given");
                     window.addEventListener("ergo_wallet_disconnected", function(event) {
                         alert("wallet disconnected");
                     });
                     ergo.get_balance().then(async function(result) {
                         const div = document.getElementById("balance");
-                        div.innerHTML = "Balance: " + result;
+                        div.innerText = "Balance: " + result;
                         const valueEntry = document.createElement("input");
                         valueEntry.setAttribute("type", "number");
                         valueEntry.setAttribute("value", Math.floor(result / 2));
                         const button = document.createElement("button");
                         button.textContent = "Send";
                         button.onclick = async function() {
-                            status.innerHTML = "Creating transaction";
+                            status.innerText = "Creating transaction";
                             const amountToSend = valueEntry.value;
                             const utxos = await ergo.get_utxos(amountToSend);
                             //alert(utxos.map(utxo => parseInt(utxo.value)));
@@ -55,16 +57,16 @@
                                     },
                                 ]
                             };
-                            status.innerHTML = "Awaiting transaction signing";
+                            status.innerText = "Awaiting transaction signing";
                             ergo
                                 .sign_tx(tx)
                                 .then(async signedTx => {
-                                    status.innerHTML = "Transaction signed - awaiting submission"
+                                    status.innerText = "Transaction signed - awaiting submission"
                                     const sentTxId = await ergo.submit_tx(signedTx);
-                                    status.innerHTML = "Transaction submitted - thank you for your donation!";
+                                    status.innerText = "Transaction submitted - thank you for your donation!";
                                 })
                                 .catch(err => {
-                                    status.innerHTML = "You must accept signing the transaction to donate. Please click send again and accept."
+                                    status.innerText = "You must accept signing the transaction to donate. Please click send again and accept."
                                 });
                         }
                         div.appendChild(valueEntry);
