@@ -114,13 +114,13 @@ export async function createStandardBip44Wallet(request: {|
     ]
   ).toPublic();
 
-  const networkId = ((
+  const chainNetworkId = ((
     Number.parseInt(request.network.BaseConfig[0].ChainNetworkId, 10): any
   ): $Values<typeof RustModule.SigmaRust.NetworkPrefix>);
 
   const initialDerivations = await getChainDefaultDerivations(
     chainKey,
-    networkId,
+    chainNetworkId,
     rawGenAddByHash(new Set()),
   );
 

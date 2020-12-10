@@ -19,7 +19,8 @@ import ShelleyEraOptionDialogContainer from './options/ShelleyEraOptionDialogCon
 import type { GeneratedData as ByronEraOptionDialogContainerData } from './options/ByronEraOptionDialogContainer';
 import type { GeneratedData as ShelleyEraOptionDialogContainerData } from './options/ShelleyEraOptionDialogContainer';
 import type { RestoreModeType } from '../../actions/common/wallet-restore-actions';
-import { getApiForNetwork, getApiMeta } from '../../api/common/utils';
+import { genLookupOrFail, getTokenName, } from '../../stores/stateless/tokenHelpers';
+import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
 
 export type GeneratedData = typeof WalletTransferPage.prototype.generated;
 
@@ -76,10 +77,11 @@ export default class WalletTransferPage extends Component<Props> {
       ? this.getDaedalusTransferDialog(this.generated.DaedalusTransferPageProps)
       : null;
 
-    const apiMeta = getApiMeta(
-      getApiForNetwork(this.props.publicDeriver.getParent().getNetworkInfo())
-    )?.meta;
-    if (apiMeta == null) throw new Error(`${nameof(WalletTransferPage)} no API selected`);
+    const defaultToken = this.props.publicDeriver.getParent().getDefaultToken();
+    const defaultTokenInfo = genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)({
+      identifier: defaultToken.defaultIdentifier,
+      networkId: defaultToken.defaultNetworkId,
+    });
 
     return (
       <>
@@ -88,7 +90,7 @@ export default class WalletTransferPage extends Component<Props> {
           onShelley={
             () => actions.dialogs.open.trigger({ dialog: ShelleyEraOptionDialogContainer })
           }
-          ticker={apiMeta.primaryTicker}
+          ticker={getTokenName(defaultTokenInfo)}
         />
         {activeDialog}
         {icarusTransfer}
@@ -127,7 +129,10 @@ export default class WalletTransferPage extends Component<Props> {
       uiDialogs: {|
         getParam: <T>(number | string) => T,
         isOpen: any => boolean
-      |}
+      |},
+      tokenInfoStore: {|
+        tokenInfo: TokenInfoMap,
+      |},
     |}
     |} {
     if (this.props.generated !== undefined) {
@@ -142,6 +147,9 @@ export default class WalletTransferPage extends Component<Props> {
         uiDialogs: {
           isOpen: stores.uiDialogs.isOpen,
           getParam: stores.uiDialogs.getParam,
+        },
+        tokenInfoStore: {
+          tokenInfo: stores.tokenInfoStore.tokenInfo,
         },
       },
       actions: {

@@ -24,16 +24,27 @@ import {
 
 import { RustModule } from '../../../../ada/lib/cardanoCrypto/rustLoader';
 import { networks } from '../../../../ada/lib/storage/database/prepackaged/networks';
+import type { JormungandrFeeConfig } from '../../../../ada/lib/storage/database/primitives/tables';
 
-const linearFeeConfig = {
-  constant: '155381',
-  coefficient: '1',
-  certificate: '4',
-  per_certificate_fees: {
-    certificate_pool_registration: '5',
-    certificate_stake_delegation: '6',
-  },
-};
+function getProtocolParams(): {|
+  feeConfig: JormungandrFeeConfig,
+  networkId: number,
+  genesisHash: string,
+|} {
+  return {
+    feeConfig: {
+      constant: '155381',
+      coefficient: '1',
+      certificate: '4',
+      per_certificate_fees: {
+        certificate_pool_registration: '5',
+        certificate_stake_delegation: '6',
+      },
+    },
+    networkId: networks.JormungandrMainnet.NetworkId,
+    genesisHash: 'adbdd5ede31637f6c9bad5c271eec0bc3d0cb9efb86a5b913bb55cba549d0770',
+  };
+}
 
 beforeAll(async () => {
   await RustModule.load();
@@ -73,12 +84,11 @@ describe('Jormungandr tx format tests', () => {
       network: networks.JormungandrMainnet,
       getUTXOsForAddresses: (_addresses) => Promise.resolve([utxo]),
       outputAddr: outAddress,
-      genesisHash: 'adbdd5ede31637f6c9bad5c271eec0bc3d0cb9efb86a5b913bb55cba549d0770',
-      feeConfig: linearFeeConfig,
+      protocolParams: getProtocolParams(),
     });
 
-    expect(transferInfo.fee.toString()).toBe('0.155383');
-    expect(transferInfo.recoveredBalance.toString()).toBe('1');
+    expect(transferInfo.fee.getDefault().toString()).toBe('155383');
+    expect(transferInfo.recoveredBalance.getDefault().toString()).toBe('1000000');
     expect(transferInfo.senders).toEqual([address]);
     expect(transferInfo.receivers[0]).toBe(outAddress);
 
@@ -135,8 +145,7 @@ describe('Jormungandr tx format tests', () => {
       network: networks.JormungandrMainnet,
       getUTXOsForAddresses: (_addresses) => Promise.resolve([utxo]),
       outputAddr: outAddress,
-      genesisHash: 'adbdd5ede31637f6c9bad5c271eec0bc3d0cb9efb86a5b913bb55cba549d0770',
-      feeConfig: linearFeeConfig,
+      protocolParams: getProtocolParams(),
     })).rejects.toThrow(NotEnoughMoneyToSendError);
   });
 
@@ -175,12 +184,11 @@ describe('Jormungandr tx format tests', () => {
       network: networks.JormungandrMainnet,
       getUTXOsForAddresses: (_addresses) => Promise.resolve(utxo),
       outputAddr: outAddress,
-      genesisHash: 'adbdd5ede31637f6c9bad5c271eec0bc3d0cb9efb86a5b913bb55cba549d0770',
-      feeConfig: linearFeeConfig,
+      protocolParams: getProtocolParams(),
     });
 
-    expect(transferInfo.fee.toString()).toBe('0.155482');
-    expect(transferInfo.recoveredBalance.toString()).toBe('100.0001');
+    expect(transferInfo.fee.getDefault().toString()).toBe('155482');
+    expect(transferInfo.recoveredBalance.getDefault().toString()).toBe('100000100');
     expect(transferInfo.senders).toEqual([address]);
     expect(transferInfo.receivers[0]).toBe(outAddress);
 

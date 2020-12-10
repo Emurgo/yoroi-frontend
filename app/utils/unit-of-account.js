@@ -3,7 +3,9 @@ import { BigNumber } from 'bignumber.js';
 import { Logger } from './logging';
 
 export function calculateAndFormatValue(
-  coinAmount: BigNumber, // in ADA, not lovelaces
+  // Note: make sure you pass the right denomination
+  // ex: pass ADA instead of lovelaces
+  coinAmount: BigNumber,
   price: number
 ): string {
   try {

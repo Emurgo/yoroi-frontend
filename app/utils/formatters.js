@@ -5,14 +5,10 @@ export function splitAmount(
   amount: BigNumber,
   decimalPlaces: number,
 ): [string, string] {
-  const valString = formattedWalletAmount(amount, decimalPlaces);
+  const valString = amount.toFormat(decimalPlaces);
   const startIndex = valString.length - decimalPlaces;
   return [valString.substring(0, startIndex), valString.substring(startIndex)];
 }
-
-export const formattedWalletAmount: (BigNumber, number) => string = (amount, decimalPlaces) => (
-  amount.toFormat(decimalPlaces)
-);
 
 export const maxNameLengthBeforeTruncation = 15;
 export const truncateLongName: string => string = (walletName) => {

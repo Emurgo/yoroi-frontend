@@ -7,7 +7,7 @@ When(/^I go to the dashboard screen$/, async function () {
 });
 
 When(/^I click on the withdraw button$/, async function () {
-  await this.click('.withdrawButton ');
+  await this.click('.withdrawButton');
 });
 
 Then(/^I should rewards in the history$/, async function () {

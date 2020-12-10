@@ -149,12 +149,14 @@ beforeAll(async () => {
 function getProtocolParams(): {|
   FeeAddress: string,
   MinimumBoxValue: string,
+  NetworkId: number,
   |} {
   const fullConfig = getErgoBaseConfig(network);
   const config = fullConfig.reduce((acc, next) => Object.assign(acc, next), {});
   return {
     FeeAddress: config.FeeAddress,
     MinimumBoxValue: config.MinimumBoxValue,
+    NetworkId: network.NetworkId,
   };
 }
 

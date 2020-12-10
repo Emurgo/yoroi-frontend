@@ -10,9 +10,9 @@ import type {
 import { size } from 'lodash';
 import ExtendableError from 'es6-error';
 
-export async function promisifyDbCall(request: IDBRequest): Promise<void> {
+export async function promisifyDbCall<T>(request: IDBRequest): Promise<T> {
   return await new Promise((resolve, reject) => {
-    request.onsuccess = () => resolve();
+    request.onsuccess = () => resolve((request.result: any));
     request.onerror = () => reject();
   });
 }

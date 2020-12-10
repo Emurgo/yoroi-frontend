@@ -1,6 +1,5 @@
 // @flow
 import React, { Component } from 'react';
-import BigNumber from 'bignumber.js';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { computed, } from 'mobx';
@@ -13,6 +12,11 @@ import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/
 import globalMessages from '../../i18n/global-messages';
 import { intlShape, } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import {
+  MultiToken,
+} from '../../api/common/lib/MultiToken';
+import type { NetworkRow, TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
+import { getDefaultEntryToken } from '../../stores/toplevel/TokenInfoStore';
 
 export type GeneratedData = typeof WithdrawalTxDialogContainer.prototype.generated;
 
@@ -31,6 +35,14 @@ export default class WithdrawalTxDialogContainer extends Component<Props> {
   render(): Node {
     const { intl } = this.context;
     const { createWithdrawalTx } = this.generated.stores.substores.ada.delegationTransaction;
+
+    if (this.generated.stores.profile.selectedNetwork == null) {
+      throw new Error(`${nameof(WithdrawalTxDialogContainer)} no selected network`);
+    }
+    const defaultToken = this.generated.stores.tokenInfoStore.getDefaultTokenInfo(
+      this.generated.stores.profile.selectedNetwork.NetworkId
+    );
+
     return (
       <TransferSendPage
         {...this.generated.TransferSendProps}
@@ -48,15 +60,15 @@ export default class WithdrawalTxDialogContainer extends Component<Props> {
             throw new Error(`${nameof(WithdrawalTxDialogContainer)} incorrect tx type`);
           }
 
-          const deregistrations = tentativeTx.keyDeregistrations(true);
-          const withdrawals = tentativeTx.withdrawals(true);
+          const deregistrations = tentativeTx.keyDeregistrations();
+          const withdrawals = tentativeTx.withdrawals();
 
           return {
             recoveredBalance: withdrawals.reduce(
-              (sum, curr) => sum.plus(curr.amount),
-              new BigNumber(0)
+              (sum, curr) => sum.joinAddCopy(curr.amount),
+              new MultiToken([], getDefaultEntryToken(defaultToken))
             ),
-            fee: tentativeTx.fee(true),
+            fee: tentativeTx.fee(),
             senders: tentativeTx
               .uniqueSenderAddresses(),
             receivers: tentativeTx
@@ -73,6 +85,10 @@ export default class WithdrawalTxDialogContainer extends Component<Props> {
     TransferSendProps: InjectedOrGenerated<TransferSendData>,
     actions: {||},
     stores: {|
+      tokenInfoStore: {|
+        getDefaultTokenInfo: number => $ReadOnly<TokenRow>,
+      |},
+      profile: {| selectedNetwork: void | $ReadOnly<NetworkRow> |},
       substores: {|
         ada: {|
           delegationTransaction: {|
@@ -98,6 +114,12 @@ export default class WithdrawalTxDialogContainer extends Component<Props> {
       actions: Object.freeze({
       }),
       stores: {
+        profile: {
+          selectedNetwork: stores.profile.selectedNetwork,
+        },
+        tokenInfoStore: {
+          getDefaultTokenInfo: stores.tokenInfoStore.getDefaultTokenInfo,
+        },
         substores: {
           ada: {
             delegationTransaction: {

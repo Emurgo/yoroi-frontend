@@ -15,7 +15,7 @@ import { RustModule } from '../../../ada/lib/cardanoCrypto/rustLoader';
 
 export function ergoGenAddressBatchFunc(
   chain: BIP32Interface,
-  network: $Values<typeof RustModule.SigmaRust.NetworkPrefix>
+  chainNetworkId: $Values<typeof RustModule.SigmaRust.NetworkPrefix>
 ): GenerateAddressFunc {
   return (
     indices: Array<number>
@@ -25,7 +25,7 @@ export function ergoGenAddressBatchFunc(
       const ergoAddr = RustModule.SigmaRust.Address.from_public_key(
         bip32Addr.publicKey
       );
-      return Buffer.from(ergoAddr.to_bytes(network)).toString('hex');
+      return Buffer.from(ergoAddr.to_bytes(chainNetworkId)).toString('hex');
     });
   };
 }

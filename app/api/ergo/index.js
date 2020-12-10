@@ -37,7 +37,6 @@ import { ConceptualWallet } from '../ada/lib/storage/models/ConceptualWallet/ind
 import type { IHasLevels } from '../ada/lib/storage/models/ConceptualWallet/interfaces';
 import type { TransactionExportRow } from '../export';
 import ErgoTransaction from '../../domain/ErgoTransaction';
-import { getApiForNetwork } from '../common/utils';
 import {
   GenericApiError,
   WalletAlreadyRestoredError,
@@ -52,6 +51,7 @@ import {
 import type {
   HistoryFunc,
   BestBlockFunc,
+  AssetInfoFunc,
   SendFunc, SignedResponse,
 } from './lib/state-fetch/types';
 import type {
@@ -59,7 +59,6 @@ import type {
 } from '../common/lib/state-fetch/currencySpecificTypes';
 import {
   getAllAddressesForDisplay,
-  buildTokenMap,
 } from '../ada/lib/storage/bridge/traitUtils';
 import {
   HARD_DERIVATION_START,
@@ -94,11 +93,11 @@ import {
 import type {
   ErgoAddressedUtxo,
 } from './lib/transactions/types';
-import type { NetworkRow } from '../ada/lib/storage/database/primitives/tables';
+import type { NetworkRow, TokenRow, } from '../ada/lib/storage/database/primitives/tables';
 import {
   getErgoBaseConfig,
 } from '../ada/lib/storage/database/prepackaged/networks';
-import { CoreAddressTypes } from '../ada/lib/storage/database/primitives/enums';
+import { CoreAddressTypes, } from '../ada/lib/storage/database/primitives/enums';
 import { BIP32PrivateKey, } from '../common/lib/crypto/keys/keyRepository';
 import { WrongPassphraseError } from '../ada/lib/cardanoCrypto/cryptoErrors';
 
@@ -106,6 +105,7 @@ import { WrongPassphraseError } from '../ada/lib/cardanoCrypto/cryptoErrors';
 
 export type GetTransactionRowsToExportRequest = {|
   publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels>,
+  getDefaultToken: number => $ReadOnly<TokenRow>,
 |};
 export type GetTransactionRowsToExportResponse = Array<TransactionExportRow>;
 export type GetTransactionRowsToExportFunc = (
@@ -117,6 +117,7 @@ export type GetTransactionRowsToExportFunc = (
 export type ErgoGetTransactionsRequest = {|
   getTransactionsHistoryForAddresses: HistoryFunc,
   checkAddressesInUse: FilterFunc,
+  getAssetInfo: AssetInfoFunc,
   getBestBlock: BestBlockFunc,
 |};
 
@@ -225,7 +226,10 @@ export default class ErgoApi {
         publicDeriver: request.publicDeriver,
       });
       Logger.debug(`${nameof(ErgoApi)}::${nameof(this.getTransactionRowsToExport)}: success`);
-      return convertErgoTransactionsToExportRows(fetchedTxs.txs);
+      return convertErgoTransactionsToExportRows(
+        fetchedTxs.txs,
+        request.getDefaultToken(request.publicDeriver.getParent().getNetworkInfo().NetworkId)
+      );
     } catch (error) {
       Logger.error(`${nameof(ErgoApi)}::${nameof(this.getTransactionRowsToExport)}: ` + stringifyError(error));
 
@@ -249,6 +253,7 @@ export default class ErgoApi {
           request.publicDeriver,
           request.checkAddressesInUse,
           request.getTransactionsHistoryForAddresses,
+          request.getAssetInfo,
           request.getBestBlock,
         );
       }
@@ -263,7 +268,8 @@ export default class ErgoApi {
         return ErgoTransaction.fromAnnotatedTx({
           tx,
           addressLookupMap: fetchedTxs.addressLookupMap,
-          api: getApiForNetwork(request.publicDeriver.getParent().getNetworkInfo()),
+          network: request.publicDeriver.getParent().getNetworkInfo(),
+          defaultToken: request.publicDeriver.getParent().getDefaultToken(),
         });
       });
       return {
@@ -291,7 +297,8 @@ export default class ErgoApi {
         return ErgoTransaction.fromAnnotatedTx({
           tx,
           addressLookupMap: fetchedTxs.addressLookupMap,
-          api: getApiForNetwork(request.publicDeriver.getParent().getNetworkInfo()),
+          network: request.publicDeriver.getParent().getNetworkInfo(),
+          defaultToken: request.publicDeriver.getParent().getDefaultToken(),
         });
       });
       return mappedTransactions;
@@ -450,34 +457,8 @@ export default class ErgoApi {
     const utxos = await request.publicDeriver.getAllUtxos();
     const filteredUtxos = utxos.filter(utxo => request.filter(utxo));
 
-    const tokensForOutputs = await buildTokenMap({
-      publicDeriver: request.publicDeriver,
-      utxoOutputs: filteredUtxos.map(
-        utxo => utxo.output.UtxoTransactionOutput.UtxoTransactionOutputId
-      ),
-    });
-    const tokenMap = new Map<
-      number,
-      Array<{
-        amount: number,
-        tokenId: string,
-        ...
-      }>
-    >();
-    for (const output of tokensForOutputs) {
-      const { UtxoTransactionOutputId } = output.TokenList;
-      if (UtxoTransactionOutputId != null) {
-        const list = tokenMap.get(UtxoTransactionOutputId) ?? [];
-        list.push({
-          amount: Number.parseInt(output.TokenList.Amount, 10),
-          tokenId: output.Token.Identifier,
-        });
-        tokenMap.set(UtxoTransactionOutputId, list);
-      }
-    }
     const addressedUtxo = asAddressedUtxo(
       filteredUtxos,
-      tokenMap,
     );
 
     const receivers = [{
@@ -521,6 +502,7 @@ export default class ErgoApi {
       const protocolParams = {
         FeeAddress: config.FeeAddress,
         MinimumBoxValue: config.MinimumBoxValue,
+        NetworkId: request.network.NetworkId,
       };
 
       let unsignedTxResponse;
@@ -592,6 +574,7 @@ export default class ErgoApi {
         networkSettingSnapshot: {
           FeeAddress: config.FeeAddress,
           ChainNetworkId: (Number.parseInt(config.ChainNetworkId, 10): any),
+          NetworkId: request.network.NetworkId,
         },
       });
     } catch (error) {

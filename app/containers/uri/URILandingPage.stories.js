@@ -13,6 +13,11 @@ import {
   genUnitOfAccount,
 } from '../../../stories/helpers/StoryWrapper';
 import { defaultToSelectedExplorer } from '../../domain/SelectedExplorer';
+import {
+  MultiToken,
+} from '../../api/common/lib/MultiToken';
+import { networks, defaultAssets } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { getDefaultEntryToken, mockFromDefaults } from '../../stores/toplevel/TokenInfoStore';
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -30,12 +35,23 @@ export const GettingMnemonics = (): Node => {
     linkCases,
     linkCases.Send,
   );
+
+  const cardanoMeta = defaultAssets.filter(
+    asset => asset.NetworkId === networks.CardanoMainnet.NetworkId
+  )[0];
   const uriParams = (() => {
     const linkVal = linkValue();
     if (linkVal === linkCases.Send) {
       return {
         address: 'Ae2tdPwUPEZ5PxKxoyZDgjsKgMWMpTRa4PH3sVgARSGBsWwNBH3qg7cMFsP',
-        amount: new BigNumber(1),
+        amount: new MultiToken(
+          [{
+            identifier: cardanoMeta.Identifier,
+            networkId: cardanoMeta.NetworkId,
+            amount: new BigNumber(1_000_000),
+          }],
+          getDefaultEntryToken(cardanoMeta)
+        ),
       };
     }
     return null;
@@ -73,6 +89,9 @@ export const GettingMnemonics = (): Node => {
               profile: {
                 isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
                 unitOfAccount: genUnitOfAccount(),
+              },
+              tokenInfoStore: {
+                tokenInfo: mockFromDefaults(defaultAssets),
               },
               coinPriceStore: {
                 getCurrentPrice: (_from, _to) => 5,

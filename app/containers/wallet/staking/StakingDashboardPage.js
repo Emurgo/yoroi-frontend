@@ -4,7 +4,6 @@ import type { Node } from 'react';
 import { intlShape } from 'react-intl';
 import moment from 'moment';
 import { observer } from 'mobx-react';
-import BigNumber from 'bignumber.js';
 
 import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 import StakingDashboard from '../../../components/wallet/staking/dashboard/StakingDashboard';
@@ -28,7 +27,6 @@ import LocalizableError from '../../../i18n/LocalizableError';
 import UnmangleTxDialogContainer from '../../transfer/UnmangleTxDialogContainer';
 import type { GeneratedData as UnmangleTxDialogContainerData } from '../../transfer/UnmangleTxDialogContainer';
 import config from '../../../config';
-import { formattedWalletAmount } from '../../../utils/formatters';
 import type { PoolTuples, ReputationObject } from '../../../api/jormungandr/lib/state-fetch/types';
 import type { PoolMeta, DelegationRequests } from '../../../stores/toplevel/DelegationStore';
 import type { AdaDelegationRequests } from '../../../stores/ada/AdaDelegationStore';
@@ -56,9 +54,8 @@ import type { Notification } from '../../../types/notificationType';
 
 import globalMessages from '../../../i18n/global-messages';
 import { computed, observable, runInAction } from 'mobx';
-import { ApiOptions, getApiForNetwork, getApiMeta } from '../../../api/common/utils';
-import type { SelectedApiType } from '../../../api/common/utils';
-import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
+import { ApiOptions, getApiForNetwork, } from '../../../api/common/utils';
+import type { NetworkRow, TokenRow, } from '../../../api/ada/lib/storage/database/primitives/tables';
 import {
   isJormungandr,
   isCardanoHaskell,
@@ -68,6 +65,11 @@ import DeregisterDialogContainer from '../../transfer/DeregisterDialogContainer'
 import type { GeneratedData as DeregisterDialogContainerData } from '../../transfer/DeregisterDialogContainer';
 import type { GeneratedData as WithdrawalTxDialogContainerData } from '../../transfer/WithdrawalTxDialogContainer';
 import WithdrawalTxDialogContainer from '../../transfer/WithdrawalTxDialogContainer';
+import {
+  MultiToken,
+} from '../../../api/common/lib/MultiToken';
+import type { TokenInfoMap } from '../../../stores/toplevel/TokenInfoStore';
+import { getTokenName, genLookupOrFail } from '../../../stores/stateless/tokenHelpers';
 
 export type GeneratedData = typeof StakingDashboardPage.prototype.generated;
 
@@ -100,48 +102,11 @@ export default class StakingDashboardPage extends Component<Props> {
     this.generated.actions.ada.delegationTransaction.reset.trigger({ justTransaction: false });
   }
 
-  hideOrFormat: (
-    BigNumber,
-    $PropertyType<SelectedApiType, 'meta'>
-  ) => {|
-    +ADA: string,
-    +unitOfAccount: void | {| currency: string, amount: string |},
-  |} = (amount, apiMeta) => {
-    if (this.generated.stores.profile.shouldHideBalance) {
-      return {
-        ADA: '******',
-        unitOfAccount: undefined,
-      };
-    }
-
-    const coinPrice: ?number = this.generated.stores.profile.unitOfAccount.enabled
-      ? this.generated.stores.coinPriceStore.getCurrentPrice(
-          apiMeta.primaryTicker,
-          this.generated.stores.profile.unitOfAccount.currency
-        )
-      : null;
-
-    const unitOfAccount =
-      coinPrice == null || this.generated.stores.profile.unitOfAccount.currency == null
-        ? undefined
-        : {
-            currency: this.generated.stores.profile.unitOfAccount.currency,
-            amount: calculateAndFormatValue(new BigNumber(amount), coinPrice),
-          };
-    return {
-      ADA: formattedWalletAmount(amount, apiMeta.decimalPlaces.toNumber()),
-      unitOfAccount,
-    };
-  };
-
   render(): Node {
     const publicDeriver = this.generated.stores.wallets.selected;
     if (publicDeriver == null) {
       throw new Error(`${nameof(StakingDashboardPage)} no public deriver. Should never happen`);
     }
-    const apiMeta = getApiMeta(getApiForNetwork(publicDeriver.getParent().getNetworkInfo()))?.meta;
-    if (apiMeta == null) throw new Error(`${nameof(StakingDashboardPage)} no API selected`);
-
     const delegationStore = this.generated.stores.delegation;
     const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
     if (delegationRequests == null) {
@@ -195,7 +160,11 @@ export default class StakingDashboardPage extends Component<Props> {
         })}
         delegationHistory={delegationRequests.getCurrentDelegation.result?.fullHistory}
         epochLength={this.getEpochLengthInDays(publicDeriver)}
-        ticker={apiMeta.primaryTicker}
+        ticker={getTokenName(
+          this.generated.stores.tokenInfoStore.getDefaultTokenInfo(
+            publicDeriver.getParent().getNetworkInfo().NetworkId
+          )
+        )}
       />
     );
 
@@ -227,8 +196,6 @@ export default class StakingDashboardPage extends Component<Props> {
     if (!isJormungandr(publicDeriver.getParent().getNetworkInfo())) {
       return null; // TODO
     }
-    const apiMeta = getApiMeta(getApiForNetwork(publicDeriver.getParent().getNetworkInfo()))?.meta;
-    if (apiMeta == null) throw new Error(`${nameof(StakingDashboardPage)} no API selected`);
 
     const { uiDialogs } = this.generated.stores;
     const delegationTxStore = this.generated.stores.substores.jormungandr.delegationTransaction;
@@ -284,17 +251,17 @@ export default class StakingDashboardPage extends Component<Props> {
           });
           cancel();
         }}
+        getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
         generatingTx={
           this.generated.stores.substores.jormungandr.delegationTransaction.createDelegationTx
             .isExecuting
         }
         isSubmitting={this.generated.stores.wallets.sendMoneyRequest.isExecuting}
-        transactionFee={getJormungandrTxFee(delegationTx.signTxRequest.self(), true)}
+        transactionFee={getJormungandrTxFee(
+          delegationTx.signTxRequest.self(),
+          publicDeriver.getParent().getNetworkInfo().NetworkId,
+        )}
         staleTx={delegationTxStore.isStale}
-        meta={{
-          decimalPlaces: apiMeta.decimalPlaces.toNumber(),
-          ticker: apiMeta.primaryTicker,
-        }}
       />
     );
   };
@@ -750,48 +717,44 @@ export default class StakingDashboardPage extends Component<Props> {
 
     const unmangledAmountsRequest = request.delegationRequests.mangledAmounts.result;
 
+    const defaultToken = request.publicDeriver.getParent().getDefaultToken();
+
     const txRequests = this.generated.stores.transactions.getTxRequests(request.publicDeriver);
     const balance = txRequests.requests.getBalanceRequest.result;
     const rewardBalance =
       request.delegationRequests.getDelegatedBalance.result == null
-        ? 0
+        ? new MultiToken([], defaultToken)
         : request.delegationRequests.getDelegatedBalance.result.accountPart;
-
-    const apiMeta = getApiMeta(getApiForNetwork(request.publicDeriver.getParent().getNetworkInfo()))
-      ?.meta;
-    if (apiMeta == null) throw new Error(`${nameof(StakingDashboardPage)} no API selected`);
-    const amountPerUnit = new BigNumber(10).pow(apiMeta.decimalPlaces);
 
     const currentlyDelegating =
       (request.delegationRequests.getCurrentDelegation.result?.currEpoch?.pools ?? []).length > 0;
 
     return (
       <UserSummary
-        meta={{
-          decimalPlaces: apiMeta.decimalPlaces.toNumber(),
-          primaryTicker: apiMeta.primaryTicker,
-        }}
-        canUnmangleSum={unmangledAmountsRequest?.canUnmangle ?? new BigNumber(0)}
-        cannotUnmangleSum={unmangledAmountsRequest?.cannotUnmangle ?? new BigNumber(0)}
+        canUnmangleSum={unmangledAmountsRequest?.canUnmangle ?? new MultiToken([], defaultToken)}
+        cannotUnmangleSum={
+          unmangledAmountsRequest?.cannotUnmangle ?? new MultiToken([], defaultToken)
+        }
+        defaultTokenInfo={
+          this.generated.stores.tokenInfoStore.getDefaultTokenInfo(
+            request.publicDeriver.getParent().getNetworkInfo().NetworkId
+          )
+        }
+        getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
         onUnmangle={() =>
           this.generated.actions.dialogs.open.trigger({
             dialog: UnmangleTxDialogContainer,
           })
         }
-        totalAdaSum={
+        totalSum={
           balance == null
             ? undefined
-            : this.hideOrFormat(balance.plus(rewardBalance).dividedBy(amountPerUnit), apiMeta)
+            : balance.joinAddCopy(rewardBalance)
         }
         totalRewards={
           !showRewardAmount || request.delegationRequests.getDelegatedBalance.result == null
             ? undefined
-            : this.hideOrFormat(
-                request.delegationRequests.getDelegatedBalance.result.accountPart.dividedBy(
-                  amountPerUnit
-                ),
-                apiMeta
-              )
+            : request.delegationRequests.getDelegatedBalance.result.accountPart
         }
         openLearnMore={() =>
           this.generated.actions.dialogs.open.trigger({
@@ -805,17 +768,40 @@ export default class StakingDashboardPage extends Component<Props> {
               }
             : undefined
         }
-        totalDelegated={
-          !showRewardAmount || request.delegationRequests.getDelegatedBalance.result == null
-            ? undefined
-            : this.hideOrFormat(
-                currentlyDelegating
-                  ? request.delegationRequests.getDelegatedBalance.result.utxoPart
-                      .plus(request.delegationRequests.getDelegatedBalance.result.accountPart)
-                      .dividedBy(amountPerUnit)
-                  : new BigNumber(0),
-                apiMeta
-              )
+        unitOfAccount={entry => {
+          const tokenRow = this.generated.stores.tokenInfoStore.tokenInfo
+            .get(entry.networkId.toString())
+            ?.get(entry.identifier);
+          if (tokenRow == null) return undefined;
+
+          if (!this.generated.stores.profile.unitOfAccount.enabled) return undefined;
+          const currency = this.generated.stores.profile.unitOfAccount.currency;
+
+          const shiftedAmount = entry.amount
+            .shiftedBy(-tokenRow.Metadata.numberOfDecimals);
+
+          const coinPrice = this.generated.stores.coinPriceStore.getCurrentPrice(
+            tokenRow.Identifier,
+            currency
+          );
+          if (coinPrice == null) return undefined;
+          return {
+            currency,
+            amount: calculateAndFormatValue(shiftedAmount, coinPrice),
+          };
+        }}
+        shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
+        totalDelegated={(() => {
+            if (!showRewardAmount) return undefined;
+            if (request.delegationRequests.getDelegatedBalance.result == null) return undefined;
+
+            return currentlyDelegating
+              ? request.delegationRequests.getDelegatedBalance.result.utxoPart
+                  .joinAddCopy(
+                    request.delegationRequests.getDelegatedBalance.result.accountPart
+                  )
+              : new MultiToken([], defaultToken)
+          })()
         }
       />
     );
@@ -841,10 +827,7 @@ export default class StakingDashboardPage extends Component<Props> {
     totalRewards: Array<GraphItems>,
     perEpochRewards: Array<GraphItems>,
   |} = request => {
-    const apiMeta = getApiMeta(getApiForNetwork(request.publicDeriver.getParent().getNetworkInfo()))
-      ?.meta;
-    if (apiMeta == null) throw new Error(`${nameof(StakingDashboardPage)} no API selected`);
-    const amountPerUnit = new BigNumber(10).pow(apiMeta.decimalPlaces);
+    const defaultToken = request.publicDeriver.getParent().getDefaultToken();
 
     const history = request.delegationRequests.rewardHistory.result;
     if (history == null) {
@@ -859,7 +842,7 @@ export default class StakingDashboardPage extends Component<Props> {
     // so we need to insert these manually
     const totalRewards: Array<GraphItems> = [];
     const perEpochRewards: Array<GraphItems> = [];
-    let amountSum = new BigNumber(0);
+    let amountSum = new MultiToken([], defaultToken);
 
     const startEpoch = (() => {
       if (isCardanoHaskell(request.publicDeriver.getParent().getNetworkInfo())) {
@@ -885,25 +868,33 @@ export default class StakingDashboardPage extends Component<Props> {
       );
     })();
 
+    const getNormalized = (tokenEntry) => {
+      const tokenRow = this.generated.stores.tokenInfoStore.tokenInfo
+        .get(tokenEntry.networkId.toString())
+        ?.get(tokenEntry.identifier);
+      if (tokenRow == null) throw new Error(`${nameof(StakingDashboardPage)} no token info for ${JSON.stringify(tokenEntry)}`);
+
+      return tokenEntry.amount.shiftedBy(-tokenRow.Metadata.numberOfDecimals);
+    }
     for (let i = startEpoch; i < endEpoch; i++) {
       if (historyIterator < history.length && i === history[historyIterator][0]) {
         // exists a reward for this epoch
         const nextReward = history[historyIterator][1];
-        amountSum = amountSum.plus(nextReward);
+        amountSum = amountSum.joinAddMutable(nextReward);
         totalRewards.push({
           name: i,
-          primary: amountSum.dividedBy(amountPerUnit).toNumber(),
+          primary: getNormalized(amountSum.getDefaultEntry()).toNumber(),
         });
         perEpochRewards.push({
           name: i,
-          primary: nextReward.div(amountPerUnit.toNumber()).toNumber(),
+          primary: getNormalized(nextReward.getDefaultEntry()).toNumber(),
         });
         historyIterator++;
       } else {
         // no reward for this epoch
         totalRewards.push({
           name: i,
-          primary: amountSum.dividedBy(amountPerUnit).toNumber(),
+          primary: getNormalized(amountSum.getDefaultEntry()).toNumber(),
         });
         perEpochRewards.push({
           name: i,
@@ -1013,6 +1004,10 @@ export default class StakingDashboardPage extends Component<Props> {
         getCurrentTimeRequests: (PublicDeriver<>) => CurrentTimeRequests,
         getTimeCalcRequests: (PublicDeriver<>) => TimeCalcRequests,
       |},
+      tokenInfoStore: {|
+        tokenInfo: TokenInfoMap,
+        getDefaultTokenInfo: number => $ReadOnly<TokenRow>,
+      |},
       substores: {|
         ada: {|
           delegation: {|
@@ -1100,6 +1095,10 @@ export default class StakingDashboardPage extends Component<Props> {
         },
         coinPriceStore: {
           getCurrentPrice: stores.coinPriceStore.getCurrentPrice,
+        },
+        tokenInfoStore: {
+          tokenInfo: stores.tokenInfoStore.tokenInfo,
+          getDefaultTokenInfo: stores.tokenInfoStore.getDefaultTokenInfo,
         },
         uiDialogs: {
           isOpen: stores.uiDialogs.isOpen,

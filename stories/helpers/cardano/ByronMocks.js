@@ -23,7 +23,7 @@ import {
 } from '../../../app/api/ada/lib/storage/database/walletTypes/bip44/api/utils';
 import { Bip44Wallet } from '../../../app/api/ada/lib/storage/models/Bip44Wallet/wrapper';
 import { WalletTypeOption } from '../../../app/api/ada/lib/storage/models/ConceptualWallet/interfaces';
-import { networks, getCardanoHaskellBaseConfig, } from '../../../app/api/ada/lib/storage/database/prepackaged/networks';
+import { networks, getCardanoHaskellBaseConfig, defaultAssets, } from '../../../app/api/ada/lib/storage/database/prepackaged/networks';
 import type { ConceptualWalletSettingsCache } from '../../../app/stores/toplevel/WalletSettingsStore';
 import WalletSettingsStore from '../../../app/stores/toplevel/WalletSettingsStore';
 import TransactionsStore from '../../../app/stores/toplevel/TransactionsStore';
@@ -45,6 +45,13 @@ import { RustModule } from '../../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import type { ISignRequest } from '../../../app/api/common/lib/transactions/ISignRequest';
 import DelegationStore from '../../../app/stores/toplevel/DelegationStore';
 import AdaDelegationStore from '../../../app/stores/ada/AdaDelegationStore';
+import {
+  MultiToken,
+} from '../../../app/api/common/lib/MultiToken';
+import {
+  getDefaultEntryTokenInfo,
+  mockFromDefaults,
+} from '../../../app/stores/toplevel/TokenInfoStore';
 
 function genByronSigningWallet(
   genHardwareInfo?: number => HwWalletMetaRow,
@@ -66,6 +73,10 @@ function genByronSigningWallet(
       })(),
       hardwareInfo,
       networkInfo: networks.CardanoMainnet,
+      defaultToken: getDefaultEntryTokenInfo(
+        networks.JormungandrMainnet.NetworkId,
+        mockFromDefaults(defaultAssets)
+      ),
     },
     {
       ConceptualWalletId: conceptualWalletId,
@@ -93,6 +104,8 @@ function genByronSigningWallet(
 }
 
 function genMockByronBip44Cache(dummyWallet: PublicDeriver<>) {
+  const defaultToken = dummyWallet.getParent().getDefaultToken();
+
   const pendingRequest = new CachedRequest(_publicDeriver => Promise.resolve([]));
   const recentRequest = new CachedRequest(_request => Promise.resolve({
     transactions: [],
@@ -103,7 +116,7 @@ function genMockByronBip44Cache(dummyWallet: PublicDeriver<>) {
     total: 0,
   }));
   const getBalanceRequest = new CachedRequest(_request => Promise.resolve(
-    new BigNumber(0),
+    new MultiToken([], defaultToken),
   ));
   return {
     conceptualWalletCache: {
@@ -293,6 +306,7 @@ export const genTentativeByronTx = (
         ChainNetworkId: Number.parseInt(baseConfig.ChainNetworkId, 10),
         PoolDeposit: new BigNumber(baseConfig.PoolDeposit),
         KeyDeposit: new BigNumber(baseConfig.KeyDeposit),
+        NetworkId: publicDeriver.getParent().getNetworkInfo().NetworkId,
       },
       {
         neededHashes: new Set(),

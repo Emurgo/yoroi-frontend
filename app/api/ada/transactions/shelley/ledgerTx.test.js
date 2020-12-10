@@ -29,6 +29,7 @@ function getProtocolParams(): {|
   minimumUtxoVal: RustModule.WalletV4.BigNum,
   poolDeposit: RustModule.WalletV4.BigNum,
   keyDeposit: RustModule.WalletV4.BigNum,
+  networkId: number,
   |} {
   return {
     linearFee: RustModule.WalletV4.LinearFee.new(
@@ -38,6 +39,7 @@ function getProtocolParams(): {|
     minimumUtxoVal: RustModule.WalletV4.BigNum.from_str('1'),
     poolDeposit: RustModule.WalletV4.BigNum.from_str('500'),
     keyDeposit: RustModule.WalletV4.BigNum.from_str('500'),
+    networkId: network.NetworkId,
   };
 }
 
@@ -330,6 +332,7 @@ test('Create Ledger transaction', async () => {
       ChainNetworkId: Number.parseInt(baseConfig.ChainNetworkId, 10),
       PoolDeposit: new BigNumber(baseConfig.PoolDeposit),
       KeyDeposit: new BigNumber(baseConfig.KeyDeposit),
+      NetworkId: network.NetworkId,
     },
     {
       neededHashes: new Set([Buffer.from(stakeCredential.to_bytes()).toString('hex')]),

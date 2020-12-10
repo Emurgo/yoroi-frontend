@@ -39,6 +39,7 @@ import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/t
 import type { GetRegistrationHistoryResponse, GetRegistrationHistoryFunc } from '../../api/ada/lib/storage/bridge/delegationUtils';
 import type { MangledAmountFunc } from '../stateless/mangledAddresses';
 import { getUnmangleAmounts } from '../stateless/mangledAddresses';
+import { MultiToken } from '../../api/common/lib/MultiToken';
 
 export type AdaDelegationRequests = {|
   publicDeriver: PublicDeriver<>,
@@ -67,9 +68,18 @@ export default class AdaDelegationStore extends Store {
           network: publicDeriver.getParent().getNetworkInfo(),
           addresses: [address],
         });
+
+        const defaultToken = publicDeriver.getParent().getDefaultToken();
         // flowlint-next-line unnecessary-optional-chain:off
         const addressRewards = historyResult[address]?.map(info => (
-          ([info.epoch, new BigNumber(info.reward)]: [number, BigNumber])
+          ([info.epoch, new MultiToken(
+            [{
+              amount: new BigNumber(info.reward),
+              identifier: defaultToken.defaultIdentifier,
+              networkId: defaultToken.defaultNetworkId,
+            }],
+            defaultToken
+          )]: [number, MultiToken])
         ));
         return addressRewards != null
           ? addressRewards
@@ -106,6 +116,8 @@ export default class AdaDelegationStore extends Store {
         delegationRequest.error = undefined;
       });
 
+      const defaultToken = publicDeriver.getParent().getDefaultToken();
+
       const withStakingKey = asGetStakingKey(publicDeriver);
       if (withStakingKey == null) {
         throw new Error(`${nameof(this.refreshDelegation)} missing staking key functionality`);
@@ -123,9 +135,16 @@ export default class AdaDelegationStore extends Store {
           const stateForStakingKey = accountStateResp[stakingKeyResp.addr.Hash];
           const delegatedBalance = delegationRequest.getDelegatedBalance.execute({
             publicDeriver: withStakingKey,
-            rewardBalance: new BigNumber(stateForStakingKey == null
-              ? 0
-              : stateForStakingKey.remainingAmount),
+            rewardBalance: new MultiToken(
+              [{
+                amount: new BigNumber(stateForStakingKey == null
+                  ? 0
+                  : stateForStakingKey.remainingAmount),
+                networkId: defaultToken.defaultNetworkId,
+                identifier: defaultToken.defaultIdentifier,
+              }],
+              defaultToken
+            ),
             stakingAddress: stakingKeyResp.addr.Hash,
           }).promise;
           if (delegatedBalance == null) throw new Error('Should never happen');

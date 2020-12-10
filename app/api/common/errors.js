@@ -140,6 +140,10 @@ const messages = defineMessages({
     id: 'api.errors.checkAdressesInUseApiError',
     defaultMessage: '!!!Error received from server while checking used addresses.',
   },
+  assetInfoApiError: {
+    id: 'api.errors.assetInfoApiError',
+    defaultMessage: '!!!Error received from server while getting asset info.',
+  },
   getAccountStateApiError: {
     id: 'api.errors.getAccountStateApiError',
     defaultMessage: '!!!Error received from server while getting account state.',
@@ -450,6 +454,15 @@ export class SendTransactionApiError extends LocalizableError {
 }
 
 export class CheckAddressesInUseApiError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.checkAdressesInUseApiError.id,
+      defaultMessage: messages.checkAdressesInUseApiError.defaultMessage || '',
+    });
+  }
+}
+
+export class GetAssetInfoApiError extends LocalizableError {
   constructor() {
     super({
       id: messages.checkAdressesInUseApiError.id,

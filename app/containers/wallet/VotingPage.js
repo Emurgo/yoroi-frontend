@@ -15,7 +15,6 @@ import Dialog from '../../components/widgets/Dialog';
 import DialogCloseButton from '../../components/widgets/DialogCloseButton';
 import ErrorBlock from '../../components/widgets/ErrorBlock';
 import AnnotatedLoader from '../../components/transfer/AnnotatedLoader';
-import { getApiForNetwork, getApiMeta } from '../../api/common/utils';
 import type { CreateVotingRegTxFunc } from '../../api/ada/index';
 import { SelectedExplorer } from '../../domain/SelectedExplorer';
 import LocalizableError from '../../i18n/LocalizableError';
@@ -23,6 +22,8 @@ import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/in
 import VotingRegTxDialog from '../../components/wallet/voting/VotingRegTxDialog';
 import VotingRegSuccessDialog from '../../components/wallet/voting/VotingRegSuccessDialog';
 import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
+import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
+import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
 
 import SpendingPasswordInput from '../../components/widgets/forms/SpendingPasswordInput';
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
@@ -108,10 +109,6 @@ export default class VotingPage extends Component<Props> {
       return null;
     }
 
-    const networkInfo = selectedWallet.getParent().getNetworkInfo();
-    const apiMeta = getApiMeta(getApiForNetwork(networkInfo))?.meta;
-    if (apiMeta == null) throw new Error(`${nameof(VotingPage)} no API selected`);
-
     const showSignDialog =
       this.generated.stores.wallets.sendMoneyRequest.isExecuting ||
       !this.generated.stores.wallets.sendMoneyRequest.wasExecuted ||
@@ -138,11 +135,12 @@ export default class VotingPage extends Component<Props> {
       return (
         <VotingRegTxDialog
           staleTx={votingRegTransaction.isStale}
-          transactionFee={votingRegTx.fee(true)}
+          transactionFee={votingRegTx.fee()}
           isSubmitting={this.generated.stores.wallets.sendMoneyRequest.isExecuting}
           isHardware={
             selectedWallet.getParent().getWalletType() === WalletTypeOption.HARDWARE_WALLET
           }
+          getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
           onCancel={this.cancel}
           onSubmit={({ password }) =>
             this.generated.actions.ada.votingTransaction.signTransaction.trigger({
@@ -152,11 +150,6 @@ export default class VotingPage extends Component<Props> {
           }
           classicTheme={this.generated.stores.profile.isClassicTheme}
           error={this.generated.stores.wallets.sendMoneyRequest.error}
-          meta={{
-            decimalPlaces: apiMeta.decimalPlaces.toNumber(),
-            totalSupply: apiMeta.totalSupply,
-            ticker: apiMeta.primaryTicker,
-          }}
         />
       );
     }
@@ -253,6 +246,9 @@ export default class VotingPage extends Component<Props> {
         isClassicTheme: boolean,
         currentLocale: string,
       |},
+      tokenInfoStore: {|
+        tokenInfo: TokenInfoMap,
+      |},
       substores: {|
         ada: {|
           votingRegTransaction: {|
@@ -331,6 +327,9 @@ export default class VotingPage extends Component<Props> {
         profile: {
           isClassicTheme: stores.profile.isClassicTheme,
           currentLocale: stores.profile.currentLocale,
+        },
+        tokenInfoStore: {
+          tokenInfo: stores.tokenInfoStore.tokenInfo,
         },
         transactions: {
           hasAnyPending: stores.transactions.hasAnyPending,

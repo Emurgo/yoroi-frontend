@@ -33,7 +33,7 @@ export async function filterMangledAddresses(request: {|
 
   const stakingKey = unwrapStakingKey(stakingKeyResp.addr.Hash);
 
-  const filterResult = filterAddressesByStakingKey(
+  const filterResult = filterAddressesByStakingKey<StandardAddress>(
     stakingKey,
     request.baseAddresses,
     false,

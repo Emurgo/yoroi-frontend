@@ -7,7 +7,6 @@ import React, { Component, } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { Input } from 'react-polymorph/lib/components/Input';
-import BigNumber from 'bignumber.js';
 import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
 import { intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
@@ -25,26 +24,34 @@ import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType'
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 import WarningBox from '../../widgets/WarningBox';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { truncateAddress } from '../../../utils/formatters';
+import {
+  truncateAddress,
+} from '../../../utils/formatters';
+import {
+  MultiToken,
+} from '../../../api/common/lib/MultiToken';
+import type {
+  TokenLookupKey,
+} from '../../../api/common/lib/MultiToken';
+import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
+import { getTokenName, genFormatTokenAmount } from '../../../stores/stateless/tokenHelpers';
 
 type Props = {|
   +staleTx: boolean,
   +selectedExplorer: SelectedExplorer,
-  +amount: BigNumber,
+  +amount: MultiToken,
   +receivers: Array<string>,
-  +totalAmount: BigNumber,
-  +transactionFee: BigNumber,
+  +totalAmount: MultiToken,
+  +transactionFee: MultiToken,
   +onSubmit: ({| password: string |}) => PossiblyAsync<void>,
-  +amountToNaturalUnits: (amountWithFractions: string) => string,
-  +formattedWalletAmount: BigNumber => string,
   +addressToDisplayString: string => string,
   +onCancel: void => void,
   +isSubmitting: boolean,
   +error: ?LocalizableError,
-  +ticker: string,
   +classicTheme: boolean,
   +unitOfAccountSetting: UnitOfAccountSettingType,
-  +coinPrice: ?number
+  +getTokenInfo: Inexact<TokenLookupKey> => $ReadOnly<TokenRow>,
+  +getCurrentPrice: (from: string, to: string) => ?number,
 |};
 
 @observer
@@ -105,9 +112,7 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
       transactionFee,
       isSubmitting,
       error,
-      ticker,
       unitOfAccountSetting,
-      coinPrice,
     } = this.props;
 
     const staleTxWarning = (
@@ -139,6 +144,27 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
         disabled: !walletPasswordField.isValid,
       },
     ];
+
+    const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
+    const convertedToUnitOfAccount = (tokens, toCurrency) => {
+      const defaultEntry = tokens.getDefaultEntry();
+      const tokenInfo = this.props.getTokenInfo(defaultEntry);
+
+      const shiftedAmount = defaultEntry.amount
+        .shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
+
+      const coinPrice = this.props.getCurrentPrice(
+        tokenInfo.Identifier,
+        toCurrency
+      );
+
+      if (coinPrice == null) return '-';
+
+      return calculateAndFormatValue(
+        shiftedAmount,
+        coinPrice
+      );
+    };
 
     return (
       <Dialog
@@ -181,21 +207,28 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
               {unitOfAccountSetting.enabled ? (
                 <>
                   <div className={styles.amount}>
-                    {coinPrice != null ?
-                      calculateAndFormatValue(amount, coinPrice) :
-                      '-'
-                    }
+                    {convertedToUnitOfAccount(amount, unitOfAccountSetting.currency)}
                     <span className={styles.currencySymbol}>
                       &nbsp;{unitOfAccountSetting.currency}
                     </span>
                   </div>
-                  <div className={styles.amountSmall}>{this.props.formattedWalletAmount(amount)}
-                    <span className={styles.currencySymbol}>&nbsp;{ticker}</span>
+                  <div className={styles.amountSmall}>{formatValue(amount.getDefaultEntry())}
+                    <span className={styles.currencySymbol}>&nbsp;{
+                      getTokenName(this.props.getTokenInfo(
+                        amount.getDefaultEntry()
+                      ))
+                    }
+                    </span>
                   </div>
                 </>
               ) : (
-                <div className={styles.amount}>{this.props.formattedWalletAmount(amount)}
-                  <span className={styles.currencySymbol}>&nbsp;{ticker}</span>
+                <div className={styles.amount}>{formatValue(amount.getDefaultEntry())}
+                  <span className={styles.currencySymbol}>&nbsp;{
+                    getTokenName(this.props.getTokenInfo(
+                      amount.getDefaultEntry()
+                    ))
+                  }
+                  </span>
                 </div>
               )}
             </div>
@@ -207,23 +240,30 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
               {unitOfAccountSetting.enabled ? (
                 <>
                   <div className={styles.fees}>+
-                    {coinPrice != null ?
-                      calculateAndFormatValue(transactionFee, coinPrice) :
-                      '-'
-                    }
+                    {convertedToUnitOfAccount(transactionFee, unitOfAccountSetting.currency)}
                     <span className={styles.currencySymbol}>
                       &nbsp;{unitOfAccountSetting.currency}
                     </span>
                   </div>
                   <div className={styles.feesSmall}>
-                    +{this.props.formattedWalletAmount(transactionFee)}
-                    <span className={styles.currencySymbol}>&nbsp;{ticker}</span>
+                    +{formatValue(transactionFee.getDefaultEntry())}
+                    <span className={styles.currencySymbol}>&nbsp;{
+                      getTokenName(this.props.getTokenInfo(
+                        transactionFee.getDefaultEntry()
+                      ))
+                    }
+                    </span>
                   </div>
                 </>
               ) : (
                 <div className={styles.fees}>
-                  +{this.props.formattedWalletAmount(transactionFee)}
-                  <span className={styles.currencySymbol}>&nbsp;{ticker}</span>
+                  +{formatValue(transactionFee.getDefaultEntry())}
+                  <span className={styles.currencySymbol}>&nbsp;{
+                    getTokenName(this.props.getTokenInfo(
+                      transactionFee.getDefaultEntry()
+                    ))
+                  }
+                  </span>
                 </div>
               )}
             </div>
@@ -236,22 +276,29 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
             {unitOfAccountSetting.enabled ? (
               <>
                 <div className={styles.totalAmount}>
-                  {coinPrice != null ?
-                    calculateAndFormatValue(totalAmount, coinPrice) :
-                    '-'
-                  }
+                  {convertedToUnitOfAccount(totalAmount, unitOfAccountSetting.currency)}
                   <span className={styles.currencySymbol}>
                     &nbsp;{unitOfAccountSetting.currency}
                   </span>
                 </div>
                 <div className={styles.totalAmountSmall}>
-                  {this.props.formattedWalletAmount(totalAmount)}
-                  <span className={styles.currencySymbol}>&nbsp;{ticker}</span>
+                  {formatValue(totalAmount.getDefaultEntry())}
+                  <span className={styles.currencySymbol}>&nbsp;{
+                    getTokenName(this.props.getTokenInfo(
+                      totalAmount.getDefaultEntry()
+                    ))
+                  }
+                  </span>
                 </div>
               </>
             ) : (
-              <div className={styles.totalAmount}>{this.props.formattedWalletAmount(totalAmount)}
-                <span className={styles.currencySymbol}>&nbsp;{ticker}</span>
+              <div className={styles.totalAmount}>{formatValue(totalAmount.getDefaultEntry())}
+                <span className={styles.currencySymbol}>&nbsp;{
+                  getTokenName(this.props.getTokenInfo(
+                    totalAmount.getDefaultEntry()
+                  ))
+                }
+                </span>
               </div>
             )}
           </div>

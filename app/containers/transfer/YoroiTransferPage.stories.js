@@ -46,6 +46,11 @@ import { allAddressSubgroups } from '../../stores/stateless/addressStores';
 import type {
   Address, Addressing
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
+import { defaultAssets, } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import {
+  MultiToken,
+} from '../../api/common/lib/MultiToken';
+import { mockFromDefaults, getDefaultEntryTokenInfo, } from '../../stores/toplevel/TokenInfoStore';
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -119,6 +124,9 @@ const genBaseProps: {|
     coinPriceStore: {
       getCurrentPrice: (_from, _to) => 5,
     },
+    tokenInfoStore: {
+      tokenInfo: mockFromDefaults(defaultAssets),
+    },
     yoroiTransfer: {
       mode: request.mode,
       status: TransferStatus.UNINITIALIZED,
@@ -173,6 +181,9 @@ const genBaseProps: {|
             },
             coinPriceStore: {
               getCurrentPrice: (_from, _to) => 5,
+            },
+            tokenInfoStore: {
+              tokenInfo: mockFromDefaults(defaultAssets),
             },
           },
           actions: {
@@ -419,6 +430,12 @@ export const GeneratingTx = (): Node => {
 export const TransferTxPage = (): Node => {
   const wallet = genShelleyCip1852DummyWithCache();
   const lookup = walletLookup([wallet]);
+
+  const primaryAssetConstant = defaultAssets.filter(
+    asset => asset.NetworkId === wallet.publicDeriver.getParent().getNetworkInfo().NetworkId
+  )[0];
+  const defaultToken = wallet.publicDeriver.getParent().getDefaultToken();
+
   return (() => {
     const errorCases = {
       NoError: 0,
@@ -442,8 +459,22 @@ export const TransferTxPage = (): Node => {
           ? undefined
           : new WalletChangedError(),
         transferTx: {
-          recoveredBalance: new BigNumber(1),
-          fee: new BigNumber(0.1),
+          recoveredBalance: new MultiToken(
+            [{
+              identifier: primaryAssetConstant.Identifier,
+              amount: new BigNumber(1_000_000),
+              networkId: wallet.publicDeriver.getParent().getNetworkInfo().NetworkId,
+            }],
+            defaultToken
+          ),
+          fee: new MultiToken(
+            [{
+              identifier: primaryAssetConstant.Identifier,
+              amount: new BigNumber(100_000),
+              networkId: wallet.publicDeriver.getParent().getNetworkInfo().NetworkId,
+            }],
+            defaultToken
+          ),
           id: 'b65ae37bcc560e323ea8922de6573004299b6646e69ab9fac305f62f0c94c3ab',
           encodedTx: new Uint8Array([]),
           senders: ['Ae2tdPwUPEZE9RAm3d3zuuh22YjqDxhR1JF6G93uJsRrk51QGHzRUzLvDjL'],
@@ -487,6 +518,12 @@ export const WithdrawalKeyInput = (): Node => {
 export const WithdrawalTxPage = (): Node => {
   const wallet = genShelleyCip1852DummyWithCache();
   const lookup = walletLookup([wallet]);
+
+  const primaryAssetConstant = defaultAssets.filter(
+    asset => asset.NetworkId === wallet.publicDeriver.getParent().getNetworkInfo().NetworkId
+  )[0];
+  const defaultToken = wallet.publicDeriver.getParent().getDefaultToken();
+
   return (() => {
     const errorCases = {
       NoError: 0,
@@ -502,6 +539,15 @@ export const WithdrawalTxPage = (): Node => {
       withdrawalProps: {
         actions: Object.freeze({}),
         stores: {
+          profile: {
+            selectedNetwork: wallet.publicDeriver.getParent().getNetworkInfo()
+          },
+          tokenInfoStore: {
+            getDefaultTokenInfo: networkId => getDefaultEntryTokenInfo(
+              networkId,
+              mockFromDefaults(defaultAssets)
+            ),
+          },
           substores: {
             ada: {
               delegationTransaction: {
@@ -534,8 +580,22 @@ export const WithdrawalTxPage = (): Node => {
           ? undefined
           : new WalletChangedError(),
         transferTx: {
-          recoveredBalance: new BigNumber(1),
-          fee: new BigNumber(0.1),
+          recoveredBalance: new MultiToken(
+            [{
+              identifier: primaryAssetConstant.Identifier,
+              amount: new BigNumber(1_000_000),
+              networkId: wallet.publicDeriver.getParent().getNetworkInfo().NetworkId,
+            }],
+            defaultToken
+          ),
+          fee: new MultiToken(
+            [{
+              identifier: primaryAssetConstant.Identifier,
+              amount: new BigNumber(100_000),
+              networkId: wallet.publicDeriver.getParent().getNetworkInfo().NetworkId,
+            }],
+            defaultToken
+          ),
           id: 'b65ae37bcc560e323ea8922de6573004299b6646e69ab9fac305f62f0c94c3ab',
           encodedTx: new Uint8Array([]),
           senders: ['Ae2tdPwUPEZE9RAm3d3zuuh22YjqDxhR1JF6G93uJsRrk51QGHzRUzLvDjL'],

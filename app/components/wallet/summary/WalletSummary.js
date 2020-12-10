@@ -1,6 +1,5 @@
 // @flow
 import React, { Component, } from 'react';
-import BigNumber from 'bignumber.js';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
@@ -14,6 +13,15 @@ import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType'
 import { formatValue } from '../../../utils/unit-of-account';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { splitAmount } from '../../../utils/formatters';
+import {
+  MultiToken,
+} from '../../../api/common/lib/MultiToken';
+import { hiddenAmount } from '../../../utils/strings';
+import type {
+  TokenLookupKey,
+} from '../../../api/common/lib/MultiToken';
+import { getTokenName } from '../../../stores/stateless/tokenHelpers';
+import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 
 const messages = defineMessages({
   pendingOutgoingConfirmationLabel: {
@@ -50,13 +58,10 @@ type Props = {|
   +numberOfTransactions: number,
   +shouldHideBalance: boolean,
   +pendingAmount: UnconfirmedAmount,
-  +meta: {|
-    +decimalPlaces: number,
-    +primaryTicker: string,
-  |},
   +isLoadingTransactions: boolean,
   +openExportTxToFileDialog: void => void,
   +unitOfAccountSetting: UnitOfAccountSettingType,
+  +getTokenInfo: Inexact<TokenLookupKey> => $ReadOnly<TokenRow>,
 |};
 
 @observer
@@ -68,15 +73,20 @@ export default class WalletSummary extends Component<Props> {
 
   renderAmountDisplay: {|
     shouldHideBalance: boolean,
-    amount: BigNumber
+    amount: MultiToken
   |} => Node = (request) => {
+    const defaultEntry = request.amount.getDefaultEntry();
+    const tokenInfo = this.props.getTokenInfo(defaultEntry);
+
     let balanceDisplay;
     if (request.shouldHideBalance) {
-      balanceDisplay = (<span>******</span>);
+      balanceDisplay = (<span>{hiddenAmount}</span>);
     } else {
+      const shiftedAmount = defaultEntry.amount
+        .shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
       const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
-        request.amount,
-        this.props.meta.decimalPlaces,
+        shiftedAmount,
+        tokenInfo.Metadata.numberOfDecimals
       );
 
       balanceDisplay = (
@@ -87,7 +97,7 @@ export default class WalletSummary extends Component<Props> {
       );
     }
 
-    return (<>{balanceDisplay} {this.props.meta.primaryTicker}</>);
+    return (<>{balanceDisplay} {getTokenName(tokenInfo)}</>);
   }
 
   render(): Node {
@@ -110,9 +120,9 @@ export default class WalletSummary extends Component<Props> {
                 <div className={styles.numberOfTransactions}>
                   {intl.formatMessage(messages.numOfTxsLabel)}: <span>{numberOfTransactions}</span>
                 </div>
-                {(pendingAmount.incoming.gt(0) || pendingAmount.outgoing.gt(0)) && (
+                {(!pendingAmount.incoming.isEmpty() || !pendingAmount.outgoing.isEmpty()) && (
                   <div className={styles.pendingSection}>
-                    {pendingAmount.incoming.isGreaterThan(0) &&
+                    {!pendingAmount.incoming.isEmpty() &&
                       <div className={styles.pendingConfirmation}>
                         {`${intl.formatMessage(messages.pendingIncomingConfirmationLabel)}`}
                         :&nbsp;
@@ -135,7 +145,7 @@ export default class WalletSummary extends Component<Props> {
                           )}
                       </div>
                     }
-                    {pendingAmount.outgoing.isGreaterThan(0) &&
+                    {!pendingAmount.outgoing.isEmpty() &&
                       <div className={styles.pendingConfirmation}>
                         {`${intl.formatMessage(messages.pendingOutgoingConfirmationLabel)}`}
                         :&nbsp;

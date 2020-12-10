@@ -214,7 +214,6 @@ async function checkPub1HasTx(
         },
         UtxoTransactionOutput: {
           AddressId: 5,
-          Amount: '2100000',
           IsUnspent: true,
           OutputIndex: 0,
           TransactionId: 1,
@@ -222,19 +221,43 @@ async function checkPub1HasTx(
           ErgoBoxId: null,
           ErgoCreationHeight: null,
           ErgoTree: null,
-        }
+          TokenListId: 1,
+        },
+        tokens: [{
+          Token: {
+            Digest: 6.262633522161549e-167,
+            IsDefault: true,
+            Identifier: '',
+            Metadata: {
+              assetName: '',
+              longName: null,
+              numberOfDecimals: 6,
+              policyId: '',
+              ticker: 'ADA',
+              type: 'Cardano',
+            },
+            NetworkId: 0,
+            TokenId: 1,
+          },
+          TokenList: {
+            Amount: '2100000',
+            ListId: 1,
+            TokenId: 1,
+            TokenListItemId: 2,
+          },
+        }],
       }
     }]);
   }
 
   {
     const response = await basePubDeriver.getUtxoBalance();
-    expect(response).toEqual(new BigNumber('2100000'));
+    expect(response.getDefault()).toEqual(new BigNumber('2100000'));
   }
 
   {
     const response = await basePubDeriver.getUtxoBalance();
-    expect(response).toEqual(new BigNumber('2100000'));
+    expect(response.getDefault()).toEqual(new BigNumber('2100000'));
   }
 
   {
@@ -263,12 +286,12 @@ async function checkPub2IsEmpty(
 
   {
     const response = await basePubDeriver.getUtxoBalance();
-    expect(response).toEqual(new BigNumber('0'));
+    expect(response.getDefault()).toEqual(new BigNumber('0'));
   }
 
   {
     const response = await basePubDeriver.getUtxoBalance();
-    expect(response).toEqual(new BigNumber('0'));
+    expect(response.getDefault()).toEqual(new BigNumber('0'));
   }
 
   {
@@ -325,7 +348,6 @@ async function checkPub2HasTx(
         },
         UtxoTransactionOutput: {
           AddressId: 41,
-          Amount: '2700000',
           IsUnspent: true,
           OutputIndex: 1,
           TransactionId: 2,
@@ -333,19 +355,43 @@ async function checkPub2HasTx(
           ErgoBoxId: null,
           ErgoCreationHeight: null,
           ErgoTree: null,
-        }
+          TokenListId: 5,
+        },
+        tokens: [{
+          Token: {
+            Digest: 6.262633522161549e-167,
+            IsDefault: true,
+            Identifier: '',
+            Metadata: {
+              assetName: '',
+              longName: null,
+              numberOfDecimals: 6,
+              policyId: '',
+              ticker: 'ADA',
+              type: 'Cardano',
+            },
+            NetworkId: 0,
+            TokenId: 1,
+          },
+          TokenList: {
+            Amount: '2700000',
+            ListId: 5,
+            TokenId: 1,
+            TokenListItemId: 6,
+          },
+        }],
       }
     }]);
   }
 
   {
     const response = await basePubDeriver.getUtxoBalance();
-    expect(response).toEqual(new BigNumber('2700000'));
+    expect(response.getDefault()).toEqual(new BigNumber('2700000'));
   }
 
   {
     const response = await basePubDeriver.getUtxoBalance();
-    expect(response).toEqual(new BigNumber('2700000'));
+    expect(response.getDefault()).toEqual(new BigNumber('2700000'));
   }
 
   {
@@ -479,7 +525,9 @@ async function syncingSimpleTransaction(
     'UtxoTransactionInput',
     'UtxoTransactionOutput',
     'LastSyncInfo',
-    'Block'
+    'Block',
+    'Token',
+    'TokenList',
   ];
   const dump = (await db.export()).tables;
   filterDbSnapshot(dump, keysForTest);

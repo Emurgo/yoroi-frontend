@@ -2,7 +2,6 @@
 import React, { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import BigNumber from 'bignumber.js';
 import { intlShape } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 import { splitAmount } from '../../../utils/formatters';
@@ -10,22 +9,26 @@ import styles from './WalletDetails.scss';
 import IconEyeOpen from '../../../assets/images/my-wallets/icon_eye_open.inline.svg';
 import IconEyeClosed from '../../../assets/images/my-wallets/icon_eye_closed.inline.svg';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { hiddenAmount } from '../../../utils/strings';
+import { MultiToken } from '../../../api/common/lib/MultiToken';
+import type {
+  TokenLookupKey,
+} from '../../../api/common/lib/MultiToken';
+import { getTokenName } from '../../../stores/stateless/tokenHelpers';
+import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 
 type Props = {|
-    +onUpdateHideBalance: void => Promise<void>,
-    +shouldHideBalance: boolean,
-    /**
-      * undefined => wallet is not a reward wallet
-      * null => still calculating
-      * value => done calculating
-    */
-    +rewards: null | void | BigNumber,
-    +walletAmount: null | BigNumber,
-    +infoText?: string,
-    +meta: {|
-      +ticker: string,
-      +decimalPlaces: number,
-    |}
+  +onUpdateHideBalance: void => Promise<void>,
+  +shouldHideBalance: boolean,
+  /**
+    * undefined => wallet is not a reward wallet
+    * null => still calculating
+    * value => done calculating
+  */
+  +rewards: null | void | MultiToken,
+  +walletAmount: null | MultiToken,
+  +infoText?: string,
+  +getTokenInfo: Inexact<TokenLookupKey> => $ReadOnly<TokenRow>,
 |};
 
 @observer
@@ -55,7 +58,7 @@ export default class WalletDetails extends Component<Props> {
             {this.renderAmountDisplay({
               shouldHideBalance,
               amount: walletAmount != null && rewards != null
-                ? walletAmount.plus(rewards)
+                ? walletAmount.joinAddCopy(rewards)
                 : null
             })}
             <span className={styles.amountLabel}>
@@ -66,7 +69,6 @@ export default class WalletDetails extends Component<Props> {
             {this.renderAmountDisplay({
               shouldHideBalance,
               amount: walletAmount,
-              decimalPlaces: this.props.meta.decimalPlaces,
             })}
             <span className={styles.amountLabel}>
               {intl.formatMessage(globalMessages.walletLabel)}
@@ -92,20 +94,24 @@ export default class WalletDetails extends Component<Props> {
 
   renderAmountDisplay: {|
     shouldHideBalance: boolean,
-    amount: ?BigNumber,
-    decimalPlaces: number,
+    amount: ?MultiToken,
   |} => Node = (request) => {
     if (request.amount == null) {
       return <div className={styles.isLoading} />;
     }
 
+    const defaultEntry = request.amount.getDefaultEntry();
+    const tokenInfo = this.props.getTokenInfo(defaultEntry);
+    const shiftedAmount = defaultEntry.amount
+      .shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
+
     let balanceDisplay;
     if (request.shouldHideBalance) {
-      balanceDisplay = (<span>******</span>);
+      balanceDisplay = (<span>{hiddenAmount}</span>);
     } else {
       const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
-        request.amount,
-        request.decimalPlaces,
+        shiftedAmount,
+        tokenInfo.Metadata.numberOfDecimals,
       );
 
       balanceDisplay = (
@@ -116,6 +122,6 @@ export default class WalletDetails extends Component<Props> {
       );
     }
 
-    return (<>{balanceDisplay} {this.props.meta.ticker}</>);
+    return (<>{balanceDisplay} {getTokenName(tokenInfo)}</>);
   }
 }

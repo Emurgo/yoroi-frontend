@@ -16,12 +16,17 @@ import { addressFilter, AddressFilter, } from '../../types/AddressFilterTypes';
 import environment from '../../environment';
 import type { Notification } from '../../types/notificationType';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import BigNumber from 'bignumber.js';
 import { truncateAddressShort, splitAmount } from '../../utils/formatters';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import NoTransactionModernSvg from '../../assets/images/transaction/no-transactions-yet.modern.inline.svg';
 import AddLabelIcon from '../../assets/images/add-label.inline.svg';
 import EditLabelIcon from '../../assets/images/edit.inline.svg';
+import { hiddenAmount } from '../../utils/strings';
+import type {
+  TokenEntry, TokenLookupKey,
+} from '../../api/common/lib/MultiToken';
+import { getTokenName } from '../../stores/stateless/tokenHelpers';
+import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
 
 const messages = defineMessages({
   generatedAddressesSectionTitle: {
@@ -72,10 +77,7 @@ type Props = {|
   +onGeneratePaymentURI: void | (string => void),
   +shouldHideBalance: boolean,
   +unitOfAccountSetting: UnitOfAccountSettingType,
-  +meta: {|
-    +primaryTicker: string,
-    +decimalPlaces: number,
-  |},
+  +getTokenInfo: Inexact<TokenLookupKey> => $ReadOnly<TokenRow>,
   +addressBook: boolean,
 |};
 
@@ -85,13 +87,18 @@ export default class WalletReceive extends Component<Props> {
     intl: intlShape.isRequired,
   };
 
-  getAmount: BigNumber => ?Node = walletAmount => {
+  getAmount: TokenEntry => ?Node = tokenEntry => {
     if (this.props.shouldHideBalance) {
-      return (<span>******</span>);
+      return (<span>{hiddenAmount}</span>);
     }
+    const tokenInfo = this.props.getTokenInfo(tokenEntry);
+
+    const shiftedAmount = tokenEntry.amount
+      .shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
+
     const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
-      walletAmount,
-      this.props.meta.decimalPlaces
+      shiftedAmount,
+      tokenInfo.Metadata.numberOfDecimals
     );
     // recall: can't be negative in this situation
     const adjustedBefore = '+' + beforeDecimalRewards;
@@ -100,6 +107,11 @@ export default class WalletReceive extends Component<Props> {
       <>
         {adjustedBefore}
         <span className={styles.afterDecimal}>{afterDecimalRewards}</span>
+        {' '}
+        {this.props.unitOfAccountSetting.enabled
+          ? this.props.unitOfAccountSetting.currency
+          : getTokenName(tokenInfo)
+        }
       </>
     );
   }
@@ -116,17 +128,10 @@ export default class WalletReceive extends Component<Props> {
     const header = (<h2>{intl.formatMessage(messages.outputAmountUTXO)}</h2>);
     const body = address => (
       <div>
-        {address.value != null
+        {address.values != null
           ? (
             <div className={styles.walletAmount}>
-              {this.getAmount(address.value.div(
-                new BigNumber(10).pow(this.props.meta.decimalPlaces)
-              ))}
-              {' '}
-              {this.props.unitOfAccountSetting.enabled
-                ? this.props.unitOfAccountSetting.currency
-                : this.props.meta.primaryTicker
-              }
+              {this.getAmount(address.values.getDefaultEntry())}
             </div>
           )
           : '-'

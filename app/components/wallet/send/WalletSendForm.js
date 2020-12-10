@@ -11,8 +11,7 @@ import { NumericInput } from 'react-polymorph/lib/components/NumericInput';
 import { Checkbox } from 'react-polymorph/lib/components/Checkbox';
 import { CheckboxSkin } from 'react-polymorph/lib/skins/simple/CheckboxSkin';
 import { defineMessages, intlShape } from 'react-intl';
-import { isValidMemoOptional, isValidMemo } from '../../../utils/validations';
-import BigNumber from 'bignumber.js';
+import { isValidMemoOptional, isValidMemo, calcMaxBeforeDot } from '../../../utils/validations';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
 import AmountInputSkin from '../skins/AmountInputSkin';
@@ -23,9 +22,8 @@ import globalMessages, { memoMessages, } from '../../../i18n/global-messages';
 import type { UriParams } from '../../../utils/URIHandling';
 import { getAddressPayload, isValidReceiveAddress } from '../../../api/ada/lib/storage/bridge/utils';
 import { MAX_MEMO_SIZE } from '../../../config/externalStorageConfig';
-import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
+import type { TokenRow, NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import {
-  formattedWalletAmount,
   formattedAmountToBigNumber,
   formattedAmountToNaturalUnits
 } from '../../../utils/formatters';
@@ -34,6 +32,13 @@ import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
 import LocalizableError from '../../../i18n/LocalizableError';
 import WarningBox from '../../widgets/WarningBox';
 import type { $npm$ReactIntl$IntlFormat, } from 'react-intl';
+import { getTokenName, genFormatTokenAmount, } from '../../../stores/stateless/tokenHelpers';
+import {
+  MultiToken,
+} from '../../../api/common/lib/MultiToken';
+import type {
+  TokenLookupKey,
+} from '../../../api/common/lib/MultiToken';
 
 const messages = defineMessages({
   receiverLabel: {
@@ -67,21 +72,21 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  +ticker: string,
   +selectedNetwork: $ReadOnly<NetworkRow>,
-  +currencyMaxIntegerDigits: number,
-  +currencyMaxFractionalDigits: number,
   +hasAnyPending: boolean,
-  +validateAmount: (amountInNaturalUnits: string) => Promise<[boolean, void | string]>,
+  +validateAmount: (
+    amountInNaturalUnits: string,
+    tokenRow: $ReadOnly<TokenRow>,
+  ) => Promise<[boolean, void | string]>,
   +onSubmit: void => void,
-  +totalInput: ?BigNumber,
+  +totalInput: ?MultiToken,
   +classicTheme: boolean,
   +updateReceiver: (void | string) => void,
   +updateAmount: (void | number) => void,
   +updateMemo: (void | string) => void,
   +shouldSendAll: boolean,
   +toggleSendAll: void => void,
-  +fee: ?BigNumber,
+  +fee: ?MultiToken,
   +isCalculatingFee: boolean,
   +reset: void => void,
   +error: ?LocalizableError,
@@ -89,6 +94,8 @@ type Props = {|
   +resetUriParams: void => void,
   +showMemo: boolean,
   +onAddMemo: void => void,
+  +getTokenInfo: Inexact<TokenLookupKey> => $ReadOnly<TokenRow>,
+  +defaultToken: $ReadOnly<TokenRow>, // need since no guarantee input in non-null
 |};
 
 @observer
@@ -102,12 +109,15 @@ export default class WalletSendForm extends Component<Props> {
 
   componentDidMount(): void {
     this.props.reset();
+
+    const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
     if (this.props.uriParams) {
       // assert not null
       const uriParams = this.props.uriParams;
+
       const adjustedAmount = formattedAmountToNaturalUnits(
         uriParams.amount.toString(),
-        this.props.currencyMaxFractionalDigits,
+        this.props.defaultToken.Metadata.numberOfDecimals,
       );
       // note: assume these are validated externally
       this.props.updateAmount(Number(adjustedAmount));
@@ -130,10 +140,10 @@ export default class WalletSendForm extends Component<Props> {
         if (!this.props.shouldSendAll) {
           return;
         }
+
         // once sendAll is triggered, set the amount field to the total input
-        this.form.$('amount').set('value', formattedWalletAmount(
-          totalInput.minus(fee),
-          this.props.currencyMaxFractionalDigits,
+        this.form.$('amount').set('value', formatValue(
+          totalInput.joinSubtractCopy(fee).getDefaultEntry(),
         ));
       },
     );
@@ -185,13 +195,15 @@ export default class WalletSendForm extends Component<Props> {
       amount: {
         label: this.context.intl.formatMessage(globalMessages.amountLabel),
         placeholder: this.props.classicTheme ?
-          `0.${'0'.repeat(this.props.currencyMaxFractionalDigits)}` : '',
-        value: this.props.uriParams
-          ? formattedWalletAmount(
-            this.props.uriParams.amount,
-            this.props.currencyMaxFractionalDigits,
-          )
-          : '',
+          `0.${'0'.repeat(this.props.defaultToken.Metadata.numberOfDecimals)}` : '',
+        value: (() => {
+          const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
+          return this.props.uriParams
+            ? formatValue(
+              this.props.uriParams.amount.getDefaultEntry(),
+            )
+            : ''
+        })(),
         validators: [async ({ field }) => {
           if (this.props.shouldSendAll) {
             // sendall doesn't depend on the amount so always succeed
@@ -204,9 +216,12 @@ export default class WalletSendForm extends Component<Props> {
           }
           const formattedAmount = formattedAmountToNaturalUnits(
             amountValue,
-            this.props.currencyMaxFractionalDigits,
+            this.props.defaultToken.Metadata.numberOfDecimals,
           );
-          const isValidAmount = await this.props.validateAmount(formattedAmount);
+          const isValidAmount = await this.props.validateAmount(
+            formattedAmount,
+            this.props.defaultToken
+          );
           if (isValidAmount[0]) {
             this.props.updateAmount(Number(formattedAmount));
           } else {
@@ -253,9 +268,6 @@ export default class WalletSendForm extends Component<Props> {
     const { intl } = this.context;
     const { memo } = this.form.values();
     const {
-      ticker,
-      currencyMaxIntegerDigits,
-      currencyMaxFractionalDigits,
       hasAnyPending,
       classicTheme,
       showMemo,
@@ -267,10 +279,19 @@ export default class WalletSendForm extends Component<Props> {
     const memoField = form.$('memo');
     const amountFieldProps = amountField.bind();
 
-    const transactionFee = this.props.fee || new BigNumber(0);
+    const transactionFee = this.props.fee ?? new MultiToken([], {
+      defaultIdentifier: this.props.defaultToken.Identifier,
+      defaultNetworkId: this.props.defaultToken.NetworkId,
+    });
 
-    const totalAmount = this.props.totalInput
-      || formattedAmountToBigNumber(amountFieldProps.value);
+    const totalAmount = this.props.totalInput ?? new MultiToken([{
+      identifier: this.props.defaultToken.Identifier,
+      networkId: this.props.defaultToken.NetworkId,
+      amount: formattedAmountToBigNumber(amountFieldProps.value),
+    }], {
+      defaultIdentifier: this.props.defaultToken.Identifier,
+      defaultNetworkId: this.props.defaultToken.NetworkId,
+    });
 
     const pendingTxWarningComponent = (
       <div className={styles.warningBox}>
@@ -290,6 +311,8 @@ export default class WalletSendForm extends Component<Props> {
         this.props.error.values
       );
     }
+
+    const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
 
     return (
       <div className={styles.component}>
@@ -313,14 +336,14 @@ export default class WalletSendForm extends Component<Props> {
               {...amountFieldProps}
               className="amount"
               label={intl.formatMessage(globalMessages.amountLabel)}
-              maxBeforeDot={currencyMaxIntegerDigits}
-              maxAfterDot={currencyMaxFractionalDigits}
+              maxBeforeDot={calcMaxBeforeDot(this.props.defaultToken.Metadata.numberOfDecimals)}
+              maxAfterDot={this.props.defaultToken.Metadata.numberOfDecimals}
               disabled={this.props.shouldSendAll}
               error={(transactionFeeError || amountField.error)}
               // AmountInputSkin props
-              currency={ticker}
-              fees={transactionFee.toFormat(currencyMaxFractionalDigits)}
-              total={totalAmount.toFormat(currencyMaxFractionalDigits)}
+              currency={getTokenName(this.props.defaultToken)}
+              fees={formatValue(transactionFee.getDefaultEntry())}
+              total={formatValue(totalAmount.getDefaultEntry())}
               skin={AmountInputSkin}
               classicTheme={classicTheme}
             />
@@ -328,14 +351,14 @@ export default class WalletSendForm extends Component<Props> {
           <div className={styles.checkbox}>
             <Checkbox
               label={intl.formatMessage(messages.checkboxLabel, {
-                currency: ticker
+                currency: getTokenName(this.props.defaultToken)
               })}
               onChange={() => {
                 this.props.toggleSendAll();
                 if (this.props.shouldSendAll) {
                   this.props.updateAmount(Number(formattedAmountToNaturalUnits(
                     this.form.$('amount').value,
-                    this.props.currencyMaxFractionalDigits,
+                    this.props.defaultToken.Metadata.numberOfDecimals,
                   )));
                 }
               }}

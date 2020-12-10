@@ -38,6 +38,7 @@ export default class AdaDaedalusTransferStore extends Store {
         ),
         minimumUtxoVal: RustModule.WalletV4.BigNum.from_str(config.MinimumUtxoVal),
         poolDeposit: RustModule.WalletV4.BigNum.from_str(config.PoolDeposit),
+        networkId: selectedNetwork.NetworkId,
       },
       absSlotNumber: new BigNumber(timeToSlot({
         // use server time for TTL if connected to server

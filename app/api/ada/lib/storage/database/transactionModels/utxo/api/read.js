@@ -17,16 +17,52 @@ import type {
   UtxoTransactionInputRow,
   UtxoTransactionOutputRow,
   DbUtxoInputs, DbUtxoOutputs,
-  TokenListRow,
 } from '../tables';
-import { TransactionSchema, TokenSchema, } from '../../../primitives/tables';
+import { TransactionSchema, } from '../../../primitives/tables';
+import { AssociateToken } from '../../../primitives/api/read';
 import { TxStatusCodes } from '../../../primitives/enums';
 import type {
   TransactionRow,
   TokenRow,
+  TokenListRow,
 } from '../../../primitives/tables';
 import type { TxStatusCodesType } from '../../../primitives/enums';
 import { getRowIn, } from '../../../utils';
+
+async function addTokenInfoToOutput<T>(
+  db: lf$Database,
+  tx: lf$Transaction,
+  rows: $ReadOnlyArray<T>,
+  getListId: T => number,
+  networkId: number
+): Promise<Array<{|
+  ...T,
+  tokens: $ReadOnlyArray<{|
+    TokenList: $ReadOnly<TokenListRow>,
+    Token: $ReadOnly<TokenRow>,
+  |}>
+|}>> {
+  const tokenInfo = await GetUtxoTxInputsWithTx.depTables.AssociateToken.join(
+    db, tx,
+    {
+      listIds: rows.map(row => getListId(row)),
+      networkId,
+    }
+  );
+
+  const result = [];
+  for (const row of rows) {
+    const newEntry = { ...row, tokens: [] };
+    for (const token of tokenInfo) {
+      if (token.TokenList.ListId === getListId(row)) {
+        newEntry.tokens.push(token);
+      }
+    }
+    result.push(newEntry);
+  }
+
+  return result;
+}
 
 export class GetUtxoInputs {
   static ownTables: {|
@@ -105,6 +141,10 @@ export class GetUtxoOutputs {
 export type UtxoTxOutput = {|
   Transaction: $ReadOnly<TransactionRow>,
   UtxoTransactionOutput: $ReadOnly<UtxoTransactionOutputRow>,
+  tokens: $ReadOnlyArray<{|
+    TokenList: $ReadOnly<TokenListRow>,
+    Token: $ReadOnly<TokenRow>,
+  |}>
 |};
 export class GetUtxoTxOutputsWithTx {
   static ownTables: {|
@@ -112,6 +152,7 @@ export class GetUtxoTxOutputsWithTx {
     UtxoTransactionOutput: typeof Tables.UtxoTransactionOutputSchema,
   |} = Object.freeze({
     [TransactionSchema.name]: TransactionSchema,
+    [Tables.UtxoTransactionOutputSchema.name]: Tables.UtxoTransactionOutputSchema,
     [Tables.UtxoTransactionOutputSchema.name]: Tables.UtxoTransactionOutputSchema,
   });
   static depTables: {||} = Object.freeze({});
@@ -144,6 +185,7 @@ export class GetUtxoTxOutputsWithTx {
     request: {|
       txId: number,
       outputIndex: number,
+      networkId: number,
     |},
   ): Promise<void | $ReadOnly<UtxoTxOutput>> {
     const query = GetUtxoTxOutputsWithTx.baseQuery(
@@ -156,21 +198,30 @@ export class GetUtxoTxOutputsWithTx {
       )
     );
 
-    const queryResult: $ReadOnlyArray<{|
+    const outputInfo: $ReadOnlyArray<{|
       Transaction: $ReadOnly<TransactionRow>,
       UtxoTransactionOutput: $ReadOnly<UtxoTransactionOutputRow>,
     |}> = await tx.attach(query);
 
-    if (queryResult.length === 0) {
+    if (outputInfo.length === 0) {
       return undefined;
     }
-    return queryResult[0];
+    return (await addTokenInfoToOutput<$ReadOnly<{|
+      Transaction: $ReadOnly<TransactionRow>,
+      UtxoTransactionOutput: $ReadOnly<UtxoTransactionOutputRow>,
+    |}>>(
+      db, tx,
+      outputInfo,
+      row => row.UtxoTransactionOutput.TokenListId,
+      request.networkId
+    ))[0]
   }
 
   static async getUtxo(
     db: lf$Database,
     tx: lf$Transaction,
     addressDerivationIds: Array<number>,
+    networkId: number,
   ): Promise<$ReadOnlyArray<$ReadOnly<UtxoTxOutput>>> {
     const query = GetUtxoTxOutputsWithTx.baseQuery(
       db,
@@ -183,7 +234,20 @@ export class GetUtxoTxOutputsWithTx {
       )
     );
 
-    return await tx.attach(query);
+    const outputInfo: $ReadOnlyArray<{|
+      Transaction: $ReadOnly<TransactionRow>,
+      UtxoTransactionOutput: $ReadOnly<UtxoTransactionOutputRow>,
+    |}> = await tx.attach(query);
+
+    return await addTokenInfoToOutput<$ReadOnly<{|
+      Transaction: $ReadOnly<TransactionRow>,
+      UtxoTransactionOutput: $ReadOnly<UtxoTransactionOutputRow>,
+    |}>>(
+      db, tx,
+      outputInfo,
+      row => row.UtxoTransactionOutput.TokenListId,
+      networkId
+    );
   }
 
   static async getOutputsForAddresses(
@@ -191,6 +255,7 @@ export class GetUtxoTxOutputsWithTx {
     tx: lf$Transaction,
     addressDerivationIds: Array<number>,
     status: $ReadOnlyArray<TxStatusCodesType>,
+    networkId: number,
   ): Promise<$ReadOnlyArray<$ReadOnly<UtxoTxOutput>>> {
     const query = GetUtxoTxOutputsWithTx.baseQuery(
       db,
@@ -202,13 +267,30 @@ export class GetUtxoTxOutputsWithTx {
       )
     );
 
-    return await tx.attach(query);
+    const outputInfo: $ReadOnlyArray<{|
+      Transaction: $ReadOnly<TransactionRow>,
+      UtxoTransactionOutput: $ReadOnly<UtxoTransactionOutputRow>,
+    |}> = await tx.attach(query);
+
+    return await addTokenInfoToOutput<$ReadOnly<{|
+      Transaction: $ReadOnly<TransactionRow>,
+      UtxoTransactionOutput: $ReadOnly<UtxoTransactionOutputRow>,
+    |}>>(
+      db, tx,
+      outputInfo,
+      row => row.UtxoTransactionOutput.TokenListId,
+      networkId
+    );
   }
 }
 
 export type UtxoTxInput = {|
   Transaction: $ReadOnly<TransactionRow>,
   UtxoTransactionInput: $ReadOnly<UtxoTransactionInputRow>,
+  tokens: $ReadOnlyArray<{|
+    TokenList: $ReadOnly<TokenListRow>,
+    Token: $ReadOnly<TokenRow>,
+  |}>
 |};
 export class GetUtxoTxInputsWithTx {
   static ownTables: {|
@@ -218,7 +300,11 @@ export class GetUtxoTxInputsWithTx {
     [TransactionSchema.name]: TransactionSchema,
     [Tables.UtxoTransactionInputSchema.name]: Tables.UtxoTransactionInputSchema,
   });
-  static depTables: {||} = Object.freeze({});
+  static depTables: {|
+    AssociateToken: typeof AssociateToken,
+  |} = Object.freeze({
+    AssociateToken
+  });
 
   static baseQuery(
     db: lf$Database,
@@ -247,6 +333,7 @@ export class GetUtxoTxInputsWithTx {
     tx: lf$Transaction,
     addressDerivationIds: Array<number>,
     status: Array<TxStatusCodesType>,
+    networkId: number,
   ): Promise<$ReadOnlyArray<$ReadOnly<UtxoTxInput>>> {
     const query = GetUtxoTxInputsWithTx.baseQuery(
       db,
@@ -258,7 +345,20 @@ export class GetUtxoTxInputsWithTx {
       )
     );
 
-    return await tx.attach(query);
+    const inputInfo: $ReadOnlyArray<$ReadOnly<{|
+      Transaction: $ReadOnly<TransactionRow>,
+      UtxoTransactionInput: $ReadOnly<UtxoTransactionInputRow>,
+    |}>> = await tx.attach(query);
+
+    return await addTokenInfoToOutput<$ReadOnly<{|
+      Transaction: $ReadOnly<TransactionRow>,
+      UtxoTransactionInput: $ReadOnly<UtxoTransactionInputRow>,
+    |}>>(
+      db, tx,
+      inputInfo,
+      row => row.UtxoTransactionInput.TokenListId,
+      networkId
+    );
   }
 }
 
@@ -327,99 +427,22 @@ export class AssociateTxWithUtxoIOs {
   }
 }
 
-export class AssociateToken {
-  static ownTables: {|
-    TokenList: typeof Tables.TokenListSchema,
-    Token: typeof TokenSchema,
-  |} = Object.freeze({
-    [Tables.TokenListSchema.name]: Tables.TokenListSchema,
-    [TokenSchema.name]: TokenSchema,
-  });
-  static depTables: {||} = Object.freeze({});
+/**
+ * returns a function that gives you the next ID for a token list
+ * starting from the last spot saved to the DB
+ */
+export async function createTokenListIdGenFunction(
+  db: lf$Database,
+  dbTx: lf$Transaction,
+  deps: {|
+    AssociateToken: Class<AssociateToken>,
+  |}
+): Promise<void => number> {
+  let nextId = await deps.AssociateToken.nextTokenListId(db, dbTx);
 
-  static async forUtxoInput(
-    db: lf$Database,
-    tx: lf$Transaction,
-    request: {| utxoInputIds: Array<number>, |},
-  ): Promise<Map<number, Array<$ReadOnly<TokenListRow>>>> {
-    const rows = await getRowIn<TokenListRow>(
-      db, tx,
-      AssociateToken.ownTables[Tables.TokenListSchema.name].name,
-      AssociateToken.ownTables[Tables.TokenListSchema.name].properties.UtxoTransactionInputId,
-      request.utxoInputIds,
-    );
-
-    const result = new Map<number, Array<$ReadOnly<TokenListRow>>>();
-    for (const row of rows) {
-      const { UtxoTransactionInputId } = row;
-      if (UtxoTransactionInputId == null) continue;
-      const entries = result.get(UtxoTransactionInputId) ?? [];
-      entries.push(row);
-      result.set(UtxoTransactionInputId, entries);
-    }
-
-    return result;
-  }
-  static async forUtxoOutput(
-    db: lf$Database,
-    tx: lf$Transaction,
-    request: {| utxoOutputIds: Array<number>, |},
-  ): Promise<Map<number, Array<$ReadOnly<TokenListRow>>>> {
-    const rows = await getRowIn<TokenListRow>(
-      db, tx,
-      AssociateToken.ownTables[Tables.TokenListSchema.name].name,
-      AssociateToken.ownTables[Tables.TokenListSchema.name].properties.UtxoTransactionOutputId,
-      request.utxoOutputIds,
-    );
-
-    const result = new Map<number, Array<$ReadOnly<TokenListRow>>>();
-    for (const row of rows) {
-      const { UtxoTransactionOutputId } = row;
-      if (UtxoTransactionOutputId == null) continue;
-      const entries = result.get(UtxoTransactionOutputId) ?? [];
-      entries.push(row);
-      result.set(UtxoTransactionOutputId, entries);
-    }
-
-    return result;
-  }
-
-  static async join(
-    db: lf$Database,
-    tx: lf$Transaction,
-    request: {|
-      utxoOutputIds: Array<number>,
-      networkId: number,
-    |},
-  ): Promise<$ReadOnlyArray<{|
-    TokenList: $ReadOnly<TokenListRow>,
-    Token: $ReadOnly<TokenRow>,
-  |}>> {
-    const tokenListTableMeta = AssociateToken.ownTables[Tables.TokenListSchema.name];
-    const tokenTableMeta = AssociateToken.ownTables[TokenSchema.name];
-
-    const tokenListTable = db.getSchema().table(tokenListTableMeta.name);
-    const tokenTable = db.getSchema().table(tokenTableMeta.name);
-    const query = db
-      .select()
-      .from(tokenListTable)
-      .innerJoin(
-        tokenTable,
-        tokenListTable[tokenListTableMeta.properties.TokenId].eq(
-          tokenTable[tokenTableMeta.properties.TokenId]
-        )
-      )
-      .where(op.and(
-        tokenListTable[tokenListTableMeta.properties.UtxoTransactionOutputId].in(
-          request.utxoOutputIds
-        ),
-        tokenTable[tokenTableMeta.properties.NetworkId].eq(request.networkId)
-      ));
-    const result: $ReadOnlyArray<{|
-      TokenList: $ReadOnly<TokenListRow>,
-      Token: $ReadOnly<TokenRow>,
-    |}> = await tx.attach(query);
-
-    return result;
+  return () => {
+    const next = nextId;
+    nextId++;
+    return next;
   }
 }

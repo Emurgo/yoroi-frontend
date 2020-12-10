@@ -1,7 +1,6 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import BigNumber from 'bignumber.js';
 import { action, computed, observable, runInAction } from 'mobx';
 import type { Node } from 'react';
 import { defineMessages, intlShape } from 'react-intl';
@@ -28,10 +27,15 @@ import { SelectedExplorer } from '../../domain/SelectedExplorer';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import LocalizableError from '../../i18n/LocalizableError';
 import type { ISignRequest } from '../../api/common/lib/transactions/ISignRequest';
-import { ApiOptions, getApiForNetwork, getApiMeta } from '../../api/common/utils';
-import { validateAmount } from '../../utils/validations';
-import { formattedWalletAmount } from '../../utils/formatters';
+import { ApiOptions, getApiForNetwork, } from '../../api/common/utils';
+import { validateAmount, getMinimumValue } from '../../utils/validations';
 import { addressToDisplayString } from '../../api/ada/lib/storage/bridge/utils';
+import {
+  MultiToken,
+} from '../../api/common/lib/MultiToken';
+import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
+import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
+import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
 
 // Hardware Wallet Confirmation
 import HWSendConfirmationDialog from '../../components/wallet/send/HWSendConfirmationDialog';
@@ -94,10 +98,6 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
     // Guard against potential null values
     if (!publicDeriver) throw new Error(`Active wallet required for ${nameof(WalletSendPage)}.`);
 
-    const selectedApiType = getApiForNetwork(publicDeriver.getParent().getNetworkInfo());
-    const apiMeta = getApiMeta(selectedApiType)?.meta;
-    if (apiMeta == null) throw new Error(`${nameof(WalletSendPage)} no API selected`);
-
     const { transactionBuilderStore } = this.generated.stores;
 
     const { uiDialogs, profile, } = this.generated.stores;
@@ -122,20 +122,22 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
       txBuilderActions.updateTentativeTx.trigger();
     };
 
+    const defaultToken = this.generated.stores.tokenInfoStore.getDefaultTokenInfo(
+      publicDeriver.getParent().getNetworkInfo().NetworkId
+    );
+
     return (
       <>
         <WalletSendForm
           selectedNetwork={publicDeriver.getParent().getNetworkInfo()}
-          ticker={apiMeta.primaryTicker}
-          currencyMaxIntegerDigits={
-            apiMeta.totalSupply.div(apiMeta.decimalPlaces).toFixed().length
-          }
-          currencyMaxFractionalDigits={apiMeta.decimalPlaces.toNumber()}
           validateAmount={(amount) => validateAmount(
             amount,
-            publicDeriver.getParent().getNetworkInfo(),
+            defaultToken,
+            getMinimumValue(publicDeriver.getParent().getNetworkInfo()),
             this.context.intl,
           )}
+          defaultToken={defaultToken}
+          getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
           onSubmit={onSubmit}
           totalInput={transactionBuilderStore.totalInput}
           hasAnyPending={hasAnyPending}
@@ -182,9 +184,6 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
   webWalletDoConfirmation: (() => Node) = () => {
     const publicDeriver = this.generated.stores.wallets.selected;
     if (!publicDeriver) throw new Error(`Active wallet required for ${nameof(this.webWalletDoConfirmation)}.`);
-    const selectedApiType = getApiForNetwork(publicDeriver.getParent().getNetworkInfo());
-    const apiMeta = getApiMeta(selectedApiType)?.meta;
-    if (apiMeta == null) throw new Error(`${nameof(this.hardwareWalletDoConfirmation)} no API selected`);
 
     const { transactionBuilderStore } = this.generated.stores;
     if (!transactionBuilderStore.tentativeTx) {
@@ -192,22 +191,11 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
     }
     const signRequest = transactionBuilderStore.tentativeTx;
 
-    const coinPrice: ?number = this.generated.stores.profile.unitOfAccount.enabled
-      ? (
-        this.generated.stores.coinPriceStore.getCurrentPrice(
-          apiMeta.primaryTicker,
-          this.generated.stores.profile.unitOfAccount.currency
-        )
-      )
-      : null;
-
     return (<WalletSendConfirmationDialogContainer
       {...this.generated.WalletSendConfirmationDialogContainerProps}
       signRequest={signRequest}
       staleTx={transactionBuilderStore.txMismatch}
-      ticker={apiMeta.primaryTicker}
       unitOfAccountSetting={this.generated.stores.profile.unitOfAccount}
-      coinPrice={coinPrice}
     />);
   };
 
@@ -218,8 +206,6 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
     const publicDeriver = this.generated.stores.wallets.selected;
     if (!publicDeriver) throw new Error(`Active wallet required for ${nameof(this.webWalletDoConfirmation)}.`);
     const selectedApiType = getApiForNetwork(publicDeriver.getParent().getNetworkInfo());
-    const apiMeta = getApiMeta(selectedApiType)?.meta;
-    if (apiMeta == null) throw new Error(`${nameof(this.hardwareWalletDoConfirmation)} no API selected`);
 
     if (selectedApiType !== ApiOptions.ada) {
       throw new Error(`${nameof(this.hardwareWalletDoConfirmation)} not ADA API type`);
@@ -235,18 +221,9 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
     }
     const signRequest = transactionBuilderStore.tentativeTx;
 
-    const totalInput = signRequest.totalInput(true);
-    const fee = signRequest.fee(true);
+    const totalInput = signRequest.totalInput();
+    const fee = signRequest.fee();
     const receivers = signRequest.receivers(false);
-
-    const coinPrice: ?number = this.generated.stores.profile.unitOfAccount.enabled
-      ? (
-        this.generated.stores.coinPriceStore.getCurrentPrice(
-          apiMeta.primaryTicker,
-          this.generated.stores.profile.unitOfAccount.currency
-        )
-      )
-      : null;
 
     const conceptualWallet = publicDeriver.getParent();
     let hwSendConfirmationDialog: Node = null;
@@ -266,11 +243,12 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
         <HWSendConfirmationDialog
           staleTx={transactionBuilderStore.txMismatch}
           selectedExplorer={selectedExplorerForNetwork}
-          amount={totalInput.minus(fee)}
+          getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
+          getCurrentPrice={this.generated.stores.coinPriceStore.getCurrentPrice}
+          amount={totalInput.joinSubtractCopy(fee)}
           receivers={receivers}
           totalAmount={totalInput}
           transactionFee={fee}
-          ticker={apiMeta.primaryTicker}
           messages={messagesLedger}
           isSubmitting={ledgerSendStore.isActionProcessing}
           error={ledgerSendStore.error}
@@ -282,11 +260,6 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
           }
           onCancel={ledgerSendAction.cancel.trigger}
           unitOfAccountSetting={this.generated.stores.profile.unitOfAccount}
-          coinPrice={coinPrice}
-          formattedWalletAmount={amount => formattedWalletAmount(
-            amount,
-            apiMeta.decimalPlaces.toNumber()
-          )}
           addressToDisplayString={
             addr => addressToDisplayString(addr, publicDeriver.getParent().getNetworkInfo())
           }
@@ -297,12 +270,13 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
       hwSendConfirmationDialog = (
         <HWSendConfirmationDialog
           staleTx={transactionBuilderStore.txMismatch}
+          getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
           selectedExplorer={selectedExplorerForNetwork}
-          amount={totalInput.minus(fee)}
+          getCurrentPrice={this.generated.stores.coinPriceStore.getCurrentPrice}
+          amount={totalInput.joinSubtractCopy(fee)}
           receivers={receivers}
           totalAmount={totalInput}
           transactionFee={fee}
-          ticker={apiMeta.primaryTicker}
           messages={messagesTrezor}
           isSubmitting={trezorSendStore.isActionProcessing}
           error={trezorSendStore.error}
@@ -314,11 +288,6 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
           }
           onCancel={trezorSendAction.cancel.trigger}
           unitOfAccountSetting={this.generated.stores.profile.unitOfAccount}
-          coinPrice={coinPrice}
-          formattedWalletAmount={amount => formattedWalletAmount(
-            amount,
-            apiMeta.decimalPlaces.toNumber()
-          )}
           addressToDisplayString={
             addr => addressToDisplayString(addr, publicDeriver.getParent().getNetworkInfo())
           }
@@ -442,6 +411,10 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
       explorers: {|
         selectedExplorer: Map<number, SelectedExplorer>,
       |},
+      tokenInfoStore: {|
+        tokenInfo: TokenInfoMap,
+        getDefaultTokenInfo: number => $ReadOnly<TokenRow>,
+      |},
       profile: {|
         isClassicTheme: boolean,
         unitOfAccount: UnitOfAccountSettingType
@@ -451,10 +424,10 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
           error: ?LocalizableError,
           isExecuting: boolean
         |},
-        fee: ?BigNumber,
+        fee: ?MultiToken,
         shouldSendAll: boolean,
         tentativeTx: null | ISignRequest<any>,
-        totalInput: ?BigNumber,
+        totalInput: ?MultiToken,
         txMismatch: boolean
       |},
       substores: {|
@@ -496,6 +469,10 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
         },
         wallets: {
           selected: stores.wallets.selected,
+        },
+        tokenInfoStore: {
+          tokenInfo: stores.tokenInfoStore.tokenInfo,
+          getDefaultTokenInfo: stores.tokenInfoStore.getDefaultTokenInfo,
         },
         memos: {
           hasSetSelectedExternalStorageProvider: stores.memos.hasSetSelectedExternalStorageProvider,

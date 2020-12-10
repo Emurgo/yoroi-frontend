@@ -2,11 +2,10 @@
 
 import type { lf$schema$Builder } from 'lovefield';
 
-import type { DbTransaction, CertificatePart, } from '../../primitives/tables';
+import type { DbTransaction, CertificatePart, DbTokenInfo } from '../../primitives/tables';
 import { TransactionType } from '../../primitives/tables';
 import type {
   DbUtxoInputs, DbUtxoOutputs,
-  DbUtxoTokenInputs, DbUtxoTokenOutputs,
 } from '../utxo/tables';
 import type { DbAccountingInputs, DbAccountingOutputs, } from '../account/tables';
 
@@ -16,6 +15,7 @@ export type CardanoByronTxIO = {|
     ...$PropertyType<DbTransaction, 'transaction'>,
     +Type: $PropertyType<typeof TransactionType, "CardanoByron">,
   |}>,
+   ...DbTokenInfo,
   ...DbUtxoInputs, ...DbUtxoOutputs,
 |};
 export type CardanoShelleyTxIO = {|
@@ -26,6 +26,7 @@ export type CardanoShelleyTxIO = {|
   |}>,
   ...DbUtxoInputs, ...DbUtxoOutputs,
   ...DbAccountingInputs,
+   ...DbTokenInfo,
   +certificates: Array<CertificatePart>,
 |};
 export type ErgoTxIO = {|
@@ -35,7 +36,7 @@ export type ErgoTxIO = {|
     +Type: $PropertyType<typeof TransactionType, "Ergo">,
   |}>,
   ...DbUtxoInputs, ...DbUtxoOutputs,
-  ...DbUtxoTokenInputs, ...DbUtxoTokenOutputs,
+  ...DbTokenInfo,
 |};
 export type JormungandrTxIO = {|
   +txType: $PropertyType<typeof TransactionType, "Jormungandr">,
@@ -46,6 +47,7 @@ export type JormungandrTxIO = {|
   +certificates: Array<CertificatePart>,
   ...DbUtxoInputs, ...DbUtxoOutputs,
   ...DbAccountingInputs, ...DbAccountingOutputs,
+  ...DbTokenInfo,
 |}
 
 export const populateMultipartTransactionsDb = (_schemaBuilder: lf$schema$Builder) => {

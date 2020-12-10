@@ -8,10 +8,12 @@ import type {
   HistoryRequest, HistoryResponse,
   SignedRequest, SignedResponse,
   BestBlockRequest, BestBlockResponse,
+  AssetInfoRequest, AssetInfoResponse,
   AddressUtxoFunc,
   HistoryFunc,
   TxBodiesFunc,
   UtxoSumFunc,
+  AssetInfoFunc,
   RemoteErgoTransaction,
 } from './types';
 import type {
@@ -28,6 +30,7 @@ import {
   GetTxsBodiesForUTXOsError,
   GetUtxosSumsForAddressesApiError,
   GetTxHistoryForAddressesApiError,
+  GetAssetInfoApiError,
 } from '../../../common/errors';
 import {
   Logger,
@@ -86,6 +89,9 @@ export class BatchedFetcher implements IFetcher {
     batchCheckAddressesInUse(this.baseFetcher.checkAddressesInUse)(body)
   )
 
+  getAssetInfo: AssetInfoRequest => Promise<AssetInfoResponse> = (body) => (
+    batchAssetInfo(this.baseFetcher.getAssetInfo)(body)
+  )
 }
 
 /** Sum up the UTXO for a list of addresses by batching backend requests */
@@ -182,6 +188,35 @@ export function batchGetUTXOsSumsForAddresses(
       Logger.error(`batchedFetcher::${nameof(batchGetUTXOsSumsForAddresses)} error: ` + stringifyError(error));
       if (error instanceof LocalizableError) throw error;
       throw new GetUtxosSumsForAddressesApiError();
+    }
+  };
+}
+
+export function batchAssetInfo(
+  getAssetInfo: AssetInfoFunc,
+): AssetInfoFunc {
+  return async function (body: AssetInfoRequest): Promise<AssetInfoResponse> {
+    try {
+      // batch all addresses into chunks for API
+      const groupsOfAddresses = chunk(body.assetIds, addressesLimit);
+      const promises =
+        groupsOfAddresses.map(groupOfAssets => getAssetInfo({
+          network: body.network,
+          assetIds: groupOfAssets,
+        }));
+      const partialResponses: Array<AssetInfoResponse> = await Promise.all(promises);
+
+      const result: AssetInfoResponse = {};
+      for (const response of partialResponses) {
+        for (const key of Object.keys(response)) {
+          result[key] = response[key];
+        }
+      }
+      return result;
+    } catch (error) {
+      Logger.error(`batchedFetcher::${nameof(batchAssetInfo)} error: ` + stringifyError(error));
+      if (error instanceof LocalizableError) throw error;
+      throw new  GetAssetInfoApiError();
     }
   };
 }

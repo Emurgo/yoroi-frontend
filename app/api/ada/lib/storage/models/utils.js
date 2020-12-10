@@ -54,7 +54,6 @@ import {
   GetDerivationSpecific,
 } from '../database/walletTypes/common/api/read';
 import type { UtxoTxOutput } from '../database/transactionModels/utxo/api/read';
-import type { UtxoTransactionOutputRow } from '../database/transactionModels/utxo/tables';
 import { Bip44DerivationLevels } from '../database/walletTypes/bip44/api/utils';
 import type {
   GetPathWithSpecificByTreeRequest,
@@ -64,6 +63,8 @@ import {
   GetUtxoTxOutputsWithTx,
 } from '../database/transactionModels/utxo/api/read';
 import { TxStatusCodes, } from '../database/primitives/enums';
+import { MultiToken } from '../../../../common/lib/MultiToken';
+import type { DefaultTokenEntry } from '../../../../common/lib/MultiToken';
 
 import { ChainDerivations, BIP44_SCAN_SIZE, } from  '../../../../../config/numbersConfig';
 
@@ -175,12 +176,16 @@ export async function rawGetUtxoUsedStatus(
   db: lf$Database,
   tx: lf$Transaction,
   deps: {| GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>, |},
-  request: {| addressIds: Array<number>, |},
+  request: {|
+    addressIds: Array<number>,
+    networkId: number,
+  |},
 ): Promise<Set<number>> {
   const outputs = await deps.GetUtxoTxOutputsWithTx.getOutputsForAddresses(
     db, tx,
     request.addressIds,
-    [TxStatusCodes.IN_BLOCK]
+    [TxStatusCodes.IN_BLOCK],
+    request.networkId
   );
   return new Set(outputs.map(output => output.UtxoTransactionOutput.AddressId));
 }
@@ -194,6 +199,8 @@ export async function rawGetAddressesForDisplay(
   request: {|
     addresses: Array<UtxoAddressPath>,
     type: CoreAddressT,
+    networkId: number,
+    defaultToken: DefaultTokenEntry,
   |},
 ): Promise<Array<{| ...Address, ...AddressType, ...Value, ...Addressing, ...UsedStatus |}>> {
   const addressIds = request.addresses
@@ -203,20 +210,24 @@ export async function rawGetAddressesForDisplay(
   const utxosForAddresses = await rawGetUtxoUsedStatus(
     db, tx,
     { GetUtxoTxOutputsWithTx: deps.GetUtxoTxOutputsWithTx },
-    { addressIds },
+    {
+      addressIds,
+      networkId: request.networkId,
+    },
   );
   const utxoForAddresses = await deps.GetUtxoTxOutputsWithTx.getUtxo(
     db, tx,
     addressIds,
+    request.networkId
   );
-  const balanceForAddresses = getUtxoBalanceForAddresses(utxoForAddresses);
+  const balanceForAddresses = getUtxoBalanceForAddresses(utxoForAddresses, request.defaultToken);
 
   return request.addresses.flatMap(family => family.addrs
     .filter(addr => addr.Type === request.type)
     .map(addr => {
       return {
         address: addr.Hash,
-        value: balanceForAddresses[addr.AddressId],
+        values: balanceForAddresses[addr.AddressId],
         addressing: family.addressing,
         isUsed: utxosForAddresses.has(addr.AddressId),
         type: request.type,
@@ -269,7 +280,9 @@ export async function rawGetChainAddressesForDisplay(
     { GetUtxoTxOutputsWithTx: deps.GetUtxoTxOutputsWithTx },
     {
       addresses: belowCutoff,
-      type: request.type
+      type: request.type,
+      networkId: request.publicDeriver.getParent().getNetworkInfo().NetworkId,
+      defaultToken: request.publicDeriver.getParent().getDefaultToken(),
     },
   );
   if (request.chainsRequest.chainId === ChainDerivations.INTERNAL) {
@@ -332,13 +345,16 @@ export async function rawGetNextUnusedIndex(
   |},
   request:  {|
     addressesForChain: Array<UtxoAddressPath>,
+    networkId: number,
   |}
 ): Promise<NextUnusedResponse> {
   const usedStatus = await rawGetUtxoUsedStatus(
     db, tx,
     { GetUtxoTxOutputsWithTx: deps.GetUtxoTxOutputsWithTx },
-    { addressIds: request.addressesForChain
-      .flatMap(address => address.addrs.map(addr => addr.AddressId))
+    {
+      addressIds: request.addressesForChain
+        .flatMap(address => address.addrs.map(addr => addr.AddressId)),
+      networkId: request.networkId,
     }
   );
   const lastUsedIndex = getLastUsedIndex({
@@ -363,6 +379,7 @@ export async function rawGetNextUnusedIndex(
 
 export function getUtxoBalanceForAddresses(
   utxos: $ReadOnlyArray<$ReadOnly<UtxoTxOutput>>,
+  defaultToken: DefaultTokenEntry,
 ): { [key: number]: IGetUtxoBalanceResponse, ... } {
   const groupByAddress = groupBy(
     utxos,
@@ -371,21 +388,29 @@ export function getUtxoBalanceForAddresses(
   const mapping = mapValues(
     groupByAddress,
     (utxoList: Array<$ReadOnly<UtxoTxOutput>>) => getBalanceForUtxos(
-      utxoList.map(utxo => utxo.UtxoTransactionOutput)
+      utxoList,
+      defaultToken
     )
   );
   return mapping;
 }
 
 export function getBalanceForUtxos(
-  utxos: $ReadOnlyArray<$ReadOnly<UtxoTransactionOutputRow>>,
+  utxos: $ReadOnlyArray<$ReadOnly<UtxoTxOutput>>,
+  defaultToken: DefaultTokenEntry,
 ): IGetUtxoBalanceResponse {
-  const amounts = utxos.map(utxo => new BigNumber(utxo.Amount));
-  const total = amounts.reduce(
-    (acc, amount) => acc.plus(amount),
-    new BigNumber(0)
-  );
-  return total;
+  const tokens = new MultiToken([], defaultToken);
+
+  for (const utxo of utxos) {
+    for (const token of utxo.tokens) {
+      tokens.add({
+        identifier: token.Token.Identifier,
+        amount: new BigNumber(token.TokenList.Amount),
+        networkId: token.Token.NetworkId,
+      });
+    }
+  }
+  return tokens;
 }
 
 export async function updateCutoffFromInsert(

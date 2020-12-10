@@ -21,12 +21,13 @@ import { SelectedExplorer } from '../../domain/SelectedExplorer';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import type { RestoreModeType } from '../../actions/common/wallet-restore-actions';
-import { formattedWalletAmount } from '../../utils/formatters';
 import { ROUTES } from '../../routes-config';
-import { ApiOptions, getApiForNetwork, getApiMeta } from '../../api/common/utils';
+import { ApiOptions, getApiForNetwork } from '../../api/common/utils';
 import { addressToDisplayString, } from '../../api/ada/lib/storage/bridge/utils';
 import { genAddressLookup } from '../../stores/stateless/addressStores';
 import type { IAddressTypeStore, IAddressTypeUiSubset } from '../../stores/stateless/addressStores';
+import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
+import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
 
 export type MockDaedalusTransferStore = {|
   +status: TransferStatusT,
@@ -122,18 +123,6 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
     if (api !== ApiOptions.ada) {
       throw new Error(`${nameof(DaedalusTransferPage)} not ADA API type`);
     }
-    const apiMeta = getApiMeta(api);
-    if (apiMeta == null) throw new Error(`${nameof(DaedalusTransferPage)} no API selected`);
-
-    const coinPrice: ?number = this.generated.stores.profile.unitOfAccount.enabled
-      ? (
-        this.generated.stores.coinPriceStore
-          .getCurrentPrice(
-            apiMeta.meta.primaryTicker,
-            this.generated.stores.profile.unitOfAccount.currency
-          )
-      )
-      : null;
 
     switch (daedalusTransfer.status) {
       case TransferStatus.GETTING_MNEMONICS:
@@ -186,10 +175,6 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
         return (
           <TransferSummaryPage
             form={null}
-            formattedWalletAmount={amount => formattedWalletAmount(
-              amount,
-              apiMeta.meta.decimalPlaces.toNumber()
-            )}
             transferTx={daedalusTransfer.transferTx}
             selectedExplorer={this.generated.stores.explorers.selectedExplorer
               .get(publicDeriver.getParent().getNetworkInfo().NetworkId) ?? (() => { throw new Error('No explorer for wallet network'); })()
@@ -205,7 +190,8 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
             }}
             error={daedalusTransfer.error}
             dialogTitle={intl.formatMessage(globalMessages.walletSendConfirmationDialogTitle)}
-            coinPrice={coinPrice}
+            getCurrentPrice={this.generated.stores.coinPriceStore.getCurrentPrice}
+            getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
             addressLookup={genAddressLookup(
               publicDeriver,
               intl,
@@ -216,7 +202,6 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
             addressToDisplayString={
               addr => addressToDisplayString(addr, publicDeriver.getParent().getNetworkInfo())
             }
-            ticker={apiMeta.meta.primaryTicker}
           />
         );
       }
@@ -279,6 +264,9 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
       coinPriceStore: {|
         getCurrentPrice: (from: string, to: string) => ?number
       |},
+      tokenInfoStore: {|
+        tokenInfo: TokenInfoMap,
+      |},
       explorers: {|
         selectedExplorer: Map<number, SelectedExplorer>,
       |},
@@ -327,6 +315,9 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
         },
         walletRestore: {
           isValidMnemonic: stores.walletRestore.isValidMnemonic,
+        },
+        tokenInfoStore: {
+          tokenInfo: stores.tokenInfoStore.tokenInfo,
         },
         wallets: {
           selected: stores.wallets.selected,

@@ -17,7 +17,8 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import Notice from '../../domain/Notice';
 import type { GetNoticesRequestOptions } from '../../api/ada/index';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
-import { getApiForNetwork, getApiMeta } from '../../api/common/utils';
+import { getTokenName, genLookupOrFail } from '../../stores/stateless/tokenHelpers';
+import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
 
 const messages = defineMessages({
   title: {
@@ -69,14 +70,15 @@ export default class NoticeBoardPage extends Component<InjectedOrGenerated<Gener
         if (selected == null) {
           throw new Error(`${nameof(NoticeBoardPage)} not handled yet`);
         }
-        const apiMeta = getApiMeta(
-          getApiForNetwork(selected.getParent().getNetworkInfo())
-        )?.meta;
-        if (apiMeta == null) throw new Error(`${nameof(NoticeBoardPage)} no API selected`);
+        const defaultToken = selected.getParent().getDefaultToken();
+        const defaultTokenInfo = genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)({
+          identifier: defaultToken.defaultIdentifier,
+          networkId: defaultToken.defaultNetworkId,
+        });
         noticeComp = (
           <NoNotice
             classicTheme={this.generated.stores.profile.isClassicTheme}
-            ticker={apiMeta.primaryTicker}
+            ticker={getTokenName(defaultTokenInfo)}
           />
         );
       }
@@ -105,6 +107,9 @@ export default class NoticeBoardPage extends Component<InjectedOrGenerated<Gener
       wallets: {|
         selected: null | PublicDeriver<>
       |},
+      tokenInfoStore: {|
+        tokenInfo: TokenInfoMap,
+      |},
       noticeBoard: {|
         hasMoreToLoad: boolean,
         isLoading: boolean,
@@ -126,6 +131,9 @@ export default class NoticeBoardPage extends Component<InjectedOrGenerated<Gener
       stores: {
         profile: {
           isClassicTheme: profileStore.isClassicTheme,
+        },
+        tokenInfoStore: {
+          tokenInfo: stores.tokenInfoStore.tokenInfo,
         },
         noticeBoard: {
           loadedNotices: stores.noticeBoard.loadedNotices,

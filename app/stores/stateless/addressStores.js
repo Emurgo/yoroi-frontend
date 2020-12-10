@@ -397,7 +397,8 @@ export function applyAddressFilter(request: {|
   }
   if (request.addressFilter === AddressFilter.HasBalance) {
     return request.addresses.filter(address => (
-      address.value !== undefined && address.value.gt(0)
+      address.values !== undefined &&
+      address.values.values.filter(value => value.amount.gt(0)).length > 0
     ));
   }
   throw new Error(`${nameof(applyAddressFilter)} unknown filter type ${request.addressFilter}`);

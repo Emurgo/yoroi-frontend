@@ -9,21 +9,28 @@ import type {
 } from '../api/ada/transactions/types';
 import type {
   BlockRow,
+  DbTokenInfo,
 } from '../api/ada/lib/storage/database/primitives/tables';
 import type {
   TxStatusCodesType,
 } from '../api/ada/lib/storage/database/primitives/enums';
 import { transactionTypes } from '../api/ada/transactions/types';
 import type { UnconfirmedAmount } from '../types/unconfirmedAmountType';
+import {
+  MultiToken,
+} from '../api/common/lib/MultiToken';
+import type {
+  DefaultTokenEntry,
+} from '../api/common/lib/MultiToken';
 
 export type TransactionAddresses = {|
   from: Array<{|
     address: string,
-    value: BigNumber,
+    value: MultiToken,
   |}>,
   to: Array<{|
     address: string,
-    value: BigNumber,
+    value: MultiToken,
   |}>,
 |};
 
@@ -31,8 +38,8 @@ export type WalletTransactionCtorData = {|
   txid: string,
   block: ?$ReadOnly<BlockRow>,
   type: TransactionDirectionType,
-  amount: BigNumber,
-  fee: BigNumber,
+  amount: MultiToken,
+  fee: MultiToken,
   date: Date,
   addresses: TransactionAddresses,
   state: TxStatusCodesType,
@@ -46,8 +53,8 @@ export default class WalletTransaction {
   // TODO: remove and make as a map
   @observable block: ?$ReadOnly<BlockRow>;
   @observable type: TransactionDirectionType;
-  @observable amount: BigNumber; // fee included
-  @observable fee: BigNumber;
+  @observable amount: MultiToken; // fee included
+  @observable fee: MultiToken;
   @observable date: Date; // TODO: remove?
   @observable addresses: TransactionAddresses = { from: [], to: [] };
 
@@ -94,11 +101,12 @@ export function calculateUnconfirmedAmount(
   lastSyncBlock: number,
   assuranceMode: AssuranceMode,
   getUnitOfAccount: Date => (void | $ReadOnly<PriceDataRow>),
+  defaultTokenInfo: DefaultTokenEntry,
 ): UnconfirmedAmount {
   const unconfirmedAmount = {
-    total: new BigNumber(0),
-    incoming: new BigNumber(0),
-    outgoing: new BigNumber(0),
+    total: new MultiToken([], defaultTokenInfo),
+    incoming: new MultiToken([], defaultTokenInfo),
+    outgoing: new MultiToken([], defaultTokenInfo),
     // If any of the below values becomes null, it means price data are
     // unavailable for at least one of the transaction in the category
     // and we just give up calculating the value.
@@ -113,19 +121,22 @@ export function calculateUnconfirmedAmount(
     const assuranceForTx = transaction.getAssuranceLevelForMode(assuranceMode, lastSyncBlock);
     if (assuranceForTx !== assuranceLevels.HIGH) {
       // total
-      unconfirmedAmount.total = unconfirmedAmount.total.plus(transaction.amount.absoluteValue());
+      unconfirmedAmount.total.joinAddMutable(transaction.amount.absCopy());
 
       // outgoing
       if (transaction.type === transactionTypes.EXPEND) {
-        unconfirmedAmount.outgoing = unconfirmedAmount.outgoing.plus(
-          transaction.amount.absoluteValue()
+        unconfirmedAmount.outgoing = unconfirmedAmount.outgoing.joinAddMutable(
+          transaction.amount.absCopy()
         );
         const unitOfAccount = getUnitOfAccount(transaction.date);
         if (unitOfAccount != null) {
           if (unconfirmedAmount.outgoingInSelectedCurrency) {
             unconfirmedAmount.outgoingInSelectedCurrency =
               unconfirmedAmount.outgoingInSelectedCurrency.plus(
-                transaction.amount.absoluteValue().multipliedBy(String(unitOfAccount.Price))
+                transaction.amount
+                  .getDefault()
+                  .absoluteValue()
+                  .multipliedBy(String(unitOfAccount.Price))
               );
           } else {
             unconfirmedAmount.outgoingInSelectedCurrency = null;
@@ -135,15 +146,18 @@ export function calculateUnconfirmedAmount(
 
       // incoming
       if (transaction.type === transactionTypes.INCOME) {
-        unconfirmedAmount.incoming = unconfirmedAmount.incoming.plus(
-          transaction.amount.absoluteValue()
+        unconfirmedAmount.incoming = unconfirmedAmount.incoming.joinAddMutable(
+          transaction.amount.absCopy()
         );
         const unitOfAccount = getUnitOfAccount(transaction.date);
         if (unitOfAccount != null) {
           if (unconfirmedAmount.incomingInSelectedCurrency) {
             unconfirmedAmount.incomingInSelectedCurrency =
               unconfirmedAmount.incomingInSelectedCurrency.plus(
-                transaction.amount.absoluteValue().multipliedBy(String(unitOfAccount.Price))
+                transaction.amount
+                  .getDefault()
+                  .absoluteValue()
+                  .multipliedBy(String(unitOfAccount.Price))
               );
           } else {
             unconfirmedAmount.incomingInSelectedCurrency = null;
@@ -159,14 +173,15 @@ export function calculateUnconfirmedAmount(
 export const toAddr: {|
   rows: $ReadOnlyArray<$ReadOnly<{
     +AddressId: number,
-    +Amount: string,
+    +TokenListId: number,
     ...,
   }>>,
-  amountPerUnit: BigNumber,
   addressLookupMap: Map<number, string>,
+  tokens: $PropertyType<DbTokenInfo, 'tokens'>,
+  defaultToken: DefaultTokenEntry
 |} => Array<{|
   address: string,
-  value: BigNumber,
+  value: MultiToken,
 |}> = request => {
   const result = [];
   for (const row of request.rows) {
@@ -174,9 +189,19 @@ export const toAddr: {|
     if (val == null) {
       throw new Error(`${nameof(toAddr)} address not in map`);
     }
+    const tokens = new MultiToken([], request.defaultToken);
+    for (const token of request.tokens) {
+      if (token.TokenList.ListId === row.TokenListId) {
+        tokens.add({
+          identifier: token.Token.Identifier,
+          amount: new BigNumber(token.TokenList.Amount),
+          networkId: token.Token.NetworkId,
+        });
+      }
+    }
     result.push({
       address: val,
-      value: new BigNumber(row.Amount).dividedBy(request.amountPerUnit),
+      value: tokens,
     });
   }
   return result;

@@ -4,7 +4,6 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { computed, observable, runInAction } from 'mobx';
 import { intlShape } from 'react-intl';
-import BigNumber from 'bignumber.js';
 import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 
 import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
@@ -26,7 +25,6 @@ import ErrorBlock from '../../../components/widgets/ErrorBlock';
 import AnnotatedLoader from '../../../components/transfer/AnnotatedLoader';
 import DelegationSuccessDialog from '../../../components/wallet/staking/DelegationSuccessDialog';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
-import { getApiForNetwork, getApiMeta } from '../../../api/common/utils';
 import type { PoolMeta, DelegationRequests } from '../../../stores/toplevel/DelegationStore';
 import { WalletTypeOption } from '../../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import DelegationTxDialog from '../../../components/wallet/staking/DelegationTxDialog';
@@ -38,6 +36,11 @@ import type { ReputationObject } from '../../../api/jormungandr/lib/state-fetch/
 import config from '../../../config';
 import { handleExternalLinkClick } from '../../../utils/routing';
 import type { TxRequests } from '../../../stores/toplevel/TransactionsStore'
+import type { TokenInfoMap } from '../../../stores/toplevel/TokenInfoStore';
+import { genLookupOrFail } from '../../../stores/stateless/tokenHelpers';
+import {
+  MultiToken,
+} from '../../../api/common/lib/MultiToken';
 
 export type GeneratedData = typeof CardanoStakingPage.prototype.generated;
 
@@ -117,7 +120,7 @@ export default class CardanoStakingPage extends Component<Props> {
 
   }
 
-  _getTotalAda: ?BigNumber => ?number = () => {
+  _getTotalAda: ?MultiToken => ?number = () => {
     const publicDeriver = this.generated.stores.wallets.selected;
     if (publicDeriver == null) {
       throw new Error(`${nameof(CardanoStakingPage)} no public deriver. Should never happen`);
@@ -133,16 +136,19 @@ export default class CardanoStakingPage extends Component<Props> {
     const balance = txRequests.requests.getBalanceRequest.result;
     const rewardBalance =
       delegationRequests.getDelegatedBalance.result == null
-        ? 0
+        ? new MultiToken([], publicDeriver.getParent().getDefaultToken())
         : delegationRequests.getDelegatedBalance.result.accountPart;
-
-    const apiMeta = getApiMeta(getApiForNetwork(publicDeriver.getParent().getNetworkInfo()))
-      ?.meta;
-    if (apiMeta == null) throw new Error(`${nameof(CardanoStakingPage)} no API selected`);
-    const amountPerUnit = new BigNumber(10).pow(apiMeta.decimalPlaces);
+    const tokenInfo = genLookupOrFail(
+      this.generated.stores.tokenInfoStore.tokenInfo
+    )(rewardBalance.getDefaultEntry());
 
     if (balance == null || rewardBalance == null) throw new Error(`${nameof(CardanoStakingPage)} balance or rewardBalance is null`)
-    return balance.plus(rewardBalance).dividedBy(amountPerUnit).toNumber();
+    return balance
+      .joinAddMutable(rewardBalance)
+      .getDefaultEntry()
+      .amount
+      .shiftedBy(-tokenInfo.Metadata.numberOfDecimals)
+      .toNumber();
   }
 
   _updatePool: ?string => Promise<void> = async (poolId) => {
@@ -291,20 +297,21 @@ export default class CardanoStakingPage extends Component<Props> {
     }
 
     const networkInfo = selectedWallet.getParent().getNetworkInfo();
-    const apiMeta = getApiMeta(getApiForNetwork(networkInfo))?.meta;
-    if (apiMeta == null) throw new Error(`${nameof(CardanoStakingPage)} no API selected`);
     const currentParams = networkInfo.BaseConfig
       .reduce((acc, next) => Object.assign(acc, next), {});
-    const amountPerUnit = new BigNumber(10).pow(apiMeta.decimalPlaces);
 
-    const approximateReward: BigNumber => BigNumber = (amount) => {
-      const rewardMultiplier = (number) => number
-        .times(currentParams.PerEpochPercentageReward)
-        .div(EPOCH_REWARD_DENOMINATOR);
+    const approximateReward = (tokenEntry) => {
+      const tokenRow = this.generated.stores.tokenInfoStore.tokenInfo
+        .get(tokenEntry.networkId.toString())
+        ?.get(tokenEntry.identifier);
+      if (tokenRow == null) throw new Error(`${nameof(CardanoStakingPage)} no token info for ${JSON.stringify(tokenEntry)}`);
 
-      const result = rewardMultiplier(amount)
-        .div(amountPerUnit);
-      return result;
+      return {
+        amount: tokenEntry.amount
+          .times(currentParams.PerEpochPercentageReward)
+          .div(EPOCH_REWARD_DENOMINATOR),
+        token: tokenRow,
+      };
     };
 
     const showSignDialog = this.generated.stores.wallets.sendMoneyRequest.isExecuting ||
@@ -354,9 +361,12 @@ export default class CardanoStakingPage extends Component<Props> {
             ?? intl.formatMessage(globalMessages.unknownPoolLabel)
           }
           poolHash={delegationTransaction.selectedPools[0]}
-          transactionFee={delegationTx.signTxRequest.fee(true)}
+          transactionFee={delegationTx.signTxRequest.fee()}
           amountToDelegate={delegationTx.totalAmountToDelegate}
-          approximateReward={approximateReward(delegationTx.totalAmountToDelegate)}
+          approximateReward={
+            approximateReward(delegationTx.totalAmountToDelegate.getDefaultEntry())
+          }
+          getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
           isSubmitting={
             this.generated.stores.wallets.sendMoneyRequest.isExecuting
           }
@@ -377,11 +387,6 @@ export default class CardanoStakingPage extends Component<Props> {
               selectedWallet.getParent().getNetworkInfo().NetworkId
             ) ?? (() => { throw new Error('No explorer for wallet network'); })()
           }
-          meta={{
-            decimalPlaces: apiMeta.decimalPlaces.toNumber(),
-            totalSupply: apiMeta.totalSupply,
-            ticker: apiMeta.primaryTicker,
-          }}
         />
       );
     }
@@ -459,6 +464,9 @@ export default class CardanoStakingPage extends Component<Props> {
         isClassicTheme: boolean,
         currentLocale: string,
       |},
+      tokenInfoStore: {|
+        tokenInfo: TokenInfoMap,
+      |},
       substores: {|
         ada: {|
           delegationTransaction: {|
@@ -518,6 +526,9 @@ export default class CardanoStakingPage extends Component<Props> {
         transactions: {
           hasAnyPending: stores.transactions.hasAnyPending,
           getTxRequests: stores.transactions.getTxRequests,
+        },
+        tokenInfoStore: {
+          tokenInfo: stores.tokenInfoStore.tokenInfo,
         },
         delegation: {
           getDelegationRequests: stores.delegation.getDelegationRequests,

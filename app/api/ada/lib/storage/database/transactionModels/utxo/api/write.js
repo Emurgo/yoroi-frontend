@@ -13,15 +13,15 @@ import type {
   UtxoTransactionInputInsert, UtxoTransactionInputRow,
   UtxoTransactionOutputInsert, UtxoTransactionOutputRow,
   DbUtxoInputs, DbUtxoOutputs,
-  TokenListInsert, TokenListRow,
 } from '../tables';
 import type {
   TransactionRow,
+  TokenRow,
+  TokenListRow,
 } from '../../../primitives/tables';
 
 import {
   addBatchToTable,
-  addOrReplaceRows,
 } from '../../../utils';
 
 import {
@@ -33,10 +33,15 @@ export type MarkAsRequest = {|
   txId: number,
   outputIndex: number,
   isUnspent: boolean,
+  networkId: number,
 |};
 export type MarkAsResponse = void | {|
   Transaction: $ReadOnly<TransactionRow>,
   UtxoTransactionOutput: $ReadOnly<UtxoTransactionOutputRow>,
+  tokens: $ReadOnlyArray<{|
+    TokenList: $ReadOnly<TokenListRow>,
+    Token: $ReadOnly<TokenRow>,
+  |}>
 |};
 export class MarkUtxo {
   static ownTables: {|
@@ -58,6 +63,7 @@ export class MarkUtxo {
       {
         txId: request.txId,
         outputIndex: request.outputIndex,
+        networkId: request.networkId,
       },
     );
     if (output === undefined) {
@@ -131,28 +137,5 @@ export class ModifyUtxoTransaction {
       utxoInputs: newInputs,
       utxoOutputs: newOutputs,
     };
-  }
-}
-
-export class ModifyTokenList {
-  static ownTables: {|
-    TokenList: typeof Tables.TokenListSchema,
-  |} = Object.freeze({
-    [Tables.TokenListSchema.name]: Tables.TokenListSchema,
-  });
-  static depTables: {||} = Object.freeze({});
-
-  static async upsert(
-    db: lf$Database,
-    tx: lf$Transaction,
-    rows: $ReadOnlyArray<TokenListInsert>,
-  ): Promise<$ReadOnlyArray<$ReadOnly<TokenListRow>>> {
-    const result = await addOrReplaceRows<TokenListInsert, TokenListRow>(
-      db, tx,
-      rows,
-      ModifyTokenList.ownTables[Tables.TokenListSchema.name].name,
-    );
-
-    return result;
   }
 }

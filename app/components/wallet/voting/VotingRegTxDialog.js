@@ -20,6 +20,15 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import SpendingPasswordInput from '../../widgets/forms/SpendingPasswordInput';
 import AmountInputSkin from '../skins/AmountInputSkin';
 import { NumericInput } from 'react-polymorph/lib/components/NumericInput';
+import {
+  MultiToken,
+} from '../../../api/common/lib/MultiToken';
+import { calcMaxBeforeDot, } from '../../../utils/validations';
+import type {
+  TokenLookupKey,
+} from '../../../api/common/lib/MultiToken';
+import type { TokenRow, } from '../../../api/ada/lib/storage/database/primitives/tables';
+import { getTokenName, genFormatTokenAmount, } from '../../../stores/stateless/tokenHelpers';
 
 import WarningBox from '../../widgets/WarningBox';
 
@@ -32,18 +41,14 @@ const messages = defineMessages({
 
 type Props = {|
   +staleTx: boolean,
-  +transactionFee: BigNumber,
+  +transactionFee: MultiToken,
   +isHardware: boolean,
   +isSubmitting: boolean,
   +onCancel: void => void,
   +onSubmit: ({| password?: string |}) => PossiblyAsync<void>,
   +classicTheme: boolean,
   +error: ?LocalizableError,
-  +meta: {|
-    +totalSupply: BigNumber,
-    +decimalPlaces: number,
-    +ticker: string,
-  |},
+  +getTokenInfo: Inexact<TokenLookupKey> => $ReadOnly<TokenRow>,
 |};
 
 @observer
@@ -120,6 +125,9 @@ export default class VotingRegTxDialog extends Component<Props> {
       },
     ];
 
+    const tokenInfo = this.props.getTokenInfo(this.props.transactionFee.getDefaultEntry());
+    const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
+
     return (
       <Dialog
         title={intl.formatMessage(globalMessages.walletSendConfirmationDialogTitle)}
@@ -140,20 +148,16 @@ export default class VotingRegTxDialog extends Component<Props> {
           <NumericInput
             className="amount"
             label={intl.formatMessage(globalMessages.amountLabel)}
-            maxBeforeDot={
-              this.props.meta.totalSupply.div(this.props.meta.decimalPlaces).toFixed().length
-            }
-            maxAfterDot={this.props.meta.decimalPlaces}
+            maxBeforeDot={calcMaxBeforeDot(tokenInfo.Metadata.numberOfDecimals)}
+            maxAfterDot={tokenInfo.Metadata.numberOfDecimals}
             disabled
             // AmountInputSkin props
-            currency={this.props.meta.ticker}
-            fees={this.props.transactionFee.toFormat(this.props.meta.decimalPlaces)}
+            currency={getTokenName(tokenInfo)}
+            fees={formatValue(this.props.transactionFee.getDefaultEntry())}
             // note: we purposely don't put "total" since it doesn't really make sense here
             // since the fee is unrelated to the amount you're about to stake
             total=""
-            value={new BigNumber(0)
-              .shiftedBy(-this.props.meta.decimalPlaces)
-              .toFormat(this.props.meta.decimalPlaces)
+            value={new BigNumber(0).toFormat(tokenInfo.Metadata.numberOfDecimals)
             }
             skin={AmountInputSkin}
             classicTheme={this.props.classicTheme}

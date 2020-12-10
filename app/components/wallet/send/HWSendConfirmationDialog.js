@@ -4,7 +4,6 @@ import React, { Component, } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { intlShape } from 'react-intl';
-import BigNumber from 'bignumber.js';
 import type { MessageDescriptor, $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 import Dialog from '../../widgets/Dialog';
@@ -23,6 +22,14 @@ import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import styles from './HWSendConfirmationDialog.scss';
 import { truncateAddress } from '../../../utils/formatters';
+import {
+  MultiToken,
+} from '../../../api/common/lib/MultiToken';
+import type {
+  TokenLookupKey,
+} from '../../../api/common/lib/MultiToken';
+import { getTokenName, genFormatTokenAmount, } from '../../../stores/stateless/tokenHelpers';
+import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 
 type ExpectedMessages = {|
   infoLine1: MessageDescriptor,
@@ -33,20 +40,19 @@ type ExpectedMessages = {|
 type Props = {|
   +staleTx: boolean,
   +selectedExplorer: SelectedExplorer,
-  +amount: BigNumber,
+  +amount: MultiToken,
   +receivers: Array<string>,
-  +totalAmount: BigNumber,
-  +transactionFee: BigNumber,
-  +ticker: string,
+  +totalAmount: MultiToken,
+  +transactionFee: MultiToken,
   +messages: ExpectedMessages,
   +isSubmitting: boolean,
   +error: ?LocalizableError,
   +onSubmit: void => PossiblyAsync<void>,
   +onCancel: void => void,
+  +getTokenInfo: Inexact<TokenLookupKey> => $ReadOnly<TokenRow>,
   +unitOfAccountSetting: UnitOfAccountSettingType,
-  +coinPrice: ?number,
-  +formattedWalletAmount: BigNumber => string,
   +addressToDisplayString: string => string,
+  +getCurrentPrice: (from: string, to: string) => ?number,
 |};
 
 @observer
@@ -63,13 +69,11 @@ export default class HWSendConfirmationDialog extends Component<Props> {
       receivers,
       totalAmount,
       transactionFee,
-      ticker,
       isSubmitting,
       messages,
       error,
       onCancel,
       unitOfAccountSetting,
-      coinPrice,
     } = this.props;
 
     const staleTxWarning = (
@@ -111,6 +115,27 @@ export default class HWSendConfirmationDialog extends Component<Props> {
         ))}
       </div>);
 
+    const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
+    const convertedToUnitOfAccount = (tokens, toCurrency) => {
+      const defaultEntry = tokens.getDefaultEntry();
+      const tokenInfo = this.props.getTokenInfo(defaultEntry);
+
+      const shiftedAmount = defaultEntry.amount
+        .shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
+
+      const coinPrice = this.props.getCurrentPrice(
+        tokenInfo.Identifier,
+        toCurrency
+      );
+
+      if (coinPrice == null) return '-';
+
+      return calculateAndFormatValue(
+        shiftedAmount,
+        coinPrice
+      );
+    };
+
     const amountBlock = (
       <div className={styles.amountFeesWrapper}>
         <div className={styles.amountWrapper}>
@@ -120,16 +145,29 @@ export default class HWSendConfirmationDialog extends Component<Props> {
           {unitOfAccountSetting.enabled ? (
             <>
               <div className={styles.amount}>
-                {coinPrice != null ? calculateAndFormatValue(amount, coinPrice) : '-'}
+                {convertedToUnitOfAccount(
+                  amount,
+                  unitOfAccountSetting.currency
+                )}
                 &nbsp;{unitOfAccountSetting.currency}
               </div>
-              <div className={styles.amountSmall}>{this.props.formattedWalletAmount(amount)}
-                <span className={styles.currencySymbol}>&nbsp;{ticker}</span>
+              <div className={styles.amountSmall}>{formatValue(amount.getDefaultEntry())}
+                <span className={styles.currencySymbol}>&nbsp;{
+                  getTokenName(this.props.getTokenInfo(
+                    this.props.amount.getDefaultEntry()
+                  ))
+                }
+                </span>
               </div>
             </>
           ) : (
-            <div className={styles.amount}>{this.props.formattedWalletAmount(amount)}
-              <span className={styles.currencySymbol}>&nbsp;{ticker}</span>
+            <div className={styles.amount}>{formatValue(amount.getDefaultEntry())}
+              <span className={styles.currencySymbol}>&nbsp;{
+                getTokenName(this.props.getTokenInfo(
+                  this.props.amount.getDefaultEntry()
+                ))
+              }
+              </span>
             </div>
           )}
         </div>
@@ -141,16 +179,29 @@ export default class HWSendConfirmationDialog extends Component<Props> {
           {unitOfAccountSetting.enabled ? (
             <>
               <div className={styles.fees}>+
-                {coinPrice != null ? calculateAndFormatValue(transactionFee, coinPrice) : '-'}
+                {convertedToUnitOfAccount(
+                  transactionFee,
+                  unitOfAccountSetting.currency
+                )}
                 &nbsp;{unitOfAccountSetting.currency}
               </div>
-              <div className={styles.feesSmall}>+{this.props.formattedWalletAmount(transactionFee)}
-                <span className={styles.currencySymbol}>&nbsp;{ticker}</span>
+              <div className={styles.feesSmall}>+{formatValue(transactionFee.getDefaultEntry())}
+                <span className={styles.currencySymbol}>&nbsp;{
+                  getTokenName(this.props.getTokenInfo(
+                    transactionFee.getDefaultEntry()
+                  ))
+                }
+                </span>
               </div>
             </>
           ) : (
-            <div className={styles.fees}>+{this.props.formattedWalletAmount(transactionFee)}
-              <span className={styles.currencySymbol}>&nbsp;{ticker}</span>
+            <div className={styles.fees}>+{formatValue(transactionFee.getDefaultEntry())}
+              <span className={styles.currencySymbol}>&nbsp;{
+                getTokenName(this.props.getTokenInfo(
+                  transactionFee.getDefaultEntry()
+                ))
+              }
+              </span>
             </div>
           )}
         </div>
@@ -164,16 +215,29 @@ export default class HWSendConfirmationDialog extends Component<Props> {
         {unitOfAccountSetting.enabled ? (
           <>
             <div className={styles.totalAmount}>
-              {coinPrice != null ? calculateAndFormatValue(totalAmount, coinPrice) : '-'}
+              {convertedToUnitOfAccount(
+                totalAmount,
+                unitOfAccountSetting.currency
+              )}
               &nbsp;{unitOfAccountSetting.currency}
             </div>
-            <div className={styles.totalAmountSmall}>{this.props.formattedWalletAmount(totalAmount)}
-              <span className={styles.currencySymbol}>&nbsp;{ticker}</span>
+            <div className={styles.totalAmountSmall}>{formatValue(totalAmount.getDefaultEntry())}
+              <span className={styles.currencySymbol}>&nbsp;{
+                getTokenName(this.props.getTokenInfo(
+                  totalAmount.getDefaultEntry()
+                ))
+              }
+              </span>
             </div>
           </>
         ) : (
-          <div className={styles.totalAmount}>{this.props.formattedWalletAmount(totalAmount)}
-            <span className={styles.currencySymbol}>&nbsp;{ticker}</span>
+          <div className={styles.totalAmount}>{formatValue(totalAmount.getDefaultEntry())}
+            <span className={styles.currencySymbol}>&nbsp;{
+              getTokenName(this.props.getTokenInfo(
+                totalAmount.getDefaultEntry()
+              ))
+            }
+            </span>
           </div>
         )}
       </div>);

@@ -1,8 +1,9 @@
 // @flow
 
 import BigNumber from 'bignumber.js';
-import { getAdaCurrencyMeta } from '../../../app/api/ada/currencyInfo';
 import { truncateAddress, } from '../../../app/utils/formatters';
+import { networks, defaultAssets } from '../../../app/api/ada/lib/storage/database/prepackaged/networks';
+import { getTokenName } from '../../../app/stores/stateless/tokenHelpers';
 
 type TransferSourceType = Array<{|
   fromAddress: string,
@@ -50,11 +51,17 @@ export async function checkTotalAmountIsCorrect(
   const totalAmount = rows.reduce(
     (acc, row) => acc.plus(new BigNumber(row.amount)), new BigNumber(0)
   );
-  const { decimalPlaces } = getAdaCurrencyMeta();
+  const network = networks.CardanoMainnet;
+  const assetInfo = defaultAssets.filter(
+    asset => asset.NetworkId === network.NetworkId
+  )[0];
+
+  const decimalPlaces = assetInfo.Metadata.numberOfDecimals;
+  const ticker = getTokenName(assetInfo);
   const amountPerUnit = new BigNumber(10).pow(decimalPlaces);
   const totalAmountFormatted = `${totalAmount
     .dividedBy(amountPerUnit)
-    .toFormat(decimalPlaces.toNumber())} ADA`;
+    .toFormat(decimalPlaces)} ${ticker}`;
   await world.waitUntilText(
     '.TransferSummaryPage_amount',
     totalAmountFormatted

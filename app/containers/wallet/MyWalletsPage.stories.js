@@ -17,6 +17,11 @@ import type { GetBalanceFunc } from '../../api/common/types';
 import MyWalletsPage from './MyWalletsPage';
 import { ServerStatusErrors } from '../../types/serverStatusErrorType';
 import { ROUTES } from '../../routes-config';
+import {
+  MultiToken,
+} from '../../api/common/lib/MultiToken';
+import { defaultAssets, } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { mockFromDefaults, getDefaultEntryTokenInfo, } from '../../stores/toplevel/TokenInfoStore';
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -29,8 +34,20 @@ export const Wallets = (): Node => {
   const genWallet = () => {
     const wallet = genShelleyCIP1852SigningWalletWithCache();
 
+    const defaultToken = wallet.publicDeriver.getParent().getDefaultToken();
+
+
     const balance: CachedRequest<GetBalanceFunc> = new CachedRequest(_request => Promise.resolve(
-      new BigNumber(3),
+      new MultiToken(
+        [{
+          amount: new BigNumber(3_000_000),
+          networkId: wallet.publicDeriver.getParent().getNetworkInfo().NetworkId,
+          identifier: defaultAssets.filter(
+            asset => asset.NetworkId === wallet.publicDeriver.getParent().getNetworkInfo().NetworkId
+          )[0].Identifier,
+        }],
+        defaultToken
+      ),
     ));
     const calculationCases = {
       Pending: 0,
@@ -90,6 +107,13 @@ export const Wallets = (): Node => {
           publicDerivers,
           getPublicKeyCache: lookup.getPublicKeyCache
         },
+        tokenInfoStore: {
+          tokenInfo: mockFromDefaults(defaultAssets),
+          getDefaultTokenInfo: networkId => getDefaultEntryTokenInfo(
+            networkId,
+            mockFromDefaults(defaultAssets)
+          ),
+        },
         transactions: {
           getTxRequests: lookup.getTransactions,
         },
@@ -143,6 +167,9 @@ export const Wallets = (): Node => {
                 ServerStatusErrors.Healthy,
               ),
               serverTime: undefined,
+            },
+            tokenInfoStore: {
+              tokenInfo: mockFromDefaults(defaultAssets),
             },
             wallets: {
               selected: null,

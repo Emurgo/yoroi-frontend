@@ -464,11 +464,48 @@ export const AddressMappingSchema: {|
   }
 };
 
+export type CommonMetadata = {|
+  numberOfDecimals: number,
+  ticker: null | string,
+  longName: null | string,
+|};
+export type TokenMetadata = {|
+  +type: 'Ergo',
+  /**
+    * This field is just an optimization for rollbacks
+    * With this, we just need to check if the most recent metadata exists
+    * and if we need to rollback, rollback in descending order
+    * note: null -> not in the chain (possible rolled back)
+    * note: 0 for ERG
+  */
+  +height: number | null,
+  // empty string for ERG
+  +boxId: string,
+  // based on https://github.com/ergoplatform/eips/blob/master/eip-0004.md
+  ...CommonMetadata,
+  +description: null | string,
+|} | {|
+  +type: 'Cardano',
+  // empty string for ADA
+  +policyId: string,
+  // empty string for ADA
+  +assetName: string,
+  ...CommonMetadata,
+|};
+
 export type TokenInsert = {|
   /** different blockchains can support native multi-asset */
   NetworkId: number,
+  IsDefault: boolean,
   Digest: number,
+  /**
+   * For Ergo, this is the tokenId (box id of first input in tx)
+   * for Cardano, this is policyId || assetName
+   * Note: we don't use null for the primary token of the chain
+   * As some blockchains have multiple primary tokens
+  */
   Identifier: string,
+  Metadata: TokenMetadata,
 |};
 export type TokenRow = {|
   TokenId: number,
@@ -481,14 +518,54 @@ export const TokenSchema: {|
   name: 'Token',
   properties: {
     TokenId: 'TokenId',
+    IsDefault: 'IsDefault',
     NetworkId: 'NetworkId',
     Digest: 'Digest',
     Identifier: 'Identifier',
+    Metadata: 'Metadata',
+  }
+};
+
+export type TokenListInsert = {|
+  ListId: number,
+  TokenId: number,
+  Amount: string,
+|};
+export type TokenListRow = {|
+  TokenListItemId: number,
+  ...TokenListInsert,
+|};
+/**
+ * For outputs that belong to you,
+ * utxo outputs are a super-set of inputs because for an address to be an input,
+ * it must have received coins (been an output) previously
+ */
+export const TokenListSchema: {|
+  +name: 'TokenList',
+  properties: $ObjMapi<TokenListRow, ToSchemaProp>,
+|} = {
+  name: 'TokenList',
+  properties: {
+    TokenListItemId: 'TokenListItemId',
+    ListId: 'ListId',
+    TokenId: 'TokenId',
+    Amount: 'Amount',
   }
 };
 
 export type DbTransaction = {|
   +transaction: $ReadOnly<TransactionRow>,
+|};
+
+export type DbTokenInfo = {|
+  +tokens: $ReadOnlyArray<{|
+    +TokenList: $ReadOnly<TokenListRow>,
+    +Token: $ReadOnly<{|
+      TokenId: number,
+      Identifier: string,
+      NetworkId: number,
+    |}>,
+  |}>
 |};
 
 export const populatePrimitivesDb = (schemaBuilder: lf$schema$Builder) => {
@@ -604,7 +681,11 @@ export const populatePrimitivesDb = (schemaBuilder: lf$schema$Builder) => {
       'Block_Digest_Index',
       ([BlockSchema.properties.Digest]: Array<string>),
       false // not unique. There is a (very small) chance of collisions
-    );
+    ).addIndex(
+      'Block_Height_Index',
+      ([BlockSchema.properties.Height]: Array<string>),
+      false
+    );;
 
   // Transaction table
   schemaBuilder.createTable(TransactionSchema.name)
@@ -736,8 +817,10 @@ export const populatePrimitivesDb = (schemaBuilder: lf$schema$Builder) => {
   schemaBuilder.createTable(TokenSchema.name)
     .addColumn(TokenSchema.properties.TokenId, Type.INTEGER)
     .addColumn(TokenSchema.properties.NetworkId, Type.INTEGER)
+    .addColumn(TokenSchema.properties.IsDefault, Type.BOOLEAN)
     .addColumn(TokenSchema.properties.Identifier, Type.STRING)
-    .addColumn(BlockSchema.properties.Digest, Type.NUMBER)
+    .addColumn(TokenSchema.properties.Digest, Type.NUMBER)
+    .addColumn(TokenSchema.properties.Metadata, Type.OBJECT)
     .addPrimaryKey(
       ([TokenSchema.properties.TokenId]: Array<string>),
       true
@@ -755,5 +838,26 @@ export const populatePrimitivesDb = (schemaBuilder: lf$schema$Builder) => {
        * easiest to achieve by using a testnet for the same blockchain
        */
       false
+    );
+
+  // TokenList Table
+  schemaBuilder.createTable(TokenListSchema.name)
+    .addColumn(TokenListSchema.properties.TokenListItemId, Type.INTEGER)
+    .addColumn(TokenListSchema.properties.ListId, Type.INTEGER)
+    .addColumn(TokenListSchema.properties.TokenId, Type.INTEGER)
+
+    .addColumn(TokenListSchema.properties.Amount, Type.STRING)
+    .addPrimaryKey(
+      ([TokenListSchema.properties.TokenListItemId]: Array<string>),
+      true
+    )
+    .addForeignKey('TokenList_Token', {
+      local: TokenListSchema.properties.TokenId,
+      ref: `${TokenSchema.name}.${TokenSchema.properties.TokenId}`,
+    })
+    .addIndex(
+      'TokenList_ListId',
+      ([TokenListSchema.properties.ListId]: Array<string>),
+      false // one list can contain multiple assets
     );
 };

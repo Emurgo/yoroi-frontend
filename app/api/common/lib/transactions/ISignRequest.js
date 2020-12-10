@@ -1,12 +1,13 @@
 // @flow
 
-import BigNumber from 'bignumber.js';
-import { RustModule } from '../../../ada/lib/cardanoCrypto/rustLoader';
+import {
+  MultiToken,
+} from '../MultiToken';
 
 export interface ISignRequest<T> {
-  totalInput(shift: boolean): BigNumber;
-  totalOutput(shift: boolean): BigNumber;
-  fee(shift: boolean): BigNumber;
+  totalInput(): MultiToken;
+  totalOutput(): MultiToken;
+  fee(): MultiToken;
   uniqueSenderAddresses(): Array<string>;
   receivers(includeChange: boolean): Array<string>;
   isEqual(tx: ?mixed): boolean;

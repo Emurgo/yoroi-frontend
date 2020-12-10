@@ -21,10 +21,9 @@ import { defineMessages, intlShape } from 'react-intl';
 import YoroiTransferWaitingPage from '../../transfer/YoroiTransferWaitingPage';
 import SuccessPage from '../../../components/transfer/SuccessPage';
 import { TransferStatus, } from '../../../types/TransferTypes';
-import { formattedWalletAmount } from '../../../utils/formatters';
 import ErrorPage from '../../../components/transfer/ErrorPage';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { ApiOptions, getApiForNetwork, getApiMeta } from '../../../api/common/utils';
+import { ApiOptions, getApiForNetwork, } from '../../../api/common/utils';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import type { RestoreStepsType, PlateWithMeta } from '../../../stores/toplevel/WalletRestoreStore';
@@ -36,6 +35,8 @@ import type {
 } from '../../../api/ada/lib/storage/database/primitives/tables';
 import { isJormungandr } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import { addressToDisplayString, } from '../../../api/ada/lib/storage/bridge/utils';
+import type { TokenInfoMap } from '../../../stores/toplevel/TokenInfoStore';
+import { genLookupOrFail } from '../../../stores/stateless/tokenHelpers';
 
 const messages = defineMessages({
   walletUpgradeNoop: {
@@ -203,22 +204,11 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
       throw new Error(`${nameof(this._transferDialogContent)} not set to ADA API`);
     }
     (selectedAPI: typeof ApiOptions.ada);
-    const apiMeta = getApiMeta(selectedAPI);
-    if (apiMeta == null) throw new Error(`${nameof(this._transferDialogContent)} no API selected`);
     const { yoroiTransfer } = this.generated.stores;
     const adaWalletRestoreActions = this.generated.actions[ApiOptions.ada].walletRestore;
     const walletRestoreActions = this.generated.actions.walletRestore;
     const { profile, } = this.generated.stores;
     const { intl } = this.context;
-
-    const coinPrice: ?number = this.generated.stores.profile.unitOfAccount.enabled
-      ? (
-        this.generated.stores.coinPriceStore.getCurrentPrice(
-          apiMeta.meta.primaryTicker,
-          this.generated.stores.profile.unitOfAccount.currency
-        )
-      )
-      : null;
 
     switch (yoroiTransfer.status) {
       // we have to verify briefly go through this step
@@ -236,14 +226,11 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
         }
         return (<TransferSummaryPage
           form={null}
-          formattedWalletAmount={amount => formattedWalletAmount(
-            amount,
-            apiMeta.meta.decimalPlaces.toNumber()
-          )}
           transferTx={yoroiTransfer.transferTx}
           selectedExplorer={this.generated.stores.explorers.selectedExplorer
             .get(this.getSelectedNetwork().NetworkId) ?? (() => { throw new Error('No explorer for wallet network'); })()
           }
+          getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
           onSubmit={{
             label: intl.formatMessage(globalMessages.nextButtonLabel),
             trigger: adaWalletRestoreActions.transferFromLegacy.trigger,
@@ -259,12 +246,11 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
             () => undefined
           }
           dialogTitle={intl.formatMessage(globalMessages.walletUpgrade)}
-          coinPrice={coinPrice}
+          getCurrentPrice={this.generated.stores.coinPriceStore.getCurrentPrice}
           unitOfAccountSetting={this.generated.stores.profile.unitOfAccount}
           addressToDisplayString={
             addr => addressToDisplayString(addr, this.getSelectedNetwork())
           }
-          ticker={apiMeta.meta.primaryTicker}
         />);
       }
       case TransferStatus.ERROR: {
@@ -345,6 +331,9 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
         selectedNetwork: void | $ReadOnly<NetworkRow>,
         unitOfAccount: UnitOfAccountSettingType
       |},
+      tokenInfoStore: {|
+        tokenInfo: TokenInfoMap,
+      |},
       walletRestore: {|
         recoveryResult: void | {|
           plates: Array<PlateWithMeta>,
@@ -406,6 +395,9 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
           sendMoneyRequest: {
             isExecuting: stores.wallets.sendMoneyRequest.isExecuting,
           },
+        },
+        tokenInfoStore: {
+          tokenInfo: stores.tokenInfoStore.tokenInfo,
         },
         coinPriceStore: {
           getCurrentPrice: stores.coinPriceStore.getCurrentPrice,

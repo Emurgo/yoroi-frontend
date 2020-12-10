@@ -1,3 +1,4 @@
+
 // @flow
 
 import type {
@@ -23,8 +24,11 @@ import type { HwWalletMetaRow, ConceptualWalletRow } from '../../database/wallet
 import { GetConceptualWallet } from '../../database/walletTypes/core/api/read';
 import Config from '../../../../../../config';
 import type {
-  NetworkRow,
+  NetworkRow, TokenRow,
 } from '../../database/primitives/tables';
+import type {
+  DefaultTokenEntry,
+} from '../../../../../common/lib/MultiToken';
 
 /** Snapshot of a ConceptualWallet in the database */
 export class ConceptualWallet implements IConceptualWallet, IRename {
@@ -38,6 +42,7 @@ export class ConceptualWallet implements IConceptualWallet, IRename {
   walletType: WalletType;
   hardwareInfo: ?$ReadOnly<HwWalletMetaRow>;
   networkInfo: $ReadOnly<NetworkRow>;
+  defaultToken: $ReadOnly<TokenRow>;
 
   constructor(data: IConceptualWalletConstructor): IConceptualWallet {
     this.db = data.db;
@@ -45,6 +50,7 @@ export class ConceptualWallet implements IConceptualWallet, IRename {
     this.walletType = data.walletType;
     this.hardwareInfo = data.hardwareInfo;
     this.networkInfo = data.networkInfo;
+    this.defaultToken = data.defaultToken;
     return this;
   }
 
@@ -54,6 +60,13 @@ export class ConceptualWallet implements IConceptualWallet, IRename {
 
   getNetworkInfo(): $ReadOnly<NetworkRow> {
     return this.networkInfo;
+  }
+
+  getDefaultToken(): DefaultTokenEntry {
+    return {
+      defaultNetworkId: this.networkInfo.NetworkId,
+      defaultIdentifier: this.defaultToken.Identifier,
+    };
   }
 
   getConceptualWalletId(): number {

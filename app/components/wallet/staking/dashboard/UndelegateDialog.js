@@ -3,7 +3,6 @@
 /* eslint react/jsx-one-expression-per-line: 0 */  // the &nbsp; in the html breaks this
 
 import type { Node } from 'react';
-import BigNumber from 'bignumber.js';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
@@ -20,6 +19,14 @@ import styles from './UndelegateDialog.scss';
 import AnnotatedLoader from '../../../transfer/AnnotatedLoader';
 import config from '../../../../config';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import {
+  MultiToken,
+} from '../../../../api/common/lib/MultiToken';
+import type {
+  TokenLookupKey,
+} from '../../../../api/common/lib/MultiToken';
+import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
+import { getTokenName } from '../../../../stores/stateless/tokenHelpers';
 
 import WarningBox from '../../../widgets/WarningBox';
 
@@ -36,17 +43,14 @@ const messages = defineMessages({
 
 type Props = {|
   +staleTx: boolean,
-  +transactionFee: BigNumber,
+  +transactionFee: MultiToken,
+  +getTokenInfo: Inexact<TokenLookupKey> => $ReadOnly<TokenRow>,
   +isSubmitting: boolean,
   +onCancel: void => void,
   +onSubmit: ({| password: string |}) => PossiblyAsync<void>,
   +classicTheme: boolean,
   +error: ?LocalizableError,
   +generatingTx: boolean,
-  +meta: {|
-    +decimalPlaces: number,
-    +ticker: string,
-  |},
 |};
 
 @observer
@@ -148,6 +152,22 @@ export default class UndelegateDialog extends Component<Props> {
       },
     ];
 
+    const rewardAmount = (() => {
+      const defaultEntry = this.props.transactionFee.getDefaultEntry();
+      const tokenInfo = this.props.getTokenInfo(defaultEntry);
+
+      const formattedAmount = defaultEntry.amount
+        .shiftedBy(-tokenInfo.Metadata.numberOfDecimals)
+        .toFormat(tokenInfo.Metadata.numberOfDecimals);
+
+      return (
+        <p className={styles.rewardAmount}>
+          {formattedAmount}&nbsp;
+          {getTokenName(tokenInfo)}
+        </p>
+      );
+    })();
+
     return (
       <Dialog
         title={intl.formatMessage(globalMessages.walletSendConfirmationDialogTitle)}
@@ -181,10 +201,7 @@ export default class UndelegateDialog extends Component<Props> {
           <p className={styles.header}>
             {intl.formatMessage(globalMessages.walletSendConfirmationFeesLabel)}
           </p>
-          <p className={styles.rewardAmount}>
-            {this.props.transactionFee.toFormat(this.props.meta.decimalPlaces)}&nbsp;
-            {this.props.meta.ticker}
-          </p>
+          {rewardAmount}
         </div>
         {this.props.error
           ? (

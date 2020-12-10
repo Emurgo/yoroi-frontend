@@ -314,12 +314,12 @@ async function baseTest(
 
     {
       const response = await basePubDeriver.getUtxoBalance();
-      expect(response).toEqual(new BigNumber('0'));
+      expect(response.getDefault()).toEqual(new BigNumber('0'));
     }
 
     {
       const response = await basePubDeriver.getUtxoBalance();
-      expect(response).toEqual(new BigNumber('0'));
+      expect(response.getDefault()).toEqual(new BigNumber('0'));
     }
 
     {
@@ -387,7 +387,7 @@ async function baseTest(
             AddressId: purposeForTest === WalletTypePurpose.CIP1852
               ? 9
               : 5,
-            Amount: '2100000',
+            TokenListId: 4,
             IsUnspent: true,
             OutputIndex: 0,
             TransactionId: 2,
@@ -395,19 +395,42 @@ async function baseTest(
             ErgoBoxId: null,
             ErgoCreationHeight: null,
             ErgoTree: null,
-          }
+          },
+          tokens: [{
+            Token: {
+              Digest: 6.262633522161549e-167,
+              IsDefault: true,
+              Identifier: '',
+              Metadata: {
+                assetName: '',
+                longName: null,
+                numberOfDecimals: 6,
+                policyId: '',
+                ticker: 'ADA',
+                type: 'Cardano',
+              },
+              NetworkId: 100,
+              TokenId: 2,
+            },
+            TokenList: {
+              Amount: '2100000',
+              ListId: 4,
+              TokenId: 2,
+              TokenListItemId: 5,
+            },
+          }]
         }
       }]);
     }
 
     {
       const response = await basePubDeriver.getUtxoBalance();
-      expect(response).toEqual(new BigNumber('2100000'));
+      expect(response.getDefault()).toEqual(new BigNumber('2100000'));
     }
 
     {
       const response = await basePubDeriver.getUtxoBalance();
-      expect(response).toEqual(new BigNumber('2100000'));
+      expect(response.getDefault()).toEqual(new BigNumber('2100000'));
     }
 
     {
@@ -489,7 +512,7 @@ async function baseTest(
             AddressId: purposeForTest === WalletTypePurpose.CIP1852
               ? 9
               : 5,
-            Amount: '2100000',
+            TokenListId: 1,
             IsUnspent: true,
             OutputIndex: 0,
             TransactionId: 1,
@@ -497,7 +520,30 @@ async function baseTest(
             ErgoBoxId: null,
             ErgoCreationHeight: null,
             ErgoTree: null,
-          }
+          },
+          tokens: [{
+            Token: {
+              Digest: 6.262633522161549e-167,
+              IsDefault: true,
+              Identifier: '',
+              Metadata: {
+                assetName: '',
+                longName: null,
+                numberOfDecimals: 6,
+                policyId: '',
+                ticker: 'ADA',
+                type: 'Cardano',
+              },
+              NetworkId: 100,
+              TokenId: 2,
+            },
+            TokenList: {
+              Amount: '2100000',
+              ListId: 1,
+              TokenId: 2,
+              TokenListItemId: 2,
+            },
+          }],
         }
       },
       {
@@ -533,7 +579,7 @@ async function baseTest(
             AddressId: purposeForTest === WalletTypePurpose.CIP1852
               ? 9
               : 5,
-            Amount: '2100000',
+            TokenListId: 4,
             IsUnspent: true,
             OutputIndex: 0,
             TransactionId: 2,
@@ -541,19 +587,42 @@ async function baseTest(
             ErgoBoxId: null,
             ErgoCreationHeight: null,
             ErgoTree: null,
-          }
+          },
+          tokens: [{
+            Token: {
+              Digest: 6.262633522161549e-167,
+              IsDefault: true,
+              Identifier: '',
+              Metadata: {
+                assetName: '',
+                longName: null,
+                numberOfDecimals: 6,
+                policyId: '',
+                ticker: 'ADA',
+                type: 'Cardano',
+              },
+              NetworkId: 100,
+              TokenId: 2,
+            },
+            TokenList: {
+              Amount: '2100000',
+              ListId: 4,
+              TokenId: 2,
+              TokenListItemId: 5,
+            },
+          }],
         }
       }]);
     }
 
     {
       const response = await basePubDeriver.getUtxoBalance();
-      expect(response).toEqual(new BigNumber('4200000'));
+      expect(response.getDefault()).toEqual(new BigNumber('4200000'));
     }
 
     {
       const response = await basePubDeriver.getUtxoBalance();
-      expect(response).toEqual(new BigNumber('4200000'));
+      expect(response.getDefault()).toEqual(new BigNumber('4200000'));
     }
 
     {
@@ -623,7 +692,7 @@ async function baseTest(
             AddressId: purposeForTest === WalletTypePurpose.CIP1852
               ? 9
               : 5,
-            Amount: '2100000',
+            TokenListId: 1,
             IsUnspent: true,
             OutputIndex: 0,
             TransactionId: 1,
@@ -631,7 +700,30 @@ async function baseTest(
             ErgoBoxId: null,
             ErgoCreationHeight: null,
             ErgoTree: null,
-          }
+          },
+          tokens: [{
+            Token: {
+              Digest: 6.262633522161549e-167,
+              IsDefault: true,
+              Identifier: '',
+              Metadata: {
+                assetName: '',
+                longName: null,
+                numberOfDecimals: 6,
+                policyId: '',
+                ticker: 'ADA',
+                type: 'Cardano',
+              },
+              NetworkId: 100,
+              TokenId: 2,
+            },
+            TokenList: {
+              Amount: '2100000',
+              ListId: 1,
+              TokenId: 2,
+              TokenListItemId: 2,
+            },
+          }],
         }
       },
       {
@@ -667,7 +759,7 @@ async function baseTest(
             AddressId: purposeForTest === WalletTypePurpose.CIP1852
               ? 9
               : 5,
-            Amount: '2100000',
+            TokenListId: 4,
             IsUnspent: true,
             OutputIndex: 0,
             TransactionId: 2,
@@ -675,19 +767,42 @@ async function baseTest(
             ErgoBoxId: null,
             ErgoCreationHeight: null,
             ErgoTree: null,
-          }
+          },
+          tokens: [{
+            Token: {
+              Digest: 6.262633522161549e-167,
+              IsDefault: true,
+              Identifier: '',
+              Metadata: {
+                assetName: '',
+                longName: null,
+                numberOfDecimals: 6,
+                policyId: '',
+                ticker: 'ADA',
+                type: 'Cardano',
+              },
+              NetworkId: 100,
+              TokenId: 2,
+            },
+            TokenList: {
+              Amount: '2100000',
+              ListId: 4,
+              TokenId: 2,
+              TokenListItemId: 5,
+            },
+          }],
         }
       }]);
     }
 
     {
       const response = await basePubDeriver.getUtxoBalance();
-      expect(response).toEqual(new BigNumber('4200000'));
+      expect(response.getDefault()).toEqual(new BigNumber('4200000'));
     }
 
     {
       const response = await basePubDeriver.getUtxoBalance();
-      expect(response).toEqual(new BigNumber('4200000'));
+      expect(response.getDefault()).toEqual(new BigNumber('4200000'));
     }
 
     {
@@ -755,7 +870,7 @@ async function baseTest(
 
     {
       const response = await basePubDeriver.getUtxoBalance();
-      expect(response).toEqual(new BigNumber('0'));
+      expect(response.getDefault()).toEqual(new BigNumber('0'));
     }
   }
 
@@ -770,7 +885,9 @@ async function baseTest(
     'UtxoTransactionInput',
     'UtxoTransactionOutput',
     'LastSyncInfo',
-    'Block'
+    'Block',
+    'Token',
+    'TokenList',
   ];
   const dump = (await db.export()).tables;
   filterDbSnapshot(dump, keysForTest);

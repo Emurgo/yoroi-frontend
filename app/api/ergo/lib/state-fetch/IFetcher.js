@@ -7,6 +7,7 @@ import type {
   HistoryRequest, HistoryResponse,
   SignedRequest, SignedResponse,
   BestBlockRequest, BestBlockResponse,
+  AssetInfoRequest, AssetInfoResponse,
 } from './types';
 import type {
   FilterUsedRequest, FilterUsedResponse,
@@ -20,4 +21,5 @@ export interface IFetcher {
   getBestBlock(body: BestBlockRequest): Promise<BestBlockResponse>;
   sendTx(body: SignedRequest): Promise<SignedResponse>;
   checkAddressesInUse(body: FilterUsedRequest): Promise<FilterUsedResponse>;
+  getAssetInfo(body: AssetInfoRequest): Promise<AssetInfoResponse>;
 }

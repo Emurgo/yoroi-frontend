@@ -18,6 +18,8 @@ import type { GeneratedData } from './Transfer';
 import Transfer from './Transfer';
 import { ComplexityLevels } from '../../types/complexityLevelType';
 import { DisclaimerStatus } from './options/ShelleyEraOptionDialogContainer';
+import { mockFromDefaults, getDefaultEntryTokenInfo, } from '../../stores/toplevel/TokenInfoStore';
+import { defaultAssets, } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -94,6 +96,13 @@ export const mockTransferProps: {
             publicDerivers: request.publicDerivers,
             getPublicKeyCache: request.getPublicKeyCache,
           },
+          tokenInfoStore: {
+            tokenInfo: mockFromDefaults(defaultAssets),
+            getDefaultTokenInfo: networkId => getDefaultEntryTokenInfo(
+              networkId,
+              mockFromDefaults(defaultAssets)
+            ),
+          },
           profile: {
             shouldHideBalance: false,
           },
@@ -123,6 +132,9 @@ export const mockTransferProps: {
           uiDialogs: {
             isOpen: (dialog) => dialog === request.dialog,
             getParam: () => (null: any),
+          },
+          tokenInfoStore: {
+            tokenInfo: mockFromDefaults(defaultAssets),
           },
         },
         actions: {
@@ -232,6 +244,9 @@ export const mockTransferProps: {
               ServerStatusErrors.Healthy,
             ),
             serverTime: undefined,
+          },
+          tokenInfoStore: {
+            tokenInfo: mockFromDefaults(defaultAssets),
           },
           wallets: {
             selected: request.selected,

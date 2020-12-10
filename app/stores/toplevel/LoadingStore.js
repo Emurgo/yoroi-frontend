@@ -1,6 +1,7 @@
 // @flow
 import type { lf$Database, lf$lovefieldExport, } from 'lovefield';
 import { schema, } from 'lovefield';
+import BigNumber from 'bignumber.js';
 import { action, observable, computed, when, runInAction } from 'mobx';
 import { pathToRegexp } from 'path-to-regexp';
 import Store from '../base/Store';
@@ -17,9 +18,10 @@ import { migrate } from '../../api';
 import { Logger, stringifyError } from '../../utils/logging';
 import { closeOtherInstances } from '../../utils/tabManager';
 import { loadLovefieldDB, importOldDb, } from '../../api/ada/lib/storage/database/index';
-import { ApiOptions, getApiMeta } from '../../api/common/utils';
 import { isWithinSupply } from '../../utils/validations';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
+import { networks, defaultAssets } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { getDefaultEntryToken } from './TokenInfoStore';
 
 /** Load dependencies before launching the app */
 export default class LoadingStore extends Store {
@@ -123,9 +125,11 @@ export default class LoadingStore extends Store {
 
   @action
   validateUriPath: void => Promise<void> = async (): Promise<void> => {
-    const meta = getApiMeta(ApiOptions.ada);
-    if (meta == null) throw new Error(`${nameof(this.validateUriPath)} no API selected`);
     if (this.fromUriScheme) {
+      const networkId = networks.CardanoMainnet.NetworkId;
+      const cardanoMeta = defaultAssets.filter(
+        asset => asset.NetworkId === networkId
+      )[0];
       const uriParams = await getURIParameters(
         decodeURIComponent(this._originRoute.location),
         currency => {
@@ -133,8 +137,9 @@ export default class LoadingStore extends Store {
           const valid = currency === 'cardano';
           return Promise.resolve(valid);
         },
-        amount => isWithinSupply(amount, meta.meta.totalSupply),
-        meta.meta.decimalPlaces.toNumber(),
+        amount => isWithinSupply(amount, new BigNumber(Number.MAX_SAFE_INTEGER)),
+        cardanoMeta.Metadata.numberOfDecimals,
+        getDefaultEntryToken(cardanoMeta)
       );
       runInAction(() => {
         this._uriParams = uriParams;
