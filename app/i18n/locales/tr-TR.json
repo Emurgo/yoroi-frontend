@@ -189,7 +189,7 @@
   "profile.privacypolicy.neverAnalytics": "<strong>Never</strong> herhangi analitik bir yazılımı veya üçüncü parti izleyicileri çalıştırır.",
   "profile.privacypolicy.neverProfile": "Bilgilerinizle <strong>Asla</strong> profil oluşturmaz.",
   "profile.privacypolicy.neverSell": "Bilgilerinizi <strong>Asla</strong> satmaz.",
-  "profile.privacypolicy.neverTrack": "<strong>Never</strong> hareketlerinizi takip eder.",
+  "profile.privacypolicy.neverTrack": "Davranış ve işlemlerinizi <strong>Asla</strong> takip etmez.",
   "profile.privacypolicy.serverLogs": "Herhangi bir sunucu kaydı yalnızca sunucu sorunlarını gidermek amacıyla en fazla 2 hafta saklanır.",
   "profile.termsOfUse.checkboxLabel": "Kullanım şartlarını kabul ediyorum",
   "profile.termsOfUse.title": "Kullanım Şartları",
