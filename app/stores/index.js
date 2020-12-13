@@ -32,6 +32,7 @@ import StateFetchStore from './toplevel/StateFetchStore';
 import CoinPriceStore from './toplevel/CoinPriceStore';
 import ExplorerStore from './toplevel/ExplorerStore';
 import ServerConnectionStore from './toplevel/ServerConnectionStore';
+import VotingStore from './toplevel/VotingStore';
 
 /** Map of var name to class. Allows dynamic lookup of class so we can init all stores one loop */
 const storeClasses = Object.freeze({
@@ -57,6 +58,7 @@ const storeClasses = Object.freeze({
   daedalusTransfer: DaedalusTransferStore,
   yoroiTransfer: YoroiTransferStore,
   explorers: ExplorerStore,
+  voting: VotingStore,
   // note: purposely exclude substores and router
 });
 
@@ -90,6 +92,7 @@ export type StoresMap = {|
   |},
   // $FlowFixMe[value-as-type]
   router: RouterStore,
+  voting: VotingStore,
 |};
 
 /** Constant that represents the stores across the lifetime of the application */
@@ -119,6 +122,7 @@ const stores: WithNullableFields<StoresMap> = observable({
   explorers: null,
   substores: null,
   router: null,
+  voting: null,
 });
 
 function initializeSubstore<T: {...}>(
