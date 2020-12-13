@@ -186,7 +186,7 @@
   "profile.nightly.warning2": "Gönderdiğiniz tüm işlemler zincir bloğu ve üretim sunucularında görülebilir.",
   "profile.nightly.warningHeader": "Bir üretim ortamını simüle etmek için:",
   "profile.privacypolicy.header": "Yoroi...",
-  "profile.privacypolicy.neverAnalytics": "<strong>Never</strong> herhangi analitik bir yazılımı veya üçüncü parti izleyicileri çalıştırır.",
+  "profile.privacypolicy.neverAnalytics": "Herhangi bir analiz veya 3. parti izleme izleme yazılımları <strong>Asla</strong> çalıştırmaz.",
   "profile.privacypolicy.neverProfile": "Bilgilerinizle <strong>Asla</strong> profil oluşturmaz.",
   "profile.privacypolicy.neverSell": "Bilgilerinizi <strong>Asla</strong> satmaz.",
   "profile.privacypolicy.neverTrack": "Davranış ve işlemlerinizi <strong>Asla</strong> takip etmez.",
