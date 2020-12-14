@@ -19,7 +19,7 @@ const PROTO_VERSION = Buffer.from('01', 'hex');
 	----------------------------------------------------------
 */
 
-const promisifyPbkdf2 = (password, salt) => {
+const promisifyPbkdf2: (Uint8Array, Buffer) => Promise<Buffer> = (password, salt) => {
   return new Promise((resolve, reject) => {
     pbkdf2.pbkdf2(password, salt, PBKDF_ITERATIONS, KEY_SIZE, DIGEST, (err, key) => {
       if (err) return reject(err);
@@ -28,10 +28,13 @@ const promisifyPbkdf2 = (password, salt) => {
   });
 };
 
-export async function encryptWithPassword(passwordBuf: Uint8Array, dataHex: Uint8Array): string {
+export async function encryptWithPassword(
+  passwordBuf: Uint8Array,
+  dataBytes: Uint8Array
+): Promise<string> {
   const salt = Buffer.from(cryptoRandomString({ length: 2 * 16 }), 'hex');
   const nonce = Buffer.from(cryptoRandomString({ length: 2 * 12 }), 'hex');
-  const data = Buffer.from(dataHex, 'hex');
+  const data = Buffer.from(dataBytes);
   const aad = Buffer.from('', 'hex');
 
   const key = await promisifyPbkdf2(passwordBuf, salt);
@@ -43,11 +46,14 @@ export async function encryptWithPassword(passwordBuf: Uint8Array, dataHex: Uint
   const final = cipher.final();
   const tag = cipher.getAuthTag();
 
-  const ciphertext = Buffer.concat([PROTO_VERSION, salt, nonce, head, final, tag]);
-  return ciphertext.toString('hex');
+  const cipherText = Buffer.concat([PROTO_VERSION, salt, nonce, head, final, tag]);
+  return cipherText.toString('hex');
 }
 
-export async function decryptWithPassword(passwordBuf: Uint8Array, ciphertextHex: string): string {
+export async function decryptWithPassword(
+  passwordBuf: Uint8Array,
+  ciphertextHex: string
+): Promise<string> {
   const ciphertext = Buffer.from(ciphertextHex, 'hex');
 
   const salt = ciphertext.slice(PROTO_SIZE, SALT_SIZE + PROTO_SIZE);

@@ -32,7 +32,7 @@ export default class VotingPage extends Component<Props> {
     return (
       <div>
         {
-        this.generated.stores.voting.encryptedKey ? (<QRCode
+        this.generated.stores.voting.encryptedKey !== null ? (<QRCode
           value={this.generated.stores.voting.encryptedKey}
           bgColor={qrCodeBackgroundColor}
           fgColor={qrCodeForegroundColor}
