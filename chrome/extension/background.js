@@ -18,6 +18,10 @@ import {
   asGetAllUtxos,
   asGetBalance,
 } from '../../app/api/ada/lib/storage/models/PublicDeriver/traits';
+import type {
+  Address,
+  Tx
+} from './ergo-dapp-api';
 
 /*::
 declare var chrome;
@@ -29,9 +33,36 @@ const onYoroiIconClicked = () => {
 
 chrome.browserAction.onClicked.addListener(debounce(onYoroiIconClicked, 500, { leading: true }));
 
+type PendingSign = {|
+  // data needed to complete the request
+  request: PendingSignData,
+  // if an opened window has been created for this request to show the user
+  openedWindow: boolean,
+  // resolve function from signRequest's Promise
+  resolve: any
+|}
+
+type RpcUid = number;
+
+type PendingSignData = {|
+  type: 'tx',
+  uid: RpcUid,
+  tx: Tx
+|} | {|
+  type: 'tx_input',
+  uid: RpcUid,
+  tx: Tx,
+  index: number,
+|} | {|
+  type: 'data',
+  uid: RpcUid,
+  address: Address,
+  bytes: string
+|}
+
 let db: ?lf$Database = null;
-// rpc uid -> { request, openedWindow, resolve, reject } (TODO: add flow types to this)
-const pendingSigns: Map<number, any> = new Map();
+
+const pendingSigns: Map<RpcUid, PendingSign> = new Map();
 
 // for mocking out network delay
 function sleep(ms) {
@@ -63,6 +94,19 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             mockSignedTx.size = 0;
             responseData.resolve({ ok: mockSignedTx });
           }
+          break;
+        case 'tx_input':
+          {
+            responseData.resolve({
+              err: {
+                code: 1,
+                info: 'mock proof generation error - tx not signed',
+              }
+            });
+          }
+          break;
+        case 'data':
+          responseData.resolve({ ok: '0x82cd23b432afab24343f' });
           break;
         default:
           // log?
@@ -97,8 +141,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
 });
 
-async function confirmSign(request): Promise<any> {
-  return new Promise((resolve, reject) => {
+async function confirmSign(request: PendingSignData): Promise<any> {
+  return new Promise(resolve => {
     chrome.windows.create({
       url: 'sign.html',
       width: 240,
@@ -109,8 +153,7 @@ async function confirmSign(request): Promise<any> {
     pendingSigns.set(request.uid, {
       request,
       openedWindow: false,
-      resolve,
-      reject
+      resolve
     });
     console.log(JSON.stringify(pendingSigns));
   });
@@ -151,6 +194,28 @@ chrome.runtime.onConnectExternal.addListener(port => {
                 uid: message.uid
               });
               console.log(`sign_tx resp: ${JSON.stringify(resp)}`);
+              rpcResponse(resp);
+            }
+            break;
+          case 'sign_tx_input':
+            {
+              const resp = await confirmSign({
+                type: 'tx_input',
+                tx: message.params[0],
+                index: message.params[1],
+                uid: message.uid
+              });
+              rpcResponse(resp);
+            }
+            break;
+          case 'sign_data':
+            {
+              const resp = await confirmSign({
+                type: 'data',
+                address: message.params[0],
+                bytes: message.params[1],
+                uid: message.uid
+              });
               rpcResponse(resp);
             }
             break;
@@ -206,22 +271,6 @@ chrome.runtime.onConnectExternal.addListener(port => {
                 });
               }
             }
-            break;
-          case 'sign_tx_input':
-            // const input = params[0];
-            // mock signing
-            rpcResponse({
-              err: {
-                code: 1,
-                info: 'mock proof generation error - tx not signed',
-              }
-            });
-            break;
-          case 'sign_data':
-            // mock signing
-            rpcResponse({
-              ok: '0x82cd23b432afab24343f'
-            });
             break;
           case 'get_used_addresses':
             rpcResponse({
