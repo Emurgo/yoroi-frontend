@@ -84,36 +84,39 @@ export type Tx = {|
 
 export type TxId = string;
 
-export type TxSendRefused = 1;
-export type TxSendFailure = 2;
-export type TxSendErrorCode = TxSendRefused | TxSendFailure;
+export const TxSendErrorCodes = Object.freeze({
+  REFUSED: 1,
+  FAILURE: 2,
+});
+export type TxSendErrorCode = $Values<typeof TxSendErrorCodes>;
 
 export type TxSendError = {|
 	code: TxSendErrorCode,
 	info: string,
 |};
 
-export type TxSignProofGeneration = 1;
-export type TxSignUserDeclined = 2;
-export type TxSignErrorCode = TxSignProofGeneration | TxSignUserDeclined;
+export const TxSignErrorCodes = Object.freeze({
+  PROOF_GENERATION: 1,
+  USER_DECLINED: 2,
+});
+export type TxSignErrorCode = $Values<typeof TxSignErrorCodes>;
 
 export type TxSignError = {|
 	code: TxSignErrorCode,
 	info: string,
 |};
 
-export type DataSignProofGeneration = 1;
-export type DataSignAddressNotPK = 2;
-export type DataSignUserDeclined = 3;
-export type DataSignInvalidFormat = 4;
-export type DataSignErrorCode = DataSignProofGeneration
-                       | DataSignAddressNotPK
-                       | DataSignUserDeclined
-                       | DataSignInvalidFormat;
+export const DataSignErrorCodes = Object.freeze({
+  DATA_SIGN_PROOF_GENERATION: 1,
+  DATA_SIGN_ADDRESS_NOT_PK: 2,
+  DATA_SIGN_USER_DECLINED: 3,
+  DATA_SIGN_INVALID_FORMAT: 4,
+});
+export type DataSignErrorCode = $Values<typeof DataSignErrorCodes>;
 
 export type DataSignError = {|
   code: DataSignErrorCode,
-  info: String
+  info: string
 |};
 
 export type Value = number | string;

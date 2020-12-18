@@ -34,7 +34,7 @@ const baseDevConfig = (
     sign: [
       customPath,
       hotScript,
-      path.join(__dirname, '../chrome/extension/sign')
+      path.join(__dirname, '../chrome/extension/ergo-connector/sign')
     ],
   },
   devMiddleware: {

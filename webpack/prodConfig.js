@@ -32,7 +32,7 @@ const baseProdConfig = (env /*: EnvParams */) /*: * */ => ({
     ],
     sign: [
       customPath,
-      path.join(__dirname, '../chrome/extension/sign')
+      path.join(__dirname, '../chrome/extension/ergo-connector/sign')
     ],
   },
   output: {

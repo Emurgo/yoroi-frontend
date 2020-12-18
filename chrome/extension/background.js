@@ -14,14 +14,15 @@ import {
 import {
   PublicDeriver,
 } from '../../app/api/ada/lib/storage/models/PublicDeriver/index';
-import {
-  asGetAllUtxos,
-  asGetBalance,
-} from '../../app/api/ada/lib/storage/models/PublicDeriver/traits';
 import type {
   Address,
   Tx
-} from './ergo-dapp-api';
+} from './ergo-connector/types';
+import {
+  connectorGetBalance,
+  connectorGetUtxos,
+  connectorSignTx
+} from './ergo-connector/api';
 
 /*::
 declare var chrome;
@@ -69,30 +70,33 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+async function firstWallet(): Promise<PublicDeriver<>> {
+  if (db != null) {
+    const wallets = await getWallets({ db });
+    return Promise.resolve(wallets[0]);
+  }
+  throw Promise.reject(new Error('Database not loaded for connector RPCs'));
+}
+
+chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
   console.log(JSON.stringify(sender));
-  //alert(`received event: ${JSON.stringify(request)}`);
+  // alert(`received event: ${JSON.stringify(request)}`);
   if (request.type === 'sign_confirmed') {
     const responseData = pendingSigns.get(request.uid);
     if (responseData) {
       switch (responseData.request.type) {
         case 'tx':
           {
-            // mocked out signing
-            const tx = request.tx;
-            let mockSignedTx = tx;
-            mockSignedTx.inputs = tx.inputs.map(input => {
-              return {
-                boxId: input.boxId,
-                spendingProof: {
-                  proofBytes: '0x267272632abddfb172',
-                  extension: {}
-                },
-                extension: {}
-              }
-            });
-            mockSignedTx.size = 0;
-            responseData.resolve({ ok: mockSignedTx });
+            const wallet = await firstWallet();
+            const utxos = await connectorGetUtxos(wallet);
+            const password = 'tencharacters';
+            const txToSign = request.tx;
+            let allIndices = [];
+            for (let i = 0; i < txToSign.inputs.length(); i += 1) {
+              allIndices.push(i);
+            }
+            const signedTx = await connectorSignTx(password, utxos, txToSign, allIndices);
+            responseData.resolve({ ok: signedTx });
           }
           break;
         case 'tx_input':
@@ -127,7 +131,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }
   } else if (request.type === 'tx_sign_window_retrieve_data') {
     console.log(`retrive data!? ${JSON.stringify(request)}`);
-    for (let [uid, responseData] of pendingSigns.entries()) {
+    for (const [/* uid */, responseData] of pendingSigns.entries()) {
       if (!responseData.openedWindow) {
         console.log(`responseData: ${JSON.stringify(responseData)}`);
         responseData.openedWindow = true;
@@ -163,13 +167,6 @@ chrome.runtime.onConnectExternal.addListener(port => {
   const connectorId = 'knfkinkbmgjefmeaddmkgpgmbggdllcp';
     if (port.sender.id === connectorId) {
     port.onMessage.addListener(async message => {
-      async function firstWallet(): Promise<PublicDeriver<>> {
-        if (db != null) {
-          const wallets = await getWallets({ db });
-          return Promise.resolve(wallets[0]);
-        }
-        throw Promise.reject(new Error('Database not loaded for connector RPCs'));
-      }
       function rpcResponse(response) {
         port.postMessage({
           type: 'connector_rpc_response',
@@ -220,56 +217,23 @@ chrome.runtime.onConnectExternal.addListener(port => {
             }
             break;
           case 'get_balance':
-            if (message.params[0] === 'ERG') {
+            {
               const wallet = await firstWallet();
-              const canGetBalance = asGetBalance(wallet);
-              if (canGetBalance != null) {
-                const balance = await canGetBalance.getBalance();
-                rpcResponse({ ok: balance });
-              }
-            } else {
-              rpcResponse({ ok: 5 });
+              const balance = await connectorGetBalance(wallet, message.params[0]);
+              rpcResponse({ ok: balance});
             }
             break;
           case 'get_utxos':
             {
               const wallet = await firstWallet();
-              const canGetAllUtxos = await asGetAllUtxos(wallet);
-              if (canGetAllUtxos != null) {
-                let utxos = await canGetAllUtxos.getAllUtxos();
-                // TODO: more intelligently choose values?
-                const valueExpected = message.params[0];
-                if (typeof valueExpected !== 'undefined') {
-                  // TODO: use bigint/whatever yoroi uses for values
-                  let valueAcc = 0;
-                  let utxosToUse = [];
-                  for (let i = 0; i < utxos.length && valueAcc < valueExpected; i += 1) {
-                    const val = parseInt(utxos[i].output.UtxoTransactionOutput.Amount, 10);
-                    console.log(`get_utxos[1]: at ${valueAcc} of ${valueExpected} requested - trying to add ${val}`);
-                    valueAcc += val;
-                    utxosToUse.push(utxos[i]);
-                    console.log(`get_utxos[2]: at ${valueAcc} of ${valueExpected} requested`);
-                  }
-                  utxos = utxosToUse;
-                }
-                let utxosFormatted = utxos.map(utxo => {
-                  let tx = utxo.output.Transaction;
-                  let box = utxo.output.UtxoTransactionOutput;
-                  return {
-                    boxId: box.ErgoBoxId,
-                    value: box.Amount,
-                    ergoTree: box.ErgoTree,
-                    assets: [],
-                    additionalRegisters: {},
-                    creationHeight: box.ErgoCreationHeight,
-                    transactionId: tx.TransactionId,
-                    index: box.OutputIndex
-                  }
-                });
+              const utxos = await connectorGetUtxos(wallet, message.params[0]);
+              if (utxos != null) {
                 rpcResponse({
-                  ok: utxosFormatted
+                  ok: utxos
                 });
-              }
+              }/* else {
+                // err
+              } */
             }
             break;
           case 'get_used_addresses':
