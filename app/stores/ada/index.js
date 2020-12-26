@@ -20,6 +20,7 @@ import AdaDelegationTransactionStore from './AdaDelegationTransactionStore';
 import AdaDelegationStore from './AdaDelegationStore';
 import AdaTimeStore from './AdaTimeStore';
 import AdaMnemonicSendStore from './send/AdaMnemonicSendStore';
+import VotingStore from './VotingStore';
 import type { ActionsMap } from '../../actions/index';
 import type { Api } from '../../api/index';
 import type { StoresMap } from '../index';
@@ -42,6 +43,7 @@ export const adaStoreClasses = Object.freeze({
   delegation: AdaDelegationStore,
   time: AdaTimeStore,
   mnemonicSend: AdaMnemonicSendStore,
+  votingStore: VotingStore,
 });
 
 export type AdaStoresMap = {|
@@ -62,6 +64,7 @@ export type AdaStoresMap = {|
   delegation: AdaDelegationStore,
   time: AdaTimeStore,
   mnemonicSend: AdaMnemonicSendStore,
+  votingStore: VotingStore,
 |};
 
 const adaStores: WithNullableFields<AdaStoresMap> = observable({
@@ -82,6 +85,7 @@ const adaStores: WithNullableFields<AdaStoresMap> = observable({
   delegation: null,
   time: null,
   mnemonicSend: null,
+  votingStore: null,
 });
 
 /** See `stores` index for description of this weird behavior

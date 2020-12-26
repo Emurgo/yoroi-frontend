@@ -689,6 +689,10 @@ export const memoMessages: * = defineMessages({
     id: 'global.labels.optionalMemo',
     defaultMessage: '!!!Memo (optional)',
   },
+  registerLabel: {
+    id: 'global.labels.register',
+    defaultMessage: '!!!Register',
+  }
 });
 
 
