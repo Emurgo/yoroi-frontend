@@ -34,10 +34,6 @@ export class ErgoTxSignRequest implements ISignRequest<RustModule.SigmaRust.TxBu
     this.networkSettingSnapshot = signRequest.networkSettingSnapshot;
   }
 
-  txMetadata(): void {
-    // implementing the method as this interface is also used for Shelley transactions
-  }
-
   totalInput(shift: boolean): BigNumber {
     return getTxInputTotal(this.unsignedTx, this.changeAddr, shift);
   }

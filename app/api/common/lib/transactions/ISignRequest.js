@@ -10,6 +10,5 @@ export interface ISignRequest<T> {
   uniqueSenderAddresses(): Array<string>;
   receivers(includeChange: boolean): Array<string>;
   isEqual(tx: ?mixed): boolean;
-  txMetadata(): RustModule.WalletV4.TransactionMetadata | void;
   self(): T;
 }

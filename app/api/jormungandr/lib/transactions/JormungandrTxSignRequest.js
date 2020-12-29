@@ -22,10 +22,6 @@ export class JormungandrTxSignRequest implements ISignRequest<RustModule.WalletV
     return getTxOutputTotal(this.signRequest.unsignedTx, shift);
   }
 
-  txMetadata(): void {
-    // implementing the method as this interface is also used for Shelley transactions
-  }
-
   fee(shift: boolean): BigNumber {
     return getJormungandrTxFee(this.signRequest.unsignedTx, shift);
   }

@@ -28,7 +28,7 @@ export class HaskellShelleyTxSignRequest
 implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
 
   signRequest: BaseSignRequest<RustModule.WalletV4.TransactionBuilder>;
-  metadata: void | RustModule.WalletV4.TransactionMetadata; // TODO: shouldn't need this
+  metadata: void | RustModule.WalletV4.TransactionMetadata;
   networkSettingSnapshot: NetworkSettingSnapshot;
   // TODO: this should be provided by WASM in some SignedTxBuilder interface of some kind
   neededStakingKeyHashes: {|
@@ -55,10 +55,6 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
     return Buffer.from(RustModule.WalletV4.hash_transaction(
       this.signRequest.unsignedTx.build()
     ).to_bytes()).toString('hex');
-  }
-
-  txMetadata(): void | RustModule.WalletV4.TransactionMetadata {
-    return this.metadata;
   }
 
   totalInput(shift: boolean): BigNumber {

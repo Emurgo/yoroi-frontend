@@ -29,7 +29,7 @@ import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 
 export default class VotingStore extends Store {
   @observable encryptedKey: ?string = null;
-  @observable catalystPrivateKey: RustModule.WalletV4.PrivateKey;
+  @observable catalystPrivateKey: RustModule.WalletV4.PrivateKey | void;
   @observable pin: Array<number>;
 
   @observable
@@ -123,12 +123,29 @@ export default class VotingStore extends Store {
         }).slot
       );
 
-      const catalystPubKey = Buffer.from(this.catalystPrivateKey.to_public().as_bytes())
+      if(this.catalystPrivateKey === undefined){
+        throw new Error(`${nameof(this._createTransaction)} should never happen`);
+      }
+      const catalystPrivateKeyBytes = this.catalystPrivateKey.to_public().as_bytes();
+      const catalystPubKey = Buffer.from(catalystPrivateKeyBytes)
         .toString('hex');
       const catalystSignature = stakingKey
-        .sign(this.catalystPrivateKey.to_public().as_bytes())
+        .sign(catalystPrivateKeyBytes)
         .to_hex();
 
+      /**
+       * Catalyst follows a certain standard to prove the voting power
+       * A transaction is submitted with following metadata format for the registration process
+       * label: 61284
+       * {
+       *   1: "pubkey generated for catalyst app",
+       *   2: "stake key public key"
+       * }
+       * label: 61285
+       * {
+       *   1: "pubkey signed using stakekey"
+       * }
+       */
       const trxMeta = [
         {
           label: '61284',
@@ -234,5 +251,8 @@ export default class VotingStore extends Store {
     if (!request.justTransaction) {
       this.isStale = false;
     }
+    this.encryptedKey = null;
+    this.catalystPrivateKey = undefined;
+    this.pin = [];
   }
 }

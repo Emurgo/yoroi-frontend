@@ -390,7 +390,7 @@ export type CreateDelegationTxFunc = (
 
 export type CreateVotingRegTxFunc = (
   request: CreateVotingRegTxRequest
-) => Promise<CreateUnsignedTxForUtxosResponse>;
+) => Promise<CreateVotingRegTxResponse>;
 
 // createWithdrawalTx
 
@@ -798,7 +798,7 @@ export default class AdaApi {
           Buffer.from(normalizedKey.prvKeyHex, 'hex')
         ),
         request.signRequest.neededStakingKeyHashes.wits,
-        request.signRequest.txMetadata(),
+        request.signRequest.metadata,
       );
 
       const response = request.sendTx({
@@ -947,10 +947,9 @@ export default class AdaApi {
       };
 
       let unsignedTxResponse;
-      let trxMetadata = undefined;
-      if(request.metadata !== undefined){
-        trxMetadata = createMetadata(request.metadata);
-      }
+      const trxMetadata =
+        request.metadata !== undefined ? createMetadata(request.metadata): undefined;
+
       if (request.shouldSendAll) {
         if (request.receivers.length !== 1) {
           throw new Error(`${nameof(this.createUnsignedTxForUtxos)} wrong output size for sendAll`);

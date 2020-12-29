@@ -3,7 +3,7 @@ import { RustModule } from '../../cardanoCrypto/rustLoader';
 
 export type TransactionMetadata = {|
   label: string,
-  data: Object,
+  data: {...},
 |};
 
 export function createMetadata(
