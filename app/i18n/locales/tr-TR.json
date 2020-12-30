@@ -500,7 +500,7 @@
   "wallet.delegation.transaction.success.button.label": "Panel sayfası",
   "wallet.delegation.transaction.success.explanation": "Bahis havuzunun durumunu ve Gösterge Tablosu sayfasından bir ödül almak için kalan süreyi izleyiniz",
   "wallet.delegation.transaction.success.title": "Başarıyla yetkilendirildi",
-  "wallet.voting.transaction.success.title": "Successfully Registered",
+  "wallet.voting.transaction.success.title": "Başarıyla Kaydedildi",
   "wallet.voting.transaction.success.button.label": "Panel sayfası",
   "wallet.voting.transaction.success.explanation": "Explainer TODO",
   "wallet.deprecation.byronLine1": "Shelley protokol yükseltmesi, temsilciliği destekleyen yeni bir Shelley cüzdan türü ekler.",
