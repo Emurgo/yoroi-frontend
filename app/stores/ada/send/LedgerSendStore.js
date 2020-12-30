@@ -229,7 +229,7 @@ export default class LedgerSendStore extends Store {
         request.signRequest.signRequest.senderUtxos,
         ledgerSignTxResp.witnesses,
         request.publicKey,
-        request.signRequest.txMetadata(),
+        request.signRequest.metadata,
       );
 
       await this.api.ada.broadcastLedgerSignedTx({

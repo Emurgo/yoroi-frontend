@@ -20,6 +20,7 @@ import {
   genTimeToSlot,
 } from '../../api/ada/lib/storage/bridge/timeUtils';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
+import type { TransactionMetadata } from '../../api/ada/lib/storage/bridge/metadataUtils';
 
 export type SetupSelfTxRequest = {|
   publicDeriver: IHasUtxoChains,
@@ -45,6 +46,7 @@ export default class TransactionBuilderStore extends Store {
   @observable tentativeTx: null | ISignRequest<any>;
 
   @observable filter: ElementOf<IGetAllUtxosResponse> => boolean;
+  @observable metadata: Array<TransactionMetadata> | void;
 
   /** tracks mismatch between `plannedTx` and `tentativeTx` */
   @observable txMismatch: boolean = false;
@@ -70,6 +72,7 @@ export default class TransactionBuilderStore extends Store {
     actions.toggleSendAll.listen(this._toggleSendAll);
     actions.initialize.listen(this._initialize);
     actions.reset.listen(this._reset);
+    actions.updateMetadata.listen(this._updateMetadata);
   }
 
   // =============
@@ -214,6 +217,7 @@ export default class TransactionBuilderStore extends Store {
           shouldSendAll,
           filter: this.filter,
           absSlotNumber,
+          metadata: this.metadata,
         }));
       } else if (amount != null) {
         await this.createUnsignedTx.execute(() => this.api.ada.createUnsignedTx({
@@ -222,6 +226,7 @@ export default class TransactionBuilderStore extends Store {
           amount,
           filter: this.filter,
           absSlotNumber,
+          metadata: this.metadata,
         }));
       }
     } else if (isErgo(network)) {
@@ -283,6 +288,11 @@ export default class TransactionBuilderStore extends Store {
   }
 
   @action
+  _updateMetadata: (Array<TransactionMetadata> | void) => void = (metadata) => {
+    this.metadata = metadata;
+  }
+
+  @action
   _updateMemo: (void | string) => void = (content) => {
     this.memo = content;
   }
@@ -307,6 +317,7 @@ export default class TransactionBuilderStore extends Store {
     this.shouldSendAll = false;
     this.memo = undefined;
     this.filter = () => true;
+    this.metadata = undefined;
     this.createUnsignedTx.cancel();
     this.createUnsignedTx.reset();
     this.plannedTx = null;

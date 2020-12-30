@@ -50,6 +50,7 @@ export function sendAllUnsignedTx(
     poolDeposit: RustModule.WalletV4.BigNum,
     keyDeposit: RustModule.WalletV4.BigNum,
   |},
+  metadata: RustModule.WalletV4.TransactionMetadata | void,
 ): V4UnsignedTxAddressedUtxoResponse {
   const addressingMap = new Map<RemoteUnspentOutput, CardanoAddressedUtxo>();
   for (const utxo of allUtxos) {
@@ -66,6 +67,7 @@ export function sendAllUnsignedTx(
     Array.from(addressingMap.keys()),
     absSlotNumber,
     protocolParams,
+    metadata,
   );
 
   const addressedUtxos = unsignedTxResponse.senderUtxos.map(
@@ -129,6 +131,7 @@ export function sendAllUnsignedTxFromUtxo(
     poolDeposit: RustModule.WalletV4.BigNum,
     keyDeposit: RustModule.WalletV4.BigNum,
   |},
+  metadata: RustModule.WalletV4.TransactionMetadata | void,
 ): V4UnsignedTxUtxoResponse {
   const totalBalance = allUtxos
     .map(utxo => new BigNumber(utxo.amount))
@@ -149,6 +152,10 @@ export function sendAllUnsignedTxFromUtxo(
   txBuilder.set_ttl(absSlotNumber.plus(defaultTtlOffset).toNumber());
   for (const input of allUtxos) {
     addUtxoInput(txBuilder, input, false);
+  }
+
+  if(metadata !== undefined){
+    txBuilder.set_metadata(metadata);
   }
 
   if (totalBalance.lt(txBuilder.min_fee().to_str())) {
@@ -207,6 +214,7 @@ export function newAdaUnsignedTx(
     amount: RustModule.WalletV4.BigNum,
   |}>,
   allowNoOutputs: boolean,
+  metadata: RustModule.WalletV4.TransactionMetadata | void,
 ): V4UnsignedTxAddressedUtxoResponse {
   const addressingMap = new Map<RemoteUnspentOutput, CardanoAddressedUtxo>();
   for (const utxo of allUtxos) {
@@ -227,6 +235,7 @@ export function newAdaUnsignedTx(
     certificates,
     withdrawals,
     allowNoOutputs,
+    metadata,
   );
 
   const addressedUtxos = unsignedTxResponse.senderUtxos.map(
@@ -294,6 +303,7 @@ export function newAdaUnsignedTxFromUtxo(
     amount: RustModule.WalletV4.BigNum,
   |}>,
   allowNoOutputs: boolean,
+  metadata: RustModule.WalletV4.TransactionMetadata | void,
 ): V4UnsignedTxUtxoResponse {
   /**
    * Shelley supports transactions with no outputs by simply burning any leftover ADA as fee
@@ -322,6 +332,9 @@ export function newAdaUnsignedTxFromUtxo(
       RustModule.WalletV4.Certificates.new()
     );
     txBuilder.set_certs(certsWasm);
+  }
+  if (metadata !== undefined){
+    txBuilder.set_metadata(metadata);
   }
   if (withdrawals.length > 0) {
     const withdrawalWasm = withdrawals.reduce(

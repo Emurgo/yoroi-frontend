@@ -167,6 +167,7 @@
     "bs58": "4.0.1",
     "bs58check": "2.1.2",
     "cardano-wallet-browser": "1.2.2",
+    "chacha": "2.1.0",
     "classnames": "2.2.6",
     "crypto-random-string": "3.3.0",
     "dropbox": "4.0.30",
