@@ -500,7 +500,7 @@
   "wallet.delegation.transaction.success.button.label": "Übersichtsseite",
   "wallet.delegation.transaction.success.explanation": "In der Übersichtsseite kannst Du den Status des Stake pools verfolgen, und die verbleibende Zeit, um eine Belohnung zu erhalten",
   "wallet.delegation.transaction.success.title": "Erfolgreich delegiert",
-  "wallet.voting.transaction.success.title": "Successfully Registered",
+  "wallet.voting.transaction.success.title": "Erfolgreich registriert",
   "wallet.voting.transaction.success.button.label": "Übersichtsseite",
   "wallet.voting.transaction.success.explanation": "Explainer TODO",
   "wallet.deprecation.byronLine1": "Das Shelley Protokoll upgrade bringt einen neuen Shelley wallet Typ, welcher Delegierungen ermöglicht.",
