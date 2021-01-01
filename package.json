@@ -192,7 +192,7 @@
     "react-copy-to-clipboard": "5.0.2",
     "react-dom": "16.13.1",
     "react-hot-loader": "4.12.21",
-    "react-intl": "2.9.0",
+    "react-intl": "5.10.10",
     "react-markdown": "5.0.2",
     "react-polymorph": "git+https://github.com/rcmorano/react-polymorph-fix.git",
     "react-resize-detector": "5.0.7",
