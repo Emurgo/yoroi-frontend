@@ -259,7 +259,6 @@ export default class NavBarContainer extends Component<Props> {
     );
     if (delegationRequest == null) return undefined;
 
-    console.log(delegationRequest);
     const balanceResult = delegationRequest.getDelegatedBalance.result;
     if (balanceResult == null) {
       return null;

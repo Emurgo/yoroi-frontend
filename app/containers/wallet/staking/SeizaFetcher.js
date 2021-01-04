@@ -14,6 +14,7 @@ type Props = {|
   +children?: Node,
   +urlTemplate: string,
   +locale: string,
+  +totalAda: ?number,
   +stakepoolSelectedAction: (string) => Promise<void>,
   +poolList: Array<string>,
 |};
@@ -87,13 +88,13 @@ export default class SeizaFetcher extends Component<Props> {
   };
 
   render(): Node {
-    const { urlTemplate, locale } = this.props;
+    const { urlTemplate, locale, totalAda } = this.props;
 
     if (urlTemplate == null) {
       throw new Error('Staking undefined POOLS_UI_URL_FOR_YOROI should never happen');
     }
 
-    const stakingUrl = this._prepareStakingURL(urlTemplate, locale);
+    const stakingUrl = this._prepareStakingURL(urlTemplate, locale, totalAda);
     if (stakingUrl == null) {
       return (
         <VerticallyCenteredLayout>
@@ -162,7 +163,7 @@ export default class SeizaFetcher extends Component<Props> {
     return 'chrome&chromeId=' + location.host;
   }
 
-  _prepareStakingURL(urlTemplate: string, locale: string): null | string {
+  _prepareStakingURL(urlTemplate: string, locale: string, totalAda: ?number): null | string {
     let finalURL = urlTemplate
       .replace(
         '$$BROWSER$$',
@@ -174,6 +175,8 @@ export default class SeizaFetcher extends Component<Props> {
     finalURL += `&lang=${lang}`;
 
     finalURL += `&delegated=${encodeURIComponent(JSON.stringify(this.props.poolList))}`;
+
+    finalURL += totalAda == null ? '' : `&totalAda=${totalAda}`;
 
     return finalURL;
   }

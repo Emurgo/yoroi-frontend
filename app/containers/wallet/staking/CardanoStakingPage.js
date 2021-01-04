@@ -37,6 +37,7 @@ import type { Notification } from '../../../types/notificationType';
 import type { ReputationObject } from '../../../api/jormungandr/lib/state-fetch/types';
 import config from '../../../config';
 import { handleExternalLinkClick } from '../../../utils/routing';
+import type { TxRequests } from '../../../stores/toplevel/TransactionsStore'
 
 export type GeneratedData = typeof CardanoStakingPage.prototype.generated;
 
@@ -77,6 +78,7 @@ export default class CardanoStakingPage extends Component<Props> {
     }
 
     if (urlTemplate != null) {
+      const totalAda = this._getTotalAda();
       const locale = this.generated.stores.profile.currentLocale;
       return (
         <div>
@@ -84,6 +86,7 @@ export default class CardanoStakingPage extends Component<Props> {
           <SeizaFetcher
             urlTemplate={urlTemplate}
             locale={locale}
+            totalAda={totalAda}
             poolList={delegationRequests.getCurrentDelegation.result?.currEpoch?.pools.map(
               tuple => tuple[0]
             ) ?? []}
@@ -104,13 +107,42 @@ export default class CardanoStakingPage extends Component<Props> {
           isProcessing={this.generated.stores.delegation.poolInfoQuery.isExecuting}
           updatePool={poolId => {
             /* note: it's okay for triggering a pool update to be async, so we don't await  */
-            this._updatePool(poolId);
+            // eslint-disable-next-line no-unused-vars
+            const _ = this._updatePool(poolId);
           }}
           onNext={async () => (this._next())}
         />
         {this._displayPoolInfo()}
       </div>);
 
+  }
+
+  _getTotalAda: ?BigNumber => ?number = () => {
+    const publicDeriver = this.generated.stores.wallets.selected;
+    if (publicDeriver == null) {
+      throw new Error(`${nameof(CardanoStakingPage)} no public deriver. Should never happen`);
+    }
+
+    const delegationStore = this.generated.stores.delegation;
+    const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
+    if (delegationRequests == null) {
+      throw new Error(`${nameof(CardanoStakingPage)} opened for non-reward wallet`);
+    }
+
+    const txRequests = this.generated.stores.transactions.getTxRequests(publicDeriver);
+    const balance = txRequests.requests.getBalanceRequest.result;
+    const rewardBalance =
+      delegationRequests.getDelegatedBalance.result == null
+        ? 0
+        : delegationRequests.getDelegatedBalance.result.accountPart;
+
+    const apiMeta = getApiMeta(getApiForNetwork(publicDeriver.getParent().getNetworkInfo()))
+      ?.meta;
+    if (apiMeta == null) throw new Error(`${nameof(CardanoStakingPage)} no API selected`);
+    const amountPerUnit = new BigNumber(10).pow(apiMeta.decimalPlaces);
+
+    if (balance == null || rewardBalance == null) throw new Error(`${nameof(CardanoStakingPage)} balance or rewardBalance is null`)
+    return balance.plus(rewardBalance).dividedBy(amountPerUnit).toNumber();
   }
 
   _updatePool: ?string => Promise<void> = async (poolId) => {
@@ -405,7 +437,10 @@ export default class CardanoStakingPage extends Component<Props> {
       |}
     |},
     stores: {|
-      transactions: {| hasAnyPending: boolean |},
+      transactions: {|
+        hasAnyPending: boolean,
+        getTxRequests: (PublicDeriver<>) => TxRequests,
+      |},
       delegation: {|
         getDelegationRequests: (
           PublicDeriver<>
@@ -482,6 +517,7 @@ export default class CardanoStakingPage extends Component<Props> {
         },
         transactions: {
           hasAnyPending: stores.transactions.hasAnyPending,
+          getTxRequests: stores.transactions.getTxRequests,
         },
         delegation: {
           getDelegationRequests: stores.delegation.getDelegationRequests,
