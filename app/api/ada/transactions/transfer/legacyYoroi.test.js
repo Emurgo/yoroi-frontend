@@ -39,6 +39,7 @@ function getProtocolParams(): {|
   linearFee: RustModule.WalletV4.LinearFee,
   minimumUtxoVal: RustModule.WalletV4.BigNum,
   poolDeposit: RustModule.WalletV4.BigNum,
+  networkId: number,
   |} {
   const baseConfig = getCardanoHaskellBaseConfig(network)
     .reduce((acc, next) => Object.assign(acc, next), {});
@@ -50,6 +51,7 @@ function getProtocolParams(): {|
     ),
     minimumUtxoVal: RustModule.WalletV4.BigNum.from_str(baseConfig.MinimumUtxoVal),
     poolDeposit: RustModule.WalletV4.BigNum.from_str(baseConfig.PoolDeposit),
+    networkId: network.NetworkId,
   };
 }
 
@@ -127,8 +129,8 @@ describe('Haskell Shelley era tx format tests', () => {
       protocolParams: getProtocolParams(),
     });
 
-    expect(transferInfo.fee.toString()).toBe('0.166469');
-    expect(transferInfo.recoveredBalance.toString()).toBe('10');
+    expect(transferInfo.fee.getDefault().toString()).toBe('166469');
+    expect(transferInfo.recoveredBalance.getDefault().toString()).toBe('10000000');
     expect(transferInfo.senders).toEqual([addr1.address]);
     expect(transferInfo.receivers[0]).toBe(outAddress);
 

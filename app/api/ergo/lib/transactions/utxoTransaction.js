@@ -23,12 +23,16 @@ import {
   Bip44DerivationLevels,
 } from '../../../ada/lib/storage/database/walletTypes/bip44/api/utils';
 import type {
-  Address, Addressing,
+  Address, Addressing, Value,
 } from '../../../ada/lib/storage/models/PublicDeriver/interfaces';
 import { BIP32PrivateKey } from '../../../common/lib/crypto/keys/keyRepository';
 import { deriveByAddressing } from '../../../common/lib/crypto/keys/utils';
 import { ErgoTxSignRequest } from './ErgoTxSignRequest';
 import { RustModule } from '../../../ada/lib/cardanoCrypto/rustLoader';
+import { PRIMARY_ASSET_CONSTANTS } from '../../../ada/lib/storage/database/primitives/enums';
+import {
+  MultiToken,
+} from '../../../common/lib/MultiToken';
 
 type TxOutput = {|
   ...Address,
@@ -43,6 +47,7 @@ export function sendAllUnsignedTx(request: {|
   protocolParams: {|
     FeeAddress: string,
     MinimumBoxValue: string,
+    NetworkId: number,
   |},
 |}): ErgoUnsignedTxAddressedUtxoResponse {
   const addressingMap = new Map<RemoteUnspentOutput, ErgoAddressedUtxo>();
@@ -84,6 +89,45 @@ export function sendAllUnsignedTx(request: {|
   };
 }
 
+function changeToModel(
+  boxList: RustModule.SigmaRust.ErgoBoxAssetsDataList,
+  addressing: $PropertyType<Addressing, 'addressing'>,
+  address: string,
+  networkId: number,
+): Array<{| ...Address, ...Value, ...Addressing |}> {
+  const changeBoxes = [];
+  for (let i = 0; i < boxList.len(); i++) {
+    const asset = boxList.get(i);
+    const boxAsset = new MultiToken(
+      [],
+      {
+        defaultNetworkId: networkId,
+        defaultIdentifier: PRIMARY_ASSET_CONSTANTS.Ergo,
+      }
+    );
+    boxAsset.add({
+      identifier: PRIMARY_ASSET_CONSTANTS.Ergo,
+      amount: new BigNumber(asset.value().as_i64().to_str()),
+      networkId,
+    });
+    const assets = asset.tokens();
+    for (let j = 0; j < assets.len(); j++) {
+      const token = assets.get(j);
+      boxAsset.add({
+        identifier: token.id().to_str(),
+        amount: new BigNumber(token.amount().as_i64().to_str()),
+        networkId,
+      });
+    }
+    changeBoxes.push({
+      addressing,
+      address,
+      values: boxAsset,
+    });
+  }
+  return changeBoxes;
+}
+
 export function sendAllUnsignedTxFromUtxo(request: {|
   receiver: {| ...Address, ...InexactSubset<Addressing> |},
   currentHeight: number,
@@ -92,6 +136,7 @@ export function sendAllUnsignedTxFromUtxo(request: {|
   protocolParams: {|
     FeeAddress: string,
     MinimumBoxValue: string,
+    NetworkId: number,
   |},
 |}): ErgoUnsignedTxUtxoResponse {
   if (request.utxos.length === 0) {
@@ -130,7 +175,7 @@ export function sendAllUnsignedTxFromUtxo(request: {|
   const assets = getAssets(request.utxos);
 
   // recall: sendall is equivalent to sending all the ERG to the change address
-  const change = (() => {
+  const changeWasm = (() => {
     const changeList = new RustModule.SigmaRust.ErgoBoxAssetsDataList();
 
     const tokens = new RustModule.SigmaRust.Tokens();
@@ -158,7 +203,7 @@ export function sendAllUnsignedTxFromUtxo(request: {|
 
   const allUtxoSelection = new RustModule.SigmaRust.BoxSelection(
     wasmInputs,
-    change
+    changeWasm
   );
 
   const txBuilder = RustModule.SigmaRust.TxBuilder.new(
@@ -176,17 +221,20 @@ export function sendAllUnsignedTxFromUtxo(request: {|
     ),
   );
 
+  const changeAddr = (() => {
+    if (request.receiver.addressing == null) return [];
+    const { addressing } = request.receiver;
+    return changeToModel(
+      changeWasm, addressing,
+      request.receiver.address,
+      request.protocolParams.NetworkId
+    );
+  })();
+
   return {
     senderUtxos: request.utxos,
     unsignedTx: txBuilder,
-    changeAddr: request.receiver.addressing
-      ? [{
-        addressing: request.receiver.addressing,
-        address: request.receiver.address,
-        value: new BigNumber(change.get(0).value().as_i64().to_str()),
-        // TODO: add tokens
-      }]
-      : [],
+    changeAddr,
   };
 }
 
@@ -204,6 +252,7 @@ export function newErgoUnsignedTx(request: {|
   protocolParams: {|
     FeeAddress: string,
     MinimumBoxValue: string,
+    NetworkId: number,
   |},
 |}): ErgoUnsignedTxAddressedUtxoResponse {
   const addressingMap = new Map<RemoteUnspentOutput, ErgoAddressedUtxo>();
@@ -278,6 +327,7 @@ export function newErgoUnsignedTxFromUtxo(request: {|
   protocolParams: {|
     FeeAddress: string,
     MinimumBoxValue: string,
+    NetworkId: number,
   |},
 |}): ErgoUnsignedTxUtxoResponse {
   if (request.utxos.length === 0) {
@@ -369,18 +419,13 @@ export function newErgoUnsignedTxFromUtxo(request: {|
   );
 
   const changeAddr = (() => {
-    const result = [];
     const selectedChange = selectedInputs.change();
-    for (let i = 0; i < selectedChange.len(); i++) {
-      const change = selectedChange.get(i);
-      // TODO: token information is dropped
-      result.push({
-        address: request.changeAddr.address,
-        value: new BigNumber(change.value().as_i64().to_str()),
-        addressing: request.changeAddr.addressing,
-      });
-    }
-    return result;
+    return changeToModel(
+      selectedChange,
+      request.changeAddr.addressing,
+      request.changeAddr.address,
+      request.protocolParams.NetworkId,
+    );
   })();
 
   const includedBoxes = (() => {

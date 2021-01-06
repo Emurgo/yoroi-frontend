@@ -8,7 +8,9 @@ import type {
   CardanoHaskellBaseConfig,
   ErgoBaseConfig,
   JormungandrBaseConfig,
+  TokenInsert,
 } from '../primitives/tables';
+import { PRIMARY_ASSET_CONSTANTS } from '../primitives/enums';
 import environment from '../../../../../../environment';
 import { decode, } from 'bs58';
 
@@ -203,3 +205,60 @@ export function getErgoBaseConfig(
   if (!isErgo(network)) throw new Error(`Incorrect network type ${JSON.stringify(network)}`);
   return (network.BaseConfig: any); // cast to return type
 }
+
+export const defaultAssets: Array<
+  $Diff<TokenInsert, {| Digest: number |}>
+> = Object.keys(networks)
+  .map(key => networks[key])
+  .flatMap(network => {
+    if (isJormungandr(network)) {
+      // TODO: not sure how Jormungandr will end up being used.
+      return [{
+        NetworkId: network.NetworkId,
+        Identifier: PRIMARY_ASSET_CONSTANTS.Jormungandr,
+        IsDefault: true,
+        Metadata: {
+          type: 'Cardano',
+          policyId: PRIMARY_ASSET_CONSTANTS.Jormungandr,
+          assetName: PRIMARY_ASSET_CONSTANTS.Jormungandr,
+          ticker: 'ADA',
+          longName: null,
+          numberOfDecimals: 6,
+        }
+      }];
+    }
+    if (isCardanoHaskell(network)) {
+      return [{
+        NetworkId: network.NetworkId,
+        Identifier: PRIMARY_ASSET_CONSTANTS.Cardano,
+        IsDefault: true,
+        Metadata: {
+          type: 'Cardano',
+          policyId: PRIMARY_ASSET_CONSTANTS.Cardano,
+          assetName: PRIMARY_ASSET_CONSTANTS.Cardano,
+          ticker: network === networks.CardanoTestnet
+            ? 'TADA'
+            : 'ADA',
+          longName: null,
+          numberOfDecimals: 6,
+        }
+      }];
+    }
+    if (isErgo(network)) {
+      return [{
+        NetworkId: network.NetworkId,
+        Identifier: PRIMARY_ASSET_CONSTANTS.Ergo,
+        IsDefault: true,
+        Metadata: {
+          type: 'Ergo',
+          height: 0,
+          boxId: PRIMARY_ASSET_CONSTANTS.Ergo,
+          ticker: 'ERG',
+          longName: null,
+          numberOfDecimals: '1000000000'.length - 1, // units per ERG
+          description: null,
+        }
+      }];
+    }
+    throw new Error(`Missing default asset for network type ${JSON.stringify(network)}`);
+  });

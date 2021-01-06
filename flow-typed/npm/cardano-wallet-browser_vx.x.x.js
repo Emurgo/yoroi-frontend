@@ -415,6 +415,8 @@ declare module 'cardano-wallet-browser' { // need to wrap flowgen output into mo
      */
     static new(key: PrivateKey): DaedalusWallet;
 
+    master_key(): PrivateKey;
+
     /**
      * @param {Entropy} entropy
      * @returns {DaedalusWallet}

@@ -108,6 +108,7 @@ export default class ProfileStore extends Store {
         // note: we want to load memos BEFORE we start syncing wallets
         // this is because syncing wallets will also try and sync memos with external storage
         await this.stores.memos.loadFromStorage();
+        await this.stores.tokenInfoStore.refreshTokenInfo();
         await this.stores.coinPriceStore.loadFromStorage();
         await this.stores.coinPriceStore.refreshCurrentCoinPrice();
 

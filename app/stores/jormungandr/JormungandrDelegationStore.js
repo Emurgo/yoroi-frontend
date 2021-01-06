@@ -31,11 +31,12 @@ import {
   genToRelativeSlotNumber,
   genTimeToSlot,
 } from '../../api/jormungandr/lib/storage/bridge/timeUtils';
-import { isJormungandr, getJormungandrBaseConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { isJormungandr, getJormungandrBaseConfig, } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import type { DelegationRequests } from '../toplevel/DelegationStore';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import type { MangledAmountFunc } from '../stateless/mangledAddresses';
 import { getUnmangleAmounts } from '../stateless/mangledAddresses';
+import { MultiToken } from '../../api/common/lib/MultiToken';
 
 export default class JormungandrDelegationStore extends Store {
 
@@ -59,9 +60,19 @@ export default class JormungandrDelegationStore extends Store {
           network: publicDeriver.getParent().getNetworkInfo(),
           addresses: [address]
         });
+
+        const defaultToken = publicDeriver.getParent().getDefaultToken();
+
         // flowlint-next-line unnecessary-optional-chain:off
         const addressRewards = historyResult[address]?.map(info => (
-          ([info[0], new BigNumber(info[1])]: [number, BigNumber])
+          ([info[0], new MultiToken(
+            [{
+              amount: new BigNumber(info[1]),
+              identifier: defaultToken.defaultIdentifier,
+              networkId: defaultToken.defaultNetworkId,
+            }],
+            defaultToken
+          )]: [number, MultiToken])
         ));
         return addressRewards != null
           ? addressRewards
@@ -95,6 +106,8 @@ export default class JormungandrDelegationStore extends Store {
         delegationRequest.error = undefined;
       });
 
+      const defaultToken = publicDeriver.getParent().getDefaultToken();
+
       const withStakingKey = asGetStakingKey(publicDeriver);
       if (withStakingKey == null) {
         throw new Error(`${nameof(this.refreshDelegation)} missing staking key functionality`);
@@ -115,7 +128,14 @@ export default class JormungandrDelegationStore extends Store {
           }
           const delegatedBalance = delegationRequest.getDelegatedBalance.execute({
             publicDeriver: withStakingKey,
-            rewardBalance: new BigNumber(stateForStakingKey.value),
+            rewardBalance: new MultiToken(
+              [{
+                amount: new BigNumber(stateForStakingKey.value),
+                networkId: defaultToken.defaultNetworkId,
+                identifier: defaultToken.defaultIdentifier,
+              }],
+              defaultToken
+            ),
             stakingAddress: stakingKeyResp.addr.Hash,
           }).promise;
           if (delegatedBalance == null) throw new Error('Should never happen');

@@ -4,26 +4,39 @@ import BigNumber from 'bignumber.js';
 import { ISignRequest } from '../../../common/lib/transactions/ISignRequest';
 import type { BaseSignRequest } from '../../../ada/transactions/types';
 import { RustModule } from '../../../ada/lib/cardanoCrypto/rustLoader';
-import { getJormungandrCurrencyMeta } from '../../currencyInfo';
+import {
+  MultiToken,
+} from '../../../common/lib/MultiToken';
+import { PRIMARY_ASSET_CONSTANTS } from '../../../ada/lib/storage/database/primitives/enums';
+
+type NetworkSettingSnapshot = {|
+  // there is no way given just an unsigned transaction body to know which network it belongs to
+  +NetworkId: number,
+|};
 
 export class JormungandrTxSignRequest implements ISignRequest<RustModule.WalletV3.InputOutput> {
 
   signRequest: BaseSignRequest<RustModule.WalletV3.InputOutput>;
+  networkSettingSnapshot: NetworkSettingSnapshot;
 
-  constructor(signRequest: BaseSignRequest<RustModule.WalletV3.InputOutput>) {
+  constructor(
+    signRequest: BaseSignRequest<RustModule.WalletV3.InputOutput>,
+    networkSettingSnapshot: NetworkSettingSnapshot,
+  ) {
     this.signRequest = signRequest;
+    this.networkSettingSnapshot = networkSettingSnapshot;
   }
 
-  totalInput(shift: boolean): BigNumber {
-    return getTxInputTotal(this.signRequest.unsignedTx, shift);
+  totalInput(): MultiToken {
+    return getTxInputTotal(this.signRequest.unsignedTx, this.networkSettingSnapshot.NetworkId);
   }
 
-  totalOutput(shift: boolean): BigNumber {
-    return getTxOutputTotal(this.signRequest.unsignedTx, shift);
+  totalOutput(): MultiToken {
+    return getTxOutputTotal(this.signRequest.unsignedTx, this.networkSettingSnapshot.NetworkId);
   }
 
-  fee(shift: boolean): BigNumber {
-    return getJormungandrTxFee(this.signRequest.unsignedTx, shift);
+  fee(): MultiToken {
+    return getJormungandrTxFee(this.signRequest.unsignedTx, this.networkSettingSnapshot.NetworkId);
   }
 
   uniqueSenderAddresses(): Array<string> {
@@ -63,51 +76,60 @@ export class JormungandrTxSignRequest implements ISignRequest<RustModule.WalletV
 
 export function getTxInputTotal(
   IOs: RustModule.WalletV3.InputOutput,
-  shift: boolean
-): BigNumber {
-  let sum = new BigNumber(0);
+  networkId: number,
+): MultiToken {
+  const values = new MultiToken(
+    [],
+    {
+      defaultNetworkId: networkId,
+      defaultIdentifier: PRIMARY_ASSET_CONSTANTS.Jormungandr,
+    }
+  );
 
   const inputs = IOs.inputs();
   for (let i = 0; i < inputs.size(); i++) {
     const input = inputs.get(i);
-    const value = new BigNumber(input.value().to_str());
-    sum = sum.plus(value);
+    values.add({
+      identifier: PRIMARY_ASSET_CONSTANTS.Jormungandr,
+      amount: new BigNumber(input.value().to_str()),
+      networkId,
+    });
   }
-  if (shift) {
-    return sum.shiftedBy(-getJormungandrCurrencyMeta().decimalPlaces.toNumber());
-  }
-  return sum;
+  return values;
 }
 
 export function getTxOutputTotal(
   IOs: RustModule.WalletV3.InputOutput,
-  shift: boolean
-): BigNumber {
-  let sum = new BigNumber(0);
+  networkId: number,
+): MultiToken {
+  const values = new MultiToken(
+    [],
+    {
+      defaultNetworkId: networkId,
+      defaultIdentifier: PRIMARY_ASSET_CONSTANTS.Jormungandr,
+    }
+  );
 
   const outputs = IOs.outputs();
   for (let i = 0; i < outputs.size(); i++) {
     const output = outputs.get(i);
-    const value = new BigNumber(output.value().to_str());
-    sum = sum.plus(value);
+    values.add({
+      identifier: PRIMARY_ASSET_CONSTANTS.Jormungandr,
+      amount: new BigNumber(output.value().to_str()),
+      networkId,
+    });
   }
-  if (shift) {
-    return sum.shiftedBy(-getJormungandrCurrencyMeta().decimalPlaces.toNumber());
-  }
-  return sum;
+  return values;
 }
 
 export function getJormungandrTxFee(
   IOs: RustModule.WalletV3.InputOutput,
-  shift: boolean,
-): BigNumber {
-  const out = getTxOutputTotal(IOs, false);
-  const ins = getTxInputTotal(IOs, false);
-  const result = ins.minus(out);
-  if (shift) {
-    return result.shiftedBy(-getJormungandrCurrencyMeta().decimalPlaces.toNumber());
-  }
-  return result;
+  networkId: number,
+): MultiToken {
+  const out = getTxOutputTotal(IOs, networkId);
+  const ins = getTxInputTotal(IOs, networkId);
+
+  return ins.joinSubtractMutable(out);
 }
 
 export function jormungandrTxEqual(

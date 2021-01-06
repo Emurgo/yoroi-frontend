@@ -120,8 +120,11 @@ export default class JormungandrYoroiTransferStore extends Store {
       getUTXOsForAddresses:
         this.stores.substores.jormungandr.stateFetchStore.fetcher.getUTXOsForAddresses,
       useLegacyWitness: mode.type === 'bip44',
-      genesisHash: config.ChainNetworkId,
-      feeConfig: config.LinearFee,
+      protocolParams: {
+        genesisHash: config.ChainNetworkId,
+        feeConfig: config.LinearFee,
+        networkId: selectedNetwork.NetworkId,
+      },
     });
     // Possible exception: NotEnoughMoneyToSendError
     return transferTx;

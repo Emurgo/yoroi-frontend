@@ -27,7 +27,7 @@ import type {
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet';
 import { digestForHash } from '../../api/ada/lib/storage/database/primitives/api/utils';
-import { getApiForNetwork, getApiMeta } from '../../api/common/utils';
+import { getApiForNetwork, } from '../../api/common/utils';
 import type { UnconfirmedAmount } from '../../types/unconfirmedAmountType';
 import LocalizedRequest from '../lib/LocalizedRequest';
 import LocalizableError, { UnexpectedError } from '../../i18n/LocalizableError';
@@ -38,8 +38,11 @@ import {
 import type { TransactionRowsToExportRequest } from '../../actions/common/transactions-actions';
 import globalMessages from '../../i18n/global-messages';
 import * as timeUtils from '../../api/ada/lib/storage/bridge/timeUtils';
-import { getCardanoHaskellBaseConfig, isCardanoHaskell } from '../../api/ada/lib/storage/database/prepackaged/networks';
-
+import { getCardanoHaskellBaseConfig, isCardanoHaskell, } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import {
+  MultiToken,
+} from '../../api/common/lib/MultiToken';
+import { genLookupOrFail, getTokenName } from '../stateless/tokenHelpers';
 
 export type TxRequests = {|
   publicDeriver: PublicDeriver<>,
@@ -100,10 +103,19 @@ export default class TransactionsStore extends Store {
 
   /** Calculate information about transactions that are still realistically reversible */
   @computed get unconfirmedAmount(): UnconfirmedAmount {
+    const selectedNetwork = this.stores.profile.selectedNetwork;
+    if (selectedNetwork == null) throw new Error(`${nameof(this.unconfirmedAmount)} no network selected`);
+
+    const defaultToken = this.stores.tokenInfoStore.getDefaultTokenInfo(selectedNetwork.NetworkId);
+    const defaultTokenInfo = {
+      defaultNetworkId: defaultToken.NetworkId,
+      defaultIdentifier: defaultToken.Identifier,
+    };
+
     const defaultUnconfirmedAmount = {
-      total: new BigNumber(0),
-      incoming: new BigNumber(0),
-      outgoing: new BigNumber(0),
+      total: new MultiToken([], defaultTokenInfo),
+      incoming: new MultiToken([], defaultTokenInfo),
+      outgoing: new MultiToken([], defaultTokenInfo),
       incomingInSelectedCurrency: new BigNumber(0),
       outgoingInSelectedCurrency: new BigNumber(0),
     };
@@ -123,15 +135,12 @@ export default class TransactionsStore extends Store {
       .getPublicDeriverSettingsCache(publicDeriver);
 
 
-    const api = getApiForNetwork(
-      publicDeriver.getParent().getNetworkInfo()
-    );
-    const apiMeta = getApiMeta(api)?.meta;
-    if (apiMeta == null) throw new Error(`${nameof(this.unconfirmedAmount)} no API selected`);
     const getUnitOfAccount = (timestamp: Date) => (!unitOfAccount.enabled
       ? undefined
       : this.stores.coinPriceStore.priceMap.get(getPriceKey(
-        apiMeta.primaryTicker,
+        getTokenName(this.stores.tokenInfoStore.getDefaultTokenInfo(
+          publicDeriver.getParent().getNetworkInfo().NetworkId
+        )),
         unitOfAccount.currency,
         timestamp
       )));
@@ -139,7 +148,8 @@ export default class TransactionsStore extends Store {
       result.transactions,
       txRequests.lastSyncInfo.Height,
       assuranceMode,
-      getUnitOfAccount
+      getUnitOfAccount,
+      defaultTokenInfo,
     );
   }
 
@@ -294,6 +304,10 @@ export default class TransactionsStore extends Store {
     if (publicDeriver == null) {
       return;
     }
+
+    // update token info cache
+    await this.stores.tokenInfoStore.refreshTokenInfo();
+
     // calculate pending transactions just to cache the result
     {
       const pendingRequest = this.getTxRequests(request.publicDeriver).requests.pendingRequest;
@@ -483,6 +497,7 @@ export default class TransactionsStore extends Store {
       const rows = await this.api[apiType].getTransactionRowsToExport({
         publicDeriver: withLevels,
         ...request.exportRequest,
+        getDefaultToken: networkId => this.stores.tokenInfoStore.getDefaultTokenInfo(networkId),
       });
 
       /**
@@ -491,11 +506,6 @@ export default class TransactionsStore extends Store {
       if (isCardanoHaskell(selectedNetwork) && delegationRequests) {
         const rewards = await delegationRequests.rewardHistory.promise;
         if (rewards != null) {
-          const apiMeta = getApiMeta(
-            getApiForNetwork(selectedNetwork)
-          )?.meta;
-          if (apiMeta == null) throw new Error(`${nameof(TransactionsStore)} no API selected`);
-          const amountPerUnit = new BigNumber(10).pow(apiMeta.decimalPlaces);
           const fullConfig = getCardanoHaskellBaseConfig(selectedNetwork);
 
           const absSlotFunc = await timeUtils.genToAbsoluteSlotNumber(fullConfig);
@@ -510,9 +520,14 @@ export default class TransactionsStore extends Store {
               absoluteSlotNum: absSlot,
               timeSinceGenesisFunc: timeSinceGenFunc
             });
+
+            const defaultInfo = item[1].getDefaultEntry();
+            const tokenInfo = this.stores.tokenInfoStore.tokenInfo
+              .get(selectedNetwork.NetworkId.toString())
+              ?.get(defaultInfo.identifier)
             return {
               type: 'in',
-              amount: item[1].div(amountPerUnit).toString(),
+              amount: defaultInfo.amount.div(tokenInfo?.Metadata.numberOfDecimals || 0).toString(),
               fee: '0',
               date: epochStartDate,
               comment: `Staking Reward Epoch ${item[0]}`
@@ -538,19 +553,19 @@ export default class TransactionsStore extends Store {
       ? null
       : this.stores.wallets.getPublicKeyCache(withPubKey).plate.TextPart;
 
-    const network = request.publicDeriver.getParent().getNetworkInfo();
-    const apiMeta = getApiMeta(getApiForNetwork(network))?.meta;
-    if (apiMeta == null) throw new Error(`${nameof(this.exportTransactionsToFile)} no API selected`);
-
-    const meta = getApiMeta(apiType)?.meta;
-    if (meta == null) throw new Error(`${nameof(this.exportTransactionsToFile)} missing API`);
     return async () => {
+      const defaultToken = request.publicDeriver.getParent().getDefaultToken();
+      const defaultTokenInfo = genLookupOrFail(this.stores.tokenInfoStore.tokenInfo)({
+        identifier: defaultToken.defaultIdentifier,
+        networkId: defaultToken.defaultNetworkId,
+      });
+      const tokenName = getTokenName(defaultTokenInfo);
       await this.stores.transactions.exportTransactions.execute({
-        ticker: meta.primaryTicker,
+        ticker: tokenName,
         rows: respTxRows,
         nameSuffix: plate == null
-          ? apiMeta.primaryTicker
-          : `${apiMeta.primaryTicker}-${plate}`,
+          ? tokenName
+          : `${tokenName}-${plate}`,
       }).promise;
     };
   }

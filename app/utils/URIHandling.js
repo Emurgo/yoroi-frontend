@@ -1,10 +1,12 @@
 // @flow
 
 import BigNumber from 'bignumber.js';
+import { MultiToken } from '../api/common/lib/MultiToken';
+import type { DefaultTokenEntry } from '../api/common/lib/MultiToken';
 
 export type UriParams = {|
   address: string,
-  amount: BigNumber,
+  amount: MultiToken,
 |}
 /**
  * retrieves URI parameters following the web+cardano protocol
@@ -13,12 +15,14 @@ export const getURIParameters: (
   string,
   string => Promise<boolean>,
   string => boolean,
-  number
+  number,
+  DefaultTokenEntry
 ) => Promise<?UriParams> = async (
   uri,
   currencyValidator,
   amountValidator,
   decimalPlaces,
+  defaultTokenInfo
 ) => {
   if (!uri) uri = decodeURIComponent(window.location.href);
   const address = await extractAddress(uri, currencyValidator);
@@ -27,7 +31,11 @@ export const getURIParameters: (
   if (amount == null) return null;
   return {
     address,
-    amount,
+    amount: new MultiToken([{
+      identifier: defaultTokenInfo.defaultIdentifier,
+      networkId: defaultTokenInfo.defaultNetworkId,
+      amount,
+    }], defaultTokenInfo),
   };
 };
 

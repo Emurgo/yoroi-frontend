@@ -12,6 +12,8 @@ import NoticeBoardPage from './NoticeBoardPage';
 import { globalKnobs } from '../../../stories/helpers/StoryWrapper';
 import { withScreenshot } from 'storycap';
 import Notice from '../../domain/Notice';
+import { mockFromDefaults, } from '../../stores/toplevel/TokenInfoStore';
+import { defaultAssets } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -68,6 +70,9 @@ export const Generic = (): Node => {
           wallets: {
             selected: null,
           },
+          tokenInfoStore: {
+            tokenInfo: mockFromDefaults(defaultAssets),
+          },
           profile: {
             isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
           },
@@ -101,6 +106,9 @@ export const Generic = (): Node => {
                   ServerStatusErrors.Healthy,
                 ),
                 serverTime: undefined,
+              },
+              tokenInfoStore: {
+                tokenInfo: mockFromDefaults(defaultAssets),
               },
               wallets: {
                 selected: null,

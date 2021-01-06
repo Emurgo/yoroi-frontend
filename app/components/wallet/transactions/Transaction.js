@@ -2,7 +2,6 @@
 import React, { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import BigNumber from 'bignumber.js';
 import { defineMessages, intlShape } from 'react-intl';
 import type {
   $npm$ReactIntl$IntlFormat,
@@ -23,17 +22,25 @@ import { Logger } from '../../../utils/logging';
 import ExpandArrow from '../../../assets/images/expand-arrow-grey.inline.svg';
 import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
-import type { PriceDataRow } from '../../../api/ada/lib/storage/database/prices/tables';
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 import { TxStatusCodes, } from '../../../api/ada/lib/storage/database/primitives/enums';
 import type { TxStatusCodesType, } from '../../../api/ada/lib/storage/database/primitives/enums';
-import type { CertificateRow } from '../../../api/ada/lib/storage/database/primitives/tables';
+import type { CertificateRow, TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import { RustModule } from '../../../api/ada/lib/cardanoCrypto/rustLoader';
 import { splitAmount, truncateAddressShort } from '../../../utils/formatters';
 import type { TxMemoTableRow } from '../../../api/ada/lib/storage/database/memos/tables';
 import CopyableAddress from '../../widgets/CopyableAddress';
 import type { Notification } from '../../../types/notificationType';
 import { genAddressLookup } from '../../../stores/stateless/addressStores';
+import {
+  MultiToken,
+} from '../../../api/common/lib/MultiToken';
+import { hiddenAmount } from '../../../utils/strings';
+import type {
+  TokenLookupKey, TokenEntry,
+} from '../../../api/common/lib/MultiToken';
+import { getTokenName } from '../../../stores/stateless/tokenHelpers';
+import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 
 const messages = defineMessages({
   type: {
@@ -188,15 +195,13 @@ type Props = {|
   +shouldHideBalance: boolean,
   +onAddMemo: WalletTransaction => void,
   +onEditMemo: WalletTransaction => void,
-  +unitOfAccount: {|
-    +primaryTicker: string,
-    +priceInfo: void | $ReadOnly<PriceDataRow>
-  |},
+  +unitOfAccountSetting: UnitOfAccountSettingType,
+  +getCurrentPrice: (from: string, to: string) => ?number,
   +addressLookup: ReturnType<typeof genAddressLookup>,
   +onCopyAddressTooltip: (string, string) => void,
   +notification: ?Notification,
-  +decimalPlaces: number, // TODO: this should be tied to individual values, not the currency itself
   +addressToDisplayString: string => string,
+  +getTokenInfo: Inexact<TokenLookupKey> => $ReadOnly<TokenRow>,
 |};
 
 type State = {|
@@ -267,28 +272,37 @@ export default class Transaction extends Component<Props, State> {
   }
 
   renderAmountDisplay: {|
-    amount: BigNumber,
-    decimalPlaces: number,
+    amount: MultiToken,
   |} => Node = (request) => {
     if (this.props.shouldHideBalance) {
-      return (<span>******</span>);
+      return (<span>{hiddenAmount}</span>);
     }
 
-    const { unitOfAccount } = this.props;
-    if (unitOfAccount.priceInfo != null) {
-      const { priceInfo } = unitOfAccount;
-      return (
-        <>
-          { calculateAndFormatValue(request.amount, priceInfo.Price) + ' ' + priceInfo.To }
-          <div className={styles.amountSmall}>
-            {request.amount.toString()} {priceInfo.From}
-          </div>
-        </>
+    const defaultEntry = request.amount.getDefaultEntry();
+    const tokenInfo = this.props.getTokenInfo(defaultEntry);
+    const shiftedAmount = defaultEntry.amount
+      .shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
+
+    if (this.props.unitOfAccountSetting.enabled === true) {
+      const { currency } = this.props.unitOfAccountSetting;
+      const price = this.props.getCurrentPrice(
+        defaultEntry.identifier,
+        currency
       );
+      if (price != null) {
+        return (
+          <>
+            { calculateAndFormatValue(shiftedAmount, price) + ' ' + currency }
+            <div className={styles.amountSmall}>
+              {shiftedAmount.toString()} {getTokenName(tokenInfo)}
+            </div>
+          </>
+        );
+      }
     }
     const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
-      request.amount,
-      request.decimalPlaces
+      shiftedAmount,
+      tokenInfo.Metadata.numberOfDecimals
     );
 
     // we may need to explicitly add + for positive values
@@ -305,31 +319,40 @@ export default class Transaction extends Component<Props, State> {
   }
 
   renderFeeDisplay: {|
-    amount: BigNumber,
-    decimalPlaces: number,
+    amount: MultiToken,
     type: TransactionDirectionType,
   |} => Node = (request) => {
     if (this.props.shouldHideBalance) {
-      return (<span>******</span>);
+      return (<span>{hiddenAmount}</span>);
     }
-    const { unitOfAccount } = this.props;
-    if (unitOfAccount.priceInfo != null) {
-      const { priceInfo } = unitOfAccount;
-      return (
-        <>
-          { calculateAndFormatValue(request.amount.abs(), priceInfo.Price) + ' ' + priceInfo.To }
-          <div className={styles.amountSmall}>
-            {request.amount.abs().toString()} {priceInfo.From}
-          </div>
-        </>
+    const defaultEntry = request.amount.getDefaultEntry();
+    const tokenInfo = this.props.getTokenInfo(defaultEntry);
+    const shiftedAmount = defaultEntry.amount
+      .shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
+
+    if (this.props.unitOfAccountSetting.enabled === true) {
+      const { currency } = this.props.unitOfAccountSetting;
+      const price = this.props.getCurrentPrice(
+        defaultEntry.identifier,
+        currency
       );
+      if (price != null) {
+        return (
+          <>
+            { calculateAndFormatValue(shiftedAmount.abs(), price) + ' ' + currency }
+            <div className={styles.amountSmall}>
+              {shiftedAmount.abs().toString()} {getTokenName(tokenInfo)}
+            </div>
+          </>
+        );
+      }
     }
     if (request.type === transactionTypes.INCOME) {
       return (<span>-</span>);
     }
     const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
-      request.amount.abs(),
-      request.decimalPlaces
+      shiftedAmount.abs(),
+      tokenInfo.Metadata.numberOfDecimals
     );
 
     return (
@@ -339,6 +362,14 @@ export default class Transaction extends Component<Props, State> {
       </>
     );
   }
+
+  getTicker: TokenEntry => string = tokenEntry => {
+    if (this.props.unitOfAccountSetting.enabled === true) {
+      return this.props.unitOfAccountSetting.currency;
+    }
+    const tokenInfo = this.props.getTokenInfo(tokenEntry);
+    return getTokenName(tokenInfo);
+  };
 
   render(): Node {
     const data = this.props.data;
@@ -399,7 +430,11 @@ export default class Transaction extends Component<Props, State> {
                 {moment(data.date).format('hh:mm:ss A')}
               </div>
               <div className={styles.type}>
-                { this.getTxTypeMsg(intl, this.props.unitOfAccount.primaryTicker, data.type) }
+                {this.getTxTypeMsg(
+                  intl,
+                  this.getTicker(data.amount.getDefaultEntry()),
+                  data.type
+                )}
               </div>
               {state === TxStatusCodes.IN_BLOCK ? (
                 <div className={labelOkClasses}>{status}</div>
@@ -412,13 +447,11 @@ export default class Transaction extends Component<Props, State> {
                 {this.renderFeeDisplay({
                   amount: data.fee,
                   type: data.type,
-                  decimalPlaces: this.props.decimalPlaces,
                 })}
               </div>
               <div className={classnames([styles.currency, styles.amount])}>
                 {this.renderAmountDisplay({
                   amount: data.amount,
-                  decimalPlaces: this.props.decimalPlaces,
                 })}
               </div>
             </div>
@@ -488,9 +521,8 @@ export default class Transaction extends Component<Props, State> {
                           {this.generateAddressButton(address.address)}
                           <div className={styles.fee}>
                             {this.renderAmountDisplay({
-                              amount: address.value.negated(),
-                              decimalPlaces: this.props.decimalPlaces,
-                            })} {this.props.unitOfAccount.primaryTicker}
+                              amount: address.value.negatedCopy(),
+                            })} {this.getTicker(address.value.getDefaultEntry())}
                           </div>
                         </div>
                       );
@@ -545,8 +577,7 @@ export default class Transaction extends Component<Props, State> {
                           <div className={styles.fee}>
                             {this.renderAmountDisplay({
                               amount: address.value,
-                              decimalPlaces: this.props.decimalPlaces,
-                            })} {this.props.unitOfAccount.primaryTicker}
+                            })} {this.getTicker(address.value.getDefaultEntry())}
                           </div>
                         </div>);
                     })}
@@ -751,8 +782,7 @@ export default class Transaction extends Component<Props, State> {
                   <div className={styles.fee}>
                     {this.renderAmountDisplay({
                       amount: withdrawal.value,
-                      decimalPlaces: this.props.decimalPlaces,
-                    })} {this.props.unitOfAccount.primaryTicker}
+                    })} {this.getTicker(withdrawal.value.getDefaultEntry())}
                   </div>
                 </div>
               );

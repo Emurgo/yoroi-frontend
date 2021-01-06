@@ -1,6 +1,5 @@
 // @flow
 import React, { Component } from 'react';
-import BigNumber from 'bignumber.js';
 import { observer } from 'mobx-react';
 import type { Node } from 'react';
 import classnames from 'classnames';
@@ -13,24 +12,29 @@ import IconEyeOpen from '../../assets/images/my-wallets/icon_eye_open.inline.svg
 import IconEyeClosed from '../../assets/images/my-wallets/icon_eye_closed.inline.svg';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import WalletCurrency from '../wallet/my-wallets/WalletCurrency';
+import { hiddenAmount } from '../../utils/strings';
+import { MultiToken } from '../../api/common/lib/MultiToken';
+import type {
+  TokenLookupKey,
+} from '../../api/common/lib/MultiToken';
+import { getTokenName } from '../../stores/stateless/tokenHelpers';
+import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
 
 type Props = {|
-    +onUpdateHideBalance: void => Promise<void>,
-    +shouldHideBalance: boolean,
-    +highlightTitle?: boolean,
-    /**
-      * undefined => wallet is not a reward wallet
-      * null => still calculating
-      * value => done calculating
-    */
-    +rewards: null | void | BigNumber,
-    +walletAmount: null | BigNumber,
-    +infoText?: string,
-    +showDetails?: boolean,
-    +meta: {|
-      +primaryTicker: string,
-      +decimalPlaces: number,
-    |},
+  +onUpdateHideBalance: void => Promise<void>,
+  +shouldHideBalance: boolean,
+  +highlightTitle?: boolean,
+  /**
+    * undefined => wallet is not a reward wallet
+    * null => still calculating
+    * value => done calculating
+  */
+  +rewards: null | void | MultiToken,
+  +walletAmount: null | MultiToken,
+  +infoText?: string,
+  +showDetails?: boolean,
+  +getTokenInfo: Inexact<TokenLookupKey> => $ReadOnly<TokenRow>,
+  +defaultToken: $ReadOnly<TokenRow>,
 |};
 
 @observer
@@ -75,7 +79,7 @@ export default class NavWalletDetails extends Component<Props> {
               showsRewards && styles.currencyAlign
             ])}
           >
-            <WalletCurrency currency={this.props.meta.primaryTicker} />
+            <WalletCurrency currency={getTokenName(this.props.defaultToken)} />
           </div>
           <div className={styles.content}>
             <div
@@ -130,31 +134,36 @@ export default class NavWalletDetails extends Component<Props> {
     );
   }
 
-  getTotalAmount: void => (null | BigNumber) = () => {
+  getTotalAmount: void => (null | MultiToken) = () => {
     if (this.props.rewards === undefined) {
       return this.props.walletAmount;
     }
     if (this.props.rewards === null || this.props.walletAmount === null) {
       return null;
     }
-    return this.props.rewards.plus(this.props.walletAmount);
+    return this.props.rewards.joinAddCopy(this.props.walletAmount);
   }
 
   renderAmountDisplay: {|
     shouldHideBalance: boolean,
-    amount: ?BigNumber
+    amount: ?MultiToken
   |} => Node = (request) => {
     if (request.amount == null) {
       return <div className={styles.isLoading} />;
     }
 
+    const defaultEntry = request.amount.getDefaultEntry();
+    const tokenInfo = this.props.getTokenInfo(defaultEntry);
+    const shiftedAmount = defaultEntry.amount
+      .shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
+
     let balanceDisplay;
     if (request.shouldHideBalance) {
-      balanceDisplay = (<span>******</span>);
+      balanceDisplay = (<span>{hiddenAmount}</span>);
     } else {
       const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
-        request.amount,
-        this.props.meta.decimalPlaces,
+        shiftedAmount,
+        tokenInfo.Metadata.numberOfDecimals,
       );
 
       balanceDisplay = (
@@ -165,6 +174,6 @@ export default class NavWalletDetails extends Component<Props> {
       );
     }
 
-    return (<>{balanceDisplay} {this.props.meta.primaryTicker}</>);
+    return (<>{balanceDisplay} {getTokenName(tokenInfo)}</>);
   }
 }

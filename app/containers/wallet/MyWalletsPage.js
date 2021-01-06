@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import type { Node } from 'react';
 import { computed } from 'mobx';
 import { observer } from 'mobx-react';
-import { intlShape, defineMessages } from 'react-intl';
+import { intlShape, } from 'react-intl';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 
 import MyWallets from '../../components/wallet/my-wallets/MyWallets';
@@ -23,10 +23,8 @@ import { ROUTES } from '../../routes-config';
 import NavBar from '../../components/topbar/NavBar';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
 import WalletSync from '../../components/wallet/my-wallets/WalletSync';
-import BigNumber from 'bignumber.js';
 import moment from 'moment';
 import NavBarAddButton from '../../components/topbar/NavBarAddButton';
-import NavWalletDetails from '../../components/topbar/NavWalletDetails';
 import globalMessages from '../../i18n/global-messages';
 import { ConceptualWallet, } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import {
@@ -39,15 +37,10 @@ import type { DelegationRequests } from '../../stores/toplevel/DelegationStore';
 import type { PublicKeyCache } from '../../stores/toplevel/WalletStore';
 import type { TxRequests } from '../../stores/toplevel/TransactionsStore';
 import type { IGetPublic } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
-import { getApiForNetwork, getApiMeta } from '../../api/common/utils';
-import { networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
-
-const messages = defineMessages({
-  walletSumInfo: {
-    id: 'myWallets.wallets.sumInfoText',
-    defaultMessage: '!!!Total wallet balance',
-  }
-});
+import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
+import { MultiToken } from '../../api/common/lib/MultiToken';
+import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
+import { genLookupOrFail, getTokenName } from '../../stores/stateless/tokenHelpers';
 
 export type GeneratedData = typeof MyWalletsPage.prototype.generated;
 
@@ -78,29 +71,9 @@ export default class MyWalletsPage extends Component<Props> {
   };
 
   render(): Node {
-    const { stores } = this.generated;
-    const { intl } = this.context;
     const sidebarContainer = (<SidebarContainer {...this.generated.SidebarContainerProps} />);
 
     const wallets = this.generated.stores.wallets.publicDerivers;
-
-    let utxoTotal = new BigNumber(0);
-    const walletBalances = wallets.map(wallet => {
-      const balanceResult = stores.transactions
-        .getTxRequests(wallet).requests.getBalanceRequest.result;
-      const apiMeta = getApiMeta(getApiForNetwork(wallet.getParent().getNetworkInfo()))?.meta;
-      if (apiMeta == null) throw new Error(`${nameof(MyWalletsPage)} no API selected`);
-      const amountPerUnit = new BigNumber(10).pow(apiMeta.decimalPlaces);
-      return balanceResult?.dividedBy(amountPerUnit);
-    });
-    for (const walletUtxoAmount of walletBalances) {
-      if (walletUtxoAmount == null) {
-        utxoTotal = null;
-        break;
-      }
-      utxoTotal = utxoTotal.plus(walletUtxoAmount);
-    }
-
 
     const navbarTitle = (
       <NavBarTitle title={this.context.intl.formatMessage(globalMessages.sidebarWallets)} />
@@ -113,24 +86,7 @@ export default class MyWalletsPage extends Component<Props> {
           () => this.generated.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD })
         }
         />}
-        walletDetails={true // eslint-disable-line no-constant-condition
-          ? undefined
-          : (
-            <NavWalletDetails
-              showDetails={false}
-              highlightTitle
-              onUpdateHideBalance={this.updateHideBalance}
-              shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
-              rewards={new BigNumber('0.000000')}
-              walletAmount={utxoTotal}
-              infoText={intl.formatMessage(messages.walletSumInfo)}
-              meta={{
-                // TODO: this no longer makes sense in multi-wallet. Needs to be re-thought
-                primaryTicker: 'ADA',
-                decimalPlaces: 6,
-              }}
-            />
-          )}
+        walletDetails={undefined}
       />
     );
 
@@ -164,28 +120,31 @@ export default class MyWalletsPage extends Component<Props> {
     const settingsCache = this.generated.stores.walletSettings
       .getConceptualWalletSettingsCache(parent);
 
-    const network = publicDeriver.getParent().getNetworkInfo();
-    const apiMeta = getApiMeta(getApiForNetwork(network))?.meta;
-    if (apiMeta == null) throw new Error(`${nameof(MyWalletsPage)} no API selected`);
-    const amountPerUnit = new BigNumber(10).pow(apiMeta.decimalPlaces);
-
-    const walletSumCurrencies = (
-      <>
-        <WalletCurrency
-          // TODO: proper per-network api meta
-          currency={
-            network.NetworkId === networks.CardanoTestnet.NetworkId
-              ? 'TADA'
-              : apiMeta.primaryTicker}
-          tooltipText={undefined /* TODO */}
-        />
-      </>
-    );
+    const walletSumCurrencies = (() => {
+      const network = publicDeriver.getParent().getNetworkInfo();
+      const defaultToken = this.generated.stores.tokenInfoStore.getDefaultTokenInfo(
+        network.NetworkId
+      );
+      const defaultTokenInfo = genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)(
+        {
+          identifier: defaultToken.Identifier,
+          networkId: network.NetworkId,
+        }
+      );
+      return (
+        <>
+          <WalletCurrency
+            // TODO: proper per-network api meta
+            currency={getTokenName(defaultTokenInfo)}
+            tooltipText={undefined /* TODO */}
+          />
+        </>
+      );
+    })();
 
     const txRequests = this.generated.stores.transactions
       .getTxRequests(publicDeriver);
-    const balance = txRequests.requests.getBalanceRequest.result
-      ?.dividedBy(amountPerUnit) || null;
+    const balance = txRequests.requests.getBalanceRequest.result ?? null;
 
     const withPubKey = asGetPublicKey(publicDeriver);
     const plate = withPubKey == null
@@ -203,10 +162,7 @@ export default class MyWalletsPage extends Component<Props> {
           // TODO: This should be probably bound to an individual wallet
           onUpdateHideBalance={this.updateHideBalance}
           shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
-          meta={{
-            decimalPlaces: apiMeta.decimalPlaces.toNumber(),
-            ticker: apiMeta.primaryTicker,
-          }}
+          getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
         />}
         walletSumCurrencies={walletSumCurrencies}
         walletSubRow={() => this.createSubrow(publicDeriver)}
@@ -233,8 +189,15 @@ export default class MyWalletsPage extends Component<Props> {
     const { intl } = this.context;
 
     const network = publicDeriver.getParent().getNetworkInfo();
-    const apiMeta = getApiMeta(getApiForNetwork(network))?.meta;
-    if (apiMeta == null) throw new Error(`${nameof(MyWalletsPage)} no API selected`);
+    const defaultToken = this.generated.stores.tokenInfoStore.getDefaultTokenInfo(
+      network.NetworkId
+    );
+    const defaultTokenInfo = genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)(
+      {
+        identifier: defaultToken.Identifier,
+        networkId: network.NetworkId,
+      }
+    );
 
     // TODO: replace with wallet addresses
     const walletAddresses = [
@@ -271,19 +234,12 @@ export default class MyWalletsPage extends Component<Props> {
           shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
           rewards={null /* TODO */}
           walletAmount={null /* TODO */}
-          meta={{
-            decimalPlaces: apiMeta.decimalPlaces.toNumber(),
-            ticker: apiMeta.primaryTicker,
-          }}
+          getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
         />}
         walletNumber={1}
         walletAddresses={walletAddresses /* TODO: replace with proper hashes */}
         walletCurrencies={<WalletCurrency
-          // TODO: proper per-network api meta
-          currency={
-            network.NetworkId === networks.CardanoTestnet.NetworkId
-              ? 'TADA'
-              : apiMeta.primaryTicker}
+          currency={getTokenName(defaultTokenInfo)}
           tooltipText="0.060" // TODO
         />}
       />
@@ -297,7 +253,7 @@ export default class MyWalletsPage extends Component<Props> {
    * null => still calculating
    * value => done calculating
    */
-  getRewardBalance: PublicDeriver<> => null | void | BigNumber = (
+  getRewardBalance: PublicDeriver<> => null | void | MultiToken = (
     publicDeriver
   ) => {
     const delegationRequest = this.generated.stores
@@ -311,10 +267,7 @@ export default class MyWalletsPage extends Component<Props> {
     if (balanceResult == null) {
       return null;
     }
-    const apiMeta = getApiMeta(getApiForNetwork(publicDeriver.getParent().getNetworkInfo()))?.meta;
-    if (apiMeta == null) throw new Error(`${nameof(MyWalletsPage)} no API selected`);
-    const amountPerUnit = new BigNumber(10).pow(apiMeta.decimalPlaces);
-    return balanceResult.accountPart.dividedBy(amountPerUnit);
+    return balanceResult.accountPart;
   }
 
   @computed get generated(): {|
@@ -346,6 +299,10 @@ export default class MyWalletsPage extends Component<Props> {
           PublicDeriver<>
         ) => void | DelegationRequests
       |},
+      tokenInfoStore: {|
+        tokenInfo: TokenInfoMap,
+        getDefaultTokenInfo: number => $ReadOnly<TokenRow>,
+      |},
       transactions: {|
         getTxRequests: (PublicDeriver<>) => TxRequests
       |},
@@ -373,6 +330,10 @@ export default class MyWalletsPage extends Component<Props> {
         wallets: {
           publicDerivers: stores.wallets.publicDerivers,
           getPublicKeyCache: stores.wallets.getPublicKeyCache,
+        },
+        tokenInfoStore: {
+          tokenInfo: stores.tokenInfoStore.tokenInfo,
+          getDefaultTokenInfo: stores.tokenInfoStore.getDefaultTokenInfo,
         },
         transactions: {
           getTxRequests: stores.transactions.getTxRequests,

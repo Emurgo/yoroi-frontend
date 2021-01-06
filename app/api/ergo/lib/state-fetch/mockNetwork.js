@@ -5,6 +5,7 @@ import type {
   HistoryRequest, HistoryResponse, HistoryFunc,
   BestBlockRequest, BestBlockResponse, BestBlockFunc,
   AddressUtxoRequest, AddressUtxoResponse, AddressUtxoFunc,
+  AssetInfoRequest, AssetInfoResponse, AssetInfoFunc,
   UtxoSumRequest, UtxoSumResponse, UtxoSumFunc,
   RemoteErgoTransaction, RemoteUnspentOutput,
   SignedRequest,
@@ -199,6 +200,16 @@ export function genGetBestBlock(
   };
 }
 
+export function genGetAssetInfo(
+  _blockchain: Array<RemoteErgoTransaction>,
+): AssetInfoFunc {
+  return async (
+    _body: AssetInfoRequest,
+  ): Promise<AssetInfoResponse> => {
+    return {}; // TODO
+  };
+}
+
 export function genUtxoForAddresses(
   getHistory: HistoryFunc,
   getBestBlock: BestBlockFunc,
@@ -336,6 +347,7 @@ export function toRemoteErgoTx(
       outputIndex: output.index,
       transactionId: txHash,
       value: output.value,
+      assets: output.assets,
     };
   };
   return {

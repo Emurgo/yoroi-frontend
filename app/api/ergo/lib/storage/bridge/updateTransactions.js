@@ -17,7 +17,8 @@ import type {
   DbBlock,
   AddressRow,
   ErgoTransactionInsert,
-  TokenInsert,
+  TokenRow,
+  TokenListInsert,
 } from '../../../../ada/lib/storage/database/primitives/tables';
 import {
   TransactionType,
@@ -35,11 +36,15 @@ import {
   GetTransaction,
   GetTxAndBlock,
   GetKeyDerivation,
+  GetToken,
+  AssociateToken,
 } from '../../../../ada/lib/storage/database/primitives/api/read';
 import {
   ModifyAddress,
   ModifyTransaction,
   FreeBlocks,
+  ModifyToken,
+  ModifyTokenList,
 } from '../../../../ada/lib/storage/database/primitives/api/write';
 import { ModifyErgoTx, } from  '../../../../ada/lib/storage/database/transactionModels/multipart/api/write';
 import { digestForHash, } from '../../../../ada/lib/storage/database/primitives/api/utils';
@@ -50,6 +55,7 @@ import {
   GetUtxoTxOutputsWithTx,
   GetUtxoInputs,
   AssociateTxWithUtxoIOs,
+  createTokenListIdGenFunction,
 } from '../../../../ada/lib/storage/database/transactionModels/utxo/api/read';
 import {
   ErgoAssociateTxWithIOs,
@@ -59,10 +65,10 @@ import type {
 } from '../../../../ada/transactions/types';
 import type {
   UtxoTransactionInputInsert, UtxoTransactionOutputInsert,
-  TokenListInsert,
 } from '../../../../ada/lib/storage/database/transactionModels/utxo/tables';
 import {
   TxStatusCodes,
+  PRIMARY_ASSET_CONSTANTS,
 } from '../../../../ada/lib/storage/database/primitives/enums';
 import {
   asScanAddresses, asHasLevels,
@@ -101,12 +107,15 @@ import { RustModule } from '../../../../ada/lib/cardanoCrypto/rustLoader';
 import { getFromUserPerspective, } from '../../../../ada/transactions/utils';
 
 import type {
-  HistoryFunc, RemoteErgoTransaction, BestBlockFunc, RemoteTxState,
+  HistoryFunc, AssetInfoFunc, RemoteErgoTransaction, BestBlockFunc, RemoteTxState,
 } from '../../state-fetch/types';
 import type {
   FilterFunc,
 } from '../../../../common/lib/state-fetch/currencySpecificTypes';
 import { getErgoBaseConfig, } from '../../../../ada/lib/storage/database/prepackaged/networks';
+import type {
+  DefaultTokenEntry,
+} from '../../../../common/lib/MultiToken';
 
 async function rawGetAllTxIds(
   db: lf$Database,
@@ -203,9 +212,11 @@ export async function rawGetTransactions(
   }
   const txsWithIOs = await deps.ErgoAssociateTxWithIOs.getIOsForTx(
     db, dbTx,
-    { txs: txs
-      .map(txWithBlock => txWithBlock.Transaction)
-      .filter(tx => tx.Type === TransactionType.Ergo)
+    {
+      txs: txs
+        .map(txWithBlock => txWithBlock.Transaction)
+        .filter(tx => tx.Type === TransactionType.Ergo),
+      networkId: request.publicDeriver.getParent().getNetworkInfo().NetworkId,
     }
   );
 
@@ -239,6 +250,7 @@ export async function rawGetTransactions(
     ...tx,
     block: blockMap.get(tx.transaction.TransactionId) || null,
     ...getFromUserPerspective({
+      tokens: tx.tokens,
       utxoInputs: tx.utxoInputs,
       utxoOutputs: tx.utxoOutputs.filter(output => (
         // in Ergo, fees are explicit as an output
@@ -250,6 +262,7 @@ export async function rawGetTransactions(
       allOwnedAddressIds: new Set(
         Object.keys(addresses).flatMap(key => addresses[key]).map(addrRow => addrRow.AddressId)
       ),
+      defaultToken: request.publicDeriver.getParent().getDefaultToken(),
     }),
   }));
 
@@ -378,6 +391,52 @@ export async function getPendingTransactions(
   );
 }
 
+export async function rawGetTokenListIds(
+  db: lf$Database,
+  dbTx: lf$Transaction,
+  deps: {|
+    GetPathWithSpecific: Class<GetPathWithSpecific>,
+    GetAddress: Class<GetAddress>,
+    ErgoAssociateTxWithIOs: Class<ErgoAssociateTxWithIOs>,
+    AssociateTxWithUtxoIOs: Class<AssociateTxWithUtxoIOs>,
+    GetDerivationSpecific: Class<GetDerivationSpecific>,
+    GetTransaction: Class<GetTransaction>,
+  |},
+  derivationTables: Map<number, string>,
+  request: {|
+    publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels>,
+  |},
+): Promise<Array<number>> {
+  const relatedIds = await rawGetAllTxIds(
+    db, dbTx,
+    {
+      GetPathWithSpecific: deps.GetPathWithSpecific,
+      GetAddress: deps.GetAddress,
+      AssociateTxWithUtxoIOs: deps.AssociateTxWithUtxoIOs,
+      GetDerivationSpecific: deps.GetDerivationSpecific,
+    },
+    { publicDeriver: request.publicDeriver },
+    derivationTables,
+  );
+
+  const fullTxs = await deps.GetTransaction.fromIds(
+    db, dbTx,
+    { ids: relatedIds.txIds }
+  );
+
+  const txsWithIOs = await deps.ErgoAssociateTxWithIOs.getIOsForTx(
+    db, dbTx,
+    {
+      txs: fullTxs,
+      networkId: request.publicDeriver.getParent().getNetworkInfo().NetworkId,
+    }
+  );
+
+  return Array.from(new Set(txsWithIOs
+    .flatMap(txs => txs.tokens)
+    .map(token => token.TokenList.ListId)));
+}
+
 export async function rawGetForeignAddresses(
   db: lf$Database,
   dbTx: lf$Transaction,
@@ -413,7 +472,10 @@ export async function rawGetForeignAddresses(
 
   const txsWithIOs = await deps.ErgoAssociateTxWithIOs.getIOsForTx(
     db, dbTx,
-    { txs: fullTxs.filter(tx => tx.Type === TransactionType.Ergo) }
+    {
+      txs: fullTxs.filter(tx => tx.Type === TransactionType.Ergo),
+      networkId: request.publicDeriver.getParent().getNetworkInfo().NetworkId,
+    }
   );
 
   const allAddressIds = txsWithIOs.flatMap(txWithIO => [
@@ -505,6 +567,7 @@ export async function rawRemoveAllTransactions(
     GetTransaction: Class<GetTransaction>,
     ModifyAddress: Class<ModifyAddress>,
     FreeBlocks: Class<FreeBlocks>,
+    ModifyTokenList: Class<ModifyTokenList>,
   |},
   derivationTables: Map<number, string>,
   request: {|
@@ -536,6 +599,23 @@ export async function rawRemoveAllTransactions(
     derivationTables,
   );
 
+  const tokenListIds = await rawGetTokenListIds(
+      db, dbTx,
+      {
+        GetPathWithSpecific: deps.GetPathWithSpecific,
+        GetAddress: deps.GetAddress,
+        ErgoAssociateTxWithIOs: deps.ErgoAssociateTxWithIOs,
+        AssociateTxWithUtxoIOs: deps.AssociateTxWithUtxoIOs,
+        GetDerivationSpecific: deps.GetDerivationSpecific,
+        GetTransaction: deps.GetTransaction,
+      },
+      derivationTables,
+      request,
+    );
+
+  // WARNING: anything past this point can't assume txs exist in the DB
+  // since we start removing stuff
+
   // 1) remove txs themselves
   await deps.DeleteAllTransactions.delete(
     db, dbTx,
@@ -554,6 +634,12 @@ export async function rawRemoveAllTransactions(
   // 3) remove blocks no longer needed
   await deps.FreeBlocks.free(db, dbTx);
 
+  // 4) Remove token lists
+  await deps.ModifyTokenList.remove(
+    db, dbTx,
+    tokenListIds
+  );
+
   return relatedIds;
 }
 
@@ -571,6 +657,7 @@ export async function removeAllTransactions(
     ModifyAddress,
     GetTransaction,
     FreeBlocks,
+    ModifyTokenList,
   });
   const db = request.publicDeriver.getDb();
   const depTables = Object
@@ -600,6 +687,7 @@ export async function updateTransactions(
   publicDeriver: IPublicDeriver<ConceptualWallet>,
   checkAddressesInUse: FilterFunc,
   getTransactionsHistoryForAddresses: HistoryFunc,
+  getAssetInfo: AssetInfoFunc,
   getBestBlock: BestBlockFunc,
 ): Promise<void> {
   const withLevels = asHasLevels<ConceptualWallet>(publicDeriver);
@@ -631,6 +719,9 @@ export async function updateTransactions(
       ErgoAssociateTxWithIOs,
       AssociateTxWithUtxoIOs,
       GetKeyDerivation,
+      ModifyToken,
+      GetToken,
+      AssociateToken,
     });
     const updateTables = Object
       .keys(updateDepTables)
@@ -660,6 +751,7 @@ export async function updateTransactions(
           lastSyncInfo,
           checkAddressesInUse,
           getTransactionsHistoryForAddresses,
+          getAssetInfo,
           getBestBlock,
           derivationTables,
         );
@@ -828,6 +920,7 @@ async function rollback(
       allTxIds: txIds,
       isUnspent: true,
       TransactionSeed,
+      networkId: request.publicDeriver.getParent().getNetworkInfo().NetworkId,
     }
   );
 
@@ -894,11 +987,15 @@ async function rawUpdateTransactions(
     ErgoAssociateTxWithIOs: Class<ErgoAssociateTxWithIOs>,
     AssociateTxWithUtxoIOs: Class<AssociateTxWithUtxoIOs>,
     GetKeyDerivation: Class<GetKeyDerivation>,
+    ModifyToken: Class<ModifyToken>,
+    GetToken: Class<GetToken>,
+    AssociateToken: Class<AssociateToken>,
   |},
   publicDeriver: IPublicDeriver<>,
   lastSyncInfo: $ReadOnly<LastSyncInfoRow>,
   checkAddressesInUse: FilterFunc,
   getTransactionsHistoryForAddresses: HistoryFunc,
+  getAssetInfo: AssetInfoFunc,
   getBestBlock: BestBlockFunc,
   derivationTables: Map<number, string>,
 ): Promise<void> {
@@ -1003,6 +1100,9 @@ async function rawUpdateTransactions(
         GetUtxoInputs: deps.GetUtxoInputs,
         ModifyTransaction: deps.ModifyTransaction,
         ModifyErgoTx: deps.ModifyErgoTx,
+        ModifyToken: deps.ModifyToken,
+        GetToken: deps.GetToken,
+        AssociateToken: deps.AssociateToken,
       },
       {
         network: publicDeriver.getParent().getNetworkInfo(),
@@ -1012,10 +1112,12 @@ async function rawUpdateTransactions(
           ourIds,
           publicDeriver.getParent().getNetworkInfo()
         ),
+        defaultToken: publicDeriver.getParent().getDefaultToken(),
         findOwnAddress: rawGenFindOwnAddress(
           ourIds
         ),
         derivationTables,
+        getAssetInfo,
       }
     );
   }
@@ -1037,7 +1139,7 @@ async function rawUpdateTransactions(
  * Pre-req: must not be any gaps within the transactions
  * Pre-req: each TX has unique hash
  */
-export async function updateTransactionBatch(
+async function updateTransactionBatch(
   db: lf$Database,
   dbTx: lf$Transaction,
   deps: {|
@@ -1048,6 +1150,9 @@ export async function updateTransactionBatch(
     GetUtxoInputs: Class<GetUtxoInputs>,
     ModifyTransaction: Class<ModifyTransaction>,
     ModifyErgoTx: Class<ModifyErgoTx>,
+    ModifyToken: Class<ModifyToken>,
+    GetToken: Class<GetToken>,
+    AssociateToken: Class<AssociateToken>,
   |},
   request: {|
     network: $ReadOnly<NetworkRow>,
@@ -1056,6 +1161,8 @@ export async function updateTransactionBatch(
     hashToIds: HashToIdsFunc,
     findOwnAddress: FindOwnAddressFunc,
     derivationTables: Map<number, string>,
+    getAssetInfo: AssetInfoFunc,
+    defaultToken: DefaultTokenEntry,
   |}
 ): Promise<Array<{|
   ...ErgoTxIO,
@@ -1073,7 +1180,10 @@ export async function updateTransactionBatch(
     const txs: Array<$ReadOnly<TransactionRow>> = Array.from(matchByDigest.values());
     const txsWithIOs = await deps.ErgoAssociateTxWithIOs.getIOsForTx(
       db, dbTx,
-      { txs: txs.filter(tx => tx.Type === TransactionType.Ergo) }
+      {
+        txs: txs.filter(tx => tx.Type === TransactionType.Ergo),
+        networkId: request.network.NetworkId,
+      }
     );
     for (const tx of txsWithIOs) {
       matchesInDb.set(tx.transaction.Hash, tx);
@@ -1137,7 +1247,24 @@ export async function updateTransactionBatch(
     }
   }
 
-  // 2) Add new transactions
+  // 2) Add any new assets & lookup known ones
+  const assetLookup = await genErgoAssetMap(
+    db, dbTx,
+    {
+      ModifyToken: deps.ModifyToken,
+      GetToken: deps.GetToken,
+    },
+    unseenNewTxs,
+    request.getAssetInfo,
+    request.network,
+    request.defaultToken,
+  );
+
+  // 3) Add new transactions
+  const genNextTokenListId = await createTokenListIdGenFunction(
+    db, dbTx,
+    { AssociateToken: deps.AssociateToken }
+  );
   const { ergoTxs, } = await networkTxToDbTx(
     db,
     dbTx,
@@ -1147,6 +1274,8 @@ export async function updateTransactionBatch(
     request.hashToIds,
     TransactionSeed,
     BlockSeed,
+    assetLookup,
+    genNextTokenListId,
   );
   const newsTxsIdSet = new Set();
   for (const newTx of ergoTxs) {
@@ -1163,13 +1292,12 @@ export async function updateTransactionBatch(
         transaction: result.transaction,
         utxoInputs: result.utxoInputs,
         utxoOutputs: result.utxoOutputs,
-        utxoTokenInputs: result.utxoTokenInputs,
-        utxoTokenOutputs: result.utxoTokenOutputs,
+        tokens: result.tokens,
       });
     }
   }
 
-  // 3) Update UTXO set
+  // 4) Update UTXO set
 
   const newTxIds = txsAddedToBlock.map(tx =>  tx.transaction.TransactionId);
   await markAllInputs(
@@ -1187,10 +1315,11 @@ export async function updateTransactionBatch(
       ],
       isUnspent: false,
       TransactionSeed,
+      networkId: request.network.NetworkId,
     }
   );
 
-  // 4) Mark any pending tx that is not found by remote as failed
+  // 5) Mark any pending tx that is not found by remote as failed
 
   const pendingTxs = await deps.GetTransaction.withStatus(
     db, dbTx,
@@ -1227,62 +1356,93 @@ export async function updateTransactionBatch(
 function genErgoIOGen(
   remoteTx: RemoteErgoTransaction,
   networkId: number,
-  getIdOrThrow: string => number,
+  getAddressIdOrThrow: string => number,
+  getAssetInfoOrThrow: string => $ReadOnly<TokenRow>,
+  genNextTokenListId: void => number,
 ): (number => {|
-  utxoInputs: Array<{|
-    input: UtxoTransactionInputInsert,
-    tokens: Array<$Diff<TokenInsert, {| Digest: number |}>>,
-    tokenList: Array<{| TokenId: number, UtxoTransactionInputId: number |} => TokenListInsert>,
-  |}>,
-  utxoOutputs: Array<{|
-    utxo: UtxoTransactionOutputInsert,
-    tokens: Array<$Diff<TokenInsert, {| Digest: number |}>>,
-    tokenList: Array<{| TokenId: number, UtxoTransactionOutputId: number |} => TokenListInsert>,
+  utxoInputs: Array<UtxoTransactionInputInsert>,
+  utxoOutputs: Array<UtxoTransactionOutputInsert>,
+  tokenList: Array<{|
+    TokenList: TokenListInsert,
+    identifier: string,
+    networkId: number,
   |}>,
 |}) {
   return (txRowId) => {
     const utxoInputs = [];
     const utxoOutputs = [];
+    const tokenList = [];
     for (let i = 0; i < remoteTx.inputs.length; i++) {
-      const input = {
-        TransactionId: txRowId,
-        AddressId: getIdOrThrow(remoteTx.inputs[i].address),
-        ParentTxHash: remoteTx.inputs[i].outputTransactionId,
-        IndexInParentTx: remoteTx.inputs[i].outputIndex,
-        IndexInOwnTx: i,
-        Amount: remoteTx.inputs[i].value.toString(),
-      };
+      const input = remoteTx.inputs[i];
 
-      const tokens = [];
-      const tokenList = [];
-      // TODO: re-enable once this is part of the explorer
-      // for (let tokenIndex = 0; tokenIndex < input.assets.length; tokenIndex++) {
-      //   tokens.push(({ NetworkId }) => ({
-      //     NetworkId,
-      //     Identifier: input.assets[tokenIndex].tokenId,
-      //   });
-      //   tokenList.push(({ TokenId, UtxoTransactionInputId }) => ({
-      //     UtxoTransactionOutputId: null,
-      //     UtxoTransactionInputId,
-      //     Amount: input.assets[tokenIndex].amount.toString(),
-      //     Index: tokenIndex,
-      //     TokenId,
-      //   }));
-      // }
-      utxoInputs.push({
-        input,
-        tokens,
-        tokenList,
+      const listId = genNextTokenListId();
+      // 1) Add ERG
+      tokenList.push({
+        TokenList: {
+          Amount: input.value.toString(),
+          ListId: listId,
+          TokenId: getAssetInfoOrThrow(PRIMARY_ASSET_CONSTANTS.Ergo).TokenId,
+        },
+        identifier: PRIMARY_ASSET_CONSTANTS.Ergo,
+        networkId,
       });
+      // 2) Add tokens
+      for (let tokenIndex = 0; tokenIndex < input.assets.length; tokenIndex++) {
+        const assetInfo = getAssetInfoOrThrow(input.assets[tokenIndex].tokenId);
+        tokenList.push({
+          TokenList: {
+            Amount: input.assets[tokenIndex].amount.toString(),
+            ListId: listId,
+            TokenId: assetInfo.TokenId,
+          },
+          identifier: input.assets[tokenIndex].tokenId,
+          networkId,
+        });
+      }
+
+      const inputEntry = {
+        TransactionId: txRowId,
+        AddressId: getAddressIdOrThrow(input.address),
+        ParentTxHash: input.outputTransactionId,
+        IndexInParentTx: input.outputIndex,
+        IndexInOwnTx: i,
+        TokenListId: listId,
+      };
+      utxoInputs.push(inputEntry);
     }
     for (let i = 0; i < remoteTx.outputs.length; i++) {
       const output = remoteTx.outputs[i];
 
+      const listId = genNextTokenListId();
+      // 1) Add ERG
+      tokenList.push({
+        TokenList: {
+          Amount: output.value.toString(),
+          ListId: listId,
+          TokenId: getAssetInfoOrThrow(PRIMARY_ASSET_CONSTANTS.Ergo).TokenId,
+        },
+        identifier: PRIMARY_ASSET_CONSTANTS.Ergo,
+        networkId,
+      });
+      // 2) Add tokens
+      for (let tokenIndex = 0; tokenIndex < output.assets.length; tokenIndex++) {
+        const assetInfo = getAssetInfoOrThrow(output.assets[tokenIndex].tokenId);
+        tokenList.push({
+          TokenList: {
+            Amount: output.assets[tokenIndex].amount.toString(),
+            ListId: listId,
+            TokenId: assetInfo.TokenId,
+          },
+          identifier: output.assets[tokenIndex].tokenId,
+          networkId,
+        });
+      }
+
       const utxo = {
         TransactionId: txRowId,
-        AddressId: getIdOrThrow(output.address),
+        AddressId: getAddressIdOrThrow(output.address),
         OutputIndex: i,
-        Amount: output.value.toString(),
+        TokenListId: listId,
         /**
           * we assume unspent for now but it will be updated after if necessary
           * Note: if this output doesn't belong to you, it will be true forever
@@ -1293,34 +1453,78 @@ function genErgoIOGen(
         ErgoCreationHeight: output.creationHeight,
         ErgoTree: output.ergoTree,
       };
-
-      const tokens = [];
-      const tokenList = [];
-      for (let tokenIndex = 0; tokenIndex < output.assets.length; tokenIndex++) {
-        tokens.push({
-          NetworkId: networkId,
-          Identifier: output.assets[tokenIndex].tokenId,
-        });
-        tokenList.push(({ TokenId, UtxoTransactionOutputId }) => ({
-          UtxoTransactionOutputId,
-          UtxoTransactionInputId: null,
-          Amount: output.assets[tokenIndex].amount.toString(),
-          Index: tokenIndex,
-          TokenId,
-        }));
-      }
-      utxoOutputs.push({
-        utxo,
-        tokens,
-        tokenList,
-      });
+      utxoOutputs.push(utxo);
     }
 
     return {
       utxoInputs,
       utxoOutputs,
+      tokenList,
     };
   };
+}
+
+async function genErgoAssetMap(
+  db: lf$Database,
+  dbTx: lf$Transaction,
+  deps: {|
+    ModifyToken: Class<ModifyToken>,
+    GetToken: Class<GetToken>,
+  |},
+  newTxs: Array<RemoteErgoTransaction>,
+  getAssetInfo: AssetInfoFunc,
+  network: $ReadOnly<NetworkRow>,
+  defaultToken: DefaultTokenEntry,
+): Promise<Map<string, $ReadOnly<TokenRow>>> {
+  const tokenIdentifiers = Array.from(new Set(newTxs.flatMap(tx => [
+    ...tx.inputs
+      .flatMap(input => input.assets)
+      .map(asset => asset.tokenId),
+    ...tx.outputs
+      .flatMap(output => output.assets)
+      .map(asset => asset.tokenId),
+    // force inclusion of primary token for chain
+    defaultToken.defaultIdentifier
+  ])));
+
+  const existingDbRows = (await deps.GetToken.fromIdentifier(
+    db, dbTx,
+    tokenIdentifiers
+  )).filter(row => row.NetworkId === network.NetworkId);
+
+  const existingTokens = new Set<string>(
+    existingDbRows.map(row => row.Identifier)
+  );
+  const tokenInfo = await getAssetInfo({
+    network,
+    assetIds: tokenIdentifiers.filter(tokenIdentifier => !existingTokens.has(tokenIdentifier))
+  });
+
+  const databaseInsert = Object.keys(tokenInfo).map(tokenId => ({
+    NetworkId: network.NetworkId,
+    Identifier: tokenId,
+    IsDefault: false,
+    Metadata: {
+      type: 'Ergo',
+      height: tokenInfo[tokenId].height,
+      boxId: tokenInfo[tokenId].boxId,
+      ticker: null,
+      longName: tokenInfo[tokenId].name,
+      numberOfDecimals: tokenInfo[tokenId].numDecimals || 0,
+      description: tokenInfo[tokenId].desc,
+    }
+  }));
+
+  const newDbRows = await deps.ModifyToken.upsert(
+    db, dbTx,
+    databaseInsert
+  );
+
+  const result = new Map<string, $ReadOnly<TokenRow>>();
+  existingDbRows.forEach(row => result.set(row.Identifier, row));
+  newDbRows.forEach(row => result.set(row.Identifier, row));
+
+  return result;
 }
 
 async function networkTxToDbTx(
@@ -1332,6 +1536,8 @@ async function networkTxToDbTx(
   hashToIds: HashToIdsFunc,
   TransactionSeed: number,
   BlockSeed: number,
+  assetLookup: Map<string, $ReadOnly<TokenRow>>,
+  genNextTokenListId: void => number,
 ): Promise<{|
   ergoTxs: Array<{|
     networkId: number,
@@ -1353,7 +1559,7 @@ async function networkTxToDbTx(
     hashes: allAddresses
   });
 
-  const getIdOrThrow = (hash: string): number => {
+  const getAddressIdOrThrow = (hash: string): number => {
     // recall: we know all non-group ids should already be present
     // because we synced our address list with the remote
     // before we queries for the transaction history
@@ -1361,6 +1567,14 @@ async function networkTxToDbTx(
     const id = idMapping.get(hash);
     if (id === undefined) {
       throw new Error(`${nameof(networkTxToDbTx)} should never happen id === undefined`);
+    }
+    return id;
+  };
+  const getAssetInfoOrThrow = (hash: string): $ReadOnly<TokenRow> => {
+    // recall: we already added all needed tokens to the DB before we get here
+    const id = assetLookup.get(hash);
+    if (id === undefined) {
+      throw new Error(`${nameof(networkTxToDbTx)} should never happen -- asset missing`);
     }
     return id;
   };
@@ -1378,7 +1592,13 @@ async function networkTxToDbTx(
       networkId,
       block,
       transaction,
-      ioGen: genErgoIOGen(networkTx, networkId, getIdOrThrow),
+      ioGen: genErgoIOGen(
+        networkTx,
+        networkId,
+        getAddressIdOrThrow,
+        getAssetInfoOrThrow,
+        genNextTokenListId
+      ),
     });
   }
 
@@ -1400,6 +1620,7 @@ async function markAllInputs(
     allTxIds: Array<number>,
     isUnspent: boolean,
     TransactionSeed: number,
+    networkId: number,
     ...
   },
 ): Promise<void> {
@@ -1433,6 +1654,7 @@ async function markAllInputs(
         txId: parentTx.TransactionId,
         outputIndex: input.IndexInParentTx,
         isUnspent: request.isUnspent,
+        networkId: request.networkId,
       }
     );
   }

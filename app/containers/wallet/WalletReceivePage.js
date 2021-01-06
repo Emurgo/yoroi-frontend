@@ -3,6 +3,7 @@ import type { Node } from 'react';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { computed, observable, runInAction } from 'mobx';
+import BigNumber from 'bignumber.js';
 import { intlShape } from 'react-intl';
 import config from '../../config';
 import WalletReceive from '../../components/wallet/WalletReceive';
@@ -30,7 +31,6 @@ import LocalizableError from '../../i18n/LocalizableError';
 import { SelectedExplorer } from '../../domain/SelectedExplorer';
 import type { Notification } from '../../types/notificationType';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
-import { getApiForNetwork, getApiMeta } from '../../api/common/utils';
 import { validateAmount } from '../../utils/validations';
 import { Logger, } from '../../utils/logging';
 import type { AddressSubgroupMeta, IAddressTypeUiSubset, IAddressTypeStore } from '../../stores/stateless/addressStores';
@@ -40,6 +40,8 @@ import {
 } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import type { ComplexityLevelType } from '../../types/complexityLevelType';
 import { handleExternalLinkClick } from '../../utils/routing';
+import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
+import { genLookupOrFail, getTokenName, } from '../../stores/stateless/tokenHelpers';
 
 export type GeneratedData = typeof WalletReceivePage.prototype.generated;
 
@@ -93,9 +95,7 @@ export default class WalletReceivePage extends Component<Props> {
     const publicDeriver = this.generated.stores.wallets.selected;
     if (!publicDeriver) throw new Error(`Active wallet required for ${nameof(WalletReceivePage)}.`);
 
-    const selectedApiType = getApiForNetwork(publicDeriver.getParent().getNetworkInfo());
-    const apiMeta = getApiMeta(selectedApiType)?.meta;
-    if (apiMeta == null) throw new Error(`${nameof(WalletReceivePage)} no API selected`);
+    this.generated.stores.tokenInfoStore.tokenInfo.get
 
     const addressTypeStore = this.getTypeStore(publicDeriver);
 
@@ -144,6 +144,12 @@ export default class WalletReceivePage extends Component<Props> {
       .get(publicDeriver.getParent().getNetworkInfo().NetworkId)
       ?? (() => { throw new Error('No explorer for wallet network'); })();
 
+    const defaultToken = publicDeriver.getParent().getDefaultToken();
+    const defaultTokenInfo = genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)({
+      identifier: defaultToken.defaultIdentifier,
+      networkId: defaultToken.defaultNetworkId,
+    });
+
     const header = (() => {
       if (addressTypeStore.meta.name.subgroup === AddressSubgroup.external) {
         return (<StandardHeader
@@ -164,7 +170,7 @@ export default class WalletReceivePage extends Component<Props> {
         />);
       }
       if (addressTypeStore.meta.name.group === AddressGroupTypes.reward) {
-        return (<RewardHeader ticker={apiMeta.primaryTicker} />);
+        return (<RewardHeader ticker={getTokenName(defaultTokenInfo)} />);
       }
       if (addressTypeStore.meta.name.subgroup === AddressSubgroup.mangled) {
         return (
@@ -173,7 +179,7 @@ export default class WalletReceivePage extends Component<Props> {
             onClick={() => this.generated.actions.dialogs.open.trigger({
               dialog: UnmangleTxDialogContainer,
             })}
-            ticker={apiMeta.primaryTicker}
+            ticker={getTokenName(defaultTokenInfo)}
           />
         );
       }
@@ -217,6 +223,7 @@ export default class WalletReceivePage extends Component<Props> {
             filter: this.generated.stores.addresses.addressFilter,
           }}
           header={header}
+          getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
           selectedExplorer={selectedExplorerForNetwork}
           walletAddresses={applyAddressFilter({
             addressFilter: this.generated.stores.addresses.addressFilter,
@@ -242,10 +249,6 @@ export default class WalletReceivePage extends Component<Props> {
         }
           shouldHideBalance={profile.shouldHideBalance}
           unitOfAccountSetting={profile.unitOfAccount}
-          meta={{
-            primaryTicker: apiMeta.primaryTicker,
-            decimalPlaces: apiMeta.decimalPlaces.toNumber(),
-          }}
           addressBook={addressTypeStore.meta.name.group === AddressGroupTypes.addressBook}
         />
 
@@ -261,19 +264,18 @@ export default class WalletReceivePage extends Component<Props> {
         ) : null}
         {uiDialogs.isOpen(URIGenerateDialog) ? (
           <URIGenerateDialog
-            primaryTicker={apiMeta.primaryTicker}
             walletAddress={uiDialogs.getParam<string>('address')}
             amount={uiDialogs.getParam<number>('amount')}
             onClose={() => actions.dialogs.closeActiveDialog.trigger()}
             onGenerate={(address, amount) => { this.generateURI(address, amount); }}
             classicTheme={profile.isClassicTheme}
-            currencyMaxIntegerDigits={
-              apiMeta.totalSupply.div(apiMeta.decimalPlaces).toFixed().length
-            }
-            currencyMaxFractionalDigits={apiMeta.decimalPlaces.toNumber()}
-            validateAmount={(amount) => validateAmount(
+            tokenInfo={defaultTokenInfo}
+            validateAmount={(amount, tokenRow) => validateAmount(
               amount,
-              publicDeriver.getParent().getNetworkInfo(),
+              tokenRow,
+              // we don't impose a minimum value for the creation of the QR codes
+              // since validation happens when the QR code is scanned anyway
+              new BigNumber(0),
               this.context.intl,
             )}
           />
@@ -447,6 +449,9 @@ export default class WalletReceivePage extends Component<Props> {
       explorers: {|
         selectedExplorer: Map<number, SelectedExplorer>,
       |},
+      tokenInfoStore: {|
+        tokenInfo: TokenInfoMap,
+      |},
       profile: {|
         selectedComplexityLevel: ?ComplexityLevelType,
         isClassicTheme: boolean,
@@ -489,7 +494,7 @@ export default class WalletReceivePage extends Component<Props> {
       if (requests == null) return false;
       const { result } = requests.mangledAmounts;
       if (result == null) return false;
-      return result.canUnmangle.gt(0);
+      return result.canUnmangle.getDefault().gt(0);
     })();
 
     return Object.freeze({
@@ -508,6 +513,9 @@ export default class WalletReceivePage extends Component<Props> {
         },
         explorers: {
           selectedExplorer: stores.explorers.selectedExplorer,
+        },
+        tokenInfoStore: {
+          tokenInfo: stores.tokenInfoStore.tokenInfo,
         },
         profile: {
           isClassicTheme: stores.profile.isClassicTheme,

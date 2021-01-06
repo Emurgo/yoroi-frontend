@@ -44,8 +44,8 @@ import {
   DerivePublicDeriverFromKey, AddAdhocPublicDeriver,
 } from '../../database/walletTypes/common/api/write';
 import { ModifyKey, } from '../../database/primitives/api/write';
-import { GetNetworks, GetKeyForDerivation, } from '../../database/primitives/api/read';
-import type { NetworkRow, } from '../../database/primitives/tables';
+import { GetNetworks, GetToken, GetKeyForDerivation, } from '../../database/primitives/api/read';
+import type { NetworkRow, TokenRow, } from '../../database/primitives/tables';
 
 import {
   rawChangePassword,
@@ -383,6 +383,7 @@ export async function refreshConceptualWalletFunctionality(
     GetHwWalletMeta,
     GetConceptualWallet,
     GetNetworks,
+    GetToken,
   });
   const depTables = Object
     .keys(deps)
@@ -392,6 +393,7 @@ export async function refreshConceptualWalletFunctionality(
     hardwareInfo: void | $ReadOnly<HwWalletMetaRow>,
     fullInfo: $ReadOnly<ConceptualWalletRow>,
     networkInfo: $ReadOnly<NetworkRow>,
+    defaultToken: $ReadOnly<TokenRow>,
   |}>(
     db,
     depTables,
@@ -412,10 +414,17 @@ export async function refreshConceptualWalletFunctionality(
         network => network.NetworkId === fullInfo.NetworkId
       );
       if (networkForWallet == null) throw new Error(`${nameof(refreshConceptualWalletFunctionality)} missing network ${fullInfo.NetworkId}`);
+
+      const allTokens = await deps.GetToken.all(db, tx);
+      const tokenForWallet = allTokens.find(
+        network => network.NetworkId === fullInfo.NetworkId
+      );
+      if (tokenForWallet == null) throw new Error(`${nameof(refreshConceptualWalletFunctionality)} missing token for ${fullInfo.NetworkId}`);
       return {
         hardwareInfo,
         fullInfo,
         networkInfo: networkForWallet,
+        defaultToken: tokenForWallet,
       };
     }
   );
@@ -429,6 +438,7 @@ export async function refreshConceptualWalletFunctionality(
     walletType,
     hardwareInfo: result.hardwareInfo,
     networkInfo: result.networkInfo,
+    defaultToken: result.defaultToken,
   };
 }
 

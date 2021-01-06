@@ -24,8 +24,11 @@ export default class JormungandrDaedalusTransferStore extends Store {
       network: selectedNetwork,
       getUTXOsForAddresses:
         this.stores.substores.ada.stateFetchStore.fetcher.getUTXOsForAddresses,
-      genesisHash: config.ChainNetworkId,
-      feeConfig: config.LinearFee,
+      protocolParams: {
+        genesisHash: config.ChainNetworkId,
+        feeConfig: config.LinearFee,
+        networkId: selectedNetwork.NetworkId,
+      }
     });
   }
 }

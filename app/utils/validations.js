@@ -2,11 +2,11 @@
 import BigNumber from 'bignumber.js';
 import isInt from 'validator/lib/isInt';
 import { MAX_MEMO_SIZE } from '../config/externalStorageConfig';
-import { getApiForNetwork, getApiMeta } from '../api/common/utils';
 import type { $npm$ReactIntl$IntlFormat, } from 'react-intl';
 import { defineMessages, } from 'react-intl';
-import type { NetworkRow } from '../api/ada/lib/storage/database/primitives/tables';
+import type { NetworkRow, TokenRow } from '../api/ada/lib/storage/database/primitives/tables';
 import { isCardanoHaskell, isErgo, getCardanoHaskellBaseConfig, getErgoBaseConfig } from '../api/ada/lib/storage/database/prepackaged/networks';
+import { getTokenName } from '../stores/stateless/tokenHelpers';
 
 export const isValidWalletName: string => boolean = (walletName) => {
   const nameLength = walletName.length;
@@ -60,9 +60,34 @@ export const isWithinSupply: (string, BigNumber) => boolean = (value, totalSuppl
   return isValid;
 };
 
+/**
+ * Calculate the max number of digits we should allow
+ * in an input box before the decimal separator
+ * ex: 123.45 would be allowed with max digits of 3
+ */
+export function calcMaxBeforeDot(
+  numberOfDecimals: number
+): number {
+  // some WASM bindings are backed by signed 64-bit numbers
+  const max64 = new BigNumber(2).pow(63).minus(1);
+
+  return max64
+    // recall: when converting to a WASM object,
+    // the decimal is included in the unit
+    // ex: 123.45 -> 12345
+    // so we need to make sure we're below 2^63 - 1 including the # of decimals
+    .div(new BigNumber(10).pow(numberOfDecimals))
+    .toFixed(0) // cut off any decimals from division
+    // remove 1 because 2^63 - 1 is not exactly divisible by 10
+    // ex: if the limit was 2^7 - 1 (127)
+    // we would need to disallow 3-digit numbers to make sure 999 can't be inputted
+    .length - 1;
+}
+
 export async function validateAmount(
   amount: string,
-  network: $ReadOnly<NetworkRow>,
+  tokenRow: $ReadOnly<TokenRow>,
+  minAmount: BigNumber,
   formatter: $npm$ReactIntl$IntlFormat,
 ): Promise<[boolean, void | string]> {
   const messages = defineMessages({
@@ -76,42 +101,38 @@ export async function validateAmount(
     },
   });
 
-  const meta = getApiMeta(getApiForNetwork(network));
-  if (meta == null) throw new Error(`${nameof(this.validateAmount)} no meta found`);
-
-  const withinBounds = isWithinSupply(amount, meta.meta.totalSupply);
-  if (withinBounds) {
-    if (isCardanoHaskell(network)) {
-      const config = getCardanoHaskellBaseConfig(network)
-        .reduce((acc, next) => Object.assign(acc, next), {});
-
-      const minUtxo = new BigNumber(config.MinimumUtxoVal);
-      if (new BigNumber(amount).lt(minUtxo)) {
-        return [
-          false,
-          formatter.formatMessage(messages.tooSmallUtxo, {
-            minUtxo: minUtxo.div(new BigNumber(10).pow(meta.meta.decimalPlaces)),
-            ticker: meta.meta.primaryTicker,
-          })
-        ];
-      }
-    }
-    if (isErgo(network)) {
-      const config = getErgoBaseConfig(network)
-        .reduce((acc, next) => Object.assign(acc, next), {});
-
-      const minUtxo = new BigNumber(config.MinimumBoxValue);
-      if (new BigNumber(amount).lt(minUtxo)) {
-        return [
-          false,
-          formatter.formatMessage(messages.tooSmallUtxo, {
-            minUtxo: minUtxo.div(new BigNumber(10).pow(meta.meta.decimalPlaces)),
-            ticker: meta.meta.primaryTicker,
-          })
-        ];
-      }
-    }
-    return [true, undefined];
+  // some Rust stuff could overflow after 2^63 - 1
+  if (new BigNumber(amount).gt(new BigNumber(2).pow(63).minus(1))) {
+    return [false, formatter.formatMessage(messages.invalidAmount)]
   }
-  return [false, formatter.formatMessage(messages.invalidAmount)];
+
+  if (new BigNumber(amount).lt(minAmount)) {
+    return [
+      false,
+      formatter.formatMessage(messages.tooSmallUtxo, {
+        minUtxo: minAmount.div(new BigNumber(10).pow(tokenRow.Metadata.numberOfDecimals)),
+        ticker: getTokenName(tokenRow),
+      })
+    ];
+  }
+  return [true, undefined];
+}
+
+export function getMinimumValue(
+  network: $ReadOnly<NetworkRow>,
+): BigNumber {
+  if (isCardanoHaskell(network)) {
+    const config = getCardanoHaskellBaseConfig(network)
+      .reduce((acc, next) => Object.assign(acc, next), {});
+
+    /// TODO: this no longer works for Mary since min value depends on UTXO size
+    return new BigNumber(config.MinimumUtxoVal);
+  }
+  if (isErgo(network)) {
+    const config = getErgoBaseConfig(network)
+      .reduce((acc, next) => Object.assign(acc, next), {});
+
+    return new BigNumber(config.MinimumBoxValue);
+  }
+  return new BigNumber(0);
 }

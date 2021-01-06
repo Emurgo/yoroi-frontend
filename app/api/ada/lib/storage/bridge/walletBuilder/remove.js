@@ -28,7 +28,7 @@ import {
   GetTransaction,
   GetCertificates,
 } from '../../database/primitives/api/read';
-import { ModifyAddress, FreeBlocks, } from '../../database/primitives/api/write';
+import { ModifyAddress, FreeBlocks, ModifyTokenList, } from '../../database/primitives/api/write';
 import { AssociateTxWithUtxoIOs, } from '../../database/transactionModels/utxo/api/read';
 import { AssociateTxWithAccountingIOs, } from '../../database/transactionModels/account/api/read';
 import {
@@ -64,6 +64,7 @@ export async function removePublicDeriver(request: {|
     GetTransaction,
     FreeBlocks,
     GetCertificates,
+    ModifyTokenList,
   });
   const db = request.publicDeriver.getDb();
   const depTables = Object
@@ -100,6 +101,7 @@ export async function removePublicDeriver(request: {|
               GetTransaction: deps.GetTransaction,
               FreeBlocks: deps.FreeBlocks,
               GetCertificates: deps.GetCertificates,
+              ModifyTokenList: deps.ModifyTokenList,
             },
             withLevels.getParent().getDerivationTables(),
             {
@@ -120,6 +122,7 @@ export async function removePublicDeriver(request: {|
               ModifyAddress: deps.ModifyAddress,
               GetTransaction: deps.GetTransaction,
               FreeBlocks: deps.FreeBlocks,
+              ModifyTokenList: deps.ModifyTokenList,
             },
             withLevels.getParent().getDerivationTables(),
             {
@@ -139,6 +142,7 @@ export async function removePublicDeriver(request: {|
               ModifyAddress: deps.ModifyAddress,
               GetTransaction: deps.GetTransaction,
               FreeBlocks: deps.FreeBlocks,
+              ModifyTokenList: deps.ModifyTokenList,
             },
             withLevels.getParent().getDerivationTables(),
             {

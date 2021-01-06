@@ -86,6 +86,11 @@ export type RemoteErgoTransaction = {|
     spendingProof: string,
     transactionId: string, // txHash of this tx
     value: number,
+    assets: $ReadOnlyArray<$ReadOnly<{
+      amount: number,
+      tokenId: string,
+      ...
+    }>>,
     ...
   }>,
   dataInputs: Array<{
@@ -159,3 +164,18 @@ export type SendFunc = (body: SignedRequest) => Promise<SignedResponse>;
 
 export type RemoteTxState = 'Successful' | 'Failed' | 'Pending';
 
+export type AssetInfoRequest = {|
+  ...BackendNetworkInfo,
+  assetIds: Array<string>
+|};
+export type AssetInfo = {|
+  name: null | string,
+  desc: null | string,
+  numDecimals: null | number,
+  boxId: string,
+  height: number,
+|};
+export type AssetInfoResponse = {|
+  [assetId: string]: AssetInfo
+|};
+export type AssetInfoFunc = (body: AssetInfoRequest) => Promise<AssetInfoResponse>;

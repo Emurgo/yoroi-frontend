@@ -15,7 +15,7 @@ import { PublicDeriver } from '../../../app/api/ada/lib/storage/models/PublicDer
 import CachedRequest from '../../../app/stores/lib/LocalizedCachedRequest';
 import BigNumber from 'bignumber.js';
 import { assuranceModes } from '../../../app/config/transactionAssuranceConfig';
-import { networks, getJormungandrBaseConfig, isJormungandr } from '../../../app/api/ada/lib/storage/database/prepackaged/networks';
+import { networks, getJormungandrBaseConfig, isJormungandr, defaultAssets, } from '../../../app/api/ada/lib/storage/database/prepackaged/networks';
 import { WalletTypeOption } from '../../../app/api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import { Cip1852Wallet } from '../../../app/api/ada/lib/storage/models/Cip1852Wallet/wrapper';
 import {
@@ -47,8 +47,17 @@ import {
 } from '../../../app/api/ada/lib/storage/database/walletTypes/bip44/api/utils';
 import { RustModule } from '../../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import type { ISignRequest } from '../../../app/api/common/lib/transactions/ISignRequest';
+import {
+  MultiToken,
+} from '../../../app/api/common/lib/MultiToken';
+import {
+  getDefaultEntryTokenInfo,
+  mockFromDefaults,
+} from '../../../app/stores/toplevel/TokenInfoStore';
 
 function genMockJormungandrCache(dummyWallet: PublicDeriver<>) {
+  const defaultToken = dummyWallet.getParent().getDefaultToken();
+
   const pendingRequest = new CachedRequest(_publicDeriver => Promise.resolve([]));
   const recentRequest = new CachedRequest(_request => Promise.resolve({
     transactions: [],
@@ -59,7 +68,7 @@ function genMockJormungandrCache(dummyWallet: PublicDeriver<>) {
     total: 0,
   }));
   const getBalanceRequest = new CachedRequest(_request => Promise.resolve(
-    new BigNumber(0),
+    new MultiToken([], defaultToken),
   ));
   return {
     conceptualWalletCache: {
@@ -159,6 +168,10 @@ function genJormungandrDummyWallet(): PublicDeriver<> {
       walletType: WalletTypeOption.WEB_WALLET,
       hardwareInfo: null,
       networkInfo: networks.JormungandrMainnet,
+      defaultToken: getDefaultEntryTokenInfo(
+        networks.JormungandrMainnet.NetworkId,
+        mockFromDefaults(defaultAssets)
+      ),
     },
     {
       ConceptualWalletId: conceptualWalletId,
@@ -209,6 +222,10 @@ function genSigningWallet(
       })(),
       hardwareInfo,
       networkInfo: networks.JormungandrMainnet,
+      defaultToken: getDefaultEntryTokenInfo(
+        networks.JormungandrMainnet.NetworkId,
+        mockFromDefaults(defaultAssets)
+      ),
     },
     {
       ConceptualWalletId: conceptualWalletId,
@@ -295,10 +312,14 @@ export const genJormungandrUndelegateTx = (
     unsignedTx: IOs,
     changeAddr: [],
     certificate: undefined, // TODO
+  }, {
+    NetworkId: publicDeriver.getParent().getNetworkInfo().NetworkId,
   });
 };
 
-export const genTentativeJormungandrTx = (): {|
+export const genTentativeJormungandrTx = (
+  networkId: number,
+): {|
   tentativeTx: null | ISignRequest<any>,
   inputAmount: string,
   fee: BigNumber,
@@ -334,6 +355,8 @@ export const genTentativeJormungandrTx = (): {|
       unsignedTx,
       changeAddr: [],
       certificate: undefined,
+    }, {
+      NetworkId: networkId,
     }),
     inputAmount,
     fee,

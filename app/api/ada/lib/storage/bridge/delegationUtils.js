@@ -15,7 +15,7 @@ import {
   normalizeToAddress,
   unwrapStakingKey,
 } from './utils';
-import { TxStatusCodes } from '../database/primitives/enums';
+import { TxStatusCodes, } from '../database/primitives/enums';
 import type { CertificateInsert } from '../database/primitives/tables';
 import type {
   GetDelegatedBalanceRequest,
@@ -27,10 +27,14 @@ import type {
 import typeof { CertificateKind } from '@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib';
 import type {
   IGetStakingKey,
+  IGetAllUtxosResponse,
 } from '../models/PublicDeriver/interfaces';
 import type {
   CertificateForKey,
 } from '../database/primitives/api/read';
+import {
+  MultiToken,
+} from '../../../../common/lib/MultiToken';
 
 export async function getDelegatedBalance(
   request: GetDelegatedBalanceRequest,
@@ -42,7 +46,7 @@ export async function getDelegatedBalance(
 
   return {
     utxoPart,
-    accountPart: new BigNumber(request.rewardBalance),
+    accountPart: request.rewardBalance,
   };
 }
 
@@ -86,10 +90,10 @@ export function filterAddressesByStakingKey<T: { +address: string, ... }>(
 export async function getUtxoDelegatedBalance(
   publicDeriver: PublicDeriver<>,
   stakingAddress: string,
-): Promise<BigNumber> {
+): Promise<MultiToken> {
   const withUtxos = asGetAllUtxos(publicDeriver);
   if (withUtxos == null) {
-    return new BigNumber(0);
+    return new MultiToken([], publicDeriver.getParent().getDefaultToken());
   }
   const basePubDeriver = withUtxos;
 
@@ -98,14 +102,21 @@ export async function getUtxoDelegatedBalance(
 
   const stakingKey = unwrapStakingKey(stakingAddress);
   const allUtxo = await basePubDeriver.getAllUtxos();
-  const allUtxosForKey = filterAddressesByStakingKey(
+  const allUtxosForKey = filterAddressesByStakingKey<ElementOf<IGetAllUtxosResponse>>(
     stakingKey,
     allUtxo,
     false,
   );
   const utxoSum = allUtxosForKey.reduce(
-    (sum, utxo) => sum.plus(new BigNumber(utxo.output.UtxoTransactionOutput.Amount)),
-    new BigNumber(0)
+    (sum, utxo) => sum.joinAddMutable(new MultiToken(
+      utxo.output.tokens.map(token => ({
+        identifier: token.Token.Identifier,
+        amount: new BigNumber(token.TokenList.Amount),
+        networkId: token.Token.NetworkId,
+      })),
+      publicDeriver.getParent().getDefaultToken()
+    )),
+    new MultiToken([], publicDeriver.getParent().getDefaultToken())
   );
 
   return utxoSum;

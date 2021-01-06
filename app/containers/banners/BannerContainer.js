@@ -15,7 +15,8 @@ import type { ServerStatusErrorType } from '../../types/serverStatusErrorType';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import { isTestnet, isCardanoHaskell } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { Bip44Wallet } from '../../api/ada/lib/storage/models/Bip44Wallet/wrapper';
-import { getApiForNetwork, getApiMeta } from '../../api/common/utils';
+import { getTokenName, genLookupOrFail } from '../../stores/stateless/tokenHelpers';
+import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
 
 export type GeneratedData = typeof BannerContainer.prototype.generated;
 
@@ -60,14 +61,16 @@ export default class BannerContainer extends Component<InjectedOrGenerated<Gener
     if (!(selected.getParent() instanceof Bip44Wallet)) {
       return null;
     }
-    const api = getApiForNetwork(selected.getParent().getNetworkInfo());
-    const apiMeta = getApiMeta(api);
-    if (apiMeta == null) throw new Error(`${nameof(BannerContainer)} no API selected`);
+    const defaultToken = selected.getParent().getDefaultToken();
+    const defaultTokenInfo = genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)({
+      identifier: defaultToken.defaultIdentifier,
+      networkId: defaultToken.defaultNetworkId,
+    });
 
     return (
       <ByronDeprecationBanner
         onUpgrade={undefined}
-        ticker={apiMeta.meta.primaryTicker}
+        ticker={getTokenName(defaultTokenInfo)}
       />
     );
   }
@@ -77,6 +80,9 @@ export default class BannerContainer extends Component<InjectedOrGenerated<Gener
       serverConnectionStore: {|
         checkAdaServerStatus: ServerStatusErrorType,
         serverTime: void | Date,
+      |},
+      tokenInfoStore: {|
+        tokenInfo: TokenInfoMap,
       |},
       wallets: {| selected: null | PublicDeriver<> |},
     |},
@@ -94,6 +100,9 @@ export default class BannerContainer extends Component<InjectedOrGenerated<Gener
         serverConnectionStore: {
           checkAdaServerStatus: stores.serverConnectionStore.checkAdaServerStatus,
           serverTime: stores.serverConnectionStore.serverTime,
+        },
+        tokenInfoStore: {
+          tokenInfo: stores.tokenInfoStore.tokenInfo,
         },
         wallets: {
           selected: stores.wallets.selected,

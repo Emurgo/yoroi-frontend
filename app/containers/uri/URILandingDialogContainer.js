@@ -12,9 +12,10 @@ import URIInvalidDialog from '../../components/uri/URIInvalidDialog';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import { SelectedExplorer } from '../../domain/SelectedExplorer';
 import type { UriParams } from '../../utils/URIHandling';
-import { getApiForNetwork, getApiMeta, } from '../../api/common/utils';
 import { networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
+import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
 
 export type GeneratedData = typeof URILandingDialogContainer.prototype.generated;
 
@@ -65,27 +66,10 @@ export default class URILandingDialogContainer extends Component<Props> {
     const uriParams = this.generated.stores.loading.uriParams;
 
     const network = networks.CardanoMainnet; // todo: uri scheme for other networks
-    const selectedApiType = getApiForNetwork(network);
-
-    const apiMeta = getApiMeta(selectedApiType);
-    if (apiMeta == null) throw new Error(`${nameof(URILandingDialogContainer)} no API found`);
-
-    const coinPrice: ?number = this.generated.stores.profile.unitOfAccount.enabled
-      ? (
-        this.generated.stores.coinPriceStore.getCurrentPrice(
-          apiMeta.meta.primaryTicker,
-          this.generated.stores.profile.unitOfAccount.currency
-        )
-      )
-      : null;
 
     if (!this.showDisclaimer) {
       return (
         <URIVerifyDialog
-          meta={{
-            primaryTicker: apiMeta.meta.primaryTicker,
-            decimalPlaces: apiMeta.meta.decimalPlaces.toNumber(),
-          }}
           onSubmit={this.onVerifiedSubmit}
           onBack={this.toggleShowDisclaimer}
           onCancel={this.onCancel}
@@ -94,7 +78,8 @@ export default class URILandingDialogContainer extends Component<Props> {
             .get(network.NetworkId) ?? (() => { throw new Error('No explorer for wallet network'); })()
           }
           unitOfAccountSetting={this.generated.stores.profile.unitOfAccount}
-          coinPrice={coinPrice}
+          getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
+          getCurrentPrice={this.generated.stores.coinPriceStore.getCurrentPrice}
         />
       );
     }
@@ -116,6 +101,9 @@ export default class URILandingDialogContainer extends Component<Props> {
       loading: {| uriParams: ?UriParams |},
       explorers: {|
         selectedExplorer: Map<number, SelectedExplorer>,
+      |},
+      tokenInfoStore: {|
+        tokenInfo: TokenInfoMap,
       |},
       profile: {|
         isClassicTheme: boolean,
@@ -142,6 +130,9 @@ export default class URILandingDialogContainer extends Component<Props> {
         },
         coinPriceStore: {
           getCurrentPrice: stores.coinPriceStore.getCurrentPrice,
+        },
+        tokenInfoStore: {
+          tokenInfo: stores.tokenInfoStore.tokenInfo,
         },
         loading: {
           uriParams: stores.loading.uriParams,

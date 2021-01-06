@@ -16,7 +16,7 @@ export const generateErgoPlate = (
   rootPk: BIP32PrivateKey,
   accountIndex: number,
   count: number,
-  network: $Values<typeof RustModule.SigmaRust.NetworkPrefix>,
+  chainNetworkId: $Values<typeof RustModule.SigmaRust.NetworkPrefix>,
 ): PlateResponse => {
   const chainKey = derivePath(
     rootPk,
@@ -34,7 +34,7 @@ export const generateErgoPlate = (
 
   const baseAddressGen = ergoGenAddressBatchFunc(
     chainKey.key,
-    network,
+    chainNetworkId,
   );
   const generateAddressFunc = (indices: Array<number>) => (
     baseAddressGen(indices)

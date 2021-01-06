@@ -1,5 +1,5 @@
 // @flow
-import { observable } from 'mobx';
+import { observable, } from 'mobx';
 import Store from '../base/Store';
 
 import type { IFetcher } from '../../api/common/lib/state-fetch/IFetcher';

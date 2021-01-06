@@ -28,6 +28,10 @@ import type {
 import {
   getCardanoSpendingKeyHash, normalizeToAddress,
 } from '../../lib/storage/bridge/utils';
+import {
+  MultiToken,
+} from '../../../common/lib/MultiToken';
+import { PRIMARY_ASSET_CONSTANTS } from '../../lib/storage/database/primitives/enums';
 
 /**
  * based off what the cardano-wallet team found worked empirically
@@ -49,6 +53,7 @@ export function sendAllUnsignedTx(
     minimumUtxoVal: RustModule.WalletV4.BigNum,
     poolDeposit: RustModule.WalletV4.BigNum,
     keyDeposit: RustModule.WalletV4.BigNum,
+    networkId: number,
   |},
   metadata: RustModule.WalletV4.TransactionMetadata | void,
 ): V4UnsignedTxAddressedUtxoResponse {
@@ -130,6 +135,7 @@ export function sendAllUnsignedTxFromUtxo(
     minimumUtxoVal: RustModule.WalletV4.BigNum,
     poolDeposit: RustModule.WalletV4.BigNum,
     keyDeposit: RustModule.WalletV4.BigNum,
+    networkId: number,
   |},
   metadata: RustModule.WalletV4.TransactionMetadata | void,
 ): V4UnsignedTxUtxoResponse {
@@ -179,18 +185,31 @@ export function sendAllUnsignedTxFromUtxo(
     }
   }
 
-  const output = new BigNumber(txBuilder.get_explicit_output().to_str());
+  const changeAddr = (() => {
+    if (receiver.addressing== null) return [];
+    const { addressing } = receiver;
+    const output = new MultiToken(
+      [{
+        identifier: PRIMARY_ASSET_CONSTANTS.Cardano,
+        amount: new BigNumber(txBuilder.get_explicit_output().to_str()),
+        networkId: protocolParams.networkId,
+      }],
+      {
+        defaultNetworkId: protocolParams.networkId,
+        defaultIdentifier: PRIMARY_ASSET_CONSTANTS.Cardano,
+      }
+    );
+    return [{
+      addressing,
+      address: receiver.address,
+      values: output,
+    }];
+  })();
 
   return {
     senderUtxos: allUtxos,
     txBuilder,
-    changeAddr: receiver.addressing
-      ? [{
-        addressing: receiver.addressing,
-        address: receiver.address,
-        value: output,
-      }]
-      : [],
+    changeAddr,
   };
 }
 
@@ -207,6 +226,7 @@ export function newAdaUnsignedTx(
     minimumUtxoVal: RustModule.WalletV4.BigNum,
     poolDeposit: RustModule.WalletV4.BigNum,
     keyDeposit: RustModule.WalletV4.BigNum,
+    networkId: number,
   |},
   certificates: $ReadOnlyArray<RustModule.WalletV4.Certificate>,
   withdrawals: $ReadOnlyArray<{|
@@ -296,6 +316,7 @@ export function newAdaUnsignedTxFromUtxo(
     minimumUtxoVal: RustModule.WalletV4.BigNum,
     poolDeposit: RustModule.WalletV4.BigNum,
     keyDeposit: RustModule.WalletV4.BigNum,
+    networkId: number,
   |},
   certificates: $ReadOnlyArray<RustModule.WalletV4.Certificate>,
   withdrawals: $ReadOnlyArray<{|
@@ -466,13 +487,21 @@ export function newAdaUnsignedTxFromUtxo(
       // note: this should never happened since it should have been handled by earlier code
       throw new Error(`No change added even though it should be forced`);
     }
-    const changeValue = new BigNumber(
-      txBuilder.get_explicit_output().checked_sub(oldOutput).to_str()
+    const output = new MultiToken(
+      [{
+        identifier: PRIMARY_ASSET_CONSTANTS.Cardano,
+        amount: new BigNumber(txBuilder.get_explicit_output().checked_sub(oldOutput).to_str()),
+        networkId: protocolParams.networkId,
+      }],
+      {
+        defaultNetworkId: protocolParams.networkId,
+        defaultIdentifier: PRIMARY_ASSET_CONSTANTS.Cardano,
+      }
     );
     return changeWasAdded
       ? [{
         ...changeAdaAddr,
-        value: changeValue,
+        values: output,
       }]
       : [];
   })();
@@ -626,7 +655,9 @@ export function asAddressedUtxo(
 ): Array<CardanoAddressedUtxo> {
   return utxos.map(utxo => {
     return {
-      amount: utxo.output.UtxoTransactionOutput.Amount,
+      amount: utxo.output.tokens.filter(
+        token => token.Token.Identifier === PRIMARY_ASSET_CONSTANTS.Cardano
+      )[0].TokenList.Amount,
       receiver: utxo.address,
       tx_hash: utxo.output.Transaction.Hash,
       tx_index: utxo.output.UtxoTransactionOutput.OutputIndex,

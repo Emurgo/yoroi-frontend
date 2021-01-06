@@ -87,6 +87,7 @@ export const generateTransaction = (): {|
         spendingProof: '', // no need just for tests I think
         transactionId: hash,
         value: genesisTxValue,
+        assets: [],
       }],
       dataInputs: [],
       outputs: [replaceMockOutputBoxId({
@@ -134,6 +135,7 @@ export const generateTransaction = (): {|
         spendingProof: '', // no need just for tests I think
         transactionId: hash,
         value: genesisTxValue,
+        assets: [],
       }],
       dataInputs: [],
       outputs: [

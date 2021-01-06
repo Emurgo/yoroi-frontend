@@ -2,7 +2,6 @@
 
 import type { Node } from 'react';
 import React from 'react';
-import BigNumber from 'bignumber.js';
 
 import { boolean, select } from '@storybook/addon-knobs';
 import { action } from '@storybook/addon-actions';
@@ -34,7 +33,8 @@ import { buildRoute } from '../../utils/routing';
 import { InvalidWitnessError } from '../../api/common/errors';
 import WalletSendConfirmationDialog from '../../components/wallet/send/WalletSendConfirmationDialog';
 import HWSendConfirmationDialog from '../../components/wallet/send/HWSendConfirmationDialog';
-import { isJormungandr } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { defaultAssets, isJormungandr } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { mockFromDefaults, getDefaultEntryTokenInfo } from '../../stores/toplevel/TokenInfoStore';
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -68,6 +68,13 @@ const genBaseProps: {|
     },
     wallets: {
       selected: request.wallet.publicDeriver,
+    },
+    tokenInfoStore: {
+      tokenInfo: mockFromDefaults(defaultAssets),
+      getDefaultTokenInfo: networkId => getDefaultEntryTokenInfo(
+        networkId,
+        mockFromDefaults(defaultAssets)
+      ),
     },
     coinPriceStore: {
       getCurrentPrice: (_from, _to) => 5,
@@ -164,6 +171,12 @@ const genBaseProps: {|
         },
         profile: {
           isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
+        },
+        coinPriceStore: {
+          getCurrentPrice: (_from, _to) => 5,
+        },
+        tokenInfoStore: {
+          tokenInfo: mockFromDefaults(defaultAssets),
         },
         wallets: {
           sendMoneyRequest: request.dialogInfo == null
@@ -271,7 +284,7 @@ export const RegularConfirmationDialog = (): Node => {
             error: getErrorValue(),
           },
           transactionBuilderStore: {
-            totalInput: new BigNumber(inputAmount),
+            totalInput: inputAmount,
             fee,
             shouldSendAll: false,
             tentativeTx,
@@ -323,7 +336,7 @@ export const LedgerConfirmationDialog = (): Node => {
             error: undefined,
           },
           transactionBuilderStore: {
-            totalInput: new BigNumber(inputAmount),
+            totalInput: inputAmount,
             fee,
             shouldSendAll: false,
             tentativeTx,
@@ -375,7 +388,7 @@ export const TrezorConfirmationDialog = (): Node => {
             error: undefined,
           },
           transactionBuilderStore: {
-            totalInput: new BigNumber(inputAmount),
+            totalInput: inputAmount,
             fee,
             shouldSendAll: false,
             tentativeTx,

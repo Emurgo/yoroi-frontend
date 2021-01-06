@@ -21,6 +21,9 @@ import {
 } from '../../api/ada/lib/storage/bridge/timeUtils';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import type { TransactionMetadata } from '../../api/ada/lib/storage/bridge/metadataUtils';
+import {
+  MultiToken,
+} from '../../api/common/lib/MultiToken';
 
 export type SetupSelfTxRequest = {|
   publicDeriver: IHasUtxoChains,
@@ -80,19 +83,19 @@ export default class TransactionBuilderStore extends Store {
   // =============
 
   @computed get
-  fee(): ?BigNumber {
+  fee(): ?MultiToken {
     if (!this.plannedTx) {
       return undefined;
     }
-    return this.plannedTx.fee(true);
+    return this.plannedTx.fee();
   }
 
   @computed get
-  totalInput(): ?BigNumber {
+  totalInput(): ?MultiToken {
     if (!this.plannedTx) {
       return undefined;
     }
-    return this.plannedTx.totalInput(true);
+    return this.plannedTx.totalInput();
   }
 
   // ================

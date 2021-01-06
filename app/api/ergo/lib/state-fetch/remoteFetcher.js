@@ -7,6 +7,7 @@ import type {
   HistoryFunc, HistoryRequest, HistoryResponse,
   BestBlockRequest, BestBlockResponse,
   SignedRequest, SignedResponse,
+  AssetInfoRequest, AssetInfoResponse,
 } from './types';
 import type {
   FilterFunc, FilterUsedRequest, FilterUsedResponse,
@@ -26,6 +27,7 @@ import {
   GetTxHistoryForAddressesApiError,
   GetBestBlockError,
   SendTransactionApiError,
+  GetAssetInfoApiError,
   CheckAddressesInUseApiError,
   InvalidWitnessError,
   RollbackApiError,
@@ -86,7 +88,7 @@ export class RemoteFetcher implements IFetcher {
 
   getTxsBodiesForUTXOs: TxBodiesRequest => Promise<TxBodiesResponse> = (body) => {
     const { BackendService } = body.network.Backend;
-    if (BackendService == null) throw new Error(`${nameof(this.getUTXOsForAddresses)} missing backend url`);
+    if (BackendService == null) throw new Error(`${nameof(this.getTxsBodiesForUTXOs)} missing backend url`);
     return axios(
       `${BackendService}/api/txs/txBodies`,
       {
@@ -109,7 +111,7 @@ export class RemoteFetcher implements IFetcher {
 
   getUTXOsSumsForAddresses: UtxoSumRequest => Promise<UtxoSumResponse> = (body) => {
     const { BackendService } = body.network.Backend;
-    if (BackendService == null) throw new Error(`${nameof(this.getUTXOsForAddresses)} missing backend url`);
+    if (BackendService == null) throw new Error(`${nameof(this.getUTXOsSumsForAddresses)} missing backend url`);
     return axios(
       `${BackendService}/api/txs/utxoSumForAddresses`,
       {
@@ -133,7 +135,7 @@ export class RemoteFetcher implements IFetcher {
   getTransactionsHistoryForAddresses: HistoryRequest => Promise<HistoryResponse> = (request) => {
     const { network, ...rest } = request;
     const { BackendService } = network.Backend;
-    if (BackendService == null) throw new Error(`${nameof(this.getUTXOsForAddresses)} missing backend url`);
+    if (BackendService == null) throw new Error(`${nameof(this.getTransactionsHistoryForAddresses)} missing backend url`);
 
     return fixHistoryFunc(async body => {
       return axios(
@@ -150,7 +152,19 @@ export class RemoteFetcher implements IFetcher {
             'yoroi-locale': this.getCurrentLocale()
           }
         }
-      ).then(response => response.data)
+      ).then(response => {
+        const data: HistoryResponse = response.data;
+        for (const datum of data) {
+          for (let i = 0; i < datum.inputs.length; i++) {
+            // TODO: remove this once this ticket is merged
+            // https://github.com/ergoplatform/explorer-backend/issues/92
+            if (datum.inputs[i].assets == null) {
+              datum.inputs[i].assets = [];
+            }
+          }
+        }
+        return data;
+      })
         .catch((error) => {
           Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getTransactionsHistoryForAddresses)} error: ` + stringifyError(error));
           if (
@@ -167,7 +181,7 @@ export class RemoteFetcher implements IFetcher {
 
   getBestBlock: BestBlockRequest => Promise<BestBlockResponse> = (body) => {
     const { BackendService } = body.network.Backend;
-    if (BackendService == null) throw new Error(`${nameof(this.getUTXOsForAddresses)} missing backend url`);
+    if (BackendService == null) throw new Error(`${nameof(this.getBestBlock)} missing backend url`);
     return axios(
       `${BackendService}/api/v2/bestblock`,
       {
@@ -188,7 +202,7 @@ export class RemoteFetcher implements IFetcher {
   sendTx: SignedRequest => Promise<SignedResponse> = (body) => {
     const { network, ...rest } = body;
     const { BackendService } = network.Backend;
-    if (BackendService == null) throw new Error(`${nameof(this.getUTXOsForAddresses)} missing backend url`);
+    if (BackendService == null) throw new Error(`${nameof(this.sendTx)} missing backend url`);
     return axios(
       `${BackendService}/api/txs/signed`,
       {
@@ -212,9 +226,32 @@ export class RemoteFetcher implements IFetcher {
       });
   }
 
+  getAssetInfo: AssetInfoRequest => Promise<AssetInfoResponse> = (request) => {
+    const { BackendService } = request.network.Backend;
+    if (BackendService == null) throw new Error(`${nameof(this.getAssetInfo)} missing backend url`);
+    return axios(
+      `${BackendService}/api/assets/info`,
+      {
+        method: 'post',
+        timeout: 2 * CONFIG.app.walletRefreshInterval,
+        data: {
+          assetIds: request.assetIds
+        },
+        headers: {
+          'yoroi-version': this.getLastLaunchVersion(),
+          'yoroi-locale': this.getCurrentLocale()
+        }
+      }
+    ).then(response => response.data)
+      .catch((error) => {
+        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getAssetInfo)} error: ` + stringifyError(error));
+        throw new GetAssetInfoApiError();
+      });
+  }
+
   checkAddressesInUse: FilterUsedRequest => Promise<FilterUsedResponse> = (request) => {
     const { BackendService } = request.network.Backend;
-    if (BackendService == null) throw new Error(`${nameof(this.getUTXOsForAddresses)} missing backend url`);
+    if (BackendService == null) throw new Error(`${nameof(this.checkAddressesInUse)} missing backend url`);
     return fixFilterFunc(body => {
       return axios(
         `${BackendService}/api/v2/addresses/filterUsed`,

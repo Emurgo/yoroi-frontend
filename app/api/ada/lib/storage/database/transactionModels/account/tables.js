@@ -13,7 +13,7 @@ export type AccountingTransactionInputInsert = {|
   AddressId: number,
   SpendingCounter: number,
   IndexInOwnTx: number,
-  Amount: string,
+  TokenListId: number,
 |};
 export type AccountingTransactionInputRow = {|
   AccountingTransactionInputId: number,
@@ -30,7 +30,7 @@ export const AccountingTransactionInputSchema: {|
     AddressId: 'AddressId',
     SpendingCounter: 'SpendingCounter',
     IndexInOwnTx: 'IndexInOwnTx',
-    Amount: 'Amount',
+    TokenListId: 'TokenListId',
   }
 };
 
@@ -38,7 +38,7 @@ export type AccountingTransactionOutputInsert = {|
   TransactionId: number,
   AddressId: number,
   OutputIndex: number,
-  Amount: string,
+  TokenListId: number,
 |};
 export type AccountingTransactionOutputRow = {|
   AccountingTransactionOutputId: number,
@@ -59,7 +59,7 @@ export const AccountingTransactionOutputSchema: {|
     TransactionId: 'TransactionId',
     AddressId: 'AddressId',
     OutputIndex: 'OutputIndex',
-    Amount: 'Amount',
+    TokenListId: 'TokenListId',
   }
 };
 
@@ -81,7 +81,7 @@ export const populateAccountingTransactionsDb = (schemaBuilder: lf$schema$Builde
     .addColumn(AccountingTransactionInputSchema.properties.AddressId, Type.INTEGER)
     .addColumn(AccountingTransactionInputSchema.properties.SpendingCounter, Type.INTEGER)
     .addColumn(AccountingTransactionInputSchema.properties.IndexInOwnTx, Type.INTEGER)
-    .addColumn(AccountingTransactionInputSchema.properties.Amount, Type.STRING)
+    .addColumn(AccountingTransactionInputSchema.properties.TokenListId, Type.INTEGER)
     .addPrimaryKey(
       ([AccountingTransactionInputSchema.properties.AccountingTransactionInputId]: Array<string>),
       true
@@ -105,7 +105,7 @@ export const populateAccountingTransactionsDb = (schemaBuilder: lf$schema$Builde
     .addColumn(AccountingTransactionOutputSchema.properties.TransactionId, Type.INTEGER)
     .addColumn(AccountingTransactionOutputSchema.properties.AddressId, Type.INTEGER)
     .addColumn(AccountingTransactionOutputSchema.properties.OutputIndex, Type.INTEGER)
-    .addColumn(AccountingTransactionOutputSchema.properties.Amount, Type.STRING)
+    .addColumn(AccountingTransactionOutputSchema.properties.TokenListId, Type.INTEGER)
     .addPrimaryKey(
       ([AccountingTransactionOutputSchema.properties.AccountingTransactionOutputId]: Array<string>),
       true

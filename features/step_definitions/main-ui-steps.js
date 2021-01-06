@@ -3,6 +3,7 @@
 import { When, Then } from 'cucumber';
 import { By } from 'selenium-webdriver';
 import { expect } from 'chai';
+import { hiddenAmount } from '../../app/utils/strings';
 
 Then(/^I should see the balance number "([^"]*)"$/, async function (number) {
   await this.waitUntilText('.NavWalletDetails_amount', number);
@@ -60,7 +61,7 @@ Then(/^I click on hide balance button$/, async function () {
 
 Then(/^I should see my balance hidden$/, async function () {
   await this.waitForElement('.NavWalletDetails_amount');
-  await this.waitUntilContainsText('.NavWalletDetails_amount', '***');
+  await this.waitUntilContainsText('.NavWalletDetails_amount', hiddenAmount);
 });
 
 Then(/^I switch to "([^"]*)" from the dropdown$/, async function (walletName) {

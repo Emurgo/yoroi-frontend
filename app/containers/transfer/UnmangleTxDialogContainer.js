@@ -92,8 +92,8 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
           reset: this.generated.actions.txBuilderActions.reset.trigger,
         }}
         toTransferTx={tentativeTx => ({
-          recoveredBalance: tentativeTx.totalInput(true),
-          fee: tentativeTx.fee(true),
+          recoveredBalance: tentativeTx.totalInput(),
+          fee: tentativeTx.fee(),
           senders: tentativeTx
             .uniqueSenderAddresses(),
           receivers: tentativeTx

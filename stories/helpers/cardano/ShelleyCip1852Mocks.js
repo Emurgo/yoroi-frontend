@@ -6,7 +6,7 @@ import { PublicDeriver } from '../../../app/api/ada/lib/storage/models/PublicDer
 import CachedRequest from '../../../app/stores/lib/LocalizedCachedRequest';
 import BigNumber from 'bignumber.js';
 import { assuranceModes } from '../../../app/config/transactionAssuranceConfig';
-import { networks, getCardanoHaskellBaseConfig } from '../../../app/api/ada/lib/storage/database/prepackaged/networks';
+import { networks, getCardanoHaskellBaseConfig, defaultAssets } from '../../../app/api/ada/lib/storage/database/prepackaged/networks';
 import {
   HasPrivateDeriver,
   HasSign,
@@ -47,8 +47,17 @@ import type { ISignRequest } from '../../../app/api/common/lib/transactions/ISig
 import { RustModule } from '../../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import { HaskellShelleyTxSignRequest } from '../../../app/api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 import AdaDelegationStore from '../../../app/stores/ada/AdaDelegationStore';
+import {
+  MultiToken,
+} from '../../../app/api/common/lib/MultiToken';
+import {
+  getDefaultEntryTokenInfo,
+  mockFromDefaults,
+} from '../../../app/stores/toplevel/TokenInfoStore';
 
 function genMockShelleyCip1852Cache(dummyWallet: PublicDeriver<>) {
+  const defaultToken = dummyWallet.getParent().getDefaultToken();
+
   const pendingRequest = new CachedRequest(_publicDeriver => Promise.resolve([]));
   const recentRequest = new CachedRequest(_request => Promise.resolve({
     transactions: [],
@@ -59,7 +68,7 @@ function genMockShelleyCip1852Cache(dummyWallet: PublicDeriver<>) {
     total: 0,
   }));
   const getBalanceRequest = new CachedRequest(_request => Promise.resolve(
-    new BigNumber(0),
+    new MultiToken([], defaultToken),
   ));
   return {
     conceptualWalletCache: {
@@ -160,6 +169,10 @@ function genShelleyCip1852DummyWallet(): PublicDeriver<> {
       walletType: WalletTypeOption.WEB_WALLET,
       hardwareInfo: null,
       networkInfo: networks.CardanoMainnet,
+      defaultToken: getDefaultEntryTokenInfo(
+        networks.CardanoMainnet.NetworkId,
+        mockFromDefaults(defaultAssets)
+      ),
     },
     {
       ConceptualWalletId: conceptualWalletId,
@@ -210,6 +223,10 @@ export function genShelleyCip1852SigningWallet(
       })(),
       hardwareInfo,
       networkInfo: networks.CardanoMainnet,
+      defaultToken: getDefaultEntryTokenInfo(
+        networks.CardanoMainnet.NetworkId,
+        mockFromDefaults(defaultAssets)
+      ),
     },
     {
       ConceptualWalletId: conceptualWalletId,
@@ -271,18 +288,34 @@ export const genTentativeShelleyTx = (
   publicDeriver: PublicDeriver<>,
 ): {|
   tentativeTx: ISignRequest<any>,
-  inputAmount: string,
-  fee: BigNumber,
+  inputAmount: MultiToken,
+  fee: MultiToken,
 |} => {
-  const inputAmount = '2000001';
-  const ouputAmount = '1000000';
-  const fee = new BigNumber(inputAmount).minus(new BigNumber(ouputAmount));
+  const defaultToken = publicDeriver.getParent().getDefaultToken();
+
+  const inputAmount = new MultiToken(
+    [{
+      identifier: defaultToken.defaultIdentifier,
+      amount: new BigNumber('2000001'),
+      networkId: publicDeriver.getParent().getNetworkInfo().NetworkId,
+    }],
+    defaultToken
+  );
+  const outputAmount = new MultiToken(
+    [{
+      identifier: defaultToken.defaultIdentifier,
+      amount: new BigNumber('1000000'),
+      networkId: publicDeriver.getParent().getNetworkInfo().NetworkId,
+    }],
+    defaultToken
+  );
+  const fee = inputAmount.joinSubtractCopy(outputAmount);
 
   const networkInfo = publicDeriver.getParent().getNetworkInfo();
   const config = getCardanoHaskellBaseConfig(networkInfo)
     .reduce((acc, next) => Object.assign(acc, next), {});
   const remoteUnspentUtxo = {
-    amount: inputAmount,
+    amount: inputAmount.getDefault().toString(),
     receiver: '01d2d1d233e88e9c8428b68ada19acbdc9ced7e3b4ab6ca5d470376ea4c3892366f174a76af9252f78368f5747d3055ab3568ea3b6bf40b01e',
     tx_hash: '6930f123df83e4178b0324ae617b2028c0b38c6ff4660583a2abf1f7b08195fe',
     tx_index: 0,
@@ -307,16 +340,18 @@ export const genTentativeShelleyTx = (
       ),
       remoteUnspentUtxo.tx_index
     ),
-    RustModule.WalletV4.BigNum.from_str(remoteUnspentUtxo.amount)
+    RustModule.WalletV4.BigNum.from_str(remoteUnspentUtxo.amount.toString())
   );
   txBuilder.add_output(RustModule.WalletV4.TransactionOutput.new(
     RustModule.WalletV4.Address.from_bytes(
       Buffer.from('01d2d1d233e88e9c8428b68ada19acbdc9ced7e3b4ab6ca5d470376ea4c3892366f174a76af9252f78368f5747d3055ab3568ea3b6bf40b01e', 'hex')
     ),
-    RustModule.WalletV4.BigNum.from_str(ouputAmount)
+    RustModule.WalletV4.BigNum.from_str(
+      outputAmount.getDefault().toString()
+    )
   ));
 
-  txBuilder.set_fee(RustModule.WalletV4.BigNum.from_str(fee.toString()));
+  txBuilder.set_fee(RustModule.WalletV4.BigNum.from_str(fee.getDefault().toString()));
   txBuilder.set_ttl(5);
 
   return {
@@ -338,6 +373,7 @@ export const genTentativeShelleyTx = (
         ChainNetworkId: Number.parseInt(config.ChainNetworkId, 10),
         KeyDeposit: new BigNumber(config.KeyDeposit),
         PoolDeposit: new BigNumber(config.PoolDeposit),
+        NetworkId: publicDeriver.getParent().getNetworkInfo().NetworkId,
       },
       {
         neededHashes: new Set(),
@@ -444,6 +480,7 @@ export const genWithdrawalTx = (
       ChainNetworkId: Number.parseInt(baseConfig.ChainNetworkId, 10),
       PoolDeposit: new BigNumber(baseConfig.PoolDeposit),
       KeyDeposit: new BigNumber(baseConfig.KeyDeposit),
+      NetworkId: publicDeriver.getParent().getNetworkInfo().NetworkId,
     },
     {
       neededHashes: new Set([Buffer.from(rewardAddr.payment_cred().to_bytes()).toString('hex')]),

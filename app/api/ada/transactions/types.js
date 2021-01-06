@@ -1,13 +1,13 @@
 // @flow
 
-import {
-  BigNumber
-} from 'bignumber.js';
 import { RustModule } from '../lib/cardanoCrypto/rustLoader';
 
 import type {
   Address, Value, Addressing,
 } from '../lib/storage/models/PublicDeriver/interfaces';
+import {
+  MultiToken,
+} from '../../common/lib/MultiToken';
 
 import type { RemoteUnspentOutput } from '../lib/state-fetch/types';
 
@@ -24,8 +24,8 @@ export type AddressKeyMap = { [addr: string]: RustModule.WalletV2.PrivateKey, ..
 
 export type UserAnnotation = {|
   +type: TransactionDirectionType,
-  +amount: BigNumber,
-  +fee: BigNumber,
+  +amount: MultiToken,
+  +fee: MultiToken,
 |};
 
 export type CardanoAddressedUtxo = {|
