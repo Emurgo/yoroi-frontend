@@ -158,7 +158,7 @@
     "@emurgo/cip4-js": "1.0.5",
     "@emurgo/js-chain-libs": "0.7.1",
     "@emurgo/ledger-connect-handler": "3.0.1",
-    "@svgr/webpack": "5.4.0",
+    "@svgr/webpack": "5.5.0",
     "axios": "0.21.1",
     "bech32": "1.1.4",
     "bignumber.js": "9.0.1",
