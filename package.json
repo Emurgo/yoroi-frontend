@@ -202,7 +202,7 @@
     "ringbufferjs": "2.0.0",
     "route-parser": "0.0.5",
     "semver": "7.3.4",
-    "tinycolor2": "1.4.1",
+    "tinycolor2": "1.4.2",
     "trezor-connect": "8.1.16",
     "ua-parser-js": "0.7.21",
     "unorm": "1.6.0",
