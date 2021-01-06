@@ -128,7 +128,7 @@
     "husky": "4.3.0",
     "jest": "26.4.2",
     "jest-canvas-mock": "2.3.0",
-    "json-server": "0.16.1",
+    "json-server": "0.16.3",
     "json-stable-stringify": "1.0.1",
     "markdown-loader": "6.0.0",
     "minimist": "1.2.5",
