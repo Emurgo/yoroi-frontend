@@ -2,7 +2,7 @@
 import type { Node } from 'react';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { computed, observable, runInAction } from 'mobx';
+import { computed, observable, runInAction, } from 'mobx';
 import { intlShape } from 'react-intl';
 import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 
@@ -144,7 +144,7 @@ export default class CardanoStakingPage extends Component<Props> {
 
     if (balance == null || rewardBalance == null) throw new Error(`${nameof(CardanoStakingPage)} balance or rewardBalance is null`)
     return balance
-      .joinAddMutable(rewardBalance)
+      .joinAddCopy(rewardBalance)
       .getDefaultEntry()
       .amount
       .shiftedBy(-tokenInfo.Metadata.numberOfDecimals)
