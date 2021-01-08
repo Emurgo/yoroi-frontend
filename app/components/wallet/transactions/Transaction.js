@@ -41,6 +41,7 @@ import type {
 } from '../../../api/common/lib/MultiToken';
 import { getTokenName } from '../../../stores/stateless/tokenHelpers';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
+import BigNumber from 'bignumber.js';
 
 const messages = defineMessages({
   type: {
@@ -374,6 +375,7 @@ export default class Transaction extends Component<Props, State> {
     data: WalletTransaction,
     address: {| address: string, value: MultiToken |},
     addressIndex: number,
+    transform?: BigNumber => BigNumber,
   |} => Node = (request) => {
     const notificationElementId = `${request.kind}-address-${request.addressIndex}-${request.data.txid}-copyNotification`;
     const divKey = (identifier) => `${request.data.txid}-${request.kind}-${request.address.address}-${request.addressIndex}-${identifier}`;
@@ -383,7 +385,9 @@ export default class Transaction extends Component<Props, State> {
           {this.renderAmountDisplay({
             entry: {
               ...entry,
-              amount: entry.amount.abs(),
+              amount: request.transform
+                ? request.transform(entry.amount)
+                : entry.amount,
             },
           })} {this.getTicker(entry)}
         </div>
@@ -554,6 +558,7 @@ export default class Transaction extends Component<Props, State> {
                         data,
                         address,
                         addressIndex,
+                        transform: amount => amount.abs().negated(), // ensure it shows as negative
                       });
                     })
                     }
