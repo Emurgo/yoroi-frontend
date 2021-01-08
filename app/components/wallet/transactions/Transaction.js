@@ -272,21 +272,19 @@ export default class Transaction extends Component<Props, State> {
   }
 
   renderAmountDisplay: {|
-    amount: MultiToken,
+    entry: TokenEntry,
   |} => Node = (request) => {
     if (this.props.shouldHideBalance) {
       return (<span>{hiddenAmount}</span>);
     }
-
-    const defaultEntry = request.amount.getDefaultEntry();
-    const tokenInfo = this.props.getTokenInfo(defaultEntry);
-    const shiftedAmount = defaultEntry.amount
+    const tokenInfo = this.props.getTokenInfo(request.entry);
+    const shiftedAmount = request.entry.amount
       .shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
 
     if (this.props.unitOfAccountSetting.enabled === true) {
       const { currency } = this.props.unitOfAccountSetting;
       const price = this.props.getCurrentPrice(
-        defaultEntry.identifier,
+        request.entry.identifier,
         currency
       );
       if (price != null) {
@@ -371,6 +369,67 @@ export default class Transaction extends Component<Props, State> {
     return getTokenName(tokenInfo);
   };
 
+  renderRow: {|
+    kind: string,
+    data: WalletTransaction,
+    address: {| address: string, value: MultiToken |},
+    addressIndex: number,
+  |} => Node = (request) => {
+    const notificationElementId = `${request.kind}-address-${request.addressIndex}-${request.data.txid}-copyNotification`;
+    const divKey = (identifier) => `${request.data.txid}-${request.kind}-${request.address.address}-${request.addressIndex}-${identifier}`;
+    const renderAmount = (entry) => {
+      return (
+        <div className={styles.fee}>
+          {this.renderAmountDisplay({
+            entry: {
+              ...entry,
+              amount: entry.amount.abs(),
+            },
+          })} {this.getTicker(entry)}
+        </div>
+      );
+    };
+
+    return (
+      // eslint-disable-next-line react/no-array-index-key
+      <div
+        key={divKey(request.address.value.getDefaultEntry().identifier)}
+        className={styles.addressItem}
+      >
+        <CopyableAddress
+          hash={this.props.addressToDisplayString(request.address.address)}
+          elementId={notificationElementId}
+          onCopyAddress={
+            () => this.props.onCopyAddressTooltip(request.address.address, notificationElementId)
+          }
+          notification={this.props.notification}
+        >
+          <ExplorableHashContainer
+            selectedExplorer={this.props.selectedExplorer}
+            hash={this.props.addressToDisplayString(request.address.address)}
+            light
+            linkType="address"
+          >
+            <span className={classnames([styles.rowData, styles.hash])}>
+              {truncateAddressShort(
+                this.props.addressToDisplayString(request.address.address)
+              )}
+            </span>
+          </ExplorableHashContainer>
+        </CopyableAddress>
+        {this.generateAddressButton(request.address.address)}
+        {renderAmount(request.address.value.getDefaultEntry())}
+        {request.address.value.nonDefaultEntries().map(entry => (
+          <React.Fragment key={divKey(entry.identifier)}>
+            <div />
+            <div />
+            {renderAmount(entry)}
+          </React.Fragment>
+        ))}
+      </div>
+    );
+  }
+
   render(): Node {
     const data = this.props.data;
     const {
@@ -379,8 +438,6 @@ export default class Transaction extends Component<Props, State> {
       assuranceLevel,
       onAddMemo,
       onEditMemo,
-      notification,
-      onCopyAddressTooltip
     } = this.props;
     const { isExpanded } = this.state;
     const { intl } = this.context;
@@ -451,7 +508,7 @@ export default class Transaction extends Component<Props, State> {
               </div>
               <div className={classnames([styles.currency, styles.amount])}>
                 {this.renderAmountDisplay({
-                  amount: data.amount,
+                  entry: data.amount.getDefaultEntry(),
                 })}
               </div>
             </div>
@@ -492,40 +549,12 @@ export default class Transaction extends Component<Props, State> {
                   </div>
                   <div className={styles.addressList}>
                     {data.addresses.from.map((address, addressIndex) => {
-
-                      const notificationElementId = `in-address-${addressIndex}-${data.txid}-copyNotification`;
-                      return (
-                        // eslint-disable-next-line react/no-array-index-key
-                        <div key={`${data.txid}-from-${address.address}-${addressIndex}`} className={styles.addressItem}>
-                          <CopyableAddress
-                            hash={this.props.addressToDisplayString(address.address)}
-                            elementId={notificationElementId}
-                            onCopyAddress={
-                              () => onCopyAddressTooltip(address.address, notificationElementId)
-                            }
-                            notification={notification}
-                          >
-                            <ExplorableHashContainer
-                              selectedExplorer={this.props.selectedExplorer}
-                              hash={this.props.addressToDisplayString(address.address)}
-                              light
-                              linkType="address"
-                            >
-                              <span className={classnames([styles.rowData, styles.hash])}>
-                                {truncateAddressShort(
-                                  this.props.addressToDisplayString(address.address)
-                                )}
-                              </span>
-                            </ExplorableHashContainer>
-                          </CopyableAddress>
-                          {this.generateAddressButton(address.address)}
-                          <div className={styles.fee}>
-                            {this.renderAmountDisplay({
-                              amount: address.value.negatedCopy(),
-                            })} {this.getTicker(address.value.getDefaultEntry())}
-                          </div>
-                        </div>
-                      );
+                      return this.renderRow({
+                        kind: 'in',
+                        data,
+                        address,
+                        addressIndex,
+                      });
                     })
                     }
                   </div>
@@ -543,43 +572,12 @@ export default class Transaction extends Component<Props, State> {
                   </div>
                   <div className={styles.addressList}>
                     {data.addresses.to.map((address, addressIndex) => {
-
-                      const notificationElementId = `out-address-${addressIndex}-${data.txid}-copyNotification`;
-                      return (
-                        <div // eslint-disable-next-line react/no-array-index-key
-                          key={`${data.txid}-to-${address.address}-${addressIndex}`}
-                          className={styles.addressItem}
-                        >
-                          <CopyableAddress
-                            hash={this.props.addressToDisplayString(address.address)}
-                            elementId={notificationElementId}
-                            onCopyAddress={
-                              () => onCopyAddressTooltip(address.address, notificationElementId)
-                            }
-                            notification={notification}
-                          >
-                            <ExplorableHashContainer
-                              selectedExplorer={this.props.selectedExplorer}
-                              hash={this.props.addressToDisplayString(address.address)}
-                              light
-                              linkType="address"
-                            >
-                              <span className={classnames([styles.rowData, styles.hash])}>
-                                {truncateAddressShort(
-                                  this.props.addressToDisplayString(address.address)
-                                )}
-                              </span>
-                            </ExplorableHashContainer>
-                          </CopyableAddress>
-                          <div>
-                            {this.generateAddressButton(address.address)}
-                          </div>
-                          <div className={styles.fee}>
-                            {this.renderAmountDisplay({
-                              amount: address.value,
-                            })} {this.getTicker(address.value.getDefaultEntry())}
-                          </div>
-                        </div>);
+                      return this.renderRow({
+                        kind: 'out',
+                        data,
+                        address,
+                        addressIndex,
+                      });
                     })}
                   </div>
                 </div>
@@ -749,43 +747,13 @@ export default class Transaction extends Component<Props, State> {
             </h2>
           </div>
           <div className={styles.addressList}>
-            {data.withdrawals.map((withdrawal, addressIndex) => {
-              const notificationElementId = `withdrawal-${addressIndex}-${data.txid}-copyNotification`;
-              return (
-                // eslint-disable-next-line react/no-array-index-key
-                <div key={`${data.txid}-from-${withdrawal.address}-${addressIndex}`} className={styles.addressItem}>
-                  <CopyableAddress
-                    hash={this.props.addressToDisplayString(withdrawal.address)}
-                    elementId={notificationElementId}
-                    onCopyAddress={
-                      () => this.props.onCopyAddressTooltip(
-                        withdrawal.address,
-                        notificationElementId
-                      )
-                    }
-                    notification={this.props.notification}
-                  >
-                    <ExplorableHashContainer
-                      selectedExplorer={this.props.selectedExplorer}
-                      hash={this.props.addressToDisplayString(withdrawal.address)}
-                      light
-                      linkType="address"
-                    >
-                      <span className={classnames([styles.rowData, styles.hash])}>
-                        {truncateAddressShort(
-                          this.props.addressToDisplayString(withdrawal.address)
-                        )}
-                      </span>
-                    </ExplorableHashContainer>
-                  </CopyableAddress>
-                  {this.generateAddressButton(withdrawal.address)}
-                  <div className={styles.fee}>
-                    {this.renderAmountDisplay({
-                      amount: withdrawal.value,
-                    })} {this.getTicker(withdrawal.value.getDefaultEntry())}
-                  </div>
-                </div>
-              );
+            {data.withdrawals.map((address, addressIndex) => {
+              return this.renderRow({
+                kind: 'withdrawal',
+                data,
+                address,
+                addressIndex,
+              });
             })
             }
           </div>
