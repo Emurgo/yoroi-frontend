@@ -34,7 +34,7 @@ export const getURIParameters: (
     amount: new MultiToken([{
       identifier: defaultTokenInfo.defaultIdentifier,
       networkId: defaultTokenInfo.defaultNetworkId,
-      amount,
+      amount: amount.shiftedBy(decimalPlaces),
     }], defaultTokenInfo),
   };
 };
