@@ -38,9 +38,6 @@ import {
   asDisplayCutoff,
   asGetUtxoBalance,
 } from '../../models/PublicDeriver/traits';
-import {
-  MultiToken,
-} from '../../../../../common/lib/MultiToken';
 
 import {
   updateTransactions, getAllTransactions
