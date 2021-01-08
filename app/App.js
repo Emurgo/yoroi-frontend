@@ -1,5 +1,4 @@
 // @flow
-import { hot } from 'react-hot-loader/root';
 import React, { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
@@ -135,4 +134,4 @@ class App extends Component<Props, State> {
   }
 }
 
-export default (hot(App): typeof App);
+export default App;
