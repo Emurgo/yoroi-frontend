@@ -149,13 +149,13 @@
     "ws": "7.3.1"
   },
   "dependencies": {
-    "@cardano-foundation/ledgerjs-hw-app-cardano": "2.0.1",
+    "@cardano-foundation/ledgerjs-hw-app-cardano": "2.1.0",
     "@coinbarn/ergo-ts": "git+https://github.com/Emurgo/ergo-ts-temp.git",
     "@download/blockies": "1.0.3",
     "@emurgo/cardano-serialization-lib-browser": "4.2.0",
     "@emurgo/cip4-js": "1.0.5",
     "@emurgo/js-chain-libs": "0.7.1",
-    "@emurgo/ledger-connect-handler": "3.0.1",
+    "@emurgo/ledger-connect-handler": "3.0.2",
     "@svgr/webpack": "5.4.0",
     "axios": "0.20.0",
     "bech32": "1.1.4",
