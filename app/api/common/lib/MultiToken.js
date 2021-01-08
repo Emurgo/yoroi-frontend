@@ -126,6 +126,13 @@ export class MultiToken {
     ))[0];
   }
 
+  nonDefaultEntries: void => Array<TokenEntry> = () => {
+    return this.values.filter(value => !(
+      value.networkId === this.defaults.defaultNetworkId &&
+      value.identifier === this.defaults.defaultIdentifier
+    ));
+  }
+
   asMap: void => Map<string, BigNumber> = () => {
     return new Map(this.values.map(value => [value.identifier, value.amount]));
   }

@@ -866,7 +866,7 @@ async function baseTest(
   const txList = await getAllTransactions({
     publicDeriver: basePubDeriver,
   });
-  expect(txList).toMatchSnapshot();
+  expect(JSON.stringify(txList, null, 2)).toMatchSnapshot();
 
   const keysForTest = [
     'Address',

@@ -116,7 +116,7 @@ export default class WalletSendForm extends Component<Props> {
       const uriParams = this.props.uriParams;
 
       const adjustedAmount = formattedAmountToNaturalUnits(
-        uriParams.amount.toString(),
+        uriParams.amount.getDefaultEntry().amount.toString(),
         this.props.defaultToken.Metadata.numberOfDecimals,
       );
       // note: assume these are validated externally

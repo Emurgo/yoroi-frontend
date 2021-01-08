@@ -1,670 +1,575 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Syncing with failed bip44 1`] = `
-Object {
-  "addressLookupMap": Map {
-    5 => "Ae2tdPwUPEZ6tzHKyuMLL6bh1au5DETgb53PTmJAN9aaCLtaUTWHvrS2mxo",
-    46 => "Ae2tdPwUPEZ5PxKxoyZDgjsKgMWMpTRa4PH3sVgARSGBsWwNBH3qg7cMFsP",
-    47 => "Ae2tdPwUPEZE9RAm3d3zuuh22YjqDxhR1JF6G93uJsRrk51QGHzRUzLvDjL",
-    48 => "Ae2tdPwUPEZE9RAm3d3zuuh22YjqDxhR1JF6G93uJsRrk51QGHzRUzLvDjL",
-  },
-  "txs": Array [
-    Object {
-      "accountingInputs": Array [],
-      "accountingOutputs": Array [],
-      "amount": MultiToken {
-        "_checkNetworkId": [Function],
-        "absCopy": [Function],
-        "add": [Function],
-        "asMap": [Function],
-        "defaults": Object {
-          "defaultIdentifier": "",
-          "defaultNetworkId": 100,
-        },
-        "get": [Function],
-        "getDefault": [Function],
-        "getDefaultEntry": [Function],
-        "isEmpty": [Function],
-        "isEqualTo": [Function],
-        "joinAddCopy": [Function],
-        "joinAddMutable": [Function],
-        "joinSubtractCopy": [Function],
-        "joinSubtractMutable": [Function],
-        "negatedCopy": [Function],
-        "subtract": [Function],
-        "values": Array [
-          Object {
-            "amount": "-1900000",
-            "identifier": "",
-            "networkId": 100,
+"{
+  \\"addressLookupMap\\": {},
+  \\"txs\\": [
+    {
+      \\"txType\\": 100,
+      \\"transaction\\": {
+        \\"Type\\": 100,
+        \\"Hash\\": \\"29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed547\\",
+        \\"Digest\\": 1.9060984568373646e-36,
+        \\"BlockId\\": null,
+        \\"Ordinal\\": null,
+        \\"LastUpdateTime\\": 1568392676000,
+        \\"Status\\": -1,
+        \\"ErrorMessage\\": null,
+        \\"Extra\\": null,
+        \\"TransactionId\\": 3
+      },
+      \\"certificates\\": [],
+      \\"utxoInputs\\": [
+        {
+          \\"TransactionId\\": 3,
+          \\"AddressId\\": 5,
+          \\"ParentTxHash\\": \\"29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546\\",
+          \\"IndexInParentTx\\": 0,
+          \\"IndexInOwnTx\\": 0,
+          \\"TokenListId\\": 6,
+          \\"UtxoTransactionInputId\\": 3
+        }
+      ],
+      \\"utxoOutputs\\": [
+        {
+          \\"TransactionId\\": 3,
+          \\"AddressId\\": 48,
+          \\"OutputIndex\\": 0,
+          \\"TokenListId\\": 7,
+          \\"IsUnspent\\": true,
+          \\"ErgoBoxId\\": null,
+          \\"ErgoCreationHeight\\": null,
+          \\"ErgoTree\\": null,
+          \\"UtxoTransactionOutputId\\": 5
+        }
+      ],
+      \\"accountingInputs\\": [],
+      \\"accountingOutputs\\": [],
+      \\"tokens\\": [
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"4000000\\",
+            \\"ListId\\": 0,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 1
           },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"2100000\\",
+            \\"ListId\\": 1,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 2
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"1731391\\",
+            \\"ListId\\": 2,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 3
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"4000000\\",
+            \\"ListId\\": 3,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 4
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"2100000\\",
+            \\"ListId\\": 4,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 5
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"1731391\\",
+            \\"ListId\\": 5,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 6
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"2100000\\",
+            \\"ListId\\": 6,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 7
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"1900000\\",
+            \\"ListId\\": 7,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 8
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        }
+      ],
+      \\"block\\": null,
+      \\"type\\": \\"expend\\",
+      \\"amount\\": {
+        \\"values\\": [
+          {
+            \\"identifier\\": \\"\\",
+            \\"networkId\\": 100,
+            \\"amount\\": \\"-1900000\\"
+          }
         ],
+        \\"defaults\\": {
+          \\"defaultNetworkId\\": 100,
+          \\"defaultIdentifier\\": \\"\\"
+        }
       },
-      "block": null,
-      "certificates": Array [],
-      "fee": MultiToken {
-        "_checkNetworkId": [Function],
-        "absCopy": [Function],
-        "add": [Function],
-        "asMap": [Function],
-        "defaults": Object {
-          "defaultIdentifier": "",
-          "defaultNetworkId": 100,
-        },
-        "get": [Function],
-        "getDefault": [Function],
-        "getDefaultEntry": [Function],
-        "isEmpty": [Function],
-        "isEqualTo": [Function],
-        "joinAddCopy": [Function],
-        "joinAddMutable": [Function],
-        "joinSubtractCopy": [Function],
-        "joinSubtractMutable": [Function],
-        "negatedCopy": [Function],
-        "subtract": [Function],
-        "values": Array [
-          Object {
-            "amount": "-200000",
-            "identifier": "",
-            "networkId": 100,
-          },
+      \\"fee\\": {
+        \\"values\\": [
+          {
+            \\"identifier\\": \\"\\",
+            \\"networkId\\": 100,
+            \\"amount\\": \\"-200000\\"
+          }
         ],
-      },
-      "tokens": Array [
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "4000000",
-            "ListId": 0,
-            "TokenId": 2,
-            "TokenListItemId": 1,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "2100000",
-            "ListId": 1,
-            "TokenId": 2,
-            "TokenListItemId": 2,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "1731391",
-            "ListId": 2,
-            "TokenId": 2,
-            "TokenListItemId": 3,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "4000000",
-            "ListId": 3,
-            "TokenId": 2,
-            "TokenListItemId": 4,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "2100000",
-            "ListId": 4,
-            "TokenId": 2,
-            "TokenListItemId": 5,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "1731391",
-            "ListId": 5,
-            "TokenId": 2,
-            "TokenListItemId": 6,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "2100000",
-            "ListId": 6,
-            "TokenId": 2,
-            "TokenListItemId": 7,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "1900000",
-            "ListId": 7,
-            "TokenId": 2,
-            "TokenListItemId": 8,
-          },
-        },
-      ],
-      "transaction": Object {
-        "BlockId": null,
-        "Digest": 1.9060984568373646e-36,
-        "ErrorMessage": null,
-        "Extra": null,
-        "Hash": "29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed547",
-        "LastUpdateTime": 1568392676000,
-        "Ordinal": null,
-        "Status": -1,
-        "TransactionId": 3,
-        "Type": 100,
-      },
-      "txType": 100,
-      "type": "expend",
-      "utxoInputs": Array [
-        Object {
-          "AddressId": 5,
-          "IndexInOwnTx": 0,
-          "IndexInParentTx": 0,
-          "ParentTxHash": "29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546",
-          "TokenListId": 6,
-          "TransactionId": 3,
-          "UtxoTransactionInputId": 3,
-        },
-      ],
-      "utxoOutputs": Array [
-        Object {
-          "AddressId": 48,
-          "ErgoBoxId": null,
-          "ErgoCreationHeight": null,
-          "ErgoTree": null,
-          "IsUnspent": true,
-          "OutputIndex": 0,
-          "TokenListId": 7,
-          "TransactionId": 3,
-          "UtxoTransactionOutputId": 5,
-        },
-      ],
+        \\"defaults\\": {
+          \\"defaultNetworkId\\": 100,
+          \\"defaultIdentifier\\": \\"\\"
+        }
+      }
     },
-    Object {
-      "accountingInputs": Array [],
-      "accountingOutputs": Array [],
-      "amount": MultiToken {
-        "_checkNetworkId": [Function],
-        "absCopy": [Function],
-        "add": [Function],
-        "asMap": [Function],
-        "defaults": Object {
-          "defaultIdentifier": "",
-          "defaultNetworkId": 100,
+    {
+      \\"txType\\": 100,
+      \\"transaction\\": {
+        \\"Type\\": 100,
+        \\"Hash\\": \\"29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed545\\",
+        \\"Digest\\": 8.191593645542673e-27,
+        \\"BlockId\\": 2,
+        \\"Ordinal\\": 0,
+        \\"LastUpdateTime\\": 1568392656000,
+        \\"Status\\": -2,
+        \\"ErrorMessage\\": null,
+        \\"Extra\\": null,
+        \\"TransactionId\\": 1
+      },
+      \\"certificates\\": [],
+      \\"utxoInputs\\": [
+        {
+          \\"TransactionId\\": 1,
+          \\"AddressId\\": 46,
+          \\"ParentTxHash\\": \\"9c8d3c4fe576f8c99d8ad6ba5d889f5a9f2d7fe07dc17b3f425f5d17696f3d20\\",
+          \\"IndexInParentTx\\": 0,
+          \\"IndexInOwnTx\\": 0,
+          \\"TokenListId\\": 0,
+          \\"UtxoTransactionInputId\\": 1
+        }
+      ],
+      \\"utxoOutputs\\": [
+        {
+          \\"TransactionId\\": 1,
+          \\"AddressId\\": 5,
+          \\"OutputIndex\\": 0,
+          \\"TokenListId\\": 1,
+          \\"IsUnspent\\": true,
+          \\"ErgoBoxId\\": null,
+          \\"ErgoCreationHeight\\": null,
+          \\"ErgoTree\\": null,
+          \\"UtxoTransactionOutputId\\": 1
         },
-        "get": [Function],
-        "getDefault": [Function],
-        "getDefaultEntry": [Function],
-        "isEmpty": [Function],
-        "isEqualTo": [Function],
-        "joinAddCopy": [Function],
-        "joinAddMutable": [Function],
-        "joinSubtractCopy": [Function],
-        "joinSubtractMutable": [Function],
-        "negatedCopy": [Function],
-        "subtract": [Function],
-        "values": Array [
-          Object {
-            "amount": "2100000",
-            "identifier": "",
-            "networkId": 100,
+        {
+          \\"TransactionId\\": 1,
+          \\"AddressId\\": 47,
+          \\"OutputIndex\\": 1,
+          \\"TokenListId\\": 2,
+          \\"IsUnspent\\": true,
+          \\"ErgoBoxId\\": null,
+          \\"ErgoCreationHeight\\": null,
+          \\"ErgoTree\\": null,
+          \\"UtxoTransactionOutputId\\": 2
+        }
+      ],
+      \\"accountingInputs\\": [],
+      \\"accountingOutputs\\": [],
+      \\"tokens\\": [
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"4000000\\",
+            \\"ListId\\": 0,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 1
           },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"2100000\\",
+            \\"ListId\\": 1,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 2
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"1731391\\",
+            \\"ListId\\": 2,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 3
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"4000000\\",
+            \\"ListId\\": 3,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 4
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"2100000\\",
+            \\"ListId\\": 4,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 5
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"1731391\\",
+            \\"ListId\\": 5,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 6
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"2100000\\",
+            \\"ListId\\": 6,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 7
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"1900000\\",
+            \\"ListId\\": 7,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 8
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        }
+      ],
+      \\"block\\": {
+        \\"Hash\\": \\"a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba26\\",
+        \\"BlockTime\\": \\"2019-09-13T16:37:36.000Z\\",
+        \\"Height\\": 218609,
+        \\"SlotNum\\": 435651,
+        \\"Digest\\": -9.690691258114666e-56,
+        \\"BlockId\\": 2
+      },
+      \\"type\\": \\"income\\",
+      \\"amount\\": {
+        \\"values\\": [
+          {
+            \\"identifier\\": \\"\\",
+            \\"networkId\\": 100,
+            \\"amount\\": \\"2100000\\"
+          }
         ],
+        \\"defaults\\": {
+          \\"defaultNetworkId\\": 100,
+          \\"defaultIdentifier\\": \\"\\"
+        }
       },
-      "block": Object {
-        "BlockId": 2,
-        "BlockTime": 2019-09-13T16:37:36.000Z,
-        "Digest": -9.690691258114666e-56,
-        "Hash": "a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba26",
-        "Height": 218609,
-        "SlotNum": 435651,
-      },
-      "certificates": Array [],
-      "fee": MultiToken {
-        "_checkNetworkId": [Function],
-        "absCopy": [Function],
-        "add": [Function],
-        "asMap": [Function],
-        "defaults": Object {
-          "defaultIdentifier": "",
-          "defaultNetworkId": 100,
-        },
-        "get": [Function],
-        "getDefault": [Function],
-        "getDefaultEntry": [Function],
-        "isEmpty": [Function],
-        "isEqualTo": [Function],
-        "joinAddCopy": [Function],
-        "joinAddMutable": [Function],
-        "joinSubtractCopy": [Function],
-        "joinSubtractMutable": [Function],
-        "negatedCopy": [Function],
-        "subtract": [Function],
-        "values": Array [
-          Object {
-            "amount": "0",
-            "identifier": "",
-            "networkId": 100,
-          },
+      \\"fee\\": {
+        \\"values\\": [
+          {
+            \\"identifier\\": \\"\\",
+            \\"networkId\\": 100,
+            \\"amount\\": \\"0\\"
+          }
         ],
-      },
-      "tokens": Array [
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "4000000",
-            "ListId": 0,
-            "TokenId": 2,
-            "TokenListItemId": 1,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "2100000",
-            "ListId": 1,
-            "TokenId": 2,
-            "TokenListItemId": 2,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "1731391",
-            "ListId": 2,
-            "TokenId": 2,
-            "TokenListItemId": 3,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "4000000",
-            "ListId": 3,
-            "TokenId": 2,
-            "TokenListItemId": 4,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "2100000",
-            "ListId": 4,
-            "TokenId": 2,
-            "TokenListItemId": 5,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "1731391",
-            "ListId": 5,
-            "TokenId": 2,
-            "TokenListItemId": 6,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "2100000",
-            "ListId": 6,
-            "TokenId": 2,
-            "TokenListItemId": 7,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "1900000",
-            "ListId": 7,
-            "TokenId": 2,
-            "TokenListItemId": 8,
-          },
-        },
-      ],
-      "transaction": Object {
-        "BlockId": 2,
-        "Digest": 8.191593645542673e-27,
-        "ErrorMessage": null,
-        "Extra": null,
-        "Hash": "29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed545",
-        "LastUpdateTime": 1568392656000,
-        "Ordinal": 0,
-        "Status": -2,
-        "TransactionId": 1,
-        "Type": 100,
-      },
-      "txType": 100,
-      "type": "income",
-      "utxoInputs": Array [
-        Object {
-          "AddressId": 46,
-          "IndexInOwnTx": 0,
-          "IndexInParentTx": 0,
-          "ParentTxHash": "9c8d3c4fe576f8c99d8ad6ba5d889f5a9f2d7fe07dc17b3f425f5d17696f3d20",
-          "TokenListId": 0,
-          "TransactionId": 1,
-          "UtxoTransactionInputId": 1,
-        },
-      ],
-      "utxoOutputs": Array [
-        Object {
-          "AddressId": 5,
-          "ErgoBoxId": null,
-          "ErgoCreationHeight": null,
-          "ErgoTree": null,
-          "IsUnspent": true,
-          "OutputIndex": 0,
-          "TokenListId": 1,
-          "TransactionId": 1,
-          "UtxoTransactionOutputId": 1,
-        },
-        Object {
-          "AddressId": 47,
-          "ErgoBoxId": null,
-          "ErgoCreationHeight": null,
-          "ErgoTree": null,
-          "IsUnspent": true,
-          "OutputIndex": 1,
-          "TokenListId": 2,
-          "TransactionId": 1,
-          "UtxoTransactionOutputId": 2,
-        },
-      ],
+        \\"defaults\\": {
+          \\"defaultNetworkId\\": 100,
+          \\"defaultIdentifier\\": \\"\\"
+        }
+      }
     },
-    Object {
-      "accountingInputs": Array [],
-      "accountingOutputs": Array [],
-      "amount": MultiToken {
-        "_checkNetworkId": [Function],
-        "absCopy": [Function],
-        "add": [Function],
-        "asMap": [Function],
-        "defaults": Object {
-          "defaultIdentifier": "",
-          "defaultNetworkId": 100,
+    {
+      \\"txType\\": 100,
+      \\"transaction\\": {
+        \\"Type\\": 100,
+        \\"Hash\\": \\"29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546\\",
+        \\"Digest\\": 1.249559827714551e-31,
+        \\"BlockId\\": 1,
+        \\"Ordinal\\": 0,
+        \\"LastUpdateTime\\": 1568392636000,
+        \\"Status\\": -2,
+        \\"ErrorMessage\\": null,
+        \\"Extra\\": null,
+        \\"TransactionId\\": 2
+      },
+      \\"certificates\\": [],
+      \\"utxoInputs\\": [
+        {
+          \\"TransactionId\\": 2,
+          \\"AddressId\\": 46,
+          \\"ParentTxHash\\": \\"9c8d3c4fe576f8c99d8ad6ba5d889f5a9f2d7fe07dc17b3f425f5d17696f3d21\\",
+          \\"IndexInParentTx\\": 0,
+          \\"IndexInOwnTx\\": 0,
+          \\"TokenListId\\": 3,
+          \\"UtxoTransactionInputId\\": 2
+        }
+      ],
+      \\"utxoOutputs\\": [
+        {
+          \\"TransactionId\\": 2,
+          \\"AddressId\\": 5,
+          \\"OutputIndex\\": 0,
+          \\"TokenListId\\": 4,
+          \\"IsUnspent\\": true,
+          \\"ErgoBoxId\\": null,
+          \\"ErgoCreationHeight\\": null,
+          \\"ErgoTree\\": null,
+          \\"UtxoTransactionOutputId\\": 3
         },
-        "get": [Function],
-        "getDefault": [Function],
-        "getDefaultEntry": [Function],
-        "isEmpty": [Function],
-        "isEqualTo": [Function],
-        "joinAddCopy": [Function],
-        "joinAddMutable": [Function],
-        "joinSubtractCopy": [Function],
-        "joinSubtractMutable": [Function],
-        "negatedCopy": [Function],
-        "subtract": [Function],
-        "values": Array [
-          Object {
-            "amount": "2100000",
-            "identifier": "",
-            "networkId": 100,
+        {
+          \\"TransactionId\\": 2,
+          \\"AddressId\\": 47,
+          \\"OutputIndex\\": 1,
+          \\"TokenListId\\": 5,
+          \\"IsUnspent\\": true,
+          \\"ErgoBoxId\\": null,
+          \\"ErgoCreationHeight\\": null,
+          \\"ErgoTree\\": null,
+          \\"UtxoTransactionOutputId\\": 4
+        }
+      ],
+      \\"accountingInputs\\": [],
+      \\"accountingOutputs\\": [],
+      \\"tokens\\": [
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"4000000\\",
+            \\"ListId\\": 0,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 1
           },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"2100000\\",
+            \\"ListId\\": 1,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 2
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"1731391\\",
+            \\"ListId\\": 2,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 3
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"4000000\\",
+            \\"ListId\\": 3,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 4
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"2100000\\",
+            \\"ListId\\": 4,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 5
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"1731391\\",
+            \\"ListId\\": 5,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 6
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"2100000\\",
+            \\"ListId\\": 6,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 7
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"1900000\\",
+            \\"ListId\\": 7,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 8
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        }
+      ],
+      \\"block\\": {
+        \\"Hash\\": \\"a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba25\\",
+        \\"BlockTime\\": \\"2019-09-13T16:37:16.000Z\\",
+        \\"Height\\": 218608,
+        \\"SlotNum\\": 435650,
+        \\"Digest\\": -6.352946211521613e-51,
+        \\"BlockId\\": 1
+      },
+      \\"type\\": \\"income\\",
+      \\"amount\\": {
+        \\"values\\": [
+          {
+            \\"identifier\\": \\"\\",
+            \\"networkId\\": 100,
+            \\"amount\\": \\"2100000\\"
+          }
         ],
+        \\"defaults\\": {
+          \\"defaultNetworkId\\": 100,
+          \\"defaultIdentifier\\": \\"\\"
+        }
       },
-      "block": Object {
-        "BlockId": 1,
-        "BlockTime": 2019-09-13T16:37:16.000Z,
-        "Digest": -6.352946211521613e-51,
-        "Hash": "a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba25",
-        "Height": 218608,
-        "SlotNum": 435650,
-      },
-      "certificates": Array [],
-      "fee": MultiToken {
-        "_checkNetworkId": [Function],
-        "absCopy": [Function],
-        "add": [Function],
-        "asMap": [Function],
-        "defaults": Object {
-          "defaultIdentifier": "",
-          "defaultNetworkId": 100,
-        },
-        "get": [Function],
-        "getDefault": [Function],
-        "getDefaultEntry": [Function],
-        "isEmpty": [Function],
-        "isEqualTo": [Function],
-        "joinAddCopy": [Function],
-        "joinAddMutable": [Function],
-        "joinSubtractCopy": [Function],
-        "joinSubtractMutable": [Function],
-        "negatedCopy": [Function],
-        "subtract": [Function],
-        "values": Array [
-          Object {
-            "amount": "0",
-            "identifier": "",
-            "networkId": 100,
-          },
+      \\"fee\\": {
+        \\"values\\": [
+          {
+            \\"identifier\\": \\"\\",
+            \\"networkId\\": 100,
+            \\"amount\\": \\"0\\"
+          }
         ],
-      },
-      "tokens": Array [
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "4000000",
-            "ListId": 0,
-            "TokenId": 2,
-            "TokenListItemId": 1,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "2100000",
-            "ListId": 1,
-            "TokenId": 2,
-            "TokenListItemId": 2,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "1731391",
-            "ListId": 2,
-            "TokenId": 2,
-            "TokenListItemId": 3,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "4000000",
-            "ListId": 3,
-            "TokenId": 2,
-            "TokenListItemId": 4,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "2100000",
-            "ListId": 4,
-            "TokenId": 2,
-            "TokenListItemId": 5,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "1731391",
-            "ListId": 5,
-            "TokenId": 2,
-            "TokenListItemId": 6,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "2100000",
-            "ListId": 6,
-            "TokenId": 2,
-            "TokenListItemId": 7,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "1900000",
-            "ListId": 7,
-            "TokenId": 2,
-            "TokenListItemId": 8,
-          },
-        },
-      ],
-      "transaction": Object {
-        "BlockId": 1,
-        "Digest": 1.249559827714551e-31,
-        "ErrorMessage": null,
-        "Extra": null,
-        "Hash": "29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546",
-        "LastUpdateTime": 1568392636000,
-        "Ordinal": 0,
-        "Status": -2,
-        "TransactionId": 2,
-        "Type": 100,
-      },
-      "txType": 100,
-      "type": "income",
-      "utxoInputs": Array [
-        Object {
-          "AddressId": 46,
-          "IndexInOwnTx": 0,
-          "IndexInParentTx": 0,
-          "ParentTxHash": "9c8d3c4fe576f8c99d8ad6ba5d889f5a9f2d7fe07dc17b3f425f5d17696f3d21",
-          "TokenListId": 3,
-          "TransactionId": 2,
-          "UtxoTransactionInputId": 2,
-        },
-      ],
-      "utxoOutputs": Array [
-        Object {
-          "AddressId": 5,
-          "ErgoBoxId": null,
-          "ErgoCreationHeight": null,
-          "ErgoTree": null,
-          "IsUnspent": true,
-          "OutputIndex": 0,
-          "TokenListId": 4,
-          "TransactionId": 2,
-          "UtxoTransactionOutputId": 3,
-        },
-        Object {
-          "AddressId": 47,
-          "ErgoBoxId": null,
-          "ErgoCreationHeight": null,
-          "ErgoTree": null,
-          "IsUnspent": true,
-          "OutputIndex": 1,
-          "TokenListId": 5,
-          "TransactionId": 2,
-          "UtxoTransactionOutputId": 4,
-        },
-      ],
-    },
-  ],
-}
+        \\"defaults\\": {
+          \\"defaultNetworkId\\": 100,
+          \\"defaultIdentifier\\": \\"\\"
+        }
+      }
+    }
+  ]
+}"
 `;
 
 exports[`Syncing with failed bip44 2`] = `
@@ -1243,670 +1148,575 @@ Array [
 `;
 
 exports[`Syncing with failed cip1852 1`] = `
-Object {
-  "addressLookupMap": Map {
-    9 => "0365267961fefd53aefe4cf741dc0df9902d360bca0de4c0abe88ca89d0d08dd3d",
-    92 => "030efc40f8fb587734cbcdeeb62a99da3f123677ea1754338665f9a294fbc904fe",
-    93 => "03b4c4b9e8e0ee0c71b67952f54a235495a450fd8e45e6be2ee2263f0b34009f85",
-    94 => "03b4c4b9e8e0ee0c71b67952f54a235495a450fd8e45e6be2ee2263f0b34009f85",
-  },
-  "txs": Array [
-    Object {
-      "accountingInputs": Array [],
-      "accountingOutputs": Array [],
-      "amount": MultiToken {
-        "_checkNetworkId": [Function],
-        "absCopy": [Function],
-        "add": [Function],
-        "asMap": [Function],
-        "defaults": Object {
-          "defaultIdentifier": "",
-          "defaultNetworkId": 100,
-        },
-        "get": [Function],
-        "getDefault": [Function],
-        "getDefaultEntry": [Function],
-        "isEmpty": [Function],
-        "isEqualTo": [Function],
-        "joinAddCopy": [Function],
-        "joinAddMutable": [Function],
-        "joinSubtractCopy": [Function],
-        "joinSubtractMutable": [Function],
-        "negatedCopy": [Function],
-        "subtract": [Function],
-        "values": Array [
-          Object {
-            "amount": "-1900000",
-            "identifier": "",
-            "networkId": 100,
+"{
+  \\"addressLookupMap\\": {},
+  \\"txs\\": [
+    {
+      \\"txType\\": 100,
+      \\"transaction\\": {
+        \\"Type\\": 100,
+        \\"Hash\\": \\"29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed547\\",
+        \\"Digest\\": 1.9060984568373646e-36,
+        \\"BlockId\\": null,
+        \\"Ordinal\\": null,
+        \\"LastUpdateTime\\": 1568392676000,
+        \\"Status\\": -1,
+        \\"ErrorMessage\\": null,
+        \\"Extra\\": null,
+        \\"TransactionId\\": 3
+      },
+      \\"certificates\\": [],
+      \\"utxoInputs\\": [
+        {
+          \\"TransactionId\\": 3,
+          \\"AddressId\\": 9,
+          \\"ParentTxHash\\": \\"29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546\\",
+          \\"IndexInParentTx\\": 0,
+          \\"IndexInOwnTx\\": 0,
+          \\"TokenListId\\": 6,
+          \\"UtxoTransactionInputId\\": 3
+        }
+      ],
+      \\"utxoOutputs\\": [
+        {
+          \\"TransactionId\\": 3,
+          \\"AddressId\\": 94,
+          \\"OutputIndex\\": 0,
+          \\"TokenListId\\": 7,
+          \\"IsUnspent\\": true,
+          \\"ErgoBoxId\\": null,
+          \\"ErgoCreationHeight\\": null,
+          \\"ErgoTree\\": null,
+          \\"UtxoTransactionOutputId\\": 5
+        }
+      ],
+      \\"accountingInputs\\": [],
+      \\"accountingOutputs\\": [],
+      \\"tokens\\": [
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"4000000\\",
+            \\"ListId\\": 0,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 1
           },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"2100000\\",
+            \\"ListId\\": 1,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 2
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"1731391\\",
+            \\"ListId\\": 2,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 3
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"4000000\\",
+            \\"ListId\\": 3,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 4
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"2100000\\",
+            \\"ListId\\": 4,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 5
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"1731391\\",
+            \\"ListId\\": 5,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 6
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"2100000\\",
+            \\"ListId\\": 6,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 7
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"1900000\\",
+            \\"ListId\\": 7,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 8
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        }
+      ],
+      \\"block\\": null,
+      \\"type\\": \\"expend\\",
+      \\"amount\\": {
+        \\"values\\": [
+          {
+            \\"identifier\\": \\"\\",
+            \\"networkId\\": 100,
+            \\"amount\\": \\"-1900000\\"
+          }
         ],
+        \\"defaults\\": {
+          \\"defaultNetworkId\\": 100,
+          \\"defaultIdentifier\\": \\"\\"
+        }
       },
-      "block": null,
-      "certificates": Array [],
-      "fee": MultiToken {
-        "_checkNetworkId": [Function],
-        "absCopy": [Function],
-        "add": [Function],
-        "asMap": [Function],
-        "defaults": Object {
-          "defaultIdentifier": "",
-          "defaultNetworkId": 100,
-        },
-        "get": [Function],
-        "getDefault": [Function],
-        "getDefaultEntry": [Function],
-        "isEmpty": [Function],
-        "isEqualTo": [Function],
-        "joinAddCopy": [Function],
-        "joinAddMutable": [Function],
-        "joinSubtractCopy": [Function],
-        "joinSubtractMutable": [Function],
-        "negatedCopy": [Function],
-        "subtract": [Function],
-        "values": Array [
-          Object {
-            "amount": "-200000",
-            "identifier": "",
-            "networkId": 100,
-          },
+      \\"fee\\": {
+        \\"values\\": [
+          {
+            \\"identifier\\": \\"\\",
+            \\"networkId\\": 100,
+            \\"amount\\": \\"-200000\\"
+          }
         ],
-      },
-      "tokens": Array [
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "4000000",
-            "ListId": 0,
-            "TokenId": 2,
-            "TokenListItemId": 1,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "2100000",
-            "ListId": 1,
-            "TokenId": 2,
-            "TokenListItemId": 2,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "1731391",
-            "ListId": 2,
-            "TokenId": 2,
-            "TokenListItemId": 3,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "4000000",
-            "ListId": 3,
-            "TokenId": 2,
-            "TokenListItemId": 4,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "2100000",
-            "ListId": 4,
-            "TokenId": 2,
-            "TokenListItemId": 5,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "1731391",
-            "ListId": 5,
-            "TokenId": 2,
-            "TokenListItemId": 6,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "2100000",
-            "ListId": 6,
-            "TokenId": 2,
-            "TokenListItemId": 7,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "1900000",
-            "ListId": 7,
-            "TokenId": 2,
-            "TokenListItemId": 8,
-          },
-        },
-      ],
-      "transaction": Object {
-        "BlockId": null,
-        "Digest": 1.9060984568373646e-36,
-        "ErrorMessage": null,
-        "Extra": null,
-        "Hash": "29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed547",
-        "LastUpdateTime": 1568392676000,
-        "Ordinal": null,
-        "Status": -1,
-        "TransactionId": 3,
-        "Type": 100,
-      },
-      "txType": 100,
-      "type": "expend",
-      "utxoInputs": Array [
-        Object {
-          "AddressId": 9,
-          "IndexInOwnTx": 0,
-          "IndexInParentTx": 0,
-          "ParentTxHash": "29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546",
-          "TokenListId": 6,
-          "TransactionId": 3,
-          "UtxoTransactionInputId": 3,
-        },
-      ],
-      "utxoOutputs": Array [
-        Object {
-          "AddressId": 94,
-          "ErgoBoxId": null,
-          "ErgoCreationHeight": null,
-          "ErgoTree": null,
-          "IsUnspent": true,
-          "OutputIndex": 0,
-          "TokenListId": 7,
-          "TransactionId": 3,
-          "UtxoTransactionOutputId": 5,
-        },
-      ],
+        \\"defaults\\": {
+          \\"defaultNetworkId\\": 100,
+          \\"defaultIdentifier\\": \\"\\"
+        }
+      }
     },
-    Object {
-      "accountingInputs": Array [],
-      "accountingOutputs": Array [],
-      "amount": MultiToken {
-        "_checkNetworkId": [Function],
-        "absCopy": [Function],
-        "add": [Function],
-        "asMap": [Function],
-        "defaults": Object {
-          "defaultIdentifier": "",
-          "defaultNetworkId": 100,
+    {
+      \\"txType\\": 100,
+      \\"transaction\\": {
+        \\"Type\\": 100,
+        \\"Hash\\": \\"29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed545\\",
+        \\"Digest\\": 8.191593645542673e-27,
+        \\"BlockId\\": 2,
+        \\"Ordinal\\": 0,
+        \\"LastUpdateTime\\": 1568392656000,
+        \\"Status\\": -2,
+        \\"ErrorMessage\\": null,
+        \\"Extra\\": null,
+        \\"TransactionId\\": 1
+      },
+      \\"certificates\\": [],
+      \\"utxoInputs\\": [
+        {
+          \\"TransactionId\\": 1,
+          \\"AddressId\\": 92,
+          \\"ParentTxHash\\": \\"9c8d3c4fe576f8c99d8ad6ba5d889f5a9f2d7fe07dc17b3f425f5d17696f3d20\\",
+          \\"IndexInParentTx\\": 0,
+          \\"IndexInOwnTx\\": 0,
+          \\"TokenListId\\": 0,
+          \\"UtxoTransactionInputId\\": 1
+        }
+      ],
+      \\"utxoOutputs\\": [
+        {
+          \\"TransactionId\\": 1,
+          \\"AddressId\\": 9,
+          \\"OutputIndex\\": 0,
+          \\"TokenListId\\": 1,
+          \\"IsUnspent\\": true,
+          \\"ErgoBoxId\\": null,
+          \\"ErgoCreationHeight\\": null,
+          \\"ErgoTree\\": null,
+          \\"UtxoTransactionOutputId\\": 1
         },
-        "get": [Function],
-        "getDefault": [Function],
-        "getDefaultEntry": [Function],
-        "isEmpty": [Function],
-        "isEqualTo": [Function],
-        "joinAddCopy": [Function],
-        "joinAddMutable": [Function],
-        "joinSubtractCopy": [Function],
-        "joinSubtractMutable": [Function],
-        "negatedCopy": [Function],
-        "subtract": [Function],
-        "values": Array [
-          Object {
-            "amount": "2100000",
-            "identifier": "",
-            "networkId": 100,
+        {
+          \\"TransactionId\\": 1,
+          \\"AddressId\\": 93,
+          \\"OutputIndex\\": 1,
+          \\"TokenListId\\": 2,
+          \\"IsUnspent\\": true,
+          \\"ErgoBoxId\\": null,
+          \\"ErgoCreationHeight\\": null,
+          \\"ErgoTree\\": null,
+          \\"UtxoTransactionOutputId\\": 2
+        }
+      ],
+      \\"accountingInputs\\": [],
+      \\"accountingOutputs\\": [],
+      \\"tokens\\": [
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"4000000\\",
+            \\"ListId\\": 0,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 1
           },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"2100000\\",
+            \\"ListId\\": 1,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 2
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"1731391\\",
+            \\"ListId\\": 2,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 3
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"4000000\\",
+            \\"ListId\\": 3,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 4
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"2100000\\",
+            \\"ListId\\": 4,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 5
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"1731391\\",
+            \\"ListId\\": 5,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 6
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"2100000\\",
+            \\"ListId\\": 6,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 7
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"1900000\\",
+            \\"ListId\\": 7,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 8
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        }
+      ],
+      \\"block\\": {
+        \\"Hash\\": \\"a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba26\\",
+        \\"BlockTime\\": \\"2019-09-13T16:37:36.000Z\\",
+        \\"Height\\": 218609,
+        \\"SlotNum\\": 435651,
+        \\"Digest\\": -9.690691258114666e-56,
+        \\"BlockId\\": 2
+      },
+      \\"type\\": \\"income\\",
+      \\"amount\\": {
+        \\"values\\": [
+          {
+            \\"identifier\\": \\"\\",
+            \\"networkId\\": 100,
+            \\"amount\\": \\"2100000\\"
+          }
         ],
+        \\"defaults\\": {
+          \\"defaultNetworkId\\": 100,
+          \\"defaultIdentifier\\": \\"\\"
+        }
       },
-      "block": Object {
-        "BlockId": 2,
-        "BlockTime": 2019-09-13T16:37:36.000Z,
-        "Digest": -9.690691258114666e-56,
-        "Hash": "a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba26",
-        "Height": 218609,
-        "SlotNum": 435651,
-      },
-      "certificates": Array [],
-      "fee": MultiToken {
-        "_checkNetworkId": [Function],
-        "absCopy": [Function],
-        "add": [Function],
-        "asMap": [Function],
-        "defaults": Object {
-          "defaultIdentifier": "",
-          "defaultNetworkId": 100,
-        },
-        "get": [Function],
-        "getDefault": [Function],
-        "getDefaultEntry": [Function],
-        "isEmpty": [Function],
-        "isEqualTo": [Function],
-        "joinAddCopy": [Function],
-        "joinAddMutable": [Function],
-        "joinSubtractCopy": [Function],
-        "joinSubtractMutable": [Function],
-        "negatedCopy": [Function],
-        "subtract": [Function],
-        "values": Array [
-          Object {
-            "amount": "0",
-            "identifier": "",
-            "networkId": 100,
-          },
+      \\"fee\\": {
+        \\"values\\": [
+          {
+            \\"identifier\\": \\"\\",
+            \\"networkId\\": 100,
+            \\"amount\\": \\"0\\"
+          }
         ],
-      },
-      "tokens": Array [
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "4000000",
-            "ListId": 0,
-            "TokenId": 2,
-            "TokenListItemId": 1,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "2100000",
-            "ListId": 1,
-            "TokenId": 2,
-            "TokenListItemId": 2,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "1731391",
-            "ListId": 2,
-            "TokenId": 2,
-            "TokenListItemId": 3,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "4000000",
-            "ListId": 3,
-            "TokenId": 2,
-            "TokenListItemId": 4,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "2100000",
-            "ListId": 4,
-            "TokenId": 2,
-            "TokenListItemId": 5,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "1731391",
-            "ListId": 5,
-            "TokenId": 2,
-            "TokenListItemId": 6,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "2100000",
-            "ListId": 6,
-            "TokenId": 2,
-            "TokenListItemId": 7,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "1900000",
-            "ListId": 7,
-            "TokenId": 2,
-            "TokenListItemId": 8,
-          },
-        },
-      ],
-      "transaction": Object {
-        "BlockId": 2,
-        "Digest": 8.191593645542673e-27,
-        "ErrorMessage": null,
-        "Extra": null,
-        "Hash": "29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed545",
-        "LastUpdateTime": 1568392656000,
-        "Ordinal": 0,
-        "Status": -2,
-        "TransactionId": 1,
-        "Type": 100,
-      },
-      "txType": 100,
-      "type": "income",
-      "utxoInputs": Array [
-        Object {
-          "AddressId": 92,
-          "IndexInOwnTx": 0,
-          "IndexInParentTx": 0,
-          "ParentTxHash": "9c8d3c4fe576f8c99d8ad6ba5d889f5a9f2d7fe07dc17b3f425f5d17696f3d20",
-          "TokenListId": 0,
-          "TransactionId": 1,
-          "UtxoTransactionInputId": 1,
-        },
-      ],
-      "utxoOutputs": Array [
-        Object {
-          "AddressId": 9,
-          "ErgoBoxId": null,
-          "ErgoCreationHeight": null,
-          "ErgoTree": null,
-          "IsUnspent": true,
-          "OutputIndex": 0,
-          "TokenListId": 1,
-          "TransactionId": 1,
-          "UtxoTransactionOutputId": 1,
-        },
-        Object {
-          "AddressId": 93,
-          "ErgoBoxId": null,
-          "ErgoCreationHeight": null,
-          "ErgoTree": null,
-          "IsUnspent": true,
-          "OutputIndex": 1,
-          "TokenListId": 2,
-          "TransactionId": 1,
-          "UtxoTransactionOutputId": 2,
-        },
-      ],
+        \\"defaults\\": {
+          \\"defaultNetworkId\\": 100,
+          \\"defaultIdentifier\\": \\"\\"
+        }
+      }
     },
-    Object {
-      "accountingInputs": Array [],
-      "accountingOutputs": Array [],
-      "amount": MultiToken {
-        "_checkNetworkId": [Function],
-        "absCopy": [Function],
-        "add": [Function],
-        "asMap": [Function],
-        "defaults": Object {
-          "defaultIdentifier": "",
-          "defaultNetworkId": 100,
+    {
+      \\"txType\\": 100,
+      \\"transaction\\": {
+        \\"Type\\": 100,
+        \\"Hash\\": \\"29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546\\",
+        \\"Digest\\": 1.249559827714551e-31,
+        \\"BlockId\\": 1,
+        \\"Ordinal\\": 0,
+        \\"LastUpdateTime\\": 1568392636000,
+        \\"Status\\": -2,
+        \\"ErrorMessage\\": null,
+        \\"Extra\\": null,
+        \\"TransactionId\\": 2
+      },
+      \\"certificates\\": [],
+      \\"utxoInputs\\": [
+        {
+          \\"TransactionId\\": 2,
+          \\"AddressId\\": 92,
+          \\"ParentTxHash\\": \\"9c8d3c4fe576f8c99d8ad6ba5d889f5a9f2d7fe07dc17b3f425f5d17696f3d21\\",
+          \\"IndexInParentTx\\": 0,
+          \\"IndexInOwnTx\\": 0,
+          \\"TokenListId\\": 3,
+          \\"UtxoTransactionInputId\\": 2
+        }
+      ],
+      \\"utxoOutputs\\": [
+        {
+          \\"TransactionId\\": 2,
+          \\"AddressId\\": 9,
+          \\"OutputIndex\\": 0,
+          \\"TokenListId\\": 4,
+          \\"IsUnspent\\": true,
+          \\"ErgoBoxId\\": null,
+          \\"ErgoCreationHeight\\": null,
+          \\"ErgoTree\\": null,
+          \\"UtxoTransactionOutputId\\": 3
         },
-        "get": [Function],
-        "getDefault": [Function],
-        "getDefaultEntry": [Function],
-        "isEmpty": [Function],
-        "isEqualTo": [Function],
-        "joinAddCopy": [Function],
-        "joinAddMutable": [Function],
-        "joinSubtractCopy": [Function],
-        "joinSubtractMutable": [Function],
-        "negatedCopy": [Function],
-        "subtract": [Function],
-        "values": Array [
-          Object {
-            "amount": "2100000",
-            "identifier": "",
-            "networkId": 100,
+        {
+          \\"TransactionId\\": 2,
+          \\"AddressId\\": 93,
+          \\"OutputIndex\\": 1,
+          \\"TokenListId\\": 5,
+          \\"IsUnspent\\": true,
+          \\"ErgoBoxId\\": null,
+          \\"ErgoCreationHeight\\": null,
+          \\"ErgoTree\\": null,
+          \\"UtxoTransactionOutputId\\": 4
+        }
+      ],
+      \\"accountingInputs\\": [],
+      \\"accountingOutputs\\": [],
+      \\"tokens\\": [
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"4000000\\",
+            \\"ListId\\": 0,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 1
           },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"2100000\\",
+            \\"ListId\\": 1,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 2
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"1731391\\",
+            \\"ListId\\": 2,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 3
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"4000000\\",
+            \\"ListId\\": 3,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 4
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"2100000\\",
+            \\"ListId\\": 4,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 5
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"1731391\\",
+            \\"ListId\\": 5,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 6
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"2100000\\",
+            \\"ListId\\": 6,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 7
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"1900000\\",
+            \\"ListId\\": 7,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 8
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        }
+      ],
+      \\"block\\": {
+        \\"Hash\\": \\"a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba25\\",
+        \\"BlockTime\\": \\"2019-09-13T16:37:16.000Z\\",
+        \\"Height\\": 218608,
+        \\"SlotNum\\": 435650,
+        \\"Digest\\": -6.352946211521613e-51,
+        \\"BlockId\\": 1
+      },
+      \\"type\\": \\"income\\",
+      \\"amount\\": {
+        \\"values\\": [
+          {
+            \\"identifier\\": \\"\\",
+            \\"networkId\\": 100,
+            \\"amount\\": \\"2100000\\"
+          }
         ],
+        \\"defaults\\": {
+          \\"defaultNetworkId\\": 100,
+          \\"defaultIdentifier\\": \\"\\"
+        }
       },
-      "block": Object {
-        "BlockId": 1,
-        "BlockTime": 2019-09-13T16:37:16.000Z,
-        "Digest": -6.352946211521613e-51,
-        "Hash": "a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba25",
-        "Height": 218608,
-        "SlotNum": 435650,
-      },
-      "certificates": Array [],
-      "fee": MultiToken {
-        "_checkNetworkId": [Function],
-        "absCopy": [Function],
-        "add": [Function],
-        "asMap": [Function],
-        "defaults": Object {
-          "defaultIdentifier": "",
-          "defaultNetworkId": 100,
-        },
-        "get": [Function],
-        "getDefault": [Function],
-        "getDefaultEntry": [Function],
-        "isEmpty": [Function],
-        "isEqualTo": [Function],
-        "joinAddCopy": [Function],
-        "joinAddMutable": [Function],
-        "joinSubtractCopy": [Function],
-        "joinSubtractMutable": [Function],
-        "negatedCopy": [Function],
-        "subtract": [Function],
-        "values": Array [
-          Object {
-            "amount": "0",
-            "identifier": "",
-            "networkId": 100,
-          },
+      \\"fee\\": {
+        \\"values\\": [
+          {
+            \\"identifier\\": \\"\\",
+            \\"networkId\\": 100,
+            \\"amount\\": \\"0\\"
+          }
         ],
-      },
-      "tokens": Array [
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "4000000",
-            "ListId": 0,
-            "TokenId": 2,
-            "TokenListItemId": 1,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "2100000",
-            "ListId": 1,
-            "TokenId": 2,
-            "TokenListItemId": 2,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "1731391",
-            "ListId": 2,
-            "TokenId": 2,
-            "TokenListItemId": 3,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "4000000",
-            "ListId": 3,
-            "TokenId": 2,
-            "TokenListItemId": 4,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "2100000",
-            "ListId": 4,
-            "TokenId": 2,
-            "TokenListItemId": 5,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "1731391",
-            "ListId": 5,
-            "TokenId": 2,
-            "TokenListItemId": 6,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "2100000",
-            "ListId": 6,
-            "TokenId": 2,
-            "TokenListItemId": 7,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "1900000",
-            "ListId": 7,
-            "TokenId": 2,
-            "TokenListItemId": 8,
-          },
-        },
-      ],
-      "transaction": Object {
-        "BlockId": 1,
-        "Digest": 1.249559827714551e-31,
-        "ErrorMessage": null,
-        "Extra": null,
-        "Hash": "29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546",
-        "LastUpdateTime": 1568392636000,
-        "Ordinal": 0,
-        "Status": -2,
-        "TransactionId": 2,
-        "Type": 100,
-      },
-      "txType": 100,
-      "type": "income",
-      "utxoInputs": Array [
-        Object {
-          "AddressId": 92,
-          "IndexInOwnTx": 0,
-          "IndexInParentTx": 0,
-          "ParentTxHash": "9c8d3c4fe576f8c99d8ad6ba5d889f5a9f2d7fe07dc17b3f425f5d17696f3d21",
-          "TokenListId": 3,
-          "TransactionId": 2,
-          "UtxoTransactionInputId": 2,
-        },
-      ],
-      "utxoOutputs": Array [
-        Object {
-          "AddressId": 9,
-          "ErgoBoxId": null,
-          "ErgoCreationHeight": null,
-          "ErgoTree": null,
-          "IsUnspent": true,
-          "OutputIndex": 0,
-          "TokenListId": 4,
-          "TransactionId": 2,
-          "UtxoTransactionOutputId": 3,
-        },
-        Object {
-          "AddressId": 93,
-          "ErgoBoxId": null,
-          "ErgoCreationHeight": null,
-          "ErgoTree": null,
-          "IsUnspent": true,
-          "OutputIndex": 1,
-          "TokenListId": 5,
-          "TransactionId": 2,
-          "UtxoTransactionOutputId": 4,
-        },
-      ],
-    },
-  ],
-}
+        \\"defaults\\": {
+          \\"defaultNetworkId\\": 100,
+          \\"defaultIdentifier\\": \\"\\"
+        }
+      }
+    }
+  ]
+}"
 `;
 
 exports[`Syncing with failed cip1852 2`] = `
@@ -2761,670 +2571,575 @@ Array [
 `;
 
 exports[`Syncing with pending bip44 1`] = `
-Object {
-  "addressLookupMap": Map {
-    5 => "Ae2tdPwUPEZ6tzHKyuMLL6bh1au5DETgb53PTmJAN9aaCLtaUTWHvrS2mxo",
-    46 => "Ae2tdPwUPEZ5PxKxoyZDgjsKgMWMpTRa4PH3sVgARSGBsWwNBH3qg7cMFsP",
-    47 => "Ae2tdPwUPEZE9RAm3d3zuuh22YjqDxhR1JF6G93uJsRrk51QGHzRUzLvDjL",
-    48 => "Ae2tdPwUPEZE9RAm3d3zuuh22YjqDxhR1JF6G93uJsRrk51QGHzRUzLvDjL",
-  },
-  "txs": Array [
-    Object {
-      "accountingInputs": Array [],
-      "accountingOutputs": Array [],
-      "amount": MultiToken {
-        "_checkNetworkId": [Function],
-        "absCopy": [Function],
-        "add": [Function],
-        "asMap": [Function],
-        "defaults": Object {
-          "defaultIdentifier": "",
-          "defaultNetworkId": 100,
-        },
-        "get": [Function],
-        "getDefault": [Function],
-        "getDefaultEntry": [Function],
-        "isEmpty": [Function],
-        "isEqualTo": [Function],
-        "joinAddCopy": [Function],
-        "joinAddMutable": [Function],
-        "joinSubtractCopy": [Function],
-        "joinSubtractMutable": [Function],
-        "negatedCopy": [Function],
-        "subtract": [Function],
-        "values": Array [
-          Object {
-            "amount": "-1900000",
-            "identifier": "",
-            "networkId": 100,
+"{
+  \\"addressLookupMap\\": {},
+  \\"txs\\": [
+    {
+      \\"txType\\": 100,
+      \\"transaction\\": {
+        \\"Type\\": 100,
+        \\"Hash\\": \\"29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed547\\",
+        \\"Digest\\": 1.9060984568373646e-36,
+        \\"BlockId\\": null,
+        \\"Ordinal\\": null,
+        \\"LastUpdateTime\\": 1568392676000,
+        \\"Status\\": -2,
+        \\"ErrorMessage\\": null,
+        \\"Extra\\": null,
+        \\"TransactionId\\": 3
+      },
+      \\"certificates\\": [],
+      \\"utxoInputs\\": [
+        {
+          \\"TransactionId\\": 3,
+          \\"AddressId\\": 5,
+          \\"ParentTxHash\\": \\"29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546\\",
+          \\"IndexInParentTx\\": 0,
+          \\"IndexInOwnTx\\": 0,
+          \\"TokenListId\\": 6,
+          \\"UtxoTransactionInputId\\": 3
+        }
+      ],
+      \\"utxoOutputs\\": [
+        {
+          \\"TransactionId\\": 3,
+          \\"AddressId\\": 48,
+          \\"OutputIndex\\": 0,
+          \\"TokenListId\\": 7,
+          \\"IsUnspent\\": true,
+          \\"ErgoBoxId\\": null,
+          \\"ErgoCreationHeight\\": null,
+          \\"ErgoTree\\": null,
+          \\"UtxoTransactionOutputId\\": 5
+        }
+      ],
+      \\"accountingInputs\\": [],
+      \\"accountingOutputs\\": [],
+      \\"tokens\\": [
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"4000000\\",
+            \\"ListId\\": 0,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 1
           },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"2100000\\",
+            \\"ListId\\": 1,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 2
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"1731391\\",
+            \\"ListId\\": 2,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 3
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"4000000\\",
+            \\"ListId\\": 3,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 4
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"2100000\\",
+            \\"ListId\\": 4,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 5
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"1731391\\",
+            \\"ListId\\": 5,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 6
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"2100000\\",
+            \\"ListId\\": 6,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 7
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"1900000\\",
+            \\"ListId\\": 7,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 8
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        }
+      ],
+      \\"block\\": null,
+      \\"type\\": \\"expend\\",
+      \\"amount\\": {
+        \\"values\\": [
+          {
+            \\"identifier\\": \\"\\",
+            \\"networkId\\": 100,
+            \\"amount\\": \\"-1900000\\"
+          }
         ],
+        \\"defaults\\": {
+          \\"defaultNetworkId\\": 100,
+          \\"defaultIdentifier\\": \\"\\"
+        }
       },
-      "block": null,
-      "certificates": Array [],
-      "fee": MultiToken {
-        "_checkNetworkId": [Function],
-        "absCopy": [Function],
-        "add": [Function],
-        "asMap": [Function],
-        "defaults": Object {
-          "defaultIdentifier": "",
-          "defaultNetworkId": 100,
-        },
-        "get": [Function],
-        "getDefault": [Function],
-        "getDefaultEntry": [Function],
-        "isEmpty": [Function],
-        "isEqualTo": [Function],
-        "joinAddCopy": [Function],
-        "joinAddMutable": [Function],
-        "joinSubtractCopy": [Function],
-        "joinSubtractMutable": [Function],
-        "negatedCopy": [Function],
-        "subtract": [Function],
-        "values": Array [
-          Object {
-            "amount": "-200000",
-            "identifier": "",
-            "networkId": 100,
-          },
+      \\"fee\\": {
+        \\"values\\": [
+          {
+            \\"identifier\\": \\"\\",
+            \\"networkId\\": 100,
+            \\"amount\\": \\"-200000\\"
+          }
         ],
-      },
-      "tokens": Array [
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "4000000",
-            "ListId": 0,
-            "TokenId": 2,
-            "TokenListItemId": 1,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "2100000",
-            "ListId": 1,
-            "TokenId": 2,
-            "TokenListItemId": 2,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "1731391",
-            "ListId": 2,
-            "TokenId": 2,
-            "TokenListItemId": 3,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "4000000",
-            "ListId": 3,
-            "TokenId": 2,
-            "TokenListItemId": 4,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "2100000",
-            "ListId": 4,
-            "TokenId": 2,
-            "TokenListItemId": 5,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "1731391",
-            "ListId": 5,
-            "TokenId": 2,
-            "TokenListItemId": 6,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "2100000",
-            "ListId": 6,
-            "TokenId": 2,
-            "TokenListItemId": 7,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "1900000",
-            "ListId": 7,
-            "TokenId": 2,
-            "TokenListItemId": 8,
-          },
-        },
-      ],
-      "transaction": Object {
-        "BlockId": null,
-        "Digest": 1.9060984568373646e-36,
-        "ErrorMessage": null,
-        "Extra": null,
-        "Hash": "29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed547",
-        "LastUpdateTime": 1568392676000,
-        "Ordinal": null,
-        "Status": -2,
-        "TransactionId": 3,
-        "Type": 100,
-      },
-      "txType": 100,
-      "type": "expend",
-      "utxoInputs": Array [
-        Object {
-          "AddressId": 5,
-          "IndexInOwnTx": 0,
-          "IndexInParentTx": 0,
-          "ParentTxHash": "29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546",
-          "TokenListId": 6,
-          "TransactionId": 3,
-          "UtxoTransactionInputId": 3,
-        },
-      ],
-      "utxoOutputs": Array [
-        Object {
-          "AddressId": 48,
-          "ErgoBoxId": null,
-          "ErgoCreationHeight": null,
-          "ErgoTree": null,
-          "IsUnspent": true,
-          "OutputIndex": 0,
-          "TokenListId": 7,
-          "TransactionId": 3,
-          "UtxoTransactionOutputId": 5,
-        },
-      ],
+        \\"defaults\\": {
+          \\"defaultNetworkId\\": 100,
+          \\"defaultIdentifier\\": \\"\\"
+        }
+      }
     },
-    Object {
-      "accountingInputs": Array [],
-      "accountingOutputs": Array [],
-      "amount": MultiToken {
-        "_checkNetworkId": [Function],
-        "absCopy": [Function],
-        "add": [Function],
-        "asMap": [Function],
-        "defaults": Object {
-          "defaultIdentifier": "",
-          "defaultNetworkId": 100,
+    {
+      \\"txType\\": 100,
+      \\"transaction\\": {
+        \\"Type\\": 100,
+        \\"Hash\\": \\"29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed545\\",
+        \\"Digest\\": 8.191593645542673e-27,
+        \\"BlockId\\": 2,
+        \\"Ordinal\\": 0,
+        \\"LastUpdateTime\\": 1568392656000,
+        \\"Status\\": -2,
+        \\"ErrorMessage\\": null,
+        \\"Extra\\": null,
+        \\"TransactionId\\": 1
+      },
+      \\"certificates\\": [],
+      \\"utxoInputs\\": [
+        {
+          \\"TransactionId\\": 1,
+          \\"AddressId\\": 46,
+          \\"ParentTxHash\\": \\"9c8d3c4fe576f8c99d8ad6ba5d889f5a9f2d7fe07dc17b3f425f5d17696f3d20\\",
+          \\"IndexInParentTx\\": 0,
+          \\"IndexInOwnTx\\": 0,
+          \\"TokenListId\\": 0,
+          \\"UtxoTransactionInputId\\": 1
+        }
+      ],
+      \\"utxoOutputs\\": [
+        {
+          \\"TransactionId\\": 1,
+          \\"AddressId\\": 5,
+          \\"OutputIndex\\": 0,
+          \\"TokenListId\\": 1,
+          \\"IsUnspent\\": true,
+          \\"ErgoBoxId\\": null,
+          \\"ErgoCreationHeight\\": null,
+          \\"ErgoTree\\": null,
+          \\"UtxoTransactionOutputId\\": 1
         },
-        "get": [Function],
-        "getDefault": [Function],
-        "getDefaultEntry": [Function],
-        "isEmpty": [Function],
-        "isEqualTo": [Function],
-        "joinAddCopy": [Function],
-        "joinAddMutable": [Function],
-        "joinSubtractCopy": [Function],
-        "joinSubtractMutable": [Function],
-        "negatedCopy": [Function],
-        "subtract": [Function],
-        "values": Array [
-          Object {
-            "amount": "2100000",
-            "identifier": "",
-            "networkId": 100,
+        {
+          \\"TransactionId\\": 1,
+          \\"AddressId\\": 47,
+          \\"OutputIndex\\": 1,
+          \\"TokenListId\\": 2,
+          \\"IsUnspent\\": true,
+          \\"ErgoBoxId\\": null,
+          \\"ErgoCreationHeight\\": null,
+          \\"ErgoTree\\": null,
+          \\"UtxoTransactionOutputId\\": 2
+        }
+      ],
+      \\"accountingInputs\\": [],
+      \\"accountingOutputs\\": [],
+      \\"tokens\\": [
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"4000000\\",
+            \\"ListId\\": 0,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 1
           },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"2100000\\",
+            \\"ListId\\": 1,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 2
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"1731391\\",
+            \\"ListId\\": 2,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 3
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"4000000\\",
+            \\"ListId\\": 3,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 4
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"2100000\\",
+            \\"ListId\\": 4,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 5
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"1731391\\",
+            \\"ListId\\": 5,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 6
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"2100000\\",
+            \\"ListId\\": 6,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 7
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"1900000\\",
+            \\"ListId\\": 7,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 8
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        }
+      ],
+      \\"block\\": {
+        \\"Hash\\": \\"a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba26\\",
+        \\"BlockTime\\": \\"2019-09-13T16:37:36.000Z\\",
+        \\"Height\\": 218609,
+        \\"SlotNum\\": 435651,
+        \\"Digest\\": -9.690691258114666e-56,
+        \\"BlockId\\": 2
+      },
+      \\"type\\": \\"income\\",
+      \\"amount\\": {
+        \\"values\\": [
+          {
+            \\"identifier\\": \\"\\",
+            \\"networkId\\": 100,
+            \\"amount\\": \\"2100000\\"
+          }
         ],
+        \\"defaults\\": {
+          \\"defaultNetworkId\\": 100,
+          \\"defaultIdentifier\\": \\"\\"
+        }
       },
-      "block": Object {
-        "BlockId": 2,
-        "BlockTime": 2019-09-13T16:37:36.000Z,
-        "Digest": -9.690691258114666e-56,
-        "Hash": "a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba26",
-        "Height": 218609,
-        "SlotNum": 435651,
-      },
-      "certificates": Array [],
-      "fee": MultiToken {
-        "_checkNetworkId": [Function],
-        "absCopy": [Function],
-        "add": [Function],
-        "asMap": [Function],
-        "defaults": Object {
-          "defaultIdentifier": "",
-          "defaultNetworkId": 100,
-        },
-        "get": [Function],
-        "getDefault": [Function],
-        "getDefaultEntry": [Function],
-        "isEmpty": [Function],
-        "isEqualTo": [Function],
-        "joinAddCopy": [Function],
-        "joinAddMutable": [Function],
-        "joinSubtractCopy": [Function],
-        "joinSubtractMutable": [Function],
-        "negatedCopy": [Function],
-        "subtract": [Function],
-        "values": Array [
-          Object {
-            "amount": "0",
-            "identifier": "",
-            "networkId": 100,
-          },
+      \\"fee\\": {
+        \\"values\\": [
+          {
+            \\"identifier\\": \\"\\",
+            \\"networkId\\": 100,
+            \\"amount\\": \\"0\\"
+          }
         ],
-      },
-      "tokens": Array [
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "4000000",
-            "ListId": 0,
-            "TokenId": 2,
-            "TokenListItemId": 1,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "2100000",
-            "ListId": 1,
-            "TokenId": 2,
-            "TokenListItemId": 2,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "1731391",
-            "ListId": 2,
-            "TokenId": 2,
-            "TokenListItemId": 3,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "4000000",
-            "ListId": 3,
-            "TokenId": 2,
-            "TokenListItemId": 4,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "2100000",
-            "ListId": 4,
-            "TokenId": 2,
-            "TokenListItemId": 5,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "1731391",
-            "ListId": 5,
-            "TokenId": 2,
-            "TokenListItemId": 6,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "2100000",
-            "ListId": 6,
-            "TokenId": 2,
-            "TokenListItemId": 7,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "1900000",
-            "ListId": 7,
-            "TokenId": 2,
-            "TokenListItemId": 8,
-          },
-        },
-      ],
-      "transaction": Object {
-        "BlockId": 2,
-        "Digest": 8.191593645542673e-27,
-        "ErrorMessage": null,
-        "Extra": null,
-        "Hash": "29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed545",
-        "LastUpdateTime": 1568392656000,
-        "Ordinal": 0,
-        "Status": -2,
-        "TransactionId": 1,
-        "Type": 100,
-      },
-      "txType": 100,
-      "type": "income",
-      "utxoInputs": Array [
-        Object {
-          "AddressId": 46,
-          "IndexInOwnTx": 0,
-          "IndexInParentTx": 0,
-          "ParentTxHash": "9c8d3c4fe576f8c99d8ad6ba5d889f5a9f2d7fe07dc17b3f425f5d17696f3d20",
-          "TokenListId": 0,
-          "TransactionId": 1,
-          "UtxoTransactionInputId": 1,
-        },
-      ],
-      "utxoOutputs": Array [
-        Object {
-          "AddressId": 5,
-          "ErgoBoxId": null,
-          "ErgoCreationHeight": null,
-          "ErgoTree": null,
-          "IsUnspent": true,
-          "OutputIndex": 0,
-          "TokenListId": 1,
-          "TransactionId": 1,
-          "UtxoTransactionOutputId": 1,
-        },
-        Object {
-          "AddressId": 47,
-          "ErgoBoxId": null,
-          "ErgoCreationHeight": null,
-          "ErgoTree": null,
-          "IsUnspent": true,
-          "OutputIndex": 1,
-          "TokenListId": 2,
-          "TransactionId": 1,
-          "UtxoTransactionOutputId": 2,
-        },
-      ],
+        \\"defaults\\": {
+          \\"defaultNetworkId\\": 100,
+          \\"defaultIdentifier\\": \\"\\"
+        }
+      }
     },
-    Object {
-      "accountingInputs": Array [],
-      "accountingOutputs": Array [],
-      "amount": MultiToken {
-        "_checkNetworkId": [Function],
-        "absCopy": [Function],
-        "add": [Function],
-        "asMap": [Function],
-        "defaults": Object {
-          "defaultIdentifier": "",
-          "defaultNetworkId": 100,
+    {
+      \\"txType\\": 100,
+      \\"transaction\\": {
+        \\"Type\\": 100,
+        \\"Hash\\": \\"29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546\\",
+        \\"Digest\\": 1.249559827714551e-31,
+        \\"BlockId\\": 1,
+        \\"Ordinal\\": 0,
+        \\"LastUpdateTime\\": 1568392636000,
+        \\"Status\\": -2,
+        \\"ErrorMessage\\": null,
+        \\"Extra\\": null,
+        \\"TransactionId\\": 2
+      },
+      \\"certificates\\": [],
+      \\"utxoInputs\\": [
+        {
+          \\"TransactionId\\": 2,
+          \\"AddressId\\": 46,
+          \\"ParentTxHash\\": \\"9c8d3c4fe576f8c99d8ad6ba5d889f5a9f2d7fe07dc17b3f425f5d17696f3d21\\",
+          \\"IndexInParentTx\\": 0,
+          \\"IndexInOwnTx\\": 0,
+          \\"TokenListId\\": 3,
+          \\"UtxoTransactionInputId\\": 2
+        }
+      ],
+      \\"utxoOutputs\\": [
+        {
+          \\"TransactionId\\": 2,
+          \\"AddressId\\": 5,
+          \\"OutputIndex\\": 0,
+          \\"TokenListId\\": 4,
+          \\"IsUnspent\\": true,
+          \\"ErgoBoxId\\": null,
+          \\"ErgoCreationHeight\\": null,
+          \\"ErgoTree\\": null,
+          \\"UtxoTransactionOutputId\\": 3
         },
-        "get": [Function],
-        "getDefault": [Function],
-        "getDefaultEntry": [Function],
-        "isEmpty": [Function],
-        "isEqualTo": [Function],
-        "joinAddCopy": [Function],
-        "joinAddMutable": [Function],
-        "joinSubtractCopy": [Function],
-        "joinSubtractMutable": [Function],
-        "negatedCopy": [Function],
-        "subtract": [Function],
-        "values": Array [
-          Object {
-            "amount": "2100000",
-            "identifier": "",
-            "networkId": 100,
+        {
+          \\"TransactionId\\": 2,
+          \\"AddressId\\": 47,
+          \\"OutputIndex\\": 1,
+          \\"TokenListId\\": 5,
+          \\"IsUnspent\\": true,
+          \\"ErgoBoxId\\": null,
+          \\"ErgoCreationHeight\\": null,
+          \\"ErgoTree\\": null,
+          \\"UtxoTransactionOutputId\\": 4
+        }
+      ],
+      \\"accountingInputs\\": [],
+      \\"accountingOutputs\\": [],
+      \\"tokens\\": [
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"4000000\\",
+            \\"ListId\\": 0,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 1
           },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"2100000\\",
+            \\"ListId\\": 1,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 2
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"1731391\\",
+            \\"ListId\\": 2,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 3
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"4000000\\",
+            \\"ListId\\": 3,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 4
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"2100000\\",
+            \\"ListId\\": 4,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 5
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"1731391\\",
+            \\"ListId\\": 5,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 6
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"2100000\\",
+            \\"ListId\\": 6,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 7
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"1900000\\",
+            \\"ListId\\": 7,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 8
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        }
+      ],
+      \\"block\\": {
+        \\"Hash\\": \\"a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba25\\",
+        \\"BlockTime\\": \\"2019-09-13T16:37:16.000Z\\",
+        \\"Height\\": 218608,
+        \\"SlotNum\\": 435650,
+        \\"Digest\\": -6.352946211521613e-51,
+        \\"BlockId\\": 1
+      },
+      \\"type\\": \\"income\\",
+      \\"amount\\": {
+        \\"values\\": [
+          {
+            \\"identifier\\": \\"\\",
+            \\"networkId\\": 100,
+            \\"amount\\": \\"2100000\\"
+          }
         ],
+        \\"defaults\\": {
+          \\"defaultNetworkId\\": 100,
+          \\"defaultIdentifier\\": \\"\\"
+        }
       },
-      "block": Object {
-        "BlockId": 1,
-        "BlockTime": 2019-09-13T16:37:16.000Z,
-        "Digest": -6.352946211521613e-51,
-        "Hash": "a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba25",
-        "Height": 218608,
-        "SlotNum": 435650,
-      },
-      "certificates": Array [],
-      "fee": MultiToken {
-        "_checkNetworkId": [Function],
-        "absCopy": [Function],
-        "add": [Function],
-        "asMap": [Function],
-        "defaults": Object {
-          "defaultIdentifier": "",
-          "defaultNetworkId": 100,
-        },
-        "get": [Function],
-        "getDefault": [Function],
-        "getDefaultEntry": [Function],
-        "isEmpty": [Function],
-        "isEqualTo": [Function],
-        "joinAddCopy": [Function],
-        "joinAddMutable": [Function],
-        "joinSubtractCopy": [Function],
-        "joinSubtractMutable": [Function],
-        "negatedCopy": [Function],
-        "subtract": [Function],
-        "values": Array [
-          Object {
-            "amount": "0",
-            "identifier": "",
-            "networkId": 100,
-          },
+      \\"fee\\": {
+        \\"values\\": [
+          {
+            \\"identifier\\": \\"\\",
+            \\"networkId\\": 100,
+            \\"amount\\": \\"0\\"
+          }
         ],
-      },
-      "tokens": Array [
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "4000000",
-            "ListId": 0,
-            "TokenId": 2,
-            "TokenListItemId": 1,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "2100000",
-            "ListId": 1,
-            "TokenId": 2,
-            "TokenListItemId": 2,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "1731391",
-            "ListId": 2,
-            "TokenId": 2,
-            "TokenListItemId": 3,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "4000000",
-            "ListId": 3,
-            "TokenId": 2,
-            "TokenListItemId": 4,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "2100000",
-            "ListId": 4,
-            "TokenId": 2,
-            "TokenListItemId": 5,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "1731391",
-            "ListId": 5,
-            "TokenId": 2,
-            "TokenListItemId": 6,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "2100000",
-            "ListId": 6,
-            "TokenId": 2,
-            "TokenListItemId": 7,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "1900000",
-            "ListId": 7,
-            "TokenId": 2,
-            "TokenListItemId": 8,
-          },
-        },
-      ],
-      "transaction": Object {
-        "BlockId": 1,
-        "Digest": 1.249559827714551e-31,
-        "ErrorMessage": null,
-        "Extra": null,
-        "Hash": "29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546",
-        "LastUpdateTime": 1568392636000,
-        "Ordinal": 0,
-        "Status": -2,
-        "TransactionId": 2,
-        "Type": 100,
-      },
-      "txType": 100,
-      "type": "income",
-      "utxoInputs": Array [
-        Object {
-          "AddressId": 46,
-          "IndexInOwnTx": 0,
-          "IndexInParentTx": 0,
-          "ParentTxHash": "9c8d3c4fe576f8c99d8ad6ba5d889f5a9f2d7fe07dc17b3f425f5d17696f3d21",
-          "TokenListId": 3,
-          "TransactionId": 2,
-          "UtxoTransactionInputId": 2,
-        },
-      ],
-      "utxoOutputs": Array [
-        Object {
-          "AddressId": 5,
-          "ErgoBoxId": null,
-          "ErgoCreationHeight": null,
-          "ErgoTree": null,
-          "IsUnspent": true,
-          "OutputIndex": 0,
-          "TokenListId": 4,
-          "TransactionId": 2,
-          "UtxoTransactionOutputId": 3,
-        },
-        Object {
-          "AddressId": 47,
-          "ErgoBoxId": null,
-          "ErgoCreationHeight": null,
-          "ErgoTree": null,
-          "IsUnspent": true,
-          "OutputIndex": 1,
-          "TokenListId": 5,
-          "TransactionId": 2,
-          "UtxoTransactionOutputId": 4,
-        },
-      ],
-    },
-  ],
-}
+        \\"defaults\\": {
+          \\"defaultNetworkId\\": 100,
+          \\"defaultIdentifier\\": \\"\\"
+        }
+      }
+    }
+  ]
+}"
 `;
 
 exports[`Syncing with pending bip44 2`] = `
@@ -4003,670 +3718,575 @@ Array [
 `;
 
 exports[`Syncing with pending cip1852 1`] = `
-Object {
-  "addressLookupMap": Map {
-    9 => "0365267961fefd53aefe4cf741dc0df9902d360bca0de4c0abe88ca89d0d08dd3d",
-    92 => "030efc40f8fb587734cbcdeeb62a99da3f123677ea1754338665f9a294fbc904fe",
-    93 => "03b4c4b9e8e0ee0c71b67952f54a235495a450fd8e45e6be2ee2263f0b34009f85",
-    94 => "03b4c4b9e8e0ee0c71b67952f54a235495a450fd8e45e6be2ee2263f0b34009f85",
-  },
-  "txs": Array [
-    Object {
-      "accountingInputs": Array [],
-      "accountingOutputs": Array [],
-      "amount": MultiToken {
-        "_checkNetworkId": [Function],
-        "absCopy": [Function],
-        "add": [Function],
-        "asMap": [Function],
-        "defaults": Object {
-          "defaultIdentifier": "",
-          "defaultNetworkId": 100,
-        },
-        "get": [Function],
-        "getDefault": [Function],
-        "getDefaultEntry": [Function],
-        "isEmpty": [Function],
-        "isEqualTo": [Function],
-        "joinAddCopy": [Function],
-        "joinAddMutable": [Function],
-        "joinSubtractCopy": [Function],
-        "joinSubtractMutable": [Function],
-        "negatedCopy": [Function],
-        "subtract": [Function],
-        "values": Array [
-          Object {
-            "amount": "-1900000",
-            "identifier": "",
-            "networkId": 100,
+"{
+  \\"addressLookupMap\\": {},
+  \\"txs\\": [
+    {
+      \\"txType\\": 100,
+      \\"transaction\\": {
+        \\"Type\\": 100,
+        \\"Hash\\": \\"29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed547\\",
+        \\"Digest\\": 1.9060984568373646e-36,
+        \\"BlockId\\": null,
+        \\"Ordinal\\": null,
+        \\"LastUpdateTime\\": 1568392676000,
+        \\"Status\\": -2,
+        \\"ErrorMessage\\": null,
+        \\"Extra\\": null,
+        \\"TransactionId\\": 3
+      },
+      \\"certificates\\": [],
+      \\"utxoInputs\\": [
+        {
+          \\"TransactionId\\": 3,
+          \\"AddressId\\": 9,
+          \\"ParentTxHash\\": \\"29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546\\",
+          \\"IndexInParentTx\\": 0,
+          \\"IndexInOwnTx\\": 0,
+          \\"TokenListId\\": 6,
+          \\"UtxoTransactionInputId\\": 3
+        }
+      ],
+      \\"utxoOutputs\\": [
+        {
+          \\"TransactionId\\": 3,
+          \\"AddressId\\": 94,
+          \\"OutputIndex\\": 0,
+          \\"TokenListId\\": 7,
+          \\"IsUnspent\\": true,
+          \\"ErgoBoxId\\": null,
+          \\"ErgoCreationHeight\\": null,
+          \\"ErgoTree\\": null,
+          \\"UtxoTransactionOutputId\\": 5
+        }
+      ],
+      \\"accountingInputs\\": [],
+      \\"accountingOutputs\\": [],
+      \\"tokens\\": [
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"4000000\\",
+            \\"ListId\\": 0,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 1
           },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"2100000\\",
+            \\"ListId\\": 1,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 2
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"1731391\\",
+            \\"ListId\\": 2,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 3
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"4000000\\",
+            \\"ListId\\": 3,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 4
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"2100000\\",
+            \\"ListId\\": 4,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 5
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"1731391\\",
+            \\"ListId\\": 5,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 6
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"2100000\\",
+            \\"ListId\\": 6,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 7
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"1900000\\",
+            \\"ListId\\": 7,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 8
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        }
+      ],
+      \\"block\\": null,
+      \\"type\\": \\"expend\\",
+      \\"amount\\": {
+        \\"values\\": [
+          {
+            \\"identifier\\": \\"\\",
+            \\"networkId\\": 100,
+            \\"amount\\": \\"-1900000\\"
+          }
         ],
+        \\"defaults\\": {
+          \\"defaultNetworkId\\": 100,
+          \\"defaultIdentifier\\": \\"\\"
+        }
       },
-      "block": null,
-      "certificates": Array [],
-      "fee": MultiToken {
-        "_checkNetworkId": [Function],
-        "absCopy": [Function],
-        "add": [Function],
-        "asMap": [Function],
-        "defaults": Object {
-          "defaultIdentifier": "",
-          "defaultNetworkId": 100,
-        },
-        "get": [Function],
-        "getDefault": [Function],
-        "getDefaultEntry": [Function],
-        "isEmpty": [Function],
-        "isEqualTo": [Function],
-        "joinAddCopy": [Function],
-        "joinAddMutable": [Function],
-        "joinSubtractCopy": [Function],
-        "joinSubtractMutable": [Function],
-        "negatedCopy": [Function],
-        "subtract": [Function],
-        "values": Array [
-          Object {
-            "amount": "-200000",
-            "identifier": "",
-            "networkId": 100,
-          },
+      \\"fee\\": {
+        \\"values\\": [
+          {
+            \\"identifier\\": \\"\\",
+            \\"networkId\\": 100,
+            \\"amount\\": \\"-200000\\"
+          }
         ],
-      },
-      "tokens": Array [
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "4000000",
-            "ListId": 0,
-            "TokenId": 2,
-            "TokenListItemId": 1,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "2100000",
-            "ListId": 1,
-            "TokenId": 2,
-            "TokenListItemId": 2,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "1731391",
-            "ListId": 2,
-            "TokenId": 2,
-            "TokenListItemId": 3,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "4000000",
-            "ListId": 3,
-            "TokenId": 2,
-            "TokenListItemId": 4,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "2100000",
-            "ListId": 4,
-            "TokenId": 2,
-            "TokenListItemId": 5,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "1731391",
-            "ListId": 5,
-            "TokenId": 2,
-            "TokenListItemId": 6,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "2100000",
-            "ListId": 6,
-            "TokenId": 2,
-            "TokenListItemId": 7,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "1900000",
-            "ListId": 7,
-            "TokenId": 2,
-            "TokenListItemId": 8,
-          },
-        },
-      ],
-      "transaction": Object {
-        "BlockId": null,
-        "Digest": 1.9060984568373646e-36,
-        "ErrorMessage": null,
-        "Extra": null,
-        "Hash": "29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed547",
-        "LastUpdateTime": 1568392676000,
-        "Ordinal": null,
-        "Status": -2,
-        "TransactionId": 3,
-        "Type": 100,
-      },
-      "txType": 100,
-      "type": "expend",
-      "utxoInputs": Array [
-        Object {
-          "AddressId": 9,
-          "IndexInOwnTx": 0,
-          "IndexInParentTx": 0,
-          "ParentTxHash": "29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546",
-          "TokenListId": 6,
-          "TransactionId": 3,
-          "UtxoTransactionInputId": 3,
-        },
-      ],
-      "utxoOutputs": Array [
-        Object {
-          "AddressId": 94,
-          "ErgoBoxId": null,
-          "ErgoCreationHeight": null,
-          "ErgoTree": null,
-          "IsUnspent": true,
-          "OutputIndex": 0,
-          "TokenListId": 7,
-          "TransactionId": 3,
-          "UtxoTransactionOutputId": 5,
-        },
-      ],
+        \\"defaults\\": {
+          \\"defaultNetworkId\\": 100,
+          \\"defaultIdentifier\\": \\"\\"
+        }
+      }
     },
-    Object {
-      "accountingInputs": Array [],
-      "accountingOutputs": Array [],
-      "amount": MultiToken {
-        "_checkNetworkId": [Function],
-        "absCopy": [Function],
-        "add": [Function],
-        "asMap": [Function],
-        "defaults": Object {
-          "defaultIdentifier": "",
-          "defaultNetworkId": 100,
+    {
+      \\"txType\\": 100,
+      \\"transaction\\": {
+        \\"Type\\": 100,
+        \\"Hash\\": \\"29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed545\\",
+        \\"Digest\\": 8.191593645542673e-27,
+        \\"BlockId\\": 2,
+        \\"Ordinal\\": 0,
+        \\"LastUpdateTime\\": 1568392656000,
+        \\"Status\\": -2,
+        \\"ErrorMessage\\": null,
+        \\"Extra\\": null,
+        \\"TransactionId\\": 1
+      },
+      \\"certificates\\": [],
+      \\"utxoInputs\\": [
+        {
+          \\"TransactionId\\": 1,
+          \\"AddressId\\": 92,
+          \\"ParentTxHash\\": \\"9c8d3c4fe576f8c99d8ad6ba5d889f5a9f2d7fe07dc17b3f425f5d17696f3d20\\",
+          \\"IndexInParentTx\\": 0,
+          \\"IndexInOwnTx\\": 0,
+          \\"TokenListId\\": 0,
+          \\"UtxoTransactionInputId\\": 1
+        }
+      ],
+      \\"utxoOutputs\\": [
+        {
+          \\"TransactionId\\": 1,
+          \\"AddressId\\": 9,
+          \\"OutputIndex\\": 0,
+          \\"TokenListId\\": 1,
+          \\"IsUnspent\\": true,
+          \\"ErgoBoxId\\": null,
+          \\"ErgoCreationHeight\\": null,
+          \\"ErgoTree\\": null,
+          \\"UtxoTransactionOutputId\\": 1
         },
-        "get": [Function],
-        "getDefault": [Function],
-        "getDefaultEntry": [Function],
-        "isEmpty": [Function],
-        "isEqualTo": [Function],
-        "joinAddCopy": [Function],
-        "joinAddMutable": [Function],
-        "joinSubtractCopy": [Function],
-        "joinSubtractMutable": [Function],
-        "negatedCopy": [Function],
-        "subtract": [Function],
-        "values": Array [
-          Object {
-            "amount": "2100000",
-            "identifier": "",
-            "networkId": 100,
+        {
+          \\"TransactionId\\": 1,
+          \\"AddressId\\": 93,
+          \\"OutputIndex\\": 1,
+          \\"TokenListId\\": 2,
+          \\"IsUnspent\\": true,
+          \\"ErgoBoxId\\": null,
+          \\"ErgoCreationHeight\\": null,
+          \\"ErgoTree\\": null,
+          \\"UtxoTransactionOutputId\\": 2
+        }
+      ],
+      \\"accountingInputs\\": [],
+      \\"accountingOutputs\\": [],
+      \\"tokens\\": [
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"4000000\\",
+            \\"ListId\\": 0,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 1
           },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"2100000\\",
+            \\"ListId\\": 1,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 2
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"1731391\\",
+            \\"ListId\\": 2,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 3
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"4000000\\",
+            \\"ListId\\": 3,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 4
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"2100000\\",
+            \\"ListId\\": 4,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 5
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"1731391\\",
+            \\"ListId\\": 5,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 6
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"2100000\\",
+            \\"ListId\\": 6,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 7
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"1900000\\",
+            \\"ListId\\": 7,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 8
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        }
+      ],
+      \\"block\\": {
+        \\"Hash\\": \\"a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba26\\",
+        \\"BlockTime\\": \\"2019-09-13T16:37:36.000Z\\",
+        \\"Height\\": 218609,
+        \\"SlotNum\\": 435651,
+        \\"Digest\\": -9.690691258114666e-56,
+        \\"BlockId\\": 2
+      },
+      \\"type\\": \\"income\\",
+      \\"amount\\": {
+        \\"values\\": [
+          {
+            \\"identifier\\": \\"\\",
+            \\"networkId\\": 100,
+            \\"amount\\": \\"2100000\\"
+          }
         ],
+        \\"defaults\\": {
+          \\"defaultNetworkId\\": 100,
+          \\"defaultIdentifier\\": \\"\\"
+        }
       },
-      "block": Object {
-        "BlockId": 2,
-        "BlockTime": 2019-09-13T16:37:36.000Z,
-        "Digest": -9.690691258114666e-56,
-        "Hash": "a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba26",
-        "Height": 218609,
-        "SlotNum": 435651,
-      },
-      "certificates": Array [],
-      "fee": MultiToken {
-        "_checkNetworkId": [Function],
-        "absCopy": [Function],
-        "add": [Function],
-        "asMap": [Function],
-        "defaults": Object {
-          "defaultIdentifier": "",
-          "defaultNetworkId": 100,
-        },
-        "get": [Function],
-        "getDefault": [Function],
-        "getDefaultEntry": [Function],
-        "isEmpty": [Function],
-        "isEqualTo": [Function],
-        "joinAddCopy": [Function],
-        "joinAddMutable": [Function],
-        "joinSubtractCopy": [Function],
-        "joinSubtractMutable": [Function],
-        "negatedCopy": [Function],
-        "subtract": [Function],
-        "values": Array [
-          Object {
-            "amount": "0",
-            "identifier": "",
-            "networkId": 100,
-          },
+      \\"fee\\": {
+        \\"values\\": [
+          {
+            \\"identifier\\": \\"\\",
+            \\"networkId\\": 100,
+            \\"amount\\": \\"0\\"
+          }
         ],
-      },
-      "tokens": Array [
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "4000000",
-            "ListId": 0,
-            "TokenId": 2,
-            "TokenListItemId": 1,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "2100000",
-            "ListId": 1,
-            "TokenId": 2,
-            "TokenListItemId": 2,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "1731391",
-            "ListId": 2,
-            "TokenId": 2,
-            "TokenListItemId": 3,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "4000000",
-            "ListId": 3,
-            "TokenId": 2,
-            "TokenListItemId": 4,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "2100000",
-            "ListId": 4,
-            "TokenId": 2,
-            "TokenListItemId": 5,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "1731391",
-            "ListId": 5,
-            "TokenId": 2,
-            "TokenListItemId": 6,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "2100000",
-            "ListId": 6,
-            "TokenId": 2,
-            "TokenListItemId": 7,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "1900000",
-            "ListId": 7,
-            "TokenId": 2,
-            "TokenListItemId": 8,
-          },
-        },
-      ],
-      "transaction": Object {
-        "BlockId": 2,
-        "Digest": 8.191593645542673e-27,
-        "ErrorMessage": null,
-        "Extra": null,
-        "Hash": "29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed545",
-        "LastUpdateTime": 1568392656000,
-        "Ordinal": 0,
-        "Status": -2,
-        "TransactionId": 1,
-        "Type": 100,
-      },
-      "txType": 100,
-      "type": "income",
-      "utxoInputs": Array [
-        Object {
-          "AddressId": 92,
-          "IndexInOwnTx": 0,
-          "IndexInParentTx": 0,
-          "ParentTxHash": "9c8d3c4fe576f8c99d8ad6ba5d889f5a9f2d7fe07dc17b3f425f5d17696f3d20",
-          "TokenListId": 0,
-          "TransactionId": 1,
-          "UtxoTransactionInputId": 1,
-        },
-      ],
-      "utxoOutputs": Array [
-        Object {
-          "AddressId": 9,
-          "ErgoBoxId": null,
-          "ErgoCreationHeight": null,
-          "ErgoTree": null,
-          "IsUnspent": true,
-          "OutputIndex": 0,
-          "TokenListId": 1,
-          "TransactionId": 1,
-          "UtxoTransactionOutputId": 1,
-        },
-        Object {
-          "AddressId": 93,
-          "ErgoBoxId": null,
-          "ErgoCreationHeight": null,
-          "ErgoTree": null,
-          "IsUnspent": true,
-          "OutputIndex": 1,
-          "TokenListId": 2,
-          "TransactionId": 1,
-          "UtxoTransactionOutputId": 2,
-        },
-      ],
+        \\"defaults\\": {
+          \\"defaultNetworkId\\": 100,
+          \\"defaultIdentifier\\": \\"\\"
+        }
+      }
     },
-    Object {
-      "accountingInputs": Array [],
-      "accountingOutputs": Array [],
-      "amount": MultiToken {
-        "_checkNetworkId": [Function],
-        "absCopy": [Function],
-        "add": [Function],
-        "asMap": [Function],
-        "defaults": Object {
-          "defaultIdentifier": "",
-          "defaultNetworkId": 100,
+    {
+      \\"txType\\": 100,
+      \\"transaction\\": {
+        \\"Type\\": 100,
+        \\"Hash\\": \\"29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546\\",
+        \\"Digest\\": 1.249559827714551e-31,
+        \\"BlockId\\": 1,
+        \\"Ordinal\\": 0,
+        \\"LastUpdateTime\\": 1568392636000,
+        \\"Status\\": -2,
+        \\"ErrorMessage\\": null,
+        \\"Extra\\": null,
+        \\"TransactionId\\": 2
+      },
+      \\"certificates\\": [],
+      \\"utxoInputs\\": [
+        {
+          \\"TransactionId\\": 2,
+          \\"AddressId\\": 92,
+          \\"ParentTxHash\\": \\"9c8d3c4fe576f8c99d8ad6ba5d889f5a9f2d7fe07dc17b3f425f5d17696f3d21\\",
+          \\"IndexInParentTx\\": 0,
+          \\"IndexInOwnTx\\": 0,
+          \\"TokenListId\\": 3,
+          \\"UtxoTransactionInputId\\": 2
+        }
+      ],
+      \\"utxoOutputs\\": [
+        {
+          \\"TransactionId\\": 2,
+          \\"AddressId\\": 9,
+          \\"OutputIndex\\": 0,
+          \\"TokenListId\\": 4,
+          \\"IsUnspent\\": true,
+          \\"ErgoBoxId\\": null,
+          \\"ErgoCreationHeight\\": null,
+          \\"ErgoTree\\": null,
+          \\"UtxoTransactionOutputId\\": 3
         },
-        "get": [Function],
-        "getDefault": [Function],
-        "getDefaultEntry": [Function],
-        "isEmpty": [Function],
-        "isEqualTo": [Function],
-        "joinAddCopy": [Function],
-        "joinAddMutable": [Function],
-        "joinSubtractCopy": [Function],
-        "joinSubtractMutable": [Function],
-        "negatedCopy": [Function],
-        "subtract": [Function],
-        "values": Array [
-          Object {
-            "amount": "2100000",
-            "identifier": "",
-            "networkId": 100,
+        {
+          \\"TransactionId\\": 2,
+          \\"AddressId\\": 93,
+          \\"OutputIndex\\": 1,
+          \\"TokenListId\\": 5,
+          \\"IsUnspent\\": true,
+          \\"ErgoBoxId\\": null,
+          \\"ErgoCreationHeight\\": null,
+          \\"ErgoTree\\": null,
+          \\"UtxoTransactionOutputId\\": 4
+        }
+      ],
+      \\"accountingInputs\\": [],
+      \\"accountingOutputs\\": [],
+      \\"tokens\\": [
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"4000000\\",
+            \\"ListId\\": 0,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 1
           },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"2100000\\",
+            \\"ListId\\": 1,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 2
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"1731391\\",
+            \\"ListId\\": 2,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 3
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"4000000\\",
+            \\"ListId\\": 3,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 4
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"2100000\\",
+            \\"ListId\\": 4,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 5
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"1731391\\",
+            \\"ListId\\": 5,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 6
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"2100000\\",
+            \\"ListId\\": 6,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 7
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        },
+        {
+          \\"TokenList\\": {
+            \\"Amount\\": \\"1900000\\",
+            \\"ListId\\": 7,
+            \\"TokenId\\": 2,
+            \\"TokenListItemId\\": 8
+          },
+          \\"Token\\": {
+            \\"TokenId\\": 2,
+            \\"Identifier\\": \\"\\",
+            \\"NetworkId\\": 100
+          }
+        }
+      ],
+      \\"block\\": {
+        \\"Hash\\": \\"a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba25\\",
+        \\"BlockTime\\": \\"2019-09-13T16:37:16.000Z\\",
+        \\"Height\\": 218608,
+        \\"SlotNum\\": 435650,
+        \\"Digest\\": -6.352946211521613e-51,
+        \\"BlockId\\": 1
+      },
+      \\"type\\": \\"income\\",
+      \\"amount\\": {
+        \\"values\\": [
+          {
+            \\"identifier\\": \\"\\",
+            \\"networkId\\": 100,
+            \\"amount\\": \\"2100000\\"
+          }
         ],
+        \\"defaults\\": {
+          \\"defaultNetworkId\\": 100,
+          \\"defaultIdentifier\\": \\"\\"
+        }
       },
-      "block": Object {
-        "BlockId": 1,
-        "BlockTime": 2019-09-13T16:37:16.000Z,
-        "Digest": -6.352946211521613e-51,
-        "Hash": "a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba25",
-        "Height": 218608,
-        "SlotNum": 435650,
-      },
-      "certificates": Array [],
-      "fee": MultiToken {
-        "_checkNetworkId": [Function],
-        "absCopy": [Function],
-        "add": [Function],
-        "asMap": [Function],
-        "defaults": Object {
-          "defaultIdentifier": "",
-          "defaultNetworkId": 100,
-        },
-        "get": [Function],
-        "getDefault": [Function],
-        "getDefaultEntry": [Function],
-        "isEmpty": [Function],
-        "isEqualTo": [Function],
-        "joinAddCopy": [Function],
-        "joinAddMutable": [Function],
-        "joinSubtractCopy": [Function],
-        "joinSubtractMutable": [Function],
-        "negatedCopy": [Function],
-        "subtract": [Function],
-        "values": Array [
-          Object {
-            "amount": "0",
-            "identifier": "",
-            "networkId": 100,
-          },
+      \\"fee\\": {
+        \\"values\\": [
+          {
+            \\"identifier\\": \\"\\",
+            \\"networkId\\": 100,
+            \\"amount\\": \\"0\\"
+          }
         ],
-      },
-      "tokens": Array [
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "4000000",
-            "ListId": 0,
-            "TokenId": 2,
-            "TokenListItemId": 1,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "2100000",
-            "ListId": 1,
-            "TokenId": 2,
-            "TokenListItemId": 2,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "1731391",
-            "ListId": 2,
-            "TokenId": 2,
-            "TokenListItemId": 3,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "4000000",
-            "ListId": 3,
-            "TokenId": 2,
-            "TokenListItemId": 4,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "2100000",
-            "ListId": 4,
-            "TokenId": 2,
-            "TokenListItemId": 5,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "1731391",
-            "ListId": 5,
-            "TokenId": 2,
-            "TokenListItemId": 6,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "2100000",
-            "ListId": 6,
-            "TokenId": 2,
-            "TokenListItemId": 7,
-          },
-        },
-        Object {
-          "Token": Object {
-            "Identifier": "",
-            "NetworkId": 100,
-            "TokenId": 2,
-          },
-          "TokenList": Object {
-            "Amount": "1900000",
-            "ListId": 7,
-            "TokenId": 2,
-            "TokenListItemId": 8,
-          },
-        },
-      ],
-      "transaction": Object {
-        "BlockId": 1,
-        "Digest": 1.249559827714551e-31,
-        "ErrorMessage": null,
-        "Extra": null,
-        "Hash": "29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546",
-        "LastUpdateTime": 1568392636000,
-        "Ordinal": 0,
-        "Status": -2,
-        "TransactionId": 2,
-        "Type": 100,
-      },
-      "txType": 100,
-      "type": "income",
-      "utxoInputs": Array [
-        Object {
-          "AddressId": 92,
-          "IndexInOwnTx": 0,
-          "IndexInParentTx": 0,
-          "ParentTxHash": "9c8d3c4fe576f8c99d8ad6ba5d889f5a9f2d7fe07dc17b3f425f5d17696f3d21",
-          "TokenListId": 3,
-          "TransactionId": 2,
-          "UtxoTransactionInputId": 2,
-        },
-      ],
-      "utxoOutputs": Array [
-        Object {
-          "AddressId": 9,
-          "ErgoBoxId": null,
-          "ErgoCreationHeight": null,
-          "ErgoTree": null,
-          "IsUnspent": true,
-          "OutputIndex": 0,
-          "TokenListId": 4,
-          "TransactionId": 2,
-          "UtxoTransactionOutputId": 3,
-        },
-        Object {
-          "AddressId": 93,
-          "ErgoBoxId": null,
-          "ErgoCreationHeight": null,
-          "ErgoTree": null,
-          "IsUnspent": true,
-          "OutputIndex": 1,
-          "TokenListId": 5,
-          "TransactionId": 2,
-          "UtxoTransactionOutputId": 4,
-        },
-      ],
-    },
-  ],
-}
+        \\"defaults\\": {
+          \\"defaultNetworkId\\": 100,
+          \\"defaultIdentifier\\": \\"\\"
+        }
+      }
+    }
+  ]
+}"
 `;
 
 exports[`Syncing with pending cip1852 2`] = `
