@@ -38,6 +38,9 @@ import {
   asDisplayCutoff,
   asGetUtxoBalance,
 } from '../../models/PublicDeriver/traits';
+import {
+  MultiToken,
+} from '../../../../../common/lib/MultiToken';
 
 import {
   updateTransactions, getAllTransactions
@@ -866,7 +869,7 @@ async function baseTest(
   const txList = await getAllTransactions({
     publicDeriver: basePubDeriver,
   });
-  expect(txList).toMatchSnapshot();
+  expect(JSON.stringify(txList, null, 2)).toMatchSnapshot();
 
   const keysForTest = [
     'Address',
