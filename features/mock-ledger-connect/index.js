@@ -25,7 +25,7 @@ import {
 } from '../../app/api/ada/lib/cardanoCrypto/cryptoWallet';
 import { testWallets } from '../mock-chain/TestWallets';
 import { IncorrectDeviceError } from '../../app/domain/ExternalDeviceCommon';
-import { AddressTypeNibbles, CertTypes } from '@cardano-foundation/ledgerjs-hw-app-cardano';
+import { AddressTypeNibbles, CertificateTypes } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 
 type WalletInfo = {|
   rootKey: RustModule.WalletV4.Bip32PrivateKey;
@@ -214,10 +214,12 @@ class MockLedgerConnect {
           input.outputIndex
         )
       );
+      if (input.path == null) throw new Error(`${nameof(MockLedgerConnect)} no path for input`);
+      const { path } = input;
       const spendingKey = derivePath(selectedWallet.rootKey, input.path);
       keys.push({
         witGen: (hash) => spendingKey.to_raw_key().sign(hash.to_bytes()),
-        path: input.path,
+        path,
       });
     }
     const outputs = RustModule.WalletV4.TransactionOutputs.new();
@@ -260,12 +262,12 @@ class MockLedgerConnect {
         const stakeCredential = RustModule.WalletV4.StakeCredential.from_keyhash(
           stakingKey.to_public().hash()
         );
-        if (cert.type === CertTypes.staking_key_registration) {
+        if (cert.type === CertificateTypes.STAKE_REGISTRATION) {
           certs.add(RustModule.WalletV4.Certificate.new_stake_registration(
             RustModule.WalletV4.StakeRegistration.new(stakeCredential)
           ));
         }
-        if (cert.type === CertTypes.staking_key_deregistration) {
+        if (cert.type === CertificateTypes.STAKE_DEREGISTRATION) {
           keys.push({
             witGen: (hash) => stakingKey.sign(hash.to_bytes()),
             path: cert.path
@@ -274,7 +276,7 @@ class MockLedgerConnect {
             RustModule.WalletV4.StakeDeregistration.new(stakeCredential)
           ));
         }
-        if (cert.type === CertTypes.delegation) {
+        if (cert.type === CertificateTypes.STAKE_DELEGATION) {
           keys.push({
             witGen: (hash) => stakingKey.sign(hash.to_bytes()),
             path: cert.path
