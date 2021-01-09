@@ -14,7 +14,7 @@ import {
   normalizeToAddress,
 } from '../../lib/storage/bridge/utils';
 import { HaskellShelleyTxSignRequest } from './HaskellShelleyTxSignRequest';
-import { AddressTypeNibbles, CertTypes } from '@cardano-foundation/ledgerjs-hw-app-cardano';
+import { AddressTypeNibbles, CertificateTypes } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { networks } from '../../lib/storage/database/prepackaged/networks';
 import { HARD_DERIVATION_START, WalletTypePurpose, CoinTypes, ChainDerivations } from '../../../../config/numbersConfig';
 
@@ -418,7 +418,8 @@ test('Create Ledger transaction', async () => {
         0,
       ],
       poolKeyHashHex: undefined,
-      type: CertTypes.staking_key_registration,
+      poolRegistrationParams: undefined,
+      type: CertificateTypes.STAKE_REGISTRATION,
     }],
     metadataHashHex: undefined,
   });

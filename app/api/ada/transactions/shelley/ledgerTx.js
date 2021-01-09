@@ -18,7 +18,7 @@ import type {
   Address, Value, Addressing,
 } from '../../lib/storage/models/PublicDeriver/interfaces';
 import { HaskellShelleyTxSignRequest } from './HaskellShelleyTxSignRequest';
-import { AddressTypeNibbles, CertTypes } from '@cardano-foundation/ledgerjs-hw-app-cardano';
+import { AddressTypeNibbles, CertificateTypes } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 import { toHexOrBase58 } from '../../lib/storage/bridge/utils';
 import {
@@ -192,27 +192,30 @@ function formatLedgerCertificates(
     const registrationCert = cert.as_stake_registration();
     if (registrationCert != null) {
       result.push({
-        type: CertTypes.staking_key_registration,
+        type: CertificateTypes.STAKE_REGISTRATION,
         path: getPath(registrationCert.stake_credential()),
         poolKeyHashHex: undefined,
+        poolRegistrationParams: undefined,
       });
       continue;
     }
     const deregistrationCert = cert.as_stake_deregistration();
     if (deregistrationCert != null) {
       result.push({
-        type: CertTypes.staking_key_deregistration,
+        type: CertificateTypes.STAKE_DEREGISTRATION,
         path: getPath(deregistrationCert.stake_credential()),
         poolKeyHashHex: undefined,
+        poolRegistrationParams: undefined,
       });
       continue;
     }
     const delegationCert = cert.as_stake_delegation();
     if (delegationCert != null) {
       result.push({
-        type: CertTypes.delegation,
+        type: CertificateTypes.STAKE_DELEGATION,
         path: getPath(delegationCert.stake_credential()),
         poolKeyHashHex: Buffer.from(delegationCert.pool_keyhash().to_bytes()).toString('hex'),
+        poolRegistrationParams: undefined,
       });
       continue;
     }
