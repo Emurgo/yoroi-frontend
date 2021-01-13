@@ -19,7 +19,7 @@ export class GetPriceData {
   static async getAllPrices(
     db: lf$Database,
     dbTx: lf$Transaction,
-  ): Promise<$ReadOnlyArray<PriceDataRow>> {
+  ): Promise<$ReadOnlyArray<$ReadOnly<PriceDataRow>>> {
     return await getAll<PriceDataRow>(
       db, dbTx,
       GetPriceData.ownTables[Tables.PriceDataSchema.name].name,

@@ -24,6 +24,7 @@ import {
 } from '../../../../ada/lib/storage/database/primitives/tables';
 import type {
   TxStatusCodesType,
+  CoreAddressT,
 } from '../../../../ada/lib/storage/database/primitives/enums';
 import {
   GetAddress,
@@ -546,7 +547,10 @@ export async function rawGetForeignAddresses(
 }
 export async function getForeignAddresses(
   request: {| publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels>, |},
-): Promise<Array<string>> {
+): Promise<Array<{|
+  address: string,
+  type: CoreAddressT,
+|}>> {
   const derivationTables = request.publicDeriver.getParent().getDerivationTables();
   const deps = Object.freeze({
     GetPathWithSpecific,
@@ -582,9 +586,21 @@ export async function getForeignAddresses(
         db, dbTx,
         addressIds
       );
-      const result = addressRows.map(row => row.Hash);
+      const result = [];
+      const seenAddresses = new Set<string>();
+
       // remove duplicates
-      return Array.from(new Set(result));
+      for (const row of addressRows) {
+        if (seenAddresses.has(row.Hash)) {
+          continue;
+        }
+        seenAddresses.add(row.Hash);
+        result.push({
+          address: row.Hash,
+          type: row.Type,
+        });
+      }
+      return result;
     }
   );
 }

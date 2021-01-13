@@ -24,6 +24,7 @@ import type {
 } from '../../database/walletTypes/bip44/tables';
 import type { IBip44Wallet } from '../Bip44Wallet/interfaces';
 import type { ICip1852Wallet } from '../Cip1852Wallet/interfaces';
+import { ConceptualWallet } from './index';
 import type { Cip1852WrapperRow } from '../../database/walletTypes/cip1852/tables';
 import {
   getAllSchemaTables,
@@ -443,12 +444,12 @@ export async function refreshConceptualWalletFunctionality(
 }
 
 export async function refreshCip1852WalletFunctionality<
-  T: ICip1852Wallet & IHasPrivateDeriver & IHasLevels & IHasSign & IConceptualWallet
+  T: ConceptualWallet & ICip1852Wallet & IHasPrivateDeriver & IHasLevels & IHasSign
 >(
   db: lf$Database,
   row: $ReadOnly<Cip1852WrapperRow>,
   base: Class<T>,
-): Promise<ICip1852Wallet> {
+): Promise<T> {
   const conceptualWalletCtorData = await refreshConceptualWalletFunctionality(
     db,
     row.ConceptualWalletId,
@@ -475,16 +476,16 @@ export async function refreshCip1852WalletFunctionality<
     privateDeriverLevel,
     privateDeriverKeyDerivationId,
   );
-  return instance;
+  return (instance: any);
 }
 
 export async function refreshBip44WalletFunctionality<
-  T: IBip44Wallet & IHasPrivateDeriver & IHasLevels & IHasSign & IConceptualWallet
+  T: ConceptualWallet & IBip44Wallet & IHasPrivateDeriver & IHasLevels & IHasSign
 >(
   db: lf$Database,
   row: $ReadOnly<Bip44WrapperRow>,
   base: Class<T>,
-): Promise<IBip44Wallet> {
+): Promise<T> {
   const conceptualWalletCtorData = await refreshConceptualWalletFunctionality(
     db,
     row.ConceptualWalletId,
@@ -511,5 +512,5 @@ export async function refreshBip44WalletFunctionality<
     privateDeriverLevel,
     privateDeriverKeyDerivationId,
   );
-  return instance;
+  return (instance: any);
 }

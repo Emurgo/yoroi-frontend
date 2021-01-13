@@ -6,7 +6,7 @@ import {
   raii,
 } from '../database/utils';
 import type {
-  ExplorerRow
+  ExplorerRow, PreferredExplorerRow
 } from '../database/explorers/tables';
 import { GetExplorers } from '../database/explorers/api/read';
 import { ModifyPreferredExplorer } from '../database/explorers/api/write';
@@ -41,7 +41,7 @@ export type SaveSelectedExplorerRequest = {|
   db: lf$Database,
   explorer: $ReadOnly<ExplorerRow>,
 |};
-export type SaveSelectedExplorerResponse = void;
+export type SaveSelectedExplorerResponse = $ReadOnlyArray<$ReadOnly<PreferredExplorerRow>>;
 export type SaveSelectedExplorerFunc = (
   request: SaveSelectedExplorerRequest
 ) => Promise<SaveSelectedExplorerResponse>;

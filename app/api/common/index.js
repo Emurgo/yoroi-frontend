@@ -50,7 +50,7 @@ import { getAllTokenInfo } from './lib/tokens/utils';
 export type GetTokenInfoRequest = {|
   db: lf$Database,
 |};
-export type GetTokenInfoResponse = Array<TokenRow>;
+export type GetTokenInfoResponse = $ReadOnlyArray<$ReadOnly<TokenRow>>;
 export type GetTokenInfoFunc = (
   request: GetTokenInfoRequest
 ) => Promise<GetTokenInfoResponse>;
