@@ -158,6 +158,8 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
             dialog: MemoNoExternalStorageDialog,
             continuation: this.toggleShowMemo,
           })}
+          spendableBalance={this.generated.stores.transactions.getBalanceRequest.result}
+          onAddToken={() => { console.log('TODO'); }}
         />
         {this.renderDialog()}
       </>
@@ -442,7 +444,12 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
           |}
         |}
       |},
-      transactions: {| hasAnyPending: boolean |},
+      transactions: {|
+        hasAnyPending: boolean,
+        getBalanceRequest: {|
+          result: ?MultiToken,
+        |},
+      |},
       uiDialogs: {|
         getParam: <T>(number | string) => T,
         isOpen: any => boolean
@@ -490,6 +497,16 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
         },
         transactions: {
           hasAnyPending: stores.transactions.hasAnyPending,
+          getBalanceRequest: (() => {
+            if (stores.wallets.selected == null) return {
+              result: undefined,
+            };
+            const { requests } = stores.transactions.getTxRequests(stores.wallets.selected);
+
+            return {
+              result: requests.getBalanceRequest.result,
+            };
+          })(),
         },
         transactionBuilderStore: {
           totalInput: stores.transactionBuilderStore.totalInput,

@@ -105,6 +105,9 @@ const genBaseProps: {|
       hasAnyPending: request.dialogInfo == null
         ? boolean('hasAnyPending', false)
         : false,
+      getBalanceRequest: {
+        result: undefined,
+      },
     },
     transactionBuilderStore: request.dialogInfo == null
       ? {

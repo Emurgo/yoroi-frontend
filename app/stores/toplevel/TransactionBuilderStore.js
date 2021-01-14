@@ -57,7 +57,7 @@ export default class TransactionBuilderStore extends Store {
   // REQUESTS
   @observable createUnsignedTx: LocalizedRequest<DeferredCall<ISignRequest<any>>>
     = new LocalizedRequest<DeferredCall<ISignRequest<any>>>(async func => await func());
-  // this.api.ada.createUnsignedTx.bind(this.api.ada)
+
   @observable memo: void | string;
 
   @observable setupSelfTx: LocalizedRequest<SetupSelfTxFunc>

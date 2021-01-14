@@ -25,20 +25,24 @@ import { MAX_MEMO_SIZE } from '../../../config/externalStorageConfig';
 import type { TokenRow, NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import {
   formattedAmountToBigNumber,
-  formattedAmountToNaturalUnits
+  formattedAmountToNaturalUnits,
+  truncateAddressShort,
 } from '../../../utils/formatters';
 import config from '../../../config';
 import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
 import LocalizableError from '../../../i18n/LocalizableError';
 import WarningBox from '../../widgets/WarningBox';
 import type { $npm$ReactIntl$IntlFormat, } from 'react-intl';
-import { getTokenName, genFormatTokenAmount, } from '../../../stores/stateless/tokenHelpers';
+import { getTokenName, genFormatTokenAmount, getTokenStrictName, getTokenIdentifierIfExists, } from '../../../stores/stateless/tokenHelpers';
 import {
   MultiToken,
 } from '../../../api/common/lib/MultiToken';
 import type {
   TokenLookupKey,
 } from '../../../api/common/lib/MultiToken';
+import { Select } from 'react-polymorph/lib/components/Select';
+import { SelectTokenSkin } from '../../../themes/skins/SelectTokenSkin';
+import TokenOptionRow from '../../widgets/tokenOption/TokenOptionRow';
 
 const messages = defineMessages({
   receiverLabel: {
@@ -96,6 +100,8 @@ type Props = {|
   +onAddMemo: void => void,
   +getTokenInfo: Inexact<TokenLookupKey> => $ReadOnly<TokenRow>,
   +defaultToken: $ReadOnly<TokenRow>, // need since no guarantee input in non-null
+  +onAddToken: $ReadOnly<TokenRow> => void,
+  +spendableBalance: ?MultiToken,
 |};
 
 @observer
@@ -230,6 +236,13 @@ export default class WalletSendForm extends Component<Props> {
           return isValidAmount;
         }],
       },
+      selectedToken: {
+        label: this.context.intl.formatMessage(globalMessages.assetSelect),
+        value: this.props.getTokenInfo({
+          identifier: this.props.defaultToken.Identifier,
+          networkId: this.props.defaultToken.NetworkId,
+        }).TokenId,
+      },
       memo: {
         label: this.context.intl.formatMessage(memoMessages.memoLabel),
         placeholder: this.context.intl.formatMessage(memoMessages.optionalMemo),
@@ -314,12 +327,47 @@ export default class WalletSendForm extends Component<Props> {
 
     const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
 
+    const tokenOptions = (() => {
+      if (this.props.spendableBalance == null) return [];
+      const { spendableBalance } = this.props;
+      return [
+        // make sure default token is always first in the list
+        spendableBalance.getDefaultEntry(),
+        ...spendableBalance.nonDefaultEntries(),
+      ].map(entry => ({
+        entry,
+        info: this.props.getTokenInfo(entry),
+      })).map(token => ({
+        value: token.info.TokenId,
+        label: getTokenStrictName(token.info) ?? '-',
+        id: getTokenIdentifierIfExists(token.info) ?? '-',
+        amount: genFormatTokenAmount(this.props.getTokenInfo)(token.entry)
+      }));
+    })();
+
     return (
       <div className={styles.component}>
 
         {hasAnyPending && pendingTxWarningComponent}
 
         <BorderedBox>
+
+          {tokenOptions.length > 1 && (
+            <Select
+              className={styles.currencySelect}
+              options={tokenOptions}
+              {...form.$('selectedToken').bind()}
+              onChange={this.props.onAddToken}
+              skin={SelectTokenSkin}
+              optionRenderer={option => (
+                <TokenOptionRow
+                  displayName={option.label}
+                  id={truncateAddressShort(option.id)}
+                  amount={option.amount}
+                />
+              )}
+            />
+          )}
 
           <div className={styles.receiverInput}>
             <Input

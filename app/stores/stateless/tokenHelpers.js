@@ -9,6 +9,7 @@ import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tab
 export function getTokenName(
   tokenRow: $ReadOnly<{
     Identifier: string,
+    IsDefault: boolean,
     Metadata: {
       ticker: null | string,
       longName: null | string,
@@ -17,12 +18,41 @@ export function getTokenName(
     ...,
   }>
 ): string {
+  const strictName = getTokenStrictName(tokenRow);
+  if (strictName != null) return strictName;
+  const identifier = getTokenIdentifierIfExists(tokenRow);
+  if (identifier != null) return identifier;
+  return '-';
+}
+
+export function getTokenStrictName(
+  tokenRow: $ReadOnly<{
+    Identifier: string,
+    Metadata: {
+      ticker: null | string,
+      longName: null | string,
+      ...,
+    },
+    ...,
+  }>
+): void | string {
   if (tokenRow.Metadata.ticker != null) {
     return tokenRow.Metadata.ticker;
   }
   if (tokenRow.Metadata.longName != null) {
     return tokenRow.Metadata.longName;
   }
+  return undefined;
+}
+
+export function getTokenIdentifierIfExists(
+  tokenRow: $ReadOnly<{
+    Identifier: string,
+    IsDefault: boolean,
+    ...,
+  }>
+): void | string {
+  if (tokenRow.IsDefault) return undefined;
   return tokenRow.Identifier;
 }
 
