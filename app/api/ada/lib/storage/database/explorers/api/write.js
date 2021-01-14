@@ -23,7 +23,7 @@ export class ModifyExplorers {
     db: lf$Database,
     tx: lf$Transaction,
     rows: $ReadOnlyArray<$ReadOnly<ExplorerInsert>>,
-  ): Promise<void> {
+  ): Promise<$ReadOnlyArray<$ReadOnly<ExplorerRow>>> {
     const result = await addOrReplaceRows<ExplorerInsert, ExplorerRow>(
       db, tx,
       rows,
@@ -45,7 +45,7 @@ export class ModifyPreferredExplorer {
     db: lf$Database,
     tx: lf$Transaction,
     row: PreferredExplorerInsert,
-  ): Promise<void> {
+  ): Promise<$ReadOnlyArray<$ReadOnly<PreferredExplorerRow>>> {
     // we can't upsert based off networkId
     // since lovefield tables all need their own primary key (not just foreign)
     // so instead, we delete any row that might already exist, then add a new row

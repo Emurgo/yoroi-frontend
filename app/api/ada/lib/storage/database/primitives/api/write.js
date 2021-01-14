@@ -146,7 +146,7 @@ export class ModifyAddress {
       data: string,
       type: CoreAddressT,
     |}>,
-  ): Promise<Array<$ReadOnly<AddressRow>>> {
+  ): Promise<$ReadOnlyArray<$ReadOnly<AddressRow>>> {
     const { AddressSeed } = await ModifyAddress.depTables.GetEncryptionMeta.get(db, tx);
     const digests = address.map<number>(meta => digestForHash(meta.data, AddressSeed));
 
@@ -171,7 +171,7 @@ export class ModifyAddress {
       data: string,
       type: CoreAddressT,
     |}>,
-  ): Promise<Array<$ReadOnly<AddressRow>>> {
+  ): Promise<$ReadOnlyArray<$ReadOnly<AddressRow>>> {
     const addressEntries = await ModifyAddress.addForeignByHash(
       db, tx,
       address.map(meta => ({ data: meta.data, type: meta.type }))
@@ -216,11 +216,11 @@ export class ModifyEncryptionMeta {
     tx: lf$Transaction,
     initialData: EncryptionMetaInsert,
   ): Promise<$ReadOnly<EncryptionMetaRow>> {
-    return await addOrReplaceRows<EncryptionMetaInsert, EncryptionMetaRow>(
+    return (await addOrReplaceRows<EncryptionMetaInsert, EncryptionMetaRow>(
       db, tx,
       [initialData],
       ModifyEncryptionMeta.ownTables[Tables.EncryptionMetaSchema.name].name,
-    );
+    ))[0];
   }
 }
 
@@ -616,7 +616,7 @@ export class ModifyNetworks {
     db: lf$Database,
     tx: lf$Transaction,
     rows: $ReadOnlyArray<NetworkInsert>,
-  ): Promise<void> {
+  ): Promise<$ReadOnlyArray<NetworkRow>> {
     const result = await addOrReplaceRows<NetworkInsert, NetworkRow>(
       db, tx,
       rows,

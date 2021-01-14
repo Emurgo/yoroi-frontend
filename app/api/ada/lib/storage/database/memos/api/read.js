@@ -19,7 +19,7 @@ export class GetTxMemo {
   static async getAllMemos(
     db: lf$Database,
     dbTx: lf$Transaction,
-  ): Promise<$ReadOnlyArray<TxMemoTableRow>> {
+  ): Promise<$ReadOnlyArray<$ReadOnly<TxMemoTableRow>>> {
     return await getAll<TxMemoTableRow>(
       db, dbTx,
       GetTxMemo.ownTables[Tables.TxMemoSchema.name].name,

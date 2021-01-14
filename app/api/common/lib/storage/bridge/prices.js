@@ -54,7 +54,7 @@ export type UpsertPriceFunc = (
 export type GetAllPricesRequest = {|
   db: lf$Database,
 |};
-export type GetAllPricesResponse = $ReadOnlyArray<PriceDataRow>;
+export type GetAllPricesResponse = $ReadOnlyArray<$ReadOnly<PriceDataRow>>;
 export type GetAllPricesFunc = (
   request: GetAllPricesRequest
 ) => Promise<GetAllPricesResponse>;

@@ -54,7 +54,7 @@ export type HistoryRequest = {|
 |};
 
 export type ErgoTxOutput = {
-  additionalRegisters: { ... },
+  additionalRegisters: {| [key: string]: string /* hex */ |},
   address: string,
   assets: $ReadOnlyArray<$ReadOnly<{
     amount: number,

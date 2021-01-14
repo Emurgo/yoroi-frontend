@@ -136,7 +136,7 @@ async function _saveInStorage(key: string, toSave: any): Promise<void> {
   await setLocalItem(key, JSON.stringify(toSave));
 }
 
-async function _getFromStorage<T>(key: string): Promise<T | void> {
+async function _getFromStorage<T>(key: string): Promise<?T> {
   return await getLocalItem(key).then((result) => {
     if (result == null) {
       return result;

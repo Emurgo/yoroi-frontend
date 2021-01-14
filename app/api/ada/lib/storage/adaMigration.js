@@ -36,7 +36,7 @@ import { loadWalletsFromStorage } from './models/load';
 import environment from '../../../../environment';
 import { KeyKind } from '../../../common/lib/crypto/keys/types';
 import {
-  removeLocalItem,
+  removeLocalItem, getLocalItem,
 } from '../../../localStorage/primitives';
 import {
   isCardanoHaskell, isErgo, networks
@@ -83,7 +83,14 @@ export async function migrateToLatest(
     ['<1.10.0', async () => await storageV2Migration(persistentDb)],
     ['=1.10.0', async () => await cardanoTxHistoryReset(persistentDb)],
     ['>=2.0.0 <2.4.0', async () => await cardanoTxHistoryReset(persistentDb)],
-    ['<3.0.0', async () => await removeLocalItem(legacyStorageKeys.SELECTED_EXPLORER_KEY)],
+    ['<3.0.0', async () => {
+      const result = await getLocalItem(legacyStorageKeys.SELECTED_EXPLORER_KEY);
+      if (result != null) {
+        await removeLocalItem(legacyStorageKeys.SELECTED_EXPLORER_KEY);
+        return true;
+      }
+      return false;
+    }],
     ['<3.3.0', async () => {
       const txHistoryWasReset = await cardanoTxHistoryReset(persistentDb);
       /**

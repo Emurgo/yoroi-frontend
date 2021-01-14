@@ -117,7 +117,7 @@ export class GetBlock {
     db: lf$Database,
     tx: lf$Transaction,
     blockId: Array<number>,
-  ): Promise<$ReadOnly<BlockRow> | void> {
+  ): Promise<$ReadOnlyArray<$ReadOnly<BlockRow>>> {
     return await getRowIn<BlockRow>(
       db, tx,
       GetBlock.ownTables[Tables.BlockSchema.name].name,
@@ -1152,7 +1152,7 @@ export class GetToken {
     tx: lf$Transaction,
     digests: Array<number>,
   ): Promise<$ReadOnlyArray<$ReadOnly<TokenRow>>> {
-    const tokenRows = await getRowIn<AddressRow>(
+    const tokenRows = await getRowIn<TokenRow>(
       db, tx,
       GetToken.ownTables[Tables.TokenSchema.name].name,
       GetToken.ownTables[Tables.TokenSchema.name].properties.Digest,
