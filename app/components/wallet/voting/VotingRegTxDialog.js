@@ -13,6 +13,7 @@ import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import Dialog from '../../widgets/Dialog';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
+import DialogBackButton from '../../widgets/DialogBackButton';
 import globalMessages from '../../../i18n/global-messages';
 import LocalizableError from '../../../i18n/LocalizableError';
 import styles from './VotingRegTxDialog.scss';
@@ -34,18 +35,20 @@ import { truncateToken } from '../../../utils/formatters';
 import WarningBox from '../../widgets/WarningBox';
 
 const messages = defineMessages({
-  explanationLine1: {
-    id: 'wallet.voting.transaction.explanationLine1',
-    defaultMessage: '!!!Confirm voting registration',
+  line1: {
+    id: 'wallet.voting.dialog.step.trx.line1',
+    defaultMessage: '!!!Confirm your spending password to register in the blockchain the certificate previously generated for voting.',
   },
 });
 
 type Props = {|
+  +progressInfo: ProgressInfo,
   +staleTx: boolean,
   +transactionFee: MultiToken,
   +isHardware: boolean,
   +isSubmitting: boolean,
   +onCancel: void => void,
+  +goBack: void => void,
   +onSubmit: ({| password?: string |}) => PossiblyAsync<void>,
   +classicTheme: boolean,
   +error: ?LocalizableError,
@@ -110,13 +113,6 @@ export default class VotingRegTxDialog extends Component<Props> {
 
     const actions = [
       {
-        label: intl.formatMessage(globalMessages.backButtonLabel),
-        disabled: this.props.isSubmitting,
-        onClick: this.props.isSubmitting
-          ? () => {} // noop
-          : this.props.onCancel
-      },
-      {
         label: intl.formatMessage(globalMessages.registerLabel),
         onClick: this.submit.bind(this),
         primary: true,
@@ -131,19 +127,20 @@ export default class VotingRegTxDialog extends Component<Props> {
 
     return (
       <Dialog
-        title={intl.formatMessage(globalMessages.walletSendConfirmationDialogTitle)}
+        title={intl.formatMessage(globalMessages.votingRegistrationTitle)}
         actions={actions}
         closeOnOverlayClick={false}
         onClose={!this.props.isSubmitting ? this.props.onCancel : null}
         className={styles.dialog}
         closeButton={<DialogCloseButton />}
+        backButton={<DialogBackButton onBack={this.props.goBack} />}
       >
+        <ProgressStepBlock progressInfo={this.props.progressInfo} classicTheme={this.props.classicTheme} />
         {this.props.staleTx && staleTxWarning}
-        <ul className={styles.explanation}>
-          <li>
-            {intl.formatMessage(messages.explanationLine1)}
-          </li>
-        </ul>
+
+        <div className={classnames([styles.lineText, styles.firstItem])}>
+          {intl.formatMessage(messages.line1)}
+        </div>
 
         <div className={styles.amountInput}>
           <NumericInput
@@ -164,10 +161,7 @@ export default class VotingRegTxDialog extends Component<Props> {
             classicTheme={this.props.classicTheme}
           />
         </div>
-
-        <div className={styles.walletPasswordFields}>
-          {spendingPasswordForm}
-        </div>
+        {spendingPasswordForm}
         {this.props.error
           ? (
             <p className={styles.error}>

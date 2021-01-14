@@ -1,0 +1,82 @@
+@import './common.scss';
+
+.voting {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+
+  .cardContainer {
+    margin-top: 40px;
+    margin-bottom: 40px;
+    display: flex;
+    :not(:last-child) {
+      margin-right: 16px;
+    }
+
+    .card {
+      width: 272px;
+      height: 374px;
+      border: 1px solid #C4CAD7;
+      border-radius: 8px;
+      padding: 24px;
+
+      .lineText {
+        font-size: 16px;
+        text-align: left;
+      }
+
+      .number {
+        width: 32px;
+        height: 32px;
+        border-radius: 20px;
+        background-color: #DCE0E9;
+        color: #242838;
+        font-size: 16px;
+        line-height: 22px;
+        display: flex;
+        align-items: center;
+        justify-content: center;        
+      }
+
+      .image {
+        display: flex;
+        justify-content: center;
+
+        margin-top: 38px;
+        margin-bottom: 89px;
+        .imagePlaceholder {
+          background-color: #DCE0E9;
+          width: 80px;
+          height: 80px;
+          border-radius: 8px;
+        }
+      }
+
+      .appBadges {
+        display: flex;
+        justify-content: center;
+        margin-top: 12px;
+      }
+    }
+  }
+
+  .lineTitle {
+    line-height: 30px;
+    font-size: 24px;
+    color: #242838;
+    text-align: center;
+    font-weight: 800;
+    margin-bottom: 12px;
+    max-width: 714px;
+  }
+  
+  .lineText {
+    color: #6B7384;
+    text-align: center;
+  }
+  
+  .registerButton {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+}

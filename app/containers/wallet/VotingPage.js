@@ -2,14 +2,9 @@
 import type { Node } from 'react';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { computed, observable, action } from 'mobx';
+import { computed } from 'mobx';
 import { intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import QRCode from 'qrcode.react';
-import { Button } from 'react-polymorph/lib/components/Button';
-import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
-import classnames from 'classnames';
-import globalMessages from '../../i18n/global-messages';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import Dialog from '../../components/widgets/Dialog';
 import DialogCloseButton from '../../components/widgets/DialogCloseButton';
@@ -29,7 +24,6 @@ import SpendingPasswordInput from '../../components/widgets/forms/SpendingPasswo
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
 
 export type GeneratedData = typeof VotingPage.prototype.generated;
-
 type Props = {|
   ...InjectedOrGenerated<GeneratedData>,
 |};
@@ -38,24 +32,14 @@ type Props = {|
 export default class VotingPage extends Component<Props> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = { intl: intlShape.isRequired };
 
-  @observable spendingPasswordForm: void | ReactToolboxMobxForm;
-
-  @action
-  setSpendingPasswordForm(form: ReactToolboxMobxForm) {
-    this.spendingPasswordForm = form;
-  }
-
-  cancel: void => void = () => {
-    this.generated.actions.ada.votingTransaction.reset.trigger({ justTransaction: true });
+  onClose: void => void = () => {
+    this.generated.actions.dialogs.closeActiveDialog.trigger();
   };
 
-  async componentWillUnmount() {
-    this.generated.actions.ada.votingTransaction.reset.trigger({ justTransaction: false });
-  }
+  start: void => void = () => {
+    this.generated.actions.dialogs.open.trigger({ dialog: VotingRegistrationDialogContainer });
+  };
 
-  componentDidMount() {
-    this.generated.actions.generateCatalystKey.trigger();
-  }
   render(): Node {
     const qrCodeBackgroundColor = document.documentElement
       ? document.documentElement.style.getPropertyValue('--theme-receive-qr-code-background-color')
@@ -153,75 +137,17 @@ export default class VotingPage extends Component<Props> {
         />
       );
     }
-    if (votingRegTx != null && !showSignDialog) {
-      return (
-        <VotingRegSuccessDialog
-          onClose={this.generated.actions.ada.votingTransaction.complete.trigger}
-          classicTheme={this.generated.stores.profile.isClassicTheme}
-        />
-      );
-    }
-    return undefined;
-  };
-
-  _errorDialog: LocalizableError => Node = error => {
-    const { intl } = this.context;
-    const dialogBackButton = [
-      {
-        label: intl.formatMessage(globalMessages.backButtonLabel),
-        onClick: this.cancel,
-        primary: true,
-      },
-    ];
     return (
-      <Dialog
-        title={intl.formatMessage(globalMessages.errorLabel)}
-        closeOnOverlayClick={false}
-        onClose={this.cancel}
-        closeButton={<DialogCloseButton onClose={this.cancel} />}
-        actions={dialogBackButton}
-      >
-        <>
-          <ErrorBlock error={error} />
-        </>
-      </Dialog>
+      <div>
+        {activeDialog}
+        <Voting start={this.start} />
+      </div>
     );
-  };
-
-  _vote: void => Promise<void> = async () => {
-    if (this.spendingPasswordForm !== undefined) {
-      this.spendingPasswordForm.submit({
-        onSuccess: async form => {
-          const { walletPassword } = form.values();
-          await this.generated.actions.ada.votingTransaction.createTransaction.trigger(
-            walletPassword
-          );
-        },
-        onError: () => {},
-      });
-    }
-  };
+  }
 
   @computed get generated(): {|
+    VotingRegistrationDialogProps: InjectedOrGenerated<VotingRegistrationDialogContainerData>,
     actions: {|
-      generateCatalystKey: {| trigger: (params: void) => Promise<void> |},
-      ada: {|
-        votingTransaction: {|
-          complete: {|
-            trigger: void => void,
-          |},
-          createTransaction: {|
-            trigger: (params: string) => Promise<void>,
-          |},
-          reset: {| trigger: (params: {| justTransaction: boolean |}) => void |},
-          signTransaction: {|
-            trigger: (params: {|
-              password?: string,
-              publicDeriver: PublicDeriver<>,
-            |}) => Promise<void>,
-          |},
-        |},
-      |},
       dialogs: {|
         closeActiveDialog: {|
           trigger: (params: void) => void,
@@ -265,14 +191,6 @@ export default class VotingPage extends Component<Props> {
         getParam: <T>(number | string) => T,
         isOpen: any => boolean,
       |},
-      wallets: {|
-        sendMoneyRequest: {|
-          error: ?LocalizableError,
-          isExecuting: boolean,
-          wasExecuted: boolean,
-        |},
-        selected: null | PublicDeriver<>,
-      |},
     |},
   |} {
     if (this.props.generated !== undefined) {
@@ -283,25 +201,8 @@ export default class VotingPage extends Component<Props> {
     }
 
     const { stores, actions } = this.props;
-    const votingStore = stores.substores.ada.votingStore;
     return Object.freeze({
       actions: {
-        ada: {
-          votingTransaction: {
-            createTransaction: {
-              trigger: actions.ada.voting.createTransaction.trigger,
-            },
-            signTransaction: {
-              trigger: actions.ada.voting.signTransaction.trigger,
-            },
-            reset: {
-              trigger: actions.ada.voting.reset.trigger,
-            },
-            complete: {
-              trigger: actions.ada.voting.complete.trigger,
-            },
-          },
-        },
         dialogs: {
           closeActiveDialog: {
             trigger: actions.dialogs.closeActiveDialog.trigger,
@@ -310,7 +211,6 @@ export default class VotingPage extends Component<Props> {
             trigger: actions.dialogs.open.trigger,
           },
         },
-        generateCatalystKey: { trigger: actions.ada.voting.generateCatalystKey.trigger },
       },
       stores: {
         explorers: {
@@ -350,10 +250,11 @@ export default class VotingPage extends Component<Props> {
           isOpen: stores.uiDialogs.isOpen,
           getParam: stores.uiDialogs.getParam,
         },
-        voting: {
-          encryptedKey: votingStore.encryptedKey,
-        },
       },
+      VotingRegistrationDialogProps: ({
+        actions,
+        stores,
+      }: InjectedOrGenerated<VotingRegistrationDialogContainerData>),
     });
   }
 }

@@ -9,6 +9,14 @@ export default class VotingActions {
     password?: string,
     publicDeriver: PublicDeriver<>,
   |}> = new AsyncAction();
-  complete: Action<void> = new Action();
-  reset: Action<{| justTransaction: boolean |}> = new Action();
+  cancel: Action<void> = new Action();
+  submitGenerate: Action<void> = new Action();
+  goBackToGenerate: Action<void> = new Action();
+  submitConfirm: Action<void> = new Action();
+  submitConfirmError: Action<void> = new Action();
+  submitRegister: Action<void> = new Action();
+  submitRegisterError: Action<Error> = new Action();
+  goBackToRegister: Action<void> = new Action();
+  finishQRCode: Action<void> = new Action();
+  submitTransaction: Action<void> = new Action();
 }

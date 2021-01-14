@@ -1,0 +1,31 @@
+@import './common.scss';
+
+.lineTitle {
+  line-height: 26px;
+  font-size: 18px;
+  color: #242838;
+  text-align: center;
+  font-weight: 800;
+}
+
+.lineText {
+  margin-top: 20px;
+  margin-bottom: 16px;
+}
+
+.lineBold {
+  color: #242838;
+  font-weight: 800;
+  font-size: 14px;
+  line-height: 22px;
+}
+
+.qrCodeContainer {
+  display: flex;
+  justify-content: center;
+  .qrCode {
+    background-color: #f0f3f5;
+    padding: 10px;
+    border-radius: 8px;
+  }
+}
