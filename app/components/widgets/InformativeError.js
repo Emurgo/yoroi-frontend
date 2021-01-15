@@ -17,13 +17,13 @@ export default class InformativeError extends Component<Props> {
   render(): Node {
     return (
       <div className={styles.wrapper}>
-        <EmptyIllustration />
         <div className={styles.text}>
           <h3 className={styles.title}>{this.props.title}</h3>
           {this.props.text != null && (
             <p className={styles.paragraph}>{this.props.text}</p>
           )}
         </div>
+        <EmptyIllustration />
       </div>
     );
   }

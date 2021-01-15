@@ -39,13 +39,9 @@ const messages = defineMessages({
     id: 'wallet.dashboard.summary.note',
     defaultMessage: '!!!Less than you expected?',
   },
-  adaAmountNote1: {
-    id: 'wallet.dashboard.summary.adaAmountNote1',
-    defaultMessage: '!!!This balance includes rewards',
-  },
-  adaAmountNote2: {
-    id: 'wallet.dashboard.summary.adaAmountNote2',
-    defaultMessage: '!!!(withdrawal required to be able to send this full amount)',
+  adaAmountNote: {
+    id: 'wallet.dashboard.summary.adaAmountNote',
+    defaultMessage: '!!!This balance includes rewards (withdrawal required to be able to send this full amount)',
   },
   mangledPopupDialogLine1: {
     id: 'wallet.dashboard.summary.mangled.line1',
@@ -128,14 +124,8 @@ export default class UserSummary extends Component<Props, State> {
             </h3>
             {this.renderAmount(this.props.totalSum)}
           </div>
-          <div>
-            <div className={styles.amountNote}>
-              {intl.formatMessage(messages.adaAmountNote1)}
-            </div>
-            <div className={styles.amountNote}>
-              {intl.formatMessage(messages.adaAmountNote2)}
-            </div>
-            <div />
+          <div className={styles.amountNote}>
+            {intl.formatMessage(messages.adaAmountNote)}
           </div>
         </div>
         <div className={styles.icon}>
