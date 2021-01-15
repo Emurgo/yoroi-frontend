@@ -38,6 +38,7 @@ import {
   MultiToken,
 } from '../../../api/common/lib/MultiToken';
 import type {
+  TokenEntry,
   TokenLookupKey,
 } from '../../../api/common/lib/MultiToken';
 import { Select } from 'react-polymorph/lib/components/Select';
@@ -150,16 +151,20 @@ export default class WalletSendForm extends Component<Props> {
 
         // once sendAll is triggered, set the amount field to the total input
         const adjustedInput = totalInput.joinSubtractCopy(fee);
-        const relatedEntry = this.props.selectedToken == null
-          ? adjustedInput.getDefaultEntry()
-          : totalInput.values.find(
-            entry => entry.identifier === this.props.selectedToken?.Identifier
-          ) ?? adjustedInput.getDefaultEntry();
+        const relatedEntry = this.getTokenEntry(adjustedInput);
         this.form.$('amount').set('value', formatValue(
           relatedEntry,
         ));
       },
     );
+  }
+
+  getTokenEntry: MultiToken => TokenEntry = (tokens) => {
+    return this.props.selectedToken == null
+      ? tokens.getDefaultEntry()
+      : tokens.values.find(
+        entry => entry.identifier === this.props.selectedToken?.Identifier
+      ) ?? tokens.getDefaultEntry();
   }
 
   componentWillUnmount(): void {
@@ -413,7 +418,7 @@ export default class WalletSendForm extends Component<Props> {
               // AmountInputSkin props
               currency={getTokenName(this.props.selectedToken ?? this.props.defaultToken)}
               fees={formatValue(transactionFee.getDefaultEntry())}
-              total={formatValue(totalAmount.getDefaultEntry())}
+              total={formatValue(this.getTokenEntry(totalAmount))}
               skin={AmountInputSkin}
               classicTheme={classicTheme}
             />
