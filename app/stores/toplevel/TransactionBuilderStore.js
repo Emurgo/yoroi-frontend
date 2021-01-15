@@ -243,11 +243,30 @@ export default class TransactionBuilderStore extends Store {
         RustModule.SigmaRust.BoxValue.SAFE_USER_MIN().as_i64().to_str()
       ).plus(100000); // slightly higher than default fee
 
+      const defaultToken = this.stores.tokenInfoStore.getDefaultTokenInfo(network.NetworkId);
+
+      const genTokenList = (userInput) => {
+        const tokens = [userInput];
+          if (this.selectedToken != null && this.selectedToken.TokenId !== defaultToken.TokenId) {
+          // if the user is sending a token, we need to make sure the resulting box
+          // has at least the minimum amount of ERG in it
+          tokens.push({
+            token: defaultToken,
+            amount: RustModule.SigmaRust.BoxValue.SAFE_USER_MIN().as_i64().to_str(),
+          });
+        }
+        return tokens;
+      }
+
       if (amount == null && shouldSendAll === true) {
         await this.createUnsignedTx.execute(() => this.api.ergo.createUnsignedTx({
           publicDeriver: withUtxos,
           receiver,
-          shouldSendAll,
+          tokens: genTokenList({
+            token: this.selectedToken
+              ?? this.stores.tokenInfoStore.getDefaultTokenInfo(network.NetworkId),
+            shouldSendAll,
+          }),
           filter: this.filter,
           currentHeight: lastSync.Height,
           txFee,
@@ -256,7 +275,11 @@ export default class TransactionBuilderStore extends Store {
         await this.createUnsignedTx.execute(() => this.api.ergo.createUnsignedTx({
           publicDeriver: withUtxos,
           receiver,
-          amount,
+          tokens: genTokenList({
+            token: this.selectedToken
+              ?? this.stores.tokenInfoStore.getDefaultTokenInfo(network.NetworkId),
+            amount,
+          }),
           filter: this.filter,
           currentHeight: lastSync.Height,
           txFee,

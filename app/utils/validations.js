@@ -106,6 +106,9 @@ export async function validateAmount(
     return [false, formatter.formatMessage(messages.invalidAmount)]
   }
 
+  // don't validate this for tokens since they have no minimum
+  if (!tokenRow.IsDefault) return [true, undefined];
+
   if (new BigNumber(amount).lt(minAmount)) {
     return [
       false,

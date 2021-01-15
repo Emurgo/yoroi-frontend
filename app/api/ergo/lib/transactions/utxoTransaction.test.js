@@ -35,6 +35,7 @@ import type {
 // } from '../../../../config/numbersConfig';
 import {
   networks,
+  defaultAssets,
   getErgoBaseConfig,
 } from '../../../ada/lib/storage/database/prepackaged/networks';
 import { decode, } from 'bs58';
@@ -43,8 +44,12 @@ import { decode, } from 'bs58';
 // import { generateWalletRootKey } from '../crypto/wallet';
 import { RustModule } from '../../../ada/lib/cardanoCrypto/rustLoader';
 import { replaceMockBoxId } from './utils';
+import { MultiToken } from '../../../common/lib/MultiToken';
 
 const network = networks.ErgoMainnet;
+const defaultIdentifier = defaultAssets.filter(
+  asset => asset.NetworkId === network.NetworkId
+)[0].Identifier;
 
 const genSampleUtxos: void => Array<RemoteUnspentOutput> = () => [
   replaceMockBoxId({
@@ -150,6 +155,7 @@ function getProtocolParams(): {|
   FeeAddress: string,
   MinimumBoxValue: string,
   NetworkId: number,
+  DefaultIdentifier: string,
   |} {
   const fullConfig = getErgoBaseConfig(network);
   const config = fullConfig.reduce((acc, next) => Object.assign(acc, next), {});
@@ -157,7 +163,22 @@ function getProtocolParams(): {|
     FeeAddress: config.FeeAddress,
     MinimumBoxValue: config.MinimumBoxValue,
     NetworkId: network.NetworkId,
+    DefaultIdentifier: defaultIdentifier,
   };
+}
+
+function genAmount(amount: string): MultiToken {
+  return new MultiToken(
+    [{
+      amount: new BigNumber(amount),
+      identifier: defaultIdentifier,
+      networkId: network.NetworkId,
+    }],
+    {
+      defaultIdentifier,
+      defaultNetworkId: network.NetworkId,
+    }
+  );
 }
 
 describe('Create unsigned TX from UTXO', () => {
@@ -167,7 +188,7 @@ describe('Create unsigned TX from UTXO', () => {
     expect(() => newErgoUnsignedTxFromUtxo({
       outputs: [{
         address: decode('9egNKTzQDH658qcdiPEoQfVM1SBxQNxnyF8BCw57aNWerRhhHBQ').toString('hex'),
-        amount: '1900001', // bigger than input including fees
+        amount: genAmount('1900001'), // bigger than input including fees
       }],
       changeAddr: {
         address: decode('9emv7LAtw7U6xMs4JrJP8NTPvwQjNRaSWpgSTGEM6947fFofBWd').toString('hex'),
@@ -187,7 +208,7 @@ describe('Create unsigned TX from UTXO', () => {
     expect(() => newErgoUnsignedTxFromUtxo({
       outputs: [{
         address: decode('9egNKTzQDH658qcdiPEoQfVM1SBxQNxnyF8BCw57aNWerRhhHBQ').toString('hex'),
-        amount: '1',
+        amount: genAmount('1'),
       }],
       changeAddr: {
         address: decode('9emv7LAtw7U6xMs4JrJP8NTPvwQjNRaSWpgSTGEM6947fFofBWd').toString('hex'),
@@ -209,7 +230,7 @@ describe('Create unsigned TX from UTXO', () => {
     expect(() => newErgoUnsignedTxFromUtxo({
       outputs: [{
         address: decode('9egNKTzQDH658qcdiPEoQfVM1SBxQNxnyF8BCw57aNWerRhhHBQ').toString('hex'),
-        amount: '100000', // less than input
+        amount: genAmount('100000'), // less than input
       }],
       changeAddr: {
         address: decode('9emv7LAtw7U6xMs4JrJP8NTPvwQjNRaSWpgSTGEM6947fFofBWd').toString('hex'),
@@ -234,7 +255,7 @@ describe('Create unsigned TX from UTXO', () => {
     const unsignedTxResponse = newErgoUnsignedTxFromUtxo({
       outputs: [{
         address: decode('9egNKTzQDH658qcdiPEoQfVM1SBxQNxnyF8BCw57aNWerRhhHBQ').toString('hex'),
-        amount: output.toString(), // smaller than input
+        amount: genAmount(output.toString()), // smaller than input
       }],
       changeAddr: sampleErgoAddresses[0],
       utxos,
@@ -298,7 +319,7 @@ describe('Create unsigned TX from addresses', () => {
     const unsignedTxResponse = newErgoUnsignedTx({
       outputs: [{
         address: decode('9egNKTzQDH658qcdiPEoQfVM1SBxQNxnyF8BCw57aNWerRhhHBQ').toString('hex'),
-        amount: '50001', // smaller than input
+        amount: genAmount('50001'), // smaller than input
       }],
       changeAddr: {
         address: decode('9emv7LAtw7U6xMs4JrJP8NTPvwQjNRaSWpgSTGEM6947fFofBWd').toString('hex'),
@@ -396,6 +417,8 @@ describe('Create unsigned TX from addresses', () => {
 // });
 
 describe('Create sendAll unsigned TX from UTXO', () => {
+  // eslint-disable-next-line no-unused-vars
+  const { DefaultIdentifier, ...parameterSubset } = getProtocolParams();
   describe('Create send-all TX from UTXO', () => {
     it('Create a transaction involving all input with no change', () => {
       const sampleUtxos = genSampleUtxos();
@@ -407,7 +430,7 @@ describe('Create sendAll unsigned TX from UTXO', () => {
         utxos,
         currentHeight: 100,
         txFee: new BigNumber('50000'),
-        protocolParams: getProtocolParams(),
+        protocolParams: parameterSubset,
       });
 
       expect(sendAllResponse.senderUtxos).toEqual(utxos);
@@ -452,7 +475,7 @@ describe('Create sendAll unsigned TX from UTXO', () => {
       utxos: [],
       currentHeight: 100,
       txFee: new BigNumber('500'),
-      protocolParams: getProtocolParams(),
+      protocolParams: parameterSubset,
     })).toThrow(NotEnoughMoneyToSendError);
   });
 
@@ -466,7 +489,7 @@ describe('Create sendAll unsigned TX from UTXO', () => {
       utxos,
       currentHeight: 100,
       txFee: new BigNumber('100000'),
-      protocolParams: getProtocolParams(),
+      protocolParams: parameterSubset,
     })).toThrow(NotEnoughMoneyToSendError);
   });
 });

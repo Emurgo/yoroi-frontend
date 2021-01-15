@@ -132,7 +132,7 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
           selectedNetwork={publicDeriver.getParent().getNetworkInfo()}
           validateAmount={(amount) => validateAmount(
             amount,
-            defaultToken,
+            transactionBuilderStore.selectedToken ?? defaultToken,
             getMinimumValue(publicDeriver.getParent().getNetworkInfo()),
             this.context.intl,
           )}

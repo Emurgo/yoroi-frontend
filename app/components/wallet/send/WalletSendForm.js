@@ -124,7 +124,7 @@ export default class WalletSendForm extends Component<Props> {
 
       const adjustedAmount = formattedAmountToNaturalUnits(
         uriParams.amount.getDefaultEntry().amount.toString(),
-        this.props.defaultToken.Metadata.numberOfDecimals,
+        this.getNumDecimals(),
       );
       // note: assume these are validated externally
       this.props.updateAmount(Number(adjustedAmount));
@@ -149,8 +149,14 @@ export default class WalletSendForm extends Component<Props> {
         }
 
         // once sendAll is triggered, set the amount field to the total input
+        const adjustedInput = totalInput.joinSubtractCopy(fee);
+        const relatedEntry = this.props.selectedToken == null
+          ? adjustedInput.getDefaultEntry()
+          : totalInput.values.find(
+            entry => entry.identifier === this.props.selectedToken?.Identifier
+          ) ?? adjustedInput.getDefaultEntry();
         this.form.$('amount').set('value', formatValue(
-          totalInput.joinSubtractCopy(fee).getDefaultEntry(),
+          relatedEntry,
         ));
       },
     );
@@ -202,7 +208,7 @@ export default class WalletSendForm extends Component<Props> {
       amount: {
         label: this.context.intl.formatMessage(globalMessages.amountLabel),
         placeholder: this.props.classicTheme ?
-          `0.${'0'.repeat(this.props.defaultToken.Metadata.numberOfDecimals)}` : '',
+          `0.${'0'.repeat(this.getNumDecimals())}` : '',
         value: (() => {
           const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
           return this.props.uriParams
@@ -223,11 +229,11 @@ export default class WalletSendForm extends Component<Props> {
           }
           const formattedAmount = formattedAmountToNaturalUnits(
             amountValue,
-            this.props.defaultToken.Metadata.numberOfDecimals,
+            this.getNumDecimals(),
           );
           const isValidAmount = await this.props.validateAmount(
             formattedAmount,
-            this.props.defaultToken
+            this.props.selectedToken ?? this.props.defaultToken
           );
           if (isValidAmount[0]) {
             this.props.updateAmount(Number(formattedAmount));
@@ -276,6 +282,14 @@ export default class WalletSendForm extends Component<Props> {
       vjf: vjf()
     },
   });
+
+  getNumDecimals(): number {
+    const info = this.props.selectedToken ?? this.props.getTokenInfo({
+      identifier: this.props.defaultToken.Identifier,
+      networkId: this.props.defaultToken.NetworkId,
+    });
+    return info.Metadata.numberOfDecimals;
+  }
 
   render(): Node {
     const { form } = this;
@@ -392,12 +406,12 @@ export default class WalletSendForm extends Component<Props> {
               {...amountFieldProps}
               className="amount"
               label={intl.formatMessage(globalMessages.amountLabel)}
-              maxBeforeDot={calcMaxBeforeDot(this.props.defaultToken.Metadata.numberOfDecimals)}
-              maxAfterDot={this.props.defaultToken.Metadata.numberOfDecimals}
+              maxBeforeDot={calcMaxBeforeDot(this.getNumDecimals())}
+              maxAfterDot={this.getNumDecimals()}
               disabled={this.props.shouldSendAll}
               error={(transactionFeeError || amountField.error)}
               // AmountInputSkin props
-              currency={getTokenName(this.props.defaultToken)}
+              currency={getTokenName(this.props.selectedToken ?? this.props.defaultToken)}
               fees={formatValue(transactionFee.getDefaultEntry())}
               total={formatValue(totalAmount.getDefaultEntry())}
               skin={AmountInputSkin}
@@ -407,14 +421,17 @@ export default class WalletSendForm extends Component<Props> {
           <div className={styles.checkbox}>
             <Checkbox
               label={intl.formatMessage(messages.checkboxLabel, {
-                currency: getTokenName(this.props.defaultToken)
+                currency: getTokenName(this.props.selectedToken ?? this.props.defaultToken)
               })}
               onChange={() => {
                 this.props.toggleSendAll();
                 if (this.props.shouldSendAll) {
+                  // if we toggle shouldSendAll from true -> false
+                  // we need to re-enable the field
+                  // and set it to whatever value was used for the sendAll value
                   this.props.updateAmount(Number(formattedAmountToNaturalUnits(
                     this.form.$('amount').value,
-                    this.props.defaultToken.Metadata.numberOfDecimals,
+                    this.getNumDecimals(),
                   )));
                 }
               }}
