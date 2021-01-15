@@ -24,6 +24,7 @@ import type { TransactionMetadata } from '../../api/ada/lib/storage/bridge/metad
 import {
   MultiToken,
 } from '../../api/common/lib/MultiToken';
+import type { TokenRow, } from '../../api/ada/lib/storage/database/primitives/tables';
 
 export type SetupSelfTxRequest = {|
   publicDeriver: IHasUtxoChains,
@@ -63,6 +64,8 @@ export default class TransactionBuilderStore extends Store {
   @observable setupSelfTx: LocalizedRequest<SetupSelfTxFunc>
     = new LocalizedRequest<SetupSelfTxFunc>(this._setupSelfTx);
 
+  @observable selectedToken: void | $ReadOnly<TokenRow>;
+
   setup(): void {
     super.setup();
     this._reset();
@@ -71,6 +74,7 @@ export default class TransactionBuilderStore extends Store {
     actions.setFilter.listen(this._setFilter);
     actions.updateAmount.listen(this._updateAmount);
     actions.updateMemo.listen(this._updateMemo);
+    actions.updateToken.listen(this._updateToken);
     actions.updateTentativeTx.listen(this._updateTentativeTx);
     actions.toggleSendAll.listen(this._toggleSendAll);
     actions.initialize.listen(this._initialize);
@@ -301,6 +305,11 @@ export default class TransactionBuilderStore extends Store {
   }
 
   @action
+  _updateToken: (void | $ReadOnly<TokenRow>) => void = (token) => {
+    this.selectedToken = token;
+  }
+
+  @action
   _updateTentativeTx: void => void = () => {
     if (!this.plannedTx) {
       this.tentativeTx = null;
@@ -319,6 +328,7 @@ export default class TransactionBuilderStore extends Store {
     this.plannedTxInfo = [{ address: undefined, value: undefined }];
     this.shouldSendAll = false;
     this.memo = undefined;
+    this.selectedToken = undefined;
     this.filter = () => true;
     this.metadata = undefined;
     this.createUnsignedTx.cancel();

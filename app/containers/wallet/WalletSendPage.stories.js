@@ -120,6 +120,7 @@ const genBaseProps: {|
           isExecuting: boolean('isExecuting', false),
           error: undefined,
         },
+        selectedToken: undefined,
       }
       : request.dialogInfo.transactionBuilderStore,
     substores: {
@@ -150,6 +151,7 @@ const genBaseProps: {|
       updateTentativeTx: { trigger: action('updateTentativeTx') },
       updateReceiver: { trigger: action('updateReceiver') },
       updateAmount: { trigger: action('updateAmount') },
+      updateToken: { trigger: action('updateToken') },
       toggleSendAll: { trigger: action('toggleSendAll') },
       reset: { trigger: action('reset') },
       updateMemo: { trigger: action('updateMemo') },
@@ -296,6 +298,7 @@ export const RegularConfirmationDialog = (): Node => {
               isExecuting: false,
               error: undefined,
             },
+            selectedToken: undefined,
           }
         }
       })}
@@ -348,6 +351,7 @@ export const LedgerConfirmationDialog = (): Node => {
               isExecuting: false,
               error: undefined,
             },
+            selectedToken: undefined,
           }
         }
       })}
@@ -400,6 +404,7 @@ export const TrezorConfirmationDialog = (): Node => {
               isExecuting: false,
               error: undefined,
             },
+            selectedToken: undefined,
           }
         }
       })}

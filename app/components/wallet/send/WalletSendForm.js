@@ -100,8 +100,9 @@ type Props = {|
   +onAddMemo: void => void,
   +getTokenInfo: Inexact<TokenLookupKey> => $ReadOnly<TokenRow>,
   +defaultToken: $ReadOnly<TokenRow>, // need since no guarantee input in non-null
-  +onAddToken: $ReadOnly<TokenRow> => void,
+  +onAddToken: (void | $ReadOnly<TokenRow>) => void,
   +spendableBalance: ?MultiToken,
+  +selectedToken: void | $ReadOnly<TokenRow>,
 |};
 
 @observer
@@ -238,7 +239,7 @@ export default class WalletSendForm extends Component<Props> {
       },
       selectedToken: {
         label: this.context.intl.formatMessage(globalMessages.assetSelect),
-        value: this.props.getTokenInfo({
+        value: this.props.selectedToken?.TokenId ?? this.props.getTokenInfo({
           identifier: this.props.defaultToken.Identifier,
           networkId: this.props.defaultToken.NetworkId,
         }).TokenId,
@@ -339,6 +340,7 @@ export default class WalletSendForm extends Component<Props> {
         info: this.props.getTokenInfo(entry),
       })).map(token => ({
         value: token.info.TokenId,
+        info: token.info,
         label: getTokenStrictName(token.info) ?? '-',
         id: getTokenIdentifierIfExists(token.info) ?? '-',
         amount: genFormatTokenAmount(this.props.getTokenInfo)(token.entry)
@@ -357,8 +359,14 @@ export default class WalletSendForm extends Component<Props> {
               className={styles.currencySelect}
               options={tokenOptions}
               {...form.$('selectedToken').bind()}
-              onChange={this.props.onAddToken}
+              onChange={tokenId => this.props.onAddToken(tokenOptions.find(
+                token => token.info.TokenId === tokenId
+              )?.info)}
               skin={SelectTokenSkin}
+              value={this.props.selectedToken?.TokenId ?? this.props.getTokenInfo({
+                identifier: this.props.defaultToken.Identifier,
+                networkId: this.props.defaultToken.NetworkId,
+              }).TokenId}
               optionRenderer={option => (
                 <TokenOptionRow
                   displayName={option.label}
