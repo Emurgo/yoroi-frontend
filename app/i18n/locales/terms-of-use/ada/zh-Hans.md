@@ -65,3 +65,13 @@
 **d.本协议受限于有约束力的仲裁。** 用户同意，因本协议或用户或其他任何人对本软件的访问、使用或安装而引起的或与之有任何关联的针对任何人的任何争议或索赔，均应受限于由按照国际商会仲裁规则委派的一名或多名仲裁员根据该等仲裁规则做出的有约束力的仲裁。仲裁地应为日本。仲裁语言为英语。
 
 **e.语言。** 本协议的任何翻译均仅为本地参考之用，如果英文版本与非英文版本之间发生任何不一致，在任何情况下均应以本协议的英文版本为准并有约束力。
+
+## 12. Delegation and Staking
+
+12.1 **Rewards.** The amount of Rewards a User may earn from delegation depends on various factors including, but not limited to, user participation, stakepool profit margins and the volume of ada being delegated. It is possible that delegation generates no Reward for a User due to the above-mentioned factors. Rewards are earned as of the start of the 3rd epoch on the Cardano blockchain.
+
+12.2 **Delegation.** Users may delegate their stake to one of the various stake pools of the Company or to a third party stake pool. User will have the sole right to determine the volume to be delegated to a stake pool and may increase or decrease its level of participation at any time. Any information Company shares regarding stakepools, including performance metrics and Rewards, will be for indicative purposes only and may not be accurate. Users may only delegate their stake to a stake pool if their ada is in an updated Daedalus or an updated Yoroi wallet at the time of the setup process. User does not acquire any automatic right to Rewards as a result of delegating its stake.
+
+12.3 **Company Stake-Pools.** The Company will operate various stake pools which will be visible in Yoroi. The cost and network and server requirements to reliably operate such stake pools shall be determined by the Company in its sole discretion. Company will communicate the percentage amount of Reward to be shared with Users through the User’s Yoroi wallet. Rewards will accrue at the end of each epoch and will automatically appear in the User’s Yoroi wallet.
+
+12.4 **Redeeming Rewards.** User shall be responsible for payment of all applicable taxes, if any, to which the Rewards might be subject and any and all other taxes which may apply to User once Rewards are redeemed.
