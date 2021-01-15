@@ -65,3 +65,13 @@
 **d. 본 규약은 구속력 있는 중재에 따릅니다:** 유저는 본 규약 또는 유저나 기타의 자에 의한 본 소프트웨어에 대한 액세스, 본 소프트웨어의 이용 또는 본 소프트웨어의 설치에 기인하거나, 어떠한 형태로든 관련된 분쟁 또는 여하한 자에 대한 청구는, 모두 국제상업회의소의 중재규칙에 근거하여 선임된 1명 내지 여러 명의 중재인에 의한 동 규칙에 근거한 구속력 있는 중재에 따른다는 점에 동의합니다. 중재지는 일본으로 하며, 중재 언어는 영어로 합니다.
 
 **e. 언어:** 본 규약의 번역은 현지에서의 참조 편의를 위해 작성되는 것이며, 영어판과 영어 외 언어판과의 사이에 불일치가 있는 경우에는, 본 규약의 영어판이 모든 점에서 우선합니다.
+
+## 12. Delegation and Staking
+
+12.1 **Rewards.** The amount of Rewards a User may earn from delegation depends on various factors including, but not limited to, user participation, stakepool profit margins and the volume of ada being delegated. It is possible that delegation generates no Reward for a User due to the above-mentioned factors. Rewards are earned as of the start of the 3rd epoch on the Cardano blockchain.
+
+12.2 **Delegation.** Users may delegate their stake to one of the various stake pools of the Company or to a third party stake pool. User will have the sole right to determine the volume to be delegated to a stake pool and may increase or decrease its level of participation at any time. Any information Company shares regarding stakepools, including performance metrics and Rewards, will be for indicative purposes only and may not be accurate. Users may only delegate their stake to a stake pool if their ada is in an updated Daedalus or an updated Yoroi wallet at the time of the setup process. User does not acquire any automatic right to Rewards as a result of delegating its stake.
+
+12.3 **Company Stake-Pools.** The Company will operate various stake pools which will be visible in Yoroi. The cost and network and server requirements to reliably operate such stake pools shall be determined by the Company in its sole discretion. Company will communicate the percentage amount of Reward to be shared with Users through the User’s Yoroi wallet. Rewards will accrue at the end of each epoch and will automatically appear in the User’s Yoroi wallet.
+
+12.4 **Redeeming Rewards.** User shall be responsible for payment of all applicable taxes, if any, to which the Rewards might be subject and any and all other taxes which may apply to User once Rewards are redeemed.
