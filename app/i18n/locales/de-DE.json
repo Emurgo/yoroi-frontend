@@ -475,7 +475,7 @@
   "wallet.dashboard.summary.mangled.line2": "Wir empfehlen zu {transactionMessage} um die {ticker} zu delegieren",
   "wallet.dashboard.summary.mangled.makeTx": "Führe eine Transaktion durch",
   "wallet.dashboard.summary.note": "Weniger als Du erwartet hast?",
-  "wallet.dashboard.summary.adaAmountNote": "This balance includes rewards (withdrawal required to be able to send this full amount)",
+  "wallet.dashboard.summary.adaAmountNote": "Dieser Stand enthält Erträge (Eine Einlösung ist notwendig um den vollen Betrag zu versenden)",
   "wallet.dashboard.summary.rewardsTitle": "Summe der Erträge",
   "wallet.dashboard.summary.title": "Zusammenfassung",
   "wallet.dashboard.upcomingRewards.at": "um",
