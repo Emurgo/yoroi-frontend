@@ -14,14 +14,15 @@ chrome.runtime.sendMessage({ type: 'tx_sign_window_retrieve_data' }, response =>
   if (response == null) {
     close();
   }
-  switch (response.type) {
+  const sign = response.sign;
+  switch (sign.type) {
     case 'tx':
       {
         console.log('tx data: ' + JSON.stringify(response));
         // TODO: handle other sign types
         const div = document.getElementById('tx-info');
         if (div != null) {
-          const tx = response.tx;
+          const tx = sign.tx;
           const txid = document.createTextNode(tx.id);
           div.appendChild(txid);
           for (const input of tx.inputs) {
@@ -30,33 +31,41 @@ chrome.runtime.sendMessage({ type: 'tx_sign_window_retrieve_data' }, response =>
             inputDiv.appendChild(boxId);
             div.appendChild(inputDiv);
           }
-          for (const output of tx.outputCandidates) {
+          for (const output of tx.outputs) {
             const outputDiv = document.createElement('div');
             const boxId = document.createTextNode(`Output: [resolve address for address-only ergotrees?] - [${output.value} nanoERGs]`);
             outputDiv.appendChild(boxId);
             div.appendChild(outputDiv);
           }
           const valueDiv = document.createElement('div');
-          if (valueDiv != null)
-          {
+          if (valueDiv != null) {
             valueDiv.appendChild(document.createTextNode(`Value transfered: [TODO: calculate]`));
             div.appendChild(valueDiv);
           }
           const send = document.getElementById('tx-sign');
           if (send != null) {
             send.onclick = () => {
-              chrome.runtime.sendMessage({
-                type: 'sign_confirmed',
-                tx: response.tx,
-                uid: response.uid
-              });
-              close();
+              const pw = document.getElementById('pw-entry');
+              if (pw != null) {
+                chrome.runtime.sendMessage({
+                  type: 'sign_confirmed',
+                  tx: sign.tx,
+                  uid: sign.uid,
+                  tabId: response.tabId,
+                  pw: pw.value
+                });
+                close();
+              }
             };
           }
           const cancel = document.getElementById('tx-cancel');
           if (cancel != null) {
             cancel.onclick = () => {
-              chrome.runtime.sendMessage({ type: 'sign_rejected', uid: response.uid });
+              chrome.runtime.sendMessage({
+                type: 'sign_rejected',
+                uid: sign.uid,
+                tabId: response.tabId
+              });
               close();
             };
           }

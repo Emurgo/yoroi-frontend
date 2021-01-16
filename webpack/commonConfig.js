@@ -38,6 +38,12 @@ const plugins = (folder /*: string */, _networkName /*: string */) /*: * */ => {
       chunks: ['sign'],
       alwaysWriteToDisk: true
     }),
+    new HtmlWebpackPlugin({
+      filename: path.join(__dirname, `../${folder}/connect.html`),
+      template: path.join(__dirname, '../chrome/views/connect.html'),
+      chunks: ['connect'],
+      alwaysWriteToDisk: true
+    }),
     /**
      * This plugin adds `alwaysWriteToDisk` to `HtmlWebpackPlugin`.
      * We need this otherwise the HTML files are managed by in-memory only by our hot reloader

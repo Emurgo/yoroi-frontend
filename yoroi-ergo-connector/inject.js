@@ -166,17 +166,19 @@ if (shouldInject()) {
         //alert("content script message: " + JSON.stringify(message));
         if (message.type == "connector_rpc_response") {
             window.postMessage(message, "*");
-        } else if (message.type == "yoroi_connected") {
-            // inject full API here
-            if (injectIntoPage(apiInject)) {
-                chrome.runtime.sendMessage({type: "init_page_action"});
-            } else {
-                alert("failed to inject Ergo API");
-                // TODO: return an error instead here if injection fails?
+        } else if (message.type == "yoroi_connect_response") {
+            if (message.success) {
+                // inject full API here
+                if (injectIntoPage(apiInject)) {
+                    chrome.runtime.sendMessage({type: "init_page_action"});
+                } else {
+                    alert("failed to inject Ergo API");
+                    // TODO: return an error instead here if injection fails?
+                }
             }
             window.postMessage({
                 type: "connector_connected",
-                success: true
+                success: message.success
             }, "*");
         }
     });
@@ -197,8 +199,14 @@ if (shouldInject()) {
             console.log("connector received from page: " + JSON.stringify(event.data) + " with source = " + event.source + " and origin = " + event.origin);
             yoroiPort.postMessage(event.data);
         } else if (event.data.type == "connector_connect_request") {
+            // URL must be provided here as the url field of Tab is only available
+            // with the "tabs" permission which Yoroi doesn't have
+            yoroiPort.postMessage({
+                type: "yoroi_connect_request",
+                url: location.hostname
+            });
             // TODO: add timeout somehow?
-            chrome.storage.local.get("whitelist", function(result) {
+            /*chrome.storage.local.get("whitelist", function(result) {
                 let whitelist = Object.keys(result).length === 0 ? [] : result.whitelist;
                 if (!whitelist.includes(location.hostname)) {
                     if (confirm(`Allow access of ${location.hostname} to Ergo-Yoroi connector?`)) {
@@ -218,7 +226,7 @@ if (shouldInject()) {
                     // already in whitelist
                     yoroiPort.postMessage({type: "yoroi_connect_request"});
                 }
-            });
+            });*/
         }
     });
 }
