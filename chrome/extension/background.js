@@ -14,6 +14,9 @@ import {
 import {
   PublicDeriver,
 } from '../../app/api/ada/lib/storage/models/PublicDeriver/index';
+import {
+  asGetAllUtxos
+} from '../../app/api/ada/lib/storage/models/PublicDeriver/traits';
 import type {
   Address,
   Tx
@@ -21,6 +24,7 @@ import type {
 import {
   connectorGetBalance,
   connectorGetUtxos,
+  connectorSendTx,
   connectorSignTx
 } from './ergo-connector/api';
 
@@ -65,11 +69,6 @@ let db: ?lf$Database = null;
 
 const pendingSigns: Map<RpcUid, PendingSign> = new Map();
 
-// for mocking out network delay
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
 async function firstWallet(): Promise<PublicDeriver<>> {
   if (db != null) {
     const wallets = await getWallets({ db });
@@ -97,8 +96,6 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
       switch (responseData.request.type) {
         case 'tx':
           {
-            const wallet = await firstWallet();
-            const utxos = await connectorGetUtxos(wallet);
             const txToSign = request.tx;
             let allIndices = [];
             for (let i = 0; i < txToSign.inputs.length; i += 1) {
@@ -254,11 +251,18 @@ chrome.runtime.onConnectExternal.addListener(port => {
             });
             break;
           case 'submit_tx':
-            // mock send
-            await sleep(2000);
-            rpcResponse({
-              ok: message.params[0].id
-            });
+            try {
+              const wallet = await firstWallet();
+              const id = await connectorSendTx(wallet, message.params[0]);
+              rpcResponse({
+                ok: id
+              });
+            } catch (e) {
+              console.log(`tx send err: ${e}`);
+              rpcResponse({
+                err: JSON.stringify(e)
+              });
+            }
             break;
           case 'add_external_box':
             rpcResponse({

@@ -28,6 +28,12 @@ import { BIP32PrivateKey, } from '../../../app/api/common/lib/crypto/keys/keyRep
 import { generateKeys } from '../../../app/api/ergo/lib/transactions/utxoTransaction';
 // UtxoTxOutput.UtxoTransactionOutput.TransactionId/OutputIndex?
 
+import axios from 'axios';
+import {
+  Logger,
+  stringifyError
+} from '../../../app/utils/logging';
+
 export async function connectorGetBalance(wallet: PublicDeriver<>, tokenId: string): Promise<BigNumber> {
   if (tokenId === 'ERG') {  
     const canGetBalance = asGetBalance(wallet);
@@ -86,8 +92,6 @@ export async function connectorGetUtxos(wallet: PublicDeriver<>, valueExpected: 
   }
   throw Error('asGetAllUtxos failed');
 }
-
-
 
 export async function connectorSignTx(wallet: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetSigningKey, password: string, utxos: any/* IGetAllUtxosResponse*/, tx: Tx, indices: Array<number>): Promise<SignedTx> {
   console.log('loading rustmodule');
@@ -153,6 +157,45 @@ export async function connectorSignTx(wallet: IPublicDeriver<ConceptualWallet & 
       RustModule.SigmaRust.ErgoBoxes.from_boxes_json([]), // TODO: not supported by sigma-rust
     );
   return signedTx.to_json();
+}
+
+export async function connectorSendTx(wallet: IPublicDeriver<ConceptualWallet>, tx: SignedTx): Promise<TxId> {  
+  // return sendTx({
+  //   network: wallet.getParent().getNetworkInfo(),
+  //   ...tx
+  // });
+  console.log(`tring to send: ${JSON.stringify(tx)}`);
+  //const tmp = tx.inputs[0].boxId;
+  //tx.inputs[0].boxId = tx.inputs[1].boxId;
+  //tx.inputs[1].boxId = tmp;
+  console.log('hi');
+  const network = wallet.getParent().getNetworkInfo();
+  const { BackendService } = network.Backend;
+  console.log(`backend: ${BackendService}`);
+  if (BackendService == null) throw new Error(`${nameof(this.getUTXOsForAddresses)} missing backend url`);
+  return axios(
+    `${BackendService}/api/txs/signed`,
+    {
+      method: 'post',
+      timeout: 2 * 20000,//CONFIG.app.walletRefreshInterval,
+      data: tx,
+      // headers: {
+      //   'yoroi-version': this.getLastLaunchVersion(),
+      //   'yoroi-locale': this.getCurrentLocale()
+      // }
+    }
+  ).then(response => {
+    console.log(`tx send success: ${response.data.id}`);
+    return Promise.resolve(response.data.id);
+  })
+    .catch((error) => {
+      Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.sendTx)} error: ` + stringifyError(error));
+      console.log(`tx send error: ${stringifyError(error)}`);
+      if (error.request.response.includes('Invalid witness')) {
+        throw new InvalidWitnessError();
+      }
+      throw new SendTransactionApiError();
+    });
 }
 
 // TODO: generic data sign
