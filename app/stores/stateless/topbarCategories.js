@@ -9,6 +9,8 @@ import { networks, isCardanoHaskell, } from '../../api/ada/lib/storage/database/
 import transactionsIcon from '../../assets/images/wallet-nav/tab-transactions.inline.svg';
 import sendIcon from '../../assets/images/wallet-nav/tab-send.inline.svg';
 import receiveIcon from '../../assets/images/wallet-nav/tab-receive.inline.svg';
+import dashboardIcon from '../../assets/images/wallet-nav/tab-dashboard.inline.svg';
+import delegationListIcon from '../../assets/images/wallet-nav/tab-delegation_list.inline.svg';
 
 const messages = defineMessages({
   transactions: {
@@ -77,7 +79,7 @@ export const RECEIVE: TopbarCategory = registerCategory({
 export const STAKE_DASHBOARD: TopbarCategory = registerCategory({
   className: 'stakeDashboard',
   route: ROUTES.WALLETS.DELEGATION_DASHBOARD,
-  icon: undefined,
+  icon: dashboardIcon,
   label: messages.delegationDashboard,
   isVisible: request => (
     asGetStakingKey(request.selected) != null
@@ -86,7 +88,7 @@ export const STAKE_DASHBOARD: TopbarCategory = registerCategory({
 export const SEIZA_STAKE_SIMULATOR: TopbarCategory = registerCategory({
   className: 'stakeSimulator',
   route: ROUTES.WALLETS.ADAPOOL_DELEGATION_SIMPLE,
-  icon: undefined,
+  icon: delegationListIcon,
   label: messages.delegationList,
   isVisible: request => (
     asGetStakingKey(request.selected) != null &&
