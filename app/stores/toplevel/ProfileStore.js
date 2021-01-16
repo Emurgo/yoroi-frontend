@@ -665,7 +665,5 @@ export function getPaperWalletIntro(currentLocale: string, defaultLocale: string
 }
 
 export function getTermsOfUse(api: 'ada', currentLocale: string): string {
-  const tos = require(`../../i18n/locales/terms-of-use/${api}/${currentLocale}.md`);
-  const stakingTerms = require(`../../i18n/locales/terms-of-use/itn/${currentLocale}.md`);
-  return tos + '\n\n' + stakingTerms;
+  return require(`../../i18n/locales/terms-of-use/${api}/${currentLocale}.md`);
 }
