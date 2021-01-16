@@ -21,18 +21,20 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import SpendingPasswordInput from '../../widgets/forms/SpendingPasswordInput';
 import AmountInputSkin from '../skins/AmountInputSkin';
 import { NumericInput } from 'react-polymorph/lib/components/NumericInput';
-import {
-  MultiToken,
-} from '../../../api/common/lib/MultiToken';
+import { ProgressInfo } from '../../../stores/ada/VotingStore';
+import ProgressStepBlock from './ProgressStepBlock';
+import WarningBox from '../../widgets/WarningBox';
+import { getTokenName, genFormatTokenAmount, } from '../../../stores/stateless/tokenHelpers';
 import { calcMaxBeforeDot, } from '../../../utils/validations';
 import type {
   TokenLookupKey,
 } from '../../../api/common/lib/MultiToken';
 import type { TokenRow, } from '../../../api/ada/lib/storage/database/primitives/tables';
-import { getTokenName, genFormatTokenAmount, } from '../../../stores/stateless/tokenHelpers';
 import { truncateToken } from '../../../utils/formatters';
 
-import WarningBox from '../../widgets/WarningBox';
+import {
+  MultiToken,
+} from '../../../api/common/lib/MultiToken';
 
 const messages = defineMessages({
   line1: {
@@ -155,8 +157,7 @@ export default class VotingRegTxDialog extends Component<Props> {
             // note: we purposely don't put "total" since it doesn't really make sense here
             // since the fee is unrelated to the amount you're about to stake
             total=""
-            value={new BigNumber(0).toFormat(tokenInfo.Metadata.numberOfDecimals)
-            }
+            value={new BigNumber(0).toFormat(tokenInfo.Metadata.numberOfDecimals)}
             skin={AmountInputSkin}
             classicTheme={this.props.classicTheme}
           />

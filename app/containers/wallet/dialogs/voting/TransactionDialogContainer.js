@@ -3,9 +3,8 @@ import type { Node } from 'react';
 import React, { Component } from 'react';
 import { observer, } from 'mobx-react';
 import { computed, } from 'mobx';
-import { defineMessages, intlShape } from 'react-intl';
+import { intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { getApiForNetwork, getApiMeta } from '../../../../api/common/utils';
 import type { InjectedOrGenerated } from '../../../../types/injectedPropsType';
 import VotingRegTxDialog from '../../../../components/wallet/voting/VotingRegTxDialog';
 import { WalletTypeOption } from '../../../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
@@ -13,6 +12,8 @@ import LocalizableError from '../../../../i18n/LocalizableError';
 import { PublicDeriver } from '../../../../api/ada/lib/storage/models/PublicDeriver/index';
 import type { CreateVotingRegTxFunc } from '../../../../api/ada/index';
 import { ProgressInfo } from '../../../../stores/ada/VotingStore';
+import type { TokenInfoMap } from '../../../../stores/toplevel/TokenInfoStore';
+import { genLookupOrFail } from '../../../../stores/stateless/tokenHelpers';
 
 export type GeneratedData = typeof TransactionDialogContainer.prototype.generated;
 
@@ -34,24 +35,23 @@ export default class TransactionDialogContainer extends Component<Props> {
     const { submit, cancel, goBack } = this.props;
     const selectedWallet = this.generated.stores.wallets.selected;
     if (selectedWallet == null) {
-      throw new Error(`${nameof(TransactionDialogContainer)} no wallet selected`);
+      return null;
     }
-    const networkInfo = selectedWallet.getParent().getNetworkInfo();
-    const apiMeta = getApiMeta(getApiForNetwork(networkInfo))?.meta;
-    if (apiMeta == null) throw new Error(`${nameof(TransactionDialogContainer)} no API selected`);
-    const { votingRegTransaction, votingStore } = this.generated.stores.substores.ada;
-    const votingRegTx = votingRegTransaction.createVotingRegTx.result;
+
+    const { votingRegTransactionStore, votingStore } = this.generated.stores.substores.ada;
+    const votingRegTx = votingRegTransactionStore.createVotingRegTx.result;
 
     if (votingRegTx != null) {
       return (
         <VotingRegTxDialog
           progressInfo={votingStore.progressInfo}
-          staleTx={votingRegTransaction.isStale}
-          transactionFee={votingRegTx.fee(true)}
+          staleTx={votingRegTransactionStore.isStale}
+          transactionFee={votingRegTx.fee()}
           isSubmitting={this.generated.stores.wallets.sendMoneyRequest.isExecuting}
           isHardware={
             selectedWallet.getParent().getWalletType() === WalletTypeOption.HARDWARE_WALLET
           }
+          getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
           onCancel={cancel}
           goBack={goBack}
           onSubmit={async ({ password }) => {
@@ -64,11 +64,6 @@ export default class TransactionDialogContainer extends Component<Props> {
           }
           classicTheme={this.props.classicTheme}
           error={this.generated.stores.wallets.sendMoneyRequest.error}
-          meta={{
-            decimalPlaces: apiMeta.decimalPlaces.toNumber(),
-            totalSupply: apiMeta.totalSupply,
-            ticker: apiMeta.primaryTicker,
-          }}
         />
       );
     }
@@ -94,7 +89,7 @@ export default class TransactionDialogContainer extends Component<Props> {
           votingStore: {|
             progressInfo: ProgressInfo,
           |},
-          votingRegTransaction: {|
+          votingRegTransactionStore: {|
             createVotingRegTx: {|
               error: ?LocalizableError,
               isExecuting: boolean,
@@ -111,6 +106,9 @@ export default class TransactionDialogContainer extends Component<Props> {
           wasExecuted: boolean,
         |},
         selected: null | PublicDeriver<>,
+      |},
+      tokenInfoStore: {|
+        tokenInfo: TokenInfoMap,
       |},
     |},
   |} {
@@ -134,6 +132,9 @@ export default class TransactionDialogContainer extends Component<Props> {
         },
       },
       stores: {
+        tokenInfoStore: {
+          tokenInfo: stores.tokenInfoStore.tokenInfo,
+        },
         wallets: {
           selected: stores.wallets.selected,
           sendMoneyRequest: {
@@ -147,7 +148,7 @@ export default class TransactionDialogContainer extends Component<Props> {
             votingStore: {
               progressInfo: stores.substores.ada.votingStore.progressInfo,
             },
-            votingRegTransaction: {
+            votingRegTransactionStore: {
               isStale: votingStore.isStale,
               createVotingRegTx: {
                 result: votingStore.createVotingRegTx.result,
