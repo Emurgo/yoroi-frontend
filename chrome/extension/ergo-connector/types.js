@@ -12,7 +12,7 @@ export type BoxCandidate = {|
   boxId: BoxId,
   value: Value,
   ergoTree: ErgoTree,
-  assets: [TokenAmount],
+  assets: TokenAmount[],
   additionalRegisters: {| [string]: Constant |},
   creationHeight: number,
 |};
@@ -62,9 +62,9 @@ export type ProverResult = {|
 
 export type SignedTx = {|
   id: TxId,
-  inputs: [SignedInput],
-  dataInputs: [DataInput],
-  outputs: [Box],
+  inputs: SignedInput[],
+  dataInputs: DataInput[],
+  outputs: Box[],
   size: number,
 |};
 
@@ -77,9 +77,9 @@ export type TokenId = string;
 
 export type Tx = {|
   id: TxId,
-  inputs: [UnsignedInput],
-  dataInputs: [DataInput],
-  outputCandidates: [BoxCandidate],
+  inputs: UnsignedInput[],
+  dataInputs: DataInput[],
+  outputCandidates: BoxCandidate[],
 |};
 
 export type TxId = string;

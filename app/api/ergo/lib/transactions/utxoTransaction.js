@@ -439,7 +439,7 @@ export function signTransaction(request: {|
   };
 }
 
-function generateKeys(request: {|
+export function generateKeys(request: {|
   senderUtxos: Array<ErgoAddressedUtxo>,
   keyLevel: number,
   signingKey: BIP32PrivateKey

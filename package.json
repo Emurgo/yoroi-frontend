@@ -170,7 +170,7 @@
     "classnames": "2.2.6",
     "crypto-random-string": "3.3.0",
     "dropbox": "4.0.30",
-    "ergo-lib-wasm-browser": "0.4.1",
+    "ergo-lib-wasm-browser": "0.4.3",
     "es6-error": "4.1.1",
     "file-saver": "1.3.8",
     "jdenticon": "3.0.1",

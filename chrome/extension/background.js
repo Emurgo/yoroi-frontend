@@ -79,6 +79,16 @@ async function firstWallet(): Promise<PublicDeriver<>> {
 }
 
 chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
+  async function signTxInputs(tx, indices: number[]): Promise<any> {
+    const wallet = await firstWallet();
+    const canGetAllUtxos = await asGetAllUtxos(wallet);
+    if (canGetAllUtxos == null) {
+      throw new Error('could not get all utxos');
+    }
+    let utxos = await canGetAllUtxos.getAllUtxos();
+    const password = 'spending pw goes here';
+    return connectorSignTx(wallet, password, utxos, tx, indices);
+  }
   console.log(JSON.stringify(sender));
   // alert(`received event: ${JSON.stringify(request)}`);
   if (request.type === 'sign_confirmed') {
@@ -89,27 +99,24 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
           {
             const wallet = await firstWallet();
             const utxos = await connectorGetUtxos(wallet);
-            const password = 'tencharacters';
             const txToSign = request.tx;
             let allIndices = [];
-            for (let i = 0; i < txToSign.inputs.length(); i += 1) {
+            for (let i = 0; i < txToSign.inputs.length; i += 1) {
               allIndices.push(i);
             }
-            const signedTx = await connectorSignTx(password, utxos, txToSign, allIndices);
+            const signedTx = await signTxInputs(txToSign, allIndices);
             responseData.resolve({ ok: signedTx });
           }
           break;
         case 'tx_input':
           {
-            responseData.resolve({
-              err: {
-                code: 1,
-                info: 'mock proof generation error - tx not signed',
-              }
-            });
+            const txToSign = request.tx;
+            const signedTx = await signTxInputs(txToSign, [request.index]);
+            responseData.resolve({ ok: signedTx.inputs[request.index] });
           }
           break;
         case 'data':
+          // mocked data sign
           responseData.resolve({ ok: '0x82cd23b432afab24343f' });
           break;
         default:
@@ -271,5 +278,7 @@ chrome.runtime.onConnectExternal.addListener(port => {
         }
       }
     });
+  } else {
+    // disconnect?
   }
 });
