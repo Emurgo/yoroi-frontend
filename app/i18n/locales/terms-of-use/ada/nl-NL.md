@@ -66,7 +66,7 @@ Door de Software te gebruiken, erkent en gaat Gebruiker ermee akkoord: (i) dat h
 
 **e. TAAL.** Elke vertaling van deze overeenkomst is uitsluitend gemaakt voor lokale referentie en in het geval van enige tegenstrijdigheid tussen de Engelse en niet-Engelse versies, zal de Engelse versie van deze overeenkomst prevaleren en in alle opzichten gelden.
 
-## 12. Delegation and Staking
+## 12. Delegeren en "Staken"
 
 12.1 **Rewards.** The amount of Rewards a User may earn from delegation depends on various factors including, but not limited to, user participation, stakepool profit margins and the volume of ada being delegated. It is possible that delegation generates no Reward for a User due to the above-mentioned factors. Rewards are earned as of the start of the 3rd epoch on the Cardano blockchain.
 
