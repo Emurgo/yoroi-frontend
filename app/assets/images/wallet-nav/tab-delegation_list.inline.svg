@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="25px" height="25px" viewBox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>6A33B04F-7DCB-4252-B9FA-1264ADAF52AD</title>
+    <defs>
+        <rect id="path-1" x="128" y="100" width="1202" height="20" rx="8"></rect>
+        <filter x="-1.6%" y="-85.0%" width="103.2%" height="290.0%" filterUnits="objectBoundingBox" id="filter-2">
+            <feOffset dx="0" dy="2" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="6" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.06 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
+        </filter>
+    </defs>
+    <g id="*transactions" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Transactions-(status-wording)" transform="translate(-1131.000000, -118.000000)">
+            <rect id="bg" fill="#F0F3F5" x="0" y="0" width="1366" height="1178"></rect>
+            <g id="Rectangle-5">
+                <use fill="black" fill-opacity="1" filter="url(#filter-2)" xlink:href="#path-1"></use>
+                <use fill="#FFFFFF" fill-rule="evenodd" xlink:href="#path-1"></use>
+            </g>
+            <rect id="Rectangle-5" fill="#FFFFFF" x="128" y="108" width="1202" height="1039" rx="8"></rect>
+            <g id="tabs" transform="translate(127.000000, 100.000000)">
+                <path d="M8,0 L1194.99917,0 C1199.41745,-1.26386638e-13 1202.99917,3.581722 1202.99917,8 L1202.99917,62 L1202.99917,62 L0,62 L0,8 C-5.41083001e-16,3.581722 3.581722,8.11624501e-16 8,0 Z" id="Rectangle-5" fill="#F0F3F5"></path>
+                <g id="tab/default-2" transform="translate(972.807980, 0.000000)">
+                    <path d="M4,1.36424205e-12 L227.19202,1.36424205e-12 C229.401159,1.37953312e-12 231.19202,1.790861 231.19202,4 L231.19202,62 L231.19202,62 L0,62 L0,4 C-2.705415e-16,1.790861 1.790861,1.36464786e-12 4,1.36424205e-12 Z" id="Rectangle-7-Copy-2" opacity="0"></path>
+                    <g id="Group" transform="translate(32.096010, 18.000000)">
+                        <g id="icon-/-transactions" transform="translate(0.000000, 1.000000)">
+                            <rect id="Rectangle" x="0" y="0" width="24" height="24"></rect>
+                            <g id="icon/dashboard-copy" transform="translate(3.000000, 5.000000)" fill="#6B7384" fill-rule="nonzero">
+                                <path d="M17,12 C17.5522847,12 18,12.4477153 18,13 C18,13.5128358 17.6139598,13.9355072 17.1166211,13.9932723 L17,14 L5,14 C4.44771525,14 4,13.5522847 4,13 C4,12.4871642 4.38604019,12.0644928 4.88337887,12.0067277 L5,12 L17,12 Z M1,12 C1.55228475,12 2,12.4477153 2,13 C2,13.5522847 1.55228475,14 1,14 C0.44771525,14 0,13.5522847 0,13 C0,12.4477153 0.44771525,12 1,12 Z M17,6 C17.5522847,6 18,6.44771525 18,7 C18,7.51283584 17.6139598,7.93550716 17.1166211,7.99327227 L17,8 L5,8 C4.44771525,8 4,7.55228475 4,7 C4,6.48716416 4.38604019,6.06449284 4.88337887,6.00672773 L5,6 L17,6 Z M1,6 C1.55228475,6 2,6.44771525 2,7 C2,7.55228475 1.55228475,8 1,8 C0.44771525,8 0,7.55228475 0,7 C0,6.44771525 0.44771525,6 1,6 Z M17,0 C17.5522847,0 18,0.44771525 18,1 C18,1.51283584 17.6139598,1.93550716 17.1166211,1.99327227 L17,2 L5,2 C4.44771525,2 4,1.55228475 4,1 C4,0.487164161 4.38604019,0.0644928393 4.88337887,0.00672773133 L5,0 L17,0 Z M1,0 C1.55228475,0 2,0.44771525 2,1 C2,1.55228475 1.55228475,2 1,2 C0.44771525,2 0,1.55228475 0,1 C0,0.44771525 0.44771525,0 1,0 Z" id="Combined-Shape"></path>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
