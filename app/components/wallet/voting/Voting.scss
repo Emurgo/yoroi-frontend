@@ -14,11 +14,19 @@
     }
 
     .card {
+      background-repeat: no-repeat;
+      background-position: 50% 30%;
+      background-size: contain;
+
       width: 272px;
       height: 374px;
       border: 1px solid #C4CAD7;
       border-radius: 8px;
       padding: 24px;
+
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
 
       .lineText {
         font-size: 16px;
@@ -38,25 +46,20 @@
         justify-content: center;        
       }
 
-      .image {
-        display: flex;
-        justify-content: center;
-
-        margin-top: 38px;
-        margin-bottom: 89px;
-        .imagePlaceholder {
-          background-color: #DCE0E9;
-          width: 80px;
-          height: 80px;
-          border-radius: 8px;
-        }
-      }
-
       .appBadges {
         display: flex;
         justify-content: center;
         margin-top: 12px;
       }
+    }
+  }
+
+  .card {
+    &.bgStep1 {
+      background-image: url(../../../assets/images/pic-catalyst-step1.inline.svg);
+    }
+    &.bgStep2 {
+      background-image: url(../../../assets/images/pic-catalyst-step2.inline.svg);
     }
   }
 
@@ -73,6 +76,10 @@
   .lineText {
     color: #6B7384;
     text-align: center;
+  }
+
+  .step2Text {
+    margin-bottom: 20px;
   }
   
   .registerButton {

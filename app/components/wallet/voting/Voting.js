@@ -8,8 +8,8 @@ import globalMessages from '../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
-import AppStoreBadge from '../../../assets/images/transaction/app-store-badge.inline.svg';
-import PlayStoreBadge from '../../../assets/images/transaction/google-play-badge.inline.svg';
+import AppStoreBadge from '../../../assets/images/app-store-badge.inline.svg';
+import PlayStoreBadge from '../../../assets/images/google-play-badge.inline.svg';
 
 import styles from './Voting.scss';
 
@@ -41,7 +41,6 @@ export default class Voting extends Component<Props> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
-  
 
   render(): Node {
     const { intl } = this.context;;
@@ -60,29 +59,25 @@ export default class Voting extends Component<Props> {
         </div>
 
         <div className={styles.cardContainer}>
-          <div className={styles.card}>
+          <div className={classnames([styles.card, styles.bgStep1])}>
             <div className={styles.number}>
               <span>1</span>
             </div>
-            <div className={styles.image}>
-              <div className={styles.imagePlaceholder} />
-            </div>
-            <div className={classnames([styles.lineText])}>
-              {intl.formatMessage(messages.line3)}
-            </div>
-            <div className={styles.appBadges}>
-              <AppStoreBadge />
-              <PlayStoreBadge />
+            <div>
+              <div className={classnames([styles.lineText])}>
+                {intl.formatMessage(messages.line3)}
+              </div>
+              <div className={styles.appBadges}>
+                <AppStoreBadge />
+                <PlayStoreBadge />
+              </div>
             </div>
           </div>
-          <div className={styles.card}>
+          <div className={classnames([styles.card, styles.bgStep2])}>
             <div className={styles.number}>
               <span>2</span>
             </div>
-            <div className={styles.image}>
-              <div className={styles.imagePlaceholder} />
-            </div>
-            <div className={classnames([styles.lineText])}>
+            <div className={classnames([styles.lineText, styles.step2Text])}>
               {intl.formatMessage(messages.line4)}
             </div>
           </div>
