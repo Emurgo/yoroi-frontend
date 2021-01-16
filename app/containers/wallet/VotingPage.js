@@ -9,6 +9,7 @@ import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import Voting from '../../components/wallet/voting/Voting';
 import VotingRegistrationDialogContainer from './dialogs/voting/VotingRegistrationDialogContainer';
 import type { GeneratedData as VotingRegistrationDialogContainerData } from './dialogs/voting/VotingRegistrationDialogContainer';
+import { handleExternalLinkClick } from '../../utils/routing';
 
 export type GeneratedData = typeof VotingPage.prototype.generated;
 type Props = {|
@@ -41,7 +42,7 @@ export default class VotingPage extends Component<Props> {
     return (
       <div>
         {activeDialog}
-        <Voting start={this.start} />
+        <Voting start={this.start} onExternalLinkClick={handleExternalLinkClick} />
       </div>
     );
   }

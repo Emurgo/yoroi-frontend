@@ -33,7 +33,8 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  start: void => void
+  +start: void => void,
+  +onExternalLinkClick: MouseEvent => void,
 |};
 
 @observer
@@ -68,8 +69,18 @@ export default class Voting extends Component<Props> {
                 {intl.formatMessage(messages.line3)}
               </div>
               <div className={styles.appBadges}>
-                <AppStoreBadge />
-                <PlayStoreBadge />
+                <a
+                  href="https://apps.apple.com/kg/app/catalyst-voting/id1517473397"
+                  onClick={event => this.props.onExternalLinkClick(event)}
+                >
+                  <AppStoreBadge />
+                </a>
+                <a
+                  href="https://play.google.com/store/apps/details?id=io.iohk.vitvoting"
+                  onClick={event => this.props.onExternalLinkClick(event)}
+                >
+                  <PlayStoreBadge />
+                </a>
               </div>
             </div>
           </div>
