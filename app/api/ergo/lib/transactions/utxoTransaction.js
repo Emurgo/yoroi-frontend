@@ -145,21 +145,7 @@ export function sendAllUnsignedTxFromUtxo(request: {|
   }
 
   const wasmInputs = RustModule.SigmaRust.ErgoBoxes.from_boxes_json(
-    request.utxos.map(utxo => {
-      return {
-        boxId: utxo.boxId,
-        value: Number.parseInt(utxo.amount, 10),
-        ergoTree: utxo.ergoTree,
-        assets: (utxo.assets ?? []).map(asset => ({
-          amount: asset.amount,
-          tokenId: asset.tokenId,
-        })),
-        creationHeight: utxo.creationHeight,
-        additionalRegisters: utxo.additionalRegisters || Object.freeze({}),
-        transactionId: utxo.tx_hash,
-        index: utxo.tx_index,
-      };
-    })
+    toErgoBoxJSON(request.utxos)
   );
 
   const inputAmountSum = request.utxos.reduce(
@@ -374,21 +360,7 @@ export function newErgoUnsignedTxFromUtxo(request: {|
   })();
 
   const wasmInputs = RustModule.SigmaRust.ErgoBoxes.from_boxes_json(
-    request.utxos.map(utxo => {
-      return {
-        boxId: utxo.boxId,
-        value: Number.parseInt(utxo.amount, 10),
-        ergoTree: utxo.ergoTree,
-        assets: (utxo.assets ?? []).map(asset => ({
-          amount: asset.amount,
-          tokenId: asset.tokenId,
-        })),
-        creationHeight: utxo.creationHeight,
-        additionalRegisters: utxo.additionalRegisters || Object.freeze({}),
-        transactionId: utxo.tx_hash,
-        index: utxo.tx_index,
-      };
-    })
+    toErgoBoxJSON(request.utxos)
   );
 
   const selectedInputs = (() => {
@@ -541,4 +513,24 @@ function generateKeys(request: {|
   }
 
   return secretKeys;
+}
+
+export function toErgoBoxJSON(
+  utxos: Array<RemoteUnspentOutput>
+): Array<ErgoBoxJson> {
+  return utxos.map(utxo => {
+      return {
+        boxId: utxo.boxId,
+        value: Number.parseInt(utxo.amount, 10),
+        ergoTree: utxo.ergoTree,
+        assets: (utxo.assets ?? []).map(asset => ({
+          amount: asset.amount,
+          tokenId: asset.tokenId,
+        })),
+        creationHeight: utxo.creationHeight,
+        additionalRegisters: utxo.additionalRegisters || Object.freeze({}),
+        transactionId: utxo.tx_hash,
+        index: utxo.tx_index,
+      };
+    })
 }
