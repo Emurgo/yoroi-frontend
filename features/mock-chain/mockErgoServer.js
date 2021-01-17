@@ -7,6 +7,7 @@ import type {
   HistoryRequest, HistoryResponse,
   BestBlockRequest, BestBlockResponse,
   SignedRequest, SignedResponse,
+  AssetInfoRequest, AssetInfoResponse,
 } from '../../app/api/ergo/lib/state-fetch/types';
 import type {
   FilterUsedRequest, FilterUsedResponse,
@@ -109,6 +110,14 @@ export function getMockServer(
     ): Promise<void> => {
       const bestBlock = await mockImporter.getBestBlock(req.body);
       res.send(bestBlock);
+    });
+
+    server.post('/api/assets/info', async (
+      req: { body: AssetInfoRequest, ... },
+      res: { send(arg: AssetInfoResponse): any, ... }
+    ): Promise<void> => {
+      const assetInfo = await mockImporter.getAssetInfo(req.body);
+      res.send(assetInfo);
     });
 
     server.post('/api/txs/signed', (

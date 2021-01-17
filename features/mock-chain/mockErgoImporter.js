@@ -7,12 +7,14 @@ import type {
   AddressUtxoFunc,
   HistoryFunc,
   BestBlockFunc,
+  AssetInfoFunc,
   ErgoTxOutput,
 } from '../../app/api/ergo/lib/state-fetch/types';
 import {
   getErgoAddress,
   genGetTransactionsHistoryForAddresses,
   genGetBestBlock,
+  genGetAssetInfo,
   genCheckAddressesInUse,
   genUtxoForAddresses,
   genUtxoSumForAddresses,
@@ -114,8 +116,19 @@ export const generateTransaction = (): {|
     const hash = 'b713cc0d63106c3806b5a7077cc37a294fcca0e479f26aac64e51e04ae808d75';
     const height = 1;
     // 9erND2FjDWVTgT2TWRZ9dCLueKAWjoskx6KqRmZbtvtRXEgCrja
-    const address = getErgoAddress(
+    const simpleAddress = getErgoAddress(
       testWallets['ergo-simple-wallet'].mnemonic,
+      [
+        WalletTypePurpose.BIP44,
+        CoinTypes.ERGO,
+        0 + HARD_DERIVATION_START,
+        ChainDerivations.EXTERNAL,
+        0
+      ]
+    );
+    // 9iFo22w5LoHJcvKn6oK9Br7dw3bUqeXkRddeiKAEEFUr95zv1bY
+    const tokenAddress = getErgoAddress(
+      testWallets['ergo-token-wallet'].mnemonic,
       [
         WalletTypePurpose.BIP44,
         CoinTypes.ERGO,
@@ -141,19 +154,53 @@ export const generateTransaction = (): {|
       outputs: [
         // ergo-simple-wallet
         replaceMockOutputBoxId({
-          // index: 0
           additionalRegisters: Object.freeze({}),
-          address: address.to_base58(),
+          address: simpleAddress.to_base58(),
           assets: [],
           creationHeight: height,
-          ergoTree: Buffer.from(address.address().to_ergo_tree().to_bytes()).toString('hex'),
+          ergoTree: Buffer.from(simpleAddress.address().to_ergo_tree().to_bytes()).toString('hex'),
           id: '',
           txId: hash,
           index: 0,
           mainChain: true,
           spentTransactionId: null,
           value: 20_000000000,
-        })
+        }),
+        // ergo-simple-wallet
+        replaceMockOutputBoxId({
+          additionalRegisters: Object.freeze({}),
+          address: tokenAddress.to_base58(),
+          assets: [],
+          creationHeight: height,
+          ergoTree: Buffer.from(tokenAddress.address().to_ergo_tree().to_bytes()).toString('hex'),
+          id: '',
+          txId: hash,
+          index: 1,
+          mainChain: true,
+          spentTransactionId: null,
+          value: 10_000000000,
+        }),
+        // ergo-simple-wallet
+        replaceMockOutputBoxId({
+          additionalRegisters: Object.freeze({
+            'R4': '0e03555344',
+            'R5': '0e184e6f7468696e67206261636b65642055534420746f6b656e',
+            'R6': '0e0132',
+          }),
+          address: tokenAddress.to_base58(),
+          assets: [{
+            amount: 12340,
+            tokenId: '43a35e15ae2a83fa188674a2bd53007b07e119a0eaaf40b890b2081c2864f12a',
+          }],
+          creationHeight: height,
+          ergoTree: Buffer.from(tokenAddress.address().to_ergo_tree().to_bytes()).toString('hex'),
+          id: '',
+          txId: hash,
+          index: 2,
+          mainChain: true,
+          spentTransactionId: null,
+          value: 1_000000000,
+        }),
       ],
       block_num: height,
       tx_ordinal: 1,
@@ -243,11 +290,14 @@ const sendTx = (request: SignedRequest): SignedResponse => {
   return { txId: remoteTx.hash };
 };
 
+const getAssetInfo: AssetInfoFunc = genGetAssetInfo(transactions);
+
 export default {
   utxoForAddresses,
   utxoSumForAddresses,
   usedAddresses,
   history,
   getBestBlock,
+  getAssetInfo,
   sendTx,
 };

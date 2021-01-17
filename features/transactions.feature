@@ -95,7 +95,7 @@ Feature: Send transaction
     Given There is a Byron wallet stored named many-tx-wallet
     And I have a wallet with funds
     When I go to the send transaction screen
-	  And I click on "Send all my ADA" checkbox
+	  And I click on "Send all" checkbox
     And I fill the address of the form:
       | address                                                     |
       | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv |
@@ -270,19 +270,8 @@ Feature: Send transaction
 
   @it-162
   Scenario Outline: Send from an ergo wallet (IT-162)
-    When I click the restore button for ergo
-    Then I select bip44 15-word wallet
-    And I enter the name "Restored Wallet"
-    And I enter the recovery phrase:
-    | recoveryPhrase                                                                             |
-    | eight country switch draw meat scout mystery blade tip drift useless good keep usage title |
-    And I enter the restored wallet password:
-    | password   | repeatedPassword |
-    | asdfasdfasdf | asdfasdfasdf       |
-    And I click the "Restore Wallet" button
-    Then I should see a plate CXTP-1821
-    Then I click the next button
-    Then I should see the opened wallet with name "Restored Wallet"
+    Given There is an Ergo wallet stored named ergo-simple-wallet
+    And I have a wallet with funds
     When I go to the send transaction screen
     And I fill the form:
       | address                        | amount   |
@@ -319,7 +308,7 @@ Feature: Send transaction
     Then I click the next button
     Then I should see the opened wallet with name "Restored Wallet"
     When I go to the send transaction screen
-    And I click on "Send all my ADA" checkbox
+    And I click on "Send all" checkbox
     And I fill the address of the form:
       | address                                                     |
       | 9guxMsa2S1Z4xzr5JHUHZesznThjZ4BMM9Ra5Lfx2E9duAnxEmv         |
@@ -381,3 +370,53 @@ Feature: Send transaction
     When I confirm Yoroi transfer funds
     Then I should see the summary screen
     And I should see 1 pending transactions
+
+  @it-170
+  Scenario Outline: Can send some of a custom token (IT-170)
+    Given There is an Ergo wallet stored named ergo-token-wallet
+    And I have a wallet with funds
+    When I go to the send transaction screen
+
+    And I open the token selection dropdown
+    And I select token "USD"
+
+    And I fill the form:
+      | address                        | amount   |
+      | <address>                      | <amount> |
+    And The transaction fees are "<fee>"
+    And I click on the next button in the wallet send form
+    And I see send money confirmation dialog
+    And I see CONFIRM TRANSACTION Pop up:
+      | address   | amount    |fee      |
+      | <address> | 0.001000000  |<fee>    |
+    And I enter the wallet password:
+      | password   |
+      | asdfasdfasdf |
+    And I submit the wallet send form
+    Then I should see the summary screen
+
+    Examples:
+      | address                                             | amount       |fee         |
+      | 9guxMsa2S1Z4xzr5JHUHZesznThjZ4BMM9Ra5Lfx2E9duAnxEmv | 123  |0.001100000 |
+
+  @it-171
+  Scenario: Can send all of a custom token (IT-171)
+    Given There is an Ergo wallet stored named ergo-token-wallet
+    And I have a wallet with funds
+    When I go to the send transaction screen
+
+    And I open the token selection dropdown
+    And I select token "USD"
+
+    And I click on "Send all" checkbox
+    And I fill the address of the form:
+      | address                                                     |
+      | 9guxMsa2S1Z4xzr5JHUHZesznThjZ4BMM9Ra5Lfx2E9duAnxEmv         |
+    And The transaction fees are "0.001100000"
+    And I click on the next button in the wallet send form
+    And I see send money confirmation dialog
+    And I enter the wallet password:
+      | password   |
+      | asdfasdfasdf |
+    And I submit the wallet send form
+    Then I should see the summary screen

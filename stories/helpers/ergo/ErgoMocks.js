@@ -65,11 +65,13 @@ function genMockErgoCache(dummyWallet: PublicDeriver<>) {
     },
     getPublicKeyCache: (wallet) => ({
       publicDeriver: wallet,
+      // eslint-disable-next-line max-len
+      // rent sword help dynamic enhance collect biology drama agent raven grape bike march length leisure
       plate: {
-        ImagePart: '2dda96f3e8a39341da9549bef4be416c173eeb940f092cfc98d5c63a06c6007d326c77a599b1fd36ddf57507b8ea52537f129dac7bceb18c674bc3baab90411f',
-        TextPart: 'CTPE-6458',
+        ImagePart: '4047a1fc82e156f08252b2ba9ad9663d5d98570ba9fdeaa98a40acde82f5c7083bfd30b9e9bb82023d706b596058d59661275ae09100ebfafd5668501c055e19',
+        TextPart: 'AZTH-1588',
       },
-      publicKey: '9e4e2f11b6ac2a269913286e26339779ab8767579d18d173cdd324929d94e2c43e3ec212cc8a36ed9860579dfe1e3ef4d6de778c5dbdd981623b48727cd96247',
+      publicKey: '0488b21e000000000000000000b9433af1acee90cab083bca7d59bc6fa65dbbfbbe0406cee9d11f48cced4fae903595503bb7c9b8d897078384ba49a0700e110440d844aea7610ca6e4e5526248d',
     }),
     getTransactions: (wallet) => ({
       publicDeriver: wallet,
