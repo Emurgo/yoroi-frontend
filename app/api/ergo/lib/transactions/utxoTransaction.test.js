@@ -311,6 +311,91 @@ describe('Create unsigned TX from UTXO', () => {
         .to_str()
     ).toEqual(expectedReturn.toString()); // change
   });
+
+  it('Should pick inputs when sending a specific token', () => {
+    const txFee = 50000;
+    const output = new MultiToken(
+      [{
+        amount: new BigNumber(RustModule.SigmaRust.BoxValue.SAFE_USER_MIN().as_i64().to_str()),
+        identifier: defaultIdentifier,
+        networkId: network.NetworkId,
+      }, {
+        amount: new BigNumber(1000),
+        identifier: '13d24a67432d447e53118d920100c747abb52da8da646bc193f03b47b64a8ac5',
+        networkId: network.NetworkId,
+      }],
+      {
+        defaultIdentifier,
+        defaultNetworkId: network.NetworkId,
+      }
+    );
+    const utxos: Array<RemoteUnspentOutput> = genSampleUtxos();
+    const sampleErgoAddresses = genSampleErgoAddresses();
+    const unsignedTxResponse = newErgoUnsignedTxFromUtxo({
+      outputs: [{
+        address: decode('9egNKTzQDH658qcdiPEoQfVM1SBxQNxnyF8BCw57aNWerRhhHBQ').toString('hex'),
+        amount: output
+      }],
+      changeAddr: sampleErgoAddresses[0],
+      utxos: [utxos[3], utxos[0], utxos[1], utxos[2]],
+      currentHeight: 100,
+      txFee: new BigNumber(txFee),
+      protocolParams: getProtocolParams(),
+    });
+
+    // input selection will only take 1 of the 4 inputs
+    // it takes 1 inputs because input selection algorithm
+    expect(unsignedTxResponse.senderUtxos).toEqual([utxos[3]]);
+    expect(
+      unsignedTxResponse.unsignedTx
+        .box_selection().boxes()
+        .get(0)
+        .box_id()
+        .to_str()
+    ).toEqual('ed0ea178230f3d95df6f9880e18f74d324c148fce524c5ace6ed711fc3de6ad0');
+
+    const unsignedTx = unsignedTxResponse.unsignedTx.build();
+    expect(unsignedTx.outputs().len()).toEqual(3);
+    expect(
+      unsignedTx
+        .outputs()
+        .get(0)
+        .value().as_i64()
+        .to_str()
+    ).toEqual(output.getDefaultEntry().amount.toString()); // output of tx
+    expect(
+      unsignedTx
+        .outputs().get(0)
+        .tokens().get(0).amount()
+        .as_i64().to_str()
+    ).toEqual(output.get('13d24a67432d447e53118d920100c747abb52da8da646bc193f03b47b64a8ac5')?.toString()); // token in output
+    expect(
+      unsignedTx
+        .outputs()
+        .get(2)
+        .value().as_i64()
+        .to_str()
+    ).toEqual(txFee.toString()); // fee
+
+    const expectedErgReturn = unsignedTxResponse.senderUtxos.reduce(
+      (sum, utxo) => sum.plus(utxo.amount),
+      new BigNumber(0)
+    ).toNumber() - output.getDefaultEntry().amount.toNumber() - txFee;
+    expect(
+      unsignedTx
+        .outputs()
+        .get(1)
+        .value().as_i64()
+        .to_str()
+    ).toEqual(expectedErgReturn.toString()); // change
+    expect(
+      unsignedTx
+        .outputs()
+        .get(1)
+        .tokens().get(0).amount()
+        .as_i64().to_str()
+    ).toEqual('9000') // token change
+  });
 });
 
 describe('Create unsigned TX from addresses', () => {
