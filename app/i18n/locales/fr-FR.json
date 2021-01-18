@@ -472,7 +472,7 @@
   "wallet.dashboard.stakePool.stake": "Enjeu",
   "wallet.dashboard.stakePool.title": "Stake Pool délégué",
   "wallet.dashboard.stakePool.viewWebpage": "Voir la page web du groupe d'enjeu",
-  "wallet.dashboard.summary.adaAmountNote": "This balance includes rewards (withdrawal required to be able to send this full amount)",
+  "wallet.dashboard.summary.adaAmountNote": "Ce solde comprend les récompenses (un retrait est nécessaire pour pouvoir envoyer la totalité de ce montant)",
   "wallet.dashboard.summary.adaTitle": "Total {ticker}",
   "wallet.dashboard.summary.delegatedTitle": "Total Délégué",
   "wallet.dashboard.summary.mangled.can": "{adaAmount} {ticker} peuvent être corrigés",
