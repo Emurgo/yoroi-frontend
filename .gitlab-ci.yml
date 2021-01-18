@@ -9,3 +9,14 @@ eslint:
   script:
    - npm install
    - npm run eslint
+
+jest:
+  script:
+   - npm install
+   - npm run jest
+   
+e2e:
+  script:
+   - npm install
+   - npm run test:build
+   - npm run test:run:e2e:chrome   
