@@ -172,6 +172,27 @@ Then(/^I pause the test to debug$/, async function () {
   await this.waitForElement('.element_that_does_not_exist');
 });
 
+Given(/^There is an Ergo wallet stored named ([^"]*)$/, async function (walletName) {
+  const restoreInfo = testWallets[walletName];
+  expect(restoreInfo).to.not.equal(undefined);
+
+  await this.click('.WalletAdd_btnRestoreWallet');
+
+  await this.waitForElement('.PickCurrencyOptionDialog');
+  await this.click('.PickCurrencyOptionDialog_ergo');
+
+  await this.waitForElement('.WalletRestoreOptionDialog');
+
+  await this.click('.WalletRestoreOptionDialog_restoreNormalWallet');
+  await this.waitForElement('.WalletRestoreDialog');
+
+  await inputMnemonicForWallet(
+    this,
+    walletName,
+    restoreInfo,
+  );
+});
+
 Given(/^There is a Shelley wallet stored named ([^"]*)$/, async function (walletName) {
   const restoreInfo = testWallets[walletName];
   expect(restoreInfo).to.not.equal(undefined);

@@ -26,7 +26,7 @@ import {
   MultiToken,
 } from '../../../api/common/lib/MultiToken';
 import type {
-  TokenLookupKey,
+  TokenLookupKey, TokenEntry,
 } from '../../../api/common/lib/MultiToken';
 import { getTokenName, genFormatTokenAmount, } from '../../../stores/stateless/tokenHelpers';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
@@ -62,18 +62,144 @@ export default class HWSendConfirmationDialog extends Component<Props> {
     intl: intlShape.isRequired,
   };
 
+  convertedToUnitOfAccount: (TokenEntry, string) => string = (token, toCurrency) => {
+    const tokenInfo = this.props.getTokenInfo(token);
+
+    const shiftedAmount = token.amount
+      .shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
+
+    const coinPrice = this.props.getCurrentPrice(
+      tokenInfo.Identifier,
+      toCurrency
+    );
+
+    if (coinPrice == null) return '-';
+
+    return calculateAndFormatValue(
+      shiftedAmount,
+      coinPrice
+    );
+  }
+
+  renderSingleAmount: TokenEntry => Node = (entry) => {
+    const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
+
+    const { unitOfAccountSetting } = this.props;
+    return unitOfAccountSetting.enabled
+      ? (
+        <>
+          <div className={styles.amount}>
+            {this.convertedToUnitOfAccount(entry, unitOfAccountSetting.currency)}
+            <span className={styles.currencySymbol}>
+              &nbsp;{unitOfAccountSetting.currency}
+            </span>
+          </div>
+          <div className={styles.amountSmall}>{formatValue(entry)}
+            <span className={styles.currencySymbol}>&nbsp;{
+              getTokenName(this.props.getTokenInfo(entry))
+            }
+            </span>
+          </div>
+        </>
+      ) : (
+        <div className={styles.amount}>{formatValue(entry)}
+          <span className={styles.currencySymbol}>&nbsp;{
+            getTokenName(this.props.getTokenInfo(entry))
+          }
+          </span>
+        </div>
+      );
+  }
+  renderTotalAmount: TokenEntry => Node = (entry) => {
+    const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
+
+    const { unitOfAccountSetting } = this.props;
+    return unitOfAccountSetting.enabled
+      ? (
+        <>
+          <div className={styles.totalAmount}>
+            {this.convertedToUnitOfAccount(entry, unitOfAccountSetting.currency)}
+            <span className={styles.currencySymbol}>
+              &nbsp;{unitOfAccountSetting.currency}
+            </span>
+          </div>
+          <div className={styles.totalAmountSmall}>{formatValue(entry)}
+            <span className={styles.currencySymbol}>&nbsp;{
+              getTokenName(this.props.getTokenInfo(entry))
+            }
+            </span>
+          </div>
+        </>
+      ) : (
+        <div className={styles.totalAmount}>{formatValue(entry)}
+          <span className={styles.currencySymbol}>&nbsp;{
+            getTokenName(this.props.getTokenInfo(entry))
+          }
+          </span>
+        </div>
+      );
+  }
+  renderSingleFee: TokenEntry => Node = (entry) => {
+    const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
+
+    const { unitOfAccountSetting } = this.props;
+    return unitOfAccountSetting.enabled
+      ? (
+        <>
+          <div className={styles.fees}>+
+            {this.convertedToUnitOfAccount(entry, unitOfAccountSetting.currency)}
+            <span className={styles.currencySymbol}>
+              &nbsp;{unitOfAccountSetting.currency}
+            </span>
+          </div>
+          <div className={styles.feesSmall}>
+            +{formatValue(entry)}
+            <span className={styles.currencySymbol}>&nbsp;{
+              getTokenName(this.props.getTokenInfo(
+                entry
+              ))
+            }
+            </span>
+          </div>
+        </>
+      ) : (
+        <div className={styles.fees}>
+          +{formatValue(entry)}
+          <span className={styles.currencySymbol}>&nbsp;{
+            getTokenName(this.props.getTokenInfo(
+              entry
+            ))
+          }
+          </span>
+        </div>
+      );
+  }
+
+  renderBundle: {|
+    amount: MultiToken,
+    render: TokenEntry => Node,
+  |} => Node = (request) => {
+    return (
+      <>
+        {request.render(request.amount.getDefaultEntry())}
+        {request.amount.nonDefaultEntries().map(entry => (
+          <React.Fragment key={entry.identifier}>
+            {request.render(entry)}
+          </React.Fragment>
+        ))}
+      </>
+    );
+  }
+
   render(): Node {
     const { intl } = this.context;
     const {
       amount,
       receivers,
-      totalAmount,
-      transactionFee,
       isSubmitting,
       messages,
       error,
       onCancel,
-      unitOfAccountSetting,
     } = this.props;
 
     const staleTxWarning = (
@@ -115,95 +241,26 @@ export default class HWSendConfirmationDialog extends Component<Props> {
         ))}
       </div>);
 
-    const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
-    const convertedToUnitOfAccount = (tokens, toCurrency) => {
-      const defaultEntry = tokens.getDefaultEntry();
-      const tokenInfo = this.props.getTokenInfo(defaultEntry);
-
-      const shiftedAmount = defaultEntry.amount
-        .shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
-
-      const coinPrice = this.props.getCurrentPrice(
-        tokenInfo.Identifier,
-        toCurrency
-      );
-
-      if (coinPrice == null) return '-';
-
-      return calculateAndFormatValue(
-        shiftedAmount,
-        coinPrice
-      );
-    };
-
     const amountBlock = (
       <div className={styles.amountFeesWrapper}>
         <div className={styles.amountWrapper}>
           <div className={styles.amountLabel}>
             {intl.formatMessage(globalMessages.amountLabel)}
           </div>
-          {unitOfAccountSetting.enabled ? (
-            <>
-              <div className={styles.amount}>
-                {convertedToUnitOfAccount(
-                  amount,
-                  unitOfAccountSetting.currency
-                )}
-                &nbsp;{unitOfAccountSetting.currency}
-              </div>
-              <div className={styles.amountSmall}>{formatValue(amount.getDefaultEntry())}
-                <span className={styles.currencySymbol}>&nbsp;{
-                  getTokenName(this.props.getTokenInfo(
-                    this.props.amount.getDefaultEntry()
-                  ))
-                }
-                </span>
-              </div>
-            </>
-          ) : (
-            <div className={styles.amount}>{formatValue(amount.getDefaultEntry())}
-              <span className={styles.currencySymbol}>&nbsp;{
-                getTokenName(this.props.getTokenInfo(
-                  this.props.amount.getDefaultEntry()
-                ))
-              }
-              </span>
-            </div>
-          )}
+          {this.renderBundle({
+            amount,
+            render: this.renderSingleAmount,
+          })}
         </div>
 
         <div className={styles.feesWrapper}>
           <div className={styles.feesLabel}>
             {intl.formatMessage(globalMessages.walletSendConfirmationFeesLabel)}
           </div>
-          {unitOfAccountSetting.enabled ? (
-            <>
-              <div className={styles.fees}>+
-                {convertedToUnitOfAccount(
-                  transactionFee,
-                  unitOfAccountSetting.currency
-                )}
-                &nbsp;{unitOfAccountSetting.currency}
-              </div>
-              <div className={styles.feesSmall}>+{formatValue(transactionFee.getDefaultEntry())}
-                <span className={styles.currencySymbol}>&nbsp;{
-                  getTokenName(this.props.getTokenInfo(
-                    transactionFee.getDefaultEntry()
-                  ))
-                }
-                </span>
-              </div>
-            </>
-          ) : (
-            <div className={styles.fees}>+{formatValue(transactionFee.getDefaultEntry())}
-              <span className={styles.currencySymbol}>&nbsp;{
-                getTokenName(this.props.getTokenInfo(
-                  transactionFee.getDefaultEntry()
-                ))
-              }
-              </span>
-            </div>
-          )}
+          {this.renderBundle({
+            amount: this.props.transactionFee,
+            render: this.renderSingleFee,
+          })}
         </div>
       </div>);
 
@@ -212,34 +269,10 @@ export default class HWSendConfirmationDialog extends Component<Props> {
         <div className={styles.totalAmountLabel}>
           {intl.formatMessage(globalMessages.walletSendConfirmationTotalLabel)}
         </div>
-        {unitOfAccountSetting.enabled ? (
-          <>
-            <div className={styles.totalAmount}>
-              {convertedToUnitOfAccount(
-                totalAmount,
-                unitOfAccountSetting.currency
-              )}
-              &nbsp;{unitOfAccountSetting.currency}
-            </div>
-            <div className={styles.totalAmountSmall}>{formatValue(totalAmount.getDefaultEntry())}
-              <span className={styles.currencySymbol}>&nbsp;{
-                getTokenName(this.props.getTokenInfo(
-                  totalAmount.getDefaultEntry()
-                ))
-              }
-              </span>
-            </div>
-          </>
-        ) : (
-          <div className={styles.totalAmount}>{formatValue(totalAmount.getDefaultEntry())}
-            <span className={styles.currencySymbol}>&nbsp;{
-              getTokenName(this.props.getTokenInfo(
-                totalAmount.getDefaultEntry()
-              ))
-            }
-            </span>
-          </div>
-        )}
+        {this.renderBundle({
+          amount: this.props.totalAmount,
+          render: this.renderTotalAmount,
+        })}
       </div>);
 
     const confirmButtonClasses = classnames([

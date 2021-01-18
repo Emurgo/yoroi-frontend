@@ -1,0 +1,22 @@
+.container {
+  display: flex;
+  width: 100%;
+  span {
+    width: 30%
+  }
+}
+
+.headerText {
+  color: #6B7384;
+  font-family: var(--font-regular);
+  font-size: 14px;
+  letter-spacing: 0;
+  line-height: 22px;
+}
+.rowText {
+  color: #242838;
+  font-family: var(--font-mono-regular);
+  font-size: 16px;
+  letter-spacing: 0;
+  line-height: 22px;
+}

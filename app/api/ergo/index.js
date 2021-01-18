@@ -100,6 +100,16 @@ import {
 import { CoreAddressTypes, } from '../ada/lib/storage/database/primitives/enums';
 import { BIP32PrivateKey, } from '../common/lib/crypto/keys/keyRepository';
 import { WrongPassphraseError } from '../ada/lib/cardanoCrypto/cryptoErrors';
+import { MultiToken } from '../common/lib/MultiToken';
+import type { DefaultTokenEntry } from '../common/lib/MultiToken';
+
+type SendTokenList = Array<$ReadOnly<{|
+  token: $ReadOnly<TokenRow>,
+  amount: string, // in lovelaces
+|}> | $ReadOnly<{|
+  token: $ReadOnly<TokenRow>,
+  shouldSendAll: true,
+|}>>;
 
 // getTransactionRowsToExport
 
@@ -162,11 +172,7 @@ export type CreateUnsignedTxRequest = {|
   publicDeriver: IPublicDeriver<ConceptualWallet> & IGetAllUtxos,
   receiver: string,
   filter: ElementOf<IGetAllUtxosResponse> => boolean,
-  ...({|
-    amount: string, // in lovelaces
-  |} | {|
-    shouldSendAll: true,
-  |}),
+  tokens: SendTokenList,
   currentHeight: number,
   txFee: BigNumber,
 |};
@@ -183,11 +189,8 @@ export type CreateUnsignedTxForUtxosRequest = {|
     ...InexactSubset<Addressing>,
   |}>,
   network: $ReadOnly<NetworkRow>,
-  ...{|
-    amount: string,
-  |} | {|
-    shouldSendAll: true,
-  |},
+  defaultToken: DefaultTokenEntry,
+  tokens: SendTokenList,
   utxos: Array<ErgoAddressedUtxo>,
   currentHeight: number,
   txFee: BigNumber,
@@ -455,6 +458,9 @@ export default class ErgoApi {
     request: CreateUnsignedTxRequest
   ): Promise<CreateUnsignedTxResponse> {
     const utxos = await request.publicDeriver.getAllUtxos();
+
+    // note: don't filter to just the entries for the token we want to send
+    // since we may need other UTXO entries to cover the fee
     const filteredUtxos = utxos.filter(utxo => request.filter(utxo));
 
     const addressedUtxo = asAddressedUtxo(
@@ -464,7 +470,9 @@ export default class ErgoApi {
     const receivers = [{
       address: request.receiver
     }];
-    if (!request.shouldSendAll) {
+
+    // note: we need to create a change address IFF we're not sending all of the default asset
+    if (!hasSendAllDefault(request.tokens)) {
       const allAddresses = await request.publicDeriver.getAllUtxoAddresses();
       const change = allAddresses[0]; // send change to 0th address
 
@@ -477,14 +485,12 @@ export default class ErgoApi {
         addressing: change.addressing,
       });
     }
-    const amountInfo = request.shouldSendAll
-      ? { shouldSendAll: request.shouldSendAll }
-      : { amount: request.amount, };
     return this.createUnsignedTxForUtxos({
       receivers,
       network: request.publicDeriver.getParent().getNetworkInfo(),
+      defaultToken: request.publicDeriver.getParent().getDefaultToken(),
       utxos: addressedUtxo,
-      ...amountInfo,
+      tokens: request.tokens,
       txFee: request.txFee,
       currentHeight: request.currentHeight,
     });
@@ -506,7 +512,7 @@ export default class ErgoApi {
       };
 
       let unsignedTxResponse;
-      if (request.shouldSendAll) {
+      if (hasSendAllDefault(request.tokens)) {
         if (request.receivers.length !== 1) {
           throw new Error(`${nameof(this.createUnsignedTxForUtxos)} wrong output size for sendAll`);
         }
@@ -519,7 +525,6 @@ export default class ErgoApi {
           protocolParams,
         });
       } else {
-        const amount = request.amount;
         const changeAddresses = request.receivers.reduce(
           (arr, next) => {
             if (next.addressing != null) {
@@ -552,7 +557,14 @@ export default class ErgoApi {
         }
         unsignedTxResponse = newErgoUnsignedTx({
           outputs: otherAddresses.length === 1
-            ? [{ address: otherAddresses[0].address, amount }]
+            ? [{
+                address: otherAddresses[0].address,
+                amount: builtSendTokenList(
+                  request.defaultToken,
+                  request.tokens,
+                  request.utxos,
+                ),
+              }]
             : [],
           changeAddr: {
             address: changeAddr.address,
@@ -561,7 +573,10 @@ export default class ErgoApi {
           utxos: request.utxos,
           txFee: request.txFee,
           currentHeight: request.currentHeight,
-          protocolParams,
+          protocolParams: {
+            ...protocolParams,
+            DefaultIdentifier: request.defaultToken.defaultIdentifier,
+          }
         });
       }
       Logger.debug(
@@ -627,4 +642,63 @@ export default class ErgoApi {
       throw new GenericApiError();
     }
   }
+}
+
+
+function hasSendAllDefault(
+  tokens: SendTokenList,
+): boolean {
+  const defaultSendAll = tokens.find(token => {
+    if (token.shouldSendAll === true && token.token.IsDefault) return true;
+    return false;
+  });
+  return defaultSendAll != null;
+}
+
+function builtSendTokenList(
+  defaultToken: DefaultTokenEntry,
+  tokens: SendTokenList,
+  utxos: Array<ErgoAddressedUtxo>,
+): MultiToken {
+  const amount = new MultiToken([], defaultToken);
+
+  for (const token of tokens) {
+    if (token.amount != null) {
+      amount.add({
+        amount: new BigNumber(token.amount),
+        identifier: token.token.Identifier,
+        networkId: token.token.NetworkId,
+      });
+    } else if (token.token.IsDefault) {
+      // recall: default tokens have no inherent identifier, so we need to handle this differently
+      const relatedUtxoSum = utxos.reduce(
+        (value, next) => value.plus(next.amount),
+        new BigNumber(0)
+      );
+      amount.add({
+        amount: relatedUtxoSum,
+        identifier: token.token.Identifier,
+        networkId: token.token.NetworkId,
+      });
+    } else {
+      // for send all, sum up the value of all our UTXOs with this token
+      const relatedUtxoSum = utxos.reduce(
+        (value, next) => {
+          if (next.assets == null) return value;
+          const assetEntry = next.assets.find(asset => asset.tokenId === token.token.Identifier);
+          if (assetEntry != null) {
+            return value.plus(assetEntry.amount);
+          }
+          return value;
+        },
+        new BigNumber(0)
+      );
+      amount.add({
+        amount: relatedUtxoSum,
+        identifier: token.token.Identifier,
+        networkId: token.token.NetworkId,
+      });
+    }
+  }
+  return amount;
 }

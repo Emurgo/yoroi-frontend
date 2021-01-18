@@ -11,6 +11,7 @@ import { PublicDeriver } from '../../app/api/ada/lib/storage/models/PublicDerive
 import type { ByronCacheValue } from './cardano/ByronMocks';
 import type { ShelleyCip1852CacheValue } from './cardano/ShelleyCip1852Mocks';
 import type { JormungandrCacheValue } from './jormungandr/JormungandrMocks';
+import type { ErgoCacheValue } from './ergo/ErgoMocks';
 
 export type CardanoCacheValue = {|
   publicDeriver: PublicDeriver<>,
@@ -36,7 +37,8 @@ export type CardanoCacheValue = {|
 export type PossibleCacheTypes =
   ByronCacheValue |
   ShelleyCip1852CacheValue |
-  JormungandrCacheValue;
+  JormungandrCacheValue |
+  ErgoCacheValue;
 
 export function walletLookup(wallets: $ReadOnlyArray<PossibleCacheTypes>): {|
   publicDerivers: Array<PublicDeriver<>>,
@@ -99,19 +101,23 @@ export function walletLookup(wallets: $ReadOnlyArray<PossibleCacheTypes>): {|
     },
     getDelegation: (publicDeriver) => {
       for (const wallet of wallets) {
-        if (wallet.publicDeriver === publicDeriver && wallet.getDelegation) {
-          return wallet.getDelegation(publicDeriver);
+        if (wallet.publicDeriver === publicDeriver) {
+          return wallet.getDelegation
+            ? wallet.getDelegation(publicDeriver)
+            : undefined;
         }
       }
       throw new Error(`Missing cache entry for delegation`);
     },
     getAdaDelegation: (publicDeriver) => {
       for (const wallet of wallets) {
-        if (wallet.publicDeriver === publicDeriver && wallet.getAdaDelegation) {
-          return wallet.getAdaDelegation(publicDeriver);
+        if (wallet.publicDeriver === publicDeriver) {
+          return wallet.getAdaDelegation
+            ? wallet.getAdaDelegation(publicDeriver)
+            : undefined;
         }
       }
-      throw new Error(`Missing cache entry for delegation`);
+      throw new Error(`Missing cache entry for ada delegation`);
     },
     getPublicKeyCache: (publicDeriver) => {
       for (const wallet of wallets) {
@@ -139,7 +145,7 @@ export function walletLookup(wallets: $ReadOnlyArray<PossibleCacheTypes>): {|
     },
     getTimeCalcRequests: (publicDeriver) => {
       for (const wallet of wallets) {
-        if (wallet.publicDeriver === publicDeriver) {
+        if (wallet.publicDeriver === publicDeriver && wallet.getTimeCalcRequests) {
           return wallet.getTimeCalcRequests(publicDeriver);
         }
       }
@@ -147,7 +153,7 @@ export function walletLookup(wallets: $ReadOnlyArray<PossibleCacheTypes>): {|
     },
     getCurrentTimeRequests: (publicDeriver) => {
       for (const wallet of wallets) {
-        if (wallet.publicDeriver === publicDeriver) {
+        if (wallet.publicDeriver === publicDeriver && wallet.getCurrentTimeRequests) {
           return wallet.getCurrentTimeRequests(publicDeriver);
         }
       }

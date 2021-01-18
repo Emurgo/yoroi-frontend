@@ -69,7 +69,7 @@ const baseDevConfig = (
         loader: 'babel-loader?cacheDirectory',
         exclude: /node_modules/,
         options: {
-          plugins: [require.resolve('react-refresh/babel')],
+          plugins: [[require.resolve('react-refresh/babel'), { skipEnvCheck: true }]],
         },
       },
       {

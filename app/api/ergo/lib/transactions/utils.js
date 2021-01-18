@@ -132,6 +132,8 @@ export function replaceMockBoxId(utxo: RemoteUnspentOutput): RemoteUnspentOutput
     tokens
   );
 
+  // TODO: no way to add registers to constructor in sigma-rust at this time
+
   return {
     ...utxo,
     boxId: box.box_id().to_str()

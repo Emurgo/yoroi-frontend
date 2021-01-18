@@ -132,7 +132,7 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
           selectedNetwork={publicDeriver.getParent().getNetworkInfo()}
           validateAmount={(amount) => validateAmount(
             amount,
-            defaultToken,
+            transactionBuilderStore.selectedToken ?? defaultToken,
             getMinimumValue(publicDeriver.getParent().getNetworkInfo()),
             this.context.intl,
           )}
@@ -158,6 +158,9 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
             dialog: MemoNoExternalStorageDialog,
             continuation: this.toggleShowMemo,
           })}
+          spendableBalance={this.generated.stores.transactions.getBalanceRequest.result}
+          onAddToken={txBuilderActions.updateToken.trigger}
+          selectedToken={transactionBuilderStore.selectedToken}
         />
         {this.renderDialog()}
       </>
@@ -355,12 +358,17 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
         |},
       |},
       txBuilderActions: {|
-          reset: {| trigger: (params: void) => void |},
+        reset: {|
+          trigger: (params: void) => void
+        |},
         toggleSendAll: {|
           trigger: (params: void) => void
         |},
         updateAmount: {|
           trigger: (params: void | number) => void
+        |},
+        updateToken: {|
+          trigger: (params: void | $ReadOnly<TokenRow>) => void
         |},
         updateMemo: {|
           trigger: (params: void | string) => void
@@ -428,7 +436,8 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
         shouldSendAll: boolean,
         tentativeTx: null | ISignRequest<any>,
         totalInput: ?MultiToken,
-        txMismatch: boolean
+        txMismatch: boolean,
+        selectedToken: void | $ReadOnly<TokenRow>,
       |},
       substores: {|
         ada: {|
@@ -442,7 +451,12 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
           |}
         |}
       |},
-      transactions: {| hasAnyPending: boolean |},
+      transactions: {|
+        hasAnyPending: boolean,
+        getBalanceRequest: {|
+          result: ?MultiToken,
+        |},
+      |},
       uiDialogs: {|
         getParam: <T>(number | string) => T,
         isOpen: any => boolean
@@ -490,6 +504,16 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
         },
         transactions: {
           hasAnyPending: stores.transactions.hasAnyPending,
+          getBalanceRequest: (() => {
+            if (stores.wallets.selected == null) return {
+              result: undefined,
+            };
+            const { requests } = stores.transactions.getTxRequests(stores.wallets.selected);
+
+            return {
+              result: requests.getBalanceRequest.result,
+            };
+          })(),
         },
         transactionBuilderStore: {
           totalInput: stores.transactionBuilderStore.totalInput,
@@ -501,6 +525,7 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
             isExecuting: stores.transactionBuilderStore.createUnsignedTx.isExecuting,
             error: stores.transactionBuilderStore.createUnsignedTx.error,
           },
+          selectedToken: stores.transactionBuilderStore.selectedToken,
         },
         substores: {
           ada: {
@@ -534,6 +559,7 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
           updateTentativeTx: { trigger: actions.txBuilderActions.updateTentativeTx.trigger },
           updateReceiver: { trigger: actions.txBuilderActions.updateReceiver.trigger },
           updateAmount: { trigger: actions.txBuilderActions.updateAmount.trigger },
+          updateToken: { trigger: actions.txBuilderActions.updateToken.trigger },
           toggleSendAll: { trigger: actions.txBuilderActions.toggleSendAll.trigger },
           reset: { trigger: actions.txBuilderActions.reset.trigger },
           updateMemo: { trigger: actions.txBuilderActions.updateMemo.trigger },

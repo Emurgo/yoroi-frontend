@@ -3,6 +3,7 @@
 const path = require('path');
 const webpack = require('webpack');
 const ConfigWebpackPlugin = require('config-webpack');
+const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 
 // your app's webpack.config.js
 const devConfig = require('../webpack/devConfig');
@@ -34,7 +35,8 @@ module.exports = async ({ config, mode } /*: {|
     plugins: [
       ...config.plugins,
       new ConfigWebpackPlugin(),
-      new webpack.DefinePlugin(commonConfig.definePlugin(ENV, isProduction, isNightly === 'true'))
+      new ReactRefreshWebpackPlugin(),
+      new webpack.DefinePlugin(commonConfig.definePlugin(ENV, isProduction, isNightly === 'true')),
     ],
     module: {
       ...config.module,

@@ -270,7 +270,6 @@ const genPropsForTransactions: {|
     mostRecentActiveNotification: request.topLevelNotification,
     isOpen: () => request.topLevelNotification != null,
     getTooltipActiveNotification: () => null,
-
   },
   wallets: {
     selected: request.wallet.publicDeriver,
@@ -342,7 +341,9 @@ const genPropsForTransactions: {|
     getPublicDeriverSettingsCache: request.getPublicDeriverSettingsCache,
   },
   delegation: {
-    getDelegationRequests: request.wallet.getDelegation,
+    getDelegationRequests: request.wallet.getDelegation
+      ? request.wallet.getDelegation
+      : () => undefined,
   },
 });
 

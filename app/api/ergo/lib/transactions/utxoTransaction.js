@@ -36,7 +36,7 @@ import {
 
 type TxOutput = {|
   ...Address,
-  amount: string,
+  amount: MultiToken,
 |};
 
 export function sendAllUnsignedTx(request: {|
@@ -145,21 +145,7 @@ export function sendAllUnsignedTxFromUtxo(request: {|
   }
 
   const wasmInputs = RustModule.SigmaRust.ErgoBoxes.from_boxes_json(
-    request.utxos.map(utxo => {
-      return {
-        boxId: utxo.boxId,
-        value: Number.parseInt(utxo.amount, 10),
-        ergoTree: utxo.ergoTree,
-        assets: (utxo.assets ?? []).map(asset => ({
-          amount: asset.amount,
-          tokenId: asset.tokenId,
-        })),
-        creationHeight: utxo.creationHeight,
-        additionalRegisters: utxo.additionalRegisters || Object.freeze({}),
-        transactionId: utxo.tx_hash,
-        index: utxo.tx_index,
-      };
-    })
+    toErgoBoxJSON(request.utxos)
   );
 
   const inputAmountSum = request.utxos.reduce(
@@ -208,13 +194,14 @@ export function sendAllUnsignedTxFromUtxo(request: {|
 
   const txBuilder = RustModule.SigmaRust.TxBuilder.new(
     allUtxoSelection,
+    // no output since it gets considered as change at the tx builder level
     RustModule.SigmaRust.ErgoBoxCandidates.empty(),
     request.currentHeight,
     RustModule.SigmaRust.BoxValue.from_i64(
       RustModule.SigmaRust.I64.from_str(request.txFee.toString())
     ),
     RustModule.SigmaRust.Address.from_bytes(
-      Buffer.from(request.protocolParams.FeeAddress, 'hex')
+      Buffer.from(request.receiver.address, 'hex')
     ),
     RustModule.SigmaRust.BoxValue.from_i64(
       RustModule.SigmaRust.I64.from_str(request.protocolParams.MinimumBoxValue.toString())
@@ -253,6 +240,7 @@ export function newErgoUnsignedTx(request: {|
     FeeAddress: string,
     MinimumBoxValue: string,
     NetworkId: number,
+    DefaultIdentifier: string,
   |},
 |}): ErgoUnsignedTxAddressedUtxoResponse {
   const addressingMap = new Map<RemoteUnspentOutput, ErgoAddressedUtxo>();
@@ -328,6 +316,7 @@ export function newErgoUnsignedTxFromUtxo(request: {|
     FeeAddress: string,
     MinimumBoxValue: string,
     NetworkId: number,
+    DefaultIdentifier: string,
   |},
 |}): ErgoUnsignedTxUtxoResponse {
   if (request.utxos.length === 0) {
@@ -338,11 +327,9 @@ export function newErgoUnsignedTxFromUtxo(request: {|
   const boxCandidates = (() => {
     let candidates = null;
     for (const output of request.outputs) {
-      // TODO: currently we don't handle tokens in the output
-      // so it all gets sent back as change
       const wasmOutput = new RustModule.SigmaRust.ErgoBoxCandidateBuilder(
         RustModule.SigmaRust.BoxValue.from_i64(
-          RustModule.SigmaRust.I64.from_str(output.amount)
+          RustModule.SigmaRust.I64.from_str(output.amount.getDefaultEntry().amount.toString())
         ),
         RustModule.SigmaRust.Contract.pay_to_address(
           RustModule.SigmaRust.Address.from_bytes(
@@ -351,6 +338,14 @@ export function newErgoUnsignedTxFromUtxo(request: {|
         ),
         request.currentHeight
       );
+      for (const token of output.amount.nonDefaultEntries()) {
+        wasmOutput.add_token(
+          RustModule.SigmaRust.TokenId.from_str(token.identifier),
+          RustModule.SigmaRust.TokenAmount.from_i64(
+            RustModule.SigmaRust.I64.from_str(token.amount.toString())
+          )
+        );
+      }
 
       const candidate = wasmOutput.build();
       if (candidates == null) {
@@ -365,38 +360,41 @@ export function newErgoUnsignedTxFromUtxo(request: {|
     return candidates;
   })();
 
-  const outputs = request.outputs.reduce(
-    (sum, next) => sum.plus(next.amount),
-    new BigNumber(0),
-  ).plus(request.txFee);
-
   const wasmInputs = RustModule.SigmaRust.ErgoBoxes.from_boxes_json(
-    request.utxos.map(utxo => {
-      return {
-        boxId: utxo.boxId,
-        value: Number.parseInt(utxo.amount, 10),
-        ergoTree: utxo.ergoTree,
-        assets: (utxo.assets ?? []).map(asset => ({
-          amount: asset.amount,
-          tokenId: asset.tokenId,
-        })),
-        creationHeight: utxo.creationHeight,
-        additionalRegisters: utxo.additionalRegisters || Object.freeze({}),
-        transactionId: utxo.tx_hash,
-        index: utxo.tx_index,
-      };
-    })
+    toErgoBoxJSON(request.utxos)
   );
 
   const selectedInputs = (() => {
     const boxSelectors = new RustModule.SigmaRust.SimpleBoxSelector();
     try {
+      const outputs = request.outputs.reduce(
+        (sum, next) => sum.joinAddCopy(next.amount),
+        new MultiToken([], {
+          defaultIdentifier: request.protocolParams.DefaultIdentifier,
+          defaultNetworkId: request.protocolParams.NetworkId,
+        }),
+      );
+      outputs.add({
+        amount: request.txFee,
+        identifier: request.protocolParams.DefaultIdentifier,
+        networkId: request.protocolParams.NetworkId,
+      });
+
+      const tokens = new RustModule.SigmaRust.Tokens();
+      for (const token of outputs.nonDefaultEntries()) {
+        tokens.add(new RustModule.SigmaRust.Token(
+          RustModule.SigmaRust.TokenId.from_str(token.identifier),
+          RustModule.SigmaRust.TokenAmount.from_i64(
+            RustModule.SigmaRust.I64.from_str(token.amount.toString())
+          )
+        ));
+      }
       return boxSelectors.select(
         wasmInputs,
         RustModule.SigmaRust.BoxValue.from_i64(
-          RustModule.SigmaRust.I64.from_str(outputs.toString())
+          RustModule.SigmaRust.I64.from_str(outputs.getDefaultEntry().amount.toString())
         ),
-        new RustModule.SigmaRust.Tokens() // TODO: handle tokens in output
+        tokens
       );
     } catch (e) {
       throw new NotEnoughMoneyToSendError();
@@ -516,4 +514,24 @@ function generateKeys(request: {|
   }
 
   return secretKeys;
+}
+
+export function toErgoBoxJSON(
+  utxos: Array<RemoteUnspentOutput>
+): Array<ErgoBoxJson> {
+  return utxos.map(utxo => {
+      return {
+        boxId: utxo.boxId,
+        value: Number.parseInt(utxo.amount, 10),
+        ergoTree: utxo.ergoTree,
+        assets: (utxo.assets ?? []).map(asset => ({
+          amount: asset.amount,
+          tokenId: asset.tokenId,
+        })),
+        creationHeight: utxo.creationHeight,
+        additionalRegisters: utxo.additionalRegisters || Object.freeze({}),
+        transactionId: utxo.tx_hash,
+        index: utxo.tx_index,
+      };
+    })
 }

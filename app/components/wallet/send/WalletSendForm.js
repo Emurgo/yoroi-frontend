@@ -25,20 +25,25 @@ import { MAX_MEMO_SIZE } from '../../../config/externalStorageConfig';
 import type { TokenRow, NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import {
   formattedAmountToBigNumber,
-  formattedAmountToNaturalUnits
+  formattedAmountToNaturalUnits,
+  truncateAddressShort,
 } from '../../../utils/formatters';
 import config from '../../../config';
 import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
 import LocalizableError from '../../../i18n/LocalizableError';
 import WarningBox from '../../widgets/WarningBox';
 import type { $npm$ReactIntl$IntlFormat, } from 'react-intl';
-import { getTokenName, genFormatTokenAmount, } from '../../../stores/stateless/tokenHelpers';
+import { getTokenName, genFormatTokenAmount, getTokenStrictName, getTokenIdentifierIfExists, } from '../../../stores/stateless/tokenHelpers';
 import {
   MultiToken,
 } from '../../../api/common/lib/MultiToken';
 import type {
+  TokenEntry,
   TokenLookupKey,
 } from '../../../api/common/lib/MultiToken';
+import { Select } from 'react-polymorph/lib/components/Select';
+import { SelectTokenSkin } from '../../../themes/skins/SelectTokenSkin';
+import TokenOptionRow from '../../widgets/tokenOption/TokenOptionRow';
 
 const messages = defineMessages({
   receiverLabel: {
@@ -96,6 +101,9 @@ type Props = {|
   +onAddMemo: void => void,
   +getTokenInfo: Inexact<TokenLookupKey> => $ReadOnly<TokenRow>,
   +defaultToken: $ReadOnly<TokenRow>, // need since no guarantee input in non-null
+  +onAddToken: (void | $ReadOnly<TokenRow>) => void,
+  +spendableBalance: ?MultiToken,
+  +selectedToken: void | $ReadOnly<TokenRow>,
 |};
 
 @observer
@@ -117,7 +125,7 @@ export default class WalletSendForm extends Component<Props> {
 
       const adjustedAmount = formattedAmountToNaturalUnits(
         uriParams.amount.getDefaultEntry().amount.toString(),
-        this.props.defaultToken.Metadata.numberOfDecimals,
+        this.getNumDecimals(),
       );
       // note: assume these are validated externally
       this.props.updateAmount(Number(adjustedAmount));
@@ -142,11 +150,21 @@ export default class WalletSendForm extends Component<Props> {
         }
 
         // once sendAll is triggered, set the amount field to the total input
+        const adjustedInput = totalInput.joinSubtractCopy(fee);
+        const relatedEntry = this.getTokenEntry(adjustedInput);
         this.form.$('amount').set('value', formatValue(
-          totalInput.joinSubtractCopy(fee).getDefaultEntry(),
+          relatedEntry,
         ));
       },
     );
+  }
+
+  getTokenEntry: MultiToken => TokenEntry = (tokens) => {
+    return this.props.selectedToken == null
+      ? tokens.getDefaultEntry()
+      : tokens.values.find(
+        entry => entry.identifier === this.props.selectedToken?.Identifier
+      ) ?? tokens.getDefaultEntry();
   }
 
   componentWillUnmount(): void {
@@ -195,7 +213,7 @@ export default class WalletSendForm extends Component<Props> {
       amount: {
         label: this.context.intl.formatMessage(globalMessages.amountLabel),
         placeholder: this.props.classicTheme ?
-          `0.${'0'.repeat(this.props.defaultToken.Metadata.numberOfDecimals)}` : '',
+          `0.${'0'.repeat(this.getNumDecimals())}` : '',
         value: (() => {
           const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
           return this.props.uriParams
@@ -216,11 +234,11 @@ export default class WalletSendForm extends Component<Props> {
           }
           const formattedAmount = formattedAmountToNaturalUnits(
             amountValue,
-            this.props.defaultToken.Metadata.numberOfDecimals,
+            this.getNumDecimals(),
           );
           const isValidAmount = await this.props.validateAmount(
             formattedAmount,
-            this.props.defaultToken
+            this.props.selectedToken ?? this.props.defaultToken
           );
           if (isValidAmount[0]) {
             this.props.updateAmount(Number(formattedAmount));
@@ -229,6 +247,13 @@ export default class WalletSendForm extends Component<Props> {
           }
           return isValidAmount;
         }],
+      },
+      selectedToken: {
+        label: this.context.intl.formatMessage(globalMessages.assetSelect),
+        value: this.props.selectedToken?.TokenId ?? this.props.getTokenInfo({
+          identifier: this.props.defaultToken.Identifier,
+          networkId: this.props.defaultToken.NetworkId,
+        }).TokenId,
       },
       memo: {
         label: this.context.intl.formatMessage(memoMessages.memoLabel),
@@ -262,6 +287,14 @@ export default class WalletSendForm extends Component<Props> {
       vjf: vjf()
     },
   });
+
+  getNumDecimals(): number {
+    const info = this.props.selectedToken ?? this.props.getTokenInfo({
+      identifier: this.props.defaultToken.Identifier,
+      networkId: this.props.defaultToken.NetworkId,
+    });
+    return info.Metadata.numberOfDecimals;
+  }
 
   render(): Node {
     const { form } = this;
@@ -314,12 +347,54 @@ export default class WalletSendForm extends Component<Props> {
 
     const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
 
+    const tokenOptions = (() => {
+      if (this.props.spendableBalance == null) return [];
+      const { spendableBalance } = this.props;
+      return [
+        // make sure default token is always first in the list
+        spendableBalance.getDefaultEntry(),
+        ...spendableBalance.nonDefaultEntries(),
+      ].map(entry => ({
+        entry,
+        info: this.props.getTokenInfo(entry),
+      })).map(token => ({
+        value: token.info.TokenId,
+        info: token.info,
+        label: getTokenStrictName(token.info) ?? '-',
+        id: getTokenIdentifierIfExists(token.info) ?? '-',
+        amount: genFormatTokenAmount(this.props.getTokenInfo)(token.entry)
+      }));
+    })();
+
     return (
       <div className={styles.component}>
 
         {hasAnyPending && pendingTxWarningComponent}
 
         <BorderedBox>
+
+          {tokenOptions.length > 1 && (
+            <Select
+              className={styles.currencySelect}
+              options={tokenOptions}
+              {...form.$('selectedToken').bind()}
+              onChange={tokenId => this.props.onAddToken(tokenOptions.find(
+                token => token.info.TokenId === tokenId
+              )?.info)}
+              skin={SelectTokenSkin}
+              value={this.props.selectedToken?.TokenId ?? this.props.getTokenInfo({
+                identifier: this.props.defaultToken.Identifier,
+                networkId: this.props.defaultToken.NetworkId,
+              }).TokenId}
+              optionRenderer={option => (
+                <TokenOptionRow
+                  displayName={option.label}
+                  id={truncateAddressShort(option.id)}
+                  amount={option.amount}
+                />
+              )}
+            />
+          )}
 
           <div className={styles.receiverInput}>
             <Input
@@ -336,14 +411,14 @@ export default class WalletSendForm extends Component<Props> {
               {...amountFieldProps}
               className="amount"
               label={intl.formatMessage(globalMessages.amountLabel)}
-              maxBeforeDot={calcMaxBeforeDot(this.props.defaultToken.Metadata.numberOfDecimals)}
-              maxAfterDot={this.props.defaultToken.Metadata.numberOfDecimals}
+              maxBeforeDot={calcMaxBeforeDot(this.getNumDecimals())}
+              maxAfterDot={this.getNumDecimals()}
               disabled={this.props.shouldSendAll}
               error={(transactionFeeError || amountField.error)}
               // AmountInputSkin props
-              currency={getTokenName(this.props.defaultToken)}
+              currency={getTokenName(this.props.selectedToken ?? this.props.defaultToken)}
               fees={formatValue(transactionFee.getDefaultEntry())}
-              total={formatValue(totalAmount.getDefaultEntry())}
+              total={formatValue(this.getTokenEntry(totalAmount))}
               skin={AmountInputSkin}
               classicTheme={classicTheme}
             />
@@ -351,14 +426,17 @@ export default class WalletSendForm extends Component<Props> {
           <div className={styles.checkbox}>
             <Checkbox
               label={intl.formatMessage(messages.checkboxLabel, {
-                currency: getTokenName(this.props.defaultToken)
+                currency: getTokenName(this.props.selectedToken ?? this.props.defaultToken)
               })}
               onChange={() => {
                 this.props.toggleSendAll();
                 if (this.props.shouldSendAll) {
+                  // if we toggle shouldSendAll from true -> false
+                  // we need to re-enable the field
+                  // and set it to whatever value was used for the sendAll value
                   this.props.updateAmount(Number(formattedAmountToNaturalUnits(
                     this.form.$('amount').value,
-                    this.props.defaultToken.Metadata.numberOfDecimals,
+                    this.getNumDecimals(),
                   )));
                 }
               }}

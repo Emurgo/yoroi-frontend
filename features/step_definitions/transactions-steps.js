@@ -88,7 +88,7 @@ When(/^I click on the next button in the wallet send form$/, async function () {
   }
 });
 
-When(/^I click on "Send all my ADA" checkbox$/, async function () {
+When(/^I click on "Send all" checkbox$/, async function () {
   await this.click('.WalletSendForm_checkbox');
 });
 
@@ -158,4 +158,18 @@ Then(/^I should see no warning block$/, async function () {
 
 When(/^I click on the unmangle button$/, async function () {
   await this.click('.MangledHeader_submitButton ');
+});
+
+When(/^I open the token selection dropdown$/, async function () {
+  await this.click('.WalletSendForm_component .SimpleInput_input');
+});
+When(/^I select token "([^"]*)"$/, async function (tokenName) {
+  const tokenRows = await this.getElementsBy('.TokenOptionRow_rowText');
+  for (const row of tokenRows) {
+    const info = await row.findElements(By.tagName('span'));
+    const name = await info[0].getText();
+    if (name === tokenName) {
+      await row.click();
+    }
+  }
 });
