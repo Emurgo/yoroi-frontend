@@ -41,7 +41,7 @@ import {
   mockFromDefaults,
 } from '../../../app/stores/toplevel/TokenInfoStore';
 import { sendAllUnsignedTxFromUtxo } from '../../../app/api/ergo/lib/transactions/utxoTransaction';
-import type { NetworkRow } from '../../../app/api/ada/lib/storage/database/primitives/tables';
+import { replaceMockBoxId } from '../../../app/api/ergo/lib/transactions/utils';
 
 function genMockErgoCache(dummyWallet: PublicDeriver<>) {
   const defaultToken = dummyWallet.getParent().getDefaultToken();
@@ -219,37 +219,39 @@ export type ErgoCacheValue = {|
 |};
 
 export const genTentativeErgoTx = (
-  network: $ReadOnly<NetworkRow>,
+  publicDeriver: PublicDeriver<>,
 ): {|
   tentativeTx: null | ISignRequest<any>,
-  inputAmount: string,
-  fee: BigNumber,
+  inputAmount: MultiToken,
+  fee: MultiToken,
 |} => {
   const config = getErgoBaseConfig(
-    network
+    publicDeriver.getParent().getNetworkInfo()
   ).reduce((acc, next) => Object.assign(acc, next), {});
 
   const remoteUnspentUtxos = [{
-    entry: {
+    entry: replaceMockBoxId({
       receiver: Buffer.from(RustModule.SigmaRust.NetworkAddress.from_base58(
-        '9hD2Cw6yQL6zzrw3TFgKdwFkBdDdU3ro1xRFmjouDw4NYS2S5RD'
+        '9ew5xgVKW8u6f1qV6AbpVn1DrPT1zfNraGy6H9aTYTmXspBhxRs'
       ).to_bytes()).toString('hex'),
-      amount: '1100000',
-      additionalRegisters: Object.freeze({
-        R4: '0e0474657374',
-        R5: '0e0120',
-        R6: '0e0131',
-      }),
+      amount: '10000000000',
+      // additionalRegisters: Object.freeze({
+      //   R4: '0e0474657374',
+      //   R5: '0e0120',
+      //   R6: '0e0131',
+      // }),
       assets: [{
         tokenId: 'c804ec8f26627b004b11cf7387b6823893737ce682ebd70a7da902e95f49a4ae',
         amount: 12340
       }],
       creationHeight: 327878,
-      ergoTree: '0008cd03622070184643e8089c6ff367dc648eacc6bcf9ee34c07fafa7e61075df25b58b',
+      ergoTree: Buffer.from(RustModule.SigmaRust.Address.from_base58(
+        '9ew5xgVKW8u6f1qV6AbpVn1DrPT1zfNraGy6H9aTYTmXspBhxRs'
+      ).to_ergo_tree().to_bytes()).toString('hex'),
       boxId: 'dc18a160f90e139f4813759d86db87b7f80db228de8f6b8c493da954042881ef',
       tx_hash: '953ea849258ea1cb1d5ad79876f4f6294f091c034c2069d7f351b90fb7e1ccf1',
       tx_index: 0,
-    },
+    }),
     addressing: {
       path: [],
       startLevel: 0,
@@ -262,7 +264,7 @@ export const genTentativeErgoTx = (
   const sendAll = sendAllUnsignedTxFromUtxo({
     receiver: {
       address: Buffer.from(RustModule.SigmaRust.NetworkAddress.from_base58(
-        '9hD2Cw6yQL6zzrw3TFgKdwFkBdDdU3ro1xRFmjouDw4NYS2S5RD'
+        '9iFo22w5LoHJcvKn6oK9Br7dw3bUqeXkRddeiKAEEFUr95zv1bY'
       ).to_bytes()).toString('hex'),
     },
     currentHeight: 999999,
@@ -271,26 +273,50 @@ export const genTentativeErgoTx = (
     protocolParams: {
       FeeAddress: config.FeeAddress,
       MinimumBoxValue: config.MinimumBoxValue,
-      NetworkId: network.NetworkId,
+      NetworkId: publicDeriver.getParent().getNetworkInfo().NetworkId,
     },
   });
+  console.log(JSON.stringify(sendAll));
 
   const signRequest = new ErgoTxSignRequest({
     senderUtxos: remoteUnspentUtxos.map(utxo => ({ ...utxo.entry, addressing: utxo.addressing })),
     unsignedTx: sendAll.unsignedTx,
     changeAddr: sendAll.changeAddr,
     networkSettingSnapshot: {
-      NetworkId: network.NetworkId,
+      NetworkId: publicDeriver.getParent().getNetworkInfo().NetworkId,
       ChainNetworkId: (Number.parseInt(config.ChainNetworkId, 10): any),
       FeeAddress: config.FeeAddress,
     },
   });
+
+  const defaultToken = publicDeriver.getParent().getDefaultToken();
   return {
     tentativeTx: signRequest,
     inputAmount: remoteUnspentUtxos.reduce(
-      (sum, next) => sum.plus(next.entry.amount),
-      new BigNumber(0)
-    ).toString(),
-    fee,
+      (sum, next) => sum.joinAddMutable(new MultiToken(
+        [
+          {
+            amount: new BigNumber(next.entry.amount),
+            identifier: defaultToken.defaultIdentifier,
+            networkId: publicDeriver.getParent().getNetworkInfo().NetworkId,
+          },
+          ...(next.entry.assets?.map(asset => ({
+            amount: new BigNumber(asset.amount),
+            identifier: asset.tokenId,
+            networkId: publicDeriver.getParent().getNetworkInfo().NetworkId,
+          })) ?? []),
+        ],
+        defaultToken
+      )),
+      new MultiToken([], defaultToken)
+    ),
+    fee: new MultiToken(
+      [{
+        identifier: defaultToken.defaultIdentifier,
+        amount: new BigNumber('2000001'),
+        networkId: publicDeriver.getParent().getNetworkInfo().NetworkId,
+      }],
+      defaultToken
+    ),
   };
 };

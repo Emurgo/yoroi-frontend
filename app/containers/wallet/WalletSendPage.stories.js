@@ -25,6 +25,7 @@ import {
 } from '../../../stories/helpers/cardano/ShelleyCip1852Mocks';
 import {
   genErgoSigningWalletWithCache,
+  genTentativeErgoTx,
 } from '../../../stories/helpers/ergo/ErgoMocks';
 import type { PossibleCacheTypes } from '../../../stories/helpers/WalletCache';
 import MemoNoExternalStorageDialog from '../../components/wallet/memos/MemoNoExternalStorageDialog';
@@ -342,6 +343,60 @@ export const RegularConfirmationDialog = (): Node => {
   const lookup = walletLookup([wallet]);
 
   const { tentativeTx, inputAmount, fee } = genTentativeShelleyTx(wallet.publicDeriver);
+  const errorCases = Object.freeze({
+    None: undefined,
+    InvalidWitness: new InvalidWitnessError(),
+  });
+  const getErrorValue = () => select(
+    'errorCases',
+    errorCases,
+    errorCases.None
+  );
+
+  const defaultToken = mockDefaultToken(
+    wallet.publicDeriver.getParent().getNetworkInfo().NetworkId,
+  );
+  return wrapWallet(
+    mockWalletProps({
+      location: getRoute(wallet.publicDeriver.getPublicDeriverId()),
+      selected: wallet.publicDeriver,
+      ...lookup,
+    }),
+    (<WalletSendPage
+      generated={genBaseProps({
+        wallet,
+        balance: new MultiToken([], defaultToken),
+        dialogInfo: {
+          sendMoneyRequest: {
+            isExecuting: boolean('isExecuting', false),
+            reset: action('reset'),
+            error: getErrorValue(),
+          },
+          transactionBuilderStore: {
+            totalInput: inputAmount,
+            fee,
+            shouldSendAll: false,
+            tentativeTx,
+            txMismatch: boolean('txMismatch', false),
+            createUnsignedTx: {
+              isExecuting: false,
+              error: undefined,
+            },
+            selectedToken: undefined,
+          }
+        }
+      })}
+    />)
+  );
+};
+
+export const MultiAssetConfirmationDialog = (): Node => {
+  const wallet = genErgoSigningWalletWithCache();
+  const lookup = walletLookup([wallet]);
+
+  const { tentativeTx, inputAmount, fee } = genTentativeErgoTx(
+    wallet.publicDeriver
+  );
   const errorCases = Object.freeze({
     None: undefined,
     InvalidWitness: new InvalidWitnessError(),

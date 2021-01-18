@@ -194,6 +194,7 @@ export function sendAllUnsignedTxFromUtxo(request: {|
 
   const txBuilder = RustModule.SigmaRust.TxBuilder.new(
     allUtxoSelection,
+    // no output since it gets considered as change at the tx builder level
     RustModule.SigmaRust.ErgoBoxCandidates.empty(),
     request.currentHeight,
     RustModule.SigmaRust.BoxValue.from_i64(
