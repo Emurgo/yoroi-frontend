@@ -1,0 +1,11 @@
+image: node:12
+
+flow:
+  script:
+   - npm install
+   - npm run flow
+   
+eslint:
+  script:
+   - npm install
+   - npm run eslint
