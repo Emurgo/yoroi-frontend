@@ -241,7 +241,7 @@ export const genTentativeErgoTx = (
       //   R6: '0e0131',
       // }),
       assets: [{
-        tokenId: 'c804ec8f26627b004b11cf7387b6823893737ce682ebd70a7da902e95f49a4ae',
+        tokenId: 'f2b5c4e4883555b882e3a5919967883aade9e0494290f29e0e3069f5ce9eabe4',
         amount: 12340
       }],
       creationHeight: 327878,

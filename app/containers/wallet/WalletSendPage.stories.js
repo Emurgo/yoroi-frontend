@@ -219,7 +219,9 @@ const genBaseProps: {|
           getCurrentPrice: (_from, _to) => 5,
         },
         tokenInfoStore: {
-          tokenInfo: mockFromDefaults(defaultAssets),
+          tokenInfo: genTokenInfoMap(
+            request.wallet.publicDeriver.getParent().getNetworkInfo()
+          ),
         },
         wallets: {
           sendMoneyRequest: request.dialogInfo == null
