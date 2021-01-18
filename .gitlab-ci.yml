@@ -19,4 +19,4 @@ e2e:
   script:
    - npm install
    - npm run test:build
-   - npm run test:run:e2e:chrome   
+   - npm run test:run:e2e:chrome
