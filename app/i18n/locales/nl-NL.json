@@ -8,7 +8,7 @@
   "api.errors.WalletAlreadyImportedError": "De portemonnee die u probeert te importeren bestaat al.",
   "api.errors.WalletAlreadyRestoredError": "De portemonnee die u probeert te herstellen bestaat al.",
   "api.errors.WalletFileImportError": "Portemonnee kan niet geïmporteerd worden. Gebruik het juiste bestand.",
-  "api.errors.assetInfoApiError": "Error received from server while getting asset info.",
+  "api.errors.assetInfoApiError": "Fout ontvangen van server tijdens het ophalen van saldogegevens.",
   "api.errors.checkAdressesInUseApiError": "Serverfout geconstateerd bij het controleren van de gebruikte adressen.",
   "api.errors.currentCoinPriceError": "Actuele muntprijs is nu niet beschikbaar.",
   "api.errors.discoverAddressesError": "Foutmelding van de API methode bij het uitzoeken van de adressen.",
