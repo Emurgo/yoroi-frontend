@@ -508,9 +508,10 @@ describe('Create sendAll unsigned TX from UTXO', () => {
     it('Create a transaction involving all input with no change', () => {
       const sampleUtxos = genSampleUtxos();
       const utxos: Array<RemoteUnspentOutput> = [sampleUtxos[1], sampleUtxos[3]];
+      const receiver = decode('9egNKTzQDH658qcdiPEoQfVM1SBxQNxnyF8BCw57aNWerRhhHBQ').toString('hex');
       const sendAllResponse = sendAllUnsignedTxFromUtxo({
         receiver: {
-          address: decode('9egNKTzQDH658qcdiPEoQfVM1SBxQNxnyF8BCw57aNWerRhhHBQ').toString('hex')
+          address: receiver
         },
         utxos,
         currentHeight: 100,
@@ -530,6 +531,18 @@ describe('Create sendAll unsigned TX from UTXO', () => {
           .value().as_i64()
           .to_str()
       ).toEqual('20950001'); // output
+      expect(Buffer.from(
+        unsignedTx
+          .outputs()
+          .get(0)
+          .ergo_tree().to_bytes()
+      ).toString('hex')).toEqual(
+        Buffer.from(
+          RustModule.SigmaRust.NetworkAddress.from_bytes(
+            Buffer.from(receiver, 'hex')
+          ).address().to_ergo_tree().to_bytes()
+        ).toString('hex')
+      ); // output
       expect(
         unsignedTx
           .outputs()
@@ -537,6 +550,18 @@ describe('Create sendAll unsigned TX from UTXO', () => {
           .value().as_i64()
           .to_str()
       ).toEqual('50000'); // fee
+      expect(Buffer.from(
+        unsignedTx
+          .outputs()
+          .get(1)
+          .ergo_tree().to_bytes()
+      ).toString('hex')).toEqual(
+        Buffer.from(
+          RustModule.SigmaRust.NetworkAddress.from_bytes(
+            Buffer.from(parameterSubset.FeeAddress, 'hex')
+          ).address().to_ergo_tree().to_bytes()
+        ).toString('hex')
+      ); // fee
       // make sure the assets are also sent
       expect(
         unsignedTx

@@ -201,7 +201,7 @@ export function sendAllUnsignedTxFromUtxo(request: {|
       RustModule.SigmaRust.I64.from_str(request.txFee.toString())
     ),
     RustModule.SigmaRust.Address.from_bytes(
-      Buffer.from(request.protocolParams.FeeAddress, 'hex')
+      Buffer.from(request.receiver.address, 'hex')
     ),
     RustModule.SigmaRust.BoxValue.from_i64(
       RustModule.SigmaRust.I64.from_str(request.protocolParams.MinimumBoxValue.toString())
