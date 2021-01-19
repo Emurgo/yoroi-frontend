@@ -394,6 +394,7 @@ async function baseTest(
             UtxoTransactionOutputId: 3,
             ErgoBoxId: null,
             ErgoCreationHeight: null,
+            ErgoRegisters: null,
             ErgoTree: null,
           },
           tokens: [{
@@ -519,6 +520,7 @@ async function baseTest(
             UtxoTransactionOutputId: 1,
             ErgoBoxId: null,
             ErgoCreationHeight: null,
+            ErgoRegisters: null,
             ErgoTree: null,
           },
           tokens: [{
@@ -586,6 +588,7 @@ async function baseTest(
             UtxoTransactionOutputId: 3,
             ErgoBoxId: null,
             ErgoCreationHeight: null,
+            ErgoRegisters: null,
             ErgoTree: null,
           },
           tokens: [{
@@ -699,6 +702,7 @@ async function baseTest(
             UtxoTransactionOutputId: 1,
             ErgoBoxId: null,
             ErgoCreationHeight: null,
+            ErgoRegisters: null,
             ErgoTree: null,
           },
           tokens: [{
@@ -766,6 +770,7 @@ async function baseTest(
             UtxoTransactionOutputId: 3,
             ErgoBoxId: null,
             ErgoCreationHeight: null,
+            ErgoRegisters: null,
             ErgoTree: null,
           },
           tokens: [{
