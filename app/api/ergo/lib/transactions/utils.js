@@ -100,7 +100,9 @@ export function asAddressedUtxo(
       creationHeight: ErgoCreationHeight,
       boxId: ErgoBoxId,
       assets: tokenTypes.tokens,
-      additionalRegisters: undefined, // TODO
+      additionalRegisters: utxo.output.UtxoTransactionOutput.ErgoRegisters == null
+        ? undefined
+        : JSON.parse(utxo.output.UtxoTransactionOutput.ErgoRegisters),
       ergoTree: ErgoTree,
     };
   });

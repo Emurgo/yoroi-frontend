@@ -44,6 +44,7 @@ type ErgoFields = {|
   ErgoBoxId: string,
   ErgoCreationHeight: number,
   ErgoTree: string,
+  ErgoRegisters: string, // JSON.stringify({| [key: string]: string /* hex */ |}),
 |};
 export type UtxoTransactionOutputInsert = {|
   TransactionId: number,
@@ -77,6 +78,7 @@ export const UtxoTransactionOutputSchema: {|
     ErgoBoxId: 'ErgoBoxId',
     ErgoCreationHeight: 'ErgoCreationHeight',
     ErgoTree: 'ErgoTree',
+    ErgoRegisters: 'ErgoRegisters',
   }
 };
 
@@ -122,6 +124,7 @@ export const populateUtxoTransactionsDb = (schemaBuilder: lf$schema$Builder) => 
     .addColumn(UtxoTransactionOutputSchema.properties.ErgoBoxId, Type.STRING)
     .addColumn(UtxoTransactionOutputSchema.properties.ErgoCreationHeight, Type.NUMBER)
     .addColumn(UtxoTransactionOutputSchema.properties.ErgoTree, Type.STRING)
+    .addColumn(UtxoTransactionOutputSchema.properties.ErgoRegisters, Type.STRING)
     .addPrimaryKey(
       ([UtxoTransactionOutputSchema.properties.UtxoTransactionOutputId]: Array<string>),
       true
@@ -139,5 +142,6 @@ export const populateUtxoTransactionsDb = (schemaBuilder: lf$schema$Builder) => 
       UtxoTransactionOutputSchema.properties.ErgoBoxId,
       UtxoTransactionOutputSchema.properties.ErgoCreationHeight,
       UtxoTransactionOutputSchema.properties.ErgoTree,
+      UtxoTransactionOutputSchema.properties.ErgoRegisters,
     ]);
 };

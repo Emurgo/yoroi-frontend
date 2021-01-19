@@ -89,6 +89,7 @@ const _output = (
   ErgoBoxId: null,
   ErgoCreationHeight: null,
   ErgoTree: null,
+  ErgoRegisters: null,
 });
 
 function tokenEntry(row: TokenListRow): ReadonlyElementOf<$PropertyType<DbTokenInfo, 'tokens'>> {

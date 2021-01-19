@@ -1570,6 +1570,7 @@ function genJormungandrIOGen(
           ErgoBoxId: null,
           ErgoCreationHeight: null,
           ErgoTree: null,
+          ErgoRegisters: null,
         });
       } else if (
         outputType === CoreAddressTypes.JORMUNGANDR_ACCOUNT
