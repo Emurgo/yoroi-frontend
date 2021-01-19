@@ -1697,7 +1697,6 @@ function genByronIOGen(
         ErgoCreationHeight: null,
         ErgoRegisters: null,
         ErgoTree: null,
-        ErgoRegisters: null,
         TokenListId: listId,
       });
     }
@@ -1824,7 +1823,6 @@ function genShelleyIOGen(
           ErgoCreationHeight: null,
           ErgoRegisters: null,
           ErgoTree: null,
-          ErgoRegisters: null,
         });
       } else if (
         outputType === CoreAddressTypes.CARDANO_REWARD
