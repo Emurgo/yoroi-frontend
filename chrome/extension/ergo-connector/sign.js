@@ -46,7 +46,7 @@ chrome.runtime.sendMessage({ type: 'tx_sign_window_retrieve_data' }, response =>
           if (send != null) {
             send.onclick = () => {
               const pw = document.getElementById('pw-entry');
-              if (pw != null) {
+              if (pw != null && pw instanceof HTMLInputElement) {
                 chrome.runtime.sendMessage({
                   type: 'sign_confirmed',
                   tx: sign.tx,

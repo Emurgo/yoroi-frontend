@@ -1,8 +1,10 @@
 // @flow
 
 import type {
+  Address,
   Box,
   Tx,
+  TxId,
   SignedTx,
   Value
 } from './types';
@@ -11,7 +13,8 @@ import { RustModule } from '../../../app/api/ada/lib/cardanoCrypto/rustLoader';
 //import { networks } from '../../../app/api/ada/lib/storage/database/prepackaged/networks';
 import type {
   IGetAllUtxosResponse,
-  IPublicDeriver
+  IPublicDeriver,
+  IGetSigningKey
 } from '../../../app/api/ada/lib/storage/models/PublicDeriver/interfaces';
 import {
   PublicDeriver,
@@ -19,20 +22,28 @@ import {
 import {
   asGetAllUtxos,
   asGetBalance,
-  IGetSigningKey
+  asHasLevels,
+  asGetSigningKey,
 } from '../../../app/api/ada/lib/storage/models/PublicDeriver/traits';
 import { ConceptualWallet } from '../../../app/api/ada/lib/storage/models/ConceptualWallet/index';
 import type { IHasLevels } from '../../../app/api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import BigNumber from 'bignumber.js';
 import { BIP32PrivateKey, } from '../../../app/api/common/lib/crypto/keys/keyRepository';
 import { generateKeys } from '../../../app/api/ergo/lib/transactions/utxoTransaction';
-// UtxoTxOutput.UtxoTransactionOutput.TransactionId/OutputIndex?
+//import type { NetworkRow } from '../../../ada/lib/storage/database/primitives/tables'
+
+import {
+  InvalidWitnessError,
+  SendTransactionApiError
+} from '../../../app/api/common/errors';
 
 import axios from 'axios';
 import {
   Logger,
   stringifyError
 } from '../../../app/utils/logging';
+
+import type { UtxoTxOutput } from '../../../app/api/ada/lib/storage/database/transactionModels/utxo/api/read';
 
 export async function connectorGetBalance(wallet: PublicDeriver<>, tokenId: string): Promise<BigNumber> {
   if (tokenId === 'ERG') {  
@@ -47,7 +58,7 @@ export async function connectorGetBalance(wallet: PublicDeriver<>, tokenId: stri
   }
 }
 
-function formatUtxoToBox(utxo): Box {
+function formatUtxoToBox(utxo: { output: UtxoTxOutput, ... }): Box {
     const tx = utxo.output.Transaction;
     const box = utxo.output.UtxoTransactionOutput;
     if (
@@ -59,44 +70,50 @@ function formatUtxoToBox(utxo): Box {
     }
     return {
       boxId: box.ErgoBoxId,
-      value: parseInt(box.Amount, 10),
       ergoTree: box.ErgoTree,
       assets: [],
       additionalRegisters: {},
       creationHeight: box.ErgoCreationHeight,
       transactionId: tx.Hash,
-      index: box.OutputIndex
-    }
+      index: box.OutputIndex,
+      value: parseInt(box.Amount, 10)
+    };
 }
 
 export async function connectorGetUtxos(wallet: PublicDeriver<>, valueExpected: ?number): Promise<Box[]> {
-  const canGetAllUtxos = await asGetAllUtxos(wallet);
-  if (canGetAllUtxos != null) {
-    let utxos = await canGetAllUtxos.getAllUtxos();
-    // TODO: more intelligently choose values?
-    if (valueExpected != null) {
-      // TODO: use bigint/whatever yoroi uses for values
-      let valueAcc = 0;
-      const utxosToUse = [];
-      for (let i = 0; i < utxos.length && valueAcc < valueExpected; i += 1) {
-        const val = parseInt(utxos[i].output.UtxoTransactionOutput.Amount, 10);
-        console.log(`get_utxos[1]: at ${valueAcc} of ${valueExpected} requested - trying to add ${val}`);
-        valueAcc += val;
-        utxosToUse.push(utxos[i]);
-        console.log(`get_utxos[2]: at ${valueAcc} of ${valueExpected} requested`);
-      }
-      utxos = utxosToUse;
-    }
-    const utxosFormatted = utxos.map(formatUtxoToBox);
-    return Promise.resolve(utxosFormatted);
+  const withUtxos = asGetAllUtxos(wallet);
+  if (withUtxos == null) {
+    throw new Error('wallet doesn\'t support IGetAllUtxos');
   }
-  throw Error('asGetAllUtxos failed');
+  let utxos = await withUtxos.getAllUtxos();
+  // TODO: more intelligently choose values?
+  if (valueExpected != null) {
+    // TODO: use bigint/whatever yoroi uses for values
+    let valueAcc = 0;
+    const utxosToUse = [];
+    for (let i = 0; i < utxos.length && valueAcc < valueExpected; i += 1) {
+      const val = parseInt(utxos[i].output.UtxoTransactionOutput.Amount, 10);
+      console.log(`get_utxos[1]: at ${valueAcc} of ${valueExpected} requested - trying to add ${val}`);
+      valueAcc += val;
+      utxosToUse.push(utxos[i]);
+      console.log(`get_utxos[2]: at ${valueAcc} of ${valueExpected} requested`);
+    }
+    utxos = utxosToUse;
+  }
+  const utxosFormatted = utxos.map(formatUtxoToBox);
+  return Promise.resolve(utxosFormatted);
 }
 
-export async function connectorSignTx(wallet: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetSigningKey, password: string, utxos: any/* IGetAllUtxosResponse*/, tx: Tx, indices: Array<number>): Promise<SignedTx> {
-  console.log('loading rustmodule');
+export async function connectorSignTx(publicDeriver: IPublicDeriver<ConceptualWallet>, password: string, utxos: any/* IGetAllUtxosResponse*/, tx: Tx, indices: Array<number>): Promise</* SignedTx */any> {
+  const withLevels = asHasLevels(publicDeriver);
+  if (withLevels == null) {
+    throw new Error('wallet doesn\'t support levels');
+  }
+  const wallet = asGetSigningKey(withLevels);
+  if (wallet == null) {
+    throw new Error('wallet doesn\'t support signing');
+  }
   await RustModule.load();
-  console.log(RustModule);
   let wasmTx;
   try {
     wasmTx = RustModule.SigmaRust.UnsignedTransaction.from_json(JSON.stringify(tx));
@@ -116,6 +133,10 @@ export async function connectorSignTx(wallet: IPublicDeriver<ConceptualWallet & 
   const utxosToSign = utxos.filter(utxo => boxIdsToSign.includes(utxo.output.UtxoTransactionOutput.ErgoBoxId));
   console.log(`utxos: ${JSON.stringify(utxos)}`);
 
+  // const canGetSigningKey = await asGetSigningKey(wallet);
+  // if (canGetSigningKey == null) {
+  //   return Error('could not get signing key');
+  // }
   const signingKey = await wallet.getSigningKey();
   const normalizedKey = await wallet.normalizeKey({
     ...signingKey,
@@ -129,25 +150,10 @@ export async function connectorSignTx(wallet: IPublicDeriver<ConceptualWallet & 
     keyLevel: wallet.getParent().getPublicDeriverLevel(),
     signingKey: finalSigningKey,
   });
-  // const config = getErgoBaseConfig(networks.ErgoMainnet)
-  //   .reduce((acc, next) => Object.assign(acc, next), {});
-  // const signReq = new ErgoTxSignRequest({
-  //   senderUtxos: utxosToSign,
-  //   unsignedTx: wasmTx,
-  //   changeAddr: [], // change addrs not used for signing?
-  //   networkSettingSnapshot: {
-  //     FeeAddress: config.FeeAddress,
-  //     ChainNetworkId: (Number.parseInt(config.ChainNetworkId, 10)),
-  //   }
-  // });
-  //let allTxBoxes = ;
   const x = utxosToSign.map(formatUtxoToBox);
   console.log(`x = ${JSON.stringify(x)}`);
   let txBoxesToSign = RustModule.SigmaRust.ErgoBoxes.from_boxes_json(x);
   console.log(`$$ txBoxesToSign = ${txBoxesToSign.len()}`);
-  // for (let i = 0; i < allTxBoxes.length(); i += 1) {
-  //   txBoxesToSign.add(wasm.ErgoBox.from_json(allTxBoxes[i])));
-  // }
   const signedTx = RustModule.SigmaRust.Wallet
     .from_secrets(wasmKeys)
     .sign_transaction(
@@ -159,22 +165,16 @@ export async function connectorSignTx(wallet: IPublicDeriver<ConceptualWallet & 
   return signedTx.to_json();
 }
 
-export async function connectorSendTx(wallet: IPublicDeriver<ConceptualWallet>, tx: SignedTx): Promise<TxId> {  
-  // return sendTx({
-  //   network: wallet.getParent().getNetworkInfo(),
-  //   ...tx
-  // });
+export async function connectorSendTx(wallet: IPublicDeriver</* ConceptualWallet */>, tx: SignedTx): Promise<TxId> {  
   console.log(`tring to send: ${JSON.stringify(tx)}`);
-  //const tmp = tx.inputs[0].boxId;
-  //tx.inputs[0].boxId = tx.inputs[1].boxId;
-  //tx.inputs[1].boxId = tmp;
   console.log('hi');
   const network = wallet.getParent().getNetworkInfo();
-  const { BackendService } = network.Backend;
-  console.log(`backend: ${BackendService}`);
-  if (BackendService == null) throw new Error(`${nameof(this.getUTXOsForAddresses)} missing backend url`);
+  const backend = network.Backend.BackendService;
+  if (backend == null) {
+    throw new Error('connectorSendTx: missing backend url');
+  }
   return axios(
-    `${BackendService}/api/txs/signed`,
+    `${backend}/api/txs/signed`,
     {
       method: 'post',
       timeout: 2 * 20000,//CONFIG.app.walletRefreshInterval,
@@ -189,8 +189,6 @@ export async function connectorSendTx(wallet: IPublicDeriver<ConceptualWallet>, 
     return Promise.resolve(response.data.id);
   })
     .catch((error) => {
-      Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.sendTx)} error: ` + stringifyError(error));
-      console.log(`tx send error: ${stringifyError(error)}`);
       if (error.request.response.includes('Invalid witness')) {
         throw new InvalidWitnessError();
       }

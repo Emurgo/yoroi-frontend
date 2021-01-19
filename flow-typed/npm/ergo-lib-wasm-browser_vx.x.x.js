@@ -1422,6 +1422,12 @@ declare module 'ergo-lib-wasm-browser' { // need to wrap flowgen output into mod
         index: number,
       |}>,
     |};
+    /**
+    * JSON representation
+    * @param {string} json
+    * @returns {UnsignedTransaction}
+    */
+    static from_json(json: string): UnsignedTransaction;
   }
   /**
   * A collection of secret keys. This simplified signing by matching the secret keys to the correct inputs automatically.

@@ -105,14 +105,14 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
   // alert(`received event: ${JSON.stringify(request)}`);
   if (request.type === 'connect_response') {
     const connection = connectedSites.get(request.tabId);
-    if (connection) {
+    if (connection && typeof connection.status === 'object') {
       connection.status.resolve(request.accepted);
       connection.status = request.accepted;
     }
   } else if (request.type === 'sign_confirmed') {
     const connection = connectedSites.get(request.tabId);
     const responseData = connection?.pendingSigns.get(request.uid);
-    if (responseData) {
+    if (connection && responseData) {
       const password = request.pw;
       switch (responseData.request.type) {
         case 'tx':
@@ -146,7 +146,7 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
   } else if (request.type === 'sign_rejected') {
     const connection = connectedSites.get(request.tabId);
     const responseData = connection?.pendingSigns.get(request.uid);
-    if (responseData) {
+    if (connection && responseData) {
       responseData.resolve({
         err: {
           code: 2,
