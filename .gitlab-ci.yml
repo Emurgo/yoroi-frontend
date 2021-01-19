@@ -1,0 +1,39 @@
+cache:
+  paths:
+    - node_modules/
+  policy: pull
+
+stages:
+  - prebuild
+  - build
+  - tests
+
+static tests:
+  image: node:12
+  stage: prebuild
+  script:
+    - npm install
+    - npm run flow
+    - npm run eslint
+
+unit tests:
+  image: node:12
+  stage: prebuild
+  script:
+    - npm install
+    - npm run jest
+
+test build:
+  image: node:12
+  stage: build
+  script:
+    - npm install
+    - npm run test:build
+
+e2e tests:
+  image: registry.gitlab.com/emurgo.io/yoroi-frontend
+  stage: tests
+  script:
+   - npm install
+   - npm run test:build
+   - npm run test:run:e2e:chrome
