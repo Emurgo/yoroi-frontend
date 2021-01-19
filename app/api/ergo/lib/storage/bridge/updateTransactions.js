@@ -1452,6 +1452,7 @@ function genErgoIOGen(
         ErgoBoxId: output.id,
         ErgoCreationHeight: output.creationHeight,
         ErgoTree: output.ergoTree,
+        ErgoRegisters: JSON.stringify(output.additionalRegisters),
       };
       utxoOutputs.push(utxo);
     }

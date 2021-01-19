@@ -1695,6 +1695,7 @@ function genByronIOGen(
         IsUnspent: true,
         ErgoBoxId: null,
         ErgoCreationHeight: null,
+        ErgoRegisters: null,
         ErgoTree: null,
         TokenListId: listId,
       });
@@ -1820,6 +1821,7 @@ function genShelleyIOGen(
           IsUnspent: true,
           ErgoBoxId: null,
           ErgoCreationHeight: null,
+          ErgoRegisters: null,
           ErgoTree: null,
         });
       } else if (
