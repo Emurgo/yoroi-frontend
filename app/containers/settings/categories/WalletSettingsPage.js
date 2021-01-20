@@ -107,15 +107,15 @@ export default class WalletSettingsPage extends Component<InjectedOrGenerated<Ge
             dialog: ResyncWalletDialogContainer,
           })}
         />
+        <ExportWallet
+          openDialog={() => actions.dialogs.open.trigger({
+            dialog: ExportWalletDialogContainer,
+          })}
+        />
         <RemoveWallet
           walletName={settingsCache.conceptualWalletName}
           openDialog={() => actions.dialogs.open.trigger({
             dialog: RemoveWalletDialogContainer,
-          })}
-        />
-        <ExportWallet
-          openDialog={() => actions.dialogs.open.trigger({
-            dialog: ExportWalletDialogContainer,
           })}
         />
       </>

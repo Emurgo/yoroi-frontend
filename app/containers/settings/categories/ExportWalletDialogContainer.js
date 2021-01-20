@@ -1,17 +1,18 @@
 // @flow
 import React, { Component } from 'react';
 import type { Node } from 'react';
-import classnames from 'classnames';
 import { observer } from 'mobx-react';
-import { computed, action, observable } from 'mobx';
-import { defineMessages, intlShape } from 'react-intl';
+import { computed, } from 'mobx';
+import { intlShape } from 'react-intl';
 
-import globalMessages from '../../../i18n/global-messages';
-import Dialog from '../../../components/widgets/Dialog';
-import DialogCloseButton from '../../../components/widgets/DialogCloseButton';
 import ExportPublicKeyDialog from '../../../components/wallet/settings/ExportPublicKeyDialog';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
+import type { IGetPublic } from '../../../api/ada/lib/storage/models/PublicDeriver/interfaces';
+import type { PublicKeyCache } from '../../../stores/toplevel/WalletStore';
+import {
+  asGetPublicKey,
+} from '../../../api/ada/lib/storage/models/PublicDeriver/traits';
 
 import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 
@@ -29,11 +30,20 @@ export default class ExportWalletDialogContainer extends Component<Props> {
   };
 
   render(): Node {
-    const { intl } = this.context;
-
+    const { selected } = this.generated.stores.wallets;
+    if (selected == null) {
+      return null;
+    }
+    const withPublicKey = asGetPublicKey(selected);
+    if (withPublicKey == null) {
+      return null;
+    }
+    const { publicKey } = this.generated.stores.wallets.getPublicKeyCache(withPublicKey);
     return (
       <ExportPublicKeyDialog
         onClose={this.generated.actions.dialogs.closeActiveDialog.trigger}
+        publicKeyHex={publicKey}
+        pathToPublic={withPublicKey.pathToPublic}
       />
     );
   }
@@ -47,6 +57,10 @@ export default class ExportWalletDialogContainer extends Component<Props> {
       |},
     |},
     stores: {|
+      wallets: {|
+        getPublicKeyCache: IGetPublic => PublicKeyCache,
+        selected: null | PublicDeriver<>,
+      |},
     |}
     |} {
     if (this.props.generated !== undefined) {
@@ -55,10 +69,14 @@ export default class ExportWalletDialogContainer extends Component<Props> {
     if (this.props.stores == null || this.props.actions == null) {
       throw new Error(`${nameof(ExportWalletDialogContainer)} no way to generated props`);
     }
-    const { actions, stores } = this.props;
+    const { actions, stores, } = this.props;
     return Object.freeze({
-      stores: Object.freeze({
-      }),
+      stores: {
+        wallets: {
+          selected: stores.wallets.selected,
+          getPublicKeyCache: stores.wallets.getPublicKeyCache,
+        },
+      },
       actions: {
         dialogs: {
           closeActiveDialog: { trigger: actions.dialogs.closeActiveDialog.trigger },

@@ -5,7 +5,6 @@ import classNames from 'classnames';
 import { defineMessages, intlShape } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 import styles from './ExportWallet.scss';
-import dangerousButtonStyles from '../../../themes/overrides/DangerousButton.scss';
 import { observer } from 'mobx-react';
 import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
@@ -49,7 +48,6 @@ export default class ExportWallet extends Component<Props> {
         </p>
 
         <Button
-          themeOverrides={dangerousButtonStyles}
           className={buttonClassNames}
           label={`${this.context.intl.formatMessage(globalMessages.exportButtonLabel)}`}
           skin={ButtonSkin}

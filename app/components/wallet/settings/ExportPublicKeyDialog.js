@@ -29,6 +29,8 @@ export const messages: * = defineMessages({
 
 type Props = {|
   +onClose: void => void,
+  +publicKeyHex: string,
+  +pathToPublic: Array<number>
 |};
 
 @observer
@@ -41,14 +43,8 @@ export default class ExportPublicKeyDialog extends Component<Props> {
     const { intl } = this.context;
 
     const walletInfo = {
-      publicKeyHex: '62def90b803d2c5616165ac40db911b98261bdc2c2a9678a0a3837024fa2f998d43e76aa8d9b5ad9d91d48479ecd8ef6d00e8df8874e8658ece0cdef94c42367',
-      path: [
-        1852 + 0x80000000,
-        1815 + 0x80000000,
-        0 + 0x80000000,
-        0,
-        1
-      ],
+      publicKeyHex: this.props.publicKeyHex,
+      path: this.props.pathToPublic,
     };
 
     return (
