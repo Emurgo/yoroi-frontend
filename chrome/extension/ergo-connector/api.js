@@ -45,6 +45,10 @@ import {
 
 import type { UtxoTxOutput } from '../../../app/api/ada/lib/storage/database/transactionModels/utxo/api/read';
 
+import { CoreAddressTypes } from '../../../app/api/ada/lib/storage/database/primitives/enums';
+import { getAllAddressesForDisplay } from '../../../app/api/ada/lib/storage/bridge/traitUtils';
+
+
 export async function connectorGetBalance(wallet: PublicDeriver<>, tokenId: string): Promise<BigNumber> {
   if (tokenId === 'ERG') {
     const canGetBalance = asGetBalance(wallet);
@@ -59,7 +63,7 @@ export async function connectorGetBalance(wallet: PublicDeriver<>, tokenId: stri
   }
 }
 
-function formatUtxoToBox(utxo: { output: UtxoTxOutput, ... }): Box {
+function formatUtxoToBox(utxo: { output: $ReadOnly<UtxoTxOutput>, ... }): Box {
     const tx = utxo.output.Transaction;
     const box = utxo.output.UtxoTransactionOutput;
     const tokens = utxo.output.tokens;
@@ -69,6 +73,7 @@ function formatUtxoToBox(utxo: { output: UtxoTxOutput, ... }): Box {
     // TODO: process other tokens too
     const token = tokens.find(token => token.TokenList.ListId === box.TokenListId);
     if (
+      token == null ||
       box.ErgoCreationHeight == null ||
       box.ErgoBoxId == null ||
       box.ErgoTree == null
@@ -94,21 +99,53 @@ export async function connectorGetUtxos(wallet: PublicDeriver<>, valueExpected: 
   }
   let utxos = await withUtxos.getAllUtxos();
   // TODO: more intelligently choose values?
+  let utxosToUse = [];
   if (valueExpected != null) {
     // TODO: use bigint/whatever yoroi uses for values
     let valueAcc = 0;
-    const utxosToUse = [];
     for (let i = 0; i < utxos.length && valueAcc < valueExpected; i += 1) {
-      const val = parseInt(utxos[i].output.UtxoTransactionOutput.Amount, 10);
-      console.log(`get_utxos[1]: at ${valueAcc} of ${valueExpected} requested - trying to add ${val}`);
-      valueAcc += val;
-      utxosToUse.push(utxos[i]);
+      const formatted = formatUtxoToBox(utxos[i]);
+      console.log(`get_utxos[1]: at ${valueAcc} of ${valueExpected} requested - trying to add ${formatted.value}`);
+      valueAcc += parseInt(formatted.value, 10);
+      utxosToUse.push(formatted);
       console.log(`get_utxos[2]: at ${valueAcc} of ${valueExpected} requested`);
     }
-    utxos = utxosToUse;
+  } else {
+    utxosToUse = utxos.map(formatUtxoToBox);
   }
-  const utxosFormatted = utxos.map(formatUtxoToBox);
-  return Promise.resolve(utxosFormatted);
+  return Promise.resolve(utxosToUse);
+}
+
+async function getAllAddresses(wallet: PublicDeriver<>, used_filter: boolean): Promise<Address[]> {
+  const p2pk = getAllAddressesForDisplay({
+    publicDeriver: wallet,
+    type: CoreAddressTypes.ERGO_P2PK
+  });
+  const p2sh = getAllAddressesForDisplay({
+    publicDeriver: wallet,
+    type: CoreAddressTypes.ERGO_P2SH
+  });
+  const p2s = getAllAddressesForDisplay({
+    publicDeriver: wallet,
+    type: CoreAddressTypes.ERGO_P2S
+  });
+  await RustModule.load();
+  const addresses = (await Promise.all([p2pk, p2sh, p2s]))
+    .flat()
+    .filter(a => a.isUsed === used_filter)
+    .map(a => RustModule.SigmaRust.NetworkAddress
+        .from_bytes(Buffer.from(a.address, 'hex'))
+        .to_base58());
+  console.log(`getAllAddresses() = ${JSON.stringify(addresses)}`);
+  return addresses;
+}
+
+export async function connectorGetUsedAddresses(wallet: PublicDeriver<>): Promise<Address[]> {
+  return getAllAddresses(wallet, true);
+}
+
+export async function connectorGetUnusedAddresses(wallet: PublicDeriver<>): Promise<Address[]> {
+  return getAllAddresses(wallet, false);
 }
 
 export async function connectorSignTx(publicDeriver: IPublicDeriver<ConceptualWallet>, password: string, utxos: any/* IGetAllUtxosResponse*/, tx: Tx, indices: Array<number>): Promise</* SignedTx */any> {

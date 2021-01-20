@@ -25,7 +25,9 @@ import {
   connectorGetBalance,
   connectorGetUtxos,
   connectorSendTx,
-  connectorSignTx
+  connectorSignTx,
+  connectorGetUsedAddresses,
+  connectorGetUnusedAddresses
 } from './ergo-connector/api';
 
 /*::
@@ -313,11 +315,24 @@ chrome.runtime.onConnectExternal.addListener(port => {
             }
             break;
           case 'get_used_addresses':
-            rpcResponse({
-              ok: ['mockUsedAddress1', 'mockUsedAddress2']
-            });
+            {
+              const wallet = await firstWallet();
+              const addresses = await connectorGetUsedAddresses(wallet); 
+              rpcResponse({
+                ok: addresses
+              });
+            }
             break;
-          case `get_unused_addresses`:
+          case 'get_unused_addresses':
+            {
+              const wallet = await firstWallet();
+              const addresses = await connectorGetUnusedAddresses(wallet); 
+              rpcResponse({
+                ok: addresses
+              });
+            }
+            break;
+          case `get_change_address`:
             rpcResponse({
               ok: ['9fYK9twHtAfPj6xspbX9emk2E7YmrrDH3PVSBaTzZ3TeSrxWEXv']
             });
