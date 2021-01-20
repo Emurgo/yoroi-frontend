@@ -46,10 +46,11 @@ import {
 import type { UtxoTxOutput } from '../../../app/api/ada/lib/storage/database/transactionModels/utxo/api/read';
 
 export async function connectorGetBalance(wallet: PublicDeriver<>, tokenId: string): Promise<BigNumber> {
-  if (tokenId === 'ERG') {  
+  if (tokenId === 'ERG') {
     const canGetBalance = asGetBalance(wallet);
     if (canGetBalance != null) {
-      return canGetBalance.getBalance();
+      const balance = await canGetBalance.getBalance();
+      return Promise.resolve(balance.getDefault()); 
     }
     throw Error('asGetBalance failed in connectorGetBalance');
   } else {
@@ -61,6 +62,12 @@ export async function connectorGetBalance(wallet: PublicDeriver<>, tokenId: stri
 function formatUtxoToBox(utxo: { output: UtxoTxOutput, ... }): Box {
     const tx = utxo.output.Transaction;
     const box = utxo.output.UtxoTransactionOutput;
+    const tokens = utxo.output.tokens;
+    // This doesn't seem right - is there a better way to access this?
+    // Or a function that does this for us?
+    console.log(`utxo = ${JSON.stringify(utxo)}`);
+    // TODO: process other tokens too
+    const token = tokens.find(token => token.TokenList.ListId === box.TokenListId);
     if (
       box.ErgoCreationHeight == null ||
       box.ErgoBoxId == null ||
@@ -76,7 +83,7 @@ function formatUtxoToBox(utxo: { output: UtxoTxOutput, ... }): Box {
       creationHeight: box.ErgoCreationHeight,
       transactionId: tx.Hash,
       index: box.OutputIndex,
-      value: parseInt(box.Amount, 10)
+      value: parseInt(token.TokenList.Amount, 10)
     };
 }
 
