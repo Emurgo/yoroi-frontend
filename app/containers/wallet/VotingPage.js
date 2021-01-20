@@ -12,6 +12,7 @@ import type { GeneratedData as VotingRegistrationDialogContainerData } from './d
 import { handleExternalLinkClick } from '../../utils/routing';
 import { WalletTypeOption, } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import UnsupportedWallet from './UnsupportedWallet';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 
 export type GeneratedData = typeof VotingPage.prototype.generated;
 type Props = {|
@@ -37,6 +38,9 @@ export default class VotingPage extends Component<Props> {
     } = this.generated.stores;
     let activeDialog = null;
 
+    if(selected == null){
+      throw new Error(`${nameof(VotingPage)} no wallet selected`);
+    }
     if (selected.getParent().getWalletType() === WalletTypeOption.HARDWARE_WALLET) {
       return <UnsupportedWallet />;
     }
