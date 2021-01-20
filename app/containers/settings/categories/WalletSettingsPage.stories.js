@@ -498,6 +498,10 @@ export const ExportWallet = (): Node => {
             ExportWalletDialogContainerProps: {
               generated: {
                 stores: Object.freeze({
+                  wallets: {
+                    selected: wallet.publicDeriver,
+                    getPublicKeyCache: lookup.getPublicKeyCache,
+                  },
                 }),
                 actions: {
                   dialogs: {
