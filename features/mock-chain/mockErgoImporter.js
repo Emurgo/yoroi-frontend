@@ -93,9 +93,16 @@ export const generateTransaction = (): {|
       }],
       dataInputs: [],
       outputs: [replaceMockOutputBoxId({
-        additionalRegisters: Object.freeze({}),
+        additionalRegisters: Object.freeze({
+          'R4': '0e03555344',
+          'R5': '0e184e6f7468696e67206261636b65642055534420746f6b656e',
+          'R6': '0e0132',
+        }),
         address,
-        assets: [],
+        assets: [{
+          amount: 12340,
+          tokenId: '33a35e15ae1a83fa188674a2bd53007b07e119a0eaaf40b890b2081c2864f12a',
+        }],
         creationHeight: height,
         ergoTree: Buffer.from(RustModule.SigmaRust.Address.from_base58(address).to_ergo_tree().to_bytes()).toString('hex'),
         id: '',
@@ -148,7 +155,10 @@ export const generateTransaction = (): {|
         spendingProof: '', // no need just for tests I think
         transactionId: hash,
         value: genesisTxValue,
-        assets: [],
+        assets: [{
+          amount: 12340,
+          tokenId: '33a35e15ae1a83fa188674a2bd53007b07e119a0eaaf40b890b2081c2864f12a',
+        }],
       }],
       dataInputs: [],
       outputs: [
@@ -182,15 +192,11 @@ export const generateTransaction = (): {|
         }),
         // ergo-simple-wallet
         replaceMockOutputBoxId({
-          additionalRegisters: Object.freeze({
-            'R4': '0e03555344',
-            'R5': '0e184e6f7468696e67206261636b65642055534420746f6b656e',
-            'R6': '0e0132',
-          }),
+          additionalRegisters: Object.freeze({}),
           address: tokenAddress.to_base58(),
           assets: [{
             amount: 12340,
-            tokenId: '43a35e15ae2a83fa188674a2bd53007b07e119a0eaaf40b890b2081c2864f12a',
+            tokenId: '33a35e15ae1a83fa188674a2bd53007b07e119a0eaaf40b890b2081c2864f12a',
           }],
           creationHeight: height,
           ergoTree: Buffer.from(tokenAddress.address().to_ergo_tree().to_bytes()).toString('hex'),

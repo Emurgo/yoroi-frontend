@@ -22,7 +22,7 @@ Feature: Wallet UI Settings
   | currentPassword | password    | repeatedPassword | |
   | asdfasdfasdf      | Secre1      | Secre1           | too short                 |
 
-@it-94
+  @it-94
   Scenario Outline: User is able to change spending password (IT-94)
     And There is a Byron wallet stored named tx-big-input-wallet
     And I have a wallet with funds
@@ -186,3 +186,13 @@ Feature: Wallet UI Settings
     And I navigate to the general settings screen
     And I click on secondary menu "blockchain" item
     Then I should see blockchain screen
+
+  @it-172
+  Scenario: User is to export their wallet key (IT-172)
+    Given There is a Byron wallet stored named simple-pending-wallet
+    Then I see the transactions summary
+    And I should see that the number of transactions is 3
+    Then I navigate to the general settings screen
+    And I click on secondary menu "wallet" item
+    When I click on export wallet
+    Then I should see the wallet export for key "6951f47ec8272208e970de38c55c0098d064ee3eb0161e769e61166ac72b029cef0caf73f59803dd7e9b187274da2933d1e0f0613eff3ac571003816bfb5eccb"

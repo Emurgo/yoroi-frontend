@@ -668,7 +668,7 @@ export class ModifyToken {
     }
 
     const knownTokens: Array<$ReadOnly<TokenRow>> = [];
-    const toQuery: Array<$ReadOnly<TokenInsert>> = []; // new tokens we haven't added to the DB yet
+    const toAdd: Array<$ReadOnly<TokenInsert>> = [];
 
     // filter out rows that are already in the DB
     const lookupMap = new Map<number, Map<number, $ReadOnly<TokenRow>>>();
@@ -689,7 +689,10 @@ export class ModifyToken {
       for (const row of deduplicatedRows) {
         const item = lookupMap.get(row.Digest)?.get(row.NetworkId);
         if (item == null) {
-          toQuery.push(row);
+          toAdd.push(row);
+        } else if (JSON.stringify(item.Metadata) !== JSON.stringify(row.Metadata)) {
+          // we want to update the row if the metadata was updated
+          toAdd.push(row);
         } else {
           knownTokens.push(item);
         }
@@ -698,7 +701,7 @@ export class ModifyToken {
 
     const newlyAdded = await addOrReplaceRows<TokenInsert, TokenRow>(
       db, tx,
-      toQuery,
+      toAdd,
       ModifyToken.ownTables[Tables.TokenSchema.name].name,
     );
 

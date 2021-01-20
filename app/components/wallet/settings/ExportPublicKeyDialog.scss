@@ -1,0 +1,40 @@
+@import '../../../themes/mixins/unordered-list';
+
+.component {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  font-size: 14px;
+  line-height: 20px;
+  font-family: var(--font-regular);
+
+  p {
+    margin-bottom: 10px;
+  }
+  .header {
+    @include unordered-list;
+    margin-bottom: 20px;
+  }
+}
+
+
+.label {
+  color:  var(--theme-wallet-receive-label-text-color);
+  font-size: 14px;
+  line-height: 22px;
+  display: block;
+  font-family: var(--font-regular);
+  margin-bottom: 4px;
+  text-align: left;
+}
+
+.derivation {
+  font-family: var(--font-mono-regular);
+  letter-spacing: 0;
+}
+
+.hash {
+  color: var(--theme-wallet-receive-hash-used-text-color);
+  font-size: 16px;
+  line-height: 22px;
+}

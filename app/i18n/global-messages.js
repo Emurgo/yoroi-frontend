@@ -96,6 +96,22 @@ const globalMessages: * = defineMessages({
     id: 'global.labels.remove',
     defaultMessage: '!!!Remove',
   },
+  exportButtonLabel: {
+    id: 'wallet.transaction.export.dialog.exportButton.label',
+    defaultMessage: '!!!Export',
+  },
+  derivationPathLabel: {
+    id: 'wallet.receive.confirmationDialog.derivationPathLabel',
+    defaultMessage: '!!!Derivation Path',
+  },
+  publicKeyExplanation: {
+    id: 'global.publicKey.explanation',
+    defaultMessage: `!!!Public keys allow seeing the wallet history for the wallet, but does <strong>not</strong> allow to spend or move the funds in any way (private key is <strong>not</strong> included)`,
+  },
+  whyUse: {
+    id: 'global.why',
+    defaultMessage: `!!!This can be used to:`,
+  },
   save: {
     id: 'global.labels.save',
     defaultMessage: '!!!Save',

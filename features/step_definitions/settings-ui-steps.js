@@ -4,6 +4,7 @@ import { When, Given, Then } from 'cucumber';
 import i18n from '../support/helpers/i18n-helpers';
 import { By, Key } from 'selenium-webdriver';
 import { truncateLongName, } from '../../app/utils/formatters';
+import { expect } from 'chai';
 
 const walletNameInputSelector = '.SettingsLayout_settingsPane .walletName input';
 
@@ -126,6 +127,17 @@ When(/^I click on remove wallet$/, async function () {
 
 When(/^I click on resync wallet$/, async function () {
   await this.click('.resyncButton');
+});
+
+When(/^I click on export wallet$/, async function () {
+  await this.click('.exportWallet');
+});
+
+Then(/^I should see the wallet export for key "([^"]*)"$/, async function (expectedKey) {
+  await this.waitForElement('.ExportPublicKeyDialog_component');
+  const publicKeyForm = await this.driver.findElement(By.css('.CodeBlock_component'));
+  const publicKey = await publicKeyForm.getText();
+  expect(publicKey).to.equal(expectedKey);
 });
 
 Then(/^I click on the checkbox$/, async function () {

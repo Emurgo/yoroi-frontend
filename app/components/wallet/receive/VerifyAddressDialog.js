@@ -7,9 +7,9 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { defineMessages, intlShape } from 'react-intl';
-import QRCode from 'qrcode.react';
 import { toDerivationPathString } from '../../../api/common/lib/crypto/keys/path';
 
+import QrCodeWrapper from '../../widgets/QrCodeWrapper';
 import Dialog from '../../widgets/Dialog';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
 import ErrorBlock from '../../widgets/ErrorBlock';
@@ -46,10 +46,6 @@ const messages = defineMessages({
   verifyAddressButtonLabel: {
     id: 'wallet.receive.confirmationDialog.verifyAddressButtonLabel',
     defaultMessage: '!!!Verify on hardware wallet',
-  },
-  derivationPathLabel: {
-    id: 'wallet.receive.confirmationDialog.derivationPathLabel',
-    defaultMessage: '!!!Derivation Path',
   },
 });
 
@@ -146,20 +142,11 @@ export default class VerifyAddressDialog extends Component<Props> {
   }
 
   renderQrCode: void => Node = () => {
-    // TODO: This should be refactored somehow so it’s not duplicated in multiple files.
-    // Get QRCode color value from active theme's CSS variable
-    const qrCodeBackgroundColor = document.documentElement ?
-      document.documentElement.style.getPropertyValue('--theme-receive-qr-code-background-color') : 'transparent';
-    const qrCodeForegroundColor = document.documentElement ?
-      document.documentElement.style.getPropertyValue('--theme-receive-qr-code-foreground-color') : '#000';
-
     return (
       <>
         <div align="center">
-          <QRCode
+          <QrCodeWrapper
             value={this.props.addressInfo.address}
-            bgColor={qrCodeBackgroundColor}
-            fgColor={qrCodeForegroundColor}
             size={152}
           />
         </div>
@@ -292,11 +279,11 @@ export default class VerifyAddressDialog extends Component<Props> {
   renderPath: (void | $PropertyType<Addressing, 'addressing'>) => Node = (addressing) => {
     if (addressing == null) return null;
     const { intl } = this.context;
-    const derivationClasses = classnames([styles.infoBlock, styles.derivation]);
+    const derivationClasses = classnames([styles.derivation]);
     return (
       <>
         <span className={this.getLabelStyle()}>
-          {intl.formatMessage(messages.derivationPathLabel)}
+          {intl.formatMessage(globalMessages.derivationPathLabel)}
         </span>
         <div className={derivationClasses}>
           <div className={styles.hash}>

@@ -10,6 +10,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import Dialog from '../../widgets/Dialog';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
 import ErrorBlock from '../../widgets/ErrorBlock';
+import globalMessages from '../../../i18n/global-messages';
 
 import styles from './ExportTransactionDialog.scss';
 
@@ -22,10 +23,6 @@ const messages = defineMessages({
     id: 'wallet.transaction.export.dialog.infoText1',
     defaultMessage: '!!!The entire transaction history within your wallet will be exported to a file',
   },
-  exportButtonLabel: {
-    id: 'wallet.transaction.export.dialog.exportButton.label',
-    defaultMessage: '!!!Export',
-  }
 });
 
 type Props = {|
@@ -56,8 +53,8 @@ export default class ExportTransactionDialog extends Component<Props> {
         <span>{intl.formatMessage(messages.infoText1)}</span>
       </div>);
 
-    const dailogActions = [{
-      label: intl.formatMessage(messages.exportButtonLabel),
+    const dialogActions = [{
+      label: intl.formatMessage(globalMessages.exportButtonLabel),
       primary: true,
       isSubmitting: isActionProcessing || false,
       onClick: submit,
@@ -67,7 +64,7 @@ export default class ExportTransactionDialog extends Component<Props> {
       <Dialog
         className={classnames([styles.component, 'ExportTransactionDialog'])}
         title={intl.formatMessage(messages.dialogTitle)}
-        actions={dailogActions}
+        actions={dialogActions}
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
         onClose={cancel}

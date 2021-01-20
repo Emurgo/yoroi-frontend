@@ -266,21 +266,14 @@ describe('Create unsigned TX from UTXO', () => {
 
     // input selection will only take 2 of the 3 inputs
     // it takes 2 inputs because input selection algorithm
-    expect(unsignedTxResponse.senderUtxos).toEqual([utxos[0], utxos[1]]);
+    expect(unsignedTxResponse.senderUtxos).toEqual([utxos[3]]);
     expect(
       unsignedTxResponse.unsignedTx
         .box_selection().boxes()
         .get(0)
         .box_id()
         .to_str()
-    ).toEqual('1123a25bed49beafcc3e08b99c24882a9fa70dc0525a6ec367af50d5b6d1bdb9');
-    expect(
-      unsignedTxResponse.unsignedTx
-        .box_selection().boxes()
-        .get(1)
-        .box_id()
-        .to_str()
-    ).toEqual('4a995b3c6ade538b71418b7a2a39d2773140df869e491a670b8502b7b6f0da1b');
+    ).toEqual('ed0ea178230f3d95df6f9880e18f74d324c148fce524c5ace6ed711fc3de6ad0');
 
     const unsignedTx = unsignedTxResponse.unsignedTx.build();
     expect(unsignedTx.outputs().len()).toEqual(3);

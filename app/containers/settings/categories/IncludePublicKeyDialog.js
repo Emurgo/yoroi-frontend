@@ -24,10 +24,6 @@ const dialogMessages = defineMessages({
     id: 'wallet.includeKey.explanationLine1',
     defaultMessage: `!!!Do you want to include your wallet's <strong>public</strong> key in the error logs?`,
   },
-  includeKeyExplanationLine2: {
-    id: 'wallet.includeKey.explanationLine2',
-    defaultMessage: `!!!It will allow support staff to see your wallet's transaction history, but they will <strong>not</strong> be able to spend or move your funds in any way (private key is <strong>not</strong> included)`,
-  },
   withKey: {
     id: 'wallet.includeKey.withKeyLabel',
     defaultMessage: '!!!With key',
@@ -79,7 +75,7 @@ export default class IncludePublicKeyDialog extends Component<Props> {
         }}
       >
         <p><FormattedHTMLMessage {...dialogMessages.includeKeyExplanationLine1} /></p>
-        <p><FormattedHTMLMessage {...dialogMessages.includeKeyExplanationLine2} /></p>
+        <p><FormattedHTMLMessage {...globalMessages.publicKeyExplanation} /></p>
       </DangerousActionDialog>
     );
   }
