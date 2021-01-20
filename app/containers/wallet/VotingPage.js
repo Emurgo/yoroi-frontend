@@ -10,6 +10,8 @@ import Voting from '../../components/wallet/voting/Voting';
 import VotingRegistrationDialogContainer from './dialogs/voting/VotingRegistrationDialogContainer';
 import type { GeneratedData as VotingRegistrationDialogContainerData } from './dialogs/voting/VotingRegistrationDialogContainer';
 import { handleExternalLinkClick } from '../../utils/routing';
+import { WalletTypeOption, } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
+import UnsupportedWallet from './UnsupportedWallet';
 
 export type GeneratedData = typeof VotingPage.prototype.generated;
 type Props = {|
@@ -29,8 +31,16 @@ export default class VotingPage extends Component<Props> {
   };
 
   render(): Node {
-    const { uiDialogs } = this.generated.stores;
+    const {
+      uiDialogs,
+      wallets: { selected },
+    } = this.generated.stores;
     let activeDialog = null;
+
+    if (selected.getParent().getWalletType() === WalletTypeOption.HARDWARE_WALLET) {
+      return <UnsupportedWallet />;
+    }
+
     if (uiDialogs.isOpen(VotingRegistrationDialogContainer)) {
       activeDialog = (
         <VotingRegistrationDialogContainer
@@ -66,6 +76,9 @@ export default class VotingPage extends Component<Props> {
       uiDialogs: {|
         isOpen: any => boolean,
       |},
+      wallets: {|
+        selected: null | PublicDeriver<>,
+      |},
     |},
   |} {
     if (this.props.generated !== undefined) {
@@ -90,6 +103,9 @@ export default class VotingPage extends Component<Props> {
       stores: {
         uiDialogs: {
           isOpen: stores.uiDialogs.isOpen,
+        },
+        wallets: {
+          selected: stores.wallets.selected,
         },
       },
       VotingRegistrationDialogProps: ({

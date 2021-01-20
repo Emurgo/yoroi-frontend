@@ -532,6 +532,7 @@
   "wallet.navigation.receive": "Receive",
   "wallet.navigation.send": "Send",
   "wallet.navigation.transactions": "Transactions",
+  "wallet.navigation.voting": "Voting",
   "wallet.nowallet.subtitle": "Please choose a wallet from the top-right dropdown",
   "wallet.nowallet.title": "No wallet selected",
   "wallet.problematic.explanation1": "The wallet you selected ({checksumTextPart}) was detected to contain some kind of issue.",

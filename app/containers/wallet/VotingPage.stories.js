@@ -42,6 +42,7 @@ const getRoute = (id) => buildRoute(
 );
 
 const defaultProps: ({|
+  wallet: *,
   openDialog?: Object,
   VotingRegistrationDialogProps?: *,
 |}) => * = request => ({
@@ -49,6 +50,9 @@ const defaultProps: ({|
     uiDialogs: {
       isOpen: clazz => clazz === request.openDialog,
     },
+    wallets: {
+      selected: request.wallet.publicDeriver,
+    }
   },
   actions: {
     dialogs: {
@@ -191,7 +195,7 @@ const genTransactionDialogProps: ({|
           progressInfo: request.progressInfo,
         },
         votingRegTransactionStore: {
-          isStale: boolean('isExecuting', false),
+          isStale: boolean('isStale', false),
           createVotingRegTx: {
             result: request.shelleyTrx,
             error: request.error,
@@ -218,19 +222,24 @@ const wrappedComponent = (component: Node): Node => {
 };
 
 export const MainPage = (): Node => {
+  const wallet = genShelleyCIP1852SigningWalletWithCache();
   return wrappedComponent(
     <VotingPage
       generated={
-        defaultProps(Object.freeze({}))
+        defaultProps(Object.freeze({
+          wallet,
+        }))
       }
     />)
 };
 
 export const Pin = (): Node => {
+  const wallet = genShelleyCIP1852SigningWalletWithCache();
   return wrappedComponent(
     <VotingPage
       generated={defaultProps(Object.freeze({
         openDialog: VotingRegistrationDialogContainer,
+        wallet,
         VotingRegistrationDialogProps: {
           generated: genVotingRegistrationDialogProps({
             progressInfo: {
@@ -245,10 +254,12 @@ export const Pin = (): Node => {
 }
 
 export const ConfirmPin = (): Node => {
+  const wallet = genShelleyCIP1852SigningWalletWithCache();
   return wrappedComponent(
     <VotingPage
       generated={defaultProps(Object.freeze({
         openDialog: VotingRegistrationDialogContainer,
+        wallet,
         VotingRegistrationDialogProps: {
           generated: genVotingRegistrationDialogProps({
             progressInfo: {
@@ -278,6 +289,7 @@ export const Register = (): Node => {
     <VotingPage
       generated={defaultProps(Object.freeze({
         openDialog: VotingRegistrationDialogContainer,
+        wallet,
         VotingRegistrationDialogProps: {
           generated: genVotingRegistrationDialogProps({
             progressInfo: {
@@ -319,6 +331,7 @@ export const Transaction = (): Node => {
     <VotingPage
       generated={defaultProps(Object.freeze({
         openDialog: VotingRegistrationDialogContainer,
+        wallet,
         VotingRegistrationDialogProps: {
           generated: genVotingRegistrationDialogProps({
             progressInfo: {
@@ -345,10 +358,12 @@ export const Transaction = (): Node => {
 }
 
 export const QrCode = (): Node => {
+  const wallet = genShelleyCIP1852SigningWalletWithCache();
   return wrappedComponent(
     <VotingPage
       generated={defaultProps(Object.freeze({
         openDialog: VotingRegistrationDialogContainer,
+        wallet,
         VotingRegistrationDialogProps: {
           generated: genVotingRegistrationDialogProps({
             progressInfo: {
