@@ -332,7 +332,7 @@ export default class UserSummary extends Component<Props, State> {
       .split('.');
 
     const amountNode = this.props.shouldHideBalance
-      ? <>hiddenAmount</>
+      ? <>{hiddenAmount}</>
       : (
         <>
           {splitAmount[0]}
