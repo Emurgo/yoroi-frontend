@@ -5,26 +5,21 @@ import { observer } from 'mobx-react';
 import { computed } from 'mobx';
 import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 import WalletSendConfirmationDialog from '../../../components/wallet/send/WalletSendConfirmationDialog';
-import {
-  formattedAmountToNaturalUnits,
-  formattedWalletAmount,
-} from '../../../utils/formatters';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import LocalizableError from '../../../i18n/LocalizableError';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
-import { getApiForNetwork, getApiMeta } from '../../../api/common/utils';
 import { addressToDisplayString } from '../../../api/ada/lib/storage/bridge/utils';
 import type { ISignRequest } from '../../../api/common/lib/transactions/ISignRequest';
+import type { TokenInfoMap } from '../../../stores/toplevel/TokenInfoStore';
+import { genLookupOrFail } from '../../../stores/stateless/tokenHelpers';
 
 export type GeneratedData = typeof WalletSendConfirmationDialogContainer.prototype.generated;
 
 type DialogProps = {|
   +signRequest: ISignRequest<any>,
-  +ticker: string,
   +staleTx: boolean,
   +unitOfAccountSetting: UnitOfAccountSettingType,
-  +coinPrice: ?number,
 |};
 type Props = {|
   ...InjectedOrGenerated<GeneratedData>,
@@ -40,24 +35,20 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
 
   render(): Node {
     const {
-      ticker,
       signRequest,
-      unitOfAccountSetting, coinPrice,
+      unitOfAccountSetting,
     } = this.props;
     const { stores, actions } = this.generated;
     const publicDeriver = stores.wallets.selected;
     const { profile } = stores;
 
     if (publicDeriver == null) throw new Error(`Active wallet required for ${nameof(WalletSendConfirmationDialogContainer)}`);
-    const selectedApiType =  getApiForNetwork(publicDeriver.getParent().getNetworkInfo());
-    const apiMeta = getApiMeta(selectedApiType)?.meta;
-    if (apiMeta == null) throw new Error(`${nameof(WalletSendConfirmationDialogContainer)} no API selected`);
 
     const { sendMoney } = actions.wallets;
     const { sendMoneyRequest } = stores.wallets;
 
-    const totalInput = signRequest.totalInput(true);
-    const fee = signRequest.fee(true);
+    const totalInput = signRequest.totalInput();
+    const fee = signRequest.fee();
     const receivers = signRequest.receivers(false);
     return (
       <WalletSendConfirmationDialog
@@ -67,18 +58,12 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
             publicDeriver.getParent().getNetworkInfo().NetworkId
           ) ?? (() => { throw new Error('No explorer for wallet network'); })()
         }
-        amount={totalInput.minus(fee)}
+        getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
+        getCurrentPrice={this.generated.stores.coinPriceStore.getCurrentPrice}
+        amount={totalInput.joinSubtractCopy(fee)}
         receivers={receivers}
         totalAmount={totalInput}
         transactionFee={fee}
-        amountToNaturalUnits={amount => formattedAmountToNaturalUnits(
-          amount,
-          apiMeta.decimalPlaces.toNumber()
-        )}
-        formattedWalletAmount={amount => formattedWalletAmount(
-          amount,
-          apiMeta.decimalPlaces.toNumber()
-        )}
         onSubmit={async ({ password }) => {
           await sendMoney.trigger({
             signRequest,
@@ -92,10 +77,8 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
           sendMoneyRequest.reset();
         }}
         error={sendMoneyRequest.error}
-        ticker={ticker}
         classicTheme={profile.isClassicTheme}
         unitOfAccountSetting={unitOfAccountSetting}
-        coinPrice={coinPrice}
         addressToDisplayString={
           addr => addressToDisplayString(addr, publicDeriver.getParent().getNetworkInfo())
         }
@@ -121,8 +104,17 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
       |}
     |},
     stores: {|
+      coinPriceStore: {|
+        getCurrentPrice: (
+          from: string,
+          to: string
+        ) => ?number,
+      |},
       explorers: {|
         selectedExplorer: Map<number, SelectedExplorer>,
+      |},
+      tokenInfoStore: {|
+        tokenInfo: TokenInfoMap,
       |},
       profile: {|
         isClassicTheme: boolean,
@@ -151,6 +143,12 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
         },
         profile: {
           isClassicTheme: stores.profile.isClassicTheme,
+        },
+        tokenInfoStore: {
+          tokenInfo: stores.tokenInfoStore.tokenInfo,
+        },
+        coinPriceStore: {
+          getCurrentPrice: stores.coinPriceStore.getCurrentPrice,
         },
         wallets: {
           selected: stores.wallets.selected,

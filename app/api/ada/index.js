@@ -37,6 +37,11 @@ import {
   filterAddressesByStakingKey,
   addrContainsAccountKey,
 } from './lib/storage/bridge/delegationUtils';
+
+import {
+  createMetadata
+} from './lib/storage/bridge/metadataUtils';
+
 import {
   Bip44Wallet,
 } from './lib/storage/models/Bip44Wallet/wrapper';
@@ -160,15 +165,17 @@ import type {
   RestoreWalletRequest, RestoreWalletResponse,
   CreateWalletRequest, CreateWalletResponse,
 } from '../common/types';
-import { getApiForNetwork } from '../common/utils';
-import { CoreAddressTypes } from './lib/storage/database/primitives/enums';
-import type { NetworkRow } from './lib/storage/database/primitives/tables';
+import { CoreAddressTypes, } from './lib/storage/database/primitives/enums';
+import type { NetworkRow, TokenRow, } from './lib/storage/database/primitives/tables';
 import {
   getCardanoHaskellBaseConfig,
 } from './lib/storage/database/prepackaged/networks';
 import {
   toSenderUtxos,
 } from './transactions/transfer/utils';
+import type { TransactionMetadata } from './lib/storage/bridge/metadataUtils';
+import { MultiToken } from '../common/lib/MultiToken';
+import type { DefaultTokenEntry } from '../common/lib/MultiToken';
 
 // ADA specific Request / Response params
 
@@ -324,8 +331,10 @@ export type CreateUnsignedTxRequest = {|
   |} | {|
     shouldSendAll: true,
   |}),
+  metadata: Array<TransactionMetadata> | void,
 |};
 export type CreateUnsignedTxResponse = HaskellShelleyTxSignRequest;
+export type CreateVotingRegTxResponse = HaskellShelleyTxSignRequest;
 export type CreateUnsignedTxFunc = (
   request: CreateUnsignedTxRequest
 ) => Promise<CreateUnsignedTxResponse>;
@@ -345,6 +354,7 @@ export type CreateUnsignedTxForUtxosRequest = {|
     shouldSendAll: true,
   |},
   utxos: Array<CardanoAddressedUtxo>,
+  metadata: Array<TransactionMetadata> | void,
 |};
 export type CreateUnsignedTxForUtxosResponse = HaskellShelleyTxSignRequest;
 export type CreateUnsignedTxForUtxosFunc = (
@@ -361,16 +371,27 @@ export type CreateDelegationTxRequest = {|
   absSlotNumber: BigNumber,
   registrationStatus: boolean,
   poolRequest: void | string,
-  valueInAccount: BigNumber,
+  valueInAccount: MultiToken,
 |};
+
+export type CreateVotingRegTxRequest = {|
+  publicDeriver: IPublicDeriver<ConceptualWallet> & IGetAllUtxos & IHasUtxoChains,
+  absSlotNumber: BigNumber,
+  metadata: Array<TransactionMetadata>
+|};
+
 export type CreateDelegationTxResponse = {|
   signTxRequest: HaskellShelleyTxSignRequest,
-  totalAmountToDelegate: BigNumber,
+  totalAmountToDelegate: MultiToken,
 |};
 
 export type CreateDelegationTxFunc = (
   request: CreateDelegationTxRequest
 ) => Promise<CreateDelegationTxResponse>;
+
+export type CreateVotingRegTxFunc = (
+  request: CreateVotingRegTxRequest
+) => Promise<CreateVotingRegTxResponse>;
 
 // createWithdrawalTx
 
@@ -499,6 +520,7 @@ export type CreateHardwareWalletFunc = (
 
 export type GetTransactionRowsToExportRequest = {|
   publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels>,
+  getDefaultToken: number => $ReadOnly<TokenRow>,
 |};
 export type GetTransactionRowsToExportResponse = Array<TransactionExportRow>;
 export type GetTransactionRowsToExportFunc = (
@@ -620,14 +642,16 @@ export default class AdaApi {
           return CardanoByronTransaction.fromAnnotatedTx({
             tx,
             addressLookupMap: fetchedTxs.addressLookupMap,
-            api: getApiForNetwork(request.publicDeriver.getParent().getNetworkInfo()),
+            network: request.publicDeriver.getParent().getNetworkInfo(),
+            defaultToken: request.publicDeriver.getParent().getDefaultToken(),
           });
         }
         if (tx.txType === TransactionType.CardanoShelley) {
           return CardanoShelleyTransaction.fromAnnotatedTx({
             tx,
             addressLookupMap: fetchedTxs.addressLookupMap,
-            api: getApiForNetwork(request.publicDeriver.getParent().getNetworkInfo()),
+            network: request.publicDeriver.getParent().getNetworkInfo(),
+            defaultToken: request.publicDeriver.getParent().getDefaultToken(),
           });
         }
         throw new Error(`${nameof(this.refreshTransactions)} unknown tx type ${tx.type}`);
@@ -658,14 +682,16 @@ export default class AdaApi {
           return CardanoByronTransaction.fromAnnotatedTx({
             tx,
             addressLookupMap: fetchedTxs.addressLookupMap,
-            api: getApiForNetwork(request.publicDeriver.getParent().getNetworkInfo()),
+            network: request.publicDeriver.getParent().getNetworkInfo(),
+            defaultToken: request.publicDeriver.getParent().getDefaultToken(),
           });
         }
         if (tx.txType === TransactionType.CardanoShelley) {
           return CardanoShelleyTransaction.fromAnnotatedTx({
             tx,
             addressLookupMap: fetchedTxs.addressLookupMap,
-            api: getApiForNetwork(request.publicDeriver.getParent().getNetworkInfo()),
+            network: request.publicDeriver.getParent().getNetworkInfo(),
+            defaultToken: request.publicDeriver.getParent().getDefaultToken(),
           });
         }
         throw new Error(`${nameof(this.refreshPendingTransactions)} unknown tx type ${tx.type}`);
@@ -778,7 +804,7 @@ export default class AdaApi {
           Buffer.from(normalizedKey.prvKeyHex, 'hex')
         ),
         request.signRequest.neededStakingKeyHashes.wits,
-        undefined,
+        request.signRequest.metadata,
       );
 
       const response = request.sendTx({
@@ -924,9 +950,13 @@ export default class AdaApi {
         ),
         minimumUtxoVal: RustModule.WalletV4.BigNum.from_str(config.MinimumUtxoVal),
         poolDeposit: RustModule.WalletV4.BigNum.from_str(config.PoolDeposit),
+        networkId: request.network.NetworkId,
       };
 
       let unsignedTxResponse;
+      const trxMetadata =
+        request.metadata !== undefined ? createMetadata(request.metadata): undefined;
+
       if (request.shouldSendAll) {
         if (request.receivers.length !== 1) {
           throw new Error(`${nameof(this.createUnsignedTxForUtxos)} wrong output size for sendAll`);
@@ -936,7 +966,8 @@ export default class AdaApi {
           receiver,
           request.utxos,
           request.absSlotNumber,
-          protocolParams
+          protocolParams,
+          trxMetadata,
         );
       } else {
         const amount = request.amount;
@@ -984,6 +1015,7 @@ export default class AdaApi {
           [],
           [],
           false,
+          trxMetadata,
         );
       }
       Logger.debug(
@@ -996,11 +1028,12 @@ export default class AdaApi {
           changeAddr: unsignedTxResponse.changeAddr,
           certificate: undefined,
         },
-        undefined,
+        trxMetadata,
         {
           ChainNetworkId: Number.parseInt(config.ChainNetworkId, 10),
           KeyDeposit: new BigNumber(config.KeyDeposit),
           PoolDeposit: new BigNumber(config.PoolDeposit),
+          NetworkId: request.network.NetworkId,
         },
         {
           neededHashes: new Set(),
@@ -1045,6 +1078,7 @@ export default class AdaApi {
       receivers,
       network: request.publicDeriver.getParent().getNetworkInfo(),
       utxos: addressedUtxo,
+      metadata: request.metadata,
       ...amountInfo,
     });
   }
@@ -1067,6 +1101,7 @@ export default class AdaApi {
         ),
         minimumUtxoVal: RustModule.WalletV4.BigNum.from_str(config.MinimumUtxoVal),
         poolDeposit: RustModule.WalletV4.BigNum.from_str(config.PoolDeposit),
+        networkId: request.publicDeriver.getParent().getNetworkInfo().NetworkId,
       };
 
       const publicKeyDbRow = await request.publicDeriver.getPublicKey();
@@ -1113,25 +1148,33 @@ export default class AdaApi {
         false,
       );
 
-      const allUtxosForKey = filterAddressesByStakingKey(
+      const allUtxosForKey = filterAddressesByStakingKey<ElementOf<IGetAllUtxosResponse>>(
         RustModule.WalletV4.StakeCredential.from_keyhash(stakingKey.hash()),
         allUtxo,
         false,
       );
       const utxoSum = allUtxosForKey.reduce(
-        (sum, utxo) => sum.plus(new BigNumber(utxo.output.UtxoTransactionOutput.Amount)),
-        new BigNumber(0)
-      );
+      (sum, utxo) => sum.joinAddMutable(new MultiToken(
+        utxo.output.tokens.map(token => ({
+          identifier: token.Token.Identifier,
+          amount: new BigNumber(token.TokenList.Amount),
+          networkId: token.Token.NetworkId,
+        })),
+        request.publicDeriver.getParent().getDefaultToken()
+      )),
+      new MultiToken([], request.publicDeriver.getParent().getDefaultToken())
+    );
 
       const differenceAfterTx = getDifferenceAfterTx(
         unsignedTx,
         allUtxo,
-        stakingKey
+        stakingKey,
+        request.publicDeriver.getParent().getDefaultToken(),
       );
 
       const totalAmountToDelegate = utxoSum
-        .plus(differenceAfterTx) // subtract any part of the fee that comes from UTXO
-        .plus(request.valueInAccount); // recall: rewards are compounding
+        .joinAddCopy(differenceAfterTx) // subtract any part of the fee that comes from UTXO
+        .joinAddCopy(request.valueInAccount); // recall: rewards are compounding
 
       const signTxRequest = new HaskellShelleyTxSignRequest(
         {
@@ -1145,6 +1188,7 @@ export default class AdaApi {
           ChainNetworkId: Number.parseInt(config.ChainNetworkId, 10),
           KeyDeposit: new BigNumber(config.KeyDeposit),
           PoolDeposit: new BigNumber(config.PoolDeposit),
+          NetworkId: request.publicDeriver.getParent().getNetworkInfo().NetworkId,
         },
         {
           neededHashes: new Set([Buffer.from(
@@ -1183,6 +1227,7 @@ export default class AdaApi {
         ),
         minimumUtxoVal: RustModule.WalletV4.BigNum.from_str(config.MinimumUtxoVal),
         poolDeposit: RustModule.WalletV4.BigNum.from_str(config.PoolDeposit),
+        networkId: request.publicDeriver.getParent().getNetworkInfo().NetworkId,
       };
 
       const utxos = await request.publicDeriver.getAllUtxos();
@@ -1317,6 +1362,7 @@ export default class AdaApi {
           ChainNetworkId: Number.parseInt(config.ChainNetworkId, 10),
           KeyDeposit: new BigNumber(config.KeyDeposit),
           PoolDeposit: new BigNumber(config.PoolDeposit),
+          NetworkId: request.publicDeriver.getParent().getNetworkInfo().NetworkId,
         },
         neededKeys,
       );
@@ -1325,6 +1371,76 @@ export default class AdaApi {
       Logger.error(
         `${nameof(AdaApi)}::${nameof(this.createWithdrawalTx)} error: ` + stringifyError(error)
       );
+      if (error instanceof LocalizableError) throw error;
+      throw new GenericApiError();
+    }
+  }
+
+  async createVotingRegTx(
+    request: CreateVotingRegTxRequest
+  ): Promise<CreateVotingRegTxResponse> {
+    Logger.debug(`${nameof(AdaApi)}::${nameof(this.createVotingRegTx)} called`);
+
+    try {
+      const config = getCardanoHaskellBaseConfig(
+        request.publicDeriver.getParent().getNetworkInfo()
+      ).reduce((acc, next) => Object.assign(acc, next), {});
+
+      const protocolParams = {
+        keyDeposit: RustModule.WalletV4.BigNum.from_str(config.KeyDeposit),
+        linearFee: RustModule.WalletV4.LinearFee.new(
+          RustModule.WalletV4.BigNum.from_str(config.LinearFee.coefficient),
+          RustModule.WalletV4.BigNum.from_str(config.LinearFee.constant),
+        ),
+        minimumUtxoVal: RustModule.WalletV4.BigNum.from_str(config.MinimumUtxoVal),
+        poolDeposit: RustModule.WalletV4.BigNum.from_str(config.PoolDeposit),
+        networkId: request.publicDeriver.getParent().getNetworkInfo().NetworkId,
+      };
+
+      const allUtxo = await request.publicDeriver.getAllUtxos();
+      const addressedUtxo = shelleyAsAddressedUtxo(allUtxo);
+      const nextUnusedInternal = await request.publicDeriver.nextInternal();
+      if (nextUnusedInternal.addressInfo == null) {
+        throw new Error(`${nameof(this.createVotingRegTx)} no internal addresses left. Should never happen`);
+      }
+      const changeAddr = nextUnusedInternal.addressInfo;
+      const trxMetadata = createMetadata(request.metadata);
+      const unsignedTx = shelleyNewAdaUnsignedTx(
+        [],
+        {
+          address: changeAddr.addr.Hash,
+          addressing: changeAddr.addressing,
+        },
+        addressedUtxo,
+        request.absSlotNumber,
+        protocolParams,
+        [],
+        [],
+        false,
+        trxMetadata,
+      );
+
+      return new HaskellShelleyTxSignRequest(
+        {
+          senderUtxos: unsignedTx.senderUtxos,
+          unsignedTx: unsignedTx.txBuilder,
+          changeAddr: unsignedTx.changeAddr,
+          certificate: undefined,
+        },
+        trxMetadata,
+        {
+          ChainNetworkId: Number.parseInt(config.ChainNetworkId, 10),
+          KeyDeposit: new BigNumber(config.KeyDeposit),
+          PoolDeposit: new BigNumber(config.PoolDeposit),
+          NetworkId: request.publicDeriver.getParent().getNetworkInfo().NetworkId,
+        },
+        {
+          neededHashes: new Set(),
+          wits: new Set(),
+        },
+      );
+    } catch (error) {
+      Logger.error(`${nameof(AdaApi)}::${nameof(this.createVotingRegTx)} error: ` + stringifyError(error));
       if (error instanceof LocalizableError) throw error;
       throw new GenericApiError();
     }
@@ -1691,6 +1807,7 @@ export default class AdaApi {
           network: request.network,
           shouldSendAll: true,
           utxos,
+          metadata: undefined,
         })
       };
     } catch (error) {
@@ -1801,7 +1918,10 @@ export default class AdaApi {
         publicDeriver: request.publicDeriver,
       });
       Logger.debug(`${nameof(AdaApi)}::${nameof(this.getTransactionRowsToExport)}: success`);
-      return convertAdaTransactionsToExportRows(fetchedTxs.txs);
+      return convertAdaTransactionsToExportRows(
+        fetchedTxs.txs,
+        request.getDefaultToken(request.publicDeriver.getParent().getNetworkInfo().NetworkId)
+      );
     } catch (error) {
       Logger.error(`${nameof(AdaApi)}::${nameof(this.getTransactionRowsToExport)}: ` + stringifyError(error));
 
@@ -1823,10 +1943,11 @@ function getDifferenceAfterTx(
   utxoResponse: V4UnsignedTxAddressedUtxoResponse,
   allUtxos: IGetAllUtxosResponse,
   stakingKey: RustModule.WalletV4.PublicKey,
-): BigNumber {
+  defaultToken: DefaultTokenEntry,
+): MultiToken {
   const stakeCredential = RustModule.WalletV4.StakeCredential.from_keyhash(stakingKey.hash());
 
-  let sumInForKey = new BigNumber(0);
+  const sumInForKey = new MultiToken([], defaultToken);
   {
     // note senderUtxos.length is approximately 1
     // since it's just to cover transaction fees
@@ -1841,12 +1962,19 @@ function getDifferenceAfterTx(
       }
       const address = match.address;
       if (addrContainsAccountKey(address, stakeCredential, true)) {
-        sumInForKey = sumInForKey.plus(new BigNumber(senderUtxo.amount));
+        sumInForKey.joinAddMutable(new MultiToken(
+          match.output.tokens.map(token => ({
+            identifier: token.Token.Identifier,
+            amount: new BigNumber(token.TokenList.Amount),
+            networkId: token.Token.NetworkId,
+          })),
+          defaultToken
+        ));
       }
     }
   }
 
-  let sumOutForKey = new BigNumber(0);
+  const sumOutForKey = new MultiToken([], defaultToken);
   {
     const txBody = utxoResponse.txBuilder.build();
     const outputs = txBody.outputs();
@@ -1854,13 +1982,16 @@ function getDifferenceAfterTx(
       const output = outputs.get(i);
       const address = Buffer.from(output.address().to_bytes()).toString('hex');
       if (addrContainsAccountKey(address, stakeCredential, true)) {
-        const value = new BigNumber(output.amount().to_str());
-        sumOutForKey = sumOutForKey.plus(value);
+        sumOutForKey.add({
+          amount: new BigNumber(output.amount().to_str()),
+          identifier: defaultToken.defaultIdentifier,
+          networkId: defaultToken.defaultNetworkId,
+         });
       }
     }
   }
 
-  return sumOutForKey.minus(sumInForKey);
+  return sumOutForKey.joinSubtractCopy(sumInForKey);
 }
 
 export async function genOwnStakingKey(request: {|

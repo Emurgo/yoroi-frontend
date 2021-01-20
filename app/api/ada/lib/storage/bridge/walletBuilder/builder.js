@@ -71,7 +71,7 @@ type TxHolder = {| tx: lf$Transaction, |};
  * Allows to easily create a wallet with all the information you need in one transactional query
  * Ensuring proper call order and proper database access is managed for you
  */
-export class WalletBuilder<CurrentState: $Shape<{||}>> {
+export class WalletBuilder<CurrentState: {...}> {
   db: lf$Database;
   txHolder: TxHolder;
 
@@ -118,10 +118,10 @@ export class WalletBuilder<CurrentState: $Shape<{||}>> {
       this.txHolder,
       this.tables.concat(newTables),
       this.buildSteps.concat(newStep),
-      {
-        ...state,
+      ({
         ...addition,
-      },
+        ...state,
+      }: any),
       this.derivationTables,
     );
   }
@@ -343,7 +343,7 @@ function AsNotNull<T: {...}>(
   data: WithNullableFields<T>
 ): T {
   // Note: return type is the non-null version if the argument
-  return data;
+  return (data: any);
 }
 
 // types to represent requirements

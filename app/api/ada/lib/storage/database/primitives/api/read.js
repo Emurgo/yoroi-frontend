@@ -22,6 +22,7 @@ import type {
   CertificatePart,
   NetworkRow,
   TokenRow,
+  TokenListRow,
 } from '../tables';
 import type {
   TxStatusCodesType,
@@ -116,7 +117,7 @@ export class GetBlock {
     db: lf$Database,
     tx: lf$Transaction,
     blockId: Array<number>,
-  ): Promise<$ReadOnly<BlockRow> | void> {
+  ): Promise<$ReadOnlyArray<$ReadOnly<BlockRow>>> {
     return await getRowIn<BlockRow>(
       db, tx,
       GetBlock.ownTables[Tables.BlockSchema.name].name,
@@ -978,7 +979,7 @@ export class GetCertificates {
       .where(certAddrTable[certAddrSchema.properties.AddressId].in(
         request.addressIds
       ))
-      .orderBy(blockTable[Tables.BlockSchema.properties.SlotNum], lf.Order.DESC)
+      .orderBy(blockTable[Tables.BlockSchema.properties.Height], lf.Order.DESC)
       .orderBy(txTable[Tables.TransactionSchema.properties.Ordinal], lf.Order.DESC)
       .orderBy(txTable[Tables.CertificateSchema.properties.Ordinal], lf.Order.DESC);
 
@@ -1115,6 +1116,16 @@ export class GetToken {
     GetEncryptionMeta,
   });
 
+  static async all(
+    db: lf$Database,
+    tx: lf$Transaction,
+  ): Promise<$ReadOnlyArray<$ReadOnly<TokenRow>>> {
+    return getAll(
+      db, tx,
+      GetToken.ownTables[Tables.TokenSchema.name].name,
+    );
+  }
+
   static async fromIds(
     db: lf$Database,
     tx: lf$Transaction,
@@ -1141,7 +1152,7 @@ export class GetToken {
     tx: lf$Transaction,
     digests: Array<number>,
   ): Promise<$ReadOnlyArray<$ReadOnly<TokenRow>>> {
-    const tokenRows = await getRowIn<AddressRow>(
+    const tokenRows = await getRowIn<TokenRow>(
       db, tx,
       GetToken.ownTables[Tables.TokenSchema.name].name,
       GetToken.ownTables[Tables.TokenSchema.name].properties.Digest,
@@ -1149,5 +1160,98 @@ export class GetToken {
     );
 
     return tokenRows;
+  }
+}
+
+export class AssociateToken {
+  static ownTables: {|
+    TokenList: typeof Tables.TokenListSchema,
+    Token: typeof Tables.TokenSchema,
+  |} = Object.freeze({
+    [Tables.TokenListSchema.name]: Tables.TokenListSchema,
+    [Tables.TokenSchema.name]: Tables.TokenSchema,
+  });
+  static depTables: {||} = Object.freeze({});
+
+  static async nextTokenListId(
+    db: lf$Database,
+    tx: lf$Transaction,
+  ): Promise<number> {
+    const tokenListTableMeta = AssociateToken.ownTables[Tables.TokenListSchema.name];
+
+    const tokenListTable = db.getSchema().table(tokenListTableMeta.name);
+    const query = db
+      .select()
+      .from(tokenListTable)
+      .orderBy(tokenListTable[Tables.TokenListSchema.properties.ListId], lf.Order.DESC)
+      .limit(1);
+    const result: $ReadOnlyArray<$ReadOnly<TokenListRow>> = await tx.attach(query);
+    if (result.length >= 1) {
+      return result[0].ListId + 1;
+    }
+    return 0; // first entry in DB
+  }
+
+  static async forListId(
+    db: lf$Database,
+    tx: lf$Transaction,
+    request: {| listIds: Array<number>, |},
+  ): Promise<Map<number, Array<$ReadOnly<TokenListRow>>>> {
+    const rows = await getRowIn<TokenListRow>(
+      db, tx,
+      AssociateToken.ownTables[Tables.TokenListSchema.name].name,
+      AssociateToken.ownTables[Tables.TokenListSchema.name].properties.ListId,
+      request.listIds,
+    );
+
+    const result = new Map<number, Array<$ReadOnly<TokenListRow>>>();
+    for (const row of rows) {
+      const { ListId } = row;
+      if (ListId == null) continue;
+      const entries = result.get(ListId) ?? [];
+      entries.push(row);
+      result.set(ListId, entries);
+    }
+
+    return result;
+  }
+
+  static async join(
+    db: lf$Database,
+    tx: lf$Transaction,
+    request: {|
+      listIds: Array<number>,
+      networkId: number,
+    |},
+  ): Promise<$ReadOnlyArray<{|
+    TokenList: $ReadOnly<TokenListRow>,
+    Token: $ReadOnly<TokenRow>,
+  |}>> {
+    const tokenListTableMeta = AssociateToken.ownTables[Tables.TokenListSchema.name];
+    const tokenTableMeta = AssociateToken.ownTables[Tables.TokenSchema.name];
+
+    const tokenListTable = db.getSchema().table(tokenListTableMeta.name);
+    const tokenTable = db.getSchema().table(tokenTableMeta.name);
+    const query = db
+      .select()
+      .from(tokenListTable)
+      .innerJoin(
+        tokenTable,
+        tokenListTable[tokenListTableMeta.properties.TokenId].eq(
+          tokenTable[tokenTableMeta.properties.TokenId]
+        )
+      )
+      .where(op.and(
+        tokenListTable[tokenListTableMeta.properties.ListId].in(
+          request.listIds
+        ),
+        tokenTable[tokenTableMeta.properties.NetworkId].eq(request.networkId)
+      ));
+    const result: $ReadOnlyArray<{|
+      TokenList: $ReadOnly<TokenListRow>,
+      Token: $ReadOnly<TokenRow>,
+    |}> = await tx.attach(query);
+
+    return result;
   }
 }

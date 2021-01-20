@@ -11,6 +11,8 @@ import TransactionsStore from '../../stores/toplevel/TransactionsStore';
 import DelegationStore from '../../stores/toplevel/DelegationStore';
 import WalletStore from '../../stores/toplevel/WalletStore';
 import type { GeneratedData } from './Wallet';
+import { mockFromDefaults, getDefaultEntryTokenInfo, } from '../../stores/toplevel/TokenInfoStore';
+import { defaultAssets, } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 export const mockWalletProps: {
   selected: null | PublicDeriver<>,
@@ -85,6 +87,13 @@ export const mockWalletProps: {
             publicDerivers: request.publicDerivers,
             getPublicKeyCache: request.getPublicKeyCache,
           },
+          tokenInfoStore: {
+            tokenInfo: mockFromDefaults(defaultAssets),
+            getDefaultTokenInfo: networkId => getDefaultEntryTokenInfo(
+              networkId,
+              mockFromDefaults(defaultAssets)
+            ),
+          },
           profile: {
             shouldHideBalance: false,
           },
@@ -118,6 +127,9 @@ export const mockWalletProps: {
               ServerStatusErrors.Healthy,
             ),
             serverTime: undefined,
+          },
+          tokenInfoStore: {
+            tokenInfo: mockFromDefaults(defaultAssets),
           },
           wallets: {
             selected: request.selected,

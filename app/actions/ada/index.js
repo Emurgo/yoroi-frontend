@@ -6,6 +6,7 @@ import TrezorSendActions from './trezor-send-actions';
 import LedgerSendActions from './ledger-send-actions';
 import HWVerifyAddressActions from './hw-verify-address-actions';
 import DelegationTransactionActions from './delegation-transaction-actions';
+import VotingActions from './voting-actions';
 
 export type AdaActionsMap = {|
   wallets: AdaWalletsActions,
@@ -16,6 +17,7 @@ export type AdaActionsMap = {|
   ledgerSend: LedgerSendActions,
   hwVerifyAddress: HWVerifyAddressActions,
   delegationTransaction: DelegationTransactionActions,
+  voting: VotingActions,
 |};
 
 const adaActionsMap: AdaActionsMap = Object.freeze({
@@ -27,6 +29,7 @@ const adaActionsMap: AdaActionsMap = Object.freeze({
   ledgerSend: new LedgerSendActions(),
   hwVerifyAddress: new HWVerifyAddressActions(),
   delegationTransaction: new DelegationTransactionActions(),
+  voting: new VotingActions,
 });
 
 export default adaActionsMap;

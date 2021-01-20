@@ -1,11 +1,11 @@
 // @flow
 
 import { lf$Database } from 'lovefield';
-import BigNumber from 'bignumber.js';
 import {
   PublicDeriver,
 } from '../ada/lib/storage/models/PublicDeriver/index';
 import type { NetworkRow } from '../ada/lib/storage/database/primitives/tables';
+import { MultiToken } from './lib/MultiToken';
 
 // isValidMnemonic
 
@@ -20,8 +20,8 @@ export type IsValidMnemonicFunc = (
 
 // getBalance
 
-export type GetBalanceRequest = {| getBalance: () => Promise<BigNumber>, |};
-export type GetBalanceResponse = BigNumber;
+export type GetBalanceRequest = {| getBalance: () => Promise<MultiToken>, |};
+export type GetBalanceResponse = MultiToken;
 export type GetBalanceFunc = (
   request: GetBalanceRequest
 ) => Promise<GetBalanceResponse>;

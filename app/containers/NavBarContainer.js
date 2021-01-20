@@ -3,7 +3,6 @@ import moment from 'moment';
 import { computed } from 'mobx';
 import React, { Component } from 'react';
 import type { Node } from 'react';
-import BigNumber from 'bignumber.js';
 import { observer } from 'mobx-react';
 import type { InjectedOrGenerated } from '../types/injectedPropsType';
 import { intlShape, defineMessages } from 'react-intl';
@@ -25,9 +24,10 @@ import type { ConceptualWalletSettingsCache } from '../stores/toplevel/WalletSet
 import type { PublicKeyCache } from '../stores/toplevel/WalletStore';
 import type { TxRequests } from '../stores/toplevel/TransactionsStore';
 import type { IGetPublic } from '../api/ada/lib/storage/models/PublicDeriver/interfaces';
-import { getApiForNetwork, getApiMeta } from '../api/common/utils';
-import type { SelectedApiType } from '../api/common/utils';
-import { networks } from '../api/ada/lib/storage/database/prepackaged/networks';
+import type { TokenRow } from '../api/ada/lib/storage/database/primitives/tables';
+import { MultiToken } from '../api/common/lib/MultiToken';
+import type { TokenInfoMap } from '../stores/toplevel/TokenInfoStore';
+import { genLookupOrFail, } from '../stores/stateless/tokenHelpers';
 
 const messages = defineMessages({
   allWalletsLabel: {
@@ -61,12 +61,6 @@ export default class NavBarContainer extends Component<Props> {
     });
   }
 
-  getMeta: PublicDeriver<> => $PropertyType<SelectedApiType, 'meta'> = (publicDeriver) => {
-    const apiMeta = getApiMeta(getApiForNetwork(publicDeriver.getParent().getNetworkInfo()))?.meta;
-    if (apiMeta == null) throw new Error(`${nameof(NavBarContainer)} no API selected`);
-    return apiMeta;
-  }
-
   render(): Node {
     const { intl } = this.context;
     const { stores } = this.generated;
@@ -77,33 +71,9 @@ export default class NavBarContainer extends Component<Props> {
 
     const wallets = this.generated.stores.wallets.publicDerivers;
 
-    let utxoTotal = new BigNumber(0);
-    const walletBalances = wallets.map(wallet => stores.transactions
-      .getTxRequests(wallet).requests.getBalanceRequest.result
-      ?.dividedBy(new BigNumber(10).pow(this.getMeta(wallet).decimalPlaces)));
-    for (const walletUtxoAmount of walletBalances) {
-      if (walletUtxoAmount == null) {
-        utxoTotal = null;
-        break;
-      }
-      utxoTotal = utxoTotal.plus(walletUtxoAmount);
-    }
-
-    let rewardTotal = new BigNumber(0);
-    for (const wallet of wallets) {
-      const amount = this.getRewardBalance(wallet);
-      if (amount === undefined) continue;
-      if (amount === null) {
-        rewardTotal = null;
-        break;
-      }
-      rewardTotal = rewardTotal?.plus(amount);
-    }
-
     const walletComponents = wallets.map(wallet => {
       const txRequests = this.generated.stores.transactions.getTxRequests(wallet);
-      const balance = txRequests.requests.getBalanceRequest.result
-        ?.dividedBy(new BigNumber(10).pow(this.getMeta(wallet).decimalPlaces)) || null;
+      const balance = txRequests.requests.getBalanceRequest.result || null;
 
       const parent = wallet.getParent();
       const settingsCache = this.generated.stores.walletSettings
@@ -113,8 +83,6 @@ export default class NavBarContainer extends Component<Props> {
       const plate = withPubKey == null
         ? null
         : this.generated.stores.wallets.getPublicKeyCache(withPubKey).plate;
-
-      const apiMeta = this.getMeta(wallet);
 
       return (
         <NavDropdownRow
@@ -135,14 +103,10 @@ export default class NavBarContainer extends Component<Props> {
               onUpdateHideBalance={this.updateHideBalance}
               shouldHideBalance={profile.shouldHideBalance}
               rewards={this.getRewardBalance(wallet)}
-              meta={{
-                primaryTicker:
-                  // TODO: proper per-network currency meta
-                  parent.getNetworkInfo().NetworkId === networks.CardanoTestnet.NetworkId
-                    ? 'TADA'
-                    : apiMeta.primaryTicker,
-                decimalPlaces: apiMeta.decimalPlaces.toNumber(),
-              }}
+              getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
+              defaultToken={this.generated.stores.tokenInfoStore.getDefaultTokenInfo(
+                wallet.getParent().getNetworkInfo().NetworkId
+              )}
             />
           }
         />
@@ -152,20 +116,7 @@ export default class NavBarContainer extends Component<Props> {
       <>
         <NavDropdownRow
           title={intl.formatMessage(messages.allWalletsLabel)}
-          detailComponent={undefined /*
-            <NavWalletDetails
-              highlightTitle
-              onUpdateHideBalance={this.updateHideBalance}
-              shouldHideBalance={profile.shouldHideBalance}
-              rewards={rewardTotal}
-              walletAmount={utxoTotal}
-              meta={{
-                // TODO: this no longer makes sense in multi-wallet. Needs to be re-thought
-                primaryTicker: 'ADA',
-                decimalPlaces: 6,
-              }}
-            />
-          */}
+          detailComponent={undefined}
         />
         {walletComponents}
       </>
@@ -180,12 +131,8 @@ export default class NavBarContainer extends Component<Props> {
           );
         }
 
-        const apiMeta = this.getMeta(publicDeriver);
-        const network = publicDeriver.getParent().getNetworkInfo();
-
         const txRequests = this.generated.stores.transactions.getTxRequests(publicDeriver);
-        const balance = txRequests.requests.getBalanceRequest.result
-          ?.dividedBy(new BigNumber(10).pow(apiMeta.decimalPlaces)) || null;
+        const balance = txRequests.requests.getBalanceRequest.result || null;
 
         return (
           <NavWalletDetails
@@ -193,13 +140,10 @@ export default class NavBarContainer extends Component<Props> {
             shouldHideBalance={profile.shouldHideBalance}
             rewards={this.getRewardBalance(publicDeriver)}
             walletAmount={balance}
-            meta={{
-              primaryTicker: // TODO: proper per-network currency meta
-                network.NetworkId === networks.CardanoTestnet.NetworkId
-                  ? 'TADA'
-                  : apiMeta.primaryTicker,
-              decimalPlaces: apiMeta.decimalPlaces.toNumber(),
-            }}
+            getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
+            defaultToken={this.generated.stores.tokenInfoStore.getDefaultTokenInfo(
+              publicDeriver.getParent().getNetworkInfo().NetworkId
+            )}
           />
         );
       });
@@ -251,7 +195,7 @@ export default class NavBarContainer extends Component<Props> {
    * null => still calculating
    * value => done calculating
    */
-  getRewardBalance: PublicDeriver<> => null | void | BigNumber = (
+  getRewardBalance: PublicDeriver<> => null | void | MultiToken = (
     publicDeriver
   ) => {
     const delegationRequest = this.generated.stores.delegation.getDelegationRequests(
@@ -259,13 +203,11 @@ export default class NavBarContainer extends Component<Props> {
     );
     if (delegationRequest == null) return undefined;
 
-    console.log(delegationRequest);
     const balanceResult = delegationRequest.getDelegatedBalance.result;
     if (balanceResult == null) {
       return null;
     }
-    const apiMeta = this.getMeta(publicDeriver);
-    return balanceResult.accountPart.dividedBy(new BigNumber(10).pow(apiMeta.decimalPlaces));
+    return balanceResult.accountPart;
   }
 
   @computed get generated(): {|
@@ -302,6 +244,10 @@ export default class NavBarContainer extends Component<Props> {
       profile: {|
         shouldHideBalance: boolean,
       |},
+      tokenInfoStore: {|
+        tokenInfo: TokenInfoMap,
+        getDefaultTokenInfo: number => $ReadOnly<TokenRow>,
+      |},
       transactions: {|
         getTxRequests: (PublicDeriver<>) => TxRequests
       |},
@@ -335,6 +281,10 @@ export default class NavBarContainer extends Component<Props> {
           selected: stores.wallets.selected,
           publicDerivers: stores.wallets.publicDerivers,
           getPublicKeyCache: stores.wallets.getPublicKeyCache,
+        },
+        tokenInfoStore: {
+          tokenInfo: stores.tokenInfoStore.tokenInfo,
+          getDefaultTokenInfo: stores.tokenInfoStore.getDefaultTokenInfo,
         },
         profile: {
           shouldHideBalance: stores.profile.shouldHideBalance,

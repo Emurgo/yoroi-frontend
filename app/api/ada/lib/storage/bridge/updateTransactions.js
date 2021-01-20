@@ -19,6 +19,8 @@ import type {
   NetworkRow,
   DbBlock,
   AddressRow,
+  TokenRow,
+  TokenListInsert,
 } from '../database/primitives/tables';
 import {
   TransactionType,
@@ -38,11 +40,15 @@ import {
   GetTxAndBlock,
   GetCertificates,
   GetKeyDerivation,
+  GetToken,
+  AssociateToken,
 } from '../database/primitives/api/read';
 import {
   ModifyAddress,
   ModifyTransaction,
   FreeBlocks,
+  ModifyToken,
+  ModifyTokenList,
 } from '../database/primitives/api/write';
 import type { AddCertificateRequest } from '../database/primitives/api/write';
 import { ModifyCardanoByronTx, ModifyCardanoShelleyTx } from  '../database/transactionModels/multipart/api/write';
@@ -54,6 +60,7 @@ import {
   GetUtxoTxOutputsWithTx,
   GetUtxoInputs,
   AssociateTxWithUtxoIOs,
+  createTokenListIdGenFunction,
 } from '../database/transactionModels/utxo/api/read';
 import {
   AssociateTxWithAccountingIOs,
@@ -77,6 +84,7 @@ import {
   TxStatusCodes,
   CoreAddressTypes,
   CertificateRelation,
+  PRIMARY_ASSET_CONSTANTS,
 } from '../database/primitives/enums';
 import {
   asScanAddresses, asHasLevels,
@@ -133,6 +141,12 @@ import type {
 import { addressToKind, } from './utils';
 import { RustModule } from '../../cardanoCrypto/rustLoader';
 import { Bech32Prefix } from '../../../../../config/stringConfig';
+import {
+  MultiToken,
+} from '../../../../common/lib/MultiToken';
+import type {
+  DefaultTokenEntry,
+} from '../../../../common/lib/MultiToken';
 
 async function rawGetAllTxIds(
   db: lf$Database,
@@ -251,16 +265,20 @@ export async function rawGetTransactions(
   }
   const byronWithIOs = await deps.CardanoByronAssociateTxWithIOs.getIOsForTx(
     db, dbTx,
-    { txs: txs
-      .map(txWithBlock => txWithBlock.Transaction)
-      .filter(tx => tx.Type === TransactionType.CardanoByron)
+    {
+      txs: txs
+        .map(txWithBlock => txWithBlock.Transaction)
+        .filter(tx => tx.Type === TransactionType.CardanoByron),
+      networkId: request.publicDeriver.getParent().getNetworkInfo().NetworkId,
     }
   );
   const shelleyWithIOs = await deps.CardanoShelleyAssociateTxWithIOs.getIOsForTx(
     db, dbTx,
-    { txs: txs
-      .map(txWithBlock => txWithBlock.Transaction)
-      .filter(tx => tx.Type === TransactionType.CardanoShelley)
+    {
+      txs: txs
+        .map(txWithBlock => txWithBlock.Transaction)
+        .filter(tx => tx.Type === TransactionType.CardanoShelley),
+      networkId: request.publicDeriver.getParent().getNetworkInfo().NetworkId,
     }
   );
   const txsWithIOs = [
@@ -297,10 +315,13 @@ export async function rawGetTransactions(
     }
   }
 
+  const defaultToken = request.publicDeriver.getParent().getDefaultToken();
+
   const result = txsWithIOs.map((tx: CardanoByronTxIO | CardanoShelleyTxIO) => ({
     ...tx,
     block: blockMap.get(tx.transaction.TransactionId) || null,
     ...getFromUserPerspective({
+      tokens: tx.tokens,
       utxoInputs: tx.utxoInputs,
       utxoOutputs: tx.utxoOutputs,
       accountingInputs: tx.accountingInputs == null ? undefined : tx.accountingInputs,
@@ -319,10 +340,10 @@ export async function rawGetTransactions(
         *    So that wouldn't be quite accurate either.
         *    Again, it's easier to say it's just whoever gets it
       */
-      ownImplicitInput: new BigNumber(0),
+      ownImplicitInput: new MultiToken([], defaultToken),
       ownImplicitOutput: (() => {
         if (tx.txType === TransactionType.CardanoShelley) {
-          let implicitOutputSum = new BigNumber(0);
+          const implicitOutputSum = new MultiToken([], defaultToken);
           for (const cert of tx.certificates) {
             if (
               cert.certificate.Kind !==
@@ -347,17 +368,20 @@ export async function rawGetTransactions(
                   if (rewardAddr == null) continue; // should never happen
                   const rewardAmount = mir.get(rewardAddr.payment_cred());
                   if (rewardAmount == null) continue; // should never happen
-                  implicitOutputSum = implicitOutputSum.plus(
-                    rewardAmount.to_str()
-                  );
+                  implicitOutputSum.add({
+                    identifier: defaultToken.defaultIdentifier,
+                    networkId: defaultToken.defaultNetworkId,
+                    amount: new BigNumber(rewardAmount.to_str()),
+                  });
                 }
               }
             }
           }
           return implicitOutputSum;
         }
-        return new BigNumber(0);
+        return new MultiToken([], defaultToken);
       })(),
+      defaultToken,
     })
   }));
 
@@ -498,6 +522,68 @@ export async function getPendingTransactions(
   );
 }
 
+export async function rawGetTokenListIds(
+  db: lf$Database,
+  dbTx: lf$Transaction,
+  deps: {|
+    GetPathWithSpecific: Class<GetPathWithSpecific>,
+    GetAddress: Class<GetAddress>,
+    CardanoByronAssociateTxWithIOs: Class<CardanoByronAssociateTxWithIOs>,
+    CardanoShelleyAssociateTxWithIOs: Class<CardanoShelleyAssociateTxWithIOs>,
+    AssociateTxWithUtxoIOs: Class<AssociateTxWithUtxoIOs>,
+    AssociateTxWithAccountingIOs: Class<AssociateTxWithAccountingIOs>,
+    GetDerivationSpecific: Class<GetDerivationSpecific>,
+    GetTransaction: Class<GetTransaction>,
+    GetCertificates: Class<GetCertificates>,
+  |},
+  derivationTables: Map<number, string>,
+  request: {|
+    publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels>,
+  |},
+): Promise<Array<number>> {
+  const relatedIds = await rawGetAllTxIds(
+    db, dbTx,
+    {
+      GetPathWithSpecific: deps.GetPathWithSpecific,
+      GetAddress: deps.GetAddress,
+      AssociateTxWithUtxoIOs: deps.AssociateTxWithUtxoIOs,
+      AssociateTxWithAccountingIOs: deps.AssociateTxWithAccountingIOs,
+      GetDerivationSpecific: deps.GetDerivationSpecific,
+      GetCertificates: deps.GetCertificates,
+    },
+    { publicDeriver: request.publicDeriver },
+    derivationTables,
+  );
+
+  const fullTxs = await deps.GetTransaction.fromIds(
+    db, dbTx,
+    { ids: relatedIds.txIds }
+  );
+
+  const byronWithIOs = await deps.CardanoByronAssociateTxWithIOs.getIOsForTx(
+    db, dbTx,
+    {
+      txs: fullTxs.filter(tx => tx.Type === TransactionType.CardanoByron),
+      networkId: request.publicDeriver.getParent().getNetworkInfo().NetworkId,
+    }
+  );
+  const shelleyWithIOs = await deps.CardanoShelleyAssociateTxWithIOs.getIOsForTx(
+    db, dbTx,
+    {
+      txs: fullTxs.filter(tx => tx.Type === TransactionType.CardanoShelley),
+      networkId: request.publicDeriver.getParent().getNetworkInfo().NetworkId,
+    }
+  );
+  const txsWithIOs = [
+    ...byronWithIOs,
+    ...shelleyWithIOs,
+  ];
+
+  return Array.from(new Set(txsWithIOs
+    .flatMap(txs => txs.tokens)
+    .map(token => token.TokenList.ListId)));
+}
+
 export async function rawGetForeignAddresses(
   db: lf$Database,
   dbTx: lf$Transaction,
@@ -538,11 +624,17 @@ export async function rawGetForeignAddresses(
 
   const byronWithIOs = await deps.CardanoByronAssociateTxWithIOs.getIOsForTx(
     db, dbTx,
-    { txs: fullTxs.filter(tx => tx.Type === TransactionType.CardanoByron) }
+    {
+      txs: fullTxs.filter(tx => tx.Type === TransactionType.CardanoByron),
+      networkId: request.publicDeriver.getParent().getNetworkInfo().NetworkId,
+    }
   );
   const shelleyWithIOs = await deps.CardanoShelleyAssociateTxWithIOs.getIOsForTx(
     db, dbTx,
-    { txs: fullTxs.filter(tx => tx.Type === TransactionType.CardanoShelley) }
+    {
+      txs: fullTxs.filter(tx => tx.Type === TransactionType.CardanoShelley),
+      networkId: request.publicDeriver.getParent().getNetworkInfo().NetworkId,
+    }
   );
   const txsWithIOs = [
     ...byronWithIOs,
@@ -649,6 +741,7 @@ export async function rawRemoveAllTransactions(
     ModifyAddress: Class<ModifyAddress>,
     FreeBlocks: Class<FreeBlocks>,
     GetCertificates: Class<GetCertificates>,
+    ModifyTokenList: Class<ModifyTokenList>,
   |},
   derivationTables: Map<number, string>,
   request: {|
@@ -685,6 +778,26 @@ export async function rawRemoveAllTransactions(
     derivationTables,
   );
 
+  const tokenListIds = await rawGetTokenListIds(
+    db, dbTx,
+    {
+      GetPathWithSpecific: deps.GetPathWithSpecific,
+      GetAddress: deps.GetAddress,
+      CardanoByronAssociateTxWithIOs: deps.CardanoByronAssociateTxWithIOs,
+      CardanoShelleyAssociateTxWithIOs: deps.CardanoShelleyAssociateTxWithIOs,
+      AssociateTxWithUtxoIOs: deps.AssociateTxWithUtxoIOs,
+      AssociateTxWithAccountingIOs: deps.AssociateTxWithAccountingIOs,
+      GetDerivationSpecific: deps.GetDerivationSpecific,
+      GetTransaction: deps.GetTransaction,
+      GetCertificates: deps.GetCertificates,
+    },
+    derivationTables,
+    request,
+  );
+
+  // WARNING: anything past this point can't assume txs exist in the DB
+  // since we start removing stuff
+
   // 1) remove txs themselves
   await deps.DeleteAllTransactions.delete(
     db, dbTx,
@@ -702,6 +815,12 @@ export async function rawRemoveAllTransactions(
 
   // 3) remove blocks no longer needed
   await deps.FreeBlocks.free(db, dbTx);
+
+  // 4) Remove token lists
+  await deps.ModifyTokenList.remove(
+    db, dbTx,
+    tokenListIds,
+  );
 
   return relatedIds;
 }
@@ -723,6 +842,7 @@ export async function removeAllTransactions(
     GetTransaction,
     FreeBlocks,
     GetCertificates,
+    ModifyTokenList,
   });
   const db = request.publicDeriver.getDb();
   const depTables = Object
@@ -787,6 +907,9 @@ export async function updateTransactions(
       AssociateTxWithAccountingIOs,
       GetCertificates,
       GetKeyDerivation,
+      ModifyToken,
+      GetToken,
+      AssociateToken,
     });
     const updateTables = Object
       .keys(updateDepTables)
@@ -991,6 +1114,7 @@ async function rollback(
       allTxIds: txIds,
       isUnspent: true,
       TransactionSeed,
+      networkId: request.publicDeriver.getParent().getNetworkInfo().NetworkId,
     }
   );
 
@@ -1061,6 +1185,9 @@ async function rawUpdateTransactions(
     AssociateTxWithAccountingIOs: Class<AssociateTxWithAccountingIOs>,
     GetCertificates: Class<GetCertificates>,
     GetKeyDerivation: Class<GetKeyDerivation>,
+    ModifyToken: Class<ModifyToken>,
+    GetToken: Class<GetToken>,
+    AssociateToken: Class<AssociateToken>,
   |},
   publicDeriver: IPublicDeriver<>,
   lastSyncInfo: $ReadOnly<LastSyncInfoRow>,
@@ -1201,6 +1328,9 @@ async function rawUpdateTransactions(
         ModifyTransaction: deps.ModifyTransaction,
         ModifyCardanoByronTx: deps.ModifyCardanoByronTx,
         ModifyCardanoShelleyTx: deps.ModifyCardanoShelleyTx,
+        ModifyToken: deps.ModifyToken,
+        GetToken: deps.GetToken,
+        AssociateToken: deps.AssociateToken,
       },
       {
         network: publicDeriver.getParent().getNetworkInfo(),
@@ -1210,6 +1340,7 @@ async function rawUpdateTransactions(
           ourIds,
           publicDeriver.getParent().getNetworkInfo()
         ),
+        defaultToken: publicDeriver.getParent().getDefaultToken(),
         findOwnAddress: rawGenFindOwnAddress(
           ourIds
         ),
@@ -1243,7 +1374,7 @@ async function rawUpdateTransactions(
  * Pre-req: must not be any gaps within the transactions
  * Pre-req: each TX has unique hash
  */
-export async function updateTransactionBatch(
+async function updateTransactionBatch(
   db: lf$Database,
   dbTx: lf$Transaction,
   deps: {|
@@ -1256,6 +1387,9 @@ export async function updateTransactionBatch(
     ModifyTransaction: Class<ModifyTransaction>,
     ModifyCardanoByronTx: Class<ModifyCardanoByronTx>,
     ModifyCardanoShelleyTx: Class<ModifyCardanoShelleyTx>,
+    ModifyToken: Class<ModifyToken>,
+    GetToken: Class<GetToken>,
+    AssociateToken: Class<AssociateToken>,
   |},
   request: {|
     network: $ReadOnly<NetworkRow>,
@@ -1265,6 +1399,7 @@ export async function updateTransactionBatch(
     hashToIds: HashToIdsFunc,
     findOwnAddress: FindOwnAddressFunc,
     derivationTables: Map<number, string>,
+    defaultToken: DefaultTokenEntry,
   |}
 ): Promise<Array<{|
   ...(CardanoByronTxIO | CardanoShelleyTxIO),
@@ -1282,11 +1417,17 @@ export async function updateTransactionBatch(
     const txs: Array<$ReadOnly<TransactionRow>> = Array.from(matchByDigest.values());
     const byronWithIOs = await deps.CardanoByronAssociateTxWithIOs.getIOsForTx(
       db, dbTx,
-      { txs: txs.filter(tx => tx.Type === TransactionType.CardanoByron) }
+      {
+        txs: txs.filter(tx => tx.Type === TransactionType.CardanoByron),
+        networkId: request.network.NetworkId,
+      }
     );
     const shelleyWithIOs = await deps.CardanoShelleyAssociateTxWithIOs.getIOsForTx(
       db, dbTx,
-      { txs: txs.filter(tx => tx.Type === TransactionType.CardanoShelley) }
+      {
+        txs: txs.filter(tx => tx.Type === TransactionType.CardanoShelley),
+        networkId: request.network.NetworkId,
+      }
     );
     const txsWithIOs = [
       ...byronWithIOs,
@@ -1355,7 +1496,24 @@ export async function updateTransactionBatch(
     }
   }
 
-  // 2) Add new transactions
+  // 2) Add any new assets & lookup known ones
+  const assetLookup = await genCardanoAssetMap(
+    db, dbTx,
+    {
+      ModifyToken: deps.ModifyToken,
+      GetToken: deps.GetToken,
+    },
+    unseenNewTxs,
+    // request.getAssetInfo,
+    request.network,
+    request.defaultToken,
+  );
+
+  // 3) Add new transactions
+  const genNextTokenListId = await createTokenListIdGenFunction(
+    db, dbTx,
+    { AssociateToken: deps.AssociateToken }
+  );
   const { byronTxs, shelleyTxs, } = await networkTxToDbTx(
     db,
     dbTx,
@@ -1367,6 +1525,8 @@ export async function updateTransactionBatch(
     request.toAbsoluteSlotNumber,
     TransactionSeed,
     BlockSeed,
+    assetLookup,
+    genNextTokenListId,
   );
   const newsTxsIdSet = new Set();
   for (const newTx of byronTxs) {
@@ -1383,6 +1543,7 @@ export async function updateTransactionBatch(
         transaction: result.transaction,
         utxoInputs: result.utxoInputs,
         utxoOutputs: result.utxoOutputs,
+        tokens: result.tokens,
       });
     }
   }
@@ -1402,11 +1563,12 @@ export async function updateTransactionBatch(
         utxoInputs: result.utxoInputs,
         utxoOutputs: result.utxoOutputs,
         accountingInputs: result.accountingInputs,
+        tokens: result.tokens,
       });
     }
   }
 
-  // 3) Update UTXO set
+  // 4) Update UTXO set
 
   const newTxIds = txsAddedToBlock.map(tx =>  tx.transaction.TransactionId);
   await markAllInputs(
@@ -1424,10 +1586,11 @@ export async function updateTransactionBatch(
       ],
       isUnspent: false,
       TransactionSeed,
+      networkId: request.network.NetworkId,
     }
   );
 
-  // 4) Mark any pending tx that is not found by remote as failed
+  // 5) Mark any pending tx that is not found by remote as failed
 
   const pendingTxs = await deps.GetTransaction.withStatus(
     db, dbTx,
@@ -1464,9 +1627,17 @@ export async function updateTransactionBatch(
 function genByronIOGen(
   byronTx: RemoteTransaction,
   getIdOrThrow: string => number,
+  network: $ReadOnly<NetworkRow>,
+  getAssetInfoOrThrow: string => $ReadOnly<TokenRow>,
+  genNextTokenListId: void => number,
 ): (number => {|
   utxoInputs: Array<UtxoTransactionInputInsert>,
   utxoOutputs: Array<UtxoTransactionOutputInsert>,
+  tokenList: Array<{|
+    TokenList: TokenListInsert,
+    identifier: string,
+    networkId: number,
+  |}>,
 |}) {
   if (!(byronTx.type == null || byronTx.type === RemoteTransactionTypes.byron)) {
     throw new Error(`${nameof(genByronIOGen)} not a byron transaction`);
@@ -1474,24 +1645,48 @@ function genByronIOGen(
   return (txRowId) => {
     const utxoInputs = [];
     const utxoOutputs = [];
+    const tokenList = [];
     for (let i = 0; i < byronTx.inputs.length; i++) {
       const input = byronTx.inputs[i];
+
+      const listId = genNextTokenListId();
+      // 1) Add ADA
+      tokenList.push({
+        TokenList: {
+          Amount: input.amount,
+          ListId: listId,
+          TokenId: getAssetInfoOrThrow(PRIMARY_ASSET_CONSTANTS.Cardano).TokenId,
+        },
+        identifier: PRIMARY_ASSET_CONSTANTS.Cardano,
+        networkId: network.NetworkId,
+      });
       utxoInputs.push({
         TransactionId: txRowId,
         AddressId: getIdOrThrow(input.address),
         ParentTxHash: input.txHash,
         IndexInParentTx: input.index,
         IndexInOwnTx: i,
-        Amount: input.amount,
+        TokenListId: listId,
       });
     }
     for (let i = 0; i < byronTx.outputs.length; i++) {
       const output = byronTx.outputs[i];
+
+      // 1) Add ADA
+      const listId = genNextTokenListId();
+      tokenList.push({
+        TokenList: {
+          Amount: output.amount,
+          ListId: listId,
+          TokenId: getAssetInfoOrThrow(PRIMARY_ASSET_CONSTANTS.Cardano).TokenId,
+        },
+        identifier: PRIMARY_ASSET_CONSTANTS.Cardano,
+        networkId: network.NetworkId,
+      });
       utxoOutputs.push({
         TransactionId: txRowId,
         AddressId: getIdOrThrow(output.address),
         OutputIndex: i,
-        Amount: output.amount,
         /**
           * we assume unspent for now but it will be updated after if necessary
           * Note: if this output doesn't belong to you, it will be true forever
@@ -1500,13 +1695,16 @@ function genByronIOGen(
         IsUnspent: true,
         ErgoBoxId: null,
         ErgoCreationHeight: null,
+        ErgoRegisters: null,
         ErgoTree: null,
+        TokenListId: listId,
       });
     }
 
     return {
       utxoInputs,
       utxoOutputs,
+      tokenList,
     };
   };
 }
@@ -1514,10 +1712,17 @@ function genShelleyIOGen(
   shelleyTx: RemoteTransaction,
   getIdOrThrow: string => number,
   network: $ReadOnly<NetworkRow>,
+  getAssetInfoOrThrow: string => $ReadOnly<TokenRow>,
+  genNextTokenListId: void => number,
 ): (number => {|
   utxoInputs: Array<UtxoTransactionInputInsert>,
   utxoOutputs: Array<UtxoTransactionOutputInsert>,
   accountingInputs: Array<AccountingTransactionInputInsert>,
+  tokenList: Array<{|
+    TokenList: TokenListInsert,
+    identifier: string,
+    networkId: number,
+  |}>,
 |}) {
   if (shelleyTx.type !== RemoteTransactionTypes.shelley) {
     throw new Error(`${nameof(genShelleyIOGen)} not a shelley transaction`);
@@ -1526,18 +1731,43 @@ function genShelleyIOGen(
     const utxoInputs = [];
     const utxoOutputs = [];
     const accountingInputs = [];
+    const tokenList = [];
     for (let i = 0; i < shelleyTx.inputs.length; i++) {
       const input = shelleyTx.inputs[i];
+
+      const listId = genNextTokenListId();
+      // 1) Add ADA
+      tokenList.push({
+        TokenList: {
+          Amount: input.amount,
+          ListId: listId,
+          TokenId: getAssetInfoOrThrow(PRIMARY_ASSET_CONSTANTS.Cardano).TokenId,
+        },
+        identifier: PRIMARY_ASSET_CONSTANTS.Cardano,
+        networkId: network.NetworkId,
+      });
       utxoInputs.push({
         TransactionId: txRowId,
         AddressId: getIdOrThrow(input.address),
         ParentTxHash: input.txHash,
         IndexInParentTx: input.index,
         IndexInOwnTx: i,
-        Amount: input.amount,
+        TokenListId: listId,
       });
     }
     for (let i = 0; i < shelleyTx.withdrawals.length; i++) {
+      const listId = genNextTokenListId();
+
+      // 1) Add ADA
+      tokenList.push({
+        TokenList: {
+          Amount: shelleyTx.withdrawals[i].amount,
+          ListId: listId,
+          TokenId: getAssetInfoOrThrow(PRIMARY_ASSET_CONSTANTS.Cardano).TokenId,
+        },
+        identifier: PRIMARY_ASSET_CONSTANTS.Cardano,
+        networkId: network.NetworkId,
+      });
       accountingInputs.push({
         TransactionId: txRowId,
         AddressId: getIdOrThrow(shelleyTx.withdrawals[i].address),
@@ -1551,11 +1781,24 @@ function genShelleyIOGen(
          * Note: the index for a withdrawal starts at 0 (independent of UTXO inputs)
          */
         IndexInOwnTx: i,
-        Amount: shelleyTx.withdrawals[i].amount,
+        TokenListId: listId,
       });
     }
     for (let i = 0; i < shelleyTx.outputs.length; i++) {
       const output = shelleyTx.outputs[i];
+
+      const listId = genNextTokenListId();
+      // 1) Add ADA
+      tokenList.push({
+        TokenList: {
+          Amount: output.amount,
+          ListId: listId,
+          TokenId: getAssetInfoOrThrow(PRIMARY_ASSET_CONSTANTS.Cardano).TokenId,
+        },
+        identifier: PRIMARY_ASSET_CONSTANTS.Cardano,
+        networkId: network.NetworkId,
+      });
+
       const outputType = addressToKind(output.address, 'bytes', network);
       // consider a group address as a UTXO output
       // since the payment (UTXO) key is the one that signs
@@ -1569,7 +1812,7 @@ function genShelleyIOGen(
           TransactionId: txRowId,
           AddressId: getIdOrThrow(output.address),
           OutputIndex: i,
-          Amount: output.amount,
+          TokenListId: listId,
           /**
             * we assume unspent for now but it will be updated after if necessary
             * Note: if this output doesn't belong to you, it will be true forever
@@ -1578,6 +1821,7 @@ function genShelleyIOGen(
           IsUnspent: true,
           ErgoBoxId: null,
           ErgoCreationHeight: null,
+          ErgoRegisters: null,
           ErgoTree: null,
         });
       } else if (
@@ -1594,10 +1838,72 @@ function genShelleyIOGen(
       utxoInputs,
       utxoOutputs,
       accountingInputs,
+      tokenList,
     };
   };
 }
 
+async function genCardanoAssetMap(
+  db: lf$Database,
+  dbTx: lf$Transaction,
+  deps: {|
+    ModifyToken: Class<ModifyToken>,
+    GetToken: Class<GetToken>,
+  |},
+  newTxs: Array<RemoteTransaction>,
+  // getAssetInfo: AssetInfoFunc,
+  network: $ReadOnly<NetworkRow>,
+  defaultToken: DefaultTokenEntry,
+): Promise<Map<string, $ReadOnly<TokenRow>>> {
+  const tokenIds = Array.from(new Set(newTxs.flatMap(_tx => [
+    // ...tx.inputs
+    //   .flatMap(input => input.assets)
+    //   .map(asset => asset.tokenId),
+    // ...tx.outputs
+    //   .flatMap(output => output.assets)
+    //   .map(asset => asset.tokenId),
+    // force inclusion of primary token for chain
+    defaultToken.defaultIdentifier
+  ])));
+
+  const existingDbRows = (await deps.GetToken.fromIdentifier(
+    db, dbTx,
+    tokenIds
+  )).filter(row => row.NetworkId === network.NetworkId);
+
+  // const existingTokens = new Set<string>(
+  //   existingDbRows.map(row => row.Identifier)
+  // );
+  // const tokenInfo = await getAssetInfo({
+  //   network,
+  //   assetIds: tokenIds.filter(token => !existingTokens.has(token))
+  // });
+
+  // const databaseInsert = Object.keys(tokenInfo).map(tokenId => ({
+  //   NetworkId: network.NetworkId,
+  //   Identifier: tokenId,
+  //   Metadata: {
+  //     type: 'Cardano',
+  //     height: tokenInfo[tokenId].height,
+  //     boxId: tokenInfo[tokenId].boxId,
+  //     ticker: null,
+  //     longName: tokenInfo[tokenId].name,
+  //     numberOfDecimals: tokenInfo[tokenId].numDecimals || 0,
+  //     description: tokenInfo[tokenId].desc,
+  //   }
+  // }));
+
+  // const newDbRows = await deps.ModifyToken.upsert(
+  //   db, dbTx,
+  //   databaseInsert
+  // );
+
+  const result = new Map<string, $ReadOnly<TokenRow>>();
+  existingDbRows.forEach(row => result.set(row.Identifier, row));
+  // newDbRows.forEach(row => result.set(row.Identifier, row));
+
+  return result;
+}
 
 async function networkTxToDbTx(
   db: lf$Database,
@@ -1610,6 +1916,8 @@ async function networkTxToDbTx(
   toAbsoluteSlotNumber: ToAbsoluteSlotNumberFunc,
   TransactionSeed: number,
   BlockSeed: number,
+  assetLookup: Map<string, $ReadOnly<TokenRow>>,
+  genNextTokenListId: void => number,
 ): Promise<{|
   byronTxs: Array<{|
     block: null | BlockInsert,
@@ -1652,6 +1960,15 @@ async function networkTxToDbTx(
     return id;
   };
 
+  const getAssetInfoOrThrow = (hash: string): $ReadOnly<TokenRow> => {
+    // recall: we already added all needed tokens to the DB before we get here
+    const id = assetLookup.get(hash);
+    if (id === undefined) {
+      throw new Error(`${nameof(networkTxToDbTx)} should never happen -- asset missing`);
+    }
+    return id;
+  };
+
   const byronTxs = [];
   const shelleyTxs = [];
 
@@ -1667,7 +1984,13 @@ async function networkTxToDbTx(
       byronTxs.push({
         block,
         transaction,
-        ioGen: genByronIOGen(networkTx, getIdOrThrow),
+        ioGen: genByronIOGen(
+          networkTx,
+          getIdOrThrow,
+          network,
+          getAssetInfoOrThrow,
+          genNextTokenListId
+        ),
       });
     } else if (networkTx.type === RemoteTransactionTypes.shelley) {
       const baseConfig = getCardanoHaskellBaseConfig(network)
@@ -1690,7 +2013,13 @@ async function networkTxToDbTx(
         block,
         transaction,
         certificates,
-        ioGen: genShelleyIOGen(networkTx, getIdOrThrow, network),
+        ioGen: genShelleyIOGen(
+          networkTx,
+          getIdOrThrow,
+          network,
+          getAssetInfoOrThrow,
+          genNextTokenListId
+        ),
       });
     } else {
       throw new Error(`${nameof(networkTxToDbTx)} Unhandled tx type ${networkTx.type ?? ''}`);
@@ -1716,6 +2045,7 @@ async function markAllInputs(
     allTxIds: Array<number>,
     isUnspent: boolean,
     TransactionSeed: number,
+    networkId: number,
     ...
   },
 ): Promise<void> {
@@ -1749,6 +2079,7 @@ async function markAllInputs(
         txId: parentTx.TransactionId,
         outputIndex: input.IndexInParentTx,
         isUnspent: request.isUnspent,
+        networkId: request.networkId,
       }
     );
   }

@@ -2,7 +2,6 @@
 import React, { Component, } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import BigNumber from 'bignumber.js';
 import classnames from 'classnames';
 import { defineMessages, intlShape } from 'react-intl';
 import styles from './TransferSummaryPage.scss';
@@ -19,6 +18,14 @@ import { SelectedExplorer } from '../../domain/SelectedExplorer';
 import { truncateAddress } from '../../utils/formatters';
 import type { TransferTx } from '../../types/TransferTypes';
 import { genAddressLookup } from '../../stores/stateless/addressStores';
+import {
+  MultiToken,
+} from '../../api/common/lib/MultiToken';
+import type {
+  TokenLookupKey,
+} from '../../api/common/lib/MultiToken';
+import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
+import { getTokenName, genFormatTokenAmount } from '../../stores/stateless/tokenHelpers';
 
 const messages = defineMessages({
   addressFromLabel: {
@@ -39,13 +46,12 @@ const messages = defineMessages({
   },
   unregisterExplanation: {
     id: 'wallet.withdrawal.transaction.unregister',
-    defaultMessage: '!!!This transaction will unregister one or more staking keys, giving you back your {refundAmount} {ticer} from your deposit',
+    defaultMessage: '!!!This transaction will unregister one or more staking keys, giving you back your {refundAmount} {ticker} from your deposit',
   },
 });
 
 type Props = {|
   +dialogTitle: string,
-  +formattedWalletAmount: BigNumber => string,
   +selectedExplorer: SelectedExplorer,
   +transferTx: TransferTx,
   +onSubmit: {|
@@ -60,8 +66,8 @@ type Props = {|
   +error: ?LocalizableError,
   +form: ?Node,
   +unitOfAccountSetting: UnitOfAccountSettingType,
-  +ticker: string,
-  +coinPrice: ?number,
+  +getTokenInfo: Inexact<TokenLookupKey> => $ReadOnly<TokenRow>,
+  +getCurrentPrice: (from: string, to: string) => ?number,
   +addressToDisplayString: string => string,
   +addressLookup: ReturnType<typeof genAddressLookup>,
   +header?: Node,
@@ -186,10 +192,12 @@ export default class TransferSummaryPage extends Component<Props> {
               })}
               <div className={styles.refund}>
                 {intl.formatMessage(messages.unregisterExplanation, {
-                  ticker: this.props.ticker,
+                  ticker: getTokenName(this.props.getTokenInfo(
+                    this.props.transferTx.recoveredBalance.getDefaultEntry()
+                  )),
                   refundAmount: deregistrations.reduce(
-                    (sum, curr) => (curr.refund == null ? sum : sum.plus(curr.refund)),
-                    new BigNumber(0)
+                    (sum, curr) => (curr.refund == null ? sum : sum.joinAddCopy(curr.refund)),
+                    new MultiToken([], this.props.transferTx.recoveredBalance.defaults)
                   ).toString()
                 })}
               </div>
@@ -268,25 +276,54 @@ export default class TransferSummaryPage extends Component<Props> {
     );
   }
 
-  getTotalBalance: void => BigNumber = () => {
-    const baseTotal = this.props.transferTx.recoveredBalance.minus(this.props.transferTx.fee);
+  getTotalBalance: void => MultiToken = () => {
+    const baseTotal = this.props.transferTx.recoveredBalance.joinSubtractCopy(
+      this.props.transferTx.fee
+    );
     if (this.props.transferTx.deregistrations == null) {
       return baseTotal;
     }
     const refundSum = this.props.transferTx.deregistrations.reduce(
-      (sum, curr) => (curr.refund == null ? sum : sum.plus(curr.refund)),
-      new BigNumber(0)
+      (sum, curr) => (curr.refund == null ? sum : sum.joinAddCopy(curr.refund)),
+      new MultiToken([], this.props.transferTx.recoveredBalance.defaults)
     );
-    return baseTotal.plus(refundSum);
+    return baseTotal.joinAddCopy(refundSum);
   }
 
   render(): Node {
     const { intl } = this.context;
-    const { transferTx, isSubmitting, error, unitOfAccountSetting, coinPrice, } = this.props;
+    const { transferTx, isSubmitting, error, unitOfAccountSetting, } = this.props;
 
-    const recoveredBalance = this.props.formattedWalletAmount(transferTx.recoveredBalance);
-    const transactionFee = this.props.formattedWalletAmount(transferTx.fee);
-    const finalBalance = this.props.formattedWalletAmount(this.getTotalBalance());
+    const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
+    const convertedToUnitOfAccount = (tokens, toCurrency) => {
+      const defaultEntry = tokens.getDefaultEntry();
+      const tokenInfo = this.props.getTokenInfo(defaultEntry);
+
+      const shiftedAmount = defaultEntry.amount
+        .shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
+
+      const coinPrice = this.props.getCurrentPrice(
+        tokenInfo.Identifier,
+        toCurrency
+      );
+
+      if (coinPrice == null) return '-';
+
+      return calculateAndFormatValue(
+        shiftedAmount,
+        coinPrice
+      );
+    };
+
+    const recoveredBalance = formatValue(
+      transferTx.recoveredBalance.getDefaultEntry()
+    );
+    const transactionFee = formatValue(
+      transferTx.fee.getDefaultEntry()
+    );
+    const finalBalance = formatValue(
+      this.getTotalBalance().getDefaultEntry()
+    );
 
     return this.wrapInDialog(
       <div className={styles.body}>
@@ -302,10 +339,10 @@ export default class TransferSummaryPage extends Component<Props> {
             {unitOfAccountSetting.enabled ? (
               <>
                 <div className={styles.amount}>
-                  {coinPrice != null
-                    ? calculateAndFormatValue(transferTx.recoveredBalance, coinPrice)
-                    : '-'
-                  }
+                  {convertedToUnitOfAccount(
+                    transferTx.recoveredBalance,
+                    unitOfAccountSetting.currency
+                  )}
                   <span className={styles.currencySymbol}>&nbsp;
                     {unitOfAccountSetting.currency}
                   </span>
@@ -319,7 +356,11 @@ export default class TransferSummaryPage extends Component<Props> {
             ) : (
               <div className={styles.amount}>{recoveredBalance}
                 <span className={styles.currencySymbol}>
-                  &nbsp;{this.props.ticker}
+                  &nbsp;{
+                    getTokenName(this.props.getTokenInfo(
+                      transferTx.recoveredBalance.getDefaultEntry()
+                    ))
+                  }
                 </span>
               </div>
             )}
@@ -332,9 +373,9 @@ export default class TransferSummaryPage extends Component<Props> {
             {unitOfAccountSetting.enabled ? (
               <>
                 <div className={styles.fees}>
-                  {'+' + (coinPrice != null
-                    ? calculateAndFormatValue(transferTx.fee, coinPrice)
-                    : '-'
+                  +{convertedToUnitOfAccount(
+                    transferTx.fee,
+                    unitOfAccountSetting.currency
                   )}
                   <span className={styles.currencySymbol}>&nbsp;
                     {unitOfAccountSetting.currency}
@@ -349,7 +390,11 @@ export default class TransferSummaryPage extends Component<Props> {
             ) : (
               <div className={styles.fees}>{transactionFee}
                 <span className={styles.currencySymbol}>
-                  &nbsp;{this.props.ticker}
+                  &nbsp;{
+                    getTokenName(this.props.getTokenInfo(
+                      transferTx.fee.getDefaultEntry()
+                    ))
+                  }
                 </span>
               </div>
             )}
@@ -363,13 +408,11 @@ export default class TransferSummaryPage extends Component<Props> {
           {unitOfAccountSetting.enabled ? (
             <>
               <div className={styles.totalAmount}>
-                {coinPrice != null
-                  ? calculateAndFormatValue(
-                    transferTx.recoveredBalance.minus(transferTx.fee),
-                    coinPrice
-                  )
-                  : '-'
-                }
+                {convertedToUnitOfAccount(
+                    transferTx.recoveredBalance
+                      .joinSubtractCopy(transferTx.fee),
+                    unitOfAccountSetting.currency
+                  )}
                 <span className={styles.currencySymbol}>&nbsp;
                   {unitOfAccountSetting.currency}
                 </span>
@@ -383,7 +426,11 @@ export default class TransferSummaryPage extends Component<Props> {
           ) : (
             <div className={styles.totalAmount}>{finalBalance}
               <span className={styles.currencySymbol}>
-                &nbsp;{this.props.ticker}
+                &nbsp;{
+                  getTokenName(this.props.getTokenInfo(
+                    transferTx.recoveredBalance.getDefaultEntry()
+                  ))
+                }
               </span>
             </div>
           )}

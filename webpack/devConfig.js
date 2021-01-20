@@ -2,6 +2,7 @@
 
 const commonConfig = require('./commonConfig');
 const connections = require('../scripts/connections');
+const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 
 const path = require('path');
 const webpack = require('webpack');
@@ -61,6 +62,7 @@ const baseDevConfig = (
   },
   plugins: [
     ...commonConfig.plugins('dev', networkName),
+    new ReactRefreshWebpackPlugin(),
     new webpack.DefinePlugin(commonConfig.definePlugin(networkName, false, isNightly)),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.IgnorePlugin(/[^/]+\/[\S]+.prod$/),
@@ -75,7 +77,10 @@ const baseDevConfig = (
       {
         test: /\.js$/,
         loader: 'babel-loader?cacheDirectory',
-        exclude: /node_modules/
+        exclude: /node_modules/,
+        options: {
+          plugins: [[require.resolve('react-refresh/babel'), { skipEnvCheck: true }]],
+        },
       },
       {
         test: /\.(js|jsx)$/,

@@ -4,10 +4,6 @@ import type {
   lf$Database,
 } from 'lovefield';
 
-import {
-  BigNumber
-} from 'bignumber.js';
-
 import { ConceptualWallet } from '../ConceptualWallet/index';
 import type { IConceptualWallet } from '../ConceptualWallet/interfaces';
 
@@ -63,18 +59,14 @@ import type {
   TreeInsert,
 } from '../../database/walletTypes/common/utils';
 import type { Bip44ChainInsert } from '../../database/walletTypes/common/tables';
+import { MultiToken } from '../../../../../common/lib/MultiToken';
 
 export type Address = {|
   +address: string,
 |};
 
 export type Value = {|
-  /**
-   * note: an undefined value is different than a value of 0
-   * since you can have a UTXO with a value of 0
-   * which is different from having no UTXO at all
-   */
-  +value: void | BigNumber,
+  +values: MultiToken,
 |};
 export type Addressing = {|
   +addressing: {|
@@ -284,7 +276,7 @@ export interface IHasUtxoChains {
 }
 
 export type IGetUtxoBalanceRequest = void;
-export type IGetUtxoBalanceResponse = BigNumber;
+export type IGetUtxoBalanceResponse = MultiToken;
 export type IGetUtxoBalanceFunc = (
   body: IGetUtxoBalanceRequest
 ) => Promise<IGetUtxoBalanceResponse>;
@@ -396,7 +388,7 @@ export interface IScanAddresses {
 }
 
 export type IGetBalanceRequest = void;
-export type IGetBalanceResponse = BigNumber;
+export type IGetBalanceResponse = MultiToken;
 export type IGetBalanceFunc = (
   body: IGetBalanceRequest
 ) => Promise<IGetBalanceResponse>;

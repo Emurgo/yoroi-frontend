@@ -8,14 +8,14 @@ import type {
   TransactionRow,
 } from '../../../primitives/tables';
 import { TransactionType } from '../../../primitives/tables';
-import { GetCertificates, } from '../../../primitives/api/read';
+import { GetCertificates, AssociateToken } from '../../../primitives/api/read';
 import type { CardanoByronTxIO, CardanoShelleyTxIO, JormungandrTxIO, ErgoTxIO } from '../tables';
 
 import {
   AssociateTxWithAccountingIOs,
 } from '../../account/api/read';
 import {
-  AssociateTxWithUtxoIOs, AssociateToken,
+  AssociateTxWithUtxoIOs,
 } from '../../utxo/api/read';
 
 const getOrThrow = function<T> (input: T | void): T {
@@ -27,23 +27,50 @@ export class CardanoByronAssociateTxWithIOs {
   static ownTables: {||} = Object.freeze({});
   static depTables: {|
     AssociateTxWithUtxoIOs: typeof AssociateTxWithUtxoIOs,
+    AssociateToken: typeof AssociateToken,
   |} = Object.freeze({
     AssociateTxWithUtxoIOs,
+    AssociateToken,
   });
 
   static async getIOsForTx(
     db: lf$Database,
     tx: lf$Transaction,
-    request: {| txs: $ReadOnlyArray<$ReadOnly<TransactionRow>>, |},
+    request: {|
+      txs: $ReadOnlyArray<$ReadOnly<TransactionRow>>,
+      networkId: number,
+    |},
   ): Promise<Array<CardanoByronTxIO>> {
     const utxo = await CardanoByronAssociateTxWithIOs.depTables.AssociateTxWithUtxoIOs.getIOsForTx(
-      db, tx, request
+      db, tx, { txs: request.txs }
+    );
+
+    const tokens = await CardanoByronAssociateTxWithIOs.depTables.AssociateToken.join(
+      db, tx,
+      {
+        listIds: request.txs.flatMap(transaction => {
+          const inputs = getOrThrow(utxo.get(transaction));
+          return [
+            ...inputs.utxoInputs.map(input => input.TokenListId),
+            ...inputs.utxoOutputs.map(input => input.TokenListId),
+          ];
+        }),
+        networkId: request.networkId,
+      }
     );
 
     const fullTx = request.txs.map(transaction  => ({
       txType: TransactionType.CardanoByron,
       transaction,
       ...getOrThrow(utxo.get(transaction)),
+      tokens: tokens.map(token => ({
+        TokenList: token.TokenList,
+        Token: {
+          TokenId: token.Token.TokenId,
+          Identifier: token.Token.Identifier,
+          NetworkId: token.Token.NetworkId,
+        },
+      })),
     }));
     return fullTx;
   }
@@ -55,23 +82,47 @@ export class JormungandrAssociateTxWithIOs {
     AssociateTxWithAccountingIOs: typeof AssociateTxWithAccountingIOs,
     AssociateTxWithUtxoIOs: typeof AssociateTxWithUtxoIOs,
     GetCertificates: typeof GetCertificates,
+    AssociateToken: typeof AssociateToken,
   |} = Object.freeze({
     AssociateTxWithAccountingIOs,
     AssociateTxWithUtxoIOs,
     GetCertificates,
+    AssociateToken,
   });
 
   static async getIOsForTx(
     db: lf$Database,
     tx: lf$Transaction,
-    request: {| txs: $ReadOnlyArray<$ReadOnly<TransactionRow>>, |},
+    request: {|
+      txs: $ReadOnlyArray<$ReadOnly<TransactionRow>>,
+      networkId: number,
+    |},
   ): Promise<Array<JormungandrTxIO>> {
+    if (request.txs.length === 0) return [];
+
     const { depTables } = JormungandrAssociateTxWithIOs;
     const accounting = await depTables.AssociateTxWithAccountingIOs.getIOsForTx(
-      db, tx, request
+      db, tx, { txs: request.txs }
     );
     const utxo = await depTables.AssociateTxWithUtxoIOs.getIOsForTx(
-      db, tx, request
+      db, tx, { txs: request.txs }
+    );
+
+    const tokens = await depTables.AssociateToken.join(
+      db, tx,
+      {
+        listIds: request.txs.flatMap(transaction => {
+          const utxoEntries = getOrThrow(utxo.get(transaction));
+          const accountingEntries = getOrThrow(accounting.get(transaction));
+          return [
+            ...utxoEntries.utxoInputs.map(entry => entry.TokenListId),
+            ...utxoEntries.utxoOutputs.map(entry => entry.TokenListId),
+            ...accountingEntries.accountingInputs.map(entry => entry.TokenListId),
+            ...accountingEntries.accountingOutputs.map(entry => entry.TokenListId),
+          ];
+        }),
+        networkId: request.networkId,
+      }
     );
 
     const certsForTxs = await depTables.GetCertificates.forTransactions(
@@ -84,6 +135,14 @@ export class JormungandrAssociateTxWithIOs {
       certificates: certsForTxs.get(transaction.TransactionId) ?? [],
       ...getOrThrow(utxo.get(transaction)),
       ...getOrThrow(accounting.get(transaction)),
+      tokens: tokens.map(token => ({
+        TokenList: token.TokenList,
+        Token: {
+          TokenId: token.Token.TokenId,
+          Identifier: token.Token.Identifier,
+          NetworkId: token.Token.NetworkId,
+        },
+      })),
     }));
     return fullTx;
   }
@@ -95,28 +154,50 @@ export class CardanoShelleyAssociateTxWithIOs {
     AssociateTxWithUtxoIOs: typeof AssociateTxWithUtxoIOs,
     GetCertificates: typeof GetCertificates,
     AssociateTxWithAccountingIOs: typeof AssociateTxWithAccountingIOs,
+    AssociateToken: typeof AssociateToken,
   |} = Object.freeze({
     AssociateTxWithUtxoIOs,
     GetCertificates,
     AssociateTxWithAccountingIOs,
+    AssociateToken,
   });
 
   static async getIOsForTx(
     db: lf$Database,
     tx: lf$Transaction,
-    request: {| txs: $ReadOnlyArray<$ReadOnly<TransactionRow>>, |},
+    request: {|
+      txs: $ReadOnlyArray<$ReadOnly<TransactionRow>>,
+      networkId: number,
+    |},
   ): Promise<Array<CardanoShelleyTxIO>> {
     const { depTables } = CardanoShelleyAssociateTxWithIOs;
     const utxo = await depTables.AssociateTxWithUtxoIOs.getIOsForTx(
-      db, tx, request
+      db, tx, { txs: request.txs }
     );
     const accounting = await depTables.AssociateTxWithAccountingIOs.getIOsForTx(
-      db, tx, request
+      db, tx, { txs: request.txs }
     );
 
     const certsForTxs = await depTables.GetCertificates.forTransactions(
       db, tx,
       { txIds: request.txs.map(transaction => transaction.TransactionId) },
+    );
+
+    const tokens = await CardanoByronAssociateTxWithIOs.depTables.AssociateToken.join(
+      db, tx,
+      {
+        listIds: request.txs.flatMap(transaction => {
+          const utxoEntries = getOrThrow(utxo.get(transaction));
+          const accountingEntries = getOrThrow(accounting.get(transaction));
+          return [
+            ...utxoEntries.utxoInputs.map(entry => entry.TokenListId),
+            ...utxoEntries.utxoOutputs.map(entry => entry.TokenListId),
+            ...accountingEntries.accountingInputs.map(entry => entry.TokenListId),
+            ...accountingEntries.accountingOutputs.map(entry => entry.TokenListId),
+          ];
+        }),
+        networkId: request.networkId,
+      }
     );
 
     const fullTx = request.txs.map(transaction  => ({
@@ -125,6 +206,14 @@ export class CardanoShelleyAssociateTxWithIOs {
       certificates: certsForTxs.get(transaction.TransactionId) ?? [],
       ...getOrThrow(utxo.get(transaction)),
       accountingInputs: getOrThrow(accounting.get(transaction)).accountingInputs,
+      tokens: tokens.map(token => ({
+        TokenList: token.TokenList,
+        Token: {
+          TokenId: token.Token.TokenId,
+          Identifier: token.Token.Identifier,
+          NetworkId: token.Token.NetworkId,
+        },
+      })),
     }));
     return fullTx;
   }
@@ -143,25 +232,27 @@ export class ErgoAssociateTxWithIOs {
   static async getIOsForTx(
     db: lf$Database,
     tx: lf$Transaction,
-    request: {| txs: $ReadOnlyArray<$ReadOnly<TransactionRow>>, |},
+    request: {|
+      txs: $ReadOnlyArray<$ReadOnly<TransactionRow>>,
+      networkId: number,
+    |},
   ): Promise<Array<ErgoTxIO>> {
     const utxo = await ErgoAssociateTxWithIOs.depTables.AssociateTxWithUtxoIOs.getIOsForTx(
-      db, tx, request
+      db, tx, { txs: request.txs }
     );
 
-    const inputIds = [];
-    const outputIds = [];
-    utxo.forEach(entry => {
-      entry.utxoInputs.forEach(input => inputIds.push(input.UtxoTransactionInputId));
-      entry.utxoOutputs.forEach(output => outputIds.push(output.UtxoTransactionOutputId));
-    });
-    const utxoInputTokens = await ErgoAssociateTxWithIOs.depTables.AssociateToken.forUtxoInput(
+    const tokens = await CardanoByronAssociateTxWithIOs.depTables.AssociateToken.join(
       db, tx,
-      { utxoInputIds: inputIds }
-    );
-    const utxoOutputTokens = await ErgoAssociateTxWithIOs.depTables.AssociateToken.forUtxoOutput(
-      db, tx,
-      { utxoOutputIds: outputIds }
+      {
+        listIds: request.txs.flatMap(transaction => {
+          const utxoEntries = getOrThrow(utxo.get(transaction));
+          return [
+            ...utxoEntries.utxoInputs.map(entry => entry.TokenListId),
+            ...utxoEntries.utxoOutputs.map(entry => entry.TokenListId),
+          ];
+        }),
+        networkId: request.networkId,
+      }
     );
 
     const fullTx = request.txs.map(transaction  => {
@@ -170,12 +261,14 @@ export class ErgoAssociateTxWithIOs {
         txType: TransactionType.Ergo,
         transaction,
         ...txRow,
-        utxoTokenInputs: txRow.utxoInputs.flatMap(
-          input => utxoInputTokens.get(input.UtxoTransactionInputId) || []
-        ),
-        utxoTokenOutputs: txRow.utxoOutputs.flatMap(
-          output => utxoOutputTokens.get(output.UtxoTransactionOutputId) || []
-        ),
+        tokens: tokens.map(token => ({
+          TokenList: token.TokenList,
+          Token: {
+            TokenId: token.Token.TokenId,
+            Identifier: token.Token.Identifier,
+            NetworkId: token.Token.NetworkId,
+          },
+        })),
       };
     });
     return fullTx;

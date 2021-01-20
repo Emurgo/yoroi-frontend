@@ -1105,6 +1105,8 @@ declare module 'ergo-lib-wasm-browser' { // need to wrap flowgen output into mod
     * @returns {TokenId}
     */
     static from_str(str: string): TokenId;
+
+    to_str(): string;
   }
   /**
   * Array of tokens

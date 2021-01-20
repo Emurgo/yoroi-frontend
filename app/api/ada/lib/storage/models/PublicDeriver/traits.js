@@ -226,6 +226,7 @@ const GetAllUtxosMixin = (
     const utxosInStorage = await deps.GetUtxoTxOutputsWithTx.getUtxo(
       super.getDb(), tx,
       addressIds,
+      this.getParent().getNetworkInfo().NetworkId
     );
     const addressingMap = new Map<number, {| ...Address, ...Addressing |}>(
       addresses.flatMap(family => family.addrs.map(addr => [addr.AddressId, {
@@ -1117,7 +1118,10 @@ const HasUtxoChainsMixin = (
     const nextUnused = await rawGetNextUnusedIndex(
       super.getDb(), tx,
       { GetUtxoTxOutputsWithTx: deps.GetUtxoTxOutputsWithTx, },
-      { addressesForChain: internalAddresses },
+      {
+        addressesForChain: internalAddresses,
+        networkId: this.getParent().getNetworkInfo().NetworkId,
+      },
     );
     if (nextUnused.addressInfo == null) {
       return {
@@ -1705,18 +1709,18 @@ const ScanErgoAccountUtxoMixin = (
     const key = BIP32PublicKey.fromBuffer(Buffer.from(body.accountPublicKey, 'hex'));
 
     const network = this.getParent().getNetworkInfo();
-    const networkId = ((
+    const chainNetworkId = ((
       Number.parseInt(network.BaseConfig[0].ChainNetworkId, 10): any
     ): $Values<typeof RustModule.SigmaRust.NetworkPrefix>);
 
     return await scanBip44Account({
       generateInternalAddresses: ergoGenAddressBatchFunc(
         deriveKey(key, ChainDerivations.INTERNAL).key,
-        networkId
+        chainNetworkId
       ),
       generateExternalAddresses: ergoGenAddressBatchFunc(
         deriveKey(key, ChainDerivations.EXTERNAL).key,
-        networkId
+        chainNetworkId
       ),
       lastUsedInternal: body.lastUsedInternal,
       lastUsedExternal: body.lastUsedExternal,
@@ -1873,7 +1877,10 @@ const ScanUtxoAccountAddressesMixin = (
     const nextUnusedInternal = await rawGetNextUnusedIndex(
       super.getDb(), tx,
       { GetUtxoTxOutputsWithTx: deps.GetUtxoTxOutputsWithTx, },
-      { addressesForChain: internalAddresses },
+      {
+        addressesForChain: internalAddresses,
+        networkId: this.getParent().getNetworkInfo().NetworkId,
+      },
     );
     const externalAddresses = await this.rawGetAddressesForChain(
       tx,
@@ -1888,7 +1895,10 @@ const ScanUtxoAccountAddressesMixin = (
     const nextUnusedExternal = await rawGetNextUnusedIndex(
       super.getDb(), tx,
       { GetUtxoTxOutputsWithTx: deps.GetUtxoTxOutputsWithTx, },
-      { addressesForChain: externalAddresses }
+      {
+        addressesForChain: externalAddresses,
+        networkId: this.getParent().getNetworkInfo().NetworkId,
+      }
     );
 
     const newToInsert = await this.rawScanAccount(
@@ -2044,7 +2054,10 @@ const ScanUtxoChainAddressesMixin = (
     const lastUsedIndex = await rawGetNextUnusedIndex(
       super.getDb(), tx,
       { GetUtxoTxOutputsWithTx: deps.GetUtxoTxOutputsWithTx, },
-      { addressesForChain: addresses },
+      {
+        addressesForChain: addresses,
+        networkId: this.getParent().getNetworkInfo().NetworkId,
+      },
     );
 
     const newToInsert = await this.rawScanChain(
@@ -2166,7 +2179,10 @@ const GetUtxoBalanceMixin = (
       undefined,
       derivationTables,
     );
-    return getBalanceForUtxos(utxos.map(utxo => utxo.output.UtxoTransactionOutput));
+    return getBalanceForUtxos(
+      utxos.map(utxo => utxo.output),
+      this.getParent().getDefaultToken()
+    );
   }
   getUtxoBalance: IGetUtxoBalanceRequest => Promise<IGetUtxoBalanceResponse> = async (_body) => {
     const derivationTables = this.getParent().getDerivationTables();

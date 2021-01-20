@@ -39,6 +39,7 @@ function getProtocolParams(): {|
   linearFee: RustModule.WalletV4.LinearFee,
   minimumUtxoVal: RustModule.WalletV4.BigNum,
   poolDeposit: RustModule.WalletV4.BigNum,
+  networkId: number,
   |} {
   const baseConfig = getCardanoHaskellBaseConfig(network)
     .reduce((acc, next) => Object.assign(acc, next), {});
@@ -50,6 +51,7 @@ function getProtocolParams(): {|
     ),
     minimumUtxoVal: RustModule.WalletV4.BigNum.from_str(baseConfig.MinimumUtxoVal),
     poolDeposit: RustModule.WalletV4.BigNum.from_str(baseConfig.PoolDeposit),
+    networkId: network.NetworkId,
   };
 }
 
@@ -106,8 +108,8 @@ describe('Byron era tx format tests', () => {
       protocolParams: getProtocolParams(),
     });
 
-    expect(transferInfo.fee.toString()).toBe('0.167965');
-    expect(transferInfo.recoveredBalance.toString()).toBe('2');
+    expect(transferInfo.fee.getDefault().toString()).toBe('167965');
+    expect(transferInfo.recoveredBalance.getDefault().toString()).toBe('2000000');
     expect(transferInfo.senders).toEqual([address]);
     expect(transferInfo.receivers[0]).toBe(outAddress);
 
@@ -205,8 +207,8 @@ describe('Byron era tx format tests', () => {
       protocolParams: getProtocolParams(),
     });
 
-    expect(transferInfo.fee.toString()).toBe('0.328169');
-    expect(transferInfo.recoveredBalance.toString()).toBe('100.0001');
+    expect(transferInfo.fee.getDefault().toString()).toBe('328169');
+    expect(transferInfo.recoveredBalance.getDefault().toString()).toBe('100000100');
     expect(transferInfo.senders).toEqual([address]);
     expect(transferInfo.receivers[0]).toBe(outAddress);
 

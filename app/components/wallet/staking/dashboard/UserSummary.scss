@@ -11,11 +11,11 @@
   padding: 20px 20px;
   flex: 1;
   border-radius: 6px;
-  box-shadow: 0px 0px 7px 3px var(--theme-dashboard-card-shadow-color);
+  box-shadow: 0px 3px 10px 2px var(--theme-dashboard-card-shadow-color);
   position: relative;
   overflow: hidden;
   min-width: 342px;
-  max-width: 342px;
+  max-width: 378px;
   min-height: 164px;
   margin-bottom: 10px;
 
@@ -90,8 +90,9 @@
 .amountNote {
   margin-top: 5px;
   font-size: 12px;
-  line-height: normal;
+  line-height: 20px;
   color: var(--theme-dashboard-link-color);
+  max-width: 248px;
 }
 
 .mr20 {

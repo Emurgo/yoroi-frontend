@@ -33,7 +33,6 @@ import type {
 } from '../../api/ada/lib/storage/bridge/memos';
 import WalletTransaction from '../../domain/WalletTransaction';
 import type { TransactionRowsToExportRequest } from '../../actions/common/transactions-actions';
-import type { PriceDataRow } from '../../api/ada/lib/storage/database/prices/tables';
 import LocalizableError from '../../i18n/LocalizableError';
 import type { MemosForWallet } from '../../stores/toplevel/MemosStore';
 import type { DelegationRequests } from '../../stores/toplevel/DelegationStore';
@@ -42,10 +41,11 @@ import { SelectedExplorer } from '../../domain/SelectedExplorer';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import type { GetTransactionsRequestOptions } from '../../api/common/index';
 import type { UnconfirmedAmount } from '../../types/unconfirmedAmountType';
-import { getApiForNetwork, getApiMeta } from '../../api/common/utils';
 import type { IAddressTypeStore, IAddressTypeUiSubset } from '../../stores/stateless/addressStores';
 import { genAddressLookup } from '../../stores/stateless/addressStores';
 import { addressToDisplayString } from '../../api/ada/lib/storage/bridge/utils';
+import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
+import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
 
 export type GeneratedData = typeof WalletSummaryPage.prototype.generated;
 
@@ -84,9 +84,6 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
       Logger.error('[WalletSummaryPage::render] Active wallet required');
       return null;
     }
-
-    const apiMeta = getApiMeta(getApiForNetwork(publicDeriver.getParent().getNetworkInfo()))?.meta;
-    if (apiMeta == null) throw new Error(`${nameof(WalletSummaryPage)} no API selected`);
 
     const { exportTransactionsToFile, closeExportTransactionDialog } = actions.transactions;
 
@@ -130,7 +127,6 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
             transactions={recent}
             lastSyncBlock={lastSyncInfo.Height}
             memoMap={this.generated.stores.memos.txMemoMap.get(walletId) || new Map()}
-            priceMap={this.generated.stores.coinPriceStore.priceMap}
             selectedExplorer={
               this.generated.stores.explorers.selectedExplorer.get(
                 publicDeriver.getParent().getNetworkInfo().NetworkId
@@ -162,10 +158,9 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
                 },
               })
             }
-            unitOfAccountSetting={{
-              primaryTicker: apiMeta.primaryTicker,
-              settings: profile.unitOfAccount,
-            }}
+            unitOfAccountSetting={profile.unitOfAccount}
+            getCurrentPrice={this.generated.stores.coinPriceStore.getCurrentPrice}
+            getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
             addressLookup={genAddressLookup(
               publicDeriver,
               intl,
@@ -174,7 +169,6 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
             )}
             onCopyAddressTooltip={onCopyAddressTooltip}
             notification={notificationToolTip}
-            decimalPlaces={apiMeta.decimalPlaces.toNumber()}
             addressToDisplayString={addr =>
               addressToDisplayString(addr, publicDeriver.getParent().getNetworkInfo())
             }
@@ -248,10 +242,7 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
           }
           openExportTxToFileDialog={this.openExportTransactionDialog}
           unitOfAccountSetting={profile.unitOfAccount}
-          meta={{
-            decimalPlaces: apiMeta.decimalPlaces.toNumber(),
-            primaryTicker: apiMeta.primaryTicker,
-          }}
+          getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
         />
 
         {walletTransactions}
@@ -449,7 +440,7 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
         addressSubgroupMap: $ReadOnlyMap<Class<IAddressTypeStore>, IAddressTypeUiSubset>,
       |},
       coinPriceStore: {|
-        priceMap: Map<string, $ReadOnly<PriceDataRow>>,
+        getCurrentPrice: (from: string, to: string) => ?number
       |},
       memos: {|
         error: ?LocalizableError,
@@ -460,6 +451,9 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
       |},
       explorers: {|
         selectedExplorer: Map<number, SelectedExplorer>,
+      |},
+      tokenInfoStore: {|
+        tokenInfo: TokenInfoMap,
       |},
       profile: {|
         isClassicTheme: boolean,
@@ -527,8 +521,11 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
         wallets: {
           selected: stores.wallets.selected,
         },
+        tokenInfoStore: {
+          tokenInfo: stores.tokenInfoStore.tokenInfo,
+        },
         coinPriceStore: {
-          priceMap: stores.coinPriceStore.priceMap,
+          getCurrentPrice: stores.coinPriceStore.getCurrentPrice,
         },
         memos: {
           hasSetSelectedExternalStorageProvider: stores.memos.hasSetSelectedExternalStorageProvider,

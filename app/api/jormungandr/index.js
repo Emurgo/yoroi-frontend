@@ -103,7 +103,7 @@ import {
 import {
   getAllAddressesForDisplay,
 } from '../ada/lib/storage/bridge/traitUtils';
-import { convertAdaTransactionsToExportRows } from '../ada/transactions/utils';
+import { convertJormungandrTransactionsToExportRows } from './lib/transactions/utils';
 import { v3PublicToV2, v4Bip32PrivateToV3, derivePrivateByAddressing } from './lib/crypto/utils';
 import type { TransactionExportRow } from '../export';
 
@@ -114,10 +114,11 @@ import type {
   IsValidMnemonicResponse,
   RestoreWalletRequest, RestoreWalletResponse,
 } from '../common/types';
-import { getApiForNetwork } from '../common/utils';
-import { CoreAddressTypes } from '../ada/lib/storage/database/primitives/enums';
-import { getJormungandrBaseConfig } from '../ada/lib/storage/database/prepackaged/networks';
-import type { NetworkRow } from '../ada/lib/storage/database/primitives/tables';
+import { CoreAddressTypes, } from '../ada/lib/storage/database/primitives/enums';
+import { getJormungandrBaseConfig, } from '../ada/lib/storage/database/prepackaged/networks';
+import type { NetworkRow, TokenRow, } from '../ada/lib/storage/database/primitives/tables';
+import { MultiToken } from '../common/lib/MultiToken';
+import type { DefaultTokenEntry } from '../common/lib/MultiToken';
 
 // getAllAddressesForDisplay
 
@@ -198,11 +199,11 @@ export type CreateUnsignedTxFunc = (
 export type CreateDelegationTxRequest = {|
   publicDeriver: IPublicDeriver<ConceptualWallet> & IGetAllUtxos & IHasUtxoChains & IGetStakingKey,
   poolRequest: PoolRequest,
-  valueInAccount: BigNumber,
+  valueInAccount: MultiToken,
 |};
 export type CreateDelegationTxResponse = {|
   signTxRequest: JormungandrTxSignRequest,
-  totalAmountToDelegate: BigNumber,
+  totalAmountToDelegate: MultiToken,
 |};
 
 export type CreateDelegationTxFunc = (
@@ -263,6 +264,7 @@ export type RestoreWalletForTransferFunc = (
 
 export type GetTransactionRowsToExportRequest = {|
   publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels>,
+  getDefaultToken: number => $ReadOnly<TokenRow>,
 |};
 export type GetTransactionRowsToExportResponse = Array<TransactionExportRow>;
 export type GetTransactionRowsToExportFunc = (
@@ -335,7 +337,8 @@ export default class JormungandrApi {
         return JormungandrTransaction.fromAnnotatedTx({
           tx,
           addressLookupMap: fetchedTxs.addressLookupMap,
-          api: getApiForNetwork(request.publicDeriver.getParent().getNetworkInfo()),
+          network: request.publicDeriver.getParent().getNetworkInfo(),
+          defaultToken: request.publicDeriver.getParent().getDefaultToken(),
         });
       });
       return {
@@ -363,7 +366,8 @@ export default class JormungandrApi {
         return JormungandrTransaction.fromAnnotatedTx({
           tx,
           addressLookupMap: fetchedTxs.addressLookupMap,
-          api: getApiForNetwork(request.publicDeriver.getParent().getNetworkInfo()),
+          network: request.publicDeriver.getParent().getNetworkInfo(),
+          defaultToken: request.publicDeriver.getParent().getDefaultToken(),
         });
       });
       return mappedTransactions;
@@ -485,7 +489,10 @@ export default class JormungandrApi {
           receiver,
           addressedUtxo,
           undefined,
-          config.LinearFee,
+          {
+            feeConfig: config.LinearFee,
+            networkId: request.publicDeriver.getParent().getNetworkInfo().NetworkId,
+          },
         );
       } else if (request.amount != null) {
         const amount = request.amount;
@@ -505,7 +512,10 @@ export default class JormungandrApi {
           }],
           addressedUtxo,
           undefined,
-          config.LinearFee,
+          {
+            feeConfig: config.LinearFee,
+            networkId: request.publicDeriver.getParent().getNetworkInfo().NetworkId,
+          },
         );
       } else {
         throw new Error(`${nameof(this.createUnsignedTx)} unknown param`);
@@ -518,6 +528,8 @@ export default class JormungandrApi {
         unsignedTx: unsignedTxResponse.IOs,
         changeAddr: unsignedTxResponse.changeAddr,
         certificate: unsignedTxResponse.certificate,
+      }, {
+        NetworkId: request.publicDeriver.getParent().getNetworkInfo().NetworkId,
       });
     } catch (error) {
       Logger.error(
@@ -558,34 +570,50 @@ export default class JormungandrApi {
       }],
       addressedUtxo,
       certificate,
-      config.LinearFee,
+      {
+        feeConfig: config.LinearFee,
+        networkId: request.publicDeriver.getParent().getNetworkInfo().NetworkId,
+      },
     );
 
-    const allUtxosForKey = filterAddressesByStakingKey(
+    const allUtxosForKey = filterAddressesByStakingKey<ElementOf<IGetAllUtxosResponse>>(
       stakingKey,
       allUtxo,
       false,
     );
+
     const utxoSum = allUtxosForKey.reduce(
-      (sum, utxo) => sum.plus(new BigNumber(utxo.output.UtxoTransactionOutput.Amount)),
-      new BigNumber(0)
+      (sum, utxo) => sum.joinAddMutable(
+        new MultiToken(
+          utxo.output.tokens.map(token => ({
+            identifier: token.Token.Identifier,
+            amount: new BigNumber(token.TokenList.Amount),
+            networkId: token.Token.NetworkId,
+          })),
+          request.publicDeriver.getParent().getDefaultToken()
+        ),
+      ),
+      new MultiToken([], request.publicDeriver.getParent().getDefaultToken())
     );
 
     const differenceAfterTx = getDifferenceAfterTx(
       unsignedTx,
       allUtxo,
-      stakingKey
+      stakingKey,
+      request.publicDeriver.getParent().getDefaultToken(),
     );
 
     const totalAmountToDelegate = utxoSum
-      .plus(differenceAfterTx) // subtract any part of the fee that comes from UTXO
-      .plus(request.valueInAccount); // recall: Jormungandr rewards are compounding
+      .joinAddCopy(differenceAfterTx) // subtract any part of the fee that comes from UTXO
+      .joinAddCopy(request.valueInAccount); // recall: rewards are compounding
 
     const signTxRequest = new JormungandrTxSignRequest({
       senderUtxos: unsignedTx.senderUtxos,
       unsignedTx: unsignedTx.IOs,
       changeAddr: unsignedTx.changeAddr,
       certificate: unsignedTx.certificate,
+    }, {
+      NetworkId: request.publicDeriver.getParent().getNetworkInfo().NetworkId,
     });
     return {
       signTxRequest,
@@ -911,7 +939,10 @@ export default class JormungandrApi {
         publicDeriver: request.publicDeriver,
       });
       Logger.debug(`${nameof(JormungandrApi)}::${nameof(this.getTransactionRowsToExport)}: success`);
-      return convertAdaTransactionsToExportRows(fetchedTxs.txs);
+      return convertJormungandrTransactionsToExportRows(
+        fetchedTxs.txs,
+        request.getDefaultToken(request.publicDeriver.getParent().getNetworkInfo().NetworkId)
+      );
     } catch (error) {
       Logger.error(`${nameof(JormungandrApi)}::${nameof(this.getTransactionRowsToExport)}: ` + stringifyError(error));
 
@@ -933,10 +964,11 @@ function getDifferenceAfterTx(
   utxoResponse: V3UnsignedTxAddressedUtxoResponse,
   allUtxos: IGetAllUtxosResponse,
   stakingKey: RustModule.WalletV3.PublicKey,
-): BigNumber {
+  defaultToken: DefaultTokenEntry,
+): MultiToken {
   const stakingKeyString = Buffer.from(stakingKey.as_bytes()).toString('hex');
 
-  let sumInForKey = new BigNumber(0);
+  const sumInForKey = new MultiToken([], defaultToken);
   {
     // note senderUtxos.length is approximately 1
     // since it's just to cover transaction fees
@@ -951,23 +983,33 @@ function getDifferenceAfterTx(
       }
       const address = match.address;
       if (groupAddrContainsAccountKey(address, stakingKeyString, true)) {
-        sumInForKey = sumInForKey.plus(new BigNumber(senderUtxo.amount));
+        sumInForKey.joinAddMutable(new MultiToken(
+          match.output.tokens.map(token => ({
+            identifier: token.Token.Identifier,
+            amount: new BigNumber(token.TokenList.Amount),
+            networkId: token.Token.NetworkId,
+          })),
+          defaultToken
+        ));
       }
     }
   }
 
-  let sumOutForKey = new BigNumber(0);
+  const sumOutForKey = new MultiToken([], defaultToken);
   {
     const outputs = utxoResponse.IOs.outputs();
     for (let i = 0; i < outputs.size(); i++) {
       const output = outputs.get(i);
       const address = Buffer.from(output.address().as_bytes()).toString('hex');
       if (groupAddrContainsAccountKey(address, stakingKeyString, true)) {
-        const value = new BigNumber(output.value().to_str());
-        sumOutForKey = sumOutForKey.plus(value);
+        sumOutForKey.add({
+          amount: new BigNumber(output.value().to_str()),
+          identifier: defaultToken.defaultIdentifier,
+          networkId: defaultToken.defaultNetworkId,
+         });
       }
     }
   }
 
-  return sumOutForKey.minus(sumInForKey);
+  return sumOutForKey.joinSubtractCopy(sumInForKey);
 }

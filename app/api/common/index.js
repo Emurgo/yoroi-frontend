@@ -41,7 +41,19 @@ import type {
   IChangePasswordRequestFunc, IChangePasswordRequest, IChangePasswordResponse,
 } from '../ada/lib/storage/models/common/interfaces';
 import { WrongPassphraseError } from '../ada/lib/cardanoCrypto/cryptoErrors';
-import type { CoreAddressT } from '../ada/lib/storage/database/primitives/enums';
+import type { TokenRow } from '../ada/lib/storage/database/primitives/tables';
+import type { CoreAddressT, } from '../ada/lib/storage/database/primitives/enums';
+import { getAllTokenInfo } from './lib/tokens/utils';
+
+// getTokenInfo
+
+export type GetTokenInfoRequest = {|
+  db: lf$Database,
+|};
+export type GetTokenInfoResponse = $ReadOnlyArray<$ReadOnly<TokenRow>>;
+export type GetTokenInfoFunc = (
+  request: GetTokenInfoRequest
+) => Promise<GetTokenInfoResponse>;
 
 // getWallets
 
@@ -174,6 +186,22 @@ export type ChangeModelPasswordFunc = (
 
 
 export default class CommonApi {
+
+  async getTokenInfo(
+    request: GetTokenInfoRequest,
+  ): Promise<GetTokenInfoResponse> {
+    Logger.debug(`${nameof(this.getTokenInfo)} called`);
+    try {
+      const tokens = await getAllTokenInfo(request);
+      Logger.debug(`${nameof(this.getTokenInfo)} success: ` + stringifyData(tokens));
+      return tokens;
+    } catch (error) {
+      Logger.error(`${nameof(this.getTokenInfo)} error: ` + stringifyError(error));
+      if (error instanceof LocalizableError) throw error;
+      throw new GenericApiError();
+    }
+  }
+
   async getTxLastUpdatedDate(
     request: GetTxLastUpdateDateRequest
   ): Promise<GetTxLastUpdateDateResponse> {

@@ -59,8 +59,10 @@ export default class CoinPriceStore extends Store {
 
   setup(): void {
     setInterval(this._pollRefresh, CONFIG.app.coinPriceRefreshInterval);
-    // $FlowExpectedError[incompatible-call] built-in types can't handle visibilitychange
-    document.addEventListener('visibilitychange', debounce(this._pollRefresh, this.ON_VISIBLE_DEBOUNCE_WAIT));
+    document.addEventListener(
+      'visibilitychange',
+      debounce((_e) => this._pollRefresh(), this.ON_VISIBLE_DEBOUNCE_WAIT)
+    );
   }
 
   @action
@@ -91,6 +93,11 @@ export default class CoinPriceStore extends Store {
     });
   }
 
+  /**
+   * TODO: this should connect to the tokenInfoStore somehow
+   * Since a ticker isn't enough to know which currency to to lookup
+   * Since multiple tokens can have the same ticker
+   */
   getCurrentPrice(from: string, to: string): ?number {
     if (this.lastUpdateTimestamp === null) {
       return null;

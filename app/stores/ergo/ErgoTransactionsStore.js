@@ -13,6 +13,7 @@ export default class ErgoTransactionsStore extends Store {
       ...request,
       getTransactionsHistoryForAddresses: stateFetcher.getTransactionsHistoryForAddresses,
       checkAddressesInUse: stateFetcher.checkAddressesInUse,
+      getAssetInfo: stateFetcher.getAssetInfo,
       getBestBlock: stateFetcher.getBestBlock,
     });
   }

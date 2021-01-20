@@ -12,7 +12,6 @@ import YoroiTransferErrorPage from './YoroiTransferErrorPage';
 import VerticallyCenteredLayout from '../../components/layout/VerticallyCenteredLayout';
 import Dialog from '../../components/widgets/Dialog';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
-import { formattedWalletAmount } from '../../utils/formatters';
 import SpendingPasswordInput from '../../components/widgets/forms/SpendingPasswordInput';
 import { addressToDisplayString, } from '../../api/ada/lib/storage/bridge/utils';
 import globalMessages from '../../i18n/global-messages';
@@ -22,7 +21,6 @@ import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/in
 import { SelectedExplorer } from '../../domain/SelectedExplorer';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import LocalizableError from '../../i18n/LocalizableError';
-import { getApiForNetwork, getApiMeta } from '../../api/common/utils';
 import type { ISignRequest } from '../../api/common/lib/transactions/ISignRequest';
 import type {
   TransferTx,
@@ -35,6 +33,8 @@ import {
 import type { SendUsingLedgerParams } from '../../actions/ada/ledger-send-actions';
 import type { SendUsingTrezorParams } from '../../actions/ada/trezor-send-actions';
 import { isLedgerNanoWallet, isTrezorTWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
+import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
+import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
@@ -171,18 +171,7 @@ export default class TransferSendPage extends Component<Props> {
     if (selected == null) {
       throw new Error(`${nameof(TransferSendPage)} no wallet selected`);
     }
-    const api = getApiForNetwork(selected.getParent().getNetworkInfo());
-    const apiMeta = getApiMeta(api);
-    if (apiMeta == null) throw new Error(`${nameof(TransferSendPage)} no API selected`);
 
-    const coinPrice: ?number = this.generated.stores.profile.unitOfAccount.enabled
-      ? (
-        this.generated.stores.coinPriceStore.getCurrentPrice(
-          apiMeta.meta.primaryTicker,
-          this.generated.stores.profile.unitOfAccount.currency
-        )
-      )
-      : null;
     const withSigning = asGetSigningKey(selected);
 
     const spendingPasswordForm = withSigning == null
@@ -201,14 +190,11 @@ export default class TransferSendPage extends Component<Props> {
       <TransferSummaryPage
         header={this.props.header}
         form={spendingPasswordForm}
-        formattedWalletAmount={amount => formattedWalletAmount(
-          amount,
-          apiMeta.meta.decimalPlaces.toNumber(),
-        )}
         selectedExplorer={this.generated.stores.explorers.selectedExplorer
           .get(selected.getParent().getNetworkInfo().NetworkId) ?? (() => { throw new Error('No explorer for wallet network'); })()
         }
         transferTx={this.props.toTransferTx(tentativeTx)}
+        getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
         onSubmit={{
           label: this.props.onSubmit.label,
           trigger: this.submit,
@@ -217,7 +203,7 @@ export default class TransferSendPage extends Component<Props> {
         onCancel={this.props.onClose}
         error={this.generated.stores.wallets.sendMoneyRequest.error}
         dialogTitle={intl.formatMessage(globalMessages.walletSendConfirmationDialogTitle)}
-        coinPrice={coinPrice}
+        getCurrentPrice={this.generated.stores.coinPriceStore.getCurrentPrice}
         unitOfAccountSetting={this.generated.stores.profile.unitOfAccount}
         addressLookup={genAddressLookup(
           selected,
@@ -228,7 +214,6 @@ export default class TransferSendPage extends Component<Props> {
         addressToDisplayString={
           addr => addressToDisplayString(addr, selected.getParent().getNetworkInfo())
         }
-        ticker={apiMeta.meta.primaryTicker}
       />
     );
   }
@@ -273,6 +258,9 @@ export default class TransferSendPage extends Component<Props> {
       explorers: {|
         selectedExplorer: Map<number, SelectedExplorer>,
       |},
+      tokenInfoStore: {|
+        tokenInfo: TokenInfoMap,
+      |},
       profile: {|
         isClassicTheme: boolean,
         unitOfAccount: UnitOfAccountSettingType
@@ -313,6 +301,9 @@ export default class TransferSendPage extends Component<Props> {
             error: stores.wallets.sendMoneyRequest.error,
             isExecuting: stores.wallets.sendMoneyRequest.isExecuting,
           },
+        },
+        tokenInfoStore: {
+          tokenInfo: stores.tokenInfoStore.tokenInfo,
         },
         coinPriceStore: {
           getCurrentPrice: stores.coinPriceStore.getCurrentPrice,

@@ -15,7 +15,7 @@ import {
   promisifyDbCall,
 } from './utils';
 import { GetEncryptionMeta, } from './primitives/api/read';
-import { ModifyEncryptionMeta, ModifyNetworks, } from './primitives/api/write';
+import { ModifyEncryptionMeta, ModifyNetworks, ModifyToken, } from './primitives/api/write';
 import { ModifyExplorers, } from './explorers/api/write';
 import { populatePrimitivesDb, TransactionType } from './primitives/tables';
 import { populateCommonDb } from './walletTypes/common/tables';
@@ -29,9 +29,11 @@ import { populateMemoTransactionsDb } from './memos/tables';
 import { populatePricesDb } from './prices/tables';
 import { populateExplorerDb } from './explorers/tables';
 import { KeyKind } from '../../../../common/lib/crypto/keys/types';
-import { networks } from './prepackaged/networks';
+import { networks, defaultAssets } from './prepackaged/networks';
 import { prepackagedExplorers } from './prepackaged/explorers';
 import environment from '../../../../../environment';
+import type { LastSyncInfoRow } from './walletTypes/core/tables';
+import type { TokenRow } from './primitives/tables';
 
 // global var from window.indexedDB
 declare var indexedDB: IDBFactory;
@@ -89,7 +91,7 @@ const populateNetworkDefaults = async (
   await raii(
     db,
     depTables,
-    async tx => ModifyNetworks.upsert(
+    async tx => deps.ModifyNetworks.upsert(
       db,
       tx,
       Object.keys(networks).map(network => networks[network])
@@ -111,10 +113,30 @@ const populateExplorerDefaults = async (
   await raii(
     db,
     depTables,
-    async tx => ModifyExplorers.upsert(
+    async tx => deps.ModifyExplorers.upsert(
       db,
       tx,
       [...prepackagedExplorers.values()].flat(),
+    )
+  );
+};
+const populateAssetDefaults = async (
+  db: lf$Database,
+): Promise<void> => {
+  const deps = Object.freeze({
+    ModifyToken,
+  });
+  const depTables = Object
+    .keys(deps)
+    .map(key => deps[key])
+    .flatMap(table => getAllSchemaTables(db, table));
+  await raii(
+    db,
+    depTables,
+    async tx => deps.ModifyToken.upsert(
+      db,
+      tx,
+      defaultAssets,
     )
   );
 };
@@ -128,6 +150,7 @@ export const loadLovefieldDB = async (
   await populateEncryptionDefault(db);
   await populateNetworkDefaults(db);
   await populateExplorerDefaults(db);
+  await populateAssetDefaults(db);
 
   return db;
 };
@@ -154,7 +177,7 @@ export async function importOldDb(
 const populateAndCreate = async (
   storeType: $Values<typeof schema.DataStoreType>
 ): Promise<lf$Database> => {
-  const schemaVersion = 15;
+  const schemaVersion = 16;
   const schemaBuilder = schema.create(schemaName, schemaVersion);
 
   populatePrimitivesDb(schemaBuilder);
@@ -186,6 +209,69 @@ export async function clear(
     await tx.attach(db.delete().from(table));
   }
   await tx.commit();
+}
+
+async function deleteTxTables(
+  rawDb: lf$raw$BackStore,
+): Promise<void> {
+  // note: no need to commit for raw transactions
+  const tx = rawDb.getRawTransaction();
+
+  const tablesToDelete = [
+    'AccountingTransactionInput',
+    'AccountingTransactionOutput',
+    'Block',
+    'Certificate',
+    'CertificateAddress',
+    'TokenList',
+    'Transaction',
+    'UtxoTransactionInput',
+    'UtxoTransactionOutput',
+    'Token',
+  ];
+  const lastSyncBackingStore = tx.objectStore('LastSyncInfo');
+  const allLastSync = await promisifyDbCall<$ReadOnlyArray<$ReadOnly<{|
+    id: number,
+    value: $ReadOnly<LastSyncInfoRow>
+  // $FlowExpectedError[prop-missing] missing function in Flow built-in types
+  |}>>>(lastSyncBackingStore.getAll());
+
+  const tokenBackingStore = tx.objectStore('Token');
+  const allTokens = await promisifyDbCall<$ReadOnlyArray<$ReadOnly<{|
+    id: number,
+    value: $ReadOnly<TokenRow>
+  // $FlowExpectedError[prop-missing] missing function in Flow built-in types
+  |}>>>(tokenBackingStore.getAll());
+
+  for (const table of tablesToDelete) {
+    try {
+      const tableBackingStore = tx.objectStore(table);
+      await promisifyDbCall<void>(tableBackingStore.clear());
+    } catch (_e) {} // eslint-disable-line no-empty
+  }
+  // add back all the lastSyncInfo entries which need to exist for every public deriver
+  for (const lastSyncRow of allLastSync) {
+    const tableBackingStore = tx.objectStore('LastSyncInfo');
+    await promisifyDbCall<void>(tableBackingStore.put({
+      id: lastSyncRow.id,
+      value: {
+        LastSyncInfoId: lastSyncRow.value.LastSyncInfoId,
+        Time: new Date(Date.now()).getTime(),
+        SlotNum: null,
+        Height: 0,
+        BlockHash: null,
+      },
+    }));
+  }
+  // add back the default tokens
+  for (const tokenRow of allTokens.filter(row => row.value.IsDefault === true)) {
+    const tableBackingStore = tx.objectStore('Token');
+    await promisifyDbCall<void>(tableBackingStore.put({
+      id: tokenRow.id,
+      value: tokenRow.value,
+    }));
+  }
+  // note: no need to commit for raw transactions
 }
 
 /**
@@ -252,7 +338,8 @@ async function onUpgrade(
     // fix mistake of assuming tx hash was always unencrypted
     const tx = rawDb.getRawTransaction();
     const txMemoStore = tx.objectStore('TxMemo');
-    await promisifyDbCall(txMemoStore.clear());
+    await promisifyDbCall<void>(txMemoStore.clear());
+    // note: no need to commit for raw transactions
   }
 
   if (version >= 3 && version <= 9) {
@@ -331,5 +418,8 @@ async function onUpgrade(
       // recall: at the time we only supported Cardano
       null
     );
+  }
+  if (version >= 3 && version <= 15) {
+    await deleteTxTables(rawDb);
   }
 }

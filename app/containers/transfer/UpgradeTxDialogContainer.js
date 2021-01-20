@@ -9,7 +9,6 @@ import LocalizableError from '../../i18n/LocalizableError';
 import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 import globalMessages from '../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { formattedWalletAmount } from '../../utils/formatters';
 import { addressToDisplayString, } from '../../api/ada/lib/storage/bridge/utils';
 import type { IAddressTypeStore, IAddressTypeUiSubset } from '../../stores/stateless/addressStores';
 import { SelectedExplorer } from '../../domain/SelectedExplorer';
@@ -17,7 +16,6 @@ import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import type {
   TransferTx,
 } from '../../types/TransferTypes';
-import { getApiForNetwork, getApiMeta } from '../../api/common/utils';
 import { genAddressLookup, genAddressingLookup, allAddressSubgroups } from '../../stores/stateless/addressStores';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import TransferSummaryPage from '../../components/transfer/TransferSummaryPage';
@@ -30,6 +28,8 @@ import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import type {
   Addressing,
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
+import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
+import { getTokenName, genLookupOrFail } from '../../stores/stateless/tokenHelpers';
 
 export type GeneratedData = typeof UpgradeTxDialogContainer.prototype.generated;
 
@@ -119,8 +119,8 @@ export default class UpgradeTxDialogContainer extends Component<Props> {
     }
 
     return {
-      recoveredBalance: tentativeTx.totalOutput(true).plus(tentativeTx.fee(true)),
-      fee: tentativeTx.fee(true),
+      recoveredBalance: tentativeTx.totalOutput().joinAddCopy(tentativeTx.fee()),
+      fee: tentativeTx.fee(),
       senders: tentativeTx
         .uniqueSenderAddresses(),
       receivers: tentativeTx
@@ -144,26 +144,18 @@ export default class UpgradeTxDialogContainer extends Component<Props> {
       throw new Error(`${nameof(UpgradeTxDialogContainer)} no wallet selected`);
     }
     const network = selected.getParent().getNetworkInfo();
-
-    const api = getApiForNetwork(network);
-    const apiMeta = getApiMeta(api);
-    if (apiMeta == null) throw new Error(`${nameof(UpgradeTxDialogContainer)} no API selected`);
-
-    const coinPrice: ?number = this.generated.stores.profile.unitOfAccount.enabled
-      ? (
-        this.generated.stores.coinPriceStore.getCurrentPrice(
-          apiMeta.meta.primaryTicker,
-          this.generated.stores.profile.unitOfAccount.currency
-        )
-      )
-      : null;
+    const defaultToken = selected.getParent().getDefaultToken();
+    const defaultTokenInfo = genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)({
+      identifier: defaultToken.defaultIdentifier,
+      networkId: defaultToken.defaultNetworkId,
+    });
 
     const { intl } = this.context;
     const header = (
       <div>
         {intl.formatMessage(
           messages.explanation,
-          { ticker: apiMeta.meta.primaryTicker }
+          { ticker: getTokenName(defaultTokenInfo) }
         )}
         <br /><br />
       </div>
@@ -175,14 +167,11 @@ export default class UpgradeTxDialogContainer extends Component<Props> {
       <TransferSummaryPage
         header={header}
         form={undefined}
-        formattedWalletAmount={amount => formattedWalletAmount(
-          amount,
-          apiMeta.meta.decimalPlaces.toNumber(),
-        )}
         selectedExplorer={this.generated.stores.explorers.selectedExplorer
           .get(network.NetworkId) ?? (() => { throw new Error('No explorer for wallet network'); })()
         }
         transferTx={transferTx}
+        getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
         onSubmit={{
           trigger: async () => await this.submit({
             network,
@@ -202,7 +191,7 @@ export default class UpgradeTxDialogContainer extends Component<Props> {
         }}
         error={this.generated.stores.wallets.sendMoneyRequest.error}
         dialogTitle={intl.formatMessage(globalMessages.walletSendConfirmationDialogTitle)}
-        coinPrice={coinPrice}
+        getCurrentPrice={this.generated.stores.coinPriceStore.getCurrentPrice}
         unitOfAccountSetting={this.generated.stores.profile.unitOfAccount}
         addressLookup={genAddressLookup(
           selected,
@@ -213,7 +202,6 @@ export default class UpgradeTxDialogContainer extends Component<Props> {
         addressToDisplayString={
           addr => addressToDisplayString(addr, selected.getParent().getNetworkInfo())
         }
-        ticker={apiMeta.meta.primaryTicker}
       />
     );
   }
@@ -246,6 +234,9 @@ export default class UpgradeTxDialogContainer extends Component<Props> {
       |},
       explorers: {|
         selectedExplorer: Map<number, SelectedExplorer>,
+      |},
+      tokenInfoStore: {|
+        tokenInfo: TokenInfoMap,
       |},
       profile: {|
         isClassicTheme: boolean,
@@ -301,6 +292,9 @@ export default class UpgradeTxDialogContainer extends Component<Props> {
         },
         explorers: {
           selectedExplorer: stores.explorers.selectedExplorer,
+        },
+        tokenInfoStore: {
+          tokenInfo: stores.tokenInfoStore.tokenInfo,
         },
         wallets: {
           selected: stores.wallets.selected,

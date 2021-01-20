@@ -1,6 +1,5 @@
 // @flow
 import { action, observable } from 'mobx';
-import BigNumber from 'bignumber.js';
 import type {
   UserAnnotation,
 } from '../api/ada/transactions/types';
@@ -10,11 +9,13 @@ import type {
 import type {
   DbBlock,
   CertificatePart,
+  NetworkRow,
 } from '../api/ada/lib/storage/database/primitives/tables';
-import type { ApiOptionType } from '../api/common/utils';
-import { getApiMeta } from '../api/common/utils';
 import WalletTransaction, { toAddr } from './WalletTransaction';
 import type { WalletTransactionCtorData } from './WalletTransaction';
+import type {
+  DefaultTokenEntry,
+} from '../api/common/lib/MultiToken';
 
 export default class JormungandrTransaction extends WalletTransaction {
 
@@ -37,31 +38,38 @@ export default class JormungandrTransaction extends WalletTransaction {
       ...UserAnnotation,
     |},
     addressLookupMap: Map<number, string>,
-    api: ApiOptionType,
+    network: $ReadOnly<NetworkRow>,
+    defaultToken: DefaultTokenEntry
   |}): JormungandrTransaction {
-    const apiMeta = getApiMeta(request.api)?.meta;
-    if (apiMeta == null) throw new Error(`${nameof(JormungandrTransaction)} no API selected`);
-    const amountPerUnit = new BigNumber(10).pow(apiMeta.decimalPlaces);
-
-    const { addressLookupMap, tx } = request;
+    const { addressLookupMap, defaultToken, tx } = request;
 
     return new JormungandrTransaction({
       txid: tx.transaction.Hash,
       block: tx.block,
       type: tx.type,
-      amount: tx.amount.dividedBy(amountPerUnit).plus(tx.fee.dividedBy(amountPerUnit)),
-      fee: tx.fee.dividedBy(amountPerUnit),
+      amount: tx.amount.joinAddCopy(tx.fee),
+      fee: tx.fee,
       date: tx.block != null
         ? tx.block.BlockTime
         : new Date(tx.transaction.LastUpdateTime),
       addresses: {
         from: [
-          ...toAddr({ rows: tx.utxoInputs, amountPerUnit, addressLookupMap }),
-          ...toAddr({ rows: tx.accountingInputs, amountPerUnit, addressLookupMap }),
+          ...toAddr({ rows: tx.utxoInputs, addressLookupMap, tokens: tx.tokens, defaultToken, }),
+          ...toAddr({
+            rows: tx.accountingInputs,
+            addressLookupMap,
+            tokens: tx.tokens,
+            defaultToken,
+          }),
         ],
         to: [
-          ...toAddr({ rows: tx.utxoOutputs, amountPerUnit, addressLookupMap }),
-          ...toAddr({ rows: tx.accountingOutputs, amountPerUnit, addressLookupMap }),
+          ...toAddr({ rows: tx.utxoOutputs, addressLookupMap, tokens: tx.tokens, defaultToken, }),
+          ...toAddr({
+            rows: tx.accountingOutputs,
+            addressLookupMap,
+            tokens: tx.tokens,
+            defaultToken,
+          }),
         ],
       },
       certificates: tx.certificates,

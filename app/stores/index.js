@@ -30,6 +30,7 @@ import type { Api } from '../api/index';
 import { ApiOptions } from '../api/common/utils';
 import StateFetchStore from './toplevel/StateFetchStore';
 import CoinPriceStore from './toplevel/CoinPriceStore';
+import TokenInfoStore from './toplevel/TokenInfoStore';
 import ExplorerStore from './toplevel/ExplorerStore';
 import ServerConnectionStore from './toplevel/ServerConnectionStore';
 
@@ -37,6 +38,7 @@ import ServerConnectionStore from './toplevel/ServerConnectionStore';
 const storeClasses = Object.freeze({
   stateFetchStore: StateFetchStore,
   coinPriceStore: CoinPriceStore,
+  tokenInfoStore: TokenInfoStore,
   profile: ProfileStore,
   serverConnectionStore: ServerConnectionStore,
   app: AppStore,
@@ -63,6 +65,7 @@ const storeClasses = Object.freeze({
 export type StoresMap = {|
   stateFetchStore: StateFetchStore,
   coinPriceStore: CoinPriceStore,
+  tokenInfoStore: TokenInfoStore,
   profile: ProfileStore,
   serverConnectionStore: ServerConnectionStore,
   app: AppStore,
@@ -96,6 +99,7 @@ export type StoresMap = {|
 const stores: WithNullableFields<StoresMap> = observable({
   stateFetchStore: null, // best to initialize first to avoid issues
   coinPriceStore: null,
+  tokenInfoStore: null,
   profile: null,
   serverConnectionStore: null,
   app: null,

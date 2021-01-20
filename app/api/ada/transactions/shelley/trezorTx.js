@@ -101,8 +101,8 @@ export async function createTrezorSignTxPayload(
       )
     };
 
-  const metadata = signRequest.txMetadata();
-  request = metadata == null
+  const metadata = signRequest.metadata;
+  request = metadata === undefined
     ? request
     : {
       ...request,

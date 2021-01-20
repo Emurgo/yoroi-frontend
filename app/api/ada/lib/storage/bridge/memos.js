@@ -69,7 +69,7 @@ export type DeleteTxMemoFunc = (
 export type GetAllTxMemoRequest = {|
   db: lf$Database,
 |};
-export type GetAllTxMemoResponse = $ReadOnlyArray<TxMemoTableRow>;
+export type GetAllTxMemoResponse = $ReadOnlyArray<$ReadOnly<TxMemoTableRow>>;
 export type GetAllTxMemoFunc = (
   request: GetAllTxMemoRequest
 ) => Promise<GetAllTxMemoResponse>;

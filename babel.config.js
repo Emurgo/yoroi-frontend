@@ -69,11 +69,6 @@ module.exports = function (api /*: ApiType */) /*: * */ {
       '@babel/plugin-proposal-private-methods',
       '@babel/plugin-proposal-export-default-from',
       '@babel/plugin-proposal-export-namespace-from',
-      ...(api.env('development') || api.env('storybook')
-        ? [
-          'react-hot-loader/babel',
-        ]
-        : []),
     ],
     env: {
       cucumber: nodePlugins,

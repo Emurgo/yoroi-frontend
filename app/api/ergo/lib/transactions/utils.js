@@ -3,12 +3,15 @@
 import type {
   DbTransaction,
   DbBlock,
+  TokenRow,
 } from '../../../ada/lib/storage/database/primitives/tables';
+import {
+  PRIMARY_ASSET_CONSTANTS,
+} from '../../../ada/lib/storage/database/primitives/enums';
 import type {
   UserAnnotation,
 } from '../../../ada/transactions/types';
 import type { TransactionExportRow } from '../../../export';
-import { getErgoCurrencyMeta } from '../../currencyInfo';
 import BigNumber from 'bignumber.js';
 import { formatBigNumberToFloatString } from '../../../../utils/formatters';
 import {
@@ -25,21 +28,31 @@ import type { RemoteUnspentOutput } from '../state-fetch/types';
 
 export function convertErgoTransactionsToExportRows(
   transactions: $ReadOnlyArray<$ReadOnly<{
-  ...DbTransaction,
-  ...WithNullableFields<DbBlock>,
-  ...UserAnnotation,
-  ...,
-}>>
+    ...DbTransaction,
+    ...WithNullableFields<DbBlock>,
+    ...UserAnnotation,
+    ...,
+  }>>,
+  defaultAssetRow: $ReadOnly<TokenRow>,
 ): Array<TransactionExportRow> {
   const result = [];
-  const amountPerUnit = new BigNumber(10).pow(getErgoCurrencyMeta().decimalPlaces);
   for (const tx of transactions) {
     if (tx.block != null) {
       result.push({
         date: tx.block.BlockTime,
         type: tx.type === transactionTypes.INCOME ? 'in' : 'out',
-        amount: formatBigNumberToFloatString(tx.amount.abs().dividedBy(amountPerUnit)),
-        fee: formatBigNumberToFloatString(tx.fee.abs().dividedBy(amountPerUnit)),
+        amount: formatBigNumberToFloatString(
+          tx.amount.get(defaultAssetRow.Identifier)
+            ?.abs()
+            .shiftedBy(-defaultAssetRow.Metadata.numberOfDecimals)
+            ?? new BigNumber(0)
+        ),
+        fee: formatBigNumberToFloatString(
+          tx.fee.get(defaultAssetRow.Identifier)
+            ?.abs()
+            .shiftedBy(-defaultAssetRow.Metadata.numberOfDecimals)
+            ?? new BigNumber(0)
+        ),
       });
     }
   }
@@ -48,15 +61,9 @@ export function convertErgoTransactionsToExportRows(
 
 export function asAddressedUtxo(
   utxos: IGetAllUtxosResponse,
-  tokenMap: Map<number, Array<{
-    amount: number,
-    tokenId: string,
-    ...
-  }>>,
 ): Array<ErgoAddressedUtxo> {
   return utxos.map(utxo => {
     const output = utxo.output.UtxoTransactionOutput;
-    const tokens = tokenMap.get(output.UtxoTransactionOutputId);
     if (
       output.ErgoCreationHeight == null ||
       output.ErgoBoxId == null ||
@@ -64,17 +71,39 @@ export function asAddressedUtxo(
     ) {
       throw new Error(`${nameof(asAddressedUtxo)} missing Ergo fields for Ergo UTXO`);
     }
+    const { ErgoCreationHeight, ErgoBoxId, ErgoTree } = output;
+
+    const tokenTypes = utxo.output.tokens.reduce(
+      (acc, next) => {
+        if (next.Token.Identifier === PRIMARY_ASSET_CONSTANTS.Ergo) {
+          acc.amount = acc.amount.plus(next.TokenList.Amount);
+        } else {
+          acc.tokens.push({
+            amount: Number(next.TokenList.Amount),
+            tokenId: next.Token.Identifier,
+          });
+        }
+        return acc;
+      },
+      {
+        amount: new BigNumber(0),
+        tokens: [],
+      }
+    );
+
     return {
-      amount: output.Amount,
+      amount: tokenTypes.amount.toString(),
       receiver: utxo.address,
       tx_hash: utxo.output.Transaction.Hash,
       tx_index: utxo.output.UtxoTransactionOutput.OutputIndex,
       addressing: utxo.addressing,
-      creationHeight: output.ErgoCreationHeight,
-      boxId: output.ErgoBoxId,
-      assets: tokens,
-      additionalRegisters: undefined, // TODO
-      ergoTree: output.ErgoTree,
+      creationHeight: ErgoCreationHeight,
+      boxId: ErgoBoxId,
+      assets: tokenTypes.tokens,
+      additionalRegisters: utxo.output.UtxoTransactionOutput.ErgoRegisters == null
+        ? undefined
+        : JSON.parse(utxo.output.UtxoTransactionOutput.ErgoRegisters),
+      ergoTree: ErgoTree,
     };
   });
 }
@@ -104,6 +133,8 @@ export function replaceMockBoxId(utxo: RemoteUnspentOutput): RemoteUnspentOutput
     utxo.tx_index,
     tokens
   );
+
+  // TODO: no way to add registers to constructor in sigma-rust at this time
 
   return {
     ...utxo,

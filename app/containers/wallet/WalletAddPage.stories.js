@@ -45,7 +45,7 @@ import UserPasswordDialog from '../../components/wallet/add/paper-wallets/UserPa
 import { ProgressStep as PaperWalletProgressStep } from '../../stores/ada/PaperWalletCreateStore';
 import { PdfGenSteps } from '../../api/ada/paperWallet/paperWalletPdf';
 import { ROUTES } from '../../routes-config';
-import { networks, isJormungandr, } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { defaultAssets, networks, isJormungandr, } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import type { RestoreModeType } from '../../actions/common/wallet-restore-actions';
 import config from '../../config';
 import {
@@ -57,6 +57,10 @@ import {
 } from '../../stores/stateless/addressStores';
 import type { IAddressTypeStore, IAddressTypeUiSubset } from '../../stores/stateless/addressStores';
 import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
+import {
+  MultiToken,
+} from '../../api/common/lib/MultiToken';
+import { mockDefaultToken, mockFromDefaults } from '../../stores/toplevel/TokenInfoStore';
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -175,6 +179,9 @@ const defaultProps: {|
             ServerStatusErrors.Healthy,
           ),
           serverTime: undefined,
+        },
+        tokenInfoStore: {
+          tokenInfo: mockFromDefaults(defaultAssets),
         },
         wallets: {
           selected: null,
@@ -492,6 +499,9 @@ const restoreWalletProps: {|
         reset: action('reset'),
       },
     },
+    tokenInfoStore: {
+      tokenInfo: mockFromDefaults(defaultAssets),
+    },
     coinPriceStore: {
       getCurrentPrice: (_from, _to) => 5,
     },
@@ -515,10 +525,32 @@ const restoreWalletProps: {|
       error: request.yoroiTransferError,
       transferTx: {
         encodedTx: new Uint8Array([]),
-        fee: new BigNumber(1),
+        fee: new MultiToken(
+          [{
+            identifier: defaultAssets.filter(
+              asset => asset.NetworkId ===  request.selectedNetwork.NetworkId
+            )[0].Identifier,
+            amount: new BigNumber(1_000_000),
+            networkId: request.selectedNetwork.NetworkId,
+          }],
+          mockDefaultToken(
+            request.selectedNetwork.NetworkId
+          )
+        ),
         id: 'b65ae37bcc560e323ea8922de6573004299b6646e69ab9fac305f62f0c94c3ab',
         receivers: ['Ae2tdPwUPEZ5PxKxoyZDgjsKgMWMpTRa4PH3sVgARSGBsWwNBH3qg7cMFsP'],
-        recoveredBalance: new BigNumber(1000),
+        recoveredBalance: new MultiToken(
+          [{
+            identifier: defaultAssets.filter(
+              asset => asset.NetworkId ===  request.selectedNetwork.NetworkId
+            )[0].Identifier,
+            amount: new BigNumber(1000_000_000),
+            networkId: request.selectedNetwork.NetworkId,
+          }],
+          mockDefaultToken(
+            request.selectedNetwork.NetworkId
+          )
+        ),
         senders: ['Ae2tdPwUPEZE9RAm3d3zuuh22YjqDxhR1JF6G93uJsRrk51QGHzRUzLvDjL'],
       },
     },
@@ -1248,6 +1280,9 @@ export const LedgerUpgrade = (): Node => {
                   profile: {
                     isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
                     unitOfAccount: genUnitOfAccount(),
+                  },
+                  tokenInfoStore: {
+                    tokenInfo: mockFromDefaults(defaultAssets),
                   },
                   wallets: {
                     selected: wallet.publicDeriver,

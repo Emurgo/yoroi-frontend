@@ -85,6 +85,7 @@ export async function daedalusTransferTxFromAddresses(payload: {|
     linearFee: RustModule.WalletV4.LinearFee,
     minimumUtxoVal: RustModule.WalletV4.BigNum,
     poolDeposit: RustModule.WalletV4.BigNum,
+    networkId: number,
   |}
 |}): Promise<TransferTx> {
   const senderUtxos = await toSenderUtxos({

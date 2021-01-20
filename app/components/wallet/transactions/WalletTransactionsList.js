@@ -18,11 +18,13 @@ import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType'
 import OneSideBarDecoration from '../../widgets/OneSideBarDecoration';
 import globalMessages from '../../../i18n/global-messages';
 import type { TxMemoTableRow } from '../../../api/ada/lib/storage/database/memos/tables';
-import type { PriceDataRow } from '../../../api/ada/lib/storage/database/prices/tables';
-import { getPriceKey } from '../../../api/common/lib/storage/bridge/prices';
 import type { $npm$ReactIntl$IntlFormat, } from 'react-intl';
 import type { Notification } from '../../../types/notificationType';
 import { genAddressLookup } from '../../../stores/stateless/addressStores';
+import type {
+  TokenLookupKey,
+} from '../../../api/common/lib/MultiToken';
+import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 
 const messages = defineMessages({
   showMoreTransactionsButtonLabel: {
@@ -37,7 +39,6 @@ type Props = {|
   +transactions: Array<WalletTransaction>,
   +lastSyncBlock: number,
   +memoMap: Map<string, $ReadOnly<TxMemoTableRow>>,
-  +priceMap: Map<string, $ReadOnly<PriceDataRow>>,
   +isLoadingTransactions: boolean,
   +hasMoreToLoad: boolean,
   +selectedExplorer: SelectedExplorer,
@@ -46,15 +47,13 @@ type Props = {|
   +shouldHideBalance: boolean,
   +onAddMemo: WalletTransaction => void,
   +onEditMemo: WalletTransaction => void,
-  +unitOfAccountSetting: {|
-    +primaryTicker: string,
-    +settings: UnitOfAccountSettingType,
-  |},
+  +unitOfAccountSetting: UnitOfAccountSettingType,
+  +getCurrentPrice: (from: string, to: string) => ?number,
   +addressLookup: ReturnType<typeof genAddressLookup>,
   +onCopyAddressTooltip: (string, string) => void,
   +notification: ?Notification,
-  +decimalPlaces: number, // TODO: this should be tied to individual values, not the currency itself
   +addressToDisplayString: string => string,
+  +getTokenInfo: Inexact<TokenLookupKey> => $ReadOnly<TokenRow>,
 |};
 
 @observer
@@ -162,22 +161,9 @@ export default class WalletTransactionsList extends Component<Props> {
                 <Transaction
                   key={`${transaction.uniqueKey}`}
                   memo={this.props.memoMap.get(transaction.txid)}
-                  unitOfAccount={(() => {
-                    if (!this.props.unitOfAccountSetting.settings.enabled) {
-                      return {
-                        primaryTicker: this.props.unitOfAccountSetting.primaryTicker,
-                        priceInfo: undefined,
-                      };
-                    }
-                    return {
-                      primaryTicker: this.props.unitOfAccountSetting.primaryTicker,
-                      priceInfo: this.props.priceMap.get(getPriceKey(
-                        this.props.unitOfAccountSetting.primaryTicker,
-                        this.props.unitOfAccountSetting.settings.currency,
-                        transaction.date,
-                      ))
-                    };
-                  })()}
+                  unitOfAccountSetting={this.props.unitOfAccountSetting}
+                  getCurrentPrice={this.props.getCurrentPrice}
+                  getTokenInfo={this.props.getTokenInfo}
                   selectedExplorer={this.props.selectedExplorer}
                   data={transaction}
                   isLastInList={transactionIndex === group.transactions.length - 1}
@@ -196,7 +182,6 @@ export default class WalletTransactionsList extends Component<Props> {
                   addressLookup={this.props.addressLookup}
                   notification={notification}
                   onCopyAddressTooltip={onCopyAddressTooltip}
-                  decimalPlaces={this.props.decimalPlaces}
                   addressToDisplayString={this.props.addressToDisplayString}
                 />
               ))}

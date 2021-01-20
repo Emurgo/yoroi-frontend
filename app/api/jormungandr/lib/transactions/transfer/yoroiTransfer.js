@@ -20,7 +20,6 @@ import type {
   TransferTx
 } from '../../../../../types/TransferTypes';
 import { RustModule } from '../../../../ada/lib/cardanoCrypto/rustLoader';
-import { getJormungandrCurrencyMeta } from '../../../currencyInfo';
 import { networks } from '../../../../ada/lib/storage/database/prepackaged/networks';
 import type {
   AddressUtxoFunc,
@@ -30,6 +29,10 @@ import type {
 } from '../../../../ada/lib/storage/models/PublicDeriver/interfaces';
 import { toSenderUtxos } from '../../../../ada/transactions/transfer/utils';
 import type { NetworkRow, JormungandrFeeConfig } from '../../../../ada/lib/storage/database/primitives/tables';
+import {
+  MultiToken,
+} from '../../../../common/lib/MultiToken';
+import { PRIMARY_ASSET_CONSTANTS } from '../../../../ada/lib/storage/database/primitives/enums';
 
 /**
  * Generate transaction including all addresses with no change.
@@ -40,27 +43,43 @@ export async function buildYoroiTransferTx(payload: {|
   keyLevel: number,
   signingKey: RustModule.WalletV3.Bip32PrivateKey,
   useLegacyWitness: boolean,
-  genesisHash: string,
-  feeConfig: JormungandrFeeConfig,
+  protocolParams: {|
+    feeConfig: JormungandrFeeConfig,
+    networkId: number,
+    genesisHash: string,
+  |},
 |}): Promise<TransferTx> {
   try {
     const { senderUtxos, outputAddr, } = payload;
 
-    const totalBalance = senderUtxos
-      .map(utxo => new BigNumber(utxo.amount))
-      .reduce(
-        (acc, amount) => acc.plus(amount),
-        new BigNumber(0)
-      );
+    const totalBalance = new MultiToken(
+      [{
+        identifier: PRIMARY_ASSET_CONSTANTS.Jormungandr,
+        amount: senderUtxos
+          .map(utxo => new BigNumber(utxo.amount))
+          .reduce(
+            (acc, amount) => acc.plus(amount),
+            new BigNumber(0)
+          ),
+        networkId: payload.protocolParams.networkId,
+      }],
+      {
+        defaultNetworkId: payload.protocolParams.networkId,
+        defaultIdentifier: PRIMARY_ASSET_CONSTANTS.Jormungandr,
+      }
+    );
 
     // first build a transaction to see what the fee will be
     const unsignedTxResponse = sendAllUnsignedTx(
       outputAddr,
       senderUtxos,
       undefined,
-      payload.feeConfig
+      {
+        feeConfig: payload.protocolParams.feeConfig,
+        networkId: payload.protocolParams.networkId,
+      },
     );
-    const fee = getJormungandrTxFee(unsignedTxResponse.IOs, false);
+    const fee = getJormungandrTxFee(unsignedTxResponse.IOs, payload.protocolParams.networkId);
 
     // sign inputs
     const fragment = signTransaction(
@@ -69,16 +88,15 @@ export async function buildYoroiTransferTx(payload: {|
       payload.signingKey,
       payload.useLegacyWitness,
       undefined,
-      payload.genesisHash,
+      payload.protocolParams.genesisHash,
     );
 
     const uniqueSenders = Array.from(new Set(senderUtxos.map(utxo => utxo.receiver)));
 
-    const lovelacesPerAda = new BigNumber(10).pow(getJormungandrCurrencyMeta().decimalPlaces);
     // return summary of transaction
     return {
-      recoveredBalance: totalBalance.dividedBy(lovelacesPerAda),
-      fee: fee.dividedBy(lovelacesPerAda),
+      recoveredBalance: totalBalance,
+      fee,
       id: Buffer.from(fragment.id().as_bytes()).toString('hex'),
       encodedTx: fragment.as_bytes(),
       // recall: some addresses may be legacy, some may be Shelley
@@ -103,8 +121,11 @@ export async function yoroiTransferTxFromAddresses(payload: {|
   network: $ReadOnly<NetworkRow>,
   getUTXOsForAddresses: AddressUtxoFunc,
   useLegacyWitness: boolean,
-  genesisHash: string,
-  feeConfig: JormungandrFeeConfig,
+  protocolParams: {|
+    feeConfig: JormungandrFeeConfig,
+    networkId: number,
+    genesisHash: string,
+  |},
 |}): Promise<TransferTx> {
   const senderUtxos = await toSenderUtxos({
     network: payload.network,
@@ -117,7 +138,6 @@ export async function yoroiTransferTxFromAddresses(payload: {|
     signingKey: payload.signingKey,
     senderUtxos,
     useLegacyWitness: payload.useLegacyWitness,
-    genesisHash: payload.genesisHash,
-    feeConfig: payload.feeConfig,
+    protocolParams: payload.protocolParams,
   });
 }

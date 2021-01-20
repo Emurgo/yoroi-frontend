@@ -254,7 +254,7 @@ export class ModifyConceptualWallet {
     db: lf$Database,
     tx: lf$Transaction,
     request: ConceptualWalletInsert,
-  ): Promise<ConceptualWalletRow> {
+  ): Promise<$ReadOnly<ConceptualWalletRow>> {
     return await addNewRowToTable<ConceptualWalletInsert, ConceptualWalletRow>(
       db, tx,
       request,

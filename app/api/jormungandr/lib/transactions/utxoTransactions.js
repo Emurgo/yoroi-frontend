@@ -27,6 +27,10 @@ import {
   utxoToTxInput,
 } from './inputSelection';
 import type { JormungandrFeeConfig } from '../../../ada/lib/storage/database/primitives/tables';
+import {
+  MultiToken,
+} from '../../../common/lib/MultiToken';
+import { PRIMARY_ASSET_CONSTANTS } from '../../../ada/lib/storage/database/primitives/enums';
 
 type TxOutput = {|
   address: string,
@@ -37,7 +41,10 @@ export function sendAllUnsignedTx(
   receiver: string,
   allUtxos: Array<CardanoAddressedUtxo>,
   certificate: void | RustModule.WalletV3.Certificate,
-  feeConfig: JormungandrFeeConfig,
+  protocolParams: {|
+    feeConfig: JormungandrFeeConfig,
+    networkId: number,
+  |},
 ): V3UnsignedTxAddressedUtxoResponse {
   const addressingMap = new Map<RemoteUnspentOutput, CardanoAddressedUtxo>();
   for (const utxo of allUtxos) {
@@ -53,7 +60,7 @@ export function sendAllUnsignedTx(
     receiver,
     Array.from(addressingMap.keys()),
     certificate,
-    feeConfig,
+    protocolParams,
   );
 
   const addressedUtxos = unsignedTxResponse.senderUtxos.map(
@@ -78,7 +85,10 @@ export function sendAllUnsignedTxFromUtxo(
   receiver: string,
   allUtxos: Array<RemoteUnspentOutput>,
   certificate: void | RustModule.WalletV3.Certificate,
-  feeConfig: JormungandrFeeConfig,
+  protocolParams: {|
+    feeConfig: JormungandrFeeConfig,
+    networkId: number,
+  |},
 ): V3UnsignedTxUtxoResponse {
   const totalBalance = allUtxos
     .map(utxo => new BigNumber(utxo.amount))
@@ -90,7 +100,7 @@ export function sendAllUnsignedTxFromUtxo(
     throw new NotEnoughMoneyToSendError();
   }
 
-  const feeAlgorithm = generateFee(feeConfig);
+  const feeAlgorithm = generateFee(protocolParams.feeConfig);
   let fee;
   {
     // first build a transaction to see what the cost would be
@@ -128,7 +138,7 @@ export function sendAllUnsignedTxFromUtxo(
     [],
     allUtxos,
     certificate,
-    feeConfig,
+    protocolParams,
   );
   return unsignedTxResponse;
 }
@@ -138,7 +148,10 @@ export function newAdaUnsignedTx(
   changeAdaAddr: Array<{| ...Address, ...Addressing |}>,
   allUtxos: Array<CardanoAddressedUtxo>,
   certificate: void | RustModule.WalletV3.Certificate,
-  feeConfig: JormungandrFeeConfig,
+  protocolParams: {|
+    feeConfig: JormungandrFeeConfig,
+    networkId: number,
+  |},
 ): V3UnsignedTxAddressedUtxoResponse {
   const addressingMap = new Map<RemoteUnspentOutput, CardanoAddressedUtxo>();
   for (const utxo of allUtxos) {
@@ -155,7 +168,7 @@ export function newAdaUnsignedTx(
     changeAdaAddr,
     Array.from(addressingMap.keys()),
     certificate,
-    feeConfig,
+    protocolParams,
   );
 
   const addressedUtxos = unsignedTxResponse.senderUtxos.map(
@@ -186,9 +199,12 @@ export function newAdaUnsignedTxFromUtxo(
   changeAddresses: Array<{| ...Address, ...Addressing |}>,
   allUtxos: Array<RemoteUnspentOutput>,
   certificate: void | RustModule.WalletV3.Certificate,
-  feeConfig: JormungandrFeeConfig,
+  protocolParams: {|
+    feeConfig: JormungandrFeeConfig,
+    networkId: number,
+  |},
 ): V3UnsignedTxUtxoResponse {
-  const feeAlgorithm = generateFee(feeConfig);
+  const feeAlgorithm = generateFee(protocolParams.feeConfig);
 
   const ioBuilder = RustModule.WalletV3.InputOutputBuilder.empty();
   for (const output of outputs) {
@@ -233,7 +249,8 @@ export function newAdaUnsignedTxFromUtxo(
     const addedChange = filterToUsedChange(
       changeAddr,
       IOs.outputs(),
-      selectedUtxos
+      selectedUtxos,
+      protocolParams.networkId,
     );
     change.push(...addedChange);
   } else if (changeAddresses.length === 0) {
@@ -268,6 +285,7 @@ function filterToUsedChange(
   changeAddr: {| ...Address, ...Addressing |},
   outputs: RustModule.WalletV3.Outputs,
   selectedUtxos: Array<RemoteUnspentOutput>,
+  networkId: number,
 ): Array<{| ...Address, ...Value, ...Addressing |}> {
   // we should never have the change address also be an input
   // but we handle this edge case just in case
@@ -290,7 +308,17 @@ function filterToUsedChange(
       if (indexInInput === -1) {
         change.push({
           ...changeAddr,
-          value: new BigNumber(val),
+          values: new MultiToken(
+            [{
+              identifier: PRIMARY_ASSET_CONSTANTS.Jormungandr,
+              amount: new BigNumber(val),
+              networkId,
+            }],
+            {
+              defaultNetworkId: networkId,
+              defaultIdentifier: PRIMARY_ASSET_CONSTANTS.Jormungandr,
+            }
+          ),
         });
       }
       // remove the duplicate and keep searching
@@ -388,7 +416,9 @@ export function asAddressedUtxo(
 ): Array<CardanoAddressedUtxo> {
   return utxos.map(utxo => {
     return {
-      amount: utxo.output.UtxoTransactionOutput.Amount,
+      amount: utxo.output.tokens.filter(
+        token => token.Token.Identifier === PRIMARY_ASSET_CONSTANTS.Jormungandr
+      )[0].TokenList.Amount,
       receiver: utxo.address,
       tx_hash: utxo.output.Transaction.Hash,
       tx_index: utxo.output.UtxoTransactionOutput.OutputIndex,

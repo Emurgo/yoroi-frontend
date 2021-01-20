@@ -5,9 +5,11 @@ import type {
   HistoryRequest, HistoryResponse, HistoryFunc,
   BestBlockRequest, BestBlockResponse, BestBlockFunc,
   AddressUtxoRequest, AddressUtxoResponse, AddressUtxoFunc,
+  AssetInfoRequest, AssetInfoResponse, AssetInfoFunc,
   UtxoSumRequest, UtxoSumResponse, UtxoSumFunc,
   RemoteErgoTransaction, RemoteUnspentOutput,
   SignedRequest,
+  ErgoTxOutput,
 } from './types';
 import type {
   FilterUsedRequest, FilterUsedResponse, FilterFunc,
@@ -199,6 +201,75 @@ export function genGetBestBlock(
   };
 }
 
+export function genGetAssetInfo(
+  blockchain: Array<RemoteErgoTransaction>,
+): AssetInfoFunc {
+  /**
+  * try parsing an int (base 10) and return NaN if it fails
+  * Can't use parseInt because parseInt('1a') returns '1' instead of failing
+  */
+  const hexToIntOrNaN: string => number = (x) => {
+    return /^[0-9a-fA-F]+$/.test(x) ? Number.parseInt(x, 16) : NaN
+  }
+
+  const numDecimalsToNum: (x: string | null) => number | null = (x) => {
+    if (x == null) return x;
+    return /^[0-9]+$/.test(x) ? Number.parseInt(x, 10) : null
+  }
+
+  // note: the following code is all according to EIP-4
+  // https://github.com/ergoplatform/eips/blob/master/eip-0004.md
+  const decode = (field: void | string): null | string => {
+    if (field == null) return null;
+    // recall: every encoding start with 0e then one byte for length
+    // minimum 3 bytes: 1 for prefix, 1 for length, 1 for content
+    if (field.length < 3 * 2) return null;
+
+    const expectedSize = hexToIntOrNaN(field.substring(2, 4));
+    if (isNaN(expectedSize)) return null;
+    const content = field.substring('0eff'.length);
+    if (content.length !== 2 * expectedSize) return null;
+
+    const bytes = Buffer.from(content, 'hex');
+    const string = new TextDecoder('utf-8').decode(bytes);
+
+    return string;
+  }
+
+  const getBoxForToken: string => ErgoTxOutput = (tokenId) => {
+    // A transaction can create out-of-thin-air tokens in its outputs
+    // if the token identifier is equal to the identifier of the first input box of the transaction
+    for (const tx of blockchain) {
+      if (tx.inputs[0].id === tokenId) {
+        const mintOutput = tx.outputs.find(
+          output => output.assets.find(asset => asset.tokenId === tokenId)
+        );
+        if (mintOutput == null) throw new Error(`${nameof(getBoxForToken)} no mint output found for token ${tokenId}`);
+        return mintOutput;
+      }
+    }
+    throw new Error(`${nameof(getBoxForToken)} no mint tx found for token ${tokenId}`);
+  }
+
+  return async (
+    body: AssetInfoRequest,
+  ): Promise<AssetInfoResponse> => {
+    const result = {};
+
+    for (const tokenId of body.assetIds) {
+      const boxInfo = getBoxForToken(tokenId);
+      result[tokenId] = {
+        name: decode(boxInfo.additionalRegisters.R4),
+        desc: decode(boxInfo.additionalRegisters.R5),
+        numDecimals: numDecimalsToNum(decode(boxInfo.additionalRegisters.R6)),
+        boxId: boxInfo.id,
+        height: boxInfo.creationHeight,
+      }
+    }
+    return result;
+  };
+}
+
 export function genUtxoForAddresses(
   getHistory: HistoryFunc,
   getBestBlock: BestBlockFunc,
@@ -336,6 +407,7 @@ export function toRemoteErgoTx(
       outputIndex: output.index,
       transactionId: txHash,
       value: output.value,
+      assets: output.assets,
     };
   };
   return {

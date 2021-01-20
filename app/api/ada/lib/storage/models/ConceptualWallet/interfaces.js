@@ -24,6 +24,7 @@ import type {
   KeyRow,
   KeyDerivationRow,
   NetworkRow,
+  TokenRow,
 } from '../../database/primitives/tables';
 
 import type {
@@ -43,6 +44,7 @@ export type IConceptualWalletConstructor = {|
   walletType: WalletType,
   hardwareInfo: ?$ReadOnly<HwWalletMetaRow>,
   networkInfo: $ReadOnly<NetworkRow>,
+  defaultToken: $ReadOnly<TokenRow>,
 |};
 
 export interface IConceptualWallet {

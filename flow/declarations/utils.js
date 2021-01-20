@@ -15,6 +15,9 @@ declare type InstanceOf<ClassType> = $Call<ExtractInstance, ClassType>;
 declare type ExtractElement = <T>(Array<T>) => T;
 declare type ElementOf<ArrayType> = $Call<ExtractElement, ArrayType>;
 
+declare type ExtractReadonlyElement = <T>($ReadOnlyArray<T>) => T;
+declare type ReadonlyElementOf<ArrayType> = $Call<ExtractReadonlyElement, ArrayType>;
+
 declare type AddToArray<ArrayType, Field> = Array<ElementOf<ArrayType> & Field>;
 
 declare type ToSchemaProp = <K, V>(K, V) => K;

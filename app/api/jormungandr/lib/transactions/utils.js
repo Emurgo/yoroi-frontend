@@ -1,9 +1,21 @@
 // @flow
 
+import BigNumber from 'bignumber.js';
 import { RustModule } from '../../../ada/lib/cardanoCrypto/rustLoader';
 import type {
   JormungandrFeeConfig,
+  DbTransaction,
+  DbBlock,
+  TokenRow,
 } from '../../../ada/lib/storage/database/primitives/tables';
+import type {
+  UserAnnotation,
+} from '../../../ada/transactions/types';
+import type { TransactionExportRow } from '../../../export';
+import {
+  transactionTypes,
+} from '../../../ada/transactions/types';
+import { formatBigNumberToFloatString } from '../../../../utils/formatters';
 
 export function generateAuthData(
   bindingSignature: RustModule.WalletV3.AccountBindingSignature,
@@ -56,4 +68,37 @@ export function generateFee(
   );
 
   return feeAlgorithm;
+}
+
+export function convertJormungandrTransactionsToExportRows(
+  transactions: $ReadOnlyArray<$ReadOnly<{
+    ...DbTransaction,
+    ...WithNullableFields<DbBlock>,
+    ...UserAnnotation,
+    ...,
+  }>>,
+  defaultAssetRow: $ReadOnly<TokenRow>,
+): Array<TransactionExportRow> {
+  const result = [];
+  for (const tx of transactions) {
+    if (tx.block != null) {
+      result.push({
+        date: tx.block.BlockTime,
+        type: tx.type === transactionTypes.INCOME ? 'in' : 'out',
+        amount: formatBigNumberToFloatString(
+          tx.amount.get(defaultAssetRow.Identifier)
+            ?.abs()
+            .shiftedBy(-defaultAssetRow.Metadata.numberOfDecimals)
+            ?? new BigNumber(0)
+        ),
+        fee: formatBigNumberToFloatString(
+          tx.fee.get(defaultAssetRow.Identifier)
+            ?.abs()
+            .shiftedBy(-defaultAssetRow.Metadata.numberOfDecimals)
+            ?? new BigNumber(0)
+        ),
+      });
+    }
+  }
+  return result;
 }

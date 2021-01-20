@@ -60,6 +60,18 @@ const globalMessages: * = defineMessages({
     id: 'global.labels.current',
     defaultMessage: '!!!Current',
   },
+  name: {
+    id: 'global.labels.name',
+    defaultMessage: '!!!Name',
+  },
+  amount: {
+    id: 'global.labels.amount',
+    defaultMessage: '!!!Amount',
+  },
+  id: {
+    id: 'global.labels.id',
+    defaultMessage: '!!!ID',
+  },
   finish: {
     id: 'global.labels.finish',
     defaultMessage: '!!!Finish',
@@ -267,6 +279,10 @@ const globalMessages: * = defineMessages({
   noTransactionsFound: {
     id: 'wallet.summary.no.transaction',
     defaultMessage: '!!!No transactions found',
+  },
+  assetSelect: {
+    id: 'global.selectAsset.labael',
+    defaultMessage: '!!!Select asset',
   },
   step1: {
     id: 'transfer.form.instructions.step1.text',
@@ -497,7 +513,7 @@ const globalMessages: * = defineMessages({
     id: 'global.labels.rewardsLabel',
     defaultMessage: '!!!Rewards',
   },
-  totalAdaLabel: {
+  totalTokenLabel: {
     id: 'wallet.dashboard.summary.adaTitle',
     defaultMessage: '!!!Total {ticker}',
   },
@@ -689,6 +705,10 @@ export const memoMessages: * = defineMessages({
     id: 'global.labels.optionalMemo',
     defaultMessage: '!!!Memo (optional)',
   },
+  registerLabel: {
+    id: 'global.labels.register',
+    defaultMessage: '!!!Register',
+  }
 });
 
 

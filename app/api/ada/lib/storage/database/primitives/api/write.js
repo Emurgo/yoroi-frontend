@@ -20,6 +20,7 @@ import type {
   DbBlock,
   NetworkInsert, NetworkRow,
   TokenInsert, TokenRow,
+  TokenListInsert, TokenListRow,
 } from '../tables';
 import type {
   CoreAddressT,
@@ -145,7 +146,7 @@ export class ModifyAddress {
       data: string,
       type: CoreAddressT,
     |}>,
-  ): Promise<Array<$ReadOnly<AddressRow>>> {
+  ): Promise<$ReadOnlyArray<$ReadOnly<AddressRow>>> {
     const { AddressSeed } = await ModifyAddress.depTables.GetEncryptionMeta.get(db, tx);
     const digests = address.map<number>(meta => digestForHash(meta.data, AddressSeed));
 
@@ -170,7 +171,7 @@ export class ModifyAddress {
       data: string,
       type: CoreAddressT,
     |}>,
-  ): Promise<Array<$ReadOnly<AddressRow>>> {
+  ): Promise<$ReadOnlyArray<$ReadOnly<AddressRow>>> {
     const addressEntries = await ModifyAddress.addForeignByHash(
       db, tx,
       address.map(meta => ({ data: meta.data, type: meta.type }))
@@ -215,11 +216,11 @@ export class ModifyEncryptionMeta {
     tx: lf$Transaction,
     initialData: EncryptionMetaInsert,
   ): Promise<$ReadOnly<EncryptionMetaRow>> {
-    return await addOrReplaceRows<EncryptionMetaInsert, EncryptionMetaRow>(
+    return (await addOrReplaceRows<EncryptionMetaInsert, EncryptionMetaRow>(
       db, tx,
       [initialData],
       ModifyEncryptionMeta.ownTables[Tables.EncryptionMetaSchema.name].name,
-    );
+    ))[0];
   }
 }
 
@@ -615,7 +616,7 @@ export class ModifyNetworks {
     db: lf$Database,
     tx: lf$Transaction,
     rows: $ReadOnlyArray<NetworkInsert>,
-  ): Promise<void> {
+  ): Promise<$ReadOnlyArray<NetworkRow>> {
     const result = await addOrReplaceRows<NetworkInsert, NetworkRow>(
       db, tx,
       rows,
@@ -705,5 +706,41 @@ export class ModifyToken {
       ...knownTokens,
       ...newlyAdded,
     ];
+  }
+}
+
+export class ModifyTokenList {
+  static ownTables: {|
+    TokenList: typeof Tables.TokenListSchema,
+  |} = Object.freeze({
+    [Tables.TokenListSchema.name]: Tables.TokenListSchema,
+  });
+  static depTables: {||} = Object.freeze({});
+
+  static async upsert(
+    db: lf$Database,
+    tx: lf$Transaction,
+    rows: $ReadOnlyArray<TokenListInsert>,
+  ): Promise<$ReadOnlyArray<$ReadOnly<TokenListRow>>> {
+    const result = await addOrReplaceRows<TokenListInsert, TokenListRow>(
+      db, tx,
+      rows,
+      ModifyTokenList.ownTables[Tables.TokenListSchema.name].name,
+    );
+
+    return result;
+  }
+
+  static async remove(
+    db: lf$Database,
+    tx: lf$Transaction,
+    listIds: $ReadOnlyArray<number>,
+  ): Promise<void> {
+    return await removeFromTableBatch(
+      db, tx,
+      ModifyTokenList.ownTables[Tables.TokenListSchema.name].name,
+      ModifyTokenList.ownTables[Tables.TokenListSchema.name].properties.ListId,
+      listIds
+    );
   }
 }

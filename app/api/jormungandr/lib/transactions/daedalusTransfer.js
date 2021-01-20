@@ -26,8 +26,11 @@ import type {
   V3UnsignedTxUtxoResponse,
   AddressKeyMap,
 } from '../../../ada/transactions/types';
-import { getJormungandrCurrencyMeta } from '../../currencyInfo';
 import type { JormungandrFeeConfig } from '../../../ada/lib/storage/database/primitives/tables';
+import {
+  MultiToken,
+} from '../../../common/lib/MultiToken';
+import { PRIMARY_ASSET_CONSTANTS } from '../../../ada/lib/storage/database/primitives/enums';
 
 /**
  * Generate transaction including all addresses with no change.
@@ -36,42 +39,56 @@ export async function buildDaedalusTransferTx(payload: {|
   addressKeys: AddressKeyMap,
   senderUtxos: Array<RemoteUnspentOutput>,
   outputAddr: string,
-  genesisHash: string,
-  feeConfig: JormungandrFeeConfig,
+  protocolParams: {|
+    genesisHash: string,
+    feeConfig: JormungandrFeeConfig,
+    networkId: number,
+  |},
 |}): Promise<TransferTx> {
   try {
     const { addressKeys, senderUtxos, outputAddr } = payload;
 
-    const totalBalance = senderUtxos
-      .map(utxo => new BigNumber(utxo.amount))
-      .reduce(
-        (acc, amount) => acc.plus(amount),
-        new BigNumber(0)
-      );
+    const totalBalance = new MultiToken(
+      [{
+        identifier: PRIMARY_ASSET_CONSTANTS.Jormungandr,
+        amount: senderUtxos
+          .map(utxo => new BigNumber(utxo.amount))
+          .reduce(
+            (acc, amount) => acc.plus(amount),
+            new BigNumber(0)
+          ),
+        networkId: payload.protocolParams.networkId,
+      }],
+      {
+        defaultNetworkId: payload.protocolParams.networkId,
+        defaultIdentifier: PRIMARY_ASSET_CONSTANTS.Jormungandr,
+      }
+    );
 
     // build tx
     const utxoResponse = sendAllUnsignedTxFromUtxo(
       outputAddr,
       senderUtxos,
       undefined,
-      payload.feeConfig
+      {
+        feeConfig: payload.protocolParams.feeConfig,
+        networkId: payload.protocolParams.networkId,
+      }
     );
-    const fee = getJormungandrTxFee(utxoResponse.IOs, false);
+    const fee = getJormungandrTxFee(utxoResponse.IOs, payload.protocolParams.networkId);
 
     // sign
     const signedTx = signDaedalusTransaction(
       utxoResponse,
       addressKeys,
-      payload.genesisHash,
+      payload.protocolParams.genesisHash,
     );
 
     const fragment = RustModule.WalletV3.Fragment.from_transaction(signedTx);
-
-    const lovelacesPerAda = new BigNumber(10).pow(getJormungandrCurrencyMeta().decimalPlaces);
     // return summary of transaction
     return {
-      recoveredBalance: totalBalance.dividedBy(lovelacesPerAda),
-      fee: fee.dividedBy(lovelacesPerAda),
+      recoveredBalance: totalBalance,
+      fee,
       id: Buffer.from(fragment.id().as_bytes()).toString('hex'),
       encodedTx: fragment.as_bytes(),
       // recall: Daedalus addresses all have to be legacy so we don't turn them to bech32

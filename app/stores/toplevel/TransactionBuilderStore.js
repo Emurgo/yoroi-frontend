@@ -20,6 +20,11 @@ import {
   genTimeToSlot,
 } from '../../api/ada/lib/storage/bridge/timeUtils';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
+import type { TransactionMetadata } from '../../api/ada/lib/storage/bridge/metadataUtils';
+import {
+  MultiToken,
+} from '../../api/common/lib/MultiToken';
+import type { TokenRow, } from '../../api/ada/lib/storage/database/primitives/tables';
 
 export type SetupSelfTxRequest = {|
   publicDeriver: IHasUtxoChains,
@@ -45,6 +50,7 @@ export default class TransactionBuilderStore extends Store {
   @observable tentativeTx: null | ISignRequest<any>;
 
   @observable filter: ElementOf<IGetAllUtxosResponse> => boolean;
+  @observable metadata: Array<TransactionMetadata> | void;
 
   /** tracks mismatch between `plannedTx` and `tentativeTx` */
   @observable txMismatch: boolean = false;
@@ -52,11 +58,13 @@ export default class TransactionBuilderStore extends Store {
   // REQUESTS
   @observable createUnsignedTx: LocalizedRequest<DeferredCall<ISignRequest<any>>>
     = new LocalizedRequest<DeferredCall<ISignRequest<any>>>(async func => await func());
-  // this.api.ada.createUnsignedTx.bind(this.api.ada)
+
   @observable memo: void | string;
 
   @observable setupSelfTx: LocalizedRequest<SetupSelfTxFunc>
     = new LocalizedRequest<SetupSelfTxFunc>(this._setupSelfTx);
+
+  @observable selectedToken: void | $ReadOnly<TokenRow>;
 
   setup(): void {
     super.setup();
@@ -66,10 +74,12 @@ export default class TransactionBuilderStore extends Store {
     actions.setFilter.listen(this._setFilter);
     actions.updateAmount.listen(this._updateAmount);
     actions.updateMemo.listen(this._updateMemo);
+    actions.updateToken.listen(this._updateToken);
     actions.updateTentativeTx.listen(this._updateTentativeTx);
     actions.toggleSendAll.listen(this._toggleSendAll);
     actions.initialize.listen(this._initialize);
     actions.reset.listen(this._reset);
+    actions.updateMetadata.listen(this._updateMetadata);
   }
 
   // =============
@@ -77,19 +87,19 @@ export default class TransactionBuilderStore extends Store {
   // =============
 
   @computed get
-  fee(): ?BigNumber {
+  fee(): ?MultiToken {
     if (!this.plannedTx) {
       return undefined;
     }
-    return this.plannedTx.fee(true);
+    return this.plannedTx.fee();
   }
 
   @computed get
-  totalInput(): ?BigNumber {
+  totalInput(): ?MultiToken {
     if (!this.plannedTx) {
       return undefined;
     }
-    return this.plannedTx.totalInput(true);
+    return this.plannedTx.totalInput();
   }
 
   // ================
@@ -214,6 +224,7 @@ export default class TransactionBuilderStore extends Store {
           shouldSendAll,
           filter: this.filter,
           absSlotNumber,
+          metadata: this.metadata,
         }));
       } else if (amount != null) {
         await this.createUnsignedTx.execute(() => this.api.ada.createUnsignedTx({
@@ -222,6 +233,7 @@ export default class TransactionBuilderStore extends Store {
           amount,
           filter: this.filter,
           absSlotNumber,
+          metadata: this.metadata,
         }));
       }
     } else if (isErgo(network)) {
@@ -231,11 +243,30 @@ export default class TransactionBuilderStore extends Store {
         RustModule.SigmaRust.BoxValue.SAFE_USER_MIN().as_i64().to_str()
       ).plus(100000); // slightly higher than default fee
 
+      const defaultToken = this.stores.tokenInfoStore.getDefaultTokenInfo(network.NetworkId);
+
+      const genTokenList = (userInput) => {
+        const tokens = [userInput];
+          if (this.selectedToken != null && this.selectedToken.TokenId !== defaultToken.TokenId) {
+          // if the user is sending a token, we need to make sure the resulting box
+          // has at least the minimum amount of ERG in it
+          tokens.push({
+            token: defaultToken,
+            amount: RustModule.SigmaRust.BoxValue.SAFE_USER_MIN().as_i64().to_str(),
+          });
+        }
+        return tokens;
+      }
+
       if (amount == null && shouldSendAll === true) {
         await this.createUnsignedTx.execute(() => this.api.ergo.createUnsignedTx({
           publicDeriver: withUtxos,
           receiver,
-          shouldSendAll,
+          tokens: genTokenList({
+            token: this.selectedToken
+              ?? this.stores.tokenInfoStore.getDefaultTokenInfo(network.NetworkId),
+            shouldSendAll,
+          }),
           filter: this.filter,
           currentHeight: lastSync.Height,
           txFee,
@@ -244,7 +275,11 @@ export default class TransactionBuilderStore extends Store {
         await this.createUnsignedTx.execute(() => this.api.ergo.createUnsignedTx({
           publicDeriver: withUtxos,
           receiver,
-          amount,
+          tokens: genTokenList({
+            token: this.selectedToken
+              ?? this.stores.tokenInfoStore.getDefaultTokenInfo(network.NetworkId),
+            amount,
+          }),
           filter: this.filter,
           currentHeight: lastSync.Height,
           txFee,
@@ -283,8 +318,18 @@ export default class TransactionBuilderStore extends Store {
   }
 
   @action
+  _updateMetadata: (Array<TransactionMetadata> | void) => void = (metadata) => {
+    this.metadata = metadata;
+  }
+
+  @action
   _updateMemo: (void | string) => void = (content) => {
     this.memo = content;
+  }
+
+  @action
+  _updateToken: (void | $ReadOnly<TokenRow>) => void = (token) => {
+    this.selectedToken = token;
   }
 
   @action
@@ -306,7 +351,9 @@ export default class TransactionBuilderStore extends Store {
     this.plannedTxInfo = [{ address: undefined, value: undefined }];
     this.shouldSendAll = false;
     this.memo = undefined;
+    this.selectedToken = undefined;
     this.filter = () => true;
+    this.metadata = undefined;
     this.createUnsignedTx.cancel();
     this.createUnsignedTx.reset();
     this.plannedTx = null;

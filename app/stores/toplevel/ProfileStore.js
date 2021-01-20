@@ -108,6 +108,7 @@ export default class ProfileStore extends Store {
         // note: we want to load memos BEFORE we start syncing wallets
         // this is because syncing wallets will also try and sync memos with external storage
         await this.stores.memos.loadFromStorage();
+        await this.stores.tokenInfoStore.refreshTokenInfo();
         await this.stores.coinPriceStore.loadFromStorage();
         await this.stores.coinPriceStore.refreshCurrentCoinPrice();
 
@@ -664,7 +665,5 @@ export function getPaperWalletIntro(currentLocale: string, defaultLocale: string
 }
 
 export function getTermsOfUse(api: 'ada', currentLocale: string): string {
-  const tos = require(`../../i18n/locales/terms-of-use/${api}/${currentLocale}.md`);
-  const stakingTerms = require(`../../i18n/locales/terms-of-use/itn/${currentLocale}.md`);
-  return tos + '\n\n' + stakingTerms;
+  return require(`../../i18n/locales/terms-of-use/${api}/${currentLocale}.md`);
 }

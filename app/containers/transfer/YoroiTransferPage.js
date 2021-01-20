@@ -20,7 +20,6 @@ import YoroiTransferWaitingPage from './YoroiTransferWaitingPage';
 import YoroiTransferErrorPage from './YoroiTransferErrorPage';
 import YoroiTransferSuccessPage from './YoroiTransferSuccessPage';
 import config from '../../config';
-import { formattedWalletAmount } from '../../utils/formatters';
 import { TransferStatus, } from '../../types/TransferTypes';
 import type { TransferStatusT, TransferTx } from '../../types/TransferTypes';
 import LocalizableError from '../../i18n/LocalizableError';
@@ -32,7 +31,7 @@ import type { GeneratedData as YoroiPlateData } from './YoroiPlatePage';
 import { SelectedExplorer } from '../../domain/SelectedExplorer';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import type { RestoreModeType } from '../../actions/common/wallet-restore-actions';
-import { ApiOptions, getApiMeta, getApiForNetwork, } from '../../api/common/utils';
+import { ApiOptions, getApiForNetwork, } from '../../api/common/utils';
 import { addressToDisplayString, } from '../../api/ada/lib/storage/bridge/utils';
 import {
   HARD_DERIVATION_START,
@@ -51,6 +50,8 @@ import {
   Bip44DerivationLevels,
 } from '../../api/ada/lib/storage/database/walletTypes/bip44/api/utils';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
+import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
+import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
 
 // Stay this long on the success page, then jump to the wallet transactions page
 const SUCCESS_PAGE_STAY_TIME = 5 * 1000;
@@ -166,17 +167,6 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
     if (api !== ApiOptions.ada) {
       throw new Error(`${nameof(YoroiTransferPage)} not ADA API type`);
     }
-    const apiMeta = getApiMeta(api);
-    if (apiMeta == null) throw new Error(`${nameof(YoroiTransferPage)} no API selected`);
-
-    const coinPrice: ?number = this.generated.stores.profile.unitOfAccount.enabled
-      ? (
-        this.generated.stores.coinPriceStore.getCurrentPrice(
-          apiMeta.meta.primaryTicker,
-          this.generated.stores.profile.unitOfAccount.currency
-        )
-      )
-      : null;
 
     switch (yoroiTransfer.status) {
       case TransferStatus.GETTING_MNEMONICS:
@@ -284,14 +274,11 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
         return (
           <TransferSummaryPage
             form={null}
-            formattedWalletAmount={amount => formattedWalletAmount(
-              amount,
-              apiMeta.meta.decimalPlaces.toNumber(),
-            )}
             transferTx={transferTx}
             selectedExplorer={this.generated.stores.explorers.selectedExplorer
               .get(publicDeriver.getParent().getNetworkInfo().NetworkId) ?? (() => { throw new Error('No explorer for wallet network'); })()
             }
+            getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
             onSubmit={{
               label: intl.formatMessage(globalMessages.nextButtonLabel),
               trigger: this.transferFunds,
@@ -303,7 +290,7 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
             }}
             error={yoroiTransfer.error}
             dialogTitle={intl.formatMessage(globalMessages.walletSendConfirmationDialogTitle)}
-            coinPrice={coinPrice}
+            getCurrentPrice={this.generated.stores.coinPriceStore.getCurrentPrice}
             addressLookup={genAddressLookup(
               publicDeriver,
               intl,
@@ -314,7 +301,6 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
             addressToDisplayString={
               addr => addressToDisplayString(addr, publicDeriver.getParent().getNetworkInfo())
             }
-            ticker={apiMeta.meta.primaryTicker}
           />
         );
       }
@@ -402,6 +388,9 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
         isClassicTheme: boolean,
         unitOfAccount: UnitOfAccountSettingType
       |},
+      tokenInfoStore: {|
+        tokenInfo: TokenInfoMap,
+      |},
       yoroiTransfer: {|
         error: ?LocalizableError,
         nextInternalAddress: (
@@ -447,6 +436,9 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
         profile: {
           isClassicTheme: stores.profile.isClassicTheme,
           unitOfAccount: stores.profile.unitOfAccount,
+        },
+        tokenInfoStore: {
+          tokenInfo: stores.tokenInfoStore.tokenInfo,
         },
         wallets: {
           selected: stores.wallets.selected,

@@ -15,9 +15,11 @@ import Dialog from '../widgets/Dialog';
 import DialogCloseButton from '../widgets/DialogCloseButton';
 import { InputOwnSkin } from '../../themes/skins/InputOwnSkin';
 import globalMessages from '../../i18n/global-messages';
-
+import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import { formattedAmountToNaturalUnits } from '../../utils/formatters';
 import config from '../../config';
+import { calcMaxBeforeDot } from '../../utils/validations';
+import { getTokenName } from '../../stores/stateless/tokenHelpers';
 
 import styles from './URIGenerateDialog.scss';
 
@@ -45,11 +47,12 @@ type Props = {|
   +onGenerate: (address: string, amount: number) => void,
   +classicTheme: boolean,
   +walletAddress: string,
-  +amount?: number,
-  +primaryTicker: string,
-  +currencyMaxIntegerDigits: number,
-  +currencyMaxFractionalDigits: number,
-  +validateAmount: (amountInNaturalUnits: string) => Promise<[boolean, void | string]>,
+  +amount?: number, // TODO: not safe to pass this as a number instead of BigNumber / string
+  +validateAmount: (
+    amountInNaturalUnits: string,
+    tokenRow: $ReadOnly<TokenRow>
+  ) => Promise<[boolean, void | string]>,
+  +tokenInfo: $ReadOnly<TokenRow>,
 |};
 
 @observer
@@ -64,7 +67,7 @@ export default class URIGenerateDialog extends Component<Props> {
 
   getAmountLabel: (() => string) = (): string => {
     const label = this.context.intl.formatMessage(messages.uriGenerateDialogAmountLabel, {
-      currency: this.props.primaryTicker,
+      currency: getTokenName(this.props.tokenInfo),
     });
 
     return label;
@@ -79,7 +82,7 @@ export default class URIGenerateDialog extends Component<Props> {
       },
       amount: {
         label: this.getAmountLabel(),
-        placeholder: `0.${'0'.repeat(this.props.currencyMaxFractionalDigits)}`,
+        placeholder: `0.${'0'.repeat(this.props.tokenInfo.Metadata.numberOfDecimals)}`,
         value: '',
         validators: [async ({ field }) => {
           const amountValue = field.value;
@@ -88,9 +91,9 @@ export default class URIGenerateDialog extends Component<Props> {
           }
           const formattedAmount = formattedAmountToNaturalUnits(
             amountValue,
-            this.props.currencyMaxFractionalDigits
+            this.props.tokenInfo.Metadata.numberOfDecimals
           );
-          return await this.props.validateAmount(formattedAmount);
+          return await this.props.validateAmount(formattedAmount, this.props.tokenInfo);
         }],
       },
     },
@@ -119,8 +122,6 @@ export default class URIGenerateDialog extends Component<Props> {
       onClose,
       onGenerate,
       classicTheme,
-      currencyMaxIntegerDigits,
-      currencyMaxFractionalDigits,
     } = this.props;
 
     const dialogClasses = classnames([
@@ -157,8 +158,8 @@ export default class URIGenerateDialog extends Component<Props> {
               {...amountField.bind()}
               label={this.getAmountLabel()}
               error={amountField.error}
-              maxBeforeDot={currencyMaxIntegerDigits}
-              maxAfterDot={currencyMaxFractionalDigits}
+              maxBeforeDot={calcMaxBeforeDot(this.props.tokenInfo.Metadata.numberOfDecimals)}
+              maxAfterDot={this.props.tokenInfo.Metadata.numberOfDecimals}
               skin={InputOwnSkin}
               done={amountField.isValid}
               classicTheme={classicTheme}

@@ -10,19 +10,25 @@ import type {
 import type {
   DbBlock,
   CertificatePart,
+  NetworkRow,
 } from '../api/ada/lib/storage/database/primitives/tables';
-import type { ApiOptionType } from '../api/common/utils';
-import { getApiMeta } from '../api/common/utils';
 import WalletTransaction, { toAddr } from './WalletTransaction';
 import type { WalletTransactionCtorData } from './WalletTransaction';
 import { TransactionType } from '../api/ada/lib/storage/database/primitives/tables';
+import { PRIMARY_ASSET_CONSTANTS } from '../api/ada/lib/storage/database/primitives/enums';
+import {
+  MultiToken,
+} from '../api/common/lib/MultiToken';
+import type {
+  DefaultTokenEntry,
+} from '../api/common/lib/MultiToken';
 
 export default class CardanoShelleyTransaction extends WalletTransaction {
 
   @observable certificates: Array<CertificatePart>;
   @observable withdrawals: Array<{|
     address: string,
-    value: BigNumber,
+    value: MultiToken,
   |}>;
   @observable ttl: void | BigNumber;
   @observable metadata: null | string;
@@ -34,7 +40,7 @@ export default class CardanoShelleyTransaction extends WalletTransaction {
     metadata: null | string,
     withdrawals: Array<{|
       address: string,
-      value: BigNumber,
+      value: MultiToken,
     |}>
   |}) {
     const { certificates, ttl, metadata, withdrawals, ...rest } = data;
@@ -53,13 +59,10 @@ export default class CardanoShelleyTransaction extends WalletTransaction {
       ...UserAnnotation,
     |},
     addressLookupMap: Map<number, string>,
-    api: ApiOptionType,
+    network: $ReadOnly<NetworkRow>,
+    defaultToken: DefaultTokenEntry
   |}): CardanoShelleyTransaction {
-    const apiMeta = getApiMeta(request.api)?.meta;
-    if (apiMeta == null) throw new Error(`${nameof(CardanoShelleyTransaction)} no API selected`);
-    const amountPerUnit = new BigNumber(10).pow(apiMeta.decimalPlaces);
-
-    const { addressLookupMap, tx } = request;
+    const { addressLookupMap, defaultToken, tx } = request;
     if (tx.transaction.Type !== TransactionType.CardanoShelley) {
       throw new Error(`${nameof(CardanoShelleyTransaction)}::${this.constructor.fromAnnotatedTx} tx type incorrect`);
     }
@@ -67,24 +70,37 @@ export default class CardanoShelleyTransaction extends WalletTransaction {
     if (Extra == null) {
       throw new Error(`${nameof(CardanoShelleyTransaction)}::${this.constructor.fromAnnotatedTx} missing extra data`);
     }
+
     return new CardanoShelleyTransaction({
       txid: tx.transaction.Hash,
       block: tx.block,
       type: tx.type,
       // note: we use the explicitly fee in the transaction
       // and not outputs - inputs since Shelley has implicit inputs like refunds or withdrawals
-      fee: new BigNumber(Extra.Fee).dividedBy(amountPerUnit),
+      fee: new MultiToken(
+        [{
+          identifier: PRIMARY_ASSET_CONSTANTS.Cardano,
+          amount: new BigNumber(Extra.Fee),
+          networkId: request.network.NetworkId,
+        }],
+        defaultToken,
+      ),
       ttl: Extra.Ttl != null ? new BigNumber(Extra.Ttl) : undefined,
       metadata: Extra.Metadata,
-      amount: tx.amount.dividedBy(amountPerUnit).plus(tx.fee.dividedBy(amountPerUnit)),
+      amount: tx.amount.joinAddCopy(tx.fee),
       date: tx.block != null
         ? tx.block.BlockTime
         : new Date(tx.transaction.LastUpdateTime),
       addresses: {
-        from: toAddr({ rows: tx.utxoInputs, amountPerUnit, addressLookupMap }),
-        to: toAddr({ rows: tx.utxoOutputs, amountPerUnit, addressLookupMap }),
+        from: toAddr({ rows: tx.utxoInputs, addressLookupMap, tokens: tx.tokens, defaultToken, }),
+        to: toAddr({ rows: tx.utxoOutputs, addressLookupMap, tokens: tx.tokens, defaultToken, }),
       },
-      withdrawals: toAddr({ rows: tx.accountingInputs, amountPerUnit, addressLookupMap }),
+      withdrawals: toAddr({
+        rows: tx.accountingInputs,
+        addressLookupMap,
+        tokens: tx.tokens,
+        defaultToken,
+      }),
       certificates: tx.certificates,
       state: tx.transaction.Status,
       errorMsg: tx.transaction.ErrorMessage,

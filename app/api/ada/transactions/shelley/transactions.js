@@ -28,6 +28,10 @@ import type {
 import {
   getCardanoSpendingKeyHash, normalizeToAddress,
 } from '../../lib/storage/bridge/utils';
+import {
+  MultiToken,
+} from '../../../common/lib/MultiToken';
+import { PRIMARY_ASSET_CONSTANTS } from '../../lib/storage/database/primitives/enums';
 
 /**
  * based off what the cardano-wallet team found worked empirically
@@ -49,7 +53,9 @@ export function sendAllUnsignedTx(
     minimumUtxoVal: RustModule.WalletV4.BigNum,
     poolDeposit: RustModule.WalletV4.BigNum,
     keyDeposit: RustModule.WalletV4.BigNum,
+    networkId: number,
   |},
+  metadata: RustModule.WalletV4.TransactionMetadata | void,
 ): V4UnsignedTxAddressedUtxoResponse {
   const addressingMap = new Map<RemoteUnspentOutput, CardanoAddressedUtxo>();
   for (const utxo of allUtxos) {
@@ -66,6 +72,7 @@ export function sendAllUnsignedTx(
     Array.from(addressingMap.keys()),
     absSlotNumber,
     protocolParams,
+    metadata,
   );
 
   const addressedUtxos = unsignedTxResponse.senderUtxos.map(
@@ -128,7 +135,9 @@ export function sendAllUnsignedTxFromUtxo(
     minimumUtxoVal: RustModule.WalletV4.BigNum,
     poolDeposit: RustModule.WalletV4.BigNum,
     keyDeposit: RustModule.WalletV4.BigNum,
+    networkId: number,
   |},
+  metadata: RustModule.WalletV4.TransactionMetadata | void,
 ): V4UnsignedTxUtxoResponse {
   const totalBalance = allUtxos
     .map(utxo => new BigNumber(utxo.amount))
@@ -149,6 +158,10 @@ export function sendAllUnsignedTxFromUtxo(
   txBuilder.set_ttl(absSlotNumber.plus(defaultTtlOffset).toNumber());
   for (const input of allUtxos) {
     addUtxoInput(txBuilder, input, false);
+  }
+
+  if(metadata !== undefined){
+    txBuilder.set_metadata(metadata);
   }
 
   if (totalBalance.lt(txBuilder.min_fee().to_str())) {
@@ -172,18 +185,31 @@ export function sendAllUnsignedTxFromUtxo(
     }
   }
 
-  const output = new BigNumber(txBuilder.get_explicit_output().to_str());
+  const changeAddr = (() => {
+    if (receiver.addressing== null) return [];
+    const { addressing } = receiver;
+    const output = new MultiToken(
+      [{
+        identifier: PRIMARY_ASSET_CONSTANTS.Cardano,
+        amount: new BigNumber(txBuilder.get_explicit_output().to_str()),
+        networkId: protocolParams.networkId,
+      }],
+      {
+        defaultNetworkId: protocolParams.networkId,
+        defaultIdentifier: PRIMARY_ASSET_CONSTANTS.Cardano,
+      }
+    );
+    return [{
+      addressing,
+      address: receiver.address,
+      values: output,
+    }];
+  })();
 
   return {
     senderUtxos: allUtxos,
     txBuilder,
-    changeAddr: receiver.addressing
-      ? [{
-        addressing: receiver.addressing,
-        address: receiver.address,
-        value: output,
-      }]
-      : [],
+    changeAddr,
   };
 }
 
@@ -200,6 +226,7 @@ export function newAdaUnsignedTx(
     minimumUtxoVal: RustModule.WalletV4.BigNum,
     poolDeposit: RustModule.WalletV4.BigNum,
     keyDeposit: RustModule.WalletV4.BigNum,
+    networkId: number,
   |},
   certificates: $ReadOnlyArray<RustModule.WalletV4.Certificate>,
   withdrawals: $ReadOnlyArray<{|
@@ -207,6 +234,7 @@ export function newAdaUnsignedTx(
     amount: RustModule.WalletV4.BigNum,
   |}>,
   allowNoOutputs: boolean,
+  metadata: RustModule.WalletV4.TransactionMetadata | void,
 ): V4UnsignedTxAddressedUtxoResponse {
   const addressingMap = new Map<RemoteUnspentOutput, CardanoAddressedUtxo>();
   for (const utxo of allUtxos) {
@@ -227,6 +255,7 @@ export function newAdaUnsignedTx(
     certificates,
     withdrawals,
     allowNoOutputs,
+    metadata,
   );
 
   const addressedUtxos = unsignedTxResponse.senderUtxos.map(
@@ -287,6 +316,7 @@ export function newAdaUnsignedTxFromUtxo(
     minimumUtxoVal: RustModule.WalletV4.BigNum,
     poolDeposit: RustModule.WalletV4.BigNum,
     keyDeposit: RustModule.WalletV4.BigNum,
+    networkId: number,
   |},
   certificates: $ReadOnlyArray<RustModule.WalletV4.Certificate>,
   withdrawals: $ReadOnlyArray<{|
@@ -294,6 +324,7 @@ export function newAdaUnsignedTxFromUtxo(
     amount: RustModule.WalletV4.BigNum,
   |}>,
   allowNoOutputs: boolean,
+  metadata: RustModule.WalletV4.TransactionMetadata | void,
 ): V4UnsignedTxUtxoResponse {
   /**
    * Shelley supports transactions with no outputs by simply burning any leftover ADA as fee
@@ -322,6 +353,9 @@ export function newAdaUnsignedTxFromUtxo(
       RustModule.WalletV4.Certificates.new()
     );
     txBuilder.set_certs(certsWasm);
+  }
+  if (metadata !== undefined){
+    txBuilder.set_metadata(metadata);
   }
   if (withdrawals.length > 0) {
     const withdrawalWasm = withdrawals.reduce(
@@ -453,13 +487,21 @@ export function newAdaUnsignedTxFromUtxo(
       // note: this should never happened since it should have been handled by earlier code
       throw new Error(`No change added even though it should be forced`);
     }
-    const changeValue = new BigNumber(
-      txBuilder.get_explicit_output().checked_sub(oldOutput).to_str()
+    const output = new MultiToken(
+      [{
+        identifier: PRIMARY_ASSET_CONSTANTS.Cardano,
+        amount: new BigNumber(txBuilder.get_explicit_output().checked_sub(oldOutput).to_str()),
+        networkId: protocolParams.networkId,
+      }],
+      {
+        defaultNetworkId: protocolParams.networkId,
+        defaultIdentifier: PRIMARY_ASSET_CONSTANTS.Cardano,
+      }
     );
     return changeWasAdded
       ? [{
         ...changeAdaAddr,
-        value: changeValue,
+        values: output,
       }]
       : [];
   })();
@@ -613,7 +655,9 @@ export function asAddressedUtxo(
 ): Array<CardanoAddressedUtxo> {
   return utxos.map(utxo => {
     return {
-      amount: utxo.output.UtxoTransactionOutput.Amount,
+      amount: utxo.output.tokens.filter(
+        token => token.Token.Identifier === PRIMARY_ASSET_CONSTANTS.Cardano
+      )[0].TokenList.Amount,
       receiver: utxo.address,
       tx_hash: utxo.output.Transaction.Hash,
       tx_index: utxo.output.UtxoTransactionOutput.OutputIndex,

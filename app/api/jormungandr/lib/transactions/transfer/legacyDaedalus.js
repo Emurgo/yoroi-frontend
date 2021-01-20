@@ -16,8 +16,11 @@ export async function daedalusTransferTxFromAddresses(payload: {|
   outputAddr: string,
   network: $ReadOnly<NetworkRow>,
   getUTXOsForAddresses: AddressUtxoFunc,
-  genesisHash: string,
-  feeConfig: JormungandrFeeConfig,
+  protocolParams: {|
+    genesisHash: string,
+    feeConfig: JormungandrFeeConfig,
+    networkId: number,
+  |},
 |}): Promise<TransferTx> {
   const senderUtxos = await toSenderUtxos({
     network: payload.network,
@@ -28,7 +31,6 @@ export async function daedalusTransferTxFromAddresses(payload: {|
     outputAddr: payload.outputAddr,
     addressKeys: payload.addressKeys,
     senderUtxos,
-    genesisHash: payload.genesisHash,
-    feeConfig: payload.feeConfig,
+    protocolParams: payload.protocolParams,
   });
 }

@@ -22,6 +22,15 @@ import RawHash from '../../widgets/hashWrappers/RawHash';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import SpendingPasswordInput from '../../widgets/forms/SpendingPasswordInput';
+import { calcMaxBeforeDot } from '../../../utils/validations';
+import {
+  MultiToken,
+} from '../../../api/common/lib/MultiToken';
+import type {
+  TokenLookupKey,
+} from '../../../api/common/lib/MultiToken';
+import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
+import { getTokenName, genFormatTokenAmount, } from '../../../stores/stateless/tokenHelpers';
 
 import WarningBox from '../../widgets/WarningBox';
 
@@ -53,20 +62,19 @@ type Props = {|
   +selectedExplorer: SelectedExplorer,
   +poolName: null | string,
   +poolHash: string,
-  +amountToDelegate: BigNumber,
-  +transactionFee: BigNumber,
-  +approximateReward: BigNumber,
+  +getTokenInfo: Inexact<TokenLookupKey> => $ReadOnly<TokenRow>,
+  +amountToDelegate: MultiToken,
+  +transactionFee: MultiToken,
+  +approximateReward: {|
+    +amount: BigNumber,
+    +token: $ReadOnly<TokenRow>,
+  |},
   +isHardware: boolean,
   +isSubmitting: boolean,
   +onCancel: void => void,
   +onSubmit: ({| password?: string |}) => PossiblyAsync<void>,
   +classicTheme: boolean,
   +error: ?LocalizableError,
-  +meta: {|
-    +totalSupply: BigNumber,
-    +decimalPlaces: number,
-    +ticker: string,
-  |},
 |};
 
 @observer
@@ -142,6 +150,8 @@ export default class DelegationTxDialog extends Component<Props> {
       },
     ];
 
+    const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
+
     return (
       <Dialog
         title={intl.formatMessage(globalMessages.walletSendConfirmationDialogTitle)}
@@ -191,21 +201,28 @@ export default class DelegationTxDialog extends Component<Props> {
           <NumericInput
             className="amount"
             label={intl.formatMessage(globalMessages.amountLabel)}
-            maxBeforeDot={
-              this.props.meta.totalSupply.div(this.props.meta.decimalPlaces).toFixed().length
+            maxBeforeDot={calcMaxBeforeDot(
+              this.props.getTokenInfo(
+                this.props.amountToDelegate.getDefaultEntry()
+              ).Metadata.numberOfDecimals
+            )}
+            maxAfterDot={
+              this.props.getTokenInfo(
+                this.props.amountToDelegate.getDefaultEntry()
+              ).Metadata.numberOfDecimals
             }
-            maxAfterDot={this.props.meta.decimalPlaces}
             disabled
             // AmountInputSkin props
-            currency={this.props.meta.ticker}
-            fees={this.props.transactionFee.toFormat(this.props.meta.decimalPlaces)}
+            currency={getTokenName(
+              this.props.getTokenInfo(
+                this.props.amountToDelegate.getDefaultEntry()
+              )
+            )}
+            fees={formatValue(this.props.transactionFee.getDefaultEntry())}
             // note: we purposely don't put "total" since it doesn't really make sense here
             // since the fee is unrelated to the amount you're about to stake
             total=""
-            value={this.props.amountToDelegate
-              .shiftedBy(-this.props.meta.decimalPlaces)
-              .toFormat(this.props.meta.decimalPlaces)
-            }
+            value={formatValue(this.props.amountToDelegate.getDefaultEntry())}
             skin={AmountInputSkin}
             classicTheme={this.props.classicTheme}
           />
@@ -216,8 +233,11 @@ export default class DelegationTxDialog extends Component<Props> {
         <div className={styles.headerBlock}>
           <p className={styles.header}>{intl.formatMessage(messages.approximateLabel)}</p>
           <p className={styles.rewardAmount}>
-            {this.props.approximateReward.toFormat(this.props.meta.decimalPlaces)}&nbsp;
-            {this.props.meta.ticker}
+            {this.props.approximateReward.amount
+              .shiftedBy(-this.props.approximateReward.token.Metadata.numberOfDecimals)
+              .toFormat(this.props.approximateReward.token.Metadata.numberOfDecimals)
+            }&nbsp;
+            {getTokenName(this.props.approximateReward.token)}
           </p>
         </div>
         {this.props.error
