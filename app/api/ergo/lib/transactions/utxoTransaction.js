@@ -33,6 +33,7 @@ import { PRIMARY_ASSET_CONSTANTS } from '../../../ada/lib/storage/database/primi
 import {
   MultiToken,
 } from '../../../common/lib/MultiToken';
+import { toErgoBoxJSON } from './utils';
 
 type TxOutput = {|
   ...Address,
@@ -514,24 +515,4 @@ function generateKeys(request: {|
   }
 
   return secretKeys;
-}
-
-export function toErgoBoxJSON(
-  utxos: Array<RemoteUnspentOutput>
-): Array<ErgoBoxJson> {
-  return utxos.map(utxo => {
-      return {
-        boxId: utxo.boxId,
-        value: Number.parseInt(utxo.amount, 10),
-        ergoTree: utxo.ergoTree,
-        assets: (utxo.assets ?? []).map(asset => ({
-          amount: asset.amount,
-          tokenId: asset.tokenId,
-        })),
-        creationHeight: utxo.creationHeight,
-        additionalRegisters: utxo.additionalRegisters || Object.freeze({}),
-        transactionId: utxo.tx_hash,
-        index: utxo.tx_index,
-      };
-    })
 }
