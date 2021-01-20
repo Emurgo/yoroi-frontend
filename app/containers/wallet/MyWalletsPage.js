@@ -69,6 +69,16 @@ export default class MyWalletsPage extends Component<Props> {
       publicDeriver
     });
   };
+  openToSettings: PublicDeriver<> => void = (
+    publicDeriver
+  ) => {
+    this.generated.actions.wallets.setActiveWallet.trigger({
+      wallet: publicDeriver
+    });
+    this.generated.actions.router.goToRoute.trigger({
+      route: ROUTES.SETTINGS.WALLET,
+    });
+  };
 
   render(): Node {
     const sidebarContainer = (<SidebarContainer {...this.generated.SidebarContainerProps} />);
@@ -134,7 +144,6 @@ export default class MyWalletsPage extends Component<Props> {
       return (
         <>
           <WalletCurrency
-            // TODO: proper per-network api meta
             currency={getTokenName(defaultTokenInfo)}
             tooltipText={undefined /* TODO */}
           />
@@ -181,6 +190,7 @@ export default class MyWalletsPage extends Component<Props> {
             }
           />
         }
+        onSettings={() => this.openToSettings(publicDeriver)}
       />
     );
   }
@@ -289,7 +299,8 @@ export default class MyWalletsPage extends Component<Props> {
         |}
       |},
       wallets: {|
-        unselectWallet: {| trigger: (params: void) => void |}
+        unselectWallet: {| trigger: (params: void) => void |},
+        setActiveWallet: {| trigger: (params: {| wallet: PublicDeriver<> |}) => void |},
       |}
     |},
     stores: {|
@@ -355,6 +366,7 @@ export default class MyWalletsPage extends Component<Props> {
         },
         wallets: {
           unselectWallet: { trigger: actions.wallets.unselectWallet.trigger },
+          setActiveWallet: { trigger: actions.wallets.setActiveWallet.trigger },
         },
       },
       SidebarContainerProps: (

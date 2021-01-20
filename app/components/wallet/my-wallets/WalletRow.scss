@@ -22,9 +22,26 @@
     padding: 31px 24px;
 }
 
-.nameSection {
+.settingSection {
+    display: flex;
+    align-items: center;
     padding: 31px 24px;
 
+    .settingButton {
+        & svg > path {
+            fill: var(--cmn-default-color-grey-3);
+        }
+        &:hover {
+            cursor: pointer;
+            & svg > path {
+                fill: var(--cmn-default-color-grey-1);
+            }
+        }
+    }
+}
+
+.nameSection {
+    @extend .section;
     &:hover {
         cursor: pointer;
     }
