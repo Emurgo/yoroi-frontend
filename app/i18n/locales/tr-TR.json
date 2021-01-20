@@ -641,7 +641,7 @@
   "wallet.settings.delete.accept": "Hala bu cüzdanı geri getirme imkanım var",
   "wallet.settings.delete.warning2": "Lütfen bu cüzdana erişimi geri yükleme imkanlarına sahip olduğunuzu tekrar kontrol edin. Yapamazsanız, cüzdanı çıkarmak geri dönüşü olmayan para kaybına neden olabilir.",
   "wallet.settings.export.explanation": "This can be used to transfer a wallet between devices.",
-  "wallet.settings.export.label": "Export wallet",
+  "wallet.settings.export.label": "Cüzdanı dışarı aktar",
   "wallet.settings.name.label": "Cüzdan adı",
   "wallet.settings.passwordLastUpdated": "Son güncelleme {lastUpdated}",
   "wallet.settings.publicExport.explanationLine1": "The below you can find your wallet's <strong>public</strong> key information.",
