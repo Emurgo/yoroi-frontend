@@ -63,7 +63,21 @@ export class MultiToken {
       return this;
     }
     existingEntry.amount = existingEntry.amount.plus(entry.amount);
+    this._removeIfZero(entry.identifier);
     return this;
+  }
+
+  _removeIfZero: string => void = (identifier) => {
+    // if after modifying a token value we end up with a value of 0,
+    // we should just remove the token from the list
+    // However, we must keep a value of 0 for the default entry
+    if (identifier === this.defaults.defaultIdentifier) {
+      return;
+    }
+    const existingValue = this.get(identifier);
+    if (existingValue != null && existingValue.eq(0)) {
+      this.values = this.values.filter(value => value.identifier !== identifier);
+    }
   }
 
   subtract: TokenEntry => MultiToken = (entry) => {
