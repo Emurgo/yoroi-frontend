@@ -97,10 +97,10 @@ export default class ConfirmPinDialog extends Component<Props> {
     if (this.pinForm !== undefined) {
       this.pinForm.submit({
         onSuccess: async () => {
-          this.props.submit();
+          await this.props.submit();
         },
-        onError: () => {
-          this.props.error();
+        onError: async () => {
+          await this.props.error();
         },
       });
     }

@@ -35,9 +35,7 @@ export default class RegisterDialogContainer extends Component<Props> {
 
   render(): Node {
     const { intl } = this.context;
-    const { submit, cancel, onError } = this.props;
-
-    const { profile } = this.generated.stores;
+    const { submit, cancel, onError, classicTheme } = this.props;
     const { votingRegTransaction } = this.generated.stores.substores.ada;
     const votingStore = this.generated.stores.substores.ada.votingStore;
 
@@ -69,14 +67,14 @@ export default class RegisterDialogContainer extends Component<Props> {
             await this.generated.actions.ada.votingTransaction.createTransaction.trigger(
               walletPassword
               );
-            submit();
+            await submit();
           } catch (error) {
             onError(error);
           }
         }}
         isProcessing={votingStore.isActionProcessing}
         cancel={cancel}
-        classicTheme={profile.isClassicTheme}
+        classicTheme={classicTheme}
       />
     );
   }
@@ -116,9 +114,6 @@ export default class RegisterDialogContainer extends Component<Props> {
       |},
     |},
     stores: {|
-      profile: {|
-        isClassicTheme: boolean,
-      |},
       substores: {|
         ada: {|
           votingStore: {|
@@ -157,9 +152,6 @@ export default class RegisterDialogContainer extends Component<Props> {
         },
       },
       stores: {
-        profile: {
-          isClassicTheme: stores.profile.isClassicTheme,
-        },
         substores: {
           ada: {
             votingStore: {

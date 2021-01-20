@@ -59,7 +59,7 @@ export default class TransactionDialogContainer extends Component<Props> {
                 password,
                 publicDeriver: selectedWallet,
               })
-              submit();
+              await submit();
             }
           }
           classicTheme={this.props.classicTheme}
@@ -103,7 +103,6 @@ export default class TransactionDialogContainer extends Component<Props> {
         sendMoneyRequest: {|
           error: ?LocalizableError,
           isExecuting: boolean,
-          wasExecuted: boolean,
         |},
         selected: null | PublicDeriver<>,
       |},
@@ -140,7 +139,6 @@ export default class TransactionDialogContainer extends Component<Props> {
           sendMoneyRequest: {
             error: stores.wallets.sendMoneyRequest.error,
             isExecuting: stores.wallets.sendMoneyRequest.isExecuting,
-            wasExecuted: stores.wallets.sendMoneyRequest.wasExecuted,
           },
         },
         substores: {

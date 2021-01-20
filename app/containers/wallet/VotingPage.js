@@ -64,7 +64,6 @@ export default class VotingPage extends Component<Props> {
     |},
     stores: {|
       uiDialogs: {|
-        getParam: <T>(number | string) => T,
         isOpen: any => boolean,
       |},
     |},
@@ -91,7 +90,6 @@ export default class VotingPage extends Component<Props> {
       stores: {
         uiDialogs: {
           isOpen: stores.uiDialogs.isOpen,
-          getParam: stores.uiDialogs.getParam,
         },
       },
       VotingRegistrationDialogProps: ({

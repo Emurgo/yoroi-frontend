@@ -89,7 +89,7 @@ export default class RegisterDialog extends Component<Props> {
       this.spendingPasswordForm.submit({
         onSuccess: async form => {
           const { walletPassword } = form.values();
-          this.props.submit(walletPassword);
+          await this.props.submit(walletPassword);
         },
         onError: () => {},
       });
