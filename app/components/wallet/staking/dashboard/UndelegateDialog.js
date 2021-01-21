@@ -27,6 +27,7 @@ import type {
 } from '../../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
 import { getTokenName } from '../../../../stores/stateless/tokenHelpers';
+import { truncateToken } from '../../../../utils/formatters';
 
 import WarningBox from '../../../widgets/WarningBox';
 
@@ -163,7 +164,7 @@ export default class UndelegateDialog extends Component<Props> {
       return (
         <p className={styles.rewardAmount}>
           {formattedAmount}&nbsp;
-          {getTokenName(tokenInfo)}
+          {truncateToken(getTokenName(tokenInfo))}
         </p>
       );
     })();

@@ -29,6 +29,7 @@ import type {
 } from '../../../api/common/lib/MultiToken';
 import type { TokenRow, } from '../../../api/ada/lib/storage/database/primitives/tables';
 import { getTokenName, genFormatTokenAmount, } from '../../../stores/stateless/tokenHelpers';
+import { truncateToken } from '../../../utils/formatters';
 
 import WarningBox from '../../widgets/WarningBox';
 
@@ -152,7 +153,7 @@ export default class VotingRegTxDialog extends Component<Props> {
             maxAfterDot={tokenInfo.Metadata.numberOfDecimals}
             disabled
             // AmountInputSkin props
-            currency={getTokenName(tokenInfo)}
+            currency={truncateToken(getTokenName(tokenInfo))}
             fees={formatValue(this.props.transactionFee.getDefaultEntry())}
             // note: we purposely don't put "total" since it doesn't really make sense here
             // since the fee is unrelated to the amount you're about to stake

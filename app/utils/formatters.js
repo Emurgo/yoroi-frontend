@@ -70,6 +70,10 @@ function truncateFormatter(addr: string, cutoff: number): string {
   return addr.substring(0, cutoff / 2) + '...' + addr.substring(addr.length - (cutoff / 2), addr.length);
 }
 
+export function truncateToken(addr: string): string {
+  return truncateFormatter(addr, 10);
+}
+
 export function truncateAddress(addr: string): string {
   // needs to be enough for any bech32 prefix & header and bech32 checksum
   // 40 empirically works well with bech32 and still fits in small spaces and dialogs

@@ -16,7 +16,7 @@ import { addressFilter, AddressFilter, } from '../../types/AddressFilterTypes';
 import environment from '../../environment';
 import type { Notification } from '../../types/notificationType';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { truncateAddressShort, splitAmount } from '../../utils/formatters';
+import { truncateAddressShort, splitAmount, truncateToken } from '../../utils/formatters';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import NoTransactionModernSvg from '../../assets/images/transaction/no-transactions-yet.modern.inline.svg';
 import AddLabelIcon from '../../assets/images/add-label.inline.svg';
@@ -110,7 +110,7 @@ export default class WalletReceive extends Component<Props> {
         {' '}
         {this.props.unitOfAccountSetting.enabled
           ? this.props.unitOfAccountSetting.currency
-          : getTokenName(tokenInfo)
+          : truncateToken(getTokenName(tokenInfo))
         }
       </>
     );

@@ -240,25 +240,22 @@ export default class TransactionBuilderStore extends Store {
       const lastSync = this.stores.transactions.getTxRequests(publicDeriver).lastSyncInfo;
 
       const defaultToken = this.stores.tokenInfoStore.getDefaultTokenInfo(network.NetworkId);
-      const isSendingToken = (
-        this.selectedToken != null && this.selectedToken.TokenId !== defaultToken.TokenId
-      );
-      const txFee = isSendingToken
-        // kind of hacky.
-        // We use a larger amount for tokens in hopes it covers any smart contract execution cost
-        ? new BigNumber(10000000)
-        : new BigNumber(
-          RustModule.SigmaRust.BoxValue.SAFE_USER_MIN().as_i64().to_str()
-        ).plus(100000); // slightly higher than default fee
+      const txFee = new BigNumber(
+        RustModule.SigmaRust.BoxValue.SAFE_USER_MIN().as_i64().to_str()
+      ).plus(100000); // slightly higher than default fee
 
       const genTokenList = (userInput) => {
         const tokens = [userInput];
-          if (isSendingToken) {
+          if (this.selectedToken != null && this.selectedToken.TokenId !== defaultToken.TokenId) {
           // if the user is sending a token, we need to make sure the resulting box
           // has at least the minimum amount of ERG in it
           tokens.push({
             token: defaultToken,
-            amount: RustModule.SigmaRust.BoxValue.SAFE_USER_MIN().as_i64().to_str(),
+            // amount: RustModule.SigmaRust.BoxValue.SAFE_USER_MIN().as_i64().to_str(),
+            // kind of hacky.
+            // We use a larger amount for tokens
+            // in hopes it covers any smart contract execution cost
+            amount: new BigNumber(10000000).toString()
           });
         }
         return tokens;

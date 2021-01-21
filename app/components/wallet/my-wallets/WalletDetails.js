@@ -4,7 +4,7 @@ import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
-import { splitAmount } from '../../../utils/formatters';
+import { splitAmount, truncateToken } from '../../../utils/formatters';
 import styles from './WalletDetails.scss';
 import IconEyeOpen from '../../../assets/images/my-wallets/icon_eye_open.inline.svg';
 import IconEyeClosed from '../../../assets/images/my-wallets/icon_eye_closed.inline.svg';
@@ -122,6 +122,6 @@ export default class WalletDetails extends Component<Props> {
       );
     }
 
-    return (<>{balanceDisplay} {getTokenName(tokenInfo)}</>);
+    return (<>{balanceDisplay} {truncateToken(getTokenName(tokenInfo))}</>);
   }
 }
