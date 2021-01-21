@@ -27,7 +27,7 @@ import { TxStatusCodes, } from '../../../api/ada/lib/storage/database/primitives
 import type { TxStatusCodesType, } from '../../../api/ada/lib/storage/database/primitives/enums';
 import type { CertificateRow, TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import { RustModule } from '../../../api/ada/lib/cardanoCrypto/rustLoader';
-import { splitAmount, truncateAddressShort } from '../../../utils/formatters';
+import { splitAmount, truncateAddressShort, truncateToken } from '../../../utils/formatters';
 import type { TxMemoTableRow } from '../../../api/ada/lib/storage/database/memos/tables';
 import CopyableAddress from '../../widgets/CopyableAddress';
 import type { Notification } from '../../../types/notificationType';
@@ -367,7 +367,7 @@ export default class Transaction extends Component<Props, State> {
       return this.props.unitOfAccountSetting.currency;
     }
     const tokenInfo = this.props.getTokenInfo(tokenEntry);
-    return getTokenName(tokenInfo);
+    return truncateToken(getTokenName(tokenInfo));
   };
 
   renderRow: {|

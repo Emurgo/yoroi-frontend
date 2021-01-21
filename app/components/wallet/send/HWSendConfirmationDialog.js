@@ -21,7 +21,7 @@ import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import styles from './HWSendConfirmationDialog.scss';
-import { truncateAddress } from '../../../utils/formatters';
+import { truncateAddress, truncateToken } from '../../../utils/formatters';
 import {
   MultiToken,
 } from '../../../api/common/lib/MultiToken';
@@ -96,7 +96,7 @@ export default class HWSendConfirmationDialog extends Component<Props> {
           </div>
           <div className={styles.amountSmall}>{formatValue(entry)}
             <span className={styles.currencySymbol}>&nbsp;{
-              getTokenName(this.props.getTokenInfo(entry))
+              truncateToken(getTokenName(this.props.getTokenInfo(entry)))
             }
             </span>
           </div>
@@ -104,7 +104,7 @@ export default class HWSendConfirmationDialog extends Component<Props> {
       ) : (
         <div className={styles.amount}>{formatValue(entry)}
           <span className={styles.currencySymbol}>&nbsp;{
-            getTokenName(this.props.getTokenInfo(entry))
+            truncateToken(getTokenName(this.props.getTokenInfo(entry)))
           }
           </span>
         </div>
@@ -125,7 +125,7 @@ export default class HWSendConfirmationDialog extends Component<Props> {
           </div>
           <div className={styles.totalAmountSmall}>{formatValue(entry)}
             <span className={styles.currencySymbol}>&nbsp;{
-              getTokenName(this.props.getTokenInfo(entry))
+              truncateToken(getTokenName(this.props.getTokenInfo(entry)))
             }
             </span>
           </div>
@@ -133,7 +133,7 @@ export default class HWSendConfirmationDialog extends Component<Props> {
       ) : (
         <div className={styles.totalAmount}>{formatValue(entry)}
           <span className={styles.currencySymbol}>&nbsp;{
-            getTokenName(this.props.getTokenInfo(entry))
+            truncateToken(getTokenName(this.props.getTokenInfo(entry)))
           }
           </span>
         </div>
@@ -155,9 +155,9 @@ export default class HWSendConfirmationDialog extends Component<Props> {
           <div className={styles.feesSmall}>
             +{formatValue(entry)}
             <span className={styles.currencySymbol}>&nbsp;{
-              getTokenName(this.props.getTokenInfo(
+              truncateToken(getTokenName(this.props.getTokenInfo(
                 entry
-              ))
+              )))
             }
             </span>
           </div>
@@ -166,9 +166,9 @@ export default class HWSendConfirmationDialog extends Component<Props> {
         <div className={styles.fees}>
           +{formatValue(entry)}
           <span className={styles.currencySymbol}>&nbsp;{
-            getTokenName(this.props.getTokenInfo(
+            truncateToken(getTokenName(this.props.getTokenInfo(
               entry
-            ))
+            )))
           }
           </span>
         </div>

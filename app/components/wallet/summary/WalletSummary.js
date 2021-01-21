@@ -12,7 +12,7 @@ import styles from './WalletSummary.scss';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import { formatValue } from '../../../utils/unit-of-account';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { splitAmount } from '../../../utils/formatters';
+import { splitAmount, truncateToken } from '../../../utils/formatters';
 import {
   MultiToken,
 } from '../../../api/common/lib/MultiToken';
@@ -97,7 +97,7 @@ export default class WalletSummary extends Component<Props> {
       );
     }
 
-    return (<>{balanceDisplay} {getTokenName(tokenInfo)}</>);
+    return (<>{balanceDisplay} {truncateToken(getTokenName(tokenInfo))}</>);
   }
 
   render(): Node {

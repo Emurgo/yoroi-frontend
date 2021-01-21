@@ -16,7 +16,7 @@ export function getTokenName(
       ...,
     },
     ...,
-  }>
+  }>,
 ): string {
   const strictName = getTokenStrictName(tokenRow);
   if (strictName != null) return strictName;
@@ -34,7 +34,7 @@ export function getTokenStrictName(
       ...,
     },
     ...,
-  }>
+  }>,
 ): void | string {
   if (tokenRow.Metadata.ticker != null) {
     return tokenRow.Metadata.ticker;

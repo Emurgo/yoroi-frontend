@@ -19,6 +19,7 @@ import type { GetNoticesRequestOptions } from '../../api/ada/index';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 import { getTokenName, genLookupOrFail } from '../../stores/stateless/tokenHelpers';
 import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
+import { truncateToken } from '../../utils/formatters';
 
 const messages = defineMessages({
   title: {
@@ -78,7 +79,7 @@ export default class NoticeBoardPage extends Component<InjectedOrGenerated<Gener
         noticeComp = (
           <NoNotice
             classicTheme={this.generated.stores.profile.isClassicTheme}
-            ticker={getTokenName(defaultTokenInfo)}
+            ticker={truncateToken(getTokenName(defaultTokenInfo))}
           />
         );
       }

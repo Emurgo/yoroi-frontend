@@ -70,6 +70,7 @@ import {
 } from '../../../api/common/lib/MultiToken';
 import type { TokenInfoMap } from '../../../stores/toplevel/TokenInfoStore';
 import { getTokenName, genLookupOrFail } from '../../../stores/stateless/tokenHelpers';
+import { truncateToken } from '../../../utils/formatters';
 
 export type GeneratedData = typeof StakingDashboardPage.prototype.generated;
 
@@ -160,11 +161,11 @@ export default class StakingDashboardPage extends Component<Props> {
         })}
         delegationHistory={delegationRequests.getCurrentDelegation.result?.fullHistory}
         epochLength={this.getEpochLengthInDays(publicDeriver)}
-        ticker={getTokenName(
+        ticker={truncateToken(getTokenName(
           this.generated.stores.tokenInfoStore.getDefaultTokenInfo(
             publicDeriver.getParent().getNetworkInfo().NetworkId
           )
-        )}
+        ))}
       />
     );
 

@@ -16,7 +16,7 @@ import DialogCloseButton from '../widgets/DialogCloseButton';
 import { InputOwnSkin } from '../../themes/skins/InputOwnSkin';
 import globalMessages from '../../i18n/global-messages';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
-import { formattedAmountToNaturalUnits } from '../../utils/formatters';
+import { formattedAmountToNaturalUnits, truncateToken } from '../../utils/formatters';
 import config from '../../config';
 import { calcMaxBeforeDot } from '../../utils/validations';
 import { getTokenName } from '../../stores/stateless/tokenHelpers';
@@ -67,7 +67,7 @@ export default class URIGenerateDialog extends Component<Props> {
 
   getAmountLabel: (() => string) = (): string => {
     const label = this.context.intl.formatMessage(messages.uriGenerateDialogAmountLabel, {
-      currency: getTokenName(this.props.tokenInfo),
+      currency: truncateToken(getTokenName(this.props.tokenInfo)),
     });
 
     return label;
@@ -81,7 +81,7 @@ export default class URIGenerateDialog extends Component<Props> {
         value: this.props.walletAddress,
       },
       amount: {
-        label: this.getAmountLabel(),
+        label: truncateToken(this.getAmountLabel()),
         placeholder: `0.${'0'.repeat(this.props.tokenInfo.Metadata.numberOfDecimals)}`,
         value: '',
         validators: [async ({ field }) => {

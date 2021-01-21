@@ -25,6 +25,7 @@ import type {
 import { getTokenName } from '../../../../stores/stateless/tokenHelpers';
 import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
 import { hiddenAmount } from '../../../../utils/strings';
+import { truncateToken } from '../../../../utils/formatters';
 
 const messages = defineMessages({
   title: {
@@ -118,7 +119,7 @@ export default class UserSummary extends Component<Props, State> {
           <div>
             <h3 className={styles.label}>
               {intl.formatMessage(globalMessages.totalTokenLabel, {
-                ticker: getTokenName(this.props.defaultTokenInfo),
+                ticker: truncateToken(getTokenName(this.props.defaultTokenInfo)),
               })}
               :
             </h3>
@@ -228,9 +229,9 @@ export default class UserSummary extends Component<Props, State> {
                     <FormattedMessage
                       {...messages.mangledPopupDialogLine2}
                       values={{
-                        ticker: getTokenName(this.props.getTokenInfo(
+                        ticker: truncateToken(getTokenName(this.props.getTokenInfo(
                           this.props.canUnmangleSum.getDefaultEntry()
-                        )),
+                        ))),
                         transactionMessage: (
                           <span
                             className={styles.link}
@@ -315,7 +316,7 @@ export default class UserSummary extends Component<Props, State> {
       <FormattedMessage
         {...message}
         values={{
-          ticker: getTokenName(tokenInfo),
+          ticker: truncateToken(getTokenName(tokenInfo)),
           adaAmount: this.props.shouldHideBalance
             ? hiddenAmount
             : amount,
@@ -344,7 +345,7 @@ export default class UserSummary extends Component<Props, State> {
         <span>
           {amountNode}{' '}
         </span>
-        {getTokenName(tokenInfo)}
+        {truncateToken(getTokenName(tokenInfo))}
       </>
     );
   };
