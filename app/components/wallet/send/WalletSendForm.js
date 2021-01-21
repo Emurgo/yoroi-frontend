@@ -319,9 +319,10 @@ export default class WalletSendForm extends Component<Props> {
     });
 
     const totalAmount = this.props.totalInput ?? new MultiToken([{
-      identifier: this.props.defaultToken.Identifier,
-      networkId: this.props.defaultToken.NetworkId,
-      amount: formattedAmountToBigNumber(amountFieldProps.value),
+      identifier: (this.props.selectedToken ?? this.props.defaultToken).Identifier,
+      networkId: (this.props.selectedToken ?? this.props.defaultToken).NetworkId,
+      amount: formattedAmountToBigNumber(amountFieldProps.value)
+        .shiftedBy((this.props.selectedToken ?? this.props.defaultToken).Metadata.numberOfDecimals),
     }], {
       defaultIdentifier: this.props.defaultToken.Identifier,
       defaultNetworkId: this.props.defaultToken.NetworkId,
