@@ -362,8 +362,10 @@ export default class WalletSendForm extends Component<Props> {
       })).map(token => ({
         value: token.info.TokenId,
         info: token.info,
-        label: truncateToken(getTokenStrictName(token.info) ?? '-'),
-        id: getTokenIdentifierIfExists(token.info) ?? '-',
+        label: truncateToken(getTokenStrictName(token.info) ?? getTokenIdentifierIfExists(token.info) ?? '-'),
+        id: getTokenStrictName(token.info) == null
+          ? '-'
+          : (getTokenIdentifierIfExists(token.info) ?? '-'),
         amount: genFormatTokenAmount(this.props.getTokenInfo)(token.entry)
       }));
     })();
