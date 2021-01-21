@@ -380,9 +380,15 @@ export default class WalletSendForm extends Component<Props> {
               className={styles.currencySelect}
               options={tokenOptions}
               {...form.$('selectedToken').bind()}
-              onChange={tokenId => this.props.onAddToken(tokenOptions.find(
-                token => token.info.TokenId === tokenId
-              )?.info)}
+              onChange={tokenId => {
+                this.props.onAddToken(tokenOptions.find(
+                  token => token.info.TokenId === tokenId
+                )?.info);
+
+                // clear amount field when switching currencies
+                this.form.$('amount').clear();
+                this.props.updateAmount();
+              }}
               skin={SelectTokenSkin}
               value={this.props.selectedToken?.TokenId ?? this.props.getTokenInfo({
                 identifier: this.props.defaultToken.Identifier,
