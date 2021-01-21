@@ -100,7 +100,7 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
     if (canGetAllUtxos == null) {
       throw new Error('could not get all utxos');
     }
-    let utxos = await canGetAllUtxos.getAllUtxos();
+    const utxos = await canGetAllUtxos.getAllUtxos();
     return connectorSignTx(wallet, password, utxos, tx, indices);
   }
   console.log(JSON.stringify(sender));
@@ -210,7 +210,7 @@ async function confirmSign(tabId: number, request: PendingSignData): Promise<any
         type: 'popup'
       });
     } else {
-      console.log(`ERR - confirmSign could not find connection with tabId = ${tabId}`);
+      // console.log(`ERR - confirmSign could not find connection with tabId = ${tabId}`);
     }
   });
 }
@@ -268,7 +268,6 @@ chrome.runtime.onConnectExternal.addListener(port => {
                 tx: message.params[0],
                 uid: message.uid
               });
-              console.log(`sign_tx resp: ${JSON.stringify(resp)}`);
               rpcResponse(resp);
             }
             break;
@@ -298,7 +297,7 @@ chrome.runtime.onConnectExternal.addListener(port => {
             {
               const wallet = await firstWallet();
               const balance = await connectorGetBalance(wallet, message.params[0]);
-              rpcResponse({ ok: balance});
+              rpcResponse({ ok: balance });
             }
             break;
           case 'get_utxos':
@@ -317,7 +316,7 @@ chrome.runtime.onConnectExternal.addListener(port => {
           case 'get_used_addresses':
             {
               const wallet = await firstWallet();
-              const addresses = await connectorGetUsedAddresses(wallet); 
+              const addresses = await connectorGetUsedAddresses(wallet);
               rpcResponse({
                 ok: addresses
               });
@@ -326,7 +325,7 @@ chrome.runtime.onConnectExternal.addListener(port => {
           case 'get_unused_addresses':
             {
               const wallet = await firstWallet();
-              const addresses = await connectorGetUnusedAddresses(wallet); 
+              const addresses = await connectorGetUnusedAddresses(wallet);
               rpcResponse({
                 ok: addresses
               });
