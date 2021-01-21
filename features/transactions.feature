@@ -388,7 +388,7 @@ Feature: Send transaction
     And I see send money confirmation dialog
     And I see CONFIRM TRANSACTION Pop up:
       | address   | amount    |fee      |
-      | <address> | 0.001000000  |<fee>    |
+      | <address> | 0.010000000  |<fee>    |
     And I enter the wallet password:
       | password   |
       | asdfasdfasdf |
@@ -397,7 +397,7 @@ Feature: Send transaction
 
     Examples:
       | address                                             | amount       |fee         |
-      | 9guxMsa2S1Z4xzr5JHUHZesznThjZ4BMM9Ra5Lfx2E9duAnxEmv | 123  |0.010000000 |
+      | 9guxMsa2S1Z4xzr5JHUHZesznThjZ4BMM9Ra5Lfx2E9duAnxEmv | 123  |0.001100000 |
 
   @it-171
   Scenario: Can send all of a custom token (IT-171)
@@ -412,7 +412,7 @@ Feature: Send transaction
     And I fill the address of the form:
       | address                                                     |
       | 9guxMsa2S1Z4xzr5JHUHZesznThjZ4BMM9Ra5Lfx2E9duAnxEmv         |
-    And The transaction fees are "0.010000000"
+    And The transaction fees are "0.001100000"
     And I click on the next button in the wallet send form
     And I see send money confirmation dialog
     And I enter the wallet password:
