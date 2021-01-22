@@ -19,4 +19,5 @@ export default class VotingActions {
   goBackToRegister: Action<void> = new Action();
   finishQRCode: Action<void> = new Action();
   submitTransaction: Action<void> = new Action();
+  submitTransactionError: Action<Error> = new Action();
 }

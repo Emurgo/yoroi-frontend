@@ -113,6 +113,9 @@ const genVotingRegistrationDialogProps: ({|
         submitTransaction: {
           trigger: action('submitTransaction'),
         },
+        submitTransactionError: {
+          trigger: action('submitTransactionError'),
+        },
         finishQRCode: {
           trigger: action('finishQRCode'),
         },
@@ -193,6 +196,7 @@ const genTransactionDialogProps: ({|
       ada: {
         votingStore: {
           progressInfo: request.progressInfo,
+          error: request.error,
         },
         votingRegTransactionStore: {
           isStale: boolean('isStale', false),

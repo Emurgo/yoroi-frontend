@@ -23,6 +23,7 @@ type Props = {|
   +cancel: void => void,
   +goBack: void => void,
   +classicTheme: boolean,
+  +onError: Error => void,
 |};
 
 @observer
@@ -32,7 +33,7 @@ export default class TransactionDialogContainer extends Component<Props> {
   };
 
   render(): Node {
-    const { submit, cancel, goBack } = this.props;
+    const { submit, cancel, goBack, onError } = this.props;
     const selectedWallet = this.generated.stores.wallets.selected;
     if (selectedWallet == null) {
       return null;
@@ -55,15 +56,19 @@ export default class TransactionDialogContainer extends Component<Props> {
           onCancel={cancel}
           goBack={goBack}
           onSubmit={async ({ password }) => {
+            try {
               await this.generated.actions.ada.votingTransaction.signTransaction.trigger({
                 password,
                 publicDeriver: selectedWallet,
               })
               await submit();
+            } catch (error) {
+              onError(error);
+            }
             }
           }
           classicTheme={this.props.classicTheme}
-          error={this.generated.stores.wallets.sendMoneyRequest.error}
+          error={votingStore.error}
         />
       );
     }
@@ -88,6 +93,7 @@ export default class TransactionDialogContainer extends Component<Props> {
         ada: {|
           votingStore: {|
             progressInfo: ProgressInfo,
+            error: ?LocalizableError,
           |},
           votingRegTransactionStore: {|
             createVotingRegTx: {|
@@ -145,6 +151,7 @@ export default class TransactionDialogContainer extends Component<Props> {
           ada: {
             votingStore: {
               progressInfo: stores.substores.ada.votingStore.progressInfo,
+              error: stores.substores.ada.votingStore.error,
             },
             votingRegTransactionStore: {
               isStale: votingStore.isStale,

@@ -98,6 +98,7 @@ export default class VotingStore extends Store {
     votingActions.goBackToRegister.listen(this._goBackToRegister);
     votingActions.submitGenerate.listen(this._submitGenerate);
     votingActions.submitTransaction.listen(this._submitTransaction);
+    votingActions.submitTransactionError.listen(this._submitTransactionError);
     votingActions.cancel.listen(this._cancel);
   }
 
@@ -106,6 +107,7 @@ export default class VotingStore extends Store {
   }
 
   @action _goBackToRegister: void => void = () => {
+    this.createVotingRegTx.reset();
     this.error = null;
     this.progressInfo.currentStep = ProgressStep.REGISTER;
     this.progressInfo.stepState = StepState.LOAD;
@@ -151,6 +153,12 @@ export default class VotingStore extends Store {
   @action _submitRegisterError: Error => void = (error) => {
     this.error = convertToLocalizableError(error);
     this.progressInfo.currentStep = ProgressStep.REGISTER;
+    this.progressInfo.stepState = StepState.ERROR;
+  };
+
+  @action _submitTransactionError: Error => void = (error) => {
+    this.error = convertToLocalizableError(error);
+    this.progressInfo.currentStep = ProgressStep.TRANSACTION;
     this.progressInfo.stepState = StepState.ERROR;
   };
 

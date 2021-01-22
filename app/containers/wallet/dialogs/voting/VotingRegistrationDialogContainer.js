@@ -93,6 +93,7 @@ export default class VotingRegistrationDialogContainer extends Component<Props> 
             cancel={this.cancel}
             submit={votingActions.submitTransaction.trigger}
             goBack={votingActions.goBackToRegister.trigger}
+            onError={votingActions.submitTransactionError.trigger}
           />);
         break;
       case ProgressStep.QR_CODE:
@@ -141,6 +142,9 @@ export default class VotingRegistrationDialogContainer extends Component<Props> 
           |},
           submitTransaction: {|
             trigger: (params: void) => void
+          |},
+          submitTransactionError: {|
+            trigger: (params: Error) => void
           |},
           finishQRCode: {|
             trigger: (params: void) => void
@@ -213,6 +217,9 @@ export default class VotingRegistrationDialogContainer extends Component<Props> 
             },
             submitTransaction: {
               trigger: actions.ada.voting.submitTransaction.trigger,
+            },
+            submitTransactionError: {
+              trigger: actions.ada.voting.submitTransactionError.trigger,
             },
             finishQRCode: {
               trigger: actions.ada.voting.finishQRCode.trigger,
