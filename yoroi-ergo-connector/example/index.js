@@ -16,6 +16,24 @@ if (typeof ergo_request_read_access === "undefined") {
             window.addEventListener("ergo_wallet_disconnected", function(event) {
                 alert("wallet disconnected");
             });
+            // ergo.get_unused_addresses().then(function(addresses) {
+            //     //console.log(`get_unused_addresses() = {`);
+            //     // for (const address of addresses) {
+            //     //     const addr = wasm.NetworkAddress.from_bytes(Buffer.from(address, 'hex'));
+            //     //     console.log(`${JSON.stringify(address)} -> ${addr.to_base58()}`);
+            //     // }
+            //     // console.log('}');
+            //     console.log(`get_unused_addresses() = ${JSON.stringify(addresses)}`);
+            // });
+            // ergo.get_used_addresses().then(function(addresses) {
+            //     //console.log(`get_used_addresses() = {`);
+            //     // for (const address of addresses) {
+            //     //     const addr = wasm.NetworkAddress.from_bytes(Buffer.from(address, 'hex'));
+            //     //     console.log(`${JSON.stringify(address)} -> ${addr.to_base58()}`);
+            //     // }
+            //     // console.log('}');
+            //     console.log(`get_used_addresses() = ${JSON.stringify(addresses)}`);
+            // });
             ergo.get_balance().then(async function(result) {
                 let tx = {};
                 const div = document.getElementById("balance");
@@ -31,9 +49,10 @@ if (typeof ergo_request_read_access === "undefined") {
                     const creationHeight = 398959;
                     const amountToSend = valueEntry.value;
                     const amountToSendBoxValue = wasm.BoxValue.from_i64(wasm.I64.from_str(amountToSend.toString()));
-                    const utxos = await ergo.get_utxos(amountToSend);
+                    const utxos = await ergo.get_utxos(amountToSend + wasm.TxBuilder.SUGGESTED_TX_FEE().as_i64().as_num());
                     //alert(utxos.map(utxo => parseInt(utxo.value)));
                     const utxosValue = utxos.map(utxo => parseInt(utxo.value, 10)).reduce((a, b) => a + b, 0);
+                    console.log(`${utxosValue} - ${amountToSend} - ${wasm.TxBuilder.SUGGESTED_TX_FEE().as_i64().as_num()}`);
                     const changeValue = utxosValue - amountToSend - wasm.TxBuilder.SUGGESTED_TX_FEE().as_i64().as_num();
                     console.log(`${changeValue} | cv.ts() = ${changeValue.toString()}`);
                     const changeValueBoxValue = wasm.BoxValue.from_i64(wasm.I64.from_str(changeValue.toString()));

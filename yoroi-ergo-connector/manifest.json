@@ -21,17 +21,11 @@
     }
   ],
   "manifest_version": 2,
-  "page_action": {
+  "browser_action": {
     "default_title": "Yoroi-Ergo dApp Connector"
   },
   "permissions": [
     "activeTab",
     "storage"
-  ],
-  "web_accessible_resources": [
-    "main.html",
-    "main.js",
-    "sign.html",
-    "sign.js"
   ]
 }

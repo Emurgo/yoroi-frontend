@@ -103,7 +103,6 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
     const utxos = await canGetAllUtxos.getAllUtxos();
     return connectorSignTx(wallet, password, utxos, tx, indices);
   }
-  console.log(JSON.stringify(sender));
   // alert(`received event: ${JSON.stringify(request)}`);
   if (request.type === 'connect_response') {
     const connection = connectedSites.get(request.tabId);
@@ -160,13 +159,10 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
       alert(`couldn't find tabId: ${request.tabId} in ${JSON.stringify(connectedSites.entries())}`);
     }
   } else if (request.type === 'tx_sign_window_retrieve_data') {
-    console.log(`retrive data!? ${JSON.stringify(request)} from ${JSON.stringify(connectedSites)}`);
     for (const [tabId, connection] of connectedSites) {
       for (const [/* uid */, responseData] of connection.pendingSigns.entries()) {
         if (!responseData.openedWindow) {
-          console.log(`responseData: ${JSON.stringify(responseData)}`);
           responseData.openedWindow = true;
-          console.log(JSON.stringify(connection.pendingSigns));
           sendResponse({
             sign: responseData.request,
             tabId
@@ -215,29 +211,57 @@ async function confirmSign(tabId: number, request: PendingSignData): Promise<any
   });
 }
 
-async function confirmConnect(tabId: number, url: string) {
+async function confirmConnect(tabId: number, url: string): Promise<boolean> {
   return new Promise(resolve => {
-    connectedSites.set(tabId, {
-      url,
-      status: {
-        resolve,
-        openedWindow: false
-      },
-      pendingSigns: new Map()
-    });
-    console.log(`connected sites: ${JSON.stringify(connectedSites)}`);
-    chrome.windows.create({
-      url: 'connect.html',
-      width: 240,
-      height: 400,
-      focused: true,
-      type: 'popup'
+    chrome.storage.local.get('connector_whitelist', async result => {
+      const whitelist = Object.keys(result).length === 0 ? [] : result.connector_whitelist;
+      if (whitelist.includes(url)) {
+        connectedSites.set(tabId, {
+          url,
+          status: true,
+          pendingSigns: new Map()
+        });
+        resolve(true);
+      } else {
+        connectedSites.set(tabId, {
+          url,
+          status: {
+            resolve,
+            openedWindow: false
+          },
+          pendingSigns: new Map()
+        });
+        chrome.windows.create({
+          url: 'connect.html',
+          width: 240,
+          height: 400,
+          focused: true,
+          type: 'popup'
+        });
+      }
     });
   });
 }
 
+const connectorId = 'knfkinkbmgjefmeaddmkgpgmbggdllcp';
+
+// generic communication to the entire connector
+chrome.runtime.onMessageExternal.addListener((message, sender) => {
+  if (sender.id === connectorId) {
+    if (message.type === 'open_browseraction_menu') {
+      chrome.windows.create({
+        url: 'config.html',
+        width: 240,
+        height: 400,
+        focused: true,
+        type: 'popup'
+      });
+    }
+  }
+});
+
+// per-page connection to injected code in the connector
 chrome.runtime.onConnectExternal.addListener(port => {
-  const connectorId = 'knfkinkbmgjefmeaddmkgpgmbggdllcp';
   if (port.sender.id === connectorId) {
     const tabId = port.sender.tab.id;
     port.onMessage.addListener(async message => {

@@ -183,16 +183,6 @@ if (shouldInject()) {
         }
     });
 
-    // events from background script
-    // Temporary code to see how a possible notifications flow can work
-    // chrome.runtime.onMessage.addListener(
-    //     function(request, sender, sendResponse) {
-    //         if (request.type === "sign_tx_confirm") {
-    //             yoroiPort.postMessage(request.rpcRequest);
-    //         }
-    //     }
-    // );
-
     // events from page (injected code)
     window.addEventListener("message", function(event) {
         if (event.data.type === "connector_rpc_request") {
@@ -205,28 +195,6 @@ if (shouldInject()) {
                 type: "yoroi_connect_request",
                 url: location.hostname
             });
-            // TODO: add timeout somehow?
-            /*chrome.storage.local.get("whitelist", function(result) {
-                let whitelist = Object.keys(result).length === 0 ? [] : result.whitelist;
-                if (!whitelist.includes(location.hostname)) {
-                    if (confirm(`Allow access of ${location.hostname} to Ergo-Yoroi connector?`)) {
-                        if (confirm(`Save ${location.hostname} to whitelist?`)) {
-                            whitelist.push(location.hostname);
-                            chrome.storage.local.set({whitelist: whitelist});
-                        }
-                        yoroiPort.postMessage({type: "yoroi_connect_request"});
-                    } else {
-                        // user refused - skip communication with Yoroi
-                        window.postMessage({
-                            type: "connector_connected",
-                            success: false
-                        }, "*");
-                    }
-                } else {
-                    // already in whitelist
-                    yoroiPort.postMessage({type: "yoroi_connect_request"});
-                }
-            });*/
         }
     });
 }
