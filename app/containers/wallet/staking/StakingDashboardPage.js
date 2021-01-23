@@ -878,7 +878,7 @@ export default class StakingDashboardPage extends Component<Props> {
         return poolHash;
       }
       if (meta.info !== null) {
-        return `${meta.info.ticker} ${meta.info.name}`
+        return `[${meta.info.ticker}] ${meta.info.name}`
       }
       return poolHash
     }
