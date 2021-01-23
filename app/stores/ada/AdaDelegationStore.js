@@ -79,7 +79,8 @@ export default class AdaDelegationStore extends Store {
               networkId: defaultToken.defaultNetworkId,
             }],
             defaultToken
-          )]: [number, MultiToken])
+          ),
+          info.poolHash]: [number, MultiToken, string])
         ));
         return addressRewards != null
           ? addressRewards

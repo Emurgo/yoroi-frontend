@@ -2076,14 +2076,17 @@ const getRewardHistory: RewardHistoryFunc = async (
     e19558e969caa9e57adcfc40b9907eb794363b590faf42fff48c38eb88: [{
       epoch: 210,
       reward: '5000000',
+      poolHash: 'df1750df9b2df285fcfb50f4740657a18ee3af42727d410c37b86207',
     }],
     e156db5cd4889c84110d4de90c0d503b51b844db3e6fd87991238995bb: [{
       epoch: 210,
       reward: '5000000',
+      poolHash: 'df1750df9b2df285fcfb50f4740657a18ee3af42727d410c37b86207',
     }],
     e1deb0bcccbace8644ecbbb2b8eb9fc7a6b0e7380e8f019f44364dd060: [{
       epoch: 210,
       reward: '5000000',
+      poolHash: 'c34a7f59c556633dc88ec25c9743c5ebca3705e179a54db5638941cb',
     }],
   };
 };

@@ -869,6 +869,20 @@ export default class StakingDashboardPage extends Component<Props> {
       );
     })();
 
+    const getMiniPoolInfo = (poolHash: string) => {
+      const meta = this.generated.stores.delegation.getLocalPoolInfo(
+        request.publicDeriver.getParent().getNetworkInfo(),
+        poolHash
+      );
+      if (meta == null) {
+        return poolHash;
+      }
+      if (meta.info !== null) {
+        return `${meta.info.ticker} ${meta.info.name}`
+      }
+      return poolHash
+    }
+
     const getNormalized = (tokenEntry) => {
       const tokenRow = this.generated.stores.tokenInfoStore.tokenInfo
         .get(tokenEntry.networkId.toString())
@@ -880,15 +894,18 @@ export default class StakingDashboardPage extends Component<Props> {
     for (let i = startEpoch; i < endEpoch; i++) {
       if (historyIterator < history.length && i === history[historyIterator][0]) {
         // exists a reward for this epoch
+        const poolHash = history[historyIterator][2];
         const nextReward = history[historyIterator][1];
         amountSum = amountSum.joinAddMutable(nextReward);
         totalRewards.push({
           name: i,
           primary: getNormalized(amountSum.getDefaultEntry()).toNumber(),
+          poolName: getMiniPoolInfo(poolHash),
         });
         perEpochRewards.push({
           name: i,
           primary: getNormalized(nextReward.getDefaultEntry()).toNumber(),
+          poolName: getMiniPoolInfo(poolHash),
         });
         historyIterator++;
       } else {
@@ -896,10 +913,12 @@ export default class StakingDashboardPage extends Component<Props> {
         totalRewards.push({
           name: i,
           primary: getNormalized(amountSum.getDefaultEntry()).toNumber(),
+          poolName: '', // TODO: Not sure if this is OK to be empty
         });
         perEpochRewards.push({
           name: i,
           primary: 0,
+          poolName: '',
         });
       }
     }

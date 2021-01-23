@@ -72,7 +72,7 @@ export default class JormungandrDelegationStore extends Store {
               networkId: defaultToken.defaultNetworkId,
             }],
             defaultToken
-          )]: [number, MultiToken])
+          ), info[2]]: [number, MultiToken, string])
         ));
         return addressRewards != null
           ? addressRewards

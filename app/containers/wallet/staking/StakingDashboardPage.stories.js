@@ -593,11 +593,13 @@ function getStakingInfo(
         ? Promise.resolve([
           [
             99,
-            multiToken(publicDeriver.getParent().getDefaultToken(), new BigNumber(1000_000_000))
+            multiToken(publicDeriver.getParent().getDefaultToken(), new BigNumber(1000_000_000)),
+            'My Pool 1',
           ],
           [
             100,
-            multiToken(publicDeriver.getParent().getDefaultToken(), new BigNumber(500_000_000))
+            multiToken(publicDeriver.getParent().getDefaultToken(), new BigNumber(500_000_000)),
+            'My Pool 2',
           ]
         ])
         : Promise.resolve([])
