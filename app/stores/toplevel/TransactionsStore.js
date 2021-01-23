@@ -525,9 +525,10 @@ export default class TransactionsStore extends Store {
             const tokenInfo = this.stores.tokenInfoStore.tokenInfo
               .get(selectedNetwork.NetworkId.toString())
               ?.get(defaultInfo.identifier)
+            const divider = new BigNumber(10).pow(tokenInfo?.Metadata.numberOfDecimals || 0);
             return {
               type: 'in',
-              amount: defaultInfo.amount.div(tokenInfo?.Metadata.numberOfDecimals || 0).toString(),
+              amount: defaultInfo.amount.div(divider).toString(),
               fee: '0',
               date: epochStartDate,
               comment: `Staking Reward Epoch ${item[0]}`
