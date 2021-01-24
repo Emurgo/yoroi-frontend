@@ -66,12 +66,12 @@
 
 **e.语言。** 本协议的任何翻译均仅为本地参考之用，如果英文版本与非英文版本之间发生任何不一致，在任何情况下均应以本协议的英文版本为准并有约束力。
 
-## 12. Delegation and Staking
+## 12. 委托和质押
 
-12.1 **Rewards.** The amount of Rewards a User may earn from delegation depends on various factors including, but not limited to, user participation, stakepool profit margins and the volume of ada being delegated. It is possible that delegation generates no Reward for a User due to the above-mentioned factors. Rewards are earned as of the start of the 3rd epoch on the Cardano blockchain.
+12.1 **奖励。** 用户可以从委托中获得的奖励金额取决于多种因素，包括但不限于用户参与度，权益池利润率和接受委托的ADA数量。基于上述因素，委托可能不会为用户产生任何奖励。奖励从在Cardano区块链授权后第三个时代开始时开始计算。
 
-12.2 **Delegation.** Users may delegate their stake to one of the various stake pools of the Company or to a third party stake pool. User will have the sole right to determine the volume to be delegated to a stake pool and may increase or decrease its level of participation at any time. Any information Company shares regarding stakepools, including performance metrics and Rewards, will be for indicative purposes only and may not be accurate. Users may only delegate their stake to a stake pool if their ada is in an updated Daedalus or an updated Yoroi wallet at the time of the setup process. User does not acquire any automatic right to Rewards as a result of delegating its stake.
+12.2 **委托。** 用户可以将其权益委托给公司的某一权益池或第三方权益池。用户拥有的唯一的权力是能够把握要委托给权益池的数量，并且可以随时增加或减少其参与程度。公司分享的有关权益池的任何信息，包括绩效指标和奖励，仅用于指导目的，可能不准确。如果其ADA存在于最新的Daedalus或Yoroi钱包中，用户就能将其权益委托给一个权益池。用户由于委托其权益并不会产生额外的权利。
 
-12.3 **Company Stake-Pools.** The Company will operate various stake pools which will be visible in Yoroi. The cost and network and server requirements to reliably operate such stake pools shall be determined by the Company in its sole discretion. Company will communicate the percentage amount of Reward to be shared with Users through the User’s Yoroi wallet. Rewards will accrue at the end of each epoch and will automatically appear in the User’s Yoroi wallet.
+12.3 **公司的权益池。** 本公司将运营各种权益池，这些权益池将在Yoroi或Seiza中显示。可靠地运营此类权益池的成本以及对网络和服务器要求，应由公司自行决定。公司将通过用户的Yoroi钱包告知用户奖励的比例。奖励将在每个时代结束时产生，并自动出现在用户的Yoroi钱包中。
 
-12.4 **Redeeming Rewards.** User shall be responsible for payment of all applicable taxes, if any, to which the Rewards might be subject and any and all other taxes which may apply to User once Rewards are redeemed.
+12.4 **提取奖励。**如果有任何可能的交易税款，应由用户承担。特别是提取奖励时有可能会产生税款。
