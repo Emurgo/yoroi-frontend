@@ -35,7 +35,6 @@ import { RustModule } from '../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import { replaceMockBoxId } from '../../app/api/ergo/lib/transactions/utils';
 
 // based on abandon x 14 + share
-const genesisTransaction = '7d4b41a1256f93989aa7e1782989dbbb9ec222c3f6b98e216b676c589b5ecece';
 const genesisAddress = '9eXpzdMjPP9oNrhMB6na4LTZMWBJZNp71NVVefqdQ6kRwrqfZHe';
 const genesisTxValue = 200000_000000000; // 200K ERG
 
@@ -66,16 +65,16 @@ export function replaceMockOutputBoxId(
 }
 
 /**
- * To simplify, our genesis is a single address which gives all its ada to a "distributor"
- * The distributor gives ERGO to a bunch of addresses to setup the tests
- */
-export const generateTransaction = (): {|
-  genesisTx: RemoteErgoTransaction,
-  distributorTx: RemoteErgoTransaction,
-|} => {
-  const genesisTx = (() => {
-    const hash = genesisTransaction;
-    const height = 1;
+ * we need to generate a chain of transactions
+ * since only one token type can be created per tx
+*/
+export const generateGenesisChain = (): Array<RemoteErgoTransaction> => {
+  const height = 1;
+  let txOrdinal = 0;
+
+  const result = [];
+  result.push((() => {
+    const hash = '7d4b41a1256f93989aa7e1782989dbbb9ec222c3f6b98e216b676c589b5ecece';
 
     const address = genesisTxReceiver;
     return {
@@ -113,12 +112,73 @@ export const generateTransaction = (): {|
         value: genesisTxValue,
       })],
       block_num: height,
-      tx_ordinal: 0,
+      tx_ordinal: txOrdinal++,
       block_hash: '1',
       time: '2019-04-19T15:13:33.000Z',
       tx_state: 'Successful'
     };
-  })();
+  })());
+  result.push((() => {
+    const hash = '8d4b41a1256f93989aa7e1782989dbbb9ec222c3f6b98e216b676c589b5ecece';
+
+    const address = genesisTxReceiver;
+    return {
+      hash,
+      inputs: [{
+        address,
+        id: '13a35e15ae1a83fa188674a2bd53007b07e119a0eaaf40b890b2081c2864f12a',
+        outputTransactionId: result[result.length - 1].hash,
+        index: 0,
+        outputIndex: 0,
+        spendingProof: '', // no need just for tests I think
+        transactionId: hash,
+        value: result[result.length - 1].outputs[0].value,
+        assets: result[result.length - 1].outputs[0].assets,
+      }],
+      dataInputs: [],
+      outputs: [replaceMockOutputBoxId({
+        additionalRegisters: Object.freeze({
+          'R4': '0e034a5059',
+          'R5': '0e184e6f7468696e67206261636b65642055534420746f6b656e',
+          'R6': '0e0132',
+        }),
+        address,
+        assets: [
+          {
+            amount: 6140,
+            tokenId: '13a35e15ae1a83fa188674a2bd53007b07e119a0eaaf40b890b2081c2864f12a',
+          },
+          ...result[result.length - 1].outputs[0].assets
+        ],
+        creationHeight: height,
+        ergoTree: Buffer.from(RustModule.SigmaRust.Address.from_base58(address).to_ergo_tree().to_bytes()).toString('hex'),
+        id: '',
+        txId: hash,
+        index: 0,
+        mainChain: true,
+        spentTransactionId: null,
+        value: result[result.length - 1].outputs[0].value,
+      })],
+      block_num: height,
+      tx_ordinal: txOrdinal++,
+      block_hash: '1',
+      time: '2019-04-19T15:13:33.000Z',
+      tx_state: 'Successful'
+    };
+  })());
+
+  return result;
+}
+
+/**
+ * To simplify, our genesis is a single address which gives all its ada to a "distributor"
+ * The distributor gives ERGO to a bunch of addresses to setup the tests
+ */
+export const generateTransaction = (): {|
+  genesisChain: Array<RemoteErgoTransaction>,
+  distributorTx: RemoteErgoTransaction,
+|} => {
+  const genesisChain = generateGenesisChain();
   const distributorTx = (() => {
     const hash = 'b713cc0d63106c3806b5a7077cc37a294fcca0e479f26aac64e51e04ae808d75';
     const height = 1;
@@ -149,16 +209,13 @@ export const generateTransaction = (): {|
       inputs: [{
         address: genesisTxReceiver,
         id: '43a35e15ae2a83fa188674a2bd53007b07e119a0eaaf40b890b2081c2864f12a',
-        outputTransactionId: genesisTx.hash,
+        outputTransactionId: genesisChain[genesisChain.length - 1].hash,
         index: 0,
         outputIndex: 0,
         spendingProof: '', // no need just for tests I think
         transactionId: hash,
-        value: genesisTxValue,
-        assets: [{
-          amount: 12340,
-          tokenId: '33a35e15ae1a83fa188674a2bd53007b07e119a0eaaf40b890b2081c2864f12a',
-        }],
+        value: genesisChain[genesisChain.length - 1].outputs[0].value,
+        assets: genesisChain[genesisChain.length - 1].outputs[0].assets,
       }],
       dataInputs: [],
       outputs: [
@@ -190,14 +247,20 @@ export const generateTransaction = (): {|
           spentTransactionId: null,
           value: 10_000000000,
         }),
-        // ergo-simple-wallet
+        // ergo-token-wallet
         replaceMockOutputBoxId({
           additionalRegisters: Object.freeze({}),
           address: tokenAddress.to_base58(),
-          assets: [{
-            amount: 12340,
-            tokenId: '33a35e15ae1a83fa188674a2bd53007b07e119a0eaaf40b890b2081c2864f12a',
-          }],
+          assets: [
+            {
+              amount: 12340,
+              tokenId: '33a35e15ae1a83fa188674a2bd53007b07e119a0eaaf40b890b2081c2864f12a',
+            },
+            {
+              amount: 6140,
+              tokenId: '13a35e15ae1a83fa188674a2bd53007b07e119a0eaaf40b890b2081c2864f12a',
+            },
+          ],
           creationHeight: height,
           ergoTree: Buffer.from(tokenAddress.address().to_ergo_tree().to_bytes()).toString('hex'),
           id: '',
@@ -209,7 +272,7 @@ export const generateTransaction = (): {|
         }),
       ],
       block_num: height,
-      tx_ordinal: 1,
+      tx_ordinal: (genesisChain[genesisChain.length - 1].tx_ordinal ?? 0) + 1,
       block_hash: '1',
       time: '2019-04-19T15:13:33.000Z',
       tx_state: 'Successful'
@@ -217,7 +280,7 @@ export const generateTransaction = (): {|
   })();
 
   return {
-    genesisTx,
+    genesisChain,
     distributorTx,
   };
 };
@@ -270,7 +333,7 @@ export function resetChain(): void {
   const txs = generateTransaction();
 
   // test setup
-  addTransaction(txs.genesisTx);
+  txs.genesisChain.forEach(tx => addTransaction(tx));
   addTransaction(txs.distributorTx);
 }
 

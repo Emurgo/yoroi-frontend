@@ -731,7 +731,7 @@ export class ModifyTokenList {
       ModifyTokenList.ownTables[Tables.TokenListSchema.name].name,
     );
 
-    return result;
+    return [...result].sort((a, b) => a.TokenListItemId - b.TokenListItemId);
   }
 
   static async remove(
