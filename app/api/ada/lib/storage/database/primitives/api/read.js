@@ -1210,6 +1210,7 @@ export class AssociateToken {
       if (ListId == null) continue;
       const entries = result.get(ListId) ?? [];
       entries.push(row);
+      entries.sort((a,b) => a.TokenListItemId - b.TokenListItemId);
       result.set(ListId, entries);
     }
 
@@ -1252,6 +1253,6 @@ export class AssociateToken {
       Token: $ReadOnly<TokenRow>,
     |}> = await tx.attach(query);
 
-    return result;
+    return [...result].sort((a,b) => a.TokenList.TokenListItemId - b.TokenList.TokenListItemId);
   }
 }
