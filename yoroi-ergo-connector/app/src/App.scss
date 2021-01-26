@@ -1,0 +1,200 @@
+// TODO: fix theme
+:root {
+  --rp-button-bg-color: #17d1aa;
+  --rp-button-bg-color-active: #12b190;
+  --rp-button-bg-color-disabled: rgba(23, 209, 170, 0.3);
+  --rp-button-bg-color-hover: #17e2b8;
+  --rp-button-font-size: 14px;
+  --rp-button-line-height: 20px;
+  --rp-button-padding: 12px 20px;
+  --rp-button-text-color: #fff;
+  --rp-button-text-transform: none;
+  --theme-button-primary-background-color: #17d1aa;
+  --theme-button-primary-background-color-hover: #17e2b8;
+  --theme-button-primary-background-color-active: #12b190;
+  --theme-button-primary-background-color-disabled: #c9ede5;
+  --theme-button-primary-text-color-disabled: #ffffff;
+  --theme-button-primary-text-color: #ffffff;
+  --rp-checkbox-border: 2px solid #353535;
+  --rp-checkbox-border-color-disabled: rgba(21, 209, 170, 0.2);
+  --rp-checkbox-check-bg-color: #15d1aa;
+  --rp-checkbox-label-text-color-disabled: rgba(53, 53, 53, 0.3);
+  --theme-button-outlined-background-color: #15d1aa;
+  --theme-button-outlined-background-color-hover: rgba(23, 226, 184, 0.1);
+  --theme-button-outlined-border-color: #3154cb;
+  --theme-button-outlined-border-color-hover: rgb(23, 226, 184);
+  --theme-button-outlined-background-color-active: #12b190;
+  --theme-button-outlined-background-color-disabled: #c9ede5;
+  --theme-button-outlined-text-color-disabled: #c9ede5;
+  --theme-button-outlined-text-color: #15d1aa;
+  --theme-button-outlined-active-text-color: #ffffff;
+
+  --theme-checkbox-label-color: #353535;
+  --theme-checkbox-border-color: #353535;
+  --theme-checkbox-background-color-checked: #17d1aa;
+  --theme-select-language-color: #15d1aa;
+}
+
+@font-face {
+  font-family: 'Rubik-Light';
+  src: url('./assets/fonts/Rubik-Light.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Rubik-Regular';
+  src: url('./assets/fonts/Rubik-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Rubik-Medium';
+  src: url('./assets/fonts/Rubik-Medium.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Rubik-Bold';
+  src: url('./assets/fonts/Rubik-Bold.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Rubik-Black';
+  src: url('./assets/fonts/Rubik-Black.ttf') format('truetype');
+}
+
+* {
+  box-sizing: border-box;
+}
+html,
+body,
+div,
+span,
+applet,
+object,
+iframe,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+pre,
+a,
+abbr,
+acronym,
+address,
+big,
+cite,
+code,
+del,
+dfn,
+em,
+img,
+ins,
+kbd,
+q,
+s,
+samp,
+small,
+strike,
+strong,
+sub,
+sup,
+tt,
+var,
+b,
+u,
+i,
+center,
+dl,
+dt,
+dd,
+ol,
+ul,
+li,
+fieldset,
+form,
+label,
+legend,
+table,
+caption,
+tbody,
+tfoot,
+thead,
+tr,
+th,
+td,
+article,
+aside,
+canvas,
+details,
+embed,
+figure,
+figcaption,
+footer,
+header,
+hgroup,
+menu,
+nav,
+output,
+ruby,
+section,
+summary,
+time,
+mark,
+audio,
+video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+menu,
+nav,
+section {
+  display: block;
+}
+body {
+  line-height: 1;
+}
+ol,
+ul {
+  list-style: none;
+}
+blockquote,
+q {
+  quotes: none;
+}
+blockquote:before,
+blockquote:after,
+q:before,
+q:after {
+  content: '';
+  content: none;
+}
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+// Buttons should not have any special style applied by default
+button {
+  background: none;
+  border: none;
+  padding: 0;
+
+  &:focus {
+    outline: 0;
+  }
+}

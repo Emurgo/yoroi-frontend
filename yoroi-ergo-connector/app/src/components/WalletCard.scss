@@ -1,0 +1,16 @@
+.card {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  & .avatar {
+    margin-right: 13px;
+    img {
+      width: 32px;
+      height: 32px;
+      object-fit: cover;
+    }
+  }
+  & .name {
+    flex: 1;
+  }
+}
