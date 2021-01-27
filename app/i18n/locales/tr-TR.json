@@ -472,7 +472,7 @@
   "wallet.dashboard.stakePool.performance": "Performans",
   "wallet.dashboard.stakePool.pledge": "Taahhüt",
   "wallet.dashboard.stakePool.stake": "Bahis",
-  "wallet.dashboard.stakePool.title": "Yetkilendirilmiş Bahis Hazuvu",
+  "wallet.dashboard.stakePool.title": "Yetkili Hisse Havuzu",
   "wallet.dashboard.stakePool.viewWebpage": "Havuz web sayfasına gözat",
   "wallet.dashboard.summary.adaAmountNote": "This balance includes rewards (withdrawal required to be able to send this full amount)",
   "wallet.dashboard.summary.adaTitle": "Toplam {ticker}",
