@@ -19,7 +19,8 @@ import {
 } from '../../app/api/ada/lib/storage/models/PublicDeriver/traits';
 import type {
   Address,
-  Tx
+  Tx,
+  Value
 } from './ergo-connector/types';
 import {
   connectorGetBalance,
@@ -69,10 +70,21 @@ type PendingSignData = {|
 
 let db: ?lf$Database = null;
 
-// boolean = successfully connected (true) or refused by user (false)
-// { resolve, openedWindow} = response (true/false) resolver,
-//                            openedWindow = if a window has fetched this to show to the user yet
-type ConnectedStatus = boolean | {| resolve: any, openedWindow: boolean |};
+type AccountIndex = number;
+
+type AccountInfo = {|
+  name: string,
+  balance: Value,
+|}
+
+// AccountIndex = successfully connected - which account the user selected
+// null = refused by user
+type ConnectedStatus = ?AccountIndex | {|
+  // response (?AccountIndex) - null means the user refused, otherwise the account they selected
+  resolve: any,
+  // if a window has fetched this to show to the user yet
+  openedWindow: boolean,
+|};
 
 type ConnectedSite = {|
   url: string,
@@ -82,20 +94,50 @@ type ConnectedSite = {|
 
 // tab id key
 const connectedSites: Map<number, ConnectedSite> = new Map();
-
-const pendingSigns: Map<RpcUid, PendingSign> = new Map();
-
-async function firstWallet(): Promise<PublicDeriver<>> {
-  if (db != null) {
-    const wallets = await getWallets({ db });
-    return Promise.resolve(wallets[0]);
+//chrome.storage.local.set({ connector_whitelist: [] });
+export async function getWalletsInfo(): Promise<AccountInfo[]> {
+  if (db == null) {
+    db = await loadLovefieldDB(schema.DataStoreType.INDEXED_DB);
   }
-  throw Promise.reject(new Error('Database not loaded for connector RPCs'));
+  const wallets = await getWallets({ db });
+  // information about each wallet to show to the user
+  const accounts = [];
+  for (const wallet of wallets) {
+    const conceptualInfo = await wallet.getParent().getFullConceptualWalletInfo();
+    // TODO: there's probably a better way to check for ERGO wallets?
+    if (conceptualInfo.NetworkId === 200) {
+      const balance = await connectorGetBalance(wallet, 'ERG');
+      accounts.push({
+        name: conceptualInfo.Name,
+        balance: balance.toString(),
+      });
+    }
+  }
+  return accounts;
+}
+
+async function getSelectedWallet(tabId: number): Promise<PublicDeriver<>> {
+  if (db == null) {
+    db = await loadLovefieldDB(schema.DataStoreType.INDEXED_DB);
+  }
+  const wallets = await getWallets({ db });
+  const connected = connectedSites.get(tabId);
+  if (connected) {
+    const index = connected.status;
+    if (typeof index === 'number') {
+      if (index >= 0 && index < wallets.length) {
+        return Promise.resolve(wallets[index]);
+      }
+      return Promise.reject(new Error(`wallet index out of bounds: ${index}`));
+    }
+    return Promise.reject(new Error('site not connected yet'));
+  }
+  return Promise.reject(new Error(`could not find tabId ${tabId} in connected sites`));
 }
 
 chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
-  async function signTxInputs(tx, indices: number[], password: string): Promise<any> {
-    const wallet = await firstWallet();
+  async function signTxInputs(tx, indices: number[], password: string, tabId: number): Promise<any> {
+    const wallet = await getSelectedWallet(tabId);
     const canGetAllUtxos = await asGetAllUtxos(wallet);
     if (canGetAllUtxos == null) {
       throw new Error('could not get all utxos');
@@ -106,9 +148,9 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
   // alert(`received event: ${JSON.stringify(request)}`);
   if (request.type === 'connect_response') {
     const connection = connectedSites.get(request.tabId);
-    if (connection && typeof connection.status === 'object') {
-      connection.status.resolve(request.accepted);
-      connection.status = request.accepted;
+    if (connection && connection.status != null && typeof connection.status === 'object') {
+      connection.status.resolve(request.accepted ? request.account : null);
+      connection.status = request.account;
     }
   } else if (request.type === 'sign_confirmed') {
     const connection = connectedSites.get(request.tabId);
@@ -123,20 +165,20 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
             for (let i = 0; i < txToSign.inputs.length; i += 1) {
               allIndices.push(i);
             }
-            const signedTx = await signTxInputs(txToSign, allIndices, password);
+            const signedTx = await signTxInputs(txToSign, allIndices, password, request.tabId);
             responseData.resolve({ ok: signedTx });
           }
           break;
         case 'tx_input':
           {
             const txToSign = request.tx;
-            const signedTx = await signTxInputs(txToSign, [request.index], password);
+            const signedTx = await signTxInputs(txToSign, [request.index], password, request.tabId);
             responseData.resolve({ ok: signedTx.inputs[request.index] });
           }
           break;
         case 'data':
           // mocked data sign
-          responseData.resolve({ ok: '0x82cd23b432afab24343f' });
+          responseData.resolve({ err: 'Generic data signing is not implemented yet' });
           break;
         default:
           // log?
@@ -175,12 +217,12 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
     sendResponse(null);
   } else if (request.type === 'connect_retrieve_data') {
     for (const [tabId, connection] of connectedSites) {
-      if (typeof connection.status === 'object') {
+      if (connection.status != null && typeof connection.status === 'object') {
         if (!connection.status.openedWindow) {
           connection.status.openedWindow = true;
           sendResponse({
             url: connection.url,
-            tabId
+            tabId,
           });
         }
       }
@@ -211,23 +253,25 @@ async function confirmSign(tabId: number, request: PendingSignData): Promise<any
   });
 }
 
-async function confirmConnect(tabId: number, url: string): Promise<boolean> {
+async function confirmConnect(tabId: number, url: string): Promise<?AccountIndex> {
   return new Promise(resolve => {
     chrome.storage.local.get('connector_whitelist', async result => {
       const whitelist = Object.keys(result).length === 0 ? [] : result.connector_whitelist;
-      if (whitelist.includes(url)) {
+      console.log(`whitelist: ${JSON.stringify(whitelist)}`);
+      const whitelistEntry = whitelist.find(entry => entry.url === url);
+      if (whitelistEntry !== undefined) {
         connectedSites.set(tabId, {
           url,
-          status: true,
+          status: whitelistEntry.walletIndex,
           pendingSigns: new Map()
         });
-        resolve(true);
+        resolve(whitelistEntry.walletIndex);
       } else {
         connectedSites.set(tabId, {
           url,
           status: {
             resolve,
-            openedWindow: false
+            openedWindow: false,
           },
           pendingSigns: new Map()
         });
@@ -273,12 +317,8 @@ chrome.runtime.onConnectExternal.addListener(port => {
         });
       }
       if (message.type === 'yoroi_connect_request') {
-        const accepted = await confirmConnect(tabId, message.url);
-        if (accepted) {
-          if (db == null) {
-            db = await loadLovefieldDB(schema.DataStoreType.INDEXED_DB);
-          }
-        }
+        const account = await confirmConnect(tabId, message.url);
+        const accepted = account !== null;
         port.postMessage({
           type: 'yoroi_connect_response',
           success: accepted
@@ -319,14 +359,14 @@ chrome.runtime.onConnectExternal.addListener(port => {
             break;
           case 'get_balance':
             {
-              const wallet = await firstWallet();
+              const wallet = await getSelectedWallet(tabId);
               const balance = await connectorGetBalance(wallet, message.params[0]);
               rpcResponse({ ok: balance });
             }
             break;
           case 'get_utxos':
             {
-              const wallet = await firstWallet();
+              const wallet = await getSelectedWallet(tabId);
               const utxos = await connectorGetUtxos(wallet, message.params[0]);
               if (utxos != null) {
                 rpcResponse({
@@ -339,7 +379,7 @@ chrome.runtime.onConnectExternal.addListener(port => {
             break;
           case 'get_used_addresses':
             {
-              const wallet = await firstWallet();
+              const wallet = await getSelectedWallet(tabId);
               const addresses = await connectorGetUsedAddresses(wallet);
               rpcResponse({
                 ok: addresses
@@ -348,7 +388,7 @@ chrome.runtime.onConnectExternal.addListener(port => {
             break;
           case 'get_unused_addresses':
             {
-              const wallet = await firstWallet();
+              const wallet = await getSelectedWallet(tabId);
               const addresses = await connectorGetUnusedAddresses(wallet);
               rpcResponse({
                 ok: addresses
@@ -362,7 +402,7 @@ chrome.runtime.onConnectExternal.addListener(port => {
             break;
           case 'submit_tx':
             try {
-              const wallet = await firstWallet();
+              const wallet = await getSelectedWallet(tabId);
               const id = await connectorSendTx(wallet, message.params[0]);
               rpcResponse({
                 ok: id
