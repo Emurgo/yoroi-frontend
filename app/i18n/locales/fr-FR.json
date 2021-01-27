@@ -772,9 +772,9 @@
   "wallet.voting.dialog.registerLabel": "S'inscrire",
   "wallet.voting.dialog.transactionLabel": "Transaction",
   "wallet.voting.dialog.stepQrCode": "Code QR",
-  "wallet.voting.dialog.title": "Register for Voting",
-  "wallet.voting.dialog.confirmPin": "Confirm PIN",
-  "wallet.voting.dialog.completeLabel": "Complete",
-  "global.errors.pinDoesNotMatch": "Pin Does Not Match",
+  "wallet.voting.dialog.title": "S'inscrire pour voter",
+  "wallet.voting.dialog.confirmPin": "Confirmer le code PIN",
+  "wallet.voting.dialog.completeLabel": "Compléter",
+  "global.errors.pinDoesNotMatch": "Le code PIN ne correspond pas",
   "global.errors.invalidPin": "Code PIN invalide"
 }
