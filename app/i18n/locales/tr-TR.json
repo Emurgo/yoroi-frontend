@@ -775,6 +775,6 @@
   "wallet.voting.dialog.title": "Oy için kaydet",
   "wallet.voting.dialog.confirmPin": "PİN'İ Onayla",
   "wallet.voting.dialog.completeLabel": "Tamamla",
-  "global.errors.pinDoesNotMatch": "Pin Does Not Match",
+  "global.errors.pinDoesNotMatch": "Pin eşleşmiyor",
   "global.errors.invalidPin": "Geçersiz Pin"
 }
