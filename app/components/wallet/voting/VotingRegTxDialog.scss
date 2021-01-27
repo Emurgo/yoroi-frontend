@@ -1,53 +1,12 @@
+@import './common.scss';
 @import '../../../themes/mixins/loading-spinner';
 @import '../../../themes/mixins/error-message';
 
 .dialog {
   font-family: var(--font-medium);
 
-  .explanation {
-    li::before {
-      content: "●";
-      margin-right:0.4em;
-      font-size:0.8em;
-      color: var(--theme-bullet-point-color);
-    }
-    
-    li {
-      display: list-item;
-      margin-left: 12px;
-      margin-top: 8px;
-      line-height: 1.38;
-      font-size: 14px;
-      color: var(--cmn-default-color-grey);
-    }
-
-    margin-bottom: 40px;
-  }
-
-  .headerBlock {
-    .header {
-      font-family: var(--font-regular);
-      color: var(--cmn-default-color-grey);
-      font-size: 16px;
-      line-height: 1.38;
-      margin-bottom: 4px;
-    }
-    .content {
-      font-family: var(--font-regular);
-      color: var(--cmn-default-color-grey-3);
-      font-size: 14px;
-      line-height: 1.38;
-      margin-bottom: 4px;
-    }
-
-    margin-bottom: 20px;
-  }
-
-  .rewardAmount {
-    font-family: var(--font-medium);
-    color: var(--theme-send-confirmation-dialog-send-values-color);
-    line-height: 1.38;
-    font-size: 16px;
+  .amountInput {
+    margin-top: 23px;
   }
 
   :global {
@@ -63,10 +22,6 @@
   .submitButtonSpinning {
     @include loading-spinner("../../../assets/images/spinner-light.svg");
   }  
-
-  .walletPassword {
-    margin-top: 20px;
-  }
 
   .error {
     @include error-message;

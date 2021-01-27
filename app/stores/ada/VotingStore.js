@@ -26,11 +26,34 @@ import {
 } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import { genOwnStakingKey } from '../../api/ada/index';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
+import type { StepStateEnum } from '../../components/widgets/ProgressSteps';
+import { StepState } from '../../components/widgets/ProgressSteps';
+import { ROUTES } from '../../routes-config';
+import {
+  convertToLocalizableError
+} from '../../domain/LedgerLocalizedError';
+import LocalizableError from '../../i18n/LocalizableError';
+import cryptoRandomString from 'crypto-random-string';
+
+export const ProgressStep = Object.freeze({
+  GENERATE: 0,
+  CONFIRM: 1,
+  REGISTER: 2,
+  TRANSACTION: 3,
+  QR_CODE: 4,
+});
+export type ProgressStepEnum = $Values<typeof ProgressStep>;
+export interface ProgressInfo {
+  currentStep: ProgressStepEnum,
+  stepState: StepStateEnum,
+}
 
 export default class VotingStore extends Store {
-  @observable encryptedKey: ?string = null;
+  @observable progressInfo: ProgressInfo
+  @observable encryptedKey: string | null = null;
   @observable catalystPrivateKey: RustModule.WalletV4.PrivateKey | void;
   @observable pin: Array<number>;
+  @observable error: ?LocalizableError;
 
   @observable
   createVotingRegTx: LocalizedRequest<CreateVotingRegTxFunc> = new LocalizedRequest<CreateVotingRegTxFunc>(
@@ -66,18 +89,84 @@ export default class VotingStore extends Store {
     votingActions.generateCatalystKey.listen(this._generateCatalystKey);
     votingActions.createTransaction.listen(this._createTransaction);
     votingActions.signTransaction.listen(this._signTransaction);
-    votingActions.complete.listen(this._complete);
-    votingActions.reset.listen(this.reset);
+    votingActions.submitRegister.listen(this._submitRegister);
+    votingActions.submitRegisterError.listen(this._submitRegisterError);
+    votingActions.finishQRCode.listen(this._finishQRCode);
+    votingActions.goBackToGenerate.listen(this._goBackToGenerate);
+    votingActions.submitConfirm.listen(this._submitConfirm);
+    votingActions.submitConfirmError.listen(this._submitConfirmError);
+    votingActions.goBackToRegister.listen(this._goBackToRegister);
+    votingActions.submitGenerate.listen(this._submitGenerate);
+    votingActions.submitTransaction.listen(this._submitTransaction);
+    votingActions.submitTransactionError.listen(this._submitTransactionError);
+    votingActions.cancel.listen(this._cancel);
   }
 
-  _complete: void => void = () => {
+  get isActionProcessing(): boolean {
+    return this.progressInfo.stepState === StepState.PROCESS;
+  }
+
+  @action _goBackToRegister: void => void = () => {
+    this.createVotingRegTx.reset();
+    this.error = null;
+    this.progressInfo.currentStep = ProgressStep.REGISTER;
+    this.progressInfo.stepState = StepState.LOAD;
+  };
+
+  @action _submitTransaction: void => void = () => {
+    this.progressInfo.currentStep = ProgressStep.QR_CODE;
+    this.progressInfo.stepState = StepState.LOAD;
+  };
+
+  @action _submitGenerate: void => void = () => {
+    this.progressInfo.currentStep = ProgressStep.CONFIRM;
+    this.progressInfo.stepState = StepState.LOAD;
+  };
+
+  @action _submitConfirm: void => void = () => {
+    this.progressInfo.currentStep = ProgressStep.REGISTER;
+    this.progressInfo.stepState = StepState.LOAD;
+  };
+
+  @action _submitConfirmError: void => void = () => {
+    this.progressInfo.currentStep = ProgressStep.CONFIRM;
+    this.progressInfo.stepState = StepState.ERROR;
+  };
+
+  @action _goBackToGenerate: void => void = () => {
+    this.progressInfo.currentStep = ProgressStep.GENERATE;
+    this.progressInfo.stepState = StepState.LOAD;
+  };
+
+
+  @action _finishQRCode: void => void = () => {
     this.actions.dialogs.closeActiveDialog.trigger();
+    this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ROOT });
+    this.reset({ justTransaction: false });
+  }
+
+  @action _submitRegister: void => void = () => {
+    this.progressInfo.currentStep = ProgressStep.TRANSACTION;
+    this.progressInfo.stepState = StepState.LOAD;
+  };
+
+  @action _submitRegisterError: Error => void = (error) => {
+    this.error = convertToLocalizableError(error);
+    this.progressInfo.currentStep = ProgressStep.REGISTER;
+    this.progressInfo.stepState = StepState.ERROR;
+  };
+
+  @action _submitTransactionError: Error => void = (error) => {
+    this.error = convertToLocalizableError(error);
+    this.progressInfo.currentStep = ProgressStep.TRANSACTION;
+    this.progressInfo.stepState = StepState.ERROR;
   };
 
   // we need password for transaction building to sign the voting key with stake key
   // as part of metadata
   @action
   _createTransaction: string => Promise<void> = async spendingPassword => {
+    this.progressInfo.stepState = StepState.PROCESS;
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) {
       return;
@@ -231,21 +320,32 @@ export default class VotingStore extends Store {
     Logger.info(
       `${nameof(VotingStore)}::${nameof(this._generateCatalystKey)} called`
     );
-    const passwordArray = [1,2,3,4];
-    const passBuff = Buffer.from(passwordArray);
+
+    const pin = cryptoRandomString({ length: 4, type: 'numeric' });
+    const pinArray = pin.split('').map(Number);
+
+    const passBuff = Buffer.from(pinArray);
     const rootKey = generatePrivateKeyForCatalyst();
     const key = await encryptWithPassword(passBuff, rootKey.to_raw_key().as_bytes());
     runInAction(() => {
       this.encryptedKey = key;
-      this.pin = passwordArray;
+      this.pin = pinArray;
       this.catalystPrivateKey = RustModule.WalletV4.PrivateKey.from_extended_bytes(
         rootKey.to_raw_key().as_bytes()
       );
     });
   };
 
+  @action _cancel: void => void = () => {
+    this.reset({ justTransaction: false });
+  }
   @action.bound
   reset(request: {| justTransaction: boolean |}): void {
+    this.progressInfo = {
+      currentStep: ProgressStep.GENERATE,
+      stepState: StepState.LOAD,
+    };
+    this.error = null;
     this.stores.wallets.sendMoneyRequest.reset();
     this.createVotingRegTx.reset();
     if (!request.justTransaction) {

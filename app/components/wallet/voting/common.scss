@@ -1,0 +1,21 @@
+$opacityCommon: 0.7;
+
+.dialog {
+  max-width: 635px !important;
+  font-family: var(--font-regular);
+}
+
+.firstItem {
+  margin-top: 48px;
+}
+
+.lineText {
+  color: #242838;
+  line-height: 22px;
+  font-size: 14px;
+}
+
+.lastItem {
+  margin-top: 32px;
+  margin-bottom: 34px !important;
+}

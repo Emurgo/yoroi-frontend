@@ -11,6 +11,7 @@ import sendIcon from '../../assets/images/wallet-nav/tab-send.inline.svg';
 import receiveIcon from '../../assets/images/wallet-nav/tab-receive.inline.svg';
 import dashboardIcon from '../../assets/images/wallet-nav/tab-dashboard.inline.svg';
 import delegationListIcon from '../../assets/images/wallet-nav/tab-delegation_list.inline.svg';
+import environment from '../../environment';
 
 const messages = defineMessages({
   transactions: {
@@ -37,6 +38,10 @@ const messages = defineMessages({
     id: 'wallet.navigation.delegationList',
     defaultMessage: '!!!Delegation List',
   },
+  voting: {
+    id: 'wallet.navigation.voting',
+    defaultMessage: '!!!Voting',
+  }
 });
 
 export type TopbarCategory = {|
@@ -83,6 +88,16 @@ export const STAKE_DASHBOARD: TopbarCategory = registerCategory({
   label: messages.delegationDashboard,
   isVisible: request => (
     asGetStakingKey(request.selected) != null
+  ),
+});
+export const VOTING: TopbarCategory = registerCategory({
+  className: 'voting',
+  route: ROUTES.WALLETS.CATALYST_VOTING,
+  icon: undefined,
+  label: messages.voting,
+  isVisible: request => (
+    asGetStakingKey(request.selected) != null
+      && (!environment.isProduction() || environment.isTest())
   ),
 });
 export const SEIZA_STAKE_SIMULATOR: TopbarCategory = registerCategory({
