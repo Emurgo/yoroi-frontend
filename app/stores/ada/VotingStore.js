@@ -50,7 +50,7 @@ export interface ProgressInfo {
 
 export default class VotingStore extends Store {
   @observable progressInfo: ProgressInfo
-  @observable encryptedKey: ?string = null;
+  @observable encryptedKey: string | null = null;
   @observable catalystPrivateKey: RustModule.WalletV4.PrivateKey | void;
   @observable pin: Array<number>;
   @observable error: ?LocalizableError;

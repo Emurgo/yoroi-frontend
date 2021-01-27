@@ -161,7 +161,7 @@ export default class VotingRegistrationDialogContainer extends Component<Props> 
           votingStore: {|
             pin: Array<number>,
             progressInfo: ProgressInfo,
-            encryptedKey: ?string,
+            encryptedKey: string | null,
           |},
         |}
       |}

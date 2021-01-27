@@ -8,9 +8,9 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 import Dialog from '../../widgets/Dialog';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
-import QRCode from 'qrcode.react';
 import ProgressStepBlock from './ProgressStepBlock';
 import { ProgressInfo } from '../../../stores/ada/VotingStore';
+import QrCodeWrapper from '../../widgets/QrCodeWrapper';
 
 import styles from './QrCodeDialog.scss';
 
@@ -35,7 +35,7 @@ type Props = {|
   +submit: void => PossiblyAsync<void>,
   +cancel: void => void,
   +classicTheme: boolean,
-  +votingKey: ?string,
+  +votingKey: string | null,
 |};
 
 @observer
@@ -55,13 +55,6 @@ export default class QrCodeDialog extends Component<Props> {
         onClick: submit,
       },
     ];
-
-    const qrCodeBackgroundColor = document.documentElement
-      ? document.documentElement.style.getPropertyValue('--theme-receive-qr-code-background-color')
-      : 'transparent';
-    const qrCodeForegroundColor = document.documentElement
-      ? document.documentElement.style.getPropertyValue('--theme-receive-qr-code-foreground-color')
-      : '#000';
 
     return (
       <Dialog
@@ -89,12 +82,7 @@ export default class QrCodeDialog extends Component<Props> {
         <div className={classnames([styles.qrCodeContainer, styles.lastItem])}>
           {votingKey !== null ? (
             <div className={styles.qrCode}>
-              <QRCode
-                value={votingKey}
-                bgColor={qrCodeBackgroundColor}
-                fgColor={qrCodeForegroundColor}
-                size={152}
-              />
+              <QrCodeWrapper value={votingKey} size={152} />
             </div>
           ) : (
             ''
