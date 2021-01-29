@@ -142,13 +142,6 @@ export default class StakingDashboardPage extends Component<Props> {
         hasAnyPending={this.generated.stores.transactions.hasAnyPending}
         themeVars={getThemeVars({ theme: 'YoroiModern' })}
         stakePools={stakePools}
-        epochProgress={
-          <EpochProgressContainer
-            {...this.generated.EpochProgressContainerProps}
-            publicDeriver={publicDeriver}
-            showTooltip={rewardInfo != null && rewardInfo.showWarning}
-          />
-        }
         userSummary={this._generateUserSummary({
           delegationRequests,
           publicDeriver,
@@ -930,7 +923,6 @@ export default class StakingDashboardPage extends Component<Props> {
   };
 
   @computed get generated(): {|
-    EpochProgressContainerProps: InjectedOrGenerated<EpochProgressContainerData>,
     UnmangleTxDialogContainerProps: InjectedOrGenerated<UnmangleTxDialogContainerData>,
     DeregisterDialogContainerProps: InjectedOrGenerated<DeregisterDialogContainerData>,
     WithdrawalTxDialogContainerProps: InjectedOrGenerated<WithdrawalTxDialogContainerData>,
@@ -1062,19 +1054,16 @@ export default class StakingDashboardPage extends Component<Props> {
     }
     const api = getApiForNetwork(selected.getParent().getNetworkInfo());
     const time = (() => {
-      if (api === ApiOptions.ada) {
-        return {
-          getTimeCalcRequests: stores.substores.ada.time.getTimeCalcRequests,
-          getCurrentTimeRequests: stores.substores.ada.time.getCurrentTimeRequests,
-        };
-      }
       if (api === ApiOptions.jormungandr) {
         return {
           getTimeCalcRequests: stores.substores.jormungandr.time.getTimeCalcRequests,
           getCurrentTimeRequests: stores.substores.jormungandr.time.getCurrentTimeRequests,
         };
       }
-      throw new Error(`${nameof(EpochProgressContainer)} api not supported`);
+      return {
+        getTimeCalcRequests: stores.substores.ada.time.getTimeCalcRequests,
+        getCurrentTimeRequests: stores.substores.ada.time.getCurrentTimeRequests,
+      };
     })();
     return Object.freeze({
       stores: {
@@ -1180,10 +1169,6 @@ export default class StakingDashboardPage extends Component<Props> {
           },
         },
       },
-      EpochProgressContainerProps: ({
-        stores,
-        actions,
-      }: InjectedOrGenerated<EpochProgressContainerData>),
       UnmangleTxDialogContainerProps: ({
         stores,
         actions,

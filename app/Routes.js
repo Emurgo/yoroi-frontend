@@ -185,7 +185,7 @@ const WalletsSubpages = (stores, actions) => (
       path={ROUTES.WALLETS.CATALYST_VOTING}
       component={(props) => <VotingPage {...props} stores={stores} actions={actions} />}
     />
-    <Redirect to={ROUTES.WALLETS.TRANSACTIONS} />
+    <Redirect to={ROUTES.WALLETS.DELEGATION_DASHBOARD} />
   </Switch>
 );
 

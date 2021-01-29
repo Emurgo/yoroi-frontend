@@ -60,6 +60,15 @@ function registerCategory(category: TopbarCategory): TopbarCategory {
   return category;
 }
 
+export const STAKE_DASHBOARD: TopbarCategory = registerCategory({
+  className: 'stakeDashboard',
+  route: ROUTES.WALLETS.DELEGATION_DASHBOARD,
+  icon: dashboardIcon,
+  label: messages.delegationDashboard,
+  isVisible: request => (
+    asGetStakingKey(request.selected) != null
+  ),
+});
 export const SUMMARY: TopbarCategory = registerCategory({
   className: 'summary',
   route: ROUTES.WALLETS.TRANSACTIONS,
@@ -81,15 +90,6 @@ export const RECEIVE: TopbarCategory = registerCategory({
   label: messages.receive,
   isVisible: _request => true,
 });
-export const STAKE_DASHBOARD: TopbarCategory = registerCategory({
-  className: 'stakeDashboard',
-  route: ROUTES.WALLETS.DELEGATION_DASHBOARD,
-  icon: dashboardIcon,
-  label: messages.delegationDashboard,
-  isVisible: request => (
-    asGetStakingKey(request.selected) != null
-  ),
-});
 export const VOTING: TopbarCategory = registerCategory({
   className: 'voting',
   route: ROUTES.WALLETS.CATALYST_VOTING,
@@ -110,13 +110,13 @@ export const SEIZA_STAKE_SIMULATOR: TopbarCategory = registerCategory({
     request.selected.getParent().getNetworkInfo().NetworkId === networks.CardanoMainnet.NetworkId
   ),
 });
-export const CARDANO_DELEGATION: TopbarCategory = registerCategory({
-  className: 'cardanoStake',
-  route: ROUTES.WALLETS.CARDANO_DELEGATION,
-  icon: undefined,
-  label: messages.delegationById,
-  isVisible: request => (
-    asGetStakingKey(request.selected) != null &&
-    isCardanoHaskell(request.selected.getParent().getNetworkInfo())
-  ),
-});
+// export const CARDANO_DELEGATION: TopbarCategory = registerCategory({
+//   className: 'cardanoStake',
+//   route: ROUTES.WALLETS.CARDANO_DELEGATION,
+//   icon: undefined,
+//   label: messages.delegationById,
+//   isVisible: request => (
+//     asGetStakingKey(request.selected) != null &&
+//     isCardanoHaskell(request.selected.getParent().getNetworkInfo())
+//   ),
+// });
