@@ -46,6 +46,7 @@ import { genAddressLookup } from '../../stores/stateless/addressStores';
 import { addressToDisplayString } from '../../api/ada/lib/storage/bridge/utils';
 import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
 import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
+import type { ComplexityLevelType } from '../../types/complexityLevelType';
 
 export type GeneratedData = typeof WalletSummaryPage.prototype.generated;
 
@@ -172,6 +173,7 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
             addressToDisplayString={addr =>
               addressToDisplayString(addr, publicDeriver.getParent().getNetworkInfo())
             }
+            complexityLevel={this.generated.stores.profile.selectedComplexityLevel}
           />
         );
       } else {
@@ -459,6 +461,7 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
         isClassicTheme: boolean,
         shouldHideBalance: boolean,
         unitOfAccount: UnitOfAccountSettingType,
+        selectedComplexityLevel: ?ComplexityLevelType,
       |},
       transactions: {|
         exportError: ?LocalizableError,
@@ -508,6 +511,7 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
           shouldHideBalance: stores.profile.shouldHideBalance,
           isClassicTheme: stores.profile.isClassicTheme,
           unitOfAccount: stores.profile.unitOfAccount,
+          selectedComplexityLevel: stores.profile.selectedComplexityLevel,
         },
         uiDialogs: {
           isOpen: stores.uiDialogs.isOpen,

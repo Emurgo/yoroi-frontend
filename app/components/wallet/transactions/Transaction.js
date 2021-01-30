@@ -41,9 +41,11 @@ import type {
 } from '../../../api/common/lib/MultiToken';
 import { getTokenName } from '../../../stores/stateless/tokenHelpers';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
-import { parseMetadata } from '../../../api/ada/lib/storage/bridge/metadataUtils';
+import { parseMetadata, parseMetadataDetailed } from '../../../api/ada/lib/storage/bridge/metadataUtils';
 import CodeBlock from '../../widgets/CodeBlock';
 import BigNumber from 'bignumber.js';
+import { ComplexityLevels } from '../../../types/complexityLevelType';
+import type { ComplexityLevelType } from '../../../types/complexityLevelType';
 
 const messages = defineMessages({
   type: {
@@ -209,6 +211,7 @@ type Props = {|
   +notification: ?Notification,
   +addressToDisplayString: string => string,
   +getTokenInfo: Inexact<TokenLookupKey> => $ReadOnly<TokenRow>,
+  +complexityLevel: ?ComplexityLevelType,
 |};
 
 type State = {|
@@ -834,9 +837,17 @@ export default class Transaction extends Component<Props, State> {
       try {
         jsonData = parseMetadata(data.metadata);
       } catch (error) {
-        // discard error
-        // can not parse metadata as json
-        // show the metadata hex as is
+        // try to parse schema using detailed conversion if advanced user
+        if(this.props.complexityLevel === ComplexityLevels.Advanced){
+          try {
+            jsonData = parseMetadataDetailed(data.metadata)
+          } catch (errDetailed) {
+            // discard error
+            // can not parse metadata as json
+            // show the metadata hex as is
+          }
+        }
+        // do nothing for simple user
       }
 
       return (

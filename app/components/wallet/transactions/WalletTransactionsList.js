@@ -25,6 +25,7 @@ import type {
   TokenLookupKey,
 } from '../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
+import type { ComplexityLevelType } from '../../../types/complexityLevelType';
 
 const messages = defineMessages({
   showMoreTransactionsButtonLabel: {
@@ -54,6 +55,7 @@ type Props = {|
   +notification: ?Notification,
   +addressToDisplayString: string => string,
   +getTokenInfo: Inexact<TokenLookupKey> => $ReadOnly<TokenRow>,
+  +complexityLevel: ?ComplexityLevelType,
 |};
 
 @observer
@@ -183,6 +185,7 @@ export default class WalletTransactionsList extends Component<Props> {
                   notification={notification}
                   onCopyAddressTooltip={onCopyAddressTooltip}
                   addressToDisplayString={this.props.addressToDisplayString}
+                  complexityLevel={this.props.complexityLevel}
                 />
               ))}
             </div>
