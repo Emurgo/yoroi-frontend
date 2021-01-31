@@ -1,12 +1,14 @@
 // @flow
 import type { Node } from 'react';
 import React, { Component } from 'react';
-import Layout from '../../components/layout/Layout';
-import ConnectPage from '../../components/connect/ConnectPage';
-import { getWalletsInfo } from '../../../../chrome/extension/background';
+import ConnectPage from '../components/connect/ConnectPage';
+import { getWalletsInfo } from '../../../chrome/extension/background';
 import { observer } from 'mobx-react';
+import { ROUTES } from '../routes-config';
 
-type Props = {||};
+type Props = {|
+  history: Object,
+|};
 declare var chrome;
 
 type State = {|
@@ -16,7 +18,6 @@ type State = {|
 let chromeMessage;
 
 chrome.runtime.sendMessage({ type: 'connect_retrieve_data' }, function (response) {
-  console.log(response);
   if (response) {
     chromeMessage = response;
   }
@@ -39,7 +40,6 @@ export default class ConnectContainer extends Component<Props, State> {
     }
   }
   onToggleCheckbox: (index: number) => void = index => {
-    console.log(index);
     const { accounts } = this.state;
     if (accounts) {
       let newItems = accounts.slice();
@@ -70,6 +70,7 @@ export default class ConnectContainer extends Component<Props, State> {
       account: walletIndex,
       tabId: chromeMessage.tabId,
     });
+    this.props.history.push(ROUTES.DETAILS);
     console.log('connecting now!', chromeMessage);
   }
 
@@ -94,19 +95,16 @@ export default class ConnectContainer extends Component<Props, State> {
 
   render(): Node {
     const { accounts } = this.state;
-    console.log(this.props);
 
     return (
-      <>
-        <ConnectPage
-          message={chromeMessage}
-          accounts={accounts}
-          onConnect={this.onConnect}
-          onToggleCheckbox={this.onToggleCheckbox}
-          onCancel={this.onCancel}
-          handleSubmit={this.handleSubmit}
-        />
-      </>
+      <ConnectPage
+        message={chromeMessage}
+        accounts={accounts}
+        onConnect={this.onConnect}
+        onToggleCheckbox={this.onToggleCheckbox}
+        onCancel={this.onCancel}
+        handleSubmit={this.handleSubmit}
+      />
     );
   }
 }

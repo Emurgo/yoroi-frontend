@@ -9,7 +9,7 @@ type WalletCardProps = {|
   balance: string,
 |};
 
-const WalletCard: any = ({ name, balance }: WalletCardProps): Node => {
+const WalletCard = ({ name, balance }: WalletCardProps): Node => {
   function constructPlate(
     plate: any,
     saturationFactor: number,
