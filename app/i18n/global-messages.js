@@ -737,6 +737,10 @@ const globalMessages: * = defineMessages({
     id: 'global.errors.invalidPin',
     defaultMessage: '!!!Invalid Pin',
   },
+  buySellAda: {
+    id: 'button.buySellAda',
+    defaultMessage: '!!!Buy/Sell ADA',
+  }
 });
 export default globalMessages;
 

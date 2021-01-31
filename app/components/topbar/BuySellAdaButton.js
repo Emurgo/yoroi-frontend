@@ -3,36 +3,33 @@ import React, { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape, } from 'react-intl';
-import styles from './NavBarAddButton.scss';
+import styles from './BuySellAdaButton.scss';
 import globalMessages from '../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import classnames  from 'classnames';
 import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 
-type Props = {|
-  +onClick: void => void,
-|};
+type Props = {||};
+
+const EXCHANGE_URL = 'https://exchange.yoroiwallet.com';
 
 @observer
-export default class NavBarAddButton extends Component<Props> {
+export default class BuySellAdaButton extends Component<Props> {
 
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
   render(): Node {
-    const {
-      onClick,
-    } = this.props;
 
     const { intl } = this.context;
 
     return (
       <Button
-        className={classnames([styles.button, 'secondary'])}
-        onClick={() => onClick()}
-        label={intl.formatMessage(globalMessages.addWalletLabel)}
+        label={intl.formatMessage(globalMessages.buySellAda)}
+        className={classnames([styles.button, 'primary'])}
+        onClick={() => window.open(EXCHANGE_URL, '_blank')}
         skin={ButtonSkin}
       />
     );
