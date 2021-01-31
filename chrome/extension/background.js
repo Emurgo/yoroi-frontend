@@ -283,9 +283,9 @@ async function confirmConnect(tabId: number, url: string): Promise<?AccountIndex
           pendingSigns: new Map()
         });
         chrome.windows.create({
-          url: 'connect.html',
-          width: 240,
-          height: 400,
+          url: 'main_window_ergo.html',
+          width: 466,
+          height: 600,
           focused: true,
           type: 'popup'
         });

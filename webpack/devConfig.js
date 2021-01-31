@@ -32,6 +32,11 @@ const baseDevConfig = (
       hotScript,
       path.join(__dirname, '../chrome/extension/background')
     ],
+    ergo: [
+      customPath,
+      hotScript,
+      path.join(__dirname, '../chrome/extension/ergo-connector/index')
+    ],
     sign: [
       customPath,
       hotScript,
