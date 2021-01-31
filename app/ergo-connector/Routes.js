@@ -7,7 +7,8 @@ import type { ActionsMap } from '../actions/index';
 import { ROUTES } from './routes-config';
 
 // PAGES
-import ConnectContainer from './containers/connect/ConnectContainer';
+import ConnectContainer from './containers/ConnectContainer';
+import ConnectWebsitesContainer from './containers/ConnectWebsitesContainer';
 import Layout from './components/layout/Layout';
 
 export const Routes = (stores: StoresMap, actions: ActionsMap): Node => (
@@ -21,8 +22,11 @@ export const Routes = (stores: StoresMap, actions: ActionsMap): Node => (
       <Route
         exact
         path={ROUTES.CONNECTED_WEBSITES}
-        component={props => <h1>List of connected website</h1>}
+        component={props => (
+          <ConnectWebsitesContainer {...props} stores={stores} actions={actions} />
+        )}
       />
+      <Route exact path={ROUTES.DETAILS} component={() => <h1>Welcome to details page</h1>} />
       <Redirect to={ROUTES.ROOT} />
     </Switch>
   </Layout>

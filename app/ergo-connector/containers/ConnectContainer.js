@@ -6,13 +6,13 @@ import { getWalletsInfo } from '../../../chrome/extension/background';
 import { observer } from 'mobx-react';
 import { ROUTES } from '../routes-config';
 
+declare var chrome;
 type Props = {|
   history: Object,
 |};
-declare var chrome;
 
 type State = {|
-  accounts?: Array<any>,
+  accounts?: Array<Object>,
 |};
 
 let chromeMessage;
@@ -25,10 +25,6 @@ chrome.runtime.sendMessage({ type: 'connect_retrieve_data' }, function (response
 
 @observer
 export default class ConnectContainer extends Component<Props, State> {
-  static defaultProps: {| accounts: void |} = {
-    accounts: undefined,
-  };
-
   state: State = {
     accounts: [],
   };
@@ -42,7 +38,7 @@ export default class ConnectContainer extends Component<Props, State> {
   onToggleCheckbox: (index: number) => void = index => {
     const { accounts } = this.state;
     if (accounts) {
-      let newItems = accounts.slice();
+      const newItems = accounts.slice();
       newItems[index].checked = !newItems[index].checked;
       this.setState({ accounts: newItems });
     }
@@ -62,7 +58,6 @@ export default class ConnectContainer extends Component<Props, State> {
       const whitelist = Object.keys(result).length === 0 ? [] : result.connector_whitelist;
       whitelist.push({ url: chromeMessage.url, walletIndex });
       chrome.storage.local.set({ connector_whitelist: whitelist });
-      console.log('connecting now!', whitelist);
     });
     chrome.runtime.sendMessage({
       type: 'connect_response',
@@ -71,7 +66,6 @@ export default class ConnectContainer extends Component<Props, State> {
       tabId: chromeMessage.tabId,
     });
     this.props.history.push(ROUTES.DETAILS);
-    console.log('connecting now!', chromeMessage);
   }
 
   onCancel() {
@@ -80,7 +74,6 @@ export default class ConnectContainer extends Component<Props, State> {
       accepted: false,
       tabId: chromeMessage.tabId,
     });
-    console.log('close now!', chromeMessage);
   }
 
   handleSubmit: () => void = () => {
