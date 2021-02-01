@@ -25,6 +25,7 @@ import NavBarTitle from '../../components/topbar/NavBarTitle';
 import WalletSync from '../../components/wallet/my-wallets/WalletSync';
 import moment from 'moment';
 import NavBarAddButton from '../../components/topbar/NavBarAddButton';
+import BuySellAdaButton from '../../components/topbar/BuySellAdaButton';
 import globalMessages from '../../i18n/global-messages';
 import { ConceptualWallet, } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import {
@@ -81,12 +82,13 @@ export default class MyWalletsPage extends Component<Props> {
   };
 
   render(): Node {
+    const { intl } = this.context;
     const sidebarContainer = (<SidebarContainer {...this.generated.SidebarContainerProps} />);
 
     const wallets = this.generated.stores.wallets.publicDerivers;
 
     const navbarTitle = (
-      <NavBarTitle title={this.context.intl.formatMessage(globalMessages.sidebarWallets)} />
+      <NavBarTitle title={intl.formatMessage(globalMessages.sidebarWallets)} />
     );
 
     const navbarElement = (
@@ -96,6 +98,8 @@ export default class MyWalletsPage extends Component<Props> {
           () => this.generated.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD })
         }
         />}
+        buyButton={
+          <BuySellAdaButton />}
         walletDetails={undefined}
       />
     );
