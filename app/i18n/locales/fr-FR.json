@@ -714,6 +714,7 @@
   "wallet.transaction.type.multiparty": "Transaction multiparties {currency}",
   "wallet.transaction.withdraw": "Retrait",
   "wallet.transaction.withdrawalsLabel": "Retraits",
+  "wallet.transaction.transactionMetadata": "Transaction Metadata",
   "wallet.transfer.cards.byron": "Wallet de l'ère Byron",
   "wallet.transfer.cards.shelley": "Wallet de type Shelley",
   "wallet.transfer.deregister.deregister": "Désenregistrer",
