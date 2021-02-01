@@ -714,6 +714,7 @@
   "wallet.transaction.type.multiparty": "{currency} mehrfach-Teilnehmer Transaktion",
   "wallet.transaction.withdraw": "Auszahlungen",
   "wallet.transaction.withdrawalsLabel": "Auszahlungen",
+  "wallet.transaction.transactionMetadata": "Transaction Metadata",
   "wallet.transfer.cards.byron": "Byron-Ära wallet",
   "wallet.transfer.cards.shelley": "Shelley-Ära wallet",
   "wallet.transfer.deregister.deregister": "Deregistrierung",
