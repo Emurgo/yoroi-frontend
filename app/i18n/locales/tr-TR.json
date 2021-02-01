@@ -776,5 +776,6 @@
   "wallet.voting.dialog.confirmPin": "PİN'İ Onayla",
   "wallet.voting.dialog.completeLabel": "Tamamla",
   "global.errors.pinDoesNotMatch": "Pin eşleşmiyor",
-  "global.errors.invalidPin": "Geçersiz Pin"
+  "global.errors.invalidPin": "Geçersiz Pin",
+  "button.buySellAda": "Buy/Sell ADA"
 }
