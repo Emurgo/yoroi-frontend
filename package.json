@@ -135,7 +135,7 @@
     "minimist": "1.2.5",
     "node-sass": "4.14.1",
     "path-to-regexp": "6.2.0",
-    "postcss-loader": "3.0.0",
+    "postcss-loader": "4.2.0",
     "prettier": "2.2.1",
     "raw-loader": "4.0.1",
     "react-intl-translations-manager": "5.0.3",
