@@ -714,6 +714,7 @@
   "wallet.transaction.type.multiparty": "{currency} смешанная транзакция",
   "wallet.transaction.withdraw": "Withdraw",
   "wallet.transaction.withdrawalsLabel": "Withdrawals",
+  "wallet.transaction.transactionMetadata": "Transaction Metadata",
   "wallet.transfer.cards.byron": "Кошелек Byron-эры",
   "wallet.transfer.cards.shelley": "Shelley-era wallet",
   "wallet.transfer.deregister.deregister": "Deregister",
