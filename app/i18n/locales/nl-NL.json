@@ -776,5 +776,6 @@
   "wallet.voting.dialog.confirmPin": "Bevestig de pincode",
   "wallet.voting.dialog.completeLabel": "Klaar",
   "global.errors.pinDoesNotMatch": "Pincode niet juist",
-  "global.errors.invalidPin": "Foute pincode"
+  "global.errors.invalidPin": "Foute pincode",
+  "button.buySellAda": "Buy/Sell ADA"
 }
