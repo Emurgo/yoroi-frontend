@@ -714,6 +714,7 @@
   "wallet.transaction.type.multiparty": "{currency} 複数人数トランザクション",
   "wallet.transaction.withdraw": "Withdraw",
   "wallet.transaction.withdrawalsLabel": "Withdrawals",
+  "wallet.transaction.transactionMetadata": "Transaction Metadata",
   "wallet.transfer.cards.byron": "従来式(Byron)ウォレット",
   "wallet.transfer.cards.shelley": "Shelley-era wallet",
   "wallet.transfer.deregister.deregister": "Deregister",
