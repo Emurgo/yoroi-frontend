@@ -1054,6 +1054,12 @@ export default class StakingDashboardPage extends Component<Props> {
     }
     const api = getApiForNetwork(selected.getParent().getNetworkInfo());
     const time = (() => {
+      if (api === ApiOptions.ada) {
+        return {
+          getTimeCalcRequests: stores.substores.ada.time.getTimeCalcRequests,
+          getCurrentTimeRequests: stores.substores.ada.time.getCurrentTimeRequests,
+        };
+      }
       if (api === ApiOptions.jormungandr) {
         return {
           getTimeCalcRequests: stores.substores.jormungandr.time.getTimeCalcRequests,
@@ -1061,8 +1067,8 @@ export default class StakingDashboardPage extends Component<Props> {
         };
       }
       return {
-        getTimeCalcRequests: stores.substores.ada.time.getTimeCalcRequests,
-        getCurrentTimeRequests: stores.substores.ada.time.getCurrentTimeRequests,
+        getTimeCalcRequests: undefined,
+        getCurrentTimeRequests: () => { throw new Error(`${nameof(StakingDashboardPage)} api not supported`) },
       };
     })();
     return Object.freeze({
