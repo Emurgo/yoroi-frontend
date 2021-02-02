@@ -26,6 +26,7 @@ const WalletCard = ({ name, balance }: WalletCardProps): Node => {
       </div>,
     ];
   }
+  // TODO: fix hardcoded avatar
   const plate = {
     ImagePart:
       '3f7eed82d34103f119b551f2705fae269b0cf02e6522a7935c95fe471dc8a17ef916d9f89ad04e4086ec91bfa36d9a4df730a5988139a5e5d53fa72e0b682b66',
@@ -38,8 +39,9 @@ const WalletCard = ({ name, balance }: WalletCardProps): Node => {
     <div className={styles.card}>
       <div className={styles.avatar}>{iconComponent}</div>
       <div className={styles.name}>{name}</div>
-      {/* TODO: type of crypto */}
-      <p>{balance} Un</p>
+      <p className={styles.balance}>
+        {balance} <span>ERG</span>
+      </p>
     </div>
   );
 };

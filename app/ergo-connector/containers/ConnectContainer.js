@@ -12,7 +12,9 @@ type Props = {|
 |};
 
 type State = {|
-  accounts?: Array<Object>,
+  error: string,
+  loading: 'idle' | 'pending' | 'success' | 'rejected',
+  accounts: Array<Object>,
 |};
 
 let chromeMessage;
@@ -26,15 +28,23 @@ chrome.runtime.sendMessage({ type: 'connect_retrieve_data' }, function (response
 @observer
 export default class ConnectContainer extends Component<Props, State> {
   state: State = {
+    loading: 'idle',
+    error: '',
     accounts: [],
   };
 
   async componentDidMount() {
-    const accounts = await getWalletsInfo();
-    if (accounts) {
-      this.setState({ accounts });
-    }
+    this.setState({ loading: 'pending' });
+    getWalletsInfo()
+      // eslint-disable-next-line promise/always-return
+      .then(data => {
+        this.setState({ loading: 'success', accounts: data });
+      })
+      .catch(err => {
+        this.setState({ loading: 'rejected', error: err.message });
+      });
   }
+
   onToggleCheckbox: (index: number) => void = index => {
     const { accounts } = this.state;
     if (accounts) {
@@ -44,14 +54,7 @@ export default class ConnectContainer extends Component<Props, State> {
     }
   };
 
-  handleAllChecked: () => void = event => {
-    const { accounts } = this.state;
-    if (accounts) {
-      // eslint-disable-next-line no-return-assign
-      accounts.forEach(item => (item.isChecked = event));
-      this.setState({ accounts });
-    }
-  };
+  handleAllChecked: () => void = () => {};
 
   onConnect(walletIndex: number) {
     chrome.storage.local.get('connector_whitelist', async result => {
@@ -87,10 +90,12 @@ export default class ConnectContainer extends Component<Props, State> {
   };
 
   render(): Node {
-    const { accounts } = this.state;
+    const { loading, accounts, error } = this.state;
 
     return (
       <ConnectPage
+        loading={loading}
+        error={error}
         message={chromeMessage}
         accounts={accounts}
         onConnect={this.onConnect}

@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 // @flow
 import React, { Component } from 'react';
 import type { Node } from 'react';
@@ -36,7 +37,9 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  accounts?: Array<Object>,
+  accounts: Array<Object>,
+  loading: 'idle' | 'pending' | 'success' | 'rejected',
+  error: string,
   message?: {| tabId: number, url: string |},
   onToggleCheckbox: number => void,
   onCancel: () => void,
@@ -52,11 +55,22 @@ class ConnectPage extends Component<Props> {
 
   render(): Node {
     const { intl } = this.context;
-    const { accounts, message, onCancel, onToggleCheckbox, handleSubmit } = this.props;
+    const {
+      loading,
+      // error,
+      accounts,
+      message,
+      onCancel,
+      onToggleCheckbox,
+      handleSubmit,
+    } = this.props;
 
     const isCheckedWallet = accounts
       ? Boolean(accounts.findIndex(item => item.checked === true))
       : [];
+    const isLoading = loading === 'idle' || loading === 'pending';
+    const isSuccess = loading === 'success';
+    const isError = loading === 'rejected';
 
     return (
       <>
@@ -70,24 +84,39 @@ class ConnectPage extends Component<Props> {
           </div>
         </div>
         <ul className={styles.list}>
-          <li className={styles.listItem}>
-            {/* TODO: Check multiple wallets */}
-            <Checkbox skin={CheckboxSkin} label={intl.formatMessage(messages.selectAllWallets)} />
-          </li>
-          {accounts && accounts.length ? (
-            accounts.map((item, idx) => (
-              <li key={item.name} className={styles.listItem}>
-                <Checkbox
-                  skin={CheckboxSkin}
-                  label={<WalletCard name={item.name} balance={item.balance} />}
-                  onChange={() => onToggleCheckbox(idx)}
-                  checked={item.checked || false}
-                />
-              </li>
-            ))
-          ) : (
+          {isError ? (
+            <div className={styles.errorMessage}>
+              Oops ... something went wrong. please try again later
+            </div>
+          ) : null}
+          {isLoading ? (
+            <p>Loading ...</p>
+          ) : isSuccess ? (
+            accounts.length > 0 && (
+              <>
+                <li className={styles.listItem}>
+                  {/* TODO: Check multiple wallets */}
+                  <Checkbox
+                    skin={CheckboxSkin}
+                    label={intl.formatMessage(messages.selectAllWallets)}
+                    disabled
+                  />
+                </li>
+                {accounts.map((item, idx) => (
+                  <li key={item.name} className={styles.listItem}>
+                    <Checkbox
+                      skin={CheckboxSkin}
+                      label={<WalletCard name={item.name} balance={item.balance} />}
+                      onChange={() => onToggleCheckbox(idx)}
+                      checked={item.checked || false}
+                    />
+                  </li>
+                ))}
+              </>
+            )
+          ) : isSuccess && !accounts.length ? (
             <div>{intl.formatMessage(messages.noWalletsFound)}</div>
-          )}
+          ) : null}
         </ul>
         <div className={styles.bottom}>
           <p>{intl.formatMessage(messages.connectInfo)} </p>

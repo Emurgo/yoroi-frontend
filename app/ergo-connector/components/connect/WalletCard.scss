@@ -2,6 +2,9 @@
   display: flex;
   align-items: center;
   width: 100%;
+
+  letter-spacing: 0;
+  line-height: 22px;
   & .avatar {
     margin-right: 13px;
     img {
@@ -12,21 +15,5 @@
   }
   & .name {
     flex: 1;
-  }
-}
-
-.amount {
-  .isLoading {
-      margin-left: 9px;
-      margin-bottom: 6px;
-      // @include loading-spinner("../../assets/images/spinner-dark.svg", 16);
-  }
-  font-family: var(--font-medium);
-  font-size: 16px;
-  line-height: 24px;
-
-  .afterDecimal {
-      font-family: var(--font-regular);
-      font-size: 12px;
   }
 }
