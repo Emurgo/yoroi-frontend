@@ -43,7 +43,8 @@ export type RewardHistoryRequest = {|
 |};
 export type RewardTuple = [
   number, /* epoch */
-  number /* amount in lovelaces */
+  number, /* amount in lovelaces */
+  string, /* poolHash */
 ];
 export type RewardHistoryResponse = { [address: string]: Array<RewardTuple>, ... };
 export type RewardHistoryFunc = (body: RewardHistoryRequest) => Promise<RewardHistoryResponse>;

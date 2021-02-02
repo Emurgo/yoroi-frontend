@@ -525,6 +525,10 @@ const globalMessages: * = defineMessages({
     id: 'global.labels.epoch',
     defaultMessage: '!!!Epoch',
   },
+  stakepoolNameLabel: {
+    id: 'global.labels.stakepool',
+    defaultMessage: '!!!Stakepool Name',
+  },
   rewardsLabel: {
     id: 'global.labels.rewardsLabel',
     defaultMessage: '!!!Rewards',
