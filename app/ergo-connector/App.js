@@ -26,8 +26,6 @@ import type { StoresMap } from '../stores';
 import type { ActionsMap } from '../actions';
 import { changeToplevelTheme } from '../themes';
 import ThemeManager from '../ThemeManager';
-import environment from '../environment';
-import MaintenancePage from '../containers/MaintenancePage';
 import CrashPage from '../containers/CrashPage';
 import { Logger } from '../utils/logging';
 
@@ -99,8 +97,6 @@ class App extends Component<Props, State> {
     return (
       <div style={{ height: '100%' }}>
         <ThemeManager variables={themeVars} />
-
-        {/* Automatically pass a theme prop to all components in this subtree. */}
         <ThemeProvider
           key={currentTheme}
           theme={yoroiPolymorphTheme}
@@ -118,9 +114,6 @@ class App extends Component<Props, State> {
     const { stores, actions, history } = this.props;
     if (this.state.crashed === true) {
       return <CrashPage stores={stores} actions={actions} />;
-    }
-    if (stores.serverConnectionStore.isMaintenance) {
-      return <MaintenancePage stores={stores} actions={actions} />;
     }
     return <Router history={history}>{Routes(stores, actions)}</Router>;
   };

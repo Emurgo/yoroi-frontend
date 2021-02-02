@@ -6,7 +6,7 @@ import { action, configure } from 'mobx';
 import { RouterStore, syncHistoryWithStore } from 'mobx-react-router';
 import { createHashHistory } from 'history';
 import { setupApi } from '../../../app/api/index';
-import createStores from '../../../app/stores/index';
+import createStores from '../../../app/ergo-connector/stores/index';
 import { translations } from '../../../app/i18n/translations';
 import actions from '../../../app/actions/index';
 import { Action } from '../../../app/actions/lib/Action';
@@ -28,7 +28,7 @@ const initializeErgoConnector: void => Promise<void> = async () => {
   const router = new RouterStore();
   const hashHistory = createHashHistory();
   const history = syncHistoryWithStore(hashHistory, router);
-  const stores = createStores(api, actions, router);
+  const stores = createStores(api, actions);
 
   window.yoroi = {
     api,
@@ -37,7 +37,7 @@ const initializeErgoConnector: void => Promise<void> = async () => {
     stores,
     reset: action(() => {
       Action.resetAllActions();
-      createStores(api, actions, router);
+      createStores(api, actions);
     }),
   };
 
