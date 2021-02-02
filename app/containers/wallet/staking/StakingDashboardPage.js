@@ -913,7 +913,7 @@ export default class StakingDashboardPage extends Component<Props> {
         totalRewards.push({
           name: i,
           primary: getNormalized(amountSum.getDefaultEntry()).toNumber(),
-          poolName: '', // TODO: Not sure if this is OK to be empty
+          poolName: '',
         });
         perEpochRewards.push({
           name: i,
