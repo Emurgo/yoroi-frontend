@@ -714,7 +714,7 @@
   "wallet.transaction.type.multiparty": "{currency} çok parçalı işlem",
   "wallet.transaction.withdraw": "Çekim",
   "wallet.transaction.withdrawalsLabel": "Çekim",
-  "wallet.transaction.transactionMetadata": "Transaction Metadata",
+  "wallet.transaction.transactionMetadata": "İşlem Metaverisi",
   "wallet.transfer.cards.byron": "Byron-era cüzdan",
   "wallet.transfer.cards.shelley": "Shelley-era cüzdan",
   "wallet.transfer.deregister.deregister": "Kaydı iptal et",
@@ -778,5 +778,5 @@
   "wallet.voting.dialog.completeLabel": "Tamamla",
   "global.errors.pinDoesNotMatch": "Pin eşleşmiyor",
   "global.errors.invalidPin": "Geçersiz Pin",
-  "button.buySellAda": "Buy/Sell ADA"
+  "button.buySellAda": "Al/Sat ADA"
 }
