@@ -29,7 +29,19 @@ const baseProdConfig = (env /*: EnvParams */) /*: * */ => ({
     background: [
       customPath,
       path.join(__dirname, '../chrome/extension/background')
-    ]
+    ],
+    sign: [
+      customPath,
+      path.join(__dirname, '../chrome/extension/ergo-connector/sign')
+    ],
+    connect: [
+      customPath,
+      path.join(__dirname, '../chrome/extension/ergo-connector/connect')
+    ],
+    config: [
+      customPath,
+      path.join(__dirname, '../chrome/extension/ergo-connector/config')
+    ],
   },
   output: {
     path: path.join(__dirname, '../build/js'),
