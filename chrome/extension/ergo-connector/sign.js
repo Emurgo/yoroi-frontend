@@ -18,6 +18,7 @@ chrome.runtime.sendMessage({ type: 'tx_sign_window_retrieve_data' }, response =>
   switch (sign.type) {
     case 'tx':
       {
+        // eslint-disable-next-line no-console
         console.log('tx data: ' + JSON.stringify(response));
         // TODO: handle other sign types
         const div = document.getElementById('tx-info');
@@ -39,7 +40,7 @@ chrome.runtime.sendMessage({ type: 'tx_sign_window_retrieve_data' }, response =>
           }
           const valueDiv = document.createElement('div');
           if (valueDiv != null) {
-            valueDiv.appendChild(document.createTextNode(`Value transfered: [TODO: calculate]`));
+            valueDiv.appendChild(document.createTextNode(`Value transferred: [TODO: calculate]`));
             div.appendChild(valueDiv);
           }
           const send = document.getElementById('tx-sign');

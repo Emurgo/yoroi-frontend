@@ -94,7 +94,7 @@ type ConnectedSite = {|
 
 // tab id key
 const connectedSites: Map<number, ConnectedSite> = new Map();
-//chrome.storage.local.set({ connector_whitelist: [] });
+// chrome.storage.local.set({ connector_whitelist: [] });
 export async function getWalletsInfo(): Promise<AccountInfo[]> {
   if (db == null) {
     db = await loadLovefieldDB(schema.DataStoreType.INDEXED_DB);
@@ -136,7 +136,12 @@ async function getSelectedWallet(tabId: number): Promise<PublicDeriver<>> {
 }
 
 chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
-  async function signTxInputs(tx, indices: number[], password: string, tabId: number): Promise<any> {
+  async function signTxInputs(
+    tx,
+    indices: number[],
+    password: string,
+    tabId: number
+  ): Promise<any> {
     const wallet = await getSelectedWallet(tabId);
     const canGetAllUtxos = await asGetAllUtxos(wallet);
     if (canGetAllUtxos == null) {
@@ -161,7 +166,7 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
         case 'tx':
           {
             const txToSign = request.tx;
-            let allIndices = [];
+            const allIndices = [];
             for (let i = 0; i < txToSign.inputs.length; i += 1) {
               allIndices.push(i);
             }
@@ -198,7 +203,8 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
       });
       connection.pendingSigns.delete(request.uid);
     } else {
-      alert(`couldn't find tabId: ${request.tabId} in ${JSON.stringify(connectedSites.entries())}`);
+      // eslint-disable-next-line no-console
+      console.error(`couldn't find tabId: ${request.tabId} in ${JSON.stringify(connectedSites.entries())}`);
     }
   } else if (request.type === 'tx_sign_window_retrieve_data') {
     for (const [tabId, connection] of connectedSites) {
@@ -257,6 +263,7 @@ async function confirmConnect(tabId: number, url: string): Promise<?AccountIndex
   return new Promise(resolve => {
     chrome.storage.local.get('connector_whitelist', async result => {
       const whitelist = Object.keys(result).length === 0 ? [] : result.connector_whitelist;
+      // eslint-disable-next-line no-console
       console.log(`whitelist: ${JSON.stringify(whitelist)}`);
       const whitelistEntry = whitelist.find(entry => entry.url === url);
       if (whitelistEntry !== undefined) {
@@ -408,6 +415,7 @@ chrome.runtime.onConnectExternal.addListener(port => {
                 ok: id
               });
             } catch (e) {
+              // eslint-disable-next-line no-console
               console.log(`tx send err: ${e}`);
               rpcResponse({
                 err: JSON.stringify(e)

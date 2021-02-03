@@ -99,9 +99,11 @@ export async function connectorGetUtxos(
     let valueAcc = 0;
     for (let i = 0; i < utxos.length && valueAcc < valueExpected; i += 1) {
       const formatted = formatUtxoToBox(utxos[i]);
+      // eslint-disable-next-line no-console
       console.log(`get_utxos[1]: at ${valueAcc} of ${valueExpected} requested - trying to add ${formatted.value}`);
       valueAcc += parseInt(formatted.value, 10);
       utxosToUse.push(formatted);
+      // eslint-disable-next-line no-console
       console.log(`get_utxos[2]: at ${valueAcc} of ${valueExpected} requested`);
     }
   } else {
@@ -161,7 +163,8 @@ export async function connectorSignTx(
   try {
     wasmTx = RustModule.SigmaRust.UnsignedTransaction.from_json(JSON.stringify(tx));
   } catch (e) {
-    console.log(`tx parse error: ${e}`);
+    // eslint-disable-next-line no-console
+    console.error(`tx parse error: ${e}`);
     throw e;
   }
   const boxIdsToSign = [];
@@ -188,7 +191,7 @@ export async function connectorSignTx(
     signingKey: finalSigningKey,
   });
   const x = utxosToSign.map(formatUtxoToBox);
-  let txBoxesToSign = RustModule.SigmaRust.ErgoBoxes.from_boxes_json(x);
+  const txBoxesToSign = RustModule.SigmaRust.ErgoBoxes.from_boxes_json(x);
   const signedTx = RustModule.SigmaRust.Wallet
     .from_secrets(wasmKeys)
     .sign_transaction(
