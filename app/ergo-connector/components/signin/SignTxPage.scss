@@ -1,0 +1,72 @@
+.component {
+  padding-right: 32px;
+  padding-left: 32px;
+  padding-top: 48px;
+  overflow-wrap: break-word;
+  font-family: 'Rubik Regular';
+}
+.language {
+  label {
+    background-color: var(--theme-settings-pane-background-color);
+  }
+}
+
+.label {
+  color: #242838;
+  font-size: 14px;
+  margin-bottom: 4px;
+  letter-spacing: 0;
+  line-height: 22px;
+}
+
+.value {
+  color: #6b7384;
+  font-size: 14px;
+  letter-spacing: 0;
+  line-height: 22px;
+  margin-bottom: 24px;
+}
+.row {
+  margin-bottom: 24px;
+}
+.details {
+  margin-bottom: 24px;
+  display: flex;
+  justify-content: space-between;
+  & > * {
+    flex: 1 1 48%;
+    max-width: 48%;
+  }
+  .amount {
+    color: #38393d;
+    font-weight: 500;
+  }
+  .stablecoins,
+  .tokens {
+    color: #242838;
+    font-size: 14px;
+  }
+}
+
+.totalValue {
+  color: #17d1aa;
+  font-size: 18px;
+  font-size: 500;
+  margin-bottom: 24px;
+}
+
+.wrapperBtn {
+  padding-top: 16px;
+  display: flex;
+  button {
+    height: 40px;
+    font-size: 14px;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  button + button {
+    margin-left: 22px;
+  }
+}

@@ -10,6 +10,7 @@ import { ROUTES } from './routes-config';
 import ConnectContainer from './containers/ConnectContainer';
 import ConnectWebsitesContainer from './containers/ConnectWebsitesContainer';
 import Layout from './components/layout/Layout';
+import SignTxContainer from './containers/SignTxContainer';
 
 export const Routes = (stores: StoresMap, actions: ActionsMap): Node => (
   <Layout>
@@ -26,7 +27,13 @@ export const Routes = (stores: StoresMap, actions: ActionsMap): Node => (
           <ConnectWebsitesContainer {...props} stores={stores} actions={actions} />
         )}
       />
+      <Route
+        exact
+        path={ROUTES.SIGNIN_TRANSACTION}
+        component={props => <SignTxContainer {...props} stores={stores} actions={actions} />}
+      />
       <Route exact path={ROUTES.DETAILS} component={() => <h1>Welcome to details page</h1>} />
+      <Route exact path={ROUTES.SETTINGS} component={() => <h1>Welcome to settings page</h1>} />
       <Redirect to={ROUTES.ROOT} />
     </Switch>
   </Layout>
