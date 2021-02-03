@@ -263,7 +263,7 @@ test('Create Ledger transaction', async () => {
           RustModule.WalletV4.TransactionHash.from_bytes(Buffer.from(utxo.tx_hash, 'hex')),
           1
         ),
-        RustModule.WalletV4.BigNum.from_str(utxo.amount)
+        RustModule.WalletV4.Value.new(RustModule.WalletV4.BigNum.from_str(utxo.amount))
       );
     } else {
       txBuilder.add_key_input(
@@ -272,14 +272,14 @@ test('Create Ledger transaction', async () => {
           RustModule.WalletV4.TransactionHash.from_bytes(Buffer.from(utxo.tx_hash, 'hex')),
           1
         ),
-        RustModule.WalletV4.BigNum.from_str(utxo.amount)
+        RustModule.WalletV4.Value.new(RustModule.WalletV4.BigNum.from_str(utxo.amount))
       );
     }
   }
   txBuilder.add_output(
     RustModule.WalletV4.TransactionOutput.new(
       RustModule.WalletV4.Address.from_bytes(Buffer.from(byronAddrToHex('Ae2tdPwUPEZAVDjkPPpwDhXMSAjH53CDmd2xMwuR9tZMAZWxLhFphrHKHXe'), 'hex')),
-      RustModule.WalletV4.BigNum.from_str('5326134')
+      RustModule.WalletV4.Value.new(RustModule.WalletV4.BigNum.from_str('5326134'))
     )
   );
   const certs = RustModule.WalletV4.Certificates.new();

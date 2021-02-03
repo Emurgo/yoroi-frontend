@@ -152,7 +152,7 @@ import {
 import {
   getAllAddressesForDisplay,
 } from './lib/storage/bridge/traitUtils';
-import { convertAdaTransactionsToExportRows } from './transactions/utils';
+import { convertAdaTransactionsToExportRows, multiTokenFromCardanoValue, } from './transactions/utils';
 import { generateAdaPaperPdf } from './paperWallet/paperWalletPdf';
 import type { PdfGenStepType } from './paperWallet/paperWalletPdf';
 import type { TransactionExportRow } from '../export';
@@ -1982,11 +1982,7 @@ function getDifferenceAfterTx(
       const output = outputs.get(i);
       const address = Buffer.from(output.address().to_bytes()).toString('hex');
       if (addrContainsAccountKey(address, stakeCredential, true)) {
-        sumOutForKey.add({
-          amount: new BigNumber(output.amount().to_str()),
-          identifier: defaultToken.defaultIdentifier,
-          networkId: defaultToken.defaultNetworkId,
-         });
+        sumOutForKey.joinAddMutable(multiTokenFromCardanoValue(output.amount(), defaultToken));
       }
     }
   }

@@ -126,7 +126,7 @@ describe('Byron era tx format tests', () => {
       // eslint-disable-next-line camelcase
       RustModule.WalletV4.ByronAddress.from_address(body.outputs().get(0).address())?.to_base58()
     ).toBe(outAddress);
-    expect(body.outputs().get(0).amount().to_str()).toBe('1832035');
+    expect(body.outputs().get(0).amount().coin().to_str()).toBe('1832035');
 
     const witnesses = signedTx.witness_set().bootstraps();
     if (witnesses == null) throw new Error('no bootstrap witnesses found');
@@ -225,7 +225,7 @@ describe('Byron era tx format tests', () => {
       // eslint-disable-next-line camelcase
       RustModule.WalletV4.ByronAddress.from_address(body.outputs().get(0).address())?.to_base58()
     ).toBe(outAddress);
-    expect(body.outputs().get(0).amount().to_str()).toBe('99671931');
+    expect(body.outputs().get(0).amount().coin().to_str()).toBe('99671931');
 
     const witnesses = signedTx.witness_set().bootstraps();
     if (witnesses == null) throw new Error('no bootstrap witnesses found');

@@ -74,11 +74,13 @@ export async function createLedgerSignTxPayload(request: {|
     ));
   }
 
+  const ttl = txBody.ttl();
+  if (ttl == null) throw new Error(`${nameof(createLedgerSignTxPayload)} Ledger firmware doesn't support no TTL txs`);
   return {
     inputs: ledgerInputs,
     outputs: ledgerOutputs,
+    ttlStr: ttl.toString(),
     feeStr: txBody.fee().to_str(),
-    ttlStr: txBody.ttl().toString(),
     protocolMagic: request.byronNetworkMagic,
     withdrawals: ledgerWithdrawal,
     certificates: ledgerCertificates,
@@ -121,18 +123,21 @@ function _transformToLedgerOutputs(request: {|
         path: changeAddr.addressing.path,
         addressingMap: request.addressingMap,
       });
+      if (output.amount().multiasset() != null) {
+        throw new Error(`${nameof(_transformToLedgerOutputs)} Ledger firmware doesn't support multi-asset`);
+      }
       result.push({
         addressTypeNibble: addressParams.addressTypeNibble,
         spendingPath: addressParams.spendingPath,
         stakingBlockchainPointer: addressParams.stakingBlockchainPointer,
         stakingKeyHashHex: addressParams.stakingKeyHashHex,
         stakingPath: addressParams.stakingPath,
-        amountStr: output.amount().to_str(),
+        amountStr: output.amount().coin().to_str(),
       });
     } else {
       result.push({
         addressHex: Buffer.from(address.to_bytes()).toString('hex'),
-        amountStr: output.amount().to_str(),
+        amountStr: output.amount().coin().to_str(),
       });
     }
   }

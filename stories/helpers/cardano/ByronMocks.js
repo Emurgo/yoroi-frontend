@@ -276,11 +276,11 @@ export const genTentativeByronTx = (
       ),
       remoteUnspentUtxo.tx_index
     ),
-    RustModule.WalletV4.BigNum.from_str(remoteUnspentUtxo.amount)
+    RustModule.WalletV4.Value.new(RustModule.WalletV4.BigNum.from_str(remoteUnspentUtxo.amount))
   );
   txBuilder.add_output(RustModule.WalletV4.TransactionOutput.new(
     RustModule.WalletV4.ByronAddress.from_base58('Ae2tdPwUPEZ4xAL3nxLq4Py7BfS1D2tJ3u2rxZGnrAXC8TNkWhTaz41J3FN').to_address(),
-    RustModule.WalletV4.BigNum.from_str(ouputAmount)
+    RustModule.WalletV4.Value.new(RustModule.WalletV4.BigNum.from_str(ouputAmount))
   ));
   txBuilder.set_fee(RustModule.WalletV4.BigNum.from_str(fee.toString()));
   txBuilder.set_ttl(5);

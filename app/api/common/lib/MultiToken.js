@@ -166,6 +166,8 @@ export class MultiToken {
     return true;
   }
 
+  size: void => number = () => this.values.length;
+
   isEmpty: void => boolean = () => {
     return this.values.filter(token => token.amount.gt(0)).length === 0;
   }

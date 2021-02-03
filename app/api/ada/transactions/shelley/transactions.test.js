@@ -286,8 +286,8 @@ describe('Create unsigned TX from UTXO', () => {
     // input selection will only take 2 of the 3 inputs
     // it takes 2 inputs because input selection algorithm
     expect(unsignedTxResponse.senderUtxos).toEqual([utxos[0], utxos[1]]);
-    expect(unsignedTxResponse.txBuilder.get_explicit_input().to_str()).toEqual('1000702');
-    expect(unsignedTxResponse.txBuilder.get_explicit_output().to_str()).toEqual('999528');
+    expect(unsignedTxResponse.txBuilder.get_explicit_input().coin().to_str()).toEqual('1000702');
+    expect(unsignedTxResponse.txBuilder.get_explicit_output().coin().to_str()).toEqual('999528');
     expect(unsignedTxResponse.txBuilder.min_fee().to_str()).toEqual('1166');
   });
 
@@ -322,8 +322,8 @@ describe('Create unsigned TX from UTXO', () => {
     // input selection will only take 2 of the 3 inputs
     // it takes 2 inputs because input selection algorithm
     expect(unsignedTxResponse.senderUtxos).toEqual([utxos[1]]);
-    expect(unsignedTxResponse.txBuilder.get_explicit_input().to_str()).toEqual('1000001');
-    expect(unsignedTxResponse.txBuilder.get_explicit_output().to_str()).toEqual('788199');
+    expect(unsignedTxResponse.txBuilder.get_explicit_input().coin().to_str()).toEqual('1000001');
+    expect(unsignedTxResponse.txBuilder.get_explicit_output().coin().to_str()).toEqual('788199');
     expect(unsignedTxResponse.txBuilder.min_fee().to_str()).toEqual('208994');
   });
 });
@@ -346,14 +346,14 @@ describe('Create unsigned TX from addresses', () => {
     );
     expect(unsignedTxResponse.senderUtxos).toEqual([addressedUtxos[0], addressedUtxos[1]]);
 
-    expect(unsignedTxResponse.txBuilder.get_explicit_input().to_str()).toEqual('1000702');
-    expect(unsignedTxResponse.txBuilder.get_explicit_output().to_str()).toEqual('5001');
+    expect(unsignedTxResponse.txBuilder.get_explicit_input().coin().to_str()).toEqual('1000702');
+    expect(unsignedTxResponse.txBuilder.get_explicit_output().coin().to_str()).toEqual('5001');
     expect(unsignedTxResponse.txBuilder.min_fee().to_str()).toEqual('1064');
     // burns remaining amount
     expect(
       unsignedTxResponse.txBuilder.get_explicit_input().checked_sub(
         unsignedTxResponse.txBuilder.get_explicit_output()
-      ).to_str()
+      ).coin().to_str()
     ).toEqual(unsignedTxResponse.txBuilder.build().fee().to_str());
   });
 });
@@ -431,7 +431,7 @@ describe('Create signed transactions', () => {
     outputs.add(
       RustModule.WalletV4.TransactionOutput.new(
         RustModule.WalletV4.Address.from_bytes(Buffer.from(byronAddrToHex('Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4'), 'hex')),
-        RustModule.WalletV4.BigNum.from_str('5001')
+        RustModule.WalletV4.Value.new(RustModule.WalletV4.BigNum.from_str('5001'))
       )
     );
     const txBody = RustModule.WalletV4.TransactionBody.new(
@@ -638,7 +638,7 @@ describe('Create signed transactions', () => {
     const fee = txBody.fee().to_str();
     expect(fee).toEqual('1310');
     expect(txBody.outputs().len()).toEqual(1);
-    expect(txBody.outputs().get(0).amount().to_str()).toEqual(
+    expect(txBody.outputs().get(0).amount().coin().to_str()).toEqual(
       new BigNumber(addressedUtxos[3].amount)
         .minus(fee)
         .plus(withdrawAmount)
@@ -674,14 +674,14 @@ describe('Create sendAll unsigned TX from UTXO', () => {
       );
 
       expect(sendAllResponse.senderUtxos).toEqual([utxos[0], utxos[1]]);
-      expect(sendAllResponse.txBuilder.get_explicit_input().to_str()).toEqual('11000002');
-      expect(sendAllResponse.txBuilder.get_explicit_output().to_str()).toEqual('10998652');
+      expect(sendAllResponse.txBuilder.get_explicit_input().coin().to_str()).toEqual('11000002');
+      expect(sendAllResponse.txBuilder.get_explicit_output().coin().to_str()).toEqual('10998652');
       expect(sendAllResponse.txBuilder.min_fee().to_str()).toEqual('1342');
       // make sure we don't accidentally burn a lot of coins
       expect(
         sendAllResponse.txBuilder.get_explicit_input().checked_sub(
           sendAllResponse.txBuilder.get_explicit_output()
-        ).to_str()
+        ).coin().to_str()
       ).toEqual('1350');
     });
   });

@@ -42,6 +42,97 @@ import {
 import type {
   DefaultTokenEntry,
 } from '../../common/lib/MultiToken';
+import { RustModule } from '../lib/cardanoCrypto/rustLoader';
+
+export function cardanoAssetToIdentifier(
+  policyId: RustModule.WalletV4.ScriptHash,
+  name: RustModule.WalletV4.AssetName,
+): string {
+  // note: possible for name to be empty causing a trailing hyphen
+  return `${Buffer.from(policyId.to_bytes()).toString('hex')}-${Buffer.from(name.to_bytes()).toString('hex')}`;
+}
+export function identifierToCardanoAsset(
+  identifier: string,
+): {|
+  policyId: RustModule.WalletV4.ScriptHash,
+  name: RustModule.WalletV4.AssetName,
+|} {
+  // recall: 'a-'.split() gives ['a', ''] as desired
+  const parts = identifier.split('-');
+  return {
+    policyId: RustModule.WalletV4.ScriptHash.from_bytes(Buffer.from(parts[0], 'hex')),
+    name: RustModule.WalletV4.AssetName.from_bytes(Buffer.from(parts[1], 'hex')),
+  };
+}
+
+export function addCardanoAssets(
+  tokens: MultiToken,
+  defaults: DefaultTokenEntry,
+  assets: void | RustModule.WalletV4.MultiAsset,
+): MultiToken {
+  if (assets == null) return tokens;
+  const hashes = assets.keys();
+  for (let i = 0; i < hashes.len(); i++) {
+    const policyId = hashes.get(i);
+    const assetsForPolicy = assets.get(policyId);
+    if (assetsForPolicy == null) continue;
+
+    const policies = assetsForPolicy.keys();
+    for (let j = 0; j < policies.len(); j++) {
+      const assetName = policies.get(j);
+      const amount = assetsForPolicy.get(assetName);
+      if (amount == null) continue;
+
+      tokens.add({
+        amount: new BigNumber(amount.to_str()),
+        identifier: cardanoAssetToIdentifier(policyId, assetName),
+        networkId: defaults.defaultNetworkId,
+      });
+    }
+  }
+  return tokens;
+}
+export function cardanoValueFromMultiToken(
+  tokens: MultiToken,
+): RustModule.WalletV4.Value {
+  const value = RustModule.WalletV4.Value.new(
+    RustModule.WalletV4.BigNum.from_str(tokens.getDefaultEntry().amount.toString())
+  );
+  if (tokens.size() === 1) return value;
+
+  const assets = RustModule.WalletV4.MultiAsset.new();
+  for (const entry of tokens.nonDefaultEntries()) {
+    const { policyId, name } = identifierToCardanoAsset(entry.identifier);
+
+    const policyContent = assets.get(policyId) ?? RustModule.WalletV4.Assets.new();
+
+    policyContent.insert(
+      name,
+      RustModule.WalletV4.BigNum.from_str(entry.amount.toString())
+    );
+    // recall: we always have to insert since WASM returns copies of objects
+    assets.insert(policyId, policyContent);
+  }
+  value.set_multiasset(assets);
+  return value;
+}
+export function multiTokenFromCardanoValue(
+  value: RustModule.WalletV4.Value,
+  defaults: DefaultTokenEntry,
+): MultiToken {
+  const multiToken = new MultiToken([], defaults);
+  multiToken.add({
+    amount: new BigNumber(value.coin().to_str()),
+    identifier: defaults.defaultIdentifier,
+    networkId: defaults.defaultNetworkId,
+  });
+  addCardanoAssets(
+    multiToken,
+    defaults,
+    value.multiasset()
+  );
+  return multiToken;
+}
 
 export function getFromUserPerspective(data: {|
   utxoInputs: $ReadOnlyArray<$ReadOnly<UtxoTransactionInputRow>>,

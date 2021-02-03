@@ -147,7 +147,7 @@ describe('Haskell Shelley era tx format tests', () => {
       // eslint-disable-next-line camelcase
       RustModule.WalletV4.ByronAddress.from_address(body.outputs().get(0).address())?.to_base58()
     ).toBe(outAddress);
-    expect(body.outputs().get(0).amount().to_str()).toBe('9833531');
+    expect(body.outputs().get(0).amount().coin().to_str()).toBe('9833531');
 
     const witnesses = signedTx.witness_set().bootstraps();
     if (witnesses == null) throw new Error('no bootstrap witnesses found');

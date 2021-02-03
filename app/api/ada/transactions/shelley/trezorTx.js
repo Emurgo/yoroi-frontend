@@ -2,7 +2,7 @@
 import type {
   CardanoAddressedUtxo,
 } from '../types';
-import { verifyFromBip44Root }  from '../utils';
+import { verifyFromBip44Root, cardanoValueFromMultiToken }  from '../utils';
 import { toDerivationPathString } from '../../../common/lib/crypto/keys/path';
 import type {
   CardanoSignTransaction,
@@ -11,6 +11,8 @@ import type {
   CardanoWithdrawal,
   CardanoCertificate,
   CardanoAddressParameters,
+  CardanoAssetGroup,
+  CardanoToken,
 } from 'trezor-connect/lib/types/networks/cardano';
 import {
   CERTIFICATE_TYPE,
@@ -55,7 +57,7 @@ export async function createTrezorSignTxPayload(
     inputs: trezorInputs,
     outputs: trezorOutputs,
     fee: txBody.fee().to_str(),
-    ttl: txBody.ttl().toString(),
+    ttl: txBody.ttl()?.toString(),
     protocolMagic: byronNetworkMagic,
     networkId,
   };
@@ -179,6 +181,39 @@ function _transformToTrezorInputs(
   }));
 }
 
+function toTrezorTokenBundle(
+  assets: ?RustModule.WalletV4.MultiAsset
+): {|
+  tokenBundle?: Array<CardanoAssetGroup>,
+|} {
+  if (assets == null) return Object.freeze({});
+
+  const assetGroup: Array<CardanoAssetGroup> = [];
+  const hashes = assets.keys();
+  for (let i = 0; i < hashes.len(); i++) {
+    const policyId = hashes.get(i);
+    const assetsForPolicy = assets.get(policyId);
+    if (assetsForPolicy == null) continue;
+
+    const tokenAmounts: Array<CardanoToken> = [];
+    const policies = assetsForPolicy.keys();
+    for (let j = 0; j < policies.len(); j++) {
+      const assetName = policies.get(j);
+      const amount = assetsForPolicy.get(assetName);
+      if (amount == null) continue;
+
+      tokenAmounts.push({
+        amount: amount.to_str(),
+        assetNameBytes: Buffer.from(assetName.to_bytes()).toString('hex'),
+      });
+    }
+    assetGroup.push({
+      policyId: Buffer.from(policyId.to_bytes()).toString('hex'),
+      tokenAmounts,
+    });
+  }
+  return { tokenBundle: assetGroup };
+}
 function _generateTrezorOutputs(
   txOutputs: RustModule.WalletV4.TransactionOutputs,
   changeAddrs: Array<{| ...Address, ...Value, ...Addressing |}>,
@@ -189,6 +224,8 @@ function _generateTrezorOutputs(
     const address = output.address();
     const jsAddr = toHexOrBase58(output.address());
 
+    const tokenBundle = toTrezorTokenBundle(output.amount().multiasset());
+
     const changeAddr = changeAddrs.find(change => jsAddr === change.address);
     if (changeAddr != null) {
       verifyFromBip44Root(changeAddr.addressing);
@@ -197,7 +234,8 @@ function _generateTrezorOutputs(
           address,
           changeAddr.addressing.path
         ),
-        amount: output.amount().to_str(),
+        amount: output.amount().coin().to_str(),
+        ...tokenBundle
       });
     } else {
       const byronWasm = RustModule.WalletV4.ByronAddress.from_address(address);
@@ -205,7 +243,8 @@ function _generateTrezorOutputs(
         address: byronWasm == null
           ? address.to_bech32()
           : byronWasm.to_base58(),
-        amount: output.amount().to_str(),
+        amount: output.amount().coin().to_str(),
+        ...tokenBundle,
       });
     }
   }

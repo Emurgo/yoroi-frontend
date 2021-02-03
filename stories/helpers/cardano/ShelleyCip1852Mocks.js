@@ -340,15 +340,17 @@ export const genTentativeShelleyTx = (
       ),
       remoteUnspentUtxo.tx_index
     ),
-    RustModule.WalletV4.BigNum.from_str(remoteUnspentUtxo.amount.toString())
+    RustModule.WalletV4.Value.new(
+      RustModule.WalletV4.BigNum.from_str(remoteUnspentUtxo.amount.toString())
+    )
   );
   txBuilder.add_output(RustModule.WalletV4.TransactionOutput.new(
     RustModule.WalletV4.Address.from_bytes(
       Buffer.from('01d2d1d233e88e9c8428b68ada19acbdc9ced7e3b4ab6ca5d470376ea4c3892366f174a76af9252f78368f5747d3055ab3568ea3b6bf40b01e', 'hex')
     ),
-    RustModule.WalletV4.BigNum.from_str(
+    RustModule.WalletV4.Value.new(RustModule.WalletV4.BigNum.from_str(
       outputAmount.getDefault().toString()
-    )
+    ))
   ));
 
   txBuilder.set_fee(RustModule.WalletV4.BigNum.from_str(fee.getDefault().toString()));
@@ -422,13 +424,15 @@ export const genWithdrawalTx = (
       ),
       remoteUnspentUtxo.tx_index
     ),
-    RustModule.WalletV4.BigNum.from_str(remoteUnspentUtxo.amount)
+    RustModule.WalletV4.Value.new(
+      RustModule.WalletV4.BigNum.from_str(remoteUnspentUtxo.amount)
+    )
   );
   txBuilder.add_output(RustModule.WalletV4.TransactionOutput.new(
     RustModule.WalletV4.Address.from_bytes(
       Buffer.from('01d2d1d233e88e9c8428b68ada19acbdc9ced7e3b4ab6ca5d470376ea4c3892366f174a76af9252f78368f5747d3055ab3568ea3b6bf40b01e', 'hex')
     ),
-    RustModule.WalletV4.BigNum.from_str(outputAmount)
+    RustModule.WalletV4.Value.new(RustModule.WalletV4.BigNum.from_str(outputAmount))
   ));
 
   const rewardAddr = RustModule.WalletV4.RewardAddress.from_address(
@@ -543,15 +547,17 @@ export const genVotingShelleyTx = (
       ),
       remoteUnspentUtxo.tx_index
     ),
-    RustModule.WalletV4.BigNum.from_str(remoteUnspentUtxo.amount.toString())
+    RustModule.WalletV4.Value.new( 
+      RustModule.WalletV4.BigNum.from_str(remoteUnspentUtxo.amount.toString())
+    )
   );
   txBuilder.add_output(RustModule.WalletV4.TransactionOutput.new(
     RustModule.WalletV4.Address.from_bytes(
       Buffer.from('01d2d1d233e88e9c8428b68ada19acbdc9ced7e3b4ab6ca5d470376ea4c3892366f174a76af9252f78368f5747d3055ab3568ea3b6bf40b01e', 'hex')
     ),
-    RustModule.WalletV4.BigNum.from_str(
+    RustModule.WalletV4.Value.new(RustModule.WalletV4.BigNum.from_str(
       outputAmount.getDefault().toString()
-    )
+    ))
   ));
 
   txBuilder.set_fee(RustModule.WalletV4.BigNum.from_str(fee.getDefault().toString()));

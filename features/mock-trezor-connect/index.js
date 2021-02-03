@@ -356,7 +356,7 @@ class MockTrezorConnect {
       outputs.add(
         RustModule.WalletV4.TransactionOutput.new(
           address,
-          RustModule.WalletV4.BigNum.from_str(output.amount)
+          RustModule.WalletV4.Value.new(RustModule.WalletV4.BigNum.from_str(output.amount))
         )
       );
     }
