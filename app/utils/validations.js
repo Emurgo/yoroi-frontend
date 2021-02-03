@@ -7,6 +7,7 @@ import { defineMessages, } from 'react-intl';
 import type { NetworkRow, TokenRow } from '../api/ada/lib/storage/database/primitives/tables';
 import { isCardanoHaskell, isErgo, getCardanoHaskellBaseConfig, getErgoBaseConfig } from '../api/ada/lib/storage/database/prepackaged/networks';
 import { getTokenName } from '../stores/stateless/tokenHelpers';
+import { truncateToken } from './formatters';
 
 export const isValidWalletName: string => boolean = (walletName) => {
   const nameLength = walletName.length;
@@ -114,7 +115,7 @@ export async function validateAmount(
       false,
       formatter.formatMessage(messages.tooSmallUtxo, {
         minUtxo: minAmount.div(new BigNumber(10).pow(tokenRow.Metadata.numberOfDecimals)),
-        ticker: getTokenName(tokenRow),
+        ticker: truncateToken(getTokenName(tokenRow)),
       })
     ];
   }

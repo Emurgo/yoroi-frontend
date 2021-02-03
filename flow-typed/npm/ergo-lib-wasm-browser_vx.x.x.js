@@ -458,6 +458,13 @@ declare module 'ergo-lib-wasm-browser' { // need to wrap flowgen output into mod
     * @returns {ErgoBoxJson}
     */
     to_json(): ErgoBoxJson;
+
+    /**
+    * JSON representation
+    * @param {string} box
+    * @returns {ErgoBox}
+    */
+    static from_json(box: string): ErgoBox;
   }
   /**
   * Pair of <value, tokens> for an box

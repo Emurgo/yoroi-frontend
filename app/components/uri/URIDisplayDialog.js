@@ -4,11 +4,11 @@ import React, { Component } from 'react';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { intlShape, defineMessages } from 'react-intl';
-import QRCode from 'qrcode.react';
 import { buildURI } from '../../utils/URIHandling';
 import Dialog from '../widgets/Dialog';
 import DialogBackButton from '../widgets/DialogBackButton';
 import DialogCloseButton from '../widgets/DialogCloseButton';
+import QrCodeWrapper from '../widgets/QrCodeWrapper';
 import WarningBox from '../widgets/WarningBox';
 import CopyableAddress from '../widgets/CopyableAddress';
 import type { Notification } from '../../types/notificationType';
@@ -62,12 +62,6 @@ export default class URIDisplayDialog extends Component<Props> {
     const uri = buildURI(address, amount);
     const uriNotificationId = 'uri-copyNotification';
 
-    // Get QRCode color value from active theme's CSS variable
-    const qrCodeBackgroundColor = document.documentElement ?
-      document.documentElement.style.getPropertyValue('--theme-receive-qr-code-background-color') : 'transparent';
-    const qrCodeForegroundColor = document.documentElement ?
-      document.documentElement.style.getPropertyValue('--theme-receive-qr-code-foreground-color') : '#000';
-
     const uriUsabilityWarning = (
       <WarningBox>
         {intl.formatMessage(messages.usabilityWarning)}
@@ -85,10 +79,8 @@ export default class URIDisplayDialog extends Component<Props> {
       >
         {uriUsabilityWarning}
         <div className={styles.qrCode}>
-          <QRCode
+          <QrCodeWrapper
             value={uri}
-            bgColor={qrCodeBackgroundColor}
-            fgColor={qrCodeForegroundColor}
             size={152}
           />
         </div>

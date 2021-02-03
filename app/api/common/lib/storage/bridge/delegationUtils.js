@@ -55,6 +55,7 @@ export type RewardHistoryRequest = string;
 export type RewardHistoryResponse = Array<[
   number, // epoch
   MultiToken, // amount
+  string, // poolHash
 ]>;
 export type RewardHistoryFunc = (
   request: RewardHistoryRequest

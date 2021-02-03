@@ -7,6 +7,7 @@ import classnames from 'classnames';
 import styles from './WalletRow.scss';
 
 import ToggleIcon from '../../../assets/images/my-wallets/arrow_down.inline.svg';
+import SettingsIcon from '../../../assets/images/sidebar/wallet-settings-2-ic.inline.svg';
 // import PlusIcon from '../../../assets/images/my-wallets/icon_plus.inline.svg';
 
 type Props = {|
@@ -16,6 +17,7 @@ type Props = {|
   +walletPlate:  Node,
   +walletSync:  Node,
   +onRowClicked: void => void,
+  +onSettings: void => void,
   +isExpandable: boolean,
 |};
 
@@ -52,6 +54,15 @@ export default class WalletRow extends Component<Props, State> {
         className={classnames([styles.wrapper, isExpanded && styles.wrapperExpanded])}
       >
         <div className={styles.content}>
+          <div className={styles.settingSection}>
+            <button
+              type="button"
+              onClick={this.props.onSettings}
+              className={styles.settingButton}
+            >
+              <SettingsIcon width="30" height="30" />
+            </button>
+          </div>
           <button
             className={styles.nameSection}
             onClick={onRowClicked}

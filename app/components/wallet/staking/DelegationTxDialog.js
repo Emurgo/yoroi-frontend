@@ -23,6 +23,7 @@ import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import SpendingPasswordInput from '../../widgets/forms/SpendingPasswordInput';
 import { calcMaxBeforeDot } from '../../../utils/validations';
+import { truncateToken } from '../../../utils/formatters';
 import {
   MultiToken,
 } from '../../../api/common/lib/MultiToken';
@@ -237,7 +238,7 @@ export default class DelegationTxDialog extends Component<Props> {
               .shiftedBy(-this.props.approximateReward.token.Metadata.numberOfDecimals)
               .toFormat(this.props.approximateReward.token.Metadata.numberOfDecimals)
             }&nbsp;
-            {getTokenName(this.props.approximateReward.token)}
+            {truncateToken(getTokenName(this.props.approximateReward.token))}
           </p>
         </div>
         {this.props.error

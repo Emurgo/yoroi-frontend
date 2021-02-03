@@ -105,11 +105,11 @@ export async function migrateToLatest(
     ['<3.7.0', async () => {
       return await removeErgoDevices(persistentDb);
     }],
-    ['>=3.7.0 <3.7.3', async () => {
-      return await ergoTxHistoryReset(persistentDb);
-    }],
     ['<3.8.0', async () => {
       return await cardanoTxHistoryReset(persistentDb);
+    }],
+    ['<3.9.6', async () => {
+      return await ergoTxHistoryReset(persistentDb);
     }],
   ];
 

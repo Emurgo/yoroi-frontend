@@ -388,7 +388,7 @@ Feature: Send transaction
     And I see send money confirmation dialog
     And I see CONFIRM TRANSACTION Pop up:
       | address   | amount    |fee      |
-      | <address> | 0.001000000  |<fee>    |
+      | <address> | 0.010000000  |<fee>    |
     And I enter the wallet password:
       | password   |
       | asdfasdfasdf |

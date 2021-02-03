@@ -25,7 +25,7 @@ import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 import WarningBox from '../../widgets/WarningBox';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import {
-  truncateAddress,
+  truncateAddress, truncateToken,
 } from '../../../utils/formatters';
 import {
   MultiToken,
@@ -134,7 +134,7 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
           </div>
           <div className={styles.amountSmall}>{formatValue(entry)}
             <span className={styles.currencySymbol}>&nbsp;{
-              getTokenName(this.props.getTokenInfo(entry))
+              truncateToken(getTokenName(this.props.getTokenInfo(entry)))
             }
             </span>
           </div>
@@ -142,7 +142,7 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
       ) : (
         <div className={styles.amount}>{formatValue(entry)}
           <span className={styles.currencySymbol}>&nbsp;{
-            getTokenName(this.props.getTokenInfo(entry))
+            truncateToken(getTokenName(this.props.getTokenInfo(entry)))
           }
           </span>
         </div>
@@ -163,7 +163,7 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
           </div>
           <div className={styles.totalAmountSmall}>{formatValue(entry)}
             <span className={styles.currencySymbol}>&nbsp;{
-              getTokenName(this.props.getTokenInfo(entry))
+              truncateToken(getTokenName(this.props.getTokenInfo(entry)))
             }
             </span>
           </div>
@@ -171,7 +171,7 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
       ) : (
         <div className={styles.totalAmount}>{formatValue(entry)}
           <span className={styles.currencySymbol}>&nbsp;{
-            getTokenName(this.props.getTokenInfo(entry))
+            truncateToken(getTokenName(this.props.getTokenInfo(entry)))
           }
           </span>
         </div>
@@ -193,9 +193,9 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
           <div className={styles.feesSmall}>
             +{formatValue(entry)}
             <span className={styles.currencySymbol}>&nbsp;{
-              getTokenName(this.props.getTokenInfo(
+              truncateToken(getTokenName(this.props.getTokenInfo(
                 entry
-              ))
+              )))
             }
             </span>
           </div>
@@ -204,9 +204,9 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
         <div className={styles.fees}>
           +{formatValue(entry)}
           <span className={styles.currencySymbol}>&nbsp;{
-            getTokenName(this.props.getTokenInfo(
+            truncateToken(getTokenName(this.props.getTokenInfo(
               entry
-            ))
+            )))
           }
           </span>
         </div>

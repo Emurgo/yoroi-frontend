@@ -25,6 +25,7 @@ import NavBarTitle from '../../components/topbar/NavBarTitle';
 import WalletSync from '../../components/wallet/my-wallets/WalletSync';
 import moment from 'moment';
 import NavBarAddButton from '../../components/topbar/NavBarAddButton';
+import BuySellAdaButton from '../../components/topbar/BuySellAdaButton';
 import globalMessages from '../../i18n/global-messages';
 import { ConceptualWallet, } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import {
@@ -69,14 +70,25 @@ export default class MyWalletsPage extends Component<Props> {
       publicDeriver
     });
   };
+  openToSettings: PublicDeriver<> => void = (
+    publicDeriver
+  ) => {
+    this.generated.actions.wallets.setActiveWallet.trigger({
+      wallet: publicDeriver
+    });
+    this.generated.actions.router.goToRoute.trigger({
+      route: ROUTES.SETTINGS.WALLET,
+    });
+  };
 
   render(): Node {
+    const { intl } = this.context;
     const sidebarContainer = (<SidebarContainer {...this.generated.SidebarContainerProps} />);
 
     const wallets = this.generated.stores.wallets.publicDerivers;
 
     const navbarTitle = (
-      <NavBarTitle title={this.context.intl.formatMessage(globalMessages.sidebarWallets)} />
+      <NavBarTitle title={intl.formatMessage(globalMessages.sidebarWallets)} />
     );
 
     const navbarElement = (
@@ -86,6 +98,8 @@ export default class MyWalletsPage extends Component<Props> {
           () => this.generated.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD })
         }
         />}
+        buyButton={
+          <BuySellAdaButton />}
         walletDetails={undefined}
       />
     );
@@ -134,7 +148,6 @@ export default class MyWalletsPage extends Component<Props> {
       return (
         <>
           <WalletCurrency
-            // TODO: proper per-network api meta
             currency={getTokenName(defaultTokenInfo)}
             tooltipText={undefined /* TODO */}
           />
@@ -181,6 +194,7 @@ export default class MyWalletsPage extends Component<Props> {
             }
           />
         }
+        onSettings={() => this.openToSettings(publicDeriver)}
       />
     );
   }
@@ -289,7 +303,8 @@ export default class MyWalletsPage extends Component<Props> {
         |}
       |},
       wallets: {|
-        unselectWallet: {| trigger: (params: void) => void |}
+        unselectWallet: {| trigger: (params: void) => void |},
+        setActiveWallet: {| trigger: (params: {| wallet: PublicDeriver<> |}) => void |},
       |}
     |},
     stores: {|
@@ -355,6 +370,7 @@ export default class MyWalletsPage extends Component<Props> {
         },
         wallets: {
           unselectWallet: { trigger: actions.wallets.unselectWallet.trigger },
+          setActiveWallet: { trigger: actions.wallets.setActiveWallet.trigger },
         },
       },
       SidebarContainerProps: (

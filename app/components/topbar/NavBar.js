@@ -10,15 +10,17 @@ type Props = {|
   +walletDetails?: ?Node,
   +button?: ?Node,
   +walletPlate?: ?Node,
+  +buyButton?: Node,
 |};
 
 @observer
 export default class NavBar extends Component<Props> {
-  static defaultProps: {|button: void, children: void, walletDetails: void, walletPlate: void|} = {
+  static defaultProps: {|button: void, children: void, walletDetails: void, walletPlate: void, buyButton: void|} = {
     children: undefined,
     walletPlate: undefined,
     button: undefined,
     walletDetails: undefined,
+    buyButton: undefined,
   };
 
   render(): Node {
@@ -38,6 +40,11 @@ export default class NavBar extends Component<Props> {
           {this.props.walletPlate != null && (
             <div className={styles.plate}>
               {this.props.walletPlate}
+            </div>
+          )}
+          {this.props.buyButton != null && (
+            <div className={styles.buyButton}>
+              {this.props.buyButton}
             </div>
           )}
           {this.props.button != null && (

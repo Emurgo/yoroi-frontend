@@ -133,6 +133,7 @@ export const Wallets = (): Node => {
         },
         wallets: {
           unselectWallet: { trigger: action('unselectWallet') },
+          setActiveWallet: { trigger: action('setActiveWallet') },
         },
       },
       SidebarContainerProps: {

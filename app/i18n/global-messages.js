@@ -96,6 +96,22 @@ const globalMessages: * = defineMessages({
     id: 'global.labels.remove',
     defaultMessage: '!!!Remove',
   },
+  exportButtonLabel: {
+    id: 'wallet.transaction.export.dialog.exportButton.label',
+    defaultMessage: '!!!Export',
+  },
+  derivationPathLabel: {
+    id: 'wallet.receive.confirmationDialog.derivationPathLabel',
+    defaultMessage: '!!!Derivation Path',
+  },
+  publicKeyExplanation: {
+    id: 'global.publicKey.explanation',
+    defaultMessage: `!!!Public keys allow seeing the wallet history for the wallet, but does <strong>not</strong> allow to spend or move the funds in any way (private key is <strong>not</strong> included)`,
+  },
+  whyUse: {
+    id: 'global.why',
+    defaultMessage: `!!!This can be used to:`,
+  },
   save: {
     id: 'global.labels.save',
     defaultMessage: '!!!Save',
@@ -509,6 +525,10 @@ const globalMessages: * = defineMessages({
     id: 'global.labels.epoch',
     defaultMessage: '!!!Epoch',
   },
+  stakepoolNameLabel: {
+    id: 'global.labels.stakepool',
+    defaultMessage: '!!!Stakepool Name',
+  },
   rewardsLabel: {
     id: 'global.labels.rewardsLabel',
     defaultMessage: '!!!Rewards',
@@ -681,6 +701,50 @@ const globalMessages: * = defineMessages({
     id: 'global.invalidKeyFormat.label',
     defaultMessage: '!!!Invalid key. Should be hexadecimal-encoded.',
   },
+  stepPin: {
+    id: 'wallet.voting.dialog.stepPin',
+    defaultMessage: '!!!PIN',
+  },
+  stepConfirm: {
+    id: 'wallet.voting.dialog.stepConfirm',
+    defaultMessage: '!!!Confirm',
+  },
+  registerLabel: {
+    id: 'wallet.voting.dialog.registerLabel',
+    defaultMessage: '!!!Register',
+  },
+  transactionLabel: {
+    id: 'wallet.voting.dialog.transactionLabel',
+    defaultMessage: '!!!Transaction',
+  },
+  stepQrCode: {
+    id: 'wallet.voting.dialog.stepQrCode',
+    defaultMessage: '!!!QR Code',
+  },
+  votingRegistrationTitle: {
+    id: 'wallet.voting.dialog.title',
+    defaultMessage: '!!!Register for Voting',
+  },
+  confirmPin: {
+    id: 'wallet.voting.dialog.confirmPin',
+    defaultMessage: '!!!Confirm PIN',
+  },
+  completeLabel: {
+    id: 'wallet.voting.dialog.completeLabel',
+    defaultMessage: '!!!complete',
+  },
+  pinDoesNotMatch: {
+    id: 'global.errors.pinDoesNotMatch',
+    defaultMessage: '!!!Pin Does Not Match',
+  },
+  invalidPin: {
+    id: 'global.errors.invalidPin',
+    defaultMessage: '!!!Invalid Pin',
+  },
+  buySellAda: {
+    id: 'button.buySellAda',
+    defaultMessage: '!!!Buy/Sell ADA',
+  }
 });
 export default globalMessages;
 
@@ -704,10 +768,6 @@ export const memoMessages: * = defineMessages({
   optionalMemo: {
     id: 'global.labels.optionalMemo',
     defaultMessage: '!!!Memo (optional)',
-  },
-  registerLabel: {
-    id: 'global.labels.register',
-    defaultMessage: '!!!Register',
   }
 });
 

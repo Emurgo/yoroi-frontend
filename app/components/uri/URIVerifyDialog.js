@@ -10,7 +10,7 @@ import DialogCloseButton from '../widgets/DialogCloseButton';
 import DialogBackButton from '../widgets/DialogBackButton';
 import type { UriParams } from '../../utils/URIHandling';
 import globalMessages from '../../i18n/global-messages';
-import { truncateAddress } from '../../utils/formatters';
+import { truncateAddress, truncateToken } from '../../utils/formatters';
 import ExplorableHashContainer from '../../containers/widgets/ExplorableHashContainer';
 import RawHash from '../widgets/hashWrappers/RawHash';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
@@ -140,19 +140,19 @@ export default class URIVerifyDialog extends Component<Props> {
                 {unitOfAccountSetting.currency}
               </div>
               <div className={styles.amountSmall}>
-                {formatValue(amount.getDefaultEntry())} {getTokenName(
+                {formatValue(amount.getDefaultEntry())} {truncateToken(getTokenName(
                   this.props.getTokenInfo(
                     amount.getDefaultEntry()
-                  ))
+                  )))
                 }
               </div>
             </>
           ) : (
             <div className={styles.amount}>
-              {formatValue(amount.getDefaultEntry())} {getTokenName(
+              {formatValue(amount.getDefaultEntry())} {truncateToken(getTokenName(
                 this.props.getTokenInfo(
                   amount.getDefaultEntry()
-                ))
+                )))
               }
             </div>
           )}

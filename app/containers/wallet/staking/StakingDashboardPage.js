@@ -70,6 +70,7 @@ import {
 } from '../../../api/common/lib/MultiToken';
 import type { TokenInfoMap } from '../../../stores/toplevel/TokenInfoStore';
 import { getTokenName, genLookupOrFail } from '../../../stores/stateless/tokenHelpers';
+import { truncateToken } from '../../../utils/formatters';
 
 export type GeneratedData = typeof StakingDashboardPage.prototype.generated;
 
@@ -160,11 +161,11 @@ export default class StakingDashboardPage extends Component<Props> {
         })}
         delegationHistory={delegationRequests.getCurrentDelegation.result?.fullHistory}
         epochLength={this.getEpochLengthInDays(publicDeriver)}
-        ticker={getTokenName(
+        ticker={truncateToken(getTokenName(
           this.generated.stores.tokenInfoStore.getDefaultTokenInfo(
             publicDeriver.getParent().getNetworkInfo().NetworkId
           )
-        )}
+        ))}
       />
     );
 
@@ -868,6 +869,20 @@ export default class StakingDashboardPage extends Component<Props> {
       );
     })();
 
+    const getMiniPoolInfo = (poolHash: string) => {
+      const meta = this.generated.stores.delegation.getLocalPoolInfo(
+        request.publicDeriver.getParent().getNetworkInfo(),
+        poolHash
+      );
+      if (meta == null) {
+        return poolHash;
+      }
+      if (meta.info !== null) {
+        return `[${meta.info.ticker}] ${meta.info.name}`
+      }
+      return poolHash
+    }
+
     const getNormalized = (tokenEntry) => {
       const tokenRow = this.generated.stores.tokenInfoStore.tokenInfo
         .get(tokenEntry.networkId.toString())
@@ -879,15 +894,18 @@ export default class StakingDashboardPage extends Component<Props> {
     for (let i = startEpoch; i < endEpoch; i++) {
       if (historyIterator < history.length && i === history[historyIterator][0]) {
         // exists a reward for this epoch
+        const poolHash = history[historyIterator][2];
         const nextReward = history[historyIterator][1];
         amountSum = amountSum.joinAddMutable(nextReward);
         totalRewards.push({
           name: i,
           primary: getNormalized(amountSum.getDefaultEntry()).toNumber(),
+          poolName: getMiniPoolInfo(poolHash),
         });
         perEpochRewards.push({
           name: i,
           primary: getNormalized(nextReward.getDefaultEntry()).toNumber(),
+          poolName: getMiniPoolInfo(poolHash),
         });
         historyIterator++;
       } else {
@@ -895,10 +913,12 @@ export default class StakingDashboardPage extends Component<Props> {
         totalRewards.push({
           name: i,
           primary: getNormalized(amountSum.getDefaultEntry()).toNumber(),
+          poolName: '',
         });
         perEpochRewards.push({
           name: i,
           primary: 0,
+          poolName: '',
         });
       }
     }

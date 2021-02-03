@@ -239,11 +239,10 @@ export default class TransactionBuilderStore extends Store {
     } else if (isErgo(network)) {
       const lastSync = this.stores.transactions.getTxRequests(publicDeriver).lastSyncInfo;
 
+      const defaultToken = this.stores.tokenInfoStore.getDefaultTokenInfo(network.NetworkId);
       const txFee = new BigNumber(
         RustModule.SigmaRust.BoxValue.SAFE_USER_MIN().as_i64().to_str()
       ).plus(100000); // slightly higher than default fee
-
-      const defaultToken = this.stores.tokenInfoStore.getDefaultTokenInfo(network.NetworkId);
 
       const genTokenList = (userInput) => {
         const tokens = [userInput];
@@ -252,7 +251,11 @@ export default class TransactionBuilderStore extends Store {
           // has at least the minimum amount of ERG in it
           tokens.push({
             token: defaultToken,
-            amount: RustModule.SigmaRust.BoxValue.SAFE_USER_MIN().as_i64().to_str(),
+            // amount: RustModule.SigmaRust.BoxValue.SAFE_USER_MIN().as_i64().to_str(),
+            // kind of hacky.
+            // We use a larger amount for tokens
+            // in hopes it covers any smart contract execution cost
+            amount: new BigNumber(10000000).toString()
           });
         }
         return tokens;

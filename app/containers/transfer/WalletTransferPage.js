@@ -21,6 +21,7 @@ import type { GeneratedData as ShelleyEraOptionDialogContainerData } from './opt
 import type { RestoreModeType } from '../../actions/common/wallet-restore-actions';
 import { genLookupOrFail, getTokenName, } from '../../stores/stateless/tokenHelpers';
 import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
+import { truncateToken } from '../../utils/formatters';
 
 export type GeneratedData = typeof WalletTransferPage.prototype.generated;
 
@@ -90,7 +91,7 @@ export default class WalletTransferPage extends Component<Props> {
           onShelley={
             () => actions.dialogs.open.trigger({ dialog: ShelleyEraOptionDialogContainer })
           }
-          ticker={getTokenName(defaultTokenInfo)}
+          ticker={truncateToken(getTokenName(defaultTokenInfo))}
         />
         {activeDialog}
         {icarusTransfer}

@@ -488,3 +488,98 @@ export const genWithdrawalTx = (
     },
   );
 };
+
+// not an exact voting transaction but enough for storybook UI
+// this separate transaction is used to get trx type HaskellShelleyTxSignRequest
+export const genVotingShelleyTx = (
+  publicDeriver: PublicDeriver<>,
+): HaskellShelleyTxSignRequest => {
+  const defaultToken = publicDeriver.getParent().getDefaultToken();
+
+  const inputAmount = new MultiToken(
+    [{
+      identifier: defaultToken.defaultIdentifier,
+      amount: new BigNumber('1174000'),
+      networkId: publicDeriver.getParent().getNetworkInfo().NetworkId,
+    }],
+    defaultToken
+  );
+  const outputAmount = new MultiToken(
+    [{
+      identifier: defaultToken.defaultIdentifier,
+      amount: new BigNumber('1000000'),
+      networkId: publicDeriver.getParent().getNetworkInfo().NetworkId,
+    }],
+    defaultToken
+  );
+  const fee = inputAmount.joinSubtractCopy(outputAmount);
+
+  const networkInfo = publicDeriver.getParent().getNetworkInfo();
+  const config = getCardanoHaskellBaseConfig(networkInfo)
+    .reduce((acc, next) => Object.assign(acc, next), {});
+  const remoteUnspentUtxo = {
+    amount: inputAmount.getDefault().toString(),
+    receiver: '01d2d1d233e88e9c8428b68ada19acbdc9ced7e3b4ab6ca5d470376ea4c3892366f174a76af9252f78368f5747d3055ab3568ea3b6bf40b01e',
+    tx_hash: '6930f123df83e4178b0324ae617b2028c0b38c6ff4660583a2abf1f7b08195fe',
+    tx_index: 0,
+    utxo_id: '6930f123df83e4178b0324ae617b2028c0b38c6ff4660583a2abf1f7b08195fe0',
+  };
+  const txBuilder = RustModule.WalletV4.TransactionBuilder.new(
+    RustModule.WalletV4.LinearFee.new(
+      RustModule.WalletV4.BigNum.from_str(config.LinearFee.coefficient),
+      RustModule.WalletV4.BigNum.from_str(config.LinearFee.constant),
+    ),
+    RustModule.WalletV4.BigNum.from_str(config.MinimumUtxoVal),
+    RustModule.WalletV4.BigNum.from_str(config.PoolDeposit),
+    RustModule.WalletV4.BigNum.from_str(config.KeyDeposit),
+  );
+  txBuilder.add_key_input(
+    RustModule.WalletV4.Ed25519KeyHash.from_bytes(
+      Buffer.from('00000000000000000000000000000000000000000000000000000000', 'hex')
+    ),
+    RustModule.WalletV4.TransactionInput.new(
+      RustModule.WalletV4.TransactionHash.from_bytes(
+        Buffer.from(remoteUnspentUtxo.tx_hash, 'hex')
+      ),
+      remoteUnspentUtxo.tx_index
+    ),
+    RustModule.WalletV4.BigNum.from_str(remoteUnspentUtxo.amount.toString())
+  );
+  txBuilder.add_output(RustModule.WalletV4.TransactionOutput.new(
+    RustModule.WalletV4.Address.from_bytes(
+      Buffer.from('01d2d1d233e88e9c8428b68ada19acbdc9ced7e3b4ab6ca5d470376ea4c3892366f174a76af9252f78368f5747d3055ab3568ea3b6bf40b01e', 'hex')
+    ),
+    RustModule.WalletV4.BigNum.from_str(
+      outputAmount.getDefault().toString()
+    )
+  ));
+
+  txBuilder.set_fee(RustModule.WalletV4.BigNum.from_str(fee.getDefault().toString()));
+  txBuilder.set_ttl(5);
+
+  return new HaskellShelleyTxSignRequest(
+      {
+        senderUtxos: [{
+          ...remoteUnspentUtxo,
+          addressing: {
+            path: [],
+            startLevel: 0,
+          },
+        }],
+        unsignedTx: txBuilder,
+        changeAddr: [],
+        certificate: undefined,
+      },
+      undefined,
+      {
+        ChainNetworkId: Number.parseInt(config.ChainNetworkId, 10),
+        KeyDeposit: new BigNumber(config.KeyDeposit),
+        PoolDeposit: new BigNumber(config.PoolDeposit),
+        NetworkId: publicDeriver.getParent().getNetworkInfo().NetworkId,
+      },
+      {
+        neededHashes: new Set(),
+        wits: new Set(),
+      },
+    );
+};

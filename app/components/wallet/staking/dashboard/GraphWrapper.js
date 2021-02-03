@@ -29,6 +29,7 @@ const messages = defineMessages({
 export type GraphItems = {|
   +name: number,
   +primary: number,
+  +poolName: string,
 |};
 
 const GraphTabs: {|
@@ -97,6 +98,7 @@ const Graph: {|
   themeVars: Object,
   data: Array<GraphItems>,
   epochTitle: string,
+  stakepoolNameTitle: string,
   xAxisLabel: string,
   yAxisLabel: string,
   primaryBarLabel: string,
@@ -105,6 +107,7 @@ const Graph: {|
   themeVars,
   data,
   epochTitle,
+  stakepoolNameTitle,
   xAxisLabel,
   yAxisLabel,
   primaryBarLabel,
@@ -146,6 +149,10 @@ const Graph: {|
           <p>
             <span className={styles.tooltipLabel}>{primaryBarLabel}:</span>&nbsp;
             <span className={styles.tooltipValue}>{payload[0].value}</span>
+          </p>
+          <p>
+            <span className={styles.tooltipLabel}>{stakepoolNameTitle}:</span>&nbsp;
+            <span className={styles.tooltipValue}>{payload[0].payload.poolName}</span>
           </p>
         </div>
       );
@@ -285,6 +292,7 @@ export default class GraphWrapper extends Component<Props, State> {
             */}
             <Graph
               epochTitle={intl.formatMessage(globalMessages.epochLabel)}
+              stakepoolNameTitle={intl.formatMessage(globalMessages.stakepoolNameLabel)}
               xAxisLabel={this._getEpochLengthLabel()}
               yAxisLabel={tabs[this.state.selectedTab].yAxisLabel}
               primaryBarLabel={tabs[this.state.selectedTab].primaryBarLabel}

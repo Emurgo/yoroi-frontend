@@ -42,6 +42,7 @@ import type { ComplexityLevelType } from '../../types/complexityLevelType';
 import { handleExternalLinkClick } from '../../utils/routing';
 import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
 import { genLookupOrFail, getTokenName, } from '../../stores/stateless/tokenHelpers';
+import { truncateToken } from '../../utils/formatters';
 
 export type GeneratedData = typeof WalletReceivePage.prototype.generated;
 
@@ -170,7 +171,7 @@ export default class WalletReceivePage extends Component<Props> {
         />);
       }
       if (addressTypeStore.meta.name.group === AddressGroupTypes.reward) {
-        return (<RewardHeader ticker={getTokenName(defaultTokenInfo)} />);
+        return (<RewardHeader ticker={truncateToken(getTokenName(defaultTokenInfo))} />);
       }
       if (addressTypeStore.meta.name.subgroup === AddressSubgroup.mangled) {
         return (
@@ -179,7 +180,7 @@ export default class WalletReceivePage extends Component<Props> {
             onClick={() => this.generated.actions.dialogs.open.trigger({
               dialog: UnmangleTxDialogContainer,
             })}
-            ticker={getTokenName(defaultTokenInfo)}
+            ticker={truncateToken(getTokenName(defaultTokenInfo))}
           />
         );
       }

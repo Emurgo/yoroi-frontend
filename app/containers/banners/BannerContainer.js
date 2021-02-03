@@ -17,6 +17,7 @@ import { isTestnet, isCardanoHaskell } from '../../api/ada/lib/storage/database/
 import { Bip44Wallet } from '../../api/ada/lib/storage/models/Bip44Wallet/wrapper';
 import { getTokenName, genLookupOrFail } from '../../stores/stateless/tokenHelpers';
 import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
+import { truncateToken } from '../../utils/formatters';
 
 export type GeneratedData = typeof BannerContainer.prototype.generated;
 
@@ -70,7 +71,7 @@ export default class BannerContainer extends Component<InjectedOrGenerated<Gener
     return (
       <ByronDeprecationBanner
         onUpgrade={undefined}
-        ticker={getTokenName(defaultTokenInfo)}
+        ticker={truncateToken(getTokenName(defaultTokenInfo))}
       />
     );
   }

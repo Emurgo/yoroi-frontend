@@ -15,7 +15,7 @@ import { calculateAndFormatValue } from '../../utils/unit-of-account';
 import globalMessages from '../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { SelectedExplorer } from '../../domain/SelectedExplorer';
-import { truncateAddress } from '../../utils/formatters';
+import { truncateAddress, truncateToken } from '../../utils/formatters';
 import type { TransferTx } from '../../types/TransferTypes';
 import { genAddressLookup } from '../../stores/stateless/addressStores';
 import {
@@ -192,9 +192,9 @@ export default class TransferSummaryPage extends Component<Props> {
               })}
               <div className={styles.refund}>
                 {intl.formatMessage(messages.unregisterExplanation, {
-                  ticker: getTokenName(this.props.getTokenInfo(
+                  ticker: truncateToken(getTokenName(this.props.getTokenInfo(
                     this.props.transferTx.recoveredBalance.getDefaultEntry()
-                  )),
+                  ))),
                   refundAmount: deregistrations.reduce(
                     (sum, curr) => (curr.refund == null ? sum : sum.joinAddCopy(curr.refund)),
                     new MultiToken([], this.props.transferTx.recoveredBalance.defaults)
@@ -357,9 +357,9 @@ export default class TransferSummaryPage extends Component<Props> {
               <div className={styles.amount}>{recoveredBalance}
                 <span className={styles.currencySymbol}>
                   &nbsp;{
-                    getTokenName(this.props.getTokenInfo(
+                    truncateToken(getTokenName(this.props.getTokenInfo(
                       transferTx.recoveredBalance.getDefaultEntry()
-                    ))
+                    )))
                   }
                 </span>
               </div>
@@ -391,9 +391,9 @@ export default class TransferSummaryPage extends Component<Props> {
               <div className={styles.fees}>{transactionFee}
                 <span className={styles.currencySymbol}>
                   &nbsp;{
-                    getTokenName(this.props.getTokenInfo(
+                    truncateToken(getTokenName(this.props.getTokenInfo(
                       transferTx.fee.getDefaultEntry()
-                    ))
+                    )))
                   }
                 </span>
               </div>
@@ -427,9 +427,9 @@ export default class TransferSummaryPage extends Component<Props> {
             <div className={styles.totalAmount}>{finalBalance}
               <span className={styles.currencySymbol}>
                 &nbsp;{
-                  getTokenName(this.props.getTokenInfo(
+                  truncateToken(getTokenName(this.props.getTokenInfo(
                     transferTx.recoveredBalance.getDefaultEntry()
-                  ))
+                  )))
                 }
               </span>
             </div>

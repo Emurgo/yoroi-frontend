@@ -65,6 +65,7 @@ import {
 import {
   mockFromDefaults,
 } from '../../stores/toplevel/TokenInfoStore';
+import { ComplexityLevels } from '../../types/complexityLevelType';
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -136,6 +137,7 @@ export const Loading = (): Node => {
             shouldHideBalance: false,
             isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
             unitOfAccount: genUnitOfAccount(),
+            selectedComplexityLevel: select('complexityLevel', ComplexityLevels, ComplexityLevels.Simple),
           },
           uiDialogs: {
             isOpen: () => false,
@@ -261,6 +263,7 @@ const genPropsForTransactions: {|
     shouldHideBalance: request.txExport == null ? boolean('shouldHideBalance', false) : false,
     isClassicTheme: globalKnobs.currentTheme() === THEMES.YOROI_CLASSIC,
     unitOfAccount: genUnitOfAccount(),
+    selectedComplexityLevel: select('complexityLevel', ComplexityLevels, ComplexityLevels.Simple),
   },
   uiDialogs: {
     isOpen: (dialog) => dialog === request.dialog,

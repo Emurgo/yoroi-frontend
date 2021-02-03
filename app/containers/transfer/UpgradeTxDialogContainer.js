@@ -30,6 +30,7 @@ import type {
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
 import { getTokenName, genLookupOrFail } from '../../stores/stateless/tokenHelpers';
+import { truncateToken } from '../../utils/formatters';
 
 export type GeneratedData = typeof UpgradeTxDialogContainer.prototype.generated;
 
@@ -155,7 +156,7 @@ export default class UpgradeTxDialogContainer extends Component<Props> {
       <div>
         {intl.formatMessage(
           messages.explanation,
-          { ticker: getTokenName(defaultTokenInfo) }
+          { ticker: truncateToken(getTokenName(defaultTokenInfo)) }
         )}
         <br /><br />
       </div>
