@@ -57,7 +57,7 @@ class ConnectPage extends Component<Props> {
     const { intl } = this.context;
     const {
       loading,
-      // error,
+      error,
       accounts,
       message,
       onCancel,
@@ -87,6 +87,7 @@ class ConnectPage extends Component<Props> {
           {isError ? (
             <div className={styles.errorMessage}>
               Oops ... something went wrong. please try again later
+              <p>{error}</p>
             </div>
           ) : null}
           {isLoading ? (
