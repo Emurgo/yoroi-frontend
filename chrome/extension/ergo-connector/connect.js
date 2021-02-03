@@ -43,11 +43,11 @@ chrome.runtime.sendMessage({ type: 'connect_retrieve_data' }, async response => 
   const connect = document.getElementById('connect');
   if (connect != null) {
     connect.onclick = () => {
-      const accountsSelected = document.getElementsByName('account');
+      const accountsSelected: HTMLCollection<HTMLInputElement> = (document.getElementsByName('account'): any);
       for (let i = 0; i < accountsSelected.length; i += 1) {
-        if (accountsSelected[i].checked) {
+        if (accountsSelected[i].checked === true) {
           chrome.storage.local.get('connector_whitelist', async result => {
-            let whitelist = Object.keys(result).length === 0 ? [] : result.connector_whitelist;
+            const whitelist = Object.keys(result).length === 0 ? [] : result.connector_whitelist;
             whitelist.push({ url: response.url, walletIndex: i });
             chrome.storage.local.set({ connector_whitelist: whitelist });
           });
