@@ -15,6 +15,7 @@ type State = {|
   error: string,
   loading: 'idle' | 'pending' | 'success' | 'rejected',
   accounts: Array<Object>,
+  selected: number,
 |};
 
 let chromeMessage;
@@ -31,6 +32,7 @@ export default class ConnectContainer extends Component<Props, State> {
     loading: 'idle',
     error: '',
     accounts: [],
+    selected: -1,
   };
 
   async componentDidMount() {
@@ -46,12 +48,7 @@ export default class ConnectContainer extends Component<Props, State> {
   }
 
   onToggleCheckbox: (index: number) => void = index => {
-    const { accounts } = this.state;
-    if (accounts) {
-      const newItems = accounts.slice();
-      newItems[index].checked = !newItems[index].checked;
-      this.setState({ accounts: newItems });
-    }
+    this.setState({ selected: index });
   };
 
   handleAllChecked: () => void = () => {};
@@ -90,7 +87,7 @@ export default class ConnectContainer extends Component<Props, State> {
   };
 
   render(): Node {
-    const { loading, accounts, error } = this.state;
+    const { loading, accounts, selected, error } = this.state;
 
     return (
       <ConnectPage
@@ -102,6 +99,7 @@ export default class ConnectContainer extends Component<Props, State> {
         onToggleCheckbox={this.onToggleCheckbox}
         onCancel={this.onCancel}
         handleSubmit={this.handleSubmit}
+        selected={selected}
       />
     );
   }

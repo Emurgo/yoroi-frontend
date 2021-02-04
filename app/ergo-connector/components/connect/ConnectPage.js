@@ -45,6 +45,7 @@ type Props = {|
   onCancel: () => void,
   onConnect: number => void,
   handleSubmit: () => void,
+  selected: number,
 |};
 
 @observer
@@ -63,15 +64,14 @@ class ConnectPage extends Component<Props> {
       onCancel,
       onToggleCheckbox,
       handleSubmit,
+      selected,
     } = this.props;
 
-    const isCheckedWallet = accounts
-      ? Boolean(accounts.findIndex(item => item.checked === true))
-      : [];
     const isLoading = loading === 'idle' || loading === 'pending';
     const isSuccess = loading === 'success';
     const isError = loading === 'rejected';
 
+    const isCheckedWallet = isSuccess ? Boolean(selected < 0) : [];
     return (
       <>
         <div className={styles.connectWrapper}>
@@ -95,21 +95,21 @@ class ConnectPage extends Component<Props> {
           ) : isSuccess ? (
             accounts.length > 0 && (
               <>
-                <li className={styles.listItem}>
-                  {/* TODO: Check multiple wallets */}
-                  <Checkbox
+                {/* <li className={styles.listItem}> */}
+                {/* TODO: Check multiple wallets */}
+                {/* <Checkbox
                     skin={CheckboxSkin}
                     label={intl.formatMessage(messages.selectAllWallets)}
                     disabled
-                  />
-                </li>
+                  /> */}
+                {/* </li> */}
                 {accounts.map((item, idx) => (
                   <li key={item.name} className={styles.listItem}>
                     <Checkbox
                       skin={CheckboxSkin}
                       label={<WalletCard name={item.name} balance={item.balance} />}
                       onChange={() => onToggleCheckbox(idx)}
-                      checked={item.checked || false}
+                      checked={selected === idx}
                     />
                   </li>
                 ))}
