@@ -18,8 +18,6 @@ import { addCloseListener } from '../../../app/utils/tabManager';
 // run MobX in strict mode
 configure({ enforceActions: 'always' });
 
-// Only throw on an invalid BigNumber value if BigNumber.DEBUG is true
-// Since Yoroi handles money, it's better to error our than proceed if an error occurs
 BigNumber.DEBUG = true;
 
 // Entry point into our application
@@ -30,7 +28,7 @@ const initializeErgoConnector: void => Promise<void> = async () => {
   const history = syncHistoryWithStore(hashHistory, router);
   const stores = createStores(api, actions);
 
-  window.yoroi = {
+  window.ergo = {
     api,
     actions,
     translations,
