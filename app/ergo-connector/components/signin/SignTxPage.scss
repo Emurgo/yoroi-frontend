@@ -39,7 +39,8 @@
   }
   .amount {
     color: #38393d;
-    font-weight: 500;
+    font-weight: 700;
+    margin-bottom: 3px;
   }
   .stablecoins,
   .tokens {
@@ -51,8 +52,36 @@
 .totalValue {
   color: #17d1aa;
   font-size: 18px;
-  font-size: 500;
+  font-size: 700;
   margin-bottom: 24px;
+}
+
+.address {
+  border-top: 1px solid #dce0e9;
+  padding-top: 24px;
+  margin-bottom: 28px;
+  display: flex;
+  font-size: 14px;
+  justify-content: space-between;
+  .label {
+    span {
+      font-weight: 700;
+    }
+  }
+  & > div {
+    flex: 1 1 50%;
+    max-width: 50%;
+    &:first-child {
+      padding-right: 24px;
+    }
+    &:last-child {
+      padding-left: 24px;
+    }
+  }
+
+  & > div + div {
+    border-left: 1px solid #dce0e9;
+  }
 }
 
 .wrapperBtn {

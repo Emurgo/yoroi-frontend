@@ -20,17 +20,22 @@ import { Select } from 'react-polymorph/lib/components/Select';
 import { SelectSkin } from 'react-polymorph/lib/skins/simple/SelectSkin';
 import WalletCard from '../connect/WalletCard';
 import CopyableAddress from '../../../components/widgets/CopyableAddress';
-import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
 import RawHash from '../../../components/widgets/hashWrappers/RawHash';
-import { truncateAddressShort } from '../../../utils/formatters';
 import config from '../../../config';
 import vjf from 'mobx-react-form/lib/validators/VJF';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
+import { handleExternalLinkClick } from '../../../utils/routing';
+import ExplorableHash from '../../../components/widgets/hashWrappers/ExplorableHash';
+import type { Notification } from '../../../types/notificationType';
 
 const messages = defineMessages({
-  subtitle: {
-    id: 'ergo-connector.label.connect',
-    defaultMessage: '!!!Connect to',
+  fromAddresses: {
+    id: 'ergo-connector.signtx.fromAdrdesses',
+    defaultMessage: '!!!From addresses',
+  },
+  toAddresses: {
+    id: 'ergo-connector.signtx.toAdrdesses',
+    defaultMessage: '!!!To addresses',
   },
 });
 
@@ -38,21 +43,36 @@ type Props = {|
   accounts: Array<Object>,
   loading: 'idle' | 'pending' | 'success' | 'rejected',
   error: string,
-  message?: {| tabId: number, url: string |},
-  onToggleCheckbox: number => void,
+  txData: any,
+  onCopyAddressTooltip: (string, string) => void,
   onCancel: () => void,
-  onConnect: number => void,
-  handleSubmit: () => void,
+  onConfirm: string => void,
+  +notification: ?Notification,
 |};
 
+function truncateFormatter(addr: string, cutoff: number): string {
+  const shortener = '...';
+
+  if (addr.length + shortener.length <= cutoff) {
+    return addr;
+  }
+  return (
+    addr.substring(0, cutoff / 2) + '...' + addr.substring(addr.length - cutoff / 2, addr.length)
+  );
+}
 @observer
 class SignTxPage extends Component<Props> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
+
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm(
     {
       fields: {
+        walletId: {
+          label: this.context.intl.formatMessage(globalMessages.languageSelectLabel),
+          value: 0,
+        },
         walletPassword: {
           type: 'password',
           label: this.context.intl.formatMessage(globalMessages.walletPasswordLabel),
@@ -84,115 +104,139 @@ class SignTxPage extends Component<Props> {
 
   submit(): void {
     this.form.submit({
-      onSuccess: async form => {
+      onSuccess: form => {
         const { walletPassword } = form.values();
-        const transactionData = {
-          password: walletPassword,
-        };
-        // await this.props.onSubmit(transactionData);
+        this.props.onConfirm(walletPassword);
       },
       onError: () => {},
     });
   }
 
-  selectWallet: () => void = label => {
-    alert(label);
-  };
   render(): Node {
+    const { loading, accounts } = this.props;
+    const isSuccess = loading === 'success';
+
     const { form } = this;
+    const walletIdField = form.$('walletId');
+    const walletPasswordField = form.$('walletPassword');
 
     const languageSelectClassNames = classNames([
       styles.language,
       true ? styles.submitLanguageSpinner : null,
     ]);
-    const walletPasswordField = form.$('walletPassword');
+    const walletOptions = accounts.map((account, idx) => ({
+      name: account.name,
+      balance: account.balance,
+      value: idx,
+    }));
 
     const { intl } = this.context;
+    const { txData, onCopyAddressTooltip, onCancel, notification } = this.props;
     return (
       <div className={styles.component}>
-        <Select
-          className={languageSelectClassNames}
-          options={[
-            {
-              label: 'Selected Wallet',
-              value: 'wallet1',
-              name: 'Paul Wallet',
-              balance: '200000',
-            },
-            {
-              label: 'Selected Wallet',
-              value: 'wallet2',
-              name: 'Ergo Test Wallet',
-              balance: '2001212000',
-            },
-          ]}
-          label="Selected wallet"
-          // value={}
-          onChange={this.selectWallet}
-          skin={SelectSkin}
-          optionRenderer={option => <WalletCard name={option.name} balance={option.balance} />}
-        />
+        {isSuccess ? (
+          <Select
+            className={languageSelectClassNames}
+            options={walletOptions}
+            {...walletIdField.bind()}
+            label="Select Wallet"
+            // onChange={}
+            skin={SelectSkin}
+            optionRenderer={option => <WalletCard name={option.name} balance={option.balance} />}
+          />
+        ) : null}
         <div className={styles.row}>
-          <p className={styles.label}>Transaction Id</p>
-          <p className={styles.value}>
-            addr1q8u4rxgja2hm70ccumwnsvyecrjmznvec86fssuy96e59p63ag5r0s2gt87ts2p8jv8st2us94el3ds54gdf40tmv86qagete6
-          </p>
+          <p className={styles.label}>{intl.formatMessage(globalMessages.transactionId)}</p>
+          <p className={styles.value}>{txData.id}</p>
         </div>
         <div className={styles.details}>
           <div>
-            <p className={styles.label}>Amount</p>
+            {/* TODO: */}
+            <p className={styles.label}>{intl.formatMessage(globalMessages.amount)}</p>
             <p className={styles.amount}>456,45.000000 ADA</p>
             <p className={styles.stablecoins}>100 Chris stablecoins</p>
             <p className={styles.tokens}>2 Marta tokens</p>
           </div>
           <div className={styles.transactionFee}>
-            <p className={styles.label}>Fee</p>
-            <p>5.050088 ADA</p>
+            <p className={styles.label}>{intl.formatMessage(globalMessages.feeLabel)}</p>
+            <p className={styles.amount}>5.050088 ADA</p>
           </div>
         </div>
         <div className={styles.row}>
-          <p className={styles.label}>Total</p>
+          <p className={styles.label}>
+            {intl.formatMessage(globalMessages.walletSendConfirmationTotalLabel)}
+          </p>
           <p className={styles.totalValue}>456,45.000000 ADA</p>
         </div>
         <div className={styles.address}>
           <div className={styles.addressFrom}>
             <p className={styles.label}>
-              From adresses: <span>4</span>
+              {intl.formatMessage(messages.fromAddresses)}: <span>{txData.inputs.length}</span>
             </p>
-            <div className={styles.addressFromList}></div>
+            <div className={styles.addressFromList}>
+              {txData.inputs?.map((address, index) => {
+                const notificationElementId = `address-${index}-copyNotification`;
+                return (
+                  <div className={styles.addressToItem}>
+                    <CopyableAddress
+                      hash={address.address}
+                      elementId={notificationElementId}
+                      onCopyAddress={() =>
+                        onCopyAddressTooltip(address.boxId, notificationElementId)
+                      }
+                      notification={notification}
+                    >
+                      <ExplorableHash
+                        light
+                        websiteName="ErgoPlatform Blockchain Explorer"
+                        url={'https://explorer.ergoplatform.com/en/addresses/' + address.boxId}
+                        onExternalLinkClick={handleExternalLinkClick}
+                      >
+                        <RawHash light>
+                          <span className={styles.addressHash}>
+                            {truncateFormatter(address.boxId, 12)}
+                          </span>
+                        </RawHash>
+                      </ExplorableHash>
+                    </CopyableAddress>
+                  </div>
+                );
+              })}
+            </div>
           </div>
           <div className={styles.addressTo}>
             <p className={styles.label}>
-              To adresses: <span>4</span>
+              {intl.formatMessage(messages.toAddresses)}: <span>{txData.outputs.length}</span>
             </p>
             <div className={styles.addressToList}>
-              <div className={styles.addressToItem}>
-                {/* <CopyableAddress
-                  hash="hash"
-                  elementId="address-copyNotification"
-                  // onCopyAddress={() => alert('hash', 'address-copyNotification')}
-                  // notification=""
-                >
-                  <ExplorableHashContainer
-                    // selectedExplorer=""
-                    hash="hash"
-                    linkType="address"
-                  >
-                    <RawHash light>
-                      <span
-                        className={classNames([
-                          styles.addressHash,
-                          true === true && styles.addressHashUsed,
-                        ])}
+              {txData.outputs?.map((address, index) => {
+                const notificationElementId = `address-output-${index}-copyNotification`;
+                return (
+                  <div className={styles.addressToItem}>
+                    <CopyableAddress
+                      hash={address.address}
+                      elementId={notificationElementId}
+                      onCopyAddress={() =>
+                        onCopyAddressTooltip(address.boxId, notificationElementId)
+                      }
+                      notification={notification}
+                    >
+                      <ExplorableHash
+                        light={false}
+                        websiteName="ErgoPlatform Blockchain Explorer"
+                        url={'https://explorer.ergoplatform.com/en/addresses/' + address.boxId}
+                        onExternalLinkClick={handleExternalLinkClick}
                       >
-                        {truncateAddressShort(
-                          'asdasdaksjdbakbqwei12312k312k3hiu1u3i1ih3123123i12123h'
-                        )}
-                      </span>
-                    </RawHash>
-                  </ExplorableHashContainer>
-                </CopyableAddress> */}
-              </div>
+                        <RawHash light={false}>
+                          <span className={styles.addressHash}>
+                            {truncateFormatter(address.boxId, 12)}
+                          </span>
+                        </RawHash>
+                      </ExplorableHash>
+                    </CopyableAddress>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>
@@ -201,7 +245,6 @@ class SignTxPage extends Component<Props> {
             type="password"
             className={styles.walletPassword}
             {...walletPasswordField.bind()}
-            // disabled
             error={walletPasswordField.error}
             skin={InputOwnSkin}
           />
@@ -211,13 +254,13 @@ class SignTxPage extends Component<Props> {
             className="secondary"
             label={intl.formatMessage(globalMessages.cancel)}
             skin={ButtonSkin}
-            // onClick={onCancel}
+            onClick={onCancel}
           />
           <Button
             label={intl.formatMessage(globalMessages.confirm)}
             skin={ButtonSkin}
-            disabled
-            // onClick={handleSubmit}
+            disabled={!walletPasswordField.isValid}
+            onClick={this.submit.bind(this)}
           />
         </div>
       </div>

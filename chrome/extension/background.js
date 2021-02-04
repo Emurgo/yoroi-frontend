@@ -246,10 +246,10 @@ async function confirmSign(tabId: number, request: PendingSignData): Promise<any
         openedWindow: false,
         resolve
       });
-      chrome.windows.create({
-        url: 'sign.html',
-        width: 240,
-        height: 400,
+       chrome.windows.create({
+        url: `${window.location.origin}/main_window_ergo.html#/signin-transaction`,
+        width: 466,
+        height: 600,
         focused: true,
         type: 'popup'
       });
@@ -301,9 +301,9 @@ chrome.runtime.onMessageExternal.addListener((message, sender) => {
   if (sender.id === connectorId) {
     if (message.type === 'open_browseraction_menu') {
       chrome.windows.create({
-        url: 'config.html',
-        width: 240,
-        height: 400,
+        url: `${window.location.origin}/main_window_ergo.html#/settings`,
+        width: 466,
+        height: 600,
         focused: true,
         type: 'popup'
       });
