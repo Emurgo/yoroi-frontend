@@ -110,13 +110,3 @@ export const SEIZA_STAKE_SIMULATOR: TopbarCategory = registerCategory({
     request.selected.getParent().getNetworkInfo().NetworkId === networks.CardanoMainnet.NetworkId
   ),
 });
-// export const CARDANO_DELEGATION: TopbarCategory = registerCategory({
-//   className: 'cardanoStake',
-//   route: ROUTES.WALLETS.CARDANO_DELEGATION,
-//   icon: undefined,
-//   label: messages.delegationById,
-//   isVisible: request => (
-//     asGetStakingKey(request.selected) != null &&
-//     isCardanoHaskell(request.selected.getParent().getNetworkInfo())
-//   ),
-// });
