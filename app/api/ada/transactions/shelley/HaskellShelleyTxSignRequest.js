@@ -9,6 +9,7 @@ import {
   MultiToken,
 } from '../../../common/lib/MultiToken';
 import { PRIMARY_ASSET_CONSTANTS } from '../../lib/storage/database/primitives/enums';
+import { multiTokenFromCardanoValue } from '../utils';
 
 /**
  * We take a copy of these parameters instead of re-evaluating them from the network
@@ -62,43 +63,25 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
   }
 
   totalInput(): MultiToken {
-    const values = new MultiToken(
-      [],
-      {
-        defaultNetworkId: this.networkSettingSnapshot.NetworkId,
-        defaultIdentifier: PRIMARY_ASSET_CONSTANTS.Cardano,
-      }
-    );
-
-    values.add({
-      identifier: PRIMARY_ASSET_CONSTANTS.Cardano,
-      amount: new BigNumber(
-        this.signRequest.unsignedTx.get_implicit_input().checked_add(
-          this.signRequest.unsignedTx.get_explicit_input()
-        ).to_str(),
+    return multiTokenFromCardanoValue(
+      this.signRequest.unsignedTx.get_implicit_input().checked_add(
+        this.signRequest.unsignedTx.get_explicit_input()
       ),
-      networkId: this.networkSettingSnapshot.NetworkId,
-    });
-    this.signRequest.changeAddr.forEach(change => values.joinSubtractMutable(change.values));
-
-    return values;
+      {
+        defaultIdentifier: PRIMARY_ASSET_CONSTANTS.Cardano,
+        defaultNetworkId: this.networkSettingSnapshot.NetworkId,
+      },
+    );
   }
 
   totalOutput(): MultiToken {
-    const values = new MultiToken(
-      [],
+    return multiTokenFromCardanoValue(
+      this.signRequest.unsignedTx.get_explicit_output(),
       {
-        defaultNetworkId: this.networkSettingSnapshot.NetworkId,
         defaultIdentifier: PRIMARY_ASSET_CONSTANTS.Cardano,
-      }
+        defaultNetworkId: this.networkSettingSnapshot.NetworkId,
+      },
     );
-    values.add({
-      identifier: PRIMARY_ASSET_CONSTANTS.Cardano,
-      amount: new BigNumber(this.signRequest.unsignedTx.get_explicit_output().to_str()),
-      networkId: this.networkSettingSnapshot.NetworkId,
-    });
-
-    return values;
   }
 
   fee(): MultiToken {

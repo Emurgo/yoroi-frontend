@@ -17,6 +17,7 @@ import LocalizableError, { UnexpectedError } from '../../i18n/LocalizableError';
 import { CheckAddressesInUseApiError } from '../../api/common/errors';
 import { getTrezorManifest, wrapWithFrame, wrapWithoutFrame } from '../lib/TrezorWrapper';
 import { ROUTES } from '../../routes-config';
+import Config from '../../config';
 
 // This is actually just an interface
 import {
@@ -235,7 +236,7 @@ export default class TrezorConnectStore
     return {
       publicMasterKey: trezorResp.payload.publicKey,
       hwFeatures: {
-        Vendor: features.vendor,
+        Vendor: features.vendor ?? Config.wallets.hardwareWallet.trezorT.VENDOR,
         Model: features.model,
         DeviceId: features.device_id || '',
       },

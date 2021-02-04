@@ -524,7 +524,7 @@ export function toRemoteByronTx(
 
     outputs.push({
       address: toHexOrBase58(output.address()),
-      amount: output.amount().to_str(),
+      amount: output.amount().coin().to_str(),
     });
   }
 

@@ -123,7 +123,7 @@ import type {
 } from '../../../../common/lib/storage/bridge/hashMapper';
 import { CARDANO_STABLE_SIZE } from '../../../../../config/numbersConfig';
 import { RollbackApiError } from '../../../../common/errors';
-import { getFromUserPerspective, } from '../../../transactions/utils';
+import { getFromUserPerspective, identifierToCardanoAsset, } from '../../../transactions/utils';
 
 import type {
   HistoryFunc, BestBlockFunc,
@@ -1660,6 +1660,20 @@ function genByronIOGen(
         identifier: PRIMARY_ASSET_CONSTANTS.Cardano,
         networkId: network.NetworkId,
       });
+      // 2) Add tokens
+      for (let tokenIndex = 0; tokenIndex < input.assets.length; tokenIndex++) {
+        const assetInfo = getAssetInfoOrThrow(input.assets[tokenIndex].tokenId);
+        tokenList.push({
+          TokenList: {
+            Amount: input.assets[tokenIndex].amount.toString(),
+            ListId: listId,
+            TokenId: assetInfo.TokenId,
+          },
+          identifier: input.assets[tokenIndex].tokenId,
+          networkId: network.NetworkId,
+        });
+      }
+
       utxoInputs.push({
         TransactionId: txRowId,
         AddressId: getIdOrThrow(input.address),
@@ -1683,6 +1697,20 @@ function genByronIOGen(
         identifier: PRIMARY_ASSET_CONSTANTS.Cardano,
         networkId: network.NetworkId,
       });
+      // 2) Add tokens
+      for (let tokenIndex = 0; tokenIndex < output.assets.length; tokenIndex++) {
+        const assetInfo = getAssetInfoOrThrow(output.assets[tokenIndex].tokenId);
+        tokenList.push({
+          TokenList: {
+            Amount: output.assets[tokenIndex].amount.toString(),
+            ListId: listId,
+            TokenId: assetInfo.TokenId,
+          },
+          identifier: output.assets[tokenIndex].tokenId,
+          networkId: network.NetworkId,
+        });
+      }
+
       utxoOutputs.push({
         TransactionId: txRowId,
         AddressId: getIdOrThrow(output.address),
@@ -1746,6 +1774,20 @@ function genShelleyIOGen(
         identifier: PRIMARY_ASSET_CONSTANTS.Cardano,
         networkId: network.NetworkId,
       });
+      // 2) Add tokens
+      for (let tokenIndex = 0; tokenIndex < input.assets.length; tokenIndex++) {
+        const assetInfo = getAssetInfoOrThrow(input.assets[tokenIndex].tokenId);
+        tokenList.push({
+          TokenList: {
+            Amount: input.assets[tokenIndex].amount.toString(),
+            ListId: listId,
+            TokenId: assetInfo.TokenId,
+          },
+          identifier: input.assets[tokenIndex].tokenId,
+          networkId: network.NetworkId,
+        });
+      }
+
       utxoInputs.push({
         TransactionId: txRowId,
         AddressId: getIdOrThrow(input.address),
@@ -1798,6 +1840,18 @@ function genShelleyIOGen(
         identifier: PRIMARY_ASSET_CONSTANTS.Cardano,
         networkId: network.NetworkId,
       });
+      for (let tokenIndex = 0; tokenIndex < output.assets.length; tokenIndex++) {
+        const assetInfo = getAssetInfoOrThrow(output.assets[tokenIndex].tokenId);
+        tokenList.push({
+          TokenList: {
+            Amount: output.assets[tokenIndex].amount.toString(),
+            ListId: listId,
+            TokenId: assetInfo.TokenId,
+          },
+          identifier: output.assets[tokenIndex].tokenId,
+          networkId: network.NetworkId,
+        });
+      }
 
       const outputType = addressToKind(output.address, 'bytes', network);
       // consider a group address as a UTXO output
@@ -1855,13 +1909,13 @@ async function genCardanoAssetMap(
   network: $ReadOnly<NetworkRow>,
   defaultToken: DefaultTokenEntry,
 ): Promise<Map<string, $ReadOnly<TokenRow>>> {
-  const tokenIds = Array.from(new Set(newTxs.flatMap(_tx => [
-    // ...tx.inputs
-    //   .flatMap(input => input.assets)
-    //   .map(asset => asset.tokenId),
-    // ...tx.outputs
-    //   .flatMap(output => output.assets)
-    //   .map(asset => asset.tokenId),
+  const tokenIds = Array.from(new Set(newTxs.flatMap(tx => [
+    ...tx.inputs
+      .flatMap(input => input.assets)
+      .map(asset => asset.tokenId),
+    ...tx.outputs
+      .flatMap(output => output.assets)
+      .map(asset => asset.tokenId),
     // force inclusion of primary token for chain
     defaultToken.defaultIdentifier
   ])));
@@ -1871,36 +1925,41 @@ async function genCardanoAssetMap(
     tokenIds
   )).filter(row => row.NetworkId === network.NetworkId);
 
-  // const existingTokens = new Set<string>(
-  //   existingDbRows.map(row => row.Identifier)
-  // );
+  const existingTokens = new Set<string>(
+    existingDbRows.map(row => row.Identifier)
+  );
   // const tokenInfo = await getAssetInfo({
   //   network,
   //   assetIds: tokenIds.filter(token => !existingTokens.has(token))
   // });
 
-  // const databaseInsert = Object.keys(tokenInfo).map(tokenId => ({
-  //   NetworkId: network.NetworkId,
-  //   Identifier: tokenId,
-  //   Metadata: {
-  //     type: 'Cardano',
-  //     height: tokenInfo[tokenId].height,
-  //     boxId: tokenInfo[tokenId].boxId,
-  //     ticker: null,
-  //     longName: tokenInfo[tokenId].name,
-  //     numberOfDecimals: tokenInfo[tokenId].numDecimals || 0,
-  //     description: tokenInfo[tokenId].desc,
-  //   }
-  // }));
+  const databaseInsert = tokenIds
+    .filter(token => !existingTokens.has(token))
+    .map(tokenId => {
+      const parts = identifierToCardanoAsset(tokenId);
+      return {
+        NetworkId: network.NetworkId,
+        Identifier: tokenId,
+        IsDefault: false,
+        Metadata: {
+          type: 'Cardano',
+          ticker: null,
+          longName: null,
+          numberOfDecimals: 0,
+          assetName: Buffer.from(parts.name.to_bytes()).toString('hex'),
+          policyId: Buffer.from(parts.policyId.to_bytes()).toString('hex'),
+        }
+      };
+    });
 
-  // const newDbRows = await deps.ModifyToken.upsert(
-  //   db, dbTx,
-  //   databaseInsert
-  // );
+  const newDbRows = await deps.ModifyToken.upsert(
+    db, dbTx,
+    databaseInsert
+  );
 
   const result = new Map<string, $ReadOnly<TokenRow>>();
   existingDbRows.forEach(row => result.set(row.Identifier, row));
-  // newDbRows.forEach(row => result.set(row.Identifier, row));
+  newDbRows.forEach(row => result.set(row.Identifier, row));
 
   return result;
 }

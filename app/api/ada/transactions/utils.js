@@ -49,7 +49,7 @@ export function cardanoAssetToIdentifier(
   name: RustModule.WalletV4.AssetName,
 ): string {
   // note: possible for name to be empty causing a trailing hyphen
-  return `${Buffer.from(policyId.to_bytes()).toString('hex')}-${Buffer.from(name.to_bytes()).toString('hex')}`;
+  return `${Buffer.from(policyId.to_bytes()).toString('hex')}|${Buffer.from(name.to_bytes()).toString('hex')}`;
 }
 export function identifierToCardanoAsset(
   identifier: string,
@@ -57,8 +57,8 @@ export function identifierToCardanoAsset(
   policyId: RustModule.WalletV4.ScriptHash,
   name: RustModule.WalletV4.AssetName,
 |} {
-  // recall: 'a-'.split() gives ['a', ''] as desired
-  const parts = identifier.split('-');
+  // recall: 'a|'.split() gives ['a', ''] as desired
+  const parts = identifier.split('|');
   return {
     policyId: RustModule.WalletV4.ScriptHash.from_bytes(Buffer.from(parts[0], 'hex')),
     name: RustModule.WalletV4.AssetName.from_bytes(Buffer.from(parts[1], 'hex')),

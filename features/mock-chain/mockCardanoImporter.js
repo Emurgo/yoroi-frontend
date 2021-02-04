@@ -99,10 +99,15 @@ export const generateTransaction = (): {|
         amount: genesisTxValue.toString(),
         txHash: '',
         index: 0,
+        assets: [],
       }
     ],
     outputs: [
-      { address: genesisTxReceiver, amount: genesisTxValue.toString() }
+      {
+        address: genesisTxReceiver,
+        amount: genesisTxValue.toString(),
+        assets: [],
+      }
     ],
     height: 1,
     epoch: 0,
@@ -111,7 +116,7 @@ export const generateTransaction = (): {|
     block_hash: '1',
     time: '2019-04-19T15:13:33.000Z',
     last_update: '2019-05-17T23:14:51.899Z',
-    tx_state: 'Successful'
+    tx_state: 'Successful',
   };
   const distributorTx = {
     hash: 'b713cc0d63106c3806b5a7077cc37a294fcca0e479f26aac64e51e04ae808d75',
@@ -121,7 +126,8 @@ export const generateTransaction = (): {|
         txHash: genesisTx.hash,
         id: genesisTx.hash + '0',
         index: 0,
-        amount: genesisTxValue.toString()
+        amount: genesisTxValue.toString(),
+        assets: [],
       }
     ],
     outputs: [
@@ -139,7 +145,8 @@ export const generateTransaction = (): {|
             0
           ]
         ),
-        amount: '20295'
+        amount: '20295',
+        assets: [],
       },
       // tx-big-input-wallet
       {
@@ -155,7 +162,8 @@ export const generateTransaction = (): {|
             0
           ]
         ),
-        amount: '1234567898765'
+        amount: '1234567898765',
+        assets: [],
       },
       // simple-pending-wallet
       {
@@ -171,7 +179,8 @@ export const generateTransaction = (): {|
             0
           ]
         ),
-        amount: '1000000'
+        amount: '1000000',
+        assets: [],
       },
       {
         // index: 3
@@ -186,7 +195,8 @@ export const generateTransaction = (): {|
             0
           ]
         ),
-        amount: '1000000'
+        amount: '1000000',
+        assets: [],
       },
       {
         // index: 4
@@ -201,7 +211,8 @@ export const generateTransaction = (): {|
             0
           ]
         ),
-        amount: '1000000'
+        amount: '1000000',
+        assets: [],
       },
       {
         // index: 5
@@ -216,7 +227,8 @@ export const generateTransaction = (): {|
             1
           ]
         ),
-        amount: '1000000'
+        amount: '1000000',
+        assets: [],
       },
       {
         // index: 6
@@ -231,7 +243,8 @@ export const generateTransaction = (): {|
             2
           ]
         ),
-        amount: '1000000'
+        amount: '1000000',
+        assets: [],
       },
       {
         // index: 7
@@ -246,7 +259,8 @@ export const generateTransaction = (): {|
             3
           ]
         ),
-        amount: '1000000'
+        amount: '1000000',
+        assets: [],
       },
       // failed-single-tx
       {
@@ -262,16 +276,29 @@ export const generateTransaction = (): {|
             0
           ]
         ),
-        amount: '1000000'
+        amount: '1000000',
+        assets: [],
       },
       // daedalus addresses
       // index: 9
-      { address: 'DdzFFzCqrhstBgE23pfNLvukYhpTPUKgZsXWLN5GsawqFZd4Fq3aVuGEHk11LhfMfmfBCFCBGrdZHVExjiB4FY5Jkjj1EYcqfTTNcczb', amount: '2000000' },
+      {
+        address: 'DdzFFzCqrhstBgE23pfNLvukYhpTPUKgZsXWLN5GsawqFZd4Fq3aVuGEHk11LhfMfmfBCFCBGrdZHVExjiB4FY5Jkjj1EYcqfTTNcczb',
+        amount: '2000000',
+        assets: [],
+      },
       // index: 10
-      { address: 'DdzFFzCqrht74dr7DYmiyCobGFQcfLCsHJCCM6nEBTztrsEk5kwv48EWKVMFU9pswAkLX9CUs4yVhVxqZ7xCVDX1TdatFwX5W39cohvm', amount: '2000000' },
+      {
+        address: 'DdzFFzCqrht74dr7DYmiyCobGFQcfLCsHJCCM6nEBTztrsEk5kwv48EWKVMFU9pswAkLX9CUs4yVhVxqZ7xCVDX1TdatFwX5W39cohvm',
+        amount: '2000000',
+        assets: [],
+      },
       // paper wallet
       // index: 11
-      { address: 'Ae2tdPwUPEZ7TQpzbJZCbA5BjW4zWYFn47jKo43ouvfe4EABoCfvEjwYvJr', amount: '2000000' },
+      {
+        address: 'Ae2tdPwUPEZ7TQpzbJZCbA5BjW4zWYFn47jKo43ouvfe4EABoCfvEjwYvJr',
+        amount: '2000000',
+        assets: [],
+      },
       // dump-wallet
       {
         // index: 12
@@ -286,7 +313,8 @@ export const generateTransaction = (): {|
             1
           ],
         ),
-        amount: '2000000'
+        amount: '2000000',
+        assets: [],
       },
       {
         // index: 13
@@ -301,7 +329,8 @@ export const generateTransaction = (): {|
             1
           ],
         ),
-        amount: '3000000'
+        amount: '3000000',
+        assets: [],
       },
       {
         // index: 14
@@ -316,7 +345,8 @@ export const generateTransaction = (): {|
             1
           ],
         ),
-        amount: '2000000'
+        amount: '2000000',
+        assets: [],
       },
       {
         // index: 15
@@ -331,7 +361,8 @@ export const generateTransaction = (): {|
             1
           ],
         ),
-        amount: '2000000'
+        amount: '2000000',
+        assets: [],
       },
       {
         // index: 16
@@ -346,7 +377,8 @@ export const generateTransaction = (): {|
             1
           ],
         ),
-        amount: '7000000'
+        amount: '7000000',
+        assets: [],
       },
       {
         // index: 17
@@ -361,7 +393,8 @@ export const generateTransaction = (): {|
             1
           ],
         ),
-        amount: '10000000'
+        amount: '10000000',
+        assets: [],
       },
       {
         // index: 18
@@ -376,7 +409,8 @@ export const generateTransaction = (): {|
             1
           ],
         ),
-        amount: '10000000'
+        amount: '10000000',
+        assets: [],
       },
       {
         // index: 19
@@ -391,7 +425,8 @@ export const generateTransaction = (): {|
             1
           ],
         ),
-        amount: '10000000'
+        amount: '10000000',
+        assets: [],
       },
       {
         // index: 20
@@ -406,7 +441,8 @@ export const generateTransaction = (): {|
             1
           ],
         ),
-        amount: '10000000'
+        amount: '10000000',
+        assets: [],
       },
       {
         // index: 21
@@ -421,7 +457,8 @@ export const generateTransaction = (): {|
             1
           ],
         ),
-        amount: '10000000'
+        amount: '10000000',
+        assets: [],
       },
       {
         // index: 22
@@ -436,7 +473,8 @@ export const generateTransaction = (): {|
             0
           ]
         ),
-        amount: '10000000'
+        amount: '10000000',
+        assets: [],
       },
       {
         // index: 23
@@ -456,7 +494,8 @@ export const generateTransaction = (): {|
             'hex'
           )
         ),
-        amount: '10000000' // enough that it can be unmangled
+        amount: '10000000', // enough that it can be unmangled
+        assets: [],
       },
       {
         // index: 24
@@ -476,7 +515,8 @@ export const generateTransaction = (): {|
             'hex'
           )
         ),
-        amount: '1' // too little to unmangle
+        amount: '1', // too little to unmangle
+        assets: [],
       },
       {
         // index: 25
@@ -493,7 +533,8 @@ export const generateTransaction = (): {|
           ],
           CoreAddressTypes.CARDANO_BASE
         ),
-        amount: '3500000'
+        amount: '3500000',
+        assets: [],
       },
     ],
     height: 1,
@@ -528,7 +569,8 @@ export const generateTransaction = (): {|
         txHash: distributorTx.hash,
         id: distributorTx.hash + '2',
         index: 2,
-        amount: '1000000'
+        amount: '1000000',
+        assets: [],
       }
     ],
     outputs: [
@@ -544,7 +586,8 @@ export const generateTransaction = (): {|
             1
           ]
         ),
-        amount: '1'
+        amount: '1',
+        assets: [],
       },
     ],
     height: null,
@@ -574,7 +617,8 @@ export const generateTransaction = (): {|
         txHash: distributorTx.hash,
         id: distributorTx.hash + '3',
         index: 3,
-        amount: '1000000'
+        amount: '1000000',
+        assets: [],
       }
     ],
     outputs: [
@@ -590,7 +634,8 @@ export const generateTransaction = (): {|
             2
           ]
         ),
-        amount: '1'
+        amount: '1',
+        assets: [],
       },
     ],
     height: null,
@@ -625,7 +670,8 @@ export const generateTransaction = (): {|
         txHash: distributorTx.hash,
         id: distributorTx.hash + '4',
         index: 4,
-        amount: '1000000'
+        amount: '1000000',
+        assets: [],
       }
     ],
     outputs: [
@@ -641,7 +687,8 @@ export const generateTransaction = (): {|
             9
           ]
         ),
-        amount: '1'
+        amount: '1',
+        assets: [],
       },
       {
         // Ae2tdPwUPEZ77uBBu8cMVxswVy1xfaMZR9wsUSwDNiB48MWqsVWfitHfUM9
@@ -655,7 +702,8 @@ export const generateTransaction = (): {|
             0
           ]
         ),
-        amount: '820000'
+        amount: '820000',
+        assets: [],
       },
     ],
     height: 100,
@@ -685,7 +733,8 @@ export const generateTransaction = (): {|
         txHash: distributorTx.hash,
         id: distributorTx.hash + '5',
         index: 5,
-        amount: '1000000'
+        amount: '1000000',
+        assets: [],
       }
     ],
     outputs: [
@@ -701,7 +750,8 @@ export const generateTransaction = (): {|
             9
           ]
         ),
-        amount: '1'
+        amount: '1',
+        assets: [],
       },
       {
         // Ae2tdPwUPEZ5uzkzh1o2DHECiUi3iugvnnKHRisPgRRP3CTF4KCMvy54Xd3
@@ -715,7 +765,8 @@ export const generateTransaction = (): {|
             1
           ]
         ),
-        amount: '820000'
+        amount: '820000',
+        assets: [],
       },
     ],
     height: 100,
@@ -745,7 +796,8 @@ export const generateTransaction = (): {|
         txHash: distributorTx.hash,
         id: distributorTx.hash + '6',
         index: 6,
-        amount: '1000000'
+        amount: '1000000',
+        assets: [],
       }
     ],
     outputs: [
@@ -761,7 +813,8 @@ export const generateTransaction = (): {|
             9
           ]
         ),
-        amount: '1'
+        amount: '1',
+        assets: [],
       },
       {
         // Ae2tdPwUPEZJZPsFg8w5bXA4brfu8peYy5prmrFiYPACb7DX64iiBY8WvHD
@@ -775,7 +828,8 @@ export const generateTransaction = (): {|
             2
           ]
         ),
-        amount: '820000'
+        amount: '820000',
+        assets: [],
       },
     ],
     height: 100,
@@ -805,7 +859,8 @@ export const generateTransaction = (): {|
         txHash: distributorTx.hash,
         id: distributorTx.hash + '7',
         index: 7,
-        amount: '1000000'
+        amount: '1000000',
+        assets: [],
       }
     ],
     outputs: [
@@ -821,7 +876,8 @@ export const generateTransaction = (): {|
             9
           ]
         ),
-        amount: '1'
+        amount: '1',
+        assets: [],
       },
       {
         // Ae2tdPwUPEZHG9AGUYWqFcM5zFn74qdEx2TqyZxuU68CQ33EBodWAVJ523w
@@ -835,7 +891,8 @@ export const generateTransaction = (): {|
             3
           ]
         ),
-        amount: '820000'
+        amount: '820000',
+        assets: [],
       },
     ],
     height: 100,
@@ -866,7 +923,8 @@ export const generateTransaction = (): {|
         txHash: manyTx1.hash,
         id: manyTx1.hash + '1',
         index: 1,
-        amount: '820000'
+        amount: '820000',
+        assets: [],
       }
     ],
     outputs: [
@@ -882,7 +940,8 @@ export const generateTransaction = (): {|
             30
           ]
         ),
-        amount: '1'
+        amount: '1',
+        assets: [],
       },
       {
         // Ae2tdPwUPEZ7VKG9jy6jJTxQCWNXoMeL2Airvzjv3dc3WCLhSBA7XbSMhKd
@@ -896,7 +955,8 @@ export const generateTransaction = (): {|
             4
           ]
         ),
-        amount: '650000'
+        amount: '650000',
+        assets: [],
       },
     ],
     height: 200,
@@ -927,7 +987,8 @@ export const generateTransaction = (): {|
         txHash: manyTx2.hash,
         id: manyTx2.hash + '1',
         index: 1,
-        amount: '820000'
+        amount: '820000',
+        assets: [],
       }
     ],
     outputs: [
@@ -943,7 +1004,8 @@ export const generateTransaction = (): {|
             0
           ]
         ),
-        amount: '500000'
+        amount: '500000',
+        assets: [],
       },
     ],
     height: 202,
@@ -974,7 +1036,8 @@ export const generateTransaction = (): {|
         txHash: manyTx2.hash,
         id: manyTx2.hash + '1',
         index: 1,
-        amount: '820000'
+        amount: '820000',
+        assets: [],
       }
     ],
     outputs: [
@@ -990,7 +1053,8 @@ export const generateTransaction = (): {|
             0
           ]
         ),
-        amount: '500000'
+        amount: '500000',
+        assets: [],
       },
     ],
     height: 202,
@@ -1025,7 +1089,8 @@ export const generateTransaction = (): {|
         txHash: distributorTx.hash,
         id: distributorTx.hash + '8',
         index: 8,
-        amount: '1000000'
+        amount: '1000000',
+        assets: [],
       }
     ],
     outputs: [
@@ -1041,7 +1106,8 @@ export const generateTransaction = (): {|
             0
           ]
         ),
-        amount: '1'
+        amount: '1',
+        assets: [],
       },
       {
         // Ae2tdPwUPEZCqWsJkibw8BK2SgbmJ1rRG142Ru1CjSnRvKwDWbL4UYPN3eU
@@ -1055,7 +1121,8 @@ export const generateTransaction = (): {|
             0
           ]
         ),
-        amount: '820000'
+        amount: '820000',
+        assets: [],
       },
     ],
     height: null,
@@ -1090,7 +1157,8 @@ export const generateTransaction = (): {|
         txHash: distributorTx.hash,
         id: distributorTx.hash + '13',
         index: 13,
-        amount: '2000000'
+        amount: '2000000',
+        assets: [],
       }
     ],
     outputs: [
@@ -1107,7 +1175,8 @@ export const generateTransaction = (): {|
           ],
           true
         ),
-        amount: '1638497'
+        amount: '1638497',
+        assets: [],
       },
     ],
     height: 300,
@@ -1138,7 +1207,8 @@ export const generateTransaction = (): {|
         txHash: distributorTx.hash,
         id: distributorTx.hash + '18',
         index: 18,
-        amount: '8500000'
+        amount: '8500000',
+        assets: [],
       }
     ],
     outputs: [
@@ -1154,14 +1224,16 @@ export const generateTransaction = (): {|
             1
           ]
         ),
-        amount: '1'
+        amount: '1',
+        assets: [],
       },
       {
         // ledger-wallet base address index 0'/0/0
         // eslint-disable-next-line max-len
         // addr1q9mvu42dtppagyyy3l0m36vr7qvefgt9ka2nyt8efzeewpc0vckke6cmv4en56dpa4e0smct43dpv5z6q2yf0tcmudzs8tsuf0
         address: '0176ce554d5843d410848fdfb8e983f01994a165b755322cf948b397070f662d6ceb1b65733a69a1ed72f86f0bac5a16505a028897af1be345',
-        amount: '5500000'
+        amount: '5500000',
+        assets: [],
       },
     ],
     height: 301,
@@ -1196,7 +1268,8 @@ export const generateTransaction = (): {|
         txHash: distributorTx.hash,
         id: distributorTx.hash + '14',
         index: 14,
-        amount: '3000000'
+        amount: '3000000',
+        assets: [],
       }
     ],
     outputs: [
@@ -1212,7 +1285,8 @@ export const generateTransaction = (): {|
             1
           ]
         ),
-        amount: '1'
+        amount: '1',
+        assets: [],
       },
       {
         // Ae2tdPwUPEZ9qgUrkrTqqTa5iKkaURYNFqM1gSbPXicn21LYyF184ZXnQ5R
@@ -1226,7 +1300,8 @@ export const generateTransaction = (): {|
             2
           ],
         ),
-        amount: '2832006'
+        amount: '2832006',
+        assets: [],
       },
     ],
     height: 301,
@@ -1256,7 +1331,8 @@ export const generateTransaction = (): {|
         txHash: distributorTx.hash,
         id: distributorTx.hash + '15',
         index: 15,
-        amount: '2000000'
+        amount: '2000000',
+        assets: [],
       }
     ],
     outputs: [
@@ -1272,7 +1348,8 @@ export const generateTransaction = (): {|
             1
           ]
         ),
-        amount: '1'
+        amount: '1',
+        assets: [],
       },
       {
         // Ae2tdPwUPEZLmqiKtMQ4kKL38emRfkyPqBsHqL64pf8uRz6uzsQCd7GAu9R
@@ -1286,7 +1363,8 @@ export const generateTransaction = (): {|
             1
           ],
         ),
-        amount: '1494128'
+        amount: '1494128',
+        assets: [],
       },
     ],
     height: 302,
@@ -1316,7 +1394,8 @@ export const generateTransaction = (): {|
         txHash: distributorTx.hash,
         id: distributorTx.hash + '16',
         index: 16,
-        amount: '2000000'
+        amount: '2000000',
+        assets: [],
       }
     ],
     outputs: [
@@ -1332,7 +1411,8 @@ export const generateTransaction = (): {|
             7
           ],
         ),
-        amount: '1000000'
+        amount: '1000000',
+        assets: [],
       },
     ],
     height: 303,
@@ -1362,7 +1442,8 @@ export const generateTransaction = (): {|
         txHash: distributorTx.hash,
         id: distributorTx.hash + '15',
         index: 15,
-        amount: '7000000'
+        amount: '7000000',
+        assets: [],
       }
     ],
     outputs: [
@@ -1378,12 +1459,14 @@ export const generateTransaction = (): {|
             1
           ]
         ),
-        amount: '1'
+        amount: '1',
+        assets: [],
       },
       {
         // trezor-wallet base address index 0'/0/2
         address: '0101ea7455b13eceade036aa02c2eecfeb0c2f5fd7398f08c573717d1764238bc39c962aa28156a45a461213770d88d808896785f92c3aa4d2',
-        amount: '5500000'
+        amount: '5500000',
+        assets: [],
       },
     ],
     height: 301,
@@ -1418,7 +1501,8 @@ export const generateTransaction = (): {|
         txHash: distributorTx.hash,
         id: distributorTx.hash + '16',
         index: 16,
-        amount: '10000000'
+        amount: '10000000',
+        assets: [],
       }
     ],
     outputs: [
@@ -1434,14 +1518,16 @@ export const generateTransaction = (): {|
             1
           ]
         ),
-        amount: '1'
+        amount: '1',
+        assets: [],
       },
       {
         // 0'/0/0
         // eslint-disable-next-line max-len
         // addr1qyv7qlaucathxkwkc503ujw0rv9lfj2rkj96feyst2rs9ey4tr5knj4fu4adelzqhxg8adu5xca4jra0gtllfrpcawyqzajfkn
         address: '0119e07fbcc7577359d6c51f1e49cf1b0bf4c943b48ba4e4905a8702e49558e969caa9e57adcfc40b9907eb794363b590faf42fff48c38eb88',
-        amount: '5500000'
+        amount: '5500000',
+        assets: [],
       },
     ],
     height: 304,
@@ -1476,7 +1562,8 @@ export const generateTransaction = (): {|
         txHash: distributorTx.hash,
         id: distributorTx.hash + '19',
         index: 19,
-        amount: '8500000'
+        amount: '8500000',
+        assets: [],
       }
     ],
     outputs: [
@@ -1492,14 +1579,16 @@ export const generateTransaction = (): {|
             1
           ]
         ),
-        amount: '1'
+        amount: '1',
+        assets: [],
       },
       {
         // shelley-delegated base address index 0'/0/0
         // eslint-disable-next-line max-len
         // addr1qymwxh8y7pkdea6dyvrldnh6rtt5u9qxp0nd43dzn6c5y06kmdwdfzyussgs6n0fpsx4qw63hpzdk0n0mpuezgufjkas3clf5j
         address: '0136e35ce4f06cdcf74d2307f6cefa1ad74e14060be6dac5a29eb1423f56db5cd4889c84110d4de90c0d503b51b844db3e6fd87991238995bb',
-        amount: '5500000'
+        amount: '5500000',
+        assets: [],
       },
     ],
     height: 100,
@@ -1523,7 +1612,8 @@ export const generateTransaction = (): {|
         txHash: shelleyDelegatedTx1.hash,
         id: shelleyDelegatedTx1.hash + '1',
         index: 1,
-        amount: '5500000'
+        amount: '5500000',
+        assets: [],
       }
     ],
     outputs: [
@@ -1532,7 +1622,8 @@ export const generateTransaction = (): {|
         // eslint-disable-next-line max-len
         // addr1qxnhwn2yw8utcxprcqxl0hx0v2wq2g304tc5wyzmhx6cvgzkmdwdfzyussgs6n0fpsx4qw63hpzdk0n0mpuezgufjkaswuh3qd
         address: '01a7774d4471f8bc1823c00df7dccf629c05222faaf147105bb9b5862056db5cd4889c84110d4de90c0d503b51b844db3e6fd87991238995bb',
-        amount: '3000000'
+        amount: '3000000',
+        assets: [],
       },
     ],
     ttl: '500',
@@ -1584,7 +1675,8 @@ export const generateTransaction = (): {|
         txHash: distributorTx.hash,
         id: distributorTx.hash + '20',
         index: 20,
-        amount: '8500000'
+        amount: '8500000',
+        assets: [],
       }
     ],
     outputs: [
@@ -1600,14 +1692,16 @@ export const generateTransaction = (): {|
             1
           ]
         ),
-        amount: '1'
+        amount: '1',
+        assets: [],
       },
       {
         // shelley-ledger-delegated base address index 0'/0/0
         // eslint-disable-next-line max-len
         // addr1q82e70f6t2v5va99t2mvc894235wz5kfc32vhs5khf0c9xw7kz7vewkwsezwewajhr4el3axkrnnsr50qx05gdjd6psq4wu69r
         address: '01d59f3d3a5a994674a55ab6cc1cb55468e152c9c454cbc296ba5f8299deb0bcccbace8644ecbbb2b8eb9fc7a6b0e7380e8f019f44364dd060',
-        amount: '5500000'
+        amount: '5500000',
+        assets: [],
       },
     ],
     height: 100,
@@ -1631,7 +1725,8 @@ export const generateTransaction = (): {|
         txHash: shelleyLedgerDelegatedTx1.hash,
         id: shelleyLedgerDelegatedTx1.hash + '1',
         index: 1,
-        amount: '5500000'
+        amount: '5500000',
+        assets: [],
       }
     ],
     outputs: [
@@ -1640,7 +1735,8 @@ export const generateTransaction = (): {|
         // eslint-disable-next-line max-len
         // addr1q9mhtwlxextzp4kqe04ycj7gus5j8gd5jaz42xsklslcdzx7kz7vewkwsezwewajhr4el3axkrnnsr50qx05gdjd6psq62plmk
         address: '017775bbe6c99620d6c0cbea4c4bc8e42923a1b49745551a16fc3f8688deb0bcccbace8644ecbbb2b8eb9fc7a6b0e7380e8f019f44364dd060',
-        amount: '3000000'
+        amount: '3000000',
+        assets: [],
       },
     ],
     ttl: '500',
@@ -1692,7 +1788,8 @@ export const generateTransaction = (): {|
         txHash: distributorTx.hash,
         id: distributorTx.hash + '21',
         index: 21,
-        amount: '8500000'
+        amount: '8500000',
+        assets: [],
       }
     ],
     outputs: [
@@ -1708,14 +1805,16 @@ export const generateTransaction = (): {|
             1
           ]
         ),
-        amount: '1'
+        amount: '1',
+        assets: [],
       },
       {
         // shelley-just-registered base address index 0'/0/0
         // eslint-disable-next-line max-len
         // addr1q97p5s9fuhlymrqe2kr94krdfh6fujuvfyy67z53g7cmwrr4dsev5marcxj472jrtwfl5qqfzkc3udfwpckx66qyqp2q0j0e6c
         address: '017c1a40a9e5fe4d8c1955865ad86d4df49e4b8c4909af0a9147b1b70c756c32ca6fa3c1a55f2a435b93fa000915b11e352e0e2c6d68040054',
-        amount: '5500000'
+        amount: '5500000',
+        assets: [],
       },
     ],
     height: 100,
@@ -1739,7 +1838,8 @@ export const generateTransaction = (): {|
         txHash: shelleyOnlyRegisteredTx1.hash,
         id: shelleyOnlyRegisteredTx1.hash + '1',
         index: 1,
-        amount: '5500000'
+        amount: '5500000',
+        assets: [],
       }
     ],
     outputs: [
@@ -1748,7 +1848,8 @@ export const generateTransaction = (): {|
         // eslint-disable-next-line max-len
         // addr1qxzjfpfhwq4474fk7ruxsjh59s9g2n504jm6reug68zwx2t4dsev5marcxj472jrtwfl5qqfzkc3udfwpckx66qyqp2qgde07v
         address: '0185248537702b5f5536f0f8684af42c0a854e8facb7a1e788d1c4e329756c32ca6fa3c1a55f2a435b93fa000915b11e352e0e2c6d68040054',
-        amount: '3000000'
+        amount: '3000000',
+        assets: [],
       },
     ],
     ttl: '500',
@@ -1797,7 +1898,8 @@ export const generateTransaction = (): {|
         txHash: distributorTx.hash,
         id: distributorTx.hash + '25',
         index: 25,
-        amount: '3500000'
+        amount: '3500000',
+        assets: [],
       }
     ],
     outputs: [
@@ -1815,7 +1917,8 @@ export const generateTransaction = (): {|
           ],
           CoreAddressTypes.CARDANO_BASE
         ),
-        amount: '1000000'
+        amount: '1000000',
+        assets: [],
       },
     ],
     ttl: '500',
