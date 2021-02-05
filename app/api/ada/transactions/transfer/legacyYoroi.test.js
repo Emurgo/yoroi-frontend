@@ -108,7 +108,8 @@ describe('Haskell Shelley era tx format tests', () => {
       tx_hash: txId,
       tx_index: txIndex,
       receiver: addr1.address,
-      amount: inputAmount
+      amount: inputAmount,
+      assets: [],
     };
 
     const baseConfig = networks.CardanoMainnet.BaseConfig[0];

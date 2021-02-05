@@ -93,7 +93,7 @@ export default class AdaMnemonicSendStore extends Store {
           neededStakingKeyHashes.wits.add(
             Buffer.from(RustModule.WalletV4.make_vkey_witness(
               RustModule.WalletV4.hash_transaction(
-                request.signRequest.signRequest.unsignedTx.build()
+                request.signRequest.unsignedTx.build()
               ),
               stakingKey
             ).to_bytes()).toString('hex')

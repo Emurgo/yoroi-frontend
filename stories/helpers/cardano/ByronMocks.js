@@ -258,6 +258,7 @@ export const genTentativeByronTx = (
     tx_hash: '6930f123df83e4178b0324ae617b2028c0b38c6ff4660583a2abf1f7b08195fe',
     tx_index: 0,
     utxo_id: '6930f123df83e4178b0324ae617b2028c0b38c6ff4660583a2abf1f7b08195fe0',
+    assets: [],
   };
   const txBuilder = RustModule.WalletV4.TransactionBuilder.new(
     RustModule.WalletV4.LinearFee.new(
@@ -288,31 +289,28 @@ export const genTentativeByronTx = (
   const baseConfig = getCardanoHaskellBaseConfig(publicDeriver.getParent().getNetworkInfo())
     .reduce((acc, next) => Object.assign(acc, next), {});
   return {
-    tentativeTx: new HaskellShelleyTxSignRequest(
-      {
-        senderUtxos: [{
-          ...remoteUnspentUtxo,
-          addressing: {
-            path: [],
-            startLevel: 0,
-          },
-        }],
-        unsignedTx: txBuilder,
-        changeAddr: [],
-        certificate: undefined,
-      },
-      undefined,
-      {
+    tentativeTx: new HaskellShelleyTxSignRequest({
+      senderUtxos: [{
+        ...remoteUnspentUtxo,
+        addressing: {
+          path: [],
+          startLevel: 0,
+        },
+      }],
+      unsignedTx: txBuilder,
+      changeAddr: [],
+      metadata: undefined,
+      networkSettingSnapshot: {
         ChainNetworkId: Number.parseInt(baseConfig.ChainNetworkId, 10),
         PoolDeposit: new BigNumber(baseConfig.PoolDeposit),
         KeyDeposit: new BigNumber(baseConfig.KeyDeposit),
         NetworkId: publicDeriver.getParent().getNetworkInfo().NetworkId,
       },
-      {
+      neededStakingKeyHashes: {
         neededHashes: new Set(),
         wits: new Set(),
       },
-    ),
+    }),
     inputAmount,
     fee,
   };

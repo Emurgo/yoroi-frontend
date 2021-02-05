@@ -186,20 +186,35 @@ export function batchGetUTXOsSumsForAddresses(
       const partialAmounts: Array<UtxoSumResponse> = await Promise.all(promises);
 
       // sum all chunks together
-      const sum: BigNumber = partialAmounts.reduce(
-        (acc: BigNumber, partialAmount) => (
-          acc.plus(
-            partialAmount.sum != null && partialAmount.sum !== '' // undefined if no addresses in the batch has any balance
-              ? new BigNumber(partialAmount.sum)
+      let sum: BigNumber = new BigNumber(0);
+      const assetMap = new Map<string, BigNumber>();
+      for (const partial of partialAmounts) {
+        sum = sum.plus(
+          partial.sum != null && partial.sum !== '' // undefined if no addresses in the batch has any balance
+              ? new BigNumber(partial.sum)
               : new BigNumber(0)
-          )
-        ),
-        new BigNumber(0)
-      );
-      if (sum.isZero()) {
-        return { sum: null };
+        );
+        for (const asset of partial.assets) {
+          const currentVal = assetMap.get(asset.tokenId) ?? new BigNumber(0);
+          assetMap.set(
+            asset.tokenId,
+            currentVal.plus(asset.amount)
+          );
+        }
       }
-      return { sum: sum.toString() };
+      if (sum.isZero()) {
+        return {
+          sum: null,
+          assets: [],
+        };
+      }
+      return {
+        sum: sum.toString(),
+        assets: Array.from(assetMap.entries()).map(entry => ({
+          tokenId: entry[0],
+          amount: entry[1].toString(),
+        })),
+      };
     } catch (error) {
       Logger.error(`batchedFetcher::${nameof(batchGetUTXOsSumsForAddresses)} error: ` + stringifyError(error));
       if (error instanceof LocalizableError) throw error;

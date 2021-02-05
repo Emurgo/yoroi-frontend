@@ -30,7 +30,7 @@ export type UtxoSumRequest = {|
 export type UtxoSumResponse = {|
   +sum: ?string,
   +assets: $ReadOnlyArray<$ReadOnly<{
-    amount: number,
+    amount: string,
     tokenId: string,
     ...
   }>>,
@@ -113,7 +113,7 @@ export type RemoteTransactionInput = {|
   +address: string,
   +amount: string,
   +assets: $ReadOnlyArray<$ReadOnly<{
-    amount: number,
+    amount: string,
     tokenId: string,
     ...
   }>>,
@@ -122,7 +122,7 @@ export type RemoteTransactionOutput = {|
   +address: string,
   +amount: string,
   +assets: $ReadOnlyArray<$ReadOnly<{
-    amount: number,
+    amount: string,
     tokenId: string,
     ...
   }>>,
@@ -164,7 +164,7 @@ export type RemoteUnspentOutput = {|
   +receiver: string,
   +amount: string,
   +assets: $ReadOnlyArray<$ReadOnly<{
-    amount: number,
+    amount: string,
     tokenId: string,
     ...
   }>>,

@@ -94,7 +94,8 @@ describe('Byron era tx format tests', () => {
       tx_hash: txId,
       tx_index: txIndex,
       receiver: address,
-      amount: inputAmount
+      amount: inputAmount,
+      assets: [],
     };
 
     const transferInfo = await daedalusTransferTxFromAddresses({
@@ -154,7 +155,8 @@ describe('Byron era tx format tests', () => {
       tx_hash: txId,
       tx_index: txIndex,
       receiver: address,
-      amount: inputAmount
+      amount: inputAmount,
+      assets: [],
     };
 
     expect(daedalusTransferTxFromAddresses({
@@ -192,7 +194,8 @@ describe('Byron era tx format tests', () => {
         tx_hash: txId,
         tx_index: i,
         receiver: address,
-        amount: inputAmount
+        amount: inputAmount,
+        assets: [],
       });
     }
 

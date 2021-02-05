@@ -4,7 +4,6 @@
 
 import BigNumber from 'bignumber.js';
 import type {
-  BaseSignRequest,
   V4UnsignedTxUtxoResponse,
   V4UnsignedTxAddressedUtxoResponse,
   CardanoAddressedUtxo,
@@ -23,7 +22,6 @@ import {
 } from '../../lib/storage/database/walletTypes/bip44/api/utils';
 import type {
   Address, Addressing,
-  IGetAllUtxosResponse,
 } from '../../lib/storage/models/PublicDeriver/interfaces';
 import {
   getCardanoSpendingKeyHash, normalizeToAddress,
@@ -64,7 +62,8 @@ export function sendAllUnsignedTx(
       receiver: utxo.receiver,
       tx_hash: utxo.tx_hash,
       tx_index: utxo.tx_index,
-      utxo_id: utxo.utxo_id
+      utxo_id: utxo.utxo_id,
+      assets: utxo.assets,
     }, utxo);
   }
   const unsignedTxResponse = sendAllUnsignedTxFromUtxo(
@@ -243,7 +242,8 @@ export function newAdaUnsignedTx(
       receiver: utxo.receiver,
       tx_hash: utxo.tx_hash,
       tx_index: utxo.tx_index,
-      utxo_id: utxo.utxo_id
+      utxo_id: utxo.utxo_id,
+      assets: utxo.assets,
     }, utxo);
   }
   const unsignedTxResponse = newAdaUnsignedTxFromUtxo(
@@ -514,8 +514,8 @@ export function newAdaUnsignedTxFromUtxo(
 }
 
 export function signTransaction(
-  signRequest: BaseSignRequest<RustModule.WalletV4.TransactionBuilder> |
-    BaseSignRequest<RustModule.WalletV4.TransactionBody>,
+  senderUtxos: Array<CardanoAddressedUtxo>,
+  unsignedTx: RustModule.WalletV4.TransactionBuilder | RustModule.WalletV4.TransactionBody,
   keyLevel: number,
   signingKey: RustModule.WalletV4.Bip32PrivateKey,
   stakingKeyWits: Set<string>,
@@ -524,7 +524,7 @@ export function signTransaction(
   const seenByronKeys: Set<string> = new Set();
   const seenKeyHashes: Set<string> = new Set();
   const deduped: Array<CardanoAddressedUtxo> = [];
-  for (const senderUtxo of signRequest.senderUtxos) {
+  for (const senderUtxo of senderUtxos) {
     const wasmAddr = normalizeToAddress(senderUtxo.receiver);
     if (wasmAddr == null) {
       throw new Error(`${nameof(signTransaction)} utxo not a valid Shelley address`);
@@ -550,9 +550,9 @@ export function signTransaction(
     }
   }
 
-  const txBody = signRequest.unsignedTx instanceof RustModule.WalletV4.TransactionBuilder
-    ? signRequest.unsignedTx.build()
-    : signRequest.unsignedTx;
+  const txBody = unsignedTx instanceof RustModule.WalletV4.TransactionBuilder
+    ? unsignedTx.build()
+    : unsignedTx;
   const txHash = RustModule.WalletV4.hash_transaction(txBody);
 
   const vkeyWits = RustModule.WalletV4.Vkeywitnesses.new();
@@ -647,24 +647,6 @@ function addWitnesses(
       bootstrapWits.add(bootstrapWit);
     }
   }
-}
-
-// TODO: should go in a utility class somewhere instead of being copy-pasted in multiple places
-export function asAddressedUtxo(
-  utxos: IGetAllUtxosResponse,
-): Array<CardanoAddressedUtxo> {
-  return utxos.map(utxo => {
-    return {
-      amount: utxo.output.tokens.filter(
-        token => token.Token.Identifier === PRIMARY_ASSET_CONSTANTS.Cardano
-      )[0].TokenList.Amount,
-      receiver: utxo.address,
-      tx_hash: utxo.output.Transaction.Hash,
-      tx_index: utxo.output.UtxoTransactionOutput.OutputIndex,
-      utxo_id: utxo.output.Transaction.Hash + utxo.output.UtxoTransactionOutput.OutputIndex,
-      addressing: utxo.addressing,
-    };
-  });
 }
 
 export function genFilterSmallUtxo(request: {|

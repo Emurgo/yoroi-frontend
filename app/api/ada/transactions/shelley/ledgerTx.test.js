@@ -209,7 +209,8 @@ test('Create Ledger transaction', async () => {
     addressing: {
       path: [WalletTypePurpose.BIP44, CoinTypes.CARDANO, HARD_DERIVATION_START, 1, 1],
       startLevel: 1
-    }
+    },
+    assets: [],
   }, {
     amount: '2832006',
     // base
@@ -220,7 +221,8 @@ test('Create Ledger transaction', async () => {
     addressing: {
       path: [WalletTypePurpose.BIP44, CoinTypes.CARDANO, HARD_DERIVATION_START, 1, 2],
       startLevel: 1
-    }
+    },
+    assets: [],
   }, {
     amount: '1000000',
     // enterprise
@@ -231,7 +233,8 @@ test('Create Ledger transaction', async () => {
     addressing: {
       path: [WalletTypePurpose.BIP44, CoinTypes.CARDANO, HARD_DERIVATION_START, 0, 7],
       startLevel: 1
-    }
+    },
+    assets: [],
   }, {
     amount: '1000000',
     // pointer
@@ -242,7 +245,8 @@ test('Create Ledger transaction', async () => {
     addressing: {
       path: [WalletTypePurpose.BIP44, CoinTypes.CARDANO, HARD_DERIVATION_START, 0, 7],
       startLevel: 1
-    }
+    },
+    assets: [],
   }];
   const protocolParams = getProtocolParams();
   const txBuilder = RustModule.WalletV4.TransactionBuilder.new(
@@ -320,25 +324,22 @@ test('Create Ledger transaction', async () => {
       ],
     },
   };
-  const signRequest = new HaskellShelleyTxSignRequest(
-    {
-      unsignedTx: txBuilder,
-      changeAddr: [],
-      senderUtxos,
-      certificate: undefined,
-    },
-    undefined,
-    {
+  const signRequest = new HaskellShelleyTxSignRequest({
+    unsignedTx: txBuilder,
+    changeAddr: [],
+    senderUtxos,
+    metadata: undefined,
+    networkSettingSnapshot: {
       ChainNetworkId: Number.parseInt(baseConfig.ChainNetworkId, 10),
       PoolDeposit: new BigNumber(baseConfig.PoolDeposit),
       KeyDeposit: new BigNumber(baseConfig.KeyDeposit),
       NetworkId: network.NetworkId,
     },
-    {
+    neededStakingKeyHashes: {
       neededHashes: new Set([Buffer.from(stakeCredential.to_bytes()).toString('hex')]),
       wits: new Set() // not needed for this test, but something should be here
     },
-  );
+  });
 
   const rewardAddressString = Buffer.from(
     RustModule.WalletV4.RewardAddress.new(
@@ -426,7 +427,7 @@ test('Create Ledger transaction', async () => {
 
   buildSignedTransaction(
     txBuilder.build(),
-    signRequest.signRequest.senderUtxos,
+    signRequest.senderUtxos,
     [
       // this witnesses doesn't belong to the transaction / key. Just used to test wit generation
       {

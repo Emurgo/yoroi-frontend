@@ -34,6 +34,7 @@ import { generateLedgerWalletRootKey } from '../cardanoCrypto/cryptoWallet';
 import { networks, getCardanoHaskellBaseConfig } from '../storage/database/prepackaged/networks';
 import { decode, fromWords } from 'bech32';
 import { Bech32Prefix } from '../../../../config/stringConfig';
+import { parseTokenList } from '../../transactions/utils';
 
 /** convert bech32 address to bytes */
 function fixAddresses(
@@ -287,6 +288,7 @@ export function genUtxoForAddresses(
             tx_index: j,
             receiver: tx.outputs[j].address,
             amount: tx.outputs[j].amount.toString(),
+            assets: tx.outputs[j].assets,
           });
         }
       }
@@ -314,14 +316,30 @@ export function genUtxoSumForAddresses(
   ): Promise<UtxoSumResponse> => {
     const utxos = await getAddressUtxo(body);
     if (utxos.length === 0) {
-      return { sum: null };
+      return {
+        sum: null,
+        assets: [],
+      };
     }
-    const result = utxos.reduce(
-      (sum, utxo) => sum.plus(new BigNumber(utxo.amount)),
-      new BigNumber(0),
-    );
+    // sum all chunks together
+    let sum: BigNumber = new BigNumber(0);
+    const assetMap = new Map<string, BigNumber>();
+    for (const partial of utxos) {
+      sum = sum.plus(new BigNumber(partial.amount));
+      for (const asset of partial.assets) {
+        const currentVal = assetMap.get(asset.tokenId) ?? new BigNumber(0);
+        assetMap.set(
+          asset.tokenId,
+          currentVal.plus(asset.amount)
+        );
+      }
+    }
     return {
-      sum: result.toString()
+      sum: sum.toString(),
+      assets: Array.from(assetMap.entries()).map(entry => ({
+        tokenId: entry[0],
+        amount: entry[1].toString(),
+      })),
     };
   };
 }
@@ -499,6 +517,7 @@ function getByronInputs(
         id: input.id + input.index,
         index: input.index,
         txHash: input.id,
+        assets: pointedOutput.assets,
       });
     } else {
       throw new Error(`${nameof(getByronInputs)} unexpected type ${addressKind}`);
@@ -521,10 +540,14 @@ export function toRemoteByronTx(
   const outputs = [];
   for (let i = 0; i < wasmOutputs.len(); i++) {
     const output = wasmOutputs.get(i);
+    const value = output.amount();
+
+    const assets = parseTokenList(value.multiasset());
 
     outputs.push({
       address: toHexOrBase58(output.address()),
-      amount: output.amount().coin().to_str(),
+      amount: value.coin().to_str(),
+      assets
     });
   }
 

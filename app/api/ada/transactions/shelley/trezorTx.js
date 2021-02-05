@@ -40,17 +40,17 @@ export async function createTrezorSignTxPayload(
   byronNetworkMagic: number,
   networkId: number,
 ): Promise<$Exact<CardanoSignTransaction>> {
-  const txBody = signRequest.signRequest.unsignedTx.build();
+  const txBody = signRequest.unsignedTx.build();
 
   // Inputs
   const trezorInputs = _transformToTrezorInputs(
-    signRequest.signRequest.senderUtxos
+    signRequest.senderUtxos
   );
 
   // Output
   const trezorOutputs = _generateTrezorOutputs(
     txBody.outputs(),
-    signRequest.signRequest.changeAddr
+    signRequest.changeAddr
   );
 
   let request = {
@@ -72,7 +72,7 @@ export async function createTrezorSignTxPayload(
 
     // assume the withdrawal is the same path as the UTXOs being spent
     // so just take the first UTXO arbitrarily and change it to the staking key path
-    const firstUtxo = signRequest.signRequest.senderUtxos[0];
+    const firstUtxo = signRequest.senderUtxos[0];
     if (firstUtxo.addressing.startLevel !== Bip44DerivationLevels.PURPOSE.level) {
       throw new Error(`${nameof(createTrezorSignTxPayload)} unexpected addressing start level`);
     }
@@ -189,16 +189,16 @@ function toTrezorTokenBundle(
   if (assets == null) return Object.freeze({});
 
   const assetGroup: Array<CardanoAssetGroup> = [];
-  const hashes = assets.keys();
-  for (let i = 0; i < hashes.len(); i++) {
-    const policyId = hashes.get(i);
+  const policyHashes = assets.keys();
+  for (let i = 0; i < policyHashes.len(); i++) {
+    const policyId = policyHashes.get(i);
     const assetsForPolicy = assets.get(policyId);
     if (assetsForPolicy == null) continue;
 
     const tokenAmounts: Array<CardanoToken> = [];
-    const policies = assetsForPolicy.keys();
-    for (let j = 0; j < policies.len(); j++) {
-      const assetName = policies.get(j);
+    const assetNames = assetsForPolicy.keys();
+    for (let j = 0; j < assetNames.len(); j++) {
+      const assetName = assetNames.get(j);
       const amount = assetsForPolicy.get(assetName);
       if (amount == null) continue;
 

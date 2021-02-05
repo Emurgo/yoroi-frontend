@@ -13,7 +13,7 @@ import {
   sendAllUnsignedTx,
   signTransaction,
 } from '../shelley/transactions';
-import type { CardanoAddressedUtxo, BaseSignRequest } from '../types';
+import type { CardanoAddressedUtxo } from '../types';
 import type {
   TransferTx
 } from '../../../../types/TransferTypes';
@@ -90,12 +90,8 @@ export async function buildYoroiTransferTx(payload: {|
 
     // sign inputs
     const signedTx = signTransaction(
-      ({
-        senderUtxos: unsignedTxResponse.senderUtxos,
-        unsignedTx: unsignedTxResponse.txBuilder,
-        changeAddr: unsignedTxResponse.changeAddr,
-        certificate: undefined,
-      }: BaseSignRequest<RustModule.WalletV4.TransactionBuilder>),
+      unsignedTxResponse.senderUtxos,
+      unsignedTxResponse.txBuilder,
       payload.keyLevel,
       payload.signingKey,
       new Set(),

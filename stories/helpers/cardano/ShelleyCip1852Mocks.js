@@ -320,6 +320,7 @@ export const genTentativeShelleyTx = (
     tx_hash: '6930f123df83e4178b0324ae617b2028c0b38c6ff4660583a2abf1f7b08195fe',
     tx_index: 0,
     utxo_id: '6930f123df83e4178b0324ae617b2028c0b38c6ff4660583a2abf1f7b08195fe0',
+    assets: [],
   };
   const txBuilder = RustModule.WalletV4.TransactionBuilder.new(
     RustModule.WalletV4.LinearFee.new(
@@ -357,31 +358,28 @@ export const genTentativeShelleyTx = (
   txBuilder.set_ttl(5);
 
   return {
-    tentativeTx: new HaskellShelleyTxSignRequest(
-      {
-        senderUtxos: [{
-          ...remoteUnspentUtxo,
-          addressing: {
-            path: [],
-            startLevel: 0,
-          },
-        }],
-        unsignedTx: txBuilder,
-        changeAddr: [],
-        certificate: undefined,
-      },
-      undefined,
-      {
+    tentativeTx: new HaskellShelleyTxSignRequest({
+      senderUtxos: [{
+        ...remoteUnspentUtxo,
+        addressing: {
+          path: [],
+          startLevel: 0,
+        },
+      }],
+      unsignedTx: txBuilder,
+      changeAddr: [],
+      metadata: undefined,
+      networkSettingSnapshot: {
         ChainNetworkId: Number.parseInt(config.ChainNetworkId, 10),
         KeyDeposit: new BigNumber(config.KeyDeposit),
         PoolDeposit: new BigNumber(config.PoolDeposit),
         NetworkId: publicDeriver.getParent().getNetworkInfo().NetworkId,
       },
-      {
+      neededStakingKeyHashes: {
         neededHashes: new Set(),
         wits: new Set(),
       },
-    ),
+    }),
     inputAmount,
     fee,
   };
@@ -404,6 +402,7 @@ export const genWithdrawalTx = (
     tx_hash: '6930f123df83e4178b0324ae617b2028c0b38c6ff4660583a2abf1f7b08195fe',
     tx_index: 0,
     utxo_id: '6930f123df83e4178b0324ae617b2028c0b38c6ff4660583a2abf1f7b08195fe0',
+    assets: [],
   };
   const txBuilder = RustModule.WalletV4.TransactionBuilder.new(
     RustModule.WalletV4.LinearFee.new(
@@ -466,8 +465,7 @@ export const genWithdrawalTx = (
 
   const baseConfig = getCardanoHaskellBaseConfig(publicDeriver.getParent().getNetworkInfo())
     .reduce((acc, next) => Object.assign(acc, next), {});
-  return new HaskellShelleyTxSignRequest(
-    {
+  return new HaskellShelleyTxSignRequest({
       senderUtxos: [{
         ...remoteUnspentUtxo,
         addressing: {
@@ -477,20 +475,18 @@ export const genWithdrawalTx = (
       }],
       unsignedTx: txBuilder,
       changeAddr: [],
-      certificate: undefined,
-    },
-    undefined,
-    {
-      ChainNetworkId: Number.parseInt(baseConfig.ChainNetworkId, 10),
-      PoolDeposit: new BigNumber(baseConfig.PoolDeposit),
-      KeyDeposit: new BigNumber(baseConfig.KeyDeposit),
-      NetworkId: publicDeriver.getParent().getNetworkInfo().NetworkId,
-    },
-    {
-      neededHashes: new Set([Buffer.from(rewardAddr.payment_cred().to_bytes()).toString('hex')]),
-      wits: new Set(), // TODO: should be present, but probably doesn't matter for UI tests
-    },
-  );
+      metadata: undefined,
+      networkSettingSnapshot: {
+        ChainNetworkId: Number.parseInt(baseConfig.ChainNetworkId, 10),
+        PoolDeposit: new BigNumber(baseConfig.PoolDeposit),
+        KeyDeposit: new BigNumber(baseConfig.KeyDeposit),
+        NetworkId: publicDeriver.getParent().getNetworkInfo().NetworkId,
+      },
+      neededStakingKeyHashes: {
+        neededHashes: new Set([Buffer.from(rewardAddr.payment_cred().to_bytes()).toString('hex')]),
+        wits: new Set(), // TODO: should be present, but probably doesn't matter for UI tests
+      },
+  });
 };
 
 // not an exact voting transaction but enough for storybook UI
@@ -527,6 +523,7 @@ export const genVotingShelleyTx = (
     tx_hash: '6930f123df83e4178b0324ae617b2028c0b38c6ff4660583a2abf1f7b08195fe',
     tx_index: 0,
     utxo_id: '6930f123df83e4178b0324ae617b2028c0b38c6ff4660583a2abf1f7b08195fe0',
+    assets: [],
   };
   const txBuilder = RustModule.WalletV4.TransactionBuilder.new(
     RustModule.WalletV4.LinearFee.new(
@@ -563,29 +560,26 @@ export const genVotingShelleyTx = (
   txBuilder.set_fee(RustModule.WalletV4.BigNum.from_str(fee.getDefault().toString()));
   txBuilder.set_ttl(5);
 
-  return new HaskellShelleyTxSignRequest(
-      {
-        senderUtxos: [{
-          ...remoteUnspentUtxo,
-          addressing: {
-            path: [],
-            startLevel: 0,
-          },
-        }],
-        unsignedTx: txBuilder,
-        changeAddr: [],
-        certificate: undefined,
+  return new HaskellShelleyTxSignRequest({
+    senderUtxos: [{
+      ...remoteUnspentUtxo,
+      addressing: {
+        path: [],
+        startLevel: 0,
       },
-      undefined,
-      {
-        ChainNetworkId: Number.parseInt(config.ChainNetworkId, 10),
-        KeyDeposit: new BigNumber(config.KeyDeposit),
-        PoolDeposit: new BigNumber(config.PoolDeposit),
-        NetworkId: publicDeriver.getParent().getNetworkInfo().NetworkId,
-      },
-      {
-        neededHashes: new Set(),
-        wits: new Set(),
-      },
-    );
+    }],
+    unsignedTx: txBuilder,
+    changeAddr: [],
+    metadata: undefined,
+    networkSettingSnapshot: {
+      ChainNetworkId: Number.parseInt(config.ChainNetworkId, 10),
+      KeyDeposit: new BigNumber(config.KeyDeposit),
+      PoolDeposit: new BigNumber(config.PoolDeposit),
+      NetworkId: publicDeriver.getParent().getNetworkInfo().NetworkId,
+    },
+    neededStakingKeyHashes: {
+      neededHashes: new Set(),
+      wits: new Set(),
+    },
+  });
 };

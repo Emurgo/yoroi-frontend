@@ -140,7 +140,15 @@ export class RemoteFetcher implements IFetcher {
           'yoroi-locale': this.getCurrentLocale()
         }
       }
-    ).then(response => response.data)
+    ).then(response => {
+      const result: UtxoSumResponse = response.data;
+      if (result.assets == null) {
+        // replace non-existent w/ empty array to handle Allegra -> Mary transition
+        // $FlowExpectedError[cannot-write]
+        result.assets = [];
+      }
+      return result;
+    })
       .catch((error) => {
         Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getUTXOsSumsForAddresses)} error: ` + stringifyError(error));
         throw new GetUtxosSumsForAddressesApiError();

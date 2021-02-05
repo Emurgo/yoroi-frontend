@@ -80,7 +80,8 @@ const networkTransactions: number => Array<RemoteTransaction> = (purpose) => [{
       amount: '4000000',
       id: '9c8d3c4fe576f8c99d8ad6ba5d889f5a9f2d7fe07dc17b3f425f5d17696f3d190',
       index: 0,
-      txHash: '9c8d3c4fe576f8c99d8ad6ba5d889f5a9f2d7fe07dc17b3f425f5d17696f3d19'
+      txHash: '9c8d3c4fe576f8c99d8ad6ba5d889f5a9f2d7fe07dc17b3f425f5d17696f3d19',
+      assets: [],
     }
   ],
   outputs: [
@@ -96,7 +97,8 @@ const networkTransactions: number => Array<RemoteTransaction> = (purpose) => [{
           7
         ]
       ),
-      amount: '3800000'
+      amount: '3800000',
+      assets: [],
     },
   ]
 },
@@ -126,7 +128,8 @@ const networkTransactions: number => Array<RemoteTransaction> = (purpose) => [{
       amount: '4000000',
       id: '9c8d3c4fe576f8c99d8ad6ba5d889f5a9f2d7fe07dc17b3f425f5d17696f3d200',
       index: 0,
-      txHash: '9c8d3c4fe576f8c99d8ad6ba5d889f5a9f2d7fe07dc17b3f425f5d17696f3d20'
+      txHash: '9c8d3c4fe576f8c99d8ad6ba5d889f5a9f2d7fe07dc17b3f425f5d17696f3d20',
+      assets: [],
     }
   ],
   outputs: [
@@ -142,7 +145,8 @@ const networkTransactions: number => Array<RemoteTransaction> = (purpose) => [{
           4
         ]
       ),
-      amount: '2100000'
+      amount: '2100000',
+      assets: [],
     },
     {
       // Ae2tdPwUPEZGLVbFwK5EnWiFxwWwLjVtV3CNzy7Hu7tB5nqFxS31uGjjhoc
@@ -156,7 +160,8 @@ const networkTransactions: number => Array<RemoteTransaction> = (purpose) => [{
           0
         ]
       ),
-      amount: '2700000'
+      amount: '2700000',
+      assets: [],
     }
   ]
 }];

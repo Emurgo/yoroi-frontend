@@ -5,7 +5,6 @@ import { schema } from 'lovefield';
 import BigNumber from 'bignumber.js';
 import type {
   CardanoAddressedUtxo,
-  BaseSignRequest,
 } from '../types';
 import type { RemoteUnspentOutput } from '../../lib/state-fetch/types';
 import {
@@ -52,6 +51,7 @@ const genSampleUtxos: void => Array<RemoteUnspentOutput> = () => [
     tx_hash: '05ec4a4a7f4645fa66886cef2e34706907a3a7f9d88e0d48b313ad2cdf76fb5f',
     tx_index: 0,
     utxo_id: '05ec4a4a7f4645fa66886cef2e34706907a3a7f9d88e0d48b313ad2cdf76fb5f0',
+    assets: [],
   },
   {
     amount: '1000001',
@@ -59,6 +59,7 @@ const genSampleUtxos: void => Array<RemoteUnspentOutput> = () => [
     tx_hash: '6930f123df83e4178b0324ae617b2028c0b38c6ff4660583a2abf1f7b08195fe',
     tx_index: 0,
     utxo_id: '6930f123df83e4178b0324ae617b2028c0b38c6ff4660583a2abf1f7b08195fe0',
+    assets: [],
   },
   {
     amount: '10000001',
@@ -66,6 +67,7 @@ const genSampleUtxos: void => Array<RemoteUnspentOutput> = () => [
     tx_hash: '0df0273e382739f8b4ae3783d81168093e78e0b48ec2c5430ff03d444806a173',
     tx_index: 0,
     utxo_id: '0df0273e382739f8b4ae3783d81168093e78e0b48ec2c5430ff03d444806a1730',
+    assets: [],
   },
   {
     amount: '30000000',
@@ -76,6 +78,7 @@ const genSampleUtxos: void => Array<RemoteUnspentOutput> = () => [
     tx_hash: '86e36b6a65d82c9dcc0370b0ee3953aee579db0b837753306405c28a74de5550',
     tx_index: 0,
     utxo_id: '86e36b6a65d82c9dcc0370b0ee3953aee579db0b837753306405c28a74de55500',
+    assets: [],
   },
 ];
 
@@ -374,12 +377,6 @@ describe('Create signed transactions', () => {
       [],
       true,
     );
-    const signRequest: BaseSignRequest<RustModule.WalletV4.TransactionBuilder> = {
-      changeAddr: unsignedTxResponse.changeAddr,
-      senderUtxos: unsignedTxResponse.senderUtxos,
-      unsignedTx: unsignedTxResponse.txBuilder,
-      certificate: undefined,
-    };
 
     const accountPrivateKey = RustModule.WalletV4.Bip32PrivateKey.from_bytes(
       Buffer.from(
@@ -388,7 +385,8 @@ describe('Create signed transactions', () => {
       ),
     );
     const signedTx = signTransaction(
-      signRequest,
+      unsignedTxResponse.senderUtxos,
+      unsignedTxResponse.txBuilder,
       Bip44DerivationLevels.ACCOUNT.level,
       accountPrivateKey,
       new Set(),
@@ -440,9 +438,9 @@ describe('Create signed transactions', () => {
       RustModule.WalletV4.BigNum.from_str('1000'),
       0,
     );
-    const signRequest: BaseSignRequest<RustModule.WalletV4.TransactionBody> = {
-      changeAddr: [],
-      senderUtxos: [
+
+    const signedTx = signTransaction(
+      [
         {
           amount: '7001',
           receiver: byronAddrToHex('Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4'),
@@ -452,7 +450,8 @@ describe('Create signed transactions', () => {
           addressing: {
             path: [WalletTypePurpose.BIP44, CoinTypes.CARDANO, HARD_DERIVATION_START + 0, 0, 135],
             startLevel: 1
-          }
+          },
+          assets: [],
         },
         {
           amount: '1000001',
@@ -463,15 +462,11 @@ describe('Create signed transactions', () => {
           addressing: {
             path: [WalletTypePurpose.BIP44, CoinTypes.CARDANO, HARD_DERIVATION_START + 0, 0, 135],
             startLevel: 1
-          }
+          },
+          assets: [],
         }
       ],
-      unsignedTx: txBody,
-      certificate: undefined,
-    };
-
-    const signedTx = signTransaction(
-      signRequest,
+      txBody,
       Bip44DerivationLevels.ACCOUNT.level,
       accountPrivateKey,
       new Set(),
@@ -525,20 +520,15 @@ describe('Create signed transactions', () => {
       [],
       true,
     );
-    const signRequest: BaseSignRequest<RustModule.WalletV4.TransactionBuilder> = {
-      changeAddr: unsignedTxResponse.changeAddr,
-      senderUtxos: unsignedTxResponse.senderUtxos,
-      unsignedTx: unsignedTxResponse.txBuilder,
-      certificate: undefined,
-    };
     const signedTx = signTransaction(
-      signRequest,
+      unsignedTxResponse.senderUtxos,
+      unsignedTxResponse.txBuilder,
       Bip44DerivationLevels.ACCOUNT.level,
       accountPrivateKey,
       new Set([Buffer.from(
         RustModule.WalletV4.make_vkey_witness(
           RustModule.WalletV4.hash_transaction(
-            signRequest.unsignedTx.build()
+            unsignedTxResponse.txBuilder.build()
           ),
           stakingKey,
         ).to_bytes()
@@ -605,20 +595,15 @@ describe('Create signed transactions', () => {
       }],
       true,
     );
-    const signRequest: BaseSignRequest<RustModule.WalletV4.TransactionBuilder> = {
-      changeAddr: unsignedTxResponse.changeAddr,
-      senderUtxos: unsignedTxResponse.senderUtxos,
-      unsignedTx: unsignedTxResponse.txBuilder,
-      certificate: undefined,
-    };
     const signedTx = signTransaction(
-      signRequest,
+      unsignedTxResponse.senderUtxos,
+      unsignedTxResponse.txBuilder,
       Bip44DerivationLevels.ACCOUNT.level,
       accountPrivateKey,
       new Set([Buffer.from(
         RustModule.WalletV4.make_vkey_witness(
           RustModule.WalletV4.hash_transaction(
-            signRequest.unsignedTx.build()
+            unsignedTxResponse.txBuilder.build()
           ),
           stakingKey,
         ).to_bytes()

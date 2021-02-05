@@ -37,18 +37,18 @@ export async function createLedgerSignTxPayload(request: {|
   networkId: number,
   addressingMap: string => (void | $PropertyType<Addressing, 'addressing'>),
 |}): Promise<SignTransactionRequest> {
-  const txBody = request.signRequest.signRequest.unsignedTx.build();
+  const txBody = request.signRequest.unsignedTx.build();
 
   // Inputs
   const ledgerInputs = _transformToLedgerInputs(
-    request.signRequest.signRequest.senderUtxos
+    request.signRequest.senderUtxos
   );
 
   // Output
   const ledgerOutputs = _transformToLedgerOutputs({
     networkId: request.networkId,
     txOutputs: txBody.outputs(),
-    changeAddrs: request.signRequest.signRequest.changeAddr,
+    changeAddrs: request.signRequest.changeAddr,
     addressingMap: request.addressingMap,
   });
 

@@ -3,6 +3,7 @@ import { groupBy, keyBy, mapValues } from 'lodash';
 import BigNumber from 'bignumber.js';
 import type {
   UserAnnotation,
+  CardanoAddressedUtxo,
 } from './types';
 import type {
   RemoteUnspentOutput,
@@ -31,6 +32,7 @@ import {
 } from '../../../config/numbersConfig';
 import type {
   Addressing,
+  IGetAllUtxosResponse,
 } from '../lib/storage/models/PublicDeriver/interfaces';
 import {
   Bip44DerivationLevels,
@@ -43,6 +45,7 @@ import type {
   DefaultTokenEntry,
 } from '../../common/lib/MultiToken';
 import { RustModule } from '../lib/cardanoCrypto/rustLoader';
+import { PRIMARY_ASSET_CONSTANTS } from '../lib/storage/database/primitives/enums';
 
 export function cardanoAssetToIdentifier(
   policyId: RustModule.WalletV4.ScriptHash,
@@ -65,12 +68,15 @@ export function identifierToCardanoAsset(
   };
 }
 
-export function addCardanoAssets(
-  tokens: MultiToken,
-  defaults: DefaultTokenEntry,
+export function parseTokenList(
   assets: void | RustModule.WalletV4.MultiAsset,
-): MultiToken {
-  if (assets == null) return tokens;
+): Array<{|
+  tokenId: string,
+  amount: string,
+|}> {
+  if (assets == null) return [];
+
+  const result = [];
   const hashes = assets.keys();
   for (let i = 0; i < hashes.len(); i++) {
     const policyId = hashes.get(i);
@@ -83,21 +89,22 @@ export function addCardanoAssets(
       const amount = assetsForPolicy.get(assetName);
       if (amount == null) continue;
 
-      tokens.add({
-        amount: new BigNumber(amount.to_str()),
-        identifier: cardanoAssetToIdentifier(policyId, assetName),
-        networkId: defaults.defaultNetworkId,
+      result.push({
+        amount: amount.to_str(),
+        tokenId: cardanoAssetToIdentifier(policyId, assetName),
       });
     }
   }
-  return tokens;
+  return result;
 }
+
 export function cardanoValueFromMultiToken(
   tokens: MultiToken,
 ): RustModule.WalletV4.Value {
   const value = RustModule.WalletV4.Value.new(
     RustModule.WalletV4.BigNum.from_str(tokens.getDefaultEntry().amount.toString())
   );
+  // recall: primary asset counts towards size
   if (tokens.size() === 1) return value;
 
   const assets = RustModule.WalletV4.MultiAsset.new();
@@ -126,12 +133,39 @@ export function multiTokenFromCardanoValue(
     identifier: defaults.defaultIdentifier,
     networkId: defaults.defaultNetworkId,
   });
-  addCardanoAssets(
-    multiToken,
-    defaults,
-    value.multiasset()
-  );
+
+  for (const token of parseTokenList(value.multiasset())) {
+    multiToken.add({
+      amount: new BigNumber(token.amount),
+      identifier: token.tokenId,
+      networkId: defaults.defaultNetworkId,
+    });
+  }
   return multiToken;
+}
+export function cardanoValueFromRemoteFormat(
+  utxo: RemoteUnspentOutput,
+): RustModule.WalletV4.Value {
+  const value = RustModule.WalletV4.Value.new(
+    RustModule.WalletV4.BigNum.from_str(utxo.amount)
+  );
+  if (utxo.assets.length === 0) return value;
+
+  const assets = RustModule.WalletV4.MultiAsset.new();
+  for (const entry of tokens.nonDefaultEntries()) {
+    const { policyId, name } = identifierToCardanoAsset(entry.identifier);
+
+    const policyContent = assets.get(policyId) ?? RustModule.WalletV4.Assets.new();
+
+    policyContent.insert(
+      name,
+      RustModule.WalletV4.BigNum.from_str(entry.amount.toString())
+    );
+    // recall: we always have to insert since WASM returns copies of objects
+    assets.insert(policyId, policyContent);
+  }
+  value.set_multiasset(assets);
+  return value;
 }
 
 export function getFromUserPerspective(data: {|
@@ -309,4 +343,38 @@ export function verifyFromBip44Root(request: $ReadOnly<{|
   if (lastLevelSpecified !== Bip44DerivationLevels.ADDRESS.level) {
     throw new Error(`${nameof(verifyFromBip44Root)} incorrect addressing size`);
   }
+}
+
+export function asAddressedUtxo(
+  utxos: IGetAllUtxosResponse,
+): Array<CardanoAddressedUtxo> {
+  return utxos.map(utxo => {
+    const tokenTypes = utxo.output.tokens.reduce(
+      (acc, next) => {
+        if (next.Token.Identifier === PRIMARY_ASSET_CONSTANTS.Cardano) {
+          acc.amount = acc.amount.plus(next.TokenList.Amount);
+        } else {
+          acc.tokens.push({
+            amount: next.TokenList.Amount,
+            tokenId: next.Token.Identifier,
+          });
+        }
+        return acc;
+      },
+      {
+        amount: new BigNumber(0),
+        tokens: [],
+      }
+    );
+
+    return {
+      amount: tokenTypes.amount.toString(),
+      receiver: utxo.address,
+      tx_hash: utxo.output.Transaction.Hash,
+      tx_index: utxo.output.UtxoTransactionOutput.OutputIndex,
+      utxo_id: utxo.output.Transaction.Hash + utxo.output.UtxoTransactionOutput.OutputIndex,
+      addressing: utxo.addressing,
+      assets: tokenTypes.tokens,
+    };
+  });
 }

@@ -72,7 +72,8 @@ const networkTransactions: number => Array<RemoteTransaction> = (purpose) => [{
       amount: '4000000',
       id: '9c8d3c4fe576f8c99d8ad6ba5d889f5a9f2d7fe07dc17b3f425f5d17696f3d200',
       index: 0,
-      txHash: '9c8d3c4fe576f8c99d8ad6ba5d889f5a9f2d7fe07dc17b3f425f5d17696f3d20'
+      txHash: '9c8d3c4fe576f8c99d8ad6ba5d889f5a9f2d7fe07dc17b3f425f5d17696f3d20',
+      assets: [],
     }
   ],
   outputs: [
@@ -88,7 +89,8 @@ const networkTransactions: number => Array<RemoteTransaction> = (purpose) => [{
           4
         ]
       ),
-      amount: '2100000'
+      amount: '2100000',
+      assets: [],
     },
     {
       // 'Ae2tdPwUPEZE9RAm3d3zuuh22YjqDxhR1JF6G93uJsRrk51QGHzRUzLvDjL'
@@ -102,7 +104,8 @@ const networkTransactions: number => Array<RemoteTransaction> = (purpose) => [{
           12
         ]
       ),
-      amount: '1731391'
+      amount: '1731391',
+      assets: [],
     }
   ],
 }];
@@ -134,7 +137,8 @@ const nextRegularSpend: number => RemoteTransaction = (purpose) => ({
       amount: '2100000',
       id: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed5450',
       index: 0,
-      txHash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed545'
+      txHash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed545',
+      assets: [],
     }
   ],
   outputs: [
@@ -150,7 +154,8 @@ const nextRegularSpend: number => RemoteTransaction = (purpose) => ({
           0
         ]
       ),
-      amount: '1100000'
+      amount: '1100000',
+      assets: [],
     },
     {
       // Ae2tdPwUPEYxsngJhnW49jrmGuaCvQK34Hqrnx5w5SWxgfjDkSDcnrRdT5G
@@ -164,7 +169,8 @@ const nextRegularSpend: number => RemoteTransaction = (purpose) => ({
           19
         ]
       ),
-      amount: '900000'
+      amount: '900000',
+      assets: [],
     },
     {
       // TODO: find address
@@ -178,7 +184,8 @@ const nextRegularSpend: number => RemoteTransaction = (purpose) => ({
           19
         ]
       ),
-      amount: '900000'
+      amount: '900000',
+      assets: [],
     }
   ],
   type: 'shelley',
