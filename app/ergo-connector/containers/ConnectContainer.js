@@ -51,14 +51,14 @@ export default class ConnectContainer extends Component<Props, State> {
     this.setState({ selected: index });
   };
 
-  handleAllChecked: () => void = () => {};
-
   onConnect(walletIndex: number) {
     chrome.storage.local.get('connector_whitelist', async result => {
+      console.log(walletIndex, result);
       const whitelist = Object.keys(result).length === 0 ? [] : result.connector_whitelist;
       whitelist.push({ url: chromeMessage.url, walletIndex });
       chrome.storage.local.set({ connector_whitelist: whitelist });
     });
+
     chrome.runtime.sendMessage({
       type: 'connect_response',
       accepted: true,
@@ -79,9 +79,9 @@ export default class ConnectContainer extends Component<Props, State> {
   handleSubmit: () => void = () => {
     const { accounts } = this.state;
     if (accounts) {
-      const walletIndex = accounts.findIndex(item => item.checked === true);
-      if (walletIndex >= 0) {
-        this.onConnect(walletIndex);
+      const { selected } = this.state;
+      if (selected >= 0) {
+        this.onConnect(selected);
       }
     }
   };

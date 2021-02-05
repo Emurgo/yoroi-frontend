@@ -1,6 +1,6 @@
 // @flow
 import { observable, action } from 'mobx';
-import ProfileStore from './toplevel/ProfileStore';
+import ProfileStore from '../../stores/toplevel/ProfileStore';
 import type { Api } from '../../api/index';
 import type { ActionsMap } from '../../actions/index';
 import ExplorerStore from '../../stores/toplevel/ExplorerStore';
@@ -26,7 +26,6 @@ const storeClasses = Object.freeze({
 export type StoresMap = {|
   profile: ProfileStore,
   stateFetchStore: StateFetchStore,
-  profile: ProfileStore,
   serverConnectionStore: ServerConnectionStore,
   uiDialogs: UiDialogsStore,
   uiNotifications: UiNotificationsStore,
