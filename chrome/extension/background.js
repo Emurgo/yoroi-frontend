@@ -30,6 +30,7 @@ import {
   connectorGetUsedAddresses,
   connectorGetUnusedAddresses
 } from './ergo-connector/api';
+import { GenericApiError } from '../../app/api/common/errors';
 
 /*::
 declare var chrome;
@@ -96,24 +97,28 @@ type ConnectedSite = {|
 const connectedSites: Map<number, ConnectedSite> = new Map();
 // chrome.storage.local.set({ connector_whitelist: [] });
 export async function getWalletsInfo(): Promise<AccountInfo[]> {
-  if (db == null) {
-    db = await loadLovefieldDB(schema.DataStoreType.INDEXED_DB);
-  }
-  const wallets = await getWallets({ db });
-  // information about each wallet to show to the user
-  const accounts = [];
-  for (const wallet of wallets) {
-    const conceptualInfo = await wallet.getParent().getFullConceptualWalletInfo();
-    // TODO: there's probably a better way to check for ERGO wallets?
-    if (conceptualInfo.NetworkId === 200) {
-      const balance = await connectorGetBalance(wallet, 'ERG');
-      accounts.push({
-        name: conceptualInfo.Name,
-        balance: balance.toString(),
-      });
+  try {
+    if (db == null) {
+      db = await loadLovefieldDB(schema.DataStoreType.INDEXED_DB);
     }
+    const wallets = await getWallets({ db });
+    // information about each wallet to show to the user
+    const accounts = [];
+    for (const wallet of wallets) {
+      const conceptualInfo = await wallet.getParent().getFullConceptualWalletInfo();
+      // TODO: there's probably a better way to check for ERGO wallets?
+      if (conceptualInfo.NetworkId === 200) {
+        const balance = await connectorGetBalance(wallet, 'ERG');
+        accounts.push({
+          name: conceptualInfo.Name,
+          balance: balance.toString(),
+        });
+      }
+    }
+    return accounts;
+  } catch (error) {
+    throw new GenericApiError();
   }
-  return accounts;
 }
 
 async function getSelectedWallet(tabId: number): Promise<PublicDeriver<>> {
