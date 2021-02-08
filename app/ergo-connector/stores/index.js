@@ -33,10 +33,9 @@ const stores: WithNullableFields<StoresMap> = observable({
 export default (action(
   (
     api: Api,
-      // $FlowFixMe[value-as-type]
-    actions: ActionsMap,
+    // $FlowFixMe[value-as-type]
+    actions: ActionsMap
   ): StoresMap => {
-
     const storeNames = Object.keys(storeClasses);
     storeNames.forEach(name => {
       if (stores[name]) stores[name].teardown();
@@ -54,4 +53,4 @@ export default (action(
     return loadedStores;
   }
   // $FlowFixMe[value-as-type]
-  ): (Api, ActionsMap) => StoresMap);
+): (Api, ActionsMap) => StoresMap);

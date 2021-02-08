@@ -105,6 +105,7 @@ class App extends Component<Props, State> {
   getContent: void => ?Node = () => {
     const { stores, actions, history } = this.props;
     if (this.state.crashed === true) {
+      // $FlowFixMe:
       return <CrashPage stores={stores} actions={actions} />;
     }
     return <Router history={history}>{Routes(stores, actions)}</Router>;

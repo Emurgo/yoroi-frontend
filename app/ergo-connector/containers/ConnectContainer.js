@@ -2,60 +2,41 @@
 import type { Node } from 'react';
 import React, { Component } from 'react';
 import ConnectPage from '../components/connect/ConnectPage';
-import { getWalletsInfo } from '../../../chrome/extension/background';
 import { observer } from 'mobx-react';
 import { ROUTES } from '../routes-config';
+import { computed } from 'mobx';
+import type { InjectedOrGeneratedConnector } from '../../types/injectedPropsType';
 
+type GeneratedData = typeof ConnectContainer.prototype.generated;
 declare var chrome;
-type Props = {|
-  history: Object,
-|};
 
 type State = {|
-  error: string,
-  loading: 'idle' | 'pending' | 'success' | 'rejected',
-  accounts: Array<Object>,
   selected: number,
 |};
 
-let chromeMessage;
-
-chrome.runtime.sendMessage({ type: 'connect_retrieve_data' }, function (response) {
-  if (response) {
-    chromeMessage = response;
-  }
-});
-
 @observer
-export default class ConnectContainer extends Component<Props, State> {
+export default class ConnectContainer extends Component<
+  InjectedOrGeneratedConnector<GeneratedData>,
+  State
+> {
   state: State = {
-    loading: 'idle',
-    error: '',
-    accounts: [],
     selected: -1,
   };
 
-  async componentDidMount() {
-    this.setState({ loading: 'pending' });
-    getWalletsInfo()
-      // eslint-disable-next-line promise/always-return
-      .then(data => {
-        this.setState({ loading: 'success', accounts: data });
-      })
-      .catch(err => {
-        this.setState({ loading: 'rejected', error: err.message });
-      });
+  componentDidMount() {
+    this.generated.actions.connector.getWallets.trigger();
   }
 
   onToggleCheckbox: (index: number) => void = index => {
     this.setState({ selected: index });
   };
 
-  onConnect(walletIndex: number) {
+  async onConnect(walletIndex: number) {
+    const chromeMessage = this.generated.stores.connector.connectingMessage;
+
     chrome.storage.local.get('connector_whitelist', async result => {
-      console.log(walletIndex, result);
       const whitelist = Object.keys(result).length === 0 ? [] : result.connector_whitelist;
-      whitelist.push({ url: chromeMessage.url, walletIndex });
+      whitelist.push({ url: chromeMessage?.url, walletIndex });
       chrome.storage.local.set({ connector_whitelist: whitelist });
     });
 
@@ -63,22 +44,27 @@ export default class ConnectContainer extends Component<Props, State> {
       type: 'connect_response',
       accepted: true,
       account: walletIndex,
-      tabId: chromeMessage.tabId,
+      tabId: chromeMessage?.tabId,
     });
-    this.props.history.push(ROUTES.DETAILS);
+
+    await this.generated.actions.connector.getConnectorWhitelist.trigger();
+    // $FlowFixMe:
+    this.props.history.push(ROUTES.CONNECTED_WEBSITES);
   }
 
   onCancel() {
+    const chromeMessage = this.generated.stores.connector.connectingMessage;
+
     chrome.runtime.sendMessage({
       type: 'connect_response',
       accepted: false,
-      tabId: chromeMessage.tabId,
+      tabId: chromeMessage?.tabId,
     });
   }
 
   handleSubmit: () => void = () => {
-    const { accounts } = this.state;
-    if (accounts) {
+    const wallets = this.generated.stores.connector.wallets;
+    if (wallets) {
       const { selected } = this.state;
       if (selected >= 0) {
         this.onConnect(selected);
@@ -87,14 +73,18 @@ export default class ConnectContainer extends Component<Props, State> {
   };
 
   render(): Node {
-    const { loading, accounts, selected, error } = this.state;
+    const { selected } = this.state;
+    const responseMessage = this.generated.stores.connector.connectingMessage;
+    const wallets = this.generated.stores.connector.wallets;
+    const error = this.generated.stores.connector.errorWallets;
+    const loadingWallets = this.generated.stores.connector.loadingWallets;
 
     return (
       <ConnectPage
-        loading={loading}
+        loading={loadingWallets}
         error={error}
-        message={chromeMessage}
-        accounts={accounts}
+        message={responseMessage}
+        accounts={wallets}
         onConnect={this.onConnect}
         onToggleCheckbox={this.onToggleCheckbox}
         onCancel={this.onCancel}
@@ -102,5 +92,54 @@ export default class ConnectContainer extends Component<Props, State> {
         selected={selected}
       />
     );
+  }
+
+  @computed get generated(): {|
+    actions: {|
+      connector: {|
+        getResponse: {|
+          trigger: (params: void) => Promise<void>,
+        |},
+        getWallets: {|
+          trigger: (params: void) => void,
+        |},
+        getConnectorWhitelist: {|
+          trigger: (params: void) => Promise<void>,
+        |},
+      |},
+    |},
+    stores: {|
+      connector: {|
+        connectingMessage: ?{| tabId: number, url: string |},
+        wallets: Array<any>,
+        errorWallets: string,
+        loadingWallets: 'idle' | 'pending' | 'success' | 'rejected',
+      |},
+    |},
+  |} {
+    if (this.props.generated !== undefined) {
+      return this.props.generated;
+    }
+    if (this.props.stores == null || this.props.actions == null) {
+      throw new Error(`${nameof(ConnectContainer)} no way to generated props`);
+    }
+    const { stores, actions } = this.props;
+    return Object.freeze({
+      stores: {
+        connector: {
+          connectingMessage: stores.connector.connectingMessage,
+          wallets: stores.connector.wallets,
+          errorWallets: stores.connector.errorWallets,
+          loadingWallets: stores.connector.loadingWallets,
+        },
+      },
+      actions: {
+        connector: {
+          getResponse: { trigger: actions.connector.getResponse.trigger },
+          getWallets: { trigger: actions.connector.getWallets.trigger },
+          getConnectorWhitelist: { trigger: actions.connector.getConnectorWhitelist.trigger },
+        },
+      },
+    });
   }
 }

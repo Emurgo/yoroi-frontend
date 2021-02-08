@@ -3,43 +3,100 @@
 import React, { Component } from 'react';
 import type { Node } from 'react';
 import ConnectWebsitesPage from '../components/connect-websites/ConnectWebsitesPage';
-import { getWalletsInfo } from '../../../chrome/extension/background';
+import { computed } from 'mobx';
+import { observer } from 'mobx-react';
+import LoadingSpinner from '../../components/widgets/LoadingSpinner';
+import type { InjectedOrGeneratedConnector } from '../../types/injectedPropsType';
 
-type Props = {||};
-type State = {| list: ?any |};
+type GeneratedData = typeof ConnectWebsitesContainer.prototype.generated;
 
-export default class ConnectWebsitesContainer extends Component<Props, State> {
-  state: State = {
-    list: [],
-  };
-
-  componentDidMount() {
-    window.chrome.storage.local.get('connector_whitelist', async result => {
-      const whitelist = Object.keys(result).length === 0 ? [] : result.connector_whitelist;
-      const accounts = await getWalletsInfo();
-      const list = [];
-      whitelist.forEach(({ url, walletIndex }) => {
-        list.push({
-          url,
-          wallet: accounts[walletIndex],
-        });
-      });
-      this.setState({ list });
-    });
+@observer
+export default class ConnectWebsitesContainer extends Component<
+  InjectedOrGeneratedConnector<GeneratedData>
+> {
+  async componentDidMount() {
+    this.generated.actions.connector.getWallets.trigger();
+    await this.generated.actions.connector.getConnectorWhitelist.trigger();
   }
 
   onRemoveWallet: string => void = url => {
-    window.chrome.storage.local.get('connector_whitelist', async result => {
-      const whitelist = Object.keys(result).length === 0 ? [] : result.connector_whitelist;
-      window.chrome.storage.local.set({
-        connector_whitelist: whitelist.filter(e => e.url !== url),
-      });
-      this.setState(prev => ({ list: prev.list?.filter(e => e.url !== url) }));
-    });
+    this.generated.actions.connector.removeWalletFromWhitelist.trigger(url);
   };
 
   render(): Node {
-    const { list } = this.state;
-    return <ConnectWebsitesPage accounts={list} onRemoveWallet={this.onRemoveWallet} />;
+    const wallets = this.generated.stores.connector.wallets;
+    const loadingWallets = this.generated.stores.connector.loadingWallets;
+    const error = this.generated.stores.connector.errorWallets;
+    const isLoading = loadingWallets === 'idle' || loadingWallets === 'pending';
+    const isSuccess = loadingWallets === 'success';
+    const isError = loadingWallets === 'rejected';
+
+    if (isLoading) {
+      return <LoadingSpinner />;
+    }
+    if (isError) {
+      return <p>{error}</p>;
+    }
+    if (isSuccess) {
+      return (
+        <ConnectWebsitesPage
+          accounts={this.generated.stores.connector.currentConnectorWhitelist}
+          wallets={wallets}
+          onRemoveWallet={this.onRemoveWallet}
+        />
+      );
+    }
+    return <></>;
+  }
+
+  @computed get generated(): {|
+    actions: {|
+      connector: {|
+        getWallets: {|
+          trigger: (params: void) => void,
+        |},
+        removeWalletFromWhitelist: {|
+          trigger: (params: string) => Promise<void>,
+        |},
+        getConnectorWhitelist: {|
+          trigger: (params: void) => Promise<void>,
+        |},
+      |},
+    |},
+    stores: {|
+      connector: {|
+        wallets: ?Array<any>,
+        currentConnectorWhitelist: ?Array<any>,
+        loadingWallets: 'idle' | 'pending' | 'success' | 'rejected',
+        errorWallets: string,
+      |},
+    |},
+  |} {
+    if (this.props.generated !== undefined) {
+      return this.props.generated;
+    }
+    if (this.props.stores == null || this.props.actions == null) {
+      throw new Error(`${nameof(ConnectWebsitesContainer)} no way to generated props`);
+    }
+    const { stores, actions } = this.props;
+    return Object.freeze({
+      stores: {
+        connector: {
+          wallets: stores.connector.wallets,
+          currentConnectorWhitelist: stores.connector.currentConnectorWhitelist,
+          loadingWallets: stores.connector.loadingWallets,
+          errorWallets: stores.connector.errorWallets,
+        },
+      },
+      actions: {
+        connector: {
+          getWallets: { trigger: actions.connector.getWallets.trigger },
+          removeWalletFromWhitelist: {
+            trigger: actions.connector.removeWalletFromWhitelist.trigger,
+          },
+          getConnectorWhitelist: { trigger: actions.connector.getConnectorWhitelist.trigger },
+        },
+      },
+    });
   }
 }
