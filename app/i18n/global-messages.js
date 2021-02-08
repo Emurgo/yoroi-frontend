@@ -770,6 +770,12 @@ export const memoMessages: * = defineMessages({
     defaultMessage: '!!!Memo (optional)',
   }
 });
+export const connectorMessages: * = defineMessages({
+  connectedWebsites: {
+    id: 'global.connector.connectedWebsites',
+    defaultMessage: '!!!Connected Websites',
+  },
+});
 
 
 export function listOfTranslators(
