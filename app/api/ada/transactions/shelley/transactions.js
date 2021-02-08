@@ -457,11 +457,11 @@ export function newAdaUnsignedTxFromUtxo(
           difference,
           protocolParams
         );
-        if (difference.coin().compare(minimumNeededForChange) >= 0) {
+        if (difference.coin().compare(minimumNeededForChange) < 0) {
           throw new NotEnoughMoneyToSendError();
         }
       }
-      if (!shouldForceChange && enoughInput) {
+      if (!shouldForceChange && !enoughInput) {
         throw new NotEnoughMoneyToSendError();
       }
     }

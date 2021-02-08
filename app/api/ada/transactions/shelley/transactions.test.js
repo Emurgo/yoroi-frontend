@@ -265,7 +265,8 @@ describe('Create unsigned TX from UTXO', () => {
       new BigNumber(0),
       {
         ...getProtocolParams(),
-        minimumUtxoVal: RustModule.WalletV4.BigNum.from_str('999000'),
+        // high enough that we can't send the remaining amount as change
+        minimumUtxoVal: RustModule.WalletV4.BigNum.from_str('999100'),
       },
       [],
       [],
@@ -348,10 +349,11 @@ describe('Create unsigned TX from UTXO', () => {
     );
     // input selection will only take 2 of the 3 inputs
     // it takes 2 inputs because input selection algorithm
+    const expectedFee = new BigNumber('1166');
     expect(unsignedTxResponse.senderUtxos).toEqual([utxos[0], utxos[1]]);
     expect(unsignedTxResponse.txBuilder.get_explicit_input().coin().to_str()).toEqual('1000702');
-    expect(unsignedTxResponse.txBuilder.get_explicit_output().coin().to_str()).toEqual('999528');
-    expect(unsignedTxResponse.txBuilder.min_fee().to_str()).toEqual('1166');
+    expect(unsignedTxResponse.txBuilder.get_explicit_output().coin().to_str()).toEqual('999536');
+    expect(unsignedTxResponse.txBuilder.min_fee().to_str()).toEqual(expectedFee.toString());
   });
 
   it('Should exclude inputs smaller than fee to include them', () => {
@@ -398,10 +400,11 @@ describe('Create unsigned TX from UTXO', () => {
     );
     // input selection will only take 2 of the 3 inputs
     // it takes 2 inputs because input selection algorithm
+    const expectedFee = new BigNumber('208994');
     expect(unsignedTxResponse.senderUtxos).toEqual([utxos[1]]);
     expect(unsignedTxResponse.txBuilder.get_explicit_input().coin().to_str()).toEqual('1000001');
-    expect(unsignedTxResponse.txBuilder.get_explicit_output().coin().to_str()).toEqual('788199');
-    expect(unsignedTxResponse.txBuilder.min_fee().to_str()).toEqual('208994');
+    expect(unsignedTxResponse.txBuilder.get_explicit_output().coin().to_str()).toEqual('791007');
+    expect(unsignedTxResponse.txBuilder.min_fee().to_str()).toEqual(expectedFee.toString());
   });
 });
 
@@ -735,7 +738,7 @@ describe('Create signed transactions', () => {
     const txBody = unsignedTxResponse.txBuilder.build();
     expect(txBody.withdrawals()?.len()).toEqual(1);
     const fee = txBody.fee().to_str();
-    expect(fee).toEqual('1310');
+    expect(fee).toEqual('1302');
     expect(txBody.outputs().len()).toEqual(1);
     expect(txBody.outputs().get(0).amount().coin().to_str()).toEqual(
       new BigNumber(addressedUtxos[3].amount)
@@ -752,8 +755,8 @@ describe('Create signed transactions', () => {
     ].sort();
 
     expect(witArray).toEqual([
-      '82582001c01f8b958699ae769a246e9785db5a70e023977ea4b856dfacf23c23346caf5840ed278dd61c950a8e8c8a5252dd028ac5ccde0571be351bd84e7d363071bb852ae803d5cd882036d3d6495a3a20078c3843c15be6c76236bc5f25f432acf3f108',
-      '82582038c14a0756e1743081a8ebfdb9169b11283a7bf6c38045c4c4a5e62a7689639d5840f533e0d1bad015c5b2f409309405c58ae27f5da6b38e24f3e7b92faba77dee0021865d6a2b70dcc3cb5b816469affd42f0aff83edf5c4773c861ee0255991f03',
+      '82582001c01f8b958699ae769a246e9785db5a70e023977ea4b856dfacf23c23346caf5840d684b2ee3f8959eb76024280903236edebb244e41c16bafca05d0a30669c7e9df19c3896002c976d8734e25a64d7273b5b58400102fffeb4f858a81f191c8204',
+      '82582038c14a0756e1743081a8ebfdb9169b11283a7bf6c38045c4c4a5e62a7689639d5840168146e19cf1074036b48b0ba6b26f9ff08cd2e6fa381f84480e9c8c9fb582a5c8d85062e62809143b1c0edc4b9412b5504f78f3de6413386a0088d302d2b301',
     ]);
   });
 });
