@@ -40,9 +40,16 @@ import {
 } from '../../../../config/numbersConfig';
 import {
   networks,
+  defaultAssets,
 } from '../../lib/storage/database/prepackaged/networks';
+import {
+  MultiToken,
+} from '../../../common/lib/MultiToken';
 
 const network = networks.CardanoMainnet;
+const defaultIdentifier = defaultAssets.filter(
+  asset => asset.NetworkId === network.NetworkId
+)[0].Identifier;
 
 const genSampleUtxos: void => Array<RemoteUnspentOutput> = () => [
   {
@@ -156,11 +163,24 @@ function getProtocolParams(): {|
 describe('Create unsigned TX from UTXO', () => {
   it('Should fail due to insufficient funds (bigger than all inputs)', () => {
     const sampleUtxos = genSampleUtxos();
+    const output = new MultiToken(
+      [{
+        // bigger than input including fees
+        amount: new BigNumber(1900001),
+        identifier: defaultIdentifier,
+        networkId: network.NetworkId,
+      }],
+      {
+        defaultIdentifier,
+        defaultNetworkId: network.NetworkId,
+      }
+    );
+
     const utxos: Array<RemoteUnspentOutput> = [sampleUtxos[1]];
     expect(() => newAdaUnsignedTxFromUtxo(
       [{
         address: byronAddrToHex('Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4'),
-        amount: '1900001', // bigger than input including fees
+        amount: output,
       }],
       undefined,
       utxos,
@@ -173,10 +193,23 @@ describe('Create unsigned TX from UTXO', () => {
   });
 
   it('Should fail due to insufficient funds (no inputs)', () => {
+    const output = new MultiToken(
+      [{
+        // bigger than input including fees
+        amount: new BigNumber(1),
+        identifier: defaultIdentifier,
+        networkId: network.NetworkId,
+      }],
+      {
+        defaultIdentifier,
+        defaultNetworkId: network.NetworkId,
+      }
+    );
+
     expect(() => newAdaUnsignedTxFromUtxo(
       [{
         address: byronAddrToHex('Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4'),
-        amount: '1', // bigger than input including fees
+        amount: output,
       }],
       undefined,
       [],
@@ -190,11 +223,24 @@ describe('Create unsigned TX from UTXO', () => {
 
   it('Should fail due to insufficient funds (not enough to cover fees)', () => {
     const sampleUtxos = genSampleUtxos();
+    const output = new MultiToken(
+      [{
+        // bigger than input including fees
+        amount: new BigNumber(1),
+        identifier: defaultIdentifier,
+        networkId: network.NetworkId,
+      }],
+      {
+        defaultIdentifier,
+        defaultNetworkId: network.NetworkId,
+      }
+    );
+
     const utxos: Array<RemoteUnspentOutput> = [sampleUtxos[0]];
     expect(() => newAdaUnsignedTxFromUtxo(
       [{
         address: byronAddrToHex('Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4'),
-        amount: '1', // bigger than input including fees
+        amount: output,
       }],
       undefined,
       utxos,
@@ -273,10 +319,24 @@ describe('Create unsigned TX from UTXO', () => {
   it('Should pick inputs when using input selection', () => {
     const utxos: Array<RemoteUnspentOutput> = genSampleUtxos();
     const sampleAdaAddresses = genSampleAdaAddresses();
+
+    const output = new MultiToken(
+      [{
+        // smaller than input
+        amount: new BigNumber(1001),
+        identifier: defaultIdentifier,
+        networkId: network.NetworkId,
+      }],
+      {
+        defaultIdentifier,
+        defaultNetworkId: network.NetworkId,
+      }
+    );
+
     const unsignedTxResponse = newAdaUnsignedTxFromUtxo(
       [{
         address: byronAddrToHex('Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4'),
-        amount: '1001', // smaller than input
+        amount: output,
       }],
       sampleAdaAddresses[0],
       utxos,
@@ -297,10 +357,24 @@ describe('Create unsigned TX from UTXO', () => {
   it('Should exclude inputs smaller than fee to include them', () => {
     const utxos: Array<RemoteUnspentOutput> = genSampleUtxos();
     const sampleAdaAddresses = genSampleAdaAddresses();
+
+    const output = new MultiToken(
+      [{
+        // smaller than input
+        amount: new BigNumber(1001),
+        identifier: defaultIdentifier,
+        networkId: network.NetworkId,
+      }],
+      {
+        defaultIdentifier,
+        defaultNetworkId: network.NetworkId,
+      }
+    );
+
     const unsignedTxResponse = newAdaUnsignedTxFromUtxo(
       [{
         address: byronAddrToHex('Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4'),
-        amount: '1001', // smaller than input
+        amount: output,
       }],
       sampleAdaAddresses[0],
       [utxos[0], utxos[1]],
@@ -334,10 +408,23 @@ describe('Create unsigned TX from UTXO', () => {
 describe('Create unsigned TX from addresses', () => {
   it('Should create a valid transaction without selection', () => {
     const addressedUtxos = genAddressedUtxos();
+
+    const output = new MultiToken(
+      [{
+        // smaller than input
+        amount: new BigNumber(5001),
+        identifier: defaultIdentifier,
+        networkId: network.NetworkId,
+      }],
+      {
+        defaultIdentifier,
+        defaultNetworkId: network.NetworkId,
+      }
+    );
     const unsignedTxResponse = newAdaUnsignedTx(
       [{
         address: byronAddrToHex('Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4'),
-        amount: '5001', // smaller than input
+        amount: output,
       }],
       undefined,
       [addressedUtxos[0], addressedUtxos[1]],
@@ -364,10 +451,23 @@ describe('Create unsigned TX from addresses', () => {
 describe('Create signed transactions', () => {
   it('Witness should match on valid private key', () => {
     const addressedUtxos = genAddressedUtxos();
+
+    const output = new MultiToken(
+      [{
+        // smaller than input
+        amount: new BigNumber(5001),
+        identifier: defaultIdentifier,
+        networkId: network.NetworkId,
+      }],
+      {
+        defaultIdentifier,
+        defaultNetworkId: network.NetworkId,
+      }
+    );
     const unsignedTxResponse = newAdaUnsignedTx(
       [{
         address: byronAddrToHex('Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4'),
-        amount: '5001', // smaller than input
+        amount: output,
       }],
       undefined,
       [addressedUtxos[0], addressedUtxos[1]],
@@ -495,10 +595,24 @@ describe('Create signed transactions', () => {
     const stakingKey = accountPrivateKey.derive(2).derive(STAKING_KEY_INDEX).to_raw_key();
 
     const addressedUtxos = genAddressedUtxos();
+
+    const output = new MultiToken(
+      [{
+        // smaller than input
+        amount: new BigNumber(5001),
+        identifier: defaultIdentifier,
+        networkId: network.NetworkId,
+      }],
+      {
+        defaultIdentifier,
+        defaultNetworkId: network.NetworkId,
+      }
+    );
+
     const unsignedTxResponse = newAdaUnsignedTx(
       [{
         address: byronAddrToHex('Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4'),
-        amount: '5001', // smaller than input
+        amount: output,
       }],
       undefined,
       [addressedUtxos[3]],

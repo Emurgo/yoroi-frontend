@@ -30,6 +30,11 @@ import {
   MultiToken,
 } from '../../../common/lib/MultiToken';
 import { PRIMARY_ASSET_CONSTANTS } from '../../lib/storage/database/primitives/enums';
+import {
+  cardanoValueFromRemoteFormat,
+  multiTokenFromCardanoValue,
+  cardanoValueFromMultiToken,
+} from '../utils';
 
 /**
  * based off what the cardano-wallet team found worked empirically
@@ -39,7 +44,7 @@ const defaultTtlOffset = 7200;
 
 type TxOutput = {|
   ...Address,
-  amount: string,
+  amount: MultiToken,
 |};
 
 export function sendAllUnsignedTx(
@@ -103,7 +108,7 @@ function addUtxoInput(
     throw new Error(`${nameof(addUtxoInput)} input not a valid Shelley address`);
   }
   const txInput = utxoToTxInput(input);
-  const wasmAmount = RustModule.WalletV4.BigNum.from_str(input.amount);
+  const wasmAmount = cardanoValueFromRemoteFormat(input);
 
   if (excludeIfSmall) {
     const feeForInput = new BigNumber(
@@ -187,21 +192,17 @@ export function sendAllUnsignedTxFromUtxo(
   const changeAddr = (() => {
     if (receiver.addressing== null) return [];
     const { addressing } = receiver;
-    const output = new MultiToken(
-      [{
-        identifier: PRIMARY_ASSET_CONSTANTS.Cardano,
-        amount: new BigNumber(txBuilder.get_explicit_output().to_str()),
-        networkId: protocolParams.networkId,
-      }],
-      {
-        defaultNetworkId: protocolParams.networkId,
-        defaultIdentifier: PRIMARY_ASSET_CONSTANTS.Cardano,
-      }
-    );
+
     return [{
       addressing,
       address: receiver.address,
-      values: output,
+      values: multiTokenFromCardanoValue(
+        txBuilder.get_explicit_output(),
+        {
+          defaultNetworkId: protocolParams.networkId,
+          defaultIdentifier: PRIMARY_ASSET_CONSTANTS.Cardano,
+        }
+      ),
     }];
   })();
 
@@ -279,25 +280,24 @@ export function newAdaUnsignedTx(
 function getFeeForChange(
   txBuilder: RustModule.WalletV4.TransactionBuilder,
   changeAdaAddr: {| ...Address, ...Addressing |},
+  value: RustModule.WalletV4.Value,
   protocolParams: {
     linearFee: RustModule.WalletV4.LinearFee,
     minimumUtxoVal: RustModule.WalletV4.BigNum,
     ...,
   },
-): BigNumber {
+): RustModule.WalletV4.BigNum {
   const wasmChange = normalizeToAddress(changeAdaAddr.address);
   if (wasmChange == null) {
     throw new Error(`${nameof(getFeeForChange)} change not a valid Shelley address`);
   }
-  const feeForChange = txBuilder.fee_for_output(RustModule.WalletV4.TransactionOutput.new(
-    wasmChange,
-    // largest possible CBOR value
-    // note: this slightly over-estimates by a few bytes
-    RustModule.WalletV4.BigNum.from_str(0x1_00_00_00_00.toString()),
-  )).to_str();
-  const minimumNeededForChange = new BigNumber(feeForChange)
-    .plus(protocolParams.minimumUtxoVal.to_str());
-  return minimumNeededForChange;
+  const feeForChange = txBuilder
+    .fee_for_output(RustModule.WalletV4.TransactionOutput.new(
+      wasmChange,
+      value,
+    ))
+    .checked_add(protocolParams.minimumUtxoVal);
+  return feeForChange;
 }
 
 /**
@@ -380,7 +380,7 @@ export function newAdaUnsignedTxFromUtxo(
       txBuilder.add_output(
         RustModule.WalletV4.TransactionOutput.new(
           wasmReceiver,
-          RustModule.WalletV4.BigNum.from_str(output.amount),
+          cardanoValueFromMultiToken(output.amount),
         )
       );
     }
@@ -390,37 +390,45 @@ export function newAdaUnsignedTxFromUtxo(
   const usedUtxos: Array<RemoteUnspentOutput> = [];
   {
     // recall: we might have some implicit input to start with from deposit refunds
-    let currentInputSum = new BigNumber(txBuilder.get_explicit_input().to_str());
+    const implicitSum = txBuilder.get_implicit_input();
 
     // add utxos until we have enough to send the transaction
     for (const utxo of utxos) {
+      // TODO: need better input selection for this to get tokens included also
       const added = addUtxoInput(txBuilder, utxo, true);
       if (!added) continue;
 
       usedUtxos.push(utxo);
-      currentInputSum = currentInputSum.plus(utxo.amount);
+      const currentInputSum = txBuilder.get_explicit_input().checked_add(implicitSum);
 
       // need to recalculate each time because fee changes
-      const output = new BigNumber(
-        txBuilder
+      const output = txBuilder
           .get_explicit_output()
-          .checked_add(txBuilder.min_fee())
-          .checked_add(txBuilder.get_deposit())
-          .to_str()
-      );
+          .checked_add(RustModule.WalletV4.Value.new(txBuilder.min_fee()))
+          .checked_add(RustModule.WalletV4.Value.new(txBuilder.get_deposit()));
+
+      const compare = currentInputSum.compare(output);
+      const enoughInput = compare != null && compare >= 0;
 
       if (shouldForceChange) {
         if (changeAdaAddr == null) throw new NoOutputsError();
-        const minimumNeededForChange = getFeeForChange(
-          txBuilder,
-          changeAdaAddr,
-          protocolParams
-        );
-        if (currentInputSum.gte(minimumNeededForChange.plus(output))) {
-          break;
+
+        // if we have enough inputs to send output
+        // we now need to make sure we have enough inputs to add change
+        if (enoughInput) {
+          const difference = currentInputSum.checked_sub(output);
+          const minimumNeededForChange = getFeeForChange(
+            txBuilder,
+            changeAdaAddr,
+            difference,
+            protocolParams
+          );
+          if (difference.coin().compare(minimumNeededForChange) >= 0) {
+            break;
+          }
         }
       }
-      if (!shouldForceChange && currentInputSum.gte(output)) {
+      if (!shouldForceChange && enoughInput) {
         break;
       }
     }
@@ -429,25 +437,31 @@ export function newAdaUnsignedTxFromUtxo(
     }
     // check to see if we have enough balance in the wallet to cover the transaction
     {
-      const output = new BigNumber(
-        txBuilder
+       const currentInputSum = txBuilder.get_explicit_input().checked_add(implicitSum);
+
+      // need to recalculate each time because fee changes
+      const output = txBuilder
           .get_explicit_output()
-          .checked_add(txBuilder.min_fee())
-          .checked_add(txBuilder.get_deposit())
-          .to_str()
-      );
+          .checked_add(RustModule.WalletV4.Value.new(txBuilder.min_fee()))
+          .checked_add(RustModule.WalletV4.Value.new(txBuilder.get_deposit()));
+
+      const compare = currentInputSum.compare(output);
+      const enoughInput = compare != null && compare >= 0;
+
       if (shouldForceChange) {
         if (changeAdaAddr == null) throw new NoOutputsError();
+        const difference = currentInputSum.checked_sub(output);
         const minimumNeededForChange = getFeeForChange(
           txBuilder,
           changeAdaAddr,
+          difference,
           protocolParams
         );
-        if (currentInputSum.lt(minimumNeededForChange.plus(output))) {
+        if (difference.coin().compare(minimumNeededForChange) >= 0) {
           throw new NotEnoughMoneyToSendError();
         }
       }
-      if (!shouldForceChange && currentInputSum.lt(output)) {
+      if (!shouldForceChange && enoughInput) {
         throw new NotEnoughMoneyToSendError();
       }
     }
@@ -461,19 +475,16 @@ export function newAdaUnsignedTxFromUtxo(
       const totalInput = txBuilder.get_explicit_input().checked_add(txBuilder.get_implicit_input());
       const totalOutput = txBuilder.get_explicit_output();
       const deposit = txBuilder.get_deposit();
-      const difference = new BigNumber(
-        totalInput
-          .checked_sub(totalOutput)
-          .checked_sub(deposit)
-          .to_str()
-      );
-      const minFee = new BigNumber(txBuilder.min_fee().to_str());
-      if (difference.lt(minFee)) {
+      const difference = totalInput
+        .checked_sub(totalOutput)
+        .checked_sub(RustModule.WalletV4.Value.new(deposit));
+      const minFee = txBuilder.min_fee();
+      if (difference.coin().compare(minFee) < 0) {
         throw new NotEnoughMoneyToSendError();
       }
       // recall: min fee assumes the largest fee possible
       // so no worries of cbor issue by including larger fee
-      txBuilder.set_fee(RustModule.WalletV4.BigNum.from_str(difference.toString()));
+      txBuilder.set_fee(RustModule.WalletV4.BigNum.from_str(difference.coin().to_str()));
       return [];
     }
     const oldOutput = txBuilder.get_explicit_output();
@@ -487,12 +498,8 @@ export function newAdaUnsignedTxFromUtxo(
       // note: this should never happened since it should have been handled by earlier code
       throw new Error(`No change added even though it should be forced`);
     }
-    const output = new MultiToken(
-      [{
-        identifier: PRIMARY_ASSET_CONSTANTS.Cardano,
-        amount: new BigNumber(txBuilder.get_explicit_output().checked_sub(oldOutput).to_str()),
-        networkId: protocolParams.networkId,
-      }],
+    const output = multiTokenFromCardanoValue(
+      txBuilder.get_explicit_output().checked_sub(oldOutput),
       {
         defaultNetworkId: protocolParams.networkId,
         defaultIdentifier: PRIMARY_ASSET_CONSTANTS.Cardano,
@@ -669,11 +676,12 @@ export function genFilterSmallUtxo(request: {|
     if (wasmAddr == null) {
       throw new Error(`${nameof(addUtxoInput)} input not a valid Shelley address`);
     }
+    const wasmAmount = cardanoValueFromRemoteFormat(utxo);
     const feeForInput = new BigNumber(
       txBuilder.fee_for_input(
         wasmAddr,
         utxoToTxInput(utxo),
-        RustModule.WalletV4.BigNum.from_str(utxo.amount)
+        wasmAmount
       ).to_str()
     );
     return feeForInput.lte(utxo.amount);

@@ -152,8 +152,8 @@ export function cardanoValueFromRemoteFormat(
   if (utxo.assets.length === 0) return value;
 
   const assets = RustModule.WalletV4.MultiAsset.new();
-  for (const entry of tokens.nonDefaultEntries()) {
-    const { policyId, name } = identifierToCardanoAsset(entry.identifier);
+  for (const entry of utxo.assets) {
+    const { policyId, name } = identifierToCardanoAsset(entry.tokenId);
 
     const policyContent = assets.get(policyId) ?? RustModule.WalletV4.Assets.new();
 
