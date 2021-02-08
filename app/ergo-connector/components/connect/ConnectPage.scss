@@ -43,11 +43,8 @@
     & > div {
       width: 100%;
     }
-    & + .listItem {
-      border-bottom: 1px solid #dce0e9;
-    }
-    &:last-child {
-      border: none;
+    & + li {
+      border-top: 1px solid #dce0e9;
     }
     label {
       width: 100%;
@@ -71,6 +68,13 @@
     button + button {
       margin-left: 22px;
     }
+  }
+}
+.checkbox {
+  & input + div {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #6b7384;
   }
 }
 .errorMessage {

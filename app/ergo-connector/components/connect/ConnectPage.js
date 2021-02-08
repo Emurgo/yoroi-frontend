@@ -99,6 +99,7 @@ class ConnectPage extends Component<Props> {
                   label={<WalletCard name={item.name} balance={item.balance} />}
                   onChange={() => onToggleCheckbox(idx)}
                   checked={selected === idx}
+                  className={styles.checkbox}
                 />
               </li>
             ))
