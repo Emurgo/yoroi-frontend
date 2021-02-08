@@ -3,57 +3,52 @@ import React, { Component } from 'react';
 import type { Node } from 'react';
 import YoroiLogo from '../../assets/images/yoroi_logo.inline.svg';
 import MenuIcon from '../../assets/images/menu_icon.inline.svg';
-import ArrowBack from '../../assets/images/arrow_back.inline.svg';
 import styles from './Layout.scss';
 import { observer } from 'mobx-react';
-import SidebarContainer from '../../containers/SidebarContainer';
+import { Link } from 'react-router-dom';
+import { ROUTES } from '../../routes-config';
+import { defineMessages, intlShape } from 'react-intl';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 type Props = {|
   children: Node,
 |};
 
-type State = {|
-  isMenuOpen: boolean,
-|};
 
+const messages = defineMessages({
+  yoroiDappConnector: {
+    id: 'global.connector.yoroiDappConnector',
+    defaultMessage: '!!!Yoroi Dapp Connector',
+  },
+  poweredBy: {
+    id: 'global.connector.poweredBy',
+    defaultMessage: '!!!Powered by Cardano',
+  },
+});
 @observer
-export default class Layout extends Component<Props, State> {
-  state: State = { isMenuOpen: false };
-
-  toggleMenu: () => void = () => {
-    this.setState(prev => ({
-      isMenuOpen: !prev.isMenuOpen,
-    }));
+export default class Layout extends Component<Props> {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
+    intl: intlShape.isRequired,
   };
+
   render(): Node {
-    const { isMenuOpen } = this.state;
+    const { intl } = this.context;
+
     return (
       <div className={styles.layout}>
         <div className={styles.header}>
-          {isMenuOpen ? (
-            <button type="button" onClick={this.toggleMenu} className={styles.menuIcon}>
-              <ArrowBack />
-            </button>
-          ) : (
-            <button type="button" onClick={this.toggleMenu} className={styles.menuIcon}>
-              <MenuIcon />
-            </button>
-          )}
+          <Link to={ROUTES.SETTINGS} className={styles.menuIcon}>
+            <MenuIcon />
+          </Link>
           <div className={styles.menu}>
-            {isMenuOpen ? (
-              <p className={styles.setting}>Settings</p>
-            ) : (
-              <>
-                <YoroiLogo />
-                <div className={styles.logo}>
-                  <h3>Yoroi Dapp Connector</h3>
-                  <p className={styles.poweredBy}>Powered by Cardano</p>
-                </div>
-              </>
-            )}
+            <YoroiLogo />
+            <div className={styles.logo}>
+              <h3>{intl.formatMessage(messages.yoroiDappConnector)}</h3>
+              <p className={styles.poweredBy}>{intl.formatMessage(messages.poweredBy)}</p>
+            </div>
           </div>
         </div>
-        {isMenuOpen ? <SidebarContainer onClickNavItems={this.toggleMenu} /> : this.props.children}
+        {this.props.children}
       </div>
     );
   }

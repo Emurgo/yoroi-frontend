@@ -1,5 +1,5 @@
 // @flow
-import { observable, computed } from 'mobx';
+import { observable, computed, runInAction, action } from 'mobx';
 import Request from '../../../stores/lib/LocalizedRequest';
 import environment from '../../../environment';
 import { THEMES } from '../../../themes';
@@ -9,6 +9,7 @@ import type { LanguageType } from '../../../i18n/translations';
 import type { SetCustomUserThemeRequest } from '../../../api/localStorage/index';
 import { SUPPORTED_CURRENCIES } from '../../../config/unitOfAccount';
 import Store from '../../../stores/base/Store';
+import moment from 'moment/moment';
 
 export default class ProfileStore extends Store {
   LANGUAGE_OPTIONS: Array<LanguageType> = [
@@ -21,6 +22,8 @@ export default class ProfileStore extends Store {
   ];
 
   UNIT_OF_ACCOUNT_OPTIONS: typeof SUPPORTED_CURRENCIES = SUPPORTED_CURRENCIES;
+  @observable
+  inMemoryLanguage: null | string = null;
 
   @observable getThemeRequest: Request<(void) => Promise<?string>> = new Request<
     (void) => Promise<?string>
@@ -36,25 +39,29 @@ export default class ProfileStore extends Store {
     this.api.localStorage.setCustomUserTheme
   );
 
+  @observable getProfileLocaleRequest: Request<(void) => Promise<?string>> = new Request<
+    (void) => Promise<?string>
+  >(this.api.localStorage.getUserLocale);
 
-  @observable getToggleSidebarRequest: Request<(void) => Promise<boolean>> = new Request<
-    (void) => Promise<boolean>
-  >(this.api.localStorage.getToggleSidebar);
+  @observable setProfileLocaleRequest: Request<(string) => Promise<void>> = new Request<
+    (string) => Promise<void>
+  >(this.api.localStorage.setUserLocale);
 
-  @observable setToggleSidebarRequest: Request<(boolean) => Promise<void>> = new Request<
-    (boolean) => Promise<void>
-  >(this.api.localStorage.setToggleSidebar);
+  @observable unsetProfileLocaleRequest: Request<(void) => Promise<void>> = new Request<
+    (void) => Promise<void>
+  >(this.api.localStorage.unsetUserLocale);
 
   setup(): void {
     super.setup();
-    this.actions.profile.toggleSidebar.listen(this._toggleSidebar);
-    this.currentTheme; // eagerly cache (note: don't remove -- getter is stateful)
+    this.actions.profile.updateLocale.listen(this._updateLocale);
+    this.actions.profile.resetLocale.listen(this._resetLocale);
+    this.actions.profile.updateTentativeLocale.listen(this._updateTentativeLocale);
+    this.currentTheme;
   }
 
   teardown(): void {
     super.teardown();
   }
-
 
   static getDefaultLocale(): string {
     return 'en-US';
@@ -125,23 +132,80 @@ export default class ProfileStore extends Store {
     return result !== undefined;
   };
 
+  // ========== Locale ========== //
 
-  // ========== Expand / Retract Sidebar ========== //
-
-  @computed get isSidebarExpanded(): boolean {
-    let { result } = this.getToggleSidebarRequest;
-    if (result == null) {
-      result = this.getToggleSidebarRequest.execute().result;
+  @computed get currentLocale(): string {
+    // allow to override the language shown to allow user to pick a language during first app start
+    if (this.inMemoryLanguage !== null) {
+      return this.inMemoryLanguage;
     }
-    return result === true;
+    let { result } = this.getProfileLocaleRequest;
+    if (result == null) {
+      result = this.getProfileLocaleRequest.execute().result;
+    }
+    if (this.isCurrentLocaleSet && result != null && result !== '') return result;
+
+    return ProfileStore.getDefaultLocale();
   }
 
-  _toggleSidebar: void => Promise<void> = async () => {
-    const isSidebarExpanded = this.isSidebarExpanded;
-    await this.setToggleSidebarRequest.execute(isSidebarExpanded);
-    await this.getToggleSidebarRequest.execute();
+  @computed get hasLoadedCurrentLocale(): boolean {
+    return this.getProfileLocaleRequest.wasExecuted && this.getProfileLocaleRequest.result !== null;
+  }
+
+  @computed get isCurrentLocaleSet(): boolean {
+    return (
+      this.getProfileLocaleRequest.result !== null &&
+      this.getProfileLocaleRequest.result !== undefined
+    );
+  }
+
+  @action
+  _updateTentativeLocale: ({| locale: string |}) => void = request => {
+    this.inMemoryLanguage = request.locale;
   };
 
+  _updateLocale: ({| locale: string |}) => Promise<void> = async ({ locale }) => {
+    await this.setProfileLocaleRequest.execute(locale);
+    await this.getProfileLocaleRequest.execute(); // eagerly cache
+  };
+
+  _resetLocale: void => Promise<void> = async () => {
+    await this.unsetProfileLocaleRequest.execute();
+    await this.getProfileLocaleRequest.execute();
+  };
+
+  _acceptLocale: void => Promise<void> = async () => {
+    // commit in-memory language to storage
+    await this.setProfileLocaleRequest.execute(
+      this.inMemoryLanguage != null ? this.inMemoryLanguage : ProfileStore.getDefaultLocale()
+    );
+    await this.getProfileLocaleRequest.execute(); // eagerly cache
+    runInAction(() => {
+      this.inMemoryLanguage = null;
+    });
+  };
+
+  _updateMomentJsLocaleAfterLocaleChange: void => void = () => {
+    moment.locale(this._convertLocaleKeyToMomentJSLocalKey(this.currentLocale));
+    // moment.relativeTimeThreshold('ss', -1);
+  };
+
+  _convertLocaleKeyToMomentJSLocalKey: string => string = localeKey => {
+    // REF -> https://github.com/moment/moment/tree/develop/locale
+    let momentJSLocalKey;
+    switch (localeKey) {
+      case 'zh-Hans':
+        momentJSLocalKey = 'zh-cn';
+        break;
+      case 'zh-Hant':
+        momentJSLocalKey = 'zh-tw';
+        break;
+      default:
+        momentJSLocalKey = localeKey;
+        break;
+    }
+    return momentJSLocalKey;
+  };
 }
 
 export const getVarsForTheme: ({|
