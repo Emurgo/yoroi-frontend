@@ -73,10 +73,6 @@ class App extends Component<Props, State> {
   render(): Node {
     const { stores } = this.props;
     const locale = stores.profile.currentLocale;
-
-    // Merged english messages with selected by user locale messages
-    // In this case all english data would be overridden to user selected locale, but untranslated
-    // (missed in object keys) just stay in english
     // eslint-disable-next-line prefer-object-spread
     const mergedMessages: { [key: string]: string, ... } = Object.assign(
       {},
@@ -85,10 +81,6 @@ class App extends Component<Props, State> {
     );
 
     const themeVars = Object.assign(stores.profile.currentThemeVars, {
-      // show wingdings on dev builds when no font is set to easily find
-      // missing font bugs. However, on production, we use Times New Roman
-      // which looks ugly but at least it's readable.
-      // '--default-font': !environment.isProduction() ? 'wingdings' : 'Times New Roman',
     });
     const currentTheme = stores.profile.currentTheme;
 
