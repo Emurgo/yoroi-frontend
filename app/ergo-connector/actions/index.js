@@ -2,20 +2,20 @@
 import ProfileActions from '../../actions/profile-actions';
 import DialogsActions from '../../actions/dialogs-actions';
 import NotificationsActions from '../../actions/notifications-actions';
-import LoadingActions from '../../actions/loading-actions';
+import ConnectorActions from './connector-actions';
 
 export type ActionsMap = {|
   profile: ProfileActions,
   dialogs: DialogsActions,
   notifications: NotificationsActions,
-  loading: LoadingActions,
+  connector: ConnectorActions,
 |};
 
 const actionsMap: ActionsMap = Object.freeze({
   profile: new ProfileActions(),
+  connector: new ConnectorActions(),
   dialogs: new DialogsActions(),
   notifications: new NotificationsActions(),
-  loading: new LoadingActions(),
 });
 
 export default actionsMap;
