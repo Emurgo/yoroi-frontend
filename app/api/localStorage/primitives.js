@@ -176,3 +176,41 @@ export async function isEmptyStorage(): Promise<boolean> {
 
   return localStorage.length === 0;
 }
+
+// =======
+//  ERGO CONNECTOR
+// =======
+
+const getStorageItemInErgoExtension = async (key: string | void): Promise<?string> =>
+  new Promise((resolve, reject) => {
+    chrome.storage.local.get(key, (data: { ... }) => {
+      if (chrome.runtime.lastError) reject(chrome.runtime.lastError);
+      if (key === undefined) {
+        resolve(JSON.stringify(data));
+      } else {
+        const value: any = data[key];
+        resolve(value);
+      }
+    });
+  });
+
+export async function getErgoConnectorLocalItem(key: string | void): Promise<?string> {
+  const isExtension = environment.userAgentInfo.isExtension();
+  if (isExtension) {
+    return await getStorageItemInErgoExtension(key);
+  }
+  return await getStorageItemInWeb(key);
+}
+
+export async function setErgoConnectorLocalItem
+  (key: string, value: Array<any> | void): Promise<void> {
+  const isExtension = environment.userAgentInfo.isExtension();
+  if (isExtension) {
+    await new Promise((resolve, reject) => {
+      chrome.storage.local.set({ [key]: value }, () => {
+        if (chrome.runtime.lastError) reject(chrome.runtime.lastError);
+        resolve();
+      });
+    });
+  }
+}
