@@ -12,7 +12,7 @@ import { SelectSkin } from 'react-polymorph/lib/skins/simple/SelectSkin';
 import FlagLabel from '../../components/widgets/FlagLabel';
 import classNames from 'classnames';
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
-import globalMessages, {connectorMessages} from '../../i18n/global-messages';
+import globalMessages, { connectorMessages } from '../../i18n/global-messages';
 
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import ArrowBack from '../assets/images/arrow_back.inline.svg';
@@ -56,7 +56,7 @@ export default class Settings extends Component<any> {
       {
         label: intl.formatMessage(messages.about),
         icon: <InfoIcon />,
-        route: ROUTES.ROOT,
+        route: '#',
       },
       {
         label: intl.formatMessage(connectorMessages.connectedWebsites),

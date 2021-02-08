@@ -52,15 +52,16 @@ export default class ConnectContainer extends Component<
     this.props.history.push(ROUTES.CONNECTED_WEBSITES);
   }
 
-  onCancel() {
+  onCancel: void => void = () => {
     const chromeMessage = this.generated.stores.connector.connectingMessage;
-
     chrome.runtime.sendMessage({
       type: 'connect_response',
       accepted: false,
       tabId: chromeMessage?.tabId,
     });
-  }
+
+    this.generated.actions.connector.closeWindow.trigger();
+  };
 
   handleSubmit: () => void = () => {
     const wallets = this.generated.stores.connector.wallets;
@@ -103,6 +104,9 @@ export default class ConnectContainer extends Component<
         getWallets: {|
           trigger: (params: void) => void,
         |},
+        closeWindow: {|
+          trigger: (params: void) => void,
+        |},
         getConnectorWhitelist: {|
           trigger: (params: void) => Promise<void>,
         |},
@@ -137,6 +141,7 @@ export default class ConnectContainer extends Component<
         connector: {
           getResponse: { trigger: actions.connector.getResponse.trigger },
           getWallets: { trigger: actions.connector.getWallets.trigger },
+          closeWindow: { trigger: actions.connector.closeWindow.trigger },
           getConnectorWhitelist: { trigger: actions.connector.getConnectorWhitelist.trigger },
         },
       },

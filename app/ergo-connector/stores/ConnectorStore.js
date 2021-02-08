@@ -64,7 +64,9 @@ export default class ConnectorStore extends Store {
     this.actions.connector.getConnectorWhitelist.listen(this._getConnectorWhitelist);
     this.actions.connector.removeWalletFromWhitelist.listen(this._removeWalletFromWhitelist);
     this.actions.connector.confirmSignInTx.listen(this._confirmSignInTx);
+    this.actions.connector.cancelSignInTx.listen(this._cancelSignInTx);
     this.actions.connector.getSigningMsg.listen(this._getSigningMsg);
+    this.actions.connector.closeWindow.listen(this._closeWindow);
     this._getConnectorWhitelist();
     this._getWallets();
     this._getConnectingMsg();
@@ -74,6 +76,12 @@ export default class ConnectorStore extends Store {
 
   teardown(): void {
     super.teardown();
+  }
+
+  // ========== general ========== //
+  @action
+  _closeWindow() {
+    window.close();
   }
 
   // ========== connecting wallets ========== //
@@ -119,6 +127,15 @@ export default class ConnectorStore extends Store {
       tabId: this.signingMessage?.tabId,
       pw: password,
     });
+  };
+  @action
+  _cancelSignInTx: void => void = () => {
+    window.chrome.runtime.sendMessage({
+      type: 'sign_rejected',
+      uid: this.signingMessage?.sign.uid,
+      tabId: this.signingMessage?.tabId,
+    });
+    this._closeWindow();
   };
 
   // ========== wallets info ========== //

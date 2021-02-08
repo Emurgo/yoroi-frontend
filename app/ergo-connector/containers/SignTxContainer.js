@@ -20,7 +20,9 @@ export default class SignTxContainer extends Component<
   onConfirm: string => void = password => {
     this.generated.actions.connector.confirmSignInTx.trigger(password);
   };
-  onCancel: () => void = () => {};
+  onCancel: () => void = () => {
+    this.generated.actions.connector.cancelSignInTx.trigger();
+  };
 
   render(): Node {
     const type = this.generated.stores.connector.signingMessage?.sign?.type ?? '';
@@ -92,6 +94,9 @@ export default class SignTxContainer extends Component<
         open: {| trigger: (params: Notification) => void |},
       |},
       connector: {|
+        cancelSignInTx: {|
+          trigger: (params: void) => void,
+        |},
         confirmSignInTx: {| trigger: (params: string) => void |},
       |},
     |},
@@ -135,6 +140,7 @@ export default class SignTxContainer extends Component<
       actions: {
         connector: {
           confirmSignInTx: { trigger: actions.connector.confirmSignInTx.trigger },
+          cancelSignInTx: { trigger: actions.connector.cancelSignInTx.trigger },
         },
         dialogs: {
           open: { trigger: actions.dialogs.open.trigger },
