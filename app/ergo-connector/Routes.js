@@ -2,9 +2,10 @@
 import React from 'react';
 import type { Node } from 'react';
 import { Route, Redirect, Switch } from 'react-router-dom';
-import type { StoresMap } from '../stores/index';
-import type { ActionsMap } from '../actions/index';
+import type { StoresMap } from './stores/index';
+import type { ActionsMap } from './actions/index';
 import { ROUTES } from './routes-config';
+import type { InjectedOrGenerated } from '../types/injectedPropsType';
 
 // PAGES
 import ConnectContainer from './containers/ConnectContainer';
@@ -12,8 +13,6 @@ import ConnectWebsitesContainer from './containers/ConnectWebsitesContainer';
 import Layout from './components/layout/Layout';
 import SignTxContainer from './containers/SignTxContainer';
 import SettingsContainer from './containers/SettingsContainer';
-import type { InjectedOrGenerated } from '../types/injectedPropsType';
-import type { GeneratedData as SettingsData } from '../containers/settings/Settings';
 
 export const Routes = (stores: StoresMap, actions: ActionsMap): Node => (
   <Switch>
@@ -53,9 +52,6 @@ const GeneralSubpages = (stores, actions) => (
   </Switch>
 );
 
-export function wrapGeneralPages(
-  generalProps: InjectedOrGenerated<SettingsData>,
-  children: Node
-): Node {
-  return <Layout {...generalProps}>{children}</Layout>;
+export function wrapGeneralPages(generalProps: InjectedOrGenerated<any>, children: Node): Node {
+  return <Layout>{children}</Layout>;
 }

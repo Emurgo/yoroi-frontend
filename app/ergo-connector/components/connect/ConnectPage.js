@@ -12,6 +12,7 @@ import { CheckboxSkin } from 'react-polymorph/lib/skins/simple/CheckboxSkin';
 import WalletCard from './WalletCard';
 import globalMessages from '../../../i18n/global-messages';
 import { observer } from 'mobx-react';
+import LoadingSpinner from '../../../components/widgets/LoadingSpinner';
 
 const messages = defineMessages({
   subtitle: {
@@ -40,10 +41,10 @@ type Props = {|
   accounts: Array<Object>,
   loading: 'idle' | 'pending' | 'success' | 'rejected',
   error: string,
-  message?: {| tabId: number, url: string |},
+  message: ?{| tabId: number, url: string |},
   onToggleCheckbox: number => void,
   onCancel: () => void,
-  onConnect: number => void,
+  onConnect: number => Promise<void>,
   handleSubmit: () => void,
   selected: number,
 |};
@@ -84,37 +85,23 @@ class ConnectPage extends Component<Props> {
           </div>
         </div>
         <ul className={styles.list}>
-          {isError ? (
-            <div className={styles.errorMessage}>
-              Oops ... something went wrong. please try again later
-              <p>{error}</p>
-            </div>
-          ) : null}
+          {isError ? <div className={styles.errorMessage}>{error}</div> : null}
           {isLoading ? (
-            <p>Loading ...</p>
+            <div className={styles.loading}>
+              <LoadingSpinner />
+            </div>
           ) : isSuccess ? (
-            accounts.length > 0 && (
-              <>
-                {/* <li className={styles.listItem}> */}
-                {/* TODO: Check multiple wallets */}
-                {/* <Checkbox
-                    skin={CheckboxSkin}
-                    label={intl.formatMessage(messages.selectAllWallets)}
-                    disabled
-                  /> */}
-                {/* </li> */}
-                {accounts.map((item, idx) => (
-                  <li key={item.name} className={styles.listItem}>
-                    <Checkbox
-                      skin={CheckboxSkin}
-                      label={<WalletCard name={item.name} balance={item.balance} />}
-                      onChange={() => onToggleCheckbox(idx)}
-                      checked={selected === idx}
-                    />
-                  </li>
-                ))}
-              </>
-            )
+            accounts.length > 0 &&
+            accounts.map((item, idx) => (
+              <li key={item.name} className={styles.listItem}>
+                <Checkbox
+                  skin={CheckboxSkin}
+                  label={<WalletCard name={item.name} balance={item.balance} />}
+                  onChange={() => onToggleCheckbox(idx)}
+                  checked={selected === idx}
+                />
+              </li>
+            ))
           ) : isSuccess && !accounts.length ? (
             <div>{intl.formatMessage(messages.noWalletsFound)}</div>
           ) : null}

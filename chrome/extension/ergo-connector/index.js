@@ -8,7 +8,7 @@ import { createHashHistory } from 'history';
 import { setupApi } from '../../../app/api/index';
 import createStores from '../../../app/ergo-connector/stores/index';
 import { translations } from '../../../app/i18n/translations';
-import actions from '../../../app/actions/index';
+import actions from '../../../app/ergo-connector/actions/index';
 import { Action } from '../../../app/actions/lib/Action';
 import App from '../../../app/ergo-connector/App';
 import '../../../app/themes/index.global.scss';

@@ -6,13 +6,16 @@ import ExpandArrow from '../../assets/images/arrow-expand.inline.svg';
 import DeleteIcon from '../../assets/images/remove-icon.inline.svg';
 import classnames from 'classnames';
 import WalletCard from '../connect/WalletCard';
+import { observer } from 'mobx-react';
 
 type Props = {|
+  label: string,
   url: string,
   wallet: {| name: string, balance: string |},
   onRemoveWallet: string => void,
 |};
 type State = {| isExpanded: boolean |};
+@observer
 export default class DropdownCard extends Component<Props, State> {
   state: State = {
     isExpanded: false,
@@ -23,11 +26,11 @@ export default class DropdownCard extends Component<Props, State> {
   };
 
   render(): Node {
-    const { url, wallet, onRemoveWallet } = this.props;
+    const { label, url, wallet, onRemoveWallet } = this.props;
     const { isExpanded } = this.state;
     const arrowClasses = isExpanded ? styles.collapseArrow : styles.expandArrow;
 
-    // TODO: STATUS
+    // TODO: status connected websites
     const statusIcon = classnames([styles.status, true ? styles.active : '']);
     const headerStyles = classnames([styles.header, isExpanded ? styles.expandedHeader : '']);
 
@@ -46,7 +49,7 @@ export default class DropdownCard extends Component<Props, State> {
         </div>
         {isExpanded ? (
           <div className={styles.expandedContent}>
-            <h3>Connected Wallets</h3>
+            <h3>{label}</h3>
             <div className={styles.card}>
               <div
                 className={styles.remove}
