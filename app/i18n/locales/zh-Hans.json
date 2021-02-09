@@ -761,7 +761,7 @@
   "wallet.voting.dialog.step.pin.line1": "请写下该PIN码，它会用于后一个步骤以完成在Catalyst投票应用中的注册程序。",
   "wallet.voting.dialog.step.qr.lineTitle": "使用Catalyst 投票应用扫描此二维码",
   "wallet.voting.dialog.step.qr.line2": "下方的二维码是Catalyst应用需要的证书，能够用于在Cardano网络上参与投票。",
-  "wallet.voting.dialog.step.qr.line3": "Also we suggest to take a screenshot of it as a backup — you won’t be able to access this QR code after clicking Complete.",
+  "wallet.voting.dialog.step.qr.line3": "此外我们建议您截图作为备份 - 在点击完成后你无法再次获得该二维码。",
   "wallet.voting.dialog.step.register.line1": "输入支付密码以生成用于投票所需的证书。",
   "wallet.voting.lineTitle": "用于投票交易的ADA将会从选定的钱包转移支付。",
   "wallet.voting.line2": "在您开始之前，请确保完成了下列步骤",
