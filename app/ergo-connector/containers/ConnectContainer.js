@@ -48,8 +48,7 @@ export default class ConnectContainer extends Component<
     });
 
     await this.generated.actions.connector.getConnectorWhitelist.trigger();
-    // $FlowFixMe:
-    this.props.history.push(ROUTES.CONNECTED_WEBSITES);
+    this.generated.actions.connector.closeWindow.trigger();
   }
 
   onCancel: void => void = () => {
