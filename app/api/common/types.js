@@ -4,7 +4,7 @@ import { lf$Database } from 'lovefield';
 import {
   PublicDeriver,
 } from '../ada/lib/storage/models/PublicDeriver/index';
-import type { NetworkRow } from '../ada/lib/storage/database/primitives/tables';
+import type { NetworkRow, TokenRow } from '../ada/lib/storage/database/primitives/tables';
 import { MultiToken } from './lib/MultiToken';
 
 // isValidMnemonic
@@ -50,3 +50,11 @@ export type CreateWalletResponse = RestoreWalletResponse;
 export type CreateWalletFunc = (
   request: CreateWalletRequest
 ) => Promise<CreateWalletResponse>;
+
+export type SendTokenList = Array<$ReadOnly<{|
+  token: $ReadOnly<TokenRow>,
+  amount: string, // in lovelaces
+|}> | $ReadOnly<{|
+  token: $ReadOnly<TokenRow>,
+  shouldSendAll: true,
+|}>>;

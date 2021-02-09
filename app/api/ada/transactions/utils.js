@@ -26,17 +26,9 @@ import type {
   AccountingTransactionOutputRow,
 } from '../lib/storage/database/transactionModels/account/tables';
 import type { TransactionExportRow } from '../../export';
-import {
-  HARD_DERIVATION_START,
-  CoinTypes,
-} from '../../../config/numbersConfig';
 import type {
-  Addressing,
   IGetAllUtxosResponse,
 } from '../lib/storage/models/PublicDeriver/interfaces';
-import {
-  Bip44DerivationLevels,
-} from '../lib/storage/database/walletTypes/bip44/api/utils';
 import { formatBigNumberToFloatString } from '../../../utils/formatters';
 import {
   MultiToken,
@@ -166,6 +158,35 @@ export function cardanoValueFromRemoteFormat(
   }
   value.set_multiasset(assets);
   return value;
+}
+export function multiTokenFromRemote(
+  utxo: $ReadOnly<{
+    ...RemoteUnspentOutput,
+    ...,
+  }>,
+  networkId: number,
+): MultiToken {
+  const result = new MultiToken(
+    [],
+    {
+      defaultNetworkId: networkId,
+      defaultIdentifier: PRIMARY_ASSET_CONSTANTS.Cardano,
+    }
+  );
+  result.add({
+    identifier: PRIMARY_ASSET_CONSTANTS.Cardano,
+    amount: new BigNumber(utxo.amount),
+    networkId,
+  });
+  for (const token of utxo.assets) {
+    result.add({
+      identifier: token.tokenId,
+      amount: new BigNumber(token.amount),
+      networkId,
+    });
+  }
+
+  return result;
 }
 
 export function getFromUserPerspective(data: {|
@@ -319,30 +340,6 @@ export function utxosToLookupMap(
     )
   );
   return lookupMap;
-}
-
-export function derivePathPrefix(purpose: number, accountIndex: number): string {
-  if (accountIndex < HARD_DERIVATION_START) {
-    throw new Error(`${nameof(derivePathPrefix)} accountIndex < 0x80000000`);
-  }
-  if (purpose < HARD_DERIVATION_START) {
-    throw new Error(`${nameof(derivePathPrefix)} purpose < 0x80000000`);
-  }
-  // https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki
-  return `m/${purpose - HARD_DERIVATION_START}'/${CoinTypes.CARDANO - HARD_DERIVATION_START}'/${accountIndex - HARD_DERIVATION_START}'`;
-}
-
-export function verifyFromBip44Root(request: $ReadOnly<{|
-  ...$PropertyType<Addressing, 'addressing'>,
-|}>): void {
-  const accountPosition = request.startLevel;
-  if (accountPosition !== Bip44DerivationLevels.PURPOSE.level) {
-    throw new Error(`${nameof(verifyFromBip44Root)} addressing does not start from root`);
-  }
-  const lastLevelSpecified = request.startLevel + request.path.length - 1;
-  if (lastLevelSpecified !== Bip44DerivationLevels.ADDRESS.level) {
-    throw new Error(`${nameof(verifyFromBip44Root)} incorrect addressing size`);
-  }
 }
 
 export function asAddressedUtxo(

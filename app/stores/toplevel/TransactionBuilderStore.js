@@ -25,6 +25,8 @@ import {
   MultiToken,
 } from '../../api/common/lib/MultiToken';
 import type { TokenRow, } from '../../api/ada/lib/storage/database/primitives/tables';
+import { getDefaultEntryToken } from './TokenInfoStore';
+import { cardanoValueFromMultiToken } from '../../api/ada/transactions/utils';
 
 export type SetupSelfTxRequest = {|
   publicDeriver: IHasUtxoChains,
@@ -211,17 +213,55 @@ export default class TransactionBuilderStore extends Store {
       }
 
       const fullConfig = getCardanoHaskellBaseConfig(network);
+      const squashedConfig = fullConfig.reduce((acc, next) => Object.assign(acc, next), {});
       const timeToSlot = await genTimeToSlot(fullConfig);
       const absSlotNumber = new BigNumber(timeToSlot({
         // use server time for TTL if connected to server
         time: this.stores.serverConnectionStore.serverTime ?? new Date(),
       }).slot);
 
+      const defaultToken = this.stores.tokenInfoStore.getDefaultTokenInfo(network.NetworkId);
+
+      const genTokenList = (userInput) => {
+        const tokens = [userInput];
+        if (this.selectedToken != null && this.selectedToken.TokenId !== defaultToken.TokenId) {
+          const fakeAmount = new BigNumber('0'); // amount doesn't matter for calculating min UTXO amount
+          const fakeMultitoken = new MultiToken(
+            [{
+              identifier: defaultToken.Identifier,
+              networkId: defaultToken.NetworkId,
+              amount: fakeAmount,
+            },
+            {
+              identifier: this.selectedToken.Identifier,
+              networkId: this.selectedToken.NetworkId,
+              amount: fakeAmount,
+            }],
+            getDefaultEntryToken(defaultToken)
+          );
+          const minAmount = RustModule.WalletV4.min_ada_required(
+            cardanoValueFromMultiToken(fakeMultitoken),
+            RustModule.WalletV4.BigNum.from_str(squashedConfig.MinimumUtxoVal)
+          );
+          // if the user is sending a token, we need to make sure the resulting utxo
+          // has at least the minimum amount of ADA in it
+          tokens.push({
+            token: defaultToken,
+            amount: minAmount.to_str(),
+          });
+        }
+        return tokens;
+      }
+
       if (amount == null && shouldSendAll === true) {
         await this.createUnsignedTx.execute(() => this.api.ada.createUnsignedTx({
           publicDeriver: withHasUtxoChains,
           receiver,
-          shouldSendAll,
+          tokens: genTokenList({
+            token: this.selectedToken
+              ?? this.stores.tokenInfoStore.getDefaultTokenInfo(network.NetworkId),
+            shouldSendAll,
+          }),
           filter: this.filter,
           absSlotNumber,
           metadata: this.metadata,
@@ -230,7 +270,11 @@ export default class TransactionBuilderStore extends Store {
         await this.createUnsignedTx.execute(() => this.api.ada.createUnsignedTx({
           publicDeriver: withHasUtxoChains,
           receiver,
-          amount,
+          tokens: genTokenList({
+            token: this.selectedToken
+              ?? this.stores.tokenInfoStore.getDefaultTokenInfo(network.NetworkId),
+            amount,
+          }),
           filter: this.filter,
           absSlotNumber,
           metadata: this.metadata,
@@ -246,7 +290,7 @@ export default class TransactionBuilderStore extends Store {
 
       const genTokenList = (userInput) => {
         const tokens = [userInput];
-          if (this.selectedToken != null && this.selectedToken.TokenId !== defaultToken.TokenId) {
+        if (this.selectedToken != null && this.selectedToken.TokenId !== defaultToken.TokenId) {
           // if the user is sending a token, we need to make sure the resulting box
           // has at least the minimum amount of ERG in it
           tokens.push({

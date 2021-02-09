@@ -2,7 +2,7 @@
 import type {
   CardanoAddressedUtxo,
 } from '../types';
-import { verifyFromBip44Root }  from '../utils';
+import { verifyFromBip44Root }  from '../../lib/storage/models/utils';
 import type {
   BIP32Path,
   StakingBlockchainPointer,

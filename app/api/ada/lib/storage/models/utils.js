@@ -490,3 +490,16 @@ export async function getCertificates(
     async dbTx => await deps.GetCertificates.forAddress(db, dbTx, { addressIds })
   );
 }
+
+export function verifyFromBip44Root(request: $ReadOnly<{|
+  ...$PropertyType<Addressing, 'addressing'>,
+|}>): void {
+  const accountPosition = request.startLevel;
+  if (accountPosition !== Bip44DerivationLevels.PURPOSE.level) {
+    throw new Error(`${nameof(verifyFromBip44Root)} addressing does not start from root`);
+  }
+  const lastLevelSpecified = request.startLevel + request.path.length - 1;
+  if (lastLevelSpecified !== Bip44DerivationLevels.ADDRESS.level) {
+    throw new Error(`${nameof(verifyFromBip44Root)} incorrect addressing size`);
+  }
+}

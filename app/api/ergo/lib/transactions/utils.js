@@ -25,6 +25,9 @@ import type {
 } from './types';
 import { RustModule } from '../../../ada/lib/cardanoCrypto/rustLoader';
 import type { RemoteUnspentOutput } from '../state-fetch/types';
+import {
+  MultiToken,
+} from '../../../common/lib/MultiToken';
 
 export function convertErgoTransactionsToExportRows(
   transactions: $ReadOnlyArray<$ReadOnly<{
@@ -161,4 +164,34 @@ export function replaceMockBoxId(utxo: RemoteUnspentOutput): RemoteUnspentOutput
     ...utxo,
     boxId: box.box_id().to_str()
   };
+}
+
+export function multiTokenFromRemote(
+  utxo: $ReadOnly<{
+    ...RemoteUnspentOutput,
+    ...,
+  }>,
+  networkId: number,
+): MultiToken {
+  const result = new MultiToken(
+    [],
+    {
+      defaultNetworkId: networkId,
+      defaultIdentifier: PRIMARY_ASSET_CONSTANTS.Ergo,
+    }
+  );
+  result.add({
+    identifier: PRIMARY_ASSET_CONSTANTS.Ergo,
+    amount: new BigNumber(utxo.amount),
+    networkId,
+  });
+  for (const token of (utxo.assets ?? [])) {
+    result.add({
+      identifier: token.tokenId,
+      amount: new BigNumber(token.amount),
+      networkId,
+    });
+  }
+
+  return result;
 }

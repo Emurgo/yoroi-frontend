@@ -29,6 +29,7 @@ import {
   MultiToken,
 } from '../../../common/lib/MultiToken';
 import { PRIMARY_ASSET_CONSTANTS } from '../../lib/storage/database/primitives/enums';
+import { multiTokenFromRemote } from '../utils';
 
 /**
  * Generate transaction including all addresses with no change.
@@ -52,22 +53,20 @@ export async function buildDaedalusTransferTx(payload: {|
   try {
     const { addressKeys, senderUtxos, } = payload;
 
-    const totalBalance = new MultiToken(
-      [{
-        identifier: PRIMARY_ASSET_CONSTANTS.Cardano,
-        amount: senderUtxos
-          .map(utxo => new BigNumber(utxo.amount))
-          .reduce(
-            (acc, amount) => acc.plus(amount),
-            new BigNumber(0)
-          ),
-        networkId: payload.protocolParams.networkId,
-      }],
-      {
-        defaultNetworkId: payload.protocolParams.networkId,
-        defaultIdentifier: PRIMARY_ASSET_CONSTANTS.Cardano,
-      }
-    );
+    const defaultEntryInfo = {
+      defaultNetworkId: payload.protocolParams.networkId,
+      defaultIdentifier: PRIMARY_ASSET_CONSTANTS.Cardano,
+    };
+
+    const totalBalance = senderUtxos
+      .map(utxo => multiTokenFromRemote(
+        utxo,
+        payload.protocolParams.networkId
+      ))
+      .reduce(
+        (acc, next) => acc.joinAddMutable(next),
+        new MultiToken([], defaultEntryInfo)
+      );
 
     // build tx
     const unsignedTxResponse = sendAllUnsignedTxFromUtxo(
@@ -84,10 +83,7 @@ export async function buildDaedalusTransferTx(payload: {|
         ).plus(unsignedTxResponse.txBuilder.get_deposit().to_str()),
         networkId: payload.protocolParams.networkId,
       }],
-      {
-        defaultNetworkId: payload.protocolParams.networkId,
-        defaultIdentifier: PRIMARY_ASSET_CONSTANTS.Cardano,
-      }
+      defaultEntryInfo
     );
 
     // sign

@@ -11,6 +11,7 @@ import type {
   IsValidMnemonicResponse,
   RestoreWalletRequest, RestoreWalletResponse,
   CreateWalletRequest, CreateWalletResponse,
+  SendTokenList,
 } from '../common/types';
 import type {
   BaseGetTransactionsRequest,
@@ -84,6 +85,7 @@ import {
 import {
   convertErgoTransactionsToExportRows,
   asAddressedUtxo,
+  multiTokenFromRemote,
 } from './lib/transactions/utils';
 import {
   sendAllUnsignedTx,
@@ -100,16 +102,8 @@ import {
 import { CoreAddressTypes, } from '../ada/lib/storage/database/primitives/enums';
 import { BIP32PrivateKey, } from '../common/lib/crypto/keys/keyRepository';
 import { WrongPassphraseError } from '../ada/lib/cardanoCrypto/cryptoErrors';
-import { MultiToken } from '../common/lib/MultiToken';
 import type { DefaultTokenEntry } from '../common/lib/MultiToken';
-
-type SendTokenList = Array<$ReadOnly<{|
-  token: $ReadOnly<TokenRow>,
-  amount: string, // in lovelaces
-|}> | $ReadOnly<{|
-  token: $ReadOnly<TokenRow>,
-  shouldSendAll: true,
-|}>>;
+import { hasSendAllDefault, builtSendTokenList } from '../common/index';
 
 // getTransactionRowsToExport
 
@@ -562,7 +556,7 @@ export default class ErgoApi {
                 amount: builtSendTokenList(
                   request.defaultToken,
                   request.tokens,
-                  request.utxos,
+                  request.utxos.map(utxo => multiTokenFromRemote(utxo, protocolParams.NetworkId)),
                 ),
               }]
             : [],
@@ -642,63 +636,4 @@ export default class ErgoApi {
       throw new GenericApiError();
     }
   }
-}
-
-
-function hasSendAllDefault(
-  tokens: SendTokenList,
-): boolean {
-  const defaultSendAll = tokens.find(token => {
-    if (token.shouldSendAll === true && token.token.IsDefault) return true;
-    return false;
-  });
-  return defaultSendAll != null;
-}
-
-function builtSendTokenList(
-  defaultToken: DefaultTokenEntry,
-  tokens: SendTokenList,
-  utxos: Array<ErgoAddressedUtxo>,
-): MultiToken {
-  const amount = new MultiToken([], defaultToken);
-
-  for (const token of tokens) {
-    if (token.amount != null) {
-      amount.add({
-        amount: new BigNumber(token.amount),
-        identifier: token.token.Identifier,
-        networkId: token.token.NetworkId,
-      });
-    } else if (token.token.IsDefault) {
-      // recall: default tokens have no inherent identifier, so we need to handle this differently
-      const relatedUtxoSum = utxos.reduce(
-        (value, next) => value.plus(next.amount),
-        new BigNumber(0)
-      );
-      amount.add({
-        amount: relatedUtxoSum,
-        identifier: token.token.Identifier,
-        networkId: token.token.NetworkId,
-      });
-    } else {
-      // for send all, sum up the value of all our UTXOs with this token
-      const relatedUtxoSum = utxos.reduce(
-        (value, next) => {
-          if (next.assets == null) return value;
-          const assetEntry = next.assets.find(asset => asset.tokenId === token.token.Identifier);
-          if (assetEntry != null) {
-            return value.plus(assetEntry.amount);
-          }
-          return value;
-        },
-        new BigNumber(0)
-      );
-      amount.add({
-        amount: relatedUtxoSum,
-        identifier: token.token.Identifier,
-        networkId: token.token.NetworkId,
-      });
-    }
-  }
-  return amount;
 }

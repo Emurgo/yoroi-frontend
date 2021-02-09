@@ -155,6 +155,7 @@ import {
   convertAdaTransactionsToExportRows,
   multiTokenFromCardanoValue,
   asAddressedUtxo,
+  multiTokenFromRemote,
 } from './transactions/utils';
 import { generateAdaPaperPdf } from './paperWallet/paperWalletPdf';
 import type { PdfGenStepType } from './paperWallet/paperWalletPdf';
@@ -167,6 +168,7 @@ import type {
   IsValidMnemonicResponse,
   RestoreWalletRequest, RestoreWalletResponse,
   CreateWalletRequest, CreateWalletResponse,
+  SendTokenList,
 } from '../common/types';
 import { CoreAddressTypes, } from './lib/storage/database/primitives/enums';
 import type { NetworkRow, TokenRow, } from './lib/storage/database/primitives/tables';
@@ -179,6 +181,7 @@ import {
 import type { TransactionMetadata } from './lib/storage/bridge/metadataUtils';
 import { MultiToken } from '../common/lib/MultiToken';
 import type { DefaultTokenEntry } from '../common/lib/MultiToken';
+import { hasSendAllDefault, builtSendTokenList } from '../common/index';
 
 // ADA specific Request / Response params
 
@@ -329,11 +332,7 @@ export type CreateUnsignedTxRequest = {|
   absSlotNumber: BigNumber,
   receiver: string,
   filter: ElementOf<IGetAllUtxosResponse> => boolean,
-  ...({|
-    amount: string, // in lovelaces
-  |} | {|
-    shouldSendAll: true,
-  |}),
+  tokens: SendTokenList,
   metadata: Array<TransactionMetadata> | void,
 |};
 export type CreateUnsignedTxResponse = HaskellShelleyTxSignRequest;
@@ -351,11 +350,8 @@ export type CreateUnsignedTxForUtxosRequest = {|
     ...InexactSubset<Addressing>,
   |}>,
   network: $ReadOnly<NetworkRow>,
-  ...{|
-    amount: string,
-  |} | {|
-    shouldSendAll: true,
-  |},
+  defaultToken: DefaultTokenEntry,
+  tokens: SendTokenList,
   utxos: Array<CardanoAddressedUtxo>,
   metadata: Array<TransactionMetadata> | void,
 |};
@@ -488,6 +484,7 @@ export type TransferToCip1852Request = {|
   absSlotNumber: BigNumber,
   getUTXOsForAddresses: AddressUtxoFunc,
   network: $ReadOnly<NetworkRow>,
+  defaultToken: $ReadOnly<TokenRow>,
 |};
 export type TransferToCip1852Response = {|
   signRequest: CreateUnsignedTxResponse,
@@ -961,7 +958,7 @@ export default class AdaApi {
       const trxMetadata =
         request.metadata !== undefined ? createMetadata(request.metadata): undefined;
 
-      if (request.shouldSendAll) {
+      if (hasSendAllDefault(request.tokens)) {
         if (request.receivers.length !== 1) {
           throw new Error(`${nameof(this.createUnsignedTxForUtxos)} wrong output size for sendAll`);
         }
@@ -974,7 +971,6 @@ export default class AdaApi {
           trxMetadata,
         );
       } else {
-        const amount = request.amount;
         const changeAddresses = request.receivers.reduce(
           (arr, next) => {
             if (next.addressing != null) {
@@ -1007,7 +1003,14 @@ export default class AdaApi {
         }
         unsignedTxResponse = shelleyNewAdaUnsignedTx(
           otherAddresses.length === 1
-            ? [{ address: otherAddresses[0].address, amount }]
+            ? [{
+              address: otherAddresses[0].address,
+              amount: builtSendTokenList(
+                request.defaultToken,
+                request.tokens,
+                request.utxos.map(utxo => multiTokenFromRemote(utxo, protocolParams.networkId)),
+              ),
+            }]
             : [],
           {
             address: changeAddr.address,
@@ -1061,7 +1064,9 @@ export default class AdaApi {
     const receivers = [{
       address: request.receiver
     }];
-    if (!request.shouldSendAll) {
+
+    // note: we need to create a change address IFF we're not sending all of the default asset
+    if (!hasSendAllDefault(request.tokens)) {
       const internal = await request.publicDeriver.nextInternal();
       if (internal.addressInfo == null) {
         throw new Error(`${nameof(this.createUnsignedTx)} no internal addresses left. Should never happen`);
@@ -1071,16 +1076,14 @@ export default class AdaApi {
         addressing: internal.addressInfo.addressing,
       });
     }
-    const amountInfo = request.shouldSendAll
-      ? { shouldSendAll: request.shouldSendAll }
-      : { amount: request.amount, };
     return this.createUnsignedTxForUtxos({
       absSlotNumber: request.absSlotNumber,
       receivers,
       network: request.publicDeriver.getParent().getNetworkInfo(),
+      defaultToken: request.publicDeriver.getParent().getDefaultToken(),
       utxos: addressedUtxo,
+      tokens: request.tokens,
       metadata: request.metadata,
-      ...amountInfo,
     });
   }
 
@@ -1797,7 +1800,15 @@ export default class AdaApi {
             },
           }],
           network: request.network,
-          shouldSendAll: true,
+          defaultToken: {
+            defaultIdentifier: request.defaultToken.Identifier,
+            defaultNetworkId: request.defaultToken.NetworkId,
+          },
+          tokens: [{
+            // note: sending all of the default token will cause UTXOs to be consumed
+            shouldSendAll: true,
+            token: request.defaultToken,
+          }],
           utxos,
           metadata: undefined,
         })

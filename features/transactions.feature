@@ -348,7 +348,7 @@ Feature: Send transaction
 
     Examples:
       | amount              | fee       | expectedTx |
-      | 1.000000            | 0.167833  | "g6QAgYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgSugI11FgGCglgrgtgYWCGDWBxA66wjgpZH9bPPW9JExWBcIUqKGMmxBlNBcCzWoAAa8oZfOxoAD0JAglg5Af0wLcvG6+RrU5YfLU0x/8kfm6HbRxOuVhSWZr6F4UOa5bEdhsrcaqLcJ6I+wLsaSX6JnAGqOfdrGgCGxKcCGgACj5kDGhH+lM2hAIGCWCAosn+8mv+rxG+osiOOtkzZqx67+DrT7IF+s0fWbhA6bFhARoefmMDg363oeCLxKyJbZI115/Lref2ZleBk7xpQgv3F4JEvqP+7D0p+6Oi8m0+UOaEREqwotQeDWSe/olRFC/Y=" |
+      | 1.000000            | 0.167657  | "g6QAgYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgSugI11FgGCglgrgtgYWCGDWBxA66wjgpZH9bPPW9JExWBcIUqKGMmxBlNBcCzWoAAa8oZfOxoAD0JAglg5Af0wLcvG6+RrU5YfLU0x/8kfm6HbRxOuVhSWZr6F4UOa5bEdhsrcaqLcJ6I+wLsaSX6JnAGqOfdrGgCGxVcCGgACjukDGhH+lM2hAIGCWCAosn+8mv+rxG+osiOOtkzZqx67+DrT7IF+s0fWbhA6bFhAokhEoNLBWrk60+zXT7fcdHwV5A6j6BUyd8x2g52AGEjx6ckVVBpKSUWLfMCYiuz2m6Z+6zV7lMvgR/QL9qFDBvY=" |
 
   @it-165
   Scenario: Can receive & unmangle utxo entries (IT-165)

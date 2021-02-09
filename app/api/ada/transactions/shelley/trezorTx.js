@@ -2,7 +2,7 @@
 import type {
   CardanoAddressedUtxo,
 } from '../types';
-import { verifyFromBip44Root, cardanoValueFromMultiToken }  from '../utils';
+import { verifyFromBip44Root }  from '../../lib/storage/models/utils';
 import { toDerivationPathString } from '../../../common/lib/crypto/keys/path';
 import type {
   CardanoSignTransaction,
