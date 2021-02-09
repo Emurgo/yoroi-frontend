@@ -30,8 +30,10 @@ export type UtxoSumRequest = {|
 export type UtxoSumResponse = {|
   +sum: ?string,
   +assets: $ReadOnlyArray<$ReadOnly<{
-    amount: string,
-    tokenId: string,
+    +amount: string,
+    +assetId: string,
+    +policyId: string,
+    +name: string,
     ...
   }>>,
 |};
@@ -113,8 +115,10 @@ export type RemoteTransactionInput = {|
   +address: string,
   +amount: string,
   +assets: $ReadOnlyArray<$ReadOnly<{
-    amount: string,
-    tokenId: string,
+    +amount: string,
+    +assetId: string,
+    +policyId: string,
+    +name: string,
     ...
   }>>,
 |};
@@ -122,8 +126,10 @@ export type RemoteTransactionOutput = {|
   +address: string,
   +amount: string,
   +assets: $ReadOnlyArray<$ReadOnly<{
-    amount: string,
-    tokenId: string,
+    +amount: string,
+    +assetId: string,
+    +policyId: string,
+    +name: string,
     ...
   }>>,
 |};
@@ -164,8 +170,10 @@ export type RemoteUnspentOutput = {|
   +receiver: string,
   +amount: string,
   +assets: $ReadOnlyArray<$ReadOnly<{
-    amount: string,
-    tokenId: string,
+    +amount: string,
+    +assetId: string,
+    +policyId: string,
+    +name: string,
     ...
   }>>,
   // +block_num: number,

@@ -323,22 +323,24 @@ export function genUtxoSumForAddresses(
     }
     // sum all chunks together
     let sum: BigNumber = new BigNumber(0);
-    const assetMap = new Map<string, BigNumber>();
+    const assetMap = new Map<string, ReadonlyElementOf<$PropertyType<UtxoSumResponse, 'assets'>>>();
     for (const partial of utxos) {
       sum = sum.plus(new BigNumber(partial.amount));
       for (const asset of partial.assets) {
-        const currentVal = assetMap.get(asset.tokenId) ?? new BigNumber(0);
+        const currentVal = assetMap.get(asset.assetId)?.amount ?? new BigNumber(0);
         assetMap.set(
-          asset.tokenId,
-          currentVal.plus(asset.amount)
+          asset.assetId,
+          {
+            ...asset,
+            amount: new BigNumber(currentVal).plus(asset.amount).toString(),
+          },
         );
       }
     }
     return {
       sum: sum.toString(),
       assets: Array.from(assetMap.entries()).map(entry => ({
-        tokenId: entry[0],
-        amount: entry[1].toString(),
+        ...entry[1],
       })),
     };
   };

@@ -44,7 +44,7 @@ export function cardanoAssetToIdentifier(
   name: RustModule.WalletV4.AssetName,
 ): string {
   // note: possible for name to be empty causing a trailing hyphen
-  return `${Buffer.from(policyId.to_bytes()).toString('hex')}|${Buffer.from(name.to_bytes()).toString('hex')}`;
+  return `${Buffer.from(policyId.to_bytes()).toString('hex')}.${Buffer.from(name.to_bytes()).toString('hex')}`;
 }
 export function identifierToCardanoAsset(
   identifier: string,
@@ -63,7 +63,9 @@ export function identifierToCardanoAsset(
 export function parseTokenList(
   assets: void | RustModule.WalletV4.MultiAsset,
 ): Array<{|
-  tokenId: string,
+  assetId: string,
+  policyId: string,
+  name: string,
   amount: string,
 |}> {
   if (assets == null) return [];
@@ -83,7 +85,9 @@ export function parseTokenList(
 
       result.push({
         amount: amount.to_str(),
-        tokenId: cardanoAssetToIdentifier(policyId, assetName),
+        assetId: cardanoAssetToIdentifier(policyId, assetName),
+        policyId: Buffer.from(policyId.to_bytes()).toString('hex'),
+        name: Buffer.from(assetName.to_bytes()).toString('hex'),
       });
     }
   }
@@ -129,7 +133,7 @@ export function multiTokenFromCardanoValue(
   for (const token of parseTokenList(value.multiasset())) {
     multiToken.add({
       amount: new BigNumber(token.amount),
-      identifier: token.tokenId,
+      identifier: token.assetId,
       networkId: defaults.defaultNetworkId,
     });
   }
@@ -145,7 +149,7 @@ export function cardanoValueFromRemoteFormat(
 
   const assets = RustModule.WalletV4.MultiAsset.new();
   for (const entry of utxo.assets) {
-    const { policyId, name } = identifierToCardanoAsset(entry.tokenId);
+    const { policyId, name } = identifierToCardanoAsset(entry.assetId);
 
     const policyContent = assets.get(policyId) ?? RustModule.WalletV4.Assets.new();
 
@@ -180,7 +184,7 @@ export function multiTokenFromRemote(
   });
   for (const token of utxo.assets) {
     result.add({
-      identifier: token.tokenId,
+      identifier: token.assetId,
       amount: new BigNumber(token.amount),
       networkId,
     });
@@ -364,6 +368,15 @@ export function asAddressedUtxo(
       }
     );
 
+    const assets = tokenTypes.tokens.map(token => {
+      const pieces = identifierToCardanoAsset(token.tokenId);
+      return {
+        amount: token.amount,
+        assetId: token.tokenId,
+        policyId: Buffer.from(pieces.policyId.to_bytes()).toString('hex'),
+        name: Buffer.from(pieces.name.to_bytes()).toString('hex'),
+      };
+    });
     return {
       amount: tokenTypes.amount.toString(),
       receiver: utxo.address,
@@ -371,7 +384,7 @@ export function asAddressedUtxo(
       tx_index: utxo.output.UtxoTransactionOutput.OutputIndex,
       utxo_id: utxo.output.Transaction.Hash + utxo.output.UtxoTransactionOutput.OutputIndex,
       addressing: utxo.addressing,
-      assets: tokenTypes.tokens,
+      assets,
     };
   });
 }

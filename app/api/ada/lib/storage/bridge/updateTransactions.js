@@ -1662,14 +1662,14 @@ function genByronIOGen(
       });
       // 2) Add tokens
       for (let tokenIndex = 0; tokenIndex < input.assets.length; tokenIndex++) {
-        const assetInfo = getAssetInfoOrThrow(input.assets[tokenIndex].tokenId);
+        const assetInfo = getAssetInfoOrThrow(input.assets[tokenIndex].assetId);
         tokenList.push({
           TokenList: {
             Amount: input.assets[tokenIndex].amount.toString(),
             ListId: listId,
             TokenId: assetInfo.TokenId,
           },
-          identifier: input.assets[tokenIndex].tokenId,
+          identifier: input.assets[tokenIndex].assetId,
           networkId: network.NetworkId,
         });
       }
@@ -1699,14 +1699,14 @@ function genByronIOGen(
       });
       // 2) Add tokens
       for (let tokenIndex = 0; tokenIndex < output.assets.length; tokenIndex++) {
-        const assetInfo = getAssetInfoOrThrow(output.assets[tokenIndex].tokenId);
+        const assetInfo = getAssetInfoOrThrow(output.assets[tokenIndex].assetId);
         tokenList.push({
           TokenList: {
             Amount: output.assets[tokenIndex].amount.toString(),
             ListId: listId,
             TokenId: assetInfo.TokenId,
           },
-          identifier: output.assets[tokenIndex].tokenId,
+          identifier: output.assets[tokenIndex].assetId,
           networkId: network.NetworkId,
         });
       }
@@ -1776,14 +1776,14 @@ function genShelleyIOGen(
       });
       // 2) Add tokens
       for (let tokenIndex = 0; tokenIndex < input.assets.length; tokenIndex++) {
-        const assetInfo = getAssetInfoOrThrow(input.assets[tokenIndex].tokenId);
+        const assetInfo = getAssetInfoOrThrow(input.assets[tokenIndex].assetId);
         tokenList.push({
           TokenList: {
             Amount: input.assets[tokenIndex].amount.toString(),
             ListId: listId,
             TokenId: assetInfo.TokenId,
           },
-          identifier: input.assets[tokenIndex].tokenId,
+          identifier: input.assets[tokenIndex].assetId,
           networkId: network.NetworkId,
         });
       }
@@ -1841,14 +1841,14 @@ function genShelleyIOGen(
         networkId: network.NetworkId,
       });
       for (let tokenIndex = 0; tokenIndex < output.assets.length; tokenIndex++) {
-        const assetInfo = getAssetInfoOrThrow(output.assets[tokenIndex].tokenId);
+        const assetInfo = getAssetInfoOrThrow(output.assets[tokenIndex].assetId);
         tokenList.push({
           TokenList: {
             Amount: output.assets[tokenIndex].amount.toString(),
             ListId: listId,
             TokenId: assetInfo.TokenId,
           },
-          identifier: output.assets[tokenIndex].tokenId,
+          identifier: output.assets[tokenIndex].assetId,
           networkId: network.NetworkId,
         });
       }
@@ -1912,10 +1912,10 @@ async function genCardanoAssetMap(
   const tokenIds = Array.from(new Set(newTxs.flatMap(tx => [
     ...tx.inputs
       .flatMap(input => input.assets)
-      .map(asset => asset.tokenId),
+      .map(asset => asset.assetId),
     ...tx.outputs
       .flatMap(output => output.assets)
-      .map(asset => asset.tokenId),
+      .map(asset => asset.assetId),
     // force inclusion of primary token for chain
     defaultToken.defaultIdentifier
   ])));
