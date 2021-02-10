@@ -78,7 +78,7 @@ Feature: Yoroi delegation dashboard
     And I enter the wallet password:
       | password   |
       | asdfasdfasdf |
-    Given The expected transaction is "g6QAgYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgSugI11FwGBglg5ATFf/lO+USTb83qMl8g53oV7XmMSuklF3gfHb8kex9YZS/n0WTCduT05oFTkplWcw+TU0UvasV/VGgCWD6sCGgAChtUDGhH+lM2hAIGCWCCxG2517QHEmTBkk1BC3zBriToLyq4PxNikr8LCc0V+jFhAUiMjVxyfTJcGdgg9q914adTdNaD7+DW+eMviv5if69KbiPhAxWcIGldT8kDaG2uiyjtePEnGLd9fXRa3unVuBPY="
+    Given The expected transaction is "g6QAgYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgSugI11FwGBglg5ATFf/lO+USTb83qMl8g53oV7XmMSuklF3gfHb8kex9YZS/n0WTCduT05oFTkplWcw+TU0UvasV/VGgCWEFsCGgAChiUDGhH+lM2hAIGCWCCxG2517QHEmTBkk1BC3zBriToLyq4PxNikr8LCc0V+jFhA0LkC9dcwcE8kORl7Oo4D4lql/IEmb+pFM9JXsKFjTXpKLIftor3/GXjnZRZh9TWkoQhBFisxgf65tR2Pfsq+AfY="
     When I confirm Yoroi transfer funds
     Then I should see the summary screen
     And I should see 1 pending transactions
