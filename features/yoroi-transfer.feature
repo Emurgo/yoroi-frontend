@@ -272,7 +272,7 @@ Feature: Transfer Yoroi Wallet funds
     Then I select the private key option
     Then I accept the prompt
     Then I keep the staking key
-    Given I enter the key "g6UAgYJYIDZ351x7ppm/3GzVfULyRvhvY679dgJQBqx4MT+tK7ohAQGBglg5Aceyi86pDUQLVFWmoConylm4aW8Gf8GWf0f5M+eVWOlpyqnletz8QLmQfreUNjtZD69C//SMOOuIGgCdmZcCGgACngkDGhH+lM0FoVgd4ZVY6WnKqeV63PxAuZB+t5Q2O1kPr0L/9Iw464gaAExLQKEAgoJYIMyYCZRBUMAPORPNKxA+m0L+YkP8NqdvnrgAaS4r2j8uWEDrHc3MU1A1Ld4wBuDlQNaLHjLyslTryHo17+6pwBijc5gHDsZdpGdHlAJ4sYEU5xhtEWcdKZJ47S/5SbW+IewEglggYWJ2UyDJOtPILMKLlXi+MaeR8Do33K4FY0PMJbvLOzFYQKgMvF2J23ta3vQDlNyQNe88f4uwUUauI8MVy5gViMXrw7Z8Oe4csDRFhMvxnpRLWRtPJ+z8j2/rL+MvY3BtAQ32"
+    Given I enter the key "2bdf5cef8eda749f705f18607adbc3ff8e5d0b5bcd92513108b9006370ccaff67fbc9935dfe2deeb8e9a445476150990c526f5d1a653bb323c1d4e309fbcaadbfa0bb19cbeaf36cdc940df1249713d7037654689d16bf3b3b681d66fa8398d954124185fb51f5cbac9530df068b29ebe59936d5e07a2595f092c16ad"
     And I enter the decryption password "asdfasdfasdf"
     And I proceed with the recovery
     Then I should see on the Yoroi withdrawal transfer summary screen:
@@ -282,7 +282,7 @@ Feature: Transfer Yoroi Wallet funds
     And I enter the wallet password:
       | password   |
       | asdfasdfasdf |
-    Given The expected transaction is "g6UAgYJYIDZ351x7ppm/3GzVfULyRvhvY679dgJQBqx4MT+tK7ohAQGBglg5Aceyi86pDUQLVFWmoConylm4aW8Gf8GWf0f5M+eVWOlpyqnletz8QLmQfreUNjtZD69C//SMOOuIGgCdmOcCGgACnrkDGhH+lM0FoVgd4ZVY6WnKqeV63PxAuZB+t5Q2O1kPr0L/9Iw464gaAExLQKEAgoJYIMyYCZRBUMAPORPNKxA+m0L+YkP8NqdvnrgAaS4r2j8uWECtpqZgzGT59YcufXB7lapcXnXV6vhAwVcOWAwJ1ETU1fYHXCu1L18h08N8G36qNKEXFYxtWkhohVpD4Q2FXIENglggYWJ2UyDJOtPILMKLlXi+MaeR8Do33K4FY0PMJbvLOzFYQEChQ6M2dwJDq/Hjjy6Wm4X16lJuvmFbVFalNvqRC/i4uamx+5ygq1sS32gdscAwi05wfkpEJ/r7ZUK1vx63BAH2"
+    Given The expected transaction is "g6UAgYJYIDZ351x7ppm/3GzVfULyRvhvY679dgJQBqx4MT+tK7ohAQGBglg5Aceyi86pDUQLVFWmoConylm4aW8Gf8GWf0f5M+eVWOlpyqnletz8QLmQfreUNjtZD69C//SMOOuIGgCdmZcCGgACngkDGhH+lM0FoVgd4ZVY6WnKqeV63PxAuZB+t5Q2O1kPr0L/9Iw464gaAExLQKEAgoJYIMyYCZRBUMAPORPNKxA+m0L+YkP8NqdvnrgAaS4r2j8uWEDrHc3MU1A1Ld4wBuDlQNaLHjLyslTryHo17+6pwBijc5gHDsZdpGdHlAJ4sYEU5xhtEWcdKZJ47S/5SbW+IewEglggYWJ2UyDJOtPILMKLlXi+MaeR8Do33K4FY0PMJbvLOzFYQKgMvF2J23ta3vQDlNyQNe88f4uwUUauI8MVy5gViMXrw7Z8Oe4csDRFhMvxnpRLWRtPJ+z8j2/rL+MvY3BtAQ32"
     When I confirm Yoroi transfer funds
     Then I should see the summary screen
 
