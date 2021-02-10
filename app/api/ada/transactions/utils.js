@@ -44,7 +44,7 @@ export function cardanoAssetToIdentifier(
   name: RustModule.WalletV4.AssetName,
 ): string {
   // note: possible for name to be empty causing a trailing hyphen
-  return `${Buffer.from(policyId.to_bytes()).toString('hex')}.${Buffer.from(name.to_bytes()).toString('hex')}`;
+  return `${Buffer.from(policyId.to_bytes()).toString('hex')}.${Buffer.from(name.name()).toString('hex')}`;
 }
 export function identifierToCardanoAsset(
   identifier: string,
@@ -52,11 +52,11 @@ export function identifierToCardanoAsset(
   policyId: RustModule.WalletV4.ScriptHash,
   name: RustModule.WalletV4.AssetName,
 |} {
-  // recall: 'a|'.split() gives ['a', ''] as desired
-  const parts = identifier.split('|');
+  // recall: 'a.'.split() gives ['a', ''] as desired
+  const parts = identifier.split('.');
   return {
     policyId: RustModule.WalletV4.ScriptHash.from_bytes(Buffer.from(parts[0], 'hex')),
-    name: RustModule.WalletV4.AssetName.from_bytes(Buffer.from(parts[1], 'hex')),
+    name: RustModule.WalletV4.AssetName.new(Buffer.from(parts[1], 'hex')),
   };
 }
 
@@ -87,7 +87,7 @@ export function parseTokenList(
         amount: amount.to_str(),
         assetId: cardanoAssetToIdentifier(policyId, assetName),
         policyId: Buffer.from(policyId.to_bytes()).toString('hex'),
-        name: Buffer.from(assetName.to_bytes()).toString('hex'),
+        name: Buffer.from(assetName.name()).toString('hex'),
       });
     }
   }
@@ -374,7 +374,7 @@ export function asAddressedUtxo(
         amount: token.amount,
         assetId: token.tokenId,
         policyId: Buffer.from(pieces.policyId.to_bytes()).toString('hex'),
-        name: Buffer.from(pieces.name.to_bytes()).toString('hex'),
+        name: Buffer.from(pieces.name.name()).toString('hex'),
       };
     });
     return {

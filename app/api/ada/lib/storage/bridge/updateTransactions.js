@@ -1946,7 +1946,7 @@ async function genCardanoAssetMap(
           ticker: null,
           longName: null,
           numberOfDecimals: 0,
-          assetName: Buffer.from(parts.name.to_bytes()).toString('hex'),
+          assetName: Buffer.from(parts.name.name()).toString('hex'),
           policyId: Buffer.from(parts.policyId.to_bytes()).toString('hex'),
         }
       };
@@ -2499,6 +2499,19 @@ async function certificateToDb(
           // TODO: what to do about dnsSrvName ?
         }
 
+        const poolMetadata = (() => {
+          if (cert.poolParams.poolMetadata == null) {
+            return undefined;
+          }
+          const metadata = cert.poolParams.poolMetadata;
+          return RustModule.WalletV4.PoolMetadata.new(
+            RustModule.WalletV4.URL.new(metadata.url),
+            RustModule.WalletV4.MetadataHash.from_bytes(
+              Buffer.from(metadata.metadataHash, 'hex')
+            )
+          );
+        })();
+
         const certificate = RustModule.WalletV4.PoolRegistration.new(
           RustModule.WalletV4.PoolParams.new(
             operatorKey,
@@ -2517,14 +2530,7 @@ async function certificateToDb(
             wasmRewardAddress,
             owners,
             relays,
-            cert.poolParams.poolMetadata == null
-              ? undefined
-              : RustModule.WalletV4.PoolMetadata.new(
-                cert.poolParams.poolMetadata.url,
-                RustModule.WalletV4.MetadataHash.from_bytes(
-                  Buffer.from(cert.poolParams.poolMetadata.metadataHash, 'hex')
-                )
-              )
+            poolMetadata
           )
         );
 

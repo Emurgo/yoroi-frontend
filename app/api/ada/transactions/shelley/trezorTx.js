@@ -204,7 +204,7 @@ function toTrezorTokenBundle(
 
       tokenAmounts.push({
         amount: amount.to_str(),
-        assetNameBytes: Buffer.from(assetName.to_bytes()).toString('hex'),
+        assetNameBytes: Buffer.from(assetName.name()).toString('hex'),
       });
     }
     assetGroup.push({
