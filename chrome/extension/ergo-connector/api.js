@@ -3,6 +3,8 @@
 import type {
   Address,
   Box,
+  Paginate,
+  PaginateError,
   Tx,
   TxId,
   SignedTx
@@ -37,6 +39,20 @@ import type { UtxoTxOutput } from '../../../app/api/ada/lib/storage/database/tra
 import { CoreAddressTypes } from '../../../app/api/ada/lib/storage/database/primitives/enums';
 import { getAllAddressesForDisplay } from '../../../app/api/ada/lib/storage/bridge/traitUtils';
 
+function paginateResults<T>(results: T[], paginate: ?Paginate): T[] | PaginateError {
+  if (paginate != null) {
+    const startIndex = paginate.page * paginate.limit;
+    if (startIndex >= results.length) {
+      return {
+        maxSize: results.length
+      };
+    }
+    console.log(`PAGINATE: [${startIndex}, ${Math.min(startIndex + paginate.limit, results.length)}) instead of [0, ${results.length})`);
+    return results.slice(startIndex, Math.min(startIndex + paginate.limit, results.length));
+  }
+  console.log(`paginate normal: ${JSON.stringify(paginate)} of ${results.length}`);
+  return results;
+}
 
 export async function connectorGetBalance(
   wallet: PublicDeriver<>,
@@ -85,8 +101,10 @@ function formatUtxoToBox(utxo: { output: $ReadOnly<UtxoTxOutput>, ... }): Box {
 
 export async function connectorGetUtxos(
   wallet: PublicDeriver<>,
-  valueExpected: ?number
-): Promise<Box[]> {
+  valueExpected: ?number,
+  tokenId: ?string,
+  paginate: ?Paginate
+): Promise<Box[] | PaginateError> {
   const withUtxos = asGetAllUtxos(wallet);
   if (withUtxos == null) {
     throw new Error('wallet doesn\'t support IGetAllUtxos');
@@ -109,7 +127,7 @@ export async function connectorGetUtxos(
   } else {
     utxosToUse = utxos.map(formatUtxoToBox);
   }
-  return Promise.resolve(utxosToUse);
+  return Promise.resolve(paginateResults(utxosToUse, paginate));
 }
 
 async function getAllAddresses(wallet: PublicDeriver<>, usedFilter: boolean): Promise<Address[]> {
@@ -135,8 +153,8 @@ async function getAllAddresses(wallet: PublicDeriver<>, usedFilter: boolean): Pr
   return addresses;
 }
 
-export async function connectorGetUsedAddresses(wallet: PublicDeriver<>): Promise<Address[]> {
-  return getAllAddresses(wallet, true);
+export async function connectorGetUsedAddresses(wallet: PublicDeriver<>, paginate: ?Paginate): Promise<Address[] | PaginateError> {
+  return getAllAddresses(wallet, true).then(addresses => paginateResults(addresses, paginate));
 }
 
 export async function connectorGetUnusedAddresses(wallet: PublicDeriver<>): Promise<Address[]> {

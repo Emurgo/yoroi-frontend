@@ -25,14 +25,26 @@ if (typeof ergo_request_read_access === "undefined") {
             //     // console.log('}');
             //     console.log(`get_unused_addresses() = ${JSON.stringify(addresses)}`);
             // });
-            // ergo.get_used_addresses().then(function(addresses) {
-            //     //console.log(`get_used_addresses() = {`);
-            //     // for (const address of addresses) {
+            function pagedUsedAddresses(page, limit) {
+                ergo.get_used_addresses({ page, limit }).then(usedAddresses => {
+                    if (usedAddresses.maxSize == null) {
+                        console.log(`usedAddresses[${page * limit} - ${page * limit + usedAddresses.length - 1}] = ${JSON.stringify(usedAddresses)}`);
+                        pagedUsedAddresses(page + 1, limit);
+                    } else {
+                        console.log(`paginateError = ${JSON.stringify(usedAddresses)}`);
+                    }
+                });
+            }
+            pagedUsedAddresses(0, 3);
+            // ergo.get_used_addresses({ page: 0, limit: 3 }).then(function(addresses) {
+            //     console.log(`get_used_addresses() = {`);
+            //     for (const address of addresses) {
             //     //     const addr = wasm.NetworkAddress.from_bytes(Buffer.from(address, 'hex'));
             //     //     console.log(`${JSON.stringify(address)} -> ${addr.to_base58()}`);
-            //     // }
-            //     // console.log('}');
-            //     console.log(`get_used_addresses() = ${JSON.stringify(addresses)}`);
+            //         console.log(`    ${address}`);
+            //     }
+            //     console.log('}');
+            //     //console.log(`get_used_addresses() = ${JSON.stringify(addresses)}`);
             // });
             ergo.get_balance().then(async function(result) {
                 let tx = {};
