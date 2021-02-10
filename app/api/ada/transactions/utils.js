@@ -116,7 +116,9 @@ export function cardanoValueFromMultiToken(
     // recall: we always have to insert since WASM returns copies of objects
     assets.insert(policyId, policyContent);
   }
-  value.set_multiasset(assets);
+  if (assets.len() > 0) {
+    value.set_multiasset(assets);
+  }
   return value;
 }
 export function multiTokenFromCardanoValue(
@@ -160,7 +162,9 @@ export function cardanoValueFromRemoteFormat(
     // recall: we always have to insert since WASM returns copies of objects
     assets.insert(policyId, policyContent);
   }
-  value.set_multiasset(assets);
+  if (assets.len() > 0) {
+    value.set_multiasset(assets);
+  }
   return value;
 }
 export function multiTokenFromRemote(

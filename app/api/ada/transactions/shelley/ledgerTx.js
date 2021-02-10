@@ -7,11 +7,13 @@ import type {
   BIP32Path,
   StakingBlockchainPointer,
   InputTypeUTxO,
-  OutputTypeAddress,
-  OutputTypeAddressParams,
+  TxOutputTypeAddress,
+  TxOutputTypeAddressParams,
   Withdrawal,
   Witness,
   Certificate,
+  AssetGroup,
+  Token,
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import type { SignTransactionRequest } from '@emurgo/ledger-connect-handler';
 import type {
@@ -75,17 +77,17 @@ export async function createLedgerSignTxPayload(request: {|
   }
 
   const ttl = txBody.ttl();
-  if (ttl == null) throw new Error(`${nameof(createLedgerSignTxPayload)} Ledger firmware doesn't support no TTL txs`);
   return {
     inputs: ledgerInputs,
     outputs: ledgerOutputs,
-    ttlStr: ttl.toString(),
+    ttlStr: ttl === undefined ? ttl : ttl.toString(),
     feeStr: txBody.fee().to_str(),
     protocolMagic: request.byronNetworkMagic,
     withdrawals: ledgerWithdrawal,
     certificates: ledgerCertificates,
     metadataHashHex: undefined,
     networkId: request.networkId,
+    validityIntervalStartStr: undefined,
   };
 }
 
@@ -102,12 +104,44 @@ function _transformToLedgerInputs(
   }));
 }
 
+function toLedgerTokenBundle(
+  assets: ?RustModule.WalletV4.MultiAsset
+): Array<AssetGroup> {
+  const assetGroup: Array<AssetGroup> = [];
+  if (assets == null) return assetGroup;
+
+  const policyHashes = assets.keys();
+  for (let i = 0; i < policyHashes.len(); i++) {
+    const policyId = policyHashes.get(i);
+    const assetsForPolicy = assets.get(policyId);
+    if (assetsForPolicy == null) continue;
+
+    const tokens: Array<Token> = [];
+    const assetNames = assetsForPolicy.keys();
+    for (let j = 0; j < assetNames.len(); j++) {
+      const assetName = assetNames.get(j);
+      const amount = assetsForPolicy.get(assetName);
+      if (amount == null) continue;
+
+      tokens.push({
+        amountStr: amount.to_str(),
+        assetNameHex: Buffer.from(assetName.name()).toString('hex'),
+      });
+    }
+    assetGroup.push({
+      policyIdHex: Buffer.from(policyId.to_bytes()).toString('hex'),
+      tokens,
+    });
+  }
+  return assetGroup;
+}
+
 function _transformToLedgerOutputs(request: {|
   networkId: number,
   txOutputs: RustModule.WalletV4.TransactionOutputs,
   changeAddrs: Array<{| ...Address, ...Value, ...Addressing |}>,
   addressingMap: string => (void | $PropertyType<Addressing, 'addressing'>),
-|}): Array<OutputTypeAddress | OutputTypeAddressParams> {
+|}): Array<TxOutputTypeAddress | TxOutputTypeAddressParams> {
   const result = [];
   for (let i = 0; i < request.txOutputs.len(); i++) {
     const output = request.txOutputs.get(i);
@@ -123,9 +157,6 @@ function _transformToLedgerOutputs(request: {|
         path: changeAddr.addressing.path,
         addressingMap: request.addressingMap,
       });
-      if (output.amount().multiasset() != null) {
-        throw new Error(`${nameof(_transformToLedgerOutputs)} Ledger firmware doesn't support multi-asset`);
-      }
       result.push({
         addressTypeNibble: addressParams.addressTypeNibble,
         spendingPath: addressParams.spendingPath,
@@ -133,11 +164,13 @@ function _transformToLedgerOutputs(request: {|
         stakingKeyHashHex: addressParams.stakingKeyHashHex,
         stakingPath: addressParams.stakingPath,
         amountStr: output.amount().coin().to_str(),
+        tokenBundle: toLedgerTokenBundle(output.amount().multiasset()),
       });
     } else {
       result.push({
         addressHex: Buffer.from(address.to_bytes()).toString('hex'),
         amountStr: output.amount().coin().to_str(),
+        tokenBundle: toLedgerTokenBundle(output.amount().multiasset()),
       });
     }
   }
