@@ -407,7 +407,8 @@ test('Create Ledger transaction', async () => {
     }],
     outputs: [{
       addressHex: '82d818582183581c891ac9abaac999b097c81ea3c0450b0fbb693d0bd232bebc0f4a391fa0001af2ff7e21',
-      amountStr: `5326134`
+      amountStr: `5326134`,
+      tokenBundle: [],
     }],
     withdrawals: [],
     certificates: [{
@@ -423,6 +424,7 @@ test('Create Ledger transaction', async () => {
       type: CertificateTypes.STAKE_REGISTRATION,
     }],
     metadataHashHex: undefined,
+    validityIntervalStartStr: undefined,
   });
 
   buildSignedTransaction(
