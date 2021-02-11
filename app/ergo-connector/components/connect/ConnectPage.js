@@ -2,7 +2,7 @@
 // @flow
 import React, { Component } from 'react';
 import type { Node } from 'react';
-import { intlShape, defineMessages } from 'react-intl';
+import { intlShape, defineMessages, FormattedHTMLMessage } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import styles from './ConnectPage.scss';
 import { Button } from 'react-polymorph/lib/components/Button';
@@ -29,7 +29,8 @@ const messages = defineMessages({
   },
   connectInfo: {
     id: 'ergo-connector.connect.info',
-    defaultMessage: '!!!Your connection preferences will be saved to your Yoroi dApp list',
+    defaultMessage:
+      '!!!Your connection preferences will be saved to your Yoroi dApp list. <br/> We are granting read-only access to view utxos/addresses.',
   },
   noWalletsFound: {
     id: 'ergo-connector.connect.noWalletsFound',
@@ -108,7 +109,9 @@ class ConnectPage extends Component<Props> {
           ) : null}
         </ul>
         <div className={styles.bottom}>
-          <p>{intl.formatMessage(messages.connectInfo)} </p>
+          <p>
+            <FormattedHTMLMessage {...messages.connectInfo} />
+          </p>
           <div className={styles.wrapperBtn}>
             <Button
               className="secondary"

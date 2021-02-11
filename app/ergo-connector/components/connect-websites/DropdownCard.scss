@@ -49,6 +49,17 @@
 .expandedContent {
   background-color: #eaedf2;
   padding: 0 32px;
+  color: #6b7384;
+  & > h3 {
+    font-size: 14px;
+    letter-spacing: 0;
+    line-height: 22px;
+    margin-bottom: 4px;
+    font-weight: 500;
+  }
+  & > p {
+    font-size: 12px;
+  }
 }
 
 .card {

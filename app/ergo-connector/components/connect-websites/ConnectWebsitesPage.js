@@ -19,6 +19,10 @@ const messages = defineMessages({
     id: 'connector.connect.connectedWallets',
     defaultMessage: '!!!Connected Wallets',
   },
+  messageReadOnly: {
+    id: 'connector.connect.messageReadOnly',
+    defaultMessage: '!!!We are granting read-only to view utxos/addresses.',
+  },
   noWalletsFound: {
     id: 'connector.connect.noWalletsFound',
     defaultMessage: '!!!We havent found any wallet. Try again',
@@ -43,6 +47,7 @@ export default class ConnectWebsitesPage extends Component<Props> {
             accounts.map(({ url, walletIndex }) => (
               <DropdownCard
                 label={intl.formatMessage(messages.connectedWallets)}
+                infoText={intl.formatMessage(messages.messageReadOnly)}
                 key={url}
                 url={url}
                 wallet={wallets[walletIndex]}

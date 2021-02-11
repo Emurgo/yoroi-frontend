@@ -10,6 +10,7 @@ import { observer } from 'mobx-react';
 
 type Props = {|
   label: string,
+  infoText: string,
   url: string,
   wallet: {| name: string, balance: string |},
   onRemoveWallet: string => void,
@@ -26,7 +27,7 @@ export default class DropdownCard extends Component<Props, State> {
   };
 
   render(): Node {
-    const { label, url, wallet, onRemoveWallet } = this.props;
+    const { label, infoText, url, wallet, onRemoveWallet } = this.props;
     const { isExpanded } = this.state;
     const arrowClasses = isExpanded ? styles.collapseArrow : styles.expandArrow;
 
@@ -50,6 +51,7 @@ export default class DropdownCard extends Component<Props, State> {
         {isExpanded ? (
           <div className={styles.expandedContent}>
             <h3>{label}</h3>
+            <p>{infoText}</p>
             <div className={styles.card}>
               <div
                 className={styles.remove}
