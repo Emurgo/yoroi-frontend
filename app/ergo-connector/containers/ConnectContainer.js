@@ -23,10 +23,24 @@ export default class ConnectContainer extends Component<
     selected: -1,
   };
 
+  onUnload: (SyntheticEvent<>) => void = ev => {
+    ev.preventDefault();
+    const chromeMessage = this.generated.stores.connector.connectingMessage;
+    chrome.runtime.sendMessage({
+      type: 'connect_response',
+      accepted: false,
+      tabId: chromeMessage?.tabId,
+    });
+  };
+
   componentDidMount() {
     this.generated.actions.connector.getWallets.trigger();
+    window.addEventListener('unload', this.onUnload);
   }
 
+  componentWillUnmount() {
+    window.removeEventListener('unload', this.onUnload);
+  }
   onToggleCheckbox: (index: number) => void = index => {
     this.setState({ selected: index });
   };

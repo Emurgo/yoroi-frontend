@@ -17,6 +17,19 @@ export default class SignTxContainer extends Component<
 > {
   @observable notificationElementId: string = '';
 
+  onUnload: (SyntheticEvent<>) => void = ev => {
+    ev.preventDefault();
+    this.generated.actions.connector.cancelSignInTx.trigger();
+  };
+
+  componentDidMount() {
+    window.addEventListener('unload', this.onUnload);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('unload', this.onUnload);
+  }
+
   onConfirm: string => void = password => {
     this.generated.actions.connector.confirmSignInTx.trigger(password);
   };
