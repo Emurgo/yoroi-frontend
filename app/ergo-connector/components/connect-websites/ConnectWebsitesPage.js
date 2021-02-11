@@ -8,6 +8,7 @@ import { observer } from 'mobx-react';
 import { intlShape, defineMessages } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { connectorMessages } from '../../../i18n/global-messages';
+import NoItemsFoundImg from '../../assets/images/no-websites-connected.inline.svg';
 
 type Props = {|
   accounts: any,
@@ -19,13 +20,9 @@ const messages = defineMessages({
     id: 'connector.connect.connectedWallets',
     defaultMessage: '!!!Connected Wallets',
   },
-  messageReadOnly: {
-    id: 'connector.connect.messageReadOnly',
-    defaultMessage: '!!!We are granting read-only to view utxos/addresses.',
-  },
-  noWalletsFound: {
-    id: 'connector.connect.noWalletsFound',
-    defaultMessage: '!!!We havent found any wallet. Try again',
+  noWebsitesConnected: {
+    id: 'connector.connect.noWebsitesConnected',
+    defaultMessage: `!!!You don't have any websites connected yet`,
   },
 });
 
@@ -41,23 +38,31 @@ export default class ConnectWebsitesPage extends Component<Props> {
 
     return (
       <div className={styles.component}>
-        <h1 className={styles.title}>{intl.formatMessage(connectorMessages.connectedWebsites)}</h1>
-        <div className={styles.walletList}>
-          {accounts.length ? (
-            accounts.map(({ url, walletIndex }) => (
-              <DropdownCard
-                label={intl.formatMessage(messages.connectedWallets)}
-                infoText={intl.formatMessage(messages.messageReadOnly)}
-                key={url}
-                url={url}
-                wallet={wallets[walletIndex]}
-                onRemoveWallet={onRemoveWallet}
-              />
-            ))
-          ) : !accounts.length ? (
-            <p className={styles.noItems}>{intl.formatMessage(messages.noWalletsFound)} </p>
-          ) : null}
-        </div>
+        {accounts.length ? (
+          <>
+            <h1 className={styles.title}>
+              {intl.formatMessage(connectorMessages.connectedWebsites)}
+            </h1>
+            <div className={styles.walletList}>
+              {accounts.map(({ url, walletIndex }) => (
+                <DropdownCard
+                  label={intl.formatMessage(messages.connectedWallets)}
+                  infoText={intl.formatMessage(connectorMessages.messageReadOnly)}
+                  key={url}
+                  url={url}
+                  wallet={wallets[walletIndex]}
+                  onRemoveWallet={onRemoveWallet}
+                />
+              ))}
+            </div>
+          </>
+        ) : !accounts.length ? (
+          <div className={styles.noItems}>
+            <NoItemsFoundImg />
+            <h3>{intl.formatMessage(messages.noWebsitesConnected)} </h3>
+            <p>{intl.formatMessage(connectorMessages.messageReadOnly)}</p>
+          </div>
+        ) : null}
       </div>
     );
   }

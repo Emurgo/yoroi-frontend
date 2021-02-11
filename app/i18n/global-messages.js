@@ -775,6 +775,10 @@ export const connectorMessages: * = defineMessages({
     id: 'global.connector.connectedWebsites',
     defaultMessage: '!!!Connected Websites',
   },
+  messageReadOnly: {
+    id: 'global.connector.messageReadOnly',
+    defaultMessage: '!!!We are granting read-only to view utxos/addresses.',
+  },
 });
 
 

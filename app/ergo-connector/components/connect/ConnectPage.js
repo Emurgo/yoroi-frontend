@@ -10,7 +10,7 @@ import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import { Checkbox } from 'react-polymorph/lib/components/Checkbox';
 import { CheckboxSkin } from 'react-polymorph/lib/skins/simple/CheckboxSkin';
 import WalletCard from './WalletCard';
-import globalMessages from '../../../i18n/global-messages';
+import globalMessages, { connectorMessages } from '../../../i18n/global-messages';
 import { observer } from 'mobx-react';
 import LoadingSpinner from '../../../components/widgets/LoadingSpinner';
 
@@ -29,8 +29,7 @@ const messages = defineMessages({
   },
   connectInfo: {
     id: 'ergo-connector.connect.info',
-    defaultMessage:
-      '!!!Your connection preferences will be saved to your Yoroi dApp list. <br/> We are granting read-only access to view utxos/addresses.',
+    defaultMessage: '!!!Your connection preferences will be saved to your Yoroi dApp list.',
   },
   noWalletsFound: {
     id: 'ergo-connector.connect.noWalletsFound',
@@ -109,9 +108,10 @@ class ConnectPage extends Component<Props> {
           ) : null}
         </ul>
         <div className={styles.bottom}>
-          <p>
-            <FormattedHTMLMessage {...messages.connectInfo} />
-          </p>
+          <div className={styles.infoText}>
+            <p>{intl.formatMessage(messages.connectInfo)}</p>
+            <p>{intl.formatMessage(connectorMessages.messageReadOnly)}</p>
+          </div>
           <div className={styles.wrapperBtn}>
             <Button
               className="secondary"

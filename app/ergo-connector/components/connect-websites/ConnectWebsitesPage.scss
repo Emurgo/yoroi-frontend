@@ -9,6 +9,20 @@
   .walletList {
   }
   .noItems {
-    padding: 12px 32px;
+    padding: 60px 32px 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #6b7384;
+    text-align: center;
+    svg {
+      margin-bottom: 24px;
+    }
+    h3 {
+      font-size: 26px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      line-height: 35px;
+    }
   }
 }
