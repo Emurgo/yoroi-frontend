@@ -1067,7 +1067,7 @@ export default class StakingDashboardPage extends Component<Props> {
         };
       }
       return {
-        getTimeCalcRequests: undefined,
+        getTimeCalcRequests: (undefined: any),
         getCurrentTimeRequests: () => { throw new Error(`${nameof(StakingDashboardPage)} api not supported`) },
       };
     })();

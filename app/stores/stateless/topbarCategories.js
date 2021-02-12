@@ -4,7 +4,7 @@ import type { MessageDescriptor } from 'react-intl';
 import { defineMessages, } from 'react-intl';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import { asGetStakingKey } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
-import { networks, isCardanoHaskell, } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { networks, } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 import transactionsIcon from '../../assets/images/wallet-nav/tab-transactions.inline.svg';
 import sendIcon from '../../assets/images/wallet-nav/tab-send.inline.svg';
