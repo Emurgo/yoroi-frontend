@@ -523,6 +523,23 @@ describe('Create unsigned TX from UTXO', () => {
       true,
     )).toThrow(NotEnoughMoneyToSendError);
   });
+
+  it('Should succeed when not enough ADA to avoid burning tokens but is sending all', () => {
+    const utxos: Array<RemoteUnspentOutput> = genSampleUtxos();
+    expect(() => sendAllUnsignedTxFromUtxo(
+      {
+        address: byronAddrToHex('Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4')
+      },
+      [utxos[4]],
+      new BigNumber(0),
+      {
+        ...getProtocolParams(),
+        // high enough that we can't send the remaining amount as change
+        minimumUtxoVal: RustModule.WalletV4.BigNum.from_str('500000'),
+      },
+      undefined,
+    )).not.toThrow(NotEnoughMoneyToSendError);
+  });
 });
 
 describe('Create unsigned TX from addresses', () => {

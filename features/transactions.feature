@@ -420,3 +420,55 @@ Feature: Send transaction
       | asdfasdfasdf |
     And I submit the wallet send form
     Then I should see the summary screen
+
+  @it-178
+  Scenario Outline: Can send some of a custom Cardano token (IT-178)
+    Given There is a Shelley wallet stored named cardano-token-wallet
+    And I have a wallet with funds
+    When I go to the send transaction screen
+
+    And I open the token selection dropdown
+    And I select token "d2719...f696e"
+
+    And I fill the form:
+      | address                        | amount   |
+      | <address>                      | <amount> |
+    And The transaction fees are "<fee>"
+    And I click on the next button in the wallet send form
+    And I see send money confirmation dialog
+    And I see CONFIRM TRANSACTION Pop up:
+      | address   | amount    |fee      |
+      | <address> | 1.444443  |<fee>    |
+    And I enter the wallet password:
+      | password   |
+      | asdfasdfasdf |
+    Given The expected transaction is "g6QAgYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgSugI11GBoBgoJYK4LYGFghg1gcQOusI4KWR/Wzz1vSRMVgXCFKihjJsQZTQXAs1qAAGvKGXzuCGgAWCluhWBzScZdoLXGQXAh8XDthsQ5tdG2wub7zUQFNdbsmoUZuaWNvaW4YGIJYOQHCOXo7AskuPwKPyvBLXitN1JhK7qw3sfYP1+4O5sPVeGnk6yzmr8YYpWzAu4tvCIuHO8+8BgeUQIIaACRhIKFYHNJxl2gtcZBcCHxcO2GxDm10bbC5vvNRAU11uyahRm5pY29pbhhMAhoAAp2FAxoR/pTNoQCBglgg2ryVo6+TyYjX+sqaAvK82tVCDycATBUMC9wANgPth/VYQHlZXPNDWElwk6ywyZArA/tp/mEDLqKxszGV0d4MQSckziOR/NlT5M5u+XmYr3ntX+dUwy9hvRn5X/jnpLpRYwH2"
+    And I submit the wallet send form
+    Then I should see the summary screen
+
+    Examples:
+      | address                                             | amount       |fee         |
+      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 24  |0.171397 |
+
+  @it-179
+  Scenario: Can send all of a custom Cardano token (IT-179)
+    Given There is a Shelley wallet stored named cardano-token-wallet
+    And I have a wallet with funds
+    When I go to the send transaction screen
+
+    And I open the token selection dropdown
+    And I select token "d2719...f696e"
+
+    And I click on "Send all" checkbox
+    And I fill the address of the form:
+      | address                                                     |
+      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv         |
+    And The transaction fees are "0.169637"
+    And I click on the next button in the wallet send form
+    And I see send money confirmation dialog
+    And I enter the wallet password:
+      | password   |
+      | asdfasdfasdf |
+    Given The expected transaction is "g6QAgYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgSugI11GBoBgoJYK4LYGFghg1gcQOusI4KWR/Wzz1vSRMVgXCFKihjJsQZTQXAs1qAAGvKGXzuCGgAWCluhWBzScZdoLXGQXAh8XDthsQ5tdG2wub7zUQFNdbsmoUZuaWNvaW4YZIJYOQHCOXo7AskuPwKPyvBLXitN1JhK7qw3sfYP1+4O5sPVeGnk6yzmr8YYpWzAu4tvCIuHO8+8BgeUQIIaACRoAKACGgAClqUDGhH+lM2hAIGCWCDavJWjr5PJiNf6ypoC8rza1UIPJwBMFQwL3AA2A+2H9VhAod8QFO11FtfoTJ1Y0ZpeN1e6OFphVJpgjKTSXI+FMw3CV5UIr4eMIIHcxwEgJiOtiYIGIIZyVZAdQbJnSmeTBPY="
+    And I submit the wallet send form
+    Then I should see the summary screen

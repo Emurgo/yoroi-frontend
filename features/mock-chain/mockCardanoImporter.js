@@ -50,6 +50,13 @@ import { CoreAddressTypes } from '../../app/api/ada/lib/storage/database/primiti
 const genesisTransaction = '52929ce6f1ab83b439e65f6613bad9590bd264c0d6c4f910e36e2369bb987b35';
 const genesisAddress = 'Ae2tdPwUPEZLs4HtbuNey7tK4hTKrwNwYtGqp7bDfCy2WdR3P6735W5Yfpe';
 const genesisTxValue = 2000000000000000; // 2 billion ada
+const testAssetId = 'd27197682d71905c087c5c3b61b10e6d746db0b9bef351014d75bb26.6e69636f696e';
+const genesisAssets = [{
+  amount: '1234',
+  assetId: testAssetId,
+  policyId: testAssetId.split('.')[0],
+  name: testAssetId.split('.')[1],
+}];
 
 // based on abandon x14 + address
 const genesisTxReceiver = 'Ae2tdPwUPEZ4YjgvykNpoFeYUxoyhNj2kg8KfKWN2FizsSpLUPv68MpTVDo';
@@ -99,14 +106,14 @@ export const generateTransaction = (): {|
         amount: genesisTxValue.toString(),
         txHash: '',
         index: 0,
-        assets: [],
+        assets: genesisAssets,
       }
     ],
     outputs: [
       {
         address: genesisTxReceiver,
         amount: genesisTxValue.toString(),
-        assets: [],
+        assets: genesisAssets,
       }
     ],
     height: 1,
@@ -127,7 +134,7 @@ export const generateTransaction = (): {|
         id: genesisTx.hash + '0',
         index: 0,
         amount: genesisTxValue.toString(),
-        assets: [],
+        assets: genesisAssets,
       }
     ],
     outputs: [
@@ -535,6 +542,29 @@ export const generateTransaction = (): {|
         ),
         amount: '3500000',
         assets: [],
+      },
+      {
+        // index: 26
+        // eslint-disable-next-line max-len
+        // addr1qxwfqlp5q96ac8rc9gu4eyxr7m9cgspnsp2dzwj46ayjadhxc02hs60yavkwdt7xrzjkes9m3dhs3zu8808mcps8j3qqjmspqv
+        address: getAddressForType(
+          testWallets['cardano-token-wallet'].mnemonic,
+          [
+            WalletTypePurpose.CIP1852,
+            CoinTypes.CARDANO,
+            0 + HARD_DERIVATION_START,
+            ChainDerivations.EXTERNAL,
+            0
+          ],
+          CoreAddressTypes.CARDANO_BASE
+        ),
+        amount: '4000000',
+        assets: [{
+          amount: '100',
+          assetId: testAssetId,
+          policyId: testAssetId.split('.')[0],
+          name: testAssetId.split('.')[1],
+        }]
       },
     ],
     height: 1,
