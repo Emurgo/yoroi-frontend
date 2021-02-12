@@ -387,6 +387,10 @@ export default class WalletSendForm extends Component<Props> {
                   token => token.info.TokenId === tokenId
                 )?.info);
 
+                // clear send all when changing currencies
+                if (this.props.shouldSendAll) {
+                  this.props.toggleSendAll();
+                }
                 // clear amount field when switching currencies
                 this.form.$('amount').clear();
                 this.props.updateAmount();
