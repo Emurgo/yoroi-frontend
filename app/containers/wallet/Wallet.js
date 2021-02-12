@@ -62,11 +62,11 @@ export default class Wallet extends Component<Props> {
     const activeCategory = allCategories.find(
       category => this.generated.stores.app.currentRoute.startsWith(category.route)
     );
-    if (activeCategory == null) return;
 
     // if we're on a page that isn't applicable for the currently selected wallet
     // ex: a cardano-only page for an Ergo wallet
-    if (!activeCategory.isVisible({ selected: publicDeriver })) {
+    // or no category is selected yet (wallet selected for the first time)
+    if (activeCategory == null || !activeCategory.isVisible({ selected: publicDeriver })) {
       const firstValidCategory = allCategories.find(
         category => category.isVisible({ selected: publicDeriver })
       );

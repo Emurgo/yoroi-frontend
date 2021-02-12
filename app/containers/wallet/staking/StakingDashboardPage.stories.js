@@ -242,16 +242,6 @@ const genBaseProps: {|
         },
       },
     },
-    EpochProgressContainerProps: {
-      generated: {
-        stores: {
-          time: {
-            getTimeCalcRequests: request.lookup.getTimeCalcRequests,
-            getCurrentTimeRequests: request.lookup.getCurrentTimeRequests,
-          },
-        },
-      },
-    },
     WithdrawalTxDialogContainerProps: request.withdrawalTxProps ?? (null: any),
     DeregisterDialogContainerProps: {
       generated: {

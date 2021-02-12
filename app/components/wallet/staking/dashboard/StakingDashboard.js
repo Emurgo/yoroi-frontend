@@ -61,7 +61,6 @@ type Props = {|
   +themeVars: Object,
   +graphData: GraphData,
   +stakePools: {| error: LocalizableError, |} | {| pools: null | Array<Node | void> |},
-  +epochProgress: Node,
   +userSummary: Node,
   +upcomingRewards: void | Node,
   +hasAnyPending: boolean,
