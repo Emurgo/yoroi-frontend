@@ -398,12 +398,26 @@ export function newAdaUnsignedTxFromUtxo(
    * This allows for replay attacks of 0-output transactions on testnets that use a mainnet snapshot
    * To protect against this, we can choose to force that there is always even one output
    * by simply enforcing a change address if no outputs are specified for the transaction
-   * This is actually enforced by hardware wallets at the moment (will error on 0 outputs)
+   * This is use to be enforced by hardware wallets (will error on 0 outputs) but may no longer be
+   *
+   * Additionally, it's not possible to burn tokens as fees at the moment
+   * but this functionality may come at a later date
    */
-  const shouldForceChange = !allowNoOutputs && outputs.length === 0;
-  if (shouldForceChange && changeAdaAddr == null) {
-    throw new NoOutputsError();
-  }
+  const shouldForceChange = (
+    assetsForChange: RustModule.WalletV4.MultiAsset | void
+  ): boolean => {
+    const noOutputDisallowed = !allowNoOutputs && outputs.length === 0;
+    if (noOutputDisallowed && changeAdaAddr == null) {
+      throw new NoOutputsError();
+    }
+    if (assetsForChange != null && assetsForChange.len() > 0) {
+      return true;
+    }
+    return noOutputDisallowed;
+
+  };
+  const emptyAsset = RustModule.WalletV4.MultiAsset.new();
+  shouldForceChange(undefined);
 
   const txBuilder = RustModule.WalletV4.TransactionBuilder.new(
     protocolParams.linearFee,
@@ -469,7 +483,7 @@ export function newAdaUnsignedTxFromUtxo(
       const remainingNeeded = output.clamped_sub(currentInputSum);
 
       // update amount required to make sure we have ADA required for change UTXO entry
-      if (shouldForceChange) {
+      if (shouldForceChange(currentInputSum.multiasset()?.sub(output.multiasset() ?? emptyAsset))) {
         if (changeAdaAddr == null) throw new NoOutputsError();
         const difference = currentInputSum.clamped_sub(output);
         const minimumNeededForChange = minRequiredForChange(
@@ -524,7 +538,10 @@ export function newAdaUnsignedTxFromUtxo(
       const compare = currentInputSum.compare(output);
       const enoughInput = compare != null && compare >= 0;
 
-      if (shouldForceChange) {
+      const forceChange = shouldForceChange(
+        currentInputSum.multiasset()?.sub(output.multiasset() ?? emptyAsset)
+      );
+      if (forceChange) {
         if (changeAdaAddr == null) throw new NoOutputsError();
         const difference = currentInputSum.checked_sub(output);
         const minimumNeededForChange = minRequiredForChange(
@@ -537,19 +554,21 @@ export function newAdaUnsignedTxFromUtxo(
           throw new NotEnoughMoneyToSendError();
         }
       }
-      if (!shouldForceChange && !enoughInput) {
+      if (!forceChange && !enoughInput) {
         throw new NotEnoughMoneyToSendError();
       }
     }
   }
 
   const changeAddr = (() => {
+    const totalInput = txBuilder.get_explicit_input().checked_add(txBuilder.get_implicit_input());
+    const difference = totalInput.checked_sub(targetOutput);
+
+    const forceChange = shouldForceChange(difference.multiasset() ?? emptyAsset);
     if (changeAdaAddr == null) {
-      if (shouldForceChange) {
+      if (forceChange) {
         throw new NoOutputsError();
       }
-      const totalInput = txBuilder.get_explicit_input().checked_add(txBuilder.get_implicit_input());
-      const difference = totalInput.checked_sub(targetOutput);
       const minFee = txBuilder.min_fee();
       if (difference.coin().compare(minFee) < 0) {
         throw new NotEnoughMoneyToSendError();
@@ -566,7 +585,7 @@ export function newAdaUnsignedTxFromUtxo(
       throw new Error(`${nameof(newAdaUnsignedTxFromUtxo)} change not a valid Shelley address`);
     }
     const changeWasAdded = txBuilder.add_change_if_needed(wasmChange);
-    if (shouldForceChange && !changeWasAdded) {
+    if (forceChange && !changeWasAdded) {
       // note: this should never happened since it should have been handled by earlier code
       throw new Error(`No change added even though it should be forced`);
     }

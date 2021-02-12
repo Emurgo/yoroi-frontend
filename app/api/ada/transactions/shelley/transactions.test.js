@@ -453,7 +453,7 @@ describe('Create unsigned TX from UTXO', () => {
         amount: output,
       }],
       sampleAdaAddresses[0],
-      utxos,
+      [utxos[0], utxos[1], utxos[2], utxos[3], utxos[4]],
       new BigNumber(0),
       getProtocolParams(),
       [],
@@ -482,6 +482,46 @@ describe('Create unsigned TX from UTXO', () => {
       ?.get(assetInfo.name)
       ?.to_str()
     ).toEqual('234'); // expected change
+  });
+
+  it('Should fail when not enough ADA to avoid burning tokens', () => {
+    const utxos: Array<RemoteUnspentOutput> = genSampleUtxos();
+    const sampleAdaAddresses = genSampleAdaAddresses();
+
+    const output = new MultiToken(
+      [{
+        // smaller than input
+        amount: new BigNumber(900000),
+        identifier: defaultIdentifier,
+        networkId: network.NetworkId,
+      }, {
+        amount: new BigNumber(1000),
+        identifier: testAssetId,
+        networkId: network.NetworkId,
+      }],
+      {
+        defaultIdentifier,
+        defaultNetworkId: network.NetworkId,
+      }
+    );
+
+    expect(() => newAdaUnsignedTxFromUtxo(
+      [{
+        address: byronAddrToHex('Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4'),
+        amount: output,
+      }],
+      sampleAdaAddresses[0],
+      [utxos[4]],
+      new BigNumber(0),
+      {
+        ...getProtocolParams(),
+        // high enough that we can't send the remaining amount as change
+        minimumUtxoVal: RustModule.WalletV4.BigNum.from_str('500000'),
+      },
+      [],
+      [],
+      true,
+    )).toThrow(NotEnoughMoneyToSendError);
   });
 });
 
