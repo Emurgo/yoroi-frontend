@@ -124,12 +124,16 @@ export async function validateAmount(
 
 export function getMinimumValue(
   network: $ReadOnly<NetworkRow>,
+  isToken: boolean,
 ): BigNumber {
+  if (isToken) {
+    // when sending a token, Yoroi will handle making sure the minimum value is in the UTXO
+    return new BigNumber(0);
+  }
   if (isCardanoHaskell(network)) {
     const config = getCardanoHaskellBaseConfig(network)
       .reduce((acc, next) => Object.assign(acc, next), {});
 
-    /// TODO: this no longer works for Mary since min value depends on UTXO size
     return new BigNumber(config.MinimumUtxoVal);
   }
   if (isErgo(network)) {
