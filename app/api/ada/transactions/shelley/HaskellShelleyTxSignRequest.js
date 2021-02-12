@@ -72,7 +72,7 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
   }
 
   totalInput(): MultiToken {
-    return multiTokenFromCardanoValue(
+    const values = multiTokenFromCardanoValue(
       this.unsignedTx.get_implicit_input().checked_add(
         this.unsignedTx.get_explicit_input()
       ),
@@ -81,6 +81,9 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
         defaultNetworkId: this.networkSettingSnapshot.NetworkId,
       },
     );
+    this.changeAddr.forEach(change => values.joinSubtractMutable(change.values));
+
+    return values;
   }
 
   totalOutput(): MultiToken {
