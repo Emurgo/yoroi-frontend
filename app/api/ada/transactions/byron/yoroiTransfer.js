@@ -13,7 +13,7 @@ import {
   sendAllUnsignedTx,
   signTransaction,
 } from '../shelley/transactions';
-import type { CardanoAddressedUtxo, BaseSignRequest } from '../types';
+import type { CardanoAddressedUtxo } from '../types';
 import type {
   TransferTx
 } from '../../../../types/TransferTypes';
@@ -25,6 +25,7 @@ import {
   MultiToken,
 } from '../../../common/lib/MultiToken';
 import { PRIMARY_ASSET_CONSTANTS } from '../../lib/storage/database/primitives/enums';
+import { multiTokenFromRemote } from '../utils';
 
 /**
  * Generate transaction including all addresses with no change.
@@ -49,22 +50,20 @@ export async function buildYoroiTransferTx(payload: {|
   try {
     const { senderUtxos, } = payload;
 
-    const totalBalance = new MultiToken(
-      [{
-        identifier: PRIMARY_ASSET_CONSTANTS.Cardano,
-        amount: senderUtxos
-          .map(utxo => new BigNumber(utxo.amount))
-          .reduce(
-            (acc, amount) => acc.plus(amount),
-            new BigNumber(0)
-          ),
-        networkId: payload.protocolParams.networkId,
-      }],
-      {
-        defaultNetworkId: payload.protocolParams.networkId,
-        defaultIdentifier: PRIMARY_ASSET_CONSTANTS.Cardano,
-      }
-    );
+    const defaultEntryInfo = {
+      defaultNetworkId: payload.protocolParams.networkId,
+      defaultIdentifier: PRIMARY_ASSET_CONSTANTS.Cardano,
+    };
+
+    const totalBalance = senderUtxos
+      .map(utxo => multiTokenFromRemote(
+        utxo,
+        payload.protocolParams.networkId
+      ))
+      .reduce(
+        (acc, next) => acc.joinAddMutable(next),
+        new MultiToken([], defaultEntryInfo)
+      );
 
     // first build a transaction to see what the fee will be
     const unsignedTxResponse = sendAllUnsignedTx(
@@ -82,20 +81,13 @@ export async function buildYoroiTransferTx(payload: {|
         ).plus(unsignedTxResponse.txBuilder.get_deposit().to_str()),
         networkId: payload.protocolParams.networkId,
       }],
-      {
-        defaultNetworkId: payload.protocolParams.networkId,
-        defaultIdentifier: PRIMARY_ASSET_CONSTANTS.Cardano,
-      }
+      defaultEntryInfo
     );
 
     // sign inputs
     const signedTx = signTransaction(
-      ({
-        senderUtxos: unsignedTxResponse.senderUtxos,
-        unsignedTx: unsignedTxResponse.txBuilder,
-        changeAddr: unsignedTxResponse.changeAddr,
-        certificate: undefined,
-      }: BaseSignRequest<RustModule.WalletV4.TransactionBuilder>),
+      unsignedTxResponse.senderUtxos,
+      unsignedTxResponse.txBuilder,
       payload.keyLevel,
       payload.signingKey,
       new Set(),

@@ -85,7 +85,6 @@ import type {
 import {
   sendAllUnsignedTx as shelleySendAllUnsignedTx,
   newAdaUnsignedTx as shelleyNewAdaUnsignedTx,
-  asAddressedUtxo as shelleyAsAddressedUtxo,
   signTransaction as shelleySignTransaction,
 } from './transactions/shelley/transactions';
 import {
@@ -152,7 +151,12 @@ import {
 import {
   getAllAddressesForDisplay,
 } from './lib/storage/bridge/traitUtils';
-import { convertAdaTransactionsToExportRows } from './transactions/utils';
+import {
+  convertAdaTransactionsToExportRows,
+  multiTokenFromCardanoValue,
+  asAddressedUtxo,
+  multiTokenFromRemote,
+} from './transactions/utils';
 import { generateAdaPaperPdf } from './paperWallet/paperWalletPdf';
 import type { PdfGenStepType } from './paperWallet/paperWalletPdf';
 import type { TransactionExportRow } from '../export';
@@ -164,6 +168,7 @@ import type {
   IsValidMnemonicResponse,
   RestoreWalletRequest, RestoreWalletResponse,
   CreateWalletRequest, CreateWalletResponse,
+  SendTokenList,
 } from '../common/types';
 import { CoreAddressTypes, } from './lib/storage/database/primitives/enums';
 import type { NetworkRow, TokenRow, } from './lib/storage/database/primitives/tables';
@@ -176,6 +181,7 @@ import {
 import type { TransactionMetadata } from './lib/storage/bridge/metadataUtils';
 import { MultiToken } from '../common/lib/MultiToken';
 import type { DefaultTokenEntry } from '../common/lib/MultiToken';
+import { hasSendAllDefault, builtSendTokenList } from '../common/index';
 
 // ADA specific Request / Response params
 
@@ -326,11 +332,7 @@ export type CreateUnsignedTxRequest = {|
   absSlotNumber: BigNumber,
   receiver: string,
   filter: ElementOf<IGetAllUtxosResponse> => boolean,
-  ...({|
-    amount: string, // in lovelaces
-  |} | {|
-    shouldSendAll: true,
-  |}),
+  tokens: SendTokenList,
   metadata: Array<TransactionMetadata> | void,
 |};
 export type CreateUnsignedTxResponse = HaskellShelleyTxSignRequest;
@@ -348,11 +350,8 @@ export type CreateUnsignedTxForUtxosRequest = {|
     ...InexactSubset<Addressing>,
   |}>,
   network: $ReadOnly<NetworkRow>,
-  ...{|
-    amount: string,
-  |} | {|
-    shouldSendAll: true,
-  |},
+  defaultToken: DefaultTokenEntry,
+  tokens: SendTokenList,
   utxos: Array<CardanoAddressedUtxo>,
   metadata: Array<TransactionMetadata> | void,
 |};
@@ -485,6 +484,7 @@ export type TransferToCip1852Request = {|
   absSlotNumber: BigNumber,
   getUTXOsForAddresses: AddressUtxoFunc,
   network: $ReadOnly<NetworkRow>,
+  defaultToken: $ReadOnly<TokenRow>,
 |};
 export type TransferToCip1852Response = {|
   signRequest: CreateUnsignedTxResponse,
@@ -798,7 +798,8 @@ export default class AdaApi {
         password,
       });
       const signedTx = shelleySignTransaction(
-        request.signRequest.signRequest,
+        request.signRequest.senderUtxos,
+        request.signRequest.unsignedTx,
         request.publicDeriver.getParent().getPublicDeriverLevel(),
         RustModule.WalletV4.Bip32PrivateKey.from_bytes(
           Buffer.from(normalizedKey.prvKeyHex, 'hex')
@@ -957,7 +958,7 @@ export default class AdaApi {
       const trxMetadata =
         request.metadata !== undefined ? createMetadata(request.metadata): undefined;
 
-      if (request.shouldSendAll) {
+      if (hasSendAllDefault(request.tokens)) {
         if (request.receivers.length !== 1) {
           throw new Error(`${nameof(this.createUnsignedTxForUtxos)} wrong output size for sendAll`);
         }
@@ -970,7 +971,6 @@ export default class AdaApi {
           trxMetadata,
         );
       } else {
-        const amount = request.amount;
         const changeAddresses = request.receivers.reduce(
           (arr, next) => {
             if (next.addressing != null) {
@@ -1003,7 +1003,14 @@ export default class AdaApi {
         }
         unsignedTxResponse = shelleyNewAdaUnsignedTx(
           otherAddresses.length === 1
-            ? [{ address: otherAddresses[0].address, amount }]
+            ? [{
+              address: otherAddresses[0].address,
+              amount: builtSendTokenList(
+                request.defaultToken,
+                request.tokens,
+                request.utxos.map(utxo => multiTokenFromRemote(utxo, protocolParams.networkId)),
+              ),
+            }]
             : [],
           {
             address: changeAddr.address,
@@ -1021,25 +1028,22 @@ export default class AdaApi {
       Logger.debug(
         `${nameof(AdaApi)}::${nameof(this.createUnsignedTxForUtxos)} success: ` + stringifyData(unsignedTxResponse)
       );
-      return new HaskellShelleyTxSignRequest(
-        {
-          senderUtxos: unsignedTxResponse.senderUtxos,
-          unsignedTx: unsignedTxResponse.txBuilder,
-          changeAddr: unsignedTxResponse.changeAddr,
-          certificate: undefined,
-        },
-        trxMetadata,
-        {
+      return new HaskellShelleyTxSignRequest({
+        senderUtxos: unsignedTxResponse.senderUtxos,
+        unsignedTx: unsignedTxResponse.txBuilder,
+        changeAddr: unsignedTxResponse.changeAddr,
+        metadata: trxMetadata,
+        networkSettingSnapshot: {
           ChainNetworkId: Number.parseInt(config.ChainNetworkId, 10),
           KeyDeposit: new BigNumber(config.KeyDeposit),
           PoolDeposit: new BigNumber(config.PoolDeposit),
           NetworkId: request.network.NetworkId,
         },
-        {
+        neededStakingKeyHashes: {
           neededHashes: new Set(),
           wits: new Set(),
         },
-      );
+      });
     } catch (error) {
       Logger.error(
         `${nameof(AdaApi)}::${nameof(this.createUnsignedTxForUtxos)} error: ` + stringifyError(error)
@@ -1055,12 +1059,14 @@ export default class AdaApi {
     const utxos = await request.publicDeriver.getAllUtxos();
     const filteredUtxos = utxos.filter(utxo => request.filter(utxo));
 
-    const addressedUtxo = shelleyAsAddressedUtxo(filteredUtxos);
+    const addressedUtxo = asAddressedUtxo(filteredUtxos);
 
     const receivers = [{
       address: request.receiver
     }];
-    if (!request.shouldSendAll) {
+
+    // note: we need to create a change address IFF we're not sending all of the default asset
+    if (!hasSendAllDefault(request.tokens)) {
       const internal = await request.publicDeriver.nextInternal();
       if (internal.addressInfo == null) {
         throw new Error(`${nameof(this.createUnsignedTx)} no internal addresses left. Should never happen`);
@@ -1070,16 +1076,14 @@ export default class AdaApi {
         addressing: internal.addressInfo.addressing,
       });
     }
-    const amountInfo = request.shouldSendAll
-      ? { shouldSendAll: request.shouldSendAll }
-      : { amount: request.amount, };
     return this.createUnsignedTxForUtxos({
       absSlotNumber: request.absSlotNumber,
       receivers,
       network: request.publicDeriver.getParent().getNetworkInfo(),
+      defaultToken: request.publicDeriver.getParent().getDefaultToken(),
       utxos: addressedUtxo,
+      tokens: request.tokens,
       metadata: request.metadata,
-      ...amountInfo,
     });
   }
 
@@ -1128,7 +1132,7 @@ export default class AdaApi {
       );
 
       const allUtxo = await request.publicDeriver.getAllUtxos();
-      const addressedUtxo = shelleyAsAddressedUtxo(allUtxo);
+      const addressedUtxo = asAddressedUtxo(allUtxo);
       const nextUnusedInternal = await request.publicDeriver.nextInternal();
       if (nextUnusedInternal.addressInfo == null) {
         throw new Error(`${nameof(this.createDelegationTx)} no internal addresses left. Should never happen`);
@@ -1176,21 +1180,18 @@ export default class AdaApi {
         .joinAddCopy(differenceAfterTx) // subtract any part of the fee that comes from UTXO
         .joinAddCopy(request.valueInAccount); // recall: rewards are compounding
 
-      const signTxRequest = new HaskellShelleyTxSignRequest(
-        {
-          senderUtxos: unsignedTx.senderUtxos,
-          unsignedTx: unsignedTx.txBuilder,
-          changeAddr: unsignedTx.changeAddr,
-          certificate: undefined,
-        },
-        undefined,
-        {
+      const signTxRequest = new HaskellShelleyTxSignRequest({
+        senderUtxos: unsignedTx.senderUtxos,
+        unsignedTx: unsignedTx.txBuilder,
+        changeAddr: unsignedTx.changeAddr,
+        metadata: undefined,
+        networkSettingSnapshot: {
           ChainNetworkId: Number.parseInt(config.ChainNetworkId, 10),
           KeyDeposit: new BigNumber(config.KeyDeposit),
           PoolDeposit: new BigNumber(config.PoolDeposit),
           NetworkId: request.publicDeriver.getParent().getNetworkInfo().NetworkId,
         },
-        {
+        neededStakingKeyHashes: {
           neededHashes: new Set([Buffer.from(
             RustModule.WalletV4.StakeCredential
               .from_keyhash(stakingKey.hash())
@@ -1198,7 +1199,7 @@ export default class AdaApi {
           ).toString('hex')]),
           wits: new Set(),
         },
-      );
+      });
       return {
         signTxRequest,
         totalAmountToDelegate
@@ -1231,7 +1232,7 @@ export default class AdaApi {
       };
 
       const utxos = await request.publicDeriver.getAllUtxos();
-      const addressedUtxo = shelleyAsAddressedUtxo(utxos);
+      const addressedUtxo = asAddressedUtxo(utxos);
 
       const nextUnusedInternal = await request.publicDeriver.nextInternal();
       if (nextUnusedInternal.addressInfo == null) {
@@ -1350,22 +1351,19 @@ export default class AdaApi {
           }
         }
       }
-      const result = new HaskellShelleyTxSignRequest(
-        {
-          senderUtxos: unsignedTxResponse.senderUtxos,
-          unsignedTx: unsignedTxResponse.txBuilder,
-          changeAddr: unsignedTxResponse.changeAddr,
-          certificate: undefined,
-        },
-        undefined,
-        {
+      const result = new HaskellShelleyTxSignRequest({
+        senderUtxos: unsignedTxResponse.senderUtxos,
+        unsignedTx: unsignedTxResponse.txBuilder,
+        changeAddr: unsignedTxResponse.changeAddr,
+        metadata: undefined,
+        networkSettingSnapshot: {
           ChainNetworkId: Number.parseInt(config.ChainNetworkId, 10),
           KeyDeposit: new BigNumber(config.KeyDeposit),
           PoolDeposit: new BigNumber(config.PoolDeposit),
           NetworkId: request.publicDeriver.getParent().getNetworkInfo().NetworkId,
         },
-        neededKeys,
-      );
+        neededStakingKeyHashes: neededKeys,
+      });
       return result;
     } catch (error) {
       Logger.error(
@@ -1398,7 +1396,7 @@ export default class AdaApi {
       };
 
       const allUtxo = await request.publicDeriver.getAllUtxos();
-      const addressedUtxo = shelleyAsAddressedUtxo(allUtxo);
+      const addressedUtxo = asAddressedUtxo(allUtxo);
       const nextUnusedInternal = await request.publicDeriver.nextInternal();
       if (nextUnusedInternal.addressInfo == null) {
         throw new Error(`${nameof(this.createVotingRegTx)} no internal addresses left. Should never happen`);
@@ -1420,25 +1418,22 @@ export default class AdaApi {
         trxMetadata,
       );
 
-      return new HaskellShelleyTxSignRequest(
-        {
-          senderUtxos: unsignedTx.senderUtxos,
-          unsignedTx: unsignedTx.txBuilder,
-          changeAddr: unsignedTx.changeAddr,
-          certificate: undefined,
-        },
-        trxMetadata,
-        {
+      return new HaskellShelleyTxSignRequest({
+        senderUtxos: unsignedTx.senderUtxos,
+        unsignedTx: unsignedTx.txBuilder,
+        changeAddr: unsignedTx.changeAddr,
+        metadata: trxMetadata,
+        networkSettingSnapshot: {
           ChainNetworkId: Number.parseInt(config.ChainNetworkId, 10),
           KeyDeposit: new BigNumber(config.KeyDeposit),
           PoolDeposit: new BigNumber(config.PoolDeposit),
           NetworkId: request.publicDeriver.getParent().getNetworkInfo().NetworkId,
         },
-        {
+        neededStakingKeyHashes: {
           neededHashes: new Set(),
           wits: new Set(),
         },
-      );
+      });
     } catch (error) {
       Logger.error(`${nameof(AdaApi)}::${nameof(this.createVotingRegTx)} error: ` + stringifyError(error));
       if (error instanceof LocalizableError) throw error;
@@ -1805,7 +1800,15 @@ export default class AdaApi {
             },
           }],
           network: request.network,
-          shouldSendAll: true,
+          defaultToken: {
+            defaultIdentifier: request.defaultToken.Identifier,
+            defaultNetworkId: request.defaultToken.NetworkId,
+          },
+          tokens: [{
+            // note: sending all of the default token will cause UTXOs to be consumed
+            shouldSendAll: true,
+            token: request.defaultToken,
+          }],
           utxos,
           metadata: undefined,
         })
@@ -1982,11 +1985,7 @@ function getDifferenceAfterTx(
       const output = outputs.get(i);
       const address = Buffer.from(output.address().to_bytes()).toString('hex');
       if (addrContainsAccountKey(address, stakeCredential, true)) {
-        sumOutForKey.add({
-          amount: new BigNumber(output.amount().to_str()),
-          identifier: defaultToken.defaultIdentifier,
-          networkId: defaultToken.defaultNetworkId,
-         });
+        sumOutForKey.joinAddMutable(multiTokenFromCardanoValue(output.amount(), defaultToken));
       }
     }
   }

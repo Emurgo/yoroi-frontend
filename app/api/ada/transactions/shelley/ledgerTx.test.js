@@ -209,7 +209,8 @@ test('Create Ledger transaction', async () => {
     addressing: {
       path: [WalletTypePurpose.BIP44, CoinTypes.CARDANO, HARD_DERIVATION_START, 1, 1],
       startLevel: 1
-    }
+    },
+    assets: [],
   }, {
     amount: '2832006',
     // base
@@ -220,7 +221,8 @@ test('Create Ledger transaction', async () => {
     addressing: {
       path: [WalletTypePurpose.BIP44, CoinTypes.CARDANO, HARD_DERIVATION_START, 1, 2],
       startLevel: 1
-    }
+    },
+    assets: [],
   }, {
     amount: '1000000',
     // enterprise
@@ -231,7 +233,8 @@ test('Create Ledger transaction', async () => {
     addressing: {
       path: [WalletTypePurpose.BIP44, CoinTypes.CARDANO, HARD_DERIVATION_START, 0, 7],
       startLevel: 1
-    }
+    },
+    assets: [],
   }, {
     amount: '1000000',
     // pointer
@@ -242,7 +245,8 @@ test('Create Ledger transaction', async () => {
     addressing: {
       path: [WalletTypePurpose.BIP44, CoinTypes.CARDANO, HARD_DERIVATION_START, 0, 7],
       startLevel: 1
-    }
+    },
+    assets: [],
   }];
   const protocolParams = getProtocolParams();
   const txBuilder = RustModule.WalletV4.TransactionBuilder.new(
@@ -263,7 +267,7 @@ test('Create Ledger transaction', async () => {
           RustModule.WalletV4.TransactionHash.from_bytes(Buffer.from(utxo.tx_hash, 'hex')),
           1
         ),
-        RustModule.WalletV4.BigNum.from_str(utxo.amount)
+        RustModule.WalletV4.Value.new(RustModule.WalletV4.BigNum.from_str(utxo.amount))
       );
     } else {
       txBuilder.add_key_input(
@@ -272,14 +276,14 @@ test('Create Ledger transaction', async () => {
           RustModule.WalletV4.TransactionHash.from_bytes(Buffer.from(utxo.tx_hash, 'hex')),
           1
         ),
-        RustModule.WalletV4.BigNum.from_str(utxo.amount)
+        RustModule.WalletV4.Value.new(RustModule.WalletV4.BigNum.from_str(utxo.amount))
       );
     }
   }
   txBuilder.add_output(
     RustModule.WalletV4.TransactionOutput.new(
       RustModule.WalletV4.Address.from_bytes(Buffer.from(byronAddrToHex('Ae2tdPwUPEZAVDjkPPpwDhXMSAjH53CDmd2xMwuR9tZMAZWxLhFphrHKHXe'), 'hex')),
-      RustModule.WalletV4.BigNum.from_str('5326134')
+      RustModule.WalletV4.Value.new(RustModule.WalletV4.BigNum.from_str('5326134'))
     )
   );
   const certs = RustModule.WalletV4.Certificates.new();
@@ -320,25 +324,22 @@ test('Create Ledger transaction', async () => {
       ],
     },
   };
-  const signRequest = new HaskellShelleyTxSignRequest(
-    {
-      unsignedTx: txBuilder,
-      changeAddr: [],
-      senderUtxos,
-      certificate: undefined,
-    },
-    undefined,
-    {
+  const signRequest = new HaskellShelleyTxSignRequest({
+    unsignedTx: txBuilder,
+    changeAddr: [],
+    senderUtxos,
+    metadata: undefined,
+    networkSettingSnapshot: {
       ChainNetworkId: Number.parseInt(baseConfig.ChainNetworkId, 10),
       PoolDeposit: new BigNumber(baseConfig.PoolDeposit),
       KeyDeposit: new BigNumber(baseConfig.KeyDeposit),
       NetworkId: network.NetworkId,
     },
-    {
+    neededStakingKeyHashes: {
       neededHashes: new Set([Buffer.from(stakeCredential.to_bytes()).toString('hex')]),
       wits: new Set() // not needed for this test, but something should be here
     },
-  );
+  });
 
   const rewardAddressString = Buffer.from(
     RustModule.WalletV4.RewardAddress.new(
@@ -406,7 +407,8 @@ test('Create Ledger transaction', async () => {
     }],
     outputs: [{
       addressHex: '82d818582183581c891ac9abaac999b097c81ea3c0450b0fbb693d0bd232bebc0f4a391fa0001af2ff7e21',
-      amountStr: `5326134`
+      amountStr: `5326134`,
+      tokenBundle: [],
     }],
     withdrawals: [],
     certificates: [{
@@ -422,11 +424,12 @@ test('Create Ledger transaction', async () => {
       type: CertificateTypes.STAKE_REGISTRATION,
     }],
     metadataHashHex: undefined,
+    validityIntervalStartStr: undefined,
   });
 
   buildSignedTransaction(
     txBuilder.build(),
-    signRequest.signRequest.senderUtxos,
+    signRequest.senderUtxos,
     [
       // this witnesses doesn't belong to the transaction / key. Just used to test wit generation
       {

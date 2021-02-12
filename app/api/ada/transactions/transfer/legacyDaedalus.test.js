@@ -78,7 +78,7 @@ describe('Byron era tx format tests', () => {
     const words = 'note park thrive ignore spare latin common balance clap soup school tiny';
     const address = 'DdzFFzCqrhsmcx7z25PRkdbeUNqNNW4brhznpVxbm1EknAahjaCFEjYXg9KJRqkixjgGyz8D9GSX3CFDRoNrZyfJsi61N2FxCnq9yWBy';
     const txId = '915f2e6865fb31cc93410efb6c0e580ca74862374b3da461e20135c01f312e7c';
-    const inputAmount = '2000000';
+    const inputAmount = new BigNumber('2000000');
     const txIndex = 0;
     const outAddress = 'Ae2tdPwUPEZ4Gg5gmqwW2t7ottKBMjWunmPt7DwKkAGsxx9XNSfWqrE1Gbk';
 
@@ -94,7 +94,8 @@ describe('Byron era tx format tests', () => {
       tx_hash: txId,
       tx_index: txIndex,
       receiver: address,
-      amount: inputAmount
+      amount: inputAmount.toString(),
+      assets: [],
     };
 
     const transferInfo = await daedalusTransferTxFromAddresses({
@@ -108,8 +109,9 @@ describe('Byron era tx format tests', () => {
       protocolParams: getProtocolParams(),
     });
 
-    expect(transferInfo.fee.getDefault().toString()).toBe('167965');
-    expect(transferInfo.recoveredBalance.getDefault().toString()).toBe('2000000');
+    const expectedFee = new BigNumber('167789');
+    expect(transferInfo.fee.getDefault().toString()).toBe(expectedFee.toString());
+    expect(transferInfo.recoveredBalance.getDefault().toString()).toBe(inputAmount.toString());
     expect(transferInfo.senders).toEqual([address]);
     expect(transferInfo.receivers[0]).toBe(outAddress);
 
@@ -126,19 +128,21 @@ describe('Byron era tx format tests', () => {
       // eslint-disable-next-line camelcase
       RustModule.WalletV4.ByronAddress.from_address(body.outputs().get(0).address())?.to_base58()
     ).toBe(outAddress);
-    expect(body.outputs().get(0).amount().to_str()).toBe('1832035');
+    expect(
+      body.outputs().get(0).amount().coin().to_str()
+    ).toBe(inputAmount.minus(expectedFee).toString());
 
     const witnesses = signedTx.witness_set().bootstraps();
     if (witnesses == null) throw new Error('no bootstrap witnesses found');
     expect(witnesses.len()).toBe(1);
-    expect(Buffer.from(witnesses.get(0).to_bytes()).toString('hex')).toBe('8458201e74f51418f5835a063c1f4c69808134852b7ebdb85d0c08e867572c0a035e7b5840c25279d5d7ab16ef51fd44e762c564e3d4a54e0f36cac4053e25151f5e6afa84b3a7be06f2ceb84d9bf0a8ebb063e0ff45d059091b4b1dee9944479021924308582006b6bd7a7baa2a5dc191cd08f0ca81ada7298cfa20db44d7eda31e7777b4bbe05822a101581e581c28a1ae6554b66549078f72b0e75e13cb0876cbbefac4f292b43e940e');
+    expect(Buffer.from(witnesses.get(0).to_bytes()).toString('hex')).toBe('8458201e74f51418f5835a063c1f4c69808134852b7ebdb85d0c08e867572c0a035e7b584041e0aa0169c8217af8f8b9c47af12b83a9b7c541390dd30c8428a73d2fdfac447e3f428c3479ee1ad12904ed665cdcc924b22762c1b551833f837f308838f706582006b6bd7a7baa2a5dc191cd08f0ca81ada7298cfa20db44d7eda31e7777b4bbe05822a101581e581c28a1ae6554b66549078f72b0e75e13cb0876cbbefac4f292b43e940e');
   });
 
   test('Daedalus transfer fails from too small UTXO', async () => {
     const words = 'note park thrive ignore spare latin common balance clap soup school tiny';
     const address = 'DdzFFzCqrhsmcx7z25PRkdbeUNqNNW4brhznpVxbm1EknAahjaCFEjYXg9KJRqkixjgGyz8D9GSX3CFDRoNrZyfJsi61N2FxCnq9yWBy';
     const txId = '915f2e6865fb31cc93410efb6c0e580ca74862374b3da461e20135c01f312e7c';
-    const inputAmount = '1000';
+    const inputAmount = new BigNumber('1000');
     const txIndex = 0;
     const outAddress = 'Ae2tdPwUPEZ4Gg5gmqwW2t7ottKBMjWunmPt7DwKkAGsxx9XNSfWqrE1Gbk';
 
@@ -154,7 +158,8 @@ describe('Byron era tx format tests', () => {
       tx_hash: txId,
       tx_index: txIndex,
       receiver: address,
-      amount: inputAmount
+      amount: inputAmount.toString(),
+      assets: [],
     };
 
     expect(daedalusTransferTxFromAddresses({
@@ -173,7 +178,7 @@ describe('Byron era tx format tests', () => {
     const words = 'note park thrive ignore spare latin common balance clap soup school tiny';
     const address = 'DdzFFzCqrhsmcx7z25PRkdbeUNqNNW4brhznpVxbm1EknAahjaCFEjYXg9KJRqkixjgGyz8D9GSX3CFDRoNrZyfJsi61N2FxCnq9yWBy';
     const txId = '915f2e6865fb31cc93410efb6c0e580ca74862374b3da461e20135c01f312e7c';
-    const inputAmount = '1000001';
+    const inputAmount = new BigNumber('1000001');
     const txIndex = 0;
     const outAddress = 'Ae2tdPwUPEZ4Gg5gmqwW2t7ottKBMjWunmPt7DwKkAGsxx9XNSfWqrE1Gbk';
 
@@ -192,7 +197,8 @@ describe('Byron era tx format tests', () => {
         tx_hash: txId,
         tx_index: i,
         receiver: address,
-        amount: inputAmount
+        amount: inputAmount.toString(),
+        assets: [],
       });
     }
 
@@ -207,8 +213,11 @@ describe('Byron era tx format tests', () => {
       protocolParams: getProtocolParams(),
     });
 
-    expect(transferInfo.fee.getDefault().toString()).toBe('328169');
-    expect(transferInfo.recoveredBalance.getDefault().toString()).toBe('100000100');
+    const expectedFee = new BigNumber('327993');
+    expect(transferInfo.fee.getDefault().toString()).toBe(expectedFee.toString());
+    expect(
+      transferInfo.recoveredBalance.getDefault().toString()
+    ).toBe(inputAmount.times(numUtxos).toString());
     expect(transferInfo.senders).toEqual([address]);
     expect(transferInfo.receivers[0]).toBe(outAddress);
 
@@ -225,11 +234,13 @@ describe('Byron era tx format tests', () => {
       // eslint-disable-next-line camelcase
       RustModule.WalletV4.ByronAddress.from_address(body.outputs().get(0).address())?.to_base58()
     ).toBe(outAddress);
-    expect(body.outputs().get(0).amount().to_str()).toBe('99671931');
+    expect(
+      body.outputs().get(0).amount().coin().to_str()
+    ).toBe(inputAmount.times(numUtxos).minus(expectedFee).toString());
 
     const witnesses = signedTx.witness_set().bootstraps();
     if (witnesses == null) throw new Error('no bootstrap witnesses found');
     expect(witnesses.len()).toBe(1);
-    expect(Buffer.from(witnesses.get(0).to_bytes()).toString('hex')).toBe('8458201e74f51418f5835a063c1f4c69808134852b7ebdb85d0c08e867572c0a035e7b58402a9d4a40c75da42e1101e5e139ea88a4809d1b5bc853901ed6a9ed90e0556eaf2c9ce30e2517bf82ef71a0ee921165ba66a796e035418d6a0ff167ed52263309582006b6bd7a7baa2a5dc191cd08f0ca81ada7298cfa20db44d7eda31e7777b4bbe05822a101581e581c28a1ae6554b66549078f72b0e75e13cb0876cbbefac4f292b43e940e');
+    expect(Buffer.from(witnesses.get(0).to_bytes()).toString('hex')).toBe('8458201e74f51418f5835a063c1f4c69808134852b7ebdb85d0c08e867572c0a035e7b584055b3ee37d50f4475f58e191bd721bd763d1ba419b091f16925f2a3e69e158c0741848f838e156ed52778604081243a9baa3d69193c64fb1e568f806ef73d9d0c582006b6bd7a7baa2a5dc191cd08f0ca81ada7298cfa20db44d7eda31e7777b4bbe05822a101581e581c28a1ae6554b66549078f72b0e75e13cb0876cbbefac4f292b43e940e');
   });
 });

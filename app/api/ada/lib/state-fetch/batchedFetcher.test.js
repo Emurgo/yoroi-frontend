@@ -86,13 +86,15 @@ test('Batched history pagination', async (done) => {
           txHash: genesisBlockHash,
           id: genesisBlockHash + i.toString(),
           index: i,
-          amount: '1000000'
+          amount: '1000000',
+          assets: [],
         }
       ],
       outputs: [
         {
           address: addresses[i],
-          amount: '1'
+          amount: '1',
+          assets: [],
         },
       ],
       height: i,
@@ -151,13 +153,15 @@ test('Batched history edge case: full response with a pending transaction', asyn
           txHash: genesisBlockHash,
           id: genesisBlockHash + i.toString(),
           index: i,
-          amount: '1000000'
+          amount: '1000000',
+          assets: [],
         }
       ],
       outputs: [
         {
           address: addresses[i],
-          amount: '1'
+          amount: '1',
+          assets: [],
         },
       ],
       height: i,
@@ -181,13 +185,15 @@ test('Batched history edge case: full response with a pending transaction', asyn
           txHash: genesisBlockHash,
           id: genesisBlockHash + i.toString(),
           index: i,
-          amount: '1000000'
+          amount: '1000000',
+          assets: [],
         }
       ],
       outputs: [
         {
           address: addresses[i],
-          amount: '1'
+          amount: '1',
+          assets: [],
         },
       ],
       height: null,

@@ -16,7 +16,7 @@ import type {
   DeriveAddressResponse,
   SignTransactionResponse,
   Witness,
-  OutputTypeAddressParams,
+  TxOutputTypeAddressParams,
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 
 import { RustModule } from '../../app/api/ada/lib/cardanoCrypto/rustLoader';
@@ -33,9 +33,9 @@ type WalletInfo = {|
   version: GetVersionResponse,
 |};
 const mockDeviceVersion = {
-  major: '2',
-  minor: '0',
-  patch: '4',
+  major: 2,
+  minor: 2,
+  patch: 0,
   flags: {
     isDebug: false,
   }
@@ -226,7 +226,7 @@ class MockLedgerConnect {
     for (const output of request.params.outputs) {
       let address;
       if (output.addressTypeNibble != null) {
-        const coercedOutput = ((output: any): OutputTypeAddressParams);
+        const coercedOutput = ((output: any): TxOutputTypeAddressParams);
         address = deriveAddress(
           selectedWallet.rootKey,
           {
@@ -241,10 +241,31 @@ class MockLedgerConnect {
         address = RustModule.WalletV4.Address.from_bytes(Buffer.from(output.addressHex, 'hex'));
       }
       if (address == null) throw new Error(`Missing output address information ${JSON.stringify(output)}`);
+
+      const value = RustModule.WalletV4.Value.new(
+        RustModule.WalletV4.BigNum.from_str(output.amountStr)
+      );
+      const multiasset = RustModule.WalletV4.MultiAsset.new();
+      for (const assetGroup of output.tokenBundle) {
+        const scriptHash = RustModule.WalletV4.ScriptHash.from_bytes(Buffer.from(assetGroup.policyIdHex, 'hex'));
+
+        const assets = RustModule.WalletV4.Assets.new();
+        for (const token of assetGroup.tokens) {
+          assets.insert(
+            RustModule.WalletV4.AssetName.new(Buffer.from(token.assetNameHex, 'hex')),
+            RustModule.WalletV4.BigNum.from_str(token.amountStr)
+          );
+        }
+
+        multiasset.insert(scriptHash, assets);
+      }
+      if (multiasset.len() > 0) {
+        value.set_multiasset(multiasset);
+      }
       outputs.add(
         RustModule.WalletV4.TransactionOutput.new(
           address,
-          RustModule.WalletV4.BigNum.from_str(output.amountStr)
+          value
         )
       );
     }
@@ -253,7 +274,9 @@ class MockLedgerConnect {
       inputs,
       outputs,
       RustModule.WalletV4.BigNum.from_str(request.params.feeStr),
-      Number.parseInt(request.params.ttlStr, 10),
+      request.params.ttlStr == null
+        ? undefined
+        : Number.parseInt(request.params.ttlStr, 10),
     );
     if (request.params.certificates.length > 0) {
       const certs = RustModule.WalletV4.Certificates.new();
@@ -297,6 +320,11 @@ class MockLedgerConnect {
       body.set_metadata_hash(RustModule.WalletV4.MetadataHash.from_bytes(
         Buffer.from(request.params.metadataHashHex, 'hex')
       ));
+    }
+    if (request.params.validityIntervalStartStr != null) {
+      body.set_validity_start_interval(
+        Number.parseInt(request.params.validityIntervalStartStr, 10)
+      );
     }
     if (request.params.withdrawals.length > 0) {
       const withdrawals = RustModule.WalletV4.Withdrawals.new();

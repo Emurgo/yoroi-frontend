@@ -27,10 +27,10 @@ export const networks = Object.freeze({
     NetworkId: 0,
     Backend: {
       BackendService: environment.isTest()
-        ? 'http://localhost:8080'
+        ? 'http://localhost:21000'
         : 'https://iohk-mainnet.yoroiwallet.com',
       WebSocket: environment.isTest()
-        ? 'ws://localhost:8080'
+        ? 'ws://localhost:21000'
         : 'wss://iohk-mainnet.yoroiwallet.com:443',
     },
     BaseConfig: ([
@@ -118,10 +118,10 @@ export const networks = Object.freeze({
     NetworkId: 3_00,
     Backend: {
       BackendService: environment.isTest()
-        ? 'http://localhost:8080'
+        ? 'http://localhost:21000'
         : 'https://testnet-backend.yoroiwallet.com',
       WebSocket: environment.isTest()
-        ? 'ws://localhost:8080'
+        ? 'ws://localhost:21000'
         : 'wss://testnet-backend.yoroiwallet.com:443',
     },
     BaseConfig: ([

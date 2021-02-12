@@ -140,7 +140,15 @@ export class RemoteFetcher implements IFetcher {
           'yoroi-locale': this.getCurrentLocale()
         }
       }
-    ).then(response => response.data)
+    ).then(response => {
+      const result: UtxoSumResponse = response.data;
+      if (result.assets == null) {
+        // replace non-existent w/ empty array to handle Allegra -> Mary transition
+        // $FlowExpectedError[cannot-write]
+        result.assets = [];
+      }
+      return result;
+    })
       .catch((error) => {
         Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getUTXOsSumsForAddresses)} error: ` + stringifyError(error));
         throw new GetUtxosSumsForAddressesApiError();
@@ -168,6 +176,9 @@ export class RemoteFetcher implements IFetcher {
           // unfortunately the backend returns Shelley addresses as bech32
           // this is a bad idea, and so we manually change them to raw payload
           for (const input of resp.inputs) {
+            // replace non-existent w/ empty array to handle Allegra -> Mary transition
+            // $FlowExpectedError[cannot-write]
+            input.assets = input.assets ?? [];
             try {
               const payload = fromWords(decode(input.address, 1000).words);
               // $FlowExpectedError[cannot-write]
@@ -175,6 +186,9 @@ export class RemoteFetcher implements IFetcher {
             } catch (_e) { /* expected not to work for base58 addresses */ }
           }
           for (const output of resp.outputs) {
+            // replace non-existent w/ empty array to handle Allegra -> Mary transition
+            // $FlowExpectedError[cannot-write]
+            output.assets = output.assets ?? [];
             try {
               const payload = fromWords(decode(output.address, 1000).words);
               // $FlowExpectedError[cannot-write]

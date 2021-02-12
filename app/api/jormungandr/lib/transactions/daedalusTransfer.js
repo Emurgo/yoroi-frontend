@@ -23,9 +23,11 @@ import type {
 } from '../../../../types/TransferTypes';
 import { RustModule } from '../../../ada/lib/cardanoCrypto/rustLoader';
 import type {
-  V3UnsignedTxUtxoResponse,
   AddressKeyMap,
 } from '../../../ada/transactions/types';
+import type {
+  V3UnsignedTxUtxoResponse,
+} from './types';
 import type { JormungandrFeeConfig } from '../../../ada/lib/storage/database/primitives/tables';
 import {
   MultiToken,

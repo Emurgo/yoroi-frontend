@@ -312,8 +312,9 @@ export const genJormungandrUndelegateTx = (
     unsignedTx: IOs,
     changeAddr: [],
     certificate: undefined, // TODO
-  }, {
-    NetworkId: publicDeriver.getParent().getNetworkInfo().NetworkId,
+    networkSettingSnapshot: {
+      NetworkId: publicDeriver.getParent().getNetworkInfo().NetworkId,
+    },
   });
 };
 
@@ -355,8 +356,9 @@ export const genTentativeJormungandrTx = (
       unsignedTx,
       changeAddr: [],
       certificate: undefined,
-    }, {
-      NetworkId: networkId,
+      networkSettingSnapshot: {
+        NetworkId: networkId,
+      },
     }),
     inputAmount,
     fee,

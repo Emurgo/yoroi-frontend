@@ -50,7 +50,7 @@ Feature: Hardware device
     Then I add a transaction memo that says "my awesome memo"
     And I click on the next button in the wallet send form
     Then I see the hardware send money confirmation dialog
-    Given The expected transaction is "g6QAgYJYIDZ351x7ppmv3GzVfULyRvhvaa79dgJQBqx4MT+tK7ohAQGCglgrgtgYWCGDWByJGsmrqsmZsJfIHqPARQsPu2k9C9IyvrwPSjkfoAAa8v9+IRoAD0JAglg5AXU/qJHPfuF4AaA3RBmWAEAnGtmf6+kXwe182LUPZi1s6xtlczppoe1y+G8LrFoWUFoCiJevG+NFGgBCGocCGgACj5kDGhH+lM2hAIGCWCA2j8onDd+7a+1yUcwDde1mFT4vweBhzNgescbtdEs7BVhATlv5a25gjqCP2KWPIFHzqVwP6v/A68OCHhky1oXE1CpLbblOb4VKjtNI+uowiwsgQWYHOCyappa9Y2b5sOVACvY="
+    Given The expected transaction is "g6QAgYJYIDZ351x7ppmv3GzVfULyRvhvaa79dgJQBqx4MT+tK7ohAQGCglgrgtgYWCGDWByJGsmrqsmZsJfIHqPARQsPu2k9C9IyvrwPSjkfoAAa8v9+IRoAD0JAglg5AXU/qJHPfuF4AaA3RBmWAEAnGtmf6+kXwe182LUPZi1s6xtlczppoe1y+G8LrFoWUFoCiJevG+NFGgBCGzcCGgACjukDGhH+lM2hAIGCWCA2j8onDd+7a+1yUcwDde1mFT4vweBhzNgescbtdEs7BVhAfswsugTQ/hLWJL5FT2YzE9F2wsyI4BbwtbltAsVEHbgs6XZouw9OzsLzhHuenc5CWw8c0RM24UNKJCgE7DkEAfY="
     Then I submit the wallet send form
     Then I should see the summary screen
     # test address verification
@@ -67,7 +67,7 @@ Feature: Hardware device
     # test restoration
     When I select a Shelley-era Ledger device
     And I restore the Ledger device
-    Given The expected transaction is "g6QAgYJYIBZt/eWxg7fglIOvu/zntB59b+00tAXMEEG0XyfosF1HAAGBglg5AXU/qJHPfuF4AaA3RBmWAEAnGtmf6+kXwe182LUPZi1s6xtlczppoe1y+G8LrFoWUFoCiJevG+NFGgAWc1wCGgACjQUDGhH+lM2hAoGEWCDx6UFmXgFAaVr5OWLg5eyxk744q7Rri4T3RlSU+o6MClhAzzQjzgs5Iikq3JI2azPV+yjzOXFMB8dUrvEaCaC5kfI7bmDtmsvSsEnzmkdU1dvvJzhBVEiV5rgknF3erup6CFgg01PmywZvwdTIA5P2TmF2Ukb40rM9KdYwTzthpuJ1ieNBoPY="
+    Given The expected transaction is "g6QAgYJYIBZt/eWxg7fglIOvu/zntB59b+00tAXMEEG0XyfosF1HAAGBglg5AXU/qJHPfuF4AaA3RBmWAEAnGtmf6+kXwe182LUPZi1s6xtlczppoe1y+G8LrFoWUFoCiJevG+NFGgAWdAwCGgACjFUDGhH+lM2hAoGEWCDx6UFmXgFAaVr5OWLg5eyxk744q7Rri4T3RlSU+o6MClhAAjDtKmE/1bQbqYZpTBpvrmy4/DV2JW56CzHCxXrNFkU/oVJjZRWva84jOTVSZu21LJGjO83BsodyxpzqtoGSCVgg01PmywZvwdTIA5P2TmF2Ukb40rM9KdYwTzthpuJ1ieNBoPY="
     Then I see the transfer transaction
     And I accept the prompt
     Then I should see the summary screen
@@ -90,7 +90,7 @@ Feature: Hardware device
     Then I see the stakepool ticker "YOROI"
     And I click on the next button in the delegation by id
     Then I see the delegation confirmation dialog
-    Given The expected transaction is "g6UAgYJYIDZ351x7ppmv3GzVfULyRvhvaa79dgJQBqx4MT+tK7ohAQGBglg5AXU/qJHPfuF4AaA3RBmWAEAnGtmf6+kXwe182LUPZi1s6xtlczppoe1y+G8LrFoWUFoCiJevG+NFGgAyvn8CGgACqWEDGhH+lM0EgoIAggBYHA9mLWzrG2VzOmmh7XL4bwusWhZQWgKIl68b40WDAoIAWBwPZi1s6xtlczppoe1y+G8LrFoWUFoCiJevG+NFWBzfF1Dfmy3yhfz7UPR0BlehjuOvQnJ9QQw3uGIHoQCCglggNo/KJw3fu2vtclHMA3XtZhU+L8HgYczYHrHG7XRLOwVYQLVGvFKDzokGmAQngxK10m+a08JP51wAzNUNPpejuTQVqR0IfQNQcXZZP75Kk17OSOnZf/6Q+qYr6FdnX3XobAeCWCCJBYq1BjLaHESdxLaCRYL2F8gcQ7Zqu0RfZ1/u85XwPlhAXsGOpvLpqtdQeucUxm1AO2TSixyDi/ogjiAd625cmsUPT+pwh+8ZgCsVe1Kps5gaa2qLEm0Et/r/PeOKSJb1DfY="
+    Given The expected transaction is "g6UAgYJYIDZ351x7ppmv3GzVfULyRvhvaa79dgJQBqx4MT+tK7ohAQGBglg5AXU/qJHPfuF4AaA3RBmWAEAnGtmf6+kXwe182LUPZi1s6xtlczppoe1y+G8LrFoWUFoCiJevG+NFGgAyvy8CGgACqLEDGhH+lM0EgoIAggBYHA9mLWzrG2VzOmmh7XL4bwusWhZQWgKIl68b40WDAoIAWBwPZi1s6xtlczppoe1y+G8LrFoWUFoCiJevG+NFWBzfF1Dfmy3yhfz7UPR0BlehjuOvQnJ9QQw3uGIHoQCCglggNo/KJw3fu2vtclHMA3XtZhU+L8HgYczYHrHG7XRLOwVYQGSlT9uWc3WJLsK5eU1yrG0dLdotynpFTuRMwgnqgd6uDowkO0Uh2qGBrriItTbszxK3ThuImmvGscKcNDKZrweCWCCJBYq1BjLaHESdxLaCRYL2F8gcQ7Zqu0RfZ1/u85XwPlhAl+nihCeJgwmha7LvsLDbmSyaL68dLnGTqldzWcOdRI+VZLk9aFw+nF1vyTS+FDywNk5kynu0iX3UeM7AejA+AvY="
     Then I submit the wallet send form
     Given I click on see dashboard
     Then I should see the dashboard screen
@@ -166,7 +166,7 @@ Feature: Hardware device
     Then I see the stakepool ticker "YOROI"
     And I click on the next button in the delegation by id
     Then I see the delegation confirmation dialog
-    Given The expected transaction is "g6UAgYJYIDZ351x7ppm/3GzVfULyRvhvaa79dgJQBqx4MT+tK7ohAQGBglg5AWUcSwdFBud7UJKQ+QefaKw+IqQtpmDiefjzV7dkI4vDnJYqooFWpFpGEhN3DYjYCIlnhfksOqTSGgAyvn8CGgACqWEDGhH+lM0EgoIAggBYHGQji8OcliqigVakWkYSE3cNiNgIiWeF+Sw6pNKDAoIAWBxkI4vDnJYqooFWpFpGEhN3DYjYCIlnhfksOqTSWBzfF1Dfmy3yhfz7UPR0BlehjuOvQnJ9QQw3uGIHoQCCglggIL1t3O4RKx2YKpd4BSHseH/S7owdieZYrByrYgJ36IhYQO/HEbYOlmcSrI3hI3DdlkEe4YW+drLXiD8flGRQE6mTdMIb5kuBBX2gAiPhfwmhFZ4gKWUKt4kcdUyuddLj+Q6CWCBSNIIHv+9Ne4kuzm9920PNEffFihrFH/jaJK5cLCyehlhAmGARMHwDZOEn4e/JY6IoWBb3rXQ+SIWcySaivbfgthsxLe2M/+OQoGyXGvb0Lq0R5GyEYjT+b7Fhy0qO3e6hCfY="
+    Given The expected transaction is "g6UAgYJYIDZ351x7ppm/3GzVfULyRvhvaa79dgJQBqx4MT+tK7ohAQGBglg5AWUcSwdFBud7UJKQ+QefaKw+IqQtpmDiefjzV7dkI4vDnJYqooFWpFpGEhN3DYjYCIlnhfksOqTSGgAyvy8CGgACqLEDGhH+lM0EgoIAggBYHGQji8OcliqigVakWkYSE3cNiNgIiWeF+Sw6pNKDAoIAWBxkI4vDnJYqooFWpFpGEhN3DYjYCIlnhfksOqTSWBzfF1Dfmy3yhfz7UPR0BlehjuOvQnJ9QQw3uGIHoQCCglggIL1t3O4RKx2YKpd4BSHseH/S7owdieZYrByrYgJ36IhYQOKensoFx6NP7xLo3odtnzYuCstQ3BPKT/MTsL5K3FUODS77ZBqN6YcjCqfpyzfIswX3xNnDBeTkDzYFiQctAw6CWCBSNIIHv+9Ne4kuzm9920PNEffFihrFH/jaJK5cLCyehlhA9CJLFmF9uAaB3+hVkvxu9SSqPKlI2nJ1uJLH99S9h5MO+SZKlP56WSsPbZLHwe1IF0ue+RfeyOYnSI+gayDLC/Y="
     Then I submit the wallet send form
     Given I click on see dashboard
     Then I should see the dashboard screen

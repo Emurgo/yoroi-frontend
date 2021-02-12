@@ -2,13 +2,17 @@
 
 import BigNumber from 'bignumber.js';
 import { ISignRequest } from '../../../common/lib/transactions/ISignRequest';
-import type { BaseSignRequest } from '../types';
+import type { CardanoAddressedUtxo } from '../types';
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 import { toHexOrBase58 } from '../../lib/storage/bridge/utils';
 import {
   MultiToken,
 } from '../../../common/lib/MultiToken';
 import { PRIMARY_ASSET_CONSTANTS } from '../../lib/storage/database/primitives/enums';
+import { multiTokenFromCardanoValue } from '../utils';
+import type {
+  Address, Value, Addressing,
+} from '../../lib/storage/models/PublicDeriver/interfaces';
 
 /**
  * We take a copy of these parameters instead of re-evaluating them from the network
@@ -31,7 +35,9 @@ type NetworkSettingSnapshot = {|
 export class HaskellShelleyTxSignRequest
 implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
 
-  signRequest: BaseSignRequest<RustModule.WalletV4.TransactionBuilder>;
+  senderUtxos: Array<CardanoAddressedUtxo>;
+  unsignedTx: RustModule.WalletV4.TransactionBuilder;
+  changeAddr: Array<{| ...Address, ...Value, ...Addressing |}>;
   metadata: void | RustModule.WalletV4.TransactionMetadata;
   networkSettingSnapshot: NetworkSettingSnapshot;
   // TODO: this should be provided by WASM in some SignedTxBuilder interface of some kind
@@ -40,65 +46,54 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
     wits: Set<string>, // Vkeywitness
   |};
 
-  constructor(
-    signRequest: BaseSignRequest<RustModule.WalletV4.TransactionBuilder>,
+  constructor(data: {|
+    senderUtxos: Array<CardanoAddressedUtxo>,
+    unsignedTx: RustModule.WalletV4.TransactionBuilder,
+    changeAddr: Array<{| ...Address, ...Value, ...Addressing |}>,
     metadata: void | RustModule.WalletV4.TransactionMetadata,
     networkSettingSnapshot: NetworkSettingSnapshot,
     neededStakingKeyHashes: {|
       neededHashes: Set<string>, // StakeCredential
       wits: Set<string>, // Vkeywitness
     |},
-  ) {
-    this.signRequest = signRequest;
-    this.metadata = metadata;
-    this.networkSettingSnapshot = networkSettingSnapshot;
-    this.neededStakingKeyHashes = neededStakingKeyHashes;
+  |}) {
+    this.senderUtxos = data.senderUtxos;
+    this.unsignedTx = data.unsignedTx;
+    this.changeAddr = data.changeAddr;
+    this.metadata = data.metadata;
+    this.networkSettingSnapshot = data.networkSettingSnapshot;
+    this.neededStakingKeyHashes = data.neededStakingKeyHashes;
   }
 
   txId(): string {
     return Buffer.from(RustModule.WalletV4.hash_transaction(
-      this.signRequest.unsignedTx.build()
+      this.unsignedTx.build()
     ).to_bytes()).toString('hex');
   }
 
   totalInput(): MultiToken {
-    const values = new MultiToken(
-      [],
-      {
-        defaultNetworkId: this.networkSettingSnapshot.NetworkId,
-        defaultIdentifier: PRIMARY_ASSET_CONSTANTS.Cardano,
-      }
-    );
-
-    values.add({
-      identifier: PRIMARY_ASSET_CONSTANTS.Cardano,
-      amount: new BigNumber(
-        this.signRequest.unsignedTx.get_implicit_input().checked_add(
-          this.signRequest.unsignedTx.get_explicit_input()
-        ).to_str(),
+    const values = multiTokenFromCardanoValue(
+      this.unsignedTx.get_implicit_input().checked_add(
+        this.unsignedTx.get_explicit_input()
       ),
-      networkId: this.networkSettingSnapshot.NetworkId,
-    });
-    this.signRequest.changeAddr.forEach(change => values.joinSubtractMutable(change.values));
+      {
+        defaultIdentifier: PRIMARY_ASSET_CONSTANTS.Cardano,
+        defaultNetworkId: this.networkSettingSnapshot.NetworkId,
+      },
+    );
+    this.changeAddr.forEach(change => values.joinSubtractMutable(change.values));
 
     return values;
   }
 
   totalOutput(): MultiToken {
-    const values = new MultiToken(
-      [],
+    return multiTokenFromCardanoValue(
+      this.unsignedTx.get_explicit_output(),
       {
-        defaultNetworkId: this.networkSettingSnapshot.NetworkId,
         defaultIdentifier: PRIMARY_ASSET_CONSTANTS.Cardano,
-      }
+        defaultNetworkId: this.networkSettingSnapshot.NetworkId,
+      },
     );
-    values.add({
-      identifier: PRIMARY_ASSET_CONSTANTS.Cardano,
-      amount: new BigNumber(this.signRequest.unsignedTx.get_explicit_output().to_str()),
-      networkId: this.networkSettingSnapshot.NetworkId,
-    });
-
-    return values;
   }
 
   fee(): MultiToken {
@@ -112,8 +107,8 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
     values.add({
       identifier: PRIMARY_ASSET_CONSTANTS.Cardano,
       amount: new BigNumber(
-        this.signRequest.unsignedTx.get_fee_if_set()?.to_str() || '0'
-      ).plus(this.signRequest.unsignedTx.get_deposit().to_str()),
+        this.unsignedTx.get_fee_if_set()?.to_str() || '0'
+      ).plus(this.unsignedTx.get_deposit().to_str()),
       networkId: this.networkSettingSnapshot.NetworkId,
     });
 
@@ -124,7 +119,7 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
     +address: string,
     +amount: MultiToken,
   |}> {
-    const withdrawals = this.signRequest.unsignedTx.build().withdrawals();
+    const withdrawals = this.unsignedTx.build().withdrawals();
     if (withdrawals == null) return [];
 
     const withdrawalKeys = withdrawals.keys();
@@ -157,7 +152,7 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
     +rewardAddress: string,
     +refund: MultiToken,
   |}> {
-    const certs = this.signRequest.unsignedTx.build().certs();
+    const certs = this.unsignedTx.build().certs();
     if (certs == null) return [];
 
     const result = [];
@@ -189,7 +184,7 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
   }
 
   receivers(includeChange: boolean): Array<string> {
-    const outputs = this.signRequest.unsignedTx.build().outputs();
+    const outputs = this.unsignedTx.build().outputs();
 
     const outputStrings = [];
     for (let i = 0; i < outputs.len(); i++) {
@@ -197,14 +192,14 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
     }
 
     if (!includeChange) {
-      const changeAddrs = this.signRequest.changeAddr.map(change => change.address);
+      const changeAddrs = this.changeAddr.map(change => change.address);
       return outputStrings.filter(addr => !changeAddrs.includes(addr));
     }
     return outputStrings;
   }
 
   uniqueSenderAddresses(): Array<string> {
-    return Array.from(new Set(this.signRequest.senderUtxos.map(utxo => utxo.receiver)));
+    return Array.from(new Set(this.senderUtxos.map(utxo => utxo.receiver)));
   }
 
   isEqual(tx: ?(mixed| RustModule.WalletV4.TransactionBuilder)): boolean {
@@ -213,13 +208,13 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
       return false;
     }
     return shelleyTxEqual(
-      this.signRequest.unsignedTx,
+      this.unsignedTx,
       tx
     );
   }
 
   self(): RustModule.WalletV4.TransactionBuilder {
-    return this.signRequest.unsignedTx;
+    return this.unsignedTx;
   }
 }
 

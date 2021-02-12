@@ -1,6 +1,7 @@
 // @flow
 
 import type { lf$Database } from 'lovefield';
+import BigNumber from 'bignumber.js';
 import {
   Logger,
   stringifyError,
@@ -34,6 +35,7 @@ import type {
 } from '../export';
 import type {
   GetBalanceRequest, GetBalanceResponse,
+  SendTokenList,
 } from './types';
 import LocalStorageApi from '../localStorage/index';
 import type {
@@ -44,6 +46,8 @@ import { WrongPassphraseError } from '../ada/lib/cardanoCrypto/cryptoErrors';
 import type { TokenRow } from '../ada/lib/storage/database/primitives/tables';
 import type { CoreAddressT, } from '../ada/lib/storage/database/primitives/enums';
 import { getAllTokenInfo } from './lib/tokens/utils';
+import { MultiToken } from './lib/MultiToken';
+import type { DefaultTokenEntry } from './lib/MultiToken';
 
 // getTokenInfo
 
@@ -294,4 +298,69 @@ export default class CommonApi {
       throw new GenericApiError();
     }
   }
+}
+
+export function hasSendAllDefault(
+  tokens: SendTokenList,
+): boolean {
+  const defaultSendAll = tokens.find(token => {
+    if (token.shouldSendAll === true && token.token.IsDefault) return true;
+    return false;
+  });
+  return defaultSendAll != null;
+}
+
+/**
+ * Construct the list of what will be included in the tx output
+*/
+export function builtSendTokenList(
+  defaultToken: DefaultTokenEntry,
+  tokens: SendTokenList,
+  utxos: Array<MultiToken>,
+): MultiToken {
+  const amount = new MultiToken([], defaultToken);
+
+  for (const token of tokens) {
+    if (token.amount != null) {
+      // if we add a specific amount of a specific token to the output, just add it
+      amount.add({
+        amount: new BigNumber(token.amount),
+        identifier: token.token.Identifier,
+        networkId: token.token.NetworkId,
+      });
+    } else if (token.token.IsDefault) {
+      // if we add a non-specific amount of the default token
+      // sum amount values in the UTXO
+      const relatedUtxoSum = utxos.reduce(
+        (value, next) => value.plus(next.getDefaultEntry().amount),
+        new BigNumber(0)
+      );
+      amount.add({
+        amount: relatedUtxoSum,
+        identifier: token.token.Identifier,
+        networkId: token.token.NetworkId,
+      });
+    } else {
+      // if we add a non-specific amount of a given token
+      // sum up the value of all our UTXOs with this token
+      const relatedUtxoSum = utxos.reduce(
+        (value, next) => {
+          const assetEntry = next.nonDefaultEntries().find(
+            entry => entry.identifier === token.token.Identifier
+          );
+          if (assetEntry != null) {
+            return value.plus(assetEntry.amount);
+          }
+          return value;
+        },
+        new BigNumber(0)
+      );
+      amount.add({
+        amount: relatedUtxoSum,
+        identifier: token.token.Identifier,
+        networkId: token.token.NetworkId,
+      });
+    }
+  }
+  return amount;
 }

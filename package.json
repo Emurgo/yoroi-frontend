@@ -77,7 +77,7 @@
     "@babel/register": "7.12.10",
     "@babel/runtime": "7.12.5",
     "@babel/runtime-corejs3": "7.11.2",
-    "@emurgo/cardano-serialization-lib-nodejs": "4.3.0",
+    "@emurgo/cardano-serialization-lib-nodejs": "6.0.0",
     "@emurgo/js-chain-libs-node": "0.7.1",
     "@pmmmwh/react-refresh-webpack-plugin": "0.4.3",
     "@storybook/addon-actions": "5.3.19",
@@ -154,12 +154,12 @@
     "ws": "7.4.2"
   },
   "dependencies": {
-    "@cardano-foundation/ledgerjs-hw-app-cardano": "2.1.0",
+    "@cardano-foundation/ledgerjs-hw-app-cardano": "2.2.0",
     "@download/blockies": "1.0.3",
-    "@emurgo/cardano-serialization-lib-browser": "4.3.0",
+    "@emurgo/cardano-serialization-lib-browser": "6.0.0",
     "@emurgo/cip4-js": "1.0.5",
     "@emurgo/js-chain-libs": "0.7.1",
-    "@emurgo/ledger-connect-handler": "3.0.2",
+    "@emurgo/ledger-connect-handler": "3.1.1",
     "@svgr/webpack": "5.5.0",
     "axios": "0.21.1",
     "bech32": "1.1.4",
@@ -204,7 +204,7 @@
     "route-parser": "0.0.5",
     "semver": "7.3.4",
     "tinycolor2": "1.4.2",
-    "trezor-connect": "8.1.16",
+    "trezor-connect": "8.1.22",
     "ua-parser-js": "0.7.21",
     "unorm": "1.6.0",
     "validator": "13.5.2"

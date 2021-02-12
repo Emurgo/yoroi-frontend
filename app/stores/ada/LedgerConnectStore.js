@@ -225,6 +225,7 @@ export default class LedgerConnectStore
           time: this.stores.serverConnectionStore.serverTime ?? new Date(),
         }).slot),
         network: selectedNetwork,
+        defaultToken: this.stores.tokenInfoStore.getDefaultTokenInfo(selectedNetwork.NetworkId),
       }).promise;
     } catch (_e) {
       // usually this means no internet connection or not enough ADA to upgrade

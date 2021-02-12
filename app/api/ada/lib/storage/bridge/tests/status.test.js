@@ -75,7 +75,8 @@ const initialPendingTx: ('Failed' | 'Pending', number) => RemoteTransaction = (
       amount: '4000000',
       id: '9c8d3c4fe576f8c99d8ad6ba5d889f5a9f2d7fe07dc17b3f425f5d17696f3d200',
       index: 0,
-      txHash: '9c8d3c4fe576f8c99d8ad6ba5d889f5a9f2d7fe07dc17b3f425f5d17696f3d20'
+      txHash: '9c8d3c4fe576f8c99d8ad6ba5d889f5a9f2d7fe07dc17b3f425f5d17696f3d20',
+      assets: [],
     }
   ],
   outputs: [
@@ -91,7 +92,8 @@ const initialPendingTx: ('Failed' | 'Pending', number) => RemoteTransaction = (
           4
         ]
       ),
-      amount: '2100000'
+      amount: '2100000',
+      assets: [],
     },
     {
       // 'Ae2tdPwUPEZE9RAm3d3zuuh22YjqDxhR1JF6G93uJsRrk51QGHzRUzLvDjL'
@@ -105,7 +107,8 @@ const initialPendingTx: ('Failed' | 'Pending', number) => RemoteTransaction = (
           12
         ]
       ),
-      amount: '1731391'
+      amount: '1731391',
+      assets: [],
     }
   ]
 });
@@ -136,7 +139,8 @@ const otherSpend: number => RemoteTransaction = (purpose) => Object.freeze({
       amount: '4000000',
       id: '9c8d3c4fe576f8c99d8ad6ba5d889f5a9f2d7fe07dc17b3f425f5d17696f3d210',
       index: 0,
-      txHash: '9c8d3c4fe576f8c99d8ad6ba5d889f5a9f2d7fe07dc17b3f425f5d17696f3d21'
+      txHash: '9c8d3c4fe576f8c99d8ad6ba5d889f5a9f2d7fe07dc17b3f425f5d17696f3d21',
+      assets: [],
     }
   ],
   outputs: [
@@ -152,7 +156,8 @@ const otherSpend: number => RemoteTransaction = (purpose) => Object.freeze({
           4
         ]
       ),
-      amount: '2100000'
+      amount: '2100000',
+      assets: [],
     },
     {
       // 'Ae2tdPwUPEZE9RAm3d3zuuh22YjqDxhR1JF6G93uJsRrk51QGHzRUzLvDjL'
@@ -166,7 +171,8 @@ const otherSpend: number => RemoteTransaction = (purpose) => Object.freeze({
           12
         ]
       ),
-      amount: '1731391'
+      amount: '1731391',
+      assets: [],
     }
   ]
 });
@@ -200,7 +206,8 @@ const pendingOutwards: ('Failed' | 'Pending', number) => RemoteTransaction = (
       amount: '2100000',
       id: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed5460',
       index: 0,
-      txHash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546'
+      txHash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546',
+      assets: [],
     }
   ],
   outputs: [
@@ -216,7 +223,8 @@ const pendingOutwards: ('Failed' | 'Pending', number) => RemoteTransaction = (
           12
         ]
       ),
-      amount: '1900000'
+      amount: '1900000',
+      assets: [],
     }
   ]
 });
@@ -247,7 +255,8 @@ const pointlessTx: number => RemoteTransaction = purpose => Object.freeze({
       amount: '4000000',
       id: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed5461',
       index: 1,
-      txHash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546'
+      txHash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546',
+      assets: [],
     }
   ],
   outputs: [
@@ -263,7 +272,8 @@ const pointlessTx: number => RemoteTransaction = purpose => Object.freeze({
           12
         ]
       ),
-      amount: '3800000'
+      amount: '3800000',
+      assets: [],
     },
   ]
 });

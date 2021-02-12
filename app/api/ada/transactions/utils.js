@@ -3,6 +3,7 @@ import { groupBy, keyBy, mapValues } from 'lodash';
 import BigNumber from 'bignumber.js';
 import type {
   UserAnnotation,
+  CardanoAddressedUtxo,
 } from './types';
 import type {
   RemoteUnspentOutput,
@@ -25,16 +26,9 @@ import type {
   AccountingTransactionOutputRow,
 } from '../lib/storage/database/transactionModels/account/tables';
 import type { TransactionExportRow } from '../../export';
-import {
-  HARD_DERIVATION_START,
-  CoinTypes,
-} from '../../../config/numbersConfig';
 import type {
-  Addressing,
+  IGetAllUtxosResponse,
 } from '../lib/storage/models/PublicDeriver/interfaces';
-import {
-  Bip44DerivationLevels,
-} from '../lib/storage/database/walletTypes/bip44/api/utils';
 import { formatBigNumberToFloatString } from '../../../utils/formatters';
 import {
   MultiToken,
@@ -42,6 +36,166 @@ import {
 import type {
   DefaultTokenEntry,
 } from '../../common/lib/MultiToken';
+import { RustModule } from '../lib/cardanoCrypto/rustLoader';
+import { PRIMARY_ASSET_CONSTANTS } from '../lib/storage/database/primitives/enums';
+
+export function cardanoAssetToIdentifier(
+  policyId: RustModule.WalletV4.ScriptHash,
+  name: RustModule.WalletV4.AssetName,
+): string {
+  // note: possible for name to be empty causing a trailing hyphen
+  return `${Buffer.from(policyId.to_bytes()).toString('hex')}.${Buffer.from(name.name()).toString('hex')}`;
+}
+export function identifierToCardanoAsset(
+  identifier: string,
+): {|
+  policyId: RustModule.WalletV4.ScriptHash,
+  name: RustModule.WalletV4.AssetName,
+|} {
+  // recall: 'a.'.split() gives ['a', ''] as desired
+  const parts = identifier.split('.');
+  return {
+    policyId: RustModule.WalletV4.ScriptHash.from_bytes(Buffer.from(parts[0], 'hex')),
+    name: RustModule.WalletV4.AssetName.new(Buffer.from(parts[1], 'hex')),
+  };
+}
+
+export function parseTokenList(
+  assets: void | RustModule.WalletV4.MultiAsset,
+): Array<{|
+  assetId: string,
+  policyId: string,
+  name: string,
+  amount: string,
+|}> {
+  if (assets == null) return [];
+
+  const result = [];
+  const hashes = assets.keys();
+  for (let i = 0; i < hashes.len(); i++) {
+    const policyId = hashes.get(i);
+    const assetsForPolicy = assets.get(policyId);
+    if (assetsForPolicy == null) continue;
+
+    const policies = assetsForPolicy.keys();
+    for (let j = 0; j < policies.len(); j++) {
+      const assetName = policies.get(j);
+      const amount = assetsForPolicy.get(assetName);
+      if (amount == null) continue;
+
+      result.push({
+        amount: amount.to_str(),
+        assetId: cardanoAssetToIdentifier(policyId, assetName),
+        policyId: Buffer.from(policyId.to_bytes()).toString('hex'),
+        name: Buffer.from(assetName.name()).toString('hex'),
+      });
+    }
+  }
+  return result;
+}
+
+export function cardanoValueFromMultiToken(
+  tokens: MultiToken,
+): RustModule.WalletV4.Value {
+  const value = RustModule.WalletV4.Value.new(
+    RustModule.WalletV4.BigNum.from_str(tokens.getDefaultEntry().amount.toString())
+  );
+  // recall: primary asset counts towards size
+  if (tokens.size() === 1) return value;
+
+  const assets = RustModule.WalletV4.MultiAsset.new();
+  for (const entry of tokens.nonDefaultEntries()) {
+    const { policyId, name } = identifierToCardanoAsset(entry.identifier);
+
+    const policyContent = assets.get(policyId) ?? RustModule.WalletV4.Assets.new();
+
+    policyContent.insert(
+      name,
+      RustModule.WalletV4.BigNum.from_str(entry.amount.toString())
+    );
+    // recall: we always have to insert since WASM returns copies of objects
+    assets.insert(policyId, policyContent);
+  }
+  if (assets.len() > 0) {
+    value.set_multiasset(assets);
+  }
+  return value;
+}
+export function multiTokenFromCardanoValue(
+  value: RustModule.WalletV4.Value,
+  defaults: DefaultTokenEntry,
+): MultiToken {
+  const multiToken = new MultiToken([], defaults);
+  multiToken.add({
+    amount: new BigNumber(value.coin().to_str()),
+    identifier: defaults.defaultIdentifier,
+    networkId: defaults.defaultNetworkId,
+  });
+
+  for (const token of parseTokenList(value.multiasset())) {
+    multiToken.add({
+      amount: new BigNumber(token.amount),
+      identifier: token.assetId,
+      networkId: defaults.defaultNetworkId,
+    });
+  }
+  return multiToken;
+}
+export function cardanoValueFromRemoteFormat(
+  utxo: RemoteUnspentOutput,
+): RustModule.WalletV4.Value {
+  const value = RustModule.WalletV4.Value.new(
+    RustModule.WalletV4.BigNum.from_str(utxo.amount)
+  );
+  if (utxo.assets.length === 0) return value;
+
+  const assets = RustModule.WalletV4.MultiAsset.new();
+  for (const entry of utxo.assets) {
+    const { policyId, name } = identifierToCardanoAsset(entry.assetId);
+
+    const policyContent = assets.get(policyId) ?? RustModule.WalletV4.Assets.new();
+
+    policyContent.insert(
+      name,
+      RustModule.WalletV4.BigNum.from_str(entry.amount.toString())
+    );
+    // recall: we always have to insert since WASM returns copies of objects
+    assets.insert(policyId, policyContent);
+  }
+  if (assets.len() > 0) {
+    value.set_multiasset(assets);
+  }
+  return value;
+}
+export function multiTokenFromRemote(
+  utxo: $ReadOnly<{
+    ...RemoteUnspentOutput,
+    ...,
+  }>,
+  networkId: number,
+): MultiToken {
+  const result = new MultiToken(
+    [],
+    {
+      defaultNetworkId: networkId,
+      defaultIdentifier: PRIMARY_ASSET_CONSTANTS.Cardano,
+    }
+  );
+  result.add({
+    identifier: PRIMARY_ASSET_CONSTANTS.Cardano,
+    amount: new BigNumber(utxo.amount),
+    networkId,
+  });
+  for (const token of utxo.assets) {
+    result.add({
+      identifier: token.assetId,
+      amount: new BigNumber(token.amount),
+      networkId,
+    });
+  }
+
+  return result;
+}
 
 export function getFromUserPerspective(data: {|
   utxoInputs: $ReadOnlyArray<$ReadOnly<UtxoTransactionInputRow>>,
@@ -196,26 +350,45 @@ export function utxosToLookupMap(
   return lookupMap;
 }
 
-export function derivePathPrefix(purpose: number, accountIndex: number): string {
-  if (accountIndex < HARD_DERIVATION_START) {
-    throw new Error(`${nameof(derivePathPrefix)} accountIndex < 0x80000000`);
-  }
-  if (purpose < HARD_DERIVATION_START) {
-    throw new Error(`${nameof(derivePathPrefix)} purpose < 0x80000000`);
-  }
-  // https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki
-  return `m/${purpose - HARD_DERIVATION_START}'/${CoinTypes.CARDANO - HARD_DERIVATION_START}'/${accountIndex - HARD_DERIVATION_START}'`;
-}
+export function asAddressedUtxo(
+  utxos: IGetAllUtxosResponse,
+): Array<CardanoAddressedUtxo> {
+  return utxos.map(utxo => {
+    const tokenTypes = utxo.output.tokens.reduce(
+      (acc, next) => {
+        if (next.Token.Identifier === PRIMARY_ASSET_CONSTANTS.Cardano) {
+          acc.amount = acc.amount.plus(next.TokenList.Amount);
+        } else {
+          acc.tokens.push({
+            amount: next.TokenList.Amount,
+            tokenId: next.Token.Identifier,
+          });
+        }
+        return acc;
+      },
+      {
+        amount: new BigNumber(0),
+        tokens: [],
+      }
+    );
 
-export function verifyFromBip44Root(request: $ReadOnly<{|
-  ...$PropertyType<Addressing, 'addressing'>,
-|}>): void {
-  const accountPosition = request.startLevel;
-  if (accountPosition !== Bip44DerivationLevels.PURPOSE.level) {
-    throw new Error(`${nameof(verifyFromBip44Root)} addressing does not start from root`);
-  }
-  const lastLevelSpecified = request.startLevel + request.path.length - 1;
-  if (lastLevelSpecified !== Bip44DerivationLevels.ADDRESS.level) {
-    throw new Error(`${nameof(verifyFromBip44Root)} incorrect addressing size`);
-  }
+    const assets = tokenTypes.tokens.map(token => {
+      const pieces = identifierToCardanoAsset(token.tokenId);
+      return {
+        amount: token.amount,
+        assetId: token.tokenId,
+        policyId: Buffer.from(pieces.policyId.to_bytes()).toString('hex'),
+        name: Buffer.from(pieces.name.name()).toString('hex'),
+      };
+    });
+    return {
+      amount: tokenTypes.amount.toString(),
+      receiver: utxo.address,
+      tx_hash: utxo.output.Transaction.Hash,
+      tx_index: utxo.output.UtxoTransactionOutput.OutputIndex,
+      utxo_id: utxo.output.Transaction.Hash + utxo.output.UtxoTransactionOutput.OutputIndex,
+      addressing: utxo.addressing,
+      assets,
+    };
+  });
 }

@@ -83,9 +83,8 @@ import { scanBip44Account, } from '../common/lib/restoration/bip44';
 import { v2genAddressBatchFunc, } from '../ada/restoration/byron/scan';
 import { scanJormungandrCip1852Account, } from './lib/restoration/scan';
 import type {
-  BaseSignRequest,
   V3UnsignedTxAddressedUtxoResponse,
-} from '../ada/transactions/types';
+} from './lib/transactions/types';
 import { JormungandrTxSignRequest } from './lib/transactions/JormungandrTxSignRequest';
 import { WrongPassphraseError } from '../ada/lib/cardanoCrypto/cryptoErrors';
 import type {
@@ -167,7 +166,7 @@ export type CreateWalletFunc = (
 
 export type SignAndBroadcastRequest = {|
   publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetSigningKey,
-  signRequest: BaseSignRequest<RustModule.WalletV3.InputOutput>,
+  signRequest: JormungandrTxSignRequest,
   password: string,
   sendTx: SendFunc,
 |};
@@ -214,7 +213,7 @@ export type CreateDelegationTxFunc = (
 
 export type SignAndBroadcastDelegationTxRequest = {|
   publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetSigningKey & IGetStakingKey,
-  signRequest: BaseSignRequest<RustModule.WalletV3.InputOutput>,
+  signRequest: JormungandrTxSignRequest,
   password: string,
   sendTx: SendFunc,
 |};
@@ -528,8 +527,9 @@ export default class JormungandrApi {
         unsignedTx: unsignedTxResponse.IOs,
         changeAddr: unsignedTxResponse.changeAddr,
         certificate: unsignedTxResponse.certificate,
-      }, {
-        NetworkId: request.publicDeriver.getParent().getNetworkInfo().NetworkId,
+        networkSettingSnapshot: {
+          NetworkId: request.publicDeriver.getParent().getNetworkInfo().NetworkId,
+        }
       });
     } catch (error) {
       Logger.error(
@@ -612,8 +612,9 @@ export default class JormungandrApi {
       unsignedTx: unsignedTx.IOs,
       changeAddr: unsignedTx.changeAddr,
       certificate: unsignedTx.certificate,
-    }, {
-      NetworkId: request.publicDeriver.getParent().getNetworkInfo().NetworkId,
+      networkSettingSnapshot: {
+        NetworkId: request.publicDeriver.getParent().getNetworkInfo().NetworkId,
+      },
     });
     return {
       signTxRequest,

@@ -2,12 +2,15 @@
 
 import BigNumber from 'bignumber.js';
 import { ISignRequest } from '../../../common/lib/transactions/ISignRequest';
-import type { BaseSignRequest } from '../../../ada/transactions/types';
+import type { JormungandrAddressedUtxo } from './types';
 import { RustModule } from '../../../ada/lib/cardanoCrypto/rustLoader';
 import {
   MultiToken,
 } from '../../../common/lib/MultiToken';
 import { PRIMARY_ASSET_CONSTANTS } from '../../../ada/lib/storage/database/primitives/enums';
+import type {
+  Address, Value, Addressing,
+} from '../../../ada/lib/storage/models/PublicDeriver/interfaces';
 
 type NetworkSettingSnapshot = {|
   // there is no way given just an unsigned transaction body to know which network it belongs to
@@ -16,38 +19,47 @@ type NetworkSettingSnapshot = {|
 
 export class JormungandrTxSignRequest implements ISignRequest<RustModule.WalletV3.InputOutput> {
 
-  signRequest: BaseSignRequest<RustModule.WalletV3.InputOutput>;
+  senderUtxos: Array<JormungandrAddressedUtxo>;
+  unsignedTx: RustModule.WalletV3.InputOutput;
+  changeAddr: Array<{| ...Address, ...Value, ...Addressing |}>;
+  certificate: void | RustModule.WalletV3.Certificate;
   networkSettingSnapshot: NetworkSettingSnapshot;
 
-  constructor(
-    signRequest: BaseSignRequest<RustModule.WalletV3.InputOutput>,
+  constructor(data: {|
+    senderUtxos: Array<JormungandrAddressedUtxo>,
+    unsignedTx: RustModule.WalletV3.InputOutput,
+    changeAddr: Array<{| ...Address, ...Value, ...Addressing |}>,
+    certificate: void | RustModule.WalletV3.Certificate,
     networkSettingSnapshot: NetworkSettingSnapshot,
-  ) {
-    this.signRequest = signRequest;
-    this.networkSettingSnapshot = networkSettingSnapshot;
+  |}) {
+    this.senderUtxos = data.senderUtxos;
+    this.unsignedTx = data.unsignedTx;
+    this.changeAddr = data.changeAddr;
+    this.certificate = data.certificate;
+    this.networkSettingSnapshot = data.networkSettingSnapshot;
   }
 
   totalInput(): MultiToken {
-    return getTxInputTotal(this.signRequest.unsignedTx, this.networkSettingSnapshot.NetworkId);
+    return getTxInputTotal(this.unsignedTx, this.networkSettingSnapshot.NetworkId);
   }
 
   totalOutput(): MultiToken {
-    return getTxOutputTotal(this.signRequest.unsignedTx, this.networkSettingSnapshot.NetworkId);
+    return getTxOutputTotal(this.unsignedTx, this.networkSettingSnapshot.NetworkId);
   }
 
   fee(): MultiToken {
-    return getJormungandrTxFee(this.signRequest.unsignedTx, this.networkSettingSnapshot.NetworkId);
+    return getJormungandrTxFee(this.unsignedTx, this.networkSettingSnapshot.NetworkId);
   }
 
   uniqueSenderAddresses(): Array<string> {
-    return Array.from(new Set(this.signRequest.senderUtxos.map(utxo => utxo.receiver)));
+    return Array.from(new Set(this.senderUtxos.map(utxo => utxo.receiver)));
   }
 
   receivers(includeChange: boolean): Array<string> {
     const receivers: Array<string> = [];
 
-    const changeAddrs = new Set(this.signRequest.changeAddr.map(change => change.address));
-    const outputs = this.signRequest.unsignedTx.outputs();
+    const changeAddrs = new Set(this.changeAddr.map(change => change.address));
+    const outputs = this.unsignedTx.outputs();
     for (let i = 0; i < outputs.size(); i++) {
       const output = outputs.get(i);
       const addr = Buffer.from(output.address().as_bytes()).toString('hex');
@@ -66,11 +78,11 @@ export class JormungandrTxSignRequest implements ISignRequest<RustModule.WalletV
     if (!(tx instanceof RustModule.WalletV3.InputOutput)) {
       return false;
     }
-    return jormungandrTxEqual(this.signRequest.unsignedTx, tx);
+    return jormungandrTxEqual(this.unsignedTx, tx);
   }
 
   self(): RustModule.WalletV3.InputOutput {
-    return this.signRequest.unsignedTx;
+    return this.unsignedTx;
   }
 }
 

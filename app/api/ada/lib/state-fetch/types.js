@@ -27,7 +27,16 @@ export type UtxoSumRequest = {|
   ...BackendNetworkInfo,
   addresses: Array<string>,
 |};
-export type UtxoSumResponse = {| sum: ?string, |};
+export type UtxoSumResponse = {|
+  +sum: ?string,
+  +assets: $ReadOnlyArray<$ReadOnly<{
+    +amount: string,
+    +assetId: string,
+    +policyId: string,
+    +name: string,
+    ...
+  }>>,
+|};
 export type UtxoSumFunc = (body: UtxoSumRequest) => Promise<UtxoSumResponse>;
 
 // getTransactionsHistoryForAddresses
@@ -77,7 +86,7 @@ export type SendFunc = (body: SignedRequest) => Promise<SignedResponse>;
 export type RemoteTxState = 'Successful' | 'Failed' | 'Pending';
 
 export type RemoteTransactionShelley = {|
-  +ttl: string,
+  +ttl?: string,
   +fee: string,
   +certificates: $ReadOnlyArray<RemoteCertificate>,
   +withdrawals: Array<RemoteWithdrawal>,
@@ -105,10 +114,24 @@ export type RemoteTransactionInput = {|
   +txHash: string, // tx that created output we're consuming
   +address: string,
   +amount: string,
+  +assets: $ReadOnlyArray<$ReadOnly<{
+    +amount: string,
+    +assetId: string,
+    +policyId: string,
+    +name: string,
+    ...
+  }>>,
 |};
 export type RemoteTransactionOutput = {|
   +address: string,
   +amount: string,
+  +assets: $ReadOnlyArray<$ReadOnly<{
+    +amount: string,
+    +assetId: string,
+    +policyId: string,
+    +name: string,
+    ...
+  }>>,
 |};
 
 /**
@@ -146,6 +169,13 @@ export type RemoteUnspentOutput = {|
   +tx_index: number,
   +receiver: string,
   +amount: string,
+  +assets: $ReadOnlyArray<$ReadOnly<{
+    +amount: string,
+    +assetId: string,
+    +policyId: string,
+    +name: string,
+    ...
+  }>>,
   // +block_num: number,
 |};
 

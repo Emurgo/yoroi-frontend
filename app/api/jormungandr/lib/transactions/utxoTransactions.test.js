@@ -2,8 +2,8 @@
 import '../../../ada/lib/test-config';
 import { schema } from 'lovefield';
 import type {
-  CardanoAddressedUtxo,
-} from '../../../ada/transactions/types';
+  JormungandrAddressedUtxo,
+} from './types';
 import type {
   RemoteUnspentOutput,
 } from '../state-fetch/types';
@@ -134,7 +134,7 @@ const addresssingMap = new Map<string, Addressing>();
 for (const address of sampleAdaAddresses) {
   addresssingMap.set(address.address, { addressing: address.addressing });
 }
-const addressedUtxos: Array<CardanoAddressedUtxo> = sampleUtxos.map(utxo => {
+const addressedUtxos: Array<JormungandrAddressedUtxo> = sampleUtxos.map(utxo => {
   const addressing = addresssingMap.get(utxo.receiver);
   if (addressing == null) throw new Error('Should never happen');
   return {

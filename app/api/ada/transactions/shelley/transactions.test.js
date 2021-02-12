@@ -5,7 +5,6 @@ import { schema } from 'lovefield';
 import BigNumber from 'bignumber.js';
 import type {
   CardanoAddressedUtxo,
-  BaseSignRequest,
 } from '../types';
 import type { RemoteUnspentOutput } from '../../lib/state-fetch/types';
 import {
@@ -41,9 +40,19 @@ import {
 } from '../../../../config/numbersConfig';
 import {
   networks,
+  defaultAssets,
 } from '../../lib/storage/database/prepackaged/networks';
+import {
+  MultiToken,
+} from '../../../common/lib/MultiToken';
+import { identifierToCardanoAsset } from '../utils';
 
 const network = networks.CardanoMainnet;
+const defaultIdentifier = defaultAssets.filter(
+  asset => asset.NetworkId === network.NetworkId
+)[0].Identifier;
+
+const testAssetId = 'd27197682d71905c087c5c3b61b10e6d746db0b9bef351014d75bb26.6e69636f696e';
 
 const genSampleUtxos: void => Array<RemoteUnspentOutput> = () => [
   {
@@ -52,6 +61,7 @@ const genSampleUtxos: void => Array<RemoteUnspentOutput> = () => [
     tx_hash: '05ec4a4a7f4645fa66886cef2e34706907a3a7f9d88e0d48b313ad2cdf76fb5f',
     tx_index: 0,
     utxo_id: '05ec4a4a7f4645fa66886cef2e34706907a3a7f9d88e0d48b313ad2cdf76fb5f0',
+    assets: [],
   },
   {
     amount: '1000001',
@@ -59,6 +69,7 @@ const genSampleUtxos: void => Array<RemoteUnspentOutput> = () => [
     tx_hash: '6930f123df83e4178b0324ae617b2028c0b38c6ff4660583a2abf1f7b08195fe',
     tx_index: 0,
     utxo_id: '6930f123df83e4178b0324ae617b2028c0b38c6ff4660583a2abf1f7b08195fe0',
+    assets: [],
   },
   {
     amount: '10000001',
@@ -66,6 +77,7 @@ const genSampleUtxos: void => Array<RemoteUnspentOutput> = () => [
     tx_hash: '0df0273e382739f8b4ae3783d81168093e78e0b48ec2c5430ff03d444806a173',
     tx_index: 0,
     utxo_id: '0df0273e382739f8b4ae3783d81168093e78e0b48ec2c5430ff03d444806a1730',
+    assets: [],
   },
   {
     amount: '30000000',
@@ -76,6 +88,23 @@ const genSampleUtxos: void => Array<RemoteUnspentOutput> = () => [
     tx_hash: '86e36b6a65d82c9dcc0370b0ee3953aee579db0b837753306405c28a74de5550',
     tx_index: 0,
     utxo_id: '86e36b6a65d82c9dcc0370b0ee3953aee579db0b837753306405c28a74de55500',
+    assets: [],
+  },
+  {
+    amount: '1000001',
+    receiver: Buffer.from(RustModule.WalletV4.Address.from_bech32(
+      // external addr 0, staking key 0
+      'addr1q8gpjmyy8zk9nuza24a0f4e7mgp9gd6h3uayp0rqnjnkl54v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqphf76y'
+    ).to_bytes()).toString('hex'),
+    tx_hash: '86e36b6a65d82c9dcc0370b0ee3953aee579db0b837753306405c28a74de5550',
+    tx_index: 0,
+    utxo_id: '86e36b6a65d82c9dcc0370b0ee3953aee579db0b837753306405c28a74de55500',
+    assets: [{
+      amount: '1234',
+      assetId: testAssetId,
+      policyId: testAssetId.split('.')[0],
+      name: testAssetId.split('.')[1],
+    }],
   },
 ];
 
@@ -153,11 +182,24 @@ function getProtocolParams(): {|
 describe('Create unsigned TX from UTXO', () => {
   it('Should fail due to insufficient funds (bigger than all inputs)', () => {
     const sampleUtxos = genSampleUtxos();
+    const output = new MultiToken(
+      [{
+        // bigger than input including fees
+        amount: new BigNumber(1900001),
+        identifier: defaultIdentifier,
+        networkId: network.NetworkId,
+      }],
+      {
+        defaultIdentifier,
+        defaultNetworkId: network.NetworkId,
+      }
+    );
+
     const utxos: Array<RemoteUnspentOutput> = [sampleUtxos[1]];
     expect(() => newAdaUnsignedTxFromUtxo(
       [{
         address: byronAddrToHex('Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4'),
-        amount: '1900001', // bigger than input including fees
+        amount: output,
       }],
       undefined,
       utxos,
@@ -170,10 +212,23 @@ describe('Create unsigned TX from UTXO', () => {
   });
 
   it('Should fail due to insufficient funds (no inputs)', () => {
+    const output = new MultiToken(
+      [{
+        // bigger than input including fees
+        amount: new BigNumber(1),
+        identifier: defaultIdentifier,
+        networkId: network.NetworkId,
+      }],
+      {
+        defaultIdentifier,
+        defaultNetworkId: network.NetworkId,
+      }
+    );
+
     expect(() => newAdaUnsignedTxFromUtxo(
       [{
         address: byronAddrToHex('Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4'),
-        amount: '1', // bigger than input including fees
+        amount: output,
       }],
       undefined,
       [],
@@ -187,11 +242,24 @@ describe('Create unsigned TX from UTXO', () => {
 
   it('Should fail due to insufficient funds (not enough to cover fees)', () => {
     const sampleUtxos = genSampleUtxos();
+    const output = new MultiToken(
+      [{
+        // bigger than input including fees
+        amount: new BigNumber(1),
+        identifier: defaultIdentifier,
+        networkId: network.NetworkId,
+      }],
+      {
+        defaultIdentifier,
+        defaultNetworkId: network.NetworkId,
+      }
+    );
+
     const utxos: Array<RemoteUnspentOutput> = [sampleUtxos[0]];
     expect(() => newAdaUnsignedTxFromUtxo(
       [{
         address: byronAddrToHex('Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4'),
-        amount: '1', // bigger than input including fees
+        amount: output,
       }],
       undefined,
       utxos,
@@ -216,7 +284,8 @@ describe('Create unsigned TX from UTXO', () => {
       new BigNumber(0),
       {
         ...getProtocolParams(),
-        minimumUtxoVal: RustModule.WalletV4.BigNum.from_str('999000'),
+        // high enough that we can't send the remaining amount as change
+        minimumUtxoVal: RustModule.WalletV4.BigNum.from_str('999100'),
       },
       [],
       [],
@@ -267,16 +336,30 @@ describe('Create unsigned TX from UTXO', () => {
     )).toThrow(NoOutputsError);
   });
 
-  it('Should pick inputs when using input selection', () => {
+  it('Should pick ada-only inputs when using input selection', () => {
     const utxos: Array<RemoteUnspentOutput> = genSampleUtxos();
     const sampleAdaAddresses = genSampleAdaAddresses();
+
+    const output = new MultiToken(
+      [{
+        // smaller than input
+        amount: new BigNumber(1001),
+        identifier: defaultIdentifier,
+        networkId: network.NetworkId,
+      }],
+      {
+        defaultIdentifier,
+        defaultNetworkId: network.NetworkId,
+      }
+    );
+
     const unsignedTxResponse = newAdaUnsignedTxFromUtxo(
       [{
         address: byronAddrToHex('Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4'),
-        amount: '1001', // smaller than input
+        amount: output,
       }],
       sampleAdaAddresses[0],
-      utxos,
+      [utxos[0], utxos[1], utxos[2], utxos[3]],
       new BigNumber(0),
       getProtocolParams(),
       [],
@@ -285,19 +368,34 @@ describe('Create unsigned TX from UTXO', () => {
     );
     // input selection will only take 2 of the 3 inputs
     // it takes 2 inputs because input selection algorithm
+    const expectedFee = new BigNumber('1166');
     expect(unsignedTxResponse.senderUtxos).toEqual([utxos[0], utxos[1]]);
-    expect(unsignedTxResponse.txBuilder.get_explicit_input().to_str()).toEqual('1000702');
-    expect(unsignedTxResponse.txBuilder.get_explicit_output().to_str()).toEqual('999528');
-    expect(unsignedTxResponse.txBuilder.min_fee().to_str()).toEqual('1166');
+    expect(unsignedTxResponse.txBuilder.get_explicit_input().coin().to_str()).toEqual('1000702');
+    expect(unsignedTxResponse.txBuilder.get_explicit_output().coin().to_str()).toEqual('999536');
+    expect(unsignedTxResponse.txBuilder.min_fee().to_str()).toEqual(expectedFee.toString());
   });
 
-  it('Should exclude inputs smaller than fee to include them', () => {
+  it('Should exclude ada-only inputs smaller than fee to include them', () => {
     const utxos: Array<RemoteUnspentOutput> = genSampleUtxos();
     const sampleAdaAddresses = genSampleAdaAddresses();
+
+    const output = new MultiToken(
+      [{
+        // smaller than input
+        amount: new BigNumber(1001),
+        identifier: defaultIdentifier,
+        networkId: network.NetworkId,
+      }],
+      {
+        defaultIdentifier,
+        defaultNetworkId: network.NetworkId,
+      }
+    );
+
     const unsignedTxResponse = newAdaUnsignedTxFromUtxo(
       [{
         address: byronAddrToHex('Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4'),
-        amount: '1001', // smaller than input
+        amount: output,
       }],
       sampleAdaAddresses[0],
       [utxos[0], utxos[1]],
@@ -321,20 +419,149 @@ describe('Create unsigned TX from UTXO', () => {
     );
     // input selection will only take 2 of the 3 inputs
     // it takes 2 inputs because input selection algorithm
+    const expectedFee = new BigNumber('208994');
     expect(unsignedTxResponse.senderUtxos).toEqual([utxos[1]]);
-    expect(unsignedTxResponse.txBuilder.get_explicit_input().to_str()).toEqual('1000001');
-    expect(unsignedTxResponse.txBuilder.get_explicit_output().to_str()).toEqual('788199');
-    expect(unsignedTxResponse.txBuilder.min_fee().to_str()).toEqual('208994');
+    expect(unsignedTxResponse.txBuilder.get_explicit_input().coin().to_str()).toEqual('1000001');
+    expect(unsignedTxResponse.txBuilder.get_explicit_output().coin().to_str()).toEqual('791007');
+    expect(unsignedTxResponse.txBuilder.min_fee().to_str()).toEqual(expectedFee.toString());
+  });
+
+  it('Should pick inputs with tokens when using input selection', () => {
+    const utxos: Array<RemoteUnspentOutput> = genSampleUtxos();
+    const sampleAdaAddresses = genSampleAdaAddresses();
+
+    const output = new MultiToken(
+      [{
+        // smaller than input
+        amount: new BigNumber(1001),
+        identifier: defaultIdentifier,
+        networkId: network.NetworkId,
+      }, {
+        amount: new BigNumber(1000),
+        identifier: testAssetId,
+        networkId: network.NetworkId,
+      }],
+      {
+        defaultIdentifier,
+        defaultNetworkId: network.NetworkId,
+      }
+    );
+
+    const unsignedTxResponse = newAdaUnsignedTxFromUtxo(
+      [{
+        address: byronAddrToHex('Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4'),
+        amount: output,
+      }],
+      sampleAdaAddresses[0],
+      [utxos[0], utxos[1], utxos[2], utxos[3], utxos[4]],
+      new BigNumber(0),
+      getProtocolParams(),
+      [],
+      [],
+      true,
+    );
+    // input selection will only take 3 of the 5 inputs
+    // it takes 2 inputs after which the ADA amount is satisfied
+    // then it skips inputs until it found an input  containing the desired token
+    const expectedFee = new BigNumber('1614');
+    expect(unsignedTxResponse.senderUtxos).toEqual([utxos[0], utxos[1], utxos[4]]);
+    expect(unsignedTxResponse.txBuilder.get_explicit_input().coin().to_str()).toEqual('2000703');
+    expect(unsignedTxResponse.txBuilder.get_explicit_output().coin().to_str()).toEqual('1999089');
+    expect(unsignedTxResponse.txBuilder.min_fee().to_str()).toEqual(expectedFee.toString());
+
+    const assetInfo = identifierToCardanoAsset(testAssetId);
+    expect(unsignedTxResponse.txBuilder.get_explicit_input().multiasset()
+      ?.get(assetInfo.policyId)
+      ?.get(assetInfo.name)
+      ?.to_str()
+    ).toEqual('1234');
+
+    const tx = unsignedTxResponse.txBuilder.build();
+    expect(tx.outputs().get(1).amount().multiasset()
+      ?.get(assetInfo.policyId)
+      ?.get(assetInfo.name)
+      ?.to_str()
+    ).toEqual('234'); // expected change
+  });
+
+  it('Should fail when not enough ADA to avoid burning tokens', () => {
+    const utxos: Array<RemoteUnspentOutput> = genSampleUtxos();
+    const sampleAdaAddresses = genSampleAdaAddresses();
+
+    const output = new MultiToken(
+      [{
+        // smaller than input
+        amount: new BigNumber(900000),
+        identifier: defaultIdentifier,
+        networkId: network.NetworkId,
+      }, {
+        amount: new BigNumber(1000),
+        identifier: testAssetId,
+        networkId: network.NetworkId,
+      }],
+      {
+        defaultIdentifier,
+        defaultNetworkId: network.NetworkId,
+      }
+    );
+
+    expect(() => newAdaUnsignedTxFromUtxo(
+      [{
+        address: byronAddrToHex('Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4'),
+        amount: output,
+      }],
+      sampleAdaAddresses[0],
+      [utxos[4]],
+      new BigNumber(0),
+      {
+        ...getProtocolParams(),
+        // high enough that we can't send the remaining amount as change
+        minimumUtxoVal: RustModule.WalletV4.BigNum.from_str('500000'),
+      },
+      [],
+      [],
+      true,
+    )).toThrow(NotEnoughMoneyToSendError);
+  });
+
+  it('Should succeed when not enough ADA to avoid burning tokens but is sending all', () => {
+    const utxos: Array<RemoteUnspentOutput> = genSampleUtxos();
+    expect(() => sendAllUnsignedTxFromUtxo(
+      {
+        address: byronAddrToHex('Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4')
+      },
+      [utxos[4]],
+      new BigNumber(0),
+      {
+        ...getProtocolParams(),
+        // high enough that we can't send the remaining amount as change
+        minimumUtxoVal: RustModule.WalletV4.BigNum.from_str('500000'),
+      },
+      undefined,
+    )).not.toThrow(NotEnoughMoneyToSendError);
   });
 });
 
 describe('Create unsigned TX from addresses', () => {
   it('Should create a valid transaction without selection', () => {
     const addressedUtxos = genAddressedUtxos();
+
+    const output = new MultiToken(
+      [{
+        // smaller than input
+        amount: new BigNumber(5001),
+        identifier: defaultIdentifier,
+        networkId: network.NetworkId,
+      }],
+      {
+        defaultIdentifier,
+        defaultNetworkId: network.NetworkId,
+      }
+    );
     const unsignedTxResponse = newAdaUnsignedTx(
       [{
         address: byronAddrToHex('Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4'),
-        amount: '5001', // smaller than input
+        amount: output,
       }],
       undefined,
       [addressedUtxos[0], addressedUtxos[1]],
@@ -346,14 +573,14 @@ describe('Create unsigned TX from addresses', () => {
     );
     expect(unsignedTxResponse.senderUtxos).toEqual([addressedUtxos[0], addressedUtxos[1]]);
 
-    expect(unsignedTxResponse.txBuilder.get_explicit_input().to_str()).toEqual('1000702');
-    expect(unsignedTxResponse.txBuilder.get_explicit_output().to_str()).toEqual('5001');
+    expect(unsignedTxResponse.txBuilder.get_explicit_input().coin().to_str()).toEqual('1000702');
+    expect(unsignedTxResponse.txBuilder.get_explicit_output().coin().to_str()).toEqual('5001');
     expect(unsignedTxResponse.txBuilder.min_fee().to_str()).toEqual('1064');
     // burns remaining amount
     expect(
       unsignedTxResponse.txBuilder.get_explicit_input().checked_sub(
         unsignedTxResponse.txBuilder.get_explicit_output()
-      ).to_str()
+      ).coin().to_str()
     ).toEqual(unsignedTxResponse.txBuilder.build().fee().to_str());
   });
 });
@@ -361,10 +588,23 @@ describe('Create unsigned TX from addresses', () => {
 describe('Create signed transactions', () => {
   it('Witness should match on valid private key', () => {
     const addressedUtxos = genAddressedUtxos();
+
+    const output = new MultiToken(
+      [{
+        // smaller than input
+        amount: new BigNumber(5001),
+        identifier: defaultIdentifier,
+        networkId: network.NetworkId,
+      }],
+      {
+        defaultIdentifier,
+        defaultNetworkId: network.NetworkId,
+      }
+    );
     const unsignedTxResponse = newAdaUnsignedTx(
       [{
         address: byronAddrToHex('Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4'),
-        amount: '5001', // smaller than input
+        amount: output,
       }],
       undefined,
       [addressedUtxos[0], addressedUtxos[1]],
@@ -374,12 +614,6 @@ describe('Create signed transactions', () => {
       [],
       true,
     );
-    const signRequest: BaseSignRequest<RustModule.WalletV4.TransactionBuilder> = {
-      changeAddr: unsignedTxResponse.changeAddr,
-      senderUtxos: unsignedTxResponse.senderUtxos,
-      unsignedTx: unsignedTxResponse.txBuilder,
-      certificate: undefined,
-    };
 
     const accountPrivateKey = RustModule.WalletV4.Bip32PrivateKey.from_bytes(
       Buffer.from(
@@ -388,7 +622,8 @@ describe('Create signed transactions', () => {
       ),
     );
     const signedTx = signTransaction(
-      signRequest,
+      unsignedTxResponse.senderUtxos,
+      unsignedTxResponse.txBuilder,
       Bip44DerivationLevels.ACCOUNT.level,
       accountPrivateKey,
       new Set(),
@@ -431,7 +666,7 @@ describe('Create signed transactions', () => {
     outputs.add(
       RustModule.WalletV4.TransactionOutput.new(
         RustModule.WalletV4.Address.from_bytes(Buffer.from(byronAddrToHex('Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4'), 'hex')),
-        RustModule.WalletV4.BigNum.from_str('5001')
+        RustModule.WalletV4.Value.new(RustModule.WalletV4.BigNum.from_str('5001'))
       )
     );
     const txBody = RustModule.WalletV4.TransactionBody.new(
@@ -440,9 +675,9 @@ describe('Create signed transactions', () => {
       RustModule.WalletV4.BigNum.from_str('1000'),
       0,
     );
-    const signRequest: BaseSignRequest<RustModule.WalletV4.TransactionBody> = {
-      changeAddr: [],
-      senderUtxos: [
+
+    const signedTx = signTransaction(
+      [
         {
           amount: '7001',
           receiver: byronAddrToHex('Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4'),
@@ -452,7 +687,8 @@ describe('Create signed transactions', () => {
           addressing: {
             path: [WalletTypePurpose.BIP44, CoinTypes.CARDANO, HARD_DERIVATION_START + 0, 0, 135],
             startLevel: 1
-          }
+          },
+          assets: [],
         },
         {
           amount: '1000001',
@@ -463,15 +699,11 @@ describe('Create signed transactions', () => {
           addressing: {
             path: [WalletTypePurpose.BIP44, CoinTypes.CARDANO, HARD_DERIVATION_START + 0, 0, 135],
             startLevel: 1
-          }
+          },
+          assets: [],
         }
       ],
-      unsignedTx: txBody,
-      certificate: undefined,
-    };
-
-    const signedTx = signTransaction(
-      signRequest,
+      txBody,
       Bip44DerivationLevels.ACCOUNT.level,
       accountPrivateKey,
       new Set(),
@@ -500,10 +732,24 @@ describe('Create signed transactions', () => {
     const stakingKey = accountPrivateKey.derive(2).derive(STAKING_KEY_INDEX).to_raw_key();
 
     const addressedUtxos = genAddressedUtxos();
+
+    const output = new MultiToken(
+      [{
+        // smaller than input
+        amount: new BigNumber(5001),
+        identifier: defaultIdentifier,
+        networkId: network.NetworkId,
+      }],
+      {
+        defaultIdentifier,
+        defaultNetworkId: network.NetworkId,
+      }
+    );
+
     const unsignedTxResponse = newAdaUnsignedTx(
       [{
         address: byronAddrToHex('Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4'),
-        amount: '5001', // smaller than input
+        amount: output,
       }],
       undefined,
       [addressedUtxos[3]],
@@ -525,20 +771,15 @@ describe('Create signed transactions', () => {
       [],
       true,
     );
-    const signRequest: BaseSignRequest<RustModule.WalletV4.TransactionBuilder> = {
-      changeAddr: unsignedTxResponse.changeAddr,
-      senderUtxos: unsignedTxResponse.senderUtxos,
-      unsignedTx: unsignedTxResponse.txBuilder,
-      certificate: undefined,
-    };
     const signedTx = signTransaction(
-      signRequest,
+      unsignedTxResponse.senderUtxos,
+      unsignedTxResponse.txBuilder,
       Bip44DerivationLevels.ACCOUNT.level,
       accountPrivateKey,
       new Set([Buffer.from(
         RustModule.WalletV4.make_vkey_witness(
           RustModule.WalletV4.hash_transaction(
-            signRequest.unsignedTx.build()
+            unsignedTxResponse.txBuilder.build()
           ),
           stakingKey,
         ).to_bytes()
@@ -605,20 +846,15 @@ describe('Create signed transactions', () => {
       }],
       true,
     );
-    const signRequest: BaseSignRequest<RustModule.WalletV4.TransactionBuilder> = {
-      changeAddr: unsignedTxResponse.changeAddr,
-      senderUtxos: unsignedTxResponse.senderUtxos,
-      unsignedTx: unsignedTxResponse.txBuilder,
-      certificate: undefined,
-    };
     const signedTx = signTransaction(
-      signRequest,
+      unsignedTxResponse.senderUtxos,
+      unsignedTxResponse.txBuilder,
       Bip44DerivationLevels.ACCOUNT.level,
       accountPrivateKey,
       new Set([Buffer.from(
         RustModule.WalletV4.make_vkey_witness(
           RustModule.WalletV4.hash_transaction(
-            signRequest.unsignedTx.build()
+            unsignedTxResponse.txBuilder.build()
           ),
           stakingKey,
         ).to_bytes()
@@ -636,9 +872,9 @@ describe('Create signed transactions', () => {
     const txBody = unsignedTxResponse.txBuilder.build();
     expect(txBody.withdrawals()?.len()).toEqual(1);
     const fee = txBody.fee().to_str();
-    expect(fee).toEqual('1310');
+    expect(fee).toEqual('1302');
     expect(txBody.outputs().len()).toEqual(1);
-    expect(txBody.outputs().get(0).amount().to_str()).toEqual(
+    expect(txBody.outputs().get(0).amount().coin().to_str()).toEqual(
       new BigNumber(addressedUtxos[3].amount)
         .minus(fee)
         .plus(withdrawAmount)
@@ -653,8 +889,8 @@ describe('Create signed transactions', () => {
     ].sort();
 
     expect(witArray).toEqual([
-      '82582001c01f8b958699ae769a246e9785db5a70e023977ea4b856dfacf23c23346caf5840ed278dd61c950a8e8c8a5252dd028ac5ccde0571be351bd84e7d363071bb852ae803d5cd882036d3d6495a3a20078c3843c15be6c76236bc5f25f432acf3f108',
-      '82582038c14a0756e1743081a8ebfdb9169b11283a7bf6c38045c4c4a5e62a7689639d5840f533e0d1bad015c5b2f409309405c58ae27f5da6b38e24f3e7b92faba77dee0021865d6a2b70dcc3cb5b816469affd42f0aff83edf5c4773c861ee0255991f03',
+      '82582001c01f8b958699ae769a246e9785db5a70e023977ea4b856dfacf23c23346caf5840d684b2ee3f8959eb76024280903236edebb244e41c16bafca05d0a30669c7e9df19c3896002c976d8734e25a64d7273b5b58400102fffeb4f858a81f191c8204',
+      '82582038c14a0756e1743081a8ebfdb9169b11283a7bf6c38045c4c4a5e62a7689639d5840168146e19cf1074036b48b0ba6b26f9ff08cd2e6fa381f84480e9c8c9fb582a5c8d85062e62809143b1c0edc4b9412b5504f78f3de6413386a0088d302d2b301',
     ]);
   });
 });
@@ -673,16 +909,22 @@ describe('Create sendAll unsigned TX from UTXO', () => {
         getProtocolParams(),
       );
 
+      const expectedFee = new BigNumber('1342');
+      const expectedInput = new BigNumber('11000002');
       expect(sendAllResponse.senderUtxos).toEqual([utxos[0], utxos[1]]);
-      expect(sendAllResponse.txBuilder.get_explicit_input().to_str()).toEqual('11000002');
-      expect(sendAllResponse.txBuilder.get_explicit_output().to_str()).toEqual('10998652');
+      expect(
+        sendAllResponse.txBuilder.get_explicit_input().coin().to_str()
+      ).toEqual(expectedInput.toString());
+      expect(
+        sendAllResponse.txBuilder.get_explicit_output().coin().to_str()
+      ).toEqual(expectedInput.minus(expectedFee).toString());
       expect(sendAllResponse.txBuilder.min_fee().to_str()).toEqual('1342');
       // make sure we don't accidentally burn a lot of coins
       expect(
         sendAllResponse.txBuilder.get_explicit_input().checked_sub(
           sendAllResponse.txBuilder.get_explicit_output()
-        ).to_str()
-      ).toEqual('1350');
+        ).coin().to_str()
+      ).toEqual(expectedFee.toString());
     });
   });
 

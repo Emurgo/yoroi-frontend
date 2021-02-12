@@ -46,7 +46,8 @@ type WalletNames =
   'ergo-simple-wallet' |
   'shelley-enterprise' |
   'shelley-mangled' |
-  'ergo-token-wallet';
+  'ergo-token-wallet' |
+  'cardano-token-wallet';
 
 // eslint-disable-next-line prefer-object-spread
 export const testWallets: { [key: WalletNames]: RestorationInput, ... } = Object.assign(
@@ -151,5 +152,10 @@ export const testWallets: { [key: WalletNames]: RestorationInput, ... } = Object
     name: ('ergo-token-wallet': WalletNames),
     mnemonic: 'rent sword help dynamic enhance collect biology drama agent raven grape bike march length leisure',
     plate: 'AZTH-1588',
+  }),
+  createWallet({
+    name: ('cardano-token-wallet': WalletNames),
+    mnemonic: 'rent sword help dynamic enhance collect biology drama agent raven grape bike march length leisure',
+    plate: 'HZPX-1482',
   }),
 );

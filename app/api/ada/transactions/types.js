@@ -33,24 +33,6 @@ export type CardanoAddressedUtxo = {|
   ...Addressing,
 |};
 
-export type BaseSignRequest<T> = {|
-  senderUtxos: Array<CardanoAddressedUtxo>,
-  unsignedTx: T,
-  changeAddr: Array<{| ...Address, ...Value, ...Addressing |}>,
-  certificate: void | RustModule.WalletV3.Certificate,
-|};
-
-export type V3UnsignedTxUtxoResponse = {|
-  senderUtxos: Array<RemoteUnspentOutput>,
-  IOs: RustModule.WalletV3.InputOutput,
-  changeAddr: Array<{| ...Address, ...Value, ...Addressing |}>,
-|};
-export type V3UnsignedTxAddressedUtxoResponse = {|
-  senderUtxos: Array<CardanoAddressedUtxo>,
-  IOs: RustModule.WalletV3.InputOutput,
-  changeAddr: Array<{| ...Address, ...Value, ...Addressing |}>,
-  certificate: void | RustModule.WalletV3.Certificate,
-|};
 export type V4UnsignedTxUtxoResponse = {|
   senderUtxos: Array<RemoteUnspentOutput>,
   txBuilder: RustModule.WalletV4.TransactionBuilder,

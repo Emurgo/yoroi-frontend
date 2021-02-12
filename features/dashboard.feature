@@ -22,7 +22,7 @@ Feature: Yoroi delegation dashboard
     And I enter the wallet password:
       | password   |
       | asdfasdfasdf |
-    Given The expected transaction is "g6YAgYJYIDZ36Gx7ppmv3BzVfULyRvhvaa79dgJQBqx4MT+tK7ohAAGBglg5AfiMMmOcqBWRIjRN6CEig4T8YKJcOWtIDaUVnSFW21zUiJyEEQ1N6QwNUDtRuETbPm/YeZEjiZW7GgCV8ZcCGgACpOkDGhH+lM0EgYIBggBYHFbbXNSInIQRDU3pDA1QO1G4RNs+b9h5kSOJlbsFoVgd4VbbXNSInIQRDU3pDA1QO1G4RNs+b9h5kSOJlbsaAExLQKEAgoJYIDHFsozgC4AMMNymh4uSd8Xls6VSRnf9Dxv6kiJPzsubWEDeymxh6IEQKI51A9krNH9zkI8E6r+yQhyKpgVMn318UvFlJ7PWkEA/UN5ttCRe+/8lHy6Vl9Dhu4RBHZ47Mu0Hglgg6cWNnhkPKitPspqy3T6+Lqi2VU1F/s8JE36FUprlBHBYQCyphTpHmP5U443IIuVOntgb8KaXTjazElk9hm6GFMebbuNWYuv907Ci+JvN7kk9wbO0R6ZKcA9pEgbbmlBYrA32"
+    Given The expected transaction is "g6YAgYJYIDZ36Gx7ppmv3BzVfULyRvhvaa79dgJQBqx4MT+tK7ohAAGBglg5AfiMMmOcqBWRIjRN6CEig4T8YKJcOWtIDaUVnSFW21zUiJyEEQ1N6QwNUDtRuETbPm/YeZEjiZW7GgCV8kcCGgACpDkDGhH+lM0EgYIBggBYHFbbXNSInIQRDU3pDA1QO1G4RNs+b9h5kSOJlbsFoVgd4VbbXNSInIQRDU3pDA1QO1G4RNs+b9h5kSOJlbsaAExLQKEAgoJYIDHFsozgC4AMMNymh4uSd8Xls6VSRnf9Dxv6kiJPzsubWEAd3HanTLSyDKwCsumQcfnUVXaupHr7ozsqYR/GMEzFvF/099CFY8K8lbcr+RJbECvDCDucXXiqmgvsqvw11EYKglgg6cWNnhkPKitPspqy3T6+Lqi2VU1F/s8JE36FUprlBHBYQI/U3TR7lVdU73V2AUPVBA4kSbEwNv+S+HOjgakFxsp9AXTOI6JkNeSW2GyperZx1Zmpk0G6UMPLrgmtwcHUkQT2"
     When I confirm Yoroi transfer funds
     Then I should see the dashboard screen
 
@@ -42,7 +42,7 @@ Feature: Yoroi delegation dashboard
     | fromAddress                                                | amount           |
     | stake1u9tdkhx53zwggygdfh5scr2s8dgms3xm8ehas7v3ywyetwcufngyf | 5000000    |
     And I see the deregistration for the transaction
-    Given The expected transaction is "g6YAgYJYIDZ36Gx7ppmv3BzVfULyRvhvaa79dgJQBqx4MT+tK7ohAAGBglg5AfiMMmOcqBWRIjRN6CEig4T8YKJcOWtIDaUVnSFW21zUiJyEEQ1N6QwNUDtRuETbPm/YeZEjiZW7GgCV8ZcCGgACpOkDGhH+lM0EgYIBggBYHFbbXNSInIQRDU3pDA1QO1G4RNs+b9h5kSOJlbsFoVgd4VbbXNSInIQRDU3pDA1QO1G4RNs+b9h5kSOJlbsaAExLQKEAgoJYIDHFsozgC4AMMNymh4uSd8Xls6VSRnf9Dxv6kiJPzsubWEDeymxh6IEQKI51A9krNH9zkI8E6r+yQhyKpgVMn318UvFlJ7PWkEA/UN5ttCRe+/8lHy6Vl9Dhu4RBHZ47Mu0Hglgg6cWNnhkPKitPspqy3T6+Lqi2VU1F/s8JE36FUprlBHBYQCyphTpHmP5U443IIuVOntgb8KaXTjazElk9hm6GFMebbuNWYuv907Ci+JvN7kk9wbO0R6ZKcA9pEgbbmlBYrA32"
+    Given The expected transaction is "g6YAgYJYIDZ36Gx7ppmv3BzVfULyRvhvaa79dgJQBqx4MT+tK7ohAAGBglg5AfiMMmOcqBWRIjRN6CEig4T8YKJcOWtIDaUVnSFW21zUiJyEEQ1N6QwNUDtRuETbPm/YeZEjiZW7GgCV8kcCGgACpDkDGhH+lM0EgYIBggBYHFbbXNSInIQRDU3pDA1QO1G4RNs+b9h5kSOJlbsFoVgd4VbbXNSInIQRDU3pDA1QO1G4RNs+b9h5kSOJlbsaAExLQKEAgoJYIDHFsozgC4AMMNymh4uSd8Xls6VSRnf9Dxv6kiJPzsubWEAd3HanTLSyDKwCsumQcfnUVXaupHr7ozsqYR/GMEzFvF/099CFY8K8lbcr+RJbECvDCDucXXiqmgvsqvw11EYKglgg6cWNnhkPKitPspqy3T6+Lqi2VU1F/s8JE36FUprlBHBYQI/U3TR7lVdU73V2AUPVBA4kSbEwNv+S+HOjgakFxsp9AXTOI6JkNeSW2GyperZx1Zmpk0G6UMPLrgmtwcHUkQT2"
     When I confirm Yoroi transfer funds
     Then I should see the dashboard screen
 
@@ -62,7 +62,7 @@ Feature: Yoroi delegation dashboard
     | fromAddress                                                | amount           |
     | stake1u80tp0xvht8gv38vhwet36ulc7ntpeecp68sr86yxexaqcqnl9kg3 | 5000000    |
     And I see the deregistration for the transaction
-    Given The expected transaction is "g6YAgYJYIDZ36Gx7ppmv3BzVfULyRvhvaa79dgJQBqx4MT+tK7ohAAGBglg5AfiMMmOcqBWRIjRN6CEig4T8YKJcOWtIDaUVnSFW21zUiJyEEQ1N6QwNUDtRuETbPm/YeZEjiZW7GgCV8ZcCGgACpOkDGhH+lM0EgYIBggBYHFbbXNSInIQRDU3pDA1QO1G4RNs+b9h5kSOJlbsFoVgd4VbbXNSInIQRDU3pDA1QO1G4RNs+b9h5kSOJlbsaAExLQKEAgoJYIDHFsozgC4AMMNymh4uSd8Xls6VSRnf9Dxv6kiJPzsubWEDeymxh6IEQKI51A9krNH9zkI8E6r+yQhyKpgVMn318UvFlJ7PWkEA/UN5ttCRe+/8lHy6Vl9Dhu4RBHZ47Mu0Hglgg6cWNnhkPKitPspqy3T6+Lqi2VU1F/s8JE36FUprlBHBYQCyphTpHmP5U443IIuVOntgb8KaXTjazElk9hm6GFMebbuNWYuv907Ci+JvN7kk9wbO0R6ZKcA9pEgbbmlBYrA32"
+    Given The expected transaction is "g6YAgYJYIDZ36Gx7ppmv3BzVfULyRvhvaa79dgJQBqx4MT+tK7ohAAGBglg5AfiMMmOcqBWRIjRN6CEig4T8YKJcOWtIDaUVnSFW21zUiJyEEQ1N6QwNUDtRuETbPm/YeZEjiZW7GgCV8kcCGgACpDkDGhH+lM0EgYIBggBYHFbbXNSInIQRDU3pDA1QO1G4RNs+b9h5kSOJlbsFoVgd4VbbXNSInIQRDU3pDA1QO1G4RNs+b9h5kSOJlbsaAExLQKEAgoJYIDHFsozgC4AMMNymh4uSd8Xls6VSRnf9Dxv6kiJPzsubWEAd3HanTLSyDKwCsumQcfnUVXaupHr7ozsqYR/GMEzFvF/099CFY8K8lbcr+RJbECvDCDucXXiqmgvsqvw11EYKglgg6cWNnhkPKitPspqy3T6+Lqi2VU1F/s8JE36FUprlBHBYQI/U3TR7lVdU73V2AUPVBA4kSbEwNv+S+HOjgakFxsp9AXTOI6JkNeSW2GyperZx1Zmpk0G6UMPLrgmtwcHUkQT2"
     When I confirm Yoroi transfer funds
     Then I should see the dashboard screen
 
@@ -78,7 +78,7 @@ Feature: Yoroi delegation dashboard
     And I enter the wallet password:
       | password   |
       | asdfasdfasdf |
-    Given The expected transaction is "g6QAgYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgSugI11FwGBglg5ATFf/lO+USTb83qMl8g53oV7XmMSuklF3gfHb8kex9YZS/n0WTCduT05oFTkplWcw+TU0UvasV/VGgCWD6sCGgAChtUDGhH+lM2hAIGCWCCxG2517QHEmTBkk1BC3zBriToLyq4PxNikr8LCc0V+jFhAUiMjVxyfTJcGdgg9q914adTdNaD7+DW+eMviv5if69KbiPhAxWcIGldT8kDaG2uiyjtePEnGLd9fXRa3unVuBPY="
+    Given The expected transaction is "g6QAgYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgSugI11FwGBglg5ATFf/lO+USTb83qMl8g53oV7XmMSuklF3gfHb8kex9YZS/n0WTCduT05oFTkplWcw+TU0UvasV/VGgCWEFsCGgAChiUDGhH+lM2hAIGCWCCxG2517QHEmTBkk1BC3zBriToLyq4PxNikr8LCc0V+jFhA0LkC9dcwcE8kORl7Oo4D4lql/IEmb+pFM9JXsKFjTXpKLIftor3/GXjnZRZh9TWkoQhBFisxgf65tR2Pfsq+AfY="
     When I confirm Yoroi transfer funds
     Then I should see the summary screen
     And I should see 1 pending transactions

@@ -121,7 +121,8 @@ test('Create Trezor transaction', async () => {
     addressing: {
       path: [2147483692, 2147485463, 2147483648, 1, 1],
       startLevel: 1
-    }
+    },
+    assets: [],
   }, {
     amount: '2832006',
     // base
@@ -132,7 +133,8 @@ test('Create Trezor transaction', async () => {
     addressing: {
       path: [2147483692, 2147485463, 2147483648, 1, 2],
       startLevel: 1
-    }
+    },
+    assets: [],
   }, {
     amount: '1000000',
     // enterprise
@@ -143,7 +145,8 @@ test('Create Trezor transaction', async () => {
     addressing: {
       path: [2147483692, 2147485463, 2147483648, 0, 7],
       startLevel: 1
-    }
+    },
+    assets: [],
   }, {
     amount: '1000000',
     // pointer
@@ -154,7 +157,8 @@ test('Create Trezor transaction', async () => {
     addressing: {
       path: [2147483692, 2147485463, 2147483648, 0, 7],
       startLevel: 1
-    }
+    },
+    assets: [],
   }];
   const protocolParams = getProtocolParams();
   const txBuilder = RustModule.WalletV4.TransactionBuilder.new(
@@ -175,7 +179,7 @@ test('Create Trezor transaction', async () => {
           RustModule.WalletV4.TransactionHash.from_bytes(Buffer.from(utxo.tx_hash, 'hex')),
           1
         ),
-        RustModule.WalletV4.BigNum.from_str(utxo.amount)
+        RustModule.WalletV4.Value.new(RustModule.WalletV4.BigNum.from_str(utxo.amount))
       );
     } else {
       txBuilder.add_key_input(
@@ -184,14 +188,14 @@ test('Create Trezor transaction', async () => {
           RustModule.WalletV4.TransactionHash.from_bytes(Buffer.from(utxo.tx_hash, 'hex')),
           1
         ),
-        RustModule.WalletV4.BigNum.from_str(utxo.amount)
+        RustModule.WalletV4.Value.new(RustModule.WalletV4.BigNum.from_str(utxo.amount))
       );
     }
   }
   txBuilder.add_output(
     RustModule.WalletV4.TransactionOutput.new(
       RustModule.WalletV4.Address.from_bytes(Buffer.from(byronAddrToHex('Ae2tdPwUPEZAVDjkPPpwDhXMSAjH53CDmd2xMwuR9tZMAZWxLhFphrHKHXe'), 'hex')),
-      RustModule.WalletV4.BigNum.from_str('5326134')
+      RustModule.WalletV4.Value.new(RustModule.WalletV4.BigNum.from_str('5326134'))
     )
   );
   const certs = RustModule.WalletV4.Certificates.new();
@@ -219,25 +223,22 @@ test('Create Trezor transaction', async () => {
   const { ByronNetworkId, ChainNetworkId } = baseConfig;
 
   const response = await createTrezorSignTxPayload(
-    new HaskellShelleyTxSignRequest(
-      {
-        unsignedTx: txBuilder,
-        changeAddr: [],
-        senderUtxos,
-        certificate: undefined,
-      },
-      undefined,
-      {
+    new HaskellShelleyTxSignRequest({
+      unsignedTx: txBuilder,
+      changeAddr: [],
+      senderUtxos,
+      metadata: undefined,
+      networkSettingSnapshot: {
         ChainNetworkId: Number.parseInt(baseConfig.ChainNetworkId, 10),
         PoolDeposit: new BigNumber(baseConfig.PoolDeposit),
         KeyDeposit: new BigNumber(baseConfig.KeyDeposit),
         NetworkId: network.NetworkId,
       },
-      {
+      neededStakingKeyHashes: {
         neededHashes: new Set([Buffer.from(stakeCredential.to_bytes()).toString('hex')]),
         wits: new Set() // not needed for this test, but something should be here
       },
-    ),
+    }),
     ByronNetworkId,
     Number.parseInt(ChainNetworkId, 10),
   );

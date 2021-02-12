@@ -2,7 +2,7 @@
 import type {
   CardanoAddressedUtxo,
 } from '../types';
-import { verifyFromBip44Root }  from '../utils';
+import { verifyFromBip44Root }  from '../../lib/storage/models/utils';
 import { toDerivationPathString } from '../../../common/lib/crypto/keys/path';
 import type {
   CardanoSignTransaction,
@@ -11,6 +11,8 @@ import type {
   CardanoWithdrawal,
   CardanoCertificate,
   CardanoAddressParameters,
+  CardanoAssetGroup,
+  CardanoToken,
 } from 'trezor-connect/lib/types/networks/cardano';
 import {
   CERTIFICATE_TYPE,
@@ -38,24 +40,24 @@ export async function createTrezorSignTxPayload(
   byronNetworkMagic: number,
   networkId: number,
 ): Promise<$Exact<CardanoSignTransaction>> {
-  const txBody = signRequest.signRequest.unsignedTx.build();
+  const txBody = signRequest.unsignedTx.build();
 
   // Inputs
   const trezorInputs = _transformToTrezorInputs(
-    signRequest.signRequest.senderUtxos
+    signRequest.senderUtxos
   );
 
   // Output
   const trezorOutputs = _generateTrezorOutputs(
     txBody.outputs(),
-    signRequest.signRequest.changeAddr
+    signRequest.changeAddr
   );
 
   let request = {
     inputs: trezorInputs,
     outputs: trezorOutputs,
     fee: txBody.fee().to_str(),
-    ttl: txBody.ttl().toString(),
+    ttl: txBody.ttl()?.toString(),
     protocolMagic: byronNetworkMagic,
     networkId,
   };
@@ -70,7 +72,7 @@ export async function createTrezorSignTxPayload(
 
     // assume the withdrawal is the same path as the UTXOs being spent
     // so just take the first UTXO arbitrarily and change it to the staking key path
-    const firstUtxo = signRequest.signRequest.senderUtxos[0];
+    const firstUtxo = signRequest.senderUtxos[0];
     if (firstUtxo.addressing.startLevel !== Bip44DerivationLevels.PURPOSE.level) {
       throw new Error(`${nameof(createTrezorSignTxPayload)} unexpected addressing start level`);
     }
@@ -179,6 +181,39 @@ function _transformToTrezorInputs(
   }));
 }
 
+function toTrezorTokenBundle(
+  assets: ?RustModule.WalletV4.MultiAsset
+): {|
+  tokenBundle?: Array<CardanoAssetGroup>,
+|} {
+  if (assets == null) return Object.freeze({});
+
+  const assetGroup: Array<CardanoAssetGroup> = [];
+  const policyHashes = assets.keys();
+  for (let i = 0; i < policyHashes.len(); i++) {
+    const policyId = policyHashes.get(i);
+    const assetsForPolicy = assets.get(policyId);
+    if (assetsForPolicy == null) continue;
+
+    const tokenAmounts: Array<CardanoToken> = [];
+    const assetNames = assetsForPolicy.keys();
+    for (let j = 0; j < assetNames.len(); j++) {
+      const assetName = assetNames.get(j);
+      const amount = assetsForPolicy.get(assetName);
+      if (amount == null) continue;
+
+      tokenAmounts.push({
+        amount: amount.to_str(),
+        assetNameBytes: Buffer.from(assetName.name()).toString('hex'),
+      });
+    }
+    assetGroup.push({
+      policyId: Buffer.from(policyId.to_bytes()).toString('hex'),
+      tokenAmounts,
+    });
+  }
+  return { tokenBundle: assetGroup };
+}
 function _generateTrezorOutputs(
   txOutputs: RustModule.WalletV4.TransactionOutputs,
   changeAddrs: Array<{| ...Address, ...Value, ...Addressing |}>,
@@ -189,6 +224,8 @@ function _generateTrezorOutputs(
     const address = output.address();
     const jsAddr = toHexOrBase58(output.address());
 
+    const tokenBundle = toTrezorTokenBundle(output.amount().multiasset());
+
     const changeAddr = changeAddrs.find(change => jsAddr === change.address);
     if (changeAddr != null) {
       verifyFromBip44Root(changeAddr.addressing);
@@ -197,7 +234,8 @@ function _generateTrezorOutputs(
           address,
           changeAddr.addressing.path
         ),
-        amount: output.amount().to_str(),
+        amount: output.amount().coin().to_str(),
+        ...tokenBundle
       });
     } else {
       const byronWasm = RustModule.WalletV4.ByronAddress.from_address(address);
@@ -205,7 +243,8 @@ function _generateTrezorOutputs(
         address: byronWasm == null
           ? address.to_bech32()
           : byronWasm.to_base58(),
-        amount: output.amount().to_str(),
+        amount: output.amount().coin().to_str(),
+        ...tokenBundle,
       });
     }
   }

@@ -6,8 +6,8 @@ import BigNumber from 'bignumber.js';
 import type {
   V3UnsignedTxAddressedUtxoResponse,
   V3UnsignedTxUtxoResponse,
-  CardanoAddressedUtxo,
-} from '../../../ada/transactions/types';
+  JormungandrAddressedUtxo,
+} from './types';
 import type { RemoteUnspentOutput, } from '../state-fetch/types';
 import {
   NotEnoughMoneyToSendError,
@@ -39,14 +39,14 @@ type TxOutput = {|
 
 export function sendAllUnsignedTx(
   receiver: string,
-  allUtxos: Array<CardanoAddressedUtxo>,
+  allUtxos: Array<JormungandrAddressedUtxo>,
   certificate: void | RustModule.WalletV3.Certificate,
   protocolParams: {|
     feeConfig: JormungandrFeeConfig,
     networkId: number,
   |},
 ): V3UnsignedTxAddressedUtxoResponse {
-  const addressingMap = new Map<RemoteUnspentOutput, CardanoAddressedUtxo>();
+  const addressingMap = new Map<RemoteUnspentOutput, JormungandrAddressedUtxo>();
   for (const utxo of allUtxos) {
     addressingMap.set({
       amount: utxo.amount,
@@ -146,14 +146,14 @@ export function sendAllUnsignedTxFromUtxo(
 export function newAdaUnsignedTx(
   outputs: Array<TxOutput>,
   changeAdaAddr: Array<{| ...Address, ...Addressing |}>,
-  allUtxos: Array<CardanoAddressedUtxo>,
+  allUtxos: Array<JormungandrAddressedUtxo>,
   certificate: void | RustModule.WalletV3.Certificate,
   protocolParams: {|
     feeConfig: JormungandrFeeConfig,
     networkId: number,
   |},
 ): V3UnsignedTxAddressedUtxoResponse {
-  const addressingMap = new Map<RemoteUnspentOutput, CardanoAddressedUtxo>();
+  const addressingMap = new Map<RemoteUnspentOutput, JormungandrAddressedUtxo>();
   for (const utxo of allUtxos) {
     addressingMap.set({
       amount: utxo.amount,
@@ -379,7 +379,7 @@ export function signTransaction(
 
 function addWitnesses(
   builderSetWitnesses: RustModule.WalletV3.TransactionBuilderSetWitness,
-  senderUtxos: Array<CardanoAddressedUtxo>,
+  senderUtxos: Array<JormungandrAddressedUtxo>,
   keyLevel: number,
   signingKey: RustModule.WalletV3.Bip32PrivateKey,
   useLegacy: boolean,
@@ -413,7 +413,7 @@ function addWitnesses(
 
 export function asAddressedUtxo(
   utxos: IGetAllUtxosResponse,
-): Array<CardanoAddressedUtxo> {
+): Array<JormungandrAddressedUtxo> {
   return utxos.map(utxo => {
     return {
       amount: utxo.output.tokens.filter(

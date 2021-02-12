@@ -253,7 +253,6 @@ class MockTrezorConnect {
           fingerprint: 3586099367,
           child_num: path[path.length - 1],
           chain_code: Buffer.from(accountKey.chaincode()).toString('hex'),
-          private_key: null,
           public_key: Buffer.from(accountKey.as_bytes()).toString('hex'),
         },
       };
@@ -323,14 +322,16 @@ class MockTrezorConnect {
 
     const inputs = RustModule.WalletV4.TransactionInputs.new();
     for (const input of request.inputs) {
+      const { path } = input;
+      if (path == null) continue;
       inputs.add(
         RustModule.WalletV4.TransactionInput.new(
           RustModule.WalletV4.TransactionHash.from_bytes(Buffer.from(input.prev_hash, 'hex')),
           input.prev_index
         )
       );
-      const spendingKey = derivePath(selectedWallet.rootKey, toPath(input.path));
-      witGens.push((hash) => addWitness(toPath(input.path), spendingKey, hash));
+      const spendingKey = derivePath(selectedWallet.rootKey, toPath(path));
+      witGens.push((hash) => addWitness(toPath(path), spendingKey, hash));
     }
     const outputs = RustModule.WalletV4.TransactionOutputs.new();
     for (const output of request.outputs) {
@@ -356,7 +357,7 @@ class MockTrezorConnect {
       outputs.add(
         RustModule.WalletV4.TransactionOutput.new(
           address,
-          RustModule.WalletV4.BigNum.from_str(output.amount)
+          RustModule.WalletV4.Value.new(RustModule.WalletV4.BigNum.from_str(output.amount))
         )
       );
     }
@@ -365,13 +366,15 @@ class MockTrezorConnect {
       inputs,
       outputs,
       RustModule.WalletV4.BigNum.from_str(request.fee),
-      Number.parseInt(request.ttl, 10),
+      request.ttl == null ? undefined : Number.parseInt(request.ttl, 10),
     );
     if (request.certificates != null && request.certificates.length > 0) {
       const certRequest = request.certificates;
       const certs = RustModule.WalletV4.Certificates.new();
       for (const cert of certRequest) {
-        const stakingKey = derivePath(selectedWallet.rootKey, toPath(cert.path));
+        const { path } = cert;
+        if (path == null) continue;
+        const stakingKey = derivePath(selectedWallet.rootKey, toPath(path));
         const stakeCredential = RustModule.WalletV4.StakeCredential.from_keyhash(
           stakingKey.to_public().to_raw_key().hash()
         );
@@ -381,13 +384,13 @@ class MockTrezorConnect {
           ));
         }
         if (cert.type === CERTIFICATE_TYPE.StakeDeregistration) {
-          witGens.push((hash) => addWitness(toPath(cert.path), stakingKey, hash));
+          witGens.push((hash) => addWitness(toPath(path), stakingKey, hash));
           certs.add(RustModule.WalletV4.Certificate.new_stake_deregistration(
             RustModule.WalletV4.StakeDeregistration.new(stakeCredential)
           ));
         }
         if (cert.type === CERTIFICATE_TYPE.StakeDelegation) {
-          witGens.push((hash) => addWitness(toPath(cert.path), stakingKey, hash));
+          witGens.push((hash) => addWitness(toPath(path), stakingKey, hash));
 
           if (cert.pool == null) throw new Error('Missing pool key hash');
           certs.add(RustModule.WalletV4.Certificate.new_stake_delegation(
@@ -510,6 +513,7 @@ class MockTrezorConnect {
           vendor: 'trezor.io',
           ...selectedWallet.version,
           bootloader_mode: (null: any),
+          capabilities: [],
           device_id: selectedWallet.deviceId,
           pin_protection: false,
           passphrase_protection: false,

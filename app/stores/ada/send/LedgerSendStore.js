@@ -226,7 +226,7 @@ export default class LedgerSendStore extends Store {
       const txId = Buffer.from(RustModule.WalletV4.hash_transaction(txBody).to_bytes()).toString('hex');
       const signedTx = buildSignedTransaction(
         txBody,
-        request.signRequest.signRequest.senderUtxos,
+        request.signRequest.senderUtxos,
         ledgerSignTxResp.witnesses,
         request.publicKey,
         request.signRequest.metadata,

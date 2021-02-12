@@ -89,7 +89,7 @@ function getByronAddress(
 describe('Haskell Shelley era tx format tests', () => {
   test('Yoroi transfer from single small UTXO', async () => {
     const txId = '915f2e6865fb31cc93410efb6c0e580ca74862374b3da461e20135c01f312e7c';
-    const inputAmount = '10000000';
+    const inputAmount = new BigNumber('10000000');
     const txIndex = 0;
     const outAddress = 'Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4';
 
@@ -108,7 +108,8 @@ describe('Haskell Shelley era tx format tests', () => {
       tx_hash: txId,
       tx_index: txIndex,
       receiver: addr1.address,
-      amount: inputAmount
+      amount: inputAmount.toString(),
+      assets: [],
     };
 
     const baseConfig = networks.CardanoMainnet.BaseConfig[0];
@@ -129,8 +130,9 @@ describe('Haskell Shelley era tx format tests', () => {
       protocolParams: getProtocolParams(),
     });
 
-    expect(transferInfo.fee.getDefault().toString()).toBe('166469');
-    expect(transferInfo.recoveredBalance.getDefault().toString()).toBe('10000000');
+    const expectedFee = new BigNumber('166293');
+    expect(transferInfo.fee.getDefault().toString()).toBe(expectedFee.toString());
+    expect(transferInfo.recoveredBalance.getDefault().toString()).toBe(inputAmount.toString());
     expect(transferInfo.senders).toEqual([addr1.address]);
     expect(transferInfo.receivers[0]).toBe(outAddress);
 
@@ -147,11 +149,13 @@ describe('Haskell Shelley era tx format tests', () => {
       // eslint-disable-next-line camelcase
       RustModule.WalletV4.ByronAddress.from_address(body.outputs().get(0).address())?.to_base58()
     ).toBe(outAddress);
-    expect(body.outputs().get(0).amount().to_str()).toBe('9833531');
+    expect(
+      body.outputs().get(0).amount().coin().to_str()
+    ).toBe(inputAmount.minus(expectedFee).toString());
 
     const witnesses = signedTx.witness_set().bootstraps();
     if (witnesses == null) throw new Error('no bootstrap witnesses found');
     expect(witnesses.len()).toBe(1);
-    expect(Buffer.from(witnesses.get(0).to_bytes()).toString('hex')).toBe('84582007cc5b01ab460562479f3e7fdf782b11636c4a1b721c19b9c1609bc7360b518e584064bc0e2723eae9f387aab05299bb41fab5275e86321bad668655085afee3713999095794c1ed18767ee49c9ea281313d396bc9237ff8ee0d4b796bd2ee1f69085820f3748736afd541361c4fb90b2963723fe9a10d237a024530d378181df4bf2c6841a0');
+    expect(Buffer.from(witnesses.get(0).to_bytes()).toString('hex')).toBe('84582007cc5b01ab460562479f3e7fdf782b11636c4a1b721c19b9c1609bc7360b518e58408e7f6bcf7e04b70caf9b754405dc85984dd6f7c41c85d0f33a130e97a3b090d24aa5d9bc7f338d58ff2b1d5e120be6ff3930cb97338c7fac23dd8d60e2d2d80a5820f3748736afd541361c4fb90b2963723fe9a10d237a024530d378181df4bf2c6841a0');
   });
 });

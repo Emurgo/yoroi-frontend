@@ -111,7 +111,7 @@ Feature: Send transaction
 
     Examples:
       | fee       | expectedTx |
-      | 0.209369  | "g6QAiYJYILcTzA1jEGw4BrGnB3zDeilPzKDkefJqrGTlHgmugI11AIJYIGBJO/JuYLC5jxQ2R2E74uwcb1C9X8FaFKL/UY9fo2vgAIJYIGBJO/JuYLC5jxQ2R2E74uwcb1C9X8FaFKL/UY9fo2vgAYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI1xAIJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI1xAYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI11AIJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI11AYJYIAoHNmmEX+pK6DzUQYoLT9VmEAl6iWAagWtYkfZn40lsAIJYIAoHNmmEX+pK6DzUQYoLT9VmEAl6iWAagWtYkfZn40lsAQGBglgrgtgYWCGDWBxA66wjgpZH9bPPW9JExWBcIUqKGMmxBlNBcCzWoAAa8oZfOxoALEKcAhoAAzHZAxoR/pTNoQKGhFggXnGsSYUyhwTHwB1G9f7mkd9iHoKwNvA477DkhDTXmX5YQODmGgT0+wEVelFubPQ7ktVrqHfziBoSJMc2ANg4taa8NbSiDdHFC8dZszJ4gEBmYI4L9bGrk2Vuy2IfNOJxxglYIO23hdKX7dxt3V0Cchr8MLvy1UwjID2hIegQ0F2VF6vHQaCEWCCPBkfbIHjkWa3BQgOfZnSx2uNRXSeHf/3Dr6sioCh8qlhA0/hhhZJs9+rR0aOHjsxWzSAvnn9hqreu9Knwxv6CqPGaFIk0QMXR08rP1PnruqsG5kgB5hb0lS+Y/y62QAGHAlggRYcsb5A2HZ+Idr1h/VYzDe7f0Gt4E0SVRIi2VqWKcA5BoIRYIOx7+AYOSniTUHVqDkzhtFF7b1HM/9BBkw6++m8Q+/SzWECcRWG/biKz8QIRihjCDtT5z9pV4U3Klu8xSm6+sk7Y4Ki3IfB3Mbq+B3n+Xh/j0u1hzdlqrw81AUadXukJCnEDWCBWM2zqwExuk/gcTouvBpcmhtN2NEKb5aluF5K/hwZh2EGghFggzHvtZR+ntErMZIIgbq2uQ2B/jHt0TTIZ2j1JzMH2HTtYQEW4KDdgVlD9ZjTxZ1SPrt5hQkJLI3zrdNUOj6kn3QbNw8sindwpGU22PF5zidKbFD7+Sd/d7kq7xWeNN5evzglYIFiANkZLmGZ3Oe+LI3Q8iACb9dHcrlZN4L/sajTg+7+/QaCEWCCrz2wieKqlEL0JsQicx3naLrAb0qgH4COJ/AE3AZvCd1hAnzF8mVAY2lyGzQSM1ItvnfIWFeTR/vpqWrluSDgiCdOr+khs0G1yBwPzHKC6Bwn8JXOGOlxI7+ZJ4i81JGM4B1ggXsJ5mvWuSD0y///s18T45fzDjpah0vqXB3erntI0INFBoIRYILlNNm5mIlb6YPjq4n8gjDChi+2y90adZ81HgfMcpj8GWEAiN1aBsY5is/h6lzQKZjiUlsH/cuo1LHIjPhKzfRIwOqIj7Z7pppu2pYysIs1Hu6jEByM7qNDMDYC0pSma9lcEWCCux11USi/M3OmzDhjc8euPOY/1uQF34sJFYQk85C/rpUGg9g==" |
+      | 0.209193  | "g6QAiYJYILcTzA1jEGw4BrGnB3zDeilPzKDkefJqrGTlHgmugI11AIJYIGBJO/JuYLC5jxQ2R2E74uwcb1C9X8FaFKL/UY9fo2vgAIJYIGBJO/JuYLC5jxQ2R2E74uwcb1C9X8FaFKL/UY9fo2vgAYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI1xAIJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI1xAYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI11AIJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI11AYJYIAoHNmmEX+pK6DzUQYoLT9VmEAl6iWAagWtYkfZn40lsAIJYIAoHNmmEX+pK6DzUQYoLT9VmEAl6iWAagWtYkfZn40lsAQGBglgrgtgYWCGDWBxA66wjgpZH9bPPW9JExWBcIUqKGMmxBlNBcCzWoAAa8oZfOxoALENMAhoAAzEpAxoR/pTNoQKGhFggXnGsSYUyhwTHwB1G9f7mkd9iHoKwNvA477DkhDTXmX5YQOgqSLhR8sUADEtWnvr6NjvmTSgZecfPXL4Rbu7TIp2UmflUqzzfx1vZ3J9wyB/h6smfq8mlqlqNVyNfO6j07A5YIO23hdKX7dxt3V0Cchr8MLvy1UwjID2hIegQ0F2VF6vHQaCEWCCPBkfbIHjkWa3BQgOfZnSx2uNRXSeHf/3Dr6sioCh8qlhAoi4s6bvzxVwn4Gkdsyewl2mPghpInwoRfQnmQIbGPcI1JoQpB64cB1cd9+f/w+uAt/t2aSU8DSFgkRkWddj9A1ggRYcsb5A2HZ+Idr1h/VYzDe7f0Gt4E0SVRIi2VqWKcA5BoIRYIOx7+AYOSniTUHVqDkzhtFF7b1HM/9BBkw6++m8Q+/SzWEDSvpZpGjk74C0E4gieWGRuFWhdnP4640l259qPRUzr5TnkUhc5BRq/ubxVC6LBqDd11PZa/g8XWGoFUJiY+toAWCBWM2zqwExuk/gcTouvBpcmhtN2NEKb5aluF5K/hwZh2EGghFggzHvtZR+ntErMZIIgbq2uQ2B/jHt0TTIZ2j1JzMH2HTtYQOCCXW2Lo0iUC+HsPqg/MgSbR3Rb+Z/WLxDhQ4t9qeZYnoXUDPOZWMOz9ToWLibo+75g5IzTK+CNWtrgM5BtmAdYIFiANkZLmGZ3Oe+LI3Q8iACb9dHcrlZN4L/sajTg+7+/QaCEWCCrz2wieKqlEL0JsQicx3naLrAb0qgH4COJ/AE3AZvCd1hATLVkXVaSCrYGXA3jOCO9JSZiqhyRYLG1IZaSVETBS9Xb9ovg+kCCX8V43NxNuwLVQ5udSiJKv5Sbf9CUhpfyAVggXsJ5mvWuSD0y///s18T45fzDjpah0vqXB3erntI0INFBoIRYILlNNm5mIlb6YPjq4n8gjDChi+2y90adZ81HgfMcpj8GWEDjpBRrBC2WEwVLLgI0qgXRYmxNAtjRcPdEaFKTugqQ0/vup0jP1r4wMq6rqkqMWOWdaodtClZs3KBIW1cXWv0FWCCux11USi/M3OmzDhjc8euPOY/1uQF34sJFYQk85C/rpUGg9g==" |
 
   @invalidWitnessTest @it-20
   Scenario: Sending a Tx and receiving from the server an invalid signature error (IT-20)
@@ -247,7 +247,7 @@ Feature: Send transaction
       | password   |
       | asdfasdfasdf |
      Then I see the delegation confirmation dialog
-     Given The expected transaction is "g6UAgYJYIDZ351x7ppm/3GzVfULyRvhvY679dgJQBqx4MT+tK7ohAQGBglg5Aceyi86pDUQLVFWmoConylm4aW8Gf8GWf0f5M+eVWOlpyqnletz8QLmQfreUNjtZD69C//SMOOuIGgAyvn8CGgACqWEDGhH+lM0EgoIAggBYHJVY6WnKqeV63PxAuZB+t5Q2O1kPr0L/9Iw464iDAoIAWByVWOlpyqnletz8QLmQfreUNjtZD69C//SMOOuIWBzfF1Dfmy3yhfz7UPR0BlehjuOvQnJ9QQw3uGIHoQCCglggzJgJlEFQwA85E80rED6bQv5iQ/w2p2+euABpLivaPy5YQGfqZRTXJdAwSfWuC5mfNFtpH7E0mrFYIo9EkwHFno9OXTvKQyyIBF4YUReZSwlm6aPPdaTb797o+07O435voQ6CWCBhYnZTIMk608gswouVeL4xp5HwOjfcrgVjQ8wlu8s7MVhAa1BrgcAgZG4iJWlm5NjyeMGbOhB/Vx2k49c1GkLi/riW0yjZ+XGSLQeYYf9PEFH7hmHc1G+sYj6XuqEyKCAnBfY="
+     Given The expected transaction is "g6UAgYJYIDZ351x7ppm/3GzVfULyRvhvY679dgJQBqx4MT+tK7ohAQGBglg5Aceyi86pDUQLVFWmoConylm4aW8Gf8GWf0f5M+eVWOlpyqnletz8QLmQfreUNjtZD69C//SMOOuIGgAyvy8CGgACqLEDGhH+lM0EgoIAggBYHJVY6WnKqeV63PxAuZB+t5Q2O1kPr0L/9Iw464iDAoIAWByVWOlpyqnletz8QLmQfreUNjtZD69C//SMOOuIWBzfF1Dfmy3yhfz7UPR0BlehjuOvQnJ9QQw3uGIHoQCCglggzJgJlEFQwA85E80rED6bQv5iQ/w2p2+euABpLivaPy5YQHEdUseECOD2uvaPsvnqa7qokE+koErqhMlU7SoRpEBgZwCbQsCLASGtkX9RfQneivUNZ59qdoz/srdWvcs3lA2CWCBhYnZTIMk608gswouVeL4xp5HwOjfcrgVjQ8wlu8s7MVhA473MwzWGlnDrg/XveIWkW2T8d0MPr3wOHo5pY94l7F/D3cDiFu6LQANl8WRGBAlDvSoVaW4PIQRjuoLRFw9VCfY="
      Then I submit the wallet send form
      Given I click on see dashboard
      Then I should see the dashboard screen
@@ -348,7 +348,7 @@ Feature: Send transaction
 
     Examples:
       | amount              | fee       | expectedTx |
-      | 1.000000            | 0.167833  | "g6QAgYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgSugI11FgGCglgrgtgYWCGDWBxA66wjgpZH9bPPW9JExWBcIUqKGMmxBlNBcCzWoAAa8oZfOxoAD0JAglg5Af0wLcvG6+RrU5YfLU0x/8kfm6HbRxOuVhSWZr6F4UOa5bEdhsrcaqLcJ6I+wLsaSX6JnAGqOfdrGgCGxKcCGgACj5kDGhH+lM2hAIGCWCAosn+8mv+rxG+osiOOtkzZqx67+DrT7IF+s0fWbhA6bFhARoefmMDg363oeCLxKyJbZI115/Lref2ZleBk7xpQgv3F4JEvqP+7D0p+6Oi8m0+UOaEREqwotQeDWSe/olRFC/Y=" |
+      | 1.000000            | 0.167657  | "g6QAgYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgSugI11FgGCglgrgtgYWCGDWBxA66wjgpZH9bPPW9JExWBcIUqKGMmxBlNBcCzWoAAa8oZfOxoAD0JAglg5Af0wLcvG6+RrU5YfLU0x/8kfm6HbRxOuVhSWZr6F4UOa5bEdhsrcaqLcJ6I+wLsaSX6JnAGqOfdrGgCGxVcCGgACjukDGhH+lM2hAIGCWCAosn+8mv+rxG+osiOOtkzZqx67+DrT7IF+s0fWbhA6bFhAokhEoNLBWrk60+zXT7fcdHwV5A6j6BUyd8x2g52AGEjx6ckVVBpKSUWLfMCYiuz2m6Z+6zV7lMvgR/QL9qFDBvY=" |
 
   @it-165
   Scenario: Can receive & unmangle utxo entries (IT-165)
@@ -366,7 +366,7 @@ Feature: Send transaction
     And I enter the wallet password:
       | password   |
       | asdfasdfasdf |
-    Given The expected transaction is "g6QAgYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgSugI11FwGBglg5ATFf/lO+USTb83qMl8g53oV7XmMSuklF3gfHb8kex9YZS/n0WTCduT05oFTkplWcw+TU0UvasV/VGgCWD6sCGgAChtUDGhH+lM2hAIGCWCCxG2517QHEmTBkk1BC3zBriToLyq4PxNikr8LCc0V+jFhAUiMjVxyfTJcGdgg9q914adTdNaD7+DW+eMviv5if69KbiPhAxWcIGldT8kDaG2uiyjtePEnGLd9fXRa3unVuBPY="
+    Given The expected transaction is "g6QAgYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgSugI11FwGBglg5ATFf/lO+USTb83qMl8g53oV7XmMSuklF3gfHb8kex9YZS/n0WTCduT05oFTkplWcw+TU0UvasV/VGgCWEFsCGgAChiUDGhH+lM2hAIGCWCCxG2517QHEmTBkk1BC3zBriToLyq4PxNikr8LCc0V+jFhA0LkC9dcwcE8kORl7Oo4D4lql/IEmb+pFM9JXsKFjTXpKLIftor3/GXjnZRZh9TWkoQhBFisxgf65tR2Pfsq+AfY="
     When I confirm Yoroi transfer funds
     Then I should see the summary screen
     And I should see 1 pending transactions
@@ -418,5 +418,57 @@ Feature: Send transaction
     And I enter the wallet password:
       | password   |
       | asdfasdfasdf |
+    And I submit the wallet send form
+    Then I should see the summary screen
+
+  @it-178
+  Scenario Outline: Can send some of a custom Cardano token (IT-178)
+    Given There is a Shelley wallet stored named cardano-token-wallet
+    And I have a wallet with funds
+    When I go to the send transaction screen
+
+    And I open the token selection dropdown
+    And I select token "d2719...f696e"
+
+    And I fill the form:
+      | address                        | amount   |
+      | <address>                      | <amount> |
+    And The transaction fees are "<fee>"
+    And I click on the next button in the wallet send form
+    And I see send money confirmation dialog
+    And I see CONFIRM TRANSACTION Pop up:
+      | address   | amount    |fee      |
+      | <address> | 1.444443  |<fee>    |
+    And I enter the wallet password:
+      | password   |
+      | asdfasdfasdf |
+    Given The expected transaction is "g6QAgYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgSugI11GBoBgoJYK4LYGFghg1gcQOusI4KWR/Wzz1vSRMVgXCFKihjJsQZTQXAs1qAAGvKGXzuCGgAWCluhWBzScZdoLXGQXAh8XDthsQ5tdG2wub7zUQFNdbsmoUZuaWNvaW4YGIJYOQHCOXo7AskuPwKPyvBLXitN1JhK7qw3sfYP1+4O5sPVeGnk6yzmr8YYpWzAu4tvCIuHO8+8BgeUQIIaACRhIKFYHNJxl2gtcZBcCHxcO2GxDm10bbC5vvNRAU11uyahRm5pY29pbhhMAhoAAp2FAxoR/pTNoQCBglgg2ryVo6+TyYjX+sqaAvK82tVCDycATBUMC9wANgPth/VYQHlZXPNDWElwk6ywyZArA/tp/mEDLqKxszGV0d4MQSckziOR/NlT5M5u+XmYr3ntX+dUwy9hvRn5X/jnpLpRYwH2"
+    And I submit the wallet send form
+    Then I should see the summary screen
+
+    Examples:
+      | address                                             | amount       |fee         |
+      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv | 24  |0.171397 |
+
+  @it-179
+  Scenario: Can send all of a custom Cardano token (IT-179)
+    Given There is a Shelley wallet stored named cardano-token-wallet
+    And I have a wallet with funds
+    When I go to the send transaction screen
+
+    And I open the token selection dropdown
+    And I select token "d2719...f696e"
+
+    And I click on "Send all" checkbox
+    And I fill the address of the form:
+      | address                                                     |
+      | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv         |
+    And The transaction fees are "0.169637"
+    And I click on the next button in the wallet send form
+    And I see send money confirmation dialog
+    And I enter the wallet password:
+      | password   |
+      | asdfasdfasdf |
+    Given The expected transaction is "g6QAgYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgSugI11GBoBgoJYK4LYGFghg1gcQOusI4KWR/Wzz1vSRMVgXCFKihjJsQZTQXAs1qAAGvKGXzuCGgAWCluhWBzScZdoLXGQXAh8XDthsQ5tdG2wub7zUQFNdbsmoUZuaWNvaW4YZIJYOQHCOXo7AskuPwKPyvBLXitN1JhK7qw3sfYP1+4O5sPVeGnk6yzmr8YYpWzAu4tvCIuHO8+8BgeUQIIaACRoAKACGgAClqUDGhH+lM2hAIGCWCDavJWjr5PJiNf6ypoC8rza1UIPJwBMFQwL3AA2A+2H9VhAod8QFO11FtfoTJ1Y0ZpeN1e6OFphVJpgjKTSXI+FMw3CV5UIr4eMIIHcxwEgJiOtiYIGIIZyVZAdQbJnSmeTBPY="
     And I submit the wallet send form
     Then I should see the summary screen

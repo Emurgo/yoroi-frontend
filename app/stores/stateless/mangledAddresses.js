@@ -20,6 +20,7 @@ import { BASE_MANGLED, GROUP_MANGLED } from './addressStores';
 import {
   unwrapStakingKey as CardanoUnwrapStakingKey,
 } from '../../api/ada/lib/storage/bridge/utils';
+import { asAddressedUtxo } from '../../api/ada/transactions/utils';
 import {
   addrContainsAccountKey,
 } from '../../api/ada/lib/storage/bridge/delegationUtils';
@@ -143,10 +144,6 @@ export async function getUnmangleAmounts(
         continue;
       }
 
-      const txIndex = utxo.output.Transaction.Ordinal;
-      // only null for pending transactions, which shouldn't happen
-      if (txIndex == null) throw new Error(`${nameof(getUnmangleAmounts)} unexpected pending tx`);
-
       const tokens = new MultiToken(
         utxo.output.tokens.map(token => ({
           identifier: token.Token.Identifier,
@@ -155,13 +152,10 @@ export async function getUnmangleAmounts(
         })),
         defaultToken
       );
-      if (filter({
-        utxo_id: utxo.output.Transaction.Hash + txIndex,
-        tx_hash: utxo.output.Transaction.Hash,
-        tx_index: txIndex,
-        receiver: utxo.address,
-        amount: tokens.getDefault().toString(),
-      })) {
+
+      // eslint-disable-next-line no-unused-vars
+      const { addressing, ...rest } = asAddressedUtxo([utxo])[0];
+      if (filter(rest)) {
         canUnmangle.push(tokens);
       } else {
         cannotUnmangle.push(tokens);
@@ -207,26 +201,9 @@ export function getMangledFilter(
         return false;
       }
 
-      const txIndex = utxo.output.Transaction.Ordinal;
-      // only null for pending transactions, which shouldn't happen
-      if (txIndex == null) throw new Error(`${nameof(getMangledFilter)} unexpected pending tx`);
-
-      const tokens = new MultiToken(
-        utxo.output.tokens.map(token => ({
-          identifier: token.Token.Identifier,
-          amount: new BigNumber(token.TokenList.Amount),
-          networkId: token.Token.NetworkId,
-        })),
-        defaultTokenEntry
-      );
-      const value = tokens.getDefault();
-      return filter({
-        utxo_id: utxo.output.Transaction.Hash + txIndex,
-        tx_hash: utxo.output.Transaction.Hash,
-        tx_index: txIndex,
-        receiver: utxo.address,
-        amount: value.toString(),
-      });
+      // eslint-disable-next-line no-unused-vars
+      const { addressing, ...rest } = asAddressedUtxo([utxo])[0];
+      return filter(rest);
     };
   }
 

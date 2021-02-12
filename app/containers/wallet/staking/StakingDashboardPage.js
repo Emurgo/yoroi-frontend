@@ -867,13 +867,10 @@ export default class StakingDashboardPage extends Component<Props> {
         request.publicDeriver.getParent().getNetworkInfo(),
         poolHash
       );
-      if (meta == null) {
+      if (meta == null || meta.info == null || meta.info.ticker == null || meta.info.name == null) {
         return poolHash;
       }
-      if (meta.info !== null) {
-        return `[${meta.info.ticker}] ${meta.info.name}`
-      }
-      return poolHash
+      return `[${meta.info.ticker}] ${meta.info.name}`;
     }
 
     const getNormalized = (tokenEntry) => {
