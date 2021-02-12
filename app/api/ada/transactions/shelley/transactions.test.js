@@ -45,11 +45,14 @@ import {
 import {
   MultiToken,
 } from '../../../common/lib/MultiToken';
+import { identifierToCardanoAsset } from '../utils';
 
 const network = networks.CardanoMainnet;
 const defaultIdentifier = defaultAssets.filter(
   asset => asset.NetworkId === network.NetworkId
 )[0].Identifier;
+
+const testAssetId = 'd27197682d71905c087c5c3b61b10e6d746db0b9bef351014d75bb26.6e69636f696e';
 
 const genSampleUtxos: void => Array<RemoteUnspentOutput> = () => [
   {
@@ -86,6 +89,22 @@ const genSampleUtxos: void => Array<RemoteUnspentOutput> = () => [
     tx_index: 0,
     utxo_id: '86e36b6a65d82c9dcc0370b0ee3953aee579db0b837753306405c28a74de55500',
     assets: [],
+  },
+  {
+    amount: '1000001',
+    receiver: Buffer.from(RustModule.WalletV4.Address.from_bech32(
+      // external addr 0, staking key 0
+      'addr1q8gpjmyy8zk9nuza24a0f4e7mgp9gd6h3uayp0rqnjnkl54v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqphf76y'
+    ).to_bytes()).toString('hex'),
+    tx_hash: '86e36b6a65d82c9dcc0370b0ee3953aee579db0b837753306405c28a74de5550',
+    tx_index: 0,
+    utxo_id: '86e36b6a65d82c9dcc0370b0ee3953aee579db0b837753306405c28a74de55500',
+    assets: [{
+      amount: '1234',
+      assetId: testAssetId,
+      policyId: testAssetId.split('.')[0],
+      name: testAssetId.split('.')[1],
+    }],
   },
 ];
 
@@ -317,7 +336,7 @@ describe('Create unsigned TX from UTXO', () => {
     )).toThrow(NoOutputsError);
   });
 
-  it('Should pick inputs when using input selection', () => {
+  it('Should pick ada-only inputs when using input selection', () => {
     const utxos: Array<RemoteUnspentOutput> = genSampleUtxos();
     const sampleAdaAddresses = genSampleAdaAddresses();
 
@@ -340,7 +359,7 @@ describe('Create unsigned TX from UTXO', () => {
         amount: output,
       }],
       sampleAdaAddresses[0],
-      utxos,
+      [utxos[0], utxos[1], utxos[2], utxos[3]],
       new BigNumber(0),
       getProtocolParams(),
       [],
@@ -356,7 +375,7 @@ describe('Create unsigned TX from UTXO', () => {
     expect(unsignedTxResponse.txBuilder.min_fee().to_str()).toEqual(expectedFee.toString());
   });
 
-  it('Should exclude inputs smaller than fee to include them', () => {
+  it('Should exclude ada-only inputs smaller than fee to include them', () => {
     const utxos: Array<RemoteUnspentOutput> = genSampleUtxos();
     const sampleAdaAddresses = genSampleAdaAddresses();
 
@@ -405,6 +424,64 @@ describe('Create unsigned TX from UTXO', () => {
     expect(unsignedTxResponse.txBuilder.get_explicit_input().coin().to_str()).toEqual('1000001');
     expect(unsignedTxResponse.txBuilder.get_explicit_output().coin().to_str()).toEqual('791007');
     expect(unsignedTxResponse.txBuilder.min_fee().to_str()).toEqual(expectedFee.toString());
+  });
+
+  it('Should pick inputs with tokens when using input selection', () => {
+    const utxos: Array<RemoteUnspentOutput> = genSampleUtxos();
+    const sampleAdaAddresses = genSampleAdaAddresses();
+
+    const output = new MultiToken(
+      [{
+        // smaller than input
+        amount: new BigNumber(1001),
+        identifier: defaultIdentifier,
+        networkId: network.NetworkId,
+      }, {
+        amount: new BigNumber(1000),
+        identifier: testAssetId,
+        networkId: network.NetworkId,
+      }],
+      {
+        defaultIdentifier,
+        defaultNetworkId: network.NetworkId,
+      }
+    );
+
+    const unsignedTxResponse = newAdaUnsignedTxFromUtxo(
+      [{
+        address: byronAddrToHex('Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4'),
+        amount: output,
+      }],
+      sampleAdaAddresses[0],
+      utxos,
+      new BigNumber(0),
+      getProtocolParams(),
+      [],
+      [],
+      true,
+    );
+    // input selection will only take 3 of the 5 inputs
+    // it takes 2 inputs after which the ADA amount is satisfied
+    // then it skips inputs until it found an input  containing the desired token
+    const expectedFee = new BigNumber('1614');
+    expect(unsignedTxResponse.senderUtxos).toEqual([utxos[0], utxos[1], utxos[4]]);
+    expect(unsignedTxResponse.txBuilder.get_explicit_input().coin().to_str()).toEqual('2000703');
+    expect(unsignedTxResponse.txBuilder.get_explicit_output().coin().to_str()).toEqual('1999089');
+    expect(unsignedTxResponse.txBuilder.min_fee().to_str()).toEqual(expectedFee.toString());
+
+    const assetInfo = identifierToCardanoAsset(testAssetId);
+    expect(unsignedTxResponse.txBuilder.get_explicit_input().multiasset()
+      ?.get(assetInfo.policyId)
+      ?.get(assetInfo.name)
+      ?.to_str()
+    ).toEqual('1234');
+
+    const tx = unsignedTxResponse.txBuilder.build();
+    expect(tx.outputs().get(1).amount().multiasset()
+      ?.get(assetInfo.policyId)
+      ?.get(assetInfo.name)
+      ?.to_str()
+    ).toEqual('234'); // expected change
   });
 });
 
