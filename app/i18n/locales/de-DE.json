@@ -519,7 +519,7 @@
   "wallet.includeKey.explanationLine1": "Möchtest Du den <strong>öffentlichen</strong> Schlüssel deiner Wallet in die Fehler-Logs schreiben? ",
   "wallet.includeKey.withKeyLabel": "Mit Schlüssel",
   "wallet.includeKey.withoutKeyLabel": "Ohne Schlüssel",
-  "wallet.nav.addButton": "Neue wallet hinzufügen",
+  "wallet.nav.addButton": "Neue Wallet hinzufügen",
   "wallet.nav.allWalletsLabel": "Alle Wallets",
   "wallet.nav.backButton": "Zurück zu meinen Wallets",
   "wallet.nav.type.ledger": "Ledger Wallet",
