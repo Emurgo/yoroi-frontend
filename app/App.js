@@ -30,6 +30,8 @@ import environment from './environment';
 import MaintenancePage from './containers/MaintenancePage';
 import CrashPage from './containers/CrashPage';
 import { Logger, } from './utils/logging';
+import { SimpleSkins } from 'react-polymorph/lib/skins/simple';
+import { SimpleDefaults } from 'react-polymorph/lib/themes/simple';
 
 // https://github.com/yahoo/react-intl/wiki#loading-locale-data
 addLocaleData([
@@ -108,6 +110,8 @@ class App extends Component<Props, State> {
         <ThemeProvider
           key={currentTheme}
           theme={yoroiPolymorphTheme}
+          skins={SimpleSkins}
+          variables={SimpleDefaults}
           themeOverrides={themeOverrides(currentTheme)}
         >
           <IntlProvider {...{ locale, key: locale, messages: mergedMessages }}>
