@@ -45,7 +45,7 @@ export default class TransactionBuilderStore extends Store {
 
   @observable shouldSendAll: boolean;
   /** Stores the tx information as the user is building it */
-  @observable plannedTxInfo: Array<{| ...InexactSubset<TxOutType<number>>, |}>;
+  @observable plannedTxInfo: Array<{| ...InexactSubset<TxOutType<BigNumber>>, |}>;
   /** Stores the tx used to generate the information on the send form */
   @observable plannedTx: null | ISignRequest<any>;
   /** Stores the tx that will be sent if the user confirms sending */
@@ -360,8 +360,8 @@ export default class TransactionBuilderStore extends Store {
 
   /** Should only set to valid amount or undefined */
   @action
-  _updateAmount: (void | number) => void = (value) => {
-    this.plannedTxInfo[0].value = value;
+  _updateAmount: (?BigNumber) => void = (value) => {
+    this.plannedTxInfo[0].value = (value ?? undefined);
   }
 
   @action

@@ -266,7 +266,11 @@ export default class WalletReceivePage extends Component<Props> {
         {uiDialogs.isOpen(URIGenerateDialog) ? (
           <URIGenerateDialog
             walletAddress={uiDialogs.getParam<string>('address')}
-            amount={uiDialogs.getParam<number>('amount')}
+            amount={(() => {
+              const val = uiDialogs.getParam<?string>('amount');
+              if (val == null) return null;
+              return new BigNumber(val);
+            })()}
             onClose={() => actions.dialogs.closeActiveDialog.trigger()}
             onGenerate={(address, amount) => { this.generateURI(address, amount); }}
             classicTheme={profile.isClassicTheme}
@@ -285,11 +289,11 @@ export default class WalletReceivePage extends Component<Props> {
         {uiDialogs.isOpen(URIDisplayDialog) ? (
           <URIDisplayDialog
             address={uiDialogs.getParam<string>('address')}
-            amount={uiDialogs.getParam<number>('amount')}
+            amount={new BigNumber(uiDialogs.getParam<?string>('amount') ?? '0')}
             onClose={actions.dialogs.closeActiveDialog.trigger}
             onBack={() => this.openURIGenerateDialog(
               uiDialogs.getParam<string>('address'),
-              uiDialogs.getParam<number>('amount'),
+              uiDialogs.getParam<?string>('amount') ?? '0',
             )}
             onCopyAddressTooltip={(elementId) => {
               if (!uiNotifications.isOpen(elementId)) {
@@ -376,7 +380,7 @@ export default class WalletReceivePage extends Component<Props> {
     actions.dialogs.open.trigger({ dialog: VerifyAddressDialog });
   }
 
-  openURIGenerateDialog: ((address: string, amount?: number) => void) = (address, amount) => {
+  openURIGenerateDialog: ((address: string, amount?: string) => void) = (address, amount) => {
     const { actions } = this.generated;
     actions.dialogs.open.trigger({
       dialog: URIGenerateDialog,
@@ -384,11 +388,11 @@ export default class WalletReceivePage extends Component<Props> {
     });
   }
 
-  generateURI: (string, number) => void = (address, amount) => {
+  generateURI: (string, BigNumber) => void = (address, amount) => {
     const { actions } = this.generated;
     actions.dialogs.open.trigger({
       dialog: URIDisplayDialog,
-      params: { address, amount }
+      params: { address, amount: amount.toString() }
     });
   }
 

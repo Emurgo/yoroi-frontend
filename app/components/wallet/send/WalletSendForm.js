@@ -11,7 +11,7 @@ import { NumericInput } from 'react-polymorph/lib/components/NumericInput';
 import { Checkbox } from 'react-polymorph/lib/components/Checkbox';
 import { CheckboxSkin } from 'react-polymorph/lib/skins/simple/CheckboxSkin';
 import { defineMessages, intlShape } from 'react-intl';
-import { isValidMemoOptional, isValidMemo, calcMaxBeforeDot } from '../../../utils/validations';
+import { isValidMemoOptional, isValidMemo, } from '../../../utils/validations';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
 import AmountInputSkin from '../skins/AmountInputSkin';
@@ -45,6 +45,7 @@ import type {
 import { Select } from 'react-polymorph/lib/components/Select';
 import { SelectTokenSkin } from '../../../themes/skins/SelectTokenSkin';
 import TokenOptionRow from '../../widgets/tokenOption/TokenOptionRow';
+import BigNumber from 'bignumber.js';
 
 const messages = defineMessages({
   receiverLabel: {
@@ -81,14 +82,14 @@ type Props = {|
   +selectedNetwork: $ReadOnly<NetworkRow>,
   +hasAnyPending: boolean,
   +validateAmount: (
-    amountInNaturalUnits: string,
+    amountInNaturalUnits: BigNumber,
     tokenRow: $ReadOnly<TokenRow>,
   ) => Promise<[boolean, void | string]>,
   +onSubmit: void => void,
   +totalInput: ?MultiToken,
   +classicTheme: boolean,
   +updateReceiver: (void | string) => void,
-  +updateAmount: (void | number) => void,
+  +updateAmount: (?BigNumber) => void,
   +updateMemo: (void | string) => void,
   +shouldSendAll: boolean,
   +toggleSendAll: void => void,
@@ -124,12 +125,8 @@ export default class WalletSendForm extends Component<Props> {
       // assert not null
       const uriParams = this.props.uriParams;
 
-      const adjustedAmount = formattedAmountToNaturalUnits(
-        uriParams.amount.getDefaultEntry().amount.toString(),
-        this.getNumDecimals(),
-      );
       // note: assume these are validated externally
-      this.props.updateAmount(Number(adjustedAmount));
+      this.props.updateAmount(uriParams.amount.getDefaultEntry().amount);
       this.props.updateReceiver(getAddressPayload(uriParams.address, this.props.selectedNetwork));
       this.props.resetUriParams();
     }
@@ -221,28 +218,28 @@ export default class WalletSendForm extends Component<Props> {
             ? formatValue(
               this.props.uriParams.amount.getDefaultEntry(),
             )
-            : ''
+            : null
         })(),
         validators: [async ({ field }) => {
           if (this.props.shouldSendAll) {
             // sendall doesn't depend on the amount so always succeed
             return true;
           }
-          const amountValue = field.value;
+          const amountValue: string = field.value;
           if (amountValue === '') {
             this.props.updateAmount();
             return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
           }
-          const formattedAmount = formattedAmountToNaturalUnits(
+          const formattedAmount = new BigNumber(formattedAmountToNaturalUnits(
             amountValue,
             this.getNumDecimals(),
-          );
+          ));
           const isValidAmount = await this.props.validateAmount(
             formattedAmount,
             this.props.selectedToken ?? this.props.defaultToken
           );
           if (isValidAmount[0]) {
-            this.props.updateAmount(Number(formattedAmount));
+            this.props.updateAmount(formattedAmount);
           } else {
             this.props.updateAmount();
           }
@@ -423,10 +420,13 @@ export default class WalletSendForm extends Component<Props> {
           <div className={styles.amountInput}>
             <NumericInput
               {...amountFieldProps}
+              value={amountFieldProps.value === ''
+                ? null
+                : formattedAmountToBigNumber(amountFieldProps.value)
+              }
               className="amount"
               label={intl.formatMessage(globalMessages.amountLabel)}
-              maxBeforeDot={calcMaxBeforeDot(this.getNumDecimals())}
-              maxAfterDot={this.getNumDecimals()}
+              decimalPlaces={this.getNumDecimals()}
               disabled={this.props.shouldSendAll}
               error={(transactionFeeError || amountField.error)}
               // AmountInputSkin props
@@ -435,6 +435,7 @@ export default class WalletSendForm extends Component<Props> {
               )}
               fees={formatValue(transactionFee.getDefaultEntry())}
               total={formatValue(this.getTokenEntry(totalAmount))}
+              allowSigns={false}
               skin={AmountInputSkin}
               classicTheme={classicTheme}
             />
@@ -452,10 +453,12 @@ export default class WalletSendForm extends Component<Props> {
                   // if we toggle shouldSendAll from true -> false
                   // we need to re-enable the field
                   // and set it to whatever value was used for the sendAll value
-                  this.props.updateAmount(Number(formattedAmountToNaturalUnits(
-                    this.form.$('amount').value,
-                    this.getNumDecimals(),
-                  )));
+                  this.props.updateAmount(new BigNumber(
+                    formattedAmountToNaturalUnits(
+                      this.form.$('amount').value,
+                      this.getNumDecimals(),
+                    )
+                  ));
                 }
               }}
               checked={this.props.shouldSendAll}

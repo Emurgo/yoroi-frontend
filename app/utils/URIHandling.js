@@ -93,8 +93,8 @@ const extractAmount: (
  */
 export const buildURI = (
   address: string,
-  amount: number
+  amount: BigNumber
 ): string => {
-  if (amount) return 'web+cardano:' + address + '?amount=' + amount;
+  if (amount) return 'web+cardano:' + address + '?amount=' + amount.toString();
   return 'web+cardano:' + address;
 };

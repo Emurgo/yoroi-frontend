@@ -12,8 +12,6 @@
 ../node_modules/eslint-plugin-jsx-a11y
 
 [untyped]
-.*/node_modules/react-polymorph/source/components/HOC/withTheme.js
-.*/node_modules/react-polymorph/source/components/layout/Flex.js
 
 [libs]
 flow/declarations/

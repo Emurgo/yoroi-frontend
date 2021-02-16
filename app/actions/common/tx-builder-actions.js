@@ -6,10 +6,11 @@ import type {
 import type { SetupSelfTxRequest } from '../../stores/toplevel/TransactionBuilderStore';
 import type { TransactionMetadata } from '../../api/ada/lib/storage/bridge/metadataUtils';
 import type { TokenRow, } from '../../api/ada/lib/storage/database/primitives/tables';
+import BigNumber from 'bignumber.js';
 
 export default class TxBuilderActions {
   updateReceiver: Action<void | string> = new Action();
-  updateAmount: Action<void | number> = new Action();
+  updateAmount: Action<?BigNumber> = new Action();
   updateMemo: Action<void | string> = new Action();
   updateToken: Action<void | $ReadOnly<TokenRow>> = new Action();
   updateTentativeTx: Action<void> = new Action();

@@ -16,10 +16,10 @@ import DialogCloseButton from '../widgets/DialogCloseButton';
 import { InputOwnSkin } from '../../themes/skins/InputOwnSkin';
 import globalMessages from '../../i18n/global-messages';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
-import { formattedAmountToNaturalUnits, truncateToken } from '../../utils/formatters';
+import { formattedAmountToNaturalUnits, formattedAmountToBigNumber, truncateToken } from '../../utils/formatters';
 import config from '../../config';
-import { calcMaxBeforeDot } from '../../utils/validations';
 import { getTokenName } from '../../stores/stateless/tokenHelpers';
+import BigNumber from 'bignumber.js';
 
 import styles from './URIGenerateDialog.scss';
 
@@ -44,12 +44,12 @@ const messages = defineMessages({
 
 type Props = {|
   +onClose: void => void,
-  +onGenerate: (address: string, amount: number) => void,
+  +onGenerate: (address: string, amount: BigNumber) => void,
   +classicTheme: boolean,
   +walletAddress: string,
-  +amount?: number, // TODO: not safe to pass this as a number instead of BigNumber / string
+  +amount: ?BigNumber,
   +validateAmount: (
-    amountInNaturalUnits: string,
+    amountInNaturalUnits: BigNumber,
     tokenRow: $ReadOnly<TokenRow>
   ) => Promise<[boolean, void | string]>,
   +tokenInfo: $ReadOnly<TokenRow>,
@@ -57,9 +57,6 @@ type Props = {|
 
 @observer
 export default class URIGenerateDialog extends Component<Props> {
-  static defaultProps: {|amount: void|} = {
-    amount: undefined,
-  };
 
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
@@ -83,16 +80,17 @@ export default class URIGenerateDialog extends Component<Props> {
       amount: {
         label: truncateToken(this.getAmountLabel()),
         placeholder: `0.${'0'.repeat(this.props.tokenInfo.Metadata.numberOfDecimals)}`,
-        value: '',
+        value: null,
         validators: [async ({ field }) => {
-          const amountValue = field.value;
+          const amountValue: string = field.value;
+          console.log(`Validate: ${amountValue}`);
           if (amountValue === '') {
             return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
           }
-          const formattedAmount = formattedAmountToNaturalUnits(
+          const formattedAmount = new BigNumber(formattedAmountToNaturalUnits(
             amountValue,
             this.props.tokenInfo.Metadata.numberOfDecimals
-          );
+          ));
           return await this.props.validateAmount(formattedAmount, this.props.tokenInfo);
         }],
       },
@@ -111,6 +109,7 @@ export default class URIGenerateDialog extends Component<Props> {
 
   componentDidMount(): void {
     const amountField = this.form.$('amount');
+    console.log(this.props.amount != null ? this.props.amount.toString() : '');
     amountField.set(
       'value',
       this.props.amount != null ? this.props.amount.toString() : ''
@@ -134,6 +133,7 @@ export default class URIGenerateDialog extends Component<Props> {
 
     const receiverField = form.$('receiver');
     const amountField = form.$('amount');
+    const amountFieldProps = amountField.bind();
 
     return (
       <Dialog
@@ -155,13 +155,17 @@ export default class URIGenerateDialog extends Component<Props> {
           <div className={styles.amountField}>
             <NumericInput
               className="amount"
-              {...amountField.bind()}
+              {...amountFieldProps}
+              value={amountFieldProps.value === ''
+                ? null
+                : formattedAmountToBigNumber(amountFieldProps.value)
+              }
+              decimalPlaces={this.props.tokenInfo.Metadata.numberOfDecimals}
               label={this.getAmountLabel()}
               error={amountField.error}
-              maxBeforeDot={calcMaxBeforeDot(this.props.tokenInfo.Metadata.numberOfDecimals)}
-              maxAfterDot={this.props.tokenInfo.Metadata.numberOfDecimals}
               skin={InputOwnSkin}
               done={amountField.isValid}
+              allowSigns={false}
               classicTheme={classicTheme}
               autoFocus
             />

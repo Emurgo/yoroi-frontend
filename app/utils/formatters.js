@@ -36,7 +36,7 @@ export const formattedAmountToBigNumber = (amount: string): BigNumber => {
  * Returns number in lovelaces
  *
  * removes leading zeros
- * ensures `DECIMAL_PLACES_IN_ADA` decimal positions
+ * ensures correct decimal positions
  * shifts decimal places over to turn into a whole number
  */
 export const formattedAmountToNaturalUnits: (
