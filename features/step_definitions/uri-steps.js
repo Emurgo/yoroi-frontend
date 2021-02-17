@@ -23,12 +23,6 @@ Then(/^I click on the copy to clipboard icon$/, async function () {
   await this.click('.URIDisplayDialog_uriDisplay .CopyableAddress_copyIconBig');
 });
 
-Then(/^I should see URI "copied" tooltip message:$/, async function (data) {
-  const notification = data.hashes()[0];
-  const notificationMessage = await this.intl(notification.message);
-  await this.waitForElement(`//div[@class='SimpleBubble_bubble'][contains(text(), '${notificationMessage}')]`, By.xpath);
-});
-
 When(/^I open a cardano URI for address (([^"]*)) and ([0-9]+) ADA$/, async function (address, amount) {
   // In practice, clicking a cardano URI will cause the browser to open a URL of this form
   const uri = this.getExtensionUrl() + '#/send-from-uri?q=web+cardano:' + address + '?amount=' + amount;

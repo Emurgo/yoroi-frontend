@@ -33,7 +33,7 @@ Then(/^I click on "copy to clipboard" button$/, async function () {
 Then(/^I should see "copied" tooltip message:$/, async function (data) {
   const notification = data.hashes()[0];
   const notificationMessage = await this.intl(notification.message);
-  await this.waitForElement(`//div[@class='SimpleBubble_bubble'][contains(text(), '${notificationMessage}')]`, By.xpath);
+  await this.waitForElement(`//div[contains(@class, 'SimpleBubble_bubble') and contains(text(), '${notificationMessage}')]`, By.xpath);
 });
 
 Then(/^I see transactions buttons are disabled$/, async function () {

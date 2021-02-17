@@ -43,7 +43,7 @@ When(/^I click the "Create personal wallet" button$/, async function () {
 
 Then(/^I should see the invalid password error message:$/, async function (data) {
   const error = data.hashes()[0];
-  const errorSelector = '.walletPassword .SimpleFormField_error';
+  const errorSelector = '.walletPassword .FormFieldOverridesClassic_error';
   await checkErrorByTranslationId(this, errorSelector, error);
 });
 
@@ -109,13 +109,13 @@ Then(/^I should stay in the create wallet dialog$/, async function () {
 
 Then(/^I should see "Wallet name requires at least 1 and at most 40 letters." error message:$/, async function (data) {
   const error = data.hashes()[0];
-  const errorSelector = '.SimpleFormField_error';
+  const errorSelector = '.FormFieldOverridesClassic_error';
   await checkErrorByTranslationId(this, errorSelector, error);
 });
 
 Then(/^I should see "Invalid Password" error message:$/, async function (data) {
   const error = data.hashes()[0];
-  const errorSelector = '.SimpleFormField_error';
+  const errorSelector = '.FormFieldOverridesClassic_error';
   await checkErrorByTranslationId(this, errorSelector, error);
 });
 

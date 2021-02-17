@@ -308,17 +308,17 @@ Feature: Restore Wallet
     # wallet 1
     When I click the restore button for cardano
     Then I select Byron-era 15-word wallet
-    And I enter the name "many-tx-wallet"
+    And I enter the name "shelley-delegated"
     And I enter the recovery phrase:
     | recoveryPhrase                                                                                   |
-    | final autumn bacon fold horse scissors act pole country focus task blush basket move view |
+    | parrot offer switch thank film high drop salute task train squirrel coral consider coyote evolve |
     And I enter the restored wallet password:
     | password   | repeatedPassword |
     | asdfasdfasdf | asdfasdfasdf       |
     And I click the "Restore Wallet" button
-    Then I should see a plate ZKTZ-4614
+    Then I should see a plate BENZ-3270
     Then I click the next button
-    Then I should see the opened wallet with name "many-tx-wallet"
+    Then I should see the opened wallet with name "shelley-delegated"
     # give some time for the wallet to fully sync
     Given I sleep for 2500
     # remove wallet #1

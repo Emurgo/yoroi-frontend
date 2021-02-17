@@ -226,3 +226,7 @@ const displayInfo = {
     txFee: '0.179999',
   },
 };
+
+When(/^I go to the tx history screen$/, async function () {
+  await this.click('.summary ');
+});

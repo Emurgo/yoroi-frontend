@@ -5,7 +5,7 @@ Feature: Voting Flow
     And I have completed the basic setup
 
   @it-173
-  Scenario: User can register for voting
+  Scenario: User can register for voting (IT-173)
     Given There is a Shelley wallet stored named shelley-simple-15
     Given I go to the voting page
     When I click on the register button in the voting page
@@ -27,7 +27,7 @@ Feature: Voting Flow
     Then Then I see qr code step
 
   @it-174
-  Scenario: User enters wrong pin
+  Scenario: User enters wrong pin (IT-174)
     Given There is a Shelley wallet stored named shelley-simple-15
     Given I go to the voting page
     When I click on the register button in the voting page
@@ -40,7 +40,7 @@ Feature: Voting Flow
     And I see the confirm Pin step
 
   @it-175
-  Scenario: User enters wrong pin and can continue with correct pin
+  Scenario: User enters wrong pin and can continue with correct pin (IT-175)
     Given There is a Shelley wallet stored named shelley-simple-15
     Given I go to the voting page
     When I click on the register button in the voting page

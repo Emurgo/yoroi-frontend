@@ -13,7 +13,7 @@ Feature: URI scheme
     And I generate a URI for 10 ADA
     Then I should see the URI displayed in a new dialog
     When I click on the copy to clipboard icon
-    Then I should see URI "copied" tooltip message:
+    Then I should see "copied" tooltip message:
     | message                                            |
     | global.copyTooltipMessage |
 

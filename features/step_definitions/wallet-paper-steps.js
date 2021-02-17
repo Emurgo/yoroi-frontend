@@ -1,7 +1,7 @@
 // @flow
 
 import { Given, Then } from 'cucumber';
-import { By } from 'selenium-webdriver';
+import { By, Key } from 'selenium-webdriver';
 import { expect } from 'chai';
 import { truncateAddress, } from '../../app/utils/formatters';
 
@@ -33,8 +33,9 @@ Then(/^I enter the paper recovery phrase$/, async function () {
   ));
   for (let i = 0; i < recoveryPhrase.length; i++) {
     const word = recoveryPhrase[i];
-    await this.input('.AutocompleteOverridesClassic_autocompleteWrapper input', word);
-    await this.click(`//li[contains(text(), '${word}')]`, By.xpath);
+    await this.driver
+      .findElement(By.css(`.AutocompleteOverridesClassic_autocompleteWrapper input`))
+      .sendKeys(word, Key.RETURN);
   }
 });
 

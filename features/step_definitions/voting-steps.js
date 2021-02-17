@@ -67,7 +67,7 @@ Then(/^I see should see pin mismatch error$/, async function () {
 
   // following selector is used as the error is deeply nested
   await this.waitUntilText(
-    '.ConfirmPinDialog_dialog .ConfirmPinDialog_pinInputContainer .SimpleFormField_error',
+    '.ConfirmPinDialog_dialog .ConfirmPinDialog_pinInputContainer .FormFieldOverridesClassic_error',
     errorMessage
   );
 
