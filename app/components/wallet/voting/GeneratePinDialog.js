@@ -23,6 +23,10 @@ const messages = defineMessages({
     id: 'wallet.voting.dialog.step.pin.line1',
     defaultMessage: '!!!Please write down this PIN as you will need it <strong>every time</strong> you want to access the Catalyst Voting app.',
   },
+  actionButton: {
+    id: 'wallet.voting.dialog.step.pin.actionButton',
+    defaultMessage: '!!!Confirm that I wrote down the PIN',
+  },
 });
 
 type Props = {|
@@ -46,7 +50,7 @@ export default class GeneratePinDialog extends Component<Props> {
 
     const dialogActions = [
       {
-        label: intl.formatMessage(globalMessages.nextButtonLabel),
+        label: intl.formatMessage(messages.actionButton),
         primary: true,
         onClick: next,
       },
@@ -73,7 +77,7 @@ export default class GeneratePinDialog extends Component<Props> {
       >
         <ProgressStepBlock progressInfo={progressInfo} classicTheme={classicTheme} />
 
-        <div className={classnames([styles.lineText, styles.firstItem])}>
+        <div className={classnames([styles.lineText, styles.firstItem, styles.importantText])}>
           <FormattedHTMLMessage {...messages.line1} />
         </div>
         {pinCards}
