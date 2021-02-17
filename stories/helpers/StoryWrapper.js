@@ -36,6 +36,8 @@ import globalMessages from '../../app/i18n/global-messages';
 import { ledgerErrors } from '../../app/domain/LedgerLocalizedError';
 import type { UnitOfAccountSettingType } from '../../app/types/unitOfAccountType';
 import { IncorrectVersionError, IncorrectDeviceError } from '../../app/domain/ExternalDeviceCommon';
+import { SimpleSkins } from 'react-polymorph/lib/skins/simple';
+import { SimpleDefaults } from 'react-polymorph/lib/themes/simple';
 
 /**
  * This whole file is meant to mirror code in App.js
@@ -111,6 +113,8 @@ export default class StoryWrapper extends Component<Props> {
         <ThemeProvider
           key={currentTheme}
           theme={yoroiPolymorphTheme}
+          skins={SimpleSkins}
+          variables={SimpleDefaults}
           themeOverrides={themeOverrides(currentTheme)}
         >
           <IntlProvider {...{

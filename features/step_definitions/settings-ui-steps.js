@@ -83,13 +83,13 @@ Then(/^I should see new wallet name "([^"]*)"$/, async function (walletName) {
 
 Then(/^I should see the following error messages:$/, async function (data) {
   const error = data.hashes()[0];
-  const errorSelector = '.ChangeWalletPasswordDialog_newPasswordClassic .SimpleFormField_error';
+  const errorSelector = '.ChangeWalletPasswordDialog_newPasswordClassic .FormFieldOverridesClassic_error';
   await checkErrorByTranslationId(this, errorSelector, error);
 });
 
 Then(/^I should see "Doesn't match" error message:$/, async function (data) {
   const error = data.hashes()[0];
-  const errorSelector = '.SimpleFormField_error';
+  const errorSelector = '.FormFieldOverridesClassic_error';
   await checkErrorByTranslationId(this, errorSelector, error);
 });
 

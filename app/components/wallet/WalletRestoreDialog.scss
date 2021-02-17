@@ -1,6 +1,5 @@
 @import '../../themes/mixins/loading-spinner';
 @import '../../themes/mixins/error-message';
-@import '../../themes/mixins/place-form-field-error-below-input';
 
 .component {
   .walletPassword {
@@ -23,8 +22,6 @@
         margin-top: 30px;
         width: 350px;
       }
-
-      @include place-form-field-error-below-input;
     }
   }
 
@@ -64,8 +61,6 @@
         :global .walletPassword {
           margin-right: 25px;
         }
-    
-        @include place-form-field-error-below-input;
       }
     
       .paperPassword {

@@ -40,7 +40,7 @@ Feature: Hardware device
     When I select a Shelley-era Ledger device
     And I restore the Ledger device
     And I click skip the transfer
-    Then I should see the summary screen
+    Then I should see the dashboard screen
     Then I should see a plate KHDC-5476
     # test sending
     Given I go to the send transaction screen
@@ -70,7 +70,8 @@ Feature: Hardware device
     Given The expected transaction is "g6QAgYJYIBZt/eWxg7fglIOvu/zntB59b+00tAXMEEG0XyfosF1HAAGBglg5AXU/qJHPfuF4AaA3RBmWAEAnGtmf6+kXwe182LUPZi1s6xtlczppoe1y+G8LrFoWUFoCiJevG+NFGgAWdAwCGgACjFUDGhH+lM2hAoGEWCDx6UFmXgFAaVr5OWLg5eyxk744q7Rri4T3RlSU+o6MClhAAjDtKmE/1bQbqYZpTBpvrmy4/DV2JW56CzHCxXrNFkU/oVJjZRWva84jOTVSZu21LJGjO83BsodyxpzqtoGSCVgg01PmywZvwdTIA5P2TmF2Ukb40rM9KdYwTzthpuJ1ieNBoPY="
     Then I see the transfer transaction
     And I accept the prompt
-    Then I should see the summary screen
+    Then I should see the dashboard screen
+    Then I go to the tx history screen
     And I should see that the number of transactions is 2
     And I should see 1 pending transactions
 
@@ -80,7 +81,7 @@ Feature: Hardware device
     When I select a Shelley-era Ledger device
     And I restore the Ledger device
     And I click skip the transfer
-    Then I should see the summary screen
+    Then I should see the dashboard screen
     Then I should see a plate KHDC-5476
     # test delegation
     Given I go to the delegation by id screen
@@ -130,7 +131,7 @@ Feature: Hardware device
     # test restoration
     When I select a Shelley-era Trezor device
     And I restore the Trezor device
-    Then I should see the summary screen
+    Then I should see the dashboard screen
     Then I should see a plate PXCA-2349
     # test sending
     Given I go to the send transaction screen
@@ -156,7 +157,7 @@ Feature: Hardware device
     Given I connected Trezor device 6495958994A4025BB5EE1DB0
     When I select a Shelley-era Trezor device
     And I restore the Trezor device
-    Then I should see the summary screen
+    Then I should see the dashboard screen
     Then I should see a plate PXCA-2349
     # test delegation
     Given I go to the delegation by id screen

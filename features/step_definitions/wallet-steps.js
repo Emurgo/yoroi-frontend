@@ -12,7 +12,7 @@ When(/^I clear the name "([^"]*)"$/, async function (walletName) {
   await this.clearInputUpdatingForm("input[name='walletName']", walletName.length);
 });
 
-When(/^I navigate to wallet transactions screen$/, async function () {
+When(/^I navigate to wallet sidebar category$/, async function () {
   await this.click(`//div[@class='Sidebar_categories']//button[1]`, By.xpath);
   await this.waitForElement('.NavPlate_name');
 });

@@ -141,7 +141,7 @@ export default class VotingStore extends Store {
 
   @action _finishQRCode: void => void = () => {
     this.actions.dialogs.closeActiveDialog.trigger();
-    this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ROOT });
+    this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.TRANSACTIONS });
     this.reset({ justTransaction: false });
   }
 

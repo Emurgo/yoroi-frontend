@@ -13,6 +13,7 @@ import WarningBox from '../widgets/WarningBox';
 import CopyableAddress from '../widgets/CopyableAddress';
 import type { Notification } from '../../types/notificationType';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import BigNumber from 'bignumber.js';
 
 import styles from './URIDisplayDialog.scss';
 
@@ -37,7 +38,7 @@ type Props = {|
   +onCopyAddressTooltip: string => void,
   +onBack: void => void,
   +address: string,
-  +amount: number,
+  +amount: BigNumber,
 |};
 
 @observer

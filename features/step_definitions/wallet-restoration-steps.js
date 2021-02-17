@@ -1,7 +1,7 @@
 // @flow
 
 import { When, Then } from 'cucumber';
-import { By } from 'selenium-webdriver';
+import { By, Key } from 'selenium-webdriver';
 import i18n from '../support/helpers/i18n-helpers';
 import { expect } from 'chai';
 
@@ -61,8 +61,9 @@ export async function enterRecoveryPhrase(customWorld: any, phrase: string): Pro
   const recoveryPhrase = phrase.split(' ');
   for (let i = 0; i < recoveryPhrase.length; i++) {
     const word = recoveryPhrase[i];
-    await customWorld.input('.AutocompleteOverridesClassic_autocompleteWrapper input', word);
-    await customWorld.click(`//li[contains(text(), '${word}')]`, By.xpath);
+    await customWorld.driver
+      .findElement(By.css(`.AutocompleteOverridesClassic_autocompleteWrapper input`))
+      .sendKeys(word, Key.RETURN);
   }
 }
 
@@ -73,7 +74,9 @@ When(/^I enter the master key:$/, async function (table) {
 
 When(/^I enter one more word to the recovery phrase field:$/, async function (table) {
   const words = table.hashes()[0];
-  await this.input('.AutocompleteOverridesClassic_autocompleteWrapper input', words.word);
+  await this.driver
+      .findElement(By.css(`.AutocompleteOverridesClassic_autocompleteWrapper input`))
+      .sendKeys(words.word, Key.RETURN);
   const lastWord = await this.driver.findElements(By.xpath(`//span[contains(text(), '${words.word}')]`));
   expect(lastWord.length).to.be.equal(0);
 });
@@ -152,7 +155,7 @@ Then(/^I delete recovery phrase by clicking "x" signs$/, async function () {
 
 Then(/^I should see an "Invalid recovery phrase" error message:$/, async function (data) {
   const error = data.hashes()[0];
-  const errorSelector = '.AutocompleteOverridesClassic_autocompleteWrapper .SimpleFormField_error';
+  const errorSelector = '.AutocompleteOverridesClassic_autocompleteWrapper .FormFieldOverridesClassic_error';
   await checkErrorByTranslationId(this, errorSelector, error);
 });
 
@@ -165,6 +168,6 @@ Then(/^I don't see last word of ([^"]*) in recovery phrase field$/, async functi
 // eslint-disable-next-line no-unused-vars
 Then(/^I should see an "X words left" error message:$/, async function (data) {
   const errorMessage = await i18n.formatMessage(this.driver, { id: 'wallet.restore.dialog.form.errors.shortRecoveryPhrase', values: { number: 1 } });
-  const errorSelector = '.AutocompleteOverridesClassic_autocompleteWrapper .SimpleFormField_error';
+  const errorSelector = '.AutocompleteOverridesClassic_autocompleteWrapper .FormFieldOverridesClassic_error';
   await this.waitUntilText(errorSelector, errorMessage);
 });

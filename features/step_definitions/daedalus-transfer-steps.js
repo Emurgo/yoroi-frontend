@@ -69,7 +69,7 @@ When(/^I click the back button$/, async function () {
 
 Then(/^I should see "This field is required." error message:$/, async function (data) {
   const error = data.hashes()[0];
-  const errorSelector = '.SimpleFormField_error';
+  const errorSelector = '.FormFieldOverridesClassic_error';
   await checkErrorByTranslationId(this, errorSelector, error);
 });
 

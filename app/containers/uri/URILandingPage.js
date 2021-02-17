@@ -17,7 +17,7 @@ export type GeneratedData = typeof URILandingPage.prototype.generated;
 export default class URILandingPage extends Component<InjectedOrGenerated<GeneratedData>> {
   onClose: void => void = () => {
     this.generated.actions.dialogs.closeActiveDialog.trigger();
-    this.generated.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ROOT });
+    this.generated.actions.router.goToRoute.trigger({ route: ROUTES.MY_WALLETS });
     this.generated.stores.loading.resetUriParams();
   };
 

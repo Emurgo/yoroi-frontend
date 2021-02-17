@@ -86,7 +86,7 @@ export function calcMaxBeforeDot(
 }
 
 export async function validateAmount(
-  amount: string,
+  amount: BigNumber,
   tokenRow: $ReadOnly<TokenRow>,
   minAmount: BigNumber,
   formatter: $npm$ReactIntl$IntlFormat,
@@ -103,14 +103,14 @@ export async function validateAmount(
   });
 
   // some Rust stuff could overflow after 2^63 - 1
-  if (new BigNumber(amount).gt(new BigNumber(2).pow(63).minus(1))) {
+  if (amount.gt(new BigNumber(2).pow(63).minus(1))) {
     return [false, formatter.formatMessage(messages.invalidAmount)]
   }
 
   // don't validate this for tokens since they have no minimum
   if (!tokenRow.IsDefault) return [true, undefined];
 
-  if (new BigNumber(amount).lt(minAmount)) {
+  if (amount.lt(minAmount)) {
     return [
       false,
       formatter.formatMessage(messages.tooSmallUtxo, {

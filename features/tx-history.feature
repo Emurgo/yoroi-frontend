@@ -75,7 +75,7 @@ Feature: Txs History
     When I click on resync wallet
     Then I click on the checkbox
     And I click the next button
-    Then I navigate to wallet transactions screen
+    Then I navigate to wallet sidebar category
     # should be same number of transactions after the resync
     And I should see that the number of transactions is 3
 

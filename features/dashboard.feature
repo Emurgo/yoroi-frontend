@@ -31,7 +31,7 @@ Feature: Yoroi delegation dashboard
     Given I connected Trezor device 6495958994A4025BB5EE1DB1
     When I select a Shelley-era Trezor device
     And I restore the Trezor device
-    Then I should see the summary screen
+    Then I should see the dashboard screen
     Then I should see a plate PALP-0076
     And I have a wallet with funds
     And I go to the dashboard screen
@@ -51,7 +51,7 @@ Feature: Yoroi delegation dashboard
     Given I connected Ledger device 707fa118bf6b84
     When I select a Shelley-era Ledger device
     And I restore the Ledger device
-    Then I should see the summary screen
+    Then I should see the dashboard screen
     Then I should see a plate DDBZ-0107
     And I have a wallet with funds
     And I go to the dashboard screen

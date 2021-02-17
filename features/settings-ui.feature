@@ -36,7 +36,7 @@ Feature: Wallet UI Settings
     And I submit the wallet password dialog
     Then I should not see the change password dialog anymore
 
-    When I navigate to wallet transactions screen
+    When I navigate to wallet sidebar category
     And I go to the send transaction screen
     And I fill the form:
       | address                                                     | amount   |
@@ -85,7 +85,7 @@ Feature: Wallet UI Settings
     | name         |
     | <walletName> |
     And I click outside "name" input field
-    And I navigate to wallet transactions screen
+    And I navigate to wallet sidebar category
     Then I should see new wallet name "<walletName>"
     Examples:
     | walletName                               |                    |

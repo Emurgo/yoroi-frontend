@@ -115,7 +115,7 @@ Then(/^I should see an invalid address error$/, async function () {
 
 Then(/^I should see a not enough ada error$/, async function () {
   const errorMessage = await i18n.formatMessage(this.driver, { id: 'api.errors.NotEnoughMoneyToSendError' });
-  await this.waitUntilText('.SimpleFormField_error', errorMessage);
+  await this.waitUntilText('.FormFieldOverridesClassic_error', errorMessage);
 });
 
 Then(/^I should not be able to submit$/, async function () {

@@ -36,6 +36,7 @@ import {
 import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
+import BigNumber from 'bignumber.js';
 
 // Hardware Wallet Confirmation
 import HWSendConfirmationDialog from '../../components/wallet/send/HWSendConfirmationDialog';
@@ -146,7 +147,7 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
           hasAnyPending={hasAnyPending}
           classicTheme={profile.isClassicTheme}
           updateReceiver={(addr: void | string) => txBuilderActions.updateReceiver.trigger(addr)}
-          updateAmount={(value: void | number) => txBuilderActions.updateAmount.trigger(value)}
+          updateAmount={(value: ?BigNumber) => txBuilderActions.updateAmount.trigger(value)}
           updateMemo={(content: void | string) => txBuilderActions.updateMemo.trigger(content)}
           shouldSendAll={transactionBuilderStore.shouldSendAll}
           toggleSendAll={txBuilderActions.toggleSendAll.trigger}
@@ -368,7 +369,7 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
           trigger: (params: void) => void
         |},
         updateAmount: {|
-          trigger: (params: void | number) => void
+          trigger: (params: ?BigNumber) => void
         |},
         updateToken: {|
           trigger: (params: void | $ReadOnly<TokenRow>) => void
