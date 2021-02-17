@@ -16,7 +16,7 @@ import styles from './Voting.scss';
 const messages = defineMessages({
   lineTitle: {
     id: 'wallet.voting.lineTitle',
-    defaultMessage: '!!!Any ADA registered in transaction to vote will be transfered from your currently selected wallet',
+    defaultMessage: '!!!Register to vote on Fund 3',
   },
   line2: {
     id: 'wallet.voting.line2',

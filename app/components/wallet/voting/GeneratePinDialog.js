@@ -3,7 +3,7 @@ import type { Node } from 'react';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 
 import globalMessages from '../../../i18n/global-messages';
 
@@ -21,7 +21,7 @@ import styles from './GeneratePinDialog.scss';
 const messages = defineMessages({
   line1: {
     id: 'wallet.voting.dialog.step.pin.line1',
-    defaultMessage: '!!!Please write down this PIN as it will be used in a later step to complete the registration process inside the Catalyst Voting App.',
+    defaultMessage: '!!!Please write down this PIN as you will need it <strong>every time</strong> you want to access the Catalyst Voting app.',
   },
 });
 
@@ -55,6 +55,7 @@ export default class GeneratePinDialog extends Component<Props> {
     const pinCards = (
       <div className={classnames([styles.pinContainer, styles.lastItem])}>
         {pin.map((value, index) => {
+          // eslint-disable-next-line react/no-array-index-key
           return <div key={index} className={styles.pin}><span>{value}</span></div>;
         })}
       </div>
@@ -73,7 +74,7 @@ export default class GeneratePinDialog extends Component<Props> {
         <ProgressStepBlock progressInfo={progressInfo} classicTheme={classicTheme} />
 
         <div className={classnames([styles.lineText, styles.firstItem])}>
-          {intl.formatMessage(messages.line1)}
+          <FormattedHTMLMessage {...messages.line1} />
         </div>
         {pinCards}
       </Dialog>
