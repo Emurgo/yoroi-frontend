@@ -83,7 +83,6 @@ export default class URIGenerateDialog extends Component<Props> {
         value: null,
         validators: [async ({ field }) => {
           const amountValue: string = field.value;
-          console.log(`Validate: ${amountValue}`);
           if (amountValue === '') {
             return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
           }
@@ -109,7 +108,6 @@ export default class URIGenerateDialog extends Component<Props> {
 
   componentDidMount(): void {
     const amountField = this.form.$('amount');
-    console.log(this.props.amount != null ? this.props.amount.toString() : '');
     amountField.set(
       'value',
       this.props.amount != null ? this.props.amount.toString() : ''
