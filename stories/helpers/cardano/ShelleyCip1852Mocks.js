@@ -56,8 +56,6 @@ import {
 } from '../../../app/stores/toplevel/TokenInfoStore';
 
 function genMockShelleyCip1852Cache(dummyWallet: PublicDeriver<>) {
-  const defaultToken = dummyWallet.getParent().getDefaultToken();
-
   const pendingRequest = new CachedRequest(_publicDeriver => Promise.resolve([]));
   const recentRequest = new CachedRequest(_request => Promise.resolve({
     transactions: [],
@@ -67,9 +65,7 @@ function genMockShelleyCip1852Cache(dummyWallet: PublicDeriver<>) {
     transactions: [],
     total: 0,
   }));
-  const getBalanceRequest = new CachedRequest(_request => Promise.resolve(
-    new MultiToken([], defaultToken),
-  ));
+  const getBalanceRequest = new CachedRequest(request => request.getBalance());
   return {
     conceptualWalletCache: {
       conceptualWallet: dummyWallet.getParent(),

@@ -43,3 +43,6 @@ export const CARDANO_STABLE_SIZE = 2160;
  * no safe reorg size of PoW cryptocurrencies
  */
 export const ERGO_STABLE_SIZE = Number.MAX_SAFE_INTEGER / 2;
+
+// Catalyst fund 3 requires > 2950 ADA to participate
+export const CATALYST_MIN_AMOUNT: BigNumber = new BigNumber(2950 * 1_000_000);

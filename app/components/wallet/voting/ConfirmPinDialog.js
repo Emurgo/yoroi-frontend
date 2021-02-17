@@ -4,7 +4,7 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { observable, action } from 'mobx';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import globalMessages from '../../../i18n/global-messages';
@@ -21,7 +21,7 @@ import styles from './ConfirmPinDialog.scss';
 const messages = defineMessages({
   line1: {
     id: 'wallet.voting.dialog.step.confirm.line1',
-    defaultMessage: '!!!Please enter the PIN as it will be used in a later step to complete the registration process inside the Catalyst Voting App.',
+    defaultMessage: '!!!Please enter the PIN as you will need it <strong>every time</strong> you want to access the Catalyst Voting app.',
   },
 });
 
@@ -76,7 +76,7 @@ export default class ConfirmPinDialog extends Component<Props> {
       >
         <ProgressStepBlock progressInfo={progressInfo} classicTheme={classicTheme} />
         <div className={classnames([styles.lineText, styles.firstItem])}>
-          {intl.formatMessage(messages.line1)}
+          <FormattedHTMLMessage {...messages.line1} />
         </div>
         <div className={classnames([styles.pinInputContainer])}>
           <PinInput

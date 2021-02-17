@@ -13,6 +13,14 @@ import { handleExternalLinkClick } from '../../utils/routing';
 import { WalletTypeOption, } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import UnsupportedWallet from './UnsupportedWallet';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import LoadingSpinner from '../../components/widgets/LoadingSpinner';
+import VerticallyCenteredLayout from '../../components/layout/VerticallyCenteredLayout';
+import { CATALYST_MIN_AMOUNT } from '../../config/numbersConfig';
+import InsufficientFundsPage from './InsufficientFundsPage';
+import { getTokenName, genLookupOrFail } from '../../stores/stateless/tokenHelpers';
+import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
+import environment from '../../environment';
+import { MultiToken } from '../../api/common/lib/MultiToken';
 
 export type GeneratedData = typeof VotingPage.prototype.generated;
 type Props = {|
@@ -45,6 +53,31 @@ export default class VotingPage extends Component<Props> {
       return <UnsupportedWallet />;
     }
 
+    const balance = this.generated.balance;
+    if (balance == null) {
+      return (
+        <VerticallyCenteredLayout>
+          <LoadingSpinner />
+        </VerticallyCenteredLayout>
+      );
+    }
+
+    // disable the minimum on E2E tests
+    if (!environment.isTest() && balance.getDefaultEntry().amount.lt(CATALYST_MIN_AMOUNT)) {
+      const getTokenInfo = genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo);
+      const tokenInfo = getTokenInfo({
+        identifier: selected.getParent().getDefaultToken().defaultIdentifier,
+        networkId: selected.getParent().getDefaultToken().defaultNetworkId,
+      });
+      return <InsufficientFundsPage
+        currentBalance={
+          balance.getDefaultEntry().amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals)
+        }
+        requiredBalance={CATALYST_MIN_AMOUNT.shiftedBy(-tokenInfo.Metadata.numberOfDecimals)}
+        tokenName={getTokenName(tokenInfo)}
+      />;
+    }
+
     if (uiDialogs.isOpen(VotingRegistrationDialogContainer)) {
       activeDialog = (
         <VotingRegistrationDialogContainer
@@ -56,7 +89,11 @@ export default class VotingPage extends Component<Props> {
     return (
       <div>
         {activeDialog}
-        <Voting start={this.start} onExternalLinkClick={handleExternalLinkClick} />
+        <Voting
+          start={this.start}
+          hasAnyPending={this.generated.hasAnyPending}
+          onExternalLinkClick={handleExternalLinkClick}
+        />
       </div>
     );
   }
@@ -76,9 +113,14 @@ export default class VotingPage extends Component<Props> {
         |},
       |},
     |},
+    hasAnyPending: boolean,
+    balance: ?MultiToken,
     stores: {|
       uiDialogs: {|
         isOpen: any => boolean,
+      |},
+      tokenInfoStore: {|
+        tokenInfo: TokenInfoMap,
       |},
       wallets: {|
         selected: null | PublicDeriver<>,
@@ -93,7 +135,21 @@ export default class VotingPage extends Component<Props> {
     }
 
     const { stores, actions } = this.props;
+    const txInfo = (() => {
+      const selected = stores.wallets.selected;
+      if (selected == null) return {
+        hasAnyPending: false,
+        balance: null,
+      };
+      const txRequests = stores.transactions.getTxRequests(selected);
+      return {
+        hasAnyPending: (txRequests.requests.pendingRequest.result ?? []).length > 0,
+        // note: Catalyst balance depends on UTXO balance -- not on rewards
+        balance: txRequests.requests.getBalanceRequest.result,
+      };
+    })();
     return Object.freeze({
+      ...txInfo,
       actions: {
         dialogs: {
           closeActiveDialog: {
@@ -110,6 +166,9 @@ export default class VotingPage extends Component<Props> {
         },
         wallets: {
           selected: stores.wallets.selected,
+        },
+        tokenInfoStore: {
+          tokenInfo: stores.tokenInfoStore.tokenInfo,
         },
       },
       VotingRegistrationDialogProps: ({

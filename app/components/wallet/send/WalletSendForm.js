@@ -68,10 +68,6 @@ const messages = defineMessages({
     id: 'wallet.send.form.calculatingFee',
     defaultMessage: '!!!Calculating fee...',
   },
-  sendingIsDisabled: {
-    id: 'wallet.send.form.sendingIsDisabled',
-    defaultMessage: '!!!Cannot send a transaction while there is a pending one',
-  },
   memoInvalidOptional: {
     id: 'wallet.transaction.memo.optional.invalid',
     defaultMessage: '!!!Memo cannot be more than {maxMemo} characters.',
@@ -328,7 +324,7 @@ export default class WalletSendForm extends Component<Props> {
     const pendingTxWarningComponent = (
       <div className={styles.warningBox}>
         <WarningBox>
-          {intl.formatMessage(messages.sendingIsDisabled)}
+          {intl.formatMessage(globalMessages.sendingIsDisabled)}
         </WarningBox>
       </div>
     );

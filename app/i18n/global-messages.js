@@ -433,6 +433,10 @@ const globalMessages: * = defineMessages({
     id: 'wallet.transaction.memo.invalid',
     defaultMessage: '!!!Memo must be at least 1 and at most {maxMemo} characters.',
   },
+  sendingIsDisabled: {
+    id: 'wallet.send.form.sendingIsDisabled',
+    defaultMessage: '!!!Cannot send a transaction while there is a pending one',
+  },
   passwordDisclaimer: {
     id: 'wallet.restore.dialog.passwordDisclaimer',
     defaultMessage: '!!!Typing the wrong wallet password will give you a different wallet. This allows for plausible deniability.',

@@ -14,7 +14,7 @@ import { THEMES } from '../../themes';
 import { mockWalletProps } from './Wallet.mock';
 import {
   globalKnobs,
-  genUnitOfAccount,
+  mockLedgerMeta,
 } from '../../../stories/helpers/StoryWrapper';
 import { InvalidWitnessError } from '../../api/common/errors';
 import {
@@ -29,6 +29,10 @@ import VotingPage from './VotingPage';
 import VotingRegistrationDialogContainer from './dialogs/voting/VotingRegistrationDialogContainer';
 import { mockFromDefaults } from '../../stores/toplevel/TokenInfoStore';
 import { defaultAssets, } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { MultiToken } from '../../api/common/lib/MultiToken';
+import BigNumber from 'bignumber.js';
+import type { ShelleyCip1852CacheValue } from '../../../stories/helpers/cardano/ShelleyCip1852Mocks';
+import { CATALYST_MIN_AMOUNT } from '../../config/numbersConfig';
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -45,14 +49,21 @@ const defaultProps: ({|
   wallet: *,
   openDialog?: Object,
   VotingRegistrationDialogProps?: *,
+  balance: ?MultiToken,
+  hasAnyPending: boolean,
 |}) => * = request => ({
+  balance: request.balance,
+  hasAnyPending: request.hasAnyPending,
   stores: {
     uiDialogs: {
       isOpen: clazz => clazz === request.openDialog,
     },
     wallets: {
       selected: request.wallet.publicDeriver,
-    }
+    },
+    tokenInfoStore: {
+      tokenInfo: mockFromDefaults(defaultAssets),
+    },
   },
   actions: {
     dialogs: {
@@ -225,6 +236,86 @@ const wrappedComponent = (component: Node): Node => {
   );
 };
 
+const getInsufficientFunds = (wallet: ShelleyCip1852CacheValue): MultiToken => {
+  return new MultiToken(
+    [{
+      identifier: wallet.publicDeriver.getParent().getDefaultToken().defaultIdentifier,
+      networkId: wallet.publicDeriver.getParent().getDefaultToken().defaultNetworkId,
+      amount: new BigNumber(5 * 1_000_000),
+    }],
+    wallet.publicDeriver.getParent().getDefaultToken()
+  );
+}
+const getSufficientFunds = (wallet: ShelleyCip1852CacheValue): MultiToken => {
+  return new MultiToken(
+    [{
+      identifier: wallet.publicDeriver.getParent().getDefaultToken().defaultIdentifier,
+      networkId: wallet.publicDeriver.getParent().getDefaultToken().defaultNetworkId,
+      amount: CATALYST_MIN_AMOUNT,
+    }],
+    wallet.publicDeriver.getParent().getDefaultToken()
+  );
+}
+
+export const Loading = (): Node => {
+  const wallet = genShelleyCIP1852SigningWalletWithCache();
+  return wrappedComponent(
+    <VotingPage
+      generated={
+        defaultProps(Object.freeze({
+          wallet,
+          balance: getSufficientFunds(wallet),
+          hasAnyPending: false,
+        }))
+      }
+    />)
+};
+
+export const InsufficientFunds = (): Node => {
+  const wallet = genShelleyCIP1852SigningWalletWithCache();
+  return wrappedComponent(
+    <VotingPage
+      generated={
+        defaultProps(Object.freeze({
+          wallet,
+          balance: getInsufficientFunds(wallet),
+          hasAnyPending: false,
+        }))
+      }
+    />)
+};
+
+export const UnsupportedWallet = (): Node => {
+  const wallet = genShelleyCIP1852SigningWalletWithCache(ConceptualWalletId => ({
+    ConceptualWalletId,
+    ...mockLedgerMeta
+  }));
+  return wrappedComponent(
+    <VotingPage
+      generated={
+        defaultProps(Object.freeze({
+          wallet,
+          balance: getSufficientFunds(wallet),
+          hasAnyPending: false,
+        }))
+      }
+    />)
+};
+
+export const PendingTransaction = (): Node => {
+  const wallet = genShelleyCIP1852SigningWalletWithCache();
+  return wrappedComponent(
+    <VotingPage
+      generated={
+        defaultProps(Object.freeze({
+          wallet,
+          balance: getSufficientFunds(wallet),
+          hasAnyPending: true,
+        }))
+      }
+    />)
+};
+
 export const MainPage = (): Node => {
   const wallet = genShelleyCIP1852SigningWalletWithCache();
   return wrappedComponent(
@@ -232,6 +323,8 @@ export const MainPage = (): Node => {
       generated={
         defaultProps(Object.freeze({
           wallet,
+          balance: getSufficientFunds(wallet),
+          hasAnyPending: false,
         }))
       }
     />)
@@ -244,6 +337,8 @@ export const Pin = (): Node => {
       generated={defaultProps(Object.freeze({
         openDialog: VotingRegistrationDialogContainer,
         wallet,
+        balance: getSufficientFunds(wallet),
+        hasAnyPending: false,
         VotingRegistrationDialogProps: {
           generated: genVotingRegistrationDialogProps({
             progressInfo: {
@@ -264,6 +359,8 @@ export const ConfirmPin = (): Node => {
       generated={defaultProps(Object.freeze({
         openDialog: VotingRegistrationDialogContainer,
         wallet,
+        balance: getSufficientFunds(wallet),
+        hasAnyPending: false,
         VotingRegistrationDialogProps: {
           generated: genVotingRegistrationDialogProps({
             progressInfo: {
@@ -279,7 +376,7 @@ export const ConfirmPin = (): Node => {
 
 export const Register = (): Node => {
   const wallet = genShelleyCIP1852SigningWalletWithCache();
-  const  tentativeTx = genVotingShelleyTx(wallet.publicDeriver);
+  const tentativeTx = genVotingShelleyTx(wallet.publicDeriver);
   const errorCases = Object.freeze({
     None: undefined,
     InvalidWitness: new InvalidWitnessError(),
@@ -294,6 +391,8 @@ export const Register = (): Node => {
       generated={defaultProps(Object.freeze({
         openDialog: VotingRegistrationDialogContainer,
         wallet,
+        balance: getSufficientFunds(wallet),
+        hasAnyPending: false,
         VotingRegistrationDialogProps: {
           generated: genVotingRegistrationDialogProps({
             progressInfo: {
@@ -321,7 +420,7 @@ export const Register = (): Node => {
 
 export const Transaction = (): Node => {
   const wallet = genShelleyCIP1852SigningWalletWithCache();
-  const  tentativeTx = genVotingShelleyTx(wallet.publicDeriver);
+  const tentativeTx = genVotingShelleyTx(wallet.publicDeriver);
   const errorCases = Object.freeze({
     None: undefined,
     InvalidWitness: new InvalidWitnessError(),
@@ -336,6 +435,8 @@ export const Transaction = (): Node => {
       generated={defaultProps(Object.freeze({
         openDialog: VotingRegistrationDialogContainer,
         wallet,
+        balance: getSufficientFunds(wallet),
+        hasAnyPending: false,
         VotingRegistrationDialogProps: {
           generated: genVotingRegistrationDialogProps({
             progressInfo: {
@@ -368,6 +469,8 @@ export const QrCode = (): Node => {
       generated={defaultProps(Object.freeze({
         openDialog: VotingRegistrationDialogContainer,
         wallet,
+        balance: getSufficientFunds(wallet),
+        hasAnyPending: false,
         VotingRegistrationDialogProps: {
           generated: genVotingRegistrationDialogProps({
             progressInfo: {
