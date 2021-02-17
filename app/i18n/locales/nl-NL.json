@@ -765,7 +765,7 @@
   "wallet.voting.dialog.step.qr.line2": "De volgende QR-code is het certificaat (gegenereerd) dat vereist is door de Catalyst Stem applicatie om te kunnen deelnemen aan het stemproces van Cardano.",
   "wallet.voting.dialog.step.qr.line3": "We raden aan om een screenshot van de QR-code te maken als back-up - je hebt geen toegang meer tot deze QR-code nadat je op Voltooien hebt geklikt.",
   "wallet.voting.dialog.step.register.line1": "Voer uw bestedingswachtwoord in om het vereiste certificaat voor stemmen te kunnen genereren.",
-  "wallet.voting.lineTitle": "Register to vote on Fund 3",
+  "wallet.voting.lineTitle": "Registreer uzelf om op Fonds 3 te stemmen",
   "wallet.voting.line2": "Zorg ervoor dat u de onderstaande stappen uitvoert voordat u begint",
   "wallet.voting.line3": "Download de Catalyst Stem-applicatie.",
   "wallet.voting.line4": "Open de Catalyst Stem-applicatie en klik op de knop \"Registratie voltooien\".",
