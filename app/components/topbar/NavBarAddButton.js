@@ -6,9 +6,6 @@ import { intlShape, } from 'react-intl';
 import styles from './NavBarAddButton.scss';
 import globalMessages from '../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import classnames  from 'classnames';
-import { Button } from 'react-polymorph/lib/components/Button';
-import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 
 type Props = {|
   +onClick: void => void,
@@ -29,12 +26,13 @@ export default class NavBarAddButton extends Component<Props> {
     const { intl } = this.context;
 
     return (
-      <Button
-        className={classnames([styles.button, 'secondary'])}
+      <button
+        type="button"
+        className={styles.button}
         onClick={() => onClick()}
-        label={intl.formatMessage(globalMessages.addWalletLabel)}
-        skin={ButtonSkin}
-      />
+      >
+        {intl.formatMessage(globalMessages.addWalletLabel)}
+      </button>
     );
   }
 }

@@ -779,6 +779,5 @@
   "wallet.voting.dialog.confirmPin": "Confirm PIN",
   "wallet.voting.dialog.completeLabel": "Complete",
   "global.errors.pinDoesNotMatch": "Pin Does Not Match",
-  "global.errors.invalidPin": "Invalid Pin",
-  "button.buySellAda": "Buy/Sell ADA"
+  "global.errors.invalidPin": "Invalid Pin"
 }

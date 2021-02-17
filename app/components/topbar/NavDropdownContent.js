@@ -4,7 +4,6 @@ import type { Node, ElementRef } from 'react';
 import { observer } from 'mobx-react';
 import styles from './NavDropdownContent.scss';
 import NavBarAddButton from './NavBarAddButton';
-import BuySellAdaButton from './BuySellAdaButton';
 
 type Props = {|
   +contentComponents?: ?Node,
@@ -93,9 +92,6 @@ export default class NavDropdownContent extends Component<Props, State> {
       >
         {contentComponents}
         <div className={styles.buttonWrapper}>
-          <div className={styles.buyButton}>
-            <BuySellAdaButton />
-          </div>
           <NavBarAddButton onClick={this.props.onAddWallet} />
         </div>
       </div>
