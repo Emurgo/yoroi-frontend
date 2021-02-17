@@ -79,7 +79,7 @@ export type Tx = {|
   id: TxId,
   inputs: UnsignedInput[],
   dataInputs: DataInput[],
-  outputCandidates: BoxCandidate[],
+  outputs: BoxCandidate[],
 |};
 
 export type TxId = string;

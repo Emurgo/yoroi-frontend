@@ -7,7 +7,8 @@ import type {
   PaginateError,
   Tx,
   TxId,
-  SignedTx
+  SignedTx,
+  Value
 } from './types';
 import { RustModule } from '../../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import type {
@@ -47,27 +48,47 @@ function paginateResults<T>(results: T[], paginate: ?Paginate): T[] | PaginateEr
         maxSize: results.length
       };
     }
-    console.log(`PAGINATE: [${startIndex}, ${Math.min(startIndex + paginate.limit, results.length)}) instead of [0, ${results.length})`);
     return results.slice(startIndex, Math.min(startIndex + paginate.limit, results.length));
   }
-  console.log(`paginate normal: ${JSON.stringify(paginate)} of ${results.length}`);
   return results;
+}
+
+function bigNumberToValue(x: BigNumber): Value {
+  // we could test and return as numbers potentially
+  // but we'll keep it as this to make sure the rest of the code is compliant
+  return x.toString();
+}
+
+function valueToBigNumber(x: Value): BigNumber {
+  // constructor takes either string/number this is just here for consisitency
+  return new BigNumber(x);
 }
 
 export async function connectorGetBalance(
   wallet: PublicDeriver<>,
   tokenId: string
-): Promise<BigNumber> {
+): Promise<Value> {
   if (tokenId === 'ERG') {
     const canGetBalance = asGetBalance(wallet);
     if (canGetBalance != null) {
       const balance = await canGetBalance.getBalance();
-      return Promise.resolve(balance.getDefault());
+      return Promise.resolve(bigNumberToValue(balance.getDefault()));
     }
     throw Error('asGetBalance failed in connectorGetBalance');
   } else {
-    // TODO: handle filtering by currency
-    return Promise.resolve(new BigNumber(5));
+    const allUtxos = await connectorGetUtxos(wallet, undefined, tokenId);
+    let total = new BigNumber(0);
+    // this should never return a PaginateError since we don't supply a Paginate param
+    if (allUtxos.maxSize === undefined) {
+      for (const box of allUtxos) {
+        for (const asset of box.assets) {
+          if (asset.tokenId === tokenId) {
+            total = total.plus(valueToBigNumber(asset.amount));
+          }
+        }
+      }
+    }
+    return Promise.resolve(bigNumberToValue(total));
   }
 }
 
@@ -77,31 +98,39 @@ function formatUtxoToBox(utxo: { output: $ReadOnly<UtxoTxOutput>, ... }): Box {
     const tokens = utxo.output.tokens;
     // This doesn't seem right - is there a better way to access this?
     // Or a function that does this for us?
-    // TODO: process other tokens too
-    const token = tokens.find(t => t.TokenList.ListId === box.TokenListId);
+    const ergoToken = tokens.find(t => t.Token.IsDefault);
     if (
-      token == null ||
+      ergoToken == null ||
       box.ErgoCreationHeight == null ||
       box.ErgoBoxId == null ||
       box.ErgoTree == null
     ) {
       throw new Error('missing Ergo fields for Ergo UTXO');
     }
+    const assets = [];
+    for (const token of tokens) {
+      if (!token.Token.IsDefault) {
+        assets.push({
+          tokenId: token.Token.Identifier,
+          amount: token.TokenList.Amount
+        });
+      }
+    }
     return {
       boxId: box.ErgoBoxId,
       ergoTree: box.ErgoTree,
-      assets: [],
-      additionalRegisters: {},
+      assets,
+      additionalRegisters: box.ErgoRegisters == null ? {} : JSON.parse(box.ErgoRegisters),
       creationHeight: box.ErgoCreationHeight,
       transactionId: tx.Hash,
       index: box.OutputIndex,
-      value: parseInt(token.TokenList.Amount, 10)
+      value: parseInt(ergoToken.TokenList.Amount, 10)
     };
 }
 
 export async function connectorGetUtxos(
   wallet: PublicDeriver<>,
-  valueExpected: ?number,
+  valueExpected: ?Value,
   tokenId: ?string,
   paginate: ?Paginate
 ): Promise<Box[] | PaginateError> {
@@ -113,16 +142,22 @@ export async function connectorGetUtxos(
   // TODO: more intelligently choose values?
   let utxosToUse = [];
   if (valueExpected != null) {
-    // TODO: use bigint/whatever yoroi uses for values
-    let valueAcc = 0;
-    for (let i = 0; i < utxos.length && valueAcc < valueExpected; i += 1) {
+    let valueAcc = new BigNumber(0);
+    const target = valueToBigNumber(valueExpected);
+    for (let i = 0; i < utxos.length && valueAcc.isLessThan(target); i += 1) {
       const formatted = formatUtxoToBox(utxos[i]);
-      // eslint-disable-next-line no-console
-      console.log(`get_utxos[1]: at ${valueAcc} of ${valueExpected} requested - trying to add ${formatted.value}`);
-      valueAcc += parseInt(formatted.value, 10);
-      utxosToUse.push(formatted);
-      // eslint-disable-next-line no-console
-      console.log(`get_utxos[2]: at ${valueAcc} of ${valueExpected} requested`);
+      if (tokenId === 'ERG') {
+        valueAcc = valueAcc.plus(valueToBigNumber(formatted.value));
+        utxosToUse.push(formatted);
+      } else {
+        for (const asset of formatted.assets) {
+          if (asset.tokenId === tokenId) {
+            valueAcc = valueAcc.plus(valueToBigNumber(asset.amount));
+            utxosToUse.push(formatted);
+            break;
+          }
+        }
+      }
     }
   } else {
     utxosToUse = utxos.map(formatUtxoToBox);
@@ -153,7 +188,10 @@ async function getAllAddresses(wallet: PublicDeriver<>, usedFilter: boolean): Pr
   return addresses;
 }
 
-export async function connectorGetUsedAddresses(wallet: PublicDeriver<>, paginate: ?Paginate): Promise<Address[] | PaginateError> {
+export async function connectorGetUsedAddresses(
+  wallet: PublicDeriver<>,
+  paginate: ?Paginate
+): Promise<Address[] | PaginateError> {
   return getAllAddresses(wallet, true).then(addresses => paginateResults(addresses, paginate));
 }
 
@@ -179,6 +217,13 @@ export async function connectorSignTx(
   await RustModule.load();
   let wasmTx;
   try {
+    // TODO: look into sigma rust string value support
+    for (const output of tx.outputs) {
+      output.value = parseInt(output.value, 10);
+      if (output.value > Number.MAX_SAFE_INTEGER) {
+        throw new Error('large values not supported by sigma-rust\'s json parsing code');
+      }
+    }
     wasmTx = RustModule.SigmaRust.UnsignedTransaction.from_json(JSON.stringify(tx));
   } catch (e) {
     // eslint-disable-next-line no-console
