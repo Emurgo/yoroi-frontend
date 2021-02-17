@@ -56,7 +56,7 @@ export default class AdaMnemonicSendStore extends Store {
 
     this.actions.dialogs.closeActiveDialog.trigger();
     this.stores.wallets.sendMoneyRequest.reset();
-    this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ROOT });
+    this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.TRANSACTIONS });
   };
 
   signAndBroadcast: {|

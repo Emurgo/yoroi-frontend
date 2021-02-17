@@ -133,7 +133,7 @@ export default class YoroiTransferPage extends Component<InjectedOrGenerated<Gen
           setTimeout(() => {
             if (walletsStore.selected != null) {
               this.generated.actions.router.goToRoute.trigger({
-                route: ROUTES.WALLETS.ROOT
+                route: ROUTES.WALLETS.TRANSACTIONS
               });
             }
             resolve();

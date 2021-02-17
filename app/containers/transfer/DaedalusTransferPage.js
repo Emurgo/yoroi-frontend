@@ -96,7 +96,7 @@ export default class DaedalusTransferPage extends Component<InjectedOrGenerated<
         }
         if (walletsStore.selected != null) {
           this.generated.actions.router.goToRoute.trigger({
-            route: ROUTES.WALLETS.ROOT
+            route: ROUTES.WALLETS.TRANSACTIONS
           });
         }
       },
