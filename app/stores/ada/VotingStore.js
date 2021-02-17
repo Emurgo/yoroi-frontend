@@ -222,13 +222,21 @@ export default class VotingStore extends Store {
         .sign(catalystPrivateKeyBytes)
         .to_hex();
 
+      const withChains = asHasUtxoChains(publicDeriver);
+      if (!withChains) throw new Error(`${nameof(this._createTransaction)} missing chains functionality`);
+      const nextInternal = await withChains.nextInternal();
+      if (nextInternal.addressInfo == null) {
+        throw new Error(`${nameof(this._createTransaction)} no internal addresses left. Should never happen`);
+      }
+
       /**
        * Catalyst follows a certain standard to prove the voting power
        * A transaction is submitted with following metadata format for the registration process
        * label: 61284
        * {
        *   1: "pubkey generated for catalyst app",
-       *   2: "stake key public key"
+       *   2: "stake key public key",
+       *   3: "address to receive rewards to"
        * }
        * label: 61285
        * {
@@ -241,6 +249,7 @@ export default class VotingStore extends Store {
           data: {
             '1': `0x${catalystPubKey}`,
             '2': `0x${stakeKeyPub}`,
+            '3': `0x${nextInternal.addressInfo.addr.Hash}`,
           },
         },
         {
