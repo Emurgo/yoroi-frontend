@@ -46,9 +46,6 @@ import type { ISignRequest } from '../../../app/api/common/lib/transactions/ISig
 import DelegationStore from '../../../app/stores/toplevel/DelegationStore';
 import AdaDelegationStore from '../../../app/stores/ada/AdaDelegationStore';
 import {
-  MultiToken,
-} from '../../../app/api/common/lib/MultiToken';
-import {
   getDefaultEntryTokenInfo,
   mockFromDefaults,
 } from '../../../app/stores/toplevel/TokenInfoStore';
@@ -104,8 +101,6 @@ function genByronSigningWallet(
 }
 
 function genMockByronBip44Cache(dummyWallet: PublicDeriver<>) {
-  const defaultToken = dummyWallet.getParent().getDefaultToken();
-
   const pendingRequest = new CachedRequest(_publicDeriver => Promise.resolve([]));
   const recentRequest = new CachedRequest(_request => Promise.resolve({
     transactions: [],
@@ -115,9 +110,7 @@ function genMockByronBip44Cache(dummyWallet: PublicDeriver<>) {
     transactions: [],
     total: 0,
   }));
-  const getBalanceRequest = new CachedRequest(_request => Promise.resolve(
-    new MultiToken([], defaultToken),
-  ));
+  const getBalanceRequest = new CachedRequest(request => request.getBalance());
   return {
     conceptualWalletCache: {
       conceptualWallet: dummyWallet.getParent(),

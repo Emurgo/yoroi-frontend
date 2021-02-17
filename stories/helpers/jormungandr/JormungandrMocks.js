@@ -48,16 +48,11 @@ import {
 import { RustModule } from '../../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import type { ISignRequest } from '../../../app/api/common/lib/transactions/ISignRequest';
 import {
-  MultiToken,
-} from '../../../app/api/common/lib/MultiToken';
-import {
   getDefaultEntryTokenInfo,
   mockFromDefaults,
 } from '../../../app/stores/toplevel/TokenInfoStore';
 
 function genMockJormungandrCache(dummyWallet: PublicDeriver<>) {
-  const defaultToken = dummyWallet.getParent().getDefaultToken();
-
   const pendingRequest = new CachedRequest(_publicDeriver => Promise.resolve([]));
   const recentRequest = new CachedRequest(_request => Promise.resolve({
     transactions: [],
@@ -67,9 +62,7 @@ function genMockJormungandrCache(dummyWallet: PublicDeriver<>) {
     transactions: [],
     total: 0,
   }));
-  const getBalanceRequest = new CachedRequest(_request => Promise.resolve(
-    new MultiToken([], defaultToken),
-  ));
+  const getBalanceRequest = new CachedRequest(request => request.getBalance());
   return {
     conceptualWalletCache: {
       conceptualWallet: dummyWallet.getParent(),

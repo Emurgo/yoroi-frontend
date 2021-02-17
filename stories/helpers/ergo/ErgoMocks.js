@@ -44,8 +44,6 @@ import { sendAllUnsignedTxFromUtxo } from '../../../app/api/ergo/lib/transaction
 import { replaceMockBoxId } from '../../../app/api/ergo/lib/transactions/utils';
 
 function genMockErgoCache(dummyWallet: PublicDeriver<>) {
-  const defaultToken = dummyWallet.getParent().getDefaultToken();
-
   const pendingRequest = new CachedRequest(_publicDeriver => Promise.resolve([]));
   const recentRequest = new CachedRequest(_request => Promise.resolve({
     transactions: [],
@@ -55,9 +53,7 @@ function genMockErgoCache(dummyWallet: PublicDeriver<>) {
     transactions: [],
     total: 0,
   }));
-  const getBalanceRequest = new CachedRequest(_request => Promise.resolve(
-    new MultiToken([], defaultToken),
-  ));
+  const getBalanceRequest = new CachedRequest(request => request.getBalance());
   return {
     conceptualWalletCache: {
       conceptualWallet: dummyWallet.getParent(),

@@ -56,9 +56,10 @@ export default class VotingStore extends Store {
   @observable error: ?LocalizableError;
 
   @observable
-  createVotingRegTx: LocalizedRequest<CreateVotingRegTxFunc> = new LocalizedRequest<CreateVotingRegTxFunc>(
-    this.api.ada.createVotingRegTx
-  );
+  createVotingRegTx: LocalizedRequest<CreateVotingRegTxFunc>
+    = new LocalizedRequest<CreateVotingRegTxFunc>(
+      this.api.ada.createVotingRegTx
+    );
 
   /** tracks if wallet balance changed during confirmation screen */
   @observable isStale: boolean = false;
