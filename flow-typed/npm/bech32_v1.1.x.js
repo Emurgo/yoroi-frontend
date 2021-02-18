@@ -1,3 +1,9 @@
+
+type ArrayLike<T> = {
+  [indexer: number]: T,
+  length: number,
+  ...
+}
 declare module "bech32" {
   /**
    * Takes a bech32 encoded string and returns the human readable part ("prefix") and

@@ -117,7 +117,7 @@ function addUtxoInput(
   const txInput = utxoToTxInput(input);
   const wasmAmount = cardanoValueFromRemoteFormat(input);
 
-  const skipInput = () => {
+  const skipInput: void => boolean = () => {
     if (remaining == null) return false;
 
     const defaultEntry = {
@@ -160,6 +160,7 @@ function addUtxoInput(
         return true;
       }
     }
+    return false;
   }
   if (skipInput()) { return false; }
 
