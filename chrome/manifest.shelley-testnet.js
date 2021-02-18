@@ -8,7 +8,7 @@ import {
   Servers,
   serverToPermission,
 } from '../scripts/connections';
-import { version } from '../package.json';
+import pkg from '../package.json';
 import { SEIZA_URL, POOLS_UI_URL_FOR_YOROI } from './manifestEnvs';
 
 export default (isDebug: boolean): * => buildManifest({
@@ -34,7 +34,7 @@ export default (isDebug: boolean): * => buildManifest({
     '128': 'img/shelley-128.png',
     /* eslint-enable quote-props */
   },
-  version,
+  version: pkg.version,
   geckoKey: '{842ae5af-a7ff-4e99-afb6-bd6c4043bcfa}',
   enableProtocolHandlers: false,
 });

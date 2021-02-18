@@ -19,7 +19,7 @@ type EnvParams = {|
 const baseProdConfig = (env /*: EnvParams */) /*: * */ => ({
   mode: 'production',
   optimization: commonConfig.optimization,
-  node: commonConfig.node,
+  experiments: commonConfig.experiments,
   resolve: commonConfig.resolve(env.networkName),
   entry: {
     yoroi: [
