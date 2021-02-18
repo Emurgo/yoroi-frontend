@@ -50,7 +50,7 @@ interface CharactersOption {
 
 type Options = BaseOptions & (TypeOption | CharactersOption);
 
-declare function cryptoRandomString(options?: Options): string;
+declare function cryptoRandomString(options: Options): string;
 
 declare module 'crypto-random-string' {
   declare module.exports: typeof cryptoRandomString;
