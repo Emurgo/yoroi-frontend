@@ -18,7 +18,7 @@ const baseDevConfig = (
 ) /*: * */ => ({
   mode: 'development',
   optimization: commonConfig.optimization,
-  node: commonConfig.node,
+  experiments: commonConfig.experiments,
   resolve: commonConfig.resolve(networkName),
   devtool: 'eval-source-map',
   entry: {
@@ -53,7 +53,6 @@ const baseDevConfig = (
     stats: {
       colors: true
     },
-    noInfo: true,
     headers: { 'Access-Control-Allow-Origin': '*' }
   },
   hotMiddleware: {
@@ -70,7 +69,9 @@ const baseDevConfig = (
     new ReactRefreshWebpackPlugin(),
     new webpack.DefinePlugin(commonConfig.definePlugin(networkName, false, isNightly)),
     new webpack.HotModuleReplacementPlugin(),
-    new webpack.IgnorePlugin(/[^/]+\/[\S]+.prod$/),
+    new webpack.IgnorePlugin({
+      resourceRegExp: /[^/]+\/[\S]+.prod$/,
+    }),
     new webpack.DefinePlugin({
       __HOST__: `'${host}'`,
       __PORT__: connections.Ports.WebpackDev,
@@ -81,16 +82,20 @@ const baseDevConfig = (
       ...commonConfig.rules(true),
       {
         test: /\.js$/,
-        loader: 'babel-loader?cacheDirectory',
+        loader: 'babel-loader',
         exclude: /node_modules/,
         options: {
           plugins: [[require.resolve('react-refresh/babel'), { skipEnvCheck: true }]],
+          cacheDirectory: true,
         },
       },
       {
         test: /\.(js|jsx)$/,
         exclude: [/node_modules/, /pdf\.worker(\.min)?\.js$/],
-        use: 'babel-loader?cacheDirectory',
+        loader: 'babel-loader',
+        options: {
+          cacheDirectory: true,
+        },
       },
       {
         test: /\.(eot|otf|ttf|woff|woff2|gif|png)$/,

@@ -14,7 +14,10 @@ const plugins = (folder /*: string */, _networkName /*: string */) /*: * */ => {
 
   return [
     /** We remove non-English languages from BIP39 to avoid triggering bad word filtering */
-    new webpack.IgnorePlugin(/^\.\/(?!english)/, /bip39\/src\/wordlists$/),
+    new webpack.IgnorePlugin({
+      resourceRegExp: /^\.\/(?!english)/,
+      contextRegExp: /bip39\/src\/wordlists$/,
+    }),
     /**
      * We use the HtmlWebpackPlugin to group back together the chunks inside the HTML
      * and with dynamic page title
@@ -58,6 +61,12 @@ const plugins = (folder /*: string */, _networkName /*: string */) /*: * */ => {
     new HtmlWebpackHarddiskPlugin(),
     // populates the CONFIG global based on ENV
     new ConfigWebpackPlugin(),
+    new webpack.ProvidePlugin({
+      process: 'process/browser',
+    }),
+    new webpack.ProvidePlugin({
+      Buffer: ['buffer', 'Buffer'],
+    })
   ];
 };
 
@@ -86,7 +95,9 @@ const rules /*: boolean => Array<*> */ = (_isDev) => [
       {
         loader: 'postcss-loader',
         options: {
-          plugins: () => [autoprefixer],
+          postcssOptions: {
+            plugins: () => [autoprefixer],
+          }
         }
       }
     ]
@@ -153,10 +164,6 @@ const rules /*: boolean => Array<*> */ = (_isDev) => [
       'markdown-loader',
     ]
   },
-  {
-    test: /\.wasm$/,
-    type: 'webassembly/experimental'
-  }
 ];
 
 
@@ -172,18 +179,30 @@ const optimization = {
   }
 };
 
-const node = {
-  fs: 'empty'
-};
-
 const resolve = (networkName /*: string */) /*: * */ => ({
   extensions: ['*', '.js', '.wasm'],
+  fallback: {
+    fs: false,
+    // path: false,
+    // stream: false,
+    // zlib: false,
+    // crypto: false,
+    // TODO: do we need these?
+    path: require.resolve('path-browserify'),
+    stream: require.resolve('stream-browserify'),
+    zlib: require.resolve('browserify-zlib'),
+    crypto: require.resolve('crypto-browserify'),
+    buffer: require.resolve('buffer'),
+  },
   alias: (networkName === 'test')
     ? {
       'trezor-connect': path.resolve(__dirname, '../features/mock-trezor-connect/'),
       '@emurgo/ledger-connect-handler': path.resolve(__dirname, '../features/mock-ledger-connect/'),
+       process: 'process/browser',
     }
-    : {},
+    : {
+      process: 'process/browser',
+    },
 });
 
 const definePlugin = (
@@ -204,7 +223,7 @@ module.exports = {
   plugins,
   rules,
   optimization,
-  node,
   resolve,
   definePlugin,
+  experiments: { syncWebAssembly: true }
 };

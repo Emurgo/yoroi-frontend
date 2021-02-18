@@ -4,7 +4,7 @@ import buildManifest from './manifest.template';
 import {
   genCSP,
 } from './constants';
-import { version } from '../package.json';
+import pkg from '../package.json';
 
 export default (): * => buildManifest({
   description: 'A simple, secure and fast Cardano ADA wallet.',
@@ -22,7 +22,7 @@ export default (): * => buildManifest({
     '128': 'img/shelley-128.png',
     /* eslint-enable quote-props */
   },
-  version,
+  version: pkg.version,
   geckoKey: '{842ae5af-a7ff-4e99-afb6-bd6c4043bcfa}',
   enableProtocolHandlers: false,
 });

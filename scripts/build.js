@@ -21,12 +21,15 @@ export function buildProd(env: string) {
   console.log('[Webpack Build]');
   console.log('-'.repeat(80));
 
-  process.exit(shell.exec(`./node_modules/.bin/webpack --config webpack/prodConfig.js --progress --profile --colors --env.networkName=${argv.env} --env.nightly=${isNightly.toString()}`).code);
+  process.exit(shell.exec(`./node_modules/.bin/webpack --config webpack/prodConfig.js --progress --profile --color --env networkName=${argv.env} --env nightly=${isNightly.toString()}`).code);
 }
 
 export function buildDev(env: string) {
   const connections = require('./connections');
   const createWebpackServer = require('webpack-httpolyglot-server');
+  const webpack = require('webpack');
+  const webpackDevMiddleware = require('webpack-dev-middleware');
+  const webpackHotMiddleware = require('webpack-hot-middleware');
 
   const config = require(`../webpack/devConfig`);
 
@@ -43,10 +46,16 @@ export function buildDev(env: string) {
   console.log('If you\'re developing Inject page,');
   console.log(`please allow 'https://localhost:${connections.Ports.WebpackDev}' connections in Google Chrome,`);
   console.log('and load unpacked extensions with `./dev` folder. (see https://developer.chrome.com/extensions/getstarted#unpacked)\n');
-  createWebpackServer(config.baseDevConfig(argv.env, isNightly), {
-    host: 'localhost',
-    port: connections.Ports.WebpackDev
-  });
+  createWebpackServer(
+    config.baseDevConfig(argv.env, isNightly),
+    webpack,
+    webpackDevMiddleware,
+    webpackHotMiddleware,
+    {
+      host: 'localhost',
+      port: connections.Ports.WebpackDev
+    },
+  );
 }
 
 if (argv.type === 'debug') {

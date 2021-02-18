@@ -9,7 +9,7 @@ import {
 import {
   genCSP,
 } from './constants';
-import { version } from '../package.json';
+import pkg from '../package.json';
 
 export default (isDebug: boolean): * => buildManifest({
   description: '[localhost] Cardano ADA wallet',
@@ -25,7 +25,7 @@ export default (isDebug: boolean): * => buildManifest({
       ],
     },
   }),
-  version,
+  version: pkg.version,
   geckoKey: '{530f7c6c-6077-4703-8f71-cb368c663e35}',
   enableProtocolHandlers: false,
 });
