@@ -520,7 +520,7 @@
   "wallet.includeKey.withKeyLabel": "Anahtarla",
   "wallet.includeKey.withoutKeyLabel": "Anahtarsız",
   "wallet.insufficientFunds.subtitle": "Participating requires at least {requiredBalance} {tokenName}, but you only have {currentBalance}. Unwithdrawn rewards are not included in this amount",
-  "wallet.insufficientFunds.title": "Insufficient funds",
+  "wallet.insufficientFunds.title": "Yetersiz bakiye",
   "wallet.nav.addButton": "Yeni cüzdan ekle",
   "wallet.nav.allWalletsLabel": "Tüm cüzdanlar",
   "wallet.nav.backButton": "Cüzdanlarıma geri dön",
