@@ -183,11 +183,6 @@ const resolve = (networkName /*: string */) /*: * */ => ({
   extensions: ['*', '.js', '.wasm'],
   fallback: {
     fs: false,
-    // path: false,
-    // stream: false,
-    // zlib: false,
-    // crypto: false,
-    // TODO: do we need these?
     path: require.resolve('path-browserify'),
     stream: require.resolve('stream-browserify'),
     zlib: require.resolve('browserify-zlib'),
