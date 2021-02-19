@@ -12,6 +12,7 @@ import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 
 type Props = {|
   +onClick: void => void,
+  +isPrimary: boolean,
 |};
 
 @observer
@@ -24,13 +25,15 @@ export default class NavBarAddButton extends Component<Props> {
   render(): Node {
     const {
       onClick,
+      isPrimary,
     } = this.props;
 
     const { intl } = this.context;
+    const extraClassName = isPrimary ? 'primary' : 'secondary';
 
     return (
       <Button
-        className={classnames([styles.button, 'secondary'])}
+        className={classnames([styles.button, extraClassName])}
         onClick={() => onClick()}
         label={intl.formatMessage(globalMessages.addWalletLabel)}
         skin={ButtonSkin}

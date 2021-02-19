@@ -94,7 +94,9 @@ export default class MyWalletsPage extends Component<Props> {
     const navbarElement = (
       <NavBar
         title={navbarTitle}
-        button={<NavBarAddButton onClick={
+        button={<NavBarAddButton
+          isPrimary
+          onClick={
           () => this.generated.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD })
         }
         />}

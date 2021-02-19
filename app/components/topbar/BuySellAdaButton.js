@@ -28,7 +28,7 @@ export default class BuySellAdaButton extends Component<Props> {
     return (
       <Button
         label={intl.formatMessage(globalMessages.buySellAda)}
-        className={classnames([styles.button, 'primary'])}
+        className={classnames([styles.button, 'secondary'])}
         onClick={() => window.open(EXCHANGE_URL, '_blank')}
         skin={ButtonSkin}
       />

@@ -96,7 +96,7 @@ export default class NavDropdownContent extends Component<Props, State> {
           <div className={styles.buyButton}>
             <BuySellAdaButton />
           </div>
-          <NavBarAddButton onClick={this.props.onAddWallet} />
+          <NavBarAddButton onClick={this.props.onAddWallet} isPrimary />
         </div>
       </div>
     );
