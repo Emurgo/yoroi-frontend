@@ -10,7 +10,7 @@ import {
 } from '../scripts/connections';
 import { version } from '../package.json';
 
-import { POOLS_UI_URL_FOR_YOROI } from './manifestEnvs';
+import { POOLS_UI_URL_FOR_YOROI, CHANGELLY_URL } from './manifestEnvs';
 
 export default (isDebug: boolean): * => buildManifest({
   description: 'A simple, secure and fast Cardano ADA wallet.',
@@ -24,6 +24,7 @@ export default (isDebug: boolean): * => buildManifest({
       ],
       'frame-src': [
         POOLS_UI_URL_FOR_YOROI,
+        CHANGELLY_URL,
       ],
     },
   }),

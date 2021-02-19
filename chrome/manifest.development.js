@@ -9,6 +9,7 @@ import {
   serverToPermission,
 } from '../scripts/connections';
 import { version } from '../package.json';
+import { CHANGELLY_URL, POOLS_UI_URL_FOR_YOROI } from './manifestEnvs'
 
 export default (isDebug: boolean): * => buildManifest({
   description: '[dev] Cardano ADA wallet',
@@ -18,6 +19,10 @@ export default (isDebug: boolean): * => buildManifest({
     additional: {
       'connect-src': [
         serverToPermission(Servers.Primary),
+      ],
+      'frame-src': [
+        POOLS_UI_URL_FOR_YOROI,
+        CHANGELLY_URL,
       ],
     },
   }),

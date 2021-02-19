@@ -42,6 +42,8 @@ import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tab
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
 import { genLookupOrFail, getTokenName } from '../../stores/stateless/tokenHelpers';
+import BuySellDialog from '../../components/buySell/BuySellDialog'
+import BuySellDialogContainer from '../buy-sell/BuySellDialogContainer'
 
 export type GeneratedData = typeof MyWalletsPage.prototype.generated;
 
@@ -50,15 +52,23 @@ type Props = InjectedOrGenerated<GeneratedData>
 @observer
 export default class MyWalletsPage extends Component<Props> {
 
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
+
+  onClose: void => void = () => {
+    this.generated.actions.dialogs.closeActiveDialog.trigger();
+  };
+
+  openDialogWrapper: any => void = (dialog) => {
+    this.generated.actions.dialogs.open.trigger({ dialog });
+  }
 
   updateHideBalance: void => Promise<void> = async () => {
     await this.generated.actions.profile.updateHideBalance.trigger();
   }
 
-  componentDidMount() {
+  componentDidMount () {
     this.generated.actions.wallets.unselectWallet.trigger();
   }
 
@@ -70,6 +80,7 @@ export default class MyWalletsPage extends Component<Props> {
       publicDeriver
     });
   };
+
   openToSettings: PublicDeriver<> => void = (
     publicDeriver
   ) => {
@@ -81,8 +92,11 @@ export default class MyWalletsPage extends Component<Props> {
     });
   };
 
-  render(): Node {
+  render (): Node {
     const { intl } = this.context;
+    const { stores } = this.generated;
+    const { uiDialogs } = stores;
+
     const sidebarContainer = (<SidebarContainer {...this.generated.SidebarContainerProps} />);
 
     const wallets = this.generated.stores.wallets.publicDerivers;
@@ -99,7 +113,7 @@ export default class MyWalletsPage extends Component<Props> {
         }
         />}
         buyButton={
-          <BuySellAdaButton />}
+          <BuySellAdaButton onBuySellClick={this.openDialogWrapper(BuySellDialog)} />}
         walletDetails={undefined}
       />
     );
@@ -109,6 +123,12 @@ export default class MyWalletsPage extends Component<Props> {
         {wallets.map(wallet => this.generateRow(wallet))}
       </WalletsList>
     );
+
+    let activeDialog = null;
+    // TODO: isOpen produce a weird error
+    if (uiDialogs.isOpen(BuySellDialog)) {
+      activeDialog = (<BuySellDialogContainer onClose={this.onClose()} />)
+    }
 
     return (
       <TopBarLayout
@@ -120,6 +140,7 @@ export default class MyWalletsPage extends Component<Props> {
         <MyWallets>
           {walletsList}
         </MyWallets>
+        {activeDialog}
       </TopBarLayout>
     );
   }
@@ -284,7 +305,7 @@ export default class MyWalletsPage extends Component<Props> {
     return balanceResult.accountPart;
   }
 
-  @computed get generated(): {|
+  @computed get generated (): {|
     BannerContainerProps: InjectedOrGenerated<BannerContainerData>,
     SidebarContainerProps: InjectedOrGenerated<SidebarContainerData>,
     actions: {|
@@ -302,6 +323,17 @@ export default class MyWalletsPage extends Component<Props> {
           |}) => void
         |}
       |},
+      dialogs: {|
+        closeActiveDialog: {|
+          trigger: (params: void) => void
+        |},
+        open: {|
+          trigger: (params: {|
+            dialog: any,
+            params?: any
+          |}) => void
+        |},
+      |},
       wallets: {|
         unselectWallet: {| trigger: (params: void) => void |},
         setActiveWallet: {| trigger: (params: {| wallet: PublicDeriver<> |}) => void |},
@@ -309,6 +341,11 @@ export default class MyWalletsPage extends Component<Props> {
     |},
     stores: {|
       profile: {| shouldHideBalance: boolean |},
+      uiDialogs: {|
+        hasOpen: boolean,
+        getParam: <T>(number | string) => (void | T),
+        isOpen: any => boolean
+      |},
       delegation: {|
         getDelegationRequests: (
           PublicDeriver<>
@@ -342,6 +379,11 @@ export default class MyWalletsPage extends Component<Props> {
         profile: {
           shouldHideBalance: stores.profile.shouldHideBalance,
         },
+        uiDialogs: {
+          hasOpen: stores.uiDialogs.hasOpen,
+          isOpen: stores.uiDialogs.isOpen,
+          getParam: stores.uiDialogs.getParam,
+        },
         wallets: {
           publicDerivers: stores.wallets.publicDerivers,
           getPublicKeyCache: stores.wallets.getPublicKeyCache,
@@ -367,6 +409,14 @@ export default class MyWalletsPage extends Component<Props> {
         },
         router: {
           goToRoute: { trigger: actions.router.goToRoute.trigger },
+        },
+        dialogs: {
+          closeActiveDialog: {
+            trigger: actions.dialogs.closeActiveDialog.trigger,
+          },
+          open: {
+            trigger: actions.dialogs.open.trigger,
+          },
         },
         wallets: {
           unselectWallet: { trigger: actions.wallets.unselectWallet.trigger },
