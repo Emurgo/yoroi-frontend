@@ -10,6 +10,7 @@ import { observer } from 'mobx-react';
 type Props = {|
   +children?: Node,
   +widgetURL: string,
+  +address: ?string,
 |};
 
 @observer
@@ -21,50 +22,9 @@ export default class ChangellyFetcher extends Component<Props> {
   @observable iframe: ?HTMLIFrameElement;
   @observable frameHeight: number = 0;
 
-  @action
-  messageHandler: any => Promise<void> = async (event: any) => {
-    if (this.iframe == null) return;
-    /**
-     * We want to ignore messages that come from any source that is not our pool selection iframe
-     * Usually, this would be done by doing something like
-     * event.origin !== our-iframe-url-here
-     * However, you cannot access event.origin unless you set allow-same-origin for the iframe
-     * But we don't want to treat the iframe as same-origin as a safety precaution.
-     *
-     * Therefore, instead, we check the source of the origin is the same window as our iframe
-     *
-     * For more information, see https://www.html5rocks.com/en/tutorials/security/sandboxed-iframes/
-     */
-    if (!(
-      event.origin === 'null' && /* message from a different origin implies event.origin is "null" */
-      event.source === this.iframe.contentWindow /* check it belongs to our iframe */
-    )) {
-
-    }
-    // const response = JSON.parse(decodeURI(event.data));
-    // if (!Array.isArray(response)) {
-    //   throw new Error(`${nameof(SeizaFetcher)} Server response is not an array`);
-    // }
-    // const pool = response[0];
-    // if (typeof pool !== 'string') {
-    //   throw new Error(`${nameof(SeizaFetcher)} Server response is not a string`);
-    // }
-    // const poolId: string = pool;
-    // if (poolId.length !== 56) {
-    //   throw new Error(`${nameof(SeizaFetcher)} Server response has incorrect pool length. Expected 56, got ${poolId.length}`);
-    // }
-    //
-    // await this.props.stakepoolSelectedAction(pool);
-  }
-
   @action setFrame: (null | HTMLIFrameElement) => void = (frame) => {
     this.iframe = frame;
   }
-
-  // constructor(props: Props) {
-  //   super(props);
-  //   // window.addEventListener('message', this.messageHandler, false);
-  // }
 
   componentDidMount() {
     window.addEventListener('resize', this.resize);
@@ -73,28 +33,23 @@ export default class ChangellyFetcher extends Component<Props> {
 
   componentWillUnmount() {
     window.removeEventListener('resize', this.resize);
-    // window.removeEventListener('message', this.messageHandler);
   }
 
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
+  addAddressToWidget: (string, string) => string = (widgetURL, address) => {
+    if (address == null) return widgetURL
+    return widgetURL + '&address=' + address
+  }
+
   render(): Node {
-    const { widgetURL } = this.props;
+    const { widgetURL, address } = this.props;
 
     if (widgetURL == null) {
       throw new Error('Changelly URL undefined. this should never happen');
     }
-
-    // const stakingUrl = this._prepareStakingURL(urlTemplate, locale, totalAda);
-    // if (stakingUrl == null) {
-    //   return (
-    //     <VerticallyCenteredLayout>
-    //       <LoadingSpinner />
-    //     </VerticallyCenteredLayout>
-    //   );
-    // }
 
     // TODO: look into iframe's CSP policy once our backend implement a CSP
     return (
@@ -125,14 +80,14 @@ export default class ChangellyFetcher extends Component<Props> {
           *     - Playing media
           *     - Storing cookies on the website
         */
-        sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox"
+        sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox allow-same-origin"
         referrerPolicy="no-referrer"
         ref={this.setFrame}
         title="Staking"
-        src={`${widgetURL}`}
+        src={`${this.addAddressToWidget(widgetURL, address)}`}
         frameBorder="0"
         width="100%"
-        height={this.iframe != null && this.frameHeight != null ? this.frameHeight + 'px' : null}
+        height={this.iframe != null && this.frameHeight != null ? '500px' : null}
       />
     );
   }

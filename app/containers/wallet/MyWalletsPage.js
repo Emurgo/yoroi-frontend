@@ -1,49 +1,51 @@
 // @flow
-import React, { Component } from 'react';
-import type { Node } from 'react';
-import { computed } from 'mobx';
-import { observer } from 'mobx-react';
-import { intlShape, } from 'react-intl';
-import type { InjectedOrGenerated } from '../../types/injectedPropsType';
+import type { Node } from 'react'
+import React, { Component } from 'react'
+import { computed } from 'mobx'
+import { observer } from 'mobx-react'
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl'
+import { intlShape, } from 'react-intl'
+import type { InjectedOrGenerated } from '../../types/injectedPropsType'
 
-import MyWallets from '../../components/wallet/my-wallets/MyWallets';
-import TopBarLayout from '../../components/layout/TopBarLayout';
+import MyWallets from '../../components/wallet/my-wallets/MyWallets'
+import TopBarLayout from '../../components/layout/TopBarLayout'
 
-import WalletsList from '../../components/wallet/my-wallets/WalletsList';
-import WalletRow from '../../components/wallet/my-wallets/WalletRow';
-import WalletDetails from '../../components/wallet/my-wallets/WalletDetails';
-import WalletCurrency from '../../components/wallet/my-wallets/WalletCurrency';
-import WalletSubRow from '../../components/wallet/my-wallets/WalletSubRow';
-import NavPlate from '../../components/topbar/NavPlate';
-import SidebarContainer from '../SidebarContainer';
-import BannerContainer from '../banners/BannerContainer';
-import type { GeneratedData as BannerContainerData } from '../banners/BannerContainer';
-import type { GeneratedData as SidebarContainerData } from '../SidebarContainer';
-import { ROUTES } from '../../routes-config';
-import NavBar from '../../components/topbar/NavBar';
-import NavBarTitle from '../../components/topbar/NavBarTitle';
-import WalletSync from '../../components/wallet/my-wallets/WalletSync';
-import moment from 'moment';
-import NavBarAddButton from '../../components/topbar/NavBarAddButton';
-import BuySellAdaButton from '../../components/topbar/BuySellAdaButton';
-import globalMessages from '../../i18n/global-messages';
-import { ConceptualWallet, } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
-import {
-  asGetPublicKey,
-} from '../../api/ada/lib/storage/models/PublicDeriver/traits';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import type { ConceptualWalletSettingsCache } from '../../stores/toplevel/WalletSettingsStore';
-import type { DelegationRequests } from '../../stores/toplevel/DelegationStore';
-import type { PublicKeyCache } from '../../stores/toplevel/WalletStore';
-import type { TxRequests } from '../../stores/toplevel/TransactionsStore';
-import type { IGetPublic } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
-import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
-import { MultiToken } from '../../api/common/lib/MultiToken';
-import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
-import { genLookupOrFail, getTokenName } from '../../stores/stateless/tokenHelpers';
+import WalletsList from '../../components/wallet/my-wallets/WalletsList'
+import WalletRow from '../../components/wallet/my-wallets/WalletRow'
+import WalletDetails from '../../components/wallet/my-wallets/WalletDetails'
+import WalletCurrency from '../../components/wallet/my-wallets/WalletCurrency'
+import WalletSubRow from '../../components/wallet/my-wallets/WalletSubRow'
+import NavPlate from '../../components/topbar/NavPlate'
+import type { GeneratedData as SidebarContainerData } from '../SidebarContainer'
+import SidebarContainer from '../SidebarContainer'
+import type { GeneratedData as BannerContainerData } from '../banners/BannerContainer'
+import BannerContainer from '../banners/BannerContainer'
+import { ROUTES } from '../../routes-config'
+import NavBar from '../../components/topbar/NavBar'
+import NavBarTitle from '../../components/topbar/NavBarTitle'
+import WalletSync from '../../components/wallet/my-wallets/WalletSync'
+import moment from 'moment'
+import NavBarAddButton from '../../components/topbar/NavBarAddButton'
+import BuySellAdaButton from '../../components/topbar/BuySellAdaButton'
+import globalMessages from '../../i18n/global-messages'
+import { ConceptualWallet, } from '../../api/ada/lib/storage/models/ConceptualWallet/index'
+import { asGetPublicKey, } from '../../api/ada/lib/storage/models/PublicDeriver/traits'
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index'
+import type { ConceptualWalletSettingsCache } from '../../stores/toplevel/WalletSettingsStore'
+import type { DelegationRequests } from '../../stores/toplevel/DelegationStore'
+import type { PublicKeyCache } from '../../stores/toplevel/WalletStore'
+import type { TxRequests } from '../../stores/toplevel/TransactionsStore'
+import type { IGetPublic } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces'
+import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables'
+import { MultiToken } from '../../api/common/lib/MultiToken'
+import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore'
+import { genLookupOrFail, getTokenName } from '../../stores/stateless/tokenHelpers'
 import BuySellDialog from '../../components/buySell/BuySellDialog'
-import BuySellDialogContainer from '../buy-sell/BuySellDialogContainer'
+import type { AddressSubgroupMeta, IAddressTypeStore, IAddressTypeUiSubset } from '../../stores/stateless/addressStores'
+import { allAddressSubgroups } from '../../stores/stateless/addressStores'
+import type { AddressFilterKind } from '../../types/AddressFilterTypes'
+import LocalizableError from '../../i18n/LocalizableError'
+import { addressToDisplayString } from '../../api/ada/lib/storage/bridge/utils'
 
 export type GeneratedData = typeof MyWalletsPage.prototype.generated;
 
@@ -113,7 +115,11 @@ export default class MyWalletsPage extends Component<Props> {
         }
         />}
         buyButton={
-          <BuySellAdaButton onBuySellClick={this.openDialogWrapper(BuySellDialog)} />}
+          <BuySellAdaButton onBuySellClick={() =>
+            (this.openDialogWrapper(BuySellDialog))
+          }
+          />
+        }
         walletDetails={undefined}
       />
     );
@@ -125,9 +131,13 @@ export default class MyWalletsPage extends Component<Props> {
     );
 
     let activeDialog = null;
-    // TODO: isOpen produce a weird error
     if (uiDialogs.isOpen(BuySellDialog)) {
-      activeDialog = (<BuySellDialogContainer onClose={this.onClose()} />)
+      activeDialog = <BuySellDialog
+        onCancel={this.onClose}
+        walletList={async () => {
+          return await this.generateUnusedAddressesPerWallet(wallets);
+        }}
+      />
     }
 
     return (
@@ -143,6 +153,36 @@ export default class MyWalletsPage extends Component<Props> {
         {activeDialog}
       </TopBarLayout>
     );
+  }
+
+  generateUnusedAddressesPerWallet: PublicDeriver<> => Promise<Array<string, string>> =
+    async (wallets: array<publicDeriver>) => {
+      const infoWallets = wallets.map(async (wallet: publicDeriver) => {
+        // Wallet Name
+        const parent: ConceptualWallet = wallet.getParent();
+        const settingsCache: ConceptualWalletSettingsCache = this.generated.stores.walletSettings
+          .getConceptualWalletSettingsCache(parent);
+
+        // An Address
+        const allAddresses = await wallet.getAllUtxoAddresses();
+        const anAddressFormatted = addressToDisplayString(
+          allAddresses[0].addrs[0].Hash,
+          parent.getNetworkInfo()
+        )
+
+        // Currency Name
+        const defaultToken = this.generated.stores.tokenInfoStore.getDefaultTokenInfo(
+          wallet.getParent().getNetworkInfo().NetworkId
+        )
+        const currencyName = getTokenName(defaultToken)
+
+        return {
+          walletName: settingsCache.conceptualWalletName,
+          currencyName,
+          anAddressFormatted,
+        }
+      })
+      return await Promise.all(infoWallets)
   }
 
   /*
@@ -176,7 +216,7 @@ export default class MyWalletsPage extends Component<Props> {
       );
     })();
 
-    const txRequests = this.generated.stores.transactions
+    const txRequests: TxRequests = this.generated.stores.transactions
       .getTxRequests(publicDeriver);
     const balance = txRequests.requests.getBalanceRequest.result ?? null;
 
@@ -337,7 +377,12 @@ export default class MyWalletsPage extends Component<Props> {
       wallets: {|
         unselectWallet: {| trigger: (params: void) => void |},
         setActiveWallet: {| trigger: (params: {| wallet: PublicDeriver<> |}) => void |},
-      |}
+      |},
+      addresses: {|
+        createAddress: {|
+          trigger: (params: PublicDeriver<>) => Promise<void>
+        |},
+      |},
     |},
     stores: {|
       profile: {| shouldHideBalance: boolean |},
@@ -345,6 +390,12 @@ export default class MyWalletsPage extends Component<Props> {
         hasOpen: boolean,
         getParam: <T>(number | string) => (void | T),
         isOpen: any => boolean
+      |},
+      addresses: {|
+        addressFilter: AddressFilterKind,
+        createAddressRequest: {| isExecuting: boolean |},
+        error: ?LocalizableError,
+        addressSubgroupMap: $ReadOnlyMap<Class<IAddressTypeStore>, IAddressTypeUiSubset>,
       |},
       delegation: {|
         getDelegationRequests: (
@@ -399,6 +450,14 @@ export default class MyWalletsPage extends Component<Props> {
           getConceptualWalletSettingsCache:
             stores.walletSettings.getConceptualWalletSettingsCache,
         },
+        addresses: {
+          addressFilter: stores.addresses.addressFilter,
+          addressSubgroupMap: stores.addresses.addressSubgroupMap,
+          createAddressRequest: {
+            isExecuting: stores.addresses.createAddressRequest.isExecuting,
+          },
+          error: stores.addresses.error,
+        },
         delegation: {
           getDelegationRequests: stores.delegation.getDelegationRequests,
         },
@@ -421,6 +480,16 @@ export default class MyWalletsPage extends Component<Props> {
         wallets: {
           unselectWallet: { trigger: actions.wallets.unselectWallet.trigger },
           setActiveWallet: { trigger: actions.wallets.setActiveWallet.trigger },
+        },
+        addresses: {
+          setFilter: { trigger: actions.addresses.setFilter.trigger, },
+          resetFilter: { trigger: actions.addresses.resetFilter.trigger, },
+          resetErrors: {
+            trigger: actions.addresses.resetErrors.trigger,
+          },
+          createAddress: {
+            trigger: actions.addresses.createAddress.trigger,
+          },
         },
       },
       SidebarContainerProps: (

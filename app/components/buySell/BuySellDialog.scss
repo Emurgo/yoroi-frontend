@@ -1,0 +1,37 @@
+@import '../../themes/mixins/underline';
+
+.component {
+  padding-left: 40px;
+  padding-right: 40px;
+  max-height: 600px;
+
+  .description {
+    color: var(--theme-dialog-title-color);
+    font-family: var(--font-regular);
+    font-size: 16px;
+    line-height: 19px;
+    text-align: center;
+  }
+}
+
+.content {
+  font-family: var(--font-regular);
+  font-size: 16px;
+}
+
+.row {
+  .left {
+    .nameAndCurrency {
+
+    }
+    .address {
+
+    }
+  }
+  .right {
+   .selectAddress {
+
+   }
+  }
+}
+

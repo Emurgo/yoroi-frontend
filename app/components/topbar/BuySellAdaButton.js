@@ -29,8 +29,7 @@ export default class BuySellAdaButton extends Component<Props> {
       <Button
         label={intl.formatMessage(globalMessages.buySellAda)}
         className={classnames([styles.button, 'primary'])}
-        onClick={() => this.props.onBuySellClick}
-        // onClick={() => (console.log('hey!'))}
+        onClick={() => this.props.onBuySellClick()}
         skin={ButtonSkin}
       />
     );
