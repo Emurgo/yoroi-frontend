@@ -61,10 +61,8 @@ export default class ChangellyFetcher extends Component<Props> {
           *   - Integrate Changelly Widget
           *
           * allow-popups:
-          * The stake pool list contains list for things like
-          *   - Accessing the stake pool website
-          *   - Seeing more information on an explorer
-          * Instead of opening these links inside the iframe, we open these as new tabs
+          * Part of the flow of Changelly, requires sometimes to open a new page
+          * on a partner website like MoonPay for KYC.
           * This requires "allows-popups"
           *
           * Popups from an iframe inherit the sandbox behavior

@@ -41,11 +41,11 @@ import { MultiToken } from '../../api/common/lib/MultiToken'
 import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore'
 import { genLookupOrFail, getTokenName } from '../../stores/stateless/tokenHelpers'
 import BuySellDialog from '../../components/buySell/BuySellDialog'
-import type { AddressSubgroupMeta, IAddressTypeStore, IAddressTypeUiSubset } from '../../stores/stateless/addressStores'
-import { allAddressSubgroups } from '../../stores/stateless/addressStores'
+import type { IAddressTypeStore, IAddressTypeUiSubset } from '../../stores/stateless/addressStores'
 import type { AddressFilterKind } from '../../types/AddressFilterTypes'
 import LocalizableError from '../../i18n/LocalizableError'
 import { addressToDisplayString } from '../../api/ada/lib/storage/bridge/utils'
+import { networks } from '../../api/ada/lib/storage/database/prepackaged/networks'
 
 export type GeneratedData = typeof MyWalletsPage.prototype.generated;
 
@@ -167,9 +167,11 @@ export default class MyWalletsPage extends Component<Props> {
         const defaultToken = this.generated.stores.tokenInfoStore.getDefaultTokenInfo(
           wallet.getParent().getNetworkInfo().NetworkId
         )
-
         const currencyName = getTokenName(defaultToken)
-        if (currencyName !== 'ADA') return Promise.resolve(null);
+
+        if (defaultToken.NetworkId === networks.CardanoMainnet.NetworkId) {
+          return Promise.resolve(null);
+        }
 
         // An Address
         const allAddresses = await wallet.getAllUtxoAddresses();
