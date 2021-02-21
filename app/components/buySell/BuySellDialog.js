@@ -64,26 +64,19 @@ export default class BuySellDialog extends Component<Props, State> {
     walletList: null,
   };
 
-  async componentDidMount() {
+  async componentDidMount () {
     const { intl } = this.context;
 
-    this.props.walletList()
-      // eslint-disable-next-line promise/always-return
-      .then((resp) => {
-        const wallets = [
-          ...resp,
-          {
-            walletName: intl.formatMessage(messages.dialogManual),
-            currencyName: '',
-            anAddressFormatted: '',
-          }
-        ]
-        this.setState({ walletList: wallets })
-      })
-      .catch((error) => {
-        Logger.error(`${nameof(BuySellDialog)}::${nameof(this.props.walletList)} error: ` + stringifyError(error));
-        throw error;
-      })
+    const resp = await this.props.walletList()
+    const wallets = [
+      ...resp,
+      {
+        walletName: intl.formatMessage(messages.dialogManual),
+        currencyName: '',
+        anAddressFormatted: '',
+      }
+    ]
+    this.setState({ walletList: wallets })
   }
 
   createRows: ($npm$ReactIntl$IntlFormat, array<WalletInfo>) => Node = (intl, wallets) => (
