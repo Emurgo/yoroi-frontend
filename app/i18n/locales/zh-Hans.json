@@ -65,7 +65,7 @@
   "daedalusTransfer.waiting.progressInfo.restoringAddresses": "正在获取地址",
   "daedalusTransfer.waiting.title.label": "正在恢复 Daedalus 钱包...",
   "daedalusTransfer.waiting.warning": "这会花费较长时间，网络不佳可能失败",
-  "decryption.label": "Decryption password",
+  "decryption.label": "解密密码",
   "global.blog.learnMore": "您可以阅读我们的{blogLink} 以了解更多。",
   "global.contact": "联系支持",
   "global.copyTooltipMessage": "已复制",
