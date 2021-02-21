@@ -64,6 +64,28 @@ export default class BuySellDialog extends Component<Props, State> {
     walletList: null,
   };
 
+  async componentDidMount() {
+    const { intl } = this.context;
+
+    this.props.walletList()
+      // eslint-disable-next-line promise/always-return
+      .then((resp) => {
+        const wallets = [
+          ...resp,
+          {
+            walletName: intl.formatMessage(messages.dialogManual),
+            currencyName: '',
+            anAddressFormatted: '',
+          }
+        ]
+        this.setState({ walletList: wallets })
+      })
+      .catch((error) => {
+        Logger.error(`${nameof(BuySellDialog)}::${nameof(this.props.walletList)} error: ` + stringifyError(error));
+        throw error;
+      })
+  }
+
   createRows: ($npm$ReactIntl$IntlFormat, array<WalletInfo>) => Node = (intl, wallets) => (
     wallets.map((wallet) => {
       return (
@@ -101,24 +123,6 @@ export default class BuySellDialog extends Component<Props, State> {
     const { intl } = this.context;
 
     if (this.state.walletList == null) {
-      this.props.walletList()
-        // eslint-disable-next-line promise/always-return
-        .then((resp) => {
-          const wallets = [
-            ...resp,
-            {
-              walletName: intl.formatMessage(messages.dialogManual),
-              currencyName: '',
-              anAddressFormatted: '',
-            }
-          ]
-          this.setState({ walletList: wallets })
-        })
-        .catch((error) => {
-          Logger.error(`${nameof(BuySellDialog)}::${nameof(this.props.walletList)} error: ` + stringifyError(error));
-          throw error;
-        })
-
       return (
         <VerticallyCenteredLayout>
           <LoadingSpinner />
