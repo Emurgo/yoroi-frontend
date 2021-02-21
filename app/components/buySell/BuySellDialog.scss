@@ -17,21 +17,61 @@
 .content {
   font-family: var(--font-regular);
   font-size: 16px;
+  flex-direction: column;
 }
 
 .row {
-  .left {
-    .nameAndCurrency {
+  display: flex;
+  flex-direction: row;
+  height: 60px;
+  align-items: flex-start;
 
+  .left {
+    flex: 7;
+
+    .nameAndCurrency {
+      color: #242838;
+      font-size: 16px;
+      letter-spacing: 0;
+      line-height: 22px;
     }
     .address {
-
+        color: #6B7384;
+        font-size: 14px;
+        letter-spacing: 0;
+        line-height: 22px;
     }
   }
   .right {
-   .selectAddress {
-
-   }
+    flex:1;
+     width: 40px;
+     height: 40px;
   }
 }
 
+.row:first-child {
+  margin-top: 40px;
+}
+
+.verifyIcon {
+  cursor: pointer;
+  object-fit: contain;
+  display: inline-flex;
+  margin-left: 5px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  transition: background-color 0.3s;
+  & > svg {
+    display: block;
+    margin: auto;
+    height: 20px;
+    width: 20px;
+    path {
+      fill: var(--theme-icon-copy-address-color);
+    }
+  }
+  &:hover {
+    background-color: var(--cmn-default-color-grey-5);
+  }
+}

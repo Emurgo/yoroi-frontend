@@ -11,6 +11,11 @@ import DialogCloseButton from '../widgets/DialogCloseButton';
 import ChangellyFetcher from './ChangellyFetcher'
 
 import styles from './BuySellDialog.scss';
+import VerifyIcon from '../../assets/images/verify-icon.inline.svg'
+import classnames from 'classnames'
+import { Logger, stringifyError } from '../../utils/logging'
+import VerticallyCenteredLayout from '../layout/VerticallyCenteredLayout'
+import LoadingSpinner from '../widgets/LoadingSpinner'
 
 const messages = defineMessages({
   dialogTitle: {
@@ -38,6 +43,7 @@ const WIDGET_URL = 'https://widget.changelly.com?from=*&to=*&amount=200&fromDefa
 
 type State = {|
   addressSelected: ?string,
+  walletList: ?array<WalletInfo>,
 |};
 
 @observer
@@ -48,38 +54,38 @@ export default class BuySellDialog extends Component<Props, State> {
 
   state: State = {
     addressSelected: null,
+    walletList: null,
   };
 
-  createRows: array<WalletInfo> => Node = (wallets) => (
+  createRows: ($npm$ReactIntl$IntlFormat, array<WalletInfo>) => Node = (intl, wallets) => (
     wallets.map((wallet) => {
       return (
-        <li key={wallet.walletName}>
-          <div className={styles.content}>
-            <div className={styles.row}>
-              <div className={styles.left}>
-                <div className={styles.nameAndCurrency}>
-                  ({wallet.currencyName}) {wallet.walletName}
-                </div>
-                <div className={styles.address}>
-                  {truncateAddress(wallet.anAddressFormatted)}
-                </div>
-              </div>
-              <div className={styles.right}>
-                <button
-                  type="button"
-                  className={styles.selectAddress}
-                  onClick={() => {
-                    this.state.addressSelected = wallet.anAddressFormatted
-                    console.log('address selected')
-                    console.log(this.state.addressSelected)
-                  }}
-                >
-                  Select
-                </button>
-              </div>
+        <div className={styles.row}>
+          <div className={styles.left}>
+            <div className={styles.nameAndCurrency}>
+              ({wallet.currencyName}) {wallet.walletName}
+            </div>
+            <div className={styles.address}>
+              {truncateAddress(wallet.anAddressFormatted)}
             </div>
           </div>
-        </li>
+          <div className={styles.right}>
+            {/* Verify Address action */}
+            <button
+              type="button"
+              onClick={() =>
+                this.setState({ addressSelected: wallet.anAddressFormatted })
+              }
+            >
+              <div>
+                <span className={styles.verifyIcon}>
+                  <VerifyIcon />
+                </span>
+              </div>
+            </button>
+            {/* Action block end */}
+          </div>
+        </div>
       )
     })
   )
@@ -87,35 +93,25 @@ export default class BuySellDialog extends Component<Props, State> {
   render(): Node {
     const { intl } = this.context;
 
-    console.log('Wallet list')
-    console.log(this.props.walletList())
-    // &address=AAAAAAA
+    if (this.state.walletList == null) {
+      this.props.walletList()
+        // eslint-disable-next-line promise/always-return
+        .then((resp) => {
+          this.setState({ walletList: resp })
+        })
+        .catch((error) => {
+          Logger.error(`${nameof(BuySellDialog)}::${nameof(this.props.walletList)} error: ` + stringifyError(error));
+          throw error;
+        })
 
-    const result = [
-       {
-         walletName: 'Nico Ergo Test',
-         currencyName: 'ERG',
-         anAddressFormatted: '9gvvnszDQV3BMDfh4kPcuWXrUmuCRqgT2fuqQ2TZDK6kQZaW6K2'
-       },
-       {
-         walletName: 'Nico Test Empty Ergo',
-         currencyName: 'ERG',
-         anAddressFormatted: '9emv7LAtw7U6xMs4JrJP8NTPvwQjNRaSWpgSTGEM6947fFofBWd'
-       },
-       {
-         walletName: 'Nico Testnet',
-         currencyName: 'TADA',
-         anAddressFormatted: 'addr_test1vzddgtdqxmsvn0rqp0ltdfpddudvf76qs3esyn3zqf44drsv4avcs'
-       },
-       {
-         walletName: 'Nico Test Mainnet',
-         currencyName: 'ADA',
-         anAddressFormatted: 'addr1vxddgtdqxmsvn0rqp0ltdfpddudvf76qs3esyn3zqf44drshafsh4'
-       }
-    ]
-
+      return (
+        <VerticallyCenteredLayout>
+          <LoadingSpinner />
+        </VerticallyCenteredLayout>
+      );
+    }
     if (this.state.addressSelected == null) {
-      const addressNodes = this.createRows(result);
+      const addressNodes = this.createRows(intl, this.state.walletList);
 
       return (
         <Dialog
@@ -125,27 +121,31 @@ export default class BuySellDialog extends Component<Props, State> {
           closeButton={<DialogCloseButton />}
           className=""
         >
-          {addressNodes}
+          <div className={styles.content}>
+            {intl.formatMessage(messages.dialogDescription)}
+            {addressNodes}
+          </div>
         </Dialog>
       )
     }
 
-    return (
-      <Dialog
-        title={intl.formatMessage(messages.dialogTitle)}
-        closeOnOverlayClick={false}
-        onClose={this.props.onCancel}
-        closeButton={<DialogCloseButton />}
-        className=""
-      >
-        <div className={styles.component}>
-          <div className={styles.description}>
-            {intl.formatMessage(messages.dialogDescription)}
-            {this.props.walletList}
+      return (
+        <Dialog
+          title={intl.formatMessage(messages.dialogTitle)}
+          closeOnOverlayClick={false}
+          onClose={this.props.onCancel}
+          closeButton={<DialogCloseButton />}
+          className=""
+        >
+          <div className={styles.component}>
+            <div className={styles.description}>
+              {intl.formatMessage(messages.dialogDescription)}
+              {this.props.walletList}
+            </div>
+            <ChangellyFetcher widgetURL={WIDGET_URL} address={this.state.addressSelected} />
           </div>
-          <ChangellyFetcher widgetURL={WIDGET_URL} address={this.state.addressSelected} />
-        </div>
-      </Dialog>
-    );
+        </Dialog>
+      );
+
   }
 }

@@ -163,18 +163,20 @@ export default class MyWalletsPage extends Component<Props> {
         const settingsCache: ConceptualWalletSettingsCache = this.generated.stores.walletSettings
           .getConceptualWalletSettingsCache(parent);
 
-        // An Address
-        const allAddresses = await wallet.getAllUtxoAddresses();
-        const anAddressFormatted = addressToDisplayString(
-          allAddresses[0].addrs[0].Hash,
-          parent.getNetworkInfo()
-        )
-
         // Currency Name
         const defaultToken = this.generated.stores.tokenInfoStore.getDefaultTokenInfo(
           wallet.getParent().getNetworkInfo().NetworkId
         )
+
         const currencyName = getTokenName(defaultToken)
+        if (currencyName !== 'ADA') return Promise.resolve(null);
+
+        // An Address
+        const allAddresses = await wallet.getAllUtxoAddresses();
+        const anAddressFormatted = addressToDisplayString(
+          allAddresses[0].addrs[1].Hash,
+          parent.getNetworkInfo()
+        )
 
         return {
           walletName: settingsCache.conceptualWalletName,
@@ -182,7 +184,7 @@ export default class MyWalletsPage extends Component<Props> {
           anAddressFormatted,
         }
       })
-      return await Promise.all(infoWallets)
+      return (await Promise.all(infoWallets)).filter((x) => !!x)
   }
 
   /*
