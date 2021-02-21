@@ -51,7 +51,6 @@ export default class ChangellyFetcher extends Component<Props> {
       throw new Error('Changelly URL undefined. this should never happen');
     }
 
-    // TODO: look into iframe's CSP policy once our backend implement a CSP
     return (
       <iframe
         /**
@@ -59,8 +58,7 @@ export default class ChangellyFetcher extends Component<Props> {
           *
           * allow-scripts:
           * The iframe uses javascript for:
-          *   - General UI
-          *   - Communicate with the extension (ex: postMessage)
+          *   - Integrate Changelly Widget
           *
           * allow-popups:
           * The stake pool list contains list for things like
@@ -68,22 +66,17 @@ export default class ChangellyFetcher extends Component<Props> {
           *   - Seeing more information on an explorer
           * Instead of opening these links inside the iframe, we open these as new tabs
           * This requires "allows-popups"
-          * TODO: we can get rid of this in the future by making that instead,
-          *       links pass a website URL back through postMessage
-          *       Then, Yoroi opens a dialog asking "You're about to visit https://foo.com are you sure?
           *
-          * allow-popups-to-escape-sandbox:
-          * (see above for why we need popups at all)
           * Popups from an iframe inherit the sandbox behavior
           * We need popups to escape the sandbox
           * Otherwise it will block sites from standard web behavior like
           *     - Playing media
           *     - Storing cookies on the website
         */
-        sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox allow-same-origin"
+        sandbox="allow-scripts allow-popups allow-same-origin"
         referrerPolicy="no-referrer"
         ref={this.setFrame}
-        title="Staking"
+        title="Changelly"
         src={`${this.addAddressToWidget(widgetURL, address)}`}
         frameBorder="0"
         width="100%"
