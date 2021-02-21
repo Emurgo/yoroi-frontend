@@ -246,7 +246,7 @@ class MockLedgerConnect {
         RustModule.WalletV4.BigNum.from_str(output.amountStr)
       );
       const multiasset = RustModule.WalletV4.MultiAsset.new();
-      for (const assetGroup of output.tokenBundle) {
+      for (const assetGroup of (output.tokenBundle ?? [])) {
         const scriptHash = RustModule.WalletV4.ScriptHash.from_bytes(Buffer.from(assetGroup.policyIdHex, 'hex'));
 
         const assets = RustModule.WalletV4.Assets.new();

@@ -1,6 +1,6 @@
 // @flow
 
-import { Given, When, Then } from 'cucumber';
+import { When, Then } from 'cucumber';
 import { By, Key } from 'selenium-webdriver';
 import i18n from '../support/helpers/i18n-helpers';
 

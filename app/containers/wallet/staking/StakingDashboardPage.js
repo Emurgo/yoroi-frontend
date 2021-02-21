@@ -31,7 +31,6 @@ import type { PoolTuples, ReputationObject } from '../../../api/jormungandr/lib/
 import type { PoolMeta, DelegationRequests } from '../../../stores/toplevel/DelegationStore';
 import type { AdaDelegationRequests } from '../../../stores/ada/AdaDelegationStore';
 import EpochProgressContainer from './EpochProgressContainer';
-import type { GeneratedData as EpochProgressContainerData } from './EpochProgressContainer';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';

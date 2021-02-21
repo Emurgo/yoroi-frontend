@@ -658,12 +658,12 @@ export const getVarsForTheme: ({|
 
 export function getPaperWalletIntro(currentLocale: string, defaultLocale: string): string {
   try {
-    return require(`../../i18n/locales/paper-wallets/intro/${currentLocale}.md`);
+    return require(`../../i18n/locales/paper-wallets/intro/${currentLocale}.md`).default;
   } catch {
-    return require(`../../i18n/locales/paper-wallets/intro/${defaultLocale}.md`);
+    return require(`../../i18n/locales/paper-wallets/intro/${defaultLocale}.md`).default;
   }
 }
 
 export function getTermsOfUse(api: 'ada', currentLocale: string): string {
-  return require(`../../i18n/locales/terms-of-use/${api}/${currentLocale}.md`);
+  return require(`../../i18n/locales/terms-of-use/${api}/${currentLocale}.md`).default;
 }

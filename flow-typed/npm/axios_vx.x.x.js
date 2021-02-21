@@ -1,6 +1,3 @@
-// flow-typed signature: fe7f00984c44d69833f19bc39895832f
-// flow-typed version: a4cc3d5e98/axios_v0.19.x/flow_>=v0.104.x
-
 declare module 'axios' {
   import type { Agent as HttpAgent } from 'http';
   import type { Agent as HttpsAgent } from 'https';
@@ -208,7 +205,7 @@ declare module 'axios' {
     Cancel: typeof Cancel;
     CancelToken: typeof CancelToken;
     isCancel(value: mixed): boolean;
-    create(config?: AxiosXHRConfigBase<T, R>): Axios;
+    create<T, R>(config?: AxiosXHRConfigBase<T, R>): Axios;
     all: typeof Promise.all;
     spread<T, R>(callback: (...args: T) => R): (array: T) => R;
   }

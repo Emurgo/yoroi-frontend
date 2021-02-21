@@ -8,7 +8,7 @@ import {
   Servers,
   serverToPermission,
 } from '../scripts/connections';
-import { version } from '../package.json';
+import pkg from '../package.json';
 
 import { POOLS_UI_URL_FOR_YOROI, CHANGELLY_URL } from './manifestEnvs';
 
@@ -28,7 +28,7 @@ export default (isDebug: boolean): * => buildManifest({
       ],
     },
   }),
-  version,
+  version: pkg.version,
   geckoKey: '{530f7c6c-6077-4703-8f71-cb368c663e35}',
   enableProtocolHandlers: true,
 });

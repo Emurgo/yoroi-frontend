@@ -97,7 +97,6 @@ export const VOTING: TopbarCategory = registerCategory({
   label: messages.voting,
   isVisible: request => (
     asGetStakingKey(request.selected) != null
-      && (!environment.isProduction() || environment.isTest())
   ),
 });
 export const SEIZA_STAKE_SIMULATOR: TopbarCategory = registerCategory({

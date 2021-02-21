@@ -27,6 +27,10 @@ const messages = defineMessages({
     id: 'wallet.voting.dialog.step.qr.line3',
     defaultMessage: '!!!Also we suggest to take a screenshot of it as a backup — you won’t be able to access this QR code after clicking Complete.',
   },
+  actionButton: {
+    id: 'wallet.voting.dialog.step.qr.actionButton',
+    defaultMessage: '!!!Confirm that I saved the QR code'
+  }
 });
 
 type Props = {|
@@ -48,9 +52,9 @@ export default class QrCodeDialog extends Component<Props> {
     const { intl } = this.context;
     const { progressInfo, submit, cancel, classicTheme, votingKey } = this.props;
 
-    const dailogActions = [
+    const dialogActions = [
       {
-        label: intl.formatMessage(globalMessages.completeLabel),
+        label: intl.formatMessage(messages.actionButton),
         primary: true,
         onClick: submit,
       },
@@ -60,7 +64,7 @@ export default class QrCodeDialog extends Component<Props> {
       <Dialog
         className={classnames([styles.dialog])}
         title={intl.formatMessage(globalMessages.votingRegistrationTitle)}
-        actions={dailogActions}
+        actions={dialogActions}
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
         onClose={cancel}
@@ -75,7 +79,7 @@ export default class QrCodeDialog extends Component<Props> {
           {intl.formatMessage(messages.line2)}
         </div>
 
-        <div className={styles.lineBold}>
+        <div className={classnames([styles.lineBold, styles.importantText])}>
           {intl.formatMessage(messages.line3)}
         </div>
 

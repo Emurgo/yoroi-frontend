@@ -29160,7 +29160,7 @@ declare module 'dropbox' {
 
 
   declare class Dropbox {
-    constructor(options: DropboxOptions): void;
+    constructor(options: DropboxTypes$DropboxOptions): void;
 
     authTokenRevoke(arg: void): Promise<void>;
 

@@ -4,6 +4,9 @@ const tasks = require('./tasks');
 const connections = require('./connections');
 
 const createWebpackServer = require('webpack-httpolyglot-server');
+const webpack = require('webpack');
+const webpackDevMiddleware = require('webpack-dev-middleware');
+const webpackHotMiddleware = require('webpack-hot-middleware');
 
 const ENV = 'test';
 
@@ -46,7 +49,13 @@ const { MockChain, resetChain } = require('../features/mock-chain/mockCardanoImp
 getMockServer({ outputLog: true });
 resetChain(MockChain.Standard);
 
-createWebpackServer(config.baseDevConfig(ENV, false), {
-  host: 'localhost',
-  port: connections.Ports.WebpackDev,
-});
+createWebpackServer(
+  config.baseDevConfig(ENV, false),
+  webpack,
+  webpackDevMiddleware,
+  webpackHotMiddleware,
+  {
+    host: 'localhost',
+    port: connections.Ports.WebpackDev,
+  }
+);
