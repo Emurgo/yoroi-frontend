@@ -116,7 +116,7 @@
   "global.labels.shelleyLabel": "Shelley",
   "global.labels.spendingKey": "Harcama anahtarı",
   "global.labels.spendingKeyHash": "Harcama anahtarı hash'i",
-  "global.labels.stakepool": "!!!Stakepool Name",
+  "global.labels.stakepool": "!!!Stake Havuz Adı",
   "global.labels.stakingKey": "Staking anahtarı",
   "global.labels.stakingKeyHash": "Staking anahtarı hash'i",
   "global.labels.upgrade": "Yükselt",
