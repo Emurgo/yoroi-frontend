@@ -12,7 +12,6 @@ import ChangellyFetcher from './ChangellyFetcher'
 
 import styles from './BuySellDialog.scss';
 import VerifyIcon from '../../assets/images/verify-icon.inline.svg'
-import classnames from 'classnames'
 import { Logger, stringifyError } from '../../utils/logging'
 import VerticallyCenteredLayout from '../layout/VerticallyCenteredLayout'
 import LoadingSpinner from '../widgets/LoadingSpinner'
@@ -22,9 +21,17 @@ const messages = defineMessages({
     id: 'buysell.dialog.title',
     defaultMessage: '!!!Buy / Sell ADA',
   },
+  dialogSelectAddress: {
+    id: 'buysell.dialog.selectAddress',
+    defaultMessage: '!!!Please select the receiving address. This will be shared with the third party provider called Changelly for the buy / sell of ADA. ',
+  },
   dialogDescription: {
-    id: 'buysell.dialog.description',
-    defaultMessage: '!!!Cardano is the first provably secure proof of stake protocol',
+    id: 'buysell.dialog.instructions',
+    defaultMessage: '!!!Please select your preferences. On the next screen, confirm your selection by pressing the green arrow on the top right',
+  },
+  dialogManual: {
+    id: 'buysell.dialog.manual',
+    defaultMessage: '!!!I will add my address manually',
   },
 });
 
@@ -63,7 +70,7 @@ export default class BuySellDialog extends Component<Props, State> {
         <div className={styles.row}>
           <div className={styles.left}>
             <div className={styles.nameAndCurrency}>
-              ({wallet.currencyName}) {wallet.walletName}
+              { wallet.currencyName ? `(${wallet.currencyName}) ` : ''}{wallet.walletName}
             </div>
             <div className={styles.address}>
               {truncateAddress(wallet.anAddressFormatted)}
@@ -97,7 +104,15 @@ export default class BuySellDialog extends Component<Props, State> {
       this.props.walletList()
         // eslint-disable-next-line promise/always-return
         .then((resp) => {
-          this.setState({ walletList: resp })
+          const wallets = [
+            ...resp,
+            {
+              walletName: intl.formatMessage(messages.dialogManual),
+              currencyName: '',
+              anAddressFormatted: '',
+            }
+          ]
+          this.setState({ walletList: wallets })
         })
         .catch((error) => {
           Logger.error(`${nameof(BuySellDialog)}::${nameof(this.props.walletList)} error: ` + stringifyError(error));
@@ -122,7 +137,7 @@ export default class BuySellDialog extends Component<Props, State> {
           className=""
         >
           <div className={styles.content}>
-            {intl.formatMessage(messages.dialogDescription)}
+            {intl.formatMessage(messages.dialogSelectAddress)}
             {addressNodes}
           </div>
         </Dialog>
