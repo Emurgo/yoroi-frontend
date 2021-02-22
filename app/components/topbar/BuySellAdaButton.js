@@ -10,9 +10,9 @@ import classnames  from 'classnames';
 import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 
-type Props = {||};
-
-const EXCHANGE_URL = 'https://exchange.yoroiwallet.com';
+type Props = {|
+  +onBuySellClick: void => void,
+|};
 
 @observer
 export default class BuySellAdaButton extends Component<Props> {
@@ -29,7 +29,7 @@ export default class BuySellAdaButton extends Component<Props> {
       <Button
         label={intl.formatMessage(globalMessages.buySellAda)}
         className={classnames([styles.button, 'secondary'])}
-        onClick={() => window.open(EXCHANGE_URL, '_blank')}
+        onClick={() => this.props.onBuySellClick()}
         skin={ButtonSkin}
       />
     );

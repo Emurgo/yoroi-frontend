@@ -15,7 +15,12 @@ const SEIZA_URL /*: string */ = process.env.SEIZA_URL != null
   ? process.env.SEIZA_URL // suggested: 'http://localhost:3000'
   : 'https://adapools.yoroiwallet.com';
 
+const CHANGELLY_URL = process.env.changelly_url != null
+  ? process.env.changelly_url
+  : 'https://widget.changelly.com/';
+
 module.exports = {
+  CHANGELLY_URL,
   POOLS_UI_URL_FOR_YOROI,
   SEIZA_URL,
 };

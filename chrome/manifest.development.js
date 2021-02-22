@@ -8,6 +8,8 @@ import {
   Servers,
   serverToPermission,
 } from '../scripts/connections';
+import { version } from '../package.json';
+import { CHANGELLY_URL, POOLS_UI_URL_FOR_YOROI } from './manifestEnvs'
 import pkg from '../package.json';
 
 export default (isDebug: boolean): * => buildManifest({
@@ -18,6 +20,10 @@ export default (isDebug: boolean): * => buildManifest({
     additional: {
       'connect-src': [
         serverToPermission(Servers.Primary),
+      ],
+      'frame-src': [
+        POOLS_UI_URL_FOR_YOROI,
+        CHANGELLY_URL,
       ],
     },
   }),
