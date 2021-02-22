@@ -4,6 +4,7 @@ import { When, Then } from 'cucumber';
 import { By } from 'selenium-webdriver';
 import { expect } from 'chai';
 import { hiddenAmount } from '../../app/utils/strings';
+import { truncateAddress, } from '../../app/utils/formatters';
 
 Then(/^I should see the balance number "([^"]*)"$/, async function (number) {
   await this.waitUntilText('.NavWalletDetails_amount', number);
@@ -76,4 +77,13 @@ Then(/^I switch to "([^"]*)" from the dropdown$/, async function (walletName) {
     }
   }
   throw new Error(`No wallet found with name ${walletName}`);
+});
+
+Then(/^I select buy-sell from the dropdown$/, async function () {
+  await this.click('.NavDropdown_toggle');
+  await this.click('.BuySellAdaButton_button');
+});
+
+Then(/^I should see the pre-filled address "([^"]*)"$/, async function (address) {
+  await this.waitUntilContainsText('.BuySellDialog_address', truncateAddress(address));
 });

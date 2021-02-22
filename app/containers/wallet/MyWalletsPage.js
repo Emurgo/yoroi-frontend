@@ -29,7 +29,7 @@ import NavBarAddButton from '../../components/topbar/NavBarAddButton'
 import BuySellAdaButton from '../../components/topbar/BuySellAdaButton'
 import globalMessages from '../../i18n/global-messages'
 import { ConceptualWallet, } from '../../api/ada/lib/storage/models/ConceptualWallet/index'
-import { asGetPublicKey, asGetAllUtxos, } from '../../api/ada/lib/storage/models/PublicDeriver/traits'
+import { asGetPublicKey, } from '../../api/ada/lib/storage/models/PublicDeriver/traits'
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index'
 import type { ConceptualWalletSettingsCache } from '../../stores/toplevel/WalletSettingsStore'
 import type { DelegationRequests } from '../../stores/toplevel/DelegationStore'
@@ -40,6 +40,7 @@ import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tab
 import { MultiToken } from '../../api/common/lib/MultiToken'
 import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore'
 import { genLookupOrFail, getTokenName } from '../../stores/stateless/tokenHelpers'
+import { getReceiveAddress } from '../../stores/stateless/addressStores';
 import BuySellDialog from '../../components/buySell/BuySellDialog';
 import type { WalletInfo } from '../../components/buySell/BuySellDialog';
 import { addressToDisplayString } from '../../api/ada/lib/storage/bridge/utils'
@@ -171,14 +172,10 @@ export default class MyWalletsPage extends Component<Props> {
           return null;
         }
 
-        // TODO: best to avoid calling a function that depends on the DB state from the UI
-        const withUtxos = asGetAllUtxos(wallet);
-        if (withUtxos == null) return null;
-
-        // An Address
-        const allAddresses = await withUtxos.getAllUtxoAddresses();
+        const receiveAddress = await this.generated.getReceiveAddress(wallet);
+        if (receiveAddress == null) return null;
         const anAddressFormatted = addressToDisplayString(
-          allAddresses[0].addrs[1].Hash,
+          receiveAddress.addr.Hash,
           parent.getNetworkInfo()
         )
 
@@ -416,7 +413,8 @@ export default class MyWalletsPage extends Component<Props> {
         getPublicKeyCache: IGetPublic => PublicKeyCache,
         publicDerivers: Array<PublicDeriver<>>
       |}
-    |}
+    |},
+    getReceiveAddress: typeof getReceiveAddress,
     |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
@@ -426,6 +424,8 @@ export default class MyWalletsPage extends Component<Props> {
     }
     const { stores, actions } = this.props;
     return Object.freeze({
+      // make this function easy to mock out in Storybook
+      getReceiveAddress,
       stores: {
         profile: {
           shouldHideBalance: stores.profile.shouldHideBalance,

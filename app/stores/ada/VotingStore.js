@@ -34,6 +34,7 @@ import {
 } from '../../domain/LedgerLocalizedError';
 import LocalizableError from '../../i18n/LocalizableError';
 import cryptoRandomString from 'crypto-random-string';
+import { getReceiveAddress } from '../stateless/addressStores';
 
 export const ProgressStep = Object.freeze({
   GENERATE: 0,
@@ -223,10 +224,8 @@ export default class VotingStore extends Store {
         .sign(catalystPrivateKeyBytes)
         .to_hex();
 
-      const withChains = asHasUtxoChains(publicDeriver);
-      if (!withChains) throw new Error(`${nameof(this._createTransaction)} missing chains functionality`);
-      const nextInternal = await withChains.nextInternal();
-      if (nextInternal.addressInfo == null) {
+      const nextInternal = await getReceiveAddress(publicDeriver);
+      if (nextInternal == null) {
         throw new Error(`${nameof(this._createTransaction)} no internal addresses left. Should never happen`);
       }
 
@@ -250,7 +249,7 @@ export default class VotingStore extends Store {
           data: {
             '1': `0x${catalystPubKey}`,
             '2': `0x${stakeKeyPub}`,
-            '3': `0x${nextInternal.addressInfo.addr.Hash}`,
+            '3': `0x${nextInternal.addr.Hash}`,
           },
         },
         {

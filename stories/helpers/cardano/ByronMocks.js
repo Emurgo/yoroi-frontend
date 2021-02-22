@@ -15,7 +15,7 @@ import {
   GetSigningKey,
   GetPublicKey,
   DisplayCutoff,
-  Bip44PickInternal,
+  CardanoBip44PickReceive,
   HasUtxoChains,
 } from '../../../app/api/ada/lib/storage/models/PublicDeriver/traits';
 import {
@@ -86,7 +86,7 @@ function genByronSigningWallet(
     null,
     null,
   );
-  const clazz = HasUtxoChains(Bip44PickInternal(
+  const clazz = HasUtxoChains(CardanoBip44PickReceive(
     DisplayCutoff(GetSigningKey(GetPublicKey(
       GetAllUtxos(HasLevels(HasSign(HasPrivateDeriver((PublicDeriver: any)))))
     )))

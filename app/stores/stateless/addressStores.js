@@ -22,7 +22,7 @@ import {
 import { CoinTypes, } from '../../config/numbersConfig';
 import type { CoinTypesT, } from '../../config/numbersConfig';
 import {
-  asHasUtxoChains, asHasLevels,
+  asHasUtxoChains, asHasLevels, asGetAllUtxos, asPickReceive,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import { Bip44Wallet } from '../../api/ada/lib/storage/models/Bip44Wallet/wrapper';
 import { Cip1852Wallet } from '../../api/ada/lib/storage/models/Cip1852Wallet/wrapper';
@@ -46,6 +46,8 @@ import { CardanoForks } from '../../api/ada/lib/storage/database/prepackaged/net
 import type { $npm$ReactIntl$IntlFormat, } from 'react-intl';
 import type {
   Addressing,
+  BaseSingleAddressPath,
+  IPublicDeriver,
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 
 export type SubgroupCtorData = {|
@@ -515,3 +517,30 @@ export function genAddressLookup(
 }
 
 export const mangledStores = [GROUP_MANGLED, BASE_MANGLED];
+
+export async function getReceiveAddress(
+  publicDeriver: IPublicDeriver<>,
+): Promise<void | BaseSingleAddressPath> {
+  const withChains = asHasUtxoChains(publicDeriver);
+  if (withChains) {
+    const nextInternal = await withChains.nextInternal();
+    return nextInternal.addressInfo;
+  }
+  const withUtxos = asGetAllUtxos(publicDeriver);
+  if (withUtxos) {
+
+    const allAddresses = await withUtxos.getAllUtxoAddresses();
+    const pickReceive = asPickReceive(withUtxos);
+    if (pickReceive) {
+      return pickReceive.pickReceive(allAddresses[0]);
+    }
+    // if no particular algorithm for picking the address, just pick the first one
+    const address = allAddresses[0];
+    return {
+      addr: address.addrs[0],
+      row: address.row,
+      addressing: address.addressing,
+    };
+  }
+  return undefined;
+}

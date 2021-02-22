@@ -15,7 +15,7 @@ import {
   GetSigningKey,
   GetPublicKey,
   DisplayCutoff,
-  Cip1852PickInternal,
+  Cip1852PickReceive,
   GetAllAccounting,
   GetStakingKey,
   HasUtxoChains,
@@ -235,7 +235,7 @@ export function genShelleyCip1852SigningWallet(
     null,
     null,
   );
-  const clazz = HasUtxoChains(Cip1852PickInternal(GetStakingKey(GetAllAccounting(
+  const clazz = HasUtxoChains(Cip1852PickReceive(GetStakingKey(GetAllAccounting(
     DisplayCutoff(GetSigningKey(GetPublicKey(
       GetAllUtxos(HasLevels(HasSign(HasPrivateDeriver((PublicDeriver: any)))))
     )))

@@ -24,6 +24,7 @@ import { defaultAssets, } from '../../api/ada/lib/storage/database/prepackaged/n
 import { mockFromDefaults, getDefaultEntryTokenInfo, } from '../../stores/toplevel/TokenInfoStore';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import BuySellDialog from '../../components/buySell/BuySellDialog';
+import { CoreAddressTypes, } from '../../api/ada/lib/storage/database/primitives/enums';
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -91,8 +92,10 @@ const genBaseProps: {|
   lookup: *,
   publicDerivers: Array<PublicDeriver<>>,
   openDialog?: *,
+  getReceiveAddress: *,
 |} => * = (request) => {
   return {
+    getReceiveAddress: request.getReceiveAddress,
     stores: {
       profile: {
         shouldHideBalance: false,
@@ -183,6 +186,23 @@ const genBaseProps: {|
   };
 }
 
+const mockAddressInfo = {
+  addr: {
+    AddressId: 0,
+    Digest: 0,
+    Type: CoreAddressTypes.CARDANO_BASE,
+    Hash: '0136e35ce4f06cdcf74d2307f6cefa1ad74e14060be6dac5a29eb1423f56db5cd4889c84110d4de90c0d503b51b844db3e6fd87991238995bb'
+  },
+  row: {
+    CanonicalAddressId: 0,
+    KeyDerivationId: 0,
+  },
+  addressing: {
+    path: [],
+    startLevel: 0,
+  },
+};
+
 export const Wallets = (): Node => {
   const wallets = [
     genWallet(),
@@ -198,11 +218,12 @@ export const Wallets = (): Node => {
     generated={genBaseProps({
       lookup,
       publicDerivers,
+      getReceiveAddress: async () => mockAddressInfo,
     })}
   />);
 };
 
-export const BuySellLoading = (): Node => {
+export const BuySellAddressList = (): Node => {
   const wallets = [
     genWallet(),
     genWallet(),
@@ -218,6 +239,7 @@ export const BuySellLoading = (): Node => {
       lookup,
       publicDerivers,
       openDialog: BuySellDialog,
+      getReceiveAddress: async () => mockAddressInfo,
     })}
   />);
 };

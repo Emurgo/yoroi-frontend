@@ -25,9 +25,6 @@ import {
   getCryptoDaedalusWalletFromMasterKey
 } from '../../api/ada/lib/cardanoCrypto/cryptoWallet';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
-import {
-  asHasUtxoChains,
-} from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import { getApiForNetwork } from '../../api/common/utils';
 import type { AddressKeyMap } from '../../api/ada/transactions/types';
@@ -36,6 +33,7 @@ import { normalizeToBase58 } from '../../api/ada/lib/storage/bridge/utils';
 import type {
   Address, Addressing
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
+import { getReceiveAddress } from '../stateless/addressStores';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
@@ -108,15 +106,13 @@ export default class DaedalusTransferStore extends Store {
     wallet,
     publicDeriver,
   ) => {
-    const withChains = asHasUtxoChains(publicDeriver);
-    if (!withChains) throw new Error(`${nameof(this._setupTransferWebSocket)} missing chains functionality`);
-    const nextInternal = await withChains.nextInternal();
-    if (nextInternal.addressInfo == null) {
+    const nextInternal = await getReceiveAddress(publicDeriver);
+    if (nextInternal == null) {
       throw new Error(`${nameof(this._setupTransferWebSocket)} no internal addresses left. Should never happen`);
     }
     const nextInternalAddress = {
-      address: nextInternal.addressInfo.addr.Hash,
-      addressing: nextInternal.addressInfo.addressing,
+      address: nextInternal.addr.Hash,
+      addressing: nextInternal.addressing,
     };
 
     this._updateStatus(TransferStatus.RESTORING_ADDRESSES);

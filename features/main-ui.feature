@@ -64,3 +64,10 @@ Feature: Main UI
     Then I should see my balance hidden
     When I click on hide balance button
     Then I should see the balance number "3.110005 ADA"
+
+  @it-180
+  Scenario: Ensure user can hide balance (IT-180)
+    Given I have completed the basic setup
+    And There is a Byron wallet stored named empty-wallet
+    And I select buy-sell from the dropdown
+    Then I should see the pre-filled address "Ae2tdPwUPEYzovVPncvtckSLQmEzzsUw2ydPJeZJYuKw6AogLMbeGqqYiJX"

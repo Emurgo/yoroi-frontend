@@ -10,7 +10,7 @@ import {
   asGetAllUtxos, asHasUtxoChains,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import type {
-  IGetAllUtxosResponse, IHasUtxoChains,
+  IGetAllUtxosResponse, IPublicDeriver,
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import {
   isCardanoHaskell, getCardanoHaskellBaseConfig,
@@ -27,9 +27,10 @@ import {
 import type { TokenRow, } from '../../api/ada/lib/storage/database/primitives/tables';
 import { getDefaultEntryToken } from './TokenInfoStore';
 import { cardanoValueFromMultiToken } from '../../api/ada/transactions/utils';
+import { getReceiveAddress } from '../stateless/addressStores';
 
 export type SetupSelfTxRequest = {|
-  publicDeriver: IHasUtxoChains,
+  publicDeriver: IPublicDeriver<>,
   filter: ElementOf<IGetAllUtxosResponse> => boolean,
 |};
 export type SetupSelfTxFunc = SetupSelfTxRequest => Promise<void>;
@@ -446,12 +447,11 @@ export default class TransactionBuilderStore extends Store {
 
   _setupSelfTx: SetupSelfTxFunc = async (request): Promise<void> => {
     this._setFilter(request.filter);
-    const nextUnusedInternal = await request.publicDeriver.nextInternal();
-    const addressInfo = nextUnusedInternal.addressInfo;
-    if (addressInfo == null) {
-      throw new Error(`${nameof(this._setupSelfTx)} ${nameof(addressInfo)} == null`);
+    const nextUnusedInternal = await getReceiveAddress(request.publicDeriver);
+    if (nextUnusedInternal == null) {
+      throw new Error(`${nameof(this._setupSelfTx)} ${nameof(nextUnusedInternal)} == null`);
     }
-    this._updateReceiver(addressInfo.addr.Hash);
+    this._updateReceiver(nextUnusedInternal.addr.Hash);
     if (this.shouldSendAll === false) {
       this._toggleSendAll();
     }
