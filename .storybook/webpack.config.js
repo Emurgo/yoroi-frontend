@@ -25,18 +25,24 @@ module.exports = async ({ config, mode } /*: {|
       publicPath: './',
     })
     : devConfig.baseDevConfig(ENV, isNightly === 'true');
+
   const finalConfig = {
     ...config,
     node: {
       ...config.node,
       __filename: true,
-      fs: 'empty',
     },
     plugins: [
       ...config.plugins,
       new ConfigWebpackPlugin(),
       new ReactRefreshWebpackPlugin(),
       new webpack.DefinePlugin(commonConfig.definePlugin(ENV, isProduction, isNightly === 'true')),
+      new webpack.ProvidePlugin({
+        process: 'process/browser',
+      }),
+      new webpack.ProvidePlugin({
+        Buffer: ['buffer', 'Buffer'],
+      })
     ],
     module: {
       ...config.module,
@@ -48,12 +54,26 @@ module.exports = async ({ config, mode } /*: {|
         ...config.resolve.extensions,
         '.wasm',
       ],
+      fallback: {
+        ...customConfig.resolve.fallback,
+        ...config.resolve.fallback,
+      },
+      alias: {
+        ...customConfig.resolve.alias,
+        ...config.resolve.alias,
+        // mysteriously we need to alias this for Storybook
+        'cardano-wallet-browser': 'cardano-wallet-browser/cardano_wallet_browser',
+        'ergo-lib-wasm-browser': 'ergo-lib-wasm-browser/ergo_lib_wasm',
+      },
+    },
+    experiments: {
+      ...customConfig.experiments,
     },
   };
 
   finalConfig.module.rules.push({
     test: /\.stories\.jsx?$/,
-    loaders: [require.resolve('@storybook/source-loader')],
+    loader: require.resolve('@storybook/source-loader'),
     enforce: 'pre',
   });
 
