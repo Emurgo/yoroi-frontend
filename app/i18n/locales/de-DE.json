@@ -51,7 +51,7 @@
   "buysell.dialog.instructions": "Bitte wähle Deine Präferenzen aus. Bestätige auf dem nächsten Bildschirm Deine Auswahl durch Drücken des grünen Pfeils oben rechts",
   "buysell.dialog.manual": "Ich trage meine Adresse händisch ein",
   "buysell.dialog.selectAddress": "Bitte wähle die Empfängeradresse aus. Diese wird dem Partner Provider Changelly mitgeteilt um ADA zu ver/kaufen. ",
-  "buysell.dialog.title": "Buy / Sell ADA",
+  "buysell.dialog.title": "Kaufe/Verkaufe ADA",
   "crash.screen.title": "Yoroi ist abgestürzt",
   "daedalusTransfer.error.noTransferTxError": "Es gibt keine zu versendende Transaktion.",
   "daedalusTransfer.error.transferFundsError": "Das Guthaben konnte nicht überwiesen werden.",
