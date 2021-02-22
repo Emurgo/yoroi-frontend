@@ -114,6 +114,9 @@ export const mockTransferProps: {
           },
         },
         actions: {
+          dialogs: {
+            open: { trigger: action('open') },
+          },
           wallets: {
             setActiveWallet: { trigger: action('setActiveWallet') },
           },

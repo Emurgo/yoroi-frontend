@@ -11,6 +11,7 @@ type Props = {|
   +onAddWallet: void => void,
   +onClickOutside: void => void,
   +buttonRef: ?ElementRef<*>;
+  +openBuySellDialog: void => void,
 |};
 
 type State = {|
@@ -94,7 +95,9 @@ export default class NavDropdownContent extends Component<Props, State> {
         {contentComponents}
         <div className={styles.buttonWrapper}>
           <div className={styles.buyButton}>
-            <BuySellAdaButton />
+            <BuySellAdaButton
+              onBuySellClick={this.props.openBuySellDialog}
+            />
           </div>
           <NavBarAddButton onClick={this.props.onAddWallet} />
         </div>

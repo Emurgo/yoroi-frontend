@@ -12,9 +12,9 @@ import ChangellyFetcher from './ChangellyFetcher'
 
 import styles from './BuySellDialog.scss';
 import VerifyIcon from '../../assets/images/verify-icon.inline.svg'
-import { Logger, stringifyError } from '../../utils/logging'
-import VerticallyCenteredLayout from '../layout/VerticallyCenteredLayout'
+import VerticalFlexContainer from '../layout/VerticalFlexContainer'
 import LoadingSpinner from '../widgets/LoadingSpinner'
+import globalMessages from '../../i18n/global-messages';
 
 const messages = defineMessages({
   dialogTitle: {
@@ -35,7 +35,7 @@ const messages = defineMessages({
   },
 });
 
-type WalletInfo = {|
+export type WalletInfo = {|
   walletName: string,
   currencyName: string,
   anAddressFormatted: string,
@@ -43,14 +43,14 @@ type WalletInfo = {|
 
 type Props = {|
   +onCancel: void => void,
-  +walletList: () => Promise<array<WalletInfo>>
+  +genWalletList: () => Promise<Array<WalletInfo>>
 |};
 
 const WIDGET_URL = 'https://widget.changelly.com?from=*&to=*&amount=200&fromDefault=usd&toDefault=ada&theme=default&merchant_id=g9qheu8vschp16jj&payment_id=&v=3'
 
 type State = {|
   addressSelected: ?string,
-  walletList: ?array<WalletInfo>,
+  walletList: ?Array<WalletInfo>,
 |};
 
 @observer
@@ -67,7 +67,7 @@ export default class BuySellDialog extends Component<Props, State> {
   async componentDidMount () {
     const { intl } = this.context;
 
-    const resp = await this.props.walletList()
+    const resp = await this.props.genWalletList()
     const wallets = [
       ...resp,
       {
@@ -79,10 +79,11 @@ export default class BuySellDialog extends Component<Props, State> {
     this.setState({ walletList: wallets })
   }
 
-  createRows: ($npm$ReactIntl$IntlFormat, array<WalletInfo>) => Node = (intl, wallets) => (
-    wallets.map((wallet) => {
+  createRows: ($npm$ReactIntl$IntlFormat, Array<WalletInfo>) => Node = (intl, wallets) => (
+    wallets.map((wallet, i) => {
       return (
-        <div className={styles.row}>
+        // eslint-disable-next-line react/no-array-index-key
+        <div key={i} className={styles.row}>
           <div className={styles.left}>
             <div className={styles.nameAndCurrency}>
               { wallet.currencyName ? `(${wallet.currencyName}) ` : ''}{wallet.walletName}
@@ -117,9 +118,14 @@ export default class BuySellDialog extends Component<Props, State> {
 
     if (this.state.walletList == null) {
       return (
-        <VerticallyCenteredLayout>
-          <LoadingSpinner />
-        </VerticallyCenteredLayout>
+        <Dialog
+          title={intl.formatMessage(globalMessages.processingLabel)}
+          closeOnOverlayClick={false}
+        >
+          <VerticalFlexContainer>
+            <LoadingSpinner />
+          </VerticalFlexContainer>
+        </Dialog>
       );
     }
     if (this.state.addressSelected == null) {
@@ -152,7 +158,6 @@ export default class BuySellDialog extends Component<Props, State> {
           <div className={styles.component}>
             <div className={styles.description}>
               {intl.formatMessage(messages.dialogDescription)}
-              {this.props.walletList}
             </div>
             <ChangellyFetcher widgetURL={WIDGET_URL} address={this.state.addressSelected} />
           </div>
