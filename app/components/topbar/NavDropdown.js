@@ -11,6 +11,7 @@ type Props = {|
   +headerComponent?: ?Node,
   +contentComponents?: ?Node,
   +onAddWallet: void => void,
+  +openBuySellDialog: void => void,
 |};
 
 type State = {|
@@ -71,6 +72,7 @@ export default class NavDropdown extends Component<Props, State> {
             onAddWallet={this.props.onAddWallet}
             onClickOutside={this.toggleExpansion}
             buttonRef={this.buttonRef}
+            openBuySellDialog={this.props.openBuySellDialog}
           />
         )}
       </div>

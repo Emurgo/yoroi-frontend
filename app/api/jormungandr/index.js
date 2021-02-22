@@ -118,6 +118,7 @@ import { getJormungandrBaseConfig, } from '../ada/lib/storage/database/prepackag
 import type { NetworkRow, TokenRow, } from '../ada/lib/storage/database/primitives/tables';
 import { MultiToken } from '../common/lib/MultiToken';
 import type { DefaultTokenEntry } from '../common/lib/MultiToken';
+import { getReceiveAddress } from '../../stores/stateless/addressStores';
 
 // getAllAddressesForDisplay
 
@@ -495,11 +496,10 @@ export default class JormungandrApi {
         );
       } else if (request.amount != null) {
         const amount = request.amount;
-        const nextUnusedInternal = await request.publicDeriver.nextInternal();
-        if (nextUnusedInternal.addressInfo == null) {
+        const changeAddr = await getReceiveAddress(request.publicDeriver);
+        if (changeAddr == null) {
           throw new Error(`${nameof(this.createUnsignedTx)} no internal addresses left. Should never happen`);
         }
-        const changeAddr = nextUnusedInternal.addressInfo;
         unsignedTxResponse = jormungandrNewAdaUnsignedTx(
           [{
             address: receiver,
@@ -557,11 +557,10 @@ export default class JormungandrApi {
 
     const allUtxo = await request.publicDeriver.getAllUtxos();
     const addressedUtxo = jormungandrAsAddressedUtxo(allUtxo);
-    const nextUnusedInternal = await request.publicDeriver.nextInternal();
-    if (nextUnusedInternal.addressInfo == null) {
+    const changeAddr = await getReceiveAddress(request.publicDeriver);
+    if (changeAddr == null) {
       throw new Error(`${nameof(this.createDelegationTx)} no internal addresses left. Should never happen`);
     }
-    const changeAddr = nextUnusedInternal.addressInfo;
     const unsignedTx = jormungandrNewAdaUnsignedTx(
       [],
       [{

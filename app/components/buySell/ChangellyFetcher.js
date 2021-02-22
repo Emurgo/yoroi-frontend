@@ -39,7 +39,7 @@ export default class ChangellyFetcher extends Component<Props> {
     intl: intlShape.isRequired,
   };
 
-  addAddressToWidget: (string, string) => string = (widgetURL, address) => {
+  addAddressToWidget: (string, ?string) => string = (widgetURL, address) => {
     if (address == null) return widgetURL
     return widgetURL + '&address=' + address
   }
@@ -64,6 +64,13 @@ export default class ChangellyFetcher extends Component<Props> {
           * Part of the flow of Changelly, requires sometimes to open a new page
           * on a partner website like MoonPay for KYC.
           * This requires "allows-popups"
+
+          * 'allow-popups-to-escape-sandbox':
+          * (see above for why we need popups at all)
+          * Popups from an iframe inherit the sandbox behavior
+          * We need popups to escape the sandbox
+          * Otherwise it will block sites from standard web behavior like
+          *     - Filling out forms (need to fill a form w/ info to register for MoonPay, etc.)
           *
           * Popups from an iframe inherit the sandbox behavior
           * We need popups to escape the sandbox
@@ -71,7 +78,7 @@ export default class ChangellyFetcher extends Component<Props> {
           *     - Playing media
           *     - Storing cookies on the website
         */
-        sandbox="allow-scripts allow-popups allow-same-origin"
+        sandbox="allow-scripts allow-popups allow-same-origin allow-popups-to-escape-sandbox"
         referrerPolicy="no-referrer"
         ref={this.setFrame}
         title="Changelly"

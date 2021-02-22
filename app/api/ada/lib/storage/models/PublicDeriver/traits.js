@@ -15,8 +15,8 @@ import type {
   IPublicDeriver,
   IGetAllUtxoAddressesRequest, IGetAllUtxoAddressesResponse,
   IGetAllUtxos, IGetAllUtxosRequest, IGetAllUtxosResponse,
-  IPickInternal,
-  IPickInternalRequest, IPickInternalResponse,
+  IPickReceive,
+  IPickReceiveRequest, IPickReceiveResponse,
   IDisplayCutoff,
   IDisplayCutoffPopRequest, IDisplayCutoffPopResponse,
   IDisplayCutoffGetRequest, IDisplayCutoffGetResponse,
@@ -889,24 +889,24 @@ export function asDisplayCutoff<T: IPublicDeriver<any>>(
   return undefined;
 }
 
-// =====================
-//   Bip44PickInternal
-// =====================
+// =======================
+//   CardanoBip44Receive
+// =======================
 
-type Bip44PickInternalMixinDependencies = IPublicDeriver<>;
-const Bip44PickInternalMixin = (
-  superclass: Class<Bip44PickInternalMixinDependencies>,
-) => (class Bip44PickInternal extends superclass implements IPickInternal {
-  rawPickInternal: (
+type CardanoBip44PickReceiveMixinDependencies = IPublicDeriver<>;
+const CardanoBip44PickReceiveMixin = (
+  superclass: Class<CardanoBip44PickReceiveMixinDependencies>,
+) => (class CardanoBip44PickReceive extends superclass implements IPickReceive {
+  rawPickReceive: (
     lf$Transaction,
     {|
       GetPathWithSpecific: Class<GetPathWithSpecific>,
       GetAddress: Class<GetAddress>,
       GetDerivationSpecific: Class<GetDerivationSpecific>,
     |},
-    IPickInternalRequest,
+    IPickReceiveRequest,
     Map<number, string>,
-  ) => Promise<IPickInternalResponse> = async (
+  ) => Promise<IPickReceiveResponse> = async (
     _tx,
     _deps,
     body,
@@ -914,37 +914,137 @@ const Bip44PickInternalMixin = (
   ) => {
     const legacyAddr = body.addrs
       .filter(addr => addr.Type === CoreAddressTypes.CARDANO_LEGACY);
-    if (legacyAddr.length !== 1) throw new Error(`${nameof(Bip44PickInternal)}::${nameof(this.rawPickInternal)} no legacy address found`);
+    if (legacyAddr.length !== 1) throw new Error(`${nameof(CardanoBip44PickReceive)}::${nameof(this.rawPickReceive)} no legacy address found`);
     return {
       addr: legacyAddr[0],
       row: body.row,
       addressing: body.addressing,
     };
   }
+
+  pickReceive: IPickReceiveRequest => Promise<IPickReceiveResponse> = async (
+    body,
+  ) => {
+    const withLevels = asHasLevels<ConceptualWallet>(this);
+    const derivationTables = withLevels == null
+      ? new Map()
+      : withLevels.getParent().getDerivationTables();
+    const deps = Object.freeze({
+      GetPathWithSpecific,
+      GetAddress,
+      GetDerivationSpecific,
+    });
+    const depTables = Object
+      .keys(deps)
+      .map(key => deps[key])
+      .flatMap(table => getAllSchemaTables(super.getDb(), table));
+    return await raii<IPickReceiveResponse>(
+      super.getDb(),
+      [
+        ...depTables,
+        ...mapToTables(super.getDb(), derivationTables),
+      ],
+      async tx => this.rawPickReceive(
+        tx,
+        deps,
+        body,
+        derivationTables,
+      )
+    );
+  }
 });
-export const Bip44PickInternal: * = Mixin<
-  Bip44PickInternalMixinDependencies,
-  IPickInternal
->(Bip44PickInternalMixin);
+export const CardanoBip44PickReceive: * = Mixin<
+  CardanoBip44PickReceiveMixinDependencies,
+  IPickReceive
+>(CardanoBip44PickReceiveMixin);
 
-// ==================================
-//   Cip1852JormungandrPickInternal
-// ==================================
+// =====================
+//   ErgoBip44Receive
+// =====================
 
-type Cip1852JormungandrPickInternalMixinDependencies = IPublicDeriver<> & IGetStakingKey;
-const Cip1852JormungandrPickInternalMixin = (
-  superclass: Class<Cip1852JormungandrPickInternalMixinDependencies>,
-) => (class Cip1852JormungandrPickInternal extends superclass implements IPickInternal {
-  rawPickInternal: (
+type ErgoBip44PickReceiveMixinDependencies = IPublicDeriver<>;
+const ErgoBip44PickReceiveMixin = (
+  superclass: Class<ErgoBip44PickReceiveMixinDependencies>,
+) => (class ErgoBip44PickReceive extends superclass implements IPickReceive {
+  rawPickReceive: (
     lf$Transaction,
     {|
       GetPathWithSpecific: Class<GetPathWithSpecific>,
       GetAddress: Class<GetAddress>,
       GetDerivationSpecific: Class<GetDerivationSpecific>,
     |},
-    IPickInternalRequest,
+    IPickReceiveRequest,
     Map<number, string>,
-  ) => Promise<IPickInternalResponse> = async (
+  ) => Promise<IPickReceiveResponse> = async (
+    _tx,
+    _deps,
+    body,
+    _derivationTables,
+  ) => {
+    const legacyAddr = body.addrs
+      .filter(addr => addr.Type === CoreAddressTypes.ERGO_P2PK);
+    if (legacyAddr.length !== 1) throw new Error(`${nameof(ErgoBip44PickReceive)}::${nameof(this.rawPickReceive)} no legacy address found`);
+    return {
+      addr: legacyAddr[0],
+      row: body.row,
+      addressing: body.addressing,
+    };
+  }
+
+  pickReceive: IPickReceiveRequest => Promise<IPickReceiveResponse> = async (
+    body,
+  ) => {
+    const withLevels = asHasLevels<ConceptualWallet>(this);
+    const derivationTables = withLevels == null
+      ? new Map()
+      : withLevels.getParent().getDerivationTables();
+    const deps = Object.freeze({
+      GetPathWithSpecific,
+      GetAddress,
+      GetDerivationSpecific,
+    });
+    const depTables = Object
+      .keys(deps)
+      .map(key => deps[key])
+      .flatMap(table => getAllSchemaTables(super.getDb(), table));
+    return await raii<IPickReceiveResponse>(
+      super.getDb(),
+      [
+        ...depTables,
+        ...mapToTables(super.getDb(), derivationTables),
+      ],
+      async tx => this.rawPickReceive(
+        tx,
+        deps,
+        body,
+        derivationTables,
+      )
+    );
+  }
+});
+export const ErgoBip44PickReceive: * = Mixin<
+  ErgoBip44PickReceiveMixinDependencies,
+  IPickReceive
+>(ErgoBip44PickReceiveMixin);
+
+// ==================================
+//   Cip1852JormungandrPickReceive
+// ==================================
+
+type Cip1852JormungandrPickReceiveMixinDependencies = IPublicDeriver<> & IGetStakingKey;
+const Cip1852JormungandrPickReceiveMixin = (
+  superclass: Class<Cip1852JormungandrPickReceiveMixinDependencies>,
+) => (class Cip1852JormungandrPickReceive extends superclass implements IPickReceive {
+  rawPickReceive: (
+    lf$Transaction,
+    {|
+      GetPathWithSpecific: Class<GetPathWithSpecific>,
+      GetAddress: Class<GetAddress>,
+      GetDerivationSpecific: Class<GetDerivationSpecific>,
+    |},
+    IPickReceiveRequest,
+    Map<number, string>,
+  ) => Promise<IPickReceiveResponse> = async (
     tx,
     deps,
     body,
@@ -961,37 +1061,68 @@ const Cip1852JormungandrPickInternalMixin = (
     const ourGroupAddress = body.addrs
       .filter(addr => (addr.Type === CoreAddressTypes.JORMUNGANDR_GROUP))
       .filter(addr => addr.Hash.includes(stakingKey));
-    if (ourGroupAddress.length !== 1) throw new Error(`${nameof(Cip1852JormungandrPickInternal)}::${nameof(this.rawPickInternal)} no group address found`);
+    if (ourGroupAddress.length !== 1) throw new Error(`${nameof(Cip1852JormungandrPickReceive)}::${nameof(this.rawPickReceive)} no group address found`);
     return {
       addr: ourGroupAddress[0],
       row: body.row,
       addressing: body.addressing,
     };
   }
+
+  pickReceive: IPickReceiveRequest => Promise<IPickReceiveResponse> = async (
+    body,
+  ) => {
+    const withLevels = asHasLevels<ConceptualWallet>(this);
+    const derivationTables = withLevels == null
+      ? new Map()
+      : withLevels.getParent().getDerivationTables();
+    const deps = Object.freeze({
+      GetPathWithSpecific,
+      GetAddress,
+      GetDerivationSpecific,
+    });
+    const depTables = Object
+      .keys(deps)
+      .map(key => deps[key])
+      .flatMap(table => getAllSchemaTables(super.getDb(), table));
+    return await raii<IPickReceiveResponse>(
+      super.getDb(),
+      [
+        ...depTables,
+        ...mapToTables(super.getDb(), derivationTables),
+      ],
+      async tx => this.rawPickReceive(
+        tx,
+        deps,
+        body,
+        derivationTables,
+      )
+    );
+  }
 });
-export const Cip1852JormungandrPickInternal: * = Mixin<
-  Cip1852JormungandrPickInternalMixinDependencies,
-  IPickInternal
->(Cip1852JormungandrPickInternalMixin);
+export const Cip1852JormungandrPickReceive: * = Mixin<
+  Cip1852JormungandrPickReceiveMixinDependencies,
+  IPickReceive
+>(Cip1852JormungandrPickReceiveMixin);
 
 // =======================
-//   Cip1852PickInternal
+//   Cip1852PickReceive
 // =======================
 
-type Cip1852PickInternalMixinDependencies = IPublicDeriver<> & IGetStakingKey;
-const Cip1852PickInternalMixin = (
-  superclass: Class<Cip1852PickInternalMixinDependencies>,
-) => (class Cip1852PickInternal extends superclass implements IPickInternal {
-  rawPickInternal: (
+type Cip1852PickReceiveMixinDependencies = IPublicDeriver<> & IGetStakingKey;
+const Cip1852PickReceiveMixin = (
+  superclass: Class<Cip1852PickReceiveMixinDependencies>,
+) => (class Cip1852PickReceive extends superclass implements IPickReceive {
+  rawPickReceive: (
     lf$Transaction,
     {|
       GetPathWithSpecific: Class<GetPathWithSpecific>,
       GetAddress: Class<GetAddress>,
       GetDerivationSpecific: Class<GetDerivationSpecific>,
     |},
-    IPickInternalRequest,
+    IPickReceiveRequest,
     Map<number, string>,
-  ) => Promise<IPickInternalResponse> = async (
+  ) => Promise<IPickReceiveResponse> = async (
     tx,
     deps,
     body,
@@ -1006,31 +1137,88 @@ const Cip1852PickInternalMixin = (
 
     const keyHash = unwrapCardanoStakingKey(stakingAddressDbRow.addr.Hash).to_keyhash();
     if (keyHash == null) {
-      throw new Error(`${nameof(Cip1852PickInternal)}::${nameof(this.rawPickInternal)} internal address is a script`);
+      throw new Error(`${nameof(Cip1852PickReceive)}::${nameof(this.rawPickReceive)} internal address is a script`);
     }
     const stakingKey = Buffer.from(keyHash.to_bytes()).toString('hex');
     const ourBaseAddress = body.addrs
       .filter(addr => addr.Type === CoreAddressTypes.CARDANO_BASE)
       .filter(addr => addr.Hash.includes(stakingKey));
-    if (ourBaseAddress.length !== 1) throw new Error(`${nameof(Cip1852PickInternal)}::${nameof(this.rawPickInternal)} no base address found`);
+    if (ourBaseAddress.length !== 1) throw new Error(`${nameof(Cip1852PickReceive)}::${nameof(this.rawPickReceive)} no base address found`);
     return {
       addr: ourBaseAddress[0],
       row: body.row,
       addressing: body.addressing,
     };
   }
+
+  pickReceive: IPickReceiveRequest => Promise<IPickReceiveResponse> = async (
+    body,
+  ) => {
+    const withLevels = asHasLevels<ConceptualWallet>(this);
+    const derivationTables = withLevels == null
+      ? new Map()
+      : withLevels.getParent().getDerivationTables();
+    const deps = Object.freeze({
+      GetPathWithSpecific,
+      GetAddress,
+      GetDerivationSpecific,
+    });
+    const depTables = Object
+      .keys(deps)
+      .map(key => deps[key])
+      .flatMap(table => getAllSchemaTables(super.getDb(), table));
+    return await raii<IPickReceiveResponse>(
+      super.getDb(),
+      [
+        ...depTables,
+        ...mapToTables(super.getDb(), derivationTables),
+      ],
+      async tx => this.rawPickReceive(
+        tx,
+        deps,
+        body,
+        derivationTables,
+      )
+    );
+  }
 });
-export const Cip1852PickInternal: * = Mixin<
-  Cip1852PickInternalMixinDependencies,
-  IPickInternal
->(Cip1852PickInternalMixin);
+export const Cip1852PickReceive: * = Mixin<
+  Cip1852PickReceiveMixinDependencies,
+  IPickReceive
+>(Cip1852PickReceiveMixin);
+
+// =================
+//   PickReceive
+// =================
+
+type PickReceiveDependencies = IPublicDeriver<> & IPickReceive;
+const PickReceiveMixin = (
+  superclass: Class<PickReceiveDependencies>,
+) => (class PickReceive extends superclass implements IPickReceive {
+});
+
+export const PickReceive: * = Mixin<
+  PickReceiveDependencies,
+  IPickReceive,
+>(PickReceiveMixin);
+const PickReceiveInstance = (
+  (PickReceive: any): ReturnType<typeof PickReceiveMixin>
+);
+export function asPickReceive<T: IPublicDeriver<any>>(
+  obj: T
+): void | (IPickReceive & PickReceiveDependencies & T) {
+  if (obj instanceof PickReceiveInstance) {
+    return obj;
+  }
+  return undefined;
+}
 
 // =================
 //   HasUtxoChains
 // =================
 
 type HasUtxoChainsDependencies = IPublicDeriver<ConceptualWallet & IHasLevels> &
-  IPickInternal & IDisplayCutoff;
+  IPickReceive & IDisplayCutoff;
 const HasUtxoChainsMixin = (
   superclass: Class<HasUtxoChainsDependencies>,
 ) => (class HasUtxoChains extends superclass implements IHasUtxoChains {
@@ -1129,7 +1317,7 @@ const HasUtxoChainsMixin = (
         index: nextUnused.index
       };
     }
-    const nextInternal = await this.rawPickInternal(
+    const nextInternal = await this.rawPickReceive(
       tx,
       derivationDeps,
       nextUnused.addressInfo,
@@ -2349,6 +2537,7 @@ export async function addTraitsForCardanoBip44(
   }
 
   currClass = AddBip44FromPublic(currClass);
+  currClass = PickReceive(CardanoBip44PickReceive(currClass));
 
   if (request.conceptualWallet.getPublicDeriverLevel() === Bip44DerivationLevels.CHAIN.level) {
     currClass = DisplayCutoff(currClass);
@@ -2356,7 +2545,7 @@ export async function addTraitsForCardanoBip44(
   if (request.conceptualWallet.getPublicDeriverLevel() === Bip44DerivationLevels.ACCOUNT.level) {
     currClass = DisplayCutoff(currClass);
 
-    currClass = HasUtxoChains(Bip44PickInternal(currClass));
+    currClass = HasUtxoChains(currClass);
     if (publicKey !== null) {
       currClass = GetPublicKey(currClass);
       currClass = ScanLegacyCardanoAccountUtxo(currClass);
@@ -2418,6 +2607,7 @@ export async function addTraitsForErgoBip44(
   }
 
   currClass = AddBip44FromPublic(currClass);
+  currClass = PickReceive(ErgoBip44PickReceive(currClass));
 
   if (request.conceptualWallet.getPublicDeriverLevel() === Bip44DerivationLevels.CHAIN.level) {
     currClass = DisplayCutoff(currClass);
@@ -2433,7 +2623,7 @@ export async function addTraitsForErgoBip44(
   ) {
     currClass = DisplayCutoff(currClass);
 
-    currClass = HasUtxoChains(Bip44PickInternal(currClass));
+    currClass = HasUtxoChains(currClass);
     if (publicKey !== null) {
       currClass = GetPublicKey(currClass);
       currClass = ScanErgoAccountUtxo(currClass);
@@ -2554,19 +2744,20 @@ export async function addTraitsForCip1852Child(
   // recall: adding addresses to public deriver in cip1852 is same as bip44
   currClass = AddBip44FromPublic(currClass);
 
+  if (isJormungandr(conceptualWallet.getNetworkInfo())) {
+    currClass = PickReceive(Cip1852JormungandrPickReceive(currClass));
+  } else if (isCardanoHaskell(conceptualWallet.getNetworkInfo())) {
+    currClass = PickReceive(Cip1852PickReceive(currClass));
+  } else {
+    throw new Error(`${nameof(addTraitsForCip1852Child)} don't know how to pick receive address`);
+  }
+
   if (conceptualWallet.getPublicDeriverLevel() === Bip44DerivationLevels.CHAIN.level) {
     currClass = DisplayCutoff(currClass);
   }
   if (conceptualWallet.getPublicDeriverLevel() === Bip44DerivationLevels.ACCOUNT.level) {
     currClass = DisplayCutoff(currClass);
 
-    if (isJormungandr(conceptualWallet.getNetworkInfo())) {
-      currClass = Cip1852JormungandrPickInternal(currClass);
-    } else if (isCardanoHaskell(conceptualWallet.getNetworkInfo())) {
-      currClass = Cip1852PickInternal(currClass);
-    } else {
-      throw new Error(`${nameof(addTraitsForCip1852Child)} don't know how to pick internal`);
-    }
     currClass = HasUtxoChains(currClass);
     if (publicKey !== null) {
       currClass = GetPublicKey(currClass);

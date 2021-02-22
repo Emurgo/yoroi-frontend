@@ -8,7 +8,6 @@ import {
   Servers,
   serverToPermission,
 } from '../scripts/connections';
-import { version } from '../package.json';
 import { CHANGELLY_URL, POOLS_UI_URL_FOR_YOROI } from './manifestEnvs'
 import pkg from '../package.json';
 

@@ -99,11 +99,11 @@ import type { NetworkRow, TokenRow, } from '../ada/lib/storage/database/primitiv
 import {
   getErgoBaseConfig,
 } from '../ada/lib/storage/database/prepackaged/networks';
-import { CoreAddressTypes, } from '../ada/lib/storage/database/primitives/enums';
 import { BIP32PrivateKey, } from '../common/lib/crypto/keys/keyRepository';
 import { WrongPassphraseError } from '../ada/lib/cardanoCrypto/cryptoErrors';
 import type { DefaultTokenEntry } from '../common/lib/MultiToken';
 import { hasSendAllDefault, builtSendTokenList } from '../common/index';
+import { getReceiveAddress } from '../../stores/stateless/addressStores';
 
 // getTransactionRowsToExport
 
@@ -467,15 +467,12 @@ export default class ErgoApi {
 
     // note: we need to create a change address IFF we're not sending all of the default asset
     if (!hasSendAllDefault(request.tokens)) {
-      const allAddresses = await request.publicDeriver.getAllUtxoAddresses();
-      const change = allAddresses[0]; // send change to 0th address
-
-      const p2pkHash = change.addrs.find(addr => addr.Type === CoreAddressTypes.ERGO_P2PK);
-      if (p2pkHash == null) {
+      const change = await getReceiveAddress(request.publicDeriver);
+      if (change == null) {
         throw new Error(`${nameof(this.createUnsignedTx)} no p2pk address found. Should never happen`);
       }
       receivers.push({
-        address: p2pkHash.Hash,
+        address: change.addr.Hash,
         addressing: change.addressing,
       });
     }

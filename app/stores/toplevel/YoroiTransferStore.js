@@ -17,9 +17,6 @@ import type {
 import { TransferStatus, } from '../../types/TransferTypes';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import {
-  asHasUtxoChains,
-} from '../../api/ada/lib/storage/models/PublicDeriver/traits';
-import {
   unscramblePaperAdaMnemonic,
 } from '../../api/ada/lib/cardanoCrypto/paperWallet';
 import config from '../../config';
@@ -33,6 +30,7 @@ import {
   Bip44DerivationLevels,
 } from '../../api/ada/lib/storage/database/walletTypes/bip44/api/utils';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
+import { getReceiveAddress } from '../stateless/addressStores';
 
 export default class YoroiTransferStore extends Store {
 
@@ -144,15 +142,13 @@ export default class YoroiTransferStore extends Store {
     publicDeriver
   ) => {
     return async () => {
-      const withChains = asHasUtxoChains(publicDeriver);
-      if (!withChains) throw new Error(`${nameof(this.nextInternalAddress)} missing chains functionality`);
-      const nextInternal = await withChains.nextInternal();
-      if (nextInternal.addressInfo == null) {
+      const nextInternal = await getReceiveAddress(publicDeriver);
+      if (nextInternal == null) {
         throw new Error(`${nameof(this.nextInternalAddress)} no internal addresses left. Should never happen`);
       }
       return {
-        address: nextInternal.addressInfo.addr.Hash,
-        addressing: nextInternal.addressInfo.addressing,
+        address: nextInternal.addr.Hash,
+        addressing: nextInternal.addressing,
       };
     };
   }

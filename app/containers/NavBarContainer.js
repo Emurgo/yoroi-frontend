@@ -28,6 +28,7 @@ import type { TokenRow } from '../api/ada/lib/storage/database/primitives/tables
 import { MultiToken } from '../api/common/lib/MultiToken';
 import type { TokenInfoMap } from '../stores/toplevel/TokenInfoStore';
 import { genLookupOrFail, } from '../stores/stateless/tokenHelpers';
+import BuySellDialog from '../components/buySell/BuySellDialog';
 
 const messages = defineMessages({
   allWalletsLabel: {
@@ -59,6 +60,11 @@ export default class NavBarContainer extends Component<Props> {
       route: this.generated.stores.app.currentRoute,
       publicDeriver: newWallet,
     });
+  }
+
+  openDialogWrapper: any => void = (dialog) => {
+    this.generated.actions.router.goToRoute.trigger({ route: ROUTES.MY_WALLETS });
+    this.generated.actions.dialogs.open.trigger({ dialog });
   }
 
   render(): Node {
@@ -155,6 +161,7 @@ export default class NavBarContainer extends Component<Props> {
           onAddWallet={
             () => this.generated.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD })
           }
+          openBuySellDialog={() => this.openDialogWrapper(BuySellDialog)}
         />
       );
     })();
@@ -212,6 +219,14 @@ export default class NavBarContainer extends Component<Props> {
 
   @computed get generated(): {|
     actions: {|
+      dialogs: {|
+        open: {|
+          trigger: (params: {|
+            dialog: any,
+            params?: any
+          |}) => void
+        |}
+      |},
       profile: {|
         updateHideBalance: {|
           trigger: (params: void) => Promise<void>
@@ -305,6 +320,9 @@ export default class NavBarContainer extends Component<Props> {
         },
         router: {
           goToRoute: { trigger: actions.router.goToRoute.trigger },
+        },
+        dialogs: {
+          open: { trigger: actions.dialogs.open.trigger },
         },
       },
     });

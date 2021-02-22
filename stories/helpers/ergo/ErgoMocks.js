@@ -17,7 +17,7 @@ import {
   GetPublicKey,
   DisplayCutoff,
   HasUtxoChains,
-  Bip44PickInternal,
+  ErgoBip44PickReceive,
 } from '../../../app/api/ada/lib/storage/models/PublicDeriver/traits';
 import {
   getNextConceptualWalletCounter,
@@ -177,7 +177,7 @@ function genSigningWallet(
     null,
     null,
   );
-  const clazz = HasUtxoChains(Bip44PickInternal(
+  const clazz = HasUtxoChains(ErgoBip44PickReceive(
     DisplayCutoff(GetSigningKey(GetPublicKey(
       GetAllUtxos(HasLevels(HasSign(HasPrivateDeriver((PublicDeriver: any)))))
     )))
@@ -272,7 +272,6 @@ export const genTentativeErgoTx = (
       NetworkId: publicDeriver.getParent().getNetworkInfo().NetworkId,
     },
   });
-  console.log(JSON.stringify(sendAll));
 
   const signRequest = new ErgoTxSignRequest({
     senderUtxos: remoteUnspentUtxos.map(utxo => ({ ...utxo.entry, addressing: utxo.addressing })),

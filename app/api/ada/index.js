@@ -182,6 +182,7 @@ import type { TransactionMetadata } from './lib/storage/bridge/metadataUtils';
 import { MultiToken } from '../common/lib/MultiToken';
 import type { DefaultTokenEntry } from '../common/lib/MultiToken';
 import { hasSendAllDefault, builtSendTokenList } from '../common/index';
+import { getReceiveAddress } from '../../stores/stateless/addressStores';
 
 // ADA specific Request / Response params
 
@@ -1067,13 +1068,13 @@ export default class AdaApi {
 
     // note: we need to create a change address IFF we're not sending all of the default asset
     if (!hasSendAllDefault(request.tokens)) {
-      const internal = await request.publicDeriver.nextInternal();
-      if (internal.addressInfo == null) {
+      const internal = await getReceiveAddress(request.publicDeriver);
+      if (internal == null) {
         throw new Error(`${nameof(this.createUnsignedTx)} no internal addresses left. Should never happen`);
       }
       receivers.push({
-        address: internal.addressInfo.addr.Hash,
-        addressing: internal.addressInfo.addressing,
+        address: internal.addr.Hash,
+        addressing: internal.addressing,
       });
     }
     return this.createUnsignedTxForUtxos({
@@ -1133,11 +1134,10 @@ export default class AdaApi {
 
       const allUtxo = await request.publicDeriver.getAllUtxos();
       const addressedUtxo = asAddressedUtxo(allUtxo);
-      const nextUnusedInternal = await request.publicDeriver.nextInternal();
-      if (nextUnusedInternal.addressInfo == null) {
+      const changeAddr = await getReceiveAddress(request.publicDeriver);
+      if (changeAddr == null) {
         throw new Error(`${nameof(this.createDelegationTx)} no internal addresses left. Should never happen`);
       }
-      const changeAddr = nextUnusedInternal.addressInfo;
       const unsignedTx = shelleyNewAdaUnsignedTx(
         [],
         {
@@ -1234,11 +1234,10 @@ export default class AdaApi {
       const utxos = await request.publicDeriver.getAllUtxos();
       const addressedUtxo = asAddressedUtxo(utxos);
 
-      const nextUnusedInternal = await request.publicDeriver.nextInternal();
-      if (nextUnusedInternal.addressInfo == null) {
+      const changeAddr = await getReceiveAddress(request.publicDeriver);
+      if (changeAddr == null) {
         throw new Error(`${nameof(this.createWithdrawalTx)} no internal addresses left. Should never happen`);
       }
-      const changeAddr = nextUnusedInternal.addressInfo;
 
       const certificates = [];
       const neededKeys = {
@@ -1397,11 +1396,10 @@ export default class AdaApi {
 
       const allUtxo = await request.publicDeriver.getAllUtxos();
       const addressedUtxo = asAddressedUtxo(allUtxo);
-      const nextUnusedInternal = await request.publicDeriver.nextInternal();
-      if (nextUnusedInternal.addressInfo == null) {
+      const changeAddr = await getReceiveAddress(request.publicDeriver);
+      if (changeAddr == null) {
         throw new Error(`${nameof(this.createVotingRegTx)} no internal addresses left. Should never happen`);
       }
-      const changeAddr = nextUnusedInternal.addressInfo;
       const trxMetadata = createMetadata(request.metadata);
       const unsignedTx = shelleyNewAdaUnsignedTx(
         [],

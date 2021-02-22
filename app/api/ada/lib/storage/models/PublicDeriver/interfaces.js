@@ -510,19 +510,21 @@ export interface IAddBip44FromPublic {
   +addBip44FromPublic: IAddBip44FromPublicFunc;
 }
 
-export type IPickInternalRequest = BaseAddressPath;
-export type IPickInternalResponse = BaseSingleAddressPath;
-export type IPickInternalFunc = (
-  body: IPickInternalRequest
-) => Promise<IPickInternalResponse>;
-export interface IPickInternal {
-  +rawPickInternal: RawTableVariation<
-    IPickInternalFunc,
+export type IPickReceiveRequest = BaseAddressPath;
+export type IPickReceiveResponse = BaseSingleAddressPath;
+export type IPickReceiveFunc = (
+  body: IPickReceiveRequest
+) => Promise<IPickReceiveResponse>;
+export interface IPickReceive {
+  +rawPickReceive: RawTableVariation<
+    IPickReceiveFunc,
     {|
       GetPathWithSpecific: Class<GetPathWithSpecific>,
       GetAddress: Class<GetAddress>,
       GetDerivationSpecific: Class<GetDerivationSpecific>,
     |},
-    IPickInternalRequest
+    IPickReceiveRequest
   >;
+
+  +pickReceive: IPickReceiveFunc;
 }

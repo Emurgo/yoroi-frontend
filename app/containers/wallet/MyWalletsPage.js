@@ -40,10 +40,9 @@ import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tab
 import { MultiToken } from '../../api/common/lib/MultiToken'
 import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore'
 import { genLookupOrFail, getTokenName } from '../../stores/stateless/tokenHelpers'
-import BuySellDialog from '../../components/buySell/BuySellDialog'
-import type { IAddressTypeStore, IAddressTypeUiSubset } from '../../stores/stateless/addressStores'
-import type { AddressFilterKind } from '../../types/AddressFilterTypes'
-import LocalizableError from '../../i18n/LocalizableError'
+import { getReceiveAddress } from '../../stores/stateless/addressStores';
+import BuySellDialog from '../../components/buySell/BuySellDialog';
+import type { WalletInfo } from '../../components/buySell/BuySellDialog';
 import { addressToDisplayString } from '../../api/ada/lib/storage/bridge/utils'
 import { networks } from '../../api/ada/lib/storage/database/prepackaged/networks'
 
@@ -134,7 +133,7 @@ export default class MyWalletsPage extends Component<Props> {
     if (uiDialogs.isOpen(BuySellDialog)) {
       activeDialog = <BuySellDialog
         onCancel={this.onClose}
-        walletList={async () => {
+        genWalletList={async () => {
           return await this.generateUnusedAddressesPerWallet(wallets);
         }}
       />
@@ -155,9 +154,9 @@ export default class MyWalletsPage extends Component<Props> {
     );
   }
 
-  generateUnusedAddressesPerWallet: PublicDeriver<> => Promise<Array<string, string>> =
-    async (wallets: array<publicDeriver>) => {
-      const infoWallets = wallets.map(async (wallet: publicDeriver) => {
+  generateUnusedAddressesPerWallet: Array<PublicDeriver<>> => Promise<Array<WalletInfo>> =
+    async (wallets: Array<PublicDeriver<>>) => {
+      const infoWallets = wallets.map(async (wallet: PublicDeriver<>) => {
         // Wallet Name
         const parent: ConceptualWallet = wallet.getParent();
         const settingsCache: ConceptualWalletSettingsCache = this.generated.stores.walletSettings
@@ -170,13 +169,13 @@ export default class MyWalletsPage extends Component<Props> {
         const currencyName = getTokenName(defaultToken)
 
         if (defaultToken.NetworkId !== networks.CardanoMainnet.NetworkId) {
-          return Promise.resolve(null);
+          return null;
         }
 
-        // An Address
-        const allAddresses = await wallet.getAllUtxoAddresses();
+        const receiveAddress = await this.generated.getReceiveAddress(wallet);
+        if (receiveAddress == null) return null;
         const anAddressFormatted = addressToDisplayString(
-          allAddresses[0].addrs[1].Hash,
+          receiveAddress.addr.Hash,
           parent.getNetworkInfo()
         )
 
@@ -186,7 +185,14 @@ export default class MyWalletsPage extends Component<Props> {
           anAddressFormatted,
         }
       })
-      return (await Promise.all(infoWallets)).filter((x) => !!x)
+      return (await Promise.all(infoWallets)).reduce(
+        (acc, next) => {
+          if (next == null) return acc;
+          acc.push(next);
+          return acc;
+        },
+        []
+      )
   }
 
   /*
@@ -382,24 +388,11 @@ export default class MyWalletsPage extends Component<Props> {
         unselectWallet: {| trigger: (params: void) => void |},
         setActiveWallet: {| trigger: (params: {| wallet: PublicDeriver<> |}) => void |},
       |},
-      addresses: {|
-        createAddress: {|
-          trigger: (params: PublicDeriver<>) => Promise<void>
-        |},
-      |},
     |},
     stores: {|
       profile: {| shouldHideBalance: boolean |},
       uiDialogs: {|
-        hasOpen: boolean,
-        getParam: <T>(number | string) => (void | T),
         isOpen: any => boolean
-      |},
-      addresses: {|
-        addressFilter: AddressFilterKind,
-        createAddressRequest: {| isExecuting: boolean |},
-        error: ?LocalizableError,
-        addressSubgroupMap: $ReadOnlyMap<Class<IAddressTypeStore>, IAddressTypeUiSubset>,
       |},
       delegation: {|
         getDelegationRequests: (
@@ -420,7 +413,8 @@ export default class MyWalletsPage extends Component<Props> {
         getPublicKeyCache: IGetPublic => PublicKeyCache,
         publicDerivers: Array<PublicDeriver<>>
       |}
-    |}
+    |},
+    getReceiveAddress: typeof getReceiveAddress,
     |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
@@ -430,14 +424,14 @@ export default class MyWalletsPage extends Component<Props> {
     }
     const { stores, actions } = this.props;
     return Object.freeze({
+      // make this function easy to mock out in Storybook
+      getReceiveAddress,
       stores: {
         profile: {
           shouldHideBalance: stores.profile.shouldHideBalance,
         },
         uiDialogs: {
-          hasOpen: stores.uiDialogs.hasOpen,
           isOpen: stores.uiDialogs.isOpen,
-          getParam: stores.uiDialogs.getParam,
         },
         wallets: {
           publicDerivers: stores.wallets.publicDerivers,
@@ -453,14 +447,6 @@ export default class MyWalletsPage extends Component<Props> {
         walletSettings: {
           getConceptualWalletSettingsCache:
             stores.walletSettings.getConceptualWalletSettingsCache,
-        },
-        addresses: {
-          addressFilter: stores.addresses.addressFilter,
-          addressSubgroupMap: stores.addresses.addressSubgroupMap,
-          createAddressRequest: {
-            isExecuting: stores.addresses.createAddressRequest.isExecuting,
-          },
-          error: stores.addresses.error,
         },
         delegation: {
           getDelegationRequests: stores.delegation.getDelegationRequests,
@@ -484,16 +470,6 @@ export default class MyWalletsPage extends Component<Props> {
         wallets: {
           unselectWallet: { trigger: actions.wallets.unselectWallet.trigger },
           setActiveWallet: { trigger: actions.wallets.setActiveWallet.trigger },
-        },
-        addresses: {
-          setFilter: { trigger: actions.addresses.setFilter.trigger, },
-          resetFilter: { trigger: actions.addresses.resetFilter.trigger, },
-          resetErrors: {
-            trigger: actions.addresses.resetErrors.trigger,
-          },
-          createAddress: {
-            trigger: actions.addresses.createAddress.trigger,
-          },
         },
       },
       SidebarContainerProps: (

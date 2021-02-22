@@ -26,7 +26,7 @@ import {
   GetSigningKey,
   GetPublicKey,
   DisplayCutoff,
-  Cip1852JormungandrPickInternal,
+  Cip1852JormungandrPickReceive,
   GetAllAccounting,
   GetStakingKey,
   HasUtxoChains,
@@ -231,7 +231,7 @@ function genSigningWallet(
     null,
     null,
   );
-  const clazz = HasUtxoChains(Cip1852JormungandrPickInternal(GetStakingKey(GetAllAccounting(
+  const clazz = HasUtxoChains(Cip1852JormungandrPickReceive(GetStakingKey(GetAllAccounting(
     DisplayCutoff(GetSigningKey(GetPublicKey(
       GetAllUtxos(HasLevels(HasSign(HasPrivateDeriver((PublicDeriver: any)))))
     )))
