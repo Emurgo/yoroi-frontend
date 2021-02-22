@@ -29,7 +29,6 @@ import environment from '../../app/environment';
 import { getVarsForTheme } from '../../app/stores/toplevel/ProfileStore';
 
 import { withKnobs, select, boolean } from '@storybook/addon-knobs';
-import { addDecorator } from '@storybook/react';
 
 import LocalizableError, { UnexpectedError } from '../../app/i18n/LocalizableError';
 import globalMessages from '../../app/i18n/global-messages';
@@ -38,6 +37,8 @@ import type { UnitOfAccountSettingType } from '../../app/types/unitOfAccountType
 import { IncorrectVersionError, IncorrectDeviceError } from '../../app/domain/ExternalDeviceCommon';
 import { SimpleSkins } from 'react-polymorph/lib/skins/simple';
 import { SimpleDefaults } from 'react-polymorph/lib/themes/simple';
+
+import { addDecorator } from '@storybook/react';
 
 /**
  * This whole file is meant to mirror code in App.js
@@ -60,7 +61,8 @@ addLocaleData([
   ...tr,
 ]);
 
-
+// TODO: should remove this as it's deprecated in Storybook v6
+// but knobs-preset seems to have an issue in the alpha build
 addDecorator(withKnobs);
 
 const themeNames = Object.values(THEMES);

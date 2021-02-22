@@ -1,16 +1,17 @@
 // @flow
 
 import React from 'react';
-import { configure, addDecorator, addParameters } from '@storybook/react';
+import StoryWrapper from '../stories/helpers/StoryWrapper';
+import type { StoryDecorator, DecoratorParameters } from '@storybook/react';
 import {
   MINIMAL_VIEWPORTS,
 } from '@storybook/addon-viewport';
 import { RustModule } from '../app/api/ada/lib/cardanoCrypto/rustLoader';
 
-import StoryWrapper from '../stories/helpers/StoryWrapper';
+// TODO: storybook and/or react doesn't seem to support top-level async
+RustModule.load();
 
-// Global Option
-addParameters({
+export const parameters: DecoratorParameters = {
   options: {
     /**
      * where to show the addon panel
@@ -51,23 +52,10 @@ addParameters({
       },
     },
   },
-});
+};
 
-// note: purposely don't await
-RustModule.load().then(() => {
-  // Global Decorator
-  addDecorator(story => {
+export const decorators: Array<StoryDecorator> = [
+  (story => {
     return <StoryWrapper>{story}</StoryWrapper>;
-  });
-
-  configure(
-    [
-      // $FlowExpectedError[prop-missing] comes from Webpack and not nodejs so Flow doesn't find the function
-      require.context('../app/components', true, /\.stories\.js$/),
-      // $FlowExpectedError[prop-missing] comes from Webpack and not nodejs so Flow doesn't find the function
-      require.context('../app/containers', true, /\.stories\.js$/),
-    ],
-    // $FlowExpectedError[invalid-export]
-    module
-  );
-});
+  })
+];
