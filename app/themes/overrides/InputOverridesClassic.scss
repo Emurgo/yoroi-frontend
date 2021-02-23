@@ -2,4 +2,9 @@
 
 .input {
   font-size: 15px;
+
+  &[type="password"] {
+    // react-polymorph adds a padding-top for some Daedalus specific handling of password fields
+    padding-top: 0px;
+  }
 }

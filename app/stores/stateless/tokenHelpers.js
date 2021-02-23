@@ -4,17 +4,15 @@ import type { TokenInfoMap } from '../toplevel/TokenInfoStore';
 import type {
   TokenLookupKey, TokenEntry,
 } from '../../api/common/lib/MultiToken';
-import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
+import type { TokenRow, TokenMetadata } from '../../api/ada/lib/storage/database/primitives/tables';
+import { isHexadecimal } from 'validator';
+import AssetFingerprint from '@emurgo/cip14-js';
 
 export function getTokenName(
   tokenRow: $ReadOnly<{
     Identifier: string,
     IsDefault: boolean,
-    Metadata: {
-      ticker: null | string,
-      longName: null | string,
-      ...,
-    },
+    Metadata: TokenMetadata,
     ...,
   }>,
 ): string {
@@ -28,11 +26,7 @@ export function getTokenName(
 export function getTokenStrictName(
   tokenRow: $ReadOnly<{
     Identifier: string,
-    Metadata: {
-      ticker: null | string,
-      longName: null | string,
-      ...,
-    },
+    Metadata: TokenMetadata,
     ...,
   }>,
 ): void | string {
@@ -42,6 +36,16 @@ export function getTokenStrictName(
   if (tokenRow.Metadata.longName != null) {
     return tokenRow.Metadata.longName;
   }
+  if (tokenRow.Metadata.type === 'Cardano') {
+    if (tokenRow.Metadata.assetName.length > 0 && isHexadecimal(tokenRow.Metadata.assetName)) {
+      const bytes = [...Buffer.from(tokenRow.Metadata.assetName, 'hex')];
+      // check this is a valid ASCII string
+      // https://github.com/trezor/trezor-firmware/blob/d4dcd7bff9aaa87d2ba3f02b3ec4aa39dfc30eaa/core/src/apps/cardano/layout.py#L68
+      if (bytes.filter(byte => byte <= 32 || byte >= 127).length === 0) {
+        return String.fromCharCode(...bytes);
+      }
+    }
+  }
   return undefined;
 }
 
@@ -49,10 +53,20 @@ export function getTokenIdentifierIfExists(
   tokenRow: $ReadOnly<{
     Identifier: string,
     IsDefault: boolean,
+    Metadata: TokenMetadata,
     ...,
   }>
 ): void | string {
   if (tokenRow.IsDefault) return undefined;
+  if (tokenRow.Metadata.type === 'Cardano') {
+    const { policyId, assetName } = tokenRow.Metadata;
+    const assetFingerprint = new AssetFingerprint(
+      Buffer.from(policyId, 'hex'),
+      Buffer.from(assetName, 'hex')
+    );
+    return assetFingerprint.fingerprint();
+  }
+
   return tokenRow.Identifier;
 }
 

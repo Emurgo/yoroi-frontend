@@ -32,7 +32,7 @@ import { RustModule } from '../cardanoCrypto/rustLoader';
 
 import { generateLedgerWalletRootKey } from '../cardanoCrypto/cryptoWallet';
 import { networks, getCardanoHaskellBaseConfig } from '../storage/database/prepackaged/networks';
-import { decode, fromWords } from 'bech32';
+import { bech32 } from 'bech32';
 import { Bech32Prefix } from '../../../../config/stringConfig';
 import { parseTokenList } from '../../transactions/utils';
 
@@ -42,7 +42,7 @@ function fixAddresses(
   network: $ReadOnly<NetworkRow>,
 ): string {
   try {
-    const bech32Info = decode(address, 1000);
+    const bech32Info = bech32.decode(address, 1000);
     if (bech32Info.prefix === Bech32Prefix.PAYMENT_KEY_HASH) {
       const config = getCardanoHaskellBaseConfig(
         network
@@ -56,7 +56,7 @@ function fixAddresses(
       );
       return Buffer.from(enterpriseAddr.to_address().to_bytes()).toString('hex');
     }
-    const payload = fromWords(bech32Info.words);
+    const payload = bech32.fromWords(bech32Info.words);
     return Buffer.from(payload).toString('hex');
   } catch (_e) {
     return address;
