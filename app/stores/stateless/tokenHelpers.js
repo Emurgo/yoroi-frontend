@@ -6,6 +6,7 @@ import type {
 } from '../../api/common/lib/MultiToken';
 import type { TokenRow, TokenMetadata } from '../../api/ada/lib/storage/database/primitives/tables';
 import { isHexadecimal } from 'validator';
+import AssetFingerprint from '@emurgo/cip14-js';
 
 export function getTokenName(
   tokenRow: $ReadOnly<{
@@ -52,10 +53,20 @@ export function getTokenIdentifierIfExists(
   tokenRow: $ReadOnly<{
     Identifier: string,
     IsDefault: boolean,
+    Metadata: TokenMetadata,
     ...,
   }>
 ): void | string {
   if (tokenRow.IsDefault) return undefined;
+  if (tokenRow.Metadata.type === 'Cardano') {
+    const { policyId, assetName } = tokenRow.Metadata;
+    const assetFingerprint = new AssetFingerprint(
+      Buffer.from(policyId, 'hex'),
+      Buffer.from(assetName, 'hex')
+    );
+    return assetFingerprint.fingerprint();
+  }
+
   return tokenRow.Identifier;
 }
 
