@@ -654,7 +654,7 @@
   "wallet.settings.export.label": "导出钱包",
   "wallet.settings.name.label": "钱包名称",
   "wallet.settings.passwordLastUpdated": "上次更新的 {lastUpdated}",
-  "wallet.settings.publicExport.explanationLine1": "The below you can find your wallet's <strong>public</strong> key information.",
+  "wallet.settings.publicExport.explanationLine1": "在下方你可以找到您的钱包的<strong>公钥</strong>信息。",
   "wallet.settings.publicExport.reason1": "在Yoroi移动版中以只读模式打开钱包以便随时查看余额",
   "wallet.settings.publicExport.reason2": "与税务软件分享您的密钥自动生成税务报告",
   "wallet.settings.remove.explanation": "删除钱包不会影响钱包余额。您的钱包可以随时恢复。",
