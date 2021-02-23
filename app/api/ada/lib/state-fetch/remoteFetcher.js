@@ -41,7 +41,7 @@ import {
 import { RustModule } from '../cardanoCrypto/rustLoader';
 
 import type { ConfigType } from '../../../../../config/config-types';
-import { fromWords, decode, } from 'bech32';
+import { bech32, } from 'bech32';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
@@ -180,7 +180,7 @@ export class RemoteFetcher implements IFetcher {
             // $FlowExpectedError[cannot-write]
             input.assets = input.assets ?? [];
             try {
-              const payload = fromWords(decode(input.address, 1000).words);
+              const payload = bech32.fromWords(bech32.decode(input.address, 1000).words);
               // $FlowExpectedError[cannot-write]
               input.address = Buffer.from(payload).toString('hex');
             } catch (_e) { /* expected not to work for base58 addresses */ }
@@ -190,7 +190,7 @@ export class RemoteFetcher implements IFetcher {
             // $FlowExpectedError[cannot-write]
             output.assets = output.assets ?? [];
             try {
-              const payload = fromWords(decode(output.address, 1000).words);
+              const payload = bech32.fromWords(bech32.decode(output.address, 1000).words);
               // $FlowExpectedError[cannot-write]
               output.address = Buffer.from(payload).toString('hex');
             } catch (_e) { /* expected not to work for base58 addresses */ }
