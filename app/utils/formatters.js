@@ -71,7 +71,11 @@ function truncateFormatter(addr: string, cutoff: number): string {
 }
 
 export function truncateToken(addr: string): string {
-  return truncateFormatter(addr, 10);
+  return truncateFormatter(addr, 20);
+}
+
+export function truncateStakePool(addr: string): string {
+  return truncateFormatter(addr, 18);
 }
 
 export function truncateAddress(addr: string): string {

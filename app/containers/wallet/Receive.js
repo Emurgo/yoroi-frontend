@@ -95,7 +95,7 @@ export default class Receive extends Component<Props> {
       }));
 
     return (
-      <FullscreenLayout bottomPadding={57}>
+      <FullscreenLayout bottomPadding={70}>
         <ReceiveWithNavigation
           addressStores={storesForWallet}
           setFilter={filter => this.generated.actions.addresses.setFilter.trigger(filter)}

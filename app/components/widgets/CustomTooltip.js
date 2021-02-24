@@ -35,15 +35,18 @@ export default class CustomTooltip extends Component<Props> {
     const child = (children == null) ? this.makeDefaultChild() : children;
 
     return (
-      <div className={styles.component}>
+      <div className={classnames([
+        styles.component,
+        this.props.isPoolAvatar === true
+          ? styles.PoolAvatarTooltip
+          : null
+        ])}
+      >
         <Tooltip
           className={classnames([
             this.props.isAligningRight === true
               ? null
               : styles.SimpleCenteredTooltip,
-            this.props.isPoolAvatar === true
-            ? styles.PoolAvatarTooltip
-            : null
           ])}
           skin={TooltipSkin}
           isAligningRight={this.props.isAligningRight}

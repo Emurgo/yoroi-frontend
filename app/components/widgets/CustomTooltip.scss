@@ -13,18 +13,6 @@
       margin-left: 20px; // offset = horizontal padding of icon and tooltip
     }
   }
-
-  .PoolAvatarTooltip {
-    
-    div[data-bubble-container] {
-      margin-left: 210px;
-      margin-top: 20px !important;
-    }
-
-    span[data-bubble-arrow] {
-      top: 16px;
-    }
-  }
   
   :global(.SimpleBubble_bubble) {
     font-size: 13px;
@@ -46,5 +34,16 @@
   }
   :global(.SimpleBubble_root.SimpleBubble_transparent.SimpleBubble_openUpward)  {
       margin-bottom: -8px !important;
+  }
+}
+
+.PoolAvatarTooltip {
+  :global(.SimpleBubble_root:not(.SimpleBubble_openUpward))  {
+    margin-top: 15px !important;
+    margin-left: 70px;
+  }
+  :global(.SimpleBubble_root.SimpleBubble_transparent.SimpleBubble_openUpward)  {
+    margin-bottom: -15px !important;
+    margin-left: 70px;
   }
 }

@@ -11,6 +11,7 @@ import CustomTooltip from '../../../widgets/CustomTooltip';
 import LoadingSpinner from '../../../widgets/LoadingSpinner';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import AttentionIcon from '../../../../assets/images/attention-modern.inline.svg';
+import { truncateStakePool } from '../../../../utils/formatters';
 
 import Card from './Card';
 import styles from './UpcomingRewards.scss';
@@ -175,13 +176,13 @@ export default class UpcomingRewards extends Component<Props> {
     const avatar = `data:image/svg+xml;utf8,${encodeURIComponent(avatarSource)}`;
 
     const tooltip = pool.ticker == null
-      ? pool.id[0]
-      : (<>[{pool.ticker}] {pool.name}<br /><span>{pool.id[0]}</span></>);
+      ? truncateStakePool(pool.id[0])
+      : (<>[{pool.ticker}] {pool.name}<br /><span>{truncateStakePool(pool.id[0])}</span></>);
 
     const poolInfo =
       pool.ticker == null ? (
         <div className={styles.poolInfo}>
-          {pool.id[0]}
+          {truncateStakePool(pool.id[0])}
         </div>
       ) : (
         <div className={styles.poolInfo}>

@@ -21,6 +21,7 @@ import type { ReputationObject } from '../../../../api/jormungandr/lib/state-fet
 import globalMessages from '../../../../i18n/global-messages';
 import WarningIcon from '../../../../assets/images/attention-modern.inline.svg';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { truncateStakePool } from '../../../../utils/formatters';
 
 const messages = defineMessages({
   title: {
@@ -197,7 +198,7 @@ export default class StakePool extends Component<Props> {
                 >
                   <RawHash light>
                     <span className={styles.hash}>{
-                      hash.substring(0, 6) + '...' + hash.substring(hash.length - 6, hash.length)
+                      truncateStakePool(hash)
                     }
                     </span>
                   </RawHash>

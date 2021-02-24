@@ -383,7 +383,7 @@ const globalMessages: * = defineMessages({
   },
   blockchainExplorer: {
     id: 'settings.general.explorer',
-    defaultMessage: '!!!Blockchain Explorer',
+    defaultMessage: '!!!explorer',
   },
   newPasswordLabel: {
     id: 'wallet.settings.changePassword.dialog.newPasswordLabel',
