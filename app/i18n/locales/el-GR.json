@@ -236,7 +236,7 @@
   "settings.general.aboutYoroi.versionLabel": "Τρέχουσα έκδοση:",
   "settings.general.aboutYoroi.website": "Ιστότοπος Yoroi",
   "settings.general.aboutYoroi.youtube": "EMURGO Youtube",
-  "settings.general.explorer": "Εξερευνητής αλυσίδας των μπλοκ",
+  "settings.general.explorer": "explorer",
   "settings.general.languageSelect.info": "Για την EMURGO, το φιλικό περιβάλλον στο Yoroi ειναι ενα σημαντικό θέμα. Πιστεύουμε πως η κατανόηση ιδεών της αλυσίδας των μπλοκ είναι ευκολότερη στη μητρική σας γλώσσα. Προσπαθούμε να υποστηρίξουμε όσες περισσότερες γλώσσες είναι δυνατόν, αλλά για μία ευρύτερη επιλογή από γλώσσες χρειάζεται να αποδεχτούμε τη βοήθεια από μεταφραστές της κοινότητας. Η επιλεγμένη γλώσσα μετάφρασης παρέχεται πλήρως από την κοινότητα.",
   "settings.general.languageSelect.labelInfo": "Η επιλεγμένη γλώσσα μετάφρασης παρέχεται πλήρως από την κοινότητα",
   "settings.general.translation.acknowledgment": "Ευχαριστούμε τους κάτωθι για την προσφορά τους: ",
