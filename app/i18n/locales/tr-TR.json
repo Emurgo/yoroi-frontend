@@ -236,7 +236,7 @@
   "settings.general.aboutYoroi.versionLabel": "Geçerli sürüm:",
   "settings.general.aboutYoroi.website": "Yoroi web sitesi",
   "settings.general.aboutYoroi.youtube": "EMURGO YouTube",
-  "settings.general.explorer": "Blockchain Gezgini",
+  "settings.general.explorer": "explorer",
   "settings.general.languageSelect.info": "EMURGO için Yoroi'de ki dostluk önemli bir konudur. Ana diliniz de blokzincir kavramlarını anlamanın daha kolay olduğuna inanıyoruz. Mümkün olduğunca çok dili desteklemeye çalışıyoruz ancak daha geniş bir dil yelpazesi için yerel çevirmenlerinin yardımını kabul etmeliyiz. Seçilen dilde ki çeviri bu çevirmenler tarafından eksiksiz bir şekilde gerçekleştirilir.",
   "settings.general.languageSelect.labelInfo": "Seçilen dil çevirisi topluluk tarafından eksiksiz bir şekilde sağlanır",
   "settings.general.translation.acknowledgment": "Katkılarından dolayı aşağıdakilere teşekkür ederiz: ",
