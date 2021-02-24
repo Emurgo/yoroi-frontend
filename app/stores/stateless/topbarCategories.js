@@ -11,6 +11,7 @@ import sendIcon from '../../assets/images/wallet-nav/tab-send.inline.svg';
 import receiveIcon from '../../assets/images/wallet-nav/tab-receive.inline.svg';
 import dashboardIcon from '../../assets/images/wallet-nav/tab-dashboard.inline.svg';
 import delegationListIcon from '../../assets/images/wallet-nav/tab-delegation_list.inline.svg';
+import votingIcon from '../../assets/images/wallet-nav/voting.inline.svg';
 import environment from '../../environment';
 
 const messages = defineMessages({
@@ -93,7 +94,7 @@ export const RECEIVE: TopbarCategory = registerCategory({
 export const VOTING: TopbarCategory = registerCategory({
   className: 'voting',
   route: ROUTES.WALLETS.CATALYST_VOTING,
-  icon: undefined,
+  icon: votingIcon,
   label: messages.voting,
   isVisible: request => (
     asGetStakingKey(request.selected) != null
