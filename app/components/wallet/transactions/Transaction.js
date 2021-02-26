@@ -415,7 +415,9 @@ export default class Transaction extends Component<Props, State> {
               hash={fingerprint}
               light
               linkType="token"
-              ><span className={styles.rowData}>{this.getTicker(entry)}</span></ExplorableHashContainer>  
+            >
+              <span className={styles.rowData}>{this.getTicker(entry)}</span>
+            </ExplorableHashContainer>
           ): this.getTicker(entry)}
           
         </div>
