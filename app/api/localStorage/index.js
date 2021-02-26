@@ -5,10 +5,12 @@ import { unitOfAccountDisabledValue } from '../../types/unitOfAccountType';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 
 import {
-  getLocalItem,
-  setLocalItem,
-  removeLocalItem,
-  isEmptyStorage,
+    getLocalItem,
+    setLocalItem,
+    removeLocalItem,
+    isEmptyStorage,
+    getErgoConnectorLocalItem,
+    setErgoConnectorLocalItem
 } from './primitives';
 import {
   OPEN_TAB_ID_KEY,
@@ -29,6 +31,8 @@ const storageKeys = {
   COIN_PRICE_PUB_KEY_DATA: networkForLocalStorage + '-COIN-PRICE-PUB-KEY-DATA',
   EXTERNAL_STORAGE: networkForLocalStorage + '-EXTERNAL-STORAGE',
   TOGGLE_SIDEBAR: networkForLocalStorage + '-TOGGLE-SIDEBAR',
+  // ========== CONNECTOR   ========== //
+  ERGO_CONNECTOR_WHITELIST: 'connector_whitelist',
 };
 
 export type SetCustomUserThemeRequest = {|
@@ -206,6 +210,13 @@ export default class LocalStorageApi {
 
   unsetExternalStorage: void => Promise<void> = () => removeLocalItem(storageKeys.EXTERNAL_STORAGE);
 
+
+  // ========== CONNECTOR whitelist  ========== //
+  getWhitelist: void => Promise<?any> = () =>
+    getErgoConnectorLocalItem(storageKeys.ERGO_CONNECTOR_WHITELIST);
+
+  setWhitelist: (Array<any> | void) => Promise<void> = value =>
+    setErgoConnectorLocalItem(storageKeys.ERGO_CONNECTOR_WHITELIST, value);
 
   // =========== Common =============== //
 

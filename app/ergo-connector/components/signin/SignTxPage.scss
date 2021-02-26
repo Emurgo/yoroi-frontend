@@ -1,0 +1,104 @@
+.component {
+  padding-right: 32px;
+  padding-left: 32px;
+  padding-top: 48px;
+  overflow-wrap: break-word;
+  font-family: 'Rubik Regular';
+}
+.language {
+  label {
+    background-color: var(--theme-settings-pane-background-color);
+  }
+}
+
+.label {
+  color: #242838;
+  font-size: 14px;
+  margin-bottom: 4px;
+  letter-spacing: 0;
+  line-height: 22px;
+}
+
+.value {
+  color: #6b7384;
+  font-size: 14px;
+  letter-spacing: 0;
+  line-height: 22px;
+  margin-bottom: 24px;
+}
+.row {
+  margin-bottom: 24px;
+}
+.details {
+  margin-bottom: 24px;
+  display: flex;
+  justify-content: space-between;
+  & > * {
+    flex: 1 1 48%;
+    max-width: 48%;
+  }
+  .amount {
+    color: #38393d;
+    font-weight: 700;
+    margin-bottom: 3px;
+  }
+  .tokens {
+    color: #242838;
+    font-size: 14px;
+    margin-bottom: 3px;
+  }
+  .amountRow {
+    margin-bottom: 9px;
+  }
+}
+
+.totalValue {
+  color: #17d1aa;
+  font-size: 18px;
+  font-size: 700;
+  margin-bottom: 24px;
+}
+
+.address {
+  border-top: 1px solid #dce0e9;
+  padding-top: 24px;
+  margin-bottom: 28px;
+  display: flex;
+  font-size: 14px;
+  justify-content: space-between;
+  .label {
+    span {
+      font-weight: 700;
+    }
+  }
+  & > div {
+    flex: 1 1 50%;
+    max-width: 50%;
+    &:first-child {
+      padding-right: 24px;
+    }
+    &:last-child {
+      padding-left: 24px;
+    }
+  }
+
+  & > div + div {
+    border-left: 1px solid #dce0e9;
+  }
+}
+
+.wrapperBtn {
+  padding-top: 16px;
+  display: flex;
+  button {
+    height: 40px;
+    font-size: 14px;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  button + button {
+    margin-left: 22px;
+  }
+}

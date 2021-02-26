@@ -11,6 +11,7 @@ const manifestEnvs = require('../chrome/manifestEnvs');
 
 const plugins = (folder /*: string */, _networkName /*: string */) /*: * */ => {
   const pageTitle = 'Yoroi';
+  const ergoPageTitle = 'Yoroi Dapp Connector';
 
   return [
     /** We remove non-English languages from BIP39 to avoid triggering bad word filtering */
@@ -28,6 +29,13 @@ const plugins = (folder /*: string */, _networkName /*: string */) /*: * */ => {
       chunks: ['yoroi'],
       alwaysWriteToDisk: true,
       title: pageTitle,
+    }),
+    new HtmlWebpackPlugin({
+      filename: path.join(__dirname, `../${folder}/main_window_ergo.html`),
+      template: path.join(__dirname, '../chrome/views/ergo-connector/main_window.html'),
+      chunks: ['ergo'],
+      alwaysWriteToDisk: true,
+      title: ergoPageTitle,
     }),
     new HtmlWebpackPlugin({
       filename: path.join(__dirname, `../${folder}/background.html`),

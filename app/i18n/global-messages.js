@@ -774,6 +774,16 @@ export const memoMessages: * = defineMessages({
     defaultMessage: '!!!Memo (optional)',
   }
 });
+export const connectorMessages: * = defineMessages({
+  connectedWebsites: {
+    id: 'global.connector.connectedWebsites',
+    defaultMessage: '!!!Connected Websites',
+  },
+  messageReadOnly: {
+    id: 'global.connector.messageReadOnly',
+    defaultMessage: '!!!We are granting read-only to view utxos/addresses.',
+  },
+});
 
 
 export function listOfTranslators(

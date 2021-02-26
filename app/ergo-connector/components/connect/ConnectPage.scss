@@ -1,0 +1,88 @@
+.connectWrapper {
+  margin-top: 44px;
+  margin-bottom: 64px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  & .image {
+    width: 60px;
+    height: 60px;
+    border: 1px solid #a7afc0;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f8f8f8;
+
+    img {
+      display: block;
+      width: 35px;
+      height: 35px;
+    }
+  }
+  & .title {
+    text-align: center;
+    margin-top: 8px;
+    font-size: 18px;
+    font-weight: 600;
+    h2 {
+      margin-bottom: 6px;
+    }
+    p {
+      color: #3154cb;
+    }
+  }
+}
+
+.list {
+  padding: 0 32px 17px;
+  border-bottom: 1px solid #dce0e9;
+  & .listItem {
+    padding-top: 15px;
+    padding-bottom: 15px;
+    & > div {
+      width: 100%;
+    }
+    & + li {
+      border-top: 1px solid #dce0e9;
+    }
+    label {
+      width: 100%;
+      color: #242838;
+    }
+  }
+}
+
+.bottom {
+  padding-top: 23px;
+  padding-left: 32px;
+  padding-right: 32px;
+
+  .infoText {
+    color: #6b7384;
+    font-size: 12px;
+    margin-bottom: 32px;
+    line-height: 20px;
+  }
+  & .wrapperBtn {
+    display: flex;
+    button + button {
+      margin-left: 22px;
+    }
+  }
+}
+.checkbox {
+  & input + div {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #6b7384;
+  }
+}
+.errorMessage {
+  color: var(--rp-formfield-error-text-color, rgba(222, 50, 38, 0.5));
+  padding: 10px 0;
+  p {
+    margin-top: 10px;
+    overflow-wrap: break-word;
+  }
+}

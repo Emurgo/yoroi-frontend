@@ -30,6 +30,7 @@ import {
   connectorGetUsedAddresses,
   connectorGetUnusedAddresses
 } from './ergo-connector/api';
+import { GenericApiError } from '../../app/api/common/errors';
 
 /*::
 declare var chrome;
@@ -96,24 +97,28 @@ type ConnectedSite = {|
 const connectedSites: Map<number, ConnectedSite> = new Map();
 // chrome.storage.local.set({ connector_whitelist: [] });
 export async function getWalletsInfo(): Promise<AccountInfo[]> {
-  if (db == null) {
-    db = await loadLovefieldDB(schema.DataStoreType.INDEXED_DB);
-  }
-  const wallets = await getWallets({ db });
-  // information about each wallet to show to the user
-  const accounts = [];
-  for (const wallet of wallets) {
-    const conceptualInfo = await wallet.getParent().getFullConceptualWalletInfo();
-    // TODO: there's probably a better way to check for ERGO wallets?
-    if (conceptualInfo.NetworkId === 200) {
-      const balance = await connectorGetBalance(wallet, 'ERG');
-      accounts.push({
-        name: conceptualInfo.Name,
-        balance: balance.toString(),
-      });
+  try {
+    if (db == null) {
+      db = await loadLovefieldDB(schema.DataStoreType.INDEXED_DB);
     }
+    const wallets = await getWallets({ db });
+    // information about each wallet to show to the user
+    const accounts = [];
+    for (const wallet of wallets) {
+      const conceptualInfo = await wallet.getParent().getFullConceptualWalletInfo();
+      // TODO: there's probably a better way to check for ERGO wallets?
+      if (conceptualInfo.NetworkId === 200) {
+        const balance = await connectorGetBalance(wallet, 'ERG');
+        accounts.push({
+          name: conceptualInfo.Name,
+          balance: balance.toString(),
+        });
+      }
+    }
+    return accounts;
+  } catch (error) {
+    throw new GenericApiError();
   }
-  return accounts;
 }
 
 async function getSelectedWallet(tabId: number): Promise<PublicDeriver<>> {
@@ -246,10 +251,10 @@ async function confirmSign(tabId: number, request: PendingSignData): Promise<any
         openedWindow: false,
         resolve
       });
-      chrome.windows.create({
-        url: 'sign.html',
-        width: 240,
-        height: 400,
+       chrome.windows.create({
+        url: `${window.location.origin}/main_window_ergo.html#/signin-transaction`,
+        width: 466,
+        height: 600,
         focused: true,
         type: 'popup'
       });
@@ -283,9 +288,9 @@ async function confirmConnect(tabId: number, url: string): Promise<?AccountIndex
           pendingSigns: new Map()
         });
         chrome.windows.create({
-          url: 'connect.html',
-          width: 240,
-          height: 400,
+          url: 'main_window_ergo.html',
+          width: 466,
+          height: 600,
           focused: true,
           type: 'popup'
         });
@@ -301,9 +306,9 @@ chrome.runtime.onMessageExternal.addListener((message, sender) => {
   if (sender.id === connectorId) {
     if (message.type === 'open_browseraction_menu') {
       chrome.windows.create({
-        url: 'config.html',
-        width: 240,
-        height: 400,
+        url: `${window.location.origin}/main_window_ergo.html#/settings`,
+        width: 466,
+        height: 600,
         focused: true,
         type: 'popup'
       });

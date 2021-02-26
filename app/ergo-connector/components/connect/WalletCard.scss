@@ -1,0 +1,22 @@
+.card {
+  display: flex;
+  align-items: center;
+  width: 100%;
+
+  letter-spacing: 0;
+  line-height: 22px;
+  & .avatar {
+    margin-right: 13px;
+    img {
+      width: 32px;
+      height: 32px;
+      object-fit: cover;
+    }
+  }
+  & .name {
+    flex: 1;
+  }
+  & .balance {
+    font-weight: 700;
+  }
+}
