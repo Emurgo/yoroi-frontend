@@ -374,7 +374,7 @@ chrome.runtime.onConnectExternal.addListener(port => {
           case 'get_utxos':
             {
               const wallet = await getSelectedWallet(tabId);
-              const utxos = await connectorGetUtxos(wallet, message.params[0]);
+              const utxos = await connectorGetUtxos(wallet, message.params[0], message.params[1], message.params[2]);
               if (utxos != null) {
                 rpcResponse({
                   ok: utxos
@@ -387,7 +387,7 @@ chrome.runtime.onConnectExternal.addListener(port => {
           case 'get_used_addresses':
             {
               const wallet = await getSelectedWallet(tabId);
-              const addresses = await connectorGetUsedAddresses(wallet);
+              const addresses = await connectorGetUsedAddresses(wallet, message.params[0]);
               rpcResponse({
                 ok: addresses
               });
