@@ -39,7 +39,7 @@ import { hiddenAmount } from '../../../utils/strings';
 import type {
   TokenLookupKey, TokenEntry,
 } from '../../../api/common/lib/MultiToken';
-import { getTokenName } from '../../../stores/stateless/tokenHelpers';
+import { getTokenName, getTokenIdentifierIfExists } from '../../../stores/stateless/tokenHelpers';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import { parseMetadata, parseMetadataDetailed } from '../../../api/ada/lib/storage/bridge/metadataUtils';
 import CodeBlock from '../../widgets/CodeBlock';
@@ -379,6 +379,14 @@ export default class Transaction extends Component<Props, State> {
     return truncateToken(getTokenName(tokenInfo));
   };
 
+  getFingerprint: TokenEntry => string | void = tokenEntry => {
+    const tokenInfo = this.props.getTokenInfo(tokenEntry);
+    if (tokenInfo.Metadata.type === 'Cardano') {
+      return getTokenIdentifierIfExists(tokenInfo);
+    }
+    return undefined;
+  }
+
   renderRow: {|
     kind: string,
     data: WalletTransaction,
@@ -389,6 +397,7 @@ export default class Transaction extends Component<Props, State> {
     const notificationElementId = `${request.kind}-address-${request.addressIndex}-${request.data.txid}-copyNotification`;
     const divKey = (identifier) => `${request.data.txid}-${request.kind}-${request.address.address}-${request.addressIndex}-${identifier}`;
     const renderAmount = (entry) => {
+      const fingerprint = this.getFingerprint(entry);
       return (
         <div className={styles.fee}>
           {this.renderAmountDisplay({
@@ -398,7 +407,17 @@ export default class Transaction extends Component<Props, State> {
                 ? request.transform(entry.amount)
                 : entry.amount,
             },
-          })} {this.getTicker(entry)}
+          })}
+          {' '}
+          { fingerprint !== undefined ? (
+            <ExplorableHashContainer
+              selectedExplorer={this.props.selectedExplorer}
+              hash={fingerprint}
+              light
+              linkType="token"
+              ><span className={styles.rowData}>{this.getTicker(entry)}</span></ExplorableHashContainer>  
+          ): this.getTicker(entry)}
+          
         </div>
       );
     };

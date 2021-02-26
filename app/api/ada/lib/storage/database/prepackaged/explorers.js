@@ -7,6 +7,40 @@ const CardanoMainnetExplorers: Array<$ReadOnly<ExplorerRow>> = [
   {
     ExplorerId: 1_00,
     NetworkId: networks.CardanoMainnet.NetworkId,
+    IsBackup: true,
+    Endpoints: {
+      address: 'https://cardanoscan.io/address/',
+      transaction: 'https://cardanoscan.io/transaction/',
+      pool: 'https://cardanoscan.io/pool/',
+      stakeAddress: 'https://cardanoscan.io/stakeKey/',
+      token: 'https://cardanoscan.io/token/',
+    },
+    Name: 'CardanoScan',
+  },
+  {
+    ExplorerId: 1_01,
+    NetworkId: networks.CardanoMainnet.NetworkId,
+    IsBackup: false,
+    Endpoints: {
+      address: 'https://adastat.net/addresses/',
+      transaction: 'https://adastat.net/transactions/',
+      pool: 'https://adastat.net/pools/',
+    },
+    Name: 'AdaStat',
+  },
+  {
+    ExplorerId: 1_02,
+    NetworkId: networks.CardanoMainnet.NetworkId,
+    IsBackup: false,
+    Endpoints: {
+      address: 'https://explorer.cardano.org/en/address?address=',
+      transaction: 'https://explorer.cardano.org/en/transaction?id=',
+    },
+    Name: 'CardanoExplorer',
+  },
+  {
+    ExplorerId: 1_03,
+    NetworkId: networks.CardanoMainnet.NetworkId,
     IsBackup: false,
     Endpoints: {
       address: 'https://adaex.org/',
@@ -16,17 +50,7 @@ const CardanoMainnetExplorers: Array<$ReadOnly<ExplorerRow>> = [
     Name: 'ADAex.org',
   },
   {
-    ExplorerId: 1_01,
-    NetworkId: networks.CardanoMainnet.NetworkId,
-    IsBackup: false,
-    Endpoints: {
-      address: 'https://adascan.net/address/',
-      transaction: 'https://adascan.net/transaction/',
-    },
-    Name: 'AdaScan',
-  },
-  {
-    ExplorerId: 1_02,
+    ExplorerId: 1_04,
     NetworkId: networks.CardanoMainnet.NetworkId,
     IsBackup: false,
     Endpoints: {
@@ -34,24 +58,6 @@ const CardanoMainnetExplorers: Array<$ReadOnly<ExplorerRow>> = [
       transaction: 'https://blockchair.com/cardano/transaction/',
     },
     Name: 'Blockchair',
-  },
-  {
-    ExplorerId: 1_03,
-    NetworkId: networks.CardanoMainnet.NetworkId,
-    IsBackup: false,
-    Endpoints: {
-    },
-    Name: 'Clio.1',
-  },
-  {
-    ExplorerId: 1_04,
-    NetworkId: networks.CardanoMainnet.NetworkId,
-    IsBackup: false,
-    Endpoints: {
-      address: 'https://explorer.cardano.org/en/address?address=',
-      transaction: 'https://explorer.cardano.org/en/transaction?id=',
-    },
-    Name: 'CardanoExplorer',
   },
   {
     ExplorerId: 1_05,
@@ -67,33 +73,11 @@ const CardanoMainnetExplorers: Array<$ReadOnly<ExplorerRow>> = [
   {
     ExplorerId: 1_06,
     NetworkId: networks.CardanoMainnet.NetworkId,
-    IsBackup: true,
-    Endpoints: {
-      address: 'https://cardanoscan.io/address/',
-      transaction: 'https://cardanoscan.io/transaction/',
-      pool: 'https://cardanoscan.io/pool/',
-    },
-    Name: 'CardanoScan',
-  },
-  {
-    ExplorerId: 1_07,
-    NetworkId: networks.CardanoMainnet.NetworkId,
     IsBackup: false,
     Endpoints: {
       pool: 'https://pooltool.io/pool/',
     },
     Name: 'PoolTool',
-  },
-  {
-    ExplorerId: 1_08,
-    NetworkId: networks.CardanoMainnet.NetworkId,
-    IsBackup: false,
-    Endpoints: {
-      address: 'https://adastat.net/addresses/',
-      transaction: 'https://adastat.net/transactions/',
-      pool: 'https://adastat.net/pools/',
-    },
-    Name: 'AdaStat',
   },
 ];
 
