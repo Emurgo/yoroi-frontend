@@ -3,7 +3,7 @@
 import { observable, action, runInAction, computed } from 'mobx';
 import { getWalletsInfo } from '../../../chrome/extension/background';
 import Request from '../../stores/lib/LocalizedRequest';
-import Store from './base/Store';
+import Store from '../../stores/base/Store';
 import type {
   AccountInfo,
   ConfirmedSignData,
@@ -12,6 +12,8 @@ import type {
   SigningMessage,
   WhitelistEntry,
 } from '../../../chrome/extension/ergo-connector/types';
+import type { ActionsMap } from '../actions/index';
+import type { StoresMap } from './index';
 
 // Need to run only once - Connecting wallets
 let initedConnecting = false;
@@ -52,7 +54,7 @@ type SetWhitelistFunc = {|
   whitelist: Array<WhitelistEntry> | void,
 |} => Promise<void>;
 
-export default class ConnectorStore extends Store {
+export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   @observable connectingMessage: ?ConnectingMessage = null;
   @observable whiteList: Array<WhitelistEntry> = [];
 

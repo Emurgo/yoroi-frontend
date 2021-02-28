@@ -59,9 +59,11 @@ import {
   genTimeToSlot,
 } from '../../api/ada/lib/storage/bridge/timeUtils';
 import { getCardanoHaskellBaseConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import type { ActionsMap } from '../../actions/index';
+import type { StoresMap } from '../index';
 
 export default class LedgerConnectStore
-  extends Store
+  extends Store<StoresMap, ActionsMap>
   implements HWConnectStoreTypes<ExtendedPublicKeyResp> {
 
   // =================== VIEW RELATED =================== //

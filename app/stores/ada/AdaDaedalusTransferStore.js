@@ -11,8 +11,10 @@ import {
   genTimeToSlot,
 } from '../../api/ada/lib/storage/bridge/timeUtils';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
+import type { ActionsMap } from '../../actions/index';
+import type { StoresMap } from '../index';
 
-export default class AdaDaedalusTransferStore extends Store {
+export default class AdaDaedalusTransferStore extends Store<StoresMap, ActionsMap> {
 
   buildTx: BuildTxFunc = async (request) => {
     const selectedNetwork = this.stores.profile.selectedNetwork;

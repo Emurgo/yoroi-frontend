@@ -16,6 +16,8 @@ import type {
   TimeSinceGenesisFunc,
   ToRealTimeFunc,
 } from '../../api/common/lib/storage/bridge/timeUtils';
+import type { ActionsMap } from '../../actions/index';
+import type { StoresMap } from '../index';
 
 export type TimeCalcRequests = {|
   // although time is network-specific
@@ -46,7 +48,7 @@ export type CurrentTimeRequests = {|
 /**
  * Different wallets can be on different networks and therefore have different measures of time
 */
-export default class BaseCardanoTimeStore extends Store {
+export default class BaseCardanoTimeStore extends Store<StoresMap, ActionsMap> {
 
   @observable time: Date = new Date();
 

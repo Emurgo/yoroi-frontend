@@ -12,6 +12,8 @@ import {
 import type {
   DefaultTokenEntry,
 } from '../../api/common/lib/MultiToken';
+import type { ActionsMap } from '../../actions/index';
+import type { StoresMap } from '../index';
 
 export type TokenInfoMap = Map<
   string, // network ID. String because mobx requires string for observable maps
@@ -21,7 +23,7 @@ export type TokenInfoMap = Map<
   >
 >;
 
-export default class TokenInfoStore extends Store {
+export default class TokenInfoStore extends Store<StoresMap, ActionsMap> {
   @observable tokenInfo: TokenInfoMap;
 
   setup(): void {

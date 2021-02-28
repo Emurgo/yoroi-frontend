@@ -28,6 +28,8 @@ import type { TokenRow, } from '../../api/ada/lib/storage/database/primitives/ta
 import { getDefaultEntryToken } from './TokenInfoStore';
 import { cardanoValueFromMultiToken } from '../../api/ada/transactions/utils';
 import { getReceiveAddress } from '../stateless/addressStores';
+import type { ActionsMap } from '../../actions/index';
+import type { StoresMap } from '../index';
 
 export type SetupSelfTxRequest = {|
   publicDeriver: IPublicDeriver<>,
@@ -42,7 +44,7 @@ export type SetupSelfTxFunc = SetupSelfTxRequest => Promise<void>;
  *
  * These can be loosened later to create a manual UTXO selection feature
  */
-export default class TransactionBuilderStore extends Store {
+export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap> {
 
   @observable shouldSendAll: boolean;
   /** Stores the tx information as the user is building it */

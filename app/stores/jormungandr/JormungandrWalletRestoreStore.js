@@ -28,8 +28,10 @@ import type {
   NetworkRow,
 } from '../../api/ada/lib/storage/database/primitives/tables';
 import { getJormungandrBaseConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import type { ActionsMap } from '../../actions/index';
+import type { StoresMap } from '../index';
 
-export default class JormungandrWalletRestoreStore extends Store {
+export default class JormungandrWalletRestoreStore extends Store<StoresMap, ActionsMap> {
 
   setup(): void {
     super.setup();

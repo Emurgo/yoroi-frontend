@@ -40,6 +40,8 @@ import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/t
 import { isJormungandr, isCardanoHaskell, isErgo } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { defineMessages, } from 'react-intl';
 import type { $npm$ReactIntl$MessageDescriptor } from 'react-intl';
+import type { ActionsMap } from '../../actions/index';
+import type { StoresMap } from '../index';
 
 const messages = defineMessages({
   walletRestoreVerifyAccountIdLabel: {
@@ -93,7 +95,7 @@ export type PlateWithMeta = {|
   addressMessage: $Exact<$npm$ReactIntl$MessageDescriptor>,
 |};
 
-export default class AdaWalletRestoreStore extends Store {
+export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> {
 
   @observable selectedAccount: number = 0 + HARD_DERIVATION_START;
 

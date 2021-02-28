@@ -37,8 +37,10 @@ import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/t
 import type { MangledAmountFunc } from '../stateless/mangledAddresses';
 import { getUnmangleAmounts } from '../stateless/mangledAddresses';
 import { MultiToken } from '../../api/common/lib/MultiToken';
+import type { ActionsMap } from '../../actions/index';
+import type { StoresMap } from '../index';
 
-export default class JormungandrDelegationStore extends Store {
+export default class JormungandrDelegationStore extends Store<StoresMap, ActionsMap> {
 
   _recalculateDelegationInfoDisposer: void => void = () => {};
 

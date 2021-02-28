@@ -10,8 +10,10 @@ import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import { buildCheckAndCall } from '../lib/check';
 import { getApiForNetwork, ApiOptions } from '../../api/common/utils';
+import type { ActionsMap } from '../../actions/index';
+import type { StoresMap } from '../index';
 
-export default class AdaWalletsStore extends Store {
+export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
 
   // REQUESTS
 

@@ -24,10 +24,12 @@ import type {
 } from '../../api/externalStorage/providers/IProvider';
 import type { SelectedExternalStorageProvider } from '../../domain/ExternalStorage';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import type { ActionsMap } from '../../actions/index';
+import type { StoresMap } from '../index';
 
 export type MemosForWallet = Map<string, $ReadOnly<TxMemoTableRow>>;
 
-export default class MemosStore extends Store {
+export default class MemosStore extends Store<StoresMap, ActionsMap> {
 
   @computed get providers(): { [key: string]: ProvidersType, ... } {
     return this.api.externalStorage.getProviders();

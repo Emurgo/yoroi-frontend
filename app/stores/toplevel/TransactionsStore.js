@@ -43,6 +43,8 @@ import {
   MultiToken,
 } from '../../api/common/lib/MultiToken';
 import { genLookupOrFail, getTokenName } from '../stateless/tokenHelpers';
+import type { ActionsMap } from '../../actions/index';
+import type { StoresMap } from '../index';
 
 export type TxRequests = {|
   publicDeriver: PublicDeriver<>,
@@ -73,7 +75,7 @@ export const INITIAL_SEARCH_LIMIT: number = 5;
 /** Skip first n transactions from api */
 export const SEARCH_SKIP: number = 0;
 
-export default class TransactionsStore extends Store {
+export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
 
   /** How many additional transactions to display when user wants to show more */
   SEARCH_LIMIT_INCREASE: number = 5;

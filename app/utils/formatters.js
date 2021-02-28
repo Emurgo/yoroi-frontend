@@ -70,6 +70,10 @@ function truncateFormatter(addr: string, cutoff: number): string {
   return addr.substring(0, cutoff / 2) + '...' + addr.substring(addr.length - (cutoff / 2), addr.length);
 }
 
+export function truncateConnectorBoxId(addr: string): string {
+  return truncateFormatter(addr, 12);
+}
+
 export function truncateToken(addr: string): string {
   return truncateFormatter(addr, 20);
 }

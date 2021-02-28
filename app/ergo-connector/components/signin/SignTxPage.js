@@ -19,6 +19,7 @@ import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import { handleExternalLinkClick } from '../../../utils/routing';
 import ExplorableHash from '../../../components/widgets/hashWrappers/ExplorableHash';
 import type { Notification } from '../../../types/notificationType';
+import { truncateConnectorBoxId } from '../../../utils/formatters';
 
 const messages = defineMessages({
   fromAddresses: {
@@ -33,23 +34,12 @@ const messages = defineMessages({
 
 type Props = {|
   totalMount: ?number,
-  txData: any,
+  txData: any, // TODO: what is this supposed to be? Doesn't match the type of the thing back in
   onCopyAddressTooltip: (string, string) => void,
   onCancel: () => void,
   onConfirm: string => void,
   +notification: ?Notification,
 |};
-
-function truncateFormatter(addr: string, cutoff: number): string {
-  const shortener = '...';
-
-  if (addr.length + shortener.length <= cutoff) {
-    return addr;
-  }
-  return (
-    addr.substring(0, cutoff / 2) + '...' + addr.substring(addr.length - cutoff / 2, addr.length)
-  );
-}
 
 const URL_WEBSITE = 'https://explorer.ergoplatform.com/en/addresses/';
 
@@ -172,7 +162,7 @@ class SignTxPage extends Component<Props> {
                       >
                         <RawHash light={false}>
                           <span className={styles.addressHash}>
-                            {truncateFormatter(address.boxId, 12)}
+                            {truncateConnectorBoxId(address.boxId)}
                           </span>
                         </RawHash>
                       </ExplorableHash>
@@ -207,7 +197,7 @@ class SignTxPage extends Component<Props> {
                       >
                         <RawHash light={false}>
                           <span className={styles.addressHash}>
-                            {truncateFormatter(address.boxId, 12)}
+                            {truncateConnectorBoxId(address.boxId)}
                           </span>
                         </RawHash>
                       </ExplorableHash>

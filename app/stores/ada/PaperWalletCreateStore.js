@@ -6,6 +6,8 @@ import type { AdaPaper } from '../../api/ada';
 import fileSaver from 'file-saver';
 import type { PdfGenStepType } from '../../api/ada/paperWallet/paperWalletPdf';
 import environment from '../../environment';
+import type { ActionsMap } from '../../actions/index';
+import type { StoresMap } from '../index';
 
 export type ProgressStepEnum = 0 | 1 | 2 | 3 | 4;
 export const ProgressStep = {
@@ -31,7 +33,7 @@ export const ProgressStep = {
   FINALIZE: 4,
 };
 
-export default class PaperWalletCreateStore extends Store {
+export default class PaperWalletCreateStore extends Store<StoresMap, ActionsMap> {
 
   @observable progressInfo: ?ProgressStepEnum;
   @observable pdfRenderStatus: ?PdfGenStepType;

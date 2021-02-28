@@ -14,8 +14,10 @@ import { ROUTES } from '../../../routes-config';
 import type { ISignRequest } from '../../../api/common/lib/transactions/ISignRequest';
 import { getApiForNetwork, ApiOptions } from '../../../api/common/utils';
 import { buildCheckAndCall } from '../../lib/check';
+import type { ActionsMap } from '../../../actions/index';
+import type { StoresMap } from '../../index';
 
-export default class JormungandrMnemonicSendStore extends Store {
+export default class JormungandrMnemonicSendStore extends Store<StoresMap, ActionsMap> {
 
   setup(): void {
     super.setup();

@@ -16,6 +16,8 @@ import {
 import {
   filterAddressesByStakingKey,
 } from '../../api/ada/lib/storage/bridge/delegationUtils';
+import type { ActionsMap } from '../../actions/index';
+import type { StoresMap } from '../index';
 
 export async function filterMangledAddresses(request: {|
   publicDeriver: PublicDeriver<>,
@@ -52,7 +54,7 @@ export async function filterMangledAddresses(request: {|
   }));
 }
 
-export default class AdaAddressesStore extends Store {
+export default class AdaAddressesStore extends Store<StoresMap, ActionsMap> {
 
   storewiseFilter: {|
     publicDeriver: PublicDeriver<>,

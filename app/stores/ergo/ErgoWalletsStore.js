@@ -10,8 +10,10 @@ import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/in
 import { buildCheckAndCall } from '../lib/check';
 import { getApiForNetwork, ApiOptions } from '../../api/common/utils';
 import { ErgoTxSignRequest } from '../../api/ergo/lib/transactions/ErgoTxSignRequest';
+import type { ActionsMap } from '../../actions/index';
+import type { StoresMap } from '../index';
 
-export default class ErgoWalletsStore extends Store {
+export default class ErgoWalletsStore extends Store<StoresMap, ActionsMap> {
 
   // REQUESTS
 

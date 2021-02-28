@@ -17,8 +17,10 @@ import type {
   ExplorerRow
 } from '../../api/ada/lib/storage/database/explorers/tables';
 import { SelectedExplorer, defaultToSelectedExplorer } from '../../domain/SelectedExplorer';
+import type { ActionsMap } from '../../actions/index';
+import type { StoresMap } from '../index';
 
-export default class ExplorerStore extends Store {
+export default class ExplorerStore extends Store<StoresMap, ActionsMap> {
 
   @observable getSelectedExplorerRequest: Request<GetSelectedExplorerFunc>
     = new Request<GetSelectedExplorerFunc>(getSelectedExplorer);

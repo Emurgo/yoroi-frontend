@@ -40,8 +40,10 @@ import { toTrezorAddressParameters } from '../../api/ada/transactions/shelley/tr
 import { toLedgerAddressParameters } from '../../api/ada/transactions/shelley/ledgerTx';
 import type { StandardAddress } from '../../types/AddressFilterTypes';
 import { genAddressingLookup } from '../stateless/addressStores';
+import type { ActionsMap } from '../../actions/index';
+import type { StoresMap } from '../index';
 
-export default class HWVerifyAddressStore extends Store {
+export default class HWVerifyAddressStore extends Store<StoresMap, ActionsMap> {
   @observable isActionProcessing: boolean = false;
   @observable error: ?LocalizableError = null;
   @observable selectedAddress: ?$ReadOnly<StandardAddress> = null;

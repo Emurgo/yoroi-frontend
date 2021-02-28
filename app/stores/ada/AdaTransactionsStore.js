@@ -5,8 +5,10 @@ import type {
   GetTransactionsFunc,
   RefreshPendingTransactionsFunc,
 } from '../../api/common';
+import type { ActionsMap } from '../../actions/index';
+import type { StoresMap } from '../index';
 
-export default class AdaTransactionsStore extends Store {
+export default class AdaTransactionsStore extends Store<StoresMap, ActionsMap> {
 
   refreshTransactions: GetTransactionsFunc = (request) => {
     const stateFetcher = this.stores.substores.ada.stateFetchStore.fetcher;

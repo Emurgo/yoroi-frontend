@@ -1,11 +1,13 @@
 // @flow
 
 import Store from '../base/Store';
+import type { ActionsMap } from '../../actions/index';
+import type { StoresMap } from '../index';
 
 /**
  * Different wallets can be on different networks and therefore have different measures of time
 */
-export default class TimeStore extends Store {
+export default class TimeStore extends Store<StoresMap, ActionsMap> {
   intervalId: void | IntervalID;
 
   setup(): void {

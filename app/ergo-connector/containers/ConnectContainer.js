@@ -5,7 +5,7 @@ import ConnectPage from '../components/connect/ConnectPage';
 import { observer } from 'mobx-react';
 import { computed } from 'mobx';
 import type { InjectedOrGeneratedConnector } from '../../types/injectedPropsType';
-import type { ConnectingMessage } from '../../../chrome/extension/ergo-connector/types';
+import type { AccountInfo, ConnectingMessage } from '../../../chrome/extension/ergo-connector/types';
 
 type GeneratedData = typeof ConnectContainer.prototype.generated;
 declare var chrome;
@@ -128,7 +128,7 @@ export default class ConnectContainer extends Component<
     stores: {|
       connector: {|
         connectingMessage: ?ConnectingMessage,
-        wallets: Array<any>,
+        wallets: Array<AccountInfo>,
         errorWallets: string,
         loadingWallets: 'idle' | 'pending' | 'success' | 'rejected',
       |},

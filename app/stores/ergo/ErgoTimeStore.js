@@ -5,11 +5,13 @@ import {
   PublicDeriver,
 } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import Store from '../base/Store';
+import type { ActionsMap } from '../../actions/index';
+import type { StoresMap } from '../index';
 
 /**
  * Different wallets can be on different networks and therefore have different measures of time
 */
-export default class ErgoTimeStore extends Store {
+export default class ErgoTimeStore extends Store<StoresMap, ActionsMap> {
 
   setup(): void {
     super.setup();

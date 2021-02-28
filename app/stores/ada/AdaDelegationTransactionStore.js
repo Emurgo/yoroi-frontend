@@ -25,8 +25,10 @@ import {
   isTrezorTWallet,
 } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import { MultiToken } from '../../api/common/lib/MultiToken';
+import type { ActionsMap } from '../../actions/index';
+import type { StoresMap } from '../index';
 
-export default class AdaDelegationTransactionStore extends Store {
+export default class AdaDelegationTransactionStore extends Store<StoresMap, ActionsMap> {
 
   @observable selectedPools: Array<string>;
 

@@ -1,6 +1,7 @@
 // @flow
 import { computed, observable, action, } from 'mobx';
 import Store from '../base/Store';
+import DialogsActions from '../../actions/dialogs-actions';
 
 type DialogEntry = {|
   dialog: any,
@@ -26,7 +27,11 @@ type DialogEntry = {|
 /** Manages the open dialog window in Yoroi.
  * Note: There can only be one open dialog at a time
  */
-export default class UiDialogsStore extends Store {
+export default class UiDialogsStore<
+  TStores,
+  TActions: { dialogs: DialogsActions, ... },
+> extends Store<TStores, TActions>
+{
 
   @observable dialogList: Array<DialogEntry> = [];
 

@@ -7,6 +7,10 @@ import { computed } from 'mobx';
 import { observer } from 'mobx-react';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import type { InjectedOrGeneratedConnector } from '../../types/injectedPropsType';
+import type {
+  AccountInfo,
+  WhitelistEntry,
+} from '../../../chrome/extension/ergo-connector/types';
 
 type GeneratedData = typeof ConnectWebsitesContainer.prototype.generated;
 
@@ -65,8 +69,8 @@ export default class ConnectWebsitesContainer extends Component<
     |},
     stores: {|
       connector: {|
-        wallets: ?Array<any>,
-        currentConnectorWhitelist: ?Array<any>,
+        wallets: ?Array<AccountInfo>,
+        currentConnectorWhitelist: ?Array<WhitelistEntry>,
         loadingWallets: 'idle' | 'pending' | 'success' | 'rejected',
         errorWallets: string,
       |},

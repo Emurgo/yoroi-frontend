@@ -7,8 +7,10 @@ import type { RestoreModeType } from '../../actions/common/wallet-restore-action
 import {
   buildCheckAndCall,
 } from '../lib/check';
+import type { ActionsMap } from '../../actions/index';
+import type { StoresMap } from '../index';
 
-export default class ErgoRestoreStore extends Store {
+export default class ErgoRestoreStore extends Store<StoresMap, ActionsMap> {
 
   setup(): void {
     super.setup();

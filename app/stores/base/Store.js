@@ -5,15 +5,15 @@ import type { StoresMap } from '../index';
 import type { Api } from '../../api/index';
 
 // Base store class used by all stores in our application
-export default class Store {
+export default class Store<TStores, TActions> {
 
-  stores: StoresMap;
+  stores: TStores;
   api: Api;
-  actions: ActionsMap;
+  actions: TActions;
 
   _reactions: Array<Reaction> = [];
 
-  constructor(stores: StoresMap, api: Api, actions: ActionsMap) {
+  constructor(stores: TStores, api: Api, actions: TActions) {
     this.stores = stores;
     this.api = api;
     this.actions = actions;

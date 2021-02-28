@@ -6,6 +6,8 @@ import WalletBackupDialog from '../../components/wallet/WalletBackupDialog';
 import {
   HARD_DERIVATION_START,
 } from '../../config/numbersConfig';
+import type { ActionsMap } from '../../actions/index';
+import type { StoresMap } from '../index';
 
 export type WalletBackupSteps = 'privacyWarning' | 'recoveryPhraseDisplay' | 'recoveryPhraseEntry' | null;
 
@@ -17,7 +19,7 @@ export type RecoveryPhraseSortedArray = Array<{|
 
 /** Pipeline for users to create their wallet and backing up their mnemonic somewhere safe */
 export default
-class WalletBackupStore extends Store {
+class WalletBackupStore extends Store<StoresMap, ActionsMap> {
 
   @observable inProgress: boolean;
   @observable currentStep: WalletBackupSteps;

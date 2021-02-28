@@ -24,8 +24,10 @@ import {
 import type {
   Address, Addressing
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
+import type { ActionsMap } from '../../actions/index';
+import type { StoresMap } from '../index';
 
-export default class JormungandrYoroiTransferStore extends Store {
+export default class JormungandrYoroiTransferStore extends Store<StoresMap, ActionsMap> {
 
   @observable restoreForTransferRequest: Request<RestoreWalletForTransferFunc>
     = new Request(this.api.jormungandr.restoreWalletForTransfer);

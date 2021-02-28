@@ -40,13 +40,15 @@ import type { GetRegistrationHistoryResponse, GetRegistrationHistoryFunc } from 
 import type { MangledAmountFunc } from '../stateless/mangledAddresses';
 import { getUnmangleAmounts } from '../stateless/mangledAddresses';
 import { MultiToken } from '../../api/common/lib/MultiToken';
+import type { ActionsMap } from '../../actions/index';
+import type { StoresMap } from '../index';
 
 export type AdaDelegationRequests = {|
   publicDeriver: PublicDeriver<>,
   getRegistrationHistory: CachedRequest<GetRegistrationHistoryFunc>,
 |};
 
-export default class AdaDelegationStore extends Store {
+export default class AdaDelegationStore extends Store<StoresMap, ActionsMap> {
 
   @observable delegationRequests: Array<AdaDelegationRequests> = [];
 

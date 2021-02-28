@@ -30,8 +30,10 @@ import { AddressTypeStore } from '../base/AddressSubgroupStore';
 import type { CoreAddressT } from '../../api/ada/lib/storage/database/primitives/enums';
 import { allAddressSubgroups } from '../stateless/addressStores';
 import type { IAddressTypeUiSubset, IAddressTypeStore } from '../stateless/addressStores';
+import type { ActionsMap } from '../../actions/index';
+import type { StoresMap } from '../index';
 
-export default class AddressesStore extends Store {
+export default class AddressesStore extends Store<StoresMap, ActionsMap> {
 
   // note: no need for this to be observable
   _addressSubgroupMap: Map<Class<IAddressTypeStore>, IAddressTypeStore> = new Map();

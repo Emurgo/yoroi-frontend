@@ -6,8 +6,10 @@ import type { ServerStatusErrorType } from '../../types/serverStatusErrorType';
 import { ServerStatusErrors } from '../../types/serverStatusErrorType';
 import environment from '../../environment';
 import type { ServerStatusResponse } from '../../api/common/lib/state-fetch/types';
+import type { ActionsMap } from '../../actions/index';
+import type { StoresMap } from '../index';
 
-export default class ServerConnectionStore extends Store {
+export default class ServerConnectionStore extends Store<StoresMap, ActionsMap> {
   SERVER_STATUS_REFRESH_INTERVAL: number = environment.getServerStatusRefreshInterval();
 
   @observable serverStatus: ServerStatusErrorType = ServerStatusErrors.Healthy;
