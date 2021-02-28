@@ -112,7 +112,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   };
 
   // ========== sign tx confirmation ========== //
-  @computed get totalMount(): ?any {
+  @computed get totalAmount(): ?any {
     const pendingSign = this.signingMessage?.sign ?? {};
     if (pendingSign.tx == null) {
       return undefined;

@@ -33,7 +33,7 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  totalMount: ?number,
+  totalAmount: ?number,
   txData: any, // TODO: what is this supposed to be? Doesn't match the type of the thing back in
   onCopyAddressTooltip: (string, string) => void,
   onCancel: () => void,
@@ -96,7 +96,7 @@ class SignTxPage extends Component<Props> {
     const walletPasswordField = form.$('walletPassword');
 
     const { intl } = this.context;
-    const { txData, onCopyAddressTooltip, onCancel, notification, totalMount } = this.props;
+    const { txData, onCopyAddressTooltip, onCancel, notification, totalAmount } = this.props;
 
     return (
       <div className={styles.component}>
@@ -134,7 +134,7 @@ class SignTxPage extends Component<Props> {
           <p className={styles.label}>
             {intl.formatMessage(globalMessages.walletSendConfirmationTotalLabel)}
           </p>
-          <p className={styles.totalValue}>{totalMount} ERG</p>
+          <p className={styles.totalValue}>{totalAmount} ERG</p>
         </div>
         <div className={styles.address}>
           <div className={styles.addressFrom}>

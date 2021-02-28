@@ -72,7 +72,7 @@ export default class SignTxContainer extends Component<
                 : uiNotifications.getTooltipActiveNotification(this.notificationElementId)
             }
             txData={txData}
-            totalMount={this.generated.stores.connector.totalMount}
+            totalAmount={this.generated.stores.connector.totalAmount}
             onConfirm={this.onConfirm}
             onCancel={this.onCancel}
           />
@@ -115,7 +115,7 @@ export default class SignTxContainer extends Component<
     stores: {|
       connector: {|
         signingMessage: ?SigningMessage,
-        totalMount: ?number,
+        totalAmount: ?number,
       |},
       uiDialogs: {|
         getParam: <T>(number | string) => T,
@@ -138,7 +138,7 @@ export default class SignTxContainer extends Component<
       stores: {
         connector: {
           signingMessage: stores.connector.signingMessage,
-          totalMount: stores.connector.totalMount,
+          totalAmount: stores.connector.totalAmount,
         },
         uiNotifications: {
           isOpen: stores.uiNotifications.isOpen,
