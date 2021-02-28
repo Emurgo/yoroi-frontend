@@ -120,3 +120,46 @@ export type DataSignError = {|
 |};
 
 export type Value = number | string;
+
+export type AccountInfo = {|
+  name: string,
+  balance: Value,
+|}
+
+export type WhitelistEntry = {| url: string, walletIndex: number |};
+
+export type ConnectingMessage = {| tabId: number, url: string |};
+export type SigningMessage = {| sign: PendingSignData, tabId: number |};
+
+export type RpcUid = number;
+
+export type PendingSignData = {|
+  type: 'tx',
+  uid: RpcUid,
+  tx: Tx
+|} | {|
+  type: 'tx_input',
+  uid: RpcUid,
+  tx: Tx,
+  index: number,
+|} | {|
+  type: 'data',
+  uid: RpcUid,
+  address: Address,
+  bytes: string
+|}
+
+export type ConfirmedSignData = {|
+  type: 'sign_confirmed',
+  tx: Tx,
+  uid: RpcUid,
+  tabId: number,
+  pw: string,
+|};
+
+export type FailedSignData = {|
+  type: 'sign_rejected',
+  uid: RpcUid,
+  tabId: number,
+|}
+

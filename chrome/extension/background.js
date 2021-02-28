@@ -18,9 +18,9 @@ import {
   asGetAllUtxos
 } from '../../app/api/ada/lib/storage/models/PublicDeriver/traits';
 import type {
-  Address,
-  Tx,
-  Value
+  PendingSignData,
+  RpcUid,
+  AccountInfo,
 } from './ergo-connector/types';
 import {
   connectorGetBalance,
@@ -31,6 +31,7 @@ import {
   connectorGetUnusedAddresses
 } from './ergo-connector/api';
 import { GenericApiError } from '../../app/api/common/errors';
+import { isErgo, } from '../../app/api/ada/lib/storage/database/prepackaged/networks';
 
 /*::
 declare var chrome;
@@ -51,32 +52,9 @@ type PendingSign = {|
   resolve: any
 |}
 
-type RpcUid = number;
-
-type PendingSignData = {|
-  type: 'tx',
-  uid: RpcUid,
-  tx: Tx
-|} | {|
-  type: 'tx_input',
-  uid: RpcUid,
-  tx: Tx,
-  index: number,
-|} | {|
-  type: 'data',
-  uid: RpcUid,
-  address: Address,
-  bytes: string
-|}
-
 let db: ?lf$Database = null;
 
 type AccountIndex = number;
-
-type AccountInfo = {|
-  name: string,
-  balance: Value,
-|}
 
 // AccountIndex = successfully connected - which account the user selected
 // null = refused by user
@@ -105,9 +83,9 @@ export async function getWalletsInfo(): Promise<AccountInfo[]> {
     // information about each wallet to show to the user
     const accounts = [];
     for (const wallet of wallets) {
-      const conceptualInfo = await wallet.getParent().getFullConceptualWalletInfo();
-      // TODO: there's probably a better way to check for ERGO wallets?
-      if (conceptualInfo.NetworkId === 200) {
+      const conceptualWallet = wallet.getParent();
+      const conceptualInfo = await conceptualWallet.getFullConceptualWalletInfo();
+      if (isErgo(conceptualWallet.getNetworkInfo())) {
         const balance = await connectorGetBalance(wallet, 'ERG');
         accounts.push({
           name: conceptualInfo.Name,
@@ -379,7 +357,12 @@ chrome.runtime.onConnectExternal.addListener(port => {
           case 'get_utxos':
             {
               const wallet = await getSelectedWallet(tabId);
-              const utxos = await connectorGetUtxos(wallet, message.params[0], message.params[1], message.params[2]);
+              const utxos = await connectorGetUtxos(
+                wallet,
+                message.params[0],
+                message.params[1],
+                message.params[2]
+              );
               if (utxos != null) {
                 rpcResponse({
                   ok: utxos

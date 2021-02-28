@@ -2,7 +2,7 @@
 // @flow
 import React, { Component } from 'react';
 import type { Node } from 'react';
-import { intlShape, defineMessages, FormattedHTMLMessage } from 'react-intl';
+import { intlShape, defineMessages, } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import styles from './ConnectPage.scss';
 import { Button } from 'react-polymorph/lib/components/Button';
@@ -13,6 +13,7 @@ import WalletCard from './WalletCard';
 import globalMessages, { connectorMessages } from '../../../i18n/global-messages';
 import { observer } from 'mobx-react';
 import LoadingSpinner from '../../../components/widgets/LoadingSpinner';
+import type { ConnectingMessage } from '../../../../chrome/extension/ergo-connector/types';
 
 const messages = defineMessages({
   subtitle: {
@@ -41,7 +42,7 @@ type Props = {|
   accounts: Array<Object>,
   loading: 'idle' | 'pending' | 'success' | 'rejected',
   error: string,
-  message: ?{| tabId: number, url: string |},
+  message: ?ConnectingMessage,
   onToggleCheckbox: number => void,
   onCancel: () => void,
   onConnect: number => Promise<void>,

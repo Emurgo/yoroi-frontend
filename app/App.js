@@ -4,6 +4,7 @@ import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { ThemeProvider } from 'react-polymorph/lib/components/ThemeProvider';
 import { Router } from 'react-router-dom';
+import type { RouterHistory } from 'react-router-dom';
 import { addLocaleData, IntlProvider } from 'react-intl';
 import en from 'react-intl/locale-data/en';
 import ko from 'react-intl/locale-data/ko';
@@ -53,7 +54,7 @@ addLocaleData([
 type Props = {|
   +stores: StoresMap,
   +actions: ActionsMap,
-  +history: Object,
+  +history: RouterHistory,
 |};
 type State = {|
   crashed: boolean,

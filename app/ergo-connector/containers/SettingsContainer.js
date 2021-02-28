@@ -16,7 +16,6 @@ export default class SettingsContainer extends Component<
   InjectedOrGeneratedConnector<GeneratedData>
 > {
   goBack: void => void = () => {
-    // $FlowFixMe:
     this.props.history.goBack();
   };
 

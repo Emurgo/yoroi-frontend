@@ -8,6 +8,7 @@ import globalMessages from '../../i18n/global-messages';
 import type { Notification } from '../../types/notificationType';
 import SignTxPage from '../components/signin/SignTxPage';
 import type { InjectedOrGeneratedConnector } from '../../types/injectedPropsType';
+import type { SigningMessage } from '../../../chrome/extension/ergo-connector/types';
 
 type GeneratedData = typeof SignTxContainer.prototype.generated;
 
@@ -38,9 +39,6 @@ export default class SignTxContainer extends Component<
   };
 
   render(): Node {
-    const type = this.generated.stores.connector.signingMessage?.sign?.type ?? '';
-    const txData = this.generated.stores.connector.signingMessage?.sign?.tx ?? '';
-
     const actions = this.generated.actions;
     const { uiNotifications } = this.generated.stores;
 
@@ -51,8 +49,9 @@ export default class SignTxContainer extends Component<
 
     let component = null;
     // TODO: handle other sign types
-    switch (type) {
-      case 'tx':
+    switch (this.generated.stores.connector.signingMessage?.sign.type) {
+      case 'tx': {
+        const txData = this.generated.stores.connector.signingMessage.sign.tx ?? '';
         component = (
           <SignTxPage
             onCopyAddressTooltip={(address, elementId) => {
@@ -79,7 +78,7 @@ export default class SignTxContainer extends Component<
           />
         );
         break;
-
+      }
       default:
         component = null;
     }
@@ -115,7 +114,7 @@ export default class SignTxContainer extends Component<
     |},
     stores: {|
       connector: {|
-        signingMessage: ?{| sign: Object, tabId: number |},
+        signingMessage: ?SigningMessage,
         totalMount: ?number,
       |},
       uiDialogs: {|
