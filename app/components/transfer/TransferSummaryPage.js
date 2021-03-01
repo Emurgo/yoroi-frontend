@@ -176,7 +176,7 @@ export default class TransferSummaryPage extends Component<Props> {
                       selectedExplorer={this.props.selectedExplorer}
                       light
                       hash={this.props.addressToDisplayString(deregistration.rewardAddress)}
-                      linkType="address"
+                      linkType="stakeAddress"
                     >
                       <RawHash light>
                         <span className={addressesClasses}>

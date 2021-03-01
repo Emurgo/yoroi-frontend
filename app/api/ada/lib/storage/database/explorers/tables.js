@@ -8,6 +8,8 @@ export const Link = Object.freeze({
   address: 'address',
   transaction: 'transaction',
   pool: 'pool',
+  stakeAddress: 'stakeAddress',
+  token: 'token',
 });
 export type LinkType = $Values<typeof Link>;
 

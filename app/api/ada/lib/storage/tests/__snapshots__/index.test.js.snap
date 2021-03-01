@@ -681,40 +681,27 @@ Object {
   "Explorer": Array [
     Object {
       "Endpoints": Object {
-        "address": "https://adaex.org/",
-        "pool": "https://adapools.org/pool/",
-        "transaction": "https://adaex.org/",
+        "address": "https://cardanoscan.io/address/",
+        "pool": "https://cardanoscan.io/pool/",
+        "stakeAddress": "https://cardanoscan.io/stakeKey/",
+        "token": "https://cardanoscan.io/token/",
+        "transaction": "https://cardanoscan.io/transaction/",
       },
-      "ExplorerId": 100,
-      "IsBackup": false,
-      "Name": "ADAex.org",
+      "ExplorerId": 106,
+      "IsBackup": true,
+      "Name": "CardanoScan",
       "NetworkId": 0,
     },
     Object {
       "Endpoints": Object {
-        "address": "https://adascan.net/address/",
-        "transaction": "https://adascan.net/transaction/",
+        "address": "https://adastat.net/addresses/",
+        "pool": "https://adastat.net/pools/",
+        "stakeAddress": "https://adastat.net/addresses/",
+        "transaction": "https://adastat.net/transactions/",
       },
-      "ExplorerId": 101,
+      "ExplorerId": 108,
       "IsBackup": false,
-      "Name": "AdaScan",
-      "NetworkId": 0,
-    },
-    Object {
-      "Endpoints": Object {
-        "address": "https://blockchair.com/cardano/address/",
-        "transaction": "https://blockchair.com/cardano/transaction/",
-      },
-      "ExplorerId": 102,
-      "IsBackup": false,
-      "Name": "Blockchair",
-      "NetworkId": 0,
-    },
-    Object {
-      "Endpoints": Object {},
-      "ExplorerId": 103,
-      "IsBackup": false,
-      "Name": "Clio.1",
+      "Name": "AdaStat",
       "NetworkId": 0,
     },
     Object {
@@ -729,8 +716,31 @@ Object {
     },
     Object {
       "Endpoints": Object {
+        "address": "https://adaex.org/",
+        "pool": "https://adapools.org/pool/",
+        "stakeAddress": "https://adaex.org/",
+        "transaction": "https://adaex.org/",
+      },
+      "ExplorerId": 100,
+      "IsBackup": false,
+      "Name": "ADAex.org",
+      "NetworkId": 0,
+    },
+    Object {
+      "Endpoints": Object {
+        "address": "https://blockchair.com/cardano/address/",
+        "transaction": "https://blockchair.com/cardano/transaction/",
+      },
+      "ExplorerId": 102,
+      "IsBackup": false,
+      "Name": "Blockchair",
+      "NetworkId": 0,
+    },
+    Object {
+      "Endpoints": Object {
         "address": "https://adapools.org/address/",
         "pool": "https://adapools.org/pool/",
+        "stakeAddress": "https://adapools.org/stake/",
         "transaction": "https://adapools.org/transactions/",
       },
       "ExplorerId": 105,
@@ -740,33 +750,11 @@ Object {
     },
     Object {
       "Endpoints": Object {
-        "address": "https://cardanoscan.io/address/",
-        "pool": "https://cardanoscan.io/pool/",
-        "transaction": "https://cardanoscan.io/transaction/",
-      },
-      "ExplorerId": 106,
-      "IsBackup": true,
-      "Name": "CardanoScan",
-      "NetworkId": 0,
-    },
-    Object {
-      "Endpoints": Object {
         "pool": "https://pooltool.io/pool/",
       },
       "ExplorerId": 107,
       "IsBackup": false,
       "Name": "PoolTool",
-      "NetworkId": 0,
-    },
-    Object {
-      "Endpoints": Object {
-        "address": "https://adastat.net/addresses/",
-        "pool": "https://adastat.net/pools/",
-        "transaction": "https://adastat.net/transactions/",
-      },
-      "ExplorerId": 108,
-      "IsBackup": false,
-      "Name": "AdaStat",
       "NetworkId": 0,
     },
     Object {
