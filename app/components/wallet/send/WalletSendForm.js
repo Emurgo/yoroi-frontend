@@ -26,7 +26,6 @@ import type { TokenRow, NetworkRow } from '../../../api/ada/lib/storage/database
 import {
   formattedAmountToBigNumber,
   formattedAmountToNaturalUnits,
-  truncateAddressShort,
   truncateToken,
 } from '../../../utils/formatters';
 import config from '../../../config';
@@ -356,9 +355,7 @@ export default class WalletSendForm extends Component<Props> {
         value: token.info.TokenId,
         info: token.info,
         label: truncateToken(getTokenStrictName(token.info) ?? getTokenIdentifierIfExists(token.info) ?? '-'),
-        id: getTokenStrictName(token.info) == null
-          ? '-'
-          : (getTokenIdentifierIfExists(token.info) ?? '-'),
+        id: (getTokenIdentifierIfExists(token.info) ?? '-'),
         amount: genFormatTokenAmount(this.props.getTokenInfo)(token.entry)
       }));
     })();
@@ -396,7 +393,7 @@ export default class WalletSendForm extends Component<Props> {
               optionRenderer={option => (
                 <TokenOptionRow
                   displayName={option.label}
-                  id={truncateAddressShort(option.id)}
+                  id={option.id}
                   amount={option.amount}
                 />
               )}
