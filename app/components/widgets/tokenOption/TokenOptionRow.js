@@ -17,9 +17,9 @@ export default class TokenOptionRow extends Component<Props> {
   render(): Node {
     return (
       <div className={classnames([styles.container, styles.rowText])}>
-        <span>{this.props.displayName}</span>
-        <span>{this.props.id}</span>
-        <span>{this.props.amount}</span>
+        <div className={styles.item_name}>{this.props.displayName}</div>
+        <div className={styles.item_amount}>{this.props.amount}</div>
+        <div className={styles.item_id}>{this.props.id}</div>
       </div>
     );
   }

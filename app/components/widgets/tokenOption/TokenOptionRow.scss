@@ -2,7 +2,7 @@
   display: flex;
   width: 100%;
   span {
-    width: 30%
+    width: 50%
   }
 }
 
@@ -13,10 +13,35 @@
   letter-spacing: 0;
   line-height: 22px;
 }
+
+.headerText span:nth-child(2) {
+  display: none;
+}
+
 .rowText {
+  flex-wrap: wrap;
   color: #242838;
   font-family: var(--font-mono-regular);
   font-size: 16px;
+  letter-spacing: 0;
+  line-height: 22px;
+
+  flex-direction: row;
+  height: 40px;
+}
+
+.item_name {
+  flex: 1;
+}
+
+.item_amount {
+  flex: 1;
+}
+
+.item_id {
+  flex: 100%;
+  color: #6B7384;
+  font-size: 14px;
   letter-spacing: 0;
   line-height: 22px;
 }
