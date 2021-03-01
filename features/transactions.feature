@@ -428,7 +428,7 @@ Feature: Send transaction
     When I go to the send transaction screen
 
     And I open the token selection dropdown
-    And I select token "d2719...f696e"
+    And I select token "nicoin"
 
     And I fill the form:
       | address                        | amount   |
@@ -457,7 +457,7 @@ Feature: Send transaction
     When I go to the send transaction screen
 
     And I open the token selection dropdown
-    And I select token "d2719...f696e"
+    And I select token "nicoin"
 
     And I click on "Send all" checkbox
     And I fill the address of the form:
