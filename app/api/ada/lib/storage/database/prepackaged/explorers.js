@@ -5,7 +5,7 @@ import type { ExplorerRow } from '../explorers/tables';
 
 const CardanoMainnetExplorers: Array<$ReadOnly<ExplorerRow>> = [
   {
-    ExplorerId: 1_00,
+    ExplorerId: 1_06,
     NetworkId: networks.CardanoMainnet.NetworkId,
     IsBackup: true,
     Endpoints: {
@@ -18,10 +18,11 @@ const CardanoMainnetExplorers: Array<$ReadOnly<ExplorerRow>> = [
     Name: 'CardanoScan',
   },
   {
-    ExplorerId: 1_01,
+    ExplorerId: 1_08,
     NetworkId: networks.CardanoMainnet.NetworkId,
     IsBackup: false,
     Endpoints: {
+      stakeAddress: 'https://adastat.net/addresses/',
       address: 'https://adastat.net/addresses/',
       transaction: 'https://adastat.net/transactions/',
       pool: 'https://adastat.net/pools/',
@@ -29,7 +30,7 @@ const CardanoMainnetExplorers: Array<$ReadOnly<ExplorerRow>> = [
     Name: 'AdaStat',
   },
   {
-    ExplorerId: 1_02,
+    ExplorerId: 1_04,
     NetworkId: networks.CardanoMainnet.NetworkId,
     IsBackup: false,
     Endpoints: {
@@ -39,10 +40,11 @@ const CardanoMainnetExplorers: Array<$ReadOnly<ExplorerRow>> = [
     Name: 'CardanoExplorer',
   },
   {
-    ExplorerId: 1_03,
+    ExplorerId: 1_00,
     NetworkId: networks.CardanoMainnet.NetworkId,
     IsBackup: false,
     Endpoints: {
+      stakeAddress: 'https://adaex.org/',
       address: 'https://adaex.org/',
       transaction: 'https://adaex.org/',
       pool: 'https://adapools.org/pool/',
@@ -50,7 +52,7 @@ const CardanoMainnetExplorers: Array<$ReadOnly<ExplorerRow>> = [
     Name: 'ADAex.org',
   },
   {
-    ExplorerId: 1_04,
+    ExplorerId: 1_02,
     NetworkId: networks.CardanoMainnet.NetworkId,
     IsBackup: false,
     Endpoints: {
@@ -64,6 +66,7 @@ const CardanoMainnetExplorers: Array<$ReadOnly<ExplorerRow>> = [
     NetworkId: networks.CardanoMainnet.NetworkId,
     IsBackup: false,
     Endpoints: {
+      stakeAddress: 'https://adapools.org/stake/',
       address: 'https://adapools.org/address/',
       transaction: 'https://adapools.org/transactions/',
       pool: 'https://adapools.org/pool/',
@@ -71,7 +74,7 @@ const CardanoMainnetExplorers: Array<$ReadOnly<ExplorerRow>> = [
     Name: 'ADApools',
   },
   {
-    ExplorerId: 1_06,
+    ExplorerId: 1_07,
     NetworkId: networks.CardanoMainnet.NetworkId,
     IsBackup: false,
     Endpoints: {
