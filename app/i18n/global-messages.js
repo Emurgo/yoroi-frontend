@@ -300,6 +300,10 @@ const globalMessages: * = defineMessages({
     id: 'global.selectAsset.labael',
     defaultMessage: '!!!Select asset',
   },
+  assets: {
+    id: 'global.label.assets',
+    defaultMessage: '!!!assets',
+  },
   step1: {
     id: 'transfer.form.instructions.step1.text',
     defaultMessage: '!!!It will take about 1 minute to restore your balance. In the next step, you will be presented with a transaction that will move all of your funds. Please review the details of the transaction carefully. You will need to pay a standard transaction fee on the Cardano network to make the transaction.',
