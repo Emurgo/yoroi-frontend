@@ -11,6 +11,7 @@ import type {
 import type { RemoteUnspentOutput, } from '../../lib/state-fetch/types';
 import {
   NotEnoughMoneyToSendError,
+  AssetOverflowError,
   NoOutputsError,
 } from '../../../common/errors';
 
@@ -97,6 +98,15 @@ export function sendAllUnsignedTx(
   };
 }
 
+const AddInputResult = Object.freeze({
+  VALID: 0,
+  // not worth the fee of adding it to input
+  TOO_SMALL: 1,
+  // token would overflow if added
+  OVERFLOW: 2,
+  // doesn't contribute to target
+  NO_NEED: 3,
+});
 function addUtxoInput(
   txBuilder: RustModule.WalletV4.TransactionBuilder,
   remaining: void | {|
@@ -109,7 +119,7 @@ function addUtxoInput(
   protocolParams: {|
     networkId: number,
   |},
-): boolean {
+): $Values<typeof AddInputResult> {
   const wasmAddr = normalizeToAddress(input.receiver);
   if (wasmAddr == null) {
     throw new Error(`${nameof(addUtxoInput)} input not a valid Shelley address`);
@@ -117,8 +127,29 @@ function addUtxoInput(
   const txInput = utxoToTxInput(input);
   const wasmAmount = cardanoValueFromRemoteFormat(input);
 
-  const skipInput: void => boolean = () => {
-    if (remaining == null) return false;
+  const skipOverflow: void => $Values<typeof AddInputResult> = () => {
+    /**
+     * UTXOs can only contain at most u64 of a value
+     * so if the sum of UTXO inputs for a tx > u64
+     * it can cause the tx to fail (due to overflow) in the output / change
+     *
+     * This can be addressed by splitting up a tx to use multiple outputs / multiple change
+     * and this just requires more ADA to cover the min UTXO of these added inputs
+     * but as a simple solution for now, we just block > u64 inputs of any token
+     * This isn't a great workaround since it means features like sendAll may end up not sending all
+    */
+    const currentInputSum = txBuilder
+      .get_explicit_input()
+      .checked_add(txBuilder.get_implicit_input());
+    try {
+      currentInputSum.checked_add(wasmAmount);
+    } catch (e) {
+      return AddInputResult.OVERFLOW;
+    }
+    return AddInputResult.VALID;
+  }
+  const skipInput: void => $Values<typeof AddInputResult> = () => {
+    if (remaining == null) return skipOverflow();
 
     const defaultEntry = {
       defaultNetworkId: protocolParams.networkId,
@@ -132,6 +163,7 @@ function addUtxoInput(
     const includedTargets = remainingTokens.nonDefaultEntries().filter(
       entry => tokenSetInInput.has(entry.identifier)
     );
+
     if (remainingTokens.getDefaultEntry().amount.gt(0) && new BigNumber(input.amount).gt(0)) {
       includedTargets.push(remainingTokens.getDefaultEntry());
     }
@@ -140,7 +172,7 @@ function addUtxoInput(
     // due to refunds in Cardano
     // so we still want to add the input in this case even if we don't care about the coins in it
     if (includedTargets.length === 0 && remaining.hasInput) {
-      return true;
+      return AddInputResult.NO_NEED;
     }
 
     const onlyDefaultEntry = (
@@ -157,19 +189,24 @@ function addUtxoInput(
         ).to_str()
       );
       if (feeForInput.gt(input.amount)) {
-        return true;
+        return AddInputResult.TOO_SMALL;
       }
     }
-    return false;
+
+    return skipOverflow();
   }
-  if (skipInput()) { return false; }
+
+  const skipResult = skipInput();
+  if (skipResult !== AddInputResult.VALID) {
+    return skipResult;
+  }
 
   txBuilder.add_input(
     wasmAddr,
     txInput,
     wasmAmount
   );
-  return true;
+  return AddInputResult.VALID;
 }
 
 export function sendAllUnsignedTxFromUtxo(
@@ -202,14 +239,20 @@ export function sendAllUnsignedTxFromUtxo(
     protocolParams.keyDeposit,
   );
   txBuilder.set_ttl(absSlotNumber.plus(defaultTtlOffset).toNumber());
+
   for (const input of allUtxos) {
-    addUtxoInput(
+    if (addUtxoInput(
       txBuilder,
       undefined,
       input,
       false,
       { networkId: protocolParams.networkId }
-    );
+    ) === AddInputResult.OVERFLOW) {
+      // for the send all case, prefer to throw an error
+      // instead of skipping inputs that would cause an error
+      // otherwise leads to unexpected cases like wallet migration leaving some UTXO behind
+      throw new AssetOverflowError();
+    }
   }
 
   if(metadata !== undefined){
@@ -521,7 +564,7 @@ export function newAdaUnsignedTxFromUtxo(
         true,
         { networkId: protocolParams.networkId },
       );
-      if (!added) continue;
+      if (added !== AddInputResult.VALID) continue;
 
       usedUtxos.push(utxo);
     }
@@ -544,6 +587,9 @@ export function newAdaUnsignedTxFromUtxo(
       );
       if (forceChange) {
         if (changeAdaAddr == null) throw new NoOutputsError();
+        if (!enoughInput) {
+          throw new NotEnoughMoneyToSendError();
+        }
         const difference = currentInputSum.checked_sub(output);
         const minimumNeededForChange = minRequiredForChange(
           txBuilder,

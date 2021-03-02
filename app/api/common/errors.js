@@ -48,6 +48,10 @@ const messages = defineMessages({
     id: 'api.errors.NotEnoughMoneyToSendError',
     defaultMessage: '!!!Not enough funds to make this transaction.',
   },
+  assetOverflowError: {
+    id: 'api.errors.assetOverflowError',
+    defaultMessage: '!!!Maximum value of a token inside a UTXO exceeded (overflow).',
+  },
   updateAdaWalletError: {
     id: 'api.errors.updateAdaWalletError',
     defaultMessage: '!!!Error while updating ada wallet.',
@@ -269,6 +273,14 @@ export class NotEnoughMoneyToSendError extends LocalizableError {
     super({
       id: messages.notEnoughMoneyToSendError.id,
       defaultMessage: messages.notEnoughMoneyToSendError.defaultMessage || '',
+    });
+  }
+}
+export class AssetOverflowError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.assetOverflowError.id,
+      defaultMessage: messages.assetOverflowError.defaultMessage || '',
     });
   }
 }
