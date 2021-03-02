@@ -1,18 +1,23 @@
 // @flow
 import React, { Component } from 'react';
 import type { Node } from 'react';
-import InfoIcon from '../assets/images/info_icon.inline.svg';
+import { Link } from 'react-router-dom';
+import classNames from 'classnames';
+import { Select } from 'react-polymorph/lib/components/Select';
+import { SelectSkin } from 'react-polymorph/lib/skins/simple/SelectSkin';
+import { intlShape, defineMessages } from 'react-intl';
+
 import styles from './Settings.scss';
 import { ROUTES } from '../routes-config';
 import { observer } from 'mobx-react';
-import { Link } from 'react-router-dom';
-import { intlShape, defineMessages } from 'react-intl';
-import { Select } from 'react-polymorph/lib/components/Select';
-import { SelectSkin } from 'react-polymorph/lib/skins/simple/SelectSkin';
 import FlagLabel from '../../components/widgets/FlagLabel';
-import classNames from 'classnames';
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
 import globalMessages, { connectorMessages } from '../../i18n/global-messages';
+import InfoIcon from '../assets/images/info_icon.inline.svg';
+import SupportIcon from '../assets/images/support_icon.inline.svg';
+import TermsUseIcon from '../assets/images/terms_of_use_icon.inline.svg';
+import LanguageIcon from '../assets/images/language_icon.inline.svg';
+import ConnectedIcon from '../assets/images/connected_icon.inline.svg';
 
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import ArrowBack from '../assets/images/arrow_back.inline.svg';
@@ -52,17 +57,17 @@ export default class Settings extends Component<any> {
       },
       {
         label: intl.formatMessage(connectorMessages.connectedWebsites),
-        icon: <InfoIcon />,
+        icon: <ConnectedIcon />,
         route: ROUTES.CONNECTED_WEBSITES,
       },
       {
         label: intl.formatMessage(globalMessages.support),
-        icon: <InfoIcon />,
+        icon: <SupportIcon />,
         route: '#',
       },
       {
         label: intl.formatMessage(globalMessages.termsOfUse),
-        icon: <InfoIcon />,
+        icon: <TermsUseIcon />,
         route: '#',
       },
     ];
@@ -101,7 +106,7 @@ export default class Settings extends Component<any> {
             </li>
           ))}
           <li className={styles.listItemLanguage}>
-            <InfoIcon />
+            <LanguageIcon />
             <Select
               className={languageSelectClassNames}
               options={languageOptions}
