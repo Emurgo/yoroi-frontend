@@ -4,6 +4,8 @@ module.exports = {
   stories: [
     '../app/components/**/*.stories.js',
     '../app/containers/**/*.stories.js',
+    '../app/ergo-connector/components/**/*.stories.js',
+    '../app/ergo-connector/containers/**/*.stories.js',
   ],
   addons: [
     '@storybook/addon-knobs/register',

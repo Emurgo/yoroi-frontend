@@ -14,6 +14,7 @@ import globalMessages, { connectorMessages } from '../../../i18n/global-messages
 import { observer } from 'mobx-react';
 import LoadingSpinner from '../../../components/widgets/LoadingSpinner';
 import type { AccountInfo, ConnectingMessage } from '../../../../chrome/extension/ergo-connector/types';
+import { LoadingWalletStates } from '../../types';
 
 const messages = defineMessages({
   subtitle: {
@@ -40,7 +41,7 @@ const messages = defineMessages({
 
 type Props = {|
   accounts: Array<AccountInfo>,
-  loading: 'idle' | 'pending' | 'success' | 'rejected',
+  loading: $Values<typeof LoadingWalletStates>,
   error: string,
   message: ?ConnectingMessage,
   onToggleCheckbox: number => void,
@@ -69,9 +70,11 @@ class ConnectPage extends Component<Props> {
       selected,
     } = this.props;
 
-    const isLoading = loading === 'idle' || loading === 'pending';
-    const isSuccess = loading === 'success';
-    const isError = loading === 'rejected';
+    const isLoading = (
+      loading === LoadingWalletStates.IDLE || loading === LoadingWalletStates.PENDING
+    );
+    const isSuccess = loading === LoadingWalletStates.SUCCESS;
+    const isError = loading === LoadingWalletStates.REJECTED;
 
     const isCheckedWallet = isSuccess ? Boolean(selected < 0) : [];
     return (

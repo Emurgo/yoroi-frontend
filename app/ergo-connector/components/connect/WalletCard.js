@@ -30,6 +30,7 @@ function constructPlate(
 export default class WalletCard extends Component<Props> {
 
   render(): Node {
+    // eslint-disable-next-line no-unused-vars
     const [_, iconComponent] = this.props.accountInfo.checksum
       ? constructPlate(this.props.accountInfo.checksum, 0, styles.icon)
       : [];

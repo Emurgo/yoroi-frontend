@@ -14,6 +14,7 @@ import type {
 } from '../../../chrome/extension/ergo-connector/types';
 import type { ActionsMap } from '../actions/index';
 import type { StoresMap } from './index';
+import { LoadingWalletStates } from '../types';
 
 // Need to run only once - Connecting wallets
 let initedConnecting = false;
@@ -58,7 +59,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   @observable connectingMessage: ?ConnectingMessage = null;
   @observable whiteList: Array<WhitelistEntry> = [];
 
-  @observable loadingWallets: 'idle' | 'pending' | 'success' | 'rejected' = 'idle';
+  @observable loadingWallets: $Values<typeof LoadingWalletStates> = LoadingWalletStates.IDLE;
   @observable errorWallets: string = '';
   @observable wallets: Array<AccountInfo> = [];
 
@@ -108,7 +109,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
           this.connectingMessage = response;
         });
       })
-      .catch(err => console.log(err));
+      .catch(err => console.error(err));
   };
 
   // ========== sign tx confirmation ========== //
@@ -134,7 +135,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
           this.signingMessage = response;
         });
       })
-      .catch(err => console.log(err));
+      .catch(err => console.error(err));
   };
 
   @action
@@ -173,17 +174,17 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   // ========== wallets info ========== //
   @action
   _getWallets: void => Promise<void> = async () => {
-    this.loadingWallets = 'pending';
+    this.loadingWallets = LoadingWalletStates.PENDING;
     await getWalletsInfo()
       .then(response => {
         runInAction(() => {
-          this.loadingWallets = 'success';
+          this.loadingWallets = LoadingWalletStates.SUCCESS;
           this.wallets = response;
         });
       })
       .catch(err => {
         runInAction(() => {
-          this.loadingWallets = 'rejected';
+          this.loadingWallets = LoadingWalletStates.REJECTED;
           this.errorWallets = err.message;
         });
       });

@@ -6,6 +6,7 @@ import { observer } from 'mobx-react';
 import { computed } from 'mobx';
 import type { InjectedOrGeneratedConnector } from '../../types/injectedPropsType';
 import type { AccountInfo, ConnectingMessage } from '../../../chrome/extension/ergo-connector/types';
+import { LoadingWalletStates } from '../types';
 
 type GeneratedData = typeof ConnectContainer.prototype.generated;
 declare var chrome;
@@ -130,7 +131,7 @@ export default class ConnectContainer extends Component<
         connectingMessage: ?ConnectingMessage,
         wallets: Array<AccountInfo>,
         errorWallets: string,
-        loadingWallets: 'idle' | 'pending' | 'success' | 'rejected',
+        loadingWallets: $Values<typeof LoadingWalletStates>,
       |},
     |},
   |} {

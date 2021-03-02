@@ -11,6 +11,7 @@ import type {
   AccountInfo,
   WhitelistEntry,
 } from '../../../chrome/extension/ergo-connector/types';
+import { LoadingWalletStates } from '../types';
 
 type GeneratedData = typeof ConnectWebsitesContainer.prototype.generated;
 
@@ -31,9 +32,11 @@ export default class ConnectWebsitesContainer extends Component<
     const wallets = this.generated.stores.connector.wallets;
     const loadingWallets = this.generated.stores.connector.loadingWallets;
     const error = this.generated.stores.connector.errorWallets;
-    const isLoading = loadingWallets === 'idle' || loadingWallets === 'pending';
-    const isSuccess = loadingWallets === 'success';
-    const isError = loadingWallets === 'rejected';
+    const isLoading = (
+      loadingWallets === LoadingWalletStates.IDLE || loadingWallets === LoadingWalletStates.PENDING
+    );
+    const isSuccess = loadingWallets === LoadingWalletStates.SUCCESS;
+    const isError = loadingWallets === LoadingWalletStates.REJECTED;
 
     if (isLoading) {
       return <LoadingSpinner />;
@@ -71,7 +74,7 @@ export default class ConnectWebsitesContainer extends Component<
       connector: {|
         wallets: ?Array<AccountInfo>,
         currentConnectorWhitelist: ?Array<WhitelistEntry>,
-        loadingWallets: 'idle' | 'pending' | 'success' | 'rejected',
+        loadingWallets: $Values<typeof LoadingWalletStates>,
         errorWallets: string,
       |},
     |},

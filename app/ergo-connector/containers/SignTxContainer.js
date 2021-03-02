@@ -88,17 +88,6 @@ export default class SignTxContainer extends Component<
 
   @computed get generated(): {|
     actions: {|
-      dialogs: {|
-        closeActiveDialog: {|
-          trigger: (params: void) => void,
-        |},
-        open: {|
-          trigger: (params: {|
-            dialog: any,
-            params?: any,
-          |}) => void,
-        |},
-      |},
       notifications: {|
         closeActiveNotification: {|
           trigger: (params: {| id: string |}) => void,
@@ -116,10 +105,6 @@ export default class SignTxContainer extends Component<
       connector: {|
         signingMessage: ?SigningMessage,
         totalAmount: ?number,
-      |},
-      uiDialogs: {|
-        getParam: <T>(number | string) => T,
-        isOpen: any => boolean,
       |},
       uiNotifications: {|
         getTooltipActiveNotification: string => ?Notification,
@@ -144,19 +129,11 @@ export default class SignTxContainer extends Component<
           isOpen: stores.uiNotifications.isOpen,
           getTooltipActiveNotification: stores.uiNotifications.getTooltipActiveNotification,
         },
-        uiDialogs: {
-          isOpen: stores.uiDialogs.isOpen,
-          getParam: stores.uiDialogs.getParam,
-        },
       },
       actions: {
         connector: {
           confirmSignInTx: { trigger: actions.connector.confirmSignInTx.trigger },
           cancelSignInTx: { trigger: actions.connector.cancelSignInTx.trigger },
-        },
-        dialogs: {
-          open: { trigger: actions.dialogs.open.trigger },
-          closeActiveDialog: { trigger: actions.dialogs.closeActiveDialog.trigger },
         },
         notifications: {
           closeActiveNotification: {

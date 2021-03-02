@@ -14,9 +14,6 @@ import {
 import {
   PublicDeriver,
 } from '../../app/api/ada/lib/storage/models/PublicDeriver/index';
-import type {
-  IGetPublic,
-} from '../../app/api/ada/lib/storage/models/PublicDeriver/interfaces';
 import {
   asGetAllUtxos,
   asGetPublicKey,
