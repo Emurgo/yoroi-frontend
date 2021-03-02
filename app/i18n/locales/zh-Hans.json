@@ -505,7 +505,7 @@
   "wallet.dashboard.summary.note": "比预期少",
   "wallet.dashboard.summary.rewardsTitle": "收益总量",
   "wallet.dashboard.summary.title": "你的总览",
-  "wallet.dashboard.upcomingRewards.at": "的",
+  "wallet.dashboard.upcomingRewards.at": " ",
   "wallet.dashboard.upcomingRewards.delegatedTitle": "已委托的权益池",
   "wallet.dashboard.upcomingRewards.endOfEpoch": "时代结束",
   "wallet.dashboard.upcomingRewards.noRewards": "当前时代将没有任何奖励",
