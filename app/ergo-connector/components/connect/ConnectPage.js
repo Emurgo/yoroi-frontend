@@ -13,7 +13,7 @@ import WalletCard from './WalletCard';
 import globalMessages, { connectorMessages } from '../../../i18n/global-messages';
 import { observer } from 'mobx-react';
 import LoadingSpinner from '../../../components/widgets/LoadingSpinner';
-import type { ConnectingMessage } from '../../../../chrome/extension/ergo-connector/types';
+import type { AccountInfo, ConnectingMessage } from '../../../../chrome/extension/ergo-connector/types';
 
 const messages = defineMessages({
   subtitle: {
@@ -39,7 +39,7 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  accounts: Array<Object>,
+  accounts: Array<AccountInfo>,
   loading: 'idle' | 'pending' | 'success' | 'rejected',
   error: string,
   message: ?ConnectingMessage,
@@ -97,7 +97,7 @@ class ConnectPage extends Component<Props> {
               <li key={item.name} className={styles.listItem}>
                 <Checkbox
                   skin={CheckboxSkin}
-                  label={<WalletCard name={item.name} balance={item.balance} />}
+                  label={<WalletCard accountInfo={item} />}
                   onChange={() => onToggleCheckbox(idx)}
                   checked={selected === idx}
                   className={styles.checkbox}

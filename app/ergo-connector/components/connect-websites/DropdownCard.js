@@ -64,7 +64,7 @@ export default class DropdownCard extends Component<Props, State> {
                   <DeleteIcon />
                 </span>
               </div>
-              <WalletCard name={wallet.name} balance={wallet.balance} />
+              <WalletCard accountInfo={wallet} />
             </div>
           </div>
         ) : null}

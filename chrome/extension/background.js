@@ -14,8 +14,12 @@ import {
 import {
   PublicDeriver,
 } from '../../app/api/ada/lib/storage/models/PublicDeriver/index';
+import type {
+  IGetPublic,
+} from '../../app/api/ada/lib/storage/models/PublicDeriver/interfaces';
 import {
-  asGetAllUtxos
+  asGetAllUtxos,
+  asGetPublicKey,
 } from '../../app/api/ada/lib/storage/models/PublicDeriver/traits';
 import type {
   PendingSignData,
@@ -31,7 +35,10 @@ import {
   connectorGetUnusedAddresses
 } from './ergo-connector/api';
 import { GenericApiError } from '../../app/api/common/errors';
-import { isErgo, } from '../../app/api/ada/lib/storage/database/prepackaged/networks';
+import { isErgo, isCardanoHaskell, } from '../../app/api/ada/lib/storage/database/prepackaged/networks';
+import { Bip44Wallet } from '../../app/api/ada/lib/storage/models/Bip44Wallet/wrapper';
+import { walletChecksum, legacyWalletChecksum } from '@emurgo/cip4-js';
+import type { WalletChecksum } from '@emurgo/cip4-js';
 
 /*::
 declare var chrome;
@@ -71,6 +78,23 @@ type ConnectedSite = {|
   pendingSigns: Map<RpcUid, PendingSign>
 |}
 
+async function getChecksum(
+  publicDeriver: ReturnType<typeof asGetPublicKey>,
+): Promise<void | WalletChecksum> {
+  if (publicDeriver == null) return undefined;
+
+  const hash = (await publicDeriver.getPublicKey()).Hash;
+
+  const isLegacyWallet =
+    isCardanoHaskell(publicDeriver.getParent().getNetworkInfo()) &&
+    publicDeriver.getParent() instanceof Bip44Wallet;
+  const checksum = isLegacyWallet
+    ? legacyWalletChecksum(hash)
+    : walletChecksum(hash);
+
+  return checksum;
+}
+
 // tab id key
 const connectedSites: Map<number, ConnectedSite> = new Map();
 // chrome.storage.local.set({ connector_whitelist: [] });
@@ -84,12 +108,15 @@ export async function getWalletsInfo(): Promise<AccountInfo[]> {
     const accounts = [];
     for (const wallet of wallets) {
       const conceptualWallet = wallet.getParent();
+      const withPubKey = asGetPublicKey(wallet);
+
       const conceptualInfo = await conceptualWallet.getFullConceptualWalletInfo();
       if (isErgo(conceptualWallet.getNetworkInfo())) {
         const balance = await connectorGetBalance(wallet, 'ERG');
         accounts.push({
           name: conceptualInfo.Name,
           balance: balance.toString(),
+          checksum: await getChecksum(withPubKey)
         });
       }
     }

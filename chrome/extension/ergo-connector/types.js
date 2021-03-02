@@ -1,5 +1,7 @@
 // @flow
 
+import type { WalletChecksum } from '@emurgo/cip4-js';
+
 export type Address = string;
 
 export type Box = {|
@@ -124,6 +126,7 @@ export type Value = number | string;
 export type AccountInfo = {|
   name: string,
   balance: Value,
+  checksum: void | WalletChecksum,
 |}
 
 export type WhitelistEntry = {| url: string, walletIndex: number |};

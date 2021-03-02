@@ -17,7 +17,7 @@ import type { StoresMap } from './index';
 
 // Need to run only once - Connecting wallets
 let initedConnecting = false;
-function sendMsgConnect() {
+function sendMsgConnect(): Promise<ConnectingMessage> {
   return new Promise((resolve, reject) => {
     if (!initedConnecting)
       window.chrome.runtime.sendMessage({ type: 'connect_retrieve_data' }, response => {
