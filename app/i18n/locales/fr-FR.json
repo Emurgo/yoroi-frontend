@@ -79,7 +79,7 @@
   "ergo-connector.label.connect": "Connect to",
   "ergo-connector.label.selectAllWallets": "Select all wallets",
   "global.blog.learnMore": "Pour en savoir plus, vous pouvez lire notre {blogLink}.",
-  "global.connector.connectedWebsites": "Connected Websites",
+  "global.connector.connectedWebsites": "Sites web connectés",
   "global.connector.messageReadOnly": "We are granting read-only to view utxos/addresses.",
   "global.connector.poweredByErgo": "Powered by Ergo",
   "global.connector.yoroiDappConnector": "Yoroi Dapp Connector",
