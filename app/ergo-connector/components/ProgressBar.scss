@@ -1,0 +1,27 @@
+.component {
+  overflow: hidden;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+
+  progress {
+    margin-right: 8px;
+  }
+
+  progress[value] {
+    width: 100%;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  progress[value]::-webkit-progress-bar {
+    height: 4px;
+    background-color: #dce0e9;
+  }
+
+  progress[value]::-webkit-progress-value {
+    height: 4px;
+    background-color: #17d1aa;
+  }
+}

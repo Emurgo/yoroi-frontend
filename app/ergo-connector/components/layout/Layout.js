@@ -48,7 +48,7 @@ export default class Layout extends Component<Props> {
             </div>
           </div>
         </div>
-        {this.props.children}
+        <div className={styles.content}>{this.props.children}</div>
       </div>
     );
   }

@@ -2,7 +2,7 @@
 // @flow
 import React, { Component } from 'react';
 import type { Node } from 'react';
-import { intlShape, defineMessages, } from 'react-intl';
+import { intlShape, defineMessages } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import styles from './ConnectPage.scss';
 import { Button } from 'react-polymorph/lib/components/Button';
@@ -13,9 +13,13 @@ import WalletCard from './WalletCard';
 import globalMessages, { connectorMessages } from '../../../i18n/global-messages';
 import { observer } from 'mobx-react';
 import LoadingSpinner from '../../../components/widgets/LoadingSpinner';
-import type { AccountInfo, ConnectingMessage } from '../../../../chrome/extension/ergo-connector/types';
+import type {
+  AccountInfo,
+  ConnectingMessage,
+} from '../../../../chrome/extension/ergo-connector/types';
 import { LoadingWalletStates } from '../../types';
-import PlaceholderIcon from '../../assets/images/placeholder_icon.inline.svg'
+import PlaceholderIcon from '../../assets/images/placeholder_icon.inline.svg';
+import ProgressBar from '../ProgressBar';
 
 const messages = defineMessages({
   subtitle: {
@@ -76,6 +80,7 @@ class ConnectPage extends Component<Props> {
     const isCheckedWallet = isSuccess ? Boolean(selected < 0) : [];
     return (
       <>
+        <ProgressBar step={1} />
         <div className={styles.connectWrapper}>
           <div className={styles.image}>
             <PlaceholderIcon />
