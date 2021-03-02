@@ -15,6 +15,7 @@ import { observer } from 'mobx-react';
 import LoadingSpinner from '../../../components/widgets/LoadingSpinner';
 import type { AccountInfo, ConnectingMessage } from '../../../../chrome/extension/ergo-connector/types';
 import { LoadingWalletStates } from '../../types';
+import PlaceholderIcon from '../../assets/images/placeholder_icon.inline.svg'
 
 const messages = defineMessages({
   subtitle: {
@@ -77,7 +78,7 @@ class ConnectPage extends Component<Props> {
       <>
         <div className={styles.connectWrapper}>
           <div className={styles.image}>
-            <img src="" alt="" />
+            <PlaceholderIcon />
           </div>
           <div className={styles.title}>
             <h2>{intl.formatMessage(messages.subtitle)}</h2>
