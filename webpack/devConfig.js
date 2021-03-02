@@ -37,21 +37,6 @@ const baseDevConfig = (
       hotScript,
       path.join(__dirname, '../chrome/extension/ergo-connector/index')
     ],
-    sign: [
-      customPath,
-      hotScript,
-      path.join(__dirname, '../chrome/extension/ergo-connector/sign')
-    ],
-    connect: [
-      customPath,
-      hotScript,
-      path.join(__dirname, '../chrome/extension/ergo-connector/connect')
-    ],
-    config: [
-      customPath,
-      hotScript,
-      path.join(__dirname, '../chrome/extension/ergo-connector/config')
-    ],
   },
   devMiddleware: {
     publicPath: `http://${host}:${connections.Ports.WebpackDev}/js`,

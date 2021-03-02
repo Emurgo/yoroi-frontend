@@ -2,7 +2,7 @@
 // @flow
 import React, { Component } from 'react';
 import type { Node } from 'react';
-import { intlShape, defineMessages, FormattedHTMLMessage } from 'react-intl';
+import { intlShape, defineMessages, } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import styles from './ConnectPage.scss';
 import { Button } from 'react-polymorph/lib/components/Button';
@@ -13,6 +13,8 @@ import WalletCard from './WalletCard';
 import globalMessages, { connectorMessages } from '../../../i18n/global-messages';
 import { observer } from 'mobx-react';
 import LoadingSpinner from '../../../components/widgets/LoadingSpinner';
+import type { AccountInfo, ConnectingMessage } from '../../../../chrome/extension/ergo-connector/types';
+import { LoadingWalletStates } from '../../types';
 
 const messages = defineMessages({
   subtitle: {
@@ -38,10 +40,10 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  accounts: Array<Object>,
-  loading: 'idle' | 'pending' | 'success' | 'rejected',
+  accounts: Array<AccountInfo>,
+  loading: $Values<typeof LoadingWalletStates>,
   error: string,
-  message: ?{| tabId: number, url: string |},
+  message: ?ConnectingMessage,
   onToggleCheckbox: number => void,
   onCancel: () => void,
   onConnect: number => Promise<void>,
@@ -68,9 +70,11 @@ class ConnectPage extends Component<Props> {
       selected,
     } = this.props;
 
-    const isLoading = loading === 'idle' || loading === 'pending';
-    const isSuccess = loading === 'success';
-    const isError = loading === 'rejected';
+    const isLoading = (
+      loading === LoadingWalletStates.IDLE || loading === LoadingWalletStates.PENDING
+    );
+    const isSuccess = loading === LoadingWalletStates.SUCCESS;
+    const isError = loading === LoadingWalletStates.REJECTED;
 
     const isCheckedWallet = isSuccess ? Boolean(selected < 0) : [];
     return (
@@ -96,7 +100,7 @@ class ConnectPage extends Component<Props> {
               <li key={item.name} className={styles.listItem}>
                 <Checkbox
                   skin={CheckboxSkin}
-                  label={<WalletCard name={item.name} balance={item.balance} />}
+                  label={<WalletCard accountInfo={item} />}
                   onChange={() => onToggleCheckbox(idx)}
                   checked={selected === idx}
                   className={styles.checkbox}

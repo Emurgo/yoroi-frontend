@@ -8,8 +8,10 @@ import type { BuildTxFunc } from '../toplevel/DaedalusTransferStore';
 import {
   getJormungandrBaseConfig,
 } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import type { ActionsMap } from '../../actions/index';
+import type { StoresMap } from '../index';
 
-export default class JormungandrDaedalusTransferStore extends Store {
+export default class JormungandrDaedalusTransferStore extends Store<StoresMap, ActionsMap> {
 
   buildTx: BuildTxFunc = async (request) => {
     const selectedNetwork = this.stores.profile.selectedNetwork;

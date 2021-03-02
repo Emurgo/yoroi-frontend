@@ -23,6 +23,8 @@ import {
   PoolMissingApiError,
 } from '../../api/common/errors';
 import type { MangledAmountFunc } from '../stateless/mangledAddresses';
+import type { ActionsMap } from '../../actions/index';
+import type { StoresMap } from '../index';
 
 export type DelegationRequests = {|
   publicDeriver: PublicDeriver<>,
@@ -56,7 +58,7 @@ export type PoolMeta = {|
   +reputation: ReputationObject, // TODO: decide what to do. Replace with community standard?
 |};
 
-export default class DelegationStore extends Store {
+export default class DelegationStore extends Store<StoresMap, ActionsMap> {
 
   @observable delegationRequests: Array<DelegationRequests> = [];
 

@@ -49,6 +49,8 @@ import {
 import type {
   RestoreModeType,
 } from '../../actions/common/wallet-restore-actions';
+import type { ActionsMap } from '../../actions/index';
+import type { StoresMap } from '../index';
 
 type TrezorConnectionResponse = {|
   trezorResp: Success<CardanoPublicKey> | Unsuccessful,
@@ -57,7 +59,7 @@ type TrezorConnectionResponse = {|
 
 
 export default class TrezorConnectStore
-  extends Store
+  extends Store<StoresMap, ActionsMap>
   implements HWConnectStoreTypes<TrezorConnectionResponse> {
 
   // =================== VIEW RELATED =================== //

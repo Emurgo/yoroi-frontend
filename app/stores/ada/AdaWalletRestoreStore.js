@@ -12,8 +12,10 @@ import { ApiMethodNotYetImplementedError } from '../lib/Request';
 import type {
   Address, Addressing
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
+import type { ActionsMap } from '../../actions/index';
+import type { StoresMap } from '../index';
 
-export default class AdaWalletRestoreStore extends Store {
+export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> {
 
   setup(): void {
     super.setup();

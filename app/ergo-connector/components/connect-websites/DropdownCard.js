@@ -7,12 +7,13 @@ import DeleteIcon from '../../assets/images/remove-icon.inline.svg';
 import classnames from 'classnames';
 import WalletCard from '../connect/WalletCard';
 import { observer } from 'mobx-react';
+import type { AccountInfo, } from '../../../../chrome/extension/ergo-connector/types';
 
 type Props = {|
   label: string,
   infoText: string,
   url: string,
-  wallet: {| name: string, balance: string |},
+  wallet: AccountInfo,
   onRemoveWallet: string => void,
 |};
 type State = {| isExpanded: boolean |};
@@ -63,7 +64,7 @@ export default class DropdownCard extends Component<Props, State> {
                   <DeleteIcon />
                 </span>
               </div>
-              <WalletCard name={wallet.name} balance={wallet.balance} />
+              <WalletCard accountInfo={wallet} />
             </div>
           </div>
         ) : null}

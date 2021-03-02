@@ -46,9 +46,11 @@ import type {
   Addressing,
 } from '../../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import { genAddressingLookup } from '../../stateless/addressStores';
+import type { ActionsMap } from '../../../actions/index';
+import type { StoresMap } from '../../index';
 
 /** Note: Handles Ledger Signing */
-export default class LedgerSendStore extends Store {
+export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
   // =================== VIEW RELATED =================== //
   // TODO: consider getting rid of both of these
   @observable isActionProcessing: boolean = false;

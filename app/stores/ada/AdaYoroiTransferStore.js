@@ -36,8 +36,10 @@ import type {
 import {
   MultiToken,
 } from '../../api/common/lib/MultiToken';
+import type { ActionsMap } from '../../actions/index';
+import type { StoresMap } from '../index';
 
-export default class AdaYoroiTransferStore extends Store {
+export default class AdaYoroiTransferStore extends Store<StoresMap, ActionsMap> {
 
   @observable restoreForTransferRequest: Request<RestoreWalletForTransferFunc>
     = new Request(this.api.ada.restoreWalletForTransfer);

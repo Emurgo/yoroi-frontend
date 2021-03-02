@@ -3,11 +3,22 @@
 import { observable, action, runInAction, computed } from 'mobx';
 import { getWalletsInfo } from '../../../chrome/extension/background';
 import Request from '../../stores/lib/LocalizedRequest';
-import Store from './base/Store';
+import Store from '../../stores/base/Store';
+import type {
+  AccountInfo,
+  ConfirmedSignData,
+  ConnectingMessage,
+  FailedSignData,
+  SigningMessage,
+  WhitelistEntry,
+} from '../../../chrome/extension/ergo-connector/types';
+import type { ActionsMap } from '../actions/index';
+import type { StoresMap } from './index';
+import { LoadingWalletStates } from '../types';
 
 // Need to run only once - Connecting wallets
 let initedConnecting = false;
-function sendMsgConnect() {
+function sendMsgConnect(): Promise<ConnectingMessage> {
   return new Promise((resolve, reject) => {
     if (!initedConnecting)
       window.chrome.runtime.sendMessage({ type: 'connect_retrieve_data' }, response => {
@@ -24,7 +35,7 @@ function sendMsgConnect() {
 
 // Need to run only once - Sign Tx Confirmation
 let initedSigning = false;
-function sendMsgSigningTx() {
+function sendMsgSigningTx(): Promise<SigningMessage> {
   return new Promise((resolve, reject) => {
     if (!initedSigning)
       window.chrome.runtime.sendMessage({ type: 'tx_sign_window_retrieve_data' }, response => {
@@ -39,24 +50,29 @@ function sendMsgSigningTx() {
   });
 }
 
-export default class ConnectorStore extends Store {
-  @observable connectingMessage: ?{| tabId: number, url: string |} = null;
-  @observable whiteList: Array<any> = [];
+type GetWhitelistFunc = void => Promise<?Array<WhitelistEntry>>;
+type SetWhitelistFunc = {|
+  whitelist: Array<WhitelistEntry> | void,
+|} => Promise<void>;
 
-  @observable loadingWallets: 'idle' | 'pending' | 'success' | 'rejected' = 'idle';
+export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
+  @observable connectingMessage: ?ConnectingMessage = null;
+  @observable whiteList: Array<WhitelistEntry> = [];
+
+  @observable loadingWallets: $Values<typeof LoadingWalletStates> = LoadingWalletStates.IDLE;
   @observable errorWallets: string = '';
-  @observable wallets: Array<any> = [];
+  @observable wallets: Array<AccountInfo> = [];
 
   @observable getConnectorWhitelist: Request<
-    (void) => Promise<?Array<{| url: string, walletIndex: number |}>>
-  > = new Request<(void) => Promise<?Array<{| url: string, walletIndex: number |}>>>(
+    GetWhitelistFunc
+  > = new Request<GetWhitelistFunc>(
     this.api.localStorage.getWhitelist
   );
-  @observable setConnectorWhitelist: Request<(Array<any> | void) => Promise<void>> = new Request<
-    (Array<any> | void) => Promise<void>
-  >(this.api.localStorage.setWhitelist);
+  @observable setConnectorWhitelist: Request<SetWhitelistFunc> = new Request<
+    SetWhitelistFunc
+  >(({ whitelist }) => this.api.localStorage.setWhitelist(whitelist));
 
-  @observable signingMessage: ?{| sign: Object, tabId: number |} = null;
+  @observable signingMessage: ?SigningMessage = null;
 
   setup(): void {
     super.setup();
@@ -86,79 +102,96 @@ export default class ConnectorStore extends Store {
 
   // ========== connecting wallets ========== //
   @action
-  _getConnectingMsg: () => any = () => {
-    sendMsgConnect()
+  _getConnectingMsg: () => Promise<void> = async () => {
+    await sendMsgConnect()
       .then(response => {
         runInAction(() => {
           this.connectingMessage = response;
         });
       })
-      .catch(err => console.log(err));
+      .catch(err => console.error(err));
   };
 
   // ========== sign tx confirmation ========== //
-  @computed get totalMount(): ?any {
-    const txData = this.signingMessage?.sign?.tx ?? {};
+  @computed get totalAmount(): ?any {
+    const pendingSign = this.signingMessage?.sign ?? {};
+    if (pendingSign.tx == null) {
+      return undefined;
+    }
+    const txData = pendingSign.tx ?? {};
 
-    const total = txData?.outputs
-      ?.map(item => item.value)
+    const total = txData.outputs
+      .map(item => item.value)
       .reduce((acum, currentValue) => acum + currentValue);
 
     return total;
   }
 
   @action
-  _getSigningMsg: () => any = () => {
-    sendMsgSigningTx()
+  _getSigningMsg: () => Promise<void> = async () => {
+    await sendMsgSigningTx()
       .then(response => {
         runInAction(() => {
           this.signingMessage = response;
         });
       })
-      .catch(err => console.log(err));
+      .catch(err => console.error(err));
   };
 
   @action
   _confirmSignInTx: string => void = password => {
-    window.chrome.runtime.sendMessage({
+    if (this.signingMessage == null) {
+      throw new Error(`${nameof(this._confirmSignInTx)} confirming a tx but no signing message set`);
+    }
+    const { signingMessage } = this;
+    if (signingMessage.sign.tx == null) {
+      throw new Error(`${nameof(this._confirmSignInTx)} signing non-tx is not supported`);
+    }
+    const sendData: ConfirmedSignData = {
       type: 'sign_confirmed',
-      tx: this.signingMessage?.sign.tx,
-      uid: this.signingMessage?.sign.uid,
-      tabId: this.signingMessage?.tabId,
+      tx: signingMessage.sign.tx,
+      uid: signingMessage.sign.uid,
+      tabId: signingMessage.tabId,
       pw: password,
-    });
+    };
+    window.chrome.runtime.sendMessage(sendData);
   };
   @action
   _cancelSignInTx: void => void = () => {
-    window.chrome.runtime.sendMessage({
+    if (this.signingMessage == null) {
+      throw new Error(`${nameof(this._confirmSignInTx)} confirming a tx but no signing message set`);
+    }
+    const { signingMessage } = this;
+    const sendData: FailedSignData = {
       type: 'sign_rejected',
-      uid: this.signingMessage?.sign.uid,
-      tabId: this.signingMessage?.tabId,
-    });
+      uid: signingMessage.sign.uid,
+      tabId: signingMessage.tabId,
+    };
+    window.chrome.runtime.sendMessage(sendData);
     this._closeWindow();
   };
 
   // ========== wallets info ========== //
   @action
-  _getWallets: any => any = () => {
-    this.loadingWallets = 'pending';
-    getWalletsInfo()
+  _getWallets: void => Promise<void> = async () => {
+    this.loadingWallets = LoadingWalletStates.PENDING;
+    await getWalletsInfo()
       .then(response => {
         runInAction(() => {
-          this.loadingWallets = 'success';
+          this.loadingWallets = LoadingWalletStates.SUCCESS;
           this.wallets = response;
         });
       })
       .catch(err => {
         runInAction(() => {
-          this.loadingWallets = 'rejected';
+          this.loadingWallets = LoadingWalletStates.REJECTED;
           this.errorWallets = err.message;
         });
       });
   };
 
   // ========== whitelist ========== //
-  @computed get currentConnectorWhitelist(): ?any {
+  @computed get currentConnectorWhitelist(): ?Array<WhitelistEntry> {
     let { result } = this.getConnectorWhitelist;
     if (result == null) {
       result = this.getConnectorWhitelist.execute().result;
@@ -170,8 +203,9 @@ export default class ConnectorStore extends Store {
   };
   _removeWalletFromWhitelist: (url: string) => Promise<void> = async url => {
     const filter = this.currentConnectorWhitelist?.filter(e => e.url !== url);
-    // $FlowFixMe:
-    await this.setConnectorWhitelist.execute(filter);
+    await this.setConnectorWhitelist.execute({
+      whitelist: filter,
+    });
     await this.getConnectorWhitelist.execute();
   };
 }

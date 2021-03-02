@@ -13,6 +13,8 @@ import type {
   GetNoticesFunc,
   GetNoticesRequestOptions
 } from '../../api/ada';
+import type { ActionsMap } from '../../actions/index';
+import type { StoresMap } from '../index';
 
 /** How many notices to display */
 const INITIAL_SEARCH_LIMIT = 5;
@@ -23,8 +25,8 @@ const SEARCH_LIMIT_INCREASE = 5;
 /** Skip first n notices from api */
 const SEARCH_SKIP = 0;
 
-/** Manages presistent notifications */
-export default class NoticeBoardStore extends Store {
+/** Manages persistent notifications */
+export default class NoticeBoardStore extends Store<StoresMap, ActionsMap> {
 
   @observable loadedNotices: Array<Notice> = [];
   @observable totalNotice: number;

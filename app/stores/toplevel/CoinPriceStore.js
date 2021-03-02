@@ -20,11 +20,13 @@ import { getPrice, upsertPrices, getAllPrices, getPriceKey } from '../../api/com
 import type { GetAllPricesFunc } from '../../api/common/lib/storage/bridge/prices';
 import { verifyTicker, verifyPubKeyDataReplacement } from '../../api/verify';
 import type { ConfigType } from '../../../config/config-types';
+import type { ActionsMap } from '../../actions/index';
+import type { StoresMap } from '../index';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
 
-export default class CoinPriceStore extends Store {
+export default class CoinPriceStore extends Store<StoresMap, ActionsMap> {
   @observable currentPriceTickers: Array<{| From: string, To: string, Price: number |}> = [];
   @observable lastUpdateTimestamp: number|null = null;
   ON_VISIBLE_DEBOUNCE_WAIT: number = 1000;

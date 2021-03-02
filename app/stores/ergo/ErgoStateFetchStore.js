@@ -6,8 +6,10 @@ import type { IFetcher } from '../../api/ergo/lib/state-fetch/IFetcher';
 import { RemoteFetcher } from '../../api/ergo/lib/state-fetch/remoteFetcher';
 import { BatchedFetcher } from '../../api/ergo/lib/state-fetch/batchedFetcher';
 import environment from '../../environment';
+import type { ActionsMap } from '../../actions/index';
+import type { StoresMap } from '../index';
 
-export default class ErgoStateFetchStore extends Store {
+export default class ErgoStateFetchStore extends Store<StoresMap, ActionsMap> {
 
   @observable fetcher: IFetcher;
 

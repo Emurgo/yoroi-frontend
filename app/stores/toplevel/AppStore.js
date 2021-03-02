@@ -4,8 +4,10 @@ import Store from '../base/Store';
 import { buildRoute } from '../../utils/routing';
 import { ROUTES } from '../../routes-config';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import type { ActionsMap } from '../../actions/index';
+import type { StoresMap } from '../index';
 
-export default class AppStore extends Store {
+export default class AppStore extends Store<StoresMap, ActionsMap> {
 
   setup(): void {
     super.setup();

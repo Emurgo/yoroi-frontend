@@ -9,10 +9,14 @@ import { intlShape, defineMessages } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { connectorMessages } from '../../../i18n/global-messages';
 import NoItemsFoundImg from '../../assets/images/no-websites-connected.inline.svg';
+import type {
+  AccountInfo,
+  WhitelistEntry,
+} from '../../../../chrome/extension/ergo-connector/types';
 
 type Props = {|
-  accounts: any,
-  wallets: any,
+  accounts: ?Array<WhitelistEntry>,
+  wallets: ?Array<AccountInfo>,
   onRemoveWallet: string => void,
 |};
 const messages = defineMessages({
@@ -32,37 +36,48 @@ export default class ConnectWebsitesPage extends Component<Props> {
     intl: intlShape.isRequired,
   };
 
-  render(): Node {
+  getContent: void => Node = () => {
     const { intl } = this.context;
-    const { accounts, onRemoveWallet, wallets } = this.props;
+    const genNoResult = () => (
+      <div className={styles.noItems}>
+        <NoItemsFoundImg />
+        <h3>{intl.formatMessage(messages.noWebsitesConnected)} </h3>
+        <p>{intl.formatMessage(connectorMessages.messageReadOnly)}</p>
+      </div>
+    );
+    if (this.props.accounts == null || this.props.wallets == null) {
+      return genNoResult();
+    }
+    const { accounts, wallets } = this.props;
+    if (accounts.length === 0) {
+      return genNoResult();
+    }
+    return (
+      <>
+        <h1 className={styles.title}>
+          {intl.formatMessage(connectorMessages.connectedWebsites)}
+        </h1>
+        <div className={styles.walletList}>
+          {accounts.map(({ url, walletIndex }) => (
+            <DropdownCard
+              label={intl.formatMessage(messages.connectedWallets)}
+              infoText={intl.formatMessage(connectorMessages.messageReadOnly)}
+              key={url}
+              url={url}
+              wallet={wallets[walletIndex]}
+              onRemoveWallet={this.props.onRemoveWallet}
+            />
+          ))}
+        </div>
+      </>
+    );
 
+  }
+
+  render(): Node {
     return (
       <div className={styles.component}>
-        {accounts.length ? (
-          <>
-            <h1 className={styles.title}>
-              {intl.formatMessage(connectorMessages.connectedWebsites)}
-            </h1>
-            <div className={styles.walletList}>
-              {accounts.map(({ url, walletIndex }) => (
-                <DropdownCard
-                  label={intl.formatMessage(messages.connectedWallets)}
-                  infoText={intl.formatMessage(connectorMessages.messageReadOnly)}
-                  key={url}
-                  url={url}
-                  wallet={wallets[walletIndex]}
-                  onRemoveWallet={onRemoveWallet}
-                />
-              ))}
-            </div>
-          </>
-        ) : !accounts.length ? (
-          <div className={styles.noItems}>
-            <NoItemsFoundImg />
-            <h3>{intl.formatMessage(messages.noWebsitesConnected)} </h3>
-            <p>{intl.formatMessage(connectorMessages.messageReadOnly)}</p>
-          </div>
-        ) : null}
+        {this.getContent()}
       </div>
     );
   }

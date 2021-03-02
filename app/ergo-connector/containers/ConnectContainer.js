@@ -3,9 +3,10 @@ import type { Node } from 'react';
 import React, { Component } from 'react';
 import ConnectPage from '../components/connect/ConnectPage';
 import { observer } from 'mobx-react';
-import { ROUTES } from '../routes-config';
 import { computed } from 'mobx';
 import type { InjectedOrGeneratedConnector } from '../../types/injectedPropsType';
+import type { AccountInfo, ConnectingMessage } from '../../../chrome/extension/ergo-connector/types';
+import { LoadingWalletStates } from '../types';
 
 type GeneratedData = typeof ConnectContainer.prototype.generated;
 declare var chrome;
@@ -127,10 +128,10 @@ export default class ConnectContainer extends Component<
     |},
     stores: {|
       connector: {|
-        connectingMessage: ?{| tabId: number, url: string |},
-        wallets: Array<any>,
+        connectingMessage: ?ConnectingMessage,
+        wallets: Array<AccountInfo>,
         errorWallets: string,
-        loadingWallets: 'idle' | 'pending' | 'success' | 'rejected',
+        loadingWallets: $Values<typeof LoadingWalletStates>,
       |},
     |},
   |} {

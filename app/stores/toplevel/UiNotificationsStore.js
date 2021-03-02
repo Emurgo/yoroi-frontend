@@ -2,9 +2,14 @@
 import { observable, action, computed } from 'mobx';
 import Store from '../base/Store';
 import type { Notification } from '../../types/notificationType';
+import NotificationsActions from '../../actions/notifications-actions';
 
 /** Manage a list on ongoing notifications and closes them when they expire */
-export default class UiNotificationsStore extends Store {
+export default class UiNotificationsStore<
+  TStores,
+  TActions: { notifications: NotificationsActions, ... },
+> extends Store<TStores, TActions>
+{
 
   @observable activeNotifications: Array<Notification> = [];
 

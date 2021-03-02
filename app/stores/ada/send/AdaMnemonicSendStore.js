@@ -17,8 +17,10 @@ import { getApiForNetwork, ApiOptions } from '../../../api/common/utils';
 import { buildCheckAndCall } from '../../lib/check';
 import { genOwnStakingKey } from '../../../api/ada/index';
 import { RustModule } from '../../../api/ada/lib/cardanoCrypto/rustLoader';
+import type { ActionsMap } from '../../../actions/index';
+import type { StoresMap } from '../../index';
 
-export default class AdaMnemonicSendStore extends Store {
+export default class AdaMnemonicSendStore extends Store<StoresMap, ActionsMap> {
 
   setup(): void {
     super.setup();

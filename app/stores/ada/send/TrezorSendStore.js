@@ -20,9 +20,11 @@ import { ROUTES } from '../../../routes-config';
 import { buildCheckAndCall } from '../../lib/check';
 import { getApiForNetwork, ApiOptions } from '../../../api/common/utils';
 import { HaskellShelleyTxSignRequest } from '../../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
+import type { ActionsMap } from '../../../actions/index';
+import type { StoresMap } from '../../index';
 
 /** Note: Handles Trezor Signing */
-export default class TrezorSendStore extends Store {
+export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
   // =================== VIEW RELATED =================== //
   // TODO: consider getting rid of both of these
   @observable isActionProcessing: boolean = false;

@@ -10,8 +10,10 @@ import type { SetCustomUserThemeRequest } from '../../../api/localStorage/index'
 import { SUPPORTED_CURRENCIES } from '../../../config/unitOfAccount';
 import Store from '../../../stores/base/Store';
 import moment from 'moment/moment';
+import type { ActionsMap } from '../../actions/index';
+import type { StoresMap } from '../index';
 
-export default class ProfileStore extends Store {
+export default class ProfileStore extends Store<StoresMap, ActionsMap> {
   LANGUAGE_OPTIONS: Array<LanguageType> = [
     ...LANGUAGES,
     ...(!environment.isProduction()

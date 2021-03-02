@@ -27,7 +27,8 @@ import { removePublicDeriver } from '../../api/ada/lib/storage/bridge/walletBuil
 import {
   groupForWallet,
 } from './WalletStore';
-
+import type { ActionsMap } from '../../actions/index';
+import type { StoresMap } from '../index';
 
 export type PublicDeriverSettingsCache = {|
   publicDeriver: PublicDeriver<>,
@@ -47,7 +48,7 @@ export type WarningList = {|
   dialogs: Array<void => Node>,
 |};
 
-export default class WalletSettingsStore extends Store {
+export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
 
   @observable renameModelRequest: Request<RenameModelFunc>
     = new Request<RenameModelFunc>(this.api.common.renameModel);

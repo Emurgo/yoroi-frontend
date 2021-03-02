@@ -14,6 +14,8 @@ import {
   filterAddressesByStakingKey,
   unwrapStakingKey,
 } from '../../api/jormungandr/lib/storage/bridge/utils';
+import type { ActionsMap } from '../../actions/index';
+import type { StoresMap } from '../index';
 
 export async function filterMangledAddresses(request: {|
   publicDeriver: PublicDeriver<>,
@@ -50,7 +52,7 @@ export async function filterMangledAddresses(request: {|
   }));
 }
 
-export default class JormungandrAddressesStore extends Store {
+export default class JormungandrAddressesStore extends Store<StoresMap, ActionsMap> {
 
   storewiseFilter: {|
     publicDeriver: PublicDeriver<>,

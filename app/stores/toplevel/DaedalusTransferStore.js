@@ -34,6 +34,8 @@ import type {
   Address, Addressing
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import { getReceiveAddress } from '../stateless/addressStores';
+import type { ActionsMap } from '../../actions/index';
+import type { StoresMap } from '../index';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
@@ -45,7 +47,7 @@ export type BuildTxFunc = {|
   outputAddr: {| ...Address, ...InexactSubset<Addressing> |},
 |} => Promise<TransferTx>;
 
-export default class DaedalusTransferStore extends Store {
+export default class DaedalusTransferStore extends Store<StoresMap, ActionsMap> {
 
   @observable status: TransferStatusT = TransferStatus.UNINITIALIZED;
   @observable error: ?LocalizableError = null;

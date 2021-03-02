@@ -10,8 +10,10 @@ import { JormungandrTxSignRequest } from '../../api/jormungandr/lib/transactions
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import { buildCheckAndCall } from '../lib/check';
 import { getApiForNetwork, ApiOptions } from '../../api/common/utils';
+import type { ActionsMap } from '../../actions/index';
+import type { StoresMap } from '../index';
 
-export default class JormungandrWalletsStore extends Store {
+export default class JormungandrWalletsStore extends Store<StoresMap, ActionsMap> {
 
   // REQUESTS
 

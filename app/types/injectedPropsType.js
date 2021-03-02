@@ -21,7 +21,10 @@ type InjectedConnectorProps = {|
   +actions: ActionsConnectorMap,
 |};
 
-type GeneratedConnectorProps<T> = {|
-  +generated: T,
+export type InjectedOrGeneratedConnector<T> = InjectedConnectorProps | GeneratedProps<T>;
+
+type JointInjectedProps = {|
+  +stores: StoresMap | StoresConnectorMap,
+  +actions: ActionsMap | ActionsConnectorMap,
 |};
-export type InjectedOrGeneratedConnector<T> = InjectedConnectorProps | GeneratedConnectorProps<T>;
+export type JointInjectedOrGenerated<T> = JointInjectedProps | GeneratedProps<T>;

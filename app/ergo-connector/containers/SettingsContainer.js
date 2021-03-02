@@ -9,14 +9,18 @@ import { computed } from 'mobx';
 import LocalizableError from '../../i18n/LocalizableError';
 import type { LanguageType } from '../../i18n/translations';
 
+type Props = {|
+  ...InjectedOrGeneratedConnector<GeneratedData>,
+  history: {
+    goBack: void => void,
+    ...,
+  },
+|};
 type GeneratedData = typeof SettingsContainer.prototype.generated;
 
 @observer
-export default class SettingsContainer extends Component<
-  InjectedOrGeneratedConnector<GeneratedData>
-> {
+export default class SettingsContainer extends Component<Props> {
   goBack: void => void = () => {
-    // $FlowFixMe:
     this.props.history.goBack();
   };
 

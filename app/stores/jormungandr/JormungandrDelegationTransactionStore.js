@@ -17,8 +17,10 @@ import {
 import type { PoolRequest } from '../../api/jormungandr/lib/storage/bridge/delegationUtils';
 import type { SelectedPool } from '../../actions/jormungandr/delegation-transaction-actions';
 import { MultiToken } from '../../api/common/lib/MultiToken';
+import type { ActionsMap } from '../../actions/index';
+import type { StoresMap } from '../index';
 
-export default class JormungandrDelegationTransactionStore extends Store {
+export default class JormungandrDelegationTransactionStore extends Store<StoresMap, ActionsMap> {
 
   @observable selectedPools: Array<SelectedPool>;
 

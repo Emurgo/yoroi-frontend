@@ -35,6 +35,8 @@ import {
 import LocalizableError from '../../i18n/LocalizableError';
 import cryptoRandomString from 'crypto-random-string';
 import { getReceiveAddress } from '../stateless/addressStores';
+import type { ActionsMap } from '../../actions/index';
+import type { StoresMap } from '../index';
 
 export const ProgressStep = Object.freeze({
   GENERATE: 0,
@@ -49,7 +51,7 @@ export interface ProgressInfo {
   stepState: StepStateEnum,
 }
 
-export default class VotingStore extends Store {
+export default class VotingStore extends Store<StoresMap, ActionsMap> {
   @observable progressInfo: ProgressInfo
   @observable encryptedKey: string | null = null;
   @observable catalystPrivateKey: RustModule.WalletV4.PrivateKey | void;

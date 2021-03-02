@@ -31,8 +31,10 @@ import {
 } from '../../api/ada/lib/storage/database/walletTypes/bip44/api/utils';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import { getReceiveAddress } from '../stateless/addressStores';
+import type { ActionsMap } from '../../actions/index';
+import type { StoresMap } from '../index';
 
-export default class YoroiTransferStore extends Store {
+export default class YoroiTransferStore extends Store<StoresMap, ActionsMap> {
 
   @observable status: TransferStatusT = TransferStatus.UNINITIALIZED;
   @observable error: ?LocalizableError = null;

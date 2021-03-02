@@ -9,13 +9,12 @@ import {
     setLocalItem,
     removeLocalItem,
     isEmptyStorage,
-    getErgoConnectorLocalItem,
-    setErgoConnectorLocalItem
 } from './primitives';
 import {
   OPEN_TAB_ID_KEY,
 } from '../../utils/tabManager';
 import type { ComplexityLevelType } from '../../types/complexityLevelType';
+import type { WhitelistEntry } from '../../../chrome/extension/ergo-connector/types';
 
 const networkForLocalStorage = String(environment.getNetworkName());
 const storageKeys = {
@@ -212,11 +211,17 @@ export default class LocalStorageApi {
 
 
   // ========== CONNECTOR whitelist  ========== //
-  getWhitelist: void => Promise<?any> = () =>
-    getErgoConnectorLocalItem(storageKeys.ERGO_CONNECTOR_WHITELIST);
+  getWhitelist: void => Promise<?Array<WhitelistEntry>> = async () => {
+    const result = await getLocalItem(storageKeys.ERGO_CONNECTOR_WHITELIST);
+    if (result === undefined || result === null) return undefined;
+    return JSON.parse(result);
+  }
 
-  setWhitelist: (Array<any> | void) => Promise<void> = value =>
-    setErgoConnectorLocalItem(storageKeys.ERGO_CONNECTOR_WHITELIST, value);
+  setWhitelist: (Array<WhitelistEntry> | void) => Promise<void> = value =>
+    setLocalItem(
+      storageKeys.ERGO_CONNECTOR_WHITELIST,
+      JSON.stringify(value ?? [])
+    );
 
   // =========== Common =============== //
 

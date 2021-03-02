@@ -22,9 +22,11 @@ import { isWithinSupply } from '../../utils/validations';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { networks, defaultAssets } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { getDefaultEntryToken } from './TokenInfoStore';
+import type { ActionsMap } from '../../actions/index';
+import type { StoresMap } from '../index';
 
 /** Load dependencies before launching the app */
-export default class LoadingStore extends Store {
+export default class LoadingStore extends Store<StoresMap, ActionsMap> {
 
   @observable error: ?LocalizableError = null;
   @observable _loading: boolean = true;

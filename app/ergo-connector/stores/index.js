@@ -5,7 +5,7 @@ import type { Api } from '../../api/index';
 import UiNotificationsStore from '../../stores/toplevel/UiNotificationsStore';
 import UiDialogsStore from '../../stores/toplevel/UiDialogsStore';
 import ConnectorStore from './ConnectorStore';
-import ActionsMap from '../actions';
+import type { ActionsMap } from '../actions';
 
 /** Map of var name to class. Allows dynamic lookup of class so we can init all stores one loop */
 const storeClasses = Object.freeze({
@@ -17,8 +17,8 @@ const storeClasses = Object.freeze({
 
 export type StoresMap = {|
   profile: ProfileStore,
-  uiDialogs: UiDialogsStore,
-  uiNotifications: UiNotificationsStore,
+  uiDialogs: UiDialogsStore<{||}, ActionsMap>,
+  uiNotifications: UiNotificationsStore<{||}, ActionsMap>,
   connector: ConnectorStore,
 |};
 
@@ -33,7 +33,6 @@ const stores: WithNullableFields<StoresMap> = observable({
 export default (action(
   (
     api: Api,
-    // $FlowFixMe[value-as-type]
     actions: ActionsMap
   ): StoresMap => {
     const storeNames = Object.keys(storeClasses);
@@ -41,16 +40,13 @@ export default (action(
       if (stores[name]) stores[name].teardown();
     });
     storeNames.forEach(name => {
-      stores[name] = (new storeClasses[name]((stores: any), api, actions): any);
+      stores[name] = (new storeClasses[name]((stores: any), api, (actions: any)): any);
     });
     storeNames.forEach(name => {
       if (stores[name]) stores[name].initialize();
     });
 
     const loadedStores: StoresMap = (stores: any);
-    // loadedStores.loading.load();
-
     return loadedStores;
   }
-  // $FlowFixMe[value-as-type]
 ): (Api, ActionsMap) => StoresMap);
