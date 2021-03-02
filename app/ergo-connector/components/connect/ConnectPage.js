@@ -25,17 +25,13 @@ const messages = defineMessages({
     id: 'ergo-connector.label.selectAllWallets',
     defaultMessage: '!!!Select all wallets',
   },
-  labelConnect: {
-    id: 'global.labels.connect',
-    defaultMessage: '!!!Connect',
-  },
   connectInfo: {
     id: 'ergo-connector.connect.info',
     defaultMessage: '!!!Your connection preferences will be saved to your Yoroi dApp list.',
   },
   noWalletsFound: {
     id: 'ergo-connector.connect.noWalletsFound',
-    defaultMessage: '!!! Not found any wallet, Try again',
+    defaultMessage: '!!!No wallets found',
   },
 });
 
@@ -124,7 +120,7 @@ class ConnectPage extends Component<Props> {
               onClick={onCancel}
             />
             <Button
-              label={intl.formatMessage(messages.labelConnect)}
+              label={intl.formatMessage(globalMessages.connectLabel)}
               skin={ButtonSkin}
               disabled={isCheckedWallet}
               onClick={handleSubmit}

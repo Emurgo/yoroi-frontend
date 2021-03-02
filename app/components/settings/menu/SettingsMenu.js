@@ -20,14 +20,6 @@ const messages = defineMessages({
     id: 'settings.menu.blockchain.link.label',
     defaultMessage: '!!!Blockchain',
   },
-  support: {
-    id: 'settings.menu.support.link.label',
-    defaultMessage: '!!!Support',
-  },
-  termsOfUse: {
-    id: 'settings.menu.termsOfUse.link.label',
-    defaultMessage: '!!!Terms of use',
-  },
   levelOfComplexity: {
     id: 'settings.menu.levelOfComplexity.link.label',
     defaultMessage: '!!!Level of Complexity',
@@ -90,14 +82,14 @@ export default class SettingsMenu extends Component<Props> {
           }
 
           <SettingsMenuItem
-            label={intl.formatMessage(messages.termsOfUse)}
+            label={intl.formatMessage(globalMessages.termsOfUse)}
             onClick={() => onItemClick(ROUTES.SETTINGS.TERMS_OF_USE)}
             active={isActiveItem(ROUTES.SETTINGS.TERMS_OF_USE)}
             className="termsOfUse"
           />
 
           <SettingsMenuItem
-            label={intl.formatMessage(messages.support)}
+            label={intl.formatMessage(globalMessages.support)}
             onClick={() => onItemClick(ROUTES.SETTINGS.SUPPORT)}
             active={isActiveItem(ROUTES.SETTINGS.SUPPORT)}
             className="support"

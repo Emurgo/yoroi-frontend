@@ -36,7 +36,7 @@ export default class ProgressStepBlock extends Component<Props> {
       <ProgressSteps
         stepsList={[
           intl.formatMessage(globalMessages.checkLabel),
-          intl.formatMessage(globalMessages.hwConnectDialogConnectButtonLabel),
+          intl.formatMessage(globalMessages.connectLabel),
           intl.formatMessage(messages.stepSaveLabel)
         ]}
         currentStep={progressInfo.currentStep}

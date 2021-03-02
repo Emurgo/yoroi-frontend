@@ -21,8 +21,8 @@ const messages = defineMessages({
     defaultMessage: '!!!Yoroi Dapp Connector',
   },
   poweredBy: {
-    id: 'global.connector.poweredBy',
-    defaultMessage: '!!!Powered by Cardano',
+    id: 'global.connector.poweredByErgo',
+    defaultMessage: '!!!Powered by Ergo',
   },
 });
 @observer

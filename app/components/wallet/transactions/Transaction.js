@@ -88,10 +88,6 @@ const messages = defineMessages({
     id: 'wallet.transaction.address.from',
     defaultMessage: '!!!From address',
   },
-  fromAddresses: {
-    id: 'wallet.transaction.addresses.from',
-    defaultMessage: '!!!From addresses',
-  },
   toAddress: {
     id: 'wallet.transaction.address.to',
     defaultMessage: '!!!To address',
@@ -99,10 +95,6 @@ const messages = defineMessages({
   addressType: {
     id: 'wallet.transaction.address.type',
     defaultMessage: '!!!Address Type',
-  },
-  toAddresses: {
-    id: 'wallet.transaction.addresses.to',
-    defaultMessage: '!!!To addresses',
   },
   certificateLabel: {
     id: 'wallet.transaction.certificateLabel',
@@ -419,7 +411,6 @@ export default class Transaction extends Component<Props, State> {
               <span className={styles.rowData}>{this.getTicker(entry)}</span>
             </ExplorableHashContainer>
           ): this.getTicker(entry)}
-          
         </div>
       );
     };
@@ -571,7 +562,7 @@ export default class Transaction extends Component<Props, State> {
                 <div>
                   <div className={styles.addressHeader}>
                     <h2>
-                      {intl.formatMessage(messages.fromAddresses)}:
+                      {intl.formatMessage(globalMessages.fromAddresses)}:
                       <span className={styles.addressCount}>
                         {data.addresses.from.length}
                       </span>
@@ -597,7 +588,7 @@ export default class Transaction extends Component<Props, State> {
                 <div>
                   <div className={styles.addressHeader}>
                     <h2>
-                      {intl.formatMessage(messages.toAddresses)}:
+                      {intl.formatMessage(globalMessages.toAddresses)}:
                       <span className={styles.addressCount}>{data.addresses.to.length}</span>
                     </h2>
                     <h2>{intl.formatMessage(messages.addressType)}</h2>

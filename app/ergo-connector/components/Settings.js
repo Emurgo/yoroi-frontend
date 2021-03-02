@@ -22,14 +22,6 @@ const messages = defineMessages({
     id: 'connector.settings.about',
     defaultMessage: '!!!About',
   },
-  support: {
-    id: 'connector.settings.support',
-    defaultMessage: '!!!Support',
-  },
-  termOfServices: {
-    id: 'connector.settings.termOfServices',
-    defaultMessage: '!!!Term of Services',
-  },
 });
 
 @observer
@@ -64,12 +56,12 @@ export default class Settings extends Component<any> {
         route: ROUTES.CONNECTED_WEBSITES,
       },
       {
-        label: intl.formatMessage(messages.support),
+        label: intl.formatMessage(globalMessages.support),
         icon: <InfoIcon />,
         route: '#',
       },
       {
-        label: intl.formatMessage(messages.termOfServices),
+        label: intl.formatMessage(globalMessages.termsOfUse),
         icon: <InfoIcon />,
         route: '#',
       },
