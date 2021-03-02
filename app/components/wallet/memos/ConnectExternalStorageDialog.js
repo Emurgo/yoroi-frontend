@@ -45,7 +45,7 @@ export default class ConnectExternalStorageDialog extends Component<Props> {
         onClick: onCancel
       },
       {
-        label: this.context.intl.formatMessage(globalMessages.hwConnectDialogConnectButtonLabel),
+        label: this.context.intl.formatMessage(globalMessages.connectLabel),
         primary: true,
         onClick: onConnect,
       },

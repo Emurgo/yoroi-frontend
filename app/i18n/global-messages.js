@@ -224,7 +224,7 @@ const globalMessages: * = defineMessages({
     id: 'wallet.send.confirmationDialog.totalLabel',
     defaultMessage: '!!!Total',
   },
-  hwConnectDialogConnectButtonLabel: {
+  connectLabel: {
     id: 'wallet.connect.hw.dialog.connect.button.label',
     defaultMessage: '!!!Connect',
   },
@@ -680,6 +680,22 @@ const globalMessages: * = defineMessages({
   keyRegistrationPointer: {
     id: 'global.labels.keyRegistrationPointer',
     defaultMessage: '!!!Key registration pointer',
+  },
+  support: {
+    id: 'settings.menu.support.link.label',
+    defaultMessage: '!!!Support',
+  },
+  termsOfUse: {
+    id: 'settings.menu.termsOfUse.link.label',
+    defaultMessage: '!!!Terms of use',
+  },
+  fromAddresses: {
+    id: 'wallet.transaction.addresses.from',
+    defaultMessage: '!!!From addresses',
+  },
+  toAddresses: {
+    id: 'wallet.transaction.addresses.to',
+    defaultMessage: '!!!To addresses',
   },
   resyncButtonLabel: {
     id: 'wallet.settings.resync.buttonLabel',

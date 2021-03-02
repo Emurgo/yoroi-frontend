@@ -2,7 +2,7 @@
 // @flow
 import React, { Component } from 'react';
 import type { Node } from 'react';
-import { intlShape, defineMessages } from 'react-intl';
+import { intlShape, } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import styles from './SignTxPage.scss';
 import { Button } from 'react-polymorph/lib/components/Button';
@@ -20,17 +20,6 @@ import { handleExternalLinkClick } from '../../../utils/routing';
 import ExplorableHash from '../../../components/widgets/hashWrappers/ExplorableHash';
 import type { Notification } from '../../../types/notificationType';
 import { truncateConnectorBoxId } from '../../../utils/formatters';
-
-const messages = defineMessages({
-  fromAddresses: {
-    id: 'ergo-connector.signtx.fromAdrdesses',
-    defaultMessage: '!!!From addresses',
-  },
-  toAddresses: {
-    id: 'ergo-connector.signtx.toAdrdesses',
-    defaultMessage: '!!!To addresses',
-  },
-});
 
 type Props = {|
   totalAmount: ?number,
@@ -139,7 +128,9 @@ class SignTxPage extends Component<Props> {
         <div className={styles.address}>
           <div className={styles.addressFrom}>
             <p className={styles.label}>
-              {intl.formatMessage(messages.fromAddresses)}: <span>{txData.inputs.length}</span>
+              {
+                intl.formatMessage(globalMessages.fromAddresses)
+              }: <span>{txData.inputs.length}</span>
             </p>
             <div className={styles.addressFromList}>
               {txData.inputs?.map((address, index) => {
@@ -174,7 +165,7 @@ class SignTxPage extends Component<Props> {
           </div>
           <div className={styles.addressTo}>
             <p className={styles.label}>
-              {intl.formatMessage(messages.toAddresses)}: <span>{txData.outputs.length}</span>
+              {intl.formatMessage(globalMessages.toAddresses)}: <span>{txData.outputs.length}</span>
             </p>
             <div className={styles.addressToList}>
               {txData.outputs?.map((address, index) => {
