@@ -598,6 +598,8 @@
   "wallet.recovery.phrase.show.entry.dialog.button.labelClear": "지우기",
   "wallet.recovery.phrase.show.entry.dialog.button.labelConfirm": "확인",
   "wallet.recovery.phrase.show.entry.dialog.button.labelRemoveLast": "마지막 단어를 제거하세요.",
+  "wallet.registrationOver.subtitle": "Registration for fund {roundNumber} is over. Open the Catalyst app for more information",
+  "wallet.registrationOver.title": "Registration has ended",
   "wallet.restore.dialog.form.errors.invalidRecoveryPhrase": "잘못된 복구 구절",
   "wallet.restore.dialog.form.errors.shortRecoveryPhrase": "{number} 단어 남음",
   "wallet.restore.dialog.paperPasswordLabel": "종이 지갑 암호",
