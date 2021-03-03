@@ -269,7 +269,8 @@ async function confirmSign(tabId: number, request: PendingSignData): Promise<any
 async function confirmConnect(tabId: number, url: string): Promise<?AccountIndex> {
   return new Promise(resolve => {
     chrome.storage.local.get('connector_whitelist', async result => {
-      const whitelist = Object.keys(result).length === 0 ? [] : result.connector_whitelist;
+      const whitelist = Object.keys(result).length === 0 ? []
+        : JSON.parse(result.connector_whitelist);
       // eslint-disable-next-line no-console
       console.log(`whitelist: ${JSON.stringify(whitelist)}`);
       const whitelistEntry = whitelist.find(entry => entry.url === url);
