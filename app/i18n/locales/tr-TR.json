@@ -598,6 +598,8 @@
   "wallet.recovery.phrase.show.entry.dialog.button.labelClear": "Temizle",
   "wallet.recovery.phrase.show.entry.dialog.button.labelConfirm": "Onayla",
   "wallet.recovery.phrase.show.entry.dialog.button.labelRemoveLast": "Son ekleneni sil",
+  "wallet.registrationOver.subtitle": "Registration for fund {roundNumber} is over. Open the Catalyst app for more information",
+  "wallet.registrationOver.title": "Registration has ended",
   "wallet.restore.dialog.form.errors.invalidRecoveryPhrase": "Geçersiz kurtarma sözcükleri",
   "wallet.restore.dialog.form.errors.shortRecoveryPhrase": "{number} sözcük kaldı",
   "wallet.restore.dialog.paperPasswordLabel": "Kağıt cüzdan şifresi",
