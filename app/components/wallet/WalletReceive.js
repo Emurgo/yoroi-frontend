@@ -27,6 +27,7 @@ import type {
 } from '../../api/common/lib/MultiToken';
 import { getTokenName } from '../../stores/stateless/tokenHelpers';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
+import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
 
 const messages = defineMessages({
   generatedAddressesSectionTitle: {
@@ -241,7 +242,10 @@ export default class WalletReceive extends Component<Props> {
                   selectedExplorer={this.props.selectedExplorer}
                   hash={address.address}
                   light={address.isUsed === true}
-                  linkType="address"
+                  linkType={address.type === CoreAddressTypes.CARDANO_REWARD
+                    ? 'stakeAddress'
+                    : 'address'
+                  }
                 >
                   <RawHash light={address.isUsed === true}>
                     <span

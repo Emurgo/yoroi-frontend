@@ -128,7 +128,10 @@ export default class VerifyAddressDialog extends Component<Props> {
               light={false}
               selectedExplorer={this.props.selectedExplorer}
               hash={this.props.addressInfo.address}
-              linkType="address"
+              linkType={this.props.addressInfo.type === CoreAddressTypes.CARDANO_REWARD
+                ? 'stakeAddress'
+                : 'address'
+              }
             >
               <RawHash light={false} className={styles.hash}>
                 {truncateAddress(this.props.addressInfo.address)}
