@@ -598,6 +598,8 @@
   "wallet.recovery.phrase.show.entry.dialog.button.labelClear": "Pulire",
   "wallet.recovery.phrase.show.entry.dialog.button.labelConfirm": "Confermare",
   "wallet.recovery.phrase.show.entry.dialog.button.labelRemoveLast": "Rimuovi l'ultimo",
+  "wallet.registrationOver.subtitle": "Registration for fund {roundNumber} is over. Open the Catalyst app for more information",
+  "wallet.registrationOver.title": "Registration has ended",
   "wallet.restore.dialog.form.errors.invalidRecoveryPhrase": "Frase di recupero non valida",
   "wallet.restore.dialog.form.errors.shortRecoveryPhrase": "{numero} parole rimanenti",
   "wallet.restore.dialog.paperPasswordLabel": "Password del paper wallet",
