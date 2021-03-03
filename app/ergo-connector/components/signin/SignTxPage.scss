@@ -3,7 +3,6 @@
   padding-left: 32px;
   padding-top: 48px;
   overflow-wrap: break-word;
-  font-family: 'Rubik Regular';
 }
 .language {
   label {
@@ -39,7 +38,7 @@
   }
   .amount {
     color: #38393d;
-    font-weight: 700;
+    font-family: var(--font-medium);
     margin-bottom: 3px;
   }
   .tokens {
@@ -55,7 +54,7 @@
 .totalValue {
   color: #17d1aa;
   font-size: 18px;
-  font-size: 700;
+  font-family: var(--font-medium);
   margin-bottom: 24px;
 }
 
@@ -68,7 +67,7 @@
   justify-content: space-between;
   .label {
     span {
-      font-weight: 700;
+      font-family: var(--font-medium);
     }
   }
   & > div {
@@ -86,7 +85,10 @@
     border-left: 1px solid #dce0e9;
   }
 }
-
+.stablecoins {
+  font-size: 14px;
+  color: #242838;
+}
 .wrapperBtn {
   padding-top: 16px;
   display: flex;
