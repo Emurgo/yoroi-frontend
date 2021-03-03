@@ -1,6 +1,6 @@
 // @flow
 import React from 'react';
-import type { Element, Ref } from 'react';
+import type { Element, ElementRef } from 'react';
 
 // external libraries
 import classnames from 'classnames';
@@ -8,6 +8,7 @@ import { isFunction, isObject } from 'lodash';
 
 // components
 import { Bubble } from 'react-polymorph/lib/components/Bubble';
+import { ScrollBar } from 'react-polymorph/lib/components/ScrollBar';
 
 // skins
 import { BubbleSkin } from 'react-polymorph/lib/skins/simple/BubbleSkin';
@@ -16,6 +17,7 @@ import TokenOptionHeader from '../../components/widgets/tokenOption/TokenOptionH
 
 /* eslint-disable no-else-return */
 /* eslint-disable react/no-array-index-key */
+/* eslint-disable react/require-default-props */
 
 type Props = {|
   getOptionProps: Function,
@@ -25,20 +27,25 @@ type Props = {|
   isOpen: boolean,
   isOpeningUpward: boolean,
   isSelectedOption: Function,
+  noOptionsArrow?: boolean,
   noResults: boolean,
   noResultsMessage: string | Element<any>,
+  noSelectedOptionCheckmark?: boolean,
+  optionHeight: number,
   optionRenderer: Function,
   options: Array<any>,
-  optionsRef: Ref<*>,
+  optionsRef: ElementRef<*>,
+  optionsMaxHeight: number,
   render: Function,
   selectedOption: any,
   setHighlightedOptionIndex: Function,
-  targetRef: Ref<*>,
+  setMouseIsOverOptions?: (boolean) => void,
+  targetRef: ElementRef<*>,
   theme: Object,
   themeId: string,
 |};
 
-export const TokenOptionSkin: Props => React$Node = (props) => {
+export const TokenOptionSkin: Props => React$Node = (props: Props) => {
   const {
     getOptionProps,
     getHighlightedOptionIndex,
@@ -47,13 +54,18 @@ export const TokenOptionSkin: Props => React$Node = (props) => {
     isOpen,
     isOpeningUpward,
     isSelectedOption,
+    noOptionsArrow,
     noResults,
     noResultsMessage,
+    noSelectedOptionCheckmark,
+    optionHeight,
+    optionsMaxHeight,
     optionRenderer,
     options,
     optionsRef,
     render,
     setHighlightedOptionIndex,
+    setMouseIsOverOptions,
     targetRef,
     theme,
     themeId,
@@ -92,10 +104,14 @@ export const TokenOptionSkin: Props => React$Node = (props) => {
                 aria-hidden
                 key={index}
                 className={classnames([
+                  option.className ? option.className : null,
                   theme[themeId].option,
                   isHighlightedOption(index) ? theme[themeId].highlightedOption : null,
                   isSelectedOption(index) ? theme[themeId].selectedOption : null,
-                  option.isDisabled ? theme[themeId].disabledOption : null
+                  option.isDisabled ? theme[themeId].disabledOption : null,
+                  noSelectedOptionCheckmark === true
+                    ? theme[themeId].hasNoSelectedOptionCheckmark
+                    : null,
                 ])}
                 onClick={boundHandleClickOnOption}
                 onMouseEnter={boundSetHighlightedOptionIndex}
@@ -122,6 +138,20 @@ export const TokenOptionSkin: Props => React$Node = (props) => {
     return option;
   };
 
+  const getScrollBarHeight = (): number => {
+    const headerSize = 52; // empirically the size of the header
+    if (!options.length) return optionHeight + headerSize;
+    if (optionsMaxHeight < (options.length * optionHeight) + headerSize) {
+      return optionsMaxHeight;
+    }
+    return (options.length * optionHeight) + headerSize;
+  };
+
+  // Enforce max height of options dropdown if necessary
+  const optionsStyle = optionsMaxHeight == null ? null : {
+    maxHeight: `${optionsMaxHeight}px`
+  };
+
   return (
     <Bubble
       className={classnames([
@@ -137,9 +167,20 @@ export const TokenOptionSkin: Props => React$Node = (props) => {
       isOpeningUpward={isOpeningUpward}
       isHidden={!isOpen}
       isFloating
+      noArrow={noOptionsArrow}
       targetRef={targetRef}
     >
-      <ul ref={optionsRef} className={theme[themeId].ul}>{renderOptions()}</ul>
+      <ul
+        style={optionsStyle}
+        ref={optionsRef}
+        className={theme[themeId].ul}
+        onMouseEnter={() => setMouseIsOverOptions && setMouseIsOverOptions(true)}
+        onMouseLeave={() => setMouseIsOverOptions && setMouseIsOverOptions(false)}
+      >
+        <ScrollBar style={{ height: `${getScrollBarHeight()}px` }}>
+          {renderOptions()}
+        </ScrollBar>
+      </ul>
     </Bubble>
   );
 };
