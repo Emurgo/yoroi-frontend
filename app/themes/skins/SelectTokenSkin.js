@@ -41,7 +41,6 @@ type Props = {|
   toggleOpen: Function,
   toggleMouseLocation: Function,
   value: string,
-  optionHeight: ?number,
 |};
 
 export const SelectTokenSkin: Props => React$Node = (props) => {
@@ -89,7 +88,7 @@ export const SelectTokenSkin: Props => React$Node = (props) => {
         targetRef={props.inputRef}
         toggleMouseLocation={props.toggleMouseLocation}
         toggleOpen={props.toggleOpen}
-        optionHeight={props.optionHeight}
+        optionHeight={70 /* empirically this is the size of a token entry */}
       />
     </div>
   );

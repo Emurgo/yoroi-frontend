@@ -164,10 +164,9 @@ When(/^I open the token selection dropdown$/, async function () {
   await this.click('.WalletSendForm_component .SimpleInput_input');
 });
 When(/^I select token "([^"]*)"$/, async function (tokenName) {
-  const tokenRows = await this.getElementsBy('.TokenOptionRow_rowText');
+  const tokenRows = await this.getElementsBy('.TokenOptionRow_item_name');
   for (const row of tokenRows) {
-    const info = await row.findElements(By.tagName('span'));
-    const name = await info[0].getText();
+    const name = await row.getText();
     if (name === tokenName) {
       await row.click();
     }
