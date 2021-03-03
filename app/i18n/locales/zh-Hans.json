@@ -598,6 +598,8 @@
   "wallet.recovery.phrase.show.entry.dialog.button.labelClear": "清除",
   "wallet.recovery.phrase.show.entry.dialog.button.labelConfirm": "确认",
   "wallet.recovery.phrase.show.entry.dialog.button.labelRemoveLast": "移除最后一个",
+  "wallet.registrationOver.subtitle": "Registration for fund {roundNumber} is over. Open the Catalyst app for more information",
+  "wallet.registrationOver.title": "Registration has ended",
   "wallet.restore.dialog.form.errors.invalidRecoveryPhrase": "助记词无效",
   "wallet.restore.dialog.form.errors.shortRecoveryPhrase": "剩余 {number} 个单词",
   "wallet.restore.dialog.paperPasswordLabel": "纸钱包密码",
