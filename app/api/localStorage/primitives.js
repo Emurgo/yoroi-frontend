@@ -28,6 +28,8 @@ const getStorageItemInExtension = async (
       // need to ensure type is string to match localStorage API
       if (value == null || typeof value === 'string') {
         resolve(value);
+      } else if ( typeof value === 'object'){
+        resolve(JSON.stringify(value));
       } else {
         reject(new Error(`${nameof(getStorageItemInExtension)} cannot get non-string value`));
       }

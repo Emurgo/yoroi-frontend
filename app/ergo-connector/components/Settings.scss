@@ -40,6 +40,9 @@
       align-items: center;
       cursor: pointer;
       text-decoration: none;
+      & > svg {
+        flex: 0 0 24px;
+      }
     }
   }
   .label {
@@ -50,10 +53,10 @@
 
 .listItemLanguage {
   display: flex;
-  padding: 5px 32px;
+  padding: 8px 32px;
   & svg {
     margin-right: -3px;
-    margin-top: 6px;
+    margin-top: 4px;
   }
   & div {
     flex: 1;

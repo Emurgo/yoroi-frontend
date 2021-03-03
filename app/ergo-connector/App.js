@@ -29,6 +29,7 @@ import ThemeManager from '../ThemeManager';
 import CrashPage from '../containers/CrashPage';
 import { Logger } from '../utils/logging';
 import type { RouterHistory } from 'react-router-dom';
+import { SimpleSkins } from 'react-polymorph/lib/skins/simple';
 
 // https://github.com/yahoo/react-intl/wiki#loading-locale-data
 addLocaleData([
@@ -93,6 +94,7 @@ class App extends Component<Props, State> {
         <ThemeProvider
           key={currentTheme}
           theme={yoroiPolymorphTheme}
+          skins={SimpleSkins}
           themeOverrides={themeOverrides(currentTheme)}
         >
           <IntlProvider {...{ locale, key: locale, messages: mergedMessages }}>

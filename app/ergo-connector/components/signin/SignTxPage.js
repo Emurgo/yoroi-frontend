@@ -2,7 +2,7 @@
 // @flow
 import React, { Component } from 'react';
 import type { Node } from 'react';
-import { intlShape, } from 'react-intl';
+import { intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import styles from './SignTxPage.scss';
 import { Button } from 'react-polymorph/lib/components/Button';
@@ -20,6 +20,7 @@ import { handleExternalLinkClick } from '../../../utils/routing';
 import ExplorableHash from '../../../components/widgets/hashWrappers/ExplorableHash';
 import type { Notification } from '../../../types/notificationType';
 import { truncateConnectorBoxId } from '../../../utils/formatters';
+import ProgressBar from '../ProgressBar';
 
 type Props = {|
   totalAmount: ?number,
@@ -88,141 +89,144 @@ class SignTxPage extends Component<Props> {
     const { txData, onCopyAddressTooltip, onCancel, notification, totalAmount } = this.props;
 
     return (
-      <div className={styles.component}>
-        <div className={styles.row}>
-          <p className={styles.label}>{intl.formatMessage(globalMessages.transactionId)}</p>
-          <p className={styles.value}>{txData.id}</p>
-        </div>
-        <div className={styles.details}>
-          <div>
-            <p className={styles.label}>{intl.formatMessage(globalMessages.amount)}</p>
-            {txData.outputs.map(({ value, assets }) => {
-              return (
-                <div className={styles.amountRow}>
-                  <p className={styles.amount}>{value} ERG</p>
-                  {assets && assets.length ? (
-                    assets.map(({ tokenId, amount }) => (
-                      <p className={styles.stablecoins}>
-                        {amount} {tokenId}
-                      </p>
-                    ))
-                  ) : (
-                    <p className={styles.tokens}>No tokens</p>
-                  )}
-                </div>
-              );
-            })}
+      <>
+        <ProgressBar step={2} />
+        <div className={styles.component}>
+          <div className={styles.row}>
+            <p className={styles.label}>{intl.formatMessage(globalMessages.transactionId)}</p>
+            <p className={styles.value}>{txData.id}</p>
           </div>
-          <div className={styles.transactionFee}>
-            {/* TODO: Fee value */}
-            {/* <p className={styles.label}>{intl.formatMessage(globalMessages.feeLabel)}</p> */}
-            {/* <p className={styles.amount}>5.050088 ERG</p> */}
-          </div>
-        </div>
-        <div className={styles.row}>
-          <p className={styles.label}>
-            {intl.formatMessage(globalMessages.walletSendConfirmationTotalLabel)}
-          </p>
-          <p className={styles.totalValue}>{totalAmount} ERG</p>
-        </div>
-        <div className={styles.address}>
-          <div className={styles.addressFrom}>
-            <p className={styles.label}>
-              {
-                intl.formatMessage(globalMessages.fromAddresses)
-              }: <span>{txData.inputs.length}</span>
-            </p>
-            <div className={styles.addressFromList}>
-              {txData.inputs?.map((address, index) => {
-                const notificationElementId = `ergo-input-${index}`;
+          <div className={styles.details}>
+            <div>
+              <p className={styles.label}>{intl.formatMessage(globalMessages.amount)}</p>
+              {txData.outputs.map(({ value, assets }) => {
                 return (
-                  <div className={styles.addressToItem}>
-                    <CopyableAddress
-                      hash={address.address}
-                      elementId={notificationElementId}
-                      onCopyAddress={() =>
-                        onCopyAddressTooltip(address.boxId, notificationElementId)
-                      }
-                      notification={notification}
-                    >
-                      <ExplorableHash
-                        light={false}
-                        websiteName="ErgoPlatform Blockchain Explorer"
-                        url={URL_WEBSITE + address.boxId}
-                        onExternalLinkClick={handleExternalLinkClick}
-                      >
-                        <RawHash light={false}>
-                          <span className={styles.addressHash}>
-                            {truncateConnectorBoxId(address.boxId)}
-                          </span>
-                        </RawHash>
-                      </ExplorableHash>
-                    </CopyableAddress>
+                  <div className={styles.amountRow}>
+                    <p className={styles.amount}>{value} ERG</p>
+                    {assets && assets.length ? (
+                      assets.map(({ tokenId, amount }) => (
+                        <p className={styles.stablecoins}>
+                          {amount} {tokenId}
+                        </p>
+                      ))
+                    ) : (
+                      <p className={styles.tokens}>No tokens</p>
+                    )}
                   </div>
                 );
               })}
             </div>
-          </div>
-          <div className={styles.addressTo}>
-            <p className={styles.label}>
-              {intl.formatMessage(globalMessages.toAddresses)}: <span>{txData.outputs.length}</span>
-            </p>
-            <div className={styles.addressToList}>
-              {txData.outputs?.map((address, index) => {
-                const notificationElementId = `address-output-${index}-copyNotification`;
-                return (
-                  <div className={styles.addressToItem}>
-                    <CopyableAddress
-                      hash={address.address}
-                      elementId={notificationElementId}
-                      onCopyAddress={() =>
-                        onCopyAddressTooltip(address.boxId, notificationElementId)
-                      }
-                      notification={notification}
-                    >
-                      <ExplorableHash
-                        light={false}
-                        websiteName="ErgoPlatform Blockchain Explorer"
-                        url={URL_WEBSITE + address.boxId}
-                        onExternalLinkClick={handleExternalLinkClick}
-                      >
-                        <RawHash light={false}>
-                          <span className={styles.addressHash}>
-                            {truncateConnectorBoxId(address.boxId)}
-                          </span>
-                        </RawHash>
-                      </ExplorableHash>
-                    </CopyableAddress>
-                  </div>
-                );
-              })}
+            <div className={styles.transactionFee}>
+              {/* TODO: Fee value */}
+              {/* <p className={styles.label}>{intl.formatMessage(globalMessages.feeLabel)}</p> */}
+              {/* <p className={styles.amount}>5.050088 ERG</p> */}
             </div>
           </div>
+          <div className={styles.row}>
+            <p className={styles.label}>
+              {intl.formatMessage(globalMessages.walletSendConfirmationTotalLabel)}
+            </p>
+            <p className={styles.totalValue}>{totalAmount} ERG</p>
+          </div>
+          <div className={styles.address}>
+            <div className={styles.addressFrom}>
+              <p className={styles.label}>
+                {intl.formatMessage(globalMessages.fromAddresses)}:{' '}
+                <span>{txData.inputs.length}</span>
+              </p>
+              <div className={styles.addressFromList}>
+                {txData.inputs?.map((address, index) => {
+                  const notificationElementId = `ergo-input-${index}`;
+                  return (
+                    <div className={styles.addressToItem}>
+                      <CopyableAddress
+                        hash={address.address}
+                        elementId={notificationElementId}
+                        onCopyAddress={() =>
+                          onCopyAddressTooltip(address.boxId, notificationElementId)
+                        }
+                        notification={notification}
+                      >
+                        <ExplorableHash
+                          light={false}
+                          websiteName="ErgoPlatform Blockchain Explorer"
+                          url={URL_WEBSITE + address.boxId}
+                          onExternalLinkClick={handleExternalLinkClick}
+                        >
+                          <RawHash light={false}>
+                            <span className={styles.addressHash}>
+                              {truncateConnectorBoxId(address.boxId)}
+                            </span>
+                          </RawHash>
+                        </ExplorableHash>
+                      </CopyableAddress>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+            <div className={styles.addressTo}>
+              <p className={styles.label}>
+                {intl.formatMessage(globalMessages.toAddresses)}:{' '}
+                <span>{txData.outputs.length}</span>
+              </p>
+              <div className={styles.addressToList}>
+                {txData.outputs?.map((address, index) => {
+                  const notificationElementId = `address-output-${index}-copyNotification`;
+                  return (
+                    <div className={styles.addressToItem}>
+                      <CopyableAddress
+                        hash={address.address}
+                        elementId={notificationElementId}
+                        onCopyAddress={() =>
+                          onCopyAddressTooltip(address.boxId, notificationElementId)
+                        }
+                        notification={notification}
+                      >
+                        <ExplorableHash
+                          light={false}
+                          websiteName="ErgoPlatform Blockchain Explorer"
+                          url={URL_WEBSITE + address.boxId}
+                          onExternalLinkClick={handleExternalLinkClick}
+                        >
+                          <RawHash light={false}>
+                            <span className={styles.addressHash}>
+                              {truncateConnectorBoxId(address.boxId)}
+                            </span>
+                          </RawHash>
+                        </ExplorableHash>
+                      </CopyableAddress>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+          <div className={styles.passwordInput}>
+            <Input
+              type="password"
+              className={styles.walletPassword}
+              {...walletPasswordField.bind()}
+              error={walletPasswordField.error}
+              skin={InputOwnSkin}
+            />
+          </div>
+          <div className={styles.wrapperBtn}>
+            <Button
+              className="secondary"
+              label={intl.formatMessage(globalMessages.cancel)}
+              skin={ButtonSkin}
+              onClick={onCancel}
+            />
+            <Button
+              label={intl.formatMessage(globalMessages.confirm)}
+              skin={ButtonSkin}
+              disabled={!walletPasswordField.isValid}
+              onClick={this.submit.bind(this)}
+            />
+          </div>
         </div>
-        <div className={styles.passwordInput}>
-          <Input
-            type="password"
-            className={styles.walletPassword}
-            {...walletPasswordField.bind()}
-            error={walletPasswordField.error}
-            skin={InputOwnSkin}
-          />
-        </div>
-        <div className={styles.wrapperBtn}>
-          <Button
-            className="secondary"
-            label={intl.formatMessage(globalMessages.cancel)}
-            skin={ButtonSkin}
-            onClick={onCancel}
-          />
-          <Button
-            label={intl.formatMessage(globalMessages.confirm)}
-            skin={ButtonSkin}
-            disabled={!walletPasswordField.isValid}
-            onClick={this.submit.bind(this)}
-          />
-        </div>
-      </div>
+      </>
     );
   }
 }
