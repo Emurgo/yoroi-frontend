@@ -598,6 +598,8 @@
   "wallet.recovery.phrase.show.entry.dialog.button.labelClear": "クリア",
   "wallet.recovery.phrase.show.entry.dialog.button.labelConfirm": "確認",
   "wallet.recovery.phrase.show.entry.dialog.button.labelRemoveLast": "１つ削除",
+  "wallet.registrationOver.subtitle": "Registration for fund {roundNumber} is over. Open the Catalyst app for more information",
+  "wallet.registrationOver.title": "Registration has ended",
   "wallet.restore.dialog.form.errors.invalidRecoveryPhrase": "復元フレーズが無効です",
   "wallet.restore.dialog.form.errors.shortRecoveryPhrase": "あと{number}単語",
   "wallet.restore.dialog.paperPasswordLabel": "ペーパーウォレットのパスワード",
