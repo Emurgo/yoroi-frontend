@@ -156,7 +156,7 @@ export default class VotingRegTxDialog extends Component<Props> {
             currency={truncateToken(getTokenName(tokenInfo))}
             fees={formatValue(this.props.transactionFee.getDefaultEntry())}
             // note: we purposely don't put "total" since it doesn't really make sense here
-            // since the fee is unrelated to the amount you're about to stake
+            // since the fee is unrelated to the amount you're about to register
             total=""
             value={new BigNumber(0)}
             allowSigns={false}
