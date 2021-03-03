@@ -5,7 +5,7 @@
   border-radius: 2px;
   background-color: #f0f3f5;
   box-shadow: 0 2px 5px 3px rgba(0, 0, 0, 0.06);
-  font-family: Rubik Regular;
+  font-family: var(--font-regular);
 }
 
 .header {
@@ -67,7 +67,7 @@
   margin-top: -20px;
   & input {
     cursor: pointer;
-    font-family: Rubik Regular;
+    font-family: var(--font-regular);
     color: #242838 !important;
     border: none !important;
     text-transform: capitalize !important;
