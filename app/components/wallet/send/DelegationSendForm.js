@@ -17,6 +17,7 @@ import WarningBox from '../../widgets/WarningBox';
 import type { $npm$ReactIntl$IntlFormat, } from 'react-intl';
 import isHexadecimal from 'validator/lib/isHexadecimal';
 import LocalizableError from '../../../i18n/LocalizableError';
+import { bech32, } from 'bech32';
 
 const messages = defineMessages({
   invalidPoolId: {
@@ -33,11 +34,32 @@ type Props = {|
   +isProcessing: boolean,
 |};
 
-function isValidPool(poolId: string): boolean {
-  if (poolId.length !== 56) {
-    return false;
+function validateAndSetPool(
+  poolId: string,
+  updatePool: (void | string) => void,
+): boolean {
+  const validateHex: string => boolean = (id) => {
+    if (id.length !== 56) {
+      return false;
+    }
+    return isHexadecimal(id);
   }
-  return isHexadecimal(poolId);
+  try {
+    const payload = Buffer.from(
+      bech32.fromWords(bech32.decode(poolId, 1000).words)
+    ).toString('hex');
+    if (validateHex(payload)) {
+      updatePool(payload);
+      return true;
+    }
+  } catch (_e) {
+    if (validateHex(poolId)) {
+      updatePool(poolId);
+      return true;
+    }
+  }
+  updatePool(undefined);
+  return false;
 }
 
 @observer
@@ -60,12 +82,7 @@ export default class DelegationSendForm extends Component<Props> {
             this.props.updatePool(undefined);
             return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
           }
-          const isValid = isValidPool(poolIdValue);
-          if (isValid) {
-            this.props.updatePool(poolIdValue);
-          } else {
-            this.props.updatePool(undefined);
-          }
+          const isValid = validateAndSetPool(poolIdValue, this.props.updatePool);
           if (this.props.poolQueryError != null) {
             return [false]; // no error message since container already displays one
           }
