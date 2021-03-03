@@ -42,7 +42,10 @@ export function getTokenStrictName(
       // check this is a valid ASCII string
       // https://github.com/trezor/trezor-firmware/blob/d4dcd7bff9aaa87d2ba3f02b3ec4aa39dfc30eaa/core/src/apps/cardano/layout.py#L68
       if (bytes.filter(byte => byte <= 32 || byte >= 127).length === 0) {
-        return String.fromCharCode(...bytes);
+        const asciiName = String.fromCharCode(...bytes);
+        if (asciiName !== 'ADA') { // overly simple blocklist for names
+          return asciiName;
+        }
       }
     }
   }
