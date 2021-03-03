@@ -5,27 +5,30 @@ import { observer } from 'mobx-react';
 import { computed } from 'mobx';
 import { intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import type { InjectedOrGenerated } from '../../types/injectedPropsType';
-import Voting from '../../components/wallet/voting/Voting';
-import VotingRegistrationDialogContainer from './dialogs/voting/VotingRegistrationDialogContainer';
-import type { GeneratedData as VotingRegistrationDialogContainerData } from './dialogs/voting/VotingRegistrationDialogContainer';
-import { handleExternalLinkClick } from '../../utils/routing';
-import { WalletTypeOption, } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
-import UnsupportedWallet from './UnsupportedWallet';
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import LoadingSpinner from '../../components/widgets/LoadingSpinner';
-import VerticallyCenteredLayout from '../../components/layout/VerticallyCenteredLayout';
-import { CATALYST_MIN_AMOUNT } from '../../config/numbersConfig';
+import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
+import Voting from '../../../components/wallet/voting/Voting';
+import VotingRegistrationDialogContainer from '../dialogs/voting/VotingRegistrationDialogContainer';
+import type { GeneratedData as VotingRegistrationDialogContainerData } from '../dialogs/voting/VotingRegistrationDialogContainer';
+import { handleExternalLinkClick } from '../../../utils/routing';
+import { WalletTypeOption, } from '../../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
+import UnsupportedWallet from '../UnsupportedWallet';
+import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
+import LoadingSpinner from '../../../components/widgets/LoadingSpinner';
+import VerticallyCenteredLayout from '../../../components/layout/VerticallyCenteredLayout';
+import { CATALYST_MIN_AMOUNT } from '../../../config/numbersConfig';
 import InsufficientFundsPage from './InsufficientFundsPage';
-import { getTokenName, genLookupOrFail } from '../../stores/stateless/tokenHelpers';
-import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
-import environment from '../../environment';
-import { MultiToken } from '../../api/common/lib/MultiToken';
+import { getTokenName, genLookupOrFail } from '../../../stores/stateless/tokenHelpers';
+import type { TokenInfoMap } from '../../../stores/toplevel/TokenInfoStore';
+import environment from '../../../environment';
+import { MultiToken } from '../../../api/common/lib/MultiToken';
+import RegistrationOver from './RegistrationOver';
 
 export type GeneratedData = typeof VotingPage.prototype.generated;
 type Props = {|
   ...InjectedOrGenerated<GeneratedData>,
 |};
+
+const roundEndDate = new Date(Date.parse('3 Mar 2021 19:00:00 GMT'));
 
 @observer
 export default class VotingPage extends Component<Props> {
@@ -60,6 +63,11 @@ export default class VotingPage extends Component<Props> {
           <LoadingSpinner />
         </VerticallyCenteredLayout>
       );
+    }
+
+    // keep enabled on the testnet
+    if (environment.isProduction() && (new Date() >= roundEndDate)) {
+      return <RegistrationOver />;
     }
 
     // disable the minimum on E2E tests

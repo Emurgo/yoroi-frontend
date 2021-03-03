@@ -9,30 +9,30 @@ import { withScreenshot } from 'storycap';
 import {
   genShelleyCIP1852SigningWalletWithCache,
   genVotingShelleyTx,
-} from '../../../stories/helpers/cardano/ShelleyCip1852Mocks';
-import { THEMES } from '../../themes';
-import { mockWalletProps } from './Wallet.mock';
+} from '../../../../stories/helpers/cardano/ShelleyCip1852Mocks';
+import { THEMES } from '../../../themes';
+import { mockWalletProps } from '../Wallet.mock';
 import {
   globalKnobs,
   mockLedgerMeta,
-} from '../../../stories/helpers/StoryWrapper';
-import { InvalidWitnessError } from '../../api/common/errors';
+} from '../../../../stories/helpers/StoryWrapper';
+import { InvalidWitnessError } from '../../../api/common/errors';
 import {
   walletLookup,
-} from '../../../stories/helpers/WalletCache';
-import { wrapWallet } from '../../Routes';
-import { ROUTES } from '../../routes-config';
-import { buildRoute } from '../../utils/routing';
-import { StepState } from '../../components/widgets/ProgressSteps';
-import { ProgressStep } from '../../stores/ada/VotingStore';
+} from '../../../../stories/helpers/WalletCache';
+import { wrapWallet } from '../../../Routes';
+import { ROUTES } from '../../../routes-config';
+import { buildRoute } from '../../../utils/routing';
+import { StepState } from '../../../components/widgets/ProgressSteps';
+import { ProgressStep } from '../../../stores/ada/VotingStore';
 import VotingPage from './VotingPage';
-import VotingRegistrationDialogContainer from './dialogs/voting/VotingRegistrationDialogContainer';
-import { mockFromDefaults } from '../../stores/toplevel/TokenInfoStore';
-import { defaultAssets, } from '../../api/ada/lib/storage/database/prepackaged/networks';
-import { MultiToken } from '../../api/common/lib/MultiToken';
+import VotingRegistrationDialogContainer from '../dialogs/voting/VotingRegistrationDialogContainer';
+import { mockFromDefaults } from '../../../stores/toplevel/TokenInfoStore';
+import { defaultAssets, } from '../../../api/ada/lib/storage/database/prepackaged/networks';
+import { MultiToken } from '../../../api/common/lib/MultiToken';
 import BigNumber from 'bignumber.js';
-import type { ShelleyCip1852CacheValue } from '../../../stories/helpers/cardano/ShelleyCip1852Mocks';
-import { CATALYST_MIN_AMOUNT } from '../../config/numbersConfig';
+import type { ShelleyCip1852CacheValue } from '../../../../stories/helpers/cardano/ShelleyCip1852Mocks';
+import { CATALYST_MIN_AMOUNT } from '../../../config/numbersConfig';
 
 export default {
   title: `${__filename.split('.')[0]}`,

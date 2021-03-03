@@ -39,7 +39,7 @@ import type { GeneratedData as ReceiveData } from './containers/wallet/Receive';
 import StakingDashboardPage from './containers/wallet/staking/StakingDashboardPage';
 import CardanoStakingPage from './containers/wallet/staking/CardanoStakingPage';
 import NoticeBoardPage from './containers/notice-board/NoticeBoardPage';
-import VotingPage from './containers/wallet/VotingPage';
+import VotingPage from './containers/wallet/voting/VotingPage';
 
 import type { ConfigType } from '../config/config-types';
 import ComplexityLevelSettingsPage from './containers/settings/categories/ComplexityLevelSettingsPage';

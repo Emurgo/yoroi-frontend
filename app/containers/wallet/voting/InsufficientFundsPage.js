@@ -2,7 +2,7 @@
 import type { Node } from 'react';
 import React, { Component } from 'react';
 import { defineMessages, intlShape } from 'react-intl';
-import FullscreenMessage from '../../components/wallet/layouts/FullscreenMessage';
+import FullscreenMessage from '../../../components/wallet/layouts/FullscreenMessage';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import BigNumber from 'bignumber.js';
