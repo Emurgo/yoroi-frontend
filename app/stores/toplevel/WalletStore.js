@@ -35,6 +35,8 @@ import { getApiForNetwork } from '../../api/common/utils';
 import { Bip44Wallet } from '../../api/ada/lib/storage/models/Bip44Wallet/wrapper';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
+import { genRootKeyFromPublicKey } from '../../api/common/lib/crypto/keys/utilityKey';
+import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 
 type GroupedWallets = {|
   publicDerivers: Array<PublicDeriver<>>,
@@ -84,6 +86,7 @@ export type PublicKeyCache = {|
   publicDeriver: IGetPublic,
   plate: WalletChecksum,
   publicKey: string,
+  rootUtilityKey: RustModule.WalletV4.Bip32PrivateKey,
 |};
 
 /**
@@ -341,6 +344,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     this.actions.profile.setSelectedNetwork.trigger(wallet.getParent().getNetworkInfo());
 
     this.selected = wallet;
+
     // do not await on purpose since the UI will handle adding loaders while refresh is happening
     this.refreshWalletFromRemote(wallet);
   };
@@ -407,6 +411,9 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
           publicDeriver: withPubKey,
           plate: checksum,
           publicKey: publicKey.Hash,
+          rootUtilityKey: genRootKeyFromPublicKey({
+            publicKey: publicKey.Hash,
+          })
         });
       });
     }

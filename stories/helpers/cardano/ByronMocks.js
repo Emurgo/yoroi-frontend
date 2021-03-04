@@ -49,6 +49,7 @@ import {
   getDefaultEntryTokenInfo,
   mockFromDefaults,
 } from '../../../app/stores/toplevel/TokenInfoStore';
+import { genRootKeyFromPublicKey } from '../../../app/api/common/lib/crypto/keys/utilityKey';
 
 function genByronSigningWallet(
   genHardwareInfo?: number => HwWalletMetaRow,
@@ -123,6 +124,9 @@ function genMockByronBip44Cache(dummyWallet: PublicDeriver<>) {
         TextPart: 'DNKO-8098',
       },
       publicKey: '79b20a54d343785933f467e5ff212ad9d161be456127842d303434b06ff90cf9022da398bd785addbd78d46b6a085d8c14d1d5f010def1bb97111f5c00597e08',
+      rootUtilityKey: genRootKeyFromPublicKey({
+        publicKey: '79b20a54d343785933f467e5ff212ad9d161be456127842d303434b06ff90cf9022da398bd785addbd78d46b6a085d8c14d1d5f010def1bb97111f5c00597e08',
+      }),
     }),
     getDelegation: (_wallet) => (undefined),
     getAdaDelegation: (_wallet) => (undefined),

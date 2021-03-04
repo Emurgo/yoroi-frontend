@@ -54,6 +54,7 @@ import {
   getDefaultEntryTokenInfo,
   mockFromDefaults,
 } from '../../../app/stores/toplevel/TokenInfoStore';
+import { genRootKeyFromPublicKey } from '../../../app/api/common/lib/crypto/keys/utilityKey';
 
 function genMockShelleyCip1852Cache(dummyWallet: PublicDeriver<>) {
   const pendingRequest = new CachedRequest(_publicDeriver => Promise.resolve([]));
@@ -78,6 +79,9 @@ function genMockShelleyCip1852Cache(dummyWallet: PublicDeriver<>) {
         TextPart: 'JHKT-8080',
       },
       publicKey: '8e4e2f11b6ac2a269913286e26339779ab8767579d18d173cdd324929d94e2c43e3ec212cc8a36ed9860579dfe1e3ef4d6de778c5dbdd981623b48727cd96247',
+      rootUtilityKey: genRootKeyFromPublicKey({
+        publicKey: '8e4e2f11b6ac2a269913286e26339779ab8767579d18d173cdd324929d94e2c43e3ec212cc8a36ed9860579dfe1e3ef4d6de778c5dbdd981623b48727cd96247',
+      }),
     }),
     getDelegation: (_wallet) => (undefined),
     getAdaDelegation: (_wallet) => (undefined),

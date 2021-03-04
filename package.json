@@ -170,6 +170,7 @@
     "bignumber.js": "9.0.1",
     "bip32": "2.0.6",
     "bip39": "3.0.3",
+    "blakejs": "1.1.0",
     "browserify-zlib": "0.2.0",
     "bs58": "4.0.1",
     "bs58check": "2.1.2",
