@@ -24,6 +24,10 @@ const messages = defineMessages({
     id: 'settings.menu.levelOfComplexity.link.label',
     defaultMessage: '!!!Level of Complexity',
   },
+  lock: {
+    id: 'settings.menu.lock.link.label',
+    defaultMessage: '!!! Lock screen',
+  },
   externalStorage: {
     id: 'settings.menu.externalStorage.link.label',
     defaultMessage: '!!!External Storage',
@@ -80,6 +84,13 @@ export default class SettingsMenu extends Component<Props> {
               className="externalStorage"
             />
           }
+
+          <SettingsMenuItem
+            label={intl.formatMessage(messages.lock)}
+            onClick={() => onItemClick(ROUTES.SETTINGS.LOCK)}
+            active={isActiveItem(ROUTES.SETTINGS.LOCK)}
+            className="lock"
+          />
 
           <SettingsMenuItem
             label={intl.formatMessage(globalMessages.termsOfUse)}

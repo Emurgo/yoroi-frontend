@@ -22,6 +22,7 @@ import ExternalStorageSettingsPage from './containers/settings/categories/Extern
 import OAuthDropboxPage from './containers/settings/categories/OAuthDropboxPage';
 import TermsOfUseSettingsPage from './containers/settings/categories/TermsOfUseSettingsPage';
 import SupportSettingsPage from './containers/settings/categories/SupportSettingsPage';
+import LockScreenSettingsPage from './containers/settings/categories/LockScreenSettingsPage';
 
 // Dynamic container loading - resolver loads file relative to '/app/' directory
 import LoadingPage from './containers/LoadingPage';
@@ -209,6 +210,11 @@ const SettingsSubpages = (stores, actions) => (
       exact
       path={ROUTES.SETTINGS.WALLET}
       component={(props) => <WalletSettingsPage {...props} stores={stores} actions={actions} />}
+    />
+    <Route
+      exact
+      path={ROUTES.SETTINGS.LOCK}
+      component={(props) => <LockScreenSettingsPage {...props} stores={stores} actions={actions} />}
     />
     <Route
       exact

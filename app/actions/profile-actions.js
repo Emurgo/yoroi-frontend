@@ -21,4 +21,8 @@ export default class ProfileActions {
   acceptNightly: Action<void> = new Action();
   updateUnitOfAccount: AsyncAction<UnitOfAccountSettingType> = new AsyncAction();
   setSelectedNetwork: Action<void | $ReadOnly<NetworkRow>> = new Action();
+  toggleLockScreen: AsyncAction<boolean> = new AsyncAction();
+  setPinCode: AsyncAction<string> = new AsyncAction();
+  checkAppLocked: Action<void> = new Action();
+  toggleAppLocked: AsyncAction<void> = new AsyncAction();
 }

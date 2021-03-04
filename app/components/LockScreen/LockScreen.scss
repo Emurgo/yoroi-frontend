@@ -1,0 +1,14 @@
+.container {
+  background: #29292b;
+  height: 100%;
+  position: relative;
+}
+.unlock {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  height: 100px;
+  width: 100px;
+  cursor: pointer;
+}
