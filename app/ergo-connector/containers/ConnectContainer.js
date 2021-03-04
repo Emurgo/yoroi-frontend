@@ -50,9 +50,9 @@ export default class ConnectContainer extends Component<
     const chromeMessage = this.generated.stores.connector.connectingMessage;
 
     chrome.storage.local.get('connector_whitelist', async result => {
-      const whitelist = Object.keys(result).length === 0 ? [] : result.connector_whitelist;
+      const whitelist = Object.keys(result).length === 0 ? [] : JSON.parse(result.connector_whitelist);
       whitelist.push({ url: chromeMessage?.url, walletIndex });
-      chrome.storage.local.set({ connector_whitelist: whitelist });
+      chrome.storage.local.set({ connector_whitelist: JSON.stringify(whitelist) });
     });
 
     chrome.runtime.sendMessage({
