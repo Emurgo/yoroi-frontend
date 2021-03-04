@@ -1,15 +1,26 @@
 // @flow
 
 import React from 'react';
-import type { Node } from 'react';
+import type { Node, ComponentType } from 'react';
 import SignTxContainer from './SignTxContainer';
 import { withScreenshot } from 'storycap';
 import { action } from '@storybook/addon-actions';
+import { MemoryRouter } from 'react-router';
+import Layout from '../components/layout/Layout';
 
 export default {
   title: `${__filename.split('.')[0]}`,
   component: SignTxContainer,
-  decorators: [withScreenshot],
+  decorators: [
+    (Story: ComponentType<any>): Node => (
+      <MemoryRouter>
+        <Layout>
+          <Story />
+        </Layout>
+      </MemoryRouter>
+    ),
+    withScreenshot,
+  ],
 };
 
 const message = {
@@ -85,4 +96,3 @@ export const Generic = (): Node => {
     />
   );
 };
-
