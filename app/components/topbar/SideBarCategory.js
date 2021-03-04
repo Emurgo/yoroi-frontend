@@ -45,7 +45,12 @@ export default class SideBarCategory extends Component<Props> {
     const SvgElem = icon;
 
     return (
-      <button type="button" className={componentStyles} onClick={onClick}>
+      <button
+        type="button"
+        className={componentStyles}
+        onClick={onClick}
+        disabled={active}
+      >
         <span className={styles.icon}><SvgElem /></span>
         {label != null && showLabel === true && (
           <span className={styles.label}>{intl.formatMessage(label)}</span>
