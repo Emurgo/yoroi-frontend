@@ -436,11 +436,11 @@ export default class WalletSendForm extends Component<Props> {
           <div className={styles.checkbox}>
             <Checkbox
               label={intl.formatMessage(messages.checkboxLabel, {
-                currency: this.props.selectedToken != null
-                  ? truncateToken(getTokenName(this.props.selectedToken))
+                currency: (this.props.selectedToken == null || this.props.selectedToken.IsDefault)
                   // sending all of the primary asset for the chain sends all assets
                   // since to send all of the primary asset, you have to include all UTXO
-                  : intl.formatMessage(globalMessages.assets)
+                  ? intl.formatMessage(globalMessages.assets)
+                  : truncateToken(getTokenName(this.props.selectedToken))
               })}
               onChange={() => {
                 this.props.toggleSendAll();

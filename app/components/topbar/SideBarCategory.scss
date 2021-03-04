@@ -8,10 +8,12 @@
     fill: var(--theme-sidebar-icon-color);
   }
   &:hover {
-    cursor: pointer;
     & svg > path {
       fill: var(--theme-sidebar-icon-color-hover);
     }
+  }
+  &.active:hover {
+    cursor: default !important;
   }
   &.active {
     background-color: var(--theme-sidebar-item-background-color-hover);
