@@ -2,7 +2,6 @@
 import React, { Component } from 'react';
 import type { Node } from 'react';
 import { intlShape } from 'react-intl';
-import type { InjectedOrGeneratedConnector } from '../../types/injectedPropsType';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { observer } from 'mobx-react';
 
@@ -11,7 +10,6 @@ import globalMessages from '../../i18n/global-messages';
 import SettingLayout from '../components/layout/SettingLayout';
 
 type Props = {|
-  ...InjectedOrGeneratedConnector<any>,
   history: {
     goBack: void => void,
     ...

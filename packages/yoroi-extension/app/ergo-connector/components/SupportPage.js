@@ -5,6 +5,8 @@ import SupportImg from '../assets/images/no-websites-connected.inline.svg';
 import styles from './SupportPage.scss';
 import { defineMessages, intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import globalMessages from '../../i18n/global-messages';
+import { handleExternalLinkClick } from '../../utils/routing';
 
 type Props = {||};
 
@@ -32,6 +34,14 @@ export default class SupportPage extends Component<Props> {
         <SupportImg />
         <h3>{intl.formatMessage(messages.supportText)}</h3>
         <p>{intl.formatMessage(messages.supportContact)}</p>
+        <a
+          className={styles.link}
+          href={intl.formatMessage(globalMessages.supportRequestLinkUrl)}
+          onClick={event => handleExternalLinkClick(event)}
+          rel="noopener noreferrer"
+        >
+          {intl.formatMessage(globalMessages.contactSupport)}
+        </a>
       </div>
     );
   }
