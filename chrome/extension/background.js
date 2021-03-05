@@ -44,6 +44,7 @@ import { RemoteFetcher } from '../../app/api/ergo/lib/state-fetch/remoteFetcher'
 import { BatchedFetcher } from '../../app/api/ergo/lib/state-fetch/batchedFetcher';
 import LocalStorageApi from '../../app/api/localStorage/index';
 import { RustModule } from '../../app/api/ada/lib/cardanoCrypto/rustLoader';
+import { Logger } from '../../app/utils/logging';
 
 /*::
 declare var chrome;
@@ -153,27 +154,31 @@ export async function getStateFetcher(): Promise<IFetcher> {
 }
 
 async function syncWallet(wallet: PublicDeriver<>): Promise<void> {
-  const lastSync = await wallet.getLastSyncInfo();
-  // don't sync more than every 30 seconds
-  const now = Date.now();
-  if (lastSync.Time == null || now - lastSync.Time.getTime() > 30*1000) {
-    const stateFetcher = await getStateFetcher();
-    await RustModule.load();
-    await updateTransactions(
-      wallet.getDb(),
-      wallet,
-      stateFetcher.checkAddressesInUse,
-      stateFetcher.getTransactionsHistoryForAddresses,
-      stateFetcher.getAssetInfo,
-      stateFetcher.getBestBlock);
-    // to be safe we filter possibly accepted txs for up to 10 minutes
-    // this could be accepted in a variable amount of time due to Ergo's PoW
-    // but this is probably an okay amount. If it was not accepted then at worst
-    // the values are just temporarily withheld for a few minutes too long,
-    // and if it was accepted, then none of the UTXOs held would have been
-    // reuseable anyway.
-    pendingTxs = pendingTxs.filter(
-      pendingTx => Date.now() - pendingTx.submittedTime.getTime() <= 10*60*1000);
+  try {
+    const lastSync = await wallet.getLastSyncInfo();
+    // don't sync more than every 30 seconds
+    const now = Date.now();
+    if (lastSync.Time == null || now - lastSync.Time.getTime() > 30*1000) {
+      const stateFetcher = await getStateFetcher();
+      await RustModule.load();
+      await updateTransactions(
+        wallet.getDb(),
+        wallet,
+        stateFetcher.checkAddressesInUse,
+        stateFetcher.getTransactionsHistoryForAddresses,
+        stateFetcher.getAssetInfo,
+        stateFetcher.getBestBlock);
+      // to be safe we filter possibly accepted txs for up to 10 minutes
+      // this could be accepted in a variable amount of time due to Ergo's PoW
+      // but this is probably an okay amount. If it was not accepted then at worst
+      // the values are just temporarily withheld for a few minutes too long,
+      // and if it was accepted, then none of the UTXOs held would have been
+      // reuseable anyway.
+      pendingTxs = pendingTxs.filter(
+        pendingTx => Date.now() - pendingTx.submittedTime.getTime() <= 10*60*1000);
+    }
+  } catch (e) {
+    Logger.error(`Syncing failed: ${e}`);
   }
 }
 
@@ -327,8 +332,7 @@ async function confirmConnect(tabId: number, url: string): Promise<?AccountIndex
     chrome.storage.local.get('connector_whitelist', async result => {
       const whitelist = Object.keys(result).length === 0 ? []
         : JSON.parse(result.connector_whitelist);
-      // eslint-disable-next-line no-console
-      console.log(`whitelist: ${JSON.stringify(whitelist)}`);
+      Logger.info(`whitelist: ${JSON.stringify(whitelist)}`);
       const whitelistEntry = whitelist.find(entry => entry.url === url);
       if (whitelistEntry !== undefined) {
         connectedSites.set(tabId, {
@@ -485,8 +489,7 @@ chrome.runtime.onConnectExternal.addListener(port => {
                 ok: id
               });
             } catch (e) {
-              // eslint-disable-next-line no-console
-              console.log(`tx send err: ${e}`);
+              Logger.error(`tx send err: ${e}`);
               rpcResponse({
                 err: JSON.stringify(e)
               });
