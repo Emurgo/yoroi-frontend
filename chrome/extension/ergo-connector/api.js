@@ -6,6 +6,7 @@ import type {
   BoxCandidate,
   Paginate,
   PaginateError,
+  PendingTransaction,
   Tx,
   TxId,
   SignedTx,
@@ -67,17 +68,32 @@ function valueToBigNumber(x: Value): BigNumber {
 
 export async function connectorGetBalance(
   wallet: PublicDeriver<>,
+  pendingTxs: PendingTransaction[],
   tokenId: string
 ): Promise<Value> {
   if (tokenId === 'ERG') {
-    const canGetBalance = asGetBalance(wallet);
-    if (canGetBalance != null) {
-      const balance = await canGetBalance.getBalance();
-      return Promise.resolve(bigNumberToValue(balance.getDefault()));
+    if (pendingTxs.length === 0) {
+      // can directly query for balance
+      const canGetBalance = asGetBalance(wallet);
+      if (canGetBalance != null) {
+        const balance = await canGetBalance.getBalance();
+        return Promise.resolve(bigNumberToValue(balance.getDefault()));
+      }
+      throw Error('asGetBalance failed in connectorGetBalance');
+    } else {
+      // need to filter based on pending txs since they could have been included (or could not)
+      const allUtxos = await connectorGetUtxos(wallet, pendingTxs, undefined, tokenId);
+      let total = new BigNumber(0);
+      // this should never return a PaginateError since we don't supply a Paginate param
+      if (allUtxos.maxSize === undefined) {
+        for (const box of allUtxos) {
+          total = total.plus(valueToBigNumber(box.value));
+        }
+      }
+      return Promise.resolve(bigNumberToValue(total));
     }
-    throw Error('asGetBalance failed in connectorGetBalance');
   } else {
-    const allUtxos = await connectorGetUtxos(wallet, undefined, tokenId);
+    const allUtxos = await connectorGetUtxos(wallet, pendingTxs, undefined, tokenId);
     let total = new BigNumber(0);
     // this should never return a PaginateError since we don't supply a Paginate param
     if (allUtxos.maxSize === undefined) {
@@ -131,6 +147,7 @@ function formatUtxoToBox(utxo: { output: $ReadOnly<UtxoTxOutput>, ... }): Box {
 
 export async function connectorGetUtxos(
   wallet: PublicDeriver<>,
+  pendingTxs: PendingTransaction[],
   valueExpected: ?Value,
   tokenId: ?string,
   paginate: ?Paginate
@@ -140,28 +157,31 @@ export async function connectorGetUtxos(
     throw new Error('wallet doesn\'t support IGetAllUtxos');
   }
   const utxos = await withUtxos.getAllUtxos();
-  // TODO: more intelligently choose values?
+  const spentBoxIds = pendingTxs.flatMap(pending => pending.tx.inputs.map(input => input.boxId));
+  // TODO: should we use a different coin selection algorithm besides greedy?
   let utxosToUse = [];
   if (valueExpected != null) {
     let valueAcc = new BigNumber(0);
     const target = valueToBigNumber(valueExpected);
     for (let i = 0; i < utxos.length && valueAcc.isLessThan(target); i += 1) {
       const formatted = formatUtxoToBox(utxos[i]);
-      if (tokenId === 'ERG') {
-        valueAcc = valueAcc.plus(valueToBigNumber(formatted.value));
-        utxosToUse.push(formatted);
-      } else {
-        for (const asset of formatted.assets) {
-          if (asset.tokenId === tokenId) {
-            valueAcc = valueAcc.plus(valueToBigNumber(asset.amount));
-            utxosToUse.push(formatted);
-            break;
+      if (!spentBoxIds.includes(formatted.boxId)) {
+        if (tokenId === 'ERG') {
+          valueAcc = valueAcc.plus(valueToBigNumber(formatted.value));
+          utxosToUse.push(formatted);
+        } else {
+          for (const asset of formatted.assets) {
+            if (asset.tokenId === tokenId) {
+              valueAcc = valueAcc.plus(valueToBigNumber(asset.amount));
+              utxosToUse.push(formatted);
+              break;
+            }
           }
         }
       }
     }
   } else {
-    utxosToUse = utxos.map(formatUtxoToBox);
+    utxosToUse = utxos.map(formatUtxoToBox).filter(box => !spentBoxIds.includes(box.boxId));
   }
   return Promise.resolve(paginateResults(utxosToUse, paginate));
 }
@@ -280,6 +300,7 @@ export async function connectorSignTx(
 
 export async function connectorSendTx(
   wallet: IPublicDeriver</* ConceptualWallet */>,
+  pendingTxs: PendingTransaction[],
   tx: SignedTx
 ): Promise<TxId> {
   const network = wallet.getParent().getNetworkInfo();
@@ -300,6 +321,10 @@ export async function connectorSendTx(
       // }
     }
   ).then(response => {
+    pendingTxs.push({
+      tx,
+      submittedTime: new Date()
+    });
     return Promise.resolve(response.data.id);
   })
     .catch((error) => {
