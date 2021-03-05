@@ -20,6 +20,7 @@ import {
 } from '../../app/api/ada/lib/storage/models/PublicDeriver/traits';
 import type {
   PendingSignData,
+  PendingTransaction,
   RpcUid,
   AccountInfo,
 } from './ergo-connector/types';
@@ -36,6 +37,13 @@ import { isErgo, isCardanoHaskell, } from '../../app/api/ada/lib/storage/databas
 import { Bip44Wallet } from '../../app/api/ada/lib/storage/models/Bip44Wallet/wrapper';
 import { walletChecksum, legacyWalletChecksum } from '@emurgo/cip4-js';
 import type { WalletChecksum } from '@emurgo/cip4-js';
+import { updateTransactions } from '../../app/api/ergo/lib/storage/bridge/updateTransactions';
+import { environment } from '../../app/environment';
+import { IFetcher } from '../../app/api/ergo/lib/state-fetch/IFetcher';
+import { RemoteFetcher } from '../../app/api/ergo/lib/state-fetch/remoteFetcher';
+import { BatchedFetcher } from '../../app/api/ergo/lib/state-fetch/batchedFetcher';
+import LocalStorageApi from '../../app/api/localStorage/index';
+import { RustModule } from '../../app/api/ada/lib/cardanoCrypto/rustLoader';
 
 /*::
 declare var chrome;
@@ -73,7 +81,7 @@ type ConnectedSite = {|
   url: string,
   status: ConnectedStatus,
   pendingSigns: Map<RpcUid, PendingSign>
-|}
+|};
 
 async function getChecksum(
   publicDeriver: ReturnType<typeof asGetPublicKey>,
@@ -94,7 +102,9 @@ async function getChecksum(
 
 // tab id key
 const connectedSites: Map<number, ConnectedSite> = new Map();
-// chrome.storage.local.set({ connector_whitelist: [] });
+
+let pendingTxs: PendingTransaction[] = [];
+
 export async function getWalletsInfo(): Promise<AccountInfo[]> {
   try {
     if (db == null) {
@@ -109,7 +119,7 @@ export async function getWalletsInfo(): Promise<AccountInfo[]> {
 
       const conceptualInfo = await conceptualWallet.getFullConceptualWalletInfo();
       if (isErgo(conceptualWallet.getNetworkInfo())) {
-        const balance = await connectorGetBalance(wallet, 'ERG');
+        const balance = await connectorGetBalance(wallet, pendingTxs, 'ERG');
         accounts.push({
           name: conceptualInfo.Name,
           balance: balance.toString(),
@@ -123,6 +133,50 @@ export async function getWalletsInfo(): Promise<AccountInfo[]> {
   }
 }
 
+export async function getStateFetcher(): Promise<IFetcher> {
+  // I don't think it's worth it to cache this? We only need it for syncs and sending tx
+  const localStorgeApi = new LocalStorageApi();
+  const locale = await localStorgeApi.getUserLocale() ?? 'en-US';
+  return Promise.resolve(new BatchedFetcher(new RemoteFetcher(
+    () => environment.getVersion(),
+    () => locale,
+    () => {
+      if (environment.userAgentInfo.isFirefox()) {
+        return 'firefox';
+      }
+      if (environment.userAgentInfo.isChrome()) {
+        return 'chrome';
+      }
+      return '-';
+    },
+  )));
+}
+
+async function syncWallet(wallet: PublicDeriver<>): Promise<void> {
+  const lastSync = await wallet.getLastSyncInfo();
+  // don't sync more than every 30 seconds
+  const now = Date.now();
+  if (lastSync.Time == null || now - lastSync.Time.getTime() > 30*1000) {
+    const stateFetcher = await getStateFetcher();
+    await RustModule.load();
+    await updateTransactions(
+      wallet.getDb(),
+      wallet,
+      stateFetcher.checkAddressesInUse,
+      stateFetcher.getTransactionsHistoryForAddresses,
+      stateFetcher.getAssetInfo,
+      stateFetcher.getBestBlock);
+    // to be safe we filter possibly accepted txs for up to 10 minutes
+    // this could be accepted in a variable amount of time due to Ergo's PoW
+    // but this is probably an okay amount. If it was not accepted then at worst
+    // the values are just temporarily withheld for a few minutes too long,
+    // and if it was accepted, then none of the UTXOs held would have been
+    // reuseable anyway.
+    pendingTxs = pendingTxs.filter(
+      pendingTx => Date.now() - pendingTx.submittedTime.getTime() <= 10*60*1000);
+  }
+}
+
 async function getSelectedWallet(tabId: number): Promise<PublicDeriver<>> {
   if (db == null) {
     db = await loadLovefieldDB(schema.DataStoreType.INDEXED_DB);
@@ -133,7 +187,9 @@ async function getSelectedWallet(tabId: number): Promise<PublicDeriver<>> {
     const index = connected.status;
     if (typeof index === 'number') {
       if (index >= 0 && index < wallets.length) {
-        return Promise.resolve(wallets[index]);
+        const selectedWallet = wallets[index];
+        await syncWallet(selectedWallet);
+        return Promise.resolve(selectedWallet);
       }
       return Promise.reject(new Error(`wallet index out of bounds: ${index}`));
     }
@@ -375,7 +431,7 @@ chrome.runtime.onConnectExternal.addListener(port => {
           case 'get_balance':
             {
               const wallet = await getSelectedWallet(tabId);
-              const balance = await connectorGetBalance(wallet, message.params[0]);
+              const balance = await connectorGetBalance(wallet, pendingTxs, message.params[0]);
               rpcResponse({ ok: balance });
             }
             break;
@@ -384,6 +440,7 @@ chrome.runtime.onConnectExternal.addListener(port => {
               const wallet = await getSelectedWallet(tabId);
               const utxos = await connectorGetUtxos(
                 wallet,
+                pendingTxs,
                 message.params[0],
                 message.params[1],
                 message.params[2]
@@ -423,7 +480,7 @@ chrome.runtime.onConnectExternal.addListener(port => {
           case 'submit_tx':
             try {
               const wallet = await getSelectedWallet(tabId);
-              const id = await connectorSendTx(wallet, message.params[0]);
+              const id = await connectorSendTx(wallet, pendingTxs, message.params[0]);
               rpcResponse({
                 ok: id
               });

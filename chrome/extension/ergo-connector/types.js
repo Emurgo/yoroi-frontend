@@ -166,3 +166,9 @@ export type FailedSignData = {|
   tabId: number,
 |}
 
+// when a tx is submitted we mark those as potentially spent and filter
+// utxo/balance/etc calls for them until they can be confirmed as spent or not
+export type PendingTransaction = {|
+  submittedTime: Date,
+  tx: SignedTx,
+|};
