@@ -55,12 +55,14 @@ export const Generic = (): Node => {
             wallets,
             errorWallets,
             loadingWallets: walletsState,
+            currentConnectorWhitelist: [],
           },
         },
         actions: {
           connector: {
             getResponse: { trigger: async (req) => action('getResponse')(req) },
             getConnectorWhitelist: { trigger: async (req) => action('getConnectorWhitelist')(req) },
+            updateConnectorWhitelist: { trigger: async (req) => action('updateConnectorWhitelist')(req) },
             getWallets: { trigger: action('getWallets') },
             closeWindow: { trigger: action('closeWindow') },
           },
