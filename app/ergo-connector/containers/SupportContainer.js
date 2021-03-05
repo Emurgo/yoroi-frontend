@@ -1,14 +1,40 @@
 // @flow
 import React, { Component } from 'react';
 import type { Node } from 'react';
+import { intlShape } from 'react-intl';
+import type { InjectedOrGeneratedConnector } from '../../types/injectedPropsType';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { observer } from 'mobx-react';
-import SupportPage from '../components/SupportPage';
 
-type Props = {||};
+import SupportPage from '../components/SupportPage';
+import globalMessages from '../../i18n/global-messages';
+import SettingLayout from '../components/layout/SettingLayout';
+
+type Props = {|
+  ...InjectedOrGeneratedConnector<any>,
+  history: {
+    goBack: void => void,
+    ...
+  },
+|};
 
 @observer
 export default class SupportContainer extends Component<Props> {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
+    intl: intlShape.isRequired,
+  };
+
+  goBack: void => void = () => {
+    this.props.history.goBack();
+  };
+
   render(): Node {
-    return <SupportPage />;
+    const { intl } = this.context;
+
+    return (
+      <SettingLayout goBack={this.goBack} headerLabel={intl.formatMessage(globalMessages.support)}>
+        <SupportPage />
+      </SettingLayout>
+    );
   }
 }

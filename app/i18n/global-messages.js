@@ -803,6 +803,10 @@ export const connectorMessages: * = defineMessages({
     id: 'global.connector.messageReadOnly',
     defaultMessage: '!!!We are granting read-only to view utxos/addresses.',
   },
+  about: {
+    id: 'connector.settings.about',
+    defaultMessage: '!!!About',
+  },
 });
 
 

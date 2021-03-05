@@ -21,8 +21,23 @@ export const Routes = (stores: StoresMap, actions: ActionsMap): Node => (
   <Switch>
     <Route
       exact
-      path={ROUTES.SETTINGS}
+      path={ROUTES.SETTINGS.GENERAL}
       component={props => <SettingsContainer {...props} stores={stores} actions={actions} />}
+    />
+    <Route
+      exact
+      path={ROUTES.SETTINGS.TERMS_OF_USE}
+      component={props => <TermsOfUseContainer {...props} stores={stores} actions={actions} />}
+    />
+    <Route
+      exact
+      path={ROUTES.SETTINGS.SUPPORT}
+      component={props => <SupportContainer {...props} stores={stores} actions={actions} />}
+    />
+    <Route
+      exact
+      path={ROUTES.SETTINGS.ABOUT}
+      component={props => <AboutContainer {...props} stores={stores} actions={actions} />}
     />
     <Route
       path={ROUTES.ROOT}
@@ -30,7 +45,7 @@ export const Routes = (stores: StoresMap, actions: ActionsMap): Node => (
         wrapGeneralPages({ ...props, stores, actions }, GeneralSubpages(stores, actions))
       }
     />
-    <Redirect to={ROUTES.SETTINGS} />
+    <Redirect to={ROUTES.SETTINGS.GENERAL} />
   </Switch>
 );
 
@@ -51,22 +66,7 @@ const GeneralSubpages = (stores, actions) => (
       path={ROUTES.SIGNIN_TRANSACTION}
       component={props => <SignTxContainer {...props} stores={stores} actions={actions} />}
     />
-    <Route
-      exact
-      path={ROUTES.TERMS_OF_USE}
-      component={props => <TermsOfUseContainer {...props} stores={stores} actions={actions} />}
-    />
-    <Route
-      exact
-      path={ROUTES.SUPPORT}
-      component={props => <SupportContainer {...props} stores={stores} actions={actions} />}
-    />
-    <Route
-      exact
-      path={ROUTES.ABOUT}
-      component={props => <AboutContainer {...props} stores={stores} actions={actions} />}
-    />
-    <Redirect to={ROUTES.SETTINGS} />
+    <Redirect to={ROUTES.SETTINGS.GENERAL} />
   </Switch>
 );
 

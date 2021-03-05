@@ -2,16 +2,42 @@
 import React, { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import type { InjectedOrGenerated } from '../../types/injectedPropsType';
+import type { InjectedOrGeneratedConnector } from '../../types/injectedPropsType';
 import { computed } from 'mobx';
 import TermsOfUsePage from '../components/TermsOfUsePage';
+import SettingLayout from '../components/layout/SettingLayout';
+import { intlShape } from 'react-intl';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import globalMessages from '../../i18n/global-messages';
 
 type GeneratedData = typeof TermsOfUseContainer.prototype.generated;
 
+type Props = {|
+  ...InjectedOrGeneratedConnector<GeneratedData>,
+  history: {
+    goBack: void => void,
+    ...
+  },
+|};
 @observer
-export default class TermsOfUseContainer extends Component<InjectedOrGenerated<GeneratedData>> {
+export default class TermsOfUseContainer extends Component<Props> {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
+    intl: intlShape.isRequired,
+  };
+  goBack: void => void = () => {
+    this.props.history.goBack();
+  };
+
   render(): Node {
-    return <TermsOfUsePage localizedTermsOfUse={this.generated.stores.profile.termsOfUse} />;
+    const { intl } = this.context;
+    return (
+      <SettingLayout
+        goBack={this.goBack}
+        headerLabel={intl.formatMessage(globalMessages.termsOfUse)}
+      >
+        <TermsOfUsePage localizedTermsOfUse={this.generated.stores.profile.termsOfUse} />;
+      </SettingLayout>
+    );
   }
   @computed get generated(): {|
     stores: {|
