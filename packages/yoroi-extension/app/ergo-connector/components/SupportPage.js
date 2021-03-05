@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import type { Node } from 'react';
-import SupportImg from '../assets/images/no-websites-connected.inline.svg';
+import SupportImg from '../assets/images/support.inline.svg';
 import styles from './SupportPage.scss';
 import { defineMessages, intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
@@ -30,7 +30,6 @@ export default class SupportPage extends Component<Props> {
 
     return (
       <div className={styles.component}>
-        {/* TODO: fix image */}
         <SupportImg />
         <h3>{intl.formatMessage(messages.supportText)}</h3>
         <p>{intl.formatMessage(messages.supportContact)}</p>

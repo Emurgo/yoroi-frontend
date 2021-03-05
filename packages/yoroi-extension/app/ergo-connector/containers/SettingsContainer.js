@@ -49,7 +49,6 @@ export default class SettingsContainer extends Component<Props> {
           languages={profileStore.LANGUAGE_OPTIONS}
           currentLocale={profileStore.currentLocale}
           error={profileStore.setProfileLocaleRequest.error}
-          goBack={this.goBack}
         />
       </SettingLayout>
     );
