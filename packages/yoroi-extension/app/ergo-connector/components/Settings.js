@@ -68,7 +68,7 @@ export default class Settings extends Component<any> {
       {
         label: intl.formatMessage(globalMessages.termsOfUse),
         icon: <TermsUseIcon />,
-        route: '#',
+        route: ROUTES.TERMS_OF_USE,
       },
     ];
 

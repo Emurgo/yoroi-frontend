@@ -18,7 +18,7 @@ type Props = {|
   accounts: ?Array<WhitelistEntry>,
   activeSites: Array<string>,
   wallets: ?Array<AccountInfo>,
-  onRemoveWallet: string => void,
+  onRemoveWallet: ?string => void,
 |};
 const messages = defineMessages({
   connectedWallets: {
