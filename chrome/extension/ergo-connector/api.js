@@ -3,6 +3,7 @@
 import type {
   Address,
   Box,
+  BoxCandidate,
   Paginate,
   PaginateError,
   Tx,
@@ -199,6 +200,22 @@ export async function connectorGetUnusedAddresses(wallet: PublicDeriver<>): Prom
   return getAllAddresses(wallet, false);
 }
 
+// TODO: look into sigma rust string value support
+function processBoxesForSigmaRust(boxes: BoxCandidate[] | Box[]) {
+  for (const output of boxes) {
+    output.value = parseInt(output.value, 10);
+    if (output.value > Number.MAX_SAFE_INTEGER) {
+      throw new Error('large values not supported by sigma-rust\'s json parsing code');
+    }
+    for (const asset of output.assets) {
+      asset.amount = parseInt(asset.amount, 10);
+      if (asset.amount > Number.MAX_SAFE_INTEGER) {
+        throw new Error('large values not supported by sigma-rust\'s json parsing code');
+      }
+    }
+  }
+}
+
 export async function connectorSignTx(
   publicDeriver: IPublicDeriver<ConceptualWallet>,
   password: string,
@@ -217,13 +234,7 @@ export async function connectorSignTx(
   await RustModule.load();
   let wasmTx;
   try {
-    // TODO: look into sigma rust string value support
-    for (const output of tx.outputs) {
-      output.value = parseInt(output.value, 10);
-      if (output.value > Number.MAX_SAFE_INTEGER) {
-        throw new Error('large values not supported by sigma-rust\'s json parsing code');
-      }
-    }
+    processBoxesForSigmaRust(tx.outputs);
     wasmTx = RustModule.SigmaRust.UnsignedTransaction.from_json(JSON.stringify(tx));
   } catch (e) {
     // eslint-disable-next-line no-console
@@ -253,8 +264,9 @@ export async function connectorSignTx(
     keyLevel: wallet.getParent().getPublicDeriverLevel(),
     signingKey: finalSigningKey,
   });
-  const x = utxosToSign.map(formatUtxoToBox);
-  const txBoxesToSign = RustModule.SigmaRust.ErgoBoxes.from_boxes_json(x);
+  const jsonBoxesToSign = utxosToSign.map(formatUtxoToBox);
+  processBoxesForSigmaRust(jsonBoxesToSign);
+  const txBoxesToSign = RustModule.SigmaRust.ErgoBoxes.from_boxes_json(jsonBoxesToSign);
   const signedTx = RustModule.SigmaRust.Wallet
     .from_secrets(wasmKeys)
     .sign_transaction(
