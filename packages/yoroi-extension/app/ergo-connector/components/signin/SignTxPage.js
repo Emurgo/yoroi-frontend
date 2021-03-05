@@ -99,13 +99,13 @@ class SignTxPage extends Component<Props> {
           <div className={styles.details}>
             <div>
               <p className={styles.label}>{intl.formatMessage(globalMessages.amount)}</p>
-              {txData.outputs.map(({ value, assets }) => {
+              {txData.outputs.map(({ value, assets, boxId }) => {
                 return (
-                  <div className={styles.amountRow}>
+                  <div className={styles.amountRow} key={boxId}>
                     <p className={styles.amount}>{value} ERG</p>
                     {assets && assets.length ? (
                       assets.map(({ tokenId, amount }) => (
-                        <p className={styles.stablecoins}>
+                        <p className={styles.stablecoins} key={tokenId}>
                           {amount} {tokenId}
                         </p>
                       ))
@@ -138,7 +138,7 @@ class SignTxPage extends Component<Props> {
                 {txData.inputs?.map((address, index) => {
                   const notificationElementId = `ergo-input-${index}`;
                   return (
-                    <div className={styles.addressToItem}>
+                    <div className={styles.addressToItem} key={address.boxId}>
                       <CopyableAddress
                         hash={address.address}
                         elementId={notificationElementId}
@@ -174,7 +174,7 @@ class SignTxPage extends Component<Props> {
                 {txData.outputs?.map((address, index) => {
                   const notificationElementId = `address-output-${index}-copyNotification`;
                   return (
-                    <div className={styles.addressToItem}>
+                    <div className={styles.addressToItem} key={address.boxId}>
                       <CopyableAddress
                         hash={address.address}
                         elementId={notificationElementId}

@@ -19,9 +19,22 @@ import TermsUseIcon from '../assets/images/terms_of_use_icon.inline.svg';
 import LanguageIcon from '../assets/images/language_icon.inline.svg';
 import ConnectedIcon from '../assets/images/connected_icon.inline.svg';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type { LanguageType } from '../../i18n/translations';
+import LocalizableError from '../../i18n/LocalizableError';
+
+type Props = {|
+  +languages: Array<LanguageType>,
+  +currentLocale: string,
+  +onSelectLanguage: ({| locale: string |}) => PossiblyAsync<void>,
+  +isSubmitting: boolean,
+  +error?: ?LocalizableError,
+|};
 
 @observer
-export default class Settings extends Component<any> {
+export default class Settings extends Component<Props> {
+  static defaultProps: {| error: void |} = {
+    error: undefined,
+  };
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };

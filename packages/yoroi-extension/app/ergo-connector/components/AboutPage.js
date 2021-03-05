@@ -7,6 +7,9 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 type Props = {||};
 
+{
+  /* TODO: fix text for about */
+}
 const messages = defineMessages({
   dAppInfo: {
     id: 'connector.settings.about.dAppInfo',
