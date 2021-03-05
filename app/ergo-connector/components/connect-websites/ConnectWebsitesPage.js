@@ -17,7 +17,7 @@ import type {
 type Props = {|
   accounts: ?Array<WhitelistEntry>,
   wallets: ?Array<AccountInfo>,
-  onRemoveWallet: string => void,
+  onRemoveWallet: ?string => void,
 |};
 const messages = defineMessages({
   connectedWallets: {

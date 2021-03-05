@@ -12,9 +12,9 @@ import type { AccountInfo, } from '../../../../chrome/extension/ergo-connector/t
 type Props = {|
   label: string,
   infoText: string,
-  url: string,
+  url: ?string,
   wallet: AccountInfo,
-  onRemoveWallet: string => void,
+  onRemoveWallet: ?string => void,
 |};
 type State = {| isExpanded: boolean |};
 @observer
