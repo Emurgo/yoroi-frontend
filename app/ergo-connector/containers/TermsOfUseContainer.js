@@ -35,7 +35,7 @@ export default class TermsOfUseContainer extends Component<Props> {
         goBack={this.goBack}
         headerLabel={intl.formatMessage(globalMessages.termsOfUse)}
       >
-        <TermsOfUsePage localizedTermsOfUse={this.generated.stores.profile.termsOfUse} />;
+        <TermsOfUsePage localizedTermsOfUse={this.generated.stores.profile.termsOfUse} />
       </SettingLayout>
     );
   }

@@ -4,14 +4,12 @@ import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import SettingLayout from '../components/layout/SettingLayout';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import type { InjectedOrGeneratedConnector } from '../../types/injectedPropsType';
 
 import { intlShape } from 'react-intl';
 import AboutPage from '../components/AboutPage';
 import { connectorMessages } from '../../i18n/global-messages';
 
 type Props = {|
-  ...InjectedOrGeneratedConnector<any>,
   history: {
     goBack: void => void,
     ...
