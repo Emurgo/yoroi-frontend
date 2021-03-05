@@ -12,6 +12,7 @@ import Store from '../../../stores/base/Store';
 import moment from 'moment/moment';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
+import { getTermsOfUse } from '../../../stores/toplevel/ProfileStore';
 
 export default class ProfileStore extends Store<StoresMap, ActionsMap> {
   LANGUAGE_OPTIONS: Array<LanguageType> = [
@@ -133,6 +134,12 @@ export default class ProfileStore extends Store<StoresMap, ActionsMap> {
     }
     return result !== undefined;
   };
+
+  // ========== Terms of Use ========== //
+
+  @computed get termsOfUse(): string {
+    return getTermsOfUse('ada', this.currentLocale);
+  }
 
   // ========== Locale ========== //
 
