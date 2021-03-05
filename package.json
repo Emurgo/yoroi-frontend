@@ -1,7 +1,19 @@
 {
   "name": "root",
   "private": true,
+  "scripts": {
+    "eslint": "lerna run eslint --stream",
+    "flow": "lerna run flow --stream",
+    "test": "lerna run test --stream"
+  },
+  "husky": {
+    "hooks": {
+      "pre-push": "npm run flow && npm run eslint && npm run test",
+      "post-checkout": "npm run translations:purge"
+    }
+  },
   "devDependencies": {
+    "husky": "4.3.0",
     "lerna": "^4.0.0"
   }
 }

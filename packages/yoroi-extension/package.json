@@ -17,7 +17,7 @@
     "flow": "flow --show-all-errors .",
     "flow-typed": "flow codemod annotate-exports --write --repeat ./app",
     "flow:install": "flow-typed create-stub insert-pkg-here --typescript",
-    "jest": "NODE_ENV=jest jest",
+    "test": "NODE_ENV=jest jest",
     "eslint": "eslint app features chrome scripts webpack/*.js",
     "test:build": "npm run prod:build -- --env 'test' && npm run prod:compress -- --env 'test' --app-id 'yoroi' --codebase 'https://yoroiwallet.com/dw/yoroi-test-extension.crx' --key ./e2etest-key.pem",
     "test:run:base": "NODE_ENV=cucumber cucumber-js --require-module '@babel/register' --compiler es6:@babel/register",
@@ -43,12 +43,6 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/Emurgo/yoroi-frontend"
-  },
-  "husky": {
-    "hooks": {
-      "pre-push": "npm run flow && npm run eslint && npm run jest",
-      "post-checkout": "npm run translations:purge"
-    }
   },
   "keywords": [
     "yoroi",
@@ -127,7 +121,6 @@
     "html-loader": "2.0.0",
     "html-webpack-harddisk-plugin": "2.0.0",
     "html-webpack-plugin": "5.1.0",
-    "husky": "4.3.0",
     "jest": "26.6.3",
     "jest-canvas-mock": "2.3.1",
     "json-server": "0.16.3",

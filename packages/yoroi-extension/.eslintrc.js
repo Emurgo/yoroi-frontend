@@ -8,7 +8,7 @@ module.exports = {
     sourceType: 'module',
     ecmaFeatures: {
       legacyDecorators: true
-    }
+    },
   },
   extends: ['airbnb', 'prettier'],
   env: {
