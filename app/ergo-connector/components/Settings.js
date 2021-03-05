@@ -63,7 +63,7 @@ export default class Settings extends Component<any> {
       {
         label: intl.formatMessage(globalMessages.support),
         icon: <SupportIcon />,
-        route: '#',
+        route: ROUTES.SUPPORT,
       },
       {
         label: intl.formatMessage(globalMessages.termsOfUse),

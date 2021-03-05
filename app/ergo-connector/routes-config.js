@@ -5,4 +5,5 @@ export const ROUTES = {
   SIGNIN_TRANSACTION: '/signin-transaction',
   SETTINGS: '/settings',
   TERMS_OF_USE: '/terms-of-use',
+  SUPPORT: '/support',
 };

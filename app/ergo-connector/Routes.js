@@ -14,6 +14,7 @@ import Layout from './components/layout/Layout';
 import SignTxContainer from './containers/SignTxContainer';
 import SettingsContainer from './containers/SettingsContainer';
 import TermsOfUseContainer from './containers/TermsOfUseContainer';
+import SupportContainer from './containers/SupportContainer';
 
 export const Routes = (stores: StoresMap, actions: ActionsMap): Node => (
   <Switch>
@@ -53,6 +54,11 @@ const GeneralSubpages = (stores, actions) => (
       exact
       path={ROUTES.TERMS_OF_USE}
       component={props => <TermsOfUseContainer {...props} stores={stores} actions={actions} />}
+    />
+    <Route
+      exact
+      path={ROUTES.SUPPORT}
+      component={props => <SupportContainer {...props} stores={stores} actions={actions} />}
     />
     <Redirect to={ROUTES.SETTINGS} />
   </Switch>
