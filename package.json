@@ -4,7 +4,8 @@
   "scripts": {
     "eslint": "lerna run eslint --stream",
     "flow": "lerna run flow --stream",
-    "test": "lerna run test --stream"
+    "test": "lerna run test --stream",
+    "translations:purge": "lerna run translations:purge -- stream"
   },
   "husky": {
     "hooks": {
