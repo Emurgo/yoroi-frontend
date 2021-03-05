@@ -1,42 +1,4 @@
 node_modules
 npm-debug.log
 .DS_Store
-staging-key.pem
-nightly-key.pem
-production-key.pem
-
-build/
-dev/
-screenshots/
-storybook-static/
-__screenshots__/
-coverage/
-
-*.zip
-*.xpi
-*.crx
-# pem files are used to sign the extension so we ignore the to avoid accidental leakage
-*.pem
-# we want some agreed-upon pem to run the e2etest though
-!e2etest-key.pem
-update.xml
 .vscode/
-
-# Generated translation files
-translations/messages
-translations/reports
-Yoroi
-
-# IntelliJ IDEA config
-.idea
-**/*.iml
-
-# manifests are built dynamically
-chrome/manifest.*.json
-
-# history plugin for vscode
-.history
-Yoroi Shelley Testnet
-
-# Local Netlify folder
-.netlify
