@@ -6,4 +6,5 @@ export const ROUTES = {
   SETTINGS: '/settings',
   TERMS_OF_USE: '/terms-of-use',
   SUPPORT: '/support',
+  ABOUT: '/about',
 };

@@ -53,7 +53,7 @@ export default class Settings extends Component<any> {
       {
         label: intl.formatMessage(messages.about),
         icon: <InfoIcon />,
-        route: '#',
+        route: ROUTES.ABOUT,
       },
       {
         label: intl.formatMessage(connectorMessages.connectedWebsites),
