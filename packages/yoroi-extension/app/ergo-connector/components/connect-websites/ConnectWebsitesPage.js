@@ -16,6 +16,7 @@ import type {
 
 type Props = {|
   accounts: ?Array<WhitelistEntry>,
+  activeSites: Array<string>,
   wallets: ?Array<AccountInfo>,
   onRemoveWallet: string => void,
 |};
@@ -64,6 +65,7 @@ export default class ConnectWebsitesPage extends Component<Props> {
               infoText={intl.formatMessage(connectorMessages.messageReadOnly)}
               key={url}
               url={url}
+              isActiveSite={this.props.activeSites.includes(url)}
               wallet={wallets[walletIndex]}
               onRemoveWallet={this.props.onRemoveWallet}
             />
