@@ -8,36 +8,50 @@ import Settings from '../components/Settings';
 import { computed } from 'mobx';
 import LocalizableError from '../../i18n/LocalizableError';
 import type { LanguageType } from '../../i18n/translations';
+import SettingLayout from '../components/layout/SettingLayout';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { intlShape } from 'react-intl';
+import globalMessages from '../../i18n/global-messages';
 
 type Props = {|
   ...InjectedOrGeneratedConnector<GeneratedData>,
   history: {
     goBack: void => void,
-    ...,
+    ...
   },
 |};
 type GeneratedData = typeof SettingsContainer.prototype.generated;
 
 @observer
 export default class SettingsContainer extends Component<Props> {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
+    intl: intlShape.isRequired,
+  };
+
   goBack: void => void = () => {
     this.props.history.goBack();
   };
 
   render(): Node {
+    const { intl } = this.context;
     const profileStore = this.generated.stores.profile;
 
     const isSubmittingLocale = profileStore.setProfileLocaleRequest.isExecuting;
 
     return (
-      <Settings
-        onSelectLanguage={this.generated.actions.profile.updateLocale.trigger}
-        isSubmitting={isSubmittingLocale}
-        languages={profileStore.LANGUAGE_OPTIONS}
-        currentLocale={profileStore.currentLocale}
-        error={profileStore.setProfileLocaleRequest.error}
+      <SettingLayout
         goBack={this.goBack}
-      />
+        headerLabel={intl.formatMessage(globalMessages.sidebarSettings)}
+      >
+        <Settings
+          onSelectLanguage={this.generated.actions.profile.updateLocale.trigger}
+          isSubmitting={isSubmittingLocale}
+          languages={profileStore.LANGUAGE_OPTIONS}
+          currentLocale={profileStore.currentLocale}
+          error={profileStore.setProfileLocaleRequest.error}
+          goBack={this.goBack}
+        />
+      </SettingLayout>
     );
   }
 

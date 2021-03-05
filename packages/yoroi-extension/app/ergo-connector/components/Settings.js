@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import classNames from 'classnames';
 import { Select } from 'react-polymorph/lib/components/Select';
 import { SelectSkin } from 'react-polymorph/lib/skins/simple/SelectSkin';
-import { intlShape, defineMessages } from 'react-intl';
+import { intlShape } from 'react-intl';
 
 import styles from './Settings.scss';
 import { ROUTES } from '../routes-config';
@@ -18,16 +18,7 @@ import SupportIcon from '../assets/images/support_icon.inline.svg';
 import TermsUseIcon from '../assets/images/terms_of_use_icon.inline.svg';
 import LanguageIcon from '../assets/images/language_icon.inline.svg';
 import ConnectedIcon from '../assets/images/connected_icon.inline.svg';
-
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import ArrowBack from '../assets/images/arrow_back.inline.svg';
-
-const messages = defineMessages({
-  about: {
-    id: 'connector.settings.about',
-    defaultMessage: '!!!About',
-  },
-});
 
 @observer
 export default class Settings extends Component<any> {
@@ -51,9 +42,9 @@ export default class Settings extends Component<any> {
 
     const navItems = [
       {
-        label: intl.formatMessage(messages.about),
+        label: intl.formatMessage(connectorMessages.about),
         icon: <InfoIcon />,
-        route: '#',
+        route: ROUTES.SETTINGS.ABOUT,
       },
       {
         label: intl.formatMessage(connectorMessages.connectedWebsites),
@@ -63,16 +54,16 @@ export default class Settings extends Component<any> {
       {
         label: intl.formatMessage(globalMessages.support),
         icon: <SupportIcon />,
-        route: '#',
+        route: ROUTES.SETTINGS.SUPPORT,
       },
       {
         label: intl.formatMessage(globalMessages.termsOfUse),
         icon: <TermsUseIcon />,
-        route: ROUTES.TERMS_OF_USE,
+        route: ROUTES.SETTINGS.TERMS_OF_USE,
       },
     ];
 
-    const { languages, isSubmitting, error, goBack } = this.props;
+    const { languages, isSubmitting, error } = this.props;
     const { form } = this;
     const languageId = form.$('languageId');
     const languageOptions = languages.map(language => ({
@@ -86,39 +77,28 @@ export default class Settings extends Component<any> {
     ]);
 
     return (
-      <div className={styles.layout}>
-        <div className={styles.header}>
-          <button onClick={goBack} type="button" className={styles.menuIcon}>
-            <ArrowBack />
-          </button>
-          <div className={styles.menu}>
-            <p className={styles.setting}>{intl.formatMessage(globalMessages.sidebarSettings)}</p>
-          </div>
-        </div>
-
-        <ul className={styles.list}>
-          {navItems.map(({ label, icon, route }) => (
-            <li key={label} className={styles.listItem}>
-              <Link to={route}>
-                {icon}
-                <span className={styles.label}>{label}</span>
-              </Link>
-            </li>
-          ))}
-          <li className={styles.listItemLanguage}>
-            <LanguageIcon />
-            <Select
-              className={languageSelectClassNames}
-              options={languageOptions}
-              {...languageId.bind()}
-              onChange={this.selectLanguage}
-              skin={SelectSkin}
-              optionRenderer={option => <FlagLabel svg={option.svg} label={option.label} />}
-            />
-            {error && <p className={styles.error}>{intl.formatMessage(error, error.values)}</p>}
+      <ul className={styles.list}>
+        {navItems.map(({ label, icon, route }) => (
+          <li key={label} className={styles.listItem}>
+            <Link to={route}>
+              {icon}
+              <span className={styles.label}>{label}</span>
+            </Link>
           </li>
-        </ul>
-      </div>
+        ))}
+        <li className={styles.listItemLanguage}>
+          <LanguageIcon />
+          <Select
+            className={languageSelectClassNames}
+            options={languageOptions}
+            {...languageId.bind()}
+            onChange={this.selectLanguage}
+            skin={SelectSkin}
+            optionRenderer={option => <FlagLabel svg={option.svg} label={option.label} />}
+          />
+          {error && <p className={styles.error}>{intl.formatMessage(error, error.values)}</p>}
+        </li>
+      </ul>
     );
   }
 }
