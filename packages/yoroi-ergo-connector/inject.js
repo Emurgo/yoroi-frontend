@@ -93,6 +93,10 @@ class ErgoAPI {
         return this._ergo_rpc_call("get_unused_addresses", []);
     }
 
+    get_change_address() {
+        return this._ergo_rpc_call("get_change_address", []);
+    }
+
     sign_tx(tx) {
         return this._ergo_rpc_call("sign_tx", [tx]);
     }

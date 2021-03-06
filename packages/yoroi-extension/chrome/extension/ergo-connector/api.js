@@ -41,6 +41,7 @@ import type { UtxoTxOutput } from '../../../app/api/ada/lib/storage/database/tra
 
 import { CoreAddressTypes } from '../../../app/api/ada/lib/storage/database/primitives/enums';
 import { getAllAddressesForDisplay } from '../../../app/api/ada/lib/storage/bridge/traitUtils';
+import { getReceiveAddress } from '../../../app/stores/stateless/addressStores';
 
 function paginateResults<T>(results: T[], paginate: ?Paginate): T[] | PaginateError {
   if (paginate != null) {
@@ -218,6 +219,18 @@ export async function connectorGetUsedAddresses(
 
 export async function connectorGetUnusedAddresses(wallet: PublicDeriver<>): Promise<Address[]> {
   return getAllAddresses(wallet, false);
+}
+
+export async function connectorGetChangeAddress(wallet: PublicDeriver<>): Promise<Address> {
+  const change = await getReceiveAddress(wallet);
+  if (change !== undefined) {
+    const hash = change.addr.Hash;
+    await RustModule.load();
+    return RustModule.SigmaRust.NetworkAddress
+        .from_bytes(Buffer.from(hash, 'hex'))
+        .to_base58();
+  }
+  throw new Error('could not get change address - this should never happen');
 }
 
 // TODO: look into sigma rust string value support

@@ -26,6 +26,7 @@ import type {
 } from './ergo-connector/types';
 import {
   connectorGetBalance,
+  connectorGetChangeAddress,
   connectorGetUtxos,
   connectorSendTx,
   connectorSignTx,
@@ -477,9 +478,13 @@ chrome.runtime.onConnectExternal.addListener(port => {
             }
             break;
           case `get_change_address`:
-            rpcResponse({
-              ok: ['9fYK9twHtAfPj6xspbX9emk2E7YmrrDH3PVSBaTzZ3TeSrxWEXv']
-            });
+            {
+              const wallet = await getSelectedWallet(tabId);
+              const change = await connectorGetChangeAddress(wallet);
+              rpcResponse({
+                ok: change
+              });
+            }
             break;
           case 'submit_tx':
             try {
