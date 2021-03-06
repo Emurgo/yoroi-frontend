@@ -1,0 +1,14 @@
+{
+  "name": "yoroi-ergo-connector",
+  "version": "0.0.0",
+  "description": "",
+  "scripts": {
+    "prod:custom": "node ./build.js",
+    "prod:nightly": "npm run prod:custom -- poonlenmfdfbjfeeballhiibknlknepo",
+    "prod:stable": "npm run prod:custom -- ffnbelfdoeiohenkjibnmadjiehjhajb"
+  },
+  "devDependencies": {
+    "fs-extra": "9.1.0",
+    "rimraf": "3.0.2"
+  }
+}

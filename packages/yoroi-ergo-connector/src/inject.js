@@ -169,7 +169,6 @@ if (shouldInject()) {
     injectIntoPage(initialInject);
 
     // events from Yoroi
-    const yoroiExtensionId = "bgihpbbhciffmelcfbccneidnnmkcdhl";
     let yoroiPort = chrome.runtime.connect(yoroiExtensionId);
     yoroiPort.onMessage.addListener(message => {
         //alert("content script message: " + JSON.stringify(message));

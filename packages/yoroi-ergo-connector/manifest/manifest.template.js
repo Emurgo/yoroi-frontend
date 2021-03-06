@@ -1,6 +1,10 @@
-{
-  "name": "Yoroi-Ergo dApp Connector",
-  "version": "1.0",
+module.exports = ({
+  name,
+  version,
+  icons,
+}) => ({
+  "name": name,
+  "version": version,
   "description": "Allows the Yoroi extension to interface with dApps following the Ergo EIP-0012 spec.",
   "background": {
     "scripts": ["background.js"],
@@ -20,12 +24,14 @@
       "all_frames": true
     }
   ],
+  icons,
   "manifest_version": 2,
   "browser_action": {
-    "default_title": "Yoroi-Ergo dApp Connector"
+    "default_title": name,
+    default_icon: icons,
   },
   "permissions": [
     "activeTab",
     "storage"
   ]
-}
+});
