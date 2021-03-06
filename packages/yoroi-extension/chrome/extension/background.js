@@ -500,11 +500,6 @@ chrome.runtime.onConnectExternal.addListener(port => {
               });
             }
             break;
-          case 'add_external_box':
-            rpcResponse({
-              ok: true
-            });
-            break;
           case 'ping':
             rpcResponse({
               ok: true,
