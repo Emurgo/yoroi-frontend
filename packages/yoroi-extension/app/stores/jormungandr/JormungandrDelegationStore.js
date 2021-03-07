@@ -66,16 +66,18 @@ export default class JormungandrDelegationStore extends Store<StoresMap, Actions
         const defaultToken = publicDeriver.getParent().getDefaultToken();
 
         // flowlint-next-line unnecessary-optional-chain:off
-        const addressRewards = historyResult[address]?.map(info => (
-          ([info[0], new MultiToken(
-            [{
-              amount: new BigNumber(info[1]),
-              identifier: defaultToken.defaultIdentifier,
-              networkId: defaultToken.defaultNetworkId,
-            }],
-            defaultToken
-          ), info[2]]: [number, MultiToken, string])
-        ));
+        const addressRewards = historyResult[address]
+          ?.sort((a,b) => a[0] - b[0])
+          ?.map(info => (
+            ([info[0], new MultiToken(
+              [{
+                amount: new BigNumber(info[1]),
+                identifier: defaultToken.defaultIdentifier,
+                networkId: defaultToken.defaultNetworkId,
+              }],
+              defaultToken
+            ), info[2]]: [number, MultiToken, string])
+          ));
         return addressRewards != null
           ? addressRewards
           : [];

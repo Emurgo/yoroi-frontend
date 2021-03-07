@@ -73,17 +73,19 @@ export default class AdaDelegationStore extends Store<StoresMap, ActionsMap> {
 
         const defaultToken = publicDeriver.getParent().getDefaultToken();
         // flowlint-next-line unnecessary-optional-chain:off
-        const addressRewards = historyResult[address]?.map(info => (
-          ([info.epoch, new MultiToken(
-            [{
-              amount: new BigNumber(info.reward),
-              identifier: defaultToken.defaultIdentifier,
-              networkId: defaultToken.defaultNetworkId,
-            }],
-            defaultToken
-          ),
-          info.poolHash]: [number, MultiToken, string])
-        ));
+        const addressRewards = historyResult[address]
+          ?.sort((a,b) => a.epoch - b.epoch)
+          ?.map(info => (
+            ([info.epoch, new MultiToken(
+              [{
+                amount: new BigNumber(info.reward),
+                identifier: defaultToken.defaultIdentifier,
+                networkId: defaultToken.defaultNetworkId,
+              }],
+              defaultToken
+            ),
+            info.poolHash]: [number, MultiToken, string])
+          ));
         return addressRewards != null
           ? addressRewards
           : [];
