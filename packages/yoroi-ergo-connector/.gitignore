@@ -4,3 +4,5 @@ npm-debug.log
 .vscode/
 *.pem
 build/
+*.zip
+*.xpi

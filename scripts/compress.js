@@ -52,7 +52,7 @@ async function compress(isCrxBuild) {
   // xpi files are used for Firefox and are simply a renaming of zip
   fs.copyFile(
     `${name}.zip`,
-    `${name}-${argv.env}.xpi`,
+    `${name}.xpi`,
     0, // flag
     (err) => {
       if (err) throw err;
