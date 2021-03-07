@@ -23,7 +23,7 @@ export function generateRegistration(request: {|
     * }
     * label: 61285
     * {
-    *   1: "pubkey signed using stakekey"
+    *   1: "signature of metadata signed using stakekey"
     * }
     */
 
