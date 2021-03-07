@@ -1,5 +1,3 @@
-// replace "*" with location.origin before committing on all postMessage calls
-
 // sets up RPC communication with the connector + access check/request functions
 const initialInject = `
 var timeout = 0;
@@ -23,9 +21,17 @@ function ergo_request_read_access() {
         return new Promise(function(resolve, reject) {
             window.postMessage({
                 type: "connector_connect_request",
-            }, "*");
+            }, location.origin);
             connectRequests.push({ resolve: resolve, reject: reject });
         });
+    }
+}
+
+function ergo_check_read_access() {
+    if (typeof ergo !== "undefined") {
+        return ergo._ergo_rpc_call("ping", []);
+    } else {
+        return Promise.resolve(false);
     }
 }
 
@@ -93,6 +99,10 @@ class ErgoAPI {
         return this._ergo_rpc_call("get_unused_addresses", []);
     }
 
+    get_change_address() {
+        return this._ergo_rpc_call("get_change_address", []);
+    }
+
     sign_tx(tx) {
         return this._ergo_rpc_call("sign_tx", [tx]);
     }
@@ -101,16 +111,15 @@ class ErgoAPI {
         return this._ergo_rpc_call("sign_tx_input", [tx, index]);
     }
 
-    sign_data(addr, message) {
-        return this._ergo_rpc_call("sign_data", [addr, message]);
-    }
+    // This is unsupported by current version of Yoroi
+    // and the details of it are not finalized yet in the EIP-012
+    // dApp bridge spec.
+    // sign_data(addr, message) {
+    //     return this._ergo_rpc_call("sign_data", [addr, message]);
+    // }
 
     submit_tx(tx) {
         return this._ergo_rpc_call("submit_tx", [tx]);
-    }
-
-    add_external_box(box_id) {
-        return this._ergo_rpc_call("add_external_box", [box_id]);
     }
 
     _ergo_rpc_call(func, params) {
@@ -120,7 +129,7 @@ class ErgoAPI {
                 uid: rpcUid,
                 function: func,
                 params: params
-            }, "*");
+            }, location.origin);
             console.log("rpcUid = " + rpcUid);
             rpcResolver.set(rpcUid, { resolve: resolve, reject: reject });
             rpcUid += 1;
@@ -165,7 +174,7 @@ if (shouldInject()) {
     yoroiPort.onMessage.addListener(message => {
         //alert("content script message: " + JSON.stringify(message));
         if (message.type == "connector_rpc_response") {
-            window.postMessage(message, "*");
+            window.postMessage(message, location.origin);
         } else if (message.type == "yoroi_connect_response") {
             if (message.success) {
                 // inject full API here
@@ -179,7 +188,7 @@ if (shouldInject()) {
             window.postMessage({
                 type: "connector_connected",
                 success: message.success
-            }, "*");
+            }, location.origin);
         }
     });
 

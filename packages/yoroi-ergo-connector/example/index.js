@@ -84,7 +84,7 @@ if (typeof ergo_request_read_access === "undefined") {
                     const changeValue = utxosValue - amountToSend - wasm.TxBuilder.SUGGESTED_TX_FEE().as_i64().as_num();
                     console.log(`${changeValue} | cv.ts() = ${changeValue.toString()}`);
                     const changeValueBoxValue = wasm.BoxValue.from_i64(wasm.I64.from_str(changeValue.toString()));
-                    const changeAddr = (await ergo.get_unused_addresses())[0];
+                    const changeAddr = await ergo.get_change_address();
                     console.log(`changeAddr = ${JSON.stringify(changeAddr)}`);
                     const selector = new wasm.SimpleBoxSelector();
                     const boxSelection = selector.select(
