@@ -66,7 +66,7 @@ export default class VotingPage extends Component<Props> {
     }
 
     // keep enabled on the testnet
-    if (environment.isProduction() && (new Date() >= roundEndDate)) {
+    if ((environment.isProduction() && !environment.isTest()) && (new Date() >= roundEndDate)) {
       return <RegistrationOver />;
     }
 

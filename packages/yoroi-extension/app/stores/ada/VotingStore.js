@@ -37,6 +37,7 @@ import cryptoRandomString from 'crypto-random-string';
 import { getReceiveAddress } from '../stateless/addressStores';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
+import { generateRegistration } from '../../api/ada/lib/cardanoCrypto/catalyst';
 
 export const ProgressStep = Object.freeze({
   GENERATE: 0,
@@ -190,9 +191,6 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
       publicDeriver: withStakingKey,
       password: spendingPassword,
     });
-    const stakeKeyPub = Buffer.from(
-      RustModule.WalletV4.StakeCredential.from_keyhash(stakingKey.to_public().hash()).to_bytes()
-    ).toString('hex');
 
     const withUtxos = asGetAllUtxos(publicDeriver);
     if (withUtxos == null) {
@@ -216,49 +214,19 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
         }).slot
       );
 
-      if(this.catalystPrivateKey === undefined){
-        throw new Error(`${nameof(this._createTransaction)} should never happen`);
-      }
-      const catalystPrivateKeyBytes = this.catalystPrivateKey.to_public().as_bytes();
-      const catalystPubKey = Buffer.from(catalystPrivateKeyBytes)
-        .toString('hex');
-      const catalystSignature = stakingKey
-        .sign(catalystPrivateKeyBytes)
-        .to_hex();
-
       const nextInternal = await getReceiveAddress(publicDeriver);
       if (nextInternal == null) {
         throw new Error(`${nameof(this._createTransaction)} no internal addresses left. Should never happen`);
       }
+      if(this.catalystPrivateKey === undefined){
+        throw new Error(`${nameof(this._createTransaction)} should never happen`);
+      }
 
-      /**
-       * Catalyst follows a certain standard to prove the voting power
-       * A transaction is submitted with following metadata format for the registration process
-       * label: 61284
-       * {
-       *   1: "pubkey generated for catalyst app",
-       *   2: "stake key public key",
-       *   3: "address to receive rewards to"
-       * }
-       * label: 61285
-       * {
-       *   1: "pubkey signed using stakekey"
-       * }
-       */
-      const trxMeta = [
-        {
-          label: '61284',
-          data: {
-            '1': `0x${catalystPubKey}`,
-            '2': `0x${stakeKeyPub}`,
-            '3': `0x${nextInternal.addr.Hash}`,
-          },
-        },
-        {
-          label: '61285',
-          data: { '1': `0x${catalystSignature}` },
-        },
-      ];
+      const trxMeta = generateRegistration({
+        stakePrivateKey: stakingKey,
+        catalystPrivateKey: this.catalystPrivateKey,
+        receiverAddress: Buffer.from(nextInternal.addr.Hash, 'hex'),
+      });
 
       const votingRegTxPromise = this.createVotingRegTx.execute({
         publicDeriver: withHasUtxoChains,

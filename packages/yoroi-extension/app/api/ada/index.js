@@ -377,7 +377,7 @@ export type CreateDelegationTxRequest = {|
 export type CreateVotingRegTxRequest = {|
   publicDeriver: IPublicDeriver<ConceptualWallet> & IGetAllUtxos & IHasUtxoChains,
   absSlotNumber: BigNumber,
-  metadata: Array<TransactionMetadata>
+  metadata: RustModule.WalletV4.GeneralTransactionMetadata,
 |};
 
 export type CreateDelegationTxResponse = {|
@@ -1400,7 +1400,7 @@ export default class AdaApi {
       if (changeAddr == null) {
         throw new Error(`${nameof(this.createVotingRegTx)} no internal addresses left. Should never happen`);
       }
-      const trxMetadata = createMetadata(request.metadata);
+      const trxMetadata = RustModule.WalletV4.TransactionMetadata.new(request.metadata);
       const unsignedTx = shelleyNewAdaUnsignedTx(
         [],
         {
