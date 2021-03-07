@@ -1,4 +1,8 @@
 // @flow
+
+// add package-specific dependencies
+module.paths.unshift(`${process.cwd()}/node_modules`);
+
 const fs = require('fs');
 const path = require('path');
 const ChromeExtension = require('crx');
@@ -7,7 +11,7 @@ const argv = require('minimist')(process.argv.slice(2));
 
 // Ignore FlowLint telling you to delete this. CI needs it
 // $FlowExpectedError[cannot-resolve-module] build-time generated file so Flow fails to find it
-const name = require('../build/manifest.json').name;
+const name = require(path.join(process.cwd(), '/build/manifest.json')).name;
 
 function readKeyFromFile(keyPath) {
   if (!fs.existsSync(keyPath)) {
@@ -41,17 +45,11 @@ const crx = new ChromeExtension({
 });
 
 async function compress(isCrxBuild) {
-  await crx.load(path.join(__dirname, '../build'));
+  await crx.load(path.join(process.cwd(), '/build'));
   const archiveBuffer = await crx.loadContents();
   fs.writeFileSync(`${name}.zip`, archiveBuffer);
 
   // xpi files are used for Firefox and are simply a renaming of zip
-  /** Reusing the same manifest for Chrome and Firefox is not supported by Selenium
-   * Notably, Chrome rejects Firefox extension IDs in the manifest but Selenium requires them
-   * We fix this by forking the repository and implementing the capability ourselves
-   * We can switch back to the selenium-webdriver package once the following is on npm
-   * https://github.com/SeleniumHQ/selenium/pull/6787
-   */
   fs.copyFile(
     `${name}.zip`,
     `${name}-${argv.env}.xpi`,
@@ -62,8 +60,8 @@ async function compress(isCrxBuild) {
   );
   if (isCrxBuild) {
     const crxBuffer = await crx.pack(archiveBuffer);
-    const updateXML = crx.generateUpdateXML();
-    fs.writeFileSync('update.xml', updateXML);
+    // const updateXML = crx.generateUpdateXML();
+    // fs.writeFileSync('update.xml', updateXML);
     fs.writeFileSync(`${name}-${argv.env}.crx`, crxBuffer);
     fs.unlinkSync(`${name}.zip`);
   }

@@ -8,7 +8,7 @@ fse.mkdirSync("./build");
 fse.mkdirSync("./build/img");
 
 const extensionId = process.argv.slice(2)[0];
-const extensionIdHeader = `export var extensionId = "${extensionId}";\r\n`;
+const extensionIdHeader = `var extensionId = "${extensionId}";\r\n`;
 
 /// need to both copy the src file and expose the extension ID to it
 function copyFileSrc(name) {
