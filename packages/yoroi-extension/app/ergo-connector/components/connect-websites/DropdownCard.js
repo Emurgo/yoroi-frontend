@@ -13,6 +13,7 @@ type Props = {|
   label: string,
   infoText: string,
   url: string,
+  isActiveSite: boolean,
   wallet: AccountInfo,
   onRemoveWallet: string => void,
 |};
@@ -28,12 +29,11 @@ export default class DropdownCard extends Component<Props, State> {
   };
 
   render(): Node {
-    const { label, infoText, url, wallet, onRemoveWallet } = this.props;
+    const { label, infoText, isActiveSite, url, wallet, onRemoveWallet } = this.props;
     const { isExpanded } = this.state;
     const arrowClasses = isExpanded ? styles.collapseArrow : styles.expandArrow;
 
-    // TODO: status connected websites
-    const statusIcon = classnames([styles.status, true ? styles.active : '']);
+    const statusIcon = classnames([styles.status, isActiveSite ? styles.active : '']);
     const headerStyles = classnames([styles.header, isExpanded ? styles.expandedHeader : '']);
 
     return (

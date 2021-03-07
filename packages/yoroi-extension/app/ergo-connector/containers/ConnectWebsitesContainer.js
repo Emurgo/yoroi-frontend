@@ -50,6 +50,7 @@ export default class ConnectWebsitesContainer extends Component<
           accounts={this.generated.stores.connector.currentConnectorWhitelist}
           wallets={wallets}
           onRemoveWallet={this.onRemoveWallet}
+          activeSites={this.generated.stores.connector.activeSites}
         />
       );
     }
@@ -76,6 +77,7 @@ export default class ConnectWebsitesContainer extends Component<
         currentConnectorWhitelist: ?Array<WhitelistEntry>,
         loadingWallets: $Values<typeof LoadingWalletStates>,
         errorWallets: string,
+        activeSites: Array<string>,
       |},
     |},
   |} {
@@ -93,6 +95,7 @@ export default class ConnectWebsitesContainer extends Component<
           currentConnectorWhitelist: stores.connector.currentConnectorWhitelist,
           loadingWallets: stores.connector.loadingWallets,
           errorWallets: stores.connector.errorWallets,
+          activeSites: stores.connector.activeSites,
         },
       },
       actions: {

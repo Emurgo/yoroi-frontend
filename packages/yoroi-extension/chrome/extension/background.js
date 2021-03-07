@@ -182,6 +182,13 @@ async function syncWallet(wallet: PublicDeriver<>): Promise<void> {
     Logger.error(`Syncing failed: ${e}`);
   }
 }
+export function getActiveSites(): Array<string> {
+  const activeSites = []
+  for (const value of connectedSites.values()){
+    activeSites.push(value);
+  }
+  return activeSites.map(item => item.url);
+}
 
 async function getSelectedWallet(tabId: number): Promise<PublicDeriver<>> {
   if (db == null) {

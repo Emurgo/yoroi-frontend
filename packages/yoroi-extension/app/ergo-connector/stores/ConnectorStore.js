@@ -1,7 +1,7 @@
 /* eslint-disable promise/always-return */
 // @flow
 import { observable, action, runInAction, computed } from 'mobx';
-import { getWalletsInfo } from '../../../chrome/extension/background';
+import { getActiveSites, getWalletsInfo } from '../../../chrome/extension/background';
 import Request from '../../stores/lib/LocalizedRequest';
 import Store from '../../stores/base/Store';
 import type {
@@ -208,4 +208,9 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     });
     await this.getConnectorWhitelist.execute();
   };
+
+  // ========== active websites ========== //
+  @computed get activeSites(): Array<string> {
+    return getActiveSites() ?? []
+  }
 }
