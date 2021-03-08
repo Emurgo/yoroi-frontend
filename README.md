@@ -14,23 +14,22 @@ Check out our [documents](docs/specs/meta) on the governance of this project.
 
 ## First-time setup
 
-[SETUP.md](docs/SETUP.md) setup dependencies for the project
+This is a multi-project Github repository. You can find the different projects in the [packages](packages/) folder.
 
-[TOOLS.md](docs/TOOLS.md) tools that may be helpful for development of new features
+Although each project has its own setup steps, steps, there are also setup steps for this repository as a whole.
 
-## Other steps
+**If you have `nvm`**, just run
 
-[BUILD.md](docs/BUILD.md) how to build the code (make sure you followed the "first steps" first)
+```
+nvm use
+```
 
-[RUN.md](docs/RUN.md) for how to load a build into your browser
+**If you don't have `nvm`** you can download `node` manually from [here](https://nodejs.org) but you need to be careful the version matches the one specified in our `.nvmrc` file.
 
-[RELEASE.md](docs/RELEASE.md) for releasing a new build
-
-[TEST.md](docs/TEST.md) for running tests
-
-## For reviewers
-
-[REVIEW.md](docs/REVIEW.md) for any reviewer that wants to review Yoroi before adding it to their distribution platform
+Next, install project-independent dependencies with
+```
+npm install
+```
 
 ## LICENSE
 
