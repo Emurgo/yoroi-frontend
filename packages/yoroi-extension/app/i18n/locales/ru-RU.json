@@ -88,7 +88,7 @@
   "global.connector.connectedWebsites": "Connected Websites",
   "global.connector.messageReadOnly": "We are granting read-only to view utxos/addresses.",
   "global.connector.poweredByErgo": "Powered by Ergo",
-  "global.connector.yoroiDappConnector": "Yoroi Dapp Connector",
+  "global.connector.yoroiDappConnector": "Yoroi dApp Connector",
   "global.contact": "contact support",
   "global.copyTooltipMessage": "Copied",
   "global.errors.fieldIsRequired": "This field is required.",
