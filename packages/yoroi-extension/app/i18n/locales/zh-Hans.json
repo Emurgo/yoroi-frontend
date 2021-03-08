@@ -88,7 +88,7 @@
   "global.connector.connectedWebsites": "已连接的网站",
   "global.connector.messageReadOnly": "你正在授权以只读方式查看utxo和地址。",
   "global.connector.poweredByErgo": "Powered by Ergo",
-  "global.connector.yoroiDappConnector": "Yoroi dApp连接器",
+  "global.connector.yoroiDappConnector": "Yoroi dApp Connector",
   "global.contact": "联系支持",
   "global.copyTooltipMessage": "已复制",
   "global.errors.fieldIsRequired": "该字段为必填字段。",
