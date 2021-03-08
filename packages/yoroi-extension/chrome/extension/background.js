@@ -370,11 +370,9 @@ async function confirmConnect(tabId: number, url: string): Promise<?AccountIndex
   });
 }
 
-const connectorId = 'knfkinkbmgjefmeaddmkgpgmbggdllcp';
-
 // generic communication to the entire connector
 chrome.runtime.onMessageExternal.addListener((message, sender) => {
-  if (sender.id === connectorId) {
+  if (sender.id === environment.ergoConnectorExtensionId) {
     if (message.type === 'open_browseraction_menu') {
       chrome.windows.create({
         url: `${window.location.origin}/main_window_ergo.html#/settings`,
@@ -389,7 +387,7 @@ chrome.runtime.onMessageExternal.addListener((message, sender) => {
 
 // per-page connection to injected code in the connector
 chrome.runtime.onConnectExternal.addListener(port => {
-  if (port.sender.id === connectorId) {
+  if (port.sender.id === environment.ergoConnectorExtensionId) {
     const tabId = port.sender.tab.id;
     port.onMessage.addListener(async message => {
       function rpcResponse(response) {

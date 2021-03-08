@@ -2,12 +2,13 @@ const rimraf = require("rimraf");
 const fse = require('fs-extra');
 const genManifest = require('./manifest/manifest.template.js');
 const package = require('./package.json');
+const argv = require('minimist')(process.argv.slice(2));
 
 rimraf.sync("./build");
 fse.mkdirSync("./build");
 fse.mkdirSync("./build/img");
 
-const extensionId = process.argv.slice(2)[0];
+const extensionId = argv.yoroiExtensionId;
 const extensionIdHeader = `var extensionId = "${extensionId}";\r\n`;
 
 /// need to both copy the src file and expose the extension ID to it

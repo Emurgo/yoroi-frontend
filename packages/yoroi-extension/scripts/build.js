@@ -47,7 +47,11 @@ export function buildDev(env: string) {
   console.log(`please allow 'https://localhost:${connections.Ports.WebpackDev}' connections in Google Chrome,`);
   console.log('and load unpacked extensions with `./dev` folder. (see https://developer.chrome.com/extensions/getstarted#unpacked)\n');
   createWebpackServer(
-    config.baseDevConfig(argv.env, isNightly),
+    config.baseDevConfig(
+      argv.env,
+      isNightly,
+      argv.ergoConnectorExtensionId
+    ),
     webpack,
     webpackDevMiddleware,
     webpackHotMiddleware,
