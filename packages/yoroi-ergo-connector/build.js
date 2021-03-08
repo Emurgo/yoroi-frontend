@@ -42,9 +42,6 @@ const icons = isNightly
 Object.values(icons).forEach(path => fse.copyFileSync(`./${path}`, `./build/${path}`));
 
 const manifest = genManifest({
-  packageName: isNightly
-    ? 'yoroi-ergo-connector-nightly'
-    : 'yoroi-ergo-connector',
   displayName: isNightly
     ? 'Yoroi-Ergo dApp Connector Nightly'
     : 'Yoroi-Ergo dApp Connector',

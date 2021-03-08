@@ -1,10 +1,9 @@
 module.exports = ({
-  packageName,
   displayName,
   version,
   icons,
 }) => ({
-  "name": packageName,
+  "name": displayName,
   "version": version,
   "description": "Allows the Yoroi extension to interface with dApps following the Ergo EIP-0012 spec.",
   "background": {
@@ -34,6 +33,5 @@ module.exports = ({
   "content_security_policy": "default-src 'none'; script-src 'self';",
   "permissions": [
     "activeTab",
-    "storage"
   ]
 });
