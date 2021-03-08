@@ -23,7 +23,6 @@ module.exports = async ({ config, mode } /*: {|
       networkName: ENV,
       nightly: isNightly,
       publicPath: './',
-      ergoConnectorExtensionId: '',
     })
     : devConfig.baseDevConfig(ENV, isNightly === 'true');
 
