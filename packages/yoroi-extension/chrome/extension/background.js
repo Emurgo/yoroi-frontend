@@ -25,6 +25,15 @@ import type {
   AccountInfo,
 } from './ergo-connector/types';
 import {
+  APIErrorCodes,
+  ConnectorError,
+  asTokenId,
+  asValue,
+  asTx,
+  asSignedTx,
+  asPaginate,
+} from './ergo-connector/types';
+import {
   connectorGetBalance,
   connectorGetChangeAddress,
   connectorGetUtxos,
@@ -397,6 +406,33 @@ chrome.runtime.onConnectExternal.addListener(port => {
           return: response
         });
       }
+      function checkParamCount(expected: number) {
+        const found = message?.params?.length;
+        if (found !== expected) {
+          throw ConnectorError.invalidRequest(`RPC call has ${found} arguments, expected ${expected}`);
+        }
+      }
+      function handleError(e: any) {
+        if (e instanceof ConnectorError) {
+          rpcResponse({
+            err: e.toAPIError()
+          });
+        } else {
+          const func = message.function;
+          const args = message.params.map(JSON.stringify).join(', ');
+          if (e?.stack != null) {
+            Logger.error(`RPC call ergo.${func}(${args}) failed due to internal error: ${e}\n${e.stack}`);
+          } else {
+            Logger.error(`RPC call ergo.${func}(${args}) failed due to internal error: ${e}`);
+          }
+          rpcResponse({
+            err: {
+              code: APIErrorCodes.API_INTERNAL_ERROR,
+              info: 'Yoroi has encountered an internal error - please see logs'
+            }
+          });
+        }
+      }
       if (message.type === 'yoroi_connect_request') {
         const account = await confirmConnect(tabId, message.url);
         const accepted = account !== null;
@@ -407,102 +443,126 @@ chrome.runtime.onConnectExternal.addListener(port => {
       } else if (message.type === 'connector_rpc_request') {
         switch (message.function) {
           case 'sign_tx':
-            {
+            try {
+              checkParamCount(1);
+              const tx = asTx(message.params[0]);
               const resp = await confirmSign(tabId, {
                 type: 'tx',
-                tx: message.params[0],
+                tx,
                 uid: message.uid
               });
               rpcResponse(resp);
+            } catch (e) {
+              handleError(e);
             }
             break;
           case 'sign_tx_input':
-            {
+            try {
+              checkParamCount(2);
+              const tx = asTx(message.params[0]);
+              const txIndex = message.params[1];
+              if (typeof txIndex !== 'number') {
+                throw ConnectorError.invalidRequest(`invalid tx input: ${txIndex}`);
+              }
               const resp = await confirmSign(tabId, {
                 type: 'tx_input',
-                tx: message.params[0],
-                index: message.params[1],
+                tx,
+                index: txIndex,
                 uid: message.uid
               });
               rpcResponse(resp);
+            } catch (e) {
+              handleError(e);
             }
             break;
-          case 'sign_data':
-            {
-              const resp = await confirmSign(tabId, {
-                type: 'data',
-                address: message.params[0],
-                bytes: message.params[1],
-                uid: message.uid
-              });
-              rpcResponse(resp);
-            }
-            break;
+          // unsupported until EIP-0012's definition is finalized
+          // case 'sign_data':
+          //   {
+          //     const resp = await confirmSign(tabId, {
+          //       type: 'data',
+          //       address: message.params[0],
+          //       bytes: message.params[1],
+          //       uid: message.uid
+          //     });
+          //     rpcResponse(resp);
+          //   }
+          //   break;
           case 'get_balance':
-            {
+            try {
+              checkParamCount(1);
+              const tokenId = asTokenId(message.params[0]);
               const wallet = await getSelectedWallet(tabId);
-              const balance = await connectorGetBalance(wallet, pendingTxs, message.params[0]);
+              const balance = await connectorGetBalance(wallet, pendingTxs, tokenId);
               rpcResponse({ ok: balance });
+            } catch(e) {
+              handleError(e);
             }
             break;
           case 'get_utxos':
-            {
+            try {
+              checkParamCount(3);
+              const valueExpected = message.params[0] == null ? null : asValue(message.params[0]);
+              const tokenId = asTokenId(message.params[1]);
+              const paginate = message.params[2] == null ? null : asPaginate(message.params[2]);
               const wallet = await getSelectedWallet(tabId);
               const utxos = await connectorGetUtxos(
                 wallet,
                 pendingTxs,
-                message.params[0],
-                message.params[1],
-                message.params[2]
+                valueExpected,
+                tokenId,
+                paginate
               );
-              if (utxos != null) {
-                rpcResponse({
-                  ok: utxos
-                });
-              }/* else {
-                // err
-              } */
+              rpcResponse({
+                ok: utxos
+              });
+            } catch (e) {
+              handleError(e);
             }
             break;
           case 'get_used_addresses':
-            {
+            try {
+              const paginate = message.params[0] == null ? null : asPaginate(message.params[0]);
               const wallet = await getSelectedWallet(tabId);
-              const addresses = await connectorGetUsedAddresses(wallet, message.params[0]);
+              const addresses = await connectorGetUsedAddresses(wallet, paginate);
               rpcResponse({
                 ok: addresses
               });
+            } catch (e) {
+              handleError(e);
             }
             break;
           case 'get_unused_addresses':
-            {
+            try {
               const wallet = await getSelectedWallet(tabId);
               const addresses = await connectorGetUnusedAddresses(wallet);
               rpcResponse({
                 ok: addresses
               });
+            } catch (e) {
+              handleError(e);
             }
             break;
           case `get_change_address`:
-            {
+            try {
               const wallet = await getSelectedWallet(tabId);
               const change = await connectorGetChangeAddress(wallet);
               rpcResponse({
                 ok: change
               });
+            } catch (e) {
+              handleError(e);
             }
             break;
           case 'submit_tx':
             try {
+              const tx = asSignedTx(message.params[0]);
               const wallet = await getSelectedWallet(tabId);
-              const id = await connectorSendTx(wallet, pendingTxs, message.params[0]);
+              const id = await connectorSendTx(wallet, pendingTxs, tx);
               rpcResponse({
                 ok: id
               });
             } catch (e) {
-              Logger.error(`tx send err: ${e}`);
-              rpcResponse({
-                err: JSON.stringify(e)
-              });
+              handleError(e);
             }
             break;
           case 'ping':
@@ -512,7 +572,10 @@ chrome.runtime.onConnectExternal.addListener(port => {
             break;
           default:
             rpcResponse({
-              err: `unknown RPC: ${message.function}(${message.params})`
+              err: {
+                code: APIErrorCodes.API_INVALID_REQUEST,
+                info: `unknown API function: ${message.function}`
+              }
             })
             break;
         }

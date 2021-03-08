@@ -27,12 +27,10 @@ if (typeof ergo_request_read_access === "undefined") {
             // });
             function pagedUsedAddresses(page, limit) {
                 ergo.get_used_addresses({ page, limit }).then(usedAddresses => {
-                    if (usedAddresses.maxSize == null) {
-                        console.log(`usedAddresses[${page * limit} - ${page * limit + usedAddresses.length - 1}] = ${JSON.stringify(usedAddresses)}`);
-                        pagedUsedAddresses(page + 1, limit);
-                    } else {
-                        console.log(`paginateError = ${JSON.stringify(usedAddresses)}`);
-                    }
+                    console.log(`usedAddresses[${page * limit} - ${page * limit + usedAddresses.length - 1}] = ${JSON.stringify(usedAddresses)}`);
+                    pagedUsedAddresses(page + 1, limit);
+                }).catch(e => {
+                    console.log(`paginateError = ${JSON.stringify(e)}`);
                 });
             }
             pagedUsedAddresses(0, 3);
@@ -132,6 +130,7 @@ if (typeof ergo_request_read_access === "undefined") {
                             }
                         })
                         .catch(err => {
+                            console.log(`Error: ${JSON.stringify(err)}`);
                             status.innerText = "You must accept signing the transaction to donate. Please click send again and accept."
                         });
                 }
