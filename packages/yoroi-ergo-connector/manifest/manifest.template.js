@@ -31,6 +31,7 @@ module.exports = ({
     "default_title": displayName,
     default_icon: icons,
   },
+  "content_security_policy": "default-src 'none'; style-src 'self'; script-src 'self'; connect-src 'none'; object-src 'none';",
   "permissions": [
     "activeTab",
     "storage"
