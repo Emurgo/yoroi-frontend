@@ -9,9 +9,10 @@ const HtmlWebpackHarddiskPlugin = require('html-webpack-harddisk-plugin');
 const shell = require('shelljs');
 const manifestEnvs = require('../chrome/manifestEnvs');
 
+/* eslint-disable no-console */
+
 const plugins = (folder /*: string */, _networkName /*: string */) /*: * */ => {
   const pageTitle = 'Yoroi';
-  const ergoPageTitle = 'Yoroi Dapp Connector';
 
   return [
     /** We remove non-English languages from BIP39 to avoid triggering bad word filtering */
@@ -35,7 +36,7 @@ const plugins = (folder /*: string */, _networkName /*: string */) /*: * */ => {
       template: path.join(__dirname, '../chrome/views/ergo-connector/main_window.html'),
       chunks: ['ergo'],
       alwaysWriteToDisk: true,
-      title: ergoPageTitle,
+      title: 'Yoroi-Ergo Dapp Connector',
     }),
     new HtmlWebpackPlugin({
       filename: path.join(__dirname, `../${folder}/background.html`),
@@ -193,16 +194,32 @@ const resolve = (networkName /*: string */) /*: * */ => ({
 const definePlugin = (
   networkName /*: string */,
   isProd /*: boolean */,
-  isNightly /*: boolean */
-) /*: * */ => ({
-  'process.env': {
-    NODE_ENV: JSON.stringify(isProd ? 'production' : 'development'),
-    COMMIT: JSON.stringify(shell.exec('git rev-parse HEAD', { silent: true }).trim()),
-    BRANCH: JSON.stringify(shell.exec('git rev-parse --abbrev-ref HEAD', { silent: true }).trim()),
-    NIGHTLY: isNightly,
-    POOLS_UI_URL_FOR_YOROI: JSON.stringify(manifestEnvs.POOLS_UI_URL_FOR_YOROI),
-  }
-});
+  isNightly /*: boolean */,
+  ergoConnectorExtensionId /*: ?string */,
+) /*: * */ => {
+  const ERGO_CONNECTOR_EXTENSION_ID = (() => {
+    if (ergoConnectorExtensionId != null) return ergoConnectorExtensionId;
+
+    // TODO: real value for these
+    if (isNightly) return 'ebnncddeiookdmpglbhiamljhpdgbjcm';
+    if (isProd) return 'ebnncddeiookdmpglbhiamljhpdgbjcm';
+
+    console.warn('Build has no ergo connector ID set and so the connector will not work');
+    return '';
+  })();
+  console.log(`Ergo connector ID set to ${ERGO_CONNECTOR_EXTENSION_ID}`);
+
+  return {
+    'process.env': {
+      NODE_ENV: JSON.stringify(isProd ? 'production' : 'development'),
+      COMMIT: JSON.stringify(shell.exec('git rev-parse HEAD', { silent: true }).trim()),
+      BRANCH: JSON.stringify(shell.exec('git rev-parse --abbrev-ref HEAD', { silent: true }).trim()),
+      NIGHTLY: isNightly,
+      POOLS_UI_URL_FOR_YOROI: JSON.stringify(manifestEnvs.POOLS_UI_URL_FOR_YOROI),
+      ERGO_CONNECTOR_EXTENSION_ID: JSON.stringify(ERGO_CONNECTOR_EXTENSION_ID),
+    }
+  };
+};
 
 module.exports = {
   plugins,

@@ -15,6 +15,7 @@ const hotScript =
 const baseDevConfig = (
   networkName /*: string */,
   isNightly /*: boolean */,
+  ergoConnectorExtensionId /*: ?string */,
 ) /*: * */ => ({
   mode: 'development',
   optimization: commonConfig.optimization,
@@ -57,7 +58,12 @@ const baseDevConfig = (
   plugins: [
     ...commonConfig.plugins('dev', networkName),
     new ReactRefreshWebpackPlugin(),
-    new webpack.DefinePlugin(commonConfig.definePlugin(networkName, false, isNightly)),
+    new webpack.DefinePlugin(commonConfig.definePlugin(
+      networkName,
+      false,
+      isNightly,
+      ergoConnectorExtensionId
+    )),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.IgnorePlugin({
       resourceRegExp: /[^/]+\/[\S]+.prod$/,

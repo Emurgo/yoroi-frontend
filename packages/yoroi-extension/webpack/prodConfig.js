@@ -14,6 +14,7 @@ type EnvParams = {|
   networkName: string,
   nightly: "true" | "false",
   publicPath?: string,
+  ergoConnectorExtensionId?: ?string,
 |};
 */
 const baseProdConfig = (env /*: EnvParams */) /*: * */ => ({
@@ -46,7 +47,8 @@ const baseProdConfig = (env /*: EnvParams */) /*: * */ => ({
     new webpack.DefinePlugin(commonConfig.definePlugin(
       env.networkName,
       true,
-      JSON.parse(env.nightly)
+      JSON.parse(env.nightly),
+      env.ergoConnectorExtensionId,
     )),
     new webpack.IgnorePlugin(/[^/]+\/[\S]+.dev$/),
   ],
