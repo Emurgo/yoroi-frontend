@@ -200,9 +200,8 @@ const definePlugin = (
   const ERGO_CONNECTOR_EXTENSION_ID = (() => {
     if (ergoConnectorExtensionId != null) return ergoConnectorExtensionId;
 
-    // TODO: real value for these
-    if (isNightly) return 'ebnncddeiookdmpglbhiamljhpdgbjcm';
-    if (isProd) return 'ebnncddeiookdmpglbhiamljhpdgbjcm';
+    if (isNightly) return 'chifollcalpmjdiokipacefnpmbgjnle';
+    if (isProd) return 'ebnncddeiookdmpglbhiamljhpdgbjcm'; // TODO: real value for this
 
     console.warn('Build has no ergo connector ID set and so the connector will not work');
     return '';
