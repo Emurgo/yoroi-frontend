@@ -18,7 +18,7 @@ const messages = defineMessages({
   dAppDescription: {
     id: 'connector.settings.about.dAppDescription',
     defaultMessage:
-      '!!!Lorem ipsum dolor sit amet, consectetur adipisicing elit. Optio, voluptatem animi necessitatibus error libero natus ea obcaecati, illum hic sunt dolorem neque asperiores magnam consequuntur quia quo ad deserunt. Molestias.',
+      '!!!The dApp connector allows dApps (decentralized applications) in the form of web pages to interact in a secure manner with the user\'s Yoroi Ergo wallets to enable smart contract functionality.',
   },
   howItWorks: {
     id: 'connector.settings.about.howItWorks',
@@ -27,7 +27,7 @@ const messages = defineMessages({
   howItWorksDescription: {
     id: 'connector.settings.about.howItWorksDescription',
     defaultMessage:
-      '!!!Lorem ipsum dolor sit amet, consectetur adipisicing elit. Optio, voluptatem animi necessitatibus error libero natus ea obcaecati, illum hic sunt dolorem neque asperiores magnam consequuntur quia quo ad deserunt. Molestias.',
+      '!!!The connector exposes a javascript interface to web pages you visit, specified by the Ergo EIP-0012 standard, allowing dApps to request read-only access to a user\'s Yoroi Ergo wallet. If the user gives access to a dApp, the dApp can read, but not change, the user\'s balance and addresses. The dApp can also request that the user sign a transaction, such as a smart contract created using the address information supplied via this connector. Private keys/passwords are never exposed to dApps, and all transaction signing is done within Yoroi and only with explicit user confirmation.',
   },
 });
 
