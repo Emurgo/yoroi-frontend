@@ -1,17 +1,28 @@
 // @flow
 
 import React from 'react';
-import type { Node } from 'react';
+import type { Node, ComponentType } from 'react';
 import ConnectWebsitesContainer from './ConnectWebsitesContainer';
 import { withScreenshot } from 'storycap';
 import { action } from '@storybook/addon-actions';
 import { LoadingWalletStates } from '../types';
 import { select, } from '@storybook/addon-knobs';
+import { MemoryRouter } from 'react-router';
+import Layout from '../components/layout/Layout';
 
 export default {
   title: `${__filename.split('.')[0]}`,
   component: ConnectWebsitesContainer,
-  decorators: [withScreenshot],
+  decorators: [
+    (Story: ComponentType<any>): Node => (
+      <MemoryRouter>
+        <Layout>
+          <Story />
+        </Layout>
+      </MemoryRouter>
+    ),
+    withScreenshot,
+  ],
 };
 
 const genBaseProps: {|

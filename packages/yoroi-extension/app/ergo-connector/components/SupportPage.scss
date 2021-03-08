@@ -1,0 +1,35 @@
+.component {
+  padding: 40px 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  color: #6b7384;
+  svg {
+    margin-bottom: 24px;
+  }
+  h3 {
+    margin: 0;
+    margin-bottom: 2px;
+    font-size: 18px;
+    letter-spacing: 0;
+    line-height: 26px;
+  }
+  p {
+    margin-bottom: 24px;
+    font-size: 12px;
+  }
+  .link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    height: 40px;
+    width: 190px;
+    border-radius: 8px;
+    font-family: var(--font-medium);
+    background-color: var(--theme-button-primary-background-color);
+    color: var(--theme-button-primary-text-color);
+    text-transform: uppercase;
+  }
+}

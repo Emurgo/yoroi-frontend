@@ -5,7 +5,11 @@ import ConnectPage from '../components/connect/ConnectPage';
 import { observer } from 'mobx-react';
 import { computed } from 'mobx';
 import type { InjectedOrGeneratedConnector } from '../../types/injectedPropsType';
-import type { AccountInfo, ConnectingMessage } from '../../../chrome/extension/ergo-connector/types';
+import type {
+  AccountInfo,
+  ConnectingMessage,
+  WhitelistEntry,
+} from '../../../chrome/extension/ergo-connector/types';
 import { LoadingWalletStates } from '../types';
 
 type GeneratedData = typeof ConnectContainer.prototype.generated;
@@ -36,6 +40,7 @@ export default class ConnectContainer extends Component<
 
   componentDidMount() {
     this.generated.actions.connector.getWallets.trigger();
+    this.generated.actions.connector.getConnectorWhitelist.trigger();
     window.addEventListener('unload', this.onUnload);
   }
 
@@ -48,21 +53,21 @@ export default class ConnectContainer extends Component<
 
   async onConnect(walletIndex: number) {
     const chromeMessage = this.generated.stores.connector.connectingMessage;
-
-    chrome.storage.local.get('connector_whitelist', async result => {
-      const whitelist = Object.keys(result).length === 0 ? [] : JSON.parse(result.connector_whitelist);
-      whitelist.push({ url: chromeMessage?.url, walletIndex });
-      chrome.storage.local.set({ connector_whitelist: JSON.stringify(whitelist) });
-    });
+    if(chromeMessage == null) {
+      throw new Error(`${nameof(chromeMessage)} connecting to a wallet but no connect message found`);
+    }
+    const result = this.generated.stores.connector.currentConnectorWhitelist;
+    const whitelist = result.length === 0 ? [] : result;
+    whitelist.push({ url: chromeMessage.url, walletIndex });
+    await this.generated.actions.connector.updateConnectorWhitelist.trigger({ whitelist });
 
     chrome.runtime.sendMessage({
       type: 'connect_response',
       accepted: true,
       account: walletIndex,
-      tabId: chromeMessage?.tabId,
+      tabId: chromeMessage.tabId,
     });
 
-    await this.generated.actions.connector.getConnectorWhitelist.trigger();
     this.generated.actions.connector.closeWindow.trigger();
   }
 
@@ -124,12 +129,18 @@ export default class ConnectContainer extends Component<
         getConnectorWhitelist: {|
           trigger: (params: void) => Promise<void>,
         |},
+        updateConnectorWhitelist: {|
+          trigger: ({|
+            whitelist: Array<WhitelistEntry>,
+          |}) => Promise<void>,
+        |},
       |},
     |},
     stores: {|
       connector: {|
         connectingMessage: ?ConnectingMessage,
         wallets: Array<AccountInfo>,
+        currentConnectorWhitelist: Array<WhitelistEntry>,
         errorWallets: string,
         loadingWallets: $Values<typeof LoadingWalletStates>,
       |},
@@ -146,6 +157,7 @@ export default class ConnectContainer extends Component<
       stores: {
         connector: {
           connectingMessage: stores.connector.connectingMessage,
+          currentConnectorWhitelist: stores.connector.currentConnectorWhitelist,
           wallets: stores.connector.wallets,
           errorWallets: stores.connector.errorWallets,
           loadingWallets: stores.connector.loadingWallets,
@@ -157,6 +169,7 @@ export default class ConnectContainer extends Component<
           getWallets: { trigger: actions.connector.getWallets.trigger },
           closeWindow: { trigger: actions.connector.closeWindow.trigger },
           getConnectorWhitelist: { trigger: actions.connector.getConnectorWhitelist.trigger },
+          updateConnectorWhitelist: { trigger: actions.connector.updateConnectorWhitelist.trigger },
         },
       },
     });

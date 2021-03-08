@@ -1,17 +1,28 @@
 // @flow
 
 import React from 'react';
-import type { Node } from 'react';
+import type { Node, ComponentType } from 'react';
 import ConnectContainer from './ConnectContainer';
 import { withScreenshot } from 'storycap';
 import { action } from '@storybook/addon-actions';
 import { LoadingWalletStates } from '../types';
 import { select, } from '@storybook/addon-knobs';
+import { MemoryRouter } from 'react-router';
+import Layout from '../components/layout/Layout';
 
 export default {
   title: `${__filename.split('.')[0]}`,
   component: ConnectContainer,
-  decorators: [withScreenshot],
+  decorators: [
+    (Story: ComponentType<any>): Node => (
+      <MemoryRouter>
+        <Layout>
+          <Story />
+        </Layout>
+      </MemoryRouter>
+    ),
+    withScreenshot,
+  ],
 };
 
 export const Generic = (): Node => {
@@ -44,12 +55,14 @@ export const Generic = (): Node => {
             wallets,
             errorWallets,
             loadingWallets: walletsState,
+            currentConnectorWhitelist: [],
           },
         },
         actions: {
           connector: {
             getResponse: { trigger: async (req) => action('getResponse')(req) },
             getConnectorWhitelist: { trigger: async (req) => action('getConnectorWhitelist')(req) },
+            updateConnectorWhitelist: { trigger: async (req) => action('updateConnectorWhitelist')(req) },
             getWallets: { trigger: action('getWallets') },
             closeWindow: { trigger: action('closeWindow') },
           },

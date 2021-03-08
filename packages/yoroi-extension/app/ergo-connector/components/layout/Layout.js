@@ -14,7 +14,6 @@ type Props = {|
   children: Node,
 |};
 
-
 const messages = defineMessages({
   yoroiDappConnector: {
     id: 'global.connector.yoroiDappConnector',
@@ -37,7 +36,7 @@ export default class Layout extends Component<Props> {
     return (
       <div className={styles.layout}>
         <div className={styles.header}>
-          <Link to={ROUTES.SETTINGS} className={styles.menuIcon}>
+          <Link to={ROUTES.SETTINGS.GENERAL} className={styles.menuIcon}>
             <MenuIcon />
           </Link>
           <div className={styles.menu}>
