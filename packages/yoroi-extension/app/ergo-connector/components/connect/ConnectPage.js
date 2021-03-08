@@ -79,7 +79,7 @@ class ConnectPage extends Component<Props> {
 
     const isCheckedWallet = isSuccess ? Boolean(selected < 0) : [];
     return (
-      <>
+      <div className={styles.component}>
         <ProgressBar step={1} />
         <div className={styles.connectWrapper}>
           <div className={styles.image}>
@@ -133,7 +133,7 @@ class ConnectPage extends Component<Props> {
             />
           </div>
         </div>
-      </>
+      </div>
     );
   }
 }

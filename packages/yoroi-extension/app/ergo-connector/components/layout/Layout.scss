@@ -1,6 +1,5 @@
 .layout {
-  max-width: 466px;
-  width: 100%;
+  min-height: 100vh;
   padding-bottom: 40px;
   border-radius: 2px;
   background-color: #f0f3f5;
@@ -16,10 +15,11 @@
   padding-right: 32px;
   padding-left: 32px;
   & .menuIcon {
-    margin-right: 80px;
     cursor: pointer;
   }
   & .menu {
+    margin: 0 auto;
+    padding-right: 24px;
     color: #fff;
     display: flex;
     & svg {
