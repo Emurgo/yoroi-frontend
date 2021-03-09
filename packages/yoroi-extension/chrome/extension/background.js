@@ -75,14 +75,11 @@ let dbPromise: ?Promise<lf$Database> = null;
 async function loadDB(): Promise<lf$Database> {
   if (loadedDB == null) {
     if (dbPromise == null) {
-      dbPromise = new Promise(resolve => {
-        loadLovefieldDB(schema.DataStoreType.INDEXED_DB).then(db => {
+      dbPromise = loadLovefieldDB(schema.DataStoreType.INDEXED_DB)
+        .then(db => {
           loadedDB = db;
-          return resolve(loadedDB);;
-        }).catch(err => {
-          Logger.error(`Failed to load DB: ${err}`);
+          return Promise.resolve(loadedDB);
         });
-      });
     }
     return dbPromise;
   }
@@ -186,35 +183,29 @@ async function syncWallet(wallet: PublicDeriver<>): Promise<void> {
     if (lastSync.Time == null || now - lastSync.Time.getTime() > 30*1000) {
       if (syncing == null) {
         await RustModule.load();
-        syncing = new Promise(resolve => {
-          Logger.debug('sync started');
-          getStateFetcher()
-            .then(stateFetcher => updateTransactions(
-              wallet.getDb(),
-              wallet,
-              stateFetcher.checkAddressesInUse,
-              stateFetcher.getTransactionsHistoryForAddresses,
-              stateFetcher.getAssetInfo,
-              stateFetcher.getBestBlock))
-            .then(() => {
-              // to be safe we filter possibly accepted txs for up to 10 minutes
-              // this could be accepted in a variable amount of time due to Ergo's PoW
-              // but this is probably an okay amount. If it was not accepted then at worst
-              // the values are just temporarily withheld for a few minutes too long,
-              // and if it was accepted, then none of the UTXOs held would have been
-              // reuseable anyway.
-              pendingTxs = pendingTxs.filter(
-                pendingTx => Date.now() - pendingTx.submittedTime.getTime() <= 10*60*1000);
-              Logger.debug('sync ended');
-              syncing = null;
-              return resolve();
-            })
-            .catch(e => {
-              Logger.error(`Syncing failed: ${e}`);
-            });
-        });
+        Logger.debug('sync started');
+        syncing = getStateFetcher()
+          .then(stateFetcher => updateTransactions(
+            wallet.getDb(),
+            wallet,
+            stateFetcher.checkAddressesInUse,
+            stateFetcher.getTransactionsHistoryForAddresses,
+            stateFetcher.getAssetInfo,
+            stateFetcher.getBestBlock))
+          .then(() => {
+            // to be safe we filter possibly accepted txs for up to 10 minutes
+            // this could be accepted in a variable amount of time due to Ergo's PoW
+            // but this is probably an okay amount. If it was not accepted then at worst
+            // the values are just temporarily withheld for a few minutes too long,
+            // and if it was accepted, then none of the UTXOs held would have been
+            // reuseable anyway.
+            pendingTxs = pendingTxs.filter(
+              pendingTx => Date.now() - pendingTx.submittedTime.getTime() <= 10*60*1000);
+            Logger.debug('sync ended');
+            return Promise.resolve(null);
+          });
       }
-      await syncing;
+      syncing = await syncing;
     }
   } catch (e) {
     Logger.error(`Syncing failed: ${e}`);
