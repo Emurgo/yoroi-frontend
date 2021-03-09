@@ -182,9 +182,11 @@ async function syncWallet(wallet: PublicDeriver<>): Promise<void> {
     const now = Date.now();
     if (lastSync.Time == null || now - lastSync.Time.getTime() > 30*1000) {
       if (syncing == null) {
-        await RustModule.load();
-        Logger.debug('sync started');
-        syncing = getStateFetcher()
+        syncing = RustModule.load()
+          .then(() => {
+            Logger.debug('sync started');
+            return getStateFetcher()
+          })
           .then(stateFetcher => updateTransactions(
             wallet.getDb(),
             wallet,
