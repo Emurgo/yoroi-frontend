@@ -78,16 +78,21 @@ class ConnectPage extends Component<Props> {
     const isError = loading === LoadingWalletStates.REJECTED;
 
     const isCheckedWallet = isSuccess ? Boolean(selected < 0) : [];
+
+    const url = message?.url ?? '';
+
     return (
       <>
         <ProgressBar step={1} />
         <div className={styles.connectWrapper}>
-          <div className={styles.image}>
-            <PlaceholderIcon />
-          </div>
+          {url ? (
+            <div className={styles.image}>
+              <img src={`https://icons.duckduckgo.com/ip3/${url}.ico`} alt={`${url} favicon`} />
+            </div>
+          ) : null}
           <div className={styles.title}>
             <h2>{intl.formatMessage(messages.subtitle)}</h2>
-            <p>{message?.url ?? ''}</p>
+            <p>{url}</p>
           </div>
         </div>
         <ul className={styles.list}>
