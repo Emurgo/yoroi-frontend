@@ -324,8 +324,8 @@ async function confirmSign(tabId: number, request: PendingSignData): Promise<any
       });
        chrome.windows.create({
         url: `${window.location.origin}/main_window_ergo.html#/signin-transaction`,
-        width: 466,
-        height: 600,
+        width: 500,
+        height: 700,
         focused: true,
         type: 'popup'
       });
@@ -360,8 +360,8 @@ async function confirmConnect(tabId: number, url: string): Promise<?AccountIndex
         });
         chrome.windows.create({
           url: 'main_window_ergo.html',
-          width: 466,
-          height: 600,
+          width: 500,
+          height: 700,
           focused: true,
           type: 'popup'
         });
@@ -376,8 +376,8 @@ chrome.runtime.onMessageExternal.addListener((message, sender) => {
     if (message.type === 'open_browseraction_menu') {
       chrome.windows.create({
         url: `${window.location.origin}/main_window_ergo.html#/settings`,
-        width: 466,
-        height: 600,
+        width: 500,
+        height: 700,
         focused: true,
         type: 'popup'
       });
