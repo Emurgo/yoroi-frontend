@@ -80,14 +80,15 @@ class ConnectPage extends Component<Props> {
     const isCheckedWallet = isSuccess ? Boolean(selected < 0) : [];
 
     const url = message?.url ?? '';
+    const faviconUrl = message?.imgBase64Url;
 
     return (
       <>
         <ProgressBar step={1} />
         <div className={styles.connectWrapper}>
-          {url ? (
+          {faviconUrl ? (
             <div className={styles.image}>
-              <img src={`https://icons.duckduckgo.com/ip3/${url}.ico`} alt={`${url} favicon`} />
+              <img src={faviconUrl} alt={`${url} favicon`} />
             </div>
           ) : null}
           <div className={styles.title}>

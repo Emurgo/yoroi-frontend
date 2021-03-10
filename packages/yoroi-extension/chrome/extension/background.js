@@ -67,6 +67,7 @@ type PendingSign = {|
 |}
 
 let db: ?lf$Database = null;
+let imgBase64Url: string = '';
 
 type AccountIndex = number;
 
@@ -304,6 +305,7 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
           connection.status.openedWindow = true;
           sendResponse({
             url: connection.url,
+            imgBase64Url,
             tabId,
           });
         }
@@ -390,6 +392,7 @@ chrome.runtime.onConnectExternal.addListener(port => {
   if (port.sender.id === environment.ergoConnectorExtensionId) {
     const tabId = port.sender.tab.id;
     port.onMessage.addListener(async message => {
+      imgBase64Url = message.imgBase64Url;
       function rpcResponse(response) {
         port.postMessage({
           type: 'connector_rpc_response',
