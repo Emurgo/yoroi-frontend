@@ -131,7 +131,7 @@ export type AccountInfo = {|
 
 export type WhitelistEntry = {| url: string, walletIndex: number |};
 
-export type ConnectingMessage = {| tabId: number, url: string |};
+export type ConnectingMessage = {| tabId: number, url: string, imgBase64Url: string |};
 export type SigningMessage = {| sign: PendingSignData, tabId: number |};
 
 export type RpcUid = number;
