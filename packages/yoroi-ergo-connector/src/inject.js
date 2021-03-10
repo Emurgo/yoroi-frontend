@@ -164,6 +164,24 @@ function shouldInject() {
     return docElemCheck && docTypeCheck;
 }
 
+function convertImgToBase64(url, outputFormat) {
+    return new Promise(resolve => {
+        let img = new Image();
+        img.crossOrigin = 'Anonymous';
+        img.onload = function() {
+            let canvas = document.createElement('canvas'),
+            ctx = canvas.getContext('2d'), dataURL;
+            canvas.height = img.height;
+            canvas.width = img.width;
+            ctx.drawImage(img, 0, 0);
+            dataURL = canvas.toDataURL(outputFormat || 'image/png');
+            resolve(dataURL);
+            canvas = null; 
+        };
+        img.src = url;
+    });
+}
+
 if (shouldInject()) {
     console.log(`content script injected into ${location.hostname}`);
     injectIntoPage(initialInject);
@@ -192,17 +210,33 @@ if (shouldInject()) {
     });
 
     // events from page (injected code)
-    window.addEventListener("message", function(event) {
+    window.addEventListener("message", async function(event) {
         if (event.data.type === "connector_rpc_request") {
             console.log("connector received from page: " + JSON.stringify(event.data) + " with source = " + event.source + " and origin = " + event.origin);
             yoroiPort.postMessage(event.data);
         } else if (event.data.type == "connector_connect_request") {
             // URL must be provided here as the url field of Tab is only available
             // with the "tabs" permission which Yoroi doesn't have
-            yoroiPort.postMessage({
-                type: "yoroi_connect_request",
-                url: location.hostname
-            });
+            try {
+                if (location.hostname === 'localhost') {
+                    yoroiPort.postMessage({
+                        imgBase64Url: '',
+                        type: "yoroi_connect_request",
+                        url: location.hostname
+                    });
+                    return;
+                }
+                const faviconURL = `https://services.keeweb.info/favicon/${location.hostname}`
+                const imgBase64Url = await convertImgToBase64(faviconURL)
+                yoroiPort.postMessage({
+                    imgBase64Url,
+                    type: "yoroi_connect_request",
+                    url: location.hostname
+                });
+
+            } catch (error) {
+                console.log(error)
+            }
         }
     });
 }
