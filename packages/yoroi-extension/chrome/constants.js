@@ -64,6 +64,6 @@ export function genCSP(request: {|
     `object-src 'self' ${objectSrc.join(' ')};`,
     `connect-src ${connectSrc.join(' ')};`,
     `style-src * ${evalStyle} 'self' ${styleSrc.join(' ')} blob:;`,
-    `img-src 'self' ${imgSrc.join(' ')} data: https://icons.duckduckgo.com/ip3/ ;`,
+    `img-src 'self' ${imgSrc.join(' ')} data: ;`,
   ].join(' ');
 }
