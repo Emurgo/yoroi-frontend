@@ -12,6 +12,8 @@ import type {
   WhitelistEntry,
 } from '../../../chrome/extension/ergo-connector/types';
 import { LoadingWalletStates } from '../types';
+import VerticallyCenteredLayout from '../../components/layout/VerticallyCenteredLayout'
+import FullscreenLayout from '../../components/layout/FullscreenLayout'
 
 type GeneratedData = typeof ConnectWebsitesContainer.prototype.generated;
 
@@ -42,7 +44,13 @@ export default class ConnectWebsitesContainer extends Component<
     const isError = loadingWallets === LoadingWalletStates.REJECTED;
 
     if (isLoading) {
-      return <LoadingSpinner />;
+      return (
+        <FullscreenLayout bottomPadding={0}>
+          <VerticallyCenteredLayout>
+            <LoadingSpinner />
+          </VerticallyCenteredLayout>
+        </FullscreenLayout>
+      );
     }
     if (isError) {
       return <p>{error}</p>;
