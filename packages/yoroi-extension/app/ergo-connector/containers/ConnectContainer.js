@@ -48,7 +48,10 @@ export default class ConnectContainer extends Component<
     window.removeEventListener('unload', this.onUnload);
   }
   onToggleCheckbox: (index: number) => void = index => {
-    this.setState({ selected: index });
+    this.setState((prevState) => prevState.selected === index
+      ? { selected: -1 }
+      : { selected: index }
+    );
   };
 
   async onConnect(walletIndex: number) {

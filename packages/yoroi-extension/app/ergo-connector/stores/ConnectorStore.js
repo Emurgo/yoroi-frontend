@@ -156,6 +156,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       pw: password,
     };
     window.chrome.runtime.sendMessage(sendData);
+    this._closeWindow();
   };
   @action
   _cancelSignInTx: void => void = () => {
