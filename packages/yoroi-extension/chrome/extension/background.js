@@ -75,7 +75,25 @@ type PendingSign = {|
   resolve: any
 |}
 
-let db: ?lf$Database = null;
+// This is a temporary workaround to DB duplicate key constraint violations
+// that is happening when multiple DBs are loaded at the same time, or possibly
+// this one being loaded while Yoroi's main App is doing DB operations.
+let loadedDB: ?lf$Database = null;
+let dbPromise: ?Promise<lf$Database> = null;
+
+async function loadDB(): Promise<lf$Database> {
+  if (loadedDB == null) {
+    if (dbPromise == null) {
+      dbPromise = loadLovefieldDB(schema.DataStoreType.INDEXED_DB)
+        .then(db => {
+          loadedDB = db;
+          return Promise.resolve(loadedDB);
+        });
+    }
+    return dbPromise;
+  }
+  return Promise.resolve(loadedDB);
+}
 
 type AccountIndex = number;
 
@@ -118,9 +136,7 @@ let pendingTxs: PendingTransaction[] = [];
 
 export async function getWalletsInfo(): Promise<AccountInfo[]> {
   try {
-    if (db == null) {
-      db = await loadLovefieldDB(schema.DataStoreType.INDEXED_DB);
-    }
+    const db = await loadDB();
     const wallets = await getWallets({ db });
     // information about each wallet to show to the user
     const accounts = [];
@@ -163,29 +179,44 @@ export async function getStateFetcher(): Promise<IFetcher> {
   )));
 }
 
+// This is a temporary workaround to DB duplicate key constraint violations
+// that is happening when multiple DBs are loaded at the same time, or possibly
+// this one being loaded while Yoroi's main App is doing DB operations.
+// Promise<void>
+let syncing: ?Promise<void> = null;
 async function syncWallet(wallet: PublicDeriver<>): Promise<void> {
   try {
     const lastSync = await wallet.getLastSyncInfo();
     // don't sync more than every 30 seconds
     const now = Date.now();
     if (lastSync.Time == null || now - lastSync.Time.getTime() > 30*1000) {
-      const stateFetcher = await getStateFetcher();
-      await RustModule.load();
-      await updateTransactions(
-        wallet.getDb(),
-        wallet,
-        stateFetcher.checkAddressesInUse,
-        stateFetcher.getTransactionsHistoryForAddresses,
-        stateFetcher.getAssetInfo,
-        stateFetcher.getBestBlock);
-      // to be safe we filter possibly accepted txs for up to 10 minutes
-      // this could be accepted in a variable amount of time due to Ergo's PoW
-      // but this is probably an okay amount. If it was not accepted then at worst
-      // the values are just temporarily withheld for a few minutes too long,
-      // and if it was accepted, then none of the UTXOs held would have been
-      // reuseable anyway.
-      pendingTxs = pendingTxs.filter(
-        pendingTx => Date.now() - pendingTx.submittedTime.getTime() <= 10*60*1000);
+      if (syncing == null) {
+        syncing = RustModule.load()
+          .then(() => {
+            Logger.debug('sync started');
+            return getStateFetcher()
+          })
+          .then(stateFetcher => updateTransactions(
+            wallet.getDb(),
+            wallet,
+            stateFetcher.checkAddressesInUse,
+            stateFetcher.getTransactionsHistoryForAddresses,
+            stateFetcher.getAssetInfo,
+            stateFetcher.getBestBlock))
+          .then(() => {
+            // to be safe we filter possibly accepted txs for up to 10 minutes
+            // this could be accepted in a variable amount of time due to Ergo's PoW
+            // but this is probably an okay amount. If it was not accepted then at worst
+            // the values are just temporarily withheld for a few minutes too long,
+            // and if it was accepted, then none of the UTXOs held would have been
+            // reuseable anyway.
+            pendingTxs = pendingTxs.filter(
+              pendingTx => Date.now() - pendingTx.submittedTime.getTime() <= 10*60*1000);
+            Logger.debug('sync ended');
+            return Promise.resolve(null);
+          });
+      }
+      syncing = await syncing;
     }
   } catch (e) {
     Logger.error(`Syncing failed: ${e}`);
@@ -200,9 +231,7 @@ export function getActiveSites(): Array<string> {
 }
 
 async function getSelectedWallet(tabId: number): Promise<PublicDeriver<>> {
-  if (db == null) {
-    db = await loadLovefieldDB(schema.DataStoreType.INDEXED_DB);
-  }
+  const db = await loadDB();
   const wallets = await getWallets({ db });
   const connected = connectedSites.get(tabId);
   if (connected) {
