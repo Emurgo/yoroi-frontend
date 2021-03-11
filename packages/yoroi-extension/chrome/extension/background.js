@@ -213,7 +213,7 @@ async function syncWallet(wallet: PublicDeriver<>): Promise<void> {
             pendingTxs = pendingTxs.filter(
               pendingTx => Date.now() - pendingTx.submittedTime.getTime() <= 10*60*1000);
             Logger.debug('sync ended');
-            return Promise.resolve(null);
+            return Promise.resolve();
           });
       }
       syncing = await syncing;

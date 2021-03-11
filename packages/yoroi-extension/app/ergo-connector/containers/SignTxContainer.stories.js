@@ -50,7 +50,7 @@ const message = {
           'R6': '0e0132',
         }),
         creationHeight: 1,
-        transactionId: "2df0273e382739f8b4ae3783d81168093e78e0b48ec2c5430ff03d444806a175",
+        transactionId: '2df0273e382739f8b4ae3783d81168093e78e0b48ec2c5430ff03d444806a175',
         index: 0
       }],
     },
