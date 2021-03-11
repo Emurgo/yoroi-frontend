@@ -1,7 +1,7 @@
 /* eslint-disable promise/always-return */
 // @flow
 import { observable, action, runInAction, computed } from 'mobx';
-import { getActiveSites, getWalletsInfo } from '../../../chrome/extension/background';
+import { getActiveSites, getWalletsInfo } from '../../../chrome/extension/utils';
 import Request from '../../stores/lib/LocalizedRequest';
 import Store from '../../stores/base/Store';
 import type {
