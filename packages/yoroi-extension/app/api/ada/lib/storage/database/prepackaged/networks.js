@@ -25,6 +25,7 @@ export const ErgoForks = Object.freeze({
 export const networks = Object.freeze({
   CardanoMainnet: ({
     NetworkId: 0,
+    NetworkName: 'Cardano Mainnet',
     Backend: {
       BackendService: environment.isTest()
         ? 'http://localhost:21000'
@@ -61,6 +62,7 @@ export const networks = Object.freeze({
   }: NetworkRow),
   JormungandrMainnet: ({
     NetworkId: 1_00,
+    NetworkName: 'Jormungandr Mainnet',
     Backend: {
       BackendService: environment.isTest()
         ? 'http://localhost:21000' // TODO: pick a port for test
@@ -95,6 +97,7 @@ export const networks = Object.freeze({
   }: NetworkRow),
   ErgoMainnet: ({
     NetworkId: 2_00,
+    NetworkName: 'Ergo Mainnet',
     Backend: {
       BackendService: environment.isTest()
         ? 'http://localhost:21001'
@@ -116,6 +119,7 @@ export const networks = Object.freeze({
   }: NetworkRow),
   CardanoTestnet: ({
     NetworkId: 3_00,
+    NetworkName: 'Cardano Testnet',
     Backend: {
       BackendService: environment.isTest()
         ? 'http://localhost:21000'

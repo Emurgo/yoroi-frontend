@@ -104,6 +104,7 @@ export type ErgoConfig = $ReadOnly<InexactSubset<{|
 
 export type NetworkInsert = {|
   NetworkId: number,
+  NetworkName: string,
   CoinType: CoinTypesT,
   Backend: {|
     BackendService?: string,
