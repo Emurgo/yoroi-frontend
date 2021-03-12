@@ -164,22 +164,15 @@ function shouldInject() {
     return docElemCheck && docTypeCheck;
 }
 
-function convertImgToBase64(url, outputFormat) {
-    return new Promise(resolve => {
-        let img = new Image();
-        img.crossOrigin = 'Anonymous';
-        img.onload = function() {
-            let canvas = document.createElement('canvas'),
-            ctx = canvas.getContext('2d'), dataURL;
-            canvas.height = img.height;
-            canvas.width = img.width;
-            ctx.drawImage(img, 0, 0);
-            dataURL = canvas.toDataURL(outputFormat || 'image/png');
-            resolve(dataURL);
-            canvas = null; 
-        };
-        img.src = url;
-    });
+function getFavicon(url) {
+    let faviconURL = '';
+    const favicon = document.querySelector("link[rel~='icon']");
+    if(favicon) {
+        faviconURL = favicon.href;
+    } else {
+        faviconURL = `${url}/favicon.ico`;
+    }
+    return faviconURL;
 }
 
 if (shouldInject()) {
@@ -226,13 +219,19 @@ if (shouldInject()) {
                     });
                     return;
                 }
-                const faviconURL = `https://services.keeweb.info/favicon/${location.hostname}`
-                const imgBase64Url = await convertImgToBase64(faviconURL)
-                yoroiPort.postMessage({
-                    imgBase64Url,
-                    type: "yoroi_connect_request",
-                    url: location.hostname
-                });
+                // get favicon URL from website url to parse
+                // to data base 64 img and send it to yoroi
+                const faviconURL = getFavicon(location.origin)
+                chrome.runtime.sendMessage(
+                    faviconURL,
+                    imgBase64Url => {
+                        yoroiPort.postMessage({
+                            imgBase64Url,
+                            type: "yoroi_connect_request",
+                            url: location.hostname
+                        });
+                    }
+                ); 
 
             } catch (error) {
                 console.log(error)
