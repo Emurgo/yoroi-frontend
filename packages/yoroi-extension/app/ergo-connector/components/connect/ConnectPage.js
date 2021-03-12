@@ -96,8 +96,7 @@ class ConnectPage extends Component<Props> {
             <div className={styles.loading}>
               <LoadingSpinner />
             </div>
-          ) : isSuccess ? (
-            accounts.length > 0 &&
+          ) : isSuccess && accounts.length ? (
             accounts.map((item, idx) => (
               <li key={item.name} className={styles.listItem}>
                 <Checkbox
