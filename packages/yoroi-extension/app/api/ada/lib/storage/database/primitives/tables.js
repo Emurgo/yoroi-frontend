@@ -140,6 +140,7 @@ export const NetworkSchema: {|
   name: 'Network',
   properties: {
     NetworkId: 'NetworkId',
+    NetworkName: 'NetworkName',
     CoinType: 'CoinType',
     Backend: 'Backend',
     BaseConfig: 'BaseConfig',
