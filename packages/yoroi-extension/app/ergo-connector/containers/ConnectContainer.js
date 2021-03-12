@@ -11,6 +11,7 @@ import type {
   WhitelistEntry,
 } from '../../../chrome/extension/ergo-connector/types';
 import { LoadingWalletStates } from '../types';
+import { networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 type GeneratedData = typeof ConnectContainer.prototype.generated;
 declare var chrome;
@@ -113,6 +114,7 @@ export default class ConnectContainer extends Component<
         onCancel={this.onCancel}
         handleSubmit={this.handleSubmit}
         selected={selected}
+        network={networks.ErgoMainnet.NetworkName}
       />
     );
   }
