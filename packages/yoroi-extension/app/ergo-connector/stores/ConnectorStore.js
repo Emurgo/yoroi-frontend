@@ -215,6 +215,10 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       whitelist: filter,
     });
     await this.getConnectorWhitelist.execute();
+    window.chrome.runtime.sendMessage({
+      type: 'remove_wallet_from_whitelist',
+      url,
+    });
   };
 
   // ========== active websites ========== //

@@ -15,16 +15,12 @@ window.addEventListener("message", function(event) {
 });
 
 function ergo_request_read_access() {
-    if (typeof ergo !== "undefined") {
-        return Promise.resolve(true);
-    } else {
-        return new Promise(function(resolve, reject) {
-            window.postMessage({
-                type: "connector_connect_request",
-            }, location.origin);
-            connectRequests.push({ resolve: resolve, reject: reject });
-        });
-    }
+    return new Promise(function(resolve, reject) {
+        window.postMessage({
+            type: "connector_connect_request",
+        }, location.origin);
+        connectRequests.push({ resolve: resolve, reject: reject });
+    });
 }
 
 function ergo_check_read_access() {
@@ -34,27 +30,6 @@ function ergo_check_read_access() {
         return Promise.resolve(false);
     }
 }
-
-// TODO: fix or change back how RPCs work
-// // disconnect detector
-// setInterval(function() {
-//     if (timeout == 20) {
-//         window.dispatchEvent(new Event("ergo_wallet_disconnected"));
-//     }
-//     if (timeout == 25) {
-//         rpcResolver.forEach(function(rpc) {
-//             rpc.reject("timed out");
-//         });
-//     }
-//     timeout += 1;
-// }, 1000);
-
-// // ping sender
-// setInterval(function() {
-//     _ergo_rpc_call("ping", []).then(function() {
-//         timeout = 0;
-//     });
-// }, 10000);
 `
 
 // client-facing ergo object API
@@ -139,6 +114,8 @@ class ErgoAPI {
 
 const ergo = Object.freeze(new ErgoAPI());
 `
+const API_INTERNAL_ERROR = -2;
+const API_REFUSED = -3;
 
 function injectIntoPage(code) {
     try {
@@ -164,24 +141,37 @@ function shouldInject() {
     return docElemCheck && docTypeCheck;
 }
 
-if (shouldInject()) {
-    console.log(`content script injected into ${location.hostname}`);
-    injectIntoPage(initialInject);
+let yoroiPort = null;
+let fullApiInjected = false;
 
+function disconnectWallet() {
+    yoroiPort = null;
+    window.dispatchEvent(new Event("ergo_wallet_disconnected"));
+}
+
+function createYoroiPort() {
     // events from Yoroi
-    let yoroiPort = chrome.runtime.connect(extensionId);
+    yoroiPort = chrome.runtime.connect(extensionId);
     yoroiPort.onMessage.addListener(message => {
         //alert("content script message: " + JSON.stringify(message));
         if (message.type == "connector_rpc_response") {
             window.postMessage(message, location.origin);
         } else if (message.type == "yoroi_connect_response") {
             if (message.success) {
-                // inject full API here
-                if (injectIntoPage(apiInject)) {
-                    chrome.runtime.sendMessage({type: "init_page_action"});
-                } else {
-                    alert("failed to inject Ergo API");
-                    // TODO: return an error instead here if injection fails?
+                if (!fullApiInjected) {
+                    // inject full API here
+                    if (injectIntoPage(apiInject)) {
+                        fullApiInjected = true;
+                    } else {
+                        console.error()
+                        window.postMessage({
+                            type: "connector_connected",
+                            err: {
+                                code: API_INTERNAL_ERROR,
+                                info: "failed to inject Ergo API"
+                            }
+                        }, location.origin);
+                    }
                 }
             }
             window.postMessage({
@@ -191,17 +181,67 @@ if (shouldInject()) {
         }
     });
 
+    yoroiPort.onDisconnect.addListener(event => {
+        disconnectWallet();
+    });
+}
+
+if (shouldInject()) {
+    console.log(`content script injected into ${location.hostname}`);
+    injectIntoPage(initialInject);
+
     // events from page (injected code)
     window.addEventListener("message", function(event) {
         if (event.data.type === "connector_rpc_request") {
             console.log("connector received from page: " + JSON.stringify(event.data) + " with source = " + event.source + " and origin = " + event.origin);
-            yoroiPort.postMessage(event.data);
+            if (yoroiPort) {
+                try {
+                    yoroiPort.postMessage(event.data);
+                    return;
+                } catch (e) {
+                    console.error(`Could not send RPC to Yoroi: ${e}`);
+                    window.postMessage({
+                        type: "connector_rpc_response",
+                        uid: event.data.uid,
+                        return: {
+                            err: {
+                                code: API_INTERNAL_ERROR,
+                                info: `Could not send RPC to Yoroi: ${e}`
+                            }
+                        }
+                    }, location.origin);
+                }
+            } else {
+                window.postMessage({
+                    type: "connector_rpc_response",
+                    uid: event.data.uid,
+                    return: {
+                        err: {
+                            code: API_REFUSED,
+                            info: 'Wallet disconnected'
+                        }
+                    }
+                }, location.origin);
+            }
         } else if (event.data.type == "connector_connect_request") {
+            if (fullApiInjected) {
+                if (yoroiPort) {
+                    // we can skip communication - API injected + hasn't been disconnected
+                    window.postMessage({
+                        type: "connector_connected",
+                        success: true
+                    }, location.origin);
+                    return;
+                }
+            }
+            if (yoroiPort) {
+                createYoroiPort();
+            }
             // URL must be provided here as the url field of Tab is only available
             // with the "tabs" permission which Yoroi doesn't have
             yoroiPort.postMessage({
                 type: "yoroi_connect_request",
-                url: location.hostname
+                url: location.hostname,
             });
         }
     });
