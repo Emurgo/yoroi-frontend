@@ -1,7 +1,7 @@
 /* eslint-disable promise/always-return */
 // @flow
 import { observable, action, runInAction, computed } from 'mobx';
-import { getActiveSites, getWalletsInfo } from '../../../chrome/extension/background';
+import { getWalletsInfo } from '../../../chrome/extension/utils';
 import Request from '../../stores/lib/LocalizedRequest';
 import Store from '../../stores/base/Store';
 import type {
@@ -11,6 +11,7 @@ import type {
   FailedSignData,
   SigningMessage,
   WhitelistEntry,
+  ConnectedSites,
 } from '../../../chrome/extension/ergo-connector/types';
 import type { ActionsMap } from '../actions/index';
 import type { StoresMap } from './index';
@@ -50,6 +51,20 @@ function sendMsgSigningTx(): Promise<SigningMessage> {
   });
 }
 
+function getConnectedSites(): Promise<ConnectedSites> {
+  return new Promise((resolve, reject) => {
+    if (!initedSigning)
+      window.chrome.runtime.sendMessage({ type: 'get_connected_sites' }, response => {
+        if (window.chrome.runtime.lastError) {
+          // eslint-disable-next-line prefer-promise-reject-errors
+          reject('Could not establish connection: get_connected_sites ');
+        }
+
+        resolve(response);
+      });
+  });
+}
+
 type GetWhitelistFunc = void => Promise<?Array<WhitelistEntry>>;
 type SetWhitelistFunc = {|
   whitelist: Array<WhitelistEntry> | void,
@@ -72,6 +87,12 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     SetWhitelistFunc
   >(({ whitelist }) => this.api.localStorage.setWhitelist(whitelist));
 
+  @observable getConnectedSites: Request<
+    typeof getConnectedSites
+  > = new Request<typeof getConnectedSites>(
+    getConnectedSites
+  );
+
   @observable signingMessage: ?SigningMessage = null;
 
   setup(): void {
@@ -83,6 +104,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     this.actions.connector.confirmSignInTx.listen(this._confirmSignInTx);
     this.actions.connector.cancelSignInTx.listen(this._cancelSignInTx);
     this.actions.connector.getSigningMsg.listen(this._getSigningMsg);
+    this.actions.connector.refreshActiveSites.listen(this._refreshActiveSites);
     this.actions.connector.closeWindow.listen(this._closeWindow);
     this._getConnectorWhitelist();
     this._getWallets();
@@ -217,8 +239,16 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     await this.getConnectorWhitelist.execute();
   };
 
+  _refreshActiveSites: void => Promise<void> = async () => {
+    await this.getConnectedSites.execute();
+  }
+
   // ========== active websites ========== //
-  @computed get activeSites(): Array<string> {
-    return getActiveSites() ?? []
+  @computed get activeSites(): ConnectedSites {
+    let { result } = this.getConnectedSites;
+    if (result == null) {
+      result = this.getConnectedSites.execute().result;
+    }
+    return result ?? { sites: [] };
   }
 }

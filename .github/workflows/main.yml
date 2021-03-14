@@ -19,8 +19,7 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: '${{ steps.nvm.outputs.NVMRC }}'
-      - run: cd packages
-      - run: cd yoroi-extension
+      - run: cd packages/yoroi-extension
       - run: npm install
       - name: Build
         run: npm run prod:nightly

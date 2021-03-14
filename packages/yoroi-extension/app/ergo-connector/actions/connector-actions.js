@@ -6,6 +6,7 @@ import type { WhitelistEntry } from '../../../chrome/extension/ergo-connector/ty
 export default class ConnectorActions {
   getResponse: AsyncAction<void> = new AsyncAction();
   getSigningMsg: AsyncAction<void> = new AsyncAction();
+  refreshActiveSites: AsyncAction<void> = new AsyncAction();
   getWallets: Action<void> = new Action();
   closeWindow: Action<void> = new Action();
   getConnectorWhitelist: AsyncAction<void> = new AsyncAction();
