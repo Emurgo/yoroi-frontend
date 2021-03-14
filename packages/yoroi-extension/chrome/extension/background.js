@@ -13,6 +13,9 @@ import {
 import type {
   PendingSignData,
   PendingTransaction,
+  SigningMessage,
+  ConnectingMessage,
+  ConnectedSites,
 } from './ergo-connector/types';
 import {
   APIErrorCodes,
@@ -216,10 +219,10 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
       for (const [/* uid */, responseData] of connection.pendingSigns.entries()) {
         if (!responseData.openedWindow) {
           responseData.openedWindow = true;
-          sendResponse({
+          sendResponse(({
             sign: responseData.request,
             tabId
-          });
+          }: SigningMessage));
           return;
         }
       }
@@ -231,14 +234,22 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
       if (connection.status != null && typeof connection.status === 'object') {
         if (!connection.status.openedWindow) {
           connection.status.openedWindow = true;
-          sendResponse({
+          sendResponse(({
             url: connection.url,
             tabId,
-          });
+          }: ConnectingMessage));
         }
       }
     }
     sendResponse(null);
+  } else if (request.type === 'get_connected_sites') {
+    const activeSites = []
+    for (const value of connectedSites.values()){
+      activeSites.push(value);
+    }
+    sendResponse(({
+      sites: activeSites.map(site => site.url),
+    }: ConnectedSites));
   }
 });
 

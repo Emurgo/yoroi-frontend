@@ -122,14 +122,3 @@ export async function getWalletsInfo(): Promise<AccountInfo[]> {
     throw new GenericApiError();
   }
 }
-
-export function getActiveSites(): Array<string> {
-  const activeSites = []
-  // TODO: can't get connected sites from background.js
-  // because it runs in a different context
-  const connectedSites = [];
-  for (const value of connectedSites.values()){
-    activeSites.push(value);
-  }
-  return activeSites.map(item => item.url);
-}
