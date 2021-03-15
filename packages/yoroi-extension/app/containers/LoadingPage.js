@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 import { computed } from 'mobx';
 import CenteredLayout from '../components/layout/CenteredLayout';
 import Loading from '../components/loading/Loading';
-import type { InjectedOrGenerated } from '../types/injectedPropsType';
+import type { JointInjectedOrGenerated } from '../types/injectedPropsType';
 import { handleExternalLinkClick } from '../utils/routing';
 import { downloadLogs } from '../utils/logging';
 import LocalizableError from '../i18n/LocalizableError';
@@ -13,7 +13,7 @@ import LocalizableError from '../i18n/LocalizableError';
 type GeneratedData = typeof LoadingPage.prototype.generated;
 
 @observer
-export default class LoadingPage extends Component<InjectedOrGenerated<GeneratedData>> {
+export default class LoadingPage extends Component<JointInjectedOrGenerated<GeneratedData>> {
 
   render(): Node {
     return (

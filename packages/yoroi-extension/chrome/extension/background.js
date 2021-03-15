@@ -16,6 +16,7 @@ import type {
   SigningMessage,
   ConnectingMessage,
   ConnectedSites,
+  RpcUid,
 } from './ergo-connector/types';
 import {
   APIErrorCodes,
@@ -43,8 +44,13 @@ import { BatchedFetcher } from '../../app/api/ergo/lib/state-fetch/batchedFetche
 import LocalStorageApi from '../../app/api/localStorage/index';
 import { RustModule } from '../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import { Logger } from '../../app/utils/logging';
-import { loadDB } from './utils';
-import type { AccountIndex, ConnectedSite } from './utils';
+import { schema } from 'lovefield';
+import type {
+  lf$Database,
+} from 'lovefield';
+import {
+  loadLovefieldDB,
+} from '../../app/api/ada/lib/storage/database/index';
 
 /*::
 declare var chrome;
@@ -56,10 +62,58 @@ const onYoroiIconClicked = () => {
 
 chrome.browserAction.onClicked.addListener(debounce(onYoroiIconClicked, 500, { leading: true }));
 
+type AccountIndex = number;
+
+// AccountIndex = successfully connected - which account the user selected
+// null = refused by user
+type ConnectedStatus = ?AccountIndex | {|
+  // response (?AccountIndex) - null means the user refused, otherwise the account they selected
+  resolve: any,
+  // if a window has fetched this to show to the user yet
+  openedWindow: boolean,
+|};
+
+type PendingSign = {|
+  // data needed to complete the request
+  request: PendingSignData,
+  // if an opened window has been created for this request to show the user
+  openedWindow: boolean,
+  // resolve function from signRequest's Promise
+  resolve: any
+|}
+
+type ConnectedSite = {|
+  url: string,
+  status: ConnectedStatus,
+  pendingSigns: Map<RpcUid, PendingSign>
+|};
+
+
 // tab id key
 const connectedSites: Map<number, ConnectedSite> = new Map();
 
 let pendingTxs: PendingTransaction[] = [];
+
+// This is a temporary workaround to DB duplicate key constraint violations
+// that is happening when multiple DBs are loaded at the same time, or possibly
+// this one being loaded while Yoroi's main App is doing DB operations.
+let loadedDB: ?lf$Database = null;
+let dbPromise: ?Promise<lf$Database> = null;
+
+export async function loadDB(): Promise<lf$Database> {
+  if (loadedDB == null) {
+    if (dbPromise == null) {
+      dbPromise = loadLovefieldDB(schema.DataStoreType.INDEXED_DB)
+        .then(db => {
+          loadedDB = db;
+          return Promise.resolve(loadedDB);
+        });
+    }
+    return dbPromise;
+  }
+  return Promise.resolve(loadedDB);
+}
+
 
 async function getStateFetcher(): Promise<IFetcher> {
   // I don't think it's worth it to cache this? We only need it for syncs and sending tx

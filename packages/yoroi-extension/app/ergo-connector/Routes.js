@@ -5,7 +5,6 @@ import { Route, Redirect, Switch } from 'react-router-dom';
 import type { StoresMap } from './stores/index';
 import type { ActionsMap } from './actions/index';
 import { ROUTES } from './routes-config';
-import type { InjectedOrGenerated } from '../types/injectedPropsType';
 
 // PAGES
 import ConnectContainer from './containers/ConnectContainer';
@@ -16,8 +15,16 @@ import SettingsContainer from './containers/SettingsContainer';
 import TermsOfUseContainer from './containers/TermsOfUseContainer';
 import SupportContainer from './containers/SupportContainer';
 import AboutContainer from './containers/AboutContainer';
+import LoadingPage from '../containers/LoadingPage';
 
-export const Routes = (stores: StoresMap, actions: ActionsMap): Node => (
+export const Routes = (stores: StoresMap, actions: ActionsMap): Node => {
+  if (stores.loading.isLoading) {
+    return <LoadingPage stores={stores} actions={actions} />;
+  }
+  return ToplevelPages(stores, actions);
+};
+
+const ToplevelPages = (stores: StoresMap, actions: ActionsMap): Node => (
   <Switch>
     <Route
       exact
@@ -41,8 +48,8 @@ export const Routes = (stores: StoresMap, actions: ActionsMap): Node => (
     />
     <Route
       path={ROUTES.ROOT}
-      component={props =>
-        wrapGeneralPages({ ...props, stores, actions }, GeneralSubpages(stores, actions))
+      component={_props =>
+        wrapGeneralPages(GeneralSubpages(stores, actions))
       }
     />
     <Redirect to={ROUTES.SETTINGS.GENERAL} />
@@ -70,6 +77,6 @@ const GeneralSubpages = (stores, actions) => (
   </Switch>
 );
 
-export function wrapGeneralPages(generalProps: InjectedOrGenerated<any>, children: Node): Node {
+export function wrapGeneralPages(children: Node): Node {
   return <Layout>{children}</Layout>;
 }
