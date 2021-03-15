@@ -1,7 +1,6 @@
 /* eslint-disable promise/always-return */
 // @flow
 import { observable, action, runInAction, computed } from 'mobx';
-import { getWalletsInfo } from '../../../chrome/extension/utils';
 import Request from '../../stores/lib/LocalizedRequest';
 import Store from '../../stores/base/Store';
 import type {
@@ -16,6 +15,19 @@ import type {
 import type { ActionsMap } from '../actions/index';
 import type { StoresMap } from './index';
 import { LoadingWalletStates } from '../types';
+import {
+  getWallets
+} from '../../api/common/index';
+import { isCardanoHaskell, isErgo, } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import {
+  asGetPublicKey,
+} from '../../api/ada/lib/storage/models/PublicDeriver/traits';
+import {
+  connectorGetBalance,
+} from '../../../chrome/extension/ergo-connector/api';
+import { Bip44Wallet } from '../../api/ada/lib/storage/models/Bip44Wallet/wrapper';
+import { walletChecksum, legacyWalletChecksum } from '@emurgo/cip4-js';
+import type { WalletChecksum } from '@emurgo/cip4-js';
 
 // Need to run only once - Connecting wallets
 let initedConnecting = false;
@@ -105,9 +117,9 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     this.actions.connector.cancelSignInTx.listen(this._cancelSignInTx);
     this.actions.connector.getSigningMsg.listen(this._getSigningMsg);
     this.actions.connector.refreshActiveSites.listen(this._refreshActiveSites);
+    this.actions.connector.refreshWallets.listen(this._getWallets);
     this.actions.connector.closeWindow.listen(this._closeWindow);
     this._getConnectorWhitelist();
-    this._getWallets();
     this._getConnectingMsg();
     this._getSigningMsg();
     this.currentConnectorWhitelist;
@@ -198,20 +210,47 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   // ========== wallets info ========== //
   @action
   _getWallets: void => Promise<void> = async () => {
-    this.loadingWallets = LoadingWalletStates.PENDING;
-    await getWalletsInfo()
-      .then(response => {
-        runInAction(() => {
-          this.loadingWallets = LoadingWalletStates.SUCCESS;
-          this.wallets = response;
+    runInAction(() => {
+      this.loadingWallets = LoadingWalletStates.PENDING;
+    });
+
+    const persistentDb = this.stores.loading.loadPersistentDbRequest.result;
+    if (persistentDb == null) {
+      throw new Error(`${nameof(this._getWallets)} db not loaded. Should never happen`);
+    }
+    try {
+      const wallets = await getWallets({ db: persistentDb });
+
+      const ergoWallets = wallets.filter(
+        wallet => isErgo(wallet.getParent().getNetworkInfo())
+      );
+
+      // TODO: need to get rid of AccountInfo entirely, but this is a temporary solution
+      const result = [];
+      for (const ergoWallet of ergoWallets) {
+        const conceptualInfo = await ergoWallet.getParent().getFullConceptualWalletInfo();
+        const withPubKey = asGetPublicKey(ergoWallet);
+        // TODO: we can't get the pending txs from background.js from here
+        // since it runs in a different context. Need a better solution
+        const pendingTxs = [];
+        const balance = await connectorGetBalance(ergoWallet, pendingTxs, 'ERG');
+        result.push({
+          name: conceptualInfo.Name,
+          balance: balance.toString(),
+          checksum: await getChecksum(withPubKey)
         });
-      })
-      .catch(err => {
-        runInAction(() => {
-          this.loadingWallets = LoadingWalletStates.REJECTED;
-          this.errorWallets = err.message;
-        });
+      }
+
+      runInAction(() => {
+        this.loadingWallets = LoadingWalletStates.SUCCESS;
+        this.wallets = result;
       });
+    } catch (err) {
+      runInAction(() => {
+        this.loadingWallets = LoadingWalletStates.REJECTED;
+        this.errorWallets = err.message;
+      });
+    }
   };
 
   // ========== whitelist ========== //
@@ -251,4 +290,22 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     }
     return result ?? { sites: [] };
   }
+}
+
+// TODO: do something better than duplicating the logic here
+async function getChecksum(
+  publicDeriver: ReturnType<typeof asGetPublicKey>,
+): Promise<void | WalletChecksum> {
+  if (publicDeriver == null) return undefined;
+
+  const hash = (await publicDeriver.getPublicKey()).Hash;
+
+  const isLegacyWallet =
+    isCardanoHaskell(publicDeriver.getParent().getNetworkInfo()) &&
+    publicDeriver.getParent() instanceof Bip44Wallet;
+  const checksum = isLegacyWallet
+    ? legacyWalletChecksum(hash)
+    : walletChecksum(hash);
+
+  return checksum;
 }

@@ -39,7 +39,7 @@ export default class ConnectContainer extends Component<
   };
 
   componentDidMount() {
-    this.generated.actions.connector.getWallets.trigger();
+    this.generated.actions.connector.refreshWallets.trigger();
     this.generated.actions.connector.getConnectorWhitelist.trigger();
     window.addEventListener('unload', this.onUnload);
   }
@@ -123,8 +123,8 @@ export default class ConnectContainer extends Component<
         getResponse: {|
           trigger: (params: void) => Promise<void>,
         |},
-        getWallets: {|
-          trigger: (params: void) => void,
+        refreshWallets: {|
+          trigger: (params: void) => Promise<void>,
         |},
         closeWindow: {|
           trigger: (params: void) => void,
@@ -169,7 +169,7 @@ export default class ConnectContainer extends Component<
       actions: {
         connector: {
           getResponse: { trigger: actions.connector.getResponse.trigger },
-          getWallets: { trigger: actions.connector.getWallets.trigger },
+          refreshWallets: { trigger: actions.connector.refreshWallets.trigger },
           closeWindow: { trigger: actions.connector.closeWindow.trigger },
           getConnectorWhitelist: { trigger: actions.connector.getConnectorWhitelist.trigger },
           updateConnectorWhitelist: { trigger: actions.connector.updateConnectorWhitelist.trigger },
