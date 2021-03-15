@@ -12,6 +12,9 @@ import { networks, defaultAssets } from '../../api/ada/lib/storage/database/prep
 import { getDefaultEntryToken } from './TokenInfoStore';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
+import {
+  TabIdKeys,
+} from '../../utils/tabManager';
 
 export default class LoadingStore extends BaseLoadingStore<StoresMap, ActionsMap> {
   /**
@@ -108,5 +111,9 @@ export default class LoadingStore extends BaseLoadingStore<StoresMap, ActionsMap
       };
     });
     this.actions.router.goToRoute.trigger({ route: ROUTES.ROOT });
+  }
+
+  getTabIdKey(): string {
+    return TabIdKeys.Primary;
   }
 }
