@@ -19,7 +19,7 @@ import {
 } from '../../../../utils/logging';
 import satisfies from 'semver/functions/satisfies';
 import {
-  OPEN_TAB_ID_KEY,
+  TabIdKeys,
 } from '../../../../utils/tabManager';
 import { migrateFromStorageV1 } from './bridge/walletBuilder/byron';
 import { RustModule } from '../cardanoCrypto/rustLoader';
@@ -152,7 +152,7 @@ async function moveStorage(localStorageApi: LocalStorageApi): Promise<boolean> {
   if (oldStorage.length === 0) {
     return false;
   }
-  if (oldStorage.length === 1 && oldStorage[OPEN_TAB_ID_KEY] != null) {
+  if (oldStorage.length === 1 && oldStorage[TabIdKeys.Primary] != null) {
     // old storage may contain just the tab id
     // since this field is re-generated every time the app launches in the right storage
     // we can just clear it

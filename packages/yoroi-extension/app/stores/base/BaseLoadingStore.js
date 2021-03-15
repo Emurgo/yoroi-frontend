@@ -42,7 +42,7 @@ export default class BaseLoadingStore<TStores, TActions> extends Store<TStores, 
         this.loadPersistentDbRequest.execute().promise
       ])
       .then(async () => {
-        await closeOtherInstances(); // TODO: make this generic
+        await closeOtherInstances(this.getTabIdKey.bind(this)()); // TODO: make this generic
         const persistentDb = this.loadPersistentDbRequest.result;
         if (persistentDb == null) throw new Error(`${nameof(BaseLoadingStore)}::${nameof(this.load)} load db was not loaded. Should never happen`);
         // TODO: does the logic in here still work if the connector is the one accessing the info?
@@ -82,6 +82,10 @@ export default class BaseLoadingStore<TStores, TActions> extends Store<TStores, 
 
   @computed get isLoading(): boolean {
     return !!this._loading;
+  }
+
+  getTabIdKey(): string {
+    throw new Error(`${nameof(BaseLoadingStore)}::${nameof(this.getTabIdKey)} child needs to override this function`);
   }
 
   async preLoadingScreenEnd(): Promise<void> {
