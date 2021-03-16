@@ -1,15 +1,13 @@
 // sets up RPC communication with the connector + access check/request functions
 const initialInject = `
-var timeout = 0;
-
-var connectRequests = [];
+var ergoConnectRequests = [];
 
 window.addEventListener("message", function(event) {
     if (event.data.type == "connector_connected") {
         if (event.data.err !== undefined) {
-            connectRequests.forEach(promise => promise.reject(event.data.err));
+            ergoConnectRequests.forEach(promise => promise.reject(event.data.err));
         } else {
-            connectRequests.forEach(promise => promise.resolve(event.data.success));
+            ergoConnectRequests.forEach(promise => promise.resolve(event.data.success));
         }
     }
 });
@@ -19,7 +17,7 @@ function ergo_request_read_access() {
         window.postMessage({
             type: "connector_connect_request",
         }, location.origin);
-        connectRequests.push({ resolve: resolve, reject: reject });
+        ergoConnectRequests.push({ resolve: resolve, reject: reject });
     });
 }
 
@@ -35,13 +33,13 @@ function ergo_check_read_access() {
 // client-facing ergo object API
 const apiInject = `
 // RPC set-up
-var rpcUid = 0;
-var rpcResolver = new Map();
+var ergoRpcUid = 0;
+var ergoRpcResolver = new Map();
 
 window.addEventListener("message", function(event) {
     if (event.data.type == "connector_rpc_response") {
         console.log("page received from connector: " + JSON.stringify(event.data) + " with source = " + event.source + " and origin = " + event.origin);
-        const rpcPromise = rpcResolver.get(event.data.uid);
+        const rpcPromise = ergoRpcResolver.get(event.data.uid);
         if (rpcPromise !== undefined) {
             const ret = event.data.return;
             if (ret.err !== undefined) {
@@ -101,13 +99,13 @@ class ErgoAPI {
         return new Promise(function(resolve, reject) {
             window.postMessage({
                 type: "connector_rpc_request",
-                uid: rpcUid,
+                uid: ergoRpcUid,
                 function: func,
                 params: params
             }, location.origin);
-            console.log("rpcUid = " + rpcUid);
-            rpcResolver.set(rpcUid, { resolve: resolve, reject: reject });
-            rpcUid += 1;
+            console.log("ergoRpcUid = " + ergoRpcUid);
+            ergoRpcResolver.set(ergoRpcUid, { resolve: resolve, reject: reject });
+            ergoRpcUid += 1;
         });
     }
 }
@@ -224,25 +222,23 @@ if (shouldInject()) {
                 }, location.origin);
             }
         } else if (event.data.type == "connector_connect_request") {
-            if (fullApiInjected) {
-                if (yoroiPort) {
-                    // we can skip communication - API injected + hasn't been disconnected
-                    window.postMessage({
-                        type: "connector_connected",
-                        success: true
-                    }, location.origin);
-                    return;
+            if (fullApiInjected && yoroiPort) {
+                // we can skip communication - API injected + hasn't been disconnected
+                window.postMessage({
+                    type: "connector_connected",
+                    success: true
+                }, location.origin);
+            } else {
+                if (yoroiPort == null) {
+                    createYoroiPort();
                 }
+                // URL must be provided here as the url field of Tab is only available
+                // with the "tabs" permission which Yoroi doesn't have
+                yoroiPort.postMessage({
+                    type: "yoroi_connect_request",
+                    url: location.hostname,
+                });
             }
-            if (yoroiPort) {
-                createYoroiPort();
-            }
-            // URL must be provided here as the url field of Tab is only available
-            // with the "tabs" permission which Yoroi doesn't have
-            yoroiPort.postMessage({
-                type: "yoroi_connect_request",
-                url: location.hostname,
-            });
         }
     });
 }
