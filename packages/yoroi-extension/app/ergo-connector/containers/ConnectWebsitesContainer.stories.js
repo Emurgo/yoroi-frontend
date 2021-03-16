@@ -56,7 +56,7 @@ const genBaseProps: {|
     }]
     : [];
 
-  const activeSites = ['google.com'];
+  const activeSites = { sites: ['google.com'] };
 
   return {
     stores: {
@@ -70,8 +70,9 @@ const genBaseProps: {|
     },
     actions: {
       connector: {
-        getWallets: { trigger: action('getWallets') },
+        refreshWallets: { trigger: async (req) => action('refreshWallets')(req) },
         removeWalletFromWhitelist: { trigger: async (req) => action('removeWalletFromWhitelist')(req) },
+        refreshActiveSites: { trigger: async (req) => action('refreshActiveSites')(req) },
         getConnectorWhitelist: { trigger: async (req) => action('getConnectorWhitelist')(req) },
       },
     },

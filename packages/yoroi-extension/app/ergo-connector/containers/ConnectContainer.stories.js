@@ -63,7 +63,7 @@ export const Generic = (): Node => {
             getResponse: { trigger: async (req) => action('getResponse')(req) },
             getConnectorWhitelist: { trigger: async (req) => action('getConnectorWhitelist')(req) },
             updateConnectorWhitelist: { trigger: async (req) => action('updateConnectorWhitelist')(req) },
-            getWallets: { trigger: action('getWallets') },
+            refreshWallets: { trigger: async (req) => action('refreshWallets')(req) },
             closeWindow: { trigger: action('closeWindow') },
           },
         },

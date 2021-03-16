@@ -22,7 +22,8 @@ export default class ConnectWebsitesContainer extends Component<
   InjectedOrGeneratedConnector<GeneratedData>
 > {
   async componentDidMount() {
-    this.generated.actions.connector.getWallets.trigger();
+    this.generated.actions.connector.refreshWallets.trigger();
+    this.generated.actions.connector.refreshActiveSites.trigger();
     await this.generated.actions.connector.getConnectorWhitelist.trigger();
   }
 
@@ -61,7 +62,7 @@ export default class ConnectWebsitesContainer extends Component<
           accounts={this.generated.stores.connector.currentConnectorWhitelist}
           wallets={wallets}
           onRemoveWallet={this.onRemoveWallet}
-          activeSites={this.generated.stores.connector.activeSites}
+          activeSites={this.generated.stores.connector.activeSites.sites}
         />
       );
     }
@@ -71,8 +72,11 @@ export default class ConnectWebsitesContainer extends Component<
   @computed get generated(): {|
     actions: {|
       connector: {|
-        getWallets: {|
-          trigger: (params: void) => void,
+        refreshWallets: {|
+          trigger: (params: void) => Promise<void>,
+        |},
+        refreshActiveSites: {|
+          trigger: (params: void) => Promise<void>,
         |},
         removeWalletFromWhitelist: {|
           trigger: (params: string) => Promise<void>,
@@ -88,7 +92,7 @@ export default class ConnectWebsitesContainer extends Component<
         currentConnectorWhitelist: ?Array<WhitelistEntry>,
         loadingWallets: $Values<typeof LoadingWalletStates>,
         errorWallets: string,
-        activeSites: Array<string>,
+        activeSites: {| sites: Array<string> |},
       |},
     |},
   |} {
@@ -111,7 +115,8 @@ export default class ConnectWebsitesContainer extends Component<
       },
       actions: {
         connector: {
-          getWallets: { trigger: actions.connector.getWallets.trigger },
+          refreshWallets: { trigger: actions.connector.refreshWallets.trigger },
+          refreshActiveSites: { trigger: actions.connector.refreshActiveSites.trigger },
           removeWalletFromWhitelist: {
             trigger: actions.connector.removeWalletFromWhitelist.trigger,
           },

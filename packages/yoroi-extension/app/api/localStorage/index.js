@@ -11,7 +11,7 @@ import {
     isEmptyStorage,
 } from './primitives';
 import {
-  OPEN_TAB_ID_KEY,
+  TabIdKeys,
 } from '../../utils/tabManager';
 import type { ComplexityLevelType } from '../../types/complexityLevelType';
 import type { WhitelistEntry } from '../../../chrome/extension/ergo-connector/types';
@@ -158,7 +158,8 @@ export default class LocalStorageApi {
     const storage = JSON.parse(await this.getStorage());
     await Object.keys(storage).forEach(async key => {
       // changing this key would cause the tab to close
-      if (key !== OPEN_TAB_ID_KEY) {
+      const isTabCloseKey = new Set(Object.values(TabIdKeys)).has(key);
+      if (!isTabCloseKey) {
         await removeLocalItem(key);
       }
     });
@@ -300,7 +301,8 @@ export default class LocalStorageApi {
   setStorage: { [key: string]: string, ... } => Promise<void> = async (localStorageData) => {
     await Object.keys(localStorageData).forEach(async key => {
       // changing this key would cause the tab to close
-      if (key !== OPEN_TAB_ID_KEY) {
+      const isTabCloseKey = new Set(Object.values(TabIdKeys)).has(key);
+      if (!isTabCloseKey) {
         await setLocalItem(key, localStorageData[key]);
       }
     });
