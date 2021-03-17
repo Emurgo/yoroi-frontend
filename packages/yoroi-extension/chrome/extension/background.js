@@ -51,6 +51,7 @@ import type {
 import {
   loadLovefieldDB,
 } from '../../app/api/ada/lib/storage/database/index';
+import { migrateNoRefresh } from '../../app/api/common/migration';
 
 /*::
 declare var chrome;
@@ -100,7 +101,7 @@ let pendingTxs: PendingTransaction[] = [];
 let loadedDB: ?lf$Database = null;
 let dbPromise: ?Promise<lf$Database> = null;
 
-export async function loadDB(): Promise<lf$Database> {
+async function loadDB(): Promise<lf$Database> {
   if (loadedDB == null) {
     if (dbPromise == null) {
       dbPromise = loadLovefieldDB(schema.DataStoreType.INDEXED_DB)
@@ -108,6 +109,15 @@ export async function loadDB(): Promise<lf$Database> {
           loadedDB = db;
           return Promise.resolve(loadedDB);
         });
+      const db = await dbPromise;
+
+      // process migration here before anything involving storage is cached
+      // as dApp can't easily recover from refreshing a page to wipe cache after storage migration
+      await migrateNoRefresh({
+        localStorageApi: new LocalStorageApi(),
+        persistentDb: db,
+        currVersion: environment.getVersion(),
+      })
     }
     return dbPromise;
   }
@@ -117,8 +127,8 @@ export async function loadDB(): Promise<lf$Database> {
 
 async function getStateFetcher(): Promise<IFetcher> {
   // I don't think it's worth it to cache this? We only need it for syncs and sending tx
-  const localStorgeApi = new LocalStorageApi();
-  const locale = await localStorgeApi.getUserLocale() ?? 'en-US';
+  const localStorageApi = new LocalStorageApi();
+  const locale = await localStorageApi.getUserLocale() ?? 'en-US';
   return Promise.resolve(new BatchedFetcher(new RemoteFetcher(
     () => environment.getVersion(),
     () => locale,
