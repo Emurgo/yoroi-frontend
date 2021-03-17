@@ -66,7 +66,7 @@ Feature: Voting Flow
     Then Then I see qr code step
 
   @it-176
-  Scenario: User enters incorrect spending password in generate step
+  Scenario: User enters incorrect spending password in generate step (IT-176)
     Given There is a Shelley wallet stored named shelley-simple-15
     Given I go to the voting page
     When I click on the register button in the voting page
@@ -83,7 +83,7 @@ Feature: Voting Flow
     Then I see incorrect wallet password dialog
 
   @it-177
-  Scenario: User enters incorrect spending password in transaction step
+  Scenario: User enters incorrect spending password in transaction step (IT-177)
     Given There is a Shelley wallet stored named shelley-simple-15
     Given I go to the voting page
     When I click on the register button in the voting page

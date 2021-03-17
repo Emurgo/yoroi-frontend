@@ -51,7 +51,7 @@ export default class BaseLoadingStore<TStores, TActions> extends Store<TStores, 
           persistentDb,
           currVersion: environment.getVersion(),
         }).promise;
-        await this.preLoadingScreenEnd.bind(this);
+        await this.preLoadingScreenEnd.bind(this)();
         runInAction(() => {
           this.error = null;
           this._loading = false;

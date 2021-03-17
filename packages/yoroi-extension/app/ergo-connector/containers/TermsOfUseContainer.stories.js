@@ -6,7 +6,7 @@ import { withScreenshot } from 'storycap';
 import { globalKnobs } from '../../../stories/helpers/StoryWrapper';
 import { action } from '@storybook/addon-actions';
 import TermsOfUseContainer from './TermsOfUseContainer';
-import { getTermsOfUse } from '../../stores/toplevel/ProfileStore';
+import { getTermsOfUse } from '../../stores/base/BaseProfileStore';
 
 export default {
   title: `${__filename.split('.')[0]}`,
