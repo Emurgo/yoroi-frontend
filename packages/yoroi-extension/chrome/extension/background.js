@@ -90,8 +90,13 @@ type ConnectedSite = {|
 |};
 
 
-// tab id key
-const connectedSites: Map<number, ConnectedSite> = new Map();
+type TabId = number;
+
+const connectedSites: Map<TabId, ConnectedSite> = new Map();
+
+// tabid => chrome.runtime.Port
+const ports: Map<TabId, any> = new Map();
+
 
 let pendingTxs: PendingTransaction[] = [];
 
@@ -207,6 +212,7 @@ async function getSelectedWallet(tabId: number): Promise<PublicDeriver<>> {
   return Promise.reject(new Error(`could not find tabId ${tabId} in connected sites`));
 }
 
+// messages from other parts of Yoroi (i.e. the UI for the connector)
 chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
   async function signTxInputs(
     tx,
@@ -306,6 +312,17 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
       }
     }
     sendResponse(null);
+  } else if (request.type === 'remove_wallet_from_whitelist') {
+    for (const [tabId, site] of connectedSites) {
+      if (site.url === request.url) {
+        const port = ports.get(tabId);
+        if (port) {
+          port.disconnect();
+          ports.delete(tabId);
+        }
+        break;
+      }
+    }
   } else if (request.type === 'get_connected_sites') {
     const activeSites = []
     for (const value of connectedSites.values()){
@@ -393,6 +410,7 @@ chrome.runtime.onMessageExternal.addListener((message, sender) => {
 chrome.runtime.onConnectExternal.addListener(port => {
   if (port.sender.id === environment.ergoConnectorExtensionId) {
     const tabId = port.sender.tab.id;
+    ports.set(tabId, port);
     port.onMessage.addListener(async message => {
       function rpcResponse(response) {
         port.postMessage({
