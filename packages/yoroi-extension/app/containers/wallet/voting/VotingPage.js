@@ -68,7 +68,7 @@ export default class VotingPage extends Component<Props> {
 
     // keep enabled on the testnet
     if (
-      environment.isTest() ||
+      !environment.isTest() &&
       (
         selected.getParent().getNetworkInfo().NetworkId === networks.CardanoMainnet.NetworkId &&
         new Date() >= roundEndDate

@@ -4,6 +4,7 @@ import ProfileStore from './toplevel/ProfileStore';
 import type { Api } from '../../api/index';
 import UiNotificationsStore from '../../stores/toplevel/UiNotificationsStore';
 import UiDialogsStore from '../../stores/toplevel/UiDialogsStore';
+import CoinPriceStore from '../../stores/toplevel/CoinPriceStore';
 import ConnectorStore from './ConnectorStore';
 import ConnectorLoadingStore from './ConnectorLoadingStore';
 import type { ActionsMap } from '../actions';
@@ -13,6 +14,7 @@ const storeClasses = Object.freeze({
   profile: ProfileStore,
   uiDialogs: UiDialogsStore,
   uiNotifications: UiNotificationsStore,
+  coinPriceStore: CoinPriceStore,
   loading: ConnectorLoadingStore,
   connector: ConnectorStore,
 });
@@ -21,6 +23,7 @@ export type StoresMap = {|
   profile: ProfileStore,
   uiDialogs: UiDialogsStore<{||}, ActionsMap>,
   uiNotifications: UiNotificationsStore<{||}, ActionsMap>,
+  coinPriceStore: CoinPriceStore,
   loading: ConnectorLoadingStore,
   connector: ConnectorStore,
 |};
@@ -30,6 +33,7 @@ const stores: WithNullableFields<StoresMap> = observable({
   profile: null,
   uiDialogs: null,
   uiNotifications: null,
+  coinPriceStore: null,
   loading: null,
   connector: null,
 });

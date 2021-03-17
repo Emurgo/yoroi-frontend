@@ -26,7 +26,7 @@ import ThemeManager from '../../app/ThemeManager';
 import { THEMES, changeToplevelTheme } from '../../app/themes';
 import type { Theme } from '../../app/themes';
 import environment from '../../app/environment';
-import { getVarsForTheme } from '../../app/stores/toplevel/ProfileStore';
+import { getVarsForTheme } from '../../app/stores/base/BaseProfileStore';
 
 import { withKnobs, select, boolean } from '@storybook/addon-knobs';
 
