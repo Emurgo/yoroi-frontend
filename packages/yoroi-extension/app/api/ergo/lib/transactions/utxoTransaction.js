@@ -146,7 +146,7 @@ export function sendAllUnsignedTxFromUtxo(request: {|
   }
 
   const wasmInputs = RustModule.SigmaRust.ErgoBoxes.from_boxes_json(
-    toErgoBoxJSON(request.utxos)
+    request.utxos.map(toErgoBoxJSON)
   );
 
   const inputAmountSum = request.utxos.reduce(
@@ -362,7 +362,7 @@ export function newErgoUnsignedTxFromUtxo(request: {|
   })();
 
   const wasmInputs = RustModule.SigmaRust.ErgoBoxes.from_boxes_json(
-    toErgoBoxJSON(request.utxos)
+    request.utxos.map(toErgoBoxJSON)
   );
 
   const selectedInputs = (() => {

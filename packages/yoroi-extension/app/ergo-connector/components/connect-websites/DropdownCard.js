@@ -7,15 +7,20 @@ import DeleteIcon from '../../assets/images/remove-icon.inline.svg';
 import classnames from 'classnames';
 import WalletCard from '../connect/WalletCard';
 import { observer } from 'mobx-react';
-import type { AccountInfo, } from '../../../../chrome/extension/ergo-connector/types';
+import type { PublicDeriverCache, } from '../../../../chrome/extension/ergo-connector/types';
+import type {
+  TokenLookupKey,
+} from '../../../api/common/lib/MultiToken';
+import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 
 type Props = {|
-  label: string,
-  infoText: string,
-  url: ?string,
-  isActiveSite: boolean,
-  wallet: AccountInfo,
-  onRemoveWallet: ?string => void,
+  +label: string,
+  +infoText: string,
+  +url: ?string,
+  +isActiveSite: boolean,
+  +wallet: PublicDeriverCache,
+  +onRemoveWallet: ?string => void,
+  +getTokenInfo: Inexact<TokenLookupKey> => $ReadOnly<TokenRow>,
 |};
 type State = {| isExpanded: boolean |};
 @observer
@@ -64,7 +69,7 @@ export default class DropdownCard extends Component<Props, State> {
                   <DeleteIcon />
                 </span>
               </div>
-              <WalletCard accountInfo={wallet} />
+              <WalletCard publicDeriver={wallet} getTokenInfo={this.props.getTokenInfo} />
             </div>
           </div>
         ) : null}

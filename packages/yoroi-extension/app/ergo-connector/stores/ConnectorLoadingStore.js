@@ -10,6 +10,10 @@ export default class ConnectorLoadingStore extends BaseLoadingStore<StoresMap, A
 
   async preLoadingScreenEnd(): Promise<void> {
     await super.preLoadingScreenEnd();
+
+    await this.stores.tokenInfoStore.refreshTokenInfo();
+    await this.stores.coinPriceStore.loadFromStorage();
+    await this.stores.coinPriceStore.refreshCurrentCoinPrice();
   }
 
   postLoadingScreenEnd(): void {

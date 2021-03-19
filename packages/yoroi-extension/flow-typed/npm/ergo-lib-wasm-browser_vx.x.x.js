@@ -3,17 +3,46 @@
 /* eslint-disable camelcase */
 
 type ErgoBoxJson = {|
-  boxId: string,
-  value: number,
+  boxId: ErgoBoxId,
+  value: number | string,
   ergoTree: string,
   assets: Array<{|
     tokenId: string, // hex
-    amount: number,
+    amount: number | string,
   |}>,
   creationHeight: number,
-  additionalRegisters: {| [key: string]: string /* hex */ |},
+  additionalRegisters: {| [key: string]: ErgoConstant |},
   transactionId: string,
   index: number
+|};
+
+type ErgoTxJson = {|
+  id: string,
+  inputs: Array<{|
+    boxId: string, // hex
+    spendingProof: {|
+      proofBytes: string, // hex
+      extension: {| [key: string]: string /* hex */ |},
+    |},
+    extension?: {| [key: string]: string /* hex */ |},
+  |}>,
+  dataInputs: Array<{|
+    boxId: string, // hex
+    extension?: {| [key: string]: string /* hex */ |},
+  |}>,
+  outputs: Array<{|
+    boxId: string,
+    value: number,
+    ergoTree: string,
+    assets: Array<{|
+      tokenId: string, // hex
+      amount: number,
+    |}>,
+    additionalRegisters: {| [key: string]: string /* hex */ |},
+    creationHeight: number,
+    transactionId: string,
+    index: number,
+  |}>,
 |};
 
 /**
@@ -1166,36 +1195,9 @@ declare module 'ergo-lib-wasm-browser' { // need to wrap flowgen output into mod
 
     /**
     * JSON representation
-    * @returns {any}
+    * @returns {ErgoTxJson}
     */
-    to_json(): {|
-      id: string,
-      inputs: Array<{|
-        boxId: string, // hex
-        spendingProof: {|
-          proofBytes: string, // hex
-          extension: {| [key: string]: string /* hex */ |},
-        |},
-        extension?: {| [key: string]: string /* hex */ |},
-      |}>,
-      dataInputs: Array<{|
-        boxId: string, // hex
-        extension?: {| [key: string]: string /* hex */ |},
-      |}>,
-      outputs: Array<{|
-        boxId: string,
-        value: number,
-        ergoTree: string,
-        assets: Array<{|
-          tokenId: string, // hex
-          amount: number,
-        |}>,
-        additionalRegisters: {| [key: string]: string /* hex */ |},
-        creationHeight: number,
-        transactionId: string,
-        index: number,
-      |}>,
-    |};
+    to_json(): ErgoTxJson;
 
     /**
     * Inputs for transaction

@@ -4,7 +4,7 @@ import { observable, action, runInAction, computed } from 'mobx';
 import Request from '../../stores/lib/LocalizedRequest';
 import Store from '../../stores/base/Store';
 import type {
-  AccountInfo,
+  PublicDeriverCache,
   ConfirmedSignData,
   ConnectingMessage,
   FailedSignData,
@@ -20,14 +20,13 @@ import {
 } from '../../api/common/index';
 import { isCardanoHaskell, isErgo, } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import {
+  asGetBalance,
   asGetPublicKey,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
-import {
-  connectorGetBalance,
-} from '../../../chrome/extension/ergo-connector/api';
 import { Bip44Wallet } from '../../api/ada/lib/storage/models/Bip44Wallet/wrapper';
 import { walletChecksum, legacyWalletChecksum } from '@emurgo/cip4-js';
 import type { WalletChecksum } from '@emurgo/cip4-js';
+import { MultiToken } from '../../api/common/lib/MultiToken';
 
 // Need to run only once - Connecting wallets
 let initedConnecting = false;
@@ -88,7 +87,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
 
   @observable loadingWallets: $Values<typeof LoadingWalletStates> = LoadingWalletStates.IDLE;
   @observable errorWallets: string = '';
-  @observable wallets: Array<AccountInfo> = [];
+  @observable wallets: Array<PublicDeriverCache> = [];
 
   @observable getConnectorWhitelist: Request<
     GetWhitelistFunc
@@ -212,6 +211,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   _getWallets: void => Promise<void> = async () => {
     runInAction(() => {
       this.loadingWallets = LoadingWalletStates.PENDING;
+      this.errorWallets = '';
     });
 
     const persistentDb = this.stores.loading.loadPersistentDbRequest.result;
@@ -225,18 +225,19 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         wallet => isErgo(wallet.getParent().getNetworkInfo())
       );
 
-      // TODO: need to get rid of AccountInfo entirely, but this is a temporary solution
       const result = [];
       for (const ergoWallet of ergoWallets) {
         const conceptualInfo = await ergoWallet.getParent().getFullConceptualWalletInfo();
         const withPubKey = asGetPublicKey(ergoWallet);
-        // TODO: we can't get the pending txs from background.js from here
-        // since it runs in a different context. Need a better solution
-        const pendingTxs = [];
-        const balance = await connectorGetBalance(ergoWallet, pendingTxs, 'ERG');
+
+        const canGetBalance = asGetBalance(ergoWallet);
+        const balance = canGetBalance == null
+          ? new MultiToken([], ergoWallet.getParent().getDefaultToken())
+          : await canGetBalance.getBalance();
         result.push({
+          publicDeriver: ergoWallet,
           name: conceptualInfo.Name,
-          balance: balance.toString(),
+          balance,
           checksum: await getChecksum(withPubKey)
         });
       }

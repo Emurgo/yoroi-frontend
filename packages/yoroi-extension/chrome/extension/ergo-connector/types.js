@@ -1,6 +1,8 @@
 // @flow
 
 import type { WalletChecksum } from '@emurgo/cip4-js';
+import { PublicDeriver } from '../../../app/api/ada/lib/storage/models/PublicDeriver/index';
+import { MultiToken } from '../../../app/api/common/lib/MultiToken';
 
 // ----- Types used in the dApp <-> Yoroi connection bridge ----- //
 
@@ -17,18 +19,7 @@ export function asAddress(input: any): Address {
   throw ConnectorError.invalidRequest(`invalid Address: ${JSON.stringify(input)}`);
 }
 
-export type Box = {|
-  boxId: BoxId,
-  value: Value,
-  ergoTree: ErgoTree,
-  assets: TokenAmount[],
-  additionalRegisters: {| [string]: Constant |},
-  creationHeight: number,
-  transactionId: TxId,
-  index: number,
-|};
-
-export function asBox(input: any): Box {
+export function asBox(input: any): ErgoBoxJson {
   try {
     if (typeof input === 'object' &&
         Array.isArray(input?.assets) &&
@@ -62,9 +53,9 @@ export function asBox(input: any): Box {
 }
 
 // hex string box id
-export type BoxId = string;
+export type ErgoBoxId = string;
 
-export function asBoxId(input: any): BoxId {
+export function asBoxId(input: any): ErgoBoxId {
   if (typeof input === 'string') {
     return input;
   }
@@ -72,9 +63,9 @@ export function asBoxId(input: any): BoxId {
 }
 
 // hex bytes of sigma-rust encoding
-export type Constant = string;
+type ErgoConstant = string;
 
-export function asConstant(input: any): Constant {
+export function asConstant(input: any): ErgoConstant {
   if (typeof input === 'string') {
     return input;
   }
@@ -83,11 +74,11 @@ export function asConstant(input: any): Constant {
 
 // empty object is for P2PK
 // values map is from id to hex-encoded Sigma-state value
-export type ContextExtension = {||} | {|
-    values: {| [string]: string |}
+type ErgoContextExtension = {||} | {|
+  values: {| [string]: string |}
 |};
 
-export function asContextExtension(input: any): ContextExtension {
+export function asContextExtension(input: any): ErgoContextExtension {
   if (typeof input === 'object') {
     if (Object.entries(input).length === 0) {
       // flow complains without the freeze
@@ -118,7 +109,7 @@ export function asErgoTree(input: any): ErgoTree {
 }
 
 export type DataInput = {|
-    boxId: BoxId,
+    boxId: ErgoBoxId,
 |};
 
 export function asDataInput(input: any): DataInput {
@@ -128,7 +119,7 @@ export function asDataInput(input: any): DataInput {
 }
 
 export type SignedInput = {|
-  boxId: BoxId,
+  boxId: ErgoBoxId,
   spendingProof: ProverResult,
 |};
 
@@ -140,8 +131,8 @@ export function asSignedInput(input: any): SignedInput {
 }
 
 export type UnsignedInput = {|
-  boxId: BoxId,
-  extension: ContextExtension,
+  boxId: ErgoBoxId,
+  extension: ErgoContextExtension,
 |};
 
 export function asUnsignedInput(input: any): UnsignedInput {
@@ -172,7 +163,7 @@ export type PaginateError = {|
 
 export type ProverResult = {|
     proofBytes: string,
-    extension: ContextExtension,
+    extension: ErgoContextExtension,
 |};
 
 export function asProverResult(input: any): ProverResult {
@@ -189,7 +180,7 @@ export type SignedTx = {|
   id: TxId,
   inputs: SignedInput[],
   dataInputs: DataInput[],
-  outputs: Box[],
+  outputs: ErgoBoxJson[],
   size: number,
 |};
 
@@ -238,7 +229,7 @@ export type Tx = {|
   id: TxId,
   inputs: UnsignedInput[],
   dataInputs: DataInput[],
-  outputs: Box[],
+  outputs: ErgoBoxJson[],
 |};
 
 export function asTx(input: any): Tx {
@@ -329,9 +320,10 @@ export type APIError = {|
 
 // ----- Types used inside the connector only ----- //
 
-export type AccountInfo = {|
+export type PublicDeriverCache = {|
+  publicDeriver: PublicDeriver<>,
   name: string,
-  balance: Value,
+  balance: MultiToken,
   checksum: void | WalletChecksum,
 |}
 
