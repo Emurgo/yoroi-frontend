@@ -14,12 +14,16 @@ import globalMessages, { connectorMessages } from '../../../i18n/global-messages
 import { observer } from 'mobx-react';
 import LoadingSpinner from '../../../components/widgets/LoadingSpinner';
 import type {
-  AccountInfo,
+  PublicDeriverCache,
   ConnectingMessage,
 } from '../../../../chrome/extension/ergo-connector/types';
 import { LoadingWalletStates } from '../../types';
 import PlaceholderIcon from '../../assets/images/placeholder_icon.inline.svg';
 import ProgressBar from '../ProgressBar';
+import type {
+  TokenLookupKey,
+} from '../../../api/common/lib/MultiToken';
+import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 
 const messages = defineMessages({
   subtitle: {
@@ -41,16 +45,17 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  accounts: Array<AccountInfo>,
-  loading: $Values<typeof LoadingWalletStates>,
-  error: string,
-  message: ?ConnectingMessage,
-  onToggleCheckbox: number => void,
-  onCancel: () => void,
-  onConnect: number => Promise<void>,
-  handleSubmit: () => void,
-  selected: number,
-  network: string,
+  +publicDerivers: Array<PublicDeriverCache>,
+  +loading: $Values<typeof LoadingWalletStates>,
+  +error: string,
+  +message: ?ConnectingMessage,
+  +onToggleCheckbox: number => void,
+  +onCancel: () => void,
+  +onConnect: number => Promise<void>,
+  +handleSubmit: () => void,
+  +selected: number,
+  +getTokenInfo: Inexact<TokenLookupKey> => $ReadOnly<TokenRow>,
+  +network: string,
 |};
 
 @observer
@@ -64,7 +69,7 @@ class ConnectPage extends Component<Props> {
     const {
       loading,
       error,
-      accounts,
+      publicDerivers,
       message,
       onCancel,
       onToggleCheckbox,
@@ -98,19 +103,19 @@ class ConnectPage extends Component<Props> {
             <div className={styles.loading}>
               <LoadingSpinner />
             </div>
-          ) : isSuccess && accounts.length ? (
-            accounts.map((item, idx) => (
+          ) : isSuccess && publicDerivers.length ? (
+            publicDerivers.map((item, idx) => (
               <li key={item.name} className={styles.listItem}>
                 <Checkbox
                   skin={CheckboxSkin}
-                  label={<WalletCard accountInfo={item} />}
+                  label={<WalletCard publicDeriver={item} getTokenInfo={this.props.getTokenInfo} />}
                   onChange={() => onToggleCheckbox(idx)}
                   checked={selected === idx}
                   className={styles.checkbox}
                 />
               </li>
             ))
-          ) : isSuccess && !accounts.length ? (
+          ) : isSuccess && !publicDerivers.length ? (
             <p>
               <FormattedHTMLMessage
                 {...messages.noWalletsFound}

@@ -9,6 +9,13 @@ import { LoadingWalletStates } from '../types';
 import { select, } from '@storybook/addon-knobs';
 import { MemoryRouter } from 'react-router';
 import Layout from '../components/layout/Layout';
+import {
+  genErgoSigningWalletWithCache,
+} from '../../../stories/helpers/ergo/ErgoMocks';
+import { MultiToken } from '../../api/common/lib/MultiToken';
+import BigNumber from 'bignumber.js';
+import { mockFromDefaults, } from '../../stores/toplevel/TokenInfoStore';
+import { defaultAssets, } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -28,6 +35,8 @@ export default {
 const genBaseProps: {|
   whitelist: *,
 |} => * = (request) => {
+  const wallet = genErgoSigningWalletWithCache();
+
   const walletsState =  request.whitelist.length === 0
     ? select(
       'loadingWallets',
@@ -41,14 +50,25 @@ const genBaseProps: {|
 
   const wallets = walletsState === LoadingWalletStates.SUCCESS
     ? [{
+      publicDeriver: wallet.publicDeriver,
       name: 'Storybook wallet A',
-      balance: '1234',
+      balance: new MultiToken([{
+        amount: new BigNumber('1234'),
+        identifier: wallet.publicDeriver.getParent().getDefaultToken().defaultIdentifier,
+        networkId: wallet.publicDeriver.getParent().getDefaultToken().defaultNetworkId,
+      }], wallet.publicDeriver.getParent().getDefaultToken()),
       checksum: {
         ImagePart: '7b9bf637f341bed7933c8673f9fb7e405097746115f24ec7d192f80fb6efb219da8bc1902dab99fc070f156b7877f29dd8e581da616ff7fdad28493d084a0db9',
         TextPart: 'XLBS-6706',
-      }},{
+      }
+    }, {
+      publicDeriver: wallet.publicDeriver, // note: same as wallet A (for simplicity)
       name: 'Storybook wallet B',
-      balance: '7890',
+      balance: new MultiToken([{
+        amount: new BigNumber('7890'),
+        identifier: wallet.publicDeriver.getParent().getDefaultToken().defaultIdentifier,
+        networkId: wallet.publicDeriver.getParent().getDefaultToken().defaultNetworkId,
+      }], wallet.publicDeriver.getParent().getDefaultToken()),
       checksum: {
         ImagePart: '7b9bf637f341bed7933c8673f9fb7e405097746115f24ec7d192f80fb6efb219da8bc1902dab99fc070f156b7877f29dd8e581da616ff7fdad28493d084a0db9',
         TextPart: 'XLBS-6706',
@@ -56,7 +76,7 @@ const genBaseProps: {|
     }]
     : [];
 
-  const activeSites = ['google.com'];
+  const activeSites = { sites: ['google.com'] };
 
   return {
     stores: {
@@ -67,11 +87,15 @@ const genBaseProps: {|
         loadingWallets: walletsState,
         activeSites,
       },
+      tokenInfoStore: {
+        tokenInfo: mockFromDefaults(defaultAssets),
+      },
     },
     actions: {
       connector: {
-        getWallets: { trigger: action('getWallets') },
+        refreshWallets: { trigger: async (req) => action('refreshWallets')(req) },
         removeWalletFromWhitelist: { trigger: async (req) => action('removeWalletFromWhitelist')(req) },
+        refreshActiveSites: { trigger: async (req) => action('refreshActiveSites')(req) },
         getConnectorWhitelist: { trigger: async (req) => action('getConnectorWhitelist')(req) },
       },
     },

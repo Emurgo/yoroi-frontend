@@ -13,7 +13,7 @@ import { Action } from '../../app/actions/lib/Action';
 import App from '../../app/App';
 import '../../app/themes/index.global.scss';
 import BigNumber from 'bignumber.js';
-import { addCloseListener } from '../../app/utils/tabManager';
+import { addCloseListener, TabIdKeys } from '../../app/utils/tabManager';
 
 // run MobX in strict mode
 configure({ enforceActions: 'always' });
@@ -51,6 +51,6 @@ const initializeYoroi: void => Promise<void> = async () => {
   );
 };
 
-addCloseListener();
+addCloseListener(TabIdKeys.Primary);
 
 window.addEventListener('load', initializeYoroi);

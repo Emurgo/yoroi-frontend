@@ -8,7 +8,7 @@ import { action } from '@storybook/addon-actions';
 import { ServerStatusErrors } from '../../types/serverStatusErrorType';
 import TermsOfUsePage from './TermsOfUsePage';
 import { withScreenshot } from 'storycap';
-import { getTermsOfUse } from '../../stores/toplevel/ProfileStore';
+import { getTermsOfUse } from '../../stores/base/BaseProfileStore';
 import { globalKnobs } from '../../../stories/helpers/StoryWrapper';
 
 export default {

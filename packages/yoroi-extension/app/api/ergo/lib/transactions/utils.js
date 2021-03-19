@@ -63,72 +63,68 @@ export function convertErgoTransactionsToExportRows(
 }
 
 export function asAddressedUtxo(
-  utxos: IGetAllUtxosResponse,
-): Array<ErgoAddressedUtxo> {
-  return utxos.map(utxo => {
-    const output = utxo.output.UtxoTransactionOutput;
-    if (
-      output.ErgoCreationHeight == null ||
-      output.ErgoBoxId == null ||
-      output.ErgoTree == null
-    ) {
-      throw new Error(`${nameof(asAddressedUtxo)} missing Ergo fields for Ergo UTXO`);
-    }
-    const { ErgoCreationHeight, ErgoBoxId, ErgoTree } = output;
+  utxo: ElementOf<IGetAllUtxosResponse>,
+): ErgoAddressedUtxo {
+  const output = utxo.output.UtxoTransactionOutput;
+  if (
+    output.ErgoCreationHeight == null ||
+    output.ErgoBoxId == null ||
+    output.ErgoTree == null
+  ) {
+    throw new Error(`${nameof(asAddressedUtxo)} missing Ergo fields for Ergo UTXO`);
+  }
+  const { ErgoCreationHeight, ErgoBoxId, ErgoTree } = output;
 
-    const tokenTypes = utxo.output.tokens.reduce(
-      (acc, next) => {
-        if (next.Token.Identifier === PRIMARY_ASSET_CONSTANTS.Ergo) {
-          acc.amount = acc.amount.plus(next.TokenList.Amount);
-        } else {
-          acc.tokens.push({
-            amount: Number(next.TokenList.Amount),
-            tokenId: next.Token.Identifier,
-          });
-        }
-        return acc;
-      },
-      {
-        amount: new BigNumber(0),
-        tokens: [],
+  const tokenTypes = utxo.output.tokens.reduce(
+    (acc, next) => {
+      if (next.Token.Identifier === PRIMARY_ASSET_CONSTANTS.Ergo) {
+        acc.amount = acc.amount.plus(next.TokenList.Amount);
+      } else {
+        acc.tokens.push({
+          amount: Number(next.TokenList.Amount),
+          tokenId: next.Token.Identifier,
+        });
       }
-    );
+      return acc;
+    },
+    {
+      amount: new BigNumber(0),
+      tokens: [],
+    }
+  );
 
-    return {
-      amount: tokenTypes.amount.toString(),
-      receiver: utxo.address,
-      tx_hash: utxo.output.Transaction.Hash,
-      tx_index: utxo.output.UtxoTransactionOutput.OutputIndex,
-      addressing: utxo.addressing,
-      creationHeight: ErgoCreationHeight,
-      boxId: ErgoBoxId,
-      assets: tokenTypes.tokens,
-      additionalRegisters: utxo.output.UtxoTransactionOutput.ErgoRegisters == null
-        ? undefined
-        : JSON.parse(utxo.output.UtxoTransactionOutput.ErgoRegisters),
-      ergoTree: ErgoTree,
-    };
-  });
+  return {
+    amount: tokenTypes.amount.toString(),
+    receiver: utxo.address,
+    tx_hash: utxo.output.Transaction.Hash,
+    tx_index: utxo.output.UtxoTransactionOutput.OutputIndex,
+    addressing: utxo.addressing,
+    creationHeight: ErgoCreationHeight,
+    boxId: ErgoBoxId,
+    assets: tokenTypes.tokens,
+    additionalRegisters: utxo.output.UtxoTransactionOutput.ErgoRegisters == null
+      ? undefined
+      : JSON.parse(utxo.output.UtxoTransactionOutput.ErgoRegisters),
+    ergoTree: ErgoTree,
+  };
 }
 
 export function toErgoBoxJSON(
-  utxos: Array<RemoteUnspentOutput>
-): Array<ErgoBoxJson> {
-  return utxos.map(utxo => {
-      return {
-        boxId: utxo.boxId,
-        value: Number.parseInt(utxo.amount, 10),
-        ergoTree: utxo.ergoTree,
-        assets: (utxo.assets ?? []).map(asset => ({
-          amount: asset.amount,
-          tokenId: asset.tokenId,
-        })),
-        creationHeight: utxo.creationHeight,
-        additionalRegisters: utxo.additionalRegisters || Object.freeze({}),
-        transactionId: utxo.tx_hash,
-        index: utxo.tx_index,
-      };
-    })
+  utxo: RemoteUnspentOutput
+): ErgoBoxJson {
+  return {
+    boxId: utxo.boxId,
+    value: Number.parseInt(utxo.amount, 10),
+    ergoTree: utxo.ergoTree,
+    assets: (utxo.assets ?? []).map(asset => ({
+      amount: asset.amount,
+      tokenId: asset.tokenId,
+    })),
+    creationHeight: utxo.creationHeight,
+    additionalRegisters: utxo.additionalRegisters || Object.freeze({}),
+    transactionId: utxo.tx_hash,
+    index: utxo.tx_index,
+  };
 }
 
 

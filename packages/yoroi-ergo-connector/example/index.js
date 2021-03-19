@@ -1,9 +1,6 @@
 import * as wasm from "ergo-lib-wasm-browser";
 
-if (typeof ergo_request_read_access === "undefined") {
-    alert("ergo not found");
-} else {
-    console.log("ergo found")
+function initDapp() {
     ergo_request_read_access().then(function(access_granted) {
         if (!access_granted) {
             //alert("ergo access denied");
@@ -13,9 +10,6 @@ if (typeof ergo_request_read_access === "undefined") {
             const status = document.getElementById("status");
             status.innerText = "Wallet successfully connected";
             console.log("ergo access given");
-            window.addEventListener("ergo_wallet_disconnected", function(event) {
-                alert("wallet disconnected");
-            });
             // ergo.get_unused_addresses().then(function(addresses) {
             //     //console.log(`get_unused_addresses() = {`);
             //     // for (const address of addresses) {
@@ -139,4 +133,21 @@ if (typeof ergo_request_read_access === "undefined") {
             });
         }
     });
+}
+
+if (typeof ergo_request_read_access === "undefined") {
+    alert("ergo not found");
+} else {
+    console.log("ergo found");
+    window.addEventListener("ergo_wallet_disconnected", function(event) {
+        const status = document.getElementById("status");
+        status.innerText = "";
+        const div = document.getElementById("balance");
+        div.innerText = "Wallet disconnected.";
+        const button = document.createElement("button");
+        button.textContent = "Reconnect";
+        button.onclick = initDapp;
+        div.appendChild(button);
+    });
+    initDapp();
 }

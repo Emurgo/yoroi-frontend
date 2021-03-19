@@ -1,13 +1,6 @@
 // @flow
 import debounce from 'lodash/debounce';
 
-import { schema } from 'lovefield';
-import type {
-  lf$Database,
-} from 'lovefield';
-import {
-  loadLovefieldDB,
-} from '../../app/api/ada/lib/storage/database/index';
 import {
   getWallets
 } from '../../app/api/common/index';
@@ -16,13 +9,14 @@ import {
 } from '../../app/api/ada/lib/storage/models/PublicDeriver/index';
 import {
   asGetAllUtxos,
-  asGetPublicKey,
 } from '../../app/api/ada/lib/storage/models/PublicDeriver/traits';
 import type {
   PendingSignData,
   PendingTransaction,
+  SigningMessage,
+  ConnectingMessage,
+  ConnectedSites,
   RpcUid,
-  AccountInfo,
 } from './ergo-connector/types';
 import {
   APIErrorCodes,
@@ -42,11 +36,6 @@ import {
   connectorGetUsedAddresses,
   connectorGetUnusedAddresses
 } from './ergo-connector/api';
-import { GenericApiError } from '../../app/api/common/errors';
-import { isErgo, isCardanoHaskell, } from '../../app/api/ada/lib/storage/database/prepackaged/networks';
-import { Bip44Wallet } from '../../app/api/ada/lib/storage/models/Bip44Wallet/wrapper';
-import { walletChecksum, legacyWalletChecksum } from '@emurgo/cip4-js';
-import type { WalletChecksum } from '@emurgo/cip4-js';
 import { updateTransactions } from '../../app/api/ergo/lib/storage/bridge/updateTransactions';
 import { environment } from '../../app/environment';
 import { IFetcher } from '../../app/api/ergo/lib/state-fetch/IFetcher';
@@ -55,6 +44,14 @@ import { BatchedFetcher } from '../../app/api/ergo/lib/state-fetch/batchedFetche
 import LocalStorageApi from '../../app/api/localStorage/index';
 import { RustModule } from '../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import { Logger } from '../../app/utils/logging';
+import { schema } from 'lovefield';
+import type {
+  lf$Database,
+} from 'lovefield';
+import {
+  loadLovefieldDB,
+} from '../../app/api/ada/lib/storage/database/index';
+import { migrateNoRefresh } from '../../app/api/common/migration';
 
 /*::
 declare var chrome;
@@ -66,6 +63,17 @@ const onYoroiIconClicked = () => {
 
 chrome.browserAction.onClicked.addListener(debounce(onYoroiIconClicked, 500, { leading: true }));
 
+type AccountIndex = number;
+
+// AccountIndex = successfully connected - which account the user selected
+// null = refused by user
+type ConnectedStatus = ?AccountIndex | {|
+  // response (?AccountIndex) - null means the user refused, otherwise the account they selected
+  resolve: any,
+  // if a window has fetched this to show to the user yet
+  openedWindow: boolean,
+|};
+
 type PendingSign = {|
   // data needed to complete the request
   request: PendingSignData,
@@ -74,6 +82,23 @@ type PendingSign = {|
   // resolve function from signRequest's Promise
   resolve: any
 |}
+
+type ConnectedSite = {|
+  url: string,
+  status: ConnectedStatus,
+  pendingSigns: Map<RpcUid, PendingSign>
+|};
+
+
+type TabId = number;
+
+const connectedSites: Map<TabId, ConnectedSite> = new Map();
+
+// tabid => chrome.runtime.Port
+const ports: Map<TabId, any> = new Map();
+
+
+let pendingTxs: PendingTransaction[] = [];
 
 // This is a temporary workaround to DB duplicate key constraint violations
 // that is happening when multiple DBs are loaded at the same time, or possibly
@@ -89,81 +114,26 @@ async function loadDB(): Promise<lf$Database> {
           loadedDB = db;
           return Promise.resolve(loadedDB);
         });
+      const db = await dbPromise;
+
+      // process migration here before anything involving storage is cached
+      // as dApp can't easily recover from refreshing a page to wipe cache after storage migration
+      await migrateNoRefresh({
+        localStorageApi: new LocalStorageApi(),
+        persistentDb: db,
+        currVersion: environment.getVersion(),
+      })
     }
     return dbPromise;
   }
   return Promise.resolve(loadedDB);
 }
 
-type AccountIndex = number;
 
-// AccountIndex = successfully connected - which account the user selected
-// null = refused by user
-type ConnectedStatus = ?AccountIndex | {|
-  // response (?AccountIndex) - null means the user refused, otherwise the account they selected
-  resolve: any,
-  // if a window has fetched this to show to the user yet
-  openedWindow: boolean,
-|};
-
-type ConnectedSite = {|
-  url: string,
-  status: ConnectedStatus,
-  pendingSigns: Map<RpcUid, PendingSign>
-|};
-
-async function getChecksum(
-  publicDeriver: ReturnType<typeof asGetPublicKey>,
-): Promise<void | WalletChecksum> {
-  if (publicDeriver == null) return undefined;
-
-  const hash = (await publicDeriver.getPublicKey()).Hash;
-
-  const isLegacyWallet =
-    isCardanoHaskell(publicDeriver.getParent().getNetworkInfo()) &&
-    publicDeriver.getParent() instanceof Bip44Wallet;
-  const checksum = isLegacyWallet
-    ? legacyWalletChecksum(hash)
-    : walletChecksum(hash);
-
-  return checksum;
-}
-
-// tab id key
-const connectedSites: Map<number, ConnectedSite> = new Map();
-
-let pendingTxs: PendingTransaction[] = [];
-
-export async function getWalletsInfo(): Promise<AccountInfo[]> {
-  try {
-    const db = await loadDB();
-    const wallets = await getWallets({ db });
-    // information about each wallet to show to the user
-    const accounts = [];
-    for (const wallet of wallets) {
-      const conceptualWallet = wallet.getParent();
-      const withPubKey = asGetPublicKey(wallet);
-
-      const conceptualInfo = await conceptualWallet.getFullConceptualWalletInfo();
-      if (isErgo(conceptualWallet.getNetworkInfo())) {
-        const balance = await connectorGetBalance(wallet, pendingTxs, 'ERG');
-        accounts.push({
-          name: conceptualInfo.Name,
-          balance: balance.toString(),
-          checksum: await getChecksum(withPubKey)
-        });
-      }
-    }
-    return accounts;
-  } catch (error) {
-    throw new GenericApiError();
-  }
-}
-
-export async function getStateFetcher(): Promise<IFetcher> {
+async function getStateFetcher(): Promise<IFetcher> {
   // I don't think it's worth it to cache this? We only need it for syncs and sending tx
-  const localStorgeApi = new LocalStorageApi();
-  const locale = await localStorgeApi.getUserLocale() ?? 'en-US';
+  const localStorageApi = new LocalStorageApi();
+  const locale = await localStorageApi.getUserLocale() ?? 'en-US';
   return Promise.resolve(new BatchedFetcher(new RemoteFetcher(
     () => environment.getVersion(),
     () => locale,
@@ -222,13 +192,6 @@ async function syncWallet(wallet: PublicDeriver<>): Promise<void> {
     Logger.error(`Syncing failed: ${e}`);
   }
 }
-export function getActiveSites(): Array<string> {
-  const activeSites = []
-  for (const value of connectedSites.values()){
-    activeSites.push(value);
-  }
-  return activeSites.map(item => item.url);
-}
 
 async function getSelectedWallet(tabId: number): Promise<PublicDeriver<>> {
   const db = await loadDB();
@@ -249,6 +212,7 @@ async function getSelectedWallet(tabId: number): Promise<PublicDeriver<>> {
   return Promise.reject(new Error(`could not find tabId ${tabId} in connected sites`));
 }
 
+// messages from other parts of Yoroi (i.e. the UI for the connector)
 chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
   async function signTxInputs(
     tx,
@@ -325,10 +289,10 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
       for (const [/* uid */, responseData] of connection.pendingSigns.entries()) {
         if (!responseData.openedWindow) {
           responseData.openedWindow = true;
-          sendResponse({
+          sendResponse(({
             sign: responseData.request,
             tabId
-          });
+          }: SigningMessage));
           return;
         }
       }
@@ -340,14 +304,33 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
       if (connection.status != null && typeof connection.status === 'object') {
         if (!connection.status.openedWindow) {
           connection.status.openedWindow = true;
-          sendResponse({
+          sendResponse(({
             url: connection.url,
             tabId,
-          });
+          }: ConnectingMessage));
         }
       }
     }
     sendResponse(null);
+  } else if (request.type === 'remove_wallet_from_whitelist') {
+    for (const [tabId, site] of connectedSites) {
+      if (site.url === request.url) {
+        const port = ports.get(tabId);
+        if (port) {
+          port.disconnect();
+          ports.delete(tabId);
+        }
+        break;
+      }
+    }
+  } else if (request.type === 'get_connected_sites') {
+    const activeSites = []
+    for (const value of connectedSites.values()){
+      activeSites.push(value);
+    }
+    sendResponse(({
+      sites: activeSites.map(site => site.url),
+    }: ConnectedSites));
   }
 });
 
@@ -427,6 +410,7 @@ chrome.runtime.onMessageExternal.addListener((message, sender) => {
 chrome.runtime.onConnectExternal.addListener(port => {
   if (port.sender.id === environment.ergoConnectorExtensionId) {
     const tabId = port.sender.tab.id;
+    ports.set(tabId, port);
     port.onMessage.addListener(async message => {
       function rpcResponse(response) {
         port.postMessage({
