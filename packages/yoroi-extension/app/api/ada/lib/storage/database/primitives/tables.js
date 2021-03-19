@@ -104,6 +104,7 @@ export type ErgoConfig = $ReadOnly<InexactSubset<{|
 
 export type NetworkInsert = {|
   NetworkId: number,
+  NetworkName: string,
   CoinType: CoinTypesT,
   Backend: {|
     BackendService?: string,
@@ -139,6 +140,7 @@ export const NetworkSchema: {|
   name: 'Network',
   properties: {
     NetworkId: 'NetworkId',
+    NetworkName: 'NetworkName',
     CoinType: 'CoinType',
     Backend: 'Backend',
     BaseConfig: 'BaseConfig',

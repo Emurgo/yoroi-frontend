@@ -1216,6 +1216,7 @@ Object {
       "CoinType": 2147485463,
       "Fork": 0,
       "NetworkId": 0,
+      "NetworkName": "Cardano Mainnet",
     },
     Object {
       "Backend": Object {
@@ -1246,6 +1247,7 @@ Object {
       "CoinType": 2147485463,
       "Fork": 1,
       "NetworkId": 100,
+      "NetworkName": "Jormungandr Mainnet",
     },
     Object {
       "Backend": Object {
@@ -1262,6 +1264,7 @@ Object {
       "CoinType": 2147484077,
       "Fork": 0,
       "NetworkId": 200,
+      "NetworkName": "Ergo Mainnet",
     },
     Object {
       "Backend": Object {
@@ -1294,6 +1297,7 @@ Object {
       "CoinType": 2147485463,
       "Fork": 0,
       "NetworkId": 300,
+      "NetworkName": "Cardano Testnet",
     },
   ],
   "PreferredExplorer": Array [],

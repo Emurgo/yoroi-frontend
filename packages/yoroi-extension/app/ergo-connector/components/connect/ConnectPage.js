@@ -2,7 +2,7 @@
 // @flow
 import React, { Component } from 'react';
 import type { Node } from 'react';
-import { intlShape, defineMessages } from 'react-intl';
+import { intlShape, defineMessages, FormattedHTMLMessage } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import styles from './ConnectPage.scss';
 import { Button } from 'react-polymorph/lib/components/Button';
@@ -40,7 +40,7 @@ const messages = defineMessages({
   },
   noWalletsFound: {
     id: 'ergo-connector.connect.noWalletsFound',
-    defaultMessage: '!!!No wallets found',
+    defaultMessage: '!!!No {network} wallets found.',
   },
 });
 
@@ -55,6 +55,7 @@ type Props = {|
   +handleSubmit: () => void,
   +selected: number,
   +getTokenInfo: Inexact<TokenLookupKey> => $ReadOnly<TokenRow>,
+  +network: string,
 |};
 
 @observer
@@ -74,6 +75,7 @@ class ConnectPage extends Component<Props> {
       onToggleCheckbox,
       handleSubmit,
       selected,
+      network
     } = this.props;
 
     const isLoading = (
@@ -101,8 +103,7 @@ class ConnectPage extends Component<Props> {
             <div className={styles.loading}>
               <LoadingSpinner />
             </div>
-          ) : isSuccess ? (
-            publicDerivers.length > 0 &&
+          ) : isSuccess && publicDerivers.length ? (
             publicDerivers.map((item, idx) => (
               <li key={item.name} className={styles.listItem}>
                 <Checkbox
@@ -115,7 +116,12 @@ class ConnectPage extends Component<Props> {
               </li>
             ))
           ) : isSuccess && !publicDerivers.length ? (
-            <div>{intl.formatMessage(messages.noWalletsFound)}</div>
+            <p>
+              <FormattedHTMLMessage
+                {...messages.noWalletsFound}
+                values={{ network }}
+              />
+            </p>
           ) : null}
         </ul>
         <div className={styles.bottom}>
