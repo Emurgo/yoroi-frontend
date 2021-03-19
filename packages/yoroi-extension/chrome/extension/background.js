@@ -90,6 +90,19 @@ type ConnectedSite = {|
 |};
 
 
+let bounds: {| width: number, positionX: number, positionY: number |} = {
+  width: screen.availWidth,
+  positionX: 0,
+  positionY: 20
+};
+
+const popupProps: {|width: number, height: number, focused: boolean, type: string|} = {
+  width: 500,
+  height: 700,
+  focused: true,
+  type: 'popup',
+};
+
 type TabId = number;
 
 const connectedSites: Map<TabId, ConnectedSite> = new Map();
@@ -344,11 +357,10 @@ async function confirmSign(tabId: number, request: PendingSignData): Promise<any
         resolve
       });
        chrome.windows.create({
-        url: `${window.location.origin}/main_window_ergo.html#/signin-transaction`,
-        width: 500,
-        height: 700,
-        focused: true,
-        type: 'popup'
+         ...popupProps,
+        url: chrome.extension.getURL(`/main_window_ergo.html#/signin-transaction`),
+        left: (bounds.width + bounds.positionX) - popupProps.width,
+        top: bounds.positionY + 80,
       });
     } else {
       // console.log(`ERR - confirmSign could not find connection with tabId = ${tabId}`);
@@ -380,11 +392,10 @@ async function confirmConnect(tabId: number, url: string): Promise<?AccountIndex
           pendingSigns: new Map()
         });
         chrome.windows.create({
-          url: 'main_window_ergo.html',
-          width: 500,
-          height: 700,
-          focused: true,
-          type: 'popup'
+          ...popupProps,
+          url: chrome.extension.getURL('main_window_ergo.html'),
+          left: (bounds.width + bounds.positionX) - popupProps.width,
+          top: bounds.positionY + 80,
         });
       }
     });
@@ -396,11 +407,10 @@ chrome.runtime.onMessageExternal.addListener((message, sender) => {
   if (sender.id === environment.ergoConnectorExtensionId) {
     if (message.type === 'open_browseraction_menu') {
       chrome.windows.create({
-        url: `${window.location.origin}/main_window_ergo.html#/settings`,
-        width: 500,
-        height: 700,
-        focused: true,
-        type: 'popup'
+        ...popupProps,
+        url: chrome.extension.getURL(`/main_window_ergo.html#/settings`),
+        left: (bounds.width + bounds.positionX) - popupProps.width,
+        top: bounds.positionY + 80,
       });
     }
   }
@@ -412,6 +422,8 @@ chrome.runtime.onConnectExternal.addListener(port => {
     const tabId = port.sender.tab.id;
     ports.set(tabId, port);
     port.onMessage.addListener(async message => {
+      // update bound from DOM
+      bounds = { ...bounds, ...message.bounds }
       function rpcResponse(response) {
         port.postMessage({
           type: 'connector_rpc_response',
