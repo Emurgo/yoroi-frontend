@@ -5,6 +5,7 @@ import type { Api } from '../../api/index';
 import UiNotificationsStore from '../../stores/toplevel/UiNotificationsStore';
 import UiDialogsStore from '../../stores/toplevel/UiDialogsStore';
 import CoinPriceStore from '../../stores/toplevel/CoinPriceStore';
+import TokenInfoStore from '../../stores/toplevel/TokenInfoStore';
 import ConnectorStore from './ConnectorStore';
 import ConnectorLoadingStore from './ConnectorLoadingStore';
 import type { ActionsMap } from '../actions';
@@ -17,6 +18,7 @@ const storeClasses = Object.freeze({
   coinPriceStore: CoinPriceStore,
   loading: ConnectorLoadingStore,
   connector: ConnectorStore,
+  tokenInfoStore: TokenInfoStore,
 });
 
 export type StoresMap = {|
@@ -26,6 +28,7 @@ export type StoresMap = {|
   coinPriceStore: CoinPriceStore,
   loading: ConnectorLoadingStore,
   connector: ConnectorStore,
+  tokenInfoStore: TokenInfoStore,
 |};
 
 /** Constant that represents the stores across the lifetime of the application */
@@ -36,6 +39,7 @@ const stores: WithNullableFields<StoresMap> = observable({
   coinPriceStore: null,
   loading: null,
   connector: null,
+  tokenInfoStore: null,
 });
 
 export default (action(

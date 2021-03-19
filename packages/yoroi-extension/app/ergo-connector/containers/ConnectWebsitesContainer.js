@@ -8,12 +8,14 @@ import { observer } from 'mobx-react';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import type { InjectedOrGeneratedConnector } from '../../types/injectedPropsType';
 import type {
-  AccountInfo,
+  PublicDeriverCache,
   WhitelistEntry,
 } from '../../../chrome/extension/ergo-connector/types';
 import { LoadingWalletStates } from '../types';
 import VerticallyCenteredLayout from '../../components/layout/VerticallyCenteredLayout'
 import FullscreenLayout from '../../components/layout/FullscreenLayout'
+import { genLookupOrFail, } from '../../stores/stateless/tokenHelpers';
+import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
 
 type GeneratedData = typeof ConnectWebsitesContainer.prototype.generated;
 
@@ -63,6 +65,7 @@ export default class ConnectWebsitesContainer extends Component<
           wallets={wallets}
           onRemoveWallet={this.onRemoveWallet}
           activeSites={this.generated.stores.connector.activeSites.sites}
+          getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
         />
       );
     }
@@ -88,11 +91,14 @@ export default class ConnectWebsitesContainer extends Component<
     |},
     stores: {|
       connector: {|
-        wallets: ?Array<AccountInfo>,
+        wallets: ?Array<PublicDeriverCache>,
         currentConnectorWhitelist: ?Array<WhitelistEntry>,
         loadingWallets: $Values<typeof LoadingWalletStates>,
         errorWallets: string,
         activeSites: {| sites: Array<string> |},
+      |},
+      tokenInfoStore: {|
+        tokenInfo: TokenInfoMap,
       |},
     |},
   |} {
@@ -111,6 +117,9 @@ export default class ConnectWebsitesContainer extends Component<
           loadingWallets: stores.connector.loadingWallets,
           errorWallets: stores.connector.errorWallets,
           activeSites: stores.connector.activeSites,
+        },
+        tokenInfoStore: {
+          tokenInfo: stores.tokenInfoStore.tokenInfo,
         },
       },
       actions: {

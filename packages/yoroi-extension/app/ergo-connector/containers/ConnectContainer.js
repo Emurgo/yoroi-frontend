@@ -6,11 +6,13 @@ import { observer } from 'mobx-react';
 import { computed } from 'mobx';
 import type { InjectedOrGeneratedConnector } from '../../types/injectedPropsType';
 import type {
-  AccountInfo,
+  PublicDeriverCache,
   ConnectingMessage,
   WhitelistEntry,
 } from '../../../chrome/extension/ergo-connector/types';
 import { LoadingWalletStates } from '../types';
+import { genLookupOrFail, } from '../../stores/stateless/tokenHelpers';
+import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
 
 type GeneratedData = typeof ConnectContainer.prototype.generated;
 declare var chrome;
@@ -107,12 +109,13 @@ export default class ConnectContainer extends Component<
         loading={loadingWallets}
         error={error}
         message={responseMessage}
-        accounts={wallets}
+        publicDerivers={wallets}
         onConnect={this.onConnect}
         onToggleCheckbox={this.onToggleCheckbox}
         onCancel={this.onCancel}
         handleSubmit={this.handleSubmit}
         selected={selected}
+        getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
       />
     );
   }
@@ -142,10 +145,13 @@ export default class ConnectContainer extends Component<
     stores: {|
       connector: {|
         connectingMessage: ?ConnectingMessage,
-        wallets: Array<AccountInfo>,
+        wallets: Array<PublicDeriverCache>,
         currentConnectorWhitelist: Array<WhitelistEntry>,
         errorWallets: string,
         loadingWallets: $Values<typeof LoadingWalletStates>,
+      |},
+      tokenInfoStore: {|
+        tokenInfo: TokenInfoMap,
       |},
     |},
   |} {
@@ -164,6 +170,9 @@ export default class ConnectContainer extends Component<
           wallets: stores.connector.wallets,
           errorWallets: stores.connector.errorWallets,
           loadingWallets: stores.connector.loadingWallets,
+        },
+        tokenInfoStore: {
+          tokenInfo: stores.tokenInfoStore.tokenInfo,
         },
       },
       actions: {
