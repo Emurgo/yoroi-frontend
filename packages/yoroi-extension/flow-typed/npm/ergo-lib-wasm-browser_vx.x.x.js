@@ -3,7 +3,7 @@
 /* eslint-disable camelcase */
 
 type ErgoBoxJson = {|
-  boxId: ErgoBoxId,
+  boxId: string,
   value: number | string,
   ergoTree: string,
   assets: Array<{|
@@ -11,7 +11,7 @@ type ErgoBoxJson = {|
     amount: number | string,
   |}>,
   creationHeight: number,
-  additionalRegisters: {| [key: string]: ErgoConstant |},
+  additionalRegisters: {| [key: string]: string |},
   transactionId: string,
   index: number
 |};
