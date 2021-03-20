@@ -64,6 +64,9 @@ export const Generic = (): Node => {
     <ConnectContainer
       generated={{
         stores: {
+          profile: {
+            shouldHideBalance: false
+          },
           connector: {
             connectingMessage: undefined,
             wallets,

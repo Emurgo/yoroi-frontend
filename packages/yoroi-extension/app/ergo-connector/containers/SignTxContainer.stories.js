@@ -61,6 +61,9 @@ const message = {
 const genBaseProps: {||} => * = () => {
   return {
     stores: {
+      profile: {
+        shouldHideBalance: false
+      },
       connector: {
         signingMessage: message,
         totalAmount: 5,
