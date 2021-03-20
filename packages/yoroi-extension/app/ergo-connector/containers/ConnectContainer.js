@@ -118,6 +118,7 @@ export default class ConnectContainer extends Component<
         selected={selected}
         network={networks.ErgoMainnet.NetworkName}
         getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
+        shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
       />
     );
   }
@@ -145,6 +146,9 @@ export default class ConnectContainer extends Component<
       |},
     |},
     stores: {|
+      profile: {|
+        shouldHideBalance: boolean,
+      |},
       connector: {|
         connectingMessage: ?ConnectingMessage,
         wallets: Array<PublicDeriverCache>,
@@ -166,6 +170,9 @@ export default class ConnectContainer extends Component<
     const { stores, actions } = this.props;
     return Object.freeze({
       stores: {
+        profile: {
+          shouldHideBalance: stores.profile.shouldHideBalance
+        },
         connector: {
           connectingMessage: stores.connector.connectingMessage,
           currentConnectorWhitelist: stores.connector.currentConnectorWhitelist,

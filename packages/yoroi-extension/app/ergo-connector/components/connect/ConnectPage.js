@@ -56,6 +56,7 @@ type Props = {|
   +selected: number,
   +getTokenInfo: Inexact<TokenLookupKey> => $ReadOnly<TokenRow>,
   +network: string,
+  +shouldHideBalance: boolean,
 |};
 
 @observer
@@ -75,7 +76,8 @@ class ConnectPage extends Component<Props> {
       onToggleCheckbox,
       handleSubmit,
       selected,
-      network
+      network,
+      shouldHideBalance,
     } = this.props;
 
     const isLoading = (
@@ -108,7 +110,13 @@ class ConnectPage extends Component<Props> {
               <li key={item.name} className={styles.listItem}>
                 <Checkbox
                   skin={CheckboxSkin}
-                  label={<WalletCard publicDeriver={item} getTokenInfo={this.props.getTokenInfo} />}
+                  label={
+                    <WalletCard
+                      shouldHideBalance={shouldHideBalance}
+                      publicDeriver={item}
+                      getTokenInfo={this.props.getTokenInfo}
+                    />
+                  }
                   onChange={() => onToggleCheckbox(idx)}
                   checked={selected === idx}
                   className={styles.checkbox}
