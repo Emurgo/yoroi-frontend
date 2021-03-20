@@ -9,6 +9,7 @@ import { Link } from 'react-router-dom';
 import { ROUTES } from '../../routes-config';
 import { defineMessages, intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import TestnetWarningBanner from '../../../components/topbar/banners/TestnetWarningBanner';
 
 type Props = {|
   children: Node,
@@ -34,21 +35,24 @@ export default class Layout extends Component<Props> {
     const { intl } = this.context;
 
     return (
-      <div className={styles.layout}>
-        <div className={styles.header}>
-          <Link to={ROUTES.SETTINGS.GENERAL} className={styles.menuIcon}>
-            <MenuIcon />
-          </Link>
-          <div className={styles.menu}>
-            <YoroiLogo />
-            <div className={styles.logo}>
-              <h3>{intl.formatMessage(messages.yoroiDappConnector)}</h3>
-              <p className={styles.poweredBy}>{intl.formatMessage(messages.poweredBy)}</p>
+      <>
+        <TestnetWarningBanner isTestnet={false} />
+        <div className={styles.layout}>
+          <div className={styles.header}>
+            <Link to={ROUTES.SETTINGS.GENERAL} className={styles.menuIcon}>
+              <MenuIcon />
+            </Link>
+            <div className={styles.menu}>
+              <YoroiLogo />
+              <div className={styles.logo}>
+                <h3>{intl.formatMessage(messages.yoroiDappConnector)}</h3>
+                <p className={styles.poweredBy}>{intl.formatMessage(messages.poweredBy)}</p>
+              </div>
             </div>
           </div>
+          <div className={styles.content}>{this.props.children}</div>
         </div>
-        <div className={styles.content}>{this.props.children}</div>
-      </div>
+      </>
     );
   }
 }
