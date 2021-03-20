@@ -75,6 +75,7 @@ export default class SignTxContainer extends Component<
             totalAmount={this.generated.stores.connector.totalAmount}
             onConfirm={this.onConfirm}
             onCancel={this.onCancel}
+            shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
           />
         );
         break;
@@ -102,6 +103,9 @@ export default class SignTxContainer extends Component<
       |},
     |},
     stores: {|
+      profile: {|
+        shouldHideBalance: boolean,
+      |},
       connector: {|
         signingMessage: ?SigningMessage,
         totalAmount: ?number,
@@ -121,6 +125,9 @@ export default class SignTxContainer extends Component<
     const { stores, actions } = this.props;
     return Object.freeze({
       stores: {
+        profile: {
+          shouldHideBalance: stores.profile.shouldHideBalance,
+        },
         connector: {
           signingMessage: stores.connector.signingMessage,
           totalAmount: stores.connector.totalAmount,

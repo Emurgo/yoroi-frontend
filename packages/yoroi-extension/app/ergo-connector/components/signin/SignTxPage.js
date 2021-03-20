@@ -21,6 +21,7 @@ import ExplorableHash from '../../../components/widgets/hashWrappers/ExplorableH
 import type { Notification } from '../../../types/notificationType';
 import { truncateConnectorBoxId } from '../../../utils/formatters';
 import ProgressBar from '../ProgressBar';
+import { hiddenAmount } from '../../../utils/strings';
 
 type Props = {|
   totalAmount: ?number,
@@ -29,6 +30,7 @@ type Props = {|
   onCancel: () => void,
   onConfirm: string => void,
   +notification: ?Notification,
+  +shouldHideBalance: boolean,
 |};
 
 // TODO: get explorer from user settings
@@ -87,7 +89,14 @@ class SignTxPage extends Component<Props> {
     const walletPasswordField = form.$('walletPassword');
 
     const { intl } = this.context;
-    const { txData, onCopyAddressTooltip, onCancel, notification, totalAmount } = this.props;
+    const {
+      txData,
+      onCopyAddressTooltip,
+      onCancel,
+      notification,
+      totalAmount,
+      shouldHideBalance,
+    } = this.props;
 
     return (
       <>
@@ -103,7 +112,7 @@ class SignTxPage extends Component<Props> {
               {txData.outputs.map(({ value, assets, boxId }) => {
                 return (
                   <div className={styles.amountRow} key={boxId}>
-                    <p className={styles.amount}>{value} ERG</p>
+                    <p className={styles.amount}>{shouldHideBalance ? hiddenAmount : value} ERG</p>
                     {assets && assets.length ? (
                       assets.map(({ tokenId, amount }) => (
                         <p className={styles.stablecoins} key={tokenId}>
@@ -127,7 +136,9 @@ class SignTxPage extends Component<Props> {
             <p className={styles.label}>
               {intl.formatMessage(globalMessages.walletSendConfirmationTotalLabel)}
             </p>
-            <p className={styles.totalValue}>{totalAmount} ERG</p>
+            <p className={styles.totalValue}>
+              {shouldHideBalance ? hiddenAmount : totalAmount} ERG
+            </p>
           </div>
           <div className={styles.address}>
             <div className={styles.addressFrom}>
