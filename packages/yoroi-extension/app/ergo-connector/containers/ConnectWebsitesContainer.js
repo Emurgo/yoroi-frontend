@@ -12,9 +12,9 @@ import type {
   WhitelistEntry,
 } from '../../../chrome/extension/ergo-connector/types';
 import { LoadingWalletStates } from '../types';
-import VerticallyCenteredLayout from '../../components/layout/VerticallyCenteredLayout'
-import FullscreenLayout from '../../components/layout/FullscreenLayout'
-import { genLookupOrFail, } from '../../stores/stateless/tokenHelpers';
+import VerticallyCenteredLayout from '../../components/layout/VerticallyCenteredLayout';
+import FullscreenLayout from '../../components/layout/FullscreenLayout';
+import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
 import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
 
 type GeneratedData = typeof ConnectWebsitesContainer.prototype.generated;
@@ -30,9 +30,9 @@ export default class ConnectWebsitesContainer extends Component<
   }
 
   onRemoveWallet: ?string => void = url => {
-    if(url == null) {
+    if (url == null) {
       throw new Error(`Removing a wallet from whitelist but there's no url`);
-    };
+    }
     this.generated.actions.connector.removeWalletFromWhitelist.trigger(url);
   };
 
@@ -66,6 +66,7 @@ export default class ConnectWebsitesContainer extends Component<
           onRemoveWallet={this.onRemoveWallet}
           activeSites={this.generated.stores.connector.activeSites.sites}
           getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
+          shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
         />
       );
     }
@@ -90,6 +91,9 @@ export default class ConnectWebsitesContainer extends Component<
       |},
     |},
     stores: {|
+      profile: {|
+        shouldHideBalance: boolean,
+      |},
       connector: {|
         wallets: ?Array<PublicDeriverCache>,
         currentConnectorWhitelist: ?Array<WhitelistEntry>,
@@ -111,6 +115,9 @@ export default class ConnectWebsitesContainer extends Component<
     const { stores, actions } = this.props;
     return Object.freeze({
       stores: {
+        profile: {
+          shouldHideBalance: stores.profile.shouldHideBalance,
+        },
         connector: {
           wallets: stores.connector.wallets,
           currentConnectorWhitelist: stores.connector.currentConnectorWhitelist,
