@@ -233,22 +233,11 @@ if (shouldInject()) {
                     createYoroiPort();
                 }
 
-                // Get measures from DOM
-                const width  = window.innerWidth || document.documentElement.clientWidth || 
-                    document.body.clientWidth;
-
-                const bounds = { 
-                    width,
-                    positionX: window.screenX,
-                    positionY: window.screenY,
-                }
-
                 // URL must be provided here as the url field of Tab is only available
                 // with the "tabs" permission which Yoroi doesn't have
                 yoroiPort.postMessage({
                     type: "yoroi_connect_request",
                     url: location.hostname,
-                    bounds
                 });
             }
         }

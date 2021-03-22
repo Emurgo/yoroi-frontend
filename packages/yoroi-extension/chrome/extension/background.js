@@ -90,11 +90,40 @@ type ConnectedSite = {|
 |};
 
 
-let bounds: {| width: number, positionX: number, positionY: number |} = {
-  width: screen.availWidth,
-  positionX: 0,
-  positionY: 20
-};
+function getDefaultBounds(): {| width: number, positionX: number, positionY: number |} {
+  return {
+    width: screen.availWidth,
+    positionX: 0,
+    positionY: 0,
+  };
+}
+
+function getBoundsForWindow(
+  targetWindow
+): {| width: number, positionX: number, positionY: number |} {
+  const defaults = getDefaultBounds();
+
+  const bounds = {
+      width: targetWindow.width ?? defaults.width,
+      positionX: targetWindow.left ?? defaults.positionX,
+      positionY: targetWindow.top ?? defaults.positionY,
+  };
+
+  return bounds;
+}
+function getBoundsForTabWindow(
+  targetTabId
+): Promise<{| width: number, positionX: number, positionY: number |}> {
+  return new Promise(resolve => {
+    chrome.tabs.get(targetTabId, (tab) => {
+      if (tab == null) return resolve(getDefaultBounds());
+      chrome.windows.get(tab.windowId, (targetWindow) => {
+        if (targetWindow == null) return resolve(getDefaultBounds());
+        resolve(getBoundsForWindow(targetWindow));
+      });
+    });
+  });
+}
 
 const popupProps: {|width: number, height: number, focused: boolean, type: string|} = {
   width: 500,
@@ -348,6 +377,7 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
 });
 
 async function confirmSign(tabId: number, request: PendingSignData): Promise<any> {
+  const bounds = await getBoundsForTabWindow(tabId);
   return new Promise(resolve => {
     const connection = connectedSites.get(tabId);
     if (connection) {
@@ -376,6 +406,7 @@ async function confirmConnect(tabId: number, url: string): Promise<?AccountIndex
       Logger.info(`whitelist: ${JSON.stringify(whitelist)}`);
       const whitelistEntry = whitelist.find(entry => entry.url === url);
       if (whitelistEntry !== undefined) {
+        // we already whitelisted this website, so no need to re-ask the user to confirm
         connectedSites.set(tabId, {
           url,
           status: whitelistEntry.walletIndex,
@@ -383,6 +414,8 @@ async function confirmConnect(tabId: number, url: string): Promise<?AccountIndex
         });
         resolve(whitelistEntry.walletIndex);
       } else {
+        // website not on whitelist, so need to ask user to confirm connection
+        const bounds = await getBoundsForTabWindow(tabId);
         connectedSites.set(tabId, {
           url,
           status: {
@@ -406,11 +439,15 @@ async function confirmConnect(tabId: number, url: string): Promise<?AccountIndex
 chrome.runtime.onMessageExternal.addListener((message, sender) => {
   if (sender.id === environment.ergoConnectorExtensionId) {
     if (message.type === 'open_browseraction_menu') {
-      chrome.windows.create({
-        ...popupProps,
-        url: chrome.extension.getURL(`/main_window_ergo.html#/settings`),
-        left: (bounds.width + bounds.positionX) - popupProps.width,
-        top: bounds.positionY + 80,
+      chrome.windows.getLastFocused(currentWindow => {
+        if (currentWindow == null) return; // should not happen
+        const bounds = getBoundsForWindow(currentWindow);
+        chrome.windows.create({
+          ...popupProps,
+          url: chrome.extension.getURL(`/main_window_ergo.html#/settings`),
+          left: (bounds.width + bounds.positionX) - popupProps.width,
+          top: bounds.positionY + 80,
+        });
       });
     }
   }
@@ -422,8 +459,6 @@ chrome.runtime.onConnectExternal.addListener(port => {
     const tabId = port.sender.tab.id;
     ports.set(tabId, port);
     port.onMessage.addListener(async message => {
-      // update bound from DOM
-      bounds = { ...bounds, ...message.bounds }
       function rpcResponse(response) {
         port.postMessage({
           type: 'connector_rpc_response',
