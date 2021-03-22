@@ -33,10 +33,9 @@ export default {
 };
 
 const genBaseProps: {|
+  wallet: *,
   whitelist: *,
 |} => * = (request) => {
-  const wallet = genErgoSigningWalletWithCache();
-
   const walletsState =  request.whitelist.length === 0
     ? select(
       'loadingWallets',
@@ -50,25 +49,25 @@ const genBaseProps: {|
 
   const wallets = walletsState === LoadingWalletStates.SUCCESS
     ? [{
-      publicDeriver: wallet.publicDeriver,
+      publicDeriver: request.wallet.publicDeriver,
       name: 'Storybook wallet A',
       balance: new MultiToken([{
         amount: new BigNumber('1234'),
-        identifier: wallet.publicDeriver.getParent().getDefaultToken().defaultIdentifier,
-        networkId: wallet.publicDeriver.getParent().getDefaultToken().defaultNetworkId,
-      }], wallet.publicDeriver.getParent().getDefaultToken()),
+        identifier: request.wallet.publicDeriver.getParent().getDefaultToken().defaultIdentifier,
+        networkId: request.wallet.publicDeriver.getParent().getDefaultToken().defaultNetworkId,
+      }], request.wallet.publicDeriver.getParent().getDefaultToken()),
       checksum: {
         ImagePart: '7b9bf637f341bed7933c8673f9fb7e405097746115f24ec7d192f80fb6efb219da8bc1902dab99fc070f156b7877f29dd8e581da616ff7fdad28493d084a0db9',
         TextPart: 'XLBS-6706',
       }
     }, {
-      publicDeriver: wallet.publicDeriver, // note: same as wallet A (for simplicity)
+      publicDeriver: request.wallet.publicDeriver, // note: same as wallet A (for simplicity)
       name: 'Storybook wallet B',
       balance: new MultiToken([{
         amount: new BigNumber('7890'),
-        identifier: wallet.publicDeriver.getParent().getDefaultToken().defaultIdentifier,
-        networkId: wallet.publicDeriver.getParent().getDefaultToken().defaultNetworkId,
-      }], wallet.publicDeriver.getParent().getDefaultToken()),
+        identifier: request.wallet.publicDeriver.getParent().getDefaultToken().defaultIdentifier,
+        networkId: request.wallet.publicDeriver.getParent().getDefaultToken().defaultNetworkId,
+      }], request.wallet.publicDeriver.getParent().getDefaultToken()),
       checksum: {
         ImagePart: '7b9bf637f341bed7933c8673f9fb7e405097746115f24ec7d192f80fb6efb219da8bc1902dab99fc070f156b7877f29dd8e581da616ff7fdad28493d084a0db9',
         TextPart: 'XLBS-6706',
@@ -105,28 +104,32 @@ const genBaseProps: {|
   };
 }
 export const EmptyList = (): Node => {
+  const wallet = genErgoSigningWalletWithCache();
   return (
     <ConnectWebsitesContainer
       generated={genBaseProps({
         whitelist: [],
+        wallet,
       })}
     />
   );
 };
 export const Whitelisted = (): Node => {
+  const wallet = genErgoSigningWalletWithCache();
   return (
     <ConnectWebsitesContainer
       generated={genBaseProps({
         whitelist: [
           {
             url: 'google.com',
-            walletIndex: 0,
+            publicDeriverId: 0,
           },
           {
             url: 'yoroi.com',
-            walletIndex: 1,
+            publicDeriverId: 1,
           },
         ],
+        wallet,
       })}
     />
   );

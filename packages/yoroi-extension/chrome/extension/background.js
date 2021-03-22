@@ -17,6 +17,14 @@ import type {
   ConnectingMessage,
   ConnectedSites,
   RpcUid,
+  WhitelistEntry,
+  ConnectResponseData,
+  ConfirmedSignData,
+  FailedSignData,
+  TxSignWindowRetrieveData,
+  ConnectRetrieveData,
+  RemoveWalletFromWhitelistData,
+  GetConnectedSitesData,
 } from './ergo-connector/types';
 import {
   APIErrorCodes,
@@ -63,12 +71,17 @@ const onYoroiIconClicked = () => {
 
 chrome.browserAction.onClicked.addListener(debounce(onYoroiIconClicked, 500, { leading: true }));
 
-type AccountIndex = number;
+/**
+ * we store the ID instead of an index
+ * because the user could delete a wallet (causing indices to shift)
+ * whereas ID lets us detect if the entry in the DB still exists
+ */
+type PublicDeriverId = number;
 
-// AccountIndex = successfully connected - which account the user selected
+// PublicDeriverId = successfully connected - which public deriver the user selected
 // null = refused by user
-type ConnectedStatus = ?AccountIndex | {|
-  // response (?AccountIndex) - null means the user refused, otherwise the account they selected
+type ConnectedStatus = ?PublicDeriverId | {|
+  // response (?PublicDeriverId) - null means the user refused, otherwise the account they selected
   resolve: any,
   // if a window has fetched this to show to the user yet
   openedWindow: boolean,
@@ -80,7 +93,7 @@ type PendingSign = {|
   // if an opened window has been created for this request to show the user
   openedWindow: boolean,
   // resolve function from signRequest's Promise
-  resolve: any
+  resolve: ({| ok: any |} | {| err: any |}) => void,
 |}
 
 type ConnectedSite = {|
@@ -240,14 +253,14 @@ async function getSelectedWallet(tabId: number): Promise<PublicDeriver<>> {
   const wallets = await getWallets({ db });
   const connected = connectedSites.get(tabId);
   if (connected) {
-    const index = connected.status;
-    if (typeof index === 'number') {
-      if (index >= 0 && index < wallets.length) {
-        const selectedWallet = wallets[index];
+    const publicDeriverId = connected.status;
+    if (typeof publicDeriverId === 'number') {
+      const selectedWallet = wallets.find(cache => cache.getPublicDeriverId() === publicDeriverId);
+      if (selectedWallet != null) {
         await syncWallet(selectedWallet);
         return Promise.resolve(selectedWallet);
       }
-      return Promise.reject(new Error(`wallet index out of bounds: ${index}`));
+      return Promise.reject(new Error(`Public deriver index not found: ${publicDeriverId}`));
     }
     return Promise.reject(new Error('site not connected yet'));
   }
@@ -255,13 +268,25 @@ async function getSelectedWallet(tabId: number): Promise<PublicDeriver<>> {
 }
 
 // messages from other parts of Yoroi (i.e. the UI for the connector)
-chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener(async (
+  request: (
+    ConnectResponseData |
+    ConfirmedSignData |
+    FailedSignData |
+    TxSignWindowRetrieveData |
+    ConnectRetrieveData |
+    RemoveWalletFromWhitelistData |
+    GetConnectedSitesData
+  ),
+  sender,
+  sendResponse
+) => {
   async function signTxInputs(
     tx,
     indices: number[],
     password: string,
     tabId: number
-  ): Promise<any> {
+  ): Promise<ErgoTxJson> {
     const wallet = await getSelectedWallet(tabId);
     const canGetAllUtxos = await asGetAllUtxos(wallet);
     if (canGetAllUtxos == null) {
@@ -272,10 +297,16 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
   }
   // alert(`received event: ${JSON.stringify(request)}`);
   if (request.type === 'connect_response') {
+    if (request.tabId == null) return;
     const connection = connectedSites.get(request.tabId);
     if (connection && connection.status != null && typeof connection.status === 'object') {
-      connection.status.resolve(request.accepted ? request.account : null);
-      connection.status = request.account;
+      if (request.accepted === true) {
+        connection.status.resolve(request.publicDeriverId);
+        connection.status = request.publicDeriverId;
+      } else {
+        connection.status.resolve(null);
+        // TODO: what to do here? Delete entry from connectedSites? Do nothing?
+      }
     }
   } else if (request.type === 'sign_confirmed') {
     const connection = connectedSites.get(request.tabId);
@@ -295,10 +326,17 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
           }
           break;
         case 'tx_input':
+          // mocked data sign
           {
+            const data = responseData.request;
             const txToSign = request.tx;
-            const signedTx = await signTxInputs(txToSign, [request.index], password, request.tabId);
-            responseData.resolve({ ok: signedTx.inputs[request.index] });
+            const signedTx = await signTxInputs(
+              txToSign,
+              [data.index],
+              password,
+              request.tabId
+            );
+            responseData.resolve({ ok: signedTx.inputs[data.index] });
           }
           break;
         case 'data':
@@ -398,10 +436,10 @@ async function confirmSign(tabId: number, request: PendingSignData): Promise<any
   });
 }
 
-async function confirmConnect(tabId: number, url: string): Promise<?AccountIndex> {
+async function confirmConnect(tabId: number, url: string): Promise<?PublicDeriverId> {
   return new Promise(resolve => {
     chrome.storage.local.get('connector_whitelist', async result => {
-      const whitelist = Object.keys(result).length === 0 ? []
+      const whitelist: Array<WhitelistEntry> = Object.keys(result).length === 0 ? []
         : JSON.parse(result.connector_whitelist);
       Logger.info(`whitelist: ${JSON.stringify(whitelist)}`);
       const whitelistEntry = whitelist.find(entry => entry.url === url);
@@ -409,10 +447,10 @@ async function confirmConnect(tabId: number, url: string): Promise<?AccountIndex
         // we already whitelisted this website, so no need to re-ask the user to confirm
         connectedSites.set(tabId, {
           url,
-          status: whitelistEntry.walletIndex,
+          status: whitelistEntry.publicDeriverId,
           pendingSigns: new Map()
         });
-        resolve(whitelistEntry.walletIndex);
+        resolve(whitelistEntry.publicDeriverId);
       } else {
         // website not on whitelist, so need to ask user to confirm connection
         const bounds = await getBoundsForTabWindow(tabId);
@@ -494,8 +532,8 @@ chrome.runtime.onConnectExternal.addListener(port => {
         }
       }
       if (message.type === 'yoroi_connect_request') {
-        const account = await confirmConnect(tabId, message.url);
-        const accepted = account !== null;
+        const publicDeriverId = await confirmConnect(tabId, message.url);
+        const accepted = publicDeriverId !== null;
         port.postMessage({
           type: 'yoroi_connect_response',
           success: accepted

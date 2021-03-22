@@ -327,7 +327,7 @@ export type PublicDeriverCache = {|
   checksum: void | WalletChecksum,
 |}
 
-export type WhitelistEntry = {| url: string, walletIndex: number |};
+export type WhitelistEntry = {| url: string, publicDeriverId: number |};
 
 export type ConnectingMessage = {| tabId: number, url: string |};
 export type SigningMessage = {| sign: PendingSignData, tabId: number |};
@@ -365,6 +365,33 @@ export type FailedSignData = {|
   type: 'sign_rejected',
   uid: RpcUid,
   tabId: number,
+|}
+
+export type ConnectResponseData = {|
+  type: 'connect_response',
+  accepted: true,
+  publicDeriverId: number,
+  tabId: ?number,
+|} | {|
+  type: 'connect_response',
+  accepted: false,
+  tabId: ?number,
+|}
+
+export type TxSignWindowRetrieveData = {|
+  type: 'tx_sign_window_retrieve_data',
+|}
+export type ConnectRetrieveData = {|
+  type: 'connect_retrieve_data',
+|}
+
+export type RemoveWalletFromWhitelistData = {|
+  type: 'remove_wallet_from_whitelist',
+  url: string,
+|}
+
+export type GetConnectedSitesData = {|
+  type: 'get_connected_sites',
 |}
 
 // when a tx is submitted we mark those as potentially spent and filter

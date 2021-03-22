@@ -9,6 +9,7 @@ import type {
   PublicDeriverCache,
   ConnectingMessage,
   WhitelistEntry,
+  ConnectResponseData,
 } from '../../../chrome/extension/ergo-connector/types';
 import { LoadingWalletStates } from '../types';
 import { networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
@@ -57,33 +58,33 @@ export default class ConnectContainer extends Component<
     );
   };
 
-  async onConnect(walletIndex: number) {
+  async onConnect(publicDeriverId: number) {
     const chromeMessage = this.generated.stores.connector.connectingMessage;
     if(chromeMessage == null) {
       throw new Error(`${nameof(chromeMessage)} connecting to a wallet but no connect message found`);
     }
     const result = this.generated.stores.connector.currentConnectorWhitelist;
     const whitelist = result.length === 0 ? [] : result;
-    whitelist.push({ url: chromeMessage.url, walletIndex });
+    whitelist.push({ url: chromeMessage.url, publicDeriverId });
     await this.generated.actions.connector.updateConnectorWhitelist.trigger({ whitelist });
 
-    chrome.runtime.sendMessage({
+    chrome.runtime.sendMessage(({
       type: 'connect_response',
       accepted: true,
-      account: walletIndex,
+      publicDeriverId,
       tabId: chromeMessage.tabId,
-    });
+    }: ConnectResponseData));
 
     this.generated.actions.connector.closeWindow.trigger();
   }
 
   onCancel: void => void = () => {
     const chromeMessage = this.generated.stores.connector.connectingMessage;
-    chrome.runtime.sendMessage({
+    chrome.runtime.sendMessage(({
       type: 'connect_response',
       accepted: false,
       tabId: chromeMessage?.tabId,
-    });
+    }: ConnectResponseData));
 
     this.generated.actions.connector.closeWindow.trigger();
   };

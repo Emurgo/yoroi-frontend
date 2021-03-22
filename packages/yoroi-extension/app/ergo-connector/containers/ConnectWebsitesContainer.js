@@ -61,7 +61,7 @@ export default class ConnectWebsitesContainer extends Component<
     if (isSuccess) {
       return (
         <ConnectWebsitesPage
-          accounts={this.generated.stores.connector.currentConnectorWhitelist}
+          whitelistEntries={this.generated.stores.connector.currentConnectorWhitelist}
           wallets={wallets}
           onRemoveWallet={this.onRemoveWallet}
           activeSites={this.generated.stores.connector.activeSites.sites}
