@@ -4,6 +4,7 @@ import React, { Component } from 'react';
 import type { Node } from 'react';
 import { intlShape, defineMessages, FormattedHTMLMessage } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import classNames from 'classnames';
 import styles from './ConnectPage.scss';
 import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
@@ -24,6 +25,7 @@ import type {
   TokenLookupKey,
 } from '../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
+import { environment } from '../../../environment';
 
 const messages = defineMessages({
   subtitle: {
@@ -78,6 +80,12 @@ class ConnectPage extends Component<Props> {
       network
     } = this.props;
 
+    const isNightly = environment.isNightly()
+    const componentClasses = classNames([
+      styles.component,
+      isNightly && styles.isNightly
+    ]);
+
     const isLoading = (
       loading === LoadingWalletStates.IDLE || loading === LoadingWalletStates.PENDING
     );
@@ -86,7 +94,7 @@ class ConnectPage extends Component<Props> {
 
     const isCheckedWallet = isSuccess ? Boolean(selected < 0) : [];
     return (
-      <div className={styles.component}>
+      <div className={componentClasses}>
         <ProgressBar step={1} />
         <div className={styles.connectWrapper}>
           <div className={styles.image}>

@@ -19,20 +19,18 @@ export default class SettingLayout extends Component<Props> {
     const { headerLabel, children, goBack } = this.props;
 
     return (
-      <>
+      <div className={styles.layout}>
         <TestnetWarningBanner isTestnet={false} />
-        <div className={styles.layout}>
-          <div className={styles.header}>
-            <button onClick={goBack} type="button" className={styles.menuIcon}>
-              <ArrowBack />
-            </button>
-            <div className={styles.menu}>
-              <p className={styles.label}>{headerLabel}</p>
-            </div>
+        <div className={styles.header}>
+          <button onClick={goBack} type="button" className={styles.menuIcon}>
+            <ArrowBack />
+          </button>
+          <div className={styles.menu}>
+            <p className={styles.label}>{headerLabel}</p>
           </div>
-          {children}
         </div>
-      </>
+        {children}
+      </div>
     );
   }
 }
