@@ -4,14 +4,14 @@ import type { Node } from 'react';
 import styles from './WalletCard.scss';
 import WalletAccountIcon from '../../../components/topbar/WalletAccountIcon';
 import type { WalletChecksum } from '@emurgo/cip4-js';
-import type { PublicDeriverCache, } from '../../../../chrome/extension/ergo-connector/types';
-import type {
-  TokenLookupKey,
-} from '../../../api/common/lib/MultiToken';
+import type { PublicDeriverCache } from '../../../../chrome/extension/ergo-connector/types';
+import type { TokenLookupKey } from '../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import { getTokenName } from '../../../stores/stateless/tokenHelpers';
+import { hiddenAmount } from '../../../utils/strings';
 
 type Props = {|
+  +shouldHideBalance: boolean,
   +publicDeriver: PublicDeriverCache,
   +getTokenInfo: Inexact<TokenLookupKey> => $ReadOnly<TokenRow>,
 |};
@@ -45,13 +45,15 @@ export default class WalletCard extends Component<Props> {
     const tokenInfo = this.props.getTokenInfo(defaultEntry);
     const shiftedAmount = defaultEntry.amount
       .shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
+    const { shouldHideBalance } = this.props;
 
     return (
       <div className={styles.card}>
         <div className={styles.avatar}>{iconComponent}</div>
         <div className={styles.name}>{this.props.publicDeriver.name}</div>
         <p className={styles.balance}>
-          {shiftedAmount.toString()} <span>{getTokenName(tokenInfo)}</span>
+          {shouldHideBalance ? hiddenAmount : shiftedAmount.toString()}{' '}
+          <span>{getTokenName(tokenInfo)}</span>
         </p>
       </div>
     );

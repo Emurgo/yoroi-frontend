@@ -13,9 +13,7 @@ import type {
   PublicDeriverCache,
   WhitelistEntry,
 } from '../../../../chrome/extension/ergo-connector/types';
-import type {
-  TokenLookupKey,
-} from '../../../api/common/lib/MultiToken';
+import type { TokenLookupKey } from '../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 
 type Props = {|
@@ -24,6 +22,7 @@ type Props = {|
   +wallets: ?Array<PublicDeriverCache>,
   +onRemoveWallet: ?string => void,
   +getTokenInfo: Inexact<TokenLookupKey> => $ReadOnly<TokenRow>,
+  shouldHideBalance: boolean,
 |};
 const messages = defineMessages({
   connectedWallets: {
@@ -74,13 +73,14 @@ export default class ConnectWebsitesPage extends Component<Props> {
               wallet={wallets[walletIndex]}
               onRemoveWallet={this.props.onRemoveWallet}
               getTokenInfo={this.props.getTokenInfo}
+              shouldHideBalance={this.props.shouldHideBalance}
             />
           ))}
         </div>
       </>
     );
+  };
 
-  }
 
   render(): Node {
     return (

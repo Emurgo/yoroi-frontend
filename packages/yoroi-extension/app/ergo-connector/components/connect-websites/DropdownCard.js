@@ -7,10 +7,8 @@ import DeleteIcon from '../../assets/images/remove-icon.inline.svg';
 import classnames from 'classnames';
 import WalletCard from '../connect/WalletCard';
 import { observer } from 'mobx-react';
-import type { PublicDeriverCache, } from '../../../../chrome/extension/ergo-connector/types';
-import type {
-  TokenLookupKey,
-} from '../../../api/common/lib/MultiToken';
+import type { PublicDeriverCache } from '../../../../chrome/extension/ergo-connector/types';
+import type { TokenLookupKey } from '../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 
 type Props = {|
@@ -19,6 +17,7 @@ type Props = {|
   +url: ?string,
   +isActiveSite: boolean,
   +wallet: PublicDeriverCache,
+  +shouldHideBalance: boolean,
   +onRemoveWallet: ?string => void,
   +getTokenInfo: Inexact<TokenLookupKey> => $ReadOnly<TokenRow>,
 |};
@@ -34,7 +33,16 @@ export default class DropdownCard extends Component<Props, State> {
   };
 
   render(): Node {
-    const { label, infoText, isActiveSite, url, wallet, onRemoveWallet } = this.props;
+    const {
+      label,
+      infoText,
+      isActiveSite,
+      url,
+      wallet,
+      onRemoveWallet,
+      shouldHideBalance,
+    } = this.props;
+
     const { isExpanded } = this.state;
     const arrowClasses = isExpanded ? styles.collapseArrow : styles.expandArrow;
 
@@ -69,7 +77,11 @@ export default class DropdownCard extends Component<Props, State> {
                   <DeleteIcon />
                 </span>
               </div>
-              <WalletCard publicDeriver={wallet} getTokenInfo={this.props.getTokenInfo} />
+              <WalletCard
+                shouldHideBalance={shouldHideBalance}
+                publicDeriver={wallet}
+                getTokenInfo={this.props.getTokenInfo}
+              />
             </div>
           </div>
         ) : null}

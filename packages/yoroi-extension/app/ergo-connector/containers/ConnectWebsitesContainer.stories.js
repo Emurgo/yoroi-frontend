@@ -80,6 +80,9 @@ const genBaseProps: {|
 
   return {
     stores: {
+      profile: {
+        shouldHideBalance: false
+      },
       connector: {
         currentConnectorWhitelist: request.whitelist,
         wallets,
