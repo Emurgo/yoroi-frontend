@@ -90,6 +90,48 @@ type ConnectedSite = {|
 |};
 
 
+function getDefaultBounds(): {| width: number, positionX: number, positionY: number |} {
+  return {
+    width: screen.availWidth,
+    positionX: 0,
+    positionY: 0,
+  };
+}
+
+function getBoundsForWindow(
+  targetWindow
+): {| width: number, positionX: number, positionY: number |} {
+  const defaults = getDefaultBounds();
+
+  const bounds = {
+      width: targetWindow.width ?? defaults.width,
+      positionX: targetWindow.left ?? defaults.positionX,
+      positionY: targetWindow.top ?? defaults.positionY,
+  };
+
+  return bounds;
+}
+function getBoundsForTabWindow(
+  targetTabId
+): Promise<{| width: number, positionX: number, positionY: number |}> {
+  return new Promise(resolve => {
+    chrome.tabs.get(targetTabId, (tab) => {
+      if (tab == null) return resolve(getDefaultBounds());
+      chrome.windows.get(tab.windowId, (targetWindow) => {
+        if (targetWindow == null) return resolve(getDefaultBounds());
+        resolve(getBoundsForWindow(targetWindow));
+      });
+    });
+  });
+}
+
+const popupProps: {|width: number, height: number, focused: boolean, type: string|} = {
+  width: 500,
+  height: 700,
+  focused: true,
+  type: 'popup',
+};
+
 type TabId = number;
 
 const connectedSites: Map<TabId, ConnectedSite> = new Map();
@@ -335,6 +377,7 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
 });
 
 async function confirmSign(tabId: number, request: PendingSignData): Promise<any> {
+  const bounds = await getBoundsForTabWindow(tabId);
   return new Promise(resolve => {
     const connection = connectedSites.get(tabId);
     if (connection) {
@@ -344,11 +387,10 @@ async function confirmSign(tabId: number, request: PendingSignData): Promise<any
         resolve
       });
        chrome.windows.create({
-        url: `${window.location.origin}/main_window_ergo.html#/signin-transaction`,
-        width: 500,
-        height: 700,
-        focused: true,
-        type: 'popup'
+         ...popupProps,
+        url: chrome.extension.getURL(`/main_window_ergo.html#/signin-transaction`),
+        left: (bounds.width + bounds.positionX) - popupProps.width,
+        top: bounds.positionY + 80,
       });
     } else {
       // console.log(`ERR - confirmSign could not find connection with tabId = ${tabId}`);
@@ -364,6 +406,7 @@ async function confirmConnect(tabId: number, url: string): Promise<?AccountIndex
       Logger.info(`whitelist: ${JSON.stringify(whitelist)}`);
       const whitelistEntry = whitelist.find(entry => entry.url === url);
       if (whitelistEntry !== undefined) {
+        // we already whitelisted this website, so no need to re-ask the user to confirm
         connectedSites.set(tabId, {
           url,
           status: whitelistEntry.walletIndex,
@@ -371,6 +414,8 @@ async function confirmConnect(tabId: number, url: string): Promise<?AccountIndex
         });
         resolve(whitelistEntry.walletIndex);
       } else {
+        // website not on whitelist, so need to ask user to confirm connection
+        const bounds = await getBoundsForTabWindow(tabId);
         connectedSites.set(tabId, {
           url,
           status: {
@@ -380,11 +425,10 @@ async function confirmConnect(tabId: number, url: string): Promise<?AccountIndex
           pendingSigns: new Map()
         });
         chrome.windows.create({
-          url: 'main_window_ergo.html',
-          width: 500,
-          height: 700,
-          focused: true,
-          type: 'popup'
+          ...popupProps,
+          url: chrome.extension.getURL('main_window_ergo.html'),
+          left: (bounds.width + bounds.positionX) - popupProps.width,
+          top: bounds.positionY + 80,
         });
       }
     });
@@ -395,12 +439,15 @@ async function confirmConnect(tabId: number, url: string): Promise<?AccountIndex
 chrome.runtime.onMessageExternal.addListener((message, sender) => {
   if (sender.id === environment.ergoConnectorExtensionId) {
     if (message.type === 'open_browseraction_menu') {
-      chrome.windows.create({
-        url: `${window.location.origin}/main_window_ergo.html#/settings`,
-        width: 500,
-        height: 700,
-        focused: true,
-        type: 'popup'
+      chrome.windows.getLastFocused(currentWindow => {
+        if (currentWindow == null) return; // should not happen
+        const bounds = getBoundsForWindow(currentWindow);
+        chrome.windows.create({
+          ...popupProps,
+          url: chrome.extension.getURL(`/main_window_ergo.html#/settings`),
+          left: (bounds.width + bounds.positionX) - popupProps.width,
+          top: bounds.positionY + 80,
+        });
       });
     }
   }

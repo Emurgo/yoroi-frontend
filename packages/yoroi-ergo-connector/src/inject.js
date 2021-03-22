@@ -232,6 +232,7 @@ if (shouldInject()) {
                 if (yoroiPort == null) {
                     createYoroiPort();
                 }
+
                 // URL must be provided here as the url field of Tab is only available
                 // with the "tabs" permission which Yoroi doesn't have
                 yoroiPort.postMessage({
