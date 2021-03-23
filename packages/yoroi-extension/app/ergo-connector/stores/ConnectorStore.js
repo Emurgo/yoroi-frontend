@@ -257,7 +257,9 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
 
       runInAction(() => {
         this.loadingWallets = LoadingWalletStates.SUCCESS;
-        this.wallets = result;
+
+        // note: "replace" is a mobx-specific function
+        (this.wallets: any).replace(result);
       });
     } catch (err) {
       runInAction(() => {

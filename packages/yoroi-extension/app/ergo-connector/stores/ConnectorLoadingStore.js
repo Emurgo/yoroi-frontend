@@ -9,6 +9,9 @@ import {
 export default class ConnectorLoadingStore extends BaseLoadingStore<StoresMap, ActionsMap> {
 
   async preLoadingScreenEnd(): Promise<void> {
+    // TODO: loading store for connector should either
+    // 1) use in-memory copy of DB
+    // 2) not run at same time as extension
     await super.preLoadingScreenEnd();
 
     await this.stores.tokenInfoStore.refreshTokenInfo();
