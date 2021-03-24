@@ -2,6 +2,9 @@
   height: calc(100vh - 92px);
   display: flex;
   flex-direction: column;
+  &.isNightly {
+    height: calc(100vh - 138px);
+  }
 }
 .connectWrapper {
   padding-top: 44px;
