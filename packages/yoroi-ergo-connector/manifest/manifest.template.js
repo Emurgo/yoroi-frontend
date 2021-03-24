@@ -30,7 +30,7 @@ module.exports = ({
     "default_title": displayName,
     default_icon: icons,
   },
-  "content_security_policy": "default-src 'none'; script-src 'self'; img-src https://* ;",
+  "content_security_policy": "default-src 'none'; script-src 'self';",
   "permissions": [
     "activeTab",
   ]

@@ -17,7 +17,6 @@ import type {
   ConnectingMessage,
   ConnectedSites,
   RpcUid,
-  WhitelistEntry,
   ConnectResponseData,
   ConfirmedSignData,
   FailedSignData,

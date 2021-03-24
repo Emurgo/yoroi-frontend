@@ -139,12 +139,20 @@ function shouldInject() {
     return docElemCheck && docTypeCheck;
 }
 
+/**
+ * We can't get the favicon using the Chrome extension API
+ * because getting the favicon for the current tab requires the "tabs" permission
+ * which we don't use in the connector
+ * So instead, we use this heuristic
+ */
 function getFavicon(url) {
     let faviconURL = '';
+    // sometimes the favicon is specified at the top of the HTML
     const favicon = document.querySelector("link[rel~='icon']");
     if(favicon) {
         faviconURL = favicon.href;
     } else {
+        // if not in the HTML, check the domain root
         faviconURL = `${url}/favicon.ico`;
     }
     return faviconURL;
@@ -244,35 +252,37 @@ if (shouldInject()) {
                     createYoroiPort();
                 }
 
-                // URL must be provided here as the url field of Tab is only available
-                // with the "tabs" permission which Yoroi doesn't have
-                try {
-                    if (location.hostname === 'localhost') {
+                // note: content scripts are subject to the same CORS policy as the website they are embedded in
+                // but since we are querying the website this script is injected into, it should be fine
+                convertImgToBase64(getFavicon(location.origin))
+                    .then(imgBase64Url => {
                         yoroiPort.postMessage({
-                            imgBase64Url: '',
+                            imgBase64Url,
                             type: "yoroi_connect_request",
                             url: location.hostname
                         });
-                        return;
-                    }
-                    // get favicon URL from website url to parse
-                    // to data base 64 img and send it to yoroi
-                    const faviconURL = getFavicon(location.origin)
-                    chrome.runtime.sendMessage(
-                        faviconURL,
-                        imgBase64Url => {
-                            yoroiPort.postMessage({
-                                imgBase64Url,
-                                type: "yoroi_connect_request",
-                                url: location.hostname
-                            });
-                        }
-                    ); 
-
-                } catch (error) {
-                    console.log(error)
-                }
+                    });
             }
         }
     });
+}
+
+/**
+ * Returns a PNG base64 encoding of the favicon
+ * but returns empty string if no favicon is set for the page
+ */
+async function convertImgToBase64(url, outputFormat) {
+    // as a safety precaution, we only load the favicon if it's the same origin as the website
+    // if we don't do this, we might get a CORS error anyway
+    // I don't know if any websites set their favicon to external websites, so it should not be a problem
+    const response = await fetch(url, {mode: 'same-origin'});
+    const blob = await response.blob();
+
+    const reader = new FileReader();
+    await new Promise((resolve, reject) => {
+        reader.onload = resolve;
+        reader.onerror = () => resolve('');
+        reader.readAsDataURL(blob);
+    });
+    return reader.result;
 }
