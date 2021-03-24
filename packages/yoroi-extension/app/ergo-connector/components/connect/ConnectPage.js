@@ -19,7 +19,6 @@ import type {
   ConnectingMessage,
 } from '../../../../chrome/extension/ergo-connector/types';
 import { LoadingWalletStates } from '../../types';
-import PlaceholderIcon from '../../assets/images/placeholder_icon.inline.svg';
 import ProgressBar from '../ProgressBar';
 import type {
   TokenLookupKey,
@@ -95,16 +94,22 @@ class ConnectPage extends Component<Props> {
     const isError = loading === LoadingWalletStates.REJECTED;
 
     const isCheckedWallet = isSuccess ? Boolean(selected < 0) : [];
+
+    const url = message?.url ?? '';
+    const faviconUrl = message?.imgBase64Url;
+
     return (
       <div className={componentClasses}>
         <ProgressBar step={1} />
         <div className={styles.connectWrapper}>
-          <div className={styles.image}>
-            <PlaceholderIcon />
-          </div>
+          {faviconUrl != null && faviconUrl !== '' ? (
+            <div className={styles.image}>
+              <img src={faviconUrl} alt={`${url} favicon`} />
+            </div>
+          ) : null}
           <div className={styles.title}>
             <h2>{intl.formatMessage(messages.subtitle)}</h2>
-            <p>{message?.url ?? ''}</p>
+            <p>{url}</p>
           </div>
         </div>
         <ul className={styles.list}>

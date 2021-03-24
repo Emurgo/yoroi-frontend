@@ -17,7 +17,6 @@ import type {
   ConnectingMessage,
   ConnectedSites,
   RpcUid,
-  WhitelistEntry,
   ConnectResponseData,
   ConfirmedSignData,
   FailedSignData,
@@ -96,6 +95,8 @@ type PendingSign = {|
   // resolve function from signRequest's Promise
   resolve: ({| ok: any |} | {| err: any |}) => void,
 |}
+
+let imgBase64Url: string = '';
 
 type ConnectedSite = {|
   url: string,
@@ -408,6 +409,7 @@ chrome.runtime.onMessage.addListener(async (
           connection.status.openedWindow = true;
           sendResponse(({
             url: connection.url,
+            imgBase64Url,
             tabId,
           }: ConnectingMessage));
         }
@@ -535,6 +537,7 @@ chrome.runtime.onConnectExternal.addListener(port => {
     const tabId = port.sender.tab.id;
     ports.set(tabId, port);
     port.onMessage.addListener(async message => {
+      imgBase64Url = message.imgBase64Url;
       function rpcResponse(response) {
         port.postMessage({
           type: 'connector_rpc_response',
