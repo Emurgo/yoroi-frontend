@@ -218,7 +218,7 @@ export async function connectorSignTx(
   utxos: any/* IGetAllUtxosResponse */,
   tx: Tx,
   indices: Array<number>
-): Promise</* SignedTx */any> {
+): Promise<ErgoTxJson> {
   const withLevels = asHasLevels(publicDeriver);
   if (withLevels == null) {
     throw new Error('wallet doesn\'t support levels');

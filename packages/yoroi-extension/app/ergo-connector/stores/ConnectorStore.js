@@ -11,6 +11,10 @@ import type {
   SigningMessage,
   WhitelistEntry,
   ConnectedSites,
+  ConnectRetrieveData,
+  TxSignWindowRetrieveData,
+  RemoveWalletFromWhitelistData,
+  GetConnectedSitesData,
 } from '../../../chrome/extension/ergo-connector/types';
 import type { ActionsMap } from '../actions/index';
 import type { StoresMap } from './index';
@@ -33,15 +37,18 @@ let initedConnecting = false;
 function sendMsgConnect(): Promise<ConnectingMessage> {
   return new Promise((resolve, reject) => {
     if (!initedConnecting)
-      window.chrome.runtime.sendMessage({ type: 'connect_retrieve_data' }, response => {
-        if (window.chrome.runtime.lastError) {
-          // eslint-disable-next-line prefer-promise-reject-errors
-          reject('Could not establish connection: connect_retrieve_data ');
-        }
+      window.chrome.runtime.sendMessage((
+        { type: 'connect_retrieve_data' }: ConnectRetrieveData),
+        response => {
+          if (window.chrome.runtime.lastError) {
+            // eslint-disable-next-line prefer-promise-reject-errors
+            reject('Could not establish connection: connect_retrieve_data ');
+          }
 
-        resolve(response);
-        initedConnecting = true;
-      });
+          resolve(response);
+          initedConnecting = true;
+        }
+      );
   });
 }
 
@@ -50,29 +57,35 @@ let initedSigning = false;
 function sendMsgSigningTx(): Promise<SigningMessage> {
   return new Promise((resolve, reject) => {
     if (!initedSigning)
-      window.chrome.runtime.sendMessage({ type: 'tx_sign_window_retrieve_data' }, response => {
-        if (window.chrome.runtime.lastError) {
-          // eslint-disable-next-line prefer-promise-reject-errors
-          reject('Could not establish connection: connect_retrieve_data ');
-        }
+      window.chrome.runtime.sendMessage(
+        ({ type: 'tx_sign_window_retrieve_data' }: TxSignWindowRetrieveData),
+        response => {
+          if (window.chrome.runtime.lastError) {
+            // eslint-disable-next-line prefer-promise-reject-errors
+            reject('Could not establish connection: connect_retrieve_data ');
+          }
 
-        resolve(response);
-        initedSigning = true;
-      });
+          resolve(response);
+          initedSigning = true;
+        }
+      );
   });
 }
 
 function getConnectedSites(): Promise<ConnectedSites> {
   return new Promise((resolve, reject) => {
     if (!initedSigning)
-      window.chrome.runtime.sendMessage({ type: 'get_connected_sites' }, response => {
-        if (window.chrome.runtime.lastError) {
-          // eslint-disable-next-line prefer-promise-reject-errors
-          reject('Could not establish connection: get_connected_sites ');
-        }
+      window.chrome.runtime.sendMessage(
+        ({ type: 'get_connected_sites' }: GetConnectedSitesData),
+        response => {
+          if (window.chrome.runtime.lastError) {
+            // eslint-disable-next-line prefer-promise-reject-errors
+            reject('Could not establish connection: get_connected_sites ');
+          }
 
-        resolve(response);
-      });
+          resolve(response);
+        }
+      );
   });
 }
 
@@ -244,7 +257,9 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
 
       runInAction(() => {
         this.loadingWallets = LoadingWalletStates.SUCCESS;
-        this.wallets = result;
+
+        // note: "replace" is a mobx-specific function
+        (this.wallets: any).replace(result);
       });
     } catch (err) {
       runInAction(() => {
@@ -277,10 +292,10 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       whitelist: filter,
     });
     await this.getConnectorWhitelist.execute();
-    window.chrome.runtime.sendMessage({
+    window.chrome.runtime.sendMessage(({
       type: 'remove_wallet_from_whitelist',
       url,
-    });
+    }: RemoveWalletFromWhitelistData));
   };
 
   _refreshActiveSites: void => Promise<void> = async () => {

@@ -106,7 +106,7 @@ class ConnectPage extends Component<Props> {
               <LoadingSpinner />
             </div>
           ) : isSuccess && publicDerivers.length ? (
-            publicDerivers.map((item, idx) => (
+            publicDerivers.map((item) => (
               <li key={item.name} className={styles.listItem}>
                 <Checkbox
                   skin={CheckboxSkin}
@@ -117,8 +117,8 @@ class ConnectPage extends Component<Props> {
                       getTokenInfo={this.props.getTokenInfo}
                     />
                   }
-                  onChange={() => onToggleCheckbox(idx)}
-                  checked={selected === idx}
+                  onChange={() => onToggleCheckbox(item.publicDeriver.getPublicDeriverId())}
+                  checked={selected === item.publicDeriver.getPublicDeriverId()}
                   className={styles.checkbox}
                 />
               </li>

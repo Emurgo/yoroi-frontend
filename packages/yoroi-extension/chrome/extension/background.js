@@ -17,6 +17,14 @@ import type {
   ConnectingMessage,
   ConnectedSites,
   RpcUid,
+  WhitelistEntry,
+  ConnectResponseData,
+  ConfirmedSignData,
+  FailedSignData,
+  TxSignWindowRetrieveData,
+  ConnectRetrieveData,
+  RemoveWalletFromWhitelistData,
+  GetConnectedSitesData,
 } from './ergo-connector/types';
 import {
   APIErrorCodes,
@@ -52,6 +60,7 @@ import {
   loadLovefieldDB,
 } from '../../app/api/ada/lib/storage/database/index';
 import { migrateNoRefresh } from '../../app/api/common/migration';
+import { Mutex, } from 'async-mutex';
 
 /*::
 declare var chrome;
@@ -63,12 +72,17 @@ const onYoroiIconClicked = () => {
 
 chrome.browserAction.onClicked.addListener(debounce(onYoroiIconClicked, 500, { leading: true }));
 
-type AccountIndex = number;
+/**
+ * we store the ID instead of an index
+ * because the user could delete a wallet (causing indices to shift)
+ * whereas ID lets us detect if the entry in the DB still exists
+ */
+type PublicDeriverId = number;
 
-// AccountIndex = successfully connected - which account the user selected
+// PublicDeriverId = successfully connected - which public deriver the user selected
 // null = refused by user
-type ConnectedStatus = ?AccountIndex | {|
-  // response (?AccountIndex) - null means the user refused, otherwise the account they selected
+type ConnectedStatus = ?PublicDeriverId | {|
+  // response (?PublicDeriverId) - null means the user refused, otherwise the account they selected
   resolve: any,
   // if a window has fetched this to show to the user yet
   openedWindow: boolean,
@@ -80,7 +94,7 @@ type PendingSign = {|
   // if an opened window has been created for this request to show the user
   openedWindow: boolean,
   // resolve function from signRequest's Promise
-  resolve: any
+  resolve: ({| ok: any |} | {| err: any |}) => void,
 |}
 
 type ConnectedSite = {|
@@ -142,39 +156,42 @@ const ports: Map<TabId, any> = new Map();
 
 let pendingTxs: PendingTransaction[] = [];
 
-// This is a temporary workaround to DB duplicate key constraint violations
-// that is happening when multiple DBs are loaded at the same time, or possibly
-// this one being loaded while Yoroi's main App is doing DB operations.
-let loadedDB: ?lf$Database = null;
-let dbPromise: ?Promise<lf$Database> = null;
+/**
+* need to make sure JS tasks run in an order where no two of them have different DB instances
+* Otherwise, caching logic may make things go wrong
+* TODO: this doesn't help if the Yoroi Extension or a Web Worker makes a query during this execution
+*/
+const dbAccessMutex = new Mutex();
 
-async function loadDB(): Promise<lf$Database> {
-  if (loadedDB == null) {
-    if (dbPromise == null) {
-      dbPromise = loadLovefieldDB(schema.DataStoreType.INDEXED_DB)
-        .then(db => {
-          loadedDB = db;
-          return Promise.resolve(loadedDB);
-        });
-      const db = await dbPromise;
-
+async function withDb<T>(
+  continuation: (lf$Database, LocalStorageApi) => Promise<T>
+): Promise<T> {
+  return await dbAccessMutex.runExclusive(async () => {
+    // note: lovefield internally caches queries an optimization
+    // this doesn't work for us because the DB can change under our feet through the Yoroi Extension
+    // so instead, we create the DB, use it, then throw it away
+    const db = await loadLovefieldDB(schema.DataStoreType.INDEXED_DB);
+    try {
       // process migration here before anything involving storage is cached
       // as dApp can't easily recover from refreshing a page to wipe cache after storage migration
+      const localStorageApi = new LocalStorageApi();
       await migrateNoRefresh({
-        localStorageApi: new LocalStorageApi(),
+        localStorageApi,
         persistentDb: db,
         currVersion: environment.getVersion(),
       })
+
+      return await continuation(db, localStorageApi);
+    } finally {
+      db.close();
     }
-    return dbPromise;
-  }
-  return Promise.resolve(loadedDB);
+  });
 }
 
 
-async function getStateFetcher(): Promise<IFetcher> {
-  // I don't think it's worth it to cache this? We only need it for syncs and sending tx
-  const localStorageApi = new LocalStorageApi();
+async function getStateFetcher(
+  localStorageApi: LocalStorageApi,
+): Promise<IFetcher> {
   const locale = await localStorageApi.getUserLocale() ?? 'en-US';
   return Promise.resolve(new BatchedFetcher(new RemoteFetcher(
     () => environment.getVersion(),
@@ -196,7 +213,10 @@ async function getStateFetcher(): Promise<IFetcher> {
 // this one being loaded while Yoroi's main App is doing DB operations.
 // Promise<void>
 let syncing: ?Promise<void> = null;
-async function syncWallet(wallet: PublicDeriver<>): Promise<void> {
+async function syncWallet(
+  wallet: PublicDeriver<>,
+  localStorageApi: LocalStorageApi,
+): Promise<void> {
   try {
     const lastSync = await wallet.getLastSyncInfo();
     // don't sync more than every 30 seconds
@@ -206,7 +226,7 @@ async function syncWallet(wallet: PublicDeriver<>): Promise<void> {
         syncing = RustModule.load()
           .then(() => {
             Logger.debug('sync started');
-            return getStateFetcher()
+            return getStateFetcher(localStorageApi)
           })
           .then(stateFetcher => updateTransactions(
             wallet.getDb(),
@@ -235,47 +255,81 @@ async function syncWallet(wallet: PublicDeriver<>): Promise<void> {
   }
 }
 
-async function getSelectedWallet(tabId: number): Promise<PublicDeriver<>> {
-  const db = await loadDB();
-  const wallets = await getWallets({ db });
-  const connected = connectedSites.get(tabId);
-  if (connected) {
-    const index = connected.status;
-    if (typeof index === 'number') {
-      if (index >= 0 && index < wallets.length) {
-        const selectedWallet = wallets[index];
-        await syncWallet(selectedWallet);
-        return Promise.resolve(selectedWallet);
+async function withSelectedWallet<T>(
+  tabId: number,
+  continuation: PublicDeriver<> => Promise<T>,
+): Promise<T> {
+  return await withDb<T>(async (db, localStorageApi) => {
+    const wallets = await getWallets({ db });
+    const connected = connectedSites.get(tabId);
+    if (connected) {
+      const publicDeriverId = connected.status;
+      if (typeof publicDeriverId === 'number') {
+        const selectedWallet = wallets.find(
+          cache => cache.getPublicDeriverId() === publicDeriverId
+        );
+        if (selectedWallet == null) {
+          connectedSites.delete(tabId);
+          await removeWallet(tabId, publicDeriverId, localStorageApi);
+          return Promise.reject(new Error(`Public deriver index not found: ${publicDeriverId}`));
+        }
+        await syncWallet(selectedWallet, localStorageApi);
+
+        // we need to make sure this runs within the withDb call
+        // since the publicDeriver contains a DB reference inside it
+        return await continuation(selectedWallet);
       }
-      return Promise.reject(new Error(`wallet index out of bounds: ${index}`));
+      return Promise.reject(new Error('site not connected yet'));
     }
-    return Promise.reject(new Error('site not connected yet'));
-  }
-  return Promise.reject(new Error(`could not find tabId ${tabId} in connected sites`));
+    return Promise.reject(new Error(`could not find tabId ${tabId} in connected sites`));
+  });
 }
 
 // messages from other parts of Yoroi (i.e. the UI for the connector)
-chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener(async (
+  request: (
+    ConnectResponseData |
+    ConfirmedSignData |
+    FailedSignData |
+    TxSignWindowRetrieveData |
+    ConnectRetrieveData |
+    RemoveWalletFromWhitelistData |
+    GetConnectedSitesData
+  ),
+  sender,
+  sendResponse
+) => {
   async function signTxInputs(
     tx,
     indices: number[],
     password: string,
     tabId: number
-  ): Promise<any> {
-    const wallet = await getSelectedWallet(tabId);
-    const canGetAllUtxos = await asGetAllUtxos(wallet);
-    if (canGetAllUtxos == null) {
-      throw new Error('could not get all utxos');
-    }
-    const utxos = await canGetAllUtxos.getAllUtxos();
-    return connectorSignTx(wallet, password, utxos, tx, indices);
+  ): Promise<ErgoTxJson> {
+    return await withSelectedWallet<ErgoTxJson>(
+      tabId,
+      async (wallet) => {
+        const canGetAllUtxos = asGetAllUtxos(wallet);
+        if (canGetAllUtxos == null) {
+          throw new Error('could not get all utxos');
+        }
+        const utxos = await canGetAllUtxos.getAllUtxos();
+        return await connectorSignTx(wallet, password, utxos, tx, indices);
+      }
+    );
   }
   // alert(`received event: ${JSON.stringify(request)}`);
   if (request.type === 'connect_response') {
-    const connection = connectedSites.get(request.tabId);
+    if (request.tabId == null) return;
+    const { tabId } = request;
+    const connection = connectedSites.get(tabId);
     if (connection && connection.status != null && typeof connection.status === 'object') {
-      connection.status.resolve(request.accepted ? request.account : null);
-      connection.status = request.account;
+      if (request.accepted === true) {
+        connection.status.resolve(request.publicDeriverId);
+        connection.status = request.publicDeriverId;
+      } else {
+        connection.status.resolve(null);
+        connectedSites.delete(tabId);
+      }
     }
   } else if (request.type === 'sign_confirmed') {
     const connection = connectedSites.get(request.tabId);
@@ -296,9 +350,15 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
           break;
         case 'tx_input':
           {
+            const data = responseData.request;
             const txToSign = request.tx;
-            const signedTx = await signTxInputs(txToSign, [request.index], password, request.tabId);
-            responseData.resolve({ ok: signedTx.inputs[request.index] });
+            const signedTx = await signTxInputs(
+              txToSign,
+              [data.index],
+              password,
+              request.tabId
+            );
+            responseData.resolve({ ok: signedTx.inputs[data.index] });
           }
           break;
         case 'data':
@@ -376,6 +436,21 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
   }
 });
 
+async function removeWallet(
+  tabId: number,
+  publicDeriverId: number,
+  localStorageApi: LocalStorageApi,
+): Promise<void> {
+  connectedSites.delete(tabId);
+
+  const whitelist = await localStorageApi.getWhitelist();
+  await localStorageApi.setWhitelist(
+    whitelist == null
+      ? undefined
+      : whitelist.filter(entry => entry.publicDeriverId !== publicDeriverId)
+  );
+}
+
 async function confirmSign(tabId: number, request: PendingSignData): Promise<any> {
   const bounds = await getBoundsForTabWindow(tabId);
   return new Promise(resolve => {
@@ -398,40 +473,41 @@ async function confirmSign(tabId: number, request: PendingSignData): Promise<any
   });
 }
 
-async function confirmConnect(tabId: number, url: string): Promise<?AccountIndex> {
+async function confirmConnect(
+  tabId: number,
+  url: string,
+  localStorageApi: LocalStorageApi,
+): Promise<?PublicDeriverId> {
+  const bounds = await getBoundsForTabWindow(tabId);
+  const whitelist = await localStorageApi.getWhitelist() ?? [];
   return new Promise(resolve => {
-    chrome.storage.local.get('connector_whitelist', async result => {
-      const whitelist = Object.keys(result).length === 0 ? []
-        : JSON.parse(result.connector_whitelist);
-      Logger.info(`whitelist: ${JSON.stringify(whitelist)}`);
-      const whitelistEntry = whitelist.find(entry => entry.url === url);
-      if (whitelistEntry !== undefined) {
-        // we already whitelisted this website, so no need to re-ask the user to confirm
-        connectedSites.set(tabId, {
-          url,
-          status: whitelistEntry.walletIndex,
-          pendingSigns: new Map()
-        });
-        resolve(whitelistEntry.walletIndex);
-      } else {
-        // website not on whitelist, so need to ask user to confirm connection
-        const bounds = await getBoundsForTabWindow(tabId);
-        connectedSites.set(tabId, {
-          url,
-          status: {
-            resolve,
-            openedWindow: false,
-          },
-          pendingSigns: new Map()
-        });
-        chrome.windows.create({
-          ...popupProps,
-          url: chrome.extension.getURL('main_window_ergo.html'),
-          left: (bounds.width + bounds.positionX) - popupProps.width,
-          top: bounds.positionY + 80,
-        });
-      }
-    });
+    Logger.info(`whitelist: ${JSON.stringify(whitelist)}`);
+    const whitelistEntry = whitelist.find(entry => entry.url === url);
+    if (whitelistEntry !== undefined) {
+      // we already whitelisted this website, so no need to re-ask the user to confirm
+      connectedSites.set(tabId, {
+        url,
+        status: whitelistEntry.publicDeriverId,
+        pendingSigns: new Map()
+      });
+      resolve(whitelistEntry.publicDeriverId);
+    } else {
+      // website not on whitelist, so need to ask user to confirm connection
+      connectedSites.set(tabId, {
+        url,
+        status: {
+          resolve,
+          openedWindow: false,
+        },
+        pendingSigns: new Map()
+      });
+      chrome.windows.create({
+        ...popupProps,
+        url: chrome.extension.getURL('main_window_ergo.html'),
+        left: (bounds.width + bounds.positionX) - popupProps.width,
+        top: bounds.positionY + 80,
+      });
+    }
   });
 }
 
@@ -494,12 +570,16 @@ chrome.runtime.onConnectExternal.addListener(port => {
         }
       }
       if (message.type === 'yoroi_connect_request') {
-        const account = await confirmConnect(tabId, message.url);
-        const accepted = account !== null;
-        port.postMessage({
-          type: 'yoroi_connect_response',
-          success: accepted
-        });
+        await withDb(
+          async (_db, localStorageApi) => {
+            const publicDeriverId = await confirmConnect(tabId, message.url, localStorageApi);
+            const accepted = publicDeriverId !== null;
+            port.postMessage({
+              type: 'yoroi_connect_response',
+              success: accepted
+            });
+          }
+        );
       } else if (message.type === 'connector_rpc_request') {
         switch (message.function) {
           case 'sign_tx':
@@ -551,9 +631,13 @@ chrome.runtime.onConnectExternal.addListener(port => {
             try {
               checkParamCount(1);
               const tokenId = asTokenId(message.params[0]);
-              const wallet = await getSelectedWallet(tabId);
-              const balance = await connectorGetBalance(wallet, pendingTxs, tokenId);
-              rpcResponse({ ok: balance });
+              await withSelectedWallet(
+                tabId,
+                async (wallet) => {
+                  const balance = await connectorGetBalance(wallet, pendingTxs, tokenId);
+                  rpcResponse({ ok: balance });
+                }
+              );
             } catch(e) {
               handleError(e);
             }
@@ -564,17 +648,22 @@ chrome.runtime.onConnectExternal.addListener(port => {
               const valueExpected = message.params[0] == null ? null : asValue(message.params[0]);
               const tokenId = asTokenId(message.params[1]);
               const paginate = message.params[2] == null ? null : asPaginate(message.params[2]);
-              const wallet = await getSelectedWallet(tabId);
-              const utxos = await connectorGetUtxos(
-                wallet,
-                pendingTxs,
-                valueExpected,
-                tokenId,
-                paginate
+
+              await withSelectedWallet(
+                tabId,
+                async (wallet) => {
+                  const utxos = await connectorGetUtxos(
+                    wallet,
+                    pendingTxs,
+                    valueExpected,
+                    tokenId,
+                    paginate
+                  );
+                  rpcResponse({
+                    ok: utxos
+                  });
+                }
               );
-              rpcResponse({
-                ok: utxos
-              });
             } catch (e) {
               handleError(e);
             }
@@ -582,33 +671,46 @@ chrome.runtime.onConnectExternal.addListener(port => {
           case 'get_used_addresses':
             try {
               const paginate = message.params[0] == null ? null : asPaginate(message.params[0]);
-              const wallet = await getSelectedWallet(tabId);
-              const addresses = await connectorGetUsedAddresses(wallet, paginate);
-              rpcResponse({
-                ok: addresses
-              });
+
+              await withSelectedWallet(
+                tabId,
+                async (wallet) => {
+                  const addresses = await connectorGetUsedAddresses(wallet, paginate);
+                  rpcResponse({
+                    ok: addresses
+                  });
+                }
+              );
             } catch (e) {
               handleError(e);
             }
             break;
           case 'get_unused_addresses':
             try {
-              const wallet = await getSelectedWallet(tabId);
-              const addresses = await connectorGetUnusedAddresses(wallet);
-              rpcResponse({
-                ok: addresses
-              });
+              await withSelectedWallet(
+                tabId,
+                async (wallet) => {
+                  const addresses = await connectorGetUnusedAddresses(wallet);
+                  rpcResponse({
+                    ok: addresses
+                  });
+                }
+              );
             } catch (e) {
               handleError(e);
             }
             break;
           case `get_change_address`:
             try {
-              const wallet = await getSelectedWallet(tabId);
-              const change = await connectorGetChangeAddress(wallet);
-              rpcResponse({
-                ok: change
-              });
+              await withSelectedWallet(
+                tabId,
+                async (wallet) => {
+                  const change = await connectorGetChangeAddress(wallet);
+                  rpcResponse({
+                    ok: change
+                  });
+                }
+              );
             } catch (e) {
               handleError(e);
             }
@@ -616,11 +718,15 @@ chrome.runtime.onConnectExternal.addListener(port => {
           case 'submit_tx':
             try {
               const tx = asSignedTx(message.params[0]);
-              const wallet = await getSelectedWallet(tabId);
-              const id = await connectorSendTx(wallet, pendingTxs, tx);
-              rpcResponse({
-                ok: id
-              });
+              await withSelectedWallet(
+                tabId,
+                async (wallet) => {
+                  const id = await connectorSendTx(wallet, pendingTxs, tx);
+                  rpcResponse({
+                    ok: id
+                  });
+                }
+              );
             } catch (e) {
               handleError(e);
             }

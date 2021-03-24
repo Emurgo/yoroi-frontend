@@ -9,6 +9,9 @@
     "prod:nightly": "npm run prod:custom -- --yoroiExtensionId=poonlenmfdfbjfeeballhiibknlknepo && npm run prod:compress -- --env 'nightly' --app-id 'yoroi-ergo-connector-nightly' --zip-only --codebase 'https://yoroiwallet.com/dw/yoroi-ergo-connector-nightly.crx' --key ./keys/nightly-key.pem",
     "prod:stable": "npm run prod:custom -- --yoroiExtensionId=ffnbelfdoeiohenkjibnmadjiehjhajb && npm run prod:compress -- --env '' --app-id 'yoroi-ergo-connector' --zip-only --codebase 'https://yoroiwallet.com/dw/yoroi-ergo-connector.crx' --key ./keys/production-key.pem"
   },
+  "dependencies": {
+    "lodash": "4.17.20"
+  },
   "devDependencies": {
     "crx": "5.0.1",
     "fs-extra": "9.1.0",
