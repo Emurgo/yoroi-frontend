@@ -29,7 +29,7 @@ import CachedRequest from '../../../stores/lib/LocalizedCachedRequest';
 import type { GetBalanceFunc } from '../../../api/common/types';
 import StakingDashboardPage from './StakingDashboardPage';
 import { mockWalletProps } from '../Wallet.mock';
-import { getVarsForTheme } from '../../../stores/toplevel/ProfileStore';
+import { getVarsForTheme } from '../../../stores/base/BaseProfileStore';
 import { defaultToSelectedExplorer } from '../../../domain/SelectedExplorer';
 import { buildRoute } from '../../../utils/routing';
 import { ROUTES } from '../../../routes-config';

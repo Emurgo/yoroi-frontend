@@ -5,6 +5,7 @@ import styles from './SettingLayout.scss';
 import { observer } from 'mobx-react';
 
 import ArrowBack from '../../assets/images/arrow_back.inline.svg';
+import TestnetWarningBanner from '../../../components/topbar/banners/TestnetWarningBanner';
 
 type Props = {|
   +headerLabel: string,
@@ -19,6 +20,7 @@ export default class SettingLayout extends Component<Props> {
 
     return (
       <div className={styles.layout}>
+        <TestnetWarningBanner isTestnet={false} />
         <div className={styles.header}>
           <button onClick={goBack} type="button" className={styles.menuIcon}>
             <ArrowBack />

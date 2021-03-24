@@ -24,7 +24,6 @@ import type {
   IDisplayCutoffPopFunc,
   IDisplayCutoffPopResponse,
 } from '../ada/lib/storage/models/PublicDeriver/interfaces';
-import { migrateToLatest } from '../ada/lib/storage/adaMigration';
 import { ConceptualWallet } from '../ada/lib/storage/models/ConceptualWallet/index';
 import type { IHasLevels } from '../ada/lib/storage/models/ConceptualWallet/interfaces';
 import WalletTransaction from '../../domain/WalletTransaction';
@@ -37,7 +36,6 @@ import type {
   GetBalanceRequest, GetBalanceResponse,
   SendTokenList,
 } from './types';
-import LocalStorageApi from '../localStorage/index';
 import type {
   IRenameFunc, IRenameRequest, IRenameResponse,
   IChangePasswordRequestFunc, IChangePasswordRequest, IChangePasswordResponse,
@@ -245,16 +243,6 @@ export default class CommonApi {
       if (error instanceof LocalizableError) throw error;
       throw new GenericApiError();
     }
-  }
-
-  async migrate(
-    localstorageApi: LocalStorageApi,
-    persistentDb: lf$Database,
-  ): Promise<boolean> {
-    return await migrateToLatest(
-      localstorageApi,
-      persistentDb,
-    );
   }
 
   async exportLocalDatabase(

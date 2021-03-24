@@ -10,15 +10,19 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { connectorMessages } from '../../../i18n/global-messages';
 import NoItemsFoundImg from '../../assets/images/no-websites-connected.inline.svg';
 import type {
-  AccountInfo,
+  PublicDeriverCache,
   WhitelistEntry,
 } from '../../../../chrome/extension/ergo-connector/types';
+import type { TokenLookupKey } from '../../../api/common/lib/MultiToken';
+import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 
 type Props = {|
-  accounts: ?Array<WhitelistEntry>,
-  activeSites: Array<string>,
-  wallets: ?Array<AccountInfo>,
-  onRemoveWallet: ?string => void,
+  +whitelistEntries: ?Array<WhitelistEntry>,
+  +activeSites: Array<string>,
+  +wallets: ?Array<PublicDeriverCache>,
+  +onRemoveWallet: ?string => void,
+  +getTokenInfo: Inexact<TokenLookupKey> => $ReadOnly<TokenRow>,
+  shouldHideBalance: boolean,
 |};
 const messages = defineMessages({
   connectedWallets: {
@@ -46,11 +50,11 @@ export default class ConnectWebsitesPage extends Component<Props> {
         <p>{intl.formatMessage(connectorMessages.messageReadOnly)}</p>
       </div>
     );
-    if (this.props.accounts == null || this.props.wallets == null) {
+    if (this.props.whitelistEntries == null || this.props.wallets == null) {
       return genNoResult();
     }
-    const { accounts, wallets } = this.props;
-    if (accounts.length === 0) {
+    const { whitelistEntries, wallets } = this.props;
+    if (whitelistEntries.length === 0) {
       return genNoResult();
     }
     return (
@@ -59,22 +63,32 @@ export default class ConnectWebsitesPage extends Component<Props> {
           {intl.formatMessage(connectorMessages.connectedWebsites)}
         </h1>
         <div className={styles.walletList}>
-          {accounts.map(({ url, walletIndex }) => (
-            <DropdownCard
-              label={intl.formatMessage(messages.connectedWallets)}
-              infoText={intl.formatMessage(connectorMessages.messageReadOnly)}
-              key={url}
-              url={url}
-              isActiveSite={this.props.activeSites.includes(url)}
-              wallet={wallets[walletIndex]}
-              onRemoveWallet={this.props.onRemoveWallet}
-            />
-          ))}
+          {whitelistEntries.map(({ url, publicDeriverId }) => {
+            const wallet = wallets.find(
+              cacheEntry => cacheEntry.publicDeriver.getPublicDeriverId() === publicDeriverId
+            );
+            // note: store should make sure that deleted wallets got removed from the whitelist
+            // but this is just a precaution
+            if (wallet == null) return null;
+            return (
+              <DropdownCard
+                label={intl.formatMessage(messages.connectedWallets)}
+                infoText={intl.formatMessage(connectorMessages.messageReadOnly)}
+                key={url}
+                url={url}
+                isActiveSite={this.props.activeSites.includes(url)}
+                wallet={wallet}
+                onRemoveWallet={this.props.onRemoveWallet}
+                getTokenInfo={this.props.getTokenInfo}
+                shouldHideBalance={this.props.shouldHideBalance}
+              />
+            );
+          })}
         </div>
       </>
     );
+  };
 
-  }
 
   render(): Node {
     return (

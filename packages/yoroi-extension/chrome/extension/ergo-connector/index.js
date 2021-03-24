@@ -13,7 +13,7 @@ import { Action } from '../../../app/actions/lib/Action';
 import App from '../../../app/ergo-connector/App';
 import '../../../app/themes/index.global.scss';
 import BigNumber from 'bignumber.js';
-import { addCloseListener } from '../../../app/utils/tabManager';
+import { addCloseListener, TabIdKeys } from '../../../app/utils/tabManager';
 
 // run MobX in strict mode
 configure({ enforceActions: 'always' });
@@ -47,6 +47,6 @@ const initializeErgoConnector: void => Promise<void> = async () => {
   render(<App stores={stores} actions={actions} history={history} />, root);
 };
 
-addCloseListener();
+addCloseListener(TabIdKeys.ErgoConnector);
 
 window.addEventListener('load', initializeErgoConnector);

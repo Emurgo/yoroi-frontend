@@ -1,7 +1,4 @@
-
-chrome.browserAction.onClicked.addListener(function() {
-    chrome.runtime.sendMessage(extensionId, { type: "open_browseraction_menu" });
-});
+import debounce from 'lodash/debounce';
 
 function convertImgToBase64(url, outputFormat) {
     return new Promise(resolve => {
@@ -25,3 +22,9 @@ chrome.runtime.onMessage.addListener(function (url, sender, onSuccess) {
     convertImgToBase64(url).then((response) => onSuccess(response));
     return true; // Will respond asynchronously.
 });
+const onConnectorIconClicked = () => {
+  // note: we send a message instead of a browser action because the UI is managed by the Yoroi extension -- not be the connector
+  chrome.runtime.sendMessage(extensionId, { type: "open_browseraction_menu" });
+};
+
+chrome.browserAction.onClicked.addListener(debounce(onConnectorIconClicked, 500, { leading: true }));

@@ -2,8 +2,9 @@
 // @flow
 import React, { Component } from 'react';
 import type { Node } from 'react';
-import { intlShape, defineMessages } from 'react-intl';
+import { intlShape, defineMessages, FormattedHTMLMessage } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import classNames from 'classnames';
 import styles from './ConnectPage.scss';
 import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
@@ -14,12 +15,17 @@ import globalMessages, { connectorMessages } from '../../../i18n/global-messages
 import { observer } from 'mobx-react';
 import LoadingSpinner from '../../../components/widgets/LoadingSpinner';
 import type {
-  AccountInfo,
+  PublicDeriverCache,
   ConnectingMessage,
 } from '../../../../chrome/extension/ergo-connector/types';
 import { LoadingWalletStates } from '../../types';
 import PlaceholderIcon from '../../assets/images/placeholder_icon.inline.svg';
 import ProgressBar from '../ProgressBar';
+import type {
+  TokenLookupKey,
+} from '../../../api/common/lib/MultiToken';
+import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
+import { environment } from '../../../environment';
 
 const messages = defineMessages({
   subtitle: {
@@ -36,20 +42,23 @@ const messages = defineMessages({
   },
   noWalletsFound: {
     id: 'ergo-connector.connect.noWalletsFound',
-    defaultMessage: '!!!No wallets found',
+    defaultMessage: '!!!No {network} wallets found.',
   },
 });
 
 type Props = {|
-  accounts: Array<AccountInfo>,
-  loading: $Values<typeof LoadingWalletStates>,
-  error: string,
-  message: ?ConnectingMessage,
-  onToggleCheckbox: number => void,
-  onCancel: () => void,
-  onConnect: number => Promise<void>,
-  handleSubmit: () => void,
-  selected: number,
+  +publicDerivers: Array<PublicDeriverCache>,
+  +loading: $Values<typeof LoadingWalletStates>,
+  +error: string,
+  +message: ?ConnectingMessage,
+  +onToggleCheckbox: number => void,
+  +onCancel: () => void,
+  +onConnect: number => Promise<void>,
+  +handleSubmit: () => void,
+  +selected: number,
+  +getTokenInfo: Inexact<TokenLookupKey> => $ReadOnly<TokenRow>,
+  +network: string,
+  +shouldHideBalance: boolean,
 |};
 
 @observer
@@ -63,13 +72,21 @@ class ConnectPage extends Component<Props> {
     const {
       loading,
       error,
-      accounts,
+      publicDerivers,
       message,
       onCancel,
       onToggleCheckbox,
       handleSubmit,
       selected,
+      network,
+      shouldHideBalance,
     } = this.props;
+
+    const isNightly = environment.isNightly()
+    const componentClasses = classNames([
+      styles.component,
+      isNightly && styles.isNightly
+    ]);
 
     const isLoading = (
       loading === LoadingWalletStates.IDLE || loading === LoadingWalletStates.PENDING
@@ -83,7 +100,7 @@ class ConnectPage extends Component<Props> {
     const faviconUrl = message?.imgBase64Url;
 
     return (
-      <>
+      <div className={componentClasses}>
         <ProgressBar step={1} />
         <div className={styles.connectWrapper}>
           {faviconUrl ? (
@@ -102,21 +119,31 @@ class ConnectPage extends Component<Props> {
             <div className={styles.loading}>
               <LoadingSpinner />
             </div>
-          ) : isSuccess ? (
-            accounts.length > 0 &&
-            accounts.map((item, idx) => (
+          ) : isSuccess && publicDerivers.length ? (
+            publicDerivers.map((item) => (
               <li key={item.name} className={styles.listItem}>
                 <Checkbox
                   skin={CheckboxSkin}
-                  label={<WalletCard accountInfo={item} />}
-                  onChange={() => onToggleCheckbox(idx)}
-                  checked={selected === idx}
+                  label={
+                    <WalletCard
+                      shouldHideBalance={shouldHideBalance}
+                      publicDeriver={item}
+                      getTokenInfo={this.props.getTokenInfo}
+                    />
+                  }
+                  onChange={() => onToggleCheckbox(item.publicDeriver.getPublicDeriverId())}
+                  checked={selected === item.publicDeriver.getPublicDeriverId()}
                   className={styles.checkbox}
                 />
               </li>
             ))
-          ) : isSuccess && !accounts.length ? (
-            <div>{intl.formatMessage(messages.noWalletsFound)}</div>
+          ) : isSuccess && !publicDerivers.length ? (
+            <p>
+              <FormattedHTMLMessage
+                {...messages.noWalletsFound}
+                values={{ network }}
+              />
+            </p>
           ) : null}
         </ul>
         <div className={styles.bottom}>
@@ -139,7 +166,7 @@ class ConnectPage extends Component<Props> {
             />
           </div>
         </div>
-      </>
+      </div>
     );
   }
 }

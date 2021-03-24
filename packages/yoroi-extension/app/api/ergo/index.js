@@ -457,9 +457,7 @@ export default class ErgoApi {
     // since we may need other UTXO entries to cover the fee
     const filteredUtxos = utxos.filter(utxo => request.filter(utxo));
 
-    const addressedUtxo = asAddressedUtxo(
-      filteredUtxos,
-    );
+    const addressedUtxo = filteredUtxos.map(asAddressedUtxo);
 
     const receivers = [{
       address: request.receiver

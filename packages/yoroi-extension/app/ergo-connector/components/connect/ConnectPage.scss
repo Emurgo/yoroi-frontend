@@ -1,3 +1,11 @@
+.component {
+  height: calc(100vh - 92px);
+  display: flex;
+  flex-direction: column;
+  &.isNightly {
+    height: calc(100vh - 138px);
+  }
+}
 .connectWrapper {
   padding-top: 44px;
   padding-bottom: 64px;
@@ -32,6 +40,7 @@
 }
 
 .list {
+  flex: 1;
   padding: 0 32px 17px;
   border-bottom: 1px solid #dce0e9;
   & .listItem {

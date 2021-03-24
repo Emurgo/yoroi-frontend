@@ -81,7 +81,7 @@
   "daedalusTransfer.waiting.warning": "This may take a long time or fail on poor internet connections",
   "decryption.label": "Decryption password",
   "ergo-connector.connect.info": "Your connection preferences will be saved to your Yoroi dApp list.",
-  "ergo-connector.connect.noWalletsFound": "No wallets found",
+  "ergo-connector.connect.noWalletsFound": "No {network} wallets found.",
   "ergo-connector.label.connect": "Connect to",
   "ergo-connector.label.selectAllWallets": "Select all wallets",
   "global.blog.learnMore": "You can read our {blogLink} to learn more.",

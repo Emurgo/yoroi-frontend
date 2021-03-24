@@ -1,30 +1,24 @@
 // sets up RPC communication with the connector + access check/request functions
 const initialInject = `
-var timeout = 0;
-
-var connectRequests = [];
+var ergoConnectRequests = [];
 
 window.addEventListener("message", function(event) {
     if (event.data.type == "connector_connected") {
         if (event.data.err !== undefined) {
-            connectRequests.forEach(promise => promise.reject(event.data.err));
+            ergoConnectRequests.forEach(promise => promise.reject(event.data.err));
         } else {
-            connectRequests.forEach(promise => promise.resolve(event.data.success));
+            ergoConnectRequests.forEach(promise => promise.resolve(event.data.success));
         }
     }
 });
 
 function ergo_request_read_access() {
-    if (typeof ergo !== "undefined") {
-        return Promise.resolve(true);
-    } else {
-        return new Promise(function(resolve, reject) {
-            window.postMessage({
-                type: "connector_connect_request",
-            }, location.origin);
-            connectRequests.push({ resolve: resolve, reject: reject });
-        });
-    }
+    return new Promise(function(resolve, reject) {
+        window.postMessage({
+            type: "connector_connect_request",
+        }, location.origin);
+        ergoConnectRequests.push({ resolve: resolve, reject: reject });
+    });
 }
 
 function ergo_check_read_access() {
@@ -34,39 +28,18 @@ function ergo_check_read_access() {
         return Promise.resolve(false);
     }
 }
-
-// TODO: fix or change back how RPCs work
-// // disconnect detector
-// setInterval(function() {
-//     if (timeout == 20) {
-//         window.dispatchEvent(new Event("ergo_wallet_disconnected"));
-//     }
-//     if (timeout == 25) {
-//         rpcResolver.forEach(function(rpc) {
-//             rpc.reject("timed out");
-//         });
-//     }
-//     timeout += 1;
-// }, 1000);
-
-// // ping sender
-// setInterval(function() {
-//     _ergo_rpc_call("ping", []).then(function() {
-//         timeout = 0;
-//     });
-// }, 10000);
 `
 
 // client-facing ergo object API
 const apiInject = `
 // RPC set-up
-var rpcUid = 0;
-var rpcResolver = new Map();
+var ergoRpcUid = 0;
+var ergoRpcResolver = new Map();
 
 window.addEventListener("message", function(event) {
     if (event.data.type == "connector_rpc_response") {
         console.log("page received from connector: " + JSON.stringify(event.data) + " with source = " + event.source + " and origin = " + event.origin);
-        const rpcPromise = rpcResolver.get(event.data.uid);
+        const rpcPromise = ergoRpcResolver.get(event.data.uid);
         if (rpcPromise !== undefined) {
             const ret = event.data.return;
             if (ret.err !== undefined) {
@@ -126,19 +99,21 @@ class ErgoAPI {
         return new Promise(function(resolve, reject) {
             window.postMessage({
                 type: "connector_rpc_request",
-                uid: rpcUid,
+                uid: ergoRpcUid,
                 function: func,
                 params: params
             }, location.origin);
-            console.log("rpcUid = " + rpcUid);
-            rpcResolver.set(rpcUid, { resolve: resolve, reject: reject });
-            rpcUid += 1;
+            console.log("ergoRpcUid = " + ergoRpcUid);
+            ergoRpcResolver.set(ergoRpcUid, { resolve: resolve, reject: reject });
+            ergoRpcUid += 1;
         });
     }
 }
 
 const ergo = Object.freeze(new ErgoAPI());
 `
+const API_INTERNAL_ERROR = -2;
+const API_REFUSED = -3;
 
 function injectIntoPage(code) {
     try {
@@ -175,24 +150,37 @@ function getFavicon(url) {
     return faviconURL;
 }
 
-if (shouldInject()) {
-    console.log(`content script injected into ${location.hostname}`);
-    injectIntoPage(initialInject);
+let yoroiPort = null;
+let fullApiInjected = false;
 
+function disconnectWallet() {
+    yoroiPort = null;
+    window.dispatchEvent(new Event("ergo_wallet_disconnected"));
+}
+
+function createYoroiPort() {
     // events from Yoroi
-    let yoroiPort = chrome.runtime.connect(extensionId);
+    yoroiPort = chrome.runtime.connect(extensionId);
     yoroiPort.onMessage.addListener(message => {
         //alert("content script message: " + JSON.stringify(message));
         if (message.type == "connector_rpc_response") {
             window.postMessage(message, location.origin);
         } else if (message.type == "yoroi_connect_response") {
             if (message.success) {
-                // inject full API here
-                if (injectIntoPage(apiInject)) {
-                    chrome.runtime.sendMessage({type: "init_page_action"});
-                } else {
-                    alert("failed to inject Ergo API");
-                    // TODO: return an error instead here if injection fails?
+                if (!fullApiInjected) {
+                    // inject full API here
+                    if (injectIntoPage(apiInject)) {
+                        fullApiInjected = true;
+                    } else {
+                        console.error()
+                        window.postMessage({
+                            type: "connector_connected",
+                            err: {
+                                code: API_INTERNAL_ERROR,
+                                info: "failed to inject Ergo API"
+                            }
+                        }, location.origin);
+                    }
                 }
             }
             window.postMessage({
@@ -202,39 +190,88 @@ if (shouldInject()) {
         }
     });
 
+    yoroiPort.onDisconnect.addListener(event => {
+        disconnectWallet();
+    });
+}
+
+if (shouldInject()) {
+    console.log(`content script injected into ${location.hostname}`);
+    injectIntoPage(initialInject);
+
     // events from page (injected code)
-    window.addEventListener("message", async function(event) {
+    window.addEventListener("message", function(event) {
         if (event.data.type === "connector_rpc_request") {
             console.log("connector received from page: " + JSON.stringify(event.data) + " with source = " + event.source + " and origin = " + event.origin);
-            yoroiPort.postMessage(event.data);
-        } else if (event.data.type == "connector_connect_request") {
-            // URL must be provided here as the url field of Tab is only available
-            // with the "tabs" permission which Yoroi doesn't have
-            try {
-                if (location.hostname === 'localhost') {
-                    yoroiPort.postMessage({
-                        imgBase64Url: '',
-                        type: "yoroi_connect_request",
-                        url: location.hostname
-                    });
+            if (yoroiPort) {
+                try {
+                    yoroiPort.postMessage(event.data);
                     return;
+                } catch (e) {
+                    console.error(`Could not send RPC to Yoroi: ${e}`);
+                    window.postMessage({
+                        type: "connector_rpc_response",
+                        uid: event.data.uid,
+                        return: {
+                            err: {
+                                code: API_INTERNAL_ERROR,
+                                info: `Could not send RPC to Yoroi: ${e}`
+                            }
+                        }
+                    }, location.origin);
                 }
-                // get favicon URL from website url to parse
-                // to data base 64 img and send it to yoroi
-                const faviconURL = getFavicon(location.origin)
-                chrome.runtime.sendMessage(
-                    faviconURL,
-                    imgBase64Url => {
+            } else {
+                window.postMessage({
+                    type: "connector_rpc_response",
+                    uid: event.data.uid,
+                    return: {
+                        err: {
+                            code: API_REFUSED,
+                            info: 'Wallet disconnected'
+                        }
+                    }
+                }, location.origin);
+            }
+        } else if (event.data.type == "connector_connect_request") {
+            if (fullApiInjected && yoroiPort) {
+                // we can skip communication - API injected + hasn't been disconnected
+                window.postMessage({
+                    type: "connector_connected",
+                    success: true
+                }, location.origin);
+            } else {
+                if (yoroiPort == null) {
+                    createYoroiPort();
+                }
+
+                // URL must be provided here as the url field of Tab is only available
+                // with the "tabs" permission which Yoroi doesn't have
+                try {
+                    if (location.hostname === 'localhost') {
                         yoroiPort.postMessage({
-                            imgBase64Url,
+                            imgBase64Url: '',
                             type: "yoroi_connect_request",
                             url: location.hostname
                         });
+                        return;
                     }
-                ); 
+                    // get favicon URL from website url to parse
+                    // to data base 64 img and send it to yoroi
+                    const faviconURL = getFavicon(location.origin)
+                    chrome.runtime.sendMessage(
+                        faviconURL,
+                        imgBase64Url => {
+                            yoroiPort.postMessage({
+                                imgBase64Url,
+                                type: "yoroi_connect_request",
+                                url: location.hostname
+                            });
+                        }
+                    ); 
 
-            } catch (error) {
-                console.log(error)
+                } catch (error) {
+                    console.log(error)
+                }
             }
         }
     });

@@ -25,7 +25,10 @@ declare var chrome;
 /**
  * Name of key we use in localstorage to specify which tab is currently active
  */
-export const OPEN_TAB_ID_KEY = 'openTabId';
+export const TabIdKeys = Object.freeze({
+  Primary: 'openTabId',
+  ErgoConnector: 'openTabId-ErgoConnector',
+});
 const thisWindowId = Date.now().toString();
 
 /**
@@ -35,9 +38,11 @@ const thisWindowId = Date.now().toString();
  *
  * Note: this may cause two copies of Yoroi loading at the same time close each other
  */
-export function addCloseListener() {
+export function addCloseListener(
+  tabKeyId: $Values<typeof TabIdKeys>,
+) {
   addListener(changes => {
-    const newId = changes[OPEN_TAB_ID_KEY];
+    const newId = changes[tabKeyId];
     if (newId != null && newId.newValue !== thisWindowId) {
       // note: we don't need "tabs" permission to get or remove our own tab
       chrome.tabs.getCurrent(tab => chrome.tabs.remove(tab.id));
@@ -68,8 +73,10 @@ export function addCloseListener() {
  *
  * WARNING: You should call this function BEFORE making any other changes to localstorage
 */
-export async function closeOtherInstances() {
-  await setLocalItem(OPEN_TAB_ID_KEY, thisWindowId);
+export async function closeOtherInstances(
+  tabKeyId: $Values<typeof TabIdKeys>,
+) {
+  await setLocalItem(tabKeyId, thisWindowId);
 }
 
 export const handlersSettingUrl: string = 'chrome://settings/handlers';

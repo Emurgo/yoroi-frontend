@@ -31,6 +31,7 @@ type Props = {|
   +notification: ?Notification,
 |};
 
+// TODO: get explorer from user settings
 const URL_WEBSITE = 'https://explorer.ergoplatform.com/en/addresses/';
 
 @observer

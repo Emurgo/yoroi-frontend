@@ -5,7 +5,7 @@ import React from 'react';
 
 import TermsOfUseSettingsPage from './TermsOfUseSettingsPage';
 import { withScreenshot } from 'storycap';
-import { getTermsOfUse } from '../../../stores/toplevel/ProfileStore';
+import { getTermsOfUse } from '../../../stores/base/BaseProfileStore';
 import { wrapSettings } from '../../../Routes';
 import { mockSettingsProps } from '../Settings.mock';
 import {

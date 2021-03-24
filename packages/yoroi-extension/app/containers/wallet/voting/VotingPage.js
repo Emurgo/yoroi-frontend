@@ -22,6 +22,7 @@ import type { TokenInfoMap } from '../../../stores/toplevel/TokenInfoStore';
 import environment from '../../../environment';
 import { MultiToken } from '../../../api/common/lib/MultiToken';
 import RegistrationOver from './RegistrationOver';
+import { networks, } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 
 export type GeneratedData = typeof VotingPage.prototype.generated;
 type Props = {|
@@ -66,7 +67,13 @@ export default class VotingPage extends Component<Props> {
     }
 
     // keep enabled on the testnet
-    if ((environment.isProduction() && !environment.isTest()) && (new Date() >= roundEndDate)) {
+    if (
+      !environment.isTest() &&
+      (
+        selected.getParent().getNetworkInfo().NetworkId === networks.CardanoMainnet.NetworkId &&
+        new Date() >= roundEndDate
+      )
+    ) {
       return <RegistrationOver />;
     }
 

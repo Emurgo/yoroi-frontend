@@ -6,11 +6,15 @@ import { observer } from 'mobx-react';
 import { computed } from 'mobx';
 import type { InjectedOrGeneratedConnector } from '../../types/injectedPropsType';
 import type {
-  AccountInfo,
+  PublicDeriverCache,
   ConnectingMessage,
   WhitelistEntry,
+  ConnectResponseData,
 } from '../../../chrome/extension/ergo-connector/types';
 import { LoadingWalletStates } from '../types';
+import { networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { genLookupOrFail, } from '../../stores/stateless/tokenHelpers';
+import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
 
 type GeneratedData = typeof ConnectContainer.prototype.generated;
 declare var chrome;
@@ -39,7 +43,7 @@ export default class ConnectContainer extends Component<
   };
 
   componentDidMount() {
-    this.generated.actions.connector.getWallets.trigger();
+    this.generated.actions.connector.refreshWallets.trigger();
     this.generated.actions.connector.getConnectorWhitelist.trigger();
     window.addEventListener('unload', this.onUnload);
   }
@@ -48,36 +52,39 @@ export default class ConnectContainer extends Component<
     window.removeEventListener('unload', this.onUnload);
   }
   onToggleCheckbox: (index: number) => void = index => {
-    this.setState({ selected: index });
+    this.setState((prevState) => prevState.selected === index
+      ? { selected: -1 }
+      : { selected: index }
+    );
   };
 
-  async onConnect(walletIndex: number) {
+  async onConnect(publicDeriverId: number) {
     const chromeMessage = this.generated.stores.connector.connectingMessage;
     if(chromeMessage == null) {
       throw new Error(`${nameof(chromeMessage)} connecting to a wallet but no connect message found`);
     }
     const result = this.generated.stores.connector.currentConnectorWhitelist;
     const whitelist = result.length === 0 ? [] : result;
-    whitelist.push({ url: chromeMessage.url, walletIndex });
+    whitelist.push({ url: chromeMessage.url, publicDeriverId });
     await this.generated.actions.connector.updateConnectorWhitelist.trigger({ whitelist });
 
-    chrome.runtime.sendMessage({
+    chrome.runtime.sendMessage(({
       type: 'connect_response',
       accepted: true,
-      account: walletIndex,
+      publicDeriverId,
       tabId: chromeMessage.tabId,
-    });
+    }: ConnectResponseData));
 
     this.generated.actions.connector.closeWindow.trigger();
   }
 
   onCancel: void => void = () => {
     const chromeMessage = this.generated.stores.connector.connectingMessage;
-    chrome.runtime.sendMessage({
+    chrome.runtime.sendMessage(({
       type: 'connect_response',
       accepted: false,
       tabId: chromeMessage?.tabId,
-    });
+    }: ConnectResponseData));
 
     this.generated.actions.connector.closeWindow.trigger();
   };
@@ -104,12 +111,15 @@ export default class ConnectContainer extends Component<
         loading={loadingWallets}
         error={error}
         message={responseMessage}
-        accounts={wallets}
+        publicDerivers={wallets}
         onConnect={this.onConnect}
         onToggleCheckbox={this.onToggleCheckbox}
         onCancel={this.onCancel}
         handleSubmit={this.handleSubmit}
         selected={selected}
+        network={networks.ErgoMainnet.NetworkName}
+        getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
+        shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
       />
     );
   }
@@ -120,8 +130,8 @@ export default class ConnectContainer extends Component<
         getResponse: {|
           trigger: (params: void) => Promise<void>,
         |},
-        getWallets: {|
-          trigger: (params: void) => void,
+        refreshWallets: {|
+          trigger: (params: void) => Promise<void>,
         |},
         closeWindow: {|
           trigger: (params: void) => void,
@@ -137,12 +147,18 @@ export default class ConnectContainer extends Component<
       |},
     |},
     stores: {|
+      profile: {|
+        shouldHideBalance: boolean,
+      |},
       connector: {|
         connectingMessage: ?ConnectingMessage,
-        wallets: Array<AccountInfo>,
+        wallets: Array<PublicDeriverCache>,
         currentConnectorWhitelist: Array<WhitelistEntry>,
         errorWallets: string,
         loadingWallets: $Values<typeof LoadingWalletStates>,
+      |},
+      tokenInfoStore: {|
+        tokenInfo: TokenInfoMap,
       |},
     |},
   |} {
@@ -155,6 +171,9 @@ export default class ConnectContainer extends Component<
     const { stores, actions } = this.props;
     return Object.freeze({
       stores: {
+        profile: {
+          shouldHideBalance: stores.profile.shouldHideBalance
+        },
         connector: {
           connectingMessage: stores.connector.connectingMessage,
           currentConnectorWhitelist: stores.connector.currentConnectorWhitelist,
@@ -162,11 +181,14 @@ export default class ConnectContainer extends Component<
           errorWallets: stores.connector.errorWallets,
           loadingWallets: stores.connector.loadingWallets,
         },
+        tokenInfoStore: {
+          tokenInfo: stores.tokenInfoStore.tokenInfo,
+        },
       },
       actions: {
         connector: {
           getResponse: { trigger: actions.connector.getResponse.trigger },
-          getWallets: { trigger: actions.connector.getWallets.trigger },
+          refreshWallets: { trigger: actions.connector.refreshWallets.trigger },
           closeWindow: { trigger: actions.connector.closeWindow.trigger },
           getConnectorWhitelist: { trigger: actions.connector.getConnectorWhitelist.trigger },
           updateConnectorWhitelist: { trigger: actions.connector.updateConnectorWhitelist.trigger },

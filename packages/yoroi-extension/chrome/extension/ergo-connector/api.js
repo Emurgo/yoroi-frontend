@@ -2,19 +2,19 @@
 
 import type {
   Address,
-  Box,
-  BoxCandidate,
   Paginate,
-  PaginateError,
   PendingTransaction,
+  TokenId,
   Tx,
   TxId,
   SignedTx,
   Value
 } from './types';
+import { ConnectorError } from './types';
 import { RustModule } from '../../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import type {
-  IPublicDeriver
+  IPublicDeriver,
+  IGetAllUtxosResponse
 } from '../../../app/api/ada/lib/storage/models/PublicDeriver/interfaces';
 import {
   PublicDeriver,
@@ -37,19 +37,18 @@ import {
 
 import axios from 'axios';
 
-import type { UtxoTxOutput } from '../../../app/api/ada/lib/storage/database/transactionModels/utxo/api/read';
-
+import { asAddressedUtxo, toErgoBoxJSON } from '../../../app/api/ergo/lib/transactions/utils';
 import { CoreAddressTypes } from '../../../app/api/ada/lib/storage/database/primitives/enums';
 import { getAllAddressesForDisplay } from '../../../app/api/ada/lib/storage/bridge/traitUtils';
 import { getReceiveAddress } from '../../../app/stores/stateless/addressStores';
 
-function paginateResults<T>(results: T[], paginate: ?Paginate): T[] | PaginateError {
+function paginateResults<T>(results: T[], paginate: ?Paginate): T[] {
   if (paginate != null) {
     const startIndex = paginate.page * paginate.limit;
     if (startIndex >= results.length) {
-      return {
+      throw new ConnectorError({
         maxSize: results.length
-      };
+      });
     }
     return results.slice(startIndex, Math.min(startIndex + paginate.limit, results.length));
   }
@@ -63,14 +62,14 @@ function bigNumberToValue(x: BigNumber): Value {
 }
 
 function valueToBigNumber(x: Value): BigNumber {
-  // constructor takes either string/number this is just here for consisitency
+  // constructor takes either string/number this is just here for consistency
   return new BigNumber(x);
 }
 
 export async function connectorGetBalance(
   wallet: PublicDeriver<>,
   pendingTxs: PendingTransaction[],
-  tokenId: string
+  tokenId: TokenId
 ): Promise<Value> {
   if (tokenId === 'ERG') {
     if (pendingTxs.length === 0) {
@@ -83,26 +82,20 @@ export async function connectorGetBalance(
       throw Error('asGetBalance failed in connectorGetBalance');
     } else {
       // need to filter based on pending txs since they could have been included (or could not)
-      const allUtxos = await connectorGetUtxos(wallet, pendingTxs, undefined, tokenId);
+      const allUtxos = await connectorGetUtxos(wallet, pendingTxs, null, tokenId);
       let total = new BigNumber(0);
-      // this should never return a PaginateError since we don't supply a Paginate param
-      if (allUtxos.maxSize === undefined) {
-        for (const box of allUtxos) {
-          total = total.plus(valueToBigNumber(box.value));
-        }
+      for (const box of allUtxos) {
+        total = total.plus(valueToBigNumber(box.value));
       }
       return Promise.resolve(bigNumberToValue(total));
     }
   } else {
-    const allUtxos = await connectorGetUtxos(wallet, pendingTxs, undefined, tokenId);
+    const allUtxos = await connectorGetUtxos(wallet, pendingTxs, null, tokenId);
     let total = new BigNumber(0);
-    // this should never return a PaginateError since we don't supply a Paginate param
-    if (allUtxos.maxSize === undefined) {
-      for (const box of allUtxos) {
-        for (const asset of box.assets) {
-          if (asset.tokenId === tokenId) {
-            total = total.plus(valueToBigNumber(asset.amount));
-          }
+    for (const box of allUtxos) {
+      for (const asset of box.assets) {
+        if (asset.tokenId === tokenId) {
+          total = total.plus(valueToBigNumber(asset.amount));
         }
       }
     }
@@ -110,49 +103,19 @@ export async function connectorGetBalance(
   }
 }
 
-function formatUtxoToBox(utxo: { output: $ReadOnly<UtxoTxOutput>, ... }): Box {
-    const tx = utxo.output.Transaction;
-    const box = utxo.output.UtxoTransactionOutput;
-    const tokens = utxo.output.tokens;
-    // This doesn't seem right - is there a better way to access this?
-    // Or a function that does this for us?
-    const ergoToken = tokens.find(t => t.Token.IsDefault);
-    if (
-      ergoToken == null ||
-      box.ErgoCreationHeight == null ||
-      box.ErgoBoxId == null ||
-      box.ErgoTree == null
-    ) {
-      throw new Error('missing Ergo fields for Ergo UTXO');
-    }
-    const assets = [];
-    for (const token of tokens) {
-      if (!token.Token.IsDefault) {
-        assets.push({
-          tokenId: token.Token.Identifier,
-          amount: token.TokenList.Amount
-        });
-      }
-    }
-    return {
-      boxId: box.ErgoBoxId,
-      ergoTree: box.ErgoTree,
-      assets,
-      additionalRegisters: box.ErgoRegisters == null ? {} : JSON.parse(box.ErgoRegisters),
-      creationHeight: box.ErgoCreationHeight,
-      transactionId: tx.Hash,
-      index: box.OutputIndex,
-      value: parseInt(ergoToken.TokenList.Amount, 10)
-    };
+function formatUtxoToBox(utxo: ElementOf<IGetAllUtxosResponse>): ErgoBoxJson {
+  // eslint-disable-next-line no-unused-vars
+  const { addressing, ...rest } = asAddressedUtxo(utxo);
+  return toErgoBoxJSON(rest);
 }
 
 export async function connectorGetUtxos(
   wallet: PublicDeriver<>,
   pendingTxs: PendingTransaction[],
   valueExpected: ?Value,
-  tokenId: ?string,
+  tokenId: TokenId,
   paginate: ?Paginate
-): Promise<Box[] | PaginateError> {
+): Promise<ErgoBoxJson[]> {
   const withUtxos = asGetAllUtxos(wallet);
   if (withUtxos == null) {
     throw new Error('wallet doesn\'t support IGetAllUtxos');
@@ -213,7 +176,7 @@ async function getAllAddresses(wallet: PublicDeriver<>, usedFilter: boolean): Pr
 export async function connectorGetUsedAddresses(
   wallet: PublicDeriver<>,
   paginate: ?Paginate
-): Promise<Address[] | PaginateError> {
+): Promise<Address[]> {
   return getAllAddresses(wallet, true).then(addresses => paginateResults(addresses, paginate));
 }
 
@@ -234,7 +197,7 @@ export async function connectorGetChangeAddress(wallet: PublicDeriver<>): Promis
 }
 
 // TODO: look into sigma rust string value support
-function processBoxesForSigmaRust(boxes: BoxCandidate[] | Box[]) {
+function processBoxesForSigmaRust(boxes: ErgoBoxJson[]) {
   for (const output of boxes) {
     output.value = parseInt(output.value, 10);
     if (output.value > Number.MAX_SAFE_INTEGER) {
@@ -255,7 +218,7 @@ export async function connectorSignTx(
   utxos: any/* IGetAllUtxosResponse */,
   tx: Tx,
   indices: Array<number>
-): Promise</* SignedTx */any> {
+): Promise<ErgoTxJson> {
   const withLevels = asHasLevels(publicDeriver);
   if (withLevels == null) {
     throw new Error('wallet doesn\'t support levels');
@@ -270,9 +233,7 @@ export async function connectorSignTx(
     processBoxesForSigmaRust(tx.outputs);
     wasmTx = RustModule.SigmaRust.UnsignedTransaction.from_json(JSON.stringify(tx));
   } catch (e) {
-    // eslint-disable-next-line no-console
-    console.error(`tx parse error: ${e}`);
-    throw e;
+    throw ConnectorError.invalidRequest(`Invalid tx - could not parse JSON: ${e}`);
   }
   const boxIdsToSign = [];
   for (const index of indices) {
