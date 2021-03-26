@@ -19,7 +19,7 @@ type Props = {|
   +wallet: PublicDeriverCache,
   +shouldHideBalance: boolean,
   +onRemoveWallet: ?string => void,
-  +getTokenInfo: Inexact<TokenLookupKey> => $ReadOnly<TokenRow>,
+  +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
 |};
 type State = {| isExpanded: boolean |};
 @observer

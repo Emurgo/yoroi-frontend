@@ -96,7 +96,7 @@ type Props = {|
   +resetUriParams: void => void,
   +showMemo: boolean,
   +onAddMemo: void => void,
-  +getTokenInfo: Inexact<TokenLookupKey> => $ReadOnly<TokenRow>,
+  +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
   +defaultToken: $ReadOnly<TokenRow>, // need since no guarantee input in non-null
   +onAddToken: (void | $ReadOnly<TokenRow>) => void,
   +spendableBalance: ?MultiToken,

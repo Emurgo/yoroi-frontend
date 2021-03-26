@@ -55,7 +55,7 @@ type Props = {|
   +onConnect: number => Promise<void>,
   +handleSubmit: () => void,
   +selected: number,
-  +getTokenInfo: Inexact<TokenLookupKey> => $ReadOnly<TokenRow>,
+  +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
   +network: string,
   +shouldHideBalance: boolean,
 |};

@@ -31,6 +31,7 @@ import { Bip44Wallet } from '../../api/ada/lib/storage/models/Bip44Wallet/wrappe
 import { walletChecksum, legacyWalletChecksum } from '@emurgo/cip4-js';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import { MultiToken } from '../../api/common/lib/MultiToken';
+import BigNumber from 'bignumber.js';
 
 // Need to run only once - Connecting wallets
 let initedConnecting = false;
@@ -160,7 +161,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   };
 
   // ========== sign tx confirmation ========== //
-  @computed get totalAmount(): ?any {
+  @computed get totalAmount(): ?BigNumber {
     const pendingSign = this.signingMessage?.sign ?? {};
     if (pendingSign.tx == null) {
       return undefined;
@@ -169,7 +170,10 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
 
     const total = txData.outputs
       .map(item => item.value)
-      .reduce((acum, currentValue) => acum + currentValue);
+      .reduce(
+        (acc, currentValue) => acc.plus(currentValue),
+        new BigNumber(0)
+      );
 
     return total;
   }

@@ -50,7 +50,7 @@ type Props = {|
   +error: ?LocalizableError,
   +classicTheme: boolean,
   +unitOfAccountSetting: UnitOfAccountSettingType,
-  +getTokenInfo: Inexact<TokenLookupKey> => $ReadOnly<TokenRow>,
+  +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
   +getCurrentPrice: (from: string, to: string) => ?number,
 |};
 

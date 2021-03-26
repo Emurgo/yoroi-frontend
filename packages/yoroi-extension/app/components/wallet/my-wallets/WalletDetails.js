@@ -28,7 +28,7 @@ type Props = {|
   +rewards: null | void | MultiToken,
   +walletAmount: null | MultiToken,
   +infoText?: string,
-  +getTokenInfo: Inexact<TokenLookupKey> => $ReadOnly<TokenRow>,
+  +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
 |};
 
 @observer

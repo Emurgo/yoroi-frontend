@@ -13,7 +13,7 @@ import { hiddenAmount } from '../../../utils/strings';
 type Props = {|
   +shouldHideBalance: boolean,
   +publicDeriver: PublicDeriverCache,
-  +getTokenInfo: Inexact<TokenLookupKey> => $ReadOnly<TokenRow>,
+  +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
 |};
 
 function constructPlate(

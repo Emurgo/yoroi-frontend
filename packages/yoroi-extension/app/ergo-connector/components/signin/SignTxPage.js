@@ -19,16 +19,23 @@ import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import { handleExternalLinkClick } from '../../../utils/routing';
 import ExplorableHash from '../../../components/widgets/hashWrappers/ExplorableHash';
 import type { Notification } from '../../../types/notificationType';
-import { truncateConnectorBoxId } from '../../../utils/formatters';
+import { truncateConnectorBoxId, truncateToken } from '../../../utils/formatters';
 import ProgressBar from '../ProgressBar';
+import type { Tx } from '../../../../chrome/extension/ergo-connector/types';
+import type { DefaultTokenEntry, TokenLookupKey } from '../../../api/common/lib/MultiToken';
+import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
+import { getTokenName, genFormatTokenAmount } from '../../../stores/stateless/tokenHelpers';
+import BigNumber from 'bignumber.js';
 
 type Props = {|
-  totalAmount: ?number,
-  txData: any, // TODO: what is this supposed to be? Doesn't match the type of the thing back in
-  onCopyAddressTooltip: (string, string) => void,
-  onCancel: () => void,
-  onConfirm: string => void,
+  +totalAmount: ?BigNumber,
+  +txData: Tx,
+  +onCopyAddressTooltip: (string, string) => void,
+  +onCancel: () => void,
+  +onConfirm: string => void,
   +notification: ?Notification,
+  +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
+  +defaultToken: DefaultTokenEntry,
 |};
 
 // TODO: get explorer from user settings
@@ -89,6 +96,12 @@ class SignTxPage extends Component<Props> {
     const { intl } = this.context;
     const { txData, onCopyAddressTooltip, onCancel, notification, totalAmount } = this.props;
 
+    const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
+    const defaultTokenEntry = {
+      identifier: this.props.defaultToken.defaultIdentifier,
+      networkId: this.props.defaultToken.defaultNetworkId,
+    };
+    const defaultTokenInfo = this.props.getTokenInfo(defaultTokenEntry);
     return (
       <>
         <ProgressBar step={2} />
@@ -103,16 +116,29 @@ class SignTxPage extends Component<Props> {
               {txData.outputs.map(({ value, assets, boxId }) => {
                 return (
                   <div className={styles.amountRow} key={boxId}>
-                    <p className={styles.amount}>{value} ERG</p>
+                    <p className={styles.amount}>
+                      {formatValue({
+                        ...defaultTokenEntry,
+                        amount: new BigNumber(value),
+                      })} {truncateToken(getTokenName(defaultTokenInfo))}
+                    </p>
                     {assets && assets.length ? (
-                      assets.map(({ tokenId, amount }) => (
-                        <p className={styles.stablecoins} key={tokenId}>
-                          {amount} {tokenId}
-                        </p>
-                      ))
-                    ) : (
-                      <p className={styles.tokens}>No tokens</p>
-                    )}
+                      assets.map(({ tokenId, amount }) => {
+                        const tokenInfoEntry = {
+                          networkId: this.props.defaultToken.defaultNetworkId,
+                          identifier: tokenId,
+                        };
+                        const tokenInfo = this.props.getTokenInfo(tokenInfoEntry);
+                        return (
+                          <p className={styles.stablecoins} key={tokenId}>
+                            {formatValue({
+                              ...tokenInfoEntry,
+                              amount: new BigNumber(amount),
+                            })} {truncateToken(getTokenName(tokenInfo))}
+                          </p>
+                        );
+                      })
+                    ) : (<></>)}
                   </div>
                 );
               })}
@@ -127,7 +153,12 @@ class SignTxPage extends Component<Props> {
             <p className={styles.label}>
               {intl.formatMessage(globalMessages.walletSendConfirmationTotalLabel)}
             </p>
-            <p className={styles.totalValue}>{totalAmount} ERG</p>
+            <p className={styles.totalValue}>
+              {formatValue({
+                ...defaultTokenEntry,
+                amount: totalAmount ?? new BigNumber(0),
+              })} {truncateToken(getTokenName(defaultTokenInfo))}
+            </p>
           </div>
           <div className={styles.address}>
             <div className={styles.addressFrom}>
@@ -136,7 +167,7 @@ class SignTxPage extends Component<Props> {
                 <span>{txData.inputs.length}</span>
               </p>
               <div className={styles.addressFromList}>
-                {txData.inputs?.map((address, index) => {
+                {txData.inputs.map((address, index) => {
                   const notificationElementId = `ergo-input-${index}`;
                   return (
                     <div className={styles.addressToItem} key={address.boxId}>
@@ -172,7 +203,7 @@ class SignTxPage extends Component<Props> {
                 <span>{txData.outputs.length}</span>
               </p>
               <div className={styles.addressToList}>
-                {txData.outputs?.map((address, index) => {
+                {txData.outputs.map((address, index) => {
                   const notificationElementId = `address-output-${index}-copyNotification`;
                   return (
                     <div className={styles.addressToItem} key={address.boxId}>

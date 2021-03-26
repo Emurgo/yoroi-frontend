@@ -48,7 +48,7 @@ type Props = {|
   +selectedExplorer: SelectedExplorer,
   +unitOfAccountSetting: UnitOfAccountSettingType,
   +getCurrentPrice: (from: string, to: string) => ?number,
-  +getTokenInfo: Inexact<TokenLookupKey> => $ReadOnly<TokenRow>,
+  +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
 |};
 
 @observer

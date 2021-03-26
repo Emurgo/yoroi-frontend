@@ -63,7 +63,7 @@ type Props = {|
   +selectedExplorer: SelectedExplorer,
   +poolName: null | string,
   +poolHash: string,
-  +getTokenInfo: Inexact<TokenLookupKey> => $ReadOnly<TokenRow>,
+  +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
   +amountToDelegate: MultiToken,
   +transactionFee: MultiToken,
   +approximateReward: {|

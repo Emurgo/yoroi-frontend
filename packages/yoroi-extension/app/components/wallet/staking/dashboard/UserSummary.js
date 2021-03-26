@@ -70,7 +70,7 @@ const messages = defineMessages({
 type Props = {|
   /** need this since we need to show the ticker names while spinner is still showing */
   +defaultTokenInfo: $ReadOnly<TokenRow>,
-  +getTokenInfo: Inexact<TokenLookupKey> => $ReadOnly<TokenRow>,
+  +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
   +totalSum: void | MultiToken,
   +totalRewards: void | MultiToken,
   +totalDelegated: void | MultiToken,

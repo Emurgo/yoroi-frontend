@@ -61,7 +61,7 @@ type Props = {|
   +isLoadingTransactions: boolean,
   +openExportTxToFileDialog: void => void,
   +unitOfAccountSetting: UnitOfAccountSettingType,
-  +getTokenInfo: Inexact<TokenLookupKey> => $ReadOnly<TokenRow>,
+  +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
 |};
 
 @observer

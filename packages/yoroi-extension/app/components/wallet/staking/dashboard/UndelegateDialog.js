@@ -45,7 +45,7 @@ const messages = defineMessages({
 type Props = {|
   +staleTx: boolean,
   +transactionFee: MultiToken,
-  +getTokenInfo: Inexact<TokenLookupKey> => $ReadOnly<TokenRow>,
+  +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
   +isSubmitting: boolean,
   +onCancel: void => void,
   +onSubmit: ({| password: string |}) => PossiblyAsync<void>,

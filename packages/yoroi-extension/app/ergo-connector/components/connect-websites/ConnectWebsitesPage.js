@@ -21,8 +21,8 @@ type Props = {|
   +activeSites: Array<string>,
   +wallets: ?Array<PublicDeriverCache>,
   +onRemoveWallet: ?string => void,
-  +getTokenInfo: Inexact<TokenLookupKey> => $ReadOnly<TokenRow>,
-  shouldHideBalance: boolean,
+  +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
+  +shouldHideBalance: boolean,
 |};
 const messages = defineMessages({
   connectedWallets: {

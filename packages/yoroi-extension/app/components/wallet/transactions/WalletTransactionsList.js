@@ -54,7 +54,7 @@ type Props = {|
   +onCopyAddressTooltip: (string, string) => void,
   +notification: ?Notification,
   +addressToDisplayString: string => string,
-  +getTokenInfo: Inexact<TokenLookupKey> => $ReadOnly<TokenRow>,
+  +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
   +complexityLevel: ?ComplexityLevelType,
 |};
 

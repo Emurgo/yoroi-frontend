@@ -201,9 +201,13 @@ export function genGetBestBlock(
   };
 }
 
-export function genGetAssetInfo(
-  blockchain: Array<RemoteErgoTransaction>,
-): AssetInfoFunc {
+export function decodeErgoTokenInfo(
+  registers: { [key: string]: string }
+): {|
+  name: string | null,
+  desc: string | null,
+  numDecimals: number | null,
+|} {
   /**
   * try parsing an int (base 10) and return NaN if it fails
   * Can't use parseInt because parseInt('1a') returns '1' instead of failing
@@ -236,6 +240,16 @@ export function genGetAssetInfo(
     return string;
   }
 
+  return {
+    name: decode(registers.R4),
+    desc: decode(registers.R5),
+    numDecimals: numDecimalsToNum(decode(registers.R6)),
+  }
+}
+
+export function genGetAssetInfo(
+  blockchain: Array<RemoteErgoTransaction>,
+): AssetInfoFunc {
   const getBoxForToken: string => ErgoTxOutput = (tokenId) => {
     // A transaction can create out-of-thin-air tokens in its outputs
     // if the token identifier is equal to the identifier of the first input box of the transaction
@@ -259,9 +273,7 @@ export function genGetAssetInfo(
     for (const tokenId of body.assetIds) {
       const boxInfo = getBoxForToken(tokenId);
       result[tokenId] = {
-        name: decode(boxInfo.additionalRegisters.R4),
-        desc: decode(boxInfo.additionalRegisters.R5),
-        numDecimals: numDecimalsToNum(decode(boxInfo.additionalRegisters.R6)),
+        ...decodeErgoTokenInfo(boxInfo.additionalRegisters),
         boxId: boxInfo.id,
         height: boxInfo.creationHeight,
       }

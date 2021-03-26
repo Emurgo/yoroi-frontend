@@ -33,7 +33,7 @@ type Props = {|
   +walletAmount: null | MultiToken,
   +infoText?: string,
   +showDetails?: boolean,
-  +getTokenInfo: Inexact<TokenLookupKey> => $ReadOnly<TokenRow>,
+  +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
   +defaultToken: $ReadOnly<TokenRow>,
 |};
 
