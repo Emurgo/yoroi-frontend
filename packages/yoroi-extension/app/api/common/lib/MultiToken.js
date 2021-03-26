@@ -5,22 +5,22 @@ import {
 } from 'bignumber.js';
 
 export type TokenLookupKey = {|
-  identifier: string,
+  +identifier: string,
   /**
     * note: avoid putting asset metadata here directly
     * since it can update over time so best not to cache it here
     */
-  networkId: number,
+  +networkId: number,
 |};
 
 export type TokenEntry = {|
   ...TokenLookupKey,
-  amount: BigNumber,
+  +amount: BigNumber,
 |};
 
 export type DefaultTokenEntry = {|
-  defaultNetworkId: number,
-  defaultIdentifier: string,
+  +defaultNetworkId: number,
+  +defaultIdentifier: string,
 |};
 
 export class MultiToken {

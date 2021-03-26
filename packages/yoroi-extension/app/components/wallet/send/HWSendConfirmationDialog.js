@@ -49,7 +49,7 @@ type Props = {|
   +error: ?LocalizableError,
   +onSubmit: void => PossiblyAsync<void>,
   +onCancel: void => void,
-  +getTokenInfo: Inexact<TokenLookupKey> => $ReadOnly<TokenRow>,
+  +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
   +unitOfAccountSetting: UnitOfAccountSettingType,
   +addressToDisplayString: string => string,
   +getCurrentPrice: (from: string, to: string) => ?number,

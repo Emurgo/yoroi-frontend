@@ -80,9 +80,11 @@ type PublicDeriverId = number;
 
 // PublicDeriverId = successfully connected - which public deriver the user selected
 // null = refused by user
-type ConnectedStatus = ?PublicDeriverId | {|
+type ConnectedStatus = null | {|
+  publicDeriverId: PublicDeriverId
+|} | {|
   // response (?PublicDeriverId) - null means the user refused, otherwise the account they selected
-  resolve: any,
+  resolve: ?PublicDeriverId => void,
   // if a window has fetched this to show to the user yet
   openedWindow: boolean,
 |};
@@ -264,8 +266,8 @@ async function withSelectedWallet<T>(
     const wallets = await getWallets({ db });
     const connected = connectedSites.get(tabId);
     if (connected) {
-      const publicDeriverId = connected.status;
-      if (typeof publicDeriverId === 'number') {
+      if (typeof connected.status?.publicDeriverId === 'number') {
+        const { publicDeriverId } = connected.status;
         const selectedWallet = wallets.find(
           cache => cache.getPublicDeriverId() === publicDeriverId
         );
@@ -323,10 +325,12 @@ chrome.runtime.onMessage.addListener(async (
     if (request.tabId == null) return;
     const { tabId } = request;
     const connection = connectedSites.get(tabId);
-    if (connection && connection.status != null && typeof connection.status === 'object') {
+    if (connection && connection.status != null && connection.status.resolve != null) {
       if (request.accepted === true) {
         connection.status.resolve(request.publicDeriverId);
-        connection.status = request.publicDeriverId;
+        connection.status = {
+          publicDeriverId: request.publicDeriverId,
+        };
       } else {
         connection.status.resolve(null);
         connectedSites.delete(tabId);
@@ -392,7 +396,11 @@ chrome.runtime.onMessage.addListener(async (
       for (const [/* uid */, responseData] of connection.pendingSigns.entries()) {
         if (!responseData.openedWindow) {
           responseData.openedWindow = true;
+          if (connection.status?.publicDeriverId == null) {
+            throw new Error(`${request.type} no public deriver set for request`);
+          }
           sendResponse(({
+            publicDeriverId: connection.status.publicDeriverId,
             sign: responseData.request,
             tabId
           }: SigningMessage));
@@ -404,8 +412,8 @@ chrome.runtime.onMessage.addListener(async (
     sendResponse(null);
   } else if (request.type === 'connect_retrieve_data') {
     for (const [tabId, connection] of connectedSites) {
-      if (connection.status != null && typeof connection.status === 'object') {
-        if (!connection.status.openedWindow) {
+      if (connection.status != null) {
+        if (connection.status.resolve) {
           connection.status.openedWindow = true;
           sendResponse(({
             url: connection.url,
@@ -489,7 +497,9 @@ async function confirmConnect(
       // we already whitelisted this website, so no need to re-ask the user to confirm
       connectedSites.set(tabId, {
         url,
-        status: whitelistEntry.publicDeriverId,
+        status: {
+          publicDeriverId: whitelistEntry.publicDeriverId,
+        },
         pendingSigns: new Map()
       });
       resolve(whitelistEntry.publicDeriverId);

@@ -8,7 +8,14 @@ import globalMessages from '../../i18n/global-messages';
 import type { Notification } from '../../types/notificationType';
 import SignTxPage from '../components/signin/SignTxPage';
 import type { InjectedOrGeneratedConnector } from '../../types/injectedPropsType';
-import type { SigningMessage } from '../../../chrome/extension/ergo-connector/types';
+import type { SigningMessage, PublicDeriverCache } from '../../../chrome/extension/ergo-connector/types';
+import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
+import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
+import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
+import VerticallyCenteredLayout from '../../components/layout/VerticallyCenteredLayout';
+import FullscreenLayout from '../../components/layout/FullscreenLayout';
+import LoadingSpinner from '../../components/widgets/LoadingSpinner';
+import BigNumber from 'bignumber.js';
 
 type GeneratedData = typeof SignTxContainer.prototype.generated;
 
@@ -24,6 +31,7 @@ export default class SignTxContainer extends Component<
   };
 
   componentDidMount() {
+    this.generated.actions.connector.refreshWallets.trigger();
     window.addEventListener('unload', this.onUnload);
   }
 
@@ -38,6 +46,16 @@ export default class SignTxContainer extends Component<
     this.generated.actions.connector.cancelSignInTx.trigger();
   };
 
+  renderLoading(): Node {
+    return (
+      <FullscreenLayout bottomPadding={0}>
+        <VerticallyCenteredLayout>
+          <LoadingSpinner />
+        </VerticallyCenteredLayout>
+      </FullscreenLayout>
+    );
+  }
+
   render(): Node {
     const actions = this.generated.actions;
     const { uiNotifications } = this.generated.stores;
@@ -47,11 +65,19 @@ export default class SignTxContainer extends Component<
       message: globalMessages.copyTooltipMessage,
     };
 
+    const { signingMessage } = this.generated.stores.connector;
+    if (signingMessage == null) return this.renderLoading();
+
+    const selectedWallet = this.generated.stores.connector.wallets.find(
+      wallet => wallet.publicDeriver.getPublicDeriverId() === signingMessage.publicDeriverId
+    );
+    if (selectedWallet == null) return this.renderLoading();
+
     let component = null;
     // TODO: handle other sign types
-    switch (this.generated.stores.connector.signingMessage?.sign.type) {
+    switch (signingMessage.sign.type) {
       case 'tx': {
-        const txData = this.generated.stores.connector.signingMessage.sign.tx ?? '';
+        const txData = signingMessage.sign.tx ?? '';
         component = (
           <SignTxPage
             onCopyAddressTooltip={(address, elementId) => {
@@ -73,6 +99,8 @@ export default class SignTxContainer extends Component<
             }
             txData={txData}
             totalAmount={this.generated.stores.connector.totalAmount}
+            getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
+            defaultToken={selectedWallet.publicDeriver.getParent().getDefaultToken()}
             onConfirm={this.onConfirm}
             onCancel={this.onCancel}
           />
@@ -99,16 +127,24 @@ export default class SignTxContainer extends Component<
           trigger: (params: void) => void,
         |},
         confirmSignInTx: {| trigger: (params: string) => void |},
+        refreshWallets: {|
+          trigger: (params: void) => Promise<void>,
+        |},
       |},
     |},
     stores: {|
       connector: {|
         signingMessage: ?SigningMessage,
-        totalAmount: ?number,
+        totalAmount: ?BigNumber,
+        wallets: Array<PublicDeriverCache>,
       |},
       uiNotifications: {|
         getTooltipActiveNotification: string => ?Notification,
         isOpen: string => boolean,
+      |},
+      tokenInfoStore: {|
+        tokenInfo: TokenInfoMap,
+        getDefaultTokenInfo: number => $ReadOnly<TokenRow>,
       |},
     |},
   |} {
@@ -124,15 +160,21 @@ export default class SignTxContainer extends Component<
         connector: {
           signingMessage: stores.connector.signingMessage,
           totalAmount: stores.connector.totalAmount,
+          wallets: stores.connector.wallets,
         },
         uiNotifications: {
           isOpen: stores.uiNotifications.isOpen,
           getTooltipActiveNotification: stores.uiNotifications.getTooltipActiveNotification,
         },
+        tokenInfoStore: {
+          tokenInfo: stores.tokenInfoStore.tokenInfo,
+          getDefaultTokenInfo: stores.tokenInfoStore.getDefaultTokenInfo,
+        },
       },
       actions: {
         connector: {
           confirmSignInTx: { trigger: actions.connector.confirmSignInTx.trigger },
+          refreshWallets: { trigger: actions.connector.refreshWallets.trigger },
           cancelSignInTx: { trigger: actions.connector.cancelSignInTx.trigger },
         },
         notifications: {

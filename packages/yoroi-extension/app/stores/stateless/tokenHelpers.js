@@ -75,8 +75,8 @@ export function getTokenIdentifierIfExists(
 
 export function genLookupOrFail(
   map: TokenInfoMap,
-): (Inexact<TokenLookupKey> => $ReadOnly<TokenRow>) {
-  return (lookup: Inexact<TokenLookupKey>): $ReadOnly<TokenRow> => {
+): ($ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>) {
+  return (lookup: $ReadOnly<Inexact<TokenLookupKey>>): $ReadOnly<TokenRow> => {
     const tokenRow = map
       .get(lookup.networkId.toString())
       ?.get(lookup.identifier);
@@ -86,7 +86,7 @@ export function genLookupOrFail(
 }
 
 export function genFormatTokenAmount(
-  getTokenInfo: Inexact<TokenLookupKey> => $ReadOnly<TokenRow>
+  getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>
 ): (TokenEntry => string) {
   return (tokenEntry) => {
     const tokenInfo = getTokenInfo(tokenEntry);

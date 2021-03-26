@@ -53,7 +53,7 @@ type Props = {|
   +onSubmit: ({| password?: string |}) => PossiblyAsync<void>,
   +classicTheme: boolean,
   +error: ?LocalizableError,
-  +getTokenInfo: Inexact<TokenLookupKey> => $ReadOnly<TokenRow>,
+  +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
 |};
 
 @observer

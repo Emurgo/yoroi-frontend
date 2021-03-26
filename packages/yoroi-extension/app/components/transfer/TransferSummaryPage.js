@@ -66,7 +66,7 @@ type Props = {|
   +error: ?LocalizableError,
   +form: ?Node,
   +unitOfAccountSetting: UnitOfAccountSettingType,
-  +getTokenInfo: Inexact<TokenLookupKey> => $ReadOnly<TokenRow>,
+  +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
   +getCurrentPrice: (from: string, to: string) => ?number,
   +addressToDisplayString: string => string,
   +addressLookup: ReturnType<typeof genAddressLookup>,

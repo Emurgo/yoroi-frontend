@@ -7,6 +7,14 @@ import { withScreenshot } from 'storycap';
 import { action } from '@storybook/addon-actions';
 import { MemoryRouter } from 'react-router';
 import Layout from '../components/layout/Layout';
+import { mockFromDefaults, getDefaultEntryTokenInfo, } from '../../stores/toplevel/TokenInfoStore';
+import { defaultAssets, } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import {
+  genErgoSigningWalletWithCache,
+} from '../../../stories/helpers/ergo/ErgoMocks';
+import { MultiToken } from '../../api/common/lib/MultiToken';
+import BigNumber from 'bignumber.js';
+import { decodeErgoTokenInfo } from '../../api/ergo/lib/state-fetch/mockNetwork';
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -23,7 +31,17 @@ export default {
   ],
 };
 
-const message = {
+const tokenInfo = {
+  registers: {
+    'R4': '0e03555344',
+    'R5': '0e184e6f7468696e67206261636b65642055534420746f6b656e',
+    'R6': '0e0132',
+  },
+  tokenId: '33a35e15ae1a83fa188674a2bd53007b07e119a0eaaf40b890b2081c2864f12a',
+};
+
+const message = (id: number) => ({
+  publicDeriverId: id,
   sign: {
     type: 'tx',
     uid: 0,
@@ -42,13 +60,9 @@ const message = {
         ergoTree: '1234',
         assets: [{
           amount: 12340,
-          tokenId: '33a35e15ae1a83fa188674a2bd53007b07e119a0eaaf40b890b2081c2864f12a',
+          tokenId: tokenInfo.tokenId,
         }],
-        additionalRegisters: Object.freeze({
-          'R4': '0e03555344',
-          'R5': '0e184e6f7468696e67206261636b65642055534420746f6b656e',
-          'R6': '0e0132',
-        }),
+        additionalRegisters: tokenInfo.registers,
         creationHeight: 1,
         transactionId: '2df0273e382739f8b4ae3783d81168093e78e0b48ec2c5430ff03d444806a175',
         index: 0
@@ -56,18 +70,61 @@ const message = {
     },
   },
   tabId: 0,
-};
+});
 
-const genBaseProps: {||} => * = () => {
+const genBaseProps: {|
+  wallet: *,
+  isLoading?: true,
+|} => * = (request) => {
+  const parsedTokenMetadata = decodeErgoTokenInfo(tokenInfo.registers);
+  const customAsset = {
+    NetworkId: request.wallet.publicDeriver.getParent().getNetworkInfo().NetworkId,
+    Identifier: '33a35e15ae1a83fa188674a2bd53007b07e119a0eaaf40b890b2081c2864f12a',
+    IsDefault: false,
+    Metadata: {
+      type: 'Ergo',
+      height: 0,
+      boxId: '05ec4a4a7f4645fa66886cef2e34706907a3a7f9d88e0d48b313ad2cdf76fb5f',
+      ticker: null,
+      longName: parsedTokenMetadata.name,
+      numberOfDecimals: parsedTokenMetadata.numDecimals || 0,
+      description: parsedTokenMetadata.desc,
+    }
+  };
+
   return {
     stores: {
       connector: {
-        signingMessage: message,
-        totalAmount: 5,
+        signingMessage: message(request.wallet.publicDeriver.getPublicDeriverId()),
+        totalAmount: new BigNumber(5),
+        wallets: request.isLoading
+          ? []
+          : [{
+            publicDeriver: request.wallet.publicDeriver,
+            name: 'Storybook wallet A',
+            balance: new MultiToken([{
+              amount: new BigNumber('1234'),
+              identifier:
+                request.wallet.publicDeriver.getParent().getDefaultToken().defaultIdentifier,
+              networkId:
+                request.wallet.publicDeriver.getParent().getDefaultToken().defaultNetworkId,
+            }], request.wallet.publicDeriver.getParent().getDefaultToken()),
+            checksum: {
+              ImagePart: '7b9bf637f341bed7933c8673f9fb7e405097746115f24ec7d192f80fb6efb219da8bc1902dab99fc070f156b7877f29dd8e581da616ff7fdad28493d084a0db9',
+              TextPart: 'XLBS-6706',
+            }
+          }],
       },
       uiNotifications: {
         getTooltipActiveNotification: (_id) => undefined,
         isOpen: (_clazz) => false,
+      },
+      tokenInfoStore: {
+        tokenInfo: mockFromDefaults([...defaultAssets, customAsset]),
+        getDefaultTokenInfo: networkId => getDefaultEntryTokenInfo(
+          networkId,
+          mockFromDefaults([...defaultAssets, customAsset])
+        ),
       },
     },
     actions: {
@@ -80,6 +137,7 @@ const genBaseProps: {||} => * = () => {
         },
       },
       connector: {
+        refreshWallets: { trigger: async (req) => action('refreshWallets')(req) },
         cancelSignInTx: {
           trigger: action('cancelSignInTx'),
         },
@@ -91,10 +149,21 @@ const genBaseProps: {||} => * = () => {
   };
 };
 
-export const Generic = (): Node => {
+export const Loading = (): Node => {
+  const wallet = genErgoSigningWalletWithCache();
   return (
     <SignTxContainer
-      generated={genBaseProps(Object.freeze({}))}
+      generated={genBaseProps(Object.freeze({ wallet, isLoading: true }))}
+    />
+  );
+};
+
+
+export const Generic = (): Node => {
+  const wallet = genErgoSigningWalletWithCache();
+  return (
+    <SignTxContainer
+      generated={genBaseProps(Object.freeze({ wallet }))}
     />
   );
 };

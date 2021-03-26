@@ -330,7 +330,11 @@ export type PublicDeriverCache = {|
 export type WhitelistEntry = {| url: string, publicDeriverId: number |};
 
 export type ConnectingMessage = {| tabId: number, url: string, imgBase64Url: string |};
-export type SigningMessage = {| sign: PendingSignData, tabId: number |};
+export type SigningMessage = {|
+  publicDeriverId: number,
+  sign: PendingSignData,
+  tabId: number,
+|};
 export type ConnectedSites = {|
   sites: Array<string>,
 |};

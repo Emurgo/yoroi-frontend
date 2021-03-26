@@ -78,7 +78,7 @@ type Props = {|
   +onGeneratePaymentURI: void | (string => void),
   +shouldHideBalance: boolean,
   +unitOfAccountSetting: UnitOfAccountSettingType,
-  +getTokenInfo: Inexact<TokenLookupKey> => $ReadOnly<TokenRow>,
+  +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
   +addressBook: boolean,
 |};
 
