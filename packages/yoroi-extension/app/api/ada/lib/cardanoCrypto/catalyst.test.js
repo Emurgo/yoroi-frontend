@@ -30,6 +30,7 @@ test('Generate Catalyst registration tx', async () => {
     stakePrivateKey,
     catalystPrivateKey,
     receiverAddress: Buffer.from(address.to_address().to_bytes()),
+    slotNumber: 1234,
   });
 
   const data = result.get(RustModule.WalletV4.BigNum.from_str(CatalystLabels.DATA.toString()));
@@ -51,10 +52,11 @@ test('Generate Catalyst registration tx', async () => {
     '61284': {
       '1': '0x0036ef3e1f0d3f5989e2d155ea54bdb2a72c4c456ccb959af4c94868f473f5a0',
       '2': '0x1c5d88aa573da97e5a4667e0f7c4a9c6a3d848934c3b0a5b9296b401540f2aef',
-      '3': '0x019f0186a15f50592b311b57980e06cf9e791dfcb998a1fb8bfd65d06ea3ba547223c9b7f4d6c545c70c0f2c1dbdf925ae98db761287aa5a85'
+      '3': '0x019f0186a15f50592b311b57980e06cf9e791dfcb998a1fb8bfd65d06ea3ba547223c9b7f4d6c545c70c0f2c1dbdf925ae98db761287aa5a85',
+      '4': 1234,
     },
     '61285': {
-      '1': '0x12127021e5fb84058e7ed02630a8dc3f659daed59e21074907fa1512ca234cbe4c24c97dd000247990439b9be76c793514fe62278cb5b680689ebf8aa0175b0f'
+      '2': '0xcc1276aebd2dafc0db75b362653a5259a1504fd5fcc47a2b8d603c7d1eb0f5eafd96c5ae384fb221ceb49354ae9f5d87f98fd838fe6dd8852a444e9c7e32ce0c'
     }
   };
   expect({
