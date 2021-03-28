@@ -1,6 +1,7 @@
 // @flow
 
 import { RustModule } from './rustLoader';
+import blake2b from 'blake2b';
 
 export const CatalystLabels = Object.freeze({
   DATA: 61284,
@@ -10,6 +11,7 @@ export function generateRegistration(request: {|
   stakePrivateKey: RustModule.WalletV4.PrivateKey,
   catalystPrivateKey: RustModule.WalletV4.PrivateKey,
   receiverAddress: Buffer,
+  slotNumber: number,
 |}): RustModule.WalletV4.GeneralTransactionMetadata {
 
   /**
@@ -20,10 +22,11 @@ export function generateRegistration(request: {|
     *   1: "pubkey generated for catalyst app",
     *   2: "stake key public key",
     *   3: "address to receive rewards to"
+    *   4: "slot number"
     * }
     * label: 61285
     * {
-    *   1: "signature of metadata signed using stakekey"
+    *   2: "signature of blake2b-256 hash of the metadata signed using stakekey"
     * }
     */
 
@@ -32,6 +35,7 @@ export function generateRegistration(request: {|
       '1': `0x${Buffer.from(request.catalystPrivateKey.to_public().as_bytes()).toString('hex')}`,
       '2': `0x${Buffer.from(request.stakePrivateKey.to_public().as_bytes()).toString('hex')}`,
       '3': `0x${Buffer.from(request.receiverAddress).toString('hex')}`,
+      '4': request.slotNumber,
     }),
     RustModule.WalletV4.MetadataJsonSchema.BasicConversions
   );
@@ -42,14 +46,14 @@ export function generateRegistration(request: {|
   );
 
   const catalystSignature = request.stakePrivateKey
-    .sign(generalMetadata.to_bytes())
+    .sign(blake2b(64).update(generalMetadata.to_bytes()).digest('hex'))
     .to_hex();
 
   generalMetadata.insert(
     RustModule.WalletV4.BigNum.from_str(CatalystLabels.SIG.toString()),
     RustModule.WalletV4.encode_json_str_to_metadatum(
       JSON.stringify({
-        '1': `0x${catalystSignature}`,
+        '2': `0x${catalystSignature}`,
       }),
       RustModule.WalletV4.MetadataJsonSchema.BasicConversions
     )

@@ -226,6 +226,10 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
         stakePrivateKey: stakingKey,
         catalystPrivateKey: this.catalystPrivateKey,
         receiverAddress: Buffer.from(nextInternal.addr.Hash, 'hex'),
+        slotNumber: timeToSlot({
+          // add current slot to registration to avoid replay attacks
+          time: new Date(),
+        }).slot,
       });
 
       const votingRegTxPromise = this.createVotingRegTx.execute({

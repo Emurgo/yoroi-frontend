@@ -1,6 +1,6 @@
 {
   "name": "yoroi",
-  "version": "4.2.1",
+  "version": "4.2.2",
   "description": "Cardano ADA wallet",
   "scripts": {
     "dev:build": "rimraf dev/ && babel-node scripts/build --type=debug",
@@ -93,7 +93,6 @@
     "babel-plugin-nameof-js": "0.0.2",
     "babel-plugin-react-intl": "5.1.18",
     "babel-preset-react-optimize": "1.0.1",
-    "blake2b": "2.1.3",
     "cardano-wallet": "1.2.2",
     "chai": "4.3.0",
     "chai-as-promised": "7.1.1",
@@ -164,6 +163,7 @@
     "bignumber.js": "9.0.1",
     "bip32": "2.0.6",
     "bip39": "3.0.3",
+    "blake2b": "2.1.3",
     "browserify-zlib": "0.2.0",
     "bs58": "4.0.1",
     "bs58check": "2.1.2",
