@@ -26,6 +26,7 @@ export default class BaseLoadingStore<TStores, TActions> extends Store<TStores, 
   @observable migrationRequest: Request<MigrationRequest => Promise<void>>
     = new Request<MigrationRequest => Promise<void>>(migrateAndRefresh);
 
+  // note: never get anything but result except for the .error inside this file
   @observable loadPersistentDbRequest: Request<void => Promise<lf$Database>>
     = new Request<void => Promise<lf$Database>>(
       async () => await loadLovefieldDB(schema.DataStoreType.INDEXED_DB)
@@ -85,6 +86,10 @@ export default class BaseLoadingStore<TStores, TActions> extends Store<TStores, 
 
   getTabIdKey(): string {
     throw new Error(`${nameof(BaseLoadingStore)}::${nameof(this.getTabIdKey)} child needs to override this function`);
+  }
+
+  getDatabase(): ?lf$Database {
+    throw new Error(`${nameof(BaseLoadingStore)}::${nameof(this.getDatabase)} child needs to override this function`);
   }
 
   async preLoadingScreenEnd(): Promise<void> {

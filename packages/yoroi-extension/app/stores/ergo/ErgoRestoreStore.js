@@ -58,7 +58,7 @@ export default class ErgoRestoreStore extends Store<StoresMap, ActionsMap> {
     }
     const { phrase } = this.stores.walletRestore.recoveryResult;
     const { walletName, walletPassword } = this.stores.walletRestore.walletRestoreMeta;
-    const persistentDb = this.stores.loading.loadPersistentDbRequest.result;
+    const persistentDb = this.stores.loading.getDatabase();
     if (persistentDb == null) {
       throw new Error(`${nameof(this._restoreToDb)} db not loaded. Should never happen`);
     }

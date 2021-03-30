@@ -174,6 +174,20 @@ export async function importOldDb(
   return db;
 }
 
+export async function copyDbToMemory(
+  db: lf$Database
+): Promise<lf$Database> {
+  const data = await db.export();
+
+  const schemaBuilder = schema.create(data.name, data.version);
+  const inMemoryDb = await schemaBuilder.connect({
+    storeType: schema.DataStoreType.MEMORY,
+  });
+  await inMemoryDb.import(data);
+
+  return inMemoryDb;
+}
+
 const populateAndCreate = async (
   storeType: $Values<typeof schema.DataStoreType>
 ): Promise<lf$Database> => {

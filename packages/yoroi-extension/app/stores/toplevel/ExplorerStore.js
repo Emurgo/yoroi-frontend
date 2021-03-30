@@ -38,7 +38,7 @@ export default class ExplorerStore extends Store<StoresMap, ActionsMap> {
   // ========== Selected Explorer ========== //
 
   @computed get selectedExplorer(): Map<number, SelectedExplorer> {
-    const db = this.stores.loading.loadPersistentDbRequest.result;
+    const db = this.stores.loading.getDatabase();
     if (db == null) throw new Error(`${nameof(ExplorerStore)}::${nameof(this.selectedExplorer)} called before storage was initialized`);
     if (this.getSelectedExplorerRequest.result == null) {
       // when still loading, just return the defaults
@@ -54,7 +54,7 @@ export default class ExplorerStore extends Store<StoresMap, ActionsMap> {
   }
 
   @computed get allExplorers(): GetAllExplorersResponse {
-    const db = this.stores.loading.loadPersistentDbRequest.result;
+    const db = this.stores.loading.getDatabase();
     if (db == null) throw new Error(`${nameof(ExplorerStore)}::${nameof(this.allExplorers)} called before storage was initialized`);
     if (this.getAllExplorerRequest.result == null) {
       // when still loading, just return the defaults
@@ -67,7 +67,7 @@ export default class ExplorerStore extends Store<StoresMap, ActionsMap> {
   setSelectedExplorer: {|
     explorer: $ReadOnly<ExplorerRow>,
   |} => Promise<void> = async (request): Promise<void> => {
-    const db = this.stores.loading.loadPersistentDbRequest.result;
+    const db = this.stores.loading.getDatabase();
     if (db == null) throw new Error(`${nameof(ExplorerStore)}::${nameof(this.setSelectedExplorer)} called before storage was initialized`);
     await this.setSelectedExplorerRequest.execute({
       db,

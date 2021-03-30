@@ -3,6 +3,7 @@
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import { PublicDeriver } from '../../../app/api/ada/lib/storage/models/PublicDeriver/index';
 import { MultiToken } from '../../../app/api/common/lib/MultiToken';
+import type { TxBodiesResponse } from '../../../app/api/ergo/lib/state-fetch/types';
 
 // ----- Types used in the dApp <-> Yoroi connection bridge ----- //
 
@@ -344,7 +345,7 @@ export type RpcUid = number;
 export type PendingSignData = {|
   type: 'tx',
   uid: RpcUid,
-  tx: Tx
+  tx: Tx,
 |} | {|
   type: 'tx_input',
   uid: RpcUid,

@@ -95,7 +95,7 @@ export class RemoteFetcher implements IFetcher {
         method: 'post',
         timeout: 2 * CONFIG.app.walletRefreshInterval,
         data: {
-          txsHashes: body.txHashes
+          txHashes: body.txHashes
         },
         headers: {
           'yoroi-version': this.getLastLaunchVersion(),

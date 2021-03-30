@@ -8,8 +8,13 @@ import { BatchedFetcher } from '../../api/ada/lib/state-fetch/batchedFetcher';
 import environment from '../../environment';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
+import BaseProfileStore from '../base/BaseProfileStore';
 
-export default class AdaStateFetchStore extends Store<StoresMap, ActionsMap> {
+export default class AdaStateFetchStore
+  <
+    TStores: {| +profile: { currentLocale: string, ..., } |},
+    TActions
+  > extends Store<TStores, TActions> {
 
   @observable fetcher: IFetcher;
 
