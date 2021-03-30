@@ -26,7 +26,7 @@ export function generateRegistration(request: {|
     * }
     * label: 61285
     * {
-    *   2: "signature of blake2b-256 hash of the metadata signed using stakekey"
+    *   1: "signature of blake2b-256 hash of the metadata signed using stakekey"
     * }
     */
 
@@ -53,7 +53,7 @@ export function generateRegistration(request: {|
     RustModule.WalletV4.BigNum.from_str(CatalystLabels.SIG.toString()),
     RustModule.WalletV4.encode_json_str_to_metadatum(
       JSON.stringify({
-        '2': `0x${catalystSignature}`,
+        '1': `0x${catalystSignature}`,
       }),
       RustModule.WalletV4.MetadataJsonSchema.BasicConversions
     )

@@ -56,7 +56,7 @@ test('Generate Catalyst registration tx', async () => {
       '4': 1234,
     },
     '61285': {
-      '2': '0xcc1276aebd2dafc0db75b362653a5259a1504fd5fcc47a2b8d603c7d1eb0f5eafd96c5ae384fb221ceb49354ae9f5d87f98fd838fe6dd8852a444e9c7e32ce0c'
+      '1': '0xcc1276aebd2dafc0db75b362653a5259a1504fd5fcc47a2b8d603c7d1eb0f5eafd96c5ae384fb221ceb49354ae9f5d87f98fd838fe6dd8852a444e9c7e32ce0c'
     }
   };
   expect({
