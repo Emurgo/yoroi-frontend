@@ -29,7 +29,7 @@ export type ErgoStoresMap = {|
   transactions: ErgoTransactionsStore,
   wallets: ErgoWalletsStore,
   walletRestore: ErgoRestoreStore,
-  stateFetchStore: ErgoStateFetchStore,
+  stateFetchStore: ErgoStateFetchStore<StoresMap, ActionsMap>,
   time: ErgoTimeStore,
   mnemonicSend: ErgoMnemonicSendStore,
 |};

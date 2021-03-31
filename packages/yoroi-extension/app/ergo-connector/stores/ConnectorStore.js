@@ -291,9 +291,12 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     if (selectedWallet == null) return;
 
     if (!signingMessage.sign.tx) return;
+    const { tx } = signingMessage.sign;
     const tokenIdentifiers = Array.from(new Set([
-      // TODO: need inputs
-      ...signingMessage.sign.tx.outputs
+      ...tx.inputs
+        .flatMap(output => output.assets)
+        .map(asset => asset.tokenId),
+      ...tx.outputs
         .flatMap(output => output.assets)
         .map(asset => asset.tokenId),
       // force inclusion of primary token for chain

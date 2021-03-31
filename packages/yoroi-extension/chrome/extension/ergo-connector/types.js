@@ -3,7 +3,6 @@
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import { PublicDeriver } from '../../../app/api/ada/lib/storage/models/PublicDeriver/index';
 import { MultiToken } from '../../../app/api/common/lib/MultiToken';
-import type { TxBodiesResponse } from '../../../app/api/ergo/lib/state-fetch/types';
 
 // ----- Types used in the dApp <-> Yoroi connection bridge ----- //
 
@@ -132,14 +131,24 @@ export function asSignedInput(input: any): SignedInput {
 }
 
 export type UnsignedInput = {|
-  boxId: ErgoBoxId,
   extension: ErgoContextExtension,
+  boxId: ErgoBoxId,
+  value: number | string,
+  ergoTree: string,
+  assets: Array<{|
+    tokenId: string, // hex
+    amount: number | string,
+  |}>,
+  creationHeight: number,
+  additionalRegisters: {| [key: string]: string |},
+  transactionId: string,
+  index: number
 |};
 
 export function asUnsignedInput(input: any): UnsignedInput {
   return {
-    boxId: asBoxId(input?.boxId),
-    extension: asContextExtension(input?.extension)
+    extension: asContextExtension(input?.extension),
+    ...asBox(input),
   };
 }
 

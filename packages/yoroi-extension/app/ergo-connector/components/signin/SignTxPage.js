@@ -19,13 +19,14 @@ import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import { handleExternalLinkClick } from '../../../utils/routing';
 import ExplorableHash from '../../../components/widgets/hashWrappers/ExplorableHash';
 import type { Notification } from '../../../types/notificationType';
-import { truncateConnectorBoxId, truncateToken } from '../../../utils/formatters';
+import { truncateAddressShort, truncateToken } from '../../../utils/formatters';
 import ProgressBar from '../ProgressBar';
 import type { Tx } from '../../../../chrome/extension/ergo-connector/types';
 import type { DefaultTokenEntry, TokenLookupKey } from '../../../api/common/lib/MultiToken';
-import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
+import type { NetworkRow, TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import { getTokenName, genFormatTokenAmount } from '../../../stores/stateless/tokenHelpers';
 import BigNumber from 'bignumber.js';
+import { RustModule } from '../../../api/ada/lib/cardanoCrypto/rustLoader';
 
 type Props = {|
   +totalAmount: ?BigNumber,
@@ -36,6 +37,7 @@ type Props = {|
   +notification: ?Notification,
   +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
   +defaultToken: DefaultTokenEntry,
+  +network: $ReadOnly<NetworkRow>,
 |};
 
 // TODO: get explorer from user settings
@@ -102,6 +104,20 @@ class SignTxPage extends Component<Props> {
       networkId: this.props.defaultToken.defaultNetworkId,
     };
     const defaultTokenInfo = this.props.getTokenInfo(defaultTokenEntry);
+
+    const chainNetworkId = (Number.parseInt(
+      this.props.network.BaseConfig[0].ChainNetworkId, 10
+    ): any);
+    const genAddress: string => string = (ergoTree) => {
+      return RustModule.SigmaRust.NetworkAddress.new(
+        chainNetworkId,
+        RustModule.SigmaRust.Address.recreate_from_ergo_tree(
+          RustModule.SigmaRust.ErgoTree.from_base16_bytes(
+            ergoTree
+          )
+        )
+      ).to_base58();
+    }
     return (
       <>
         <ProgressBar step={2} />
@@ -169,25 +185,26 @@ class SignTxPage extends Component<Props> {
               <div className={styles.addressFromList}>
                 {txData.inputs.map((address, index) => {
                   const notificationElementId = `ergo-input-${index}`;
+                  const addressBase58 = genAddress(address.ergoTree);
                   return (
                     <div className={styles.addressToItem} key={address.boxId}>
                       <CopyableAddress
-                        hash={address.address}
+                        hash={addressBase58}
                         elementId={notificationElementId}
                         onCopyAddress={() =>
-                          onCopyAddressTooltip(address.boxId, notificationElementId)
+                          onCopyAddressTooltip(addressBase58, notificationElementId)
                         }
                         notification={notification}
                       >
                         <ExplorableHash
                           light={false}
                           websiteName="ErgoPlatform Blockchain Explorer"
-                          url={URL_WEBSITE + address.boxId}
+                          url={URL_WEBSITE + addressBase58}
                           onExternalLinkClick={handleExternalLinkClick}
                         >
                           <RawHash light={false}>
                             <span className={styles.addressHash}>
-                              {truncateConnectorBoxId(address.boxId)}
+                              {truncateAddressShort(addressBase58)}
                             </span>
                           </RawHash>
                         </ExplorableHash>
@@ -205,25 +222,26 @@ class SignTxPage extends Component<Props> {
               <div className={styles.addressToList}>
                 {txData.outputs.map((address, index) => {
                   const notificationElementId = `address-output-${index}-copyNotification`;
+                  const addressBase58 = genAddress(address.ergoTree);
                   return (
                     <div className={styles.addressToItem} key={address.boxId}>
                       <CopyableAddress
-                        hash={address.address}
+                        hash={addressBase58}
                         elementId={notificationElementId}
                         onCopyAddress={() =>
-                          onCopyAddressTooltip(address.boxId, notificationElementId)
+                          onCopyAddressTooltip(addressBase58, notificationElementId)
                         }
                         notification={notification}
                       >
                         <ExplorableHash
                           light={false}
                           websiteName="ErgoPlatform Blockchain Explorer"
-                          url={URL_WEBSITE + address.boxId}
+                          url={URL_WEBSITE + addressBase58}
                           onExternalLinkClick={handleExternalLinkClick}
                         >
                           <RawHash light={false}>
                             <span className={styles.addressHash}>
-                              {truncateConnectorBoxId(address.boxId)}
+                              {truncateAddressShort(addressBase58)}
                             </span>
                           </RawHash>
                         </ExplorableHash>

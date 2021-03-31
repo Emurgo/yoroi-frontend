@@ -36,7 +36,7 @@ export type JormungandrStoresMap = {|
   addresses: AddressesStore,
   daedalusTransfer: JormungandrDaedalusTransferStore,
   yoroiTransfer: JormungandrYoroiTransferStore,
-  stateFetchStore: JormungandrStateFetchStore,
+  stateFetchStore: JormungandrStateFetchStore<StoresMap, ActionsMap>,
   walletRestore: JormungandrWalletRestoreStore,
   delegationTransaction: JormungandrDelegationTransactionStore,
   delegation: JormungandrDelegationStore,

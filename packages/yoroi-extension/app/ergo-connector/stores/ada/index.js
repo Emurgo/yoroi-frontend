@@ -11,7 +11,7 @@ export const adaStoreClasses = Object.freeze({
 });
 
 export type AdaStoresMap = {|
-  stateFetchStore: AdaStateFetchStore,
+  stateFetchStore: AdaStateFetchStore<StoresMap, ActionsMap>,
 |};
 
 const adaStores: WithNullableFields<AdaStoresMap> = observable({

@@ -13,7 +13,7 @@ export const ergoStoreClasses = Object.freeze({
 });
 
 export type ErgoStoresMap = {|
-  stateFetchStore: ErgoStateFetchStore,
+  stateFetchStore: ErgoStateFetchStore<StoresMap, ActionsMap>,
 |};
 
 const ergoStores: WithNullableFields<ErgoStoresMap> = observable({

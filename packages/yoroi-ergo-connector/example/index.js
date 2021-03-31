@@ -109,7 +109,10 @@ function initDapp() {
                     console.log(`tx: ${tx}`);
                     status.innerText = "Awaiting transaction signing";
                     ergo
-                        .sign_tx(tx)
+                        .sign_tx({
+                            ...tx,
+                            inputs: utxos.map(utxo => ({ ...utxo, extension: {} })),
+                        })
                         .then(async signedTx => {
                             status.innerText = "Transaction signed - awaiting submission"
                             try {

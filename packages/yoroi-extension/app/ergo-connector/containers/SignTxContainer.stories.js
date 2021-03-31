@@ -15,6 +15,7 @@ import {
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import BigNumber from 'bignumber.js';
 import { decodeErgoTokenInfo } from '../../api/ergo/lib/state-fetch/mockNetwork';
+import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -50,6 +51,15 @@ const message = (id: number) => ({
       inputs: [{
         boxId: '1df0273e382739f8b4ae3783d81168093e78e0b48ec2c5430ff03d444806a174',
         extension: {},
+        value: '100001',
+        transactionId: '05ec4a4a7f4645fa66886cef2e34706907a3a7f9d88e0d48b313ad2cdf76fb5f',
+        index: 0,
+        creationHeight: 1,
+        ergoTree: Buffer.from(RustModule.SigmaRust.Address.from_base58(
+          '9egNKTzQDH658qcdiPEoQfVM1SBxQNxnyF8BCw57aNWerRhhHBQ'
+        ).to_ergo_tree().to_bytes()).toString('hex'),
+        assets: [],
+        additionalRegisters: Object.freeze({}),
       }],
       dataInputs: [{
         boxId: '0df0273e382739f8b4ae3783d81168093e78e0b48ec2c5430ff03d444806a173',
@@ -57,7 +67,9 @@ const message = (id: number) => ({
       outputs: [{
         boxId: '3df0273e382739f8b4ae3783d81168093e78e0b48ec2c5430ff03d444806a176',
         value: '1234567',
-        ergoTree: '1234',
+        ergoTree: Buffer.from(RustModule.SigmaRust.Address.from_base58(
+          '9egNKTzQDH658qcdiPEoQfVM1SBxQNxnyF8BCw57aNWerRhhHBQ'
+        ).to_ergo_tree().to_bytes()).toString('hex'),
         assets: [{
           amount: 12340,
           tokenId: tokenInfo.tokenId,

@@ -1,15 +1,21 @@
 // @flow
 import { observable } from 'mobx';
-import Store from '../base/Store';
+import BaseStateFetchStore from '../base/BaseStateFetchStore';
+import type { RequiredStores } from '../base/BaseStateFetchStore';
 
 import type { IFetcher } from '../../api/ergo/lib/state-fetch/IFetcher';
 import { RemoteFetcher } from '../../api/ergo/lib/state-fetch/remoteFetcher';
 import { BatchedFetcher } from '../../api/ergo/lib/state-fetch/batchedFetcher';
 import environment from '../../environment';
-import type { ActionsMap } from '../../actions/index';
-import type { StoresMap } from '../index';
 
-export default class ErgoStateFetchStore extends Store<StoresMap, ActionsMap> {
+export default class ErgoStateFetchStore<
+  TStores: RequiredStores,
+  TActions
+> extends BaseStateFetchStore<
+  TStores,
+  TActions,
+  IFetcher
+> {
 
   @observable fetcher: IFetcher;
 

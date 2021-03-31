@@ -47,7 +47,6 @@ import { updateTransactions } from '../../app/api/ergo/lib/storage/bridge/update
 import { environment } from '../../app/environment';
 import { IFetcher } from '../../app/api/ergo/lib/state-fetch/IFetcher';
 import { RemoteFetcher } from '../../app/api/ergo/lib/state-fetch/remoteFetcher';
-import type { TxBodiesResponse } from '../../app/api/ergo/lib/state-fetch/types';
 import { BatchedFetcher } from '../../app/api/ergo/lib/state-fetch/batchedFetcher';
 import LocalStorageApi from '../../app/api/localStorage/index';
 import { RustModule } from '../../app/api/ada/lib/cardanoCrypto/rustLoader';
