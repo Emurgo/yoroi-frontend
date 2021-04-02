@@ -45,8 +45,11 @@ export function generateRegistration(request: {|
     registrationData
   );
 
+  const hashedMetadata = blake2b(256 / 8).update(
+    generalMetadata.to_bytes()
+  ).digest('binary');
   const catalystSignature = request.stakePrivateKey
-    .sign(blake2b(64).update(generalMetadata.to_bytes()).digest('hex'))
+    .sign(hashedMetadata)
     .to_hex();
 
   generalMetadata.insert(
