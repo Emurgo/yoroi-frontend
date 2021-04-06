@@ -29,7 +29,7 @@ type Props = {|
   ...InjectedOrGenerated<GeneratedData>,
 |};
 
-const roundEndDate = new Date(Date.parse('3 Mar 2021 19:00:00 GMT'));
+const roundEndDate = new Date(Date.parse('13 Apr 2021 19:00:00 GMT'));
 
 @observer
 export default class VotingPage extends Component<Props> {
