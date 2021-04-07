@@ -39,7 +39,7 @@ import {
 
 /**
  * based off what the cardano-wallet team found worked empirically
- * note: slots are 1 second in Shelley mainnet, so this is 2 minutes
+ * note: slots are 1 second in Shelley mainnet, so this is 2hrs
  */
 const defaultTtlOffset = 7200;
 

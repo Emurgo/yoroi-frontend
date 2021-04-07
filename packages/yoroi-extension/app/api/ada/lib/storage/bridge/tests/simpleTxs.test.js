@@ -177,13 +177,13 @@ const nextRegularSpend: number => RemoteTransaction = (purpose) => ({
 
 const twoTxsRegularSpend: number => Array<RemoteTransaction> = (purpose) => [{
   hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed547',
-  height: 218611,
+  height: 435653,
   block_hash: 'a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba27',
   time: '2019-09-13T16:38:26.000Z',
   last_update: '2019-09-13T16:38:26.000Z',
   tx_state: 'Successful',
   tx_ordinal: 0,
-  epoch: 10,
+  epoch: 20,
   slot: 3653,
   inputs: [
     {
@@ -225,13 +225,13 @@ const twoTxsRegularSpend: number => Array<RemoteTransaction> = (purpose) => [{
 },
 {
   hash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed548',
-  height: 218611,
+  height: 435653,
   block_hash: 'a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba27',
   time: '2019-09-13T16:38:26.000Z',
   last_update: '2019-09-13T16:38:26.000Z',
   tx_state: 'Successful',
   tx_ordinal: 1,
-  epoch: 10,
+  epoch: 20,
   slot: 3653,
   inputs: [
     {
@@ -432,34 +432,23 @@ async function syncingSimpleTransaction(
   }
 
   // test: add a 2nd transaction
-  {
-    txHistory.push(nextRegularSpend(purposeForTest));
-
-    await updateTransactions(
-      db,
-      basePubDeriver,
-      checkAddressesInUse,
-      getTransactionsHistoryForAddresses,
-      getBestBlock,
-    );
-
-    {
-      const expectedAddressing1 = [
-        purposeForTest,
-        CoinTypes.CARDANO,
-        0 + HARD_DERIVATION_START,
-        ChainDerivations.INTERNAL,
-        0
-      ];
-      const expectedAddressing2 = [
-        purposeForTest,
-        CoinTypes.CARDANO,
-        0 + HARD_DERIVATION_START,
-        ChainDerivations.EXTERNAL,
-        19
-      ];
-      const response = await basePubDeriver.getAllUtxos();
-      expect(response).toEqual([{
+  const expected2ndTxResults = (() => {
+    const expectedAddressing1 = [
+      purposeForTest,
+      CoinTypes.CARDANO,
+      0 + HARD_DERIVATION_START,
+      ChainDerivations.INTERNAL,
+      0
+    ];
+    const expectedAddressing2 = [
+      purposeForTest,
+      CoinTypes.CARDANO,
+      0 + HARD_DERIVATION_START,
+      ChainDerivations.EXTERNAL,
+      19
+    ];
+    return {
+      utxos: [{
         // 'Ae2tdPwUPEZ3Kt2BJnDMQggxEA4c9MTagByH41rJkv2k82dBch2nqMAdyHJ'
         address: getSingleAddressString(
           TX_TEST_MNEMONIC_1,
@@ -578,23 +567,35 @@ async function syncingSimpleTransaction(
             },
           }],
         },
-      }
-      ]);
+      }],
+      utxoBalance: new BigNumber('2000000'),
+      cutoff: 19,
+    }
+  })();
+  {
+    txHistory.push(nextRegularSpend(purposeForTest));
+
+    await updateTransactions(
+      db,
+      basePubDeriver,
+      checkAddressesInUse,
+      getTransactionsHistoryForAddresses,
+      getBestBlock,
+    );
+
+    {
+      const response = await basePubDeriver.getAllUtxos();
+      expect(response).toEqual(expected2ndTxResults.utxos);
     }
 
     {
       const response = await basePubDeriver.getUtxoBalance();
-      expect(response.getDefault()).toEqual(new BigNumber('2000000'));
-    }
-
-    {
-      const response = await basePubDeriver.getUtxoBalance();
-      expect(response.getDefault()).toEqual(new BigNumber('2000000'));
+      expect(response.getDefault()).toEqual(expected2ndTxResults.utxoBalance)
     }
 
     {
       const response = await basePubDeriver.getCutoff();
-      expect(response).toEqual(19);
+      expect(response).toEqual(expected2ndTxResults.cutoff);
     }
 
     {
@@ -632,11 +633,6 @@ async function syncingSimpleTransaction(
     }
 
     {
-      const response = await basePubDeriver.getUtxoBalance();
-      expect(response.getDefault()).toEqual(new BigNumber('0'));
-    }
-
-    {
       const response = await basePubDeriver.getCutoff();
       expect(response).toEqual(19);
     }
@@ -644,8 +640,52 @@ async function syncingSimpleTransaction(
 
   // test rollback
   {
+    // mock network best block is based on the highest tx in the mock chain
+    // so if we get rid of txs, the best block on the mock chain goes down
+    // but this causes rollbacks to stop happening (since it goes back more than k slots)
+    // so to avoid this, we save the best block and force return it later
+    const bestBlock = getBestBlock({ network });
     txHistory.pop();
     txHistory.pop();
+
+    await updateTransactions(
+      db,
+      basePubDeriver,
+      checkAddressesInUse,
+      getTransactionsHistoryForAddresses,
+      () => bestBlock,
+    );
+
+    {
+      const response = await basePubDeriver.getAllUtxos();
+      expect(response).toEqual(expected2ndTxResults.utxos);
+    }
+
+    {
+      const response = await basePubDeriver.getUtxoBalance();
+      expect(response.getDefault()).toEqual(expected2ndTxResults.utxoBalance)
+    }
+
+    {
+      const response = await basePubDeriver.getCutoff();
+      expect(response).toEqual(expected2ndTxResults.cutoff);
+    }
+
+    {
+      const response = await publicDeriver.getLastSyncInfo();
+      expect(response).toEqual({
+        BlockHash: 'a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba26',
+        LastSyncInfoId: 1,
+        SlotNum: 219651,
+        Height: 218609,
+        Time: new Date(4),
+      });
+    }
+  }
+
+  // test: two txs in the same block
+  {
+    txHistory.push(...twoTxsRegularSpend(purposeForTest));
 
     await updateTransactions(
       db,
@@ -678,11 +718,11 @@ async function syncingSimpleTransaction(
     {
       const response = await publicDeriver.getLastSyncInfo();
       expect(response).toEqual({
-        BlockHash: null,
+        BlockHash: 'a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba27',
         LastSyncInfoId: 1,
-        SlotNum: null,
-        Height: 0,
-        Time: new Date(4),
+        SlotNum: 435653,
+        Height: 435653,
+        Time: new Date(5),
       });
     }
   }
