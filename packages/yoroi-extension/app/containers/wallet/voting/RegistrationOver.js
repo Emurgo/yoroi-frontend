@@ -18,6 +18,7 @@ export const messages: * = defineMessages({
 });
 
 type Props = {|
+  roundNumber: number,
 |};
 
 @observer
@@ -35,7 +36,7 @@ export default class RegistrationOver extends Component<Props> {
         subtitle={intl.formatMessage(
           messages.subtitle,
           {
-            roundNumber: 3,
+            roundNumber: this.props.roundNumber,
           }
         )}
       />

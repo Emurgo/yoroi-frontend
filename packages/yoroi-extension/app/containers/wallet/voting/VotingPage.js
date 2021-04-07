@@ -29,7 +29,11 @@ type Props = {|
   ...InjectedOrGenerated<GeneratedData>,
 |};
 
-const roundEndDate = new Date(Date.parse('13 Apr 2021 19:00:00 GMT'));
+const roundInfo = {
+  startDate: new Date(Date.parse('13 Apr 2021 19:00:00 GMT')),
+  endDate: new Date(Date.parse('20 Apr 2021 19:00:00 GMT')),
+  nextRound: 4,
+};
 
 @observer
 export default class VotingPage extends Component<Props> {
@@ -67,14 +71,22 @@ export default class VotingPage extends Component<Props> {
     }
 
     // keep enabled on the testnet
-    if (
-      !environment.isTest() &&
-      (
+    if (!environment.isTest()) {
+      const isLate = new Date() >= roundInfo.endDate;
+      const isEarly = new Date() <= roundInfo.startDate;
+      if (
         selected.getParent().getNetworkInfo().NetworkId === networks.CardanoMainnet.NetworkId &&
-        new Date() >= roundEndDate
-      )
-    ) {
-      return <RegistrationOver />;
+        (isEarly || isLate)
+      ) {
+        return (
+          <RegistrationOver roundNumber={
+              isLate
+                ? roundInfo.nextRound
+                : roundInfo.nextRound - 1
+            }
+          />
+        );
+      }
     }
 
     // disable the minimum on E2E tests
