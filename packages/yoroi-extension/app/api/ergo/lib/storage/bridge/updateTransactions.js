@@ -909,6 +909,10 @@ async function rollback(
 
   // 5) set all UTXO from these transactions as unspent
 
+  // note: we don't need to mark our own outputs as unspent. Only inputs we depended upon
+  // this is because there are two cases
+  // 1) Our outputs are already marked as "unspent" so nothing is required
+  // 2) Our outputs were spent but the tx that spent it also got rolled back & marked us as unspent
   await markAllInputs(
     db, dbTx,
     {
@@ -1196,6 +1200,7 @@ async function updateTransactionBatch(
     ...DbBlock,
   |}> = [];
   const modifiedTxIds = new Set<number>();
+  const modifiedToSuccessful: Array<ErgoTxIO> = [];
   for (const txFromNetwork of request.txsFromNetwork) {
     const matchInDb = matchesInDb.get(txFromNetwork.hash);
     if (matchInDb == null) {
@@ -1234,14 +1239,13 @@ async function updateTransactionBatch(
 
     // sanity check: although we should only see non-success => success
     // it's possible we see the same success tx twice
-    if (matchInDb.transaction.BlockId !== null) {
+    if (matchInDb.transaction.Status === TxStatusCodes.IN_BLOCK) {
       continue;
     }
     if (result.block !== null) {
-      txsAddedToBlock.push({
-        ...(matchInDb: ErgoTxIO),
+      modifiedToSuccessful.push({
+        ...(matchInDb: (ErgoTxIO)),
         // override with updated
-        block: result.block,
         transaction: result.transaction,
       });
     }
@@ -1308,7 +1312,11 @@ async function updateTransactionBatch(
       GetTransaction: deps.GetTransaction,
     },
     {
-      inputTxIds: newTxIds,
+      inputTxIds: [
+        ...newTxIds,
+        // txs we've seen before may have changed status to success, so we need to update them
+        ...modifiedToSuccessful.map(value => value.transaction.TransactionId),
+      ],
       allTxIds: [
         ...request.txIds,
         ...newTxIds,
@@ -1637,10 +1645,6 @@ async function markAllInputs(
       txIds: request.allTxIds,
     },
   );
-  // note: we don't need to mark our own outputs as unspent. Only inputs we depended upon
-  // this is because there are two cases
-  // 1) Our outputs are already marked as "unspent" so nothing is required
-  // 2) Our outputs were spent but the tx that spent it also got rolled back & marked us as unspent
   for (const input of inputs) {
     // get parent
     const parentTx = txMap.get(input.ParentTxHash);

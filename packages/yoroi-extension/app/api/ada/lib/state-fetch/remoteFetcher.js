@@ -211,10 +211,11 @@ export class RemoteFetcher implements IFetcher {
     })
       .catch((error) => {
         Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getTransactionsHistoryForAddresses)} error: ` + stringifyError(error));
+        const errorMessage = error?.response?.data?.error?.response;
         if (
-          error?.response === 'REFERENCE_BLOCK_MISMATCH' ||
-          error?.response === 'REFERENCE_TX_NOT_FOUND' ||
-          error?.response === 'REFERENCE_BEST_BLOCK_MISMATCH'
+          errorMessage === 'REFERENCE_BLOCK_MISMATCH' ||
+          errorMessage === 'REFERENCE_TX_NOT_FOUND' ||
+          errorMessage === 'REFERENCE_BEST_BLOCK_MISMATCH'
         ) {
           throw new RollbackApiError();
         }

@@ -8,9 +8,9 @@ declare class Blake2b {
 declare module 'blake2b' {
   declare export default function createHash(
     outlen?: number,
-    key?: Uint8Array | undefined,
-    salt?: Uint8Array | undefined,
-    personal?: Uint8Array | undefined,
+    key?: Uint8Array | void,
+    salt?: Uint8Array | void,
+    personal?: Uint8Array | void,
     noAssert?: boolean
   ): Blake2b;
 }
