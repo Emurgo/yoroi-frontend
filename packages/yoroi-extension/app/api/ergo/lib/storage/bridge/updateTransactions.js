@@ -1200,7 +1200,6 @@ async function updateTransactionBatch(
     ...DbBlock,
   |}> = [];
   const modifiedTxIds = new Set<number>();
-  const modifiedToSuccessful: Array<ErgoTxIO> = [];
   for (const txFromNetwork of request.txsFromNetwork) {
     const matchInDb = matchesInDb.get(txFromNetwork.hash);
     if (matchInDb == null) {
@@ -1243,10 +1242,11 @@ async function updateTransactionBatch(
       continue;
     }
     if (result.block !== null) {
-      modifiedToSuccessful.push({
+      txsAddedToBlock.push({
         ...(matchInDb: (ErgoTxIO)),
         // override with updated
         transaction: result.transaction,
+        block: result.block,
       });
     }
   }
@@ -1312,11 +1312,7 @@ async function updateTransactionBatch(
       GetTransaction: deps.GetTransaction,
     },
     {
-      inputTxIds: [
-        ...newTxIds,
-        // txs we've seen before may have changed status to success, so we need to update them
-        ...modifiedToSuccessful.map(value => value.transaction.TransactionId),
-      ],
+      inputTxIds: newTxIds,
       allTxIds: [
         ...request.txIds,
         ...newTxIds,
