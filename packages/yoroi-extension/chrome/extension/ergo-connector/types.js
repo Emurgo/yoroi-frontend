@@ -3,6 +3,7 @@
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import { PublicDeriver } from '../../../app/api/ada/lib/storage/models/PublicDeriver/index';
 import { MultiToken } from '../../../app/api/common/lib/MultiToken';
+import { RustModule } from '../../../app/api/ada/lib/cardanoCrypto/rustLoader';
 
 // ----- Types used in the dApp <-> Yoroi connection bridge ----- //
 
@@ -19,7 +20,10 @@ export function asAddress(input: any): Address {
   throw ConnectorError.invalidRequest(`invalid Address: ${JSON.stringify(input)}`);
 }
 
-export function asBox(input: any): ErgoBoxJson {
+export function asBox(
+  input: any,
+  wasmInstance: typeof RustModule.SigmaRust
+): ErgoBoxJson {
   try {
     if (typeof input === 'object' &&
         Array.isArray(input?.assets) &&
@@ -35,7 +39,7 @@ export function asBox(input: any): ErgoBoxJson {
         }
         throw ConnectorError.invalidRequest(`additionalRegisters: Must be strings of the form "R4" to "R9": : ${JSON.stringify(input)}`);
       });
-      return {
+      const boxJson = {
         boxId: asBoxId(input.boxId),
         value: asValue(input.value),
         ergoTree: asErgoTree(input.ergoTree),
@@ -45,6 +49,14 @@ export function asBox(input: any): ErgoBoxJson {
         transactionId: asTxId(input.transactionId),
         index: input.index
       };
+
+      {
+        // we just want to validate that the boxID matches the content
+        const wasmBox = wasmInstance.ErgoBox.from_json(JSON.stringify(boxJson));
+        wasmBox.free();
+      }
+
+      return boxJson;
     }
   } catch (err) {
     throw ConnectorError.invalidRequest(`Box invalid structure: ${JSON.stringify(input)} due to ${err}`);
@@ -145,10 +157,13 @@ export type UnsignedInput = {|
   index: number
 |};
 
-export function asUnsignedInput(input: any): UnsignedInput {
+export function asUnsignedInput(
+  input: any,
+  wasmInstance: typeof RustModule.SigmaRust
+): UnsignedInput {
   return {
     extension: asContextExtension(input?.extension),
-    ...asBox(input),
+    ...asBox(input, wasmInstance),
   };
 }
 
@@ -194,7 +209,10 @@ export type SignedTx = {|
   size: number,
 |};
 
-export function asSignedTx(input: any): SignedTx {
+export function asSignedTx(
+  input: any,
+  wasmInstance: typeof RustModule.SigmaRust
+): SignedTx {
   try {
     if (typeof input === 'object' &&
         Array.isArray(input.inputs) &&
@@ -204,7 +222,7 @@ export function asSignedTx(input: any): SignedTx {
         id: asTxId(input.id),
         inputs: input.inputs.map(asSignedInput),
         dataInputs: input.dataInputs.map(asDataInput),
-        outputs: input.outputs.map(asBox),
+        outputs: input.outputs.map(output => asBox(output, wasmInstance)),
         size: input.size
       };
     }
@@ -242,23 +260,26 @@ export type Tx = {|
   outputs: ErgoBoxJson[],
 |};
 
-export function asTx(input: any): Tx {
+export function asTx(
+  tx: any,
+  wasmInstance: typeof RustModule.SigmaRust
+): Tx {
   try {
-    if (typeof input === 'object' &&
-        Array.isArray(input.inputs) &&
-        Array.isArray(input.dataInputs) &&
-        Array.isArray(input.outputs)) {
+    if (typeof tx === 'object' &&
+        Array.isArray(tx.inputs) &&
+        Array.isArray(tx.dataInputs) &&
+        Array.isArray(tx.outputs)) {
       return {
-        id: asTxId(input.id),
-        inputs: input.inputs.map(asUnsignedInput),
-        dataInputs: input.dataInputs.map(asDataInput),
-        outputs: input.outputs.map(asBox),
+        id: asTxId(tx.id),
+        inputs: tx.inputs.map(input => asUnsignedInput(input, wasmInstance)),
+        dataInputs: tx.dataInputs.map(asDataInput),
+        outputs: tx.outputs.map(output => asBox(output, wasmInstance)),
       };
     }
   } catch (err) {
-    throw ConnectorError.invalidRequest(`invalid Tx: ${JSON.stringify(input)} due to ${err}`);
+    throw ConnectorError.invalidRequest(`invalid Tx: ${JSON.stringify(tx)} due to ${err}`);
   }
-  throw ConnectorError.invalidRequest(`invalid Tx: ${JSON.stringify(input)}`);
+  throw ConnectorError.invalidRequest(`invalid Tx: ${JSON.stringify(tx)}`);
 }
 
 export type TxId = string;

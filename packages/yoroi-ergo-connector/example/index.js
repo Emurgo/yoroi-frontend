@@ -128,7 +128,7 @@ function initDapp() {
                         })
                         .catch(err => {
                             console.log(`Error: ${JSON.stringify(err)}`);
-                            status.innerText = "You must accept signing the transaction to donate. Please click send again and accept."
+                            status.innerText = `Error: ${JSON.stringify(err)}`
                         });
                 }
                 div.appendChild(valueEntry);
