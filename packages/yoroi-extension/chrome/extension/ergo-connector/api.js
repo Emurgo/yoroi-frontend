@@ -292,8 +292,8 @@ export async function connectorSendTx(
       timeout: 2 * 20000,
       data: tx,
       headers: {
-        'yoroi-version': localStorage.getLastLaunchVersion(),
-        'yoroi-locale': localStorage.getUserLocale()
+        'yoroi-version': await localStorage.getLastLaunchVersion(),
+        'yoroi-locale': await localStorage.getUserLocale()
       }
     }
   ).then(response => {
