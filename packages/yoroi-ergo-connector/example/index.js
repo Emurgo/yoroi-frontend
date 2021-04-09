@@ -109,7 +109,10 @@ function initDapp() {
                     console.log(`tx: ${tx}`);
                     status.innerText = "Awaiting transaction signing";
                     ergo
-                        .sign_tx(tx)
+                        .sign_tx({
+                            ...tx,
+                            inputs: utxos.map(utxo => ({ ...utxo, extension: {} })),
+                        })
                         .then(async signedTx => {
                             status.innerText = "Transaction signed - awaiting submission"
                             try {
@@ -125,7 +128,7 @@ function initDapp() {
                         })
                         .catch(err => {
                             console.log(`Error: ${JSON.stringify(err)}`);
-                            status.innerText = "You must accept signing the transaction to donate. Please click send again and accept."
+                            status.innerText = `Error: ${JSON.stringify(err)}`
                         });
                 }
                 div.appendChild(valueEntry);

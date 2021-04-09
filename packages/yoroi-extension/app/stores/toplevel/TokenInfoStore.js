@@ -32,7 +32,7 @@ export default class TokenInfoStore extends Store<StoresMap, ActionsMap> {
   }
 
   refreshTokenInfo: void => Promise<void> = async () => {
-    const db = this.stores.loading.loadPersistentDbRequest.result;
+    const db = this.stores.loading.getDatabase();
     if (db == null) throw new Error(`${nameof(TokenInfoStore)}::${nameof(this.refreshTokenInfo)} called before storage was initialized`);
     const tokens = await this.api.common.getTokenInfo({ db });
 

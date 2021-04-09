@@ -29,7 +29,25 @@ export type TxBodiesRequest = {|
   txHashes: Array<string>,
 |};
 export type TxBodiesResponse = {|
-  [txHash: string]: any // TODO: add this when we need it
+  [txHash: string]: {
+    summary: {
+      id: string,
+      timestamp: number,
+      index: number,
+      size: number,
+      confirmationsCount: number,
+      block: {
+        id: string,
+        height: number,
+        ...,
+      },
+      ...,
+    },
+    inputs: Array<ErgoTxInput>,
+    dataInputs: Array<ErgoTxDataInput>,
+    outputs: Array<ErgoTxOutput>,
+    ...,
+  }
 |};
 export type TxBodiesFunc = (body: TxBodiesRequest) => Promise<TxBodiesResponse>;
 
@@ -72,37 +90,39 @@ export type ErgoTxOutput = {
   value: number,
   ...
 };
+export type ErgoTxInput = {
+  address: string,
+  id: string, // boxId
+  outputTransactionId: string, // txHash of tx that created the output we're consuming
+  index: number, // index of this input in this tx
+  outputIndex: number, // index in tx that created the output we're consuming
+  spendingProof: string,
+  transactionId: string, // txHash of this tx
+  value: number,
+  assets: $ReadOnlyArray<$ReadOnly<{
+    amount: number,
+    tokenId: string,
+    ...
+  }>>,
+  ...
+};
+export type ErgoTxDataInput = {
+  id: string,
+  value: number,
+  transactionId: string,
+  index: number,
+  outputIndex: number,
+  outputTransactionId: string,
+  address: string,
+  ...,
+};
 export type RemoteErgoTransaction = {|
   block_hash: null | string,
   block_num: null | number,
   tx_ordinal: null | number,
   hash: string,
-  inputs: Array<{
-    address: string,
-    id: string, // boxId
-    outputTransactionId: string, // txHash of tx that created the output we're consuming
-    index: number, // index of this input in this tx
-    outputIndex: number, // index in tx that created the output we're consuming
-    spendingProof: string,
-    transactionId: string, // txHash of this tx
-    value: number,
-    assets: $ReadOnlyArray<$ReadOnly<{
-      amount: number,
-      tokenId: string,
-      ...
-    }>>,
-    ...
-  }>,
-  dataInputs: Array<{
-    id: string,
-    value: number,
-    transactionId: string,
-    index: number,
-    outputIndex: number,
-    outputTransactionId: string,
-    address: string,
-    ...,
-  }>,
+  inputs: Array<ErgoTxInput>,
+  dataInputs: Array<ErgoTxDataInput>,
   outputs: Array<ErgoTxOutput>,
   // epoch: 0, // TODO
   // slot: 0, // TODO

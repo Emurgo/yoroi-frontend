@@ -9,6 +9,11 @@ import TokenInfoStore from '../../stores/toplevel/TokenInfoStore';
 import ConnectorStore from './ConnectorStore';
 import ConnectorLoadingStore from './ConnectorLoadingStore';
 import type { ActionsMap } from '../actions';
+import type { AdaStoresMap } from './ada/index';
+import type { ErgoStoresMap } from './ergo/index';
+import setupAdaStores from './ada/index';
+import setupErgoStores from './ergo/index';
+import { ApiOptions } from '../../api/common/utils';
 
 /** Map of var name to class. Allows dynamic lookup of class so we can init all stores one loop */
 const storeClasses = Object.freeze({
@@ -29,6 +34,10 @@ export type StoresMap = {|
   loading: ConnectorLoadingStore,
   connector: ConnectorStore,
   tokenInfoStore: TokenInfoStore,
+  substores: {|
+    ada: AdaStoresMap,
+    ergo: ErgoStoresMap,
+  |},
 |};
 
 /** Constant that represents the stores across the lifetime of the application */
@@ -40,7 +49,17 @@ const stores: WithNullableFields<StoresMap> = observable({
   loading: null,
   connector: null,
   tokenInfoStore: null,
+  substores: null,
 });
+
+function initializeSubstore<T: {...}>(
+  substore: T,
+): void {
+  Object
+    .keys(substore)
+    .map(key => substore[key])
+    .forEach(store => store.initialize());
+}
 
 export default (action(
   (
@@ -58,7 +77,18 @@ export default (action(
       if (stores[name]) stores[name].initialize();
     });
 
+    /** Add currency specific stores
+     * Note: we have to split up th setup and the initialization
+     * Because to make sure all substores are non-null we have to create the object
+     * But we only want to actually initialize it if it is the currency in use */
+    stores.substores = {
+      ada: setupAdaStores((stores: any), api, actions),
+      ergo: setupErgoStores((stores: any), api, actions),
+    };
+
     const loadedStores: StoresMap = (stores: any);
+    initializeSubstore<ErgoStoresMap>(loadedStores.substores[ApiOptions.ergo]);
+    initializeSubstore<AdaStoresMap>(loadedStores.substores[ApiOptions.ada]);
 
     // Perform load after all setup is done to ensure migration can modify store state
     loadedStores.loading.load();

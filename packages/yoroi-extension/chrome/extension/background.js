@@ -57,6 +57,7 @@ import type {
 } from 'lovefield';
 import {
   loadLovefieldDB,
+  copyDbToMemory,
 } from '../../app/api/ada/lib/storage/database/index';
 import { migrateNoRefresh } from '../../app/api/common/migration';
 import { Mutex, } from 'async-mutex';
@@ -166,26 +167,46 @@ let pendingTxs: PendingTransaction[] = [];
 */
 const dbAccessMutex = new Mutex();
 
+/**
+ * Performs wallet version migration if needed
+ * Then calls the continuation with storage objects
+ * Note: the DB returns is an IN-MEMORY COPY of the real DB
+ * This is to avoid DB modifications corrupting the state of the Yoroi Extension
+ * If the Yoroi Extension is running at the same time
+ */
 async function withDb<T>(
   continuation: (lf$Database, LocalStorageApi) => Promise<T>
 ): Promise<T> {
   return await dbAccessMutex.runExclusive(async () => {
     // note: lovefield internally caches queries an optimization
     // this doesn't work for us because the DB can change under our feet through the Yoroi Extension
-    // so instead, we create the DB, use it, then throw it away
+    // so instead, we create the DB, use it, then close the connection
     const db = await loadLovefieldDB(schema.DataStoreType.INDEXED_DB);
+    let inMemoryDb: void | lf$Database = undefined;
     try {
       // process migration here before anything involving storage is cached
       // as dApp can't easily recover from refreshing a page to wipe cache after storage migration
       const localStorageApi = new LocalStorageApi();
+      // note: it's safe that this call modifies the DB that is shared with the main extension
+      // since if a migration actually needs to be processed,
+      // it means the extension hasn't been launched since the Yoroi version updated
+      // which means it's not running at the same time as the connector
       await migrateNoRefresh({
         localStorageApi,
         persistentDb: db,
         currVersion: environment.getVersion(),
       })
 
-      return await continuation(db, localStorageApi);
+      // note: we can't close the persistent DB connection here after copying it
+      // since lovefield closes some shared workers causing the in-memory connection to fail as well
+      inMemoryDb = await copyDbToMemory(db);
+
+      return await continuation(inMemoryDb, localStorageApi);
+    } catch (e) {
+      Logger.error(`DB continuation call failed due to internal error: ${e}\n${e.stack}`);
+      throw e;
     } finally {
+      inMemoryDb?.close();
       db.close();
     }
   });
@@ -261,31 +282,31 @@ async function syncWallet(
 async function withSelectedWallet<T>(
   tabId: number,
   continuation: PublicDeriver<> => Promise<T>,
+  db: lf$Database,
+  localStorageApi: LocalStorageApi,
 ): Promise<T> {
-  return await withDb<T>(async (db, localStorageApi) => {
-    const wallets = await getWallets({ db });
-    const connected = connectedSites.get(tabId);
-    if (connected) {
-      if (typeof connected.status?.publicDeriverId === 'number') {
-        const { publicDeriverId } = connected.status;
-        const selectedWallet = wallets.find(
-          cache => cache.getPublicDeriverId() === publicDeriverId
-        );
-        if (selectedWallet == null) {
-          connectedSites.delete(tabId);
-          await removeWallet(tabId, publicDeriverId, localStorageApi);
-          return Promise.reject(new Error(`Public deriver index not found: ${publicDeriverId}`));
-        }
-        await syncWallet(selectedWallet, localStorageApi);
-
-        // we need to make sure this runs within the withDb call
-        // since the publicDeriver contains a DB reference inside it
-        return await continuation(selectedWallet);
+  const wallets = await getWallets({ db });
+  const connected = connectedSites.get(tabId);
+  if (connected) {
+    if (typeof connected.status?.publicDeriverId === 'number') {
+      const { publicDeriverId } = connected.status;
+      const selectedWallet = wallets.find(
+        cache => cache.getPublicDeriverId() === publicDeriverId
+      );
+      if (selectedWallet == null) {
+        connectedSites.delete(tabId);
+        await removeWallet(tabId, publicDeriverId, localStorageApi);
+        return Promise.reject(new Error(`Public deriver index not found: ${publicDeriverId}`));
       }
-      return Promise.reject(new Error('site not connected yet'));
+      await syncWallet(selectedWallet, localStorageApi);
+
+      // we need to make sure this runs within the withDb call
+      // since the publicDeriver contains a DB reference inside it
+      return await continuation(selectedWallet);
     }
-    return Promise.reject(new Error(`could not find tabId ${tabId} in connected sites`));
-  });
+    return Promise.reject(new Error('site not connected yet'));
+  }
+  return Promise.reject(new Error(`could not find tabId ${tabId} in connected sites`));
 }
 
 // messages from other parts of Yoroi (i.e. the UI for the connector)
@@ -308,17 +329,21 @@ chrome.runtime.onMessage.addListener(async (
     password: string,
     tabId: number
   ): Promise<ErgoTxJson> {
-    return await withSelectedWallet<ErgoTxJson>(
-      tabId,
-      async (wallet) => {
-        const canGetAllUtxos = asGetAllUtxos(wallet);
-        if (canGetAllUtxos == null) {
-          throw new Error('could not get all utxos');
-        }
-        const utxos = await canGetAllUtxos.getAllUtxos();
-        return await connectorSignTx(wallet, password, utxos, tx, indices);
-      }
-    );
+    return await withDb<ErgoTxJson>(async (db, localStorageApi) => {
+      return await withSelectedWallet<ErgoTxJson>(
+        tabId,
+        async (wallet) => {
+          const canGetAllUtxos = asGetAllUtxos(wallet);
+          if (canGetAllUtxos == null) {
+            throw new Error('could not get all utxos');
+          }
+          const utxos = await canGetAllUtxos.getAllUtxos();
+          return await connectorSignTx(wallet, password, utxos, tx, indices);
+        },
+        db,
+        localStorageApi
+      );
+    });
   }
   // alert(`received event: ${JSON.stringify(request)}`);
   if (request.type === 'connect_response') {
@@ -461,25 +486,24 @@ async function removeWallet(
   );
 }
 
-async function confirmSign(tabId: number, request: PendingSignData): Promise<any> {
+async function confirmSign(
+  tabId: number,
+  request: PendingSignData,
+  connectedSite: ConnectedSite,
+): Promise<void | ({| ok: any |} | {| err: any |})> {
   const bounds = await getBoundsForTabWindow(tabId);
   return new Promise(resolve => {
-    const connection = connectedSites.get(tabId);
-    if (connection) {
-      connection.pendingSigns.set(request.uid, {
-        request,
-        openedWindow: false,
-        resolve
-      });
-       chrome.windows.create({
-         ...popupProps,
-        url: chrome.extension.getURL(`/main_window_ergo.html#/signin-transaction`),
-        left: (bounds.width + bounds.positionX) - popupProps.width,
-        top: bounds.positionY + 80,
-      });
-    } else {
-      // console.log(`ERR - confirmSign could not find connection with tabId = ${tabId}`);
-    }
+    connectedSite.pendingSigns.set(request.uid, {
+      request,
+      openedWindow: false,
+      resolve
+    });
+      chrome.windows.create({
+        ...popupProps,
+      url: chrome.extension.getURL(`/main_window_ergo.html#/signin-transaction`),
+      left: (bounds.width + bounds.positionX) - popupProps.width,
+      top: bounds.positionY + 80,
+    });
   });
 }
 
@@ -598,13 +622,23 @@ chrome.runtime.onConnectExternal.addListener(port => {
           case 'sign_tx':
             try {
               checkParamCount(1);
-              const tx = asTx(message.params[0]);
-              const resp = await confirmSign(tabId, {
-                type: 'tx',
-                tx,
-                uid: message.uid
-              });
-              rpcResponse(resp);
+              await RustModule.load();
+              const tx = asTx(message.params[0], RustModule.SigmaRust);
+              const connection = connectedSites.get(tabId);
+              if (connection == null) {
+                Logger.error(`ERR - sign_tx could not find connection with tabId = ${tabId}`);
+                rpcResponse(undefined); // shouldn't happen
+              } else {
+                const resp = await confirmSign(tabId,
+                  {
+                    type: 'tx',
+                    tx,
+                    uid: message.uid
+                  },
+                  connection
+                );
+                rpcResponse(resp);
+              }
             } catch (e) {
               handleError(e);
             }
@@ -612,18 +646,28 @@ chrome.runtime.onConnectExternal.addListener(port => {
           case 'sign_tx_input':
             try {
               checkParamCount(2);
-              const tx = asTx(message.params[0]);
+              await RustModule.load();
+              const tx = asTx(message.params[0], RustModule.SigmaRust);
               const txIndex = message.params[1];
               if (typeof txIndex !== 'number') {
                 throw ConnectorError.invalidRequest(`invalid tx input: ${txIndex}`);
               }
-              const resp = await confirmSign(tabId, {
-                type: 'tx_input',
-                tx,
-                index: txIndex,
-                uid: message.uid
-              });
-              rpcResponse(resp);
+              const connection = connectedSites.get(tabId);
+              if (connection == null) {
+                Logger.error(`ERR - sign_tx could not find connection with tabId = ${tabId}`);
+                rpcResponse(undefined); // shouldn't happen
+              } else {
+                const resp = await confirmSign(tabId,
+                  {
+                    type: 'tx_input',
+                    tx,
+                    index: txIndex,
+                    uid: message.uid
+                  },
+                  connection
+                );
+                rpcResponse(resp);
+              }
             } catch (e) {
               handleError(e);
             }
@@ -644,13 +688,17 @@ chrome.runtime.onConnectExternal.addListener(port => {
             try {
               checkParamCount(1);
               const tokenId = asTokenId(message.params[0]);
-              await withSelectedWallet(
-                tabId,
-                async (wallet) => {
-                  const balance = await connectorGetBalance(wallet, pendingTxs, tokenId);
-                  rpcResponse({ ok: balance });
-                }
-              );
+              await withDb(async (db, localStorageApi) => {
+                await withSelectedWallet(
+                  tabId,
+                  async (wallet) => {
+                    const balance = await connectorGetBalance(wallet, pendingTxs, tokenId);
+                    rpcResponse({ ok: balance });
+                  },
+                  db,
+                  localStorageApi,
+                )
+              });
             } catch(e) {
               handleError(e);
             }
@@ -662,21 +710,25 @@ chrome.runtime.onConnectExternal.addListener(port => {
               const tokenId = asTokenId(message.params[1]);
               const paginate = message.params[2] == null ? null : asPaginate(message.params[2]);
 
-              await withSelectedWallet(
-                tabId,
-                async (wallet) => {
-                  const utxos = await connectorGetUtxos(
-                    wallet,
-                    pendingTxs,
-                    valueExpected,
-                    tokenId,
-                    paginate
-                  );
-                  rpcResponse({
-                    ok: utxos
-                  });
-                }
-              );
+              await withDb(async (db, localStorageApi) => {
+                await withSelectedWallet(
+                  tabId,
+                  async (wallet) => {
+                    const utxos = await connectorGetUtxos(
+                      wallet,
+                      pendingTxs,
+                      valueExpected,
+                      tokenId,
+                      paginate
+                    );
+                    rpcResponse({
+                      ok: utxos
+                    });
+                  },
+                  db,
+                  localStorageApi,
+                )
+              });
             } catch (e) {
               handleError(e);
             }
@@ -685,61 +737,78 @@ chrome.runtime.onConnectExternal.addListener(port => {
             try {
               const paginate = message.params[0] == null ? null : asPaginate(message.params[0]);
 
-              await withSelectedWallet(
-                tabId,
-                async (wallet) => {
-                  const addresses = await connectorGetUsedAddresses(wallet, paginate);
-                  rpcResponse({
-                    ok: addresses
-                  });
-                }
-              );
+              await withDb(async (db, localStorageApi) => {
+                await withSelectedWallet(
+                  tabId,
+                  async (wallet) => {
+                    const addresses = await connectorGetUsedAddresses(wallet, paginate);
+                    rpcResponse({
+                      ok: addresses
+                    });
+                  },
+                  db,
+                  localStorageApi,
+                )
+              });
             } catch (e) {
               handleError(e);
             }
             break;
           case 'get_unused_addresses':
             try {
-              await withSelectedWallet(
-                tabId,
-                async (wallet) => {
-                  const addresses = await connectorGetUnusedAddresses(wallet);
-                  rpcResponse({
-                    ok: addresses
-                  });
-                }
-              );
+              await withDb(async (db, localStorageApi) => {
+                await withSelectedWallet(
+                  tabId,
+                  async (wallet) => {
+                    const addresses = await connectorGetUnusedAddresses(wallet);
+                    rpcResponse({
+                      ok: addresses
+                    });
+                  },
+                  db,
+                  localStorageApi,
+                )
+              });
             } catch (e) {
               handleError(e);
             }
             break;
           case `get_change_address`:
             try {
-              await withSelectedWallet(
-                tabId,
-                async (wallet) => {
-                  const change = await connectorGetChangeAddress(wallet);
-                  rpcResponse({
-                    ok: change
-                  });
-                }
-              );
+              await withDb(async (db, localStorageApi) => {
+                await withSelectedWallet(
+                  tabId,
+                  async (wallet) => {
+                    const change = await connectorGetChangeAddress(wallet);
+                    rpcResponse({
+                      ok: change
+                    });
+                  },
+                  db,
+                  localStorageApi,
+                )
+              });
             } catch (e) {
               handleError(e);
             }
             break;
           case 'submit_tx':
             try {
-              const tx = asSignedTx(message.params[0]);
-              await withSelectedWallet(
-                tabId,
-                async (wallet) => {
-                  const id = await connectorSendTx(wallet, pendingTxs, tx);
-                  rpcResponse({
-                    ok: id
-                  });
-                }
-              );
+              await RustModule.load();
+              const tx = asSignedTx(message.params[0], RustModule.SigmaRust);
+              await withDb(async (db, localStorageApi) => {
+                await withSelectedWallet(
+                  tabId,
+                  async (wallet) => {
+                    const id = await connectorSendTx(wallet, pendingTxs, tx);
+                    rpcResponse({
+                      ok: id
+                    });
+                  },
+                  db,
+                  localStorageApi,
+                )
+              });
             } catch (e) {
               handleError(e);
             }

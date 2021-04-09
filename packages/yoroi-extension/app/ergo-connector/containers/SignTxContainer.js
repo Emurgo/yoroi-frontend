@@ -101,6 +101,7 @@ export default class SignTxContainer extends Component<
             totalAmount={this.generated.stores.connector.totalAmount}
             getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
             defaultToken={selectedWallet.publicDeriver.getParent().getDefaultToken()}
+            network={selectedWallet.publicDeriver.getParent().getNetworkInfo()}
             onConfirm={this.onConfirm}
             onCancel={this.onCancel}
           />

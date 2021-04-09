@@ -274,7 +274,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
 
   /** Make all API calls required to setup/update wallet */
   @action restoreWalletsFromStorage: void => Promise<void> = async () => {
-    const persistentDb = this.stores.loading.loadPersistentDbRequest.result;
+    const persistentDb = this.stores.loading.getDatabase();
     if (persistentDb == null) {
       throw new Error(
         `${nameof(this.restoreWalletsFromStorage)} db not loaded. Should never happen`

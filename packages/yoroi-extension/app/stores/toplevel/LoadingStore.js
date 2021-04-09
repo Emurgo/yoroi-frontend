@@ -15,6 +15,7 @@ import type { StoresMap } from '../index';
 import {
   TabIdKeys,
 } from '../../utils/tabManager';
+import type { lf$Database } from 'lovefield';
 
 export default class LoadingStore extends BaseLoadingStore<StoresMap, ActionsMap> {
   /**
@@ -115,5 +116,9 @@ export default class LoadingStore extends BaseLoadingStore<StoresMap, ActionsMap
 
   getTabIdKey(): string {
     return TabIdKeys.Primary;
+  }
+
+  getDatabase(): ?lf$Database {
+    return this.loadPersistentDbRequest.result;
   }
 }

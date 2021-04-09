@@ -32,6 +32,8 @@ import { walletChecksum, legacyWalletChecksum } from '@emurgo/cip4-js';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import BigNumber from 'bignumber.js';
+import { addErgoAssets } from '../../api/ergo/lib/storage/bridge/updateTransactions';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 
 // Need to run only once - Connecting wallets
 let initedConnecting = false;
@@ -231,7 +233,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       this.errorWallets = '';
     });
 
-    const persistentDb = this.stores.loading.loadPersistentDbRequest.result;
+    const persistentDb = this.stores.loading.getDatabase();
     if (persistentDb == null) {
       throw new Error(`${nameof(this._getWallets)} db not loaded. Should never happen`);
     }
@@ -241,6 +243,8 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       const ergoWallets = wallets.filter(
         wallet => isErgo(wallet.getParent().getNetworkInfo())
       );
+
+      await this._getTxAssets(ergoWallets);
 
       const result = [];
       for (const ergoWallet of ergoWallets) {
@@ -272,6 +276,40 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       });
     }
   };
+
+  _getTxAssets: Array<PublicDeriver<>> => Promise<void> = async (publicDerivers) => {
+    const persistentDb = this.stores.loading.getDatabase();
+    if (persistentDb == null) {
+      throw new Error(`${nameof(this._getWallets)} db not loaded. Should never happen`);
+    }
+    if (this.signingMessage == null) return;
+    const { signingMessage } = this;
+
+    const selectedWallet = publicDerivers.find(
+      wallet => wallet.getPublicDeriverId() === signingMessage.publicDeriverId
+    );
+    if (selectedWallet == null) return;
+
+    if (!signingMessage.sign.tx) return;
+    const { tx } = signingMessage.sign;
+    const tokenIdentifiers = Array.from(new Set([
+      ...tx.inputs
+        .flatMap(output => output.assets)
+        .map(asset => asset.tokenId),
+      ...tx.outputs
+        .flatMap(output => output.assets)
+        .map(asset => asset.tokenId),
+      // force inclusion of primary token for chain
+      selectedWallet.getParent().getDefaultToken().defaultIdentifier
+    ]));
+    const stateFetcher = this.stores.substores.ergo.stateFetchStore.fetcher;
+    await addErgoAssets({
+      db: selectedWallet.getDb(),
+      tokenIdentifiers,
+      getAssetInfo: stateFetcher.getAssetInfo,
+      network: selectedWallet.getParent().getNetworkInfo(),
+    });
+  }
 
   // ========== whitelist ========== //
   @computed get currentConnectorWhitelist(): Array<WhitelistEntry> {

@@ -383,7 +383,7 @@ export default class LedgerConnectStore
     }
     const { publicMasterKey, hwFeatures } = this.hwDeviceInfo;
 
-    const persistentDb = this.stores.loading.loadPersistentDbRequest.result;
+    const persistentDb = this.stores.loading.getDatabase();
     if (persistentDb == null) {
       throw new Error(`${nameof(this._prepareCreateHWReqParams)} db not loaded. Should never happen`);
     }

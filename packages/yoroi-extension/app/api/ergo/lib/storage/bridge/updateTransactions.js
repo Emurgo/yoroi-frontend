@@ -1469,29 +1469,17 @@ function genErgoIOGen(
   };
 }
 
-async function genErgoAssetMap(
+async function rawAddErgoAssets(
   db: lf$Database,
   dbTx: lf$Transaction,
   deps: {|
     ModifyToken: Class<ModifyToken>,
     GetToken: Class<GetToken>,
   |},
-  newTxs: Array<RemoteErgoTransaction>,
+  tokenIdentifiers: Array<string>,
   getAssetInfo: AssetInfoFunc,
   network: $ReadOnly<NetworkRow>,
-  defaultToken: DefaultTokenEntry,
 ): Promise<Map<string, $ReadOnly<TokenRow>>> {
-  const tokenIdentifiers = Array.from(new Set(newTxs.flatMap(tx => [
-    ...tx.inputs
-      .flatMap(input => input.assets)
-      .map(asset => asset.tokenId),
-    ...tx.outputs
-      .flatMap(output => output.assets)
-      .map(asset => asset.tokenId),
-    // force inclusion of primary token for chain
-    defaultToken.defaultIdentifier
-  ])));
-
   const existingDbRows = (await deps.GetToken.fromIdentifier(
     db, dbTx,
     tokenIdentifiers
@@ -1530,6 +1518,70 @@ async function genErgoAssetMap(
   newDbRows.forEach(row => result.set(row.Identifier, row));
 
   return result;
+}
+
+export async function addErgoAssets(
+  request: {|
+    db: lf$Database,
+    tokenIdentifiers: Array<string>,
+    getAssetInfo: AssetInfoFunc,
+    network: $ReadOnly<NetworkRow>,
+  |},
+): Promise<Map<string, $ReadOnly<TokenRow>>> {
+  const deps = Object.freeze({
+    ModifyToken,
+    GetToken,
+  });
+  const depTables = Object
+    .keys(deps)
+    .map(key => deps[key])
+    .flatMap(table => getAllSchemaTables(request.db, table));
+
+  return await raii<PromisslessReturnType<typeof rawAddErgoAssets>>(
+    request.db,
+    depTables,
+    async dbTx => rawAddErgoAssets(
+        request.db,
+        dbTx,
+        deps,
+        request.tokenIdentifiers,
+        request.getAssetInfo,
+        request.network,
+    )
+  );
+}
+
+async function genErgoAssetMap(
+  db: lf$Database,
+  dbTx: lf$Transaction,
+  deps: {|
+    ModifyToken: Class<ModifyToken>,
+    GetToken: Class<GetToken>,
+  |},
+  newTxs: Array<RemoteErgoTransaction>,
+  getAssetInfo: AssetInfoFunc,
+  network: $ReadOnly<NetworkRow>,
+  defaultToken: DefaultTokenEntry,
+): Promise<Map<string, $ReadOnly<TokenRow>>> {
+  const tokenIdentifiers = Array.from(new Set(newTxs.flatMap(tx => [
+    ...tx.inputs
+      .flatMap(input => input.assets)
+      .map(asset => asset.tokenId),
+    ...tx.outputs
+      .flatMap(output => output.assets)
+      .map(asset => asset.tokenId),
+    // force inclusion of primary token for chain
+    defaultToken.defaultIdentifier
+  ])));
+
+  return rawAddErgoAssets(
+    db,
+    dbTx,
+    deps,
+    tokenIdentifiers,
+    getAssetInfo,
+    network,
+  );
 }
 
 async function networkTxToDbTx(
