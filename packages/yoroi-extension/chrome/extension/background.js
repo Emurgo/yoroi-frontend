@@ -800,7 +800,7 @@ chrome.runtime.onConnectExternal.addListener(port => {
                 await withSelectedWallet(
                   tabId,
                   async (wallet) => {
-                    const id = await connectorSendTx(wallet, pendingTxs, tx);
+                    const id = await connectorSendTx(wallet, pendingTxs, tx, localStorageApi);
                     rpcResponse({
                       ok: id
                     });
