@@ -31,7 +31,6 @@ import { BIP32PrivateKey, } from '../../../app/api/common/lib/crypto/keys/keyRep
 import { generateKeys } from '../../../app/api/ergo/lib/transactions/utxoTransaction';
 
 import {
-  InvalidWitnessError,
   SendTransactionApiError
 } from '../../../app/api/common/errors';
 
@@ -41,6 +40,8 @@ import { asAddressedUtxo, toErgoBoxJSON } from '../../../app/api/ergo/lib/transa
 import { CoreAddressTypes } from '../../../app/api/ada/lib/storage/database/primitives/enums';
 import { getAllAddressesForDisplay } from '../../../app/api/ada/lib/storage/bridge/traitUtils';
 import { getReceiveAddress } from '../../../app/stores/stateless/addressStores';
+
+import LocalStorageApi from '../../../app/api/localStorage/index';
 
 function paginateResults<T>(results: T[], paginate: ?Paginate): T[] {
   if (paginate != null) {
@@ -275,7 +276,8 @@ export async function connectorSignTx(
 export async function connectorSendTx(
   wallet: IPublicDeriver</* ConceptualWallet */>,
   pendingTxs: PendingTransaction[],
-  tx: SignedTx
+  tx: SignedTx,
+  localStorage: LocalStorageApi,
 ): Promise<TxId> {
   const network = wallet.getParent().getNetworkInfo();
   const backend = network.Backend.BackendService;
@@ -289,10 +291,10 @@ export async function connectorSendTx(
       // 2 * CONFIG.app.walletRefreshInterval,
       timeout: 2 * 20000,
       data: tx,
-      // headers: {
-      //   'yoroi-version': this.getLastLaunchVersion(),
-      //   'yoroi-locale': this.getCurrentLocale()
-      // }
+      headers: {
+        'yoroi-version': localStorage.getLastLaunchVersion(),
+        'yoroi-locale': localStorage.getUserLocale()
+      }
     }
   ).then(response => {
     pendingTxs.push({
@@ -301,10 +303,7 @@ export async function connectorSendTx(
     });
     return Promise.resolve(response.data.id);
   })
-    .catch((error) => {
-      if (error.request.response.includes('Invalid witness')) {
-        throw new InvalidWitnessError();
-      }
+    .catch((_error) => {
       throw new SendTransactionApiError();
     });
 }
