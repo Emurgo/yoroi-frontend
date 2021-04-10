@@ -15,7 +15,10 @@ import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import { SUPPORTED_CURRENCIES } from '../../config/unitOfAccount';
 import type { ComplexityLevelType } from '../../types/complexityLevelType';
 import BaseProfileActions from '../../actions/base/base-profile-actions';
-import CoinPriceStore from '../toplevel/CoinPriceStore';
+
+interface CoinPriceStore {
+  refreshCurrentUnit: Request<void => Promise<void>>
+}
 
 export default class BaseProfileStore
   <
