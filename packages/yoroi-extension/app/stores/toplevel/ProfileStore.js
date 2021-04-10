@@ -81,7 +81,6 @@ export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap
         await this.stores.memos.loadFromStorage();
         await this.stores.tokenInfoStore.refreshTokenInfo();
         await this.stores.coinPriceStore.loadFromStorage();
-        await this.stores.coinPriceStore.refreshCurrentCoinPrice();
 
         await wallets.restoreWalletsFromStorage();
         if (wallets.hasAnyWallets && this.stores.loading.fromUriScheme) {

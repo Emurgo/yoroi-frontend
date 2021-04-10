@@ -1,15 +1,15 @@
 // @flow
-import BaseLoadingStore from '../../stores/base/BaseLoadingStore';
+import BaseLoadingStore from '../../../stores/base/BaseLoadingStore';
 import type { ActionsMap } from '../../actions/index';
-import type { StoresMap } from './index';
+import type { StoresMap } from '../index';
 import {
   TabIdKeys,
-} from '../../utils/tabManager';
+} from '../../../utils/tabManager';
 import type { lf$Database } from 'lovefield';
 import { observable, runInAction } from 'mobx';
 import {
   copyDbToMemory,
-} from '../../api/ada/lib/storage/database/index';
+} from '../../../api/ada/lib/storage/database/index';
 
 export default class ConnectorLoadingStore extends BaseLoadingStore<StoresMap, ActionsMap> {
 
@@ -28,7 +28,6 @@ export default class ConnectorLoadingStore extends BaseLoadingStore<StoresMap, A
 
     await this.stores.tokenInfoStore.refreshTokenInfo();
     await this.stores.coinPriceStore.loadFromStorage();
-    await this.stores.coinPriceStore.refreshCurrentCoinPrice();
   }
 
   postLoadingScreenEnd(): void {

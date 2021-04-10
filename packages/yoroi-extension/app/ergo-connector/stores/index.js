@@ -4,33 +4,36 @@ import ProfileStore from './toplevel/ProfileStore';
 import type { Api } from '../../api/index';
 import UiNotificationsStore from '../../stores/toplevel/UiNotificationsStore';
 import UiDialogsStore from '../../stores/toplevel/UiDialogsStore';
-import CoinPriceStore from '../../stores/toplevel/CoinPriceStore';
+import ConnectorCoinPriceStore from './toplevel/ConnectorCoinPriceStore';
 import TokenInfoStore from '../../stores/toplevel/TokenInfoStore';
 import ConnectorStore from './ConnectorStore';
-import ConnectorLoadingStore from './ConnectorLoadingStore';
+import ConnectorLoadingStore from './toplevel/ConnectorLoadingStore';
 import type { ActionsMap } from '../actions';
 import type { AdaStoresMap } from './ada/index';
 import type { ErgoStoresMap } from './ergo/index';
 import setupAdaStores from './ada/index';
 import setupErgoStores from './ergo/index';
 import { ApiOptions } from '../../api/common/utils';
+import StateFetchStore from '../../stores/toplevel/StateFetchStore';
 
 /** Map of var name to class. Allows dynamic lookup of class so we can init all stores one loop */
 const storeClasses = Object.freeze({
+  stateFetchStore: StateFetchStore,
   profile: ProfileStore,
   uiDialogs: UiDialogsStore,
   uiNotifications: UiNotificationsStore,
-  coinPriceStore: CoinPriceStore,
+  coinPriceStore: ConnectorCoinPriceStore,
   loading: ConnectorLoadingStore,
   connector: ConnectorStore,
   tokenInfoStore: TokenInfoStore,
 });
 
 export type StoresMap = {|
+  stateFetchStore: StateFetchStore,
   profile: ProfileStore,
   uiDialogs: UiDialogsStore<{||}, ActionsMap>,
   uiNotifications: UiNotificationsStore<{||}, ActionsMap>,
-  coinPriceStore: CoinPriceStore,
+  coinPriceStore: ConnectorCoinPriceStore,
   loading: ConnectorLoadingStore,
   connector: ConnectorStore,
   tokenInfoStore: TokenInfoStore,
@@ -42,6 +45,7 @@ export type StoresMap = {|
 
 /** Constant that represents the stores across the lifetime of the application */
 const stores: WithNullableFields<StoresMap> = observable({
+  stateFetchStore: null, // best to initialize first to avoid issues
   profile: null,
   uiDialogs: null,
   uiNotifications: null,
