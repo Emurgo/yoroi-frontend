@@ -294,6 +294,11 @@ export const genJormungandrUndelegateTx = (
   const builder = RustModule.WalletV3.InputOutputBuilder.empty();
   builder.add_input(input);
   const IOs = builder.build();
+
+  const networkInfo = publicDeriver.getParent().getNetworkInfo();
+  const config = getJormungandrBaseConfig(networkInfo)
+    .reduce((acc, next) => Object.assign(acc, next), {});
+
   return new JormungandrTxSignRequest({
     senderUtxos: [{
       ...remoteUnspentUtxo,
@@ -306,18 +311,23 @@ export const genJormungandrUndelegateTx = (
     changeAddr: [],
     certificate: undefined, // TODO
     networkSettingSnapshot: {
-      NetworkId: publicDeriver.getParent().getNetworkInfo().NetworkId,
+      NetworkId: networkInfo.NetworkId,
+      ChainNetworkId: Number.parseInt(config.ChainNetworkId, 10),
     },
   });
 };
 
 export const genTentativeJormungandrTx = (
-  networkId: number,
+  publicDeriver: PublicDeriver<>,
 ): {|
   tentativeTx: null | ISignRequest<any>,
   inputAmount: string,
   fee: BigNumber,
 |} => {
+  const networkInfo = publicDeriver.getParent().getNetworkInfo();
+  const config = getJormungandrBaseConfig(networkInfo)
+    .reduce((acc, next) => Object.assign(acc, next), {});
+
   const inputAmount = '1000001';
   const outputAmount = '400';
   const fee = new BigNumber(inputAmount).minus(new BigNumber(outputAmount));
@@ -350,7 +360,8 @@ export const genTentativeJormungandrTx = (
       changeAddr: [],
       certificate: undefined,
       networkSettingSnapshot: {
-        NetworkId: networkId,
+        NetworkId: networkInfo.NetworkId,
+        ChainNetworkId: Number.parseInt(config.ChainNetworkId, 10),
       },
     }),
     inputAmount,

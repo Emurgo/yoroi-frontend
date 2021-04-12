@@ -22,7 +22,11 @@ import { LoadingWalletStates } from '../types';
 import {
   getWallets
 } from '../../api/common/index';
-import { isCardanoHaskell, isErgo, } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import {
+  isCardanoHaskell,
+  isErgo,
+  getErgoBaseConfig,
+} from '../../api/ada/lib/storage/database/prepackaged/networks';
 import {
   asGetBalance,
   asGetPublicKey,
@@ -31,9 +35,12 @@ import { Bip44Wallet } from '../../api/ada/lib/storage/models/Bip44Wallet/wrappe
 import { walletChecksum, legacyWalletChecksum } from '@emurgo/cip4-js';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import { MultiToken } from '../../api/common/lib/MultiToken';
-import BigNumber from 'bignumber.js';
 import { addErgoAssets } from '../../api/ergo/lib/storage/bridge/updateTransactions';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import type { ISignRequest } from '../../api/common/lib/transactions/ISignRequest';
+import { ErgoExternalTxSignRequest } from '../../api/ergo/lib/transactions/ErgoExternalTxSignRequest';
+import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
+import { toRemoteUtxo } from '../../api/ergo/lib/transactions/utils';
 
 // Need to run only once - Connecting wallets
 let initedConnecting = false;
@@ -161,24 +168,6 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       })
       .catch(err => console.error(err));
   };
-
-  // ========== sign tx confirmation ========== //
-  @computed get totalAmount(): ?BigNumber {
-    const pendingSign = this.signingMessage?.sign ?? {};
-    if (pendingSign.tx == null) {
-      return undefined;
-    }
-    const txData = pendingSign.tx ?? {};
-
-    const total = txData.outputs
-      .map(item => item.value)
-      .reduce(
-        (acc, currentValue) => acc.plus(currentValue),
-        new BigNumber(0)
-      );
-
-    return total;
-  }
 
   @action
   _getSigningMsg: () => Promise<void> = async () => {
@@ -309,6 +298,40 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       getAssetInfo: stateFetcher.getAssetInfo,
       network: selectedWallet.getParent().getNetworkInfo(),
     });
+  }
+
+  @computed get signingRequest(): ?ISignRequest<any> {
+    if (this.signingMessage == null) return;
+    const { signingMessage } = this;
+    const selectedWallet = this.wallets.find(
+      wallet => wallet.publicDeriver.getPublicDeriverId() === signingMessage.publicDeriverId
+    );
+    if (selectedWallet == null) return undefined;
+    if (!signingMessage.sign.tx) return undefined;
+    const { tx } = signingMessage.sign;
+
+    const network = selectedWallet.publicDeriver.getParent().getNetworkInfo();
+    if (isErgo(network)) {
+      const config = getErgoBaseConfig(
+        network
+      ).reduce((acc, next) => Object.assign(acc, next), {});
+      const networkSettingSnapshot = {
+        NetworkId: network.NetworkId,
+        ChainNetworkId: (Number.parseInt(config.ChainNetworkId, 10): any),
+        FeeAddress: config.FeeAddress,
+      }
+      return new ErgoExternalTxSignRequest({
+        inputUtxos: tx.inputs
+          .map(
+            // eslint-disable-next-line no-unused-vars
+            ({ extension, ...rest }) => toRemoteUtxo(rest, networkSettingSnapshot.ChainNetworkId)
+          ),
+        unsignedTx: RustModule.SigmaRust.UnsignedTransaction.from_json(JSON.stringify(tx)),
+        changeAddr: [],
+        networkSettingSnapshot
+      });
+    }
+    throw new Error(`${nameof(ConnectorStore)}::${nameof(this.signingRequest)} unexpected wallet type`);
   }
 
   // ========== whitelist ========== //

@@ -15,6 +15,7 @@ import type {
 type NetworkSettingSnapshot = {|
   // there is no way given just an unsigned transaction body to know which network it belongs to
   +NetworkId: number,
+  +ChainNetworkId: number,
 |};
 
 export class JormungandrTxSignRequest implements ISignRequest<RustModule.WalletV3.InputOutput> {
@@ -39,10 +40,30 @@ export class JormungandrTxSignRequest implements ISignRequest<RustModule.WalletV
     this.networkSettingSnapshot = data.networkSettingSnapshot;
   }
 
+  inputs(): Array<{|
+    address: string,
+    value: MultiToken,
+  |}> {
+    return getTxInputs(
+      this.unsignedTx,
+      this.senderUtxos,
+      this.networkSettingSnapshot.NetworkId,
+      this.networkSettingSnapshot.ChainNetworkId,
+    );
+  }
   totalInput(): MultiToken {
     return getTxInputTotal(this.unsignedTx, this.networkSettingSnapshot.NetworkId);
   }
 
+  outputs(): Array<{|
+    address: string,
+    value: MultiToken,
+  |}> {
+    return getTxOutputs(
+      this.unsignedTx,
+      this.networkSettingSnapshot.NetworkId
+    );
+  }
   totalOutput(): MultiToken {
     return getTxOutputTotal(this.unsignedTx, this.networkSettingSnapshot.NetworkId);
   }
@@ -86,6 +107,61 @@ export class JormungandrTxSignRequest implements ISignRequest<RustModule.WalletV
   }
 }
 
+export function getTxInputs(
+  IOs: RustModule.WalletV3.InputOutput,
+  senderUtxos: Array<JormungandrAddressedUtxo>,
+  networkId: number,
+  chainNetworkId: number,
+): Array<{|
+    address: string,
+    value: MultiToken,
+  |}> {
+  const values = [];
+
+  const inputs = IOs.inputs();
+  for (let i = 0; i < inputs.size(); i++) {
+    const input = inputs.get(i);
+
+    const value = new MultiToken(
+      [{
+        identifier: PRIMARY_ASSET_CONSTANTS.Jormungandr,
+        amount: new BigNumber(input.value().to_str()),
+        networkId,
+      }],
+      {
+        defaultNetworkId: networkId,
+        defaultIdentifier: PRIMARY_ASSET_CONSTANTS.Jormungandr,
+      }
+    );
+    if (input.is_account()) {
+      const address = input.get_account_identifier()
+        .to_account_single() // TODO multisig
+        .to_address(chainNetworkId);
+
+      values.push({
+        value,
+        address: Buffer.from(address.as_bytes()).toString('hex'),
+      });
+    } else {
+      const pointer = input.get_utxo_pointer();
+      const key = {
+        hash: Buffer.from(pointer.fragment_id().as_bytes()).toString('hex'),
+        index: pointer.output_index(),
+      };
+      const utxoEntry = senderUtxos.find(
+        utxo => utxo.tx_hash === key.hash && utxo.tx_index === key.index
+      );
+      if (utxoEntry == null) {
+        throw new Error(`${nameof(getTxInputs)} missing ${nameof(senderUtxos)} input for ${JSON.stringify(key)}`);
+      }
+      values.push({
+        value,
+        address: utxoEntry.receiver,
+      });
+    }
+  }
+  return values;
+}
 export function getTxInputTotal(
   IOs: RustModule.WalletV3.InputOutput,
   networkId: number,
@@ -105,6 +181,38 @@ export function getTxInputTotal(
       identifier: PRIMARY_ASSET_CONSTANTS.Jormungandr,
       amount: new BigNumber(input.value().to_str()),
       networkId,
+    });
+  }
+  return values;
+}
+
+export function getTxOutputs(
+  IOs: RustModule.WalletV3.InputOutput,
+  networkId: number,
+): Array<{|
+    address: string,
+    value: MultiToken,
+  |}> {
+  const values = [];
+
+  const outputs = IOs.outputs();
+  for (let i = 0; i < outputs.size(); i++) {
+    const output = outputs.get(i);
+
+    const value = new MultiToken(
+      [{
+        identifier: PRIMARY_ASSET_CONSTANTS.Jormungandr,
+        amount: new BigNumber(output.value().to_str()),
+        networkId,
+      }],
+      {
+        defaultNetworkId: networkId,
+        defaultIdentifier: PRIMARY_ASSET_CONSTANTS.Jormungandr,
+      }
+    );
+    values.push({
+      value,
+      address: Buffer.from(output.address().as_bytes()).toString('hex')
     });
   }
   return values;

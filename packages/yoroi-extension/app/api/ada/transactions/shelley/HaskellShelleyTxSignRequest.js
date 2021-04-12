@@ -9,7 +9,7 @@ import {
   MultiToken,
 } from '../../../common/lib/MultiToken';
 import { PRIMARY_ASSET_CONSTANTS } from '../../lib/storage/database/primitives/enums';
-import { multiTokenFromCardanoValue } from '../utils';
+import { multiTokenFromCardanoValue, multiTokenFromRemote } from '../utils';
 import type {
   Address, Value, Addressing,
 } from '../../lib/storage/models/PublicDeriver/interfaces';
@@ -71,6 +71,39 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
     ).to_bytes()).toString('hex');
   }
 
+  inputs(): Array<{|
+    address: string,
+    value: MultiToken,
+  |}> {
+    const body = this.unsignedTx.build();
+
+    const values = [];
+
+    const inputs = body.inputs();
+    for (let i = 0; i < inputs.len(); i++) {
+      const input = inputs.get(i);
+
+      const key = {
+        hash: Buffer.from(input.transaction_id().to_bytes()).toString('hex'),
+        index: input.index(),
+      };
+      const utxoEntry = this.senderUtxos.find(
+        utxo => utxo.tx_hash === key.hash && utxo.tx_index === key.index
+      );
+      if (utxoEntry == null) {
+        throw new Error(`${nameof(this.inputs)} missing ${nameof(this.senderUtxos)} input for ${JSON.stringify(key)}`);
+      }
+      values.push({
+        value: multiTokenFromRemote(
+          utxoEntry,
+          this.networkSettingSnapshot.NetworkId,
+        ),
+        address: utxoEntry.receiver,
+      });
+    }
+
+    return values;
+  }
   totalInput(): MultiToken {
     const values = multiTokenFromCardanoValue(
       this.unsignedTx.get_implicit_input().checked_add(
@@ -86,6 +119,32 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
     return values;
   }
 
+  outputs(): Array<{|
+    address: string,
+    value: MultiToken,
+  |}> {
+    const body = this.unsignedTx.build();
+
+    const values = [];
+
+    const outputs = body.outputs();
+    for (let i = 0; i < outputs.len(); i++) {
+      const output = outputs.get(i);
+
+      values.push({
+        value: multiTokenFromCardanoValue(
+            output.amount(),
+            {
+              defaultIdentifier: PRIMARY_ASSET_CONSTANTS.Cardano,
+              defaultNetworkId: this.networkSettingSnapshot.NetworkId,
+            },
+          ),
+        address: Buffer.from(output.address().to_bytes()).toString('hex'),
+      });
+    }
+
+    return values;
+  }
   totalOutput(): MultiToken {
     return multiTokenFromCardanoValue(
       this.unsignedTx.get_explicit_output(),

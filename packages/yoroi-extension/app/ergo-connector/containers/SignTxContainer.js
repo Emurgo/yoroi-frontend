@@ -15,7 +15,10 @@ import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tab
 import VerticallyCenteredLayout from '../../components/layout/VerticallyCenteredLayout';
 import FullscreenLayout from '../../components/layout/FullscreenLayout';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
-import BigNumber from 'bignumber.js';
+import type { ISignRequest } from '../../api/common/lib/transactions/ISignRequest';
+import { addressToDisplayString } from '../../api/ada/lib/storage/bridge/utils';
+import { SelectedExplorer } from '../../domain/SelectedExplorer';
+import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 
 type GeneratedData = typeof SignTxContainer.prototype.generated;
 
@@ -77,7 +80,8 @@ export default class SignTxContainer extends Component<
     // TODO: handle other sign types
     switch (signingMessage.sign.type) {
       case 'tx': {
-        const txData = signingMessage.sign.tx ?? '';
+        const txData = this.generated.stores.connector.signingRequest;
+        if (txData == null) return this.renderLoading();
         component = (
           <SignTxPage
             onCopyAddressTooltip={(address, elementId) => {
@@ -98,12 +102,25 @@ export default class SignTxContainer extends Component<
                 : uiNotifications.getTooltipActiveNotification(this.notificationElementId)
             }
             txData={txData}
-            totalAmount={this.generated.stores.connector.totalAmount}
             getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
             defaultToken={selectedWallet.publicDeriver.getParent().getDefaultToken()}
             network={selectedWallet.publicDeriver.getParent().getNetworkInfo()}
             onConfirm={this.onConfirm}
             onCancel={this.onCancel}
+            addressToDisplayString={addr => addressToDisplayString(
+              addr,
+              selectedWallet.publicDeriver.getParent().getNetworkInfo()
+            )}
+            getCurrentPrice={this.generated.stores.coinPriceStore.getCurrentPrice}
+            selectedExplorer={
+              this.generated.stores.explorers.selectedExplorer.get(
+                selectedWallet.publicDeriver.getParent().getNetworkInfo().NetworkId
+              ) ??
+              (() => {
+                throw new Error('No explorer for wallet network');
+              })()
+            }
+            unitOfAccountSetting={this.generated.stores.profile.unitOfAccount}
           />
         );
         break;
@@ -134,10 +151,19 @@ export default class SignTxContainer extends Component<
       |},
     |},
     stores: {|
+      coinPriceStore: {|
+        getCurrentPrice: (from: string, to: string) => ?number
+      |},
       connector: {|
         signingMessage: ?SigningMessage,
-        totalAmount: ?BigNumber,
         wallets: Array<PublicDeriverCache>,
+        signingRequest: ?ISignRequest<any>,
+      |},
+      explorers: {|
+        selectedExplorer: Map<number, SelectedExplorer>,
+      |},
+      profile: {|
+        unitOfAccount: UnitOfAccountSettingType,
       |},
       uiNotifications: {|
         getTooltipActiveNotification: string => ?Notification,
@@ -158,10 +184,19 @@ export default class SignTxContainer extends Component<
     const { stores, actions } = this.props;
     return Object.freeze({
       stores: {
+        coinPriceStore: {
+          getCurrentPrice: stores.coinPriceStore.getCurrentPrice,
+        },
         connector: {
           signingMessage: stores.connector.signingMessage,
-          totalAmount: stores.connector.totalAmount,
           wallets: stores.connector.wallets,
+          signingRequest: stores.connector.signingRequest,
+        },
+        explorers: {
+          selectedExplorer: stores.explorers.selectedExplorer,
+        },
+        profile: {
+          unitOfAccount: stores.profile.unitOfAccount,
         },
         uiNotifications: {
           isOpen: stores.uiNotifications.isOpen,

@@ -15,6 +15,7 @@ import setupAdaStores from './ada/index';
 import setupErgoStores from './ergo/index';
 import { ApiOptions } from '../../api/common/utils';
 import StateFetchStore from '../../stores/toplevel/StateFetchStore';
+import ExplorerStore from './toplevel/ExplorerStore';
 
 /** Map of var name to class. Allows dynamic lookup of class so we can init all stores one loop */
 const storeClasses = Object.freeze({
@@ -26,6 +27,7 @@ const storeClasses = Object.freeze({
   loading: ConnectorLoadingStore,
   connector: ConnectorStore,
   tokenInfoStore: TokenInfoStore,
+  explorers: ExplorerStore,
 });
 
 export type StoresMap = {|
@@ -33,6 +35,7 @@ export type StoresMap = {|
   profile: ProfileStore,
   uiDialogs: UiDialogsStore<{||}, ActionsMap>,
   uiNotifications: UiNotificationsStore<{||}, ActionsMap>,
+  explorers: ExplorerStore,
   coinPriceStore: ConnectorCoinPriceStore,
   loading: ConnectorLoadingStore,
   connector: ConnectorStore,
@@ -47,6 +50,7 @@ export type StoresMap = {|
 const stores: WithNullableFields<StoresMap> = observable({
   stateFetchStore: null, // best to initialize first to avoid issues
   profile: null,
+  explorers: null,
   uiDialogs: null,
   uiNotifications: null,
   coinPriceStore: null,

@@ -484,7 +484,7 @@ export function signTransaction(request: {|
 }
 
 export function generateKeys(request: {|
-  senderUtxos: Array<ErgoAddressedUtxo>,
+  senderUtxos: $ReadOnlyArray<ErgoAddressedUtxo>,
   keyLevel: number,
   signingKey: BIP32PrivateKey
 |}): RustModule.SigmaRust.SecretKeys {

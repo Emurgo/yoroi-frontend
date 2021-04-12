@@ -1580,7 +1580,7 @@ export const UnmangleDialogConfirm = (): Node => {
   const wallet = genBaseJormungandrWallet(new BigNumber(1_000_000));
   const lookup = walletLookup([wallet]);
   const { tentativeTx } = genTentativeJormungandrTx(
-    wallet.publicDeriver.getParent().getNetworkInfo().NetworkId
+    wallet.publicDeriver
   );
   return wrapWallet(
     mockWalletProps({

@@ -11,11 +11,16 @@ import { mockFromDefaults, getDefaultEntryTokenInfo, } from '../../stores/toplev
 import { defaultAssets, } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import {
   genErgoSigningWalletWithCache,
+  genTentativeErgoTx,
 } from '../../../stories/helpers/ergo/ErgoMocks';
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import BigNumber from 'bignumber.js';
 import { decodeErgoTokenInfo } from '../../api/ergo/lib/state-fetch/mockNetwork';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
+import { defaultToSelectedExplorer } from '../../domain/SelectedExplorer';
+import {
+  genUnitOfAccount,
+} from '../../../stories/helpers/StoryWrapper';
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -91,7 +96,7 @@ const genBaseProps: {|
   const parsedTokenMetadata = decodeErgoTokenInfo(tokenInfo.registers);
   const customAsset = {
     NetworkId: request.wallet.publicDeriver.getParent().getNetworkInfo().NetworkId,
-    Identifier: '33a35e15ae1a83fa188674a2bd53007b07e119a0eaaf40b890b2081c2864f12a',
+    Identifier: 'f2b5c4e4883555b882e3a5919967883aade9e0494290f29e0e3069f5ce9eabe4',
     IsDefault: false,
     Metadata: {
       type: 'Ergo',
@@ -104,11 +109,15 @@ const genBaseProps: {|
     }
   };
 
+  const { tentativeTx, } = genTentativeErgoTx(
+    request.wallet.publicDeriver
+  );
+
   return {
     stores: {
       connector: {
+        signingRequest: tentativeTx,
         signingMessage: message(request.wallet.publicDeriver.getPublicDeriverId()),
-        totalAmount: new BigNumber(5),
         wallets: request.isLoading
           ? []
           : [{
@@ -126,6 +135,15 @@ const genBaseProps: {|
               TextPart: 'XLBS-6706',
             }
           }],
+      },
+      coinPriceStore: {
+        getCurrentPrice: (_from, _to) => 5,
+      },
+      explorers: {
+        selectedExplorer: defaultToSelectedExplorer(),
+      },
+      profile: {
+        unitOfAccount: genUnitOfAccount(),
       },
       uiNotifications: {
         getTooltipActiveNotification: (_id) => undefined,
