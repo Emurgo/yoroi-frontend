@@ -5,7 +5,15 @@ import {
 } from '../MultiToken';
 
 export interface ISignRequest<T> {
+  inputs(): Array<{|
+    address: string,
+    value: MultiToken,
+  |}>,
   totalInput(): MultiToken;
+  outputs(): Array<{|
+    address: string,
+    value: MultiToken,
+  |}>,
   totalOutput(): MultiToken;
   fee(): MultiToken;
   uniqueSenderAddresses(): Array<string>;

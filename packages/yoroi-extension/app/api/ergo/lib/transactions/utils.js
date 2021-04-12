@@ -127,6 +127,33 @@ export function toErgoBoxJSON(
   };
 }
 
+export function toRemoteUtxo(
+  utxo: ErgoBoxJson,
+  chainNetworkId: number,
+): RemoteUnspentOutput {
+  return {
+    boxId: utxo.boxId,
+    amount: utxo.value.toString(),
+    ergoTree: utxo.ergoTree,
+    assets: (utxo.assets ?? []).map(asset => ({
+      amount: typeof asset.amount === 'string'
+        ? Number.parseInt(asset.amount, 10)
+        : asset.amount,
+      tokenId: asset.tokenId,
+    })),
+    receiver: Buffer.from(RustModule.SigmaRust.NetworkAddress.new(
+      (chainNetworkId: any),
+      RustModule.SigmaRust.Address.recreate_from_ergo_tree(
+        RustModule.SigmaRust.ErgoTree.from_base16_bytes(utxo.ergoTree)
+      )
+    ).to_bytes()).toString('hex'),
+    creationHeight: utxo.creationHeight,
+    additionalRegisters: utxo.additionalRegisters,
+    tx_hash: utxo.transactionId,
+    tx_index: utxo.index,
+  };
+}
+
 
 export function replaceMockBoxId(utxo: RemoteUnspentOutput): RemoteUnspentOutput {
   const tokens = new RustModule.SigmaRust.Tokens();

@@ -1,5 +1,5 @@
 // @flow
-import BaseExplorerStore from '../base/BaseExplorerStore';
+import BaseExplorerStore from '../../../stores/base/BaseExplorerStore';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 

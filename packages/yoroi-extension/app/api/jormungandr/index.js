@@ -529,6 +529,7 @@ export default class JormungandrApi {
         certificate: unsignedTxResponse.certificate,
         networkSettingSnapshot: {
           NetworkId: request.publicDeriver.getParent().getNetworkInfo().NetworkId,
+          ChainNetworkId: Number.parseInt(config.ChainNetworkId, 10),
         }
       });
     } catch (error) {
@@ -613,6 +614,7 @@ export default class JormungandrApi {
       certificate: unsignedTx.certificate,
       networkSettingSnapshot: {
         NetworkId: request.publicDeriver.getParent().getNetworkInfo().NetworkId,
+        ChainNetworkId: Number.parseInt(config.ChainNetworkId, 10),
       },
     });
     return {

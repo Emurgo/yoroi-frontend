@@ -9,6 +9,7 @@ import {
   MultiToken,
 } from '../../../common/lib/MultiToken';
 import type { ErgoAddressedUtxo } from './types';
+import type { RemoteUnspentOutput } from '../state-fetch/types';
 import { RustModule } from '../../../ada/lib/cardanoCrypto/rustLoader';
 import { PRIMARY_ASSET_CONSTANTS } from '../../../ada/lib/storage/database/primitives/enums';
 
@@ -19,20 +20,22 @@ type NetworkSettingSnapshot = {|
   +FeeAddress: string,
 |};
 
-export class ErgoTxSignRequest implements ISignRequest<RustModule.SigmaRust.TxBuilder> {
+export class ErgoExternalTxSignRequest
+  implements ISignRequest<RustModule.SigmaRust.UnsignedTransaction>
+{
 
-  senderUtxos: $ReadOnlyArray<ErgoAddressedUtxo>;
-  unsignedTx: RustModule.SigmaRust.TxBuilder;
+  inputUtxos: $ReadOnlyArray<ErgoAddressedUtxo | RemoteUnspentOutput>;
+  unsignedTx: RustModule.SigmaRust.UnsignedTransaction;
   changeAddr: Array<{| ...Address, ...Value, ...Addressing |}>;
   networkSettingSnapshot: NetworkSettingSnapshot;
 
   constructor(signRequest: {|
-    senderUtxos: $ReadOnlyArray<ErgoAddressedUtxo>,
-    unsignedTx: RustModule.SigmaRust.TxBuilder,
+    inputUtxos: $ReadOnlyArray<ErgoAddressedUtxo | RemoteUnspentOutput>,
+    unsignedTx: RustModule.SigmaRust.UnsignedTransaction,
     changeAddr: Array<{| ...Address, ...Value, ...Addressing |}>,
     networkSettingSnapshot: NetworkSettingSnapshot,
   |}) {
-    this.senderUtxos = signRequest.senderUtxos;
+    this.inputUtxos = signRequest.inputUtxos;
     this.unsignedTx = signRequest.unsignedTx;
     this.changeAddr = signRequest.changeAddr;
     this.networkSettingSnapshot = signRequest.networkSettingSnapshot;
@@ -43,15 +46,14 @@ export class ErgoTxSignRequest implements ISignRequest<RustModule.SigmaRust.TxBu
     value: MultiToken,
   |}> {
     return getTxInputs(
-      this.unsignedTx,
+      this.inputUtxos,
       this.changeAddr,
-      this.networkSettingSnapshot.NetworkId,
-      this.networkSettingSnapshot.ChainNetworkId,
+      this.networkSettingSnapshot.NetworkId
     );
   }
   totalInput(): MultiToken {
     return getTxInputTotal(
-      this.unsignedTx,
+      this.inputUtxos,
       this.changeAddr,
       this.networkSettingSnapshot.NetworkId
     );
@@ -80,19 +82,21 @@ export class ErgoTxSignRequest implements ISignRequest<RustModule.SigmaRust.TxBu
   fee(): MultiToken {
     return getErgoTxFee(
       this.unsignedTx,
-      this.networkSettingSnapshot.NetworkId
+      this.networkSettingSnapshot.NetworkId,
+      this.networkSettingSnapshot.ChainNetworkId,
+      this.networkSettingSnapshot.FeeAddress,
     );
   }
 
   uniqueSenderAddresses(): Array<string> {
-    return Array.from(new Set(this.senderUtxos.map(utxo => utxo.receiver)));
+    return Array.from(new Set(this.inputUtxos.map(utxo => utxo.receiver)));
   }
 
   receivers(includeChangeAndFee: boolean): Array<string> {
     const receivers: Array<string> = [];
 
     const changeAddrs = new Set(this.changeAddr.map(change => change.address));
-    const outputs = this.unsignedTx.build().outputs();
+    const outputs = this.unsignedTx.outputs();
     for (let i = 0; i < outputs.len(); i++) {
       const output = outputs.get(i);
       const ergoTree = output.ergo_tree();
@@ -118,38 +122,34 @@ export class ErgoTxSignRequest implements ISignRequest<RustModule.SigmaRust.TxBu
     return receivers;
   }
 
-  isEqual(tx: ?(mixed| RustModule.SigmaRust.TxBuilder)): boolean {
+  isEqual(tx: ?(mixed| RustModule.SigmaRust.UnsignedTransaction)): boolean {
     if (tx == null) return false;
-    if (!(tx instanceof RustModule.SigmaRust.TxBuilder)) {
+    if (!(tx instanceof RustModule.SigmaRust.UnsignedTransaction)) {
       return false;
     }
     return ergoTxEqual(this.unsignedTx, tx);
   }
 
-  self(): RustModule.SigmaRust.TxBuilder {
+  self(): RustModule.SigmaRust.UnsignedTransaction {
     return this.unsignedTx;
   }
 }
 
 export function getTxInputs(
-  tx: RustModule.SigmaRust.TxBuilder,
+  inputUtxos: $ReadOnlyArray<ErgoAddressedUtxo | RemoteUnspentOutput>,
   changeAddr: Array<{| ...Address, ...Value, ...Addressing |}>,
   networkId: number,
-  chainNetworkId: $Values<typeof RustModule.SigmaRust.NetworkPrefix>,
 ): Array<{|
     address: string,
     value: MultiToken,
   |}> {
   const values = [];
 
-  const inputs = tx.box_selection().boxes();
-  for (let i = 0; i < inputs.len(); i++) {
-    const input = inputs.get(i);
-
+  for (const input of inputUtxos) {
     const value = new MultiToken(
       [{
         identifier: PRIMARY_ASSET_CONSTANTS.Ergo,
-        amount: new BigNumber(input.value().as_i64().to_str()),
+        amount: new BigNumber(input.amount),
         networkId,
       }],
       {
@@ -157,25 +157,15 @@ export function getTxInputs(
         defaultIdentifier: PRIMARY_ASSET_CONSTANTS.Ergo,
       }
     );
-    const tokens = input.tokens();
-    for (let j = 0; j < tokens.len(); j++) {
-      const token = tokens.get(j);
+    for (const asset of (input.assets ?? [])) {
       value.add({
-        identifier: token.id().to_str(),
-        amount: new BigNumber(token.amount().as_i64().to_str()),
+        identifier: asset.tokenId,
+        amount: new BigNumber(asset.amount),
         networkId,
       });
     }
-
-    const address = RustModule.SigmaRust.NetworkAddress.new(
-      chainNetworkId,
-      RustModule.SigmaRust.Address.recreate_from_ergo_tree(
-        input.ergo_tree()
-      )
-    );
-
     values.push({
-      address: Buffer.from(address.to_bytes()).toString('hex'),
+      address: input.receiver,
       value,
     });
   }
@@ -183,7 +173,7 @@ export function getTxInputs(
   return values;
 }
 export function getTxInputTotal(
-  tx: RustModule.SigmaRust.TxBuilder,
+  inputUtxos: $ReadOnlyArray<ErgoAddressedUtxo | RemoteUnspentOutput>,
   changeAddr: Array<{| ...Address, ...Value, ...Addressing |}>,
   networkId: number,
 ): MultiToken {
@@ -195,20 +185,16 @@ export function getTxInputTotal(
     }
   );
 
-  const inputs = tx.box_selection().boxes();
-  for (let i = 0; i < inputs.len(); i++) {
-    const input = inputs.get(i);
+  for (const input of inputUtxos) {
     values.add({
       identifier: PRIMARY_ASSET_CONSTANTS.Ergo,
-      amount: new BigNumber(input.value().as_i64().to_str()),
+      amount: new BigNumber(input.amount),
       networkId,
     });
-    const tokens = input.tokens();
-    for (let j = 0; j < tokens.len(); j++) {
-      const token = tokens.get(j);
+    for (const asset of (input.assets ?? [])) {
       values.add({
-        identifier: token.id().to_str(),
-        amount: new BigNumber(token.amount().as_i64().to_str()),
+        identifier: asset.tokenId,
+        amount: new BigNumber(asset.amount),
         networkId,
       });
     }
@@ -220,7 +206,7 @@ export function getTxInputTotal(
 }
 
 export function getTxOutputs(
-  tx: RustModule.SigmaRust.TxBuilder,
+  tx: RustModule.SigmaRust.UnsignedTransaction,
   chainNetworkId: $Values<typeof RustModule.SigmaRust.NetworkPrefix>,
   feeAddress: string,
   networkId: number,
@@ -230,7 +216,7 @@ export function getTxOutputs(
   |}> {
   const values = [];
 
-  const outputs = tx.build().outputs();
+  const outputs = tx.outputs();
   for (let i = 0; i < outputs.len(); i++) {
     const output = outputs.get(i);
     const address = RustModule.SigmaRust.NetworkAddress.new(
@@ -273,7 +259,7 @@ export function getTxOutputs(
   return values;
 }
 export function getTxOutputTotal(
-  tx: RustModule.SigmaRust.TxBuilder,
+  tx: RustModule.SigmaRust.UnsignedTransaction,
   chainNetworkId: $Values<typeof RustModule.SigmaRust.NetworkPrefix>,
   feeAddress: string,
   networkId: number,
@@ -286,7 +272,7 @@ export function getTxOutputTotal(
     }
   );
 
-  const outputs = tx.build().outputs();
+  const outputs = tx.outputs();
   for (let i = 0; i < outputs.len(); i++) {
     const output = outputs.get(i);
     const address = RustModule.SigmaRust.NetworkAddress.new(
@@ -320,15 +306,35 @@ export function getTxOutputTotal(
 }
 
 export function getErgoTxFee(
-  tx: RustModule.SigmaRust.TxBuilder,
+  tx: RustModule.SigmaRust.UnsignedTransaction,
   networkId: number,
+  chainNetworkId: $Values<typeof RustModule.SigmaRust.NetworkPrefix>,
+  feeAddress: string,
 ): MultiToken {
+  const feeAmount = (() => {
+    const outputs = tx.outputs();
+    for (let i = 0; i < outputs.len(); i++) {
+      const output = outputs.get(i);
+      const address = RustModule.SigmaRust.NetworkAddress.new(
+        chainNetworkId,
+        RustModule.SigmaRust.Address.recreate_from_ergo_tree(
+          output.ergo_tree()
+        )
+      );
+      const addr = Buffer.from(address.to_bytes()).toString('hex');
+      if (addr === feeAddress) {
+        return output.value().as_i64().to_str();
+      }
+    }
+  })();
   const values = new MultiToken(
-    [{
-      identifier: PRIMARY_ASSET_CONSTANTS.Ergo,
-      amount: new BigNumber(tx.fee_amount().as_i64().to_str()),
-      networkId,
-    }],
+    feeAmount == null
+      ? []
+      : [{
+        identifier: PRIMARY_ASSET_CONSTANTS.Ergo,
+        amount: new BigNumber(feeAmount),
+        networkId,
+      }],
     {
       defaultNetworkId: networkId,
       defaultIdentifier: PRIMARY_ASSET_CONSTANTS.Ergo,
@@ -339,10 +345,10 @@ export function getErgoTxFee(
 }
 
 export function ergoTxEqual(
-  req1: RustModule.SigmaRust.TxBuilder,
-  req2: RustModule.SigmaRust.TxBuilder,
+  req1: RustModule.SigmaRust.UnsignedTransaction,
+  req2: RustModule.SigmaRust.UnsignedTransaction,
 ): boolean {
-  const tx1 = req1.build().to_json();
-  const tx2 = req2.build().to_json();
+  const tx1 = req1.to_json();
+  const tx2 = req2.to_json();
   return JSON.stringify(tx1) === JSON.stringify(tx2);
 }

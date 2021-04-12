@@ -12,25 +12,32 @@ import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
 import globalMessages from '../../../i18n/global-messages';
 import { observer } from 'mobx-react';
 import CopyableAddress from '../../../components/widgets/CopyableAddress';
-import RawHash from '../../../components/widgets/hashWrappers/RawHash';
 import config from '../../../config';
 import vjf from 'mobx-react-form/lib/validators/VJF';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
-import { handleExternalLinkClick } from '../../../utils/routing';
-import ExplorableHash from '../../../components/widgets/hashWrappers/ExplorableHash';
 import type { Notification } from '../../../types/notificationType';
-import { truncateAddressShort, truncateToken } from '../../../utils/formatters';
+import { splitAmount, truncateAddressShort, truncateToken } from '../../../utils/formatters';
 import ProgressBar from '../ProgressBar';
-import type { Tx } from '../../../../chrome/extension/ergo-connector/types';
-import type { DefaultTokenEntry, TokenLookupKey } from '../../../api/common/lib/MultiToken';
+import type {
+  DefaultTokenEntry,
+  TokenLookupKey,
+  TokenEntry,
+} from '../../../api/common/lib/MultiToken';
 import type { NetworkRow, TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
-import { getTokenName, genFormatTokenAmount } from '../../../stores/stateless/tokenHelpers';
+import { getTokenName, getTokenIdentifierIfExists } from '../../../stores/stateless/tokenHelpers';
 import BigNumber from 'bignumber.js';
-import { RustModule } from '../../../api/ada/lib/cardanoCrypto/rustLoader';
+import type { ISignRequest } from '../../../api/common/lib/transactions/ISignRequest';
+import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
+import {
+  MultiToken,
+} from '../../../api/common/lib/MultiToken';
+import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
+import { SelectedExplorer } from '../../../domain/SelectedExplorer';
+import { calculateAndFormatValue } from '../../../utils/unit-of-account';
+import classnames from 'classnames';
 
 type Props = {|
-  +totalAmount: ?BigNumber,
-  +txData: Tx,
+  +txData: ISignRequest<any>,
   +onCopyAddressTooltip: (string, string) => void,
   +onCancel: () => void,
   +onConfirm: string => void,
@@ -38,10 +45,11 @@ type Props = {|
   +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
   +defaultToken: DefaultTokenEntry,
   +network: $ReadOnly<NetworkRow>,
+  +unitOfAccountSetting: UnitOfAccountSettingType,
+  +addressToDisplayString: string => string,
+  +selectedExplorer: SelectedExplorer,
+  +getCurrentPrice: (from: string, to: string) => ?number,
 |};
-
-// TODO: get explorer from user settings
-const URL_WEBSITE = 'https://explorer.ergoplatform.com/en/addresses/';
 
 @observer
 class SignTxPage extends Component<Props> {
@@ -91,163 +99,208 @@ class SignTxPage extends Component<Props> {
     });
   }
 
+  getTicker: $ReadOnly<TokenRow> => Node = tokenInfo => {
+    const fingerprint = this.getFingerprint(tokenInfo);
+    return fingerprint !== undefined
+      ? (
+        <ExplorableHashContainer
+          selectedExplorer={this.props.selectedExplorer}
+          hash={fingerprint}
+          light
+          linkType="token"
+        >
+          <span className={styles.rowData}>{truncateToken(getTokenName(tokenInfo))}</span>
+        </ExplorableHashContainer>
+      )
+      : truncateToken(getTokenName(tokenInfo))
+  };
+
+  getFingerprint: $ReadOnly<TokenRow> => string | void = tokenInfo => {
+    if (tokenInfo.Metadata.type === 'Cardano') {
+      return getTokenIdentifierIfExists(tokenInfo);
+    }
+    return undefined;
+  }
+
+  renderAmountDisplay: {|
+    entry: TokenEntry,
+  |} => Node = (request) => {
+    const tokenInfo = this.props.getTokenInfo(request.entry);
+    const shiftedAmount = request.entry.amount
+      .shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
+
+    if (this.props.unitOfAccountSetting.enabled === true) {
+      const { currency } = this.props.unitOfAccountSetting;
+      const price = this.props.getCurrentPrice(
+        request.entry.identifier,
+        currency
+      );
+      if (price != null) {
+        return (
+          <>
+            <span className={styles.amountRegular}>
+              {calculateAndFormatValue(shiftedAmount, price)}
+            </span>
+            {' '}{currency}
+            <div className={styles.amountSmall}>
+              {shiftedAmount.toString()} {this.getTicker(tokenInfo)}
+            </div>
+          </>
+        );
+      }
+    }
+    const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
+      shiftedAmount,
+      tokenInfo.Metadata.numberOfDecimals
+    );
+
+    // we may need to explicitly add + for positive values
+    const adjustedBefore = beforeDecimalRewards.startsWith('-')
+      ? beforeDecimalRewards
+      : '+' + beforeDecimalRewards;
+
+    return (
+      <>
+        <span className={styles.amountRegular}>{adjustedBefore}</span>
+        <span className={styles.afterDecimal}>{afterDecimalRewards}</span>
+        {' '}{this.getTicker(tokenInfo)}
+      </>
+    );
+  }
+
+  renderRow: {|
+    kind: string,
+    address: {| address: string, value: MultiToken |},
+    addressIndex: number,
+    transform?: BigNumber => BigNumber,
+  |} => Node = (request) => {
+    const notificationElementId = `${request.kind}-address-${request.addressIndex}-copyNotification`;
+    const divKey = (identifier) => `${request.kind}-${request.address.address}-${request.addressIndex}-${identifier}`;
+    const renderAmount = (entry) => {
+      return (
+        <div className={styles.amount}>
+          {this.renderAmountDisplay({
+            entry: {
+              ...entry,
+              amount: request.transform
+                ? request.transform(entry.amount)
+                : entry.amount,
+            },
+          })}
+        </div>
+      );
+    };
+
+    return (
+      // eslint-disable-next-line react/no-array-index-key
+      <div
+        key={divKey(request.address.value.getDefaultEntry().identifier)}
+        className={styles.addressItem}
+      >
+        <CopyableAddress
+          hash={this.props.addressToDisplayString(request.address.address)}
+          elementId={notificationElementId}
+          onCopyAddress={
+            () => this.props.onCopyAddressTooltip(request.address.address, notificationElementId)
+          }
+          notification={this.props.notification}
+        >
+          <ExplorableHashContainer
+            selectedExplorer={this.props.selectedExplorer}
+            hash={this.props.addressToDisplayString(request.address.address)}
+            light
+            linkType="address"
+          >
+            <span className={classnames([styles.rowData, styles.hash])}>
+              {truncateAddressShort(
+                this.props.addressToDisplayString(request.address.address)
+              )}
+            </span>
+          </ExplorableHashContainer>
+        </CopyableAddress>
+        {renderAmount(request.address.value.getDefaultEntry())}
+        {request.address.value.nonDefaultEntries().map(entry => (
+          <React.Fragment key={divKey(entry.identifier)}>
+            <div />
+            <div />
+            {renderAmount(entry)}
+          </React.Fragment>
+        ))}
+      </div>
+    );
+  }
+
   render(): Node {
     const { form } = this;
     const walletPasswordField = form.$('walletPassword');
 
     const { intl } = this.context;
-    const { txData, onCopyAddressTooltip, onCancel, notification, totalAmount } = this.props;
-
-    const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
-    const defaultTokenEntry = {
-      identifier: this.props.defaultToken.defaultIdentifier,
-      networkId: this.props.defaultToken.defaultNetworkId,
-    };
-    const defaultTokenInfo = this.props.getTokenInfo(defaultTokenEntry);
-
-    const chainNetworkId = (Number.parseInt(
-      this.props.network.BaseConfig[0].ChainNetworkId, 10
-    ): any);
-    const genAddress: string => string = (ergoTree) => {
-      return RustModule.SigmaRust.NetworkAddress.new(
-        chainNetworkId,
-        RustModule.SigmaRust.Address.recreate_from_ergo_tree(
-          RustModule.SigmaRust.ErgoTree.from_base16_bytes(
-            ergoTree
-          )
-        )
-      ).to_base58();
-    }
+    const { txData, onCancel, } = this.props;
     return (
       <>
         <ProgressBar step={2} />
         <div className={styles.component}>
-          <div className={styles.row}>
-            <p className={styles.label}>{intl.formatMessage(globalMessages.transactionId)}</p>
-            <p className={styles.value}>{txData.id}</p>
-          </div>
-          <div className={styles.details}>
-            <div>
-              <p className={styles.label}>{intl.formatMessage(globalMessages.amount)}</p>
-              {txData.outputs.map(({ value, assets, boxId }) => {
-                return (
-                  <div className={styles.amountRow} key={boxId}>
-                    <p className={styles.amount}>
-                      {formatValue({
-                        ...defaultTokenEntry,
-                        amount: new BigNumber(value),
-                      })} {truncateToken(getTokenName(defaultTokenInfo))}
-                    </p>
-                    {assets && assets.length ? (
-                      assets.map(({ tokenId, amount }) => {
-                        const tokenInfoEntry = {
-                          networkId: this.props.defaultToken.defaultNetworkId,
-                          identifier: tokenId,
-                        };
-                        const tokenInfo = this.props.getTokenInfo(tokenInfoEntry);
-                        return (
-                          <p className={styles.stablecoins} key={tokenId}>
-                            {formatValue({
-                              ...tokenInfoEntry,
-                              amount: new BigNumber(amount),
-                            })} {truncateToken(getTokenName(tokenInfo))}
-                          </p>
-                        );
-                      })
-                    ) : (<></>)}
-                  </div>
-                );
-              })}
-            </div>
-            <div className={styles.transactionFee}>
-              {/* TODO: Fee value */}
-              {/* <p className={styles.label}>{intl.formatMessage(globalMessages.feeLabel)}</p> */}
-              {/* <p className={styles.amount}>5.050088 ERG</p> */}
-            </div>
-          </div>
-          <div className={styles.row}>
-            <p className={styles.label}>
-              {intl.formatMessage(globalMessages.walletSendConfirmationTotalLabel)}
-            </p>
-            <p className={styles.totalValue}>
-              {formatValue({
-                ...defaultTokenEntry,
-                amount: totalAmount ?? new BigNumber(0),
-              })} {truncateToken(getTokenName(defaultTokenInfo))}
-            </p>
-          </div>
-          <div className={styles.address}>
-            <div className={styles.addressFrom}>
-              <p className={styles.label}>
-                {intl.formatMessage(globalMessages.fromAddresses)}:{' '}
-                <span>{txData.inputs.length}</span>
-              </p>
-              <div className={styles.addressFromList}>
-                {txData.inputs.map((address, index) => {
-                  const notificationElementId = `ergo-input-${index}`;
-                  const addressBase58 = genAddress(address.ergoTree);
-                  return (
-                    <div className={styles.addressToItem} key={address.boxId}>
-                      <CopyableAddress
-                        hash={addressBase58}
-                        elementId={notificationElementId}
-                        onCopyAddress={() =>
-                          onCopyAddressTooltip(addressBase58, notificationElementId)
-                        }
-                        notification={notification}
-                      >
-                        <ExplorableHash
-                          light={false}
-                          websiteName="ErgoPlatform Blockchain Explorer"
-                          url={URL_WEBSITE + addressBase58}
-                          onExternalLinkClick={handleExternalLinkClick}
-                        >
-                          <RawHash light={false}>
-                            <span className={styles.addressHash}>
-                              {truncateAddressShort(addressBase58)}
-                            </span>
-                          </RawHash>
-                        </ExplorableHash>
-                      </CopyableAddress>
-                    </div>
-                  );
-                })}
+          <div>
+            <div className={styles.addressHeader}>
+              <div className={styles.addressFrom}>
+                <p className={styles.label}>
+                  {intl.formatMessage(globalMessages.fromAddresses)}:{' '}
+                  <span>{txData.inputs().length}</span>
+                </p>
+              </div>
+              <div className={styles.addressFrom}>
+                <p className={styles.label}>
+                  {intl.formatMessage(globalMessages.amount)}
+                </p>
               </div>
             </div>
-            <div className={styles.addressTo}>
-              <p className={styles.label}>
-                {intl.formatMessage(globalMessages.toAddresses)}:{' '}
-                <span>{txData.outputs.length}</span>
-              </p>
-              <div className={styles.addressToList}>
-                {txData.outputs.map((address, index) => {
-                  const notificationElementId = `address-output-${index}-copyNotification`;
-                  const addressBase58 = genAddress(address.ergoTree);
-                  return (
-                    <div className={styles.addressToItem} key={address.boxId}>
-                      <CopyableAddress
-                        hash={addressBase58}
-                        elementId={notificationElementId}
-                        onCopyAddress={() =>
-                          onCopyAddressTooltip(addressBase58, notificationElementId)
-                        }
-                        notification={notification}
-                      >
-                        <ExplorableHash
-                          light={false}
-                          websiteName="ErgoPlatform Blockchain Explorer"
-                          url={URL_WEBSITE + addressBase58}
-                          onExternalLinkClick={handleExternalLinkClick}
-                        >
-                          <RawHash light={false}>
-                            <span className={styles.addressHash}>
-                              {truncateAddressShort(addressBase58)}
-                            </span>
-                          </RawHash>
-                        </ExplorableHash>
-                      </CopyableAddress>
-                    </div>
-                  );
+            <div className={styles.addressFromList}>
+              {txData.inputs().map((address, addressIndex) => {
+                return this.renderRow({
+                  kind: 'in',
+                  address,
+                  addressIndex,
+                  transform: amount => amount.abs().negated(),
+                });
+              })}
+            </div>
+            <div className={styles.addressHeader}>
+              <div className={styles.addressTo}>
+                <p className={styles.label}>
+                  {intl.formatMessage(globalMessages.toAddresses)}:{' '}
+                  <span>{txData.outputs().length}</span>
+                </p>
+              </div>
+              <div className={styles.addressTo}>
+                <p className={styles.label}>
+                  {intl.formatMessage(globalMessages.amount)}
+                </p>
+              </div>
+            </div>
+            <div className={styles.addressToList}>
+              {txData.outputs().map((address, addressIndex) => {
+                return this.renderRow({
+                  kind: 'in',
+                  address,
+                  addressIndex,
+                  transform: amount => amount.abs(),
+                });
+              })}
+            </div>
+            <div className={styles.addressHeader}>
+              <div className={styles.addressTo}>
+                <p className={styles.label}>
+                  {intl.formatMessage(globalMessages.feeLabel)}
+                </p>
+              </div>
+            </div>
+            <div className={styles.addressToList}>
+              <div className={styles.amount}>
+                {this.renderAmountDisplay({
+                  entry: {
+                    ...txData.fee().getDefaultEntry(),
+                    amount: txData.fee().getDefaultEntry().amount.abs().negated(),
+                  },
                 })}
               </div>
             </div>

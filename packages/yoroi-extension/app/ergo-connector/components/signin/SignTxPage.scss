@@ -3,10 +3,22 @@
   padding-left: 32px;
   padding-top: 48px;
   overflow-wrap: break-word;
-}
-.language {
-  label {
-    background-color: var(--theme-settings-pane-background-color);
+
+  .amountSmall {
+    font-size: 12px;
+    font-family: var(--font-regular);
+  }
+  .amountRegular {
+    font-family: var(--font-medium);
+  }
+  .afterDecimal {
+    font-size: 12px;
+    font-family: var(--font-medium);
+  }
+
+  .amount {
+    font-family: var(--font-regular);
+    color: var(--cmn-default-color-grey);
   }
 }
 
@@ -18,13 +30,27 @@
   line-height: 22px;
 }
 
-.value {
-  color: #6b7384;
+.rowData {
   font-size: 14px;
-  letter-spacing: 0;
+  font-family: var(--font-regular);
+  color: var(--theme-transactions-list-detail-row-text-color);
+  word-break: break-all;
   line-height: 22px;
-  margin-bottom: 24px;
 }
+.hash {
+  font-family: var(--font-mono-regular);
+}
+.addressItem {
+  display: grid;
+  grid-gap: 15px;
+  grid-template-columns: minmax(232px,550px) 150px 1fr;
+  align-items: center;
+}
+* + h2,
+* + .row {
+  margin-top: 18px;
+}
+
 .row {
   margin-bottom: 24px;
 }
@@ -36,59 +62,22 @@
     flex: 1 1 48%;
     max-width: 48%;
   }
-  .amount {
-    color: #38393d;
-    font-family: var(--font-medium);
-    margin-bottom: 3px;
-  }
-  .tokens {
-    color: #242838;
-    font-size: 14px;
-    margin-bottom: 3px;
-  }
-  .amountRow {
-    margin-bottom: 9px;
-  }
 }
 
-.totalValue {
-  color: #17d1aa;
-  font-size: 18px;
-  font-family: var(--font-medium);
-  margin-bottom: 24px;
-}
-
-.address {
-  border-top: 1px solid #dce0e9;
+.addressHeader {
+  margin-bottom: 8px;
   padding-top: 24px;
-  margin-bottom: 28px;
-  display: flex;
-  font-size: 14px;
-  justify-content: space-between;
-  .label {
-    span {
-      font-family: var(--font-medium);
-    }
-  }
-  & > div {
-    flex: 1 1 50%;
-    max-width: 50%;
-    &:first-child {
-      padding-right: 24px;
-    }
-    &:last-child {
-      padding-left: 24px;
-    }
-  }
+  border-top: 1px solid #dce0e9;
+  display: grid;
+  grid-gap: 15px;
+  grid-template-columns: minmax(232px,550px) 150px 1fr;
+}
 
-  & > div + div {
-    border-left: 1px solid #dce0e9;
-  }
+.addressToList,
+.addressFromList {
+  padding-bottom: 24px;
 }
-.stablecoins {
-  font-size: 14px;
-  color: #242838;
-}
+
 .wrapperBtn {
   padding-top: 16px;
   display: flex;
