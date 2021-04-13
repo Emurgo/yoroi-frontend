@@ -30,8 +30,8 @@ type Props = {|
 |};
 
 const roundInfo = {
-  startDate: new Date(Date.parse('13 Apr 2021 19:00:00 GMT')),
-  endDate: new Date(Date.parse('20 Apr 2021 19:00:00 GMT')),
+  startDate: new Date(Date.parse('27 Apr 2021 19:00:00 GMT')),
+  endDate: new Date(Date.parse('4 May 2021 19:00:00 GMT')),
   nextRound: 4,
 };
 
