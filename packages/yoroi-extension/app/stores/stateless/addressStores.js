@@ -26,7 +26,7 @@ import {
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import { Bip44Wallet } from '../../api/ada/lib/storage/models/Bip44Wallet/wrapper';
 import { Cip1852Wallet } from '../../api/ada/lib/storage/models/Cip1852Wallet/wrapper';
-import { getAddressPayload } from '../../api/ada/lib/storage/bridge/utils';
+import { addressToDisplayString } from '../../api/ada/lib/storage/bridge/utils';
 import type { AddressFilterKind, StandardAddress, AddressTypeName } from '../../types/AddressFilterTypes';
 import {
   AddressFilter,
@@ -437,8 +437,9 @@ export function genAddressStoreLookup(
       const request = addressSubgroupMap.get(addressStore.class);
       if (request == null) throw new Error('Should never happen');
 
+      const displayAddress = addressToDisplayString(address, networkInfo);
       const addressInfo = request.all.find(
-        addressInStore => getAddressPayload(addressInStore.address, networkInfo) === address
+        addressInStore => addressInStore.address === displayAddress
       );
       if (addressInfo != null) {
         return {
