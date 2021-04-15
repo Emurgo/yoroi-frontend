@@ -52,7 +52,7 @@ export default class AdaDelegationStore extends Store<StoresMap, ActionsMap> {
 
   @observable delegationRequests: Array<AdaDelegationRequests> = [];
 
-  _recalculateDelegationInfoDisposer: void => void = () => {};
+  _recalculateDelegationInfoDisposer: Array<void => void> = [];
 
   @action addObservedWallet: PublicDeriver<> => void = (
     publicDeriver
@@ -115,8 +115,6 @@ export default class AdaDelegationStore extends Store<StoresMap, ActionsMap> {
         publicDeriver,
       }).promise;
 
-      delegationRequest.getDelegatedBalance.reset();
-      delegationRequest.getCurrentDelegation.reset();
       runInAction(() => {
         delegationRequest.error = undefined;
       });
@@ -303,36 +301,70 @@ export default class AdaDelegationStore extends Store<StoresMap, ActionsMap> {
 
   @action.bound
   _startWatch: void => void = () => {
-    this._recalculateDelegationInfoDisposer = reaction(
+    const triggerRefresh = async () => {
+      if (!this.stores.serverConnectionStore.checkAdaServerStatus) {
+        // don't re-query when server goes offline -- only when it comes back online
+        return;
+      }
+      const selected = this.stores.wallets.selected;
+      if (selected == null) return;
+      if (!isCardanoHaskell(selected.getParent().getNetworkInfo())) {
+        return;
+      }
+      if (asGetStakingKey(selected) != null) {
+        await this.refreshDelegation(selected);
+      }
+    };
+    this._recalculateDelegationInfoDisposer.push(reaction(
       () => [
         this.stores.wallets.selected,
+      ],
+      triggerRefresh,
+    ));
+    this._recalculateDelegationInfoDisposer.push(reaction(
+      () => [
         // update if tx history changes
         this.stores.transactions.hash,
+      ],
+      async () => {
+        for (const requests of this.stores.delegation.delegationRequests) {
+          requests.mangledAmounts.invalidate();
+          requests.getDelegatedBalance.invalidate();
+          requests.getCurrentDelegation.invalidate();
+        }
+        for (const requests of this.delegationRequests) {
+          requests.getRegistrationHistory.invalidate();
+        }
+        await triggerRefresh();
+      },
+    ));
+    this._recalculateDelegationInfoDisposer = reaction(
+      () => [
         // if query failed due to server issue, need to re-query when it comes back online
         this.stores.serverConnectionStore.checkAdaServerStatus,
         // reward grows every epoch so we have to refresh
         this.stores.substores.ada.time.currentTime?.currentEpoch,
       ],
       async () => {
-        if (!this.stores.serverConnectionStore.checkAdaServerStatus) {
-          // don't re-query when server goes offline -- only when it comes back online
-          return;
+        for (const requests of this.stores.delegation.delegationRequests) {
+          requests.mangledAmounts.invalidate();
+          requests.getDelegatedBalance.invalidate();
+          requests.getCurrentDelegation.invalidate();
+          requests.rewardHistory.invalidate();
         }
-        const selected = this.stores.wallets.selected;
-        if (selected == null) return;
-        if (!isCardanoHaskell(selected.getParent().getNetworkInfo())) {
-          return;
+        for (const requests of this.delegationRequests) {
+          requests.getRegistrationHistory.invalidate();
         }
-        if (asGetStakingKey(selected) != null) {
-          await this.refreshDelegation(selected);
-        }
+        await triggerRefresh();
       },
     );
   }
 
   @action.bound
   reset(): void {
-    this._recalculateDelegationInfoDisposer();
-    this._recalculateDelegationInfoDisposer = () => {};
+    while (this._recalculateDelegationInfoDisposer.length > 0) {
+      const disposer = this._recalculateDelegationInfoDisposer.pop();
+      disposer();
+    }
   }
 }
