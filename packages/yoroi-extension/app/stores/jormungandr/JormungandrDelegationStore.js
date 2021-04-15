@@ -42,7 +42,7 @@ import type { StoresMap } from '../index';
 
 export default class JormungandrDelegationStore extends Store<StoresMap, ActionsMap> {
 
-  _recalculateDelegationInfoDisposer: void => void = () => {};
+  _recalculateDelegationInfoDisposer: Array<void => void> = [];
 
   @action addObservedWallet: PublicDeriver<> => void = (
     publicDeriver
@@ -104,8 +104,6 @@ export default class JormungandrDelegationStore extends Store<StoresMap, Actions
         publicDeriver,
       }).promise;
 
-      delegationRequest.getDelegatedBalance.reset();
-      delegationRequest.getCurrentDelegation.reset();
       runInAction(() => {
         delegationRequest.error = undefined;
       });
@@ -254,36 +252,64 @@ export default class JormungandrDelegationStore extends Store<StoresMap, Actions
 
   @action.bound
   _startWatch: void => void = () => {
-    this._recalculateDelegationInfoDisposer = reaction(
+    const triggerRefresh = async () => {
+      if (!this.stores.serverConnectionStore.checkAdaServerStatus) {
+        // don't re-query when server goes offline -- only when it comes back online
+        return;
+      }
+      const selected = this.stores.wallets.selected;
+      if (selected == null) return;
+      if (!isJormungandr(selected.getParent().getNetworkInfo())) {
+        return;
+      }
+      if (asGetStakingKey(selected) != null) {
+        await this.refreshDelegation(selected);
+      }
+    };
+    this._recalculateDelegationInfoDisposer.push(reaction(
       () => [
         this.stores.wallets.selected,
+      ],
+      triggerRefresh,
+    ));
+    this._recalculateDelegationInfoDisposer.push(reaction(
+      () => [
         // update if tx history changes
         this.stores.transactions.hash,
+      ],
+      async () => {
+        for (const requests of this.stores.delegation.delegationRequests) {
+          requests.mangledAmounts.invalidate();
+          requests.getDelegatedBalance.invalidate();
+          requests.getCurrentDelegation.invalidate();
+        }
+        await triggerRefresh();
+      },
+    ));
+    this._recalculateDelegationInfoDisposer = reaction(
+      () => [
         // if query failed due to server issue, need to re-query when it comes back online
         this.stores.serverConnectionStore.checkAdaServerStatus,
         // reward grows every epoch so we have to refresh
         this.stores.substores.jormungandr.time.currentTime?.currentEpoch,
       ],
       async () => {
-        if (!this.stores.serverConnectionStore.checkAdaServerStatus) {
-          // don't re-query when server goes offline -- only when it comes back online
-          return;
+        for (const requests of this.stores.delegation.delegationRequests) {
+          requests.mangledAmounts.invalidate();
+          requests.getDelegatedBalance.invalidate();
+          requests.getCurrentDelegation.invalidate();
+          requests.rewardHistory.invalidate();
         }
-        const selected = this.stores.wallets.selected;
-        if (selected == null) return;
-        if (!isJormungandr(selected.getParent().getNetworkInfo())) {
-          return;
-        }
-        if (asGetStakingKey(selected) != null) {
-          await this.refreshDelegation(selected);
-        }
+        await triggerRefresh();
       },
     );
   }
 
   @action.bound
   reset(): void {
-    this._recalculateDelegationInfoDisposer();
-    this._recalculateDelegationInfoDisposer = () => {};
+    while (this._recalculateDelegationInfoDisposer.length > 0) {
+      const disposer = this._recalculateDelegationInfoDisposer.pop();
+      disposer();
+    }
   }
 }
