@@ -4,19 +4,21 @@ import type {
   ExtendedPublicKeyResp,
   GetVersionRequest,
   GetSerialRequest,
-  GetExtendedPublicKeyRequest,
-  DeriveAddressRequest,
-  SignTransactionRequest,
-  VerifyAddressInfoType,
 } from '@emurgo/ledger-connect-handler';
 import type {
   BIP32Path,
+  DeriveAddressRequest,
+  GetExtendedPublicKeyRequest,
+  GetExtendedPublicKeyResponse,
+  GetExtendedPublicKeysRequest,
+  GetExtendedPublicKeysResponse,
   GetVersionResponse,
   GetSerialResponse,
   DeriveAddressResponse,
+  SignTransactionRequest,
   SignTransactionResponse,
+  ShowAddressRequest,
   Witness,
-  TxOutputTypeAddressParams,
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 
 import { RustModule } from '../../app/api/ada/lib/cardanoCrypto/rustLoader';
@@ -25,7 +27,7 @@ import {
 } from '../../app/api/ada/lib/cardanoCrypto/cryptoWallet';
 import { testWallets } from '../mock-chain/TestWallets';
 import { IncorrectDeviceError } from '../../app/domain/ExternalDeviceCommon';
-import { AddressTypeNibbles, CertificateTypes } from '@cardano-foundation/ledgerjs-hw-app-cardano';
+import { AddressType, CertificateType, TxOutputDestinationType } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 
 type WalletInfo = {|
   rootKey: RustModule.WalletV4.Bip32PrivateKey;
@@ -49,7 +51,14 @@ async function genWalletInfo(serial: string): Promise<WalletInfo> {
       return {
         rootKey,
         serial: { serial },
-        version: mockDeviceVersion,
+        version: {
+          version: mockDeviceVersion,
+          compatibility: {
+            isCompatible: true,
+            recommendedVersion: null,
+            supportsMary: true,
+          },
+        },
       };
     }
   }
@@ -74,62 +83,62 @@ function deriveAddress(
     ...,
   },
 ): RustModule.WalletV4.Address {
-  const spendingKey = derivePath(rootKey, request.spendingPath);
+  const spendingKey = derivePath(rootKey, request.address.params.spendingPath);
 
-  if (request.addressTypeNibble === AddressTypeNibbles.BYRON) {
+  if (request.address.type === AddressType.BYRON) {
     return RustModule.WalletV4.ByronAddress.icarus_from_key(
       spendingKey.to_public(),
-      request.networkIdOrProtocolMagic
+      request.network.protocolMagic
     ).to_address();
   }
-  if (request.addressTypeNibble === AddressTypeNibbles.ENTERPRISE) {
+  if (request.address.type === AddressType.ENTERPRISE) {
     return RustModule.WalletV4.EnterpriseAddress.new(
-      request.networkIdOrProtocolMagic,
+      request.network.networkId,
       RustModule.WalletV4.StakeCredential.from_keyhash(
         spendingKey.to_public().to_raw_key().hash()
       ),
     ).to_address();
   }
-  if (request.addressTypeNibble === AddressTypeNibbles.POINTER) {
-    if (request.stakingBlockchainPointer == null) {
-      throw new Error(`Missing pointer information`);
-    }
+  if (request.address.type === AddressType.POINTER) {
     const pointer = RustModule.WalletV4.Pointer.new(
-      request.stakingBlockchainPointer.blockIndex,
-      request.stakingBlockchainPointer.txIndex,
-      request.stakingBlockchainPointer.certificateIndex
+      request.address.params.stakingBlockchainPointer.blockIndex,
+      request.address.params.stakingBlockchainPointer.txIndex,
+      request.address.params.stakingBlockchainPointer.certificateIndex
     );
     return RustModule.WalletV4.PointerAddress.new(
-      request.networkIdOrProtocolMagic,
+      request.network.networkId,
       RustModule.WalletV4.StakeCredential.from_keyhash(
         spendingKey.to_public().to_raw_key().hash()
       ),
       pointer,
     ).to_address();
   }
-  if (request.addressTypeNibble === AddressTypeNibbles.REWARD) {
+  if (request.address.type === AddressType.REWARD) {
     return RustModule.WalletV4.RewardAddress.new(
-      request.networkIdOrProtocolMagic,
+      request.network.networkId,
       RustModule.WalletV4.StakeCredential.from_keyhash(
         spendingKey.to_public().to_raw_key().hash()
       ),
     ).to_address();
   }
-  if (request.addressTypeNibble === AddressTypeNibbles.BASE) {
+  if (request.address.type === AddressType.BASE) {
     let stakingKeyHash;
-    if (request.stakingKeyHashHex != null) {
+    if (request.address.params.stakingKeyHashHex != null) {
       stakingKeyHash = RustModule.WalletV4.Ed25519KeyHash.from_bytes(
-        Buffer.from(request.stakingKeyHashHex, 'hex')
+        Buffer.from(request.address.params.stakingKeyHashHex, 'hex')
       );
     }
-    if (request.stakingPath != null) {
-      stakingKeyHash = derivePath(rootKey, request.stakingPath).to_raw_key().to_public().hash();
+    if (request.address.params.stakingPath != null) {
+      stakingKeyHash = derivePath(
+        rootKey,
+        request.address.params.stakingPath
+      ).to_raw_key().to_public().hash();
     }
     if (stakingKeyHash == null) {
       throw new Error(`Missing staking key information`);
     }
     return RustModule.WalletV4.BaseAddress.new(
-      request.networkIdOrProtocolMagic,
+      request.network.networkId,
       RustModule.WalletV4.StakeCredential.from_keyhash(
         spendingKey.to_public().to_raw_key().hash()
       ),
@@ -171,7 +180,7 @@ class MockLedgerConnect {
   getExtendedPublicKey: {|
     serial: ?string,
     params: GetExtendedPublicKeyRequest,
-  |} => Promise<ExtendedPublicKeyResp> = async (request) => {
+  |} => Promise<ExtendedPublicKeyResp<GetExtendedPublicKeyResponse>> = async (request) => {
     this.checkSerial(request.serial);
     if (MockLedgerConnect.selectedWallet == null) {
       throw new Error(`No mock Ledger wallet selected`);
@@ -185,6 +194,30 @@ class MockLedgerConnect {
     };
     return {
       response: responseKey,
+      deviceVersion: selectedWallet.version,
+      deriveSerial: selectedWallet.serial,
+    };
+  }
+
+  getExtendedPublicKeys: {|
+    serial: ?string,
+    params: GetExtendedPublicKeysRequest,
+  |} => Promise<ExtendedPublicKeyResp<GetExtendedPublicKeysResponse>> = async (request) => {
+    this.checkSerial(request.serial);
+    if (MockLedgerConnect.selectedWallet == null) {
+      throw new Error(`No mock Ledger wallet selected`);
+    }
+    const selectedWallet = MockLedgerConnect.selectedWallet;
+
+    const responseKeys: GetExtendedPublicKeysResponse = request.params.paths.map(path => {
+      const finalKey = derivePath(selectedWallet.rootKey, path);
+      return {
+        publicKeyHex: Buffer.from(finalKey.to_raw_key().to_public().as_bytes()).toString('hex'),
+        chainCodeHex: Buffer.from(finalKey.chaincode()).toString('hex'),
+      };
+    });
+    return {
+      response: responseKeys,
       deviceVersion: selectedWallet.version,
       deriveSerial: selectedWallet.serial,
     };
@@ -207,7 +240,7 @@ class MockLedgerConnect {
     |}> = [];
 
     const inputs = RustModule.WalletV4.TransactionInputs.new();
-    for (const input of request.params.inputs) {
+    for (const input of request.params.tx.inputs) {
       inputs.add(
         RustModule.WalletV4.TransactionInput.new(
           RustModule.WalletV4.TransactionHash.from_bytes(Buffer.from(input.txHashHex, 'hex')),
@@ -223,27 +256,24 @@ class MockLedgerConnect {
       });
     }
     const outputs = RustModule.WalletV4.TransactionOutputs.new();
-    for (const output of request.params.outputs) {
+    for (const output of request.params.tx.outputs) {
       let address;
-      if (output.addressTypeNibble != null) {
-        const coercedOutput = ((output: any): TxOutputTypeAddressParams);
+      if (output.destination.type === TxOutputDestinationType.DEVICE_OWNED) {
         address = deriveAddress(
           selectedWallet.rootKey,
           {
-            networkIdOrProtocolMagic: output.addressTypeNibble === AddressTypeNibbles.BYRON
-              ? request.params.protocolMagic
-              : request.params.networkId,
-            ...coercedOutput
+            network: request.params.tx.network,
+            address: output.destination.params,
           }
         );
       }
-      if (output.addressHex != null) {
-        address = RustModule.WalletV4.Address.from_bytes(Buffer.from(output.addressHex, 'hex'));
-      }
+      if (output.destination.type === TxOutputDestinationType.THIRD_PARTY) {
+          address = RustModule.WalletV4.Address.from_bytes(Buffer.from(output.destination.params.addressHex, 'hex'));
+        }
       if (address == null) throw new Error(`Missing output address information ${JSON.stringify(output)}`);
 
       const value = RustModule.WalletV4.Value.new(
-        RustModule.WalletV4.BigNum.from_str(output.amountStr)
+        RustModule.WalletV4.BigNum.from_str(output.amount.toString())
       );
       const multiasset = RustModule.WalletV4.MultiAsset.new();
       for (const assetGroup of (output.tokenBundle ?? [])) {
@@ -253,7 +283,7 @@ class MockLedgerConnect {
         for (const token of assetGroup.tokens) {
           assets.insert(
             RustModule.WalletV4.AssetName.new(Buffer.from(token.assetNameHex, 'hex')),
-            RustModule.WalletV4.BigNum.from_str(token.amountStr)
+            RustModule.WalletV4.BigNum.from_str(token.amount.toString())
           );
         }
 
@@ -273,62 +303,66 @@ class MockLedgerConnect {
     const body = RustModule.WalletV4.TransactionBody.new(
       inputs,
       outputs,
-      RustModule.WalletV4.BigNum.from_str(request.params.feeStr),
-      request.params.ttlStr == null
+      RustModule.WalletV4.BigNum.from_str(request.params.tx.fee.toString()),
+      request.params.tx.ttl == null
         ? undefined
-        : Number.parseInt(request.params.ttlStr, 10),
+        : Number.parseInt(request.params.tx.ttl.toString(), 10),
     );
-    if (request.params.certificates.length > 0) {
+    if (request.params.tx.certificates && request.params.tx.certificates.length > 0) {
       const certs = RustModule.WalletV4.Certificates.new();
-      for (const cert of request.params.certificates) {
-        const stakingKey = derivePath(selectedWallet.rootKey, cert.path).to_raw_key();
+      for (const cert of request.params.tx.certificates ?? []) {
+        if (cert.type === CertificateType.STAKE_POOL_REGISTRATION) {
+          // TODO
+          continue;
+        }
+        const stakingKey = derivePath(selectedWallet.rootKey, cert.params.path).to_raw_key();
         const stakeCredential = RustModule.WalletV4.StakeCredential.from_keyhash(
           stakingKey.to_public().hash()
         );
-        if (cert.type === CertificateTypes.STAKE_REGISTRATION) {
+        if (cert.type === CertificateType.STAKE_REGISTRATION) {
           certs.add(RustModule.WalletV4.Certificate.new_stake_registration(
             RustModule.WalletV4.StakeRegistration.new(stakeCredential)
           ));
         }
-        if (cert.type === CertificateTypes.STAKE_DEREGISTRATION) {
+        if (cert.type === CertificateType.STAKE_DEREGISTRATION) {
           keys.push({
             witGen: (hash) => stakingKey.sign(hash.to_bytes()),
-            path: cert.path
+            path: cert.params.path
           });
           certs.add(RustModule.WalletV4.Certificate.new_stake_deregistration(
             RustModule.WalletV4.StakeDeregistration.new(stakeCredential)
           ));
         }
-        if (cert.type === CertificateTypes.STAKE_DELEGATION) {
+        if (cert.type === CertificateType.STAKE_DELEGATION) {
           keys.push({
             witGen: (hash) => stakingKey.sign(hash.to_bytes()),
-            path: cert.path
+            path: cert.params.path
           });
 
-          if (cert.poolKeyHashHex == null) throw new Error('Missing pool key hash');
+          if (cert.params.poolKeyHashHex == null) throw new Error('Missing pool key hash');
           certs.add(RustModule.WalletV4.Certificate.new_stake_delegation(
             RustModule.WalletV4.StakeDelegation.new(
               stakeCredential,
-              RustModule.WalletV4.Ed25519KeyHash.from_bytes(Buffer.from(cert.poolKeyHashHex, 'hex'))
+              RustModule.WalletV4.Ed25519KeyHash.from_bytes(Buffer.from(cert.params.poolKeyHashHex, 'hex'))
             )
           ));
         }
       }
       body.set_certs(certs);
     }
-    if (request.params.metadataHashHex != null) {
+    if (request.params.tx.auxiliaryData != null) {
       body.set_metadata_hash(RustModule.WalletV4.MetadataHash.from_bytes(
-        Buffer.from(request.params.metadataHashHex, 'hex')
+        Buffer.from(request.params.tx.auxiliaryData.params.hashHex, 'hex')
       ));
     }
-    if (request.params.validityIntervalStartStr != null) {
+    if (request.params.tx.validityIntervalStart != null) {
       body.set_validity_start_interval(
-        Number.parseInt(request.params.validityIntervalStartStr, 10)
+        Number.parseInt(request.params.tx.validityIntervalStart.toString(), 10)
       );
     }
-    if (request.params.withdrawals.length > 0) {
+    if (request.params.tx.withdrawals && request.params.tx.withdrawals.length > 0) {
       const withdrawals = RustModule.WalletV4.Withdrawals.new();
-      for (const withdrawal of request.params.withdrawals) {
+      for (const withdrawal of request.params.tx.withdrawals ?? []) {
         const stakingKey = derivePath(selectedWallet.rootKey, withdrawal.path).to_raw_key();
         keys.push({
           witGen: (hash) => stakingKey.sign(hash.to_bytes()),
@@ -336,14 +370,14 @@ class MockLedgerConnect {
         });
 
         const rewardAddress = RustModule.WalletV4.RewardAddress.new(
-          request.params.networkId,
+          request.params.tx.network.networkId,
           RustModule.WalletV4.StakeCredential.from_keyhash(
             stakingKey.to_public().hash()
           )
         );
         withdrawals.insert(
           rewardAddress,
-          RustModule.WalletV4.BigNum.from_str(withdrawal.amountStr)
+          RustModule.WalletV4.BigNum.from_str(withdrawal.amount.toString())
         );
       }
       body.set_withdrawals(withdrawals);
@@ -373,7 +407,10 @@ class MockLedgerConnect {
 
   showAddress: {|
     serial: ?string,
-    params: VerifyAddressInfoType,
+    params: {|
+      ...ShowAddressRequest,
+      expectedAddr: string,
+    |},
   |} => Promise<void> = async (request) => {
     this.checkSerial(request.serial);
 
@@ -388,9 +425,9 @@ class MockLedgerConnect {
     ).to_bytes()).toString('hex');
 
     const expectedAddr = Buffer.from(
-      (request.params.addressTypeNibble === AddressTypeNibbles.BYRON
-        ? RustModule.WalletV4.ByronAddress.from_base58(request.params.address).to_address()
-        : RustModule.WalletV4.Address.from_bech32(request.params.address)).to_bytes()
+      (request.params.address.type === AddressType.BYRON
+        ? RustModule.WalletV4.ByronAddress.from_base58(request.params.expectedAddr).to_address()
+        : RustModule.WalletV4.Address.from_bech32(request.params.expectedAddr)).to_bytes()
     ).toString('hex');
 
     if (address !== expectedAddr) {

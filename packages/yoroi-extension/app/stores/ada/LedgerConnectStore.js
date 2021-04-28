@@ -61,10 +61,13 @@ import {
 import { getCardanoHaskellBaseConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
+import type {
+  GetExtendedPublicKeyResponse,
+} from '@cardano-foundation/ledgerjs-hw-app-cardano';
 
 export default class LedgerConnectStore
   extends Store<StoresMap, ActionsMap>
-  implements HWConnectStoreTypes<ExtendedPublicKeyResp> {
+  implements HWConnectStoreTypes<ExtendedPublicKeyResp<GetExtendedPublicKeyResponse>> {
 
   // =================== VIEW RELATED =================== //
   @observable progressInfo: ProgressInfo;
@@ -174,7 +177,8 @@ export default class LedgerConnectStore
     Logger.debug(stringifyData(request));
     try {
       const ledgerConnect = new LedgerConnect({
-        locale: this.stores.profile.currentLocale
+        locale: this.stores.profile.currentLocale,
+        connectorUrl: 'https://emurgo.github.io/yoroi-extension-ledger-connect-vnext/#/v3',
       });
       this.ledgerConnect = ledgerConnect;
       await prepareLedgerConnect(ledgerConnect);
@@ -260,7 +264,7 @@ export default class LedgerConnectStore
     }
   };
 
-  _normalizeHWResponse: ExtendedPublicKeyResp => HWDeviceInfo = (
+  _normalizeHWResponse: ExtendedPublicKeyResp<GetExtendedPublicKeyResponse> => HWDeviceInfo = (
     resp,
   ) => {
     this._validateHWResponse(resp);
@@ -278,7 +282,7 @@ export default class LedgerConnectStore
     };
   }
 
-  _validateHWResponse: ExtendedPublicKeyResp => boolean = (
+  _validateHWResponse: ExtendedPublicKeyResp<GetExtendedPublicKeyResponse> => boolean = (
     resp,
   ) => {
     if (resp.deviceVersion == null) {

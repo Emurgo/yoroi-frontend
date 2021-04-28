@@ -130,7 +130,7 @@ import type {
   CardanoAddressedUtxo,
 } from './transactions/types';
 import { HaskellShelleyTxSignRequest, } from './transactions/shelley/HaskellShelleyTxSignRequest';
-import type { SignTransactionRequest } from '@emurgo/ledger-connect-handler';
+import type { SignTransactionRequest } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { WrongPassphraseError } from './lib/cardanoCrypto/cryptoErrors';
 
 import type {

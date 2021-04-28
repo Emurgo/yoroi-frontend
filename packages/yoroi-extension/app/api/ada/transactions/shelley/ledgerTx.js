@@ -4,23 +4,21 @@ import type {
 } from '../types';
 import { verifyFromBip44Root }  from '../../lib/storage/models/utils';
 import type {
-  BIP32Path,
-  StakingBlockchainPointer,
-  InputTypeUTxO,
-  TxOutputTypeAddress,
-  TxOutputTypeAddressParams,
+  DeviceOwnedAddress,
   Withdrawal,
   Witness,
   Certificate,
   AssetGroup,
   Token,
+  TxOutput,
+  TxInput,
+  SignTransactionRequest,
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
-import type { SignTransactionRequest } from '@emurgo/ledger-connect-handler';
 import type {
   Address, Value, Addressing,
 } from '../../lib/storage/models/PublicDeriver/interfaces';
 import { HaskellShelleyTxSignRequest } from './HaskellShelleyTxSignRequest';
-import { AddressTypeNibbles, CertificateTypes } from '@cardano-foundation/ledgerjs-hw-app-cardano';
+import { AddressType, CertificateType, TransactionSigningMode, TxOutputDestinationType, } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 import { toHexOrBase58 } from '../../lib/storage/bridge/utils';
 import {
@@ -78,22 +76,27 @@ export async function createLedgerSignTxPayload(request: {|
 
   const ttl = txBody.ttl();
   return {
-    inputs: ledgerInputs,
-    outputs: ledgerOutputs,
-    ttlStr: ttl === undefined ? ttl : ttl.toString(),
-    feeStr: txBody.fee().to_str(),
-    protocolMagic: request.byronNetworkMagic,
-    withdrawals: ledgerWithdrawal,
-    certificates: ledgerCertificates,
-    metadataHashHex: undefined,
-    networkId: request.networkId,
-    validityIntervalStartStr: undefined,
+    signingMode: TransactionSigningMode.ORDINARY_TRANSACTION,
+    tx: {
+      inputs: ledgerInputs,
+      outputs: ledgerOutputs,
+      ttl: ttl === undefined ? ttl : ttl.toString(),
+      fee: txBody.fee().to_str(),
+      network: {
+        networkId: request.networkId,
+        protocolMagic: request.byronNetworkMagic,
+      },
+      withdrawals: ledgerWithdrawal.length === 0 ? null : ledgerWithdrawal,
+      certificates: ledgerCertificates.length === 0 ? null : ledgerCertificates,
+      auxiliaryData: undefined,
+      validityIntervalStart: undefined,
+    }
   };
 }
 
 function _transformToLedgerInputs(
   inputs: Array<CardanoAddressedUtxo>
-): Array<InputTypeUTxO> {
+): Array<TxInput> {
   for (const input of inputs) {
     verifyFromBip44Root(input.addressing);
   }
@@ -106,9 +109,9 @@ function _transformToLedgerInputs(
 
 function toLedgerTokenBundle(
   assets: ?RustModule.WalletV4.MultiAsset
-): Array<AssetGroup> {
+): Array<AssetGroup> | null {
+  if (assets == null) return null;
   const assetGroup: Array<AssetGroup> = [];
-  if (assets == null) return assetGroup;
 
   const policyHashes = assets.keys();
   for (let i = 0; i < policyHashes.len(); i++) {
@@ -124,7 +127,7 @@ function toLedgerTokenBundle(
       if (amount == null) continue;
 
       tokens.push({
-        amountStr: amount.to_str(),
+        amount: amount.to_str(),
         assetNameHex: Buffer.from(assetName.name()).toString('hex'),
       });
     }
@@ -141,7 +144,7 @@ function _transformToLedgerOutputs(request: {|
   txOutputs: RustModule.WalletV4.TransactionOutputs,
   changeAddrs: Array<{| ...Address, ...Value, ...Addressing |}>,
   addressingMap: string => (void | $PropertyType<Addressing, 'addressing'>),
-|}): Array<TxOutputTypeAddress | TxOutputTypeAddressParams> {
+|}): Array<TxOutput> {
   const result = [];
   for (let i = 0; i < request.txOutputs.len(); i++) {
     const output = request.txOutputs.get(i);
@@ -158,19 +161,23 @@ function _transformToLedgerOutputs(request: {|
         addressingMap: request.addressingMap,
       });
       result.push({
-        addressTypeNibble: addressParams.addressTypeNibble,
-        spendingPath: addressParams.spendingPath,
-        stakingBlockchainPointer: addressParams.stakingBlockchainPointer,
-        stakingKeyHashHex: addressParams.stakingKeyHashHex,
-        stakingPath: addressParams.stakingPath,
-        amountStr: output.amount().coin().to_str(),
+        amount: output.amount().coin().to_str(),
         tokenBundle: toLedgerTokenBundle(output.amount().multiasset()),
+        destination: {
+          type: TxOutputDestinationType.DEVICE_OWNED,
+          params: addressParams,
+        },
       });
     } else {
       result.push({
-        addressHex: Buffer.from(address.to_bytes()).toString('hex'),
-        amountStr: output.amount().coin().to_str(),
+        amount: output.amount().coin().to_str(),
         tokenBundle: toLedgerTokenBundle(output.amount().multiasset()),
+        destination: {
+          type: TxOutputDestinationType.THIRD_PARTY,
+          params: {
+            addressHex: Buffer.from(address.to_bytes()).toString('hex'),
+          },
+        }
       });
     }
   }
@@ -197,7 +204,7 @@ function formatLedgerWithdrawals(
       throw new Error(`${nameof(formatLedgerWithdrawals)} Ledger can only withdraw from own address ${rewardAddressPayload}`);
     }
     result.push({
-      amountStr: withdrawalAmount.to_str(),
+      amount: withdrawalAmount.to_str(),
       path: addressing.path,
     });
   }
@@ -230,30 +237,31 @@ function formatLedgerCertificates(
     const registrationCert = cert.as_stake_registration();
     if (registrationCert != null) {
       result.push({
-        type: CertificateTypes.STAKE_REGISTRATION,
-        path: getPath(registrationCert.stake_credential()),
-        poolKeyHashHex: undefined,
-        poolRegistrationParams: undefined,
+        type: CertificateType.STAKE_REGISTRATION,
+        params: {
+          path: getPath(registrationCert.stake_credential()),
+        }
       });
       continue;
     }
     const deregistrationCert = cert.as_stake_deregistration();
     if (deregistrationCert != null) {
       result.push({
-        type: CertificateTypes.STAKE_DEREGISTRATION,
-        path: getPath(deregistrationCert.stake_credential()),
-        poolKeyHashHex: undefined,
-        poolRegistrationParams: undefined,
+        type: CertificateType.STAKE_DEREGISTRATION,
+        params: {
+          path: getPath(deregistrationCert.stake_credential()),
+        },
       });
       continue;
     }
     const delegationCert = cert.as_stake_delegation();
     if (delegationCert != null) {
       result.push({
-        type: CertificateTypes.STAKE_DELEGATION,
-        path: getPath(delegationCert.stake_credential()),
-        poolKeyHashHex: Buffer.from(delegationCert.pool_keyhash().to_bytes()).toString('hex'),
-        poolRegistrationParams: undefined,
+        type: CertificateType.STAKE_DELEGATION,
+        params: {
+          path: getPath(delegationCert.stake_credential()),
+          poolKeyHashHex: Buffer.from(delegationCert.pool_keyhash().to_bytes()).toString('hex'),
+        },
       });
       continue;
     }
@@ -267,24 +275,15 @@ export function toLedgerAddressParameters(request: {|
   address: RustModule.WalletV4.Address,
   path: Array<number>,
   addressingMap: string => (void | $PropertyType<Addressing, 'addressing'>),
-|}): {|
-  addressTypeNibble: $Values<typeof AddressTypeNibbles>,
-  networkIdOrProtocolMagic: number,
-  spendingPath: BIP32Path,
-  stakingPath: ?BIP32Path,
-  stakingKeyHashHex: ?string,
-  stakingBlockchainPointer: ?StakingBlockchainPointer
-|} {
+|}): DeviceOwnedAddress {
   {
     const byronAddr = RustModule.WalletV4.ByronAddress.from_address(request.address);
     if (byronAddr) {
       return {
-        addressTypeNibble: AddressTypeNibbles.BYRON,
-        networkIdOrProtocolMagic: byronAddr.byron_protocol_magic(),
-        spendingPath: request.path,
-        stakingPath: undefined,
-        stakingKeyHashHex: undefined,
-        stakingBlockchainPointer: undefined,
+        type: AddressType.BYRON,
+        params: {
+          spendingPath: request.path,
+        },
       };
     }
   }
@@ -298,7 +297,6 @@ export function toLedgerAddressParameters(request: {|
       const addressPayload = Buffer.from(rewardAddr.to_address().to_bytes()).toString('hex');
       const addressing = request.addressingMap(addressPayload);
 
-      let stakingKeyInfo;
       if (addressing == null) {
         const stakeCred = baseAddr.stake_cred();
         const wasmHash = stakeCred.to_keyhash() ?? stakeCred.to_scripthash();
@@ -307,24 +305,22 @@ export function toLedgerAddressParameters(request: {|
         }
         const hashInAddress = Buffer.from(wasmHash.to_bytes()).toString('hex');
 
-        stakingKeyInfo = {
-          stakingPath: undefined,
+        return {
           // can't always know staking key path since address may not belong to the wallet
           // (mangled address)
-          stakingKeyHashHex: hashInAddress,
-        };
-      } else {
-        stakingKeyInfo = {
-          stakingPath: addressing.path,
-          stakingKeyHashHex: undefined,
+          type: AddressType.BASE,
+          params: {
+            spendingPath: request.path,
+            stakingKeyHashHex: hashInAddress,
+          },
         };
       }
       return {
-        addressTypeNibble: AddressTypeNibbles.BASE,
-        networkIdOrProtocolMagic: baseAddr.to_address().network_id(),
-        spendingPath: request.path,
-        ...stakingKeyInfo,
-        stakingBlockchainPointer: undefined,
+        type: AddressType.BASE,
+        params: {
+          spendingPath: request.path,
+          stakingPath: addressing.path,
+        },
       };
     }
   }
@@ -333,15 +329,14 @@ export function toLedgerAddressParameters(request: {|
     if (ptrAddr) {
       const pointer = ptrAddr.stake_pointer();
       return {
-        addressTypeNibble: AddressTypeNibbles.POINTER,
-        networkIdOrProtocolMagic: ptrAddr.to_address().network_id(),
-        spendingPath: request.path,
-        stakingPath: undefined,
-        stakingKeyHashHex: undefined,
-        stakingBlockchainPointer: {
-          blockIndex: pointer.slot(),
-          txIndex: pointer.tx_index(),
-          certificateIndex: pointer.cert_index(),
+        type: AddressType.POINTER,
+        params: {
+          spendingPath: request.path,
+          stakingBlockchainPointer: {
+            blockIndex: pointer.slot(),
+            txIndex: pointer.tx_index(),
+            certificateIndex: pointer.cert_index(),
+          },
         },
       };
     }
@@ -350,12 +345,10 @@ export function toLedgerAddressParameters(request: {|
     const enterpriseAddr = RustModule.WalletV4.EnterpriseAddress.from_address(request.address);
     if (enterpriseAddr) {
       return {
-        addressTypeNibble: AddressTypeNibbles.ENTERPRISE,
-        networkIdOrProtocolMagic: enterpriseAddr.to_address().network_id(),
-        spendingPath: request.path,
-        stakingPath: undefined,
-        stakingKeyHashHex: undefined,
-        stakingBlockchainPointer: undefined,
+        type: AddressType.ENTERPRISE,
+        params: {
+          spendingPath: request.path,
+        },
       };
     }
   }
@@ -363,12 +356,10 @@ export function toLedgerAddressParameters(request: {|
     const rewardAddr = RustModule.WalletV4.RewardAddress.from_address(request.address);
     if (rewardAddr) {
       return {
-        addressTypeNibble: AddressTypeNibbles.REWARD,
-        networkIdOrProtocolMagic: rewardAddr.to_address().network_id(),
-        spendingPath: request.path, // reward addresses use spending path
-        stakingPath: undefined,
-        stakingKeyHashHex: undefined,
-        stakingBlockchainPointer: undefined,
+        type: AddressType.REWARD,
+        params: {
+          spendingPath: request.path, // reward addresses use spending path
+        },
       };
     }
   }

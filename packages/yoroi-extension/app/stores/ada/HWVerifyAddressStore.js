@@ -121,12 +121,13 @@ export default class HWVerifyAddressStore extends Store<StoresMap, ActionsMap> {
 
   ledgerVerifyAddress: (BIP32Path, string, PublicDeriver<>) => Promise<void> = async (
     path,
-    address,
+    expectedAddr,
     publicDeriver,
   ) => {
     try {
       this.ledgerConnect = new LedgerConnect({
-        locale: this.stores.profile.currentLocale
+        locale: this.stores.profile.currentLocale,
+        connectorUrl: 'https://emurgo.github.io/yoroi-extension-ledger-connect-vnext/#/v3',
       });
       await prepareLedgerConnect(this.ledgerConnect);
 
@@ -136,8 +137,8 @@ export default class HWVerifyAddressStore extends Store<StoresMap, ActionsMap> {
         publicDeriver.getParent().getNetworkInfo()
       ).reduce((acc, next) => Object.assign(acc, next), {});
 
-      const wasmAddr = normalizeToAddress(address);
-      if (wasmAddr == null) throw new Error(`${nameof(HWVerifyAddressStore)}::${nameof(this.ledgerVerifyAddress)} invalid address ${address}`);
+      const wasmAddr = normalizeToAddress(expectedAddr);
+      if (wasmAddr == null) throw new Error(`${nameof(HWVerifyAddressStore)}::${nameof(this.ledgerVerifyAddress)} invalid address ${expectedAddr}`);
       const addressParams = toLedgerAddressParameters({
         address: wasmAddr,
         path,
@@ -149,8 +150,12 @@ export default class HWVerifyAddressStore extends Store<StoresMap, ActionsMap> {
       if (this.ledgerConnect) {
         await this.ledgerConnect.showAddress({
           params: {
-            address,
-            ...addressParams,
+            expectedAddr,
+            address: addressParams,
+            network: {
+              networkId: Number.parseInt(config.ChainNetworkId, 10),
+              protocolMagic: config.ByronNetworkId,
+            }
           },
           serial: expectedSerial,
         });

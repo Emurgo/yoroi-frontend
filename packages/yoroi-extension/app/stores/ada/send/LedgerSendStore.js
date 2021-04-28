@@ -201,7 +201,8 @@ export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
       Logger.debug(`${nameof(LedgerSendStore)}::${nameof(this.signAndBroadcast)} called: ` + stringifyData(request));
 
       ledgerConnect = new LedgerConnect({
-        locale: this.stores.profile.currentLocale
+        locale: this.stores.profile.currentLocale,
+        connectorUrl: 'https://emurgo.github.io/yoroi-extension-ledger-connect-vnext/#/v3',
       });
 
       const { ledgerSignTxPayload } = await this.api.ada.createLedgerSignTxData({
