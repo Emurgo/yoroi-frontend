@@ -181,7 +181,7 @@ export default class LedgerConnectStore
 
       const extendedPublicKeyResp = await ledgerConnect.getExtendedPublicKey({
         params: {
-          path: request.path,
+          paths: [request.path],
         },
         // don't pass serial
         // since we use the request to fetch the public key to get the serial # in the first place
