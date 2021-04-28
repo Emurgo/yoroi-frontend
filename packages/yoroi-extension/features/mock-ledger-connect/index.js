@@ -9,6 +9,9 @@ import type {
   BIP32Path,
   DeriveAddressRequest,
   GetExtendedPublicKeyRequest,
+  GetExtendedPublicKeyResponse,
+  GetExtendedPublicKeysRequest,
+  GetExtendedPublicKeysResponse,
   GetVersionResponse,
   GetSerialResponse,
   DeriveAddressResponse,
@@ -177,7 +180,7 @@ class MockLedgerConnect {
   getExtendedPublicKey: {|
     serial: ?string,
     params: GetExtendedPublicKeyRequest,
-  |} => Promise<ExtendedPublicKeyResp> = async (request) => {
+  |} => Promise<ExtendedPublicKeyResp<GetExtendedPublicKeyResponse>> = async (request) => {
     this.checkSerial(request.serial);
     if (MockLedgerConnect.selectedWallet == null) {
       throw new Error(`No mock Ledger wallet selected`);
@@ -191,6 +194,30 @@ class MockLedgerConnect {
     };
     return {
       response: responseKey,
+      deviceVersion: selectedWallet.version,
+      deriveSerial: selectedWallet.serial,
+    };
+  }
+
+  getExtendedPublicKeys: {|
+    serial: ?string,
+    params: GetExtendedPublicKeysRequest,
+  |} => Promise<ExtendedPublicKeyResp<GetExtendedPublicKeysResponse>> = async (request) => {
+    this.checkSerial(request.serial);
+    if (MockLedgerConnect.selectedWallet == null) {
+      throw new Error(`No mock Ledger wallet selected`);
+    }
+    const selectedWallet = MockLedgerConnect.selectedWallet;
+
+    const responseKeys: GetExtendedPublicKeysResponse = request.params.paths.map(path => {
+      const finalKey = derivePath(selectedWallet.rootKey, path);
+      return {
+        publicKeyHex: Buffer.from(finalKey.to_raw_key().to_public().as_bytes()).toString('hex'),
+        chainCodeHex: Buffer.from(finalKey.chaincode()).toString('hex'),
+      };
+    });
+    return {
+      response: responseKeys,
       deviceVersion: selectedWallet.version,
       deriveSerial: selectedWallet.serial,
     };

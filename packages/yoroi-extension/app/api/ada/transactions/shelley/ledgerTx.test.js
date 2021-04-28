@@ -14,7 +14,8 @@ import {
   normalizeToAddress,
 } from '../../lib/storage/bridge/utils';
 import { HaskellShelleyTxSignRequest } from './HaskellShelleyTxSignRequest';
-import { AddressTypeNibbles, CertificateTypes } from '@cardano-foundation/ledgerjs-hw-app-cardano';
+import { AddressType, CertificateType, TransactionSigningMode, TxOutputDestinationType } from '@cardano-foundation/ledgerjs-hw-app-cardano';
+import type { DeviceOwnedAddress, SignTransactionRequest } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { networks } from '../../lib/storage/database/prepackaged/networks';
 import { HARD_DERIVATION_START, WalletTypePurpose, CoinTypes, ChainDerivations } from '../../../../config/numbersConfig';
 
@@ -47,7 +48,7 @@ function getProtocolParams(): {|
 test('Generate address parameters', async () => {
   const baseConfig = network.BaseConfig
     .reduce((acc, next) => Object.assign(acc, next), {});
-  const { ByronNetworkId, ChainNetworkId } = baseConfig;
+  const { ChainNetworkId } = baseConfig;
 
   const path = [WalletTypePurpose.BIP44, CoinTypes.CARDANO, HARD_DERIVATION_START, 1, 1];
 
@@ -61,14 +62,12 @@ test('Generate address parameters', async () => {
       networkId: Number.parseInt(ChainNetworkId, 10),
       path,
       addressingMap: () => undefined,
-    })).toEqual({
-      addressTypeNibble: AddressTypeNibbles.BYRON,
-      networkIdOrProtocolMagic: ByronNetworkId,
-      spendingPath: path,
-      stakingBlockchainPointer: undefined,
-      stakingKeyHashHex: undefined,
-      stakingPath: undefined,
-    });
+    })).toEqual(({
+      type: AddressType.BYRON,
+      params: {
+        spendingPath: path,
+      }
+    }: DeviceOwnedAddress));
   }
 
   // base (staking key)
@@ -81,14 +80,13 @@ test('Generate address parameters', async () => {
       networkId: Number.parseInt(ChainNetworkId, 10),
       path,
       addressingMap: () => undefined,
-    })).toEqual({
-      addressTypeNibble: AddressTypeNibbles.BASE,
-      networkIdOrProtocolMagic: Number.parseInt(ChainNetworkId, 10),
-      spendingPath: path,
-      stakingBlockchainPointer: undefined,
-      stakingKeyHashHex: '63073aa639558af724c96fbd1d01f35d087823e1e14b7d4e0fdb2132',
-      stakingPath: undefined,
-    });
+    })).toEqual(({
+      type: AddressType.BASE,
+      params: {
+        spendingPath: path,
+        stakingKeyHashHex: '63073aa639558af724c96fbd1d01f35d087823e1e14b7d4e0fdb2132',
+      },
+    }: DeviceOwnedAddress));
   }
 
   // base (path)
@@ -116,14 +114,13 @@ test('Generate address parameters', async () => {
         }
         return undefined;
       },
-    })).toEqual({
-      addressTypeNibble: AddressTypeNibbles.BASE,
-      networkIdOrProtocolMagic: Number.parseInt(ChainNetworkId, 10),
-      spendingPath: path,
-      stakingBlockchainPointer: undefined,
-      stakingKeyHashHex: undefined,
-      stakingPath: stakingKeyPath,
-    });
+    })).toEqual(({
+      type: AddressType.BASE,
+      params: {
+        spendingPath: path,
+        stakingPath: stakingKeyPath,
+      }
+    }: DeviceOwnedAddress));
   }
 
   // enterprise
@@ -136,14 +133,12 @@ test('Generate address parameters', async () => {
       networkId: Number.parseInt(ChainNetworkId, 10),
       path,
       addressingMap: () => undefined,
-    })).toEqual({
-      addressTypeNibble: AddressTypeNibbles.ENTERPRISE,
-      networkIdOrProtocolMagic: Number.parseInt(ChainNetworkId, 10),
-      spendingPath: path,
-      stakingBlockchainPointer: undefined,
-      stakingKeyHashHex: undefined,
-      stakingPath: undefined,
-    });
+    })).toEqual(({
+      type: AddressType.ENTERPRISE,
+      params: {
+        spendingPath: path,
+      }
+    }: DeviceOwnedAddress));
   }
 
   // pointer
@@ -156,18 +151,17 @@ test('Generate address parameters', async () => {
       networkId: Number.parseInt(ChainNetworkId, 10),
       path,
       addressingMap: () => undefined,
-    })).toEqual({
-      addressTypeNibble: AddressTypeNibbles.POINTER,
-      networkIdOrProtocolMagic: Number.parseInt(ChainNetworkId, 10),
-      spendingPath: path,
-      stakingBlockchainPointer: {
-        blockIndex: 1,
-        certificateIndex: 3,
-        txIndex: 2,
-      },
-      stakingKeyHashHex: undefined,
-      stakingPath: undefined,
-    });
+    })).toEqual(({
+      type: AddressType.POINTER,
+      params: {
+        spendingPath: path,
+        stakingBlockchainPointer: {
+          blockIndex: 1,
+          certificateIndex: 3,
+          txIndex: 2,
+        },
+      }
+    }: DeviceOwnedAddress));
   }
 
   // reward
@@ -187,14 +181,12 @@ test('Generate address parameters', async () => {
       networkId: Number.parseInt(ChainNetworkId, 10),
       path: stakingKeyPath,
       addressingMap: () => undefined,
-    })).toEqual({
-      addressTypeNibble: AddressTypeNibbles.REWARD,
-      networkIdOrProtocolMagic: Number.parseInt(ChainNetworkId, 10),
-      spendingPath: stakingKeyPath,
-      stakingBlockchainPointer: undefined,
-      stakingKeyHashHex: undefined,
-      stakingPath: undefined,
-    });
+    })).toEqual(({
+      type: AddressType.REWARD,
+      params: {
+        spendingPath: stakingKeyPath,
+      }
+    }: DeviceOwnedAddress));
   }
 });
 
@@ -359,73 +351,83 @@ test('Create Ledger transaction', async () => {
     },
   });
 
-  expect(response).toStrictEqual({
-    feeStr: '1000',
-    ttlStr: '500',
-    networkId: 1,
-    protocolMagic: 764824073,
-    inputs: [{
-      path: [
-        44 + HARD_DERIVATION_START,
-        1815 + HARD_DERIVATION_START,
-        0 + HARD_DERIVATION_START,
-        1,
-        1,
-      ],
-      txHashHex: '058405892f66075d83abd1b7fe341d2d5bfd2f6122b2f874700039e5078e0dd5',
-      outputIndex: 1,
-    }, {
-      path: [
-        44 + HARD_DERIVATION_START,
-        1815 + HARD_DERIVATION_START,
-        0 + HARD_DERIVATION_START,
-        1,
-        2,
-      ],
-      txHashHex: '3677e75c7ba699bfdc6cd57d42f246f86f69aefd76025006ac78313fad2bba20',
-      outputIndex: 1,
-    }, {
-      path: [
-        44 + HARD_DERIVATION_START,
-        1815 + HARD_DERIVATION_START,
-        0 + HARD_DERIVATION_START,
-        0,
-        7,
-      ],
-      txHashHex: '1029eef5bb0f06979ab0b9530a62bac11e180797d08cab980fe39389d42b3657',
-      outputIndex: 0,
-    }, {
-      path: [
-        44 + HARD_DERIVATION_START,
-        1815 + HARD_DERIVATION_START,
-        0 + HARD_DERIVATION_START,
-        0,
-        7,
-      ],
-      txHashHex: '2029eef5bb0f06979ab0b9530a62bac11e180797d08cab980fe39389d42b3658',
-      outputIndex: 0,
-    }],
-    outputs: [{
-      addressHex: '82d818582183581c891ac9abaac999b097c81ea3c0450b0fbb693d0bd232bebc0f4a391fa0001af2ff7e21',
-      amountStr: `5326134`,
-      tokenBundle: [],
-    }],
-    withdrawals: [],
-    certificates: [{
-      path: [
-        WalletTypePurpose.CIP1852,
-        CoinTypes.CARDANO,
-        HARD_DERIVATION_START,
-        2,
-        0,
-      ],
-      poolKeyHashHex: undefined,
-      poolRegistrationParams: undefined,
-      type: CertificateTypes.STAKE_REGISTRATION,
-    }],
-    metadataHashHex: undefined,
-    validityIntervalStartStr: undefined,
-  });
+  expect(response).toStrictEqual(({
+    signingMode: TransactionSigningMode.ORDINARY_TRANSACTION,
+    tx: {
+      fee: '1000',
+      ttl: '500',
+      network: {
+        networkId: 1,
+        protocolMagic: 764824073,
+      },
+      inputs: [{
+        path: [
+          44 + HARD_DERIVATION_START,
+          1815 + HARD_DERIVATION_START,
+          0 + HARD_DERIVATION_START,
+          1,
+          1,
+        ],
+        txHashHex: '058405892f66075d83abd1b7fe341d2d5bfd2f6122b2f874700039e5078e0dd5',
+        outputIndex: 1,
+      }, {
+        path: [
+          44 + HARD_DERIVATION_START,
+          1815 + HARD_DERIVATION_START,
+          0 + HARD_DERIVATION_START,
+          1,
+          2,
+        ],
+        txHashHex: '3677e75c7ba699bfdc6cd57d42f246f86f69aefd76025006ac78313fad2bba20',
+        outputIndex: 1,
+      }, {
+        path: [
+          44 + HARD_DERIVATION_START,
+          1815 + HARD_DERIVATION_START,
+          0 + HARD_DERIVATION_START,
+          0,
+          7,
+        ],
+        txHashHex: '1029eef5bb0f06979ab0b9530a62bac11e180797d08cab980fe39389d42b3657',
+        outputIndex: 0,
+      }, {
+        path: [
+          44 + HARD_DERIVATION_START,
+          1815 + HARD_DERIVATION_START,
+          0 + HARD_DERIVATION_START,
+          0,
+          7,
+        ],
+        txHashHex: '2029eef5bb0f06979ab0b9530a62bac11e180797d08cab980fe39389d42b3658',
+        outputIndex: 0,
+      }],
+      outputs: [{
+        destination: {
+          params: {
+            addressHex: '82d818582183581c891ac9abaac999b097c81ea3c0450b0fbb693d0bd232bebc0f4a391fa0001af2ff7e21',
+          },
+          type: TxOutputDestinationType.THIRD_PARTY,
+        },
+        amount: `5326134`,
+        tokenBundle: null,
+      }],
+      withdrawals: null,
+      certificates: [{
+        params: {
+          path: [
+            WalletTypePurpose.CIP1852,
+            CoinTypes.CARDANO,
+            HARD_DERIVATION_START,
+            2,
+            0,
+          ],
+        },
+        type: CertificateType.STAKE_REGISTRATION,
+      }],
+      auxiliaryData: undefined,
+      validityIntervalStart: undefined,
+    },
+  }: SignTransactionRequest));
 
   buildSignedTransaction(
     txBuilder.build(),

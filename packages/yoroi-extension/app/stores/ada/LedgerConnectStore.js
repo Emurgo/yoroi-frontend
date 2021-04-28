@@ -61,10 +61,13 @@ import {
 import { getCardanoHaskellBaseConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
+import type {
+  GetExtendedPublicKeyResponse,
+} from '@cardano-foundation/ledgerjs-hw-app-cardano';
 
 export default class LedgerConnectStore
   extends Store<StoresMap, ActionsMap>
-  implements HWConnectStoreTypes<ExtendedPublicKeyResp> {
+  implements HWConnectStoreTypes<ExtendedPublicKeyResp<GetExtendedPublicKeyResponse>> {
 
   // =================== VIEW RELATED =================== //
   @observable progressInfo: ProgressInfo;
@@ -181,7 +184,7 @@ export default class LedgerConnectStore
 
       const extendedPublicKeyResp = await ledgerConnect.getExtendedPublicKey({
         params: {
-          paths: [request.path],
+          path: request.path,
         },
         // don't pass serial
         // since we use the request to fetch the public key to get the serial # in the first place
@@ -260,7 +263,7 @@ export default class LedgerConnectStore
     }
   };
 
-  _normalizeHWResponse: ExtendedPublicKeyResp => HWDeviceInfo = (
+  _normalizeHWResponse: ExtendedPublicKeyResp<GetExtendedPublicKeyResponse> => HWDeviceInfo = (
     resp,
   ) => {
     this._validateHWResponse(resp);
@@ -278,7 +281,7 @@ export default class LedgerConnectStore
     };
   }
 
-  _validateHWResponse: ExtendedPublicKeyResp => boolean = (
+  _validateHWResponse: ExtendedPublicKeyResp<GetExtendedPublicKeyResponse> => boolean = (
     resp,
   ) => {
     if (resp.deviceVersion == null) {
