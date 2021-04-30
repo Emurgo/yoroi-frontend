@@ -458,7 +458,7 @@
   "wallet.currency.pick.ergo": "Ergo baut fortschrittliche kryptografische Funktionen und radikal neue DeFi-Funktionalität auf einem felsenfesten Fundament, das durch ein Jahrzehnt der Blockchain-theorie und -entwicklung gelegt wurde",
   "wallet.currency.pick.header": "Wähle eine Währung oder Plattform",
   "wallet.currency.pick.testnetDescription": "Das Testnet ist eine alternative Chain mit der Tests durchgeführt werden. Dies erlaubt es Anwendungsentwicklern zu experimentieren und testen, ohne dass echte Geldwerte benutzt werden müssen.",
-  "wallet.dashboard.empty.text": "Gehe auf die Delegationsseite um auszuwählen an welchen Stake Pool du delegieren möchtest.",
+  "wallet.dashboard.empty.text": "Gehe auf die Delegationsseite, um auszuwählen an welchen Stake Pool du delegieren möchtest.",
   "wallet.dashboard.empty.title": "Du hast noch keine {ticker} delegiert",
   "wallet.dashboard.epochEndTitle": "Zeit bis zum Ende der Epoche",
   "wallet.dashboard.epochProgress": "Epochen Fortschritt",
