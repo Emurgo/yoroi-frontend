@@ -75,7 +75,7 @@
     "@emurgo/js-chain-libs-node": "0.7.1",
     "@pmmmwh/react-refresh-webpack-plugin": "0.4.3",
     "@storybook/addon-actions": "6.2.7",
-    "@storybook/addon-knobs": "6.2.7",
+    "@storybook/addon-knobs": "6.2.9",
     "@storybook/addon-links": "6.2.7",
     "@storybook/addon-postcss": "2.0.0",
     "@storybook/addon-viewport": "6.2.7",
