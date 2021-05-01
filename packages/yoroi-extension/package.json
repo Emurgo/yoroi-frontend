@@ -100,7 +100,7 @@
     "config": "1.31.0",
     "config-webpack": "1.0.4",
     "crx": "5.0.1",
-    "css-loader": "5.0.2",
+    "css-loader": "5.2.4",
     "cucumber": "git+https://github.com/SebastienGllmt/cucumber-js.git",
     "ergo-lib-wasm-nodejs": "0.7.0",
     "eslint": "7.20.0",
