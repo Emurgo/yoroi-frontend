@@ -191,6 +191,14 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
       publicDeriver: withStakingKey,
       password: spendingPassword,
     });
+    const fullConfig = getCardanoHaskellBaseConfig(
+      publicDeriver.getParent().getNetworkInfo()
+    );
+    const config = fullConfig.reduce((acc, next) => Object.assign(acc, next), {});
+    const rewardAddress = RustModule.WalletV4.RewardAddress.new(
+      Number.parseInt(config.ChainNetworkId, 10),
+      RustModule.WalletV4.StakeCredential.from_keyhash(stakingKey.to_public().hash()),
+    );
 
     const withUtxos = asGetAllUtxos(publicDeriver);
     if (withUtxos == null) {
@@ -203,9 +211,6 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
       if (withHasUtxoChains == null) {
         throw new Error(`${nameof(this._createTransaction)} missing chains functionality`);
       }
-      const fullConfig = getCardanoHaskellBaseConfig(
-        withHasUtxoChains.getParent().getNetworkInfo()
-      );
       const timeToSlot = await genTimeToSlot(fullConfig);
       const absSlotNumber = new BigNumber(
         timeToSlot({
@@ -214,10 +219,6 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
         }).slot
       );
 
-      const nextInternal = await getReceiveAddress(publicDeriver);
-      if (nextInternal == null) {
-        throw new Error(`${nameof(this._createTransaction)} no internal addresses left. Should never happen`);
-      }
       if(this.catalystPrivateKey === undefined){
         throw new Error(`${nameof(this._createTransaction)} should never happen`);
       }
@@ -225,7 +226,7 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
       const trxMeta = generateRegistration({
         stakePrivateKey: stakingKey,
         catalystPrivateKey: this.catalystPrivateKey,
-        receiverAddress: Buffer.from(nextInternal.addr.Hash, 'hex'),
+        receiverAddress: Buffer.from(rewardAddress.to_address().to_bytes()),
         slotNumber: timeToSlot({
           // add current slot to registration to avoid replay attacks
           time: new Date(),
