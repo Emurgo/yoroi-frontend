@@ -267,11 +267,15 @@ export async function connectorSignTx(
   processBoxesForSigmaRust(jsonBoxesToSign);
   const txBoxesToSign = RustModule.SigmaRust.ErgoBoxes.from_boxes_json(jsonBoxesToSign);
   console.log('data inputs');
-  const dataInputs = new RustModule.SigmaRust.DataInputs();
-  for (const dataInput of tx.dataInputs) {
-    const boxId = RustModule.SigmaRust.BoxId.from_str(dataInput.boxId);
-    dataInputs.add(new RustModule.SigmaRust.DataInput(boxId));
-  }
+  const dataBoxIds = tx.dataInputs.map(box => box.boxId);
+  const dataInputs = utxos.filter(
+    utxo => dataBoxIds.includes(utxo.output.UtxoTransactionOutput.ErgoBoxId)
+  ).map(formatUtxoToBox);
+  // const dataInputs = new RustModule.SigmaRust.DataInputs();
+  // for (const dataInput of tx.dataInputs) {
+  //   const boxId = RustModule.SigmaRust.BoxId.from_str(dataInput.boxId);
+  //   dataInputs.add(new RustModule.SigmaRust.DataInput(boxId));
+  // }
   // We could modify the best block backend to return this information for the previous block
   // but I'm guessing that votes of the previous block isn't useful for the current one
   // and I'm also unsure if any of these 3 would impact signing or not.
@@ -295,7 +299,7 @@ export async function connectorSignTx(
       new RustModule.SigmaRust.ErgoStateContext(preHeader),
       wasmTx,
       txBoxesToSign,
-      RustModule.SigmaRust.ErgoBoxes.from_boxes_json([]),
+      RustModule.SigmaRust.ErgoBoxes.from_boxes_json(dataInputs),
     );
   return signedTx.to_json();
 }
