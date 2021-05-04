@@ -43,6 +43,8 @@ import { getReceiveAddress } from '../../../app/stores/stateless/addressStores';
 
 import LocalStorageApi from '../../../app/api/localStorage/index';
 
+import type { BestBlockResponse } from '../../../app/api/ergo/lib/state-fetch/types';
+
 function paginateResults<T>(results: T[], paginate: ?Paginate): T[] {
   if (paginate != null) {
     const startIndex = paginate.page * paginate.limit;
@@ -217,9 +219,11 @@ export async function connectorSignTx(
   publicDeriver: IPublicDeriver<ConceptualWallet>,
   password: string,
   utxos: any/* IGetAllUtxosResponse */,
+  bestBlock: BestBlockResponse,
   tx: Tx,
   indices: Array<number>
 ): Promise<ErgoTxJson> {
+  console.log('connectSignTx()');
   const withLevels = asHasLevels(publicDeriver);
   if (withLevels == null) {
     throw new Error('wallet doesn\'t support levels');
@@ -262,13 +266,36 @@ export async function connectorSignTx(
   const jsonBoxesToSign = utxosToSign.map(formatUtxoToBox);
   processBoxesForSigmaRust(jsonBoxesToSign);
   const txBoxesToSign = RustModule.SigmaRust.ErgoBoxes.from_boxes_json(jsonBoxesToSign);
+  console.log('data inputs');
+  const dataInputs = new RustModule.SigmaRust.DataInputs();
+  for (const dataInput of tx.dataInputs) {
+    const boxId = RustModule.SigmaRust.BoxId.from_str(dataInput.boxId);
+    dataInputs.add(new RustModule.SigmaRust.DataInput(boxId));
+  }
+  // We could modify the best block backend to return this information for the previous block
+  // but I'm guessing that votes of the previous block isn't useful for the current one
+  // and I'm also unsure if any of these 3 would impact signing or not.
+  // Maybe version would later be used in the ergoscript context?
+  const headerJson = JSON.stringify({
+    version: 2, // TODO: where to get version? (does this impact signing?)
+    parentId: bestBlock.hash,
+    timestamp: Date.now(),
+    nBits: 682315684511744, // TODO: where to get difficulty? (does this impact signing?)
+    height: bestBlock.height + 1,
+    votes: "040000", // TODO: where to get votes? (does this impact signing?)
+  });
+  console.log(`block header: ${headerJson}`);
+  const blockHeader = RustModule.SigmaRust.BlockHeader.from_json(headerJson);
+  console.log('pre-header');
+  const preHeader = RustModule.SigmaRust.PreHeader.from_block_header(blockHeader);
+  console.log('before signing');
   const signedTx = RustModule.SigmaRust.Wallet
     .from_secrets(wasmKeys)
     .sign_transaction(
-      RustModule.SigmaRust.ErgoStateContext.dummy(), // TODO? Not implemented in sigma-rust
+      new RustModule.SigmaRust.ErgoStateContext(preHeader),
       wasmTx,
       txBoxesToSign,
-      RustModule.SigmaRust.ErgoBoxes.from_boxes_json([]), // TODO: not supported by sigma-rust
+      RustModule.SigmaRust.ErgoBoxes.from_boxes_json([]),
     );
   return signedTx.to_json();
 }

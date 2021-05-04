@@ -56,7 +56,8 @@ function initDapp() {
                 button.textContent = "Send";
                 button.onclick = async function() {
                     status.innerText = "Creating transaction";
-                    const donationAddr = "9fp6ERwLEF8u3Jvbii2msogFDUa9edxmvQKbwbwogXjLg7oXZSo";
+                    const heightGT1337 = "5yE918nbfmCzFGNoh7wz"; // HEIGHT > 1337
+                    const donationAddr = "9hD2Cw6yQL6zzrw3TFgKdwFkBdDdU3ro1xRFmjouDw4NYS2S5RD";
                     const creationHeight = 398959;
                     const amountToSend = parseInt(valueEntry.value, 10);
                     const amountToSendBoxValue = wasm.BoxValue.from_i64(wasm.I64.from_str(amountToSend.toString()));
@@ -70,7 +71,20 @@ function initDapp() {
                             asset.amount = parseInt(asset.amount);
                         }
                         return utxo;
-                    })
+                    });
+                    // this is a box we created with that HEIGHT > 1337 as the ergo tree
+                    utxos.unshift({
+                        "additionalRegisters": {
+                        },
+                        "assets": [
+                        ],
+                        "boxId": "0f0e4c71ccfbe7e749591ef2a906607b415deadee8c23a8d822517c4cd55374e",
+                        "creationHeight": 398959,
+                        "ergoTree": "100104f214d191a37300",
+                        "index": 0,
+                        "transactionId": "c93731f3a79a85f4c959785eb8d981ff0e03730c432dfb07da7049a9b0081027",
+                        "value": 195800
+                    });
                     console.log(`utxosValue: ${utxosValue}`);
                     console.log(`${utxosValue} - ${amountToSend} - ${wasm.TxBuilder.SUGGESTED_TX_FEE().as_i64().as_num()}`);
                     const changeValue = utxosValue - amountToSend - wasm.TxBuilder.SUGGESTED_TX_FEE().as_i64().as_num();
@@ -93,7 +107,12 @@ function initDapp() {
                     //     changeValueBoxValue,
                     //     wasm.Contract.pay_to_address(wasm.Address.from_base58(changeAddr)),
                     //     creationHeight);
-                    outputCandidates.add(donationBoxBuilder.build());
+                    try {
+                        outputCandidates.add(donationBoxBuilder.build());
+                    } catch (e) {
+                        console.log(`building error: ${e}`);
+                        throw e;
+                    }
                     //outputCandidates.add(changeBoxBuilder.build());
                     console.log(`utxosval: ${utxosValue}`);
                     const txBuilder = wasm.TxBuilder.new(
@@ -104,15 +123,34 @@ function initDapp() {
                         wasm.Address.from_base58(changeAddr),
                         wasm.BoxValue.SAFE_USER_MIN());
                         //changeValueBoxValue);
-                    
+                    const dataInputs = new wasm.DataInputs();
+                    // ranndom tx we sent via the connector before - not referenced in any smart contract right now
+                    //dataInputs.add(new wasm.DataInput(wasm.BoxId.from_str("0f0e4c71ccfbe7e749591ef2a906607b415deadee8c23a8d822517c4cd55374e")));
+                    txBuilder.set_data_inputs(dataInputs);
                     const tx = txBuilder.build().to_json();
-                    console.log(`tx: ${tx}`);
+                    console.log(`tx: ${JSON.stringify(tx)}`);
+                    console.log(`original id: ${tx.id}`);
+                    // sigma-rust doesn't support most compilation so manually insert it here
+                    // this is HEIGHT > 1337 but in hex and without the checksum/etc for the address of the contract
+                    //tx.outputs[0].ergoTree = "100104f214d191a37300";
+                    // and we rebuild it using
+                    const correctTx = wasm.UnsignedTransaction.from_json(JSON.stringify(tx)).to_json();
+                    console.log(`new id: ${correctTx.id}`);
+                    // we must use the exact order chosen as after 0.4.3 in sigma-rust
+                    // this can change and might not use all the utxos as the coin selection
+                    // might choose a more optimal amount
+                    correctTx.inputs = correctTx.inputs.map(box => {
+console.log(`box: ${JSON.stringify(box)}`);
+                        const fullBoxInfo = utxos.find(utxo => utxo.boxId === box.boxId);
+                        return {
+                            ...fullBoxInfo,
+                            extension: {}
+                        };
+                    });
                     status.innerText = "Awaiting transaction signing";
+                    console.log(`${JSON.stringify(correctTx)}`);
                     ergo
-                        .sign_tx({
-                            ...tx,
-                            inputs: utxos.map(utxo => ({ ...utxo, extension: {} })),
-                        })
+                        .sign_tx(correctTx)
                         .then(async signedTx => {
                             status.innerText = "Transaction signed - awaiting submission"
                             try {
