@@ -263,7 +263,7 @@ export async function connectorSignTx(
     keyLevel: wallet.getParent().getPublicDeriverLevel(),
     signingKey: finalSigningKey,
   });
-  const jsonBoxesToSign = utxosToSign.map(formatUtxoToBox);
+  const jsonBoxesToSign = tx.inputs.filter((box, index) => indices.includes(index));
   processBoxesForSigmaRust(jsonBoxesToSign);
   const txBoxesToSign = RustModule.SigmaRust.ErgoBoxes.from_boxes_json(jsonBoxesToSign);
   console.log('data inputs');
