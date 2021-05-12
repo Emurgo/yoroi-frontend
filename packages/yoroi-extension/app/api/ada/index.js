@@ -374,11 +374,23 @@ export type CreateDelegationTxRequest = {|
   valueInAccount: MultiToken,
 |};
 
-export type CreateVotingRegTxRequest = {|
+type CreateVotingRegTxRequestCommon = {|
   publicDeriver: IPublicDeriver<ConceptualWallet> & IGetAllUtxos & IHasUtxoChains,
   absSlotNumber: BigNumber,
-  metadata: RustModule.WalletV4.GeneralTransactionMetadata,
 |};
+
+export type CreateVotingRegTxRequest = {|
+  ...CreateVotingRegTxRequestCommon,
+  normalWallet: {|
+    metadata: RustModule.WalletV4.GeneralTransactionMetadata,
+  |}
+|} | {|
+  ...CreateVotingRegTxRequestCommon,
+  trezorTWallet: {|
+    votingPublicKey: string,
+  |}
+|};
+
 
 export type CreateDelegationTxResponse = {|
   signTxRequest: HaskellShelleyTxSignRequest,
@@ -849,7 +861,6 @@ export default class AdaApi {
         Number.parseInt(config.ChainNetworkId, 10),
       );
       Logger.debug(`${nameof(AdaApi)}::${nameof(this.createTrezorSignTxData)} success: ` + stringifyData(trezorSignTxPayload));
-
       return {
         trezorSignTxPayload,
       };
@@ -1400,7 +1411,16 @@ export default class AdaApi {
       if (changeAddr == null) {
         throw new Error(`${nameof(this.createVotingRegTx)} no internal addresses left. Should never happen`);
       }
-      const trxMetadata = RustModule.WalletV4.TransactionMetadata.new(request.metadata);
+      let trxMetadata;
+      if (request.trezorTWallet) {
+        trxMetadata = undefined;
+      } else {
+        // Mnemonic wallet
+        trxMetadata = RustModule.WalletV4.TransactionMetadata.new(
+          request.normalWallet.metadata
+        );
+      }
+
       const unsignedTx = shelleyNewAdaUnsignedTx(
         [],
         {
@@ -1431,6 +1451,13 @@ export default class AdaApi {
           neededHashes: new Set(),
           wits: new Set(),
         },
+        trezorTCatalystRegistrationTxSignData:
+          request.trezorTWallet ?
+            {
+              votingPublicKey: request.trezorTWallet.votingPublicKey,
+              nonce: request.absSlotNumber,
+            } :
+            undefined,
       });
     } catch (error) {
       Logger.error(`${nameof(AdaApi)}::${nameof(this.createVotingRegTx)} error: ` + stringifyError(error));
