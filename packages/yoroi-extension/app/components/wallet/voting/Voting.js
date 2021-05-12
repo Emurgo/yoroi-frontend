@@ -31,12 +31,21 @@ const messages = defineMessages({
     id: 'wallet.voting.line4',
     defaultMessage: '!!!Open the Catalyst Voting App and click on the Complete registration button.',
   },
+  notDelegated: {
+    id: 'wallet.voting.notDelegated',
+    defaultMessage: '!!!You have not delegated. Your voting power is how much you delegate and the voting rewards will be distributed to your delegation reward address. Please make sure to delegate before voting.',
+  },
+  keepDelegated: {
+    id: 'wallet.voting.keepDelegated',
+    defaultMessage: '!!!Your voting power is how much you delegate and the voting rewards will be distributed to your delegation reward address. Please keep delegated until the voting ends.',
+  },
 });
 
 type Props = {|
   +start: void => void,
   +onExternalLinkClick: MouseEvent => void,
   +hasAnyPending: boolean,
+  +isDelegated: boolean,
 |};
 
 @observer
@@ -107,6 +116,22 @@ export default class Voting extends Component<Props> {
                 {intl.formatMessage(messages.line4)}
               </div>
             </div>
+          </div>
+          <div className={styles.delegationStatus}>
+            {this.props.isDelegated ?
+              (
+                <div className={styles.lineText}>
+                  {intl.formatMessage(messages.keepDelegated)}
+                </div>
+              ) :
+              (
+                <div className={styles.warningBox}>
+                  <WarningBox>
+                    {intl.formatMessage(messages.notDelegated)}
+                  </WarningBox>
+                </div>
+              )
+            }
           </div>
           <div className={styles.registerButton}>
             <Button
