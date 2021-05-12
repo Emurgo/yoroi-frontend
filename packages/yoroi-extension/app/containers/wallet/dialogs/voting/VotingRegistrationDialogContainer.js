@@ -201,7 +201,7 @@ export default class VotingRegistrationDialogContainer extends Component<Props> 
               trigger: actions.ada.voting.goBackToGenerate.trigger,
             },
             submitConfirm: {
-              trigger: actions.ada.voting.submitConfirm.trigger,
+              trigger: () => { actions.ada.voting.submitConfirm.trigger() },
             },
             submitConfirmError: {
               trigger: actions.ada.voting.submitConfirmError.trigger,
