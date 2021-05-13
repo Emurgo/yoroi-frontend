@@ -60,10 +60,6 @@ class ErgoAPI {
         return this._ergo_rpc_call("get_utxos", [amount, token_id, paginate]);
     }
 
-    sign_tx(tx) {
-        return this._ergo_rpc_call("sign_tx", [tx]);
-    }
-
     get_used_addresses(paginate = undefined) {
         return this._ergo_rpc_call("get_used_addresses", [paginate]);
     }

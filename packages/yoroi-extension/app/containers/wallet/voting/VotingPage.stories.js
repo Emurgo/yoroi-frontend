@@ -64,6 +64,9 @@ const defaultProps: ({|
     tokenInfoStore: {
       tokenInfo: mockFromDefaults(defaultAssets),
     },
+    delegation: {
+      getDelegationRequests: walletLookup([request.wallet]).getDelegation,
+    },
   },
   actions: {
     dialogs: {

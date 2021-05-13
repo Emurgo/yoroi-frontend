@@ -111,6 +111,26 @@ export async function createTrezorSignTxPayload(
       metadata: Buffer.from(metadata.to_bytes()).toString('hex')
     };
 
+  if (signRequest.trezorTCatalystRegistrationTxSignData) {
+    const { votingPublicKey, nonce } = signRequest.trezorTCatalystRegistrationTxSignData;
+    request = {
+      ...request,
+      auxiliaryData: {
+        catalystRegistrationParameters: {
+          votingPublicKey,
+          stakingPath: getStakingKeyPath(),
+          rewardAddressParameters: {
+            addressType: ADDRESS_TYPE.Reward,
+            stakingPath: getStakingKeyPath(),
+          },
+          nonce,
+        },
+      }
+    };
+  }
+  // trezor-connect v8.1.26 doesn't support auxiliaryData. When it does, we
+  // can remove the next line:
+  // $FlowFixMe[prop-missing]
   return request;
 }
 

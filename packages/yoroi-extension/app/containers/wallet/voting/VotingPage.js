@@ -23,6 +23,7 @@ import environment from '../../../environment';
 import { MultiToken } from '../../../api/common/lib/MultiToken';
 import RegistrationOver from './RegistrationOver';
 import { networks, } from '../../../api/ada/lib/storage/database/prepackaged/networks';
+import type { DelegationRequests } from '../../../stores/toplevel/DelegationStore';
 
 export type GeneratedData = typeof VotingPage.prototype.generated;
 type Props = {|
@@ -30,8 +31,8 @@ type Props = {|
 |};
 
 const roundInfo = {
-  startDate: new Date(Date.parse('13 May 2021 19:00:00 GMT')),
-  endDate: new Date(Date.parse('20 May 2021 19:00:00 GMT')),
+  startDate: new Date(Date.parse('2021-05-20T19:00:00Z')),
+  endDate: new Date(Date.parse('2021-05-27T19:00:00Z')),
   nextRound: 4,
 };
 
@@ -46,6 +47,36 @@ export default class VotingPage extends Component<Props> {
   start: void => void = () => {
     this.generated.actions.dialogs.open.trigger({ dialog: VotingRegistrationDialogContainer });
   };
+
+  get isDelegated(): ?boolean {
+    const publicDeriver = this.generated.stores.wallets.selected;
+    const delegationStore = this.generated.stores.delegation;
+
+    if (!publicDeriver) {
+      throw new Error(`${nameof(this.isDelegated)} no public deriver. Should never happen`);
+    }
+
+    const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
+    if (delegationRequests == null) {
+      throw new Error(`${nameof(this.isDelegated)} called for non-reward wallet`);
+    }
+    const currentDelegation = delegationRequests.getCurrentDelegation;
+
+    if (
+      !currentDelegation.wasExecuted ||
+      currentDelegation.isExecuting ||
+      currentDelegation.result == null
+    ) {
+      return undefined;
+    }
+    if(
+      !currentDelegation.result.currEpoch ||
+      currentDelegation.result.currEpoch.pools.length === 0
+    ) {
+      return false;
+    }
+    return true;
+  }
 
   render(): Node {
     const {
@@ -120,6 +151,7 @@ export default class VotingPage extends Component<Props> {
           start={this.start}
           hasAnyPending={this.generated.hasAnyPending}
           onExternalLinkClick={handleExternalLinkClick}
+          isDelegated={this.isDelegated === true}
         />
       </div>
     );
@@ -151,6 +183,9 @@ export default class VotingPage extends Component<Props> {
       |},
       wallets: {|
         selected: null | PublicDeriver<>,
+      |},
+      delegation: {|
+        getDelegationRequests: (PublicDeriver<>) => void | DelegationRequests,
       |},
     |},
   |} {
@@ -196,6 +231,9 @@ export default class VotingPage extends Component<Props> {
         },
         tokenInfoStore: {
           tokenInfo: stores.tokenInfoStore.tokenInfo,
+        },
+        delegation: {
+          getDelegationRequests: stores.delegation.getDelegationRequests,
         },
       },
       VotingRegistrationDialogProps: ({

@@ -45,6 +45,10 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
     neededHashes: Set<string>, // StakeCredential
     wits: Set<string>, // Vkeywitness
   |};
+  trezorTCatalystRegistrationTxSignData: void | {|
+    votingPublicKey: string,
+    nonce: BigNumber,
+  |};
 
   constructor(data: {|
     senderUtxos: Array<CardanoAddressedUtxo>,
@@ -56,6 +60,10 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
       neededHashes: Set<string>, // StakeCredential
       wits: Set<string>, // Vkeywitness
     |},
+    trezorTCatalystRegistrationTxSignData?: void | {|
+      votingPublicKey: string,
+      nonce: BigNumber,
+    |};
   |}) {
     this.senderUtxos = data.senderUtxos;
     this.unsignedTx = data.unsignedTx;
@@ -63,6 +71,8 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
     this.metadata = data.metadata;
     this.networkSettingSnapshot = data.networkSettingSnapshot;
     this.neededStakingKeyHashes = data.neededStakingKeyHashes;
+    this.trezorTCatalystRegistrationTxSignData =
+      data.trezorTCatalystRegistrationTxSignData;
   }
 
   txId(): string {
