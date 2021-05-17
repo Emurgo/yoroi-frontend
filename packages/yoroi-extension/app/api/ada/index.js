@@ -388,6 +388,16 @@ export type CreateVotingRegTxRequest = {|
   ...CreateVotingRegTxRequestCommon,
   trezorTWallet: {|
     votingPublicKey: string,
+    nonce: number,
+  |}
+|} | {|
+  ...CreateVotingRegTxRequestCommon,
+  ledgerNanoWallet: {|
+    votingPublicKey: string,
+    stakingKeyPath: Array<number>,
+    stakingKey: string,
+    rewardAddress: string,
+    nonce: number,
   |}
 |};
 
@@ -1412,7 +1422,7 @@ export default class AdaApi {
         throw new Error(`${nameof(this.createVotingRegTx)} no internal addresses left. Should never happen`);
       }
       let trxMetadata;
-      if (request.trezorTWallet) {
+      if (request.trezorTWallet || request.ledgerNanoWallet) {
         trxMetadata = undefined;
       } else {
         // Mnemonic wallet
@@ -1452,12 +1462,9 @@ export default class AdaApi {
           wits: new Set(),
         },
         trezorTCatalystRegistrationTxSignData:
-          request.trezorTWallet ?
-            {
-              votingPublicKey: request.trezorTWallet.votingPublicKey,
-              nonce: request.absSlotNumber,
-            } :
-            undefined,
+          request.trezorTWallet ? request.trezorTWallet : undefined,
+        ledgerNanoCatalystRegistrationTxSignData:
+          request.ledgerNanoWallet ? request.ledgerNanoWallet: undefined,
       });
     } catch (error) {
       Logger.error(`${nameof(AdaApi)}::${nameof(this.createVotingRegTx)} error: ` + stringifyError(error));

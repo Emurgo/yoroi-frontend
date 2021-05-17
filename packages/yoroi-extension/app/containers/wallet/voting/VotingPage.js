@@ -88,6 +88,7 @@ export default class VotingPage extends Component<Props> {
     if(selected == null){
       throw new Error(`${nameof(VotingPage)} no wallet selected`);
     }
+
     if (selected.getParent().getWalletType() === WalletTypeOption.HARDWARE_WALLET) {
       return <UnsupportedWallet />;
     }

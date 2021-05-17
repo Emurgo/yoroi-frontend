@@ -13,12 +13,14 @@ import {
   asHasUtxoChains,
   asGetSigningKey,
   asGetAllAccounting,
+  asGetStakingKey,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import {
   isCardanoHaskell,
   getCardanoHaskellBaseConfig,
 } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { genTimeToSlot } from '../../api/ada/lib/storage/bridge/timeUtils';
+import { unwrapStakingKey } from '../../api/ada/lib/storage/bridge/utils';
 import { generatePrivateKeyForCatalyst } from '../../api/ada/lib/cardanoCrypto/cryptoWallet';
 import {
   isLedgerNanoWallet,
@@ -226,18 +228,50 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
       throw new Error(`${nameof(this._createTransaction)} should never happen`);
     }
 
+    const config = fullConfig.reduce((acc, next) => Object.assign(acc, next), {});
+    const nonce = timeToSlot({ time: new Date() }).slot;
+
     let votingRegTxPromise;
 
-    if (isTrezorTWallet(publicDeriver.getParent())) {
+    if (
+      publicDeriver.getParent().getWalletType() === WalletTypeOption.HARDWARE_WALLET
+    ) {
       const votingPublicKey = `0x${Buffer.from(catalystPrivateKey.to_public().as_bytes()).toString('hex')}`;
 
-      votingRegTxPromise = this.createVotingRegTx.execute({
-        publicDeriver: withHasUtxoChains,
-        absSlotNumber,
-        trezorTWallet: {
-          votingPublicKey
-        },
-      }).promise;
+      if (isTrezorTWallet(publicDeriver.getParent())) {
+        votingRegTxPromise = this.createVotingRegTx.execute({
+          publicDeriver: withHasUtxoChains,
+          absSlotNumber,
+          trezorTWallet: { votingPublicKey, nonce },
+        }).promise;
+      } else if (isLedgerNanoWallet(publicDeriver.getParent())) {
+        const withStakingKey = asGetStakingKey(publicDeriver);
+        if (!withStakingKey) {
+          throw new Error(`${nameof(this._createTransaction)} can't get staking key`);
+        }
+        const stakingKeyResp = await withStakingKey.getStakingKey();
+        const stakingKey = unwrapStakingKey(stakingKeyResp.addr.Hash);
+
+        const rewardAddress = RustModule.WalletV4.RewardAddress.new(
+          Number.parseInt(config.ChainNetworkId, 10),
+          stakingKey,
+        );
+
+        votingRegTxPromise = this.createVotingRegTx.execute({
+          publicDeriver: withHasUtxoChains,
+          absSlotNumber,
+          ledgerNanoWallet: {
+            votingPublicKey,
+            stakingKeyPath: stakingKeyResp.addressing.path,
+            stakingKey: Buffer.from(stakingKey.to_bytes()).toString('hex'),
+            rewardAddress: Buffer.from(rewardAddress.to_address().to_bytes()).toString('hex'),
+            nonce,
+          },
+        }).promise;
+      } else {
+        throw new Error(`${nameof(this._createTransaction)} unexpected hardware wallet type`);
+      }
+
     } else if (
       publicDeriver.getParent().getWalletType() === WalletTypeOption.WEB_WALLET
     ) {
@@ -258,7 +292,7 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
         publicDeriver: withStakingKey,
         password: spendingPassword,
       });
-      const config = fullConfig.reduce((acc, next) => Object.assign(acc, next), {});
+
       const rewardAddress = RustModule.WalletV4.RewardAddress.new(
         Number.parseInt(config.ChainNetworkId, 10),
         RustModule.WalletV4.StakeCredential.from_keyhash(stakingKey.to_public().hash()),
@@ -268,10 +302,7 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
         stakePrivateKey: stakingKey,
         catalystPrivateKey,
         receiverAddress: Buffer.from(rewardAddress.to_address().to_bytes()),
-        slotNumber: timeToSlot({
-          // add current slot to registration to avoid replay attacks
-          time: new Date(),
-        }).slot,
+        slotNumber: nonce,
       });
 
       votingRegTxPromise = this.createVotingRegTx.execute({
