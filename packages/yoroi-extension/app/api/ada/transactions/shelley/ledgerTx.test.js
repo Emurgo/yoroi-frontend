@@ -184,7 +184,7 @@ test('Generate address parameters', async () => {
     })).toEqual(({
       type: AddressType.REWARD,
       params: {
-        spendingPath: stakingKeyPath,
+        stakingPath: stakingKeyPath,
       }
     }: DeviceOwnedAddress));
   }

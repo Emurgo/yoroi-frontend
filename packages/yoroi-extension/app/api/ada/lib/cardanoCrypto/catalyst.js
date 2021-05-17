@@ -7,12 +7,21 @@ export const CatalystLabels = Object.freeze({
   DATA: 61284,
   SIG: 61285,
 });
-export function generateRegistration(request: {|
-  stakePrivateKey: RustModule.WalletV4.PrivateKey,
-  catalystPrivateKey: RustModule.WalletV4.PrivateKey,
-  receiverAddress: Buffer,
-  slotNumber: number,
-|}): RustModule.WalletV4.GeneralTransactionMetadata {
+
+function prefix0x(hex: string): string {
+  if (hex.startsWith('0x')) {
+    return hex;
+  }
+  return '0x' + hex;
+}
+
+export function generateRegistrationMetadata(
+  votingPublicKey: string,
+  stakingPublicKey: string,
+  rewardAddress: string,
+  nonce: number,
+  signer: Uint8Array => string,
+): RustModule.WalletV4.GeneralTransactionMetadata {
 
   /**
     * Catalyst follows a certain standard to prove the voting power
@@ -32,10 +41,10 @@ export function generateRegistration(request: {|
 
   const registrationData = RustModule.WalletV4.encode_json_str_to_metadatum(
     JSON.stringify({
-      '1': `0x${Buffer.from(request.catalystPrivateKey.to_public().as_bytes()).toString('hex')}`,
-      '2': `0x${Buffer.from(request.stakePrivateKey.to_public().as_bytes()).toString('hex')}`,
-      '3': `0x${Buffer.from(request.receiverAddress).toString('hex')}`,
-      '4': request.slotNumber,
+      '1': prefix0x(votingPublicKey),
+      '2': prefix0x(stakingPublicKey),
+      '3': prefix0x(rewardAddress),
+      '4': nonce,
     }),
     RustModule.WalletV4.MetadataJsonSchema.BasicConversions
   );
@@ -48,19 +57,31 @@ export function generateRegistration(request: {|
   const hashedMetadata = blake2b(256 / 8).update(
     generalMetadata.to_bytes()
   ).digest('binary');
-  const catalystSignature = request.stakePrivateKey
-    .sign(hashedMetadata)
-    .to_hex();
 
   generalMetadata.insert(
     RustModule.WalletV4.BigNum.from_str(CatalystLabels.SIG.toString()),
     RustModule.WalletV4.encode_json_str_to_metadatum(
       JSON.stringify({
-        '1': `0x${catalystSignature}`,
+        '1': prefix0x(signer(hashedMetadata)),
       }),
       RustModule.WalletV4.MetadataJsonSchema.BasicConversions
     )
   );
 
   return generalMetadata;
+}
+
+export function generateRegistration(request: {|
+  stakePrivateKey: RustModule.WalletV4.PrivateKey,
+  catalystPrivateKey: RustModule.WalletV4.PrivateKey,
+  receiverAddress: Buffer,
+  slotNumber: number,
+|}): RustModule.WalletV4.GeneralTransactionMetadata {
+  return generateRegistrationMetadata(
+    Buffer.from(request.catalystPrivateKey.to_public().as_bytes()).toString('hex'),
+    Buffer.from(request.stakePrivateKey.to_public().as_bytes()).toString('hex'),
+    Buffer.from(request.receiverAddress).toString('hex'),
+    request.slotNumber,
+    (hashedMetadata) => request.stakePrivateKey.sign(hashedMetadata).to_hex(),
+  );
 }
