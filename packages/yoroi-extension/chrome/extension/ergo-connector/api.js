@@ -223,7 +223,6 @@ export async function connectorSignTx(
   tx: Tx,
   indices: Array<number>
 ): Promise<ErgoTxJson> {
-  console.log('connectSignTx()');
   const withLevels = asHasLevels(publicDeriver);
   if (withLevels == null) {
     throw new Error('wallet doesn\'t support levels');
@@ -266,16 +265,10 @@ export async function connectorSignTx(
   const jsonBoxesToSign = tx.inputs.filter((box, index) => indices.includes(index));
   processBoxesForSigmaRust(jsonBoxesToSign);
   const txBoxesToSign = RustModule.SigmaRust.ErgoBoxes.from_boxes_json(jsonBoxesToSign);
-  console.log('data inputs');
   const dataBoxIds = tx.dataInputs.map(box => box.boxId);
   const dataInputs = utxos.filter(
     utxo => dataBoxIds.includes(utxo.output.UtxoTransactionOutput.ErgoBoxId)
   ).map(formatUtxoToBox);
-  // const dataInputs = new RustModule.SigmaRust.DataInputs();
-  // for (const dataInput of tx.dataInputs) {
-  //   const boxId = RustModule.SigmaRust.BoxId.from_str(dataInput.boxId);
-  //   dataInputs.add(new RustModule.SigmaRust.DataInput(boxId));
-  // }
   // We could modify the best block backend to return this information for the previous block
   // but I'm guessing that votes of the previous block isn't useful for the current one
   // and I'm also unsure if any of these 3 would impact signing or not.
@@ -288,11 +281,8 @@ export async function connectorSignTx(
     height: bestBlock.height + 1,
     votes: "040000", // TODO: where to get votes? (does this impact signing?)
   });
-  console.log(`block header: ${headerJson}`);
   const blockHeader = RustModule.SigmaRust.BlockHeader.from_json(headerJson);
-  console.log('pre-header');
   const preHeader = RustModule.SigmaRust.PreHeader.from_block_header(blockHeader);
-  console.log('before signing');
   const signedTx = RustModule.SigmaRust.Wallet
     .from_secrets(wasmKeys)
     .sign_transaction(
