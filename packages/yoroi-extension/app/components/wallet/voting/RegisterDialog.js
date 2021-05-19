@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 import { observable, action } from 'mobx';
 import classnames from 'classnames';
 import { defineMessages, intlShape } from 'react-intl';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type { $npm$ReactIntl$IntlFormat, MessageDescriptor } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import globalMessages from '../../../i18n/global-messages';
 import Dialog from '../../widgets/Dialog';
@@ -25,6 +25,7 @@ const messages = defineMessages({
 });
 
 type Props = {|
+  +stepsList: Array<MessageDescriptor>,
   +progressInfo: ProgressInfo,
   +submit: string => PossiblyAsync<void>,
   +cancel: void => void,
@@ -47,6 +48,7 @@ export default class RegisterDialog extends Component<Props> {
   render(): Node {
     const { intl } = this.context;
     const {
+      stepsList,
       progressInfo,
       cancel,
       classicTheme,
@@ -70,7 +72,11 @@ export default class RegisterDialog extends Component<Props> {
         closeButton={<DialogCloseButton />}
         onClose={cancel}
       >
-        <ProgressStepBlock progressInfo={progressInfo} classicTheme={classicTheme} />
+        <ProgressStepBlock
+          stepsList={stepsList}
+          progressInfo={progressInfo}
+          classicTheme={classicTheme}
+        />
         <div className={classnames([styles.lineText, styles.firstItem])}>
           {intl.formatMessage(messages.line1)}
         </div>

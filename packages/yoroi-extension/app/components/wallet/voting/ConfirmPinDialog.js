@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { observable, action } from 'mobx';
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type { $npm$ReactIntl$IntlFormat, MessageDescriptor } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import globalMessages from '../../../i18n/global-messages';
 
@@ -26,6 +26,7 @@ const messages = defineMessages({
 });
 
 type Props = {|
+  +stepsList: Array<MessageDescriptor>,
   +progressInfo: ProgressInfo,
   +goBack: void => void,
   +submit: void => PossiblyAsync<void>,
@@ -51,6 +52,7 @@ export default class ConfirmPinDialog extends Component<Props> {
   render(): Node {
     const { intl } = this.context;
     const {
+      stepsList,
       progressInfo,
       goBack,
       cancel,
@@ -74,7 +76,11 @@ export default class ConfirmPinDialog extends Component<Props> {
         backButton={<DialogBackButton onBack={goBack} />}
         onClose={cancel}
       >
-        <ProgressStepBlock progressInfo={progressInfo} classicTheme={classicTheme} />
+        <ProgressStepBlock
+          stepsList={stepsList}
+          progressInfo={progressInfo}
+          classicTheme={classicTheme}
+        />
         <div className={classnames([styles.lineText, styles.firstItem])}>
           <FormattedHTMLMessage {...messages.line1} />
         </div>

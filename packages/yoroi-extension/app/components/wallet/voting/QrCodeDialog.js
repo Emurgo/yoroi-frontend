@@ -4,7 +4,7 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { defineMessages, intlShape } from 'react-intl';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type { $npm$ReactIntl$IntlFormat, MessageDescriptor } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 import Dialog from '../../widgets/Dialog';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
@@ -34,6 +34,7 @@ const messages = defineMessages({
 });
 
 type Props = {|
+  +stepsList: Array<MessageDescriptor>,
   +progressInfo: ProgressInfo,
   +onExternalLinkClick: MouseEvent => void,
   +submit: void => PossiblyAsync<void>,
@@ -50,7 +51,7 @@ export default class QrCodeDialog extends Component<Props> {
 
   render(): Node {
     const { intl } = this.context;
-    const { progressInfo, submit, cancel, classicTheme, votingKey } = this.props;
+    const { stepsList, progressInfo, submit, cancel, classicTheme, votingKey } = this.props;
 
     const dialogActions = [
       {
@@ -69,7 +70,11 @@ export default class QrCodeDialog extends Component<Props> {
         closeButton={<DialogCloseButton />}
         onClose={cancel}
       >
-        <ProgressStepBlock progressInfo={progressInfo} classicTheme={classicTheme} />
+        <ProgressStepBlock
+          stepsList={stepsList}
+          progressInfo={progressInfo}
+          classicTheme={classicTheme}
+        />
 
         <div className={classnames([styles.lineTitle, styles.firstItem])}>
           {intl.formatMessage(messages.lineTitle)}

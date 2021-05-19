@@ -13,7 +13,7 @@ import DialogBackButton from '../../widgets/DialogBackButton';
 
 import ProgressStepBlock from './ProgressStepBlock';
 
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type { $npm$ReactIntl$IntlFormat, MessageDescriptor } from 'react-intl';
 import { ProgressInfo } from '../../../stores/ada/VotingStore';
 
 import styles from './GeneratePinDialog.scss';
@@ -30,6 +30,7 @@ const messages = defineMessages({
 });
 
 type Props = {|
+  +stepsList: Array<MessageDescriptor>,
   +progressInfo: ProgressInfo,
   +next: void => void,
   +cancel: void => void,
@@ -46,7 +47,7 @@ export default class GeneratePinDialog extends Component<Props> {
 
   render(): Node {
     const { intl } = this.context;
-    const { progressInfo, next, cancel, classicTheme, pin } = this.props;
+    const { stepsList, progressInfo, next, cancel, classicTheme, pin } = this.props;
 
     const dialogActions = [
       {
@@ -75,7 +76,11 @@ export default class GeneratePinDialog extends Component<Props> {
         backButton={<DialogBackButton onBack={this.props.onBack} />}
         onClose={cancel}
       >
-        <ProgressStepBlock progressInfo={progressInfo} classicTheme={classicTheme} />
+        <ProgressStepBlock
+          stepsList={stepsList}
+          progressInfo={progressInfo}
+          classicTheme={classicTheme}
+        />
 
         <div className={classnames([styles.lineText, styles.firstItem, styles.importantText])}>
           <FormattedHTMLMessage {...messages.line1} />

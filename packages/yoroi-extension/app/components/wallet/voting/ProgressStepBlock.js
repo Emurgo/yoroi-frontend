@@ -3,13 +3,13 @@ import type { Node } from 'react';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type { $npm$ReactIntl$IntlFormat, MessageDescriptor } from 'react-intl';
 
 import ProgressSteps from '../../widgets/ProgressSteps';
-import globalMessages from '../../../i18n/global-messages';
 import { ProgressInfo } from '../../../stores/ada/VotingStore';
 
 type Props = {|
+  +stepsList: Array<MessageDescriptor>,
   +progressInfo: ProgressInfo,
   +classicTheme: boolean
 |};
@@ -23,17 +23,11 @@ export default class ProgressStepBlock extends Component<Props> {
 
   render(): Node {
     const { intl } = this.context;
-    const { progressInfo, classicTheme } = this.props;
+    const { stepsList, progressInfo, classicTheme } = this.props;
 
     return (
       <ProgressSteps
-        stepsList={[
-          intl.formatMessage(globalMessages.stepPin),
-          intl.formatMessage(globalMessages.stepConfirm),
-          intl.formatMessage(globalMessages.registerLabel),
-          intl.formatMessage(globalMessages.transactionLabel),
-          intl.formatMessage(globalMessages.stepQrCode)
-        ]}
+        stepsList={stepsList.map(intl.formatMessage)}
         currentStep={progressInfo.currentStep}
         stepState={progressInfo.stepState}
         classicTheme={classicTheme}
