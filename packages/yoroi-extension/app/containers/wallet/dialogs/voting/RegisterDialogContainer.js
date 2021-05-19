@@ -4,7 +4,7 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { computed } from 'mobx';
 import { intlShape } from 'react-intl';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type { $npm$ReactIntl$IntlFormat, MessageDescriptor } from 'react-intl';
 import globalMessages from '../../../../i18n/global-messages';
 import AnnotatedLoader from '../../../../components/transfer/AnnotatedLoader';
 import DialogCloseButton from '../../../../components/widgets/DialogCloseButton';
@@ -20,6 +20,7 @@ export type GeneratedData = typeof RegisterDialogContainer.prototype.generated;
 
 type Props = {|
   ...InjectedOrGenerated<GeneratedData>,
+  +stepsList: Array<MessageDescriptor>,
   +submit: void => PossiblyAsync<void>,
   +cancel: void => void,
   +goBack: void => void,
@@ -35,7 +36,7 @@ export default class RegisterDialogContainer extends Component<Props> {
 
   render(): Node {
     const { intl } = this.context;
-    const { submit, cancel, onError, classicTheme } = this.props;
+    const { submit, cancel, onError, classicTheme, stepsList } = this.props;
     const { votingRegTransaction } = this.generated.stores.substores.ada;
     const votingStore = this.generated.stores.substores.ada.votingStore;
 
@@ -61,6 +62,7 @@ export default class RegisterDialogContainer extends Component<Props> {
     }
     return (
       <RegisterDialog
+        stepsList={stepsList}
         progressInfo={votingStore.progressInfo}
         submit={async (walletPassword: string) => {
           try {

@@ -4,7 +4,7 @@ import React, { Component } from 'react';
 import { observer, } from 'mobx-react';
 import { computed, } from 'mobx';
 import { intlShape } from 'react-intl';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type { $npm$ReactIntl$IntlFormat, MessageDescriptor } from 'react-intl';
 import type { InjectedOrGenerated } from '../../../../types/injectedPropsType';
 import VotingRegTxDialog from '../../../../components/wallet/voting/VotingRegTxDialog';
 import { WalletTypeOption } from '../../../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
@@ -19,6 +19,7 @@ export type GeneratedData = typeof TransactionDialogContainer.prototype.generate
 
 type Props = {|
   ...InjectedOrGenerated<GeneratedData>,
+  +stepsList: Array<MessageDescriptor>,
   +submit: void => PossiblyAsync<void>,
   +cancel: void => void,
   +goBack: void => void,
@@ -33,7 +34,7 @@ export default class TransactionDialogContainer extends Component<Props> {
   };
 
   render(): Node {
-    const { submit, cancel, goBack, onError } = this.props;
+    const { stepsList, submit, cancel, goBack, onError } = this.props;
     const selectedWallet = this.generated.stores.wallets.selected;
     if (selectedWallet == null) {
       return null;
@@ -45,6 +46,7 @@ export default class TransactionDialogContainer extends Component<Props> {
     if (votingRegTx != null) {
       return (
         <VotingRegTxDialog
+          stepsList={stepsList}
           progressInfo={votingStore.progressInfo}
           staleTx={votingRegTransactionStore.isStale}
           transactionFee={votingRegTx.fee()}
