@@ -77,7 +77,25 @@ export default class Voting extends Component<Props> {
     return (
       <>
         {pendingTxWarningComponent}
+
         <div className={styles.voting}>
+          <div className={styles.delegationStatus}>
+            {this.props.isDelegated ?
+              (
+                <div className={styles.lineText}>
+                  {intl.formatMessage(messages.keepDelegated)}
+                </div>
+              ) :
+              (
+                <div className={styles.warningBox}>
+                  <WarningBox>
+                    {intl.formatMessage(messages.notDelegated)}
+                  </WarningBox>
+                </div>
+              )
+            }
+          </div>
+
           <div className={classnames([styles.lineTitle, styles.firstItem])}>
             {intl.formatMessage(messages.lineTitle, { round })}
           </div>
@@ -119,22 +137,6 @@ export default class Voting extends Component<Props> {
                 {intl.formatMessage(messages.line4)}
               </div>
             </div>
-          </div>
-          <div className={styles.delegationStatus}>
-            {this.props.isDelegated ?
-              (
-                <div className={styles.lineText}>
-                  {intl.formatMessage(messages.keepDelegated)}
-                </div>
-              ) :
-              (
-                <div className={styles.warningBox}>
-                  <WarningBox>
-                    {intl.formatMessage(messages.notDelegated)}
-                  </WarningBox>
-                </div>
-              )
-            }
           </div>
           <div className={styles.registerButton}>
             <Button
