@@ -33,7 +33,6 @@ import { MultiToken } from '../../../api/common/lib/MultiToken';
 import BigNumber from 'bignumber.js';
 import type { ShelleyCip1852CacheValue } from '../../../../stories/helpers/cardano/ShelleyCip1852Mocks';
 import { CATALYST_MIN_AMOUNT } from '../../../config/numbersConfig';
-import globalMessages from '../../../i18n/global-messages';
 
 export default {
   title: `${__filename.split('.')[0]}`,
@@ -145,13 +144,6 @@ const genVotingRegistrationDialogProps: ({|
   },
   TransactionDialogProps: request.TransactionDialogProps || (null: any),
   RegisterDialogProps: request.RegisterDialogProps || (null: any),
-  stepsList: [
-    globalMessages.stepPin,
-    globalMessages.stepConfirm,
-    globalMessages.registerLabel,
-    globalMessages.transactionLabel,
-    globalMessages.stepQrCode,
-  ],
 })
 
 const genRegisterDialogProps: ({|

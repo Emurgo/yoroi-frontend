@@ -13,6 +13,7 @@ import PlayStoreBadge from '../../../assets/images/google-play-badge.inline.svg'
 import WarningBox from '../../widgets/WarningBox';
 
 import styles from './Voting.scss';
+import type { WalletType } from './types';
 
 const messages = defineMessages({
   lineTitle: {
@@ -48,8 +49,6 @@ const messages = defineMessages({
     defaultMessage: '!!!<a target="_blank" rel="noopener noreferrer" href="https://emurgo.github.io/yoroi-extension-ledger-connect-vnext/catalyst#/update-ledger-app">Update</a>the Cardano app on your Ledger to version 2.3.2 or above with <a target="_blank" rel="noopener noreferrer" href="https://www.ledger.com/ledger-live"> Ledger Live</a>.',
   },
 });
-
-export type WalletType = 'mnemonic' | 'trezorT' | 'ledgerNano';
 
 type Props = {|
   +start: void => void,

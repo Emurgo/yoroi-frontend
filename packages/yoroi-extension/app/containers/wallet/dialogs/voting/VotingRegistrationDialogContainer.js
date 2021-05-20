@@ -15,14 +15,15 @@ import RegisterDialogContainer from './RegisterDialogContainer';
 import type { GeneratedData as TransactionDialogData } from './TransactionDialogContainer';
 import type { GeneratedData as RegisterDialogData } from './RegisterDialogContainer';
 import { ProgressStep, ProgressInfo } from '../../../../stores/ada/VotingStore';
-import type { MessageDescriptor } from 'react-intl';
+import type { WalletType } from '../../../../components/wallet/voting/types';
+import globalMessages from '../../../../i18n/global-messages';
 
 export type GeneratedData = typeof VotingRegistrationDialogContainer.prototype.generated;
 
 type Props = {|
   ...InjectedOrGenerated<GeneratedData>,
-  +stepsList: Array<MessageDescriptor>,
   +onClose: void => void,
+  +walletType: WalletType,
 |};
 
 @observer
@@ -45,7 +46,14 @@ export default class VotingRegistrationDialogContainer extends Component<Props> 
     const { profile } = this.generated.stores;
     const votingStore = this.generated.stores.substores.ada.votingStore;
     const votingActions = this.generated.actions.ada.votingActions;
-    const stepsList = this.props.stepsList;
+    const walletType = this.props.walletType;
+    const stepsList = [
+      globalMessages.stepPin,
+      globalMessages.stepConfirm,
+      ...(walletType === 'mnemonic' ? [globalMessages.registerLabel] : []),
+      globalMessages.transactionLabel,
+      globalMessages.stepQrCode,
+    ];
 
     let component = null;
 
@@ -101,6 +109,7 @@ export default class VotingRegistrationDialogContainer extends Component<Props> 
             submit={votingActions.submitTransaction.trigger}
             goBack={votingActions.goBackToRegister.trigger}
             onError={votingActions.submitTransactionError.trigger}
+            walletType={walletType}
           />);
         break;
       case ProgressStep.QR_CODE:
@@ -176,7 +185,6 @@ export default class VotingRegistrationDialogContainer extends Component<Props> 
     |},
     TransactionDialogProps: InjectedOrGenerated<TransactionDialogData>,
     RegisterDialogProps: InjectedOrGenerated<RegisterDialogData>,
-    stepsList: Array<MessageDescriptor>,
     |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
@@ -184,7 +192,7 @@ export default class VotingRegistrationDialogContainer extends Component<Props> 
     if (this.props.stores == null || this.props.actions == null) {
       throw new Error(`${nameof(VotingRegistrationDialogContainer)} no way to generated props`);
     }
-    const { stores, actions, stepsList } = this.props;
+    const { stores, actions } = this.props;
     return Object.freeze({
       stores: {
         profile: {
@@ -244,7 +252,6 @@ export default class VotingRegistrationDialogContainer extends Component<Props> 
         ({ actions, stores, }: InjectedOrGenerated<TransactionDialogData>),
       RegisterDialogProps:
         ({ actions, stores, }: InjectedOrGenerated<RegisterDialogData>),
-      stepsList,
     });
   }
 }
