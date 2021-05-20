@@ -7,13 +7,13 @@ import { intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat, MessageDescriptor } from 'react-intl';
 import type { InjectedOrGenerated } from '../../../../types/injectedPropsType';
 import VotingRegTxDialog from '../../../../components/wallet/voting/VotingRegTxDialog';
-import { WalletTypeOption } from '../../../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import LocalizableError from '../../../../i18n/LocalizableError';
 import { PublicDeriver } from '../../../../api/ada/lib/storage/models/PublicDeriver/index';
 import type { CreateVotingRegTxFunc } from '../../../../api/ada/index';
 import { ProgressInfo } from '../../../../stores/ada/VotingStore';
 import type { TokenInfoMap } from '../../../../stores/toplevel/TokenInfoStore';
 import { genLookupOrFail } from '../../../../stores/stateless/tokenHelpers';
+import type { WalletType } from '../../../../components/wallet/voting/types';
 
 export type GeneratedData = typeof TransactionDialogContainer.prototype.generated;
 
@@ -25,6 +25,7 @@ type Props = {|
   +goBack: void => void,
   +classicTheme: boolean,
   +onError: Error => void,
+  +walletType: WalletType,
 |};
 
 @observer
@@ -34,7 +35,7 @@ export default class TransactionDialogContainer extends Component<Props> {
   };
 
   render(): Node {
-    const { stepsList, submit, cancel, goBack, onError } = this.props;
+    const { stepsList, submit, cancel, goBack, onError, walletType } = this.props;
     const selectedWallet = this.generated.stores.wallets.selected;
     if (selectedWallet == null) {
       return null;
@@ -51,9 +52,6 @@ export default class TransactionDialogContainer extends Component<Props> {
           staleTx={votingRegTransactionStore.isStale}
           transactionFee={votingRegTx.fee()}
           isSubmitting={this.generated.stores.wallets.sendMoneyRequest.isExecuting}
-          isHardware={
-            selectedWallet.getParent().getWalletType() === WalletTypeOption.HARDWARE_WALLET
-          }
           getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
           onCancel={cancel}
           goBack={goBack}
@@ -71,6 +69,7 @@ export default class TransactionDialogContainer extends Component<Props> {
           }
           classicTheme={this.props.classicTheme}
           error={votingStore.error}
+          walletType={walletType}
         />
       );
     }

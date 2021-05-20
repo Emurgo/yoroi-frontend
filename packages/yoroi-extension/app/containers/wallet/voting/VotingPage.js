@@ -11,9 +11,6 @@ import VotingRegistrationDialogContainer from '../dialogs/voting/VotingRegistrat
 import type { GeneratedData as VotingRegistrationDialogContainerData } from '../dialogs/voting/VotingRegistrationDialogContainer';
 import { handleExternalLinkClick } from '../../../utils/routing';
 import {
-  isTrezorTWallet,
-} from '../../../api/ada/lib/storage/models/ConceptualWallet/index';
-import {
   WalletTypeOption,
 } from '../../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import UnsupportedWallet from '../UnsupportedWallet';
@@ -29,7 +26,6 @@ import { MultiToken } from '../../../api/common/lib/MultiToken';
 import RegistrationOver from './RegistrationOver';
 import { networks, } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import type { DelegationRequests } from '../../../stores/toplevel/DelegationStore';
-import globalMessages from '../../../i18n/global-messages';
 import {
   isLedgerNanoWallet,
   isTrezorTWallet,
@@ -150,7 +146,9 @@ export default class VotingPage extends Component<Props> {
     }
 
     let walletType;
-    if (!isHardwareWallet) {
+    if (
+      selected.getParent().getWalletType() !== WalletTypeOption.HARDWARE_WALLET
+    ) {
       walletType = 'mnemonic';
     } else if (isTrezorTWallet(selected.getParent())) {
       walletType = 'trezorT';
@@ -160,24 +158,12 @@ export default class VotingPage extends Component<Props> {
       throw new Error(`${nameof(VotingPage)} unexpected wallet type`);
     }
 
-    const stepsList = [
-      globalMessages.stepPin,
-      globalMessages.stepConfirm,
-      ...(
-        selected.getParent().getWalletType() === WalletTypeOption.HARDWARE_WALLET
-          ? []
-          : [globalMessages.registerLabel]
-      ),
-      globalMessages.transactionLabel,
-      globalMessages.stepQrCode,
-    ];
-
     if (uiDialogs.isOpen(VotingRegistrationDialogContainer)) {
       activeDialog = (
         <VotingRegistrationDialogContainer
           {...this.generated.VotingRegistrationDialogProps}
           onClose={this.onClose}
-          stepsList={stepsList}
+          walletType={walletType}
         />
       );
     }
