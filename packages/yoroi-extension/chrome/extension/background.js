@@ -338,7 +338,9 @@ chrome.runtime.onMessage.addListener(async (
             throw new Error('could not get all utxos');
           }
           const utxos = await canGetAllUtxos.getAllUtxos();
-          return await connectorSignTx(wallet, password, utxos, tx, indices);
+          const stateFetcher = await getStateFetcher(localStorageApi);
+          const bestBlock = await stateFetcher.getBestBlock({ network: wallet.getParent().getNetworkInfo() });
+          return await connectorSignTx(wallet, password, utxos, bestBlock, tx, indices);
         },
         db,
         localStorageApi
