@@ -17,6 +17,7 @@ import type { GeneratedData as RegisterDialogData } from './RegisterDialogContai
 import { ProgressStep, ProgressInfo } from '../../../../stores/ada/VotingStore';
 import type { WalletType } from '../../../../components/wallet/voting/types';
 import globalMessages from '../../../../i18n/global-messages';
+import CreateTxExecutingDialog from '../../../../components/wallet/voting/CreateTxExecutingDialog'
 
 export type GeneratedData = typeof VotingRegistrationDialogContainer.prototype.generated;
 
@@ -42,9 +43,12 @@ export default class VotingRegistrationDialogContainer extends Component<Props> 
   }
 
   render(): null | Node {
+    const votingStore = this.generated.stores.substores.ada.votingStore;
+    if (votingStore.createVotingRegTx.isExecuting) {
+      return (<CreateTxExecutingDialog />);
+    }
 
     const { profile } = this.generated.stores;
-    const votingStore = this.generated.stores.substores.ada.votingStore;
     const votingActions = this.generated.actions.ada.votingActions;
     const walletType = this.props.walletType;
     const stepsList = [
@@ -89,6 +93,7 @@ export default class VotingRegistrationDialogContainer extends Component<Props> 
                 return pin === enteredPin;
               }
             }
+            isProcessing={votingStore.isActionProcessing}
           />);
         break;
       case ProgressStep.REGISTER:
@@ -183,6 +188,10 @@ export default class VotingRegistrationDialogContainer extends Component<Props> 
             pin: Array<number>,
             progressInfo: ProgressInfo,
             encryptedKey: string | null,
+            isActionProcessing: boolean,
+            createVotingRegTx: {|
+              isExecuting: boolean,
+            |},
           |},
         |}
       |}
@@ -208,6 +217,10 @@ export default class VotingRegistrationDialogContainer extends Component<Props> 
               progressInfo: stores.substores.ada.votingStore.progressInfo,
               pin: stores.substores.ada.votingStore.pin,
               encryptedKey: stores.substores.ada.votingStore.encryptedKey,
+              isActionProcessing: stores.substores.ada.votingStore.isActionProcessing,
+              createVotingRegTx: {
+                isExecuting: stores.substores.ada.votingStore.createVotingRegTx.isExecuting,
+              },
             },
           },
         },

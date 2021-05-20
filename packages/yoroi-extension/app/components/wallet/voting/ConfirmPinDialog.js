@@ -35,6 +35,7 @@ type Props = {|
   +cancel: void => void,
   +classicTheme: boolean,
   +pinValidation: string => boolean,
+  +isProcessing: boolean,
 |};
 
 @observer
@@ -59,12 +60,15 @@ export default class ConfirmPinDialog extends Component<Props> {
       cancel,
       classicTheme,
       pinValidation,
+      isProcessing,
     } = this.props;
 
     const dailogActions = [{
       label: intl.formatMessage(globalMessages.stepConfirm),
       primary: true,
       onClick: this._submitForm,
+      isSubmitting: isProcessing,
+      disabled: isProcessing,
     }];
 
     return (
