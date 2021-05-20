@@ -17,7 +17,7 @@ import DialogBackButton from '../../widgets/DialogBackButton';
 import globalMessages from '../../../i18n/global-messages';
 import LocalizableError from '../../../i18n/LocalizableError';
 import styles from './VotingRegTxDialog.scss';
-import type { $npm$ReactIntl$IntlFormat, MessageDescriptor } from 'react-intl';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import SpendingPasswordInput from '../../widgets/forms/SpendingPasswordInput';
 import AmountInputSkin from '../skins/AmountInputSkin';
 import { NumericInput } from 'react-polymorph/lib/components/NumericInput';
@@ -34,7 +34,7 @@ import { truncateToken } from '../../../utils/formatters';
 import {
   MultiToken,
 } from '../../../api/common/lib/MultiToken';
-import type { WalletType } from './types';
+import type { WalletType, StepsList } from './types';
 
 const messages = defineMessages({
   line1: {
@@ -52,7 +52,7 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  +stepsList: Array<MessageDescriptor>,
+  +stepsList: StepsList,
   +progressInfo: ProgressInfo,
   +staleTx: boolean,
   +transactionFee: MultiToken,

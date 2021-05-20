@@ -4,7 +4,7 @@ import React, { Component } from 'react';
 import { observer, } from 'mobx-react';
 import { computed, } from 'mobx';
 import { intlShape } from 'react-intl';
-import type { $npm$ReactIntl$IntlFormat, MessageDescriptor } from 'react-intl';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { InjectedOrGenerated } from '../../../../types/injectedPropsType';
 import VotingRegTxDialog from '../../../../components/wallet/voting/VotingRegTxDialog';
 import LocalizableError from '../../../../i18n/LocalizableError';
@@ -13,13 +13,16 @@ import type { CreateVotingRegTxFunc } from '../../../../api/ada/index';
 import { ProgressInfo } from '../../../../stores/ada/VotingStore';
 import type { TokenInfoMap } from '../../../../stores/toplevel/TokenInfoStore';
 import { genLookupOrFail } from '../../../../stores/stateless/tokenHelpers';
-import type { WalletType } from '../../../../components/wallet/voting/types';
+import type {
+  WalletType,
+  StepsList,
+} from '../../../../components/wallet/voting/types';
 
 export type GeneratedData = typeof TransactionDialogContainer.prototype.generated;
 
 type Props = {|
   ...InjectedOrGenerated<GeneratedData>,
-  +stepsList: Array<MessageDescriptor>,
+  +stepsList: StepsList,
   +submit: void => PossiblyAsync<void>,
   +cancel: void => void,
   +goBack: void => void,

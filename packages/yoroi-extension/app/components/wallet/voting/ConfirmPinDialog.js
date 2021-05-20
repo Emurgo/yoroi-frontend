@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { observable, action } from 'mobx';
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
-import type { $npm$ReactIntl$IntlFormat, MessageDescriptor } from 'react-intl';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import globalMessages from '../../../i18n/global-messages';
 
@@ -17,6 +17,7 @@ import { ProgressInfo } from '../../../stores/ada/VotingStore';
 import PinInput from '../../widgets/forms/PinInput';
 
 import styles from './ConfirmPinDialog.scss';
+import type { StepsList } from './types';
 
 const messages = defineMessages({
   line1: {
@@ -26,7 +27,7 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  +stepsList: Array<MessageDescriptor>,
+  +stepsList: StepsList,
   +progressInfo: ProgressInfo,
   +goBack: void => void,
   +submit: void => PossiblyAsync<void>,

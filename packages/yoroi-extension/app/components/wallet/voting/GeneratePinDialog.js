@@ -13,10 +13,11 @@ import DialogBackButton from '../../widgets/DialogBackButton';
 
 import ProgressStepBlock from './ProgressStepBlock';
 
-import type { $npm$ReactIntl$IntlFormat, MessageDescriptor } from 'react-intl';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { ProgressInfo } from '../../../stores/ada/VotingStore';
 
 import styles from './GeneratePinDialog.scss';
+import type { StepsList } from './types';
 
 const messages = defineMessages({
   line1: {
@@ -30,7 +31,7 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  +stepsList: Array<MessageDescriptor>,
+  +stepsList: StepsList,
   +progressInfo: ProgressInfo,
   +next: void => void,
   +cancel: void => void,

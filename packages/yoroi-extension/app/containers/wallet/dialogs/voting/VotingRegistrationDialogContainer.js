@@ -48,11 +48,15 @@ export default class VotingRegistrationDialogContainer extends Component<Props> 
     const votingActions = this.generated.actions.ada.votingActions;
     const walletType = this.props.walletType;
     const stepsList = [
-      globalMessages.stepPin,
-      globalMessages.stepConfirm,
-      ...(walletType === 'mnemonic' ? [globalMessages.registerLabel] : []),
-      globalMessages.transactionLabel,
-      globalMessages.stepQrCode,
+      { step: ProgressStep.GENERATE, message: globalMessages.stepPin },
+      { step: ProgressStep.CONFIRM, message: globalMessages.stepConfirm },
+      ...(
+        walletType === 'mnemonic' ?
+          [{ step: ProgressStep.REGISTER, message: globalMessages.registerLabel }] :
+          []
+      ),
+      { step: ProgressStep.TRANSACTION, message: globalMessages.transactionLabel },
+      { step: ProgressStep.QR_CODE, message: globalMessages.stepQrCode },
     ];
 
     let component = null;

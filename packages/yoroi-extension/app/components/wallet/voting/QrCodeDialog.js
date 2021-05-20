@@ -4,13 +4,14 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { defineMessages, intlShape } from 'react-intl';
-import type { $npm$ReactIntl$IntlFormat, MessageDescriptor } from 'react-intl';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 import Dialog from '../../widgets/Dialog';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
 import ProgressStepBlock from './ProgressStepBlock';
 import { ProgressInfo } from '../../../stores/ada/VotingStore';
 import QrCodeWrapper from '../../widgets/QrCodeWrapper';
+import type { StepsList } from './types';
 
 import styles from './QrCodeDialog.scss';
 
@@ -34,7 +35,7 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  +stepsList: Array<MessageDescriptor>,
+  +stepsList: StepsList,
   +progressInfo: ProgressInfo,
   +onExternalLinkClick: MouseEvent => void,
   +submit: void => PossiblyAsync<void>,
