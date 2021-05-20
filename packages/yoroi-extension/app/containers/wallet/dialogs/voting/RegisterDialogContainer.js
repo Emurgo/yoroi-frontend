@@ -4,7 +4,7 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { computed } from 'mobx';
 import { intlShape } from 'react-intl';
-import type { $npm$ReactIntl$IntlFormat, MessageDescriptor } from 'react-intl';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import globalMessages from '../../../../i18n/global-messages';
 import AnnotatedLoader from '../../../../components/transfer/AnnotatedLoader';
 import DialogCloseButton from '../../../../components/widgets/DialogCloseButton';
@@ -15,12 +15,13 @@ import ErrorBlock from '../../../../components/widgets/ErrorBlock';
 import type { CreateVotingRegTxFunc } from '../../../../api/ada/index';
 import { ProgressInfo } from '../../../../stores/ada/VotingStore';
 import RegisterDialog from '../../../../components/wallet/voting/RegisterDialog';
+import type { StepsList } from '../../../../components/wallet/voting/types';
 
 export type GeneratedData = typeof RegisterDialogContainer.prototype.generated;
 
 type Props = {|
   ...InjectedOrGenerated<GeneratedData>,
-  +stepsList: Array<MessageDescriptor>,
+  +stepsList: StepsList,
   +submit: void => PossiblyAsync<void>,
   +cancel: void => void,
   +goBack: void => void,
