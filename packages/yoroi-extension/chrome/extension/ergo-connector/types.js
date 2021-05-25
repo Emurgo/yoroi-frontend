@@ -1,9 +1,9 @@
 // @flow
 
 import type { WalletChecksum } from '@emurgo/cip4-js';
-import { PublicDeriver } from '../../../app/api/ada/lib/storage/models/PublicDeriver/index';
-import { MultiToken } from '../../../app/api/common/lib/MultiToken';
-import { RustModule } from '../../../app/api/ada/lib/cardanoCrypto/rustLoader';
+import {PublicDeriver} from '../../../app/api/ada/lib/storage/models/PublicDeriver/index';
+import {MultiToken} from '../../../app/api/common/lib/MultiToken';
+import {RustModule} from '../../../app/api/ada/lib/cardanoCrypto/rustLoader';
 
 // ----- Types used in the dApp <-> Yoroi connection bridge ----- //
 
@@ -18,6 +18,37 @@ export function asAddress(input: any): Address {
     return input;
   }
   throw ConnectorError.invalidRequest(`invalid Address: ${JSON.stringify(input)}`);
+}
+
+export function asBoxCandidate(
+  input: any,
+  wasmInstance: typeof RustModule.SigmaRust
+): ErgoBoxCandidateJson {
+  try {
+    if (typeof input === 'object' &&
+        Array.isArray(input?.assets) &&
+        typeof input.additionalRegisters === 'object' &&
+        typeof input.creationHeight === 'number') {
+      const registers = Object.entries(input.additionalRegisters).map(([k, v]) => {
+        if (typeof k === 'string' && k.match(/^R[4-9]$/) != null) {
+          if (typeof v === 'string') {
+            return [k, v];
+          }
+        }
+        throw ConnectorError.invalidRequest(`additionalRegisters: Must be strings of the form "R4" to "R9": : ${JSON.stringify(input)}`);
+      });
+      return {
+        value: asValue(input.value),
+        ergoTree: asErgoTree(input.ergoTree),
+        assets: input.assets.map(asTokenAmount),
+        additionalRegisters: Object.fromEntries(registers),
+        creationHeight: input.creationHeight
+      };
+    }
+  } catch (err) {
+    throw ConnectorError.invalidRequest(`Box invalid structure: ${JSON.stringify(input)} due to ${err}`);
+  }
+  throw ConnectorError.invalidRequest(`Box invalid structure: ${JSON.stringify(input)}`);
 }
 
 export function asBox(
@@ -270,10 +301,9 @@ export function asTx(
         Array.isArray(tx.dataInputs) &&
         Array.isArray(tx.outputs)) {
       return {
-        id: asTxId(tx.id),
         inputs: tx.inputs.map(input => asUnsignedInput(input, wasmInstance)),
         dataInputs: tx.dataInputs.map(asDataInput),
-        outputs: tx.outputs.map(output => asBox(output, wasmInstance)),
+        outputs: tx.outputs.map(output => asBoxCandidate(output, wasmInstance)),
       };
     }
   } catch (err) {

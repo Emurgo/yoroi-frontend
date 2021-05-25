@@ -11,7 +11,7 @@
     "start": "webpack-dev-server"
   },
   "devDependencies": {
-    "ergo-lib-wasm-browser": "0.10.0",
+    "ergo-lib-wasm-browser": "0.13.0-alpha-503e98e",
     "webpack": "^4.29.3",
     "webpack-cli": "^3.1.0",
     "webpack-dev-server": "^3.1.5",
