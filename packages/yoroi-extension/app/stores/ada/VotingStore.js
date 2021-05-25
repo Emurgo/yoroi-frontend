@@ -14,13 +14,14 @@ import {
   asGetSigningKey,
   asGetAllAccounting,
   asGetStakingKey,
+  asGetPublicKey,
+  asHasLevels,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import {
   isCardanoHaskell,
   getCardanoHaskellBaseConfig,
 } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { genTimeToSlot } from '../../api/ada/lib/storage/bridge/timeUtils';
-import { unwrapStakingKey } from '../../api/ada/lib/storage/bridge/utils';
 import { generatePrivateKeyForCatalyst } from '../../api/ada/lib/cardanoCrypto/cryptoWallet';
 import {
   isLedgerNanoWallet,
@@ -40,6 +41,8 @@ import cryptoRandomString from 'crypto-random-string';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import { generateRegistration } from '../../api/ada/lib/cardanoCrypto/catalyst';
+import { derivePublicByAddressing } from '../../api/ada/lib/cardanoCrypto/utils'
+import type { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet'
 
 export const ProgressStep = Object.freeze({
   GENERATE: 0,
@@ -250,12 +253,30 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
           throw new Error(`${nameof(this._createTransaction)} can't get staking key`);
         }
         const stakingKeyResp = await withStakingKey.getStakingKey();
-        const stakingKey = unwrapStakingKey(stakingKeyResp.addr.Hash);
 
-        const rewardAddress = RustModule.WalletV4.RewardAddress.new(
-          Number.parseInt(config.ChainNetworkId, 10),
-          stakingKey,
+        const withPublicKey = asGetPublicKey(publicDeriver);
+        if (!withPublicKey) {
+          throw new Error(`${nameof(this._createTransaction)} can't get public key`);
+        }
+        const publicKeyResp = await withPublicKey.getPublicKey();
+        const publicKey = RustModule.WalletV4.Bip32PublicKey.from_bytes(
+          Buffer.from(publicKeyResp.Hash, 'hex')
         );
+
+        const withLevels = asHasLevels<ConceptualWallet>(publicDeriver);
+        if (!withLevels) {
+          throw new Error(`${nameof(this._createTransaction)} can't get level`);
+        }
+
+        const stakingKey = derivePublicByAddressing({
+          addressing: stakingKeyResp.addressing,
+          startingFrom: {
+            level: withLevels.getParent().getPublicDeriverLevel(),
+            key: publicKey,
+          },
+        }).to_raw_key();
+
+        const rewardAddress = stakingKeyResp.addr.Hash;
 
         votingRegTxPromise = this.createVotingRegTx.execute({
           publicDeriver: withHasUtxoChains,
@@ -263,8 +284,8 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
           ledgerNanoWallet: {
             votingPublicKey,
             stakingKeyPath: stakingKeyResp.addressing.path,
-            stakingKey: Buffer.from(stakingKey.to_bytes()).toString('hex'),
-            rewardAddress: Buffer.from(rewardAddress.to_address().to_bytes()).toString('hex'),
+            stakingKey: Buffer.from(stakingKey.as_bytes()).toString('hex'),
+            rewardAddress,
             nonce,
           },
         }).promise;
