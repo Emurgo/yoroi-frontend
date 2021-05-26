@@ -383,7 +383,7 @@ type CreateVotingRegTxRequestCommon = {|
 export type CreateVotingRegTxRequest = {|
   ...CreateVotingRegTxRequestCommon,
   normalWallet: {|
-    metadata: RustModule.WalletV4.GeneralTransactionMetadata,
+    metadata: RustModule.WalletV4.TransactionMetadata,
   |}
 |} | {|
   ...CreateVotingRegTxRequestCommon,
@@ -1430,7 +1430,7 @@ export default class AdaApi {
         // Pass a placeholder metadata so that the tx fee is correctly
         // calculated.
         const hwWallet = request.trezorTWallet || request.ledgerNanoWallet;
-        const generalMetadata = generateRegistrationMetadata(
+        trxMetadata = generateRegistrationMetadata(
           hwWallet.votingPublicKey,
           hwWallet.stakingKey,
           hwWallet.rewardAddress,
@@ -1439,14 +1439,9 @@ export default class AdaApi {
             return '0'.repeat(64 * 2)
           },
         );
-        trxMetadata = RustModule.WalletV4.TransactionMetadata.new(
-          generalMetadata
-        );
       } else {
         // Mnemonic wallet
-        trxMetadata = RustModule.WalletV4.TransactionMetadata.new(
-          request.normalWallet.metadata
-        );
+        trxMetadata = request.normalWallet.metadata;
       }
 
       const unsignedTx = shelleyNewAdaUnsignedTx(

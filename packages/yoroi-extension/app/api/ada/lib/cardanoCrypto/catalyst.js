@@ -21,7 +21,7 @@ export function generateRegistrationMetadata(
   rewardAddress: string,
   nonce: number,
   signer: Uint8Array => string,
-): RustModule.WalletV4.GeneralTransactionMetadata {
+): RustModule.WalletV4.TransactionMetadata {
 
   /**
     * Catalyst follows a certain standard to prove the voting power
@@ -68,7 +68,22 @@ export function generateRegistrationMetadata(
     )
   );
 
-  return generalMetadata;
+  // This is how Ledger constructs the metadata. We must be consistent with it.
+  const metadataList = RustModule.WalletV4.MetadataList.new();
+  metadataList.add(
+    RustModule.WalletV4.TransactionMetadatum.from_bytes(
+      generalMetadata.to_bytes()
+    )
+  );
+  metadataList.add(
+    RustModule.WalletV4.TransactionMetadatum.new_list(
+      RustModule.WalletV4.MetadataList.new()
+    )
+  );
+
+  return RustModule.WalletV4.TransactionMetadata.from_bytes(
+    metadataList.to_bytes()
+  );
 }
 
 export function generateRegistration(request: {|
@@ -76,7 +91,7 @@ export function generateRegistration(request: {|
   catalystPrivateKey: RustModule.WalletV4.PrivateKey,
   receiverAddress: Buffer,
   slotNumber: number,
-|}): RustModule.WalletV4.GeneralTransactionMetadata {
+|}): RustModule.WalletV4.TransactionMetadata {
   return generateRegistrationMetadata(
     Buffer.from(request.catalystPrivateKey.to_public().as_bytes()).toString('hex'),
     Buffer.from(request.stakePrivateKey.to_public().as_bytes()).toString('hex'),

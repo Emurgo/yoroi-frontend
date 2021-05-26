@@ -246,7 +246,7 @@ export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
         const { catalystRegistrationSignatureHex } =
           ledgerSignTxResp.auxiliaryDataSupplement;
 
-        const generalMetadata = generateRegistrationMetadata(
+        metadata = generateRegistrationMetadata(
           votingPublicKey,
           stakingKey,
           rewardAddress,
@@ -255,7 +255,11 @@ export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
             return catalystRegistrationSignatureHex;
           },
         );
-        metadata = RustModule.WalletV4.TransactionMetadata.new(generalMetadata);
+        // We can verify that
+        //  Buffer.from(
+        //    blake2b(256 / 8).update(metadata.to_bytes()).digest('binary')
+        //  ).toString('hex') ===
+        // ledgerSignTxResp.auxiliaryDataSupplement.auxiliaryDataHashaHex
       } else {
         metadata = request.signRequest.metadata;
       }
