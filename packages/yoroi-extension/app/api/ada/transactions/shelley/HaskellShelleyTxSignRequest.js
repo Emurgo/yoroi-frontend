@@ -40,6 +40,9 @@ type LedgerNanoCatalystRegistrationTxSignData = {|
   nonce: number,
 |};
 
+type TrezorTCatalystRegistrationTxSignData =
+  LedgerNanoCatalystRegistrationTxSignData;
+
 export class HaskellShelleyTxSignRequest
 implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
 
@@ -53,10 +56,8 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
     neededHashes: Set<string>, // StakeCredential
     wits: Set<string>, // Vkeywitness
   |};
-  trezorTCatalystRegistrationTxSignData: void | {|
-    votingPublicKey: string,
-    nonce: number,
-  |};
+  trezorTCatalystRegistrationTxSignData:
+    void | TrezorTCatalystRegistrationTxSignData;
   ledgerNanoCatalystRegistrationTxSignData:
     void | LedgerNanoCatalystRegistrationTxSignData;
 
@@ -70,10 +71,8 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
       neededHashes: Set<string>, // StakeCredential
       wits: Set<string>, // Vkeywitness
     |},
-    trezorTCatalystRegistrationTxSignData?: void | {|
-      votingPublicKey: string,
-      nonce: number,
-    |};
+    trezorTCatalystRegistrationTxSignData?: 
+      void | TrezorTCatalystRegistrationTxSignData;
     ledgerNanoCatalystRegistrationTxSignData?:
       void | LedgerNanoCatalystRegistrationTxSignData;
   |}) {

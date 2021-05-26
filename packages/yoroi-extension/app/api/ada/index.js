@@ -183,6 +183,7 @@ import { MultiToken } from '../common/lib/MultiToken';
 import type { DefaultTokenEntry } from '../common/lib/MultiToken';
 import { hasSendAllDefault, builtSendTokenList } from '../common/index';
 import { getReceiveAddress } from '../../stores/stateless/addressStores';
+import { generateRegistrationMetadata } from './lib/cardanoCrypto/catalyst';
 
 // ADA specific Request / Response params
 
@@ -388,6 +389,9 @@ export type CreateVotingRegTxRequest = {|
   ...CreateVotingRegTxRequestCommon,
   trezorTWallet: {|
     votingPublicKey: string,
+    stakingKeyPath: Array<number>,
+    stakingKey: string,
+    rewardAddress: string,
     nonce: number,
   |}
 |} | {|
@@ -1423,7 +1427,21 @@ export default class AdaApi {
       }
       let trxMetadata;
       if (request.trezorTWallet || request.ledgerNanoWallet) {
-        trxMetadata = undefined;
+        // Pass a placeholder metadata so that the tx fee is correctly
+        // calculated.
+        const hwWallet = request.trezorTWallet || request.ledgerNanoWallet;
+        const generalMetadata = generateRegistrationMetadata(
+          hwWallet.votingPublicKey,
+          hwWallet.stakingKey,
+          hwWallet.rewardAddress,
+          hwWallet.nonce,
+          (_hashedMetadata) => {
+            return '0'.repeat(64 * 2)
+          },
+        );
+        trxMetadata = RustModule.WalletV4.TransactionMetadata.new(
+          generalMetadata
+        );
       } else {
         // Mnemonic wallet
         trxMetadata = RustModule.WalletV4.TransactionMetadata.new(

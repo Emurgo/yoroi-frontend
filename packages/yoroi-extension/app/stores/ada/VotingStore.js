@@ -241,43 +241,49 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
     ) {
       const votingPublicKey = `0x${Buffer.from(catalystPrivateKey.to_public().as_bytes()).toString('hex')}`;
 
+      const withStakingKey = asGetStakingKey(publicDeriver);
+      if (!withStakingKey) {
+        throw new Error(`${nameof(this._createTransaction)} can't get staking key`);
+      }
+      const stakingKeyResp = await withStakingKey.getStakingKey();
+
+      const withPublicKey = asGetPublicKey(publicDeriver);
+      if (!withPublicKey) {
+        throw new Error(`${nameof(this._createTransaction)} can't get public key`);
+      }
+      const publicKeyResp = await withPublicKey.getPublicKey();
+      const publicKey = RustModule.WalletV4.Bip32PublicKey.from_bytes(
+        Buffer.from(publicKeyResp.Hash, 'hex')
+      );
+
+      const withLevels = asHasLevels<ConceptualWallet>(publicDeriver);
+      if (!withLevels) {
+        throw new Error(`${nameof(this._createTransaction)} can't get level`);
+      }
+
+      const stakingKey = derivePublicByAddressing({
+        addressing: stakingKeyResp.addressing,
+        startingFrom: {
+          level: withLevels.getParent().getPublicDeriverLevel(),
+          key: publicKey,
+        },
+      }).to_raw_key();
+
+      const rewardAddress = stakingKeyResp.addr.Hash;
+
       if (isTrezorTWallet(publicDeriver.getParent())) {
         votingRegTxPromise = this.createVotingRegTx.execute({
           publicDeriver: withHasUtxoChains,
           absSlotNumber,
-          trezorTWallet: { votingPublicKey, nonce },
+          trezorTWallet: {
+            votingPublicKey,
+            stakingKeyPath: stakingKeyResp.addressing.path,
+            stakingKey: Buffer.from(stakingKey.as_bytes()).toString('hex'),
+            rewardAddress,
+            nonce,
+          },
         }).promise;
       } else if (isLedgerNanoWallet(publicDeriver.getParent())) {
-        const withStakingKey = asGetStakingKey(publicDeriver);
-        if (!withStakingKey) {
-          throw new Error(`${nameof(this._createTransaction)} can't get staking key`);
-        }
-        const stakingKeyResp = await withStakingKey.getStakingKey();
-
-        const withPublicKey = asGetPublicKey(publicDeriver);
-        if (!withPublicKey) {
-          throw new Error(`${nameof(this._createTransaction)} can't get public key`);
-        }
-        const publicKeyResp = await withPublicKey.getPublicKey();
-        const publicKey = RustModule.WalletV4.Bip32PublicKey.from_bytes(
-          Buffer.from(publicKeyResp.Hash, 'hex')
-        );
-
-        const withLevels = asHasLevels<ConceptualWallet>(publicDeriver);
-        if (!withLevels) {
-          throw new Error(`${nameof(this._createTransaction)} can't get level`);
-        }
-
-        const stakingKey = derivePublicByAddressing({
-          addressing: stakingKeyResp.addressing,
-          startingFrom: {
-            level: withLevels.getParent().getPublicDeriverLevel(),
-            key: publicKey,
-          },
-        }).to_raw_key();
-
-        const rewardAddress = stakingKeyResp.addr.Hash;
-
         votingRegTxPromise = this.createVotingRegTx.execute({
           publicDeriver: withHasUtxoChains,
           absSlotNumber,
