@@ -71,7 +71,7 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
       neededHashes: Set<string>, // StakeCredential
       wits: Set<string>, // Vkeywitness
     |},
-    trezorTCatalystRegistrationTxSignData?: 
+    trezorTCatalystRegistrationTxSignData?:
       void | TrezorTCatalystRegistrationTxSignData;
     ledgerNanoCatalystRegistrationTxSignData?:
       void | LedgerNanoCatalystRegistrationTxSignData;
