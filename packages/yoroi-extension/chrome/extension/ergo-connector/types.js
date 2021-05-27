@@ -285,10 +285,9 @@ export function asTokenId(input: any): TokenId {
 }
 
 export type Tx = {|
-  id: TxId,
   inputs: UnsignedInput[],
   dataInputs: DataInput[],
-  outputs: ErgoBoxJson[],
+  outputs: ErgoBoxCandidateJson[],
 |};
 
 export function asTx(
