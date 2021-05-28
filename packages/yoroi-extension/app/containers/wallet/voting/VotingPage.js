@@ -10,7 +10,9 @@ import Voting from '../../../components/wallet/voting/Voting';
 import VotingRegistrationDialogContainer from '../dialogs/voting/VotingRegistrationDialogContainer';
 import type { GeneratedData as VotingRegistrationDialogContainerData } from '../dialogs/voting/VotingRegistrationDialogContainer';
 import { handleExternalLinkClick } from '../../../utils/routing';
-import { WalletTypeOption, } from '../../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
+import {
+  isTrezorTWallet,
+} from '../../../api/ada/lib/storage/models/ConceptualWallet/index';
 import UnsupportedWallet from '../UnsupportedWallet';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 import LoadingSpinner from '../../../components/widgets/LoadingSpinner';
@@ -89,7 +91,7 @@ export default class VotingPage extends Component<Props> {
       throw new Error(`${nameof(VotingPage)} no wallet selected`);
     }
 
-    if (selected.getParent().getWalletType() === WalletTypeOption.HARDWARE_WALLET) {
+    if (isTrezorTWallet(selected.getParent())) {
       return <UnsupportedWallet />;
     }
 
