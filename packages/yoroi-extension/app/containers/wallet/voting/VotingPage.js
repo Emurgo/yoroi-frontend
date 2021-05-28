@@ -15,7 +15,7 @@ import UnsupportedWallet from '../UnsupportedWallet';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 import LoadingSpinner from '../../../components/widgets/LoadingSpinner';
 import VerticallyCenteredLayout from '../../../components/layout/VerticallyCenteredLayout';
-import { CATALYST_MIN_AMOUNT } from '../../../config/numbersConfig';
+import { CATALYST_MIN_AMOUNT, CATALYST_DISPLAYED_MIN_AMOUNT } from '../../../config/numbersConfig';
 import InsufficientFundsPage from './InsufficientFundsPage';
 import { getTokenName, genLookupOrFail } from '../../../stores/stateless/tokenHelpers';
 import type { TokenInfoMap } from '../../../stores/toplevel/TokenInfoStore';
@@ -131,7 +131,9 @@ export default class VotingPage extends Component<Props> {
         currentBalance={
           balance.getDefaultEntry().amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals)
         }
-        requiredBalance={CATALYST_MIN_AMOUNT.shiftedBy(-tokenInfo.Metadata.numberOfDecimals)}
+        requiredBalance={
+          CATALYST_DISPLAYED_MIN_AMOUNT.shiftedBy(-tokenInfo.Metadata.numberOfDecimals)
+        }
         tokenName={getTokenName(tokenInfo)}
       />;
     }
