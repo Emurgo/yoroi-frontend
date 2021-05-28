@@ -17,7 +17,7 @@ import styles from './Voting.scss';
 const messages = defineMessages({
   lineTitle: {
     id: 'wallet.voting.lineTitle',
-    defaultMessage: '!!!Register to vote on Fund 3',
+    defaultMessage: '!!!Register to vote on Fund {round}',
   },
   line2: {
     id: 'wallet.voting.line2',
@@ -46,6 +46,7 @@ type Props = {|
   +onExternalLinkClick: MouseEvent => void,
   +hasAnyPending: boolean,
   +isDelegated: boolean,
+  +round: number,
 |};
 
 @observer
@@ -56,6 +57,8 @@ export default class Voting extends Component<Props> {
 
   render(): Node {
     const { intl } = this.context;
+
+    const round = this.props.round;
 
     const pendingTxWarningComponent = this.props.hasAnyPending
       ? (
@@ -76,7 +79,7 @@ export default class Voting extends Component<Props> {
         {pendingTxWarningComponent}
         <div className={styles.voting}>
           <div className={classnames([styles.lineTitle, styles.firstItem])}>
-            {intl.formatMessage(messages.lineTitle)}
+            {intl.formatMessage(messages.lineTitle, { round })}
           </div>
 
           <div className={styles.lineText}>
