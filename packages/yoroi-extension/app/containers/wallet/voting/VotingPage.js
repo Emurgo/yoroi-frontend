@@ -152,6 +152,7 @@ export default class VotingPage extends Component<Props> {
           hasAnyPending={this.generated.hasAnyPending}
           onExternalLinkClick={handleExternalLinkClick}
           isDelegated={this.isDelegated === true}
+          round={roundInfo.nextRound}
         />
       </div>
     );
