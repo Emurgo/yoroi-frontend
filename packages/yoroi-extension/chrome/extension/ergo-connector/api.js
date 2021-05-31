@@ -271,7 +271,9 @@ export async function connectorSignTx(
     keyLevel: wallet.getParent().getPublicDeriverLevel(),
     signingKey: finalSigningKey,
   });
-  const jsonBoxesToSign = tx.inputs.filter((box, index) => indices.includes(index));
+  const jsonBoxesToSign: Array<ErgoBoxJson> =
+    // $FlowFixMe[prop-missing]: our inputs are nearly like `ErgoBoxJson` just with one extra field
+    tx.inputs.filter((box, index) => indices.includes(index));
   processBoxesForSigmaRust(jsonBoxesToSign);
   const txBoxesToSign = RustModule.SigmaRust.ErgoBoxes.from_boxes_json(jsonBoxesToSign);
   const dataBoxIds = tx.dataInputs.map(box => box.boxId);
