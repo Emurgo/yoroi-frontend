@@ -199,8 +199,17 @@ export async function connectorGetChangeAddress(wallet: PublicDeriver<>): Promis
   throw new Error('could not get change address - this should never happen');
 }
 
+export type BoxLike = {
+  value: number | string,
+  assets: Array<{|
+    tokenId: string, // hex
+    amount: number | string,
+  |}>,
+  ...
+}
+
 // TODO: look into sigma rust string value support
-function processBoxesForSigmaRust(boxes: ErgoBoxJson[]) {
+function processBoxesForSigmaRust<T: BoxLike>(boxes: T[]) {
   for (const output of boxes) {
     output.value = parseInt(output.value, 10);
     if (output.value > Number.MAX_SAFE_INTEGER) {
@@ -262,7 +271,9 @@ export async function connectorSignTx(
     keyLevel: wallet.getParent().getPublicDeriverLevel(),
     signingKey: finalSigningKey,
   });
-  const jsonBoxesToSign = tx.inputs.filter((box, index) => indices.includes(index));
+  const jsonBoxesToSign: Array<ErgoBoxJson> =
+    // $FlowFixMe[prop-missing]: our inputs are nearly like `ErgoBoxJson` just with one extra field
+    tx.inputs.filter((box, index) => indices.includes(index));
   processBoxesForSigmaRust(jsonBoxesToSign);
   const txBoxesToSign = RustModule.SigmaRust.ErgoBoxes.from_boxes_json(jsonBoxesToSign);
   const dataBoxIds = tx.dataInputs.map(box => box.boxId);
