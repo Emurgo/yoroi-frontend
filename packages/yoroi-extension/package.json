@@ -188,7 +188,7 @@
     "mixwith": "0.1.1",
     "mobx": "5.15.7",
     "mobx-react": "6.3.1",
-    "mobx-react-form": "2.0.8",
+    "mobx-react-form": "2.0.9",
     "mobx-react-router": "4.1.0",
     "moment": "2.29.1",
     "path-browserify": "1.0.1",
