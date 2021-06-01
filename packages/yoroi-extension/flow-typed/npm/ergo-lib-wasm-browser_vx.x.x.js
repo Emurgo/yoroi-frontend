@@ -16,6 +16,17 @@ type ErgoBoxJson = {|
   index: number
 |};
 
+type ErgoBoxCandidateJson = {|
+  value: number | string,
+  ergoTree: string,
+  assets: Array<{|
+    tokenId: string, // hex
+    amount: number | string,
+  |}>,
+  creationHeight: number,
+  additionalRegisters: {| [key: string]: string |}
+|};
+
 type ErgoTxJson = {|
   id: string,
   inputs: Array<{|
