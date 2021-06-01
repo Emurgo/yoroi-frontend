@@ -302,7 +302,7 @@ export function asTx(
       return {
         inputs: tx.inputs.map(input => asUnsignedInput(input, wasmInstance)),
         dataInputs: tx.dataInputs.map(asDataInput),
-        outputs: tx.outputs.map(output => asBoxCandidate(output, wasmInstance)),
+        outputs: tx.outputs.map(output => asBoxCandidate(output /* , wasmInstance */)),
       };
     }
   } catch (err) {
