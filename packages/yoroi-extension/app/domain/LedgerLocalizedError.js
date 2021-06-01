@@ -31,6 +31,10 @@ export const ledgerErrors: * = defineMessages({
     id: 'wallet.hw.ledger.common.error.105',
     defaultMessage: '!!!Network error. Please check your internet connection.',
   },
+  cip15NotSupportedError106: {
+    id: 'wallet.hw.ledger.catalyst.unsupported.106',
+    defaultMessage: '!!!Please upgrade your Ledger firmware version to at least 2.0.0 and Caradano app version to 2.3.2 or above.',
+  },
 });
 
 export function convertToLocalizableError(error: Error): LocalizableError {
@@ -89,6 +93,11 @@ export function convertToLocalizableError(error: Error): LocalizableError {
       case "LedgerConnect Error: Timeout happened, Couldn't connect to connect handler":
         // Showing - Network error. Please check your internet connection.
         localizableError = new LocalizableError(ledgerErrors.networkError105);
+        break;
+      case 'catalyst registration not supported':
+        localizableError = new LocalizableError(
+          ledgerErrors.cip15NotSupportedError106
+        );
         break;
       default:
         /** we are not able to figure out why Error is thrown
