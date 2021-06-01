@@ -290,7 +290,7 @@ export async function connectorSignTx(
     timestamp: Date.now(),
     nBits: 682315684511744, // TODO: where to get difficulty? (does this impact signing?)
     height: bestBlock.height + 1,
-    votes: "040000", // TODO: where to get votes? (does this impact signing?)
+    votes: '040000', // TODO: where to get votes? (does this impact signing?)
   });
   const blockHeader = RustModule.SigmaRust.BlockHeader.from_json(headerJson);
   const preHeader = RustModule.SigmaRust.PreHeader.from_block_header(blockHeader);
