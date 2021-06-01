@@ -166,6 +166,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
           this.connectingMessage = response;
         });
       })
+      // eslint-disable-next-line no-console
       .catch(err => console.error(err));
   };
 
@@ -177,6 +178,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
           this.signingMessage = response;
         });
       })
+      // eslint-disable-next-line no-console
       .catch(err => console.error(err));
   };
 

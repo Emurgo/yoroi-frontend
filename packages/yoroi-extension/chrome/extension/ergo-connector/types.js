@@ -1,9 +1,9 @@
 // @flow
 
 import type { WalletChecksum } from '@emurgo/cip4-js';
-import {PublicDeriver} from '../../../app/api/ada/lib/storage/models/PublicDeriver/index';
-import {MultiToken} from '../../../app/api/common/lib/MultiToken';
-import {RustModule} from '../../../app/api/ada/lib/cardanoCrypto/rustLoader';
+import { PublicDeriver } from '../../../app/api/ada/lib/storage/models/PublicDeriver/index';
+import { MultiToken } from '../../../app/api/common/lib/MultiToken';
+import { RustModule } from '../../../app/api/ada/lib/cardanoCrypto/rustLoader';
 
 // ----- Types used in the dApp <-> Yoroi connection bridge ----- //
 
@@ -22,7 +22,7 @@ export function asAddress(input: any): Address {
 
 export function asBoxCandidate(
   input: any,
-  wasmInstance: typeof RustModule.SigmaRust
+  // wasmInstance: typeof RustModule.SigmaRust
 ): ErgoBoxCandidateJson {
   try {
     if (typeof input === 'object' &&
@@ -302,7 +302,7 @@ export function asTx(
       return {
         inputs: tx.inputs.map(input => asUnsignedInput(input, wasmInstance)),
         dataInputs: tx.dataInputs.map(asDataInput),
-        outputs: tx.outputs.map(output => asBoxCandidate(output, wasmInstance)),
+        outputs: tx.outputs.map(output => asBoxCandidate(output /* , wasmInstance */)),
       };
     }
   } catch (err) {
