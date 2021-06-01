@@ -192,7 +192,7 @@
     "mobx-react-router": "4.1.0",
     "moment": "2.29.1",
     "path-browserify": "1.0.1",
-    "pbkdf2": "3.1.1",
+    "pbkdf2": "3.1.2",
     "process": "0.11.10",
     "qr-image": "3.2.0",
     "qrcode.react": "1.0.1",
