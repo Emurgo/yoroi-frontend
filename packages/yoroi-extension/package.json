@@ -134,7 +134,7 @@
     "path-to-regexp": "6.2.0",
     "postcss": "8.2.6",
     "postcss-loader": "5.0.0",
-    "prettier": "2.2.1",
+    "prettier": "2.3.0",
     "raw-loader": "4.0.2",
     "react-intl-translations-manager": "5.0.3",
     "react-refresh": "0.9.0",
