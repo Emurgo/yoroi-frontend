@@ -102,7 +102,7 @@
     "chai-as-promised": "7.1.1",
     "chromedriver": "87.0.4",
     "config": "1.31.0",
-    "config-webpack": "1.0.4",
+    "config-webpack": "1.0.5",
     "crx": "5.0.1",
     "css-loader": "5.0.2",
     "cucumber": "git+https://github.com/SebastienGllmt/cucumber-js.git",
