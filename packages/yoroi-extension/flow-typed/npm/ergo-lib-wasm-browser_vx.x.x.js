@@ -16,6 +16,17 @@ type ErgoBoxJson = {|
   index: number
 |};
 
+type ErgoBoxCandidateJson = {|
+  value: number | string,
+  ergoTree: string,
+  assets: Array<{|
+    tokenId: string, // hex
+    amount: number | string,
+  |}>,
+  creationHeight: number,
+  additionalRegisters: {| [key: string]: string |}
+|};
+
 type ErgoTxJson = {|
   id: string,
   inputs: Array<{|
@@ -773,6 +784,12 @@ declare module 'ergo-lib-wasm-browser' { // need to wrap flowgen output into mod
     */
     get(index: number): ErgoBox;
   }
+  declare export class BlockHeader {
+    static from_json(json: string): BlockHeader;
+  }
+  declare export class PreHeader {
+    static from_block_header(block_header: BlockHeader): PreHeader;
+  }
   /**
   * TBD
   */
@@ -784,6 +801,8 @@ declare module 'ergo-lib-wasm-browser' { // need to wrap flowgen output into mod
     * @returns {ErgoStateContext}
     */
     static dummy(): ErgoStateContext;
+
+    constructor(pre_header: PreHeader): this;
   }
   /**
   * The root of ErgoScript IR. Serialized instances of this class are self sufficient and can be passed around.
