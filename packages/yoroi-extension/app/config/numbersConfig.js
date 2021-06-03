@@ -44,5 +44,7 @@ export const CARDANO_STABLE_SIZE = 2160;
  */
 export const ERGO_STABLE_SIZE = Number.MAX_SAFE_INTEGER / 2;
 
-// Catalyst fund 3 requires > 2950 ADA to participate
+// Catalyst fund 4 *technically* requires > 450 ADA to participate
+// However, the official min amount is 500 ADA
 export const CATALYST_MIN_AMOUNT: BigNumber = new BigNumber(450 * 1_000_000);
+export const CATALYST_DISPLAYED_MIN_AMOUNT: BigNumber = new BigNumber(500 * 1_000_000);
