@@ -92,8 +92,8 @@ export function ergoAddressToType(
   address: RustModule.SigmaRust.NetworkAddress,
 ): CoreAddressT {
   switch (address.address().address_type_prefix()) {
-    case RustModule.SigmaRust.AddressTypePrefix.P2PK: return CoreAddressTypes.ERGO_P2PK;
-    case RustModule.SigmaRust.AddressTypePrefix.Pay2SH: return CoreAddressTypes.ERGO_P2SH;
+    case RustModule.SigmaRust.AddressTypePrefix.P2Pk: return CoreAddressTypes.ERGO_P2PK;
+    case RustModule.SigmaRust.AddressTypePrefix.Pay2Sh: return CoreAddressTypes.ERGO_P2SH;
     case RustModule.SigmaRust.AddressTypePrefix.Pay2S: return CoreAddressTypes.ERGO_P2S;
     default: throw new Error(`${nameof(ergoAddressToType)} unknown Ergo address type ${address.to_base58()}`);
   }
