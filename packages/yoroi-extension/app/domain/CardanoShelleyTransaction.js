@@ -22,6 +22,8 @@ import {
 import type {
   DefaultTokenEntry,
 } from '../api/common/lib/MultiToken';
+import { parseMetadata } from '../api/ada/lib/storage/bridge/metadataUtils';
+import { CatalystLabels } from '../api/ada/lib/cardanoCrypto/catalyst';
 
 export default class CardanoShelleyTransaction extends WalletTransaction {
 
@@ -105,5 +107,22 @@ export default class CardanoShelleyTransaction extends WalletTransaction {
       state: tx.transaction.Status,
       errorMsg: tx.transaction.ErrorMessage,
     });
+  }
+
+  isCatalystVotingRegistration(): boolean {
+    if (this.metadata === null) {
+      return false;
+    }
+    const metadataString = parseMetadata(this.metadata);
+    let metadata;
+    try {
+      metadata = JSON.parse(metadataString);
+    } catch {
+      return false;
+    }
+    if (metadata[String(CatalystLabels.DATA)]) {
+      return true;
+    }
+    return false;
   }
 }
