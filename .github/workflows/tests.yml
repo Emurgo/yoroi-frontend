@@ -37,5 +37,4 @@ jobs:
           . install-all.sh
       - name: flow and lint
         run: |
-          npm run flow
-          npm run eslint
+          npm run test
