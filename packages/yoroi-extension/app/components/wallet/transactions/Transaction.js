@@ -255,26 +255,38 @@ export default class Transaction extends Component<Props, State> {
     }
     if (type === transactionTypes.SELF) {
       if (data instanceof CardanoShelleyTransaction) {
-        if (data.withdrawals.length) {
+        const features = data.getFeatures();
+        if (
+          (
+            features.includes('Withdrawal') && features.length === 1
+          ) || (
+            features.includes('Withdrawal')
+            && features.includes('StakeDeregistration')
+            && features.length === 2
+          )
+        ) {
           return intl.formatMessage(messages.rewardWithdrawn);
         }
-        if (data.isCatalystVotingRegistration()) {
+        if (
+          features.includes('CatalystVotingRegistration')
+          && features.length === 1
+        ) {
           return intl.formatMessage(messages.catalystVotingRegistered);
         }
-        let hasStakeDelegationCert = false;
-        let hasStakeRegistrationCert = false;
-        for (const cert of data.certificates) {
-          if (cert.certificate.Kind === RustModule.WalletV4.CertificateKind.StakeDelegation) {
-            hasStakeDelegationCert = true;
-          }
-          if (cert.certificate.Kind === RustModule.WalletV4.CertificateKind.StakeRegistration) {
-            hasStakeRegistrationCert = true;
-          }
-        }
-        if (hasStakeDelegationCert) {
+        if (
+          (
+            features.includes('StakeDelegation') && features.length === 1
+          ) || (
+            features.includes('StakeDelegation')
+            && features.includes('StakeRegistration')
+            && features.length === 2
+          )
+        ) {
           return intl.formatMessage(messages.stakeDelegated);
         }
-        if (hasStakeRegistrationCert) {
+        if (
+          (features.includes('StakeRegistration') && features.length === 1)
+        ) {
           return intl.formatMessage(messages.stakeKeyRegistered);
         }
       }
