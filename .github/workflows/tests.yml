@@ -5,7 +5,7 @@ on:
     types: [ submitted ]
 
 jobs:
-  flow-and-lint:
+  tests:
     if: github.event.review && (github.event.review.state == 'approved' || contains(github.event.review.body, '/check'))
     runs-on: ubuntu-latest
     steps:
@@ -35,6 +35,6 @@ jobs:
       - name: npm install
         run: |
           . install-all.sh
-      - name: flow and lint
+      - name: tests
         run: |
           npm run test
