@@ -73,17 +73,6 @@ export default class CardanoShelleyTransaction extends WalletTransaction {
       throw new Error(`${nameof(CardanoShelleyTransaction)}::${this.constructor.fromAnnotatedTx} missing extra data`);
     }
 
-    const withdrawals = toAddr({
-      rows: tx.accountingInputs,
-      addressLookupMap,
-      tokens: tx.tokens,
-      defaultToken,
-    });
-    const amount = tx.amount.joinAddCopy(tx.fee);
-    for (const {value} of withdrawals) {
-      amount.joinAddMutable(value);
-    }
-
     return new CardanoShelleyTransaction({
       txid: tx.transaction.Hash,
       block: tx.block,
@@ -100,7 +89,7 @@ export default class CardanoShelleyTransaction extends WalletTransaction {
       ),
       ttl: Extra.Ttl != null ? new BigNumber(Extra.Ttl) : undefined,
       metadata: Extra.Metadata,
-      amount,
+      amount: tx.amount.joinAddCopy(tx.fee),
       date: tx.block != null
         ? tx.block.BlockTime
         : new Date(tx.transaction.LastUpdateTime),
@@ -108,7 +97,12 @@ export default class CardanoShelleyTransaction extends WalletTransaction {
         from: toAddr({ rows: tx.utxoInputs, addressLookupMap, tokens: tx.tokens, defaultToken, }),
         to: toAddr({ rows: tx.utxoOutputs, addressLookupMap, tokens: tx.tokens, defaultToken, }),
       },
-      withdrawals,
+      withdrawals: toAddr({
+        rows: tx.accountingInputs,
+        addressLookupMap,
+        tokens: tx.tokens,
+        defaultToken,
+      }),
       certificates: tx.certificates,
       state: tx.transaction.Status,
       errorMsg: tx.transaction.ErrorMessage,
