@@ -6,7 +6,7 @@ import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/in
 import { asGetStakingKey } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import { networks, isCardanoHaskell, } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
-import transactionsIcon from '../../assets/images/wallet-nav/tab-transactions.inline.svg';
+import transactionsIcon from '../../assets/images/wallet-nav/transactions.inline.svg';
 import sendIcon from '../../assets/images/wallet-nav/tab-send.inline.svg';
 import receiveIcon from '../../assets/images/wallet-nav/tab-receive.inline.svg';
 import dashboardIcon from '../../assets/images/wallet-nav/tab-dashboard.inline.svg';
