@@ -5,8 +5,10 @@ import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
 import styles from './WalletNavigation.scss';
 import WalletNavButton from './WalletNavButton';
-
+import TransactionImageActive from '../../../assets/images/wallet-nav/transactions.active.inline.svg'
 import type { MessageDescriptor, $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { WALLET_TRANSACTION_ID } from '../../../stores/stateless/topbarCategories';
+
 
 export type Category = {|
   +className: string,
@@ -29,7 +31,6 @@ export default class WalletNavigation extends Component<Props> {
 
   renderCategory: Category => ?Node = (category) => {
     const { intl } = this.context;
-
     return (
       <div
         className={styles.navItem}
@@ -38,7 +39,7 @@ export default class WalletNavigation extends Component<Props> {
         <WalletNavButton
           className={category.className}
           label={intl.formatMessage(category.label)}
-          icon={category.icon}
+          icon={category.label.id === WALLET_TRANSACTION_ID && category.isActive ? TransactionImageActive  : category.icon}
           isActive={category.isActive}
           onClick={category.onClick}
         />

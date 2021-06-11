@@ -14,9 +14,10 @@ import delegationListIcon from '../../assets/images/wallet-nav/tab-delegation_li
 import votingIcon from '../../assets/images/wallet-nav/voting.inline.svg';
 import environment from '../../environment';
 
-const messages = defineMessages({
+export const WALLET_TRANSACTION_ID = 'wallet.navigation.transactions'
+export const messages = defineMessages({
   transactions: {
-    id: 'wallet.navigation.transactions',
+    id: WALLET_TRANSACTION_ID,
     defaultMessage: '!!!Transactions',
   },
   send: {

@@ -4,7 +4,6 @@ import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import styles from './WalletNavButton.scss';
-import TransactionImageActive from '../../../assets/images/wallet-nav/transactions.active.inline.svg'
 
 type Props = {|
   +label: string,
@@ -36,11 +35,7 @@ export default class WalletNavButton extends Component<Props> {
       <button type="button" className={componentClasses} onClick={onClick}>
         {IconComponent != null &&
           <div className={styles.icon}>
-            {
-              label === 'Transactions' && isActive ?
-              <TransactionImageActive />
-              : <IconComponent />
-            }
+            <IconComponent />
           </div>
         }
         <span className={styles.label}>{label}</span>
