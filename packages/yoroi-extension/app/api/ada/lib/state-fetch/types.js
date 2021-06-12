@@ -338,3 +338,4 @@ export type TokenInfoResponse = {|
   [key: string]: (RemoteTokenInfo | null),
 |};
 export type PoolInfoFunc = (body: PoolInfoRequest) => Promise<PoolInfoResponse>;
+export type TokenInfoFunc = (body: TokenInfoRequest) => Promise<TokenInfoResponse>;

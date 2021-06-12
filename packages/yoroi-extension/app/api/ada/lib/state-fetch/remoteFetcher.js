@@ -36,6 +36,7 @@ import {
   GetBestBlockError,
   GetPoolInfoApiError,
   GetRewardHistoryApiError,
+  GetTokenInfoApiError,
   GetTxHistoryForAddressesApiError,
   GetTxsBodiesForUTXOsApiError,
   GetUtxosForAddressesApiError,
@@ -385,7 +386,7 @@ export class RemoteFetcher implements IFetcher {
     ).then(response => response.data)
       .catch((error) => {
         Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getTokenInfo)} error: ` + stringifyError(error));
-        throw new GetPoolInfoApiError();
+        throw new GetTokenInfoApiError();
       }));
     return (await Promise.all(promises)).reduce((res, resp) => {
       if (resp && resp.subject) {
