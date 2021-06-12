@@ -33,6 +33,8 @@ export const networks = Object.freeze({
       WebSocket: environment.isTest()
         ? 'ws://localhost:21000'
         : 'wss://iohk-mainnet.yoroiwallet.com:443',
+      TokenInfoService:
+        'https://tokens.cardano.org',
     },
     BaseConfig: ([
       Object.freeze({
@@ -127,6 +129,8 @@ export const networks = Object.freeze({
       WebSocket: environment.isTest()
         ? 'ws://localhost:21000'
         : 'wss://testnet-backend.yoroiwallet.com:443',
+      TokenInfoService:
+        'https://stage-cdn.yoroiwallet.com',
     },
     BaseConfig: ([
       Object.freeze({

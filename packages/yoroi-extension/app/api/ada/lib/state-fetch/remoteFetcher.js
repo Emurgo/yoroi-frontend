@@ -1,42 +1,48 @@
 // @flow
 
 import type {
-  AddressUtxoRequest, AddressUtxoResponse,
-  TxBodiesRequest, TxBodiesResponse,
-  UtxoSumRequest, UtxoSumResponse,
-  HistoryRequest, HistoryResponse,
-  AccountStateRequest, AccountStateResponse,
-  RewardHistoryRequest, RewardHistoryResponse,
-  BestBlockRequest, BestBlockResponse,
-  SignedRequest, SignedResponse,
-  PoolInfoRequest, PoolInfoResponse,
-  SignedRequestInternal,
+  AccountStateRequest,
+  AccountStateResponse,
+  AddressUtxoRequest,
+  AddressUtxoResponse,
+  BestBlockRequest,
+  BestBlockResponse,
+  HistoryRequest,
+  HistoryResponse,
+  PoolInfoRequest,
+  PoolInfoResponse,
   RemoteTransaction,
+  RewardHistoryRequest,
+  RewardHistoryResponse,
+  SignedRequest,
+  SignedRequestInternal,
+  SignedResponse,
+  TokenInfoRequest,
+  TokenInfoResponse,
+  TxBodiesRequest,
+  TxBodiesResponse,
+  UtxoSumRequest,
+  UtxoSumResponse,
 } from './types';
-import type {
-  FilterUsedRequest, FilterUsedResponse,
-} from '../../../common/lib/state-fetch/currencySpecificTypes';
+import type { FilterUsedRequest, FilterUsedResponse, } from '../../../common/lib/state-fetch/currencySpecificTypes';
 
 import type { IFetcher } from './IFetcher';
 
 import axios from 'axios';
+import { Logger, stringifyError } from '../../../../utils/logging';
 import {
-  Logger,
-  stringifyError
-} from '../../../../utils/logging';
-import {
+  CheckAddressesInUseApiError,
+  GetAccountStateApiError,
+  GetBestBlockError,
+  GetPoolInfoApiError,
+  GetRewardHistoryApiError,
+  GetTxHistoryForAddressesApiError,
   GetTxsBodiesForUTXOsApiError,
   GetUtxosForAddressesApiError,
   GetUtxosSumsForAddressesApiError,
-  GetTxHistoryForAddressesApiError,
-  GetRewardHistoryApiError,
-  GetPoolInfoApiError,
-  GetAccountStateApiError,
-  GetBestBlockError,
-  SendTransactionApiError,
-  CheckAddressesInUseApiError,
   InvalidWitnessError,
   RollbackApiError,
+  SendTransactionApiError,
 } from '../../../common/errors';
 import { RustModule } from '../cardanoCrypto/rustLoader';
 
@@ -361,5 +367,40 @@ export class RemoteFetcher implements IFetcher {
         Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getPoolInfo)} error: ` + stringifyError(error));
         throw new GetPoolInfoApiError();
       });
+  }
+
+  getTokenInfo: TokenInfoRequest => Promise<TokenInfoResponse> = async (body) => {
+    const { TokenInfoService } = body.network.Backend;
+    if (TokenInfoService == null) return {};
+    const promises = body.tokenIds.map(id => axios(
+      `${TokenInfoService}/metadata/${id}`,
+      {
+        method: 'get',
+        timeout: 2 * CONFIG.app.walletRefreshInterval,
+        // headers: {
+        //   'yoroi-version': this.getLastLaunchVersion(),
+        //   'yoroi-locale': this.getCurrentLocale()
+        // }
+      }
+    ).then(response => response.data)
+      .catch((error) => {
+        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getTokenInfo)} error: ` + stringifyError(error));
+        throw new GetPoolInfoApiError();
+      }));
+    return (await Promise.all(promises)).reduce((res, resp) => {
+      if (resp && resp.subject) {
+        const v = {};
+        if (resp.name?.value) {
+          v.name = resp.name.value;
+        }
+        if (resp.decimals?.value) {
+          v.decimals = resp.decimals.value;
+        }
+        if (v.name || v.decimals) {
+          res[resp.subject] = v;
+        }
+      }
+      return res;
+    }, {});
   }
 }

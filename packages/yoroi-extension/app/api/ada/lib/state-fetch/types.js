@@ -304,6 +304,10 @@ export type PoolInfoRequest = {|
   ...BackendNetworkInfo,
   poolIds: Array<string>
 |};
+export type TokenInfoRequest = {|
+  ...BackendNetworkInfo,
+  tokenIds: Array<string>
+|};
 export type RemotePoolInfo = {|
   // from pool metadata (off chain)
   +name?: string,
@@ -323,5 +327,14 @@ export type RemotePool = {|
 |};
 export type PoolInfoResponse = {|
   [key: string]: (RemotePool | null),
+|};
+
+export type RemoteTokenInfo = {|
+  // from token metadata (off chain)
+  +name?: string,
+  +decimals?: number,
+|};
+export type TokenInfoResponse = {|
+  [key: string]: (RemoteTokenInfo | null),
 |};
 export type PoolInfoFunc = (body: PoolInfoRequest) => Promise<PoolInfoResponse>;
