@@ -4,12 +4,12 @@ import Store from '../base/Store';
 import type {
   GetTransactionsFunc, GetTransactionsResponse,
   RefreshPendingTransactionsFunc,
+  BaseGetTransactionsRequest,
 } from '../../api/common';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import WalletTransaction from '../../domain/WalletTransaction';
 import CardanoShelleyTransaction from '../../domain/CardanoShelleyTransaction';
-import type { BaseGetTransactionsRequest } from '../../api/common';
 import type { RemoteTokenInfo } from '../../api/ada/lib/state-fetch/types';
 
 export default class AdaTransactionsStore extends Store<StoresMap, ActionsMap> {
