@@ -507,8 +507,8 @@ export class GetPoolInfoApiError extends LocalizableError {
 export class GetTokenInfoApiError extends LocalizableError {
   constructor() {
     super({
-      id: messages.getPoolInfoApiError.id,
-      defaultMessage: messages.getPoolInfoApiError.defaultMessage || '',
+      id: messages.getTokenInfoApiError.id,
+      defaultMessage: messages.getTokenInfoApiError.defaultMessage || '',
     });
   }
 }

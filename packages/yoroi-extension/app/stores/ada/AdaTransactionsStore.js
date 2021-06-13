@@ -35,7 +35,7 @@ export default class AdaTransactionsStore extends Store<StoresMap, ActionsMap> {
         }
       });
       const missingMetaTokenIds = [...tokenIds]
-        .filter(tokenId => !localStorage.getItem(`token-metadata-${tokenId}`))
+        .filter(tokenId => tokenId?.length > 0 && !localStorage.getItem(`token-metadata-${tokenId}`))
         .map(id => id.split('.')[0]);
       const tokenInfo = await stateFetcher.getTokenInfo({
         network: request.publicDeriver.getParent().getNetworkInfo(),
