@@ -28,12 +28,15 @@ export default class AdaTransactionsStore extends Store<StoresMap, ActionsMap> {
       const tokenIds = new Set<string>();
       txs.transactions.forEach((tx: WalletTransaction) => {
         tx.amount.values.forEach(t => tokenIds.add(t.identifier));
+        tx.addresses.from.flatMap(a => a.value.values).forEach(t => tokenIds.add(t.identifier));
+        tx.addresses.to.flatMap(a => a.value.values).forEach(t => tokenIds.add(t.identifier));
         if (tx instanceof CardanoShelleyTransaction) {
           tx.withdrawals.flatMap(w => w.value.values).forEach(t => tokenIds.add(t.identifier));
         }
       });
       const missingMetaTokenIds = [...tokenIds]
-        .filter(tokenId => !!localStorage.getItem(`token-metadata-${tokenId}`));
+        .filter(tokenId => !localStorage.getItem(`token-metadata-${tokenId}`))
+        .map(id => id.split('.')[0]);
       const tokenInfo = await stateFetcher.getTokenInfo({
         network: request.publicDeriver.getParent().getNetworkInfo(),
         tokenIds: missingMetaTokenIds,
