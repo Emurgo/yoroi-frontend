@@ -14,7 +14,7 @@ import type { RemoteTokenInfo } from '../../api/ada/lib/state-fetch/types';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 
 function createTokenLocalStorageKey(tokenId: string, network: $ReadOnly<NetworkRow>): string {
-  return `token-metadata-${network.NetworkName}-${tokenId}`;
+  return `token-metadata-${network.NetworkId}-${tokenId}`;
 }
 
 export default class AdaTransactionsStore extends Store<StoresMap, ActionsMap> {
