@@ -43,7 +43,7 @@ export default class AdaTransactionsStore extends Store<StoresMap, ActionsMap> {
       const missingMetaTokenIds = [...tokenIds]
         .filter(tokenId => tokenId.length > 0
           && !localStorage.getItem(createTokenLocalStorageKey(tokenId, network)))
-        .map(id => id.split('.')[0]);
+        .map(id => id.split('.').join(''));
       const tokenInfo = await stateFetcher.getTokenInfo({
         network,
         tokenIds: missingMetaTokenIds,

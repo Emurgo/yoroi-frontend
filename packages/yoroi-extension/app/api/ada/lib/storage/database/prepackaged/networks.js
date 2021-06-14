@@ -34,7 +34,7 @@ export const networks = Object.freeze({
         ? 'ws://localhost:21000'
         : 'wss://iohk-mainnet.yoroiwallet.com:443',
       TokenInfoService:
-        'https://tokens.cardano.org',
+        'https://cdn.yoroiwallet.com',
     },
     BaseConfig: ([
       Object.freeze({

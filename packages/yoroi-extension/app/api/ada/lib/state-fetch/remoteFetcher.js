@@ -371,17 +371,17 @@ export class RemoteFetcher implements IFetcher {
   }
 
   getTokenInfo: TokenInfoRequest => Promise<TokenInfoResponse> = async (body) => {
-    const { TokenInfoService } = body.network.Backend;
+    const { TokenInfoService } = body?.network?.Backend;
     if (TokenInfoService == null) return {};
     const promises = body.tokenIds.map(id => axios(
       `${TokenInfoService}/metadata/${id}`,
       {
         method: 'get',
         timeout: 2 * CONFIG.app.walletRefreshInterval,
-        // headers: {
-        //   'yoroi-version': this.getLastLaunchVersion(),
-        //   'yoroi-locale': this.getCurrentLocale()
-        // }
+        headers: {
+          'yoroi-version': this.getLastLaunchVersion(),
+          'yoroi-locale': this.getCurrentLocale()
+        }
       }
     ).then(response => response.data)
       .catch((error) => {
