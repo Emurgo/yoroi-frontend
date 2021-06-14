@@ -39,9 +39,9 @@ export default class AdaTransactionsStore extends Store<StoresMap, ActionsMap> {
           tx.withdrawals.flatMap(w => w.value.values).forEach(t => tokenIds.add(t.identifier));
         }
       });
-      let network = request.publicDeriver.getParent().getNetworkInfo();
+      const network = request.publicDeriver.getParent().getNetworkInfo();
       const missingMetaTokenIds = [...tokenIds]
-        .filter(tokenId => tokenId?.length > 0
+        .filter(tokenId => tokenId.length > 0
           && !localStorage.getItem(createTokenLocalStorageKey(tokenId, network)))
         .map(id => id.split('.')[0]);
       const tokenInfo = await stateFetcher.getTokenInfo({
