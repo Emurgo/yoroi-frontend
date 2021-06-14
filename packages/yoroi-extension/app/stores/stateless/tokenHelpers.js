@@ -82,7 +82,7 @@ export function genLookupOrFail(
       ?.get(lookup.identifier);
     if (tokenRow == null) throw new Error(`${nameof(genLookupOrFail)} no token info for ${JSON.stringify(lookup)}`);
     // fixme: temporary solution
-    const id = lookup.identifier.split('.')[0];
+    const id = lookup.identifier.split('.').join('');
     const metadataStr = localStorage.getItem(
       `token-metadata-${lookup.networkId}-${id}`
     );
