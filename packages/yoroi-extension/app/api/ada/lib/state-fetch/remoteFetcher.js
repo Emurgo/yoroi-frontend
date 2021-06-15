@@ -378,18 +378,18 @@ export class RemoteFetcher implements IFetcher {
       {
         method: 'get',
         timeout: 2 * CONFIG.app.walletRefreshInterval,
-        headers: {
-          'yoroi-version': this.getLastLaunchVersion(),
-          'yoroi-locale': this.getCurrentLocale()
-        }
       }
     ).then(response => response.data)
       .catch((error) => {
-        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getTokenInfo)} error: ` + stringifyError(error));
-        throw new GetTokenInfoApiError();
+        if (error.response.status) {
+          Logger.info(`${nameof(RemoteFetcher)}::${nameof(this.getTokenInfo)} 404: no token meta found for subject: ` + id);
+        } else {
+          Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getTokenInfo)} error: ` + stringifyError(error));
+        }
+        return null;
       }));
     return (await Promise.all(promises)).reduce((res, resp) => {
-      if (resp && resp.subject) {
+      if (resp?.subject) {
         const v = {};
         if (resp.name?.value) {
           v.name = resp.name.value;

@@ -2,9 +2,10 @@
 
 import Store from '../base/Store';
 import type {
-  GetTransactionsFunc, GetTransactionsResponse,
-  RefreshPendingTransactionsFunc,
   BaseGetTransactionsRequest,
+  GetTransactionsFunc,
+  GetTransactionsResponse,
+  RefreshPendingTransactionsFunc,
 } from '../../api/common';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
@@ -41,9 +42,9 @@ export default class AdaTransactionsStore extends Store<StoresMap, ActionsMap> {
       });
       const network = request.publicDeriver.getParent().getNetworkInfo();
       const missingMetaTokenIds = [...tokenIds]
+        .map(id => id?.split('.')?.join(''))
         .filter(tokenId => tokenId.length > 0
-          && !localStorage.getItem(createTokenLocalStorageKey(tokenId, network)))
-        .map(id => id.split('.').join(''));
+          && !localStorage.getItem(createTokenLocalStorageKey(tokenId, network)));
       const tokenInfo = await stateFetcher.getTokenInfo({
         network,
         tokenIds: missingMetaTokenIds,
