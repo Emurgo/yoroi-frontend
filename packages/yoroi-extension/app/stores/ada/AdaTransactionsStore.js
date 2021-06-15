@@ -50,7 +50,8 @@ export default class AdaTransactionsStore extends Store<StoresMap, ActionsMap> {
         tokenIds: missingMetaTokenIds,
       });
       // $FlowFixMe[incompatible-call]
-      Object.entries(tokenInfo).forEach(([tokenId, tokenMeta]: [string, RemoteTokenInfo]) => {
+      missingMetaTokenIds.forEach((tokenId: string) => {
+        const tokenMeta: RemoteTokenInfo = tokenInfo[tokenId];
         localStorage.setItem(createTokenLocalStorageKey(tokenId, network), JSON.stringify({
           ...tokenMeta,
           timestamp: new Date().toISOString(),
