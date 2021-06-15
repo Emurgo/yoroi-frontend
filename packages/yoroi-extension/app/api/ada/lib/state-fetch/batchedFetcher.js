@@ -8,6 +8,7 @@ import type {
   HistoryRequest, HistoryResponse,
   RewardHistoryFunc, RewardHistoryRequest, RewardHistoryResponse,
   PoolInfoFunc, PoolInfoRequest, PoolInfoResponse,
+  TokenInfoFunc, TokenInfoRequest, TokenInfoResponse,
   AccountStateFunc, AccountStateRequest, AccountStateResponse,
   SignedRequest, SignedResponse,
   BestBlockRequest, BestBlockResponse,
@@ -34,6 +35,7 @@ import {
   GetRewardHistoryApiError,
   GetAccountStateApiError,
   GetPoolInfoApiError,
+  GetTokenInfoApiError,
 } from '../../../common/errors';
 import {
   Logger,
@@ -104,6 +106,10 @@ export class BatchedFetcher implements IFetcher {
 
   getPoolInfo: PoolInfoRequest => Promise<PoolInfoResponse> = (body) => (
     batchGetPoolInfo(this.baseFetcher.getPoolInfo)(body)
+  )
+
+  getTokenInfo: TokenInfoRequest => Promise<TokenInfoResponse> = (body) => (
+    batchGetTokenInfo(this.baseFetcher.getTokenInfo)(body)
   )
 }
 
@@ -435,6 +441,28 @@ export function batchGetPoolInfo(
       Logger.error(`batchedFetcher::${nameof(batchGetPoolInfo)} error: ` + stringifyError(error));
       if (error instanceof LocalizableError) throw error;
       throw new GetPoolInfoApiError();
+    }
+  };
+}
+
+export function batchGetTokenInfo(
+  getTokenInfo: TokenInfoFunc,
+): TokenInfoFunc {
+  return async function (body: TokenInfoRequest): Promise<TokenInfoResponse> {
+    try {
+      const tokenIds = chunk(body.tokenIds, addressesLimit);
+      const tokenInfoPromises = tokenIds.map(
+        tokenId => getTokenInfo({
+          network: body.network,
+          tokenIds: tokenId,
+        })
+      );
+      const tokenInfos = await Promise.all(tokenInfoPromises);
+      return Object.assign({}, ...tokenInfos);
+    } catch (error) {
+      Logger.error(`batchedFetcher::${nameof(batchGetTokenInfo)} error: ` + stringifyError(error));
+      if (error instanceof LocalizableError) throw error;
+      throw new GetTokenInfoApiError();
     }
   };
 }
