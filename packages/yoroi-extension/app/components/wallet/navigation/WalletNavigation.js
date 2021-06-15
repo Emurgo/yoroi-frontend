@@ -5,8 +5,8 @@ import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
 import styles from './WalletNavigation.scss';
 import WalletNavButton from './WalletNavButton';
-import type { MessageDescriptor, $npm$ReactIntl$IntlFormat } from 'react-intl';
 
+import type { MessageDescriptor, $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 export type Category = {|
   +className: string,
@@ -29,6 +29,7 @@ export default class WalletNavigation extends Component<Props> {
 
   renderCategory: Category => ?Node = (category) => {
     const { intl } = this.context;
+
     return (
       <div
         className={styles.navItem}

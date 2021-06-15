@@ -4,9 +4,9 @@ import type { MessageDescriptor } from 'react-intl';
 import { defineMessages, } from 'react-intl';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import { asGetStakingKey } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
-import { isCardanoHaskell, networks, } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { networks, isCardanoHaskell, } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
-import transactionsIcon from '../../assets/images/wallet-nav/transactions.inline.svg';
+import transactionsIcon from '../../assets/images/wallet-nav/tab-transactions.inline.svg';
 import sendIcon from '../../assets/images/wallet-nav/tab-send.inline.svg';
 import receiveIcon from '../../assets/images/wallet-nav/tab-receive.inline.svg';
 import dashboardIcon from '../../assets/images/wallet-nav/tab-dashboard.inline.svg';
@@ -14,7 +14,7 @@ import delegationListIcon from '../../assets/images/wallet-nav/tab-delegation_li
 import votingIcon from '../../assets/images/wallet-nav/voting.inline.svg';
 import environment from '../../environment';
 
-export const messages = defineMessages({
+const messages = defineMessages({
   transactions: {
     id: 'wallet.navigation.transactions',
     defaultMessage: '!!!Transactions',
