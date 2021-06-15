@@ -11,7 +11,7 @@ import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import WalletTransaction from '../../domain/WalletTransaction';
 import CardanoShelleyTransaction from '../../domain/CardanoShelleyTransaction';
-import type { RemoteTokenInfo } from '../../api/ada/lib/state-fetch/types';
+import type { RemoteTokenInfo, TokenInfoResponse } from '../../api/ada/lib/state-fetch/types';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 
 function createTokenLocalStorageKey(tokenId: string, network: $ReadOnly<NetworkRow>): string {
@@ -45,13 +45,13 @@ export default class AdaTransactionsStore extends Store<StoresMap, ActionsMap> {
         .map(id => id?.split('.')?.join(''))
         .filter(tokenId => tokenId.length > 0
           && !localStorage.getItem(createTokenLocalStorageKey(tokenId, network)));
-      const tokenInfo = await stateFetcher.getTokenInfo({
+      const tokenInfo: TokenInfoResponse = await stateFetcher.getTokenInfo({
         network,
         tokenIds: missingMetaTokenIds,
       });
       // $FlowFixMe[incompatible-call]
       missingMetaTokenIds.forEach((tokenId: string) => {
-        const tokenMeta: RemoteTokenInfo = tokenInfo[tokenId];
+        const tokenMeta: ?RemoteTokenInfo = tokenInfo[tokenId];
         localStorage.setItem(createTokenLocalStorageKey(tokenId, network), JSON.stringify({
           ...tokenMeta,
           timestamp: new Date().toISOString(),
