@@ -36,7 +36,6 @@ import {
   GetBestBlockError,
   GetPoolInfoApiError,
   GetRewardHistoryApiError,
-  GetTokenInfoApiError,
   GetTxHistoryForAddressesApiError,
   GetTxsBodiesForUTXOsApiError,
   GetUtxosForAddressesApiError,
