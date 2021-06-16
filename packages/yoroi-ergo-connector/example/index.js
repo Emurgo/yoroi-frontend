@@ -88,10 +88,13 @@ function initDapp() {
                         new wasm.Tokens());
                     console.log(`boxes selected: ${boxSelection.boxes().len()}`);
                     const outputCandidates = wasm.ErgoBoxCandidates.empty();
+                    const token = new wasm.Token(wasm.TokenId.from_box_id(wasm.BoxId.from_str(utxos[1].boxId)), wasm.TokenAmount.from_i64(wasm.I64.from_str("12345678")));
                     const donationBoxBuilder = new wasm.ErgoBoxCandidateBuilder(
                         amountToSendBoxValue,
                         wasm.Contract.pay_to_address(wasm.Address.from_base58(donationAddr)),
                         creationHeight);
+                    donationBoxBuilder.mint_token(token, "ECEDT", "Ergo Connector Example Dapp Token (for testing)", 5);
+                    //donationBoxBuilder.add_token(token.id(), token.amount());
                     try {
                         outputCandidates.add(donationBoxBuilder.build());
                     } catch (e) {
