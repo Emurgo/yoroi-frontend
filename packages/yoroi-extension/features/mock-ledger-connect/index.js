@@ -27,7 +27,12 @@ import {
 } from '../../app/api/ada/lib/cardanoCrypto/cryptoWallet';
 import { testWallets } from '../mock-chain/TestWallets';
 import { IncorrectDeviceError } from '../../app/domain/ExternalDeviceCommon';
-import { AddressType, CertificateType, TxOutputDestinationType } from '@cardano-foundation/ledgerjs-hw-app-cardano';
+import {
+  AddressType,
+  CertificateType,
+  TxOutputDestinationType,
+  TxAuxiliaryDataType
+} from '@cardano-foundation/ledgerjs-hw-app-cardano';
 
 type WalletInfo = {|
   rootKey: RustModule.WalletV4.Bip32PrivateKey;
@@ -57,6 +62,8 @@ async function genWalletInfo(serial: string): Promise<WalletInfo> {
             isCompatible: true,
             recommendedVersion: null,
             supportsMary: true,
+            supportsCatalystRegistration: true,
+            supportsZeroTtl: true,
           },
         },
       };
@@ -83,7 +90,13 @@ function deriveAddress(
     ...,
   },
 ): RustModule.WalletV4.Address {
-  const spendingKey = derivePath(rootKey, request.address.params.spendingPath);
+  let keyPath;
+  if (request.address.type === AddressType.REWARD) {
+    keyPath = request.address.params.stakingPath;
+  } else {
+    keyPath = request.address.params.spendingPath;
+  }
+  const spendingKey = derivePath(rootKey, keyPath);
 
   if (request.address.type === AddressType.BYRON) {
     return RustModule.WalletV4.ByronAddress.icarus_from_key(
@@ -351,9 +364,16 @@ class MockLedgerConnect {
       body.set_certs(certs);
     }
     if (request.params.tx.auxiliaryData != null) {
-      body.set_metadata_hash(RustModule.WalletV4.MetadataHash.from_bytes(
-        Buffer.from(request.params.tx.auxiliaryData.params.hashHex, 'hex')
-      ));
+      if (
+        request.params.tx.auxiliaryData.type ===
+          TxAuxiliaryDataType.ARBITRARY_HASH
+      ) {
+        body.set_metadata_hash(RustModule.WalletV4.MetadataHash.from_bytes(
+          Buffer.from(request.params.tx.auxiliaryData.params.hashHex, 'hex')
+        ));
+      } else {
+        throw new Error('mock Ledger does not support Catalyst registration tx');
+      }
     }
     if (request.params.tx.validityIntervalStart != null) {
       body.set_validity_start_interval(
@@ -402,6 +422,7 @@ class MockLedgerConnect {
     return {
       txHashHex: Buffer.from(txBodyHash.to_bytes()).toString('hex'),
       witnesses,
+      auxiliaryDataSupplement: null,
     };
   }
 
