@@ -126,10 +126,10 @@ class SignTxPage extends Component<Props> {
   }
 
   // Tokens can be minted inside the transaction so we have to look it up there first
-  _resolveTokenInfo: TokenEntry => TokenRow = tokenEntry => {
+  _resolveTokenInfo: TokenEntry => $ReadOnly<TokenRow> = tokenEntry => {
     const { tx } = this.props;
     const mintedTokens = mintedTokenInfo(tx);
-    const mintedToken = mintedTokens.find(t => tokenEntry.identifier == t.Identifier);
+    const mintedToken = mintedTokens.find(t => tokenEntry.identifier === t.Identifier);
     if (mintedToken != null) {
       return mintedToken;
     }
