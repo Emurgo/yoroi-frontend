@@ -28,11 +28,11 @@
   }
 
   .icon {
+    & > svg {
+      color: var(--theme-wallet-navigation-tab-text-color-active);
+    }
     & > svg > path {
       fill: var(--theme-wallet-navigation-tab-text-color-active);
-    }
-    & > svg > g {
-      stroke: var(--theme-wallet-navigation-tab-text-color-active);
     }
   }
 }
