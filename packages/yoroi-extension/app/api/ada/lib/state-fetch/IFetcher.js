@@ -10,6 +10,7 @@ import type {
   SignedRequest, SignedResponse,
   PoolInfoRequest, PoolInfoResponse,
   BestBlockRequest, BestBlockResponse,
+  TokenInfoRequest, TokenInfoResponse,
 } from './types';
 import type {
   FilterUsedRequest, FilterUsedResponse,
@@ -25,5 +26,6 @@ export interface IFetcher {
   sendTx(body: SignedRequest): Promise<SignedResponse>;
   getAccountState(body: AccountStateRequest): Promise<AccountStateResponse>;
   getPoolInfo(body: PoolInfoRequest): Promise<PoolInfoResponse>;
+  getTokenInfo(body: TokenInfoRequest): Promise<TokenInfoResponse>;
   checkAddressesInUse(body: FilterUsedRequest): Promise<FilterUsedResponse>;
 }

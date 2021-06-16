@@ -1,11 +1,11 @@
-name: Flow and lint
+name: Tests
 
 on:
   pull_request_review:
     types: [ submitted ]
 
 jobs:
-  flow-and-lint:
+  tests:
     if: github.event.review && (github.event.review.state == 'approved' || contains(github.event.review.body, '/check'))
     runs-on: ubuntu-latest
     steps:
@@ -35,9 +35,6 @@ jobs:
       - name: npm install
         run: |
           . install-all.sh
-      - name: flow
+      - name: tests
         run: |
-          npm run flow
-      - name: lint
-        run: |
-          npm run eslint
+          npm run test
