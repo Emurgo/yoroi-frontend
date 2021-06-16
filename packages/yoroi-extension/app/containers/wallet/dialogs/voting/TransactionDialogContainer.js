@@ -7,23 +7,28 @@ import { intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { InjectedOrGenerated } from '../../../../types/injectedPropsType';
 import VotingRegTxDialog from '../../../../components/wallet/voting/VotingRegTxDialog';
-import { WalletTypeOption } from '../../../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import LocalizableError from '../../../../i18n/LocalizableError';
 import { PublicDeriver } from '../../../../api/ada/lib/storage/models/PublicDeriver/index';
 import type { CreateVotingRegTxFunc } from '../../../../api/ada/index';
 import { ProgressInfo } from '../../../../stores/ada/VotingStore';
 import type { TokenInfoMap } from '../../../../stores/toplevel/TokenInfoStore';
 import { genLookupOrFail } from '../../../../stores/stateless/tokenHelpers';
+import type {
+  WalletType,
+  StepsList,
+} from '../../../../components/wallet/voting/types';
 
 export type GeneratedData = typeof TransactionDialogContainer.prototype.generated;
 
 type Props = {|
   ...InjectedOrGenerated<GeneratedData>,
+  +stepsList: StepsList,
   +submit: void => PossiblyAsync<void>,
   +cancel: void => void,
   +goBack: void => void,
   +classicTheme: boolean,
   +onError: Error => void,
+  +walletType: WalletType,
 |};
 
 @observer
@@ -33,7 +38,7 @@ export default class TransactionDialogContainer extends Component<Props> {
   };
 
   render(): Node {
-    const { submit, cancel, goBack, onError } = this.props;
+    const { stepsList, submit, cancel, goBack, onError, walletType } = this.props;
     const selectedWallet = this.generated.stores.wallets.selected;
     if (selectedWallet == null) {
       return null;
@@ -45,13 +50,11 @@ export default class TransactionDialogContainer extends Component<Props> {
     if (votingRegTx != null) {
       return (
         <VotingRegTxDialog
+          stepsList={stepsList}
           progressInfo={votingStore.progressInfo}
           staleTx={votingRegTransactionStore.isStale}
           transactionFee={votingRegTx.fee()}
           isSubmitting={this.generated.stores.wallets.sendMoneyRequest.isExecuting}
-          isHardware={
-            selectedWallet.getParent().getWalletType() === WalletTypeOption.HARDWARE_WALLET
-          }
           getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
           onCancel={cancel}
           goBack={goBack}
@@ -69,6 +72,7 @@ export default class TransactionDialogContainer extends Component<Props> {
           }
           classicTheme={this.props.classicTheme}
           error={votingStore.error}
+          walletType={walletType}
         />
       );
     }

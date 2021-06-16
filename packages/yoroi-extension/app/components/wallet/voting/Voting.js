@@ -3,7 +3,7 @@ import type { Node } from 'react';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Button } from 'react-polymorph/lib/components/Button';
@@ -13,6 +13,7 @@ import PlayStoreBadge from '../../../assets/images/google-play-badge.inline.svg'
 import WarningBox from '../../widgets/WarningBox';
 
 import styles from './Voting.scss';
+import type { WalletType } from './types';
 
 const messages = defineMessages({
   lineTitle: {
@@ -39,6 +40,14 @@ const messages = defineMessages({
     id: 'wallet.voting.keepDelegated',
     defaultMessage: '!!!Your voting power is how much you delegate and the voting rewards will be distributed to your delegation reward address. Please keep delegated until the voting ends.',
   },
+  trezorTRequirement: {
+    id: 'wallet.voting.trezorTRequirement',
+    defaultMessage: '!!!<a target="_blank" rel="noopener noreferrer" href="https://wiki.trezor.io/User_manual:Updating_the_Trezor_device_firmware">Update</a> your Trezor Model T firmware version to ?.?.? or above.',
+  },
+  ledgerNanoRequirement: {
+    id: 'wallet.voting.ledgerNanoRequirement',
+    defaultMessage: '!!!<a target="_blank" rel="noopener noreferrer" href="https://emurgo.github.io/yoroi-extension-ledger-connect-vnext/catalyst/update-ledger-app/">Update</a>the Cardano app on your Ledger to version 2.3.2 or above with <a target="_blank" rel="noopener noreferrer" href="https://www.ledger.com/ledger-live"> Ledger Live</a>.',
+  },
 });
 
 type Props = {|
@@ -47,6 +56,7 @@ type Props = {|
   +hasAnyPending: boolean,
   +isDelegated: boolean,
   +round: number,
+  +walletType: WalletType,
 |};
 
 @observer
@@ -54,6 +64,39 @@ export default class Voting extends Component<Props> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
+
+  renderStep3(): Node {
+    const { walletType } = this.props;
+
+    if (walletType === 'mnemonic') {
+      return null;
+    }
+    if (walletType === 'trezorT') {
+      return (
+        <div className={classnames([styles.card, styles.bgStep3TrezorT])}>
+          <div className={styles.number}>
+            <span>3</span>
+          </div>
+          <div className={classnames([styles.lineText, styles.step2Text])}>
+            <FormattedHTMLMessage {...messages.trezorTRequirement} />
+          </div>
+        </div>
+      );
+    }
+    if (walletType === 'ledgerNano') {
+      return (
+        <div className={classnames([styles.card, styles.bgStep3LedgerNano])}>
+          <div className={styles.number}>
+            <span>3</span>
+          </div>
+          <div className={classnames([styles.lineText, styles.step2Text])}>
+            <FormattedHTMLMessage {...messages.ledgerNanoRequirement} />
+          </div>
+        </div>
+      );
+    }
+    throw new Error(`${nameof(Voting)} impossible wallet type`);
+  }
 
   render(): Node {
     const { intl } = this.context;
@@ -77,7 +120,25 @@ export default class Voting extends Component<Props> {
     return (
       <>
         {pendingTxWarningComponent}
+
         <div className={styles.voting}>
+          <div className={styles.delegationStatus}>
+            {this.props.isDelegated ?
+              (
+                <div className={styles.lineText}>
+                  {intl.formatMessage(messages.keepDelegated)}
+                </div>
+              ) :
+              (
+                <div className={styles.warningBox}>
+                  <WarningBox>
+                    {intl.formatMessage(messages.notDelegated)}
+                  </WarningBox>
+                </div>
+              )
+            }
+          </div>
+
           <div className={classnames([styles.lineTitle, styles.firstItem])}>
             {intl.formatMessage(messages.lineTitle, { round })}
           </div>
@@ -119,22 +180,7 @@ export default class Voting extends Component<Props> {
                 {intl.formatMessage(messages.line4)}
               </div>
             </div>
-          </div>
-          <div className={styles.delegationStatus}>
-            {this.props.isDelegated ?
-              (
-                <div className={styles.lineText}>
-                  {intl.formatMessage(messages.keepDelegated)}
-                </div>
-              ) :
-              (
-                <div className={styles.warningBox}>
-                  <WarningBox>
-                    {intl.formatMessage(messages.notDelegated)}
-                  </WarningBox>
-                </div>
-              )
-            }
+            {this.renderStep3()}
           </div>
           <div className={styles.registerButton}>
             <Button

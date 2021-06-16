@@ -11,6 +11,7 @@ import DialogCloseButton from '../../widgets/DialogCloseButton';
 import ProgressStepBlock from './ProgressStepBlock';
 import { ProgressInfo } from '../../../stores/ada/VotingStore';
 import QrCodeWrapper from '../../widgets/QrCodeWrapper';
+import type { StepsList } from './types';
 
 import styles from './QrCodeDialog.scss';
 
@@ -34,6 +35,7 @@ const messages = defineMessages({
 });
 
 type Props = {|
+  +stepsList: StepsList,
   +progressInfo: ProgressInfo,
   +onExternalLinkClick: MouseEvent => void,
   +submit: void => PossiblyAsync<void>,
@@ -50,7 +52,7 @@ export default class QrCodeDialog extends Component<Props> {
 
   render(): Node {
     const { intl } = this.context;
-    const { progressInfo, submit, cancel, classicTheme, votingKey } = this.props;
+    const { stepsList, progressInfo, submit, cancel, classicTheme, votingKey } = this.props;
 
     const dialogActions = [
       {
@@ -69,7 +71,11 @@ export default class QrCodeDialog extends Component<Props> {
         closeButton={<DialogCloseButton />}
         onClose={cancel}
       >
-        <ProgressStepBlock progressInfo={progressInfo} classicTheme={classicTheme} />
+        <ProgressStepBlock
+          stepsList={stepsList}
+          progressInfo={progressInfo}
+          classicTheme={classicTheme}
+        />
 
         <div className={classnames([styles.lineTitle, styles.firstItem])}>
           {intl.formatMessage(messages.lineTitle)}
