@@ -2,6 +2,7 @@
 import { action, observable } from 'mobx';
 
 import LedgerConnect from '@emurgo/ledger-connect-handler';
+import { TxAuxiliaryDataSupplementType } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import type {
   SignTransactionResponse as LedgerSignTxResponse
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
@@ -48,6 +49,7 @@ import type {
 import { genAddressingLookup } from '../../stateless/addressStores';
 import type { ActionsMap } from '../../../actions/index';
 import type { StoresMap } from '../../index';
+import { generateRegistrationMetadata } from '../../../api/ada/lib/cardanoCrypto/catalyst';
 
 /** Note: Handles Ledger Signing */
 export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
@@ -202,7 +204,7 @@ export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
 
       ledgerConnect = new LedgerConnect({
         locale: this.stores.profile.currentLocale,
-        connectorUrl: 'https://emurgo.github.io/yoroi-extension-ledger-connect-vnext/#/v3',
+        connectorUrl: 'https://emurgo.github.io/yoroi-extension-ledger-connect-vnext/catalyst/#/v3.1',
       });
 
       const { ledgerSignTxPayload } = await this.api.ada.createLedgerSignTxData({
@@ -212,7 +214,6 @@ export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
       });
 
       await prepareLedgerConnect(ledgerConnect);
-
       const ledgerSignTxResp: LedgerSignTxResponse =
         await ledgerConnect.signTransaction({
           serial: request.expectedSerial,
@@ -225,6 +226,48 @@ export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
       // Disposing here will fix the UI issue.
       ledgerConnect.dispose();
 
+      let metadata;
+
+      if (request.signRequest.ledgerNanoCatalystRegistrationTxSignData) {
+        const {
+          votingPublicKey,
+          stakingKey,
+          rewardAddress,
+          nonce,
+        } = request.signRequest.ledgerNanoCatalystRegistrationTxSignData;
+
+        if (
+          !ledgerSignTxResp.auxiliaryDataSupplement ||
+            (ledgerSignTxResp.auxiliaryDataSupplement.type !==
+              TxAuxiliaryDataSupplementType.CATALYST_REGISTRATION)
+        ) {
+          throw new Error(`${nameof(LedgerSendStore)}::${nameof(this.signAndBroadcast)} unexpected Ledger sign transaction response`);
+        }
+        const { catalystRegistrationSignatureHex } =
+          ledgerSignTxResp.auxiliaryDataSupplement;
+
+        metadata = generateRegistrationMetadata(
+          votingPublicKey,
+          stakingKey,
+          rewardAddress,
+          nonce,
+          (_hashedMetadata) => {
+            return catalystRegistrationSignatureHex;
+          },
+        );
+        // We can verify that
+        //  Buffer.from(
+        //    blake2b(256 / 8).update(metadata.to_bytes()).digest('binary')
+        //  ).toString('hex') ===
+        // ledgerSignTxResp.auxiliaryDataSupplement.auxiliaryDataHashaHex
+      } else {
+        metadata = request.signRequest.metadata;
+      }
+
+      if (metadata) {
+        request.signRequest.self().set_metadata(metadata);
+      }
+
       const txBody = request.signRequest.self().build();
       const txId = Buffer.from(RustModule.WalletV4.hash_transaction(txBody).to_bytes()).toString('hex');
       const signedTx = buildSignedTransaction(
@@ -232,7 +275,7 @@ export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
         request.signRequest.senderUtxos,
         ledgerSignTxResp.witnesses,
         request.publicKey,
-        request.signRequest.metadata,
+        metadata,
       );
 
       await this.api.ada.broadcastLedgerSignedTx({

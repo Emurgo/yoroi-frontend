@@ -32,6 +32,17 @@ type NetworkSettingSnapshot = {|
   +KeyDeposit: BigNumber,
 |};
 
+type LedgerNanoCatalystRegistrationTxSignData = {|
+  votingPublicKey: string,
+  stakingKeyPath: Array<number>,
+  stakingKey: string,
+  rewardAddress: string,
+  nonce: number,
+|};
+
+type TrezorTCatalystRegistrationTxSignData =
+  LedgerNanoCatalystRegistrationTxSignData;
+
 export class HaskellShelleyTxSignRequest
 implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
 
@@ -45,6 +56,10 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
     neededHashes: Set<string>, // StakeCredential
     wits: Set<string>, // Vkeywitness
   |};
+  trezorTCatalystRegistrationTxSignData:
+    void | TrezorTCatalystRegistrationTxSignData;
+  ledgerNanoCatalystRegistrationTxSignData:
+    void | LedgerNanoCatalystRegistrationTxSignData;
 
   constructor(data: {|
     senderUtxos: Array<CardanoAddressedUtxo>,
@@ -56,6 +71,10 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
       neededHashes: Set<string>, // StakeCredential
       wits: Set<string>, // Vkeywitness
     |},
+    trezorTCatalystRegistrationTxSignData?:
+      void | TrezorTCatalystRegistrationTxSignData;
+    ledgerNanoCatalystRegistrationTxSignData?:
+      void | LedgerNanoCatalystRegistrationTxSignData;
   |}) {
     this.senderUtxos = data.senderUtxos;
     this.unsignedTx = data.unsignedTx;
@@ -63,6 +82,10 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
     this.metadata = data.metadata;
     this.networkSettingSnapshot = data.networkSettingSnapshot;
     this.neededStakingKeyHashes = data.neededStakingKeyHashes;
+    this.trezorTCatalystRegistrationTxSignData =
+      data.trezorTCatalystRegistrationTxSignData;
+    this.ledgerNanoCatalystRegistrationTxSignData =
+      data.ledgerNanoCatalystRegistrationTxSignData;
   }
 
   txId(): string {

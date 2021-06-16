@@ -40,32 +40,22 @@ import BigNumber from 'bignumber.js';
 
 // Hardware Wallet Confirmation
 import HWSendConfirmationDialog from '../../components/wallet/send/HWSendConfirmationDialog';
+import globalMessages from '../../i18n/global-messages';
 
-const messagesLedger = defineMessages({
-  infoLine1: {
+const messages = defineMessages({
+  txConfirmationLedgerNanoLine1: {
     id: 'wallet.send.ledger.confirmationDialog.info.line.1',
     defaultMessage: '!!!After connecting your Ledger device to your computer’s USB port, press the Send using Ledger button.',
   },
-  infoLine2: {
-    id: 'wallet.send.ledger.confirmationDialog.info.line.2',
-    defaultMessage: '!!!Make sure Cardano ADA app must remain open on the Ledger device throughout the process.',
-  },
-  sendUsingHWButtonLabel: {
+  sendUsingLedgerNano: {
     id: 'wallet.send.ledger.confirmationDialog.submit',
     defaultMessage: '!!!Send using Ledger',
   },
-});
-
-const messagesTrezor = defineMessages({
-  infoLine1: {
+  txConfirmationTrezorTLine1: {
     id: 'wallet.send.trezor.confirmationDialog.info.line.1',
     defaultMessage: '!!!After connecting your Trezor device to your computer, press the Send using Trezor button.',
   },
-  infoLine2: {
-    id: 'wallet.send.trezor.confirmationDialog.info.line.2',
-    defaultMessage: '!!!A new tab will appear. Please follow the instructions in the new tab.',
-  },
-  sendUsingHWButtonLabel: {
+  sendUsingTrezorT: {
     id: 'wallet.send.trezor.confirmationDialog.submit',
     defaultMessage: '!!!Send using Trezor',
   },
@@ -243,6 +233,11 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
       ?? (() => { throw new Error('No explorer for wallet network'); })();
 
     if (isLedgerNanoWallet(conceptualWallet)) {
+      const messagesLedgerNano = {
+        infoLine1: messages.txConfirmationLedgerNanoLine1,
+        infoLine2: globalMessages.txConfirmationLedgerNanoLine2,
+        sendUsingHWButtonLabel: messages.sendUsingLedgerNano,
+      };
       const ledgerSendAction = this.generated.actions[adaApi].ledgerSend;
       ledgerSendAction.init.trigger();
       const ledgerSendStore = this.generated.stores.substores[adaApi].ledgerSend;
@@ -256,7 +251,7 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
           receivers={receivers}
           totalAmount={totalInput}
           transactionFee={fee}
-          messages={messagesLedger}
+          messages={messagesLedgerNano}
           isSubmitting={ledgerSendStore.isActionProcessing}
           error={ledgerSendStore.error}
           onSubmit={
@@ -272,6 +267,11 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
           }
         />);
     } else if (isTrezorTWallet(conceptualWallet)) {
+      const messagesTrezor = {
+        infoLine1: messages.txConfirmationTrezorTLine1,
+        infoLine2: globalMessages.txConfirmationTrezorTLine2,
+        sendUsingHWButtonLabel: messages.sendUsingTrezorT,
+      };
       const trezorSendAction = this.generated.actions[adaApi].trezorSend;
       const trezorSendStore = this.generated.stores.substores[adaApi].trezorSend;
       hwSendConfirmationDialog = (

@@ -34,19 +34,28 @@ import { truncateToken } from '../../../utils/formatters';
 import {
   MultiToken,
 } from '../../../api/common/lib/MultiToken';
+import type { WalletType, StepsList } from './types';
 
 const messages = defineMessages({
   line1: {
     id: 'wallet.voting.dialog.step.trx.line1',
     defaultMessage: '!!!Confirm your spending password to register in the blockchain the certificate previously generated for voting.',
   },
+  txConfirmationTrezorTLine1: {
+    id: 'wallet.voting.dialog.step.trx.trezor.info.line.1',
+    defaultMessage: '!!!After connecting your Trezor device to your computer, press the Register button.',
+  },
+  txConfirmationLedgerNanoLine1: {
+    id: 'wallet.voting.dialog.step.trx.ledger.info.line.1',
+    defaultMessage: '!!!After connecting your Ledger device to your computer’s USB port, press the Register button.',
+  },
 });
 
 type Props = {|
+  +stepsList: StepsList,
   +progressInfo: ProgressInfo,
   +staleTx: boolean,
   +transactionFee: MultiToken,
-  +isHardware: boolean,
   +isSubmitting: boolean,
   +onCancel: void => void,
   +goBack: void => void,
@@ -54,6 +63,7 @@ type Props = {|
   +classicTheme: boolean,
   +error: ?LocalizableError,
   +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
+  +walletType: WalletType,
 |};
 
 @observer
@@ -85,18 +95,52 @@ export default class VotingRegTxDialog extends Component<Props> {
     });
   }
 
+  renderInfoBlock(): Node {
+    const { walletType } = this.props;
+    const { intl } = this.context;
+
+    if (walletType === 'mnemonic') {
+      return (
+        <div className={classnames([styles.lineText, styles.firstItem])}>
+          {intl.formatMessage(messages.line1)}
+        </div>
+      );
+    }
+
+    let infoLine1;
+    let infoLine2;
+    if (walletType === 'trezorT') {
+      infoLine1 = messages.txConfirmationTrezorTLine1;
+      infoLine2 = globalMessages.txConfirmationTrezorTLine2;
+    } else if (walletType === 'ledgerNano') {
+      infoLine1 = messages.txConfirmationLedgerNanoLine1;
+      infoLine2 = globalMessages.txConfirmationLedgerNanoLine2;
+    } else {
+      throw new Error(`${nameof(VotingRegTxDialog)} impossible wallet type`);
+    }
+
+    return (
+      <div className={styles.infoBlock}>
+        <ul>
+          <li key="1"><span>{intl.formatMessage(infoLine1)}</span><br /></li>
+          <li key="2"><span>{intl.formatMessage(infoLine2)}</span><br /></li>
+        </ul>
+      </div>
+    );
+  }
+
   render(): Node {
     const { intl } = this.context;
 
-    const spendingPasswordForm = this.props.isHardware
-      ? undefined
-      : (
+    const spendingPasswordForm = (this.props.walletType === 'mnemonic')
+      ? (
         <SpendingPasswordInput
           setForm={(form) => this.setSpendingPasswordForm(form)}
           classicTheme={this.props.classicTheme}
           isSubmitting={this.props.isSubmitting}
         />
-      );
+      )
+      : undefined; // hardware wallet
 
     const staleTxWarning = (
       <div className={styles.warningBox}>
@@ -137,14 +181,13 @@ export default class VotingRegTxDialog extends Component<Props> {
         backButton={<DialogBackButton onBack={this.props.goBack} />}
       >
         <ProgressStepBlock
+          stepsList={this.props.stepsList}
           progressInfo={this.props.progressInfo}
           classicTheme={this.props.classicTheme}
         />
         {this.props.staleTx && staleTxWarning}
 
-        <div className={classnames([styles.lineText, styles.firstItem])}>
-          {intl.formatMessage(messages.line1)}
-        </div>
+        {this.renderInfoBlock()}
 
         <div className={styles.amountInput}>
           <NumericInput

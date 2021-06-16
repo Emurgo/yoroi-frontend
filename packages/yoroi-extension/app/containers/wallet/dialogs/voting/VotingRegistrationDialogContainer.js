@@ -15,12 +15,16 @@ import RegisterDialogContainer from './RegisterDialogContainer';
 import type { GeneratedData as TransactionDialogData } from './TransactionDialogContainer';
 import type { GeneratedData as RegisterDialogData } from './RegisterDialogContainer';
 import { ProgressStep, ProgressInfo } from '../../../../stores/ada/VotingStore';
+import type { WalletType } from '../../../../components/wallet/voting/types';
+import globalMessages from '../../../../i18n/global-messages';
+import CreateTxExecutingDialog from '../../../../components/wallet/voting/CreateTxExecutingDialog'
 
 export type GeneratedData = typeof VotingRegistrationDialogContainer.prototype.generated;
 
 type Props = {|
   ...InjectedOrGenerated<GeneratedData>,
   +onClose: void => void,
+  +walletType: WalletType,
 |};
 
 @observer
@@ -39,10 +43,25 @@ export default class VotingRegistrationDialogContainer extends Component<Props> 
   }
 
   render(): null | Node {
+    const votingStore = this.generated.stores.substores.ada.votingStore;
+    if (votingStore.createVotingRegTx.isExecuting) {
+      return (<CreateTxExecutingDialog />);
+    }
 
     const { profile } = this.generated.stores;
-    const votingStore = this.generated.stores.substores.ada.votingStore;
     const votingActions = this.generated.actions.ada.votingActions;
+    const walletType = this.props.walletType;
+    const stepsList = [
+      { step: ProgressStep.GENERATE, message: globalMessages.stepPin },
+      { step: ProgressStep.CONFIRM, message: globalMessages.stepConfirm },
+      ...(
+        walletType === 'mnemonic' ?
+          [{ step: ProgressStep.REGISTER, message: globalMessages.registerLabel }] :
+          []
+      ),
+      { step: ProgressStep.TRANSACTION, message: globalMessages.transactionLabel },
+      { step: ProgressStep.QR_CODE, message: globalMessages.stepQrCode },
+    ];
 
     let component = null;
 
@@ -50,6 +69,7 @@ export default class VotingRegistrationDialogContainer extends Component<Props> 
       case ProgressStep.GENERATE:
         component = (
           <GeneratePinDialog
+            stepsList={stepsList}
             progressInfo={votingStore.progressInfo}
             pin={votingStore.pin}
             next={votingActions.submitGenerate.trigger}
@@ -61,6 +81,7 @@ export default class VotingRegistrationDialogContainer extends Component<Props> 
       case ProgressStep.CONFIRM:
         component = (
           <ConfirmPinDialog
+            stepsList={stepsList}
             progressInfo={votingStore.progressInfo}
             goBack={votingActions.goBackToGenerate.trigger}
             submit={votingActions.submitConfirm.trigger}
@@ -72,12 +93,14 @@ export default class VotingRegistrationDialogContainer extends Component<Props> 
                 return pin === enteredPin;
               }
             }
+            isProcessing={votingStore.isActionProcessing}
           />);
         break;
       case ProgressStep.REGISTER:
         component = (
           <RegisterDialogContainer
             {...this.generated.RegisterDialogProps}
+            stepsList={stepsList}
             submit={votingActions.submitRegister.trigger}
             goBack={votingActions.goBackToRegister.trigger}
             cancel={this.cancel}
@@ -89,16 +112,19 @@ export default class VotingRegistrationDialogContainer extends Component<Props> 
         component = (
           <TransactionDialogContainer
             {...this.generated.TransactionDialogProps}
+            stepsList={stepsList}
             classicTheme={profile.isClassicTheme}
             cancel={this.cancel}
             submit={votingActions.submitTransaction.trigger}
             goBack={votingActions.goBackToRegister.trigger}
             onError={votingActions.submitTransactionError.trigger}
+            walletType={walletType}
           />);
         break;
       case ProgressStep.QR_CODE:
         component = (
           <QrCodeDialog
+            stepsList={stepsList}
             progressInfo={votingStore.progressInfo}
             onExternalLinkClick={handleExternalLinkClick}
             submit={votingActions.finishQRCode.trigger}
@@ -162,6 +188,10 @@ export default class VotingRegistrationDialogContainer extends Component<Props> 
             pin: Array<number>,
             progressInfo: ProgressInfo,
             encryptedKey: string | null,
+            isActionProcessing: boolean,
+            createVotingRegTx: {|
+              isExecuting: boolean,
+            |},
           |},
         |}
       |}
@@ -175,7 +205,7 @@ export default class VotingRegistrationDialogContainer extends Component<Props> 
     if (this.props.stores == null || this.props.actions == null) {
       throw new Error(`${nameof(VotingRegistrationDialogContainer)} no way to generated props`);
     }
-    const { stores, actions, } = this.props;
+    const { stores, actions } = this.props;
     return Object.freeze({
       stores: {
         profile: {
@@ -187,6 +217,10 @@ export default class VotingRegistrationDialogContainer extends Component<Props> 
               progressInfo: stores.substores.ada.votingStore.progressInfo,
               pin: stores.substores.ada.votingStore.pin,
               encryptedKey: stores.substores.ada.votingStore.encryptedKey,
+              isActionProcessing: stores.substores.ada.votingStore.isActionProcessing,
+              createVotingRegTx: {
+                isExecuting: stores.substores.ada.votingStore.createVotingRegTx.isExecuting,
+              },
             },
           },
         },
@@ -201,7 +235,7 @@ export default class VotingRegistrationDialogContainer extends Component<Props> 
               trigger: actions.ada.voting.goBackToGenerate.trigger,
             },
             submitConfirm: {
-              trigger: actions.ada.voting.submitConfirm.trigger,
+              trigger: () => { actions.ada.voting.submitConfirm.trigger() },
             },
             submitConfirmError: {
               trigger: actions.ada.voting.submitConfirmError.trigger,

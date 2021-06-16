@@ -10,12 +10,14 @@ import Voting from '../../../components/wallet/voting/Voting';
 import VotingRegistrationDialogContainer from '../dialogs/voting/VotingRegistrationDialogContainer';
 import type { GeneratedData as VotingRegistrationDialogContainerData } from '../dialogs/voting/VotingRegistrationDialogContainer';
 import { handleExternalLinkClick } from '../../../utils/routing';
-import { WalletTypeOption, } from '../../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
+import {
+  WalletTypeOption,
+} from '../../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import UnsupportedWallet from '../UnsupportedWallet';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 import LoadingSpinner from '../../../components/widgets/LoadingSpinner';
 import VerticallyCenteredLayout from '../../../components/layout/VerticallyCenteredLayout';
-import { CATALYST_MIN_AMOUNT } from '../../../config/numbersConfig';
+import { CATALYST_MIN_AMOUNT, CATALYST_DISPLAYED_MIN_AMOUNT } from '../../../config/numbersConfig';
 import InsufficientFundsPage from './InsufficientFundsPage';
 import { getTokenName, genLookupOrFail } from '../../../stores/stateless/tokenHelpers';
 import type { TokenInfoMap } from '../../../stores/toplevel/TokenInfoStore';
@@ -23,6 +25,11 @@ import environment from '../../../environment';
 import { MultiToken } from '../../../api/common/lib/MultiToken';
 import RegistrationOver from './RegistrationOver';
 import { networks, } from '../../../api/ada/lib/storage/database/prepackaged/networks';
+import type { DelegationRequests } from '../../../stores/toplevel/DelegationStore';
+import {
+  isLedgerNanoWallet,
+  isTrezorTWallet,
+} from '../../../api/ada/lib/storage/models/ConceptualWallet/index';
 
 export type GeneratedData = typeof VotingPage.prototype.generated;
 type Props = {|
@@ -30,8 +37,8 @@ type Props = {|
 |};
 
 const roundInfo = {
-  startDate: new Date(Date.parse('6 May 2021 19:00:00 GMT')),
-  endDate: new Date(Date.parse('13 May 2021 19:00:00 GMT')),
+  startDate: new Date(Date.parse('2021-06-03T16:00:00Z')),
+  endDate: new Date(Date.parse('2021-06-11T11:00:00Z')),
   nextRound: 4,
 };
 
@@ -47,6 +54,36 @@ export default class VotingPage extends Component<Props> {
     this.generated.actions.dialogs.open.trigger({ dialog: VotingRegistrationDialogContainer });
   };
 
+  get isDelegated(): ?boolean {
+    const publicDeriver = this.generated.stores.wallets.selected;
+    const delegationStore = this.generated.stores.delegation;
+
+    if (!publicDeriver) {
+      throw new Error(`${nameof(this.isDelegated)} no public deriver. Should never happen`);
+    }
+
+    const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
+    if (delegationRequests == null) {
+      throw new Error(`${nameof(this.isDelegated)} called for non-reward wallet`);
+    }
+    const currentDelegation = delegationRequests.getCurrentDelegation;
+
+    if (
+      !currentDelegation.wasExecuted ||
+      currentDelegation.isExecuting ||
+      currentDelegation.result == null
+    ) {
+      return undefined;
+    }
+    if(
+      !currentDelegation.result.currEpoch ||
+      currentDelegation.result.currEpoch.pools.length === 0
+    ) {
+      return false;
+    }
+    return true;
+  }
+
   render(): Node {
     const {
       uiDialogs,
@@ -57,7 +94,8 @@ export default class VotingPage extends Component<Props> {
     if(selected == null){
       throw new Error(`${nameof(VotingPage)} no wallet selected`);
     }
-    if (selected.getParent().getWalletType() === WalletTypeOption.HARDWARE_WALLET) {
+
+    if (isTrezorTWallet(selected.getParent())) {
       return <UnsupportedWallet />;
     }
 
@@ -100,9 +138,24 @@ export default class VotingPage extends Component<Props> {
         currentBalance={
           balance.getDefaultEntry().amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals)
         }
-        requiredBalance={CATALYST_MIN_AMOUNT.shiftedBy(-tokenInfo.Metadata.numberOfDecimals)}
+        requiredBalance={
+          CATALYST_DISPLAYED_MIN_AMOUNT.shiftedBy(-tokenInfo.Metadata.numberOfDecimals)
+        }
         tokenName={getTokenName(tokenInfo)}
       />;
+    }
+
+    let walletType;
+    if (
+      selected.getParent().getWalletType() !== WalletTypeOption.HARDWARE_WALLET
+    ) {
+      walletType = 'mnemonic';
+    } else if (isTrezorTWallet(selected.getParent())) {
+      walletType = 'trezorT';
+    } else if (isLedgerNanoWallet(selected.getParent())) {
+      walletType = 'ledgerNano';
+    } else {
+      throw new Error(`${nameof(VotingPage)} unexpected wallet type`);
     }
 
     if (uiDialogs.isOpen(VotingRegistrationDialogContainer)) {
@@ -110,6 +163,7 @@ export default class VotingPage extends Component<Props> {
         <VotingRegistrationDialogContainer
           {...this.generated.VotingRegistrationDialogProps}
           onClose={this.onClose}
+          walletType={walletType}
         />
       );
     }
@@ -120,6 +174,9 @@ export default class VotingPage extends Component<Props> {
           start={this.start}
           hasAnyPending={this.generated.hasAnyPending}
           onExternalLinkClick={handleExternalLinkClick}
+          isDelegated={this.isDelegated === true}
+          round={roundInfo.nextRound}
+          walletType={walletType}
         />
       </div>
     );
@@ -151,6 +208,9 @@ export default class VotingPage extends Component<Props> {
       |},
       wallets: {|
         selected: null | PublicDeriver<>,
+      |},
+      delegation: {|
+        getDelegationRequests: (PublicDeriver<>) => void | DelegationRequests,
       |},
     |},
   |} {
@@ -196,6 +256,9 @@ export default class VotingPage extends Component<Props> {
         },
         tokenInfoStore: {
           tokenInfo: stores.tokenInfoStore.tokenInfo,
+        },
+        delegation: {
+          getDelegationRequests: stores.delegation.getDelegationRequests,
         },
       },
       VotingRegistrationDialogProps: ({

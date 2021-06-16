@@ -183,6 +183,7 @@ import { MultiToken } from '../common/lib/MultiToken';
 import type { DefaultTokenEntry } from '../common/lib/MultiToken';
 import { hasSendAllDefault, builtSendTokenList } from '../common/index';
 import { getReceiveAddress } from '../../stores/stateless/addressStores';
+import { generateRegistrationMetadata } from './lib/cardanoCrypto/catalyst';
 
 // ADA specific Request / Response params
 
@@ -374,11 +375,36 @@ export type CreateDelegationTxRequest = {|
   valueInAccount: MultiToken,
 |};
 
-export type CreateVotingRegTxRequest = {|
+type CreateVotingRegTxRequestCommon = {|
   publicDeriver: IPublicDeriver<ConceptualWallet> & IGetAllUtxos & IHasUtxoChains,
   absSlotNumber: BigNumber,
-  metadata: RustModule.WalletV4.GeneralTransactionMetadata,
 |};
+
+export type CreateVotingRegTxRequest = {|
+  ...CreateVotingRegTxRequestCommon,
+  normalWallet: {|
+    metadata: RustModule.WalletV4.TransactionMetadata,
+  |}
+|} | {|
+  ...CreateVotingRegTxRequestCommon,
+  trezorTWallet: {|
+    votingPublicKey: string,
+    stakingKeyPath: Array<number>,
+    stakingKey: string,
+    rewardAddress: string,
+    nonce: number,
+  |}
+|} | {|
+  ...CreateVotingRegTxRequestCommon,
+  ledgerNanoWallet: {|
+    votingPublicKey: string,
+    stakingKeyPath: Array<number>,
+    stakingKey: string,
+    rewardAddress: string,
+    nonce: number,
+  |}
+|};
+
 
 export type CreateDelegationTxResponse = {|
   signTxRequest: HaskellShelleyTxSignRequest,
@@ -849,7 +875,6 @@ export default class AdaApi {
         Number.parseInt(config.ChainNetworkId, 10),
       );
       Logger.debug(`${nameof(AdaApi)}::${nameof(this.createTrezorSignTxData)} success: ` + stringifyData(trezorSignTxPayload));
-
       return {
         trezorSignTxPayload,
       };
@@ -1400,7 +1425,25 @@ export default class AdaApi {
       if (changeAddr == null) {
         throw new Error(`${nameof(this.createVotingRegTx)} no internal addresses left. Should never happen`);
       }
-      const trxMetadata = RustModule.WalletV4.TransactionMetadata.new(request.metadata);
+      let trxMetadata;
+      if (request.trezorTWallet || request.ledgerNanoWallet) {
+        // Pass a placeholder metadata so that the tx fee is correctly
+        // calculated.
+        const hwWallet = request.trezorTWallet || request.ledgerNanoWallet;
+        trxMetadata = generateRegistrationMetadata(
+          hwWallet.votingPublicKey,
+          hwWallet.stakingKey,
+          hwWallet.rewardAddress,
+          hwWallet.nonce,
+          (_hashedMetadata) => {
+            return '0'.repeat(64 * 2)
+          },
+        );
+      } else {
+        // Mnemonic wallet
+        trxMetadata = request.normalWallet.metadata;
+      }
+
       const unsignedTx = shelleyNewAdaUnsignedTx(
         [],
         {
@@ -1431,6 +1474,10 @@ export default class AdaApi {
           neededHashes: new Set(),
           wits: new Set(),
         },
+        trezorTCatalystRegistrationTxSignData:
+          request.trezorTWallet ? request.trezorTWallet : undefined,
+        ledgerNanoCatalystRegistrationTxSignData:
+          request.ledgerNanoWallet ? request.ledgerNanoWallet: undefined,
       });
     } catch (error) {
       Logger.error(`${nameof(AdaApi)}::${nameof(this.createVotingRegTx)} error: ` + stringifyError(error));
