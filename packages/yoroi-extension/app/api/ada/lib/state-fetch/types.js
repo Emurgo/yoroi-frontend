@@ -339,3 +339,20 @@ export type TokenInfoResponse = {|
 |};
 export type PoolInfoFunc = (body: PoolInfoRequest) => Promise<PoolInfoResponse>;
 export type TokenInfoFunc = (body: TokenInfoRequest) => Promise<TokenInfoResponse>;
+
+export type CatalystRoundInfoRequest = {|
+  ...BackendNetworkInfo
+|};
+
+export type CatalystRound = {|
+  +id: number,
+  +registrationStart: string,
+  +registrationEnd: string,
+  +votingStart: string,
+  +votingEnd: string,
+  +votingPowerThreshold: string,
+|};
+
+export type CatalystRoundInfoResponse = {|
+  [key: string]: (CatalystRound | null),
+|};

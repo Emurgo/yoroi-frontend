@@ -9,6 +9,7 @@ import type {
   AccountStateRequest, AccountStateResponse,
   SignedRequest, SignedResponse,
   PoolInfoRequest, PoolInfoResponse,
+  CatalystRoundInfoRequest, CatalystRoundInfoResponse,
   BestBlockRequest, BestBlockResponse,
   TokenInfoRequest, TokenInfoResponse,
 } from './types';
@@ -26,6 +27,7 @@ export interface IFetcher {
   sendTx(body: SignedRequest): Promise<SignedResponse>;
   getAccountState(body: AccountStateRequest): Promise<AccountStateResponse>;
   getPoolInfo(body: PoolInfoRequest): Promise<PoolInfoResponse>;
+  getCatalystRoundInfo(body: CatalystRoundInfoRequest): Promise<CatalystRoundInfoResponse>;
   getTokenInfo(body: TokenInfoRequest): Promise<TokenInfoResponse>;
   checkAddressesInUse(body: FilterUsedRequest): Promise<FilterUsedResponse>;
 }
