@@ -508,6 +508,9 @@ export type TokenInsert = {|
    * As some blockchains have multiple primary tokens
   */
   Identifier: string,
+  // If the token row is fetched from network, this is the ISO time string.
+  // Otherwise it is null or not present.
+  lastUpdatedAt?: ?string,
   Metadata: TokenMetadata,
 |};
 export type TokenRow = {|

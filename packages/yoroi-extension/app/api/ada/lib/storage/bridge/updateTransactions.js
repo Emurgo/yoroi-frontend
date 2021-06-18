@@ -130,6 +130,7 @@ import type {
   RemoteTxState,
   RemoteTransaction,
   RemoteCertificate,
+  TokenInfoFunc,
 } from '../../state-fetch/types';
 import {
   ShelleyCertificateTypes,
@@ -873,6 +874,7 @@ export async function updateTransactions(
   checkAddressesInUse: FilterFunc,
   getTransactionsHistoryForAddresses: HistoryFunc,
   getBestBlock: BestBlockFunc,
+  getTokenInfo: TokenInfoFunc,
 ): Promise<void> {
   const withLevels = asHasLevels<ConceptualWallet>(publicDeriver);
   const derivationTables = withLevels == null
@@ -941,6 +943,7 @@ export async function updateTransactions(
           getTransactionsHistoryForAddresses,
           getBestBlock,
           derivationTables,
+          getTokenInfo,
         );
       }
     );
@@ -1199,6 +1202,7 @@ async function rawUpdateTransactions(
   getTransactionsHistoryForAddresses: HistoryFunc,
   getBestBlock: BestBlockFunc,
   derivationTables: Map<number, string>,
+  getTokenInfo: TokenInfoFunc,
 ): Promise<void> {
   const network = publicDeriver.getParent().getNetworkInfo();
   // TODO: consider passing this function in as an argument instead of generating it here
@@ -1350,6 +1354,7 @@ async function rawUpdateTransactions(
         ),
         toAbsoluteSlotNumber,
         derivationTables,
+        getTokenInfo,
       }
     );
   }
@@ -1404,6 +1409,7 @@ async function updateTransactionBatch(
     findOwnAddress: FindOwnAddressFunc,
     derivationTables: Map<number, string>,
     defaultToken: DefaultTokenEntry,
+    getTokenInfo: TokenInfoFunc,
   |}
 ): Promise<Array<{|
   ...(CardanoByronTxIO | CardanoShelleyTxIO),
@@ -1508,7 +1514,7 @@ async function updateTransactionBatch(
       GetToken: deps.GetToken,
     },
     unseenNewTxs,
-    // request.getAssetInfo,
+    request.getTokenInfo,
     request.network,
     request.defaultToken,
   );
@@ -1909,7 +1915,7 @@ async function genCardanoAssetMap(
     GetToken: Class<GetToken>,
   |},
   newTxs: Array<RemoteTransaction>,
-  // getAssetInfo: AssetInfoFunc,
+  getTokenInfo: TokenInfoFunc,
   network: $ReadOnly<NetworkRow>,
   defaultToken: DefaultTokenEntry,
 ): Promise<Map<string, $ReadOnly<TokenRow>>> {
@@ -1927,29 +1933,57 @@ async function genCardanoAssetMap(
   const existingDbRows = (await deps.GetToken.fromIdentifier(
     db, dbTx,
     tokenIds
-  )).filter(row => row.NetworkId === network.NetworkId);
+  )).filter(row =>
+    row.NetworkId === network.NetworkId &&
+    // only rows with lastUpdateAt are considered existing, except for default asset
+    // rows, because they are never updated from network
+    row.lastUpdatedAt || row.IsDefault
+  );
 
   const existingTokens = new Set<string>(
     existingDbRows.map(row => row.Identifier)
   );
-  // const tokenInfo = await getAssetInfo({
-  //   network,
-  //   assetIds: tokenIds.filter(token => !existingTokens.has(token))
-  // });
 
-  const databaseInsert = tokenIds
-    .filter(token => !existingTokens.has(token))
+  const missingTokenIds = tokenIds.filter(token => !existingTokens.has(token));
+
+  const tokenInfoResponse = await getTokenInfo({
+    network,
+    tokenIds: missingTokenIds.map(id => id.split('.').join(''))
+  });
+
+  const databaseInsert = missingTokenIds
     .map(tokenId => {
+      // If fetched token metadata from network, store in db; otherwise store a
+      // placeholder row. The field `lastUpdateAt` differentiates the two cases.
+      let numberOfDecimals;
+      let ticker;
+      let lastUpdatedAt;
+      let longName;
+
+      const tokenInfo = tokenInfoResponse[tokenId.split('.').join('')];
+      if (tokenInfo) {
+        numberOfDecimals = tokenInfo.decimals ?? 0;
+        ticker = tokenInfo.ticker ?? null;
+        lastUpdatedAt = new Date().toISOString();
+        longName = tokenInfo.name ?? null;
+      } else {
+        numberOfDecimals = 0;
+        ticker = null;
+        lastUpdatedAt = null;
+        longName = null;
+      }
+
       const parts = identifierToCardanoAsset(tokenId);
       return {
         NetworkId: network.NetworkId,
         Identifier: tokenId,
         IsDefault: false,
+        lastUpdatedAt,
         Metadata: {
           type: 'Cardano',
-          ticker: null,
-          longName: null,
-          numberOfDecimals: 0,
+          ticker,
+          longName,
+          numberOfDecimals,
           assetName: Buffer.from(parts.name.name()).toString('hex'),
           policyId: Buffer.from(parts.policyId.to_bytes()).toString('hex'),
         }
