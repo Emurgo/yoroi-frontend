@@ -84,7 +84,7 @@ export function genLookupOrFail(
     // fixme: temporary solution
     const id = lookup.identifier.split('.').join('');
     const metadataStr = localStorage.getItem(
-      `token-metadata-${lookup.networkId}-${id}`
+      `token-metadata-${id}`
     );
     if (metadataStr) {
       const clone = JSON.parse(JSON.stringify(tokenRow));
