@@ -81,22 +81,6 @@ export function genLookupOrFail(
       .get(lookup.networkId.toString())
       ?.get(lookup.identifier);
     if (tokenRow == null) throw new Error(`${nameof(genLookupOrFail)} no token info for ${JSON.stringify(lookup)}`);
-    // fixme: temporary solution
-    const id = lookup.identifier.split('.').join('');
-    const metadataStr = localStorage.getItem(
-      `token-metadata-${id}`
-    );
-    if (metadataStr) {
-      const clone = JSON.parse(JSON.stringify(tokenRow));
-      const metadata = JSON.parse(metadataStr);
-      if (typeof metadata.decimals === 'number') {
-        clone.Metadata.numberOfDecimals = metadata.decimals;
-      }
-      if (typeof metadata.name === 'string') {
-        clone.Metadata.assetName = Buffer.from(metadata.name).toString('hex');
-      }
-      return clone;
-    }
     return tokenRow;
   };
 }
