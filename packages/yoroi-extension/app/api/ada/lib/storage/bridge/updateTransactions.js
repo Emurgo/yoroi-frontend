@@ -1937,7 +1937,7 @@ export async function genCardanoAssetMap(
     existingDbRows.filter(
       // only tokens with lastUpdateAt are considered existing, except for default
       // asset rows, because they are never updated from network
-      row => row.lastUpdatedAt || row.IsDefault
+      row => row.Metadata.lastUpdatedAt || row.IsDefault
     ).map(row => row.Identifier)
   );
 
@@ -1975,7 +1975,6 @@ export async function genCardanoAssetMap(
         NetworkId: network.NetworkId,
         Identifier: tokenId,
         IsDefault: false,
-        lastUpdatedAt,
         Metadata: {
           type: 'Cardano',
           ticker,
@@ -1983,6 +1982,7 @@ export async function genCardanoAssetMap(
           numberOfDecimals,
           assetName: Buffer.from(parts.name.name()).toString('hex'),
           policyId: Buffer.from(parts.policyId.to_bytes()).toString('hex'),
+          lastUpdatedAt,
         }
       };
     });
