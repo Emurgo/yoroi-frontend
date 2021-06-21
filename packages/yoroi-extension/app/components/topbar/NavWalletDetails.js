@@ -24,6 +24,7 @@ type Props = {|
   +onUpdateHideBalance: void => Promise<void>,
   +shouldHideBalance: boolean,
   +highlightTitle?: boolean,
+  +showEyeIcon?: boolean, 
   /**
     * undefined => wallet is not a reward wallet
     * null => still calculating
@@ -40,10 +41,11 @@ type Props = {|
 @observer
 export default class NavWalletDetails extends Component<Props> {
 
-  static defaultProps: {|highlightTitle: boolean, infoText: void, showDetails: boolean|} = {
+  static defaultProps: {|highlightTitle: boolean, infoText: void, showDetails: boolean, showEyeIcon: boolean|} = {
     highlightTitle: false,
     infoText: undefined,
     showDetails: true,
+    showEyeIcon: true,
   };
 
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
@@ -58,7 +60,8 @@ export default class NavWalletDetails extends Component<Props> {
       rewards,
       walletAmount,
       infoText,
-      showDetails
+      showDetails,
+      showEyeIcon,
     } = this.props;
 
     const { intl } = this.context;
@@ -115,7 +118,7 @@ export default class NavWalletDetails extends Component<Props> {
               </div>
             )}
           </div>
-          {totalAmount != null &&
+          {totalAmount != null&& showEyeIcon &&
             <button
               type="button"
               className={styles.toggleButton}
