@@ -1933,15 +1933,14 @@ async function genCardanoAssetMap(
   const existingDbRows = (await deps.GetToken.fromIdentifier(
     db, dbTx,
     tokenIds
-  )).filter(row =>
-    row.NetworkId === network.NetworkId &&
-    // only rows with lastUpdateAt are considered existing, except for default asset
-    // rows, because they are never updated from network
-    row.lastUpdatedAt || row.IsDefault
-  );
+  )).filter(row => row.NetworkId === network.NetworkId);
 
   const existingTokens = new Set<string>(
-    existingDbRows.map(row => row.Identifier)
+    existingDbRows.filter(
+      // only tokens with lastUpdateAt are considered existing, except for default
+      // asset rows, because they are never updated from network
+      row => row.lastUpdatedAt || row.IsDefault
+    ).map(row => row.Identifier)
   );
 
   const missingTokenIds = tokenIds.filter(token => !existingTokens.has(token));
