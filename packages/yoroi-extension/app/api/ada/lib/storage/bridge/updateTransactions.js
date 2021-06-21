@@ -1507,16 +1507,26 @@ async function updateTransactionBatch(
   }
 
   // 2) Add any new assets & lookup known ones
+  const tokenIds = Array.from(new Set(unseenNewTxs.flatMap(tx => [
+    ...tx.inputs
+      .flatMap(input => input.assets)
+      .map(asset => asset.assetId),
+    ...tx.outputs
+      .flatMap(output => output.assets)
+      .map(asset => asset.assetId),
+    // force inclusion of primary token for chain
+    request.defaultToken.defaultIdentifier
+  ])));
+
   const assetLookup = await genCardanoAssetMap(
     db, dbTx,
     {
       ModifyToken: deps.ModifyToken,
       GetToken: deps.GetToken,
     },
-    unseenNewTxs,
+    tokenIds,
     request.getTokenInfo,
     request.network,
-    request.defaultToken,
   );
 
   // 3) Add new transactions
@@ -1907,29 +1917,17 @@ function genShelleyIOGen(
   };
 }
 
-async function genCardanoAssetMap(
+export async function genCardanoAssetMap(
   db: lf$Database,
   dbTx: lf$Transaction,
   deps: {|
     ModifyToken: Class<ModifyToken>,
     GetToken: Class<GetToken>,
   |},
-  newTxs: Array<RemoteTransaction>,
+  tokenIds: Array<string>,
   getTokenInfo: TokenInfoFunc,
   network: $ReadOnly<NetworkRow>,
-  defaultToken: DefaultTokenEntry,
 ): Promise<Map<string, $ReadOnly<TokenRow>>> {
-  const tokenIds = Array.from(new Set(newTxs.flatMap(tx => [
-    ...tx.inputs
-      .flatMap(input => input.assets)
-      .map(asset => asset.assetId),
-    ...tx.outputs
-      .flatMap(output => output.assets)
-      .map(asset => asset.assetId),
-    // force inclusion of primary token for chain
-    defaultToken.defaultIdentifier
-  ])));
-
   const existingDbRows = (await deps.GetToken.fromIdentifier(
     db, dbTx,
     tokenIds
