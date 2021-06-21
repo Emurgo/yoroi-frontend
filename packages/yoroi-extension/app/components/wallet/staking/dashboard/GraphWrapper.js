@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import type { Node } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Label, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Label, ResponsiveContainer } from 'recharts';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { defineMessages, intlShape } from 'react-intl';
@@ -117,20 +117,12 @@ const Graph: {|
   const graphVars = {
     axisTickColor: themeVars['--theme-dashboard-graph-axis-tick-color'],
     axisTextColor: themeVars['--theme-dashboard-graph-axis-text-color'],
-    legendTextColor: themeVars['--theme-dashboard-graph-legend-text-color'],
-    legendIconSize: themeVars['--theme-dashboard-graph-legend-icon-size'],
     barWidth: themeVars['--theme-dashboard-graph-bar-width'],
     barHoverBgColor: themeVars['--theme-dashboard-graph-bar-hover-background-color'],
     barPrimaryColor: themeVars['--theme-dashboard-graph-bar-primary-color'],
     fontSize: themeVars['--theme-dashboard-graph-font-size'],
     lineHeight: themeVars['--theme-dashboard-graph-line-height'],
   };
-
-  const formatLegend = (value) => (
-    <span style={{ fontSize: graphVars.fontSize, color: graphVars.legendTextColor }}>
-      {value}
-    </span>
-  );
 
   const formatYAxis = (value) => (
     !hideYAxis ? value : '∗∗∗ '
@@ -208,18 +200,7 @@ const Graph: {|
           content={graphTooltip}
           cursor={{ fill: graphVars.barHoverBgColor }}
         />
-        <Legend
-          formatter={formatLegend}
-          align="left"
-          iconSize={graphVars.legendIconSize}
-          iconType="square"
-          wrapperStyle={{
-            position: 'absolute',
-            left: '100px',
-            bottom: '18px',
-            width: 'auto'
-          }}
-        />
+
         <Bar
           name={primaryBarLabel}
           maxBarSize={graphVars.barWidth}
