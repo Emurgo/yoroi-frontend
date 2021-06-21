@@ -1933,6 +1933,10 @@ export async function genCardanoAssetMap(
     tokenIds
   )).filter(row => row.NetworkId === network.NetworkId);
 
+  const existingRowsMap = new Map<string, TokenRow>(
+    existingDbRows.map(row => [row.Identifier, row])
+  );
+
   const existingTokens = new Set<string>(
     existingDbRows.filter(
       // only tokens with lastUpdateAt are considered existing, except for default
@@ -1975,6 +1979,10 @@ export async function genCardanoAssetMap(
         NetworkId: network.NetworkId,
         Identifier: tokenId,
         IsDefault: false,
+        // must have the same TokenId, which is the primary key, as the existing
+        // token row, otherwise a new row is inserted instead of the existing row
+        // being updated
+        TokenId: existingRowsMap.get(tokenId)?.TokenId,
         Metadata: {
           type: 'Cardano',
           ticker,
