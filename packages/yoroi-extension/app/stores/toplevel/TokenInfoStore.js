@@ -45,7 +45,10 @@ export default class TokenInfoStore extends Store<StoresMap, ActionsMap> {
     );
   }
 
-  @action _fetchMissingTokenInfo: ({| wallet: PublicDeriver<> |}) => Promise<void> = async ({ wallet }) => {
+  @action _fetchMissingTokenInfo
+    : ({| wallet: PublicDeriver<> |}) => Promise<void>
+    = async ({ wallet }) => {
+
     const { requests } = this.stores.transactions.getTxRequests(wallet);
 
     await requests.getBalanceRequest;
@@ -82,7 +85,7 @@ export default class TokenInfoStore extends Store<StoresMap, ActionsMap> {
     const assetMap = await raii(
       db,
       depTables,
-      dbTx => (      
+      dbTx => (
         genCardanoAssetMap(
           db,
           dbTx,
