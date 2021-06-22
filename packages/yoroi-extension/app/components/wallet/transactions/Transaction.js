@@ -384,7 +384,7 @@ export default class Transaction extends Component<Props, State> {
   |} => Node = (request) => {
     if (request.assets.length === 0) {
       return null;
-    } 
+    }
     if (request.assets.length === 1) {
       const entry = request.assets[0];
       return (
