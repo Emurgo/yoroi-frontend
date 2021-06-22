@@ -379,6 +379,52 @@ export default class Transaction extends Component<Props, State> {
     return undefined;
   }
 
+  renderAssets: {|
+    assets: Array<TokenEntry>,
+  |} => Node = (request) => {
+    if (request.assets.length === 0) {
+      return null;
+    } 
+    if (request.assets.length === 1) {
+      const entry = request.assets[0];
+      return (
+        <div className={classnames([styles.asset])}>
+          {this.renderAmountDisplay({ entry })}
+          {' '}
+          {this.getTicker(entry)}
+        </div>
+      );
+    }
+    // request.assets.length > 1
+
+    // display sign only if all amounts are either the same sign or zero
+    let sign = undefined;
+    for (const entry of request.assets) {
+      if (entry.amount.isPositive()) {
+        if (sign === '-') {
+          sign = null;
+          break;
+        }
+        sign = '+';
+      } else if (entry.amount.isNegative()) {
+        if (sign === '+') {
+          sign = null;
+          break;
+        }
+        sign = '-';
+      }
+    }
+
+    return (
+      <div className={classnames([styles.asset])}>
+        {sign}
+        {request.assets.length}
+        {' '}
+        {this.context.intl.formatMessage(globalMessages.assets)}
+      </div>
+    );
+  }
+
   renderRow: {|
     kind: string,
     data: WalletTransaction,
@@ -531,10 +577,15 @@ export default class Transaction extends Component<Props, State> {
                   type: data.type,
                 })}
               </div>
-              <div className={classnames([styles.currency, styles.amount])}>
-                {this.renderAmountDisplay({
-                  entry: data.amount.getDefaultEntry(),
-                })}
+              <div className={classnames([styles.amount])}>
+                <div className={classnames([styles.currency])}>
+                  {this.renderAmountDisplay({
+                    entry: data.amount.getDefaultEntry(),
+                  })}
+                  {' '}
+                  {this.getTicker(data.amount.getDefaultEntry())}
+                </div>
+                {this.renderAssets({ assets: data.amount.nonDefaultEntries() })}
               </div>
             </div>
             <div className={styles.expandArrowBox}>
