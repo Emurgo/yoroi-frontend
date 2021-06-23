@@ -11,7 +11,6 @@ import {
   asGetSigningKey,
   asGetAllAccounting,
 } from '../../../api/ada/lib/storage/models/PublicDeriver/traits';
-import { ROUTES } from '../../../routes-config';
 import type { ISignRequest } from '../../../api/common/lib/transactions/ISignRequest';
 import { getApiForNetwork, ApiOptions } from '../../../api/common/utils';
 import { buildCheckAndCall } from '../../lib/check';
@@ -58,7 +57,6 @@ export default class AdaMnemonicSendStore extends Store<StoresMap, ActionsMap> {
 
     this.actions.dialogs.closeActiveDialog.trigger();
     this.stores.wallets.sendMoneyRequest.reset();
-    this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.TRANSACTIONS });
   };
 
   signAndBroadcast: {|

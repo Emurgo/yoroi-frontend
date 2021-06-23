@@ -24,6 +24,7 @@ type DialogProps = {|
 type Props = {|
   ...InjectedOrGenerated<GeneratedData>,
   ...DialogProps,
+  +openTransactionSuccessDialog: () => void,
 |};
 
 @observer
@@ -52,6 +53,7 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
     const receivers = signRequest.receivers(false);
     return (
       <WalletSendConfirmationDialog
+        openTransactionSuccessDialog={this.props.openTransactionSuccessDialog}
         staleTx={this.props.staleTx}
         selectedExplorer={stores.explorers.selectedExplorer
           .get(

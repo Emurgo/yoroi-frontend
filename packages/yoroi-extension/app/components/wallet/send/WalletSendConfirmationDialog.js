@@ -52,6 +52,7 @@ type Props = {|
   +unitOfAccountSetting: UnitOfAccountSettingType,
   +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
   +getCurrentPrice: (from: string, to: string) => ?number,
+  +openTransactionSuccessDialog: () => void,
 |};
 
 @observer
@@ -95,6 +96,7 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
           password: walletPassword,
         };
         await this.props.onSubmit(transactionData);
+        this.props.openTransactionSuccessDialog()
       },
       onError: () => {}
     });
