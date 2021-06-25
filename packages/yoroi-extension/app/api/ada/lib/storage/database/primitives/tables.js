@@ -108,6 +108,7 @@ export type NetworkInsert = {|
   CoinType: CoinTypesT,
   Backend: {|
     BackendService?: string,
+    TokenInfoService?: string,
     WebSocket?: string,
   |},
   /**

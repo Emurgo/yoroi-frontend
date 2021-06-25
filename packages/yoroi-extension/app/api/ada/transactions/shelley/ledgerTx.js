@@ -18,7 +18,13 @@ import type {
   Address, Value, Addressing,
 } from '../../lib/storage/models/PublicDeriver/interfaces';
 import { HaskellShelleyTxSignRequest } from './HaskellShelleyTxSignRequest';
-import { AddressType, CertificateType, TransactionSigningMode, TxOutputDestinationType, } from '@cardano-foundation/ledgerjs-hw-app-cardano';
+import {
+  AddressType,
+  CertificateType,
+  TransactionSigningMode,
+  TxOutputDestinationType,
+  TxAuxiliaryDataType,
+} from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 import { toHexOrBase58 } from '../../lib/storage/bridge/utils';
 import {
@@ -75,6 +81,28 @@ export async function createLedgerSignTxPayload(request: {|
   }
 
   const ttl = txBody.ttl();
+
+  let auxiliaryData = undefined;
+  if (request.signRequest.ledgerNanoCatalystRegistrationTxSignData) {
+    const { votingPublicKey, stakingKeyPath, nonce } =
+      request.signRequest.ledgerNanoCatalystRegistrationTxSignData;
+
+    auxiliaryData = {
+      type: TxAuxiliaryDataType.CATALYST_REGISTRATION,
+      params: {
+        votingPublicKeyHex: votingPublicKey.replace(/^0x/, ''),
+        stakingPath: stakingKeyPath,
+        rewardsDestination: {
+          type: AddressType.REWARD,
+          params: {
+            stakingPath: stakingKeyPath,
+          },
+        },
+        nonce,
+      }
+    };
+  }
+
   return {
     signingMode: TransactionSigningMode.ORDINARY_TRANSACTION,
     tx: {
@@ -88,7 +116,7 @@ export async function createLedgerSignTxPayload(request: {|
       },
       withdrawals: ledgerWithdrawal.length === 0 ? null : ledgerWithdrawal,
       certificates: ledgerCertificates.length === 0 ? null : ledgerCertificates,
-      auxiliaryData: undefined,
+      auxiliaryData,
       validityIntervalStart: undefined,
     }
   };
@@ -358,7 +386,7 @@ export function toLedgerAddressParameters(request: {|
       return {
         type: AddressType.REWARD,
         params: {
-          spendingPath: request.path, // reward addresses use spending path
+          stakingPath: request.path, // reward addresses use spending path
         },
       };
     }

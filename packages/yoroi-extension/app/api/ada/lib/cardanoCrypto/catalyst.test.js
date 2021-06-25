@@ -8,9 +8,6 @@ beforeAll(async () => {
 });
 
 test('Generate Catalyst registration tx', async () => {
-  // const paymentKey = RustModule.WalletV4.PublicKey.from_bytes(
-  //   Buffer.from('3273a5316e4de228863bd7cf8dac90d57149e1a595f3dd131073b84e35546676', 'hex')
-  // );
   const stakePrivateKey = RustModule.WalletV4.PrivateKey.from_normal_bytes(
     Buffer.from('f5beaeff7932a4164d270afde7716067582412e8977e67986cd9b456fc082e3a', 'hex')
   );
@@ -26,12 +23,15 @@ test('Generate Catalyst registration tx', async () => {
   );
 
   const nonce = 1234;
-  const result = generateRegistration({
+  const metadata = generateRegistration({
     stakePrivateKey,
     catalystPrivateKey,
     receiverAddress: Buffer.from(address.to_address().to_bytes()),
     slotNumber: nonce,
   });
+  const result = RustModule.WalletV4.GeneralTransactionMetadata.from_bytes(
+    RustModule.WalletV4.MetadataList.from_bytes(metadata.to_bytes()).get(0).to_bytes()
+  );
 
   const data = result.get(RustModule.WalletV4.BigNum.from_str(CatalystLabels.DATA.toString()));
   if (data == null) throw new Error('Should never happen');
