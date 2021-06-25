@@ -768,7 +768,15 @@ const globalMessages: * = defineMessages({
   buySellAda: {
     id: 'button.buySellAda',
     defaultMessage: '!!!Buy/Sell ADA',
-  }
+  },
+  txConfirmationLedgerNanoLine2: {
+    id: 'wallet.send.ledger.confirmationDialog.info.line.2',
+    defaultMessage: '!!!Make sure Cardano ADA app must remain open on the Ledger device throughout the process.',
+  },
+  txConfirmationTrezorTLine2: {
+    id: 'wallet.send.trezor.confirmationDialog.info.line.2',
+    defaultMessage: '!!!A new tab will appear. Please follow the instructions in the new tab.',
+  },
 });
 export default globalMessages;
 

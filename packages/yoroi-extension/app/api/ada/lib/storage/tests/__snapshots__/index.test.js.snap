@@ -1188,6 +1188,7 @@ Object {
     Object {
       "Backend": Object {
         "BackendService": "https://iohk-mainnet.yoroiwallet.com",
+        "TokenInfoService": "https://cdn.yoroiwallet.com",
         "WebSocket": "wss://iohk-mainnet.yoroiwallet.com:443",
       },
       "BaseConfig": Array [
@@ -1269,6 +1270,7 @@ Object {
     Object {
       "Backend": Object {
         "BackendService": "https://testnet-backend.yoroiwallet.com",
+        "TokenInfoService": "https://stage-cdn.yoroiwallet.com",
         "WebSocket": "wss://testnet-backend.yoroiwallet.com:443",
       },
       "BaseConfig": Array [
