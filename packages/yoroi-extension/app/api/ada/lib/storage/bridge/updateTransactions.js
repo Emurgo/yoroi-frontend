@@ -1933,7 +1933,7 @@ export async function genCardanoAssetMap(
     tokenIds
   )).filter(row => row.NetworkId === network.NetworkId);
 
-  const existingRowsMap = new Map<string, TokenRow>(
+  const existingRowsMap = new Map<string, $ReadOnly<TokenRow>>(
     existingDbRows.map(row => [row.Identifier, row])
   );
 
