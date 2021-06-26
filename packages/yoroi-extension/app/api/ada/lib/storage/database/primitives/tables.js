@@ -471,6 +471,9 @@ export type CommonMetadata = {|
   numberOfDecimals: number,
   ticker: null | string,
   longName: null | string,
+  // If the token row is fetched from network, this is the ISO time string.
+  // Otherwise it is null or not present.
+  lastUpdatedAt?: ?string,
 |};
 export type TokenMetadata = {|
   +type: 'Ergo',
@@ -510,6 +513,11 @@ export type TokenInsert = {|
   Identifier: string,
   Metadata: TokenMetadata,
 |};
+export type TokenUpsertWithDigest = TokenInsert | {|
+  TokenId?: ?number,
+  ...TokenInsert,
+|};
+export type TokenUpsert = $Diff<TokenUpsertWithDigest, {| Digest: number |}>;
 export type TokenRow = {|
   TokenId: number,
   ...TokenInsert,

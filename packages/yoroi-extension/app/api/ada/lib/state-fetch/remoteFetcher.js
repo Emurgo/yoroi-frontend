@@ -396,9 +396,13 @@ export class RemoteFetcher implements IFetcher {
         if (resp.decimals?.value) {
           v.decimals = resp.decimals.value;
         }
-        if (v.name || v.decimals) {
+        if (resp.ticker?.value) {
+          v.ticker = resp.ticker.value;
+        }
+        if (v.name || v.decimals || v.ticker) {
           res[resp.subject] = v;
         }
+
       }
       return res;
     }, {});
