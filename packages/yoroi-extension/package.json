@@ -153,7 +153,7 @@
     "ws": "7.4.3"
   },
   "dependencies": {
-    "@cardano-foundation/ledgerjs-hw-app-cardano": "3.1.0",
+    "@cardano-foundation/ledgerjs-hw-app-cardano": "3.2.1",
     "@download/blockies": "1.0.3",
     "@emurgo/cardano-serialization-lib-browser": "6.0.0",
     "@emurgo/cip14-js": "2.0.0",
