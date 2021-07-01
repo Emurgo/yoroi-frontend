@@ -8,7 +8,7 @@ export type TransactionMetadata = {|
 
 export function createMetadata(
   metadata: Array<TransactionMetadata>
-): RustModule.WalletV4.TransactionMetadata {
+): RustModule.WalletV4.AuxiliaryData {
   const transactionMetadata = RustModule.WalletV4.GeneralTransactionMetadata.new();
 
   metadata.forEach((meta: TransactionMetadata) => {
@@ -19,7 +19,7 @@ export function createMetadata(
     transactionMetadata.insert(RustModule.WalletV4.BigNum.from_str(meta.label), metadatum);
   });
 
-  return RustModule.WalletV4.TransactionMetadata.new(transactionMetadata);
+  return RustModule.WalletV4.AuxiliaryData.new(transactionMetadata);
 }
 
 export function parseMetadata(hex: string): any {

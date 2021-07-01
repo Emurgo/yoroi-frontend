@@ -405,7 +405,7 @@ class MockTrezorConnect {
     }
 
     const metadata = request.metadata != null
-      ? RustModule.WalletV4.TransactionMetadata.from_bytes(
+      ? RustModule.WalletV4.AuxiliaryData.from_bytes(
         Buffer.from(request.metadata, 'hex')
       )
       : undefined;
