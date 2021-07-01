@@ -19,7 +19,9 @@ export function createMetadata(
     transactionMetadata.insert(RustModule.WalletV4.BigNum.from_str(meta.label), metadatum);
   });
 
-  return RustModule.WalletV4.AuxiliaryData.new(transactionMetadata);
+  const auxData = RustModule.WalletV4.AuxiliaryData.new();
+  auxData.set_metadata(transactionMetadata);
+  return auxData;
 }
 
 export function parseMetadata(hex: string): any {
