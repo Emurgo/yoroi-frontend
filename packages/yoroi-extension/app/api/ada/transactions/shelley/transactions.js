@@ -256,7 +256,7 @@ export function sendAllUnsignedTxFromUtxo(
   }
 
   if(metadata !== undefined){
-    txBuilder.set_metadata(metadata);
+    txBuilder.set_auxiliary_data(metadata);
   }
 
   if (totalBalance.lt(txBuilder.min_fee().to_str())) {
@@ -477,7 +477,7 @@ export function newAdaUnsignedTxFromUtxo(
     txBuilder.set_certs(certsWasm);
   }
   if (metadata !== undefined){
-    txBuilder.set_metadata(metadata);
+    txBuilder.set_auxiliary_data(metadata);
   }
   if (withdrawals.length > 0) {
     const withdrawalWasm = withdrawals.reduce(
