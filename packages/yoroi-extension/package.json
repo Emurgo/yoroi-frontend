@@ -130,7 +130,7 @@
     "json-stable-stringify": "1.0.1",
     "markdown-loader": "6.0.0",
     "minimist": "1.2.5",
-    "node-sass": "5.0.0",
+    "node-sass": "6.0.1",
     "path-to-regexp": "6.2.0",
     "postcss": "8.2.6",
     "postcss-loader": "5.0.0",
