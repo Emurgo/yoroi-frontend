@@ -2545,7 +2545,7 @@ async function certificateToDb(
           const metadata = cert.poolParams.poolMetadata;
           return RustModule.WalletV4.PoolMetadata.new(
             RustModule.WalletV4.URL.new(metadata.url),
-            RustModule.WalletV4.MetadataHash.from_bytes(
+            RustModule.WalletV4.PoolMetadataHash.from_bytes(
               Buffer.from(metadata.metadataHash, 'hex')
             )
           );
