@@ -368,7 +368,7 @@ class MockLedgerConnect {
         request.params.tx.auxiliaryData.type ===
           TxAuxiliaryDataType.ARBITRARY_HASH
       ) {
-        body.set_metadata_hash(RustModule.WalletV4.MetadataHash.from_bytes(
+        body.set_metadata_hash(RustModule.WalletV4.AuxiliaryDataHash.from_bytes(
           Buffer.from(request.params.tx.auxiliaryData.params.hashHex, 'hex')
         ));
       } else {
