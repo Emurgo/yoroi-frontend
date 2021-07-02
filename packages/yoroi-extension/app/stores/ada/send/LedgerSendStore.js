@@ -265,7 +265,7 @@ export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
       }
 
       if (metadata) {
-        request.signRequest.self().set_metadata(metadata);
+        request.signRequest.self().set_auxiliary_data(metadata);
       }
 
       const txBody = request.signRequest.self().build();

@@ -59,7 +59,7 @@ export function sendAllUnsignedTx(
     keyDeposit: RustModule.WalletV4.BigNum,
     networkId: number,
   |},
-  metadata: RustModule.WalletV4.TransactionMetadata | void,
+  metadata: RustModule.WalletV4.AuxiliaryData | void,
 ): V4UnsignedTxAddressedUtxoResponse {
   const addressingMap = new Map<RemoteUnspentOutput, CardanoAddressedUtxo>();
   for (const utxo of allUtxos) {
@@ -220,7 +220,7 @@ export function sendAllUnsignedTxFromUtxo(
     keyDeposit: RustModule.WalletV4.BigNum,
     networkId: number,
   |},
-  metadata: RustModule.WalletV4.TransactionMetadata | void,
+  metadata: RustModule.WalletV4.AuxiliaryData | void,
 ): V4UnsignedTxUtxoResponse {
   const totalBalance = allUtxos
     .map(utxo => new BigNumber(utxo.amount))
@@ -256,7 +256,7 @@ export function sendAllUnsignedTxFromUtxo(
   }
 
   if(metadata !== undefined){
-    txBuilder.set_metadata(metadata);
+    txBuilder.set_auxiliary_data(metadata);
   }
 
   if (totalBalance.lt(txBuilder.min_fee().to_str())) {
@@ -325,7 +325,7 @@ export function newAdaUnsignedTx(
     amount: RustModule.WalletV4.BigNum,
   |}>,
   allowNoOutputs: boolean,
-  metadata: RustModule.WalletV4.TransactionMetadata | void,
+  metadata: RustModule.WalletV4.AuxiliaryData | void,
 ): V4UnsignedTxAddressedUtxoResponse {
   const addressingMap = new Map<RemoteUnspentOutput, CardanoAddressedUtxo>();
   for (const utxo of allUtxos) {
@@ -432,7 +432,7 @@ export function newAdaUnsignedTxFromUtxo(
     amount: RustModule.WalletV4.BigNum,
   |}>,
   allowNoOutputs: boolean,
-  metadata: RustModule.WalletV4.TransactionMetadata | void,
+  metadata: RustModule.WalletV4.AuxiliaryData | void,
 ): V4UnsignedTxUtxoResponse {
   /**
    * Shelley supports transactions with no outputs by simply burning any leftover ADA as fee
@@ -477,7 +477,7 @@ export function newAdaUnsignedTxFromUtxo(
     txBuilder.set_certs(certsWasm);
   }
   if (metadata !== undefined){
-    txBuilder.set_metadata(metadata);
+    txBuilder.set_auxiliary_data(metadata);
   }
   if (withdrawals.length > 0) {
     const withdrawalWasm = withdrawals.reduce(
@@ -666,7 +666,7 @@ export function signTransaction(
   keyLevel: number,
   signingKey: RustModule.WalletV4.Bip32PrivateKey,
   stakingKeyWits: Set<string>,
-  metadata: void | RustModule.WalletV4.TransactionMetadata,
+  metadata: void | RustModule.WalletV4.AuxiliaryData,
 ): RustModule.WalletV4.Transaction {
   const seenByronKeys: Set<string> = new Set();
   const seenKeyHashes: Set<string> = new Set();

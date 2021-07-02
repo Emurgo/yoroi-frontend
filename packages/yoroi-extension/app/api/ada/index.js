@@ -385,7 +385,7 @@ type CreateVotingRegTxRequestCommon = {|
 export type CreateVotingRegTxRequest = {|
   ...CreateVotingRegTxRequestCommon,
   normalWallet: {|
-    metadata: RustModule.WalletV4.TransactionMetadata,
+    metadata: RustModule.WalletV4.AuxiliaryData,
   |}
 |} | {|
   ...CreateVotingRegTxRequestCommon,

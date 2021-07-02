@@ -405,12 +405,12 @@ class MockTrezorConnect {
     }
 
     const metadata = request.metadata != null
-      ? RustModule.WalletV4.TransactionMetadata.from_bytes(
+      ? RustModule.WalletV4.AuxiliaryData.from_bytes(
         Buffer.from(request.metadata, 'hex')
       )
       : undefined;
     if (metadata != null) {
-      body.set_metadata_hash(RustModule.WalletV4.hash_metadata(metadata));
+      body.set_metadata_hash(RustModule.WalletV4.hash_auxiliary_data(metadata));
     }
     if (request.withdrawals != null && request.withdrawals.length > 0) {
       const withdrawalRequest = request.withdrawals;

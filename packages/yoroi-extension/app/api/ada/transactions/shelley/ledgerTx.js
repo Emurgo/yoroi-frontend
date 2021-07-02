@@ -402,7 +402,7 @@ export function buildSignedTransaction(
     ...Addressing,
     key: RustModule.WalletV4.Bip32PublicKey,
   |},
-  metadata: RustModule.WalletV4.TransactionMetadata | void
+  metadata: RustModule.WalletV4.AuxiliaryData | void
 ): RustModule.WalletV4.Transaction {
   const isSameArray = (array1: Array<number>, array2: Array<number>) => (
     array1.length === array2.length && array1.every((value, index) => value === array2[index])
