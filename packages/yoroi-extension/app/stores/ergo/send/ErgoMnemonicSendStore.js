@@ -37,6 +37,7 @@ export default class ErgoMnemonicSendStore extends Store<StoresMap, ActionsMap> 
     signRequest: ISignRequest<any>,
     password: string,
     publicDeriver: PublicDeriver<>,
+    onSuccess?: void => void,
   |} => Promise<void> = async (request) => {
     if (!(request.signRequest instanceof ErgoTxSignRequest)) {
       throw new Error(`${nameof(this._sendMoney)} wrong tx sign request`);

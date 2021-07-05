@@ -11,6 +11,7 @@ import {
   asGetSigningKey,
   asGetAllAccounting,
 } from '../../../api/ada/lib/storage/models/PublicDeriver/traits';
+import { ROUTES } from '../../../routes-config';
 import type { ISignRequest } from '../../../api/common/lib/transactions/ISignRequest';
 import { getApiForNetwork, ApiOptions } from '../../../api/common/utils';
 import { buildCheckAndCall } from '../../lib/check';
@@ -39,6 +40,7 @@ export default class AdaMnemonicSendStore extends Store<StoresMap, ActionsMap> {
     signRequest: ISignRequest<any>,
     password: string,
     publicDeriver: PublicDeriver<>,
+    onSuccess?: void => void,
   |} => Promise<void> = async (request) => {
     if (!(request.signRequest instanceof HaskellShelleyTxSignRequest)) {
       throw new Error(`${nameof(this._sendMoney)} wrong tx sign request`);
@@ -57,6 +59,11 @@ export default class AdaMnemonicSendStore extends Store<StoresMap, ActionsMap> {
 
     this.actions.dialogs.closeActiveDialog.trigger();
     this.stores.wallets.sendMoneyRequest.reset();
+    if (request.onSuccess) {
+      request.onSuccess();
+    } else {
+      this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.TRANSACTIONS });
+    }
   };
 
   signAndBroadcast: {|

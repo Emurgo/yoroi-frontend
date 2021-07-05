@@ -38,6 +38,7 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
     const {
       signRequest,
       unitOfAccountSetting,
+      openTransactionSuccessDialog,
     } = this.props;
     const { stores, actions } = this.generated;
     const publicDeriver = stores.wallets.selected;
@@ -53,7 +54,6 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
     const receivers = signRequest.receivers(false);
     return (
       <WalletSendConfirmationDialog
-        openTransactionSuccessDialog={this.props.openTransactionSuccessDialog}
         staleTx={this.props.staleTx}
         selectedExplorer={stores.explorers.selectedExplorer
           .get(
@@ -71,6 +71,7 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
             signRequest,
             password,
             publicDeriver,
+            onSuccess: openTransactionSuccessDialog,
           });
         }}
         isSubmitting={sendMoneyRequest.isExecuting}
@@ -96,6 +97,7 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
             password: string,
             publicDeriver: PublicDeriver<>,
             signRequest: ISignRequest<any>,
+            onSuccess?: void => void,
           |}) => Promise<void>
         |},
       |},

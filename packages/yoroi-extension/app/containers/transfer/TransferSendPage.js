@@ -244,6 +244,7 @@ export default class TransferSendPage extends Component<Props> {
             password: string,
             publicDeriver: PublicDeriver<>,
             signRequest: ISignRequest<any>,
+            onSuccess?: void => void,
           |}) => Promise<void>
         |}
       |},
