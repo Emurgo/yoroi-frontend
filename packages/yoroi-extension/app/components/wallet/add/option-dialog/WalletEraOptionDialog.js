@@ -56,17 +56,17 @@ export default class WalletEraOptionDialog extends Component<Props> {
           <ul className={styles.optionBlockList}>
             <OptionBlock
               parentName="WalletEraOptionDialog"
-              type="bgByronMainnet"
-              title={intl.formatMessage(messages.restoreByronEraWalletTitle)}
-              learnMoreText={intl.formatMessage(globalMessages.restoreByronEraWalletDescription)}
-              onSubmit={this.props.onByron}
-            />
-            <OptionBlock
-              parentName="WalletEraOptionDialog"
               type="bgShelleyMainnet"
               title={intl.formatMessage(messages.restoreShelleyEraWalletTitle)}
               learnMoreText={intl.formatMessage(globalMessages.restoreShelleyEraWalletDescription)}
               onSubmit={this.props.onShelley}
+            />
+            <OptionBlock
+              parentName="WalletEraOptionDialog"
+              type="bgByronMainnet"
+              title={intl.formatMessage(messages.restoreByronEraWalletTitle)}
+              learnMoreText={intl.formatMessage(globalMessages.restoreByronEraWalletDescription)}
+              onSubmit={this.props.onByron}
             />
           </ul>
         </div>
