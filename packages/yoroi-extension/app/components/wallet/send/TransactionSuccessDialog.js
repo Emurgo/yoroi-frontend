@@ -10,15 +10,15 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 const messages = defineMessages({
   title: {
     id: 'wallet.transaction.success.title',
-    defaultMessage: 'Successfully sent',
+    defaultMessage: '!!!Successfully sent',
   },
   buttonLabel: {
     id: 'wallet.transaction.success.button.label',
-    defaultMessage: 'Transaction page',
+    defaultMessage: '!!!Transaction page',
   },
   explanation: {
     id: 'wallet.transaction.success.explanation',
-    defaultMessage: 'Track the status of the transaction from the Transactions page',
+    defaultMessage: '!!!Track the status of the transaction from the Transactions page',
   }
 });
 
