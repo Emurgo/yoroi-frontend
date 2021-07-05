@@ -620,6 +620,16 @@ chrome.runtime.onConnectExternal.addListener(port => {
             });
           }
         );
+      } else if (message.type === 'yoroi_connect_request/cardano') {
+        await withDb(
+          async (_db, localStorageApi) => {
+            const connextionConfirmed = await confirmConnect(tabId, message.url, localStorageApi);
+            port.postMessage({
+              type: 'yoroi_connect_response/cardano',
+              success: connextionConfirmed !== null
+            });
+          }
+        );
       } else if (message.type === 'connector_rpc_request') {
         switch (message.function) {
           case 'sign_tx':

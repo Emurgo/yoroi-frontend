@@ -28,10 +28,28 @@ function ergo_check_read_access() {
         return Promise.resolve(false);
     }
 }
+
+function cardano_request_read_access() {
+    return new Promise(function(resolve, reject) {
+        window.postMessage({
+            type: "yoroi_connect_request/cardano",
+        }, location.origin);
+        ergoConnectRequests.push({ resolve: resolve, reject: reject });
+    });
+}
+
+// @todo
+function cardano_check_read_access() {
+    if (typeof cardano !== "undefined") {
+        return 'Under development'
+    } else {
+        return Promise.resolve(false);
+    }
+}
 `
 
 // client-facing ergo object API
-const apiInject = `
+const ergoApiInject = `
 // RPC set-up
 var ergoRpcUid = 0;
 var ergoRpcResolver = new Map();
@@ -108,6 +126,25 @@ class ErgoAPI {
 
 const ergo = Object.freeze(new ErgoAPI());
 `
+
+const cardanoApiInject = `
+
+// @todo add cardano rpc resolver when it is done
+
+class CardanoAPI {
+    constructor(){
+        this.initTimestamp = Date.now()
+        this.getInitTimestamp()
+    }
+
+    getInitTimestamp(){
+        return this.initTimestamp
+    }
+}
+
+const cardano = Object.freeze(new CardanoAPI())
+`
+
 const API_INTERNAL_ERROR = -2;
 const API_REFUSED = -3;
 
@@ -155,7 +192,8 @@ function getFavicon(url) {
 }
 
 let yoroiPort = null;
-let fullApiInjected = false;
+let ergoApiInjected = false;
+let cardanoApiInjected = false;
 
 function disconnectWallet() {
     yoroiPort = null;
@@ -166,15 +204,15 @@ function createYoroiPort() {
     // events from Yoroi
     yoroiPort = chrome.runtime.connect(extensionId);
     yoroiPort.onMessage.addListener(message => {
-        //alert("content script message: " + JSON.stringify(message));
+        alert("content script message: " + JSON.stringify(message));
         if (message.type == "connector_rpc_response") {
             window.postMessage(message, location.origin);
         } else if (message.type == "yoroi_connect_response") {
             if (message.success) {
-                if (!fullApiInjected) {
+                if (!ergoApiInjected) {
                     // inject full API here
-                    if (injectIntoPage(apiInject)) {
-                        fullApiInjected = true;
+                    if (injectIntoPage(ergoApiInject)) {
+                        ergoApiInjected = true;
                     } else {
                         console.error()
                         window.postMessage({
@@ -182,6 +220,28 @@ function createYoroiPort() {
                             err: {
                                 code: API_INTERNAL_ERROR,
                                 info: "failed to inject Ergo API"
+                            }
+                        }, location.origin);
+                    }
+                }
+            }
+            window.postMessage({
+                type: "connector_connected",
+                success: message.success
+            }, location.origin);
+        } else if (message.type == "yoroi_connect_response/cardano") {
+            if (message.success) {
+                if (!cardanoApiInjected) {
+                    // inject full API here
+                    if (injectIntoPage(cardanoApiInject)) {
+                        cardanoApiInjected = true;
+                    } else {
+                        console.error()
+                        window.postMessage({
+                            type: "connector_connected",
+                            err: {
+                                code: API_INTERNAL_ERROR,
+                                info: "failed to inject Cardano API"
                             }
                         }, location.origin);
                     }
