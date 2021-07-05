@@ -90,7 +90,6 @@ export default class VotingPage extends Component<Props> {
       wallets: { selected },
     } = this.generated.stores;
     let activeDialog = null;
-
     if(selected == null){
       throw new Error(`${nameof(VotingPage)} no wallet selected`);
     }

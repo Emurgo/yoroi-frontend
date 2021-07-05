@@ -156,6 +156,10 @@ const messages = defineMessages({
     id: 'api.errors.getPoolInfoApiError',
     defaultMessage: '!!!Error received from server while getting pool info.',
   },
+  getCatalystRoundApiError: {
+    id: 'api.errors.getCatalystRoundApiError',
+    defaultMessage: '!!!Error received from server while getting catalyst round info.',
+  },
   getTokenInfoApiError: {
     id: 'api.errors.getTokenInfoApiError',
     defaultMessage: '!!!Error received from server while getting token info.',
@@ -504,6 +508,16 @@ export class GetPoolInfoApiError extends LocalizableError {
     });
   }
 }
+
+export class GetCatalystRoundInfoApiError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.getCatalystRoundApiError.id,
+      defaultMessage: messages.getCatalystRoundApiError.defaultMessage || '',
+    });
+  }
+}
+
 export class GetTokenInfoApiError extends LocalizableError {
   constructor() {
     super({
