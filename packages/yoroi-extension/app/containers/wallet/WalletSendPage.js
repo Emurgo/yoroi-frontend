@@ -278,6 +278,7 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
             () => ledgerSendAction.sendUsingLedgerWallet.trigger({
               params: { signRequest },
               publicDeriver,
+              onSuccess: this.openTransactionSuccessDialog,
             })
           }
           onCancel={ledgerSendAction.cancel.trigger}
@@ -311,6 +312,7 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
             () => trezorSendAction.sendUsingTrezor.trigger({
               params: { signRequest },
               publicDeriver,
+              onSuccess: this.openTransactionSuccessDialog,
             })
           }
           onCancel={trezorSendAction.cancel.trigger}
@@ -367,7 +369,8 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
           sendUsingLedgerWallet: {|
             trigger: (params: {|
               params: SendUsingLedgerParams,
-              publicDeriver: PublicDeriver<>
+              publicDeriver: PublicDeriver<>,
+              onSuccess?: void => void,
             |}) => Promise<void>
           |}
         |},
@@ -376,7 +379,8 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
           sendUsingTrezor: {|
             trigger: (params: {|
               params: SendUsingTrezorParams,
-              publicDeriver: PublicDeriver<>
+              publicDeriver: PublicDeriver<>,
+              onSuccess?: void => void,
             |}) => Promise<void>
           |}
         |},

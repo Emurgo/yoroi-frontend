@@ -225,7 +225,8 @@ export default class TransferSendPage extends Component<Props> {
           sendUsingLedgerWallet: {|
             trigger: (params: {|
               params: SendUsingLedgerParams,
-              publicDeriver: PublicDeriver<>
+              publicDeriver: PublicDeriver<>,
+              onSuccess?: void => void,
             |}) => Promise<void>
           |}
         |},
@@ -233,7 +234,8 @@ export default class TransferSendPage extends Component<Props> {
           sendUsingTrezor: {|
             trigger: (params: {|
               params: SendUsingTrezorParams,
-              publicDeriver: PublicDeriver<>
+              publicDeriver: PublicDeriver<>,
+              onSuccess?: void => void,
             |}) => Promise<void>
           |}
         |},
