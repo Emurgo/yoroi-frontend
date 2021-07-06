@@ -134,7 +134,6 @@ const cardanoApiInject = `
 class CardanoAPI {
     constructor(){
         this.initTimestamp = Date.now()
-        this.getInitTimestamp()
     }
 
     getInitTimestamp(){
