@@ -12,6 +12,7 @@ import type {
   RemoteTransaction, RemoteUnspentOutput,
   SignedRequestInternal,
   RemoteTransactionInput,
+  TokenInfoFunc,
 } from './types';
 import type {
   FilterUsedRequest, FilterUsedResponse, FilterFunc,
@@ -665,4 +666,9 @@ export function genGetPoolInfo(
     }
     return result;
   };
+}
+
+export function genGetTokenInfo(
+): TokenInfoFunc {
+  return async (_) => ({});
 }
