@@ -15,11 +15,13 @@ import ErrorBlock from '../../../../components/widgets/ErrorBlock';
 import type { CreateVotingRegTxFunc } from '../../../../api/ada/index';
 import { ProgressInfo } from '../../../../stores/ada/VotingStore';
 import RegisterDialog from '../../../../components/wallet/voting/RegisterDialog';
+import type { StepsList } from '../../../../components/wallet/voting/types';
 
 export type GeneratedData = typeof RegisterDialogContainer.prototype.generated;
 
 type Props = {|
   ...InjectedOrGenerated<GeneratedData>,
+  +stepsList: StepsList,
   +submit: void => PossiblyAsync<void>,
   +cancel: void => void,
   +goBack: void => void,
@@ -35,7 +37,7 @@ export default class RegisterDialogContainer extends Component<Props> {
 
   render(): Node {
     const { intl } = this.context;
-    const { submit, cancel, onError, classicTheme } = this.props;
+    const { submit, cancel, onError, classicTheme, stepsList } = this.props;
     const { votingRegTransaction } = this.generated.stores.substores.ada;
     const votingStore = this.generated.stores.substores.ada.votingStore;
 
@@ -61,6 +63,7 @@ export default class RegisterDialogContainer extends Component<Props> {
     }
     return (
       <RegisterDialog
+        stepsList={stepsList}
         progressInfo={votingStore.progressInfo}
         submit={async (walletPassword: string) => {
           try {

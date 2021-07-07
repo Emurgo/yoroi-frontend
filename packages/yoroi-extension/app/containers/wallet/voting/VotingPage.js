@@ -10,7 +10,9 @@ import Voting from '../../../components/wallet/voting/Voting';
 import VotingRegistrationDialogContainer from '../dialogs/voting/VotingRegistrationDialogContainer';
 import type { GeneratedData as VotingRegistrationDialogContainerData } from '../dialogs/voting/VotingRegistrationDialogContainer';
 import { handleExternalLinkClick } from '../../../utils/routing';
-import { WalletTypeOption, } from '../../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
+import {
+  WalletTypeOption,
+} from '../../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import UnsupportedWallet from '../UnsupportedWallet';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 import LoadingSpinner from '../../../components/widgets/LoadingSpinner';
@@ -24,6 +26,10 @@ import { MultiToken } from '../../../api/common/lib/MultiToken';
 import RegistrationOver from './RegistrationOver';
 import { networks, } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import type { DelegationRequests } from '../../../stores/toplevel/DelegationStore';
+import {
+  isLedgerNanoWallet,
+  isTrezorTWallet,
+} from '../../../api/ada/lib/storage/models/ConceptualWallet/index';
 
 export type GeneratedData = typeof VotingPage.prototype.generated;
 type Props = {|
@@ -88,7 +94,8 @@ export default class VotingPage extends Component<Props> {
     if(selected == null){
       throw new Error(`${nameof(VotingPage)} no wallet selected`);
     }
-    if (selected.getParent().getWalletType() === WalletTypeOption.HARDWARE_WALLET) {
+
+    if (isTrezorTWallet(selected.getParent())) {
       return <UnsupportedWallet />;
     }
 
@@ -138,11 +145,25 @@ export default class VotingPage extends Component<Props> {
       />;
     }
 
+    let walletType;
+    if (
+      selected.getParent().getWalletType() !== WalletTypeOption.HARDWARE_WALLET
+    ) {
+      walletType = 'mnemonic';
+    } else if (isTrezorTWallet(selected.getParent())) {
+      walletType = 'trezorT';
+    } else if (isLedgerNanoWallet(selected.getParent())) {
+      walletType = 'ledgerNano';
+    } else {
+      throw new Error(`${nameof(VotingPage)} unexpected wallet type`);
+    }
+
     if (uiDialogs.isOpen(VotingRegistrationDialogContainer)) {
       activeDialog = (
         <VotingRegistrationDialogContainer
           {...this.generated.VotingRegistrationDialogProps}
           onClose={this.onClose}
+          walletType={walletType}
         />
       );
     }
@@ -155,6 +176,7 @@ export default class VotingPage extends Component<Props> {
           onExternalLinkClick={handleExternalLinkClick}
           isDelegated={this.isDelegated === true}
           round={roundInfo.nextRound}
+          walletType={walletType}
         />
       </div>
     );
