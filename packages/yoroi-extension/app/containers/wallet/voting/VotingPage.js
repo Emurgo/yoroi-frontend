@@ -31,9 +31,9 @@ type Props = {|
 |};
 
 const roundInfo = {
-  startDate: new Date(Date.parse('2021-06-03T16:00:00Z')),
-  endDate: new Date(Date.parse('2021-06-11T11:00:00Z')),
-  nextRound: 4,
+  startDate: new Date(Date.parse('2021-07-08T16:00:00Z')),
+  endDate: new Date(Date.parse('2021-07-19T11:00:00Z')),
+  nextRound: 5,
 };
 
 @observer
