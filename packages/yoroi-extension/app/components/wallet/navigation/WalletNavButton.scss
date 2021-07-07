@@ -7,7 +7,6 @@
   justify-content: center;
   height: var(--theme-wallet-navigation-tab-height);
   color: var(--theme-nav-item-text-color);
-  border-top-right-radius: var(--theme-page-content-border-radius);
 
   &:hover {
     background-color: var(--theme-nav-item-background-color-hover);
@@ -28,6 +27,9 @@
   }
 
   .icon {
+    & > svg {
+      color: var(--theme-wallet-navigation-tab-text-color-active);
+    }
     & > svg > path {
       fill: var(--theme-wallet-navigation-tab-text-color-active);
     }

@@ -19,7 +19,7 @@ import type {
   CertificateAddressInsert, CertificateAddressRow,
   DbBlock,
   NetworkInsert, NetworkRow,
-  TokenInsert, TokenRow,
+  TokenRow, TokenUpsert, TokenUpsertWithDigest,
   TokenListInsert, TokenListRow,
 } from '../tables';
 import type {
@@ -644,10 +644,10 @@ export class ModifyToken {
   static async upsert(
     db: lf$Database,
     tx: lf$Transaction,
-    rows: $ReadOnlyArray<$Diff<TokenInsert, {| Digest: number |}>>,
+    rows: $ReadOnlyArray<TokenUpsert>,
   ): Promise<$ReadOnlyArray<$ReadOnly<TokenRow>>> {
     // de-duplicate function argument
-    const deduplicatedRows: Array<$ReadOnly<TokenInsert>> = [];
+    const deduplicatedRows: Array<$ReadOnly<TokenUpsertWithDigest>> = [];
     {
       const { TokenSeed } = await ModifyToken.depTables.GetEncryptionMeta.get(db, tx);
       const rowsWithDigest = rows.map(row => ({
@@ -668,7 +668,7 @@ export class ModifyToken {
     }
 
     const knownTokens: Array<$ReadOnly<TokenRow>> = [];
-    const toAdd: Array<$ReadOnly<TokenInsert>> = [];
+    const toAdd: Array<$ReadOnly<TokenUpsertWithDigest>> = [];
 
     // filter out rows that are already in the DB
     const lookupMap = new Map<number, Map<number, $ReadOnly<TokenRow>>>();
@@ -699,7 +699,7 @@ export class ModifyToken {
       }
     }
 
-    const newlyAdded = await addOrReplaceRows<TokenInsert, TokenRow>(
+    const newlyAdded = await addOrReplaceRows<TokenUpsertWithDigest, TokenRow>(
       db, tx,
       toAdd,
       ModifyToken.ownTables[Tables.TokenSchema.name].name,

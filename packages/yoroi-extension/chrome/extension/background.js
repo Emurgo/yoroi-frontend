@@ -338,7 +338,10 @@ chrome.runtime.onMessage.addListener(async (
             throw new Error('could not get all utxos');
           }
           const utxos = await canGetAllUtxos.getAllUtxos();
-          return await connectorSignTx(wallet, password, utxos, tx, indices);
+          const stateFetcher = await getStateFetcher(localStorageApi);
+          const bestBlock = await stateFetcher
+            .getBestBlock({ network: wallet.getParent().getNetworkInfo() });
+          return await connectorSignTx(wallet, password, utxos, bestBlock, tx, indices);
         },
         db,
         localStorageApi
@@ -614,6 +617,16 @@ chrome.runtime.onConnectExternal.addListener(port => {
             port.postMessage({
               type: 'yoroi_connect_response',
               success: accepted
+            });
+          }
+        );
+      } else if (message.type === 'yoroi_connect_request/cardano') {
+        await withDb(
+          async (_db, localStorageApi) => {
+            const connextionConfirmed = await confirmConnect(tabId, message.url, localStorageApi);
+            port.postMessage({
+              type: 'yoroi_connect_response/cardano',
+              success: connextionConfirmed !== null
             });
           }
         );

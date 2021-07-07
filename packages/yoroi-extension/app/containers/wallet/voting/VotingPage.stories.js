@@ -96,6 +96,10 @@ const genVotingRegistrationDialogProps: ({|
           progressInfo: request.progressInfo,
           pin: [1, 2, 3, 4],
           encryptedKey: 'some-encrypted-data',
+          isActionProcessing: boolean('isProcessing', false),
+          createVotingRegTx: {
+            isExecuting: boolean('isExecuting', false),
+          },
         },
       },
     },
@@ -167,12 +171,8 @@ const genRegisterDialogProps: ({|
           isActionProcessing: boolean('isActionProcessing', false),
           progressInfo: request.progressInfo,
           error: request.error,
-        },
-        votingRegTransaction: {
           createVotingRegTx: {
-            result: request.shelleyTrx,
             error: request.error,
-            isExecuting: boolean('isExecuting', false),
           },
         },
       },

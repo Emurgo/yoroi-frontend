@@ -41,6 +41,7 @@ import type { ISignRequest } from '../../api/common/lib/transactions/ISignReques
 import { ErgoExternalTxSignRequest } from '../../api/ergo/lib/transactions/ErgoExternalTxSignRequest';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { toRemoteUtxo } from '../../api/ergo/lib/transactions/utils';
+import { mintedTokenInfo } from '../../../chrome/extension/ergo-connector/utils';
 
 // Need to run only once - Connecting wallets
 let initedConnecting = false;
@@ -166,6 +167,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
           this.connectingMessage = response;
         });
       })
+      // eslint-disable-next-line no-console
       .catch(err => console.error(err));
   };
 
@@ -177,6 +179,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
           this.signingMessage = response;
         });
       })
+      // eslint-disable-next-line no-console
       .catch(err => console.error(err));
   };
 
@@ -281,6 +284,8 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
 
     if (!signingMessage.sign.tx) return;
     const { tx } = signingMessage.sign;
+    // it's possible we minted assets in this tx, so looking them up will fail
+    const mintedTokenIds = mintedTokenInfo(tx).map(t => t.Identifier);
     const tokenIdentifiers = Array.from(new Set([
       ...tx.inputs
         .flatMap(output => output.assets)
@@ -290,7 +295,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         .map(asset => asset.tokenId),
       // force inclusion of primary token for chain
       selectedWallet.getParent().getDefaultToken().defaultIdentifier
-    ]));
+    ])).filter(id => !mintedTokenIds.includes(id));
     const stateFetcher = this.stores.substores.ergo.stateFetchStore.fetcher;
     await addErgoAssets({
       db: selectedWallet.getDb(),
