@@ -6,13 +6,11 @@ import { computed } from 'mobx';
 import { intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import globalMessages from '../../../../i18n/global-messages';
-import AnnotatedLoader from '../../../../components/transfer/AnnotatedLoader';
 import DialogCloseButton from '../../../../components/widgets/DialogCloseButton';
 import Dialog from '../../../../components/widgets/Dialog';
 import type { InjectedOrGenerated } from '../../../../types/injectedPropsType';
 import LocalizableError from '../../../../i18n/LocalizableError';
 import ErrorBlock from '../../../../components/widgets/ErrorBlock';
-import type { CreateVotingRegTxFunc } from '../../../../api/ada/index';
 import { ProgressInfo } from '../../../../stores/ada/VotingStore';
 import RegisterDialog from '../../../../components/wallet/voting/RegisterDialog';
 import type { StepsList } from '../../../../components/wallet/voting/types';
@@ -36,27 +34,11 @@ export default class RegisterDialogContainer extends Component<Props> {
   };
 
   render(): Node {
-    const { intl } = this.context;
     const { submit, cancel, onError, classicTheme, stepsList } = this.props;
-    const { votingRegTransaction } = this.generated.stores.substores.ada;
     const votingStore = this.generated.stores.substores.ada.votingStore;
 
-    if (votingRegTransaction.createVotingRegTx.isExecuting) {
-      return (
-        <Dialog
-          title={intl.formatMessage(globalMessages.processingLabel)}
-          closeOnOverlayClick={false}
-        >
-          <AnnotatedLoader
-            title={intl.formatMessage(globalMessages.processingLabel)}
-            details={intl.formatMessage(globalMessages.txGeneration)}
-          />
-        </Dialog>
-      );
-    }
-
-    if (votingRegTransaction.createVotingRegTx.error != null) {
-      return this._errorDialog(votingRegTransaction.createVotingRegTx.error);
+    if (votingStore.createVotingRegTx.error != null) {
+      return this._errorDialog(votingStore.createVotingRegTx.error);
     }
     if (votingStore.error != null) {
       return this._errorDialog(votingStore.error);
@@ -123,12 +105,8 @@ export default class RegisterDialogContainer extends Component<Props> {
             isActionProcessing: boolean,
             progressInfo: ProgressInfo,
             error: ?LocalizableError,
-          |},
-          votingRegTransaction: {|
             createVotingRegTx: {|
               error: ?LocalizableError,
-              isExecuting: boolean,
-              result: ?PromisslessReturnType<CreateVotingRegTxFunc>,
             |},
           |},
         |},
@@ -143,7 +121,6 @@ export default class RegisterDialogContainer extends Component<Props> {
     }
 
     const { stores, actions } = this.props;
-    const votingStore = stores.substores.ada.votingStore;
     return Object.freeze({
       actions: {
         ada: {
@@ -161,12 +138,8 @@ export default class RegisterDialogContainer extends Component<Props> {
               isActionProcessing: stores.substores.ada.votingStore.isActionProcessing,
               progressInfo: stores.substores.ada.votingStore.progressInfo,
               error: stores.substores.ada.votingStore.error,
-            },
-            votingRegTransaction: {
               createVotingRegTx: {
-                result: votingStore.createVotingRegTx.result,
-                error: votingStore.createVotingRegTx.error,
-                isExecuting: votingStore.createVotingRegTx.isExecuting,
+                error: stores.substores.ada.votingStore.createVotingRegTx.error,
               },
             },
           },

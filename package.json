@@ -9,7 +9,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-push": "npm run flow && npm run eslint && npm run test",
+      "pre-push": ". check-all.sh",
       "post-checkout": "npm run translations:purge"
     }
   },

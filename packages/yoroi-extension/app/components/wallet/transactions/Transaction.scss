@@ -76,6 +76,15 @@
         font-size: 12px;
     }
   }
+  .asset {
+    color: var(--theme-transactions-list-text-color);
+    font-size: 14px;
+    line-height: 20px;
+     
+    .afterDecimal {
+        font-size: 10px;
+    }
+  }
 
   .fee {
     min-width: $min-fee-width;
@@ -91,7 +100,6 @@
     font-family: var(--font-medium);
     text-align: right;
   }
-
   .pendingLabel {
     background-color: var(--theme-transactions-state-pending-background-color);
     background-size: 35px 50px;
