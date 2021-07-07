@@ -105,8 +105,17 @@ When(/^I submit the wallet send form$/, async function () {
   await this.click('.confirmButton');
 });
 
-Then(/^I should see the summary screen$/, async function () {
-  await this.waitForElement('.WalletSummary_component');
+Then(/^I should see the successfully sent page$/, async function () {
+  await this.waitForElement('.TransactionSuccessDialog_dialog')
+})
+
+Then(/^I click the transaction page button$/, async function () {
+  await this.waitForElement('.TransactionSuccessDialog_nextButton');
+  await this.click("//button[contains(@label, 'Transaction page')]", By.xpath);
+});
+
+When(/^I should see the transaction screen$/, async function () {
+  await this.waitForElement('.Transaction_page');
 });
 
 Then(/^I should see an invalid address error$/, async function () {
