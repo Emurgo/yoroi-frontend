@@ -172,14 +172,6 @@ Feature: Wallet UI Settings
     And I click on secondary menu "support" item
     Then I should see support screen
 
-  @it-125
-  Scenario: Switch complexity levels (IT-125)
-    And I navigate to the general settings screen
-    And I click on secondary menu "levelOfComplexity" item
-    Then The selected level is "ADVANCED"
-    Then I select the simplest level
-    Then The selected level is "SIMPLE"
-
   @it-126
   Scenario: Yoroi Settings Screen / Blockchain (IT-126)
     And There is a Byron wallet stored named empty-wallet
