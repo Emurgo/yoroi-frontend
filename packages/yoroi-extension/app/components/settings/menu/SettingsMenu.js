@@ -20,10 +20,6 @@ const messages = defineMessages({
     id: 'settings.menu.blockchain.link.label',
     defaultMessage: '!!!Blockchain',
   },
-  levelOfComplexity: {
-    id: 'settings.menu.levelOfComplexity.link.label',
-    defaultMessage: '!!!Level of Complexity',
-  },
   externalStorage: {
     id: 'settings.menu.externalStorage.link.label',
     defaultMessage: '!!!External Storage',
@@ -93,13 +89,6 @@ export default class SettingsMenu extends Component<Props> {
             onClick={() => onItemClick(ROUTES.SETTINGS.SUPPORT)}
             active={isActiveItem(ROUTES.SETTINGS.SUPPORT)}
             className="support"
-          />
-
-          <SettingsMenuItem
-            label={intl.formatMessage(messages.levelOfComplexity)}
-            onClick={() => onItemClick(ROUTES.SETTINGS.LEVEL_OF_COMPLEXITY)}
-            active={isActiveItem(ROUTES.SETTINGS.LEVEL_OF_COMPLEXITY)}
-            className="levelOfComplexity"
           />
         </div>
       </div>
