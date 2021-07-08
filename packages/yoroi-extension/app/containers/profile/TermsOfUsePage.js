@@ -17,6 +17,8 @@ import LocalizableError from '../../i18n/LocalizableError';
 import type { ServerStatusErrorType } from '../../types/serverStatusErrorType';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import { isTestnet } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import type { ComplexityLevelType } from '../../types/complexityLevelType';
+import { ComplexityLevels } from '../../types/complexityLevelType';
 
 const messages = defineMessages({
   title: {
@@ -33,6 +35,11 @@ export default class TermsOfUsePage extends Component<InjectedOrGenerated<Genera
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
+
+  onSubmit: ((acceptance: any) => void) = (acceptance: any) => {
+    this.generated.actions.profile.acceptTermsOfUse.trigger(acceptance)
+    this.generated.actions.profile.selectComplexityLevel.trigger(ComplexityLevels.Simple)
+  }
 
   render(): Node {
     const { checkAdaServerStatus } = this.generated.stores.serverConnectionStore;
@@ -58,7 +65,7 @@ export default class TermsOfUsePage extends Component<InjectedOrGenerated<Genera
       >
         <TermsOfUseForm
           localizedTermsOfUse={this.generated.stores.profile.termsOfUse}
-          onSubmit={this.generated.actions.profile.acceptTermsOfUse.trigger}
+          onSubmit={this.onSubmit}
           isSubmitting={this.generated.stores.profile.setTermsOfUseAcceptanceRequest.isExecuting}
           error={this.generated.stores.profile.setTermsOfUseAcceptanceRequest.error}
         />
@@ -71,7 +78,8 @@ export default class TermsOfUsePage extends Component<InjectedOrGenerated<Genera
       profile: {|
         acceptTermsOfUse: {|
           trigger: (params: void) => Promise<void>
-        |}
+        |},
+        selectComplexityLevel: {| trigger: (params: ComplexityLevelType) => Promise < void > |}
       |}
     |},
     stores: {|
@@ -115,6 +123,7 @@ export default class TermsOfUsePage extends Component<InjectedOrGenerated<Genera
       actions: {
         profile: {
           acceptTermsOfUse: { trigger: actions.profile.acceptTermsOfUse.trigger },
+          selectComplexityLevel: { trigger: actions.profile.selectComplexityLevel.trigger }
         },
       },
     });

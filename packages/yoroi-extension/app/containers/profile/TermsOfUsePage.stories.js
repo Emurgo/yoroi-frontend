@@ -42,6 +42,7 @@ export const Generic = (): Node => (
       actions: {
         profile: {
           acceptTermsOfUse: { trigger: async (req) => action('acceptTermsOfUse')(req) },
+          selectComplexityLevel: { trigger: async (req) => action('selectComplexityLevel')(req) },
         }
       }
     }}
