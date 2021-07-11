@@ -41,7 +41,7 @@ export default class TokenInfoStore extends Store<StoresMap, ActionsMap> {
     super.setup();
     this.tokenInfo = new Map();
     // the Ergo connector doesn't have this action
-    if (this.actions.wallets.setActiveWallet) {
+    if (this.actions.wallets?.setActiveWallet) {
       this.actions.wallets.setActiveWallet.listen(
         wallet => { this._fetchMissingTokenInfo(wallet) }
       );
