@@ -2,7 +2,6 @@
 const initialInject = `
 var connectRequests = [];
 
-var cardanoConnectRequests = [];
 window.addEventListener("message", function(event) {
     if (event.data.type == "connector_connected") {
         if (event.data.err !== undefined) {
