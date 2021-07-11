@@ -1,13 +1,13 @@
 // sets up RPC communication with the connector + access check/request functions
 const initialInject = `
-var ergoConnectRequests = [];
+var connectRequests = [];
 
 window.addEventListener("message", function(event) {
     if (event.data.type == "connector_connected") {
         if (event.data.err !== undefined) {
-            ergoConnectRequests.forEach(promise => promise.reject(event.data.err));
+            connectRequests.forEach(promise => promise.reject(event.data.err));
         } else {
-            ergoConnectRequests.forEach(promise => promise.resolve(event.data.success));
+            connectRequests.forEach(promise => promise.resolve(event.data.success));
         }
     }
 });
@@ -17,7 +17,7 @@ function ergo_request_read_access() {
         window.postMessage({
             type: "connector_connect_request",
         }, location.origin);
-        ergoConnectRequests.push({ resolve: resolve, reject: reject });
+        connectRequests.push({ resolve: resolve, reject: reject });
     });
 }
 
@@ -34,14 +34,14 @@ function cardano_request_read_access() {
         window.postMessage({
             type: "yoroi_connect_request/cardano",
         }, location.origin);
-        ergoConnectRequests.push({ resolve: resolve, reject: reject });
+        connectRequests.push({ resolve: resolve, reject: reject });
     });
 }
 
 // @todo
 function cardano_check_read_access() {
     if (typeof cardano !== "undefined") {
-        return 'Under development'
+        return cardano._cardano_rpc_call("ping", []);
     } else {
         return Promise.resolve(false);
     }
@@ -55,7 +55,7 @@ var ergoRpcUid = 0;
 var ergoRpcResolver = new Map();
 
 window.addEventListener("message", function(event) {
-    if (event.data.type == "connector_rpc_response") {
+    if (event.data.type == "connector_rpc_response" && event.data.protocol === "ergo") {
         console.log("page received from connector: " + JSON.stringify(event.data) + " with source = " + event.source + " and origin = " + event.origin);
         const rpcPromise = ergoRpcResolver.get(event.data.uid);
         if (rpcPromise !== undefined) {
@@ -113,6 +113,7 @@ class ErgoAPI {
         return new Promise(function(resolve, reject) {
             window.postMessage({
                 type: "connector_rpc_request",
+                protocol: "ergo",
                 uid: ergoRpcUid,
                 function: func,
                 params: params
@@ -129,7 +130,24 @@ const ergo = Object.freeze(new ErgoAPI());
 
 const cardanoApiInject = `
 
-// @todo add cardano rpc resolver when it is done
+// RPC setup
+var cardanoRpcUid = 0;
+var cardanoRpcResolver = new Map();
+
+window.addEventListener("message", function(event) {
+    if (event.data.type == "connector_rpc_response" && event.data.protocol === "cardano") {
+        console.log("page received from connector: " + JSON.stringify(event.data) + " with source = " + event.source + " and origin = " + event.origin);
+        const rpcPromise = cardanoRpcResolver.get(event.data.uid);
+        if (rpcPromise !== undefined) {
+            const ret = event.data.return;
+            if (ret.err !== undefined) {
+                rpcPromise.reject(ret.err);
+            } else {
+                rpcPromise.resolve(ret.ok);
+            }
+        }
+    }
+});
 
 class CardanoAPI {
     constructor(){
@@ -138,6 +156,21 @@ class CardanoAPI {
 
     getInitTimestamp(){
         return this.initTimestamp
+    }
+
+    _cardano_rpc_call(func, params) {
+        return new Promise(function(resolve, reject) {
+            window.postMessage({
+                type: "connector_rpc_request",
+                protocol: "cardano",
+                uid: cardanoRpcUid,
+                function: func,
+                params: params
+            }, location.origin);
+            console.log("cardanoRpcUid = " + cardanoRpcUid);
+            cardanoRpcResolver.set(cardanoRpcUid, { resolve: resolve, reject: reject });
+            cardanoRpcUid += 1;
+        });
     }
 }
 
