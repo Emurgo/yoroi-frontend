@@ -39,7 +39,7 @@ export type StoresMap = {|
   coinPriceStore: ConnectorCoinPriceStore,
   loading: ConnectorLoadingStore,
   connector: ConnectorStore,
-  tokenInfoStore: TokenInfoStore,
+  tokenInfoStore: TokenInfoStore<StoresMap, ActionsMap>,
   substores: {|
     ada: AdaStoresMap,
     ergo: ErgoStoresMap,
