@@ -6,30 +6,28 @@ import React from 'react';
 import { select, boolean, } from '@storybook/addon-knobs';
 import { action } from '@storybook/addon-actions';
 import { ServerStatusErrors } from '../../types/serverStatusErrorType';
-import TermsOfUsePage from './TermsOfUsePage';
+import ComplexityLevelPage from './ComplexityLevelPage';
 import { withScreenshot } from 'storycap';
-import { getTermsOfUse } from '../../stores/base/BaseProfileStore';
-import { globalKnobs } from '../../../stories/helpers/StoryWrapper';
 
 export default {
   title: `${__filename.split('.')[0]}`,
-  component: TermsOfUsePage,
+  component: ComplexityLevelPage,
   decorators: [withScreenshot],
 };
 
 export const Generic = (): Node => (
-  <TermsOfUsePage
+  <ComplexityLevelPage
     generated={{
       stores: {
         wallets: {
           selected: null,
         },
         profile: {
-          setTermsOfUseAcceptanceRequest: {
+          setComplexityLevelRequest: {
             isExecuting: boolean('isExecuting', false),
             error: null,
           },
-          termsOfUse: getTermsOfUse('ada', globalKnobs.locale()),
+          selectedComplexityLevel: undefined,
         },
         serverConnectionStore: {
           checkAdaServerStatus: select(
@@ -41,11 +39,9 @@ export const Generic = (): Node => (
       },
       actions: {
         profile: {
-          acceptTermsOfUse: { trigger: async (req) => action('acceptTermsOfUse')(req) },
+          selectComplexityLevel: { trigger: async (req) => action('selectComplexityLevel')(req) },
         }
       }
     }}
   />
 );
-
-/* ===== Notable variations ===== */

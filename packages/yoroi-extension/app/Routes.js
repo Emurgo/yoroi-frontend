@@ -42,6 +42,8 @@ import NoticeBoardPage from './containers/notice-board/NoticeBoardPage';
 import VotingPage from './containers/wallet/voting/VotingPage';
 
 import type { ConfigType } from '../config/config-types';
+import ComplexityLevelSettingsPage from './containers/settings/categories/ComplexityLevelSettingsPage';
+import ComplexityLevelPage from './containers/profile/ComplexityLevelPage';
 import BlockchainSettingsPage from './containers/settings/categories/BlockchainSettingsPage';
 import WalletSwitch from './containers/WalletSwitch';
 
@@ -69,6 +71,11 @@ export const Routes = (
         exact
         path={ROUTES.PROFILE.LANGUAGE_SELECTION}
         component={(props) => <LanguageSelectionPage {...props} stores={stores} actions={actions} />}
+      />
+      <Route
+        exact
+        path={ROUTES.PROFILE.COMPLEXITY_LEVEL}
+        component={(props) => <ComplexityLevelPage {...props} stores={stores} actions={actions} />}
       />
       <Route
         exact
@@ -212,6 +219,11 @@ const SettingsSubpages = (stores, actions) => (
       exact
       path={ROUTES.SETTINGS.SUPPORT}
       component={(props) => <SupportSettingsPage {...props} stores={stores} actions={actions} />}
+    />
+    <Route
+      exact
+      path={ROUTES.SETTINGS.LEVEL_OF_COMPLEXITY}
+      component={(props) => <ComplexityLevelSettingsPage {...props} stores={stores} actions={actions} />}
     />
     <Redirect to={ROUTES.SETTINGS.GENERAL} />
   </Switch>
