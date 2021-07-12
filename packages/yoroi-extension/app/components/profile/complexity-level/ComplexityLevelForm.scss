@@ -1,0 +1,102 @@
+@import '../../../themes/mixins/loading-spinner';
+@import '../../../themes/mixins/error-message';
+
+.component{
+  max-width: 650px;
+  margin: 0 auto;
+  margin-top: 65px;
+  .header {
+    color: var(--theme-wallet-dropdown-secondary-text-color);
+    text-align: center;
+    margin-bottom: 50px;
+    font-size: 1.125rem;
+    font-weight: bold;
+    letter-spacing: 0;
+    line-height: 1.375rem;
+  }
+  .description {
+    color: var(--theme-transactions-list-detail-row-text-color);
+    font-size: 1rem;
+    line-height: 1.375rem;
+    text-align: center;
+  }
+  .selected {
+    font-size: 1rem;
+    text-align: center;
+    margin: 1rem 0;
+
+    span {
+      color: var(--theme-button-outlined-text-color);
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+  }
+  .cardsWrapper {
+    margin: 30px auto;
+    display: flex;
+    & > div {
+      flex: 1;
+    }
+  }
+  .card {
+    margin-right: 30px;
+    border-radius: 8px;
+    background-color: #FFFFFF;
+    box-shadow: 0 5px 20px 0 rgba(24,26,30,0.08);
+    overflow: hidden;
+    &:last-child {
+      margin-right: 0;
+    }
+    .cardImage {
+      background-color: #e5e5e5;
+      height:184px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .simple {
+      background: #F1FDFA;
+    }
+    .advanced {
+      background: #F3F5FD;
+    }
+    .cardContent{
+      padding: 24px ;
+      color: var(--theme-transactions-list-text-color);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 300px;
+      h3 {
+        font-size: 1.5rem;
+        letter-spacing: 0;
+        line-height: 1.875rem;
+        text-align: center;
+        text-transform: capitalize;
+        margin-bottom: 16px;
+      }
+      p {
+        font-size: .75rem;
+        letter-spacing: 0;
+        line-height: 1.25rem;
+      }
+    }
+    .submitButton,
+    .submitButtonSpinning {
+      display: block !important;
+      margin: 0;
+      width: 100%;
+    }
+    
+    .submitButtonSpinning {
+      @include loading-spinner("../../../assets/images/spinner-light.svg");
+    }
+    
+    .error {
+      @include error-message;
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    
+  }
+}
