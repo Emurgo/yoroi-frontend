@@ -158,6 +158,10 @@ class CardanoAPI {
         return this.initTimestamp
     }
 
+    get_balance(token_id = 'ADA') {
+        return this._cardano_rpc_call("get_balance", [token_id]);
+    }
+
     _cardano_rpc_call(func, params) {
         return new Promise(function(resolve, reject) {
             window.postMessage({
