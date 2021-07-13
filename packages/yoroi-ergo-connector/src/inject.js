@@ -329,7 +329,7 @@ if (shouldInject()) {
                 }, location.origin);
             }
         } else if (event.data.type == "connector_connect_request") {
-            if (fullApiInjected && yoroiPort) {
+            if ((ergoApiInjected || cardanoApiInjected) && yoroiPort) {
                 // we can skip communication - API injected + hasn't been disconnected
                 window.postMessage({
                     type: "connector_connected",
