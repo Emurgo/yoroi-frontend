@@ -1,6 +1,6 @@
 import * as wasm from "ergo-lib-wasm-browser";
 
-function initDapp() {
+function initDapp(){
     ergo_request_read_access().then(function(access_granted) {
         if (!access_granted) {
             //alert("ergo access denied");
@@ -58,23 +58,29 @@ function initDapp() {
                     status.innerText = "Creating transaction";
                     const donationAddr = "9hD2Cw6yQL6zzrw3TFgKdwFkBdDdU3ro1xRFmjouDw4NYS2S5RD";
                     const creationHeight = 398959;
-                    const amountToSend = BigInt(valueEntry.value);
+                    const amountToSend = parseInt(valueEntry.value, 10);
                     const amountToSendBoxValue = wasm.BoxValue.from_i64(wasm.I64.from_str(amountToSend.toString()));
-                    const rawUtxos = await ergo.get_utxos((amountToSend + BigInt(wasm.TxBuilder.SUGGESTED_TX_FEE().as_i64().to_str())).toString());
-                    let utxosValue = BigInt(0);
+                    const rawUtxos = await ergo.get_utxos(amountToSend + wasm.TxBuilder.SUGGESTED_TX_FEE().as_i64().as_num());
+                    let utxosValue = 0;
                     let utxos = rawUtxos.map(utxo => {
                         // need to convert strings to numbers for sigma-rust for now
-                        //utxo.value = parseInt(utxo.value, 10);
-                        utxosValue += BigInt(utxo.value);
+                        utxo.value = parseInt(utxo.value, 10);
+                        utxosValue += utxo.value;
                         for (let asset of utxo.assets) {
-                            //asset.amount = parseInt(asset.amount);
+                            asset.amount = parseInt(asset.amount);
                         }
                         return utxo;
                     });
                     // Testing with p2S inputs since Yoroi won't return those as they don't belong to anyone's wallet
                     //while (utxos.length > 1) { utxos.pop(); }
                     //utxos.unshift({"boxId":"6dd679cc32afd1f56ad74696c7af53c45330148a703da29b3f6b3ca3b09851c3","value":1331719,"ergoTree":"1002040004f2c001d193e4c6b2a573000004047301","assets":[],"additionalRegisters":{},"creationHeight":398959,"transactionId":"d2fbf4b62f262f4bce7973924ae06685aa5ec2313e24716e8b1d86d62789c89b","index":0});
+<<<<<<< HEAD
                     const changeValue = utxosValue - amountToSend - BigInt(wasm.TxBuilder.SUGGESTED_TX_FEE().as_i64().to_str());
+=======
+                    console.log(`utxosValue: ${utxosValue}`);
+                    console.log(`${utxosValue} - ${amountToSend} - ${wasm.TxBuilder.SUGGESTED_TX_FEE().as_i64().as_num()}`);
+                    const changeValue = utxosValue - amountToSend - wasm.TxBuilder.SUGGESTED_TX_FEE().as_i64().as_num();
+>>>>>>> 6e3b530c (Add the initDapp function)
                     console.log(`${changeValue} | cv.ts() = ${changeValue.toString()}`);
                     const changeValueBoxValue = wasm.BoxValue.from_i64(wasm.I64.from_str(changeValue.toString()));
                     const changeAddr = await ergo.get_change_address();
@@ -86,12 +92,20 @@ function initDapp() {
                         new wasm.Tokens());
                     console.log(`boxes selected: ${boxSelection.boxes().len()}`);
                     const outputCandidates = wasm.ErgoBoxCandidates.empty();
+<<<<<<< HEAD
                     const token = new wasm.Token(wasm.TokenId.from_box_id(wasm.BoxId.from_str(utxos[2].boxId)), wasm.TokenAmount.from_i64(wasm.I64.from_str("1234567890123456789")));
+=======
+                    const token = new wasm.Token(wasm.TokenId.from_box_id(wasm.BoxId.from_str(utxos[1].boxId)), wasm.TokenAmount.from_i64(wasm.I64.from_str("12345678")));
+>>>>>>> 6e3b530c (Add the initDapp function)
                     const donationBoxBuilder = new wasm.ErgoBoxCandidateBuilder(
                         amountToSendBoxValue,
                         wasm.Contract.pay_to_address(wasm.Address.from_base58(donationAddr)),
                         creationHeight);
+<<<<<<< HEAD
                     donationBoxBuilder.mint_token(token, "VLT", "Very Large Token", 2);
+=======
+                    donationBoxBuilder.mint_token(token, "ECEDT", "Ergo Connector Example Dapp Token (for testing)", 5);
+>>>>>>> 6e3b530c (Add the initDapp function)
                     //donationBoxBuilder.add_token(token.id(), token.amount());
                     try {
                         outputCandidates.add(donationBoxBuilder.build());
@@ -100,7 +114,11 @@ function initDapp() {
                         throw e;
                     }
                     //outputCandidates.add(changeBoxBuilder.build());
+<<<<<<< HEAD
                     console.log(`utxosval: ${utxosValue.toString()}`);
+=======
+                    console.log(`utxosval: ${utxosValue}`);
+>>>>>>> 6e3b530c (Add the initDapp function)
                     const txBuilder = wasm.TxBuilder.new(
                         boxSelection,
                         outputCandidates,
@@ -164,19 +182,19 @@ console.log(`box: ${JSON.stringify(box)}`);
     });
 }
 
-if (typeof ergo_request_read_access === "undefined") {
-    alert("ergo not found");
+if (typeof cardano_request_read_access === "undefined") {
+    alert("Cardano not found");
 } else {
-    console.log("ergo found");
-    window.addEventListener("ergo_wallet_disconnected", function(event) {
-        const status = document.getElementById("status");
-        status.innerText = "";
-        const div = document.getElementById("balance");
-        div.innerText = "Wallet disconnected.";
-        const button = document.createElement("button");
-        button.textContent = "Reconnect";
-        button.onclick = initDapp;
-        div.appendChild(button);
-    });
+    console.log("Cardano found");
+    // window.addEventListener("ergo_wallet_disconnected", function(event) {
+    //     const status = document.getElementById("status");
+    //     status.innerText = "";
+    //     const div = document.getElementById("balance");
+    //     div.innerText = "Wallet disconnected.";
+    //     const button = document.createElement("button");
+    //     button.textContent = "Reconnect";
+    //     button.onclick = initDapp;
+    //     div.appendChild(button);
+    // });
     initDapp();
 }
