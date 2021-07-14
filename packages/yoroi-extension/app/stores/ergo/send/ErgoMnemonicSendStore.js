@@ -56,7 +56,11 @@ export default class ErgoMnemonicSendStore extends Store<StoresMap, ActionsMap> 
 
     this.actions.dialogs.closeActiveDialog.trigger();
     this.stores.wallets.sendMoneyRequest.reset();
-    this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.TRANSACTIONS });
+    if (request.onSuccess) {
+      request.onSuccess();
+    } else {
+      this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.TRANSACTIONS });
+    } 
   };
 
   signAndBroadcast: {|
