@@ -1947,10 +1947,15 @@ export async function genCardanoAssetMap(
 
   const missingTokenIds = tokenIds.filter(token => !existingTokens.has(token));
 
-  const tokenInfoResponse = await getTokenInfo({
-    network,
-    tokenIds: missingTokenIds.map(id => id.split('.').join(''))
-  });
+  let tokenInfoResponse;
+  try {
+    tokenInfoResponse = await getTokenInfo({
+      network,
+      tokenIds: missingTokenIds.map(id => id.split('.').join(''))
+    });
+  } catch {
+    tokenInfoResponse = {};
+  }
 
   const databaseInsert = missingTokenIds
     .map(tokenId => {
