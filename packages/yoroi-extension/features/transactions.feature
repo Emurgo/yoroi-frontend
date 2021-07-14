@@ -23,7 +23,7 @@ Feature: Send transaction
     And I submit the wallet send form
     Then I should see the successfully sent page
     And I click the transaction page button
-    Then I should see the transaction page
+    Then I should see the summary screen
     
 
     Examples:
@@ -110,9 +110,9 @@ Feature: Send transaction
       | asdfasdfasdf |
     Given The expected transaction is <expectedTx>
     And I submit the wallet send form
-    Then I should see the "successfully sent" page
-    And I click the "transaction page" button
-    Then I should see the transaction page
+    Then I should see the successfully sent page
+    And I click the transaction page button
+    Then I should see the summary screen
 
     Examples:
       | fee       | expectedTx |
@@ -201,9 +201,9 @@ Feature: Send transaction
       | asdfasdfasdf |
     Given The expected transaction is "g6QAg4JYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI1xAYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI11AYJYIAoHNmmEX+pK6DzUQYoLT9VmEAl6iWAagWtYkfZn40lsAQGBglgrgtgYWCGDWBxA66wjgpZH9bPPW9JExWBcIUqKGMmxBlNBcCzWoAAa8oZfOxoAHoSAAhoABGzQAxoR/pTNoQKDhFgg7Hv4Bg5KeJNQdWoOTOG0UXtvUcz/0EGTDr76bxD79LNYQJgmViCF11mg1pQBlxk5WmjKSs335DeKn3nsuX34oYLm25fA7GEios1jIGV+DVc5TCvhR9taKi5BImTCR56izgNYIFYzbOrATG6T+BxOi68GlyaG03Y0QpvlqW4Xkr+HBmHYQaCEWCDMe+1lH6e0SsxkgiBura5DYH+Me3RNMhnaPUnMwfYdO1hA2eLKUK3aour0AVVuH9n8iplfXanW6IR4KpRrPT03y0a5wCR9LBoyZKIvAI0VhZChXHZUqm7wxy6O5eD6mLpICFggWIA2RkuYZnc574sjdDyIAJv10dyuVk3gv+xqNOD7v79BoIRYILlNNm5mIlb6YPjq4n8gjDChi+2y90adZ81HgfMcpj8GWEAdrzsYU4XXFWKVSukTrZoSKmwL9O5BFooOSPuLB3XUpVQz9jW4TIa1jRIPBnfiVzvASIzc+7YdJ4EPfEhkjPgKWCCux11USi/M3OmzDhjc8euPOY/1uQF34sJFYQk85C/rpUGg9g=="
     And I submit the wallet send form
-    Then I should see the "successfully sent" page
-    And I click the "transaction page" button
-    Then I should see the transaction page
+    Then I should see the successfully sent page
+    And I click the transaction page button
+    Then I should see the summary screen
 
   @it-60
   Scenario: User can send a tx after invalid password attempt (IT-60)
@@ -227,9 +227,9 @@ Feature: Send transaction
       | asdfasdfasdf |
     Given The expected transaction is "g6QAgoJYIGBJO/JuYLC5jxQ2R2E74uwcb1C9X8FaFKL/UY9fo2vgAYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgmugI1xAQGBglgrgtgYWCGDWBxA66wjgpZH9bPPW9JExWBcIUqKGMmxBlNBcCzWoAAa8oZfOxoAD0JAAhoACcQAAxoR/pTNoQKChFggjwZH2yB45FmtwUIDn2Z0sdrjUV0nh3/9w6+rIqAofKpYQJnz4URZfjl5AOpaEjMTWdF1lsFXPE+IKC0puBMdBjkWaqk6BIzW8VZ7pu7f8J/Mv8E3lRFiBVX7BnDQNYlT7g1YIEWHLG+QNh2fiHa9Yf1WMw3u39BreBNElUSItlalinAOQaCEWCDse/gGDkp4k1B1ag5M4bRRe29RzP/QQZMOvvpvEPv0s1hASaHptgaRcfgiyLBN80gqUIAueQBKkwSLu9iAd+UIN7PELThmN5ItmVzMeZIevE/7eS7wFX15sax9ap5ihK/1ClggVjNs6sBMbpP4HE6LrwaXJobTdjRCm+WpbheSv4cGYdhBoPY="
     And I submit the wallet send form
-    Then I should see the "successfully sent" page
-    And I click the "transaction page" button
-    Then I should see the transaction page
+    Then I should see the successfully sent page
+    And I click the transaction page button
+    Then I should see the summary screen
 
   @it-61
   Scenario: Display warning if wallet changes during send screen (IT-61)
@@ -295,9 +295,9 @@ Feature: Send transaction
       | password   |
       | asdfasdfasdf |
     And I submit the wallet send form
-    Then I should see the "successfully sent" page
-    And I click the "transaction page" button
-    Then I should see the transaction page
+    Then I should see the successfully sent page
+    And I click the transaction page button
+    Then I should see the summary screen
 
     Examples:
       | address                                             | amount       |fee         |
@@ -330,9 +330,9 @@ Feature: Send transaction
       | password   |
       | asdfasdfasdf |
     And I submit the wallet send form
-    Then I should see the "successfully sent" page
-    And I click the "transaction page" button
-    Then I should see the transaction page
+    Then I should see the successfully sent page
+    And I click the transaction page button
+    Then I should see the summary screen
 
   @it-164
   Scenario Outline: Can receive & send funds from enterprise address (IT-164)
@@ -357,9 +357,9 @@ Feature: Send transaction
       | asdfasdfasdf |
     Given The expected transaction is <expectedTx>
     And I submit the wallet send form
-    Then I should see the "successfully sent" page
-    And I click the "transaction page" button
-    Then I should see the transaction page
+    Then I should see the successfully sent page
+    And I click the transaction page button
+    Then I should see the summary screen
 
     Examples:
       | amount              | fee       | expectedTx |
@@ -408,9 +408,9 @@ Feature: Send transaction
       | password   |
       | asdfasdfasdf |
     And I submit the wallet send form
-    Then I should see the "successfully sent" page
-    And I click the "transaction page" button
-    Then I should see the transaction page
+    Then I should see the successfully sent page
+    And I click the transaction page button
+    Then I should see the summary screen
 
     Examples:
       | address                                             | amount       |fee         |
@@ -436,9 +436,9 @@ Feature: Send transaction
       | password   |
       | asdfasdfasdf |
     And I submit the wallet send form
-    Then I should see the "successfully sent" page
-    And I click the "transaction page" button
-    Then I should see the transaction page
+    Then I should see the successfully sent page
+    And I click the transaction page button
+    Then I should see the summary screen
 
   @it-178
   Scenario Outline: Can send some of a custom Cardano token (IT-178)
@@ -463,9 +463,9 @@ Feature: Send transaction
       | asdfasdfasdf |
     Given The expected transaction is "g6QAgYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgSugI11GBoBgoJYK4LYGFghg1gcQOusI4KWR/Wzz1vSRMVgXCFKihjJsQZTQXAs1qAAGvKGXzuCGgAWCluhWBzScZdoLXGQXAh8XDthsQ5tdG2wub7zUQFNdbsmoUZuaWNvaW4YGIJYOQHCOXo7AskuPwKPyvBLXitN1JhK7qw3sfYP1+4O5sPVeGnk6yzmr8YYpWzAu4tvCIuHO8+8BgeUQIIaACRhIKFYHNJxl2gtcZBcCHxcO2GxDm10bbC5vvNRAU11uyahRm5pY29pbhhMAhoAAp2FAxoR/pTNoQCBglgg2ryVo6+TyYjX+sqaAvK82tVCDycATBUMC9wANgPth/VYQHlZXPNDWElwk6ywyZArA/tp/mEDLqKxszGV0d4MQSckziOR/NlT5M5u+XmYr3ntX+dUwy9hvRn5X/jnpLpRYwH2"
     And I submit the wallet send form
-    Then I should see the "successfully sent" page
-    And I click the "transaction page" button
-    Then I should see the transaction page
+    Then I should see the successfully sent page
+    And I click the transaction page button
+    Then I should see the summary screen
 
     Examples:
       | address                                             | amount       |fee         |
@@ -492,6 +492,6 @@ Feature: Send transaction
       | asdfasdfasdf |
     Given The expected transaction is "g6QAgYJYILcTzA1jEGw4BrWnB3zDeilPzKDkefJqrGTlHgSugI11GBoBgoJYK4LYGFghg1gcQOusI4KWR/Wzz1vSRMVgXCFKihjJsQZTQXAs1qAAGvKGXzuCGgAWCluhWBzScZdoLXGQXAh8XDthsQ5tdG2wub7zUQFNdbsmoUZuaWNvaW4YZIJYOQHCOXo7AskuPwKPyvBLXitN1JhK7qw3sfYP1+4O5sPVeGnk6yzmr8YYpWzAu4tvCIuHO8+8BgeUQIIaACRoAKACGgAClqUDGhH+lM2hAIGCWCDavJWjr5PJiNf6ypoC8rza1UIPJwBMFQwL3AA2A+2H9VhAod8QFO11FtfoTJ1Y0ZpeN1e6OFphVJpgjKTSXI+FMw3CV5UIr4eMIIHcxwEgJiOtiYIGIIZyVZAdQbJnSmeTBPY="
     And I submit the wallet send form
-    Then I should see the "successfully sent" page
-    And I click the "transaction page" button
-    Then I should see the transaction page
+    Then I should see the successfully sent page
+    And I click the transaction page button
+    Then I should see the summary screen
