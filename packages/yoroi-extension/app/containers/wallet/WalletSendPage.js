@@ -109,11 +109,6 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
     const { hasAnyPending } = this.generated.stores.transactions;
     const { txBuilderActions } = this.generated.actions;
 
-    // disallow sending when pending tx exists
-    if (uiDialogs.isOpen && hasAnyPending) {
-      actions.dialogs.closeActiveDialog.trigger();
-    }
-
     const walletType = publicDeriver.getParent().getWalletType();
     const targetDialog = walletType === WalletTypeOption.HARDWARE_WALLET ?
       HWSendConfirmationDialog :
