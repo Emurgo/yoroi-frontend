@@ -578,6 +578,7 @@ chrome.runtime.onConnectExternal.addListener(port => {
       function rpcResponse(response) {
         port.postMessage({
           type: 'connector_rpc_response',
+          protocol: message.protocol,
           uid: message.uid,
           return: response
         });
