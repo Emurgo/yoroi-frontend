@@ -58,25 +58,23 @@ function initDapp() {
                     status.innerText = "Creating transaction";
                     const donationAddr = "9hD2Cw6yQL6zzrw3TFgKdwFkBdDdU3ro1xRFmjouDw4NYS2S5RD";
                     const creationHeight = 398959;
-                    const amountToSend = parseInt(valueEntry.value, 10);
+                    const amountToSend = BigInt(valueEntry.value);
                     const amountToSendBoxValue = wasm.BoxValue.from_i64(wasm.I64.from_str(amountToSend.toString()));
-                    const rawUtxos = await ergo.get_utxos(amountToSend + wasm.TxBuilder.SUGGESTED_TX_FEE().as_i64().as_num());
-                    let utxosValue = 0;
+                    const rawUtxos = await ergo.get_utxos((amountToSend + BigInt(wasm.TxBuilder.SUGGESTED_TX_FEE().as_i64().to_str())).toString());
+                    let utxosValue = BigInt(0);
                     let utxos = rawUtxos.map(utxo => {
                         // need to convert strings to numbers for sigma-rust for now
-                        utxo.value = parseInt(utxo.value, 10);
-                        utxosValue += utxo.value;
+                        //utxo.value = parseInt(utxo.value, 10);
+                        utxosValue += BigInt(utxo.value);
                         for (let asset of utxo.assets) {
-                            asset.amount = parseInt(asset.amount);
+                            //asset.amount = parseInt(asset.amount);
                         }
                         return utxo;
                     });
                     // Testing with p2S inputs since Yoroi won't return those as they don't belong to anyone's wallet
                     //while (utxos.length > 1) { utxos.pop(); }
                     //utxos.unshift({"boxId":"6dd679cc32afd1f56ad74696c7af53c45330148a703da29b3f6b3ca3b09851c3","value":1331719,"ergoTree":"1002040004f2c001d193e4c6b2a573000004047301","assets":[],"additionalRegisters":{},"creationHeight":398959,"transactionId":"d2fbf4b62f262f4bce7973924ae06685aa5ec2313e24716e8b1d86d62789c89b","index":0});
-                    console.log(`utxosValue: ${utxosValue}`);
-                    console.log(`${utxosValue} - ${amountToSend} - ${wasm.TxBuilder.SUGGESTED_TX_FEE().as_i64().as_num()}`);
-                    const changeValue = utxosValue - amountToSend - wasm.TxBuilder.SUGGESTED_TX_FEE().as_i64().as_num();
+                    const changeValue = utxosValue - amountToSend - BigInt(wasm.TxBuilder.SUGGESTED_TX_FEE().as_i64().to_str());
                     console.log(`${changeValue} | cv.ts() = ${changeValue.toString()}`);
                     const changeValueBoxValue = wasm.BoxValue.from_i64(wasm.I64.from_str(changeValue.toString()));
                     const changeAddr = await ergo.get_change_address();
@@ -88,12 +86,12 @@ function initDapp() {
                         new wasm.Tokens());
                     console.log(`boxes selected: ${boxSelection.boxes().len()}`);
                     const outputCandidates = wasm.ErgoBoxCandidates.empty();
-                    const token = new wasm.Token(wasm.TokenId.from_box_id(wasm.BoxId.from_str(utxos[1].boxId)), wasm.TokenAmount.from_i64(wasm.I64.from_str("12345678")));
+                    const token = new wasm.Token(wasm.TokenId.from_box_id(wasm.BoxId.from_str(utxos[2].boxId)), wasm.TokenAmount.from_i64(wasm.I64.from_str("1234567890123456789")));
                     const donationBoxBuilder = new wasm.ErgoBoxCandidateBuilder(
                         amountToSendBoxValue,
                         wasm.Contract.pay_to_address(wasm.Address.from_base58(donationAddr)),
                         creationHeight);
-                    donationBoxBuilder.mint_token(token, "ECEDT", "Ergo Connector Example Dapp Token (for testing)", 5);
+                    donationBoxBuilder.mint_token(token, "VLT", "Very Large Token", 2);
                     //donationBoxBuilder.add_token(token.id(), token.amount());
                     try {
                         outputCandidates.add(donationBoxBuilder.build());
@@ -102,7 +100,7 @@ function initDapp() {
                         throw e;
                     }
                     //outputCandidates.add(changeBoxBuilder.build());
-                    console.log(`utxosval: ${utxosValue}`);
+                    console.log(`utxosval: ${utxosValue.toString()}`);
                     const txBuilder = wasm.TxBuilder.new(
                         boxSelection,
                         outputCandidates,
