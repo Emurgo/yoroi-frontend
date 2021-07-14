@@ -60,7 +60,7 @@ export default class ErgoMnemonicSendStore extends Store<StoresMap, ActionsMap> 
       request.onSuccess();
     } else {
       this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.TRANSACTIONS });
-    } 
+    }
   };
 
   signAndBroadcast: {|

@@ -104,7 +104,7 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
 
     const { transactionBuilderStore } = this.generated.stores;
 
-    const { uiDialogs, profile, } = this.generated.stores;
+    const { profile, } = this.generated.stores;
     const { actions } = this.generated;
     const { hasAnyPending } = this.generated.stores.transactions;
     const { txBuilderActions } = this.generated.actions;
