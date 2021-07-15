@@ -6,10 +6,17 @@ import type { IFetcher } from '../../api/common/lib/state-fetch/IFetcher';
 import { RemoteFetcher } from '../../api/common/lib/state-fetch/remoteFetcher';
 import { BatchedFetcher } from '../../api/common/lib/state-fetch/batchedFetcher';
 import environment from '../../environment';
-import type { ActionsMap } from '../../actions/index';
-import type { StoresMap } from '../index';
 
-export default class StateFetchStore extends Store<StoresMap, ActionsMap> {
+export default class StateFetchStore<
+  StoresMapType: {
+    +profile: {
+      +currentLocale: string,
+      ...
+    },
+    ...
+  },
+  ActionsMapType
+> extends Store<StoresMapType, ActionsMapType> {
 
   @observable fetcher: IFetcher;
 
