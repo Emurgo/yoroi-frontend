@@ -15,5 +15,6 @@ export default class TrezorSendActions {
   sendUsingTrezor: AsyncAction<{|
     params: SendUsingTrezorParams,
     publicDeriver: PublicDeriver<>,
+    onSuccess?: void => void,
   |}> = new AsyncAction();
 }

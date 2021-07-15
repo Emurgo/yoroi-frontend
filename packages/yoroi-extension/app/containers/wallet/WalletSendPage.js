@@ -37,6 +37,7 @@ import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
 import BigNumber from 'bignumber.js';
+import TransactionSuccessDialog from '../../components/wallet/send/TransactionSuccessDialog';
 
 // Hardware Wallet Confirmation
 import HWSendConfirmationDialog from '../../components/wallet/send/HWSendConfirmationDialog';
@@ -72,6 +73,18 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
 
   @observable showMemo: boolean = false;
 
+
+  closeTransactionSuccessDialog: void => void = () => {
+    this.generated.actions.dialogs.closeActiveDialog.trigger();
+    this.generated.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.TRANSACTIONS });
+  }
+
+  openTransactionSuccessDialog: void => void = () => {
+    this.generated.actions.dialogs.push.trigger({
+      dialog: TransactionSuccessDialog
+    });
+  }
+
   componentDidMount(): void {
     runInAction(() => {
       this.showMemo = this.generated.initialShowMemoState;
@@ -97,7 +110,12 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
     const { txBuilderActions } = this.generated.actions;
 
     // disallow sending when pending tx exists
-    if (uiDialogs.isOpen && hasAnyPending) {
+    if (
+      (
+        uiDialogs.isOpen(HWSendConfirmationDialog) ||
+          uiDialogs.isOpen(WalletSendConfirmationDialog)
+      ) && hasAnyPending
+    ) {
       actions.dialogs.closeActiveDialog.trigger();
     }
 
@@ -173,6 +191,12 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
     if (uiDialogs.isOpen(MemoNoExternalStorageDialog)) {
       return this.noCloudWarningDialog();
     }
+    if(uiDialogs.isOpen(TransactionSuccessDialog)){
+      return (<TransactionSuccessDialog
+        onClose={this.closeTransactionSuccessDialog}
+        classicTheme={this.generated.stores.profile.isClassicTheme}
+      />)
+    }
     return '';
   }
 
@@ -193,6 +217,7 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
       signRequest={signRequest}
       staleTx={transactionBuilderStore.txMismatch}
       unitOfAccountSetting={this.generated.stores.profile.unitOfAccount}
+      openTransactionSuccessDialog={this.openTransactionSuccessDialog}
     />);
   };
 
@@ -258,6 +283,7 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
             () => ledgerSendAction.sendUsingLedgerWallet.trigger({
               params: { signRequest },
               publicDeriver,
+              onSuccess: this.openTransactionSuccessDialog,
             })
           }
           onCancel={ledgerSendAction.cancel.trigger}
@@ -291,6 +317,7 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
             () => trezorSendAction.sendUsingTrezor.trigger({
               params: { signRequest },
               publicDeriver,
+              onSuccess: this.openTransactionSuccessDialog,
             })
           }
           onCancel={trezorSendAction.cancel.trigger}
@@ -347,7 +374,8 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
           sendUsingLedgerWallet: {|
             trigger: (params: {|
               params: SendUsingLedgerParams,
-              publicDeriver: PublicDeriver<>
+              publicDeriver: PublicDeriver<>,
+              onSuccess?: void => void,
             |}) => Promise<void>
           |}
         |},
@@ -356,7 +384,8 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
           sendUsingTrezor: {|
             trigger: (params: {|
               params: SendUsingTrezorParams,
-              publicDeriver: PublicDeriver<>
+              publicDeriver: PublicDeriver<>,
+              onSuccess?: void => void,
             |}) => Promise<void>
           |}
         |},
