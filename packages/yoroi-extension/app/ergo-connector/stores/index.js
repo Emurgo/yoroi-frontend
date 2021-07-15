@@ -79,7 +79,7 @@ export default (action(
       if (stores[name]) stores[name].teardown();
     });
     storeNames.forEach(name => {
-      stores[name] = (new storeClasses[name]((stores: any), api, (actions: any)): any);
+      stores[name] = (new storeClasses[name]((stores: any), api, actions): any);
     });
     storeNames.forEach(name => {
       if (stores[name]) stores[name].initialize();
