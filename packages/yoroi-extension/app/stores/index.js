@@ -96,7 +96,10 @@ export type StoresMap = {|
 |};
 
 /** Constant that represents the stores across the lifetime of the application */
-const stores: WithNullableFields<StoresMap> = observable({
+// Note: initially we assign a map of all-null values which violates the type (thus
+// the cast to `any`), but as soon as the below set-up code is executed, the object
+// becomes conformant to the type.
+const stores: StoresMap = (observable({
   stateFetchStore: null, // best to initialize first to avoid issues
   coinPriceStore: null,
   tokenInfoStore: null,
@@ -123,7 +126,7 @@ const stores: WithNullableFields<StoresMap> = observable({
   explorers: null,
   substores: null,
   router: null,
-});
+}): any);
 
 function initializeSubstore<T: {...}>(
   substore: T,
@@ -160,7 +163,7 @@ export default (action(
     storeNames.forEach(name => {
       // Careful: we pass incomplete `store` down to child components
       // Any toplevel store that accesses `store` in its constructor may crash
-      stores[name] = ((new storeClasses[name]((stores: any), api, actions)): any);
+      stores[name] = ((new storeClasses[name](stores, api, actions)): any);
     });
     storeNames.forEach(name => { if (stores[name]) stores[name].initialize(); });
 
