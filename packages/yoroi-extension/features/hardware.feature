@@ -22,6 +22,8 @@ Feature: Hardware device
     Then I see the hardware send money confirmation dialog
     Given The expected transaction is "g6QAgYJYIBZt/eWxg7fglIOvu/zntB59b+00tAXMEEG0XyfosF1HAAGBglgrgtgYWCGDWBxA66wjgpZH9bPPW9JExWBcIUqKGMmxBlNBcCzWoAAa8oZfOxoAD0JAAhoACb4hAxoR/pTNoQKBhFgg8elBZl4BQGla+Tli4OXssZO+OKu0a4uE90ZUlPqOjApYQFfNdN84xjlYUK+VJmNfrCv5BsNoKskjkCN4ixLwUUrICfdRrmvqgAdQI2eczTSA1wvWZjl8mkFwPxNtZVjH6gVYINNT5ssGb8HUyAOT9k5hdlJG+NKzPSnWME87YabidYnjQaD2"
     Then I submit the wallet send form
+    Then I should see the successfully sent page
+    And I click the transaction page button
     Then I should see the summary screen
     And I expand the top transaction
     Then The memo content says "my awesome memo"
@@ -52,6 +54,8 @@ Feature: Hardware device
     Then I see the hardware send money confirmation dialog
     Given The expected transaction is "g6QAgYJYIDZ351x7ppmv3GzVfULyRvhvaa79dgJQBqx4MT+tK7ohAQGCglgrgtgYWCGDWByJGsmrqsmZsJfIHqPARQsPu2k9C9IyvrwPSjkfoAAa8v9+IRoAD0JAglg5AXU/qJHPfuF4AaA3RBmWAEAnGtmf6+kXwe182LUPZi1s6xtlczppoe1y+G8LrFoWUFoCiJevG+NFGgBCGzcCGgACjukDGhH+lM2hAIGCWCA2j8onDd+7a+1yUcwDde1mFT4vweBhzNgescbtdEs7BVhAfswsugTQ/hLWJL5FT2YzE9F2wsyI4BbwtbltAsVEHbgs6XZouw9OzsLzhHuenc5CWw8c0RM24UNKJCgE7DkEAfY="
     Then I submit the wallet send form
+    Then I should see the successfully sent page
+    And I click the transaction page button
     Then I should see the summary screen
     # test address verification
     When I go to the receive screen
@@ -114,6 +118,8 @@ Feature: Hardware device
     Then I see the hardware send money confirmation dialog
     Given The expected transaction is "g6QAg4JYIDZ351x7ppm/3GzVfULyRvhvaa79dgJQBqx4MT+tK7ogAYJYIAWEBYkvZgddg6vRt/40HS1b/S9hIrL4dHAAOeUHjg3VAYJYIBAp7vW7DwaXmrC5UwpiusEeGAeX0IyrmA/jk4nUKzZXAAGBglgrgtgYWCGDWByJGsmrqsmZsJfIHqPARQsPu2k9C9IyvrwPSjkfoAAa8v9+IRoATn9BAhoAAsX1AxoR/pTNoQKDhFgg/OzJFHxPlMKFDW9EFxmYPVVgPVzugQEeJKi8G6Z53SBYQL6AGt9yNRSaA62/trcYpxUTx3b3g0zn+sRN1dRj2B9WH6MRJE6fDab5MqSab9TpGNNG4xPcpSoE1aepTVBmfAVYIDV5JxLCyqvpBdt0le+EfezS1nIHZ/SVPbtaFugdNbENQaCEWCBuJwykTKqtfi5OyMYeJG+UyCLYack5wLGIlNEp24UZVlhAP7nKpcJyuREGWncNtFNy1ZOqifzgi0Cji4oBRuTv5hapZWSEL1fRVitJVWL7FSdHEXaPsa1OOfu+ZzXWhQKaAFggfWWCXtxX4sbaJDEuCcMwUmas37GGCd6TftqcwcstFCZBoIRYIO9odrsMMrrk705nbVG5FWZXouCzkB8U8VHjAMiKu+FbWECGGzqdT95Z8q+gE1e7Ax897Unj62yPC80ru7EPo5fJenRmoOwv+kWefItSZArK9YAv5Vs2qMsfIL9HjlcwGr0LWCDbr4V5V0+JN2EAd8rerGsUQVAxeKvkdq4sVrOvsCZ9akGg9g=="
     Then I submit the wallet send form
+    Then I should see the successfully sent page
+    And I click the transaction page button
     Then I should see the summary screen
     And I expand the top transaction
     Then The memo content says "my awesome memo"
@@ -143,6 +149,8 @@ Feature: Hardware device
     Then I see the hardware send money confirmation dialog
     Given The expected transaction is "g6QAgYJYIDZ351x7ppm/3GzVfULyRvhvaa79dgJQBqx4MT+tK7ohAQGBglgrgtgYWCGDWByJGsmrqsmZsJfIHqPARQsPu2k9C9IyvrwPSjkfoAAa8v9+IRoATn9BAhoABW0fAxoR/pTNoQCBglggIL1t3O4RKx2YKpd4BSHseH/S7owdieZYrByrYgJ36IhYQMZ/R9HvQmS5L94KlLZ4klQvhvDqhX2i/POawWllajX2ki62p4nAjOKALkkZXyd7twGJboAfguNYIWAamNIcNQT2"
     Then I submit the wallet send form
+    Then I should see the successfully sent page
+    And I click the transaction page button
     Then I should see the summary screen
     # test address verification
     When I go to the receive screen

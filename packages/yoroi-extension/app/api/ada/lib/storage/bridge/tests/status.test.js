@@ -20,6 +20,7 @@ import {
   genGetTransactionsHistoryForAddresses,
   genGetBestBlock,
   getSingleAddressString,
+  genGetTokenInfo,
 } from '../../../state-fetch/mockNetwork';
 import { loadLovefieldDB } from '../../database/index';
 import {
@@ -297,6 +298,7 @@ async function baseTest(
     network,
   );
   const getBestBlock = genGetBestBlock(networkTransactions);
+  const getTokenInfo = genGetTokenInfo();
 
   const withDisplayCutoff = asDisplayCutoff(publicDeriver);
   if (!withDisplayCutoff) throw new Error('missing display cutoff functionality');
@@ -314,6 +316,7 @@ async function baseTest(
       checkAddressesInUse,
       getTransactionsHistoryForAddresses,
       getBestBlock,
+      getTokenInfo,
     );
 
     {
@@ -358,6 +361,7 @@ async function baseTest(
       checkAddressesInUse,
       getTransactionsHistoryForAddresses,
       getBestBlock,
+      getTokenInfo,
     );
 
     {
@@ -482,6 +486,7 @@ async function baseTest(
       checkAddressesInUse,
       getTransactionsHistoryForAddresses,
       getBestBlock,
+      getTokenInfo,
     );
 
     {
@@ -660,6 +665,7 @@ async function baseTest(
       checkAddressesInUse,
       getTransactionsHistoryForAddresses,
       getBestBlock,
+      getTokenInfo,
     );
 
     {
@@ -827,6 +833,7 @@ async function baseTest(
       checkAddressesInUse,
       getTransactionsHistoryForAddresses,
       getBestBlock,
+      getTokenInfo,
     );
 
     expect((await db.export()).tables.Transaction).toEqual([{
@@ -925,6 +932,7 @@ async function pendingDropped(
     network
   );
   const getBestBlock = genGetBestBlock(networkTransactions);
+  const getTokenInfo = genGetTokenInfo();
 
   const basePubDeriver = asGetAllUtxos(publicDeriver);
   expect(basePubDeriver != null).toEqual(true);
@@ -939,6 +947,7 @@ async function pendingDropped(
     checkAddressesInUse,
     getTransactionsHistoryForAddresses,
     getBestBlock,
+    getTokenInfo,
   );
 
   // remove it from backend
@@ -951,6 +960,7 @@ async function pendingDropped(
     checkAddressesInUse,
     getTransactionsHistoryForAddresses,
     getBestBlock,
+    getTokenInfo,
   );
 
   expect((await db.export()).tables.Transaction).toEqual([

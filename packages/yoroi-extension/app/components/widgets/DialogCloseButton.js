@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 
-import CloseCross from '../../assets/images/close-cross.inline.svg';
+import CloseCross from '../../assets/images/cross-dark.inline.svg';
 import styles from './DialogCloseButton.scss';
 
 type Props = {|

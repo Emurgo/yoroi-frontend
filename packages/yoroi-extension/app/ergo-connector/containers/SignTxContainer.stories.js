@@ -52,7 +52,6 @@ const message = (id: number) => ({
     type: 'tx',
     uid: 0,
     tx: {
-      id: '2df0273e382739f8b4ae3783d81168093e78e0b48ec2c5430ff03d444806a175',
       inputs: [{
         boxId: '1df0273e382739f8b4ae3783d81168093e78e0b48ec2c5430ff03d444806a174',
         extension: {},
@@ -70,7 +69,6 @@ const message = (id: number) => ({
         boxId: '0df0273e382739f8b4ae3783d81168093e78e0b48ec2c5430ff03d444806a173',
       }],
       outputs: [{
-        boxId: '3df0273e382739f8b4ae3783d81168093e78e0b48ec2c5430ff03d444806a176',
         value: '1234567',
         ergoTree: Buffer.from(RustModule.SigmaRust.Address.from_base58(
           '9egNKTzQDH658qcdiPEoQfVM1SBxQNxnyF8BCw57aNWerRhhHBQ'
@@ -80,9 +78,7 @@ const message = (id: number) => ({
           tokenId: tokenInfo.tokenId,
         }],
         additionalRegisters: tokenInfo.registers,
-        creationHeight: 1,
-        transactionId: '2df0273e382739f8b4ae3783d81168093e78e0b48ec2c5430ff03d444806a175',
-        index: 0
+        creationHeight: 1
       }],
     },
   },

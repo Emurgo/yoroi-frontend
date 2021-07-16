@@ -305,7 +305,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     }
     runInAction('refresh active wallet', () => {
       if (this.selected == null && newWithCachedData.length === 1) {
-        this._setActiveWallet({
+        this.actions.wallets.setActiveWallet.trigger({
           wallet: newWithCachedData[0],
         });
       }

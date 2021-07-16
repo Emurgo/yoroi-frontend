@@ -20,6 +20,7 @@ import {
   genGetTransactionsHistoryForAddresses,
   genGetBestBlock,
   getSingleAddressString,
+  genGetTokenInfo,
 } from '../../../state-fetch/mockNetwork';
 import {
   HARD_DERIVATION_START,
@@ -216,6 +217,7 @@ async function syncingSimpleTransaction(
     network,
   );
   const getBestBlock = genGetBestBlock(txHistory);
+  const getTokenInfo = genGetTokenInfo();
 
   const withDisplayCutoff = asDisplayCutoff(publicDeriver);
   if (!withDisplayCutoff) throw new Error('missing display cutoff functionality');
@@ -237,6 +239,7 @@ async function syncingSimpleTransaction(
       checkAddressesInUse,
       getTransactionsHistoryForAddresses,
       getBestBlock,
+      getTokenInfo,
     );
 
     {
@@ -347,6 +350,7 @@ async function syncingSimpleTransaction(
       checkAddressesInUse,
       getTransactionsHistoryForAddresses,
       getBestBlock,
+      getTokenInfo,
     );
 
     {

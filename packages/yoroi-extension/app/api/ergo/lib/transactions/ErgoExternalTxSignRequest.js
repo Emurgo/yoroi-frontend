@@ -96,7 +96,7 @@ export class ErgoExternalTxSignRequest
     const receivers: Array<string> = [];
 
     const changeAddrs = new Set(this.changeAddr.map(change => change.address));
-    const outputs = this.unsignedTx.outputs();
+    const outputs = this.unsignedTx.output_candidates();
     for (let i = 0; i < outputs.len(); i++) {
       const output = outputs.get(i);
       const ergoTree = output.ergo_tree();
@@ -216,7 +216,7 @@ export function getTxOutputs(
   |}> {
   const values = [];
 
-  const outputs = tx.outputs();
+  const outputs = tx.output_candidates();
   for (let i = 0; i < outputs.len(); i++) {
     const output = outputs.get(i);
     const address = RustModule.SigmaRust.NetworkAddress.new(
@@ -272,7 +272,7 @@ export function getTxOutputTotal(
     }
   );
 
-  const outputs = tx.outputs();
+  const outputs = tx.output_candidates();
   for (let i = 0; i < outputs.len(); i++) {
     const output = outputs.get(i);
     const address = RustModule.SigmaRust.NetworkAddress.new(
@@ -312,7 +312,7 @@ export function getErgoTxFee(
   feeAddress: string,
 ): MultiToken {
   const feeAmount = (() => {
-    const outputs = tx.outputs();
+    const outputs = tx.output_candidates();
     for (let i = 0; i < outputs.len(); i++) {
       const output = outputs.get(i);
       const address = RustModule.SigmaRust.NetworkAddress.new(

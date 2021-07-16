@@ -27,6 +27,7 @@ import {
   genGetTransactionsHistoryForAddresses,
   genGetBestBlock,
   getSingleAddressString,
+  genGetTokenInfo,
 } from '../../../state-fetch/mockNetwork';
 import { loadLovefieldDB } from '../../database/index';
 
@@ -422,6 +423,7 @@ async function syncingSimpleTransaction(
     network,
   );
   const getBestBlock = genGetBestBlock(txHistory);
+  const getTokenInfo = genGetTokenInfo();
 
   const withUtxos1 = asGetAllUtxos(publicDeriver1);
   expect(withUtxos1 != null).toEqual(true);
@@ -442,6 +444,7 @@ async function syncingSimpleTransaction(
       checkAddressesInUse,
       getTransactionsHistoryForAddresses,
       getBestBlock,
+      getTokenInfo,
     );
     await checkPub1HasTx(purposeForTest, publicDeriver1);
 
@@ -480,6 +483,7 @@ async function syncingSimpleTransaction(
       checkAddressesInUse,
       getTransactionsHistoryForAddresses,
       getBestBlock,
+      getTokenInfo,
     );
 
     await checkPub2HasTx(purposeForTest, publicDeriver2);
@@ -506,6 +510,7 @@ async function syncingSimpleTransaction(
       checkAddressesInUse,
       getTransactionsHistoryForAddresses,
       getBestBlock,
+      getTokenInfo,
     );
     await checkPub2IsEmpty(publicDeriver2);
     {
@@ -549,6 +554,7 @@ async function syncingSimpleTransaction(
       checkAddressesInUse,
       getTransactionsHistoryForAddresses,
       getBestBlock,
+      getTokenInfo,
     );
 
     await checkPub2HasTx(purposeForTest, publicDeriver2);

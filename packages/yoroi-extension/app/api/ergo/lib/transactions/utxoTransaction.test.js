@@ -276,17 +276,17 @@ describe('Create unsigned TX from UTXO', () => {
     ).toEqual('ed0ea178230f3d95df6f9880e18f74d324c148fce524c5ace6ed711fc3de6ad0');
 
     const unsignedTx = unsignedTxResponse.unsignedTx.build();
-    expect(unsignedTx.outputs().len()).toEqual(3);
+    expect(unsignedTx.output_candidates().len()).toEqual(3);
     expect(
       unsignedTx
-        .outputs()
+        .output_candidates()
         .get(0)
         .value().as_i64()
         .to_str()
     ).toEqual(output.toString()); // output of tx
     expect(
       unsignedTx
-        .outputs()
+        .output_candidates()
         .get(2)
         .value().as_i64()
         .to_str()
@@ -298,7 +298,7 @@ describe('Create unsigned TX from UTXO', () => {
     ).toNumber() - output - txFee;
     expect(
       unsignedTx
-        .outputs()
+        .output_candidates()
         .get(1)
         .value().as_i64()
         .to_str()
@@ -348,23 +348,23 @@ describe('Create unsigned TX from UTXO', () => {
     ).toEqual('ed0ea178230f3d95df6f9880e18f74d324c148fce524c5ace6ed711fc3de6ad0');
 
     const unsignedTx = unsignedTxResponse.unsignedTx.build();
-    expect(unsignedTx.outputs().len()).toEqual(3);
+    expect(unsignedTx.output_candidates().len()).toEqual(3);
     expect(
       unsignedTx
-        .outputs()
+        .output_candidates()
         .get(0)
         .value().as_i64()
         .to_str()
     ).toEqual(output.getDefaultEntry().amount.toString()); // output of tx
     expect(
       unsignedTx
-        .outputs().get(0)
+        .output_candidates().get(0)
         .tokens().get(0).amount()
         .as_i64().to_str()
     ).toEqual(output.get('13d24a67432d447e53118d920100c747abb52da8da646bc193f03b47b64a8ac5')?.toString()); // token in output
     expect(
       unsignedTx
-        .outputs()
+        .output_candidates()
         .get(2)
         .value().as_i64()
         .to_str()
@@ -376,14 +376,14 @@ describe('Create unsigned TX from UTXO', () => {
     ).toNumber() - output.getDefaultEntry().amount.toNumber() - txFee;
     expect(
       unsignedTx
-        .outputs()
+        .output_candidates()
         .get(1)
         .value().as_i64()
         .to_str()
     ).toEqual(expectedErgReturn.toString()); // change
     expect(
       unsignedTx
-        .outputs()
+        .output_candidates()
         .get(1)
         .tokens().get(0).amount()
         .as_i64().to_str()
@@ -516,17 +516,17 @@ describe('Create sendAll unsigned TX from UTXO', () => {
       expect(sendAllResponse.unsignedTx.box_selection().boxes().len()).toEqual(2);
 
       const unsignedTx = sendAllResponse.unsignedTx.build();
-      expect(unsignedTx.outputs().len()).toEqual(2);
+      expect(unsignedTx.output_candidates().len()).toEqual(2);
       expect(
         unsignedTx
-          .outputs()
+          .output_candidates()
           .get(0)
           .value().as_i64()
           .to_str()
       ).toEqual('20950001'); // output
       expect(Buffer.from(
         unsignedTx
-          .outputs()
+          .output_candidates()
           .get(0)
           .ergo_tree().to_bytes()
       ).toString('hex')).toEqual(
@@ -538,14 +538,14 @@ describe('Create sendAll unsigned TX from UTXO', () => {
       ); // output
       expect(
         unsignedTx
-          .outputs()
+          .output_candidates()
           .get(1)
           .value().as_i64()
           .to_str()
       ).toEqual('50000'); // fee
       expect(Buffer.from(
         unsignedTx
-          .outputs()
+          .output_candidates()
           .get(1)
           .ergo_tree().to_bytes()
       ).toString('hex')).toEqual(
@@ -558,7 +558,7 @@ describe('Create sendAll unsigned TX from UTXO', () => {
       // make sure the assets are also sent
       expect(
         unsignedTx
-          .outputs()
+          .output_candidates()
           .get(0)
           .tokens()
           .get(0)

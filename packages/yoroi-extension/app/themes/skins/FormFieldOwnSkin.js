@@ -4,8 +4,8 @@ import type { Element, Node } from 'react';
 import { omit } from 'lodash';
 import classnames from 'classnames';
 import ErrorSvg from '../../assets/images/input/exclamationmark.inline.svg';
-import PasswordSvg from '../../assets/images/input/password.watch.inline.svg';
-import PasswordHiddenSvg from '../../assets/images/input/password.hiden.inline.svg';
+import PasswordShownIcon from '../../assets/images/input/visibility.opened.inline.svg';
+import PasswordHiddenIcon from '../../assets/images/input/visibility.closed.inline.svg';
 import SuccessSvg from '../../assets/images/widget/tick-green.inline.svg';
 import DeleteMemoSvg from '../../assets/images/cross.inline.svg';
 import styles from './FormFieldOwnSkin.scss';
@@ -76,8 +76,8 @@ export const FormFieldOwnSkin = class extends React.Component<Props, State> {
             {(this.props.type === 'password') ? (
               <button tabIndex="-1" type="button" onClick={this.showPassword}>
                 {isPasswordShown
-                  ? <PasswordSvg />
-                  : <PasswordHiddenSvg />}
+                  ? <PasswordShownIcon />
+                  : <PasswordHiddenIcon />}
               </button>
             ) : null}
             {this.props.type === 'memo' && !this.props.error ? (

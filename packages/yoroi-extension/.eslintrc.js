@@ -77,7 +77,7 @@ module.exports = {
     'no-undef-init': 0, // need this to improve Flow type inference
     'no-unneeded-ternary': ['error', { defaultAssignment: true }],
     'prefer-template': 0,
-    'no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+    'no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
     'no-trailing-spaces': 1,
     'padded-blocks': 0,
     'no-undef': 1,

@@ -37,6 +37,7 @@ export default class ErgoMnemonicSendStore extends Store<StoresMap, ActionsMap> 
     signRequest: ISignRequest<any>,
     password: string,
     publicDeriver: PublicDeriver<>,
+    onSuccess?: void => void,
   |} => Promise<void> = async (request) => {
     if (!(request.signRequest instanceof ErgoTxSignRequest)) {
       throw new Error(`${nameof(this._sendMoney)} wrong tx sign request`);
@@ -55,7 +56,11 @@ export default class ErgoMnemonicSendStore extends Store<StoresMap, ActionsMap> 
 
     this.actions.dialogs.closeActiveDialog.trigger();
     this.stores.wallets.sendMoneyRequest.reset();
-    this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.TRANSACTIONS });
+    if (request.onSuccess) {
+      request.onSuccess();
+    } else {
+      this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.TRANSACTIONS });
+    }
   };
 
   signAndBroadcast: {|

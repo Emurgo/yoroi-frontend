@@ -141,6 +141,7 @@ import type {
   SignedRequest,
   AccountStateFunc,
   AddressUtxoFunc,
+  TokenInfoFunc,
 } from './lib/state-fetch/types';
 import type {
   FilterFunc,
@@ -250,6 +251,7 @@ export type AdaGetTransactionsRequest = {|
   getTransactionsHistoryForAddresses: HistoryFunc,
   checkAddressesInUse: FilterFunc,
   getBestBlock: BestBlockFunc,
+  getTokenInfo: TokenInfoFunc,
 |};
 
 // notices
@@ -655,6 +657,7 @@ export default class AdaApi {
           request.checkAddressesInUse,
           request.getTransactionsHistoryForAddresses,
           request.getBestBlock,
+          request.getTokenInfo,
         );
       }
       const fetchedTxs = await getAllTransactions({

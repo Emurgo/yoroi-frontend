@@ -21,6 +21,7 @@ export default class LedgerSendActions {
   sendUsingLedgerWallet: AsyncAction<{|
     params: SendUsingLedgerParams,
     publicDeriver: PublicDeriver<>,
+    onSuccess?: void => void,
   |}> = new AsyncAction();
   sendUsingLedgerKey: AsyncAction<{|
     signRequest: HaskellShelleyTxSignRequest,

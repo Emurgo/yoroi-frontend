@@ -1,8 +1,15 @@
 # Environment
 
-Tested on Ubuntu 18.04
+Tested on Ubuntu 18.04, Windows 10
 
 # Prerequisites
+### Windows 10
+- Node 14 (check [nvm-windows](https://github.com/coreybutler/nvm-windows)
+-- ``` nvm install 14 ```
+-- ``` nvm use 14 ```
+- Python 2.7.17 (check [pyenv-win](https://github.com/pyenv-win/pyenv-win))
+-- ``` pyenv install 2.7.17 ```
+-- ``` pyenv global 2.7.17 ```
 
 ### Packages
 To install other Yoroi-frontend related dependencies use:

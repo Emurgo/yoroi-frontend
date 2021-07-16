@@ -27,6 +27,12 @@ Example
 $ npm run prod:stable
 ```
 
+#### with byron mainnet (Windows)
+```bash
+# build files to './build'
+$ npm run prod:stable-win
+```
+
 This command will create a full build of the extension in the `./build` directory, which you can also "load unpacked" into your browser, and it will not require you to keep a running process to continue working (standalone build).
 
 Note: debug build does not imply that you are connecting to the mainnet. The network picked depends on the `npm` command.

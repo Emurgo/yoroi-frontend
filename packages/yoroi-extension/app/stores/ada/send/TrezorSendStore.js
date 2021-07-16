@@ -58,6 +58,7 @@ export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
   _sendWrapper: {|
     params: SendUsingTrezorParams,
     publicDeriver: PublicDeriver<>,
+    onSuccess?: void => void,
   |} => Promise<void> = async (request) => {
     try {
       if (this.isActionProcessing) {
@@ -84,7 +85,11 @@ export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
 
       this.actions.dialogs.closeActiveDialog.trigger();
       this.stores.wallets.sendMoneyRequest.reset();
-      this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.TRANSACTIONS });
+      if (request.onSuccess) {
+        request.onSuccess();
+      } else {
+        this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.TRANSACTIONS });
+      }
       this._reset();
 
       Logger.info('SUCCESS: ADA sent using Trezor SignTx');

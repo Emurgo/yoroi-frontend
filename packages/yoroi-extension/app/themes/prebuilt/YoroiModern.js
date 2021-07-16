@@ -460,8 +460,6 @@ const YoroiModern = {
   '--theme-dashboard-graph-active-radio-color': '#17D1AA',
   '--theme-dashboard-graph-axis-tick-color': '#ADAEB6',
   '--theme-dashboard-graph-axis-text-color': '#38393D',
-  '--theme-dashboard-graph-legend-text-color': '#676970',
-  '--theme-dashboard-graph-legend-icon-size': 12,
   '--theme-dashboard-graph-bar-hover-background-color': '#D9DDE0',
   '--theme-dashboard-graph-bar-primary-color': '#6D80FF',
   '--theme-dashboard-graph-bar-secondary-color': '#1A44B7',
