@@ -50,7 +50,6 @@ export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap
           return;
         }
         this.actions.profile.selectComplexityLevel.trigger(ComplexityLevels.Simple);
-        this.actions.router.goToRoute.trigger({ route });
       },
     },
     {
