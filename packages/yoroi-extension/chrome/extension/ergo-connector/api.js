@@ -45,6 +45,8 @@ import LocalStorageApi from '../../../app/api/localStorage/index';
 
 import type { BestBlockResponse } from '../../../app/api/ergo/lib/state-fetch/types';
 
+import JSONBigInt from 'json-bigint';
+
 function paginateResults<T>(results: T[], paginate: ?Paginate): T[] {
   if (paginate != null) {
     const startIndex = paginate.page * paginate.limit;
@@ -208,22 +210,6 @@ export type BoxLike = {
   ...
 }
 
-// TODO: look into sigma rust string value support
-function processBoxesForSigmaRust<T: BoxLike>(boxes: T[]) {
-  for (const output of boxes) {
-    output.value = parseInt(output.value, 10);
-    if (output.value > Number.MAX_SAFE_INTEGER) {
-      throw new Error('large values not supported by sigma-rust\'s json parsing code');
-    }
-    for (const asset of output.assets) {
-      asset.amount = parseInt(asset.amount, 10);
-      if (asset.amount > Number.MAX_SAFE_INTEGER) {
-        throw new Error('large values not supported by sigma-rust\'s json parsing code');
-      }
-    }
-  }
-}
-
 export async function connectorSignTx(
   publicDeriver: IPublicDeriver<ConceptualWallet>,
   password: string,
@@ -243,8 +229,7 @@ export async function connectorSignTx(
   await RustModule.load();
   let wasmTx;
   try {
-    processBoxesForSigmaRust(tx.outputs);
-    wasmTx = RustModule.SigmaRust.UnsignedTransaction.from_json(JSON.stringify(tx));
+    wasmTx = RustModule.SigmaRust.UnsignedTransaction.from_json(JSONBigInt.stringify(tx));
   } catch (e) {
     throw ConnectorError.invalidRequest(`Invalid tx - could not parse JSON: ${e}`);
   }
@@ -274,7 +259,6 @@ export async function connectorSignTx(
   const jsonBoxesToSign: Array<ErgoBoxJson> =
     // $FlowFixMe[prop-missing]: our inputs are nearly like `ErgoBoxJson` just with one extra field
     tx.inputs.filter((box, index) => indices.includes(index));
-  processBoxesForSigmaRust(jsonBoxesToSign);
   const txBoxesToSign = RustModule.SigmaRust.ErgoBoxes.from_boxes_json(jsonBoxesToSign);
   const dataBoxIds = tx.dataInputs.map(box => box.boxId);
   const dataInputs = utxos.filter(
@@ -284,7 +268,7 @@ export async function connectorSignTx(
   // but I'm guessing that votes of the previous block isn't useful for the current one
   // and I'm also unsure if any of these 3 would impact signing or not.
   // Maybe version would later be used in the ergoscript context?
-  const headerJson = JSON.stringify({
+  const headerJson = JSONBigInt.stringify({
     version: 2, // TODO: where to get version? (does this impact signing?)
     parentId: bestBlock.hash,
     timestamp: Date.now(),
