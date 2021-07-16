@@ -5,6 +5,8 @@ import { PublicDeriver } from '../../../app/api/ada/lib/storage/models/PublicDer
 import { MultiToken } from '../../../app/api/common/lib/MultiToken';
 import { RustModule } from '../../../app/api/ada/lib/cardanoCrypto/rustLoader';
 
+import JSONBigInt from 'json-bigint';
+
 // ----- Types used in the dApp <-> Yoroi connection bridge ----- //
 
 // the as* conversion functions do structural verification/sanitation on
@@ -17,7 +19,7 @@ export function asAddress(input: any): Address {
   if (typeof input === 'string') {
     return input;
   }
-  throw ConnectorError.invalidRequest(`invalid Address: ${JSON.stringify(input)}`);
+  throw ConnectorError.invalidRequest(`invalid Address: ${JSONBigInt.stringify(input)}`);
 }
 
 export function asBoxCandidate(
@@ -35,7 +37,7 @@ export function asBoxCandidate(
             return [k, v];
           }
         }
-        throw ConnectorError.invalidRequest(`additionalRegisters: Must be strings of the form "R4" to "R9": : ${JSON.stringify(input)}`);
+        throw ConnectorError.invalidRequest(`additionalRegisters: Must be strings of the form "R4" to "R9": : ${JSONBigInt.stringify(input)}`);
       });
       return {
         value: asValue(input.value),
@@ -46,9 +48,9 @@ export function asBoxCandidate(
       };
     }
   } catch (err) {
-    throw ConnectorError.invalidRequest(`Box invalid structure: ${JSON.stringify(input)} due to ${err}`);
+    throw ConnectorError.invalidRequest(`Box invalid structure: ${JSONBigInt.stringify(input)} due to ${err}`);
   }
-  throw ConnectorError.invalidRequest(`Box invalid structure: ${JSON.stringify(input)}`);
+  throw ConnectorError.invalidRequest(`Box invalid structure: ${JSONBigInt.stringify(input)}`);
 }
 
 export function asBox(
@@ -68,7 +70,7 @@ export function asBox(
             return [k, v];
           }
         }
-        throw ConnectorError.invalidRequest(`additionalRegisters: Must be strings of the form "R4" to "R9": : ${JSON.stringify(input)}`);
+        throw ConnectorError.invalidRequest(`additionalRegisters: Must be strings of the form "R4" to "R9": : ${JSONBigInt.stringify(input)}`);
       });
       const boxJson = {
         boxId: asBoxId(input.boxId),
@@ -83,16 +85,16 @@ export function asBox(
 
       {
         // we just want to validate that the boxID matches the content
-        const wasmBox = wasmInstance.ErgoBox.from_json(JSON.stringify(boxJson));
+        const wasmBox = wasmInstance.ErgoBox.from_json(JSONBigInt.stringify(boxJson));
         wasmBox.free();
       }
 
       return boxJson;
     }
   } catch (err) {
-    throw ConnectorError.invalidRequest(`Box invalid structure: ${JSON.stringify(input)} due to ${err}`);
+    throw ConnectorError.invalidRequest(`Box invalid structure: ${JSONBigInt.stringify(input)} due to ${err}`);
   }
-  throw ConnectorError.invalidRequest(`Box invalid structure: ${JSON.stringify(input)}`);
+  throw ConnectorError.invalidRequest(`Box invalid structure: ${JSONBigInt.stringify(input)}`);
 }
 
 // hex string box id
@@ -102,7 +104,7 @@ export function asBoxId(input: any): ErgoBoxId {
   if (typeof input === 'string') {
     return input;
   }
-  throw ConnectorError.invalidRequest(`invalid BoxId: ${JSON.stringify(input)}`);
+  throw ConnectorError.invalidRequest(`invalid BoxId: ${JSONBigInt.stringify(input)}`);
 }
 
 // hex bytes of sigma-rust encoding
@@ -112,7 +114,7 @@ export function asConstant(input: any): ErgoConstant {
   if (typeof input === 'string') {
     return input;
   }
-  throw ConnectorError.invalidRequest(`invalid Constant: : ${JSON.stringify(input)}`);
+  throw ConnectorError.invalidRequest(`invalid Constant: : ${JSONBigInt.stringify(input)}`);
 }
 
 // empty object is for P2PK
@@ -133,12 +135,12 @@ export function asContextExtension(input: any): ErgoContextExtension {
           if (typeof k === 'string' && typeof v === 'string') {
             return [k, v];
           }
-          throw ConnectorError.invalidRequest(`ContextExtension must map from string -> string: ${JSON.stringify(input)}`);
+          throw ConnectorError.invalidRequest(`ContextExtension must map from string -> string: ${JSONBigInt.stringify(input)}`);
         }))
       };
     }
   }
-  throw ConnectorError.invalidRequest(`ContextExtension must be a map: : ${JSON.stringify(input)}`);
+  throw ConnectorError.invalidRequest(`ContextExtension must be a map: : ${JSONBigInt.stringify(input)}`);
 }
 
 // hex-encoded bytes
@@ -148,7 +150,7 @@ export function asErgoTree(input: any): ErgoTree {
   if (typeof input === 'string') {
     return input;
   }
-  throw ConnectorError.invalidRequest(`invalid ErgoTree: : ${JSON.stringify(input)}`);
+  throw ConnectorError.invalidRequest(`invalid ErgoTree: : ${JSONBigInt.stringify(input)}`);
 }
 
 export type DataInput = {|
@@ -210,7 +212,7 @@ export function asPaginate(input: any): Paginate {
       limit: input.limit
     };
   }
-  throw ConnectorError.invalidRequest(`invalid Paginate: ${JSON.stringify(input)}`);
+  throw ConnectorError.invalidRequest(`invalid Paginate: ${JSONBigInt.stringify(input)}`);
 }
 
 export type PaginateError = {|
@@ -229,7 +231,7 @@ export function asProverResult(input: any): ProverResult {
       extension: asContextExtension(input.extension)
     };
   }
-  throw ConnectorError.invalidRequest(`invalid ProverResult: ${JSON.stringify(input)}`);
+  throw ConnectorError.invalidRequest(`invalid ProverResult: ${JSONBigInt.stringify(input)}`);
 }
 
 export type SignedTx = {|
@@ -258,9 +260,9 @@ export function asSignedTx(
       };
     }
   } catch (err) {
-    throw ConnectorError.invalidRequest(`invalid SignedTx: ${JSON.stringify(input)} due to ${err}`);
+    throw ConnectorError.invalidRequest(`invalid SignedTx: ${JSONBigInt.stringify(input)} due to ${err}`);
   }
-  throw ConnectorError.invalidRequest(`invalid SignedTx: ${JSON.stringify(input)}`);
+  throw ConnectorError.invalidRequest(`invalid SignedTx: ${JSONBigInt.stringify(input)}`);
 }
 
 export type TokenAmount = {|
@@ -281,7 +283,7 @@ export function asTokenId(input: any): TokenId {
   if (typeof input === 'string') {
     return input;
   }
-  throw ConnectorError.invalidRequest(`invalid TokenId: ${JSON.stringify(input)}`);
+  throw ConnectorError.invalidRequest(`invalid TokenId: ${JSONBigInt.stringify(input)}`);
 }
 
 export type Tx = {|
@@ -306,9 +308,9 @@ export function asTx(
       };
     }
   } catch (err) {
-    throw ConnectorError.invalidRequest(`invalid Tx: ${JSON.stringify(tx)} due to ${err}`);
+    throw ConnectorError.invalidRequest(`invalid Tx: ${JSONBigInt.stringify(tx)} due to ${err}`);
   }
-  throw ConnectorError.invalidRequest(`invalid Tx: ${JSON.stringify(tx)}`);
+  throw ConnectorError.invalidRequest(`invalid Tx: ${JSONBigInt.stringify(tx)}`);
 }
 
 export type TxId = string;
@@ -317,7 +319,7 @@ export function asTxId(input: any): TxId {
   if (typeof input === 'string') {
     return input;
   }
-  throw new Error(`invalid TxId, must be string: ${JSON.stringify(input)}`);
+  throw new Error(`invalid TxId, must be string: ${JSONBigInt.stringify(input)}`);
 }
 
 export type Value = number | string;
@@ -326,7 +328,7 @@ export function asValue(input: any): Value {
   if (typeof input === 'number' || typeof input === 'string') {
     return input;
   }
-  throw ConnectorError.invalidRequest(`Value must be a string or number: : ${JSON.stringify(input)}`);
+  throw ConnectorError.invalidRequest(`Value must be a string or number: : ${JSONBigInt.stringify(input)}`);
 }
 
 // Errors (Exposed to dApps):
@@ -474,7 +476,7 @@ export class ConnectorError extends Error {
   e: AllErrors
 
   constructor(e: AllErrors) {
-    super(JSON.stringify(e));
+    super(JSONBigInt.stringify(e));
     this.e = e;
   }
 
