@@ -253,7 +253,7 @@ function createYoroiPort() {
     // events from Yoroi
     yoroiPort = chrome.runtime.connect(extensionId);
     yoroiPort.onMessage.addListener(message => {
-        alert("content script message: " + debugJsonStringify(message));
+        // alert("content script message: " + debugJsonStringify(message));
         if (message.type === "connector_rpc_response") {
             window.postMessage(message, location.origin);
         } else if (message.type === "yoroi_connect_response") {
