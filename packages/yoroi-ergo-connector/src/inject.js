@@ -1,3 +1,17 @@
+function debugJsonStringify(x) {
+    return JSON.stringify(x, function (k ,v) {
+        return typeof v === "bigint" ? "$BigInt(" + v.toString() + ")" : v;
+    });
+}
+
+const DEBUG_JSON_STRINGIFY = `
+function debugJsonStringify(x) {
+    return JSON.stringify(x, function (k ,v) {
+        return typeof v === "bigint" ? "$BigInt(" + v.toString() + ")" : v;
+    });
+}
+`
+
 // sets up RPC communication with the connector + access check/request functions
 const initialInject = `
 var connectRequests = [];
@@ -50,13 +64,15 @@ function cardano_check_read_access() {
 
 // client-facing ergo object API
 const ergoApiInject = `
+${DEBUG_JSON_STRINGIFY}
+
 // RPC set-up
 var ergoRpcUid = 0;
 var ergoRpcResolver = new Map();
 
 window.addEventListener("message", function(event) {
     if (event.data.type == "connector_rpc_response" && event.data.protocol === "ergo") {
-        console.log("page received from connector: " + JSON.stringify(event.data) + " with source = " + event.source + " and origin = " + event.origin);
+        console.log("page received from connector: " + debugJsonStringify(event.data) + " with source = " + event.source + " and origin = " + event.origin);
         const rpcPromise = ergoRpcResolver.get(event.data.uid);
         if (rpcPromise !== undefined) {
             const ret = event.data.return;
@@ -129,6 +145,7 @@ const ergo = Object.freeze(new ErgoAPI());
 `
 
 const cardanoApiInject = `
+${DEBUG_JSON_STRINGIFY}
 
 // RPC setup
 var cardanoRpcUid = 0;
@@ -136,7 +153,7 @@ var cardanoRpcResolver = new Map();
 
 window.addEventListener("message", function(event) {
     if (event.data.type == "connector_rpc_response" && event.data.protocol === "cardano") {
-        console.log("page received from connector: " + JSON.stringify(event.data) + " with source = " + event.source + " and origin = " + event.origin);
+        console.log("page received from connector: " + debugJsonStringify(event.data) + " with source = " + event.source + " and origin = " + event.origin);
         const rpcPromise = cardanoRpcResolver.get(event.data.uid);
         if (rpcPromise !== undefined) {
             const ret = event.data.return;
@@ -236,7 +253,7 @@ function createYoroiPort() {
     // events from Yoroi
     yoroiPort = chrome.runtime.connect(extensionId);
     yoroiPort.onMessage.addListener(message => {
-        alert("content script message: " + JSON.stringify(message));
+        alert("content script message: " + debugJsonStringify(message));
         if (message.type === "connector_rpc_response") {
             window.postMessage(message, location.origin);
         } else if (message.type === "yoroi_connect_response") {
@@ -298,7 +315,7 @@ if (shouldInject()) {
     // events from page (injected code)
     window.addEventListener("message", function(event) {
         if (event.data.type === "connector_rpc_request") {
-            console.log("connector received from page: " + JSON.stringify(event.data) + " with source = " + event.source + " and origin = " + event.origin);
+            console.log("connector received from page: " + debugJsonStringify(event.data) + " with source = " + event.source + " and origin = " + event.origin);
             if (yoroiPort) {
                 try {
                     yoroiPort.postMessage(event.data);
