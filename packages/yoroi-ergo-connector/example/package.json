@@ -10,6 +10,9 @@
     "build": "webpack --config webpack.config.js",
     "start": "webpack-dev-server"
   },
+  "dependencies": {
+    "json-bigint": "1.0.0"
+  },
   "devDependencies": {
     "ergo-lib-wasm-browser": "0.13.3",
     "webpack": "^4.29.3",
