@@ -237,9 +237,9 @@ function createYoroiPort() {
     yoroiPort = chrome.runtime.connect(extensionId);
     yoroiPort.onMessage.addListener(message => {
         alert("content script message: " + JSON.stringify(message));
-        if (message.type == "connector_rpc_response") {
+        if (message.type === "connector_rpc_response") {
             window.postMessage(message, location.origin);
-        } else if (message.type == "yoroi_connect_response") {
+        } else if (message.type === "yoroi_connect_response") {
             if (message.success) {
                 if (!ergoApiInjected) {
                     // inject full API here
@@ -261,7 +261,7 @@ function createYoroiPort() {
                 type: "connector_connected",
                 success: message.success
             }, location.origin);
-        } else if (message.type == "yoroi_connect_response/cardano") {
+        } else if (message.type === "yoroi_connect_response/cardano") {
             if (message.success) {
                 if (!cardanoApiInjected) {
                     // inject full API here
@@ -328,8 +328,8 @@ if (shouldInject()) {
                     }
                 }, location.origin);
             }
-        } else if (event.data.type == "connector_connect_request") {
-            if (fullApiInjected && yoroiPort) {
+        } else if (event.data.type === "connector_connect_request") {
+            if (ergoApiInjected && yoroiPort) {
                 // we can skip communication - API injected + hasn't been disconnected
                 window.postMessage({
                     type: "connector_connected",
