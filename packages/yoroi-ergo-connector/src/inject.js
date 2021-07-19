@@ -15,7 +15,7 @@ window.addEventListener("message", function(event) {
 function ergo_request_read_access() {
     return new Promise(function(resolve, reject) {
         window.postMessage({
-            type: "connector_connect_request",
+            type: "connector_connect_request/ergo",
         }, location.origin);
         connectRequests.push({ resolve: resolve, reject: reject });
     });
@@ -32,7 +32,7 @@ function ergo_check_read_access() {
 function cardano_request_read_access() {
     return new Promise(function(resolve, reject) {
         window.postMessage({
-            type: "yoroi_connect_request/cardano",
+            type: "connector_connect_request/cardano",
         }, location.origin);
         connectRequests.push({ resolve: resolve, reject: reject });
     });
@@ -239,7 +239,7 @@ function createYoroiPort() {
         // alert("content script message: " + JSON.stringify(message));
         if (message.type === "connector_rpc_response") {
             window.postMessage(message, location.origin);
-        } else if (message.type === "yoroi_connect_response") {
+        } else if (message.type === "yoroi_connect_response/ergo") {
             if (message.success) {
                 if (!ergoApiInjected) {
                     // inject full API here
@@ -328,7 +328,7 @@ if (shouldInject()) {
                     }
                 }, location.origin);
             }
-        } else if (event.data.type === "connector_connect_request") {
+        } else if (event.data.type === "connector_connect_request/ergo") {
             if (ergoApiInjected && yoroiPort) {
                 // we can skip communication - API injected + hasn't been disconnected
                 window.postMessage({
@@ -346,12 +346,12 @@ if (shouldInject()) {
                     .then(imgBase64Url => {
                         yoroiPort.postMessage({
                             imgBase64Url,
-                            type: "yoroi_connect_request",
+                            type: "yoroi_connect_request/ergo",
                             url: location.hostname
                         });
                     });
             }
-        } else if (event.data.type === "yoroi_connect_request/cardano") {
+        } else if (event.data.type === "connector_connect_request/cardano") {
             if (cardanoApiInjected && yoroiPort) {
                 // we can skip communication - API injected + hasn't been disconnected
                 window.postMessage({
