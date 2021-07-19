@@ -328,7 +328,7 @@ if (shouldInject()) {
                     }
                 }, location.origin);
             }
-        } else if (event.data.type == "connector_connect_request") {
+        } else if (event.data.type == "connector_connect_request" || event.data.type == 'yoroi_connect_request/cardano') {
             if ((ergoApiInjected || cardanoApiInjected) && yoroiPort) {
                 // we can skip communication - API injected + hasn't been disconnected
                 window.postMessage({
@@ -339,14 +339,15 @@ if (shouldInject()) {
                 if (yoroiPort == null) {
                     createYoroiPort();
                 }
-
+                let type = 'yoroi_connect_request'
+                if (event.data.type == 'yoroi_connect_request/cardano') type = 'yoroi_connect_request/cardano'
                 // note: content scripts are subject to the same CORS policy as the website they are embedded in
                 // but since we are querying the website this script is injected into, it should be fine
                 convertImgToBase64(getFavicon(location.origin))
                     .then(imgBase64Url => {
                         yoroiPort.postMessage({
                             imgBase64Url,
-                            type: "yoroi_connect_request",
+                            type,
                             url: location.hostname
                         });
                     });
