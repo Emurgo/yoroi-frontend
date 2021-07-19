@@ -1,9 +1,3 @@
-function debugJsonStringify(x) {
-    return JSON.stringify(x, function (k ,v) {
-        return typeof v === "bigint" ? "$BigInt(" + v.toString() + ")" : v;
-    });
-}
-
 const DEBUG_JSON_STRINGIFY = `
 function debugJsonStringify(x) {
     return JSON.stringify(x, function (k ,v) {
@@ -253,8 +247,9 @@ function createYoroiPort() {
     // events from Yoroi
     yoroiPort = chrome.runtime.connect(extensionId);
     yoroiPort.onMessage.addListener(message => {
-        // alert("content script message: " + debugJsonStringify(message));
+        // alert("content script message: " + window.JsonBigInt.stringify(message));
         if (message.type === "connector_rpc_response") {
+            message.return = window.JsonBigInt.parse(message.return);
             window.postMessage(message, location.origin);
         } else if (message.type === "yoroi_connect_response") {
             if (message.success) {
@@ -315,10 +310,10 @@ if (shouldInject()) {
     // events from page (injected code)
     window.addEventListener("message", function(event) {
         if (event.data.type === "connector_rpc_request") {
-            console.log("connector received from page: " + debugJsonStringify(event.data) + " with source = " + event.source + " and origin = " + event.origin);
+            console.log("connector received from page: " + window.JsonBigInt.stringify(event.data) + " with source = " + event.source + " and origin = " + event.origin);
             if (yoroiPort) {
                 try {
-                    yoroiPort.postMessage(event.data);
+                    yoroiPort.postMessage(window.JsonBigInt.stringify(event.data));
                     return;
                 } catch (e) {
                     console.error(`Could not send RPC to Yoroi: ${e}`);

@@ -20,6 +20,8 @@ import { addressToDisplayString } from '../../api/ada/lib/storage/bridge/utils';
 import { SelectedExplorer } from '../../domain/SelectedExplorer';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 
+const JSONBigInt = require('json-bigint')({ useNativeBigInt: true });
+
 type GeneratedData = typeof SignTxContainer.prototype.generated;
 
 @observer
@@ -78,7 +80,8 @@ export default class SignTxContainer extends Component<
 
     let component = null;
     // TODO: handle other sign types
-    switch (signingMessage.sign.type) {
+    const sign = JSONBigInt.parse(signingMessage.sign);
+    switch (sign.type) {
       case 'tx': {
         const txData = this.generated.stores.connector.signingRequest;
         if (txData == null) return this.renderLoading();
@@ -101,7 +104,7 @@ export default class SignTxContainer extends Component<
                 ? null
                 : uiNotifications.getTooltipActiveNotification(this.notificationElementId)
             }
-            tx={signingMessage.sign.tx}
+            tx={sign.tx}
             txData={txData}
             getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
             defaultToken={selectedWallet.publicDeriver.getParent().getDefaultToken()}

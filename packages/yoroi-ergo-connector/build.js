@@ -12,9 +12,9 @@ const extensionId = argv.yoroiExtensionId;
 const extensionIdHeader = `var extensionId = "${extensionId}";\r\n`;
 
 /// need to both copy the src file and expose the extension ID to it
-function copyFileSrc(name) {
-  const file = `./src/${name}`;
-  const data = fse.readFileSync(`./src/${name}`); //read existing contents into data
+function copyFileSrc(name, dir) {
+  const file = `./${dir}/${name}`;
+  const data = fse.readFileSync(`./${dir}/${name}`); //read existing contents into data
   const fd = fse.openSync(`./build/${name}`, 'w+');
 
   // expose extension ID for build
@@ -24,7 +24,8 @@ function copyFileSrc(name) {
   fse.close(fd);
 }
 
-fse.readdirSync('./src').forEach(file => copyFileSrc(file));
+fse.readdirSync('./src').forEach(file => copyFileSrc(file, 'src'));
+fse.readdirSync('./lib').forEach(file => copyFileSrc(file, 'lib'));
 
 const isNightly = extensionId === 'poonlenmfdfbjfeeballhiibknlknepo';
 

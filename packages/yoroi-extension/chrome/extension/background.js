@@ -62,7 +62,7 @@ import {
 import { migrateNoRefresh } from '../../app/api/common/migration';
 import { Mutex, } from 'async-mutex';
 
-import JSONBigInt from 'json-bigint';
+const JSONBigInt = require('json-bigint')({ useNativeBigInt: true });
 
 /*::
 declare var chrome;
@@ -431,7 +431,7 @@ chrome.runtime.onMessage.addListener(async (
           }
           sendResponse(({
             publicDeriverId: connection.status.publicDeriverId,
-            sign: responseData.request,
+            sign: JSONBigInt.stringify(responseData.request),
             tabId
           }: SigningMessage));
           return;
@@ -575,14 +575,16 @@ chrome.runtime.onConnectExternal.addListener(port => {
   if (port.sender.id === environment.ergoConnectorExtensionId) {
     const tabId = port.sender.tab.id;
     ports.set(tabId, port);
-    port.onMessage.addListener(async message => {
+    port.onMessage.addListener(async messageRaw => {
+      const message = messageRaw.type === 'yoroi_connect_request'
+        ? messageRaw : JSONBigInt.parse(messageRaw);
       imgBase64Url = message.imgBase64Url;
       function rpcResponse(response) {
         port.postMessage({
           type: 'connector_rpc_response',
           protocol: message.protocol,
           uid: message.uid,
-          return: response
+          return: JSONBigInt.stringify(response),
         });
       }
       function checkParamCount(expected: number) {

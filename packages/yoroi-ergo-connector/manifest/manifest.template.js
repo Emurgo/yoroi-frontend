@@ -18,7 +18,8 @@ module.exports = ({
         "https://*/*"
       ],
       "js": [
-        "inject.js"
+        "json-bigint-browser.min.js",
+        "inject.js",
       ],
       "run_at": "document_start",
       "all_frames": true

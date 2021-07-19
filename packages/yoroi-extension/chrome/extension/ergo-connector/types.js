@@ -325,10 +325,11 @@ export function asTxId(input: any): TxId {
 export type Value = number | string;
 
 export function asValue(input: any): Value {
-  if (typeof input === 'number' || typeof input === 'string') {
+  const inputType = typeof input;
+  if (inputType === 'number' || inputType === 'string' || inputType === 'bigint') {
     return input;
   }
-  throw ConnectorError.invalidRequest(`Value must be a string or number: : ${JSONBigInt.stringify(input)}`);
+  throw ConnectorError.invalidRequest(`Value must be a string or number or bigint, but got: "${inputType}" : ${JSONBigInt.stringify(input)}`);
 }
 
 // Errors (Exposed to dApps):
