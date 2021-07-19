@@ -1,4 +1,5 @@
 import * as wasm from "ergo-lib-wasm-browser";
+const cardanoAccessBtn = document.querySelector('#cardano-access')
 
 function initDapp(){
     cardano_request_read_access().then(function(access_granted){
@@ -9,6 +10,11 @@ function initDapp(){
         }
     });
 }
+
+cardanoAccessBtn.addEventListener('click', () => {
+    initDapp()
+})
+
 
 if (typeof cardano_request_read_access === "undefined") {
     alert("Cardano not found");
@@ -24,5 +30,4 @@ if (typeof cardano_request_read_access === "undefined") {
         button.onclick = initDapp;
         div.appendChild(button);
     });
-    initDapp();
 }
