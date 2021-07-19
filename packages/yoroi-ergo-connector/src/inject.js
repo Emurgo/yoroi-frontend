@@ -236,10 +236,10 @@ function createYoroiPort() {
     // events from Yoroi
     yoroiPort = chrome.runtime.connect(extensionId);
     yoroiPort.onMessage.addListener(message => {
-        alert("content script message: " + JSON.stringify(message));
-        if (message.type == "connector_rpc_response") {
+        // alert("content script message: " + JSON.stringify(message));
+        if (message.type === "connector_rpc_response") {
             window.postMessage(message, location.origin);
-        } else if (message.type == "yoroi_connect_response") {
+        } else if (message.type === "yoroi_connect_response") {
             if (message.success) {
                 if (!ergoApiInjected) {
                     // inject full API here
@@ -261,7 +261,7 @@ function createYoroiPort() {
                 type: "connector_connected",
                 success: message.success
             }, location.origin);
-        } else if (message.type == "yoroi_connect_response/cardano") {
+        } else if (message.type === "yoroi_connect_response/cardano") {
             if (message.success) {
                 if (!cardanoApiInjected) {
                     // inject full API here
@@ -328,8 +328,8 @@ if (shouldInject()) {
                     }
                 }, location.origin);
             }
-        } else if (event.data.type == "connector_connect_request") {
-            if (fullApiInjected && yoroiPort) {
+        } else if (event.data.type === "connector_connect_request") {
+            if (ergoApiInjected && yoroiPort) {
                 // we can skip communication - API injected + hasn't been disconnected
                 window.postMessage({
                     type: "connector_connected",
@@ -347,6 +347,29 @@ if (shouldInject()) {
                         yoroiPort.postMessage({
                             imgBase64Url,
                             type: "yoroi_connect_request",
+                            url: location.hostname
+                        });
+                    });
+            }
+        } else if (event.data.type === "yoroi_connect_request/cardano") {
+            if (cardanoApiInjected && yoroiPort) {
+                // we can skip communication - API injected + hasn't been disconnected
+                window.postMessage({
+                    type: "connector_connected",
+                    success: true
+                }, location.origin);
+            } else {
+                if (yoroiPort == null) {
+                    createYoroiPort();
+                }
+
+                // note: content scripts are subject to the same CORS policy as the website they are embedded in
+                // but since we are querying the website this script is injected into, it should be fine
+                convertImgToBase64(getFavicon(location.origin))
+                    .then(imgBase64Url => {
+                        yoroiPort.postMessage({
+                            imgBase64Url,
+                            type: "yoroi_connect_request/cardano",
                             url: location.hostname
                         });
                     });
