@@ -108,7 +108,7 @@ export type ErgoTxInput = {
 };
 export type ErgoTxDataInput = {
   id: string,
-  value: number,
+  value: string,
   transactionId: string,
   index: number,
   outputIndex: number,
@@ -162,12 +162,12 @@ export type SignedRequest = {|
   |}>,
   outputs: Array<{|
     boxId?: string, // hex
-    value: number,
+    value: string,
     ergoTree: string, // hex
     creationHeight: number,
     assets?: $ReadOnlyArray<$ReadOnly<{|
       tokenId: string, // hex
-      amount: number,
+      amount: string,
     |}>>,
     additionalRegisters: {| [key: string]: string /* hex */ |},
     transactionId?: string, // hex
