@@ -114,7 +114,7 @@ export function toErgoBoxJSON(
 ): ErgoBoxJson {
   return {
     boxId: utxo.boxId,
-    value: Number.parseInt(utxo.amount, 10),
+    value: utxo.amount,
     ergoTree: utxo.ergoTree,
     assets: (utxo.assets ?? []).map(asset => ({
       amount: asset.amount,
