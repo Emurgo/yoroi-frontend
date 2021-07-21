@@ -97,7 +97,7 @@ const genSampleUtxos: void => Array<RemoteUnspentOutput> = () => [
     ).to_ergo_tree().to_bytes()).toString('hex'),
     assets: [{
       tokenId: '13d24a67432d447e53118d920100c747abb52da8da646bc193f03b47b64a8ac5',
-      amount: 10000,
+      amount: '10000',
     }],
   }),
 ];

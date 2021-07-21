@@ -612,13 +612,13 @@ chrome.runtime.onConnectExternal.addListener(port => {
           });
         }
       }
-      if (message.type === 'yoroi_connect_request') {
+      if (message.type === 'yoroi_connect_request/ergo') {
         await withDb(
           async (_db, localStorageApi) => {
             const publicDeriverId = await confirmConnect(tabId, message.url, localStorageApi);
             const accepted = publicDeriverId !== null;
             port.postMessage({
-              type: 'yoroi_connect_response',
+              type: 'yoroi_connect_response/ergo',
               success: accepted
             });
           }

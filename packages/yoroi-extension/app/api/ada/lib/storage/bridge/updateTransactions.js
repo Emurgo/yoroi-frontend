@@ -1941,7 +1941,7 @@ export async function genCardanoAssetMap(
     existingDbRows.filter(
       // only tokens with lastUpdateAt are considered existing, except for default
       // asset rows, because they are never updated from network
-      row => row.Metadata.lastUpdatedAt || row.IsDefault
+      row => (row.Metadata.lastUpdatedAt != null) || row.IsDefault
     ).map(row => row.Identifier)
   );
 

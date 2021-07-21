@@ -67,7 +67,6 @@ function bigNumberToValue(x: BigNumber): Value {
 }
 
 function valueToBigNumber(x: Value): BigNumber {
-  // constructor takes either string/number this is just here for consistency
   return new BigNumber(x);
 }
 
