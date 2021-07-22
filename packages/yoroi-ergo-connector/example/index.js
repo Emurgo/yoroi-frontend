@@ -86,7 +86,7 @@ function initDapp() {
                         new wasm.Tokens());
                     console.log(`boxes selected: ${boxSelection.boxes().len()}`);
                     const outputCandidates = wasm.ErgoBoxCandidates.empty();
-                    const token = new wasm.Token(wasm.TokenId.from_box_id(wasm.BoxId.from_str(utxos[2].boxId)), wasm.TokenAmount.from_i64(wasm.I64.from_str("1234567890123456789")));
+                    const token = new wasm.Token(wasm.TokenId.from_box_id(wasm.BoxId.from_str(utxos[utxos.length - 1].boxId)), wasm.TokenAmount.from_i64(wasm.I64.from_str("1234567890123456789")));
                     const donationBoxBuilder = new wasm.ErgoBoxCandidateBuilder(
                         amountToSendBoxValue,
                         wasm.Contract.pay_to_address(wasm.Address.from_base58(donationAddr)),
@@ -137,25 +137,62 @@ console.log(`box: ${JSON.stringify(box)}`);
                     });
                     status.innerText = "Awaiting transaction signing";
                     console.log(`${JSON.stringify(correctTx)}`);
-                    ergo
-                        .sign_tx(correctTx)
-                        .then(async signedTx => {
-                            status.innerText = "Transaction signed - awaiting submission"
-                            try {
-                                const sentTxId = await ergo.submit_tx(signedTx);
-                                status.innerText = "Transaction submitted - thank you for your donation!";
-                                const txTracker = document.createElement("a");
-                                txTracker.appendChild(document.createTextNode(`Track TX ${sentTxId}`));
-                                txTracker.href = `https://explorer.ergoplatform.com/en/transactions/${sentTxId}`;
-                                status.appendChild(txTracker);
-                            } catch (e) {
-                                status.innerText = `Transaction could not be sent: ${JSON.stringify(e)}`;
-                            }
-                        })
-                        .catch(err => {
-                            console.log(`Error: ${JSON.stringify(err)}`);
-                            status.innerText = `Error: ${JSON.stringify(err)}`
-                        });
+
+                    async function signTx(txToBeSigned) {
+                        try {
+                            return await ergo.sign_tx(txToBeSigned);
+                        } catch (err) {
+                            const msg = `[signTx] Error: ${err}`;
+                            console.error(msg, err);
+                            status.innerText = msg
+                            return null;
+                        }
+                    }
+
+                    async function submitTx(txToBeSubmitted) {
+                        try {
+                            return await ergo.submit_tx(txToBeSubmitted);
+                        } catch (err) {
+                            const msg = `[submitTx] Error: ${err}`;
+                            console.error(msg, err);
+                            status.innerText = msg
+                            return null;
+                        }
+                    }
+
+                    async function processTx(txToBeProcessed) {
+                        const msg = s => {
+                            console.log('[processTx]', s);
+                            status.innerText = s;
+                        };
+                        const signedTx = await signTx(txToBeProcessed);
+                        if (!signedTx) {
+                            console.log(`No signed tx`);
+                            return null;
+                        }
+                        msg("Transaction signed - awaiting submission");
+                        const txId = await submitTx(signedTx);
+                        if (!txId) {
+                            console.log(`No submotted tx ID`);
+                            return null;
+                        }
+                        msg("Transaction submitted - thank you for your donation!");
+                        return txId;
+                    }
+
+                    function displayTxId(txId) {
+                        const txTracker = document.createElement("a");
+                        txTracker.appendChild(document.createTextNode(`Track TX ${txId}`));
+                        txTracker.href = `https://explorer.ergoplatform.com/en/transactions/${txId}`;
+                        status.appendChild(txTracker);
+                    }
+
+                    processTx(correctTx).then(txId => {
+                        console.log('[txId]', txId);
+                        if (txId) {
+                            displayTxId(txId);
+                        }
+                    });
                 }
                 div.appendChild(valueEntry);
                 div.appendChild(button);
