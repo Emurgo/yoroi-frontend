@@ -44,7 +44,7 @@ import { generateRegistration } from '../../api/ada/lib/cardanoCrypto/catalyst';
 import { derivePublicByAddressing } from '../../api/ada/lib/cardanoCrypto/utils'
 import type { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet'
 import type { CatalystRoundInfoResponse } from '../../api/ada/lib/state-fetch/types'
- 
+
 export const ProgressStep = Object.freeze({
   GENERATE: 0,
   CONFIRM: 1,
@@ -95,9 +95,7 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
 
   setup(): void {
     super.setup();
-    // this._getCatalystRoundInfo()
     const { voting: votingActions } = this.actions.ada;
-    console.log(votingActions)
     this.reset({ justTransaction: false });
     votingActions.generateCatalystKey.listen(this._generateCatalystKey);
     votingActions.createTransaction.listen(this._createTransaction);
@@ -115,7 +113,7 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
     votingActions.cancel.listen(this._cancel);
     this.actions.wallets.setActiveWallet.listen(() => {this._getCatalystRoundInfo()});
   }
-  
+
   get isActionProcessing(): boolean {
     return this.progressInfo.stepState === StepState.PROCESS;
   }
@@ -126,25 +124,12 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
       return
     }
     const network = publicDeriver.getParent().getNetworkInfo()
+    const res = await this.stores.substores.ada.stateFetchStore.fetcher
+                .getCatalystRoundInfo({ network })
+    runInAction(() => {
+      this.catalystRoundInfo = res
+    })
 
-    console.log('getCatalystRoundInfo')
-    try {
-      let res = await this.stores.substores.ada.stateFetchStore.fetcher.getCatalystRoundInfo({network})
-      console.log('response', res)
-      const result  = {
-        "currentFund": {
-          "id": 5,
-          "registrationStart": "08 Jul 2021 16:00:00 GMT",
-          "registrationEnd": "19 Jul 2021 11:00:00 GMT",
-          "votingStart": "22 Jul 2021 11:00:00 GMT",
-          "votingEnd": "02 Aug 2021 11:00:00 GMT",
-          "votingPowerThreshold": "450"
-        }
-      }
-       this.catalystRoundInfo = result
-    } catch (error) { 
-      console.log(error.message);
-    }
   }
 
   @action _goBackToRegister: void => void = () => {

@@ -432,7 +432,7 @@ export function batchGetCatalystRoundInfo(
 ): CatalystRoundInfoFunc {
   return async function (body: CatalystRoundInfoRequest): any {
     try {
-      getCatalystRoundInfo(body)
+      return getCatalystRoundInfo(body)
     } catch (error) {
       Logger.error(`batchedFetcher::${nameof(batchGetAccountState)} error: ` + stringifyError(error));
       if (error instanceof LocalizableError) throw error;

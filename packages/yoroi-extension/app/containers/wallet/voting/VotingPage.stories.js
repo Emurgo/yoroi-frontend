@@ -70,7 +70,16 @@ const defaultProps: ({|
     substores: {
       ada: {
         votingStore: {
-          catalystRoundInfo: '',
+          catalystRoundInfo: {
+            currentFund: {
+              id: 5,
+              registrationStart: '08 Jul 2021 16:00:00 GMT',
+              registrationEnd: '19 Jul 2021 11:00:00 GMT',
+              votingStart: '22 Jul 2021 11:00:00 GMT',
+              votingEnd: '02 Aug 2021 11:00:00 GMT',
+              votingPowerThreshold: '450'
+            }
+          },
         }
       }
     }

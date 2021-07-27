@@ -411,36 +411,20 @@ export class RemoteFetcher implements IFetcher {
     }, {});
   }
 
-  getCatalystRoundInfo: CatalystRoundInfoRequest => Promise<CatalystRoundInfoResponse> = (body) => {
+  getCatalystRoundInfo: CatalystRoundInfoRequest => Promise<CatalystRoundInfoResponse> = async (body) => {
     const { BackendService } = body.network.Backend;
     if (BackendService == null) throw new Error(`${nameof(this.getCatalystRoundInfo)} missing backend url`);
-    return axios(
-      `${BackendService}/api/v0/catalyst/fundInfo`,
+    const isMainnet = /Mainnet/g.test(body.network.NetworkName)
+    const prefix = isMainnet ? '' : 'api/'
+    return await axios(
+      `${BackendService}/${prefix}v0/catalyst/fundInfo`,
       {
         method: 'get',
-        headers: {
-          'yoroi-version': this.getLastLaunchVersion(),
-          'yoroi-locale': this.getCurrentLocale()
-        }
       }
     ).then(response => response.data)
       .catch((error) => {
-        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getPoolInfo)} error: ` + stringifyError(error));
-        throw new GetPoolInfoApiError();
+        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getCatalystRoundInfo)} error: ` + stringifyError(error));
+        throw new GetCatalystRoundInfoApiError();
       });
-    // return axios(
-    //   `${BackendService}/api/v0/catalyst/fundInfo`,
-    //   {
-    //     method: 'get',
-    //     headers: {
-    //       'yoroi-version': this.getLastLaunchVersion(),
-    //       'yoroi-locale': this.getCurrentLocale()
-    //     }
-    //   }
-    // ).then(response => response.data)
-    //   .catch((error) => {
-    //     Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getCatalystRoundInfo)} error: ` + stringifyError(error));
-    //     throw new GetCatalystRoundInfoApiError();
-    //   });
   }
 }
