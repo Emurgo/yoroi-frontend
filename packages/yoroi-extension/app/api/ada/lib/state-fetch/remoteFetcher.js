@@ -425,8 +425,22 @@ export class RemoteFetcher implements IFetcher {
       }
     ).then(response => response.data)
       .catch((error) => {
-        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getCatalystRoundInfo)} error: ` + stringifyError(error));
-        throw new GetCatalystRoundInfoApiError();
+        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getPoolInfo)} error: ` + stringifyError(error));
+        throw new GetPoolInfoApiError();
       });
+    // return axios(
+    //   `${BackendService}/api/v0/catalyst/fundInfo`,
+    //   {
+    //     method: 'get',
+    //     headers: {
+    //       'yoroi-version': this.getLastLaunchVersion(),
+    //       'yoroi-locale': this.getCurrentLocale()
+    //     }
+    //   }
+    // ).then(response => response.data)
+    //   .catch((error) => {
+    //     Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getCatalystRoundInfo)} error: ` + stringifyError(error));
+    //     throw new GetCatalystRoundInfoApiError();
+    //   });
   }
 }

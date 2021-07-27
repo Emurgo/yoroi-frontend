@@ -30,6 +30,8 @@ import {
   isLedgerNanoWallet,
   isTrezorTWallet,
 } from '../../../api/ada/lib/storage/models/ConceptualWallet/index';
+import type { CatalystRoundInfoResponse } from '../../../api/ada/lib/state-fetch/types'
+import string from 'lodash/string';
 
 export type GeneratedData = typeof VotingPage.prototype.generated;
 type Props = {|
@@ -85,6 +87,7 @@ export default class VotingPage extends Component<Props> {
   }
 
   render(): Node {
+    console.log('hello world',this.generated.stores.substores.ada.votingStore.catalystRoundInfo?.currentFund)
     const {
       uiDialogs,
       wallets: { selected },
@@ -106,11 +109,20 @@ export default class VotingPage extends Component<Props> {
         </VerticallyCenteredLayout>
       );
     }
-
+    const NewRoundInfo = this.generated.stores.substores.ada.votingStore.catalystRoundInfo
+    console.log('roundinfo', NewRoundInfo)
+    // const endDate = roundInfo.cur 
+    //roundInfo.currentFund?.registrationEnd
     // keep enabled on the testnet
     if (!environment.isTest()) {
-      const isLate = new Date() >= roundInfo.endDate;
-      const isEarly = new Date() <= roundInfo.startDate;
+      // let isLate = new Date() >= roundInfo.endDate
+      // let isEarly = new Date() <= roundInfo.startDate;
+
+      // if(NewRoundInfo) {
+       const isLate = new Date() >= new Date(Date.parse(NewRoundInfo.currentFund.registrationEnd))
+       const isEarly = new Date() <= new Date(Date.parse(NewRoundInfo.currentFund.registrationStart))
+      // }
+
       if (
         selected.getParent().getNetworkInfo().NetworkId === networks.CardanoMainnet.NetworkId &&
         (isEarly || isLate)
@@ -118,8 +130,8 @@ export default class VotingPage extends Component<Props> {
         return (
           <RegistrationOver roundNumber={
               isLate
-                ? roundInfo.nextRound
-                : roundInfo.nextRound - 1
+                ? NewRoundInfo.currentFund.id 
+                : NewRoundInfo.currentFund.id + 1
             }
           />
         );
@@ -174,7 +186,7 @@ export default class VotingPage extends Component<Props> {
           hasAnyPending={this.generated.hasAnyPending}
           onExternalLinkClick={handleExternalLinkClick}
           isDelegated={this.isDelegated === true}
-          round={roundInfo.nextRound}
+          round={NewRoundInfo.currentFund.id}
           walletType={walletType}
         />
       </div>
@@ -211,6 +223,13 @@ export default class VotingPage extends Component<Props> {
       delegation: {|
         getDelegationRequests: (PublicDeriver<>) => void | DelegationRequests,
       |},
+      substores: {|
+        ada: {|
+          votingStore: {|
+            catalystRoundInfo: CatalystRoundInfoResponse,
+          |}
+        |}
+      |}
     |},
   |} {
     if (this.props.generated !== undefined) {
@@ -259,6 +278,13 @@ export default class VotingPage extends Component<Props> {
         delegation: {
           getDelegationRequests: stores.delegation.getDelegationRequests,
         },
+        substores: {
+          ada: {
+            votingStore: {
+              catalystRoundInfo: stores.substores.ada.votingStore.catalystRoundInfo
+            }
+          }
+        }
       },
       VotingRegistrationDialogProps: ({
         actions,

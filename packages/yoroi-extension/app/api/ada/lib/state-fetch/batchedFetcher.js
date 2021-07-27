@@ -10,6 +10,7 @@ import type {
   PoolInfoFunc, PoolInfoRequest, PoolInfoResponse,
   TokenInfoFunc, TokenInfoRequest, TokenInfoResponse,
   AccountStateFunc, AccountStateRequest, AccountStateResponse,
+  CatalystRoundInfoFunc,CatalystRoundInfoRequest, CatalystRoundInfoResponse,
   SignedRequest, SignedResponse,
   BestBlockRequest, BestBlockResponse,
   AddressUtxoFunc,
@@ -110,6 +111,10 @@ export class BatchedFetcher implements IFetcher {
 
   getTokenInfo: TokenInfoRequest => Promise<TokenInfoResponse> = (body) => (
     batchGetTokenInfo(this.baseFetcher.getTokenInfo)(body)
+  )
+
+  getCatalystRoundInfo: CatalystRoundInfoRequest => Promise<CatalystRoundInfoResponse> = (body) => (
+    batchGetCatalystRoundInfo(this.baseFetcher.getCatalystRoundInfo)(body)
   )
 }
 
@@ -415,6 +420,19 @@ export function batchGetAccountState(
       );
       const chimericAccountStates = await Promise.all(chimericAccountPromises);
       return Object.assign({}, ...chimericAccountStates);
+    } catch (error) {
+      Logger.error(`batchedFetcher::${nameof(batchGetAccountState)} error: ` + stringifyError(error));
+      if (error instanceof LocalizableError) throw error;
+      throw new GetAccountStateApiError();
+    }
+  };
+}
+export function batchGetCatalystRoundInfo(
+  getCatalystRoundInfo: CatalystRoundInfoFunc,
+): CatalystRoundInfoFunc {
+  return async function (body: CatalystRoundInfoRequest): any {
+    try {
+      getCatalystRoundInfo(body)
     } catch (error) {
       Logger.error(`batchedFetcher::${nameof(batchGetAccountState)} error: ` + stringifyError(error));
       if (error instanceof LocalizableError) throw error;

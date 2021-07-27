@@ -341,10 +341,11 @@ export type TokenInfoResponse = {|
 export type PoolInfoFunc = (body: PoolInfoRequest) => Promise<PoolInfoResponse>;
 export type TokenInfoFunc = (body: TokenInfoRequest) => Promise<TokenInfoResponse>;
 
+
 export type CatalystRoundInfoRequest = {|
   ...BackendNetworkInfo
-|};
-
+  |};
+  
 export type CatalystRound = {|
   +id: number,
   +registrationStart: string,
@@ -353,7 +354,10 @@ export type CatalystRound = {|
   +votingEnd: string,
   +votingPowerThreshold: string,
 |};
-
+    
 export type CatalystRoundInfoResponse = {|
-  [key: string]: (CatalystRound | null),
+  currentFund: CatalystRound,
+  nextFund?: CatalystRound
 |};
+
+export type CatalystRoundInfoFunc = (body: CatalystRoundInfoRequest) => Promise<CatalystRoundInfoResponse>;
