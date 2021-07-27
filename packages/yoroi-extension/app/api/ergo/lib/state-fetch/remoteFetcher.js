@@ -40,6 +40,38 @@ import { decode, encode } from 'bs58';
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
 
+function errClass(Err: Function): (* => Function) {
+  return _ => new Err();
+}
+
+async function axiosPost<T>(url: string, params: {
+  data: *,
+  responseMapper?: Object => T,
+  callerName: string,
+  errorFactory: (error: *) => Function,
+}): Promise {
+  return await axios(url, {
+    method: 'post',
+    timeout: 2 * CONFIG.app.walletRefreshInterval,
+    data: params.data,
+    headers: {
+      'yoroi-version': this.getLastLaunchVersion(),
+      'yoroi-locale': this.getCurrentLocale()
+    }
+  }).then(response => {
+    console.log(`AXIOS[${url}] > `, response);
+    const mapper = params.responseMapper;
+    const data = response.data;
+    return mapper ? mapper(data) : data;
+  }).catch((error) => {
+    Logger.error(`${nameof(RemoteFetcher)}::${params.callerName} error: ` + stringifyError(error));
+    const err = params.errorFactory(error);
+    if (err) {
+      throw err;
+    }
+  });
+}
+
 /**
  * Makes calls to Yoroi backend service
  * https://github.com/Emurgo/yoroi-graphql-migration-backend
@@ -63,73 +95,37 @@ export class RemoteFetcher implements IFetcher {
   getUTXOsForAddresses: AddressUtxoRequest => Promise<AddressUtxoResponse> = async (body) => {
     const { BackendService } = body.network.Backend;
     if (BackendService == null) throw new Error(`${nameof(this.getUTXOsForAddresses)} missing backend url`);
-    return await axios(
-      `${BackendService}/api/txs/utxoForAddresses`,
-      {
-        method: 'post',
-        timeout: 2 * CONFIG.app.walletRefreshInterval,
-        data: {
-          addresses: body.addresses.map(addr => encode(Buffer.from(addr, 'hex')))
-        },
-        headers: {
-          'yoroi-version': this.getLastLaunchVersion(),
-          'yoroi-locale': this.getCurrentLocale()
-        }
+    return await axiosPost(`${BackendService}/api/txs/utxoForAddresses`, {
+      data: { addresses: body.addresses.map(addr => encode(Buffer.from(addr, 'hex'))) },
+      callerName: nameof(this.getUTXOsForAddresses),
+      errorFactory: errClass(GetUtxosForAddressesApiError),
+      responseMapper: data => {
+        return data.map((resp: ElementOf<AddressUtxoResponse>) => ({
+          ...resp,
+          receiver: decode(resp.receiver).toString('hex'),
+        }))
       }
-    ).then(response => response.data.map((resp: ElementOf<AddressUtxoResponse>) => ({
-      ...resp,
-      receiver: decode(resp.receiver).toString('hex'),
-    })))
-      .catch((error) => {
-        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getUTXOsForAddresses)} error: ` + stringifyError(error));
-        throw new GetUtxosForAddressesApiError();
-      });
+    });
   }
 
   getTxsBodiesForUTXOs: TxBodiesRequest => Promise<TxBodiesResponse> = (body) => {
     const { BackendService } = body.network.Backend;
     if (BackendService == null) throw new Error(`${nameof(this.getTxsBodiesForUTXOs)} missing backend url`);
-    return axios(
-      `${BackendService}/api/txs/txBodies`,
-      {
-        method: 'post',
-        timeout: 2 * CONFIG.app.walletRefreshInterval,
-        data: {
-          txHashes: body.txHashes
-        },
-        headers: {
-          'yoroi-version': this.getLastLaunchVersion(),
-          'yoroi-locale': this.getCurrentLocale()
-        }
-      }
-    ).then(response => response.data)
-      .catch((error) => {
-        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getTxsBodiesForUTXOs)} error: ` + stringifyError(error));
-        throw new GetTxsBodiesForUTXOsApiError();
-      });
+    return axiosPost(`${BackendService}/api/txs/txBodies`, {
+      data: { txHashes: body.txHashes },
+      callerName: nameof(this.getTxsBodiesForUTXOs),
+      errorFactory: errClass(GetTxsBodiesForUTXOsApiError),
+    });
   }
 
   getUTXOsSumsForAddresses: UtxoSumRequest => Promise<UtxoSumResponse> = (body) => {
     const { BackendService } = body.network.Backend;
     if (BackendService == null) throw new Error(`${nameof(this.getUTXOsSumsForAddresses)} missing backend url`);
-    return axios(
-      `${BackendService}/api/txs/utxoSumForAddresses`,
-      {
-        method: 'post',
-        timeout: 2 * CONFIG.app.walletRefreshInterval,
-        data: {
-          addresses: body.addresses.map(addr => encode(Buffer.from(addr, 'hex')))
-        },
-        headers: {
-          'yoroi-version': this.getLastLaunchVersion(),
-          'yoroi-locale': this.getCurrentLocale()
-        }
-      }
-    ).then(response => response.data)
-      .catch((error) => {
-        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getUTXOsSumsForAddresses)} error: ` + stringifyError(error));
-        throw new GetUtxosSumsForAddressesApiError();
-      });
+    return axiosPost(`${BackendService}/api/txs/utxoSumForAddresses`, {
+      data: { addresses: body.addresses.map(addr => encode(Buffer.from(addr, 'hex'))) },
+      callerName: nameof(this.getUTXOsSumsForAddresses),
+      errorFactory: errClass(GetUtxosSumsForAddressesApiError),
+    });
   }
 
   getTransactionsHistoryForAddresses: HistoryRequest => Promise<HistoryResponse> = (request) => {
@@ -138,45 +134,33 @@ export class RemoteFetcher implements IFetcher {
     if (BackendService == null) throw new Error(`${nameof(this.getTransactionsHistoryForAddresses)} missing backend url`);
 
     return fixHistoryFunc(async body => {
-      return axios(
-        `${BackendService}/api/v2/txs/history`,
-        {
-          method: 'post',
-          timeout: 2 * CONFIG.app.walletRefreshInterval,
-          data: {
-            ...rest,
-            addresses: body.addresses,
-          },
-          headers: {
-            'yoroi-version': this.getLastLaunchVersion(),
-            'yoroi-locale': this.getCurrentLocale()
-          }
-        }
-      ).then(response => {
-        const data: HistoryResponse = response.data;
-        for (const datum of data) {
-          for (let i = 0; i < datum.inputs.length; i++) {
-            // TODO: remove this once this ticket is merged
-            // https://github.com/ergoplatform/explorer-backend/issues/92
-            if (datum.inputs[i].assets == null) {
-              datum.inputs[i].assets = [];
-            }
-          }
-        }
-        return data;
-      })
-        .catch((error) => {
-          Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getTransactionsHistoryForAddresses)} error: ` + stringifyError(error));
+      return axiosPost(`${BackendService}/api/v2/txs/history`, {
+        data: { ...rest, addresses: body.addresses },
+        callerName: nameof(this.getTransactionsHistoryForAddresses),
+        errorFactory: error => {
           const errorMessage = error.response.data.error;
           if (
             errorMessage === 'REFERENCE_BLOCK_MISMATCH' ||
             errorMessage === 'REFERENCE_TX_NOT_FOUND' ||
             errorMessage === 'REFERENCE_BEST_BLOCK_MISMATCH'
           ) {
-            throw new RollbackApiError();
+            return new RollbackApiError();
           }
-          throw new GetTxHistoryForAddressesApiError();
-        });
+          return new GetTxHistoryForAddressesApiError();
+        },
+        responseMapper: (data: HistoryResponse) => {
+          for (const datum of data) {
+            for (let i = 0; i < datum.inputs.length; i++) {
+              // TODO: remove this once this ticket is merged
+              // https://github.com/ergoplatform/explorer-backend/issues/92
+              if (datum.inputs[i].assets == null) {
+                datum.inputs[i].assets = [];
+              }
+            }
+          }
+          return data;
+        },
+      })
     })(request);
   }
 
@@ -204,6 +188,7 @@ export class RemoteFetcher implements IFetcher {
     const { network, ...rest } = body;
     const { BackendService } = network.Backend;
     if (BackendService == null) throw new Error(`${nameof(this.sendTx)} missing backend url`);
+    console.log('[sendTx]', rest);
     return axios(
       `${BackendService}/api/txs/signed`,
       {
@@ -218,13 +203,13 @@ export class RemoteFetcher implements IFetcher {
     ).then(response => ({
       txId: response.data.id,
     }))
-      .catch((error) => {
-        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.sendTx)} error: ` + stringifyError(error));
-        if (error.request.response.includes('Invalid witness')) {
-          throw new InvalidWitnessError();
-        }
-        throw new SendTransactionApiError();
-      });
+    .catch((error) => {
+      Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.sendTx)} error: ` + stringifyError(error));
+      if (error.request.response.includes('Invalid witness')) {
+        throw new InvalidWitnessError();
+      }
+      throw new SendTransactionApiError();
+    });
   }
 
   getAssetInfo: AssetInfoRequest => Promise<AssetInfoResponse> = (request) => {
