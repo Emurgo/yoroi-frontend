@@ -53,7 +53,9 @@ import type {
   HistoryFunc,
   BestBlockFunc,
   AssetInfoFunc,
-  SendFunc, SignedResponse,
+  SendFunc,
+  SignedResponse,
+  RemoteUnspentOutput,
 } from './lib/state-fetch/types';
 import type {
   FilterFunc,
@@ -104,6 +106,14 @@ import { WrongPassphraseError } from '../ada/lib/cardanoCrypto/cryptoErrors';
 import type { DefaultTokenEntry } from '../common/lib/MultiToken';
 import { hasSendAllDefault, builtSendTokenList } from '../common/index';
 import { getReceiveAddress } from '../../stores/stateless/addressStores';
+
+export function fixUtxoToStringValues(utxo: RemoteUnspentOutput): RemoteUnspentOutput {
+  utxo.value = String(utxo.value);
+  utxo.assets.forEach(a => {
+    a.amount = String(a.amount);
+  });
+  return utxo;
+}
 
 // getTransactionRowsToExport
 

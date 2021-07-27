@@ -1,41 +1,51 @@
 // @flow
 
 import type {
-  AddressUtxoRequest, AddressUtxoResponse,
-  TxBodiesRequest, TxBodiesResponse,
-  UtxoSumRequest, UtxoSumResponse,
-  HistoryFunc, HistoryRequest, HistoryResponse,
-  BestBlockRequest, BestBlockResponse,
-  SignedRequest, SignedResponse,
-  AssetInfoRequest, AssetInfoResponse,
+  AddressUtxoRequest,
+  AddressUtxoResponse,
+  AssetInfoRequest,
+  AssetInfoResponse,
+  BestBlockRequest,
+  BestBlockResponse,
+  HistoryFunc,
+  HistoryRequest,
+  HistoryResponse,
+  SignedRequest,
+  SignedResponse,
+  TxBodiesRequest,
+  TxBodiesResponse,
+  UtxoSumRequest,
+  UtxoSumResponse,
 } from './types';
 import type {
-  FilterFunc, FilterUsedRequest, FilterUsedResponse,
+  FilterFunc,
+  FilterUsedRequest,
+  FilterUsedResponse,
 } from '../../../common/lib/state-fetch/currencySpecificTypes';
 
 import type { IFetcher } from './IFetcher';
 
 import axios from 'axios';
+import { Logger, stringifyError } from '../../../../utils/logging';
 import {
-  Logger,
-  stringifyError
-} from '../../../../utils/logging';
-import {
+  CheckAddressesInUseApiError,
+  GetAssetInfoApiError,
+  GetBestBlockError,
+  GetTxHistoryForAddressesApiError,
   GetTxsBodiesForUTXOsApiError,
   GetUtxosForAddressesApiError,
   GetUtxosSumsForAddressesApiError,
-  GetTxHistoryForAddressesApiError,
-  GetBestBlockError,
-  SendTransactionApiError,
-  GetAssetInfoApiError,
-  CheckAddressesInUseApiError,
   InvalidWitnessError,
   RollbackApiError,
+  SendTransactionApiError,
 } from '../../../common/errors';
 
 import type { ConfigType } from '../../../../../config/config-types';
+import { fixUtxoToStringValues } from '../../index';
 
 import { decode, encode } from 'bs58';
+import JSONBigInt from 'json-bigint';
+import cloneDeep from 'lodash/cloneDeep'
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
@@ -51,7 +61,7 @@ const axiosRequest: (RemoteFetcher, string) => <T>(string, {
   errorFactory: (error: *) => Function,
 }) => Promise<T> = (fetcher, method) => (url, params): Promise => {
   const debug = (s, p) => {
-    console.debug(`AXIOS[${method}][${url}] ${s} > `, p);
+    console.debug(`AXIOS[${method}][${url}] ${s} > `, cloneDeep(p));
   };
   debug('CALLING', params);
   return axios(url, {
@@ -61,12 +71,21 @@ const axiosRequest: (RemoteFetcher, string) => <T>(string, {
       'yoroi-version': fetcher.getLastLaunchVersion(),
       'yoroi-locale': fetcher.getCurrentLocale()
     },
+    transformResponse: resp => {
+      debug('RSPRAW', resp);
+      return JSONBigInt.parse(resp);
+    },
     ...(params.data ? { data: params.data } : {}),
   }).then(response => {
     debug('RSP', response);
     const mapper = params.responseMapper;
     const data = response.data;
-    return mapper ? mapper(data) : data;
+    if (!mapper) {
+      return data;
+    }
+    const res = mapper(data);
+    debug('RSPMAP', res);
+    return res;
   }).catch((error) => {
     debug('ERR', error);
     Logger.error(`${nameof(RemoteFetcher)}::${params.callerName} error: ` + stringifyError(error));
@@ -121,7 +140,7 @@ export class RemoteFetcher implements IFetcher {
       errorFactory: errClass(GetUtxosForAddressesApiError),
       responseMapper: data => {
         return data.map((resp: ElementOf<AddressUtxoResponse>) => ({
-          ...resp,
+          ...fixUtxoToStringValues(resp),
           receiver: decode(resp.receiver).toString('hex'),
         }))
       }
@@ -135,6 +154,12 @@ export class RemoteFetcher implements IFetcher {
       data: { txHashes: body.txHashes },
       callerName: nameof(this.getTxsBodiesForUTXOs),
       errorFactory: errClass(GetTxsBodiesForUTXOsApiError),
+      responseMapper: data => {
+        Object.values(data).forEach(({ outputs }) => {
+          outputs.forEach(o => fixUtxoToStringValues(o));
+        });
+        return data;
+      }
     });
   }
 
@@ -171,13 +196,10 @@ export class RemoteFetcher implements IFetcher {
         },
         responseMapper: (data: HistoryResponse) => {
           for (const datum of data) {
-            for (let i = 0; i < datum.inputs.length; i++) {
-              // TODO: remove this once this ticket is merged
-              // https://github.com/ergoplatform/explorer-backend/issues/92
-              if (datum.inputs[i].assets == null) {
-                datum.inputs[i].assets = [];
-              }
-            }
+            datum.outputs.forEach(o => fixUtxoToStringValues(o));
+            // TODO: the inputs fix might potentially be removed
+            // https://github.com/ergoplatform/explorer-backend/issues/92
+            datum.inputs.forEach(i => { i.assets = i.assets ?? [] })
           }
           return data;
         },
@@ -198,6 +220,7 @@ export class RemoteFetcher implements IFetcher {
     const { network, ...rest } = body;
     const { BackendService } = network.Backend;
     if (BackendService == null) throw new Error(`${nameof(this.sendTx)} missing backend url`);
+    // todo: fix values from strings to BigInts and then use the lib for encoding
     return this.axiosPost(`${BackendService}/api/txs/signed`, {
       data: rest,
       callerName: nameof(this.sendTx),
