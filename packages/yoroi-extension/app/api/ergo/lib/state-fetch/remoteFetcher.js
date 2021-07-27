@@ -44,34 +44,6 @@ function errClass(Err: Function): (* => Function) {
   return _ => new Err();
 }
 
-async function axiosPost<T>(url: string, params: {
-  data: *,
-  responseMapper?: Object => T,
-  callerName: string,
-  errorFactory: (error: *) => Function,
-}): Promise {
-  return await axios(url, {
-    method: 'post',
-    timeout: 2 * CONFIG.app.walletRefreshInterval,
-    data: params.data,
-    headers: {
-      'yoroi-version': this.getLastLaunchVersion(),
-      'yoroi-locale': this.getCurrentLocale()
-    }
-  }).then(response => {
-    console.log(`AXIOS[${url}] > `, response);
-    const mapper = params.responseMapper;
-    const data = response.data;
-    return mapper ? mapper(data) : data;
-  }).catch((error) => {
-    Logger.error(`${nameof(RemoteFetcher)}::${params.callerName} error: ` + stringifyError(error));
-    const err = params.errorFactory(error);
-    if (err) {
-      throw err;
-    }
-  });
-}
-
 /**
  * Makes calls to Yoroi backend service
  * https://github.com/Emurgo/yoroi-graphql-migration-backend
@@ -92,10 +64,41 @@ export class RemoteFetcher implements IFetcher {
     this.getPlatform = getPlatform;
   }
 
-  getUTXOsForAddresses: AddressUtxoRequest => Promise<AddressUtxoResponse> = async (body) => {
+  axiosPost: <T>(string, {
+    data: *,
+    responseMapper?: Object => T,
+    callerName: string,
+    errorFactory: (error: *) => Function,
+  }) => Promise<T> = (url, params): Promise => {
+    console.debug(`AXIOS[${url}] CALLING > `, params);
+    return axios(url, {
+      method: 'post',
+      timeout: 2 * CONFIG.app.walletRefreshInterval,
+      data: params.data,
+      headers: {
+        'yoroi-version': this.getLastLaunchVersion(),
+        'yoroi-locale': this.getCurrentLocale()
+      }
+    }).then(response => {
+      console.debug(`AXIOS[${url}] RSP > `, response);
+      const mapper = params.responseMapper;
+      const data = response.data;
+      return mapper ? mapper(data) : data;
+    }).catch((error) => {
+      console.debug(`AXIOS[${url}] ERR > `, error);
+      Logger.error(`${nameof(RemoteFetcher)}::${params.callerName} error: ` + stringifyError(error));
+      const err = params.errorFactory(error);
+      if (err) {
+        throw err;
+      }
+    });
+  }
+
+
+  getUTXOsForAddresses: AddressUtxoRequest => Promise<AddressUtxoResponse> = (body) => {
     const { BackendService } = body.network.Backend;
     if (BackendService == null) throw new Error(`${nameof(this.getUTXOsForAddresses)} missing backend url`);
-    return await axiosPost(`${BackendService}/api/txs/utxoForAddresses`, {
+    return this.axiosPost(`${BackendService}/api/txs/utxoForAddresses`, {
       data: { addresses: body.addresses.map(addr => encode(Buffer.from(addr, 'hex'))) },
       callerName: nameof(this.getUTXOsForAddresses),
       errorFactory: errClass(GetUtxosForAddressesApiError),
@@ -111,7 +114,7 @@ export class RemoteFetcher implements IFetcher {
   getTxsBodiesForUTXOs: TxBodiesRequest => Promise<TxBodiesResponse> = (body) => {
     const { BackendService } = body.network.Backend;
     if (BackendService == null) throw new Error(`${nameof(this.getTxsBodiesForUTXOs)} missing backend url`);
-    return axiosPost(`${BackendService}/api/txs/txBodies`, {
+    return this.axiosPost(`${BackendService}/api/txs/txBodies`, {
       data: { txHashes: body.txHashes },
       callerName: nameof(this.getTxsBodiesForUTXOs),
       errorFactory: errClass(GetTxsBodiesForUTXOsApiError),
@@ -121,7 +124,7 @@ export class RemoteFetcher implements IFetcher {
   getUTXOsSumsForAddresses: UtxoSumRequest => Promise<UtxoSumResponse> = (body) => {
     const { BackendService } = body.network.Backend;
     if (BackendService == null) throw new Error(`${nameof(this.getUTXOsSumsForAddresses)} missing backend url`);
-    return axiosPost(`${BackendService}/api/txs/utxoSumForAddresses`, {
+    return this.axiosPost(`${BackendService}/api/txs/utxoSumForAddresses`, {
       data: { addresses: body.addresses.map(addr => encode(Buffer.from(addr, 'hex'))) },
       callerName: nameof(this.getUTXOsSumsForAddresses),
       errorFactory: errClass(GetUtxosSumsForAddressesApiError),
@@ -133,8 +136,9 @@ export class RemoteFetcher implements IFetcher {
     const { BackendService } = network.Backend;
     if (BackendService == null) throw new Error(`${nameof(this.getTransactionsHistoryForAddresses)} missing backend url`);
 
+    const self = this;
     return fixHistoryFunc(async body => {
-      return axiosPost(`${BackendService}/api/v2/txs/history`, {
+      return await self.axiosPost(`${BackendService}/api/v2/txs/history`, {
         data: { ...rest, addresses: body.addresses },
         callerName: nameof(this.getTransactionsHistoryForAddresses),
         errorFactory: error => {
@@ -160,7 +164,7 @@ export class RemoteFetcher implements IFetcher {
           }
           return data;
         },
-      })
+      });
     })(request);
   }
 
