@@ -44,6 +44,39 @@ function errClass(Err: Function): (* => Function) {
   return _ => new Err();
 }
 
+const axiosRequest: (RemoteFetcher, string) => <T>(string, {
+  data?: *,
+  responseMapper?: Object => T,
+  callerName: string,
+  errorFactory: (error: *) => Function,
+}) => Promise<T> = (fetcher, method) => (url, params): Promise => {
+  const debug = (s, p) => {
+    console.debug(`AXIOS[${method}][${url}] ${s} > `, p);
+  };
+  debug('CALLING', params);
+  return axios(url, {
+    method,
+    timeout: 2 * CONFIG.app.walletRefreshInterval,
+    headers: {
+      'yoroi-version': fetcher.getLastLaunchVersion(),
+      'yoroi-locale': fetcher.getCurrentLocale()
+    },
+    ...(params.data ? { data: params.data } : {}),
+  }).then(response => {
+    debug('RSP', response);
+    const mapper = params.responseMapper;
+    const data = response.data;
+    return mapper ? mapper(data) : data;
+  }).catch((error) => {
+    debug('ERR', error);
+    Logger.error(`${nameof(RemoteFetcher)}::${params.callerName} error: ` + stringifyError(error));
+    const err = params.errorFactory(error);
+    if (err) {
+      throw err;
+    }
+  });
+};
+
 /**
  * Makes calls to Yoroi backend service
  * https://github.com/Emurgo/yoroi-graphql-migration-backend
@@ -64,35 +97,19 @@ export class RemoteFetcher implements IFetcher {
     this.getPlatform = getPlatform;
   }
 
+  axiosGet: <T>(string, {
+    data: *,
+    responseMapper?: Object => T,
+    callerName: string,
+    errorFactory: (error: *) => Function,
+  }) => Promise<T> = axiosRequest(this, 'get');
+
   axiosPost: <T>(string, {
     data: *,
     responseMapper?: Object => T,
     callerName: string,
     errorFactory: (error: *) => Function,
-  }) => Promise<T> = (url, params): Promise => {
-    console.debug(`AXIOS[${url}] CALLING > `, params);
-    return axios(url, {
-      method: 'post',
-      timeout: 2 * CONFIG.app.walletRefreshInterval,
-      data: params.data,
-      headers: {
-        'yoroi-version': this.getLastLaunchVersion(),
-        'yoroi-locale': this.getCurrentLocale()
-      }
-    }).then(response => {
-      console.debug(`AXIOS[${url}] RSP > `, response);
-      const mapper = params.responseMapper;
-      const data = response.data;
-      return mapper ? mapper(data) : data;
-    }).catch((error) => {
-      console.debug(`AXIOS[${url}] ERR > `, error);
-      Logger.error(`${nameof(RemoteFetcher)}::${params.callerName} error: ` + stringifyError(error));
-      const err = params.errorFactory(error);
-      if (err) {
-        throw err;
-      }
-    });
-  }
+  }) => Promise<T> = axiosRequest(this, 'post');
 
 
   getUTXOsForAddresses: AddressUtxoRequest => Promise<AddressUtxoResponse> = (body) => {
@@ -171,96 +188,49 @@ export class RemoteFetcher implements IFetcher {
   getBestBlock: BestBlockRequest => Promise<BestBlockResponse> = (body) => {
     const { BackendService } = body.network.Backend;
     if (BackendService == null) throw new Error(`${nameof(this.getBestBlock)} missing backend url`);
-    return axios(
-      `${BackendService}/api/v2/bestblock`,
-      {
-        method: 'get',
-        timeout: 2 * CONFIG.app.walletRefreshInterval,
-        headers: {
-          'yoroi-version': this.getLastLaunchVersion(),
-          'yoroi-locale': this.getCurrentLocale()
-        }
-      }
-    ).then(response => response.data)
-      .catch((error) => {
-        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getBestBlock)} error: ` + stringifyError(error));
-        throw new GetBestBlockError();
-      });
+    return this.axiosGet(`${BackendService}/api/v2/bestblock`, {
+      callerName: nameof(this.getBestBlock),
+      errorFactory: errClass(GetBestBlockError),
+    });
   }
 
   sendTx: SignedRequest => Promise<SignedResponse> = (body) => {
     const { network, ...rest } = body;
     const { BackendService } = network.Backend;
     if (BackendService == null) throw new Error(`${nameof(this.sendTx)} missing backend url`);
-    console.log('[sendTx]', rest);
-    return axios(
-      `${BackendService}/api/txs/signed`,
-      {
-        method: 'post',
-        timeout: 2 * CONFIG.app.walletRefreshInterval,
-        data: rest,
-        headers: {
-          'yoroi-version': this.getLastLaunchVersion(),
-          'yoroi-locale': this.getCurrentLocale()
+    return this.axiosPost(`${BackendService}/api/txs/signed`, {
+      data: rest,
+      callerName: nameof(this.sendTx),
+      errorFactory: error => {
+        if (error.request.response.includes('Invalid witness')) {
+          return new InvalidWitnessError();
         }
-      }
-    ).then(response => ({
-      txId: response.data.id,
-    }))
-    .catch((error) => {
-      Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.sendTx)} error: ` + stringifyError(error));
-      if (error.request.response.includes('Invalid witness')) {
-        throw new InvalidWitnessError();
-      }
-      throw new SendTransactionApiError();
+        return new SendTransactionApiError();
+      },
+      responseMapper: ({ id }) => ({ txId: id }),
     });
   }
 
   getAssetInfo: AssetInfoRequest => Promise<AssetInfoResponse> = (request) => {
     const { BackendService } = request.network.Backend;
     if (BackendService == null) throw new Error(`${nameof(this.getAssetInfo)} missing backend url`);
-    return axios(
-      `${BackendService}/api/assets/info`,
-      {
-        method: 'post',
-        timeout: 2 * CONFIG.app.walletRefreshInterval,
-        data: {
-          assetIds: request.assetIds
-        },
-        headers: {
-          'yoroi-version': this.getLastLaunchVersion(),
-          'yoroi-locale': this.getCurrentLocale()
-        }
-      }
-    ).then(response => response.data)
-      .catch((error) => {
-        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getAssetInfo)} error: ` + stringifyError(error));
-        throw new GetAssetInfoApiError();
-      });
+    return this.axiosPost(`${BackendService}/api/assets/info`, {
+      data: { assetIds: request.assetIds },
+      callerName: nameof(this.getAssetInfo),
+      errorFactory: errClass(GetAssetInfoApiError),
+    });
   }
 
   checkAddressesInUse: FilterUsedRequest => Promise<FilterUsedResponse> = (request) => {
     const { BackendService } = request.network.Backend;
     if (BackendService == null) throw new Error(`${nameof(this.checkAddressesInUse)} missing backend url`);
+    const self = this;
     return fixFilterFunc(body => {
-      return axios(
-        `${BackendService}/api/v2/addresses/filterUsed`,
-        {
-          method: 'post',
-          timeout: 2 * CONFIG.app.walletRefreshInterval,
-          data: {
-            addresses: body.addresses
-          },
-          headers: {
-            'yoroi-version': this.getLastLaunchVersion(),
-            'yoroi-locale': this.getCurrentLocale()
-          }
-        }
-      ).then(response => response.data)
-        .catch((error) => {
-          Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.checkAddressesInUse)} error: ` + stringifyError(error));
-          throw new CheckAddressesInUseApiError();
-        });
+      return self.axiosPost(`${BackendService}/api/v2/addresses/filterUsed`, {
+        data: { addresses: body.addresses },
+        callerName: nameof(this.checkAddressesInUse),
+        errorFactory: errClass(CheckAddressesInUseApiError),
+      });
     })(request);
   }
 }
