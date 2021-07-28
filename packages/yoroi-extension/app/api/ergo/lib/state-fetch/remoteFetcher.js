@@ -55,55 +55,65 @@ function errClass(Err: Function): (* => Function) {
   return _ => new Err();
 }
 
-const axiosRequest: (RemoteFetcher, string) => <T>(string, {
-  data?: *,
+type AxiosGet<T> = {|
   responseMapper?: Object => T,
   callerName: string,
   errorFactory: (error: *) => Function,
-}) => Promise<T> = (fetcher, method) => (url, params): Promise => {
-  const debug = (s, p) => {
-    Logger.debug(`AXIOS[${method}][${url}] ${s} > `, cloneDeep(p));
-  };
-  debug('CALLING', params);
-  return axios(url, {
-    method,
-    timeout: 2 * CONFIG.app.walletRefreshInterval,
-    headers: {
-      'yoroi-version': fetcher.getLastLaunchVersion(),
-      'yoroi-locale': fetcher.getCurrentLocale()
-    },
-    transformResponse: resp => {
-      debug('RSPRAW', resp);
-      return JSONBigInt.parse(resp);
-    },
-    transformRequest: data => {
-      if (!data) {
-        return data;
+|};
+type AxiosPost<T> = {|
+  data?: *,
+  ...AxiosGet<T>,
+|};
+type AxiosParams<T> = AxiosGet<T> | AxiosPost<T>;
+type AxiosMethod = 'get' | 'post';
+type AxiosFunc<T> = (string, AxiosParams<T>) => Promise<T>
+
+function axiosRequest<T>(fetcher: RemoteFetcher, method: AxiosMethod): AxiosFunc<T> {
+  return (url, params) => {
+    const debug = (s: string, p: *) => {
+      // eslint-disable-next-line no-console
+      console.debug(`AXIOS[${method}][${url}] ${s} > `, cloneDeep(p));
+    };
+    debug('CALLING', params);
+    return axios(url, {
+      method,
+      timeout: 2 * CONFIG.app.walletRefreshInterval,
+      headers: {
+        'yoroi-version': fetcher.getLastLaunchVersion(),
+        'yoroi-locale': fetcher.getCurrentLocale()
+      },
+      transformResponse: resp => {
+        debug('RSPRAW', resp);
+        return JSONBigInt.parse(resp);
+      },
+      transformRequest: data => {
+        if (!data) {
+          return data;
+        }
+        const res = JSONBigInt.stringify(data);
+        debug('REQFIX', res);
+        return res;
+      },
+      ...(params.data ? { data: params.data } : {}),
+    }).then(response => {
+      debug('RSP', response);
+      const mapper: ?(Object => T) = params.responseMapper;
+      const data = response.data;
+      if (!mapper) {
+        // forcing the type, since the mapper has not been specified
+        const t: T = data;
+        return t;
       }
-      const res = JSONBigInt.stringify(data);
-      debug('REQFIX', res);
+      const res: T = mapper(data);
+      debug('RSPMAP', res);
       return res;
-    },
-    ...(params.data ? { data: params.data } : {}),
-  }).then(response => {
-    debug('RSP', response);
-    const mapper = params.responseMapper;
-    const data = response.data;
-    if (!mapper) {
-      return data;
-    }
-    const res = mapper(data);
-    debug('RSPMAP', res);
-    return res;
-  }).catch((error) => {
-    debug('ERR', error);
-    Logger.error(`${nameof(RemoteFetcher)}::${params.callerName} error: ` + stringifyError(error));
-    const err = params.errorFactory(error);
-    if (err) {
-      throw err;
-    }
-  });
-};
+    }).catch((error) => {
+      debug('ERR', error);
+      Logger.error(`${nameof(RemoteFetcher)}::${params.callerName} error: ` + stringifyError(error));
+      throw (params.errorFactory(error) ?? error);
+    });
+  };
+}
 
 /**
  * Makes calls to Yoroi backend service
@@ -125,19 +135,18 @@ export class RemoteFetcher implements IFetcher {
     this.getPlatform = getPlatform;
   }
 
-  axiosGet: <T>(string, {
-    data: *,
+  axiosGet: <T>(string, {|
     responseMapper?: Object => T,
     callerName: string,
     errorFactory: (error: *) => Function,
-  }) => Promise<T> = axiosRequest(this, 'get');
+  |}) => Promise<T> = axiosRequest(this, 'get');
 
-  axiosPost: <T>(string, {
+  axiosPost: <T>(string, {|
     data: *,
     responseMapper?: Object => T,
     callerName: string,
     errorFactory: (error: *) => Function,
-  }) => Promise<T> = axiosRequest(this, 'post');
+  |}) => Promise<T> = axiosRequest(this, 'post');
 
 
   getUTXOsForAddresses: AddressUtxoRequest => Promise<AddressUtxoResponse> = (body) => {
@@ -164,6 +173,7 @@ export class RemoteFetcher implements IFetcher {
       callerName: nameof(this.getTxsBodiesForUTXOs),
       errorFactory: errClass(GetTxsBodiesForUTXOsApiError),
       responseMapper: data => {
+        // $FlowFixMe[incompatible-use]
         Object.values(data).forEach(({ outputs }) => {
           outputs.forEach(o => fixUtxoToStringValues(o));
         });
@@ -229,9 +239,11 @@ export class RemoteFetcher implements IFetcher {
     const { network, ...rest } = cloneDeep(body);
     const { BackendService } = network.Backend;
     if (BackendService == null) throw new Error(`${nameof(this.sendTx)} missing backend url`);
-    rest.outputs?.forEach(o => {
+    rest.outputs.forEach(o => {
+      // $FlowFixMe[incompatible-type]
       o.value = new BigNumber(o.value);
       o.assets?.forEach(a => {
+        // $FlowFixMe[cannot-write]
         a.amount = new BigNumber(a.amount);
       })
     });
