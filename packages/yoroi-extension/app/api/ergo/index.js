@@ -53,7 +53,8 @@ import type {
   HistoryFunc,
   BestBlockFunc,
   AssetInfoFunc,
-  SendFunc, SignedResponse,
+  SendFunc,
+  SignedResponse,
 } from './lib/state-fetch/types';
 import type {
   FilterFunc,
@@ -104,6 +105,16 @@ import { WrongPassphraseError } from '../ada/lib/cardanoCrypto/cryptoErrors';
 import type { DefaultTokenEntry } from '../common/lib/MultiToken';
 import { hasSendAllDefault, builtSendTokenList } from '../common/index';
 import { getReceiveAddress } from '../../stores/stateless/addressStores';
+
+export function fixUtxoToStringValues<T>(utxo: T): T {
+  // $FlowFixMe[incompatible-use]
+  utxo.value = String(utxo.value);
+  // $FlowFixMe[incompatible-use]
+  utxo.assets?.forEach(a => {
+    a.amount = String(a.amount);
+  });
+  return utxo;
+}
 
 // getTransactionRowsToExport
 
