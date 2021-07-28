@@ -1941,16 +1941,21 @@ export async function genCardanoAssetMap(
     existingDbRows.filter(
       // only tokens with lastUpdateAt are considered existing, except for default
       // asset rows, because they are never updated from network
-      row => row.Metadata.lastUpdatedAt || row.IsDefault
+      row => (row.Metadata.lastUpdatedAt != null) || row.IsDefault
     ).map(row => row.Identifier)
   );
 
   const missingTokenIds = tokenIds.filter(token => !existingTokens.has(token));
 
-  const tokenInfoResponse = await getTokenInfo({
-    network,
-    tokenIds: missingTokenIds.map(id => id.split('.').join(''))
-  });
+  let tokenInfoResponse;
+  try {
+    tokenInfoResponse = await getTokenInfo({
+      network,
+      tokenIds: missingTokenIds.map(id => id.split('.').join(''))
+    });
+  } catch {
+    tokenInfoResponse = {};
+  }
 
   const databaseInsert = missingTokenIds
     .map(tokenId => {

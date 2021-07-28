@@ -373,7 +373,7 @@ export class RemoteFetcher implements IFetcher {
   }
 
   getTokenInfo: TokenInfoRequest => Promise<TokenInfoResponse> = async (body) => {
-    const { TokenInfoService } = body?.network?.Backend;
+    const { TokenInfoService } = body.network.Backend;
     if (TokenInfoService == null) return {};
     const promises = body.tokenIds.map(id => axios(
       `${TokenInfoService}/metadata/${id}`,
