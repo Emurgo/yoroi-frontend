@@ -46,6 +46,7 @@ import { fixUtxoToStringValues } from '../../index';
 import { decode, encode } from 'bs58';
 import JSONBigInt from 'json-bigint';
 import cloneDeep from 'lodash/cloneDeep'
+import BigNumber from 'bignumber.js';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
@@ -61,7 +62,7 @@ const axiosRequest: (RemoteFetcher, string) => <T>(string, {
   errorFactory: (error: *) => Function,
 }) => Promise<T> = (fetcher, method) => (url, params): Promise => {
   const debug = (s, p) => {
-    console.debug(`AXIOS[${method}][${url}] ${s} > `, cloneDeep(p));
+    Logger.debug(`AXIOS[${method}][${url}] ${s} > `, cloneDeep(p));
   };
   debug('CALLING', params);
   return axios(url, {
@@ -74,6 +75,14 @@ const axiosRequest: (RemoteFetcher, string) => <T>(string, {
     transformResponse: resp => {
       debug('RSPRAW', resp);
       return JSONBigInt.parse(resp);
+    },
+    transformRequest: data => {
+      if (!data) {
+        return data;
+      }
+      const res = JSONBigInt.stringify(data);
+      debug('REQFIX', res);
+      return res;
     },
     ...(params.data ? { data: params.data } : {}),
   }).then(response => {
@@ -217,10 +226,15 @@ export class RemoteFetcher implements IFetcher {
   }
 
   sendTx: SignedRequest => Promise<SignedResponse> = (body) => {
-    const { network, ...rest } = body;
+    const { network, ...rest } = cloneDeep(body);
     const { BackendService } = network.Backend;
     if (BackendService == null) throw new Error(`${nameof(this.sendTx)} missing backend url`);
-    // todo: fix values from strings to BigInts and then use the lib for encoding
+    rest.outputs?.forEach(o => {
+      o.value = new BigNumber(o.value);
+      o.assets?.forEach(a => {
+        a.amount = new BigNumber(a.amount);
+      })
+    });
     return this.axiosPost(`${BackendService}/api/txs/signed`, {
       data: rest,
       callerName: nameof(this.sendTx),
