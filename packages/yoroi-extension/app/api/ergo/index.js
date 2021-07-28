@@ -55,7 +55,6 @@ import type {
   AssetInfoFunc,
   SendFunc,
   SignedResponse,
-  RemoteUnspentOutput,
 } from './lib/state-fetch/types';
 import type {
   FilterFunc,
