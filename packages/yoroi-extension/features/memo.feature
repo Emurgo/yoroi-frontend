@@ -37,6 +37,8 @@ Feature: Memos
       | password   |
       | asdfasdfasdf |
     And I submit the wallet send form
+    Then I should see the successfully sent page
+    And I click the transaction page button
     Then I should see the summary screen
     And I expand the top transaction
     Then The memo content says "my awesome memo"
