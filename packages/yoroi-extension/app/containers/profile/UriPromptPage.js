@@ -35,7 +35,7 @@ type GeneratedData = typeof UriPromptPage.prototype.generated;
 export default class UriPromptPage extends Component<InjectedOrGenerated<GeneratedData>> {
 
   @observable
-  selectedChoice: CHOICES | null = null;
+  isAccepted: boolean = false;
 
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
@@ -44,45 +44,66 @@ export default class UriPromptPage extends Component<InjectedOrGenerated<Generat
   onAccept: void => void = () => {
     registerProtocols();
     runInAction(() => {
-      this.selectedChoice = Choices.ACCEPT;
+      this.isAccepted = true;
     });
   };
 
   onSkip: void => void = () => {
-    runInAction(() => {
-      this.selectedChoice = Choices.SKIP;
-    });
+    // runInAction(() => {
+    //   this.selectedChoice = Choices.SKIP;
+    // });
+    this.generated.actions.profile.acceptUriScheme.trigger()
   };
 
   onBack: void => void = () => {
     runInAction(() => {
-      this.selectedChoice = null;
+      this.isAccepted = false;
     });
   };
 
   _getContent: (() => Node) = () => {
-    switch (this.selectedChoice) {
-      case null:
+
+    if (!this.isAccepted) {
         return <UriPromptForm
           onAccept={this.onAccept}
           onSkip={this.onSkip}
           classicTheme={this.generated.stores.profile.isClassicTheme}
         />;
-      case Choices.ACCEPT:
+    }
+
+    if (this.isAccepted) {
         return <UriAccept
           onConfirm={this.generated.actions.profile.acceptUriScheme.trigger}
           onBack={this.onBack}
           classicTheme={this.generated.stores.profile.isClassicTheme}
         />;
-      case Choices.SKIP:
-        return <UriSkip
-          onConfirm={this.generated.actions.profile.acceptUriScheme.trigger}
-          onBack={this.onBack}
-          classicTheme={this.generated.stores.profile.isClassicTheme}
-        />;
-      default:
-        throw new Error('UriPromptPage::_getContent Should never happen');
     }
+
+    throw new Error('UriPromptPage::_getContent Should never happen');
+    // switch (this.isAccepted) {
+    //   case !this.isAccepted:
+    //     // return <UriPromptForm
+    //     //   onAccept={this.onAccept}
+    //     //   onSkip={this.onSkip}
+    //     //   classicTheme={this.generated.stores.profile.isClassicTheme}
+    //     // />;
+    //     return <h1>I should be shown first</h1>
+    //   case this.isAccepted:
+    //     // return <UriAccept
+    //     //   onConfirm={this.generated.actions.profile.acceptUriScheme.trigger}
+    //     //   onBack={this.onBack}
+    //     //   classicTheme={this.generated.stores.profile.isClassicTheme}
+    //     // />;
+    //     return <h1>I should be shwon second</h1>
+    //   // case Choices.SKIP:
+    //   //   return <UriSkip
+    //   //     onConfirm={this.generated.actions.profile.acceptUriScheme.trigger}
+    //   //     onBack={this.onBack}
+    //   //     classicTheme={this.generated.stores.profile.isClassicTheme}
+    //   //   />;
+    //   default:
+    //     throw new Error('UriPromptPage::_getContent Should never happen');
+    // }
   }
 
   render(): Node {
