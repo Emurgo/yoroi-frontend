@@ -52,7 +52,6 @@ export default class UriPromptPage extends Component<InjectedOrGenerated<Generat
   };
 
   _getContent: (() => Node) = () => {
-
     if (!this.isAccepted) {
         return <UriPromptForm
           onAccept={this.onAccept}
