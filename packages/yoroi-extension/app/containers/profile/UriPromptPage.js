@@ -10,7 +10,6 @@ import TopBar from '../../components/topbar/TopBar';
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import UriPromptForm from '../../components/profile/uri-prompt/UriPromptForm';
 import UriAccept from '../../components/profile/uri-prompt/UriAccept';
-import UriSkip from '../../components/profile/uri-prompt/UriSkip';
 
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import TestnetWarningBanner from '../../components/topbar/banners/TestnetWarningBanner';
@@ -22,12 +21,6 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { ServerStatusErrorType } from '../../types/serverStatusErrorType';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import { isTestnet } from '../../api/ada/lib/storage/database/prepackaged/networks';
-
-const Choices = {
-  ACCEPT: 'accept',
-  SKIP: 'skip',
-};
-type CHOICES = $Values<typeof Choices>;
 
 type GeneratedData = typeof UriPromptPage.prototype.generated;
 
@@ -49,9 +42,6 @@ export default class UriPromptPage extends Component<InjectedOrGenerated<Generat
   };
 
   onSkip: void => void = () => {
-    // runInAction(() => {
-    //   this.selectedChoice = Choices.SKIP;
-    // });
     this.generated.actions.profile.acceptUriScheme.trigger()
   };
 
@@ -80,30 +70,6 @@ export default class UriPromptPage extends Component<InjectedOrGenerated<Generat
     }
 
     throw new Error('UriPromptPage::_getContent Should never happen');
-    // switch (this.isAccepted) {
-    //   case !this.isAccepted:
-    //     // return <UriPromptForm
-    //     //   onAccept={this.onAccept}
-    //     //   onSkip={this.onSkip}
-    //     //   classicTheme={this.generated.stores.profile.isClassicTheme}
-    //     // />;
-    //     return <h1>I should be shown first</h1>
-    //   case this.isAccepted:
-    //     // return <UriAccept
-    //     //   onConfirm={this.generated.actions.profile.acceptUriScheme.trigger}
-    //     //   onBack={this.onBack}
-    //     //   classicTheme={this.generated.stores.profile.isClassicTheme}
-    //     // />;
-    //     return <h1>I should be shwon second</h1>
-    //   // case Choices.SKIP:
-    //   //   return <UriSkip
-    //   //     onConfirm={this.generated.actions.profile.acceptUriScheme.trigger}
-    //   //     onBack={this.onBack}
-    //   //     classicTheme={this.generated.stores.profile.isClassicTheme}
-    //   //   />;
-    //   default:
-    //     throw new Error('UriPromptPage::_getContent Should never happen');
-    // }
   }
 
   render(): Node {

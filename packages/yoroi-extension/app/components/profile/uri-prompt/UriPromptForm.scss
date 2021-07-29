@@ -1,22 +1,30 @@
 .component {
-  padding-top: 60px;
+  padding-top: 120px;
   display: flex;
   height: 100%;
   justify-content: center;
   overflow: overlay;
 
   .centeredBox {
-    width: 594px;
+    width: 500px;
   }
 
   .explanation {
-    margin-top: 49px;
     font-family: var(--font-regular);
     color: var(--cmn-default-color-grey);
-    font-size: 14px;
     line-height: 22px;
+
+    h1 {
+      text-align: center;
+      font-weight: 700;
+      margin-top: 40px;
+      margin-bottom: 25px;
+      font-size: 18px;
+    }
+
     p {
       display: block;
+      font-size: 14px;
       margin-bottom: 8px;
     }
   }
@@ -33,7 +41,7 @@
   .submitButton {
     display: block !important;
     margin: 0;
-    width: 287px !important;
+    width: 240px !important;
   }
 
   .buttonsWrapper {

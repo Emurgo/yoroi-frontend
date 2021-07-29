@@ -13,22 +13,14 @@ import globalMessages from '../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
-  uriExplanationLine1: {
+  uriHeading: {
+    id: 'profile.uriPrompt.form.heading',
+    defaultMessage: 'Allow Cardano Payment URLs'
+  },
+  uriExplanation: {
     id: 'profile.uriPrompt.form.explanation',
-    defaultMessage: '!!!Do you want to enable Cardano payment URLs?',
-  },
-  uriExplanationLine2: {
-    id: 'profile.uriPrompt.form.explanationLine2',
-    defaultMessage: '!!!Yoroi allows you to generate special links that you can share with someone else and allow them to make an easy payment to you. You will be able to create these links right away.',
-  },
-  uriExplanationLine3: {
-    id: 'profile.uriPrompt.form.explanationLine3',
-    defaultMessage: '!!!But to allow you to click on such links you need to give Yoroi a special permission in the browser. Click "Allow" if you wish to do so.',
-  },
-  uriExplanationLine4: {
-    id: 'profile.uriPrompt.form.explanationLine4',
-    defaultMessage: '!!!You don\'t have to decide right now, you can always enable this feature in the \"Settings > Blockchain\" section.',
-  },
+    defaultMessage: '!!!Yoroi will allow you to generate special links in Receive page and share it in order to receive payment faster and easier. You can always enable this feature in the Settings.',
+  }
 });
 
 type Props = {|
@@ -67,10 +59,8 @@ export default class UriPromptForm extends Component<Props> {
           </span>
 
           <div className={styles.explanation}>
-            <p>{intl.formatMessage(messages.uriExplanationLine1)}</p>
-            <p>{intl.formatMessage(messages.uriExplanationLine2)}</p>
-            <p>{intl.formatMessage(messages.uriExplanationLine3)}</p>
-            <p>{intl.formatMessage(messages.uriExplanationLine4)}</p>
+            <h1>{intl.formatMessage(messages.uriHeading)}</h1>
+            <p>{intl.formatMessage(messages.uriExplanation)}</p>
           </div>
 
           <div className={styles.buttonsWrapper}>
