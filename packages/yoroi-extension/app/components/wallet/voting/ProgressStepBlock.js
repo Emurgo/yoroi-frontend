@@ -6,10 +6,11 @@ import { intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 import ProgressSteps from '../../widgets/ProgressSteps';
-import globalMessages from '../../../i18n/global-messages';
 import { ProgressInfo } from '../../../stores/ada/VotingStore';
+import type { StepsList } from './types';
 
 type Props = {|
+  +stepsList: StepsList,
   +progressInfo: ProgressInfo,
   +classicTheme: boolean
 |};
@@ -23,18 +24,14 @@ export default class ProgressStepBlock extends Component<Props> {
 
   render(): Node {
     const { intl } = this.context;
-    const { progressInfo, classicTheme } = this.props;
+    const { stepsList, progressInfo, classicTheme } = this.props;
+
+    const currentStep = stepsList.findIndex(({ step }) => step === progressInfo.currentStep);
 
     return (
       <ProgressSteps
-        stepsList={[
-          intl.formatMessage(globalMessages.stepPin),
-          intl.formatMessage(globalMessages.stepConfirm),
-          intl.formatMessage(globalMessages.registerLabel),
-          intl.formatMessage(globalMessages.transactionLabel),
-          intl.formatMessage(globalMessages.stepQrCode)
-        ]}
-        currentStep={progressInfo.currentStep}
+        stepsList={stepsList.map(({ message }) => intl.formatMessage(message))}
+        currentStep={currentStep}
         stepState={progressInfo.stepState}
         classicTheme={classicTheme}
       />);

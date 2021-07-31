@@ -12,5 +12,6 @@ export default class WalletsActions {
     signRequest: ISignRequest<any>,
     password: string,
     publicDeriver: PublicDeriver<>,
+    onSuccess?: void => void,
   |}> = new AsyncAction();
 }

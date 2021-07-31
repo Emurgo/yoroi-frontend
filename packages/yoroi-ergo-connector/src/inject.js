@@ -1,13 +1,13 @@
 // sets up RPC communication with the connector + access check/request functions
 const initialInject = `
-var ergoConnectRequests = [];
+var connectRequests = [];
 
 window.addEventListener("message", function(event) {
     if (event.data.type == "connector_connected") {
         if (event.data.err !== undefined) {
-            ergoConnectRequests.forEach(promise => promise.reject(event.data.err));
+            connectRequests.forEach(promise => promise.reject(event.data.err));
         } else {
-            ergoConnectRequests.forEach(promise => promise.resolve(event.data.success));
+            connectRequests.forEach(promise => promise.resolve(event.data.success));
         }
     }
 });
@@ -15,9 +15,9 @@ window.addEventListener("message", function(event) {
 function ergo_request_read_access() {
     return new Promise(function(resolve, reject) {
         window.postMessage({
-            type: "connector_connect_request",
+            type: "connector_connect_request/ergo",
         }, location.origin);
-        ergoConnectRequests.push({ resolve: resolve, reject: reject });
+        connectRequests.push({ resolve: resolve, reject: reject });
     });
 }
 
@@ -28,16 +28,34 @@ function ergo_check_read_access() {
         return Promise.resolve(false);
     }
 }
+
+function cardano_request_read_access() {
+    return new Promise(function(resolve, reject) {
+        window.postMessage({
+            type: "connector_connect_request/cardano",
+        }, location.origin);
+        connectRequests.push({ resolve: resolve, reject: reject });
+    });
+}
+
+// @todo
+function cardano_check_read_access() {
+    if (typeof cardano !== "undefined") {
+        return cardano._cardano_rpc_call("ping", []);
+    } else {
+        return Promise.resolve(false);
+    }
+}
 `
 
 // client-facing ergo object API
-const apiInject = `
+const ergoApiInject = `
 // RPC set-up
 var ergoRpcUid = 0;
 var ergoRpcResolver = new Map();
 
 window.addEventListener("message", function(event) {
-    if (event.data.type == "connector_rpc_response") {
+    if (event.data.type == "connector_rpc_response" && event.data.protocol === "ergo") {
         console.log("page received from connector: " + JSON.stringify(event.data) + " with source = " + event.source + " and origin = " + event.origin);
         const rpcPromise = ergoRpcResolver.get(event.data.uid);
         if (rpcPromise !== undefined) {
@@ -95,6 +113,7 @@ class ErgoAPI {
         return new Promise(function(resolve, reject) {
             window.postMessage({
                 type: "connector_rpc_request",
+                protocol: "ergo",
                 uid: ergoRpcUid,
                 function: func,
                 params: params
@@ -108,6 +127,56 @@ class ErgoAPI {
 
 const ergo = Object.freeze(new ErgoAPI());
 `
+
+const cardanoApiInject = `
+
+// RPC setup
+var cardanoRpcUid = 0;
+var cardanoRpcResolver = new Map();
+
+window.addEventListener("message", function(event) {
+    if (event.data.type == "connector_rpc_response" && event.data.protocol === "cardano") {
+        console.log("page received from connector: " + JSON.stringify(event.data) + " with source = " + event.source + " and origin = " + event.origin);
+        const rpcPromise = cardanoRpcResolver.get(event.data.uid);
+        if (rpcPromise !== undefined) {
+            const ret = event.data.return;
+            if (ret.err !== undefined) {
+                rpcPromise.reject(ret.err);
+            } else {
+                rpcPromise.resolve(ret.ok);
+            }
+        }
+    }
+});
+
+class CardanoAPI {
+    constructor(){
+        this.initTimestamp = Date.now()
+    }
+
+    getInitTimestamp(){
+        return this.initTimestamp
+    }
+
+    _cardano_rpc_call(func, params) {
+        return new Promise(function(resolve, reject) {
+            window.postMessage({
+                type: "connector_rpc_request",
+                protocol: "cardano",
+                uid: cardanoRpcUid,
+                function: func,
+                params: params
+            }, location.origin);
+            console.log("cardanoRpcUid = " + cardanoRpcUid);
+            cardanoRpcResolver.set(cardanoRpcUid, { resolve: resolve, reject: reject });
+            cardanoRpcUid += 1;
+        });
+    }
+}
+
+const cardano = Object.freeze(new CardanoAPI())
+`
+
 const API_INTERNAL_ERROR = -2;
 const API_REFUSED = -3;
 
@@ -155,7 +224,8 @@ function getFavicon(url) {
 }
 
 let yoroiPort = null;
-let fullApiInjected = false;
+let ergoApiInjected = false;
+let cardanoApiInjected = false;
 
 function disconnectWallet() {
     yoroiPort = null;
@@ -166,15 +236,15 @@ function createYoroiPort() {
     // events from Yoroi
     yoroiPort = chrome.runtime.connect(extensionId);
     yoroiPort.onMessage.addListener(message => {
-        //alert("content script message: " + JSON.stringify(message));
-        if (message.type == "connector_rpc_response") {
+        // alert("content script message: " + JSON.stringify(message));
+        if (message.type === "connector_rpc_response") {
             window.postMessage(message, location.origin);
-        } else if (message.type == "yoroi_connect_response") {
+        } else if (message.type === "yoroi_connect_response/ergo") {
             if (message.success) {
-                if (!fullApiInjected) {
+                if (!ergoApiInjected) {
                     // inject full API here
-                    if (injectIntoPage(apiInject)) {
-                        fullApiInjected = true;
+                    if (injectIntoPage(ergoApiInject)) {
+                        ergoApiInjected = true;
                     } else {
                         console.error()
                         window.postMessage({
@@ -182,6 +252,28 @@ function createYoroiPort() {
                             err: {
                                 code: API_INTERNAL_ERROR,
                                 info: "failed to inject Ergo API"
+                            }
+                        }, location.origin);
+                    }
+                }
+            }
+            window.postMessage({
+                type: "connector_connected",
+                success: message.success
+            }, location.origin);
+        } else if (message.type === "yoroi_connect_response/cardano") {
+            if (message.success) {
+                if (!cardanoApiInjected) {
+                    // inject full API here
+                    if (injectIntoPage(cardanoApiInject)) {
+                        cardanoApiInjected = true;
+                    } else {
+                        console.error()
+                        window.postMessage({
+                            type: "connector_connected",
+                            err: {
+                                code: API_INTERNAL_ERROR,
+                                info: "failed to inject Cardano API"
                             }
                         }, location.origin);
                     }
@@ -236,8 +328,8 @@ if (shouldInject()) {
                     }
                 }, location.origin);
             }
-        } else if (event.data.type == "connector_connect_request") {
-            if (fullApiInjected && yoroiPort) {
+        } else if (event.data.type === "connector_connect_request/ergo") {
+            if (ergoApiInjected && yoroiPort) {
                 // we can skip communication - API injected + hasn't been disconnected
                 window.postMessage({
                     type: "connector_connected",
@@ -254,7 +346,30 @@ if (shouldInject()) {
                     .then(imgBase64Url => {
                         yoroiPort.postMessage({
                             imgBase64Url,
-                            type: "yoroi_connect_request",
+                            type: "yoroi_connect_request/ergo",
+                            url: location.hostname
+                        });
+                    });
+            }
+        } else if (event.data.type === "connector_connect_request/cardano") {
+            if (cardanoApiInjected && yoroiPort) {
+                // we can skip communication - API injected + hasn't been disconnected
+                window.postMessage({
+                    type: "connector_connected",
+                    success: true
+                }, location.origin);
+            } else {
+                if (yoroiPort == null) {
+                    createYoroiPort();
+                }
+
+                // note: content scripts are subject to the same CORS policy as the website they are embedded in
+                // but since we are querying the website this script is injected into, it should be fine
+                convertImgToBase64(getFavicon(location.origin))
+                    .then(imgBase64Url => {
+                        yoroiPort.postMessage({
+                            imgBase64Url,
+                            type: "yoroi_connect_request/cardano",
                             url: location.hostname
                         });
                     });

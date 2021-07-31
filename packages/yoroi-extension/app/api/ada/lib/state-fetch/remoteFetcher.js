@@ -36,7 +36,6 @@ import {
   GetBestBlockError,
   GetPoolInfoApiError,
   GetRewardHistoryApiError,
-  GetTokenInfoApiError,
   GetTxHistoryForAddressesApiError,
   GetTxsBodiesForUTXOsApiError,
   GetUtxosForAddressesApiError,
@@ -371,7 +370,7 @@ export class RemoteFetcher implements IFetcher {
   }
 
   getTokenInfo: TokenInfoRequest => Promise<TokenInfoResponse> = async (body) => {
-    const { TokenInfoService } = body?.network?.Backend;
+    const { TokenInfoService } = body.network.Backend;
     if (TokenInfoService == null) return {};
     const promises = body.tokenIds.map(id => axios(
       `${TokenInfoService}/metadata/${id}`,
@@ -397,9 +396,13 @@ export class RemoteFetcher implements IFetcher {
         if (resp.decimals?.value) {
           v.decimals = resp.decimals.value;
         }
-        if (v.name || v.decimals) {
+        if (resp.ticker?.value) {
+          v.ticker = resp.ticker.value;
+        }
+        if (v.name || v.decimals || v.ticker) {
           res[resp.subject] = v;
         }
+
       }
       return res;
     }, {});

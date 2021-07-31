@@ -130,6 +130,7 @@ import type {
   RemoteTxState,
   RemoteTransaction,
   RemoteCertificate,
+  TokenInfoFunc,
 } from '../../state-fetch/types';
 import {
   ShelleyCertificateTypes,
@@ -873,6 +874,7 @@ export async function updateTransactions(
   checkAddressesInUse: FilterFunc,
   getTransactionsHistoryForAddresses: HistoryFunc,
   getBestBlock: BestBlockFunc,
+  getTokenInfo: TokenInfoFunc,
 ): Promise<void> {
   const withLevels = asHasLevels<ConceptualWallet>(publicDeriver);
   const derivationTables = withLevels == null
@@ -941,6 +943,7 @@ export async function updateTransactions(
           getTransactionsHistoryForAddresses,
           getBestBlock,
           derivationTables,
+          getTokenInfo,
         );
       }
     );
@@ -1199,6 +1202,7 @@ async function rawUpdateTransactions(
   getTransactionsHistoryForAddresses: HistoryFunc,
   getBestBlock: BestBlockFunc,
   derivationTables: Map<number, string>,
+  getTokenInfo: TokenInfoFunc,
 ): Promise<void> {
   const network = publicDeriver.getParent().getNetworkInfo();
   // TODO: consider passing this function in as an argument instead of generating it here
@@ -1350,6 +1354,7 @@ async function rawUpdateTransactions(
         ),
         toAbsoluteSlotNumber,
         derivationTables,
+        getTokenInfo,
       }
     );
   }
@@ -1404,6 +1409,7 @@ async function updateTransactionBatch(
     findOwnAddress: FindOwnAddressFunc,
     derivationTables: Map<number, string>,
     defaultToken: DefaultTokenEntry,
+    getTokenInfo: TokenInfoFunc,
   |}
 ): Promise<Array<{|
   ...(CardanoByronTxIO | CardanoShelleyTxIO),
@@ -1501,16 +1507,26 @@ async function updateTransactionBatch(
   }
 
   // 2) Add any new assets & lookup known ones
+  const tokenIds = Array.from(new Set(unseenNewTxs.flatMap(tx => [
+    ...tx.inputs
+      .flatMap(input => input.assets)
+      .map(asset => asset.assetId),
+    ...tx.outputs
+      .flatMap(output => output.assets)
+      .map(asset => asset.assetId),
+    // force inclusion of primary token for chain
+    request.defaultToken.defaultIdentifier
+  ])));
+
   const assetLookup = await genCardanoAssetMap(
     db, dbTx,
     {
       ModifyToken: deps.ModifyToken,
       GetToken: deps.GetToken,
     },
-    unseenNewTxs,
-    // request.getAssetInfo,
+    tokenIds,
+    request.getTokenInfo,
     request.network,
-    request.defaultToken,
   );
 
   // 3) Add new transactions
@@ -1901,57 +1917,85 @@ function genShelleyIOGen(
   };
 }
 
-async function genCardanoAssetMap(
+export async function genCardanoAssetMap(
   db: lf$Database,
   dbTx: lf$Transaction,
   deps: {|
     ModifyToken: Class<ModifyToken>,
     GetToken: Class<GetToken>,
   |},
-  newTxs: Array<RemoteTransaction>,
-  // getAssetInfo: AssetInfoFunc,
+  tokenIds: Array<string>,
+  getTokenInfo: TokenInfoFunc,
   network: $ReadOnly<NetworkRow>,
-  defaultToken: DefaultTokenEntry,
 ): Promise<Map<string, $ReadOnly<TokenRow>>> {
-  const tokenIds = Array.from(new Set(newTxs.flatMap(tx => [
-    ...tx.inputs
-      .flatMap(input => input.assets)
-      .map(asset => asset.assetId),
-    ...tx.outputs
-      .flatMap(output => output.assets)
-      .map(asset => asset.assetId),
-    // force inclusion of primary token for chain
-    defaultToken.defaultIdentifier
-  ])));
-
   const existingDbRows = (await deps.GetToken.fromIdentifier(
     db, dbTx,
     tokenIds
   )).filter(row => row.NetworkId === network.NetworkId);
 
-  const existingTokens = new Set<string>(
-    existingDbRows.map(row => row.Identifier)
+  const existingRowsMap = new Map<string, $ReadOnly<TokenRow>>(
+    existingDbRows.map(row => [row.Identifier, row])
   );
-  // const tokenInfo = await getAssetInfo({
-  //   network,
-  //   assetIds: tokenIds.filter(token => !existingTokens.has(token))
-  // });
 
-  const databaseInsert = tokenIds
-    .filter(token => !existingTokens.has(token))
+  const existingTokens = new Set<string>(
+    existingDbRows.filter(
+      // only tokens with lastUpdateAt are considered existing, except for default
+      // asset rows, because they are never updated from network
+      row => (row.Metadata.lastUpdatedAt != null) || row.IsDefault
+    ).map(row => row.Identifier)
+  );
+
+  const missingTokenIds = tokenIds.filter(token => !existingTokens.has(token));
+
+  let tokenInfoResponse;
+  try {
+    tokenInfoResponse = await getTokenInfo({
+      network,
+      tokenIds: missingTokenIds.map(id => id.split('.').join(''))
+    });
+  } catch {
+    tokenInfoResponse = {};
+  }
+
+  const databaseInsert = missingTokenIds
     .map(tokenId => {
+      // If fetched token metadata from network, store in db; otherwise store a
+      // placeholder row. The field `lastUpdateAt` differentiates the two cases.
+      let numberOfDecimals;
+      let ticker;
+      let lastUpdatedAt;
+      let longName;
+
+      const tokenInfo = tokenInfoResponse[tokenId.split('.').join('')];
+      if (tokenInfo) {
+        numberOfDecimals = tokenInfo.decimals ?? 0;
+        ticker = tokenInfo.ticker ?? null;
+        lastUpdatedAt = new Date().toISOString();
+        longName = tokenInfo.name ?? null;
+      } else {
+        numberOfDecimals = 0;
+        ticker = null;
+        lastUpdatedAt = null;
+        longName = null;
+      }
+
       const parts = identifierToCardanoAsset(tokenId);
       return {
         NetworkId: network.NetworkId,
         Identifier: tokenId,
         IsDefault: false,
+        // must have the same TokenId, which is the primary key, as the existing
+        // token row, otherwise a new row is inserted instead of the existing row
+        // being updated
+        TokenId: existingRowsMap.get(tokenId)?.TokenId,
         Metadata: {
           type: 'Cardano',
-          ticker: null,
-          longName: null,
-          numberOfDecimals: 0,
+          ticker,
+          longName,
+          numberOfDecimals,
           assetName: Buffer.from(parts.name.name()).toString('hex'),
           policyId: Buffer.from(parts.policyId.to_bytes()).toString('hex'),
+          lastUpdatedAt,
         }
       };
     });

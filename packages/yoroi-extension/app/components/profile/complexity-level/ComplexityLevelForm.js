@@ -16,7 +16,7 @@ import type { ComplexityLevelType } from '../../../types/complexityLevelType';
 const messages = defineMessages({
   subtitle: {
     id: 'profile.complexityLevel.subtitle',
-    defaultMessage: '!!!Understanding blockchain can be difficult, which is why we will try and keep the interface as simple as possible for you'
+    defaultMessage: '!!!We understand blockchain can be difficult, which is why we try and keep the interface as simple as possible for you'
   },
   titleSimpleLevel: {
     id: 'profile.complexityLevel.simple',
@@ -28,15 +28,15 @@ const messages = defineMessages({
   },
   descriptionSimpleLevel: {
     id: 'profile.complexityLevel.simple.description',
-    defaultMessage: '!!!Simplest experience possible. No previous knowledge in Blockchain required. Highly friendly to on-board beginners, and for users that prefer simplicity.'
+    defaultMessage: '!!!Simplest experience possible. No previous knowledge of blockchain required. Highly friendly to on-board beginners, and for users who prefer simplicity.'
   },
   descriptionAdvancedLevel: {
     id: 'profile.complexityLevel.advanced.description',
-    defaultMessage: '!!!I have a some understanding of blockchain and how cryptography is used to power both the blockchain itself and wallet software. I am okay with seeing options and functionality that critically depend on my understanding of these concepts.'
+    defaultMessage: '!!!I have some understanding of blockchain and how cryptography is used to power both the blockchain itself and the wallet software. I am okay with seeing options and functionality that critically depend on my understanding of these concepts.'
   },
   labelSelectedLevel: {
     id: 'profile.complexityLevel.selected.label',
-    defaultMessage: '!!!Your currently level of Complexity is'
+    defaultMessage: '!!!Your current level of Complexity is'
   },
   labelChoose: {
     id: 'global.label.choose',

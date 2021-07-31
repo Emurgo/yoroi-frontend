@@ -101,6 +101,7 @@ export default class SignTxContainer extends Component<
                 ? null
                 : uiNotifications.getTooltipActiveNotification(this.notificationElementId)
             }
+            tx={signingMessage.sign.tx}
             txData={txData}
             getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
             defaultToken={selectedWallet.publicDeriver.getParent().getDefaultToken()}

@@ -17,6 +17,7 @@ import { ProgressInfo } from '../../../stores/ada/VotingStore';
 import PinInput from '../../widgets/forms/PinInput';
 
 import styles from './ConfirmPinDialog.scss';
+import type { StepsList } from './types';
 
 const messages = defineMessages({
   line1: {
@@ -26,6 +27,7 @@ const messages = defineMessages({
 });
 
 type Props = {|
+  +stepsList: StepsList,
   +progressInfo: ProgressInfo,
   +goBack: void => void,
   +submit: void => PossiblyAsync<void>,
@@ -33,6 +35,7 @@ type Props = {|
   +cancel: void => void,
   +classicTheme: boolean,
   +pinValidation: string => boolean,
+  +isProcessing: boolean,
 |};
 
 @observer
@@ -51,17 +54,21 @@ export default class ConfirmPinDialog extends Component<Props> {
   render(): Node {
     const { intl } = this.context;
     const {
+      stepsList,
       progressInfo,
       goBack,
       cancel,
       classicTheme,
       pinValidation,
+      isProcessing,
     } = this.props;
 
     const dailogActions = [{
       label: intl.formatMessage(globalMessages.stepConfirm),
       primary: true,
       onClick: this._submitForm,
+      isSubmitting: isProcessing,
+      disabled: isProcessing,
     }];
 
     return (
@@ -74,7 +81,11 @@ export default class ConfirmPinDialog extends Component<Props> {
         backButton={<DialogBackButton onBack={goBack} />}
         onClose={cancel}
       >
-        <ProgressStepBlock progressInfo={progressInfo} classicTheme={classicTheme} />
+        <ProgressStepBlock
+          stepsList={stepsList}
+          progressInfo={progressInfo}
+          classicTheme={classicTheme}
+        />
         <div className={classnames([styles.lineText, styles.firstItem])}>
           <FormattedHTMLMessage {...messages.line1} />
         </div>

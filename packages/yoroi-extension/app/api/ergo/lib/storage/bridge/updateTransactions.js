@@ -18,7 +18,7 @@ import type {
   AddressRow,
   ErgoTransactionInsert,
   TokenRow,
-  TokenListInsert,
+  TokenListInsert, TokenUpsert,
 } from '../../../../ada/lib/storage/database/primitives/tables';
 import {
   TransactionType,
@@ -1493,20 +1493,27 @@ async function rawAddErgoAssets(
     assetIds: tokenIdentifiers.filter(tokenIdentifier => !existingTokens.has(tokenIdentifier))
   });
 
-  const databaseInsert = Object.keys(tokenInfo).map(tokenId => ({
-    NetworkId: network.NetworkId,
-    Identifier: tokenId,
-    IsDefault: false,
-    Metadata: {
-      type: 'Ergo',
-      height: tokenInfo[tokenId].height,
-      boxId: tokenInfo[tokenId].boxId,
-      ticker: null,
-      longName: tokenInfo[tokenId].name,
-      numberOfDecimals: tokenInfo[tokenId].numDecimals || 0,
-      description: tokenInfo[tokenId].desc,
-    }
-  }));
+  const databaseInsert: Array<TokenUpsert> = Object.keys(tokenInfo).map(tokenId => {
+    const numberOfDecimals: number = tokenInfo[tokenId].numDecimals || 0;
+    const description: string | null = tokenInfo[tokenId].desc;
+    const boxId: string = tokenInfo[tokenId].boxId;
+    const height: number = tokenInfo[tokenId].height;
+    const longName: string | null = tokenInfo[tokenId].name;
+    return ({
+      NetworkId: network.NetworkId,
+      Identifier: tokenId,
+      IsDefault: false,
+      Metadata: {
+        type: 'Ergo',
+        height,
+        boxId,
+        ticker: null,
+        longName,
+        numberOfDecimals,
+        description,
+      }
+    });
+  });
 
   const newDbRows = await deps.ModifyToken.upsert(
     db, dbTx,

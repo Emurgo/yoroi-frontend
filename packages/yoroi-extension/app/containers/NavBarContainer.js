@@ -113,6 +113,7 @@ export default class NavBarContainer extends Component<Props> {
               defaultToken={this.generated.stores.tokenInfoStore.getDefaultTokenInfo(
                 wallet.getParent().getNetworkInfo().NetworkId
               )}
+              showEyeIcon={false}
             />
           }
         />

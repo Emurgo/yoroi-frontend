@@ -37,35 +37,26 @@ import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
 import BigNumber from 'bignumber.js';
+import TransactionSuccessDialog from '../../components/wallet/send/TransactionSuccessDialog';
 
 // Hardware Wallet Confirmation
 import HWSendConfirmationDialog from '../../components/wallet/send/HWSendConfirmationDialog';
+import globalMessages from '../../i18n/global-messages';
 
-const messagesLedger = defineMessages({
-  infoLine1: {
+const messages = defineMessages({
+  txConfirmationLedgerNanoLine1: {
     id: 'wallet.send.ledger.confirmationDialog.info.line.1',
     defaultMessage: '!!!After connecting your Ledger device to your computer’s USB port, press the Send using Ledger button.',
   },
-  infoLine2: {
-    id: 'wallet.send.ledger.confirmationDialog.info.line.2',
-    defaultMessage: '!!!Make sure Cardano ADA app must remain open on the Ledger device throughout the process.',
-  },
-  sendUsingHWButtonLabel: {
+  sendUsingLedgerNano: {
     id: 'wallet.send.ledger.confirmationDialog.submit',
     defaultMessage: '!!!Send using Ledger',
   },
-});
-
-const messagesTrezor = defineMessages({
-  infoLine1: {
+  txConfirmationTrezorTLine1: {
     id: 'wallet.send.trezor.confirmationDialog.info.line.1',
     defaultMessage: '!!!After connecting your Trezor device to your computer, press the Send using Trezor button.',
   },
-  infoLine2: {
-    id: 'wallet.send.trezor.confirmationDialog.info.line.2',
-    defaultMessage: '!!!A new tab will appear. Please follow the instructions in the new tab.',
-  },
-  sendUsingHWButtonLabel: {
+  sendUsingTrezorT: {
     id: 'wallet.send.trezor.confirmationDialog.submit',
     defaultMessage: '!!!Send using Trezor',
   },
@@ -81,6 +72,18 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
   };
 
   @observable showMemo: boolean = false;
+
+
+  closeTransactionSuccessDialog: void => void = () => {
+    this.generated.actions.dialogs.closeActiveDialog.trigger();
+    this.generated.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.TRANSACTIONS });
+  }
+
+  openTransactionSuccessDialog: void => void = () => {
+    this.generated.actions.dialogs.push.trigger({
+      dialog: TransactionSuccessDialog
+    });
+  }
 
   componentDidMount(): void {
     runInAction(() => {
@@ -107,7 +110,12 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
     const { txBuilderActions } = this.generated.actions;
 
     // disallow sending when pending tx exists
-    if (uiDialogs.isOpen && hasAnyPending) {
+    if (
+      (
+        uiDialogs.isOpen(HWSendConfirmationDialog) ||
+          uiDialogs.isOpen(WalletSendConfirmationDialog)
+      ) && hasAnyPending
+    ) {
       actions.dialogs.closeActiveDialog.trigger();
     }
 
@@ -183,6 +191,12 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
     if (uiDialogs.isOpen(MemoNoExternalStorageDialog)) {
       return this.noCloudWarningDialog();
     }
+    if(uiDialogs.isOpen(TransactionSuccessDialog)){
+      return (<TransactionSuccessDialog
+        onClose={this.closeTransactionSuccessDialog}
+        classicTheme={this.generated.stores.profile.isClassicTheme}
+      />)
+    }
     return '';
   }
 
@@ -203,6 +217,7 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
       signRequest={signRequest}
       staleTx={transactionBuilderStore.txMismatch}
       unitOfAccountSetting={this.generated.stores.profile.unitOfAccount}
+      openTransactionSuccessDialog={this.openTransactionSuccessDialog}
     />);
   };
 
@@ -243,6 +258,11 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
       ?? (() => { throw new Error('No explorer for wallet network'); })();
 
     if (isLedgerNanoWallet(conceptualWallet)) {
+      const messagesLedgerNano = {
+        infoLine1: messages.txConfirmationLedgerNanoLine1,
+        infoLine2: globalMessages.txConfirmationLedgerNanoLine2,
+        sendUsingHWButtonLabel: messages.sendUsingLedgerNano,
+      };
       const ledgerSendAction = this.generated.actions[adaApi].ledgerSend;
       ledgerSendAction.init.trigger();
       const ledgerSendStore = this.generated.stores.substores[adaApi].ledgerSend;
@@ -256,13 +276,14 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
           receivers={receivers}
           totalAmount={totalInput}
           transactionFee={fee}
-          messages={messagesLedger}
+          messages={messagesLedgerNano}
           isSubmitting={ledgerSendStore.isActionProcessing}
           error={ledgerSendStore.error}
           onSubmit={
             () => ledgerSendAction.sendUsingLedgerWallet.trigger({
               params: { signRequest },
               publicDeriver,
+              onSuccess: this.openTransactionSuccessDialog,
             })
           }
           onCancel={ledgerSendAction.cancel.trigger}
@@ -272,6 +293,11 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
           }
         />);
     } else if (isTrezorTWallet(conceptualWallet)) {
+      const messagesTrezor = {
+        infoLine1: messages.txConfirmationTrezorTLine1,
+        infoLine2: globalMessages.txConfirmationTrezorTLine2,
+        sendUsingHWButtonLabel: messages.sendUsingTrezorT,
+      };
       const trezorSendAction = this.generated.actions[adaApi].trezorSend;
       const trezorSendStore = this.generated.stores.substores[adaApi].trezorSend;
       hwSendConfirmationDialog = (
@@ -291,6 +317,7 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
             () => trezorSendAction.sendUsingTrezor.trigger({
               params: { signRequest },
               publicDeriver,
+              onSuccess: this.openTransactionSuccessDialog,
             })
           }
           onCancel={trezorSendAction.cancel.trigger}
@@ -347,7 +374,8 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
           sendUsingLedgerWallet: {|
             trigger: (params: {|
               params: SendUsingLedgerParams,
-              publicDeriver: PublicDeriver<>
+              publicDeriver: PublicDeriver<>,
+              onSuccess?: void => void,
             |}) => Promise<void>
           |}
         |},
@@ -356,7 +384,8 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
           sendUsingTrezor: {|
             trigger: (params: {|
               params: SendUsingTrezorParams,
-              publicDeriver: PublicDeriver<>
+              publicDeriver: PublicDeriver<>,
+              onSuccess?: void => void,
             |}) => Promise<void>
           |}
         |},

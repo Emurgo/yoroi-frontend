@@ -1,6 +1,6 @@
 {
   "name": "yoroi",
-  "version": "4.5.5",
+  "version": "4.5.7",
   "description": "Cardano ADA wallet",
   "scripts": {
     "dev:build": "rimraf dev/ && babel-node scripts/build --type=debug",
@@ -100,7 +100,7 @@
     "cardano-wallet": "1.2.2",
     "chai": "4.3.0",
     "chai-as-promised": "7.1.1",
-    "chromedriver": "87.0.4",
+    "chromedriver": "91.0.1",
     "config": "1.31.0",
     "config-webpack": "1.0.4",
     "crx": "5.0.1",
@@ -153,13 +153,13 @@
     "ws": "7.4.3"
   },
   "dependencies": {
-    "@cardano-foundation/ledgerjs-hw-app-cardano": "git+https://github.com/SebastienGllmt/ledgerjs-hw-app-cardano.git",
+    "@cardano-foundation/ledgerjs-hw-app-cardano": "3.1.0",
     "@download/blockies": "1.0.3",
     "@emurgo/cardano-serialization-lib-browser": "6.0.0",
     "@emurgo/cip14-js": "2.0.0",
     "@emurgo/cip4-js": "1.0.5",
     "@emurgo/js-chain-libs": "0.7.1",
-    "@emurgo/ledger-connect-handler": "4.7.0",
+    "@emurgo/ledger-connect-handler": "5.0.0",
     "@svgr/webpack": "5.5.0",
     "async-mutex": "^0.3.1",
     "axios": "0.21.1",
@@ -212,7 +212,7 @@
     "semver": "7.3.4",
     "stream-browserify": "3.0.0",
     "tinycolor2": "1.4.2",
-    "trezor-connect": "8.1.26",
+    "trezor-connect": "8.1.29",
     "ua-parser-js": "0.7.24",
     "unorm": "1.6.0",
     "validator": "13.5.2"
