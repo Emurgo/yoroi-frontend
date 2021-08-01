@@ -17,7 +17,10 @@ import {
 import { ConceptualWallet } from '../../../app/api/ada/lib/storage/models/ConceptualWallet/index';
 import BigNumber from 'bignumber.js';
 import { BIP32PrivateKey, } from '../../../app/api/common/lib/crypto/keys/keyRepository';
-import { extractP2sKeyFromErgoTree, generateKey } from '../../../app/api/ergo/lib/transactions/utxoTransaction';
+import {
+  createP2sAddressTreeMatcher,
+  generateKey,
+} from '../../../app/api/ergo/lib/transactions/utxoTransaction';
 
 import { SendTransactionApiError } from '../../../app/api/common/errors';
 
@@ -232,14 +235,8 @@ export async function connectorSignTx(
   // SIGNING INPUTS //
   // ////////////// //
 
-  const walletPKs = new Set(
-    addresses.map((a) =>
-      RustModule.SigmaRust.Address
-        .from_base58(a)
-        .to_ergo_tree()
-        .to_base16_bytes()
-        .replace(/^0008cd/, ''))
-  );
+  const p2sMatcher =
+    createP2sAddressTreeMatcher(addresses);
 
   const utxoMap = keyBy(utxos, u => u.output.UtxoTransactionOutput.ErgoBoxId);
 
@@ -259,14 +256,13 @@ export async function connectorSignTx(
       inputSigningKeys.add(generateKey({ utxo, keyLevel, signingKey }));
     } else {
       debug('signing', 'No UTxO found! Checking if input is P2S');
-      const p2sKey: ?string = extractP2sKeyFromErgoTree(input.ergoTree);
-      if (p2sKey) {
-        if (walletPKs.has(p2sKey)) {
-          debug('signing', 'Input is a P2S with valid matching address');
-          // todo: p2s signature
-        } else {
+      const { isP2S, matchingAddress } = p2sMatcher(input.ergoTree);
+      if (isP2S) {
+        if (!matchingAddress) {
           throw new Error(`Input ${inputId} is a P2S, but no matching address is found in wallet!`);
         }
+        debug('signing', 'Input is a P2S with valid matching address', matchingAddress);
+        // todo: p2s signature
       } else {
         throw new Error(`Input ${inputId} is not recognised! No matching UTxO found and is not P2S!`)
       }
