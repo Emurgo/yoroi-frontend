@@ -641,7 +641,6 @@ chrome.runtime.onConnectExternal.addListener(port => {
               checkParamCount(1);
               await RustModule.load();
               const tx = asTx(message.params[0], RustModule.SigmaRust);
-              console.log('[background][sign_tx]param:', tx);
               const connection = connectedSites.get(tabId);
               if (connection == null) {
                 Logger.error(`ERR - sign_tx could not find connection with tabId = ${tabId}`);
@@ -655,7 +654,6 @@ chrome.runtime.onConnectExternal.addListener(port => {
                   },
                   connection
                 );
-                console.log('[background][sign_tx]res:', resp);
                 rpcResponse(resp);
               }
             } catch (e) {
@@ -740,7 +738,6 @@ chrome.runtime.onConnectExternal.addListener(port => {
                       tokenId,
                       paginate
                     );
-                    console.log('[background][get_utxos]res:', utxos);
                     rpcResponse({
                       ok: utxos
                     });
