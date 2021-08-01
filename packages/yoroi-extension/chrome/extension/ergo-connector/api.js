@@ -1,40 +1,29 @@
 // @flow
 
-import type {
-  Address,
-  Paginate,
-  PendingTransaction,
-  TokenId,
-  Tx,
-  TxId,
-  SignedTx,
-  Value
-} from './types';
+import type { Address, Paginate, PendingTransaction, SignedTx, TokenId, Tx, TxId, Value } from './types';
 import { ConnectorError } from './types';
 import { RustModule } from '../../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import type {
-  IPublicDeriver,
-  IGetAllUtxosResponse
+  IGetAllUtxosResponse,
+  IPublicDeriver
 } from '../../../app/api/ada/lib/storage/models/PublicDeriver/interfaces';
-import {
-  PublicDeriver,
-} from '../../../app/api/ada/lib/storage/models/PublicDeriver/index';
+import { PublicDeriver, } from '../../../app/api/ada/lib/storage/models/PublicDeriver/index';
 import {
   asGetAllUtxos,
   asGetBalance,
-  asHasLevels,
   asGetSigningKey,
+  asHasLevels,
 } from '../../../app/api/ada/lib/storage/models/PublicDeriver/traits';
 import { ConceptualWallet } from '../../../app/api/ada/lib/storage/models/ConceptualWallet/index';
 import BigNumber from 'bignumber.js';
 import { BIP32PrivateKey, } from '../../../app/api/common/lib/crypto/keys/keyRepository';
-import { generateKeys } from '../../../app/api/ergo/lib/transactions/utxoTransaction';
+import { extractP2sKeyFromErgoTree, generateKey } from '../../../app/api/ergo/lib/transactions/utxoTransaction';
 
-import {
-  SendTransactionApiError
-} from '../../../app/api/common/errors';
+import { SendTransactionApiError } from '../../../app/api/common/errors';
 
 import axios from 'axios';
+import keyBy from 'lodash/keyBy';
+import cloneDeep from 'lodash/cloneDeep';
 
 import { asAddressedUtxo, toErgoBoxJSON } from '../../../app/api/ergo/lib/transactions/utils';
 import { CoreAddressTypes } from '../../../app/api/ada/lib/storage/database/primitives/enums';
@@ -125,7 +114,7 @@ export async function connectorGetUtxos(
   const utxos = await withUtxos.getAllUtxos();
   const spentBoxIds = pendingTxs.flatMap(pending => pending.tx.inputs.map(input => input.boxId));
   // TODO: should we use a different coin selection algorithm besides greedy?
-  let utxosToUse = [];
+  const utxosToUse = [];
   if (valueExpected != null) {
     let valueAcc = new BigNumber(0);
     const target = valueToBigNumber(valueExpected);
@@ -147,7 +136,8 @@ export async function connectorGetUtxos(
       }
     }
   } else {
-    utxosToUse = utxos.map(formatUtxoToBox).filter(box => !spentBoxIds.includes(box.boxId));
+    const filtered = utxos.map(formatUtxoToBox).filter(box => !spentBoxIds.includes(box.boxId));
+    utxosToUse.push(...filtered);
   }
   return Promise.resolve(paginateResults(utxosToUse, paginate));
 }
@@ -211,10 +201,17 @@ export async function connectorSignTx(
   publicDeriver: IPublicDeriver<ConceptualWallet>,
   password: string,
   utxos: any/* IGetAllUtxosResponse */,
+  addresses: Address[],
   bestBlock: BestBlockResponse,
   tx: Tx,
   indices: Array<number>
 ): Promise<ErgoTxJson> {
+
+  const debug = (t: string, s: string, p: *) => {
+    // eslint-disable-next-line no-console
+    console.debug(`[connectorSignTx][${t}] ${s} > `, p && cloneDeep(p));
+  };
+
   const withLevels = asHasLevels(publicDeriver);
   if (withLevels == null) {
     throw new Error('wallet doesn\'t support levels');
@@ -230,29 +227,52 @@ export async function connectorSignTx(
   } catch (e) {
     throw ConnectorError.invalidRequest(`Invalid tx - could not parse JSON: ${e}`);
   }
-  const boxIdsToSign = [];
+
+  // ////////////// //
+  // SIGNING INPUTS //
+  // ////////////// //
+
+  const walletPKs = new Set(
+    addresses.map((a) =>
+      RustModule.SigmaRust.Address
+        .from_base58(a)
+        .to_ergo_tree()
+        .to_base16_bytes()
+        .replace(/^0008cd/, ''))
+  );
+
+  const utxoMap = keyBy(utxos, u => u.output.UtxoTransactionOutput.ErgoBoxId);
+
+  const signingKey = await wallet.getSigningKey()
+    .then(key => wallet.normalizeKey({ ...key, password }))
+    .then(key => BIP32PrivateKey.fromBuffer(Buffer.from(key.prvKeyHex, 'hex')));
+
+  const keyLevel = wallet.getParent().getPublicDeriverLevel();
+  const inputSigningKeys = new RustModule.SigmaRust.SecretKeys();
   for (const index of indices) {
     const input = tx.inputs[index];
-    boxIdsToSign.push(input.boxId);
+    const inputId = input.boxId;
+    debug('signing', 'Signing input ID', inputId);
+    const utxo = utxoMap[inputId];
+    if (utxo) {
+      debug('signing', 'UTxO found, regular signature');
+      inputSigningKeys.add(generateKey({ utxo, keyLevel, signingKey }));
+    } else {
+      debug('signing', 'No UTxO found! Checking if input is P2S');
+      const p2sKey: ?string = extractP2sKeyFromErgoTree(input.ergoTree);
+      if (p2sKey) {
+        if (walletPKs.has(p2sKey)) {
+          debug('signing', 'Input is a P2S with valid matching address');
+          // todo: p2s signature
+        } else {
+          throw new Error(`Input ${inputId} is a P2S, but no matching address is found in wallet!`);
+        }
+      } else {
+        throw new Error(`Input ${inputId} is not recognised! No matching UTxO found and is not P2S!`)
+      }
+    }
   }
 
-  const utxosToSign = utxos.filter(
-    utxo => boxIdsToSign.includes(utxo.output.UtxoTransactionOutput.ErgoBoxId)
-  );
-
-  const signingKey = await wallet.getSigningKey();
-  const normalizedKey = await wallet.normalizeKey({
-    ...signingKey,
-    password,
-  });
-  const finalSigningKey = BIP32PrivateKey.fromBuffer(
-    Buffer.from(normalizedKey.prvKeyHex, 'hex')
-  );
-  const wasmKeys = generateKeys({
-    senderUtxos: utxosToSign,
-    keyLevel: wallet.getParent().getPublicDeriverLevel(),
-    signingKey: finalSigningKey,
-  });
   const jsonBoxesToSign: Array<ErgoBoxJson> =
     // $FlowFixMe[prop-missing]: our inputs are nearly like `ErgoBoxJson` just with one extra field
     tx.inputs.filter((box, index) => indices.includes(index));
@@ -276,13 +296,15 @@ export async function connectorSignTx(
   const blockHeader = RustModule.SigmaRust.BlockHeader.from_json(headerJson);
   const preHeader = RustModule.SigmaRust.PreHeader.from_block_header(blockHeader);
   const signedTx = RustModule.SigmaRust.Wallet
-    .from_secrets(wasmKeys)
+    .from_secrets(inputSigningKeys)
     .sign_transaction(
       new RustModule.SigmaRust.ErgoStateContext(preHeader),
       wasmTx,
       txBoxesToSign,
       RustModule.SigmaRust.ErgoBoxes.from_boxes_json(dataInputs),
     );
+
+  debug('signedTx', '', signedTx);
   return signedTx.to_json();
 }
 
