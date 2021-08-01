@@ -469,17 +469,17 @@ export function signTransaction(request: {|
 }
 
 export function generateKey(request: {|
-  +utxo: ErgoAddressedUtxo,
+  +addressing: Addressing,
   +keyLevel: number,
   +signingKey: BIP32PrivateKey
 |}): RustModule.SigmaRust.SecretKey {
-  const { utxo, keyLevel, signingKey } = request;
-  const lastLevelSpecified = utxo.addressing.startLevel + utxo.addressing.path.length - 1;
+  const { addressing: { addressing }, keyLevel, signingKey } = request;
+  const lastLevelSpecified = addressing.startLevel + addressing.path.length - 1;
   if (lastLevelSpecified !== Bip44DerivationLevels.ADDRESS.level) {
     throw new Error(`${nameof(generateKeys)} incorrect addressing size`);
   }
   const key = deriveByAddressing({
-    addressing: utxo.addressing,
+    addressing,
     startingFrom: {
       level: keyLevel,
       key: signingKey,
@@ -503,7 +503,7 @@ export function generateKeys(request: {|
   const secretKeys = new RustModule.SigmaRust.SecretKeys();
   for (const utxo of request.senderUtxos) {
     // recall: duplicates are fine
-    secretKeys.add(generateKey({ utxo, keyLevel, signingKey }));
+    secretKeys.add(generateKey({ addressing: utxo, keyLevel, signingKey }));
   }
   return secretKeys;
 }

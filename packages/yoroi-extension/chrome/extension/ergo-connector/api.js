@@ -247,6 +247,41 @@ function createP2sAddressTreeMatcher(
   };
 }
 
+function createMockHeader(bestBlock) {
+  // We could modify the best block backend to return this information for the previous block
+  // but I'm guessing that votes of the previous block isn't useful for the current one
+  // and I'm also unsure if any of these 3 would impact signing or not.
+  // Maybe version would later be used in the ergoscript context?
+  return JSON.stringify({
+    version: 2, // TODO: where to get version? (does this impact signing?)
+    parentId: bestBlock.hash,
+    timestamp: Date.now(),
+    nBits: 682315684511744, // TODO: where to get difficulty? (does this impact signing?)
+    height: bestBlock.height + 1,
+    votes: '040000', // TODO: where to get votes? (does this impact signing?)
+  });
+}
+
+function validateWalletForSigning(publicDeriver) {
+  const withLevels = asHasLevels(publicDeriver);
+  if (withLevels == null) {
+    throw new Error('wallet doesn\'t support levels');
+  }
+  const wallet = asGetSigningKey(withLevels);
+  if (wallet == null) {
+    throw new Error('wallet doesn\'t support signing');
+  }
+  return wallet;
+}
+
+function parseWasmTx(tx) {
+  try {
+    return RustModule.SigmaRust.UnsignedTransaction.from_json(JSON.stringify(tx));
+  } catch (e) {
+    throw ConnectorError.invalidRequest(`Invalid tx - could not parse JSON: ${e}`);
+  }
+}
+
 export async function connectorSignTx(
   publicDeriver: IPublicDeriver<ConceptualWallet>,
   password: string,
@@ -256,36 +291,41 @@ export async function connectorSignTx(
   indices: Array<number>
 ): Promise<ErgoTxJson> {
 
-  const debug = (t: string, s: string, p: *) => {
+  const debug = (t: string, s: string, ...ps: *) => {
     // eslint-disable-next-line no-console
-    console.debug(`[connectorSignTx][${t}] ${s} > `, p && cloneDeep(p));
+    console.debug(`[connectorSignTx][${t}] ${s} > `, ...((ps||[]).map(cloneDeep)));
   };
 
-  const withLevels = asHasLevels(publicDeriver);
-  if (withLevels == null) {
-    throw new Error('wallet doesn\'t support levels');
-  }
-  const wallet = asGetSigningKey(withLevels);
-  if (wallet == null) {
-    throw new Error('wallet doesn\'t support signing');
-  }
+  debug('args', 'tx', tx);
+  debug('args', 'utxos', utxos);
+
+  const wallet = validateWalletForSigning(publicDeriver);
+
   await RustModule.load();
-  let wasmTx;
-  try {
-    wasmTx = RustModule.SigmaRust.UnsignedTransaction.from_json(JSON.stringify(tx));
-  } catch (e) {
-    throw ConnectorError.invalidRequest(`Invalid tx - could not parse JSON: ${e}`);
+  const wasmTx = parseWasmTx(tx);
+
+  const utxoMap = keyBy(utxos,
+    u => u.output.UtxoTransactionOutput.ErgoBoxId);
+
+  const selectedInputs = []
+  for (const index of indices) {
+    const input = tx.inputs[index];
+    selectedInputs.push(input);
   }
 
-  // ////////////// //
+  const dataInputs = tx.dataInputs.map(box => {
+    const utxo = utxoMap[box.boxId];
+    if (!utxo) {
+      throw new Error(`Data-input ${box.boxId}, no matching UTxO found!`);
+    }
+    return formatUtxoToBox(utxo);
+  });
+
   // SIGNING INPUTS //
-  // ////////////// //
 
   const p2sMatcher = createP2sAddressTreeMatcher(
     () => getAllFullAddresses(wallet, true),
   );
-
-  const utxoMap = keyBy(utxos, u => u.output.UtxoTransactionOutput.ErgoBoxId);
 
   const signingKey = await wallet.getSigningKey()
     .then(key => wallet.normalizeKey({ ...key, password }))
@@ -293,14 +333,13 @@ export async function connectorSignTx(
 
   const keyLevel = wallet.getParent().getPublicDeriverLevel();
   const inputSigningKeys = new RustModule.SigmaRust.SecretKeys();
-  for (const index of indices) {
-    const input = tx.inputs[index];
+  for (const input of selectedInputs) {
     const inputId = input.boxId;
     debug('signing', 'Signing input ID', inputId);
     const utxo = utxoMap[inputId];
     if (utxo) {
       debug('signing', 'UTxO found, regular signature');
-      inputSigningKeys.add(generateKey({ utxo, keyLevel, signingKey }));
+      inputSigningKeys.add(generateKey({ addressing: utxo, keyLevel, signingKey }));
     } else {
       debug('signing', 'No UTxO found! Checking if input is P2S');
       const { isP2S, matchingAddress } = await p2sMatcher(input.ergoTree);
@@ -309,44 +348,31 @@ export async function connectorSignTx(
           throw new Error(`Input ${inputId} is a P2S, but no matching address is found in wallet!`);
         }
         debug('signing', 'Input is a P2S with valid matching address', matchingAddress);
-        // todo: p2s signature
+        const { fullAddress } = matchingAddress;
+        inputSigningKeys.add(generateKey({ addressing: fullAddress, keyLevel, signingKey }));
       } else {
         throw new Error(`Input ${inputId} is not recognised! No matching UTxO found and is not P2S!`)
       }
     }
   }
 
-  const jsonBoxesToSign: Array<ErgoBoxJson> =
-    // $FlowFixMe[prop-missing]: our inputs are nearly like `ErgoBoxJson` just with one extra field
-    tx.inputs.filter((box, index) => indices.includes(index));
-  const txBoxesToSign = RustModule.SigmaRust.ErgoBoxes.from_boxes_json(jsonBoxesToSign);
-  const dataBoxIds = tx.dataInputs.map(box => box.boxId);
-  const dataInputs = utxos.filter(
-    utxo => dataBoxIds.includes(utxo.output.UtxoTransactionOutput.ErgoBoxId)
-  ).map(formatUtxoToBox);
-  // We could modify the best block backend to return this information for the previous block
-  // but I'm guessing that votes of the previous block isn't useful for the current one
-  // and I'm also unsure if any of these 3 would impact signing or not.
-  // Maybe version would later be used in the ergoscript context?
-  const headerJson = JSON.stringify({
-    version: 2, // TODO: where to get version? (does this impact signing?)
-    parentId: bestBlock.hash,
-    timestamp: Date.now(),
-    nBits: 682315684511744, // TODO: where to get difficulty? (does this impact signing?)
-    height: bestBlock.height + 1,
-    votes: '040000', // TODO: where to get votes? (does this impact signing?)
-  });
-  const blockHeader = RustModule.SigmaRust.BlockHeader.from_json(headerJson);
+  debug('signing', 'Produced input keys', inputSigningKeys.len(), inputSigningKeys);
+
+  // $FlowFixMe[prop-missing]: our inputs are nearly like `ErgoBoxJson` just with one extra field
+  const blockHeader = RustModule.SigmaRust.BlockHeader.from_json(createMockHeader(bestBlock));
   const preHeader = RustModule.SigmaRust.PreHeader.from_block_header(blockHeader);
+  const ergoStateContext = new RustModule.SigmaRust.ErgoStateContext(preHeader);
+  const txBoxesToSpend = RustModule.SigmaRust.ErgoBoxes.from_boxes_json(selectedInputs);
+  const dataBoxesToSpend = RustModule.SigmaRust.ErgoBoxes.from_boxes_json(dataInputs);
+
   const signedTx = RustModule.SigmaRust.Wallet
     .from_secrets(inputSigningKeys)
     .sign_transaction(
-      new RustModule.SigmaRust.ErgoStateContext(preHeader),
+      ergoStateContext,
       wasmTx,
-      txBoxesToSign,
-      RustModule.SigmaRust.ErgoBoxes.from_boxes_json(dataInputs),
+      txBoxesToSpend,
+      dataBoxesToSpend,
     );
-
   debug('signedTx', '', signedTx);
   return signedTx.to_json();
 }
