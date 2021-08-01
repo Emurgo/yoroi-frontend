@@ -17,10 +17,7 @@ import {
 import { ConceptualWallet } from '../../../app/api/ada/lib/storage/models/ConceptualWallet/index';
 import BigNumber from 'bignumber.js';
 import { BIP32PrivateKey, } from '../../../app/api/common/lib/crypto/keys/keyRepository';
-import {
-  createP2sAddressTreeMatcher,
-  generateKey,
-} from '../../../app/api/ergo/lib/transactions/utxoTransaction';
+import { extractP2sKeyFromErgoTree, generateKey, } from '../../../app/api/ergo/lib/transactions/utxoTransaction';
 
 import { SendTransactionApiError } from '../../../app/api/common/errors';
 
@@ -30,6 +27,7 @@ import cloneDeep from 'lodash/cloneDeep';
 
 import { asAddressedUtxo, toErgoBoxJSON } from '../../../app/api/ergo/lib/transactions/utils';
 import { CoreAddressTypes } from '../../../app/api/ada/lib/storage/database/primitives/enums';
+import type { FullAddressPayload } from '../../../app/api/ada/lib/storage/bridge/traitUtils';
 import { getAllAddressesForDisplay } from '../../../app/api/ada/lib/storage/bridge/traitUtils';
 import { getReceiveAddress } from '../../../app/stores/stateless/addressStores';
 
@@ -145,7 +143,15 @@ export async function connectorGetUtxos(
   return Promise.resolve(paginateResults(utxosToUse, paginate));
 }
 
-async function getAllAddresses(wallet: PublicDeriver<>, usedFilter: boolean): Promise<Address[]> {
+export type FullAddressPayloadWithBase58 = {|
+  fullAddress: FullAddressPayload,
+  base58: Address,
+|};
+
+async function getAllFullAddresses(
+  wallet: PublicDeriver<>,
+  usedFilter: boolean,
+): Promise<FullAddressPayloadWithBase58[]> {
   const p2pk = getAllAddressesForDisplay({
     publicDeriver: wallet,
     type: CoreAddressTypes.ERGO_P2PK
@@ -159,13 +165,21 @@ async function getAllAddresses(wallet: PublicDeriver<>, usedFilter: boolean): Pr
     type: CoreAddressTypes.ERGO_P2S
   });
   await RustModule.load();
-  const addresses = (await Promise.all([p2pk, p2sh, p2s]))
-    .flat()
+  const addresses: FullAddressPayload[] =
+    (await Promise.all([p2pk, p2sh, p2s])).flat();
+  return addresses
     .filter(a => a.isUsed === usedFilter)
-    .map(a => RustModule.SigmaRust.NetworkAddress
+    .map(a => ({
+      fullAddress: a,
+      base58: RustModule.SigmaRust.NetworkAddress
         .from_bytes(Buffer.from(a.address, 'hex'))
-        .to_base58());
-  return addresses;
+        .to_base58(),
+    }));
+}
+
+async function getAllAddresses(wallet: PublicDeriver<>, usedFilter: boolean): Promise<Address[]> {
+  return getAllFullAddresses(wallet, usedFilter)
+    .then(arr => arr.map(a => a.base58));
 }
 
 export async function connectorGetUsedAddresses(
@@ -198,6 +212,39 @@ export type BoxLike = {
     amount: number | string,
   |}>,
   ...
+}
+
+function extractAddressPK(addressBase58: string) {
+  return RustModule.SigmaRust.Address
+    .from_base58(addressBase58)
+    .to_ergo_tree()
+    .to_base16_bytes()
+    .replace(/^0008cd/, '');
+}
+
+function addressesToPkMap(addresses: Array<FullAddressPayloadWithBase58>) {
+  return addresses.reduce((res, a) => {
+    const addressPk = extractAddressPK(a.base58);
+    return ({ ...res, [addressPk]: a });
+  }, {});
+}
+
+function createP2sAddressTreeMatcher(
+  addressesGetter: () => Promise<Array<FullAddressPayloadWithBase58>>,
+): (
+  string => Promise<{| isP2S: boolean, matchingAddress: ?FullAddressPayloadWithBase58 |}>
+) {
+  const keyAddressMapHolder = [];
+  return async ergoTree => {
+    const key: ?string = extractP2sKeyFromErgoTree(ergoTree);
+    if (!key) {
+      return { isP2S: false, matchingAddress: null };
+    }
+    if (!keyAddressMapHolder[0]) {
+      keyAddressMapHolder[0] = addressesToPkMap(await addressesGetter());
+    }
+    return { isP2S: true, matchingAddress: keyAddressMapHolder[0][key] };
+  };
 }
 
 export async function connectorSignTx(
@@ -235,7 +282,7 @@ export async function connectorSignTx(
   // ////////////// //
 
   const p2sMatcher = createP2sAddressTreeMatcher(
-    () => getAllAddresses(wallet, true),
+    () => getAllFullAddresses(wallet, true),
   );
 
   const utxoMap = keyBy(utxos, u => u.output.UtxoTransactionOutput.ErgoBoxId);
