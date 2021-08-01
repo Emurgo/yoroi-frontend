@@ -526,10 +526,10 @@ export function extractP2sKeyFromErgoTree(ergoTree: string): ?string {
   return null;
 }
 
-export function createP2sAddressTreeMatcher(addresses: Array<string>): (
-  string => {| isP2S: boolean, matchingAddress: ?string |}
+export function createP2sAddressTreeMatcher(addressesGetter: () => Promise<Array<string>>): (
+  string => Promise<{| isP2S: boolean, matchingAddress: ?string |}>
 ) {
-  const keyAddressMap = addresses.reduce((res, a) => {
+  const keyAddressMapFunc = addresses => addresses.reduce((res, a) => {
     const key = RustModule.SigmaRust.Address
       .from_base58(a)
       .to_ergo_tree()
@@ -537,10 +537,15 @@ export function createP2sAddressTreeMatcher(addresses: Array<string>): (
       .replace(/^0008cd/, '');
     return { ...res, [key]: a };
   }, {});
-  return ergoTree => {
+  const keyAddressMapHolder = [];
+  return async ergoTree => {
     const key: ?string = extractP2sKeyFromErgoTree(ergoTree);
-    return key
-      ? { isP2S: true, matchingAddress: keyAddressMap[key] }
-      : { isP2S: false, matchingAddress: null };
+    if (!key) {
+      return { isP2S: false, matchingAddress: null };
+    }
+    if (!keyAddressMapHolder[0]) {
+      keyAddressMapHolder[0] = keyAddressMapFunc(await addressesGetter());
+    }
+    return { isP2S: true, matchingAddress: keyAddressMapHolder[0][key] };
   };
 }

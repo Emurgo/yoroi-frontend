@@ -338,13 +338,12 @@ chrome.runtime.onMessage.addListener(async (
             throw new Error('could not get all utxos');
           }
           const network = wallet.getParent().getNetworkInfo();
-          const [utxos, addresses, bestBlock] = await Promise.all([
+          const [utxos, bestBlock] = await Promise.all([
             canGetAllUtxos.getAllUtxos(),
-            connectorGetUsedAddresses(wallet),
             getStateFetcher(localStorageApi)
               .then(f => f.getBestBlock({ network })),
           ])
-          return await connectorSignTx(wallet, password, utxos, addresses, bestBlock, tx, indices);
+          return await connectorSignTx(wallet, password, utxos, bestBlock, tx, indices);
         },
         db,
         localStorageApi

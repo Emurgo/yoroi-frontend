@@ -204,7 +204,6 @@ export async function connectorSignTx(
   publicDeriver: IPublicDeriver<ConceptualWallet>,
   password: string,
   utxos: any/* IGetAllUtxosResponse */,
-  addresses: Address[],
   bestBlock: BestBlockResponse,
   tx: Tx,
   indices: Array<number>
@@ -235,8 +234,9 @@ export async function connectorSignTx(
   // SIGNING INPUTS //
   // ////////////// //
 
-  const p2sMatcher =
-    createP2sAddressTreeMatcher(addresses);
+  const p2sMatcher = createP2sAddressTreeMatcher(
+    () => getAllAddresses(wallet, true),
+  );
 
   const utxoMap = keyBy(utxos, u => u.output.UtxoTransactionOutput.ErgoBoxId);
 
@@ -256,7 +256,7 @@ export async function connectorSignTx(
       inputSigningKeys.add(generateKey({ utxo, keyLevel, signingKey }));
     } else {
       debug('signing', 'No UTxO found! Checking if input is P2S');
-      const { isP2S, matchingAddress } = p2sMatcher(input.ergoTree);
+      const { isP2S, matchingAddress } = await p2sMatcher(input.ergoTree);
       if (isP2S) {
         if (!matchingAddress) {
           throw new Error(`Input ${inputId} is a P2S, but no matching address is found in wallet!`);
