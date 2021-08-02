@@ -13,10 +13,14 @@ import globalMessages from '../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
-  explanationLine1: {
-    id: 'profile.uriPrompt.form.explanation',
-    defaultMessage: '!!!Do you want to enable Cardano payment URLs?',
+  uriHeading: {
+    id: 'profile.uriPrompt.form.heading',
+    defaultMessage: 'Allow Cardano Payment URLs'
   },
+  uriExplanation: {
+    id: 'profile.uriPrompt.form.explanation',
+    defaultMessage: '!!!Yoroi will allow you to generate special links in Receive page and share it in order to receive payment faster and easier. You can always enable this feature in the Settings.',
+  }
 });
 
 type Props = {|
@@ -55,8 +59,8 @@ export default class UriPromptForm extends Component<Props> {
           </span>
 
           <div className={styles.explanation}>
-            {intl.formatMessage(messages.explanationLine1)}&nbsp;
-            {intl.formatMessage(globalMessages.uriExplanation)}
+            <h1>{intl.formatMessage(messages.uriHeading)}</h1>
+            <p>{intl.formatMessage(messages.uriExplanation)}</p>
           </div>
 
           <div className={styles.buttonsWrapper}>
