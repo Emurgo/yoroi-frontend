@@ -174,8 +174,12 @@ export class RemoteFetcher implements IFetcher {
       errorFactory: errClass(GetTxsBodiesForUTXOsApiError),
       responseMapper: data => {
         // $FlowFixMe[incompatible-use]
-        Object.values(data).forEach(({ outputs }) => {
+        Object.values(data).forEach(({ inputs, outputs }) => {
           outputs.forEach(o => fixUtxoToStringValues(o));
+          inputs.forEach(i => {
+            i.assets = i.assets ?? [];
+            fixUtxoToStringValues(i);
+          });
         });
         return data;
       }
@@ -216,9 +220,10 @@ export class RemoteFetcher implements IFetcher {
         responseMapper: (data: HistoryResponse) => {
           for (const datum of data) {
             datum.outputs.forEach(o => fixUtxoToStringValues(o));
-            // TODO: the inputs fix might potentially be removed
-            // https://github.com/ergoplatform/explorer-backend/issues/92
-            datum.inputs.forEach(i => { i.assets = i.assets ?? [] })
+            datum.inputs.forEach(i => {
+              i.assets = i.assets ?? [];
+              fixUtxoToStringValues(i);
+            })
           }
           return data;
         },
