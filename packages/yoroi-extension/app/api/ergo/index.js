@@ -107,6 +107,7 @@ import { hasSendAllDefault, builtSendTokenList } from '../common/index';
 import { getReceiveAddress } from '../../stores/stateless/addressStores';
 
 export function fixUtxoToStringValues<T>(utxo: T): T {
+  // $FlowFixMe[incompatible-type]
   if (utxo.value != null) {
     // $FlowFixMe[incompatible-use]
     utxo.value = String(utxo.value);
