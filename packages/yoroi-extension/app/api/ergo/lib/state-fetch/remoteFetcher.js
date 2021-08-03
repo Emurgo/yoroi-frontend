@@ -92,7 +92,9 @@ function axiosRequest<T>(fetcher: RemoteFetcher, method: AxiosMethod): AxiosFunc
         }
         const res = JSONBigInt.stringify(data);
         debug('REQFIX', res);
-        headers['Content-Type'] = 'application/json';
+        if (headers) {
+          headers['Content-Type'] = 'application/json';
+        }
         return res;
       },
       ...(params.data ? { data: params.data } : {}),
