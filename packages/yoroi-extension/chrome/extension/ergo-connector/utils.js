@@ -39,7 +39,7 @@ export function mintedTokenInfo(tx: Tx): $ReadOnly<TokenRow>[] {
   for (const output of tx.outputs) {
     const name = parseEIP0004Data(output.additionalRegisters.R4);
     const description = parseEIP0004Data(output.additionalRegisters.R5);
-    const decimals = parseEIP0004Data(output.additionalRegisters.R6);
+    const decimals = parseInt(parseEIP0004Data(output.additionalRegisters.R6) ?? '', 10);
     if (name != null && description != null && decimals != null) {
       tokens.push({
         TokenId: 0,
@@ -51,7 +51,7 @@ export function mintedTokenInfo(tx: Tx): $ReadOnly<TokenRow>[] {
           type: 'Ergo',
           height: tx.inputs[0].creationHeight,
           boxId: tx.inputs[0].boxId,
-          numberOfDecimals: parseInt(decimals, 10),
+          numberOfDecimals: isNaN(decimals) ? null : decimals,
           ticker: name,
           longName: description,
           description,
