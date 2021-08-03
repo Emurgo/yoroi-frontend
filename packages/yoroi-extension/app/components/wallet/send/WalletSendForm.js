@@ -8,8 +8,6 @@ import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import { Input } from 'react-polymorph/lib/components/Input';
 import { NumericInput } from 'react-polymorph/lib/components/NumericInput';
-import { Checkbox } from 'react-polymorph/lib/components/Checkbox';
-import { CheckboxSkin } from 'react-polymorph/lib/skins/simple/CheckboxSkin';
 import { defineMessages, intlShape } from 'react-intl';
 import { isValidMemoOptional, isValidMemo, } from '../../../utils/validations';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
@@ -45,7 +43,6 @@ import { Select } from 'react-polymorph/lib/components/Select';
 import { SelectTokenSkin } from '../../../themes/skins/SelectTokenSkin';
 import TokenOptionRow from '../../widgets/tokenOption/TokenOptionRow';
 import BigNumber from 'bignumber.js';
-import SendOptionsDropDown from './SendOptionsDropDown';
 
 const messages = defineMessages({
   receiverLabel: {
@@ -264,7 +261,8 @@ export default class WalletSendForm extends Component<Props> {
       },
       selectedAmount: {
         label: this.context.intl.formatMessage(messages.selectedAmountLable),
-        value: this.props.shouldSendAll ? this.props.selectedToken?.TokenId ?? this.props.getTokenInfo({
+        value: this.props.shouldSendAll ? 
+          this.props.selectedToken?.TokenId ?? this.props.getTokenInfo({
           identifier: this.props.defaultToken.Identifier,
           networkId: this.props.defaultToken.NetworkId,
         }).TokenId : CUSTOM_AMOUNT
@@ -381,14 +379,14 @@ export default class WalletSendForm extends Component<Props> {
       }));
     })();
 
-    const tokenId = this.props.selectedToken?.TokenId ?? this.props.getTokenInfo({
-      identifier: this.props.defaultToken.Identifier,
-      networkId: this.props.defaultToken.NetworkId,
-    }).TokenId
-
+    
     const sendAmountOptions = (() => {
+      const tokenId = this.props.selectedToken?.TokenId ?? this.props.getTokenInfo({
+        identifier: this.props.defaultToken.Identifier,
+        networkId: this.props.defaultToken.NetworkId,
+      }).TokenId
       return [
-        { id: 'custom-amount', label: intl.formatMessage(messages.customAmount), value: CUSTOM_AMOUNT},
+        { id: 'custom-amount', label: intl.formatMessage(messages.customAmount), value: CUSTOM_AMOUNT },
         ...tokenOptions.filter(t => t.value === tokenId).map(token => {
           let label = intl.formatMessage(messages.dropdownAmountLabel, {
             currency: truncateToken(token.label)
@@ -481,40 +479,36 @@ export default class WalletSendForm extends Component<Props> {
               classicTheme={classicTheme}
             />
           </div>
-          <div className={styles.currencySelect}>
-            {tokenOptions.length > 1 && (
-            <Select
-              className={styles.currencySelect}
-              options={sendAmountOptions}
-              {...form.$('selectedAmount').bind()}
-              onChange={value => {
-                this.form.$('selectedAmount').value = value
-                if(value === CUSTOM_AMOUNT && this.props.shouldSendAll) {
-                  this.props.toggleSendAll();
-                } else if (value !== CUSTOM_AMOUNT) {
-                  this.props.toggleSendAll()
-                }
-                if (this.props.shouldSendAll) {
-                  // if we toggle shouldSendAll from true -> false
-                  // we need to re-enable the field
-                  // and set it to whatever value was used for the sendAll value
-                  this.props.updateAmount(new BigNumber(
-                    formattedAmountToNaturalUnits(
-                      this.form.$('amount').value,
-                      this.getNumDecimals(),
-                    )
-                  ));
-                }
-              }}
-              optionRenderer={option => (
-                <TokenOptionRow
-                  displayName={option.label}
-                  nameOnly={true}
-                />
-              )}
-            />
-          )}
-          </div>
+
+          <Select
+            options={sendAmountOptions}
+            {...form.$('selectedAmount').bind()}
+            onChange={value => {
+              this.form.$('selectedAmount').value = value
+              if(value === CUSTOM_AMOUNT && this.props.shouldSendAll) {
+                this.props.toggleSendAll();
+              } else if (value !== CUSTOM_AMOUNT) {
+                this.props.toggleSendAll()
+              }
+              if (this.props.shouldSendAll) {
+                // if we toggle shouldSendAll from true -> false
+                // we need to re-enable the field
+                // and set it to whatever value was used for the sendAll value
+                this.props.updateAmount(new BigNumber(
+                  formattedAmountToNaturalUnits(
+                    this.form.$('amount').value,
+                    this.getNumDecimals(),
+                  )
+                ));
+              }
+            }}
+            optionRenderer={option => (
+              <TokenOptionRow
+                displayName={option.label}
+                nameOnly
+              />
+            )}
+          />
 
           {showMemo ? (
             <div className={styles.memoInput}>

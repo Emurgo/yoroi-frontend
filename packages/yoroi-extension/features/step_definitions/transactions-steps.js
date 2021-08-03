@@ -171,6 +171,7 @@ When(/^I click on the unmangle button$/, async function () {
 When(/^I open the token selection dropdown$/, async function () {
   await this.click('.WalletSendForm_component .SimpleInput_input');
 });
+
 When(/^I select token "([^"]*)"$/, async function (tokenName) {
   const tokenRows = await this.getElementsBy('.TokenOptionRow_item_name');
   for (const row of tokenRows) {
@@ -180,3 +181,18 @@ When(/^I select token "([^"]*)"$/, async function (tokenName) {
     }
   }
 });
+
+When(/^I open the amount selection dropdown$/, async function () {
+  await this.click('.WalletSendForm_component  >  div > div:nth-child(4) .SimpleInput_input')
+});
+
+When(/^I select send all$/, async function () {
+  const tokenRows = await this.getElementsBy('.TokenOptionRow_item_name');
+  for (const row of tokenRows) {
+    const name = await row.getText();
+    if (name.startsWith('Send all')) {
+      await row.click();
+    }
+  }
+});
+
