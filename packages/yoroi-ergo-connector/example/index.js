@@ -54,23 +54,32 @@ function initDapp() {
                 valueEntry.setAttribute("value", Math.floor(result / 10));
                 const button = document.createElement("button");
                 button.textContent = "Send";
+
+                async function getUtxos(amountToSend) {
+                    const fee = BigInt(wasm.TxBuilder.SUGGESTED_TX_FEE().as_i64().to_str());
+                    const fullAmountToSend = BigInt(1000) * amountToSend + fee;
+                    const utxos = await ergo.get_utxos(fullAmountToSend.toString());
+                    const filteredUtxos = [];
+                    for (const utxo of utxos) {
+                        try {
+                            await wasm.ErgoBox.from_json(JSON.stringify(utxo));
+                            filteredUtxos.push(utxo);
+                        } catch (e) {
+                            console.error('[getUtxos] UTxO failed parsing:', utxo, e);
+                        }
+                    }
+                    return filteredUtxos;
+                }
+
                 button.onclick = async function() {
                     status.innerText = "Creating transaction";
                     const donationAddr = "9hD2Cw6yQL6zzrw3TFgKdwFkBdDdU3ro1xRFmjouDw4NYS2S5RD";
                     const creationHeight = 398959;
                     const amountToSend = BigInt(valueEntry.value);
                     const amountToSendBoxValue = wasm.BoxValue.from_i64(wasm.I64.from_str(amountToSend.toString()));
-                    const rawUtxos = await ergo.get_utxos((amountToSend + BigInt(wasm.TxBuilder.SUGGESTED_TX_FEE().as_i64().to_str())).toString());
-                    let utxosValue = BigInt(0);
-                    let utxos = rawUtxos.map(utxo => {
-                        // need to convert strings to numbers for sigma-rust for now
-                        //utxo.value = parseInt(utxo.value, 10);
-                        utxosValue += BigInt(utxo.value);
-                        for (let asset of utxo.assets) {
-                            //asset.amount = parseInt(asset.amount);
-                        }
-                        return utxo;
-                    });
+                    const utxos = await getUtxos(amountToSend);
+                    let utxosValue = utxos.reduce((acc, utxo) => acc += BigInt(utxo.value), BigInt(0));
+                    console.log('utxos', utxosValue, utxos);
                     // Testing with p2S inputs since Yoroi won't return those as they don't belong to anyone's wallet
                     //while (utxos.length > 1) { utxos.pop(); }
                     //utxos.unshift({"boxId":"6dd679cc32afd1f56ad74696c7af53c45330148a703da29b3f6b3ca3b09851c3","value":1331719,"ergoTree":"1002040004f2c001d193e4c6b2a573000004047301","assets":[],"additionalRegisters":{},"creationHeight":398959,"transactionId":"d2fbf4b62f262f4bce7973924ae06685aa5ec2313e24716e8b1d86d62789c89b","index":0});
@@ -86,7 +95,7 @@ function initDapp() {
                         new wasm.Tokens());
                     console.log(`boxes selected: ${boxSelection.boxes().len()}`);
                     const outputCandidates = wasm.ErgoBoxCandidates.empty();
-                    const token = new wasm.Token(wasm.TokenId.from_box_id(wasm.BoxId.from_str(utxos[2].boxId)), wasm.TokenAmount.from_i64(wasm.I64.from_str("1234567890123456789")));
+                    const token = new wasm.Token(wasm.TokenId.from_box_id(wasm.BoxId.from_str(utxos[utxos.length - 1].boxId)), wasm.TokenAmount.from_i64(wasm.I64.from_str("1234567890123456789")));
                     const donationBoxBuilder = new wasm.ErgoBoxCandidateBuilder(
                         amountToSendBoxValue,
                         wasm.Contract.pay_to_address(wasm.Address.from_base58(donationAddr)),
@@ -123,12 +132,13 @@ function initDapp() {
                     //tx.outputs[0].ergoTree = "1002040004f2c001d193e4c6b2a573000004047301";
                     // and we rebuild it using
                     const correctTx = wasm.UnsignedTransaction.from_json(JSON.stringify(tx)).to_json();
+                    console.log(`correct tx: ${JSON.stringify(correctTx)}`);
                     console.log(`new id: ${correctTx.id}`);
                     // we must use the exact order chosen as after 0.4.3 in sigma-rust
                     // this can change and might not use all the utxos as the coin selection
                     // might choose a more optimal amount
                     correctTx.inputs = correctTx.inputs.map(box => {
-console.log(`box: ${JSON.stringify(box)}`);
+                        console.log(`box: ${JSON.stringify(box)}`);
                         const fullBoxInfo = utxos.find(utxo => utxo.boxId === box.boxId);
                         return {
                             ...fullBoxInfo,
@@ -137,25 +147,62 @@ console.log(`box: ${JSON.stringify(box)}`);
                     });
                     status.innerText = "Awaiting transaction signing";
                     console.log(`${JSON.stringify(correctTx)}`);
-                    ergo
-                        .sign_tx(correctTx)
-                        .then(async signedTx => {
-                            status.innerText = "Transaction signed - awaiting submission"
-                            try {
-                                const sentTxId = await ergo.submit_tx(signedTx);
-                                status.innerText = "Transaction submitted - thank you for your donation!";
-                                const txTracker = document.createElement("a");
-                                txTracker.appendChild(document.createTextNode(`Track TX ${sentTxId}`));
-                                txTracker.href = `https://explorer.ergoplatform.com/en/transactions/${sentTxId}`;
-                                status.appendChild(txTracker);
-                            } catch (e) {
-                                status.innerText = `Transaction could not be sent: ${JSON.stringify(e)}`;
-                            }
-                        })
-                        .catch(err => {
-                            console.log(`Error: ${JSON.stringify(err)}`);
-                            status.innerText = `Error: ${JSON.stringify(err)}`
-                        });
+
+                    async function signTx(txToBeSigned) {
+                        try {
+                            return await ergo.sign_tx(txToBeSigned);
+                        } catch (err) {
+                            const msg = `[signTx] Error: ${JSON.stringify(err)}`;
+                            console.error(msg, err);
+                            status.innerText = msg
+                            return null;
+                        }
+                    }
+
+                    async function submitTx(txToBeSubmitted) {
+                        try {
+                            return await ergo.submit_tx(txToBeSubmitted);
+                        } catch (err) {
+                            const msg = `[submitTx] Error: ${JSON.stringify(err)}`;
+                            console.error(msg, err);
+                            status.innerText = msg
+                            return null;
+                        }
+                    }
+
+                    async function processTx(txToBeProcessed) {
+                        const msg = s => {
+                            console.log('[processTx]', s);
+                            status.innerText = s;
+                        };
+                        const signedTx = await signTx(txToBeProcessed);
+                        if (!signedTx) {
+                            console.log(`No signed tx`);
+                            return null;
+                        }
+                        msg("Transaction signed - awaiting submission");
+                        const txId = await submitTx(signedTx);
+                        if (!txId) {
+                            console.log(`No submotted tx ID`);
+                            return null;
+                        }
+                        msg("Transaction submitted - thank you for your donation!");
+                        return txId;
+                    }
+
+                    function displayTxId(txId) {
+                        const txTracker = document.createElement("a");
+                        txTracker.appendChild(document.createTextNode(`Track TX ${txId}`));
+                        txTracker.href = `https://explorer.ergoplatform.com/en/transactions/${txId}`;
+                        status.appendChild(txTracker);
+                    }
+
+                    processTx(correctTx).then(txId => {
+                        console.log('[txId]', txId);
+                        if (txId) {
+                            displayTxId(txId);
+                        }
+                    });
                 }
                 div.appendChild(valueEntry);
                 div.appendChild(button);

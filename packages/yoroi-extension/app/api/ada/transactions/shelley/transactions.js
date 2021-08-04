@@ -434,6 +434,70 @@ export function newAdaUnsignedTxFromUtxo(
   allowNoOutputs: boolean,
   metadata: RustModule.WalletV4.TransactionMetadata | void,
 ): V4UnsignedTxUtxoResponse {
+  /*
+    This is an ad-hoc optimization for one specific senario:
+    If the input is enough to cover the output and the fee, but the remaining amount
+    is less than the minimum UTXO amount (1 ADA as of now), then
+    `txBuilder.add_change_if_need` will "burn" the remaining as fee instead of adding
+    a change.
+    The optimization is to include one extra UTXO input to force the change amount
+    to be larger than the minimum UTXO amount.
+  */
+  const result = _newAdaUnsignedTxFromUtxo(
+    outputs,
+    changeAdaAddr,
+    utxos,
+    absSlotNumber,
+    protocolParams,
+    certificates,
+    withdrawals,
+    allowNoOutputs,
+    metadata,
+    false,
+  );
+  const fee = result.txBuilder.get_fee_if_set();
+
+  const resultWithOneExtraInput = _newAdaUnsignedTxFromUtxo(
+    outputs,
+    changeAdaAddr,
+    utxos,
+    absSlotNumber,
+    protocolParams,
+    certificates,
+    withdrawals,
+    allowNoOutputs,
+    metadata,
+    true,
+  );
+  const feeWithOneExtraInput = resultWithOneExtraInput.txBuilder.get_fee_if_set();
+
+  if (feeWithOneExtraInput && fee && feeWithOneExtraInput.compare(fee) < 0) {
+    return resultWithOneExtraInput;
+  }
+  return result;
+}
+
+function _newAdaUnsignedTxFromUtxo(
+  outputs: Array<TxOutput>,
+  changeAdaAddr: void | {| ...Address, ...Addressing |},
+  utxos: Array<RemoteUnspentOutput>,
+  absSlotNumber: BigNumber,
+  protocolParams: {|
+    linearFee: RustModule.WalletV4.LinearFee,
+    minimumUtxoVal: RustModule.WalletV4.BigNum,
+    poolDeposit: RustModule.WalletV4.BigNum,
+    keyDeposit: RustModule.WalletV4.BigNum,
+    networkId: number,
+  |},
+  certificates: $ReadOnlyArray<RustModule.WalletV4.Certificate>,
+  withdrawals: $ReadOnlyArray<{|
+    address: RustModule.WalletV4.RewardAddress,
+    amount: RustModule.WalletV4.BigNum,
+  |}>,
+  allowNoOutputs: boolean,
+  metadata: RustModule.WalletV4.TransactionMetadata | void,
+  oneExtraInput: boolean,
+): V4UnsignedTxUtxoResponse {
   /**
    * Shelley supports transactions with no outputs by simply burning any leftover ADA as fee
    * This is can happen in the following:
@@ -519,8 +583,13 @@ export function newAdaUnsignedTxFromUtxo(
     // recall: we might have some implicit input to start with from deposit refunds
     const implicitSum = txBuilder.get_implicit_input();
 
+    // this flag is set when one extra input is added
+    let oneExtraAdded = false;
     // add utxos until we have enough to send the transaction
     for (const utxo of utxos) {
+      if (oneExtraAdded) {
+        break;
+      }
       const currentInputSum = txBuilder.get_explicit_input().checked_add(implicitSum);
       const output = targetOutput
         .checked_add(RustModule.WalletV4.Value.new(txBuilder.min_fee()));
@@ -550,16 +619,24 @@ export function newAdaUnsignedTxFromUtxo(
           (remainingAssets == null || remainingAssets.len() === 0) &&
           usedUtxos.length > 0
         ) {
-          break;
+          if (oneExtraInput) {
+            // We've added all the assets we need, but we add one extra.
+            // Set the flag so that the adding loop stops after this extra one is added.
+            oneExtraAdded = true;
+          } else {
+            break;
+          }
         }
       }
 
       const added = addUtxoInput(
         txBuilder,
-        {
-          value: remainingNeeded,
-          hasInput: usedUtxos.length > 0,
-        },
+        oneExtraAdded ?
+          undefined : // avoid 'NO_NEED'
+          {
+            value: remainingNeeded,
+           hasInput: usedUtxos.length > 0,
+          },
         utxo,
         true,
         { networkId: protocolParams.networkId },
