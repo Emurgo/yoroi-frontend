@@ -35,8 +35,11 @@ import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashC
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 import classnames from 'classnames';
+import { mintedTokenInfo } from '../../../../chrome/extension/ergo-connector/utils';
+import type { Tx } from '../../../../chrome/extension/ergo-connector/types';
 
 type Props = {|
+  +tx: Tx,
   +txData: ISignRequest<any>,
   +onCopyAddressTooltip: (string, string) => void,
   +onCancel: () => void,
@@ -122,10 +125,21 @@ class SignTxPage extends Component<Props> {
     return undefined;
   }
 
+  // Tokens can be minted inside the transaction so we have to look it up there first
+  _resolveTokenInfo: TokenEntry => $ReadOnly<TokenRow> = tokenEntry => {
+    const { tx } = this.props;
+    const mintedTokens = mintedTokenInfo(tx);
+    const mintedToken = mintedTokens.find(t => tokenEntry.identifier === t.Identifier);
+    if (mintedToken != null) {
+      return mintedToken;
+    }
+    return this.props.getTokenInfo(tokenEntry);
+  }
+
   renderAmountDisplay: {|
     entry: TokenEntry,
   |} => Node = (request) => {
-    const tokenInfo = this.props.getTokenInfo(request.entry);
+    const tokenInfo = this._resolveTokenInfo(request.entry);
     const shiftedAmount = request.entry.amount
       .shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
 

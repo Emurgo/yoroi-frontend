@@ -8,6 +8,7 @@ import { ROUTES } from '../../routes-config';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
+import { ComplexityLevels } from '../../types/complexityLevelType';
 
 export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap> {
   @observable __selectedNetwork: void | $ReadOnly<NetworkRow> = undefined;
@@ -48,7 +49,7 @@ export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap
         if (this.stores.app.currentRoute === route) {
           return;
         }
-        this.actions.router.goToRoute.trigger({ route });
+        this.actions.profile.selectComplexityLevel.trigger(ComplexityLevels.Simple);
       },
     },
     {

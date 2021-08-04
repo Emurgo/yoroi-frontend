@@ -42,7 +42,7 @@ const messages = defineMessages({
   },
   trezorTRequirement: {
     id: 'wallet.voting.trezorTRequirement',
-    defaultMessage: '!!!<a target="_blank" rel="noopener noreferrer" href="https://wiki.trezor.io/User_manual:Updating_the_Trezor_device_firmware">Update</a> your Trezor Model T firmware version to ?.?.? or above.',
+    defaultMessage: '!!!<a target="_blank" rel="noopener noreferrer" href="https://wiki.trezor.io/User_manual:Updating_the_Trezor_device_firmware">Update</a> your Trezor Model T firmware version to 2.4.1 or above.',
   },
   ledgerNanoRequirement: {
     id: 'wallet.voting.ledgerNanoRequirement',

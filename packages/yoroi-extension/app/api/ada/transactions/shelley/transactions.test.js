@@ -634,6 +634,59 @@ describe('Create unsigned TX from UTXO', () => {
     // one of the inputs skipped to keep <= u64
     expect(result.senderUtxos.length).toEqual(1);
   });
+
+  it('Should optimize away coin burn by using one extra input', () => {
+    const utxos = [
+      {
+        amount: '10831727',
+        receiver: '82d818582183581ce3a1faa5b54bd1485a424d8f9b5e75296b328a2a624ef1d2f4c7b480a0001a88e5cdab',
+        tx_hash: '05ec4a4a7f4645fa66886cef2e34706907a3a7f9d88e0d48b313ad2cdf76fb5f',
+        tx_index: 0,
+        utxo_id: '05ec4a4a7f4645fa66886cef2e34706907a3a7f9d88e0d48b313ad2cdf76fb5f0',
+        assets: []
+      },
+      {
+        amount: '1000000',
+        receiver: '82d818582183581ce3a1faa5b54bd1485a424d8f9b5e75296b328a2a624ef1d2f4c7b480a0001a88e5cdab',
+        tx_hash: '6930f123df83e4178b0324ae617b2028c0b38c6ff4660583a2abf1f7b08195fe',
+        tx_index: 0,
+        utxo_id: '6930f123df83e4178b0324ae617b2028c0b38c6ff4660583a2abf1f7b08195fe0',
+        assets: []
+      },
+    ];
+    const sampleAdaAddresses = genSampleAdaAddresses();
+    const output = new MultiToken(
+      [{
+        amount: new BigNumber(10000000),
+        identifier: defaultIdentifier,
+        networkId: network.NetworkId,
+      }],
+      {
+        defaultIdentifier,
+        defaultNetworkId: network.NetworkId,
+      }
+    );
+
+    const result = newAdaUnsignedTxFromUtxo(
+      [{
+        address: byronAddrToHex('Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4'),
+        amount: output,
+      }],
+      sampleAdaAddresses[0],
+      utxos,
+      new BigNumber(0),
+      {
+        ...getProtocolParams(),
+        minimumUtxoVal: RustModule.WalletV4.BigNum.from_str('1000000'),
+      },
+      [],
+      [],
+      true,
+    );
+
+    expect(result.senderUtxos.length).toEqual(2);
+    expect(result.txBuilder.get_fee_if_set()?.to_str()).toEqual('1170');
+  });
 });
 
 describe('Create unsigned TX from addresses', () => {

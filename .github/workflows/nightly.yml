@@ -19,10 +19,29 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: '${{ steps.nvm.outputs.NVMRC }}'
-      - run: cd packages/yoroi-extension
-      - run: npm install
+      - name: Cache node modules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-yoroi-extension-node-modules
+        with:
+          # https://github.com/actions/cache/blob/main/examples.md#node---npm
+          # It is recommended to cache the NPM cache (~/.npm) instead of node_modules.
+          # But we put node version into the cache key and cache node_modules.
+          path: packages/yoroi-extension/node_modules
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-node-${{ steps.nvm.outputs.NVMRC }}-${{ hashFiles('packages/yoroi-extension/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
+      - name: npm install
+        run: |
+          cd packages/yoroi-extension
+          npm install
       - name: Build
-        run: npm run prod:nightly
+        run: |
+          cd packages/yoroi-extension
+          npm run prod:nightly
         env:
           YOROI_NIGHTLY_PEM: ${{ secrets.YOROI_NIGHTLY_PEM }}
       - name: publish nightly
@@ -31,7 +50,7 @@ jobs:
           # ID of the extension that you are updating
           extension: poonlenmfdfbjfeeballhiibknlknepo
           # Path to a .zip of your addon
-          zip: "Yoroi Nightly.zip"
+          zip: "packages/yoroi-extension/Yoroi Nightly.zip"
           # TODO: only share with trusted testers for now
           publishTarget: trustedTesters
           # Google OAuth2

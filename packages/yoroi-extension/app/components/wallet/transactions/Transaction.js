@@ -84,6 +84,22 @@ const messages = defineMessages({
     id: 'wallet.transaction.type.multiparty',
     defaultMessage: '!!!{currency} multiparty transaction',
   },
+  rewardWithdrawn: {
+    id: 'wallet.transaction.type.rewardWithdrawn',
+    defaultMessage: '!!!Reward withdrawn',
+  },
+  catalystVotingRegistered: {
+    id: 'wallet.transaction.type.catalystVotingRegistered',
+    defaultMessage: '!!!Catalyst voting registered',
+  },
+  stakeDelegated: {
+    id: 'wallet.transaction.type.stakeDelegated',
+    defaultMessage: '!!!Stake delegated',
+  },
+  stakeKeyRegistered: {
+    id: 'wallet.transaction.type.stakeKeyRegistered',
+    defaultMessage: '!!!Staking key registered',
+  },
   fromAddress: {
     id: 'wallet.transaction.address.from',
     defaultMessage: '!!!From address',
@@ -228,8 +244,9 @@ export default class Transaction extends Component<Props, State> {
   getTxTypeMsg(
     intl: $npm$ReactIntl$IntlFormat,
     currency: string,
-    type: TransactionDirectionType
+    data: WalletTransaction,
   ): string {
+    const { type } = data;
     if (type === transactionTypes.EXPEND) {
       return intl.formatMessage(messages.sent, { currency });
     }
@@ -237,6 +254,42 @@ export default class Transaction extends Component<Props, State> {
       return intl.formatMessage(messages.received, { currency });
     }
     if (type === transactionTypes.SELF) {
+      if (data instanceof CardanoShelleyTransaction) {
+        const features = data.getFeatures();
+        if (
+          (
+            features.includes('Withdrawal') && features.length === 1
+          ) || (
+            features.includes('Withdrawal')
+            && features.includes('StakeDeregistration')
+            && features.length === 2
+          )
+        ) {
+          return intl.formatMessage(messages.rewardWithdrawn);
+        }
+        if (
+          features.includes('CatalystVotingRegistration')
+          && features.length === 1
+        ) {
+          return intl.formatMessage(messages.catalystVotingRegistered);
+        }
+        if (
+          (
+            features.includes('StakeDelegation') && features.length === 1
+          ) || (
+            features.includes('StakeDelegation')
+            && features.includes('StakeRegistration')
+            && features.length === 2
+          )
+        ) {
+          return intl.formatMessage(messages.stakeDelegated);
+        }
+        if (
+          (features.includes('StakeRegistration') && features.length === 1)
+        ) {
+          return intl.formatMessage(messages.stakeKeyRegistered);
+        }
+      }
       return intl.formatMessage(messages.intrawallet, { currency });
     }
     if (type === transactionTypes.MULTI) {
@@ -379,6 +432,52 @@ export default class Transaction extends Component<Props, State> {
     return undefined;
   }
 
+  renderAssets: {|
+    assets: Array<TokenEntry>,
+  |} => Node = (request) => {
+    if (request.assets.length === 0) {
+      return null;
+    }
+    if (request.assets.length === 1) {
+      const entry = request.assets[0];
+      return (
+        <div className={classnames([styles.asset])}>
+          {this.renderAmountDisplay({ entry })}
+          {' '}
+          {this.getTicker(entry)}
+        </div>
+      );
+    }
+    // request.assets.length > 1
+
+    // display sign only if all amounts are either the same sign or zero
+    let sign = undefined;
+    for (const entry of request.assets) {
+      if (entry.amount.isPositive()) {
+        if (sign === '-') {
+          sign = null;
+          break;
+        }
+        sign = '+';
+      } else if (entry.amount.isNegative()) {
+        if (sign === '+') {
+          sign = null;
+          break;
+        }
+        sign = '-';
+      }
+    }
+
+    return (
+      <div className={classnames([styles.asset])}>
+        {sign}
+        {request.assets.length}
+        {' '}
+        {this.context.intl.formatMessage(globalMessages.assets)}
+      </div>
+    );
+  }
+
   renderRow: {|
     kind: string,
     data: WalletTransaction,
@@ -515,7 +614,7 @@ export default class Transaction extends Component<Props, State> {
                 {this.getTxTypeMsg(
                   intl,
                   this.getTicker(data.amount.getDefaultEntry()),
-                  data.type
+                  data,
                 )}
               </div>
               {state === TxStatusCodes.IN_BLOCK ? (
@@ -531,10 +630,15 @@ export default class Transaction extends Component<Props, State> {
                   type: data.type,
                 })}
               </div>
-              <div className={classnames([styles.currency, styles.amount])}>
-                {this.renderAmountDisplay({
-                  entry: data.amount.getDefaultEntry(),
-                })}
+              <div className={classnames([styles.amount])}>
+                <div className={classnames([styles.currency])}>
+                  {this.renderAmountDisplay({
+                    entry: data.amount.getDefaultEntry(),
+                  })}
+                  {' '}
+                  {this.getTicker(data.amount.getDefaultEntry())}
+                </div>
+                {this.renderAssets({ assets: data.amount.nonDefaultEntries() })}
               </div>
             </div>
             <div className={styles.expandArrowBox}>

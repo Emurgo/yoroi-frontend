@@ -20,6 +20,37 @@ export function asAddress(input: any): Address {
   throw ConnectorError.invalidRequest(`invalid Address: ${JSON.stringify(input)}`);
 }
 
+export function asBoxCandidate(
+  input: any,
+  // wasmInstance: typeof RustModule.SigmaRust
+): ErgoBoxCandidateJson {
+  try {
+    if (typeof input === 'object' &&
+        Array.isArray(input?.assets) &&
+        typeof input.additionalRegisters === 'object' &&
+        typeof input.creationHeight === 'number') {
+      const registers = Object.entries(input.additionalRegisters).map(([k, v]) => {
+        if (typeof k === 'string' && k.match(/^R[4-9]$/) != null) {
+          if (typeof v === 'string') {
+            return [k, v];
+          }
+        }
+        throw ConnectorError.invalidRequest(`additionalRegisters: Must be strings of the form "R4" to "R9": : ${JSON.stringify(input)}`);
+      });
+      return {
+        value: asValue(input.value),
+        ergoTree: asErgoTree(input.ergoTree),
+        assets: input.assets.map(asTokenAmount),
+        additionalRegisters: Object.fromEntries(registers),
+        creationHeight: input.creationHeight
+      };
+    }
+  } catch (err) {
+    throw ConnectorError.invalidRequest(`Box invalid structure: ${JSON.stringify(input)} due to ${err}`);
+  }
+  throw ConnectorError.invalidRequest(`Box invalid structure: ${JSON.stringify(input)}`);
+}
+
 export function asBox(
   input: any,
   wasmInstance: typeof RustModule.SigmaRust
@@ -145,11 +176,11 @@ export function asSignedInput(input: any): SignedInput {
 export type UnsignedInput = {|
   extension: ErgoContextExtension,
   boxId: ErgoBoxId,
-  value: number | string,
+  value: string,
   ergoTree: string,
   assets: Array<{|
     tokenId: string, // hex
-    amount: number | string,
+    amount: string,
   |}>,
   creationHeight: number,
   additionalRegisters: {| [key: string]: string |},
@@ -254,10 +285,9 @@ export function asTokenId(input: any): TokenId {
 }
 
 export type Tx = {|
-  id: TxId,
   inputs: UnsignedInput[],
   dataInputs: DataInput[],
-  outputs: ErgoBoxJson[],
+  outputs: ErgoBoxCandidateJson[],
 |};
 
 export function asTx(
@@ -270,10 +300,9 @@ export function asTx(
         Array.isArray(tx.dataInputs) &&
         Array.isArray(tx.outputs)) {
       return {
-        id: asTxId(tx.id),
         inputs: tx.inputs.map(input => asUnsignedInput(input, wasmInstance)),
         dataInputs: tx.dataInputs.map(asDataInput),
-        outputs: tx.outputs.map(output => asBox(output, wasmInstance)),
+        outputs: tx.outputs.map(output => asBoxCandidate(output /* , wasmInstance */)),
       };
     }
   } catch (err) {
@@ -291,13 +320,13 @@ export function asTxId(input: any): TxId {
   throw new Error(`invalid TxId, must be string: ${JSON.stringify(input)}`);
 }
 
-export type Value = number | string;
+export type Value = string;
 
 export function asValue(input: any): Value {
-  if (typeof input === 'number' || typeof input === 'string') {
+  if (typeof input === 'string') {
     return input;
   }
-  throw ConnectorError.invalidRequest(`Value must be a string or number: : ${JSON.stringify(input)}`);
+  throw ConnectorError.invalidRequest(`Value must be a string: : ${JSON.stringify(input)}`);
 }
 
 // Errors (Exposed to dApps):
