@@ -109,7 +109,8 @@ export default class VotingPage extends Component<Props> {
       const isEarly = new Date() <= roundInfo.startDate;
       if (
         selected.getParent().getNetworkInfo().NetworkId === networks.CardanoMainnet.NetworkId &&
-        (isEarly || isLate)
+        (isEarly || isLate) &&
+        !(document.location.hash.includes('ignore-date'))
       ) {
         return (
           <RegistrationOver roundNumber={
