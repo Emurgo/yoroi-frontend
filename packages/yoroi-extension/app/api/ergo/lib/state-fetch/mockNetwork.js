@@ -318,7 +318,7 @@ export function genUtxoForAddresses(
             tx_hash: tx.hash,
             tx_index: j,
             receiver: tx.outputs[j].address,
-            amount: tx.outputs[j].value.toString(),
+            amount: tx.outputs[j].value,
             creationHeight: tx.outputs[j].creationHeight,
             boxId: tx.outputs[j].id,
             assets: tx.outputs[j].assets,
