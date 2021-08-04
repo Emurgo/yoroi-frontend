@@ -3,37 +3,22 @@
 // Handles creating transactions
 
 import BigNumber from 'bignumber.js';
-import type {
-  ErgoUnsignedTxUtxoResponse,
-  ErgoUnsignedTxAddressedUtxoResponse,
-  ErgoAddressedUtxo,
-} from './types';
-import type {
-  RemoteUnspentOutput,
-  SignedRequest,
-} from '../state-fetch/types';
-import type {
-  BackendNetworkInfo,
-} from '../../../common/lib/state-fetch/types';
-import {
-  NotEnoughMoneyToSendError,
-} from '../../../common/errors';
+import type { ErgoAddressedUtxo, ErgoUnsignedTxAddressedUtxoResponse, ErgoUnsignedTxUtxoResponse, } from './types';
+import type { RemoteUnspentOutput, SignedRequest, } from '../state-fetch/types';
+import type { BackendNetworkInfo, } from '../../../common/lib/state-fetch/types';
+import { NotEnoughMoneyToSendError, } from '../../../common/errors';
 
-import {
-  Bip44DerivationLevels,
-} from '../../../ada/lib/storage/database/walletTypes/bip44/api/utils';
-import type {
-  Address, Addressing, Value,
-} from '../../../ada/lib/storage/models/PublicDeriver/interfaces';
+import { Bip44DerivationLevels, } from '../../../ada/lib/storage/database/walletTypes/bip44/api/utils';
+import type { Address, Addressing, Value, } from '../../../ada/lib/storage/models/PublicDeriver/interfaces';
 import { BIP32PrivateKey } from '../../../common/lib/crypto/keys/keyRepository';
 import { deriveByAddressing } from '../../../common/lib/crypto/keys/utils';
 import { ErgoTxSignRequest } from './ErgoTxSignRequest';
 import { RustModule } from '../../../ada/lib/cardanoCrypto/rustLoader';
 import { PRIMARY_ASSET_CONSTANTS } from '../../../ada/lib/storage/database/primitives/enums';
-import {
-  MultiToken,
-} from '../../../common/lib/MultiToken';
+import { MultiToken, } from '../../../common/lib/MultiToken';
 import { toErgoBoxJSON } from './utils';
+
+const SIGMA_CONSTANT_ADDRESS_PK_MATCHER_REG = new RegExp(/^08cd([0-9a-fA-F]+)$/);
 
 type TxOutput = {|
   ...Address,
@@ -483,36 +468,60 @@ export function signTransaction(request: {|
   };
 }
 
+export function generateKey(request: {|
+  +addressing: Addressing,
+  +keyLevel: number,
+  +signingKey: BIP32PrivateKey
+|}): RustModule.SigmaRust.SecretKey {
+  const { addressing: { addressing }, keyLevel, signingKey } = request;
+  const lastLevelSpecified = addressing.startLevel + addressing.path.length - 1;
+  if (lastLevelSpecified !== Bip44DerivationLevels.ADDRESS.level) {
+    throw new Error(`${nameof(generateKeys)} incorrect addressing size`);
+  }
+  const key = deriveByAddressing({
+    addressing,
+    startingFrom: {
+      level: keyLevel,
+      key: signingKey,
+    }
+  });
+  const privateKey = key.key.privateKey;
+  if (privateKey == null) {
+    throw new Error(`${nameof(generateKeys)} private key not found (should never happen)`);
+  }
+  return RustModule.SigmaRust.SecretKey.dlog_from_bytes(
+    privateKey
+  );
+}
+
 export function generateKeys(request: {|
   senderUtxos: $ReadOnlyArray<ErgoAddressedUtxo>,
   keyLevel: number,
   signingKey: BIP32PrivateKey
 |}): RustModule.SigmaRust.SecretKeys {
+  const { keyLevel, signingKey } = request;
   const secretKeys = new RustModule.SigmaRust.SecretKeys();
-
   for (const utxo of request.senderUtxos) {
-    const lastLevelSpecified = utxo.addressing.startLevel + utxo.addressing.path.length - 1;
-    if (lastLevelSpecified !== Bip44DerivationLevels.ADDRESS.level) {
-      throw new Error(`${nameof(generateKeys)} incorrect addressing size`);
-    }
-    const key = deriveByAddressing({
-      addressing: utxo.addressing,
-      startingFrom: {
-        level: request.keyLevel,
-        key: request.signingKey,
-      }
-    });
-    const privateKey = key.key.privateKey;
-    if (privateKey == null) {
-      throw new Error(`${nameof(generateKeys)} private key not found (should never happen)`);
-    }
-
-    const wasmKey = RustModule.SigmaRust.SecretKey.dlog_from_bytes(
-      privateKey
-    );
     // recall: duplicates are fine
-    secretKeys.add(wasmKey);
+    secretKeys.add(generateKey({ addressing: utxo, keyLevel, signingKey }));
   }
-
   return secretKeys;
+}
+
+function extractWalletPkFromHexConstant(hexConstant: string): ?string {
+  const matched = SIGMA_CONSTANT_ADDRESS_PK_MATCHER_REG.exec(hexConstant);
+  return matched ? matched[1] : null;
+}
+
+export function extractP2sKeyFromErgoTree(ergoTree: string): ?string {
+  const tree = RustModule.SigmaRust.ErgoTree.from_base16_bytes(ergoTree);
+  const constantsLen = tree.constants_len();
+  for (let i = 0; i < constantsLen; i++) {
+    const hex = tree.get_constant(i).encode_to_base16();
+    const walletPk: ?string = extractWalletPkFromHexConstant(hex);
+    if (walletPk) {
+      return walletPk;
+    }
+  }
+  return null;
 }

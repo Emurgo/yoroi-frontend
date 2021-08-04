@@ -13,7 +13,6 @@ import { handleExternalLinkClick } from '../../../utils/routing';
 import {
   WalletTypeOption,
 } from '../../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
-import UnsupportedWallet from '../UnsupportedWallet';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 import LoadingSpinner from '../../../components/widgets/LoadingSpinner';
 import VerticallyCenteredLayout from '../../../components/layout/VerticallyCenteredLayout';
@@ -95,10 +94,6 @@ export default class VotingPage extends Component<Props> {
       throw new Error(`${nameof(VotingPage)} no wallet selected`);
     }
 
-    if (isTrezorTWallet(selected.getParent())) {
-      return <UnsupportedWallet />;
-    }
-
     const balance = this.generated.balance;
     if (balance == null) {
       return (
@@ -114,7 +109,8 @@ export default class VotingPage extends Component<Props> {
       const isEarly = new Date() <= roundInfo.startDate;
       if (
         selected.getParent().getNetworkInfo().NetworkId === networks.CardanoMainnet.NetworkId &&
-        (isEarly || isLate)
+        (isEarly || isLate) &&
+        !(document.location.hash.includes('ignore-date'))
       ) {
         return (
           <RegistrationOver roundNumber={

@@ -107,11 +107,16 @@ import { hasSendAllDefault, builtSendTokenList } from '../common/index';
 import { getReceiveAddress } from '../../stores/stateless/addressStores';
 
 export function fixUtxoToStringValues<T>(utxo: T): T {
-  // $FlowFixMe[incompatible-use]
-  utxo.value = String(utxo.value);
+  // $FlowFixMe[incompatible-type]
+  if (utxo.value != null) {
+    // $FlowFixMe[incompatible-use]
+    utxo.value = String(utxo.value);
+  }
   // $FlowFixMe[incompatible-use]
   utxo.assets?.forEach(a => {
-    a.amount = String(a.amount);
+    if (a.amount != null) {
+      a.amount = String(a.amount);
+    }
   });
   return utxo;
 }

@@ -103,34 +103,31 @@ export async function createTrezorSignTxPayload(
       )
     };
 
-  const metadata = signRequest.metadata;
-  request = metadata === undefined
-    ? request
-    : {
-      ...request,
-      metadata: Buffer.from(metadata.to_bytes()).toString('hex')
-    };
-
   if (signRequest.trezorTCatalystRegistrationTxSignData) {
     const { votingPublicKey, nonce } = signRequest.trezorTCatalystRegistrationTxSignData;
     request = {
       ...request,
       auxiliaryData: {
         catalystRegistrationParameters: {
-          votingPublicKey,
+          votingPublicKey: votingPublicKey.replace(/^0x/, ''),
           stakingPath: getStakingKeyPath(),
           rewardAddressParameters: {
             addressType: ADDRESS_TYPE.Reward,
-            stakingPath: getStakingKeyPath(),
+            path: getStakingKeyPath(),
           },
-          nonce,
+          nonce: String(nonce),
         },
       }
     };
+  } else {
+    const metadata = signRequest.metadata;
+    request = metadata === undefined
+      ? request
+      : {
+        ...request,
+        auxiliaryData: { blob: Buffer.from(metadata.to_bytes()).toString('hex') }
+      };
   }
-  // trezor-connect v8.1.26 doesn't support auxiliaryData. When it does, we
-  // can remove the next line:
-  // $FlowFixMe[prop-missing]
   return request;
 }
 
