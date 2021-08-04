@@ -380,11 +380,12 @@ export default class WalletSendForm extends Component<Props> {
     })();
 
     
+    const tokenId = this.props.selectedToken?.TokenId ?? this.props.getTokenInfo({
+      identifier: this.props.defaultToken.Identifier,
+      networkId: this.props.defaultToken.NetworkId,
+    }).TokenId
+
     const sendAmountOptions = (() => {
-      const tokenId = this.props.selectedToken?.TokenId ?? this.props.getTokenInfo({
-        identifier: this.props.defaultToken.Identifier,
-        networkId: this.props.defaultToken.NetworkId,
-      }).TokenId
       return [
         { id: 'custom-amount', label: intl.formatMessage(messages.customAmount), value: CUSTOM_AMOUNT },
         ...tokenOptions.filter(t => t.value === tokenId).map(token => {
@@ -403,7 +404,13 @@ export default class WalletSendForm extends Component<Props> {
         })
       ]
     })()
-
+    const tokenListClasses = classnames([
+      styles.tokenList,
+      {
+        [styles.show]: this.props.shouldSendAll && 
+           this.form.$('selectedAmount').value === tokenId
+      }
+    ])
     return (
       <div className={styles.component}>
 
@@ -485,6 +492,9 @@ export default class WalletSendForm extends Component<Props> {
             {...form.$('selectedAmount').bind()}
             onChange={value => {
               this.form.$('selectedAmount').value = value
+              if(value === CUSTOM_AMOUNT){
+                this.form.$('amount').clear();
+              }
               if(value === CUSTOM_AMOUNT && this.props.shouldSendAll) {
                 this.props.toggleSendAll();
               } else if (value !== CUSTOM_AMOUNT) {
@@ -509,6 +519,15 @@ export default class WalletSendForm extends Component<Props> {
               />
             )}
           />
+
+          <div className={tokenListClasses}>
+            <h1>Will Send All of tokens!</h1>
+            { tokenOptions.map(token => (
+              <p key={token.id} className= "accordion-item__paragraph" >
+              {token.amount} {' '} {token.label}
+              </p>
+              ))}
+          </div>
 
           {showMemo ? (
             <div className={styles.memoInput}>
