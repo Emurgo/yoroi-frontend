@@ -182,17 +182,15 @@ When(/^I select token "([^"]*)"$/, async function (tokenName) {
   }
 });
 
-When(/^I open the amount selection dropdown$/, async function () {
-  await this.click('.WalletSendForm_component  >  div > div:nth-child(4) .SimpleInput_input')
+When(/^I open the amount dropdown and select send all$/, async function () {
+  await this.driver.executeScript(
+    `const dropdownInput = document.querySelector('input[value="Custom Amount"]').click;
+    const tokenList = document.querySelectorAll('.TokenOptionRow_item_name');
+    for(let token of tokenList){
+      if(token.innerHTML.startsWith('Send all')){
+        token.click()
+         }
+     }
+`,
+  );
 });
-
-When(/^I select send all$/, async function () {
-  const tokenRows = await this.getElementsBy('.TokenOptionRow_item_name');
-  for (const row of tokenRows) {
-    const name = await row.getText();
-    if (name.startsWith('Send all')) {
-      await row.click();
-    }
-  }
-});
-
