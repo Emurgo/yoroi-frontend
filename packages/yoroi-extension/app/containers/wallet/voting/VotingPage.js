@@ -38,11 +38,11 @@ type Props = {|
 |};
 
 export const messages: * = defineMessages({
-  title: {
+  mainTitle: {
     id: 'wallet.registrationOver.title',
     defaultMessage: '!!!Registration has ended',
   },
-  subtitle: {
+  mainSubtitle: {
     id: 'wallet.registrationOver.subtitle',
     defaultMessage: '!!!Registration for fund {roundNumber} is over. Open the Catalyst app for more information',
   },
@@ -54,6 +54,10 @@ export const messages: * = defineMessages({
     id: 'wallet.registrationOver.unavailableSubTitle',
     defaultMessage: '!!!Please check the Catalyst app for more info',
   },
+  earlyForRegistrationSubTitle: {
+    id: 'wallet.registrationOver.earlyForRegistrationSubTitle',
+    defaultMessage: '!!!Round {roundNumber} registration starts at {registrationStart}'
+  }
 });
 
 @observer
@@ -122,67 +126,70 @@ export default class VotingPage extends Component<Props> {
       );
     }
     // keep enabled on the testnet
-    const catalystRoundInfo = this.generated.stores.substores.ada.votingStore.catalystRoundInfo
+    const catalystRoundInfo = this.generated.stores.substores.ada.votingStore.catalystRoundInfo;
     if (!environment.isTest()) {
       if (!catalystRoundInfo || (!catalystRoundInfo.currentFund && !catalystRoundInfo.nextFund)){
         return (
-          <RegistrationOver 
-          title={intl.formatMessage(messages.unavailableTitle)} 
-          subtitle={intl.formatMessage(messages.unavailableSubtitle)}
+          <RegistrationOver
+            title={intl.formatMessage(messages.unavailableTitle)}
+            subtitle={intl.formatMessage(messages.unavailableSubtitle)}
           />
           )
         }
-        const { currentFund, nextFund } = catalystRoundInfo
+        const { currentFund, nextFund } = catalystRoundInfo;
         if(currentFund) {
           const isLate = new Date() >= new Date(Date.parse(currentFund.registrationEnd))
           const isEarly = new Date() <= new Date(Date.parse(currentFund.registrationStart))
           const isBeforeVoting = new Date() <= new Date(Date.parse(currentFund.votingStart))
           const isAfterVoting = new Date() >= new Date(Date.parse(currentFund.votingEnd))
-          const isBetweenVoting = !isBeforeVoting && !isAfterVoting
-          
+          const isBetweenVoting = !isBeforeVoting && !isAfterVoting;
+
           if(isEarly) {
             return (
               <RegistrationOver
-              title={intl.formatMessage(messages.title)}
-              subtitle={`'round {currentFund.id} registration starts at {registrationStart}'`}
+                title={intl.formatMessage(messages.mainTitle)}
+                subtitle={intl.formatMessage(messages.earlyForRegistrationSubTitle, {
+                  roundNumber: currentFund.id,
+                  registrationStart: currentFund.registrationStart
+                })}
               />
               )
             }
-            
+
             // registeration is ended -> check for voting start and end dates
             if (isLate) {
               if (isBeforeVoting) {
                 return (
                   <RegistrationOver
-                  title={intl.formatMessage(messages.title)}
-                  subtitle={`Registration has ended. Voting starts at ${currentFund.votingStart}`}
+                    title={intl.formatMessage(messages.mainTitle)}
+                    subtitle={`Registration has ended. Voting starts at ${currentFund.votingStart}`}
                   />
                   )
                 }
-                
+
                 if (isBetweenVoting) {
                   return (
                     <RegistrationOver
-                    title={intl.formatMessage(messages.title)}
-                    subtitle={`Registration has ended.  Voting ends at  ${currentFund.votingEnd}`}
+                      title={intl.formatMessage(messages.mainSubtitle)}
+                      subtitle={`Registration has ended.  Voting ends at  ${currentFund.votingEnd}`}
                     />
                     )
                 }
 
                 if (isAfterVoting) {
-                  /* if we after the voting date (= between funds) and no next funds 
-                  will dispaly "round is over" */ 
-                  let subtitle = intl.formatMessage(messages.subtitle, {
+                  /* if we after the voting date (= between funds) and no next funds
+                  will dispaly "round is over" */
+                  let subtitle = intl.formatMessage(messages.mainSubtitle, {
                     roundNumber: currentFund.id
                   })
                   // Check for the next funds if we are after voting
                   if(nextFund) {
-                    subtitle = `Round ${nextFund.id} starts at ${nextFund.registrationStart}` 
+                    subtitle = `Round ${nextFund.id} starts at ${nextFund.registrationStart}`
                   }
                   return (
                     <RegistrationOver
-                    title={intl.formatMessage(messages.title)}
-                    subtitle={subtitle}
+                      title={intl.formatMessage(messages.mainTitle)}
+                      subtitle={subtitle}
                     />
                   )
                 }
@@ -190,14 +197,14 @@ export default class VotingPage extends Component<Props> {
               // No current funds -> check for next funds
               return (
                 <RegistrationOver
-                title={intl.formatMessage(messages.title)}
-                subtitle={`Round ${nextFund.id} starts at ${nextFund.registrationStart}`}
+                  title={intl.formatMessage(messages.mainTitle)}
+                  subtitle={`Round ${nextFund.id} starts at ${nextFund.registrationStart}`}
                 />
                 )
             }
         }
     }
-                  
+
     // disable the minimum on E2E tests
     if (!environment.isTest() && balance.getDefaultEntry().amount.lt(CATALYST_MIN_AMOUNT)) {
       const getTokenInfo = genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo);
@@ -238,8 +245,8 @@ export default class VotingPage extends Component<Props> {
         />
       );
     }
-    /* 
-    At this point we are sure that we have current funds 
+    /*
+    At this point we are sure that we have current funds
     I added the "5" for two reasons
     1. As a placeholder as the component will not be rendered without it.
     2. this page you can see it in test environment even if you
@@ -247,7 +254,7 @@ export default class VotingPage extends Component<Props> {
     */
     const round = catalystRoundInfo?.currentFund?.id || catalystRoundInfo?.nextFund?.id || 5
     return (
-      // 
+      //
       <div>
         {activeDialog}
         <Voting
