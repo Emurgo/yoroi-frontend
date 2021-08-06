@@ -56,6 +56,10 @@ export const messages: * = defineMessages({
   earlyForRegistrationSubTitle: {
     id: 'wallet.registrationOver.earlyForRegistrationSubTitle',
     defaultMessage: '!!!Round {roundNumber} registration starts at {registrationStart}'
+  },
+  beforeVotingSubtitle: {
+    id: 'wallet.registrationOver.beforeVotingSubtitle',
+    defaultMessage: '!!!Registration has ended. Voting starts at ${votingStart}'
   }
 });
 
@@ -157,7 +161,7 @@ export default class VotingPage extends Component<Props> {
                 return (
                   <RegistrationOver
                     title={intl.formatMessage(messages.mainTitle)}
-                    subtitle={`Registration has ended. Voting starts at ${currentFund.votingStart}`}
+                    subtitle={intl.formatMessage(messages.beforeVotingSubtitle)}
                   />
                   )
                 }
