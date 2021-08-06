@@ -23,7 +23,6 @@ import type { TokenInfoMap } from '../../../stores/toplevel/TokenInfoStore';
 import environment from '../../../environment';
 import { MultiToken } from '../../../api/common/lib/MultiToken';
 import RegistrationOver from './RegistrationOver';
-import { networks, } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import type { DelegationRequests } from '../../../stores/toplevel/DelegationStore';
 import {
   isLedgerNanoWallet,
@@ -38,11 +37,11 @@ type Props = {|
 
 export const messages: * = defineMessages({
   mainTitle: {
-    id: 'wallet.registrationOver.title',
+    id: 'wallet.registrationOver.mainTitle',
     defaultMessage: '!!!Registration has ended',
   },
   mainSubtitle: {
-    id: 'wallet.registrationOver.subtitle',
+    id: 'wallet.registrationOver.mainSubtitle',
     defaultMessage: '!!!Registration for fund {roundNumber} is over. Open the Catalyst app for more information',
   },
   unavailableTitle: {
@@ -50,8 +49,12 @@ export const messages: * = defineMessages({
     defaultMessage: '!!!Catalyst Round Info unavailable',
   },
   unavailableSubtitle: {
-    id: 'wallet.registrationOver.unavailableSubTitle',
+    id: 'wallet.registrationOver.unavailableSubtitle',
     defaultMessage: '!!!Please check the Catalyst app for more info',
+  },
+  earlyForRegistrationTitle: {
+    id: 'wallet.registrationOver.earlyForRegistrationTitle',
+    defaultMessage: '!!!Registration hasn\'t started yet'
   },
   earlyForRegistrationSubTitle: {
     id: 'wallet.registrationOver.earlyForRegistrationSubTitle',
@@ -59,7 +62,15 @@ export const messages: * = defineMessages({
   },
   beforeVotingSubtitle: {
     id: 'wallet.registrationOver.beforeVotingSubtitle',
-    defaultMessage: '!!!Registration has ended. Voting starts at ${votingStart}'
+    defaultMessage: '!!!Registration has ended. Voting starts at {votingStart}'
+  },
+  betweenVotingSubtitle: {
+    id: 'wallet.registrationOver.betweenVotingSubtitle',
+    defaultMessage: '!!!"Registration has ended.  Voting ends at  {votingEnd}'
+  },
+  nextFundRegistration: {
+    id: 'wallet.registrationOver.nextFundRegistration',
+    defaultMessage: 'Round {roundNumber} starts at {registrationStart}'
   }
 });
 
@@ -136,6 +147,11 @@ export default class VotingPage extends Component<Props> {
           )
         }
         const { currentFund, nextFund } = catalystRoundInfo;
+        const nextFundRegistrationSubtitle = intl.formatMessage(messages.nextFundRegistration, {
+          roundNumber: nextFund?.id,
+          registrationStart: nextFund?.registrationStart
+        })
+
         if(currentFund) {
           const isLate = new Date() >= new Date(Date.parse(currentFund.registrationEnd))
           const isEarly = new Date() <= new Date(Date.parse(currentFund.registrationStart))
@@ -146,7 +162,7 @@ export default class VotingPage extends Component<Props> {
           if(isEarly) {
             return (
               <RegistrationOver
-                title={intl.formatMessage(messages.mainTitle)}
+                title={intl.formatMessage(messages.earlyForRegistrationTitle)}
                 subtitle={intl.formatMessage(messages.earlyForRegistrationSubTitle, {
                   roundNumber: currentFund.id,
                   registrationStart: currentFund.registrationStart
@@ -156,12 +172,14 @@ export default class VotingPage extends Component<Props> {
             }
 
             // registeration is ended -> check for voting start and end dates
-            if (isLate) {
+            if (true || isLate) {
               if (isBeforeVoting) {
                 return (
                   <RegistrationOver
                     title={intl.formatMessage(messages.mainTitle)}
-                    subtitle={intl.formatMessage(messages.beforeVotingSubtitle)}
+                    subtitle={intl.formatMessage(messages.beforeVotingSubtitle, {
+                      votingStart: currentFund.votingStart
+                    })}
                   />
                   )
                 }
@@ -169,8 +187,10 @@ export default class VotingPage extends Component<Props> {
                 if (isBetweenVoting) {
                   return (
                     <RegistrationOver
-                      title={intl.formatMessage(messages.mainSubtitle)}
-                      subtitle={`Registration has ended.  Voting ends at  ${currentFund.votingEnd}`}
+                      title={intl.formatMessage(messages.mainTitle)}
+                      subtitle={intl.formatMessage(messages.betweenVotingSubtitle, {
+                        votingEnd: currentFund.votingEnd
+                      })}
                     />
                     )
                 }
@@ -183,7 +203,7 @@ export default class VotingPage extends Component<Props> {
                   })
                   // Check for the next funds if we are after voting
                   if(nextFund) {
-                    subtitle = `Round ${nextFund.id} starts at ${nextFund.registrationStart}`
+                    subtitle = nextFundRegistrationSubtitle
                   }
                   return (
                     <RegistrationOver
@@ -192,15 +212,15 @@ export default class VotingPage extends Component<Props> {
                     />
                   )
                 }
-            } else if (nextFund) {
-              // No current funds -> check for next funds
-              return (
-                <RegistrationOver
-                  title={intl.formatMessage(messages.mainTitle)}
-                  subtitle={`Round ${nextFund.id} starts at ${nextFund.registrationStart}`}
-                />
-                )
             }
+        } else if (nextFund) {
+          // No current funds -> check for next funds
+          return (
+            <RegistrationOver
+              title={intl.formatMessage(messages.mainTitle)}
+              subtitle={nextFundRegistrationSubtitle}
+            />
+            )
         }
     }
 
