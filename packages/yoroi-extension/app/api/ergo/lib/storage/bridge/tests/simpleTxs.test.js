@@ -70,7 +70,7 @@ const networkTransactions: void => Array<RemoteErgoTransaction> = () => [{
           7
         ]
       ).to_base58(),
-      value: 4000000,
+      value: '4000000',
       id: '33a35e15ae1a83fa188674a2bd53007b07e119a0eaaf40b890b2081c2864f12a',
       index: 0,
       outputIndex: 0,
@@ -96,7 +96,7 @@ const networkTransactions: void => Array<RemoteErgoTransaction> = () => [{
       );
       return {
         address: addr.to_base58(),
-        value: 2100000,
+        value: '2100000',
         additionalRegisters: Object.freeze({}),
         assets: [],
         creationHeight: 1,
@@ -122,7 +122,7 @@ const networkTransactions: void => Array<RemoteErgoTransaction> = () => [{
       );
       return {
         address: addr.to_base58(),
-        value: 1731391,
+        value: '1731391',
         additionalRegisters: Object.freeze({}),
         assets: [],
         creationHeight: 1,
@@ -157,7 +157,7 @@ const nextRegularSpend: void => RemoteErgoTransaction = () => ({
           4
         ]
       ).to_base58(),
-      value: 2100000,
+      value: '2100000',
       id: 'aca35e15ae1a83ff188674a2bd53007b07e119a0eaaf40b890b2081c2864f12a',
       index: 0,
       outputIndex: 0,
@@ -183,7 +183,7 @@ const nextRegularSpend: void => RemoteErgoTransaction = () => ({
       );
       return {
         address: addr.to_base58(),
-        value: 1100000,
+        value: '1100000',
         additionalRegisters: Object.freeze({}),
         assets: [],
         creationHeight: 1,
@@ -209,7 +209,7 @@ const nextRegularSpend: void => RemoteErgoTransaction = () => ({
       );
       return {
         address: addr.to_base58(),
-        value: 900000,
+        value: '900000',
         additionalRegisters: Object.freeze({}),
         assets: [],
         creationHeight: 1,

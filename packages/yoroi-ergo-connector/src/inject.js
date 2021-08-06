@@ -15,7 +15,7 @@ window.addEventListener("message", function(event) {
 function ergo_request_read_access() {
     return new Promise(function(resolve, reject) {
         window.postMessage({
-            type: "connector_connect_request",
+            type: "connector_connect_request/ergo",
         }, location.origin);
         connectRequests.push({ resolve: resolve, reject: reject });
     });
@@ -32,7 +32,7 @@ function ergo_check_read_access() {
 function cardano_request_read_access() {
     return new Promise(function(resolve, reject) {
         window.postMessage({
-            type: "yoroi_connect_request/cardano",
+            type: "connector_connect_request/cardano",
         }, location.origin);
         connectRequests.push({ resolve: resolve, reject: reject });
     });
@@ -158,6 +158,10 @@ class CardanoAPI {
         return this.initTimestamp
     }
 
+    get_balance(token_id = 'ADA') {
+        return this._cardano_rpc_call("get_balance", [token_id]);
+    }
+
     _cardano_rpc_call(func, params) {
         return new Promise(function(resolve, reject) {
             window.postMessage({
@@ -236,10 +240,10 @@ function createYoroiPort() {
     // events from Yoroi
     yoroiPort = chrome.runtime.connect(extensionId);
     yoroiPort.onMessage.addListener(message => {
-        alert("content script message: " + JSON.stringify(message));
-        if (message.type == "connector_rpc_response") {
+        // alert("content script message: " + JSON.stringify(message));
+        if (message.type === "connector_rpc_response") {
             window.postMessage(message, location.origin);
-        } else if (message.type == "yoroi_connect_response") {
+        } else if (message.type === "yoroi_connect_response/ergo") {
             if (message.success) {
                 if (!ergoApiInjected) {
                     // inject full API here
@@ -261,7 +265,7 @@ function createYoroiPort() {
                 type: "connector_connected",
                 success: message.success
             }, location.origin);
-        } else if (message.type == "yoroi_connect_response/cardano") {
+        } else if (message.type === "yoroi_connect_response/cardano") {
             if (message.success) {
                 if (!cardanoApiInjected) {
                     // inject full API here

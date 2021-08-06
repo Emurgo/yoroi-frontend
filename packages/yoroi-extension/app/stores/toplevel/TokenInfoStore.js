@@ -15,8 +15,6 @@ import {
 import type {
   DefaultTokenEntry,
 } from '../../api/common/lib/MultiToken';
-import type { ActionsMap } from '../../actions/index';
-import type { StoresMap } from '../index';
 import {
   getAllSchemaTables,
   raii,
@@ -25,6 +23,9 @@ import { GetToken } from '../../api/ada/lib/storage/database/primitives/api/read
 import { ModifyToken } from '../../api/ada/lib/storage/database/primitives/api/write';
 import { genCardanoAssetMap } from '../../api/ada/lib/storage/bridge/updateTransactions';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index'
+import type WalletsActions from '../../actions/wallet-actions';
+import type TransactionsStore from './TransactionsStore';
+import type { IFetcher } from '../../api/ada/lib/state-fetch/IFetcher';
 
 export type TokenInfoMap = Map<
   string, // network ID. String because mobx requires string for observable maps
@@ -34,7 +35,27 @@ export type TokenInfoMap = Map<
   >
 >;
 
-export default class TokenInfoStore extends Store<StoresMap, ActionsMap> {
+export default class TokenInfoStore<
+  StoresMapType: {
+    +transactions?: TransactionsStore,
+    +loading: {
+      +getDatabase: () => any,
+      ...
+    },
+    +substores: {
+      +ada: {
+        +stateFetchStore: {
+          +fetcher: IFetcher,
+          ...
+        },
+        ...
+      },
+      ...
+    },
+    ...
+  },
+  ActionsMapType: { +wallets?: WalletsActions, ... },
+> extends Store<StoresMapType, ActionsMapType> {
   @observable tokenInfo: TokenInfoMap;
 
   setup(): void {
@@ -50,7 +71,12 @@ export default class TokenInfoStore extends Store<StoresMap, ActionsMap> {
 
   @action _fetchMissingTokenInfo
     : ({| wallet: PublicDeriver<> |}) => Promise<void>
-    = async ({ wallet }) => {
+  = async ({ wallet }) => {
+
+    // the Ergo connector doesn't have this store, but it this function won't be invoked
+    if (!this.stores.transactions) {
+      throw new Error(`${nameof(TokenInfoStore)}::${nameof(this._fetchMissingTokenInfo)} missing transactions store`);
+    }
 
     const { requests } = this.stores.transactions.getTxRequests(wallet);
 
