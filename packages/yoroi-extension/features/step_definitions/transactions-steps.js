@@ -171,6 +171,7 @@ When(/^I click on the unmangle button$/, async function () {
 When(/^I open the token selection dropdown$/, async function () {
   await this.click('.WalletSendForm_component .SimpleInput_input');
 });
+
 When(/^I select token "([^"]*)"$/, async function (tokenName) {
   const tokenRows = await this.getElementsBy('.TokenOptionRow_item_name');
   for (const row of tokenRows) {
@@ -179,4 +180,17 @@ When(/^I select token "([^"]*)"$/, async function (tokenName) {
       await row.click();
     }
   }
+});
+
+When(/^I open the amount dropdown and select send all$/, async function () {
+  await this.driver.executeScript(
+    `const dropdownInput = document.querySelector('input[value="Custom Amount"]').click;
+    const tokenList = document.querySelectorAll('.TokenOptionRow_item_name');
+    for(let token of tokenList){
+      if(token.innerHTML.startsWith('Send all')){
+        token.click()
+         }
+     }
+`,
+  );
 });

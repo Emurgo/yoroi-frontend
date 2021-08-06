@@ -4,7 +4,7 @@
 
 | Firefox | Chrome | Edge |
 |---|----|----|
-| [<img src="https://pbs.twimg.com/profile_images/1138489258207899648/9_KBUEn7_400x400.jpg" width="48">](https://addons.mozilla.org/en-US/firefox/addon/yoroi/) | [<img src="https://pbs.twimg.com/profile_images/1037025533182193664/aCWlGSZF_400x400.jpg" width="48">](https://chrome.google.com/webstore/detail/yoroi/ffnbelfdoeiohenkjibnmadjiehjhajb) | [<img src="https://pbs.twimg.com/profile_images/1314301428995743750/xnhDug3t_400x400.jpg" width="48">](https://microsoftedge.microsoft.com/addons/detail/yoroi/akoiaibnepcedcplijmiamnaigbepmcb) |
+| [<img src="https://pbs.twimg.com/profile_images/1399715004010532871/H_xS5LMU_400x400.jpg" width="48">](https://addons.mozilla.org/en-US/firefox/addon/yoroi/) | [<img src="https://pbs.twimg.com/profile_images/1037025533182193664/aCWlGSZF_400x400.jpg" width="48">](https://chrome.google.com/webstore/detail/yoroi/ffnbelfdoeiohenkjibnmadjiehjhajb) | [<img src="https://pbs.twimg.com/profile_images/1314301428995743750/xnhDug3t_400x400.jpg" width="48">](https://microsoftedge.microsoft.com/addons/detail/yoroi/akoiaibnepcedcplijmiamnaigbepmcb) |
 
 Looking for Yoroi Mobile? See [here](https://github.com/Emurgo/yoroi-mobile)
 
