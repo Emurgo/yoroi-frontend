@@ -65,7 +65,6 @@ function bigNumberToValue(x: BigNumber): Value {
 }
 
 function valueToBigNumber(x: Value): BigNumber {
-  // constructor takes either string/number this is just here for consistency
   return new BigNumber(x);
 }
 
@@ -208,22 +207,6 @@ export type BoxLike = {
   ...
 }
 
-// TODO: look into sigma rust string value support
-function processBoxesForSigmaRust<T: BoxLike>(boxes: T[]) {
-  for (const output of boxes) {
-    output.value = parseInt(output.value, 10);
-    if (output.value > Number.MAX_SAFE_INTEGER) {
-      throw new Error('large values not supported by sigma-rust\'s json parsing code');
-    }
-    for (const asset of output.assets) {
-      asset.amount = parseInt(asset.amount, 10);
-      if (asset.amount > Number.MAX_SAFE_INTEGER) {
-        throw new Error('large values not supported by sigma-rust\'s json parsing code');
-      }
-    }
-  }
-}
-
 export async function connectorSignTx(
   publicDeriver: IPublicDeriver<ConceptualWallet>,
   password: string,
@@ -243,7 +226,6 @@ export async function connectorSignTx(
   await RustModule.load();
   let wasmTx;
   try {
-    processBoxesForSigmaRust(tx.outputs);
     wasmTx = RustModule.SigmaRust.UnsignedTransaction.from_json(JSON.stringify(tx));
   } catch (e) {
     throw ConnectorError.invalidRequest(`Invalid tx - could not parse JSON: ${e}`);
@@ -274,7 +256,6 @@ export async function connectorSignTx(
   const jsonBoxesToSign: Array<ErgoBoxJson> =
     // $FlowFixMe[prop-missing]: our inputs are nearly like `ErgoBoxJson` just with one extra field
     tx.inputs.filter((box, index) => indices.includes(index));
-  processBoxesForSigmaRust(jsonBoxesToSign);
   const txBoxesToSign = RustModule.SigmaRust.ErgoBoxes.from_boxes_json(jsonBoxesToSign);
   const dataBoxIds = tx.dataInputs.map(box => box.boxId);
   const dataInputs = utxos.filter(

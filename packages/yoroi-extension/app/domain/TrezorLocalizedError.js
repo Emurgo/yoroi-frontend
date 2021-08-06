@@ -13,6 +13,10 @@ const messages = defineMessages({
     id: 'wallet.send.trezor.error.101',
     defaultMessage: '!!!Signing cancelled on Trezor device. Please retry.',
   },
+  firmwareCatalystSupportError: {
+    id: 'wallet.send.tezor.error.firmwareCatalystSupport',
+    defaultMessage: '!!!Registering for Catalyst voting requires Trezor firmware 2.4.1',
+  },
 });
 
 /** Converts error(from API or Trezor API) to LocalizableError */
@@ -37,6 +41,9 @@ export function convertToLocalizableError(error: Error): LocalizableError {
         break;
       case 'Signing cancelled':
         localizableError = new LocalizableError(messages.signTxError101);
+        break;
+      case 'Feature AuxiliaryData not supported by device firmware':
+        localizableError = new LocalizableError(messages.firmwareCatalystSupportError);
         break;
       default:
         /** we are not able to figure out why Error is thrown

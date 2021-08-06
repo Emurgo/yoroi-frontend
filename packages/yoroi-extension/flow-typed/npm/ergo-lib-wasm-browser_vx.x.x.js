@@ -4,11 +4,11 @@
 
 type ErgoBoxJson = {|
   boxId: string,
-  value: number | string,
+  value: string,
   ergoTree: string,
   assets: Array<{|
     tokenId: string, // hex
-    amount: number | string,
+    amount: string,
   |}>,
   creationHeight: number,
   additionalRegisters: {| [key: string]: string |},
@@ -17,11 +17,11 @@ type ErgoBoxJson = {|
 |};
 
 type ErgoBoxCandidateJson = {|
-  value: number | string,
+  value: string,
   ergoTree: string,
   assets: Array<{|
     tokenId: string, // hex
-    amount: number | string,
+    amount: string,
   |}>,
   creationHeight: number,
   additionalRegisters: {| [key: string]: string |}
@@ -43,11 +43,11 @@ type ErgoTxJson = {|
   |}>,
   outputs: Array<{|
     boxId: string,
-    value: number,
+    value: string,
     ergoTree: string,
     assets: Array<{|
       tokenId: string, // hex
-      amount: number,
+      amount: string,
     |}>,
     additionalRegisters: {| [key: string]: string /* hex */ |},
     creationHeight: number,
@@ -70,11 +70,11 @@ type ErgoUnsignedTxJson = {|
     extension?: {| [key: string]: string /* hex */ |},
   |}>,
   outputs: Array<{|
-    value: number,
+    value: string,
     ergoTree: string,
     assets: Array<{|
       tokenId: string, // hex
-      amount: number,
+      amount: string,
     |}>,
     additionalRegisters: {| [key: string]: string /* hex */ |},
     creationHeight: number,

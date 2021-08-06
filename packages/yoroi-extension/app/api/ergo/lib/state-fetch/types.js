@@ -14,7 +14,7 @@ export type RemoteUnspentOutput = {|
   +creationHeight: number,
   +boxId: string,
   +assets?: $ReadOnlyArray<$ReadOnly<{
-    amount: number,
+    amount: string,
     tokenId: string,
     ...
   }>>,
@@ -75,7 +75,7 @@ export type ErgoTxOutput = {
   additionalRegisters: {| [key: string]: string /* hex */ |},
   address: string,
   assets: $ReadOnlyArray<$ReadOnly<{
-    amount: number,
+    amount: string,
     tokenId: string,
     ...
   }>>,
@@ -87,7 +87,7 @@ export type ErgoTxOutput = {
   index: number, // index of this output in this tx
   mainChain: boolean,
   spentTransactionId: null | string,
-  value: number,
+  value: string,
   ...
 };
 export type ErgoTxInput = {
@@ -98,9 +98,9 @@ export type ErgoTxInput = {
   outputIndex: number, // index in tx that created the output we're consuming
   spendingProof: string,
   transactionId: string, // txHash of this tx
-  value: number,
+  value: string,
   assets: $ReadOnlyArray<$ReadOnly<{
-    amount: number,
+    amount: string,
     tokenId: string,
     ...
   }>>,
@@ -108,7 +108,7 @@ export type ErgoTxInput = {
 };
 export type ErgoTxDataInput = {
   id: string,
-  value: number,
+  value: string,
   transactionId: string,
   index: number,
   outputIndex: number,
@@ -162,12 +162,12 @@ export type SignedRequest = {|
   |}>,
   outputs: Array<{|
     boxId?: string, // hex
-    value: number,
+    value: string,
     ergoTree: string, // hex
     creationHeight: number,
     assets?: $ReadOnlyArray<$ReadOnly<{|
       tokenId: string, // hex
-      amount: number,
+      amount: string,
     |}>>,
     additionalRegisters: {| [key: string]: string /* hex */ |},
     transactionId?: string, // hex

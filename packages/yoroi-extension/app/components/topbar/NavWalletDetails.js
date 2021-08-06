@@ -78,6 +78,7 @@ export default class NavWalletDetails extends Component<Props> {
       showDetails !== null &&
       showDetails === true
     );
+    const showEyeIconSafe = showEyeIcon != null && showEyeIcon;
     return (
       <div className={styles.wrapper}>
         <div className={styles.outerWrapper}>
@@ -123,7 +124,7 @@ export default class NavWalletDetails extends Component<Props> {
               </div>
             )}
           </div>
-          {totalAmount != null && showEyeIcon &&
+          {totalAmount != null && showEyeIconSafe &&
             <button
               type="button"
               className={styles.toggleButton}
