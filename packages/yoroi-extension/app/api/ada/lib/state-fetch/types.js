@@ -355,7 +355,7 @@ export type CatalystRound = {|
 |};
 
 export type CatalystRoundInfoResponse = {|
-  currentFund: CatalystRound,
+  currentFund?: CatalystRound,
   nextFund?: CatalystRound
 |};
 

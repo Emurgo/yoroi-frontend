@@ -5,20 +5,12 @@ import { defineMessages, intlShape } from 'react-intl';
 import FullscreenMessage from '../../../components/wallet/layouts/FullscreenMessage';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import string from 'lodash/string';
 
-export const messages: * = defineMessages({
-  title: {
-    id: 'wallet.registrationOver.title',
-    defaultMessage: '!!!Registration has ended',
-  },
-  subtitle: {
-    id: 'wallet.registrationOver.subtitle',
-    defaultMessage: '!!!Registration for fund {roundNumber} is over. Open the Catalyst app for more information',
-  },
-});
 
 type Props = {|
-  roundNumber: number,
+  title: string,
+  subtitle: string,
 |};
 
 @observer
@@ -32,13 +24,8 @@ export default class RegistrationOver extends Component<Props> {
 
     return (
       <FullscreenMessage
-        title={intl.formatMessage(messages.title)}
-        subtitle={intl.formatMessage(
-          messages.subtitle,
-          {
-            roundNumber: this.props.roundNumber,
-          }
-        )}
+        title={this.props.title}
+        subtitle={this.props.subtitle}
       />
     );
   }
