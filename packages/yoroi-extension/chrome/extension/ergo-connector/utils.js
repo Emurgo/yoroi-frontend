@@ -4,7 +4,7 @@ import type { Tx } from './types';
 import type { TokenRow } from '../../../app/api/ada/lib/storage/database/primitives/tables';
 import { Logger } from '../../../app/utils/logging';
 
-function parseEIP0004Data(input: any): ?string {
+export function parseEIP0004Data(input: any): ?string {
   // https://github.com/ergoplatform/eips/blob/master/eip-0004.md
   // format is: 0e + vlq(len(body as bytes)) + body (as bytes formatted in hex)
   // where body is a utf8 string
@@ -51,7 +51,7 @@ export function mintedTokenInfo(tx: Tx): $ReadOnly<TokenRow>[] {
           type: 'Ergo',
           height: tx.inputs[0].creationHeight,
           boxId: tx.inputs[0].boxId,
-          numberOfDecimals: isNaN(decimals) ? null : decimals,
+          numberOfDecimals: isNaN(decimals) ? 0 : decimals,
           ticker: name,
           longName: description,
           description,

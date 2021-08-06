@@ -209,8 +209,8 @@ export function decodeErgoTokenInfo(
   desc: string | null,
   numDecimals: number | null,
 |} {
-  const name = parseEIP0004Data(registers.R4);
-  const desc = parseEIP0004Data(registers.R5);
+  const name = parseEIP0004Data(registers.R4) || null
+  const desc = parseEIP0004Data(registers.R5) || null;
   const numDecimals = parseInt(parseEIP0004Data(registers.R6) ?? '', 10);
 
   return {
