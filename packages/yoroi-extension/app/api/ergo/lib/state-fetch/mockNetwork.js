@@ -25,6 +25,7 @@ import { derivePath } from '../../../common/lib/crypto/keys/keyRepository';
 import { RollbackApiError, } from '../../../common/errors';
 import { getErgoBaseConfig } from '../../../ada/lib/storage/database/prepackaged/networks';
 import { RustModule } from '../../../ada/lib/cardanoCrypto/rustLoader';
+import { parseEIP0004Data } from '../../../../../chrome/extension/ergo-connector/utils';
 
 // note: this function assumes mainnet
 export function getErgoAddress(
@@ -208,43 +209,15 @@ export function decodeErgoTokenInfo(
   desc: string | null,
   numDecimals: number | null,
 |} {
-  /**
-  * try parsing an int (base 10) and return NaN if it fails
-  * Can't use parseInt because parseInt('1a') returns '1' instead of failing
-  */
-  const hexToIntOrNaN: string => number = (x) => {
-    return /^[0-9a-fA-F]+$/.test(x) ? Number.parseInt(x, 16) : NaN
-  }
-
-  const numDecimalsToNum: (x: string | null) => number | null = (x) => {
-    if (x == null) return x;
-    return /^[0-9]+$/.test(x) ? Number.parseInt(x, 10) : null
-  }
-
-  // note: the following code is all according to EIP-4
-  // https://github.com/ergoplatform/eips/blob/master/eip-0004.md
-  const decode = (field: void | string): null | string => {
-    if (field == null) return null;
-    // recall: every encoding start with 0e then one byte for length
-    // minimum 3 bytes: 1 for prefix, 1 for length, 1 for content
-    if (field.length < 3 * 2) return null;
-
-    const expectedSize = hexToIntOrNaN(field.substring(2, 4));
-    if (isNaN(expectedSize)) return null;
-    const content = field.substring('0eff'.length);
-    if (content.length !== 2 * expectedSize) return null;
-
-    const bytes = Buffer.from(content, 'hex');
-    const string = new TextDecoder('utf-8').decode(bytes);
-
-    return string;
-  }
+  const name = parseEIP0004Data(registers.R4) || null
+  const desc = parseEIP0004Data(registers.R5) || null;
+  const numDecimals = parseInt(parseEIP0004Data(registers.R6) ?? '', 10);
 
   return {
-    name: decode(registers.R4),
-    desc: decode(registers.R5),
-    numDecimals: numDecimalsToNum(decode(registers.R6)),
-  }
+    name,
+    desc,
+    numDecimals: isNaN(numDecimals) ? null : numDecimals,
+  };
 }
 
 export function genGetAssetInfo(
