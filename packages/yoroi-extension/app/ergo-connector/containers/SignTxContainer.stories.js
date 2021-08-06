@@ -74,7 +74,7 @@ const message = (id: number) => ({
           '9egNKTzQDH658qcdiPEoQfVM1SBxQNxnyF8BCw57aNWerRhhHBQ'
         ).to_ergo_tree().to_bytes()).toString('hex'),
         assets: [{
-          amount: 12340,
+          amount: '12340',
           tokenId: tokenInfo.tokenId,
         }],
         additionalRegisters: tokenInfo.registers,

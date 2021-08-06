@@ -36,7 +36,7 @@ import { replaceMockBoxId } from '../../app/api/ergo/lib/transactions/utils';
 
 // based on abandon x 14 + share
 const genesisAddress = '9eXpzdMjPP9oNrhMB6na4LTZMWBJZNp71NVVefqdQ6kRwrqfZHe';
-const genesisTxValue = 200000_000000000; // 200K ERG
+const genesisTxValue = String(200_000_000_000_000); // 200K ERG
 
 // based on abandon x14 + address
 const genesisTxReceiver = '9emv7LAtw7U6xMs4JrJP8NTPvwQjNRaSWpgSTGEM6947fFofBWd';
@@ -99,7 +99,7 @@ export const generateGenesisChain = (): Array<RemoteErgoTransaction> => {
         }),
         address,
         assets: [{
-          amount: 12340,
+          amount: '12340',
           tokenId: '33a35e15ae1a83fa188674a2bd53007b07e119a0eaaf40b890b2081c2864f12a',
         }],
         creationHeight: height,
@@ -145,7 +145,7 @@ export const generateGenesisChain = (): Array<RemoteErgoTransaction> => {
         address,
         assets: [
           {
-            amount: 6140,
+            amount: '6140',
             tokenId: '13a35e15ae1a83fa188674a2bd53007b07e119a0eaaf40b890b2081c2864f12a',
           },
           ...result[result.length - 1].outputs[0].assets
@@ -231,7 +231,7 @@ export const generateTransaction = (): {|
           index: 0,
           mainChain: true,
           spentTransactionId: null,
-          value: 20_000000000,
+          value: String(20_000_000_000),
         }),
         // ergo-simple-wallet
         replaceMockOutputBoxId({
@@ -245,7 +245,7 @@ export const generateTransaction = (): {|
           index: 1,
           mainChain: true,
           spentTransactionId: null,
-          value: 10_000000000,
+          value: String(10_000_000_000),
         }),
         // ergo-token-wallet
         replaceMockOutputBoxId({
@@ -253,11 +253,11 @@ export const generateTransaction = (): {|
           address: tokenAddress.to_base58(),
           assets: [
             {
-              amount: 12340,
+              amount: '12340',
               tokenId: '33a35e15ae1a83fa188674a2bd53007b07e119a0eaaf40b890b2081c2864f12a',
             },
             {
-              amount: 6140,
+              amount: '6140',
               tokenId: '13a35e15ae1a83fa188674a2bd53007b07e119a0eaaf40b890b2081c2864f12a',
             },
           ],
@@ -268,7 +268,7 @@ export const generateTransaction = (): {|
           index: 2,
           mainChain: true,
           spentTransactionId: null,
-          value: 1_000000000,
+          value: String(1_000_000_000),
         }),
       ],
       block_num: height,
