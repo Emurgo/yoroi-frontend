@@ -2,6 +2,7 @@ import * as wasm from "ergo-lib-wasm-browser";
 const cardanoAccessBtn = document.querySelector('#cardano-access')
 
 function initDapp(){
+    alert('Request the access?')
     cardano_request_read_access().then(function(access_granted){
         if(!access_granted){
             alert("Wallet access denied")
