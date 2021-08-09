@@ -162,6 +162,19 @@ class CardanoAPI {
         return this._cardano_rpc_call("get_balance", [token_id]);
     }
 
+    get_used_addresses(paginate = undefined) {
+        return this._ergo_rpc_call("get_used_addresses", [paginate]);
+    }
+
+    get_unused_addresses() {
+        return this._ergo_rpc_call("get_unused_addresses", []);
+    }
+
+    get_change_address() {
+        return this._ergo_rpc_call("get_change_address", []);
+    }
+
+
     _cardano_rpc_call(func, params) {
         return new Promise(function(resolve, reject) {
             window.postMessage({
