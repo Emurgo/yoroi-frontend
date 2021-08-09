@@ -60,6 +60,7 @@ import type {
 } from '../common/lib/state-fetch/currencySpecificTypes';
 import {
   getAllAddressesForDisplay,
+  rawGetAddressRowsForWallet,
 } from '../ada/lib/storage/bridge/traitUtils';
 import {
   HARD_DERIVATION_START,
@@ -104,6 +105,20 @@ import { WrongPassphraseError } from '../ada/lib/cardanoCrypto/cryptoErrors';
 import type { DefaultTokenEntry } from '../common/lib/MultiToken';
 import { hasSendAllDefault, builtSendTokenList } from '../common/index';
 import { getReceiveAddress } from '../../stores/stateless/addressStores';
+import {
+  GetPathWithSpecific,
+  GetAddress,
+} from '../ada/lib/storage/database/primitives/api/read';
+import {
+  getAllSchemaTables,
+  raii,
+  mapToTables,
+} from '../ada/lib/storage/database/utils';
+import { GetDerivationSpecific, } from '../ada/lib/storage/database/walletTypes/common/api/read';
+import { MultiToken } from '../common/lib/MultiToken';
+import { TxStatusCodes } from '../ada/lib/storage/database/primitives/enums';
+import type { WalletTransactionCtorData } from '../../domain/WalletTransaction';
+import { asHasLevels } from '../ada/lib/storage/models/PublicDeriver/traits';
 
 // getTransactionRowsToExport
 
@@ -630,5 +645,78 @@ export default class ErgoApi {
       if (error instanceof LocalizableError) throw error;
       throw new GenericApiError();
     }
+  }
+
+  async createSubmittedTransactionData(
+    publicDeriver: PublicDeriver<>,
+    signRequest: ErgoTxSignRequest,
+    txId: string,
+    defaultNetworkId: number,
+    defaultToken: $ReadOnly<TokenRow>,
+  ): Promise<WalletTransactionCtorData> {
+    const p = asHasLevels<ConceptualWallet>(publicDeriver);
+    if (!p) {
+      throw new Error(`${nameof(this.createSubmittedTransactionData)} publicDerviver traits missing`);
+    }
+    const derivationTables = p.getParent().getDerivationTables();
+    const deps = Object.freeze({
+      GetPathWithSpecific,
+      GetAddress,
+      GetDerivationSpecific,
+    });
+    const depTables = Object
+      .keys(deps)
+      .map(key => deps[key])
+      .flatMap(table => getAllSchemaTables(publicDeriver.getDb(), table));
+
+    const { utxoAddresses } = await raii(
+      publicDeriver.getDb(),
+      [
+        ...depTables,
+        ...mapToTables(publicDeriver.getDb(), derivationTables),
+      ],
+      dbTx => rawGetAddressRowsForWallet(
+        dbTx,
+        deps,
+        { publicDeriver },
+        derivationTables,
+      ),
+    );
+    const ownAddresses = new Set(
+      utxoAddresses.map(a => a.Hash)
+    );
+    const amount = new MultiToken(
+      [],
+      {
+        defaultNetworkId,
+        defaultIdentifier: defaultToken.Identifier,
+      },
+    );
+    for (const input of signRequest.inputs()) {
+      amount.joinSubtractMutable(input.value);
+    }
+    let isIntraWallet = true;
+    for (const output of signRequest.outputs()) {
+      if (ownAddresses.has(output.address)) {
+        amount.joinAddMutable(output.value);
+      } else {
+        isIntraWallet = false;
+      }
+    }
+
+    return {
+      txid: txId,
+      type: isIntraWallet ? 'self' : 'expend',
+      amount,
+      fee: signRequest.fee(),
+      date: new Date,
+      addresses: {
+        from: signRequest.inputs(),
+        to: signRequest.outputs(),
+      },
+      state: TxStatusCodes.SUBMITTED,
+      errorMsg: null,
+      block: null,
+    };
   }
 }

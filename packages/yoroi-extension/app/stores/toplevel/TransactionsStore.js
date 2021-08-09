@@ -45,6 +45,7 @@ import {
 import { genLookupOrFail, getTokenName } from '../stateless/tokenHelpers';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
+import type { WalletTransactionCtorData } from '../../domain/WalletTransaction';
 
 export type TxRequests = {|
   publicDeriver: PublicDeriver<>,
@@ -75,6 +76,11 @@ export const INITIAL_SEARCH_LIMIT: number = 5;
 /** Skip first n transactions from api */
 export const SEARCH_SKIP: number = 0;
 
+type SubmittedTransactionEntry = {|
+  publicDeriver: PublicDeriver<>,
+  transaction: WalletTransaction,
+|};
+
 export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
 
   /** How many additional transactions to display when user wants to show more */
@@ -87,6 +93,8 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     publicDeriver: PublicDeriver<>,
     options: GetTransactionsRequestOptions,
   |}> = [];
+
+  _submittedTransactions: Array<SubmittedTransactionEntry> = [];
 
   getTransactionRowsToExportRequest: LocalizedRequest<(void => Promise<void>) => Promise<void>>
     = new LocalizedRequest<(void => Promise<void>) => Promise<void>>(func => func());
@@ -214,7 +222,10 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) return [];
     const result = this.getTxRequests(publicDeriver).requests.recentRequest.result;
-    return result ? result.transactions : [];
+    return  [
+      ...this.getSubmittedTransactions(publicDeriver),
+      ...(result ? result.transactions : [])
+    ];
   }
 
   @computed get hasAny(): boolean {
@@ -294,6 +305,17 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       db: publicDeriver.getDb(),
       transactions: result.transactions,
     });
+
+    const remoteTransactionIds = new Set(
+      result.transactions.map(tx => tx.txid)
+    );
+    for (let i = 0; i < this._submittedTransactions.length;) {
+      if (remoteTransactionIds.has(this._submittedTransactions[i].transaction.txid)) {
+        this._submittedTransactions.splice(i, 1);
+      } else {
+        i++;
+      }
+    }
   };
 
   @action reactToTxHistoryUpdate: {|
@@ -571,6 +593,30 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
           : `${tokenName}-${plate}`,
       }).promise;
     };
+  }
+
+  @action
+  recordSubmittedTransaction: (
+    PublicDeriver<>,
+    WalletTransactionCtorData,
+  ) => void = (
+    publicDeriver,
+    transaction,
+  ) => {
+    this._submittedTransactions.push({
+      publicDeriver,
+      transaction: new WalletTransaction(transaction),
+    });
+  }
+
+  getSubmittedTransactions: (
+    PublicDeriver<>,
+  ) => Array<WalletTransaction> = (
+    publicDeriver
+  ) => {
+    return this._submittedTransactions.filter(tx =>
+      tx.publicDeriver === publicDeriver
+    ).map(tx => tx.transaction);
   }
 }
 
