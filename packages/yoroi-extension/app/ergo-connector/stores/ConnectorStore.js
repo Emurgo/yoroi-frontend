@@ -18,7 +18,7 @@ import type {
 } from '../../../chrome/extension/ergo-connector/types';
 import type { ActionsMap } from '../actions/index';
 import type { StoresMap } from './index';
-import { LoadingWalletStates } from '../types';
+import { LoadingWalletStates, WalletTypes } from '../types';
 import {
   getWallets
 } from '../../api/common/index';
@@ -219,7 +219,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
 
   // ========== wallets info ========== //
   @action
-  _getWallets: void => Promise<void> = async () => {
+  _getWallets: string => Promise<void> = async (walletType: string = WalletTypes.ERGO) => {
     runInAction(() => {
       this.loadingWallets = LoadingWalletStates.PENDING;
       this.errorWallets = '';
@@ -232,23 +232,23 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     try {
       const wallets = await getWallets({ db: persistentDb });
 
-      const ergoWallets = wallets.filter(
-        wallet => isErgo(wallet.getParent().getNetworkInfo())
-      );
+      const filteredWallets = wallets
+      // list all wallet for now until we find away to know which type of wallet to filter ( ergo || cardano )
+      // .filter(wallet => !isErgo(wallet.getParent().getNetworkInfo()));
 
-      await this._getTxAssets(ergoWallets);
+      await this._getTxAssets(filteredWallets);
 
       const result = [];
-      for (const ergoWallet of ergoWallets) {
-        const conceptualInfo = await ergoWallet.getParent().getFullConceptualWalletInfo();
-        const withPubKey = asGetPublicKey(ergoWallet);
+      for (const currentWallet of filteredWallets) {
+        const conceptualInfo = await currentWallet.getParent().getFullConceptualWalletInfo();
+        const withPubKey = asGetPublicKey(currentWallet);
 
-        const canGetBalance = asGetBalance(ergoWallet);
+        const canGetBalance = asGetBalance(currentWallet);
         const balance = canGetBalance == null
-          ? new MultiToken([], ergoWallet.getParent().getDefaultToken())
+          ? new MultiToken([], currentWallet.getParent().getDefaultToken())
           : await canGetBalance.getBalance();
         result.push({
-          publicDeriver: ergoWallet,
+          publicDeriver: currentWallet,
           name: conceptualInfo.Name,
           balance,
           checksum: await getChecksum(withPubKey)

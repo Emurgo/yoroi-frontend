@@ -163,15 +163,15 @@ class CardanoAPI {
     }
 
     get_used_addresses(paginate = undefined) {
-        return this._ergo_rpc_call("get_used_addresses", [paginate]);
+        return this._cardano_rpc_call("get_used_addresses", [paginate]);
     }
 
     get_unused_addresses() {
-        return this._ergo_rpc_call("get_unused_addresses", []);
+        return this._cardano_rpc_call("get_unused_addresses", []);
     }
 
     get_change_address() {
-        return this._ergo_rpc_call("get_change_address", []);
+        return this._cardano_rpc_call("get_change_address", []);
     }
 
 
@@ -279,6 +279,7 @@ function createYoroiPort() {
                 success: message.success
             }, location.origin);
         } else if (message.type === "yoroi_connect_response/cardano") {
+            console.log('this the response for caradano')
             if (message.success) {
                 if (!cardanoApiInjected) {
                     // inject full API here
@@ -315,7 +316,6 @@ if (shouldInject()) {
     // events from page (injected code)
     window.addEventListener("message", function(event) {
         const dataType = event.data.type;
-        console.log('DataType: ', dataType)
         if (dataType === "connector_rpc_request") {
             console.log("connector received from page: " + JSON.stringify(event.data) + " with source = " + event.source + " and origin = " + event.origin);
             if (yoroiPort) {
@@ -361,7 +361,7 @@ if (shouldInject()) {
                 }
                 // note: content scripts are subject to the same CORS policy as the website they are embedded in
                 // but since we are querying the website this script is injected into, it should be fine
-                console.log("dataType", dataType)
+                console.log("dataType: ", dataType)
                 convertImgToBase64(getFavicon(location.origin))
                     .then(imgBase64Url => {
                         yoroiPort.postMessage({

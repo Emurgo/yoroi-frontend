@@ -7,3 +7,8 @@ export const LoadingWalletStates = Object.freeze({
   SUCCESS: 2,
   REJECTED: 3,
 });
+
+export const WalletTypes = {
+  ERGO: 'ERGO',
+  CARDANO: 'CARDANO'
+};
