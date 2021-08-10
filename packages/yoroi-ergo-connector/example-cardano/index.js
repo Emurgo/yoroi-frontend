@@ -1,6 +1,8 @@
 import * as wasm from "ergo-lib-wasm-browser";
 const cardanoAccessBtn = document.querySelector('#request-access')
 const getUnUsedAddresses = document.querySelector('#get-unused-addresses')
+const getUsedAddresses = document.querySelector('#get-used-addresses')
+const getChangeAddress = document.querySelector('#get-change-address')
 const getAccountBalance = document.querySelector('#get-balance')
 
 let accessGranted = false
@@ -12,9 +14,6 @@ function initDapp(){
         }else {
             alert("you have access now")
             accessGranted = true
-            cardano.get_unused_addresses().then(function(addresses) {
-                console.log(`get_unused_addresses() = ${JSON.stringify(addresses)}`);
-            });
         }
     });
 }
@@ -39,6 +38,26 @@ getUnUsedAddresses.addEventListener('click', () => {
     } else {
         cardano.get_unused_addresses().then(function(addresses) {
             console.log(`get_unused_addresses() = ${JSON.stringify(addresses)}`);
+        });
+    }
+})
+
+getUsedAddresses.addEventListener('click', () => {
+    if(!accessGranted) {
+        alert('Should request access first')
+    } else {
+        cardano.get_used_addresses().then(function(addresses) {
+            console.log(`get_used_addresses() = ${JSON.stringify(addresses)}`);
+        });
+    }
+})
+
+getChangeAddress.addEventListener('click', () => {
+    if(!accessGranted) {
+        alert('Should request access first')
+    } else {
+        cardano.get_change_address().then(function(addresses) {
+            console.log(`get_used_addresses() = ${JSON.stringify(addresses)}`);
         });
     }
 })
