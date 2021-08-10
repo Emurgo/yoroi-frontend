@@ -4,6 +4,7 @@ const getUnUsedAddresses = document.querySelector('#get-unused-addresses')
 const getUsedAddresses = document.querySelector('#get-used-addresses')
 const getChangeAddress = document.querySelector('#get-change-address')
 const getAccountBalance = document.querySelector('#get-balance')
+const getUtxos = document.querySelector('#get-utxos')
 const alertEl = document.querySelector('#alert')
 
 let accessGranted = false
@@ -73,6 +74,12 @@ getChangeAddress.addEventListener('click', () => {
             }
         });
     }
+})
+
+getUtxos.addEventListener('click', () => {
+    cardano.get_utxos().then(utxos => {
+        console.log('Utxos', utxos)
+    })
 })
 
 
