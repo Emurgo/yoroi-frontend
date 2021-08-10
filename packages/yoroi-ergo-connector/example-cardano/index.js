@@ -4,15 +4,16 @@ const getUnUsedAddresses = document.querySelector('#get-unused-addresses')
 const getUsedAddresses = document.querySelector('#get-used-addresses')
 const getChangeAddress = document.querySelector('#get-change-address')
 const getAccountBalance = document.querySelector('#get-balance')
+const alertEl = document.querySelector('#alert')
 
 let accessGranted = false
 
 function initDapp(){
     cardano_request_read_access().then(function(access_granted){
         if(!access_granted){
-            alert("Wallet access denied")
+            alertError('Access Denied')
         }else {
-            alert("you have access now")
+            alertSuccess( 'You have access now')
             accessGranted = true
         }
     });
@@ -24,40 +25,52 @@ cardanoAccessBtn.addEventListener('click', () => {
 
 getAccountBalance.addEventListener('click', () => {
     if(!accessGranted) {
-        alert('Should request access first')
+       alertError('Should request access first')
     } else {
         cardano.get_balance().then(function(balance) {
-            console.log(`get_balance() = ${balance}`);
+            alertSuccess(`Account Balance: ${balance}`)
         });
     }
 })
 
 getUnUsedAddresses.addEventListener('click', () => {
     if(!accessGranted) {
-        alert('Should request access first')
+       alertError('Should request access first')
     } else {
         cardano.get_unused_addresses().then(function(addresses) {
-            console.log(`get_unused_addresses() = ${JSON.stringify(addresses)}`);
+            if(addresses.length === 0){
+                alertWarrning('No unused addresses')
+            } else {
+                alertSuccess(`Address: ${addresses.concat(',')}`)
+            }
         });
     }
 })
 
 getUsedAddresses.addEventListener('click', () => {
     if(!accessGranted) {
-        alert('Should request access first')
+       alertError('Should request access first')
     } else {
         cardano.get_used_addresses().then(function(addresses) {
-            console.log(`get_used_addresses() = ${JSON.stringify(addresses)}`);
+           if(addresses.length === 0){
+               alertWarrning('No used addresses')
+           } else {
+               alertSuccess(`Address: ${addresses.concat(',')}`)
+           }
         });
     }
 })
 
 getChangeAddress.addEventListener('click', () => {
     if(!accessGranted) {
-        alert('Should request access first')
+       alertError('Should request access first')
     } else {
         cardano.get_change_address().then(function(addresses) {
-            console.log(`get_used_addresses() = ${JSON.stringify(addresses)}`);
+            if(addresses.length === 0){
+                alertWarrning('No change addresses')
+            } else {
+                alertSuccess(`Address: ${addresses.concat(',')}`)
+            }
         });
     }
 })
@@ -70,4 +83,19 @@ if (typeof cardano_request_read_access === "undefined") {
     window.addEventListener("ergo_wallet_disconnected", function(event) {
         console.log("Wallet Disconnect")
     });
+}
+
+function alertError (text) {
+    alertEl.className = 'alert alert-danger'
+    alertEl.innerHTML = text
+}
+
+function alertSuccess(text) {
+    alertEl.className = 'alert alert-success'
+    alertEl.innerHTML = text
+}
+
+function alertWarrning(text) {
+    alertEl.className = 'alert alert-warning'
+    alertEl.innerHTML = text
 }

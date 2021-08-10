@@ -18,7 +18,7 @@ import type {
 } from '../../../chrome/extension/ergo-connector/types';
 import type { ActionsMap } from '../actions/index';
 import type { StoresMap } from './index';
-import { LoadingWalletStates, WalletTypes } from '../types';
+import { LoadingWalletStates } from '../types';
 import {
   getWallets
 } from '../../api/common/index';
@@ -219,7 +219,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
 
   // ========== wallets info ========== //
   @action
-  _getWallets: string => Promise<void> = async (walletType: string = WalletTypes.ERGO) => {
+  _getWallets: void => Promise<void> = async () => {
     runInAction(() => {
       this.loadingWallets = LoadingWalletStates.PENDING;
       this.errorWallets = '';
