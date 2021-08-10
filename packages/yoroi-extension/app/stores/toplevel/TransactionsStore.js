@@ -94,7 +94,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     options: GetTransactionsRequestOptions,
   |}> = [];
 
-  _submittedTransactions: Array<SubmittedTransactionEntry> = [];
+  @observable _submittedTransactions: Array<SubmittedTransactionEntry> = [];
 
   getTransactionRowsToExportRequest: LocalizedRequest<(void => Promise<void>) => Promise<void>>
     = new LocalizedRequest<(void => Promise<void>) => Promise<void>>(func => func());
@@ -309,13 +309,15 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     const remoteTransactionIds = new Set(
       result.transactions.map(tx => tx.txid)
     );
-    for (let i = 0; i < this._submittedTransactions.length;) {
-      if (remoteTransactionIds.has(this._submittedTransactions[i].transaction.txid)) {
-        this._submittedTransactions.splice(i, 1);
-      } else {
-        i++;
+    runInAction(() => {
+      for (let i = 0; i < this._submittedTransactions.length;) {
+        if (remoteTransactionIds.has(this._submittedTransactions[i].transaction.txid)) {
+          this._submittedTransactions.splice(i, 1);
+        } else {
+          i++;
+        }
       }
-    }
+    });
   };
 
   @action reactToTxHistoryUpdate: {|
