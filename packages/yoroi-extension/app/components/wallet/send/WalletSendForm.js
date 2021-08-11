@@ -81,6 +81,10 @@ const messages = defineMessages({
     id: 'wallet.transaction.memo.optional.invalid',
     defaultMessage: '!!!Memo cannot be more than {maxMemo} characters.',
   },
+  willSendAll: {
+    id: 'wallet.send.form.willSendAll',
+    defaultMessage: '!!!Will Send All Tokens!'
+  }
 });
 
 type Props = {|
@@ -521,7 +525,7 @@ export default class WalletSendForm extends Component<Props> {
           />
 
           <div className={tokenListClasses}>
-            <h1>Will Send All of tokens!</h1>
+            <h1>{intl.formatMessage(messages.willSendAll)}</h1>
             { tokenOptions.map(token => (
               <p key={token.id} className= "accordion-item__paragraph" >
               {token.amount} {' '} {token.label}

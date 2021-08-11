@@ -646,6 +646,7 @@
   "wallet.send.confirmationDialog.walletPasswordFieldPlaceholder": "Type your spending password",
   "wallet.send.confirmationDialog.walletPasswordLabel": "Spending password",
   "wallet.send.form.calculatingFee": "Calculating fee...",
+  "wallet.send.form.willSendAll": "Will Send All Tokens!",
   "wallet.send.form.cannotSendToLegacy": "You cannot send to legacy addresses (any address created before November 29th, 2019)",
   "wallet.send.form.cannotSendToP2SH": "You cannot send to pay-to-script-hash addresses",
   "wallet.send.form.cannotSendToReward": "You cannot send to a reward account",
