@@ -18,7 +18,6 @@ import WalletSubRow from '../../components/wallet/my-wallets/WalletSubRow'
 import NavPlate from '../../components/topbar/NavPlate'
 import type { GeneratedData as SidebarContainerData } from '../SidebarContainer'
 import SidebarContainer from '../SidebarContainer'
-import SidebarRevampContainer from '../SidebarRevampContainer'
 import type { GeneratedData as BannerContainerData } from '../banners/BannerContainer'
 import BannerContainer from '../banners/BannerContainer'
 import { ROUTES } from '../../routes-config'
@@ -99,12 +98,8 @@ export default class MyWalletsPage extends Component<Props> {
     const { stores } = this.generated;
     const { uiDialogs } = stores;
 
-    const sidebarContainer = false ? (
-     // $FlowFixMe:
-      <SidebarRevampContainer {...this.generated.SidebarContainerProps} />
-    ) : (
-      <SidebarContainer {...this.generated.SidebarContainerProps} />
-    );
+    const sidebarContainer = <SidebarContainer {...this.generated.SidebarContainerProps} />
+
     const wallets = this.generated.stores.wallets.publicDerivers;
 
     const navbarTitle = (
