@@ -10,6 +10,7 @@ import styles from './SideBarCategoryRevamp.scss';
 type Props = {|
   +icon: string,
   +active: boolean,
+  +route: string,
   +onClick: void => void,
   +label: ?MessageDescriptor,
 |};
@@ -23,19 +24,27 @@ export default class SideBarCategoryRevamp extends Component<Props> {
   render(): Node {
     const { intl } = this.context;
 
-    const { icon, active, onClick, label } = this.props;
+    const { icon, active, onClick, label, route } = this.props;
 
     const componentStyles = classNames([styles.component, active ? styles.active : null]);
 
     const SvgElem = icon;
+    const isInternalLink = route.startsWith('/') || route.startsWith('#');
 
-    return (
+    return isInternalLink ? (
       <button type="button" className={componentStyles} onClick={onClick} disabled={active}>
         <span className={styles.icon}>
           <SvgElem />
         </span>
         {label ? <span className={styles.label}>{intl.formatMessage(label)}</span> : null}
       </button>
+    ) : (
+      <a href={route} className={componentStyles} target="_blank" rel="noopener noreferrer">
+        <span className={styles.icon}>
+          <SvgElem />
+        </span>
+        {label ? <span className={styles.label}>{intl.formatMessage(label)}</span> : null}
+      </a>
     );
   }
 }

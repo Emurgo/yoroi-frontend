@@ -4,15 +4,15 @@ import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import SideBarCategoryRevamp from './SideBarCategoryRevamp';
 import styles from './SidebarRevamp.scss';
-import type { SidebarCategory } from '../../stores/stateless/sidebarCategories';
+import type { SidebarCategoryRevamp } from '../../stores/stateless/sidebarCategories';
 
 import yoroiLogo from '../../assets/images/sidebar/yoroi_logo.inline.svg';
 
 type Props = {|
   +children?: ?Node,
-  +categories?: Array<SidebarCategory>,
-  +isActiveCategory?: SidebarCategory => boolean,
-  +onCategoryClicked?: SidebarCategory => void,
+  +categories?: Array<SidebarCategoryRevamp>,
+  +isActiveCategory?: SidebarCategoryRevamp => boolean,
+  +onCategoryClicked?: SidebarCategoryRevamp => void,
 |};
 
 @observer
@@ -47,6 +47,7 @@ export default class SidebarRevamp extends Component<Props> {
                   <SideBarCategoryRevamp
                     key={category.className}
                     icon={category.icon}
+                    route={category.route}
                     active={isActiveCategory !== undefined && isActiveCategory(category)}
                     label={category.label}
                     onClick={() => {

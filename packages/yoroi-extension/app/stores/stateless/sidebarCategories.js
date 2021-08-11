@@ -158,7 +158,7 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
   },
   {
     className: 'faq',
-    route: '/faq',
+    route: 'https://yoroi-wallet.com/faq',
     icon: faqIcon,
     label: globalMessages.sidebarFaq,
     isVisible: request => request.hasAnyWallets,
