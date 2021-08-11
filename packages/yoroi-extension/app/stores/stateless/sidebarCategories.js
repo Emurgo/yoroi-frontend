@@ -115,7 +115,7 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     className: 'wallets',
     route: ROUTES.MY_WALLETS,
     icon: walletIcon,
-    label: globalMessages.sidebarWallets,
+    label: globalMessages.walletLabel,
     isVisible: request =>
       request.hasAnyWallets &&
       request.selected == null &&
