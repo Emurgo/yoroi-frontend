@@ -78,7 +78,12 @@ getChangeAddress.addEventListener('click', () => {
 
 getUtxos.addEventListener('click', () => {
     cardano.get_utxos().then(utxos => {
-        console.log('Utxos', utxos)
+        if(utxos.length === 0){
+            alertWarrning('NO UTXOS')
+        } else {
+            alertSuccess(`Check the console`)
+            console.log('Utxos', utxos)
+        }
     })
 })
 
