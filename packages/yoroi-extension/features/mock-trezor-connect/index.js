@@ -410,7 +410,7 @@ class MockTrezorConnect {
       )
       : undefined;
     if (metadata != null) {
-      body.set_metadata_hash(RustModule.WalletV4.hash_auxiliary_data(metadata));
+      body.set_auxiliary_data_hash(RustModule.WalletV4.hash_auxiliary_data(metadata));
     }
     if (request.withdrawals != null && request.withdrawals.length > 0) {
       const withdrawalRequest = request.withdrawals;
