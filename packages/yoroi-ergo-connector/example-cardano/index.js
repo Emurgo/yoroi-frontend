@@ -6,6 +6,7 @@ const getChangeAddress = document.querySelector('#get-change-address')
 const getAccountBalance = document.querySelector('#get-balance')
 const getUtxos = document.querySelector('#get-utxos')
 const alertEl = document.querySelector('#alert')
+const spinner = document.querySelector('#spinner')
 
 let accessGranted = false
 
@@ -25,10 +26,12 @@ cardanoAccessBtn.addEventListener('click', () => {
 })
 
 getAccountBalance.addEventListener('click', () => {
+    toggleSpinner('show')
     if(!accessGranted) {
        alertError('Should request access first')
     } else {
         cardano.get_balance().then(function(balance) {
+            toggleSpinner('hide')
             alertSuccess(`Account Balance: ${balance}`)
         });
     }
@@ -38,7 +41,9 @@ getUnUsedAddresses.addEventListener('click', () => {
     if(!accessGranted) {
        alertError('Should request access first')
     } else {
+        toggleSpinner('show')
         cardano.get_unused_addresses().then(function(addresses) {
+            toggleSpinner('hide')
             if(addresses.length === 0){
                 alertWarrning('No unused addresses')
             } else {
@@ -52,7 +57,9 @@ getUsedAddresses.addEventListener('click', () => {
     if(!accessGranted) {
        alertError('Should request access first')
     } else {
+        toggleSpinner('show')
         cardano.get_used_addresses().then(function(addresses) {
+            toggleSpinner('hide')
            if(addresses.length === 0){
                alertWarrning('No used addresses')
            } else {
@@ -64,9 +71,11 @@ getUsedAddresses.addEventListener('click', () => {
 
 getChangeAddress.addEventListener('click', () => {
     if(!accessGranted) {
-       alertError('Should request access first')
+        alertError('Should request access first')
     } else {
+        toggleSpinner('show')
         cardano.get_change_address().then(function(addresses) {
+            toggleSpinner('hide')
             if(addresses.length === 0){
                 alertWarrning('No change addresses')
             } else {
@@ -77,12 +86,14 @@ getChangeAddress.addEventListener('click', () => {
 })
 
 getUtxos.addEventListener('click', () => {
+    toggleSpinner('show')
     cardano.get_utxos().then(utxos => {
+        toggleSpinner('hide')
         if(utxos.length === 0){
             alertWarrning('NO UTXOS')
         } else {
             alertSuccess(`Check the console`)
-            console.log('Utxos', utxos)
+            alertEl.innerHTML = '<pre>' + JSON.stringify(utxos, undefined, 2) + '</pre>'
         }
     })
 })
@@ -110,4 +121,13 @@ function alertSuccess(text) {
 function alertWarrning(text) {
     alertEl.className = 'alert alert-warning'
     alertEl.innerHTML = text
+}
+
+function toggleSpinner(status){
+    if(status === 'show') {
+        spinner.className = 'spinner-border'
+        alertEl.className = 'd-none'
+    } else {
+        spinner.className = 'd-none'
+    }
 }
