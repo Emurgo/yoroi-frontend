@@ -81,7 +81,7 @@ export function asAddressedUtxo(
         acc.amount = acc.amount.plus(next.TokenList.Amount);
       } else {
         acc.tokens.push({
-          amount: Number(next.TokenList.Amount),
+          amount: next.TokenList.Amount,
           tokenId: next.Token.Identifier,
         });
       }
@@ -114,7 +114,7 @@ export function toErgoBoxJSON(
 ): ErgoBoxJson {
   return {
     boxId: utxo.boxId,
-    value: Number.parseInt(utxo.amount, 10),
+    value: utxo.amount,
     ergoTree: utxo.ergoTree,
     assets: (utxo.assets ?? []).map(asset => ({
       amount: asset.amount,
@@ -136,9 +136,7 @@ export function toRemoteUtxo(
     amount: utxo.value.toString(),
     ergoTree: utxo.ergoTree,
     assets: (utxo.assets ?? []).map(asset => ({
-      amount: typeof asset.amount === 'string'
-        ? Number.parseInt(asset.amount, 10)
-        : asset.amount,
+      amount: asset.amount,
       tokenId: asset.tokenId,
     })),
     receiver: Buffer.from(RustModule.SigmaRust.NetworkAddress.new(

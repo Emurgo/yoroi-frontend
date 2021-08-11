@@ -8,8 +8,6 @@ import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import { Input } from 'react-polymorph/lib/components/Input';
 import { NumericInput } from 'react-polymorph/lib/components/NumericInput';
-import { Checkbox } from 'react-polymorph/lib/components/Checkbox';
-import { CheckboxSkin } from 'react-polymorph/lib/skins/simple/CheckboxSkin';
 import { defineMessages, intlShape } from 'react-intl';
 import { isValidMemoOptional, isValidMemo, } from '../../../utils/validations';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
@@ -55,9 +53,21 @@ const messages = defineMessages({
     id: 'wallet.send.form.receiver.hint',
     defaultMessage: '!!!Wallet Address',
   },
-  checkboxLabel: {
-    id: 'wallet.send.form.sendAll.checkboxLabel',
+  dropdownAmountLabel: {
+    id: 'wallet.send.form.sendAll.dropdownAmountLabel',
     defaultMessage: '!!!Send all {coinName}',
+  },
+  allTokens: {
+    id: 'wallet.send.form.sendAll.allTokens',
+    defaultMessage: '!!! + all tokens',
+  },
+  selectedAmountLable: {
+    id: 'wallet.send.form.sendAll.selectedAmountLable',
+    defaultMessage: '!!!Amount Options',
+  },
+  customAmount: {
+    id: 'wallet.send.form.sendAll.customAmount',
+    defaultMessage: '!!!Custom Amount',
   },
   transactionFeeError: {
     id: 'wallet.send.form.transactionFeeError',
@@ -102,6 +112,7 @@ type Props = {|
   +spendableBalance: ?MultiToken,
   +selectedToken: void | $ReadOnly<TokenRow>,
 |};
+const CUSTOM_AMOUNT = 'CUSTOM_AMOUNT'
 
 @observer
 export default class WalletSendForm extends Component<Props> {
@@ -248,6 +259,14 @@ export default class WalletSendForm extends Component<Props> {
           networkId: this.props.defaultToken.NetworkId,
         }).TokenId,
       },
+      selectedAmount: {
+        label: this.context.intl.formatMessage(messages.selectedAmountLable),
+        value: this.props.shouldSendAll ? 
+          this.props.selectedToken?.TokenId ?? this.props.getTokenInfo({
+          identifier: this.props.defaultToken.Identifier,
+          networkId: this.props.defaultToken.NetworkId,
+        }).TokenId : CUSTOM_AMOUNT
+      },
       memo: {
         label: this.context.intl.formatMessage(memoMessages.memoLabel),
         placeholder: this.context.intl.formatMessage(memoMessages.optionalMemo),
@@ -360,6 +379,31 @@ export default class WalletSendForm extends Component<Props> {
       }));
     })();
 
+    
+    const sendAmountOptions = (() => {
+      const tokenId = this.props.selectedToken?.TokenId ?? this.props.getTokenInfo({
+        identifier: this.props.defaultToken.Identifier,
+        networkId: this.props.defaultToken.NetworkId,
+      }).TokenId
+      return [
+        { id: 'custom-amount', label: intl.formatMessage(messages.customAmount), value: CUSTOM_AMOUNT },
+        ...tokenOptions.filter(t => t.value === tokenId).map(token => {
+          let label = intl.formatMessage(messages.dropdownAmountLabel, {
+            currency: truncateToken(token.label)
+          })
+          const defaultTokenName =truncateToken(getTokenName(this.props.defaultToken))
+          if(token.label === defaultTokenName){
+            label += intl.formatMessage(messages.allTokens)
+          }
+          return {
+            label,
+            value: token.value,
+            id: token.id
+          }
+        })
+      ]
+    })()
+
     return (
       <div className={styles.component}>
 
@@ -383,6 +427,8 @@ export default class WalletSendForm extends Component<Props> {
                 }
                 // clear amount field when switching currencies
                 this.form.$('amount').clear();
+                // reset the amout dropdown to coustom amount
+                this.form.$('selectedAmount').value = CUSTOM_AMOUNT
                 this.props.updateAmount();
               }}
               skin={SelectTokenSkin}
@@ -433,33 +479,36 @@ export default class WalletSendForm extends Component<Props> {
               classicTheme={classicTheme}
             />
           </div>
-          <div className={styles.checkbox}>
-            <Checkbox
-              label={intl.formatMessage(messages.checkboxLabel, {
-                currency: (this.props.selectedToken == null || this.props.selectedToken.IsDefault)
-                  // sending all of the primary asset for the chain sends all assets
-                  // since to send all of the primary asset, you have to include all UTXO
-                  ? intl.formatMessage(globalMessages.assets)
-                  : truncateToken(getTokenName(this.props.selectedToken))
-              })}
-              onChange={() => {
+
+          <Select
+            options={sendAmountOptions}
+            {...form.$('selectedAmount').bind()}
+            onChange={value => {
+              this.form.$('selectedAmount').value = value
+              if(value === CUSTOM_AMOUNT && this.props.shouldSendAll) {
                 this.props.toggleSendAll();
-                if (this.props.shouldSendAll) {
-                  // if we toggle shouldSendAll from true -> false
-                  // we need to re-enable the field
-                  // and set it to whatever value was used for the sendAll value
-                  this.props.updateAmount(new BigNumber(
-                    formattedAmountToNaturalUnits(
-                      this.form.$('amount').value,
-                      this.getNumDecimals(),
-                    )
-                  ));
-                }
-              }}
-              checked={this.props.shouldSendAll}
-              skin={CheckboxSkin}
-            />
-          </div>
+              } else if (value !== CUSTOM_AMOUNT) {
+                this.props.toggleSendAll()
+              }
+              if (this.props.shouldSendAll) {
+                // if we toggle shouldSendAll from true -> false
+                // we need to re-enable the field
+                // and set it to whatever value was used for the sendAll value
+                this.props.updateAmount(new BigNumber(
+                  formattedAmountToNaturalUnits(
+                    this.form.$('amount').value,
+                    this.getNumDecimals(),
+                  )
+                ));
+              }
+            }}
+            optionRenderer={option => (
+              <TokenOptionRow
+                displayName={option.label}
+                nameOnly
+              />
+            )}
+          />
 
           {showMemo ? (
             <div className={styles.memoInput}>

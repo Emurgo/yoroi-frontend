@@ -48,6 +48,8 @@ Feature: Wallet UI Settings
       | password   |
       | newSecret123 |
     And I submit the wallet send form
+    Then I should see the successfully sent page
+    And I click the transaction page button
     Then I should see the summary screen
 
         Examples:
@@ -176,9 +178,9 @@ Feature: Wallet UI Settings
   Scenario: Switch complexity levels (IT-125)
     And I navigate to the general settings screen
     And I click on secondary menu "levelOfComplexity" item
-    Then The selected level is "ADVANCED"
-    Then I select the simplest level
     Then The selected level is "SIMPLE"
+    Then I select the most complex level
+    Then The selected level is "ADVANCED" 
 
   @it-126
   Scenario: Yoroi Settings Screen / Blockchain (IT-126)

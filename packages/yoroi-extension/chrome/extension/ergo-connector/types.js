@@ -176,11 +176,11 @@ export function asSignedInput(input: any): SignedInput {
 export type UnsignedInput = {|
   extension: ErgoContextExtension,
   boxId: ErgoBoxId,
-  value: number | string,
+  value: string,
   ergoTree: string,
   assets: Array<{|
     tokenId: string, // hex
-    amount: number | string,
+    amount: string,
   |}>,
   creationHeight: number,
   additionalRegisters: {| [key: string]: string |},
@@ -320,13 +320,13 @@ export function asTxId(input: any): TxId {
   throw new Error(`invalid TxId, must be string: ${JSON.stringify(input)}`);
 }
 
-export type Value = number | string;
+export type Value = string;
 
 export function asValue(input: any): Value {
-  if (typeof input === 'number' || typeof input === 'string') {
+  if (typeof input === 'string') {
     return input;
   }
-  throw ConnectorError.invalidRequest(`Value must be a string or number: : ${JSON.stringify(input)}`);
+  throw ConnectorError.invalidRequest(`Value must be a string: : ${JSON.stringify(input)}`);
 }
 
 // Errors (Exposed to dApps):

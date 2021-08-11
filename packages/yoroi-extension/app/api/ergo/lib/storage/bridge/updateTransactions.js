@@ -1495,10 +1495,10 @@ async function rawAddErgoAssets(
 
   const databaseInsert: Array<TokenUpsert> = Object.keys(tokenInfo).map(tokenId => {
     const numberOfDecimals: number = tokenInfo[tokenId].numDecimals || 0;
-    const description: string | null = tokenInfo[tokenId].desc || null;
+    const description: string | null = tokenInfo[tokenId].desc;
     const boxId: string = tokenInfo[tokenId].boxId;
     const height: number = tokenInfo[tokenId].height;
-    const longName: string | null = tokenInfo[tokenId].name || null;
+    const longName: string | null = tokenInfo[tokenId].name;
     return ({
       NetworkId: network.NetworkId,
       Identifier: tokenId,

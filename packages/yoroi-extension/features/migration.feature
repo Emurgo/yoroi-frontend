@@ -28,7 +28,6 @@ Feature: Migration
     # make sure all major functionality work
     # even if user hasn't launched Yoroi since the very first version
     Given I import a snapshot named historical-versions/1_0_4/software
-    Then I select the most complex level
     Then I accept uri registration
     Then I should see the summary screen
     Then I should see a plate EDAO-9229
@@ -55,6 +54,8 @@ Feature: Migration
       | password   |
       | asdfasdfasdf |
     And I submit the wallet send form
+    Then I should see the successfully sent page
+    And I click the transaction page button
     Then I should see the summary screen
 
     Examples:
@@ -67,7 +68,6 @@ Feature: Migration
     # make sure all major functionality work
     # even if user hasn't launched Yoroi since the very first version
     Given I import a snapshot named historical-versions/1_4_0/software
-    Then I select the most complex level
     Then I accept uri registration
     Then I should see the summary screen
     Then I should see a plate EDAO-9229

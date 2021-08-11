@@ -404,9 +404,9 @@ class MockTrezorConnect {
       body.set_certs(certs);
     }
 
-    const metadata = request.metadata != null
+    const metadata = request.auxiliaryData?.blob != null
       ? RustModule.WalletV4.AuxiliaryData.from_bytes(
-        Buffer.from(request.metadata, 'hex')
+        Buffer.from(request.auxiliaryData.blob, 'hex')
       )
       : undefined;
     if (metadata != null) {
@@ -535,7 +535,19 @@ class MockTrezorConnect {
           fw_vendor: (null: any),
           fw_vendor_keys: (null: any),
           unfinished_backup: false,
-          no_backup: false
+          no_backup: false,
+          recovery_mode: false,
+          backup_type: null,
+          sd_card_present: false,
+          sd_protection: false,
+          wipe_code_protection: false,
+          session_id: null,
+          passphrase_always_on_device: false,
+          safety_checks: null,
+          auto_lock_delay_ms: 0,
+          display_rotation: 0,
+          experimental_features: false,
+          unlocked: false,
         }
       }: KnownDevice)
     }));
