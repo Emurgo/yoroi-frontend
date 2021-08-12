@@ -168,7 +168,7 @@ export function toErgoBoxJSON(
 }
 
 
-type CardanoBoxJson = {|
+export type CardanoBoxJson = {|
   value: string,
   assets: Array<{|
     tokenId: string, // hex
@@ -176,7 +176,7 @@ type CardanoBoxJson = {|
   |}>,
   additionalRegisters: {| [key: string]: string |},
   transactionId: string,
-  index: number
+  index: number,
 |};
 
 export function toCardanoBoxJSON(

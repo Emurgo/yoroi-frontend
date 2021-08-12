@@ -233,7 +233,8 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       const wallets = await getWallets({ db: persistentDb });
 
       const filteredWallets = wallets
-      // list all wallet for now until we find away to know which type of wallet to filter ( ergo || cardano )
+      // list all wallet for now until we find a way to
+      // know which type of wallet to filter ( ergo || cardano )
       // .filter(wallet => !isErgo(wallet.getParent().getNetworkInfo()));
 
       await this._getTxAssets(filteredWallets);

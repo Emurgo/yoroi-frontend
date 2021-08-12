@@ -37,11 +37,12 @@ import {
 import {
   connectorGetBalance,
   connectorGetChangeAddress,
-  connectorGetUtxos,
+  connectorGetUtxosErgo,
   connectorSendTx,
   connectorSignTx,
   connectorGetUsedAddresses,
-  connectorGetUnusedAddresses
+  connectorGetUnusedAddresses,
+  connectorGetUtxosCardano
 } from './ergo-connector/api';
 import { updateTransactions } from '../../app/api/ergo/lib/storage/bridge/updateTransactions';
 import { environment } from '../../app/environment';
@@ -71,7 +72,6 @@ const onYoroiIconClicked = () => {
 };
 
 chrome.browserAction.onClicked.addListener(debounce(onYoroiIconClicked, 500, { leading: true }));
-const log = chrome.extension.getBackgroundPage().console.log;
 
 /**
  * we store the ID instead of an index
@@ -729,13 +729,25 @@ chrome.runtime.onConnectExternal.addListener(port => {
                 await withSelectedWallet(
                   tabId,
                   async (wallet) => {
-                    const utxos = await connectorGetUtxos(
-                      wallet,
-                      pendingTxs,
-                      valueExpected,
-                      tokenId,
-                      paginate
-                    );
+                    const walletType = wallet.parent.defaultToken.Metadata.type
+                    let utxos;
+                    if(walletType === 'Cardano') {
+                      utxos = await connectorGetUtxosCardano(
+                        wallet,
+                        pendingTxs,
+                        valueExpected,
+                        tokenId,
+                        paginate
+                      );
+                    } else {
+                      utxos = await connectorGetUtxosErgo(
+                        wallet,
+                        pendingTxs,
+                        valueExpected,
+                        tokenId,
+                        paginate
+                        );
+                    }
                     rpcResponse({
                       ok: utxos
                     });
