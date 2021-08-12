@@ -189,10 +189,11 @@ async function getAllAddresses(wallet: PublicDeriver<>, usedFilter: boolean): Pr
     .flat()
     .filter(a => a.isUsed === usedFilter)
     // @note: from_bytes returns Ergo tree
-    // throw an error when used on cardano addresses 
+    // will throw an error when used on cardano addresses 
     // .map(a => RustModule.SigmaRust.NetworkAddress
     //     .from_bytes(Buffer.from(a.address, 'hex'))
     //     .to_base58());
+    .map(a => a.address)
   return addresses;
 }
 
