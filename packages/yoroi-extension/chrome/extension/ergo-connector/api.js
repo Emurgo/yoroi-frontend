@@ -153,25 +153,52 @@ export async function connectorGetUtxos(
 }
 
 async function getAllAddresses(wallet: PublicDeriver<>, usedFilter: boolean): Promise<Address[]> {
-  const p2pk = getAllAddressesForDisplay({
-    publicDeriver: wallet,
-    type: CoreAddressTypes.ERGO_P2PK
-  });
-  const p2sh = getAllAddressesForDisplay({
-    publicDeriver: wallet,
-    type: CoreAddressTypes.ERGO_P2SH
-  });
-  const p2s = getAllAddressesForDisplay({
-    publicDeriver: wallet,
-    type: CoreAddressTypes.ERGO_P2S
-  });
+  // @todo: This only get all addresses for ERGO 
+  // need to select which type of addresses we'll query for.
+  const ergoAddressTypes = [
+    CoreAddressTypes.ERGO_P2PK, 
+    CoreAddressTypes.ERGO_P2SH, 
+    CoreAddressTypes.ERGO_P2S
+  ]
+  const cardanoAddressTypes = [
+    CoreAddressTypes.CARDANO_BASE, 
+    CoreAddressTypes.CARDANO_ENTERPRISE, 
+    CoreAddressTypes.CARDANO_LEGACY,
+    CoreAddressTypes.CARDANO_PTR,
+    CoreAddressTypes.CARDANO_REWARD
+  ]
+  
+  const selectedAddressesTypes = cardanoAddressTypes
+  const allAddressesResult = []
+  for(let type of selectedAddressesTypes){
+    const result = getAllAddressesForDisplay({
+      publicDeriver: wallet,
+      type: type
+    });
+    allAddressesResult.push(result)
+  }
+  // const p2pk = getAllAddressesForDisplay({
+  //   publicDeriver: wallet,
+  //   type: CoreAddressTypes.ERGO_P2PK
+  // });
+  // const p2sh = getAllAddressesForDisplay({
+  //   publicDeriver: wallet,
+  //   type: CoreAddressTypes.ERGO_P2SH
+  // });
+  // const p2s = getAllAddressesForDisplay({
+  //   publicDeriver: wallet,
+  //   type: CoreAddressTypes.ERGO_P2S
+  // });
   await RustModule.load();
-  const addresses = (await Promise.all([p2pk, p2sh, p2s]))
+  console.log((await Promise.all([...allAddressesResult])), selectedAddressesTypes)
+  const addresses = (await Promise.all([...allAddressesResult]))
     .flat()
-    .filter(a => a.isUsed === usedFilter)
-    .map(a => RustModule.SigmaRust.NetworkAddress
-        .from_bytes(Buffer.from(a.address, 'hex'))
-        .to_base58());
+    .filter(a => a.isUsed === true)
+    // @note: from_bytes returns Ergo tree
+    // throw an error when used on cardano addresses 
+    // .map(a => RustModule.SigmaRust.NetworkAddress
+    //     .from_bytes(Buffer.from(a.address, 'hex'))
+    //     .to_base58());
   return addresses;
 }
 
