@@ -43,7 +43,7 @@ export default class SideBarCategoryRevamp extends Component<Props> {
         <span className={styles.icon}>
           <SvgElem />
         </span>
-        {label ? <span className={styles.label}>{intl.formatMessage(label)}</span> : null}
+        {label ? <span>{intl.formatMessage(label)}</span> : null}
       </a>
     );
   }

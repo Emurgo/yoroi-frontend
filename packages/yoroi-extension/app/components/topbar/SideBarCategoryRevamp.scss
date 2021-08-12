@@ -4,6 +4,12 @@
   flex-direction: column;
   align-items: center;
   opacity: 0.5;
+  text-decoration: none;
+  font-size: 12px;
+  font-family: var(--font-regular);
+  line-height: var(--theme-sidebar-text-line-height);
+  color: var(--theme-sidebar-text-color);
+
   & + & {
     margin-top: 18px;
   }
@@ -20,14 +26,5 @@
 .icon {
   max-width: 24px;
   max-height: 24px;
-  color: var(--theme-sidebar-text-color);
   margin-bottom: 4px;
-}
-
-.label {
-  display: block;
-  color: var(--theme-sidebar-text-color);
-  font-family: var(--font-regular);
-  font-size: '10px';
-  line-height: var(--theme-sidebar-text-line-height);
 }
