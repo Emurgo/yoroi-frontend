@@ -167,8 +167,8 @@ async function getAllAddresses(wallet: PublicDeriver<>, usedFilter: boolean): Pr
     CoreAddressTypes.CARDANO_PTR,
     CoreAddressTypes.CARDANO_REWARD
   ]
-  
-  const selectedAddressesTypes = cardanoAddressTypes
+  const walletType = wallet.parent.defaultToken.Metadata.type
+  const selectedAddressesTypes = walletType === 'Cardano' ? cardanoAddressTypes : ergoAddressTypes
   const allAddressesResult = []
   for(let type of selectedAddressesTypes){
     const result = getAllAddressesForDisplay({
@@ -177,20 +177,7 @@ async function getAllAddresses(wallet: PublicDeriver<>, usedFilter: boolean): Pr
     });
     allAddressesResult.push(result)
   }
-  // const p2pk = getAllAddressesForDisplay({
-  //   publicDeriver: wallet,
-  //   type: CoreAddressTypes.ERGO_P2PK
-  // });
-  // const p2sh = getAllAddressesForDisplay({
-  //   publicDeriver: wallet,
-  //   type: CoreAddressTypes.ERGO_P2SH
-  // });
-  // const p2s = getAllAddressesForDisplay({
-  //   publicDeriver: wallet,
-  //   type: CoreAddressTypes.ERGO_P2S
-  // });
   await RustModule.load();
-  console.log((await Promise.all([...allAddressesResult])), selectedAddressesTypes)
   const addresses = (await Promise.all([...allAddressesResult]))
     .flat()
     .filter(a => a.isUsed === true)
