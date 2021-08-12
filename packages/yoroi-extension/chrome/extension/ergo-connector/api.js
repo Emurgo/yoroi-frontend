@@ -137,7 +137,8 @@ export async function connectorGetUtxos(
     let valueAcc = new BigNumber(0);
     const target = valueToBigNumber(valueExpected);
     for (let i = 0; i < utxos.length && valueAcc.isLessThan(target); i += 1) {
-      const formatted = tokenId === 'ERG' ? formatUtxoToBoxErgo(utxos[i]) : formatUtxoToBoxCardano(utxos[i]);
+      const walletType = wallet.parent.defaultToken.Metadata.type
+      const formatted = walletType === 'Cardano' ? formatUtxoToBoxErgo(utxos[i]) : formatUtxoToBoxCardano(utxos[i]);
       if (!spentBoxIds.includes(formatted.boxId)) {
         if (tokenId === 'ERG' || tokenId == 'ADA') {
           valueAcc = valueAcc.plus(valueToBigNumber(formatted.value));
@@ -185,7 +186,7 @@ async function getAllAddresses(wallet: PublicDeriver<>, usedFilter: boolean): Pr
     allAddressesResult.push(result)
   }
   await RustModule.load();
-  const addresses = (await Promise.all([...allAddressesResult]))
+  let addresses = (await Promise.all([...allAddressesResult]))
     .flat()
     .filter(a => a.isUsed === usedFilter)
     // @note: from_bytes returns Ergo tree
@@ -193,7 +194,17 @@ async function getAllAddresses(wallet: PublicDeriver<>, usedFilter: boolean): Pr
     // .map(a => RustModule.SigmaRust.NetworkAddress
     //     .from_bytes(Buffer.from(a.address, 'hex'))
     //     .to_base58());
-    .map(a => a.address)
+    // .map(a => a.address)
+
+    if(walletType === 'Cardano') {
+      // Cardano does not have a function to convert from bytes to_base58
+      addresses = addresses.map(a => a.address)
+    } else {
+      addresses =  addresses.map(a => RustModule.SigmaRust.NetworkAddress
+        .from_bytes(Buffer.from(a.address, 'hex'))
+        .to_base58());
+    }
+
   return addresses;
 }
 

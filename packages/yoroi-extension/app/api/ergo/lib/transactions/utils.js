@@ -167,19 +167,27 @@ export function toErgoBoxJSON(
   };
 }
 
-// todo : add cardano types 
+
+type CardanoBoxJson = {|
+  value: string,
+  assets: Array<{|
+    tokenId: string, // hex
+    amount: string,
+  |}>,
+  additionalRegisters: {| [key: string]: string |},
+  transactionId: string,
+  index: number
+|};
+
 export function toCardanoBoxJSON(
   utxo: RemoteUnspentOutput
-): any {
+): CardanoBoxJson {
   return {
-    boxId: utxo.boxId,
     value: utxo.amount,
-    ergoTree: utxo.ergoTree,
     assets: (utxo.assets ?? []).map(asset => ({
       amount: asset.amount,
       tokenId: asset.tokenId,
     })),
-    creationHeight: utxo.creationHeight,
     additionalRegisters: utxo.additionalRegisters || Object.freeze({}),
     transactionId: utxo.tx_hash,
     index: utxo.tx_index,
