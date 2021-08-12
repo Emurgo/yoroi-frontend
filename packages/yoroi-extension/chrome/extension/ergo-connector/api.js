@@ -180,7 +180,7 @@ async function getAllAddresses(wallet: PublicDeriver<>, usedFilter: boolean): Pr
   await RustModule.load();
   const addresses = (await Promise.all([...allAddressesResult]))
     .flat()
-    .filter(a => a.isUsed === true)
+    .filter(a => a.isUsed === usedFilter)
     // @note: from_bytes returns Ergo tree
     // throw an error when used on cardano addresses 
     // .map(a => RustModule.SigmaRust.NetworkAddress
