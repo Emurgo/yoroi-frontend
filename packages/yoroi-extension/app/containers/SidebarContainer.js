@@ -1,5 +1,5 @@
 // @flow
-import type { Node } from 'react';
+import type { ComponentType, Node } from 'react';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { computed } from 'mobx';
@@ -8,22 +8,29 @@ import type { InjectedOrGenerated } from '../types/injectedPropsType';
 import { allCategories, allCategoriesRevamp } from '../stores/stateless/sidebarCategories';
 import { PublicDeriver } from '../api/ada/lib/storage/models/PublicDeriver';
 import SidebarRevamp from '../components/topbar/SidebarRevamp';
+import { withLayout } from '../themes/context/layout';
 
 export type GeneratedData = typeof SidebarContainer.prototype.generated;
 
-@observer
-export default class SidebarContainer extends Component<InjectedOrGenerated<GeneratedData>> {
+type Props = {|
+  ...InjectedOrGenerated<GeneratedData>,
+|};
+type InjectedProps = {|
+  +isRevampLayout: boolean,
+|};
+type AllProps = {| ...Props, ...InjectedProps |};
 
+@observer
+class SidebarContainer extends Component<AllProps> {
   toggleSidebar: void => Promise<void> = async () => {
     await this.generated.actions.profile.toggleSidebar.trigger();
-  }
+  };
 
   render(): Node {
     const { stores } = this.generated;
     const { profile } = stores;
-    // TODO: Remove hardcoded variable
-    const isRevampTheme = false;
-    return isRevampTheme ? (
+
+    return this.props.isRevampLayout ? (
       <SidebarRevamp
         onCategoryClicked={category => {
           this.generated.actions.router.goToRoute.trigger({
@@ -68,17 +75,17 @@ export default class SidebarContainer extends Component<InjectedOrGenerated<Gene
     actions: {|
       profile: {|
         toggleSidebar: {|
-          trigger: (params: void) => Promise<void>
-        |}
+          trigger: (params: void) => Promise<void>,
+        |},
       |},
       router: {|
         goToRoute: {|
           trigger: (params: {|
             publicDeriver?: null | PublicDeriver<>,
             params?: ?any,
-            route: string
-          |}) => void
-        |}
+            route: string,
+          |}) => void,
+        |},
       |},
     |},
     stores: {|
@@ -86,10 +93,10 @@ export default class SidebarContainer extends Component<InjectedOrGenerated<Gene
       profile: {| isSidebarExpanded: boolean |},
       wallets: {|
         hasAnyWallets: boolean,
-        selected: null | PublicDeriver<>
-      |}
-    |}
-    |} {
+        selected: null | PublicDeriver<>,
+      |},
+    |},
+  |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }
@@ -121,3 +128,4 @@ export default class SidebarContainer extends Component<InjectedOrGenerated<Gene
     });
   }
 }
+export default (withLayout(SidebarContainer): ComponentType<Props>);
