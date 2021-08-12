@@ -45,10 +45,6 @@ function initDapp() {
             ergo.get_utxos(5000, assetId).then(result => {
                 console.log(`get_utxos(5000, custom asset) = ${JSON.stringify(result)}`);
             });*/
-            const assetId = "12c83f696c0731cfa6f70d1dea4c438c29ba3a193bf651b0c74d101ad62cf8b9";
-            ergo.get_utxos('5000', assetId).then(result => {
-                console.log(`get_utxos(5000, custom asset) = ${JSON.stringify(result)}`);
-            });
             ergo.get_balance().then(async function(result) {
                 let tx = {};
                 const div = document.getElementById("balance");

@@ -242,7 +242,6 @@ function getFavicon(url) {
     }
     return faviconURL;
 }
-console.log("Starting")
 let yoroiPort = null;
 let ergoApiInjected = false;
 let cardanoApiInjected = false;
@@ -282,7 +281,6 @@ function createYoroiPort() {
                 success: message.success
             }, location.origin);
         } else if (message.type === "yoroi_connect_response/cardano") {
-            console.log('this the response for caradano')
             if (message.success) {
                 if (!cardanoApiInjected) {
                     // inject full API here
@@ -364,7 +362,6 @@ if (shouldInject()) {
                 }
                 // note: content scripts are subject to the same CORS policy as the website they are embedded in
                 // but since we are querying the website this script is injected into, it should be fine
-                console.log("dataType: ", dataType)
                 convertImgToBase64(getFavicon(location.origin))
                     .then(imgBase64Url => {
                         yoroiPort.postMessage({
