@@ -36,7 +36,7 @@ import {
 
 import axios from 'axios';
 
-import { asAddressedUtxo, toErgoBoxJSON } from '../../../app/api/ergo/lib/transactions/utils';
+import { asAddressedUtxo, asAddressedUtxoCardano, toCardanoBoxJSON, toErgoBoxJSON } from '../../../app/api/ergo/lib/transactions/utils';
 import { CoreAddressTypes } from '../../../app/api/ada/lib/storage/database/primitives/enums';
 import { getAllAddressesForDisplay } from '../../../app/api/ada/lib/storage/bridge/traitUtils';
 import { getReceiveAddress } from '../../../app/stores/stateless/addressStores';
@@ -105,10 +105,16 @@ export async function connectorGetBalance(
   }
 }
 
-function formatUtxoToBox(utxo: ElementOf<IGetAllUtxosResponse>): ErgoBoxJson {
+function formatUtxoToBoxErgo(utxo: ElementOf<IGetAllUtxosResponse>): ErgoBoxJson {
   // eslint-disable-next-line no-unused-vars
   const { addressing, ...rest } = asAddressedUtxo(utxo);
   return toErgoBoxJSON(rest);
+}
+
+function formatUtxoToBoxCardano(utxo: ElementOf<IGetAllUtxosResponse>): ErgoBoxJson {
+  // eslint-disable-next-line no-unused-vars
+  const { addressing, ...rest } = asAddressedUtxoCardano(utxo);
+  return toCardanoBoxJSON(rest);
 }
 
 export async function connectorGetUtxos(
@@ -117,6 +123,7 @@ export async function connectorGetUtxos(
   valueExpected: ?Value,
   tokenId: TokenId,
   paginate: ?Paginate
+  //@todo Update api return type
 ): Promise<ErgoBoxJson[]> {
   const withUtxos = asGetAllUtxos(wallet);
   if (withUtxos == null) {
@@ -130,9 +137,9 @@ export async function connectorGetUtxos(
     let valueAcc = new BigNumber(0);
     const target = valueToBigNumber(valueExpected);
     for (let i = 0; i < utxos.length && valueAcc.isLessThan(target); i += 1) {
-      const formatted = formatUtxoToBox(utxos[i]);
+      const formatted = tokenId === 'ERG' ? formatUtxoToBoxErgo(utxos[i]) : formatUtxoToBoxCardano(utxos[i]);
       if (!spentBoxIds.includes(formatted.boxId)) {
-        if (tokenId === 'ERG') {
+        if (tokenId === 'ERG' || tokenId == 'ADA') {
           valueAcc = valueAcc.plus(valueToBigNumber(formatted.value));
           utxosToUse.push(formatted);
         } else {
@@ -147,7 +154,7 @@ export async function connectorGetUtxos(
       }
     }
   } else {
-    utxosToUse = utxos.map(formatUtxoToBox).filter(box => !spentBoxIds.includes(box.boxId));
+    utxosToUse = utxos.map(tokenId === 'ERG' ? formatUtxoToBoxErgo : formatUtxoToBoxCardano).filter(box => !spentBoxIds.includes(box.boxId));
   }
   return Promise.resolve(paginateResults(utxosToUse, paginate));
 }
@@ -274,7 +281,7 @@ export async function connectorSignTx(
   const dataBoxIds = tx.dataInputs.map(box => box.boxId);
   const dataInputs = utxos.filter(
     utxo => dataBoxIds.includes(utxo.output.UtxoTransactionOutput.ErgoBoxId)
-  ).map(formatUtxoToBox);
+  ).map(formatUtxoToBoxErgo);
   // We could modify the best block backend to return this information for the previous block
   // but I'm guessing that votes of the previous block isn't useful for the current one
   // and I'm also unsure if any of these 3 would impact signing or not.

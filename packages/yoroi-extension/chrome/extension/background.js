@@ -71,6 +71,7 @@ const onYoroiIconClicked = () => {
 };
 
 chrome.browserAction.onClicked.addListener(debounce(onYoroiIconClicked, 500, { leading: true }));
+const log = chrome.extension.getBackgroundPage().console.log;
 
 /**
  * we store the ID instead of an index
@@ -724,7 +725,6 @@ chrome.runtime.onConnectExternal.addListener(port => {
               const valueExpected = message.params[0] == null ? null : asValue(message.params[0]);
               const tokenId = asTokenId(message.params[1]);
               const paginate = message.params[2] == null ? null : asPaginate(message.params[2]);
-
               await withDb(async (db, localStorageApi) => {
                 await withSelectedWallet(
                   tabId,
