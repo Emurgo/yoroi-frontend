@@ -44,8 +44,8 @@ import { getReceiveAddress } from '../../../app/stores/stateless/addressStores';
 import LocalStorageApi from '../../../app/api/localStorage/index';
 
 import type { BestBlockResponse } from '../../../app/api/ergo/lib/state-fetch/types';
-import { asAddressedUtxo as  asAddressedUtxoCardano } from "../../../app/api/ada/transactions/utils.js";
-import type { RemoteUnspentOutput } from '../../../app/api/jormungandr/lib/state-fetch/types'
+import { asAddressedUtxo as  asAddressedUtxoCardano } from '../../../app/api/ada/transactions/utils';
+import type { RemoteUnspentOutput } from '../../../app/api/ada/lib/state-fetch/types'
 
 function paginateResults<T>(results: T[], paginate: ?Paginate): T[] {
   if (paginate != null) {
@@ -160,17 +160,35 @@ export async function connectorGetUtxosCardano(
   valueExpected: ?Value,
   tokenId: TokenId,
   paginate: ?Paginate
-): Promise<Array<any>> {
+): Promise<Array<RemoteUnspentOutput>> {
   const withUtxos = asGetAllUtxos(wallet);
   if (withUtxos == null) {
     throw new Error('wallet doesn\'t support IGetAllUtxos');
   }
   const utxos = await withUtxos.getAllUtxos();
-  const utxosToUse = asAddressedUtxoCardano(utxos).map(utxos => {
-    const { addressing, ...rest } = utxos
+  const utxosToUse = []
+  const formattedUtxos = asAddressedUtxoCardano(utxos).map(u => {
+    // eslint-disable-next-line no-unused-vars
+    const { addressing, ...rest } = u
     return rest
   })
-  return Promise.resolve(paginateResults(utxosToUse, paginate))
+  let valueAcc = new BigNumber(0);
+  for(const formatted of formattedUtxos){
+    if (tokenId === 'ADA') {
+      valueAcc = valueAcc.plus(valueToBigNumber(formatted.amount));
+      utxosToUse.push(formatted);
+    } else {
+      for (const asset of formatted.assets) {
+        if (asset.assetId === tokenId) {
+          valueAcc = valueAcc.plus(valueToBigNumber(asset.amount));
+          utxosToUse.push(formatted);
+          break;
+        }
+      }
+    }
+  }
+
+  return Promise.resolve(paginateResults(formattedUtxos, paginate))
 }
 
 async function getAllAddresses(wallet: PublicDeriver<>, usedFilter: boolean): Promise<Address[]> { 

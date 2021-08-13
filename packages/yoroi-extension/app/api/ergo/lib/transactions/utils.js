@@ -109,7 +109,6 @@ export function asAddressedUtxo(
   };
 }
 
-
 export function toErgoBoxJSON(
   utxo: RemoteUnspentOutput
 ): ErgoBoxJson {
