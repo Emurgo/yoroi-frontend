@@ -109,45 +109,6 @@ export function asAddressedUtxo(
   };
 }
 
-export function asAddressedUtxoCardano(
-  utxo: ElementOf<IGetAllUtxosResponse>,
-): any {
-  const output = utxo.output.UtxoTransactionOutput;
-  const { ErgoCreationHeight, ErgoBoxId, ErgoTree } = output;
-
-  const tokenTypes = utxo.output.tokens.reduce(
-    (acc, next) => {
-      if (next.Token.Identifier === PRIMARY_ASSET_CONSTANTS.Ergo) {
-        acc.amount = acc.amount.plus(next.TokenList.Amount);
-      } else {
-        acc.tokens.push({
-          amount: next.TokenList.Amount,
-          tokenId: next.Token.Identifier,
-        });
-      }
-      return acc;
-    },
-    {
-      amount: new BigNumber(0),
-      tokens: [],
-    }
-  );
-
-  return {
-    amount: tokenTypes.amount.toString(),
-    receiver: utxo.address,
-    tx_hash: utxo.output.Transaction.Hash,
-    tx_index: utxo.output.UtxoTransactionOutput.OutputIndex,
-    addressing: utxo.addressing,
-    creationHeight: ErgoCreationHeight,
-    boxId: ErgoBoxId,
-    assets: tokenTypes.tokens,
-    additionalRegisters: utxo.output.UtxoTransactionOutput.ErgoRegisters == null
-      ? undefined
-      : JSON.parse(utxo.output.UtxoTransactionOutput.ErgoRegisters),
-    ergoTree: ErgoTree,
-  };
-}
 
 export function toErgoBoxJSON(
   utxo: RemoteUnspentOutput
@@ -161,33 +122,6 @@ export function toErgoBoxJSON(
       tokenId: asset.tokenId,
     })),
     creationHeight: utxo.creationHeight,
-    additionalRegisters: utxo.additionalRegisters || Object.freeze({}),
-    transactionId: utxo.tx_hash,
-    index: utxo.tx_index,
-  };
-}
-
-
-export type CardanoBoxJson = {|
-  value: string,
-  assets: Array<{|
-    tokenId: string, // hex
-    amount: string,
-  |}>,
-  additionalRegisters: {| [key: string]: string |},
-  transactionId: string,
-  index: number,
-|};
-
-export function toCardanoBoxJSON(
-  utxo: RemoteUnspentOutput
-): CardanoBoxJson {
-  return {
-    value: utxo.amount,
-    assets: (utxo.assets ?? []).map(asset => ({
-      amount: asset.amount,
-      tokenId: asset.tokenId,
-    })),
     additionalRegisters: utxo.additionalRegisters || Object.freeze({}),
     transactionId: utxo.tx_hash,
     index: utxo.tx_index,

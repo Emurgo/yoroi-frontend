@@ -36,7 +36,7 @@ import {
 
 import axios from 'axios';
 
-import { asAddressedUtxo, asAddressedUtxoCardano, toCardanoBoxJSON, toErgoBoxJSON } from '../../../app/api/ergo/lib/transactions/utils';
+import { asAddressedUtxo, toCardanoBoxJSON, toErgoBoxJSON } from '../../../app/api/ergo/lib/transactions/utils';
 import type { CardanoBoxJson } from '../../../app/api/ergo/lib/transactions/utils'
 import { CoreAddressTypes } from '../../../app/api/ada/lib/storage/database/primitives/enums';
 import { getAllAddressesForDisplay } from '../../../app/api/ada/lib/storage/bridge/traitUtils';
@@ -45,6 +45,7 @@ import { getReceiveAddress } from '../../../app/stores/stateless/addressStores';
 import LocalStorageApi from '../../../app/api/localStorage/index';
 
 import type { BestBlockResponse } from '../../../app/api/ergo/lib/state-fetch/types';
+import { asAddressedUtxo as  asAddressedUtxoCardano } from "../../../app/api/ada/transactions/utils.js";
 
 function paginateResults<T>(results: T[], paginate: ?Paginate): T[] {
   if (paginate != null) {
@@ -112,11 +113,12 @@ function formatUtxoToBoxErgo(utxo: ElementOf<IGetAllUtxosResponse>): ErgoBoxJson
   return toErgoBoxJSON(rest);
 }
 
-function formatUtxoToBoxCardano(utxo: ElementOf<IGetAllUtxosResponse>): CardanoBoxJson {
-  // eslint-disable-next-line no-unused-vars
-  const { addressing, ...rest } = asAddressedUtxoCardano(utxo);
-  return toCardanoBoxJSON(rest);
-}
+// function formatUtxoToBoxCardano(utxo: IGetAllUtxosResponse): CardanoBoxJson {
+//   // eslint-disable-next-line no-unused-vars
+//   // const { addressing, ...rest } = asAddressedUtxoCardano(utxo);
+//   const { addressing, ...rest } = asAddressedUtxoCardano(utxo);
+//   return toCardanoBoxJSON(rest);
+// }
 
 export async function connectorGetUtxosErgo(
   wallet: PublicDeriver<>,
@@ -165,36 +167,17 @@ export async function connectorGetUtxosCardano(
   valueExpected: ?Value,
   tokenId: TokenId,
   paginate: ?Paginate
-): Promise<CardanoBoxJson[]> {
+): Promise<any> {
   const withUtxos = asGetAllUtxos(wallet);
   if (withUtxos == null) {
     throw new Error('wallet doesn\'t support IGetAllUtxos');
   }
   const utxos = await withUtxos.getAllUtxos();
-  // TODO: should we use a different coin selection algorithm besides greedy?
-  let utxosToUse = [];
-  if (valueExpected != null) {
-    let valueAcc = new BigNumber(0);
-    const target = valueToBigNumber(valueExpected);
-    for (let i = 0; i < utxos.length && valueAcc.isLessThan(target); i += 1) {
-      const formatted = formatUtxoToBoxCardano(utxos[i]);
-        if (tokenId === 'ADA') {
-          valueAcc = valueAcc.plus(valueToBigNumber(formatted.value));
-          utxosToUse.push(formatted);
-        } else {
-          for (const asset of formatted.assets) {
-            if (asset.tokenId === tokenId) {
-              valueAcc = valueAcc.plus(valueToBigNumber(asset.amount));
-              utxosToUse.push(formatted);
-              break;
-            }
-          }
-        }
-    }
-  } else {
-    utxosToUse = utxos.map(formatUtxoToBoxCardano);
-  }
-  return Promise.resolve(paginateResults(utxosToUse, paginate));
+  const utxosToUse = asAddressedUtxoCardano(utxos)
+  return utxosToUse.map(utxos => {
+    const { addressing, ...rest } = utxos
+    return rest
+  })
 }
 
 async function getAllAddresses(wallet: PublicDeriver<>, usedFilter: boolean): Promise<Address[]> { 
