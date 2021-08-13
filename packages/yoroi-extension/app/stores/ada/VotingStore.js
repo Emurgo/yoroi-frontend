@@ -64,7 +64,8 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
   @observable catalystPrivateKey: RustModule.WalletV4.PrivateKey | void;
   @observable pin: Array<number>;
   @observable error: ?LocalizableError;
-  @observable catalystRoundInfo: CatalystRoundInfoResponse
+  @observable catalystRoundInfo: ?CatalystRoundInfoResponse;
+  @observable loadingCatalystRoundInfo: boolean = false;
   @observable
   createVotingRegTx: LocalizedRequest<CreateVotingRegTxFunc>
     = new LocalizedRequest<CreateVotingRegTxFunc>(
@@ -119,8 +120,14 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
   }
 
   @action _getCatalystRoundInfo: void => Promise<void> = async () => {
+    runInAction(() => {
+      this.loadingCatalystRoundInfo = true
+    })
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) {
+      runInAction(() => {
+        this.loadingCatalystRoundInfo = false
+      })
       return;
     }
     const network = publicDeriver.getParent().getNetworkInfo()
@@ -128,6 +135,7 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
                 .getCatalystRoundInfo({ network })
     runInAction(() => {
       this.catalystRoundInfo = res
+      this.loadingCatalystRoundInfo = false
     })
 
   }

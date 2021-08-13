@@ -136,7 +136,14 @@ export default class VotingPage extends Component<Props> {
       );
     }
     // keep enabled on the testnet
-    const catalystRoundInfo = this.generated.stores.substores.ada.votingStore.catalystRoundInfo;
+    const { catalystRoundInfo, loadingCatalystRoundInfo } = this.generated.stores.substores.ada.votingStore;
+    if (loadingCatalystRoundInfo) {
+      return (
+        <VerticallyCenteredLayout>
+          <LoadingSpinner />
+        </VerticallyCenteredLayout>
+      );
+    }
     if (!environment.isTest()) {
       if (!catalystRoundInfo || (!catalystRoundInfo.currentFund && !catalystRoundInfo.nextFund)){
         return (
@@ -321,7 +328,8 @@ export default class VotingPage extends Component<Props> {
       substores: {|
         ada: {|
           votingStore: {|
-            catalystRoundInfo: CatalystRoundInfoResponse | null,
+            catalystRoundInfo: ?CatalystRoundInfoResponse,
+            loadingCatalystRoundInfo: boolean,
           |}
         |}
       |}
@@ -376,7 +384,8 @@ export default class VotingPage extends Component<Props> {
         substores: {
           ada: {
             votingStore: {
-              catalystRoundInfo: stores.substores.ada.votingStore.catalystRoundInfo
+              catalystRoundInfo: stores.substores.ada.votingStore.catalystRoundInfo,
+              loadingCatalystRoundInfo: stores.substores.ada.votingStore.loadingCatalystRoundInfo,
             }
           }
         }

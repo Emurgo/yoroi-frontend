@@ -70,7 +70,8 @@ const defaultProps: ({|
     substores: {
       ada: {
         votingStore: {
-          catalystRoundInfo: null
+          catalystRoundInfo: null,
+          loadingCatalystRoundInfo: false,
         }
       }
     }
