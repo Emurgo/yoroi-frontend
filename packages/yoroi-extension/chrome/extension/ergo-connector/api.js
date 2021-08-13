@@ -45,6 +45,7 @@ import LocalStorageApi from '../../../app/api/localStorage/index';
 
 import type { BestBlockResponse } from '../../../app/api/ergo/lib/state-fetch/types';
 import { asAddressedUtxo as  asAddressedUtxoCardano } from "../../../app/api/ada/transactions/utils.js";
+import type { RemoteUnspentOutput } from '../../../app/api/jormungandr/lib/state-fetch/types'
 
 function paginateResults<T>(results: T[], paginate: ?Paginate): T[] {
   if (paginate != null) {
@@ -159,17 +160,17 @@ export async function connectorGetUtxosCardano(
   valueExpected: ?Value,
   tokenId: TokenId,
   paginate: ?Paginate
-): Promise<any> {
+): Promise<Array<any>> {
   const withUtxos = asGetAllUtxos(wallet);
   if (withUtxos == null) {
     throw new Error('wallet doesn\'t support IGetAllUtxos');
   }
   const utxos = await withUtxos.getAllUtxos();
-  const utxosToUse = asAddressedUtxoCardano(utxos)
-  return utxosToUse.map(utxos => {
+  const utxosToUse = asAddressedUtxoCardano(utxos).map(utxos => {
     const { addressing, ...rest } = utxos
     return rest
   })
+  return Promise.resolve(paginateResults(utxosToUse, paginate))
 }
 
 async function getAllAddresses(wallet: PublicDeriver<>, usedFilter: boolean): Promise<Address[]> { 

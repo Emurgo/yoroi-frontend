@@ -83,7 +83,8 @@ getChangeAddress.addEventListener('click', () => {
             if(addresses.length === 0){
                 alertWarrning('No change addresses')
             } else {
-                alertSuccess(`Address: ${addresses.concat(',')}`)
+                alertSuccess(`Address: `)
+                alertEl.innerHTML = '<pre>' + JSON.stringify(addresses, undefined, 2) + '</pre>'
             }
         });
     }
