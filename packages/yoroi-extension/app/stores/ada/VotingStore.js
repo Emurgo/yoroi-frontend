@@ -121,7 +121,7 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
   @action _getCatalystRoundInfo: void => Promise<void> = async () => {
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) {
-      return
+      return;
     }
     const network = publicDeriver.getParent().getNetworkInfo()
     const res = await this.stores.substores.ada.stateFetchStore.fetcher
