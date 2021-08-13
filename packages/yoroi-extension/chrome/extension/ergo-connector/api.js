@@ -36,8 +36,7 @@ import {
 
 import axios from 'axios';
 
-import { asAddressedUtxo, toCardanoBoxJSON, toErgoBoxJSON } from '../../../app/api/ergo/lib/transactions/utils';
-import type { CardanoBoxJson } from '../../../app/api/ergo/lib/transactions/utils'
+import { asAddressedUtxo, toErgoBoxJSON } from '../../../app/api/ergo/lib/transactions/utils';
 import { CoreAddressTypes } from '../../../app/api/ada/lib/storage/database/primitives/enums';
 import { getAllAddressesForDisplay } from '../../../app/api/ada/lib/storage/bridge/traitUtils';
 import { getReceiveAddress } from '../../../app/stores/stateless/addressStores';
@@ -112,13 +111,6 @@ function formatUtxoToBoxErgo(utxo: ElementOf<IGetAllUtxosResponse>): ErgoBoxJson
   const { addressing, ...rest } = asAddressedUtxo(utxo);
   return toErgoBoxJSON(rest);
 }
-
-// function formatUtxoToBoxCardano(utxo: IGetAllUtxosResponse): CardanoBoxJson {
-//   // eslint-disable-next-line no-unused-vars
-//   // const { addressing, ...rest } = asAddressedUtxoCardano(utxo);
-//   const { addressing, ...rest } = asAddressedUtxoCardano(utxo);
-//   return toCardanoBoxJSON(rest);
-// }
 
 export async function connectorGetUtxosErgo(
   wallet: PublicDeriver<>,
@@ -216,6 +208,10 @@ async function getAllAddresses(wallet: PublicDeriver<>, usedFilter: boolean): Pr
 
     if(walletType === 'Cardano') {
       // Cardano does not have a function to convert from bytes to_base58
+      // @note the code blow throw an error 
+      // addresses = addresses.map(
+      //   a => RustModule.WalletV4.ScriptHash.from_bytes(Buffer.from(a.address, 'hex')).to_base58()
+      // )
       addresses = addresses.map(a => a.address)
     } else {
       addresses =  addresses.map(a => RustModule.SigmaRust.NetworkAddress
