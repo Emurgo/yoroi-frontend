@@ -178,6 +178,14 @@ class CardanoAPI {
         return this._cardano_rpc_call("get_utxos", [amount, token_id, paginate]);
     }
 
+    submit_tx(tx) {
+        return this._cardano_rpc_call('submit_tx', [tx]);
+    }
+
+    sign_tx(tx) {
+        return this._cardano_rpc_call('sign_tx', [tx]);
+    }
+
     _cardano_rpc_call(func, params) {
         return new Promise(function(resolve, reject) {
             window.postMessage({
