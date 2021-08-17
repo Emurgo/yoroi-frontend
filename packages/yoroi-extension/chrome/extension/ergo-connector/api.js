@@ -65,7 +65,7 @@ export async function connectorGetBalance(
   pendingTxs: PendingTransaction[],
   tokenId: TokenId
 ): Promise<Value> {
-  if (tokenId === 'ERG' || tokenId === 'ADA') {
+  if (tokenId === 'ERG' || tokenId === 'ADA' || tokenId === 'TADA') {
     if (pendingTxs.length === 0) {
       // can directly query for balance
       const canGetBalance = asGetBalance(wallet);
@@ -165,7 +165,7 @@ export async function connectorGetUtxosCardano(
   })
   let valueAcc = new BigNumber(0);
   for(const formatted of formattedUtxos){
-    if (tokenId === 'ADA') {
+    if (tokenId === 'ADA' || tokenId === 'TADA') {
       valueAcc = valueAcc.plus(valueToBigNumber(formatted.amount));
       utxosToUse.push(formatted);
     } else {
