@@ -467,4 +467,34 @@ export async function connectorSendTx(
     });
 }
 
+export async function connectorSendTxCardano(
+  wallet: IPublicDeriver</* ConceptualWallet */>,
+  signedTx: Uint8Array,
+  localStorage: LocalStorageApi,
+): Promise<void> {
+  const signedTx64 = Buffer.from(signedTx).toString('base64');
+  const network = wallet.getParent().getNetworkInfo();
+  const backend = network.Backend.BackendService;
+  if (backend == null) {
+    throw new Error('connectorSendTxCardano: missing backend url');
+  }
+  return axios(
+    `${backend}/api/txs/signed`,
+    {
+      method: 'post',
+      // 2 * CONFIG.app.walletRefreshInterval,
+      timeout: 2 * 20000,
+      data: { signedTx: signedTx64 },
+      headers: {
+        'yoroi-version': await localStorage.getLastLaunchVersion(),
+        'yoroi-locale': await localStorage.getUserLocale()
+      }
+    }
+  ).then(_response => {
+    return Promise.resolve();
+  }).catch((_error) => {
+    throw new SendTransactionApiError();
+  });
+}
+
 // TODO: generic data sign

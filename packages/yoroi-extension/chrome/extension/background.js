@@ -39,6 +39,7 @@ import {
   connectorGetChangeAddress,
   connectorGetUtxosErgo,
   connectorSendTx,
+  connectorSendTxCardano,
   connectorSignTx,
   connectorGetUsedAddresses,
   connectorGetUnusedAddresses,
@@ -62,6 +63,7 @@ import {
 } from '../../app/api/ada/lib/storage/database/index';
 import { migrateNoRefresh } from '../../app/api/common/migration';
 import { Mutex, } from 'async-mutex';
+import { isCardanoHaskell } from '../../app/api/ada/lib/storage/database/prepackaged/networks';
 
 /*::
 declare var chrome;
@@ -833,12 +835,27 @@ chrome.runtime.onConnectExternal.addListener(port => {
           case 'submit_tx':
             try {
               await RustModule.load();
-              const tx = asSignedTx(message.params[0], RustModule.SigmaRust);
               await withDb(async (db, localStorageApi) => {
                 await withSelectedWallet(
                   tabId,
                   async (wallet) => {
-                    const id = await connectorSendTx(wallet, pendingTxs, tx, localStorageApi);
+                    let id;
+                    if (isCardanoHaskell(wallet.getParent().getNetworkInfo())) {
+                      const tx = RustModule.WalletV4.Transaction.from_bytes(
+                        Buffer.from(message.params[0], 'hex'),
+                      );
+                      await connectorSendTxCardano(
+                        wallet,
+                        tx.to_bytes(),
+                        localStorageApi,
+                      );
+                      id = Buffer.from(
+                        RustModule.WalletV4.hash_transaction(tx.body()).to_bytes()
+                      ).toString('hex');
+                    } else { // is Ergo
+                      const tx = asSignedTx(message.params[0], RustModule.SigmaRust);
+                      id = await connectorSendTx(wallet, pendingTxs, tx, localStorageApi);
+                    }
                     rpcResponse({
                       ok: id
                     });
