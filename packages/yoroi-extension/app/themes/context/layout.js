@@ -3,13 +3,18 @@ import React from 'react';
 import type { Node } from 'react';
 import { THEMES, THEMES_REVAMP } from '..';
 
-type layoutState = {|
-  selected: string,
-  [key: 'CLASSIC' | 'REVAMP']: {|
+type Layouts = 'CLASSIC' | 'REVAMP';
+export type LayoutComponentMap = {|
+  [key: Layouts]: Node,
+|};
+type LayoutInitialState = {|
+  selected: Layouts,
+  [key: Layouts]: {|
     themes: Object,
   |},
 |};
-const initialState: layoutState = {
+
+const initialState: LayoutInitialState = {
   selected: 'CLASSIC',
   CLASSIC: {
     themes: THEMES,
@@ -40,13 +45,17 @@ const LayoutProvider = (props: Object): Node => {
         selectedLayout: state.selected,
         isRevampLayout: state.selected === 'REVAMP',
         changeLayout: () => dispatch({ type: 'CHANGE_LAYOUT' }),
+        renderLayoutComponent: (layoutMap: LayoutComponentMap = {}) => {
+          const selectedComponent = layoutMap[state.selected];
+          return selectedComponent;
+        },
       }}
       {...props}
     />
   );
 };
 
-function useLayout(): layoutState {
+function useLayout(): LayoutInitialState {
   const context = React.useContext(LayoutContext);
   if (!context) {
     throw new Error('useLayout must be used within a LayoutProvider');

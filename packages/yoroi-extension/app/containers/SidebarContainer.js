@@ -9,6 +9,7 @@ import { allCategories, allCategoriesRevamp } from '../stores/stateless/sidebarC
 import { PublicDeriver } from '../api/ada/lib/storage/models/PublicDeriver';
 import SidebarRevamp from '../components/topbar/SidebarRevamp';
 import { withLayout } from '../themes/context/layout';
+import type { LayoutComponentMap } from '../themes/context/layout';
 
 export type GeneratedData = typeof SidebarContainer.prototype.generated;
 
@@ -16,7 +17,8 @@ type Props = {|
   ...InjectedOrGenerated<GeneratedData>,
 |};
 type InjectedProps = {|
-  +isRevampLayout: boolean,
+  +selectedLayout: string,
+  +renderLayoutComponent: LayoutComponentMap => Node,
 |};
 type AllProps = {| ...Props, ...InjectedProps |};
 
@@ -30,25 +32,7 @@ class SidebarContainer extends Component<AllProps> {
     const { stores } = this.generated;
     const { profile } = stores;
 
-    return this.props.isRevampLayout ? (
-      <SidebarRevamp
-        onCategoryClicked={category => {
-          this.generated.actions.router.goToRoute.trigger({
-            route: category.route,
-          });
-        }}
-        isActiveCategory={category =>
-          this.generated.stores.app.currentRoute.startsWith(category.route)
-        }
-        categories={allCategoriesRevamp.filter(category =>
-          category.isVisible({
-            hasAnyWallets: this.generated.stores.wallets.hasAnyWallets,
-            selected: this.generated.stores.wallets.selected,
-            currentRoute: this.generated.stores.app.currentRoute,
-          })
-        )}
-      />
-    ) : (
+    const SidebarComponent = (
       <Sidebar
         onCategoryClicked={category => {
           this.generated.actions.router.goToRoute.trigger({
@@ -69,6 +53,31 @@ class SidebarContainer extends Component<AllProps> {
         isSidebarExpanded={profile.isSidebarExpanded}
       />
     );
+
+    const SidebarRevampComponent = (
+      <SidebarRevamp
+        onCategoryClicked={category => {
+          this.generated.actions.router.goToRoute.trigger({
+            route: category.route,
+          });
+        }}
+        isActiveCategory={category =>
+          this.generated.stores.app.currentRoute.startsWith(category.route)
+        }
+        categories={allCategoriesRevamp.filter(category =>
+          category.isVisible({
+            hasAnyWallets: this.generated.stores.wallets.hasAnyWallets,
+            selected: this.generated.stores.wallets.selected,
+            currentRoute: this.generated.stores.app.currentRoute,
+          })
+        )}
+      />
+    );
+
+    return this.props.renderLayoutComponent({
+      CLASSIC: SidebarComponent,
+      REVAMP: SidebarRevampComponent,
+    });
   }
 
   @computed get generated(): {|
