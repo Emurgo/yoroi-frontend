@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import classNames from 'classnames';
-import styles from './SettingsMenuItem.scss';
+import styles from './SubMenuItem.scss';
 
 type Props = {|
   +label: string,
@@ -14,9 +14,9 @@ type Props = {|
 |};
 
 @observer
-export default class SettingsMenuItem extends Component<Props> {
-  static defaultProps: {|disabled: boolean|} = {
-    disabled: false
+export default class SubMenuItem extends Component<Props> {
+  static defaultProps: {| disabled: boolean |} = {
+    disabled: false,
   };
 
   render(): Node {
@@ -27,16 +27,12 @@ export default class SettingsMenuItem extends Component<Props> {
     } else if (active) {
       state = styles.active;
     }
-    const componentClasses = classNames([
-      styles.component,
-      state,
-      className
-    ]);
+    const componentClasses = classNames([styles.component, state, className]);
 
-    const disableClick = active || (disabled === true);
     return (
-      <button type="button" className={componentClasses} onClick={disableClick ? () => {} : onClick}>{label}</button>
+      <button type="button" className={componentClasses} disabled={disabled} onClick={onClick}>
+        {label}
+      </button>
     );
   }
-
 }
