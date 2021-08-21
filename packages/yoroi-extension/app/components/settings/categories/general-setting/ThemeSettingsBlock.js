@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import type { Node } from 'react';
+import type { Node, ComponentType } from 'react';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { Button } from 'react-polymorph/lib/components/Button';
@@ -59,7 +59,7 @@ type Props = {|
   +onExternalLinkClick: MouseEvent => void,
 |};
 type InjectedProps = {|
-  +isRevampLayout: string,
+  +changeLayout: void => void,
   +renderLayoutComponent: LayoutComponentMap => Node,
 |};
 type AllProps = {| ...Props, ...InjectedProps |};
@@ -207,4 +207,4 @@ class ThemeSettingsBlock extends Component<AllProps> {
     });
   }
 }
-export default (withLayout(ThemeSettingsBlock): Node);
+export default (withLayout(ThemeSettingsBlock): ComponentType<Props>);
