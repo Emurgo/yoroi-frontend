@@ -3,13 +3,10 @@
 export const THEMES = Object.freeze({
   YOROI_CLASSIC: 'YoroiClassic',
   YOROI_MODERN: 'YoroiModern',
-});
-export const THEMES_REVAMP = Object.freeze({
   YOROI_REVAMP: 'YoroiRevamp',
 });
 
 export type Theme = $Values<typeof THEMES>;
-export type ThemeRevamp = $Values<typeof THEMES_REVAMP>;
 
 
 // Refer: https://github.com/Emurgo/yoroi-frontend/pull/497
