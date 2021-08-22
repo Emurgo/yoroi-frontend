@@ -1,0 +1,35 @@
+@import '../../themes/mixins/loading-spinner';
+
+.wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 40px;
+  text-align: center;
+  font-family: var(--font-regular);
+}
+.header {
+  h3 {
+    font-size: 24px;
+    color: var(--theme-wallet-dropdown-main-text-color);
+    line-height: 30px;
+  }
+}
+.content {
+  padding: 60px 0;
+}
+
+.noWallets {
+  color: var(--theme-nav-color);
+  font-size: 16px;
+  margin-bottom: 4px;
+  color: inherit;
+  line-height: 22px;
+}
+.goToWallets {
+  color: var(--theme-nav-color);
+  font-size: 12px;
+  line-height: 20px;
+  color: inherit;
+}

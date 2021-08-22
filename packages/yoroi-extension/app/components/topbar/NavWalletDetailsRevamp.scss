@@ -1,0 +1,68 @@
+@import '../../themes/mixins/loading-spinner';
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  color: var(--theme-wallet-dropdown-main-text-color);
+  font-family: var(--font-regular);
+}
+
+.outerWrapper {
+  display: flex;
+  align-items: center;
+}
+
+.currency {
+  margin-right: 12px;
+  display: flex;
+  border-radius: 50%;
+  border: none;
+  overflow: hidden;
+  width: 32px;
+  height: 32px;
+  & canvas {
+    width: 100% !important;
+    height: 100% !important;
+  }
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  font-size: 16px;
+  line-height: 22px;
+}
+
+.isLoading {
+  position: relative;
+  display: inline-block;
+  margin-left: 15px;
+  margin-bottom: 4px;
+}
+
+.amount {
+  font-family: var(--font-medium);
+
+  .isLoading {
+    margin-left: 9px;
+    margin-bottom: 6px;
+    @include loading-spinner('../../assets/images/spinner-dark.svg', 16);
+  }
+}
+
+.highlightAmount {
+  color: var(--theme-wallet-dropdown-accent-text-color);
+}
+
+.toggleButton {
+  margin-left: auto;
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.fixedAmount {
+  color: #6b7384;
+}
