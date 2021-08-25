@@ -31,6 +31,9 @@ export function buildDev(env: string) {
   const webpackDevMiddleware = require('webpack-dev-middleware');
   const webpackHotMiddleware = require('webpack-hot-middleware');
 
+  const path = require('path');
+  const fs = require('fs');
+
   const config = require(`../webpack/devConfig`);
 
   console.log('[Build manifest]');
@@ -46,6 +49,21 @@ export function buildDev(env: string) {
   console.log('If you\'re developing Inject page,');
   console.log(`please allow 'https://localhost:${connections.Ports.WebpackDev}' connections in Google Chrome,`);
   console.log('and load unpacked extensions with `./dev` folder. (see https://developer.chrome.com/extensions/getstarted#unpacked)\n');
+
+  const serverOpts: any = {
+    host: 'localhost',
+    port: connections.Ports.WebpackDev
+  };
+
+  if (argv.type === 'debug') {
+    const sslOverridesPath = path.join(__dirname, './sslOverrides.js');
+    if (fs.existsSync(sslOverridesPath)) {
+      const sslOverrides = require(sslOverridesPath);
+      serverOpts.key = sslOverrides.key;
+      serverOpts.cert = sslOverrides.cert;
+    }
+  }
+
   createWebpackServer(
     config.baseDevConfig(
       argv.env,
@@ -55,10 +73,7 @@ export function buildDev(env: string) {
     webpack,
     webpackDevMiddleware,
     webpackHotMiddleware,
-    {
-      host: 'localhost',
-      port: connections.Ports.WebpackDev
-    },
+    serverOpts
   );
 }
 
