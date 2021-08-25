@@ -257,6 +257,11 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
       }
 
       if (amount == null && shouldSendAll === true) {
+        console.log("Amount",genTokenList({
+          token: this.selectedToken
+            ?? this.stores.tokenInfoStore.getDefaultTokenInfo(network.NetworkId),
+          shouldSendAll,
+        }))
         await this.createUnsignedTx.execute(() => this.api.ada.createUnsignedTx({
           publicDeriver: withHasUtxoChains,
           receiver,
@@ -270,6 +275,12 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
           metadata: this.metadata,
         }));
       } else if (amount != null) {
+        const res = genTokenList({
+          token: this.selectedToken
+            ?? this.stores.tokenInfoStore.getDefaultTokenInfo(network.NetworkId),
+          amount,
+        })
+        console.log(res)
         await this.createUnsignedTx.execute(() => this.api.ada.createUnsignedTx({
           publicDeriver: withHasUtxoChains,
           receiver,

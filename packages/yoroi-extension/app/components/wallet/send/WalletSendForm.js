@@ -113,7 +113,7 @@ type Props = {|
   +selectedToken: void | $ReadOnly<TokenRow>,
 |};
 const CUSTOM_AMOUNT = 'CUSTOM_AMOUNT'
-
+const SEND_ALL_KEEP_TOKENS = 'SEND_ALL_KEEP_TOKENS'
 @observer
 export default class WalletSendForm extends Component<Props> {
 
@@ -385,23 +385,50 @@ export default class WalletSendForm extends Component<Props> {
         identifier: this.props.defaultToken.Identifier,
         networkId: this.props.defaultToken.NetworkId,
       }).TokenId
-      return [
-        { id: 'custom-amount', label: intl.formatMessage(messages.customAmount), value: CUSTOM_AMOUNT },
-        ...tokenOptions.filter(t => t.value === tokenId).map(token => {
-          let label = intl.formatMessage(messages.dropdownAmountLabel, {
-            currency: truncateToken(token.label)
-          })
-          const defaultTokenName =truncateToken(getTokenName(this.props.defaultToken))
-          if(token.label === defaultTokenName){
-            label += intl.formatMessage(messages.allTokens)
-          }
-          return {
-            label,
-            value: token.value,
-            id: token.id
-          }
-        })
+
+      const amountOptions = [
+        { id: 'custom-amount', label: intl.formatMessage(messages.customAmount), value: CUSTOM_AMOUNT }
       ]
+      tokenOptions.map(token => {
+        if (token.value !== tokenId) return
+        let label = intl.formatMessage(messages.dropdownAmountLabel, {
+          currency: truncateToken(token.label)
+        })
+        const defaultTokenName =truncateToken(getTokenName(this.props.defaultToken))
+        if(token.label === defaultTokenName){
+          label += intl.formatMessage(messages.allTokens)
+          // If default token is select we can show new option `Send all {defaultToken}, keep tokens`
+          amountOptions.push({
+            id: 'send-all-keep-tokens',
+            // @todo add translation
+            label: `Send All ${token.label}, Keep tokens`,
+            value: SEND_ALL_KEEP_TOKENS
+          })
+        }
+        amountOptions.push({
+          label,
+          value: token.value,
+          id: token.id
+        })
+      })
+      return amountOptions
+      // return [
+      //   { id: 'custom-amount', label: intl.formatMessage(messages.customAmount), value: CUSTOM_AMOUNT },
+      //   ...tokenOptions.filter(t => t.value === tokenId).map(token => {
+      //     let label = intl.formatMessage(messages.dropdownAmountLabel, {
+      //       currency: truncateToken(token.label)
+      //     })
+      //     const defaultTokenName =truncateToken(getTokenName(this.props.defaultToken))
+      //     if(token.label === defaultTokenName){
+      //       label += intl.formatMessage(messages.allTokens)
+      //     }
+      //     return {
+      //       label,
+      //       value: token.value,
+      //       id: token.id
+      //     }
+      //   })
+      // ]
     })()
 
     return (
@@ -497,6 +524,16 @@ export default class WalletSendForm extends Component<Props> {
                 this.props.updateAmount(new BigNumber(
                   formattedAmountToNaturalUnits(
                     this.form.$('amount').value,
+                    this.getNumDecimals(),
+                  )
+                ));
+              }
+              console.log("Total Amount", formatValue(this.getTokenEntry(totalAmount)))
+              console.log('SpendableBalance',this.props.spendableBalance && this.props.spendableBalance.getDefaultEntry().amount)
+              if (value === SEND_ALL_KEEP_TOKENS && !this.props.shouldSendAll) {
+                this.props.updateAmount(new BigNumber(
+                  formattedAmountToNaturalUnits(
+                    formatValue(this.getTokenEntry(totalAmount)),
                     this.getNumDecimals(),
                   )
                 ));

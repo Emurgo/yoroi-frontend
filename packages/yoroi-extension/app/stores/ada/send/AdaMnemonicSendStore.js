@@ -110,6 +110,15 @@ export default class AdaMnemonicSendStore extends Store<StoresMap, ActionsMap> {
         }
       }
 
+      console.log(
+        {
+          publicDeriver: withSigning,
+          password: request.password,
+          signRequest: request.signRequest,
+          sendTx: this.stores.substores.ada.stateFetchStore.fetcher.sendTx,
+        }
+      )
+
       return await this.api.ada.signAndBroadcast({
         publicDeriver: withSigning,
         password: request.password,
