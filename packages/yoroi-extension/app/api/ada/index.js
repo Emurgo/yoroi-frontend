@@ -986,8 +986,17 @@ export default class AdaApi {
       let unsignedTxResponse;
       const trxMetadata =
         request.metadata !== undefined ? createMetadata(request.metadata): undefined;
-
-      if (hasSendAllDefault(request.tokens)) {
+      console.log(request.tokens[0])
+      if(request.tokens[0].shouldSendAllKeepTokens){
+        const receiver = request.receivers[0];
+        unsignedTxResponse = shelleySendAllUnsignedTx(
+          receiver,
+          request.utxos,
+          request.absSlotNumber,
+          protocolParams,
+          trxMetadata,
+        );
+      } else if (hasSendAllDefault(request.tokens)) {
         if (request.receivers.length !== 1) {
           throw new Error(`${nameof(this.createUnsignedTxForUtxos)} wrong output size for sendAll`);
         }
@@ -1053,6 +1062,7 @@ export default class AdaApi {
           false,
           trxMetadata,
         );
+        console.log("unsignedTxResponse: Custom Amount ", unsignedTxResponse)
       }
       Logger.debug(
         `${nameof(AdaApi)}::${nameof(this.createUnsignedTxForUtxos)} success: ` + stringifyData(unsignedTxResponse)
@@ -1095,7 +1105,7 @@ export default class AdaApi {
     }];
 
     // note: we need to create a change address IFF we're not sending all of the default asset
-    if (!hasSendAllDefault(request.tokens)) {
+    if (!hasSendAllDefault(request.tokens) && !request.tokens[0].shouldSendAllKeepTokens) {
       const internal = await getReceiveAddress(request.publicDeriver);
       if (internal == null) {
         throw new Error(`${nameof(this.createUnsignedTx)} no internal addresses left. Should never happen`);

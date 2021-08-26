@@ -98,6 +98,8 @@ type Props = {|
   +updateMemo: (void | string) => void,
   +shouldSendAll: boolean,
   +toggleSendAll: void => void,
+  +updateSendAllKeepTokens: boolean => void,
+  +shouldSendAllKeepTokens: boolean,
   +fee: ?MultiToken,
   +isCalculatingFee: boolean,
   +reset: void => void,
@@ -149,7 +151,7 @@ export default class WalletSendForm extends Component<Props> {
         }
         const totalInput = this.props.totalInput;
         const fee = this.props.fee;
-        if (!this.props.shouldSendAll) {
+        if (!this.props.shouldSendAll && !this.props.shouldSendAllKeepTokens) {
           return;
         }
 
@@ -411,25 +413,9 @@ export default class WalletSendForm extends Component<Props> {
           id: token.id
         })
       })
-      return amountOptions
-      // return [
-      //   { id: 'custom-amount', label: intl.formatMessage(messages.customAmount), value: CUSTOM_AMOUNT },
-      //   ...tokenOptions.filter(t => t.value === tokenId).map(token => {
-      //     let label = intl.formatMessage(messages.dropdownAmountLabel, {
-      //       currency: truncateToken(token.label)
-      //     })
-      //     const defaultTokenName =truncateToken(getTokenName(this.props.defaultToken))
-      //     if(token.label === defaultTokenName){
-      //       label += intl.formatMessage(messages.allTokens)
-      //     }
-      //     return {
-      //       label,
-      //       value: token.value,
-      //       id: token.id
-      //     }
-      //   })
-      // ]
+      return amountOptions;
     })()
+    console.log("Amount: ", amountFieldProps.value && formattedAmountToBigNumber(amountFieldProps.value).toString())
 
     return (
       <div className={styles.component}>
@@ -528,16 +514,13 @@ export default class WalletSendForm extends Component<Props> {
                   )
                 ));
               }
-              console.log("Total Amount", formatValue(this.getTokenEntry(totalAmount)))
-              console.log('SpendableBalance',this.props.spendableBalance && this.props.spendableBalance.getDefaultEntry().amount)
-              if (value === SEND_ALL_KEEP_TOKENS && !this.props.shouldSendAll) {
-                this.props.updateAmount(new BigNumber(
-                  formattedAmountToNaturalUnits(
-                    formatValue(this.getTokenEntry(totalAmount)),
-                    this.getNumDecimals(),
-                  )
-                ));
-              }
+
+              if (value === SEND_ALL_KEEP_TOKENS) {
+                if(this.props.shouldSendAll){
+                  this.props.toggleSendAll()
+                }
+                this.props.updateSendAllKeepTokens(true)
+              };
             }}
             optionRenderer={option => (
               <TokenOptionRow

@@ -159,6 +159,8 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
           updateMemo={(content: void | string) => txBuilderActions.updateMemo.trigger(content)}
           shouldSendAll={transactionBuilderStore.shouldSendAll}
           toggleSendAll={txBuilderActions.toggleSendAll.trigger}
+          updateSendAllKeepTokens={(status: boolean) => txBuilderActions.updateSendAllKeepTokens.trigger(status)}
+          shouldSendAllKeepTokens={transactionBuilderStore.shouldSendAllKeepTokens}
           fee={transactionBuilderStore.fee}
           isCalculatingFee={transactionBuilderStore.createUnsignedTx.isExecuting}
           reset={txBuilderActions.reset.trigger}
@@ -397,6 +399,9 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
         toggleSendAll: {|
           trigger: (params: void) => void
         |},
+        updateSendAllKeepTokens: {|
+          trigger: (params: boolean) => void
+        |},
         updateAmount: {|
           trigger: (params: ?BigNumber) => void
         |},
@@ -467,6 +472,7 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
         |},
         fee: ?MultiToken,
         shouldSendAll: boolean,
+        shouldSendAllKeepTokens: boolean,
         tentativeTx: null | ISignRequest<any>,
         totalInput: ?MultiToken,
         txMismatch: boolean,
@@ -552,6 +558,7 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
           totalInput: stores.transactionBuilderStore.totalInput,
           fee: stores.transactionBuilderStore.fee,
           shouldSendAll: stores.transactionBuilderStore.shouldSendAll,
+          shouldSendAllKeepTokens: stores.transactionBuilderStore.shouldSendAllKeepTokens,
           tentativeTx: stores.transactionBuilderStore.tentativeTx,
           txMismatch: stores.transactionBuilderStore.txMismatch,
           createUnsignedTx: {
@@ -594,6 +601,7 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
           updateAmount: { trigger: actions.txBuilderActions.updateAmount.trigger },
           updateToken: { trigger: actions.txBuilderActions.updateToken.trigger },
           toggleSendAll: { trigger: actions.txBuilderActions.toggleSendAll.trigger },
+          updateSendAllKeepTokens: { trigger: actions.txBuilderActions.updateSendAllKeepTokens.trigger },
           reset: { trigger: actions.txBuilderActions.reset.trigger },
           updateMemo: { trigger: actions.txBuilderActions.updateMemo.trigger },
         },

@@ -47,6 +47,7 @@ export type SetupSelfTxFunc = SetupSelfTxRequest => Promise<void>;
 export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap> {
 
   @observable shouldSendAll: boolean;
+  @observable shouldSendAllKeepTokens: boolean = false;
   /** Stores the tx information as the user is building it */
   @observable plannedTxInfo: Array<{| ...InexactSubset<TxOutType<BigNumber>>, |}>;
   /** Stores the tx used to generate the information on the send form */
@@ -82,6 +83,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
     actions.updateToken.listen(this._updateToken);
     actions.updateTentativeTx.listen(this._updateTentativeTx);
     actions.toggleSendAll.listen(this._toggleSendAll);
+    actions.updateSendAllKeepTokens.listen(this._updateSendAllKeepTokens)
     actions.initialize.listen(this._initialize);
     actions.reset.listen(this._reset);
     actions.updateMetadata.listen(this._updateMetadata);
@@ -164,6 +166,9 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
 
   _canCompute(): boolean {
     for (let i = 0; i < this.plannedTxInfo.length; i++) {
+      if(this.shouldSendAllKeepTokens){
+        return true;
+      }
       // we only care about the value in non-sendall case
       if (!this.shouldSendAll && this.plannedTxInfo[i].value == null) {
         return false;
@@ -197,7 +202,9 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
     const amount = plannedTxInfo[0].value != null
       ? plannedTxInfo[0].value.toString()
       : null;
+    console.log('Amount From the store: ', amount)
     const shouldSendAll = this.shouldSendAll;
+    const shouldSendAllKeepTokens = this.shouldSendAllKeepTokens
 
     if (this.createUnsignedTx.isExecuting) {
       this.createUnsignedTx.cancel();
@@ -256,7 +263,20 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
         return tokens;
       }
 
-      if (amount == null && shouldSendAll === true) {
+      if(amount == null && shouldSendAllKeepTokens === true ){
+        await this.createUnsignedTx.execute(() => this.api.ada.createUnsignedTx({
+          publicDeriver: withHasUtxoChains,
+          receiver,
+          tokens: genTokenList({
+            token: this.selectedToken
+              ?? this.stores.tokenInfoStore.getDefaultTokenInfo(network.NetworkId),
+            shouldSendAllKeepTokens,
+          }),
+          filter: this.filter,
+          absSlotNumber,
+          metadata: this.metadata,
+        }));
+      } else if (amount == null && shouldSendAll === true) {
         console.log("Amount",genTokenList({
           token: this.selectedToken
             ?? this.stores.tokenInfoStore.getDefaultTokenInfo(network.NetworkId),
@@ -361,6 +381,9 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
     this.shouldSendAll = !this.shouldSendAll;
   }
 
+  _updateSendAllKeepTokens: boolean => void = (status: boolean) => {
+    this.shouldSendAllKeepTokens = status
+  }
   /** Should only set to valid address or undefined */
   @action
   _updateReceiver: (void | string) => void = (receiver) => {

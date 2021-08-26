@@ -57,4 +57,7 @@ export type SendTokenList = Array<$ReadOnly<{|
 |}> | $ReadOnly<{|
   token: $ReadOnly<TokenRow>,
   shouldSendAll: true,
-|}>>;
+|}> | $ReadOnly<{|
+  token: $ReadOnly<TokenRow>,
+  shouldSendAllKeepTokens: true,
+|}>> ;

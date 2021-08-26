@@ -310,15 +310,13 @@ export function builtSendTokenList(
 
   for (const token of tokens) {
     if (token.amount != null) {
-      alert('normal token')
       // if we add a specific amount of a specific token to the output, just add it
-      // amount.add({
-      //   amount: new BigNumber(token.amount),
-      //   identifier: token.token.Identifier,
-      //   networkId: token.token.NetworkId,
-      // });
+      amount.add({
+        amount: new BigNumber(token.amount),
+        identifier: token.token.Identifier,
+        networkId: token.token.NetworkId,
+      });
     } else if (token.token.IsDefault) {
-      alert('default token');
       // if we add a non-specific amount of the default token
       // sum amount values in the UTXO
       const relatedUtxoSum = utxos.reduce(
@@ -331,7 +329,6 @@ export function builtSendTokenList(
         networkId: token.token.NetworkId,
       });
     } else {
-      alert('else')
       // if we add a non-specific amount of a given token
       // sum up the value of all our UTXOs with this token
       const relatedUtxoSum = utxos.reduce(
