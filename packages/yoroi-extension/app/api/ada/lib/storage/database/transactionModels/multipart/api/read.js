@@ -183,7 +183,7 @@ export class CardanoShelleyAssociateTxWithIOs {
       { txIds: request.txs.map(transaction => transaction.TransactionId) },
     );
 
-    const tokens = await CardanoByronAssociateTxWithIOs.depTables.AssociateToken.join(
+    const _tokens = await CardanoByronAssociateTxWithIOs.depTables.AssociateToken.join(
       db, tx,
       {
         listIds: request.txs.flatMap(transaction => {
@@ -199,6 +199,14 @@ export class CardanoShelleyAssociateTxWithIOs {
         networkId: request.networkId,
       }
     );
+    const tokens = _tokens.map(token => ({
+      TokenList: token.TokenList,
+      Token: {
+        TokenId: token.Token.TokenId,
+        Identifier: token.Token.Identifier,
+        NetworkId: token.Token.NetworkId,
+      }
+    }));
 
     const fullTx = request.txs.map(transaction  => ({
       txType: TransactionType.CardanoShelley,
@@ -206,14 +214,7 @@ export class CardanoShelleyAssociateTxWithIOs {
       certificates: certsForTxs.get(transaction.TransactionId) ?? [],
       ...getOrThrow(utxo.get(transaction)),
       accountingInputs: getOrThrow(accounting.get(transaction)).accountingInputs,
-      tokens: tokens.map(token => ({
-        TokenList: token.TokenList,
-        Token: {
-          TokenId: token.Token.TokenId,
-          Identifier: token.Token.Identifier,
-          NetworkId: token.Token.NetworkId,
-        },
-      })),
+      tokens,
     }));
     return fullTx;
   }

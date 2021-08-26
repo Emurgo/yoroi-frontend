@@ -4,7 +4,7 @@ import type { Tx } from './types';
 import type { TokenRow } from '../../../app/api/ada/lib/storage/database/primitives/tables';
 import { Logger } from '../../../app/utils/logging';
 
-function parseEIP0004Data(input: any): ?string {
+export function parseEIP0004Data(input: any): ?string {
   // https://github.com/ergoplatform/eips/blob/master/eip-0004.md
   // format is: 0e + vlq(len(body as bytes)) + body (as bytes formatted in hex)
   // where body is a utf8 string
@@ -39,7 +39,7 @@ export function mintedTokenInfo(tx: Tx): $ReadOnly<TokenRow>[] {
   for (const output of tx.outputs) {
     const name = parseEIP0004Data(output.additionalRegisters.R4);
     const description = parseEIP0004Data(output.additionalRegisters.R5);
-    const decimals = parseEIP0004Data(output.additionalRegisters.R6);
+    const decimals = parseInt(parseEIP0004Data(output.additionalRegisters.R6) ?? '', 10);
     if (name != null && description != null && decimals != null) {
       tokens.push({
         TokenId: 0,
@@ -51,7 +51,7 @@ export function mintedTokenInfo(tx: Tx): $ReadOnly<TokenRow>[] {
           type: 'Ergo',
           height: tx.inputs[0].creationHeight,
           boxId: tx.inputs[0].boxId,
-          numberOfDecimals: parseInt(decimals, 10),
+          numberOfDecimals: isNaN(decimals) ? 0 : decimals,
           ticker: name,
           longName: description,
           description,

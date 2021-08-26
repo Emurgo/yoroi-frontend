@@ -13,7 +13,6 @@ import { handleExternalLinkClick } from '../../../utils/routing';
 import {
   WalletTypeOption,
 } from '../../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
-import UnsupportedWallet from '../UnsupportedWallet';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 import LoadingSpinner from '../../../components/widgets/LoadingSpinner';
 import VerticallyCenteredLayout from '../../../components/layout/VerticallyCenteredLayout';
@@ -37,9 +36,9 @@ type Props = {|
 |};
 
 const roundInfo = {
-  startDate: new Date(Date.parse('2021-07-08T16:00:00Z')),
-  endDate: new Date(Date.parse('2021-07-19T11:00:00Z')),
-  nextRound: 5,
+  startDate: new Date(Date.parse('2021-08-12T11:00:00Z')),
+  endDate: new Date(Date.parse('2021-09-01T11:00:00Z')),
+  nextRound: 6,
 };
 
 @observer
@@ -93,10 +92,6 @@ export default class VotingPage extends Component<Props> {
 
     if(selected == null){
       throw new Error(`${nameof(VotingPage)} no wallet selected`);
-    }
-
-    if (isTrezorTWallet(selected.getParent())) {
-      return <UnsupportedWallet />;
     }
 
     const balance = this.generated.balance;
