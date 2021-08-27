@@ -153,82 +153,82 @@ export default class VotingPage extends Component<Props> {
           />
         );
       }
-        const { currentFund, nextFund } = catalystRoundInfo;
-        const nextFundRegistrationSubtitle = intl.formatMessage(messages.nextFundRegistration, {
-          roundNumber: nextFund?.id,
-          registrationStart: nextFund?.registrationStart
-        })
+      const { currentFund, nextFund } = catalystRoundInfo;
+      const nextFundRegistrationSubtitle = intl.formatMessage(messages.nextFundRegistration, {
+        roundNumber: nextFund?.id,
+        registrationStart: nextFund?.registrationStart
+      })
 
-        if (currentFund) {
-          const isLate = new Date() >= new Date(Date.parse(currentFund.registrationEnd))
-          const isEarly = new Date() <= new Date(Date.parse(currentFund.registrationStart))
-          const isBeforeVoting = new Date() <= new Date(Date.parse(currentFund.votingStart))
-          const isAfterVoting = new Date() >= new Date(Date.parse(currentFund.votingEnd))
-          const isBetweenVoting = !isBeforeVoting && !isAfterVoting;
+      if (currentFund) {
+        const isLate = new Date() >= new Date(Date.parse(currentFund.registrationEnd))
+        const isEarly = new Date() <= new Date(Date.parse(currentFund.registrationStart))
+        const isBeforeVoting = new Date() <= new Date(Date.parse(currentFund.votingStart))
+        const isAfterVoting = new Date() >= new Date(Date.parse(currentFund.votingEnd))
+        const isBetweenVoting = !isBeforeVoting && !isAfterVoting;
 
-          if(isEarly) {
+        if(isEarly) {
+          return (
+            <RegistrationOver
+              title={intl.formatMessage(messages.earlyForRegistrationTitle)}
+              subtitle={intl.formatMessage(messages.earlyForRegistrationSubTitle, {
+                roundNumber: currentFund.id,
+                registrationStart: currentFund.registrationStart
+              })}
+            />
+          );
+        }
+
+        // registeration is ended -> check for voting start and end dates
+        if (isLate) {
+          if (isBeforeVoting) {
             return (
               <RegistrationOver
-                title={intl.formatMessage(messages.earlyForRegistrationTitle)}
-                subtitle={intl.formatMessage(messages.earlyForRegistrationSubTitle, {
-                  roundNumber: currentFund.id,
-                  registrationStart: currentFund.registrationStart
+                title={intl.formatMessage(messages.mainTitle)}
+                subtitle={intl.formatMessage(messages.beforeVotingSubtitle, {
+                  votingStart: currentFund.votingStart
                 })}
               />
             );
           }
 
-          // registeration is ended -> check for voting start and end dates
-          if (isLate) {
-            if (isBeforeVoting) {
-              return (
-                <RegistrationOver
-                  title={intl.formatMessage(messages.mainTitle)}
-                  subtitle={intl.formatMessage(messages.beforeVotingSubtitle, {
-                    votingStart: currentFund.votingStart
-                  })}
-                />
-              );
-            }
-
-            if (isBetweenVoting) {
-              return (
-                <RegistrationOver
-                  title={intl.formatMessage(messages.mainTitle)}
-                  subtitle={intl.formatMessage(messages.betweenVotingSubtitle, {
-                    votingEnd: currentFund.votingEnd
-                  })}
-                />
-              );
-            }
-
-            if (isAfterVoting) {
-              /* if we after the voting date (= between funds) and no next funds
-              will dispaly "round is over" */
-              let subtitle = intl.formatMessage(messages.mainSubtitle, {
-                roundNumber: currentFund.id
-              })
-              // Check for the next funds if we are after voting
-              if(nextFund) {
-                subtitle = nextFundRegistrationSubtitle
-              }
-              return (
-                <RegistrationOver
-                  title={intl.formatMessage(messages.mainTitle)}
-                  subtitle={subtitle}
-                />
-              );
-            }
+          if (isBetweenVoting) {
+            return (
+              <RegistrationOver
+                title={intl.formatMessage(messages.mainTitle)}
+                subtitle={intl.formatMessage(messages.betweenVotingSubtitle, {
+                  votingEnd: currentFund.votingEnd
+                })}
+              />
+            );
           }
-        } else if (nextFund) {
-          // No current funds -> check for next funds
-          return (
-            <RegistrationOver
-              title={intl.formatMessage(messages.mainTitle)}
-              subtitle={nextFundRegistrationSubtitle}
-            />
-            )
+
+          if (isAfterVoting) {
+            /* if we after the voting date (= between funds) and no next funds
+            will dispaly "round is over" */
+            let subtitle = intl.formatMessage(messages.mainSubtitle, {
+              roundNumber: currentFund.id
+            })
+            // Check for the next funds if we are after voting
+            if(nextFund) {
+              subtitle = nextFundRegistrationSubtitle
+            }
+            return (
+              <RegistrationOver
+                title={intl.formatMessage(messages.mainTitle)}
+                subtitle={subtitle}
+              />
+            );
+          }
         }
+      } else if (nextFund) {
+        // No current funds -> check for next funds
+        return (
+          <RegistrationOver
+            title={intl.formatMessage(messages.mainTitle)}
+            subtitle={nextFundRegistrationSubtitle}
+          />
+          )
+      }
     }
 
     // disable the minimum on E2E tests
