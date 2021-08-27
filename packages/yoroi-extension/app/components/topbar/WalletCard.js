@@ -3,13 +3,13 @@ import React, { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape, defineMessages } from 'react-intl';
-import styles from './NavPlateRevamp.scss';
+import styles from './WalletCard.scss';
 import WalletAccountIcon from './WalletAccountIcon';
 import ConceptualIcon from '../../assets/images/wallet-nav/conceptual-wallet.inline.svg';
 import TrezorIcon from '../../assets/images/wallet-nav/trezor-wallet.inline.svg';
 import LedgerIcon from '../../assets/images/wallet-nav/ledger-wallet.inline.svg';
 import { MultiToken } from '../../api/common/lib/MultiToken';
-
+import classnames from 'classnames';
 import { truncateToken, splitAmount } from '../../utils/formatters';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import type { $npm$ReactIntl$IntlFormat, $npm$ReactIntl$MessageDescriptor } from 'react-intl';
@@ -25,8 +25,13 @@ import { getTokenName } from '../../stores/stateless/tokenHelpers';
 import { hiddenAmount } from '../../utils/strings';
 import type { TokenLookupKey } from '../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
+import RandomIcon from '../../assets/images/sidebar/revamp/wallet.inline.svg';
 
 const messages = defineMessages({
+  tokenTypes: {
+    id: 'wallet.topbar.dialog.tokenTypes',
+    defaultMessage: '!!!Token types',
+  },
   standardWallet: {
     id: 'wallet.nav.type.standard',
     defaultMessage: '!!!Standard wallet',
@@ -55,7 +60,11 @@ type Props = {|
   +shouldHideBalance: boolean,
   +walletAmount: null | MultiToken,
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
+  +isCurrentWallet?: boolean,
+  +onSelect?: void => void,
 |};
+
+type State = {| +isActionsShow: boolean |};
 
 function constructPlate(
   plate: WalletChecksum,
@@ -75,9 +84,21 @@ function constructPlate(
 }
 
 @observer
-export default class NavPlateRevamp extends Component<Props> {
+export default class WalletCard extends Component<Props, State> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
+  };
+
+  static defaultProps: {|
+    isCurrentWallet: boolean,
+    onSelect: void,
+  |} = {
+    onSelect: undefined,
+    isCurrentWallet: false,
+  };
+
+  state: State = {
+    isActionsShow: false,
   };
 
   getEra: ConceptualWallet => void | $Exact<$npm$ReactIntl$MessageDescriptor> = wallet => {
@@ -110,54 +131,95 @@ export default class NavPlateRevamp extends Component<Props> {
     return ConceptualIcon;
   };
 
+  showActions: void => void = () => {
+    this.setState({ isActionsShow: true });
+  };
+  hideActions: void => void = () => {
+    this.setState({ isActionsShow: false });
+  };
+
   render(): Node {
     const { intl } = this.context;
     const { shouldHideBalance } = this.props;
+    const { isActionsShow } = this.state;
 
     const [, iconComponent] = this.props.plate
       ? constructPlate(this.props.plate, 0, styles.icon)
       : [];
 
-    const typeText = [
-      // this.getEra(this.props.wallet.conceptualWallet),
-      this.getType(this.props.wallet.conceptualWallet),
-    ]
+    const typeText = [this.getType(this.props.wallet.conceptualWallet)]
       .filter(text => text != null)
       .map(text => intl.formatMessage(text))
       .join(' - ');
     const totalAmount = this.getTotalAmount();
 
+    const wrapperClassname = classnames(
+      styles.cardWrapper,
+      this.props.isCurrentWallet !== null &&
+        this.props.isCurrentWallet === true &&
+        styles.currentCardWrapper
+    );
+
     return (
-      <div className={styles.wrapper}>
-        <div className={styles.header}>
-          <h5 className={styles.name}>{this.props.wallet.conceptualWalletName}</h5>
-          {' ·  '}
-          <div className={styles.type}>{typeText}</div>
-        </div>
-        <div className={styles.card}>
-          <div>{iconComponent}</div>
-          <div className={styles.content}>
-            <div className={styles.amount}>
-              {this.renderAmountDisplay({
-                shouldHideBalance,
-                amount: totalAmount,
-              })}
-            </div>
-            <div className={styles.fixedAmount}>
-              <p>
-                {/* TODO: fix value to USD */}
+      <button
+        className={wrapperClassname}
+        type="button"
+        onClick={this.props.onSelect}
+        onMouseEnter={this.showActions}
+        onMouseLeave={this.hideActions}
+      >
+        <div className={styles.main}>
+          <div className={styles.header}>
+            <h5 className={styles.name}>{this.props.wallet.conceptualWalletName}</h5>
+            {' ·  '}
+            <div className={styles.type}>{typeText}</div>
+          </div>
+          <div className={styles.body}>
+            <div>{iconComponent}</div>
+            <div className={styles.content}>
+              <div className={styles.amount}>
                 {this.renderAmountDisplay({
                   shouldHideBalance,
                   amount: totalAmount,
-                })}{' '}
-                USD
+                })}
+              </div>
+              <div className={styles.fixedAmount}>
+                <p>
+                  {/* TODO: fix value to USD */}
+                  {this.renderAmountDisplay({
+                    shouldHideBalance,
+                    amount: totalAmount,
+                  })}{' '}
+                  USD
+                </p>
+              </div>
+            </div>
+            <div className={styles.extraInfo}>
+              <p className={styles.label}>
+                {intl.formatMessage(messages.tokenTypes)} <span className={styles.value}>20</span>
+              </p>
+              <p className={styles.label}>
+                NFTs <span className={styles.value}>2</span>
               </p>
             </div>
           </div>
         </div>
-      </div>
+        <div className={styles.actions}>
+          {isActionsShow ? (
+            <>
+              <button type="button" onClick={() => {}}>
+                <RandomIcon />
+              </button>
+              <button type="button" onClick={() => {}}>
+                <RandomIcon />
+              </button>
+            </>
+          ) : null}
+        </div>
+      </button>
     );
   }
+
   renderAmountDisplay: ({|
     shouldHideBalance: boolean,
     amount: ?MultiToken,
