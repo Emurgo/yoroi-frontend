@@ -52,7 +52,7 @@ type Props = {|
     conceptualWalletName: string,
   |},
   +rewards: null | void | MultiToken,
-
+  +shouldHideBalance: boolean,
   +walletAmount: null | MultiToken,
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
 |};
@@ -111,7 +111,8 @@ export default class NavPlateRevamp extends Component<Props> {
   };
 
   render(): Node {
-    const { intl, shouldHideBalance } = this.context;
+    const { intl } = this.context;
+    const { shouldHideBalance } = this.props;
 
     const [, iconComponent] = this.props.plate
       ? constructPlate(this.props.plate, 0, styles.icon)
@@ -144,8 +145,12 @@ export default class NavPlateRevamp extends Component<Props> {
             </div>
             <div className={styles.fixedAmount}>
               <p>
-                {/* TODO: fix value */}
-                !!2,000,00 USD
+                {/* TODO: fix value to USD */}
+                {this.renderAmountDisplay({
+                  shouldHideBalance,
+                  amount: totalAmount,
+                })}{' '}
+                USD
               </p>
             </div>
           </div>
