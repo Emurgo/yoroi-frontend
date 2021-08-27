@@ -38,7 +38,7 @@ import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tab
 import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
 import BigNumber from 'bignumber.js';
 import TransactionSuccessDialog from '../../components/wallet/send/TransactionSuccessDialog';
-
+import type { UpdateSendStatus } from '../../stores/toplevel/TransactionBuilderStore'
 // Hardware Wallet Confirmation
 import HWSendConfirmationDialog from '../../components/wallet/send/HWSendConfirmationDialog';
 import globalMessages from '../../i18n/global-messages';
@@ -158,7 +158,7 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
           updateAmount={(value: ?BigNumber) => txBuilderActions.updateAmount.trigger(value)}
           updateMemo={(content: void | string) => txBuilderActions.updateMemo.trigger(content)}
           shouldSendAll={transactionBuilderStore.shouldSendAll}
-          updateSendAllKeepTokens={(status: boolean) => txBuilderActions.updateSendAllKeepTokens.trigger(status)}
+          updateSendAllKeepTokens={(status: UpdateSendStatus) => txBuilderActions.updateSendAllKeepTokens.trigger(status)}
           shouldSendAllKeepTokens={transactionBuilderStore.shouldSendAllKeepTokens}
           updateSendAllStatus={txBuilderActions.updateSendAllStatus.trigger}
           fee={transactionBuilderStore.fee}
@@ -400,7 +400,7 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
           trigger: (params: boolean | void) => void
         |},
         updateSendAllKeepTokens: {|
-          trigger: (params: boolean) => void
+          trigger: (params: UpdateSendStatus) => void
         |},
         updateAmount: {|
           trigger: (params: ?BigNumber) => void

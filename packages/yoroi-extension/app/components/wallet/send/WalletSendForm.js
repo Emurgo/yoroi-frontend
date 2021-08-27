@@ -43,6 +43,7 @@ import { Select } from 'react-polymorph/lib/components/Select';
 import { SelectTokenSkin } from '../../../themes/skins/SelectTokenSkin';
 import TokenOptionRow from '../../widgets/tokenOption/TokenOptionRow';
 import BigNumber from 'bignumber.js';
+import type { UpdateSendStatus } from '../../../stores/toplevel/TransactionBuilderStore'
 
 const messages = defineMessages({
   receiverLabel: {
@@ -97,7 +98,7 @@ type Props = {|
   +updateAmount: (?BigNumber) => void,
   +updateMemo: (void | string) => void,
   +shouldSendAll: boolean,
-  +updateSendAllKeepTokens: boolean => void,
+  +updateSendAllKeepTokens: UpdateSendStatus => void,
   +shouldSendAllKeepTokens: boolean,
   +updateSendAllStatus: (void | boolean) => void,
   +fee: ?MultiToken,
@@ -115,6 +116,7 @@ type Props = {|
   +selectedToken: void | $ReadOnly<TokenRow>,
 |};
 const CUSTOM_AMOUNT = 'CUSTOM_AMOUNT'
+const SEND_ALL = 'SEND_ALL'
 const SEND_ALL_KEEP_TOKENS = 'SEND_ALL_KEEP_TOKENS'
 @observer
 export default class WalletSendForm extends Component<Props> {
@@ -229,7 +231,7 @@ export default class WalletSendForm extends Component<Props> {
             : null
         })(),
         validators: [async ({ field }) => {
-          if (this.props.shouldSendAll) {
+          if (this.props.shouldSendAll || this.props.shouldSendAllKeepTokens) {
             // sendall doesn't depend on the amount so always succeed
             return true;
           }
@@ -409,13 +411,12 @@ export default class WalletSendForm extends Component<Props> {
         }
         amountOptions.push({
           label,
-          value: token.value,
+          value: SEND_ALL,
           id: token.id
         })
       })
       return amountOptions;
     })()
-    console.log("Amount: ", amountFieldProps.value && formattedAmountToBigNumber(amountFieldProps.value).toString())
 
     return (
       <div className={styles.component}>
@@ -479,7 +480,7 @@ export default class WalletSendForm extends Component<Props> {
               className="amount"
               label={intl.formatMessage(globalMessages.amountLabel)}
               decimalPlaces={this.getNumDecimals()}
-              disabled={this.props.shouldSendAll}
+              disabled={this.props.shouldSendAll || this.props.shouldSendAllKeepTokens}
               error={(transactionFeeError || amountField.error)}
               // AmountInputSkin props
               currency={truncateToken(
@@ -497,19 +498,29 @@ export default class WalletSendForm extends Component<Props> {
             options={sendAmountOptions}
             {...form.$('selectedAmount').bind()}
             onChange={value => {
+              this.form.$('selectedAmount').value = value;
               if (value === CUSTOM_AMOUNT) {
-                this.props.updateSendAllStatus(false);
-                this.form.$('amount').clear();
-              } else if (value !== CUSTOM_AMOUNT) {
-                this.props.updateSendAllStatus(true);
+                this.props.updateSendAllKeepTokens({
+                  shouldSendAll: false,
+                  shouldSendAllKeepTokens: false,
+                });
+              } else if (value === SEND_ALL) {
+                this.props.updateSendAllKeepTokens({
+                  shouldSendAll: true,
+                  shouldSendAllKeepTokens: false,
+                });
                 this.props.updateAmount(new BigNumber(
                   formattedAmountToNaturalUnits(
                     this.form.$('amount').value,
                     this.getNumDecimals(),
                   )
                 ));
+              } else if (value === SEND_ALL_KEEP_TOKENS){
+                this.props.updateSendAllKeepTokens({
+                  shouldSendAll: false,
+                  shouldSendAllKeepTokens: true,
+                })
               }
-              this.form.$('selectedAmount').value = value;
             }}
             optionRenderer={option => (
               <TokenOptionRow

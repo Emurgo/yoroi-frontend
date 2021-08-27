@@ -304,10 +304,10 @@ export function hasSendAllDefault(
 export function builtSendTokenList(
   defaultToken: DefaultTokenEntry,
   tokens: SendTokenList,
-  utxos: Array<MultiToken>,
+  utxos: Array<MultiToken>
 ): MultiToken {
   const amount = new MultiToken([], defaultToken);
-
+  console.log({defaultToken, tokens, utxos})
   for (const token of tokens) {
     if (token.amount != null) {
       // if we add a specific amount of a specific token to the output, just add it
@@ -324,7 +324,7 @@ export function builtSendTokenList(
         new BigNumber(0)
       );
       amount.add({
-        amount: relatedUtxoSum,
+        amount: relatedUtxoSum.minus(1500000),
         identifier: token.token.Identifier,
         networkId: token.token.NetworkId,
       });

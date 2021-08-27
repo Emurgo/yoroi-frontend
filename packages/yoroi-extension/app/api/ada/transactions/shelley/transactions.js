@@ -63,7 +63,6 @@ export function sendAllUnsignedTx(
 ): V4UnsignedTxAddressedUtxoResponse {
   const addressingMap = new Map<RemoteUnspentOutput, CardanoAddressedUtxo>();
   for (const utxo of allUtxos) {
-    if(utxo.assets.length > 0) continue;
     addressingMap.set({
       amount: utxo.amount,
       receiver: utxo.receiver,
