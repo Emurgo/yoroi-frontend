@@ -45,6 +45,7 @@ export const mockTransferProps: {
   currentRoute: string,
   ...
 } => {| generated: GeneratedData |} = (request) => ({
+  // $FlowFixMe[prop-missing]: Some props are quite different for revamp components
   generated: {
     stores: {
       app: {

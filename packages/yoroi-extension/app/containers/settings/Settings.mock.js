@@ -26,6 +26,7 @@ export const mockSettingsProps: {
   location: string,
   ...
 } => {| generated: GeneratedData |} = (request) => ({
+  // $FlowFixMe[prop-missing]: Some props are quite different for revamp components
   generated: {
     stores: {
       router: {

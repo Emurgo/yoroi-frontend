@@ -116,9 +116,12 @@ export default class NavBarContainerRevamp extends Component<Props> {
           headerComponent={getDropdownHead()}
           contentComponents={<NoWalletsAccessList />}
           walletsCount={wallets.length}
-          openWalletInfoDialog={() =>
-            this.generated.actions.dialogs.open.trigger({ dialog: WalletListDialog })
-          }
+          openWalletInfoDialog={() => {
+            this.generated.actions.dialogs.open.trigger({ dialog: WalletListDialog });
+            this.generated.actions.router.goToRoute.trigger({
+              route: ROUTES.WALLETS.DELEGATION_DASHBOARD,
+            });
+          }}
         />
       );
     })();
@@ -222,8 +225,8 @@ export default class NavBarContainerRevamp extends Component<Props> {
   ) => {
     const infoWallets = wallets.map(async (wallet: PublicDeriver<>) => {
       const parent: ConceptualWallet = wallet.getParent();
-      const settingsCache: ConceptualWalletSettingsCache =
-        this.generated.stores.walletSettings.getConceptualWalletSettingsCache(
+      const settingsCache: ConceptualWalletSettingsCache
+        = this.generated.stores.walletSettings.getConceptualWalletSettingsCache(
           parent
         );
 
