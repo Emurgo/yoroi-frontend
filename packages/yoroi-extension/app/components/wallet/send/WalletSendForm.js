@@ -427,9 +427,9 @@ export default class WalletSendForm extends Component<Props> {
               className={styles.currencySelect}
               options={tokenOptions}
               {...form.$('selectedToken').bind()}
-              onChange={tokenId => {
+              onChange={value => {
                 this.props.onAddToken(tokenOptions.find(
-                  token => token.info.TokenId === tokenId
+                  token => token.info.TokenId === value
                 )?.info);
 
                 // clear send all when changing currencies
@@ -523,11 +523,10 @@ export default class WalletSendForm extends Component<Props> {
 
           <div className={tokenListClasses}>
             <h1>{intl.formatMessage(messages.willSendAll)}</h1>
-            { tokenOptions.map(token => (
-              <p key={token.id} className= "accordion-item__paragraph" >
-              {token.amount} {' '} {token.label}
-              </p>
-              ))}
+            {tokenOptions.map(token => (
+              <p key={token.id}>
+                {token.amount} {' '} {token.label}
+              </p>))}
           </div>
 
           {showMemo ? (
