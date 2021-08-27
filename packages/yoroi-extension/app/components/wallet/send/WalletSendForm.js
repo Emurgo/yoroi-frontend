@@ -412,7 +412,7 @@ export default class WalletSendForm extends Component<Props> {
       styles.tokenList,
       {
         [styles.show]: this.props.shouldSendAll && 
-           this.form.$('selectedAmount').value === tokenId
+           this.form.$('selectedToken').value === tokenId
       }
     ])
     return (
@@ -495,10 +495,7 @@ export default class WalletSendForm extends Component<Props> {
             options={sendAmountOptions}
             {...form.$('selectedAmount').bind()}
             onChange={value => {
-              this.form.$('selectedAmount').value = value
-              if(value === CUSTOM_AMOUNT){
-                this.form.$('amount').clear();
-              }
+              this.form.$('selectedAmount').set('value', value);
               if(value === CUSTOM_AMOUNT && this.props.shouldSendAll) {
                 this.props.toggleSendAll();
               } else if (value !== CUSTOM_AMOUNT) {
