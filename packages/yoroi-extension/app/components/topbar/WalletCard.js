@@ -161,10 +161,12 @@ export default class WalletCard extends Component<Props, State> {
     );
 
     return (
-      <button
+      <div
+        tabIndex="0"
+        role="button"
         className={wrapperClassname}
-        type="button"
         onClick={this.props.onSelect}
+        onKeyDown={this.props.onSelect}
         onMouseEnter={this.showActions}
         onMouseLeave={this.hideActions}
       >
@@ -184,14 +186,12 @@ export default class WalletCard extends Component<Props, State> {
                 })}
               </div>
               <div className={styles.fixedAmount}>
-                <p>
-                  {/* TODO: fix value to USD */}
-                  {this.renderAmountDisplay({
-                    shouldHideBalance,
-                    amount: totalAmount,
-                  })}{' '}
-                  USD
-                </p>
+                {/* TODO: fix value to USD */}
+                {this.renderAmountDisplay({
+                  shouldHideBalance,
+                  amount: totalAmount,
+                })}{' '}
+                USD
               </div>
             </div>
             <div className={styles.extraInfo}>
@@ -216,7 +216,7 @@ export default class WalletCard extends Component<Props, State> {
             </>
           ) : null}
         </div>
-      </button>
+      </div>
     );
   }
 
