@@ -28,7 +28,6 @@ import WalletListDialog from '../components/topbar/WalletListDialog';
 import { networks } from '../api/ada/lib/storage/database/prepackaged/networks';
 import { addressToDisplayString } from '../api/ada/lib/storage/bridge/utils';
 import { getReceiveAddress } from '../stores/stateless/addressStores';
-import WalletCard from '../components/topbar/WalletCard';
 
 export type GeneratedData = typeof NavBarContainerRevamp.prototype.generated;
 
@@ -164,7 +163,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
     const txRequests = this.generated.stores.transactions.getTxRequests(publicDeriver);
     const balance = txRequests.requests.getBalanceRequest.result || null;
 
-    const walletComponents = wallets.map(wallet => {
+    const walletsMap = wallets.map(wallet => {
       const parent = wallet.getParent();
       const settingsCache = this.generated.stores.walletSettings.getConceptualWalletSettingsCache(
         parent
@@ -176,26 +175,23 @@ export default class NavBarContainerRevamp extends Component<Props> {
           ? null
           : this.generated.stores.wallets.getPublicKeyCache(withPubKey).plate;
 
-      return (
-        <WalletCard
-          key={wallet.getPublicDeriverId()}
-          rewards={this.getRewardBalance(publicDeriver)}
-          walletAmount={balance}
-          getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
-          plate={plate}
-          wallet={settingsCache}
-          shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
-          onSelect={() => this.switchToNewWallet(wallet)}
-          isCurrentWallet={wallet === this.generated.stores.wallets.selected}
-        />
-      );
+      return {
+        walletId: wallet.getPublicDeriverId(),
+        rewards: this.getRewardBalance(publicDeriver),
+        walletAmount: balance,
+        getTokenInfo: genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo),
+        plate,
+        wallet: settingsCache,
+        shouldHideBalance: this.generated.stores.profile.shouldHideBalance,
+        onSelect: () => this.switchToNewWallet(wallet),
+        isCurrentWallet: wallet === this.generated.stores.wallets.selected,
+      };
     });
 
     if (this.generated.stores.uiDialogs.isOpen(WalletListDialog)) {
       return (
         <WalletListDialog
-          walletsComponent={walletComponents}
-          walletsCount={wallets.length}
+          wallets={walletsMap}
           close={this.generated.actions.dialogs.closeActiveDialog.trigger}
           shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
           onUpdateHideBalance={this.updateHideBalance}

@@ -16,6 +16,7 @@ import { hiddenAmount } from '../../utils/strings';
 import type { TokenLookupKey } from '../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import { MultiToken } from '../../api/common/lib/MultiToken';
+import WalletCard from './WalletCard';
 
 const messages = defineMessages({
   allWalletsLabel: {
@@ -33,14 +34,13 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  +walletsComponent: Node,
   +close: void => void,
-  +walletsCount: number,
   +shouldHideBalance: boolean,
   +onUpdateHideBalance: void => Promise<void>,
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
   +walletAmount: MultiToken | null,
   +onAddWallet: void => void,
+  +wallets: Array<Object>,
 |};
 
 @observer
@@ -87,18 +87,17 @@ export default class WalletListDialog extends Component<Props> {
   render(): Node {
     const { intl } = this.context;
     const {
-      walletsCount,
       shouldHideBalance,
       onAddWallet,
       walletAmount,
       onUpdateHideBalance,
-      walletsComponent,
+      wallets,
     } = this.props;
 
     return (
       <Dialog
         className={styles.component}
-        title={`${intl.formatMessage(messages.allWalletsLabel)} (${walletsCount})`}
+        title={`${intl.formatMessage(messages.allWalletsLabel)} (${wallets.length})`}
         closeOnOverlayClick
         closeButton={<DialogCloseButton />}
         onClose={this.props.close}
@@ -120,7 +119,11 @@ export default class WalletListDialog extends Component<Props> {
             </button>
           </div>
         </div>
-        <div className={styles.list}>{walletsComponent}</div>
+        <div className={styles.list}>
+          {wallets.length
+            ? wallets.map(wallet => <WalletCard key={wallet.walletId} {...wallet} />)
+            : null}
+        </div>
         <div className={styles.footer}>
           <button type="button" className={styles.toggleButton} onClick={onAddWallet}>
             {intl.formatMessage(messages.addWallet)}
