@@ -23,6 +23,8 @@ import type {
   TxBodiesResponse,
   UtxoSumRequest,
   UtxoSumResponse,
+  CatalystRoundInfoRequest,
+  CatalystRoundInfoResponse,
 } from './types';
 import type { FilterUsedRequest, FilterUsedResponse, } from '../../../common/lib/state-fetch/currencySpecificTypes';
 
@@ -35,6 +37,7 @@ import {
   GetAccountStateApiError,
   GetBestBlockError,
   GetPoolInfoApiError,
+  GetCatalystRoundInfoApiError,
   GetRewardHistoryApiError,
   GetTxHistoryForAddressesApiError,
   GetTxsBodiesForUTXOsApiError,
@@ -406,5 +409,22 @@ export class RemoteFetcher implements IFetcher {
       }
       return res;
     }, {});
+  }
+
+  getCatalystRoundInfo: CatalystRoundInfoRequest => Promise<CatalystRoundInfoResponse> = async (body) => {
+    const { BackendService } = body.network.Backend;
+    if (BackendService == null) throw new Error(`${nameof(this.getCatalystRoundInfo)} missing backend url`);
+    const isMainnet = /Mainnet/g.test(body.network.NetworkName)
+    const prefix = isMainnet ? '' : 'api/'
+    return await axios(
+      `${BackendService}/${prefix}v0/catalyst/fundInfo`,
+      {
+        method: 'get',
+      }
+    ).then(response => response.data)
+      .catch((error) => {
+        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getCatalystRoundInfo)} error: ` + stringifyError(error));
+        throw new GetCatalystRoundInfoApiError();
+      });
   }
 }
