@@ -166,7 +166,7 @@ export default class VotingPage extends Component<Props> {
         const isAfterVoting = new Date() >= new Date(Date.parse(currentFund.votingEnd))
         const isBetweenVoting = !isBeforeVoting && !isAfterVoting;
 
-        if(isEarly) {
+        if (isEarly) {
           return (
             <RegistrationOver
               title={intl.formatMessage(messages.earlyForRegistrationTitle)}
@@ -227,7 +227,7 @@ export default class VotingPage extends Component<Props> {
             title={intl.formatMessage(messages.mainTitle)}
             subtitle={nextFundRegistrationSubtitle}
           />
-          )
+        );
       }
     }
 
