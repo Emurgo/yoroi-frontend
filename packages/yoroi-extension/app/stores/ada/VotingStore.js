@@ -43,6 +43,7 @@ import type { StoresMap } from '../index';
 import { generateRegistration } from '../../api/ada/lib/cardanoCrypto/catalyst';
 import { derivePublicByAddressing } from '../../api/ada/lib/cardanoCrypto/utils'
 import type { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet'
+import type { CatalystRoundInfoResponse } from '../../api/ada/lib/state-fetch/types'
 
 export const ProgressStep = Object.freeze({
   GENERATE: 0,
@@ -63,7 +64,8 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
   @observable catalystPrivateKey: RustModule.WalletV4.PrivateKey | void;
   @observable pin: Array<number>;
   @observable error: ?LocalizableError;
-
+  @observable catalystRoundInfo: ?CatalystRoundInfoResponse;
+  @observable loadingCatalystRoundInfo: boolean = false;
   @observable
   createVotingRegTx: LocalizedRequest<CreateVotingRegTxFunc>
     = new LocalizedRequest<CreateVotingRegTxFunc>(
@@ -110,10 +112,32 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
     votingActions.submitTransaction.listen(this._submitTransaction);
     votingActions.submitTransactionError.listen(this._submitTransactionError);
     votingActions.cancel.listen(this._cancel);
+    this.actions.wallets.setActiveWallet.listen(() => {this._getCatalystRoundInfo()});
   }
 
   get isActionProcessing(): boolean {
     return this.progressInfo.stepState === StepState.PROCESS;
+  }
+
+  @action _getCatalystRoundInfo: void => Promise<void> = async () => {
+    runInAction(() => {
+      this.loadingCatalystRoundInfo = true
+    })
+    const publicDeriver = this.stores.wallets.selected;
+    if (!publicDeriver) {
+      runInAction(() => {
+        this.loadingCatalystRoundInfo = false
+      })
+      return;
+    }
+    const network = publicDeriver.getParent().getNetworkInfo()
+    const res = await this.stores.substores.ada.stateFetchStore.fetcher
+                .getCatalystRoundInfo({ network })
+    runInAction(() => {
+      this.catalystRoundInfo = res
+      this.loadingCatalystRoundInfo = false
+    })
+
   }
 
   @action _goBackToRegister: void => void = () => {
