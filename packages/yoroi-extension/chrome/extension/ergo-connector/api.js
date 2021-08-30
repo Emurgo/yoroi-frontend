@@ -73,7 +73,7 @@ export async function connectorGetBalance(
   pendingTxs: PendingTransaction[],
   tokenId: TokenId
 ): Promise<Value> {
-  if (tokenId === 'ERG') {
+  if (tokenId === 'ERG' || tokenId === 'ADA') {
     if (pendingTxs.length === 0) {
       // can directly query for balance
       const canGetBalance = asGetBalance(wallet);
