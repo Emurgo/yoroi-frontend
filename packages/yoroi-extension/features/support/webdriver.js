@@ -247,6 +247,13 @@ function CustomWorld(cmdInput: WorldInput) {
       });
     }, index);
   };
+
+  this.clickElementByQuery = async (query) => {
+    await this.driver.executeScript(
+      `document.querySelector('${query}').click()`,
+    );
+  };
+
 }
 
 // no need to await

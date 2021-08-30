@@ -98,7 +98,7 @@ Feature: Send transaction
     Given There is a Byron wallet stored named many-tx-wallet
     And I have a wallet with funds
     When I go to the send transaction screen
-	  And I click on "Send all" checkbox
+    And I open the amount dropdown and select send all
     And I fill the address of the form:
       | address                                                     |
       | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv |
@@ -319,7 +319,7 @@ Feature: Send transaction
     Then I click the next button
     Then I should see the opened wallet with name "Restored Wallet"
     When I go to the send transaction screen
-    And I click on "Send all" checkbox
+    And I open the amount dropdown and select send all
     And I fill the address of the form:
       | address                                                     |
       | 9guxMsa2S1Z4xzr5JHUHZesznThjZ4BMM9Ra5Lfx2E9duAnxEmv         |
@@ -424,8 +424,7 @@ Feature: Send transaction
 
     And I open the token selection dropdown
     And I select token "USD"
-
-    And I click on "Send all" checkbox
+    And I open the amount dropdown and select send all
     And I fill the address of the form:
       | address                                                     |
       | 9guxMsa2S1Z4xzr5JHUHZesznThjZ4BMM9Ra5Lfx2E9duAnxEmv         |
@@ -480,7 +479,7 @@ Feature: Send transaction
     And I open the token selection dropdown
     And I select token "nicoin"
 
-    And I click on "Send all" checkbox
+    And I open the amount dropdown and select send all
     And I fill the address of the form:
       | address                                                     |
       | Ae2tdPwUPEZ3HUU7bmfexrUzoZpAZxuyt4b4bn7fus7RHfXoXRightdgMCv         |
