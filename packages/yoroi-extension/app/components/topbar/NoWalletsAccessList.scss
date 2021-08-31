@@ -5,11 +5,16 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 40px;
+  padding: 40px 36px;
   text-align: center;
   font-family: var(--font-regular);
 }
 .header {
+  display: flex;
+  align-items: center;
+  svg {
+    margin-right: 8px;
+  }
   h3 {
     font-size: 24px;
     color: var(--theme-wallet-dropdown-main-text-color);

@@ -25,7 +25,8 @@ import { getTokenName } from '../../stores/stateless/tokenHelpers';
 import { hiddenAmount } from '../../utils/strings';
 import type { TokenLookupKey } from '../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
-import RandomIcon from '../../assets/images/sidebar/revamp/wallet.inline.svg';
+import DragIcon from '../../assets/images/add-wallet/wallet-list/drag.inline.svg';
+import StarIcon from '../../assets/images/add-wallet/wallet-list/star.inline.svg';
 import { Draggable } from 'react-beautiful-dnd';
 
 const messages = defineMessages({
@@ -216,10 +217,10 @@ export default class WalletCard extends Component<Props, State> {
               )}
             >
               <div {...provided.dragHandleProps}>
-                <RandomIcon />
+                <DragIcon />
               </div>
               <button type="button" onClick={() => {}}>
-                <RandomIcon />
+                <StarIcon />
               </button>
             </div>
           </div>
