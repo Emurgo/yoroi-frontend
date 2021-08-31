@@ -200,6 +200,8 @@ export default class NavBarContainerRevamp extends Component<Props> {
           onAddWallet={() =>
             this.generated.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD })
           }
+          updateSortedWalletList={this.generated.actions.profile.updateSortedWalletList.trigger}
+          currentSortedWallets={this.generated.stores.profile.currentSortedWallets ?? []}
         />
       );
     }
@@ -289,6 +291,9 @@ export default class NavBarContainerRevamp extends Component<Props> {
         updateHideBalance: {|
           trigger: (params: void) => Promise<void>,
         |},
+        updateSortedWalletList: {|
+          trigger: ({| sortedWallets: Array<number> |}) => Promise<void>,
+        |},
       |},
       router: {|
         goToRoute: {|
@@ -315,6 +320,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
       |},
       profile: {|
         shouldHideBalance: boolean,
+        currentSortedWallets: ?Array<number>,
       |},
       tokenInfoStore: {|
         tokenInfo: TokenInfoMap,
@@ -364,6 +370,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
         },
         profile: {
           shouldHideBalance: stores.profile.shouldHideBalance,
+          currentSortedWallets: stores.profile.currentSortedWallets,
         },
         delegation: {
           getDelegationRequests: stores.delegation.getDelegationRequests,
@@ -378,6 +385,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
         },
         profile: {
           updateHideBalance: { trigger: actions.profile.updateHideBalance.trigger },
+          updateSortedWalletList: { trigger: actions.profile.updateSortedWalletList.trigger },
         },
         router: {
           goToRoute: { trigger: actions.router.goToRoute.trigger },

@@ -26,6 +26,7 @@ import { hiddenAmount } from '../../utils/strings';
 import type { TokenLookupKey } from '../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import RandomIcon from '../../assets/images/sidebar/revamp/wallet.inline.svg';
+import { Draggable } from 'react-beautiful-dnd';
 
 const messages = defineMessages({
   tokenTypes: {
@@ -62,6 +63,8 @@ type Props = {|
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
   +isCurrentWallet?: boolean,
   +onSelect?: void => void,
+  +walletId: string,
+  +idx: number,
 |};
 
 type State = {| +isActionsShow: boolean |};
@@ -140,7 +143,7 @@ export default class WalletCard extends Component<Props, State> {
 
   render(): Node {
     const { intl } = this.context;
-    const { shouldHideBalance } = this.props;
+    const { shouldHideBalance, walletId, idx } = this.props;
     const { isActionsShow } = this.state;
 
     const [, iconComponent] = this.props.plate
@@ -153,70 +156,75 @@ export default class WalletCard extends Component<Props, State> {
       .join(' - ');
     const totalAmount = this.getTotalAmount();
 
-    const wrapperClassname = classnames(
-      styles.cardWrapper,
-      this.props.isCurrentWallet !== null &&
-        this.props.isCurrentWallet === true &&
-        styles.currentCardWrapper
-    );
-
     return (
-      <div
-        tabIndex="0"
-        role="button"
-        className={wrapperClassname}
-        onClick={this.props.onSelect}
-        onKeyDown={this.props.onSelect}
-        onMouseEnter={this.showActions}
-        onMouseLeave={this.hideActions}
-      >
-        <div className={styles.main}>
-          <div className={styles.header}>
-            <h5 className={styles.name}>{this.props.wallet.conceptualWalletName}</h5>
-            {' ·  '}
-            <div className={styles.type}>{typeText}</div>
-          </div>
-          <div className={styles.body}>
-            <div>{iconComponent}</div>
-            <div className={styles.content}>
-              <div className={styles.amount}>
-                {this.renderAmountDisplay({
-                  shouldHideBalance,
-                  amount: totalAmount,
-                })}
+      <Draggable draggableId={walletId.toString()} index={idx}>
+        {(provided, snapshot) => (
+          <div
+            tabIndex="0"
+            role="button"
+            className={classnames(
+              styles.cardWrapper,
+              this.props.isCurrentWallet === true && styles.currentCardWrapper,
+              snapshot.isDragging === true && styles.isDragging
+            )}
+            onClick={this.props.onSelect}
+            onKeyDown={this.props.onSelect}
+            onMouseEnter={this.showActions}
+            onMouseLeave={this.hideActions}
+            {...provided.draggableProps}
+            ref={provided.innerRef}
+          >
+            <div className={styles.main}>
+              <div className={styles.header}>
+                <h5 className={styles.name}>{this.props.wallet.conceptualWalletName}</h5>
+                {' ·  '}
+                <div className={styles.type}>{typeText}</div>
               </div>
-              <div className={styles.fixedAmount}>
-                {/* TODO: fix value to USD */}
-                {this.renderAmountDisplay({
-                  shouldHideBalance,
-                  amount: totalAmount,
-                })}{' '}
-                USD
+              <div className={styles.body}>
+                <div>{iconComponent}</div>
+                <div className={styles.content}>
+                  <div className={styles.amount}>
+                    {this.renderAmountDisplay({
+                      shouldHideBalance,
+                      amount: totalAmount,
+                    })}
+                  </div>
+                  <div className={styles.fixedAmount}>
+                    {/* TODO: fix value to USD */}
+                    {this.renderAmountDisplay({
+                      shouldHideBalance,
+                      amount: totalAmount,
+                    })}{' '}
+                    USD
+                  </div>
+                </div>
+                <div className={styles.extraInfo}>
+                  <p className={styles.label}>
+                    {intl.formatMessage(messages.tokenTypes)}{' '}
+                    <span className={styles.value}>20</span>
+                  </p>
+                  <p className={styles.label}>
+                    NFTs <span className={styles.value}>2</span>
+                  </p>
+                </div>
               </div>
             </div>
-            <div className={styles.extraInfo}>
-              <p className={styles.label}>
-                {intl.formatMessage(messages.tokenTypes)} <span className={styles.value}>20</span>
-              </p>
-              <p className={styles.label}>
-                NFTs <span className={styles.value}>2</span>
-              </p>
-            </div>
-          </div>
-        </div>
-        <div className={styles.actions}>
-          {isActionsShow ? (
-            <>
+            <div
+              className={classnames(
+                styles.actions,
+                (isActionsShow === true || snapshot.isDragging === true) && styles.showActions
+              )}
+            >
+              <div {...provided.dragHandleProps}>
+                <RandomIcon />
+              </div>
               <button type="button" onClick={() => {}}>
                 <RandomIcon />
               </button>
-              <button type="button" onClick={() => {}}>
-                <RandomIcon />
-              </button>
-            </>
-          ) : null}
-        </div>
-      </div>
+            </div>
+          </div>
+        )}
+      </Draggable>
     );
   }
 
