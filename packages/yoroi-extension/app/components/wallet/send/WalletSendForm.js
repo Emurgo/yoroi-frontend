@@ -492,14 +492,16 @@ export default class WalletSendForm extends Component<Props> {
                 // and set it to whatever value was used for the sendAll value
                 this.props.updateSendAllStatus(true);
               }
-              if(this.props.shouldSendAll){
+
+              if (this.props.shouldSendAll) { 
                 this.props.updateAmount(new BigNumber(
                   formattedAmountToNaturalUnits(
                     this.form.$('amount').value,
                     this.getNumDecimals(),
-                    )
+                  )
                 ));
               }
+
               this.form.$('selectedAmount').value = value;
             }}
             optionRenderer={option => (
