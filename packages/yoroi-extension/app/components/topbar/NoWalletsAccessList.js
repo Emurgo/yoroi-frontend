@@ -33,8 +33,6 @@ export default class NoWalletsAccessList extends Component<Props> {
   render(): Node {
     const { intl } = this.context;
 
-    // ;
-
     return (
       <div className={styles.wrapper}>
         <div className={styles.header}>
