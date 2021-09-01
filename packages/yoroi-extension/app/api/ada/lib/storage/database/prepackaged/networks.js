@@ -284,7 +284,7 @@ export const defaultAssets: Array<
           policyId: PRIMARY_ASSET_CONSTANTS.Cardano,
           assetName: PRIMARY_ASSET_CONSTANTS.Cardano,
           ticker:
-            (network === networks.CardanoTestnet || network === networks.AlonzoWhiteTestnet)
+            (network === networks.CardanoTestnet || network === networks.AlonzoTestnet)
               ? 'TADA'
               : 'ADA',
           longName: null,

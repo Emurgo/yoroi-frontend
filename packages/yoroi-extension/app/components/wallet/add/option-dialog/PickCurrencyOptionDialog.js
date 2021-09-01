@@ -37,7 +37,7 @@ type Props = {|
   +onCardano: void => void,
   +onCardanoTestnet: void => void,
   +onErgo: void | (void => void),
-  +onAlonzoWhiteTestnet: void => void,
+  +onAlonzoTestnet: void => void,
   +onExternalLinkClick: MouseEvent => void,
 |};
 
@@ -99,7 +99,7 @@ export default class PickCurrencyOptionDialog extends Component<Props> {
                 parentName="PickCurrencyOptionDialog"
                 type="alonzoWhiteTestnet"
                 title="Alonzo White Testnet"
-                onSubmit={this.props.onAlonzoWhiteTestnet}
+                onSubmit={this.props.onAlonzoTestnet}
                 learnMoreText={
                   <>
                     {intl.formatMessage(messages.testnetDescription)}<br />
