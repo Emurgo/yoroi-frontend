@@ -22,6 +22,21 @@ import {
 import type {
   DefaultTokenEntry,
 } from '../api/common/lib/MultiToken';
+import { parseMetadata } from '../api/ada/lib/storage/bridge/metadataUtils';
+import { CatalystLabels } from '../api/ada/lib/cardanoCrypto/catalyst';
+import { RustModule } from '../api/ada/lib/cardanoCrypto/rustLoader';
+
+export type CardanoShelleyTransactionFeature =
+  | 'CatalystVotingRegistration'
+  | 'Withdrawal'
+  | 'StakeDelegation'
+  | 'StakeRegistration'
+  | 'StakeDeregistration'
+  | 'PoolRegistration'
+  | 'PoolRetirement'
+  | 'GenesisKeyDelegation'
+  | 'MoveInstantaneousRewards'
+;
 
 export default class CardanoShelleyTransaction extends WalletTransaction {
 
@@ -105,5 +120,60 @@ export default class CardanoShelleyTransaction extends WalletTransaction {
       state: tx.transaction.Status,
       errorMsg: tx.transaction.ErrorMessage,
     });
+  }
+
+  isCatalystVotingRegistration(): boolean {
+    if (this.metadata === null) {
+      return false;
+    }
+    const metadataString = parseMetadata(this.metadata);
+    let metadata;
+    try {
+      metadata = JSON.parse(metadataString);
+    } catch {
+      return false;
+    }
+    if (metadata[String(CatalystLabels.DATA)]) {
+      return true;
+    }
+    return false;
+  }
+
+  getFeatures(): Array<CardanoShelleyTransactionFeature> {
+    const features = [];
+    if (this.withdrawals.length) {
+      features.push('Withdrawal');
+    }
+    if (this.isCatalystVotingRegistration()) {
+      features.push('CatalystVotingRegistration');
+    }
+    for (const cert of this.certificates) {
+      if (cert.certificate.Kind === RustModule.WalletV4.CertificateKind.StakeDelegation) {
+        features.push('StakeDelegation');
+      }
+      if (cert.certificate.Kind === RustModule.WalletV4.CertificateKind.StakeRegistration) {
+        features.push('StakeRegistration');
+      }
+      if (cert.certificate.Kind === RustModule.WalletV4.CertificateKind.StakeDeregistration) {
+        features.push('StakeDeregistration');
+      }
+      if (cert.certificate.Kind === RustModule.WalletV4.CertificateKind.PoolRegistration) {
+        features.push('PoolRegistration');
+      }
+      if (cert.certificate.Kind === RustModule.WalletV4.CertificateKind.PoolRetirement) {
+        features.push('PoolRetirement');
+      }
+      if (cert.certificate.Kind === RustModule.WalletV4.CertificateKind.GenesisKeyDelegation) {
+        features.push('GenesisKeyDelegation');
+      }
+      if (
+        cert.certificate.Kind ===
+          RustModule.WalletV4.CertificateKind.MoveInstantaneousRewardsCert
+      ) {
+        features.push('MoveInstantaneousRewards');
+      }
+    }
+
+    return features;
   }
 }

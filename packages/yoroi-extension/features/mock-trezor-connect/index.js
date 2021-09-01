@@ -404,13 +404,13 @@ class MockTrezorConnect {
       body.set_certs(certs);
     }
 
-    const metadata = request.metadata != null
-      ? RustModule.WalletV4.TransactionMetadata.from_bytes(
-        Buffer.from(request.metadata, 'hex')
+    const metadata = request.auxiliaryData?.blob != null
+      ? RustModule.WalletV4.AuxiliaryData.from_bytes(
+        Buffer.from(request.auxiliaryData.blob, 'hex')
       )
       : undefined;
     if (metadata != null) {
-      body.set_metadata_hash(RustModule.WalletV4.hash_metadata(metadata));
+      body.set_auxiliary_data_hash(RustModule.WalletV4.hash_auxiliary_data(metadata));
     }
     if (request.withdrawals != null && request.withdrawals.length > 0) {
       const withdrawalRequest = request.withdrawals;
@@ -535,7 +535,19 @@ class MockTrezorConnect {
           fw_vendor: (null: any),
           fw_vendor_keys: (null: any),
           unfinished_backup: false,
-          no_backup: false
+          no_backup: false,
+          recovery_mode: false,
+          backup_type: null,
+          sd_card_present: false,
+          sd_protection: false,
+          wipe_code_protection: false,
+          session_id: null,
+          passphrase_always_on_device: false,
+          safety_checks: null,
+          auto_lock_delay_ms: 0,
+          display_rotation: 0,
+          experimental_features: false,
+          unlocked: false,
         }
       }: KnownDevice)
     }));

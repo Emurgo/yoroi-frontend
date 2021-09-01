@@ -65,7 +65,6 @@ function bigNumberToValue(x: BigNumber): Value {
 }
 
 function valueToBigNumber(x: Value): BigNumber {
-  // constructor takes either string/number this is just here for consistency
   return new BigNumber(x);
 }
 
@@ -74,7 +73,7 @@ export async function connectorGetBalance(
   pendingTxs: PendingTransaction[],
   tokenId: TokenId
 ): Promise<Value> {
-  if (tokenId === 'ERG') {
+  if (tokenId === 'ERG' || tokenId === 'ADA') {
     if (pendingTxs.length === 0) {
       // can directly query for balance
       const canGetBalance = asGetBalance(wallet);
