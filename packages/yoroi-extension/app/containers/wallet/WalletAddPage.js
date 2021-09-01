@@ -139,6 +139,9 @@ export default class WalletAddPage extends Component<Props> {
         onErgo={uiDialogs.isOpen(WalletConnectHWOptionDialog)
           ? undefined
           : () => actions.profile.setSelectedNetwork.trigger(networks.ErgoMainnet)}
+        onAlonzoWhiteTestnet={
+          () => actions.profile.setSelectedNetwork.trigger(networks.AlonzoWhiteTestnet)
+        }
       />);
     } else if (uiDialogs.isOpen(WalletCreateOptionDialog)) {
       if (selectedNetwork === undefined) {
