@@ -158,9 +158,9 @@ export const networks = Object.freeze({
     CoinType: CoinTypes.CARDANO,
     Fork: CardanoForks.Haskell,
   }: NetworkRow),
-  AlonzoWhiteTestnet: ({
+  AlonzoTestnet: ({
     NetworkId: 4_00,
-    NetworkName: 'Alonzo White Testnet',
+    NetworkName: 'Alonzo Testnet',
     Backend: {
       BackendService: environment.isTest()
         ? 'http://localhost:21000'
