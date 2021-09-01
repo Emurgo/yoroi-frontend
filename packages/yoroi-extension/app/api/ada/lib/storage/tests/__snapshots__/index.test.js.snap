@@ -1343,7 +1343,7 @@ Object {
       "CoinType": 2147485463,
       "Fork": 0,
       "NetworkId": 400,
-      "NetworkName": "Alonzo White Testnet",
+      "NetworkName": "Alonzo Testnet",
     },
   ],
   "PreferredExplorer": Array [],

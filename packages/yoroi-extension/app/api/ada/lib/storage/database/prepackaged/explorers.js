@@ -134,10 +134,10 @@ const CardanoTestnetExplorers: Array<$ReadOnly<ExplorerRow>> = [
   },
 ];
 
-const AlonzoWhiteTestnetExplorers: Array<$ReadOnly<ExplorerRow>> = [
+const AlonzoTestnetExplorers: Array<$ReadOnly<ExplorerRow>> = [
   {
     ExplorerId: 5_00,
-    NetworkId: networks.AlonzoWhiteTestnet.NetworkId,
+    NetworkId: networks.AlonzoTestnet.NetworkId,
     IsBackup: true,
     Endpoints: {
       address: 'https://explorer.alonzo-white.dev.cardano.org/en/address?address=',
@@ -152,7 +152,7 @@ export const prepackagedExplorers: Map<number, $ReadOnlyArray<$ReadOnly<Explorer
   [networks.CardanoTestnet.NetworkId, CardanoTestnetExplorers],
   [networks.JormungandrMainnet.NetworkId, JormungandrExplorers],
   [networks.ErgoMainnet.NetworkId, ErgoExplorers],
-  [networks.AlonzoWhiteTestnet.NetworkId, AlonzoWhiteTestnetExplorers],
+  [networks.AlonzoTestnet.NetworkId, AlonzoTestnetExplorers],
 ]);
 const getOrThrow = function<T> (input: ?T): T {
   if (input == null) throw new Error('No backup explorer for type');
@@ -172,7 +172,7 @@ export const prepackagedDefaultExplorers:
     [networks.ErgoMainnet.NetworkId, getOrThrow(
       ErgoExplorers.find(explorer => explorer.IsBackup)
     )],
-    [networks.AlonzoWhiteTestnet.NetworkId, getOrThrow(
-      AlonzoWhiteTestnetExplorers.find(explorer => explorer.IsBackup)
+    [networks.AlonzoTestnet.NetworkId, getOrThrow(
+      AlonzoTestnetExplorers.find(explorer => explorer.IsBackup)
     )],
   ]);

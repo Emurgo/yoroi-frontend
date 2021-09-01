@@ -158,9 +158,9 @@ export const networks = Object.freeze({
     CoinType: CoinTypes.CARDANO,
     Fork: CardanoForks.Haskell,
   }: NetworkRow),
-  AlonzoWhiteTestnet: ({
+  AlonzoTestnet: ({
     NetworkId: 4_00,
-    NetworkName: 'Alonzo White Testnet',
+    NetworkName: 'Alonzo Testnet',
     Backend: {
       BackendService: environment.isTest()
         ? 'http://localhost:21000'
@@ -284,7 +284,7 @@ export const defaultAssets: Array<
           policyId: PRIMARY_ASSET_CONSTANTS.Cardano,
           assetName: PRIMARY_ASSET_CONSTANTS.Cardano,
           ticker:
-            (network === networks.CardanoTestnet || network === networks.AlonzoWhiteTestnet)
+            (network === networks.CardanoTestnet || network === networks.AlonzoTestnet)
               ? 'TADA'
               : 'ADA',
           longName: null,
