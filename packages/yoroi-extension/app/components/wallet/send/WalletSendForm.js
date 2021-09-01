@@ -486,8 +486,10 @@ export default class WalletSendForm extends Component<Props> {
             onChange={value => {
               if (value === CUSTOM_AMOUNT) {
                 this.props.updateSendAllStatus(false);
-                this.form.$('amount').clear();
-              } else if (value !== CUSTOM_AMOUNT) {
+              } else {
+                // if we switched shouldSendAll from true -> false
+                // we need to re-enable the field
+                // and set it to whatever value was used for the sendAll value
                 this.props.updateSendAllStatus(true);
                 this.props.updateAmount(new BigNumber(
                   formattedAmountToNaturalUnits(
