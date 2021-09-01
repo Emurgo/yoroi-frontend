@@ -205,7 +205,7 @@
     "react-markdown": "5.0.3",
     "react-polymorph": "0.9.8-rc.9",
     "react-resize-detector": "6.6.0",
-    "react-router": "5.2.0",
+    "react-router": "5.2.1",
     "react-router-dom": "5.2.0",
     "recharts": "1.8.5",
     "ringbufferjs": "2.0.0",
