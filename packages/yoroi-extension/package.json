@@ -201,7 +201,7 @@
     "react-blockies": "1.4.1",
     "react-copy-to-clipboard": "5.0.3",
     "react-dom": "16.13.1",
-    "react-intl": "2.9.0",
+    "react-intl": "5.20.10",
     "react-markdown": "5.0.3",
     "react-polymorph": "0.9.8-rc.9",
     "react-resize-detector": "6.6.0",
