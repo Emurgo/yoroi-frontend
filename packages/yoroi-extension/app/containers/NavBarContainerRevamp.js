@@ -60,59 +60,57 @@ export default class NavBarContainerRevamp extends Component<Props> {
   };
 
   render(): Node {
-    // const { intl } = this.context;
     const { stores } = this.generated;
     const { profile } = stores;
 
     const walletsStore = stores.wallets;
-
     const wallets = this.generated.stores.wallets.publicDerivers;
 
-    const dropdownComponent = (() => {
-      const getDropdownHead = () => {
-        const publicDeriver = walletsStore.selected;
-        if (publicDeriver == null) {
-          // TODO: Remove style since for now, we don't have a selected wallet by default
-          return (
-            <div style={{ marginRight: '100px' }}>
-              <NoWalletsDropdown />
-            </div>
-          );
-        }
-        const parent = publicDeriver.getParent();
-
-        const settingsCache = this.generated.stores.walletSettings.getConceptualWalletSettingsCache(
-          parent
-        );
-
-        const withPubKey = asGetPublicKey(publicDeriver);
-        const plate =
-          withPubKey == null
-            ? null
-            : this.generated.stores.wallets.getPublicKeyCache(withPubKey).plate;
-
-        const txRequests = this.generated.stores.transactions.getTxRequests(publicDeriver);
-        const balance = txRequests.requests.getBalanceRequest.result || null;
-
+    const DropdownHead = () => {
+      const publicDeriver = walletsStore.selected;
+      if (publicDeriver == null) {
+        // TODO: Remove style since for now, we don't have a selected wallet by default
         return (
-          <NavWalletDetailsRevamp
-            plate={plate}
-            wallet={settingsCache}
-            onUpdateHideBalance={this.updateHideBalance}
-            shouldHideBalance={profile.shouldHideBalance}
-            rewards={this.getRewardBalance(publicDeriver)}
-            walletAmount={balance}
-            getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
-            defaultToken={this.generated.stores.tokenInfoStore.getDefaultTokenInfo(
-              publicDeriver.getParent().getNetworkInfo().NetworkId
-            )}
-          />
+          <div style={{ marginRight: '100px' }}>
+            <NoWalletsDropdown />
+          </div>
         );
-      };
+      }
+      const parent = publicDeriver.getParent();
+
+      const settingsCache = this.generated.stores.walletSettings.getConceptualWalletSettingsCache(
+        parent
+      );
+
+      const withPubKey = asGetPublicKey(publicDeriver);
+      const plate =
+        withPubKey == null
+          ? null
+          : this.generated.stores.wallets.getPublicKeyCache(withPubKey).plate;
+
+      const txRequests = this.generated.stores.transactions.getTxRequests(publicDeriver);
+      const balance = txRequests.requests.getBalanceRequest.result || null;
 
       return (
+        <NavWalletDetailsRevamp
+          plate={plate}
+          wallet={settingsCache}
+          onUpdateHideBalance={this.updateHideBalance}
+          shouldHideBalance={profile.shouldHideBalance}
+          rewards={this.getRewardBalance(publicDeriver)}
+          walletAmount={balance}
+          getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
+          defaultToken={this.generated.stores.tokenInfoStore.getDefaultTokenInfo(
+            publicDeriver.getParent().getNetworkInfo().NetworkId
+          )}
+        />
+      );
+    };
+
+    const DropdownComponent = () => {
+      return (
         <NavDropdownRevamp
-          headerComponent={getDropdownHead()}
+          headerComponent={<DropdownHead />}
           contentComponents={<NoWalletsAccessList />}
           walletsCount={wallets.length}
           openWalletInfoDialog={() => {
@@ -123,7 +121,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
           }}
         />
       );
-    })();
+    };
 
     return (
       <>
@@ -131,7 +129,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
         <NavBarRevamp
           title={this.props.title}
           menu={this.props.menu}
-          walletDetails={dropdownComponent}
+          walletDetails={<DropdownComponent />}
           goToNotifications={() =>
             this.generated.actions.router.goToRoute.trigger({
               route: ROUTES.NOTICE_BOARD.ROOT,
@@ -223,8 +221,8 @@ export default class NavBarContainerRevamp extends Component<Props> {
   ) => {
     const infoWallets = wallets.map(async (wallet: PublicDeriver<>) => {
       const parent: ConceptualWallet = wallet.getParent();
-      const settingsCache: ConceptualWalletSettingsCache
-        = this.generated.stores.walletSettings.getConceptualWalletSettingsCache(
+      const settingsCache: ConceptualWalletSettingsCache =
+        this.generated.stores.walletSettings.getConceptualWalletSettingsCache(
           parent
         );
 
