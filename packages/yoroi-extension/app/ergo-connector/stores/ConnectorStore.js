@@ -130,6 +130,8 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
 
   @observable signingMessage: ?SigningMessage = null;
 
+  @observable getTxAssetsError: string = '';
+
   setup(): void {
     super.setup();
     this.actions.connector.getResponse.listen(this._getConnectingMsg);
@@ -297,12 +299,18 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       selectedWallet.getParent().getDefaultToken().defaultIdentifier
     ])).filter(id => !mintedTokenIds.includes(id));
     const stateFetcher = this.stores.substores.ergo.stateFetchStore.fetcher;
-    await addErgoAssets({
-      db: selectedWallet.getDb(),
-      tokenIdentifiers,
-      getAssetInfo: stateFetcher.getAssetInfo,
-      network: selectedWallet.getParent().getNetworkInfo(),
-    });
+    try {
+      await addErgoAssets({
+        db: selectedWallet.getDb(),
+        tokenIdentifiers,
+        getAssetInfo: stateFetcher.getAssetInfo,
+        network: selectedWallet.getParent().getNetworkInfo(),
+      });
+    } catch (error) {
+      runInAction(() => {
+        this.getTxAssetsError = error.message
+      });
+    }
   }
 
   @computed get signingRequest(): ?ISignRequest<any> {

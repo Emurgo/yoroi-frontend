@@ -97,7 +97,7 @@ class ConnectPage extends Component<Props> {
 
     const url = message?.url ?? '';
     const faviconUrl = message?.imgBase64Url;
-
+    console.log('url' , url)
     return (
       <div className={componentClasses}>
         <ProgressBar step={1} />

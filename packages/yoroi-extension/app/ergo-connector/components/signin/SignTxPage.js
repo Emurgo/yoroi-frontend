@@ -133,13 +133,20 @@ class SignTxPage extends Component<Props> {
     if (mintedToken != null) {
       return mintedToken;
     }
-    return this.props.getTokenInfo(tokenEntry);
+    console.log('tokenEntry request', tokenEntry)
+    try {
+      return this.props.getTokenInfo(tokenEntry);
+    } catch (error) {
+      return null
+    }
   }
 
   renderAmountDisplay: {|
     entry: TokenEntry,
   |} => Node = (request) => {
     const tokenInfo = this._resolveTokenInfo(request.entry);
+    console.log('tokenEntry success', tokenInfo)
+    if(!tokenInfo) return <h1>No Available</h1>
     const shiftedAmount = request.entry.amount
       .shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
 
