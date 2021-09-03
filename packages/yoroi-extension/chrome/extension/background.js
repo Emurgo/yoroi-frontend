@@ -624,10 +624,11 @@ chrome.runtime.onConnectExternal.addListener(port => {
       } else if (message.type === 'yoroi_connect_request/cardano') {
         await withDb(
           async (_db, localStorageApi) => {
-            const connextionConfirmed = await confirmConnect(tabId, message.url, localStorageApi);
+            const publicDeriverId = await confirmConnect(tabId, message.url, localStorageApi);
+            const accepted = publicDeriverId !== null;
             port.postMessage({
               type: 'yoroi_connect_response/cardano',
-              success: connextionConfirmed !== null
+              success: accepted
             });
           }
         );

@@ -779,7 +779,7 @@ describe('Create signed transactions', () => {
     const witnesses = signedTx.witness_set();
 
     expect(witnesses.vkeys()).toEqual(undefined);
-    expect(witnesses.scripts()).toEqual(undefined);
+    expect(witnesses.native_scripts()).toEqual(undefined);
     const bootstrapWits = witnesses.bootstraps();
     if (bootstrapWits == null) throw new Error('Bootstrap witnesses should not be null');
     expect(bootstrapWits.len()).toEqual(1);
@@ -859,7 +859,7 @@ describe('Create signed transactions', () => {
     const witnesses = signedTx.witness_set();
 
     expect(witnesses.vkeys()).toEqual(undefined);
-    expect(witnesses.scripts()).toEqual(undefined);
+    expect(witnesses.native_scripts()).toEqual(undefined);
     const bootstrapWits = witnesses.bootstraps();
     if (bootstrapWits == null) throw new Error('Bootstrap witnesses should not be null');
     expect(bootstrapWits.len()).toEqual(1); // note: only one witness since we got rid of duplicates
@@ -938,7 +938,7 @@ describe('Create signed transactions', () => {
     const vKeyWits = witnesses.vkeys();
     if (vKeyWits == null) throw new Error('Vkey witnesses should not be null');
     expect(vKeyWits.len()).toEqual(2);
-    expect(witnesses.scripts()).toEqual(undefined);
+    expect(witnesses.native_scripts()).toEqual(undefined);
     expect(witnesses.bootstraps()).toEqual(undefined);
 
     // set is used so order not defined so we sort the list
@@ -1013,7 +1013,7 @@ describe('Create signed transactions', () => {
     const vKeyWits = witnesses.vkeys();
     if (vKeyWits == null) throw new Error('Vkey witnesses should not be null');
     expect(vKeyWits.len()).toEqual(2);
-    expect(witnesses.scripts()).toEqual(undefined);
+    expect(witnesses.native_scripts()).toEqual(undefined);
     expect(witnesses.bootstraps()).toEqual(undefined);
 
     const txBody = unsignedTxResponse.txBuilder.build();
