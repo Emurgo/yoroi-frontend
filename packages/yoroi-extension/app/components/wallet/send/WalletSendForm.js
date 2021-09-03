@@ -484,6 +484,8 @@ export default class WalletSendForm extends Component<Props> {
             options={sendAmountOptions}
             {...form.$('selectedAmount').bind()}
             onChange={value => {
+              // Do nothing if we select the same option twice 
+              if (this.form.$('selectedAmount').value === value) return 
               if (value === CUSTOM_AMOUNT) {
                 this.props.updateSendAllStatus(false);
               } else {
