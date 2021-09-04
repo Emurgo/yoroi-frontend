@@ -1,7 +1,7 @@
 // @flow
 import moment from 'moment';
 import { computed } from 'mobx';
-import React, { Component } from 'react';
+import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import type { InjectedOrGenerated } from '../types/injectedPropsType';

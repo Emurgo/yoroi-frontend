@@ -1,7 +1,6 @@
 // @flow
 
 import type { Node } from 'react';
-import React from 'react';
 import { select, } from '@storybook/addon-knobs';
 import { withScreenshot } from 'storycap';
 import {

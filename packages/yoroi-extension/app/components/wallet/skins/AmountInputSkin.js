@@ -1,5 +1,5 @@
 // @flow
-import React, { Component } from 'react';
+import { Component } from 'react';
 import type { Node, Ref } from 'react';
 import { defineMessages, intlShape } from 'react-intl';
 import classnames from 'classnames';

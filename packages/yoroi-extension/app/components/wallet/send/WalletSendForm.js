@@ -1,5 +1,5 @@
 // @flow
-import React, { Component } from 'react';
+import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { reaction } from 'mobx';
@@ -261,7 +261,7 @@ export default class WalletSendForm extends Component<Props> {
       },
       selectedAmount: {
         label: this.context.intl.formatMessage(messages.selectedAmountLable),
-        value: this.props.shouldSendAll ? 
+        value: this.props.shouldSendAll ?
           this.props.selectedToken?.TokenId ?? this.props.getTokenInfo({
           identifier: this.props.defaultToken.Identifier,
           networkId: this.props.defaultToken.NetworkId,
@@ -379,7 +379,7 @@ export default class WalletSendForm extends Component<Props> {
       }));
     })();
 
-    
+
     const sendAmountOptions = (() => {
       const tokenId = this.props.selectedToken?.TokenId ?? this.props.getTokenInfo({
         identifier: this.props.defaultToken.Identifier,

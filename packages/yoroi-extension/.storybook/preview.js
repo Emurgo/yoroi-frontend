@@ -1,6 +1,5 @@
 // @flow
 
-import React from 'react';
 import StoryWrapper from '../stories/helpers/StoryWrapper';
 import type { StoryDecorator, DecoratorParameters } from '@storybook/react';
 import {

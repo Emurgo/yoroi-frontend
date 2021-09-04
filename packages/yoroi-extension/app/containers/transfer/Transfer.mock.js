@@ -2,7 +2,6 @@
 
 import { select, } from '@storybook/addon-knobs';
 import type { Node } from 'react';
-import React from 'react';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import { ServerStatusErrors } from '../../types/serverStatusErrorType';
 import { action } from '@storybook/addon-actions';

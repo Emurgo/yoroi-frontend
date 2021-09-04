@@ -1,5 +1,4 @@
 // @flow
-import React from 'react';
 import type { Node } from 'react';
 import { Route, Redirect, Switch } from 'react-router-dom';
 import type { StoresMap } from './stores/index';
