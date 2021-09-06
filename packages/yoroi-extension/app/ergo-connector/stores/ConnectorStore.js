@@ -130,8 +130,6 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
 
   @observable signingMessage: ?SigningMessage = null;
 
-  @observable getTxAssetsError: string = '';
-
   setup(): void {
     super.setup();
     this.actions.connector.getResponse.listen(this._getConnectingMsg);
@@ -307,9 +305,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         network: selectedWallet.getParent().getNetworkInfo(),
       });
     } catch (error) {
-      runInAction(() => {
-        this.getTxAssetsError = error.message
-      });
+      console.error('Token info unavailable', error.message)
     }
   }
 

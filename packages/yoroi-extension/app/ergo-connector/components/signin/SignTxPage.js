@@ -144,7 +144,7 @@ class SignTxPage extends Component<Props> {
   displayUnAvailableToken: TokenEntry => Node = (tokenEntry) => {
     return (
       <>
-        <span className={styles.amountRegular}>{"+"}{tokenEntry.amount.toString()}</span>
+        <span className={styles.amountRegular}>{'+'}{tokenEntry.amount.toString()}</span>
         {' '}
         <span>   
           {truncateAddressShort(
@@ -159,7 +159,7 @@ class SignTxPage extends Component<Props> {
     entry: TokenEntry,
   |} => Node = (request) => {
     const tokenInfo = this._resolveTokenInfo(request.entry);
-    
+
     if (tokenInfo == null) return this.displayUnAvailableToken(request.entry)
     const shiftedAmount = request.entry.amount
       .shiftedBy(-tokenInfo.Metadata.numberOfDecimals);

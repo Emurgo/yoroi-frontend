@@ -68,9 +68,8 @@ export default class SignTxContainer extends Component<
       message: globalMessages.copyTooltipMessage,
     };
 
-    const { signingMessage, getTxAssetsError } = this.generated.stores.connector;
+    const { signingMessage } = this.generated.stores.connector;
     if (signingMessage == null) return this.renderLoading();
-    console.log(signingMessage, getTxAssetsError)
 
     const selectedWallet = this.generated.stores.connector.wallets.find(
       wallet => wallet.publicDeriver.getPublicDeriverId() === signingMessage.publicDeriverId
@@ -82,9 +81,6 @@ export default class SignTxContainer extends Component<
     switch (signingMessage.sign.type) {
       case 'tx': {
         const txData = this.generated.stores.connector.signingRequest;
-        console.log(txData,'txData')
-        // if (getTxAssetsError) return <h1> {getTxAssetsError} </h1>
-
         if (txData == null) return this.renderLoading();
         component = (
           <SignTxPage
@@ -163,7 +159,6 @@ export default class SignTxContainer extends Component<
         signingMessage: ?SigningMessage,
         wallets: Array<PublicDeriverCache>,
         signingRequest: ?ISignRequest<any>,
-        getTxAssetsError: string,
       |},
       explorers: {|
         selectedExplorer: Map<number, SelectedExplorer>,
@@ -197,7 +192,6 @@ export default class SignTxContainer extends Component<
           signingMessage: stores.connector.signingMessage,
           wallets: stores.connector.wallets,
           signingRequest: stores.connector.signingRequest,
-          getTxAssetsError: stores.connector.getTxAssetsError,
         },
         explorers: {
           selectedExplorer: stores.explorers.selectedExplorer,
