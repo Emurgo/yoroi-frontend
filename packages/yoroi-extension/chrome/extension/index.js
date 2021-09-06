@@ -54,3 +54,5 @@ const initializeYoroi: void => Promise<void> = async () => {
 addCloseListener(TabIdKeys.Primary);
 
 window.addEventListener('load', initializeYoroi);
+
+window.__TREZOR_CONNECT_SRC = 'https://localhost:8088/';

@@ -70,7 +70,7 @@ export default ({
     ],
     content_scripts: [
       {
-        matches: ['*://connect.trezor.io/*/popup.html'],
+        matches: ['*://connect.trezor.io/*/popup.html', 'https://localhost:8088/popup.html'],
         js: ['js/trezor-content-script.js'],
       },
       {
