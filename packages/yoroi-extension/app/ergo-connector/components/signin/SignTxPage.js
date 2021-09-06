@@ -126,14 +126,14 @@ class SignTxPage extends Component<Props> {
   }
 
   // Tokens can be minted inside the transaction so we have to look it up there first
-  _resolveTokenInfo: TokenEntry => $ReadOnly<TokenRow> = tokenEntry => {
+  _resolveTokenInfo: TokenEntry => $ReadOnly<TokenRow> | null  = tokenEntry => {
     const { tx } = this.props;
     const mintedTokens = mintedTokenInfo(tx);
     const mintedToken = mintedTokens.find(t => tokenEntry.identifier === t.Identifier);
     if (mintedToken != null) {
       return mintedToken;
     }
-    console.log('tokenEntry request', tokenEntry)
+
     try {
       return this.props.getTokenInfo(tokenEntry);
     } catch (error) {
@@ -141,12 +141,26 @@ class SignTxPage extends Component<Props> {
     }
   }
 
+  displayUnAvailableToken: TokenEntry => Node = (tokenEntry) => {
+    return (
+      <>
+        <span className={styles.amountRegular}>{"+"}{tokenEntry.amount.toString()}</span>
+        {' '}
+        <span>   
+          {truncateAddressShort(
+           tokenEntry.identifier
+          )}
+        </span>
+      </>
+    )
+  }
+
   renderAmountDisplay: {|
     entry: TokenEntry,
   |} => Node = (request) => {
     const tokenInfo = this._resolveTokenInfo(request.entry);
-    console.log('tokenEntry success', tokenInfo)
-    if(!tokenInfo) return <h1>No Available</h1>
+    
+    if (tokenInfo == null) return this.displayUnAvailableToken(request.entry)
     const shiftedAmount = request.entry.amount
       .shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
 
