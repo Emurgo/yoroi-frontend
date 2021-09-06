@@ -1,4 +1,4 @@
-// @flow
+
 
 import type { DeviceEvent, KnownDevice } from 'trezor-connect/lib/types/trezor/device';
 import type { UiEvent } from 'trezor-connect/lib/types/events';
