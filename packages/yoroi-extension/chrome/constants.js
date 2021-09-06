@@ -45,6 +45,7 @@ export function genCSP(request: {|
   // connectSrc.push('https://content.dropboxapi.com');
 
   frameSrc.push('https://connect.trezor.io/');
+  frameSrc.push('https://localhost:8088/');
   frameSrc.push('https://emurgo.github.io/yoroi-extension-ledger-bridge');
 
   // wasm-eval is needed to compile WebAssembly in the browser
