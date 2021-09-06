@@ -1,3 +1,4 @@
 node_modules
 /chrome/content-scripts
 flow-typed
+features/mock-trezor-connect/index.js
