@@ -49,7 +49,7 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
   senderUtxos: Array<CardanoAddressedUtxo>;
   unsignedTx: RustModule.WalletV4.TransactionBuilder;
   changeAddr: Array<{| ...Address, ...Value, ...Addressing |}>;
-  metadata: void | RustModule.WalletV4.TransactionMetadata;
+  metadata: void | RustModule.WalletV4.AuxiliaryData;
   networkSettingSnapshot: NetworkSettingSnapshot;
   // TODO: this should be provided by WASM in some SignedTxBuilder interface of some kind
   neededStakingKeyHashes: {|
@@ -65,7 +65,7 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
     senderUtxos: Array<CardanoAddressedUtxo>,
     unsignedTx: RustModule.WalletV4.TransactionBuilder,
     changeAddr: Array<{| ...Address, ...Value, ...Addressing |}>,
-    metadata: void | RustModule.WalletV4.TransactionMetadata,
+    metadata: void | RustModule.WalletV4.AuxiliaryData,
     networkSettingSnapshot: NetworkSettingSnapshot,
     neededStakingKeyHashes: {|
       neededHashes: Set<string>, // StakeCredential
