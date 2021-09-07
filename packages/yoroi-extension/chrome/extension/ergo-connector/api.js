@@ -34,7 +34,7 @@ import { getReceiveAddress } from '../../../app/stores/stateless/addressStores';
 import LocalStorageApi from '../../../app/api/localStorage/index';
 
 import type { BestBlockResponse } from '../../../app/api/ergo/lib/state-fetch/types';
-import { asAddressedUtxo as  asAddressedUtxoCardano } from '../../../app/api/ada/transactions/utils';
+import { asAddressedUtxo as asAddressedUtxoCardano } from '../../../app/api/ada/transactions/utils';
 import type { RemoteUnspentOutput } from '../../../app/api/ada/lib/state-fetch/types'
 
 function paginateResults<T>(results: T[], paginate: ?Paginate): T[] {
@@ -187,42 +187,37 @@ export type FullAddressPayloadWithBase58 = {|
   base58: Address,
 |};
 
+function ergoAddressToBase58(a: FullAddressPayload): string {
+  return RustModule.SigmaRust.NetworkAddress
+    .from_bytes(Buffer.from(a.address, 'hex'))
+    .to_base58()
+}
+
 async function getAllFullAddresses(
   wallet: IPublicDeriver<>,
   usedFilter: boolean,
 ): Promise<FullAddressPayloadWithBase58[]> {
-  const ergoAddressTypes = [
-    CoreAddressTypes.ERGO_P2PK,
-    CoreAddressTypes.ERGO_P2SH,
-    CoreAddressTypes.ERGO_P2S
-  ]
-  const cardanoAddressTypes = [
+  const isCardano = wallet.getParent().defaultToken.Metadata.type === 'Cardano';
+  const addressTypes = isCardano ? [
     CoreAddressTypes.CARDANO_BASE,
     CoreAddressTypes.CARDANO_ENTERPRISE,
     CoreAddressTypes.CARDANO_LEGACY,
     CoreAddressTypes.CARDANO_PTR,
     CoreAddressTypes.CARDANO_REWARD
+  ] : [
+    CoreAddressTypes.ERGO_P2PK,
+    CoreAddressTypes.ERGO_P2SH,
+    CoreAddressTypes.ERGO_P2S
   ]
-  const isCardano = walletType === 'Cardano';
-  const walletType = wallet.parent.defaultToken.Metadata.type
-  const selectedAddressesTypes = isCardano ? cardanoAddressTypes : ergoAddressTypes
-  const allAddressesResult = []
-  for(const type of selectedAddressesTypes){
-    const result = getAllAddressesForDisplay({
-      publicDeriver: wallet,
-      type,
-    });
-    allAddressesResult.push(result)
-  }
+  const promises = addressTypes
+    .map(type => getAllAddressesForDisplay({ publicDeriver: wallet, type }));
   await RustModule.load();
   const addresses: FullAddressPayload[] =
-    (await Promise.all(allAddressesResult)).flat();
+    (await Promise.all(promises)).flat();
   return addresses
     .filter(a => a.isUsed === usedFilter)
     .map(a => {
-      const base58 = isCardano ? a.address : RustModule.SigmaRust.NetworkAddress
-        .from_bytes(Buffer.from(a.address, 'hex'))
-        .to_base58();
+      const base58 = isCardano ? a.address : ergoAddressToBase58(a);
       return {
         fullAddress: a,
         base58,
