@@ -503,8 +503,7 @@ export function generateKeys(request: {|
   const secretKeys = new RustModule.SigmaRust.SecretKeys();
   for (const utxo of request.senderUtxos) {
     // recall: duplicates are fine
-    // $FlowFixMe
-    secretKeys.add(generateKey({ utxo, keyLevel, signingKey }));
+    secretKeys.add(generateKey({ addressing: utxo, keyLevel, signingKey }));
   }
   return secretKeys;
 }
@@ -520,7 +519,7 @@ export function extractP2sKeyFromErgoTree(ergoTree: string): ?string {
   for (let i = 0; i < constantsLen; i++) {
     const hex = tree.get_constant(i).encode_to_base16();
     const walletPk: ?string = extractWalletPkFromHexConstant(hex);
-    if (walletPk) {
+    if (walletPk != null) {
       return walletPk;
     }
   }

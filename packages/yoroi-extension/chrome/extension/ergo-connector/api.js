@@ -237,7 +237,7 @@ function createP2sAddressTreeMatcher(
   const keyAddressMapHolder = [];
   return async ergoTree => {
     const key: ?string = extractP2sKeyFromErgoTree(ergoTree);
-    if (!key) {
+    if (key == null) {
       return { isP2S: false, matchingAddress: null };
     }
     if (!keyAddressMapHolder[0]) {
@@ -307,9 +307,10 @@ export async function connectorSignTx(
   const utxoMap = keyBy(utxos,
     u => u.output.UtxoTransactionOutput.ErgoBoxId);
 
-  const selectedInputs = []
+  const selectedInputs: Array<ErgoBoxJson> = []
   for (const index of indices) {
     const input = tx.inputs[index];
+    // $FlowFixMe[prop-missing]
     selectedInputs.push(input);
   }
 
@@ -358,7 +359,6 @@ export async function connectorSignTx(
 
   debug('signing', 'Produced input keys', inputSigningKeys.len(), inputSigningKeys);
 
-  // $FlowFixMe[prop-missing]: our inputs are nearly like `ErgoBoxJson` just with one extra field
   const blockHeader = RustModule.SigmaRust.BlockHeader.from_json(createMockHeader(bestBlock));
   const preHeader = RustModule.SigmaRust.PreHeader.from_block_header(blockHeader);
   const ergoStateContext = new RustModule.SigmaRust.ErgoStateContext(preHeader);
