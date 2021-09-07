@@ -469,7 +469,7 @@ export function signTransaction(request: {|
 }
 
 export function generateKey(request: {|
-  +addressing: Addressing,
+  +addressing: { ...Addressing, ... },
   +keyLevel: number,
   +signingKey: BIP32PrivateKey
 |}): RustModule.SigmaRust.SecretKey {
@@ -503,7 +503,8 @@ export function generateKeys(request: {|
   const secretKeys = new RustModule.SigmaRust.SecretKeys();
   for (const utxo of request.senderUtxos) {
     // recall: duplicates are fine
-    secretKeys.add(generateKey({ addressing: utxo, keyLevel, signingKey }));
+    // $FlowFixMe
+    secretKeys.add(generateKey({ utxo, keyLevel, signingKey }));
   }
   return secretKeys;
 }

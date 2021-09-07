@@ -149,7 +149,7 @@ export type FullAddressPayloadWithBase58 = {|
 |};
 
 async function getAllFullAddresses(
-  wallet: PublicDeriver<>,
+  wallet: IPublicDeriver<>,
   usedFilter: boolean,
 ): Promise<FullAddressPayloadWithBase58[]> {
   const p2pk = getAllAddressesForDisplay({
@@ -324,7 +324,7 @@ export async function connectorSignTx(
   // SIGNING INPUTS //
 
   const p2sMatcher = createP2sAddressTreeMatcher(
-    () => getAllFullAddresses(wallet, true),
+    () => getAllFullAddresses(publicDeriver, true),
   );
 
   const signingKey = await wallet.getSigningKey()
