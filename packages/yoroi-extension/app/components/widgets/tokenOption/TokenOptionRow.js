@@ -10,20 +10,22 @@ type Props = {|
   +displayName: string,
   +id?: string,
   +amount?: string,
-  nameOnly?: boolean | null
+  +nameOnly?: boolean
 |};
 
 @observer
 export default class TokenOptionRow extends Component<Props> {
   render(): Node {
+    const notOnlyName = !this.props.nameOnly;
     return (
       <div className={classnames([styles.container, styles.rowText])}>
         <div className={styles.item_name}>{this.props.displayName}</div>
-        {!this.props.nameOnly &&
-        <> 
-        <div className={styles.item_amount}>{this.props.amount}</div>
-        <div className={styles.item_id}> {this.props.id}</div>
-        </>}
+        {notOnlyName ? (
+          <>
+            <div className={styles.item_amount}>{this.props.amount}</div>
+            <div className={styles.item_id}> {this.props.id}</div>
+          </>
+        ) : null}
 
       </div>
     );
