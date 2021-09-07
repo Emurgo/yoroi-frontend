@@ -53,7 +53,8 @@ import type {
   HistoryFunc,
   BestBlockFunc,
   AssetInfoFunc,
-  SendFunc, SignedResponse,
+  SendFunc,
+  SignedResponse,
 } from './lib/state-fetch/types';
 import type {
   FilterFunc,
@@ -119,6 +120,21 @@ import { MultiToken } from '../common/lib/MultiToken';
 import { TxStatusCodes } from '../ada/lib/storage/database/primitives/enums';
 import type { WalletTransactionCtorData } from '../../domain/WalletTransaction';
 import { asHasLevels } from '../ada/lib/storage/models/PublicDeriver/traits';
+
+export function fixUtxoToStringValues<T>(utxo: T): T {
+  // $FlowFixMe[incompatible-type]
+  if (utxo.value != null) {
+    // $FlowFixMe[incompatible-use]
+    utxo.value = String(utxo.value);
+  }
+  // $FlowFixMe[incompatible-use]
+  utxo.assets?.forEach(a => {
+    if (a.amount != null) {
+      a.amount = String(a.amount);
+    }
+  });
+  return utxo;
+}
 
 // getTransactionRowsToExport
 
