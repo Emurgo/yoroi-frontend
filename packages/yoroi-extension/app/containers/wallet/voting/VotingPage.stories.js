@@ -67,6 +67,14 @@ const defaultProps: ({|
     delegation: {
       getDelegationRequests: walletLookup([request.wallet]).getDelegation,
     },
+    substores: {
+      ada: {
+        votingStore: {
+          catalystRoundInfo: null,
+          loadingCatalystRoundInfo: false,
+        }
+      }
+    }
   },
   actions: {
     dialogs: {
