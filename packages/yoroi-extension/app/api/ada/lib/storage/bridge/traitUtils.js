@@ -122,12 +122,15 @@ export async function rawGetAllAddressesForDisplay(
   );
 }
 
+export type FullAddressPayload =
+  {| ...Address, ...AddressType, ...Value, ...Addressing, ...UsedStatus |};
+
 export async function getAllAddressesForDisplay(
   request: {|
     publicDeriver: IPublicDeriver<ConceptualWallet>,
     type: CoreAddressT,
   |},
-): Promise<Array<{| ...Address, ...AddressType, ...Value, ...Addressing, ...UsedStatus |}>> {
+): Promise<Array<FullAddressPayload>> {
   const withLevels = asHasLevels<ConceptualWallet>(request.publicDeriver);
   const derivationTables = withLevels == null
     ? new Map()
