@@ -413,12 +413,9 @@ export class RemoteFetcher implements IFetcher {
 
   getCatalystRoundInfo: CatalystRoundInfoRequest => Promise<CatalystRoundInfoResponse> = async (body) => {
     const { BackendService } = body.network.Backend;
-    console.log(body)
     if (BackendService == null) throw new Error(`${nameof(this.getCatalystRoundInfo)} missing backend url`);
-    const isMainnet = /Mainnet/g.test(body.network.NetworkName)
-    const prefix = isMainnet ? '' : 'api/'
     return await axios(
-      `${BackendService}/${prefix}v0/catalyst/fundInfo`,
+      `${BackendService}/api/v0/catalyst/fundInfo`,
       {
         method: 'get',
       }
