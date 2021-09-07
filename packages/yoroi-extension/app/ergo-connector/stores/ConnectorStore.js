@@ -297,12 +297,16 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       selectedWallet.getParent().getDefaultToken().defaultIdentifier
     ])).filter(id => !mintedTokenIds.includes(id));
     const stateFetcher = this.stores.substores.ergo.stateFetchStore.fetcher;
-    await addErgoAssets({
-      db: selectedWallet.getDb(),
-      tokenIdentifiers,
-      getAssetInfo: stateFetcher.getAssetInfo,
-      network: selectedWallet.getParent().getNetworkInfo(),
-    });
+    try {
+      await addErgoAssets({
+        db: selectedWallet.getDb(),
+        tokenIdentifiers,
+        getAssetInfo: stateFetcher.getAssetInfo,
+        network: selectedWallet.getParent().getNetworkInfo(),
+      });
+    } catch (error) {
+      console.error('Token info unavailable', error.message)
+    }
   }
 
   @computed get signingRequest(): ?ISignRequest<any> {
