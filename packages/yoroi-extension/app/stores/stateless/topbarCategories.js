@@ -13,6 +13,7 @@ import dashboardIcon from '../../assets/images/wallet-nav/tab-dashboard.inline.s
 import delegationListIcon from '../../assets/images/wallet-nav/tab-delegation_list.inline.svg';
 import votingIcon from '../../assets/images/wallet-nav/voting.inline.svg';
 import environment from '../../environment';
+import { MultiToken } from '../../api/common/lib/MultiToken';
 
 const messages = defineMessages({
   transactions: {
@@ -42,6 +43,10 @@ const messages = defineMessages({
   voting: {
     id: 'wallet.navigation.voting',
     defaultMessage: '!!!Voting',
+  },
+  assets: {
+    id: 'wallet.navigation.assets',
+    defaultMessage: '!!!Assets',
   }
 });
 
@@ -52,6 +57,7 @@ export type TopbarCategory = {|
   +label?: MessageDescriptor,
   +isVisible: {|
     selected: PublicDeriver<>,
+    spendableBalance: MultiToken,
   |} => (boolean | {| disabledReason: MessageDescriptor |}),
 |};
 
@@ -82,6 +88,13 @@ export const SEND: TopbarCategory = registerCategory({
   route: ROUTES.WALLETS.SEND,
   icon: sendIcon,
   label: messages.send,
+  isVisible: _request => true,
+});
+export const ASSETS: TopbarCategory = registerCategory({
+  className: 'assets',
+  route: ROUTES.WALLETS.ASSETS,
+  icon: sendIcon,
+  label: messages.assets,
   isVisible: _request => true,
 });
 export const RECEIVE: TopbarCategory = registerCategory({
