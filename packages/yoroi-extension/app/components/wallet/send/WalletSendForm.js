@@ -101,7 +101,7 @@ type Props = {|
   +updateAmount: (?BigNumber) => void,
   +updateMemo: (void | string) => void,
   +shouldSendAll: boolean,
-  +toggleSendAll: void => void,
+  +updateSendAllStatus: (void | boolean) => void,
   +fee: ?MultiToken,
   +isCalculatingFee: boolean,
   +reset: void => void,
@@ -434,7 +434,7 @@ export default class WalletSendForm extends Component<Props> {
 
                 // clear send all when changing currencies
                 if (this.props.shouldSendAll) {
-                  this.props.toggleSendAll();
+                  this.props.updateSendAllStatus(false);
                 }
                 // clear amount field when switching currencies
                 this.form.$('amount').clear();
@@ -495,16 +495,18 @@ export default class WalletSendForm extends Component<Props> {
             options={sendAmountOptions}
             {...form.$('selectedAmount').bind()}
             onChange={value => {
-              this.form.$('selectedAmount').set('value', value);
-              if(value === CUSTOM_AMOUNT && this.props.shouldSendAll) {
-                this.props.toggleSendAll();
-              } else if (value !== CUSTOM_AMOUNT) {
-                this.props.toggleSendAll()
-              }
-              if (this.props.shouldSendAll) {
-                // if we toggle shouldSendAll from true -> false
+              // Do nothing if we select the same option twice 
+              if (this.form.$('selectedAmount').value === value) return 
+              if (value === CUSTOM_AMOUNT) {
+                this.props.updateSendAllStatus(false);
+              } else {
+                // if we switched shouldSendAll from true -> false
                 // we need to re-enable the field
                 // and set it to whatever value was used for the sendAll value
+                this.props.updateSendAllStatus(true);
+              }
+
+              if (this.props.shouldSendAll) { 
                 this.props.updateAmount(new BigNumber(
                   formattedAmountToNaturalUnits(
                     this.form.$('amount').value,
@@ -512,6 +514,8 @@ export default class WalletSendForm extends Component<Props> {
                   )
                 ));
               }
+
+              this.form.$('selectedAmount').value = value;
             }}
             optionRenderer={option => (
               <TokenOptionRow
