@@ -67,9 +67,11 @@ export default class Wallet extends Component<Props> {
     // if we're on a page that isn't applicable for the currently selected wallet
     // ex: a cardano-only page for an Ergo wallet
     // or no category is selected yet (wallet selected for the first time)
-    if (activeCategory == null || !activeCategory.isVisible({ selected: publicDeriver })) {
+    const spendableBalance = this.generated.stores.transactions.getBalanceRequest.result
+
+    if (activeCategory == null || !activeCategory.isVisible({ selected: publicDeriver, spendableBalance })) {
       const firstValidCategory = allCategories.find(
-        category => category.isVisible({ selected: publicDeriver })
+        category => category.isVisible({ selected: publicDeriver, spendableBalance })
       );
       if (firstValidCategory == null) {
         throw new Error(`Selected wallet has no valid category`);
@@ -121,7 +123,7 @@ export default class Wallet extends Component<Props> {
     const selectedWallet = wallets.selected;
     const warning = this.getWarning(selectedWallet);
     const spendableBalance = this.generated.stores.transactions.getBalanceRequest.result
-    
+
     return (
       <TopBarLayout
         banner={(<BannerContainer {...this.generated.BannerContainerProps} />)}
