@@ -30,9 +30,13 @@ import ThemeManager from './ThemeManager';
 import environment from './environment';
 import MaintenancePage from './containers/MaintenancePage';
 import CrashPage from './containers/CrashPage';
-import { Logger, } from './utils/logging';
+import { Logger } from './utils/logging';
 import { SimpleSkins } from 'react-polymorph/lib/skins/simple';
 import { SimpleDefaults } from 'react-polymorph/lib/themes/simple';
+import { ThemeProvider as MuiThemeProvide } from '@mui/material/styles';
+import { CssBaseline } from '@mui/material';
+import { classicTheme, modernTheme } from './styles/themes';
+import { globalStyles } from './styles/globalStyles';
 
 // https://github.com/yahoo/react-intl/wiki#loading-locale-data
 addLocaleData([
@@ -77,7 +81,7 @@ class App extends Component<Props, State> {
   }
 
   render(): Node {
-    const { stores, } = this.props;
+    const { stores } = this.props;
     const locale = stores.profile.currentLocale;
 
     // Merged english messages with selected by user locale messages
@@ -90,35 +94,38 @@ class App extends Component<Props, State> {
       translations[locale]
     );
 
-    const themeVars = Object.assign(
-      stores.profile.currentThemeVars,
-      {
-        // show wingdings on dev builds when no font is set to easily find
-        // missing font bugs. However, on production, we use Times New Roman
-        // which looks ugly but at least it's readable.
-        '--default-font': !environment.isProduction() ? 'wingdings' : 'Times New Roman',
-      }
-    );
+    const themeVars = Object.assign(stores.profile.currentThemeVars, {
+      // show wingdings on dev builds when no font is set to easily find
+      // missing font bugs. However, on production, we use Times New Roman
+      // which looks ugly but at least it's readable.
+      '--default-font': !environment.isProduction() ? 'wingdings' : 'Times New Roman',
+    });
     const currentTheme = stores.profile.currentTheme;
 
     changeToplevelTheme(currentTheme);
 
+    // eslint-disable-next-line no-constant-condition
+    const theme = true ? modernTheme : classicTheme
+
     return (
       <div style={{ height: '100%' }}>
-        <ThemeManager variables={themeVars} />
-
-        {/* Automatically pass a theme prop to all components in this subtree. */}
-        <ThemeProvider
-          key={currentTheme}
-          theme={yoroiPolymorphTheme}
-          skins={SimpleSkins}
-          variables={SimpleDefaults}
-          themeOverrides={themeOverrides(currentTheme)}
-        >
-          <IntlProvider {...{ locale, key: locale, messages: mergedMessages }}>
-            {this.getContent()}
-          </IntlProvider>
-        </ThemeProvider>
+        <MuiThemeProvide theme={theme}>
+          <CssBaseline />
+          {globalStyles(theme)}
+          <ThemeManager variables={themeVars} />
+          {/* Automatically pass a theme prop to all components in this subtree. */}
+          <ThemeProvider
+            key={currentTheme}
+            theme={yoroiPolymorphTheme}
+            skins={SimpleSkins}
+            variables={SimpleDefaults}
+            themeOverrides={themeOverrides(currentTheme)}
+          >
+            <IntlProvider {...{ locale, key: locale, messages: mergedMessages }}>
+              {this.getContent()}
+            </IntlProvider>
+          </ThemeProvider>
+        </MuiThemeProvide>
       </div>
     );
   }
