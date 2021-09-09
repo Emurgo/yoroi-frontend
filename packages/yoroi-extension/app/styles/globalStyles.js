@@ -37,6 +37,18 @@ const globalStyles = (theme: Object): Node => (
         '--mui-checkbox-border-color': 'hsl(0 0% 21%)',
         '--mui-checkbox-border-color-disabled': 'hsl(168 82% 45% / 20%)',
         '--mui-checkbox-check-bg-color': theme.palette.secondary.main,
+
+        /* === TEXTFIELD === */
+        '--mui-input-bg-color': 'hsl(0deg 0% 0% / 0%)',
+        '--mui-input-bg-color-disabled': 'hsl(0deg 0% 0% / 0%)',
+        '--mui-input-border-color': 'hsl(0deg 0% 61%)',
+        '--mui-input-border-color-disabled': 'hsl(0deg 0% 61% / 50%)',
+        '--mui-input-border-color-error': theme.palette.error.main,
+        '--mui-input-border-color-focus': 'hsl(0deg 0% 29%)',
+        '--mui-input-placeholder-color': 'hsl(225deg 4% 38% / 50%)',
+        '--mui-input-placeholder-color-disabled': 'hsl(225deg 4% 38% / 50%)',
+        '--mui-input-text-color': 'hsl(0deg 0% 21%)',
+        '--mui-input-text-color-disabled': 'hsl(225deg 4% 38% / 50%)',
       },
     }}
   />
