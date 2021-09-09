@@ -347,7 +347,7 @@ export function buildSignedTransaction(
     key: RustModule.WalletV4.Bip32PublicKey,
   |},
   stakingKey: RustModule.WalletV4.Bip32PublicKey,
-  metadata: RustModule.WalletV4.AuxiliaryData | void
+  metadata: RustModule.WalletV4.TransactionMetadata | void
 ): RustModule.WalletV4.Transaction {
   const findWitness = (pubKey: string) => {
     for (const witness of witnesses) {

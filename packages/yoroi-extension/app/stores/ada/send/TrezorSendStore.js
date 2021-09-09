@@ -181,7 +181,6 @@ export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
           rewardAddress,
           nonce,
         } = request.params.signRequest.trezorTCatalystRegistrationTxSignData;
-
         if (
           !trezorSignTxResp.payload.auxiliaryDataSupplement ||
             trezorSignTxResp.payload.auxiliaryDataSupplement.type !== 1 ||
@@ -210,7 +209,7 @@ export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
       }
 
       if (metadata) {
-        request.params.signRequest.self().set_auxiliary_data(metadata);
+        request.params.signRequest.self().set_metadata(metadata);
       }
 
       const signedTx = buildSignedTransaction(
