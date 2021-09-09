@@ -225,6 +225,7 @@ export const defaultAssets: Array<
         NetworkId: network.NetworkId,
         Identifier: PRIMARY_ASSET_CONSTANTS.Jormungandr,
         IsDefault: true,
+        IsNFT: false,
         Metadata: {
           type: 'Cardano',
           policyId: PRIMARY_ASSET_CONSTANTS.Jormungandr,
@@ -240,6 +241,7 @@ export const defaultAssets: Array<
         NetworkId: network.NetworkId,
         Identifier: PRIMARY_ASSET_CONSTANTS.Cardano,
         IsDefault: true,
+        IsNFT: false,
         Metadata: {
           type: 'Cardano',
           policyId: PRIMARY_ASSET_CONSTANTS.Cardano,
@@ -257,6 +259,7 @@ export const defaultAssets: Array<
         NetworkId: network.NetworkId,
         Identifier: PRIMARY_ASSET_CONSTANTS.Ergo,
         IsDefault: true,
+        IsNFT: false,
         Metadata: {
           type: 'Ergo',
           height: 0,

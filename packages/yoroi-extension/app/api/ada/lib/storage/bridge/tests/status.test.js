@@ -21,6 +21,7 @@ import {
   genGetBestBlock,
   getSingleAddressString,
   genGetTokenInfo,
+  genGetMultiAssetMetadata,
 } from '../../../state-fetch/mockNetwork';
 import { loadLovefieldDB } from '../../database/index';
 import {
@@ -299,6 +300,7 @@ async function baseTest(
   );
   const getBestBlock = genGetBestBlock(networkTransactions);
   const getTokenInfo = genGetTokenInfo();
+  const getMultiAssetMetadata = genGetMultiAssetMetadata();
 
   const withDisplayCutoff = asDisplayCutoff(publicDeriver);
   if (!withDisplayCutoff) throw new Error('missing display cutoff functionality');
@@ -317,6 +319,7 @@ async function baseTest(
       getTransactionsHistoryForAddresses,
       getBestBlock,
       getTokenInfo,
+      getMultiAssetMetadata
     );
 
     {
@@ -362,6 +365,7 @@ async function baseTest(
       getTransactionsHistoryForAddresses,
       getBestBlock,
       getTokenInfo,
+      getMultiAssetMetadata
     );
 
     {
@@ -487,6 +491,7 @@ async function baseTest(
       getTransactionsHistoryForAddresses,
       getBestBlock,
       getTokenInfo,
+      getMultiAssetMetadata
     );
 
     {
@@ -666,6 +671,7 @@ async function baseTest(
       getTransactionsHistoryForAddresses,
       getBestBlock,
       getTokenInfo,
+      getMultiAssetMetadata
     );
 
     {
@@ -834,6 +840,7 @@ async function baseTest(
       getTransactionsHistoryForAddresses,
       getBestBlock,
       getTokenInfo,
+      getMultiAssetMetadata
     );
 
     expect((await db.export()).tables.Transaction).toEqual([{
@@ -933,6 +940,7 @@ async function pendingDropped(
   );
   const getBestBlock = genGetBestBlock(networkTransactions);
   const getTokenInfo = genGetTokenInfo();
+  const getMultiAssetMetadata = genGetMultiAssetMetadata();
 
   const basePubDeriver = asGetAllUtxos(publicDeriver);
   expect(basePubDeriver != null).toEqual(true);
@@ -948,6 +956,7 @@ async function pendingDropped(
     getTransactionsHistoryForAddresses,
     getBestBlock,
     getTokenInfo,
+    getMultiAssetMetadata
   );
 
   // remove it from backend
@@ -961,6 +970,7 @@ async function pendingDropped(
     getTransactionsHistoryForAddresses,
     getBestBlock,
     getTokenInfo,
+    getMultiAssetMetadata
   );
 
   expect((await db.export()).tables.Transaction).toEqual([

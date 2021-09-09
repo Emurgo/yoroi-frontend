@@ -690,7 +690,8 @@ export class ModifyToken {
         const item = lookupMap.get(row.Digest)?.get(row.NetworkId);
         if (item == null) {
           toAdd.push(row);
-        } else if (JSON.stringify(item.Metadata) !== JSON.stringify(row.Metadata)) {
+        } else if (JSON.stringify(item.Metadata) !== JSON.stringify(row.Metadata)
+        || item.IsNFT !== row.IsNFT) {
           // we want to update the row if the metadata was updated
           toAdd.push(row);
         } else {

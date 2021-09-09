@@ -511,6 +511,7 @@ export type TokenInsert = {|
    * As some blockchains have multiple primary tokens
   */
   Identifier: string,
+  IsNFT: boolean,
   Metadata: TokenMetadata,
 |};
 export type TokenUpsertWithDigest = TokenInsert | {|
@@ -529,6 +530,7 @@ export const TokenSchema: {|
   name: 'Token',
   properties: {
     TokenId: 'TokenId',
+    IsNFT: 'IsNFT',
     IsDefault: 'IsDefault',
     NetworkId: 'NetworkId',
     Digest: 'Digest',

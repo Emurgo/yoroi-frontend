@@ -25,6 +25,8 @@ import type {
   UtxoSumResponse,
   CatalystRoundInfoRequest,
   CatalystRoundInfoResponse,
+  MultiAssetMintMetadataRequest,
+  MultiAssetMintMetadataResponse,
 } from './types';
 import type { FilterUsedRequest, FilterUsedResponse, } from '../../../common/lib/state-fetch/currencySpecificTypes';
 
@@ -425,6 +427,27 @@ export class RemoteFetcher implements IFetcher {
       .catch((error) => {
         Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getCatalystRoundInfo)} error: ` + stringifyError(error));
         throw new GetCatalystRoundInfoApiError();
+      });
+  }
+
+  getMultiAssetMintMetadata: MultiAssetMintMetadataRequest
+    => Promise<MultiAssetMintMetadataResponse> = async (body) => {
+      const { BackendService } = body.network.Backend;
+      if (BackendService == null) throw new Error(`${nameof(this.getCatalystRoundInfo)} missing backend url`);
+      const isMainnet = /Mainnet/g.test(body.network.NetworkName)
+      const prefix = isMainnet ? '' : 'api/'
+      return await axios(
+        `${BackendService}/${prefix}multiAsset/metadata`,
+        {
+          method: 'post',
+          data: {
+            assets: body.assets
+          }
+        }
+      ).then(response => response.data)
+      .catch((error) => {
+        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getCatalystRoundInfo)} error: ` + stringifyError(error));
+        return {};
       });
   }
 }

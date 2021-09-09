@@ -66,6 +66,7 @@ const genTokenInfoMap = (network) => {
           NetworkId: network.NetworkId,
           Identifier: 'f2b5c4e4883555b882e3a5919967883aade9e0494290f29e0e3069f5ce9eabe4',
           IsDefault: false,
+          IsNFT: false,
           Metadata: {
             type: 'Ergo',
             height: 0,

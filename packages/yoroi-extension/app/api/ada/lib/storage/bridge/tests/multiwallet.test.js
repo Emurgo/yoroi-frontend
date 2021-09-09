@@ -28,6 +28,7 @@ import {
   genGetBestBlock,
   getSingleAddressString,
   genGetTokenInfo,
+  genGetMultiAssetMetadata
 } from '../../../state-fetch/mockNetwork';
 import { loadLovefieldDB } from '../../database/index';
 
@@ -424,6 +425,7 @@ async function syncingSimpleTransaction(
   );
   const getBestBlock = genGetBestBlock(txHistory);
   const getTokenInfo = genGetTokenInfo();
+  const getMultiAssetMetadata = genGetMultiAssetMetadata();
 
   const withUtxos1 = asGetAllUtxos(publicDeriver1);
   expect(withUtxos1 != null).toEqual(true);
@@ -445,6 +447,7 @@ async function syncingSimpleTransaction(
       getTransactionsHistoryForAddresses,
       getBestBlock,
       getTokenInfo,
+      getMultiAssetMetadata
     );
     await checkPub1HasTx(purposeForTest, publicDeriver1);
 
@@ -484,6 +487,7 @@ async function syncingSimpleTransaction(
       getTransactionsHistoryForAddresses,
       getBestBlock,
       getTokenInfo,
+      getMultiAssetMetadata
     );
 
     await checkPub2HasTx(purposeForTest, publicDeriver2);
@@ -511,6 +515,7 @@ async function syncingSimpleTransaction(
       getTransactionsHistoryForAddresses,
       getBestBlock,
       getTokenInfo,
+      getMultiAssetMetadata
     );
     await checkPub2IsEmpty(publicDeriver2);
     {
@@ -555,6 +560,7 @@ async function syncingSimpleTransaction(
       getTransactionsHistoryForAddresses,
       getBestBlock,
       getTokenInfo,
+      getMultiAssetMetadata
     );
 
     await checkPub2HasTx(purposeForTest, publicDeriver2);
