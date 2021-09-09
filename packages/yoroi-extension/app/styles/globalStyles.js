@@ -6,7 +6,7 @@ const globalStyles = (theme: Object): Node => (
   <GlobalStyles
     styles={{
       ':root': {
-        /* BUTTON */
+        /* === BUTTON === */
         // general button primary variant
         '--mui-button-primary-background-color': theme.palette.secondary.main,
         '--mui-button-primary-background-color-hover': theme.palette.secondary.dark,
@@ -32,6 +32,11 @@ const globalStyles = (theme: Object): Node => (
         '--mui-button-flat-background-color-disabled': 'hsl(204 20% 95% / 30%)',
         '--mui-button-flat-text-color-disabled': 'hsl(237 37% 11%)',
         '--mui-button-flat-text-color': 'hsl(237 37% 11%)',
+
+        /* === CHECKBOX === */
+        '--mui-checkbox-border-color': 'hsl(0 0% 21%)',
+        '--mui-checkbox-border-color-disabled': 'hsl(168 82% 45% / 20%)',
+        '--mui-checkbox-check-bg-color': theme.palette.secondary.main,
       },
     }}
   />
