@@ -1,14 +1,16 @@
 // @flow
 import { createTheme } from '@mui/material/styles';
 import { SFUIDisplayFonts } from '../fonts';
+import { ClassicButton } from '../overrides';
 
 export const classicTheme: Object = createTheme({
   components: {
     MuiCssBaseline: {
       styleOverrides: `
         ${SFUIDisplayFonts}
-        `,
+      `,
     },
+    MuiButton: ClassicButton,
   },
   palette: {
     primary: {
@@ -16,6 +18,9 @@ export const classicTheme: Object = createTheme({
     },
     secondary: {
       main: 'hsl(9, 46%, 73%)',
+      light: 'hsl(9 46% 73% / 20%)',
+      dark: 'hsl(10 66% 79%)',
+      contrastText: 'hsl(210 25% 98%)',
     },
     error: {
       main: 'hsl(354, 79%, 61%)',
