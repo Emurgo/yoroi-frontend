@@ -27,7 +27,7 @@ const SORTING_DIRECTIONS = {
   DOWN: 'DOWN'
 }
 
-const SORTIN_COLUMNS = {
+const SORTING_COLUMNS = {
   NAME: 'name',
   AMOUNT: 'amount'
 }
@@ -44,7 +44,7 @@ type Props = {|
 type State = {|
   assetsList: any,
   sortingDirection: null | 'UP' | 'DOWN',
-  sortingColumn: null | 'name' | 'amount'
+  sortingColumn: string
 |}
 
 
@@ -58,7 +58,7 @@ export default class AssetsList extends Component<Props, State> {
   state: State = {
     assetsList: [...this.props.assetsList],
     sortingDirection: null,
-    sortingColumn: null,
+    sortingColumn: '',
   };
 
   search: ((e: SyntheticEvent<HTMLInputElement>) => void) = (event: SyntheticEvent<HTMLInputElement>) => {
@@ -92,13 +92,26 @@ export default class AssetsList extends Component<Props, State> {
   sortAssets: ((field: string) => void) = (field: string) => {
 
     const sortedAssets = [...this.state.assetsList].sort((a,b) => this.compare(a,b, field))
-    this.setState({ assetsList: sortedAssets })
+    this.setState({ assetsList: sortedAssets, sortingColumn: field })
   };
+
+  displayColumnLogo: ((column: string) => Node) = (column: string) => {
+    const {
+        sortingColumn,
+        sortingDirection
+    } = this.state
+    return (!sortingDirection || sortingColumn !== column ?
+        <ArrowsList />
+        :sortingDirection === SORTING_DIRECTIONS.UP && sortingColumn === column ?
+        <ArrowsListFromTop  />
+        :sortingDirection === SORTING_DIRECTIONS.DOWN && sortingColumn === column &&
+        <ArrowsListFromBottom /> )
+}
 
   render(): Node {
 
     const { intl } = this.context;
-
+    const { sortingColumn, sortingDirection, assetsList } = this.state
     return (
       <div className={styles.component}>
         <BorderedBox>
@@ -111,21 +124,21 @@ export default class AssetsList extends Component<Props, State> {
           </div>
         </BorderedBox>
         <ul className={styles.columns}>
-          <li onClick={() => this.sortAssets('name')}>
+          <li onClick={() => this.sortAssets(SORTING_COLUMNS.NAME)}>
             <p className={styles.headerText}>Name and ticker</p>
-            <ArrowsList />
+            {this.displayColumnLogo(SORTING_COLUMNS.NAME)}
           </li>
           <li>
             <p className={styles.headerText}>Subject</p>
             <Info />
           </li>
-          <li onClick={() => this.sortAssets('amount')}>
+          <li onClick={() => this.sortAssets(SORTING_COLUMNS.AMOUNT)}>
             <p className={styles.headerText}>Quantity</p>
-            <ArrowsList />
+            {this.displayColumnLogo(SORTING_COLUMNS.AMOUNT)}
           </li>
         </ul>
         {
-          this.state.assetsList.map(token => (
+          assetsList.map(token => (
             <ul className={styles.row} key={token.id} onClick={this.props.onClick}>
               <li className={styles.token}>
                 <div className={styles.logo}>
