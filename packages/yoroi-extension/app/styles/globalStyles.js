@@ -56,6 +56,12 @@ const globalStyles = (theme: Object): Node => (
         '--mui-option-checkmark-color': 'hsl(0 0% 21%)',
         '--mui-option-text-color': 'hsl(0 0% 21%)',
         '--mui-option-border-color': 'hsl(0 0% 21%)',
+
+        /* === TABS === */
+        '--mui-tabs-background-color': 'hsl(0 0% 100%)',
+        '--mui-tabs-text-color': 'hsl(233 6% 70%)',
+        '--mui-tabs-text-color-active': theme.palette.secondary.main,
+        '--mui-tabs-text-color-disabled': 'hsl(221 19% 81%)',
       },
     }}
   />

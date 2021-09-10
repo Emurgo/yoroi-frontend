@@ -7,6 +7,8 @@ import {
   ClassicTextField,
   ClassicMenu,
   ClassicMenuItem,
+  ClassicTabs,
+  ClassicTabPanel,
 } from '../overrides';
 
 export const classicTheme: Object = createTheme({
@@ -21,6 +23,8 @@ export const classicTheme: Object = createTheme({
     MuiTextField: ClassicTextField,
     MuiMenuItem: ClassicMenuItem,
     MuiMenu: ClassicMenu,
+    MuiTabs: ClassicTabs,
+    MuiTabPanel: ClassicTabPanel,
   },
   palette: {
     primary: {

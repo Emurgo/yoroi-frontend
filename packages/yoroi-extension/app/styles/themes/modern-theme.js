@@ -7,6 +7,8 @@ import {
   ModernTextField,
   ModernMenu,
   ModernMenuItem,
+  ModernTabs,
+  ModernTabPanel,
 } from '../overrides';
 
 export const modernTheme: Object = createTheme({
@@ -21,6 +23,8 @@ export const modernTheme: Object = createTheme({
     MuiTextField: ModernTextField,
     MuiMenuItem: ModernMenuItem,
     MuiMenu: ModernMenu,
+    MuiTabs: ModernTabs,
+    MuiTabPanel: ModernTabPanel,
   },
   palette: {
     primary: {
