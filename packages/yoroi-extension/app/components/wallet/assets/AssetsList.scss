@@ -5,7 +5,7 @@
         justify-content: space-between;
 
         .tokens {
-            font-size: 20px;
+            font-size: 25px;
             line-height: 20px;
         }
 
@@ -36,6 +36,7 @@
     .columns {
         display: grid;
         grid-template-columns: .4fr 1fr 1fr;
+        grid-gap: 10px;
         padding: 20px 30px;
         border-top: 1px ;
         border-bottom: 1px;
@@ -61,6 +62,7 @@
         display: grid;
         align-items: center;
         grid-template-columns: .4fr 1fr 1fr;
+        grid-gap: 10px;
         padding: 20px 30px;
         margin-bottom: 20px;
     }

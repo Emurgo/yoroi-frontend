@@ -22,6 +22,15 @@ import BorderedBox from '../../widgets/BorderedBox';
 
 const messages = defineMessages({});
 
+const SORTING_DIRECTIONS = {
+  UP: 'UP',
+  DOWN: 'DOWN'
+}
+
+const SORTIN_COLUMNS = {
+  NAME: 'name',
+  AMOUNT: 'amount'
+}
 
 /**
  * @todo
@@ -34,7 +43,10 @@ type Props = {|
 
 type State = {|
   assetsList: any,
+  sortingDirection: null | 'UP' | 'DOWN',
+  sortingColumn: null | 'name' | 'amount'
 |}
+
 
 @observer
 export default class AssetsList extends Component<Props, State> {
@@ -45,7 +57,9 @@ export default class AssetsList extends Component<Props, State> {
 
   state: State = {
     assetsList: [...this.props.assetsList],
-  }
+    sortingDirection: null,
+    sortingColumn: null,
+  };
 
   search: ((e: SyntheticEvent<HTMLInputElement>) => void) = (event: SyntheticEvent<HTMLInputElement>) => {
     const keyword = event.currentTarget.value
@@ -55,7 +69,31 @@ export default class AssetsList extends Component<Props, State> {
     const assetsListCopy = [...this.props.assetsList]
     const filteredAssetsList = assetsListCopy.filter(a => regExp.test(a.name))
     this.setState({ assetsList: filteredAssetsList })
+  };
+
+  compare: ((a: any, b: any, field: string) => number) = ( a, b, field ) => {
+    const newSortDirection = !this.state.sortingDirection 
+        ? SORTING_DIRECTIONS.UP :
+        this.state.sortingDirection === SORTING_DIRECTIONS.UP 
+        ? SORTING_DIRECTIONS.DOWN :
+          SORTING_DIRECTIONS.UP
+
+    this.setState({ sortingDirection: newSortDirection })
+  
+    if ( a[field] < b[field] ){
+      return newSortDirection === SORTING_DIRECTIONS.UP ? -1 : 1;
+    }
+    if ( a[field] > b[field] ){
+      return newSortDirection === SORTING_DIRECTIONS.UP ? 1 : -1;
+    }
+    return 0;
   }
+
+  sortAssets: ((field: string) => void) = (field: string) => {
+
+    const sortedAssets = [...this.state.assetsList].sort((a,b) => this.compare(a,b, field))
+    this.setState({ assetsList: sortedAssets })
+  };
 
   render(): Node {
 
@@ -73,7 +111,7 @@ export default class AssetsList extends Component<Props, State> {
           </div>
         </BorderedBox>
         <ul className={styles.columns}>
-          <li>
+          <li onClick={() => this.sortAssets('name')}>
             <p className={styles.headerText}>Name and ticker</p>
             <ArrowsList />
           </li>
@@ -81,7 +119,7 @@ export default class AssetsList extends Component<Props, State> {
             <p className={styles.headerText}>Subject</p>
             <Info />
           </li>
-          <li>
+          <li onClick={() => this.sortAssets('amount')}>
             <p className={styles.headerText}>Quantity</p>
             <ArrowsList />
           </li>
