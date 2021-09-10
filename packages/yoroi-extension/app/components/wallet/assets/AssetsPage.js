@@ -72,11 +72,7 @@ export default class AssetsPage extends Component<Props> {
 
     return (
       <div className={styles.component}>
-        <BorderedBox>
-          <h1 className={styles.header}>Tokens ({this.props.assetsList.length})</h1>
-        </BorderedBox>
         <AssetsList assetsList={this.props.assetsList} onClick={() => {}} />
-
       </div>
     );
   }

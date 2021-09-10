@@ -2,102 +2,60 @@
 import React, { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { reaction } from 'mobx';
-import classnames from 'classnames';
-import { Button } from 'react-polymorph/lib/components/Button';
-import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import { Input } from 'react-polymorph/lib/components/Input';
-import { NumericInput } from 'react-polymorph/lib/components/NumericInput';
+
 import { defineMessages, intlShape } from 'react-intl';
-import { isValidMemoOptional, isValidMemo, } from '../../../utils/validations';
-import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
-import vjf from 'mobx-react-form/lib/validators/VJF';
-import AmountInputSkin from '../skins/AmountInputSkin';
-import AddMemoSvg from '../../../assets/images/add-memo.inline.svg';
-import BorderedBox from '../../widgets/BorderedBox';
-import styles from './AssetsList.scss';
-import globalMessages, { memoMessages, } from '../../../i18n/global-messages';
-import type { UriParams } from '../../../utils/URIHandling';
-import { getAddressPayload, isValidReceiveAddress } from '../../../api/ada/lib/storage/bridge/utils';
-import { MAX_MEMO_SIZE } from '../../../config/externalStorageConfig';
-import type { TokenRow, NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
-import {
-  formattedAmountToBigNumber,
-  formattedAmountToNaturalUnits,
-  truncateAddressShort,
-  truncateToken,
-} from '../../../utils/formatters';
-import config from '../../../config';
-import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
-import LocalizableError from '../../../i18n/LocalizableError';
-import WarningBox from '../../widgets/WarningBox';
+import styles from './AssetsList.scss'
 import type { $npm$ReactIntl$IntlFormat, } from 'react-intl';
 import { getTokenName, genFormatTokenAmount, getTokenStrictName, getTokenIdentifierIfExists, } from '../../../stores/stateless/tokenHelpers';
 import {
   MultiToken,
 } from '../../../api/common/lib/MultiToken';
-import type {
-  TokenEntry,
-  TokenLookupKey,
-} from '../../../api/common/lib/MultiToken';
-import { Select } from 'react-polymorph/lib/components/Select';
-import { SelectTokenSkin } from '../../../themes/skins/SelectTokenSkin';
-import TokenOptionRow from '../../widgets/tokenOption/TokenOptionRow';
-import BigNumber from 'bignumber.js';
+import NoAssetLogo from '../../../assets/images/assets-page/asset-no.inline.svg';
+import ArrowsListFromBottom from '../../../assets/images/assets-page/arrows-list-from-bottom.inline.svg';
+import ArrowsListFromTop from '../../../assets/images/assets-page/arrows-list-from-top.inline.svg';
+import ArrowsList from '../../../assets/images/assets-page/arrows-list.inline.svg';
+import Info from '../../../assets/images/assets-page/info.inline.svg';
+import Search from '../../../assets/images/assets-page/search.inline.svg';
+import { truncateAddressShort } from '../../../utils/formatters';
+import BorderedBox from '../../widgets/BorderedBox';
 
-const messages = defineMessages({
-  receiverLabel: {
-    id: 'wallet.send.form.receiver.label',
-    defaultMessage: '!!!Receiver',
-  },
-  receiverHint: {
-    id: 'wallet.send.form.receiver.hint',
-    defaultMessage: '!!!Wallet Address',
-  },
-  dropdownAmountLabel: {
-    id: 'wallet.send.form.sendAll.dropdownAmountLabel',
-    defaultMessage: '!!!Send all {coinName}',
-  },
-  allTokens: {
-    id: 'wallet.send.form.sendAll.allTokens',
-    defaultMessage: '!!! + all tokens',
-  },
-  selectedAmountLable: {
-    id: 'wallet.send.form.sendAll.selectedAmountLable',
-    defaultMessage: '!!!Amount Options',
-  },
-  customAmount: {
-    id: 'wallet.send.form.sendAll.customAmount',
-    defaultMessage: '!!!Custom Amount',
-  },
-  transactionFeeError: {
-    id: 'wallet.send.form.transactionFeeError',
-    defaultMessage: '!!!Not enough Ada for fees. Try sending a smaller amount.',
-  },
-  calculatingFee: {
-    id: 'wallet.send.form.calculatingFee',
-    defaultMessage: '!!!Calculating fee...',
-  },
-  memoInvalidOptional: {
-    id: 'wallet.transaction.memo.optional.invalid',
-    defaultMessage: '!!!Memo cannot be more than {maxMemo} characters.',
-  },
-});
+const messages = defineMessages({});
 
+
+/**
+ * @todo
+ * Add assetsList props
+ */
 type Props = {|
   +onClick: void => void,
   +assetsList: any,
 |};
 
+type State = {|
+  assetsList: any,
+|}
+
 @observer
-export default class AssetsList extends Component<Props> {
+export default class AssetsList extends Component<Props, State> {
 
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
+  state: State = {
+    assetsList: [...this.props.assetsList],
+  }
 
-
+  search: ((e: SyntheticEvent<HTMLInputElement>) => void) = (event: SyntheticEvent<HTMLInputElement>) => {
+    const keyword = event.currentTarget.value
+    this.setState({ assetsList: this.props.assetsList })
+    if(!keyword) return
+    const regExp = new RegExp(keyword, 'gi')
+    const assetsListCopy = [...this.props.assetsList]
+    const filteredAssetsList = assetsListCopy.filter(a => regExp.test(a.name))
+    this.setState({ assetsList: filteredAssetsList })
+  }
 
   render(): Node {
 
@@ -105,15 +63,38 @@ export default class AssetsList extends Component<Props> {
 
     return (
       <div className={styles.component}>
-        <ul className={styles.header}>
-          <li>Name</li>
-          <li>Subject</li>
-          <li>Quantity</li>
+        <BorderedBox>
+          <div className={styles.header}>
+            <h1 className={styles.tokens}>Tokens ({this.props.assetsList.length})</h1>
+            <div className={styles.search}>
+              <Search />
+              <input onChange={this.search} type='text' placeholder='Search' />
+            </div>
+          </div>
+        </BorderedBox>
+        <ul className={styles.columns}>
+          <li>
+            <p className={styles.headerText}>Name and ticker</p>
+            <ArrowsList />
+          </li>
+          <li>
+            <p className={styles.headerText}>Subject</p>
+            <Info />
+          </li>
+          <li>
+            <p className={styles.headerText}>Quantity</p>
+            <ArrowsList />
+          </li>
         </ul>
         {
-          this.props.assetsList.map(token => (
+          this.state.assetsList.map(token => (
             <ul className={styles.row} key={token.id} onClick={this.props.onClick}>
-              <li className={styles.name}>{token.name}</li>
+              <li className={styles.token}>
+                <div className={styles.logo}>
+                  <NoAssetLogo />
+                </div>
+                <p>{token.name}</p>
+              </li>
               <li>{truncateAddressShort(token.id)}</li>
               <li className={styles.amount}>{token.amount}</li>
            </ul>
