@@ -6,3 +6,4 @@ export * from './MenuItem';
 export * from './Menu';
 export * from './Tabs';
 export * from './TabPanel';
+export * from './Chip';

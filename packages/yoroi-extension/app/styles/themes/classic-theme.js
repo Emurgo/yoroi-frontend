@@ -9,6 +9,7 @@ import {
   ClassicMenuItem,
   ClassicTabs,
   ClassicTabPanel,
+  ClassicChip,
 } from '../overrides';
 
 export const classicTheme: Object = createTheme({
@@ -25,6 +26,7 @@ export const classicTheme: Object = createTheme({
     MuiMenu: ClassicMenu,
     MuiTabs: ClassicTabs,
     MuiTabPanel: ClassicTabPanel,
+    MuiChip: ClassicChip,
   },
   palette: {
     primary: {

@@ -39,16 +39,16 @@ const globalStyles = (theme: Object): Node => (
         '--mui-checkbox-check-bg-color': theme.palette.secondary.main,
 
         /* === TEXTFIELD === */
-        '--mui-input-bg-color': 'hsl(0deg 0% 0% / 0%)',
-        '--mui-input-bg-color-disabled': 'hsl(0deg 0% 0% / 0%)',
-        '--mui-input-border-color': 'hsl(0deg 0% 61%)',
-        '--mui-input-border-color-disabled': 'hsl(0deg 0% 61% / 50%)',
+        '--mui-input-bg-color': 'hsl(0 0% 0% / 0%)',
+        '--mui-input-bg-color-disabled': 'hsl(0 0% 0% / 0%)',
+        '--mui-input-border-color': 'hsl(0 0% 61%)',
+        '--mui-input-border-color-disabled': 'hsl(0 0% 61% / 50%)',
         '--mui-input-border-color-error': theme.palette.error.main,
-        '--mui-input-border-color-focus': 'hsl(0deg 0% 29%)',
-        '--mui-input-placeholder-color': 'hsl(225deg 4% 38% / 50%)',
-        '--mui-input-placeholder-color-disabled': 'hsl(225deg 4% 38% / 50%)',
-        '--mui-input-text-color': 'hsl(0deg 0% 21%)',
-        '--mui-input-text-color-disabled': 'hsl(225deg 4% 38% / 50%)',
+        '--mui-input-border-color-focus': 'hsl(0 0% 29%)',
+        '--mui-input-placeholder-color': 'hsl(225 4% 38% / 50%)',
+        '--mui-input-placeholder-color-disabled': 'hsl(225 4% 38% / 50%)',
+        '--mui-input-text-color': 'hsl(0 0% 21%)',
+        '--mui-input-text-color-disabled': 'hsl(225 4% 38% / 50%)',
 
         /* === SELECT === */
         '--mui-option-bg-color': 'hsl(0 0% 100%)',
@@ -62,6 +62,18 @@ const globalStyles = (theme: Object): Node => (
         '--mui-tabs-text-color': 'hsl(233 6% 70%)',
         '--mui-tabs-text-color-active': theme.palette.secondary.main,
         '--mui-tabs-text-color-disabled': 'hsl(221 19% 81%)',
+
+        /* === STATUS TX === */
+        '--mui-transactions-state-pending-background-color': 'hsl(206 10% 86%)',
+        '--mui-transactions-state-pending-text-color': 'hsl(233 6% 20%)',
+        '--mui-transactions-state-high-background-color': 'hsl(167 50% 86%)',
+        '--mui-transactions-state-high-text-color': 'hsl(167 80% 45%)',
+        '--mui-transactions-state-failed-background-color': 'hsl(344 100% 54% / 50%) ',
+        '--mui-transactions-state-failed-text-color': 'hsl(344 100% 45%) ',
+        '--mui-transactions-state-medium-background-color': 'hsl(37 91% 55% / 30%)',
+        '--mui-transactions-state-medium-text-color': 'hsl(37 91% 55%)',
+        '--mui-transactions-state-low-background-color': 'hsl(344 100% 54% / 15%)',
+        '--mui-transactions-state-low-text-color': 'hsl(344 94% 68%)',
       },
     }}
   />
