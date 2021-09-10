@@ -81,6 +81,10 @@ const messages = defineMessages({
     id: 'wallet.transaction.memo.optional.invalid',
     defaultMessage: '!!!Memo cannot be more than {maxMemo} characters.',
   },
+  willSendAll: {
+    id: 'wallet.send.form.willSendAll',
+    defaultMessage: '!!!Will Send All Tokens!'
+  }
 });
 
 type Props = {|
@@ -380,11 +384,12 @@ export default class WalletSendForm extends Component<Props> {
     })();
 
     
+    const tokenId = this.props.selectedToken?.TokenId ?? this.props.getTokenInfo({
+      identifier: this.props.defaultToken.Identifier,
+      networkId: this.props.defaultToken.NetworkId,
+    }).TokenId
+
     const sendAmountOptions = (() => {
-      const tokenId = this.props.selectedToken?.TokenId ?? this.props.getTokenInfo({
-        identifier: this.props.defaultToken.Identifier,
-        networkId: this.props.defaultToken.NetworkId,
-      }).TokenId
       return [
         { id: 'custom-amount', label: intl.formatMessage(messages.customAmount), value: CUSTOM_AMOUNT },
         ...tokenOptions.filter(t => t.value === tokenId).map(token => {
@@ -403,7 +408,13 @@ export default class WalletSendForm extends Component<Props> {
         })
       ]
     })()
-
+    const tokenListClasses = classnames([
+      styles.tokenList,
+      {
+        [styles.show]: this.props.shouldSendAll && 
+           this.form.$('selectedToken').value === tokenId
+      }
+    ])
     return (
       <div className={styles.component}>
 
@@ -416,9 +427,9 @@ export default class WalletSendForm extends Component<Props> {
               className={styles.currencySelect}
               options={tokenOptions}
               {...form.$('selectedToken').bind()}
-              onChange={tokenId => {
+              onChange={value => {
                 this.props.onAddToken(tokenOptions.find(
-                  token => token.info.TokenId === tokenId
+                  token => token.info.TokenId === value
                 )?.info);
 
                 // clear send all when changing currencies
@@ -513,6 +524,14 @@ export default class WalletSendForm extends Component<Props> {
               />
             )}
           />
+
+          <div className={tokenListClasses}>
+            <h1>{intl.formatMessage(messages.willSendAll)}</h1>
+            {tokenOptions.map(token => (
+              <p key={token.id}>
+                {token.amount} {' '} {token.label}
+              </p>))}
+          </div>
 
           {showMemo ? (
             <div className={styles.memoInput}>
