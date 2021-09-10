@@ -1,7 +1,13 @@
 // @flow
 import { createTheme } from '@mui/material/styles';
 import { SFUIDisplayFonts } from '../fonts';
-import { ClassicButton, ClassicCheckbox, ClassicTextField } from '../overrides';
+import {
+  ClassicButton,
+  ClassicCheckbox,
+  ClassicTextField,
+  ClassicMenu,
+  ClassicMenuItem,
+} from '../overrides';
 
 export const classicTheme: Object = createTheme({
   components: {
@@ -13,6 +19,8 @@ export const classicTheme: Object = createTheme({
     MuiButton: ClassicButton,
     MuiCheckbox: ClassicCheckbox,
     MuiTextField: ClassicTextField,
+    MuiMenuItem: ClassicMenuItem,
+    MuiMenu: ClassicMenu,
   },
   palette: {
     primary: {

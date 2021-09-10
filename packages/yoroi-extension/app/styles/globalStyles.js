@@ -49,6 +49,13 @@ const globalStyles = (theme: Object): Node => (
         '--mui-input-placeholder-color-disabled': 'hsl(225deg 4% 38% / 50%)',
         '--mui-input-text-color': 'hsl(0deg 0% 21%)',
         '--mui-input-text-color-disabled': 'hsl(225deg 4% 38% / 50%)',
+
+        /* === SELECT === */
+        '--mui-option-bg-color': 'hsl(0 0% 100%)',
+        '--mui-option-bg-color-highlighted': 'hsl(204 20% 95%)',
+        '--mui-option-checkmark-color': 'hsl(0 0% 21%)',
+        '--mui-option-text-color': 'hsl(0 0% 21%)',
+        '--mui-option-border-color': 'hsl(0 0% 21%)',
       },
     }}
   />

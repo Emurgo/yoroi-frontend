@@ -6,8 +6,10 @@ const ClassicTextField = {
       borderColor: 'var(--mui-input-border-color)',
       '& label': {
         color: 'var(--mui-input-placeholder-color)',
-        marginTop: '-40px',
+        marginTop: '-45px',
         left: '-12px',
+        letterSpacing: '1.12px',
+        fontWeight: 500,
       },
       '& label.Mui-focused': {
         color: 'var(--mui-input-text-color)',
@@ -41,6 +43,9 @@ const ClassicTextField = {
         '&.Mui-error fieldset': {
           borderColor: 'var(--mui-input-border-color-errored)',
         },
+      },
+      '& .MuiSelect-select': {
+        backgroundColor: 'white',
       },
       '& .MuiFormHelperText-root': {
         letterSpacing: '0.4px',
@@ -94,6 +99,10 @@ const ModernTextField = {
         '&.Mui-error fieldset': {
           borderColor: 'var(--mui-input-border-color-errored)',
         },
+      },
+      '& .MuiSelect-select': {
+        borderRadius: 8,
+        backgroundColor: 'white',
       },
       '& .MuiFormHelperText-root': {
         letterSpacing: '0.4px',

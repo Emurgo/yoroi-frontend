@@ -1,7 +1,13 @@
 // @flow
 import { createTheme } from '@mui/material/styles';
 import { RubikFonts } from '../fonts';
-import { ModernButton, ModernCheckbox, ModernTextField } from '../overrides';
+import {
+  ModernButton,
+  ModernCheckbox,
+  ModernTextField,
+  ModernMenu,
+  ModernMenuItem,
+} from '../overrides';
 
 export const modernTheme: Object = createTheme({
   components: {
@@ -13,6 +19,8 @@ export const modernTheme: Object = createTheme({
     MuiButton: ModernButton,
     MuiCheckbox: ModernCheckbox,
     MuiTextField: ModernTextField,
+    MuiMenuItem: ModernMenuItem,
+    MuiMenu: ModernMenu,
   },
   palette: {
     primary: {
