@@ -44,25 +44,9 @@ import HWSendConfirmationDialog from '../../components/wallet/send/HWSendConfirm
 import globalMessages from '../../i18n/global-messages';
 import AssetsList from '../../components/wallet/assets/AssetsList';
 import { truncateToken } from '../../utils/formatters';
+import AssetsPage from '../../components/wallet/assets/AssetsPage';
 
-const messages = defineMessages({
-  txConfirmationLedgerNanoLine1: {
-    id: 'wallet.send.ledger.confirmationDialog.info.line.1',
-    defaultMessage: '!!!After connecting your Ledger device to your computer’s USB port, press the Send using Ledger button.',
-  },
-  sendUsingLedgerNano: {
-    id: 'wallet.send.ledger.confirmationDialog.submit',
-    defaultMessage: '!!!Send using Ledger',
-  },
-  txConfirmationTrezorTLine1: {
-    id: 'wallet.send.trezor.confirmationDialog.info.line.1',
-    defaultMessage: '!!!After connecting your Trezor device to your computer, press the Send using Trezor button.',
-  },
-  sendUsingTrezorT: {
-    id: 'wallet.send.trezor.confirmationDialog.submit',
-    defaultMessage: '!!!Send using Trezor',
-  },
-});
+const messages = defineMessages({});
 
 export type GeneratedData = typeof WalletAssetsPage.prototype.generated;
 
@@ -92,9 +76,8 @@ export default class WalletAssetsPage extends Component<InjectedOrGenerated<Gene
           entry,
           info: getTokenInfo(entry),
         })).map(token => ({
-          value: token.info.TokenId,
           info: token.info,
-          label: truncateToken(getTokenStrictName(token.info) ?? getTokenIdentifierIfExists(token.info) ?? '-'),
+          name: truncateToken(getTokenStrictName(token.info) ?? getTokenIdentifierIfExists(token.info) ?? '-'),
           id: (getTokenIdentifierIfExists(token.info) ?? '-'),
           amount: genFormatTokenAmount(getTokenInfo)(token.entry)
         }));
@@ -103,8 +86,7 @@ export default class WalletAssetsPage extends Component<InjectedOrGenerated<Gene
   
     return (
       <>
-       <AssetsList
-        onClick={() => {}}
+       <AssetsPage
         assetsList={assetsList}
        />
       </>

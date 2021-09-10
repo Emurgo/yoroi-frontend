@@ -1,0 +1,32 @@
+.component {
+    .header {
+        display: grid;
+        grid-template-columns: .3fr 1fr 1fr;
+        padding: 20px 30px;
+        border-top: 1px ;
+        border-bottom: 1px;
+        border-color:rgba(111, 114, 144, 0.24);
+        border-style: solid;
+        color: var(--theme-wallet-plate-secondary-text-color);
+        font-size: 15px;
+        box-shadow: 0 5px 7px rgba(0, 0, 0, 0.1);
+        margin-bottom: 16px;
+    }
+
+    .row {
+        display: grid;
+        grid-template-columns: .3fr 1fr 1fr;
+        padding: 20px 30px;
+        margin-bottom: 20px;
+    }
+
+    .name {
+        color: var(--theme-default-color-blue-medium);
+        font-size: 16px;
+        font-weight: 600;
+    }
+
+    .amount {
+        font-weight: 800;
+    }
+}

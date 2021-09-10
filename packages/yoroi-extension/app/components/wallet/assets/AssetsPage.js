@@ -15,7 +15,7 @@ import vjf from 'mobx-react-form/lib/validators/VJF';
 import AmountInputSkin from '../skins/AmountInputSkin';
 import AddMemoSvg from '../../../assets/images/add-memo.inline.svg';
 import BorderedBox from '../../widgets/BorderedBox';
-import styles from './AssetsList.scss';
+import styles from './AssetsPage.scss';
 import globalMessages, { memoMessages, } from '../../../i18n/global-messages';
 import type { UriParams } from '../../../utils/URIHandling';
 import { getAddressPayload, isValidReceiveAddress } from '../../../api/ada/lib/storage/bridge/utils';
@@ -24,7 +24,6 @@ import type { TokenRow, NetworkRow } from '../../../api/ada/lib/storage/database
 import {
   formattedAmountToBigNumber,
   formattedAmountToNaturalUnits,
-  truncateAddressShort,
   truncateToken,
 } from '../../../utils/formatters';
 import config from '../../../config';
@@ -44,60 +43,28 @@ import { Select } from 'react-polymorph/lib/components/Select';
 import { SelectTokenSkin } from '../../../themes/skins/SelectTokenSkin';
 import TokenOptionRow from '../../widgets/tokenOption/TokenOptionRow';
 import BigNumber from 'bignumber.js';
+import AssetsList from './AssetsList';
 
-const messages = defineMessages({
-  receiverLabel: {
-    id: 'wallet.send.form.receiver.label',
-    defaultMessage: '!!!Receiver',
-  },
-  receiverHint: {
-    id: 'wallet.send.form.receiver.hint',
-    defaultMessage: '!!!Wallet Address',
-  },
-  dropdownAmountLabel: {
-    id: 'wallet.send.form.sendAll.dropdownAmountLabel',
-    defaultMessage: '!!!Send all {coinName}',
-  },
-  allTokens: {
-    id: 'wallet.send.form.sendAll.allTokens',
-    defaultMessage: '!!! + all tokens',
-  },
-  selectedAmountLable: {
-    id: 'wallet.send.form.sendAll.selectedAmountLable',
-    defaultMessage: '!!!Amount Options',
-  },
-  customAmount: {
-    id: 'wallet.send.form.sendAll.customAmount',
-    defaultMessage: '!!!Custom Amount',
-  },
-  transactionFeeError: {
-    id: 'wallet.send.form.transactionFeeError',
-    defaultMessage: '!!!Not enough Ada for fees. Try sending a smaller amount.',
-  },
-  calculatingFee: {
-    id: 'wallet.send.form.calculatingFee',
-    defaultMessage: '!!!Calculating fee...',
-  },
-  memoInvalidOptional: {
-    id: 'wallet.transaction.memo.optional.invalid',
-    defaultMessage: '!!!Memo cannot be more than {maxMemo} characters.',
-  },
-});
+const messages = defineMessages({});
 
 type Props = {|
-  +onClick: void => void,
   +assetsList: any,
 |};
 
 @observer
-export default class AssetsList extends Component<Props> {
+export default class AssetsPage extends Component<Props> {
 
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
 
-
+  /**
+   * @todo
+   * Change the icon 
+   * apply translations 
+   * 
+   */
 
   render(): Node {
 
@@ -105,20 +72,11 @@ export default class AssetsList extends Component<Props> {
 
     return (
       <div className={styles.component}>
-        <ul className={styles.header}>
-          <li>Name</li>
-          <li>Subject</li>
-          <li>Quantity</li>
-        </ul>
-        {
-          this.props.assetsList.map(token => (
-            <ul className={styles.row} key={token.id} onClick={this.props.onClick}>
-              <li className={styles.name}>{token.name}</li>
-              <li>{truncateAddressShort(token.id)}</li>
-              <li className={styles.amount}>{token.amount}</li>
-           </ul>
-          ))
-        }
+        <BorderedBox>
+          <h1 className={styles.header}>Tokens ({this.props.assetsList.length})</h1>
+        </BorderedBox>
+        <AssetsList assetsList={this.props.assetsList} onClick={() => {}} />
+
       </div>
     );
   }
