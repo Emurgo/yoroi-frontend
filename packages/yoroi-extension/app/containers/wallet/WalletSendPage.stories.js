@@ -190,7 +190,7 @@ const genBaseProps: {|
       updateReceiver: { trigger: action('updateReceiver') },
       updateAmount: { trigger: action('updateAmount') },
       updateToken: { trigger: action('updateToken') },
-      toggleSendAll: { trigger: action('toggleSendAll') },
+      updateSendAllStatus: { trigger: action('updateSendAllStatus') },
       reset: { trigger: action('reset') },
       updateMemo: { trigger: action('updateMemo') },
     },

@@ -1,43 +1,33 @@
 // @flow
 
-import type {
-  Address,
-  Paginate,
-  PendingTransaction,
-  TokenId,
-  Tx,
-  TxId,
-  SignedTx,
-  Value
-} from './types';
+import type { Address, Paginate, PendingTransaction, SignedTx, TokenId, Tx, TxId, Value } from './types';
 import { ConnectorError } from './types';
 import { RustModule } from '../../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import type {
-  IPublicDeriver,
-  IGetAllUtxosResponse
+  IGetAllUtxosResponse,
+  IPublicDeriver
 } from '../../../app/api/ada/lib/storage/models/PublicDeriver/interfaces';
-import {
-  PublicDeriver,
-} from '../../../app/api/ada/lib/storage/models/PublicDeriver/index';
+import { PublicDeriver, } from '../../../app/api/ada/lib/storage/models/PublicDeriver/index';
 import {
   asGetAllUtxos,
   asGetBalance,
-  asHasLevels,
   asGetSigningKey,
+  asHasLevels,
 } from '../../../app/api/ada/lib/storage/models/PublicDeriver/traits';
 import { ConceptualWallet } from '../../../app/api/ada/lib/storage/models/ConceptualWallet/index';
 import BigNumber from 'bignumber.js';
 import { BIP32PrivateKey, } from '../../../app/api/common/lib/crypto/keys/keyRepository';
-import { generateKeys } from '../../../app/api/ergo/lib/transactions/utxoTransaction';
+import { extractP2sKeyFromErgoTree, generateKey, } from '../../../app/api/ergo/lib/transactions/utxoTransaction';
 
-import {
-  SendTransactionApiError
-} from '../../../app/api/common/errors';
+import { SendTransactionApiError } from '../../../app/api/common/errors';
 
 import axios from 'axios';
+import keyBy from 'lodash/keyBy';
+import cloneDeep from 'lodash/cloneDeep';
 
 import { asAddressedUtxo, toErgoBoxJSON } from '../../../app/api/ergo/lib/transactions/utils';
 import { CoreAddressTypes } from '../../../app/api/ada/lib/storage/database/primitives/enums';
+import type { FullAddressPayload } from '../../../app/api/ada/lib/storage/bridge/traitUtils';
 import { getAllAddressesForDisplay } from '../../../app/api/ada/lib/storage/bridge/traitUtils';
 import { getReceiveAddress } from '../../../app/stores/stateless/addressStores';
 
@@ -73,7 +63,7 @@ export async function connectorGetBalance(
   pendingTxs: PendingTransaction[],
   tokenId: TokenId
 ): Promise<Value> {
-  if (tokenId === 'ERG') {
+  if (tokenId === 'ERG' || tokenId === 'ADA') {
     if (pendingTxs.length === 0) {
       // can directly query for balance
       const canGetBalance = asGetBalance(wallet);
@@ -125,7 +115,7 @@ export async function connectorGetUtxos(
   const utxos = await withUtxos.getAllUtxos();
   const spentBoxIds = pendingTxs.flatMap(pending => pending.tx.inputs.map(input => input.boxId));
   // TODO: should we use a different coin selection algorithm besides greedy?
-  let utxosToUse = [];
+  const utxosToUse = [];
   if (valueExpected != null) {
     let valueAcc = new BigNumber(0);
     const target = valueToBigNumber(valueExpected);
@@ -147,12 +137,21 @@ export async function connectorGetUtxos(
       }
     }
   } else {
-    utxosToUse = utxos.map(formatUtxoToBox).filter(box => !spentBoxIds.includes(box.boxId));
+    const filtered = utxos.map(formatUtxoToBox).filter(box => !spentBoxIds.includes(box.boxId));
+    utxosToUse.push(...filtered);
   }
   return Promise.resolve(paginateResults(utxosToUse, paginate));
 }
 
-async function getAllAddresses(wallet: PublicDeriver<>, usedFilter: boolean): Promise<Address[]> {
+export type FullAddressPayloadWithBase58 = {|
+  fullAddress: FullAddressPayload,
+  base58: Address,
+|};
+
+async function getAllFullAddresses(
+  wallet: IPublicDeriver<>,
+  usedFilter: boolean,
+): Promise<FullAddressPayloadWithBase58[]> {
   const p2pk = getAllAddressesForDisplay({
     publicDeriver: wallet,
     type: CoreAddressTypes.ERGO_P2PK
@@ -166,13 +165,21 @@ async function getAllAddresses(wallet: PublicDeriver<>, usedFilter: boolean): Pr
     type: CoreAddressTypes.ERGO_P2S
   });
   await RustModule.load();
-  const addresses = (await Promise.all([p2pk, p2sh, p2s]))
-    .flat()
+  const addresses: FullAddressPayload[] =
+    (await Promise.all([p2pk, p2sh, p2s])).flat();
+  return addresses
     .filter(a => a.isUsed === usedFilter)
-    .map(a => RustModule.SigmaRust.NetworkAddress
+    .map(a => ({
+      fullAddress: a,
+      base58: RustModule.SigmaRust.NetworkAddress
         .from_bytes(Buffer.from(a.address, 'hex'))
-        .to_base58());
-  return addresses;
+        .to_base58(),
+    }));
+}
+
+async function getAllAddresses(wallet: PublicDeriver<>, usedFilter: boolean): Promise<Address[]> {
+  return getAllFullAddresses(wallet, usedFilter)
+    .then(arr => arr.map(a => a.base58));
 }
 
 export async function connectorGetUsedAddresses(
@@ -207,14 +214,55 @@ export type BoxLike = {
   ...
 }
 
-export async function connectorSignTx(
-  publicDeriver: IPublicDeriver<ConceptualWallet>,
-  password: string,
-  utxos: any/* IGetAllUtxosResponse */,
-  bestBlock: BestBlockResponse,
-  tx: Tx,
-  indices: Array<number>
-): Promise<ErgoTxJson> {
+function extractAddressPK(addressBase58: string) {
+  return RustModule.SigmaRust.Address
+    .from_base58(addressBase58)
+    .to_ergo_tree()
+    .to_base16_bytes()
+    .replace(/^0008cd/, '');
+}
+
+function addressesToPkMap(addresses: Array<FullAddressPayloadWithBase58>) {
+  return addresses.reduce((res, a) => {
+    const addressPk = extractAddressPK(a.base58);
+    return ({ ...res, [addressPk]: a });
+  }, {});
+}
+
+function createP2sAddressTreeMatcher(
+  addressesGetter: () => Promise<Array<FullAddressPayloadWithBase58>>,
+): (
+  string => Promise<{| isP2S: boolean, matchingAddress: ?FullAddressPayloadWithBase58 |}>
+) {
+  const keyAddressMapHolder = [];
+  return async ergoTree => {
+    const key: ?string = extractP2sKeyFromErgoTree(ergoTree);
+    if (key == null) {
+      return { isP2S: false, matchingAddress: null };
+    }
+    if (!keyAddressMapHolder[0]) {
+      keyAddressMapHolder[0] = addressesToPkMap(await addressesGetter());
+    }
+    return { isP2S: true, matchingAddress: keyAddressMapHolder[0][key] };
+  };
+}
+
+function createMockHeader(bestBlock) {
+  // We could modify the best block backend to return this information for the previous block
+  // but I'm guessing that votes of the previous block isn't useful for the current one
+  // and I'm also unsure if any of these 3 would impact signing or not.
+  // Maybe version would later be used in the ergoscript context?
+  return JSON.stringify({
+    version: 2, // TODO: where to get version? (does this impact signing?)
+    parentId: bestBlock.hash,
+    timestamp: Date.now(),
+    nBits: 682315684511744, // TODO: where to get difficulty? (does this impact signing?)
+    height: bestBlock.height + 1,
+    votes: '040000', // TODO: where to get votes? (does this impact signing?)
+  });
+}
+
+function validateWalletForSigning(publicDeriver) {
   const withLevels = asHasLevels(publicDeriver);
   if (withLevels == null) {
     throw new Error('wallet doesn\'t support levels');
@@ -223,66 +271,109 @@ export async function connectorSignTx(
   if (wallet == null) {
     throw new Error('wallet doesn\'t support signing');
   }
-  await RustModule.load();
-  let wasmTx;
+  return wallet;
+}
+
+function parseWasmTx(tx) {
   try {
-    wasmTx = RustModule.SigmaRust.UnsignedTransaction.from_json(JSON.stringify(tx));
+    return RustModule.SigmaRust.UnsignedTransaction.from_json(JSON.stringify(tx));
   } catch (e) {
     throw ConnectorError.invalidRequest(`Invalid tx - could not parse JSON: ${e}`);
   }
-  const boxIdsToSign = [];
+}
+
+export async function connectorSignTx(
+  publicDeriver: IPublicDeriver<ConceptualWallet>,
+  password: string,
+  utxos: any/* IGetAllUtxosResponse */,
+  bestBlock: BestBlockResponse,
+  tx: Tx,
+  indices: Array<number>
+): Promise<ErgoTxJson> {
+
+  const debug = (t: string, s: string, ...ps: *) => {
+    // eslint-disable-next-line no-console
+    console.debug(`[connectorSignTx][${t}] ${s} > `, ...((ps||[]).map(cloneDeep)));
+  };
+
+  debug('args', 'tx', tx);
+  debug('args', 'utxos', utxos);
+
+  const wallet = validateWalletForSigning(publicDeriver);
+
+  await RustModule.load();
+  const wasmTx = parseWasmTx(tx);
+
+  const utxoMap = keyBy(utxos,
+    u => u.output.UtxoTransactionOutput.ErgoBoxId);
+
+  const selectedInputs: Array<ErgoBoxJson> = []
   for (const index of indices) {
     const input = tx.inputs[index];
-    boxIdsToSign.push(input.boxId);
+    // $FlowFixMe[prop-missing]
+    selectedInputs.push(input);
   }
 
-  const utxosToSign = utxos.filter(
-    utxo => boxIdsToSign.includes(utxo.output.UtxoTransactionOutput.ErgoBoxId)
+  const dataInputs = tx.dataInputs.map(box => {
+    const utxo = utxoMap[box.boxId];
+    if (!utxo) {
+      throw new Error(`Data-input ${box.boxId}, no matching UTxO found!`);
+    }
+    return formatUtxoToBox(utxo);
+  });
+
+  // SIGNING INPUTS //
+
+  const p2sMatcher = createP2sAddressTreeMatcher(
+    () => getAllFullAddresses(publicDeriver, true),
   );
 
-  const signingKey = await wallet.getSigningKey();
-  const normalizedKey = await wallet.normalizeKey({
-    ...signingKey,
-    password,
-  });
-  const finalSigningKey = BIP32PrivateKey.fromBuffer(
-    Buffer.from(normalizedKey.prvKeyHex, 'hex')
-  );
-  const wasmKeys = generateKeys({
-    senderUtxos: utxosToSign,
-    keyLevel: wallet.getParent().getPublicDeriverLevel(),
-    signingKey: finalSigningKey,
-  });
-  const jsonBoxesToSign: Array<ErgoBoxJson> =
-    // $FlowFixMe[prop-missing]: our inputs are nearly like `ErgoBoxJson` just with one extra field
-    tx.inputs.filter((box, index) => indices.includes(index));
-  const txBoxesToSign = RustModule.SigmaRust.ErgoBoxes.from_boxes_json(jsonBoxesToSign);
-  const dataBoxIds = tx.dataInputs.map(box => box.boxId);
-  const dataInputs = utxos.filter(
-    utxo => dataBoxIds.includes(utxo.output.UtxoTransactionOutput.ErgoBoxId)
-  ).map(formatUtxoToBox);
-  // We could modify the best block backend to return this information for the previous block
-  // but I'm guessing that votes of the previous block isn't useful for the current one
-  // and I'm also unsure if any of these 3 would impact signing or not.
-  // Maybe version would later be used in the ergoscript context?
-  const headerJson = JSON.stringify({
-    version: 2, // TODO: where to get version? (does this impact signing?)
-    parentId: bestBlock.hash,
-    timestamp: Date.now(),
-    nBits: 682315684511744, // TODO: where to get difficulty? (does this impact signing?)
-    height: bestBlock.height + 1,
-    votes: '040000', // TODO: where to get votes? (does this impact signing?)
-  });
-  const blockHeader = RustModule.SigmaRust.BlockHeader.from_json(headerJson);
+  const signingKey = await wallet.getSigningKey()
+    .then(key => wallet.normalizeKey({ ...key, password }))
+    .then(key => BIP32PrivateKey.fromBuffer(Buffer.from(key.prvKeyHex, 'hex')));
+
+  const keyLevel = wallet.getParent().getPublicDeriverLevel();
+  const inputSigningKeys = new RustModule.SigmaRust.SecretKeys();
+  for (const input of selectedInputs) {
+    const inputId = input.boxId;
+    debug('signing', 'Signing input ID', inputId);
+    const utxo = utxoMap[inputId];
+    if (utxo) {
+      debug('signing', 'UTxO found, regular signature');
+      inputSigningKeys.add(generateKey({ addressing: utxo, keyLevel, signingKey }));
+    } else {
+      debug('signing', 'No UTxO found! Checking if input is P2S');
+      const { isP2S, matchingAddress } = await p2sMatcher(input.ergoTree);
+      if (isP2S) {
+        if (!matchingAddress) {
+          throw new Error(`Input ${inputId} is a P2S, but no matching address is found in wallet!`);
+        }
+        debug('signing', 'Input is a P2S with valid matching address', matchingAddress);
+        const { fullAddress } = matchingAddress;
+        inputSigningKeys.add(generateKey({ addressing: fullAddress, keyLevel, signingKey }));
+      } else {
+        throw new Error(`Input ${inputId} is not recognised! No matching UTxO found and is not P2S!`)
+      }
+    }
+  }
+
+  debug('signing', 'Produced input keys', inputSigningKeys.len(), inputSigningKeys);
+
+  const blockHeader = RustModule.SigmaRust.BlockHeader.from_json(createMockHeader(bestBlock));
   const preHeader = RustModule.SigmaRust.PreHeader.from_block_header(blockHeader);
+  const ergoStateContext = new RustModule.SigmaRust.ErgoStateContext(preHeader);
+  const txBoxesToSpend = RustModule.SigmaRust.ErgoBoxes.from_boxes_json(selectedInputs);
+  const dataBoxesToSpend = RustModule.SigmaRust.ErgoBoxes.from_boxes_json(dataInputs);
+
   const signedTx = RustModule.SigmaRust.Wallet
-    .from_secrets(wasmKeys)
+    .from_secrets(inputSigningKeys)
     .sign_transaction(
-      new RustModule.SigmaRust.ErgoStateContext(preHeader),
+      ergoStateContext,
       wasmTx,
-      txBoxesToSign,
-      RustModule.SigmaRust.ErgoBoxes.from_boxes_json(dataInputs),
+      txBoxesToSpend,
+      dataBoxesToSpend,
     );
+  debug('signedTx', '', signedTx);
   return signedTx.to_json();
 }
 
