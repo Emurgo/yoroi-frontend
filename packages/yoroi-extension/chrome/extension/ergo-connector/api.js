@@ -63,7 +63,7 @@ export async function connectorGetBalance(
   pendingTxs: PendingTransaction[],
   tokenId: TokenId
 ): Promise<Value> {
-  if (tokenId === 'ERG') {
+  if (tokenId === 'ERG' || tokenId === 'ADA') {
     if (pendingTxs.length === 0) {
       // can directly query for balance
       const canGetBalance = asGetBalance(wallet);
@@ -149,7 +149,7 @@ export type FullAddressPayloadWithBase58 = {|
 |};
 
 async function getAllFullAddresses(
-  wallet: PublicDeriver<>,
+  wallet: IPublicDeriver<>,
   usedFilter: boolean,
 ): Promise<FullAddressPayloadWithBase58[]> {
   const p2pk = getAllAddressesForDisplay({
@@ -237,7 +237,7 @@ function createP2sAddressTreeMatcher(
   const keyAddressMapHolder = [];
   return async ergoTree => {
     const key: ?string = extractP2sKeyFromErgoTree(ergoTree);
-    if (!key) {
+    if (key == null) {
       return { isP2S: false, matchingAddress: null };
     }
     if (!keyAddressMapHolder[0]) {
@@ -307,9 +307,10 @@ export async function connectorSignTx(
   const utxoMap = keyBy(utxos,
     u => u.output.UtxoTransactionOutput.ErgoBoxId);
 
-  const selectedInputs = []
+  const selectedInputs: Array<ErgoBoxJson> = []
   for (const index of indices) {
     const input = tx.inputs[index];
+    // $FlowFixMe[prop-missing]
     selectedInputs.push(input);
   }
 
@@ -324,7 +325,7 @@ export async function connectorSignTx(
   // SIGNING INPUTS //
 
   const p2sMatcher = createP2sAddressTreeMatcher(
-    () => getAllFullAddresses(wallet, true),
+    () => getAllFullAddresses(publicDeriver, true),
   );
 
   const signingKey = await wallet.getSigningKey()
@@ -358,7 +359,6 @@ export async function connectorSignTx(
 
   debug('signing', 'Produced input keys', inputSigningKeys.len(), inputSigningKeys);
 
-  // $FlowFixMe[prop-missing]: our inputs are nearly like `ErgoBoxJson` just with one extra field
   const blockHeader = RustModule.SigmaRust.BlockHeader.from_json(createMockHeader(bestBlock));
   const preHeader = RustModule.SigmaRust.PreHeader.from_block_header(blockHeader);
   const ergoStateContext = new RustModule.SigmaRust.ErgoStateContext(preHeader);

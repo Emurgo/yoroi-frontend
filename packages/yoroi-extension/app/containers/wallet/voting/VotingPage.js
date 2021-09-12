@@ -3,7 +3,7 @@ import type { Node } from 'react';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { computed } from 'mobx';
-import { intlShape } from 'react-intl';
+import { defineMessages, intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 import Voting from '../../../components/wallet/voting/Voting';
@@ -23,23 +23,56 @@ import type { TokenInfoMap } from '../../../stores/toplevel/TokenInfoStore';
 import environment from '../../../environment';
 import { MultiToken } from '../../../api/common/lib/MultiToken';
 import RegistrationOver from './RegistrationOver';
-import { networks, } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import type { DelegationRequests } from '../../../stores/toplevel/DelegationStore';
 import {
   isLedgerNanoWallet,
   isTrezorTWallet,
 } from '../../../api/ada/lib/storage/models/ConceptualWallet/index';
+import type { CatalystRoundInfoResponse } from '../../../api/ada/lib/state-fetch/types'
 
 export type GeneratedData = typeof VotingPage.prototype.generated;
 type Props = {|
   ...InjectedOrGenerated<GeneratedData>,
 |};
 
-const roundInfo = {
-  startDate: new Date(Date.parse('2021-07-08T16:00:00Z')),
-  endDate: new Date(Date.parse('2021-07-19T11:00:00Z')),
-  nextRound: 5,
-};
+const messages: * = defineMessages({
+  mainTitle: {
+    id: 'wallet.registrationOver.mainTitle',
+    defaultMessage: '!!!Registration has ended',
+  },
+  mainSubtitle: {
+    id: 'wallet.registrationOver.mainSubtitle',
+    defaultMessage: '!!!Registration for fund {roundNumber} is over. Open the Catalyst app for more information',
+  },
+  unavailableTitle: {
+    id: 'wallet.registrationOver.unavailableTitle',
+    defaultMessage: '!!!Catalyst Round Info unavailable',
+  },
+  unavailableSubtitle: {
+    id: 'wallet.registrationOver.unavailableSubtitle',
+    defaultMessage: '!!!Please check the Catalyst app for more info',
+  },
+  earlyForRegistrationTitle: {
+    id: 'wallet.registrationOver.earlyForRegistrationTitle',
+    defaultMessage: '!!!Registration hasn\'t started yet'
+  },
+  earlyForRegistrationSubTitle: {
+    id: 'wallet.registrationOver.earlyForRegistrationSubTitle',
+    defaultMessage: '!!!Round {roundNumber} registration starts at {registrationStart}'
+  },
+  beforeVotingSubtitle: {
+    id: 'wallet.registrationOver.beforeVotingSubtitle',
+    defaultMessage: '!!!Registration has ended. Voting starts at {votingStart}'
+  },
+  betweenVotingSubtitle: {
+    id: 'wallet.registrationOver.betweenVotingSubtitle',
+    defaultMessage: '!!!"Registration has ended.  Voting ends at  {votingEnd}'
+  },
+  nextFundRegistration: {
+    id: 'wallet.registrationOver.nextFundRegistration',
+    defaultMessage: 'Round {roundNumber} starts at {registrationStart}'
+  }
+});
 
 @observer
 export default class VotingPage extends Component<Props> {
@@ -84,12 +117,12 @@ export default class VotingPage extends Component<Props> {
   }
 
   render(): Node {
+    const { intl } = this.context
     const {
       uiDialogs,
       wallets: { selected },
     } = this.generated.stores;
     let activeDialog = null;
-
     if(selected == null){
       throw new Error(`${nameof(VotingPage)} no wallet selected`);
     }
@@ -102,22 +135,97 @@ export default class VotingPage extends Component<Props> {
         </VerticallyCenteredLayout>
       );
     }
-
     // keep enabled on the testnet
+    const { catalystRoundInfo, loadingCatalystRoundInfo } = this.generated.stores.substores.ada.votingStore;
+    if (loadingCatalystRoundInfo) {
+      return (
+        <VerticallyCenteredLayout>
+          <LoadingSpinner />
+        </VerticallyCenteredLayout>
+      );
+    }
     if (!environment.isTest()) {
-      const isLate = new Date() >= roundInfo.endDate;
-      const isEarly = new Date() <= roundInfo.startDate;
-      if (
-        selected.getParent().getNetworkInfo().NetworkId === networks.CardanoMainnet.NetworkId &&
-        (isEarly || isLate) &&
-        !(document.location.hash.includes('ignore-date'))
-      ) {
+      if (!catalystRoundInfo || (!catalystRoundInfo.currentFund && !catalystRoundInfo.nextFund)){
         return (
-          <RegistrationOver roundNumber={
-              isLate
-                ? roundInfo.nextRound
-                : roundInfo.nextRound - 1
+          <RegistrationOver
+            title={intl.formatMessage(messages.unavailableTitle)}
+            subtitle={intl.formatMessage(messages.unavailableSubtitle)}
+          />
+        );
+      }
+      const { currentFund, nextFund } = catalystRoundInfo;
+      const nextFundRegistrationSubtitle = intl.formatMessage(messages.nextFundRegistration, {
+        roundNumber: nextFund?.id,
+        registrationStart: nextFund?.registrationStart
+      })
+
+      if (currentFund) {
+        const isLate = new Date() >= new Date(Date.parse(currentFund.registrationEnd))
+        const isEarly = new Date() <= new Date(Date.parse(currentFund.registrationStart))
+        const isBeforeVoting = new Date() <= new Date(Date.parse(currentFund.votingStart))
+        const isAfterVoting = new Date() >= new Date(Date.parse(currentFund.votingEnd))
+        const isBetweenVoting = !isBeforeVoting && !isAfterVoting;
+
+        if (isEarly) {
+          return (
+            <RegistrationOver
+              title={intl.formatMessage(messages.earlyForRegistrationTitle)}
+              subtitle={intl.formatMessage(messages.earlyForRegistrationSubTitle, {
+                roundNumber: currentFund.id,
+                registrationStart: currentFund.registrationStart
+              })}
+            />
+          );
+        }
+
+        // registeration is ended -> check for voting start and end dates
+        if (isLate) {
+          if (isBeforeVoting) {
+            return (
+              <RegistrationOver
+                title={intl.formatMessage(messages.mainTitle)}
+                subtitle={intl.formatMessage(messages.beforeVotingSubtitle, {
+                  votingStart: currentFund.votingStart
+                })}
+              />
+            );
+          }
+
+          if (isBetweenVoting) {
+            return (
+              <RegistrationOver
+                title={intl.formatMessage(messages.mainTitle)}
+                subtitle={intl.formatMessage(messages.betweenVotingSubtitle, {
+                  votingEnd: currentFund.votingEnd
+                })}
+              />
+            );
+          }
+
+          if (isAfterVoting) {
+            /* if we after the voting date (= between funds) and no next funds
+            will dispaly "round is over" */
+            let subtitle = intl.formatMessage(messages.mainSubtitle, {
+              roundNumber: currentFund.id
+            })
+            // Check for the next funds if we are after voting
+            if(nextFund) {
+              subtitle = nextFundRegistrationSubtitle
             }
+            return (
+              <RegistrationOver
+                title={intl.formatMessage(messages.mainTitle)}
+                subtitle={subtitle}
+              />
+            );
+          }
+        }
+      } else if (nextFund) {
+        // No current funds -> check for next funds
+        return (
+          <RegistrationOver
+            title={intl.formatMessage(messages.mainTitle)}
+            subtitle={nextFundRegistrationSubtitle}
           />
         );
       }
@@ -163,7 +271,16 @@ export default class VotingPage extends Component<Props> {
         />
       );
     }
+    /*
+    At this point we are sure that we have current funds
+    I added the "5" for two reasons
+    1. As a placeholder as the component will not be rendered without it.
+    2. this page you can see it in test environment even if you
+    out of the registration dates.
+    */
+    const round = catalystRoundInfo?.currentFund?.id || catalystRoundInfo?.nextFund?.id || 5
     return (
+      //
       <div>
         {activeDialog}
         <Voting
@@ -171,7 +288,7 @@ export default class VotingPage extends Component<Props> {
           hasAnyPending={this.generated.hasAnyPending}
           onExternalLinkClick={handleExternalLinkClick}
           isDelegated={this.isDelegated === true}
-          round={roundInfo.nextRound}
+          round={round}
           walletType={walletType}
         />
       </div>
@@ -208,6 +325,14 @@ export default class VotingPage extends Component<Props> {
       delegation: {|
         getDelegationRequests: (PublicDeriver<>) => void | DelegationRequests,
       |},
+      substores: {|
+        ada: {|
+          votingStore: {|
+            catalystRoundInfo: ?CatalystRoundInfoResponse,
+            loadingCatalystRoundInfo: boolean,
+          |}
+        |}
+      |}
     |},
   |} {
     if (this.props.generated !== undefined) {
@@ -256,6 +381,14 @@ export default class VotingPage extends Component<Props> {
         delegation: {
           getDelegationRequests: stores.delegation.getDelegationRequests,
         },
+        substores: {
+          ada: {
+            votingStore: {
+              catalystRoundInfo: stores.substores.ada.votingStore.catalystRoundInfo,
+              loadingCatalystRoundInfo: stores.substores.ada.votingStore.loadingCatalystRoundInfo,
+            }
+          }
+        }
       },
       VotingRegistrationDialogProps: ({
         actions,

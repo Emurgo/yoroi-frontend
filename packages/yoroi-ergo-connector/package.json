@@ -1,6 +1,6 @@
 {
   "name": "yoroi-ergo-connector",
-  "version": "0.6.001",
+  "version": "0.7.0",
   "description": "",
   "scripts": {
     "keygen": "crx keygen",

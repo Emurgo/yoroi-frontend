@@ -469,7 +469,7 @@ export function signTransaction(request: {|
 }
 
 export function generateKey(request: {|
-  +addressing: Addressing,
+  +addressing: { ...Addressing, ... },
   +keyLevel: number,
   +signingKey: BIP32PrivateKey
 |}): RustModule.SigmaRust.SecretKey {
@@ -519,7 +519,7 @@ export function extractP2sKeyFromErgoTree(ergoTree: string): ?string {
   for (let i = 0; i < constantsLen; i++) {
     const hex = tree.get_constant(i).encode_to_base16();
     const walletPk: ?string = extractWalletPkFromHexConstant(hex);
-    if (walletPk) {
+    if (walletPk != null) {
       return walletPk;
     }
   }
