@@ -10,6 +10,7 @@ import {
   ModernTabs,
   ModernTabPanel,
   ModernChip,
+  ModernTooltip
 } from '../overrides';
 
 export const modernTheme: Object = createTheme({
@@ -27,6 +28,7 @@ export const modernTheme: Object = createTheme({
     MuiTabs: ModernTabs,
     MuiTabPanel: ModernTabPanel,
     MuiChip: ModernChip,
+    MuiTooltip: ModernTooltip,
   },
   palette: {
     primary: {

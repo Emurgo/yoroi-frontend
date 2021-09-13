@@ -7,3 +7,4 @@ export * from './Menu';
 export * from './Tabs';
 export * from './TabPanel';
 export * from './Chip';
+export * from './Tooltip';

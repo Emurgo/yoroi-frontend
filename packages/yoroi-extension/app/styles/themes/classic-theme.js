@@ -10,6 +10,7 @@ import {
   ClassicTabs,
   ClassicTabPanel,
   ClassicChip,
+  ClassicTooltip,
 } from '../overrides';
 
 export const classicTheme: Object = createTheme({
@@ -27,6 +28,7 @@ export const classicTheme: Object = createTheme({
     MuiTabs: ClassicTabs,
     MuiTabPanel: ClassicTabPanel,
     MuiChip: ClassicChip,
+    MuiTooltip: ClassicTooltip,
   },
   palette: {
     primary: {

@@ -74,6 +74,11 @@ const globalStyles = (theme: Object): Node => (
         '--mui-transactions-state-medium-text-color': 'hsl(37 91% 55%)',
         '--mui-transactions-state-low-background-color': 'hsl(344 100% 54% / 15%)',
         '--mui-transactions-state-low-text-color': 'hsl(344 94% 68%)',
+
+        /* === TOOLTIP === */
+        '--mui-tooltip-background-color': 'hsl(225 4% 38% / 0.9)',
+        '--mui-tooltip-border-color': 'hsl(214deg 16% 81%)',
+        '--mui-tooltip-text-color': 'hsl(0 0% 100%)',
       },
     }}
   />
