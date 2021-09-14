@@ -416,8 +416,8 @@ class MockTrezorConnect {
 
     const auxDataHash = request.auxiliaryData?.hash;
     if (auxDataHash != null) {
-      body.set_metadata_hash(
-        RustModule.WalletV4.MetadataHash.from_bytes(
+      body.set_auxiliary_data_hash(
+        RustModule.WalletV4.AuxiliaryDataHash.from_bytes(
           Buffer.from(auxDataHash, 'hex')
         )
       );

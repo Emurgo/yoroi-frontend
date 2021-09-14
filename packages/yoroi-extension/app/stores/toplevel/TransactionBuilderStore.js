@@ -81,7 +81,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
     actions.updateMemo.listen(this._updateMemo);
     actions.updateToken.listen(this._updateToken);
     actions.updateTentativeTx.listen(this._updateTentativeTx);
-    actions.toggleSendAll.listen(this._toggleSendAll);
+    actions.updateSendAllStatus.listen(this._updateSendAllStatus);
     actions.initialize.listen(this._initialize);
     actions.reset.listen(this._reset);
     actions.updateMetadata.listen(this._updateMetadata);
@@ -345,9 +345,9 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
   // ===========
 
   @action
-  _toggleSendAll: void => void = () => {
+  _updateSendAllStatus: (void | boolean) => void = (status) => {
     this._updateAmount();
-    this.shouldSendAll = !this.shouldSendAll;
+    this.shouldSendAll = status || false;
   }
 
   /** Should only set to valid address or undefined */
@@ -455,7 +455,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
     }
     this._updateReceiver(nextUnusedInternal.addr.Hash);
     if (this.shouldSendAll === false) {
-      this._toggleSendAll();
+      this._updateSendAllStatus(true);
     }
 
     await this._updateTxBuilder();

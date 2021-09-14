@@ -110,12 +110,6 @@ export default class NavWalletDetails extends Component<Props> {
                 </p>
                 {this.renderAmountDisplay({ shouldHideBalance, amount: walletAmount })}
               </div>
-              <div>
-                <p className={styles.label}>
-                  {intl.formatMessage(globalMessages.rewardsLabel)}&nbsp;
-                </p>
-                {this.renderAmountDisplay({ shouldHideBalance, amount: rewards })}
-              </div>
             </div>
             }
             {this.props.rewards === undefined && (
@@ -150,7 +144,7 @@ export default class NavWalletDetails extends Component<Props> {
     if (this.props.rewards === null || this.props.walletAmount === null) {
       return null;
     }
-    return this.props.rewards.joinAddCopy(this.props.walletAmount);
+    return this.props.walletAmount;
   }
 
   renderAmountDisplay: {|
