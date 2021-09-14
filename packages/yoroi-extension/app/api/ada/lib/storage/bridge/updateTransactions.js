@@ -2261,6 +2261,9 @@ export function networkTxHeaderToDb(
         Extra: {
           Fee: tx.fee,
           Metadata: tx.metadata,
+          // for backward compatiblity, if the field is not present, we take the tx as valid
+          IsValid: !Object.prototype.hasOwnProperty.call(tx, 'valid_transaction') ||
+            tx.valid_transaction,
         },
         BlockId: blockId,
         ...baseTx,

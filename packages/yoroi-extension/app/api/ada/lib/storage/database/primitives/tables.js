@@ -319,6 +319,8 @@ export type CardanoShelleyTransactionInsert = {|
     Fee: string,
     Ttl?: string,
     Metadata: null | string,
+    // note if this field is not present, the tx is *valid*
+    IsValid?: boolean,
   |},
   ...TransactionInsertBase,
 |};
