@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { computed, observable, runInAction } from 'mobx';
+import { computed } from 'mobx';
 import type { Node } from 'react';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
@@ -11,7 +11,6 @@ import {
 import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import { genFormatTokenAmount, genLookupOrFail, getTokenIdentifierIfExists, getTokenStrictName } from '../../stores/stateless/tokenHelpers';
-import AssetsList from '../../components/wallet/assets/AssetsList';
 import { truncateToken } from '../../utils/formatters';
 import AssetsPage from '../../components/wallet/assets/AssetsPage';
 
@@ -40,15 +39,8 @@ export default class WalletAssetsPage extends Component<InjectedOrGenerated<Gene
           amount: genFormatTokenAmount(getTokenInfo)(token.entry)
         }));
       })();
-  
-  
-    return (
-      <>
-       <AssetsPage
-        assetsList={assetsList}
-       />
-      </>
-    );
+
+    return <AssetsPage assetsList={assetsList} />
   }
 
   @computed get generated(): {|
@@ -72,7 +64,6 @@ export default class WalletAssetsPage extends Component<InjectedOrGenerated<Gene
       throw new Error(`${nameof(WalletAssetsPage)} no way to generated props`);
     }
     const { stores } = this.props;
-    const adaStore = stores.substores.ada;
     return Object.freeze({
       stores: {
         wallets: {
@@ -94,6 +85,6 @@ export default class WalletAssetsPage extends Component<InjectedOrGenerated<Gene
             };
           })(),
         }
-    }})
+    } })
   }
 };

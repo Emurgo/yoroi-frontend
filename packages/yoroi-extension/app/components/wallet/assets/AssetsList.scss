@@ -47,13 +47,13 @@
         box-shadow: 0 5px 7px rgba(0, 0, 0, 0.1);
         margin-bottom: 16px;
 
-        & > li {
+        & > li, & > li > button {
             display: flex;
             align-items: center;
             justify-content: flex-start;
             cursor: pointer;
            & > .headerText {
-               margin-right: 5px;
+               margin-right: 3px;
            } 
         }
     }

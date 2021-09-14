@@ -96,7 +96,8 @@ export const ASSETS: TopbarCategory = registerCategory({
   route: ROUTES.WALLETS.ASSETS,
   icon: assetsIcon,
   label: messages.assets,
-  isVisible: ({ spendableBalance }) =>  !!spendableBalance && spendableBalance.nonDefaultEntries().length > 0 
+  isVisible: ({ spendableBalance }) =>  
+  !!spendableBalance && spendableBalance.nonDefaultEntries().length > 0 
 });
 export const RECEIVE: TopbarCategory = registerCategory({
   className: 'receive',

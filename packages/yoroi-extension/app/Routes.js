@@ -158,7 +158,6 @@ const WalletsSubpages = (stores, actions) => (
       component={(props) => <WalletSendPage {...props} stores={stores} actions={actions} />}
     />
     <Route
-
       path={ROUTES.WALLETS.ASSETS}
       component={(props) => <WalletAssetsPage {...props} stores={stores} actions={actions} />}
     />
