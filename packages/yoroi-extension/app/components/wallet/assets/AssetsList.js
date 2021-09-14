@@ -61,6 +61,10 @@ const messages = defineMessages({
     id: 'wallet.assets.search',
     defaultMessage: '!!!Search',
   },
+  noAssetFound: {
+    id: 'wallet.assets.noAssetFound',
+    defaultMessage: '!!!No Asset Found',
+  },
 });
 @observer
 export default class AssetsList extends Component<Props, State> {
@@ -81,7 +85,13 @@ export default class AssetsList extends Component<Props, State> {
     if(!keyword) return
     const regExp = new RegExp(keyword, 'gi')
     const assetsListCopy = [...this.props.assetsList]
-    const filteredAssetsList = assetsListCopy.filter(a => regExp.test(a.name))
+    const filteredAssetsList = assetsListCopy.filter(a => a.name.match(regExp))
+    console.log({
+      keyword,
+      regExp,
+      assetsListCopy,
+      filteredAssetsList
+    })
     this.setState({ assetsList: filteredAssetsList })
   };
 
@@ -144,36 +154,46 @@ export default class AssetsList extends Component<Props, State> {
             </div>
           </div>
         </BorderedBox>
-        <ul className={styles.columns}>
-          <li>
-           <button type='button' onClick={() => this.sortAssets(SORTING_COLUMNS.NAME)}>
-            <p className={styles.headerText}>{intl.formatMessage(messages.nameAndTicker)}</p>
-              {this.displayColumnLogo(SORTING_COLUMNS.NAME)}
-           </button>
-          </li>
-          <li>
-            <p className={styles.headerText}>{intl.formatMessage(messages.subject)}</p>
-            <Info />
-          </li>
-          <li>
-           <button type='button' onClick={() => this.sortAssets(SORTING_COLUMNS.AMOUNT)}>
-            <p className={styles.headerText}>{intl.formatMessage(messages.quantity)}</p>
-              {this.displayColumnLogo(SORTING_COLUMNS.AMOUNT)}
-           </button>
-          </li>
-        </ul>
-        {assetsList.map(token => (
-          <ul className={styles.row} key={token.id}>
-            <li className={styles.token}>
-              <div className={styles.logo}>
-                <NoAssetLogo />
-              </div>
-              <p>{token.name}</p>
-            </li>
-            <li>{truncateAddressShort(token.id)}</li>
-            <li className={styles.amount}>{token.amount}</li>
-          </ul>
-        ))}
+        {
+          assetsList.length === 0 ? (
+            <div className={styles.noAssetFound}>
+              <h1>{intl.defineMessages(messages.noAssetFound)}</h1>
+            </div>
+          ): (
+            <>
+               <ul className={styles.columns}>
+                <li>
+                <button type='button' onClick={() => this.sortAssets(SORTING_COLUMNS.NAME)}>
+                  <p className={styles.headerText}>{intl.formatMessage(messages.nameAndTicker)}</p>
+                    {this.displayColumnLogo(SORTING_COLUMNS.NAME)}
+                </button>
+                </li>
+                <li>
+                  <p className={styles.headerText}>{intl.formatMessage(messages.subject)}</p>
+                  <Info />
+                </li>
+                <li>
+                <button type='button' onClick={() => this.sortAssets(SORTING_COLUMNS.AMOUNT)}>
+                  <p className={styles.headerText}>{intl.formatMessage(messages.quantity)}</p>
+                    {this.displayColumnLogo(SORTING_COLUMNS.AMOUNT)}
+                </button>
+                </li>
+              </ul>
+              {assetsList.map(token => (
+                <ul className={styles.row} key={token.id}>
+                  <li className={styles.token}>
+                    <div className={styles.logo}>
+                      <NoAssetLogo />
+                    </div>
+                    <p>{token.name}</p>
+                  </li>
+                  <li>{truncateAddressShort(token.id)}</li>
+                  <li className={styles.amount}>{token.amount}</li>
+                </ul>
+              ))}
+            </>
+          )
+        }
       </div>
     );
   }

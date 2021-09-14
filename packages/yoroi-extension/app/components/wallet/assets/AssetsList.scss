@@ -1,4 +1,6 @@
 .component {
+    height: 100%;
+
     .header {
         display: flex;
         align-items: center;
@@ -82,5 +84,14 @@
 
     .amount {
         font-weight: 800;
+    }
+
+    .noAssetFound {
+        height: 30vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32px;
+        line-height: 32px;
     }
 }

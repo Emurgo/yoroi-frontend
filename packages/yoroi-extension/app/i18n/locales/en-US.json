@@ -680,6 +680,7 @@
   "wallet.assets.quantity": "Quantity",
   "wallet.assets.subject": "Subject",
   "wallet.assets.tokens": "Tokens ({number})",
+  "wallet.assets.noAssetFound": "No Asset Found",
   "wallet.settings.changePassword.dialog.currentPasswordFieldPlaceholder": "Type current spending password",
   "wallet.settings.changePassword.dialog.currentPasswordLabel": "Current spending password",
   "wallet.settings.changePassword.dialog.newPasswordFieldPlaceholder": "Type new spending password",
