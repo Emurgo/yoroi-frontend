@@ -3,7 +3,6 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { computed, observable, runInAction } from 'mobx';
 import type { Node } from 'react';
-import { defineMessages, intlShape } from 'react-intl';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import {
@@ -12,22 +11,14 @@ import {
 import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import { genFormatTokenAmount, genLookupOrFail, getTokenIdentifierIfExists, getTokenStrictName } from '../../stores/stateless/tokenHelpers';
-import globalMessages from '../../i18n/global-messages';
 import AssetsList from '../../components/wallet/assets/AssetsList';
 import { truncateToken } from '../../utils/formatters';
 import AssetsPage from '../../components/wallet/assets/AssetsPage';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-
-const messages = defineMessages({});
 
 export type GeneratedData = typeof WalletAssetsPage.prototype.generated;
 
 @observer
 export default class WalletAssetsPage extends Component<InjectedOrGenerated<GeneratedData>> {
-
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
-    intl: intlShape.isRequired,
-  };
 
   render(): Node {
     const publicDeriver = this.generated.stores.wallets.selected;
@@ -67,7 +58,6 @@ export default class WalletAssetsPage extends Component<InjectedOrGenerated<Gene
         getDefaultTokenInfo: number => $ReadOnly<TokenRow>,
       |},
       transactions: {|
-        hasAnyPending: boolean,
         getBalanceRequest: {|
           result: ?MultiToken,
         |},
@@ -93,7 +83,6 @@ export default class WalletAssetsPage extends Component<InjectedOrGenerated<Gene
           getDefaultTokenInfo: stores.tokenInfoStore.getDefaultTokenInfo,
         },
         transactions: {
-          hasAnyPending: stores.transactions.hasAnyPending,
           getBalanceRequest: (() => {
             if (stores.wallets.selected == null) return {
               result: undefined,

@@ -2,7 +2,6 @@
 import React, { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { Input } from 'react-polymorph/lib/components/Input';
 
 import { defineMessages, intlShape } from 'react-intl';
 import styles from './AssetsList.scss'
@@ -19,8 +18,6 @@ import Info from '../../../assets/images/assets-page/info.inline.svg';
 import Search from '../../../assets/images/assets-page/search.inline.svg';
 import { truncateAddressShort } from '../../../utils/formatters';
 import BorderedBox from '../../widgets/BorderedBox';
-
-const messages = defineMessages({});
 
 const SORTING_DIRECTIONS = {
   UP: 'UP',
@@ -51,7 +48,28 @@ type State = {|
   sortingColumn: string
 |}
 
-
+const messages = defineMessages({
+  tokens: {
+    id: 'wallet.assets.tokens',
+    defaultMessage: '!!!Tokens ({number})',
+  },
+  nameAndTicker: {
+    id: 'wallet.assets.nameAndTicker',
+    defaultMessage: '!!!Name and ticker',
+  },
+  quantity: {
+    id: 'wallet.assets.quantity',
+    defaultMessage: '!!!Quantity',
+  },
+  subject: {
+    id: 'wallet.assets.subject',
+    defaultMessage: '!!!Subject',
+  },
+  search: {
+    id: 'wallet.assets.search',
+    defaultMessage: '!!!Search',
+  },
+});
 @observer
 export default class AssetsList extends Component<Props, State> {
 
@@ -120,24 +138,24 @@ export default class AssetsList extends Component<Props, State> {
       <div className={styles.component}>
         <BorderedBox>
           <div className={styles.header}>
-            <h1 className={styles.tokens}>Tokens ({this.props.assetsList.length})</h1>
+            <h1 className={styles.tokens}>{intl.formatMessage(messages.tokens, { number: this.props.assetsList.length })}</h1>
             <div className={styles.search}>
               <Search />
-              <input onChange={this.search} type='text' placeholder='Search' />
+              <input onChange={this.search} type='text' placeholder={intl.formatMessage(messages.search)} />
             </div>
           </div>
         </BorderedBox>
         <ul className={styles.columns}>
           <li onClick={() => this.sortAssets(SORTING_COLUMNS.NAME)}>
-            <p className={styles.headerText}>Name and ticker</p>
+            <p className={styles.headerText}>{intl.formatMessage(messages.nameAndTicker)}</p>
             {this.displayColumnLogo(SORTING_COLUMNS.NAME)}
           </li>
           <li>
-            <p className={styles.headerText}>Subject</p>
+            <p className={styles.headerText}>{intl.formatMessage(messages.subject)}</p>
             <Info />
           </li>
           <li onClick={() => this.sortAssets(SORTING_COLUMNS.AMOUNT)}>
-            <p className={styles.headerText}>Quantity</p>
+            <p className={styles.headerText}>{intl.formatMessage(messages.quantity)}</p>
             {this.displayColumnLogo(SORTING_COLUMNS.AMOUNT)}
           </li>
         </ul>
