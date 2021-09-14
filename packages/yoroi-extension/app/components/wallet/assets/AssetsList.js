@@ -86,12 +86,6 @@ export default class AssetsList extends Component<Props, State> {
     const regExp = new RegExp(keyword, 'gi')
     const assetsListCopy = [...this.props.assetsList]
     const filteredAssetsList = assetsListCopy.filter(a => a.name.match(regExp))
-    console.log({
-      keyword,
-      regExp,
-      assetsListCopy,
-      filteredAssetsList
-    })
     this.setState({ assetsList: filteredAssetsList })
   };
 
@@ -157,11 +151,11 @@ export default class AssetsList extends Component<Props, State> {
         {
           assetsList.length === 0 ? (
             <div className={styles.noAssetFound}>
-              <h1>{intl.defineMessages(messages.noAssetFound)}</h1>
+              <h1>{intl.formatMessage(messages.noAssetFound)}</h1>
             </div>
           ): (
             <>
-               <ul className={styles.columns}>
+              <ul className={styles.columns}>
                 <li>
                 <button type='button' onClick={() => this.sortAssets(SORTING_COLUMNS.NAME)}>
                   <p className={styles.headerText}>{intl.formatMessage(messages.nameAndTicker)}</p>
