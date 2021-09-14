@@ -12,7 +12,7 @@ import receiveIcon from '../../assets/images/wallet-nav/tab-receive.inline.svg';
 import dashboardIcon from '../../assets/images/wallet-nav/tab-dashboard.inline.svg';
 import delegationListIcon from '../../assets/images/wallet-nav/tab-delegation_list.inline.svg';
 import votingIcon from '../../assets/images/wallet-nav/voting.inline.svg';
-import assetsIcon from '../../assets/images/assets-page/assets.inline.svg';
+import assetsIcon from '../../assets/images/assets-page/assets-active.inline.svg';
 import environment from '../../environment';
 import { MultiToken } from '../../api/common/lib/MultiToken';
 
