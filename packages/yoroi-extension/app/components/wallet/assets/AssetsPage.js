@@ -44,11 +44,13 @@ import { SelectTokenSkin } from '../../../themes/skins/SelectTokenSkin';
 import TokenOptionRow from '../../widgets/tokenOption/TokenOptionRow';
 import BigNumber from 'bignumber.js';
 import AssetsList from './AssetsList';
+import type { Asset } from './AssetsList';
+
 
 const messages = defineMessages({});
 
 type Props = {|
-  +assetsList: any,
+  +assetsList: Asset[],
 |};
 
 @observer
@@ -63,7 +65,7 @@ export default class AssetsPage extends Component<Props> {
    * @todo
    * Change the icon 
    * apply translations 
-   * 
+   * remove unused code
    */
 
   render(): Node {
@@ -72,7 +74,7 @@ export default class AssetsPage extends Component<Props> {
 
     return (
       <div className={styles.component}>
-        <AssetsList assetsList={this.props.assetsList} onClick={() => {}} />
+        <AssetsList assetsList={this.props.assetsList} />
       </div>
     );
   }

@@ -36,13 +36,17 @@ const SORTING_COLUMNS = {
  * @todo
  * Add assetsList props
  */
+ export type Asset = {|
+  name: string,
+  id: string,
+  amount: string,
+|}
 type Props = {|
-  +onClick: void => void,
-  +assetsList: any,
+  +assetsList: Asset[],
 |};
 
 type State = {|
-  assetsList: any,
+  assetsList: Asset[],
   sortingDirection: null | 'UP' | 'DOWN',
   sortingColumn: string
 |}
@@ -139,7 +143,7 @@ export default class AssetsList extends Component<Props, State> {
         </ul>
         {
           assetsList.map(token => (
-            <ul className={styles.row} key={token.id} onClick={this.props.onClick}>
+            <ul className={styles.row} key={token.id}>
               <li className={styles.token}>
                 <div className={styles.logo}>
                   <NoAssetLogo />
