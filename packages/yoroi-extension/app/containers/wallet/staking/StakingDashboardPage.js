@@ -742,7 +742,7 @@ export default class StakingDashboardPage extends Component<Props> {
         totalSum={
           balance == null
             ? undefined
-            : balance.joinAddCopy(rewardBalance)
+            : balance // .joinAddCopy(rewardBalance) // <TODO:RWRD2109>
         }
         totalRewards={
           !showRewardAmount || request.delegationRequests.getDelegatedBalance.result == null
