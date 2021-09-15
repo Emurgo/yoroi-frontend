@@ -16,6 +16,7 @@ import {
 } from '../../../app/api/ada/lib/storage/models/PublicDeriver/traits';
 import { ConceptualWallet } from '../../../app/api/ada/lib/storage/models/ConceptualWallet/index';
 import BigNumber from 'bignumber.js';
+import JSONBigInt from 'json-bigint';
 import { BIP32PrivateKey, } from '../../../app/api/common/lib/crypto/keys/keyRepository';
 import { extractP2sKeyFromErgoTree, generateKey, } from '../../../app/api/ergo/lib/transactions/utxoTransaction';
 
@@ -374,7 +375,7 @@ export async function connectorSignTx(
       dataBoxesToSpend,
     );
   debug('signedTx', '', signedTx);
-  return signedTx.to_json();
+  return JSONBigInt.parse(signedTx.to_json());
 }
 
 export async function connectorSendTx(

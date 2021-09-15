@@ -3,6 +3,7 @@
 // Handles creating transactions
 
 import BigNumber from 'bignumber.js';
+import JSONBigInt from 'json-bigint';
 import type { ErgoAddressedUtxo, ErgoUnsignedTxAddressedUtxoResponse, ErgoUnsignedTxUtxoResponse, } from './types';
 import type { RemoteUnspentOutput, SignedRequest, } from '../state-fetch/types';
 import type { BackendNetworkInfo, } from '../../../common/lib/state-fetch/types';
@@ -454,7 +455,7 @@ export function signTransaction(request: {|
       RustModule.SigmaRust.ErgoBoxes.from_boxes_json([]), // TODO: not supported by sigma-rust
     );
 
-  const json = signedTx.to_json();
+  const json = JSONBigInt.parse(signedTx.to_json());
   return {
     inputs: json.inputs,
     dataInputs: json.dataInputs,

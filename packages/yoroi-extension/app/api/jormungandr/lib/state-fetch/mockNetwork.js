@@ -1,6 +1,7 @@
 // @flow
 
 import BigNumber from 'bignumber.js';
+import JSONBigInt from 'json-bigint';
 import { InputTypes } from './types';
 import type {
   HistoryRequest, HistoryResponse, HistoryFunc,
@@ -575,7 +576,7 @@ export function toRemoteByronTx(
   const signedTx = RustModule.WalletV2.SignedTransaction
     .from_bytes(Buffer.from(request.signedTx, 'base64'));
   const hash = signedTx.id();
-  const transaction = signedTx.to_json().tx;
+  const transaction = JSONBigInt.parse(signedTx.to_json()).tx;
 
   const base = {
     hash,
