@@ -131,19 +131,25 @@ export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
 
       if (trezorSignTxResp && trezorSignTxResp.payload && trezorSignTxResp.payload.error != null) {
         // this Error will be converted to LocalizableError()
+        // noinspection ExceptionCaughtLocallyJS
         throw new Error(trezorSignTxResp.payload.error);
       }
       if (!trezorSignTxResp.success) {
+        // noinspection ExceptionCaughtLocallyJS
         throw new Error(`${nameof(TrezorSendStore)}::${nameof(this.signAndBroadcast)} should never happen`);
       }
 
       const withLevels = asHasLevels<ConceptualWallet>(request.publicDeriver);
       if (withLevels == null) {
+        // noinspection ExceptionCaughtLocallyJS
         throw new Error(`${nameof(this.signAndBroadcast)} No public deriver level for this public deriver`);
       }
 
       const withPublicKey = asGetPublicKey(withLevels);
-      if (withPublicKey == null) throw new Error(`${nameof(this.signAndBroadcast)} No public key for this public deriver`);
+      if (withPublicKey == null) {
+        // noinspection ExceptionCaughtLocallyJS
+        throw new Error(`${nameof(this.signAndBroadcast)} No public key for this public deriver`);
+      }
       const publicKey = await withPublicKey.getPublicKey();
 
       const publicKeyInfo = {
@@ -158,6 +164,7 @@ export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
 
       const withStakingKey = asGetStakingKey(request.publicDeriver);
       if (!withStakingKey) {
+        // noinspection ExceptionCaughtLocallyJS
         throw new Error(`${nameof(this.signAndBroadcast)} can't get staking key`);
       }
       const stakingKeyResp = await withStakingKey.getStakingKey();
@@ -180,14 +187,16 @@ export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
           nonce,
         } = request.params.signRequest.trezorTCatalystRegistrationTxSignData;
 
+        const auxDataSupplement = trezorSignTxResp.payload.auxiliaryDataSupplement;
         if (
-          !trezorSignTxResp.payload.auxiliaryDataSupplement ||
-            trezorSignTxResp.payload.auxiliaryDataSupplement.type !== 1 ||
-            !trezorSignTxResp.payload.auxiliaryDataSupplement.catalystSignature
+          !auxDataSupplement
+          || auxDataSupplement.type !== 1
+          || auxDataSupplement.catalystSignature == null
         ) {
+          // noinspection ExceptionCaughtLocallyJS
           throw new Error(`${nameof(TrezorSendStore)}::${nameof(this.signAndBroadcast)} unexpected Trezor sign transaction response`);
         }
-        const { catalystSignature } = trezorSignTxResp.payload.auxiliaryDataSupplement;
+        const { catalystSignature } = auxDataSupplement;
 
         metadata = generateRegistrationMetadata(
           votingPublicKey,
