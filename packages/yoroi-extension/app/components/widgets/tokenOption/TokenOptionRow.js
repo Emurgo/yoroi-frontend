@@ -18,7 +18,7 @@ export default class TokenOptionRow extends Component<Props> {
 
   static defaultProps: {|
     id: string,
-    amount: number,
+    amount: string,
     nameOnly: boolean,
   |} = {
     id: '',

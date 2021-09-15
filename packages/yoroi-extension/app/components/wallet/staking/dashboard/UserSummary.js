@@ -147,7 +147,7 @@ export default class UserSummary extends Component<Props, State> {
             </h3>
             {/* <TODO:RWRD2109> */}
             Due to protocol update, the rewards are being recalculated.
-            {/ *{this.renderAmount(this.props.totalRewards)} */}
+            {/* {this.renderAmount(this.props.totalRewards)} */}
           </div>
           <div className={styles.footer}>
             {this.props.withdrawRewards != null && (
