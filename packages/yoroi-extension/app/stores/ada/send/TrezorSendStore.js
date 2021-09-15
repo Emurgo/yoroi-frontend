@@ -137,8 +137,6 @@ export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
         throw new Error(`${nameof(TrezorSendStore)}::${nameof(this.signAndBroadcast)} should never happen`);
       }
 
-      const txBody = request.params.signRequest.self().build();
-
       const withLevels = asHasLevels<ConceptualWallet>(request.publicDeriver);
       if (withLevels == null) {
         throw new Error(`${nameof(this.signAndBroadcast)} No public deriver level for this public deriver`);
@@ -212,6 +210,8 @@ export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
       if (metadata) {
         request.params.signRequest.self().set_auxiliary_data(metadata);
       }
+
+      const txBody = request.params.signRequest.self().build();
 
       const signedTx = buildSignedTransaction(
         txBody,
