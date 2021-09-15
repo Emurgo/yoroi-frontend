@@ -14,6 +14,7 @@ import {
 } from '../overrides';
 
 export const modernTheme: Object = createTheme({
+  name: 'modern',
   components: {
     MuiCssBaseline: {
       styleOverrides: `
