@@ -136,7 +136,8 @@ export default class VotingPage extends Component<Props> {
       );
     }
     // keep enabled on the testnet
-    const { catalystRoundInfo, loadingCatalystRoundInfo } = this.generated.stores.substores.ada.votingStore;
+    const { catalystRoundInfo, loadingCatalystRoundInfo } =
+      this.generated.stores.substores.ada.votingStore;
     if (loadingCatalystRoundInfo) {
       return (
         <VerticallyCenteredLayout>

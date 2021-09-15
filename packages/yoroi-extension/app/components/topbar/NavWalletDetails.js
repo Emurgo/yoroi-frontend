@@ -62,6 +62,8 @@ export default class NavWalletDetails extends Component<Props> {
       shouldHideBalance,
       onUpdateHideBalance,
       highlightTitle,
+      // <TODO:RWRD2109>
+      // eslint-disable-next-line no-unused-vars
       rewards,
       walletAmount,
       infoText,
@@ -111,12 +113,12 @@ export default class NavWalletDetails extends Component<Props> {
                 {this.renderAmountDisplay({ shouldHideBalance, amount: walletAmount })}
               </div>
               {/* <TODO:RWRD2109> */}
-              {/*<div>*/}
-              {/*  <p className={styles.label}>*/}
-              {/*    {intl.formatMessage(globalMessages.rewardsLabel)}&nbsp;*/}
-              {/*  </p>*/}
-              {/*  {this.renderAmountDisplay({ shouldHideBalance, amount: rewards })}*/}
-              {/*</div>*/}
+              {/* <div> */}
+              {/*  <p className={styles.label}> */}
+              {/*    {intl.formatMessage(globalMessages.rewardsLabel)}&nbsp; */}
+              {/*  </p> */}
+              {/*  {this.renderAmountDisplay({ shouldHideBalance, amount: rewards })} */}
+              {/* </div> */}
             </div>
             }
             {this.props.rewards === undefined && (
