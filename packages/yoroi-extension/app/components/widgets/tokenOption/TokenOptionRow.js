@@ -15,6 +15,17 @@ type Props = {|
 
 @observer
 export default class TokenOptionRow extends Component<Props> {
+
+  static defaultProps: {|
+    id: string,
+    amount: string,
+    nameOnly: boolean,
+  |} = {
+    id: '',
+    amount: '',
+    nameOnly: false,
+  };
+
   render(): Node {
     const notOnlyName = !this.props.nameOnly;
     return (
