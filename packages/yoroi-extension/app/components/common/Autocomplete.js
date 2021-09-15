@@ -4,11 +4,12 @@
 import { useState } from 'react';
 import type { Node } from 'react';
 import { useCombobox, useMultipleSelection } from 'downshift';
-import { IconButton, Input, Box, InputLabel, FormControl, FormHelperText } from '@mui/material';
+import { Input, Box, InputLabel, FormControl, FormHelperText, useTheme, Chip } from '@mui/material';
 import { styled } from '@mui/system';
 import { slice } from 'lodash';
 import SuccessIcon from '../../assets/images/forms/done.inline.svg';
 import ErrorIcon from '../../assets/images/forms/error.inline.svg';
+import CloseIcon from '../../assets/images/close-chip.inline.svg';
 
 type Props = {|
   +options: Array<any>,
@@ -105,22 +106,21 @@ export default function Autocomplete({
 
   return (
     <StyledFormControl variant="outlined" error={Boolean(error)} disabled={disabled} fullWidth>
-      <StyledInputLabel htmlFor={id ?? 'autocomplete-combobox'} shrink {...getLabelProps()}>
+      <StyledInputLabel htmlFor={id ?? 'autocomplete-combobox'} {...getLabelProps()}>
         {label}
       </StyledInputLabel>
       <InputWrapper onClick={toggleMenu} error={error} isOpen={isOpen}>
         {selectedItems.map((selectedItem, index) => (
-          <Tag key={`selected-item-${index}`} {...getSelectedItemProps({ selectedItem, index })}>
-            <span>{selectedItem}</span>
-            <IconButton
-              color="inherit"
-              onClick={() => {
-                removeSelectedItem(selectedItem);
-              }}
-            >
-              ×
-            </IconButton>
-          </Tag>
+          <Chip
+            variant="autocomplete"
+            key={`selected-item-${index}`}
+            label={selectedItem}
+            onDelete={() => {
+              removeSelectedItem(selectedItem);
+            }}
+            deleteIcon={<CloseIcon />}
+            {...getSelectedItemProps({ selectedItem, index })}
+          />
         ))}
         <Box sx={{ flex: 1 }} {...getComboboxProps()}>
           <Input
@@ -199,28 +199,6 @@ const StyledInputLabel = styled(InputLabel)({
   transform: 'translate(0) scale(1)',
 });
 
-const Tag = styled(Box)({
-  borderRadius: '2px',
-  margin: '5px 3px 0 3px',
-  padding: '3px 0 3px 6px',
-  background: 'hsl(9deg 46% 73%)',
-  height: '28px',
-  display: 'flex',
-  alignItems: 'center',
-  color: 'hsl(210deg 25% 98%)',
-  fontSize: '0.9rem',
-  fontWeight: 300,
-  span: {
-    marginLeft: '2px',
-  },
-  button: {
-    fontSize: '0.875rem',
-    '&:hover': {
-      background: 'none',
-    },
-  },
-});
-
 const ULList = styled(Box)({
   width: '100%',
   background: 'hsl(240deg 9% 96%)',
@@ -247,11 +225,12 @@ const InputWrapper = styled('div')(
       ? 'hsl(237deg 37% 11%)'
       : theme.name === 'classic'
       ? 'hsl(214 16% 81%)'
-      : '#d9d9d9'
+      : 'var(--mui-input-border-color)'
   };
-  background-color: ${theme.name === 'classic' ? 'hsl(240 9% 96%)' : '#fff'};
-  border-radius: 0;
-  min-height: 73px;
+  border-radius: ${theme.name === 'classic' ? '0' : '8px'};
+  background-color: ${theme.name === 'classic' ? 'hsl(240 9% 96%)' : 'white'};
+  min-height: ${theme.name === 'classic' ? '73px' : '140px'};
+  align-content: baseline;
   display: inline-flex;
   padding: 0 10px 10px 2px;
   flex-wrap: wrap;
