@@ -4,6 +4,7 @@ import { SFUIDisplayFonts } from '../fonts';
 import {
   ClassicButton,
   ClassicCheckbox,
+  ClassicInputLabel,
   ClassicTextField,
   ClassicMenu,
   ClassicMenuItem,
@@ -23,6 +24,7 @@ export const classicTheme: Object = createTheme({
     },
     MuiButton: ClassicButton,
     MuiCheckbox: ClassicCheckbox,
+    MuiInputLabel: ClassicInputLabel,
     MuiTextField: ClassicTextField,
     MuiMenuItem: ClassicMenuItem,
     MuiMenu: ClassicMenu,

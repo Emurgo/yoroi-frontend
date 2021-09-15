@@ -4,7 +4,7 @@
 import { useState } from 'react';
 import type { Node } from 'react';
 import { useCombobox, useMultipleSelection } from 'downshift';
-import { Input, Box, InputLabel, FormControl, FormHelperText, useTheme, Chip } from '@mui/material';
+import { Input, Box, InputLabel, FormControl, FormHelperText, Chip } from '@mui/material';
 import { styled } from '@mui/system';
 import { slice } from 'lodash';
 import SuccessIcon from '../../assets/images/forms/done.inline.svg';
@@ -105,10 +105,10 @@ export default function Autocomplete({
   });
 
   return (
-    <StyledFormControl variant="outlined" error={Boolean(error)} disabled={disabled} fullWidth>
-      <StyledInputLabel htmlFor={id ?? 'autocomplete-combobox'} {...getLabelProps()}>
+    <StyledFormControl error={Boolean(error)} disabled={disabled} fullWidth>
+      <InputLabel htmlFor={id ?? 'autocomplete-combobox'} {...getLabelProps()}>
         {label}
-      </StyledInputLabel>
+      </InputLabel>
       <InputWrapper onClick={toggleMenu} error={error} isOpen={isOpen}>
         {selectedItems.map((selectedItem, index) => (
           <Chip
@@ -188,15 +188,6 @@ const StyledFormControl = styled(FormControl)({
   marginTop: '23px',
   paddingBottom: '12px',
   color: 'hsl(237 37% 11%)',
-});
-
-const StyledInputLabel = styled(InputLabel)({
-  color: 'hsl(237 37% 11%)',
-  marginTop: '-26px',
-  letterSpacing: '1.12px',
-  fontWeight: 500,
-  fontSize: '1rem',
-  transform: 'translate(0) scale(1)',
 });
 
 const ULList = styled(Box)({
