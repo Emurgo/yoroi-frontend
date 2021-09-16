@@ -18,12 +18,12 @@
       }
     }
   }
-  
+
   .amountInput {
     position: relative;
     margin-bottom: 10px;
   }
-  
+
   .adaLabel {
     bottom: 16px;
     color: var(--theme-input-right-floating-text-color);
@@ -31,11 +31,6 @@
     position: absolute;
     right: 20px;
     text-transform: uppercase;
-  }
-  
-  .nextButton {
-    display: block !important;
-    margin: 30px auto 0;
   }
 
   .checkbox {
@@ -99,10 +94,6 @@
         font-family: var(--font-mono-regular);
       }
     }
-  }
-
-  .nextButton {
-    margin: 20px auto 0;
   }
 
   fieldset {

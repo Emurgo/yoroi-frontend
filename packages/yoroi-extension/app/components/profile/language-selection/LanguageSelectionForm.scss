@@ -1,4 +1,3 @@
-@import '../../../themes/mixins/loading-spinner';
 @import '../../../themes/mixins/error-message';
 
 .component {
@@ -12,17 +11,6 @@
     width: 400px;
   }
 
-  .submitButton,
-  .submitButtonSpinning {
-    display: block !important;
-    margin: 0 auto;
-    width: 100% !important;
-  }
-  
-  .submitButtonSpinning {
-    @include loading-spinner("../../../assets/images/spinner-light.svg");
-  }
-  
   .error {
     @include error-message;
     text-align: center;
@@ -31,7 +19,7 @@
 
   .languageSelect {
     margin-bottom: 10px;
-  
+
     label {
       width: 100%;
       left: 0;

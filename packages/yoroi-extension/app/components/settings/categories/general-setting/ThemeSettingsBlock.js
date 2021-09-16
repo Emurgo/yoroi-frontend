@@ -3,8 +3,7 @@ import { Component } from 'react';
 import type { Node } from 'react';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
-import { Button } from 'react-polymorph/lib/components/Button';
-import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
+import { Button } from '@mui/material';
 import { defineMessages, intlShape, FormattedMessage, FormattedHTMLMessage } from 'react-intl';
 import styles from './ThemeSettingsBlock.scss';
 import { THEMES } from '../../../../themes';
@@ -85,11 +84,6 @@ export default class ThemeSettingsBlock extends Component<Props> {
       styles.themeImageWrapper,
     ]);
 
-    const exportButtonClasses = classnames([
-      'primary',
-      styles.button,
-    ]);
-
     const blogLink = (
       <a
         className={styles.link}
@@ -143,14 +137,11 @@ export default class ThemeSettingsBlock extends Component<Props> {
               <h3 className={styles.subTitle}>{intl.formatMessage(messages.themeYoroiClassic)}</h3>
             </button>
           </div>
-          <Button
-            className={exportButtonClasses}
-            label={intl.formatMessage(messages.themeExportButton)}
-            skin={ButtonSkin}
-            onClick={exportTheme.bind(this)}
-          />
-        </div>
 
+          <Button variant="primary" onClick={exportTheme.bind(this)} sx={{ width: '400px' }}>
+            {intl.formatMessage(messages.themeExportButton)}
+          </Button>
+        </div>
       </div>
     );
   }

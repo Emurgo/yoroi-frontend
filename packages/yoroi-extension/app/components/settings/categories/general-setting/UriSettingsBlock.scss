@@ -13,24 +13,16 @@
     margin-bottom: 12px;
   }
 
-  p,
-  button {
+  p {
     color: var(--theme-support-settings-text-color);
     font-size: 14px;
     line-height: 22px;
   }
 
   p button {
-    color: var(--theme-support-settings-link-color);
     @include underline(var(--theme-support-settings-link-color));
-    line-height: initial;
   }
 
-  .submitButton {
-    font-family: var(--font-medium);
-    width: 287px !important;
-    margin-top: 20px;
-  }
 
   p {
     margin-bottom: 2px;

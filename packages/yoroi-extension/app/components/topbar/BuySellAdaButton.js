@@ -3,12 +3,9 @@ import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape, } from 'react-intl';
-import styles from './BuySellAdaButton.scss';
+import { Button } from '@mui/material';
 import globalMessages from '../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import classnames  from 'classnames';
-import { Button } from 'react-polymorph/lib/components/Button';
-import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 
 type Props = {|
   +onBuySellClick: void => void,
@@ -27,11 +24,12 @@ export default class BuySellAdaButton extends Component<Props> {
 
     return (
       <Button
-        label={intl.formatMessage(globalMessages.buySellAda)}
-        className={classnames([styles.button, 'secondary'])}
+        variant="secondary"
+        sx={{ width: '230px' }}
         onClick={() => this.props.onBuySellClick()}
-        skin={ButtonSkin}
-      />
+      >
+        {intl.formatMessage(globalMessages.buySellAda)}
+      </Button>
     );
   }
 }

@@ -1,11 +1,9 @@
 // @flow
 import { Component } from 'react';
 import type { Node } from 'react';
-import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { Select } from 'react-polymorph/lib/components/Select';
-import { Button } from 'react-polymorph/lib/components/Button';
-import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
+import { LoadingButton } from '@mui/lab';
 import { SelectSkin } from 'react-polymorph/lib/skins/simple/SelectSkin';
 import { intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
@@ -69,10 +67,6 @@ export default class LanguageSelectionForm extends Component<Props> {
       label: intl.formatMessage(language.label),
       svg: language.svg
     }));
-    const buttonClasses = classnames([
-      'primary',
-      isSubmitting ? styles.submitButtonSpinning : styles.submitButton,
-    ]);
 
     return (
       <div className={styles.component}>
@@ -96,12 +90,14 @@ export default class LanguageSelectionForm extends Component<Props> {
             </p>
           )}
 
-          <Button
-            className={buttonClasses}
-            label={intl.formatMessage(globalMessages.continue)}
-            onMouseUp={this.submit}
-            skin={ButtonSkin}
-          />
+          <LoadingButton
+            variant="primary"
+            fullWidth
+            loading={isSubmitting}
+            onClick={this.submit}
+          >
+            {intl.formatMessage(globalMessages.continue)}
+          </LoadingButton>
 
           {!tier1Languages.includes(currentLocale) &&
             <div className={styles.info}>

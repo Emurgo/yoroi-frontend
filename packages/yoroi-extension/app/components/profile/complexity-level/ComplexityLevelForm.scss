@@ -81,22 +81,12 @@
         line-height: 1.25rem;
       }
     }
-    .submitButton,
-    .submitButtonSpinning {
-      display: block !important;
-      margin: 0;
-      width: 100%;
-    }
-    
-    .submitButtonSpinning {
-      @include loading-spinner("../../../assets/images/spinner-light.svg");
-    }
-    
+
     .error {
       @include error-message;
       text-align: center;
       margin-bottom: 1rem;
     }
-    
+
   }
 }

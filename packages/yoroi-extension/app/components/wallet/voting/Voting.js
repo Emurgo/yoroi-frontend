@@ -6,8 +6,7 @@ import classnames from 'classnames';
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { Button } from 'react-polymorph/lib/components/Button';
-import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
+import { Button } from '@mui/material';
 import AppStoreBadge from '../../../assets/images/app-store-badge.inline.svg';
 import PlayStoreBadge from '../../../assets/images/google-play-badge.inline.svg';
 import WarningBox from '../../widgets/WarningBox';
@@ -113,10 +112,6 @@ export default class Voting extends Component<Props> {
       )
       : (null);
 
-    const buttonClasses = classnames([
-      'primary',
-    ]);
-
     return (
       <>
         {pendingTxWarningComponent}
@@ -184,12 +179,13 @@ export default class Voting extends Component<Props> {
           </div>
           <div className={styles.registerButton}>
             <Button
-              className={buttonClasses}
-              label={intl.formatMessage(globalMessages.registerLabel)}
-              onMouseUp={this.props.start}
-              skin={ButtonSkin}
+              variant="primary"
+              onClick={this.props.start}
               disabled={this.props.hasAnyPending}
-            />
+              sx={{ width: '400px' }}
+            >
+              {intl.formatMessage(globalMessages.registerLabel)}
+            </Button>
           </div>
         </div>
       </>
