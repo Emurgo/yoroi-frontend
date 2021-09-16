@@ -278,5 +278,6 @@ test('Create Trezor transaction', async () => {
       ],
       type: CERTIFICATE_TYPE.StakeRegistration,
     }],
+    signingMode: 0,
   });
 });

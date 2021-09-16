@@ -20,6 +20,7 @@ import {
 import {
   isCardanoHaskell,
   getCardanoHaskellBaseConfig,
+  isErgo,
 } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { genTimeToSlot } from '../../api/ada/lib/storage/bridge/timeUtils';
 import { generatePrivateKeyForCatalyst } from '../../api/ada/lib/cardanoCrypto/cryptoWallet';
@@ -124,7 +125,7 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
       this.loadingCatalystRoundInfo = true
     })
     const publicDeriver = this.stores.wallets.selected;
-    if (!publicDeriver) {
+    if (!publicDeriver || isErgo(publicDeriver.getParent().getNetworkInfo())) {
       runInAction(() => {
         this.loadingCatalystRoundInfo = false
       })

@@ -10,6 +10,7 @@ type Props = {|
   +onCardano: void => void,
   +onCardanoTestnet: void => void,
   +onErgo: void | (void => void),
+  +onAlonzoTestnet: void => void,
 |};
 
 @observer
@@ -23,6 +24,7 @@ export default class PickCurrencyDialogContainer extends Component<Props> {
         onCardano={this.props.onCardano}
         onCardanoTestnet={this.props.onCardanoTestnet}
         onErgo={this.props.onErgo}
+        onAlonzoTestnet={this.props.onAlonzoTestnet}
       />
     );
   }
