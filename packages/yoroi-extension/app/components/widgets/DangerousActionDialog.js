@@ -8,8 +8,7 @@ import DialogCloseButton from './DialogCloseButton';
 import Dialog from './Dialog';
 import globalMessages from '../../i18n/global-messages';
 import LocalizableError from '../../i18n/LocalizableError';
-import { Checkbox } from 'react-polymorph/lib/components/Checkbox';
-import { CheckboxSkin } from 'react-polymorph/lib/skins/simple/CheckboxSkin';
+import CheckboxLabel from '../common/CheckboxLabel';
 import styles from './DangerousActionDialog.scss';
 import dangerousButtonStyles from '../../themes/overrides/DangerousButton.scss';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
@@ -85,11 +84,10 @@ export default class DangerousActionDialog extends Component<Props> {
         {this.props.children}
 
         <div className={styles.checkbox}>
-          <Checkbox
+          <CheckboxLabel
             label={this.props.checkboxAcknowledge}
             onChange={this.props.toggleCheck}
             checked={this.props.isSubmitting || this.props.isChecked}
-            skin={CheckboxSkin}
           />
         </div>
 

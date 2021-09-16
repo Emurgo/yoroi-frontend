@@ -3,7 +3,6 @@ import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import classNames from 'classnames';
-import { Checkbox } from 'react-polymorph/lib/components/Checkbox';
 import { Select } from 'react-polymorph/lib/components/Select';
 import { SelectSkin } from 'react-polymorph/lib/skins/simple/SelectSkin';
 import { defineMessages, intlShape } from 'react-intl';
@@ -11,7 +10,7 @@ import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
 import LocalizableError from '../../i18n/LocalizableError';
 import styles from './WalletPaperDialog.scss';
 import ReactMarkdown from 'react-markdown';
-import { CheckboxOwnSkin } from '../../themes/skins/CheckboxOwnSkin';
+import CheckboxLabel from '../common/CheckboxLabel';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import Dialog from '../widgets/Dialog';
 import DialogCloseButton from '../widgets/DialogCloseButton';
@@ -36,7 +35,7 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  +onCreatePaper: {| numAddresses: number, printAccountPlate: boolean |} => void,
+  +onCreatePaper: ({| numAddresses: number, printAccountPlate: boolean |}) => void,
   +onCancel: void => void,
   +paperWalletsIntroText: string,
   +error?: ?LocalizableError,
@@ -70,21 +69,18 @@ export default class PaperWalletDialog extends Component<Props> {
         label: this.context.intl.formatMessage(messages.printIdentificationSelectLabel),
         value: true,
       },
-    }
+    },
   });
-
-  setPrintPaperIdentification: ((
-    printPaperWalletIdentification: boolean
-  ) => void) = (printPaperWalletIdentification) => {
-    this.form.$('printPaperWalletIdentification').value = printPaperWalletIdentification;
-  };
 
   render(): Node {
     const { intl } = this.context;
     const { error, paperWalletsIntroText, onCancel } = this.props;
     const numAddresses = this.form.$('numAddresses');
     const printPaperWalletIdentification = this.form.$('printPaperWalletIdentification');
-    const numAddressOptions = [...Array(5).keys()].map(x => ({ value: `${x + 1}`, label: `${x + 1}` }));
+    const numAddressOptions = [...Array(5).keys()].map(x => ({
+      value: `${x + 1}`,
+      label: `${x + 1}`,
+    }));
     const componentClassNames = classNames([styles.component, 'general']);
     const numAddressesSelectClassNames = classNames([styles.numAddressesSelect]);
 
@@ -105,7 +101,6 @@ export default class PaperWalletDialog extends Component<Props> {
         actions={actions}
         closeButton={<DialogCloseButton />}
       >
-
         <div className={styles.intro}>
           <ReactMarkdown source={paperWalletsIntroText} escapeHtml={false} />
         </div>
@@ -118,23 +113,15 @@ export default class PaperWalletDialog extends Component<Props> {
           isOpeningUpward
         />
 
-        <Checkbox
-          skin={CheckboxOwnSkin}
-          {...printPaperWalletIdentification.bind()}
+        <CheckboxLabel
           checked={printPaperWalletIdentification.value}
-          onChange={this.setPrintPaperIdentification}
+          onChange={printPaperWalletIdentification.onChange}
           label={this.context.intl.formatMessage(messages.printIdentificationSelectLabel)}
           description={this.context.intl.formatMessage(messages.printIdentificationMessage)}
         />
 
-        {error && (
-          <p className={styles.error}>
-            {intl.formatMessage(error, error.values)}
-          </p>
-        )}
-
+        {error && <p className={styles.error}>{intl.formatMessage(error, error.values)}</p>}
       </Dialog>
     );
   }
-
 }
