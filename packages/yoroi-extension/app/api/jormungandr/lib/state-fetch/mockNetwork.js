@@ -576,7 +576,7 @@ export function toRemoteByronTx(
   const signedTx = RustModule.WalletV2.SignedTransaction
     .from_bytes(Buffer.from(request.signedTx, 'base64'));
   const hash = signedTx.id();
-  const transaction = JSONBigInt.parse(signedTx.to_json()).tx;
+  const transaction = signedTx.to_json().tx;
 
   const base = {
     hash,

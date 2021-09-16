@@ -375,7 +375,26 @@ export async function connectorSignTx(
       dataBoxesToSpend,
     );
   debug('signedTx', '', signedTx);
-  return JSONBigInt.parse(signedTx.to_json());
+
+  const json = JSONBigInt.parse(signedTx.to_json());
+  return {
+    id: json.id,
+    inputs: json.inputs,
+    dataInputs: json.dataInputs,
+    outputs: json.outputs.map(output => ({
+      boxId: output.boxId,
+      value: output.value.toString(),
+      ergoTree: output.ergoTree,
+      assets: output.assets.map(asset => ({
+        tokenId: asset.tokenId,
+        amount: asset.amount.toString(),
+      })),
+      additionalRegisters: output.additionalRegisters,
+      creationHeight: output.creationHeight,
+      transactionId: output.transactionId,
+      index: output.index
+    })),
+  };
 }
 
 export async function connectorSendTx(

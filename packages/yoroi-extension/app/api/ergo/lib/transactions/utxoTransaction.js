@@ -460,12 +460,15 @@ export function signTransaction(request: {|
     inputs: json.inputs,
     dataInputs: json.dataInputs,
     outputs: json.outputs.map(output => ({
-      value: output.value,
+      value: output.value.toString(),
       ergoTree: output.ergoTree,
       creationHeight: output.creationHeight,
-      assets: output.assets,
+      assets: output.assets?.map(asset => ({
+        tokenId: asset.tokenId, // hex
+        amount: asset.amount.toString(),
+      })),
       additionalRegisters: output.additionalRegisters,
-    })),
+    }))
   };
 }
 
