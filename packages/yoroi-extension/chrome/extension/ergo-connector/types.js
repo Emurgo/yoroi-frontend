@@ -399,6 +399,9 @@ export type ConnectedSites = {|
   sites: Array<string>,
 |};
 
+export type Protocol = {|
+  type: string
+|}
 export type RpcUid = number;
 
 export type PendingSignData = {|

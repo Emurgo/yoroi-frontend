@@ -474,7 +474,10 @@ chrome.runtime.onMessage.addListener(async (
     sendResponse(({
       sites: activeSites.map(site => site.url),
     }: ConnectedSites));
-  }
+  } 
+  // else if (request.type === 'get_protocol') {
+  //   sendResponse({pro: 'ergo'})
+  // }
 });
 
 async function removeWallet(
@@ -577,6 +580,12 @@ chrome.runtime.onConnectExternal.addListener(port => {
     const tabId = port.sender.tab.id;
     ports.set(tabId, port);
     port.onMessage.addListener(async message => {
+      chrome.runtime.onMessage.addListener((request,sender, sendResponse) => {
+        if(request.type === 'get_protocol') {
+          sendResponse({ type : message.protocol })
+        }
+      })
+
       imgBase64Url = message.imgBase64Url;
       function rpcResponse(response) {
         port.postMessage({
