@@ -15,7 +15,7 @@ const globalStyles = (theme: Object): Node => (
         '--mui-button-primary-text-disabled': theme.palette.secondary.contrastText,
         '--mui-button-primary-text': theme.palette.secondary.contrastText,
         // general button secondary variant
-        '--mui-button-outlined-background-color': theme.palette.secondary.contrastText,
+        '--mui-button-outlined-background-color': 'transparent',
         '--mui-button-outlined-background-color-hover': theme.palette.secondary.light,
         '--mui-button-outlined-border-color': theme.palette.secondary.main,
         '--mui-button-outlined-border-color-disabled': theme.palette.secondary.disabled,
@@ -41,8 +41,9 @@ const globalStyles = (theme: Object): Node => (
 
         /* === CHECKBOX === */
         '--mui-checkbox-border-color': 'hsl(0 0% 21%)',
-        '--mui-checkbox-border-color-disabled': 'hsl(168 82% 45% / 20%)',
+        '--mui-checkbox-border-color-disabled': theme.palette.secondary.disabled,
         '--mui-checkbox-check-bg-color': theme.palette.secondary.main,
+        '--mui-checkbox-label-text-color': 'hsl(228 4% 23%)',
 
         /* === TEXTFIELD === */
         '--mui-input-bg-color': 'hsl(0 0% 0% / 0%)',
