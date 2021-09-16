@@ -9,8 +9,8 @@ const ClassicButton = {
       fontWeight: 500,
       minHeight: 44,
       minWidth: 230,
-      lineHeight: '21px',
       padding: '12px 20px',
+      textTransform: 'none',
     },
   },
   defaultProps: { disableRipple: true },
@@ -29,6 +29,9 @@ const ClassicButton = {
         '&.Mui-disabled': {
           backgroundColor: 'var(--mui-button-primary-background-color-disabled)',
           color: 'var(--mui-button-primary-text-disabled)',
+        },
+        '& .MuiLoadingButton-loadingIndicator': {
+          color: 'var(--mui-button-primary-text)',
         },
       },
     },
@@ -48,6 +51,29 @@ const ClassicButton = {
           backgroundColor: 'var(--mui-button-flat-background-color-disabled)',
           color: 'var(--mui-button-flat-text-color-disabled)',
         },
+        '& .MuiLoadingButton-loadingIndicator': {
+          color: 'var(--mui-button-flat-text-color)',
+        },
+      },
+    },
+    {
+      props: { variant: 'danger' },
+      style: {
+        backgroundColor: 'var(--mui-danger-button-background-color)',
+        color: 'white',
+        border: 0,
+        ':hover': {
+          backgroundColor: 'var(--mui-danger-button-background-color-hover)',
+        },
+        '&.Mui-active': {
+          backgroundColor: 'var(--mui-danger-button-background-color-active)',
+        },
+        '&.Mui-disabled': {
+          backgroundColor: 'var(--mui-danger-button-background-color-disabled)',
+        },
+        '& .MuiLoadingButton-loadingIndicator': {
+          color: 'var(--mui-danger-button-background-color)',
+        },
       },
     },
   ],
@@ -61,9 +87,10 @@ const ModernButton = {
       fontWeight: 500,
       minHeight: 52,
       minWidth: 230,
-      lineHeight: '21px',
+      lineHeight: '18px',
       textTransform: 'uppercase',
       padding: '16px',
+      height: 52,
     },
   },
   defaultProps: { disableRipple: true },
@@ -82,6 +109,9 @@ const ModernButton = {
         '&.Mui-disabled': {
           backgroundColor: 'var(--mui-button-primary-background-color-disabled)',
           color: 'var(--mui-button-primary-text-disabled)',
+        },
+        '& .MuiLoadingButton-loadingIndicator': {
+          color: 'var(--mui-button-primary-text)',
         },
       },
     },
@@ -105,6 +135,29 @@ const ModernButton = {
           backgroundColor: 'var(--mui-button-outlined-background-color-disabled)',
           color: 'var(--mui-button-outlined-text-color-disabled)',
           borderColor: 'var(--mui-button-outlined-border-color-disabled)',
+        },
+        '& .MuiLoadingButton-loadingIndicator': {
+          color: 'var(--mui-button-outlined-text-color)',
+        },
+      },
+    },
+    {
+      props: { variant: 'danger' },
+      style: {
+        backgroundColor: 'var(--mui-danger-button-background-color)',
+        color: 'white',
+        border: 0,
+        ':hover': {
+          backgroundColor: 'var(--mui-danger-button-background-color-hover)',
+        },
+        '&.Mui-active': {
+          backgroundColor: 'var(--mui-danger-button-background-color-active)',
+        },
+        '&.Mui-disabled': {
+          backgroundColor: 'var(--mui-danger-button-background-color-disabled)',
+        },
+        '& .MuiLoadingButton-loadingIndicator': {
+          color: 'var(--mui-danger-button-background-color)',
         },
       },
     },
