@@ -7,8 +7,6 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import classNames from 'classnames';
 import styles from './ConnectPage.scss';
 import { Button } from '@mui/material';
-import { Checkbox } from 'react-polymorph/lib/components/Checkbox';
-import { CheckboxSkin } from 'react-polymorph/lib/skins/simple/CheckboxSkin';
 import WalletCard from './WalletCard';
 import globalMessages, { connectorMessages } from '../../../i18n/global-messages';
 import { observer } from 'mobx-react';
@@ -19,11 +17,10 @@ import type {
 } from '../../../../chrome/extension/ergo-connector/types';
 import { LoadingWalletStates } from '../../types';
 import ProgressBar from '../ProgressBar';
-import type {
-  TokenLookupKey,
-} from '../../../api/common/lib/MultiToken';
+import type { TokenLookupKey } from '../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import { environment } from '../../../environment';
+import CheckboxLabel from '../../../components/common/CheckboxLabel';
 
 const messages = defineMessages({
   subtitle: {
@@ -118,10 +115,9 @@ class ConnectPage extends Component<Props> {
               <LoadingSpinner />
             </div>
           ) : isSuccess && publicDerivers.length ? (
-            publicDerivers.map((item) => (
+            publicDerivers.map(item => (
               <li key={item.name} className={styles.listItem}>
-                <Checkbox
-                  skin={CheckboxSkin}
+                <CheckboxLabel
                   label={
                     <WalletCard
                       shouldHideBalance={shouldHideBalance}
@@ -131,7 +127,6 @@ class ConnectPage extends Component<Props> {
                   }
                   onChange={() => onToggleCheckbox(item.publicDeriver.getPublicDeriverId())}
                   checked={selected === item.publicDeriver.getPublicDeriverId()}
-                  className={styles.checkbox}
                 />
               </li>
             ))
@@ -150,10 +145,15 @@ class ConnectPage extends Component<Props> {
             <p>{intl.formatMessage(connectorMessages.messageReadOnly)}</p>
           </div>
           <div className={styles.wrapperBtn}>
-            <Button variant="secondary" onClick={onCancel}>
+            <Button variant="secondary" onClick={onCancel} sx={{ minWidth: 'unset', flex: 1 }}>
               {intl.formatMessage(globalMessages.cancel)}
             </Button>
-            <Button variant="primary" disabled={isCheckedWallet} onClick={handleSubmit}>
+            <Button
+              variant="primary"
+              disabled={isCheckedWallet}
+              onClick={handleSubmit}
+              sx={{ minWidth: 'unset', flex: 1 }}
+            >
               {intl.formatMessage(globalMessages.connectLabel)}
             </Button>
           </div>

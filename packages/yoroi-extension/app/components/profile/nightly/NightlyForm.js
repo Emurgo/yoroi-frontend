@@ -1,11 +1,9 @@
 // @flow
 import { Component } from 'react';
 import type { Node } from 'react';
-import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { Button } from '@mui/material';
-import { Checkbox } from 'react-polymorph/lib/components/Checkbox';
-import { CheckboxSkin } from 'react-polymorph/lib/skins/simple/CheckboxSkin';
+import CheckboxLabel from '../../common/CheckboxLabel';
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import styles from './NightlyForm.scss';
 import globalMessages from '../../../i18n/global-messages';
@@ -57,7 +55,7 @@ type State = {|
 
 @observer
 export default class NightlyForm extends Component<Props, State> {
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
@@ -106,11 +104,10 @@ export default class NightlyForm extends Component<Props, State> {
             </ul>
           </div>
           <div className={styles.checkbox}>
-            <Checkbox
+            <CheckboxLabel
               label={intl.formatMessage(messages.acknowledgedRisks)}
               onChange={this.toggleAcceptance.bind(this)}
               checked={this.state.acknowledgedRisks}
-              skin={CheckboxSkin}
             />
           </div>
           <Button
@@ -125,5 +122,4 @@ export default class NightlyForm extends Component<Props, State> {
       </div>
     );
   }
-
 }

@@ -4,8 +4,7 @@ import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { LoadingButton } from '@mui/lab';
 import { defineMessages, intlShape } from 'react-intl';
-import { Checkbox } from 'react-polymorph/lib/components/Checkbox';
-import { CheckboxSkin } from 'react-polymorph/lib/skins/simple/CheckboxSkin';
+import CheckboxLabel from '../../common/CheckboxLabel';
 import LocalizableError from '../../../i18n/LocalizableError';
 import TermsOfUseText from './TermsOfUseText';
 import PrivacyPolicy from './PrivacyPolicy';
@@ -34,11 +33,11 @@ type State = {|
 
 @observer
 export default class TermsOfUseForm extends Component<Props, State> {
-  static defaultProps: {|error: void|} = {
-    error: undefined
+  static defaultProps: {| error: void |} = {
+    error: undefined,
   };
 
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
@@ -66,11 +65,10 @@ export default class TermsOfUseForm extends Component<Props, State> {
           <TermsOfUseText localizedTermsOfUse={localizedTermsOfUse} fixedHeight />
 
           <div className={styles.checkbox}>
-            <Checkbox
+            <CheckboxLabel
               label={intl.formatMessage(messages[checkboxLabel])}
               onChange={this.toggleAcceptance.bind(this)}
               checked={areTermsOfUseAccepted || this.props.isSubmitting}
-              skin={CheckboxSkin}
             />
 
             <LoadingButton
@@ -84,11 +82,7 @@ export default class TermsOfUseForm extends Component<Props, State> {
             </LoadingButton>
           </div>
 
-          {error && (
-            <p className={styles.error}>
-              {intl.formatMessage(error, error.values)}
-            </p>
-          )}
+          {error && <p className={styles.error}>{intl.formatMessage(error, error.values)}</p>}
         </div>
       </div>
     );
