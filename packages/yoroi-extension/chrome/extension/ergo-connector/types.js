@@ -400,7 +400,7 @@ export type ConnectedSites = {|
 |};
 
 export type Protocol = {|
-  type: string
+  type: 'ergo' | 'cardano'
 |}
 export type RpcUid = number;
 
