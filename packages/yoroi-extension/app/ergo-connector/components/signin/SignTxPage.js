@@ -45,7 +45,7 @@ type Props = {|
   +onCancel: () => void,
   +onConfirm: string => void,
   +notification: ?Notification,
-  +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
+  +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow> | null,
   +defaultToken: DefaultTokenEntry,
   +network: $ReadOnly<NetworkRow>,
   +unitOfAccountSetting: UnitOfAccountSettingType,
