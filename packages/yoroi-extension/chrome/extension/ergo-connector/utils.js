@@ -4,6 +4,8 @@ import type { Tx } from './types';
 import type { TokenRow } from '../../../app/api/ada/lib/storage/database/primitives/tables';
 import { Logger } from '../../../app/utils/logging';
 
+import JSONBigInt from 'json-bigint';
+
 export function parseEIP0004Data(input: any): ?string {
   // https://github.com/ergoplatform/eips/blob/master/eip-0004.md
   // format is: 0e + vlq(len(body as bytes)) + body (as bytes formatted in hex)
@@ -60,7 +62,7 @@ export function mintedTokenInfo(tx: Tx): $ReadOnly<TokenRow>[] {
     }
   }
   if (tokens.length > 1) {
-    Logger.info(`tx ${JSON.stringify(tx)} had multiple EIP-0004-looking outputs`);
+    Logger.info(`tx ${JSONBigInt.stringify(tx)} had multiple EIP-0004-looking outputs`);
   }
   return tokens;
 }
