@@ -134,11 +134,7 @@ class SignTxPage extends Component<Props> {
       return mintedToken;
     }
 
-    try {
-      return this.props.getTokenInfo(tokenEntry);
-    } catch (error) {
-      return null
-    }
+    return this.props.getTokenInfo(tokenEntry);
   }
 
   displayUnAvailableToken: TokenEntry => Node = (tokenEntry) => {
