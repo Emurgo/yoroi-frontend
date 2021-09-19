@@ -5,8 +5,7 @@ import typeof * as WasmV3 from '@emurgo/js-chain-libs/js_chain_libs';
 import typeof * as WasmV4 from '@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib';
 import typeof * as SigmaRust from 'ergo-lib-wasm-browser';
 
-const MAX_OUTPUT_BYTES = 5000;
-
+const MAX_VALUE_BYTES = 5000;
 const MAX_TX_BYTES = 16384;
 
 class Module {
@@ -29,9 +28,9 @@ class Module {
       minimumUtxoVal,
       poolDeposit,
       keyDeposit,
-      maxOutputBytes = MAX_OUTPUT_BYTES,
+      maxValueBytes = MAX_VALUE_BYTES,
       maxTxBytes = MAX_TX_BYTES,
-    ) => _new(linearFee, minimumUtxoVal, poolDeposit, keyDeposit, maxOutputBytes, maxTxBytes);
+    ) => _new(linearFee, minimumUtxoVal, poolDeposit, keyDeposit, maxValueBytes, maxTxBytes);
   }
 
   // Need to expose through a getter to get Flow to detect the type correctly
