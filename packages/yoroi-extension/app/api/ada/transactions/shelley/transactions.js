@@ -577,6 +577,26 @@ function _newAdaUnsignedTxFromUtxo(
     .get_explicit_output()
     .checked_add(RustModule.WalletV4.Value.new(txBuilder.get_deposit()));
 
+  // prioritize inputs
+  const sortedUtxos: Array<RemoteUnspentOutput> = [...utxos].sort((u1, u2) => {
+    const u1Assets = u1.assets.length;
+    const u2Assets = u2.assets.length;
+    const u1Amount = parseInt(u1.amount, 10);
+    const u2Amount = parseInt(u2.amount, 10);
+    if (u1Assets === 0 || u2Assets === 0) {
+      // at least one of the utxos is clean
+      if (u1Assets === u2Assets) {
+        // both utxos are clean - randomize them
+        return Math.random() - 0.5;
+      }
+      // The clean utxo is prioritized
+      return u1Assets - u2Assets;
+    }
+    // both utxos are dirty
+    // dirty utxos with highest ADA are prioritised
+    return u2Amount - u1Amount;
+  });
+
   // pick inputs
   const usedUtxos: Array<RemoteUnspentOutput> = [];
   {
@@ -586,7 +606,7 @@ function _newAdaUnsignedTxFromUtxo(
     // this flag is set when one extra input is added
     let oneExtraAdded = false;
     // add utxos until we have enough to send the transaction
-    for (const utxo of utxos) {
+    for (const utxo of sortedUtxos) {
       if (oneExtraAdded) {
         break;
       }
