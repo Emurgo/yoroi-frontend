@@ -577,25 +577,41 @@ function _newAdaUnsignedTxFromUtxo(
     .get_explicit_output()
     .checked_add(RustModule.WalletV4.Value.new(txBuilder.get_deposit()));
 
+  const utxosMapped = utxos.map((u: RemoteUnspentOutput) => {
+    if (u.assets.length === 0) {
+      return [u, true];
+    }
+    const amount = RustModule.WalletV4.BigNum.from_str(u.amount);
+    const minRequired = RustModule.WalletV4.min_ada_required(
+      cardanoValueFromRemoteFormat(u),
+      protocolParams.minimumUtxoVal,
+    );
+    const spendable = parseInt(amount.clamped_sub(minRequired).to_str(), 10);
+    // Round down the spendable value to the nearest full ADA for safer deposit
+    // TODO: unmagic the constant
+    return [u, false, Math.floor(spendable / 1_000_000) * 1_000_000];
+  });
+
+  const utxosFiltered = utxosMapped
+    .filter(([, isPure, spendableValue]) => isPure || (spendableValue > 0));
+
   // prioritize inputs
-  const sortedUtxos: Array<RemoteUnspentOutput> = [...utxos].sort((u1, u2) => {
-    const u1Assets = u1.assets.length;
-    const u2Assets = u2.assets.length;
-    const u1Amount = parseInt(u1.amount, 10);
-    const u2Amount = parseInt(u2.amount, 10);
-    if (u1Assets === 0 || u2Assets === 0) {
+  const sortedUtxos: Array<RemoteUnspentOutput> = utxosFiltered.sort((v1, v2) => {
+    const [, isPure1, spendableValue1] = v1;
+    const [, isPure2, spendableValue2] = v2;
+    if (isPure1 || isPure2) {
       // at least one of the utxos is clean
-      if (u1Assets === u2Assets) {
+      if (isPure1 && isPure2) {
         // both utxos are clean - randomize them
         return Math.random() - 0.5;
       }
       // The clean utxo is prioritized
-      return u1Assets - u2Assets;
+      return isPure1 ? -1 : 1;
     }
     // both utxos are dirty
-    // dirty utxos with highest ADA are prioritised
-    return u2Amount - u1Amount;
-  });
+    // dirty utxos with highest spendable ADA are prioritised
+    return spendableValue2 - spendableValue1;
+  }).map(([u]) => u);
 
   // pick inputs
   const usedUtxos: Array<RemoteUnspentOutput> = [];
