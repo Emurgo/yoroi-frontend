@@ -434,6 +434,43 @@ export function newAdaUnsignedTxFromUtxo(
   allowNoOutputs: boolean,
   metadata: RustModule.WalletV4.AuxiliaryData | void,
 ): V4UnsignedTxUtxoResponse {
+
+  const utxosMapped = utxos.map((u: RemoteUnspentOutput) => {
+    if (u.assets.length === 0) {
+      return [u, true];
+    }
+    const amount = RustModule.WalletV4.BigNum.from_str(u.amount);
+    const minRequired = RustModule.WalletV4.min_ada_required(
+      cardanoValueFromRemoteFormat(u),
+      protocolParams.minimumUtxoVal,
+    );
+    const spendable = parseInt(amount.clamped_sub(minRequired).to_str(), 10);
+    // Round down the spendable value to the nearest full ADA for safer deposit
+    // TODO: unmagic the constant
+    return [u, false, Math.floor(spendable / 1_000_000) * 1_000_000];
+  });
+
+  const utxosFiltered = utxosMapped
+    .filter(([, isPure, spendableValue]) => isPure || (spendableValue > 0));
+
+  // prioritize inputs
+  const sortedUtxos: Array<RemoteUnspentOutput> = utxosFiltered.sort((v1, v2) => {
+    const [, isPure1, spendableValue1] = v1;
+    const [, isPure2, spendableValue2] = v2;
+    if (isPure1 || isPure2) {
+      // at least one of the utxos is clean
+      if (isPure1 && isPure2) {
+        // both utxos are clean - randomize them
+        return Math.random() - 0.5;
+      }
+      // The clean utxo is prioritized
+      return isPure1 ? -1 : 1;
+    }
+    // both utxos are dirty
+    // dirty utxos with highest spendable ADA are prioritised
+    return spendableValue2 - spendableValue1;
+  }).map(([u]) => u);
+
   /*
     This is an ad-hoc optimization for one specific senario:
     If the input is enough to cover the output and the fee, but the remaining amount
@@ -446,7 +483,7 @@ export function newAdaUnsignedTxFromUtxo(
   const result = _newAdaUnsignedTxFromUtxo(
     outputs,
     changeAdaAddr,
-    utxos,
+    sortedUtxos,
     absSlotNumber,
     protocolParams,
     certificates,
@@ -460,7 +497,7 @@ export function newAdaUnsignedTxFromUtxo(
   const resultWithOneExtraInput = _newAdaUnsignedTxFromUtxo(
     outputs,
     changeAdaAddr,
-    utxos,
+    sortedUtxos,
     absSlotNumber,
     protocolParams,
     certificates,
@@ -577,42 +614,6 @@ function _newAdaUnsignedTxFromUtxo(
     .get_explicit_output()
     .checked_add(RustModule.WalletV4.Value.new(txBuilder.get_deposit()));
 
-  const utxosMapped = utxos.map((u: RemoteUnspentOutput) => {
-    if (u.assets.length === 0) {
-      return [u, true];
-    }
-    const amount = RustModule.WalletV4.BigNum.from_str(u.amount);
-    const minRequired = RustModule.WalletV4.min_ada_required(
-      cardanoValueFromRemoteFormat(u),
-      protocolParams.minimumUtxoVal,
-    );
-    const spendable = parseInt(amount.clamped_sub(minRequired).to_str(), 10);
-    // Round down the spendable value to the nearest full ADA for safer deposit
-    // TODO: unmagic the constant
-    return [u, false, Math.floor(spendable / 1_000_000) * 1_000_000];
-  });
-
-  const utxosFiltered = utxosMapped
-    .filter(([, isPure, spendableValue]) => isPure || (spendableValue > 0));
-
-  // prioritize inputs
-  const sortedUtxos: Array<RemoteUnspentOutput> = utxosFiltered.sort((v1, v2) => {
-    const [, isPure1, spendableValue1] = v1;
-    const [, isPure2, spendableValue2] = v2;
-    if (isPure1 || isPure2) {
-      // at least one of the utxos is clean
-      if (isPure1 && isPure2) {
-        // both utxos are clean - randomize them
-        return Math.random() - 0.5;
-      }
-      // The clean utxo is prioritized
-      return isPure1 ? -1 : 1;
-    }
-    // both utxos are dirty
-    // dirty utxos with highest spendable ADA are prioritised
-    return spendableValue2 - spendableValue1;
-  }).map(([u]) => u);
-
   // pick inputs
   const usedUtxos: Array<RemoteUnspentOutput> = [];
   {
@@ -622,7 +623,7 @@ function _newAdaUnsignedTxFromUtxo(
     // this flag is set when one extra input is added
     let oneExtraAdded = false;
     // add utxos until we have enough to send the transaction
-    for (const utxo of sortedUtxos) {
+    for (const utxo of utxos) {
       if (oneExtraAdded) {
         break;
       }
