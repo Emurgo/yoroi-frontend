@@ -649,6 +649,7 @@
   "wallet.send.confirmationDialog.submit": "Send",
   "wallet.send.confirmationDialog.title": "Confirm transaction",
   "wallet.send.confirmationDialog.totalLabel": "Total",
+  "wallet.send.confirmationDialog.txSizeLabel": "Size (bytes)",
   "wallet.send.confirmationDialog.walletPasswordFieldPlaceholder": "Type your spending password",
   "wallet.send.confirmationDialog.walletPasswordLabel": "Spending password",
   "wallet.send.form.calculatingFee": "Calculating fee...",

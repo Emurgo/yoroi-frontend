@@ -224,6 +224,10 @@ const globalMessages: * = defineMessages({
     id: 'wallet.send.confirmationDialog.totalLabel',
     defaultMessage: '!!!Total',
   },
+  walletSendConfirmationTxSizeLabel: {
+    id: 'wallet.send.confirmationDialog.txSizeLabel',
+    defaultMessage: '!!!Size',
+  },
   connectLabel: {
     id: 'wallet.connect.hw.dialog.connect.button.label',
     defaultMessage: '!!!Connect',
