@@ -5,6 +5,7 @@ import typeof * as WasmV3 from '@emurgo/js-chain-libs/js_chain_libs';
 import typeof * as WasmV4 from '@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib';
 import typeof * as SigmaRust from 'ergo-lib-wasm-browser';
 
+// TODO: unmagic the constants
 const MAX_VALUE_BYTES = 5000;
 const MAX_TX_BYTES = 16384;
 
