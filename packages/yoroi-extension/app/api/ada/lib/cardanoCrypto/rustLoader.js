@@ -3,6 +3,7 @@
 import typeof * as WasmV2 from 'cardano-wallet-browser';
 import typeof * as WasmV3 from '@emurgo/js-chain-libs/js_chain_libs';
 import typeof * as WasmV4 from '@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib';
+import type { BigNum, LinearFee, TransactionBuilder } from '@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib';
 import typeof * as SigmaRust from 'ergo-lib-wasm-browser';
 
 // TODO: unmagic the constants
@@ -37,13 +38,13 @@ class Module {
   }
   // Need to expose through a getter to get Flow to detect the type correctly
   WalletV4TxBuilder(
-    linearFee: WasmV4.LinearFee,
-    minimumUtxoVal: WasmV4.BigNum,
-    poolDeposit: WasmV4.BigNum,
-    keyDeposit: WasmV4.BigNum,
+    linearFee: LinearFee,
+    minimumUtxoVal: BigNum,
+    poolDeposit: BigNum,
+    keyDeposit: BigNum,
     maxValueBytes: number = MAX_VALUE_BYTES,
     maxTxBytes: number = MAX_TX_BYTES,
-  ): WasmV4.TransactionBuilder {
+  ): TransactionBuilder {
     return this.WalletV4.TransactionBuilder.new(
       linearFee,
       minimumUtxoVal,
