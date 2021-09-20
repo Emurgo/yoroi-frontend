@@ -435,11 +435,22 @@ export function newAdaUnsignedTxFromUtxo(
   metadata: RustModule.WalletV4.AuxiliaryData | void,
 ): V4UnsignedTxUtxoResponse {
 
-  const utxosMapped: Array<[RemoteUnspentOutput, boolean, number]> =
+  const outputAssets = outputs.reduce((set, o) => {
+    o.amount.values
+      .map(v => v.identifier)
+      .filter(id => id.length > 0)
+      .forEach(id => set.add(id));
+    return set;
+  }, new Set<string>());
+  const isAssetsRequired = outputAssets.size > 0;
+
+  const utxosMapped: Array<[RemoteUnspentOutput, boolean, boolean, number]> =
     utxos.map((u: RemoteUnspentOutput) => {
       if (u.assets.length === 0) {
-        return [u, true, 0];
+        return [u, true, false, 0];
       }
+      const hasRequiredAsset = isAssetsRequired
+        && u.assets.some(a => outputAssets.has(a.assetId));
       const amount = RustModule.WalletV4.BigNum.from_str(u.amount);
       const minRequired = RustModule.WalletV4.min_ada_required(
         cardanoValueFromRemoteFormat(u),
@@ -448,16 +459,23 @@ export function newAdaUnsignedTxFromUtxo(
       const spendable = parseInt(amount.clamped_sub(minRequired).to_str(), 10);
       // Round down the spendable value to the nearest full ADA for safer deposit
       // TODO: unmagic the constant
-      return [u, false, Math.floor(spendable / 1_000_000) * 1_000_000];
+      return [u, false, hasRequiredAsset, Math.floor(spendable / 1_000_000) * 1_000_000];
     });
 
-  const utxosFiltered: Array<[RemoteUnspentOutput, boolean, number]> = utxosMapped
-    .filter(([, isPure, spendableValue]) => isPure || (spendableValue > 0));
+  const utxosFiltered: Array<[RemoteUnspentOutput, boolean, boolean, number]> = utxosMapped
+    .filter(([, isPure, hasRequiredAsset, spendableValue]) =>
+      isPure || hasRequiredAsset || (spendableValue > 0));
 
   // prioritize inputs
   const sortedUtxos: Array<RemoteUnspentOutput> = utxosFiltered.sort((v1, v2) => {
-    const [, isPure1, spendableValue1] = v1;
-    const [, isPure2, spendableValue2] = v2;
+    const [, isPure1, hasRequiredAsset1, spendableValue1] = v1;
+    const [, isPure2, hasRequiredAsset2, spendableValue2] = v2;
+    if (hasRequiredAsset1 ^ hasRequiredAsset2) {
+      // one but not both of the utxos has required assets
+      // utxos with required assets are always prioritized
+      // ahead of any other, pure or dirty
+      return hasRequiredAsset1 ? -1 : 1;
+    }
     if (isPure1 || isPure2) {
       // at least one of the utxos is clean
       if (isPure1 && isPure2) {
