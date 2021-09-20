@@ -232,7 +232,7 @@ export function sendAllUnsignedTxFromUtxo(
     throw new NotEnoughMoneyToSendError();
   }
 
-  const txBuilder = RustModule.WalletV4.TransactionBuilder.new(
+  const txBuilder = RustModule.WalletV4TxBuilder(
     protocolParams.linearFee,
     protocolParams.minimumUtxoVal,
     protocolParams.poolDeposit,
@@ -564,7 +564,7 @@ function _newAdaUnsignedTxFromUtxo(
   const emptyAsset = RustModule.WalletV4.MultiAsset.new();
   shouldForceChange(undefined);
 
-  const txBuilder = RustModule.WalletV4.TransactionBuilder.new(
+  const txBuilder = RustModule.WalletV4TxBuilder(
     protocolParams.linearFee,
     protocolParams.minimumUtxoVal,
     protocolParams.poolDeposit,
@@ -917,7 +917,7 @@ export function genFilterSmallUtxo(request: {|
 |}): (
   RemoteUnspentOutput => boolean
 ) {
-  const txBuilder = RustModule.WalletV4.TransactionBuilder.new(
+  const txBuilder = RustModule.WalletV4TxBuilder(
     request.protocolParams.linearFee,
     // no need for the following parameters just to calculate the fee of adding a UTXO
     RustModule.WalletV4.BigNum.from_str('0'),

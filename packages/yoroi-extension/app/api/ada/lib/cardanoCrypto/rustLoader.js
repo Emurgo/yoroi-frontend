@@ -20,17 +20,6 @@ class Module {
     this._wasmv3 = await import('@emurgo/js-chain-libs/js_chain_libs');
     this._wasmv4 = await import('@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib');
     this._ergo = await import('ergo-lib-wasm-browser');
-
-    // Override Wallet4 Transaction builder constructor function
-    const _new = this._wasmv4.TransactionBuilder.new;
-    this._wasmv4.TransactionBuilder.new = (
-      linearFee,
-      minimumUtxoVal,
-      poolDeposit,
-      keyDeposit,
-      maxValueBytes = MAX_VALUE_BYTES,
-      maxTxBytes = MAX_TX_BYTES,
-    ) => _new(linearFee, minimumUtxoVal, poolDeposit, keyDeposit, maxValueBytes, maxTxBytes);
   }
 
   // Need to expose through a getter to get Flow to detect the type correctly
@@ -44,6 +33,24 @@ class Module {
   // Need to expose through a getter to get Flow to detect the type correctly
   get WalletV4(): WasmV4 {
     return this._wasmv4;
+  }
+  // Need to expose through a getter to get Flow to detect the type correctly
+  WalletV4TxBuilder(
+    linearFee: WasmV4.LinearFee,
+    minimumUtxoVal: WasmV4.BigNum,
+    poolDeposit: WasmV4.BigNum,
+    keyDeposit: WasmV4.BigNum,
+    maxValueBytes: number = MAX_VALUE_BYTES,
+    maxTxBytes: number = MAX_TX_BYTES,
+  ): WasmV4.TransactionBuilder {
+    return this.WalletV4.TransactionBuilder.new(
+      linearFee,
+      minimumUtxoVal,
+      poolDeposit,
+      keyDeposit,
+      maxValueBytes,
+      maxTxBytes,
+    );
   }
   // Need to expose through a getter to get Flow to detect the type correctly
   get SigmaRust(): SigmaRust {

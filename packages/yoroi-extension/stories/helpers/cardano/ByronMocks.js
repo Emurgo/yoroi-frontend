@@ -253,7 +253,7 @@ export const genTentativeByronTx = (
     utxo_id: '6930f123df83e4178b0324ae617b2028c0b38c6ff4660583a2abf1f7b08195fe0',
     assets: [],
   };
-  const txBuilder = RustModule.WalletV4.TransactionBuilder.new(
+  const txBuilder = RustModule.WalletV4TxBuilder(
     RustModule.WalletV4.LinearFee.new(
       RustModule.WalletV4.BigNum.from_str(config.LinearFee.coefficient),
       RustModule.WalletV4.BigNum.from_str(config.LinearFee.constant),
