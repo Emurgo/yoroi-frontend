@@ -111,6 +111,7 @@ function genMockByronBip44Cache(dummyWallet: PublicDeriver<>) {
     total: 0,
   }));
   const getBalanceRequest = new CachedRequest(request => request.getBalance());
+  const getAssetDepositRequest = new CachedRequest(request => request.getBalance());
   return {
     conceptualWalletCache: {
       conceptualWallet: dummyWallet.getParent(),
@@ -140,6 +141,7 @@ function genMockByronBip44Cache(dummyWallet: PublicDeriver<>) {
         recentRequest,
         allRequest,
         getBalanceRequest,
+        getAssetDepositRequest,
       },
     }),
     getPublicDeriverSettingsCache: (publicDeriver) => ({
