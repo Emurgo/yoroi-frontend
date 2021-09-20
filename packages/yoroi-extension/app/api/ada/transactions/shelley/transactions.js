@@ -13,6 +13,7 @@ import {
   NotEnoughMoneyToSendError,
   AssetOverflowError,
   NoOutputsError,
+  CannotSendBelowMinimumValueError,
 } from '../../../common/errors';
 
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
@@ -269,10 +270,19 @@ export function sendAllUnsignedTxFromUtxo(
       throw new Error(`${nameof(sendAllUnsignedTxFromUtxo)} receiver not a valid Shelley address`);
     }
 
-    // semantically, sending all ADA to somebody
-    // is the same as if you're sending all the ADA as change to yourself
-    // (module the fact the address doesn't belong to you)
-    const couldSendAmount = txBuilder.add_change_if_needed(wasmReceiver);
+    let couldSendAmount = false;
+    try {
+      // semantically, sending all ADA to somebody
+      // is the same as if you're sending all the ADA as change to yourself
+      // (module the fact the address doesn't belong to you)
+      couldSendAmount = txBuilder.add_change_if_needed(wasmReceiver);
+    } catch (e) {
+      if (!String(e).includes('Not enough ADA')) {
+        // any other error except not-enough-ada terminates here
+        console.error('Failed to construct send-all output!', e);
+        throw e;
+      }
+    }
     if (!couldSendAmount) {
       // if you couldn't send any amount,
       // it's because you couldn't cover the fee of adding an output
@@ -619,12 +629,19 @@ function _newAdaUnsignedTxFromUtxo(
       if (wasmReceiver == null) {
         throw new Error(`${nameof(newAdaUnsignedTxFromUtxo)} receiver not a valid Shelley address`);
       }
-      txBuilder.add_output(
-        RustModule.WalletV4.TransactionOutput.new(
-          wasmReceiver,
-          cardanoValueFromMultiToken(output.amount),
-        )
-      );
+      try {
+        txBuilder.add_output(
+          RustModule.WalletV4.TransactionOutput.new(
+            wasmReceiver,
+            cardanoValueFromMultiToken(output.amount),
+          )
+        );
+      } catch (e) {
+        if (String(e).includes('less than the minimum UTXO value')) {
+          throw new CannotSendBelowMinimumValueError();
+        }
+        throw e;
+      }
     }
   }
 
@@ -764,7 +781,16 @@ function _newAdaUnsignedTxFromUtxo(
     if (wasmChange == null) {
       throw new Error(`${nameof(newAdaUnsignedTxFromUtxo)} change not a valid Shelley address`);
     }
-    const changeWasAdded = txBuilder.add_change_if_needed(wasmChange);
+    let changeWasAdded: boolean;
+    try {
+      changeWasAdded = txBuilder.add_change_if_needed(wasmChange);
+    } catch (e) {
+      if (String(e).includes('Not enough ADA')) {
+        throw new NotEnoughMoneyToSendError();
+      }
+      console.error('Failed to construct tx change!', e);
+      throw e;
+    }
     if (forceChange && !changeWasAdded) {
       // note: this should never happened since it should have been handled by earlier code
       throw new Error(`No change added even though it should be forced`);
