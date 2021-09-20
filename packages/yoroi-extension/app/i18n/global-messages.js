@@ -124,6 +124,10 @@ const globalMessages: * = defineMessages({
     id: 'settings.menu.wallet.link.label',
     defaultMessage: '!!!Wallet',
   },
+  assetDepositLabel: {
+    id: 'settings.menu.assetDeposit.link.label',
+    defaultMessage: '!!!Locked assets deposit',
+  },
   languageEnglish: {
     id: 'global.language.english',
     defaultMessage: '!!!English',
