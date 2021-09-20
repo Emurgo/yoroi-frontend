@@ -16,9 +16,9 @@ export interface ISignRequest<T> {
   |}>,
   totalOutput(): MultiToken;
   fee(): MultiToken;
-  size?: () => {| full: number, outputs: number[] |};
   uniqueSenderAddresses(): Array<string>;
   receivers(includeChange: boolean): Array<string>;
   isEqual(tx: ?mixed): boolean;
   self(): T;
+  +size?: () => {| full: number, outputs: number[] |};
 }

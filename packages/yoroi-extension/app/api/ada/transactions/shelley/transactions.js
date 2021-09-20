@@ -435,22 +435,23 @@ export function newAdaUnsignedTxFromUtxo(
   metadata: RustModule.WalletV4.AuxiliaryData | void,
 ): V4UnsignedTxUtxoResponse {
 
-  const utxosMapped = utxos.map((u: RemoteUnspentOutput) => {
-    if (u.assets.length === 0) {
-      return [u, true];
-    }
-    const amount = RustModule.WalletV4.BigNum.from_str(u.amount);
-    const minRequired = RustModule.WalletV4.min_ada_required(
-      cardanoValueFromRemoteFormat(u),
-      protocolParams.minimumUtxoVal,
-    );
-    const spendable = parseInt(amount.clamped_sub(minRequired).to_str(), 10);
-    // Round down the spendable value to the nearest full ADA for safer deposit
-    // TODO: unmagic the constant
-    return [u, false, Math.floor(spendable / 1_000_000) * 1_000_000];
-  });
+  const utxosMapped: Array<[RemoteUnspentOutput, boolean, number]> =
+    utxos.map((u: RemoteUnspentOutput) => {
+      if (u.assets.length === 0) {
+        return [u, true, 0];
+      }
+      const amount = RustModule.WalletV4.BigNum.from_str(u.amount);
+      const minRequired = RustModule.WalletV4.min_ada_required(
+        cardanoValueFromRemoteFormat(u),
+        protocolParams.minimumUtxoVal,
+      );
+      const spendable = parseInt(amount.clamped_sub(minRequired).to_str(), 10);
+      // Round down the spendable value to the nearest full ADA for safer deposit
+      // TODO: unmagic the constant
+      return [u, false, Math.floor(spendable / 1_000_000) * 1_000_000];
+    });
 
-  const utxosFiltered = utxosMapped
+  const utxosFiltered: Array<[RemoteUnspentOutput, boolean, number]> = utxosMapped
     .filter(([, isPure, spendableValue]) => isPure || (spendableValue > 0));
 
   // prioritize inputs
