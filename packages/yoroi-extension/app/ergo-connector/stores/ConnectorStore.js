@@ -301,11 +301,18 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       await addErgoAssets({
         db: selectedWallet.getDb(),
         tokenIdentifiers,
-        getAssetInfo: stateFetcher.getAssetInfo,
+        getAssetInfo: async (req) => {
+          try {
+            return await stateFetcher.getAssetInfo(req);
+          } catch (e) {
+              console.error('Aseet info request failed', e);
+              return {};
+          }
+        },
         network: selectedWallet.getParent().getNetworkInfo(),
       });
     } catch (error) {
-      console.error('Token info unavailable', error.message)
+      console.error('Failed to add ergo assets!', error);
     }
   }
 
