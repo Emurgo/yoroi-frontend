@@ -40,14 +40,15 @@ import {
   isCardanoHaskell,
 } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { MultiToken, } from '../../api/common/lib/MultiToken';
+import type { DefaultTokenEntry, TokenEntry, } from '../../api/common/lib/MultiToken';
 import { genLookupOrFail, getTokenName } from '../stateless/tokenHelpers';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import { asAddressedUtxo, cardanoValueFromRemoteFormat } from '../../api/ada/transactions/utils';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
-import type { RemoteUnspentOutput } from '../../api/ada/lib/state-fetch/types';
 import { PRIMARY_ASSET_CONSTANTS } from '../../api/ada/lib/storage/database/primitives/enums';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
+import type { CardanoAddressedUtxo } from '../../api/ada/transactions/types';
 
 export type TxRequests = {|
   publicDeriver: PublicDeriver<>,
@@ -86,6 +87,13 @@ function getMinUtxoValue(network: $ReadOnly<NetworkRow>): RustModule.WalletV4.Bi
   const config = getCardanoHaskellBaseConfig(network)
     .reduce((acc, next) => Object.assign(acc, next), {});
   return RustModule.WalletV4.BigNum.from_str(config.MinimumUtxoVal);
+}
+
+function newMultiToken(
+  defaultTokenInfo: DefaultTokenEntry,
+  values: Array<TokenEntry> = [],
+): MultiToken {
+  return new MultiToken(values, defaultTokenInfo)
 }
 
 export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
@@ -128,9 +136,9 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     };
 
     const defaultUnconfirmedAmount = {
-      total: new MultiToken([], defaultTokenInfo),
-      incoming: new MultiToken([], defaultTokenInfo),
-      outgoing: new MultiToken([], defaultTokenInfo),
+      total: newMultiToken(defaultTokenInfo),
+      incoming: newMultiToken(defaultTokenInfo),
+      outgoing: newMultiToken(defaultTokenInfo),
       incomingInSelectedCurrency: new BigNumber(0),
       outgoingInSelectedCurrency: new BigNumber(0),
     };
@@ -358,15 +366,16 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
           try {
             const canGetUtxos = asGetAllUtxos(publicDeriver);
             if (canGetUtxos == null) {
-              return null;
+              return newMultiToken(defaultToken);
             }
             const utxos = await canGetUtxos.getAllUtxos();
             const addressedUtxos = asAddressedUtxo(utxos)
               .filter(u => u.assets.length > 0);
             const deposits: Array<RustModule.WalletV4.BigNum> =
-              addressedUtxos.map((u: RemoteUnspentOutput) => {
+              addressedUtxos.map((u: CardanoAddressedUtxo) => {
                 try {
                   return WalletV4.min_ada_required(
+                    // $FlowFixMe[prop-missing]
                     cardanoValueFromRemoteFormat(u),
                     minUtxoVal,
                   );
@@ -379,17 +388,18 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
               (a, b) => a.checked_add(b),
               WalletV4.BigNum.zero(),
             );
-            return new MultiToken(
+            return newMultiToken(
+              defaultToken,
               [{
                 identifier: PRIMARY_ASSET_CONSTANTS.Cardano,
                 amount: new BigNumber(sumDeposit.to_str()),
                 networkId: networkInfo.NetworkId,
               }],
-              defaultToken,
             );
           } catch (e) {
             console.error('Failed to request asset deposit recalc', e);
           }
+          return newMultiToken(defaultToken);
         },
       });
       if (!getBalanceRequest.promise || !getAssetDepositRequest.promise) throw new Error('should never happen');
