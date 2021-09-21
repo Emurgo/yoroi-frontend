@@ -723,7 +723,7 @@ describe('Create unsigned TX from UTXO', () => {
 });
 
 describe('Create unsigned TX from addresses', () => {
-  it('Should create a valid transaction without selection', () => {
+  it('Should create a valid transaction without change', () => {
     const addressedUtxos = genAddressedUtxos();
 
     const output = new MultiToken(
@@ -744,18 +744,18 @@ describe('Create unsigned TX from addresses', () => {
         amount: output,
       }],
       undefined,
-      [addressedUtxos[0], addressedUtxos[1]],
+      [addressedUtxos[1]],
       new BigNumber(0),
       getProtocolParams(),
       [],
       [],
       true,
     );
-    expect(unsignedTxResponse.senderUtxos).toEqual([addressedUtxos[0], addressedUtxos[1]]);
+    expect(unsignedTxResponse.senderUtxos).toEqual([addressedUtxos[1]]);
 
-    expect(unsignedTxResponse.txBuilder.get_explicit_input().coin().to_str()).toEqual('1000702');
+    expect(unsignedTxResponse.txBuilder.get_explicit_input().coin().to_str()).toEqual('1000001');
     expect(unsignedTxResponse.txBuilder.get_explicit_output().coin().to_str()).toEqual('5001');
-    expect(unsignedTxResponse.txBuilder.min_fee().to_str()).toEqual('1064');
+    expect(unsignedTxResponse.txBuilder.min_fee().to_str()).toEqual('992');
     // burns remaining amount
     expect(
       unsignedTxResponse.txBuilder.get_explicit_input().checked_sub(
