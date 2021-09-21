@@ -62,7 +62,19 @@ function Select({
         }}
         {...props}
       />
-      {helperText !== null ? <FormHelperText>{helperText}</FormHelperText> : null}
+      {helperText !== null ? (
+        <FormHelperText
+          sx={{
+            position: 'absolute',
+            marginLeft: 0,
+            lineHeight: '1.33',
+            fontSize: '12px',
+            bottom: '-5px',
+          }}
+        >
+          {helperText}
+        </FormHelperText>
+      ) : null}
     </SFormControl>
   );
 }
@@ -79,7 +91,9 @@ Select.defaultProps = {
 };
 
 const SFormControl = styled(FormControl)(({ theme }) => ({
+  position: 'relative',
   marginTop: theme.name === 'classic' ? '24px' : 0,
+  paddingBottom: '20px',
   '& .MuiOutlinedInput-root': {
     height: '50px',
     '& fieldset': {
