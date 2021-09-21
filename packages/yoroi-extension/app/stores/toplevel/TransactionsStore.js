@@ -512,8 +512,6 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
         exportRequest: request.exportRequest,
       });
 
-
-
       /** Intentionally added delay to feel smooth flow */
       setTimeout(async () => {
         await continuation();
