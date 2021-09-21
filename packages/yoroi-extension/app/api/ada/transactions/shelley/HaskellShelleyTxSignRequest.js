@@ -90,7 +90,7 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
     ).to_bytes()).toString('hex');
   }
 
-  size(): { full: number, outputs: Array<number> } {
+  size(): {| full: number, outputs: number[] |} {
     return {
       full: this.unsignedTx.full_size(),
       outputs: [...this.unsignedTx.output_sizes()],
