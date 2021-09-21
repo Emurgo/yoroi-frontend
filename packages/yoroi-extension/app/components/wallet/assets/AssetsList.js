@@ -10,7 +10,6 @@ import NoAssetLogo from '../../../assets/images/assets-page/asset-no.inline.svg'
 import ArrowsListFromBottom from '../../../assets/images/assets-page/arrows-list-from-bottom.inline.svg';
 import ArrowsListFromTop from '../../../assets/images/assets-page/arrows-list-from-top.inline.svg';
 import ArrowsList from '../../../assets/images/assets-page/arrows-list.inline.svg';
-import Info from '../../../assets/images/assets-page/info.inline.svg';
 import Search from '../../../assets/images/assets-page/search.inline.svg';
 import { truncateAddressShort } from '../../../utils/formatters';
 import BorderedBox from '../../widgets/BorderedBox';
@@ -79,15 +78,16 @@ export default class AssetsList extends Component<Props, State> {
     sortingColumn: '',
   };
 
-  search: ((e: SyntheticEvent<HTMLInputElement>) => void) = (event: SyntheticEvent<HTMLInputElement>) => {
-    const keyword = event.currentTarget.value
-    this.setState({ assetsList: this.props.assetsList })
-    if(!keyword) return
-    const regExp = new RegExp(keyword, 'gi')
-    const assetsListCopy = [...this.props.assetsList]
-    const filteredAssetsList = assetsListCopy.filter(a => a.name.match(regExp))
-    this.setState({ assetsList: filteredAssetsList })
-  };
+  search: ((e: SyntheticEvent<HTMLInputElement>) => void) =
+    (event: SyntheticEvent<HTMLInputElement>) => {
+      const keyword = event.currentTarget.value
+      this.setState({ assetsList: this.props.assetsList })
+      if(!keyword) return
+      const regExp = new RegExp(keyword, 'gi')
+      const assetsListCopy = [...this.props.assetsList]
+      const filteredAssetsList = assetsListCopy.filter(a => a.name.match(regExp))
+      this.setState({ assetsList: filteredAssetsList })
+    };
 
   compare: ((a: any, b: any, field: string) => number) = ( a, b, field ) => {
     let newSortDirection = SORTING_DIRECTIONS.UP

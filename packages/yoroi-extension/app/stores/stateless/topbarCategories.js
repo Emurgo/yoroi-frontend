@@ -14,7 +14,6 @@ import delegationListIcon from '../../assets/images/wallet-nav/tab-delegation_li
 import votingIcon from '../../assets/images/wallet-nav/voting.inline.svg';
 import assetsIcon from '../../assets/images/assets-page/assets.inline.svg';
 import environment from '../../environment';
-import { MultiToken } from '../../api/common/lib/MultiToken';
 
 const messages = defineMessages({
   transactions: {
