@@ -480,6 +480,7 @@ export function newAdaUnsignedTxFromUtxo(
   const sortedUtxos: Array<RemoteUnspentOutput> = utxosFiltered.sort((v1, v2) => {
     const [, isPure1, hasRequiredAsset1, spendableValue1] = v1;
     const [, isPure2, hasRequiredAsset2, spendableValue2] = v2;
+    // $FlowFixMe[unsafe-addition]
     if (hasRequiredAsset1 ^ hasRequiredAsset2) {
       // one but not both of the utxos has required assets
       // utxos with required assets are always prioritized
@@ -664,14 +665,16 @@ function _newAdaUnsignedTxFromUtxo(
         break;
       }
       const currentInputSum = txBuilder.get_explicit_input().checked_add(implicitSum);
-      const output = targetOutput
+      const neededInput = targetOutput
         .checked_add(RustModule.WalletV4.Value.new(txBuilder.min_fee()));
-      const remainingNeeded = output.clamped_sub(currentInputSum);
+      const excessiveInputAssets = currentInputSum.multiasset()
+        ?.sub(neededInput.multiasset() ?? emptyAsset);
 
+      const remainingNeeded = neededInput.clamped_sub(currentInputSum);
       // update amount required to make sure we have ADA required for change UTXO entry
-      if (shouldForceChange(currentInputSum.multiasset()?.sub(output.multiasset() ?? emptyAsset))) {
+      if (shouldForceChange(excessiveInputAssets)) {
         if (changeAdaAddr == null) throw new NoOutputsError();
-        const difference = currentInputSum.clamped_sub(output);
+        const difference = currentInputSum.clamped_sub(neededInput);
         const minimumNeededForChange = minRequiredForChange(
           txBuilder,
           changeAdaAddr,
@@ -685,13 +688,12 @@ function _newAdaUnsignedTxFromUtxo(
       }
 
       // stop if we've added all the assets we needed
+      const isNonEmptyInputs = usedUtxos.length > 0;
       {
         const remainingAssets = remainingNeeded.multiasset();
-        if (
-          remainingNeeded.coin().compare(RustModule.WalletV4.BigNum.from_str('0')) === 0 &&
-          (remainingAssets == null || remainingAssets.len() === 0) &&
-          usedUtxos.length > 0
-        ) {
+        const isRemainingNeededCoinZero = isBigNumZero(remainingNeeded.coin());
+        const isRemainingNeededAssetZero = (remainingAssets?.len() ?? 0) === 0;
+        if (isRemainingNeededCoinZero && isRemainingNeededAssetZero && isNonEmptyInputs) {
           if (oneExtraInput) {
             // We've added all the assets we need, but we add one extra.
             // Set the flag so that the adding loop stops after this extra one is added.
@@ -708,7 +710,7 @@ function _newAdaUnsignedTxFromUtxo(
           undefined : // avoid 'NO_NEED'
           {
             value: remainingNeeded,
-           hasInput: usedUtxos.length > 0,
+            hasInput: isNonEmptyInputs,
           },
         utxo,
         true,
@@ -985,4 +987,8 @@ export function genFilterSmallUtxo(request: {|
     );
     return feeForInput.lte(utxo.amount);
   };
+}
+
+function isBigNumZero(b: RustModule.WalletV4.BigNum): boolean {
+  return b.compare(RustModule.WalletV4.BigNum.zero()) === 0;
 }
