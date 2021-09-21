@@ -94,11 +94,11 @@ export default class AssetsList extends Component<Props, State> {
     if (!this.state.sortingDirection) {
       newSortDirection = SORTING_DIRECTIONS.UP
     } else if (this.state.sortingDirection === SORTING_DIRECTIONS.UP) {
-      newSortDirection = SORTING_DIRECTIONS.DOWN 
+      newSortDirection = SORTING_DIRECTIONS.DOWN
     }
 
     this.setState({ sortingDirection: newSortDirection })
-  
+
     if ( a[field] < b[field] ){
       return newSortDirection === SORTING_DIRECTIONS.UP ? -1 : 1;
     }
@@ -121,13 +121,13 @@ export default class AssetsList extends Component<Props, State> {
     } = this.state;
     if (!sortingDirection || sortingColumn !== column) {
       return <ArrowsList />
-    };
+    }
     if (sortingDirection === SORTING_DIRECTIONS.UP && sortingColumn === column) {
       return <ArrowsListFromTop />
-    };
+    }
     if (sortingDirection === SORTING_DIRECTIONS.DOWN && sortingColumn === column) {
       return <ArrowsListFromBottom />
-    };
+    }
     return <ArrowsList />;
   }
 
@@ -157,20 +157,26 @@ export default class AssetsList extends Component<Props, State> {
             <>
               <ul className={styles.columns}>
                 <li>
-                <button type='button' onClick={() => this.sortAssets(SORTING_COLUMNS.NAME)}>
-                  <p className={styles.headerText}>{intl.formatMessage(messages.nameAndTicker)}</p>
+                  <button type='button' onClick={() => this.sortAssets(SORTING_COLUMNS.NAME)}>
+                    <p className={styles.headerText}>
+                      {intl.formatMessage(messages.nameAndTicker)}
+                    </p>
                     {this.displayColumnLogo(SORTING_COLUMNS.NAME)}
-                </button>
+                  </button>
                 </li>
                 <li>
-                  <p className={styles.headerText}>{intl.formatMessage(messages.subject)}</p>
-                  <Info />
+                  <p className={styles.headerText}>
+                    {intl.formatMessage(messages.subject)}
+                  </p>
+                  {/* <Info /> TODO: subject info? */}
                 </li>
                 <li>
-                <button type='button' onClick={() => this.sortAssets(SORTING_COLUMNS.AMOUNT)}>
-                  <p className={styles.headerText}>{intl.formatMessage(messages.quantity)}</p>
+                  <button type='button' onClick={() => this.sortAssets(SORTING_COLUMNS.AMOUNT)}>
+                    <p className={styles.headerText}>
+                      {intl.formatMessage(messages.quantity)}
+                    </p>
                     {this.displayColumnLogo(SORTING_COLUMNS.AMOUNT)}
-                </button>
+                  </button>
                 </li>
               </ul>
               {assetsList.map(token => (
