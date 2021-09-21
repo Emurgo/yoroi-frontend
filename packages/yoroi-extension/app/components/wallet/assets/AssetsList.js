@@ -53,9 +53,9 @@ const messages = defineMessages({
     id: 'wallet.assets.quantity',
     defaultMessage: '!!!Quantity',
   },
-  subject: {
-    id: 'wallet.assets.subject',
-    defaultMessage: '!!!Subject',
+  identifier: {
+    id: 'wallet.assets.id',
+    defaultMessage: '!!!ID',
   },
   search: {
     id: 'wallet.assets.search',
@@ -166,9 +166,9 @@ export default class AssetsList extends Component<Props, State> {
                 </li>
                 <li>
                   <p className={styles.headerText}>
-                    {intl.formatMessage(messages.subject)}
+                    {intl.formatMessage(messages.identifier)}
                   </p>
-                  {/* <Info /> TODO: subject info? */}
+                  {/* <Info /> TODO: identifier info? */}
                 </li>
                 <li>
                   <button type='button' onClick={() => this.sortAssets(SORTING_COLUMNS.AMOUNT)}>

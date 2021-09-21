@@ -34,7 +34,7 @@ export default class WalletAssetsPage extends Component<InjectedOrGenerated<Gene
           entry,
           info: getTokenInfo(entry),
         })).map(token => ({
-          name: truncateToken(getTokenStrictName(token.info) ?? getTokenIdentifierIfExists(token.info) ?? '-'),
+          name: truncateToken(getTokenStrictName(token.info) ?? '-'),
           id: (getTokenIdentifierIfExists(token.info) ?? '-'),
           amount: genFormatTokenAmount(getTokenInfo)(token.entry)
         }));
