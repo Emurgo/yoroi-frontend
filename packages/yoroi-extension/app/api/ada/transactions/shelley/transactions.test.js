@@ -353,7 +353,7 @@ describe('Create unsigned TX from UTXO', () => {
     )).toThrow(NoOutputsError);
   });
 
-  it('Should pick ada-only inputs when using input selection', () => {
+  it('Should pick random pure inputs when using input selection', () => {
     const utxos: Array<RemoteUnspentOutput> = genSampleUtxos();
     const sampleAdaAddresses = genSampleAdaAddresses();
 
@@ -370,26 +370,60 @@ describe('Create unsigned TX from UTXO', () => {
       }
     );
 
-    const unsignedTxResponse = newAdaUnsignedTxFromUtxo(
-      [{
-        address: byronAddrToHex('Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4'),
-        amount: output,
-      }],
-      sampleAdaAddresses[0],
-      [utxos[0], utxos[1], utxos[2], utxos[3]],
-      new BigNumber(0),
-      getProtocolParams(),
-      [],
-      [],
-      true,
-    );
-    // input selection will only take 2 of the 3 inputs
-    // it takes 2 inputs because input selection algorithm
-    const expectedFee = new BigNumber('1166');
-    expect(unsignedTxResponse.senderUtxos).toEqual([utxos[0], utxos[1]]);
-    expect(unsignedTxResponse.txBuilder.get_explicit_input().coin().to_str()).toEqual('1000702');
-    expect(unsignedTxResponse.txBuilder.get_explicit_output().coin().to_str()).toEqual('999536');
-    expect(unsignedTxResponse.txBuilder.min_fee().to_str()).toEqual(expectedFee.toString());
+    function testTxConstruction(randomValues: number[], expected: {
+      inputs: any[],
+      fee: string,
+      sumInputs: string,
+      sumOutputs: string,
+    }): void {
+      randomValues.reduce(
+        (m, v) => m.mockReturnValueOnce(v),
+        jest.spyOn(global.Math, 'random'),
+      );
+
+      const unsignedTxResponse = newAdaUnsignedTxFromUtxo(
+        [{
+          address: byronAddrToHex('Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4'),
+          amount: output,
+        }],
+        sampleAdaAddresses[0],
+        [utxos[0], utxos[1], utxos[2], utxos[3]],
+        new BigNumber(0),
+        getProtocolParams(),
+        [],
+        [],
+        true,
+      );
+
+      jest.spyOn(global.Math, 'random').mockRestore();
+
+      const txBuilder = unsignedTxResponse.txBuilder;
+      expect(unsignedTxResponse.senderUtxos).toEqual(expected.inputs);
+      expect(txBuilder.get_explicit_input().coin().to_str()).toEqual(expected.sumInputs);
+      expect(txBuilder.get_explicit_output().coin().to_str()).toEqual(expected.sumOutputs);
+      expect(txBuilder.min_fee().to_str()).toEqual(expected.fee);
+    }
+
+    testTxConstruction([0.2, 0.2, 0.2, 0.2, 0.2], {
+      inputs: [utxos[3]],
+      fee: '1022',
+      sumInputs: '30000000',
+      sumOutputs: '29998978',
+    });
+
+    testTxConstruction([0.7, 0.7, 0.7, 0.7, 0.7], {
+      inputs: [utxos[0], utxos[1]],
+      fee: '1166',
+      sumInputs: '1000702',
+      sumOutputs: '999536',
+    });
+
+    testTxConstruction([0.7, 0.2, 0.7, 0.2, 0.7], {
+      inputs: [utxos[0], utxos[3]],
+      fee: '1372',
+      sumInputs: '30000701',
+      sumOutputs: '29999329',
+    });
   });
 
   it('Should exclude ada-only inputs smaller than fee to include them', () => {
@@ -747,6 +781,10 @@ describe('Create signed transactions', () => {
         defaultNetworkId: network.NetworkId,
       }
     );
+
+    // Fix the random value to handle the pure inputs prioritisation properly
+    jest.spyOn(global.Math, 'random').mockReturnValue(0.7);
+
     const unsignedTxResponse = newAdaUnsignedTx(
       [{
         address: byronAddrToHex('Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4'),
@@ -760,6 +798,8 @@ describe('Create signed transactions', () => {
       [],
       true,
     );
+
+    jest.spyOn(global.Math, 'random').mockRestore();
 
     const accountPrivateKey = RustModule.WalletV4.Bip32PrivateKey.from_bytes(
       Buffer.from(
