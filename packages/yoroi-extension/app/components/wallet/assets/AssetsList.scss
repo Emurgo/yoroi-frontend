@@ -37,7 +37,7 @@
 
     .columns {
         display: grid;
-        grid-template-columns: .4fr 1fr 1fr;
+        grid-template-columns: 3fr 2fr 3fr;
         grid-gap: 10px;
         padding: 24px 30px;
         border-top: 1px ;
@@ -64,7 +64,7 @@
     .row {
         display: grid;
         align-items: center;
-        grid-template-columns: .4fr 1fr 1fr;
+        grid-template-columns: 3fr 2fr 3fr;
         grid-gap: 10px;
         padding: 20px 30px;
         margin-bottom: 20px;
