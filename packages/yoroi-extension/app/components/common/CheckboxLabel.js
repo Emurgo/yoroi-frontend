@@ -51,7 +51,7 @@ function CheckboxLabel({
           }}
         >
           <Typography
-            marginBottom={description ? '8px' : 0}
+            marginBottom={description !== null ? '8px' : 0}
             sx={{
               color: 'var(--mui-checkbox-label-text-color)',
               fontWeight: 300,
@@ -64,7 +64,7 @@ function CheckboxLabel({
         </Box>
       }
       sx={{
-        alignItems: description !== null ? 'center' : 'flex-start',
+        alignItems: description === null ? 'center' : 'flex-start',
         margin: 0,
         '& .MuiFormControlLabel-label': {
           flex: 1,
