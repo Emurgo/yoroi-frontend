@@ -370,12 +370,12 @@ describe('Create unsigned TX from UTXO', () => {
       }
     );
 
-    function testTxConstruction(randomValues: number[], expected: {
+    function testTxConstruction(randomValues: number[], expected: {|
       inputs: any[],
       fee: string,
       sumInputs: string,
       sumOutputs: string,
-    }): void {
+    |}): void {
       randomValues.reduce(
         (m, v) => m.mockReturnValueOnce(v),
         jest.spyOn(global.Math, 'random'),
