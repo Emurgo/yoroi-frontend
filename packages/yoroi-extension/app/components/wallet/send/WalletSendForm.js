@@ -436,7 +436,7 @@ export default class WalletSendForm extends Component<Props> {
                 // clear amount field when switching currencies
                 this.form.$('amount').clear();
                 // reset the amout dropdown to coustom amount
-                this.form.$('selectedAmount').value = CUSTOM_AMOUNT
+                this.form.$('selectedAmount').value = CUSTOM_AMOUNT;
                 this.props.updateAmount();
               }}
               value={
