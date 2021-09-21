@@ -3,8 +3,8 @@ import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import classNames from 'classnames';
-import { Select } from 'react-polymorph/lib/components/Select';
-import { SelectSkin } from 'react-polymorph/lib/skins/simple/SelectSkin';
+import Select from '../common/Select';
+import { MenuItem } from '@mui/material';
 import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
 import LocalizableError from '../../i18n/LocalizableError';
@@ -82,7 +82,6 @@ export default class PaperWalletDialog extends Component<Props> {
       label: `${x + 1}`,
     }));
     const componentClassNames = classNames([styles.component, 'general']);
-    const numAddressesSelectClassNames = classNames([styles.numAddressesSelect]);
 
     const actions = [
       {
@@ -106,12 +105,32 @@ export default class PaperWalletDialog extends Component<Props> {
         </div>
 
         <Select
-          className={numAddressesSelectClassNames}
-          options={numAddressOptions}
+          formControlProps={{ sx: { margin: '34px 0 12px 0' } }}
+          labelId="number-address-option-select"
           {...numAddresses.bind()}
-          skin={SelectSkin}
-          isOpeningUpward
-        />
+          menuProps={{
+            anchorOrigin: {
+              vertical: 'bottom',
+              horizontal: 'left',
+            },
+            transformOrigin: {
+              vertical: 'bottom',
+              horizontal: 'left',
+            },
+            sx: {
+              '& .MuiMenu-paper': {
+                marginTop: '-60px',
+                maxHeight: '280px',
+              },
+            },
+          }}
+        >
+          {numAddressOptions.map(item => (
+            <MenuItem key={item.value} value={item.value}>
+              {item.label}
+            </MenuItem>
+          ))}
+        </Select>
 
         <CheckboxLabel
           checked={printPaperWalletIdentification.value}

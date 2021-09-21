@@ -3,7 +3,7 @@ import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { reaction } from 'mobx';
-import { Button } from '@mui/material';
+import { Button, MenuItem, Typography } from '@mui/material';
 import { Input } from 'react-polymorph/lib/components/Input';
 import { NumericInput } from 'react-polymorph/lib/components/NumericInput';
 import { defineMessages, intlShape } from 'react-intl';
@@ -28,7 +28,7 @@ import config from '../../../config';
 import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
 import LocalizableError from '../../../i18n/LocalizableError';
 import WarningBox from '../../widgets/WarningBox';
-import type { $npm$ReactIntl$IntlFormat, } from 'react-intl';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { getTokenName, genFormatTokenAmount, getTokenStrictName, getTokenIdentifierIfExists, } from '../../../stores/stateless/tokenHelpers';
 import {
   MultiToken,
@@ -37,8 +37,8 @@ import type {
   TokenEntry,
   TokenLookupKey,
 } from '../../../api/common/lib/MultiToken';
-import { Select } from 'react-polymorph/lib/components/Select';
-import { SelectTokenSkin } from '../../../themes/skins/SelectTokenSkin';
+import Select from '../../common/Select';
+import { Box } from '@mui/system';
 import TokenOptionRow from '../../widgets/tokenOption/TokenOptionRow';
 import BigNumber from 'bignumber.js';
 
@@ -404,20 +404,18 @@ export default class WalletSendForm extends Component<Props> {
 
     return (
       <div className={styles.component}>
-
         {hasAnyPending && pendingTxWarningComponent}
 
         <BorderedBox>
-
           {tokenOptions.length > 1 && (
             <Select
-              className={styles.currencySelect}
-              options={tokenOptions}
+              formControlProps={{ sx: { marginBottom: '10px' } }}
+              labelId="token-assets-select"
               {...form.$('selectedToken').bind()}
               onChange={tokenId => {
-                this.props.onAddToken(tokenOptions.find(
-                  token => token.info.TokenId === tokenId
-                )?.info);
+                this.props.onAddToken(
+                  tokenOptions.find(token => token.info.TokenId === tokenId)?.info
+                );
 
                 // clear send all when changing currencies
                 if (this.props.shouldSendAll) {
@@ -426,22 +424,44 @@ export default class WalletSendForm extends Component<Props> {
                 // clear amount field when switching currencies
                 this.form.$('amount').clear();
                 // reset the amout dropdown to coustom amount
-                this.form.$('selectedAmount').value = CUSTOM_AMOUNT
+                this.form.$('selectedAmount').value = CUSTOM_AMOUNT;
                 this.props.updateAmount();
               }}
-              skin={SelectTokenSkin}
-              value={this.props.selectedToken?.TokenId ?? this.props.getTokenInfo({
-                identifier: this.props.defaultToken.Identifier,
-                networkId: this.props.defaultToken.NetworkId,
-              }).TokenId}
-              optionRenderer={option => (
-                <TokenOptionRow
-                  displayName={option.label}
-                  id={option.id}
-                  amount={option.amount}
-                />
+              value={
+                this.props.selectedToken?.TokenId ??
+                this.props.getTokenInfo({
+                  identifier: this.props.defaultToken.Identifier,
+                  networkId: this.props.defaultToken.NetworkId,
+                }).TokenId
+              }
+              renderValue={value => (
+                <Box>{tokenOptions.filter(option => option.value === value)[0].label}</Box>
               )}
-            />
+            >
+              <MenuItem
+                sx={{ height: '50px', '&.Mui-disabled': { opacity: 0.8 } }}
+                value=""
+                disabled
+              >
+                <Box width="100%" display="flex">
+                  <Typography variant="body2" flex="1">
+                    {intl.formatMessage(globalMessages.name)}
+                  </Typography>
+                  <Typography variant="body2" flex="1">
+                    {intl.formatMessage(globalMessages.amount)}
+                  </Typography>
+                </Box>
+              </MenuItem>
+              {tokenOptions.map(option => (
+                <MenuItem sx={{ height: '70px' }} key={option.value} value={option.value}>
+                  <TokenOptionRow
+                    displayName={option.label}
+                    id={option.id}
+                    amount={option.amount}
+                  />
+                </MenuItem>
+              ))}
+            </Select>
           )}
 
           <div className={styles.receiverInput}>
@@ -479,34 +499,41 @@ export default class WalletSendForm extends Component<Props> {
           </div>
 
           <Select
-            options={sendAmountOptions}
             {...form.$('selectedAmount').bind()}
+            labelId="amount-options-select"
+            renderValue={value => (
+              <Typography sx={{ textTransform: 'uppercase' }}>
+                {sendAmountOptions.filter(item => item.value === value)[0].label}
+              </Typography>
+            )}
             onChange={value => {
-              this.form.$('selectedAmount').value = value
-              if(value === CUSTOM_AMOUNT && this.props.shouldSendAll) {
+              this.form.$('selectedAmount').value = value;
+              if (value === CUSTOM_AMOUNT && this.props.shouldSendAll) {
                 this.props.toggleSendAll();
               } else if (value !== CUSTOM_AMOUNT) {
-                this.props.toggleSendAll()
+                this.props.toggleSendAll();
               }
               if (this.props.shouldSendAll) {
                 // if we toggle shouldSendAll from true -> false
                 // we need to re-enable the field
                 // and set it to whatever value was used for the sendAll value
-                this.props.updateAmount(new BigNumber(
-                  formattedAmountToNaturalUnits(
-                    this.form.$('amount').value,
-                    this.getNumDecimals(),
+                this.props.updateAmount(
+                  new BigNumber(
+                    formattedAmountToNaturalUnits(
+                      this.form.$('amount').value,
+                      this.getNumDecimals()
+                    )
                   )
-                ));
+                );
               }
             }}
-            optionRenderer={option => (
-              <TokenOptionRow
-                displayName={option.label}
-                nameOnly
-              />
-            )}
-          />
+          >
+            {sendAmountOptions.map(option => (
+              <MenuItem key={option.value} value={option.value}>
+                <TokenOptionRow displayName={option.label} nameOnly />
+              </MenuItem>
+            ))}
+          </Select>
 
           {showMemo ? (
             <div className={styles.memoInput}>
@@ -538,9 +565,7 @@ export default class WalletSendForm extends Component<Props> {
           )}
 
           {this._makeInvokeConfirmationButton()}
-
         </BorderedBox>
-
       </div>
     );
   }
