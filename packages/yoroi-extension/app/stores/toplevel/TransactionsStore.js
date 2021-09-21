@@ -380,6 +380,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
                     minUtxoVal,
                   );
                 } catch (e) {
+                  // eslint-disable-next-line no-console
                   console.error(`Failed to calculate min-required ADA for utxo: ${JSON.stringify(u)}`, e);
                   return WalletV4.BigNum.zero();
                 }
@@ -397,6 +398,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
               }],
             );
           } catch (e) {
+            // eslint-disable-next-line no-console
             console.error('Failed to request asset deposit recalc', e);
           }
           return newMultiToken(defaultToken);
