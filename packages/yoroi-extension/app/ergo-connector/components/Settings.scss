@@ -62,14 +62,3 @@
     flex: 1;
   }
 }
-
-.language {
-  margin-top: -20px;
-  & input {
-    cursor: pointer;
-    font-family: var(--font-regular);
-    color: #242838 !important;
-    border: none !important;
-    text-transform: capitalize !important;
-  }
-}

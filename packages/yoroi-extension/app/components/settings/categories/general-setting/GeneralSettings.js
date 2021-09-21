@@ -3,8 +3,8 @@ import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import classNames from 'classnames';
-import { Select } from 'react-polymorph/lib/components/Select';
-import { SelectSkin } from 'react-polymorph/lib/skins/simple/SelectSkin';
+import Select from '../../../common/Select';
+import { MenuItem, Typography } from '@mui/material';
 import { intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../../../utils/ReactToolboxMobxForm';
 import LocalizableError from '../../../../i18n/LocalizableError';
@@ -57,29 +57,27 @@ export default class GeneralSettings extends Component<Props> {
       svg: language.svg
     }));
     const componentClassNames = classNames([styles.component, 'general']);
-    const languageSelectClassNames = classNames([
-      styles.language,
-      isSubmitting ? styles.submitLanguageSpinner : null,
-    ]);
 
     return (
       <div className={componentClassNames}>
-
         <Select
-          className={languageSelectClassNames}
-          options={languageOptions}
+          labelId="languages-select"
           {...languageId.bind()}
           onChange={this.selectLanguage}
-          skin={SelectSkin}
-          optionRenderer={option => (
-            <FlagLabel svg={option.svg} label={option.label} />
+          disabled={isSubmitting}
+          renderValue={value => (
+            <Typography variant="body2">
+              {languageOptions.filter(item => item.value === value)[0].label}
+            </Typography>
           )}
-        />
-        {error && (
-          <p className={styles.error}>
-            {intl.formatMessage(error, error.values)}
-          </p>
-        )}
+        >
+          {languageOptions.map(option => (
+            <MenuItem key={option.value} value={option.value}>
+              <FlagLabel svg={option.svg} label={option.label} />
+            </MenuItem>
+          ))}
+        </Select>
+        {error && <p className={styles.error}>{intl.formatMessage(error, error.values)}</p>}
 
         {!tier1Languages.includes(languageId.value) &&
           <div className={styles.info}>
@@ -96,5 +94,4 @@ export default class GeneralSettings extends Component<Props> {
       </div>
     );
   }
-
 }

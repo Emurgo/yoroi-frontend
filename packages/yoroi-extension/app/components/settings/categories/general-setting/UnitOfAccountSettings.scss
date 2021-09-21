@@ -28,15 +28,6 @@
     margin-bottom: 2px;
   }
 
-  .optionSmall {
-    font-size: 14px;
-    color: var(--theme-widgets-hash-light-color);
-  }
-
-  :global(.SelectOverrides_selectInput) input {
-    // don't uppercase selected currency
-    text-transform: none;
-  }
 
   .optionRow {
     display: flex;
@@ -49,13 +40,6 @@
 .error {
   @include error-message;
   text-align: center;
-}
-
-.currency {
-  margin-top: 20px;
-  label {
-    background-color: var(--theme-settings-pane-background-color);
-  }
 }
 
 :global(.YoroiModern) .optionSmallNative {
