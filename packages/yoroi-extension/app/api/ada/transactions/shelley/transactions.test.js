@@ -477,14 +477,13 @@ describe('Create unsigned TX from UTXO', () => {
       [],
       true,
     );
-    // input selection will only take 3 of the 5 inputs
-    // it takes 2 inputs after which the ADA amount is satisfied
-    // then it skips inputs until it found an input  containing the desired token
-    const expectedFee = new BigNumber('1614');
-    expect(unsignedTxResponse.senderUtxos).toEqual([utxos[0], utxos[1], utxos[4]]);
-    expect(unsignedTxResponse.txBuilder.get_explicit_input().coin().to_str()).toEqual('2000703');
-    expect(unsignedTxResponse.txBuilder.get_explicit_output().coin().to_str()).toEqual('1999089');
-    expect(unsignedTxResponse.txBuilder.min_fee().to_str()).toEqual(expectedFee.toString());
+    // input selection will order utxos to have the ones with the required token at the top
+    // it will take only one of the utxos because it covers the required token and the fee
+    const expectedFee = '1192';
+    expect(unsignedTxResponse.senderUtxos).toEqual([utxos[4]]);
+    expect(unsignedTxResponse.txBuilder.get_explicit_input().coin().to_str()).toEqual('1000001');
+    expect(unsignedTxResponse.txBuilder.get_explicit_output().coin().to_str()).toEqual('998817');
+    expect(unsignedTxResponse.txBuilder.min_fee().to_str()).toEqual(expectedFee);
 
     const assetInfo = identifierToCardanoAsset(testAssetId);
     expect(unsignedTxResponse.txBuilder.get_explicit_input().multiasset()
