@@ -20,4 +20,5 @@ export interface ISignRequest<T> {
   receivers(includeChange: boolean): Array<string>;
   isEqual(tx: ?mixed): boolean;
   self(): T;
+  +size?: () => {| full: number, outputs: number[] |};
 }
