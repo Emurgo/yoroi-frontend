@@ -182,8 +182,8 @@ class CardanoAPI {
         return this._cardano_rpc_call('submit_tx', [tx]);
     }
 
-    sign_tx(tx) {
-        return this._cardano_rpc_call('sign_tx', [tx]);
+    sign_tx(tx, partialSign = false) {
+        return this._cardano_rpc_call('sign_tx/cardano', [{ tx, partialSign }]);
     }
 
     _cardano_rpc_call(func, params) {

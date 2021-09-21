@@ -1,4 +1,5 @@
-import * as wasm from "ergo-lib-wasm-browser";
+import * as CardanoWasm from "@emurgo/cardano-serialization-lib-browser"
+import { getTtl} from './utils'
 const cardanoAccessBtn = document.querySelector('#request-access')
 const getUnUsedAddresses = document.querySelector('#get-unused-addresses')
 const getUsedAddresses = document.querySelector('#get-used-addresses')
@@ -11,6 +12,9 @@ const alertEl = document.querySelector('#alert')
 const spinner = document.querySelector('#spinner')
 
 let accessGranted = false
+let utxos
+let changeAddress
+let transactionHex
 
 function initDapp(){
     toggleSpinner('show')
@@ -80,13 +84,14 @@ getChangeAddress.addEventListener('click', () => {
         alertError('Should request access first')
     } else {
         toggleSpinner('show')
-        cardano.get_change_address().then(function(addresses) {
+        cardano.get_change_address().then(function(address) {
             toggleSpinner('hide')
-            if(addresses.length === 0){
+            if(address.length === 0){
                 alertWarrning('No change addresses')
             } else {
+                changeAddress = address
                 alertSuccess(`Address: `)
-                alertEl.innerHTML = '<pre>' + JSON.stringify(addresses, undefined, 2) + '</pre>'
+                alertEl.innerHTML = '<pre>' + JSON.stringify(address, undefined, 2) + '</pre>'
             }
         });
     }
@@ -98,50 +103,130 @@ getUtxos.addEventListener('click', () => {
         return
     }
     toggleSpinner('show')
-    cardano.get_utxos().then(utxos => {
+    cardano.get_utxos().then(utxosResponse => {
         toggleSpinner('hide')
-        if(utxos.length === 0){
+        if(utxosResponse.length === 0){
             alertWarrning('NO UTXOS')
         } else {
+            utxos = utxosResponse
             alertSuccess(`Check the console`)
-            alertEl.innerHTML = '<pre>' + JSON.stringify(utxos, undefined, 2) + '</pre>'
+            alertEl.innerHTML = '<pre>' + JSON.stringify(utxosResponse, undefined, 2) + '</pre>'
         }
     })
 })
 
 submitTx.addEventListener('click', () => {
-  const tx = '83a40082825820aba09d4db0d9c594469199196696872336e3e1b1eafabc85c2ab82119bef72c400825820aba09d4db0d9c594469199196696872336e3e1b1eafabc85c2ab82119bef72c401018282583900f20459be4d9701d839605bbcc021886237d6b0a73ecbadb4d0dbde3ec3892366f174a76af9252f78368f5747d3055ab3568ea3b6bf40b01e1a000f42408258390093610a3392d2c0ee9e2be8e9da14d5fb07e35a4c335453bd31372b58c3892366f174a76af9252f78368f5747d3055ab3568ea3b6bf40b01e821a247a85f6a2581c6b8d07d69639e9413dd637a1a815a7323c69c86abbafb66dbfdb1aa7a14004581cedcb58cae6fcb5def9f23663237c1d95bd54e51c3c40369e538661bca14363726401021a0002b511031a0214d61fa10082825820e5f0f9a6fe196ea035c8614af96a6dd06a731b7c07e2201bb5a0c0d89a4e27b65840a754bf6a280197029626174110095cd173df355439eec5c92f1f2adb0c42915ef33b8c771cd33e8a3c747af7794f1a1250946a79a194382aec7733a0abad1e058258200c6f80408ea0220d5effaf2b28244f3a0039022e8e898b23e3d2bf66b98eeb7c58400a8dbb7c3292f0d2858aafd0cd784a36b83471b50bb417efc09e35e55c66a925d7ff56d11ebf8f23c79721538f4efed2f1da03fc5cb8e16f5543b697d5eb0802f6'; //TODO
-
   if (!accessGranted) {
-    alertError('Should request access first');
-    return;
+    alertError('Should request access first')
+    return
   }
-  toggleSpinner('show');
-  cardano.submit_tx(tx).then(txId => {
-    toggleSpinner('hide');
+  if (!transactionHex) {
+    alertError('Should sign tx first')
+    return
+  }
+
+  toggleSpinner('show')
+  cardano.submit_tx(transactionHex).then(txId => {
+    toggleSpinner('hide')
     alertSuccess(`Transaction ${txId} submitted`);
   }).catch(error => {
-    toggleSpinner('hide');
-    alertWarrning('Transaction submission failed');
-  });
-});
+    toggleSpinner('hide')
+    alertWarrning('Transaction submission failed')
+  })
+})
+
+const AMOUNT_TO_SEND = '1000000'
+const SEND_TO_ADDRESS = 'addr_test1qz8xh9w6f2vdnp89xzqlxnusldhz6kdm4rp970gl8swwjjkr3y3kdut55a40jff00qmg74686vz44v6k363md06qkq0q4lztj0'
 
 signTx.addEventListener('click', () => {
-  const tx = { amount: '1000000', receiver: '00756c95f9967c214e571500a0140b88f6dd9c4a7444e74acc1841ce92c3892366f174a76af9252f78368f5747d3055ab3568ea3b6bf40b01e' };
+  toggleSpinner('show');
+  
   if (!accessGranted) {
     alertError('Should request access first');
     return;
   }
-  toggleSpinner('show');
-  cardano.sign_tx(tx).then(signedTx => {
-    debugger
-    toggleSpinner('hide');
-    alertSuccess('Signing tx succeeds: ' + signedTx);
+
+  if (!utxos) {
+    alertError('Should request utxos first');
+    return
+  }
+
+  if (!changeAddress) {
+    alertError('Should request change address first')
+  }
+  
+  const txBuilder = CardanoWasm.TransactionBuilder.new(
+    // all of these are taken from the mainnet genesis settings
+    // linear fee parameters (a*size + b)
+    CardanoWasm.LinearFee.new(CardanoWasm.BigNum.from_str('44'), CardanoWasm.BigNum.from_str('155381')),
+    // minimum utxo value
+    CardanoWasm.BigNum.from_str('1000000'),
+    // pool deposit
+    CardanoWasm.BigNum.from_str('500000000'),
+    // key deposit
+    CardanoWasm.BigNum.from_str('2000000')
+  )
+
+  // add a keyhash input - for ADA held in a Shelley-era normal address (Base, Enterprise, Pointer)
+  const utxo = utxos[0]
+  
+  const addr = CardanoWasm.Address.from_bytes(
+    Buffer.from(utxo.receiver, 'hex')
+  )
+  const baseAddr = CardanoWasm.BaseAddress.from_address(addr);
+  const keyHash = baseAddr.payment_cred().to_keyhash();
+  txBuilder.add_key_input(
+    keyHash,
+    CardanoWasm.TransactionInput.new(
+      CardanoWasm.TransactionHash.from_bytes(
+        Buffer.from(utxo.tx_hash, "hex")
+      ), // tx hash
+      utxo.tx_index, // index
+    ),
+    CardanoWasm.Value.new(CardanoWasm.BigNum.from_str(utxo.amount))
+  )  
+
+  const shelleyOutputAddress = CardanoWasm.Address.from_bech32(SEND_TO_ADDRESS)
+
+  const shelleyChangeAddress = CardanoWasm.Address.from_bytes(
+    Buffer.from(changeAddress, 'hex')
+  )
+
+  // add output to the tx
+  txBuilder.add_output(
+    CardanoWasm.TransactionOutput.new(
+      shelleyOutputAddress,
+      CardanoWasm.Value.new(CardanoWasm.BigNum.from_str(AMOUNT_TO_SEND))    
+    ),
+  )
+
+  const ttl = getTtl()
+  txBuilder.set_ttl(ttl)
+
+  // calculate the min fee required and send any change to an address
+  txBuilder.add_change_if_needed(shelleyChangeAddress)
+
+  const txBody = txBuilder.build()
+  const txHex = Buffer.from(txBody.to_bytes()).toString('hex')
+
+  cardano.sign_tx(txHex, true).then(witnessSetHex => {
+    toggleSpinner('hide')
+    alertSuccess('Signing tx succeeds: ')
+    const witnessSet = CardanoWasm.TransactionWitnessSet.from_bytes(
+      Buffer.from(witnessSetHex, 'hex')
+    )
+    const transaction = CardanoWasm.Transaction.new(
+      txBody,
+      witnessSet,
+      undefined,
+    )
+    transactionHex = Buffer.from(transaction.to_bytes()).toString('hex')
   }).catch(error => {
-    toggleSpinner('hide');
-    alertWarrning('Signing tx fails');
-  });
-});
+    console.error(error)
+    toggleSpinner('hide')
+    alertWarrning('Signing tx fails')
+  })
+})
 
 if (typeof cardano_request_read_access === "undefined") {
     alert("Cardano not found");

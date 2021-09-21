@@ -1,6 +1,16 @@
 // @flow
 
-import type { Address, Paginate, PendingTransaction, SignedTx, TokenId, Tx, TxId, Value } from './types';
+import type {
+  Address,
+  Paginate,
+  PendingTransaction,
+  TokenId,
+  Tx,
+  TxId,
+  SignedTx,
+  Value,
+  CardanoTx,
+} from './types';
 import { ConnectorError } from './types';
 import { RustModule } from '../../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import type {
@@ -13,6 +23,7 @@ import {
   asGetBalance,
   asGetSigningKey,
   asHasLevels,
+  asHasUtxoChains,
 } from '../../../app/api/ada/lib/storage/models/PublicDeriver/traits';
 import { ConceptualWallet } from '../../../app/api/ada/lib/storage/models/ConceptualWallet/index';
 import BigNumber from 'bignumber.js';
@@ -36,6 +47,10 @@ import LocalStorageApi from '../../../app/api/localStorage/index';
 import type { BestBlockResponse } from '../../../app/api/ergo/lib/state-fetch/types';
 import { asAddressedUtxo as asAddressedUtxoCardano } from '../../../app/api/ada/transactions/utils';
 import type { RemoteUnspentOutput } from '../../../app/api/ada/lib/state-fetch/types'
+import {
+  signTransaction as shelleySignTransaction
+} from '../../../app/api/ada/transactions/shelley/transactions';
+
 
 function paginateResults<T>(results: T[], paginate: ?Paginate): T[] {
   if (paginate != null) {
@@ -430,6 +445,59 @@ export async function connectorSignTx(
     );
   debug('signedTx', '', signedTx);
   return signedTx.to_json();
+}
+
+export async function connectorSignCardanoTx(
+  publicDeriver: IPublicDeriver<ConceptualWallet>,
+  password: string,
+  tx: CardanoTx,
+): Promise<string> {
+  // eslint-disable-next-line no-unused-vars
+  const { tx: txHex, partialSign } = tx;
+
+  const txBody = RustModule.WalletV4.TransactionBody.from_bytes(
+    Buffer.from(txHex, 'hex')
+  );
+
+  const withUtxos = asGetAllUtxos(publicDeriver);
+  if (withUtxos == null) {
+    throw new Error(`missing utxo functionality`);
+  }
+
+  const withHasUtxoChains = asHasUtxoChains(withUtxos);
+  if (withHasUtxoChains == null) {
+    throw new Error(`missing chains functionality`);
+  }
+  const utxos = await withHasUtxoChains.getAllUtxos();
+  const addressedUtxos = asAddressedUtxoCardano(utxos);
+
+  const withLevels = asHasLevels<ConceptualWallet>(publicDeriver);
+  if (!withLevels) {
+    throw new Error(`can't get level`);
+  }
+
+  const withSigningKey = asGetSigningKey(publicDeriver);
+  if (!withSigningKey) {
+    throw new Error('expect to be able to get signing key');
+  }
+  const signingKey = await withSigningKey.getSigningKey();
+  const normalizedKey = await withSigningKey.normalizeKey({
+    ...signingKey,
+    password,
+  });
+
+  const signedTx = shelleySignTransaction(
+    addressedUtxos,
+    txBody,
+    withLevels.getParent().getPublicDeriverLevel(),
+    RustModule.WalletV4.Bip32PrivateKey.from_bytes(
+      Buffer.from(normalizedKey.prvKeyHex, 'hex')
+    ),
+    new Set(), // stakingKeyWits
+    undefined, // metadata
+  );
+
+  return Buffer.from(signedTx.witness_set().to_bytes()).toString('hex');
 }
 
 export async function connectorSendTx(
