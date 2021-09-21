@@ -41,9 +41,9 @@ type State = {|
 |}
 
 const messages = defineMessages({
-  tokens: {
-    id: 'wallet.assets.tokens',
-    defaultMessage: '!!!Tokens ({number})',
+  assets: {
+    id: 'wallet.assets.assets',
+    defaultMessage: '!!!Assets ({number})',
   },
   nameAndTicker: {
     id: 'wallet.assets.nameAndTicker',
@@ -139,8 +139,8 @@ export default class AssetsList extends Component<Props, State> {
       <div className={styles.component}>
         <BorderedBox>
           <div className={styles.header}>
-            <h1 className={styles.tokens}>
-              {intl.formatMessage(messages.tokens, { number: this.props.assetsList.length })}
+            <h1 className={styles.assets}>
+              {intl.formatMessage(messages.assets, { number: this.props.assetsList.length })}
             </h1>
             <div className={styles.search}>
               <Search />
