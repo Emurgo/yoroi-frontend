@@ -60,6 +60,9 @@ export default class Wallet extends Component<Props> {
     const publicDeriver = this.generated.stores.wallets.selected;
     if (publicDeriver == null) throw new Error(`${nameof(Wallet)} no public deriver`);
 
+    const spendableBalance = this.generated.stores.transactions.getBalanceRequest.result;
+    const walletHasAssets = !!(spendableBalance?.nonDefaultEntries()?.length);
+
     const activeCategory = allCategories.find(
       category => this.generated.stores.app.currentRoute.startsWith(category.route)
     );
@@ -67,12 +70,10 @@ export default class Wallet extends Component<Props> {
     // if we're on a page that isn't applicable for the currently selected wallet
     // ex: a cardano-only page for an Ergo wallet
     // or no category is selected yet (wallet selected for the first time)
-    const spendableBalance = this.generated.stores.transactions.getBalanceRequest.result
-
-    if (activeCategory == null || !activeCategory.isVisible({ selected: publicDeriver, spendableBalance })) {
-      const firstValidCategory = allCategories.find(
-        category => category.isVisible({ selected: publicDeriver, spendableBalance })
-      );
+    const visibilityContext = { selected: publicDeriver, walletHasAssets };
+    if (!activeCategory?.isVisible(visibilityContext)) {
+      const firstValidCategory = allCategories
+        .find(c => c.isVisible(visibilityContext));
       if (firstValidCategory == null) {
         throw new Error(`Selected wallet has no valid category`);
       }
@@ -122,7 +123,10 @@ export default class Wallet extends Component<Props> {
     }
     const selectedWallet = wallets.selected;
     const warning = this.getWarning(selectedWallet);
+
     const spendableBalance = this.generated.stores.transactions.getBalanceRequest.result
+    const walletHasAssets = !!(spendableBalance?.nonDefaultEntries()?.length);
+    const visibilityContext = { selected: selectedWallet, walletHasAssets };
 
     return (
       <TopBarLayout
@@ -136,7 +140,7 @@ export default class Wallet extends Component<Props> {
         <WalletWithNavigation
           categories={
             allCategories
-              .filter(category => category.isVisible({ selected: selectedWallet, spendableBalance }))
+              .filter(c => c.isVisible(visibilityContext))
               .map(category => ({
                 className: category.className,
                 icon: category.icon,

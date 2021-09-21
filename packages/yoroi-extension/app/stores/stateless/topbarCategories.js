@@ -58,7 +58,7 @@ export type TopbarCategory = {|
   +label?: MessageDescriptor,
   +isVisible: {|
     selected: PublicDeriver<>,
-    spendableBalance: ?MultiToken,
+    walletHasAssets: boolean,
   |} => (boolean | {| disabledReason: MessageDescriptor |}),
 |};
 
@@ -96,8 +96,7 @@ export const ASSETS: TopbarCategory = registerCategory({
   route: ROUTES.WALLETS.ASSETS,
   icon: assetsIcon,
   label: messages.assets,
-  isVisible: ({ spendableBalance }) =>  
-  !!spendableBalance && spendableBalance.nonDefaultEntries().length > 0 
+  isVisible: ({ walletHasAssets }) => walletHasAssets,
 });
 export const RECEIVE: TopbarCategory = registerCategory({
   className: 'receive',
