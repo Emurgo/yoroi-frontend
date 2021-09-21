@@ -279,6 +279,7 @@ export function sendAllUnsignedTxFromUtxo(
     } catch (e) {
       if (!String(e).includes('Not enough ADA')) {
         // any other error except not-enough-ada terminates here
+        // eslint-disable-next-line no-console
         console.error('Failed to construct send-all output!', e);
         throw e;
       }
@@ -790,6 +791,7 @@ function _newAdaUnsignedTxFromUtxo(
       if (String(e).includes('Not enough ADA')) {
         throw new NotEnoughMoneyToSendError();
       }
+      // eslint-disable-next-line no-console
       console.error('Failed to construct tx change!', e);
       throw e;
     }
