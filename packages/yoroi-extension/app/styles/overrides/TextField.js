@@ -2,12 +2,15 @@
 const ClassicTextField = {
   styleOverrides: {
     root: {
-      minWidth: 400,
+      // minWidth: 400,
+      width: '100%',
       borderColor: 'var(--mui-input-border-color)',
+      marginTop: '24px',
       '& label': {
         color: 'var(--mui-input-placeholder-color)',
-        marginTop: '-45px',
-        left: '-12px',
+        position: 'relative',
+        top: 'unset',
+        marginBottom: '10px',
         letterSpacing: '1.12px',
         fontWeight: 500,
       },
@@ -24,6 +27,7 @@ const ClassicTextField = {
         height: '1.2em',
       },
       '& .MuiOutlinedInput-root': {
+        paddingRight: '16px',
         '& fieldset': {
           borderColor: 'var(--mui-input-border-color)',
           borderRadius: 0,
@@ -41,14 +45,17 @@ const ClassicTextField = {
           color: 'var(--mui-input-text-color-disabled)',
         },
         '&.Mui-error fieldset': {
-          borderColor: 'var(--mui-input-border-color-errored)',
+          borderColor: 'var(--mui-input-border-color-error)',
         },
       },
       '& .MuiSelect-select': {
         backgroundColor: 'white',
       },
       '& .MuiFormHelperText-root': {
-        letterSpacing: '0.4px',
+        marginLeft: 0,
+        fontWeight: 400,
+        position: 'absolute',
+        bottom: '-2px',
       },
     },
   },
@@ -80,6 +87,7 @@ const ModernTextField = {
         height: '1.2em',
       },
       '& .MuiOutlinedInput-root': {
+        paddingRight: '16px',
         '& fieldset': {
           borderColor: 'var(--mui-input-border-color)',
           borderRadius: 8,
@@ -97,7 +105,7 @@ const ModernTextField = {
           color: 'var(--mui-input-text-color-disabled)',
         },
         '&.Mui-error fieldset': {
-          borderColor: 'var(--mui-input-border-color-errored)',
+          borderColor: 'var(--mui-input-border-color-error)',
         },
       },
       '& .MuiSelect-select': {
@@ -106,6 +114,10 @@ const ModernTextField = {
       },
       '& .MuiFormHelperText-root': {
         letterSpacing: '0.4px',
+        marginLeft: 0,
+        fontWeight: 400,
+        position: 'absolute',
+        bottom: '-2px',
       },
     },
   },
