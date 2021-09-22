@@ -161,7 +161,7 @@ test('Create Trezor transaction', async () => {
     assets: [],
   }];
   const protocolParams = getProtocolParams();
-  const txBuilder = RustModule.WalletV4.TransactionBuilder.new(
+  const txBuilder = RustModule.WalletV4TxBuilder(
     protocolParams.linearFee,
     protocolParams.minimumUtxoVal,
     protocolParams.poolDeposit,
