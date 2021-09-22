@@ -1,6 +1,6 @@
 // @flow
 import { createTheme } from '@mui/material/styles';
-import { SFUIDisplayFonts } from '../fonts';
+import { SFUIDisplayFonts, RobotoMonoFonts } from '../fonts';
 import {
   ClassicButton,
   ClassicCheckbox,
@@ -21,6 +21,7 @@ export const classicTheme: Object = createTheme({
     MuiCssBaseline: {
       styleOverrides: `
         ${SFUIDisplayFonts}
+        ${RobotoMonoFonts}
       `,
     },
     MuiButton: ClassicButton,
