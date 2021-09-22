@@ -6,8 +6,7 @@ import { intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import styles from './SignTxPage.scss';
 import { Button } from '@mui/material';
-import { Input } from 'react-polymorph/lib/components/Input';
-import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
+import TextField from '../../../components/common/TextField';
 import globalMessages from '../../../i18n/global-messages';
 import { observer } from 'mobx-react';
 import CopyableAddress from '../../../components/widgets/CopyableAddress';
@@ -319,12 +318,12 @@ class SignTxPage extends Component<Props> {
             </div>
           </div>
           <div className={styles.passwordInput}>
-            <Input
+            <TextField
               type="password"
               className={styles.walletPassword}
               {...walletPasswordField.bind()}
               error={walletPasswordField.error}
-              skin={InputOwnSkin}
+              helperText={walletPasswordField.error}
             />
           </div>
           <div className={styles.wrapperBtn}>

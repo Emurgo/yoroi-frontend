@@ -3,14 +3,13 @@ import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { Button } from '@mui/material';
-import { Input } from 'react-polymorph/lib/components/Input';
+import TextField from '../../common/TextField';
 import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
 import BorderedBox from '../../widgets/BorderedBox';
 import styles from './DelegationSendForm.scss';
 import globalMessages from '../../../i18n/global-messages';
-import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
 import WarningBox from '../../widgets/WarningBox';
 import type { $npm$ReactIntl$IntlFormat, } from 'react-intl';
 import isHexadecimal from 'validator/lib/isHexadecimal';
@@ -126,11 +125,11 @@ export default class DelegationSendForm extends Component<Props> {
         <BorderedBox>
 
           <div className={styles.poolInput}>
-            <Input
+            <TextField
               className="poolId"
               {...poolIdField.bind()}
               error={poolIdField.error || poolQueryError}
-              skin={InputOwnSkin}
+              helperText={poolIdField.error || poolQueryError}
               done={poolIdField.isValid}
             />
           </div>
