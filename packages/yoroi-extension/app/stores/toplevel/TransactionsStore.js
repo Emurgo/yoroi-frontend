@@ -334,7 +334,8 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     const deriverParent = request.publicDeriver.getParent();
     const networkInfo = deriverParent.getNetworkInfo();
     const defaultToken = deriverParent.getDefaultToken();
-    const minUtxoVal = getMinUtxoValue(networkInfo);
+    const isCardano = isCardanoHaskell(networkInfo);
+    const minUtxoVal = isCardano ? getMinUtxoValue(networkInfo) : RustModule.WalletV4.BigNum.zero();
 
     // calculate pending transactions just to cache the result
     const requests = this.getTxRequests(request.publicDeriver).requests;
@@ -362,12 +363,12 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       });
       getAssetDepositRequest.execute({
         getBalance: async (): Promise<MultiToken> => {
-          const WalletV4 = RustModule.WalletV4;
           try {
             const canGetUtxos = asGetAllUtxos(publicDeriver);
-            if (canGetUtxos == null) {
+            if (!isCardano || canGetUtxos == null) {
               return newMultiToken(defaultToken);
             }
+            const WalletV4 = RustModule.WalletV4;
             const utxos = await canGetUtxos.getAllUtxos();
             const addressedUtxos = asAddressedUtxo(utxos)
               .filter(u => u.assets.length > 0);
