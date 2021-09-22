@@ -1,7 +1,6 @@
 // @flow
 
 import BigNumber from 'bignumber.js';
-import JSONBigInt from 'json-bigint';
 import { InputTypes } from './types';
 import type {
   HistoryRequest, HistoryResponse, HistoryFunc,
