@@ -1,25 +1,25 @@
 // @flow
-import { runInAction, observable, computed, action, } from 'mobx';
+import { action, computed, observable, runInAction, } from 'mobx';
 import { find } from 'lodash';
 import BigNumber from 'bignumber.js';
 import Store from '../base/Store';
 import CachedRequest from '../lib/LocalizedCachedRequest';
 import WalletTransaction, { calculateUnconfirmedAmount } from '../../domain/WalletTransaction';
 import { getPriceKey } from '../../api/common/lib/storage/bridge/prices';
+import type { GetBalanceFunc, } from '../../api/common/types';
 import type {
-  GetBalanceFunc,
-} from '../../api/common/types';
-import type {
-  GetTransactionsFunc,
-  BaseGetTransactionsRequest, GetTransactionsRequestOptions,
-  RefreshPendingTransactionsFunc,
+  BaseGetTransactionsRequest,
   ExportTransactionsFunc,
+  GetTransactionsFunc,
+  GetTransactionsRequestOptions,
+  RefreshPendingTransactionsFunc,
 } from '../../api/common/index';
+import { PublicDeriver, } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import {
-  PublicDeriver,
-} from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import {
-  asGetBalance, asHasLevels, asGetPublicKey,
+  asGetAllUtxos,
+  asGetBalance,
+  asGetPublicKey,
+  asHasLevels,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import type {
   IGetLastSyncInfo,
@@ -31,20 +31,24 @@ import { getApiForNetwork, } from '../../api/common/utils';
 import type { UnconfirmedAmount } from '../../types/unconfirmedAmountType';
 import LocalizedRequest from '../lib/LocalizedRequest';
 import LocalizableError, { UnexpectedError } from '../../i18n/LocalizableError';
-import {
-  Logger,
-  stringifyError
-} from '../../utils/logging';
+import { Logger, stringifyError } from '../../utils/logging';
 import type { TransactionRowsToExportRequest } from '../../actions/common/transactions-actions';
 import globalMessages from '../../i18n/global-messages';
 import * as timeUtils from '../../api/ada/lib/storage/bridge/timeUtils';
-import { getCardanoHaskellBaseConfig, isCardanoHaskell, } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import {
-  MultiToken,
-} from '../../api/common/lib/MultiToken';
+  getCardanoHaskellBaseConfig,
+  isCardanoHaskell,
+} from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { MultiToken, } from '../../api/common/lib/MultiToken';
+import type { DefaultTokenEntry, TokenEntry, } from '../../api/common/lib/MultiToken';
 import { genLookupOrFail, getTokenName } from '../stateless/tokenHelpers';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
+import { asAddressedUtxo, cardanoValueFromRemoteFormat } from '../../api/ada/transactions/utils';
+import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
+import { PRIMARY_ASSET_CONSTANTS } from '../../api/ada/lib/storage/database/primitives/enums';
+import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
+import type { CardanoAddressedUtxo } from '../../api/ada/transactions/types';
 
 export type TxRequests = {|
   publicDeriver: PublicDeriver<>,
@@ -63,6 +67,10 @@ export type TxRequests = {|
      * in lovelaces
      */
     getBalanceRequest: CachedRequest<GetBalanceFunc>,
+    /**
+     * in lovelaces
+     */
+    getAssetDepositRequest: CachedRequest<GetBalanceFunc>,
   |},
 |};
 
@@ -74,6 +82,19 @@ export const INITIAL_SEARCH_LIMIT: number = 5;
 
 /** Skip first n transactions from api */
 export const SEARCH_SKIP: number = 0;
+
+function getMinUtxoValue(network: $ReadOnly<NetworkRow>): RustModule.WalletV4.BigNum {
+  const config = getCardanoHaskellBaseConfig(network)
+    .reduce((acc, next) => Object.assign(acc, next), {});
+  return RustModule.WalletV4.BigNum.from_str(config.MinimumUtxoVal);
+}
+
+function newMultiToken(
+  defaultTokenInfo: DefaultTokenEntry,
+  values: Array<TokenEntry> = [],
+): MultiToken {
+  return new MultiToken(values, defaultTokenInfo)
+}
 
 export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
 
@@ -115,9 +136,9 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     };
 
     const defaultUnconfirmedAmount = {
-      total: new MultiToken([], defaultTokenInfo),
-      incoming: new MultiToken([], defaultTokenInfo),
-      outgoing: new MultiToken([], defaultTokenInfo),
+      total: newMultiToken(defaultTokenInfo),
+      incoming: newMultiToken(defaultTokenInfo),
+      outgoing: newMultiToken(defaultTokenInfo),
       incomingInSelectedCurrency: new BigNumber(0),
       outgoingInSelectedCurrency: new BigNumber(0),
     };
@@ -310,9 +331,15 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     // update token info cache
     await this.stores.tokenInfoStore.refreshTokenInfo();
 
+    const deriverParent = request.publicDeriver.getParent();
+    const networkInfo = deriverParent.getNetworkInfo();
+    const defaultToken = deriverParent.getDefaultToken();
+    const minUtxoVal = getMinUtxoValue(networkInfo);
+
     // calculate pending transactions just to cache the result
+    const requests = this.getTxRequests(request.publicDeriver).requests;
     {
-      const pendingRequest = this.getTxRequests(request.publicDeriver).requests.pendingRequest;
+      const { pendingRequest } = requests;
       pendingRequest.invalidate({ immediately: false });
       pendingRequest.execute(
         { publicDeriver }
@@ -327,13 +354,58 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       if (canGetBalance == null) {
         return;
       }
-      const balanceReq = this.getTxRequests(request.publicDeriver).requests.getBalanceRequest;
-      balanceReq.invalidate({ immediately: false });
-      balanceReq.execute({
+      const { getBalanceRequest, getAssetDepositRequest } = requests;
+      getBalanceRequest.invalidate({ immediately: false });
+      getAssetDepositRequest.invalidate({ immediately: false });
+      getBalanceRequest.execute({
         getBalance: canGetBalance.getBalance,
       });
-      if (!balanceReq.promise) throw new Error('should never happen');
-      await balanceReq.promise;
+      getAssetDepositRequest.execute({
+        getBalance: async (): Promise<MultiToken> => {
+          const WalletV4 = RustModule.WalletV4;
+          try {
+            const canGetUtxos = asGetAllUtxos(publicDeriver);
+            if (canGetUtxos == null) {
+              return newMultiToken(defaultToken);
+            }
+            const utxos = await canGetUtxos.getAllUtxos();
+            const addressedUtxos = asAddressedUtxo(utxos)
+              .filter(u => u.assets.length > 0);
+            const deposits: Array<RustModule.WalletV4.BigNum> =
+              addressedUtxos.map((u: CardanoAddressedUtxo) => {
+                try {
+                  return WalletV4.min_ada_required(
+                    // $FlowFixMe[prop-missing]
+                    cardanoValueFromRemoteFormat(u),
+                    minUtxoVal,
+                  );
+                } catch (e) {
+                  // eslint-disable-next-line no-console
+                  console.error(`Failed to calculate min-required ADA for utxo: ${JSON.stringify(u)}`, e);
+                  return WalletV4.BigNum.zero();
+                }
+              });
+            const sumDeposit = deposits.reduce(
+              (a, b) => a.checked_add(b),
+              WalletV4.BigNum.zero(),
+            );
+            return newMultiToken(
+              defaultToken,
+              [{
+                identifier: PRIMARY_ASSET_CONSTANTS.Cardano,
+                amount: new BigNumber(sumDeposit.to_str()),
+                networkId: networkInfo.NetworkId,
+              }],
+            );
+          } catch (e) {
+            // eslint-disable-next-line no-console
+            console.error('Failed to request asset deposit recalc', e);
+          }
+          return newMultiToken(defaultToken);
+        },
+      });
+      if (!getBalanceRequest.promise || !getAssetDepositRequest.promise) throw new Error('should never happen');
+      await Promise.all([getBalanceRequest.promise, getAssetDepositRequest.promise]);
     })();
 
     // refresh local history
@@ -400,6 +472,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
           this.stores.substores[apiType].transactions.refreshTransactions
         ),
         getBalanceRequest: new CachedRequest<GetBalanceFunc>(this.api.common.getBalance),
+        getAssetDepositRequest: new CachedRequest<GetBalanceFunc>(this.api.common.getAssetDeposit),
         pendingRequest: new CachedRequest<RefreshPendingTransactionsFunc>(
           this.stores.substores[apiType].transactions.refreshPendingTransactions
         ),
@@ -440,8 +513,6 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
         publicDeriver: request.publicDeriver,
         exportRequest: request.exportRequest,
       });
-
-
 
       /** Intentionally added delay to feel smooth flow */
       setTimeout(async () => {
