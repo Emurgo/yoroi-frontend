@@ -37,6 +37,7 @@ import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 import classnames from 'classnames';
 import { mintedTokenInfo } from '../../../../chrome/extension/ergo-connector/utils';
 import type { Tx } from '../../../../chrome/extension/ergo-connector/types';
+import { Logger } from '../../../utils/logging';
 
 type Props = {|
   +tx: Tx,
@@ -128,7 +129,7 @@ class SignTxPage extends Component<Props> {
   // Tokens can be minted inside the transaction so we have to look it up there first
   _resolveTokenInfo: TokenEntry => $ReadOnly<TokenRow> = tokenEntry => {
     const { tx } = this.props;
-    const mintedTokens = mintedTokenInfo(tx);
+    const mintedTokens = mintedTokenInfo(tx, Logger.info);
     const mintedToken = mintedTokens.find(t => tokenEntry.identifier === t.Identifier);
     if (mintedToken != null) {
       return mintedToken;
