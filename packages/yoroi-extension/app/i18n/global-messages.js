@@ -124,6 +124,10 @@ const globalMessages: * = defineMessages({
     id: 'settings.menu.wallet.link.label',
     defaultMessage: '!!!Wallet',
   },
+  assetDepositLabel: {
+    id: 'settings.menu.assetDeposit.link.label',
+    defaultMessage: '!!!Locked assets deposit',
+  },
   languageEnglish: {
     id: 'global.language.english',
     defaultMessage: '!!!English',
@@ -223,6 +227,10 @@ const globalMessages: * = defineMessages({
   walletSendConfirmationTotalLabel: {
     id: 'wallet.send.confirmationDialog.totalLabel',
     defaultMessage: '!!!Total',
+  },
+  walletSendConfirmationTxSizeLabel: {
+    id: 'wallet.send.confirmationDialog.txSizeLabel',
+    defaultMessage: '!!!Size',
   },
   connectLabel: {
     id: 'wallet.connect.hw.dialog.connect.button.label',
