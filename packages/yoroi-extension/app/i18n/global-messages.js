@@ -577,6 +577,35 @@ const globalMessages: * = defineMessages({
     id: 'sidebar.transfer',
     defaultMessage: '!!!Claim or transfer wallet',
   },
+  // Revamp labels for sidebar
+  sidebarStaking: {
+    id: 'sidebar.staking',
+    defaultMessage: '!!!Staking',
+  },
+  sidebarAssets: {
+    id: 'sidebar.assets',
+    defaultMessage: '!!!Assets',
+  },
+  sidebarVoting: {
+    id: 'sidebar.voting',
+    defaultMessage: '!!!Voting',
+  },
+  sidebarSwap: {
+    id: 'sidebar.swap',
+    defaultMessage: '!!!Swap',
+  },
+  sidebarFaq: {
+    id: 'sidebar.faq',
+    defaultMessage: '!!!Faq',
+  },
+  sidebarNewUpdates: {
+    id: 'sidebar.newUpdates',
+    defaultMessage: '!!!New updates',
+  },
+  sidebarFeedback: {
+    id: 'sidebar.feedback',
+    defaultMessage: '!!!Feedback',
+  },
   ledgerTitle: {
     id: 'wallet.add.optionDialog.connect.hw.ledger.title',
     defaultMessage: '!!!Ledger Hardware Wallet',
