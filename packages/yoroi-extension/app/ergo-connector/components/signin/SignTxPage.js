@@ -45,7 +45,7 @@ type Props = {|
   +onCancel: () => void,
   +onConfirm: string => void,
   +notification: ?Notification,
-  +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
+  +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow> | null,
   +defaultToken: DefaultTokenEntry,
   +network: $ReadOnly<NetworkRow>,
   +unitOfAccountSetting: UnitOfAccountSettingType,
@@ -134,11 +134,7 @@ class SignTxPage extends Component<Props> {
       return mintedToken;
     }
 
-    try {
-      return this.props.getTokenInfo(tokenEntry);
-    } catch (error) {
-      return null
-    }
+    return this.props.getTokenInfo(tokenEntry);
   }
 
   displayUnAvailableToken: TokenEntry => Node = (tokenEntry) => {

@@ -21,6 +21,7 @@ import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import type { WarningList } from '../../stores/toplevel/WalletSettingsStore';
 import { allCategories } from '../../stores/stateless/topbarCategories';
+import { MultiToken } from '../../api/common/lib/MultiToken';
 
 export type GeneratedData = typeof Wallet.prototype.generated;
 
@@ -59,6 +60,9 @@ export default class Wallet extends Component<Props> {
     const publicDeriver = this.generated.stores.wallets.selected;
     if (publicDeriver == null) throw new Error(`${nameof(Wallet)} no public deriver`);
 
+    const spendableBalance = this.generated.stores.transactions.getBalanceRequest.result;
+    const walletHasAssets = !!(spendableBalance?.nonDefaultEntries()?.length);
+
     const activeCategory = allCategories.find(
       category => this.generated.stores.app.currentRoute.startsWith(category.route)
     );
@@ -66,10 +70,10 @@ export default class Wallet extends Component<Props> {
     // if we're on a page that isn't applicable for the currently selected wallet
     // ex: a cardano-only page for an Ergo wallet
     // or no category is selected yet (wallet selected for the first time)
-    if (activeCategory == null || !activeCategory.isVisible({ selected: publicDeriver })) {
-      const firstValidCategory = allCategories.find(
-        category => category.isVisible({ selected: publicDeriver })
-      );
+    const visibilityContext = { selected: publicDeriver, walletHasAssets };
+    if (!activeCategory?.isVisible(visibilityContext)) {
+      const firstValidCategory = allCategories
+        .find(c => c.isVisible(visibilityContext));
       if (firstValidCategory == null) {
         throw new Error(`Selected wallet has no valid category`);
       }
@@ -120,6 +124,10 @@ export default class Wallet extends Component<Props> {
     const selectedWallet = wallets.selected;
     const warning = this.getWarning(selectedWallet);
 
+    const spendableBalance = this.generated.stores.transactions.getBalanceRequest.result
+    const walletHasAssets = !!(spendableBalance?.nonDefaultEntries()?.length);
+    const visibilityContext = { selected: selectedWallet, walletHasAssets };
+
     return (
       <TopBarLayout
         banner={(<BannerContainer {...this.generated.BannerContainerProps} />)}
@@ -132,7 +140,7 @@ export default class Wallet extends Component<Props> {
         <WalletWithNavigation
           categories={
             allCategories
-              .filter(category => category.isVisible({ selected: selectedWallet }))
+              .filter(c => c.isVisible(visibilityContext))
               .map(category => ({
                 className: category.className,
                 icon: category.icon,
@@ -184,7 +192,12 @@ export default class Wallet extends Component<Props> {
       walletSettings: {|
         getWalletWarnings: (PublicDeriver<>) => WarningList
       |},
-      wallets: {| selected: null | PublicDeriver<> |}
+      wallets: {| selected: null | PublicDeriver<> |},
+      transactions: {|
+        getBalanceRequest: {|
+          result: ?MultiToken,
+        |},
+      |},
     |}
     |} {
     if (this.props.generated !== undefined) {
@@ -205,6 +218,18 @@ export default class Wallet extends Component<Props> {
         },
         walletSettings: {
           getWalletWarnings: settingStore.getWalletWarnings,
+        },
+        transactions: {
+          getBalanceRequest: (() => {
+            if (stores.wallets.selected == null) return {
+              result: undefined,
+            };
+            const { requests } = stores.transactions.getTxRequests(stores.wallets.selected);
+
+            return {
+              result: requests.getBalanceRequest.result,
+            };
+          })(),
         },
       },
       actions: {
