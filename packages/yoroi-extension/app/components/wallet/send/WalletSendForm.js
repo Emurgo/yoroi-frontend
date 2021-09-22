@@ -4,7 +4,7 @@ import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { reaction } from 'mobx';
 import { Button, MenuItem, Typography } from '@mui/material';
-import { Input } from 'react-polymorph/lib/components/Input';
+import TextField from '../../common/TextField'
 import { NumericInput } from 'react-polymorph/lib/components/NumericInput';
 import { defineMessages, intlShape } from 'react-intl';
 import { isValidMemoOptional, isValidMemo, } from '../../../utils/validations';
@@ -25,7 +25,6 @@ import {
   truncateToken,
 } from '../../../utils/formatters';
 import config from '../../../config';
-import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
 import LocalizableError from '../../../i18n/LocalizableError';
 import WarningBox from '../../widgets/WarningBox';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
@@ -477,11 +476,11 @@ export default class WalletSendForm extends Component<Props> {
           )}
 
           <div className={styles.receiverInput}>
-            <Input
+            <TextField
               className="receiver"
               {...receiverField.bind()}
               error={receiverField.error}
-              skin={InputOwnSkin}
+              helperText={receiverField.error}
               done={receiverField.isValid}
             />
           </div>
@@ -559,11 +558,11 @@ export default class WalletSendForm extends Component<Props> {
 
           {showMemo ? (
             <div className={styles.memoInput}>
-              <Input
+              <TextField
                 className="memo"
                 {...memoField.bind()}
                 error={memoField.error}
-                skin={InputOwnSkin}
+                helperText={memoField.error}
                 done={isValidMemo(memo)}
               />
             </div>

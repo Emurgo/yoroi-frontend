@@ -13,25 +13,8 @@
     margin-bottom: 10px;
   }
 
-  .receiverInput {
-    position: relative;
-
-    :global {
-      .SimpleInput_input {
-        font-family: var(--font-mono-light);
-        letter-spacing: 0;
-      }
-    }
-  }
-
   .amountField {
     margin-bottom: 15px;
-  }
-}
-
-:global(.YoroiClassic) .component {
-  .receiverInput {
-    margin-bottom: 10px;
   }
 }
 
@@ -55,5 +38,4 @@
   .amountField {
     margin-bottom: 10px;
   }
-
 }
