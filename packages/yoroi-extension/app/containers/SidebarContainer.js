@@ -1,4 +1,3 @@
-
 // @flow
 import type { Node } from 'react';
 import React, { Component } from 'react';
@@ -6,8 +5,9 @@ import { observer } from 'mobx-react';
 import { computed } from 'mobx';
 import Sidebar from '../components/topbar/Sidebar';
 import type { InjectedOrGenerated } from '../types/injectedPropsType';
-import { allCategories } from '../stores/stateless/sidebarCategories';
+import { allCategories, allCategoriesRevamp } from '../stores/stateless/sidebarCategories';
 import { PublicDeriver } from '../api/ada/lib/storage/models/PublicDeriver';
+import SidebarRevamp from '../components/topbar/SidebarRevamp';
 
 export type GeneratedData = typeof SidebarContainer.prototype.generated;
 
@@ -21,22 +21,43 @@ export default class SidebarContainer extends Component<InjectedOrGenerated<Gene
   render(): Node {
     const { stores } = this.generated;
     const { profile } = stores;
-
-    return (
+    // TODO: Remove hardcoded variable
+    const isRevampTheme = false;
+    return isRevampTheme ? (
+      <SidebarRevamp
+        onCategoryClicked={category => {
+          this.generated.actions.router.goToRoute.trigger({
+            route: category.route,
+          });
+        }}
+        isActiveCategory={category =>
+          this.generated.stores.app.currentRoute.startsWith(category.route)
+        }
+        categories={allCategoriesRevamp.filter(category =>
+          category.isVisible({
+            hasAnyWallets: this.generated.stores.wallets.hasAnyWallets,
+            selected: this.generated.stores.wallets.selected,
+            currentRoute: this.generated.stores.app.currentRoute,
+          })
+        )}
+      />
+    ) : (
       <Sidebar
         onCategoryClicked={category => {
           this.generated.actions.router.goToRoute.trigger({
             route: category.route,
           });
         }}
-        isActiveCategory={
-          category => this.generated.stores.app.currentRoute.startsWith(category.route)
+        isActiveCategory={category =>
+          this.generated.stores.app.currentRoute.startsWith(category.route)
         }
-        categories={allCategories.filter(category => category.isVisible({
-          hasAnyWallets: this.generated.stores.wallets.hasAnyWallets,
-          selected: this.generated.stores.wallets.selected,
-          currentRoute: this.generated.stores.app.currentRoute,
-        }))}
+        categories={allCategories.filter(category =>
+          category.isVisible({
+            hasAnyWallets: this.generated.stores.wallets.hasAnyWallets,
+            selected: this.generated.stores.wallets.selected,
+            currentRoute: this.generated.stores.app.currentRoute,
+          })
+        )}
         onToggleSidebar={this.toggleSidebar}
         isSidebarExpanded={profile.isSidebarExpanded}
       />

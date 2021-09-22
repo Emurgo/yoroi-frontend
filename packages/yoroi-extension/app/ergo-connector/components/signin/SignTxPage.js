@@ -46,7 +46,7 @@ type Props = {|
   +onCancel: () => void,
   +onConfirm: string => void,
   +notification: ?Notification,
-  +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
+  +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow> | null,
   +defaultToken: DefaultTokenEntry,
   +network: $ReadOnly<NetworkRow>,
   +unitOfAccountSetting: UnitOfAccountSettingType,
@@ -127,20 +127,37 @@ class SignTxPage extends Component<Props> {
   }
 
   // Tokens can be minted inside the transaction so we have to look it up there first
-  _resolveTokenInfo: TokenEntry => $ReadOnly<TokenRow> = tokenEntry => {
+  _resolveTokenInfo: TokenEntry => $ReadOnly<TokenRow> | null  = tokenEntry => {
     const { tx } = this.props;
     const mintedTokens = mintedTokenInfo(tx, Logger.info);
     const mintedToken = mintedTokens.find(t => tokenEntry.identifier === t.Identifier);
     if (mintedToken != null) {
       return mintedToken;
     }
+
     return this.props.getTokenInfo(tokenEntry);
+  }
+
+  displayUnAvailableToken: TokenEntry => Node = (tokenEntry) => {
+    return (
+      <>
+        <span className={styles.amountRegular}>{'+'}{tokenEntry.amount.toString()}</span>
+        {' '}
+        <span>   
+          {truncateAddressShort(
+           tokenEntry.identifier
+          )}
+        </span>
+      </>
+    )
   }
 
   renderAmountDisplay: {|
     entry: TokenEntry,
   |} => Node = (request) => {
     const tokenInfo = this._resolveTokenInfo(request.entry);
+
+    if (tokenInfo == null) return this.displayUnAvailableToken(request.entry)
     const shiftedAmount = request.entry.amount
       .shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
 
