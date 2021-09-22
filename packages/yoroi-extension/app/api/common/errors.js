@@ -48,6 +48,10 @@ const messages = defineMessages({
     id: 'api.errors.NotEnoughMoneyToSendError',
     defaultMessage: '!!!Not enough funds to make this transaction.',
   },
+  cannotSendBelowMinimumValueError: {
+    id: 'api.errors.CannotSendBelowMinimumValueError',
+    defaultMessage: '!!!Cannot send amount below required minimum.',
+  },
   assetOverflowError: {
     id: 'api.errors.assetOverflowError',
     defaultMessage: '!!!Maximum value of a token inside a UTXO exceeded (overflow).',
@@ -155,6 +159,10 @@ const messages = defineMessages({
   getPoolInfoApiError: {
     id: 'api.errors.getPoolInfoApiError',
     defaultMessage: '!!!Error received from server while getting pool info.',
+  },
+  getCatalystRoundApiError: {
+    id: 'api.errors.getCatalystRoundApiError',
+    defaultMessage: '!!!Error received from server while getting catalyst round info.',
   },
   getTokenInfoApiError: {
     id: 'api.errors.getTokenInfoApiError',
@@ -277,6 +285,14 @@ export class NotEnoughMoneyToSendError extends LocalizableError {
     super({
       id: messages.notEnoughMoneyToSendError.id,
       defaultMessage: messages.notEnoughMoneyToSendError.defaultMessage || '',
+    });
+  }
+}
+export class CannotSendBelowMinimumValueError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.cannotSendBelowMinimumValueError.id,
+      defaultMessage: messages.cannotSendBelowMinimumValueError.defaultMessage || '',
     });
   }
 }
@@ -504,6 +520,16 @@ export class GetPoolInfoApiError extends LocalizableError {
     });
   }
 }
+
+export class GetCatalystRoundInfoApiError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.getCatalystRoundApiError.id,
+      defaultMessage: messages.getCatalystRoundApiError.defaultMessage || '',
+    });
+  }
+}
+
 export class GetTokenInfoApiError extends LocalizableError {
   constructor() {
     super({

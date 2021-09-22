@@ -367,12 +367,14 @@ export async function rawGetTransactions(
                     )
                   );
                   if (rewardAddr == null) continue; // should never happen
-                  const rewardAmount = mir.get(rewardAddr.payment_cred());
-                  if (rewardAmount == null) continue; // should never happen
+                  const rewardAmount = mir.as_to_stake_creds()
+                    ?.get(rewardAddr.payment_cred());
+                  // happens if the MIR is to another pot
+                  if (rewardAmount == null) continue;
                   implicitOutputSum.add({
                     identifier: defaultToken.defaultIdentifier,
                     networkId: defaultToken.defaultNetworkId,
-                    amount: new BigNumber(rewardAmount.to_str()),
+                    amount: new BigNumber(String(rewardAmount.as_i32())),
                   });
                 }
               }
@@ -2550,7 +2552,7 @@ async function certificateToDb(
           const metadata = cert.poolParams.poolMetadata;
           return RustModule.WalletV4.PoolMetadata.new(
             RustModule.WalletV4.URL.new(metadata.url),
-            RustModule.WalletV4.MetadataHash.from_bytes(
+            RustModule.WalletV4.PoolMetadataHash.from_bytes(
               Buffer.from(metadata.metadataHash, 'hex')
             )
           );
@@ -2661,7 +2663,7 @@ async function certificateToDb(
           Relation: CertificateRelationType,
         |}> = [];
 
-        const certPot = RustModule.WalletV4.MoveInstantaneousReward.new(cert.pot);
+        const certPot = RustModule.WalletV4.MIRToStakeCredentials.new();
         for (const key of Object.keys(cert.rewards)) {
           const rewardAddress = RustModule.WalletV4.RewardAddress.from_address(
             RustModule.WalletV4.Address.from_bytes(
@@ -2673,7 +2675,9 @@ async function certificateToDb(
           if (stakeCredentials == null) throw new Error(`${nameof(certificateToDb)} not a valid reward account`);
           certPot.insert(
             stakeCredentials,
-            RustModule.WalletV4.BigNum.from_str(cert.rewards[key])
+            RustModule.WalletV4.Int.new(
+              RustModule.WalletV4.BigNum.from_str(cert.rewards[key])
+            ),
           );
 
           const rewardAddrKey = await findOwnAddress(
@@ -2686,7 +2690,12 @@ async function certificateToDb(
             });
           }
         }
-        const certificate = RustModule.WalletV4.MoveInstantaneousRewardsCert.new(certPot);
+        const certificate = RustModule.WalletV4.MoveInstantaneousRewardsCert.new(
+          RustModule.WalletV4.MoveInstantaneousReward.new_to_stake_creds(
+            cert.pot,
+            certPot,
+          )
+        );
         result.push((txId: number) => ({
           certificate: {
             Ordinal: cert.certIndex,
