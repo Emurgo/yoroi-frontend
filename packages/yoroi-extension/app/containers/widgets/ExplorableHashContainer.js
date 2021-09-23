@@ -19,13 +19,13 @@ type Props = {|
   +hash: string,
   +light: boolean,
   +linkType: LinkType,
-  +tooltipOpensUpward?: boolean,
+  +placementTooltip?: string,
 |};
 
 @observer
 export default class ExplorableHashContainer extends Component<Props> {
-  static defaultProps: {|tooltipOpensUpward: boolean|} = {
-    tooltipOpensUpward: false,
+  static defaultProps: {|placementTooltip: string|} = {
+    placementTooltip: 'bottom',
   };
 
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
@@ -48,7 +48,7 @@ export default class ExplorableHashContainer extends Component<Props> {
         url={explorerInfo.baseUrl + this.props.hash}
         light={this.props.light}
         onExternalLinkClick={handleExternalLinkClick}
-        tooltipOpensUpward={this.props.tooltipOpensUpward}
+        placementTooltip={this.props.placementTooltip}
       >
         {this.props.children}
       </ExplorableHash>

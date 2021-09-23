@@ -6,8 +6,7 @@ import type { Node } from 'react';
 import classnames from 'classnames';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import styles from './ExplorableHash.scss';
-import Tooltip from '../../common/Tooltip'
-import { Typography } from '@mui/material';
+import { Tooltip, Typography } from '@mui/material';
 
 const messages = defineMessages({
   websiteTip: {
@@ -21,34 +20,31 @@ type Props = {|
   +websiteName: string,
   +url: string,
   +light: boolean,
-  +tooltipOpensUpward?: boolean,
+  +placementTooltip?: string,
   +onExternalLinkClick: MouseEvent => void,
-  +arrowRelativeToTip?: boolean,
 |};
 
 @observer
 export default class ExplorableHash extends Component<Props> {
-  static defaultProps: {|arrowRelativeToTip: boolean, tooltipOpensUpward: boolean|} = {
-    tooltipOpensUpward: false,
-    arrowRelativeToTip: true,
+  static defaultProps: {|
+    placementTooltip: string,
+  |} = {
+    placementTooltip: 'bottom',
   };
 
   render(): Node {
     const { websiteName, onExternalLinkClick } = this.props;
 
-    const addressClass = classnames([
-      this.props.light ? styles.lightColor : styles.darkColor
-    ]);
+    const addressClass = classnames([this.props.light ? styles.lightColor : styles.darkColor]);
     return (
       <Tooltip
         className={styles.component}
-        isOpeningUpward={this.props.tooltipOpensUpward}
-        arrowRelativeToTip={this.props.arrowRelativeToTip}
         title={
           <Typography variant="tooltip">
             <FormattedMessage {...messages.websiteTip} values={{ websiteName }} />
           </Typography>
         }
+        placement={this.props.placementTooltip}
       >
         <a
           className={styles.url}

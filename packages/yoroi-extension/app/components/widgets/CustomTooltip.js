@@ -2,8 +2,7 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import Tooltip from '../common/Tooltip'
-import { Typography } from '@mui/material'
+import { Typography, Tooltip } from '@mui/material'
 import InfoIcon from '../../assets/images/info-icon.inline.svg';
 import styles from './CustomTooltip.scss';
 import classnames from 'classnames';
@@ -11,20 +10,20 @@ import classnames from 'classnames';
 type Props = {|
   +toolTip: Node,
   +children?: Node,
-  +isOpeningUpward?: boolean,
   +isPoolAvatar?: boolean,
+  +placementTooltip?: string,
 |};
 
 @observer
 export default class CustomTooltip extends Component<Props> {
   static defaultProps: {|
     children: void,
-    isOpeningUpward: boolean,
     isPoolAvatar: boolean,
+    placementTooltip: string,
   |} = {
     children: undefined,
-    isOpeningUpward: true,
     isPoolAvatar: false,
+    placementTooltip: 'top',
   }
 
   render(): Node {
@@ -41,7 +40,7 @@ export default class CustomTooltip extends Component<Props> {
       >
         <Tooltip
           title={<Typography variant="tooltip">{toolTip}</Typography>}
-          isOpeningUpward={this.props.isOpeningUpward}
+          placement="top"
         >
           <span className={styles.infoIcon}>
             {child}

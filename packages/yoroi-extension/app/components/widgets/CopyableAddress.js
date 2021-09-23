@@ -8,8 +8,7 @@ import CopyToClipboard from 'react-copy-to-clipboard';
 import IconCopy from '../../assets/images/copy.inline.svg';
 import IconCopied from '../../assets/images/copied.inline.svg';
 import styles from './CopyableAddress.scss';
-import { Typography } from '@mui/material';
-import Tooltip from '../common/Tooltip';
+import { Tooltip, Typography } from '@mui/material';
 import type { Notification } from '../../types/notificationType';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
@@ -25,8 +24,7 @@ type Props = {|
   +hash: string,
   +elementId?: string,
   +onCopyAddress?: void => void,
-  +tooltipOpensUpward?: boolean,
-  +arrowRelativeToTip?: boolean,
+  +placementTooltip?: string,
   +notification: ?Notification,
   +darkVariant?: boolean,
 |};
@@ -38,15 +36,13 @@ export default class CopyableAddress extends Component<Props> {
   };
 
   static defaultProps: {|
-    arrowRelativeToTip: boolean,
     darkVariant: boolean,
     elementId: void,
     onCopyAddress: void,
-    tooltipOpensUpward: boolean,
+    placementTooltip: string,
   |} = {
     onCopyAddress: undefined,
-    tooltipOpensUpward: false,
-    arrowRelativeToTip: true,
+    placementTooltip: 'bottom',
     elementId: undefined,
     darkVariant: false
   };
@@ -60,8 +56,6 @@ export default class CopyableAddress extends Component<Props> {
       : IconCopy;
     const tooltipComponent = (
       <Tooltip
-        isOpeningUpward={this.props.tooltipOpensUpward}
-        arrowRelativeToTip={this.props.arrowRelativeToTip}
         title={
           <Typography variant="tooltip">
             {notification && notification.id === elementId
@@ -69,6 +63,7 @@ export default class CopyableAddress extends Component<Props> {
               : intl.formatMessage(messages.copyTooltipMessage)}
           </Typography>
         }
+        placement={this.props.placementTooltip}
       >
         <span className={styles.copyIconBig}>
           <Icon />

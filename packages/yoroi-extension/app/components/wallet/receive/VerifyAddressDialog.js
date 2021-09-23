@@ -123,6 +123,7 @@ export default class VerifyAddressDialog extends Component<Props> {
               () => this.props.onCopyAddressTooltip(notificationId)
             }
             notification={this.props.notification}
+            placementTooltip="bottom-start"
           >
             <ExplorableHashContainer
               light={false}

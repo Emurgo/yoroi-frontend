@@ -136,14 +136,14 @@ export default class FinalizeDialog extends Component<Props> {
                 elementId={notificationElementId}
                 onCopyAddress={() => onCopyAddressTooltip(address, notificationElementId)}
                 notification={notification}
-                tooltipOpensUpward
+                placementTooltip="top-start"
                 key={address}
               >
                 <ExplorableHashContainer
                   hash={address}
                   selectedExplorer={this.props.selectedExplorer}
                   light
-                  tooltipOpensUpward
+                  placementTooltip="top-start"
                   linkType="address"
                 >
                   <RawHash light>

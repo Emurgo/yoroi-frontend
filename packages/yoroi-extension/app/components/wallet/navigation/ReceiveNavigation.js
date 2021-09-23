@@ -21,8 +21,7 @@ import InfoIcon from '../../../assets/images/attention-big-light.inline.svg';
 
 import type { AddressTypeName, AddressFilterKind } from '../../../types/AddressFilterTypes';
 import classNames from 'classnames';
-import Tooltip from '../../common/Tooltip';
-import { Typography } from '@mui/material';
+import { Tooltip, Typography } from '@mui/material';
 
 type AddressStoreSubset = {
   +isActiveStore: boolean,
