@@ -2,8 +2,8 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { Tooltip } from 'react-polymorph/lib/components/Tooltip';
-import { TooltipSkin } from 'react-polymorph/lib/skins/simple/TooltipSkin';
+import Tooltip from '../common/Tooltip'
+import { Typography } from '@mui/material'
 import InfoIcon from '../../assets/images/info-icon.inline.svg';
 import styles from './CustomTooltip.scss';
 import classnames from 'classnames';
@@ -11,7 +11,6 @@ import classnames from 'classnames';
 type Props = {|
   +toolTip: Node,
   +children?: Node,
-  +isAligningRight?: boolean,
   +isOpeningUpward?: boolean,
   +isPoolAvatar?: boolean,
 |};
@@ -21,12 +20,10 @@ export default class CustomTooltip extends Component<Props> {
   static defaultProps: {|
     children: void,
     isOpeningUpward: boolean,
-    isAligningRight: boolean,
     isPoolAvatar: boolean,
   |} = {
     children: undefined,
     isOpeningUpward: true,
-    isAligningRight: false,
     isPoolAvatar: false,
   }
 
@@ -43,14 +40,7 @@ export default class CustomTooltip extends Component<Props> {
         ])}
       >
         <Tooltip
-          className={classnames([
-            this.props.isAligningRight === true
-              ? null
-              : styles.SimpleCenteredTooltip,
-          ])}
-          skin={TooltipSkin}
-          isAligningRight={this.props.isAligningRight}
-          tip={toolTip}
+          title={<Typography variant="tooltip">{toolTip}</Typography>}
           isOpeningUpward={this.props.isOpeningUpward}
         >
           <span className={styles.infoIcon}>

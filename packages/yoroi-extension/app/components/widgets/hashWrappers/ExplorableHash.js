@@ -6,9 +6,8 @@ import type { Node } from 'react';
 import classnames from 'classnames';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import styles from './ExplorableHash.scss';
-
-import { Tooltip } from 'react-polymorph/lib/components/Tooltip';
-import { TooltipSkin } from 'react-polymorph/lib/skins/simple/TooltipSkin';
+import Tooltip from '../../common/Tooltip'
+import { Typography } from '@mui/material';
 
 const messages = defineMessages({
   websiteTip: {
@@ -43,10 +42,13 @@ export default class ExplorableHash extends Component<Props> {
     return (
       <Tooltip
         className={styles.component}
-        skin={TooltipSkin}
         isOpeningUpward={this.props.tooltipOpensUpward}
         arrowRelativeToTip={this.props.arrowRelativeToTip}
-        tip={<FormattedMessage {...messages.websiteTip} values={{ websiteName }} />}
+        title={
+          <Typography variant="tooltip">
+            <FormattedMessage {...messages.websiteTip} values={{ websiteName }} />
+          </Typography>
+        }
       >
         <a
           className={styles.url}

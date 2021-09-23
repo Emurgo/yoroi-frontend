@@ -8,8 +8,8 @@ import CopyToClipboard from 'react-copy-to-clipboard';
 import IconCopy from '../../assets/images/copy.inline.svg';
 import IconCopied from '../../assets/images/copied.inline.svg';
 import styles from './CopyableAddress.scss';
-import { Tooltip } from 'react-polymorph/lib/components/Tooltip';
-import { TooltipSkin } from 'react-polymorph/lib/skins/simple/TooltipSkin';
+import { Typography } from '@mui/material';
+import Tooltip from '../common/Tooltip';
 import type { Notification } from '../../types/notificationType';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
@@ -60,17 +60,19 @@ export default class CopyableAddress extends Component<Props> {
       : IconCopy;
     const tooltipComponent = (
       <Tooltip
-        className={styles.SimpleTooltip}
-        skin={TooltipSkin}
         isOpeningUpward={this.props.tooltipOpensUpward}
         arrowRelativeToTip={this.props.arrowRelativeToTip}
-        tip={notification && notification.id === elementId
-          ? intl.formatMessage(notification.message)
-          : intl.formatMessage(messages.copyTooltipMessage)
+        title={
+          <Typography variant="tooltip">
+            {notification && notification.id === elementId
+              ? intl.formatMessage(notification.message)
+              : intl.formatMessage(messages.copyTooltipMessage)}
+          </Typography>
         }
       >
-
-        <span className={styles.copyIconBig}><Icon /></span>
+        <span className={styles.copyIconBig}>
+          <Icon />
+        </span>
       </Tooltip>
     );
 

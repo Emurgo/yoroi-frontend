@@ -8,8 +8,8 @@ import WalletAccountIcon from './WalletAccountIcon';
 import ConceptualIcon from '../../assets/images/wallet-nav/conceptual-wallet.inline.svg';
 import TrezorIcon from '../../assets/images/wallet-nav/trezor-wallet.inline.svg';
 import LedgerIcon from '../../assets/images/wallet-nav/ledger-wallet.inline.svg';
-import { Tooltip } from 'react-polymorph/lib/components/Tooltip';
-import { TooltipSkin } from 'react-polymorph/lib/skins/simple/TooltipSkin';
+import { Typography } from '@mui/material';
+import Tooltip from '../common/Tooltip';
 import { truncateLongName, maxNameLengthBeforeTruncation } from '../../utils/formatters';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import type { $npm$ReactIntl$IntlFormat, $npm$ReactIntl$MessageDescriptor } from 'react-intl';
@@ -147,12 +147,16 @@ export default class NavPlate extends Component<Props> {
     const truncatedName = truncateLongName(walletName);
     return (
       <Tooltip
-        className={styles.SimpleTooltip}
-        skin={TooltipSkin}
+        title={
+          <Typography variant="tooltip">
+            {walletName}
+          </Typography>
+        }
         isOpeningUpward={false}
-        tip={<span className={styles.tooltip}>{walletName}</span>}
       >
-        {truncatedName}
+        <Typography variant="h6" fontSize="1.125rem" pr="4px">
+          {truncatedName}
+        </Typography>
       </Tooltip>
     );
   }
