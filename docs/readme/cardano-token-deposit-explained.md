@@ -4,9 +4,9 @@
 
 Storing any assets on the Cardano blockchain "costs" some money, but you are not actually paying them to anyone, instead you are just depositing them as a collateral to ensure that you have some motivation to not leave lots of worthless assets just lying around forever and forget about them.
 
-For example, at the moment it takes at least 1 ADA to store any ADA, which might sound weird, but in reality it just means that you cannot send any amount less than 1 ADA (for now, but it can be changed at any moment as a simple protocol parameter). This ensures that any non-empty wallet will have at least 1 ADA in it, which might be enough motivation to not just leave it there and rather get it out and send it into circulation.
+For example, at the moment it takes at least ~1 ADA to store any ADA, which might sound weird, but in reality it just means that you cannot send any amount less than 1 ADA (for now, but it can be changed at any moment as a simple protocol parameter). This ensures that any non-empty wallet will have at least 1 ADA in it, which might be enough motivation to not just leave it there and rather get it out and send it into circulation.
 
-Similar to that, storing any native tokens or NFTs requires having a minimum deposit of ADA and this number scales depending on how closely together or separately apart the assets are being stored.
+Similar to that, storing any native tokens or NFTs requires having a minimum deposit of ADA and this number scales depending on how the assets are being stored in the wallet.
 
 ## "Storage boxes" analogy
 
@@ -27,6 +27,8 @@ An example of such a reducing case would be if you have 100 ADA and 20 NFTs that
 It is fairly complicated to make the final estimation of what would be the deposit when the NFTs are already all packed, until you actually try making that transaction, which is why Yoroi would have to display ~30 ADA deposit when the NFTs are all separate in individual boxes initially. And how exactly the repackaging should be done might also depend on user preferences and wallet settings.
 
 But we are working on improving this process now as much as possible in next versions, so this deposit number should now become more and more useful. At the moment the main point is that when you see the **locked asset deposit** value in your wallet - know that it might be **hard or impossible** to reduce it and therefore you might get a **"Not enough funds"** error when trying to send a transaction not leaving enough ADAs in your wallet.
+
+One additional feature that is being developed at the moment and is targeted to improve this process is allowing to combine multiple assets together to be sent in a single transaction, in case you want to send someone multiple NFTs at once or different tokens together. Once available, this not only will improve the user experience but will allow to send a lower ADA deposit along with those assets, because they will be sent in a single box together.
 
 ----
 ----
