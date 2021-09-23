@@ -42,6 +42,7 @@ import { ErgoExternalTxSignRequest } from '../../api/ergo/lib/transactions/ErgoE
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { toRemoteUtxo } from '../../api/ergo/lib/transactions/utils';
 import { mintedTokenInfo } from '../../../chrome/extension/ergo-connector/utils';
+import { Logger } from '../../utils/logging';
 
 // Need to run only once - Connecting wallets
 let initedConnecting = false;
@@ -285,7 +286,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     if (!signingMessage.sign.tx) return;
     const { tx } = signingMessage.sign;
     // it's possible we minted assets in this tx, so looking them up will fail
-    const mintedTokenIds = mintedTokenInfo(tx).map(t => t.Identifier);
+    const mintedTokenIds = mintedTokenInfo(tx, Logger.info).map(t => t.Identifier);
     const tokenIdentifiers = Array.from(new Set([
       ...tx.inputs
         .flatMap(output => output.assets)
