@@ -40,7 +40,7 @@ export default function TextField({
     <STextField
       fullWidth
       className={className}
-      error={error}
+      error={Boolean(error)}
       label={label}
       value={value}
       disabled={disabled}

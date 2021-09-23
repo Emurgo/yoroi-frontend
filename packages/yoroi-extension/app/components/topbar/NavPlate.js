@@ -154,7 +154,7 @@ export default class NavPlate extends Component<Props> {
         }
         isOpeningUpward={false}
       >
-        <Typography variant="h6" fontSize="1.125rem" pr="4px">
+        <Typography variant="p" fontWeight="500" fontSize="1.125rem" pr="4px">
           {truncatedName}
         </Typography>
       </Tooltip>

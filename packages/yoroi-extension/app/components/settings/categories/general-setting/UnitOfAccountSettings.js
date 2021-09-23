@@ -136,11 +136,9 @@ export default class UnitOfAccountSettings extends Component<Props> {
 
         <Select
           formControlProps={{ sx: { marginTop: '40px' } }}
-          options={currencies}
           {...coinPriceCurrencyId.bind()}
           onChange={this.props.onSelect}
           value={currentValue}
-          optionRenderer={optionRenderer}
           menuProps={{
             sx: {
               '& .MuiMenu-paper': {
