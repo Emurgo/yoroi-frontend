@@ -75,5 +75,9 @@ export const classicTheme: Object = createTheme({
   },
   typography: {
     fontFamily: '"SFUIDisplay", sans-serif',
+    tooltip: {
+      fontWeight: 400,
+      fontSize: '0.75rem',
+    },
   },
 });
