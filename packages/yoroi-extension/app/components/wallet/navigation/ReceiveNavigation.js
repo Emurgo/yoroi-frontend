@@ -1,15 +1,13 @@
 // @flow
-import React, { Component } from 'react';
-import type { Node, ElementRef } from 'react';
+import { Component } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
 import styles from './ReceiveNavigation.scss';
 
 import AttentionIcon from '../../../assets/images/attention-modern.inline.svg';
 import ReceiveNavButton from './ReceiveNavButton';
-import type {
-  $npm$ReactIntl$IntlFormat,
-} from 'react-intl';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import {
   addressGroupName,
   addressSubgroupName,
@@ -23,124 +21,48 @@ import InfoIcon from '../../../assets/images/attention-big-light.inline.svg';
 
 import type { AddressTypeName, AddressFilterKind } from '../../../types/AddressFilterTypes';
 import classNames from 'classnames';
-import { Tooltip } from 'react-polymorph/lib/components/Tooltip';
-import { TooltipSkin } from 'react-polymorph/lib/skins/simple/TooltipSkin';
-import ReactResizeDetector from 'react-resize-detector';
+import Tooltip from '../../common/Tooltip';
+import { Typography } from '@mui/material';
 
 type AddressStoreSubset = {
-    +isActiveStore: boolean,
-    +setAsActiveStore: void => void,
-    +name: AddressTypeName,
-    +validFilters: $ReadOnlyArray<AddressFilterKind>,
-    +wasExecuted: boolean,
-    ...,
+  +isActiveStore: boolean,
+  +setAsActiveStore: void => void,
+  +name: AddressTypeName,
+  +validFilters: $ReadOnlyArray<AddressFilterKind>,
+  +wasExecuted: boolean,
+  ...
 };
 export type Props = {|
   +setFilter: AddressFilterKind => void,
   +activeFilter: AddressFilterKind,
-  +addressStores: $ReadOnlyArray<AddressStoreSubset>;
+  +addressStores: $ReadOnlyArray<AddressStoreSubset>,
 |};
-
-type State = {|
-  accordionScrollHeight: null | number,
-  groupsToHide: Set<string>,
-|};
-
 
 @observer
-export default class ReceiveNavigation extends Component<Props, State> {
-
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+export default class ReceiveNavigation extends Component<Props> {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
-  contentRef: ?ElementRef<*>;
-  tooltipIconRefs: Map<string, ElementRef<*>>;
 
-  state: State = {
-    accordionScrollHeight: null,
-    groupsToHide: new Set(),
-  };
-
-  constructor(props: Props) {
-    super(props);
-    this.tooltipIconRefs = new Map();
-    this.contentRef = React.createRef();
-  }
-
-  componentDidMount(): void {
-    this.resize();
-  }
-
-  resize: void => void = () => {
-    const { documentElement } = document;
-    if (
-      !documentElement || !documentElement.style ||
-      !this.contentRef
-    ) {
-      return;
-    }
-    const current = this.contentRef.current;
-    if (current == null) return;
-
-    const groupsToHide = new Set();
-    for (const [groupName, tooltipIconWrapper] of this.tooltipIconRefs.entries()) {
-      const tooltipIcon = tooltipIconWrapper.children[0];
-      const { bottom, top } = tooltipIcon.getBoundingClientRect();
-      const insetCutTop = current.getBoundingClientRect().top - top;
-      const insetCutBottom = bottom - current.getBoundingClientRect().bottom;
-
-      const infoIconHeight = (bottom - top);
-
-      if (insetCutTop >= infoIconHeight || insetCutBottom >= infoIconHeight) {
-        groupsToHide.add(groupName);
-      } else {
-        // we hide the info icon progressively with the scrollbar
-        // ex: if only 50% of the element is visible, this will properly mask 50% of the icon
-        tooltipIcon.style.clipPath = `inset(${insetCutTop}px 0% ${insetCutBottom}px 0%)`;
-      }
-    }
-
-    this.setState({
-      accordionScrollHeight: current.scrollTop,
-      groupsToHide,
-    });
-  }
-
-  genTooltip: AddressStoreSubset => Node = (store) => {
+  genTooltip: AddressStoreSubset => Node = store => {
     const { intl } = this.context;
     return (
       <Tooltip
-        className={classNames([
-          styles.Tooltip,
-          // if tooltip scrolls out of view, we need to manually hide it
-          // note: this is different than hiding the "info" icon
-          // since even if the info icon is hidden,
-          // hovering it over it still triggers the tooltip unless we hide the tooltip also
-          this.state.groupsToHide.has(store.name.group)
-            ? styles.hidden
-            : null,
-        ])}
-        style={{
-          // need the tooltip to be absolute position in order to appear above other content
-          // however, it also needs to properly sync its y position with the scrollbar
-          marginTop: `-${this.state.accordionScrollHeight || 0}px`,
-        }}
-        skin={TooltipSkin}
-        tip={intl.formatMessage(addressGroupsTooltip[store.name.group])}
+        placement="top-start"
+        title={
+          <Typography variant="tooltip">
+            {intl.formatMessage(addressGroupsTooltip[store.name.group])}
+          </Typography>
+        }
       >
-        <span
-          className={styles.infoIcon}
-          ref={(tooltipIconWrapper) => {
-            this.tooltipIconRefs.set(store.name.group, tooltipIconWrapper);
-          }}
-        >
+        <span className={styles.infoIcon}>
           <InfoIcon />
         </span>
       </Tooltip>
     );
-  }
+  };
 
-  createAccordionForGroup: $PropertyType<Props, 'addressStores'> => Node = (stores) => {
+  createAccordionForGroup: ($PropertyType<Props, 'addressStores'>) => Node = stores => {
     const { intl } = this.context;
 
     if (stores.length === 1 && stores[0].name.subgroup === AddressSubgroup.all) {
@@ -148,15 +70,8 @@ export default class ReceiveNavigation extends Component<Props, State> {
       return (
         <div className={stores[0].name.group}>
           <ReceiveNavButton
-            className={classNames([
-              store.name.subgroup,
-              store.name.group,
-            ])}
-            icon={
-              stores[0].name.group === AddressGroupTypes.reward
-                ? AttentionIcon
-                : undefined
-            }
+            className={classNames([store.name.subgroup, store.name.group])}
+            icon={stores[0].name.group === AddressGroupTypes.reward ? AttentionIcon : undefined}
             label={intl.formatMessage(addressGroupName[stores[0].name.group])}
             isActive={store.isActiveStore}
             onClick={store.setAsActiveStore}
@@ -195,7 +110,7 @@ export default class ReceiveNavigation extends Component<Props, State> {
         ))}
       </Accordion>
     );
-  }
+  };
 
   createAccordions: void => Node = () => {
     // we use an array instead of a map to maintain the order of stores
@@ -214,14 +129,11 @@ export default class ReceiveNavigation extends Component<Props, State> {
     }
 
     return groups.map(group => (
-      <div
-        key={group[0].name.group}
-        className={styles.accordion}
-      >
+      <div key={group[0].name.group} className={styles.accordion}>
         {this.createAccordionForGroup(group)}
       </div>
     ));
-  }
+  };
 
   generateFilterSection: void => ?Node = () => {
     const { intl } = this.context;
@@ -244,30 +156,17 @@ export default class ReceiveNavigation extends Component<Props, State> {
         ))}
       </div>
     );
-  }
+  };
 
   render(): Node {
     return (
-      <ReactResizeDetector
-        handleHeight
-        onResize={this.resize}
-      >
-        {() => (
-          <div className={styles.wrapper}>
-            <div className={styles.content}>
-              <div
-                ref={this.contentRef}
-                onScroll={this.resize}
-                className={styles.accordions}
-              >
-                {this.createAccordions()}
-              </div>
-              {/* Section filtered button */}
-              {this.generateFilterSection()}
-            </div>
-          </div>
-        )}
-      </ReactResizeDetector>
+      <div className={styles.wrapper}>
+        <div className={styles.content}>
+          <div className={styles.accordions}>{this.createAccordions()}</div>
+          {/* Section filtered button */}
+          {this.generateFilterSection()}
+        </div>
+      </div>
     );
   }
 }
