@@ -86,6 +86,12 @@ const globalStyles = (theme: Object): Node => (
         '--mui-tooltip-background-color': 'hsl(225 4% 38% / 0.9)',
         '--mui-tooltip-border-color': 'hsl(214deg 16% 81%)',
         '--mui-tooltip-text-color': 'hsl(0 0% 100%)',
+
+        /* === MODAL === */
+        '--mui-dialog-background-color': 'hsl(0 0% 100%)',
+        '--mui-dialog-text-color': 'hsl(231deg 8% 18%)',
+        '--mui-dialog-overlay-background-color': 'hsl(226deg 71% 8% / 80%)',
+        '--mui-dialog-min-width-cmn': '540px',
       },
     }}
   />

@@ -1,24 +1,21 @@
+/* eslint-disable no-nested-ternary */
 // @flow
-import React, { Component } from 'react';
+import React from 'react';
 import { map } from 'lodash';
-import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import type { Node, Element } from 'react';
-import { Modal } from 'react-polymorph/lib/components/Modal';
-// TODO: Remove RP Button
-import { Button } from 'react-polymorph/lib/components/Button';
-import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
-import { ModalSkin } from 'react-polymorph/lib/skins/simple/ModalSkin';
-import styles from './Dialog.scss';
+import { Modal, Typography } from '@mui/material';
+import { Box, styled } from '@mui/system';
+import { LoadingButton } from '@mui/lab';
 
 type ActionType = {|
   +label: string,
   +onClick: void => PossiblyAsync<void>,
   +primary?: boolean,
+  +danger?: boolean,
   +isSubmitting?: boolean,
   +disabled?: boolean,
   +className?: ?string,
-  +themeOverrides?: {...},
 |};
 
 type Props = {|
@@ -28,112 +25,148 @@ type Props = {|
   +closeButton?: Element<any>,
   +backButton?: Node,
   +className?: string,
-  +styleOverride?: {...},
-  +onClose?: ?(void => PossiblyAsync<void>),
+  +styleOverride?: { ... },
+  +onClose?: ?(void) => PossiblyAsync<void>,
   +closeOnOverlayClick?: boolean,
 |};
 
-@observer
-export default class Dialog extends Component<Props> {
-  static defaultProps: {|
-    actions: void,
-    backButton: void,
-    children: void,
-    className: void,
-    closeButton: void,
-    closeOnOverlayClick: void,
-    onClose: void,
-    styleOverride: void,
-    title: void,
-  |} = {
-    title: undefined,
-    children: undefined,
-    actions: undefined,
-    closeButton: undefined,
-    backButton: undefined,
-    className: undefined,
-    styleOverride: undefined,
-    onClose: undefined,
-    closeOnOverlayClick: undefined,
-  };
+export default function DialogFn(props: Props): Node {
+  const {
+    title,
+    children,
+    actions,
+    closeOnOverlayClick,
+    onClose,
+    className,
+    closeButton,
+    backButton,
+  } = props;
 
-  render(): Node {
-    const {
-      title,
-      children,
-      actions,
-      closeOnOverlayClick,
-      onClose,
-      className,
-      closeButton,
-      backButton,
-    } = this.props;
+  const hasSubmitting =
+    actions != null && actions.filter(action => action.isSubmitting === true).length > 0;
 
-    const hasSubmitting = actions != null && actions.filter(
-      action => action.isSubmitting === true
-    ).length > 0;
-
-    return (
-      <Modal
-        isOpen
-        triggerCloseOnOverlayClick={closeOnOverlayClick}
-        onClose={onClose}
-        skin={ModalSkin}
+  return (
+    <Modal
+      open
+      onClose={
+        closeOnOverlayClick === true
+          ? onClose
+          : (event, reason) => {
+              if (reason !== 'backdropClick') {
+                onClose?.(event);
+              }
+            }
+      }
+      sx={{
+        background: 'var(--mui-dialog-overlay-background-color)',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        '& .MuiBackdrop-root': {
+          background: 'none',
+        },
+      }}
+    >
+      <ModalContainer
+        display="flex"
+        flexDirection="column"
+        className={className}
+        style={props.styleOverride}
       >
-
-        <div
-          className={classnames([styles.component, className])}
-          style={this.props.styleOverride}
-        >
-          {(title != null && title !== '')
-            ? (
-              <div className={styles.title}>
-                <h1>{title}</h1>
-              </div>)
-            : null
-          }
-
-          {children != null
-            ? (
-              <div className={styles.content}>
-                {children}
-              </div>)
-            : null
-          }
-
-          {actions && actions.length > 0 && (
-            <div className={styles.actions}>
-              {map(actions, (action, i: number) => {
-                const buttonClasses = classnames([
-                  action.className != null ? action.className : null,
-                  action.primary === true ? 'primary' : 'secondary',
-                  action.isSubmitting === true && action.primary === true
-                    ? styles.isSubmittingPrimary
-                    : null,
-                  action.isSubmitting === true && action.primary !== true
-                    ? styles.isSubmittingSecondary
-                    : null,
-                ]);
-                return (
-                  <Button
-                    themeOverrides={action.themeOverrides}
-                    key={i}
-                    className={buttonClasses}
-                    label={action.label}
-                    onClick={action.onClick}
-                    disabled={action.disabled === true || action.isSubmitting === true}
-                    skin={ButtonSkin}
-                  />
-                );
-              })}
-            </div>)
-          }
-
-          {!hasSubmitting && closeButton ? React.cloneElement(closeButton, { onClose }) : null}
-          {!hasSubmitting && backButton}
-
-        </div>
-      </Modal>
-    );
-  }
+        {title != null && title !== '' ? (
+          <Typography as="h1" variant="body1" className="dialog__title">
+            {title}
+          </Typography>
+        ) : null}
+        {children != null ? <ModalContent>{children}</ModalContent> : null}
+        {actions && actions.length > 0 && (
+          <ModalFooter>
+            {map(actions, (action, i: number) => {
+              const buttonClasses = classnames([
+                // Keep classnames for testing
+                action.className != null ? action.className : null,
+                action.primary === true ? 'primary' : 'secondary',
+              ]);
+              return (
+                <LoadingButton
+                  key={i}
+                  variant={
+                    action.danger === true
+                      ? 'danger'
+                      : action.primary === true
+                      ? 'primary'
+                      : 'secondary'
+                  }
+                  className={buttonClasses}
+                  loading={action.isSubmitting}
+                  onClick={action.onClick}
+                  disabled={action.disabled === true || action.isSubmitting === true}
+                >
+                  {action.label}
+                </LoadingButton>
+              );
+            })}
+          </ModalFooter>
+        )}
+        {!hasSubmitting && closeButton ? React.cloneElement(closeButton, { onClose }) : null}
+        {!hasSubmitting && backButton}
+      </ModalContainer>
+    </Modal>
+  );
 }
+
+DialogFn.defaultProps = {
+  title: undefined,
+  children: undefined,
+  actions: undefined,
+  closeButton: undefined,
+  backButton: undefined,
+  className: undefined,
+  styleOverride: undefined,
+  onClose: undefined,
+  closeOnOverlayClick: false,
+};
+
+const ModalContainer = styled(Box)(({ theme }) => ({
+  position: 'relative',
+  minWidth: 'var(--mui-dialog-min-width-cmn)',
+  borderRadius: theme.name === 'classic' ? 0 : 8,
+  paddingTop: theme.name === 'classic' ? '25px' : '24px',
+  paddingBottom: theme.name === 'classic' ? '30px' : '40px',
+  maxWidth: theme.name === 'classic' ? '785px' : '560px',
+  backgroundColor: 'var(--mui-dialog-background-color)',
+  color: 'var(--mui-dialog-text-color)',
+  maxHeight: '80vh',
+
+  '& .dialog__title': {
+    flex: 1,
+    marginBottom: theme.name === 'classic' ? '22px' : '40px',
+    fontWeight: 500,
+    textAlign: 'center',
+    textTransform: 'uppercase',
+    letterSpacing: 0,
+  },
+}));
+const ModalContent = styled(Box)(({ theme }) => ({
+  overflowX: 'hidden',
+  overflowY: 'overlay',
+  maxHeight: '60vh',
+  paddingLeft: theme.name === 'classic' ? '30px' : '40px',
+  paddingRight: theme.name === 'classic' ? '30px' : '40px',
+}));
+const ModalFooter = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  paddingLeft: theme.name === 'classic' ? '30px' : '40px',
+  paddingRight: theme.name === 'classic' ? '30px' : '40px',
+  marginTop: theme.name === 'classic' ? '20px' : '34px',
+  '& button': {
+    width: ' 50%',
+    '&:only-child': {
+      margin: 'auto',
+      width: '100%',
+    },
+    '& + button': {
+      marginLeft: '20px',
+    },
+  },
+}));
