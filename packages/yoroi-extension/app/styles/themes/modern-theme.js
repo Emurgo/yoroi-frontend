@@ -78,6 +78,6 @@ export const modernTheme: Object = createTheme({
     tooltip: {
       fontWeight: 400,
       fontSize: '0.75rem',
-    }
+    },
   },
 });

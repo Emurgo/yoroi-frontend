@@ -10,7 +10,6 @@ import globalMessages from '../../i18n/global-messages';
 import LocalizableError from '../../i18n/LocalizableError';
 import CheckboxLabel from '../common/CheckboxLabel';
 import styles from './DangerousActionDialog.scss';
-import dangerousButtonStyles from '../../themes/overrides/DangerousButton.scss';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 type Props = {|
@@ -35,16 +34,13 @@ type Props = {|
 
 @observer
 export default class DangerousActionDialog extends Component<Props> {
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
   render(): Node {
     const { intl } = this.context;
-    const {
-      isSubmitting,
-      error,
-    } = this.props;
+    const { isSubmitting, error } = this.props;
 
     const dialogClasses = classnames(['removeWalletDialog', styles.dialog]);
 
@@ -65,7 +61,7 @@ export default class DangerousActionDialog extends Component<Props> {
         primary: true,
         className: confirmButtonClasses,
         disabled: !this.props.isChecked ? true : undefined,
-        themeOverrides: dangerousButtonStyles,
+        danger: true,
         isSubmitting: this.props.isSubmitting,
         ...(this.props.primaryButton ?? Object.freeze({})),
       },
@@ -80,7 +76,6 @@ export default class DangerousActionDialog extends Component<Props> {
         className={dialogClasses}
         closeButton={<DialogCloseButton onClose={this.props.onCancel} />}
       >
-
         {this.props.children}
 
         <div className={styles.checkbox}>
@@ -91,17 +86,8 @@ export default class DangerousActionDialog extends Component<Props> {
           />
         </div>
 
-        {error
-          ? (
-            <p className={styles.error}>
-              {intl.formatMessage(error, error.values)}
-            </p>
-          )
-          : null
-        }
-
+        {error ? <p className={styles.error}>{intl.formatMessage(error, error.values)}</p> : null}
       </Dialog>
     );
   }
-
 }
