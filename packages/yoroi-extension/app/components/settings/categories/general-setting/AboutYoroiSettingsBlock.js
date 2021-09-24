@@ -157,7 +157,7 @@ export default class AboutYoroiSettingsBlock extends Component<{||}> {
               websiteName="Github"
               url={baseGithubUrl + 'tree/' + environment.branch}
               light={false}
-              placementTooltip="bottom"
+              placementTooltip="bottom-start"
               onExternalLinkClick={handleExternalLinkClick}
             >
               <RawHash light={false}>
