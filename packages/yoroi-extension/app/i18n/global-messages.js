@@ -773,9 +773,9 @@ const globalMessages: * = defineMessages({
     id: 'global.errors.invalidPin',
     defaultMessage: '!!!Invalid Pin',
   },
-  buySellAda: {
-    id: 'button.buySellAda',
-    defaultMessage: '!!!Buy/Sell ADA',
+  buyAda: {
+    id: 'button.buyAda',
+    defaultMessage: '!!!Buy ADA',
   },
   txConfirmationLedgerNanoLine2: {
     id: 'wallet.send.ledger.confirmationDialog.info.line.2',
