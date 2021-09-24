@@ -11,7 +11,7 @@ import {
 import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import { genFormatTokenAmount, genLookupOrFail, getTokenIdentifierIfExists, getTokenStrictName } from '../../stores/stateless/tokenHelpers';
-import { truncateToken } from '../../utils/formatters';
+import { amountWithoutZeros, truncateToken } from '../../utils/formatters';
 import AssetsPage from '../../components/wallet/assets/AssetsPage';
 
 export type GeneratedData = typeof WalletAssetsPage.prototype.generated;
@@ -36,7 +36,7 @@ export default class WalletAssetsPage extends Component<InjectedOrGenerated<Gene
         })).map(token => ({
           name: truncateToken(getTokenStrictName(token.info) ?? '-'),
           id: (getTokenIdentifierIfExists(token.info) ?? '-'),
-          amount: genFormatTokenAmount(getTokenInfo)(token.entry)
+          amount: amountWithoutZeros(genFormatTokenAmount(getTokenInfo)(token.entry)),
         }));
       })();
 
