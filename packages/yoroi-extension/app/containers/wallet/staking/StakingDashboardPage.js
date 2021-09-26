@@ -715,8 +715,6 @@ export default class StakingDashboardPage extends Component<Props> {
     const txRequests = this.generated.stores.transactions.getTxRequests(request.publicDeriver);
     const balance = txRequests.requests.getBalanceRequest.result;
 
-    // <TODO:RWRD2109>
-    // eslint-disable-next-line no-unused-vars
     const rewardBalance =
       request.delegationRequests.getDelegatedBalance.result == null
         ? new MultiToken([], defaultToken)
@@ -745,7 +743,7 @@ export default class StakingDashboardPage extends Component<Props> {
         totalSum={
           balance == null
             ? undefined
-            : balance // .joinAddCopy(rewardBalance) // <TODO:RWRD2109>
+            : balance.joinAddCopy(rewardBalance)
         }
         totalRewards={
           !showRewardAmount || request.delegationRequests.getDelegatedBalance.result == null
