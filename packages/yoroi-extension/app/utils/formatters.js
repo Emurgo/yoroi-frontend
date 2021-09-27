@@ -1,28 +1,6 @@
 // @flow
 import BigNumber from 'bignumber.js';
 
-export function splitAmount(
-  amount: BigNumber,
-  decimalPlaces: number,
-): [string, string] {
-  const valString = amount.toFormat(decimalPlaces);
-  const startIndex = valString.length - decimalPlaces;
-  let beforeDecimal = valString.substring(0, startIndex)
-  const afterDecimal = valString.substring(startIndex)
-
-  let sliceZerosIdx = decimalPlaces
-  for (let i = 0; i < decimalPlaces; i++) {
-     if (Number(afterDecimal[i]) === 0 && sliceZerosIdx == decimalPlaces) sliceZerosIdx = i 
-     if (Number(afterDecimal[i]) !== 0) sliceZerosIdx = decimalPlaces
-  }
-  const afterDecimalWithoutZeros = afterDecimal.slice(0, sliceZerosIdx)
-  // Remove the dots if no decimals
-  if (Number(afterDecimalWithoutZeros) == 0) {
-    beforeDecimal = beforeDecimal.slice(0, beforeDecimal.length - 1)
-  }
-  return [beforeDecimal,afterDecimalWithoutZeros]
-}
-
 export const removeZeros: (string => string) = (amount: string): string => {
   let sliceZerosIdx = amount.length
   const amountLength = amount.length
@@ -31,6 +9,21 @@ export const removeZeros: (string => string) = (amount: string): string => {
      if (Number(amount[i]) !== 0) sliceZerosIdx = amountLength
   }
   return amount.slice(0, sliceZerosIdx)
+}
+
+export function splitAmount(
+  amount: BigNumber,
+  decimalPlaces: number,
+): [string, string] {
+  const valString = amount.toFormat(decimalPlaces);
+  const startIndex = valString.length - decimalPlaces;
+  let beforeDecimal = valString.substring(0, startIndex)
+  const afterDecimal = removeZeros(valString.substring(startIndex))
+  // Remove the dots if no decimals
+  if (Number(afterDecimal) == 0) {
+    beforeDecimal = beforeDecimal.slice(0, beforeDecimal.length - 1)
+  }
+  return [beforeDecimal, afterDecimal]
 }
 
 export const amountWithoutZeros: (string => string) = (amount: string): string => {
