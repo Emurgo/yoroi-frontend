@@ -5,8 +5,8 @@ export const removeZeros: (string => string) = (amount: string): string => {
   let sliceZerosIdx = amount.length
   const amountLength = amount.length
   for (let i = 0; i < amountLength; i++) {
-     if (Number(amount[i]) === 0 && sliceZerosIdx == amountLength) sliceZerosIdx = i 
-     if (Number(amount[i]) !== 0) sliceZerosIdx = amountLength
+    if (Number(amount[i]) === 0 && sliceZerosIdx === amountLength) sliceZerosIdx = i 
+    if (Number(amount[i]) !== 0) sliceZerosIdx = amountLength
   }
   return amount.slice(0, sliceZerosIdx)
 }
@@ -20,7 +20,7 @@ export function splitAmount(
   let beforeDecimal = valString.substring(0, startIndex)
   const afterDecimal = removeZeros(valString.substring(startIndex))
   // Remove the dots if no decimals
-  if (Number(afterDecimal) == 0) {
+  if (Number(afterDecimal) === 0) {
     beforeDecimal = beforeDecimal.slice(0, beforeDecimal.length - 1)
   }
   return [beforeDecimal, afterDecimal]
@@ -29,7 +29,7 @@ export function splitAmount(
 export const amountWithoutZeros: (string => string) = (amount: string): string => {
   const [before, after] = amount.split('.')
   const afterWithoutDecimals = removeZeros(after || '')
-  // Remove the dot 
+  // Remove the dot
   if (Number(afterWithoutDecimals) === 0) return before
   return before.concat('.', afterWithoutDecimals)
 }
