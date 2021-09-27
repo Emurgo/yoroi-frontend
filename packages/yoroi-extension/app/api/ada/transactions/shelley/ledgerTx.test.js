@@ -14,7 +14,13 @@ import {
   normalizeToAddress,
 } from '../../lib/storage/bridge/utils';
 import { HaskellShelleyTxSignRequest } from './HaskellShelleyTxSignRequest';
-import { AddressType, CertificateType, TransactionSigningMode, TxOutputDestinationType } from '@cardano-foundation/ledgerjs-hw-app-cardano';
+import {
+  AddressType,
+  CertificateType,
+  TransactionSigningMode,
+  TxOutputDestinationType,
+  StakeCredentialParamsType,
+} from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import type { DeviceOwnedAddress, SignTransactionRequest } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { networks } from '../../lib/storage/database/prepackaged/networks';
 import { HARD_DERIVATION_START, WalletTypePurpose, CoinTypes, ChainDerivations } from '../../../../config/numbersConfig';
@@ -81,7 +87,7 @@ test('Generate address parameters', async () => {
       path,
       addressingMap: () => undefined,
     })).toEqual(({
-      type: AddressType.BASE,
+      type: AddressType.BASE_PAYMENT_KEY_STAKE_KEY,
       params: {
         spendingPath: path,
         stakingKeyHashHex: '63073aa639558af724c96fbd1d01f35d087823e1e14b7d4e0fdb2132',
@@ -115,7 +121,7 @@ test('Generate address parameters', async () => {
         return undefined;
       },
     })).toEqual(({
-      type: AddressType.BASE,
+      type: AddressType.BASE_PAYMENT_KEY_STAKE_KEY,
       params: {
         spendingPath: path,
         stakingPath: stakingKeyPath,
@@ -134,7 +140,7 @@ test('Generate address parameters', async () => {
       path,
       addressingMap: () => undefined,
     })).toEqual(({
-      type: AddressType.ENTERPRISE,
+      type: AddressType.ENTERPRISE_KEY,
       params: {
         spendingPath: path,
       }
@@ -152,7 +158,7 @@ test('Generate address parameters', async () => {
       path,
       addressingMap: () => undefined,
     })).toEqual(({
-      type: AddressType.POINTER,
+      type: AddressType.POINTER_KEY,
       params: {
         spendingPath: path,
         stakingBlockchainPointer: {
@@ -182,7 +188,7 @@ test('Generate address parameters', async () => {
       path: stakingKeyPath,
       addressingMap: () => undefined,
     })).toEqual(({
-      type: AddressType.REWARD,
+      type: AddressType.REWARD_KEY,
       params: {
         stakingPath: stakingKeyPath,
       }
@@ -414,19 +420,23 @@ test('Create Ledger transaction', async () => {
       withdrawals: null,
       certificates: [{
         params: {
-          path: [
-            WalletTypePurpose.CIP1852,
-            CoinTypes.CARDANO,
-            HARD_DERIVATION_START,
-            2,
-            0,
-          ],
+          stakeCredential: {
+            type: StakeCredentialParamsType.KEY_PATH,
+            keyPath: [
+              WalletTypePurpose.CIP1852,
+              CoinTypes.CARDANO,
+              HARD_DERIVATION_START,
+              2,
+              0,
+            ],
+          },
         },
         type: CertificateType.STAKE_REGISTRATION,
       }],
       auxiliaryData: undefined,
       validityIntervalStart: undefined,
     },
+    additionalWitnessPaths: [],
   }: SignTransactionRequest));
 
   buildSignedTransaction(
