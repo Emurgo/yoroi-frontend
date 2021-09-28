@@ -115,14 +115,6 @@ export default class NavWalletDetails extends Component<Props> {
                 </p>
                 {this.renderAmountDisplay({ shouldHideBalance, amount: walletAmount })}
               </div>
-              {isNonZeroDeposit ? (
-                <div>
-                  <p className={styles.label}>
-                    {intl.formatMessage(globalMessages.assetDepositLabel)}&nbsp;
-                  </p>
-                  {this.renderAmountDisplay({ shouldHideBalance, amount: assetDeposit })}
-                </div>
-              ) : null}
               {/* <TODO:RWRD2109> */}
               {/* <div> */}
               {/*  <p className={styles.label}> */}

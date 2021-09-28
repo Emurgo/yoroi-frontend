@@ -44,12 +44,15 @@ export default class WalletAssetsPage extends Component<InjectedOrGenerated<Gene
 
       const txRequests = this.generated.stores.transactions.getTxRequests(publicDeriver);
       const assetDeposit = txRequests.requests.getAssetDepositRequest.result || null;
-
+      const { stores } = this.generated;
+      const { profile } = stores;
+      
     return (
       <AssetsPage
        assetsList={assetsList}
        getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)} 
-       assetDeposit={assetDeposit} 
+       assetDeposit={assetDeposit}
+       shouldHideBalance={profile.shouldHideBalance}
       />
     )
   }
@@ -66,7 +69,10 @@ export default class WalletAssetsPage extends Component<InjectedOrGenerated<Gene
         |},
         getTxRequests: (PublicDeriver<>) => TxRequests
       |},
-      wallets: {| selected: null | PublicDeriver<> |}
+      wallets: {| selected: null | PublicDeriver<> |},
+      profile: {|
+        shouldHideBalance: boolean,
+      |},
     |}
     |} {
     if (this.props.generated !== undefined) {
@@ -97,7 +103,10 @@ export default class WalletAssetsPage extends Component<InjectedOrGenerated<Gene
             };
           })(),
           getTxRequests: stores.transactions.getTxRequests,
-        }
+        },
+        profile: {
+          shouldHideBalance: stores.profile.shouldHideBalance,
+        },
     } })
   }
 };

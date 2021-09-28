@@ -20,6 +20,7 @@ import type {
 } from '../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import globalMessages from '../../../i18n/global-messages';
+import { hiddenAmount } from '../../../utils/strings';
 
 const SORTING_DIRECTIONS = {
   UP: 'UP',
@@ -40,6 +41,7 @@ type Props = {|
   +assetsList: Asset[],
   +assetDeposit:? null | MultiToken,
   +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
+  +shouldHideBalance: Boolean,
 |};
 
 type State = {|
@@ -141,6 +143,7 @@ export default class AssetsList extends Component<Props, State> {
   }
 
   renderAmountDisplay: {|
+    shouldHideBalance: boolean,
     amount: ?MultiToken
   |} => Node = (request) => {
     if (request.amount == null) {
@@ -156,12 +159,22 @@ export default class AssetsList extends Component<Props, State> {
         tokenInfo.Metadata.numberOfDecimals,
       );
 
-     const balanceDisplay = (
-        <>
-          <span className={styles.beforeDecimal}>{beforeDecimalRewards}</span>
-          <span className={styles.afterDecimal}>{afterDecimalRewards}</span>
-        </>
-      );
+      let balanceDisplay;
+      if (request.shouldHideBalance) {
+        balanceDisplay = (<span>{hiddenAmount}</span>);
+      } else {
+        const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
+          shiftedAmount,
+          tokenInfo.Metadata.numberOfDecimals,
+        );
+  
+        balanceDisplay = (
+          <>
+            <span className={styles.beforeDecimal}>{beforeDecimalRewards}</span>
+            <span className={styles.afterDecimal}>{afterDecimalRewards}</span>
+          </>
+        );
+      }
 
     return (<>{balanceDisplay} <span className={styles.tokenName}>{truncateToken(getTokenName(tokenInfo))}</span></>);
   }
@@ -170,7 +183,7 @@ export default class AssetsList extends Component<Props, State> {
 
     const { intl } = this.context;
     const { assetsList } = this.state
-    const { assetDeposit } = this.props
+    const { assetDeposit, shouldHideBalance } = this.props
 
     return (
       <div className={styles.component}>
@@ -190,7 +203,7 @@ export default class AssetsList extends Component<Props, State> {
               <p className={styles.label}>
                 {intl.formatMessage(globalMessages.assetDepositLabel)} &nbsp;
               </p>
-              {this.renderAmountDisplay({ amount: assetDeposit })}
+              {this.renderAmountDisplay({ shouldHideBalance, amount: assetDeposit })}
             </div>
           </div>
           )}
