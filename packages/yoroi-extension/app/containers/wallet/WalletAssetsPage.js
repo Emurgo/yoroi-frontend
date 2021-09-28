@@ -13,6 +13,8 @@ import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tab
 import { genFormatTokenAmount, genLookupOrFail, getTokenIdentifierIfExists, getTokenStrictName } from '../../stores/stateless/tokenHelpers';
 import { truncateToken } from '../../utils/formatters';
 import AssetsPage from '../../components/wallet/assets/AssetsPage';
+import type { TxRequests } from '../../stores/toplevel/TransactionsStore';
+
 
 export type GeneratedData = typeof WalletAssetsPage.prototype.generated;
 
@@ -40,7 +42,16 @@ export default class WalletAssetsPage extends Component<InjectedOrGenerated<Gene
         }));
       })();
 
-    return <AssetsPage assetsList={assetsList} />
+      const txRequests = this.generated.stores.transactions.getTxRequests(publicDeriver);
+      const assetDeposit = txRequests.requests.getAssetDepositRequest.result || null;
+
+    return (
+      <AssetsPage
+       assetsList={assetsList}
+       getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)} 
+       assetDeposit={assetDeposit} 
+      />
+    )
   }
 
   @computed get generated(): {|
@@ -53,6 +64,7 @@ export default class WalletAssetsPage extends Component<InjectedOrGenerated<Gene
         getBalanceRequest: {|
           result: ?MultiToken,
         |},
+        getTxRequests: (PublicDeriver<>) => TxRequests
       |},
       wallets: {| selected: null | PublicDeriver<> |}
     |}
@@ -84,6 +96,7 @@ export default class WalletAssetsPage extends Component<InjectedOrGenerated<Gene
               result: requests.getBalanceRequest.result,
             };
           })(),
+          getTxRequests: stores.transactions.getTxRequests,
         }
     } })
   }

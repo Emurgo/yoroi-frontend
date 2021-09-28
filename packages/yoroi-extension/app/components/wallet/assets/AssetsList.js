@@ -11,8 +11,15 @@ import ArrowsListFromBottom from '../../../assets/images/assets-page/arrows-list
 import ArrowsListFromTop from '../../../assets/images/assets-page/arrows-list-from-top.inline.svg';
 import ArrowsList from '../../../assets/images/assets-page/arrows-list.inline.svg';
 import Search from '../../../assets/images/assets-page/search.inline.svg';
-import { truncateAddressShort } from '../../../utils/formatters';
+import { splitAmount, truncateAddressShort, truncateToken } from '../../../utils/formatters';
 import BorderedBox from '../../widgets/BorderedBox';
+import { MultiToken } from '../../../api/common/lib/MultiToken';
+import { getTokenName } from '../../../stores/stateless/tokenHelpers';
+import type {
+  TokenLookupKey,
+} from '../../../api/common/lib/MultiToken';
+import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
+import globalMessages from '../../../i18n/global-messages';
 
 const SORTING_DIRECTIONS = {
   UP: 'UP',
@@ -31,6 +38,8 @@ const SORTING_COLUMNS = {
 |}
 type Props = {|
   +assetsList: Asset[],
+  +assetDeposit:? null | MultiToken,
+  +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
 |};
 
 type State = {|
@@ -131,10 +140,38 @@ export default class AssetsList extends Component<Props, State> {
     return <ArrowsList />;
   }
 
+  renderAmountDisplay: {|
+    amount: ?MultiToken
+  |} => Node = (request) => {
+    if (request.amount == null) {
+      return <div className={styles.isLoading} />;
+    }
+
+    const defaultEntry = request.amount.getDefaultEntry();
+    const tokenInfo = this.props.getTokenInfo(defaultEntry);
+    const shiftedAmount = defaultEntry.amount
+      .shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
+      const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
+        shiftedAmount,
+        tokenInfo.Metadata.numberOfDecimals,
+      );
+
+     const balanceDisplay = (
+        <>
+          <span className={styles.beforeDecimal}>{beforeDecimalRewards}</span>
+          <span className={styles.afterDecimal}>{afterDecimalRewards}</span>
+        </>
+      );
+
+    return (<>{balanceDisplay} <span className={styles.tokenName}>{truncateToken(getTokenName(tokenInfo))}</span></>);
+  }
+
   render(): Node {
 
     const { intl } = this.context;
     const { assetsList } = this.state
+    const { assetDeposit } = this.props
+
     return (
       <div className={styles.component}>
         <BorderedBox>
@@ -147,6 +184,16 @@ export default class AssetsList extends Component<Props, State> {
               <input onChange={this.search} type='text' placeholder={intl.formatMessage(messages.search)} />
             </div>
           </div>
+          {assetDeposit && (
+          <div className={styles.lockedAssets}>
+            <div className={styles.lockedAssetsAmount}>
+              <p className={styles.label}>
+                {intl.formatMessage(globalMessages.assetDepositLabel)} &nbsp;
+              </p>
+              {this.renderAmountDisplay({ amount: assetDeposit })}
+            </div>
+          </div>
+          )}
         </BorderedBox>
         {
           assetsList.length === 0 ? (

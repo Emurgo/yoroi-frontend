@@ -6,20 +6,29 @@ import styles from './AssetsPage.scss';
 
 import AssetsList from './AssetsList';
 import type { Asset } from './AssetsList';
-
-
+import { splitAmount, truncateToken } from '../../../utils/formatters';
+import { genLookupOrFail, getTokenName } from '../../../stores/stateless/tokenHelpers';
+import { MultiToken } from '../../../api/common/lib/MultiToken';
+import type {
+  TokenLookupKey,
+} from '../../../api/common/lib/MultiToken';
+import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 
 type Props = {|
   +assetsList: Asset[],
+  +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
+  +assetDeposit: null | MultiToken,
 |};
 
 @observer
 export default class AssetsPage extends Component<Props> {
 
   render(): Node {
+    const { assetDeposit } = this.props
+    const isNonZeroDeposit = !assetDeposit?.isEmpty();
     return (
       <div className={styles.component}>
-        <AssetsList assetsList={this.props.assetsList} />
+        <AssetsList assetsList={this.props.assetsList} assetDeposit={isNonZeroDeposit ? assetDeposit : null} getTokenInfo={this.props.getTokenInfo}/>
       </div>
     );
   }
