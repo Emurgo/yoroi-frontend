@@ -32,7 +32,6 @@ type Props = {|
   */
   +rewards: null | void | MultiToken,
   +walletAmount: null | MultiToken,
-  +assetDeposit: null | MultiToken,
   +infoText?: string,
   +showDetails?: boolean,
   +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
@@ -67,7 +66,6 @@ export default class NavWalletDetails extends Component<Props> {
       // eslint-disable-next-line no-unused-vars
       rewards,
       walletAmount,
-      assetDeposit,
       infoText,
       showDetails,
       showEyeIcon,
@@ -76,7 +74,6 @@ export default class NavWalletDetails extends Component<Props> {
     const { intl } = this.context;
 
     const totalAmount = this.getTotalAmount();
-    const isNonZeroDeposit = !assetDeposit?.isEmpty();
 
     const showsRewards = (
       this.props.rewards !== undefined &&

@@ -41,7 +41,7 @@ type Props = {|
   +assetsList: Asset[],
   +assetDeposit:? null | MultiToken,
   +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
-  +shouldHideBalance: Boolean,
+  +shouldHideBalance: boolean,
 |};
 
 type State = {|
@@ -154,10 +154,6 @@ export default class AssetsList extends Component<Props, State> {
     const tokenInfo = this.props.getTokenInfo(defaultEntry);
     const shiftedAmount = defaultEntry.amount
       .shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
-      const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
-        shiftedAmount,
-        tokenInfo.Metadata.numberOfDecimals,
-      );
 
       let balanceDisplay;
       if (request.shouldHideBalance) {
@@ -176,7 +172,12 @@ export default class AssetsList extends Component<Props, State> {
         );
       }
 
-    return (<>{balanceDisplay} <span className={styles.tokenName}>{truncateToken(getTokenName(tokenInfo))}</span></>);
+    return (
+      <>
+        {balanceDisplay}
+        <span className={styles.tokenName}>{truncateToken(getTokenName(tokenInfo))}</span>
+      </>
+    );
   }
 
   render(): Node {

@@ -46,13 +46,13 @@ export default class WalletAssetsPage extends Component<InjectedOrGenerated<Gene
       const assetDeposit = txRequests.requests.getAssetDepositRequest.result || null;
       const { stores } = this.generated;
       const { profile } = stores;
-      
+      const isNonZeroDeposit = !assetDeposit?.isEmpty();
     return (
       <AssetsPage
-       assetsList={assetsList}
-       getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)} 
-       assetDeposit={assetDeposit}
-       shouldHideBalance={profile.shouldHideBalance}
+        assetsList={assetsList}
+        getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)} 
+        assetDeposit={isNonZeroDeposit ? assetDeposit : null}
+        shouldHideBalance={profile.shouldHideBalance}
       />
     )
   }

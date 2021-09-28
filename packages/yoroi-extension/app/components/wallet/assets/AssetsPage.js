@@ -6,8 +6,6 @@ import styles from './AssetsPage.scss';
 
 import AssetsList from './AssetsList';
 import type { Asset } from './AssetsList';
-import { splitAmount, truncateToken } from '../../../utils/formatters';
-import { genLookupOrFail, getTokenName } from '../../../stores/stateless/tokenHelpers';
 import { MultiToken } from '../../../api/common/lib/MultiToken';
 import type {
   TokenLookupKey,
@@ -18,7 +16,7 @@ type Props = {|
   +assetsList: Asset[],
   +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
   +assetDeposit: null | MultiToken,
-  +shouldHideBalance: boolean
+  +shouldHideBalance: boolean,
 |};
 
 @observer
@@ -26,15 +24,13 @@ export default class AssetsPage extends Component<Props> {
 
   render(): Node {
     const { assetDeposit } = this.props
-    const isNonZeroDeposit = !assetDeposit?.isEmpty();
-
     return (
       <div className={styles.component}>
         <AssetsList 
-         assetsList={this.props.assetsList}
-         assetDeposit={isNonZeroDeposit ? assetDeposit : null}
-         getTokenInfo={this.props.getTokenInfo}
-         shouldHideBalance={this.props.shouldHideBalance}
+          assetsList={this.props.assetsList}
+          assetDeposit={assetDeposit}
+          getTokenInfo={this.props.getTokenInfo}
+          shouldHideBalance={this.props.shouldHideBalance}
         />
       </div>
     );
