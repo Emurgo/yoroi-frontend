@@ -27,12 +27,6 @@
 
   .receiverInput {
     letter-spacing: 0;
-
-    :global {
-      .SimpleInput_input {
-        font-family: var(--font-mono-regular);
-      }
-    }
   }
 
   .amountField {
