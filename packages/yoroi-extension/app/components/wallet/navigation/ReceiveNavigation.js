@@ -49,7 +49,7 @@ export default class ReceiveNavigation extends Component<Props> {
       <Tooltip
         placement="top-start"
         title={
-          <Typography variant="tooltip">
+          <Typography variant="body3">
             {intl.formatMessage(addressGroupsTooltip[store.name.group])}
           </Typography>
         }

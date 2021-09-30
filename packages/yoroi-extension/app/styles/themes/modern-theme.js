@@ -38,36 +38,38 @@ export const modernTheme: Object = createTheme({
   },
   palette: {
     primary: {
-      main: 'hsl(232, 100%, 64%)',
+      light: '#164FD6',
+      main: '#3154CB',
+      dark: '#1A44B7',
     },
     secondary: {
-      main: 'hsl(167, 80%, 45%)',
+      main: '#17D1AA',
       light: 'hsl(168deg 82% 49% / 10%)',
-      dark: 'hsl(168 82% 49%)',
-      disabled: 'rgb(201 237 229)',
-      contrastText: 'hsl(0deg 0% 100%)',
+      dark: '#16e3ba',
+      disabled: '#c9ede5',
+      contrastText: '#fff',
     },
     error: {
-      main: 'hsl(345, 100%, 54%)',
+      main: '#FF1351',
     },
     warning: {
-      main: 'hsl(38, 92%, 55%)',
+      main: '#f6a823',
     },
     input: {
-      main: 'hsl(0 0% 61%)',
-      dark: 'hsl(0 0% 29%)',
+      main: '#9c9c9c',
+      dark: '#4a4a4a',
     },
     grey: {
-      '50': 'hsl(201, 22%, 95%)',
-      '100': 'hsl(216, 26%, 93%)',
-      '200': 'hsl(219, 23%, 89%)',
-      '300': 'hsl(222, 19%, 81%)',
-      '400': 'hsl(221, 17%, 70%)',
-      '500': 'hsl(221, 12%, 59%)',
-      '600': 'hsl(221, 10%, 47%)',
-      '700': 'hsl(228, 15%, 34%)',
-      '800': 'hsl(229, 20%, 28%)',
-      '900': 'hsl(228, 22%, 18%)',
+      '50': '#F0F3F5',
+      '100': '#EAEDF2',
+      '200': '#DCE0E9',
+      '300': '#C4CAD7',
+      '400': '#A7AFC0',
+      '500': '#8A92A3',
+      '600': '#6B7384',
+      '700': '#4A5065',
+      '800': '#383E54',
+      '900': '#242838',
     },
   },
   shape: {
@@ -75,7 +77,45 @@ export const modernTheme: Object = createTheme({
   },
   typography: {
     fontFamily: 'Rubik, sans-serif',
-    tooltip: {
+    h1: {
+      fontWeight: 500,
+      fontSize: '1.875rem',
+    },
+    h2: {
+      fontWeight: 500,
+      fontSize: '1.75rem',
+    },
+    h3: {
+      fontWeight: 500,
+      fontSize: '1.5rem',
+    },
+    h4: {
+      fontWeight: 500,
+      fontSize: '1.25rem',
+    },
+    h5: {
+      fontWeight: 500,
+      fontSize: '1.125rem',
+    },
+    h6: {
+      fontWeight: 500,
+      fontSize: '1rem',
+      textTransform: 'uppercase',
+    },
+    h7: {
+      fontWeight: 500,
+      fontSize: '0.875rem',
+      textTransform: 'uppercase',
+    },
+    body1: {
+      fontWeight: 400,
+      fontSize: '1rem',
+    },
+    body2: {
+      fontWeight: 400,
+      fontSize: '0.875rem',
+    },
+    body3: {
       fontWeight: 400,
       fontSize: '0.75rem',
     },
