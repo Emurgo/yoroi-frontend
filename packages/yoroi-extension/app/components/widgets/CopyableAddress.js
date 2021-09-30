@@ -57,7 +57,7 @@ export default class CopyableAddress extends Component<Props> {
     const tooltipComponent = (
       <Tooltip
         title={
-          <Typography variant="tooltip">
+          <Typography variant="body3">
             {notification && notification.id === elementId
               ? intl.formatMessage(notification.message)
               : intl.formatMessage(messages.copyTooltipMessage)}

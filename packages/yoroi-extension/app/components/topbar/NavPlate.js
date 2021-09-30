@@ -147,7 +147,7 @@ export default class NavPlate extends Component<Props> {
     return (
       <Tooltip
         title={
-          <Typography variant="tooltip">
+          <Typography variant="body3">
             {walletName}
           </Typography>
         }
