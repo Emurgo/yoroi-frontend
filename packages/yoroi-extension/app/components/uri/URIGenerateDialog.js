@@ -4,14 +4,13 @@ import { Component } from 'react';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { Button } from '@mui/material';
-import { NumericInput } from 'react-polymorph/lib/components/NumericInput';
 import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import Dialog from '../widgets/Dialog';
 import DialogCloseButton from '../widgets/DialogCloseButton';
-import { InputOwnSkin } from '../../themes/skins/InputOwnSkin';
+import NumericInputRP from '../common/NumericInputRP';
 import globalMessages from '../../i18n/global-messages';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import TextField from '../common/TextField';
@@ -118,11 +117,7 @@ export default class URIGenerateDialog extends Component<Props> {
   }
 
   render(): Node {
-    const {
-      onClose,
-      onGenerate,
-      classicTheme,
-    } = this.props;
+    const { onClose, onGenerate } = this.props;
 
     const dialogClasses = classnames([
       styles.component,
@@ -159,20 +154,19 @@ export default class URIGenerateDialog extends Component<Props> {
             />
           </div>
           <div className={styles.amountField}>
-            <NumericInput
+            <NumericInputRP
               className="amount"
               {...amountFieldProps}
-              value={amountFieldProps.value === ''
-                ? null
-                : formattedAmountToBigNumber(amountFieldProps.value)
+              value={
+                amountFieldProps.value === ''
+                  ? null
+                  : formattedAmountToBigNumber(amountFieldProps.value)
               }
               decimalPlaces={this.props.tokenInfo.Metadata.numberOfDecimals}
               label={this.getAmountLabel()}
               error={amountField.error}
-              skin={InputOwnSkin}
               done={amountField.isValid}
               allowSigns={false}
-              classicTheme={classicTheme}
               autoFocus
             />
           </div>

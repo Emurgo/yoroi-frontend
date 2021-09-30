@@ -5,12 +5,11 @@ import { observer } from 'mobx-react';
 import { reaction } from 'mobx';
 import { Button, MenuItem, Typography } from '@mui/material';
 import TextField from '../../common/TextField'
-import { NumericInput } from 'react-polymorph/lib/components/NumericInput';
 import { defineMessages, intlShape } from 'react-intl';
 import { isValidMemoOptional, isValidMemo, } from '../../../utils/validations';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
-import AmountInputSkin from '../skins/AmountInputSkin';
+import { AmountInput } from '../../common/NumericInputRP';
 import AddMemoSvg from '../../../assets/images/add-memo.inline.svg';
 import BorderedBox from '../../widgets/BorderedBox';
 import styles from './WalletSendForm.scss';
@@ -316,7 +315,6 @@ export default class WalletSendForm extends Component<Props> {
     const { memo } = this.form.values();
     const {
       hasAnyPending,
-      classicTheme,
       showMemo,
       onAddMemo
     } = this.props;
@@ -486,7 +484,7 @@ export default class WalletSendForm extends Component<Props> {
           </div>
 
           <div className={styles.amountInput}>
-            <NumericInput
+            <AmountInput
               {...amountFieldProps}
               value={amountFieldProps.value === ''
                 ? null
@@ -497,15 +495,12 @@ export default class WalletSendForm extends Component<Props> {
               decimalPlaces={this.getNumDecimals()}
               disabled={this.props.shouldSendAll}
               error={(transactionFeeError || amountField.error)}
-              // AmountInputSkin props
               currency={truncateToken(
                 getTokenName(this.props.selectedToken ?? this.props.defaultToken)
               )}
               fees={formatValue(transactionFee.getDefaultEntry())}
               total={formatValue(this.getTokenEntry(totalAmount))}
               allowSigns={false}
-              skin={AmountInputSkin}
-              classicTheme={classicTheme}
             />
           </div>
 
