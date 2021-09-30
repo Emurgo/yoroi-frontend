@@ -98,7 +98,7 @@ export default class MyWalletsPage extends Component<Props> {
     const { stores } = this.generated;
     const { uiDialogs } = stores;
 
-    const sidebarContainer = (<SidebarContainer {...this.generated.SidebarContainerProps} />);
+    const sidebarContainer = <SidebarContainer {...this.generated.SidebarContainerProps} />
 
     const wallets = this.generated.stores.wallets.publicDerivers;
 

@@ -265,7 +265,7 @@ export default class WalletSendForm extends Component<Props> {
       },
       selectedAmount: {
         label: this.context.intl.formatMessage(messages.selectedAmountLable),
-        value: this.props.shouldSendAll ? 
+        value: this.props.shouldSendAll ?
           this.props.selectedToken?.TokenId ?? this.props.getTokenInfo({
           identifier: this.props.defaultToken.Identifier,
           networkId: this.props.defaultToken.NetworkId,
@@ -383,7 +383,7 @@ export default class WalletSendForm extends Component<Props> {
       }));
     })();
 
-    
+
     const tokenId = this.props.selectedToken?.TokenId ?? this.props.getTokenInfo({
       identifier: this.props.defaultToken.Identifier,
       networkId: this.props.defaultToken.NetworkId,
@@ -411,7 +411,7 @@ export default class WalletSendForm extends Component<Props> {
     const tokenListClasses = classnames([
       styles.tokenList,
       {
-        [styles.show]: this.props.shouldSendAll && 
+        [styles.show]: this.props.shouldSendAll &&
            this.form.$('selectedToken').value === tokenId
       }
     ])
@@ -495,8 +495,8 @@ export default class WalletSendForm extends Component<Props> {
             options={sendAmountOptions}
             {...form.$('selectedAmount').bind()}
             onChange={value => {
-              // Do nothing if we select the same option twice 
-              if (this.form.$('selectedAmount').value === value) return 
+              // Do nothing if we select the same option twice
+              if (this.form.$('selectedAmount').value === value) return
               if (value === CUSTOM_AMOUNT) {
                 this.props.updateSendAllStatus(false);
               } else {
@@ -506,7 +506,7 @@ export default class WalletSendForm extends Component<Props> {
                 this.props.updateSendAllStatus(true);
               }
 
-              if (this.props.shouldSendAll) { 
+              if (this.props.shouldSendAll) {
                 this.props.updateAmount(new BigNumber(
                   formattedAmountToNaturalUnits(
                     this.form.$('amount').value,
