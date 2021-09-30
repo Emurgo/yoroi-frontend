@@ -1,7 +1,7 @@
 /* eslint-disable no-nested-ternary */
 // @flow
-import type { Node } from 'react';
-import { IconButton, InputAdornment, TextField as TextFieldBase } from '@mui/material';
+import type { ElementRef, Node } from 'react';
+import { IconButton, InputAdornment, TextField as TextFieldBase, useTheme } from '@mui/material';
 import ErrorIcon from '../../assets/images/forms/error.inline.svg';
 import DoneIcon from '../../assets/images/forms/done.inline.svg';
 import { styled } from '@mui/system';
@@ -12,23 +12,34 @@ import React from 'react';
 type Props = {|
   error?: boolean | string,
   done?: boolean,
-  type: string,
+  type?: string,
   className?: string,
   value: any,
   disabled?: boolean,
   label?: string,
+  InputLabelProps?: Object,
+  onChange?: Function,
+  onBlur?: Function,
+  autoFocus?: boolean,
+  inputRef?: ?{| current: null | ElementRef<'input'> |},
 |};
 
-export default function TextField({
+function TextField({
   label,
   value,
   disabled,
   error,
   done,
   type,
+  inputRef,
   className,
+  InputLabelProps,
+  onBlur,
+  onChange,
+  autoFocus,
   ...props
 }: Props): Node {
+  const theme = useTheme();
   const [showPassword, setShowPassword] = React.useState(false);
   const handleClickShowPassword = () => {
     setShowPassword(prev => !prev);
@@ -36,6 +47,7 @@ export default function TextField({
   const handleMouseDownPassword = event => {
     event.preventDefault();
   };
+
   return (
     <STextField
       fullWidth
@@ -44,19 +56,28 @@ export default function TextField({
       label={label}
       value={value}
       disabled={disabled}
+      autoFocus={autoFocus}
+      inputRef={inputRef}
+      helperText={error}
+      onBlur={onBlur}
+      onChange={onChange}
       type={type !== 'password' ? type : showPassword ? 'text' : 'password'}
+      /*
+        In order to show placeholders for classic theme we dont' need to override
+        'shrink' and 'notched' prop status so we pass an empty object
+      */
+      InputLabelProps={
+        theme.name === 'classic' ? { shrink: true, ...InputLabelProps } : { ...InputLabelProps }
+      }
       InputProps={{
+        ...(theme.name === 'classic' ? { notched: false } : {}),
         endAdornment:
           type === 'password' ? (
             <InputAdornment
               position="end"
               sx={{ minWidth: '52px', display: 'flex', justifyContent: 'flex-end' }}
             >
-              {error !== null && error === true ? (
-                <ErrorIcon />
-              ) : done !== null && done === true ? (
-                <DoneIcon />
-              ) : null}
+              {Boolean(error) === true ? <ErrorIcon /> : done === true ? <DoneIcon /> : null}
               <IconButton
                 aria-label="toggle password visibility"
                 onClick={handleClickShowPassword}
@@ -68,11 +89,7 @@ export default function TextField({
             </InputAdornment>
           ) : (
             <InputAdornment position="end">
-              {error !== null && error === true ? (
-                <ErrorIcon />
-              ) : done !== null && done === true ? (
-                <DoneIcon />
-              ) : null}
+              {Boolean(error) === true ? <ErrorIcon /> : done === true ? <DoneIcon /> : null}
             </InputAdornment>
           ),
       }}
@@ -86,9 +103,17 @@ TextField.defaultProps = {
   error: '',
   className: '',
   disabled: false,
+  InputLabelProps: null,
+  inputRef: null,
+  onChange: null,
+  onBlur: null,
+  type: 'text',
+  autoFocus: false,
 };
 const STextField = styled(TextFieldBase)(({ theme }) => ({
   paddingBottom: 20,
   marginTop: theme.name === 'classic' ? 0 : 10,
   marginBottom: 10,
 }));
+
+export default TextField;
