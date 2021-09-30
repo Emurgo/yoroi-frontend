@@ -5,7 +5,7 @@ import type { lf$Database } from 'lovefield';
 import { schema } from 'lovefield';
 import { RustModule } from '../../ada/lib/cardanoCrypto/rustLoader';
 import { CoinTypes, WalletTypePurpose, HARD_DERIVATION_START } from '../../../config/numbersConfig';
-import { legacyWalletChecksum } from '@emurgo/cip4-js';
+import { walletChecksum } from '@emurgo/cip4-js';
 import {
   asGetPublicKey
 } from '../../ada/lib/storage/models/PublicDeriver/traits';
@@ -78,7 +78,7 @@ test('Restore Ergo wallet', async () => {
   expect(asGetPublicKeyInstance != null).toEqual(true);
   if (asGetPublicKeyInstance != null) {
     const pubKey = await asGetPublicKeyInstance.getPublicKey();
-    const plate = legacyWalletChecksum(pubKey.Hash);
-    expect(plate.TextPart).toEqual('NTOA-0222');
+    const plate = walletChecksum(pubKey.Hash);
+    expect(plate.TextPart).toEqual('SZAX-0852');
   }
 });

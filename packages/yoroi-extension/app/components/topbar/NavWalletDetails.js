@@ -32,6 +32,7 @@ type Props = {|
   */
   +rewards: null | void | MultiToken,
   +walletAmount: null | MultiToken,
+  +assetDeposit: null | MultiToken,
   +infoText?: string,
   +showDetails?: boolean,
   +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
@@ -62,10 +63,9 @@ export default class NavWalletDetails extends Component<Props> {
       shouldHideBalance,
       onUpdateHideBalance,
       highlightTitle,
-      // <TODO:RWRD2109>
-      // eslint-disable-next-line no-unused-vars
       rewards,
       walletAmount,
+      assetDeposit,
       infoText,
       showDetails,
       showEyeIcon,
@@ -74,6 +74,7 @@ export default class NavWalletDetails extends Component<Props> {
     const { intl } = this.context;
 
     const totalAmount = this.getTotalAmount();
+    const isNonZeroDeposit = !assetDeposit?.isEmpty();
 
     const showsRewards = (
       this.props.rewards !== undefined &&
@@ -112,13 +113,20 @@ export default class NavWalletDetails extends Component<Props> {
                 </p>
                 {this.renderAmountDisplay({ shouldHideBalance, amount: walletAmount })}
               </div>
-              {/* <TODO:RWRD2109> */}
-              {/* <div> */}
-              {/*  <p className={styles.label}> */}
-              {/*    {intl.formatMessage(globalMessages.rewardsLabel)}&nbsp; */}
-              {/*  </p> */}
-              {/*  {this.renderAmountDisplay({ shouldHideBalance, amount: rewards })} */}
-              {/* </div> */}
+              <div>
+                <p className={styles.label}>
+                  {intl.formatMessage(globalMessages.rewardsLabel)}&nbsp;
+                </p>
+                {this.renderAmountDisplay({ shouldHideBalance, amount: rewards })}
+              </div>
+              {isNonZeroDeposit ? (
+                <div>
+                  <p className={styles.label}>
+                    {intl.formatMessage(globalMessages.assetDepositLabel)}&nbsp;
+                  </p>
+                  {this.renderAmountDisplay({ shouldHideBalance, amount: assetDeposit })}
+                </div>
+              ) : null}
             </div>
             }
             {this.props.rewards === undefined && (
@@ -153,8 +161,7 @@ export default class NavWalletDetails extends Component<Props> {
     if (this.props.rewards === null || this.props.walletAmount === null) {
       return null;
     }
-    // <TODO:RWRD2109>
-    return this.props.walletAmount; // .joinAddCopy(this.props.rewards);
+    return this.props.walletAmount.joinAddCopy(this.props.rewards);
   }
 
   renderAmountDisplay: {|
