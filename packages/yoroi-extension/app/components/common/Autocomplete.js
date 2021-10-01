@@ -123,7 +123,15 @@ function Autocomplete({
       fullWidth
     >
       <InputLabel
-        sx={{ padding: '0 6px', background: 'white' }}
+        sx={{
+          position: theme.name === 'classic' ? 'relative' : 'absolute',
+          top: theme.name === 'classic' ? 'unset' : 'initial',
+          marginBottom: theme.name === 'classic' ? '10px' : 0,
+          '&.MuiInputLabel-shrink': {
+            padding: theme.name === 'classic' ? 0 : '0 6px',
+            background: 'white',
+          },
+        }}
         {...(value.length || theme.name === 'classic' ? { shrink: true } : {})}
         htmlFor={id ?? 'autocomplete-combobox'}
         {...getLabelProps()}
@@ -179,7 +187,10 @@ function Autocomplete({
           {Boolean(error) === true ? <ErrorIcon /> : null}
         </CheckWrapper>
       </InputWrapper>
-      <FormHelperText sx={{ position: 'absolute', bottom: 0 }} id={id ?? 'autocomplete-combobox'}>
+      <FormHelperText
+        sx={{ position: 'absolute', bottom: 0, marginLeft: theme.name === 'classic' && 0 }}
+        id={id ?? 'autocomplete-combobox'}
+      >
         {error}
       </FormHelperText>
 
@@ -187,14 +198,14 @@ function Autocomplete({
         component="ul"
         {...getMenuProps()}
         sx={{
-          border: isOpen ? '1px solid hsl(214deg 16% 81%)' : 'none',
+          border: isOpen ? '1px solid #c7ced6' : 'none',
         }}
       >
         {isOpen && !sliceArrayItems.length ? (
           <Box
             sx={{
               padding: '14px 20px',
-              bgcolor: 'white',
+              bgcolor: '#fff',
             }}
           >
             {noResultsMessage}
@@ -207,7 +218,7 @@ function Autocomplete({
                   key={`${item}${index}`}
                   sx={{
                     padding: '14px 20px',
-                    backgroundColor: highlightedIndex === index ? 'hsl(204 20% 95%)' : 'white',
+                    backgroundColor: highlightedIndex === index ? '#f0f3f5' : '#fff',
                     cursor: 'pointer',
                   }}
                   {...getItemProps({
@@ -237,19 +248,22 @@ Autocomplete.defaultProps = {
   chipProps: null,
 };
 
-const StyledFormControl = styled(FormControl)({
-  marginTop: '10px',
+const StyledFormControl = styled(FormControl)(({ theme }) => ({
+  marginTop: theme.name === 'classic' ? 0 : '12px',
   marginBottom: '10px',
   paddingBottom: '24px',
   '& .MuiInputLabel-root': {
+    '&.Mui-focused ': {
+      color: 'var(--mui-input-text-color)',
+    },
     '&.MuiInputLabel-shrink ': {
-      color: '#2a2b32',
+      color: 'var(--mui-input-placeholder-color)',
     },
     '&.Mui-error': {
-      color: 'red',
+      color: 'var(--mui-input-border-color-error)',
     },
   },
-});
+}));
 
 const CheckWrapper = styled(Box)({
   display: 'flex',
@@ -262,7 +276,7 @@ const CheckWrapper = styled(Box)({
 
 const ULList = styled(Box)({
   width: '100%',
-  background: 'hsl(240deg 9% 96%)',
+  background: '#f4f4f6',
   margin: 0,
   borderTop: 0,
   position: 'absolute',
@@ -282,15 +296,15 @@ const InputWrapper = styled('div')(
   width: 100%;
   border: 1px solid ${
     error
-      ? 'hsl(354deg 79% 61%)'
+      ? '#ea4d5d'
       : isOpen
-      ? 'hsl(237deg 37% 11%)'
+      ? '#121326'
       : theme.name === 'classic'
-      ? 'hsl(214 16% 81%)'
+      ? '#c7ced6'
       : 'var(--mui-input-border-color)'
   };
   border-radius: ${theme.name === 'classic' ? '0' : '8px'};
-  background-color: ${theme.name === 'classic' ? 'hsl(240 9% 96%)' : 'white'};
+  background-color: ${theme.name === 'classic' ? '#f4f4f6' : 'white'};
   min-height: ${theme.name === 'classic' ? '73px' : '140px'};
   align-content: baseline;
   display: inline-flex;
@@ -299,13 +313,12 @@ const InputWrapper = styled('div')(
   padding-left: 5px;
   flex-wrap: wrap;
   position: relative;
+  cursor: text;
 
   & input {
     background-color: transparent;
-    color: ${theme.name === 'classic' ? 'hsl(237 37% 11%)' : 'rgba(0,0,0,.85)'};
-    color: hsl(225deg 4% 30%);
-    font-weight: 300;
-    font-size: 0.9rem;
+    color: ${theme.name === 'classic' ? '#121326' : '#000000d9'};
+    font-size: 1rem;
     padding: 4px 6px;
     letter-spacing: 0;
   }
