@@ -85,7 +85,7 @@ export const INITIAL_SEARCH_LIMIT: number = 5;
 export const SEARCH_SKIP: number = 0;
 
 type SubmittedTransactionEntry = {|
-  publicDeriver: PublicDeriver<>,
+  publicDeriverId: number,
   transaction: WalletTransaction,
 |};
 
@@ -101,6 +101,8 @@ function newMultiToken(
 ): MultiToken {
   return new MultiToken(values, defaultTokenInfo)
 }
+
+const SUBMITTED_TRANSACTIONS_KEY = 'submittedTransactions';
 
 export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
 
@@ -130,6 +132,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     actions.loadMoreTransactions.listen(this._increaseSearchLimit);
     actions.exportTransactionsToFile.listen(this._exportTransactionsToFile);
     actions.closeExportTransactionDialog.listen(this._closeExportTransactionDialog);
+    this._loadSubmittedTransactions();
   }
 
   /** Calculate information about transactions that are still realistically reversible */
@@ -330,15 +333,21 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     const remoteTransactionIds = new Set(
       result.transactions.map(tx => tx.txid)
     );
+
+    let submittedTransactionsChanged = false;
     runInAction(() => {
       for (let i = 0; i < this._submittedTransactions.length;) {
         if (remoteTransactionIds.has(this._submittedTransactions[i].transaction.txid)) {
           this._submittedTransactions.splice(i, 1);
+          submittedTransactionsChanged = true;
         } else {
           i++;
         }
       }
     });
+    if (submittedTransactionsChanged) {
+      this._persistSubmittedTransactions();
+    }
   };
 
   @action reactToTxHistoryUpdate: {|
@@ -678,9 +687,10 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     transaction,
   ) => {
     this._submittedTransactions.push({
-      publicDeriver,
+      publicDeriverId: publicDeriver.publicDeriverId,
       transaction: new WalletTransaction(transaction),
     });
+    this._persistSubmittedTransactions();
   }
 
   getSubmittedTransactions: (
@@ -688,9 +698,59 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   ) => Array<WalletTransaction> = (
     publicDeriver
   ) => {
-    return this._submittedTransactions.filter(tx =>
-      tx.publicDeriver === publicDeriver
+    return this._submittedTransactions.filter(({ publicDeriverId }) =>
+      publicDeriverId === publicDeriver.publicDeriverId
     ).map(tx => tx.transaction);
+  }
+
+  _persistSubmittedTransactions: () => void = () => {
+    localStorage.setItem(
+      SUBMITTED_TRANSACTIONS_KEY,
+      JSON.stringify(this._submittedTransactions)
+    );
+  }
+
+  _loadSubmittedTransactions: () => void = () => {
+    try {
+      const dataStr = localStorage.getItem(SUBMITTED_TRANSACTIONS_KEY);
+      if (dataStr == null) {
+        return;
+      }
+      const data = JSON.parse(dataStr);
+
+      const txs = data.map(({ publicDeriverId, transaction }) => {
+        if (transaction.block) {
+          throw new Error('submitted transaction should not have block data');
+        }
+        const tx =  new WalletTransaction({
+          txid: transaction.txid,
+          block: null,
+          type: transaction.type,
+          amount: MultiToken.from(transaction.amount),
+          fee: MultiToken.from(transaction.fee),
+          date: new Date(transaction.date),
+          addresses: {
+            from: transaction.addresses.from.map(({ address, value }) => ({
+              address,
+              value: MultiToken.from(value)
+            })),
+            to: transaction.addresses.to.map(({ address, value }) => ({
+              address,
+              value: MultiToken.from(value)
+            })),
+          },
+          state: transaction.state,
+          errorMsg: transaction.errorMsg,
+        });
+        return {
+          publicDeriverId,
+          transaction: tx,
+        };
+      });
+      this._submittedTransactions.splice(0, 0, ...txs);
+    } catch (error) {
+      console.error(error);
+    }
   }
 }
 
