@@ -5,7 +5,7 @@ import { join } from 'lodash';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import TextField from '../common/TextField';
-import { Autocomplete } from 'react-polymorph/lib/components/Autocomplete';
+import Autocomplete from '../common/Autocomplete';
 import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
@@ -23,7 +23,6 @@ import styles from './WalletRestoreDialog.scss';
 import headerMixin from '../mixins/HeaderBlock.scss';
 import config from '../../config';
 import DialogBackButton from '../widgets/DialogBackButton';
-import { AutocompleteOwnSkin } from '../../themes/skins/AutocompleteOwnSkin';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
@@ -392,15 +391,11 @@ export default class WalletRestoreDialog extends Component<Props> {
         <Autocomplete
           options={validWords}
           maxSelections={this.props.numberOfMnemonics}
-          // Refer: https://github.com/Emurgo/yoroi-frontend/pull/1009
-          // inputRef={(input) => { this.recoveryPhraseInput = input; }}
-          {...recoveryPhraseField.bind()}
-          done={recoveryPhraseField.isValid}
-          error={recoveryPhraseField.error}
           maxVisibleOptions={5}
           noResultsMessage={intl.formatMessage(globalMessages.recoveryPhraseNoResults)}
-          skin={AutocompleteOwnSkin}
-          preselectedOptions={recoveryPhraseField.value}
+          done={recoveryPhraseField.isValid}
+          error={recoveryPhraseField.error}
+          {...recoveryPhraseField.bind()}
         />
 
         {showPaperPassword === true ? (
