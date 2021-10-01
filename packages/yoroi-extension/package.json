@@ -207,7 +207,7 @@
     "react-resize-detector": "6.6.0",
     "react-router": "5.2.0",
     "react-router-dom": "5.2.0",
-    "recharts": "1.8.5",
+    "recharts": "2.1.4",
     "ringbufferjs": "2.0.0",
     "route-parser": "0.0.5",
     "semver": "7.3.4",
