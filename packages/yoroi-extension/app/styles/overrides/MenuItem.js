@@ -3,21 +3,21 @@ const ClassicMenuItem = {
   styleOverrides: {
     root: {
       padding: '14px 20px',
-      backgroundColor: 'var(--mui-option-bg-color)',
+      backgroundColor: 'var(--component-menu-item-background)',
       height: 50,
-      color: 'var(--mui-option-text-color)',
+      color: 'var(--component-menu-item-text)',
       '&:hover': {
-        background: 'var(--mui-option-bg-color-highlighted)',
+        background: 'var(--component-menu-item-background-highlighted)',
       },
       '&.Mui-selected': {
-        background: 'var(--mui-option-bg-color-highlighted)',
+        background: 'var(--component-menu-item-background-highlighted)',
         '&:hover': {
-          backgroundColor: 'var(--mui-option-bg-color-highlighted)',
+          backgroundColor: 'var(--component-menu-item-background-highlighted)',
         },
         '&::after': {
           content: '""',
           position: 'absolute',
-          borderColor: '#5e6066',
+          borderColor: 'var(--component-menu-item-checkmark)',
           borderStyle: 'solid',
           borderWidth: '0 2px 2px 0',
           height: '9px',
@@ -34,22 +34,22 @@ const ModernMenuItem = {
   styleOverrides: {
     root: {
       padding: '14px 20px',
-      backgroundColor: 'var(--mui-option-bg-color)',
-      height: 50,
-      color: 'var(--mui-option-text-color)',
+      backgroundColor: 'var(--component-menu-item-background)',
+      height: 45,
+      color: 'var(--component-menu-item-text)',
       '&:hover': {
-        background: 'var(--mui-option-bg-color-highlighted)',
+        background: 'var(--component-menu-item-background-highlighted)',
       },
       '&.Mui-selected': {
-        background: 'var(--mui-option-bg-color-highlighted)',
+        background: 'var(--component-menu-item-background-highlighted)',
         position: 'relative',
         '&:hover': {
-          backgroundColor: 'var(--mui-option-bg-color-highlighted)',
+          backgroundColor: 'var(--component-menu-item-background-highlighted)',
         },
         '&::after': {
           content: '""',
           position: 'absolute',
-          borderColor: '#5e6066',
+          borderColor: 'var(--component-menu-item-checkmark)',
           borderStyle: 'solid',
           borderWidth: '0 2px 2px 0',
           height: '9px',

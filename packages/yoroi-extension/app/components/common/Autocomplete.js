@@ -129,7 +129,7 @@ function Autocomplete({
           marginBottom: theme.name === 'classic' ? '10px' : 0,
           '&.MuiInputLabel-shrink': {
             padding: theme.name === 'classic' ? 0 : '0 6px',
-            background: 'white',
+            background: 'var(--th-palette-common-white)',
           },
         }}
         {...(value.length || theme.name === 'classic' ? { shrink: true } : {})}
@@ -163,7 +163,7 @@ function Autocomplete({
         ))}
         <Box {...getComboboxProps()}>
           <Input
-            color="input"
+            color="gray"
             // $FlowFixMe[invalid-compare]
             placeholder={value.length >= maxSelections ? '' : placeholder}
             // $FlowFixMe[invalid-compare]
@@ -188,7 +188,7 @@ function Autocomplete({
         </CheckWrapper>
       </InputWrapper>
       <FormHelperText
-        sx={{ position: 'absolute', bottom: 0, marginLeft: theme.name === 'classic' && 0 }}
+        sx={{ position: 'absolute', bottom: 0, marginLeft: theme.name === 'classic' ? 0 : '14px' }}
         id={id ?? 'autocomplete-combobox'}
       >
         {error}
@@ -198,14 +198,14 @@ function Autocomplete({
         component="ul"
         {...getMenuProps()}
         sx={{
-          border: isOpen ? '1px solid #c7ced6' : 'none',
+          boxShadow: isOpen ? '0 3px 7px 0 rgba(74,74,74,0.16)' : 'unset',
         }}
       >
         {isOpen && !sliceArrayItems.length ? (
           <Box
             sx={{
               padding: '14px 20px',
-              bgcolor: '#fff',
+              bgcolor: 'var(--th-palette-common-white)',
             }}
           >
             {noResultsMessage}
@@ -218,7 +218,10 @@ function Autocomplete({
                   key={`${item}${index}`}
                   sx={{
                     padding: '14px 20px',
-                    backgroundColor: highlightedIndex === index ? '#f0f3f5' : '#fff',
+                    backgroundColor:
+                      highlightedIndex === index
+                        ? 'var(--th-palette-gray-50)'
+                        : 'var(--th-palette-common-white)',
                     cursor: 'pointer',
                   }}
                   {...getItemProps({
@@ -252,15 +255,24 @@ const StyledFormControl = styled(FormControl)(({ theme }) => ({
   marginTop: theme.name === 'classic' ? 0 : '12px',
   marginBottom: '10px',
   paddingBottom: '24px',
-  '& .MuiInputLabel-root': {
-    '&.Mui-focused ': {
-      color: 'var(--mui-input-text-color)',
+  '&:hover': {
+    '& .MuiInputLabel-root': {
+      color: 'var(--component-input-text-focus)',
+      '&.Mui-disabled': {
+        color: 'var(--component-input-border-disabled)',
+      },
     },
-    '&.MuiInputLabel-shrink ': {
-      color: 'var(--mui-input-placeholder-color)',
+  },
+  '& .MuiInputLabel-root': {
+    color: 'var(--component-input-placeholder)',
+    '&.Mui-focused': {
+      color: 'var(--component-input-text-focus)',
+    },
+    '&.Mui-disabled': {
+      color: 'var(--component-input-placeholder-disabled)',
     },
     '&.Mui-error': {
-      color: 'var(--mui-input-border-color-error)',
+      color: 'var(--component-input-error)',
     },
   },
 }));
@@ -276,7 +288,7 @@ const CheckWrapper = styled(Box)({
 
 const ULList = styled(Box)({
   width: '100%',
-  background: '#f4f4f6',
+  background: 'var(--th-palette-common-white)',
   margin: 0,
   borderTop: 0,
   position: 'absolute',
@@ -294,17 +306,17 @@ const ULList = styled(Box)({
 const InputWrapper = styled('div')(
   ({ theme, error, isOpen }) => `
   width: 100%;
-  border: 1px solid ${
+  border: ${isOpen ? '2px' : '1px'} solid ${
     error
-      ? '#ea4d5d'
+      ? 'var(--component-input-error)'
       : isOpen
-      ? '#121326'
+      ? 'var(--component-input-text-focus)'
       : theme.name === 'classic'
       ? '#c7ced6'
-      : 'var(--mui-input-border-color)'
+      : 'var(--component-input-border)'
   };
   border-radius: ${theme.name === 'classic' ? '0' : '8px'};
-  background-color: ${theme.name === 'classic' ? '#f4f4f6' : 'white'};
+  background-color: ${theme.name === 'classic' ? '#f4f4f6' : 'var(--th-palette-common-white)'};
   min-height: ${theme.name === 'classic' ? '73px' : '140px'};
   align-content: baseline;
   display: inline-flex;
@@ -315,9 +327,11 @@ const InputWrapper = styled('div')(
   position: relative;
   cursor: text;
 
+
+
   & input {
     background-color: transparent;
-    color: ${theme.name === 'classic' ? '#121326' : '#000000d9'};
+    color: ${theme.name === 'classic' ? 'var(--component-input-border)' : '#000000d9'};
     font-size: 1rem;
     padding: 4px 6px;
     letter-spacing: 0;

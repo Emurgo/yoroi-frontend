@@ -58,7 +58,7 @@ export default function DialogFn(props: Props): Node {
             }
       }
       sx={{
-        background: 'var(--mui-dialog-overlay-background-color)',
+        background: 'var(--component-dialog-overlay-background-color)',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
@@ -129,13 +129,13 @@ DialogFn.defaultProps = {
 
 const ModalContainer = styled(Box)(({ theme }) => ({
   position: 'relative',
-  minWidth: 'var(--mui-dialog-min-width-cmn)',
+  minWidth: 'var(--component-dialog-min-width-cmn)',
   borderRadius: theme.name === 'classic' ? 0 : 8,
   paddingTop: theme.name === 'classic' ? '25px' : '24px',
   paddingBottom: theme.name === 'classic' ? '30px' : '40px',
   maxWidth: theme.name === 'classic' ? '785px' : '560px',
-  backgroundColor: 'var(--mui-dialog-background-color)',
-  color: 'var(--mui-dialog-text-color)',
+  backgroundColor: 'var(--component-dialog-background)',
+  color: 'var(--component-dialog-text)',
   maxHeight: '80vh',
 
   '& .dialog__title': {

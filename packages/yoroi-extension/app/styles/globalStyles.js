@@ -112,6 +112,7 @@ const globalStyles = (theme: Object): Node => (
         '--component-input-helper-text-disabled': 'var(--th-palette-gray-200)',
 
         /* === SELECT === */
+        '--component-menu-icon': 'var(--th-palette-gray-600)',
         '--component-menu-item-background': 'var(--th-palette-common-white)',
         '--component-menu-item-background-highlighted': 'var(--th-palette-gray-50)',
         '--component-menu-item-checkmark': 'var(--th-palette-secondary-300)',

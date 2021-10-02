@@ -103,7 +103,7 @@ export default class TransferSummaryPage extends Component<Props> {
     ];
     return (
       <Dialog
-        styleOverride={{ '--mui-dialog-min-width-cmn': '680px' }}
+        styleOverride={{ '--component-dialog-min-width-cmn': '680px' }}
         title={this.props.dialogTitle}
         actions={actions}
         closeButton={<DialogCloseButton />}
