@@ -3,59 +3,76 @@ const ClassicTextField = {
   styleOverrides: {
     root: {
       width: '100%',
-      borderColor: 'var(--mui-input-border-color)',
+      borderColor: 'var(--component-input-border)',
       marginTop: '24px',
-      '& label': {
-        color: 'var(--mui-input-placeholder-color)',
+      '& .MuiInputLabel-root': {
+        color: 'var(--component-input-placeholder)',
         position: 'relative',
         top: 'unset',
         marginBottom: '10px',
         letterSpacing: '1.12px',
         fontWeight: 500,
-      },
-      '& label.Mui-focused': {
-        color: 'var(--mui-input-text-color)',
-      },
-      '& label.Mui-disabled': {
-        color: 'var(--mui-input-placeholder-color-disabled)',
-      },
-      '& label.Mui-error': {
-        color: 'var(--mui-input-border-color-error)',
+        '&.Mui-focused': {
+          color: 'var(--component-input-text)',
+        },
+        '&.Mui-disabled': {
+          color: 'var(--component-input-placeholder-disabled)',
+        },
+        '&.Mui-error': {
+          color: 'var(--component-input-error)',
+        },
       },
       '& .MuiInputBase-input ': {
         height: '1.2em',
       },
       '& .MuiOutlinedInput-root': {
         paddingRight: '16px',
-        '& fieldset': {
-          borderColor: 'var(--mui-input-border-color)',
+        '& .MuiOutlinedInput-notchedOutline': {
+          borderColor: 'var(--component-input-border)',
           borderRadius: 0,
-          backgroundColor: 'var(--mui-input-bg-color)',
+          backgroundColor: 'var(--component-input-background)',
           letterSpacing: 'initial',
         },
-        '&:hover fieldset': {
-          borderColor: 'var(--mui-input-border-color-focus)',
+        '& svg': {
+          color: 'var(--component-input-border)',
         },
-        '&.Mui-focused fieldset': {
-          borderColor: 'var(--mui-input-border-color-focus)',
+        '&.Mui-focused svg': {
+          color: 'var(--component-input-helper-text)',
         },
-        '&.Mui-disabled fieldset': {
-          borderColor: 'var(--mui-input-border-color-disabled)',
-          backgroundColor: 'var(--mui-input-bg-color-disabled)',
-          color: 'var(--mui-input-text-color-disabled)',
+        '&.Mui-disabled svg': {
+          color: 'var(--component-input-border-disabled)',
         },
-        '&.Mui-error fieldset': {
-          borderColor: 'var(--mui-input-border-color-error)',
+        '&:hover .MuiOutlinedInput-notchedOutline': {
+          borderColor: 'var(--component-input-border-focus)',
+        },
+        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+          borderColor: 'var(--component-input-border-focus)',
+        },
+
+        '&.Mui-disabled .MuiOutlinedInput-notchedOutline': {
+          borderColor: 'var(--component-input-border-disabled)',
+          backgroundColor: 'var(--component-input-background-disabled)',
+          color: 'var(--component-input-text-disabled)',
+        },
+        '&.Mui-error .MuiOutlinedInput-notchedOutline': {
+          borderColor: 'var(--component-input-error)',
         },
       },
       '& .MuiSelect-select': {
         backgroundColor: 'white',
       },
       '& .MuiFormHelperText-root': {
+        color: 'var(--component-input-helper-text)',
         marginLeft: 0,
         fontWeight: 400,
         position: 'absolute',
         bottom: '-2px',
+        '&.Mui-disabled': {
+          color: 'var(--component-input-helper-text-disabled)',
+        },
+        '&.Mui-error': {
+          color: 'var(--component-input-error)',
+        },
       },
     },
   },
@@ -66,43 +83,65 @@ const ClassicTextField = {
 const ModernTextField = {
   styleOverrides: {
     root: {
-      borderColor: 'var(--mui-input-border-color)',
-      '& label': {
-        color: 'var(--mui-input-placeholder-color)',
+      '&:hover': {
+        '& .MuiInputLabel-root': {
+          color: 'var(--component-input-text-focus)',
+          '&.Mui-disabled': {
+            color: 'var(--component-input-border-disabled)',
+          },
+        },
       },
-      '& label.Mui-focused': {
-        color: 'var(--mui-input-text-color)',
+      '& .MuiInputLabel-root': {
+        color: 'var(--component-input-placeholder)',
+        '&.Mui-focused': {
+          color: 'var(--component-input-text-focus)',
+        },
+        '&.Mui-disabled': {
+          color: 'var(--component-input-placeholder-disabled)',
+        },
+        '&.Mui-error': {
+          color: 'var(--component-input-error)',
+        },
       },
-      '& label.Mui-disabled': {
-        color: 'var(--mui-input-placeholder-color-disabled)',
-      },
-      '& label.Mui-error': {
-        color: 'var(--mui-input-border-color-error)',
-      },
-      '& .MuiInputBase-input ': {
-        height: '1.2em',
+
+      '& .MuiOutlinedInput-input': {
+        '&.Mui-disabled': {
+          color: 'var(--component-input-text-disabled)',
+          WebkitTextFillColor: 'var(--component-input-text-disabled)',
+        },
       },
       '& .MuiOutlinedInput-root': {
         paddingRight: '16px',
-        '& fieldset': {
-          borderColor: 'var(--mui-input-border-color)',
+        height: '56px',
+        '&:hover .MuiOutlinedInput-notchedOutline': {
+          borderColor: 'var(--component-input-border-focus)',
+        },
+        '& .MuiOutlinedInput-notchedOutline': {
+          borderColor: 'var(--component-input-border)',
           borderRadius: 8,
-          backgroundColor: 'var(--mui-input-bg-color)',
+          backgroundColor: 'var(--component-input-background)',
           letterSpacing: 'initial',
         },
-        '&:hover fieldset': {
-          borderColor: 'var(--mui-input-border-color-focus)',
+        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+          borderColor: 'var(--component-input-border-focus)',
+          border: '2px solid',
         },
-        '&.Mui-focused fieldset': {
-          borderColor: 'var(--mui-input-border-color-focus)',
+        '& svg': {
+          color: 'var(--component-input-border)',
         },
-        '&.Mui-disabled fieldset': {
-          borderColor: 'var(--mui-input-border-color-disabled)',
-          backgroundColor: 'var(--mui-input-bg-color-disabled)',
-          color: 'var(--mui-input-text-color-disabled)',
+        '&.Mui-focused svg': {
+          color: 'var(--component-input-helper-text)',
         },
-        '&.Mui-error fieldset': {
-          borderColor: 'var(--mui-input-border-color-error)',
+        '&.Mui-disabled svg': {
+          color: 'var(--component-input-border-disabled)',
+        },
+        '&.Mui-disabled .MuiOutlinedInput-notchedOutline': {
+          borderColor: 'var(--component-input-border-disabled)',
+          backgroundColor: 'var(--component-input-background-disabled)',
+          color: 'var(--component-input-text-disabled)',
+        },
+        '&.Mui-error .MuiOutlinedInput-notchedOutline': {
+          borderColor: 'var(--component-input-error)',
         },
       },
       '& .MuiSelect-select': {
@@ -110,11 +149,18 @@ const ModernTextField = {
         backgroundColor: 'white',
       },
       '& .MuiFormHelperText-root': {
+        color: 'var(--component-input-helper-text)',
         letterSpacing: '0.4px',
         marginLeft: '14px',
         fontWeight: 400,
         position: 'absolute',
         bottom: '-2px',
+        '&.Mui-disabled': {
+          color: 'var(--component-input-helper-text-disabled)',
+        },
+        '&.Mui-error': {
+          color: 'var(--component-input-error)',
+        },
       },
     },
   },

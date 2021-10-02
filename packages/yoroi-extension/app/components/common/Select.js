@@ -33,10 +33,6 @@ function Select({
     <SFormControl fullWidth disabled={disabled} {...formControlProps}>
       <InputLabel
         sx={{
-          color: 'var(--mui-input-text-color)',
-          '&.Mui-focused': {
-            color: 'var(--mui-input-text-color)',
-          },
           ...(labelSx !== null && labelSx),
         }}
         shrink={shrink}
@@ -45,6 +41,7 @@ function Select({
         {label}
       </InputLabel>
       <SelectBase
+        color="gray"
         labelId={labelId}
         IconComponent={ArrowIcon}
         label={label}
@@ -68,7 +65,7 @@ function Select({
             position: 'absolute',
             marginLeft: 0,
             lineHeight: '1.33',
-            fontSize: '12px',
+            fontSize: '0.75rem',
             bottom: '-5px',
           }}
         >
@@ -94,12 +91,56 @@ const SFormControl = styled(FormControl)(({ theme }) => ({
   position: 'relative',
   marginTop: theme.name === 'classic' ? '24px' : 0,
   paddingBottom: '20px',
+  /* TODO: Unify label and fieldset styles in one place
+  These styles came from overrides TextField */
+  '&:hover': {
+    '& .MuiInputLabel-root': {
+      color: 'var(--component-input-text-focus)',
+      '&.Mui-disabled': {
+        color: 'var(--component-input-border-disabled)',
+      },
+    },
+  },
+  '& .MuiInputLabel-root': {
+    color: 'var(--component-input-placeholder)',
+    '&.Mui-focused': {
+      color: 'var(--component-input-text-focus)',
+    },
+    '&.Mui-disabled': {
+      color: 'var(--component-input-placeholder-disabled)',
+    },
+    '&.Mui-error': {
+      color: 'var(--component-input-error)',
+    },
+  },
   '& .MuiOutlinedInput-root': {
-    height: '50px',
-    '& fieldset': {
-      background: 'unset',
-      borderColor: 'var(--mui-input-border-color)',
-      borderRadius: theme.shape.borderRadius,
+    '&:hover .MuiOutlinedInput-notchedOutline': {
+      borderColor: 'var(--component-input-border-focus)',
+    },
+    '& .MuiOutlinedInput-notchedOutline': {
+      borderColor: 'var(--component-input-border)',
+      backgroundColor: 'var(--component-input-background)',
+    },
+    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+      borderColor: 'var(--component-input-border-focus)',
+      border: '2px solid',
+    },
+    '& svg': {
+      color: 'var(--component-input-border)',
+    },
+    '&.Mui-focused svg': {
+      color: 'var(--component-input-helper-text)',
+    },
+    '&.Mui-disabled svg': {
+      color: 'var(--component-input-border-disabled)',
+    },
+    '&.Mui-disabled .MuiOutlinedInput-notchedOutline': {
+      borderColor: 'var(--component-input-border-disabled)',
+      backgroundColor: 'var(--component-input-background-disabled)',
+      color: 'var(--component-input-text-disabled)',
+    },
+    '&.Mui-error .MuiOutlinedInput-notchedOutline': {
+      borderColor: 'var(--component-input-error)',
     },
   },
 }));

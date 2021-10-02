@@ -438,7 +438,6 @@ function escapedGlobalRegExp(regex) {
   return new RegExp(escapeRegExp(regex), 'g');
 }
 
-
 /*  Components based on NumericInput */
 
 // This type should be kept open (not "exact") because it is a react-polymorph skin
@@ -487,7 +486,7 @@ class AmountInput extends Component<AmountInputProps> {
               right: '10px',
               fontWeight: 400,
               fontSize: '0.75rem',
-              color: 'var(--mui-input-text-color)',
+              color: 'var(--component-input-text)',
             }}
           >
             {intl.formatMessage(messages.feesLabel, { amount: fees })}
@@ -495,13 +494,12 @@ class AmountInput extends Component<AmountInputProps> {
         ) : null}
 
         <Typography
+          variant="body3"
           sx={{
             position: 'absolute',
             bottom: '45px',
             right: error != null && error !== '' ? '45px' : '10px',
-            fontWeight: 300,
-            fontSize: '0.93rem',
-            color: 'var(--mui-input-text-color)',
+            color: 'var(--component-input-text)',
             textTransform: 'uppercase',
           }}
         >

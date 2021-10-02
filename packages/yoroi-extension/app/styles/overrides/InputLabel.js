@@ -2,7 +2,7 @@
 const ClassicInputLabel = {
   styleOverrides: {
     root: {
-      color: 'var(--mui-input-placeholder-color)',
+      color: 'var(--component-input-placeholder)',
       top: '-30px',
       letterSpacing: '1.12px',
       fontWeight: 500,
@@ -17,7 +17,7 @@ const ClassicInputLabel = {
 const ModernInputLabel = {
   styleOverrides: {
     root: {
-      color: 'var(--mui-input-placeholder-color)',
+      color: 'var(--component-input-placeholder)',
     },
   },
   defaultProps: {

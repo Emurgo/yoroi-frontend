@@ -4,12 +4,12 @@ const ClassicCheckbox = {
     root: {
       padding: 0,
       marginRight: '18px',
-      color: 'var(--mui-checkbox-check-bg-color)',
+      color: 'var(--component-checkbox-background-active)',
       '&.Mui-checked': {
-        color: 'var(--mui-checkbox-check-bg-color)',
+        color: 'var(--component-checkbox-background-active)',
       },
       '&.Mui-disabled': {
-        color: 'var(--mui-checkbox-border-color-disabled)',
+        color: 'var(--component-checkbox-border-disabled)',
       },
     },
   },
@@ -19,12 +19,12 @@ const ModernCheckbox = {
     root: {
       padding: 0,
       marginRight: '18px',
-      color: 'var(--mui-checkbox-border-color)',
+      color: 'var(--component-checkbox-border)',
       '&.Mui-checked': {
-        color: 'var(--mui-checkbox-check-bg-color)',
+        color: 'var(--component-checkbox-background-active)',
       },
       '&.Mui-disabled	': {
-        color: 'var(--mui-checkbox-border-color-disabled)',
+        color: 'var(--component-checkbox-border-disabled)',
       },
     },
   },

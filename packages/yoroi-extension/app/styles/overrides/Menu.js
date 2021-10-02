@@ -8,7 +8,7 @@ const ClassicMenu = {
       },
       '& .MuiMenu-list': {
         padding: 0,
-        boxShadow: '0 1.5px 5px 1px rgb(0 0 0 / 10%)',
+        boxShadow: '0 3px 7px 0 rgba(74,74,74,0.16)',
       },
     },
   },
@@ -18,11 +18,12 @@ const ModernMenu = {
     root: {
       '& .MuiMenu-paper': {
         maxHeight: '500px',
-        borderRadius: 8,
+        borderRadius: 6,
+        boxShadow: '0 3px 7px 0 rgba(74,74,74,0.16)',
+        marginTop: '4px',
       },
       '& .MuiMenu-list': {
         padding: 0,
-        border: '1px solid var(--mui-option-bg-color)',
       },
     },
   },
