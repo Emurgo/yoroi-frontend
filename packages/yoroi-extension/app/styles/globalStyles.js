@@ -5,93 +5,140 @@ import { GlobalStyles } from '@mui/material';
 const globalStyles = (theme: Object): Node => (
   <GlobalStyles
     styles={{
+      /*
+        CSS variables follow the same name as mui using kebab case syntax
+        expect from `theme` that is renamed to `th`
+        to not get in trouble with previous CSS variables for revamp
+
+        Note:
+         Make sure the colors you'll use in any part of UI is using CSS Variables from BASE COLORS.
+         Whenever you are adding a new color, add it in MUI theme object and then called it in BASE
+         to keep consistency and allow users to override few options from BASE if they want to
+      */
+
       ':root': {
+        /* === BASE === */
+        '--th-palette-common-white': theme.palette.common.white,
+        '--th-palette-common-black': theme.palette.common.black,
+
+        '--th-palette-primary-50': theme.palette.primary['50'],
+        '--th-palette-primary-100': theme.palette.primary['100'],
+        '--th-palette-primary-200': theme.palette.primary['200'],
+        '--th-palette-primary-300': theme.palette.primary['300'],
+        '--th-palette-primary-contrastText': theme.palette.primary.contrastText,
+
+        '--th-palette-secondary-50': theme.palette.secondary['50'],
+        '--th-palette-secondary-100': theme.palette.secondary['100'],
+        '--th-palette-secondary-200': theme.palette.secondary['200'],
+        '--th-palette-secondary-300': theme.palette.secondary['300'],
+        '--th-palette-secondary-contrastText': theme.palette.secondary.contrastText,
+
+        '--th-palette-error-50': theme.palette.error['50'],
+        '--th-palette-error-100': theme.palette.error['100'],
+        '--th-palette-error-200': theme.palette.error['200'],
+
+        '--th-palette-cyan-50': theme.palette.cyan['50'],
+        '--th-palette-cyan-100': theme.palette.cyan['100'],
+
+        '--th-palette-gray-50': theme.palette.gray['50'],
+        '--th-palette-gray-100': theme.palette.gray['100'],
+        '--th-palette-gray-200': theme.palette.gray['200'],
+        '--th-palette-gray-300': theme.palette.gray['300'],
+        '--th-palette-gray-400': theme.palette.gray['400'],
+        '--th-palette-gray-500': theme.palette.gray['500'],
+        '--th-palette-gray-600': theme.palette.gray['600'],
+        '--th-palette-gray-700': theme.palette.gray['700'],
+        '--th-palette-gray-800': theme.palette.gray['800'],
+        '--th-palette-gray-900': theme.palette.gray['900'],
+        '--th-palette-background-overlay': theme.palette.background.overlay,
+
+        '--th-palette-tx-status-pending-background': theme.palette.txStatus.pending.background,
+        '--th-palette-tx-status-pending-text': theme.palette.txStatus.pending.text,
+        '--th-palette-tx-status-high-background': theme.palette.txStatus.high.background,
+        '--th-palette-tx-status-high-text': theme.palette.txStatus.high.text,
+        '--th-palette-tx-status-failed-background': theme.palette.txStatus.failed.background,
+        '--th-palette-tx-status-failed-text': theme.palette.txStatus.failed.text,
+        '--th-palette-tx-status-medium-background': theme.palette.txStatus.medium.background,
+        '--th-palette-tx-status-medium-text': theme.palette.txStatus.medium.text,
+        '--th-palette-tx-status-low-background': theme.palette.txStatus.low.background,
+        '--th-palette-tx-status-low-text': theme.palette.txStatus.low.text,
+
         /* === BUTTON === */
-        // general button primary variant
-        '--mui-button-primary-background-color': theme.palette.secondary.main,
-        '--mui-button-primary-background-color-hover': theme.palette.secondary.dark,
-        '--mui-button-primary-background-color-active': theme.palette.secondary.dark,
-        '--mui-button-primary-background-color-disabled': theme.palette.secondary.disabled,
-        '--mui-button-primary-text-disabled': theme.palette.secondary.contrastText,
-        '--mui-button-primary-text': theme.palette.secondary.contrastText,
-        // general button secondary variant
-        '--mui-button-outlined-background-color': 'transparent',
-        '--mui-button-outlined-background-color-hover': theme.palette.secondary.light,
-        '--mui-button-outlined-border-color': theme.palette.secondary.main,
-        '--mui-button-outlined-border-color-disabled': theme.palette.secondary.disabled,
-        '--mui-button-outlined-border-color-hover': theme.palette.secondary.dark,
-        '--mui-button-outlined-background-color-active': theme.palette.secondary.light,
-        '--mui-button-outlined-background-color-disabled': theme.palette.secondary.contrastText,
-        '--mui-button-outlined-text-color-disabled': theme.palette.secondary.disabled,
-        '--mui-button-outlined-text-color': theme.palette.secondary.main,
-        '--mui-button-outlined-active-text-color': theme.palette.secondary.dark,
-        // classic button secondary variant
-        '--mui-button-flat-background-color': 'hsl(10deg 43% 97%)',
-        '--mui-button-flat-background-color-hover': 'hsl(9 73% 81% / 10%)',
-        '--mui-button-flat-background-color-active': 'hsl(9 30% 64% / 10%)',
-        '--mui-button-flat-background-color-disabled': 'hsl(204 20% 95% / 30%)',
-        '--mui-button-flat-text-color-disabled': 'hsl(237 37% 11%)',
-        '--mui-button-flat-text-color': 'hsl(237 37% 11%)',
+        // button primary variant
+        '--component-button-primary-background': 'var(--th-palette-secondary-300)',
+        '--component-button-primary-background-hover': 'var(--th-palette-secondary-200)',
+        '--component-button-primary-background-active': 'var(--th-palette-secondary-300)',
+        '--component-button-primary-text': 'var(--th-palette-secondary-contrastText)',
+        // button secondary variant
+        '--component-button-secondary-background': 'transparent',
+        '--component-button-secondary-background-hover': 'var(--th-palette-secondary-50)',
+        '--component-button-secondary-background-active': 'transparent',
+        '--component-button-secondary-border': 'var(--th-palette-secondary-300)',
+        '--component-button-secondary-border-hover': 'var(--th-palette-secondary-200)',
+        '--component-button-secondary-text': 'var(--th-palette-secondary-300)',
+        '--component-button-secondary-text-active': 'var(--th-palette-secondary-300)',
         // danger button
-        '--mui-danger-color': 'hsl(344deg 100% 54%)',
-        '--mui-danger-button-background-color': 'hsl(344deg 87% 43%)',
-        '--mui-danger-button-background-color-hover': 'hsl(344deg 100% 54%)',
-        '--mui-danger-button-background-color-active': 'hsl(344deg 87% 43%)',
-        '--mui-danger-button-background-color-disabled': 'hsl(344deg 87% 43% / 35%)',
+        '--component-button-danger-background': 'var(--th-palette-error-200)',
+        '--component-button-danger-background-hover': 'var(--th-palette-error-100)',
+        '--component-button-danger-background-active': 'var(--th-palette-error-200)',
+        '--component-button-danger-text': 'var(--th-palette-common-white)',
+        // [CLASSIC:deprecated] secondary variant
+        '--component-button-flat-background': '#fbf5f4',
+        '--component-button-flat-background-hover': '#F1EDEE',
+        '--component-button-flat-background-active': '#EBE9EA',
+        '--component-button-flat-background-disabled': '#F1F3F5',
+        '--component-button-flat-text-disabled': '#121326',
+        '--component-button-flat-text': '#121326',
 
         /* === CHECKBOX === */
-        '--mui-checkbox-border-color': 'hsl(0 0% 21%)',
-        '--mui-checkbox-border-color-disabled': theme.palette.secondary.disabled,
-        '--mui-checkbox-check-bg-color': theme.palette.secondary.main,
-        '--mui-checkbox-label-text-color': 'hsl(228 4% 23%)',
+        '--component-checkbox-border': 'var(--th-palette-gray-900)',
+        '--component-checkbox-border-disabled': 'var(--th-palette-gray-200)',
+        '--component-checkbox-background-active': 'var(--th-palette-secondary-300)',
+        '--component-checkbox-text': 'var(--th-palette-gray-900)',
 
         /* === TEXTFIELD === */
-        '--mui-input-bg-color': 'hsl(0 0% 0% / 0%)',
-        '--mui-input-bg-color-disabled': 'hsl(0 0% 0% / 0%)',
-        '--mui-input-border-color': theme.palette.input.main,
-        '--mui-input-border-color-disabled': 'hsl(0 0% 61% / 50%)',
-        '--mui-input-border-color-error': theme.palette.error.main,
-        '--mui-input-border-color-focus': theme.palette.input.dark,
-        '--mui-input-placeholder-color': 'hsl(225 4% 38% / 50%)',
-        '--mui-input-placeholder-color-disabled': 'hsl(225 4% 38% / 50%)',
-        '--mui-input-text-color': 'hsl(0 0% 21%)',
-        '--mui-input-text-color-disabled': 'hsl(225 4% 38% / 50%)',
+        '--component-input-error': 'var(--th-palette-error-100)',
+        '--component-input-background': 'transparent',
+        '--component-input-background-disabled': 'transparent',
+        '--component-input-border': 'var(--th-palette-gray-400)',
+        '--component-input-border-disabled': 'var(--th-palette-gray-200)',
+        '--component-input-border-focus': 'var(--th-palette-gray-900)',
+        '--component-input-placeholder': 'var(--th-palette-gray-400)',
+        '--component-input-placeholder-disabled': 'var(--th-palette-gray-200)',
+        '--component-input-text': 'var(--th-palette-gray-900)',
+        '--component-input-text-focus': 'var(--th-palette-gray-900)',
+        '--component-input-text-disabled': 'var(--th-palette-gray-200)',
+        '--component-input-helper-text': 'var(--th-palette-gray-600)',
+        '--component-input-helper-text-disabled': 'var(--th-palette-gray-200)',
 
         /* === SELECT === */
-        '--mui-option-bg-color': 'hsl(0 0% 100%)',
-        '--mui-option-bg-color-highlighted': 'hsl(204 20% 95%)',
-        '--mui-option-checkmark-color': 'hsl(0 0% 21%)',
-        '--mui-option-text-color': 'hsl(0 0% 21%)',
-        '--mui-option-border-color': 'hsl(0 0% 21%)',
+        '--component-menu-item-background': 'var(--th-palette-common-white)',
+        '--component-menu-item-background-highlighted': 'var(--th-palette-gray-50)',
+        '--component-menu-item-checkmark': 'var(--th-palette-secondary-300)',
+        '--component-menu-item-text': 'var(--th-palette-gray-900)',
 
         /* === TABS === */
-        '--mui-tabs-background-color': 'hsl(0 0% 100%)',
-        '--mui-tabs-text-color': 'hsl(233 6% 70%)',
-        '--mui-tabs-text-color-active': theme.palette.secondary.main,
-        '--mui-tabs-text-color-disabled': 'hsl(221 19% 81%)',
-
-        /* === STATUS TX === */
-        '--mui-transactions-state-pending-background-color': 'hsl(206 10% 86%)',
-        '--mui-transactions-state-pending-text-color': 'hsl(233 6% 20%)',
-        '--mui-transactions-state-high-background-color': 'hsl(167 50% 86%)',
-        '--mui-transactions-state-high-text-color': 'hsl(167 80% 45%)',
-        '--mui-transactions-state-failed-background-color': 'hsl(344 100% 54% / 50%) ',
-        '--mui-transactions-state-failed-text-color': 'hsl(344 100% 45%) ',
-        '--mui-transactions-state-medium-background-color': 'hsl(37 91% 55% / 30%)',
-        '--mui-transactions-state-medium-text-color': 'hsl(37 91% 55%)',
-        '--mui-transactions-state-low-background-color': 'hsl(344 100% 54% / 15%)',
-        '--mui-transactions-state-low-text-color': 'hsl(344 94% 68%)',
+        '--component-tabs-background': 'var(--th-palette-common-white)',
+        '--component-tabs-text': 'var(--th-palette-gray-600)',
+        '--component-tabs-text-active': 'var(--th-palette-secondary-300)',
+        '--component-tabs-text-disabled': 'var(--th-palette-gray-400)',
 
         /* === TOOLTIP === */
-        '--mui-tooltip-background-color': 'hsl(225 4% 38% / 0.9)',
-        '--mui-tooltip-border-color': 'hsl(214deg 16% 81%)',
-        '--mui-tooltip-text-color': 'hsl(0 0% 100%)',
+        '--component-tooltip-background': 'var(--th-palette-gray-700)',
+        '--component-tooltip-text': 'var(--th-palette-common-white)',
 
         /* === MODAL === */
-        '--mui-dialog-background-color': 'hsl(0 0% 100%)',
-        '--mui-dialog-text-color': 'hsl(231deg 8% 18%)',
-        '--mui-dialog-overlay-background-color': 'hsl(226deg 71% 8% / 80%)',
-        '--mui-dialog-min-width-cmn': '540px',
+        '--component-dialog-background': 'var(--th-palette-common-white)',
+        '--component-dialog-text': 'var(--th-palette-gray-900)',
+        '--component-dialog-overlay-background-color': 'var(--th-palette-background-overlay)',
+        '--component-dialog-min-width-cmn': '540px',
+      },
+      /* === GLOBAL STYLES === */
+      body: {
+        /* To remove background color for Chrome Inputs */
+        'input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus,input:-webkit-autofill:active': {
+          WebkitBoxShadow: '0 0 0 30px rgba(255, 255, 255) inset !important',
+        },
       },
     }}
   />
