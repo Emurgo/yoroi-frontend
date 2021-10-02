@@ -353,7 +353,6 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
             {...walletPasswordField.bind()}
             disabled={isSubmitting}
             error={walletPasswordField.error}
-            helperText={walletPasswordField.error}
           />
         </div>
 

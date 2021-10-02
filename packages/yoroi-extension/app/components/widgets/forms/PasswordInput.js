@@ -100,7 +100,6 @@ export default class PasswordInput extends Component<Props> {
           {...passwordField.bind()}
           disabled={this.props.disabled}
           error={passwordField.error}
-          helperText={passwordField.error}
           done={this.props.done}
         />
       </div>

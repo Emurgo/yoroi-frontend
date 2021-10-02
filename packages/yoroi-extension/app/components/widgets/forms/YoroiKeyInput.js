@@ -80,7 +80,6 @@ export default class YoroiKeyInput extends Component<Props> {
         autoComplete="off"
         {...keyField.bind()}
         error={keyField.error}
-        helperText={keyField.error}
         done={keyField.isValid}
       />
     );

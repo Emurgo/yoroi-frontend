@@ -478,7 +478,6 @@ export default class WalletSendForm extends Component<Props> {
               className="receiver"
               {...receiverField.bind()}
               error={receiverField.error}
-              helperText={receiverField.error}
               done={receiverField.isValid}
             />
           </div>
@@ -557,7 +556,6 @@ export default class WalletSendForm extends Component<Props> {
                 className="memo"
                 {...memoField.bind()}
                 error={memoField.error}
-                helperText={memoField.error}
                 done={isValidMemo(memo)}
               />
             </div>

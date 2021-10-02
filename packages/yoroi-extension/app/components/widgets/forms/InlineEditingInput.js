@@ -171,7 +171,6 @@ export default class InlineEditingInput extends Component<Props, State> {
           onChange={inputField.onChange}
           onKeyDown={event => this.handleInputKeyDown(event)}
           error={isActive ? inputField.error : ''}
-          helperText={isActive ? inputField.error : ''}
           inputRef={(input) => { this.inputField = input; }}
         />
 

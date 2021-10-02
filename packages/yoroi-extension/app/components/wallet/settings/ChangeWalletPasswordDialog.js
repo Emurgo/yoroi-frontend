@@ -193,7 +193,6 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
             onChange={(value) => this.handleDataChange('currentPasswordValue', value)}
             {...currentPasswordField.bind()}
             error={currentPasswordField.error}
-            helperText={currentPasswordField.error}
           />
         </div>
 
@@ -206,7 +205,6 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
             {...newPasswordField.bind()}
             done={newPasswordField.isValid}
             error={newPasswordField.error}
-            helperText={newPasswordField.error}
           />
 
           <TextField
@@ -217,7 +215,6 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
             {...repeatedPasswordField.bind()}
             done={repeatedPassword && repeatedPasswordField.isValid}
             error={repeatedPasswordField.error}
-            helperText={repeatedPasswordField.error}
           />
         </div>
 
