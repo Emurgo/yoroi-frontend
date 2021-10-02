@@ -323,7 +323,6 @@ class SignTxPage extends Component<Props> {
               className={styles.walletPassword}
               {...walletPasswordField.bind()}
               error={walletPasswordField.error}
-              helperText={walletPasswordField.error}
             />
           </div>
           <div className={styles.wrapperBtn}>

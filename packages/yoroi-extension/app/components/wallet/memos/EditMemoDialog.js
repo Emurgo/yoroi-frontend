@@ -142,7 +142,6 @@ export default class EditMemoDialog extends Component<Props, State> {
           inputRef={(input) => { this.memoContentInput = input; }}
           {...memoContentField.bind()}
           error={memoContentField.error}
-          helperText={memoContentField.error}
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">

@@ -141,7 +141,6 @@ export default class AddMemoDialog extends Component<Props, State> {
           {...memoContentField.bind()}
           done={memoContentField.isValid}
           error={memoContentField.error}
-          helperText={memoContentField.error}
         />
         { error ? (<ErrorBlock error={error} />) : null }
       </Dialog>);

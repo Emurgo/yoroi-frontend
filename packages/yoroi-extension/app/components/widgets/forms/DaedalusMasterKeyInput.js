@@ -84,7 +84,6 @@ export default class DaedalusMasterKeyInput extends Component<Props> {
         autoComplete="off"
         {...masterKeyField.bind()}
         error={masterKeyField.error}
-        helperText={masterKeyField.error}
         done={masterKeyField.isValid}
       />
     );

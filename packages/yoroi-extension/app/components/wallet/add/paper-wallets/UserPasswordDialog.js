@@ -187,7 +187,6 @@ export default class UserPasswordDialog extends Component<Props> {
             {...paperPasswordField.bind()}
             done={paperPasswordField.isValid}
             error={paperPasswordField.error}
-            helperText={paperPasswordField.error}
           />
         </div>
         <div className={styles.repeatedPassword}>
@@ -199,7 +198,6 @@ export default class UserPasswordDialog extends Component<Props> {
             done={repeatPassword && repeatedPasswordField.isValid}
             {...repeatedPasswordField.bind()}
             error={repeatedPasswordField.error}
-            helperText={repeatedPasswordField.error}
           />
         </div>
       </Dialog>
