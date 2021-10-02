@@ -5,23 +5,6 @@ const ClassicTextField = {
       width: '100%',
       borderColor: 'var(--component-input-border)',
       marginTop: '24px',
-      '& .MuiInputLabel-root': {
-        color: 'var(--component-input-placeholder)',
-        position: 'relative',
-        top: 'unset',
-        marginBottom: '10px',
-        letterSpacing: '1.12px',
-        fontWeight: 500,
-        '&.Mui-focused': {
-          color: 'var(--component-input-text)',
-        },
-        '&.Mui-disabled': {
-          color: 'var(--component-input-placeholder-disabled)',
-        },
-        '&.Mui-error': {
-          color: 'var(--component-input-error)',
-        },
-      },
       '& .MuiInputBase-input ': {
         height: '1.2em',
       },
@@ -89,21 +72,11 @@ const ModernTextField = {
           '&.Mui-disabled': {
             color: 'var(--component-input-border-disabled)',
           },
+          '&.Mui-error': {
+            color: 'var(--component-input-error)',
+          },
         },
       },
-      '& .MuiInputLabel-root': {
-        color: 'var(--component-input-placeholder)',
-        '&.Mui-focused': {
-          color: 'var(--component-input-text-focus)',
-        },
-        '&.Mui-disabled': {
-          color: 'var(--component-input-placeholder-disabled)',
-        },
-        '&.Mui-error': {
-          color: 'var(--component-input-error)',
-        },
-      },
-
       '& .MuiOutlinedInput-input': {
         '&.Mui-disabled': {
           color: 'var(--component-input-text-disabled)',

@@ -123,15 +123,6 @@ function Autocomplete({
       fullWidth
     >
       <InputLabel
-        sx={{
-          position: theme.name === 'classic' ? 'relative' : 'absolute',
-          top: theme.name === 'classic' ? 'unset' : 'initial',
-          marginBottom: theme.name === 'classic' ? '10px' : 0,
-          '&.MuiInputLabel-shrink': {
-            padding: theme.name === 'classic' ? 0 : '0 6px',
-            background: 'var(--th-palette-common-white)',
-          },
-        }}
         {...(value.length || theme.name === 'classic' ? { shrink: true } : {})}
         htmlFor={id ?? 'autocomplete-combobox'}
         {...getLabelProps()}
@@ -261,18 +252,9 @@ const StyledFormControl = styled(FormControl)(({ theme }) => ({
       '&.Mui-disabled': {
         color: 'var(--component-input-border-disabled)',
       },
-    },
-  },
-  '& .MuiInputLabel-root': {
-    color: 'var(--component-input-placeholder)',
-    '&.Mui-focused': {
-      color: 'var(--component-input-text-focus)',
-    },
-    '&.Mui-disabled': {
-      color: 'var(--component-input-placeholder-disabled)',
-    },
-    '&.Mui-error': {
-      color: 'var(--component-input-error)',
+      '&.Mui-error': {
+        color: 'var(--component-input-error)',
+      },
     },
   },
 }));
