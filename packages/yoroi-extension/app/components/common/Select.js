@@ -91,26 +91,15 @@ const SFormControl = styled(FormControl)(({ theme }) => ({
   position: 'relative',
   marginTop: theme.name === 'classic' ? '24px' : 0,
   paddingBottom: '20px',
-  /* TODO: Unify label and fieldset styles in one place
-  These styles came from overrides TextField */
   '&:hover': {
     '& .MuiInputLabel-root': {
       color: 'var(--component-input-text-focus)',
       '&.Mui-disabled': {
         color: 'var(--component-input-border-disabled)',
       },
-    },
-  },
-  '& .MuiInputLabel-root': {
-    color: 'var(--component-input-placeholder)',
-    '&.Mui-focused': {
-      color: 'var(--component-input-text-focus)',
-    },
-    '&.Mui-disabled': {
-      color: 'var(--component-input-placeholder-disabled)',
-    },
-    '&.Mui-error': {
-      color: 'var(--component-input-error)',
+      '&.Mui-error': {
+        color: 'var(--component-input-error)',
+      },
     },
   },
   '& .MuiOutlinedInput-root': {

@@ -3,10 +3,21 @@ const ClassicInputLabel = {
   styleOverrides: {
     root: {
       color: 'var(--component-input-placeholder)',
-      top: '-30px',
+      position: 'relative',
+      top: 'unset',
+      transform: 'none',
+      marginBottom: '10px',
       letterSpacing: '1.12px',
       fontWeight: 500,
-      transform: 'none',
+      '&.Mui-focused': {
+        color: 'var(--component-input-text-focus)',
+      },
+      '&.Mui-disabled': {
+        color: 'var(--component-input-placeholder-disabled)',
+      },
+      '&.Mui-error': {
+        color: 'var(--component-input-error)',
+      },
     },
   },
   defaultProps: {
@@ -18,6 +29,19 @@ const ModernInputLabel = {
   styleOverrides: {
     root: {
       color: 'var(--component-input-placeholder)',
+      '&.Mui-focused': {
+        color: 'var(--component-input-text-focus)',
+      },
+      '&.Mui-disabled': {
+        color: 'var(--component-input-placeholder-disabled)',
+      },
+      '&.Mui-error': {
+        color: 'var(--component-input-error)',
+      },
+      '&.MuiInputLabel-shrink': {
+        padding: '0 6px',
+        background: 'var(--th-palette-common-white)',
+      },
     },
   },
   defaultProps: {
