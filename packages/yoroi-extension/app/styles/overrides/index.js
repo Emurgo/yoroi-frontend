@@ -3,6 +3,7 @@ export * from './Button';
 export * from './Checkbox';
 export * from './TextField';
 export * from './OutlinedInput';
+export * from './FormHelperText';
 export * from './Select';
 export * from './MenuItem';
 export * from './Menu';

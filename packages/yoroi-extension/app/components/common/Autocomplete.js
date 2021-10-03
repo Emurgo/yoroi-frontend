@@ -177,12 +177,7 @@ function Autocomplete({
           {Boolean(error) === true ? <ErrorIcon /> : null}
         </CheckWrapper>
       </InputWrapper>
-      <FormHelperText
-        sx={{ position: 'absolute', bottom: 0, marginLeft: theme.name === 'classic' ? 0 : '14px' }}
-        id={id ?? 'autocomplete-combobox'}
-      >
-        {error}
-      </FormHelperText>
+      <FormHelperText id={id ?? 'autocomplete-combobox'}>{error}</FormHelperText>
 
       <ULList
         component="ul"
@@ -243,7 +238,7 @@ Autocomplete.defaultProps = {
 
 const StyledFormControl = styled(FormControl)(({ theme }) => ({
   marginTop: theme.name === 'classic' ? 0 : '12px',
-  marginBottom: '10px',
+  marginBottom: '16px',
   paddingBottom: '24px',
   '&:hover': {
     '& .MuiInputLabel-root': {
