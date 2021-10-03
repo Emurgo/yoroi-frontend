@@ -703,6 +703,25 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     ).map(tx => tx.transaction);
   }
 
+  @action
+  clearSubmittedTransactions: (
+    PublicDeriver<>,
+  ) => void = (
+    publicDeriver
+  ) => {
+    for (let i = 0; i < this._submittedTransactions.length;) {
+      if (
+        this._submittedTransactions[i].publicDeriverId ===
+          publicDeriver.publicDeriverId
+      ) {
+        this._submittedTransactions.splice(i, 1);
+      } else {
+        i++;
+      }
+    }
+    this._persistSubmittedTransactions();
+  }
+
   _persistSubmittedTransactions: () => void = () => {
     localStorage.setItem(
       SUBMITTED_TRANSACTIONS_KEY,
