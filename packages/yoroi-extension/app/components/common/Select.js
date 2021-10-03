@@ -52,19 +52,7 @@ function Select({
         }}
         {...props}
       />
-      {helperText !== null ? (
-        <FormHelperText
-          sx={{
-            position: 'absolute',
-            marginLeft: 0,
-            lineHeight: '1.33',
-            fontSize: '0.75rem',
-            bottom: '-5px',
-          }}
-        >
-          {helperText}
-        </FormHelperText>
-      ) : null}
+      {helperText !== null ? <FormHelperText>{helperText}</FormHelperText> : null}
     </SFormControl>
   );
 }
