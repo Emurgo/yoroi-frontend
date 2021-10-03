@@ -154,7 +154,6 @@ function Autocomplete({
         ))}
         <Box {...getComboboxProps()}>
           <Input
-            color="gray"
             // $FlowFixMe[invalid-compare]
             placeholder={value.length >= maxSelections ? '' : placeholder}
             // $FlowFixMe[invalid-compare]
@@ -285,7 +284,7 @@ const ULList = styled(Box)({
   borderRadius: 0,
 });
 
-const InputWrapper = styled('div')(
+const InputWrapper = styled(Box)(
   ({ theme, error, isOpen }) => `
   width: 100%;
   border: ${isOpen ? '2px' : '1px'} solid ${

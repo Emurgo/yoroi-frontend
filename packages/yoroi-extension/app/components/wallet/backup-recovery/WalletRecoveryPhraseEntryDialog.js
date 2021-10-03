@@ -190,14 +190,22 @@ export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
                 label={<FormattedHTMLMessage {...messages.termDevice} />}
                 onChange={onAcceptTermDevice}
                 checked={isTermDeviceAccepted}
-                labelSx={{ fontSize: '14px' }}
+                labelProps={{
+                  sx: {
+                    fontSize: '0.875rem',
+                  },
+                }}
               />
             </div>
             <div className={styles.checkbox}>
               <CheckboxLabel
                 label={intl.formatMessage(messages.termRecovery)}
                 onChange={onAcceptTermRecovery}
-                labelSx={{ fontSize: '14px' }}
+                labelProps={{
+                  sx: {
+                    fontSize: '0.875rem',
+                  },
+                }}
                 checked={isTermRecoveryAccepted}
               />
             </div>
