@@ -11,8 +11,8 @@ type Props = {|
   formControlProps?: Object,
   shrink?: boolean,
   disabled?: boolean,
-  labelSx?: Object,
   menuProps?: Object,
+  labelProps?: Object,
   helperText?: string,
   options: Array<Object>,
 |};
@@ -23,25 +23,18 @@ function Select({
   onChange,
   helperText,
   formControlProps,
-  labelSx,
   menuProps,
   shrink,
   disabled,
+  labelProps,
   ...props
 }: Props): Node {
   return (
     <SFormControl fullWidth disabled={disabled} {...formControlProps}>
-      <InputLabel
-        sx={{
-          ...(labelSx !== null && labelSx),
-        }}
-        shrink={shrink}
-        id={labelId}
-      >
+      <InputLabel shrink={shrink} id={labelId} {...labelProps}>
         {label}
       </InputLabel>
       <SelectBase
-        color="gray"
         labelId={labelId}
         IconComponent={ArrowIcon}
         label={label}
@@ -80,16 +73,15 @@ export default Select;
 
 Select.defaultProps = {
   formControlProps: null,
-  labelSx: null,
   menuProps: null,
+  labelProps: null,
   helperText: null,
   shrink: true,
   disabled: false,
 };
 
-const SFormControl = styled(FormControl)(({ theme }) => ({
+const SFormControl = styled(FormControl)({
   position: 'relative',
-  marginTop: theme.name === 'classic' ? '24px' : 0,
   paddingBottom: '20px',
   '&:hover': {
     '& .MuiInputLabel-root': {
@@ -132,4 +124,4 @@ const SFormControl = styled(FormControl)(({ theme }) => ({
       borderColor: 'var(--component-input-error)',
     },
   },
-}));
+});

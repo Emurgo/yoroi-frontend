@@ -73,14 +73,16 @@ export default class LanguageSelectionForm extends Component<Props> {
         <div className={styles.centeredBox}>
           <Select
             formControlProps={{ sx: { marginBottom: '25px' } }}
-            labelSx={{
-              width: '100%',
-              left: '0',
-              top: '-55px',
-              textAlign: 'center',
-              fontSize: '1rem',
-              fontWeight: '500',
-              textTransform: 'uppercase',
+            labelProps={{
+              sx: {
+                width: '100%',
+                left: '0',
+                top: '-55px',
+                textAlign: 'center',
+                fontSize: '1rem',
+                fontWeight: '500',
+                textTransform: 'uppercase',
+              },
             }}
             labelId="languages-select"
             value={currentLocale}
