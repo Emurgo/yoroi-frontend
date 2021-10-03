@@ -1,7 +1,6 @@
 // @flow
 import type { Node } from 'react';
 import { FormControl, FormHelperText, InputLabel, Select as SelectBase } from '@mui/material';
-import { styled } from '@mui/system';
 import ArrowIcon from '../../assets/images/forms/arrow-dropdown.inline.svg';
 
 type Props = {|
@@ -30,7 +29,7 @@ function Select({
   ...props
 }: Props): Node {
   return (
-    <SFormControl fullWidth disabled={disabled} {...formControlProps}>
+    <FormControl disabled={disabled} {...formControlProps}>
       <InputLabel shrink={shrink} id={labelId} {...labelProps}>
         {label}
       </InputLabel>
@@ -53,7 +52,7 @@ function Select({
         {...props}
       />
       {helperText !== null ? <FormHelperText>{helperText}</FormHelperText> : null}
-    </SFormControl>
+    </FormControl>
   );
 }
 
@@ -67,19 +66,3 @@ Select.defaultProps = {
   shrink: true,
   disabled: false,
 };
-
-const SFormControl = styled(FormControl)({
-  position: 'relative',
-  paddingBottom: '20px',
-  '&:hover': {
-    '& .MuiInputLabel-root': {
-      color: 'var(--component-input-text-focus)',
-      '&.Mui-disabled': {
-        color: 'var(--component-input-border-disabled)',
-      },
-      '&.Mui-error': {
-        color: 'var(--component-input-error)',
-      },
-    },
-  },
-});
