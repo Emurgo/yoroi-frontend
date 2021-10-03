@@ -94,34 +94,4 @@ const SFormControl = styled(FormControl)({
       },
     },
   },
-  '& .MuiOutlinedInput-root': {
-    '&:hover .MuiOutlinedInput-notchedOutline': {
-      borderColor: 'var(--component-input-border-focus)',
-    },
-    '& .MuiOutlinedInput-notchedOutline': {
-      borderColor: 'var(--component-input-border)',
-      backgroundColor: 'var(--component-input-background)',
-    },
-    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-      borderColor: 'var(--component-input-border-focus)',
-      border: '2px solid',
-    },
-    '& svg': {
-      color: 'var(--component-input-border)',
-    },
-    '&.Mui-focused svg': {
-      color: 'var(--component-input-helper-text)',
-    },
-    '&.Mui-disabled svg': {
-      color: 'var(--component-input-border-disabled)',
-    },
-    '&.Mui-disabled .MuiOutlinedInput-notchedOutline': {
-      borderColor: 'var(--component-input-border-disabled)',
-      backgroundColor: 'var(--component-input-background-disabled)',
-      color: 'var(--component-input-text-disabled)',
-    },
-    '&.Mui-error .MuiOutlinedInput-notchedOutline': {
-      borderColor: 'var(--component-input-error)',
-    },
-  },
 });
