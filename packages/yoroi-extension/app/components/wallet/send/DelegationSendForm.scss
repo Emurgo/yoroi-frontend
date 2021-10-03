@@ -23,8 +23,8 @@
 
   .actionLabel {
     color: var(--theme-label-button-color);
-    font-family: var(--rp-checkbox-label-font-family, var(--rp-theme-font-light, "NotoSans-Light, NotoSansCJKjp-Light"), sans-serif);
-    font-size: var(--rp-checkbox-label-font-size, 16px);
+    font-weight: 300;
+    font-size: 16px;
     padding-left: 17px;
   }
 }
@@ -40,19 +40,9 @@
 
   .poolIdInput {
     letter-spacing: 0;
-
-    :global {
-      .SimpleInput_input {
-        font-family: var(--font-mono-regular);
-      }
-    }
   }
 
   .nextButton {
     margin: 20px auto 0;
-  }
-
-  fieldset {
-    background: var(--theme-settings-pane-background-color);
   }
 }

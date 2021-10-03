@@ -1,5 +1,5 @@
 .serverError {
-  font-family: var(--rp-theme-font-bold);
+  font-weight: 700;
   text-align: center;
   color: white;
   background-color: red;
@@ -16,7 +16,7 @@
 
   a {
     color: white;
-    font-family: var(--rp-theme-font-bold);
+    font-weight: 700;
     text-transform: uppercase;
   }
 }
