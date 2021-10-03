@@ -4,7 +4,6 @@ import type { ElementRef, Node } from 'react';
 import { IconButton, InputAdornment, TextField as TextFieldBase, useTheme } from '@mui/material';
 import ErrorIcon from '../../assets/images/forms/error.inline.svg';
 import DoneIcon from '../../assets/images/forms/done.inline.svg';
-import { styled } from '@mui/system';
 import EyeIcon from '../../assets/images/forms/password-eye-close.inline.svg';
 import CloseEyeIcon from '../../assets/images/forms/password-eye.inline.svg';
 import React from 'react';
@@ -49,8 +48,7 @@ function TextField({
   };
 
   return (
-    <STextField
-      fullWidth
+    <TextFieldBase
       className={className}
       error={Boolean(error)}
       label={label}
@@ -110,10 +108,5 @@ TextField.defaultProps = {
   type: 'text',
   autoFocus: false,
 };
-const STextField = styled(TextFieldBase)(({ theme }) => ({
-  paddingBottom: 20,
-  marginTop: theme.name === 'classic' ? 0 : 10,
-  marginBottom: 10,
-}));
 
 export default TextField;

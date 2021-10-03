@@ -116,11 +116,10 @@ function Autocomplete({
   });
   const theme = useTheme();
   return (
-    <StyledFormControl
+    <FormControl
       error={Boolean(error)}
       // $FlowFixMe[invalid-compare]
       disabled={disabled === true || value.length >= maxSelections}
-      fullWidth
     >
       <InputLabel
         {...(value.length || theme.name === 'classic' ? { shrink: true } : {})}
@@ -220,7 +219,7 @@ function Autocomplete({
             })
           : null}
       </ULList>
-    </StyledFormControl>
+    </FormControl>
   );
 }
 export default Autocomplete;
@@ -235,23 +234,6 @@ Autocomplete.defaultProps = {
   noResultsMessage: '',
   chipProps: null,
 };
-
-const StyledFormControl = styled(FormControl)(({ theme }) => ({
-  marginTop: theme.name === 'classic' ? 0 : '12px',
-  marginBottom: '16px',
-  paddingBottom: '24px',
-  '&:hover': {
-    '& .MuiInputLabel-root': {
-      color: 'var(--component-input-text-focus)',
-      '&.Mui-disabled': {
-        color: 'var(--component-input-border-disabled)',
-      },
-      '&.Mui-error': {
-        color: 'var(--component-input-error)',
-      },
-    },
-  },
-}));
 
 const CheckWrapper = styled(Box)({
   display: 'flex',
@@ -302,9 +284,6 @@ const InputWrapper = styled(Box)(
   flex-wrap: wrap;
   position: relative;
   cursor: text;
-
-
-
   & input {
     background-color: transparent;
     color: ${theme.name === 'classic' ? 'var(--component-input-border)' : '#000000d9'};

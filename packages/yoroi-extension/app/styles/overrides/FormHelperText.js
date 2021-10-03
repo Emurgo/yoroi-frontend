@@ -16,6 +16,9 @@ const ClassicFormHelperText = {
       },
     },
   },
+  defaultProps: {
+    variant: 'outlined',
+  },
 };
 const ModernFormHelperText = {
   styleOverrides: {
@@ -33,6 +36,9 @@ const ModernFormHelperText = {
         color: 'var(--component-input-error)',
       },
     },
+  },
+  defaultProps: {
+    variant: 'outlined',
   },
 };
 export { ClassicFormHelperText, ModernFormHelperText };
