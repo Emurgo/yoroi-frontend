@@ -433,7 +433,7 @@ export class RemoteFetcher implements IFetcher {
   getMultiAssetMintMetadata: MultiAssetMintMetadataRequest
     => Promise<MultiAssetMintMetadataResponse> = async (body) => {
       const { BackendService } = body.network.Backend;
-      if (BackendService == null) throw new Error(`${nameof(this.getCatalystRoundInfo)} missing backend url`);
+      if (BackendService == null) throw new Error(`${nameof(this.getMultiAssetMintMetadata)} missing backend url`);
       const isMainnet = /Mainnet/g.test(body.network.NetworkName)
       const prefix = isMainnet ? '' : 'api/'
       return await axios(
@@ -446,7 +446,7 @@ export class RemoteFetcher implements IFetcher {
         }
       ).then(response => response.data)
       .catch((error) => {
-        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getCatalystRoundInfo)} error: ` + stringifyError(error));
+        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getMultiAssetMintMetadata)} error: ` + stringifyError(error));
         return {};
       });
   }
