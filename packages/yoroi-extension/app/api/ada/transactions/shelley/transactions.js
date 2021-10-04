@@ -473,14 +473,10 @@ export function newAdaUnsignedTxFromUtxo(
       return [u, false, hasRequiredAsset, Math.floor(spendable / 1_000_000) * 1_000_000];
     });
 
-  const utxosFiltered: Array<[RemoteUnspentOutput, boolean, boolean, number]> = utxosMapped
-    .filter(([, isPure, hasRequiredAsset, spendableValue]) =>
-      isPure || hasRequiredAsset || (spendableValue > 0));
-
   // prioritize inputs
-  const sortedUtxos: Array<RemoteUnspentOutput> = utxosFiltered.sort((v1, v2) => {
-    const [, isPure1, hasRequiredAsset1, spendableValue1] = v1;
-    const [, isPure2, hasRequiredAsset2, spendableValue2] = v2;
+  const sortedUtxos: Array<RemoteUnspentOutput> = utxosMapped.sort((v1, v2) => {
+    const [u1, isPure1, hasRequiredAsset1, spendableValue1] = v1;
+    const [u2, isPure2, hasRequiredAsset2, spendableValue2] = v2;
     // $FlowFixMe[unsafe-addition]
     if (hasRequiredAsset1 ^ hasRequiredAsset2) {
       // one but not both of the utxos has required assets
@@ -488,18 +484,22 @@ export function newAdaUnsignedTxFromUtxo(
       // ahead of any other, pure or dirty
       return hasRequiredAsset1 ? -1 : 1;
     }
+    if (isPure1 && isPure2) {
+      // both utxos are clean - randomize them
+      return Math.random() - 0.5;
+    }
     if (isPure1 || isPure2) {
-      // at least one of the utxos is clean
-      if (isPure1 && isPure2) {
-        // both utxos are clean - randomize them
-        return Math.random() - 0.5;
-      }
+      // At least one of the utxos is clean
       // The clean utxo is prioritized
       return isPure1 ? -1 : 1;
     }
     // both utxos are dirty
-    // dirty utxos with highest spendable ADA are prioritised
-    return spendableValue2 - spendableValue1;
+    if (spendableValue1 !== spendableValue2) {
+      // dirty utxos with highest spendable ADA are prioritised
+      return spendableValue2 - spendableValue1;
+    }
+    // utxo with fewer assets is prioritised
+    return u1.assets.length - u2.assets.length;
   }).map(([u]) => u);
 
   /*
