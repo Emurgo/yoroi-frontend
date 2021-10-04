@@ -45,6 +45,7 @@ import { decode, } from 'bs58';
 import { RustModule } from '../../../ada/lib/cardanoCrypto/rustLoader';
 import { replaceMockBoxId } from './utils';
 import { MultiToken } from '../../../common/lib/MultiToken';
+import JSONBigInt from 'json-bigint';
 
 const network = networks.ErgoMainnet;
 const defaultIdentifier = defaultAssets.filter(
@@ -416,16 +417,17 @@ describe('Create unsigned TX from addresses', () => {
     expect(unsignedTxResponse.unsignedTx.output_candidates().len()).toEqual(1);
     // make sure the assets are sent back to us in the change
     expect(
-      unsignedTxResponse.unsignedTx
-        .box_selection()
-        .change()
-        .get(0)
-        .tokens()
-        .get(0)
-        .to_json()
+      JSONBigInt.parse(
+        unsignedTxResponse.unsignedTx
+          .box_selection()
+          .change()
+          .get(0)
+          .tokens()
+          .get(0)
+          .to_json())
     ).toEqual({
       tokenId: '13d24a67432d447e53118d920100c747abb52da8da646bc193f03b47b64a8ac5',
-      amount: '10000',
+      amount: 10000,
     });
   });
 });
@@ -557,15 +559,16 @@ describe('Create sendAll unsigned TX from UTXO', () => {
       ); // fee
       // make sure the assets are also sent
       expect(
-        unsignedTx
-          .output_candidates()
-          .get(0)
-          .tokens()
-          .get(0)
-          .to_json()
+        JSONBigInt.parse(
+          unsignedTx
+            .output_candidates()
+            .get(0)
+            .tokens()
+            .get(0)
+            .to_json())
       ).toEqual({
         tokenId: '13d24a67432d447e53118d920100c747abb52da8da646bc193f03b47b64a8ac5',
-        amount: '10000',
+        amount: 10000,
       }); // output
     });
   });

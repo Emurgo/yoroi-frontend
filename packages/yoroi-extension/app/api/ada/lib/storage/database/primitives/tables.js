@@ -585,6 +585,7 @@ export const populatePrimitivesDb = (schemaBuilder: lf$schema$Builder) => {
   // Network Table
   schemaBuilder.createTable(NetworkSchema.name)
     .addColumn(NetworkSchema.properties.NetworkId, Type.INTEGER)
+    .addColumn(NetworkSchema.properties.NetworkName, Type.STRING)
     .addColumn(NetworkSchema.properties.CoinType, Type.NUMBER)
     .addColumn(NetworkSchema.properties.Backend, Type.OBJECT)
     .addColumn(NetworkSchema.properties.BaseConfig, Type.OBJECT)
