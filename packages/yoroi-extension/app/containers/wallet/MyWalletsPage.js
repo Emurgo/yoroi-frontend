@@ -168,10 +168,10 @@ export default class MyWalletsPage extends Component<Props> {
         )
         const currencyName = getTokenName(defaultToken)
 
-      if (
-        defaultToken.NetworkId !== networks.CardanoMainnet.NetworkId &&
-        defaultToken.NetworkId !== networks.ErgoMainnet.NetworkId
-      ) {
+        if (
+          defaultToken.NetworkId !== networks.CardanoMainnet.NetworkId &&
+          defaultToken.NetworkId !== networks.ErgoMainnet.NetworkId
+        ) {
           return null;
         }
 
