@@ -16,6 +16,10 @@ import { genLookupOrFail } from '../../../stores/stateless/tokenHelpers';
 
 export type GeneratedData = typeof WalletSendConfirmationDialogContainer.prototype.generated;
 
+// TODO: unmagic the constants
+const MAX_VALUE_BYTES = 5000;
+const MAX_TX_BYTES = 16384;
+
 type DialogProps = {|
   +signRequest: ISignRequest<any>,
   +staleTx: boolean,
@@ -51,6 +55,13 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
 
     const totalInput = signRequest.totalInput();
     const fee = signRequest.fee();
+    const size = signRequest.size?.();
+    const fullSize = size ? size.full : 0;
+    const maxOutput = size ? Math.max(...size.outputs) : 0;
+    const showSize = size != null && (
+      size.full > (MAX_TX_BYTES - 1000)
+      || maxOutput > (MAX_VALUE_BYTES - 1000)
+    );
     const receivers = signRequest.receivers(false);
     return (
       <WalletSendConfirmationDialog
@@ -66,6 +77,7 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
         receivers={receivers}
         totalAmount={totalInput}
         transactionFee={fee}
+        transactionSize={showSize ? `${fullSize}/${MAX_TX_BYTES} (Biggest output: ${maxOutput}/${MAX_VALUE_BYTES})` : null}
         onSubmit={async ({ password }) => {
           await sendMoney.trigger({
             signRequest,

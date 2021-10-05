@@ -47,6 +47,7 @@ import { ErgoExternalTxSignRequest } from '../../api/ergo/lib/transactions/ErgoE
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { toRemoteUtxo } from '../../api/ergo/lib/transactions/utils';
 import { mintedTokenInfo } from '../../../chrome/extension/ergo-connector/utils';
+import { Logger } from '../../utils/logging';
 import type { CardanoConnectorSignRequest } from '../types';
 import {
   asAddressedUtxo,
@@ -326,7 +327,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     // $FlowFixMe[prop-missing]
     const tx: Tx = signingMessage.sign.tx;
     // it's possible we minted assets in this tx, so looking them up will fail
-    const mintedTokenIds = mintedTokenInfo(tx).map(t => t.Identifier);
+    const mintedTokenIds = mintedTokenInfo(tx, Logger.info).map(t => t.Identifier);
     const tokenIdentifiers = Array.from(new Set([
       ...tx.inputs
         .flatMap(output => output.assets)
@@ -338,12 +339,23 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       selectedWallet.getParent().getDefaultToken().defaultIdentifier
     ])).filter(id => !mintedTokenIds.includes(id));
     const stateFetcher = this.stores.substores.ergo.stateFetchStore.fetcher;
-    await addErgoAssets({
-      db: selectedWallet.getDb(),
-      tokenIdentifiers,
-      getAssetInfo: stateFetcher.getAssetInfo,
-      network: selectedWallet.getParent().getNetworkInfo(),
-    });
+    try {
+      await addErgoAssets({
+        db: selectedWallet.getDb(),
+        tokenIdentifiers,
+        getAssetInfo: async (req) => {
+          try {
+            return await stateFetcher.getAssetInfo(req);
+          } catch (e) {
+              console.error('Aseet info request failed', e);
+              return {};
+          }
+        },
+        network: selectedWallet.getParent().getNetworkInfo(),
+      });
+    } catch (error) {
+      console.error('Failed to add ergo assets!', error);
+    }
   }
 
   // De-serialize the tx so that the signing dialog could show the tx info (

@@ -18,8 +18,8 @@ import globalMessages from '../../i18n/global-messages';
 
 const messages = defineMessages({
   dialogTitle: {
-    id: 'buysell.dialog.title',
-    defaultMessage: '!!!Buy / Sell ADA',
+    id: 'buy.dialog.title',
+    defaultMessage: '!!!Buy ADA',
   },
   dialogSelectAddress: {
     id: 'buysell.dialog.selectAddress',
