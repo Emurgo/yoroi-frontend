@@ -8,12 +8,12 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { truncateAddress } from '../../utils/formatters';
 import Dialog from '../widgets/Dialog';
 import DialogCloseButton from '../widgets/DialogCloseButton';
-import ChangellyFetcher from './ChangellyFetcher'
+import ChangellyFetcher from './ChangellyFetcher';
 
 import styles from './BuySellDialog.scss';
-import VerifyIcon from '../../assets/images/verify-icon.inline.svg'
-import VerticalFlexContainer from '../layout/VerticalFlexContainer'
-import LoadingSpinner from '../widgets/LoadingSpinner'
+import VerifyIcon from '../../assets/images/verify-icon.inline.svg';
+import VerticalFlexContainer from '../layout/VerticalFlexContainer';
+import LoadingSpinner from '../widgets/LoadingSpinner';
 import globalMessages from '../../i18n/global-messages';
 
 const messages = defineMessages({
@@ -23,11 +23,13 @@ const messages = defineMessages({
   },
   dialogSelectAddress: {
     id: 'buysell.dialog.selectAddress',
-    defaultMessage: '!!!Please select the receiving address. This will be shared with the third party provider called Changelly for the buy / sell of ADA. ',
+    defaultMessage:
+      '!!!Please select the receiving address. This will be shared with the third party provider called Changelly for the buy / sell of ADA. ',
   },
   dialogDescription: {
     id: 'buysell.dialog.instructions',
-    defaultMessage: '!!!Please select your preferences. On the next screen, confirm your selection by pressing the green arrow on the top right',
+    defaultMessage:
+      '!!!Please select your preferences. On the next screen, confirm your selection by pressing the green arrow on the top right',
   },
   dialogManual: {
     id: 'buysell.dialog.manual',
@@ -39,65 +41,67 @@ export type WalletInfo = {|
   walletName: string,
   currencyName: string,
   anAddressFormatted: string,
-|}
+|};
 
 type Props = {|
   +onCancel: void => void,
-  +genWalletList: () => Promise<Array<WalletInfo>>
+  +genWalletList: () => Promise<Array<WalletInfo>>,
 |};
-
-const WIDGET_URL = 'https://widget.changelly.com?from=*&to=*&amount=200&fromDefault=usd&toDefault=ada&theme=default&merchant_id=g9qheu8vschp16jj&payment_id=&v=3'
 
 type State = {|
   addressSelected: ?string,
+  currencySelected: ?string,
   walletList: ?Array<WalletInfo>,
 |};
 
 @observer
 export default class BuySellDialog extends Component<Props, State> {
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
   state: State = {
     addressSelected: null,
+    currencySelected: null,
     walletList: null,
   };
 
-  async componentDidMount () {
+  async componentDidMount() {
     const { intl } = this.context;
 
-    const resp = await this.props.genWalletList()
+    const resp = await this.props.genWalletList();
     const wallets = [
       ...resp,
       {
         walletName: intl.formatMessage(messages.dialogManual),
         currencyName: '',
         anAddressFormatted: '',
-      }
-    ]
-    this.setState({ walletList: wallets })
+      },
+    ];
+    this.setState({ walletList: wallets });
   }
 
-  createRows: ($npm$ReactIntl$IntlFormat, Array<WalletInfo>) => Node = (intl, wallets) => (
+  createRows: ($npm$ReactIntl$IntlFormat, Array<WalletInfo>) => Node = (intl, wallets) =>
     wallets.map((wallet, i) => {
       return (
         // eslint-disable-next-line react/no-array-index-key
         <div key={i} className={styles.row}>
           <div className={styles.left}>
             <div className={styles.nameAndCurrency}>
-              { wallet.currencyName ? `(${wallet.currencyName}) ` : ''}{wallet.walletName}
+              {wallet.currencyName ? `(${wallet.currencyName}) ` : ''}
+              {wallet.walletName}
             </div>
-            <div className={styles.address}>
-              {truncateAddress(wallet.anAddressFormatted)}
-            </div>
+            <div className={styles.address}>{truncateAddress(wallet.anAddressFormatted)}</div>
           </div>
           <div className={styles.right}>
             {/* Verify Address action */}
             <button
               type="button"
               onClick={() =>
-                this.setState({ addressSelected: wallet.anAddressFormatted })
+                this.setState({
+                  addressSelected: wallet.anAddressFormatted,
+                  currencySelected: wallet.currencyName,
+                })
               }
             >
               <div>
@@ -109,9 +113,8 @@ export default class BuySellDialog extends Component<Props, State> {
             {/* Action block end */}
           </div>
         </div>
-      )
-    })
-  )
+      );
+    });
 
   render(): Node {
     const { intl } = this.context;
@@ -144,25 +147,25 @@ export default class BuySellDialog extends Component<Props, State> {
             {addressNodes}
           </div>
         </Dialog>
-      )
+      );
     }
 
-      return (
-        <Dialog
-          title={intl.formatMessage(messages.dialogTitle)}
-          closeOnOverlayClick={false}
-          onClose={this.props.onCancel}
-          closeButton={<DialogCloseButton />}
-          className=""
-        >
-          <div className={styles.component}>
-            <div className={styles.description}>
-              {intl.formatMessage(messages.dialogDescription)}
-            </div>
-            <ChangellyFetcher widgetURL={WIDGET_URL} address={this.state.addressSelected} />
-          </div>
-        </Dialog>
-      );
-
+    return (
+      <Dialog
+        title={intl.formatMessage(messages.dialogTitle)}
+        closeOnOverlayClick={false}
+        onClose={this.props.onCancel}
+        closeButton={<DialogCloseButton />}
+        className=""
+      >
+        <div className={styles.component}>
+          <div className={styles.description}>{intl.formatMessage(messages.dialogDescription)}</div>
+          <ChangellyFetcher
+            address={this.state.addressSelected}
+            currency={this.state.currencySelected}
+          />
+        </div>
+      </Dialog>
+    );
   }
 }

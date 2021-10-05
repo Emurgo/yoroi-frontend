@@ -3,28 +3,28 @@
 import React, { Component } from 'react';
 import type { Node } from 'react';
 import { action, observable } from 'mobx';
-import { intlShape, } from 'react-intl';
+import { intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { observer } from 'mobx-react';
 
 type Props = {|
   +children?: Node,
-  +widgetURL: string,
   +address: ?string,
+  +currency: ?string,
 |};
 
 @observer
 export default class ChangellyFetcher extends Component<Props> {
-  static defaultProps: {|children: void|} = {
-    children: undefined
+  static defaultProps: {| children: void |} = {
+    children: undefined,
   };
 
   @observable iframe: ?HTMLIFrameElement;
   @observable frameHeight: number = 0;
 
-  @action setFrame: (null | HTMLIFrameElement) => void = (frame) => {
+  @action setFrame: (null | HTMLIFrameElement) => void = frame => {
     this.iframe = frame;
-  }
+  };
 
   componentDidMount() {
     window.addEventListener('resize', this.resize);
@@ -35,21 +35,18 @@ export default class ChangellyFetcher extends Component<Props> {
     window.removeEventListener('resize', this.resize);
   }
 
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
-  addAddressToWidget: (string, ?string) => string = (widgetURL, address) => {
-    if (address == null) return widgetURL
-    return widgetURL + '&address=' + address
+  getWidgetUrl(currency: ?string, address: ?string): string {
+    return `https://widget.changelly.com?from=*&to=*&amount=200&fromDefault=usd&theme=default&merchant_id=g9qheu8vschp16jj&payment_id=&v=3&toDefault=${
+      currency?.toLowerCase() || 'ada'
+    }&address=${address || ''}`;
   }
 
   render(): Node {
-    const { widgetURL, address } = this.props;
-
-    if (widgetURL == null) {
-      throw new Error('Changelly URL undefined. this should never happen');
-    }
+    const { currency, address } = this.props;
 
     return (
       <iframe
@@ -82,7 +79,7 @@ export default class ChangellyFetcher extends Component<Props> {
         referrerPolicy="no-referrer"
         ref={this.setFrame}
         title="Changelly"
-        src={`${this.addAddressToWidget(widgetURL, address)}`}
+        src={`${this.getWidgetUrl(currency, address)}`}
         frameBorder="0"
         width="100%"
         height={this.iframe != null && this.frameHeight != null ? '500px' : null}
@@ -100,5 +97,5 @@ export default class ChangellyFetcher extends Component<Props> {
       window.innerHeight - this.iframe.getBoundingClientRect().top - 30,
       0
     );
-  }
+  };
 }
