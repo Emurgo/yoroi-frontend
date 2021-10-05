@@ -2,7 +2,6 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { ThemeProvider } from 'react-polymorph/lib/components/ThemeProvider';
 import { Router } from 'react-router-dom';
 import type { RouterHistory } from 'react-router-dom';
 import { addLocaleData, IntlProvider } from 'react-intl';
@@ -20,8 +19,6 @@ import es from 'react-intl/locale-data/es';
 import it from 'react-intl/locale-data/it';
 import tr from 'react-intl/locale-data/tr';
 import { Routes } from './Routes';
-import { yoroiPolymorphTheme } from './themes/PolymorphThemes';
-import { themeOverrides } from './themes/overrides';
 import { translations } from './i18n/translations';
 import type { StoresMap } from './stores';
 import type { ActionsMap } from './actions';
@@ -31,9 +28,7 @@ import environment from './environment';
 import MaintenancePage from './containers/MaintenancePage';
 import CrashPage from './containers/CrashPage';
 import { Logger } from './utils/logging';
-import { SimpleSkins } from 'react-polymorph/lib/skins/simple';
-import { SimpleDefaults } from 'react-polymorph/lib/themes/simple';
-import { ThemeProvider as MuiThemeProvide } from '@mui/material/styles';
+import { ThemeProvider } from '@mui/material/styles';
 import { CssBaseline } from '@mui/material';
 import { globalStyles } from './styles/globalStyles';
 
@@ -102,27 +97,19 @@ class App extends Component<Props, State> {
 
     changeToplevelTheme(currentTheme);
 
-    const muiTheme = MuiThemes[currentTheme] ?? 'YoroiModern';
+    const muiTheme = MuiThemes[currentTheme];
 
     return (
       <div style={{ height: '100%' }}>
-        <MuiThemeProvide theme={muiTheme}>
+        <ThemeProvider theme={muiTheme}>
           <CssBaseline />
           {globalStyles(muiTheme)}
           <ThemeManager variables={themeVars} />
           {/* Automatically pass a theme prop to all components in this subtree. */}
-          <ThemeProvider
-            key={currentTheme}
-            theme={yoroiPolymorphTheme}
-            skins={SimpleSkins}
-            variables={SimpleDefaults}
-            themeOverrides={themeOverrides(currentTheme)}
-          >
-            <IntlProvider {...{ locale, key: locale, messages: mergedMessages }}>
-              {this.getContent()}
-            </IntlProvider>
-          </ThemeProvider>
-        </MuiThemeProvide>
+          <IntlProvider {...{ locale, key: locale, messages: mergedMessages }}>
+            {this.getContent()}
+          </IntlProvider>
+        </ThemeProvider>
       </div>
     );
   }
@@ -130,10 +117,10 @@ class App extends Component<Props, State> {
   getContent: void => ?Node = () => {
     const { stores, actions, history } = this.props;
     if (this.state.crashed === true) {
-      return (<CrashPage stores={stores} actions={actions} />);
+      return <CrashPage stores={stores} actions={actions} />;
     }
     if (stores.serverConnectionStore.isMaintenance) {
-      return (<MaintenancePage stores={stores} actions={actions} />);
+      return <MaintenancePage stores={stores} actions={actions} />;
     }
     return <Router history={history}>{Routes(stores, actions)}</Router>;
   };
