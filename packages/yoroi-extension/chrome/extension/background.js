@@ -37,11 +37,12 @@ import {
 import {
   connectorGetBalance,
   connectorGetChangeAddress,
-  connectorGetUtxos,
+  connectorGetUtxosErgo,
   connectorSendTx,
   connectorSignTx,
   connectorGetUsedAddresses,
-  connectorGetUnusedAddresses
+  connectorGetUnusedAddresses,
+  connectorGetUtxosCardano
 } from './ergo-connector/api';
 import { updateTransactions } from '../../app/api/ergo/lib/storage/bridge/updateTransactions';
 import { environment } from '../../app/environment';
@@ -473,7 +474,10 @@ chrome.runtime.onMessage.addListener(async (
     sendResponse(({
       sites: activeSites.map(site => site.url),
     }: ConnectedSites));
-  }
+  } 
+  // else if (request.type === 'get_protocol') {
+  //   sendResponse({pro: 'ergo'})
+  // }
 });
 
 async function removeWallet(
@@ -576,6 +580,12 @@ chrome.runtime.onConnectExternal.addListener(port => {
     const tabId = port.sender.tab.id;
     ports.set(tabId, port);
     port.onMessage.addListener(async message => {
+      chrome.runtime.onMessage.addListener((request,sender, sendResponse) => {
+        if(request.type === 'get_protocol') {
+          sendResponse({ type : message.protocol })
+        }
+      })
+
       imgBase64Url = message.imgBase64Url;
       function rpcResponse(response) {
         port.postMessage({
@@ -726,18 +736,29 @@ chrome.runtime.onConnectExternal.addListener(port => {
               const valueExpected = message.params[0] == null ? null : asValue(message.params[0]);
               const tokenId = asTokenId(message.params[1]);
               const paginate = message.params[2] == null ? null : asPaginate(message.params[2]);
-
               await withDb(async (db, localStorageApi) => {
                 await withSelectedWallet(
                   tabId,
                   async (wallet) => {
-                    const utxos = await connectorGetUtxos(
-                      wallet,
-                      pendingTxs,
-                      valueExpected,
-                      tokenId,
-                      paginate
-                    );
+                    const walletType = wallet.parent.defaultToken.Metadata.type
+                    let utxos;
+                    if(walletType === 'Cardano') {
+                      utxos = await connectorGetUtxosCardano(
+                        wallet,
+                        pendingTxs,
+                        valueExpected,
+                        tokenId,
+                        paginate
+                      );
+                    } else {
+                      utxos = await connectorGetUtxosErgo(
+                        wallet,
+                        pendingTxs,
+                        valueExpected,
+                        tokenId,
+                        paginate
+                        );
+                    }
                     rpcResponse({
                       ok: utxos
                     });
