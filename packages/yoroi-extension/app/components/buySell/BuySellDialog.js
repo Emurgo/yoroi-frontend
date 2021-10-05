@@ -8,12 +8,12 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { truncateAddress } from '../../utils/formatters';
 import Dialog from '../widgets/Dialog';
 import DialogCloseButton from '../widgets/DialogCloseButton';
-import ChangellyFetcher from './ChangellyFetcher';
+import ChangellyFetcher from './ChangellyFetcher'
 
 import styles from './BuySellDialog.scss';
-import VerifyIcon from '../../assets/images/verify-icon.inline.svg';
-import VerticalFlexContainer from '../layout/VerticalFlexContainer';
-import LoadingSpinner from '../widgets/LoadingSpinner';
+import VerifyIcon from '../../assets/images/verify-icon.inline.svg'
+import VerticalFlexContainer from '../layout/VerticalFlexContainer'
+import LoadingSpinner from '../widgets/LoadingSpinner'
 import globalMessages from '../../i18n/global-messages';
 
 const messages = defineMessages({
@@ -23,13 +23,11 @@ const messages = defineMessages({
   },
   dialogSelectAddress: {
     id: 'buysell.dialog.selectAddress',
-    defaultMessage:
-      '!!!Please select the receiving address. This will be shared with the third party provider called Changelly for the buy / sell of ADA. ',
+    defaultMessage: '!!!Please select the receiving address. This will be shared with the third party provider called Changelly for the buy / sell of ADA. ',
   },
   dialogDescription: {
     id: 'buysell.dialog.instructions',
-    defaultMessage:
-      '!!!Please select your preferences. On the next screen, confirm your selection by pressing the green arrow on the top right',
+    defaultMessage: '!!!Please select your preferences. On the next screen, confirm your selection by pressing the green arrow on the top right',
   },
   dialogManual: {
     id: 'buysell.dialog.manual',
@@ -41,11 +39,11 @@ export type WalletInfo = {|
   walletName: string,
   currencyName: string,
   anAddressFormatted: string,
-|};
+|}
 
 type Props = {|
   +onCancel: void => void,
-  +genWalletList: () => Promise<Array<WalletInfo>>,
+  +genWalletList: () => Promise<Array<WalletInfo>>
 |};
 
 type State = {|
@@ -56,7 +54,7 @@ type State = {|
 
 @observer
 export default class BuySellDialog extends Component<Props, State> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
@@ -66,32 +64,33 @@ export default class BuySellDialog extends Component<Props, State> {
     walletList: null,
   };
 
-  async componentDidMount() {
+  async componentDidMount () {
     const { intl } = this.context;
 
-    const resp = await this.props.genWalletList();
+    const resp = await this.props.genWalletList()
     const wallets = [
       ...resp,
       {
         walletName: intl.formatMessage(messages.dialogManual),
         currencyName: '',
         anAddressFormatted: '',
-      },
-    ];
-    this.setState({ walletList: wallets });
+      }
+    ]
+    this.setState({ walletList: wallets })
   }
 
-  createRows: ($npm$ReactIntl$IntlFormat, Array<WalletInfo>) => Node = (intl, wallets) =>
+  createRows: ($npm$ReactIntl$IntlFormat, Array<WalletInfo>) => Node = (intl, wallets) => (
     wallets.map((wallet, i) => {
       return (
         // eslint-disable-next-line react/no-array-index-key
         <div key={i} className={styles.row}>
           <div className={styles.left}>
             <div className={styles.nameAndCurrency}>
-              {wallet.currencyName ? `(${wallet.currencyName}) ` : ''}
-              {wallet.walletName}
+              { wallet.currencyName ? `(${wallet.currencyName}) ` : ''}{wallet.walletName}
             </div>
-            <div className={styles.address}>{truncateAddress(wallet.anAddressFormatted)}</div>
+            <div className={styles.address}>
+              {truncateAddress(wallet.anAddressFormatted)}
+            </div>
           </div>
           <div className={styles.right}>
             {/* Verify Address action */}
@@ -113,8 +112,9 @@ export default class BuySellDialog extends Component<Props, State> {
             {/* Action block end */}
           </div>
         </div>
-      );
-    });
+      )
+    })
+  )
 
   render(): Node {
     const { intl } = this.context;
@@ -147,7 +147,7 @@ export default class BuySellDialog extends Component<Props, State> {
             {addressNodes}
           </div>
         </Dialog>
-      );
+      )
     }
 
     return (
@@ -159,7 +159,9 @@ export default class BuySellDialog extends Component<Props, State> {
         className=""
       >
         <div className={styles.component}>
-          <div className={styles.description}>{intl.formatMessage(messages.dialogDescription)}</div>
+          <div className={styles.description}>
+            {intl.formatMessage(messages.dialogDescription)}
+          </div>
           <ChangellyFetcher
             address={this.state.addressSelected}
             currency={this.state.currencySelected}

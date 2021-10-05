@@ -3,7 +3,7 @@
 import React, { Component } from 'react';
 import type { Node } from 'react';
 import { action, observable } from 'mobx';
-import { intlShape } from 'react-intl';
+import { intlShape, } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { observer } from 'mobx-react';
 
@@ -15,16 +15,16 @@ type Props = {|
 
 @observer
 export default class ChangellyFetcher extends Component<Props> {
-  static defaultProps: {| children: void |} = {
-    children: undefined,
+  static defaultProps: {|children: void|} = {
+    children: undefined
   };
 
   @observable iframe: ?HTMLIFrameElement;
   @observable frameHeight: number = 0;
 
-  @action setFrame: (null | HTMLIFrameElement) => void = frame => {
+  @action setFrame: (null | HTMLIFrameElement) => void = (frame) => {
     this.iframe = frame;
-  };
+  }
 
   componentDidMount() {
     window.addEventListener('resize', this.resize);
@@ -35,11 +35,11 @@ export default class ChangellyFetcher extends Component<Props> {
     window.removeEventListener('resize', this.resize);
   }
 
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  getWidgetUrl(currency: ?string, address: ?string): string {
+  mountWidgetUrl(currency: ?string, address: ?string): string {
     return `https://widget.changelly.com?from=*&to=*&amount=200&fromDefault=usd&theme=default&merchant_id=g9qheu8vschp16jj&payment_id=&v=3&toDefault=${
       currency?.toLowerCase() || 'ada'
     }&address=${address || ''}`;
@@ -79,7 +79,7 @@ export default class ChangellyFetcher extends Component<Props> {
         referrerPolicy="no-referrer"
         ref={this.setFrame}
         title="Changelly"
-        src={`${this.getWidgetUrl(currency, address)}`}
+        src={`${this.mountWidgetUrl(currency, address)}`}
         frameBorder="0"
         width="100%"
         height={this.iframe != null && this.frameHeight != null ? '500px' : null}
