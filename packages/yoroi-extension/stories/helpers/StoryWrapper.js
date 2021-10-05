@@ -3,7 +3,6 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { ThemeProvider } from 'react-polymorph/lib/components/ThemeProvider';
 import { addLocaleData, IntlProvider } from 'react-intl';
 import en from 'react-intl/locale-data/en';
 import ko from 'react-intl/locale-data/ko';
@@ -19,11 +18,13 @@ import es from 'react-intl/locale-data/es';
 import it from 'react-intl/locale-data/it';
 import tr from 'react-intl/locale-data/tr';
 import '../../app/themes/index.global.scss';
-import { yoroiPolymorphTheme } from '../../app/themes/PolymorphThemes';
-import { themeOverrides } from '../../app/themes/overrides';
+import { ThemeProvider } from '@mui/material/styles';
+import { CssBaseline } from '@mui/material';
+import { globalStyles } from '../../app/styles/globalStyles';
+import { ThemeProvider as EmotionThemeProvider } from 'emotion-theming';
 import { translations, LANGUAGES } from '../../app/i18n/translations';
 import ThemeManager from '../../app/ThemeManager';
-import { THEMES, changeToplevelTheme } from '../../app/themes';
+import { THEMES, changeToplevelTheme, MuiThemes } from '../../app/themes';
 import type { Theme } from '../../app/themes';
 import environment from '../../app/environment';
 import { getVarsForTheme } from '../../app/stores/base/BaseProfileStore';
@@ -35,9 +36,6 @@ import globalMessages from '../../app/i18n/global-messages';
 import { ledgerErrors } from '../../app/domain/LedgerLocalizedError';
 import type { UnitOfAccountSettingType } from '../../app/types/unitOfAccountType';
 import { IncorrectVersionError, IncorrectDeviceError } from '../../app/domain/ExternalDeviceCommon';
-import { SimpleSkins } from 'react-polymorph/lib/skins/simple';
-import { SimpleDefaults } from 'react-polymorph/lib/themes/simple';
-
 import { addDecorator } from '@storybook/react';
 
 /**
@@ -90,7 +88,6 @@ export const isFirefoxKnob: void => boolean = () => {
 
 @observer
 export default class StoryWrapper extends Component<Props> {
-
   render(): Node {
     const { children: Story } = this.props;
     const locale = globalKnobs.locale();
@@ -106,28 +103,29 @@ export default class StoryWrapper extends Component<Props> {
     const themeVars = getVarsForTheme({ theme: currentTheme });
 
     changeToplevelTheme(currentTheme);
+    const muiTheme = MuiThemes[currentTheme];
 
+    /* Emotion theme provider is used to ensure that the theme gets picked up correctly.
+    Issue: https://github.com/mui-org/material-ui/issues/24282#issuecomment-859393395 */
     return (
       <div style={{ height: 'calc(100vh)' }}>
-        <ThemeManager variables={themeVars} />
-
-        {/* Automatically pass a theme prop to all components in this subtree. */}
-        <ThemeProvider
-          key={currentTheme}
-          theme={yoroiPolymorphTheme}
-          skins={SimpleSkins}
-          variables={SimpleDefaults}
-          themeOverrides={themeOverrides(currentTheme)}
-        >
-          <IntlProvider {...{
-            locale,
-            key: locale,
-            messages: mergedMessages
-          }}
-          >
-            <Story />
-          </IntlProvider>
-        </ThemeProvider>
+        <EmotionThemeProvider theme={muiTheme}>
+          <ThemeProvider theme={muiTheme}>
+            <CssBaseline />
+            {globalStyles(muiTheme)}
+            <ThemeManager variables={themeVars} />
+            {/* Automatically pass a theme prop to all components in this subtree. */}
+            <IntlProvider
+              {...{
+                locale,
+                key: locale,
+                messages: mergedMessages,
+              }}
+            >
+              <Story />
+            </IntlProvider>
+          </ThemeProvider>
+        </EmotionThemeProvider>
       </div>
     );
   }
