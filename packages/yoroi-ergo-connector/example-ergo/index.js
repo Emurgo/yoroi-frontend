@@ -1,4 +1,5 @@
 import * as wasm from "ergo-lib-wasm-browser";
+import JSONBigInt from 'json-bigint';
 
 function initDapp() {
     ergo_request_read_access().then(function(access_granted) {
@@ -62,7 +63,7 @@ function initDapp() {
                     const filteredUtxos = [];
                     for (const utxo of utxos) {
                         try {
-                            await wasm.ErgoBox.from_json(JSON.stringify(utxo));
+                            await wasm.ErgoBox.from_json(JSONBigInt.stringify(utxo));
                             filteredUtxos.push(utxo);
                         } catch (e) {
                             console.error('[getUtxos] UTxO failed parsing:', utxo, e);
@@ -122,8 +123,8 @@ function initDapp() {
                     // random tx we sent via the connector before - not referenced in any smart contract right now
                     //dataInputs.add(new wasm.DataInput(wasm.BoxId.from_str("0f0e4c71ccfbe7e749591ef2a906607b415deadee8c23a8d822517c4cd55374e")));
                     txBuilder.set_data_inputs(dataInputs);
-                    const tx = txBuilder.build().to_json();
-                    console.log(`tx: ${JSON.stringify(tx)}`);
+                    const tx = parseJson(txBuilder.build().to_json());
+                    console.log(`tx: ${JSONBigInt.stringify(tx)}`);
                     console.log(`original id: ${tx.id}`);
                     // sigma-rust doesn't support most compilation so manually insert it here
                     // this is HEIGHT > 1337 but in hex and without the checksum/etc for the address of the contract
@@ -131,14 +132,14 @@ function initDapp() {
                     // and this is a register-using one
                     //tx.outputs[0].ergoTree = "1002040004f2c001d193e4c6b2a573000004047301";
                     // and we rebuild it using
-                    const correctTx = wasm.UnsignedTransaction.from_json(JSON.stringify(tx)).to_json();
-                    console.log(`correct tx: ${JSON.stringify(correctTx)}`);
+                    const correctTx = parseJson(wasm.UnsignedTransaction.from_json(JSONBigInt.stringify(tx)).to_json());
+                    console.log(`correct tx: ${JSONBigInt.stringify(correctTx)}`);
                     console.log(`new id: ${correctTx.id}`);
                     // we must use the exact order chosen as after 0.4.3 in sigma-rust
                     // this can change and might not use all the utxos as the coin selection
                     // might choose a more optimal amount
                     correctTx.inputs = correctTx.inputs.map(box => {
-                        console.log(`box: ${JSON.stringify(box)}`);
+                        console.log(`box: ${JSONBigInt.stringify(box)}`);
                         const fullBoxInfo = utxos.find(utxo => utxo.boxId === box.boxId);
                         return {
                             ...fullBoxInfo,
@@ -146,7 +147,7 @@ function initDapp() {
                         };
                     });
                     status.innerText = "Awaiting transaction signing";
-                    console.log(`${JSON.stringify(correctTx)}`);
+                    console.log(`${JSONBigInt.stringify(correctTx)}`);                    
 
                     async function signTx(txToBeSigned) {
                         try {
@@ -209,6 +210,28 @@ function initDapp() {
             });
         }
     });
+}
+
+function parseJson(str) {
+    let json = JSONBigInt.parse(str);
+    return {
+        id: json.id,
+        inputs: json.inputs,
+        dataInputs: json.dataInputs,
+        outputs: json.outputs.map(output => ({
+          boxId: output.boxId,
+          value: output.value.toString(),
+          ergoTree: output.ergoTree,
+          assets: output.assets.map(asset => ({
+            tokenId: asset.tokenId,
+            amount: asset.amount.toString(),
+          })),
+          additionalRegisters: output.additionalRegisters,
+          creationHeight: output.creationHeight,
+          transactionId: output.transactionId,
+          index: output.index
+        })),
+      };
 }
 
 if (typeof ergo_request_read_access === "undefined") {

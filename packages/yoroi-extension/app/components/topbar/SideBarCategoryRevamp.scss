@@ -1,0 +1,30 @@
+.component {
+  padding: 4px 9px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  opacity: 0.5;
+  text-decoration: none;
+  font-size: 12px;
+  font-family: var(--font-regular);
+  line-height: var(--theme-sidebar-text-line-height);
+  color: var(--theme-sidebar-text-color);
+
+  & + & {
+    margin-top: 18px;
+  }
+
+  &:hover {
+    opacity: 0.7;
+  }
+
+  &.active {
+    opacity: 1;
+  }
+}
+
+.icon {
+  max-width: 24px;
+  max-height: 24px;
+  margin-bottom: 4px;
+}

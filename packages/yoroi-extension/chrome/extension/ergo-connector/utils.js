@@ -2,9 +2,11 @@
 
 import type { Tx } from './types';
 import type { TokenRow } from '../../../app/api/ada/lib/storage/database/primitives/tables';
-import { Logger } from '../../../app/utils/logging';
 
-export function parseEIP0004Data(input: any): ?string {
+export function parseEIP0004Data(
+  input: any,
+  log: string => void,
+): ?string {
   // https://github.com/ergoplatform/eips/blob/master/eip-0004.md
   // format is: 0e + vlq(len(body as bytes)) + body (as bytes formatted in hex)
   // where body is a utf8 string
@@ -25,7 +27,7 @@ export function parseEIP0004Data(input: any): ?string {
     len = (128 * len) + (lenChunk & 0x7F);
   } while (readNext);
   if (2 * len > body.length) {
-    Logger.info(`vlq decode trailing data: ${body.slice(2 * len)}`);
+    log(`vlq decode trailing data: ${body.slice(2 * len)}`);
   }
   if (2 * len < body.length) {
     return null;
@@ -34,12 +36,17 @@ export function parseEIP0004Data(input: any): ?string {
 }
 
 // you should not be able to mint more than 1
-export function mintedTokenInfo(tx: Tx): $ReadOnly<TokenRow>[] {
+export function mintedTokenInfo(
+  tx: Tx,
+  log: string => void,
+): $ReadOnly<TokenRow>[] {
   const tokens = []
   for (const output of tx.outputs) {
-    const name = parseEIP0004Data(output.additionalRegisters.R4);
-    const description = parseEIP0004Data(output.additionalRegisters.R5);
-    const decimals = parseInt(parseEIP0004Data(output.additionalRegisters.R6) ?? '', 10);
+    const name = parseEIP0004Data(output.additionalRegisters.R4, log);
+    const description = parseEIP0004Data(output.additionalRegisters.R5, log);
+    const decimals = parseInt(
+      parseEIP0004Data(output.additionalRegisters.R6, log) ?? '', 10
+    );
     if (name != null && description != null && decimals != null) {
       tokens.push({
         TokenId: 0,
@@ -60,7 +67,7 @@ export function mintedTokenInfo(tx: Tx): $ReadOnly<TokenRow>[] {
     }
   }
   if (tokens.length > 1) {
-    Logger.info(`tx ${JSON.stringify(tx)} had multiple EIP-0004-looking outputs`);
+    log(`tx ${JSON.stringify(tx)} had multiple EIP-0004-looking outputs`);
   }
   return tokens;
 }
