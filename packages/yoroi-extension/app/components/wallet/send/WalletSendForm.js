@@ -428,9 +428,11 @@ export default class WalletSendForm extends Component<Props> {
               options={tokenOptions}
               {...form.$('selectedToken').bind()}
               onChange={value => {
-                this.props.onAddToken(tokenOptions.find(
+                const tokenInfo = tokenOptions.find(
                   token => token.info.TokenId === value
-                )?.info);
+                )?.info
+
+                this.props.onAddToken(tokenInfo);
 
                 // clear send all when changing currencies
                 if (this.props.shouldSendAll) {
@@ -438,9 +440,16 @@ export default class WalletSendForm extends Component<Props> {
                 }
                 // clear amount field when switching currencies
                 this.form.$('amount').clear();
-                // reset the amout dropdown to coustom amount
-                this.form.$('selectedAmount').value = CUSTOM_AMOUNT
-                this.props.updateAmount();
+                // NFT amount is always "1"
+                // We are triggering send all -> will make the amount = 1 and disable the amount input  
+                if (tokenInfo && tokenInfo.IsNFT) {
+                  this.props.updateSendAllStatus(true)
+                  this.form.$('selectedAmount').value = value
+                } else {
+                  // reset the amout dropdown to coustom amount
+                  this.form.$('selectedAmount').value = CUSTOM_AMOUNT
+                  this.props.updateAmount();
+                }
               }}
               skin={SelectTokenSkin}
               value={this.props.selectedToken?.TokenId ?? this.props.getTokenInfo({
