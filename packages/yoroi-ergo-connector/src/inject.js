@@ -162,6 +162,22 @@ class CardanoAPI {
         return this._cardano_rpc_call("get_balance", [token_id]);
     }
 
+    get_used_addresses(paginate = undefined) {
+        return this._cardano_rpc_call("get_used_addresses", [paginate]);
+    }
+
+    get_unused_addresses() {
+        return this._cardano_rpc_call("get_unused_addresses", []);
+    }
+
+    get_change_address() {
+        return this._cardano_rpc_call("get_change_address", []);
+    }
+
+    get_utxos(amount = undefined, token_id = 'ADA', paginate = undefined) {
+        return this._cardano_rpc_call("get_utxos", [amount, token_id, paginate]);
+    }
+
     _cardano_rpc_call(func, params) {
         return new Promise(function(resolve, reject) {
             window.postMessage({
@@ -226,7 +242,6 @@ function getFavicon(url) {
     }
     return faviconURL;
 }
-
 let yoroiPort = null;
 let ergoApiInjected = false;
 let cardanoApiInjected = false;
@@ -333,9 +348,10 @@ if (shouldInject()) {
                     }
                 }, location.origin);
             }
-        } else if (dataType === "connector_connect_request/ergo" || dataType === 'yoroi_connect_request/cardano') {
+        } else if (dataType === "connector_connect_request/ergo" || dataType === 'connector_connect_request/cardano') {
             if ((ergoApiInjected || cardanoApiInjected) && yoroiPort) {
                 // we can skip communication - API injected + hasn't been disconnected
+                console.log('you are already connected')
                 window.postMessage({
                     type: "connector_connected",
                     success: true

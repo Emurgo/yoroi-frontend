@@ -399,6 +399,9 @@ export type ConnectedSites = {|
   sites: Array<string>,
 |};
 
+export type Protocol = {|
+  type: 'ergo' | 'cardano'
+|}
 export type RpcUid = number;
 
 export type PendingSignData = {|

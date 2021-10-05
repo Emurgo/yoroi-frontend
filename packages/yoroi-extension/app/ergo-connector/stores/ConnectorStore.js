@@ -15,6 +15,7 @@ import type {
   TxSignWindowRetrieveData,
   RemoveWalletFromWhitelistData,
   GetConnectedSitesData,
+  Protocol
 } from '../../../chrome/extension/ergo-connector/types';
 import type { ActionsMap } from '../actions/index';
 import type { StoresMap } from './index';
@@ -79,6 +80,22 @@ function sendMsgSigningTx(): Promise<SigningMessage> {
 
           resolve(response);
           initedSigning = true;
+        }
+      );
+  });
+}
+
+function getProtocol(): Promise<Protocol> {
+  return new Promise((resolve, reject) => {
+      window.chrome.runtime.sendMessage(
+        ({ type: 'get_protocol' }),
+        response => {
+          if (window.chrome.runtime.lastError) {
+            // eslint-disable-next-line prefer-promise-reject-errors
+            reject('Could not establish connection: get_protocol ');
+          }
+
+          resolve(response);
         }
       );
   });
@@ -232,24 +249,26 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     }
     try {
       const wallets = await getWallets({ db: persistentDb });
+      const protocol = await getProtocol().then(res => res)
+      const protocolFilter = (wallet) => protocol.type === 'ergo'
+        ? isErgo(wallet.getParent().getNetworkInfo())
+        : !isErgo(wallet.getParent().getNetworkInfo())
+      const filteredWallets = wallets
+      .filter(wallet => protocolFilter(wallet));
 
-      const ergoWallets = wallets.filter(
-        wallet => isErgo(wallet.getParent().getNetworkInfo())
-      );
-
-      await this._getTxAssets(ergoWallets);
+      await this._getTxAssets(filteredWallets);
 
       const result = [];
-      for (const ergoWallet of ergoWallets) {
-        const conceptualInfo = await ergoWallet.getParent().getFullConceptualWalletInfo();
-        const withPubKey = asGetPublicKey(ergoWallet);
+      for (const currentWallet of filteredWallets) {
+        const conceptualInfo = await currentWallet.getParent().getFullConceptualWalletInfo();
+        const withPubKey = asGetPublicKey(currentWallet);
 
-        const canGetBalance = asGetBalance(ergoWallet);
+        const canGetBalance = asGetBalance(currentWallet);
         const balance = canGetBalance == null
-          ? new MultiToken([], ergoWallet.getParent().getDefaultToken())
+          ? new MultiToken([], currentWallet.getParent().getDefaultToken())
           : await canGetBalance.getBalance();
         result.push({
-          publicDeriver: ergoWallet,
+          publicDeriver: currentWallet,
           name: conceptualInfo.Name,
           balance,
           checksum: await getChecksum(withPubKey)

@@ -35,6 +35,8 @@ import { getReceiveAddress } from '../../../app/stores/stateless/addressStores';
 import LocalStorageApi from '../../../app/api/localStorage/index';
 
 import type { BestBlockResponse } from '../../../app/api/ergo/lib/state-fetch/types';
+import { asAddressedUtxo as asAddressedUtxoCardano } from '../../../app/api/ada/transactions/utils';
+import type { RemoteUnspentOutput } from '../../../app/api/ada/lib/state-fetch/types'
 
 function paginateResults<T>(results: T[], paginate: ?Paginate): T[] {
   if (paginate != null) {
@@ -75,7 +77,7 @@ export async function connectorGetBalance(
       throw Error('asGetBalance failed in connectorGetBalance');
     } else {
       // need to filter based on pending txs since they could have been included (or could not)
-      const allUtxos = await connectorGetUtxos(wallet, pendingTxs, null, tokenId);
+      const allUtxos = await connectorGetUtxosErgo(wallet, pendingTxs, null, tokenId);
       let total = new BigNumber(0);
       for (const box of allUtxos) {
         total = total.plus(valueToBigNumber(box.value));
@@ -83,7 +85,7 @@ export async function connectorGetBalance(
       return Promise.resolve(bigNumberToValue(total));
     }
   } else {
-    const allUtxos = await connectorGetUtxos(wallet, pendingTxs, null, tokenId);
+    const allUtxos = await connectorGetUtxosErgo(wallet, pendingTxs, null, tokenId);
     let total = new BigNumber(0);
     for (const box of allUtxos) {
       for (const asset of box.assets) {
@@ -96,13 +98,13 @@ export async function connectorGetBalance(
   }
 }
 
-function formatUtxoToBox(utxo: ElementOf<IGetAllUtxosResponse>): ErgoBoxJson {
+function formatUtxoToBoxErgo(utxo: ElementOf<IGetAllUtxosResponse>): ErgoBoxJson {
   // eslint-disable-next-line no-unused-vars
   const { addressing, ...rest } = asAddressedUtxo(utxo);
   return toErgoBoxJSON(rest);
 }
 
-export async function connectorGetUtxos(
+export async function connectorGetUtxosErgo(
   wallet: PublicDeriver<>,
   pendingTxs: PendingTransaction[],
   valueExpected: ?Value,
@@ -121,7 +123,7 @@ export async function connectorGetUtxos(
     let valueAcc = new BigNumber(0);
     const target = valueToBigNumber(valueExpected);
     for (let i = 0; i < utxos.length && valueAcc.isLessThan(target); i += 1) {
-      const formatted = formatUtxoToBox(utxos[i]);
+      const formatted = formatUtxoToBoxErgo(utxos[i])
       if (!spentBoxIds.includes(formatted.boxId)) {
         if (tokenId === 'ERG') {
           valueAcc = valueAcc.plus(valueToBigNumber(formatted.value));
@@ -138,10 +140,47 @@ export async function connectorGetUtxos(
       }
     }
   } else {
-    const filtered = utxos.map(formatUtxoToBox).filter(box => !spentBoxIds.includes(box.boxId));
+    const filtered = utxos.map(formatUtxoToBoxErgo).filter(box => !spentBoxIds.includes(box.boxId));
     utxosToUse.push(...filtered);
   }
   return Promise.resolve(paginateResults(utxosToUse, paginate));
+}
+
+export async function connectorGetUtxosCardano(
+  wallet: PublicDeriver<>,
+  pendingTxs: PendingTransaction[],
+  valueExpected: ?Value,
+  tokenId: TokenId,
+  paginate: ?Paginate
+): Promise<Array<RemoteUnspentOutput>> {
+  const withUtxos = asGetAllUtxos(wallet);
+  if (withUtxos == null) {
+    throw new Error('wallet doesn\'t support IGetAllUtxos');
+  }
+  const utxos = await withUtxos.getAllUtxos();
+  const utxosToUse = []
+  const formattedUtxos = asAddressedUtxoCardano(utxos).map(u => {
+    // eslint-disable-next-line no-unused-vars
+    const { addressing, ...rest } = u
+    return rest
+  })
+  let valueAcc = new BigNumber(0);
+  for(const formatted of formattedUtxos){
+    if (tokenId === 'ADA') {
+      valueAcc = valueAcc.plus(valueToBigNumber(formatted.amount));
+      utxosToUse.push(formatted);
+    } else {
+      for (const asset of formatted.assets) {
+        if (asset.assetId === tokenId) {
+          valueAcc = valueAcc.plus(valueToBigNumber(asset.amount));
+          utxosToUse.push(formatted);
+          break;
+        }
+      }
+    }
+  }
+
+  return Promise.resolve(paginateResults(formattedUtxos, paginate))
 }
 
 export type FullAddressPayloadWithBase58 = {|
@@ -149,33 +188,42 @@ export type FullAddressPayloadWithBase58 = {|
   base58: Address,
 |};
 
+function ergoAddressToBase58(a: FullAddressPayload): string {
+  return RustModule.SigmaRust.NetworkAddress
+    .from_bytes(Buffer.from(a.address, 'hex'))
+    .to_base58()
+}
+
 async function getAllFullAddresses(
   wallet: IPublicDeriver<>,
   usedFilter: boolean,
 ): Promise<FullAddressPayloadWithBase58[]> {
-  const p2pk = getAllAddressesForDisplay({
-    publicDeriver: wallet,
-    type: CoreAddressTypes.ERGO_P2PK
-  });
-  const p2sh = getAllAddressesForDisplay({
-    publicDeriver: wallet,
-    type: CoreAddressTypes.ERGO_P2SH
-  });
-  const p2s = getAllAddressesForDisplay({
-    publicDeriver: wallet,
-    type: CoreAddressTypes.ERGO_P2S
-  });
+  const isCardano = wallet.getParent().defaultToken.Metadata.type === 'Cardano';
+  const addressTypes = isCardano ? [
+    CoreAddressTypes.CARDANO_BASE,
+    CoreAddressTypes.CARDANO_ENTERPRISE,
+    CoreAddressTypes.CARDANO_LEGACY,
+    CoreAddressTypes.CARDANO_PTR,
+    CoreAddressTypes.CARDANO_REWARD
+  ] : [
+    CoreAddressTypes.ERGO_P2PK,
+    CoreAddressTypes.ERGO_P2SH,
+    CoreAddressTypes.ERGO_P2S
+  ]
+  const promises = addressTypes
+    .map(type => getAllAddressesForDisplay({ publicDeriver: wallet, type }));
   await RustModule.load();
   const addresses: FullAddressPayload[] =
-    (await Promise.all([p2pk, p2sh, p2s])).flat();
+    (await Promise.all(promises)).flat();
   return addresses
     .filter(a => a.isUsed === usedFilter)
-    .map(a => ({
-      fullAddress: a,
-      base58: RustModule.SigmaRust.NetworkAddress
-        .from_bytes(Buffer.from(a.address, 'hex'))
-        .to_base58(),
-    }));
+    .map(a => {
+      const base58 = isCardano ? a.address : ergoAddressToBase58(a);
+      return {
+        fullAddress: a,
+        base58,
+      };
+    });
 }
 
 async function getAllAddresses(wallet: PublicDeriver<>, usedFilter: boolean): Promise<Address[]> {
@@ -199,6 +247,13 @@ export async function connectorGetChangeAddress(wallet: PublicDeriver<>): Promis
   if (change !== undefined) {
     const hash = change.addr.Hash;
     await RustModule.load();
+    // Note: SimgaRust only works for ergo
+    // RustModule.walletV2 works for cardano but doesn't not have from_bytes and to_base58 methods
+    const walletType = wallet.parent.defaultToken.Metadata.type
+
+    if(walletType === 'Cardano') {
+      return hash
+    }
     return RustModule.SigmaRust.NetworkAddress
         .from_bytes(Buffer.from(hash, 'hex'))
         .to_base58();
@@ -320,7 +375,7 @@ export async function connectorSignTx(
     if (!utxo) {
       throw new Error(`Data-input ${box.boxId}, no matching UTxO found!`);
     }
-    return formatUtxoToBox(utxo);
+    return formatUtxoToBoxErgo(utxo);
   });
 
   // SIGNING INPUTS //
