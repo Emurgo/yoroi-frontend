@@ -135,7 +135,7 @@ class SignTxPage extends Component<Props> {
       // Because this is a Ergo wallet, we know the type of `tx` must be `Tx`
       // $FlowFixMe[prop-missing]
       const tx: Tx = this.props.tx;
-      const mintedTokens = mintedTokenInfo(tx);
+      const mintedTokens = mintedTokenInfo(tx, () => {});
       const mintedToken = mintedTokens.find(t => tokenEntry.identifier === t.Identifier);
       if (mintedToken != null) {
         return mintedToken;
