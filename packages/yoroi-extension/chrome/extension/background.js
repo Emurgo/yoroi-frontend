@@ -24,6 +24,8 @@ import type {
   ConnectRetrieveData,
   RemoveWalletFromWhitelistData,
   GetConnectedSitesData,
+  Tx,
+  CardanoTx,
 } from './ergo-connector/types';
 import {
   APIErrorCodes,
@@ -39,7 +41,9 @@ import {
   connectorGetChangeAddress,
   connectorGetUtxosErgo,
   connectorSendTx,
+  connectorSendTxCardano,
   connectorSignTx,
+  connectorSignCardanoTx,
   connectorGetUsedAddresses,
   connectorGetUnusedAddresses,
   connectorGetUtxosCardano
@@ -62,6 +66,8 @@ import {
 } from '../../app/api/ada/lib/storage/database/index';
 import { migrateNoRefresh } from '../../app/api/common/migration';
 import { Mutex, } from 'async-mutex';
+import { isCardanoHaskell } from '../../app/api/ada/lib/storage/database/prepackaged/networks';
+
 
 /*::
 declare var chrome;
@@ -325,7 +331,7 @@ chrome.runtime.onMessage.addListener(async (
   sendResponse
 ) => {
   async function signTxInputs(
-    tx,
+    tx: Tx,
     indices: number[],
     password: string,
     tabId: number
@@ -351,6 +357,27 @@ chrome.runtime.onMessage.addListener(async (
       );
     });
   }
+  async function signCardanoTx(
+    tx: CardanoTx,
+    password: string,
+    tabId: number
+  ): Promise<string> {
+    return await withDb(async (db, localStorageApi) => {
+      return await withSelectedWallet(
+        tabId,
+        async (wallet) => {
+          return await connectorSignCardanoTx(
+            wallet,
+            password,
+            tx,
+          );
+        },
+        db,
+        localStorageApi
+      );
+    });
+  }
+
   // alert(`received event: ${JSON.stringify(request)}`);
   if (request.type === 'connect_response') {
     if (request.tabId == null) return;
@@ -375,7 +402,9 @@ chrome.runtime.onMessage.addListener(async (
       switch (responseData.request.type) {
         case 'tx':
           {
-            const txToSign = request.tx;
+            // We know `tx` is a `Tx` here
+            // $FlowFixMe[prop-missing]
+            const txToSign: Tx = request.tx;
             const allIndices = [];
             for (let i = 0; i < txToSign.inputs.length; i += 1) {
               allIndices.push(i);
@@ -387,7 +416,8 @@ chrome.runtime.onMessage.addListener(async (
         case 'tx_input':
           {
             const data = responseData.request;
-            const txToSign = request.tx;
+            // $FlowFixMe[prop-missing]
+            const txToSign: Tx = request.tx;
             const signedTx = await signTxInputs(
               txToSign,
               [data.index],
@@ -397,6 +427,18 @@ chrome.runtime.onMessage.addListener(async (
             responseData.resolve({ ok: signedTx.inputs[data.index] });
           }
           break;
+        case 'tx/cardano':
+          {
+            const signedTx = await signCardanoTx(
+              // $FlowFixMe[prop-missing]
+              // $FlowFixMe[incompatible-cast]
+              (request.tx.tx: CardanoTx),
+              password,
+              request.tabId
+            );
+            responseData.resolve({ ok: signedTx });
+          }
+        break;
         case 'data':
           // mocked data sign
           responseData.resolve({ err: 'Generic data signing is not implemented yet' });
@@ -474,7 +516,7 @@ chrome.runtime.onMessage.addListener(async (
     sendResponse(({
       sites: activeSites.map(site => site.url),
     }: ConnectedSites));
-  } 
+  }
   // else if (request.type === 'get_protocol') {
   //   sendResponse({pro: 'ergo'})
   // }
@@ -582,7 +624,7 @@ chrome.runtime.onConnectExternal.addListener(port => {
     port.onMessage.addListener(async message => {
       chrome.runtime.onMessage.addListener((request,sender, sendResponse) => {
         if(request.type === 'get_protocol') {
-          sendResponse({ type : message.protocol })
+          sendResponse({ type: message.protocol })
         }
       })
 
@@ -669,7 +711,33 @@ chrome.runtime.onConnectExternal.addListener(port => {
             } catch (e) {
               handleError(e);
             }
-            break;
+          break;
+          case 'sign_tx/cardano':
+            try {
+              checkParamCount(1);
+              await RustModule.load();
+              const connection = connectedSites.get(tabId);
+              if (connection == null) {
+                Logger.error(`ERR - sign_tx could not find connection with tabId = ${tabId}`);
+                rpcResponse(undefined); // shouldn't happen
+              } else {
+                const resp = await confirmSign(tabId,
+                  {
+                    type: 'tx/cardano',
+                    tx: {
+                      tx: message.params[0],
+                      partialSign: message.params[1],
+                    },
+                    uid: message.uid
+                  },
+                  connection
+                );
+                rpcResponse(resp);
+              }
+            } catch (e) {
+              handleError(e);
+            }
+          break;
           case 'sign_tx_input':
             try {
               checkParamCount(2);
@@ -833,12 +901,27 @@ chrome.runtime.onConnectExternal.addListener(port => {
           case 'submit_tx':
             try {
               await RustModule.load();
-              const tx = asSignedTx(message.params[0], RustModule.SigmaRust);
               await withDb(async (db, localStorageApi) => {
                 await withSelectedWallet(
                   tabId,
                   async (wallet) => {
-                    const id = await connectorSendTx(wallet, pendingTxs, tx, localStorageApi);
+                    let id;
+                    if (isCardanoHaskell(wallet.getParent().getNetworkInfo())) {
+                      const tx = RustModule.WalletV4.Transaction.from_bytes(
+                        Buffer.from(message.params[0], 'hex'),
+                      );
+                      await connectorSendTxCardano(
+                        wallet,
+                        tx.to_bytes(),
+                        localStorageApi,
+                      );
+                      id = Buffer.from(
+                        RustModule.WalletV4.hash_transaction(tx.body()).to_bytes()
+                      ).toString('hex');
+                    } else { // is Ergo
+                      const tx = asSignedTx(message.params[0], RustModule.SigmaRust);
+                      id = await connectorSendTx(wallet, pendingTxs, tx, localStorageApi);
+                    }
                     rpcResponse({
                       ok: id
                     });
