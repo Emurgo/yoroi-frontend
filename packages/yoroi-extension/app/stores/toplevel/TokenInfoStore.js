@@ -211,7 +211,7 @@ export function mockFromDefaults(
     ...entry,
     TokenId: i,
     Digest: i,
-    IsNFT: false
+    IsNFT: entry.IsNFT
   }));
   for (const token of withMock) {
     const mapForNetwork = tokenInfo.get(token.NetworkId.toString());

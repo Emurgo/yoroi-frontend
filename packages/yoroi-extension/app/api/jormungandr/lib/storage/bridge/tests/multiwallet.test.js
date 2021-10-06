@@ -230,6 +230,7 @@ async function checkPub1HasTx(
           Token: {
             Digest: 6.262633522161549e-167,
             IsDefault: true,
+            IsNFT: false,
             Identifier: '',
             Metadata: {
               assetName: '',
@@ -367,6 +368,7 @@ async function checkPub2HasTx(
           Token: {
             Digest: 6.262633522161549e-167,
             IsDefault: true,
+            IsNFT: false,
             Identifier: '',
             Metadata: {
               assetName: '',

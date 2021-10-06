@@ -293,6 +293,7 @@ async function syncingSimpleTransaction(
             Token: {
               Digest: 6.262633522161549e-167,
               IsDefault: true,
+              IsNFT: false,
               Identifier: '',
               Metadata: {
                 assetName: '',
@@ -415,6 +416,7 @@ async function syncingSimpleTransaction(
             Token: {
               Digest: 6.262633522161549e-167,
               IsDefault: true,
+              IsNFT: false,
               Identifier: '',
               Metadata: {
                 assetName: '',
@@ -478,6 +480,7 @@ async function syncingSimpleTransaction(
             Token: {
               Digest: 6.262633522161549e-167,
               IsDefault: true,
+              IsNFT: false,
               Identifier: '',
               Metadata: {
                 assetName: '',
