@@ -155,7 +155,7 @@ signTx.addEventListener('click', () => {
     alertError('Should request change address first')
   }
   
-  const txBuilder = CardanoWasm.TransactionBuilder.new(
+  const txBuilder = CardanoWasm.WalletV4TxBuilder(
     // all of these are taken from the mainnet genesis settings
     // linear fee parameters (a*size + b)
     CardanoWasm.LinearFee.new(CardanoWasm.BigNum.from_str('44'), CardanoWasm.BigNum.from_str('155381')),
