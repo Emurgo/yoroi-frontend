@@ -1940,7 +1940,7 @@ export async function getTokenMintMetadata(
   getMultiAssetMetadata: MultiAssetMintMetadataFunc,
   network: $ReadOnly<NetworkRow>)
 : Promise<$ReadOnly<TokensMintMetadata>> {
-  if (!tokenIds) return {};
+  if (!tokenIds || tokenIds.length === 0) return {};
 
   const nativeAssets = tokenIds
     .filter(t => t.indexOf('.') !== -1)
