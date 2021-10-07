@@ -290,6 +290,11 @@ export type Tx = {|
   outputs: ErgoBoxCandidateJson[],
 |};
 
+export type CardanoTx = {|
+  tx: string,
+  partialSign: boolean,
+|};
+
 export function asTx(
   tx: any,
   wasmInstance: typeof RustModule.SigmaRust
@@ -399,6 +404,9 @@ export type ConnectedSites = {|
   sites: Array<string>,
 |};
 
+export type Protocol = {|
+  type: 'ergo' | 'cardano'
+|}
 export type RpcUid = number;
 
 export type PendingSignData = {|
@@ -415,11 +423,15 @@ export type PendingSignData = {|
   uid: RpcUid,
   address: Address,
   bytes: string
-|}
+|} | {|
+  type: 'tx/cardano',
+  uid: RpcUid,
+  tx: CardanoTx,
+|};
 
 export type ConfirmedSignData = {|
   type: 'sign_confirmed',
-  tx: Tx,
+  tx: Tx | CardanoTx,
   uid: RpcUid,
   tabId: number,
   pw: string,

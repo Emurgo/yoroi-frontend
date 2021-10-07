@@ -131,6 +131,7 @@ const genBaseProps: {|
               TextPart: 'XLBS-6706',
             }
           }],
+        adaTransaction: null,
       },
       coinPriceStore: {
         getCurrentPrice: (_from, _to) => 5,
