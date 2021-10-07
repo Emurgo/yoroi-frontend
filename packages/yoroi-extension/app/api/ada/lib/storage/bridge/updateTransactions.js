@@ -1952,7 +1952,10 @@ export async function getTokenMintMetadata(
         name: Buffer.from(assetName, 'hex').toString(),
         policy: policyId
       };
-    });
+    })
+    .filter(a => a.name !== '');
+
+  if (!nativeAssets || nativeAssets.length === 0) return {};
 
   const tokensMintMetadata = await getMultiAssetMetadata({
     network,
