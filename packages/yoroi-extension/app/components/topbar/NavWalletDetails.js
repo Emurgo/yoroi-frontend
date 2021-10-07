@@ -4,7 +4,7 @@ import { observer } from 'mobx-react';
 import type { Node } from 'react';
 import classnames from 'classnames';
 import { intlShape, } from 'react-intl';
-import { amountWithoutZeros, splitAmount, truncateToken } from '../../utils/formatters';
+import { amountWithoutZeros, truncateToken } from '../../utils/formatters';
 
 import globalMessages from '../../i18n/global-messages';
 import styles from './NavWalletDetails.scss';
