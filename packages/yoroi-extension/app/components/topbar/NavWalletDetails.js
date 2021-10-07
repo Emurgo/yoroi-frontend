@@ -185,10 +185,8 @@ export default class NavWalletDetails extends Component<Props> {
         shiftedAmount,
         tokenInfo.Metadata.numberOfDecimals,
       );
-      // const displayAmount = shiftedAmount.toFormat(tokenInfo.Metadata.numberOfDecimals)
       balanceDisplay = (
         <>
-         {/* {displayAmount} */}
           {beforeDecimalRewards}
           <span>{afterDecimalRewards}</span>
         </>

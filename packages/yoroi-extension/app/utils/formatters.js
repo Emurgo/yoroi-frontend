@@ -1,15 +1,7 @@
 // @flow
 import BigNumber from 'bignumber.js';
 
-export const removeZeros: (string => string) = (amount: string): string => {
-  let sliceZerosIdx = amount.length
-  const amountLength = amount.length
-  for (let i = 0; i < amountLength; i++) {
-    if (Number(amount[i]) === 0 && sliceZerosIdx === amountLength) sliceZerosIdx = i 
-    if (Number(amount[i]) !== 0) sliceZerosIdx = amountLength
-  }
-  return amount.slice(0, sliceZerosIdx)
-}
+const removeZeros: (string => string) = (amount: string): string => amount.replace(/0+$/, '')
 
 export function splitAmount(
   amount: BigNumber,
@@ -18,21 +10,16 @@ export function splitAmount(
   const valString = amount.toFormat(decimalPlaces);
   const startIndex = valString.length - decimalPlaces;
   let beforeDecimal = valString.substring(0, startIndex)
-  const afterDecimal = removeZeros(valString.substring(startIndex))
+  const afterDecimal = valString.substring(startIndex).replace(/0+$/, '')
   // Remove the dots if no decimals
-  if (Number(afterDecimal) === 0) {
+  if (!afterDecimal) {
     beforeDecimal = beforeDecimal.slice(0, beforeDecimal.length - 1)
   }
   return [beforeDecimal, afterDecimal]
 }
 
-export const amountWithoutZeros: (string => string) = (amount: string): string => {
-  const [before, after] = amount.split('.')
-  const afterWithoutDecimals = removeZeros(after || '')
-  // Remove the dot
-  if (Number(afterWithoutDecimals) === 0) return before
-  return before.concat('.', afterWithoutDecimals)
-}
+export const amountWithoutZeros: (string => string) = (amount: string): string => amount.replace(/0+$/, '').replace(/\.$/, '')
+
 export const maxNameLengthBeforeTruncation = 15;
 export const truncateLongName: string => string = (walletName) => {
   return walletName.length > maxNameLengthBeforeTruncation
