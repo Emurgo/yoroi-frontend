@@ -1,7 +1,6 @@
 // @flow
 import BigNumber from 'bignumber.js';
 
-const removeZeros: (string => string) = (amount: string): string => amount.replace(/0+$/, '')
 
 export function splitAmount(
   amount: BigNumber,
