@@ -2037,6 +2037,11 @@ export async function genCardanoAssetMap(
 
       const tokenMetadata = metadata[identifierInMetadata];
 
+      let isNft = false;
+      if (tokenMetadata && tokenMetadata.filter(m => m.key === '721').length > 0) {
+        isNft = true;
+      }
+
       return {
         NetworkId: network.NetworkId,
         Identifier: tokenId,
@@ -2045,7 +2050,7 @@ export async function genCardanoAssetMap(
         // token row, otherwise a new row is inserted instead of the existing row
         // being updated
         TokenId: existingRowsMap.get(tokenId)?.TokenId,
-        IsNFT: tokenMetadata && tokenMetadata.filter(m => m.key === '721').length > 0,
+        IsNFT: isNft,
         Metadata: {
           type: 'Cardano',
           ticker,
