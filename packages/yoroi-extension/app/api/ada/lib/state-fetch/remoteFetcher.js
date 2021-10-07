@@ -434,10 +434,8 @@ export class RemoteFetcher implements IFetcher {
     => Promise<MultiAssetMintMetadataResponse> = async (body) => {
       const { BackendService } = body.network.Backend;
       if (BackendService == null) throw new Error(`${nameof(this.getMultiAssetMintMetadata)} missing backend url`);
-      const isMainnet = /Mainnet/g.test(body.network.NetworkName)
-      const prefix = isMainnet ? '' : 'api/'
       return await axios(
-        `${BackendService}/${prefix}multiAsset/metadata`,
+        `${BackendService}/api/multiAsset/metadata`,
         {
           method: 'post',
           data: {
