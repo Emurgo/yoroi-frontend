@@ -12,7 +12,7 @@ export function getTokenName(
   tokenRow: $ReadOnly<{
     Identifier: string,
     IsDefault: boolean,
-    IsNFT: boolean,
+    IsNFT?: boolean,
     Metadata: TokenMetadata,
     ...,
   }>,
@@ -64,7 +64,7 @@ export function getTokenIdentifierIfExists(
   tokenRow: $ReadOnly<{
     Identifier: string,
     IsDefault: boolean,
-    IsNFT: boolean,
+    IsNFT?: boolean,
     Metadata: TokenMetadata,
     ...,
   }>
