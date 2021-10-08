@@ -29,24 +29,24 @@ export default class WalletAssetsPage extends Component<InjectedOrGenerated<Gene
     const getTokenInfo= genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)
 
     const assetsList = (() => {
-        if (spendableBalance == null) return [];
-        return [
-          ...spendableBalance.nonDefaultEntries(),
-        ].map(entry => ({
-          entry,
-          info: getTokenInfo(entry),
-        })).map(token => ({
-          name: truncateToken(getTokenStrictName(token.info) ?? '-'),
-          id: (getTokenIdentifierIfExists(token.info) ?? '-'),
-          amount: genFormatTokenAmount(getTokenInfo)(token.entry)
-        }));
-      })();
+      if (spendableBalance == null) return [];
+      return [
+        ...spendableBalance.nonDefaultEntries(),
+      ].map(entry => ({
+        entry,
+        info: getTokenInfo(entry),
+      })).map(token => ({
+        name: truncateToken(getTokenStrictName(token.info) ?? '-'),
+        id: (getTokenIdentifierIfExists(token.info) ?? '-'),
+        amount: genFormatTokenAmount(getTokenInfo)(token.entry)
+      }));
+    })();
 
-      const txRequests = this.generated.stores.transactions.getTxRequests(publicDeriver);
-      const assetDeposit = txRequests.requests.getAssetDepositRequest.result || null;
-      const { stores } = this.generated;
-      const { profile } = stores;
-      const isNonZeroDeposit = !assetDeposit?.isEmpty();
+    const txRequests = this.generated.stores.transactions.getTxRequests(publicDeriver);
+    const assetDeposit = txRequests.requests.getAssetDepositRequest.result || null;
+    const { stores } = this.generated;
+    const { profile } = stores;
+    const isNonZeroDeposit = !assetDeposit?.isEmpty();
     return (
       <AssetsPage
         assetsList={assetsList}

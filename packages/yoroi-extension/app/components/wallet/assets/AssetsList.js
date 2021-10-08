@@ -155,22 +155,22 @@ export default class AssetsList extends Component<Props, State> {
     const shiftedAmount = defaultEntry.amount
       .shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
 
-      let balanceDisplay;
-      if (request.shouldHideBalance) {
-        balanceDisplay = (<span>{hiddenAmount}</span>);
-      } else {
-        const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
-          shiftedAmount,
-          tokenInfo.Metadata.numberOfDecimals,
-        );
-  
-        balanceDisplay = (
-          <>
-            <span className={styles.beforeDecimal}>{beforeDecimalRewards}</span>
-            <span className={styles.afterDecimal}>{afterDecimalRewards}</span>
-          </>
-        );
-      }
+    let balanceDisplay;
+    if (request.shouldHideBalance) {
+      balanceDisplay = (<span>{hiddenAmount}</span>);
+    } else {
+      const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
+        shiftedAmount,
+        tokenInfo.Metadata.numberOfDecimals,
+      );
+
+      balanceDisplay = (
+        <>
+          <span className={styles.beforeDecimal}>{beforeDecimalRewards}</span>
+          <span className={styles.afterDecimal}>{afterDecimalRewards}</span>
+        </>
+      );
+    }
 
     return (
       <>
