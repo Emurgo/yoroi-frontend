@@ -142,21 +142,18 @@ export default class AssetsList extends Component<Props, State> {
     return <ArrowsList />;
   }
 
-  renderAmountDisplay: {|
-    shouldHideBalance: boolean,
-    amount: ?MultiToken
-  |} => Node = (request) => {
-    if (request.amount == null) {
+  renderAmountDisplay: () => Node = (request) => {
+    if (this.props.assetDeposit == null) {
       return <div className={styles.isLoading} />;
     }
 
-    const defaultEntry = request.amount.getDefaultEntry();
+    const defaultEntry = this.props.assetDeposit.getDefaultEntry();
     const tokenInfo = this.props.getTokenInfo(defaultEntry);
     const shiftedAmount = defaultEntry.amount
       .shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
 
     let balanceDisplay;
-    if (request.shouldHideBalance) {
+    if (this.props.shouldHideBalance) {
       balanceDisplay = (<span>{hiddenAmount}</span>);
     } else {
       const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
@@ -204,7 +201,7 @@ export default class AssetsList extends Component<Props, State> {
               <p className={styles.label}>
                 {intl.formatMessage(globalMessages.assetDepositLabel)} &nbsp;
               </p>
-              {this.renderAmountDisplay({ shouldHideBalance, amount: assetDeposit })}
+              {this.renderAmountDisplay()}
             </div>
           </div>
           )}
