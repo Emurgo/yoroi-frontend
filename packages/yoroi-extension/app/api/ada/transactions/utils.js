@@ -372,6 +372,7 @@ export function asAddressedUtxo(
       }
     );
 
+
     const assets = tokenTypes.tokens.map(token => {
       const pieces = identifierToCardanoAsset(token.tokenId);
       return {

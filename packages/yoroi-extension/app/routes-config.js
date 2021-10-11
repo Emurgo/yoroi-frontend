@@ -16,6 +16,7 @@ export const ROUTES = {
     ADD: '/wallets/add',
     TRANSACTIONS: '/wallets/transactions',
     SEND: '/wallets/send',
+    ASSETS: '/wallets/assets',
     RECEIVE: {
       ROOT: '/wallets/receive',
       ADDRESS_LIST: '/wallets/receive/:group/:name',

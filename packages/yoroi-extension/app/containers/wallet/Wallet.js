@@ -21,6 +21,7 @@ import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import type { WarningList } from '../../stores/toplevel/WalletSettingsStore';
 import { allCategories } from '../../stores/stateless/topbarCategories';
+import { MultiToken } from '../../api/common/lib/MultiToken';
 import { withLayout } from '../../themes/context/layout';
 import type { LayoutComponentMap } from '../../themes/context/layout';
 import NavBarContainerRevamp from '../NavBarContainerRevamp';
@@ -66,17 +67,20 @@ class Wallet extends Component<AllProps> {
     const publicDeriver = this.generated.stores.wallets.selected;
     if (publicDeriver == null) throw new Error(`${nameof(Wallet)} no public deriver`);
 
-    const activeCategory = allCategories.find(category =>
-      this.generated.stores.app.currentRoute.startsWith(category.route)
+    const spendableBalance = this.generated.stores.transactions.getBalanceRequest.result;
+    const walletHasAssets = !!(spendableBalance?.nonDefaultEntries()?.length);
+
+    const activeCategory = allCategories.find(
+      category => this.generated.stores.app.currentRoute.startsWith(category.route)
     );
 
     // if we're on a page that isn't applicable for the currently selected wallet
     // ex: a cardano-only page for an Ergo wallet
     // or no category is selected yet (wallet selected for the first time)
-    if (activeCategory == null || !activeCategory.isVisible({ selected: publicDeriver })) {
-      const firstValidCategory = allCategories.find(category =>
-        category.isVisible({ selected: publicDeriver })
-      );
+    const visibilityContext = { selected: publicDeriver, walletHasAssets };
+    if (!activeCategory?.isVisible(visibilityContext)) {
+      const firstValidCategory = allCategories
+        .find(c => c.isVisible(visibilityContext));
       if (firstValidCategory == null) {
         throw new Error(`Selected wallet has no valid category`);
       }
@@ -115,6 +119,10 @@ class Wallet extends Component<AllProps> {
     const selectedWallet = wallets.selected;
     const warning = this.getWarning(selectedWallet);
 
+    const spendableBalance = this.generated.stores.transactions.getBalanceRequest.result
+    const walletHasAssets = !!(spendableBalance?.nonDefaultEntries()?.length);
+    const visibilityContext = { selected: selectedWallet, walletHasAssets };
+
     const menu = (
       <SubMenu
         options={allCategories
@@ -151,15 +159,15 @@ class Wallet extends Component<AllProps> {
       >
         {warning}
         <WalletWithNavigation
-          categories={allCategories
-            .filter(category => category.isVisible({ selected: selectedWallet }))
-            .map(category => ({
-              className: category.className,
-              icon: category.icon,
-              label: category.label,
-              isActive: this.generated.stores.app.currentRoute.startsWith(category.route),
-              onClick: () =>
-                this.generated.actions.router.goToRoute.trigger({
+          categories={
+            allCategories
+              .filter(c => c.isVisible(visibilityContext))
+              .map(category => ({
+                className: category.className,
+                icon: category.icon,
+                label: category.label,
+                isActive: this.generated.stores.app.currentRoute.startsWith(category.route),
+                onClick: () => this.generated.actions.router.goToRoute.trigger({
                   route: category.route,
                 }),
             }))}
@@ -227,8 +235,13 @@ class Wallet extends Component<AllProps> {
       |},
       wallets: {| selected: null | PublicDeriver<> |},
       router: {| location: any |},
-    |},
-  |} {
+      transactions: {|
+        getBalanceRequest: {|
+          result: ?MultiToken,
+        |},
+      |},
+    |}
+    |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }
@@ -250,6 +263,18 @@ class Wallet extends Component<AllProps> {
         },
         router: {
           location: stores.router.location,
+        },
+        transactions: {
+          getBalanceRequest: (() => {
+            if (stores.wallets.selected == null) return {
+              result: undefined,
+            };
+            const { requests } = stores.transactions.getTxRequests(stores.wallets.selected);
+
+            return {
+              result: requests.getBalanceRequest.result,
+            };
+          })(),
         },
       },
       actions: {

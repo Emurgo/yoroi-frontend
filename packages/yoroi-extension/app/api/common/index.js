@@ -245,6 +245,18 @@ export default class CommonApi {
     }
   }
 
+  async getAssetDeposit(
+    request: GetBalanceRequest
+  ): Promise<GetBalanceResponse> {
+    try {
+      return await request.getBalance();
+    } catch (error) {
+      Logger.error(`${nameof(CommonApi)}::${nameof(this.getAssetDeposit)} error: ` + stringifyError(error));
+      if (error instanceof LocalizableError) throw error;
+      throw new GenericApiError();
+    }
+  }
+
   async exportLocalDatabase(
     db: lf$Database,
   ): Promise<string> {

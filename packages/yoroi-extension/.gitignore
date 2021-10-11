@@ -40,3 +40,6 @@ Yoroi Shelley Testnet
 
 # Local Netlify folder
 .netlify
+
+# SSL overrides for DEV
+scripts/sslOverrides.js

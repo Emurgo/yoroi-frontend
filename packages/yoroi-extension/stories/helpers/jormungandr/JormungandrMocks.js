@@ -63,6 +63,7 @@ function genMockJormungandrCache(dummyWallet: PublicDeriver<>) {
     total: 0,
   }));
   const getBalanceRequest = new CachedRequest(request => request.getBalance());
+  const getAssetDepositRequest = new CachedRequest(request => request.getBalance());
   return {
     conceptualWalletCache: {
       conceptualWallet: dummyWallet.getParent(),
@@ -91,6 +92,7 @@ function genMockJormungandrCache(dummyWallet: PublicDeriver<>) {
         recentRequest,
         allRequest,
         getBalanceRequest,
+        getAssetDepositRequest,
       },
     }),
     getPublicDeriverSettingsCache: (publicDeriver) => ({
