@@ -1,6 +1,17 @@
 // @flow
 import { createTheme } from '@mui/material/styles';
 import { RubikFonts } from '../fonts';
+import {
+  ModernButton,
+  ModernCheckbox,
+  ModernTextField,
+  ModernMenu,
+  ModernMenuItem,
+  ModernTabs,
+  ModernTabPanel,
+  ModernChip,
+  ModernTooltip
+} from '../overrides';
 
 export const modernTheme: Object = createTheme({
   components: {
@@ -9,6 +20,15 @@ export const modernTheme: Object = createTheme({
         ${RubikFonts}
       `,
     },
+    MuiButton: ModernButton,
+    MuiCheckbox: ModernCheckbox,
+    MuiTextField: ModernTextField,
+    MuiMenuItem: ModernMenuItem,
+    MuiMenu: ModernMenu,
+    MuiTabs: ModernTabs,
+    MuiTabPanel: ModernTabPanel,
+    MuiChip: ModernChip,
+    MuiTooltip: ModernTooltip,
   },
   palette: {
     primary: {
@@ -16,6 +36,9 @@ export const modernTheme: Object = createTheme({
     },
     secondary: {
       main: 'hsl(167, 80%, 45%)',
+      light: 'hsl(168 48% 86%)',
+      dark: 'hsl(168 82% 49%)',
+      contrastText: 'hsl(0deg 0% 100%)',
     },
     error: {
       main: 'hsl(345, 100%, 54%)',
@@ -23,6 +46,10 @@ export const modernTheme: Object = createTheme({
     warning: {
       main: 'hsl(38, 92%, 55%)',
     },
+    input: {
+      main: 'hsl(38, 92%, 55%)',
+    },
+
     grey: {
       '50': 'hsl(201, 22%, 95%)',
       '100': 'hsl(216, 26%, 93%)',
