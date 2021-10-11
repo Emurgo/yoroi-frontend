@@ -1503,6 +1503,7 @@ async function rawAddErgoAssets(
       NetworkId: network.NetworkId,
       Identifier: tokenId,
       IsDefault: false,
+      IsNFT: false,
       Metadata: {
         type: 'Ergo',
         height,

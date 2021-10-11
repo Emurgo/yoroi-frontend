@@ -31,6 +31,7 @@ import type { GeneratedData as WalletData } from './containers/wallet/Wallet';
 import MyWalletsPage from './containers/wallet/MyWalletsPage';
 import WalletSummaryPage from './containers/wallet/WalletSummaryPage';
 import WalletSendPage from './containers/wallet/WalletSendPage';
+import WalletAssetsPage from './containers/wallet/WalletAssetsPage';
 import WalletReceivePage from './containers/wallet/WalletReceivePage';
 import URILandingPage from './containers/uri/URILandingPage';
 import Transfer from './containers/transfer/Transfer';
@@ -155,6 +156,10 @@ const WalletsSubpages = (stores, actions) => (
       exact
       path={ROUTES.WALLETS.SEND}
       component={(props) => <WalletSendPage {...props} stores={stores} actions={actions} />}
+    />
+    <Route
+      path={ROUTES.WALLETS.ASSETS}
+      component={(props) => <WalletAssetsPage {...props} stores={stores} actions={actions} />}
     />
     <Route
       path={ROUTES.WALLETS.RECEIVE.ROOT}

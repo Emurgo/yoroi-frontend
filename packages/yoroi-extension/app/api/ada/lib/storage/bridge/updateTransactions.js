@@ -131,6 +131,7 @@ import type {
   RemoteTransaction,
   RemoteCertificate,
   TokenInfoFunc,
+  MultiAssetMintMetadataFunc
 } from '../../state-fetch/types';
 import {
   ShelleyCertificateTypes,
@@ -148,6 +149,15 @@ import {
 import type {
   DefaultTokenEntry,
 } from '../../../../common/lib/MultiToken';
+
+type TokensMintMetadata = {|
+...{[key: string]: TokenMintMetadata[]}
+|}
+
+type TokenMintMetadata = {|
+key: string,
+metadata: any
+|}
 
 async function rawGetAllTxIds(
   db: lf$Database,
@@ -367,12 +377,14 @@ export async function rawGetTransactions(
                     )
                   );
                   if (rewardAddr == null) continue; // should never happen
-                  const rewardAmount = mir.get(rewardAddr.payment_cred());
-                  if (rewardAmount == null) continue; // should never happen
+                  const rewardAmount = mir.as_to_stake_creds()
+                    ?.get(rewardAddr.payment_cred());
+                  // happens if the MIR is to another pot
+                  if (rewardAmount == null) continue;
                   implicitOutputSum.add({
                     identifier: defaultToken.defaultIdentifier,
                     networkId: defaultToken.defaultNetworkId,
-                    amount: new BigNumber(rewardAmount.to_str()),
+                    amount: new BigNumber(String(rewardAmount.as_i32())),
                   });
                 }
               }
@@ -875,6 +887,7 @@ export async function updateTransactions(
   getTransactionsHistoryForAddresses: HistoryFunc,
   getBestBlock: BestBlockFunc,
   getTokenInfo: TokenInfoFunc,
+  getMultiAssetMetadata: MultiAssetMintMetadataFunc,
 ): Promise<void> {
   const withLevels = asHasLevels<ConceptualWallet>(publicDeriver);
   const derivationTables = withLevels == null
@@ -944,6 +957,7 @@ export async function updateTransactions(
           getBestBlock,
           derivationTables,
           getTokenInfo,
+          getMultiAssetMetadata
         );
       }
     );
@@ -1203,6 +1217,7 @@ async function rawUpdateTransactions(
   getBestBlock: BestBlockFunc,
   derivationTables: Map<number, string>,
   getTokenInfo: TokenInfoFunc,
+  getMultiAssetMetadata: MultiAssetMintMetadataFunc,
 ): Promise<void> {
   const network = publicDeriver.getParent().getNetworkInfo();
   // TODO: consider passing this function in as an argument instead of generating it here
@@ -1355,6 +1370,7 @@ async function rawUpdateTransactions(
         toAbsoluteSlotNumber,
         derivationTables,
         getTokenInfo,
+        getMultiAssetMetadata
       }
     );
   }
@@ -1410,6 +1426,7 @@ async function updateTransactionBatch(
     derivationTables: Map<number, string>,
     defaultToken: DefaultTokenEntry,
     getTokenInfo: TokenInfoFunc,
+    getMultiAssetMetadata: MultiAssetMintMetadataFunc,
   |}
 ): Promise<Array<{|
   ...(CardanoByronTxIO | CardanoShelleyTxIO),
@@ -1526,7 +1543,8 @@ async function updateTransactionBatch(
     },
     tokenIds,
     request.getTokenInfo,
-    request.network,
+    request.getMultiAssetMetadata,
+    request.network
   );
 
   // 3) Add new transactions
@@ -1917,6 +1935,36 @@ function genShelleyIOGen(
   };
 }
 
+export async function getTokenMintMetadata(
+  tokenIds: string[],
+  getMultiAssetMetadata: MultiAssetMintMetadataFunc,
+  network: $ReadOnly<NetworkRow>)
+: Promise<$ReadOnly<TokensMintMetadata>> {
+  if (!tokenIds || tokenIds.length === 0) return {};
+
+  const nativeAssets = tokenIds
+    .filter(t => t.indexOf('.') !== -1)
+    .map(t => {
+      const parts = t.split('.');
+      const assetName = parts[1];
+      const policyId = parts[0];
+      return {
+        name: Buffer.from(assetName, 'hex').toString(),
+        policy: policyId
+      };
+    })
+    .filter(a => a.name !== '');
+
+  if (!nativeAssets || nativeAssets.length === 0) return {};
+
+  const tokensMintMetadata = await getMultiAssetMetadata({
+    network,
+    assets: nativeAssets
+  });
+
+  return tokensMintMetadata;
+};
+
 export async function genCardanoAssetMap(
   db: lf$Database,
   dbTx: lf$Transaction,
@@ -1926,6 +1974,7 @@ export async function genCardanoAssetMap(
   |},
   tokenIds: Array<string>,
   getTokenInfo: TokenInfoFunc,
+  getMultiAssetMetadata: MultiAssetMintMetadataFunc,
   network: $ReadOnly<NetworkRow>,
 ): Promise<Map<string, $ReadOnly<TokenRow>>> {
   const existingDbRows = (await deps.GetToken.fromIdentifier(
@@ -1957,6 +2006,8 @@ export async function genCardanoAssetMap(
     tokenInfoResponse = {};
   }
 
+  const metadata = await getTokenMintMetadata(tokenIds, getMultiAssetMetadata, network);
+
   const databaseInsert = missingTokenIds
     .map(tokenId => {
       // If fetched token metadata from network, store in db; otherwise store a
@@ -1980,6 +2031,20 @@ export async function genCardanoAssetMap(
       }
 
       const parts = identifierToCardanoAsset(tokenId);
+
+      const assetName = Buffer.from(parts.name.name()).toString('hex');
+      const policyId = Buffer.from(parts.policyId.to_bytes()).toString('hex');
+
+      const assetNameInMetadata = Buffer.from(assetName, 'hex').toString();
+      const identifierInMetadata = `${policyId}.${assetNameInMetadata}`;
+
+      const tokenMetadata = metadata[identifierInMetadata];
+
+      let isNft = false;
+      if (tokenMetadata && tokenMetadata.filter(m => m.key === '721').length > 0) {
+        isNft = true;
+      }
+
       return {
         NetworkId: network.NetworkId,
         Identifier: tokenId,
@@ -1988,13 +2053,14 @@ export async function genCardanoAssetMap(
         // token row, otherwise a new row is inserted instead of the existing row
         // being updated
         TokenId: existingRowsMap.get(tokenId)?.TokenId,
+        IsNFT: isNft,
         Metadata: {
           type: 'Cardano',
           ticker,
           longName,
           numberOfDecimals,
-          assetName: Buffer.from(parts.name.name()).toString('hex'),
-          policyId: Buffer.from(parts.policyId.to_bytes()).toString('hex'),
+          assetName,
+          policyId,
           lastUpdatedAt,
         }
       };
@@ -2550,7 +2616,7 @@ async function certificateToDb(
           const metadata = cert.poolParams.poolMetadata;
           return RustModule.WalletV4.PoolMetadata.new(
             RustModule.WalletV4.URL.new(metadata.url),
-            RustModule.WalletV4.MetadataHash.from_bytes(
+            RustModule.WalletV4.PoolMetadataHash.from_bytes(
               Buffer.from(metadata.metadataHash, 'hex')
             )
           );
@@ -2661,7 +2727,7 @@ async function certificateToDb(
           Relation: CertificateRelationType,
         |}> = [];
 
-        const certPot = RustModule.WalletV4.MoveInstantaneousReward.new(cert.pot);
+        const certPot = RustModule.WalletV4.MIRToStakeCredentials.new();
         for (const key of Object.keys(cert.rewards)) {
           const rewardAddress = RustModule.WalletV4.RewardAddress.from_address(
             RustModule.WalletV4.Address.from_bytes(
@@ -2673,7 +2739,9 @@ async function certificateToDb(
           if (stakeCredentials == null) throw new Error(`${nameof(certificateToDb)} not a valid reward account`);
           certPot.insert(
             stakeCredentials,
-            RustModule.WalletV4.BigNum.from_str(cert.rewards[key])
+            RustModule.WalletV4.Int.new(
+              RustModule.WalletV4.BigNum.from_str(cert.rewards[key])
+            ),
           );
 
           const rewardAddrKey = await findOwnAddress(
@@ -2686,7 +2754,12 @@ async function certificateToDb(
             });
           }
         }
-        const certificate = RustModule.WalletV4.MoveInstantaneousRewardsCert.new(certPot);
+        const certificate = RustModule.WalletV4.MoveInstantaneousRewardsCert.new(
+          RustModule.WalletV4.MoveInstantaneousReward.new_to_stake_creds(
+            cert.pot,
+            certPot,
+          )
+        );
         result.push((txId: number) => ({
           certificate: {
             Ordinal: cert.certIndex,

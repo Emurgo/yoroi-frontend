@@ -340,3 +340,48 @@ export type TokenInfoResponse = {|
 |};
 export type PoolInfoFunc = (body: PoolInfoRequest) => Promise<PoolInfoResponse>;
 export type TokenInfoFunc = (body: TokenInfoRequest) => Promise<TokenInfoResponse>;
+
+export type CatalystRoundInfoRequest = {|
+  ...BackendNetworkInfo
+  |};
+
+export type CatalystRound = {|
+  +id: number,
+  +registrationStart: string,
+  +registrationEnd: string,
+  +votingStart: string,
+  +votingEnd: string,
+  +votingPowerThreshold: string,
+|};
+
+export type CatalystRoundInfoResponse = {|
+  currentFund?: CatalystRound,
+  nextFund?: CatalystRound
+|};
+
+export type CatalystRoundInfoFunc = (body: CatalystRoundInfoRequest)
+                                      => Promise<CatalystRoundInfoResponse>;
+
+// Multi Asset Mint Metadata
+
+export type MultiAssetMintMetadataFunc = (body: MultiAssetMintMetadataRequest)
+  => Promise<MultiAssetMintMetadataResponse>;
+
+export type MultiAssetMintMetadataRequest = {|
+  ...BackendNetworkInfo,
+  assets: MultiAssetMintMetadataRequestAsset[]
+|};
+
+export type MultiAssetMintMetadataRequestAsset = {|
+  name: string,
+  policy: string
+|}
+
+export type MultiAssetMintMetadataResponse = {|
+  ...{[key: string]: MultiAssetMintMetadataResponseAsset[]}
+|}
+
+export type MultiAssetMintMetadataResponseAsset = {|
+  key: string,
+  metadata: {[key: string]: any}
+|}
