@@ -48,6 +48,10 @@ const messages = defineMessages({
     id: 'api.errors.NotEnoughMoneyToSendError',
     defaultMessage: '!!!Not enough funds to make this transaction.',
   },
+  cannotSendBelowMinimumValueError: {
+    id: 'api.errors.CannotSendBelowMinimumValueError',
+    defaultMessage: '!!!Cannot send amount below required minimum.',
+  },
   assetOverflowError: {
     id: 'api.errors.assetOverflowError',
     defaultMessage: '!!!Maximum value of a token inside a UTXO exceeded (overflow).',
@@ -281,6 +285,14 @@ export class NotEnoughMoneyToSendError extends LocalizableError {
     super({
       id: messages.notEnoughMoneyToSendError.id,
       defaultMessage: messages.notEnoughMoneyToSendError.defaultMessage || '',
+    });
+  }
+}
+export class CannotSendBelowMinimumValueError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.cannotSendBelowMinimumValueError.id,
+      defaultMessage: messages.cannotSendBelowMinimumValueError.defaultMessage || '',
     });
   }
 }

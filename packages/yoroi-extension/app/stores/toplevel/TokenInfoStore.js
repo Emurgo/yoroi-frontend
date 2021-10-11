@@ -121,6 +121,7 @@ export default class TokenInfoStore<
           deps,
           tokenIds,
           this.stores.substores.ada.stateFetchStore.fetcher.getTokenInfo,
+          this.stores.substores.ada.stateFetchStore.fetcher.getMultiAssetMintMetadata,
           network,
         )
       )
@@ -210,6 +211,7 @@ export function mockFromDefaults(
     ...entry,
     TokenId: i,
     Digest: i,
+    IsNFT: entry.IsNFT
   }));
   for (const token of withMock) {
     const mapForNetwork = tokenInfo.get(token.NetworkId.toString());

@@ -33,6 +33,7 @@ import CrashPage from './containers/CrashPage';
 import { Logger } from './utils/logging';
 import { SimpleSkins } from 'react-polymorph/lib/skins/simple';
 import { SimpleDefaults } from 'react-polymorph/lib/themes/simple';
+import { LayoutProvider } from './themes/context/layout';
 import { ThemeProvider as MuiThemeProvide } from '@mui/material/styles';
 import { CssBaseline } from '@mui/material';
 import { classicTheme, modernTheme } from './styles/themes';
@@ -105,7 +106,7 @@ class App extends Component<Props, State> {
     changeToplevelTheme(currentTheme);
 
     // eslint-disable-next-line no-constant-condition
-    const theme = true ? modernTheme : classicTheme
+    const theme = true ? modernTheme : classicTheme;
 
     return (
       <div style={{ height: '100%' }}>

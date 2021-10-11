@@ -1,7 +1,6 @@
 // @flow
 
 import { select, } from '@storybook/addon-knobs';
-import { globalKnobs, } from '../../../stories/helpers/StoryWrapper';
 import { ServerStatusErrors } from '../../types/serverStatusErrorType';
 import { action } from '@storybook/addon-actions';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
@@ -27,12 +26,9 @@ export const mockSettingsProps: {
   location: string,
   ...
 } => {| generated: GeneratedData |} = (request) => ({
+  // $FlowFixMe[prop-missing]: Some props are quite different for revamp components
   generated: {
     stores: {
-      profile: {
-        currentLocale: globalKnobs.locale(),
-        currentTheme: globalKnobs.currentTheme(),
-      },
       router: {
         location: {
           pathname: request.location,

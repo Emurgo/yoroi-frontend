@@ -8,7 +8,8 @@
   width: 100%;
 }
 
-.topbar, .navbar {
+.topbar,
+.navbar {
   // Show elements that overflow the topbar above the content area
   z-index: 2;
 }
@@ -68,6 +69,13 @@
   min-height: 200px;
 }
 
+.contentRevamp {
+  height: 100%;
+  min-height: 200px;
+  padding: 40px;
+  background-color: #f0f3f5;
+}
+
 .containerContent {
   max-width: var(--theme-page-container-width);
   padding-left: var(--theme-page-container-side-padding);
@@ -75,6 +83,16 @@
   width: 100%;
   margin-left: auto;
   margin-right: auto;
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100% - var(--theme-page-content-box-bottom) - var(--theme-banner-height));
+}
+
+.containerContentRevamp {
+  max-width: 100%;
+  width: 100%;
+  padding: 0;
+  margin: 0;
   display: flex;
   flex-direction: column;
   max-height: calc(100% - var(--theme-page-content-box-bottom) - var(--theme-banner-height));
