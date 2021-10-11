@@ -40,7 +40,7 @@ class BuySellAdaButton extends Component<Props & InjectedProps> {
 
     const BuyAdaButtonRevamp = (
       <Button
-        label={intl.formatMessage(globalMessages.buySellAda)}
+        label={intl.formatMessage(globalMessages.buyAda)}
         className={styles.buttonRevamp}
         onClick={() => this.props.onBuySellClick()}
         skin={ButtonSkin}
