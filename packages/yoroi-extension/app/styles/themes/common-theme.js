@@ -30,7 +30,7 @@ export const commonTheme: Object = createTheme({
       '900': '#242838',
     },
     background: {
-      overlay: '#060d23cc', // dialogs
+      overlay: '#060d23cc', // dialogs,
     },
     txStatus: {
       pending: {
@@ -53,50 +53,6 @@ export const commonTheme: Object = createTheme({
         background: '#ff145326',
         text: '#fa618a',
       },
-    },
-  },
-  typography: {
-    h1: {
-      fontWeight: 500,
-      fontSize: '1.875rem',
-    },
-    h2: {
-      fontWeight: 500,
-      fontSize: '1.75rem',
-    },
-    h3: {
-      fontWeight: 500,
-      fontSize: '1.5rem',
-    },
-    h4: {
-      fontWeight: 500,
-      fontSize: '1.25rem',
-    },
-    h5: {
-      fontWeight: 500,
-      fontSize: '1.125rem',
-    },
-    h6: {
-      fontWeight: 500,
-      fontSize: '1rem',
-      textTransform: 'uppercase',
-    },
-    h7: {
-      fontWeight: 500,
-      fontSize: '0.875rem',
-      textTransform: 'uppercase',
-    },
-    body1: {
-      fontWeight: 400,
-      fontSize: '1rem',
-    },
-    body2: {
-      fontWeight: 400,
-      fontSize: '0.875rem',
-    },
-    body3: {
-      fontWeight: 400,
-      fontSize: '0.75rem',
     },
   },
 });

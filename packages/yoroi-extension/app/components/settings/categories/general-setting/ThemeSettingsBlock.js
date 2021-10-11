@@ -49,17 +49,15 @@ const messages = defineMessages({
 
 type Props = {|
   +currentTheme: Theme,
-  +selectTheme: {| theme: string |} => PossiblyAsync<void>,
+  +selectTheme: ({| theme: string |}) => PossiblyAsync<void>,
   +exportTheme: void => PossiblyAsync<void>,
-  +getThemeVars: {| theme: string |} => { [key: string]: string, ... },
   +hasCustomTheme: void => boolean,
   +onExternalLinkClick: MouseEvent => void,
 |};
 
 @observer
 export default class ThemeSettingsBlock extends Component<Props> {
-
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
@@ -67,7 +65,6 @@ export default class ThemeSettingsBlock extends Component<Props> {
     const {
       currentTheme,
       selectTheme,
-      getThemeVars,
       exportTheme,
       hasCustomTheme,
       onExternalLinkClick,
@@ -96,13 +93,14 @@ export default class ThemeSettingsBlock extends Component<Props> {
 
     return (
       <div className={styles.component}>
+        <h2 className={styles.title}>{intl.formatMessage(messages.themeLabel)}</h2>
 
-        <h2 className={styles.title}>
-          {intl.formatMessage(messages.themeLabel)}
-        </h2>
-
-        <p><FormattedHTMLMessage {...messages.themeNote} /></p>
-        <p><FormattedMessage {...messages.blog} values={{ blogLink }} /></p>
+        <p>
+          <FormattedHTMLMessage {...messages.themeNote} />
+        </p>
+        <p>
+          <FormattedMessage {...messages.blog} values={{ blogLink }} />
+        </p>
 
         <div className={styles.main}>
           <div className={styles.themesWrapper}>
@@ -112,13 +110,12 @@ export default class ThemeSettingsBlock extends Component<Props> {
               className={themeYoroiModernClasses}
               onClick={selectTheme.bind(this, { theme: THEMES.YOROI_MODERN })}
             >
-              {(currentTheme === THEMES.YOROI_MODERN
-                && hasCustomTheme() &&
-                  <div className={styles.themeWarning}>
-                    {intl.formatMessage(messages.themeWarning)}
-                  </div>)
-              }
-              <ThemeThumbnail themeVars={getThemeVars({ theme: THEMES.YOROI_MODERN })} themeKey="modern" />
+              {currentTheme === THEMES.YOROI_MODERN && hasCustomTheme() && (
+                <div className={styles.themeWarning}>
+                  {intl.formatMessage(messages.themeWarning)}
+                </div>
+              )}
+              <ThemeThumbnail theme={THEMES.YOROI_MODERN} themeKey="modern" />
               <h3 className={styles.subTitle}>{intl.formatMessage(messages.themeYoroiModern)}</h3>
             </button>
             {/* Classic Theme */}
@@ -127,13 +124,12 @@ export default class ThemeSettingsBlock extends Component<Props> {
               className={themeYoroiClassicClasses}
               onClick={selectTheme.bind(this, { theme: THEMES.YOROI_CLASSIC })}
             >
-              {(currentTheme === THEMES.YOROI_CLASSIC
-                && hasCustomTheme() &&
-                  <div className={styles.themeWarning}>
-                    {intl.formatMessage(messages.themeWarning)}
-                  </div>)
-              }
-              <ThemeThumbnail themeVars={getThemeVars({ theme: THEMES.YOROI_CLASSIC })} themeKey="classic" />
+              {currentTheme === THEMES.YOROI_CLASSIC && hasCustomTheme() && (
+                <div className={styles.themeWarning}>
+                  {intl.formatMessage(messages.themeWarning)}
+                </div>
+              )}
+              <ThemeThumbnail theme={THEMES.YOROI_CLASSIC} themeKey="classic" />
               <h3 className={styles.subTitle}>{intl.formatMessage(messages.themeYoroiClassic)}</h3>
             </button>
           </div>
@@ -145,5 +141,4 @@ export default class ThemeSettingsBlock extends Component<Props> {
       </div>
     );
   }
-
 }

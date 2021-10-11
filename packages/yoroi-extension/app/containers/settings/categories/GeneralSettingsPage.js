@@ -35,7 +35,6 @@ export default class GeneralSettingsPage extends Component<InjectedOrGenerated<G
         <ThemeSettingsBlock
           currentTheme={currentTheme}
           selectTheme={this.generated.actions.profile.updateTheme.trigger}
-          getThemeVars={this.generated.stores.profile.getThemeVars}
           exportTheme={this.generated.actions.profile.exportTheme.trigger}
           hasCustomTheme={this.generated.stores.profile.hasCustomTheme}
           onExternalLinkClick={handleExternalLinkClick}
@@ -68,10 +67,6 @@ export default class GeneralSettingsPage extends Component<InjectedOrGenerated<G
         LANGUAGE_OPTIONS: Array<LanguageType>,
         currentLocale: string,
         currentTheme: Theme,
-        getThemeVars: ({| theme: string |}) => {
-          [key: string]: string,
-          ...
-        },
         hasCustomTheme: void => boolean,
         setProfileLocaleRequest: {|
           error: ?LocalizableError,
@@ -98,7 +93,6 @@ export default class GeneralSettingsPage extends Component<InjectedOrGenerated<G
           LANGUAGE_OPTIONS: profileStore.LANGUAGE_OPTIONS,
           currentLocale: profileStore.currentLocale,
           currentTheme: profileStore.currentTheme,
-          getThemeVars: profileStore.getThemeVars,
           hasCustomTheme: profileStore.hasCustomTheme,
         },
       },
