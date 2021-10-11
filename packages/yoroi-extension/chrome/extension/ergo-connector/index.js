@@ -1,6 +1,5 @@
 // @flow
 
-import React from 'react';
 import { render } from 'react-dom';
 import { action, configure } from 'mobx';
 import { RouterStore, syncHistoryWithStore } from 'mobx-react-router';

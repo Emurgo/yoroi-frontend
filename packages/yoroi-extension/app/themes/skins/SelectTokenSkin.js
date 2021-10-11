@@ -1,5 +1,4 @@
 // @flow
-import React from 'react';
 import type { Element, ElementRef, } from 'react';
 
 // external libraries

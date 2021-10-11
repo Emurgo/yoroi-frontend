@@ -1,6 +1,6 @@
 // @flow
 import type { ComponentType, Node } from 'react';
-import React, { Component } from 'react';
+import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { computed } from 'mobx';
 import Sidebar from '../components/topbar/Sidebar';

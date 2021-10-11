@@ -1,6 +1,6 @@
 // @flow
 import type { Node } from 'react';
-import React, { Component } from 'react';
+import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { handleExternalLinkClick } from '../../../utils/routing';
 import PickCurrencyOptionDialog from '../../../components/wallet/add/option-dialog/PickCurrencyOptionDialog';

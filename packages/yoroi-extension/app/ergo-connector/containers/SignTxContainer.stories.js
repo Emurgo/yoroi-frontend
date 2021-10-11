@@ -1,6 +1,5 @@
 // @flow
 
-import React from 'react';
 import type { Node, ComponentType } from 'react';
 import SignTxContainer from './SignTxContainer';
 import { withScreenshot } from 'storycap';

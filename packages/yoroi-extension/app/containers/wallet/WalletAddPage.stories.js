@@ -2,7 +2,6 @@
 // @flow
 
 import type { Node } from 'react';
-import React from 'react';
 import BigNumber from 'bignumber.js';
 
 import { select, boolean, } from '@storybook/addon-knobs';

@@ -1,7 +1,6 @@
 // @flow
 
 import type { Node } from 'react';
-import React from 'react';
 
 import moment from 'moment';
 import { select, } from '@storybook/addon-knobs';

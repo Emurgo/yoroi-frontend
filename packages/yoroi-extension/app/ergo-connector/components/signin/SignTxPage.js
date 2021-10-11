@@ -143,7 +143,7 @@ class SignTxPage extends Component<Props> {
       <>
         <span className={styles.amountRegular}>{'+'}{tokenEntry.amount.toString()}</span>
         {' '}
-        <span>   
+        <span>
           {truncateAddressShort(
            tokenEntry.identifier
           )}

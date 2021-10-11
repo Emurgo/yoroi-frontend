@@ -1,5 +1,5 @@
 // @flow
-import React, { Component } from 'react';
+import { Component } from 'react';
 import type { Node } from 'react';
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import TopBar from '../../components/topbar/TopBar';

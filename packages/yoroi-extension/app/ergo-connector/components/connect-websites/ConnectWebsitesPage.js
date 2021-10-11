@@ -1,6 +1,6 @@
 /* eslint-disable no-nested-ternary */
 // @flow
-import React, { Component } from 'react';
+import { Component } from 'react';
 import type { Node } from 'react';
 import DropdownCard from './DropdownCard';
 import styles from './ConnectWebsitesPage.scss';

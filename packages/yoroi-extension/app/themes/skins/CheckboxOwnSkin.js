@@ -1,6 +1,5 @@
 // @flow
 // Extended version of Checkbox component from react-polymorph (simple skin)
-import React from 'react';
 import type { Element, Node } from 'react';
 // external libraries
 import classnames from 'classnames';

@@ -347,6 +347,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
           try {
             return await stateFetcher.getAssetInfo(req);
           } catch (e) {
+            // eslint-disable-next-line no-console
               console.error('Aseet info request failed', e);
               return {};
           }
@@ -354,6 +355,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         network: selectedWallet.getParent().getNetworkInfo(),
       });
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Failed to add ergo assets!', error);
     }
   }
@@ -370,7 +372,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     if (!signingMessage.sign.tx) return undefined;
     // Invoked only for Cardano, so we know the type of `tx` must be `CardanoTx`.
     // $FlowFixMe[prop-missing]
-    const { tx/*, partialSign*/ } = signingMessage.sign.tx.tx;
+    const { tx/* , partialSign */ } = signingMessage.sign.tx.tx;
 
     const network = selectedWallet.publicDeriver.getParent().getNetworkInfo();
 
