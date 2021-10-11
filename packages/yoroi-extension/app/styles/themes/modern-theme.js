@@ -10,10 +10,12 @@ import {
   ModernTabs,
   ModernTabPanel,
   ModernChip,
-  ModernTooltip
+  ModernTooltip,
+  ModernInputLabel,
 } from '../overrides';
 
 export const modernTheme: Object = createTheme({
+  name: 'modern',
   components: {
     MuiCssBaseline: {
       styleOverrides: `
@@ -23,6 +25,7 @@ export const modernTheme: Object = createTheme({
     MuiButton: ModernButton,
     MuiCheckbox: ModernCheckbox,
     MuiTextField: ModernTextField,
+    MuiInputLabel: ModernInputLabel,
     MuiMenuItem: ModernMenuItem,
     MuiMenu: ModernMenu,
     MuiTabs: ModernTabs,
