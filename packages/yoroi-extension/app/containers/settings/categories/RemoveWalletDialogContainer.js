@@ -1,5 +1,5 @@
 // @flow
-import type { Node } from 'react';
+import type { Node, ComponentType } from 'react';
 import React, { Component } from 'react';
 import { computed, action, observable } from 'mobx';
 import { observer } from 'mobx-react';
@@ -13,6 +13,8 @@ import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 
 import DangerousActionDialog from '../../../components/widgets/DangerousActionDialog';
 import LocalizableError from '../../../i18n/LocalizableError';
+import { withLayout } from '../../../themes/context/layout';
+import type { LayoutComponentMap } from '../../../themes/context/layout';
 
 export type GeneratedData = typeof RemoveWalletDialogContainer.prototype.generated;
 
@@ -20,11 +22,16 @@ type Props = {|
   ...InjectedOrGenerated<GeneratedData>,
   publicDeriver: void | PublicDeriver<>,
 |};
+type InjectedProps = {|
+  +renderLayoutComponent: LayoutComponentMap => Node,
+|};
+type AllProps = {| ...Props, ...InjectedProps |};
 
 const dialogMessages = defineMessages({
   warning2: {
     id: 'wallet.settings.delete.warning2',
-    defaultMessage: '!!!Please double-check you still have the means to restore access to this wallet. If you cannot, removing the wallet may result in irreversible loss of funds.',
+    defaultMessage:
+      '!!!Please double-check you still have the means to restore access to this wallet. If you cannot, removing the wallet may result in irreversible loss of funds.',
   },
   accept: {
     id: 'wallet.settings.delete.accept',
@@ -33,8 +40,8 @@ const dialogMessages = defineMessages({
 });
 
 @observer
-export default class RemoveWalletDialogContainer extends Component<Props> {
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+class RemoveWalletDialogContainer extends Component<AllProps> {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
@@ -48,14 +55,35 @@ export default class RemoveWalletDialogContainer extends Component<Props> {
   toggleCheck: void => void = () => {
     if (this.generated.stores.walletSettings.removeWalletRequest.isExecuting) return;
     this.isChecked = !this.isChecked;
-  }
+  };
+
+  removeWalletRevamp: void => Promise<void> = async () => {
+    const settingsActions = this.generated.actions.walletSettings;
+
+    const selectedWalletId = this.props.publicDeriver?.getPublicDeriverId();
+    const walletIdList = this.generated.stores.profile.currentSortedWallets;
+
+    const newSortedWalletIds =
+      walletIdList !== null &&
+      walletIdList !== undefined &&
+      walletIdList.filter(walletId => walletId !== selectedWalletId);
+
+    await this.generated.actions.profile.updateSortedWalletList.trigger({
+      sortedWallets: newSortedWalletIds || [],
+    });
+
+    this.props.publicDeriver &&
+      settingsActions.removeWallet.trigger({
+        publicDeriver: this.props.publicDeriver,
+      });
+  };
 
   render(): Node {
     const { intl } = this.context;
     const settingsStore = this.generated.stores.walletSettings;
     const settingsActions = this.generated.actions.walletSettings;
 
-    return (
+    const DangerousActionDialogClassic = (
       <DangerousActionDialog
         title={intl.formatMessage(messages.titleLabel)}
         checkboxAcknowledge={intl.formatMessage(dialogMessages.accept)}
@@ -66,45 +94,84 @@ export default class RemoveWalletDialogContainer extends Component<Props> {
         onCancel={this.generated.actions.dialogs.closeActiveDialog.trigger}
         primaryButton={{
           label: intl.formatMessage(globalMessages.remove),
-          onClick: () => this.props.publicDeriver && settingsActions.removeWallet.trigger({
-            publicDeriver: this.props.publicDeriver,
-          })
+          onClick: () =>
+            this.props.publicDeriver &&
+            settingsActions.removeWallet.trigger({
+              publicDeriver: this.props.publicDeriver,
+            }),
         }}
         secondaryButton={{
-          onClick: this.generated.actions.dialogs.closeActiveDialog.trigger
+          onClick: this.generated.actions.dialogs.closeActiveDialog.trigger,
         }}
       >
         <p>{intl.formatMessage(messages.removeExplanation)}</p>
         <p>{intl.formatMessage(dialogMessages.warning2)}</p>
       </DangerousActionDialog>
     );
+    const DangerousActionDialogRevamp = (
+      <DangerousActionDialog
+        title={intl.formatMessage(messages.titleLabel)}
+        checkboxAcknowledge={intl.formatMessage(dialogMessages.accept)}
+        isChecked={this.isChecked}
+        toggleCheck={this.toggleCheck}
+        isSubmitting={settingsStore.removeWalletRequest.isExecuting}
+        error={settingsStore.removeWalletRequest.error}
+        onCancel={this.generated.actions.dialogs.closeActiveDialog.trigger}
+        primaryButton={{
+          label: intl.formatMessage(globalMessages.remove),
+          onClick: this.removeWalletRevamp,
+        }}
+        secondaryButton={{
+          onClick: this.generated.actions.dialogs.closeActiveDialog.trigger,
+        }}
+      >
+        <p>{intl.formatMessage(messages.removeExplanation)}</p>
+        <p>{intl.formatMessage(dialogMessages.warning2)}</p>
+      </DangerousActionDialog>
+    );
+
+    return this.props.renderLayoutComponent({
+      CLASSIC: DangerousActionDialogClassic,
+      REVAMP: DangerousActionDialogRevamp,
+    });
   }
 
   @computed get generated(): {|
     actions: {|
+      profile: {|
+        updateSortedWalletList: {|
+          trigger: ({| sortedWallets: Array<number> |}) => Promise<void>,
+        |},
+      |},
       dialogs: {|
         closeActiveDialog: {|
-          trigger: (params: void) => void
-        |}
+          trigger: (params: void) => void,
+        |},
       |},
       walletSettings: {|
         removeWallet: {|
           trigger: (params: {|
-            publicDeriver: PublicDeriver<>
-          |}) => Promise<void>
-        |}
-      |}
+            publicDeriver: PublicDeriver<>,
+          |}) => Promise<void>,
+        |},
+      |},
     |},
     stores: {|
+      profile: {|
+        currentSortedWallets: ?Array<number>,
+      |},
       walletSettings: {|
         removeWalletRequest: {|
           error: ?LocalizableError,
           isExecuting: boolean,
-          reset: () => void
-        |}
-      |}
-    |}
-    |} {
+          reset: () => void,
+        |},
+      |},
+      wallets: {|
+        publicDerivers: Array<PublicDeriver<>>,
+      |},
+    |},
+  |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }
@@ -116,6 +183,12 @@ export default class RemoveWalletDialogContainer extends Component<Props> {
     const settingStore = stores.walletSettings;
     return Object.freeze({
       stores: {
+        wallets: {
+          publicDerivers: stores.wallets.publicDerivers,
+        },
+        profile: {
+          currentSortedWallets: stores.profile.currentSortedWallets,
+        },
         walletSettings: {
           removeWalletRequest: {
             reset: settingStore.removeWalletRequest.reset,
@@ -125,6 +198,9 @@ export default class RemoveWalletDialogContainer extends Component<Props> {
         },
       },
       actions: {
+        profile: {
+          updateSortedWalletList: { trigger: actions.profile.updateSortedWalletList.trigger },
+        },
         walletSettings: {
           removeWallet: { trigger: settingActions.removeWallet.trigger },
         },
@@ -135,3 +211,4 @@ export default class RemoveWalletDialogContainer extends Component<Props> {
     });
   }
 }
+export default (withLayout(RemoveWalletDialogContainer): ComponentType<Props>);

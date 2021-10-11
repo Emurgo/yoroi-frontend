@@ -6,12 +6,10 @@ import classnames from 'classnames';
 import { intlShape } from 'react-intl';
 import { splitAmount, truncateToken } from '../../utils/formatters';
 
-// import globalMessages from '../../i18n/global-messages';
 import styles from './NavWalletDetailsRevamp.scss';
 import IconEyeOpen from '../../assets/images/my-wallets/icon_eye_open.inline.svg';
 import IconEyeClosed from '../../assets/images/my-wallets/icon_eye_closed.inline.svg';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-// import WalletCurrency from '../wallet/my-wallets/WalletCurrency';
 import { hiddenAmount } from '../../utils/strings';
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import type { TokenLookupKey } from '../../api/common/lib/MultiToken';
@@ -111,14 +109,12 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
               })}
             </div>
             <div className={styles.fixedAmount}>
-              <p>
-                {/* TODO: fix value to USD */}
-                {this.renderAmountDisplay({
-                  shouldHideBalance,
-                  amount: totalAmount,
-                })}{' '}
-                USD
-              </p>
+              {/* TODO: fix value to USD */}
+              {this.renderAmountDisplay({
+                shouldHideBalance,
+                amount: totalAmount,
+              })}{' '}
+              USD
             </div>
           </div>
           {totalAmount != null && showEyeIconSafe && (

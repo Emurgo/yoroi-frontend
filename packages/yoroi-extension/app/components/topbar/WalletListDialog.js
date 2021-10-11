@@ -16,6 +16,8 @@ import { hiddenAmount } from '../../utils/strings';
 import type { TokenLookupKey } from '../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import { MultiToken } from '../../api/common/lib/MultiToken';
+import WalletCard from './WalletCard';
+import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 
 const messages = defineMessages({
   allWalletsLabel: {
@@ -33,21 +35,62 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  +walletsComponent: Node,
   +close: void => void,
-  +walletsCount: number,
   +shouldHideBalance: boolean,
   +onUpdateHideBalance: void => Promise<void>,
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
   +walletAmount: MultiToken | null,
   +onAddWallet: void => void,
+  +wallets: Array<Object>,
+  +currentSortedWallets: Array<number> | void,
+  +updateSortedWalletList: ({| sortedWallets: Array<number> |}) => Promise<void>,
+|};
+type State = {|
+  walletListIdx: Array<any>,
 |};
 
+const reorder = (list, startIndex, endIndex) => {
+  const result = Array.from(list);
+  const [removed] = result.splice(startIndex, 1);
+  result.splice(endIndex, 0, removed);
+  return result;
+};
 @observer
-export default class WalletListDialog extends Component<Props> {
+export default class WalletListDialog extends Component<Props, State> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
+  state: State = {
+    walletListIdx: [],
+  };
+
+  async componentDidMount(): Promise<void> {
+    const sortedWalletListIdx = this.props.currentSortedWallets;
+    const currentWalletIdx = this.props.wallets.map(wallet => wallet.walletId);
+
+    let generatedWalletIds;
+    if (sortedWalletListIdx !== undefined && sortedWalletListIdx.length > 0) {
+      const newWalletIds = currentWalletIdx.filter(id => {
+        const index = sortedWalletListIdx.indexOf(id);
+        if (index === -1) {
+          return true;
+        }
+        return false;
+      });
+      generatedWalletIds = [...sortedWalletListIdx, ...newWalletIds];
+    } else {
+      generatedWalletIds = currentWalletIdx;
+    }
+
+    this.setState(
+      {
+        walletListIdx: generatedWalletIds,
+      },
+      async () => {
+        await this.props.updateSortedWalletList({ sortedWallets: generatedWalletIds });
+      }
+    );
+  }
 
   renderAmountDisplay: ({|
     shouldHideBalance: boolean,
@@ -84,21 +127,46 @@ export default class WalletListDialog extends Component<Props> {
       </>
     );
   };
+
+  onDragEnd: Object => any = async result => {
+    const { destination, source } = result;
+    if (!destination || destination.index === source.index) {
+      return;
+    }
+
+    this.setState(
+      prev => {
+        const walletListIdx = reorder(
+          prev.walletListIdx,
+          result.source.index,
+          result.destination.index
+        );
+        return {
+          walletListIdx,
+        };
+      },
+      async function () {
+        await this.props.updateSortedWalletList({ sortedWallets: this.state.walletListIdx });
+      }
+    );
+  };
+
   render(): Node {
     const { intl } = this.context;
+    const { walletListIdx } = this.state;
+
     const {
-      walletsCount,
       shouldHideBalance,
       onAddWallet,
       walletAmount,
       onUpdateHideBalance,
-      walletsComponent,
+      wallets,
     } = this.props;
 
     return (
       <Dialog
         className={styles.component}
-        title={`${intl.formatMessage(messages.allWalletsLabel)} (${walletsCount})`}
+        title={`${intl.formatMessage(messages.allWalletsLabel)} (${wallets.length})`}
         closeOnOverlayClick
         closeButton={<DialogCloseButton />}
         onClose={this.props.close}
@@ -120,7 +188,20 @@ export default class WalletListDialog extends Component<Props> {
             </button>
           </div>
         </div>
-        <div className={styles.list}>{walletsComponent}</div>
+        <DragDropContext onDragEnd={this.onDragEnd}>
+          <Droppable droppableId="wallet-list-droppable">
+            {provided => (
+              <div className={styles.list} {...provided.droppableProps} ref={provided.innerRef}>
+                {walletListIdx.length > 0 &&
+                  walletListIdx.map((walletId, idx) => {
+                    const wallet = this.props.wallets.find(w => w.walletId === walletId);
+                    return <WalletCard key={walletId} idx={idx} {...wallet} />;
+                  })}
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
+        </DragDropContext>
         <div className={styles.footer}>
           <button type="button" className={styles.toggleButton} onClick={onAddWallet}>
             {intl.formatMessage(messages.addWallet)}

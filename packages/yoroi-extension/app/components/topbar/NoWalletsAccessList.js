@@ -5,6 +5,7 @@ import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import styles from './NoWalletsAccessList.scss';
+import StarIcon from '../../assets/images/add-wallet/wallet-list/stared.inline.svg';
 
 const messages = defineMessages({
   quickAccess: {
@@ -32,11 +33,10 @@ export default class NoWalletsAccessList extends Component<Props> {
   render(): Node {
     const { intl } = this.context;
 
-    // ;
-
     return (
       <div className={styles.wrapper}>
         <div className={styles.header}>
+          <StarIcon />
           <h3>{intl.formatMessage(messages.quickAccess)}</h3>
         </div>
         <div className={styles.content}>

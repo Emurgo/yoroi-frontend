@@ -426,6 +426,7 @@ export const RemoveWallet = (): Node => {
         getConceptualWalletSettingsCache: lookup.getConceptualWalletSettingsCache,
         getSigningKeyCache: lookup.getSigningKeyCache,
       });
+      // $FlowFixMe[prop-missing]: Some props are quite different for revamp components
       return (
         <WalletSettingsPage
           generated={{
@@ -439,6 +440,7 @@ export const RemoveWallet = (): Node => {
             },
             ChangeWalletPasswordDialogContainerProps: (null: any),
             ExportWalletDialogContainerProps: (null: any),
+            // $FlowFixMe[incompatible-type]: Revamp has different logic
             RemoveWalletDialogContainerProps: {
               generated: {
                 stores: {

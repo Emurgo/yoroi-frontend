@@ -1,5 +1,5 @@
 // @flow
-//  ==== Theme: Yoroi Modern === //
+//  ==== Theme: Yoroi YoroiRevamp === //
 import common from './Common';
 
 // FONTS
@@ -193,7 +193,7 @@ const modalMargin = {
   left: 40,
 };
 
-const YoroiModern = {
+const YoroiRevamp = {
   // COMMON-THEME-INDEPENDENT
   ...common,
 
@@ -538,7 +538,7 @@ const YoroiModern = {
 };
 
 // *************************************************************
-// Here we are overriding YoroiModern theme for Shelley Testnet
+// Here we are overriding YoroiRevamp theme for Shelley Testnet
 // Creating a new theme is costly because not only color
 // changes but layout is different in different theme.
 // e.g for new theme we need to override :global(.NewTheme)
@@ -575,10 +575,10 @@ const ShelleyTestnetOverrides = {
 export const getThemeVars: ('shelley' | void) => { ... } = env => {
   if (env === 'shelley') {
     const mergedTheme = {
-      ...YoroiModern,
+      ...YoroiRevamp,
       ...ShelleyTestnetOverrides,
     };
     return mergedTheme;
   }
-  return YoroiModern;
+  return YoroiRevamp;
 };
