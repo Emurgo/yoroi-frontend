@@ -733,6 +733,8 @@
   "wallet.summary.page.walletCreatedNotificationMessage": "You have successfully created a new Wallet",
   "wallet.summary.page.walletRestoredNotificationMessage": "You have successfully restored your Wallet",
   "wallet.summary.page.yesterdayLabel": "Yesterday",
+  "wallet.topbar.dialog.tokenTypes": "Token types",
+  "wallet.topbar.dialog.totalBalance": "Total Balance",
   "wallet.transaction.address.from": "From address",
   "wallet.transaction.address.to": "To address",
   "wallet.transaction.address.type": "Address Type",

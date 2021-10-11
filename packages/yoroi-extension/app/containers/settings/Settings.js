@@ -14,6 +14,7 @@ import { buildRoute } from '../../utils/routing';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import type { GeneratedData as SidebarContainerData } from '../SidebarContainer';
 import type { GeneratedData as NavBarContainerData } from '../NavBarContainer';
+import type { GeneratedData as NavBarContainerRevampData } from '../NavBarContainerRevamp';
 
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import SidebarContainer from '../SidebarContainer';
@@ -91,7 +92,7 @@ class Settings extends Component<AllProps> {
         sidebar={sidebarContainer}
         navbar={
           <NavBarContainerRevamp
-            {...this.generated.NavBarContainerProps}
+            {...this.generated.NavBarContainerRevampProps}
             title={
               <NavBarTitle
                 title={this.context.intl.formatMessage(globalMessages.sidebarSettings)}
@@ -115,6 +116,7 @@ class Settings extends Component<AllProps> {
   @computed get generated(): {|
     BannerContainerProps: InjectedOrGenerated<BannerContainerData>,
     NavBarContainerProps: InjectedOrGenerated<NavBarContainerData>,
+    NavBarContainerRevampProps: InjectedOrGenerated<NavBarContainerRevampData>,
     SidebarContainerProps: InjectedOrGenerated<SidebarContainerData>,
     actions: {|
       router: {|
@@ -155,6 +157,10 @@ class Settings extends Component<AllProps> {
       },
       SidebarContainerProps: ({ actions, stores }: InjectedOrGenerated<SidebarContainerData>),
       NavBarContainerProps: ({ actions, stores }: InjectedOrGenerated<NavBarContainerData>),
+      NavBarContainerRevampProps: ({
+        actions,
+        stores,
+      }: InjectedOrGenerated<NavBarContainerRevampData>),
       BannerContainerProps: ({ actions, stores }: InjectedOrGenerated<BannerContainerData>),
     });
   }

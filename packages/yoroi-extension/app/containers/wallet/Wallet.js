@@ -28,6 +28,7 @@ import NavBarContainerRevamp from '../NavBarContainerRevamp';
 import globalMessages from '../../i18n/global-messages';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
 import SubMenu from '../../components/topbar/SubMenu';
+import type { GeneratedData as NavBarContainerRevampData } from '../NavBarContainerRevamp';
 
 export type GeneratedData = typeof Wallet.prototype.generated;
 
@@ -183,7 +184,7 @@ class Wallet extends Component<AllProps> {
         sidebar={sidebarContainer}
         navbar={
           <NavBarContainerRevamp
-            {...this.generated.NavBarContainerProps}
+            {...this.generated.NavBarContainerRevampProps}
             title={<NavBarTitle title={intl.formatMessage(globalMessages.walletLabel)} />}
             menu={menu}
           />
@@ -210,6 +211,7 @@ class Wallet extends Component<AllProps> {
   @computed get generated(): {|
     BannerContainerProps: InjectedOrGenerated<BannerContainerData>,
     NavBarContainerProps: InjectedOrGenerated<NavBarContainerData>,
+    NavBarContainerRevampProps: InjectedOrGenerated<NavBarContainerRevampData>,
     SidebarContainerProps: InjectedOrGenerated<SidebarContainerData>,
     actions: {|
       router: {|
@@ -285,6 +287,10 @@ class Wallet extends Component<AllProps> {
       },
       SidebarContainerProps: ({ actions, stores }: InjectedOrGenerated<SidebarContainerData>),
       NavBarContainerProps: ({ actions, stores }: InjectedOrGenerated<NavBarContainerData>),
+      NavBarContainerRevampProps: ({
+        actions,
+        stores,
+      }: InjectedOrGenerated<NavBarContainerRevampData>),
       BannerContainerProps: ({ actions, stores }: InjectedOrGenerated<BannerContainerData>),
     });
   }

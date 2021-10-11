@@ -112,8 +112,12 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
             </div>
             <div className={styles.fixedAmount}>
               <p>
-                {/* TODO: fix value */}
-                !!2,000,00 USD
+                {/* TODO: fix value to USD */}
+                {this.renderAmountDisplay({
+                  shouldHideBalance,
+                  amount: totalAmount,
+                })}{' '}
+                USD
               </p>
             </div>
           </div>

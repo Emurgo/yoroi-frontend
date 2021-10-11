@@ -4,8 +4,6 @@ import React, { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import type { InjectedOrGenerated } from '../types/injectedPropsType';
-import { intlShape } from 'react-intl';
-// import { intlShape, defineMessages } from 'react-intl';
 import NavBarRevamp from '../components/topbar/NavBarRevamp';
 import NoWalletsDropdown from '../components/topbar/NoWalletsDropdown';
 import NavDropdownRevamp from '../components/topbar/NavDropdownRevamp';
@@ -13,7 +11,6 @@ import { ROUTES } from '../routes-config';
 import { ConceptualWallet } from '../api/ada/lib/storage/models/ConceptualWallet/index';
 import { asGetPublicKey } from '../api/ada/lib/storage/models/PublicDeriver/traits';
 import { PublicDeriver } from '../api/ada/lib/storage/models/PublicDeriver';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { DelegationRequests } from '../stores/toplevel/DelegationStore';
 import type { ConceptualWalletSettingsCache } from '../stores/toplevel/WalletSettingsStore';
 import type { PublicKeyCache } from '../stores/toplevel/WalletStore';
@@ -22,12 +19,16 @@ import type { IGetPublic } from '../api/ada/lib/storage/models/PublicDeriver/int
 import type { TokenRow } from '../api/ada/lib/storage/database/primitives/tables';
 import { MultiToken } from '../api/common/lib/MultiToken';
 import type { TokenInfoMap } from '../stores/toplevel/TokenInfoStore';
-import { genLookupOrFail } from '../stores/stateless/tokenHelpers';
 import BuySellDialog from '../components/buySell/BuySellDialog';
-
+import { genLookupOrFail, getTokenName } from '../stores/stateless/tokenHelpers';
 import NavWalletDetailsRevamp from '../components/topbar/NavWalletDetailsRevamp';
 import BuySellAdaButton from '../components/topbar/BuySellAdaButton';
 import NoWalletsAccessList from '../components/topbar/NoWalletsAccessList';
+import WalletListDialog from '../components/topbar/WalletListDialog';
+import { networks } from '../api/ada/lib/storage/database/prepackaged/networks';
+import { addressToDisplayString } from '../api/ada/lib/storage/bridge/utils';
+import { getReceiveAddress } from '../stores/stateless/addressStores';
+import WalletCard from '../components/topbar/WalletCard';
 
 export type GeneratedData = typeof NavBarContainerRevamp.prototype.generated;
 
@@ -41,9 +42,6 @@ type Props = {|
 export default class NavBarContainerRevamp extends Component<Props> {
   static defaultProps: {| menu: void |} = {
     menu: undefined,
-  };
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
   };
 
   updateHideBalance: void => Promise<void> = async () => {
@@ -118,29 +116,149 @@ export default class NavBarContainerRevamp extends Component<Props> {
           headerComponent={getDropdownHead()}
           contentComponents={<NoWalletsAccessList />}
           walletsCount={wallets.length}
-          openWalletInfoDialog={() =>
-            this.generated.actions.router.goToRoute.trigger({ route: ROUTES.MY_WALLETS })
-          }
+          openWalletInfoDialog={() => {
+            this.generated.actions.dialogs.open.trigger({ dialog: WalletListDialog });
+            this.generated.actions.router.goToRoute.trigger({
+              route: ROUTES.WALLETS.DELEGATION_DASHBOARD,
+            });
+          }}
         />
       );
     })();
 
     return (
-      <NavBarRevamp
-        title={this.props.title}
-        menu={this.props.menu}
-        walletDetails={dropdownComponent}
-        goToNotifications={() =>
-          this.generated.actions.router.goToRoute.trigger({
-            route: ROUTES.NOTICE_BOARD.ROOT,
-          })
-        }
-        buyButton={
-          <BuySellAdaButton onBuySellClick={() => this.openDialogWrapper(BuySellDialog)} />
-        }
-      />
+      <>
+        {this.getDialog()}
+        <NavBarRevamp
+          title={this.props.title}
+          menu={this.props.menu}
+          walletDetails={dropdownComponent}
+          goToNotifications={() =>
+            this.generated.actions.router.goToRoute.trigger({
+              route: ROUTES.NOTICE_BOARD.ROOT,
+            })
+          }
+          buyButton={
+            <BuySellAdaButton
+              onBuySellClick={() =>
+                this.generated.actions.dialogs.open.trigger({ dialog: BuySellDialog })
+              }
+            />
+          }
+        />
+      </>
     );
   }
+
+  getDialog: void => Node = () => {
+    const publicDeriver = this.generated.stores.wallets.selected;
+    if (publicDeriver == null) {
+      // TODO: Remove style since for now, we don't have a selected wallet by default
+      return (
+        <div style={{ marginRight: '100px' }}>
+          <NoWalletsDropdown />
+        </div>
+      );
+    }
+    const wallets = this.generated.stores.wallets.publicDerivers;
+    const txRequests = this.generated.stores.transactions.getTxRequests(publicDeriver);
+    const balance = txRequests.requests.getBalanceRequest.result || null;
+
+    const walletComponents = wallets.map(wallet => {
+      const parent = wallet.getParent();
+      const settingsCache = this.generated.stores.walletSettings.getConceptualWalletSettingsCache(
+        parent
+      );
+
+      const withPubKey = asGetPublicKey(wallet);
+      const plate =
+        withPubKey == null
+          ? null
+          : this.generated.stores.wallets.getPublicKeyCache(withPubKey).plate;
+
+      return (
+        <WalletCard
+          key={wallet.getPublicDeriverId()}
+          rewards={this.getRewardBalance(publicDeriver)}
+          walletAmount={balance}
+          getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
+          plate={plate}
+          wallet={settingsCache}
+          shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
+          onSelect={() => this.switchToNewWallet(wallet)}
+          isCurrentWallet={wallet === this.generated.stores.wallets.selected}
+        />
+      );
+    });
+
+    if (this.generated.stores.uiDialogs.isOpen(WalletListDialog)) {
+      return (
+        <WalletListDialog
+          walletsComponent={walletComponents}
+          walletsCount={wallets.length}
+          close={this.generated.actions.dialogs.closeActiveDialog.trigger}
+          shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
+          onUpdateHideBalance={this.updateHideBalance}
+          getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
+          walletAmount={balance}
+          onAddWallet={() =>
+            this.generated.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD })
+          }
+        />
+      );
+    }
+    if (this.generated.stores.uiDialogs.isOpen(BuySellDialog)) {
+      return (
+        <BuySellDialog
+          onCancel={this.generated.actions.dialogs.closeActiveDialog.trigger}
+          genWalletList={async () => {
+            return await this.generateUnusedAddressesPerWallet(wallets);
+          }}
+        />
+      );
+    }
+    return null;
+  };
+
+  generateUnusedAddressesPerWallet: (Array<PublicDeriver<>>) => Promise<Array<any>> = async (
+    wallets: Array<PublicDeriver<>>
+  ) => {
+    const infoWallets = wallets.map(async (wallet: PublicDeriver<>) => {
+      const parent: ConceptualWallet = wallet.getParent();
+      const settingsCache: ConceptualWalletSettingsCache
+        = this.generated.stores.walletSettings.getConceptualWalletSettingsCache(
+          parent
+        );
+
+      const defaultToken = this.generated.stores.tokenInfoStore.getDefaultTokenInfo(
+        wallet.getParent().getNetworkInfo().NetworkId
+      );
+      const currencyName = getTokenName(defaultToken);
+
+      if (defaultToken.NetworkId !== networks.CardanoMainnet.NetworkId) {
+        return null;
+      }
+
+      const receiveAddress = await this.generated.getReceiveAddress(wallet);
+      if (receiveAddress == null) return null;
+      const anAddressFormatted = addressToDisplayString(
+        receiveAddress.addr.Hash,
+        parent.getNetworkInfo()
+      );
+
+      return {
+        walletName: settingsCache.conceptualWalletName,
+        currencyName,
+        anAddressFormatted,
+      };
+    });
+
+    return (await Promise.all(infoWallets)).reduce((acc, next) => {
+      if (next == null) return acc;
+      acc.push(next);
+      return acc;
+    }, []);
+  };
 
   /**
    * undefined => wallet is not a reward wallet
@@ -167,6 +285,9 @@ export default class NavBarContainerRevamp extends Component<Props> {
             params?: any,
           |}) => void,
         |},
+        closeActiveDialog: {|
+          trigger: (params: void) => void,
+        |},
       |},
       profile: {|
         updateHideBalance: {|
@@ -192,6 +313,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
     |},
     stores: {|
       app: {| currentRoute: string |},
+      uiDialogs: {| isOpen: any => boolean |},
       delegation: {|
         getDelegationRequests: (PublicDeriver<>) => void | DelegationRequests,
       |},
@@ -214,6 +336,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
         selected: null | PublicDeriver<>,
       |},
     |},
+    getReceiveAddress: typeof getReceiveAddress,
   |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
@@ -223,6 +346,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
     }
     const { stores, actions } = this.props;
     return Object.freeze({
+      getReceiveAddress,
       stores: {
         app: {
           currentRoute: stores.app.currentRoute,
@@ -238,6 +362,9 @@ export default class NavBarContainerRevamp extends Component<Props> {
         tokenInfoStore: {
           tokenInfo: stores.tokenInfoStore.tokenInfo,
           getDefaultTokenInfo: stores.tokenInfoStore.getDefaultTokenInfo,
+        },
+        uiDialogs: {
+          isOpen: stores.uiDialogs.isOpen,
         },
         profile: {
           shouldHideBalance: stores.profile.shouldHideBalance,
@@ -261,6 +388,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
         },
         dialogs: {
           open: { trigger: actions.dialogs.open.trigger },
+          closeActiveDialog: { trigger: actions.dialogs.closeActiveDialog.trigger },
         },
       },
     });

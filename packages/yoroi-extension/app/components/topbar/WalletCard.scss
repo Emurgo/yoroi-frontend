@@ -1,7 +1,8 @@
 @import '../../themes/mixins/loading-spinner';
 
-.wrapper {
-  min-width: 300px;
+.main {
+  font-family: var(--font-regular);
+  flex: 1;
   canvas {
     width: 32px !important;
     height: 32px !important;
@@ -17,14 +18,13 @@
   margin-bottom: 8px;
 }
 
-.card {
+.body {
   display: flex;
   align-items: center;
 }
 
 .name {
   margin-right: 5px;
-  font-family: var(--font-regular);
 }
 
 .type {
@@ -34,7 +34,6 @@
 }
 .data {
   margin-left: 12px;
-  font-family: var(--font-regular);
 }
 
 .isLoading {
@@ -44,19 +43,20 @@
   margin-bottom: 4px;
 }
 
+.fixedAmount {
+  color: #6b7384;
+}
 .amount {
   font-family: var(--font-medium);
-
+  flex: 1;
   .isLoading {
     margin-left: 9px;
     margin-bottom: 6px;
     @include loading-spinner('../../assets/images/spinner-dark.svg', 16);
   }
 }
-.fixedAmount {
-  color: #6b7384;
-}
 .content {
+  flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -64,4 +64,60 @@
   font-size: 14px;
   line-height: 22px;
   margin-left: 12px;
+}
+
+.extraInfo {
+  flex: 1;
+  text-align: left;
+  .label {
+    color: #6b7384;
+    line-height: 22px;
+  }
+  .value {
+    color: #2b2c32;
+  }
+}
+.actions {
+  min-width: 80px;
+  svg {
+    max-width: 24px;
+    max-height: 24px;
+    color: #6b7384;
+  }
+  button {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    &:hover {
+      background: #eaedf2;
+    }
+  }
+}
+
+.cardWrapper {
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--theme-wallet-dropdown-background-color);
+  border-radius: 8px;
+  border: 1px solid transparent;
+
+  & + & {
+    margin-top: 14px;
+  }
+
+  &:hover {
+    cursor: pointer;
+    border: 1px solid #eaedf2;
+  }
+}
+
+.currentCardWrapper {
+  border: 1px solid #3154cb;
+
+  &:hover {
+    cursor: pointer;
+    border: 1px solid #3154cb;
+  }
 }

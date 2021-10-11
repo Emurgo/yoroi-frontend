@@ -28,6 +28,7 @@ import HorizontalLine from '../../components/widgets/HorizontalLine';
 import NavBarContainerRevamp from '../NavBarContainerRevamp';
 import { withLayout } from '../../themes/context/layout';
 import type { LayoutComponentMap } from '../../themes/context/layout';
+import type { GeneratedData as NavBarContainerRevampData } from '../NavBarContainerRevamp';
 
 export type GeneratedData = typeof Transfer.prototype.generated;
 
@@ -64,7 +65,7 @@ class Transfer extends Component<AllProps> {
 
     const navbarRevamp = (
       <NavBarContainerRevamp
-        {...this.generated.NavBarContainerProps}
+        {...this.generated.NavBarContainerRevampProps}
         title={
           <NavBarTitle title={this.context.intl.formatMessage(globalMessages.sidebarSettings)} />
         }
@@ -113,6 +114,7 @@ class Transfer extends Component<AllProps> {
   @computed get generated(): {|
     BannerContainerProps: InjectedOrGenerated<BannerContainerData>,
     NavBarContainerProps: InjectedOrGenerated<NavBarContainerData>,
+    NavBarContainerRevampProps: InjectedOrGenerated<NavBarContainerRevampData>,
     SidebarContainerProps: InjectedOrGenerated<SidebarContainerData>,
     WalletTransferPageProps: InjectedOrGenerated<WalletTransferPageData>,
     actions: {|
@@ -157,6 +159,9 @@ class Transfer extends Component<AllProps> {
       ),
       NavBarContainerProps: (
         { actions, stores, }: InjectedOrGenerated<NavBarContainerData>
+      ),
+      NavBarContainerRevampProps: (
+        { actions, stores, }: InjectedOrGenerated<NavBarContainerRevampData>
       ),
       WalletTransferPageProps: (
         { actions, stores, }: InjectedOrGenerated<WalletTransferPageData>
