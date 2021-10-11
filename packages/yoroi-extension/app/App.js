@@ -113,19 +113,21 @@ class App extends Component<Props, State> {
         <MuiThemeProvide theme={theme}>
           <CssBaseline />
           {globalStyles(theme)}
-          <ThemeManager variables={themeVars} />
-          {/* Automatically pass a theme prop to all components in this subtree. */}
-          <ThemeProvider
-            key={currentTheme}
-            theme={yoroiPolymorphTheme}
-            skins={SimpleSkins}
-            variables={SimpleDefaults}
-            themeOverrides={themeOverrides(currentTheme)}
-          >
-            <IntlProvider {...{ locale, key: locale, messages: mergedMessages }}>
-              {this.getContent()}
-            </IntlProvider>
-          </ThemeProvider>
+          <LayoutProvider>
+            <ThemeManager variables={themeVars} />
+            {/* Automatically pass a theme prop to all components in this subtree. */}
+            <ThemeProvider
+              key={currentTheme}
+              theme={yoroiPolymorphTheme}
+              skins={SimpleSkins}
+              variables={SimpleDefaults}
+              themeOverrides={themeOverrides(currentTheme)}
+            >
+              <IntlProvider {...{ locale, key: locale, messages: mergedMessages }}>
+                {this.getContent()}
+              </IntlProvider>
+            </ThemeProvider>
+          </LayoutProvider>
         </MuiThemeProvide>
       </div>
     );
