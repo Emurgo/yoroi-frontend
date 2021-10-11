@@ -1,7 +1,6 @@
 // @flow
 
 import type { Node } from 'react';
-import React from 'react';
 
 import TermsOfUseSettingsPage from './TermsOfUseSettingsPage';
 import { withScreenshot } from 'storycap';

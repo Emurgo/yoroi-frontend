@@ -1,5 +1,5 @@
 // @flow
-import React, { Component } from 'react';
+import { Component } from 'react';
 import type { Node, ComponentType } from 'react';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';

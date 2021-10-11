@@ -1,6 +1,6 @@
 // @flow
 import type { Node } from 'react';
-import React, { Component } from 'react';
+import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { computed, observable, runInAction, } from 'mobx';
 import UserPasswordDialog from '../../../components/wallet/add/paper-wallets/UserPasswordDialog';

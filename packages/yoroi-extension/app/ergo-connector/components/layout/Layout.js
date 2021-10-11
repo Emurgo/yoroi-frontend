@@ -1,5 +1,5 @@
 // @flow
-import React, { Component } from 'react';
+import { Component } from 'react';
 import type { Node } from 'react';
 import YoroiLogo from '../../assets/images/yoroi_logo.inline.svg';
 import MenuIcon from '../../assets/images/menu_icon.inline.svg';

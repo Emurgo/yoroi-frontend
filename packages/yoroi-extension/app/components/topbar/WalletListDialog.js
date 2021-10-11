@@ -1,7 +1,7 @@
 // @flow
 
 import type { Node } from 'react';
-import React, { Component } from 'react';
+import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import Dialog from '../widgets/Dialog';

@@ -1,5 +1,4 @@
 // @flow
-import * as React from 'react';
 import styles from './ProgressBar.scss';
 
 import type { Node } from 'react';

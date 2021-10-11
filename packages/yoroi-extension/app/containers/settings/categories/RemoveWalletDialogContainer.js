@@ -1,6 +1,6 @@
 // @flow
 import type { Node, ComponentType } from 'react';
-import React, { Component } from 'react';
+import { Component } from 'react';
 import { computed, action, observable } from 'mobx';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
