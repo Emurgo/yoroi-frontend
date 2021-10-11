@@ -105,8 +105,10 @@ class App extends Component<Props, State> {
 
     changeToplevelTheme(currentTheme);
 
-    // eslint-disable-next-line no-constant-condition
-    const theme = true ? modernTheme : classicTheme;
+    // <TODO:THEME_SELECT>
+    const isModernTheme = true;
+
+    const theme = isModernTheme ? modernTheme : classicTheme;
 
     return (
       <div style={{ height: '100%' }}>
