@@ -17,7 +17,6 @@ import id from 'react-intl/locale-data/id';
 import es from 'react-intl/locale-data/es';
 import it from 'react-intl/locale-data/it';
 import tr from 'react-intl/locale-data/tr';
-import '../../app/themes/index.global.scss';
 import { ThemeProvider } from '@mui/material/styles';
 import { CssBaseline } from '@mui/material';
 import { globalStyles } from '../../app/styles/globalStyles';

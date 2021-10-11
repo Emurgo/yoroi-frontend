@@ -134,12 +134,96 @@ const globalStyles = (theme: Object): Node => (
         '--component-dialog-overlay-background-color': 'var(--th-palette-background-overlay)',
         '--component-dialog-min-width-cmn': '540px',
       },
+
       /* === GLOBAL STYLES === */
+
+      '#root': {
+        height: '100%',
+      },
+
+      '#root > [data-reactroot]': {
+        width: '100%',
+        height: '100%',
+      },
+
+      // ============ RESET ===========
+      // http://meyerweb.com/eric/tools/css/reset
+
+      'html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td,article,aside,canvas,details,embed,figure,figcaption,footer,header,hgroup,menu,nav,output,ruby,section,summary,time,mark,audio,video': {
+        margin: 0,
+        padding: 0,
+        border: 0,
+        fontSize: '100%',
+        font: 'inherit',
+        verticalAlign: 'baseline',
+      },
+      /* HTML5 display-role reset for older browsers */
+      'article,aside,details,figcaption,figure,footer,header,hgroup,menu,nav,section': {
+        display: 'block',
+      },
+      'ol,ul': {
+        listStyle: 'none',
+      },
+      table: {
+        borderCollapse: 'collapse',
+        borderSpacing: 0,
+      },
+
+      // Buttons should not have any special style applied by default
+      button: {
+        background: 'none',
+        border: 'none',
+        padding: 0,
+
+        '&:focus': {
+          outline: 0,
+        },
+      },
+      '*': {
+        boxSizing: 'border-box',
+        '&::-webkit-scrollbar': {
+          width: '20px',
+        },
+        '&::-webkit-scrollbar-track': {
+          backgroundColor: 'transparent',
+        },
+        '&::-webkit-scrollbar-thumb': {
+          backgroundColor: 'var(--scrollbar-thumb-background)',
+          border: '7px solid transparent',
+          borderRadius: '12px',
+          backgroundClip: 'content-box',
+        },
+      },
+
+      // ====== GLOBAL SCROLLBAR STYLE ======
+      'html,body,#root,#root > [data-reactroot]': {
+        width: '100%',
+        height: '100%',
+        '-webkit-font-smoothing': 'antialiased',
+        ':global(.YoroiClassic)': {
+          letterSpacing: '1px',
+        },
+      },
       body: {
         /* To remove background color for Chrome Inputs */
         'input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus,input:-webkit-autofill:active': {
           WebkitBoxShadow: '0 0 0 30px rgba(255, 255, 255) inset !important',
         },
+        '-webkit-font-smoothing': 'antialiased',
+        lineHeight: 1,
+        fontFamily: theme.typography.fontFamily,
+      },
+      // ======= RE-USABLE ANIMATIONS =======
+      '@keyframes loading-spin': {
+        from: {
+          transform: 'rotate(0deg)',
+        },
+        to: {
+          transform: 'rotate(360deg)',
+        },
+      },
+      strong: {
+        fontWeight: 500,
       },
     }}
   />
