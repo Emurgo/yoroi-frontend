@@ -342,7 +342,5 @@ export function ergoTxEqual(
   req1: RustModule.SigmaRust.TxBuilder,
   req2: RustModule.SigmaRust.TxBuilder,
 ): boolean {
-  const tx1 = req1.build().to_json();
-  const tx2 = req2.build().to_json();
-  return JSON.stringify(tx1) === JSON.stringify(tx2);
+  return req1.build().to_json() === req2.build().to_json();
 }

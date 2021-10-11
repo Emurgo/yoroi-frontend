@@ -798,6 +798,16 @@ Object {
       "Name": "ErgoPlatform",
       "NetworkId": 200,
     },
+    Object {
+      "Endpoints": Object {
+        "address": "https://explorer.alonzo-white.dev.cardano.org/en/address?address=",
+        "transaction": "https://explorer.alonzo-white.dev.cardano.org/en/transaction?id=",
+      },
+      "ExplorerId": 500,
+      "IsBackup": true,
+      "Name": "CardanoExplorer",
+      "NetworkId": 400,
+    },
   ],
   "HwWalletMeta": Array [],
   "Key": Array [
@@ -1301,6 +1311,40 @@ Object {
       "NetworkId": 300,
       "NetworkName": "Cardano Testnet",
     },
+    Object {
+      "Backend": Object {
+        "BackendService": "https://alonzo-backend.yoroiwallet.com",
+        "TokenInfoService": "https://stage-cdn.yoroiwallet.com",
+        "WebSocket": "wss://alonzo-backend.yoroiwallet.com:443",
+      },
+      "BaseConfig": Array [
+        Object {
+          "ByronNetworkId": 1097911063,
+          "ChainNetworkId": "0",
+          "GenesisDate": "1563999616000",
+          "SlotDuration": 20,
+          "SlotsPerEpoch": 21600,
+          "StartAt": 0,
+        },
+        Object {
+          "KeyDeposit": "2000000",
+          "LinearFee": Object {
+            "coefficient": "44",
+            "constant": "155381",
+          },
+          "MinimumUtxoVal": "1000000",
+          "PerEpochPercentageReward": 69344,
+          "PoolDeposit": "500000000",
+          "SlotDuration": 1,
+          "SlotsPerEpoch": 432000,
+          "StartAt": 0,
+        },
+      ],
+      "CoinType": 2147485463,
+      "Fork": 0,
+      "NetworkId": 400,
+      "NetworkName": "Alonzo Testnet",
+    },
   ],
   "PreferredExplorer": Array [],
   "PriceData": Array [],
@@ -1339,6 +1383,7 @@ Object {
       "Digest": 6.262633522161549e-167,
       "Identifier": "",
       "IsDefault": true,
+      "IsNFT": false,
       "Metadata": Object {
         "assetName": "",
         "longName": null,
@@ -1354,6 +1399,7 @@ Object {
       "Digest": 6.262633522161549e-167,
       "Identifier": "",
       "IsDefault": true,
+      "IsNFT": false,
       "Metadata": Object {
         "assetName": "",
         "longName": null,
@@ -1369,6 +1415,7 @@ Object {
       "Digest": 6.262633522161549e-167,
       "Identifier": "",
       "IsDefault": true,
+      "IsNFT": false,
       "Metadata": Object {
         "boxId": "",
         "description": null,
@@ -1385,6 +1432,7 @@ Object {
       "Digest": 6.262633522161549e-167,
       "Identifier": "",
       "IsDefault": true,
+      "IsNFT": false,
       "Metadata": Object {
         "assetName": "",
         "longName": null,
@@ -1395,6 +1443,22 @@ Object {
       },
       "NetworkId": 300,
       "TokenId": 4,
+    },
+    Object {
+      "Digest": 6.262633522161549e-167,
+      "Identifier": "",
+      "IsDefault": true,
+      "IsNFT": false,
+      "Metadata": Object {
+        "assetName": "",
+        "longName": null,
+        "numberOfDecimals": 6,
+        "policyId": "",
+        "ticker": "TADA",
+        "type": "Cardano",
+      },
+      "NetworkId": 400,
+      "TokenId": 5,
     },
   ],
   "TokenList": Array [],

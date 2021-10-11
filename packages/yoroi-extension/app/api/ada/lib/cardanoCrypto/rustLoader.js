@@ -3,7 +3,12 @@
 import typeof * as WasmV2 from 'cardano-wallet-browser';
 import typeof * as WasmV3 from '@emurgo/js-chain-libs/js_chain_libs';
 import typeof * as WasmV4 from '@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib';
+import type { BigNum, LinearFee, TransactionBuilder } from '@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib';
 import typeof * as SigmaRust from 'ergo-lib-wasm-browser';
+
+// TODO: unmagic the constants
+const MAX_VALUE_BYTES = 5000;
+const MAX_TX_BYTES = 16384;
 
 class Module {
   _wasmv2: WasmV2;
@@ -30,6 +35,24 @@ class Module {
   // Need to expose through a getter to get Flow to detect the type correctly
   get WalletV4(): WasmV4 {
     return this._wasmv4;
+  }
+  // Need to expose through a getter to get Flow to detect the type correctly
+  WalletV4TxBuilder(
+    linearFee: LinearFee,
+    minimumUtxoVal: BigNum,
+    poolDeposit: BigNum,
+    keyDeposit: BigNum,
+    maxValueBytes: number = MAX_VALUE_BYTES,
+    maxTxBytes: number = MAX_TX_BYTES,
+  ): TransactionBuilder {
+    return this.WalletV4.TransactionBuilder.new(
+      linearFee,
+      minimumUtxoVal,
+      poolDeposit,
+      keyDeposit,
+      maxValueBytes,
+      maxTxBytes,
+    );
   }
   // Need to expose through a getter to get Flow to detect the type correctly
   get SigmaRust(): SigmaRust {

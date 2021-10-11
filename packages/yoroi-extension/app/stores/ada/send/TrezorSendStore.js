@@ -22,6 +22,18 @@ import { getApiForNetwork, ApiOptions } from '../../../api/common/utils';
 import { HaskellShelleyTxSignRequest } from '../../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 import type { ActionsMap } from '../../../actions/index';
 import type { StoresMap } from '../../index';
+import { buildSignedTransaction } from '../../../api/ada/transactions/shelley/trezorTx';
+import {
+  asGetPublicKey,
+  asHasLevels,
+  asGetStakingKey,
+} from '../../../api/ada/lib/storage/models/PublicDeriver/traits';
+import { RustModule } from '../../../api/ada/lib/cardanoCrypto/rustLoader';
+import type {
+  ConceptualWallet
+} from '../../../api/ada/lib/storage/models/ConceptualWallet/index';
+import { derivePublicByAddressing } from '../../../api/ada/lib/cardanoCrypto/utils';
+import { generateRegistrationMetadata } from '../../../api/ada/lib/cardanoCrypto/catalyst';
 
 /** Note: Handles Trezor Signing */
 export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
@@ -119,17 +131,115 @@ export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
 
       if (trezorSignTxResp && trezorSignTxResp.payload && trezorSignTxResp.payload.error != null) {
         // this Error will be converted to LocalizableError()
+        // noinspection ExceptionCaughtLocallyJS
         throw new Error(trezorSignTxResp.payload.error);
       }
       if (!trezorSignTxResp.success) {
+        // noinspection ExceptionCaughtLocallyJS
         throw new Error(`${nameof(TrezorSendStore)}::${nameof(this.signAndBroadcast)} should never happen`);
       }
+
+      const withLevels = asHasLevels<ConceptualWallet>(request.publicDeriver);
+      if (withLevels == null) {
+        // noinspection ExceptionCaughtLocallyJS
+        throw new Error(`${nameof(this.signAndBroadcast)} No public deriver level for this public deriver`);
+      }
+
+      const withPublicKey = asGetPublicKey(withLevels);
+      if (withPublicKey == null) {
+        // noinspection ExceptionCaughtLocallyJS
+        throw new Error(`${nameof(this.signAndBroadcast)} No public key for this public deriver`);
+      }
+      const publicKey = await withPublicKey.getPublicKey();
+
+      const publicKeyInfo = {
+        key: RustModule.WalletV4.Bip32PublicKey.from_bytes(
+          Buffer.from(publicKey.Hash, 'hex')
+        ),
+        addressing: {
+          startLevel: 1,
+          path: withLevels.getPathToPublic(),
+        },
+      };
+
+      const withStakingKey = asGetStakingKey(request.publicDeriver);
+      if (!withStakingKey) {
+        // noinspection ExceptionCaughtLocallyJS
+        throw new Error(`${nameof(this.signAndBroadcast)} can't get staking key`);
+      }
+      const stakingKeyResp = await withStakingKey.getStakingKey();
+
+      const stakingKey = derivePublicByAddressing({
+        addressing: stakingKeyResp.addressing,
+        startingFrom: {
+          level: publicKeyInfo.addressing.startLevel + publicKeyInfo.addressing.path.length - 1,
+          key: publicKeyInfo.key,
+        }
+      });
+
+      let metadata;
+
+      if (request.params.signRequest.trezorTCatalystRegistrationTxSignData) {
+        const {
+          votingPublicKey,
+          stakingKey: stakingKeyHex,
+          rewardAddress,
+          nonce,
+        } = request.params.signRequest.trezorTCatalystRegistrationTxSignData;
+
+        const auxDataSupplement = trezorSignTxResp.payload.auxiliaryDataSupplement;
+        if (
+          !auxDataSupplement
+          || auxDataSupplement.type !== 1
+          || auxDataSupplement.catalystSignature == null
+        ) {
+          // noinspection ExceptionCaughtLocallyJS
+          throw new Error(`${nameof(TrezorSendStore)}::${nameof(this.signAndBroadcast)} unexpected Trezor sign transaction response`);
+        }
+        const { catalystSignature } = auxDataSupplement;
+
+        metadata = generateRegistrationMetadata(
+          votingPublicKey,
+          stakingKeyHex,
+          rewardAddress,
+          nonce,
+          (_hashedMetadata) => {
+            return catalystSignature;
+          },
+        );
+        // We can verify that
+        //  Buffer.from(
+        //    blake2b(256 / 8).update(metadata.to_bytes()).digest('binary')
+        //  ).toString('hex') ===
+        // trezorSignTxResp.payload.auxiliaryDataSupplement.auxiliaryDataHash
+      } else {
+        metadata = request.params.signRequest.metadata;
+      }
+
+      if (metadata) {
+        request.params.signRequest.self().set_auxiliary_data(metadata);
+      }
+
+      const txBody = request.params.signRequest.self().build();
+
+      const signedTx = buildSignedTransaction(
+        txBody,
+        request.params.signRequest.senderUtxos,
+        trezorSignTxResp.payload.witnesses,
+        publicKeyInfo,
+        stakingKey,
+        metadata,
+      );
+
+      const txId = Buffer.from(
+        RustModule.WalletV4.hash_transaction(txBody).to_bytes()
+      ).toString('hex');
 
       return await this.api.ada.broadcastTrezorSignedTx({
         signedTxRequest: {
           network,
-          id: trezorSignTxResp.payload.hash,
-          encodedTx: Buffer.from(trezorSignTxResp.payload.serializedTx, 'hex'),
+          id: txId,
+          encodedTx: signedTx.to_bytes(),
         },
         sendTx: this.stores.substores.ada.stateFetchStore.fetcher.sendTx,
       });
