@@ -126,7 +126,7 @@ class Wallet extends Component<AllProps> {
     const menu = (
       <SubMenu
         options={allCategories
-          .filter(category => category.isVisible({ selected: selectedWallet }))
+          .filter(category => category.isVisible(visibilityContext))
           .map(category => ({
             className: category.className,
             label: intl.formatMessage(category.label),
