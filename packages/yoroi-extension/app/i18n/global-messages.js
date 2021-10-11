@@ -124,6 +124,10 @@ const globalMessages: * = defineMessages({
     id: 'settings.menu.wallet.link.label',
     defaultMessage: '!!!Wallet',
   },
+  assetDepositLabel: {
+    id: 'settings.menu.assetDeposit.link.label',
+    defaultMessage: '!!!Locked assets deposit',
+  },
   languageEnglish: {
     id: 'global.language.english',
     defaultMessage: '!!!English',
@@ -223,6 +227,10 @@ const globalMessages: * = defineMessages({
   walletSendConfirmationTotalLabel: {
     id: 'wallet.send.confirmationDialog.totalLabel',
     defaultMessage: '!!!Total',
+  },
+  walletSendConfirmationTxSizeLabel: {
+    id: 'wallet.send.confirmationDialog.txSizeLabel',
+    defaultMessage: '!!!Size',
   },
   connectLabel: {
     id: 'wallet.connect.hw.dialog.connect.button.label',
@@ -498,8 +506,8 @@ const globalMessages: * = defineMessages({
     defaultMessage: '!!!Wallets created before July 29th, 2020 are Byron-era wallets and cannot delegate.',
   },
   restoreShelleyEraWalletDescription: {
-    id: 'wallet.add.optionDialog.walletEra.shelleyEra.description',
-    defaultMessage: '!!!Shelley-era wallets support delegation to stake pools.',
+    id: 'wallet.add.optionDialog.walletEra.standard.description',
+    defaultMessage: '!!!Standard modern wallets support delegation to stake pools.',
   },
   hardwareTransferInstructions: {
     id: 'transfer.instructions.hardware.disclaimer.instructions1',
@@ -568,6 +576,35 @@ const globalMessages: * = defineMessages({
   sidebarTransfer: {
     id: 'sidebar.transfer',
     defaultMessage: '!!!Claim or transfer wallet',
+  },
+  // Revamp labels for sidebar
+  sidebarStaking: {
+    id: 'sidebar.staking',
+    defaultMessage: '!!!Staking',
+  },
+  sidebarAssets: {
+    id: 'sidebar.assets',
+    defaultMessage: '!!!Assets',
+  },
+  sidebarVoting: {
+    id: 'sidebar.voting',
+    defaultMessage: '!!!Voting',
+  },
+  sidebarSwap: {
+    id: 'sidebar.swap',
+    defaultMessage: '!!!Swap',
+  },
+  sidebarFaq: {
+    id: 'sidebar.faq',
+    defaultMessage: '!!!Faq',
+  },
+  sidebarNewUpdates: {
+    id: 'sidebar.newUpdates',
+    defaultMessage: '!!!New updates',
+  },
+  sidebarFeedback: {
+    id: 'sidebar.feedback',
+    defaultMessage: '!!!Feedback',
   },
   ledgerTitle: {
     id: 'wallet.add.optionDialog.connect.hw.ledger.title',
@@ -765,9 +802,9 @@ const globalMessages: * = defineMessages({
     id: 'global.errors.invalidPin',
     defaultMessage: '!!!Invalid Pin',
   },
-  buySellAda: {
-    id: 'button.buySellAda',
-    defaultMessage: '!!!Buy/Sell ADA',
+  buyAda: {
+    id: 'button.buyAda',
+    defaultMessage: '!!!Buy ADA',
   },
   txConfirmationLedgerNanoLine2: {
     id: 'wallet.send.ledger.confirmationDialog.info.line.2',

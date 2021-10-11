@@ -53,7 +53,7 @@
     }
     font-family: var(--font-medium);
     font-size: 16px;
-    line-height: 24px;
+    line-height: 20px;
 
     .afterDecimal {
         font-family: var(--font-regular);
@@ -84,8 +84,8 @@
         @include loading-spinner("../../assets/images/spinner-dark.svg", 8);
     }
     font-size: 10px;
-    line-height: 16px;
-    margin-top: 2px;
+    line-height: 14px;
+    margin-top: -2px;
 
     .afterDecimal {
         font-size: 10px;

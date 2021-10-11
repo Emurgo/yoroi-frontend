@@ -33,6 +33,7 @@ import CrashPage from './containers/CrashPage';
 import { Logger } from './utils/logging';
 import { SimpleSkins } from 'react-polymorph/lib/skins/simple';
 import { SimpleDefaults } from 'react-polymorph/lib/themes/simple';
+import { LayoutProvider } from './themes/context/layout';
 import { ThemeProvider as MuiThemeProvide } from '@mui/material/styles';
 import { CssBaseline } from '@mui/material';
 import { classicTheme, modernTheme } from './styles/themes';
@@ -104,27 +105,31 @@ class App extends Component<Props, State> {
 
     changeToplevelTheme(currentTheme);
 
-    // eslint-disable-next-line no-constant-condition
-    const theme = true ? modernTheme : classicTheme
+    // <TODO:THEME_SELECT>
+    const isModernTheme = true;
+
+    const theme = isModernTheme ? modernTheme : classicTheme;
 
     return (
       <div style={{ height: '100%' }}>
         <MuiThemeProvide theme={theme}>
           <CssBaseline />
           {globalStyles(theme)}
-          <ThemeManager variables={themeVars} />
-          {/* Automatically pass a theme prop to all components in this subtree. */}
-          <ThemeProvider
-            key={currentTheme}
-            theme={yoroiPolymorphTheme}
-            skins={SimpleSkins}
-            variables={SimpleDefaults}
-            themeOverrides={themeOverrides(currentTheme)}
-          >
-            <IntlProvider {...{ locale, key: locale, messages: mergedMessages }}>
-              {this.getContent()}
-            </IntlProvider>
-          </ThemeProvider>
+          <LayoutProvider>
+            <ThemeManager variables={themeVars} />
+            {/* Automatically pass a theme prop to all components in this subtree. */}
+            <ThemeProvider
+              key={currentTheme}
+              theme={yoroiPolymorphTheme}
+              skins={SimpleSkins}
+              variables={SimpleDefaults}
+              themeOverrides={themeOverrides(currentTheme)}
+            >
+              <IntlProvider {...{ locale, key: locale, messages: mergedMessages }}>
+                {this.getContent()}
+              </IntlProvider>
+            </ThemeProvider>
+          </LayoutProvider>
         </MuiThemeProvide>
       </div>
     );
