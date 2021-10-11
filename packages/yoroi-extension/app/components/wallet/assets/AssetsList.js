@@ -142,7 +142,7 @@ export default class AssetsList extends Component<Props, State> {
     return <ArrowsList />;
   }
 
-  renderAmountDisplay: () => Node = (request) => {
+  renderAmountDisplay: () => Node = () => {
     if (this.props.assetDeposit == null) {
       return <div className={styles.isLoading} />;
     }
@@ -181,7 +181,7 @@ export default class AssetsList extends Component<Props, State> {
 
     const { intl } = this.context;
     const { assetsList } = this.state
-    const { assetDeposit, shouldHideBalance } = this.props
+    const { assetDeposit } = this.props
 
     return (
       <div className={styles.component}>
