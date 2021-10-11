@@ -1,7 +1,6 @@
 // @flow
 import React from 'react';
 import type { Node } from 'react';
-import { THEMES, THEMES_REVAMP } from '..';
 
 type Layouts = 'CLASSIC' | 'REVAMP';
 export type LayoutComponentMap = {|
@@ -9,19 +8,10 @@ export type LayoutComponentMap = {|
 |};
 type LayoutInitialState = {|
   selected: Layouts,
-  [key: Layouts]: {|
-    themes: Object,
-  |},
 |};
 
 const initialState: LayoutInitialState = {
   selected: 'CLASSIC',
-  CLASSIC: {
-    themes: THEMES,
-  },
-  REVAMP: {
-    themes: THEMES_REVAMP,
-  },
 };
 
 const LayoutContext = React.createContext();
