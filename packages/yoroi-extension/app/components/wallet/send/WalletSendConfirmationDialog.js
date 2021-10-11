@@ -43,6 +43,7 @@ type Props = {|
   +receivers: Array<string>,
   +totalAmount: MultiToken,
   +transactionFee: MultiToken,
+  +transactionSize: ?string,
   +onSubmit: ({| password: string |}) => PossiblyAsync<void>,
   +addressToDisplayString: string => string,
   +onCancel: void => void,
@@ -303,6 +304,17 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
               </ExplorableHashContainer>
             ))}
           </div>
+
+          {this.props.transactionSize != null ? (
+            <div className={styles.addressToLabelWrapper}>
+              <div className={styles.addressToLabel}>
+                {intl.formatMessage(globalMessages.walletSendConfirmationTxSizeLabel)}
+              </div>
+              <span className={styles.txSize}>
+                {this.props.transactionSize}
+              </span>
+            </div>
+          ) : null}
 
           <div className={styles.amountFeesWrapper}>
             <div className={styles.amountWrapper}>

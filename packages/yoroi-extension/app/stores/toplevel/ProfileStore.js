@@ -133,6 +133,16 @@ export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap
     (boolean) => Promise<void>
   >(this.api.localStorage.setToggleSidebar);
 
+  @observable getSortedWalletsRequest: Request<(void) => Promise<?Array<number>>> = new Request<
+    (void) => Promise<?Array<number>>
+  >(this.api.localStorage.getSortedWallets);
+
+  @observable setSortedWalletsRequest: Request<
+    ({| sortedWallets: Array<number> |}) => Promise<void>
+  > = new Request<({| sortedWallets: Array<number> |}) => Promise<void>>(
+    ({ sortedWallets }) => this.api.localStorage.setSortedWallets(sortedWallets)
+  );
+
   setup(): void {
     super.setup();
     this.actions.profile.acceptTermsOfUse.listen(this._acceptTermsOfUse);
@@ -142,8 +152,10 @@ export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap
     this.registerReactions([
       this._checkSetupSteps,
     ]);
+    this.actions.profile.updateSortedWalletList.listen(this._updateSortedWalletList);
     this._getTermsOfUseAcceptance(); // eagerly cache
     this._getUriSchemeAcceptance(); // eagerly cache
+    this._getSortedWalletList()
   }
 
   teardown(): void {
@@ -231,6 +243,24 @@ export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap
         return;
       }
     }
+  };
+
+  // ========== Sort wallets - Revamp ========== //
+  @computed get currentSortedWallets(): (Array<number> | void) {
+    let { result } = this.getSortedWalletsRequest;
+    if (result == null) {
+      result = this.getSortedWalletsRequest.execute().result;
+    }
+    return result ?? [];
+  }
+  _getSortedWalletList: void => Promise<void> = async () => {
+    await this.getSortedWalletsRequest.execute();
+  };
+  _updateSortedWalletList: ({| sortedWallets: Array<number> |}) => Promise<void> = async ({
+    sortedWallets,
+  }) => {
+    await this.setSortedWalletsRequest.execute({ sortedWallets });
+    await this.getSortedWalletsRequest.execute();
   };
 }
 

@@ -12,6 +12,7 @@ import receiveIcon from '../../assets/images/wallet-nav/tab-receive.inline.svg';
 import dashboardIcon from '../../assets/images/wallet-nav/tab-dashboard.inline.svg';
 import delegationListIcon from '../../assets/images/wallet-nav/tab-delegation_list.inline.svg';
 import votingIcon from '../../assets/images/wallet-nav/voting.inline.svg';
+import assetsIcon from '../../assets/images/assets-page/assets.inline.svg';
 import environment from '../../environment';
 
 const messages = defineMessages({
@@ -42,6 +43,10 @@ const messages = defineMessages({
   voting: {
     id: 'wallet.navigation.voting',
     defaultMessage: '!!!Voting',
+  },
+  assets: {
+    id: 'wallet.navigation.assets',
+    defaultMessage: '!!!Assets',
   }
 });
 
@@ -52,6 +57,7 @@ export type TopbarCategory = {|
   +label?: MessageDescriptor,
   +isVisible: {|
     selected: PublicDeriver<>,
+    walletHasAssets: boolean,
   |} => (boolean | {| disabledReason: MessageDescriptor |}),
 |};
 
@@ -83,6 +89,13 @@ export const SEND: TopbarCategory = registerCategory({
   icon: sendIcon,
   label: messages.send,
   isVisible: _request => true,
+});
+export const ASSETS: TopbarCategory = registerCategory({
+  className: 'assets',
+  route: ROUTES.WALLETS.ASSETS,
+  icon: assetsIcon,
+  label: messages.assets,
+  isVisible: ({ walletHasAssets }) => walletHasAssets,
 });
 export const RECEIVE: TopbarCategory = registerCategory({
   className: 'receive',

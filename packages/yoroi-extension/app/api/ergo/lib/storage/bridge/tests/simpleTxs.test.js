@@ -313,6 +313,7 @@ async function syncingSimpleTransaction(): Promise<void> {
             Token: {
               Digest: 6.262633522161549e-167,
               IsDefault: true,
+              IsNFT: false,
               Identifier: '',
               Metadata: {
                 longName: null,
@@ -432,6 +433,7 @@ async function syncingSimpleTransaction(): Promise<void> {
             Token: {
               Digest: 6.262633522161549e-167,
               IsDefault: true,
+              IsNFT: false,
               Identifier: '',
               Metadata: {
                 longName: null,
@@ -493,6 +495,7 @@ async function syncingSimpleTransaction(): Promise<void> {
             Token: {
               Digest: 6.262633522161549e-167,
               IsDefault: true,
+              IsNFT: false,
               Identifier: '',
               Metadata: {
                 longName: null,

@@ -33,6 +33,7 @@ import CrashPage from './containers/CrashPage';
 import { Logger, } from './utils/logging';
 import { SimpleSkins } from 'react-polymorph/lib/skins/simple';
 import { SimpleDefaults } from 'react-polymorph/lib/themes/simple';
+import { LayoutProvider } from './themes/context/layout';
 
 // https://github.com/yahoo/react-intl/wiki#loading-locale-data
 addLocaleData([
@@ -105,20 +106,21 @@ class App extends Component<Props, State> {
 
     return (
       <div style={{ height: '100%' }}>
-        <ThemeManager variables={themeVars} />
-
-        {/* Automatically pass a theme prop to all components in this subtree. */}
-        <ThemeProvider
-          key={currentTheme}
-          theme={yoroiPolymorphTheme}
-          skins={SimpleSkins}
-          variables={SimpleDefaults}
-          themeOverrides={themeOverrides(currentTheme)}
-        >
-          <IntlProvider {...{ locale, key: locale, messages: mergedMessages }}>
-            {this.getContent()}
-          </IntlProvider>
-        </ThemeProvider>
+        <LayoutProvider>
+          <ThemeManager variables={themeVars} />
+          {/* Automatically pass a theme prop to all components in this subtree. */}
+          <ThemeProvider
+            key={currentTheme}
+            theme={yoroiPolymorphTheme}
+            skins={SimpleSkins}
+            variables={SimpleDefaults}
+            themeOverrides={themeOverrides(currentTheme)}
+          >
+            <IntlProvider {...{ locale, key: locale, messages: mergedMessages }}>
+              {this.getContent()}
+            </IntlProvider>
+          </ThemeProvider>
+        </LayoutProvider>
       </div>
     );
   }
