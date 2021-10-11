@@ -515,7 +515,7 @@ const YoroiModern = {
 
   '--theme-navbar-height': '60px',
   '--theme-navbar-background-color': '#F0F3F5',
-  '--theme-navbar-color': '#6B7384',
+  '--theme-navbar-color': '#38393D',
 
   // My Wallets page
   '--theme-mywallets-page-background-color': '#F0F3F5',

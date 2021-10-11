@@ -1,9 +1,10 @@
 // @flow
 import React, { Component } from 'react';
-import type { Node } from 'react';
+import type { Node, ComponentType } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import styles from './TopBarLayout.scss';
+import { withLayout } from '../../themes/context/layout';
 
 type Props = {|
   +banner?: Node,
@@ -17,9 +18,10 @@ type Props = {|
   +showAsCard?: boolean,
 |};
 
+type InjectedProps = {| isRevampLayout: boolean |};
 /** Adds a top bar above the wrapped node */
 @observer
-export default class TopBarLayout extends Component<Props> {
+class TopBarLayout extends Component<Props & InjectedProps> {
   static defaultProps: {|
     banner: void,
     children: void,
@@ -82,10 +84,12 @@ export default class TopBarLayout extends Component<Props> {
     );
   }
 
-  optionallyWrapInContainer: Node => Node = (content) => {
-    const { showInContainer } = this.props;
+  optionallyWrapInContainer: Node => Node = content => {
+    const { showInContainer, isRevampLayout } = this.props;
     if (showInContainer === true) {
-      return (
+      return isRevampLayout ? (
+        <div className={styles.containerContentRevamp}>{content}</div>
+      ) : (
         <div
           className={
             classnames([
@@ -99,7 +103,7 @@ export default class TopBarLayout extends Component<Props> {
       );
     }
     return content;
-  }
+  };
 
   getContentUnderBanner: void => Node = () => {
     const {
@@ -108,20 +112,13 @@ export default class TopBarLayout extends Component<Props> {
       children,
       notification,
       showInContainer,
-      showAsCard
+      showAsCard,
+      isRevampLayout,
     } = this.props;
 
-    const topbarComponent = (
-      <div className={styles.topbar}>
-        {topbar}
-      </div>
-    );
+    const topbarComponent = <div className={styles.topbar}>{topbar}</div>;
 
-    const navbarComponent = (
-      <div className={styles.navbar}>
-        {navbar}
-      </div>
-    );
+    const navbarComponent = <div className={styles.navbar}>{navbar}</div>;
 
     const content = (
       <>
@@ -137,13 +134,17 @@ export default class TopBarLayout extends Component<Props> {
             ])
           }
         >
-          <div className={styles.content}>
-            {children}
-          </div>
+          {isRevampLayout ? (
+            <div className={styles.contentRevamp}>{children}</div>
+          ) : (
+            <div className={styles.content}>{children}</div>
+          )}
         </div>
       </>
     );
 
     return this.optionallyWrapInContainer(content);
-  }
+  };
 }
+
+export default (withLayout(TopBarLayout): ComponentType<Props>);

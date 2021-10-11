@@ -3,13 +3,11 @@ import React, { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
-import SettingsMenuItem from './SettingsMenuItem';
-import styles from './SettingsMenu.scss';
 import environmnent from '../../../environment';
 import { ROUTES } from '../../../routes-config';
-import type { Theme } from '../../../themes';
 import globalMessages from '../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import SubMenu from '../../topbar/SubMenu';
 
 const messages = defineMessages({
   general: {
@@ -33,77 +31,57 @@ const messages = defineMessages({
 type Props = {|
   +isActiveItem: string => boolean,
   +onItemClick: string => void,
-  +currentLocale: string,
-  +currentTheme: Theme,
 |};
-
 @observer
 export default class SettingsMenu extends Component<Props> {
-
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
   render(): Node {
     const { intl } = this.context;
-    const { onItemClick, isActiveItem, } = this.props;
+    const { onItemClick, isActiveItem } = this.props;
+
+    const settingOptions: Array<Object> = [
+      {
+        label: intl.formatMessage(messages.general),
+        route: ROUTES.SETTINGS.GENERAL,
+        className: 'general',
+      },
+      {
+        label: intl.formatMessage(messages.blockchain),
+        route: ROUTES.SETTINGS.BLOCKCHAIN,
+        className: 'blockchain',
+      },
+      {
+        label: intl.formatMessage(globalMessages.walletLabel),
+        route: ROUTES.SETTINGS.WALLET,
+        className: 'wallet',
+      },
+      !environmnent.isProduction() && {
+        label: intl.formatMessage(messages.externalStorage),
+        route: ROUTES.SETTINGS.EXTERNAL_STORAGE,
+        className: 'externalStorage',
+      },
+      {
+        label: intl.formatMessage(globalMessages.termsOfUse),
+        route: ROUTES.SETTINGS.TERMS_OF_USE,
+        className: 'termsOfUse',
+      },
+      {
+        label: intl.formatMessage(globalMessages.support),
+        route: ROUTES.SETTINGS.SUPPORT,
+        className: 'support',
+      },
+      {
+        label: intl.formatMessage(messages.levelOfComplexity),
+        route: ROUTES.SETTINGS.LEVEL_OF_COMPLEXITY,
+        className: 'levelOfComplexity',
+      },
+    ];
 
     return (
-      <div className={styles.componentWrapper}>
-        <div className={styles.component}>
-          <SettingsMenuItem
-            label={intl.formatMessage(messages.general)}
-            onClick={() => onItemClick(ROUTES.SETTINGS.GENERAL)}
-            active={isActiveItem(ROUTES.SETTINGS.GENERAL)}
-            className="general"
-          />
-
-          <SettingsMenuItem
-            label={intl.formatMessage(messages.blockchain)}
-            onClick={() => onItemClick(ROUTES.SETTINGS.BLOCKCHAIN)}
-            active={isActiveItem(ROUTES.SETTINGS.BLOCKCHAIN)}
-            className="blockchain"
-          />
-
-          <SettingsMenuItem
-            label={intl.formatMessage(globalMessages.walletLabel)}
-            onClick={() => onItemClick(ROUTES.SETTINGS.WALLET)}
-            active={isActiveItem(ROUTES.SETTINGS.WALLET)}
-            className="wallet"
-          />
-
-          {!environmnent.isProduction() &&
-            <SettingsMenuItem
-              label={intl.formatMessage(messages.externalStorage)}
-              onClick={() => onItemClick(ROUTES.SETTINGS.EXTERNAL_STORAGE)}
-              active={isActiveItem(ROUTES.SETTINGS.EXTERNAL_STORAGE)}
-              className="externalStorage"
-            />
-          }
-
-          <SettingsMenuItem
-            label={intl.formatMessage(globalMessages.termsOfUse)}
-            onClick={() => onItemClick(ROUTES.SETTINGS.TERMS_OF_USE)}
-            active={isActiveItem(ROUTES.SETTINGS.TERMS_OF_USE)}
-            className="termsOfUse"
-          />
-
-          <SettingsMenuItem
-            label={intl.formatMessage(globalMessages.support)}
-            onClick={() => onItemClick(ROUTES.SETTINGS.SUPPORT)}
-            active={isActiveItem(ROUTES.SETTINGS.SUPPORT)}
-            className="support"
-          />
-
-          <SettingsMenuItem
-            label={intl.formatMessage(messages.levelOfComplexity)}
-            onClick={() => onItemClick(ROUTES.SETTINGS.LEVEL_OF_COMPLEXITY)}
-            active={isActiveItem(ROUTES.SETTINGS.LEVEL_OF_COMPLEXITY)}
-            className="levelOfComplexity"
-          />
-        </div>
-      </div>
+      <SubMenu options={settingOptions} onItemClick={onItemClick} isActiveItem={isActiveItem} />
     );
   }
-
 }

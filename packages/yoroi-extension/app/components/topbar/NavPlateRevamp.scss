@@ -1,0 +1,67 @@
+@import '../../themes/mixins/loading-spinner';
+
+.wrapper {
+  min-width: 300px;
+  canvas {
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 50%;
+  }
+}
+.header {
+  display: flex;
+  color: var(--theme-wallet-dropdown-main-text-color);
+  font-size: 14px;
+  letter-spacing: 0;
+  line-height: 22px;
+  margin-bottom: 8px;
+}
+
+.card {
+  display: flex;
+  align-items: center;
+}
+
+.name {
+  margin-right: 5px;
+  font-family: var(--font-regular);
+}
+
+.type {
+  display: flex;
+  align-items: center;
+  margin-left: 5px;
+}
+.data {
+  margin-left: 12px;
+  font-family: var(--font-regular);
+}
+
+.isLoading {
+  position: relative;
+  display: inline-block;
+  margin-left: 15px;
+  margin-bottom: 4px;
+}
+
+.amount {
+  font-family: var(--font-medium);
+
+  .isLoading {
+    margin-left: 9px;
+    margin-bottom: 6px;
+    @include loading-spinner('../../assets/images/spinner-dark.svg', 16);
+  }
+}
+.fixedAmount {
+  color: #6b7384;
+}
+.content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: start;
+  font-size: 14px;
+  line-height: 22px;
+  margin-left: 12px;
+}

@@ -48,7 +48,9 @@ export const mockWalletProps: {
           dialogs: [],
         }))
       },
-    },
+      router: {
+        location: request.location,
+      },    },
     actions: {
       router: {
         goToRoute: { trigger: action('goToRoute') },

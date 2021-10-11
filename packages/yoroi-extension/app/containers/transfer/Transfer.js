@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import type { Node } from 'react';
+import type { Node, ComponentType } from 'react';
 import { computed } from 'mobx';
 import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
@@ -25,6 +25,9 @@ import {
   CoinTypes,
 } from '../../config/numbersConfig';
 import HorizontalLine from '../../components/widgets/HorizontalLine';
+import NavBarContainerRevamp from '../NavBarContainerRevamp';
+import { withLayout } from '../../themes/context/layout';
+import type { LayoutComponentMap } from '../../themes/context/layout';
 
 export type GeneratedData = typeof Transfer.prototype.generated;
 
@@ -33,8 +36,11 @@ type Props = {|
   +children?: Node,
 |};
 
+type InjectedProps = {| +renderLayoutComponent: LayoutComponentMap => Node |};
+type AllProps = {| ...Props, ...InjectedProps |};
+
 @observer
-export default class Transfer extends Component<Props> {
+class Transfer extends Component<AllProps> {
 
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
@@ -47,14 +53,28 @@ export default class Transfer extends Component<Props> {
   render(): Node {
     const sidebarContainer = (<SidebarContainer {...this.generated.SidebarContainerProps} />);
 
-    const navbar = (
+    const navbarClassic = (
       <NavBarContainer
         {...this.generated.NavBarContainerProps}
-        title={<NavBarTitle
-          title={this.context.intl.formatMessage(globalMessages.sidebarTransfer)}
-        />}
+        title={
+          <NavBarTitle title={this.context.intl.formatMessage(globalMessages.sidebarTransfer)} />
+        }
       />
     );
+
+    const navbarRevamp = (
+      <NavBarContainerRevamp
+        {...this.generated.NavBarContainerProps}
+        title={
+          <NavBarTitle title={this.context.intl.formatMessage(globalMessages.sidebarSettings)} />
+        }
+      />
+    );
+
+    const navbar = this.props.renderLayoutComponent({
+      CLASSIC: navbarClassic,
+      REVAMP: navbarRevamp,
+    });
 
     return (
       <TopBarLayout
@@ -145,3 +165,4 @@ export default class Transfer extends Component<Props> {
     });
   }
 }
+export default (withLayout(Transfer): ComponentType<Props>)
