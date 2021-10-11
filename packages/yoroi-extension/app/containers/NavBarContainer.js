@@ -80,6 +80,7 @@ export default class NavBarContainer extends Component<Props> {
     const walletComponents = wallets.map(wallet => {
       const txRequests = this.generated.stores.transactions.getTxRequests(wallet);
       const balance = txRequests.requests.getBalanceRequest.result || null;
+      const assetDeposit = txRequests.requests.getAssetDepositRequest.result || null;
 
       const parent = wallet.getParent();
       const settingsCache = this.generated.stores.walletSettings
@@ -106,6 +107,7 @@ export default class NavBarContainer extends Component<Props> {
           detailComponent={
             <NavWalletDetails
               walletAmount={balance}
+              assetDeposit={assetDeposit}
               onUpdateHideBalance={this.updateHideBalance}
               shouldHideBalance={profile.shouldHideBalance}
               rewards={this.getRewardBalance(wallet)}
@@ -140,6 +142,7 @@ export default class NavBarContainer extends Component<Props> {
 
         const txRequests = this.generated.stores.transactions.getTxRequests(publicDeriver);
         const balance = txRequests.requests.getBalanceRequest.result || null;
+        const assetDeposit = txRequests.requests.getAssetDepositRequest.result || null;
 
         return (
           <NavWalletDetails
@@ -147,6 +150,7 @@ export default class NavBarContainer extends Component<Props> {
             shouldHideBalance={profile.shouldHideBalance}
             rewards={this.getRewardBalance(publicDeriver)}
             walletAmount={balance}
+            assetDeposit={assetDeposit}
             getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
             defaultToken={this.generated.stores.tokenInfoStore.getDefaultTokenInfo(
               publicDeriver.getParent().getNetworkInfo().NetworkId

@@ -7,6 +7,7 @@ import type {
 import {
   groupBy,
   mapValues,
+  uniqBy
 } from 'lodash';
 
 import {
@@ -67,6 +68,11 @@ import { MultiToken } from '../../../../common/lib/MultiToken';
 import type { DefaultTokenEntry } from '../../../../common/lib/MultiToken';
 
 import { ChainDerivations, BIP44_SCAN_SIZE, } from  '../../../../../config/numbersConfig';
+
+type TokenCount = {|
+  tokenTypes: number,
+  nftTypes: number
+|}
 
 export async function rawGetDerivationsByPath<
   Row: { +KeyDerivationId: number, ... }
@@ -393,6 +399,43 @@ export function getUtxoBalanceForAddresses(
     )
   );
   return mapping;
+}
+
+export function getTokenCountForAddresses(
+  utxos: $ReadOnlyArray<$ReadOnly<UtxoTxOutput>>
+): { [key: number]: TokenCount } {
+  const groupByAddress = groupBy(
+    utxos,
+    utxo => utxo.UtxoTransactionOutput.AddressId
+  );
+
+  const mapping: { [key: number]: TokenCount } = {};
+
+  for (const k of Object.keys(groupByAddress)) {
+    const group = groupByAddress[k];
+    mapping[k] = getTokenCountForUtxos(group)
+  }
+
+  return mapping;
+}
+
+export function getTokenCountForUtxos(
+  utxos: $ReadOnlyArray<$ReadOnly<UtxoTxOutput>>
+): TokenCount {
+
+  const allTokens = utxos
+    .reduce((prev, curr) => prev.concat(curr.tokens), [])
+    .filter(t => t.Token.Identifier !== '');
+
+  const uniqueTokens = uniqBy(
+    allTokens,
+    t => t.Token.Identifier
+  );
+
+  return {
+    nftTypes: uniqueTokens.filter(t => t.Token.IsNFT).length,
+    tokenTypes: uniqueTokens.filter(t => !t.Token.IsNFT).length
+  };
 }
 
 export function getBalanceForUtxos(

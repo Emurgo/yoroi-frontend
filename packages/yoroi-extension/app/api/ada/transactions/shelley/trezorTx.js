@@ -13,11 +13,13 @@ import type {
   CardanoAddressParameters,
   CardanoAssetGroup,
   CardanoToken,
+  CardanoSignedTxWitness,
 } from 'trezor-connect/lib/types/networks/cardano';
 import {
   CERTIFICATE_TYPE,
   ADDRESS_TYPE,
 } from 'trezor-connect/lib/constants/cardano';
+import { CardanoTxSigningMode } from 'trezor-connect';
 import type {
   Address, Value, Addressing,
 } from '../../lib/storage/models/PublicDeriver/interfaces';
@@ -32,6 +34,7 @@ import {
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 import { range } from 'lodash';
 import { toHexOrBase58 } from '../../lib/storage/bridge/utils';
+import { derivePublicByAddressing } from '../../lib/cardanoCrypto/utils';
 
 // ==================== TREZOR ==================== //
 /** Generate a payload for Trezor SignTx */
@@ -54,6 +57,7 @@ export async function createTrezorSignTxPayload(
   );
 
   let request = {
+    signingMode: CardanoTxSigningMode.ORDINARY_TRANSACTION,
     inputs: trezorInputs,
     outputs: trezorOutputs,
     fee: txBody.fee().to_str(),
@@ -332,4 +336,121 @@ export function toTrezorAddressParameters(
     }
   }
   throw new Error(`${nameof(toTrezorAddressParameters)} unknown address type`);
+}
+
+export function buildSignedTransaction(
+  txBody: RustModule.WalletV4.TransactionBody,
+  senderUtxos: Array<CardanoAddressedUtxo>,
+  witnesses: Array<CardanoSignedTxWitness>,
+  publicKey: {|
+    ...Addressing,
+    key: RustModule.WalletV4.Bip32PublicKey,
+  |},
+  stakingKey: RustModule.WalletV4.Bip32PublicKey,
+  metadata: RustModule.WalletV4.AuxiliaryData | void
+): RustModule.WalletV4.Transaction {
+  const findWitness = (pubKey: string) => {
+    for (const witness of witnesses) {
+      if (witness.pubKey === pubKey) {
+        return witness.signature;
+      }
+    }
+    throw new Error(`${nameof(buildSignedTransaction)} no witness for ${pubKey}`);
+  };
+
+  const keyLevel = publicKey.addressing.startLevel + publicKey.addressing.path.length - 1;
+
+  const witSet = RustModule.WalletV4.TransactionWitnessSet.new();
+  const bootstrapWitnesses: Array<RustModule.WalletV4.BootstrapWitness> = [];
+  const vkeys: Array<RustModule.WalletV4.Vkeywitness> = [];
+
+  const seenVKeyWit = new Set<string>();
+  const seenBootstrapWit = new Set<string>();
+
+  for (const utxo of senderUtxos) {
+    verifyFromBip44Root(utxo.addressing);
+
+    const addressKey = derivePublicByAddressing({
+      addressing: utxo.addressing,
+      startingFrom: {
+        level: keyLevel,
+        key: publicKey.key,
+      }
+    });
+    const pubKey = Buffer.from(addressKey.to_raw_key().as_bytes()).toString('hex');
+
+    const witness = findWitness(pubKey);
+
+    if (RustModule.WalletV4.ByronAddress.is_valid(utxo.receiver)) {
+
+      const byronAddr = RustModule.WalletV4.ByronAddress.from_base58(utxo.receiver);
+      const bootstrapWit = RustModule.WalletV4.BootstrapWitness.new(
+        RustModule.WalletV4.Vkey.new(addressKey.to_raw_key()),
+        RustModule.WalletV4.Ed25519Signature.from_bytes(
+          Buffer.from(witness, 'hex')
+        ),
+        addressKey.chaincode(),
+        byronAddr.attributes(),
+      );
+      const asString = Buffer.from(bootstrapWit.to_bytes()).toString('hex');
+      if (seenBootstrapWit.has(asString)) {
+        continue;
+      }
+      seenBootstrapWit.add(asString);
+      bootstrapWitnesses.push(bootstrapWit);
+      continue;
+    }
+
+    const vkeyWit = RustModule.WalletV4.Vkeywitness.new(
+      RustModule.WalletV4.Vkey.new(addressKey.to_raw_key()),
+      RustModule.WalletV4.Ed25519Signature.from_bytes(
+        Buffer.from(witness, 'hex')
+      ),
+    );
+    const asString = Buffer.from(vkeyWit.to_bytes()).toString('hex');
+    if (seenVKeyWit.has(asString)) {
+      continue;
+    }
+    seenVKeyWit.add(asString);
+    vkeys.push(vkeyWit);
+  }
+
+  // add any staking key needed
+  const stakingPubKey = Buffer.from(stakingKey.to_raw_key().as_bytes()).toString('hex');
+
+  for (const witness of witnesses) {
+    if (witness.pubKey === stakingPubKey) {
+      const vkeyWit = RustModule.WalletV4.Vkeywitness.new(
+        RustModule.WalletV4.Vkey.new(stakingKey.to_raw_key()),
+        RustModule.WalletV4.Ed25519Signature.from_bytes(Buffer.from(witness.signature, 'hex')),
+      );
+      const asString = Buffer.from(vkeyWit.to_bytes()).toString('hex');
+      if (seenVKeyWit.has(asString)) {
+        continue;
+      }
+      seenVKeyWit.add(asString);
+      vkeys.push(vkeyWit);
+    }
+  }
+
+  if (bootstrapWitnesses.length > 0) {
+    const bootstrapWitWasm = RustModule.WalletV4.BootstrapWitnesses.new();
+    for (const bootstrapWit of bootstrapWitnesses) {
+      bootstrapWitWasm.add(bootstrapWit);
+    }
+    witSet.set_bootstraps(bootstrapWitWasm);
+  }
+  if (vkeys.length > 0) {
+    const vkeyWitWasm = RustModule.WalletV4.Vkeywitnesses.new();
+    for (const vkey of vkeys) {
+      vkeyWitWasm.add(vkey);
+    }
+    witSet.set_vkeys(vkeyWitWasm);
+  }
+  // TODO: handle script witnesses
+  return RustModule.WalletV4.Transaction.new(
+    txBody,
+    witSet,
+    metadata
+  );
 }

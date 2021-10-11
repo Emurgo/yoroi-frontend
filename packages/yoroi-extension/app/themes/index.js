@@ -3,6 +3,7 @@
 export const THEMES = Object.freeze({
   YOROI_CLASSIC: 'YoroiClassic',
   YOROI_MODERN: 'YoroiModern',
+  YOROI_REVAMP: 'YoroiRevamp',
 });
 
 export type Theme = $Values<typeof THEMES>;
