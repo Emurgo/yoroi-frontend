@@ -21,7 +21,7 @@ export function generateRegistrationMetadata(
   rewardAddress: string,
   nonce: number,
   signer: Uint8Array => string,
-): RustModule.WalletV4.TransactionMetadata {
+): RustModule.WalletV4.AuxiliaryData {
 
   /**
     * Catalyst follows a certain standard to prove the voting power
@@ -81,7 +81,7 @@ export function generateRegistrationMetadata(
     )
   );
 
-  return RustModule.WalletV4.TransactionMetadata.from_bytes(
+  return RustModule.WalletV4.AuxiliaryData.from_bytes(
     metadataList.to_bytes()
   );
 }
@@ -91,7 +91,7 @@ export function generateRegistration(request: {|
   catalystPrivateKey: RustModule.WalletV4.PrivateKey,
   receiverAddress: Buffer,
   slotNumber: number,
-|}): RustModule.WalletV4.TransactionMetadata {
+|}): RustModule.WalletV4.AuxiliaryData {
   return generateRegistrationMetadata(
     Buffer.from(request.catalystPrivateKey.to_public().as_bytes()).toString('hex'),
     Buffer.from(request.stakePrivateKey.to_public().as_bytes()).toString('hex'),

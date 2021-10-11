@@ -5,14 +5,10 @@ import { ISignRequest } from '../../../common/lib/transactions/ISignRequest';
 import type { CardanoAddressedUtxo } from '../types';
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 import { toHexOrBase58 } from '../../lib/storage/bridge/utils';
-import {
-  MultiToken,
-} from '../../../common/lib/MultiToken';
+import { MultiToken, } from '../../../common/lib/MultiToken';
 import { PRIMARY_ASSET_CONSTANTS } from '../../lib/storage/database/primitives/enums';
 import { multiTokenFromCardanoValue, multiTokenFromRemote } from '../utils';
-import type {
-  Address, Value, Addressing,
-} from '../../lib/storage/models/PublicDeriver/interfaces';
+import type { Address, Addressing, Value, } from '../../lib/storage/models/PublicDeriver/interfaces';
 
 /**
  * We take a copy of these parameters instead of re-evaluating them from the network
@@ -49,7 +45,7 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
   senderUtxos: Array<CardanoAddressedUtxo>;
   unsignedTx: RustModule.WalletV4.TransactionBuilder;
   changeAddr: Array<{| ...Address, ...Value, ...Addressing |}>;
-  metadata: void | RustModule.WalletV4.TransactionMetadata;
+  metadata: void | RustModule.WalletV4.AuxiliaryData;
   networkSettingSnapshot: NetworkSettingSnapshot;
   // TODO: this should be provided by WASM in some SignedTxBuilder interface of some kind
   neededStakingKeyHashes: {|
@@ -65,7 +61,7 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
     senderUtxos: Array<CardanoAddressedUtxo>,
     unsignedTx: RustModule.WalletV4.TransactionBuilder,
     changeAddr: Array<{| ...Address, ...Value, ...Addressing |}>,
-    metadata: void | RustModule.WalletV4.TransactionMetadata,
+    metadata: void | RustModule.WalletV4.AuxiliaryData,
     networkSettingSnapshot: NetworkSettingSnapshot,
     neededStakingKeyHashes: {|
       neededHashes: Set<string>, // StakeCredential
@@ -92,6 +88,13 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
     return Buffer.from(RustModule.WalletV4.hash_transaction(
       this.unsignedTx.build()
     ).to_bytes()).toString('hex');
+  }
+
+  size(): {| full: number, outputs: number[] |} {
+    return {
+      full: this.unsignedTx.full_size(),
+      outputs: [...this.unsignedTx.output_sizes()],
+    };
   }
 
   inputs(): Array<{|

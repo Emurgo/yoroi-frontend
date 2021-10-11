@@ -134,7 +134,7 @@
             background-image: url(../../../assets/images/my-wallets/symbol_ada.inline.svg);
           }
           &.cardanoTestnet {
-            background-image: url(../../../assets/images/my-wallets/symbol_adaTestnet.inline.svg);
+             background-image: url(../../../assets/images/my-wallets/symbol_adaTestnet.inline.svg);
           }
           &.ergo {
             background-image: url(../../../assets/images/my-wallets/symbol_ergo.inline.svg);
@@ -146,6 +146,9 @@
             background-image: url(../../../assets/images/add-wallet/option-dialog/Master_key.inline.svg);
             background-position: center 15px !important;
             background-size: 50px;
+          }
+          &.alonzoWhiteTestnet {
+             background-image: url(../../../assets/images/my-wallets/symbol_adaTestnet.inline.svg);
           }
           // CONNECT HARDWARE WALLET
           &.connectLedger {
@@ -212,6 +215,9 @@
             background-image: url(../../../assets/images/add-wallet/option-dialog/Master_key.inline.svg);
             background-position: center 15px !important;
             background-size: 50px;
+          }
+          &.alonzoWhiteTestnet {
+             background-image: url(../../../assets/images/my-wallets/symbol_adaTestnet.inline.svg);
           }
           // CONNECT HARDWARE WALLET
           &.connectLedger {

@@ -76,7 +76,7 @@ export default class NavPlate extends Component<Props> {
     if (wallet instanceof Bip44Wallet) {
       return globalMessages.byronLabel;
     }
-    return globalMessages.shelleyLabel;
+    return undefined;
   }
 
   getType: ConceptualWallet => $Exact<$npm$ReactIntl$MessageDescriptor> = (wallet) => {
