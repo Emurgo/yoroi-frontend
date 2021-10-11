@@ -23,6 +23,10 @@ import type {
   TxBodiesResponse,
   UtxoSumRequest,
   UtxoSumResponse,
+  CatalystRoundInfoRequest,
+  CatalystRoundInfoResponse,
+  MultiAssetMintMetadataRequest,
+  MultiAssetMintMetadataResponse,
 } from './types';
 import type { FilterUsedRequest, FilterUsedResponse, } from '../../../common/lib/state-fetch/currencySpecificTypes';
 
@@ -35,6 +39,7 @@ import {
   GetAccountStateApiError,
   GetBestBlockError,
   GetPoolInfoApiError,
+  GetCatalystRoundInfoApiError,
   GetRewardHistoryApiError,
   GetTxHistoryForAddressesApiError,
   GetTxsBodiesForUTXOsApiError,
@@ -406,5 +411,41 @@ export class RemoteFetcher implements IFetcher {
       }
       return res;
     }, {});
+  }
+
+  getCatalystRoundInfo: CatalystRoundInfoRequest =>
+    Promise<CatalystRoundInfoResponse> = async (body) =>
+  {
+    const { BackendService } = body.network.Backend;
+    if (BackendService == null) throw new Error(`${nameof(this.getCatalystRoundInfo)} missing backend url`);
+    return await axios(
+      `${BackendService}/api/v0/catalyst/fundInfo`,
+      {
+        method: 'get',
+      }
+    ).then(response => response.data)
+      .catch((error) => {
+        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getCatalystRoundInfo)} error: ` + stringifyError(error));
+        throw new GetCatalystRoundInfoApiError();
+      });
+  }
+
+  getMultiAssetMintMetadata: MultiAssetMintMetadataRequest
+    => Promise<MultiAssetMintMetadataResponse> = async (body) => {
+      const { BackendService } = body.network.Backend;
+      if (BackendService == null) throw new Error(`${nameof(this.getMultiAssetMintMetadata)} missing backend url`);
+      return await axios(
+        `${BackendService}/api/multiAsset/metadata`,
+        {
+          method: 'post',
+          data: {
+            assets: body.assets
+          }
+        }
+      ).then(response => response.data)
+      .catch((error) => {
+        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getMultiAssetMintMetadata)} error: ` + stringifyError(error));
+        return {};
+      });
   }
 }

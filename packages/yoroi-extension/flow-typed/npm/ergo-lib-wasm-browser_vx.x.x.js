@@ -937,6 +937,19 @@ declare export class ErgoStateContext {
      * @returns {string}
      */
     to_base16_bytes(): string;
+
+    /**
+     * Returns number
+     * @returns {number}
+     */
+    constants_len(): number;
+
+    /**
+     * Returns the constant
+     * @param {number} idx
+     * @returns {Constant}
+     */
+    get_constant(idx: number): Constant;
   }
   /**
   * Wrapper for i64 for JS/TS

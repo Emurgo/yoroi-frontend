@@ -38,6 +38,11 @@ export const mockWalletProps: {
       wallets: {
         selected: request.selected,
       },
+      transactions: {
+        getBalanceRequest: {
+          result: null,
+        },
+      },
       walletSettings: {
         getWalletWarnings: request.getWalletWarnings ?? ((publicDeriver) => ({
           publicDeriver,
