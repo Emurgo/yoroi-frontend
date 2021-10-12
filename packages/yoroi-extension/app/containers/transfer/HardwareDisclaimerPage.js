@@ -1,6 +1,6 @@
 // @flow
 import type { Node } from 'react';
-import React, { Component } from 'react';
+import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { action, observable } from 'mobx';
 import HardwareDisclaimer from '../../components/transfer/HardwareDisclaimer';

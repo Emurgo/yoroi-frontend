@@ -1,5 +1,5 @@
 // @flow
-import React, { Component } from 'react';
+import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape, defineMessages } from 'react-intl';
@@ -76,7 +76,7 @@ export default class NavPlate extends Component<Props> {
     if (wallet instanceof Bip44Wallet) {
       return globalMessages.byronLabel;
     }
-    return globalMessages.shelleyLabel;
+    return undefined;
   }
 
   getType: ConceptualWallet => $Exact<$npm$ReactIntl$MessageDescriptor> = (wallet) => {

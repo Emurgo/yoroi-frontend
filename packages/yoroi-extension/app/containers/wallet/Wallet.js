@@ -1,8 +1,8 @@
 // @flow
-import React, { Component } from 'react';
-import type { Node } from 'react';
+import { Component } from 'react';
+import type { Node, ComponentType } from 'react';
 import { observer } from 'mobx-react';
-import { computed, } from 'mobx';
+import { computed } from 'mobx';
 import { intlShape, defineMessages } from 'react-intl';
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import VerticallyCenteredLayout from '../../components/layout/VerticallyCenteredLayout';
@@ -22,6 +22,13 @@ import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/in
 import type { WarningList } from '../../stores/toplevel/WalletSettingsStore';
 import { allCategories } from '../../stores/stateless/topbarCategories';
 import { MultiToken } from '../../api/common/lib/MultiToken';
+import { withLayout } from '../../themes/context/layout';
+import type { LayoutComponentMap } from '../../themes/context/layout';
+import NavBarContainerRevamp from '../NavBarContainerRevamp';
+import globalMessages from '../../i18n/global-messages';
+import NavBarTitle from '../../components/topbar/NavBarTitle';
+import SubMenu from '../../components/topbar/SubMenu';
+import type { GeneratedData as NavBarContainerRevampData } from '../NavBarContainerRevamp';
 
 export type GeneratedData = typeof Wallet.prototype.generated;
 
@@ -29,6 +36,8 @@ type Props = {|
   ...InjectedOrGenerated<GeneratedData>,
   +children: Node,
 |};
+type InjectedProps = {| +renderLayoutComponent: LayoutComponentMap => Node |};
+type AllProps = {| ...Props, ...InjectedProps |};
 
 const messages = defineMessages({
   backButton: {
@@ -38,9 +47,8 @@ const messages = defineMessages({
 });
 
 @observer
-export default class Wallet extends Component<Props> {
-
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+class Wallet extends Component<AllProps> {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
@@ -54,7 +62,7 @@ export default class Wallet extends Component<Props> {
     }
   }
 
-  checkRoute(): (void | string) {
+  checkRoute(): void | string {
     // void -> this route is fine for this wallet type
     // string -> what you should be redirected to
     const publicDeriver = this.generated.stores.wallets.selected;
@@ -82,9 +90,9 @@ export default class Wallet extends Component<Props> {
     return undefined;
   }
 
-  navigateToWallets: string => void = (destination) => {
+  navigateToWallets: string => void = destination => {
     this.generated.actions.router.goToRoute.trigger({ route: destination });
-  }
+  };
 
   render(): Node {
     // abort rendering if the page isn't valid for this wallet
@@ -92,26 +100,14 @@ export default class Wallet extends Component<Props> {
       return null;
     }
     const { intl } = this.context;
-    const { wallets, } = this.generated.stores;
-    const sidebarContainer = (<SidebarContainer {...this.generated.SidebarContainerProps} />);
-    const navbarContainer = (
-      <NavBarContainer
-        {...this.generated.NavBarContainerProps}
-        title={
-          <NavBarBack
-            route={ROUTES.MY_WALLETS}
-            onBackClick={this.navigateToWallets}
-            title={intl.formatMessage(messages.backButton)}
-          />
-        }
-      />
-    );
+    const { wallets } = this.generated.stores;
+    const { actions } = this.generated;
 
     if (!wallets.selected) {
       return (
         <TopBarLayout
-          banner={(<BannerContainer {...this.generated.BannerContainerProps} />)}
-          navbar={navbarContainer}
+          banner={<BannerContainer {...this.generated.BannerContainerProps} />}
+          navbar={<NavBarContainer title="" {...this.generated.NavBarContainerProps} />}
           showInContainer
           showAsCard
         >
@@ -128,11 +124,37 @@ export default class Wallet extends Component<Props> {
     const walletHasAssets = !!(spendableBalance?.nonDefaultEntries()?.length);
     const visibilityContext = { selected: selectedWallet, walletHasAssets };
 
-    return (
+    const menu = (
+      <SubMenu
+        options={allCategories
+          .filter(category => category.isVisible(visibilityContext))
+          .map(category => ({
+            className: category.className,
+            label: intl.formatMessage(category.label),
+            route: category.route,
+          }))}
+        onItemClick={route => actions.router.goToRoute.trigger({ route })}
+        isActiveItem={route => this.generated.stores.app.currentRoute.startsWith(route)}
+      />
+    );
+
+    const sidebarContainer = <SidebarContainer {...this.generated.SidebarContainerProps} />;
+    const walletClassic = (
       <TopBarLayout
-        banner={(<BannerContainer {...this.generated.BannerContainerProps} />)}
+        banner={<BannerContainer {...this.generated.BannerContainerProps} />}
         sidebar={sidebarContainer}
-        navbar={navbarContainer}
+        navbar={
+          <NavBarContainer
+            {...this.generated.NavBarContainerProps}
+            title={
+              <NavBarBack
+                route={ROUTES.MY_WALLETS}
+                onBackClick={this.navigateToWallets}
+                title={intl.formatMessage(messages.backButton)}
+              />
+            }
+          />
+        }
         showInContainer
         showAsCard
       >
@@ -149,26 +171,47 @@ export default class Wallet extends Component<Props> {
                 onClick: () => this.generated.actions.router.goToRoute.trigger({
                   route: category.route,
                 }),
-              }))
-          }
+            }))}
         >
           {this.props.children}
         </WalletWithNavigation>
       </TopBarLayout>
     );
+
+    const walletRevamp = (
+      <TopBarLayout
+        banner={<BannerContainer {...this.generated.BannerContainerProps} />}
+        sidebar={sidebarContainer}
+        navbar={
+          <NavBarContainerRevamp
+            {...this.generated.NavBarContainerRevampProps}
+            title={<NavBarTitle title={intl.formatMessage(globalMessages.walletLabel)} />}
+            menu={menu}
+          />
+        }
+        showInContainer
+        showAsCard
+      >
+        {warning}
+        {this.props.children}
+      </TopBarLayout>
+    );
+
+    return this.props.renderLayoutComponent({ CLASSIC: walletClassic, REVAMP: walletRevamp });
   }
 
-  getWarning: PublicDeriver<> => void | Node = (publicDeriver) => {
+  getWarning: (PublicDeriver<>) => void | Node = publicDeriver => {
     const warnings = this.generated.stores.walletSettings.getWalletWarnings(publicDeriver).dialogs;
     if (warnings.length === 0) {
       return undefined;
     }
     return warnings[warnings.length - 1]();
-  }
+  };
 
   @computed get generated(): {|
     BannerContainerProps: InjectedOrGenerated<BannerContainerData>,
     NavBarContainerProps: InjectedOrGenerated<NavBarContainerData>,
+    NavBarContainerRevampProps: InjectedOrGenerated<NavBarContainerRevampData>,
     SidebarContainerProps: InjectedOrGenerated<SidebarContainerData>,
     actions: {|
       router: {|
@@ -176,23 +219,24 @@ export default class Wallet extends Component<Props> {
           trigger: (params: {|
             publicDeriver?: null | PublicDeriver<>,
             params?: ?any,
-            route: string
+            route: string,
           |}) => void,
         |},
         redirect: {|
           trigger: (params: {|
             params?: ?any,
-            route: string
-          |}) => void
+            route: string,
+          |}) => void,
         |},
-      |}
+      |},
     |},
     stores: {|
       app: {| currentRoute: string |},
       walletSettings: {|
-        getWalletWarnings: (PublicDeriver<>) => WarningList
+        getWalletWarnings: (PublicDeriver<>) => WarningList,
       |},
       wallets: {| selected: null | PublicDeriver<> |},
+      router: {| location: any |},
       transactions: {|
         getBalanceRequest: {|
           result: ?MultiToken,
@@ -219,6 +263,9 @@ export default class Wallet extends Component<Props> {
         walletSettings: {
           getWalletWarnings: settingStore.getWalletWarnings,
         },
+        router: {
+          location: stores.router.location,
+        },
         transactions: {
           getBalanceRequest: (() => {
             if (stores.wallets.selected == null) return {
@@ -238,9 +285,14 @@ export default class Wallet extends Component<Props> {
           redirect: { trigger: actions.router.redirect.trigger },
         },
       },
-      SidebarContainerProps: ({ actions, stores, }: InjectedOrGenerated<SidebarContainerData>),
-      NavBarContainerProps: ({ actions, stores, }: InjectedOrGenerated<NavBarContainerData>),
+      SidebarContainerProps: ({ actions, stores }: InjectedOrGenerated<SidebarContainerData>),
+      NavBarContainerProps: ({ actions, stores }: InjectedOrGenerated<NavBarContainerData>),
+      NavBarContainerRevampProps: ({
+        actions,
+        stores,
+      }: InjectedOrGenerated<NavBarContainerRevampData>),
       BannerContainerProps: ({ actions, stores }: InjectedOrGenerated<BannerContainerData>),
     });
   }
 }
+export default (withLayout(Wallet): ComponentType<Props>);

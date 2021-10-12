@@ -1,5 +1,5 @@
 // @flow
-import React, { Component } from 'react';
+import { Component } from 'react';
 import { observer } from 'mobx-react';
 import type { Node } from 'react';
 import classnames from 'classnames';
@@ -62,8 +62,6 @@ export default class NavWalletDetails extends Component<Props> {
       shouldHideBalance,
       onUpdateHideBalance,
       highlightTitle,
-      // <TODO:RWRD2109>
-      // eslint-disable-next-line no-unused-vars
       rewards,
       walletAmount,
       infoText,
@@ -105,21 +103,20 @@ export default class NavWalletDetails extends Component<Props> {
               })}
             </div>
             {showsRewards &&
-            <div className={styles.details}>
-              <div>
-                <p className={styles.label}>
-                  {intl.formatMessage(globalMessages.walletLabel)}&nbsp;
-                </p>
-                {this.renderAmountDisplay({ shouldHideBalance, amount: walletAmount })}
+              <div className={styles.details}>
+                <div>
+                  <p className={styles.label}>
+                    {intl.formatMessage(globalMessages.walletLabel)}&nbsp;
+                  </p>
+                  {this.renderAmountDisplay({ shouldHideBalance, amount: walletAmount })}
+                </div>
+                <div>
+                  <p className={styles.label}>
+                    {intl.formatMessage(globalMessages.rewardsLabel)}&nbsp;
+                  </p>
+                  {this.renderAmountDisplay({ shouldHideBalance, amount: rewards })}
+                </div>
               </div>
-              {/* <TODO:RWRD2109> */}
-              {/* <div> */}
-              {/*  <p className={styles.label}> */}
-              {/*    {intl.formatMessage(globalMessages.rewardsLabel)}&nbsp; */}
-              {/*  </p> */}
-              {/*  {this.renderAmountDisplay({ shouldHideBalance, amount: rewards })} */}
-              {/* </div> */}
-            </div>
             }
             {this.props.rewards === undefined && (
               <div className={styles.info}>
@@ -153,8 +150,7 @@ export default class NavWalletDetails extends Component<Props> {
     if (this.props.rewards === null || this.props.walletAmount === null) {
       return null;
     }
-    // <TODO:RWRD2109>
-    return this.props.walletAmount; // .joinAddCopy(this.props.rewards);
+    return this.props.walletAmount.joinAddCopy(this.props.rewards);
   }
 
   renderAmountDisplay: {|

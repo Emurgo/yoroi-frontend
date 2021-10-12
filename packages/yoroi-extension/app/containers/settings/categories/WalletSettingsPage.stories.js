@@ -1,7 +1,6 @@
 // @flow
 
 import type { Node } from 'react';
-import React from 'react';
 import { select, boolean, } from '@storybook/addon-knobs';
 import { action } from '@storybook/addon-actions';
 import WalletSettingsPage from './WalletSettingsPage';
@@ -426,6 +425,7 @@ export const RemoveWallet = (): Node => {
         getConceptualWalletSettingsCache: lookup.getConceptualWalletSettingsCache,
         getSigningKeyCache: lookup.getSigningKeyCache,
       });
+      // $FlowFixMe[prop-missing]: Some props are quite different for revamp components
       return (
         <WalletSettingsPage
           generated={{
@@ -439,6 +439,7 @@ export const RemoveWallet = (): Node => {
             },
             ChangeWalletPasswordDialogContainerProps: (null: any),
             ExportWalletDialogContainerProps: (null: any),
+            // $FlowFixMe[incompatible-type]: Revamp has different logic
             RemoveWalletDialogContainerProps: {
               generated: {
                 stores: {

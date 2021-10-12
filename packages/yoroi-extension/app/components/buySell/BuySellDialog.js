@@ -1,6 +1,6 @@
 // @flow
 import type { Node } from 'react';
-import React, { Component } from 'react';
+import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
@@ -18,8 +18,8 @@ import globalMessages from '../../i18n/global-messages';
 
 const messages = defineMessages({
   dialogTitle: {
-    id: 'buysell.dialog.title',
-    defaultMessage: '!!!Buy / Sell ADA',
+    id: 'buy.dialog.title',
+    defaultMessage: '!!!Buy ADA',
   },
   dialogSelectAddress: {
     id: 'buysell.dialog.selectAddress',

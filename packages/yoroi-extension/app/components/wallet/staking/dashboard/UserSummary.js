@@ -1,5 +1,5 @@
 // @flow
-import React, { Component } from 'react';
+import { Component } from 'react';
 import type { Node } from 'react';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
@@ -145,9 +145,7 @@ export default class UserSummary extends Component<Props, State> {
             <h3 className={styles.label}>
               {intl.formatMessage(globalMessages.totalRewardsLabel)}:
             </h3>
-            {/* <TODO:RWRD2109> */}
-            Due to protocol update, the rewards are being recalculated.
-            {/* {this.renderAmount(this.props.totalRewards)} */}
+            {this.renderAmount(this.props.totalRewards)}
           </div>
           <div className={styles.footer}>
             {this.props.withdrawRewards != null && (
@@ -156,7 +154,6 @@ export default class UserSummary extends Component<Props, State> {
                 label={intl.formatMessage(globalMessages.withdrawLabel)}
                 onClick={this.props.withdrawRewards}
                 skin={ButtonSkin}
-                disabled // <TODO:RWRD2109>
               />
             )}
             <div

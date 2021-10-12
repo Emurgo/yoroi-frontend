@@ -93,3 +93,35 @@
     }
   }
 }
+
+.revampWrapper {
+  margin: 20px 0;
+  display: flex;
+  justify-content: center;
+}
+.classic,
+.revamp {
+  background: white !important;
+  color: #6b7384 !important;
+  border: 1px solid #6b7384 !important;
+  &:hover {
+    color: #383838;
+    background: white !important;
+  }
+}
+.revamp {
+  position: relative;
+  &::after {
+    content: 'new';
+    text-transform: uppercase;
+    top: 50%;
+    right: 30px;
+    transform: translateY(-50%);
+    position: absolute;
+    font-size: 14px;
+    color: var(--theme-button-primary-text-color);
+    background-color: var(--theme-button-primary-background-color);
+    padding: 4px 10px;
+    border-radius: 777px;
+  }
+}

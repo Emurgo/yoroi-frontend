@@ -690,9 +690,20 @@ export class ModifyToken {
         const item = lookupMap.get(row.Digest)?.get(row.NetworkId);
         if (item == null) {
           toAdd.push(row);
-        } else if (JSON.stringify(item.Metadata) !== JSON.stringify(row.Metadata)) {
-          // we want to update the row if the metadata was updated
-          toAdd.push(row);
+        } else if (JSON.stringify(item.Metadata) !== JSON.stringify(row.Metadata)
+        || item.IsNFT !== row.IsNFT) {
+          // we want to update the row if the metadata or IsNFT flag was updated
+          // because of that, if TokenId is not present in row, we have to add it,
+          // otherwise the record will be re-inserted instead of updated, leaving us with
+          // duplicated rows
+          if (row.TokenId !== undefined) {
+            toAdd.push(row);
+          } else {
+            toAdd.push({
+              ...row,
+              TokenId: item.TokenId
+            });
+          }
         } else {
           knownTokens.push(item);
         }

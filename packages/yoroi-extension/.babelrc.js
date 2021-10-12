@@ -34,7 +34,12 @@ module.exports = function (api /*: ApiType */) /*: * */ {
         }
       ],
       '@babel/preset-flow',
-      '@babel/preset-react'
+      [
+        '@babel/preset-react',
+        {
+          runtime: 'automatic',
+        },
+      ],
     ],
     plugins: [
       '@babel/plugin-proposal-nullish-coalescing-operator',

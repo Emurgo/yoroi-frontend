@@ -1,6 +1,6 @@
 // @flow
 import type { Node } from 'react';
-import React, { Component } from 'react';
+import { Component } from 'react';
 import { computed } from 'mobx';
 import { Redirect } from 'react-router-dom';
 import { observer } from 'mobx-react';
