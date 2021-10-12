@@ -51,7 +51,7 @@
     margin: var(--theme-modal-margin-cmn);
     min-width: var(--theme-modal-min-max-width-cmn);
     max-width: var(--theme-modal-min-max-width-cmn);
-  
+
     & > .title {
       font-size: 16px;
       letter-spacing: 0px;
@@ -70,6 +70,29 @@
   }
 }
 
+:global(.YoroiRevamp) {
+  .component {
+    margin: var(--theme-modal-margin-cmn);
+    min-width: var(--theme-modal-min-max-width-cmn);
+    max-width: var(--theme-modal-min-max-width-cmn);
+
+    & > .title {
+      font-size: 16px;
+      letter-spacing: 0px;
+    }
+
+    & > .content {
+      padding: 0 40px;
+      margin: 0 -40px;
+      max-height: 60vh;
+
+      /* Fix: non-zero bottom margin helps dynamic height rendering and prevents unnecessary scrollbars  */
+      & > :last-child {
+        margin-bottom: 1px;
+      }
+    }
+  }
+}
 .isSubmittingPrimary {
   @include loading-spinner("../../assets/images/spinner-light.svg");
 }

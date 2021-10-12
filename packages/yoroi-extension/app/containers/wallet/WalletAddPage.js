@@ -1,5 +1,5 @@
 // @flow
-import type { Node } from 'react';
+import type { Node, ComponentType } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { computed } from 'mobx';
@@ -64,13 +64,18 @@ import type {
 import {
   networks, isJormungandr, isCardanoHaskell, isErgo,
 } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import NavBarRevamp from '../../components/topbar/NavBarRevamp';
+import { withLayout } from '../../themes/context/layout'
+import type { LayoutComponentMap } from '../../themes/context/layout'
 
 export type GeneratedData = typeof WalletAddPage.prototype.generated;
 
 type Props = InjectedOrGenerated<GeneratedData>;
+type InjectedProps = {| +renderLayoutComponent: LayoutComponentMap => Node |};
+type AllProps = {| ...Props, ...InjectedProps |};
 
 @observer
-export default class WalletAddPage extends Component<Props> {
+class WalletAddPage extends Component<AllProps> {
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
@@ -325,15 +330,29 @@ export default class WalletAddPage extends Component<Props> {
         </TopBarLayout>
       );
     }
-    const navbarElement = (
+
+
+    const navbarElementClassic = (
       <NavBar
         title={
-          <NavBarTitle
-            title={this.context.intl.formatMessage(globalMessages.addWalletLabel)}
-          />
+          <NavBarTitle title={this.context.intl.formatMessage(globalMessages.addWalletLabel)} />
         }
       />
     );
+
+    const navbarElementRevamp = (
+      <NavBarRevamp
+        title={
+          <NavBarTitle title={this.context.intl.formatMessage(globalMessages.addWalletLabel)} />
+        }
+      />
+    );
+
+    const navbarElement = this.props.renderLayoutComponent({
+      CLASSIC: navbarElementClassic,
+      REVAMP: navbarElementRevamp,
+    });
+
     return (
       <TopBarLayout
         banner={(<BannerContainer {...this.generated.BannerContainerProps} />)}
@@ -527,3 +546,4 @@ export default class WalletAddPage extends Component<Props> {
     });
   }
 }
+export default (withLayout(WalletAddPage): ComponentType<Props>)

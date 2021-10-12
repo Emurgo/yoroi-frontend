@@ -16,7 +16,7 @@ export default class TxBuilderActions {
   updateTentativeTx: Action<void> = new Action();
   setFilter: Action<(ElementOf<IGetAllUtxosResponse> => boolean)> = new Action();
   updateMetadata: Action<Array<TransactionMetadata> | void> = new Action();
-  toggleSendAll: Action<void> = new Action();
+  updateSendAllStatus: Action<void | boolean> = new Action();
   initialize: AsyncAction<SetupSelfTxRequest> = new AsyncAction();
   reset: Action<void> = new Action();
 }
