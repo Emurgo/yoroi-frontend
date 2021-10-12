@@ -22,8 +22,8 @@ const messages = defineMessages({
     defaultMessage: '!!!Byron-era (read-only) wallet',
   },
   restoreShelleyEraWalletTitle: {
-    id: 'wallet.add.optionDialog.walletEra.shelleyEra.title',
-    defaultMessage: '!!!Shelley-era wallet',
+    id: 'wallet.add.optionDialog.walletEra.standard.title',
+    defaultMessage: '!!!Standard wallet',
   },
 });
 

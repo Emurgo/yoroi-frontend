@@ -348,7 +348,5 @@ export function ergoTxEqual(
   req1: RustModule.SigmaRust.UnsignedTransaction,
   req2: RustModule.SigmaRust.UnsignedTransaction,
 ): boolean {
-  const tx1 = req1.to_json();
-  const tx2 = req2.to_json();
-  return JSON.stringify(tx1) === JSON.stringify(tx2);
+  return req1.to_json() === req2.to_json();
 }

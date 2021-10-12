@@ -29,6 +29,7 @@ export const mockWalletProps: {
   location: string,
   ...
 } => {| generated: GeneratedData |} = (request) => ({
+  // $FlowFixMe[prop-missing]: Some props are quite different for revamp components
   generated: {
     stores: {
       app: {
@@ -37,13 +38,20 @@ export const mockWalletProps: {
       wallets: {
         selected: request.selected,
       },
+      transactions: {
+        getBalanceRequest: {
+          result: null,
+        },
+      },
       walletSettings: {
         getWalletWarnings: request.getWalletWarnings ?? ((publicDeriver) => ({
           publicDeriver,
           dialogs: [],
         }))
       },
-    },
+      router: {
+        location: request.location,
+      },    },
     actions: {
       router: {
         goToRoute: { trigger: action('goToRoute') },

@@ -33,6 +33,7 @@ import CrashPage from './containers/CrashPage';
 import { Logger } from './utils/logging';
 import { SimpleSkins } from 'react-polymorph/lib/skins/simple';
 import { SimpleDefaults } from 'react-polymorph/lib/themes/simple';
+import { LayoutProvider } from './themes/context/layout';
 import { ThemeProvider as MuiThemeProvide } from '@mui/material/styles';
 import { CssBaseline } from '@mui/material';
 import { globalStyles } from './styles/globalStyles';
@@ -102,27 +103,29 @@ class App extends Component<Props, State> {
 
     changeToplevelTheme(currentTheme);
 
-    const muiTheme = MuiThemes[currentTheme] ?? 'YoroiModern';
+    const muiTheme = MuiThemes[currentTheme ?? 'YoroiModern'];
 
     return (
       <div style={{ height: '100%' }}>
-        <MuiThemeProvide theme={muiTheme}>
-          <CssBaseline />
-          {globalStyles(muiTheme)}
-          <ThemeManager variables={themeVars} />
-          {/* Automatically pass a theme prop to all components in this subtree. */}
-          <ThemeProvider
-            key={currentTheme}
-            theme={yoroiPolymorphTheme}
-            skins={SimpleSkins}
-            variables={SimpleDefaults}
-            themeOverrides={themeOverrides(currentTheme)}
-          >
-            <IntlProvider {...{ locale, key: locale, messages: mergedMessages }}>
-              {this.getContent()}
-            </IntlProvider>
-          </ThemeProvider>
-        </MuiThemeProvide>
+        <LayoutProvider>
+          <MuiThemeProvide theme={muiTheme}>
+            <CssBaseline />
+            {globalStyles(muiTheme)}
+            <ThemeManager variables={themeVars} />
+            {/* Automatically pass a theme prop to all components in this subtree. */}
+            <ThemeProvider
+              key={currentTheme}
+              theme={yoroiPolymorphTheme}
+              skins={SimpleSkins}
+              variables={SimpleDefaults}
+              themeOverrides={themeOverrides(currentTheme)}
+            >
+              <IntlProvider {...{ locale, key: locale, messages: mergedMessages }}>
+                {this.getContent()}
+              </IntlProvider>
+            </ThemeProvider>
+          </MuiThemeProvide>
+        </LayoutProvider>
       </div>
     );
   }

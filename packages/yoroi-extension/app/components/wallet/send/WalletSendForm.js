@@ -40,6 +40,7 @@ import Select from '../../common/Select';
 import { Box } from '@mui/system';
 import TokenOptionRow from '../../widgets/tokenOption/TokenOptionRow';
 import BigNumber from 'bignumber.js';
+import classnames from 'classnames';
 
 const messages = defineMessages({
   receiverLabel: {
@@ -78,6 +79,10 @@ const messages = defineMessages({
     id: 'wallet.transaction.memo.optional.invalid',
     defaultMessage: '!!!Memo cannot be more than {maxMemo} characters.',
   },
+  willSendAll: {
+    id: 'wallet.send.form.willSendAll',
+    defaultMessage: '!!!Will Send All Tokens!'
+  }
 });
 
 type Props = {|
@@ -94,7 +99,7 @@ type Props = {|
   +updateAmount: (?BigNumber) => void,
   +updateMemo: (void | string) => void,
   +shouldSendAll: boolean,
-  +toggleSendAll: void => void,
+  +updateSendAllStatus: (void | boolean) => void,
   +fee: ?MultiToken,
   +isCalculatingFee: boolean,
   +reset: void => void,
@@ -377,11 +382,12 @@ export default class WalletSendForm extends Component<Props> {
     })();
 
 
+    const tokenId = this.props.selectedToken?.TokenId ?? this.props.getTokenInfo({
+      identifier: this.props.defaultToken.Identifier,
+      networkId: this.props.defaultToken.NetworkId,
+    }).TokenId
+
     const sendAmountOptions = (() => {
-      const tokenId = this.props.selectedToken?.TokenId ?? this.props.getTokenInfo({
-        identifier: this.props.defaultToken.Identifier,
-        networkId: this.props.defaultToken.NetworkId,
-      }).TokenId
       return [
         { id: 'custom-amount', label: intl.formatMessage(messages.customAmount), value: CUSTOM_AMOUNT },
         ...tokenOptions.filter(t => t.value === tokenId).map(token => {
@@ -400,7 +406,13 @@ export default class WalletSendForm extends Component<Props> {
         })
       ]
     })()
-
+    const tokenListClasses = classnames([
+      styles.tokenList,
+      {
+        [styles.show]: this.props.shouldSendAll &&
+           this.form.$('selectedToken').value === tokenId
+      }
+    ])
     return (
       <div className={styles.component}>
         {hasAnyPending && pendingTxWarningComponent}
@@ -411,14 +423,14 @@ export default class WalletSendForm extends Component<Props> {
               formControlProps={{ sx: { marginBottom: '10px' } }}
               labelId="token-assets-select"
               {...form.$('selectedToken').bind()}
-              onChange={tokenId => {
-                this.props.onAddToken(
-                  tokenOptions.find(token => token.info.TokenId === tokenId)?.info
-                );
+              onChange={value => {
+                this.props.onAddToken(tokenOptions.find(
+                  token => token.info.TokenId === value
+                )?.info);
 
                 // clear send all when changing currencies
                 if (this.props.shouldSendAll) {
-                  this.props.toggleSendAll();
+                  this.props.updateSendAllStatus(false);
                 }
                 // clear amount field when switching currencies
                 this.form.$('amount').clear();
@@ -506,25 +518,27 @@ export default class WalletSendForm extends Component<Props> {
               </Typography>
             )}
             onChange={value => {
-              this.form.$('selectedAmount').value = value;
-              if (value === CUSTOM_AMOUNT && this.props.shouldSendAll) {
-                this.props.toggleSendAll();
-              } else if (value !== CUSTOM_AMOUNT) {
-                this.props.toggleSendAll();
-              }
-              if (this.props.shouldSendAll) {
-                // if we toggle shouldSendAll from true -> false
+              // Do nothing if we select the same option twice
+              if (this.form.$('selectedAmount').value === value) return
+              if (value === CUSTOM_AMOUNT) {
+                this.props.updateSendAllStatus(false);
+              } else {
+                // if we switched shouldSendAll from true -> false
                 // we need to re-enable the field
                 // and set it to whatever value was used for the sendAll value
-                this.props.updateAmount(
-                  new BigNumber(
-                    formattedAmountToNaturalUnits(
-                      this.form.$('amount').value,
-                      this.getNumDecimals()
-                    )
-                  )
-                );
+                this.props.updateSendAllStatus(true);
               }
+
+              if (this.props.shouldSendAll) {
+                this.props.updateAmount(new BigNumber(
+                  formattedAmountToNaturalUnits(
+                    this.form.$('amount').value,
+                    this.getNumDecimals(),
+                  )
+                ));
+              }
+
+              this.form.$('selectedAmount').value = value;
             }}
           >
             {sendAmountOptions.map(option => (
@@ -533,6 +547,14 @@ export default class WalletSendForm extends Component<Props> {
               </MenuItem>
             ))}
           </Select>
+
+          <div className={tokenListClasses}>
+            <h1>{intl.formatMessage(messages.willSendAll)}</h1>
+            {tokenOptions.map(token => (
+              <p key={token.id}>
+                {token.amount} {' '} {token.label}
+              </p>))}
+          </div>
 
           {showMemo ? (
             <div className={styles.memoInput}>

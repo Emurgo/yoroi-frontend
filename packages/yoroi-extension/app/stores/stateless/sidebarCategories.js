@@ -11,16 +11,26 @@ import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/in
 import { matchRoute } from '../../utils/routing';
 import environment from '../../environment';
 
+import walletIcon from '../../assets/images/sidebar/revamp/wallet.inline.svg';
+import stakingIcon from '../../assets/images/sidebar/revamp/staking.inline.svg';
+import assetsIcon from '../../assets/images/sidebar/revamp/assets.inline.svg';
+import votingIcon from '../../assets/images/sidebar/revamp/voting.inline.svg';
+import swapIcon from '../../assets/images/sidebar/revamp/swap.inline.svg';
+import settingIcon from '../../assets/images/sidebar/revamp/setting.inline.svg';
+import faqIcon from '../../assets/images/sidebar/revamp/faq.inline.svg';
+import newUpdatesIcon from '../../assets/images/sidebar/revamp/new-updates.inline.svg';
+import feedbackIcon from '../../assets/images/sidebar/revamp/feedback.inline.svg';
+
 export type SidebarCategory = {|
   +className: string,
   +route: string,
   +icon: string,
   +label?: MessageDescriptor,
-  +isVisible: {|
+  +isVisible: ({|
     hasAnyWallets: boolean,
     selected: null | PublicDeriver<>,
     currentRoute: string,
-  |} => boolean,
+  |}) => boolean,
 |};
 
 export const allCategories: Array<SidebarCategory> = [];
@@ -34,21 +44,17 @@ export const MY_WALLETS: SidebarCategory = registerCategory({
   route: ROUTES.MY_WALLETS,
   icon: walletsIcon,
   label: globalMessages.sidebarWallets,
-  isVisible: request => (
+  isVisible: request =>
     request.hasAnyWallets &&
     request.selected == null &&
-    matchRoute(ROUTES.WALLETS.ADD, request.currentRoute) === false
-  ),
+    matchRoute(ROUTES.WALLETS.ADD, request.currentRoute) === false,
 });
 export const WALLETS_ROOT: SidebarCategory = registerCategory({
   className: 'wallets',
   route: ROUTES.WALLETS.ROOT,
   icon: walletsIcon,
   label: globalMessages.sidebarWallets,
-  isVisible: request => (
-    request.hasAnyWallets &&
-    request.selected != null
-  ),
+  isVisible: request => request.hasAnyWallets && request.selected != null,
 });
 
 export const BACK_TO_ADD: SidebarCategory = registerCategory({
@@ -56,9 +62,7 @@ export const BACK_TO_ADD: SidebarCategory = registerCategory({
   route: ROUTES.WALLETS.ADD,
   icon: goBackIcon,
   label: globalMessages.goBack,
-  isVisible: request => (
-    !request.hasAnyWallets
-  ),
+  isVisible: request => !request.hasAnyWallets,
 });
 
 export const BACK_TO_MY_WALLETS: SidebarCategory = registerCategory({
@@ -66,11 +70,10 @@ export const BACK_TO_MY_WALLETS: SidebarCategory = registerCategory({
   route: ROUTES.MY_WALLETS,
   icon: goBackIcon,
   label: globalMessages.goBack,
-  isVisible: request => (
+  isVisible: request =>
     request.hasAnyWallets &&
     request.selected == null &&
-    matchRoute(ROUTES.WALLETS.ADD, request.currentRoute) !== false
-  ),
+    matchRoute(ROUTES.WALLETS.ADD, request.currentRoute) !== false,
 });
 
 export const SETTINGS: SidebarCategory = registerCategory({
@@ -95,3 +98,80 @@ export const NOTICE_BOARD: SidebarCategory = registerCategory({
   icon: noticeBoardIcon,
   isVisible: _request => !environment.isProduction(),
 });
+export type SidebarCategoryRevamp = {|
+  +className: string,
+  +route: string,
+  +icon: string,
+  +label?: MessageDescriptor,
+  +isVisible: ({|
+    hasAnyWallets: boolean,
+    selected: null | PublicDeriver<>,
+    currentRoute: string,
+  |}) => boolean,
+|};
+// TODO: Fix routes and isVisible prop
+export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
+  {
+    className: 'wallets',
+    route: ROUTES.MY_WALLETS,
+    icon: walletIcon,
+    label: globalMessages.walletLabel,
+    isVisible: _request => true,
+  },
+  {
+    className: 'staking',
+    route: '/staking',
+    icon: stakingIcon,
+    label: globalMessages.sidebarStaking,
+    isVisible: _request => true,
+  },
+  {
+    className: 'assets',
+    route: '/assets',
+    icon: assetsIcon,
+    label: globalMessages.sidebarAssets,
+    isVisible: _request => true,
+  },
+  {
+    className: 'voting',
+    route: '/voting',
+    icon: votingIcon,
+    label: globalMessages.sidebarVoting,
+    isVisible: _request => true,
+  },
+  {
+    className: 'swap',
+    route: '/swap',
+    icon: swapIcon,
+    label: globalMessages.sidebarSwap,
+    isVisible: _request => true,
+  },
+  {
+    className: 'settings',
+    route: '/settings',
+    icon: settingIcon,
+    label: globalMessages.sidebarSettings,
+    isVisible: _request => true,
+  },
+  {
+    className: 'faq',
+    route: 'https://yoroi-wallet.com/faq',
+    icon: faqIcon,
+    label: globalMessages.sidebarFaq,
+    isVisible: _request => true,
+  },
+  {
+    className: 'new-updates',
+    route: '/new-updates',
+    icon: newUpdatesIcon,
+    label: globalMessages.sidebarNewUpdates,
+    isVisible: _request => true,
+  },
+  {
+    className: 'feedback',
+    route: '/feedback',
+    icon: feedbackIcon,
+    label: globalMessages.sidebarFeedback,
+    isVisible: _request => true,
+  },
+];
