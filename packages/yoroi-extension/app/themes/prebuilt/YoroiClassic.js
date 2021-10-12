@@ -12,27 +12,6 @@ const sidebarGradient = {
 };
 
 const YoroiClassic = {
-  // FONTS
-  '--preferred-font': '"Times New Roman", serif',
-
-  '--font-ultralight': 'SFUIDisplay-Ultralight',
-  '--font-thin': 'SFUIDisplay-Thin',
-  '--font-light': 'SFUIDisplay-Light',
-  '--font-regular': 'SFUIDisplay-Regular',
-  '--font-medium': 'SFUIDisplay-Medium',
-  '--font-semibold': 'SFUIDisplay-Semibold',
-  '--font-bold': 'SFUIDisplay-Bold',
-  '--font-heavy': 'SFUIDisplay-Heavy',
-  '--font-black': 'SFUIDisplay-Black',
-
-  '--font-mono-thin': 'RobotoMono-Thin',
-  '--font-mono-light': 'RobotoMono-Light',
-  '--font-mono-regular': 'RobotoMono-Regular',
-  '--font-mono-medium': 'RobotoMono-Medium',
-  '--font-mono-bold': 'RobotoMono-Bold',
-
-  '--theme-input-hint-font': 'SFUIDisplay-Regular',
-
   // COLORS
   '--theme-border-gray': '#DEE2EA',
   '--theme-scrollbar-thumb-background': '#c8ccce',
@@ -233,10 +212,8 @@ const YoroiClassic = {
 
   // Sidebar
   '--theme-sidebar-background-color': `linear-gradient(22.58deg, ${sidebarGradient.start} 0%, ${sidebarGradient.end} 100%)`,
-  '--theme-sidebar-text-left-spacing': '16px',
   '--theme-sidebar-text-color': '#FFFFFF',
-  '--theme-sidebar-text-font-size': '14px',
-  '--theme-sidebar-text-line-height': '22px',
+  '--theme-sidebar-text--size': '14px',
   '--theme-sidebar-icon-color': '#FFFFFF',
   '--theme-sidebar-icon-color-hover': '#DAA49A',
   '--theme-sidebar-icon-color-active': '#DAA49A',

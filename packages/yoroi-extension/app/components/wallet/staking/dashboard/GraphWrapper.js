@@ -120,8 +120,8 @@ const Graph: {|
     barWidth: themeVars['--theme-dashboard-graph-bar-width'],
     barHoverBgColor: themeVars['--theme-dashboard-graph-bar-hover-background-color'],
     barPrimaryColor: themeVars['--theme-dashboard-graph-bar-primary-color'],
-    fontSize: themeVars['--theme-dashboard-graph-font-size'],
-    lineHeight: themeVars['--theme-dashboard-graph-line-height'],
+    fontSize: '0.75rem',
+    lineHeight: 14,
   };
 
   const formatYAxis = (value) => (

@@ -18,27 +18,6 @@ const modalMargin = {
 };
 
 const YoroiModern = {
-  // FONTS
-  '--preferred-font': '"Times New Roman", serif',
-
-  '--font-ultralight': 'Rubik-Light',
-  '--font-thin': 'Rubik-Light',
-  '--font-light': 'Rubik-Light',
-  '--font-regular': 'Rubik-Regular',
-  '--font-medium': 'Rubik-Medium',
-  '--font-semibold': 'Rubik-Medium',
-  '--font-bold': 'Rubik-Bold',
-  '--font-heavy': 'Rubik-Bold',
-  '--font-black': 'Rubik-Black',
-
-  '--font-mono-thin': 'RobotoMono-Thin',
-  '--font-mono-light': 'RobotoMono-Light',
-  '--font-mono-regular': 'RobotoMono-Regular',
-  '--font-mono-medium': 'RobotoMono-Medium',
-  '--font-mono-bold': 'RobotoMono-Bold',
-
-  '--theme-input-hint-font': 'Rubik-Regular',
-
   // COLORS
   '--theme-border-gray': '#DEE2EA',
   '--theme-scrollbar-thumb-background': '#c8ccce',
@@ -282,20 +261,13 @@ const YoroiModern = {
   '--theme-dashboard-graph-bar-primary-color': '#6D80FF',
   '--theme-dashboard-graph-bar-secondary-color': '#1A44B7',
   '--theme-dashboard-graph-bar-width': 16,
-  '--theme-dashboard-graph-font-size': 12,
-  '--theme-dashboard-graph-line-height': 14,
-  '--theme-dashboard-graph-tooltip-font-size': '11px',
-  '--theme-dashboard-graph-tooltip-line-height': '14px',
   '--theme-dashboard-graph-tooltip-text-color': '#FFFFFF',
   '--theme-dashboard-graph-tooltip-background': 'rgba(56, 57, 61, 0.7)',
 
   // Sidebar
   '--theme-sidebar-background-color':
     'linear-gradient(22.58deg, rgba(36,74,191,1) 0%, rgba(71,96,255,1) 100%)',
-  '--theme-sidebar-text-left-spacing': '16px',
   '--theme-sidebar-text-color': '#FFFFFF',
-  '--theme-sidebar-text-font-size': '14px',
-  '--theme-sidebar-text-line-height': '22px',
   '--theme-sidebar-icon-color': '#FFFFFF',
   '--theme-sidebar-icon-color-hover': '#17D1AA',
   '--theme-sidebar-icon-color-active': '#17D1AA',
