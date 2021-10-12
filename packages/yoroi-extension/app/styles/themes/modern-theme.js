@@ -65,9 +65,13 @@ const theme = {
       contrastText: '#FFF',
     },
     background: {
-      sidebarGradient: {
+      sidebar: {
         start: '#1e46bd',
         end: '#4760ff',
+        text: '#FFFFFF',
+      },
+      banner: {
+        warning: '#f5a623',
       },
     },
   },

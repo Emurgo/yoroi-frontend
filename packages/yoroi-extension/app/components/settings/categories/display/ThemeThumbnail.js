@@ -115,6 +115,6 @@ const SRect = styled('rect')(({ theme }) => ({
 }));
 
 const SGradient = styled('linearGradient')(({ theme }) => ({
-  '--gradient-start': theme.palette.background.sidebarGradient.start,
-  '--gradient-end': theme.palette.background.sidebarGradient.end,
+  '--gradient-start': theme.palette.background.sidebar.start,
+  '--gradient-end': theme.palette.background.sidebar.end,
 }));
