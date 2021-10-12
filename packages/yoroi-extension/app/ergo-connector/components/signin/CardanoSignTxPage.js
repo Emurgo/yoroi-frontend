@@ -5,8 +5,7 @@ import type { Node } from 'react';
 import { intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import styles from './SignTxPage.scss';
-import { Button } from 'react-polymorph/lib/components/Button';
-import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
+import { Button } from '@mui/material';
 import { Input } from 'react-polymorph/lib/components/Input';
 import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
 import globalMessages from '../../../i18n/global-messages';
@@ -338,18 +337,16 @@ class SignTxPage extends Component<Props> {
             />
           </div>
           <div className={styles.wrapperBtn}>
+            <Button variant="secondary" className="secondary" onClick={onCancel}>
+              {intl.formatMessage(globalMessages.cancel)}
+            </Button>
             <Button
-              className="secondary"
-              label={intl.formatMessage(globalMessages.cancel)}
-              skin={ButtonSkin}
-              onClick={onCancel}
-            />
-            <Button
-              label={intl.formatMessage(globalMessages.confirm)}
-              skin={ButtonSkin}
+              variant="primary"
               disabled={!walletPasswordField.isValid}
               onClick={this.submit.bind(this)}
-            />
+            >
+              {intl.formatMessage(globalMessages.confirm)}
+            </Button>
           </div>
         </div>
       </>
