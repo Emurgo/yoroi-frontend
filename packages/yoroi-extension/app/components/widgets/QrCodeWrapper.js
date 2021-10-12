@@ -9,15 +9,17 @@ type Props = {|
   +size: number,
 |};
 
+function readCssVar(varName: string): string {
+  varName = varName.startsWith('--') ? varName : '--' + varName;
+  return window.getComputedStyle(document.documentElement).getPropertyValue(varName);
+}
+
 @observer
 export default class QrCodeWrapper extends Component<Props> {
   render(): Node {
-
     // Get QRCode color value from active theme's CSS variable
-    const qrCodeBackgroundColor = document.documentElement ?
-      document.documentElement.style.getPropertyValue('--theme-receive-qr-code-background-color') : 'transparent';
-    const qrCodeForegroundColor = document.documentElement ?
-      document.documentElement.style.getPropertyValue('--theme-receive-qr-code-foreground-color') : '#000';
+    const qrCodeBackgroundColor = readCssVar('--th-qr-code-background');
+    const qrCodeForegroundColor = readCssVar('--th-qr-code-foreground');
 
     return (
       <QRCode

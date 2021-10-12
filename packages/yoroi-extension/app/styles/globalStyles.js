@@ -63,6 +63,8 @@ const globalStyles = (theme: Object): Node => (
         '--th-palette-tx-status-low-background': theme.palette.txStatus.low.background,
         '--th-palette-tx-status-low-text': theme.palette.txStatus.low.text,
 
+        '--th-palette-background-banner-warning': theme.palette.background.banner.warning,
+
         /* === BUTTON === */
         // button primary variant
         '--component-button-primary-background': 'var(--th-palette-secondary-300)',
@@ -133,6 +135,28 @@ const globalStyles = (theme: Object): Node => (
         '--component-dialog-text': 'var(--th-palette-gray-900)',
         '--component-dialog-overlay-background-color': 'var(--th-palette-background-overlay)',
         '--component-dialog-min-width-cmn': '540px',
+
+        '--th-sidebar-text': theme.palette.background.sidebar.text,
+        '--th-sidebar-background': `linear-gradient(22.58deg, ${theme.palette.background.sidebar.start} 0%, ${theme.palette.background.sidebar.end} 100%)`,
+        '--th-sidebar-end': theme.palette.background.sidebar.end,
+
+        '--th-notification-message-background': 'rgba(21, 209, 170, 0.8)',
+
+        /* === QR CODE === */
+        '--th-qr-code-background': 'transparent',
+        '--th-qr-code-foreground': 'var(--th-palette-gray-800)',
+
+        /* === TO FIX: === */
+
+        '--th-transactions-icon-type-expend-background-color': '#15d1aa',
+        '--th-transactions-icon-type-income-background-color': '#9ab2d9',
+        '--th-transactions-icon-type-exchange-background-color': '#10aca4',
+        '--th-transactions-icon-type-failed-background-color': '#eb6d7a',
+
+        '--scrollbar-thumb-background': '#c8ccce',
+
+        '--warning-box-bg-shadow': '0 2px 40px 0 rgba(242, 242, 242, 0.5)',
+        '--topbar-height': '64px',
       },
 
       /* === GLOBAL STYLES === */

@@ -1,14 +1,6 @@
 // @flow
 //  ==== Theme: Yoroi Modern === //
 
-// OPTION CARD
-
-// Sidebar gradient
-const sidebarGradient = {
-  start: '#1e46bd',
-  end: '#4760ff',
-};
-
 // Modal Margin
 const modalMargin = {
   top: 24,
@@ -20,30 +12,8 @@ const modalMargin = {
 const YoroiModern = {
   // COLORS
 
-  '--theme-receive-qr-code-background-color': 'transparent',
-  '--theme-receive-qr-code-foreground-color': '#353535',
-
   '--theme-send-confirmation-dialog-send-values-color': '#15d1aa',
   '--theme-hw-send-confirmation-info-block-background-color': '#f0f3f5',
-
-  '--theme-settings-pane-background-color': '#ffffff',
-  '--theme-settings-pane-border': '1px solid #ffffff',
-  '--theme-settings-menu-box-background-color': '#f0f3f5',
-  '--theme-settings-menu-box-border': '1px solid #f0f3f5',
-  '--theme-settings-menu-item-text-color': '#adaeb6',
-  '--theme-settings-menu-item-text-color-active': '#2b2c32',
-  '--theme-settings-menu-item-text-color-enabled-hover': '#2b2c32',
-  '--theme-settings-menu-item-text-color-disabled': '#D9DAE1',
-  '--theme-settings-menu-item-background-color-active': '#ffffff',
-  '--theme-settings-menu-item-left-border-color-active': '#3d5cdb',
-  '--theme-settings-theme-select-title-color': '#2b2c32',
-
-  '--theme-topbar-background-color-gradient-start': sidebarGradient.start,
-  '--theme-topbar-background-color-gradient-end': sidebarGradient.end,
-  '--theme-topbar-background-color': `linear-gradient(to right, ${sidebarGradient.start}, ${sidebarGradient.end})`,
-  '--theme-topbar-wallet-name-color': '#ffffff',
-  '--theme-topbar-wallet-info-color': '#ffffff',
-  '--theme-topbar-layout-body-background-color': '#ffffff',
 
   '--theme-transactions-state-pending-background-color': '#F0F3F5',
   '--theme-transactions-state-pending-stripes-color': 'rgba(217, 221, 224, 0.2)', // #D9DDE0
@@ -91,7 +61,6 @@ const YoroiModern = {
   '--theme-widgets-hash-dark-color': '#464749',
   '--theme-widgets-hash-light-color': '#adaeB6',
 
-
   '--theme-default-color-blue': '#2249BE',
 
   // OTHERS
@@ -100,20 +69,6 @@ const YoroiModern = {
   '--theme-modal-min-max-width-lg': `${680 - (modalMargin.left + modalMargin.right)}px`,
 
   '--theme-wallet-navigation-tab-height': '62px',
-  '--theme-wallet-navigation-tab-text-color': '#6B7384',
-  '--theme-wallet-navigation-tab-text-color-active': '#17D1AA',
-  '--theme-wallet-navigation-tab-text-color-hover': '#17D1AA',
-  '--theme-wallet-navigation-tab-text-color-disabled': '#C4CAD7',
-
-  '--theme-warning-box-bg-color': 'rgba(255, 19, 81, 0.06)', // #FF1351
-
-  '--theme-warning-color': `#FF1351`,
-  '--theme-warning-button-color': `#CC0E41`,
-  '--theme-warning-button-color-active': `#CC0E41`,
-  '--theme-warning-button-color-hover': `#FF1351`,
-  '--theme-warning-button-color-disabled': `rgba(204, 14, 65, 0.35)`, // CC0E41
-
-  '--theme-tooltipbox-border-color': 'rgba(77,32,192,0.08)', // 4d20c0
 
   // Dashboard
   '--theme-dashboard-page-background-color': '#ffffff',
