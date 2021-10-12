@@ -49,11 +49,11 @@ const theme = {
   palette: {
     /* `main` is added since MUI required it but we don't use it at all */
     primary: {
-      main: '#3154CB',
-      '50': '#E1E7F2',
-      '100': '#164FD6',
-      '200': '#3154CB',
-      '300': '#1A44B7',
+      main: '#daa49a',
+      '50': '#F4FDFA',
+      '100': '#C9ECE5',
+      '200': '#EDB2A6',
+      '300': '#DAA49A',
       contrastText: '#FFF',
     },
     secondary: {

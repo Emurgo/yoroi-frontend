@@ -1,183 +1,7 @@
 // @flow
 //  ==== Theme: Yoroi Modern === //
-import common from './Common';
-
-// FONTS
-const rpFonts = {
-  '--rp-theme-font-thin': 'Rubik-Light',
-  '--rp-theme-font-light': 'Rubik-Light',
-  '--rp-theme-font-medium': 'Rubik-Medium',
-  '--rp-theme-font-regular': 'Rubik-Regular',
-  '--rp-theme-font-bold': 'Rubik-Bold',
-};
-
-// AUTOCOMPLETE
-const rpAutocomplete = {
-  '--rp-autocomplete-bg-color': 'transparent',
-  '--rp-autocomplete-border': '1px solid #9b9b9b',
-  '--rp-autocomplete-border-color-opened': '#353535',
-  '--rp-autocomplete-input-text-color': '#353535',
-  '--rp-autocomplete-placeholder-color': 'rgba(94, 96, 102, 0.5)', // #5E6066
-  '--rp-autocomplete-selected-word-box-bg-color': '#f0f3f5',
-  '--rp-autocomplete-selected-word-box-bg-color-secondary': '#D9DDE0',
-  '--rp-autocomplete-selected-word-text-color': '#353535',
-};
-
-// BUBBLE
-const rpBubble = {
-  '--rp-bubble-bg-color': '#fff',
-  '--rp-bubble-border-color': '#fff',
-  '--rp-bubble-border-radius': '8px',
-  // arrows are actually used by tooltips
-  '--rp-bubble-arrow-width': '14px',
-  '--rp-bubble-arrow-height': '4px',
-};
-
-// BUTTON
-const rpButton = {
-  '--rp-button-bg-color': '#17d1aa',
-  '--rp-button-bg-color-active': '#12b190',
-  '--rp-button-bg-color-disabled': 'rgba(23, 209, 170, 0.3)', // #17d1aa
-  '--rp-button-bg-color-hover': '#17e2b8',
-  '--rp-button-font-family': rpFonts['--rp-theme-font-medium'],
-  '--rp-button-font-size': '14px',
-  '--rp-button-line-height': '20px',
-  '--rp-button-padding': '12px 20px',
-  '--rp-button-text-color': '#fff',
-  '--rp-button-text-transform': 'none',
-};
-
-// CHECKBOX
-const rpCheckbox = {
-  '--rp-checkbox-border': '2px solid #353535',
-  '--rp-checkbox-border-color-disabled': 'rgba(21, 209, 170, 0.2)', // #15d1aa
-  '--rp-checkbox-check-bg-color': '#15d1aa',
-  '--rp-checkbox-label-text-color': common['--cmn-default-color-grey'],
-  '--rp-checkbox-label-text-color-disabled': 'rgba(53, 53, 53, 0.3)', // #353535
-};
-
-// COLORS
-const rpColors = {
-  '--rp-theme-color-error': '#ff1351',
-};
-
-// FORMFIELD
-const rpFormfield = {
-  '--rp-formfield-bg-color-disabled': 'none',
-  '--rp-formfield-label-text-color': '#353535',
-  '--rp-formfield-label-text-color-disabled': 'rgba(53, 53, 53, 0.5)', // '#353535
-  '--rp-formfield-error-text-color': '#ff1351',
-  '--rp-formfield-error-text-opacity': '1',
-};
-
-// INPUT
-const rpInput = {
-  '--rp-input-bg-color': 'transparent',
-  '--rp-input-bg-color-disabled': 'transparent',
-  '--rp-input-border-color': '#9b9b9b',
-  '--rp-input-border-color-disabled': 'rgba(155, 155, 155, 0.5)', // #9b9b9b
-  '--rp-input-border-color-errored': '#ff1351',
-  '--rp-input-border-color-focus': '#4a4a4a',
-  '--rp-input-placeholder-color': 'rgba(94, 96, 102, 0.5)', // #5E6066
-  '--rp-input-placeholder-color-disabled': 'rgba(94, 96, 102, 0.5)', // #5E6066
-  '--rp-input-text-color': '#353535',
-  '--rp-input-text-color-disabled': 'rgba(94, 96, 102, 0.5)', // #5E6066
-  '--rp-input-font-family': rpFonts['--rp-theme-font-regular'],
-};
-
-// MODAL
-const rpModal = {
-  '--rp-modal-bg-color': '#fff',
-  '--rp-modal-max-height': '97%',
-  '--rp-modal-overlay-bg-color': 'rgba(6, 13, 36, 0.8)', // #060D24
-};
-
-// OPTIONS
-const rpOptions = {
-  '--rp-option-bg-color': '#fff',
-  '--rp-option-bg-color-highlighted': '#edeeef',
-  '--rp-option-border-color': '#c6cdd6',
-  '--rp-option-checkmark-color': '#353535',
-  '--rp-option-line-height': '22px',
-  '--rp-option-text-color': '#353535',
-  '--rp-options-border-color': '#c6cdd6',
-  '--rp-options-shadow': 'none',
-};
-
-// SELECT
-const rpSelect = {
-  '--rp-select-arrow-bg-color': '#9b9b9b',
-  '--rp-select-arrow-bg-color-open': '#353535',
-  '--rp-select-input-bg-color': '#fafbfc',
-  '--rp-select-input-border-color': '#9b9b9b',
-  '--rp-select-input-border-color-focus': '#4a4a4a',
-  '--rp-select-input-text-color': '#353535',
-};
-
-// SWITCH
-const rpSwitch = {
-  '--rp-switch-bg-color-off': '#daa49a',
-  '--rp-switch-bg-color-on': '#daa49a',
-  '--rp-switch-label-margin': '0 30px 0 0',
-  '--rp-switch-label-opacity': '0.5',
-  '--rp-switch-label-text-color': '#c6cdd6',
-  '--rp-switch-label-width': '100%',
-  '--rp-switch-opacity-off': '0.3',
-  '--rp-switch-root-margin': '0 0 30px 0',
-  '--rp-switch-thumb-bg-color': '#fff',
-};
-
-// TEXTAREA
-const rpTextArea = {
-  '--rp-textarea-bg-color': 'transparent',
-  '--rp-textarea-bg-color-disabled': 'transparent',
-  '--rp-textarea-border': '1px solid #9b9b9b',
-  '--rp-textarea-border-color-disabled': 'rgba(155, 155, 155, 1)', // #9b9b9b
-  '--rp-textarea-border-color-errored': '#ff1351',
-  '--rp-textarea-border-color-focus': '#4a4a4a',
-  '--rp-textarea-border-radius': '8px',
-  '--rp-textarea-line-height': '20px',
-  '--rp-textarea-placeholder-color': 'rgba(94, 96, 102, 0.5)', // #5E6066
-  '--rp-textarea-resize': 'none',
-  '--rp-textarea-text-color': '#353535',
-};
-
-// TABS
-const tabs = {
-  '--tab-link-text-color': '#17D1AA',
-  '--tab-link-text-size': '16px',
-  '--tab-link-line-height': '19px',
-  '--tab-link-border-color': '#17D1AA',
-};
 
 // OPTION CARD
-const itemCard = {
-  '--card-bg-color': '#fff',
-  '--card-border-radius': '8px',
-  '--card-text-color': '#38393d',
-  '--card-text-color-hover': '#2249BE',
-  '--card-text-size': '16px',
-  '--card-width': '250px',
-  '--card-height': '380px',
-};
-
-const rpYoroiTheme = {
-  ...rpAutocomplete,
-  ...rpBubble,
-  ...rpButton,
-  ...rpCheckbox,
-  ...rpColors,
-  ...rpFonts,
-  ...rpFormfield,
-  ...rpInput,
-  ...rpModal,
-  ...rpOptions,
-  ...rpSelect,
-  ...rpSwitch,
-  ...rpTextArea,
-  ...tabs,
-  ...itemCard,
-};
 
 // Sidebar gradient
 const sidebarGradient = {
@@ -194,12 +18,6 @@ const modalMargin = {
 };
 
 const YoroiModern = {
-  // COMMON-THEME-INDEPENDENT
-  ...common,
-
-  // REACT-POLYMORPH
-  ...rpYoroiTheme,
-
   // FONTS
   '--preferred-font': '"Times New Roman", serif',
 
@@ -472,7 +290,8 @@ const YoroiModern = {
   '--theme-dashboard-graph-tooltip-background': 'rgba(56, 57, 61, 0.7)',
 
   // Sidebar
-  '--theme-sidebar-background-color': 'linear-gradient(22.58deg, rgba(36,74,191,1) 0%, rgba(71,96,255,1) 100%)',
+  '--theme-sidebar-background-color':
+    'linear-gradient(22.58deg, rgba(36,74,191,1) 0%, rgba(71,96,255,1) 100%)',
   '--theme-sidebar-text-left-spacing': '16px',
   '--theme-sidebar-text-color': '#FFFFFF',
   '--theme-sidebar-text-font-size': '14px',
@@ -521,7 +340,8 @@ const YoroiModern = {
   '--theme-mywallets-row-background-color': '#FFFFFF',
   '--theme-mywallets-row-box-shadow': '0 5px 20px 0 rgba(24, 26, 30, 0.08)',
   '--theme-mywallets-expandable-background-color': '#FAFAFC',
-  '--theme-mywallets-expandable-box-shadow': 'inset 0 -1px 10px 0 rgba(255,255,255,0.5), inset 0 2px 4px 0 rgba(56,57,61,0.2)',
+  '--theme-mywallets-expandable-box-shadow':
+    'inset 0 -1px 10px 0 rgba(255,255,255,0.5), inset 0 2px 4px 0 rgba(56,57,61,0.2)',
   '--theme-mywallets-separator-color': '#E0E3EB',
   '--theme-mywallets-separator-dark-color': '#DFE3EB',
   '--theme-mywallets-main-text-color': '#242838',
@@ -543,10 +363,6 @@ const YoroiModern = {
 // *************************************************************
 const ShelleyTestnetOverrides = {
   // React Polymorph buttons
-  '--rp-button-bg-color': '#3154CB',
-  '--rp-button-bg-color-active': '#3154CB',
-  '--rp-button-bg-color-disabled': 'rgba(49, 84, 203, 0.3)', // #3154CB
-  '--rp-button-bg-color-hover': '#4760FF',
   // Sidebar
   '--theme-topbar-background-color': 'linear-gradient(225deg, #F14D78 0%, #1A44B7 100%)',
   // Button Primary
@@ -566,14 +382,14 @@ const ShelleyTestnetOverrides = {
   // Language Selection
   '--theme-select-language-color': '#3154CB',
   // Top banner
-  '--theme-banner-warning-background-color': 'linear-gradient(41deg, #1A44B7 0%, #4760FF 100%)'
+  '--theme-banner-warning-background-color': 'linear-gradient(41deg, #1A44B7 0%, #4760FF 100%)',
 };
 
-export const getThemeVars: ('shelley' | void) => {...} = (env) => {
+export const getThemeVars: ('shelley' | void) => { ... } = env => {
   if (env === 'shelley') {
     const mergedTheme = {
       ...YoroiModern,
-      ...ShelleyTestnetOverrides
+      ...ShelleyTestnetOverrides,
     };
     return mergedTheme;
   }

@@ -1,186 +1,9 @@
 // @flow
 //  ==== Theme: Yoroi Classic === //
 
-import common from './Common';
-
-// FONTS
-const rpFonts = {
-  '--rp-theme-font-thin': 'SFUIDisplay-Thin',
-  '--rp-theme-font-light': 'SFUIDisplay-Light',
-  '--rp-theme-font-medium': 'SFUIDisplay-Medium',
-  '--rp-theme-font-regular': 'SFUIDisplay-Regular',
-  '--rp-theme-font-bold': 'SFUIDisplay-Bold',
-};
-
-// AUTOCOMPLETE
-const rpAutocomplete = {
-  '--rp-autocomplete-bg-color': '#f3f3f5',
-  '--rp-autocomplete-border': '1px solid #c6cdd6',
-  '--rp-autocomplete-border-color-opened': '#121327',
-  '--rp-autocomplete-input-text-color': '#121327',
-  '--rp-autocomplete-placeholder-color': 'rgba(94, 96, 102, 0.5)', // #5E6066
-  '--rp-autocomplete-selected-word-box-bg-color': 'rgba(218, 164, 154, 1)', // #DAA49A
-  '--rp-autocomplete-selected-word-text-color': '#fafbfc',
-};
-
-// BUBBLE
-const rpBubble = {
-  '--rp-bubble-bg-color': '#f3f3f5',
-  '--rp-bubble-border-color': '#c6cdd6',
-  '--rp-bubble-border-radius': '2px',
-  // arrows are actually used by tooltips
-  '--rp-bubble-arrow-width': '14px',
-  '--rp-bubble-arrow-height': '4px',
-};
-
-// BUTTON
-const rpButton = {
-  '--rp-button-bg-color': '#daa49a',
-  '--rp-button-bg-color-active': '#c4948b',
-  '--rp-button-bg-color-disabled': 'rgba(218, 164, 154, 0.3)', // #DAA49A
-  '--rp-button-bg-color-hover': '#edb3a8',
-  '--rp-button-font-family': rpFonts['--rp-theme-font-medium'],
-  '--rp-button-font-size': '14px',
-  '--rp-button-line-height': '20px',
-  '--rp-button-padding': '12px 20px',
-  '--rp-button-text-color': '#fafbfc',
-  '--rp-button-text-transform': 'none',
-  '--rp-button-width': '400px',
-};
-
-// CHECKBOX
-const rpCheckbox = {
-  '--rp-checkbox-border': '1px solid #daa49a',
-  '--rp-checkbox-border-color-disabled': 'rgba(218, 164, 154, 0.2)', // #DAA49A
-  '--rp-checkbox-check-bg-color': '#daa49a',
-  '--rp-checkbox-label-text-color': common['--cmn-default-color-grey'],
-  '--rp-checkbox-label-text-color-disabled': 'rgba(18, 19, 39, 0.3)', // #121327
-};
-
-// COLORS
-const rpColors = {
-  '--rp-theme-color-error': '#ea4c5b',
-};
-
-// FORMFIELD
-const rpFormfield = {
-  '--rp-formfield-bg-color-disabled': 'none',
-  '--rp-formfield-label-text-color': '#121327',
-  '--rp-formfield-label-text-color-disabled': '#121327',
-  '--rp-formfield-error-text-color': '#ea4c5b',
-  '--rp-formfield-error-text-opacity': '0.75',
-};
-
-// INPUT
-const rpInput = {
-  '--rp-input-bg-color': 'transparent',
-  '--rp-input-bg-color-disabled': 'transparent',
-  '--rp-input-border-color': '#c6cdd6',
-  '--rp-input-border-color-disabled': 'rgba(207, 207, 207, 0.05)', // #cfcfcf
-  '--rp-input-border-color-errored': '#ea4c5b',
-  '--rp-input-border-color-focus': '#121327',
-  '--rp-input-line-height': '22px',
-  '--rp-input-padding': '10px',
-  '--rp-input-placeholder-color': 'rgba(94, 96, 102, 0.5)', // #5E6066
-  '--rp-input-placeholder-color-disabled': 'rgba(94, 96, 102, 0.5)', // #5E6066
-  '--rp-input-text-color': '#121327',
-  '--rp-input-text-color-disabled': 'rgba(94, 96, 102, 0.5)', // #5E6066
-  '--rp-input-font-family': rpFonts['--rp-theme-font-light'],
-};
-
-// MODAL
-const rpModal = {
-  '--rp-modal-bg-color': '#fafbfc',
-  '--rp-modal-max-height': '90%',
-  '--rp-modal-overlay-bg-color': 'rgba(11, 6, 6, 0.8)', // #0B0606
-};
-
-// OPTIONS
-const rpOptions = {
-  '--rp-option-bg-color': '#fafbfc',
-  '--rp-option-bg-color-highlighted': '#edeeef',
-  '--rp-option-border-color': '#c6cdd6',
-  '--rp-option-checkmark-color': '#121327',
-  '--rp-option-line-height': '22px',
-  '--rp-option-text-color': '#121327',
-  '--rp-options-border-color': '#c6cdd6',
-  '--rp-options-shadow': 'none',
-};
-
-// SELECT
-const rpSelect = {
-  '--rp-select-arrow-bg-color': '#c6cdd6',
-  '--rp-select-arrow-bg-color-open': '#121327',
-  '--rp-select-input-bg-color': '#fafbfc',
-  '--rp-select-input-border-color': '#c6cdd6',
-  '--rp-select-input-border-color-focus': '#121327',
-  '--rp-select-input-text-color': '#121327',
-};
-
-// SWITCH
-const rpSwitch = {
-  '--rp-switch-bg-color-off': '#daa49a',
-  '--rp-switch-bg-color-on': '#daa49a',
-  '--rp-switch-label-margin': '0 30px 0 0',
-  '--rp-switch-label-opacity': '0.5',
-  '--rp-switch-label-text-color': '#c6cdd6',
-  '--rp-switch-label-width': '100%',
-  '--rp-switch-opacity-off': '0.3',
-  '--rp-switch-root-margin': '0 0 30px 0',
-  '--rp-switch-thumb-bg-color': '#fff',
-};
-
-// TEXTAREA
-const rpTextArea = {
-  '--rp-textarea-bg-color': '#fafbfc',
-  '--rp-textarea-bg-color-disabled': 'rgba(94, 96, 102, 0.05)', // #5E6066
-  '--rp-textarea-border': '1px solid #c6cdd6',
-  '--rp-textarea-border-color-disabled': 'rgba(94, 96, 102, 0.05)', // #5E6066
-  '--rp-textarea-border-color-errored': '#ea4c5b',
-  '--rp-textarea-border-color-focus': '#121327',
-  '--rp-textarea-border-radius': '2px',
-  '--rp-textarea-line-height': '20px',
-  '--rp-textarea-placeholder-color': 'rgba(94, 96, 102, 0.5)', // #5E6066
-  '--rp-textarea-resize': 'none',
-  '--rp-textarea-text-color': '#121327',
-};
-
 // TABS
-const tabs = {
-  '--tab-link-text-color': '#DAA49A',
-  '--tab-link-text-size': '16px',
-  '--tab-link-line-height': '19px',
-  '--tab-link-border-color': '#DAA49A',
-};
 
 // OPTION CARD
-const itemCard = {
-  '--card-bg-color': '#fff',
-  '--card-border-radius': '8px',
-  '--card-text-color': '#2b2c32',
-  '--card-text-color-hover': '#DAA49A',
-  '--card-text-size': '16px',
-  '--card-width': '250px',
-  '--card-height': '380px',
-};
-
-const rpYoroiTheme = {
-  ...rpAutocomplete,
-  ...rpBubble,
-  ...rpButton,
-  ...rpCheckbox,
-  ...rpColors,
-  ...rpFonts,
-  ...rpFormfield,
-  ...rpInput,
-  ...rpModal,
-  ...rpOptions,
-  ...rpSelect,
-  ...rpSwitch,
-  ...rpTextArea,
-  ...tabs,
-  ...itemCard,
-};
 
 // Sidebar gradient
 const sidebarGradient = {
@@ -189,12 +12,6 @@ const sidebarGradient = {
 };
 
 const YoroiClassic = {
-  // COMMON-THEME-INDEPENDENT
-  ...common,
-
-  // REACT-POLYMORPH
-  ...rpYoroiTheme,
-
   // FONTS
   '--preferred-font': '"Times New Roman", serif',
 
@@ -404,7 +221,6 @@ const YoroiClassic = {
   '--theme-wallet-navigation-tab-text-color-hover': '#17D1AA',
   '--theme-wallet-navigation-tab-text-color-disabled': '#C4CAD7',
 
-
   '--theme-warning-box-bg-color': 'rgba(233, 72, 61, 0.06)', // #E9483D
 
   '--theme-warning-color': `#E9483D`,
@@ -460,6 +276,6 @@ const YoroiClassic = {
   '--theme-navbar-color': '#6B7384',
 };
 
-export const getThemeVars: ('shelley' | void) => {...} = (_env) => {
+export const getThemeVars: ('shelley' | void) => { ... } = _env => {
   return YoroiClassic;
 };
