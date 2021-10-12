@@ -34,8 +34,9 @@ export const commonTheme: Object = createTheme({
     },
     txStatus: {
       pending: {
-        background: '#d8dcdf',
-        text: '#303136',
+        background: '#F0F3F5',
+        text: '#ADAEB6',
+        stripes: 'rgba(217, 221, 224, 0.2)',
       },
       high: {
         background: '#c9ede5',
@@ -51,7 +52,7 @@ export const commonTheme: Object = createTheme({
       },
       low: {
         background: '#ff145326',
-        text: '#fa618a',
+        text: '#FA5F88',
       },
     },
   },

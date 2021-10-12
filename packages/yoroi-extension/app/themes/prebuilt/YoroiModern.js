@@ -15,16 +15,6 @@ const YoroiModern = {
   '--theme-send-confirmation-dialog-send-values-color': '#15d1aa',
   '--theme-hw-send-confirmation-info-block-background-color': '#f0f3f5',
 
-  '--theme-transactions-state-pending-background-color': '#F0F3F5',
-  '--theme-transactions-state-pending-stripes-color': 'rgba(217, 221, 224, 0.2)', // #D9DDE0
-  '--theme-transactions-state-pending-text-color': '#ADAEB6',
-  '--theme-transactions-priority-low-background-color': 'rgba(255, 19, 81, 0.15)', // #ff1351
-  '--theme-transactions-priority-low-text-color': '#FA5F88',
-  '--theme-transactions-priority-medium-background-color': 'rgba(245, 166, 35, 0.3)', // F5A623
-  '--theme-transactions-priority-medium-text-color': '#F5A623',
-  '--theme-transactions-priority-high-background-color': '#C9EDE5',
-  '--theme-transactions-priority-high-text-color': '#17D1AA',
-
   '--theme-wallet-add-title-color': '#ffffff',
   '--theme-wallet-add-sub-title-color': '#ffffff',
   '--theme-wallet-add-option-dialog-item-title-color': '#2B2C32',

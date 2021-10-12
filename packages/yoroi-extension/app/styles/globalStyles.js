@@ -54,6 +54,7 @@ const globalStyles = (theme: Object): Node => (
 
         '--th-palette-tx-status-pending-background': theme.palette.txStatus.pending.background,
         '--th-palette-tx-status-pending-text': theme.palette.txStatus.pending.text,
+        '--th-palette-tx-status-pending-stripes': theme.palette.txStatus.pending.text,
         '--th-palette-tx-status-high-background': theme.palette.txStatus.high.background,
         '--th-palette-tx-status-high-text': theme.palette.txStatus.high.text,
         '--th-palette-tx-status-failed-background': theme.palette.txStatus.failed.background,
