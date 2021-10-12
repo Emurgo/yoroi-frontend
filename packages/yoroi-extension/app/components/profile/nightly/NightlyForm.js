@@ -1,7 +1,6 @@
 // @flow
 import { Component } from 'react';
 import type { Node } from 'react';
-import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { Button } from '@mui/material';
 import { Checkbox } from 'react-polymorph/lib/components/Checkbox';

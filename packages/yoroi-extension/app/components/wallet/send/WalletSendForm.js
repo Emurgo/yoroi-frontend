@@ -41,6 +41,7 @@ import { Select } from 'react-polymorph/lib/components/Select';
 import { SelectTokenSkin } from '../../../themes/skins/SelectTokenSkin';
 import TokenOptionRow from '../../widgets/tokenOption/TokenOptionRow';
 import BigNumber from 'bignumber.js';
+import classnames from 'classnames';
 
 const messages = defineMessages({
   receiverLabel: {
