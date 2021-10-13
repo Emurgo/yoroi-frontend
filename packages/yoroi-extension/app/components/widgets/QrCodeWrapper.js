@@ -3,16 +3,12 @@ import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import QRCode from 'qrcode.react';
+import { readCssVar } from '../../styles/utils';
 
 type Props = {|
   +value: string,
   +size: number,
 |};
-
-function readCssVar(varName: string): string {
-  varName = varName.startsWith('--') ? varName : '--' + varName;
-  return window.getComputedStyle(document.documentElement).getPropertyValue(varName);
-}
 
 @observer
 export default class QrCodeWrapper extends Component<Props> {

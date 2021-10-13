@@ -118,8 +118,6 @@ export default class StakingDashboardPage extends Component<Props> {
     const errorIfPresent = this.getErrorInFetch(publicDeriver);
     const stakePools = errorIfPresent == null ? this.getStakePools(publicDeriver) : errorIfPresent;
 
-    const { getThemeVars } = this.generated.stores.profile;
-
     const dashboard = (
       <StakingDashboard
         pageInfo={
@@ -139,7 +137,6 @@ export default class StakingDashboardPage extends Component<Props> {
               }
         }
         hasAnyPending={this.generated.stores.transactions.hasAnyPending}
-        themeVars={getThemeVars({ theme: 'YoroiModern' })}
         stakePools={stakePools}
         userSummary={this._generateUserSummary({
           delegationRequests,
@@ -995,10 +992,6 @@ export default class StakingDashboardPage extends Component<Props> {
         selectedExplorer: Map<number, SelectedExplorer>,
       |},
       profile: {|
-        getThemeVars: ({| theme: string |}) => {
-          [key: string]: string,
-          ...
-        },
         isClassicTheme: boolean,
         shouldHideBalance: boolean,
         unitOfAccount: UnitOfAccountSettingType,
@@ -1094,7 +1087,6 @@ export default class StakingDashboardPage extends Component<Props> {
         profile: {
           isClassicTheme: stores.profile.isClassicTheme,
           shouldHideBalance: stores.profile.shouldHideBalance,
-          getThemeVars: stores.profile.getThemeVars,
           unitOfAccount: stores.profile.unitOfAccount,
         },
         wallets: {

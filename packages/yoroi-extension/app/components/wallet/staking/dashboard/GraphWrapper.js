@@ -10,6 +10,7 @@ import styles from './GraphWrapper.scss';
 import CardShadow from './CardShadow';
 import globalMessages from '../../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { readCssVar } from '../../../../styles/utils';
 
 const messages = defineMessages({
   epochAxisLabel: {
@@ -95,7 +96,6 @@ const GraphTabs: {|
 // };
 
 const Graph: {|
-  themeVars: Object,
   data: Array<GraphItems>,
   epochTitle: string,
   stakepoolNameTitle: string,
@@ -104,7 +104,6 @@ const Graph: {|
   primaryBarLabel: string,
   hideYAxis: boolean,
 |} => Node = ({
-  themeVars,
   data,
   epochTitle,
   stakepoolNameTitle,
@@ -115,11 +114,11 @@ const Graph: {|
 }) => {
 
   const graphVars = {
-    axisTickColor: themeVars['--theme-dashboard-graph-axis-tick-color'],
-    axisTextColor: themeVars['--theme-dashboard-graph-axis-text-color'],
-    barWidth: themeVars['--theme-dashboard-graph-bar-width'],
-    barHoverBgColor: themeVars['--theme-dashboard-graph-bar-hover-background-color'],
-    barPrimaryColor: themeVars['--theme-dashboard-graph-bar-primary-color'],
+    axisTickColor: readCssVar('--theme-dashboard-graph-axis-tick-color'),
+    axisTextColor: readCssVar('--theme-dashboard-graph-axis-text-color'),
+    barWidth: readCssVar('--theme-dashboard-graph-bar-width'),
+    barHoverBgColor: readCssVar('--theme-dashboard-graph-bar-hover-background-color'),
+    barPrimaryColor: readCssVar('--theme-dashboard-graph-bar-primary-color'),
     fontSize: '0.75rem',
     lineHeight: 14,
   };
@@ -214,7 +213,6 @@ const Graph: {|
 };
 
 type Props = {|
-  themeVars: Object,
   epochLength: ?number,
   tabs: Array<{|
     tabName: string,
@@ -253,7 +251,7 @@ export default class GraphWrapper extends Component<Props, State> {
 
   render(): Node {
     const { intl } = this.context;
-    const { tabs, themeVars } = this.props;
+    const { tabs } = this.props;
 
     return (
       <div className={styles.wrapper}>
@@ -277,7 +275,6 @@ export default class GraphWrapper extends Component<Props, State> {
               xAxisLabel={this._getEpochLengthLabel()}
               yAxisLabel={tabs[this.state.selectedTab].yAxisLabel}
               primaryBarLabel={tabs[this.state.selectedTab].primaryBarLabel}
-              themeVars={themeVars}
               data={tabs[this.state.selectedTab].data}
               hideYAxis={tabs[this.state.selectedTab].hideYAxis}
             />
