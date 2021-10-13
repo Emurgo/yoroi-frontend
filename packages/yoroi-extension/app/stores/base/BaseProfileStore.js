@@ -308,7 +308,7 @@ export default class BaseProfileStore
 
   _updateTheme: ({| theme: string |}) => Promise<void> = async ({ theme }) => {
     // Unset / Clear the Customized Theme from LocalStorage
-    document.documentElement.removeAttribute('style') // remove css prop
+    document.documentElement?.removeAttribute('style') // remove css prop
     await this.unsetCustomThemeRequest.execute();
     await this.getCustomThemeRequest.execute(); // eagerly cache
     await this.setThemeRequest.execute(theme);

@@ -29,18 +29,19 @@ const getCSSCustomPropIndex = () =>
   [...document.styleSheets].filter(isSameDomain).reduce(
     (finalArr, sheet) =>
       finalArr.concat(
-        [...sheet.cssRules].filter(isStyleRule).reduce((propValArr, rule) => {
-          const props = [...rule.style]
-            .map(propName => [propName.trim(), rule.style.getPropertyValue(propName).trim()])
-            // Discard any props that don't start with "--". Custom props are required to.
-            .filter(([propName]) => propName.indexOf('--') === 0);
-          return [...propValArr, ...props];
-        }, [])
-      ),
+      // $FlowFixMe[prop-missing]
+      [...sheet.cssRules].filter(isStyleRule).reduce((propValArr, rule) => {
+        const props = [...rule.style]
+          .map(propName => [propName.trim(), rule.style.getPropertyValue(propName).trim()])
+          // Discard any props that don't start with "--". Custom props are required to.
+          .filter(([propName]) => propName.indexOf('--') === 0);
+        return [...propValArr, ...props];
+      }, [])
+    ),
     []
   );
 
-const getCSSCustomPropObject = () => {
+const getCSSCustomPropObject:void => Object = () => {
   const allCSSVars = getCSSCustomPropIndex();
   const mapAllCssVars = allCSSVars.map(([cssVar, cssValue]) => ({
     [cssVar]: cssValue,
@@ -48,14 +49,14 @@ const getCSSCustomPropObject = () => {
   return Object.assign({}, ...mapAllCssVars);
 };
 
-const readCssVar = (varName: string) => {
+const readCssVar = (varName: string):string => {
   varName = varName.startsWith('--') ? varName : '--' + varName;
   return window.getComputedStyle(document.documentElement).getPropertyValue(varName);
 };
 
-const writeCssVar = (varName, value) => {
+const writeCssVar = (varName:string, value:any):void => {
   varName = varName.startsWith('--') ? varName : '--' + varName;
-  document.documentElement.style.setProperty(varName, value);
+  document.documentElement?.style.setProperty(varName, value);
 };
 
 export { readCssVar, writeCssVar, getCSSCustomPropObject };
