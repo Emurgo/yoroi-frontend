@@ -1,13 +1,12 @@
-
 @import '../../../../themes/mixins/unordered-list';
 
 :global(.YoroiModern) .component {
-  min-width: var(--theme-modal-min-max-width-lg);
-  max-width: var(--theme-modal-min-max-width-lg); 
+  min-width: var(--component-dialog-min-width-lg);
+  max-width: var(--component-dialog-min-width-lg);
 }
 
 .component {
-  font-family: var(--font-regular);
+  font-weight: 400;
   @include unordered-list;
 
   .header {

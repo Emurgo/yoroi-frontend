@@ -5,7 +5,7 @@
 }
 
 .navigation {
-  height: var(--theme-wallet-navigation-tab-height);
+  height: var(--th-navigation-tab-height);
   flex-shrink: 0;
 }
 
@@ -17,6 +17,6 @@
 
 :global(.YoroiModern) {
   .navigation {
-    height: var(--theme-wallet-navigation-tab-height);
+    height: var(--th-navigation-tab-height);
   }
 }

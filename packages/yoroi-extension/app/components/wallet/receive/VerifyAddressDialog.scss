@@ -1,31 +1,32 @@
 @import '../../../themes/mixins/loading-spinner.scss';
 
 .processing {
-  @include loading-spinner("../../../assets/images/spinner-light.svg");
+  @include loading-spinner('../../../assets/images/spinner-light.svg');
 }
 
 .label {
-  color:  var(--theme-wallet-receive-label-text-color);
+  color: var(--th-palette-gray-900);
   font-size: 14px;
   line-height: 22px;
   display: block;
-  font-family: var(--font-regular);
+  font-weight: 400;
   margin-bottom: 4px;
   text-align: left;
 }
 
 .derivation {
-  font-family: var(--font-mono-regular);
+  font-family: 'RobotoMono';
+  font-weight: 400;
   letter-spacing: 0;
 }
 
 .hash {
-  color: var(--theme-wallet-receive-hash-used-text-color);
+  color: var(--th-palette-gray-600);
   font-size: 16px;
   line-height: 22px;
 }
 
 :global(.YoroiModern) .component {
-  min-width: var(--theme-modal-min-max-width-lg);
-  max-width: var(--theme-modal-min-max-width-lg); 
+  min-width: var(--component-dialog-min-width-lg);
+  max-width: var(--component-dialog-min-width-lg);
 }

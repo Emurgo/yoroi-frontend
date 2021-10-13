@@ -1,8 +1,8 @@
 .component {
-  color: var(--theme-settings-menu-item-text-color);
+  color: var(--th-palette-gray-600);
   display: block;
   text-align: left;
-  font-family: var(--font-regular);
+  font-weight: 400;
   font-size: 16px;
   line-height: 22px;
   padding: 6px 0px;
@@ -11,11 +11,11 @@
   width: initial;
 
   &.active {
-    border-bottom-color: var(--theme-wallet-navigation-tab-text-color-active);
-    color: var(--theme-wallet-navigation-tab-text-color-active);
-  
+    border-bottom-color: var(--th-palette-secondary-300);
+    color: var(--th-palette-secondary-300);
+
     &:hover {
-      border-bottom-color: var(--theme-wallet-navigation-tab-text-color-active);
+      border-bottom-color: var(--th-palette-secondary-300);
     }
   }
 
@@ -26,11 +26,11 @@
 
 .enabled {
   &:hover {
-    color: var(--theme-settings-menu-item-text-color-enabled-hover);
+    color: var(--th-palette-gray-900);
     cursor: pointer;
   }
 }
 
 .disabled {
-  color: var(--theme-settings-menu-item-text-color-disabled);
+  color: var(--th-palette-gray-200);
 }

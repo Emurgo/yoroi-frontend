@@ -18,7 +18,7 @@
   .component {
     border-radius: 2px;
     text-align: center;
-    font-family: var(--font-medium);
+    font-weight: 500;
     color: var(--theme-instructions-text-color);
     background-color: var(--theme-backup-mnemonic-background-color);
     min-height: 52px;
@@ -29,7 +29,7 @@
   .component {
     border-radius: 8px;
     text-align: left;
-    font-family: var(--font-regular);
+    font-weight: 400;
     color: var(--theme-instructions-recovery-text-color);
   }
 }

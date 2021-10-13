@@ -3,16 +3,16 @@
 .component {
   margin-top: 16px;
   text-align: center;
-  font-family: var(--font-regular);
+  font-weight: 400;
   font-size: 15px;
   height: 22px;
-  
+
   a {
     line-height: 20px;
     display: inline-flex;
     opacity: 0.7;
     text-decoration: none;
-    color: var(--font-black);
+    color: var(--th-palette-gray-900);
 
     span {
       margin-left: 4px;
@@ -22,9 +22,9 @@
     }
 
     &:hover {
-      @include underline(var(--theme-underline-dark-color));
+      @include underline(var(--th-palette-gray-800));
     }
-  }  
+  }
 }
 
 :global(.YoroiClassic) .component {

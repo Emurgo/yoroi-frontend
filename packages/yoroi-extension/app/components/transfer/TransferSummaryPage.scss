@@ -2,13 +2,13 @@
 @import '../../themes/mixins/loading-spinner';
 
 .body {
-  color: var(--theme-bordered-box-text-color);
-  font-family: var(--font-regular);
+  color: var(--th-palette-gray-900);
+  font-weight: 400;
   font-size: 14px;
   line-height: 19px;
-  
+
   .currencySymbol {
-    font-family: var(--font-light);
+    font-weight: 300;
     text-transform: uppercase;
   }
 

@@ -1,14 +1,15 @@
 .hash {
   word-break: break-all;
-  font-family: var(--font-mono-regular);
+  font-family: 'RobotoMono';
+  font-weight: 400;
   letter-spacing: 0;
   line-height: 22px;
 }
 
 .lightColor {
-  color: var(--theme-widgets-hash-light-color);
+  color: var(--th-widgets-hash-light);
 }
 
 .darkColor {
-  color: var(--theme-widgets-hash-dark-color);
+  color: var(--th-widgets-hash-dark);
 }

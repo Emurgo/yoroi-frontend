@@ -5,20 +5,20 @@
   display: flex;
   align-items: center;
   & svg > path {
-    fill: var(--theme-sidebar-icon-color);
+    fill: var(--th-sidebar-text);
   }
   &:hover {
     & svg > path {
-      fill: var(--theme-sidebar-icon-color-hover);
+      fill: var(--th-palette-secondary-300);
     }
   }
   &.active:hover {
     cursor: default !important;
   }
   &.active {
-    background-color: var(--theme-sidebar-item-background-color-hover);
+    background-color: var(--th-sidebar-end);
     & svg > path {
-      fill: var(--theme-sidebar-icon-color-active);
+      fill: var(--th-palette-secondary-300);
     }
   }
 }
@@ -32,9 +32,9 @@
 
 .label {
   display: block;
-  color: var(--theme-sidebar-text-color);
-  font-family: var(--font-regular);
-  font-size: var(--theme-sidebar-text-font-size);
-  line-height: var(--theme-sidebar-text-line-height);
-  margin-left: var(--theme-sidebar-text-left-spacing);
+  color: var(--th-sidebar-text);
+  font-weight: 400;
+  font-size: 0.875rem;
+  line-height: 22px;
+  margin-left: 16px;
 }

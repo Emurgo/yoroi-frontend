@@ -1,13 +1,13 @@
 .topBar {
   align-items: center;
-  background: var(--theme-sidebar-background-color);
+  background: var(--th-sidebar-background);
   display: flex;
-  height: var(--cmn-topbar-height);
+  height: var(--topbar-height);
   padding: 0;
   position: relative;
   z-index: 100;
 
   .topBarTitle {
     flex-grow: 1;
-  }  
+  }
 }

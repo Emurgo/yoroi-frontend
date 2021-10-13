@@ -27,9 +27,9 @@
     height: 40px;
     width: 190px;
     border-radius: 8px;
-    font-family: var(--font-medium);
-    background-color: var(--theme-button-primary-background-color);
-    color: var(--theme-button-primary-text-color);
+    font-weight: 500;
+    background-color: var(--th-palette-secondary-300);
+    color: var(--component-button-primary-text);
     text-transform: uppercase;
   }
 }

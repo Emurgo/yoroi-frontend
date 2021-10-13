@@ -1,12 +1,11 @@
 @import '../../../themes/mixins/underline';
 
 :global(.YoroiModern) .component {
-  min-width: var(--theme-modal-min-max-width-cmn);
-  max-width: var(--theme-modal-min-max-width-cmn);
+  min-width: var(--component-dialog-min-width-md);
 }
 
 .component {
-  font-family: var(--font-regular);
+  font-weight: 400;
   font-size: 14px;
   line-height: 22px;
 
@@ -15,7 +14,7 @@
   }
 
   a {
-    color: var(--font-black);
-    @include underline(var(--theme-underline-dark-color));
+    color: var(--th-palette-gray-900);
+    @include underline(var(--th-palette-gray-800));
   }
 }

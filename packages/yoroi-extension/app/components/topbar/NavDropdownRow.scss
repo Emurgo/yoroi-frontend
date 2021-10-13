@@ -1,8 +1,8 @@
 .wrapper {
-  padding: 20px 20px 20px 40px;
+  padding: 20px 40px 20px;
   display: flex;
-  background-color: var(--theme-wallet-dropdown-background-color);
-  border-bottom: 1px solid var(--theme-wallet-dropdown-row-border-color);
+  background-color: var(--th-palette-common-white);
+  border-bottom: 1px solid var(--th-palette-gray-100);
 }
 
 .titleWrapper {
@@ -10,15 +10,15 @@
 }
 
 .title {
-  color: var(--theme-wallet-dropdown-secondary-text-color);
-  font-family: var(--font-medium);
+  color: var(--th-palette-gray-600);
+  font-weight: 500;
   font-size: 18px;
   line-height: 22px;
   text-align: left;
 }
 
 .currentWrapper {
-  background-color: var(--theme-wallet-dropdown-selected-background-color);
+  background-color: var(--th-palette-gray-50);
 }
 
 .head {
@@ -38,12 +38,12 @@ button {
   position: relative;
   left: 10px;
   align-self: flex-end;
-  color: var(--theme-wallet-dropdown-main-text-color);
-  font-family: var(--font-regular);
+  color: var(--th-palette-gray-900);
+  font-weight: 400;
   font-size: 10px;
   line-height: 16px;
 }
 
 .syncLabel {
-  color: var(--theme-wallet-dropdown-secondary-text-color);
+  color: var(--th-palette-gray-600);
 }

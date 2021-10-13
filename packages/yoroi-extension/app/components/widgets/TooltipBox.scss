@@ -9,7 +9,7 @@
 
   transform: translateX(-100%);
   background-color: white;
-  border: 1px solid var(--theme-tooltipbox-border-color);
+  border: 1px solid rgba(77,32,192,0.08);
 
   // size tooltip to text contained inside
   min-width: auto;
@@ -26,10 +26,10 @@
       .headerIcon {
         margin-top: -2px;
       }
-    
+
       .headerText {
-        font-family: var(--font-medium);
-        color: var(--theme-warning-color);
+        font-weight: 500;
+        color: var(--th-palette-error-200);
         font-size: 16px;
         line-height: 19px;
         margin-left: 4px;

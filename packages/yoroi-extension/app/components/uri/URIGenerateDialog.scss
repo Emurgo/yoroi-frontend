@@ -1,6 +1,6 @@
 .component {
-  min-width: var(--theme-modal-min-max-width-lg) !important;
-  max-width: var(--theme-modal-min-max-width-lg) !important;
+  min-width: var(--component-dialog-min-width-lg) !important;
+  max-width: var(--component-dialog-min-width-lg) !important;
 
   :global {
     .Dialog_title {
@@ -9,7 +9,7 @@
   }
 
   .receiverLabel {
-    font-family: var(--font-regular);
+    font-weight: 400;
     margin-bottom: 10px;
   }
 

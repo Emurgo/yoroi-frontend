@@ -1,31 +1,30 @@
 @import '../../../../themes/mixins/underline';
 
 .component {
-  border-top: 1px solid var(--cmn-default-color-grey-3-alpha);
+  border-top: 1px solid var(--th-palette-gray-200);
   padding-top: 24px;
   padding-bottom: 24px;
 
   .title {
-    color: var(--theme-support-settings-text-color);
-    font-family: var(--font-semibold);
+    color: var(--theme-support-settings-text);
+    font-weight: 500;
     font-size: 18px;
     line-height: 22px;
     margin-bottom: 12px;
   }
 
   p {
-    color: var(--theme-support-settings-text-color);
+    color: var(--theme-support-settings-text);
     font-size: 14px;
     line-height: 22px;
   }
 
   p button {
-    @include underline(var(--theme-support-settings-link-color));
+    @include underline(var(--theme-support-settings-text));
   }
-
 
   p {
     margin-bottom: 2px;
-    font-family: var(--font-regular);
+    font-weight: 400;
   }
 }

@@ -7,9 +7,9 @@
 }
 .headerBlock {
   @include headerBlockBase;
-  font-family: var(--font-regular);
-} 
+  font-weight: 400;
+}
 .headerBlockClassic {
   @include headerBlockBase;
-  font-family: var(--font-light);
+  font-weight: 300;
 }

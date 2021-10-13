@@ -6,25 +6,25 @@ $opacityCommon: 0.7;
     display: flex;
     flex-shrink: 0;
     margin-top: 20px;
-  
+
     button {
       width: 50%;
-  
+
       &:only-child {
         margin: auto;
         width: 100%;
       }
-  
+
       & + button {
         margin-left: 20px;
       }
     }
   }
-  
+
   .headerBlock {
     margin-bottom: 16px;
   }
-  
+
   .middleBlock {
     object-fit: contain;
   }
@@ -46,7 +46,7 @@ $opacityCommon: 0.7;
     width: 725px;
 
     span {
-      font-family: var(--font-light);
+      font-weight: 300;
       line-height: 1.38;
       font-size: 14px;
       opacity: $opacityCommon;
@@ -55,7 +55,7 @@ $opacityCommon: 0.7;
 
   .middleBlock {
     background-color: var(--theme-hw-connect-dialog-middle-block-common-background-color);
-    border-radius: 4px;  
+    border-radius: 4px;
     width: 725px;
     height: 280px;
     padding: 10px 0 10px 10px;

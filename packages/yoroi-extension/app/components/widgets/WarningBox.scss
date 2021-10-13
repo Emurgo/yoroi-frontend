@@ -7,25 +7,25 @@
   justify-content: center;
   padding: 16px 0 16px 0;
   border-radius: 8px;
-  background-color: var(--theme-warning-box-bg-color);
-  box-shadow: var(--cmn-warning-box-bg-shadow);
+  background-color: rgba(255, 19, 81, 0.06);
+  box-shadow: var(--warning-box-bg-shadow);
 
   .header {
     display: inline-flex;
     align-items: flex-end;
-  
+
     .headerIcon {
       width: 20px;
       height: 20px;
       background-size: contain;
       background-position: center center;
       background-repeat: no-repeat;
-      margin-bottom: 1px
+      margin-bottom: 1px;
     }
-  
+
     .headerText {
-      font-family: var(--font-medium);
-      color: var(--theme-warning-color);
+      font-weight: 500;
+      color: var(--th-palette-error-200);
       font-size: 16px;
       font-weight: 500;
       margin-left: 6px;
@@ -40,21 +40,22 @@
     & *,
     & {
       line-height: 22px;
-      font-family: var(--font-regular);
-      color: var(--theme-warning-color);
+      font-weight: 400;
+      color: var(--th-palette-error-200);
       font-size: 12px;
     }
-    a, button {
-      @include underline(var(--theme-warning-color));
+    a,
+    button {
+      @include underline(var(--th-palette-error-200));
       line-height: initial;
     }
-  }  
+  }
 }
 
 :global(.YoroiClassic) {
   .component {
     .headerIcon {
-      background-image: url(../../assets/images/attention-classic.inline.svg);      
+      background-image: url(../../assets/images/attention-classic.inline.svg);
     }
 
     .headerText {
@@ -67,6 +68,6 @@
   .component {
     .headerIcon {
       background-image: url(../../assets/images/attention-modern.inline.svg);
-    }    
+    }
   }
 }

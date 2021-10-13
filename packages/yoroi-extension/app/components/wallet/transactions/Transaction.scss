@@ -1,4 +1,4 @@
-@import "./categoryData";
+@import './categoryData';
 
 .component {
   // ========= TOGGLER =========
@@ -23,9 +23,9 @@
   .time {
     min-width: $time-min-width;
     text-align: $time-align;
-  
-    font-family: var(--font-regular);
-    color: var(--theme-transactions-list-text-color);
+
+    font-weight: 400;
+    color: var(--th-palette-gray-900);
     font-size: 16px;
     line-height: 25px;
   }
@@ -37,8 +37,8 @@
     text-align: left;
     font-size: 16px;
     line-height: 22px;
-    font-family: var(--font-regular);
-    color: var(--theme-transactions-list-text-color);
+    font-weight: 400;
+    color: var(--th-palette-gray-900);
   }
 
   .status {
@@ -47,7 +47,7 @@
     text-align: $status-align;
 
     display: inline-block;
-    font-family: var(--font-regular);
+    font-weight: 400;
     font-size: 12px;
     line-height: 21px;
     letter-spacing: 1px;
@@ -58,31 +58,31 @@
     height: 25px;
     user-select: none;
   }
-  .typeAddress{
+  .typeAddress {
     min-width: fit-content;
     height: fit-content;
     width: 105px;
-    background: var(--cmn-default-color-grey-5);
+    background: var(--th-palette-gray-50);
     font-size: 10px;
     letter-spacing: 0;
   }
 
   .currency {
-    color: var(--theme-transactions-list-text-color);
+    color: var(--th-palette-gray-900);
     font-size: 16px;
     line-height: 22px;
-     
+
     .afterDecimal {
-        font-size: 12px;
+      font-size: 12px;
     }
   }
   .asset {
-    color: var(--theme-transactions-list-text-color);
+    color: var(--th-palette-gray-900);
     font-size: 14px;
     line-height: 20px;
-     
+
     .afterDecimal {
-        font-size: 10px;
+      font-size: 10px;
     }
   }
 
@@ -91,28 +91,28 @@
     text-align: $fee-align;
 
     text-align: right;
-    font-family: var(--font-regular);
+    font-weight: 400;
   }
   .amount {
     min-width: $min-amount-width;
     text-align: $amount-align;
 
-    font-family: var(--font-medium);
+    font-weight: 500;
     text-align: right;
   }
   .pendingLabel {
-    background-color: var(--theme-transactions-state-pending-background-color);
+    background-color: var(--th-palette-tx-status-pending-background);
     background-size: 35px 50px;
     overflow: hidden;
     background-image: linear-gradient(
       55deg,
-      transparent  33.4%,
-      var(--theme-transactions-state-pending-stripes-color) 33.4%,
-      var(--theme-transactions-state-pending-stripes-color) 50%,
+      transparent 33.4%,
+      var(--th-palette-tx-status-pending-stripes) 33.4%,
+      var(--th-palette-tx-status-pending-stripes) 50%,
       transparent 50%,
       transparent 83.4%,
-      var(--theme-transactions-state-pending-stripes-color) 83.4%,
-      var(--theme-transactions-state-pending-stripes-color)
+      var(--th-palette-tx-status-pending-stripes) 83.4%,
+      var(--th-palette-tx-status-pending-stripes)
     );
     animation: pending-label-animation 1s linear infinite;
     :global {
@@ -128,7 +128,7 @@
   }
 
   .amountSmall {
-    color: var(--theme-widgets-hash-light-color);
+    color: var(--th-widgets-hash-light);
     font-size: 14px;
   }
   .afterDecimal {
@@ -136,49 +136,52 @@
   }
 
   .failedLabel {
-    color: var(--theme-transactions-state-failed-text-color);
-    background-color: var(--theme-transactions-state-failed-background-color);
+    color: var(--th-palette-tx-status-failed-text);
+    background-color: var(--th-palette-tx-status-failed-background);
   }
-  
+
   .low {
-    color: var(--theme-transactions-priority-low-text-color);
-    background-color: var(--theme-transactions-priority-low-background-color);
+    color: var(--th-palette-tx-status-low-text);
+    background-color: var(--th-palette-tx-status-low-background);
   }
-  
+
   .medium {
-    color: var(--theme-transactions-priority-medium-text-color);
-    background-color: var(--theme-transactions-priority-medium-background-color);
+    color: var(--th-palette-tx-status-medium-text);
+    background-color: var(--th-palette-tx-status-medium-background);
   }
-  
+
   .high {
-    color: var(--theme-transactions-priority-high-text-color);
-    background-color: var(--theme-transactions-priority-high-background-color);
+    color: var(--th-palette-tx-status-high-text);
+    background-color: var(--th-palette-tx-status-high-background);
   }
-  
+
   .assuranceLevel {
     text-transform: capitalize;
   }
 
-
   &.pending {
-    .type, .time, .fee, .amount, .details {
-      color: var(--theme-transactions-list-pending-text-color);
+    .type,
+    .time,
+    .fee,
+    .amount,
+    .details {
+      color: var(--th-palette-gray-300);
     }
     .status {
-      color: var(--theme-transactions-state-pending-text-color);
+      color: var(--th-palette-tx-status-pending-text);
     }
   }
- 
+
   .expandArrowBox {
     margin-left: 16px;
     align-items: center;
   }
-  
+
   .expandArrow svg {
     width: 24px;
     height: 24px;
   }
-  
+
   .collapseArrow svg {
     width: 24px;
     height: 24px;
@@ -186,7 +189,7 @@
   }
   // ========= DETAILS =========
   .content {
-    background-color: var(--theme-transactions-list-detail-background-color);
+    background-color: var(--th-palette-gray-50);
     padding-left: 24px;
     padding-right: 24px;
 
@@ -195,7 +198,7 @@
       overflow: hidden;
       padding-bottom: 0;
     }
-    
+
     .expanded {
       max-height: 100%;
       padding-top: 30px;
@@ -203,7 +206,8 @@
     }
   }
   .shadow {
-    box-shadow: var(--theme-mywallets-expandable-box-shadow);
+    box-shadow: inset 0 -1px 10px 0 rgba(255, 255, 255, 0.5),
+      inset 0 2px 4px 0 rgba(56, 57, 61, 0.2);
   }
 
   .last {
@@ -213,26 +217,26 @@
   }
   .notLast {
     .closed {
-      border-bottom: 1px solid var(--cmn-default-color-grey-4);
+      border-bottom: 1px solid var(--th-palette-gray-200);
     }
   }
 
   .details {
     height: auto;
-    
+
     .addressContent {
       display: flex;
-      border-top: 1px solid var(--cmn-default-color-grey-3-alpha);
-      border-bottom: 1px solid var(--cmn-default-color-grey-3-alpha);
+      border-top: 1px solid var(--th-palette-gray-200);
+      border-bottom: 1px solid var(--th-palette-gray-200);
       & > div {
         flex: 1 1 50%;
         padding-top: 24px;
         margin-bottom: -1px;
-        &:first-child{
+        &:first-child {
           padding-right: 24px;
         }
-        &:last-child{
-          border-left: 1px solid var(--cmn-default-color-grey-3-alpha);
+        &:last-child {
+          border-left: 1px solid var(--th-palette-gray-200);
           padding-left: 24px;
         }
       }
@@ -240,10 +244,10 @@
         flex-direction: column;
         border: none;
         & > div {
-          &:first-child{
+          &:first-child {
             padding-right: 0;
           }
-          &:last-child{
+          &:last-child {
             border: none;
             padding-left: 0;
             padding-top: 40px;
@@ -254,7 +258,7 @@
     .addressHeader {
       display: grid;
       grid-gap: 15px;
-      grid-template-columns: minmax(232px,1fr) 105px 1fr;
+      grid-template-columns: minmax(232px, 1fr) 105px 1fr;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 24px;
@@ -267,37 +271,37 @@
       margin-left: 5px;
     }
     .addressList {
-      color: var(--theme-transactions-list-detail-row-text-color);
+      color: var(--th-palette-gray-600);
       font-size: 14px;
       & > * {
         padding-bottom: 10px;
         margin-top: 14px;
-        border-bottom: 1px solid var(--theme-border-gray);
+        border-bottom: 1px solid var(--th-palette-gray-200);
       }
     }
     .addressItem {
       display: grid;
       grid-gap: 15px;
-      grid-template-columns: minmax(232px,1fr) 105px 1fr;
+      grid-template-columns: minmax(232px, 1fr) 105px 1fr;
       align-items: center;
     }
     * + h2,
     * + .row {
       margin-top: 18px;
     }
-  
+
     h2 {
-      font-family: var(--font-regular);
+      font-weight: 400;
       font-size: 14px;
       margin-bottom: 3px;
       line-height: 1.38;
-      color: var(--theme-transactions-list-text-color);
+      color: var(--th-palette-gray-900);
     }
-  
+
     .rowData {
       font-size: 14px;
-      font-family: var(--font-regular);
-      color: var(--theme-transactions-list-detail-row-text-color);
+      font-weight: 400;
+      color: var(--th-palette-gray-600);
       word-break: break-all;
       line-height: 22px;
     }
@@ -334,8 +338,8 @@
       }
 
       span {
-        color: var(--theme-label-button-color);
-        font-family: var(--font-regular);
+        color: var(--th-palette-gray-800);
+        font-weight: 400;
         font-size: 14px;
         margin-left: 6px;
       }
@@ -353,14 +357,15 @@
     }
 
     .hash {
-      font-family: var(--font-mono-regular);
+      font-family: 'RobotoMono';
+      font-weight: 400;
     }
   }
-  
+
   .conversion {
     display: flex;
   }
-  
+
   .conversionRate {
     margin-left: 76px;
   }

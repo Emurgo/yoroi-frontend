@@ -1,18 +1,18 @@
 @mixin unordered-list() {
   li::before {
-    content: "●";
-    margin-right:0.4em;
-    font-size:0.8em;
-    color: var(--theme-bullet-point-color);
+    content: '●';
+    margin-right: 0.4em;
+    font-size: 0.8em;
+    color: var(--th-palette-gray-400);
   }
 
   li {
-    font-family: var(--font-regular);
+    font-weight: 400;
     display: list-item;
     margin-left: 12px;
     line-height: 1.38;
     font-size: 14px;
-    color: var(--cmn-default-color-grey);
+    color: var(--th-palette-gray-800);
 
     & + li {
       margin-top: 8px;

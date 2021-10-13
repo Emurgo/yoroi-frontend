@@ -1,26 +1,26 @@
 @mixin card-mixin {
-  width: var(--card-width);
-  height: var(--card-height);
-  border-radius: var(--card-border-radius);
-  background-color: var(--card-bg-color);
-  color: var(--card-text-color);
-  font-size: var(--card-text-size);
-  font-family: var(--font-regular);
+  width: 250px;
+  height: 380px;
+  border-radius: 8px;
+  background-color: var(--th-palette-common-white);
+  color: var(--th-palette-gray-800);
+  font-size: 1rem;
+  font-weight: 400;
   padding: 32px 20px;
   text-align: center;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
   margin: 0 8px;
-  box-shadow: 0 5px 20px 0px rgba(24,26,30, .08);
+  box-shadow: 0 5px 20px 0px rgba(24, 26, 30, 0.08);
   margin-bottom: 15px;
   cursor: pointer;
 
   &:hover {
-    box-shadow: 0 5px 30px 0px rgba(24,26,30, .12);
+    box-shadow: 0 5px 30px 0px rgba(24, 26, 30, 0.12);
 
     .heroCardsItemTitle {
-      color: var(--card-text-color-hover);
+      color: var(--th-palette-primary-300);
     }
   }
 
@@ -37,7 +37,7 @@
   }
 
   .heroCardsItemDate {
-    color: #6B7384;
+    color: #6b7384;
     font-size: 12px;
     line-height: 20px;
   }

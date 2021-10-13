@@ -1,6 +1,6 @@
 .component {
   background-color: var(--theme-mnemonic-background-color)!important;
-  font-family: var(--font-regular)!important;
+  font-weight: 400!important;
   color: var(--theme-mnemonic-button-text-color)!important;
 
   &.disabled {
@@ -24,7 +24,7 @@
     height: 40px;
     padding: 10px 20px;
     width: 140px;
-  
+
     &.disabled {
       opacity: 0.3;
     }
@@ -45,5 +45,5 @@
       opacity: 0;
     }
   }
-  
+
 }

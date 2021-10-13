@@ -8,7 +8,6 @@
       flex-wrap: wrap;
       justify-content: space-between;
 
-
       & > div {
         margin-top: 30px;
         width: 350px;
@@ -23,7 +22,7 @@
   }
 
   .isSubmitting {
-    @include loading-spinner("../../assets/images/spinner-light.svg");
+    @include loading-spinner('../../assets/images/spinner-light.svg');
   }
 }
 
@@ -69,7 +68,6 @@
 
     .walletPassword {
       .walletPasswordFields {
-
         &.show {
           max-height: 600px;
           opacity: 1;
@@ -83,7 +81,7 @@
     }
 
     :global(.Dialog_actions) {
-      margin-top: var(--theme-dialog-password-input-actions-margin-top);
+      margin-top: 10px;
     }
   }
 }

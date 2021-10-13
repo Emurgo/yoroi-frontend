@@ -5,16 +5,16 @@
   padding-right: 40px;
 
   .attention {
-    color: var(--theme-dialog-title-color);
-    font-family: var(--font-medium);
+    color: var(--th-palette-gray-900);
+    font-weight: 500;
     font-size: 16px;
     line-height: 19px;
     text-align: center;
   }
 
   .explanation {
-    color: var(--theme-dialog-title-color);
-    font-family: var(--font-regular);
+    color: var(--th-palette-gray-900);
+    font-weight: 400;
     font-size: 14px;
     line-height: 22px;
     text-align: center;

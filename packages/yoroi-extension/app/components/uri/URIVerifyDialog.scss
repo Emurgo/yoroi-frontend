@@ -1,6 +1,5 @@
 .dialog {
-
-  font-family: var(--font-regular);
+  font-weight: 400;
 
   :global {
     .Dialog_title {
@@ -15,7 +14,8 @@
 
   .address {
     letter-spacing: 0px;
-    font-family: var(--font-mono-regular);
+    font-family: 'RobotoMono';
+    font-weight: 400;
     word-break: break-all;
     font-size: 16px;
     line-height: 23px;
@@ -30,7 +30,7 @@
   }
 
   .textBlock {
-    font-family: var(--font-light);
+    font-weight: 300;
     margin-top: 10px;
     font-size: 13px;
     margin-bottom: 20px;
@@ -39,13 +39,13 @@
   .amountSmall {
     @extend .amount;
     font-size: 14px;
-    color: var(--theme-widgets-hash-light-color);
+    color: var(--th-widgets-hash-light);
   }
 }
 
 :global(.YoroiModern) .component {
-  min-width: var(--theme-modal-min-max-width-lg);
-  max-width: var(--theme-modal-min-max-width-lg);
+  min-width: var(--component-dialog-min-width-lg);
+  max-width: var(--component-dialog-min-width-lg);
 
   .address {
     color: var(--theme-transactions-received-address-color);

@@ -3,13 +3,13 @@
   margin-bottom: 10px;
 
   strong {
-    font-family: var(--font-medium);
+    font-weight: 500;
   }
 }
 
 :global(.YoroiClassic) {
   .component {
-    font-family: var(--font-light);
+    font-weight: 300;
     font-size: 16px;
     color: var(--theme-instructions-text-color);
     text-align: center;
@@ -18,7 +18,7 @@
 
 :global(.YoroiModern) {
   .component {
-    font-family: var(--font-regular);
+    font-weight: 400;
     font-size: 14px;
     color: var(--theme-instructions-recovery-text-color);
     text-align: left;

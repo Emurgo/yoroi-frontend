@@ -2,9 +2,9 @@
 
 .component {
   a {
-    color: var(--theme-support-settings-text-color);
+    color: var(--theme-support-settings-text);
   }
   .link {
-    @include underline(var(--theme-underline-dark-color));
+    @include underline(var(--th-palette-gray-800));
   }
 }

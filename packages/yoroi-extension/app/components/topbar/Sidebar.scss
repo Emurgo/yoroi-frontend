@@ -2,14 +2,14 @@
   min-height: 100%;
   display: flex;
   flex-direction: column;
-  background: var(--theme-sidebar-background-color);
+  background: var(--th-sidebar-background);
 }
 
 .header {
   padding: 18px;
   min-height: 74px;
   & svg > path {
-    fill: var(--theme-sidebar-icon-color);
+    fill: var(--th-sidebar-text);
   }
 }
 
@@ -25,12 +25,12 @@
   display: flex;
   justify-content: center;
   & svg > path {
-    fill: var(--theme-sidebar-icon-color);
+    fill: var(--th-sidebar-text);
   }
   &:hover {
     cursor: pointer;
     & svg > path {
-      fill: var(--theme-sidebar-icon-color-hover);
+      fill: var(--th-palette-secondary-300);
     }
   }
   & .iconRotate {

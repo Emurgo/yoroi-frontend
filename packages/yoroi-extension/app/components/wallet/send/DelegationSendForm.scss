@@ -15,14 +15,15 @@
 
     :global {
       .SimpleInput_input {
-        font-family: var(--font-mono-light);
+        font-family: 'RobotoMono';
+        font-weight: 300;
         letter-spacing: 0;
       }
     }
   }
 
   .actionLabel {
-    color: var(--theme-label-button-color);
+    color: var(--th-palette-gray-800);
     font-weight: 300;
     font-size: 16px;
     padding-left: 17px;

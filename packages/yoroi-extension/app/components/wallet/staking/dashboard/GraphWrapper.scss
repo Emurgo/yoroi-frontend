@@ -23,7 +23,7 @@
 }
 
 .tab {
-    font-family: var(--font-medium);
+    font-weight: 500;
     display: inline-block;
     color: var(--theme-dashboard-graph-tab-color);
     font-size: 16px;
@@ -97,11 +97,11 @@
     padding: 8px 12px 8px 8px;
     background-color: var(--theme-dashboard-graph-tooltip-background);
     color: var(--theme-dashboard-graph-tooltip-text-color);
-    font-size: var(--theme-dashboard-graph-tooltip-font-size);
-    line-height: var(--theme-dashboard-graph-tooltip-line-height);
+    font-size: '0.75rem';
+    line-height: '14px';
     border-radius: 4px;
 }
 
 .tooltipValue {
-    font-family: var(--font-medium);
+    font-weight: 500;
 }

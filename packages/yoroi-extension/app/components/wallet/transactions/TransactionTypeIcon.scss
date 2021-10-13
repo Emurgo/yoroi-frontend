@@ -8,25 +8,25 @@
 
   &.expend {
     svg path {
-      fill: var(--theme-transactions-icon-type-expend-background-color);
+      fill: var(--th-transactions-icon-type-expend-background-color);
     }
   }
 
   &.income {
     svg path {
-      fill: var(--theme-transactions-icon-type-income-background-color);
+      fill: var(--th-transactions-icon-type-income-background-color);
     }
   }
 
   &.exchange {
     svg path {
-      fill: var(--theme-transactions-icon-type-exchange-background-color);
+      fill: var(--th-transactions-icon-type-exchange-background-color);
     }
   }
 
   &.failed {
     svg path {
-      fill: var(--theme-transactions-icon-type-failed-background-color);
+      fill: var(--th-transactions-icon-type-failed-background-color);
     }
     .transactionTypeIcon > svg {
       height: 16px;
@@ -42,7 +42,7 @@
     height: 19px;
     width: 23px;
     path {
-      fill: var(--theme-icon-transaction-type-color);
+      fill: #fafbfc;
     }
   }
 }

@@ -1,4 +1,4 @@
-$common-color:var(--theme-widgets-progress-step-common-color);
+$common-color: var(--th-palette-secondary-300);
 
 .component {
   text-align: center;
@@ -8,65 +8,65 @@ $common-color:var(--theme-widgets-progress-step-common-color);
     display: inline-block;
     vertical-align: top;
     padding-left: 5px;
-    padding-right: 5px; 
+    padding-right: 5px;
   }
-  
+
   .stepTopBar {
     background-color: $common-color;
     height: 6px;
     border-radius: 3px;
     opacity: 0.3;
   }
-  
+
   .stepTopBarDone {
-    opacity: 1.0;
+    opacity: 1;
   }
-  
+
   .stepTopBarActive {
-    opacity: 1.0;
+    opacity: 1;
   }
 
   .stepBottomBlock {
     width: 117px;
     margin-top: 2px;
-  
+
     span {
       margin-top: 1px;
       display: inline-block;
     }
-  
+
     svg {
       height: 10px;
       width: 10px;
     }
   }
-  
+
   .stepStateIconContainer {
     display: inline-block;
     width: 16px;
     height: 16px;
     margin-left: -16px;
   }
-  
+
   .stepTextContainer {
     display: inline-block;
     vertical-align: top;
   }
-  
+
   .stepText {
     color: $common-color;
     opacity: 0.3;
     font-size: 13px;
-    font-family: var(--font-light);
+    font-weight: 300;
   }
-  
+
   .stepTextDone {
-    opacity: 1.0;
+    opacity: 1;
   }
-  
+
   .stepTextActive {
-    opacity: 1.0;
-  }  
+    opacity: 1;
+  }
 }
 
 :global(.YoroiClassic) .component {
@@ -80,6 +80,6 @@ $common-color:var(--theme-widgets-progress-step-common-color);
 
   .stepText {
     font-size: 12px;
-    font-family: var(--font-regular);
-  }  
+    font-weight: 400;
+  }
 }

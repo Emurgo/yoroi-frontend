@@ -1,5 +1,5 @@
 .component {
-  background-color: var(--theme-topbar-layout-body-background-color);
+  background-color: var(--th-palette-common-white);
   box-shadow: 0 0 70px 0 rgba(0, 0, 0, 0.75);
   display: flex;
   flex-direction: column;
@@ -8,13 +8,14 @@
   width: 100%;
 }
 
-.topbar, .navbar {
+.topbar,
+.navbar {
   // Show elements that overflow the topbar above the content area
   z-index: 2;
 }
 
 .windowWrapper {
-  font-family: var(--font-regular);
+  font-weight: 400;
   display: flex;
   flex-wrap: nowrap;
   min-height: 100%;
@@ -34,7 +35,7 @@
 }
 
 .containerMain {
-  background-color: var(--theme-page-background-color);
+  background-color: var(--th-palette-gray-50);
 }
 
 .inner {
@@ -49,7 +50,7 @@
 
 .containerInner {
   margin-top: 4px;
-  background-color: var(--theme-page-content-background-color);
+  background-color: var(--th-palette-common-white);
   width: 100%;
   overflow: hidden;
   display: flex;
@@ -59,8 +60,8 @@
 }
 
 .containerCard {
-  box-shadow: var(--theme-page-content-box-shadow);
-  border-radius: var(--theme-page-content-border-radius);
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.06);
+  border-radius: 8px;
 }
 
 .content {
@@ -69,23 +70,20 @@
 }
 
 .containerContent {
-  max-width: var(--theme-page-container-width);
-  padding-left: var(--theme-page-container-side-padding);
-  padding-right: var(--theme-page-container-side-padding);
+  max-width: 1295px;
+  padding-left: 40px;
+  padding-right: 40px;
   width: 100%;
   margin-left: auto;
   margin-right: auto;
   display: flex;
   flex-direction: column;
-  max-height: calc(100% - var(--theme-page-content-box-bottom) - var(--theme-banner-height));
+  max-height: calc(100% - 24px - 46px);
 }
 
 // avoid background image overlapping with language select form
 
-@media
-  (min-width: 1100px) and (min-height: 820px),
-  (min-width: 1160px)
-{
+@media (min-width: 1100px) and (min-height: 820px), (min-width: 1160px) {
   :global(.YoroiModern):global(.YoroiShelley) .languageSelectionBackground {
     background-image: url(../../assets/images/select-language-shelley.svg);
     background-size: auto;

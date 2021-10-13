@@ -5,14 +5,14 @@
 }
 
 .title {
-    font-family: var(--font-medium);
+    font-weight: 500;
     font-size: 18px;
     line-height: 22px;
     margin-bottom: 16px;
 }
 
 .inner {
-    background-color: var(--theme-main-body-background-color);
+    background-color: var(--th-palette-common-white);
     flex: 1;
     border-radius: 6px;
     box-shadow: 0 3px 10px 2px var(--theme-dashboard-card-shadow-color);

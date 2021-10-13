@@ -14,10 +14,10 @@
 
     .groupDate {
       padding-left: 24px;
-      font-family: var(--font-regular);
+      font-weight: 400;
       font-size: 14px;
       line-height: 1.38;
-      color: var(--theme-navbar-color);
+      color: var(--th-palette-gray-600);
     }
   }
 
@@ -28,7 +28,6 @@
       margin: 0;
     }
   }
-
 }
 
 .loading {

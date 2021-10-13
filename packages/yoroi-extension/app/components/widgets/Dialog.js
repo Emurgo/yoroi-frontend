@@ -129,7 +129,7 @@ DialogFn.defaultProps = {
 
 const ModalContainer = styled(Box)(({ theme }) => ({
   position: 'relative',
-  minWidth: 'var(--component-dialog-min-width-cmn)',
+  minWidth: 'var(--component-dialog-min-width-md)',
   borderRadius: theme.name === 'classic' ? 0 : 8,
   paddingTop: theme.name === 'classic' ? '25px' : '24px',
   paddingBottom: theme.name === 'classic' ? '30px' : '40px',
