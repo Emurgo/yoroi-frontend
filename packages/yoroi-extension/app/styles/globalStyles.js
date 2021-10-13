@@ -266,7 +266,7 @@ const globalStyles = (theme: Object): Node => (
         background: 'none',
         border: 'none',
         padding: 0,
-
+        fontFamily: 'inherit',
         '&:focus': {
           outline: 0,
         },
@@ -291,7 +291,7 @@ const globalStyles = (theme: Object): Node => (
       'html,body,#root,#root > [data-reactroot]': {
         width: '100%',
         height: '100%',
-        '-webkit-font-smoothing': 'antialiased',
+        WebkitFontSmoothing: 'antialiased',
         ':global(.YoroiClassic)': {
           letterSpacing: '1px',
         },
@@ -301,7 +301,6 @@ const globalStyles = (theme: Object): Node => (
         'input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus,input:-webkit-autofill:active': {
           WebkitBoxShadow: '0 0 0 30px rgba(255, 255, 255) inset !important',
         },
-        '-webkit-font-smoothing': 'antialiased',
         lineHeight: 1,
         fontFamily: theme.typography.fontFamily,
       },

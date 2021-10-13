@@ -22,11 +22,9 @@ import { CssBaseline } from '@mui/material';
 import { globalStyles } from '../../app/styles/globalStyles';
 import { ThemeProvider as EmotionThemeProvider } from 'emotion-theming';
 import { translations, LANGUAGES } from '../../app/i18n/translations';
-import ThemeManager from '../../app/ThemeManager';
 import { THEMES, changeToplevelTheme, MuiThemes } from '../../app/themes';
 import type { Theme } from '../../app/themes';
 import environment from '../../app/environment';
-import { getVarsForTheme } from '../../app/stores/base/BaseProfileStore';
 
 import { withKnobs, select, boolean } from '@storybook/addon-knobs';
 
@@ -98,8 +96,6 @@ export default class StoryWrapper extends Component<Props> {
     // eslint-disable-next-line prefer-object-spread
     const mergedMessages = Object.assign({}, translations['en-US'], translations[locale]);
 
-    // eslint-disable-next-line prefer-object-spread
-    const themeVars = getVarsForTheme({ theme: currentTheme });
 
     changeToplevelTheme(currentTheme);
     const muiTheme = MuiThemes[currentTheme];
@@ -112,7 +108,6 @@ export default class StoryWrapper extends Component<Props> {
           <ThemeProvider theme={muiTheme}>
             <CssBaseline />
             {globalStyles(muiTheme)}
-            <ThemeManager variables={themeVars} />
             {/* Automatically pass a theme prop to all components in this subtree. */}
             <IntlProvider
               {...{

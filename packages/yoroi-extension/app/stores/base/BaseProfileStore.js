@@ -286,15 +286,16 @@ export default class BaseProfileStore
 
   /* @Returns Merged Pre-Built Theme and Custom Theme */
   @computed get currentThemeVars(): { [key: string]: string, ... } {
-    const currentThemeVars = this.getThemeVars({ theme: this.currentTheme });
     let { result } = this.getCustomThemeRequest;
     if (result == null) {
       result = this.getCustomThemeRequest.execute().result;
     }
     let customThemeVars = {};
-    if (result != null) customThemeVars = JSON.parse(result);
-    // Merge Custom Theme and Current Theme
-    return { ...currentThemeVars, ...customThemeVars };
+    if (result != null) {
+      customThemeVars = JSON.parse(result);
+    }
+    // Merge Custom Theme
+    return customThemeVars;
   }
 
   @computed get isCurrentThemeSet(): boolean {
@@ -307,29 +308,23 @@ export default class BaseProfileStore
 
   _updateTheme: ({| theme: string |}) => Promise<void> = async ({ theme }) => {
     // Unset / Clear the Customized Theme from LocalStorage
+    document.documentElement.removeAttribute('style') // remove css prop
     await this.unsetCustomThemeRequest.execute();
     await this.getCustomThemeRequest.execute(); // eagerly cache
     await this.setThemeRequest.execute(theme);
     await this.getThemeRequest.execute(); // eagerly cache
   };
 
-  _exportTheme: void => Promise<void> = async () => {
-    // TODO: It should be ok to access DOM Style from here
-    // but not sure about project conventions about accessing the DOM (Clark)
-    const html = document.querySelector('html');
-    if (html) {
-      const attributes: any = html.attributes;
-      await this.unsetCustomThemeRequest.execute();
-      await this.setCustomThemeRequest.execute({
-        customThemeVars: (attributes.style.value: string),
-        currentThemeVars: this.getThemeVars({ theme: this.currentTheme }),
-      });
-      await this.getCustomThemeRequest.execute(); // eagerly cache
-    }
-  };
 
-  getThemeVars: ({| theme: string |}) => { [key: string]: string, ... } = request => {
-    return getVarsForTheme(request);
+
+  _exportTheme: void => Promise<void> = async () => {
+    const { getCSSCustomPropObject } = require(`../../styles/utils`);
+    const cssCustomPropObject = getCSSCustomPropObject();
+    await this.unsetCustomThemeRequest.execute();
+    await this.setCustomThemeRequest.execute({
+      cssCustomPropObject
+    });
+    await this.getCustomThemeRequest.execute(); // eagerly cache
   };
 
   hasCustomTheme: void => boolean = (): boolean => {
@@ -452,19 +447,6 @@ export default class BaseProfileStore
     return this.getUnitOfAccountRequest.wasExecuted && this.getUnitOfAccountRequest.result !== null;
   }
 }
-
-export const getVarsForTheme: ({|
-  theme: string,
-|}) => { [key: string]: string, ... } = ({ theme }) => {
-  const { getThemeVars } = require(`../../themes/prebuilt/${theme}.js`);
-  // we used this theme for the Shelley version of the Yoroi extension
-  // however, going forward, Yoroi will be a mono-project containing all sub-networks
-  // eslint-disable-next-line no-constant-condition
-  if (false) {
-    return getThemeVars('shelley');
-  }
-  return getThemeVars(undefined);
-};
 
 export function getTermsOfUse(api: 'ada', currentLocale: string): string {
   return require(`../../i18n/locales/terms-of-use/${api}/${currentLocale}.md`).default;

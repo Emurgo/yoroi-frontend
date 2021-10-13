@@ -104,7 +104,7 @@ class App extends Component<Props, State> {
         <ThemeProvider theme={muiTheme}>
           <CssBaseline />
           {globalStyles(muiTheme)}
-          <ThemeManager variables={themeVars} />
+          <ThemeManager cssVariables={themeVars} />
           {/* Automatically pass a theme prop to all components in this subtree. */}
           <IntlProvider {...{ locale, key: locale, messages: mergedMessages }}>
             {this.getContent()}
