@@ -22,7 +22,7 @@ import { Routes } from './Routes';
 import { translations } from './i18n/translations';
 import type { StoresMap } from './stores';
 import type { ActionsMap } from './actions';
-import { changeToplevelTheme, MuiThemes } from './themes';
+import { changeToplevelTheme, MuiThemes } from './styles/utils';
 import ThemeManager from './ThemeManager';
 import environment from './environment';
 import MaintenancePage from './containers/MaintenancePage';

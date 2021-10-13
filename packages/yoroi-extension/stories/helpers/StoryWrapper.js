@@ -22,8 +22,8 @@ import { CssBaseline } from '@mui/material';
 import { globalStyles } from '../../app/styles/globalStyles';
 import { ThemeProvider as EmotionThemeProvider } from 'emotion-theming';
 import { translations, LANGUAGES } from '../../app/i18n/translations';
-import { THEMES, changeToplevelTheme, MuiThemes } from '../../app/themes';
-import type { Theme } from '../../app/themes';
+import { THEMES, changeToplevelTheme, MuiThemes } from '../../app/styles/utils';
+import type { Theme } from '../../app/styles/utils';
 import environment from '../../app/environment';
 
 import { withKnobs, select, boolean } from '@storybook/addon-knobs';

@@ -5,7 +5,7 @@ import { select, boolean, } from '@storybook/addon-knobs';
 import { action } from '@storybook/addon-actions';
 import WalletSettingsPage from './WalletSettingsPage';
 import { withScreenshot } from 'storycap';
-import { THEMES } from '../../../themes';
+import { THEMES } from '../../../styles/utils';
 import {
   globalKnobs,
 } from '../../../../stories/helpers/StoryWrapper';

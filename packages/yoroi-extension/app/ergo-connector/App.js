@@ -21,7 +21,7 @@ import { Routes } from './Routes';
 import { translations } from '../i18n/translations';
 import type { StoresMap } from './stores';
 import type { ActionsMap } from './actions';
-import { changeToplevelTheme, MuiThemes } from '../themes';
+import { changeToplevelTheme, MuiThemes } from '../styles/utils';
 import ThemeManager from '../ThemeManager';
 import CrashPage from '../containers/CrashPage';
 import { Logger } from '../utils/logging';

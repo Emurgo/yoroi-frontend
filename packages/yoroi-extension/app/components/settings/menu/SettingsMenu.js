@@ -7,7 +7,7 @@ import SettingsMenuItem from './SettingsMenuItem';
 import styles from './SettingsMenu.scss';
 import environmnent from '../../../environment';
 import { ROUTES } from '../../../routes-config';
-import type { Theme } from '../../../themes';
+import type { Theme } from '../../../styles/utils';
 import globalMessages from '../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 

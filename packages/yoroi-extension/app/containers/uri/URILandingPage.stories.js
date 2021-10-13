@@ -6,7 +6,7 @@ import { withScreenshot } from 'storycap';
 import { select, } from '@storybook/addon-knobs';
 import { action } from '@storybook/addon-actions';
 import URILandingPage from './URILandingPage';
-import { THEMES } from '../../themes';
+import { THEMES } from '../../styles/utils';
 import {
   globalKnobs,
   genUnitOfAccount,

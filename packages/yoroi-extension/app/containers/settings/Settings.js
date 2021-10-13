@@ -20,7 +20,7 @@ import SidebarContainer from '../SidebarContainer';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import type { Theme } from '../../themes/index';
+import type { Theme } from '../../styles/utils';
 
 export type GeneratedData = typeof Settings.prototype.generated;
 

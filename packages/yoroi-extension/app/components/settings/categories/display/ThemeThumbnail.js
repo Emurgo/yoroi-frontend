@@ -3,7 +3,7 @@
 import { ThemeProvider } from '@mui/material';
 import { styled } from '@mui/system';
 import type { Node } from 'react';
-import { MuiThemes } from '../../../../themes';
+import { MuiThemes } from '../../../../styles/utils';
 
 type Props = {|
   +theme: Object,

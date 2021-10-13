@@ -10,7 +10,7 @@ import ThemeSettingsBlock from '../../../components/settings/categories/general-
 import AboutYoroiSettingsBlock from '../../../components/settings/categories/general-setting/AboutYoroiSettingsBlock';
 import LocalizableError from '../../../i18n/LocalizableError';
 import type { LanguageType } from '../../../i18n/translations';
-import type { Theme } from '../../../themes';
+import type { Theme } from '../../../styles/utils';
 
 type GeneratedData = typeof GeneralSettingsPage.prototype.generated;
 

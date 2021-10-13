@@ -31,7 +31,7 @@ import { mockWalletProps } from '../Wallet.mock';
 import { defaultToSelectedExplorer } from '../../../domain/SelectedExplorer';
 import { buildRoute } from '../../../utils/routing';
 import { ROUTES } from '../../../routes-config';
-import { THEMES } from '../../../themes';
+import { THEMES } from '../../../styles/utils';
 import { wrapWallet } from '../../../Routes';
 import type {
   GetDelegatedBalanceFunc,

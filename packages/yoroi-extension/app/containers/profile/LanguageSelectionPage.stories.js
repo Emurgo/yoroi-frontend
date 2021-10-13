@@ -6,7 +6,7 @@ import { select, boolean, } from '@storybook/addon-knobs';
 import { action } from '@storybook/addon-actions';
 import { LANGUAGES } from '../../i18n/translations';
 import { ServerStatusErrors } from '../../types/serverStatusErrorType';
-import { THEMES } from '../../themes';
+import { THEMES } from '../../styles/utils';
 import LanguageSelectionPage from './LanguageSelectionPage';
 import { globalKnobs } from '../../../stories/helpers/StoryWrapper';
 import { withScreenshot } from 'storycap';

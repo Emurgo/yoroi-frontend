@@ -9,7 +9,7 @@ import {
   genShelleyCIP1852SigningWalletWithCache,
   genVotingShelleyTx,
 } from '../../../../stories/helpers/cardano/ShelleyCip1852Mocks';
-import { THEMES } from '../../../themes';
+import { THEMES } from '../../../styles/utils';
 import { mockWalletProps } from '../Wallet.mock';
 import {
   globalKnobs,
