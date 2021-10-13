@@ -5,11 +5,11 @@
   line-height: 1.38;
   word-spacing: 10px;
   -webkit-user-select: none;
-  border: 1px solid var(--theme-mnemonic-border-color);
+  border: 1px solid var(--yoroi-mnemonic-border-color);
 
   &.filled {
     padding: 14px;
-    border: 2px solid var(--theme-mnemonic-border-filled-color);
+    border: 2px solid var(--yoroi-mnemonic-border-filled-color);
     min-height: 132px;
   }
 }
@@ -19,8 +19,8 @@
     border-radius: 2px;
     text-align: center;
     font-weight: 500;
-    color: var(--theme-instructions-text-color);
-    background-color: var(--theme-backup-mnemonic-background-color);
+    color: var(--yoroi-instructions-text-color);
+    background-color: var(--yoroi-backup-mnemonic-background-color);
     min-height: 52px;
   }
 }
@@ -30,6 +30,6 @@
     border-radius: 8px;
     text-align: left;
     font-weight: 400;
-    color: var(--theme-instructions-recovery-text-color);
+    color: var(--yoroi-instructions-recovery-text-color);
   }
 }

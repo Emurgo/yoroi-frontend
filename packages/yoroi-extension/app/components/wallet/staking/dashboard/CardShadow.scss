@@ -12,9 +12,9 @@
 }
 
 .inner {
-    background-color: var(--th-palette-common-white);
+    background-color: var(--yoroi-palette-common-white);
     flex: 1;
     border-radius: 6px;
-    box-shadow: 0 3px 10px 2px var(--theme-dashboard-card-shadow-color);
-    border: 1px solid var(--theme-dashboard-card-border-color);
+    box-shadow: 0 3px 10px 2px var(--yoroi-dashboard-card-shadow-color);
+    border: 1px solid var(--yoroi-dashboard-card-border-color);
 }

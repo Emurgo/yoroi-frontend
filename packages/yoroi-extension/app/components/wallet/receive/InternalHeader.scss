@@ -2,9 +2,9 @@
 
 .component {
   a {
-    color: var(--theme-support-settings-text);
+    color: var(--yoroi-support-settings-text);
   }
   .link {
-    @include underline(var(--th-palette-gray-800));
+    @include underline(var(--yoroi-palette-gray-800));
   }
 }

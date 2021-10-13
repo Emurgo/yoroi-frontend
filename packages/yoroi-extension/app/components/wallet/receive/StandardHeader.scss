@@ -14,13 +14,13 @@
     margin-left: 80px;
 
     canvas {
-      border: 4px solid var(--th-qr-code-background-color);
+      border: 4px solid var(--yoroi-qr-code-background-color);
       box-sizing: content-box;
     }
   }
 
   .instructions {
-    color: var(--th-palette-gray-900);
+    color: var(--yoroi-palette-gray-900);
     display: flex;
     flex-direction: column;
     font-weight: 400;
@@ -39,7 +39,7 @@
       line-height: 22px;
       font-family: 'RobotoMono';
       font-weight: 500;
-      color: var(--th-palette-gray-800);
+      color: var(--yoroi-palette-gray-800);
     }
 
     .hashLabel {
@@ -55,7 +55,7 @@
       line-height: 1.57;
       margin-bottom: 24px;
       word-break: break-word;
-      color: var(--th-palette-gray-600);
+      color: var(--yoroi-palette-gray-600);
     }
 
     .submitWithPasswordButton {

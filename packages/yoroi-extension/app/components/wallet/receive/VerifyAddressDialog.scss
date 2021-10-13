@@ -5,7 +5,7 @@
 }
 
 .label {
-  color: var(--th-palette-gray-900);
+  color: var(--yoroi-palette-gray-900);
   font-size: 14px;
   line-height: 22px;
   display: block;
@@ -21,12 +21,12 @@
 }
 
 .hash {
-  color: var(--th-palette-gray-600);
+  color: var(--yoroi-palette-gray-600);
   font-size: 16px;
   line-height: 22px;
 }
 
 :global(.YoroiModern) .component {
-  min-width: var(--component-dialog-min-width-lg);
-  max-width: var(--component-dialog-min-width-lg);
+  min-width: var(--yoroi-comp-dialog-min-width-lg);
+  max-width: var(--yoroi-comp-dialog-min-width-lg);
 }

@@ -7,7 +7,7 @@
   justify-content: center;
   height: 100%;
   min-height: 60px;
-  color: var(--th-palette-gray-900);
+  color: var(--yoroi-palette-gray-900);
   font-weight: 400;
 }
 
@@ -19,9 +19,9 @@
   box-sizing: border-box;
   height: fit-content;
   width: fit-content;
-  border: 1px solid var(--th-palette-gray-200);
+  border: 1px solid var(--yoroi-palette-gray-200);
   border-radius: 8px;
-  background-color: var(--th-palette-gray-50);
+  background-color: var(--yoroi-palette-gray-50);
   margin-right: 11.5px;
 }
 .currencyAlign {
@@ -62,7 +62,7 @@
 }
 
 .highlightAmount {
-  color: var(--th-palette-secondary-300);
+  color: var(--yoroi-palette-secondary-300);
 }
 
 .toggleButton {
@@ -95,11 +95,11 @@
 
 .label {
   display: inline-block;
-  color: var(--th-palette-gray-600);
+  color: var(--yoroi-palette-gray-600);
 }
 
 .info {
   font-size: 12px;
   line-height: 20px;
-  color: var(--th-palette-gray-600);
+  color: var(--yoroi-palette-gray-600);
 }

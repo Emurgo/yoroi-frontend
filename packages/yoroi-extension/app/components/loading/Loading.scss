@@ -33,7 +33,7 @@
     width: 100px;
     margin: 0 114px;
     & > path {
-      fill: var(--th-palette-secondary-300);
+      fill: var(--yoroi-palette-secondary-300);
     }
   }
 }
@@ -61,8 +61,8 @@
 }
 
 .link {
-  color: var(--th-palette-error-200);
-  @include underline(var(--th-palette-error-200));
+  color: var(--yoroi-palette-error-200);
+  @include underline(var(--yoroi-palette-error-200));
 }
 
 .error {

@@ -10,7 +10,7 @@ $blockHeight: 27px;
     align-items: center;
     text-decoration: none;
     font-weight: 400;
-    color: var(--th-palette-common-black);
+    color: var(--yoroi-palette-common-black);
   }
 }
 
@@ -36,6 +36,6 @@ $blockHeight: 27px;
 }
 
 .block:hover {
-  background-color: var(--th-palette-gray-200);
+  background-color: var(--yoroi-palette-gray-200);
   cursor: pointer;
 }

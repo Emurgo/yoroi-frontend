@@ -38,7 +38,7 @@
 }
 
 :global(.YoroiClassic) .terms {
-  color: var(--theme-terms-of-use-text-color);
+  color: var(--yoroi-terms-of-use-text-color);
 }
 
 :global(.YoroiModern) .terms {
@@ -55,7 +55,7 @@
   }
 
   p, li {
-    color: var(--theme-terms-of-use-text-color);
+    color: var(--yoroi-terms-of-use-text-color);
     font-size: 13px;
     line-height: 1.54;
   }

@@ -15,7 +15,7 @@
 .column {
   padding: 24px 24px;
   flex: 1;
-  border-right: 1px solid var(--theme-dashboard-card-vertical-separator-color);
+  border-right: 1px solid var(--yoroi-dashboard-card-vertical-separator-color);
 }
 
 .card {
@@ -51,7 +51,7 @@
 
 .label {
   margin-right: auto;
-  color: var(--th-palette-gray-600);
+  color: var(--yoroi-palette-gray-600);
   font-weight: 400;
   font-size: 14px;
   line-height: 27px;
@@ -88,11 +88,11 @@
 }
 
 .noDelegation {
-  background-color: var(--theme-dashboard-card-nodelegation-background-color);
+  background-color: var(--yoroi-dashboard-card-nodelegation-background-color);
 
   .message {
     height: 53px;
-    color: var(--th-palette-gray-600);
+    color: var(--yoroi-palette-gray-600);
     font-weight: 400;
     font-size: 12px;
     line-height: 18px;
@@ -124,7 +124,7 @@
 
 .poolInfoToolTip {
   padding: 4px 0px;
-  color: var(--th-palette-common-white);
+  color: var(--yoroi-palette-common-white);
   font-size: 11px;
   line-height: 14px;
 

@@ -25,7 +25,7 @@
 .tab {
     font-weight: 500;
     display: inline-block;
-    color: var(--theme-dashboard-graph-tab-color);
+    color: var(--yoroi-dashboard-graph-tab-color);
     font-size: 16px;
     line-height: 20px;
     text-transform: uppercase;
@@ -63,7 +63,7 @@
     margin: 0 10px 0 0;
 	height: 16px;
 	width: 16px;
-    border: 2px solid var(--theme-dashboard-graph-radio-color);
+    border: 2px solid var(--yoroi-dashboard-graph-radio-color);
     &::before {
         content: '';
         position: absolute;
@@ -74,12 +74,12 @@
         margin: auto;
         height: 8px;
         width: 8px;
-        background-color: var(--theme-dashboard-graph-active-radio-color);
+        background-color: var(--yoroi-dashboard-graph-active-radio-color);
         visibility: hidden;
         border-radius: 50%;
     }
     &:checked {
-        border-color: var(--theme-dashboard-graph-active-radio-color);
+        border-color: var(--yoroi-dashboard-graph-active-radio-color);
     }
     &:checked::before {
         visibility: visible;
@@ -90,13 +90,13 @@
 }
 
 .tabActive {
-    color: var(--theme-dashboard-graph-active-tab-color);
+    color: var(--yoroi-dashboard-graph-active-tab-color);
 }
 
 .tooltip {
     padding: 8px 12px 8px 8px;
-    background-color: var(--theme-dashboard-graph-tooltip-background);
-    color: var(--theme-dashboard-graph-tooltip-text-color);
+    background-color: var(--yoroi-dashboard-graph-tooltip-background);
+    color: var(--yoroi-dashboard-graph-tooltip-text-color);
     font-size: '0.75rem';
     line-height: '14px';
     border-radius: 4px;

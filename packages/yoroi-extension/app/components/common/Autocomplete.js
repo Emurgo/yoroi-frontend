@@ -189,7 +189,7 @@ function Autocomplete({
           <Box
             sx={{
               padding: '14px 20px',
-              bgcolor: 'var(--th-palette-common-white)',
+              bgcolor: 'var(--yoroi-palette-common-white)',
             }}
           >
             {noResultsMessage}
@@ -204,8 +204,8 @@ function Autocomplete({
                     padding: '14px 20px',
                     backgroundColor:
                       highlightedIndex === index
-                        ? 'var(--th-palette-gray-50)'
-                        : 'var(--th-palette-common-white)',
+                        ? 'var(--yoroi-palette-gray-50)'
+                        : 'var(--yoroi-palette-common-white)',
                     cursor: 'pointer',
                   }}
                   {...getItemProps({
@@ -246,7 +246,7 @@ const CheckWrapper = styled(Box)({
 
 const ULList = styled(Box)({
   width: '100%',
-  background: 'var(--th-palette-common-white)',
+  background: 'var(--yoroi-palette-common-white)',
   margin: 0,
   borderTop: 0,
   position: 'absolute',
@@ -266,15 +266,15 @@ const InputWrapper = styled(Box)(
   width: 100%;
   border: ${isOpen ? '2px' : '1px'} solid ${
     error
-      ? 'var(--component-input-error)'
+      ? 'var(--yoroi-comp-input-error)'
       : isOpen
-      ? 'var(--component-input-text-focus)'
+      ? 'var(--yoroi-comp-input-text-focus)'
       : theme.name === 'classic'
       ? '#c7ced6'
-      : 'var(--component-input-border)'
+      : 'var(--yoroi-comp-input-border)'
   };
   border-radius: ${theme.name === 'classic' ? '0' : '8px'};
-  background-color: ${theme.name === 'classic' ? '#f4f4f6' : 'var(--th-palette-common-white)'};
+  background-color: ${theme.name === 'classic' ? '#f4f4f6' : 'var(--yoroi-palette-common-white)'};
   min-height: ${theme.name === 'classic' ? '73px' : '140px'};
   align-content: baseline;
   display: inline-flex;
@@ -286,7 +286,7 @@ const InputWrapper = styled(Box)(
   cursor: text;
   & input {
     background-color: transparent;
-    color: ${theme.name === 'classic' ? 'var(--component-input-border)' : '#000000d9'};
+    color: ${theme.name === 'classic' ? 'var(--yoroi-comp-input-border)' : '#000000d9'};
     font-size: 1rem;
     padding: 4px 6px;
     letter-spacing: 0;

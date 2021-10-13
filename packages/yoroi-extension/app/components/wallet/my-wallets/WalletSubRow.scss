@@ -5,7 +5,7 @@
 .section {
   display: flex;
   align-items: center;
-  border-right: 1px solid var(--th-palette-gray-200);
+  border-right: 1px solid var(--yoroi-palette-gray-200);
 }
 
 .contentHead {
@@ -14,7 +14,7 @@
 
 .walletNumber {
   margin-right: 44px;
-  color: var(--th-palette-gray-600);
+  color: var(--yoroi-palette-gray-600);
   font-size: 14px;
   line-height: 22px;
 }

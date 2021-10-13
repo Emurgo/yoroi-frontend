@@ -2,14 +2,14 @@
   min-height: 100%;
   display: flex;
   flex-direction: column;
-  background: var(--th-sidebar-background);
+  background: var(--yoroi-sidebar-background);
 }
 
 .header {
   padding: 18px;
   min-height: 74px;
   & svg > path {
-    fill: var(--th-sidebar-text);
+    fill: var(--yoroi-sidebar-text);
   }
 }
 
@@ -25,12 +25,12 @@
   display: flex;
   justify-content: center;
   & svg > path {
-    fill: var(--th-sidebar-text);
+    fill: var(--yoroi-sidebar-text);
   }
   &:hover {
     cursor: pointer;
     & svg > path {
-      fill: var(--th-palette-secondary-300);
+      fill: var(--yoroi-palette-secondary-300);
     }
   }
   & .iconRotate {

@@ -3,11 +3,11 @@
 .wrapper {
   display: flex;
   font-weight: 300;
-  color: var(--th-palette-gray-600);
+  color: var(--yoroi-palette-gray-600);
   font-size: 1rem;
   &:hover {
     cursor: pointer;
-    background: var(--th-palette-common-white);
+    background: var(--yoroi-palette-common-white);
   }
 }
 
@@ -17,20 +17,20 @@
   border-bottom: 3px solid transparent;
   width: 100%;
   text-align: left;
-  color: var(--th-palette-gray-600);
+  color: var(--yoroi-palette-gray-600);
 }
 
 .active {
-  background: var(--th-palette-common-white);
-  color: var(--th-palette-gray-600);
+  background: var(--yoroi-palette-common-white);
+  color: var(--yoroi-palette-gray-600);
   .label {
     font-weight: 500;
   }
   .notTopLevel {
-    color: var(--th-palette-gray-600);
+    color: var(--yoroi-palette-gray-600);
   }
   .topLevel {
-    color: var(--th-palette-secondary-300);
+    color: var(--yoroi-palette-secondary-300);
   }
 }
 .notTopLevel {
@@ -50,7 +50,7 @@
     max-width: 24px;
 
     & > g {
-      fill: var(--th-palette-gray-600);
+      fill: var(--yoroi-palette-gray-600);
     }
   }
 }

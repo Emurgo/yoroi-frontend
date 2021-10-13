@@ -53,7 +53,7 @@ function CheckboxLabel({
           <Typography
             marginBottom={description !== null ? '8px' : 0}
             sx={{
-              color: 'var(--component-checkbox-text)',
+              color: 'var(--yoroi-comp-checkbox-text)',
               fontWeight: 300,
               ...(labelSx !== null && labelSx),
             }}

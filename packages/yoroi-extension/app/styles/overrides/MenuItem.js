@@ -3,21 +3,21 @@ const ClassicMenuItem = {
   styleOverrides: {
     root: {
       padding: '14px 20px',
-      backgroundColor: 'var(--component-menu-item-background)',
+      backgroundColor: 'var(--yoroi-comp-menu-item-background)',
       height: 50,
-      color: 'var(--component-menu-item-text)',
+      color: 'var(--yoroi-comp-menu-item-text)',
       '&:hover': {
-        background: 'var(--component-menu-item-background-highlighted)',
+        background: 'var(--yoroi-comp-menu-item-background-highlighted)',
       },
       '&.Mui-selected': {
-        background: 'var(--component-menu-item-background-highlighted)',
+        background: 'var(--yoroi-comp-menu-item-background-highlighted)',
         '&:hover': {
-          backgroundColor: 'var(--component-menu-item-background-highlighted)',
+          backgroundColor: 'var(--yoroi-comp-menu-item-background-highlighted)',
         },
         '&::after': {
           content: '""',
           position: 'absolute',
-          borderColor: 'var(--component-menu-item-checkmark)',
+          borderColor: 'var(--yoroi-comp-menu-item-checkmark)',
           borderStyle: 'solid',
           borderWidth: '0 2px 2px 0',
           height: '9px',
@@ -34,22 +34,22 @@ const ModernMenuItem = {
   styleOverrides: {
     root: {
       padding: '14px 20px',
-      backgroundColor: 'var(--component-menu-item-background)',
+      backgroundColor: 'var(--yoroi-comp-menu-item-background)',
       height: 45,
-      color: 'var(--component-menu-item-text)',
+      color: 'var(--yoroi-comp-menu-item-text)',
       '&:hover': {
-        background: 'var(--component-menu-item-background-highlighted)',
+        background: 'var(--yoroi-comp-menu-item-background-highlighted)',
       },
       '&.Mui-selected': {
-        background: 'var(--component-menu-item-background-highlighted)',
+        background: 'var(--yoroi-comp-menu-item-background-highlighted)',
         position: 'relative',
         '&:hover': {
-          backgroundColor: 'var(--component-menu-item-background-highlighted)',
+          backgroundColor: 'var(--yoroi-comp-menu-item-background-highlighted)',
         },
         '&::after': {
           content: '""',
           position: 'absolute',
-          borderColor: 'var(--component-menu-item-checkmark)',
+          borderColor: 'var(--yoroi-comp-menu-item-checkmark)',
           borderStyle: 'solid',
           borderWidth: '0 2px 2px 0',
           height: '9px',

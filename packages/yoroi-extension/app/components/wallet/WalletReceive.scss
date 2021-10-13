@@ -9,7 +9,7 @@
     font-weight: 400;
     font-size: 20px;
     padding-bottom: 5px;
-    border-bottom: 1px solid var(--th-palette-gray-200);
+    border-bottom: 1px solid var(--yoroi-palette-gray-200);
 
     .filter {
       font-size: 14px;
@@ -25,7 +25,7 @@
   .notFound {
     padding-top: 2rem;
     text-align: center;
-    color: var(--th-palette-gray-600);
+    color: var(--yoroi-palette-gray-600);
     svg {
       max-width: 140px;
       max-height: 140px;
@@ -42,7 +42,7 @@
   }
 
   .generatedAddresses {
-    color: var(--th-palette-gray-900);
+    color: var(--yoroi-palette-gray-900);
     font-weight: 400;
     font-size: 14px;
     line-height: 22px;
@@ -67,7 +67,7 @@
       margin-bottom: 10px;
       line-height: 22px;
       font-weight: lighter;
-      color: var(--th-palette-gray-600);
+      color: var(--yoroi-palette-gray-600);
     }
     .labelHeader {
       text-align: left;
@@ -78,7 +78,7 @@
       word-break: break-all;
 
       & + .walletAddress {
-        border-top: 1px solid var(--th-palette-gray-200);
+        border-top: 1px solid var(--yoroi-palette-gray-200);
       }
 
       .addressActions {
@@ -95,7 +95,7 @@
           }
 
           span {
-            color: var(--th-palette-gray-800);
+            color: var(--yoroi-palette-gray-800);
             font-weight: 400;
             font-size: 14px;
             margin-left: 6px;
@@ -122,7 +122,7 @@
         .labelText {
           position: relative;
 
-          background: var(--th-palette-gray-200);
+          background: var(--yoroi-palette-gray-200);
           color: #6b7384;
           padding: 2px 6px;
           height: 27px;
@@ -133,7 +133,7 @@
             height: 0;
             border-top: 13px solid transparent;
             border-bottom: 14px solid transparent;
-            border-left: 14px solid var(--th-palette-gray-200);
+            border-left: 14px solid var(--yoroi-palette-gray-200);
             position: absolute;
             top: 50%;
             margin-top: -14px;
@@ -163,11 +163,11 @@
   line-height: 22px;
   font-family: 'RobotoMono';
   font-weight: 400;
-  color: var(--th-palette-gray-900);
+  color: var(--yoroi-palette-gray-900);
 }
 
 .addressHashUsed {
-  color: var(--th-palette-gray-600);
+  color: var(--yoroi-palette-gray-600);
 }
 
 .verifyIcon,
@@ -188,11 +188,11 @@
     height: 20px;
     width: 20px;
     path {
-      fill: var(--th-palette-gray-900);
+      fill: var(--yoroi-palette-gray-900);
     }
   }
   &:hover {
-    background-color: var(--th-palette-gray-50);
+    background-color: var(--yoroi-palette-gray-50);
   }
 }
 .generateURIIcon {

@@ -5,20 +5,20 @@
   display: flex;
   align-items: center;
   & svg > path {
-    fill: var(--th-sidebar-text);
+    fill: var(--yoroi-sidebar-text);
   }
   &:hover {
     & svg > path {
-      fill: var(--th-palette-secondary-300);
+      fill: var(--yoroi-palette-secondary-300);
     }
   }
   &.active:hover {
     cursor: default !important;
   }
   &.active {
-    background-color: var(--th-sidebar-end);
+    background-color: var(--yoroi-sidebar-end);
     & svg > path {
-      fill: var(--th-palette-secondary-300);
+      fill: var(--yoroi-palette-secondary-300);
     }
   }
 }
@@ -32,7 +32,7 @@
 
 .label {
   display: block;
-  color: var(--th-sidebar-text);
+  color: var(--yoroi-sidebar-text);
   font-weight: 400;
   font-size: 0.875rem;
   line-height: 22px;

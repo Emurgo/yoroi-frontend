@@ -8,7 +8,7 @@
   padding: 16px 0 16px 0;
   border-radius: 8px;
   background-color: rgba(255, 19, 81, 0.06);
-  box-shadow: var(--warning-box-bg-shadow);
+  box-shadow: var(--yoroi-warning-box-bg-shadow);
 
   .header {
     display: inline-flex;
@@ -25,7 +25,7 @@
 
     .headerText {
       font-weight: 500;
-      color: var(--th-palette-error-200);
+      color: var(--yoroi-palette-error-200);
       font-size: 16px;
       font-weight: 500;
       margin-left: 6px;
@@ -41,12 +41,12 @@
     & {
       line-height: 22px;
       font-weight: 400;
-      color: var(--th-palette-error-200);
+      color: var(--yoroi-palette-error-200);
       font-size: 12px;
     }
     a,
     button {
-      @include underline(var(--th-palette-error-200));
+      @include underline(var(--yoroi-palette-error-200));
       line-height: initial;
     }
   }

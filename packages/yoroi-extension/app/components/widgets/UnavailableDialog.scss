@@ -18,7 +18,7 @@
   background-color: #ffffff;
 
   box-sizing: border-box;
-  border: 1px solid var(--th-palette-gray-200);
+  border: 1px solid var(--yoroi-palette-gray-200);
   border-radius: 8px;
   background-color: #ffffff;
   box-shadow: 0 13px 20px -1px rgba(0, 0, 0, 0.15);
@@ -27,7 +27,7 @@
   flex-direction: column;
 
   .header {
-    background-color: var(--th-palette-error-200);
+    background-color: var(--yoroi-palette-error-200);
     border-radius: 7.5px 7.5px 0 0;
     width: 100%;
     height: 65px;

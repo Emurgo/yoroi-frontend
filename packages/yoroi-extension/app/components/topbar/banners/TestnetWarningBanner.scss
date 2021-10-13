@@ -3,8 +3,8 @@
 .testnetWarning {
   font-weight: 700;
   text-align: center;
-  color: var(--th-palette-common-white);
-  background-color: var(--th-palette-background-banner-warning);
+  color: var(--yoroi-palette-common-white);
+  background-color: var(--yoroi-palette-background-banner-warning);
   padding: 4px;
   text-transform: uppercase;
   font-size: 14px;
@@ -17,10 +17,10 @@
   }
 
   a {
-    color: var(--th-palette-common-white);
+    color: var(--yoroi-palette-common-white);
     font-weight: 700;
     text-transform: uppercase;
-    @include underline(var(--th-palette-common-white));
+    @include underline(var(--yoroi-palette-common-white));
   }
 }
 
@@ -29,14 +29,14 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background: var(--th-palette-background-banner-warning);
+  background: var(--yoroi-palette-background-banner-warning);
   .shelleyTestnetWarningIcon {
     margin-right: 9px;
   }
   .text {
     text-transform: uppercase;
     height: 20px;
-    color: var(--th-palette-common-white);
+    color: var(--yoroi-palette-common-white);
     font-size: 13px;
     font-weight: bold;
     font-weight: 400;

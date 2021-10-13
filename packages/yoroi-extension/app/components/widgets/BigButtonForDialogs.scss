@@ -1,6 +1,6 @@
 .component {
-  background-color: var(--th-palette-gray-50);
-  border: solid 4px var(--th-palette-gray-50);
+  background-color: var(--yoroi-palette-gray-50);
+  border: solid 4px var(--yoroi-palette-gray-50);
   display: flex;
   flex: 1;
   flex-direction: column;
@@ -19,7 +19,7 @@
 .label {
   font-size: 19px;
   line-height: 1.37;
-  color: var(--th-palette-gray-800);
+  color: var(--yoroi-palette-gray-800);
   font-weight: 500;
 }
 
@@ -28,5 +28,5 @@
   height: 19px;
   font-size: 14px;
   line-height: 1.36;
-  color: var(--th-palette-gray-800);
+  color: var(--yoroi-palette-gray-800);
 }

@@ -1,7 +1,7 @@
 @import '../../../../themes/mixins/underline';
 
 .component {
-  border-top: 1px solid var(--th-palette-gray-200);
+  border-top: 1px solid var(--yoroi-palette-gray-200);
   padding-top: 30px;
 
   .main {
@@ -11,7 +11,7 @@
   }
 
   .title {
-    color: var(--theme-support-settings-text);
+    color: var(--yoroi-support-settings-text);
     font-weight: 500;
     font-size: 18px;
     line-height: 22px;
@@ -23,19 +23,19 @@
     font-weight: 400;
     line-height: 22px;
     text-align: center;
-    color: var(--theme-support-settings-text);
+    color: var(--yoroi-support-settings-text);
   }
 
   a,
   p {
-    color: var(--theme-support-settings-text);
+    color: var(--yoroi-support-settings-text);
     font-weight: 400;
     font-size: 14px;
     line-height: 22px;
   }
 
   a {
-    color: var(--theme-support-settings-text);
+    color: var(--yoroi-support-settings-text);
   }
 
   p {
@@ -43,7 +43,7 @@
   }
 
   .link {
-    @include underline(var(--th-palette-gray-800));
+    @include underline(var(--yoroi-palette-gray-800));
   }
 }
 
@@ -75,8 +75,8 @@
       position: absolute;
       top: calc(50% - 37px);
       left: 0px;
-      background-color: var(--th-palette-background-banner-warning);
-      color: var(--th-palette-common-white);
+      background-color: var(--yoroi-palette-background-banner-warning);
+      color: var(--yoroi-palette-common-white);
       padding: 10px;
     }
 

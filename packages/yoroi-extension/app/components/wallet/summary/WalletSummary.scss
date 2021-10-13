@@ -43,7 +43,7 @@ $rightBlockWidth: $leftBlockWidth;
       .exportTxToFileSvg:hover {
         cursor: pointer;
         circle {
-          fill: var(--th-palette-gray-50);
+          fill: var(--yoroi-palette-gray-50);
         }
       }
     }
@@ -71,9 +71,9 @@ $rightBlockWidth: $leftBlockWidth;
         font-size: 14px;
         line-height: 21px;
         font-weight: 500;
-        color: var(--th-palette-gray-400);
+        color: var(--yoroi-palette-gray-400);
         .amount {
-          color: var(--th-palette-gray-900);
+          color: var(--yoroi-palette-gray-900);
           font-weight: 500;
           margin-right: 8px;
 
@@ -89,7 +89,7 @@ $rightBlockWidth: $leftBlockWidth;
             height: 12px;
             width: 9px;
             & > g {
-              stroke: var(--th-palette-gray-900);
+              stroke: var(--yoroi-palette-gray-900);
             }
           }
         }
@@ -101,10 +101,10 @@ $rightBlockWidth: $leftBlockWidth;
       font-size: 18px;
       line-height: 22px;
       font-weight: 500;
-      color: var(--th-palette-gray-400);
+      color: var(--yoroi-palette-gray-400);
       span {
         margin-left: 8px;
-        color: var(--th-palette-gray-900);
+        color: var(--yoroi-palette-gray-900);
       }
     }
 
@@ -115,7 +115,7 @@ $rightBlockWidth: $leftBlockWidth;
       margin-bottom: 10px;
 
       .sectionTitle {
-        color: var(--th-palette-gray-600);
+        color: var(--yoroi-palette-gray-600);
         font-weight: 400;
         font-size: 14px;
         line-height: 22px;

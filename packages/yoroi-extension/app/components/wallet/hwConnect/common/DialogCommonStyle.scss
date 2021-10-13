@@ -54,7 +54,7 @@ $opacityCommon: 0.7;
   }
 
   .middleBlock {
-    background-color: var(--theme-hw-connect-dialog-middle-block-common-background-color);
+    background-color: var(--yoroi-hw-connect-dialog-middle-block-common-background-color);
     border-radius: 4px;
     width: 725px;
     height: 280px;
@@ -69,7 +69,7 @@ $opacityCommon: 0.7;
   }
 
   .middleBlock {
-    background-color: var(--theme-trezor-connect-dialog-middle-block-common-background-color);
+    background-color: var(--yoroi-palette-common-white);
     border-radius: 8px;
   }
 }

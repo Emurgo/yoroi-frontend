@@ -1,8 +1,8 @@
 @import '../../../../themes/mixins/unordered-list';
 
 :global(.YoroiModern) .component {
-  min-width: var(--component-dialog-min-width-lg);
-  max-width: var(--component-dialog-min-width-lg);
+  min-width: var(--yoroi-comp-dialog-min-width-lg);
+  max-width: var(--yoroi-comp-dialog-min-width-lg);
 }
 
 .component {

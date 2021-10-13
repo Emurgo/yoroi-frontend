@@ -14,8 +14,8 @@ type Props = {|
 export default class QrCodeWrapper extends Component<Props> {
   render(): Node {
     // Get QRCode color value from active theme's CSS variable
-    const qrCodeBackgroundColor = readCssVar('--th-qr-code-background');
-    const qrCodeForegroundColor = readCssVar('--th-qr-code-foreground');
+    const qrCodeBackgroundColor = readCssVar('--yoroi-qr-code-background');
+    const qrCodeForegroundColor = readCssVar('--yoroi-qr-code-foreground');
 
     return (
       <QRCode

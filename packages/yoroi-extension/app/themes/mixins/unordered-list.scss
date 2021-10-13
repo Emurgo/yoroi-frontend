@@ -3,7 +3,7 @@
     content: '●';
     margin-right: 0.4em;
     font-size: 0.8em;
-    color: var(--th-palette-gray-400);
+    color: var(--yoroi-palette-gray-400);
   }
 
   li {
@@ -12,7 +12,7 @@
     margin-left: 12px;
     line-height: 1.38;
     font-size: 14px;
-    color: var(--th-palette-gray-800);
+    color: var(--yoroi-palette-gray-800);
 
     & + li {
       margin-top: 8px;

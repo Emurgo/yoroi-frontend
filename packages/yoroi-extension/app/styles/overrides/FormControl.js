@@ -20,12 +20,12 @@ const ModernFormControl = {
       marginTop: '7px',
       '&:hover': {
         '& .MuiInputLabel-root': {
-          color: 'var(--component-input-text-focus)',
+          color: 'var(--yoroi-comp-input-text-focus)',
           '&.Mui-disabled': {
-            color: 'var(--component-input-border-disabled)',
+            color: 'var(--yoroi-comp-input-border-disabled)',
           },
           '&.Mui-error': {
-            color: 'var(--component-input-error)',
+            color: 'var(--yoroi-comp-input-error)',
           },
         },
       },

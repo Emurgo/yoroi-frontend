@@ -5,33 +5,33 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  height: var(--th-navigation-tab-height);
-  color: var(--th-palette-gray-400);
+  height: var(--yoroi-navigation-tab-height);
+  color: var(--yoroi-palette-gray-400);
 
   &:hover {
-    background-color: var(--th-palette-common-white);
+    background-color: var(--yoroi-palette-common-white);
     cursor: pointer;
   }
 }
 
 .active {
-  background-color: var(--th-palette-common-white);
+  background-color: var(--yoroi-palette-common-white);
 
   .label {
-    color: var(--th-palette-secondary-300);
+    color: var(--yoroi-palette-secondary-300);
   }
 
   &:hover {
     cursor: default;
-    background-color: var(--th-palette-common-white);
+    background-color: var(--yoroi-palette-common-white);
   }
 
   .icon {
     & > svg {
-      color: var(--th-palette-secondary-300);
+      color: var(--yoroi-palette-secondary-300);
     }
     & > svg > path {
-      fill: var(--th-palette-secondary-300);
+      fill: var(--yoroi-palette-secondary-300);
     }
   }
 }
@@ -44,7 +44,7 @@
   display: block;
   text-align: center;
   line-height: 22px;
-  color: var(--th-palette-gray-600);
+  color: var(--yoroi-palette-gray-600);
 }
 
 .icon {
@@ -55,7 +55,7 @@
     max-width: 24px;
 
     & > path {
-      fill: var(--th-palette-gray-600);
+      fill: var(--yoroi-palette-gray-600);
     }
   }
 
@@ -67,7 +67,7 @@
 :global(.YoroiModern) {
   .active {
     .label {
-      color: var(--th-palette-secondary-300);
+      color: var(--yoroi-palette-secondary-300);
     }
   }
 }

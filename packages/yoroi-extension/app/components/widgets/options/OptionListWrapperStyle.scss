@@ -17,16 +17,16 @@
   line-height: var(--tab-link-line-height);
 
   &.active {
-    color: var(--th-palette-secondary-300);
+    color: var(--yoroi-palette-secondary-300);
     font-weight: 500;
   }
 
   &:hover {
-    color: var(--th-palette-secondary-300);
+    color: var(--yoroi-palette-secondary-300);
   }
 
   &:disabled {
-    color: var(--th-palette-gray-300);
+    color: var(--yoroi-palette-gray-300);
   }
 
   &.active::after {

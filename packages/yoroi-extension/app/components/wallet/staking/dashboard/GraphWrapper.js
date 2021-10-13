@@ -114,11 +114,11 @@ const Graph: {|
 }) => {
 
   const graphVars = {
-    axisTickColor: readCssVar('--theme-dashboard-graph-axis-tick-color'),
-    axisTextColor: readCssVar('--theme-dashboard-graph-axis-text-color'),
-    barWidth: readCssVar('--theme-dashboard-graph-bar-width'),
-    barHoverBgColor: readCssVar('--theme-dashboard-graph-bar-hover-background-color'),
-    barPrimaryColor: readCssVar('--theme-dashboard-graph-bar-primary-color'),
+    axisTickColor: readCssVar('--yoroi-dashboard-graph-axis-tick-color'),
+    axisTextColor: readCssVar('--yoroi-dashboard-graph-axis-text-color'),
+    barWidth: readCssVar('--yoroi-dashboard-graph-bar-width'),
+    barHoverBgColor: readCssVar('--yoroi-dashboard-graph-bar-hover-background-color'),
+    barPrimaryColor: readCssVar('--yoroi-dashboard-graph-bar-primary-color'),
     fontSize: '0.75rem',
     lineHeight: 14,
   };

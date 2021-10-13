@@ -1,15 +1,15 @@
 @import '../../../themes/mixins/loading-spinner';
 
 .component {
-  border-top: 1px solid var(--th-palette-gray-200);
+  border-top: 1px solid var(--yoroi-palette-gray-200);
   padding-top: 30px;
   margin-top: 32px;
 
   font-weight: 400;
-  color: var(--theme-support-settings-text);
+  color: var(--yoroi-support-settings-text);
 
   h2 {
-    color: var(--theme-support-settings-text);
+    color: var(--yoroi-support-settings-text);
     font-weight: 500;
     font-size: 18px;
     line-height: 22px;
@@ -17,7 +17,7 @@
   }
 
   p {
-    color: var(--theme-support-settings-text);
+    color: var(--yoroi-support-settings-text);
     font-weight: 400;
     font-size: 14px;
     line-height: 19px;

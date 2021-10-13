@@ -1,12 +1,12 @@
 @import '../../../../themes/mixins/error-message';
 
 .component {
-  border-top: 1px solid var(--th-palette-gray-200);
+  border-top: 1px solid var(--yoroi-palette-gray-200);
   padding-top: 30px;
   margin-bottom: 20px;
 
   .title {
-    color: var(--theme-support-settings-text);
+    color: var(--yoroi-support-settings-text);
     font-weight: 500;
     font-size: 18px;
     line-height: 22px;
@@ -14,14 +14,14 @@
   }
   a,
   p {
-    color: var(--theme-support-settings-text);
+    color: var(--yoroi-support-settings-text);
     font-weight: 400;
     font-size: 14px;
     line-height: 22px;
   }
 
   a {
-    color: var(--theme-support-settings-text);
+    color: var(--yoroi-support-settings-text);
   }
 
   p {
@@ -43,5 +43,5 @@
 
 :global(.YoroiModern) .optionSmallNative {
   font-size: 14px;
-  color: var(--th-palette-secondary-200);
+  color: var(--yoroi-palette-secondary-200);
 }

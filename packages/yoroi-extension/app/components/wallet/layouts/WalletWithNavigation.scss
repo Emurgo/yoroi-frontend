@@ -5,7 +5,7 @@
 }
 
 .navigation {
-  height: var(--th-navigation-tab-height);
+  height: var(--yoroi-navigation-tab-height);
   flex-shrink: 0;
 }
 
@@ -17,6 +17,6 @@
 
 :global(.YoroiModern) {
   .navigation {
-    height: var(--th-navigation-tab-height);
+    height: var(--yoroi-navigation-tab-height);
   }
 }

@@ -23,13 +23,13 @@
 
 .label {
   display: inline-block;
-  color: var(--th-palette-gray-600);
+  color: var(--yoroi-palette-gray-600);
   font-weight: 400;
   font-size: 14px;
   line-height: 22px;
   margin-bottom: 2px;
   &.dashed {
-    border-bottom: 0.5px dashed var(--theme-dashboard-label-underline-color);
+    border-bottom: 0.5px dashed var(--yoroi-dashboard-label-underline-color);
   }
 }
 

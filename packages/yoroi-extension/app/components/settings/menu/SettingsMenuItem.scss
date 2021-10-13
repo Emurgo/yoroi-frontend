@@ -1,5 +1,5 @@
 .component {
-  color: var(--th-palette-gray-600);
+  color: var(--yoroi-palette-gray-600);
   display: block;
   text-align: left;
   font-weight: 400;
@@ -11,11 +11,11 @@
   width: initial;
 
   &.active {
-    border-bottom-color: var(--th-palette-secondary-300);
-    color: var(--th-palette-secondary-300);
+    border-bottom-color: var(--yoroi-palette-secondary-300);
+    color: var(--yoroi-palette-secondary-300);
 
     &:hover {
-      border-bottom-color: var(--th-palette-secondary-300);
+      border-bottom-color: var(--yoroi-palette-secondary-300);
     }
   }
 
@@ -26,11 +26,11 @@
 
 .enabled {
   &:hover {
-    color: var(--th-palette-gray-900);
+    color: var(--yoroi-palette-gray-900);
     cursor: pointer;
   }
 }
 
 .disabled {
-  color: var(--th-palette-gray-200);
+  color: var(--yoroi-palette-gray-200);
 }

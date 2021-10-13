@@ -1,6 +1,6 @@
 .component {
-  min-width: var(--component-dialog-min-width-lg) !important;
-  max-width: var(--component-dialog-min-width-lg) !important;
+  min-width: var(--yoroi-comp-dialog-min-width-lg) !important;
+  max-width: var(--yoroi-comp-dialog-min-width-lg) !important;
 
   :global {
     .Dialog_title {

@@ -19,7 +19,7 @@
       display: flex;
       align-items: center;
       padding: 11px 30px;
-      background-color: var(--th-palette-common-white);
+      background-color: var(--yoroi-palette-common-white);
       width: 100%;
       cursor: pointer;
       transition: 100ms;
@@ -28,7 +28,7 @@
       .optionTitle {
         font-size: 18px;
         line-height: 22px;
-        color: var(--theme-wallet-add-option-dialog-item-title-color);
+        color: var(--yoroi-wallet-add-option-dialog-item-title-color);
         text-align: left;
         font-weight: 500;
         transition: 100ms;
@@ -52,15 +52,15 @@
     // LEARN MORE TEXT BLOCK
     .learnMoreTextBlock {
       a {
-        @include underline(var(--th-palette-gray-800));
-        color: var(--theme-wallet-add-option-dialog-item-title-color);
+        @include underline(var(--yoroi-palette-gray-800));
+        color: var(--yoroi-wallet-add-option-dialog-item-title-color);
       }
 
       overflow: hidden;
       max-height: 0;
       transition: 300ms linear;
       will-change: height;
-      background-color: var(--th-palette-gray-50);
+      background-color: var(--yoroi-palette-gray-50);
 
       .learnMoreTextWrapper {
         padding: 20px 40px 15px;
@@ -79,8 +79,8 @@
 
     // LEARN MORE BUTTON
     .learnMoreButton {
-      color: var(--th-palette-gray-400);
-      background-color: var(--theme-wallet-add-option-dialog-item-learn-more-button-bg-color);
+      color: var(--yoroi-palette-gray-400);
+      background-color: var(--yoroi-wallet-add-option-dialog-item-learn-more-button-bg-color);
       display: block;
       font-size: 14px;
       text-align: center;
@@ -124,7 +124,7 @@
       .optionSubmitButton {
         &:hover {
           .optionTitle {
-            color: var(--th-palette-secondary-300);
+            color: var(--yoroi-palette-secondary-300);
           }
         }
 
@@ -193,7 +193,7 @@
       .optionSubmitButton {
         &:hover {
           .optionTitle {
-            color: var(--theme-default-color-blue);
+            color: var(--yoroi-default-color-blue);
           }
         }
 

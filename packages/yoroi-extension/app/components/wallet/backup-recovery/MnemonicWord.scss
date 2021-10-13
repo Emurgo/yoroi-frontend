@@ -1,7 +1,7 @@
 .component {
-  background-color: var(--theme-mnemonic-background-color)!important;
+  background-color: var(--yoroi-mnemonic-background-color)!important;
   font-weight: 400!important;
-  color: var(--theme-mnemonic-button-text-color)!important;
+  color: var(--yoroi-mnemonic-button-text-color)!important;
 
   &.disabled {
     cursor: default;
@@ -11,7 +11,7 @@
     &:active {
       cursor: pointer;
       &:hover {
-        background-color: var(--theme-mnemonic-background-color-hover);
+        background-color: var(--yoroi-mnemonic-background-color-hover);
       }
     }
   }

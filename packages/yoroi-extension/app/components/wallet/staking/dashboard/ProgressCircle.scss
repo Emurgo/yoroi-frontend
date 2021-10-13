@@ -11,7 +11,7 @@
   font-weight: 500;
   font-size: 18px;
   line-height: 22px;
-  color: var(--th-palette-gray-600);
+  color: var(--yoroi-palette-gray-600);
   text-align: center;
   &.bold {
     font-weight: 700;
@@ -46,18 +46,18 @@
 
 .epoch {
   & .circle {
-    stroke: var(--theme-dashboard-percentage-epoch-circle);
+    stroke: var(--yoroi-dashboard-percentage-epoch-circle);
   }
   & .baseCircle {
-    stroke: var(--theme-dashboard-percentage-epoch-base);
+    stroke: var(--yoroi-dashboard-percentage-epoch-base);
   }
 }
 
 .stake {
   & .circle {
-    stroke: var(--theme-dashboard-percentage-stake-circle);
+    stroke: var(--yoroi-dashboard-percentage-stake-circle);
   }
   & .baseCircle {
-    stroke: var(--theme-dashboard-percentage-stake-base);
+    stroke: var(--yoroi-dashboard-percentage-stake-base);
   }
 }

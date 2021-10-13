@@ -25,17 +25,17 @@
   display: flex;
   font-size: 14px;
   line-height: 22px;
-  color: var(--th-palette-gray-800);
+  color: var(--yoroi-palette-gray-800);
 }
 
 .label {
-  border-bottom: 0.5px dashed var(--theme-dashboard-label-underline-color);
+  border-bottom: 0.5px dashed var(--yoroi-dashboard-label-underline-color);
   margin-right: auto;
-  color: var(--th-palette-gray-600);
+  color: var(--yoroi-palette-gray-600);
 }
 
 .head {
-  background-color: var(--theme-dashboard-stakepool-head-background-color);
+  background-color: var(--yoroi-dashboard-stakepool-head-background-color);
   display: flex;
   align-items: center;
   padding: 20px 23px;
@@ -82,7 +82,7 @@
   max-width: 135px;
   overflow: hidden;
   text-overflow: ellipsis;
-  color: var(--th-palette-gray-600);
+  color: var(--yoroi-palette-gray-600);
   font-size: 14px;
   line-height: 22px;
 }

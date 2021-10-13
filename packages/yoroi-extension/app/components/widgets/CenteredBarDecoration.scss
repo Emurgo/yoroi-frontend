@@ -2,7 +2,7 @@
   display: flex;
   align-items: center;
   text-align: center;
-  border-bottom: 1px solid var(--th-palette-gray-200);
+  border-bottom: 1px solid var(--yoroi-palette-gray-200);
 }
 .separator {
   display: flex;
@@ -13,7 +13,7 @@
 .separator::after {
   content: '';
   flex: 1;
-  border-bottom: 1px solid var(--th-palette-gray-200);
+  border-bottom: 1px solid var(--yoroi-palette-gray-200);
 }
 .separator::before {
   margin-right: 40px;

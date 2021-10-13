@@ -15,7 +15,7 @@ $height: 128px;
 
     .background {
       height: inherit;
-      background-color: var(--th-palette-secondary-300);
+      background-color: var(--yoroi-palette-secondary-300);
       opacity: 0.06;
       border-radius: 8px;
     }
@@ -31,7 +31,7 @@ $height: 128px;
       justify-content: space-between;
     }
     .title {
-      color: var(--th-palette-secondary-300);
+      color: var(--yoroi-palette-secondary-300);
       font-weight: 500;
       font-size: 16px;
       font-weight: 500;
@@ -40,7 +40,7 @@ $height: 128px;
       margin-bottom: 16px;
     }
     .explanation {
-      color: var(--th-palette-gray-900);
+      color: var(--yoroi-palette-gray-900);
       font-weight: 400;
       font-size: 14px;
       letter-spacing: 0;

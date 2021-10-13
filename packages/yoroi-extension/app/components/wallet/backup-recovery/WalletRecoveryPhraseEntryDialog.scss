@@ -23,7 +23,7 @@
     letter-spacing: 0;
     line-height: 1.57;
     padding: 30px 20px;
-    color: var(--theme-instructions-text-color);
+    color: var(--yoroi-instructions-text-color);
   }
 
   .phraseWrapper {
@@ -32,14 +32,14 @@
   }
 
   .phraseWord {
-    background-color: var(--theme-mnemonic-background-color);
+    background-color: var(--yoroi-mnemonic-background-color);
     font-size: 14px;
     font-weight: 400;
     margin: 0 10px 10px 0;
     height: 30px;
     line-height: 26px;
     padding: 3px 13px;
-    color: var(--theme-mnemonic-button-text-color);
+    color: var(--yoroi-mnemonic-button-text-color);
     border-radius: 8px;
     letter-spacing: 0;
   }

@@ -40,7 +40,7 @@ $linebreakWidth: 1540px;
   }
 
   .heroTitle {
-    color: var(--th-palette-gray-900);
+    color: var(--yoroi-palette-gray-900);
 
     font-size: 54px;
     letter-spacing: 0.5px;
@@ -97,7 +97,7 @@ $linebreakWidth: 1540px;
 
 :global(.YoroiClassic) {
   .component {
-    background-image: linear-gradient(to right, #f3f3f5 65%, var(--th-palette-common-white) 65%);
+    background-image: linear-gradient(to right, #f3f3f5 65%, var(--yoroi-palette-common-white) 65%);
 
     .heroCardsItemLink {
       width: calc(250px * 2 + 15px);
@@ -108,16 +108,16 @@ $linebreakWidth: 1540px;
     .heroCardsItemLinkIcon,
     .settingsBarLink {
       path {
-        fill: var(--th-palette-secondary-300);
+        fill: var(--yoroi-palette-secondary-300);
       }
     }
 
     .heroTitle {
-      color: var(--th-palette-background-walletAdd-title);
+      color: var(--yoroi-palette-background-walletAdd-title);
     }
 
     .heroSubTitle {
-      color: var(--th-palette-background-walletAdd-subtitle);
+      color: var(--yoroi-palette-background-walletAdd-subtitle);
     }
   }
 }
@@ -134,11 +134,11 @@ $linebreakWidth: 1540px;
     }
 
     .heroTitle {
-      color: var(--th-palette-background-walletAdd-title);
+      color: var(--yoroi-palette-background-walletAdd-title);
     }
 
     .heroSubTitle {
-      color: var(--th-palette-background-walletAdd-subtitle);
+      color: var(--yoroi-palette-background-walletAdd-subtitle);
     }
 
     .heroCardsItemLink {
@@ -149,13 +149,13 @@ $linebreakWidth: 1540px;
     .heroLogo,
     .settingsBarLink {
       path {
-        fill: var(--th-palette-common-white);
+        fill: var(--yoroi-palette-common-white);
       }
     }
 
     .heroCardsItemLinkIcon {
       path {
-        fill: var(--theme-default-color-blue);
+        fill: var(--yoroi-default-color-blue);
       }
     }
   }

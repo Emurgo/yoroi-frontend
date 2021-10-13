@@ -17,7 +17,7 @@
   .button {
     // top: 50%;
     transform: translateY(-4px);
-    color: var(--th-palette-gray-800);
+    color: var(--yoroi-palette-gray-800);
     cursor: pointer;
     font-weight: 300;
     font-size: 16px;
@@ -48,7 +48,7 @@
 
   .savingResultLabel {
     animation: animateSavingResultLabel 3s;
-    color: var(--th-palette-gray-600);
+    color: var(--yoroi-palette-gray-600);
     font-weight: 300;
     font-size: 14px;
     opacity: 0;

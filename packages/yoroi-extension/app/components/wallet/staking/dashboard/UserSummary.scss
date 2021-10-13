@@ -11,7 +11,7 @@
   padding: 20px 20px;
   flex: 1;
   border-radius: 6px;
-  box-shadow: 0px 3px 10px 2px var(--theme-dashboard-card-shadow-color);
+  box-shadow: 0px 3px 10px 2px var(--yoroi-dashboard-card-shadow-color);
   position: relative;
   overflow: hidden;
   min-width: 342px;
@@ -57,7 +57,7 @@
 }
 
 .label {
-  color: var(--th-palette-gray-600);
+  color: var(--yoroi-palette-gray-600);
   font-size: 14px;
   line-height: 32px;
   margin-bottom: 1px;
@@ -76,10 +76,10 @@
 .note {
   font-size: 12px;
   line-height: 14px;
-  color: var(--th-palette-gray-400);
+  color: var(--yoroi-palette-gray-400);
   width: max-content;
   &:hover {
-    @include underline(var(--th-palette-gray-400));
+    @include underline(var(--yoroi-palette-gray-400));
   }
 }
 
@@ -87,7 +87,7 @@
   margin-top: 5px;
   font-size: 12px;
   line-height: 20px;
-  color: var(--th-palette-gray-400);
+  color: var(--yoroi-palette-gray-400);
   max-width: 248px;
 }
 
@@ -108,7 +108,7 @@
     padding: 20px 20px;
     flex: 1;
     border-radius: 6px;
-    box-shadow: 0px 3px 10px 2px var(--theme-dashboard-card-shadow-color);
+    box-shadow: 0px 3px 10px 2px var(--yoroi-dashboard-card-shadow-color);
     position: relative;
     overflow: hidden;
 
@@ -150,12 +150,12 @@
       p,
       ul {
         font-weight: 400;
-        color: var(--th-palette-gray-600);
+        color: var(--yoroi-palette-gray-600);
         font-size: 14px;
         line-height: 22px;
 
         .link {
-          @include underline(var(--th-palette-gray-400));
+          @include underline(var(--yoroi-palette-gray-400));
         }
       }
 

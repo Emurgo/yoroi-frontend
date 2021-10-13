@@ -2,14 +2,14 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background: var(--th-palette-background-banner-warning);
+  background: var(--yoroi-palette-background-banner-warning);
   .warningIcon {
     margin-right: 9px;
   }
   .text {
     margin: 20px 0px;
     text-transform: uppercase;
-    color: var(--th-palette-common-white);
+    color: var(--yoroi-palette-common-white);
     font-size: 13px;
     font-weight: bold;
     font-weight: 400;

@@ -6,7 +6,7 @@
   max-height: 600px;
 
   .description {
-    color: var(--th-palette-gray-900);
+    color: var(--yoroi-palette-gray-900);
     font-weight: 400;
     font-size: 16px;
     line-height: 19px;
@@ -70,10 +70,10 @@
     height: 20px;
     width: 20px;
     path {
-      fill: var(--th-palette-gray-800);
+      fill: var(--yoroi-palette-gray-800);
     }
   }
   &:hover {
-    background-color: var(--th-palette-gray-50);
+    background-color: var(--yoroi-palette-gray-50);
   }
 }

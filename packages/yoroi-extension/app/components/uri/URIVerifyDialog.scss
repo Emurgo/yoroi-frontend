@@ -22,7 +22,7 @@
   }
 
   .amount {
-    color: var(--theme-send-confirmation-dialog-send-values-color);
+    color: var(--yoroi-send-confirmation-dialog-send-values-color);
     margin-bottom: 6px;
     font-size: 16px;
     line-height: 1.38;
@@ -39,15 +39,11 @@
   .amountSmall {
     @extend .amount;
     font-size: 14px;
-    color: var(--th-widgets-hash-light);
+    color: var(--yoroi-widgets-hash-light);
   }
 }
 
 :global(.YoroiModern) .component {
-  min-width: var(--component-dialog-min-width-lg);
-  max-width: var(--component-dialog-min-width-lg);
-
-  .address {
-    color: var(--theme-transactions-received-address-color);
-  }
+  min-width: var(--yoroi-comp-dialog-min-width-lg);
+  max-width: var(--yoroi-comp-dialog-min-width-lg);
 }

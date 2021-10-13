@@ -12,7 +12,7 @@
     display: inline-flex;
     opacity: 0.7;
     text-decoration: none;
-    color: var(--th-palette-gray-900);
+    color: var(--yoroi-palette-gray-900);
 
     span {
       margin-left: 4px;
@@ -22,7 +22,7 @@
     }
 
     &:hover {
-      @include underline(var(--th-palette-gray-800));
+      @include underline(var(--yoroi-palette-gray-800));
     }
   }
 }
