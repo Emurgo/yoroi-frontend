@@ -73,6 +73,10 @@ const theme = {
       banner: {
         warning: '#f5a623',
       },
+      walletAdd: {
+        title: '#ffffff',
+        subtitle: '#ffffff',
+      },
     },
   },
   shape: {

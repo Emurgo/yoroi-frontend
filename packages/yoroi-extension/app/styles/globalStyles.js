@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 // @flow
 import type { Node } from 'react';
 import { GlobalStyles } from '@mui/material';
@@ -65,6 +66,8 @@ const globalStyles = (theme: Object): Node => (
         '--th-palette-tx-status-low-text': theme.palette.txStatus.low.text,
 
         '--th-palette-background-banner-warning': theme.palette.background.banner.warning,
+        '--th-palette-background-walletAdd-title': theme.palette.background.walletAdd.title,
+        '--th-palette-background-walletAdd-subtitle': theme.palette.background.walletAdd.subtitle,
 
         /* === BUTTON === */
         // button primary variant
@@ -135,7 +138,8 @@ const globalStyles = (theme: Object): Node => (
         '--component-dialog-background': 'var(--th-palette-common-white)',
         '--component-dialog-text': 'var(--th-palette-gray-900)',
         '--component-dialog-overlay-background-color': 'var(--th-palette-background-overlay)',
-        '--component-dialog-min-width-cmn': '540px',
+        '--component-dialog-min-width-md': '540px',
+        '--component-dialog-min-width-lg': '600px',
 
         '--th-sidebar-text': theme.palette.background.sidebar.text,
         '--th-sidebar-background': `linear-gradient(22.58deg, ${theme.palette.background.sidebar.start} 0%, ${theme.palette.background.sidebar.end} 100%)`,
@@ -147,17 +151,80 @@ const globalStyles = (theme: Object): Node => (
         '--th-qr-code-background': 'transparent',
         '--th-qr-code-foreground': 'var(--th-palette-gray-800)',
 
-        /* === TO FIX: === */
-
+        /* === TODO: FIX AND UNIFY ALL CSS VARIABLES === */
         '--th-transactions-icon-type-expend-background-color': '#15d1aa',
         '--th-transactions-icon-type-income-background-color': '#9ab2d9',
         '--th-transactions-icon-type-exchange-background-color': '#10aca4',
         '--th-transactions-icon-type-failed-background-color': '#eb6d7a',
-
         '--scrollbar-thumb-background': '#c8ccce',
-
         '--warning-box-bg-shadow': '0 2px 40px 0 rgba(242, 242, 242, 0.5)',
         '--topbar-height': '64px',
+        '--th-navigation-tab-height': theme.name === 'classic' ? '45px' : '64px',
+        '--th-widgets-hash-dark': theme.name === 'classic' ? '#000000' : '#464749',
+        '--th-widgets-hash-light': theme.name === 'classic' ? '#929293' : '#adaeb6',
+        '--theme-send-confirmation-dialog-send-values-color':
+          theme.name === 'classic' ? '#ea4c5b' : '#15d1aa',
+        '--theme-wallet-add-option-dialog-item-title-color': 'var(--th-palette-gray-900)',
+        '--theme-wallet-add-option-dialog-item-learn-more-button-bg-color': '#F5F7F9',
+
+        '--theme-hw-connect-dialog-middle-block-common-background-color':
+          theme.name === 'classic' ? '#f3f3f5' : '#ffffff',
+        '--theme-hw-connect-dialog-middle-block-common-error-background-color':
+          theme.name === 'classic' ? '#fdf1f0' : '#ffffff',
+
+        '--theme-terms-of-use-text-color': theme.name === 'classic' ? '#121327' : '#38293d',
+        '--theme-loading-background-color': '#fafbfc',
+
+        '--theme-support-settings-text': theme.name === 'classic' ? '#121327' : '#2b2c32',
+        '--theme-instructions-text-color': theme.name === 'classic' ? '#121327' : '#adaeb6',
+        '--theme-mnemonic-background-color-hover':
+          theme.name === 'classic' ? 'rgba(242, 183, 172, 0.12)' : '#f0f3f5',
+        '--theme-mnemonic-background-color':
+          theme.name === 'classic' ? 'rgba(218, 164, 154, 0.12)' : '#f0f3f5',
+
+        ...(theme.name === 'classic'
+          ? {
+              '--theme-backup-mnemonic-background-color': '#f3f3f5',
+            }
+          : theme.name === 'modern'
+          ? {
+              '--theme-instructions-recovery-text-color': '#2b2c32',
+              '--theme-mnemonic-border-color': '#9b9b9b',
+              '--theme-mnemonic-border-filled-color': '#4a4a4a',
+              '--theme-mnemonic-button-text-color': '#353535',
+              '--theme-default-color-blue': '#2249BE',
+              // Dashboard
+              '--theme-dashboard-label-underline-color': 'rgba(135, 145, 173, 0.8)',
+              '--theme-dashboard-card-shadow-color': 'rgba(24, 26, 30, 0.08)',
+              '--theme-dashboard-card-border-color': 'rgba(77, 32, 192, 0.08)',
+              '--theme-dashboard-card-vertical-separator-color': '#E6E6E6',
+              '--theme-dashboard-card-nodelegation-background-color': '#F9FBFF',
+              '--theme-dashboard-tooltip-background-color': 'rgba(56, 57, 61, 0.75)',
+              '--theme-dashboard-stakepool-head-background-color': '#F4F6FC',
+              '--theme-dashboard-epoch-time-background': '#F0F3F5',
+              '--theme-dashboard-percentage-epoch-base': '#B7C3ED',
+              '--theme-dashboard-percentage-epoch-circle': '#3154CB',
+              '--theme-dashboard-percentage-stake-base': '#FFEDF2',
+              '--theme-dashboard-percentage-stake-circle': '#FF1755',
+              '--theme-dashboard-graph-tab-color': '#ADAEB6',
+              '--theme-dashboard-graph-active-tab-color': '#3D60CD',
+              '--theme-dashboard-graph-radio-color': '#93979C',
+              '--theme-dashboard-graph-active-radio-color': '#17D1AA',
+              '--theme-dashboard-graph-axis-tick-color': '#ADAEB6',
+              '--theme-dashboard-graph-axis-text-color': '#38393D',
+              '--theme-dashboard-graph-bar-hover-background-color': '#D9DDE0',
+              '--theme-dashboard-graph-bar-primary-color': '#6D80FF',
+              '--theme-dashboard-graph-bar-secondary-color': '#1A44B7',
+              '--theme-dashboard-graph-bar-width': 16,
+              '--theme-dashboard-graph-tooltip-text-color': '#FFFFFF',
+              '--theme-dashboard-graph-tooltip-background': 'rgba(56, 57, 61, 0.7)',
+
+              // My Wallets page
+              '--theme-mywallets-expandable-background-color': '#FAFAFC',
+              '--theme-mywallets-ada-amount-decimal-color': 'rgba(36, 40, 56, 0.5)',
+              '--theme-mywallets-tooltip-background-color': 'rgba(56, 57, 61, 0.7)',
+            }
+          : null),
       },
 
       /* === GLOBAL STYLES === */
