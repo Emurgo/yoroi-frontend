@@ -69,8 +69,8 @@ const getCSSCustomPropIndex = () =>
       [...sheet.cssRules].filter(isStyleRule).reduce((propValArr, rule) => {
         const props = [...rule.style]
           .map(propName => [propName.trim(), rule.style.getPropertyValue(propName).trim()])
-          // Discard any props that don't start with "--". Custom props are required to.
-          .filter(([propName]) => propName.indexOf('--') === 0);
+          // Discard any props that don't start with "--yoroi" prefix.
+          .filter(([propName]) => propName.indexOf('--yoroi') === 0);
         return [...propValArr, ...props];
       }, [])
     ),
