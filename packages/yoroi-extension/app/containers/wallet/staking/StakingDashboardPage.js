@@ -70,6 +70,9 @@ import {
 import type { TokenInfoMap } from '../../../stores/toplevel/TokenInfoStore';
 import { getTokenName, genLookupOrFail } from '../../../stores/stateless/tokenHelpers';
 import { truncateToken } from '../../../utils/formatters';
+import TransactionSuccessDialog from '../../../components/wallet/send/TransactionSuccessDialog';
+import { ROUTES } from '../../../routes-config';
+import WalletSyncingOverlay from '../../../components/wallet/syncingOverlay/WalletSyncingOverlay';
 
 export type GeneratedData = typeof StakingDashboardPage.prototype.generated;
 
