@@ -71,6 +71,20 @@ export const themeOverrides = (theme: Theme): Object => {
         [SELECT]: SelectOverrides,
         [SWITCH]: SwitchOverrides,
       });
+    case THEMES.YOROI_REVAMP:
+      return ({
+        [AUTOCOMPLETE]: AutocompleteOverrides,
+        [BUBBLE]: BubbleOverrides,
+        [BUTTON]: ButtonOverrides,
+        [CHECKBOX]: CheckboxOverrides,
+        [FORM_FIELD]: FormFieldOverrides,
+        [INPUT]: InputOverrides,
+        [TEXT_AREA]: TextAreaOverrides,
+        [MODAL]: ModalOverrides,
+        [OPTIONS]: OptionsOverrides,
+        [SELECT]: SelectOverrides,
+        [SWITCH]: SwitchOverrides,
+      });
     default:
       throw new Error(`Unsupported Theme: ${theme}`);
   }
