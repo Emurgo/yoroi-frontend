@@ -12,6 +12,7 @@ import {
   ClassicTabPanel,
   ClassicChip,
   ClassicTooltip,
+  ClassicSelect,
 } from '../overrides';
 
 export const classicTheme: Object = createTheme({
@@ -26,6 +27,7 @@ export const classicTheme: Object = createTheme({
     MuiCheckbox: ClassicCheckbox,
     MuiInputLabel: ClassicInputLabel,
     MuiTextField: ClassicTextField,
+    MuiSelect: ClassicSelect,
     MuiMenuItem: ClassicMenuItem,
     MuiMenu: ClassicMenu,
     MuiTabs: ClassicTabs,
@@ -50,6 +52,10 @@ export const classicTheme: Object = createTheme({
     warning: {
       main: 'hsl(4, 79%, 58%)',
     },
+    input: {
+      main: 'hsl(214 16% 81%)',
+      dark: 'hsl(0 0% 29%)',
+    },
     grey: {
       '50': 'hsl(201, 22%, 95%)',
       '100': 'hsl(216, 26%, 93%)',
@@ -62,6 +68,9 @@ export const classicTheme: Object = createTheme({
       '800': 'hsl(229, 20%, 28%)',
       '900': 'hsl(236, 37%, 11%)',
     },
+  },
+  shape: {
+    borderRadius: 0,
   },
   typography: {
     fontFamily: '"SFUIDisplay", sans-serif',

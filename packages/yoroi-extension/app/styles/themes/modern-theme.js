@@ -12,6 +12,7 @@ import {
   ModernChip,
   ModernTooltip,
   ModernInputLabel,
+  ModernSelect,
 } from '../overrides';
 
 export const modernTheme: Object = createTheme({
@@ -25,9 +26,10 @@ export const modernTheme: Object = createTheme({
     MuiButton: ModernButton,
     MuiCheckbox: ModernCheckbox,
     MuiTextField: ModernTextField,
+    MuiSelect: ModernSelect,
     MuiInputLabel: ModernInputLabel,
-    MuiMenuItem: ModernMenuItem,
     MuiMenu: ModernMenu,
+    MuiMenuItem: ModernMenuItem,
     MuiTabs: ModernTabs,
     MuiTabPanel: ModernTabPanel,
     MuiChip: ModernChip,
@@ -50,6 +52,10 @@ export const modernTheme: Object = createTheme({
     warning: {
       main: 'hsl(38, 92%, 55%)',
     },
+    input: {
+      main: 'hsl(0 0% 61%)',
+      dark: 'hsl(0 0% 29%)',
+    },
     grey: {
       '50': 'hsl(201, 22%, 95%)',
       '100': 'hsl(216, 26%, 93%)',
@@ -62,6 +68,9 @@ export const modernTheme: Object = createTheme({
       '800': 'hsl(229, 20%, 28%)',
       '900': 'hsl(228, 22%, 18%)',
     },
+  },
+  shape: {
+    borderRadius: 8,
   },
   typography: {
     fontFamily: 'Rubik, sans-serif',

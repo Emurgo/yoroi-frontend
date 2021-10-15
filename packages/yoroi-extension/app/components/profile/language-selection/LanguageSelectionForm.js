@@ -2,9 +2,9 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { Select } from 'react-polymorph/lib/components/Select';
 import { LoadingButton } from '@mui/lab';
-import { SelectSkin } from 'react-polymorph/lib/skins/simple/SelectSkin';
+import { MenuItem } from '@mui/material';
+import Select from '../../common/Select';
 import { intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import LocalizableError from '../../../i18n/LocalizableError';
@@ -71,18 +71,30 @@ export default class LanguageSelectionForm extends Component<Props> {
     return (
       <div className={styles.component}>
         <div className={styles.centeredBox}>
-
           <Select
-            className={styles.languageSelect}
-            options={languageOptions}
+            formControlProps={{ sx: { marginBottom: '25px' } }}
+            labelSx={{
+              width: '100%',
+              left: '0',
+              top: '-55px',
+              textAlign: 'center',
+              fontSize: '1rem',
+              fontWeight: '500',
+              textTransform: 'uppercase',
+            }}
+            labelId="languages-select"
             value={currentLocale}
             {...languageId.bind()}
-            skin={SelectSkin}
             onChange={this.selectLanguage}
-            optionRenderer={option => (
-              <FlagLabel svg={option.svg} label={option.label} />
-            )}
-          />
+            notched={false}
+            shrink={false}
+          >
+            {languageOptions.map(option => (
+              <MenuItem key={option.value} value={option.value}>
+                <FlagLabel svg={option.svg} label={option.label} />
+              </MenuItem>
+            ))}
+          </Select>
 
           {error && (
             <p className={styles.error}>
@@ -115,5 +127,4 @@ export default class LanguageSelectionForm extends Component<Props> {
       </div>
     );
   }
-
 }
