@@ -1,6 +1,6 @@
 // @flow
 import { createTheme } from '@mui/material/styles';
-import { RubikFonts } from '../fonts';
+import { RubikFonts, RobotoMonoFonts } from '../fonts';
 import {
   ModernButton,
   ModernCheckbox,
@@ -21,6 +21,7 @@ export const modernTheme: Object = createTheme({
     MuiCssBaseline: {
       styleOverrides: `
         ${RubikFonts}
+        ${RobotoMonoFonts}
       `,
     },
     MuiButton: ModernButton,

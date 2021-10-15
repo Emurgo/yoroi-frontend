@@ -6,8 +6,7 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
-import { Input } from 'react-polymorph/lib/components/Input';
-import { InputOwnSkin } from '../../../../themes/skins/InputOwnSkin';
+import TextField from '../../../common/TextField';
 import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
@@ -189,13 +188,13 @@ export default class UndelegateDialog extends Component<Props> {
         </ul>
 
         <div className={styles.walletPasswordFields}>
-          <Input
+          <TextField
             type="password"
             className={styles.walletPassword}
             {...walletPasswordField.bind()}
             disabled={this.props.isSubmitting}
             error={walletPasswordField.error}
-            skin={InputOwnSkin}
+            helperText={walletPasswordField.error}
           />
         </div>
         <div className={styles.headerBlock}>

@@ -5,7 +5,6 @@ import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { Button } from '@mui/material';
 import { NumericInput } from 'react-polymorph/lib/components/NumericInput';
-import { Input } from 'react-polymorph/lib/components/Input';
 import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
@@ -15,7 +14,12 @@ import DialogCloseButton from '../widgets/DialogCloseButton';
 import { InputOwnSkin } from '../../themes/skins/InputOwnSkin';
 import globalMessages from '../../i18n/global-messages';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
-import { formattedAmountToNaturalUnits, formattedAmountToBigNumber, truncateToken } from '../../utils/formatters';
+import TextField from '../common/TextField';
+import {
+  formattedAmountToNaturalUnits,
+  formattedAmountToBigNumber,
+  truncateToken,
+} from '../../utils/formatters';
 import config from '../../config';
 import { getTokenName } from '../../stores/stateless/tokenHelpers';
 import BigNumber from 'bignumber.js';
@@ -142,10 +146,15 @@ export default class URIGenerateDialog extends Component<Props> {
       >
         <div>
           <div className={styles.receiverInput}>
-            <Input
+            <TextField
+              sx={{
+                '& .MuiInputBase-input': {
+                  fontFamily: 'RobotoMono',
+                  fontWeight: 300,
+                },
+              }}
               className="receiver"
               {...receiverField.bind()}
-              skin={InputOwnSkin}
               disabled
             />
           </div>
@@ -180,5 +189,4 @@ export default class URIGenerateDialog extends Component<Props> {
       </Dialog>
     );
   }
-
 }

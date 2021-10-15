@@ -10,8 +10,7 @@ import DialogCloseButton from '../../widgets/DialogCloseButton';
 import ErrorBlock from '../../widgets/ErrorBlock';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
-import { Input } from 'react-polymorph/lib/components/Input';
-import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
+import TextField from '../../common/TextField';
 import type { TxMemoTablePreInsert } from '../../../api/ada/lib/storage/bridge/memos';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 import { isValidMemo } from '../../../utils/validations';
@@ -55,7 +54,7 @@ export default class AddMemoDialog extends Component<Props, State> {
   };
 
   // $FlowFixMe[value-as-type]
-  memoContentInput: Input;
+  memoContentInput: TextField;
 
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
     fields: {
@@ -136,13 +135,13 @@ export default class AddMemoDialog extends Component<Props, State> {
         closeButton={<DialogCloseButton />}
         onClose={onCancel}
       >
-        <Input
+        <TextField
           className={styles.memoContent}
           inputRef={(input) => { this.memoContentInput = input; }}
           {...memoContentField.bind()}
           done={memoContentField.isValid}
           error={memoContentField.error}
-          skin={InputOwnSkin}
+          helperText={memoContentField.error}
         />
         { error ? (<ErrorBlock error={error} />) : null }
       </Dialog>);

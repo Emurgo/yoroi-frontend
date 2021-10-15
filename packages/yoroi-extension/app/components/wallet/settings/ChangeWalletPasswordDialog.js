@@ -3,7 +3,7 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
-import { Input } from 'react-polymorph/lib/components/Input';
+import TextField from '../../common/TextField';
 import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
@@ -14,7 +14,6 @@ import globalMessages from '../../../i18n/global-messages';
 import LocalizableError from '../../../i18n/LocalizableError';
 import styles from './ChangeWalletPasswordDialog.scss';
 import config from '../../../config';
-import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
@@ -187,19 +186,19 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
       >
 
         <div className={styles.walletPassword}>
-          <Input
+          <TextField
             type="password"
             className="currentPassword"
             value={dialogData.currentPasswordValue}
             onChange={(value) => this.handleDataChange('currentPasswordValue', value)}
             {...currentPasswordField.bind()}
             error={currentPasswordField.error}
-            skin={InputOwnSkin}
+            helperText={currentPasswordField.error}
           />
         </div>
 
         <div className={walletPasswordFieldsClasses}>
-          <Input
+          <TextField
             type="password"
             className={newPasswordClasses}
             value={dialogData.newPasswordValue}
@@ -207,10 +206,10 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
             {...newPasswordField.bind()}
             done={newPasswordField.isValid}
             error={newPasswordField.error}
-            skin={InputOwnSkin}
+            helperText={newPasswordField.error}
           />
 
-          <Input
+          <TextField
             type="password"
             className="repeatedPassword"
             value={dialogData.repeatedPasswordValue}
@@ -218,7 +217,7 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
             {...repeatedPasswordField.bind()}
             done={repeatedPassword && repeatedPasswordField.isValid}
             error={repeatedPasswordField.error}
-            skin={InputOwnSkin}
+            helperText={repeatedPasswordField.error}
           />
         </div>
 
