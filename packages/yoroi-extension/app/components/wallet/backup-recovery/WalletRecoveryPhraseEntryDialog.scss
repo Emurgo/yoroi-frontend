@@ -25,12 +25,12 @@
     padding: 30px 20px;
     color: var(--theme-instructions-text-color);
   }
-  
+
   .phraseWrapper {
     display: flex;
     flex-wrap: wrap;
   }
-  
+
   .phraseWord {
     background-color: var(--theme-mnemonic-background-color);
     font-size: 14px;
@@ -60,9 +60,5 @@
 :global(.YoroiModern) {
   .component {
     text-align: left;
-
-    label {
-      font-size: 14px;
-    }
-  }  
+  }
 }

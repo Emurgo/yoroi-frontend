@@ -77,13 +77,6 @@
     }
   }
 }
-.checkbox {
-  & input + div {
-    width: 20px;
-    height: 20px;
-    border: 2px solid #6b7384;
-  }
-}
 .errorMessage {
   color: var(--rp-formfield-error-text-color, rgba(222, 50, 38, 0.5));
   padding: 10px 0;

@@ -24,12 +24,14 @@ import { themeOverrides } from '../themes/overrides';
 import { translations } from '../i18n/translations';
 import type { StoresMap } from './stores';
 import type { ActionsMap } from './actions';
-import { changeToplevelTheme } from '../themes';
+import { changeToplevelTheme, MuiThemes } from '../themes';
 import ThemeManager from '../ThemeManager';
 import CrashPage from '../containers/CrashPage';
 import { Logger } from '../utils/logging';
 import type { RouterHistory } from 'react-router-dom';
 import { SimpleSkins } from 'react-polymorph/lib/skins/simple';
+import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
+import { globalStyles } from '../styles/globalStyles';
 
 // https://github.com/yahoo/react-intl/wiki#loading-locale-data
 addLocaleData([
@@ -85,22 +87,26 @@ class App extends Component<Props, State> {
     const themeVars = Object.assign(stores.profile.currentThemeVars, {
     });
     const currentTheme = stores.profile.currentTheme;
+    const muiTheme = MuiThemes[currentTheme] ?? 'YoroiModern';
 
     changeToplevelTheme(currentTheme);
 
     return (
       <div style={{ height: '100%' }}>
-        <ThemeManager variables={themeVars} />
-        <ThemeProvider
-          key={currentTheme}
-          theme={yoroiPolymorphTheme}
-          skins={SimpleSkins}
-          themeOverrides={themeOverrides(currentTheme)}
-        >
-          <IntlProvider {...{ locale, key: locale, messages: mergedMessages }}>
-            {this.getContent()}
-          </IntlProvider>
-        </ThemeProvider>
+        <MuiThemeProvider theme={muiTheme}>
+          {globalStyles(muiTheme)}
+          <ThemeManager variables={themeVars} />
+          <ThemeProvider
+            key={currentTheme}
+            theme={yoroiPolymorphTheme}
+            skins={SimpleSkins}
+            themeOverrides={themeOverrides(currentTheme)}
+          >
+            <IntlProvider {...{ locale, key: locale, messages: mergedMessages }}>
+              {this.getContent()}
+            </IntlProvider>
+          </ThemeProvider>
+        </MuiThemeProvider>
       </div>
     );
   }
