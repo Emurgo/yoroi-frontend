@@ -26,8 +26,8 @@ import {
 } from '../../config/numbersConfig';
 import HorizontalLine from '../../components/widgets/HorizontalLine';
 import NavBarContainerRevamp from '../NavBarContainerRevamp';
-import { withLayout } from '../../themes/context/layout';
-import type { LayoutComponentMap } from '../../themes/context/layout';
+import { withLayout } from '../../styles/context/layout';
+import type { LayoutComponentMap } from '../../styles/context/layout';
 import type { GeneratedData as NavBarContainerRevampData } from '../NavBarContainerRevamp';
 
 export type GeneratedData = typeof Transfer.prototype.generated;

@@ -21,8 +21,8 @@ import SidebarContainer from '../SidebarContainer';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import { withLayout } from '../../themes/context/layout';
-import type { LayoutComponentMap } from '../../themes/context/layout';
+import { withLayout } from '../../styles/context/layout';
+import type { LayoutComponentMap } from '../../styles/context/layout';
 import NavBarContainerRevamp from '../NavBarContainerRevamp';
 
 export type GeneratedData = typeof Settings.prototype.generated;

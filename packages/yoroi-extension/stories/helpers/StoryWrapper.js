@@ -34,7 +34,7 @@ import { ledgerErrors } from '../../app/domain/LedgerLocalizedError';
 import type { UnitOfAccountSettingType } from '../../app/types/unitOfAccountType';
 import { IncorrectVersionError, IncorrectDeviceError } from '../../app/domain/ExternalDeviceCommon';
 import { addDecorator } from '@storybook/react';
-import { LayoutProvider } from '../../app/themes/context/layout';
+import { LayoutProvider } from '../../app/styles/context/layout';
 
 /**
  * This whole file is meant to mirror code in App.js

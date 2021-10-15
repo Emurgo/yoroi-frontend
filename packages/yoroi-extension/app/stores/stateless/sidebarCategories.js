@@ -15,11 +15,11 @@ import walletIcon from '../../assets/images/sidebar/revamp/wallet.inline.svg';
 import stakingIcon from '../../assets/images/sidebar/revamp/staking.inline.svg';
 import assetsIcon from '../../assets/images/sidebar/revamp/assets.inline.svg';
 import votingIcon from '../../assets/images/sidebar/revamp/voting.inline.svg';
-import swapIcon from '../../assets/images/sidebar/revamp/swap.inline.svg';
+// import swapIcon from '../../assets/images/sidebar/revamp/swap.inline.svg';
 import settingIcon from '../../assets/images/sidebar/revamp/setting.inline.svg';
 import faqIcon from '../../assets/images/sidebar/revamp/faq.inline.svg';
-import newUpdatesIcon from '../../assets/images/sidebar/revamp/new-updates.inline.svg';
-import feedbackIcon from '../../assets/images/sidebar/revamp/feedback.inline.svg';
+// import newUpdatesIcon from '../../assets/images/sidebar/revamp/new-updates.inline.svg';
+// import feedbackIcon from '../../assets/images/sidebar/revamp/feedback.inline.svg';
 
 export type SidebarCategory = {|
   +className: string,
@@ -139,13 +139,13 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     label: globalMessages.sidebarVoting,
     isVisible: _request => true,
   },
-  {
-    className: 'swap',
-    route: '/swap',
-    icon: swapIcon,
-    label: globalMessages.sidebarSwap,
-    isVisible: _request => true,
-  },
+  // {
+  //   className: 'swap',
+  //   route: '/swap',
+  //   icon: swapIcon,
+  //   label: globalMessages.sidebarSwap,
+  //   isVisible: _request => true,
+  // },
   {
     className: 'settings',
     route: '/settings',
@@ -160,18 +160,18 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     label: globalMessages.sidebarFaq,
     isVisible: _request => true,
   },
-  {
-    className: 'new-updates',
-    route: '/new-updates',
-    icon: newUpdatesIcon,
-    label: globalMessages.sidebarNewUpdates,
-    isVisible: _request => true,
-  },
-  {
-    className: 'feedback',
-    route: '/feedback',
-    icon: feedbackIcon,
-    label: globalMessages.sidebarFeedback,
-    isVisible: _request => true,
-  },
+  // {
+  //   className: 'new-updates',
+  //   route: '/new-updates',
+  //   icon: newUpdatesIcon,
+  //   label: globalMessages.sidebarNewUpdates,
+  //   isVisible: _request => true,
+  // },
+  // {
+  //   className: 'feedback',
+  //   route: '/feedback',
+  //   icon: feedbackIcon,
+  //   label: globalMessages.sidebarFeedback,
+  //   isVisible: _request => true,
+  // },
 ];

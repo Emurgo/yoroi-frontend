@@ -95,7 +95,7 @@
   margin: 0;
   display: flex;
   flex-direction: column;
-  max-height: calc(100% - var(--theme-page-content-box-bottom) - var(--theme-banner-height));
+  max-height: calc(100% - 24px - 46px);
 }
 
 // avoid background image overlapping with language select form

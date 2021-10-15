@@ -11,8 +11,8 @@ import type { Theme } from '../../../../styles/utils';
 import ThemeThumbnail from '../display/ThemeThumbnail';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import globalMessages from '../../../../i18n/global-messages';
-import { withLayout } from '../../../../themes/context/layout';
-import type { LayoutComponentMap } from '../../../../themes/context/layout';
+import { withLayout } from '../../../../styles/context/layout';
+import type { LayoutComponentMap } from '../../../../styles/context/layout';
 
 const messages = defineMessages({
   themeLabel: {
@@ -169,8 +169,8 @@ class ThemeSettingsBlock extends Component<AllProps> {
                 right: '30px',
                 transform: 'translateY(-50%)',
                 position: 'absolute',
-                color: 'var(--theme-button-primary-text-color)',
-                backgroundColor: 'var(--theme-button-primary-background-color)',
+                color: 'var(--yoroi-comp-button-primary-text)',
+                backgroundColor: 'var(--yoroi-comp-button-primary-background)',
                 padding: '4px 10px',
                 borderRadius: '777px',
               },

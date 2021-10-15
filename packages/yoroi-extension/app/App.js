@@ -28,7 +28,7 @@ import environment from './environment';
 import MaintenancePage from './containers/MaintenancePage';
 import CrashPage from './containers/CrashPage';
 import { Logger } from './utils/logging';
-import { LayoutProvider } from './themes/context/layout';
+import { LayoutProvider } from './styles/context/layout';
 import { ThemeProvider } from '@mui/material/styles';
 import { CssBaseline } from '@mui/material';
 import { globalStyles } from './styles/globalStyles';

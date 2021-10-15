@@ -22,8 +22,8 @@ import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/in
 import type { WarningList } from '../../stores/toplevel/WalletSettingsStore';
 import { allCategories } from '../../stores/stateless/topbarCategories';
 import { MultiToken } from '../../api/common/lib/MultiToken';
-import { withLayout } from '../../themes/context/layout';
-import type { LayoutComponentMap } from '../../themes/context/layout';
+import { withLayout } from '../../styles/context/layout';
+import type { LayoutComponentMap } from '../../styles/context/layout';
 import NavBarContainerRevamp from '../NavBarContainerRevamp';
 import globalMessages from '../../i18n/global-messages';
 import NavBarTitle from '../../components/topbar/NavBarTitle';

@@ -3,7 +3,7 @@ import { Component } from 'react';
 import type { Node, ComponentType } from 'react';
 import { observer } from 'mobx-react';
 import styles from './SubMenu.scss';
-import { withLayout } from '../../themes/context/layout';
+import { withLayout } from '../../styles/context/layout';
 import SubMenuItem from './SubMenuItem';
 
 type Props = {|
