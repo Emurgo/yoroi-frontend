@@ -1,10 +1,8 @@
 // @flow
 import { Component } from 'react';
 import type { Node } from 'react';
-import classnames from 'classnames';
 import { observer } from 'mobx-react';
-import { Button } from 'react-polymorph/lib/components/Button';
-import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
+import { LoadingButton } from '@mui/lab';
 import { defineMessages, intlShape } from 'react-intl';
 import { Checkbox } from 'react-polymorph/lib/components/Checkbox';
 import { CheckboxSkin } from 'react-polymorph/lib/skins/simple/CheckboxSkin';
@@ -57,11 +55,6 @@ export default class TermsOfUseForm extends Component<Props, State> {
     const { isSubmitting, error, localizedTermsOfUse } = this.props;
     const { areTermsOfUseAccepted } = this.state;
 
-    const buttonClasses = classnames([
-      'primary',
-      isSubmitting ? styles.submitButtonSpinning : styles.submitButton,
-    ]);
-
     const checkboxLabel = 'checkboxLabel';
     return (
       <div className={styles.component}>
@@ -80,13 +73,15 @@ export default class TermsOfUseForm extends Component<Props, State> {
               skin={CheckboxSkin}
             />
 
-            <Button
-              className={buttonClasses}
-              label={intl.formatMessage(globalMessages.continue)}
-              onMouseUp={this.props.onSubmit}
-              disabled={!areTermsOfUseAccepted || this.props.isSubmitting}
-              skin={ButtonSkin}
-            />
+            <LoadingButton
+              variant="primary"
+              disabled={!areTermsOfUseAccepted}
+              onClick={this.props.onSubmit}
+              loading={isSubmitting}
+              sx={{ width: '350px' }}
+            >
+              {intl.formatMessage(globalMessages.continue)}
+            </LoadingButton>
           </div>
 
           {error && (

@@ -3,8 +3,7 @@ import { Component } from 'react';
 import type { Node, ComponentType } from 'react';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
-import { Button } from 'react-polymorph/lib/components/Button';
-import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
+import { Button } from '@mui/material';
 import { defineMessages, intlShape, FormattedMessage, FormattedHTMLMessage } from 'react-intl';
 import styles from './ThemeSettingsBlock.scss';
 import { THEMES } from '../../../../themes';
@@ -92,8 +91,6 @@ class ThemeSettingsBlock extends Component<AllProps> {
       styles.themeImageWrapper,
     ]);
 
-    const exportButtonClasses = classnames(['primary', styles.button]);
-
     const blogLink = (
       <a
         className={styles.link}
@@ -156,23 +153,43 @@ class ThemeSettingsBlock extends Component<AllProps> {
               <h3 className={styles.subTitle}>{intl.formatMessage(messages.themeYoroiClassic)}</h3>
             </button>
           </div>
-          <Button
-            className={exportButtonClasses}
-            label={intl.formatMessage(messages.themeExportButton)}
-            skin={ButtonSkin}
-            onClick={exportTheme.bind(this)}
-          />
+
+          <Button variant="primary" onClick={exportTheme.bind(this)} sx={{ width: '400px' }}>
+            {intl.formatMessage(messages.themeExportButton)}
+          </Button>
         </div>
         <div className={styles.revampWrapper}>
+          {/* TODO: MUI: fix css variables */}
           <Button
-            className={styles.revamp}
-            label="Try new Yoroi Revamp"
-            skin={ButtonSkin}
+            sx={{
+              width: '400px',
+              background: 'white',
+              color: '#6b7384',
+              border: '1px solid #6b7384',
+              '&:hover': {
+                color: '#383838',
+                background: 'white',
+              },
+              position: 'relative',
+              '&::after': {
+                content: '"new"',
+                top: '50%',
+                right: '30px',
+                transform: 'translateY(-50%)',
+                position: 'absolute',
+                color: 'var(--theme-button-primary-text-color)',
+                backgroundColor: 'var(--theme-button-primary-background-color)',
+                padding: '4px 10px',
+                borderRadius: '777px',
+              },
+            }}
             onClick={() => {
               changeLayout();
               selectTheme({ theme: THEMES.YOROI_REVAMP });
             }}
-          />
+          >
+            Try new Yoroi Revamp
+          </Button>
         </div>
       </div>
     );
@@ -181,23 +198,29 @@ class ThemeSettingsBlock extends Component<AllProps> {
       <div className={styles.component}>
         {commonHeader}
         <div className={styles.main}>
-          <Button
-            className={exportButtonClasses}
-            label={intl.formatMessage(messages.themeExportButton)}
-            skin={ButtonSkin}
-            onClick={exportTheme.bind(this)}
-          />
+          <Button variant="primary" onClick={exportTheme.bind(this)} sx={{ width: '400px' }}>
+            {intl.formatMessage(messages.themeExportButton)}
+          </Button>
         </div>
         <div className={styles.revampWrapper}>
           <Button
-            className={styles.classic}
-            label="Back to Yoroi Classic"
-            skin={ButtonSkin}
             onClick={() => {
               changeLayout();
               selectTheme({ theme: THEMES.YOROI_MODERN });
             }}
-          />
+            sx={{
+              width: '400px',
+              background: 'white',
+              color: '#6b7384',
+              border: '1px solid #6b7384',
+              '&:hover': {
+                color: '#383838',
+                background: 'white',
+              },
+            }}
+          >
+            Back to Yoroi Classic
+          </Button>
         </div>
       </div>
     );

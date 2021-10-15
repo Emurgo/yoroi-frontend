@@ -5,6 +5,7 @@ import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import type { Node, Element } from 'react';
 import { Modal } from 'react-polymorph/lib/components/Modal';
+// TODO: Remove RP Button
 import { Button } from 'react-polymorph/lib/components/Button';
 import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
 import { ModalSkin } from 'react-polymorph/lib/skins/simple/ModalSkin';

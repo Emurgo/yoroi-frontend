@@ -1,10 +1,8 @@
 // @flow
 import { Component } from 'react';
 import type { Node } from 'react';
-import classnames from 'classnames';
 import { observer } from 'mobx-react';
-import { Button } from 'react-polymorph/lib/components/Button';
-import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
+import { Button } from '@mui/material';
 import { Checkbox } from 'react-polymorph/lib/components/Checkbox';
 import { CheckboxSkin } from 'react-polymorph/lib/skins/simple/CheckboxSkin';
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
@@ -115,12 +113,13 @@ export default class NightlyForm extends Component<Props, State> {
             />
           </div>
           <Button
-            className={classnames(['primary', styles.button])}
-            label={intl.formatMessage(globalMessages.continue)}
-            onMouseUp={this.props.onSubmit}
-            skin={ButtonSkin}
+            variant="primary"
+            onClick={this.props.onSubmit}
             disabled={!this.state.acknowledgedRisks}
-          />
+            sx={{ width: '480px' }}
+          >
+            {intl.formatMessage(globalMessages.continue)}
+          </Button>
         </div>
       </div>
     );

@@ -25,7 +25,7 @@ import { themeOverrides } from './themes/overrides';
 import { translations } from './i18n/translations';
 import type { StoresMap } from './stores';
 import type { ActionsMap } from './actions';
-import { changeToplevelTheme } from './themes';
+import { changeToplevelTheme, MuiThemes } from './themes';
 import ThemeManager from './ThemeManager';
 import environment from './environment';
 import MaintenancePage from './containers/MaintenancePage';
@@ -36,7 +36,6 @@ import { SimpleDefaults } from 'react-polymorph/lib/themes/simple';
 import { LayoutProvider } from './themes/context/layout';
 import { ThemeProvider as MuiThemeProvide } from '@mui/material/styles';
 import { CssBaseline } from '@mui/material';
-import { classicTheme, modernTheme } from './styles/themes';
 import { globalStyles } from './styles/globalStyles';
 
 // https://github.com/yahoo/react-intl/wiki#loading-locale-data
@@ -67,7 +66,6 @@ type State = {|
 
 @observer
 class App extends Component<Props, State> {
-
   state: State = {
     crashed: false,
   };
@@ -105,17 +103,14 @@ class App extends Component<Props, State> {
 
     changeToplevelTheme(currentTheme);
 
-    // <TODO:THEME_SELECT>
-    const isModernTheme = true;
-
-    const theme = isModernTheme ? modernTheme : classicTheme;
+    const muiTheme = MuiThemes[currentTheme ?? 'YoroiModern'];
 
     return (
       <div style={{ height: '100%' }}>
-        <MuiThemeProvide theme={theme}>
-          <CssBaseline />
-          {globalStyles(theme)}
-          <LayoutProvider>
+        <LayoutProvider>
+          <MuiThemeProvide theme={muiTheme}>
+            <CssBaseline />
+            {globalStyles(muiTheme)}
             <ThemeManager variables={themeVars} />
             {/* Automatically pass a theme prop to all components in this subtree. */}
             <ThemeProvider
@@ -129,8 +124,8 @@ class App extends Component<Props, State> {
                 {this.getContent()}
               </IntlProvider>
             </ThemeProvider>
-          </LayoutProvider>
-        </MuiThemeProvide>
+          </MuiThemeProvide>
+        </LayoutProvider>
       </div>
     );
   }
@@ -143,12 +138,8 @@ class App extends Component<Props, State> {
     if (stores.serverConnectionStore.isMaintenance) {
       return (<MaintenancePage stores={stores} actions={actions} />);
     }
-    return (
-      <Router history={history}>
-        {Routes(stores, actions)}
-      </Router>
-    );
-  }
+    return <Router history={history}>{Routes(stores, actions)}</Router>;
+  };
 }
 
 export default App;

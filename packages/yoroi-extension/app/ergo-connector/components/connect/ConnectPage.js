@@ -6,8 +6,7 @@ import { intlShape, defineMessages, FormattedHTMLMessage } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import classNames from 'classnames';
 import styles from './ConnectPage.scss';
-import { Button } from 'react-polymorph/lib/components/Button';
-import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
+import { Button } from '@mui/material';
 import { Checkbox } from 'react-polymorph/lib/components/Checkbox';
 import { CheckboxSkin } from 'react-polymorph/lib/skins/simple/CheckboxSkin';
 import WalletCard from './WalletCard';
@@ -151,18 +150,12 @@ class ConnectPage extends Component<Props> {
             <p>{intl.formatMessage(connectorMessages.messageReadOnly)}</p>
           </div>
           <div className={styles.wrapperBtn}>
-            <Button
-              className="secondary"
-              label={intl.formatMessage(globalMessages.cancel)}
-              skin={ButtonSkin}
-              onClick={onCancel}
-            />
-            <Button
-              label={intl.formatMessage(globalMessages.connectLabel)}
-              skin={ButtonSkin}
-              disabled={isCheckedWallet}
-              onClick={handleSubmit}
-            />
+            <Button variant="secondary" onClick={onCancel}>
+              {intl.formatMessage(globalMessages.cancel)}
+            </Button>
+            <Button variant="primary" disabled={isCheckedWallet} onClick={handleSubmit}>
+              {intl.formatMessage(globalMessages.connectLabel)}
+            </Button>
           </div>
         </div>
       </div>

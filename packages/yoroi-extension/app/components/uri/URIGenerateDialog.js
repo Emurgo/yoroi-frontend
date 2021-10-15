@@ -3,8 +3,7 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
-import { Button } from 'react-polymorph/lib/components/Button';
-import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
+import { Button } from '@mui/material';
 import { NumericInput } from 'react-polymorph/lib/components/NumericInput';
 import { Input } from 'react-polymorph/lib/components/Input';
 import { defineMessages, intlShape } from 'react-intl';
@@ -170,12 +169,13 @@ export default class URIGenerateDialog extends Component<Props> {
           </div>
 
           <Button
-            label={this.context.intl.formatMessage(messages.uriGenerateDialogConfirmLabel)}
+            variant="primary"
             onClick={onGenerate.bind(this, receiverField.value, amountField.value)}
-            skin={ButtonSkin}
-            className={classnames(['primary', styles.generateButton])}
             disabled={!amountField.isValid}
-          />
+            sx={{ margin: '30px auto 0', display: 'block', width: '400px' }}
+          >
+            {this.context.intl.formatMessage(messages.uriGenerateDialogConfirmLabel)}
+          </Button>
         </div>
       </Dialog>
     );

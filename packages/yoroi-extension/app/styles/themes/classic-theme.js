@@ -41,6 +41,7 @@ export const classicTheme: Object = createTheme({
       main: 'hsl(9, 46%, 73%)',
       light: 'hsl(9 46% 73% / 20%)',
       dark: 'hsl(10 66% 79%)',
+      disabled: 'hsl(9 46% 73% / 30%)',
       contrastText: 'hsl(210 25% 98%)',
     },
     error: {

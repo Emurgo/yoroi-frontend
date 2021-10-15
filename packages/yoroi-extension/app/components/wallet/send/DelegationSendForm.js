@@ -2,9 +2,7 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import classnames from 'classnames';
-import { Button } from 'react-polymorph/lib/components/Button';
-import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
+import { Button } from '@mui/material';
 import { Input } from 'react-polymorph/lib/components/Input';
 import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
@@ -147,22 +145,18 @@ export default class DelegationSendForm extends Component<Props> {
   _makeInvokeConfirmationButton(): Node {
     const { intl } = this.context;
 
-    const buttonClasses = classnames([
-      'primary',
-      styles.nextButton,
-    ]);
-
     return (
       <Button
-        className={buttonClasses}
-        label={intl.formatMessage(globalMessages.nextButtonLabel)}
-        onMouseUp={this.props.onNext}
+        variant="primary"
+        onClick={this.props.onNext}
         disabled={
           this.props.hasAnyPending ||
           this.props.isProcessing ||
           this.props.poolQueryError != null
         }
-        skin={ButtonSkin}
-      />);
+        sx={{ margin: '30px auto 0', display: 'block' }}
+      >
+        {intl.formatMessage(globalMessages.nextButtonLabel)}
+      </Button>);
   }
 }

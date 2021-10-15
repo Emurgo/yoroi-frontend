@@ -26,11 +26,11 @@
   a {
     color: var(--theme-support-settings-link-color);
   }
-  
+
   p {
     margin-bottom: 10px;
   }
-  
+
   .link {
     @include underline(var(--theme-underline-dark-color));
   }
@@ -39,9 +39,6 @@
     outline: none;
   }
 
-  .downloadButton {
-    margin-top: 20px;
-  }
 }
 
 :global(.YoroiClassic) .component {

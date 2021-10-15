@@ -1,4 +1,6 @@
 // @flow
+import { classicTheme } from '../styles/themes/classic-theme';
+import { modernTheme } from '../styles/themes/modern-theme';
 
 export const THEMES = Object.freeze({
   YOROI_CLASSIC: 'YoroiClassic',
@@ -8,6 +10,11 @@ export const THEMES = Object.freeze({
 
 export type Theme = $Values<typeof THEMES>;
 
+export const MuiThemes: {| [Theme]: Object |} = Object.freeze({
+  [THEMES.YOROI_CLASSIC]: classicTheme,
+  [THEMES.YOROI_MODERN]: modernTheme,
+  [THEMES.YOROI_REVAMP]: modernTheme,
+});
 
 // Refer: https://github.com/Emurgo/yoroi-frontend/pull/497
 export function changeToplevelTheme(currentTheme: Theme) {

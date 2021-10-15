@@ -69,7 +69,7 @@ class Wallet extends Component<AllProps> {
     if (publicDeriver == null) throw new Error(`${nameof(Wallet)} no public deriver`);
 
     const spendableBalance = this.generated.stores.transactions.getBalanceRequest.result;
-    const walletHasAssets = !!(spendableBalance?.nonDefaultEntries()?.length);
+    const walletHasAssets = !!(spendableBalance?.nonDefaultEntries().length);
 
     const activeCategory = allCategories.find(
       category => this.generated.stores.app.currentRoute.startsWith(category.route)
@@ -121,7 +121,7 @@ class Wallet extends Component<AllProps> {
     const warning = this.getWarning(selectedWallet);
 
     const spendableBalance = this.generated.stores.transactions.getBalanceRequest.result
-    const walletHasAssets = !!(spendableBalance?.nonDefaultEntries()?.length);
+    const walletHasAssets = !!(spendableBalance?.nonDefaultEntries().length);
     const visibilityContext = { selected: selectedWallet, walletHasAssets };
 
     const menu = (

@@ -2,13 +2,10 @@
 import { Component } from 'react';
 import type { Node, ComponentType } from 'react';
 import { observer } from 'mobx-react';
-import { intlShape } from 'react-intl';
-import styles from './BuySellAdaButton.scss';
+import { Button } from '@mui/material';
 import globalMessages from '../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import classnames from 'classnames';
-import { Button } from 'react-polymorph/lib/components/Button';
-import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
+import { intlShape } from 'react-intl';
 import { withLayout } from '../../themes/context/layout';
 import type { LayoutComponentMap } from '../../themes/context/layout';
 
@@ -31,20 +28,39 @@ class BuySellAdaButton extends Component<Props & InjectedProps> {
 
     const BuyAdaButtonClassic = (
       <Button
-        label={intl.formatMessage(globalMessages.buyAda)}
-        className={classnames([styles.button, 'secondary'])}
+        variant="secondary"
+        sx={{ width: '230px' }}
+        className="secondary"
         onClick={() => this.props.onBuySellClick()}
-        skin={ButtonSkin}
-      />
+      >
+        {intl.formatMessage(globalMessages.buyAda)}
+      </Button>
     );
 
     const BuyAdaButtonRevamp = (
       <Button
-        label={intl.formatMessage(globalMessages.buyAda)}
-        className={styles.buttonRevamp}
+        // TODO: Add new button variant for revamp
+        variant="secondary"
+        sx={{
+          borderColor: '#a7afc0',
+          background: 'white',
+          width: '160px',
+          padding: '11px 0',
+          color: '#6b7384',
+          fontSize: '14px',
+          fontWeight: 500,
+          letterSpacing: '0.5px',
+          lineHeight: '22px',
+          '&:hover': {
+            background: 'transparent',
+            borderColor: '#a7afc0',
+            color: '#6b7384',
+          },
+        }}
         onClick={() => this.props.onBuySellClick()}
-        skin={ButtonSkin}
-      />
+      >
+        {intl.formatMessage(globalMessages.buyAda)}
+      </Button>
     );
 
     return this.props.renderLayoutComponent({

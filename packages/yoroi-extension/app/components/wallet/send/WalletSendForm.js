@@ -3,9 +3,7 @@ import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { reaction } from 'mobx';
-import classnames from 'classnames';
-import { Button } from 'react-polymorph/lib/components/Button';
-import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
+import { Button } from '@mui/material';
 import { Input } from 'react-polymorph/lib/components/Input';
 import { NumericInput } from 'react-polymorph/lib/components/NumericInput';
 import { defineMessages, intlShape } from 'react-intl';
@@ -43,6 +41,7 @@ import { Select } from 'react-polymorph/lib/components/Select';
 import { SelectTokenSkin } from '../../../themes/skins/SelectTokenSkin';
 import TokenOptionRow from '../../widgets/tokenOption/TokenOptionRow';
 import BigNumber from 'bignumber.js';
+import classnames from 'classnames';
 
 const messages = defineMessages({
   receiverLabel: {
@@ -574,11 +573,6 @@ export default class WalletSendForm extends Component<Props> {
     const { intl } = this.context;
     const { memo } = this.form.values();
 
-    const buttonClasses = classnames([
-      'primary',
-      styles.nextButton,
-    ]);
-
     const {
       hasAnyPending,
     } = this.props;
@@ -591,13 +585,14 @@ export default class WalletSendForm extends Component<Props> {
 
     return (
       <Button
-        className={buttonClasses}
-        label={intl.formatMessage(globalMessages.nextButtonLabel)}
-        onMouseUp={this.props.onSubmit}
+        variant="primary"
+        onClick={this.props.onSubmit}
         /** Next Action can't be performed in case transaction fees are not calculated
           * or there's a transaction waiting to be confirmed (pending) */
         disabled={disabledCondition}
-        skin={ButtonSkin}
-      />);
+        sx={{ margin: '30px auto 0', display: 'block' }}
+      >
+        {intl.formatMessage(globalMessages.nextButtonLabel)}
+      </Button>);
   }
 }

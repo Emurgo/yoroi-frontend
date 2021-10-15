@@ -22,22 +22,17 @@
         letter-spacing: 0;
       }
     }
-  }  
+  }
 
   .amountField {
     margin-bottom: 15px;
-  }
-
-  .generateButton {
-    display: block !important;
-    margin: 30px auto 0;
   }
 }
 
 :global(.YoroiClassic) .component {
   .receiverInput {
     margin-bottom: 10px;
-  }  
+  }
 }
 
 :global(.YoroiModern) .component {
@@ -61,7 +56,4 @@
     margin-bottom: 10px;
   }
 
-  .generateButton {
-    margin: 0 auto;
-  }
 }

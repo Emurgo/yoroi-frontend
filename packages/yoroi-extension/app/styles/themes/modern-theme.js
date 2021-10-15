@@ -39,8 +39,9 @@ export const modernTheme: Object = createTheme({
     },
     secondary: {
       main: 'hsl(167, 80%, 45%)',
-      light: 'hsl(168 48% 86%)',
+      light: 'hsl(168deg 82% 49% / 10%)',
       dark: 'hsl(168 82% 49%)',
+      disabled: 'rgb(201 237 229)',
       contrastText: 'hsl(0deg 0% 100%)',
     },
     error: {
@@ -49,10 +50,6 @@ export const modernTheme: Object = createTheme({
     warning: {
       main: 'hsl(38, 92%, 55%)',
     },
-    input: {
-      main: 'hsl(38, 92%, 55%)',
-    },
-
     grey: {
       '50': 'hsl(201, 22%, 95%)',
       '100': 'hsl(216, 26%, 93%)',
@@ -67,6 +64,6 @@ export const modernTheme: Object = createTheme({
     },
   },
   typography: {
-    fontFamily: '"Rubik", sans-serif',
+    fontFamily: 'Rubik, sans-serif',
   },
 });

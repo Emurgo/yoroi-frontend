@@ -1,15 +1,12 @@
 // @flow
 import type { Node } from 'react';
 import { Component } from 'react';
-import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import WarningHeader from './WarningHeader';
-import { Button } from 'react-polymorph/lib/components/Button';
-import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
+import { Button } from '@mui/material';
 import globalMessages from '../../../i18n/global-messages';
 import { addressSubgroupName } from '../../../types/AddressFilterTypes';
-import styles from './MangledHeader.scss';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
@@ -38,10 +35,6 @@ export default class MangledHeader extends Component<Props> {
   render(): Node {
     const { intl } = this.context;
 
-    const buttonClasses = classnames([
-      'primary',
-      styles.submitButton,
-    ]);
     return (
       <>
         <WarningHeader
@@ -62,11 +55,12 @@ export default class MangledHeader extends Component<Props> {
         >
           {this.props.hasMangledUtxo && (
             <Button
-              className={buttonClasses}
-              label={intl.formatMessage(messages.fixLabel)}
+              variant="primary"
               onClick={this.props.onClick}
-              skin={ButtonSkin}
-            />
+              sx={{ width: 'max-content' , marginTop: '16px' }}
+            >
+              {intl.formatMessage(messages.fixLabel)}
+            </Button>
           )}
         </WarningHeader>
       </>

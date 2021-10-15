@@ -425,7 +425,6 @@ export const RemoveWallet = (): Node => {
         getConceptualWalletSettingsCache: lookup.getConceptualWalletSettingsCache,
         getSigningKeyCache: lookup.getSigningKeyCache,
       });
-      // $FlowFixMe[prop-missing]: Some props are quite different for revamp components
       return (
         <WalletSettingsPage
           generated={{
