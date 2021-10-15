@@ -711,6 +711,7 @@ export default class StakingDashboardPage extends Component<Props> {
 
     const txRequests = this.generated.stores.transactions.getTxRequests(request.publicDeriver);
     const balance = txRequests.requests.getBalanceRequest.result;
+
     const rewardBalance =
       request.delegationRequests.getDelegatedBalance.result == null
         ? new MultiToken([], defaultToken)

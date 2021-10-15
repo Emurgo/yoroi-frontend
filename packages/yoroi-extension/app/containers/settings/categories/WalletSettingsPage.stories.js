@@ -438,6 +438,7 @@ export const RemoveWallet = (): Node => {
             },
             ChangeWalletPasswordDialogContainerProps: (null: any),
             ExportWalletDialogContainerProps: (null: any),
+            // $FlowFixMe[incompatible-type]: Revamp has different logic
             RemoveWalletDialogContainerProps: {
               generated: {
                 stores: {

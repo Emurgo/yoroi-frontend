@@ -103,20 +103,20 @@ export default class NavWalletDetails extends Component<Props> {
               })}
             </div>
             {showsRewards &&
-            <div className={styles.details}>
-              <div>
-                <p className={styles.label}>
-                  {intl.formatMessage(globalMessages.walletLabel)}&nbsp;
-                </p>
-                {this.renderAmountDisplay({ shouldHideBalance, amount: walletAmount })}
+              <div className={styles.details}>
+                <div>
+                  <p className={styles.label}>
+                    {intl.formatMessage(globalMessages.walletLabel)}&nbsp;
+                  </p>
+                  {this.renderAmountDisplay({ shouldHideBalance, amount: walletAmount })}
+                </div>
+                <div>
+                  <p className={styles.label}>
+                    {intl.formatMessage(globalMessages.rewardsLabel)}&nbsp;
+                  </p>
+                  {this.renderAmountDisplay({ shouldHideBalance, amount: rewards })}
+                </div>
               </div>
-              <div>
-                <p className={styles.label}>
-                  {intl.formatMessage(globalMessages.rewardsLabel)}&nbsp;
-                </p>
-                {this.renderAmountDisplay({ shouldHideBalance, amount: rewards })}
-              </div>
-            </div>
             }
             {this.props.rewards === undefined && (
               <div className={styles.info}>
@@ -150,7 +150,7 @@ export default class NavWalletDetails extends Component<Props> {
     if (this.props.rewards === null || this.props.walletAmount === null) {
       return null;
     }
-    return this.props.rewards.joinAddCopy(this.props.walletAmount);
+    return this.props.walletAmount.joinAddCopy(this.props.rewards);
   }
 
   renderAmountDisplay: {|

@@ -24,6 +24,7 @@ export default class TokenOptionRow extends Component<Props> {
     nameOnly: undefined,
   };
   render(): Node {
+    const notOnlyName = !this.props.nameOnly;
     return (
       <Box width="100%">
         <Box
@@ -36,12 +37,10 @@ export default class TokenOptionRow extends Component<Props> {
           }}
         >
           <Typography sx={{ flex: 1 }}>{this.props.displayName}</Typography>
-          {/* $FlowFixMe[sketchy-null-bool][sketchy-null-mixed] */}
-          {!this.props.nameOnly && <Typography flex={1}>{this.props.amount}</Typography>}
+          {notOnlyName && <Typography flex={1}>{this.props.amount}</Typography>}
         </Box>
         <Box>
-          {/* $FlowFixMe[sketchy-null-bool][sketchy-null-mixed] */}
-          {!this.props.nameOnly && (
+          {notOnlyName && (
             <Typography
               sx={{ color: '#6B7384', fontSize: '0.875rem', letterSpacing: 0, lineHeight: '22px' }}
             >

@@ -9,5 +9,8 @@ export default class ProfileActions extends BaseProfileActions {
   acceptTermsOfUse: AsyncAction<void> = new AsyncAction();
   acceptUriScheme: AsyncAction<void> = new AsyncAction();
   toggleSidebar: AsyncAction<void> = new AsyncAction();
+  updateSortedWalletList: AsyncAction<{|
+    sortedWallets: Array<number>,
+  |}> = new AsyncAction();
   setSelectedNetwork: Action<void | $ReadOnly<NetworkRow>> = new Action();
 }

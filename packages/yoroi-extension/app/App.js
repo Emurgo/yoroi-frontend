@@ -28,6 +28,7 @@ import environment from './environment';
 import MaintenancePage from './containers/MaintenancePage';
 import CrashPage from './containers/CrashPage';
 import { Logger } from './utils/logging';
+import { LayoutProvider } from './themes/context/layout';
 import { ThemeProvider } from '@mui/material/styles';
 import { CssBaseline } from '@mui/material';
 import { globalStyles } from './styles/globalStyles';
@@ -101,15 +102,17 @@ class App extends Component<Props, State> {
 
     return (
       <div style={{ height: '100%' }}>
-        <ThemeProvider theme={muiTheme}>
-          <CssBaseline />
-          {globalStyles(muiTheme)}
-          <ThemeManager cssVariables={themeVars} />
-          {/* Automatically pass a theme prop to all components in this subtree. */}
-          <IntlProvider {...{ locale, key: locale, messages: mergedMessages }}>
-            {this.getContent()}
-          </IntlProvider>
-        </ThemeProvider>
+        <LayoutProvider>
+          <ThemeProvider theme={muiTheme}>
+            <CssBaseline />
+            {globalStyles(muiTheme)}
+            <ThemeManager cssVariables={themeVars} />
+            {/* Automatically pass a theme prop to all components in this subtree. */}
+            <IntlProvider {...{ locale, key: locale, messages: mergedMessages }}>
+              {this.getContent()}
+            </IntlProvider>
+          </ThemeProvider>
+        </LayoutProvider>
       </div>
     );
   }

@@ -68,6 +68,32 @@
     font-size: 16px;
     padding-left: 17px;
   }
+
+  .tokenList {
+    max-height: 0px;
+    height: 0px;
+    overflow: hidden;
+    transition: all .5s cubic-bezier(0,1,0,1);
+
+    h1 {
+      margin-bottom: 10px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #cccdcf;
+    }
+
+    p {
+      color: var(--theme-send-confirmation-dialog-send-values-color);
+      font-family: var(--font-medium);
+    }
+  }
+
+  .show {
+    height: auto;
+    max-height: 9999px;
+    transition: all .5s cubic-bezier(0,1,0,1);
+  }
+
 }
 
 :global(.YoroiModern) .component {

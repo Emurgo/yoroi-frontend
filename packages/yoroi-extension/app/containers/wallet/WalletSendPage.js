@@ -158,7 +158,7 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
           updateAmount={(value: ?BigNumber) => txBuilderActions.updateAmount.trigger(value)}
           updateMemo={(content: void | string) => txBuilderActions.updateMemo.trigger(content)}
           shouldSendAll={transactionBuilderStore.shouldSendAll}
-          toggleSendAll={txBuilderActions.toggleSendAll.trigger}
+          updateSendAllStatus={txBuilderActions.updateSendAllStatus.trigger}
           fee={transactionBuilderStore.fee}
           isCalculatingFee={transactionBuilderStore.createUnsignedTx.isExecuting}
           reset={txBuilderActions.reset.trigger}
@@ -394,8 +394,8 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
         reset: {|
           trigger: (params: void) => void
         |},
-        toggleSendAll: {|
-          trigger: (params: void) => void
+        updateSendAllStatus: {|
+          trigger: (params: boolean | void) => void
         |},
         updateAmount: {|
           trigger: (params: ?BigNumber) => void
@@ -593,7 +593,7 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
           updateReceiver: { trigger: actions.txBuilderActions.updateReceiver.trigger },
           updateAmount: { trigger: actions.txBuilderActions.updateAmount.trigger },
           updateToken: { trigger: actions.txBuilderActions.updateToken.trigger },
-          toggleSendAll: { trigger: actions.txBuilderActions.toggleSendAll.trigger },
+          updateSendAllStatus: { trigger: actions.txBuilderActions.updateSendAllStatus.trigger },
           reset: { trigger: actions.txBuilderActions.reset.trigger },
           updateMemo: { trigger: actions.txBuilderActions.updateMemo.trigger },
         },

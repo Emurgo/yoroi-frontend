@@ -1,0 +1,30 @@
+.wrapper {
+  position: relative;
+  width: 340px;
+  padding: 12px 0;
+  padding-left: 24px;
+  padding-right: 12px;
+  display: flex;
+  align-items: center;
+}
+.wrapperHovered {
+  border: 1px solid #eaedf2;
+  border-radius: 8px;
+}
+.icon {
+  width: 20px;
+  margin-right: 20px;
+  height: 20px;
+}
+.component {
+  flex: 1;
+}
+
+.toggle {
+  margin-left: auto;
+  transition: background-color 0.4s;
+  &:hover {
+    cursor: pointer;
+    background-color: #ededed;
+  }
+}

@@ -1,6 +1,6 @@
 // @flow
 import { Component } from 'react';
-import type { Node } from 'react';
+import type { Node, ComponentType } from 'react';
 import { computed } from 'mobx';
 import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
@@ -14,13 +14,16 @@ import { buildRoute } from '../../utils/routing';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import type { GeneratedData as SidebarContainerData } from '../SidebarContainer';
 import type { GeneratedData as NavBarContainerData } from '../NavBarContainer';
+import type { GeneratedData as NavBarContainerRevampData } from '../NavBarContainerRevamp';
 
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import SidebarContainer from '../SidebarContainer';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import type { Theme } from '../../styles/utils';
+import { withLayout } from '../../themes/context/layout';
+import type { LayoutComponentMap } from '../../themes/context/layout';
+import NavBarContainerRevamp from '../NavBarContainerRevamp';
 
 export type GeneratedData = typeof Settings.prototype.generated;
 
@@ -28,19 +31,22 @@ type Props = {|
   ...InjectedOrGenerated<GeneratedData>,
   +children?: Node,
 |};
+type InjectedProps = {|
+  +renderLayoutComponent: LayoutComponentMap => Node,
+|};
 
+type AllProps = {| ...Props, ...InjectedProps |};
 @observer
-export default class Settings extends Component<Props> {
-
-  static defaultProps: {|children: void|} = {
+class Settings extends Component<AllProps> {
+  static defaultProps: {| children: void |} = {
     children: undefined,
   };
 
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
-  isActivePage: string => boolean = (route) => {
+  isActivePage: string => boolean = route => {
     const { location } = this.generated.stores.router;
     if (location) {
       return location.pathname === buildRoute(route);
@@ -50,46 +56,67 @@ export default class Settings extends Component<Props> {
 
   render(): Node {
     const { children } = this.props;
-    const { actions, stores } = this.generated;
-    const { profile } = stores;
-    const sidebarContainer = (<SidebarContainer {...this.generated.SidebarContainerProps} />);
+    const { actions } = this.generated;
+    const sidebarContainer = <SidebarContainer {...this.generated.SidebarContainerProps} />;
 
     const menu = (
       <SettingsMenu
-        onItemClick={(route) => actions.router.goToRoute.trigger({ route })}
+        onItemClick={route => actions.router.goToRoute.trigger({ route })}
         isActiveItem={this.isActivePage}
-        currentLocale={profile.currentLocale}
-        currentTheme={profile.currentTheme}
       />
     );
 
-    const navbar = (
-      <NavBarContainer
-        {...this.generated.NavBarContainerProps}
-        title={<NavBarTitle
-          title={this.context.intl.formatMessage(globalMessages.sidebarSettings)}
-        />}
-      />
-    );
-
-    return (
+    const SettingsLayoutClassic = (
       <TopBarLayout
-        banner={(<BannerContainer {...this.generated.BannerContainerProps} />)}
+        banner={<BannerContainer {...this.generated.BannerContainerProps} />}
         sidebar={sidebarContainer}
-        navbar={navbar}
+        navbar={
+          <NavBarContainer
+            {...this.generated.NavBarContainerProps}
+            title={
+              <NavBarTitle
+                title={this.context.intl.formatMessage(globalMessages.sidebarSettings)}
+              />
+            }
+          />
+        }
         showInContainer
         showAsCard
       >
-        <SettingsLayout menu={menu}>
-          {children != null ? children : null}
-        </SettingsLayout>
+        <SettingsLayout menu={menu}>{children != null ? children : null}</SettingsLayout>
       </TopBarLayout>
     );
+    const SettingsLayoutRevamp = (
+      <TopBarLayout
+        banner={<BannerContainer {...this.generated.BannerContainerProps} />}
+        sidebar={sidebarContainer}
+        navbar={
+          <NavBarContainerRevamp
+            {...this.generated.NavBarContainerRevampProps}
+            title={
+              <NavBarTitle
+                title={this.context.intl.formatMessage(globalMessages.sidebarSettings)}
+              />
+            }
+            menu={menu}
+          />
+        }
+        showInContainer
+        showAsCard
+      >
+        {children}
+      </TopBarLayout>
+    );
+    return this.props.renderLayoutComponent({
+      CLASSIC: SettingsLayoutClassic,
+      REVAMP: SettingsLayoutRevamp,
+    });
   }
 
   @computed get generated(): {|
     BannerContainerProps: InjectedOrGenerated<BannerContainerData>,
     NavBarContainerProps: InjectedOrGenerated<NavBarContainerData>,
+    NavBarContainerRevampProps: InjectedOrGenerated<NavBarContainerRevampData>,
     SidebarContainerProps: InjectedOrGenerated<SidebarContainerData>,
     actions: {|
       router: {|
@@ -97,20 +124,16 @@ export default class Settings extends Component<Props> {
           trigger: (params: {|
             publicDeriver?: null | PublicDeriver<>,
             params?: ?any,
-            route: string
-          |}) => void
-        |}
-      |}
+            route: string,
+          |}) => void,
+        |},
+      |},
     |},
     stores: {|
-      profile: {|
-        currentLocale: string,
-        currentTheme: Theme
-      |},
       router: {| location: any |},
-      wallets: {| selected: null | PublicDeriver<> |}
-    |}
-    |} {
+      wallets: {| selected: null | PublicDeriver<> |},
+    |},
+  |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }
@@ -120,10 +143,6 @@ export default class Settings extends Component<Props> {
     const { stores, actions } = this.props;
     return Object.freeze({
       stores: {
-        profile: {
-          currentLocale: stores.profile.currentLocale,
-          currentTheme: stores.profile.currentTheme,
-        },
         router: {
           location: stores.router.location,
         },
@@ -136,9 +155,14 @@ export default class Settings extends Component<Props> {
           goToRoute: { trigger: actions.router.goToRoute.trigger },
         },
       },
-      SidebarContainerProps: ({ actions, stores, }: InjectedOrGenerated<SidebarContainerData>),
-      NavBarContainerProps: ({ actions, stores, }: InjectedOrGenerated<NavBarContainerData>),
+      SidebarContainerProps: ({ actions, stores }: InjectedOrGenerated<SidebarContainerData>),
+      NavBarContainerProps: ({ actions, stores }: InjectedOrGenerated<NavBarContainerData>),
+      NavBarContainerRevampProps: ({
+        actions,
+        stores,
+      }: InjectedOrGenerated<NavBarContainerRevampData>),
       BannerContainerProps: ({ actions, stores }: InjectedOrGenerated<BannerContainerData>),
     });
   }
 }
+export default (withLayout(Settings): ComponentType<Props>);
