@@ -187,6 +187,7 @@ export default class StakePool extends Component<Props> {
                 elementId={poolIdNotificationId}
                 onCopyAddress={() => this.props.onCopyAddressTooltip(hash, poolIdNotificationId)}
                 notification={this.props.notification}
+                placementTooltip="bottom-start"
               >
                 <ExplorableHashContainer
                   selectedExplorer={this.props.selectedExplorer}

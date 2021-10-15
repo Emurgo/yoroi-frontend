@@ -189,7 +189,7 @@ export default class DelegationTxDialog extends Component<Props> {
               hash={this.props.poolHash}
               light
               linkType="pool"
-              tooltipOpensUpward // otherwise it overlaps with amount field
+              placementTooltip="top-start"
             >
               <RawHash light>
                 {this.props.poolHash}

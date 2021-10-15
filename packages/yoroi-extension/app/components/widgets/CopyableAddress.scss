@@ -26,16 +26,6 @@
   }
 }
 
-.SimpleTooltip {
-  :global(.SimpleBubble_root:not(.SimpleBubble_openUpward))  {
-    margin-top: -5px !important;
-  }
-  div[data-bubble-container] {
-    transform: translate(-50%, 0); // center the tooltip no matter how long is the text inside
-    margin-left: 20px; // offset = horizontal padding of icon and tooltip
-  }
-}
-
 .componentDark {
   background-color: var(--theme-page-background-color);
   display: flex;

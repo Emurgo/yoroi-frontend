@@ -196,7 +196,7 @@ export default class UpcomingRewards extends Component<Props> {
       <CustomTooltip
         key={pool.id[0] + pool.id[1]}
         toolTip={<div className={styles.poolInfoToolTip}>{tooltip}</div>}
-        isOpeningUpward={false}
+        placementTooltip="bottom"
         isPoolAvatar
       >
         <div className={styles.poolBox} key={pool.id[0] + pool.id[1]}>

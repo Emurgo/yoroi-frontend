@@ -94,6 +94,7 @@ export default class StandardHeader extends Component<Props> {
             elementId={mainAddressNotificationId}
             onCopyAddress={() => onCopyAddressTooltip(walletAddress, mainAddressNotificationId)}
             notification={notification}
+            placementTooltip="bottom-start"
           >
             <ExplorableHashContainer
               selectedExplorer={this.props.selectedExplorer}

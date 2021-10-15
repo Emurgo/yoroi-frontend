@@ -3,23 +3,6 @@
   display: flex;
   align-items: center;
   height: 100%;
-
-  :global(.SimpleBubble_bubble) {
-    font-size: 12px;
-    font-family: var(--font-regular);
-    color: white;
-    background-color: rgba(56, 57, 61, 0.7); // #38393D
-
-    // size tooltip to text contained inside
-    min-width: auto;
-    padding: 4px 12px 4px 12px !important;
-
-    // use this to vertical-align
-    line-height: 22px;
-  }
-  :global(.SimpleBubble_root:not(.SimpleBubble_openUpward))  {
-    margin-top: -8px !important;
-  }
 }
 
 .content {
@@ -73,10 +56,4 @@
   font-family: var(--font-regular);
   font-size: 12px;
   line-height: 20px;
-}
-
-.tooltip {
-  font-family: var(--font-regular);
-  font-size: 12px;
-  line-height: 22px;
 }

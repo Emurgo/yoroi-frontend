@@ -9,7 +9,7 @@
   }
 
   .button {
-    bottom: 20px;
+    bottom: 44px;
     color: var(--theme-label-button-color);
     cursor: pointer;
     font-family: var(--font-light);
@@ -23,10 +23,6 @@
       opacity: 1;
     }
   }
-
-  .icon svg {
-    vertical-align: bottom;
-  }  
 }
 
 :global(.YoroiModern) .component {
@@ -41,6 +37,6 @@
 
 :global(.YoroiClassic) .component {
   .button {
-    bottom: 35px;
-  }  
+    bottom: 44px;
+  }
 }

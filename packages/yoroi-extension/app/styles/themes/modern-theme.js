@@ -75,5 +75,9 @@ export const modernTheme: Object = createTheme({
   },
   typography: {
     fontFamily: 'Rubik, sans-serif',
+    tooltip: {
+      fontWeight: 400,
+      fontSize: '0.75rem',
+    }
   },
 });
