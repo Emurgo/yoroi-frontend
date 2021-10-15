@@ -6,6 +6,7 @@ import { modernTheme } from './themes/modern-theme';
 export const THEMES = Object.freeze({
   YOROI_CLASSIC: 'YoroiClassic',
   YOROI_MODERN: 'YoroiModern',
+  YOROI_REVAMP: 'YoroiRevamp',
 });
 
 export type Theme = $Values<typeof THEMES>;
@@ -13,6 +14,7 @@ export type Theme = $Values<typeof THEMES>;
 export const MuiThemes: {| [Theme]: Object |} = Object.freeze({
   [THEMES.YOROI_CLASSIC]: classicTheme,
   [THEMES.YOROI_MODERN]: modernTheme,
+  [THEMES.YOROI_REVAMP]: modernTheme,
 });
 
 // Refer: https://github.com/Emurgo/yoroi-frontend/pull/497
