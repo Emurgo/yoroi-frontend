@@ -1,7 +1,7 @@
 .component {
   text-align: center;
   line-height: 22px;
-  color: #2B2C32;
+  color: var(--yoroi-palette-gray-900);
 
   .title {
     font-weight: 500;

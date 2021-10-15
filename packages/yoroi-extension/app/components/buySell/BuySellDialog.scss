@@ -32,13 +32,13 @@
     flex: 7;
 
     .nameAndCurrency {
-      color: #242838;
+      color: var(--yoroi-palette-gray-900);
       font-size: 16px;
       letter-spacing: 0;
       line-height: 22px;
     }
     .address {
-      color: #6b7384;
+      color: var(--yoroi-palette-gray-600);
       font-size: 14px;
       letter-spacing: 0;
       line-height: 22px;

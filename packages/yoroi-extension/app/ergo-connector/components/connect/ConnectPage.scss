@@ -54,7 +54,7 @@
     }
     label {
       width: 100%;
-      color: #242838;
+      color: var(--yoroi-palette-gray-900);
     }
   }
 }
@@ -65,7 +65,7 @@
   padding-right: 32px;
 
   .infoText {
-    color: #6b7384;
+    color: var(--yoroi-palette-gray-600);
     font-size: 12px;
     margin-bottom: 32px;
     line-height: 20px;

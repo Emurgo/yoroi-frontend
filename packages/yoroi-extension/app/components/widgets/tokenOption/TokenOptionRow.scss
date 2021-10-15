@@ -7,7 +7,7 @@
 }
 
 .headerText {
-  color: #6B7384;
+  color: var(--yoroi-palette-gray-600);
   font-weight: 400;
   font-size: 14px;
   letter-spacing: 0;
@@ -20,7 +20,7 @@
 
 .rowText {
   flex-wrap: wrap;
-  color: #242838;
+  color: var(--yoroi-palette-gray-900);
   font-family: 'RobotoMono';
   font-weight: 400;
   font-size: 16px;
@@ -41,7 +41,7 @@
 
 .item_id {
   flex: 100%;
-  color: #6B7384;
+  color: var(--yoroi-palette-gray-600);
   font-size: 14px;
   letter-spacing: 0;
   line-height: 22px;
