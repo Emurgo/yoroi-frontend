@@ -35,6 +35,41 @@
        
     }
 
+    .lockedAssets {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        .lockedAssetsAmount {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            background-color: var(--theme-nav-item-background-color);
+            border-radius: 8px;
+            width: auto;
+            padding: 7px 15px;
+            margin-left: -15px;
+            font-size: 16px;
+            line-height: 24px;
+        }
+        
+        .label {
+            color: var(--theme-wallet-dropdown-secondary-text-color)
+        }
+
+        .beforeDecimal, .tokenName {
+            font-family: var(--font-medium);
+        }
+
+        .tokenName {
+            margin-left: 2px;
+            display: inline-block;
+        }
+
+        .afterDecimal {
+            font-family: var(--font-regular);
+        }
+    }
+
     .columns {
         display: grid;
         grid-template-columns: 3fr 2fr 3fr;
