@@ -30,7 +30,6 @@ import NavBarTitle from '../../components/topbar/NavBarTitle';
 import SubMenu from '../../components/topbar/SubMenu';
 import type { GeneratedData as NavBarContainerRevampData } from '../NavBarContainerRevamp';
 import WalletSyncingOverlay from '../../components/wallet/syncingOverlay/WalletSyncingOverlay';
-import { isErgo } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 export type GeneratedData = typeof Wallet.prototype.generated;
 
@@ -183,7 +182,7 @@ class Wallet extends Component<AllProps> {
             }))}
         >
           {this.props.children}
-          {isErgo(selectedWallet.getParent().getNetworkInfo()) && this.renderOverlay()}
+          {this.renderOverlay()}
         </WalletWithNavigation>
       </TopBarLayout>
     );

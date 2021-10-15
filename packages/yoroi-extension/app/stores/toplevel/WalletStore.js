@@ -35,7 +35,7 @@ import { getApiForNetwork } from '../../api/common/utils';
 import { Bip44Wallet } from '../../api/ada/lib/storage/models/Bip44Wallet/wrapper';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
-import { getCurrentWalletFromLS, updateSyncedWallets } from '../../utils/localStorage';
+import { getCurrentWalletFromLS, markExistingWalletsAsSynced, updateSyncedWallets } from '../../utils/localStorage';
 
 type GroupedWallets = {|
   publicDerivers: Array<PublicDeriver<>>,
@@ -215,12 +215,8 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
 
   refreshWalletFromRemote: (PublicDeriver<>) => Promise<void> = async publicDeriver => {
     try {
-      /** 
-       * Check if the wallet is syncing for the first time then mark it as synced 
-       * if the wallet was not stored or was stored and is not done syncing 
-       * -> show the overlay that pervent user from performing any transaction
-      */
-      const wallet = await getCurrentWalletFromLS(publicDeriver)
+      await markExistingWalletsAsSynced(this.stores.wallets.publicDerivers)
+      const wallet = await getCurrentWalletFromLS(publicDeriver);
       if (!wallet || !wallet.isSynced) {
         runInAction(() => {
           this.firstSync = true
