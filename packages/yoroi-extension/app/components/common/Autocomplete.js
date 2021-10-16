@@ -1,10 +1,10 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable react/no-array-index-key */
 // @flow
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import type { Node } from 'react';
 import { useCombobox, useMultipleSelection } from 'downshift';
-import { Input, Box, InputLabel, FormControl, FormHelperText, Chip } from '@mui/material';
+import { Input, Box, InputLabel, FormControl, FormHelperText, Chip, useTheme } from '@mui/material';
 import { styled } from '@mui/system';
 import { slice } from 'lodash';
 import SuccessIcon from '../../assets/images/forms/done.inline.svg';
@@ -12,22 +12,25 @@ import ErrorIcon from '../../assets/images/forms/error.inline.svg';
 import CloseIcon from '../../assets/images/close-chip.inline.svg';
 
 type Props = {|
-  +options: Array<any>,
-  +maxSelections: number,
-  +done: boolean,
-  +disabled: boolean,
-  +error: ?boolean,
-  +maxVisibleOptions: number,
-  +noResultsMessage: string,
+  +options: Array<string>,
+  +maxSelections?: number,
+  +done?: boolean,
+  +disabled?: boolean,
+  +error?: boolean,
+  +maxVisibleOptions?: number,
+  +noResultsMessage?: string,
   +id: string,
   +placeholder: string,
   +label: string,
-  +preselectedOptions: Array<any>,
-  +onChange: () => void,
-  +value: Array<any>,
+  +onChange: (Array<string>) => void,
+  +value: Array<string>,
+  +autoFocus?: boolean,
+  +type: string,
+  +name: string,
+  +chipProps?: Object,
 |};
 
-export default function Autocomplete({
+function Autocomplete({
   options,
   maxSelections,
   done,
@@ -37,12 +40,16 @@ export default function Autocomplete({
   label,
   disabled,
   id,
-  // onChange,
-  // value: selectedItems,
+  onChange,
+  value,
+  autoFocus,
+  type,
+  name,
   placeholder,
+  chipProps,
 }: Props): Node {
   const [inputValue, setInputValue] = useState<string>('');
-
+  const inputRef = useRef();
   const filteredList = options.filter(
     item => !inputValue || item.toLowerCase().includes(inputValue.toLowerCase())
   );
@@ -53,8 +60,11 @@ export default function Autocomplete({
     getDropdownProps,
     addSelectedItem,
     removeSelectedItem,
-    selectedItems,
-  } = useMultipleSelection();
+  } = useMultipleSelection({
+    onSelectedItemsChange: ({ selectedItems }) => {
+      onChange(selectedItems);
+    },
+  });
 
   const {
     isOpen,
@@ -64,15 +74,15 @@ export default function Autocomplete({
     getComboboxProps,
     highlightedIndex,
     getItemProps,
-    toggleMenu,
+    openMenu,
   } = useCombobox({
     inputValue,
     defaultHighlightedIndex: 0,
     selectedItem: null,
     items: filteredList,
     stateReducer: (state, actionAndChanges) => {
-      const { changes, type } = actionAndChanges;
-      switch (type) {
+      const { changes, type: actionType } = actionAndChanges;
+      switch (actionType) {
         case useCombobox.stateChangeTypes.InputKeyDownEnter:
         case useCombobox.stateChangeTypes.ItemClick:
         case useCombobox.stateChangeTypes.InputChange:
@@ -93,7 +103,8 @@ export default function Autocomplete({
         case useCombobox.stateChangeTypes.InputKeyDownEnter:
         case useCombobox.stateChangeTypes.ItemClick:
         case useCombobox.stateChangeTypes.InputBlur:
-          if (selectedItem && selectedItems.length < maxSelections) {
+          // $FlowFixMe[invalid-compare]
+          if (selectedItem && value.length < maxSelections) {
             setInputValue('');
             addSelectedItem(selectedItem);
           }
@@ -103,14 +114,41 @@ export default function Autocomplete({
       }
     },
   });
-
+  const theme = useTheme();
   return (
-    <StyledFormControl error={Boolean(error)} disabled={disabled} fullWidth>
-      <InputLabel htmlFor={id ?? 'autocomplete-combobox'} {...getLabelProps()}>
+    <StyledFormControl
+      error={Boolean(error)}
+      // $FlowFixMe[invalid-compare]
+      disabled={disabled === true || value.length >= maxSelections}
+      fullWidth
+    >
+      <InputLabel
+        sx={{
+          position: theme.name === 'classic' ? 'relative' : 'absolute',
+          top: theme.name === 'classic' ? 'unset' : 'initial',
+          marginBottom: theme.name === 'classic' ? '10px' : 0,
+          '&.MuiInputLabel-shrink': {
+            padding: theme.name === 'classic' ? 0 : '0 6px',
+            background: 'white',
+          },
+        }}
+        {...(value.length || theme.name === 'classic' ? { shrink: true } : {})}
+        htmlFor={id ?? 'autocomplete-combobox'}
+        {...getLabelProps()}
+      >
         {label}
       </InputLabel>
-      <InputWrapper onClick={toggleMenu} error={error} isOpen={isOpen}>
-        {selectedItems.map((selectedItem, index) => (
+      <InputWrapper
+        onClick={() => {
+          if (!isOpen) {
+            inputRef.current?.focus();
+            openMenu();
+          }
+        }}
+        error={error}
+        isOpen={isOpen}
+      >
+        {value.map((selectedItem, index) => (
           <Chip
             variant="autocomplete"
             key={`selected-item-${index}`}
@@ -119,26 +157,40 @@ export default function Autocomplete({
               removeSelectedItem(selectedItem);
             }}
             deleteIcon={<CloseIcon />}
+            {...chipProps}
             {...getSelectedItemProps({ selectedItem, index })}
           />
         ))}
-        <Box sx={{ flex: 1 }} {...getComboboxProps()}>
+        <Box {...getComboboxProps()}>
           <Input
-            placeholder={selectedItems.length >= maxSelections ? '' : placeholder}
-            disabled={selectedItems.length >= maxSelections}
+            color="input"
+            // $FlowFixMe[invalid-compare]
+            placeholder={value.length >= maxSelections ? '' : placeholder}
+            // $FlowFixMe[invalid-compare]
+            disabled={value.length >= maxSelections}
             disableUnderline
             fullWidth
+            autoFocus={autoFocus}
             error={Boolean(error)}
             id={id ?? 'autocomplete-combobox'}
-            {...getInputProps(getDropdownProps({ preventKeyAction: isOpen }))}
+            {...getInputProps({
+              inputRef,
+              type,
+              name,
+              autoFocus,
+              ...getDropdownProps(),
+            })}
           />
         </Box>
-        <Box display="flex" alignItems="center">
+        <CheckWrapper>
           {done === true ? <SuccessIcon /> : null}
           {Boolean(error) === true ? <ErrorIcon /> : null}
-        </Box>
+        </CheckWrapper>
       </InputWrapper>
-      <FormHelperText sx={{ marginLeft: 0 }} id={id ?? 'autocomplete-combobox'}>
+      <FormHelperText
+        sx={{ position: 'absolute', bottom: 0, marginLeft: theme.name === 'classic' && 0 }}
+        id={id ?? 'autocomplete-combobox'}
+      >
         {error}
       </FormHelperText>
 
@@ -146,14 +198,14 @@ export default function Autocomplete({
         component="ul"
         {...getMenuProps()}
         sx={{
-          border: isOpen ? '1px solid hsl(214deg 16% 81%)' : 'none',
+          border: isOpen ? '1px solid #c7ced6' : 'none',
         }}
       >
         {isOpen && !sliceArrayItems.length ? (
           <Box
             sx={{
               padding: '14px 20px',
-              bgcolor: 'white',
+              bgcolor: '#fff',
             }}
           >
             {noResultsMessage}
@@ -166,7 +218,7 @@ export default function Autocomplete({
                   key={`${item}${index}`}
                   sx={{
                     padding: '14px 20px',
-                    backgroundColor: highlightedIndex === index ? 'hsl(204 20% 95%)' : 'white',
+                    backgroundColor: highlightedIndex === index ? '#f0f3f5' : '#fff',
                     cursor: 'pointer',
                   }}
                   {...getItemProps({
@@ -183,22 +235,54 @@ export default function Autocomplete({
     </StyledFormControl>
   );
 }
+export default Autocomplete;
 
-const StyledFormControl = styled(FormControl)({
-  marginTop: '23px',
-  paddingBottom: '12px',
-  color: 'hsl(237 37% 11%)',
+Autocomplete.defaultProps = {
+  maxSelections: 10,
+  done: false,
+  disabled: false,
+  error: false,
+  autoFocus: false,
+  maxVisibleOptions: 10,
+  noResultsMessage: '',
+  chipProps: null,
+};
+
+const StyledFormControl = styled(FormControl)(({ theme }) => ({
+  marginTop: theme.name === 'classic' ? 0 : '12px',
+  marginBottom: '10px',
+  paddingBottom: '24px',
+  '& .MuiInputLabel-root': {
+    '&.Mui-focused ': {
+      color: 'var(--mui-input-text-color)',
+    },
+    '&.MuiInputLabel-shrink ': {
+      color: 'var(--mui-input-placeholder-color)',
+    },
+    '&.Mui-error': {
+      color: 'var(--mui-input-border-color-error)',
+    },
+  },
+}));
+
+const CheckWrapper = styled(Box)({
+  display: 'flex',
+  minWidth: '35px',
+  position: 'absolute',
+  right: 0,
+  top: '50%',
+  transform: 'translateY(-50%)',
 });
 
 const ULList = styled(Box)({
   width: '100%',
-  background: 'hsl(240deg 9% 96%)',
+  background: '#f4f4f6',
   margin: 0,
   borderTop: 0,
   position: 'absolute',
   zIndex: 1000,
   left: 0,
-  top: '87%',
+  top: '100%',
   maxHeight: '30rem',
   overflowY: 'auto',
   overflowX: 'hidden',
@@ -206,38 +290,37 @@ const ULList = styled(Box)({
   transition: 'opacity .1s ease',
   borderRadius: 0,
 });
+
 const InputWrapper = styled('div')(
   ({ theme, error, isOpen }) => `
   width: 100%;
   border: 1px solid ${
     error
-      ? 'hsl(354deg 79% 61%)'
+      ? '#ea4d5d'
       : isOpen
-      ? 'hsl(237deg 37% 11%)'
+      ? '#121326'
       : theme.name === 'classic'
-      ? 'hsl(214 16% 81%)'
+      ? '#c7ced6'
       : 'var(--mui-input-border-color)'
   };
   border-radius: ${theme.name === 'classic' ? '0' : '8px'};
-  background-color: ${theme.name === 'classic' ? 'hsl(240 9% 96%)' : 'white'};
+  background-color: ${theme.name === 'classic' ? '#f4f4f6' : 'white'};
   min-height: ${theme.name === 'classic' ? '73px' : '140px'};
   align-content: baseline;
   display: inline-flex;
-  padding: 0 10px 10px 2px;
+  padding: 10px;
+  padding-right: 40px;
+  padding-left: 5px;
   flex-wrap: wrap;
+  position: relative;
+  cursor: text;
 
   & input {
     background-color: transparent;
-    color: ${theme.name === 'classic' ? 'hsl(237 37% 11%)' : 'rgba(0,0,0,.85)'};
-    height: 30px;
-    color: hsl(225deg 4% 30%);
-    font-weight: 300;
-    font-size: 0.9rem;
+    color: ${theme.name === 'classic' ? '#121326' : '#000000d9'};
+    font-size: 1rem;
     padding: 4px 6px;
     letter-spacing: 0;
-    border: 0;
-    margin: 0;
-    outline: 0;
   }
 `
 );
