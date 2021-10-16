@@ -85,7 +85,9 @@ class ThemeSettingsBlock extends Component<AllProps> {
     ]);
 
     const themeYoroiModernClasses = classnames([
-      currentTheme === THEMES.YOROI_MODERN ? styles.active : styles.inactive,
+      currentTheme === THEMES.YOROI_MODERN || currentTheme === THEMES.YOROI_REVAMP
+        ? styles.active
+        : styles.inactive,
       styles.themeImageWrapper,
     ]);
 
