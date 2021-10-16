@@ -2,7 +2,6 @@
 const ClassicTextField = {
   styleOverrides: {
     root: {
-      // minWidth: 400,
       width: '100%',
       borderColor: 'var(--mui-input-border-color)',
       marginTop: '24px',
@@ -32,6 +31,7 @@ const ClassicTextField = {
           borderColor: 'var(--mui-input-border-color)',
           borderRadius: 0,
           backgroundColor: 'var(--mui-input-bg-color)',
+          letterSpacing: 'initial',
         },
         '&:hover fieldset': {
           borderColor: 'var(--mui-input-border-color-focus)',
@@ -61,15 +61,11 @@ const ClassicTextField = {
   },
   defaultProps: {
     variant: 'outlined',
-    InputLabelProps: {
-      shrink: false,
-    },
   },
 };
 const ModernTextField = {
   styleOverrides: {
     root: {
-      minWidth: 400,
       borderColor: 'var(--mui-input-border-color)',
       '& label': {
         color: 'var(--mui-input-placeholder-color)',
@@ -92,6 +88,7 @@ const ModernTextField = {
           borderColor: 'var(--mui-input-border-color)',
           borderRadius: 8,
           backgroundColor: 'var(--mui-input-bg-color)',
+          letterSpacing: 'initial',
         },
         '&:hover fieldset': {
           borderColor: 'var(--mui-input-border-color-focus)',
@@ -114,7 +111,7 @@ const ModernTextField = {
       },
       '& .MuiFormHelperText-root': {
         letterSpacing: '0.4px',
-        marginLeft: 0,
+        marginLeft: '14px',
         fontWeight: 400,
         position: 'absolute',
         bottom: '-2px',
