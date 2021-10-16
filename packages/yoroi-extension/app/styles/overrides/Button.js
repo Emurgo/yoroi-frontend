@@ -70,6 +70,7 @@ const ClassicButton = {
         },
         '&.Mui-disabled': {
           backgroundColor: 'var(--mui-danger-button-background-color-disabled)',
+          color: 'white',
         },
         '& .MuiLoadingButton-loadingIndicator': {
           color: 'var(--mui-danger-button-background-color)',
@@ -155,6 +156,7 @@ const ModernButton = {
         },
         '&.Mui-disabled': {
           backgroundColor: 'var(--mui-danger-button-background-color-disabled)',
+          color: 'white',
         },
         '& .MuiLoadingButton-loadingIndicator': {
           color: 'var(--mui-danger-button-background-color)',
