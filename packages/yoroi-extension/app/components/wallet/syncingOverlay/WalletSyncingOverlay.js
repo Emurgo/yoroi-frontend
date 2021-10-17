@@ -2,7 +2,7 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { intlShape } from 'react-intl';
+import { intlShape, defineMessages } from 'react-intl';
 import styles from './WalletSyncingOverlay.scss';
 import Dialog from '../../widgets/Dialog';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
@@ -14,6 +14,20 @@ type Props = {|
   +onClose: void => PossiblyAsync<void>,
 |};
 
+const messages = defineMessages({
+  title: {
+    id: 'wallet.syncingOverlay.title',
+    defaultMessage: '!!!Wallet Syncing',
+  },
+  explanation: {
+    id: 'wallet.syncingOverlay.explanation',
+    defaultMessage: '!!!We are proccessing you wallet data. This is may take time. Please wait...'
+  },
+  returnBtnLabel: {
+    id: 'wallet.syncingOverlay.return',
+    defaultMessage: '!!!Return to my wallets'
+  }
+})
 @observer
 export default class WalletSyncingOverlay extends Component<Props> {
 
@@ -22,10 +36,11 @@ export default class WalletSyncingOverlay extends Component<Props> {
   };
 
   render(): Node {
+    const { intl } = this.context;
     const actions = this.props.onClose == null
       ? undefined
       : [{
-        label: 'Return to my wallets',
+        label: intl.formatMessage(messages.returnBtnLabel),
         onClick: this.props.onClose,
         primary: true
       }];
@@ -43,10 +58,10 @@ export default class WalletSyncingOverlay extends Component<Props> {
           <div>
             <div className={styles.successImg} />
             <div className={styles.title}>
-              {'Wallet Syncing'}
+              {intl.formatMessage(messages.title)}
             </div>
             <div className={styles.text}>
-              {'Please wait....'}
+             {intl.formatMessage(messages.explanation)}
             </div>
             <div className={styles.spinnerSection}>
               <LoadingSpinner />
