@@ -97,7 +97,12 @@ class Wallet extends Component<AllProps> {
 
   renderOverlay(): null | React$Element<typeof WalletSyncingOverlay> {
     if (this.generated.stores.wallets.firstSync) {
-      return <WalletSyncingOverlay classicTheme={this.generated.stores.profile.isClassicTheme} onClose={() => this.navigateToWallets(ROUTES.MY_WALLETS)}/>
+      return (
+        <WalletSyncingOverlay 
+          classicTheme={this.generated.stores.profile.isClassicTheme} 
+          onClose={() => this.navigateToWallets(ROUTES.MY_WALLETS)} 
+        />
+      )
     }
     return null
   }

@@ -1,7 +1,7 @@
 //@flow
 import type { PublicDeriver } from "../api/ada/lib/storage/models/PublicDeriver";
-import { asGetPublicKey } from '../../app/api/ada/lib/storage/models/PublicDeriver/traits';
-  
+import { asGetPublicKey } from "../api/ada/lib/storage/models/PublicDeriver/traits";
+
 type SyncedWallet = {|
     publicKey: string,
     isSynced: boolean,
@@ -54,7 +54,7 @@ export const removeWalletFromLS = async (publicDeriver: PublicDeriver<>): Promis
 export const updateSyncedWallets = async (publicDeriver: PublicDeriver<>): Promise<void> => {
     const syncedWallet = await createSyncedWalletObj(publicDeriver);
     const syncedWallets = getSyncedWallets()
-    const wallet = syncedWallets.wallets.find(wallet => compareWallets(wallet, syncedWallet))
+    const wallet = syncedWallets.wallets.find(w => compareWallets(w, syncedWallet))
     if (wallet) {
         wallet.isSynced = true
     } else {
@@ -72,7 +72,7 @@ export const updateSyncedWallets = async (publicDeriver: PublicDeriver<>): Promi
 export const markExistingWalletsAsSynced = async (publicDerivers: PublicDeriver<>[]): Promise<void> => {
     const syncedWallets = getSyncedWallets()
     if (!syncedWallets.isFirstTime) return
-    for (let publicDeriver of publicDerivers) {
+    for (const publicDeriver of publicDerivers) {
         const syncedWallet = await createSyncedWalletObj(publicDeriver)
         syncedWallets.wallets.push(syncedWallet)
     }
