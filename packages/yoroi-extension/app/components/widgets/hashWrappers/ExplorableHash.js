@@ -40,7 +40,7 @@ export default class ExplorableHash extends Component<Props> {
       <Tooltip
         className={styles.component}
         title={
-          <Typography variant="tooltip">
+          <Typography variant="body3">
             <FormattedMessage {...messages.websiteTip} values={{ websiteName }} />
           </Typography>
         }

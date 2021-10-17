@@ -1,0 +1,102 @@
+// @flow
+import { createTheme } from '@mui/material/styles';
+
+/* Common settings for colors, typography, shapes */
+export const commonTheme: Object = createTheme({
+  palette: {
+    error: {
+      main: '#FF1351',
+      '50': '#FFF3F5',
+      '100': '#FF1351',
+      '200': '#CD0E41',
+    },
+    warning: {
+      main: '#f6a823',
+    },
+    cyan: {
+      '50': '#F2F9FF',
+      '100': '#59B1F4',
+    },
+    gray: {
+      '50': '#F0F3F5',
+      '100': '#EAEDF2',
+      '200': '#DCE0E9',
+      '300': '#C4CAD7',
+      '400': '#A7AFC0',
+      '500': '#8A92A3',
+      '600': '#6B7384',
+      '700': '#4A5065',
+      '800': '#383E54',
+      '900': '#242838',
+    },
+    background: {
+      overlay: '#060d23cc', // dialogs
+    },
+    txStatus: {
+      pending: {
+        background: '#d8dcdf',
+        text: '#303136',
+      },
+      high: {
+        background: '#c9ede5',
+        text: '#17cfa7',
+      },
+      failed: {
+        background: '#ff145380',
+        text: '#e6003d',
+      },
+      medium: {
+        background: '#f5a5244d',
+        text: '#f5a524',
+      },
+      low: {
+        background: '#ff145326',
+        text: '#fa618a',
+      },
+    },
+  },
+  typography: {
+    h1: {
+      fontWeight: 500,
+      fontSize: '1.875rem',
+    },
+    h2: {
+      fontWeight: 500,
+      fontSize: '1.75rem',
+    },
+    h3: {
+      fontWeight: 500,
+      fontSize: '1.5rem',
+    },
+    h4: {
+      fontWeight: 500,
+      fontSize: '1.25rem',
+    },
+    h5: {
+      fontWeight: 500,
+      fontSize: '1.125rem',
+    },
+    h6: {
+      fontWeight: 500,
+      fontSize: '1rem',
+      textTransform: 'uppercase',
+    },
+    h7: {
+      fontWeight: 500,
+      fontSize: '0.875rem',
+      textTransform: 'uppercase',
+    },
+    body1: {
+      fontWeight: 400,
+      fontSize: '1rem',
+    },
+    body2: {
+      fontWeight: 400,
+      fontSize: '0.875rem',
+    },
+    body3: {
+      fontWeight: 400,
+      fontSize: '0.75rem',
+    },
+  },
+});

@@ -53,7 +53,7 @@ function CheckboxLabel({
           <Typography
             marginBottom={description !== null ? '8px' : 0}
             sx={{
-              color: 'var(--mui-checkbox-label-text-color)',
+              color: 'var(--component-checkbox-text)',
               fontWeight: 300,
               ...(labelSx !== null && labelSx),
             }}

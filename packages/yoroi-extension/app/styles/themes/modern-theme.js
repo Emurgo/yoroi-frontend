@@ -5,6 +5,9 @@ import {
   ModernButton,
   ModernCheckbox,
   ModernTextField,
+  ModernOutlinedInput,
+  ModernFormHelperText,
+  ModernFormControl,
   ModernMenu,
   ModernMenuItem,
   ModernTabs,
@@ -14,70 +17,58 @@ import {
   ModernInputLabel,
   ModernSelect,
 } from '../overrides';
+import { commonTheme } from './common-theme';
 
-export const modernTheme: Object = createTheme({
-  name: 'modern',
-  components: {
-    MuiCssBaseline: {
-      styleOverrides: `
+export const modernTheme: Object = createTheme(
+  {
+    name: 'modern',
+    components: {
+      MuiCssBaseline: {
+        styleOverrides: `
         ${RubikFonts}
         ${RobotoMonoFonts}
       `,
+      },
+      MuiButton: ModernButton,
+      MuiCheckbox: ModernCheckbox,
+      MuiTextField: ModernTextField,
+      MuiOutlinedInput: ModernOutlinedInput,
+      MuiFormHelperText: ModernFormHelperText,
+      MuiFormControl: ModernFormControl,
+      MuiSelect: ModernSelect,
+      MuiInputLabel: ModernInputLabel,
+      MuiMenu: ModernMenu,
+      MuiMenuItem: ModernMenuItem,
+      MuiTabs: ModernTabs,
+      MuiTabPanel: ModernTabPanel,
+      MuiChip: ModernChip,
+      MuiTooltip: ModernTooltip,
     },
-    MuiButton: ModernButton,
-    MuiCheckbox: ModernCheckbox,
-    MuiTextField: ModernTextField,
-    MuiSelect: ModernSelect,
-    MuiInputLabel: ModernInputLabel,
-    MuiMenu: ModernMenu,
-    MuiMenuItem: ModernMenuItem,
-    MuiTabs: ModernTabs,
-    MuiTabPanel: ModernTabPanel,
-    MuiChip: ModernChip,
-    MuiTooltip: ModernTooltip,
-  },
-  palette: {
-    primary: {
-      main: 'hsl(232, 100%, 64%)',
+    palette: {
+      /* `main` is added since MUI required it but we don't use it at all */
+      primary: {
+        main: '#3154CB',
+        '50': '#F0F2FB',
+        '100': '#164FD6',
+        '200': '#3154CB',
+        '300': '#1A44B7',
+        contrastText: '#FFF',
+      },
+      secondary: {
+        main: '#16E3BA',
+        '50': '#F4FDFA', // ?
+        '100': '#C9ECE5', // light
+        '200': '#16E3BA', // main - hover btn color -
+        '300': '#17D1AA', // dark
+        contrastText: '#FFF',
+      },
     },
-    secondary: {
-      main: 'hsl(167, 80%, 45%)',
-      light: 'hsl(168deg 82% 49% / 10%)',
-      dark: 'hsl(168 82% 49%)',
-      disabled: 'rgb(201 237 229)',
-      contrastText: 'hsl(0deg 0% 100%)',
+    shape: {
+      borderRadius: 8,
     },
-    error: {
-      main: 'hsl(345, 100%, 54%)',
-    },
-    warning: {
-      main: 'hsl(38, 92%, 55%)',
-    },
-    input: {
-      main: 'hsl(0 0% 61%)',
-      dark: 'hsl(0 0% 29%)',
-    },
-    grey: {
-      '50': 'hsl(201, 22%, 95%)',
-      '100': 'hsl(216, 26%, 93%)',
-      '200': 'hsl(219, 23%, 89%)',
-      '300': 'hsl(222, 19%, 81%)',
-      '400': 'hsl(221, 17%, 70%)',
-      '500': 'hsl(221, 12%, 59%)',
-      '600': 'hsl(221, 10%, 47%)',
-      '700': 'hsl(228, 15%, 34%)',
-      '800': 'hsl(229, 20%, 28%)',
-      '900': 'hsl(228, 22%, 18%)',
+    typography: {
+      fontFamily: 'Rubik, sans-serif',
     },
   },
-  shape: {
-    borderRadius: 8,
-  },
-  typography: {
-    fontFamily: 'Rubik, sans-serif',
-    tooltip: {
-      fontWeight: 400,
-      fontSize: '0.75rem',
-    },
-  },
-});
+  commonTheme
+);

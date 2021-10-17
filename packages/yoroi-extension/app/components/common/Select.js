@@ -1,7 +1,6 @@
 // @flow
 import type { Node } from 'react';
 import { FormControl, FormHelperText, InputLabel, Select as SelectBase } from '@mui/material';
-import { styled } from '@mui/system';
 import ArrowIcon from '../../assets/images/forms/arrow-dropdown.inline.svg';
 
 type Props = {|
@@ -11,8 +10,8 @@ type Props = {|
   formControlProps?: Object,
   shrink?: boolean,
   disabled?: boolean,
-  labelSx?: Object,
   menuProps?: Object,
+  labelProps?: Object,
   helperText?: string,
   options: Array<Object>,
 |};
@@ -23,25 +22,15 @@ function Select({
   onChange,
   helperText,
   formControlProps,
-  labelSx,
   menuProps,
   shrink,
   disabled,
+  labelProps,
   ...props
 }: Props): Node {
   return (
-    <SFormControl fullWidth disabled={disabled} {...formControlProps}>
-      <InputLabel
-        sx={{
-          color: 'var(--mui-input-text-color)',
-          '&.Mui-focused': {
-            color: 'var(--mui-input-text-color)',
-          },
-          ...(labelSx !== null && labelSx),
-        }}
-        shrink={shrink}
-        id={labelId}
-      >
+    <FormControl disabled={disabled} {...formControlProps}>
+      <InputLabel shrink={shrink} id={labelId} {...labelProps}>
         {label}
       </InputLabel>
       <SelectBase
@@ -62,20 +51,8 @@ function Select({
         }}
         {...props}
       />
-      {helperText !== null ? (
-        <FormHelperText
-          sx={{
-            position: 'absolute',
-            marginLeft: 0,
-            lineHeight: '1.33',
-            fontSize: '12px',
-            bottom: '-5px',
-          }}
-        >
-          {helperText}
-        </FormHelperText>
-      ) : null}
-    </SFormControl>
+      {helperText !== null ? <FormHelperText>{helperText}</FormHelperText> : null}
+    </FormControl>
   );
 }
 
@@ -83,23 +60,9 @@ export default Select;
 
 Select.defaultProps = {
   formControlProps: null,
-  labelSx: null,
   menuProps: null,
+  labelProps: null,
   helperText: null,
   shrink: true,
   disabled: false,
 };
-
-const SFormControl = styled(FormControl)(({ theme }) => ({
-  position: 'relative',
-  marginTop: theme.name === 'classic' ? '24px' : 0,
-  paddingBottom: '20px',
-  '& .MuiOutlinedInput-root': {
-    height: '50px',
-    '& fieldset': {
-      background: 'unset',
-      borderColor: 'var(--mui-input-border-color)',
-      borderRadius: theme.shape.borderRadius,
-    },
-  },
-}));

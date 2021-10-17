@@ -2,12 +2,11 @@
 const ClassicSelect = {
   styleOverrides: {
     icon: {
-      color: 'hsl(221 12% 59%)',
+      color: 'var(--component-menu-icon)',
       right: '15px',
     },
   },
   defaultProps: {
-    color: 'input',
     notched: false,
   },
 };
@@ -15,12 +14,11 @@ const ClassicSelect = {
 const ModernSelect = {
   styleOverrides: {
     icon: {
-      color: 'hsl(221 12% 59%)',
+      color: 'var(--component-menu-icon)',
       right: '15px',
     },
   },
   defaultProps: {
-    color: 'input',
     notched: true,
   },
 };
