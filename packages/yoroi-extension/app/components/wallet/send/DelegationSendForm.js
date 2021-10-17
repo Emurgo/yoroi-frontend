@@ -129,7 +129,6 @@ export default class DelegationSendForm extends Component<Props> {
               className="poolId"
               {...poolIdField.bind()}
               error={poolIdField.error || poolQueryError}
-              helperText={poolIdField.error || poolQueryError}
               done={poolIdField.isValid}
             />
           </div>

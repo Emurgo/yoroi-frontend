@@ -97,7 +97,6 @@ export default class PinInput extends Component<Props> {
           {...pinField.bind()}
           disabled={this.props.disabled}
           error={pinField.error}
-          helperText={pinField.error}
           done={this.props.done}
         />
       </div>

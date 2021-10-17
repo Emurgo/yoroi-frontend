@@ -78,7 +78,7 @@
   }
 }
 .errorMessage {
-  color: var(--rp-formfield-error-text-color, rgba(222, 50, 38, 0.5));
+  color: var(--component-input-error);
   padding: 10px 0;
   p {
     margin-top: 10px;

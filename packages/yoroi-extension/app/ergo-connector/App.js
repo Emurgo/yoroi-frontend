@@ -2,7 +2,6 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { ThemeProvider } from 'react-polymorph/lib/components/ThemeProvider';
 import { Router } from 'react-router-dom';
 import { addLocaleData, IntlProvider } from 'react-intl';
 import en from 'react-intl/locale-data/en';
@@ -19,8 +18,6 @@ import es from 'react-intl/locale-data/es';
 import it from 'react-intl/locale-data/it';
 import tr from 'react-intl/locale-data/tr';
 import { Routes } from './Routes';
-import { yoroiPolymorphTheme } from '../themes/PolymorphThemes';
-import { themeOverrides } from '../themes/overrides';
 import { translations } from '../i18n/translations';
 import type { StoresMap } from './stores';
 import type { ActionsMap } from './actions';
@@ -29,9 +26,9 @@ import ThemeManager from '../ThemeManager';
 import CrashPage from '../containers/CrashPage';
 import { Logger } from '../utils/logging';
 import type { RouterHistory } from 'react-router-dom';
-import { SimpleSkins } from 'react-polymorph/lib/skins/simple';
-import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
+import { ThemeProvider } from '@mui/material/styles';
 import { globalStyles } from '../styles/globalStyles';
+import { CssBaseline } from '@mui/material';
 
 // https://github.com/yahoo/react-intl/wiki#loading-locale-data
 addLocaleData([
@@ -84,8 +81,7 @@ class App extends Component<Props, State> {
       translations[locale]
     );
 
-    const themeVars = Object.assign(stores.profile.currentThemeVars, {
-    });
+    const themeVars = Object.assign(stores.profile.currentThemeVars, {});
     const currentTheme = stores.profile.currentTheme;
     const muiTheme = MuiThemes[currentTheme] ?? 'YoroiModern';
 
@@ -93,20 +89,14 @@ class App extends Component<Props, State> {
 
     return (
       <div style={{ height: '100%' }}>
-        <MuiThemeProvider theme={muiTheme}>
+        <ThemeProvider theme={muiTheme}>
+          <CssBaseline />
           {globalStyles(muiTheme)}
           <ThemeManager variables={themeVars} />
-          <ThemeProvider
-            key={currentTheme}
-            theme={yoroiPolymorphTheme}
-            skins={SimpleSkins}
-            themeOverrides={themeOverrides(currentTheme)}
-          >
-            <IntlProvider {...{ locale, key: locale, messages: mergedMessages }}>
-              {this.getContent()}
-            </IntlProvider>
-          </ThemeProvider>
-        </MuiThemeProvider>
+          <IntlProvider {...{ locale, key: locale, messages: mergedMessages }}>
+            {this.getContent()}
+          </IntlProvider>
+        </ThemeProvider>
       </div>
     );
   }

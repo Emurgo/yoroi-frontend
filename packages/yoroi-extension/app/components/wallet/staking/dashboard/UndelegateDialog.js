@@ -194,7 +194,6 @@ export default class UndelegateDialog extends Component<Props> {
             {...walletPasswordField.bind()}
             disabled={this.props.isSubmitting}
             error={walletPasswordField.error}
-            helperText={walletPasswordField.error}
           />
         </div>
         <div className={styles.headerBlock}>

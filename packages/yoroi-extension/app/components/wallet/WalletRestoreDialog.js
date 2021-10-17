@@ -383,7 +383,6 @@ export default class WalletRestoreDialog extends Component<Props> {
               {...walletNameField.bind()}
               done={walletNameField.isValid}
               error={walletNameField.error}
-              helperText={walletNameField.error}
             />
           )
         }
@@ -411,7 +410,6 @@ export default class WalletRestoreDialog extends Component<Props> {
                 {...paperPasswordField.bind()}
                 done={validatePaperPassword()}
                 error={paperPasswordField.error}
-                helperText={paperPasswordField.error}
               />
             </div>
           </div>
@@ -425,14 +423,12 @@ export default class WalletRestoreDialog extends Component<Props> {
                 {...walletPasswordField.bind()}
                 done={walletPasswordField.isValid}
                 error={walletPasswordField.error}
-                helperText={walletPasswordField.error}
               />
               <TextField
                 className="repeatedPassword"
                 {...repeatedPasswordField.bind()}
                 done={repeatPassword && repeatedPasswordField.isValid}
                 error={repeatedPasswordField.error}
-                helperText={repeatedPasswordField.error}
               />
             </div>
           </div>

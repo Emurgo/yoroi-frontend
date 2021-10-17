@@ -131,7 +131,6 @@ export default class SaveDialog extends Component<Props> {
           className={walletNameFieldClasses}
           {...walletNameField.bind()}
           error={walletNameField.error}
-          helperText={walletNameField.error}
           done={walletNameField.isValid}
         />
       </div>);

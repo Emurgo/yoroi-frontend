@@ -1,6 +1,6 @@
 @mixin error-message {
-  color: var(--rp-theme-color-error);
-  font-family: var(--rp-theme-font-regular);
+  color: var(--component-input-error);
+  font-weight: 400;
   font-size: 14px;
   line-height: 1.5em;
   letter-spacing: 0.5px;
