@@ -2,7 +2,7 @@
 const ClassicSelect = {
   styleOverrides: {
     icon: {
-      color: 'var(--component-menu-icon)',
+      color: 'var(--yoroi-comp-menu-icon)',
       right: '15px',
     },
   },
@@ -14,7 +14,7 @@ const ClassicSelect = {
 const ModernSelect = {
   styleOverrides: {
     icon: {
-      color: 'var(--component-menu-icon)',
+      color: 'var(--yoroi-comp-menu-icon)',
       right: '15px',
     },
   },

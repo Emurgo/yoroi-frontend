@@ -10,7 +10,6 @@ import { translations } from '../../../app/i18n/translations';
 import actions from '../../../app/ergo-connector/actions/index';
 import { Action } from '../../../app/actions/lib/Action';
 import App from '../../../app/ergo-connector/App';
-import '../../../app/themes/index.global.scss';
 import BigNumber from 'bignumber.js';
 import { addCloseListener, TabIdKeys } from '../../../app/utils/tabManager';
 

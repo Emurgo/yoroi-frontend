@@ -19,36 +19,36 @@ const ClassicChip = {
     {
       props: { variant: 'pending' },
       style: {
-        background: 'var(--th-palette-tx-status-pending-background)',
-        color: 'var(--th-palette-tx-status-pending-text)',
+        background: 'var(--yoroi-palette-tx-status-pending-background)',
+        color: 'var(--yoroi-palette-tx-status-pending-text)',
       },
     },
     {
       props: { variant: 'high' },
       style: {
-        background: 'var(--th-palette-tx-status-high-background)',
-        color: 'var(--th-palette-tx-status-high-text)',
+        background: 'var(--yoroi-palette-tx-status-high-background)',
+        color: 'var(--yoroi-palette-tx-status-high-text)',
       },
     },
     {
       props: { variant: 'failed' },
       style: {
-        background: 'var(--th-palette-tx-status-failed-background)',
-        color: 'var(--th-palette-tx-status-failed-text)',
+        background: 'var(--yoroi-palette-tx-status-failed-background)',
+        color: 'var(--yoroi-palette-tx-status-failed-text)',
       },
     },
     {
       props: { variant: 'medium' },
       style: {
-        background: 'var(--th-palette-tx-status-medium-background)',
-        color: 'var(--th-palette-tx-status-medium-text)',
+        background: 'var(--yoroi-palette-tx-status-medium-background)',
+        color: 'var(--yoroi-palette-tx-status-medium-text)',
       },
     },
     {
       props: { variant: 'low' },
       style: {
-        background: 'var(--th-palette-tx-status-low-background)',
-        color: 'var(--th-palette-tx-status-low-text)',
+        background: 'var(--yoroi-palette-tx-status-low-background)',
+        color: 'var(--yoroi-palette-tx-status-low-text)',
       },
     },
     {
@@ -102,36 +102,36 @@ const ModernChip = {
     {
       props: { variant: 'pending' },
       style: {
-        background: 'var(--th-palette-tx-status-pending-background)',
-        color: 'var(--th-palette-tx-status-pending-text)',
+        background: 'var(--yoroi-palette-tx-status-pending-background)',
+        color: 'var(--yoroi-palette-tx-status-pending-text)',
       },
     },
     {
       props: { variant: 'high' },
       style: {
-        background: 'var(--th-palette-tx-status-high-background)',
-        color: 'var(--th-palette-tx-status-high-text)',
+        background: 'var(--yoroi-palette-tx-status-high-background)',
+        color: 'var(--yoroi-palette-tx-status-high-text)',
       },
     },
     {
       props: { variant: 'failed' },
       style: {
-        background: 'var(--th-palette-tx-status-failed-background)',
-        color: 'var(--th-palette-tx-status-failed-text)',
+        background: 'var(--yoroi-palette-tx-status-failed-background)',
+        color: 'var(--yoroi-palette-tx-status-failed-text)',
       },
     },
     {
       props: { variant: 'medium' },
       style: {
-        background: 'var(--th-palette-tx-status-medium-background)',
-        color: 'var(--th-palette-tx-status-medium-text)',
+        background: 'var(--yoroi-palette-tx-status-medium-background)',
+        color: 'var(--yoroi-palette-tx-status-medium-text)',
       },
     },
     {
       props: { variant: 'low' },
       style: {
-        background: 'var(--th-palette-tx-status-low-background)',
-        color: 'var(--th-palette-tx-status-low-text)',
+        background: 'var(--yoroi-palette-tx-status-low-background)',
+        color: 'var(--yoroi-palette-tx-status-low-text)',
       },
     },
     {
@@ -142,12 +142,12 @@ const ModernChip = {
         textTransform: 'lowercase',
         margin: '5px 4px 0 4px',
         padding: '3px 0 4px 3px',
-        background: 'var(--th-palette-gray-50)',
+        background: 'var(--yoroi-palette-gray-50)',
         height: '30px',
         display: 'flex',
         alignItems: 'center',
         fontSize: '0.875rem',
-        color: 'var(--th-palette-gray-900)',
+        color: 'var(--yoroi-palette-gray-900)',
         letterSpacing: 0,
         span: {
           padding: 0,
@@ -158,7 +158,7 @@ const ModernChip = {
           color: 'inherit',
         },
         '&:hover': {
-          background: 'var(--th-palette-gray-50)',
+          background: 'var(--yoroi-palette-gray-50)',
         },
       },
     },

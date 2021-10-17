@@ -6,8 +6,8 @@ import { Button } from '@mui/material';
 import globalMessages from '../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { intlShape } from 'react-intl';
-import { withLayout } from '../../themes/context/layout';
-import type { LayoutComponentMap } from '../../themes/context/layout';
+import { withLayout } from '../../styles/context/layout';
+import type { LayoutComponentMap } from '../../styles/context/layout';
 
 type Props = {|
   +onBuySellClick: void => void,
@@ -42,19 +42,19 @@ class BuySellAdaButton extends Component<Props & InjectedProps> {
         // TODO: Add new button variant for revamp
         variant="secondary"
         sx={{
-          borderColor: '#a7afc0',
+          borderColor: 'var(--yoroi-palette-gray-400)',
           background: 'white',
           width: '160px',
           padding: '11px 0',
-          color: '#6b7384',
+          color: 'var(--yoroi-palette-gray-600)',
           fontSize: '14px',
           fontWeight: 500,
           letterSpacing: '0.5px',
           lineHeight: '22px',
           '&:hover': {
             background: 'transparent',
-            borderColor: '#a7afc0',
-            color: '#6b7384',
+            borderColor: 'var(--yoroi-palette-gray-400)',
+            color: 'var(--yoroi-palette-gray-600)',
           },
         }}
         onClick={() => this.props.onBuySellClick()}

@@ -58,7 +58,7 @@ export default function DialogFn(props: Props): Node {
             }
       }
       sx={{
-        background: 'var(--component-dialog-overlay-background-color)',
+        background: 'var(--yoroi-comp-dialog-overlay-background-color)',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
@@ -129,13 +129,13 @@ DialogFn.defaultProps = {
 
 const ModalContainer = styled(Box)(({ theme }) => ({
   position: 'relative',
-  minWidth: 'var(--component-dialog-min-width-cmn)',
+  minWidth: 'var(--yoroi-comp-dialog-min-width-md)',
   borderRadius: theme.name === 'classic' ? 0 : 8,
   paddingTop: theme.name === 'classic' ? '25px' : '24px',
   paddingBottom: theme.name === 'classic' ? '30px' : '40px',
   maxWidth: theme.name === 'classic' ? '785px' : '560px',
-  backgroundColor: 'var(--component-dialog-background)',
-  color: 'var(--component-dialog-text)',
+  backgroundColor: 'var(--yoroi-comp-dialog-background)',
+  color: 'var(--yoroi-comp-dialog-text)',
   maxHeight: '80vh',
 
   '& .dialog__title': {

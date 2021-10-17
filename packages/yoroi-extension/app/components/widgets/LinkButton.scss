@@ -9,8 +9,8 @@ $blockHeight: 27px;
     display: flex;
     align-items: center;
     text-decoration: none;
-    font-family: var(--font-regular);
-    color: var(--theme-link-button-text-color);
+    font-weight: 400;
+    color: var(--yoroi-palette-common-black);
   }
 }
 
@@ -33,9 +33,9 @@ $blockHeight: 27px;
     display: inline-block;
     vertical-align: middle;
   }
-};
+}
 
 .block:hover {
-  background-color: var(--theme-link-button-background-color-hover);
+  background-color: var(--yoroi-palette-gray-200);
   cursor: pointer;
-};
+}

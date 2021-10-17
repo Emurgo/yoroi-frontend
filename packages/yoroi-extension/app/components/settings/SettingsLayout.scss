@@ -1,7 +1,7 @@
-@import "./settingsConfig";
+@import './settingsConfig';
 
 .component {
-  background-color: var(--theme-settings-body-background-color);
+  background-color: var(--yoroi-palette-common-white);
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -15,9 +15,8 @@
   .settingsPane {
     min-height: 100%;
     padding: 32px 24px;
-    background-color: var(--theme-settings-pane-background-color);
-    border: var(--theme-settings-pane-border);
+    background-color: var(--yoroi-palette-common-white);
+    border: 1px solid #ffffff;
     overflow: visible;
   }
-
 }

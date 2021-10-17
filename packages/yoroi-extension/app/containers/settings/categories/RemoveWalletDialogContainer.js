@@ -13,8 +13,8 @@ import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 
 import DangerousActionDialog from '../../../components/widgets/DangerousActionDialog';
 import LocalizableError from '../../../i18n/LocalizableError';
-import { withLayout } from '../../../themes/context/layout';
-import type { LayoutComponentMap } from '../../../themes/context/layout';
+import { withLayout } from '../../../styles/context/layout';
+import type { LayoutComponentMap } from '../../../styles/context/layout';
 
 export type GeneratedData = typeof RemoveWalletDialogContainer.prototype.generated;
 

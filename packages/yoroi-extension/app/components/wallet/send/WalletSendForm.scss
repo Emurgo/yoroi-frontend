@@ -13,7 +13,8 @@
 
     :global {
       .SimpleInput_input {
-        font-family: var(--font-mono-light);
+        font-family: 'RobotoMono';
+        font-weight: 300;
         letter-spacing: 0;
       }
     }
@@ -24,17 +25,9 @@
     margin-bottom: 10px;
   }
 
-  .adaLabel {
-    bottom: 16px;
-    color: var(--theme-input-right-floating-text-color);
-    font-family: var(--font-light);
-    position: absolute;
-    right: 20px;
-    text-transform: uppercase;
-  }
-
   .checkbox {
-    font-family: var(--font-mono-light);
+    font-family: 'RobotoMono';
+    font-weight: 300;
     width: fit-content;
   }
 
@@ -70,7 +63,7 @@
   }
 
   .actionLabel {
-    color: var(--theme-label-button-color);
+    color: var(--yoroi-palette-gray-800);
     font-weight: 300;
     font-size: 16px;
     padding-left: 17px;
@@ -90,8 +83,8 @@
     }
 
     p {
-      color: var(--theme-send-confirmation-dialog-send-values-color);
-      font-family: var(--font-medium);
+      color: var(--yoroi-palette-secondary-200);
+      font-weight: 500;
     }
   }
 

@@ -21,7 +21,7 @@ import { Routes } from './Routes';
 import { translations } from '../i18n/translations';
 import type { StoresMap } from './stores';
 import type { ActionsMap } from './actions';
-import { changeToplevelTheme, MuiThemes } from '../themes';
+import { changeToplevelTheme, MuiThemes } from '../styles/utils';
 import ThemeManager from '../ThemeManager';
 import CrashPage from '../containers/CrashPage';
 import { Logger } from '../utils/logging';
@@ -83,7 +83,7 @@ class App extends Component<Props, State> {
 
     const themeVars = Object.assign(stores.profile.currentThemeVars, {});
     const currentTheme = stores.profile.currentTheme;
-    const muiTheme = MuiThemes[currentTheme] ?? 'YoroiModern';
+    const muiTheme = MuiThemes[currentTheme];
 
     changeToplevelTheme(currentTheme);
 
@@ -92,7 +92,7 @@ class App extends Component<Props, State> {
         <ThemeProvider theme={muiTheme}>
           <CssBaseline />
           {globalStyles(muiTheme)}
-          <ThemeManager variables={themeVars} />
+          <ThemeManager cssVariables={themeVars} />
           <IntlProvider {...{ locale, key: locale, messages: mergedMessages }}>
             {this.getContent()}
           </IntlProvider>

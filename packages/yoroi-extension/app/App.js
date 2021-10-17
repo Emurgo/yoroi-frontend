@@ -22,13 +22,13 @@ import { Routes } from './Routes';
 import { translations } from './i18n/translations';
 import type { StoresMap } from './stores';
 import type { ActionsMap } from './actions';
-import { changeToplevelTheme, MuiThemes } from './themes';
+import { changeToplevelTheme, MuiThemes } from './styles/utils';
 import ThemeManager from './ThemeManager';
 import environment from './environment';
 import MaintenancePage from './containers/MaintenancePage';
 import CrashPage from './containers/CrashPage';
 import { Logger } from './utils/logging';
-import { LayoutProvider } from './themes/context/layout';
+import { LayoutProvider } from './styles/context/layout';
 import { ThemeProvider } from '@mui/material/styles';
 import { CssBaseline } from '@mui/material';
 import { globalStyles } from './styles/globalStyles';
@@ -106,7 +106,7 @@ class App extends Component<Props, State> {
           <ThemeProvider theme={muiTheme}>
             <CssBaseline />
             {globalStyles(muiTheme)}
-            <ThemeManager variables={themeVars} />
+            <ThemeManager cssVariables={themeVars} />
             {/* Automatically pass a theme prop to all components in this subtree. */}
             <IntlProvider {...{ locale, key: locale, messages: mergedMessages }}>
               {this.getContent()}

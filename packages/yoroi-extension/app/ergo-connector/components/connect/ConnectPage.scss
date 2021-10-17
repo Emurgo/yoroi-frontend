@@ -29,7 +29,7 @@
     text-align: center;
     margin-top: 8px;
     font-size: 18px;
-    font-family: var(--font-medium);
+    font-weight: 500;
     h2 {
       margin-bottom: 6px;
     }
@@ -78,7 +78,7 @@
   }
 }
 .errorMessage {
-  color: var(--component-input-error);
+  color: var(--yoroi-comp-input-error);
   padding: 10px 0;
   p {
     margin-top: 10px;

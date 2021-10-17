@@ -4,7 +4,7 @@
   margin-bottom: 20px;
 
   h1 {
-    color: var(--theme-support-settings-text-color);
+    color: var(--yoroi-support-settings-text);
     font-weight: 500;
     font-size: 16px;
     line-height: 1.38;
@@ -19,12 +19,12 @@
 }
 
 .info {
-  color: var(--theme-terms-of-use-text-color);
+  color: var(--yoroi-terms-of-use-text-color);
   text-align: justify;
   margin-top: 10px;
 
   h1 {
-    color: var(--th-palette-gray-800);
+    color: var(--yoroi-palette-gray-800);
     font-weight: 500;
     font-size: 14px;
     margin-bottom: 11px;

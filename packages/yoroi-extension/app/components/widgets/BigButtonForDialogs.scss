@@ -1,6 +1,6 @@
 .component {
-  background-color: var(--theme-dialog-big-button-background-color);
-  border: solid 4px var(--theme-dialog-big-button-border-color);
+  background-color: var(--yoroi-palette-gray-50);
+  border: solid 4px var(--yoroi-palette-gray-50);
   display: flex;
   flex: 1;
   flex-direction: column;
@@ -19,14 +19,14 @@
 .label {
   font-size: 19px;
   line-height: 1.37;
-  color: var(--theme-dialog-big-button-label-color);
-  font-family: var(--font-medium);
+  color: var(--yoroi-palette-gray-800);
+  font-weight: 500;
 }
 
 .description {
-  font-family: var(--font-regular);
+  font-weight: 400;
   height: 19px;
   font-size: 14px;
   line-height: 1.36;
-  color: var(--theme-dialog-big-button-description-color);
+  color: var(--yoroi-palette-gray-800);
 }

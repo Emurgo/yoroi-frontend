@@ -2,13 +2,13 @@
 @import '../../themes/mixins/loading-spinner';
 
 .body {
-  color: var(--theme-bordered-box-text-color);
-  font-family: var(--font-regular);
+  color: var(--yoroi-palette-gray-900);
+  font-weight: 400;
   font-size: 14px;
   line-height: 19px;
-  
+
   .currencySymbol {
-    font-family: var(--font-light);
+    font-weight: 300;
     text-transform: uppercase;
   }
 
@@ -56,7 +56,7 @@
 
     .amount,
     .fees {
-      color: var(--theme-send-confirmation-dialog-send-values-color);
+      color: var(--yoroi-send-confirmation-dialog-send-values-color);
       line-height: 1.38;
       margin-top: 6px;
       word-break: break-word;
@@ -86,7 +86,7 @@
   }
 
   .totalAmount {
-    color: var(--theme-send-confirmation-dialog-send-values-color);
+    color: var(--yoroi-send-confirmation-dialog-send-values-color);
     line-height: 1.38;
     margin-top: 6px;
     word-break: break-word;

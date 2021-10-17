@@ -2,7 +2,7 @@
 @import '../../../../themes/mixins/error-message';
 
 .dialog {
-  font-family: var(--font-light);
+  font-weight: 300;
   .walletPassword {
     & + .walletPasswordFields {
       .newPassword {
@@ -18,16 +18,16 @@
   }
 
   li::before {
-    content: "●";
-    font-size:0.8em;
-    color: var(--theme-bullet-point-color);
+    content: '●';
+    font-size: 0.8em;
+    color: var(--yoroi-palette-gray-400);
   }
   li {
     display: list-item;
-  
+
     span {
       font-size: 13px;
-      margin-left:0.2em;
+      margin-left: 0.2em;
     }
   }
 }
@@ -41,7 +41,7 @@
 }
 
 .addressLabel {
-  font-family: var(--font-regular);
+  font-weight: 400;
   margin-top: 20px;
   margin-bottom: 10px;
 }
@@ -60,6 +60,6 @@
 }
 
 :global(.YoroiModern) .dialog {
-  min-width: var(--theme-modal-min-max-width-lg);
-  max-width: var(--theme-modal-min-max-width-lg); 
+  min-width: var(--yoroi-comp-dialog-min-width-lg);
+  max-width: var(--yoroi-comp-dialog-min-width-lg);
 }

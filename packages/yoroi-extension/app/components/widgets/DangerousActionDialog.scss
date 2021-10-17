@@ -2,11 +2,11 @@
 @import '../../themes/mixins/error-message';
 
 .dialog {
-  font-family: var(--font-light);
+  font-weight: 300;
 
   p {
-    color: var(--theme-support-settings-text-color);
-    font-family: var(--font-regular);
+    color: var(--yoroi-support-settings-text);
+    font-weight: 400;
     font-size: 14px;
     line-height: 19px;
     margin-bottom: 20px;
@@ -30,11 +30,11 @@
 :global(.YoroiModern) {
   .dialog {
     :global(.Dialog_actions) {
-      margin-top: var(--theme-dialog-password-input-actions-margin-top);
+      margin-top: 10px;
     }
   }
 }
 
 .isSubmitting {
-  @include loading-spinner("../../assets/images/spinner-light.svg");
+  @include loading-spinner('../../assets/images/spinner-light.svg');
 }

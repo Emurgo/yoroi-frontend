@@ -16,7 +16,7 @@ import {
   genShelleyCip1852DummyWithCache,
 } from '../../../stories/helpers/cardano/ShelleyCip1852Mocks';
 import { mockTransferProps, wrapTransfer } from './Transfer.mock';
-import { THEMES } from '../../themes';
+import { THEMES } from '../../styles/utils';
 import { defaultToSelectedExplorer } from '../../domain/SelectedExplorer';
 import { ROUTES } from '../../routes-config';
 import DaedalusTransferPage from './DaedalusTransferPage';

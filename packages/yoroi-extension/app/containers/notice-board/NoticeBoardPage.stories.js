@@ -6,7 +6,7 @@ import moment from 'moment';
 import { select, } from '@storybook/addon-knobs';
 import { action } from '@storybook/addon-actions';
 import { ServerStatusErrors } from '../../types/serverStatusErrorType';
-import { THEMES } from '../../themes';
+import { THEMES } from '../../styles/utils';
 import NoticeBoardPage from './NoticeBoardPage';
 import { globalKnobs } from '../../../stories/helpers/StoryWrapper';
 import { withScreenshot } from 'storycap';

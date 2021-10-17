@@ -6,19 +6,19 @@
 
   .amountSmall {
     font-size: 12px;
-    font-family: var(--font-regular);
+    font-weight: 400;
   }
   .amountRegular {
-    font-family: var(--font-medium);
+    font-weight: 500;
   }
   .afterDecimal {
     font-size: 12px;
-    font-family: var(--font-medium);
+    font-weight: 500;
   }
 
   .amount {
-    font-family: var(--font-regular);
-    color: var(--cmn-default-color-grey);
+    font-weight: 400;
+    color: var(--yoroi-palette-gray-800);
   }
 }
 
@@ -32,18 +32,19 @@
 
 .rowData {
   font-size: 14px;
-  font-family: var(--font-regular);
-  color: var(--theme-transactions-list-detail-row-text-color);
+  font-weight: 400;
+  color: var(--yoroi-palette-gray-600);
   word-break: break-all;
   line-height: 22px;
 }
 .hash {
-  font-family: var(--font-mono-regular);
+  font-family: 'RobotoMono';
+  font-weight: 400;
 }
 .addressItem {
   display: grid;
   grid-gap: 15px;
-  grid-template-columns: minmax(232px,550px) 150px 1fr;
+  grid-template-columns: minmax(232px, 550px) 150px 1fr;
   align-items: center;
 }
 * + h2,
@@ -70,7 +71,7 @@
   border-top: 1px solid #dce0e9;
   display: grid;
   grid-gap: 15px;
-  grid-template-columns: minmax(232px,550px) 150px 1fr;
+  grid-template-columns: minmax(232px, 550px) 150px 1fr;
 }
 
 .addressToList,

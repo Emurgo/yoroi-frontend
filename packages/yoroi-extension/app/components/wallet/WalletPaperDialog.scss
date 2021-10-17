@@ -4,8 +4,8 @@
   margin-bottom: 20px;
 
   h1 {
-    color: var(--cmn-default-color-grey);
-    font-family: var(--font-semibold);
+    color: var(--yoroi-palette-gray-800);
+    font-weight: 500;
     font-size: 16px;
     line-height: 1.38;
     margin-bottom: 10px;
@@ -23,13 +23,13 @@
 }
 
 .intro {
-  color: var(--cmn-default-color-grey);
-  font-family: var(--font-regular);
+  color: var(--yoroi-palette-gray-800);
+  font-weight: 400;
   text-align: justify;
 
   h1,
   h2 {
-    font-family: var(--font-medium);
+    font-weight: 500;
     font-size: 17px;
     margin-bottom: 11px;
   }
@@ -45,8 +45,8 @@
 
   p,
   li {
-    color: var(--cmn-default-color-grey);
-    font-family: var(--font-regular);
+    color: var(--yoroi-palette-gray-800);
+    font-weight: 400;
     font-size: 14px;
     letter-spacing: 0.5px;
     line-height: 1.38;

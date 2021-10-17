@@ -94,7 +94,7 @@ export default class UnitOfAccountSettings extends Component<Props> {
                   native
                 </Typography>
               ) : (
-                <Typography variant="body2" color="var(--theme-widgets-hash-light-color)">
+                <Typography variant="body2" color="var(--yoroi-widgets-hash-light)">
                   1 ADA =&nbsp;
                   {/* $FlowFixMe[prop-missing] */}
                   {option.price !== null ? option.price : '-'} {option.value}

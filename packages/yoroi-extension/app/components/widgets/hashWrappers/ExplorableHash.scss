@@ -2,17 +2,16 @@
 
 .url {
   text-decoration: none;
-
 }
 
 .darkColor {
   &:hover {
-    @include underline(var(--theme-underline-dark-color));
+    @include underline(var(--yoroi-palette-gray-800));
   }
 }
 
 .lightColor {
   &:hover {
-    @include underline(var(--theme-underline-light-color));
+    @include underline(var(--yoroi-palette-gray-400));
   }
 }

@@ -1,7 +1,6 @@
 @import '../../themes/mixins/loading-spinner';
 
 .main {
-  font-family: var(--font-regular);
   flex: 1;
   canvas {
     width: 32px !important;
@@ -11,7 +10,7 @@
 }
 .header {
   display: flex;
-  color: var(--theme-wallet-dropdown-main-text-color);
+  color: var(--yoroi-palette-gray-900);
   font-size: 14px;
   letter-spacing: 0;
   line-height: 22px;
@@ -44,10 +43,10 @@
 }
 
 .fixedAmount {
-  color: #6b7384;
+  color: var(--yoroi-palette-gray-600);
 }
 .amount {
-  font-family: var(--font-medium);
+  font-weight: 500;
   flex: 1;
   .isLoading {
     margin-left: 9px;
@@ -70,7 +69,7 @@
   flex: 1;
   text-align: left;
   .label {
-    color: #6b7384;
+    color: var(--yoroi-palette-gray-600);
     line-height: 22px;
   }
   .value {
@@ -84,7 +83,7 @@
   svg {
     max-width: 24px;
     max-height: 24px;
-    color: #6b7384;
+    color: var(--yoroi-palette-gray-600);
   }
   & > * {
     width: 40px;
@@ -106,7 +105,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background-color: var(--theme-wallet-dropdown-background-color);
+  background-color: white;
   border-radius: 8px;
   border: 1px solid transparent;
 

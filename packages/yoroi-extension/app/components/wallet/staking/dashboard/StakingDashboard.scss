@@ -1,8 +1,8 @@
 .page {
-  background-color: var(--theme-dashboard-page-background-color);
+  background-color: var(--yoroi-palette-common-white);
   padding: 40px 30px 26px 30px;
-  font-family: var(--font-regular);
-  color: var(--theme-dashboard-text-color);
+  font-weight: 400;
+  color: var(--yoroi-palette-gray-800);
   min-height: 100%;
   display: flex;
   flex-direction: column;

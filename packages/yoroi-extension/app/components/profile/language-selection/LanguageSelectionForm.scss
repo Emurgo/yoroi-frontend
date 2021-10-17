@@ -19,15 +19,15 @@
 }
 
 .info {
-  color: var(--theme-terms-of-use-text-color);
+  color: var(--yoroi-terms-of-use-text-color);
   text-align: justify;
   margin-top: 30px;
-  background-color: var(--theme-bordered-box-background-color);
+  background-color: var(--yoroi-palette-common-white);
   border-radius: 8px;
   padding: 16px;
 
   h1 {
-    color: var(--th-palette-gray-800);
+    color: var(--yoroi-palette-gray-800);
     font-weight: 500;
     font-size: 14px;
     margin-bottom: 11px;

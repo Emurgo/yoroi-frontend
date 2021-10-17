@@ -486,7 +486,7 @@ class AmountInput extends Component<AmountInputProps> {
               right: '10px',
               fontWeight: 400,
               fontSize: '0.75rem',
-              color: 'var(--component-input-text)',
+              color: 'var(--yoroi-comp-input-text)',
             }}
           >
             {intl.formatMessage(messages.feesLabel, { amount: fees })}
@@ -499,7 +499,7 @@ class AmountInput extends Component<AmountInputProps> {
             position: 'absolute',
             bottom: '45px',
             right: error != null && error !== '' ? '45px' : '10px',
-            color: 'var(--component-input-text)',
+            color: 'var(--yoroi-comp-input-text)',
             textTransform: 'uppercase',
           }}
         >

@@ -1,5 +1,5 @@
 .dialog {
-  font-family: var(--font-medium);
+  font-weight: 500;
 
   :global {
     .Dialog_title {
@@ -9,9 +9,9 @@
 }
 
 :global(.YoroiModern) .dialog {
-  min-width: var(--theme-modal-min-max-width-lg);
-  max-width: var(--theme-modal-min-max-width-lg);  
-  font-family: var(--font-regular);
+  min-width: var(--yoroi-comp-dialog-min-width-lg);
+  max-width: var(--yoroi-comp-dialog-min-width-lg);
+  font-weight: 400;
 
   .walletPassword {
     margin-top: 0;
