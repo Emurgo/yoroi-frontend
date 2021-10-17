@@ -152,6 +152,8 @@ const globalStyles = (theme: Object): Node => (
         '--yoroi-qr-code-foreground': 'var(--yoroi-palette-gray-800)',
 
         /* === TODO: FIX AND UNIFY ALL CSS VARIABLES === */
+        '--yoroi-wallet-add-option-dialog-item-title-color': 'var(--yoroi-palette-gray-900)',
+        '--yoroi-wallet-add-option-dialog-item-learn-more-button-bg-color': 'var(--yoroi-palette-gray-50)',
         '--yoroi-transactions-icon-type-expend-background-color': '#15d1aa',
         '--yoroi-transactions-icon-type-income-background-color': '#9ab2d9',
         '--yoroi-transactions-icon-type-exchange-background-color': '#10aca4',
@@ -164,8 +166,6 @@ const globalStyles = (theme: Object): Node => (
         '--yoroi-widgets-hash-light': theme.name === 'classic' ? '#929293' : '#adaeb6',
         '--yoroi-send-confirmation-dialog-send-values-color':
           theme.name === 'classic' ? '#ea4c5b' : '#15d1aa',
-        '--yoroi-wallet-add-option-dialog-item-title-color': 'var(--yoroi-palette-gray-900)',
-        '--yoroi-wallet-add-option-dialog-item-learn-more-button-bg-color': '#F5F7F9',
 
         '--yoroi-hw-connect-dialog-middle-block-common-background-color':
           theme.name === 'classic' ? '#f3f3f5' : '#ffffff',
@@ -181,18 +181,10 @@ const globalStyles = (theme: Object): Node => (
           theme.name === 'classic' ? 'rgba(242, 183, 172, 0.12)' : '#f0f3f5',
         '--yoroi-mnemonic-background-color':
           theme.name === 'classic' ? 'rgba(218, 164, 154, 0.12)' : '#f0f3f5',
+              '--yoroi-backup-mnemonic-background-color': 'var(--yoroi-palette-gray-50)',
 
-        ...(theme.name === 'classic'
+        ...(theme.name === 'modern'
           ? {
-              '--yoroi-backup-mnemonic-background-color': '#f3f3f5',
-            }
-          : theme.name === 'modern'
-          ? {
-              '--yoroi-instructions-recovery-text-color': '#2b2c32',
-              '--yoroi-mnemonic-border-color': '#9b9b9b',
-              '--yoroi-mnemonic-border-filled-color': '#4a4a4a',
-              '--yoroi-mnemonic-button-text-color': '#353535',
-              '--yoroi-default-color-blue': '#2249BE',
               // Dashboard
               '--yoroi-dashboard-label-underline-color': 'rgba(135, 145, 173, 0.8)',
               '--yoroi-dashboard-card-shadow-color': 'rgba(24, 26, 30, 0.08)',
@@ -209,7 +201,6 @@ const globalStyles = (theme: Object): Node => (
               '--yoroi-dashboard-graph-tab-color': '#ADAEB6',
               '--yoroi-dashboard-graph-active-tab-color': '#3D60CD',
               '--yoroi-dashboard-graph-radio-color': '#93979C',
-              '--yoroi-dashboard-graph-active-radio-color': '#17D1AA',
               '--yoroi-dashboard-graph-axis-tick-color': '#ADAEB6',
               '--yoroi-dashboard-graph-axis-text-color': '#38393D',
               '--yoroi-dashboard-graph-bar-hover-background-color': '#D9DDE0',
@@ -218,11 +209,6 @@ const globalStyles = (theme: Object): Node => (
               '--yoroi-dashboard-graph-bar-width': 16,
               '--yoroi-dashboard-graph-tooltip-text-color': '#FFFFFF',
               '--yoroi-dashboard-graph-tooltip-background': 'rgba(56, 57, 61, 0.7)',
-
-              // My Wallets page
-              '--yoroi-mywallets-expandable-background-color': '#FAFAFC',
-              '--yoroi-mywallets-ada-amount-decimal-color': 'rgba(36, 40, 56, 0.5)',
-              '--yoroi-mywallets-tooltip-background-color': 'rgba(56, 57, 61, 0.7)',
             }
           : null),
       },

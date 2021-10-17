@@ -1,7 +1,7 @@
 .component {
   background-color: var(--yoroi-mnemonic-background-color)!important;
   font-weight: 400!important;
-  color: var(--yoroi-mnemonic-button-text-color)!important;
+  color: var(--yoroi-palette-gray-900)!important;
 
   &.disabled {
     cursor: default;

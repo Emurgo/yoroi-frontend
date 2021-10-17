@@ -15,12 +15,12 @@
   margin-top: 90px;
   width: 485px;
   padding-bottom: 40px;
-  background-color: #ffffff;
+  background-color: var(--yoroi-palette-common-white);
 
   box-sizing: border-box;
   border: 1px solid var(--yoroi-palette-gray-200);
   border-radius: 8px;
-  background-color: #ffffff;
+  background-color: var(--yoroi-palette-common-white);
   box-shadow: 0 13px 20px -1px rgba(0, 0, 0, 0.15);
 
   display: flex;
@@ -37,7 +37,7 @@
       font-size: 16px;
       line-height: 19px;
       text-align: center;
-      color: white;
+      color: var(--yoroi-palette-common-white);
     }
   }
 

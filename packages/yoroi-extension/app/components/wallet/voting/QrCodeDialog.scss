@@ -3,7 +3,7 @@
 .lineTitle {
   line-height: 26px;
   font-size: 18px;
-  color: #242838;
+  color: var(--yoroi-palette-gray-900);
   text-align: center;
   font-weight: 800;
 }
@@ -14,7 +14,7 @@
 }
 
 .lineBold {
-  color: #242838;
+  color: var(--yoroi-palette-gray-900);
   font-weight: 800;
   font-size: 14px;
   line-height: 22px;

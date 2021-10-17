@@ -74,12 +74,12 @@
         margin: auto;
         height: 8px;
         width: 8px;
-        background-color: var(--yoroi-dashboard-graph-active-radio-color);
+        background-color: var(--yoroi-palette-secondary-300);
         visibility: hidden;
         border-radius: 50%;
     }
     &:checked {
-        border-color: var(--yoroi-dashboard-graph-active-radio-color);
+        border-color: var(--yoroi-palette-secondary-300);
     }
     &:checked::before {
         visibility: visible;
