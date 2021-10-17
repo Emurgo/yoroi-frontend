@@ -1,6 +1,6 @@
 //@flow
-import type { PublicDeriver } from "../api/ada/lib/storage/models/PublicDeriver";
-import { asGetPublicKey } from "../api/ada/lib/storage/models/PublicDeriver/traits";
+import type { PublicDeriver } from '../api/ada/lib/storage/models/PublicDeriver';
+import { asGetPublicKey } from '../api/ada/lib/storage/models/PublicDeriver/traits';
 
 type SyncedWallet = {|
     publicKey: string,
