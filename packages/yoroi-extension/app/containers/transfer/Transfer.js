@@ -1,6 +1,6 @@
 // @flow
 import { Component } from 'react';
-import type { Node } from 'react';
+import type { Node, ComponentType } from 'react';
 import { computed } from 'mobx';
 import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
@@ -25,6 +25,10 @@ import {
   CoinTypes,
 } from '../../config/numbersConfig';
 import HorizontalLine from '../../components/widgets/HorizontalLine';
+import NavBarContainerRevamp from '../NavBarContainerRevamp';
+import { withLayout } from '../../styles/context/layout';
+import type { LayoutComponentMap } from '../../styles/context/layout';
+import type { GeneratedData as NavBarContainerRevampData } from '../NavBarContainerRevamp';
 
 export type GeneratedData = typeof Transfer.prototype.generated;
 
@@ -33,8 +37,11 @@ type Props = {|
   +children?: Node,
 |};
 
+type InjectedProps = {| +renderLayoutComponent: LayoutComponentMap => Node |};
+type AllProps = {| ...Props, ...InjectedProps |};
+
 @observer
-export default class Transfer extends Component<Props> {
+class Transfer extends Component<AllProps> {
 
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
@@ -47,14 +54,28 @@ export default class Transfer extends Component<Props> {
   render(): Node {
     const sidebarContainer = (<SidebarContainer {...this.generated.SidebarContainerProps} />);
 
-    const navbar = (
+    const navbarClassic = (
       <NavBarContainer
         {...this.generated.NavBarContainerProps}
-        title={<NavBarTitle
-          title={this.context.intl.formatMessage(globalMessages.sidebarTransfer)}
-        />}
+        title={
+          <NavBarTitle title={this.context.intl.formatMessage(globalMessages.sidebarTransfer)} />
+        }
       />
     );
+
+    const navbarRevamp = (
+      <NavBarContainerRevamp
+        {...this.generated.NavBarContainerRevampProps}
+        title={
+          <NavBarTitle title={this.context.intl.formatMessage(globalMessages.sidebarSettings)} />
+        }
+      />
+    );
+
+    const navbar = this.props.renderLayoutComponent({
+      CLASSIC: navbarClassic,
+      REVAMP: navbarRevamp,
+    });
 
     return (
       <TopBarLayout
@@ -93,6 +114,7 @@ export default class Transfer extends Component<Props> {
   @computed get generated(): {|
     BannerContainerProps: InjectedOrGenerated<BannerContainerData>,
     NavBarContainerProps: InjectedOrGenerated<NavBarContainerData>,
+    NavBarContainerRevampProps: InjectedOrGenerated<NavBarContainerRevampData>,
     SidebarContainerProps: InjectedOrGenerated<SidebarContainerData>,
     WalletTransferPageProps: InjectedOrGenerated<WalletTransferPageData>,
     actions: {|
@@ -138,6 +160,9 @@ export default class Transfer extends Component<Props> {
       NavBarContainerProps: (
         { actions, stores, }: InjectedOrGenerated<NavBarContainerData>
       ),
+      NavBarContainerRevampProps: (
+        { actions, stores, }: InjectedOrGenerated<NavBarContainerRevampData>
+      ),
       WalletTransferPageProps: (
         { actions, stores, }: InjectedOrGenerated<WalletTransferPageData>
       ),
@@ -145,3 +170,4 @@ export default class Transfer extends Component<Props> {
     });
   }
 }
+export default (withLayout(Transfer): ComponentType<Props>)

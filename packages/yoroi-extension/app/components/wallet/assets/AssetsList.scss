@@ -1,0 +1,130 @@
+.component {
+    height: 100%;
+
+    .header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        .assets {
+            font-size: 25px;
+            line-height: 20px;
+        }
+
+        .search {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--yoroi-palette-gray-50);
+            border-radius: 8px;
+            width: 350px;
+            padding: 10px 12px;
+
+            & > input {
+                background-color: var(--yoroi-palette-gray-50) ;
+                border: none;
+                width: 100%;
+            }
+
+            & > input:focus {
+                outline: none;
+                border: none;
+                padding: 3px 4px;
+            }
+        }
+
+    }
+
+    .lockedAssets {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        .lockedAssetsAmount {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            background-color: var(--yoroi-palette-gray-50);
+            border-radius: 8px;
+            width: auto;
+            padding: 7px 15px;
+            margin-left: -15px;
+            font-size: 16px;
+            line-height: 24px;
+        }
+
+        .label {
+            color: var(--yoroi-palette-gray-600)
+        }
+
+        .beforeDecimal, .tokenName {
+            font-weight: 500;
+        }
+
+        .tokenName {
+            margin-left: 2px;
+            display: inline-block;
+        }
+
+    }
+
+    .columns {
+        display: grid;
+        grid-template-columns: 3fr 2fr 3fr;
+        grid-gap: 10px;
+        padding: 24px 30px;
+        border-top: 1px ;
+        border-bottom: 1px;
+        border-color:rgba(111, 114, 144, 0.24);
+        border-style: solid;
+        color: #A7AFC0;
+        font-size: 15px;
+        box-shadow: 0 5px 7px rgba(0, 0, 0, 0.1);
+        margin-bottom: 16px;
+
+        & > li, & > li > button {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            cursor: pointer;
+            color: #A7AFC0;
+           & > .headerText {
+               margin-right: 3px;
+           }
+        }
+    }
+
+    .row {
+        display: grid;
+        align-items: center;
+        grid-template-columns: 3fr 2fr 3fr;
+        grid-gap: 10px;
+        padding: 20px 30px;
+        margin-bottom: 20px;
+    }
+
+    .token {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        color: #3154CB;
+        font-size: 16px;
+        font-weight: 500;
+
+        & > .logo {
+            margin-right: 15px;
+        }
+    }
+
+    .amount {
+        font-weight: 700;
+    }
+
+    .noAssetFound {
+        height: 30vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32px;
+        line-height: 32px;
+    }
+}

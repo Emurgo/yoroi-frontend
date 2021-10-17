@@ -511,6 +511,7 @@ export type TokenInsert = {|
    * As some blockchains have multiple primary tokens
   */
   Identifier: string,
+  IsNFT?: boolean,
   Metadata: TokenMetadata,
 |};
 export type TokenUpsertWithDigest = TokenInsert | {|
@@ -529,6 +530,7 @@ export const TokenSchema: {|
   name: 'Token',
   properties: {
     TokenId: 'TokenId',
+    IsNFT: 'IsNFT',
     IsDefault: 'IsDefault',
     NetworkId: 'NetworkId',
     Digest: 'Digest',
@@ -583,6 +585,7 @@ export const populatePrimitivesDb = (schemaBuilder: lf$schema$Builder) => {
   // Network Table
   schemaBuilder.createTable(NetworkSchema.name)
     .addColumn(NetworkSchema.properties.NetworkId, Type.INTEGER)
+    .addColumn(NetworkSchema.properties.NetworkName, Type.STRING)
     .addColumn(NetworkSchema.properties.CoinType, Type.NUMBER)
     .addColumn(NetworkSchema.properties.Backend, Type.OBJECT)
     .addColumn(NetworkSchema.properties.BaseConfig, Type.OBJECT)
@@ -829,6 +832,7 @@ export const populatePrimitivesDb = (schemaBuilder: lf$schema$Builder) => {
     .addColumn(TokenSchema.properties.TokenId, Type.INTEGER)
     .addColumn(TokenSchema.properties.NetworkId, Type.INTEGER)
     .addColumn(TokenSchema.properties.IsDefault, Type.BOOLEAN)
+    .addColumn('IsNFT', Type.BOOLEAN)
     .addColumn(TokenSchema.properties.Identifier, Type.STRING)
     .addColumn(TokenSchema.properties.Digest, Type.NUMBER)
     .addColumn(TokenSchema.properties.Metadata, Type.OBJECT)

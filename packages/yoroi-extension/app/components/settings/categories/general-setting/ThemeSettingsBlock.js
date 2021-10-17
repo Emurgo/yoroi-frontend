@@ -1,6 +1,6 @@
 // @flow
 import { Component } from 'react';
-import type { Node } from 'react';
+import type { Node, ComponentType } from 'react';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { Button } from '@mui/material';
@@ -11,6 +11,8 @@ import type { Theme } from '../../../../styles/utils';
 import ThemeThumbnail from '../display/ThemeThumbnail';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import globalMessages from '../../../../i18n/global-messages';
+import { withLayout } from '../../../../styles/context/layout';
+import type { LayoutComponentMap } from '../../../../styles/context/layout';
 
 const messages = defineMessages({
   themeLabel: {
@@ -54,9 +56,14 @@ type Props = {|
   +hasCustomTheme: void => boolean,
   +onExternalLinkClick: MouseEvent => void,
 |};
+type InjectedProps = {|
+  +changeLayout: void => void,
+  +renderLayoutComponent: LayoutComponentMap => Node,
+|};
+type AllProps = {| ...Props, ...InjectedProps |};
 
 @observer
-export default class ThemeSettingsBlock extends Component<Props> {
+class ThemeSettingsBlock extends Component<AllProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
@@ -68,6 +75,7 @@ export default class ThemeSettingsBlock extends Component<Props> {
       exportTheme,
       hasCustomTheme,
       onExternalLinkClick,
+      changeLayout,
     } = this.props;
     const { intl } = this.context;
 
@@ -77,7 +85,9 @@ export default class ThemeSettingsBlock extends Component<Props> {
     ]);
 
     const themeYoroiModernClasses = classnames([
-      currentTheme === THEMES.YOROI_MODERN ? styles.active : styles.inactive,
+      currentTheme === THEMES.YOROI_MODERN || currentTheme === THEMES.YOROI_REVAMP
+        ? styles.active
+        : styles.inactive,
       styles.themeImageWrapper,
     ]);
 
@@ -91,17 +101,21 @@ export default class ThemeSettingsBlock extends Component<Props> {
       </a>
     );
 
-    return (
-      <div className={styles.component}>
+    const commonHeader = (
+      <>
         <h2 className={styles.title}>{intl.formatMessage(messages.themeLabel)}</h2>
-
         <p>
           <FormattedHTMLMessage {...messages.themeNote} />
         </p>
         <p>
           <FormattedMessage {...messages.blog} values={{ blogLink }} />
         </p>
+      </>
+    );
 
+    const themeBlockClassicComponent = (
+      <div className={styles.component}>
+        {commonHeader}
         <div className={styles.main}>
           <div className={styles.themesWrapper}>
             {/* Modern Theme */}
@@ -138,7 +152,76 @@ export default class ThemeSettingsBlock extends Component<Props> {
             {intl.formatMessage(messages.themeExportButton)}
           </Button>
         </div>
+        <div className={styles.revampWrapper}>
+          {/* TODO: MUI: fix css variables */}
+          <Button
+            sx={{
+              width: '400px',
+              background: 'white',
+              color: '#6b7384',
+              border: '1px solid #6b7384',
+              '&:hover': {
+                color: '#383838',
+                background: 'white',
+              },
+              position: 'relative',
+              '&::after': {
+                content: '"new"',
+                top: '50%',
+                right: '30px',
+                transform: 'translateY(-50%)',
+                position: 'absolute',
+                color: 'var(--yoroi-comp-button-primary-text)',
+                backgroundColor: 'var(--yoroi-comp-button-primary-background)',
+                padding: '4px 10px',
+                borderRadius: '777px',
+              },
+            }}
+            onClick={() => {
+              changeLayout();
+              selectTheme({ theme: THEMES.YOROI_REVAMP });
+            }}
+          >
+            Try new Yoroi Revamp
+          </Button>
+        </div>
       </div>
     );
+
+    const themeBlockRevampComponent = (
+      <div className={styles.component}>
+        {commonHeader}
+        <div className={styles.main}>
+          <Button variant="primary" onClick={exportTheme.bind(this)} sx={{ width: '400px' }}>
+            {intl.formatMessage(messages.themeExportButton)}
+          </Button>
+        </div>
+        <div className={styles.revampWrapper}>
+          <Button
+            onClick={() => {
+              changeLayout();
+              selectTheme({ theme: THEMES.YOROI_MODERN });
+            }}
+            sx={{
+              width: '400px',
+              background: 'white',
+              color: '#6b7384',
+              border: '1px solid #6b7384',
+              '&:hover': {
+                color: '#383838',
+                background: 'white',
+              },
+            }}
+          >
+            Back to Yoroi Classic
+          </Button>
+        </div>
+      </div>
+    );
+    return this.props.renderLayoutComponent({
+      CLASSIC: themeBlockClassicComponent,
+      REVAMP: themeBlockRevampComponent,
+    });
   }
 }
+export default (withLayout(ThemeSettingsBlock): ComponentType<Props>);

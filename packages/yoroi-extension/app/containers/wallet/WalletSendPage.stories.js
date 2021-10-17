@@ -65,6 +65,7 @@ const genTokenInfoMap = (network) => {
           NetworkId: network.NetworkId,
           Identifier: 'f2b5c4e4883555b882e3a5919967883aade9e0494290f29e0e3069f5ce9eabe4',
           IsDefault: false,
+          IsNFT: false,
           Metadata: {
             type: 'Ergo',
             height: 0,
@@ -189,7 +190,7 @@ const genBaseProps: {|
       updateReceiver: { trigger: action('updateReceiver') },
       updateAmount: { trigger: action('updateAmount') },
       updateToken: { trigger: action('updateToken') },
-      toggleSendAll: { trigger: action('toggleSendAll') },
+      updateSendAllStatus: { trigger: action('updateSendAllStatus') },
       reset: { trigger: action('reset') },
       updateMemo: { trigger: action('updateMemo') },
     },

@@ -1,5 +1,3 @@
-@import '../settingsConfig';
-
 .component {
   background-color: var(--yoroi-palette-gray-50);
   padding: 10px 24px 0 24px;
@@ -11,6 +9,14 @@
   height: initial;
   overflow: auto;
   display: flex;
+}
+.componentRevamp {
+  padding: 10px 40px 0 40px;
+  width: 100%;
+  display: flex;
+  button {
+    text-transform: capitalize;
+  }
 }
 
 .componentWrapper {

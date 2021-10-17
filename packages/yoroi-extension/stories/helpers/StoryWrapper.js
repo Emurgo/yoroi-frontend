@@ -34,6 +34,7 @@ import { ledgerErrors } from '../../app/domain/LedgerLocalizedError';
 import type { UnitOfAccountSettingType } from '../../app/types/unitOfAccountType';
 import { IncorrectVersionError, IncorrectDeviceError } from '../../app/domain/ExternalDeviceCommon';
 import { addDecorator } from '@storybook/react';
+import { LayoutProvider } from '../../app/styles/context/layout';
 
 /**
  * This whole file is meant to mirror code in App.js
@@ -104,22 +105,24 @@ export default class StoryWrapper extends Component<Props> {
     Issue: https://github.com/mui-org/material-ui/issues/24282#issuecomment-859393395 */
     return (
       <div style={{ height: 'calc(100vh)' }}>
-        <EmotionThemeProvider theme={muiTheme}>
-          <ThemeProvider theme={muiTheme}>
-            <CssBaseline />
-            {globalStyles(muiTheme)}
-            {/* Automatically pass a theme prop to all components in this subtree. */}
-            <IntlProvider
-              {...{
-                locale,
-                key: locale,
-                messages: mergedMessages,
-              }}
-            >
-              <Story />
-            </IntlProvider>
-          </ThemeProvider>
-        </EmotionThemeProvider>
+        <LayoutProvider>
+          <EmotionThemeProvider theme={muiTheme}>
+            <ThemeProvider theme={muiTheme}>
+              <CssBaseline />
+              {globalStyles(muiTheme)}
+              {/* Automatically pass a theme prop to all components in this subtree. */}
+              <IntlProvider
+                {...{
+                  locale,
+                  key: locale,
+                  messages: mergedMessages,
+                }}
+              >
+                <Story />
+              </IntlProvider>
+            </ThemeProvider>
+          </EmotionThemeProvider>
+        </LayoutProvider>
       </div>
     );
   }

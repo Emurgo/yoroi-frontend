@@ -30,6 +30,7 @@ const storageKeys = {
   COIN_PRICE_PUB_KEY_DATA: networkForLocalStorage + '-COIN-PRICE-PUB-KEY-DATA',
   EXTERNAL_STORAGE: networkForLocalStorage + '-EXTERNAL-STORAGE',
   TOGGLE_SIDEBAR: networkForLocalStorage + '-TOGGLE-SIDEBAR',
+  SORTED_WALLETS: networkForLocalStorage + '-SORTED-WALLET',
   // ========== CONNECTOR   ========== //
   ERGO_CONNECTOR_WHITELIST: 'connector_whitelist',
 };
@@ -262,6 +263,17 @@ export default class LocalStorageApi {
       // ignore the error
     }
   }
+
+
+  // ========== Sort wallets - Revamp ========== //
+  getSortedWallets: void => Promise<?Array<number>> = async () => {
+    const result = await getLocalItem(storageKeys.SORTED_WALLETS);
+    if (result === undefined || result === null) return undefined;
+    return JSON.parse(result);
+  };
+
+  setSortedWallets: (Array<number>) => Promise<void> = value =>
+    setLocalItem(storageKeys.SORTED_WALLETS, JSON.stringify(value ?? []));
 
   async reset(): Promise<void> {
     await this.unsetUserLocale();

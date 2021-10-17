@@ -95,8 +95,8 @@ export default class StakingDashboard extends Component<Props> {
       : (null);
 
     // don't show anything when user has never delegated
-    const hideGraph = this.props.delegationHistory != null &&
-      this.props.delegationHistory.length === 0;
+    const hideGraph = (this.props.delegationHistory != null &&
+      this.props.delegationHistory.length === 0) || true; // <TODO:RWRD2109>
 
     const graphs = hideGraph
       ? null
