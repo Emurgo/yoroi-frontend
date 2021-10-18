@@ -1,5 +1,5 @@
 // @flow
-import type { Node } from 'react';
+import type { ComponentType, Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { computed, runInAction, observable } from 'mobx';
@@ -47,8 +47,16 @@ import { addressToDisplayString } from '../../api/ada/lib/storage/bridge/utils';
 import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
 import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
 import type { ComplexityLevelType } from '../../types/complexityLevelType';
+import { withLayout } from '../../styles/context/layout';
+import type { LayoutComponentMap } from '../../styles/context/layout';
+import WalletSummaryRevamp from '../../components/wallet/summary/WalletSummaryRevamp';
 
 export type GeneratedData = typeof WalletSummaryPage.prototype.generated;
+type Props = InjectedOrGenerated<GeneratedData>;
+type InjectedProps = {|
+  +renderLayoutComponent: LayoutComponentMap => Node,
+|};
+type AllProps = {| ...Props, ...InjectedProps |};
 
 const targetNotificationIds = [
   globalMessages.walletCreatedNotificationMessage.id,
@@ -57,13 +65,13 @@ const targetNotificationIds = [
 ];
 
 @observer
-export default class WalletSummaryPage extends Component<InjectedOrGenerated<GeneratedData>> {
+class WalletSummaryPage extends Component<AllProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
   @observable notificationElementId: string = '';
 
-  render(): null | Node {
+  render(): Node {
     const { intl } = this.context;
     const actions = this.generated.actions;
     const { wallets } = this.generated.stores;
@@ -220,7 +228,7 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
       );
     }
 
-    return (
+    const walletSummaryPageClassic = (
       <VerticalFlexContainer>
         <NotificationMessage icon={successIcon} show={!!notification}>
           {!!notification && (
@@ -324,6 +332,116 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
         ) : null}
       </VerticalFlexContainer>
     );
+
+    const walletSummaryPageRevamp = (
+      <VerticalFlexContainer>
+        <NotificationMessage icon={successIcon} show={!!notification}>
+          {!!notification && (
+            <FormattedHTMLMessage
+              {...notification.message}
+              values={notification.values == null ? undefined : notification.values(intl)}
+            />
+          )}
+        </NotificationMessage>
+
+        <WalletSummaryRevamp
+          numberOfTransactions={totalAvailable}
+          pendingAmount={unconfirmedAmount}
+          shouldHideBalance={profile.shouldHideBalance}
+          isLoadingTransactions={
+            /**
+             * only use first load
+             * to avoid wallet summary disappearing when wallet tx list is updating
+             */
+            !recentTransactionsRequest.wasExecuted
+          }
+          openExportTxToFileDialog={this.openExportTransactionDialog}
+          unitOfAccountSetting={profile.unitOfAccount}
+          getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
+        />
+
+        {walletTransactions}
+
+        {uiDialogs.isOpen(ExportTransactionDialog) ? exportDialog : null}
+
+        {uiDialogs.isOpen(AddMemoDialog) ? (
+          <AddMemoDialog
+            selectedWallet={publicDeriver}
+            selectedTransaction={(() => {
+              if (memos.selectedTransaction == null)
+                throw new Error('no selected transaction. Should never happen');
+              return memos.selectedTransaction;
+            })()}
+            error={memos.error}
+            onCancel={actions.memos.closeMemoDialog.trigger}
+            onSubmit={values => {
+              return actions.memos.saveTxMemo.trigger(values);
+            }}
+            classicTheme={profile.isClassicTheme}
+          />
+        ) : null}
+
+        {uiDialogs.isOpen(MemoNoExternalStorageDialog) ? (
+          <MemoNoExternalStorageDialog
+            onCancel={actions.memos.closeMemoDialog.trigger}
+            addExternal={() => {
+              actions.memos.closeMemoDialog.trigger();
+              actions.router.goToRoute.trigger({ route: ROUTES.SETTINGS.EXTERNAL_STORAGE });
+            }}
+            onAcknowledge={() => {
+              this.generated.stores.uiDialogs.getParam<(void) => void>('continuation')();
+            }}
+          />
+        ) : null}
+
+        {uiDialogs.isOpen(EditMemoDialog) ? (
+          <EditMemoDialog
+            selectedWallet={publicDeriver}
+            existingMemo={(() => {
+              if (memos.selectedTransaction == null)
+                throw new Error('no selected transaction. Should never happen');
+              const txid = memos.selectedTransaction.txid;
+              const memo = this.generated.stores.memos.txMemoMap.get(walletId)?.get(txid);
+              if (memo == null) throw new Error('Should never happen');
+              return memo;
+            })()}
+            error={memos.error}
+            onCancel={actions.memos.closeMemoDialog.trigger}
+            onClickDelete={this.openDeleteMemoDialog}
+            onSubmit={values => {
+              return actions.memos.updateTxMemo.trigger(values);
+            }}
+            classicTheme={profile.isClassicTheme}
+          />
+        ) : null}
+
+        {uiDialogs.isOpen(DeleteMemoDialog) ? (
+          <DeleteMemoDialog
+            selectedTransaction={(() => {
+              if (memos.selectedTransaction == null)
+                throw new Error('no selected transaction. Should never happen');
+              return memos.selectedTransaction;
+            })()}
+            error={memos.error}
+            onCancel={() => {
+              actions.memos.closeMemoDialog.trigger();
+            }}
+            onClose={actions.memos.closeMemoDialog.trigger}
+            onDelete={txHash => {
+              return actions.memos.deleteTxMemo.trigger({
+                publicDeriver,
+                txHash,
+              });
+            }}
+          />
+        ) : null}
+      </VerticalFlexContainer>
+    );
+
+    return this.props.renderLayoutComponent({
+      CLASSIC: walletSummaryPageClassic,
+      REVAMP: walletSummaryPageRevamp,
+    });
   }
 
   _getThisPageActiveNotification: void => ?Notification = () => {
@@ -442,7 +560,7 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
         addressSubgroupMap: $ReadOnlyMap<Class<IAddressTypeStore>, IAddressTypeUiSubset>,
       |},
       coinPriceStore: {|
-        getCurrentPrice: (from: string, to: string) => ?number
+        getCurrentPrice: (from: string, to: string) => ?number,
       |},
       memos: {|
         error: ?LocalizableError,
@@ -600,3 +718,4 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
     });
   }
 }
+export default (withLayout(WalletSummaryPage): ComponentType<Props>);
