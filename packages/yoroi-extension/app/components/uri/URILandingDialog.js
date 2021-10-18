@@ -3,8 +3,7 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
-import { Button } from 'react-polymorph/lib/components/Button';
-import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
+import { Button } from '@mui/material';
 import { defineMessages, intlShape } from 'react-intl';
 
 import Dialog from '../widgets/Dialog';
@@ -82,12 +81,12 @@ export default class URILandingDialog extends Component<Props> {
             </ul>
           </div>
           <Button
-            label={intl.formatMessage(globalMessages.uriLandingDialogConfirmLabel)}
-            onMouseUp={this.submit}
-            disabled={false}
-            skin={ButtonSkin}
-            className={classnames(['primary', styles.confirmButton])}
-          />
+            variant="primary"
+            onClick={this.submit}
+            sx={{ margin: '30px auto 0', display: 'block' }}
+          >
+            {intl.formatMessage(globalMessages.uriLandingDialogConfirmLabel)}
+          </Button>
         </div>
       </Dialog>
     );

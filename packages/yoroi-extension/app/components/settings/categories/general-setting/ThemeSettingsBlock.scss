@@ -1,7 +1,7 @@
 @import '../../../../themes/mixins/underline';
 
 .component {
-  border-top: 1px solid var(--cmn-default-color-grey-3-alpha);
+  border-top: 1px solid var(--yoroi-palette-gray-200);
   padding-top: 30px;
 
   .main {
@@ -11,8 +11,8 @@
   }
 
   .title {
-    color: var(--theme-support-settings-text-color);
-    font-family: var(--font-semibold);
+    color: var(--yoroi-support-settings-text);
+    font-weight: 500;
     font-size: 18px;
     line-height: 22px;
     margin-bottom: 12px;
@@ -20,22 +20,22 @@
 
   .subTitle {
     font-size: 14px;
-    font-family: var(--font-regular);
+    font-weight: 400;
     line-height: 22px;
     text-align: center;
-    color: var(--theme-support-settings-text-color);
+    color: var(--yoroi-support-settings-text);
   }
 
   a,
   p {
-    color: var(--theme-support-settings-text-color);
-    font-family: var(--font-regular);
+    color: var(--yoroi-support-settings-text);
+    font-weight: 400;
     font-size: 14px;
     line-height: 22px;
   }
 
   a {
-    color: var(--theme-support-settings-link-color);
+    color: var(--yoroi-support-settings-text);
   }
 
   p {
@@ -43,7 +43,7 @@
   }
 
   .link {
-    @include underline(var(--theme-underline-dark-color));
+    @include underline(var(--yoroi-palette-gray-800));
   }
 }
 
@@ -75,13 +75,13 @@
       position: absolute;
       top: calc(50% - 37px);
       left: 0px;
-      background-color: var(--theme-banner-warning-background-color);
-      color: var(--rp-button-text-color, #fff);
+      background-color: var(--yoroi-palette-background-banner-warning);
+      color: var(--yoroi-palette-common-white);
       padding: 10px;
     }
 
     div {
-      box-shadow: 0 5px 30px 0px rgba(24,26,30, .12);
+      box-shadow: 0 5px 30px 0px rgba(24, 26, 30, 0.12);
     }
 
     &.inactive {
@@ -98,30 +98,4 @@
   margin: 20px 0;
   display: flex;
   justify-content: center;
-}
-.classic,
-.revamp {
-  background: white !important;
-  color: #6b7384 !important;
-  border: 1px solid #6b7384 !important;
-  &:hover {
-    color: #383838;
-    background: white !important;
-  }
-}
-.revamp {
-  position: relative;
-  &::after {
-    content: 'new';
-    text-transform: uppercase;
-    top: 50%;
-    right: 30px;
-    transform: translateY(-50%);
-    position: absolute;
-    font-size: 14px;
-    color: var(--theme-button-primary-text-color);
-    background-color: var(--theme-button-primary-background-color);
-    padding: 4px 10px;
-    border-radius: 777px;
-  }
 }

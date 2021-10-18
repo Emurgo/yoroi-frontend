@@ -8,8 +8,7 @@ import classnames  from 'classnames';
 import BeginnerLevel from '../../../assets/images/complexity-level/beginner-level.inline.svg';
 import AdvancedLevel from '../../../assets/images/complexity-level/advanced-level.inline.svg';
 import LocalizableError from '../../../i18n/LocalizableError';
-import { Button } from 'react-polymorph/lib/components/Button';
-import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
+import { LoadingButton } from '@mui/lab';
 import { ComplexityLevels } from '../../../types/complexityLevelType';
 import type { ComplexityLevelType } from '../../../types/complexityLevelType';
 
@@ -78,13 +77,6 @@ class ComplexityLevel extends Component<Props> {
       }
     ];
 
-    const buttonClasses = classnames([
-      'secondary',
-      isSubmitting ?
-        styles.submitButtonSpinning :
-        styles.submitButton
-    ]);
-
     return (
       <>
         <div className={styles.component}>
@@ -111,13 +103,14 @@ class ComplexityLevel extends Component<Props> {
                     <h3>{level.name}</h3>
                     <p>{level.description}</p>
                   </div>
-                  <Button
-                    label={intl.formatMessage(messages.labelChoose)}
-                    className={buttonClasses}
-                    disabled={isSubmitting || (complexityLevel === level.key)}
+                  <LoadingButton
+                    variant="secondary"
+                    loading={isSubmitting}
+                    disabled={(complexityLevel === level.key)}
                     onClick={() => this.props.onSubmit(level.key)}
-                    skin={ButtonSkin}
-                  />
+                  >
+                    {intl.formatMessage(messages.labelChoose)}
+                  </LoadingButton>
                 </div>
               </div>
             ))

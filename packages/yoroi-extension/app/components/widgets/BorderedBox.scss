@@ -1,14 +1,13 @@
 .component {
-  background: var(--theme-bordered-box-background-color);
-  border: var(--theme-bordered-box-border);
+  background: var(--yoroi-palette-common-white);
   padding: 20px;
 }
 
 :global(.YoroiModern) .component {
   padding: 30px;
   border-radius: 8px;
-  
+
   label {
-    background: var(--theme-bordered-box-background-color);
-  }  
+    background: var(--yoroi-palette-common-white);
+  }
 }

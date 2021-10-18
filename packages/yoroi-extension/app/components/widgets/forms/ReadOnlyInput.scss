@@ -2,17 +2,11 @@
   margin-bottom: 32px;
   position: relative;
 
-  .disabled {
-    background-color: var(--theme-input-background-color);
-    border-color: var(--theme-input-border-color);
-    color: var(--theme-input-text-color);
-  }
-
   .button {
-    bottom: 20px;
-    color: var(--theme-label-button-color);
+    bottom: 44px;
+    color: var(--yoroi-palette-gray-800);
     cursor: pointer;
-    font-family: var(--font-light);
+    font-weight: 300;
     font-size: 16px;
     line-height: 1.38;
     opacity: 0.5;
@@ -23,10 +17,6 @@
       opacity: 1;
     }
   }
-
-  .icon svg {
-    vertical-align: bottom;
-  }  
 }
 
 :global(.YoroiModern) .component {
@@ -41,6 +31,6 @@
 
 :global(.YoroiClassic) .component {
   .button {
-    bottom: 35px;
-  }  
+    bottom: 44px;
+  }
 }

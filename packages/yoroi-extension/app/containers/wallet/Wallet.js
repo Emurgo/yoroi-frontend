@@ -22,8 +22,8 @@ import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/in
 import type { WarningList } from '../../stores/toplevel/WalletSettingsStore';
 import { allCategories } from '../../stores/stateless/topbarCategories';
 import { MultiToken } from '../../api/common/lib/MultiToken';
-import { withLayout } from '../../themes/context/layout';
-import type { LayoutComponentMap } from '../../themes/context/layout';
+import { withLayout } from '../../styles/context/layout';
+import type { LayoutComponentMap } from '../../styles/context/layout';
 import NavBarContainerRevamp from '../NavBarContainerRevamp';
 import globalMessages from '../../i18n/global-messages';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
@@ -69,7 +69,7 @@ class Wallet extends Component<AllProps> {
     if (publicDeriver == null) throw new Error(`${nameof(Wallet)} no public deriver`);
 
     const spendableBalance = this.generated.stores.transactions.getBalanceRequest.result;
-    const walletHasAssets = !!(spendableBalance?.nonDefaultEntries()?.length);
+    const walletHasAssets = !!(spendableBalance?.nonDefaultEntries().length);
 
     const activeCategory = allCategories.find(
       category => this.generated.stores.app.currentRoute.startsWith(category.route)
@@ -121,7 +121,7 @@ class Wallet extends Component<AllProps> {
     const warning = this.getWarning(selectedWallet);
 
     const spendableBalance = this.generated.stores.transactions.getBalanceRequest.result
-    const walletHasAssets = !!(spendableBalance?.nonDefaultEntries()?.length);
+    const walletHasAssets = !!(spendableBalance?.nonDefaultEntries().length);
     const visibilityContext = { selected: selectedWallet, walletHasAssets };
 
     const menu = (

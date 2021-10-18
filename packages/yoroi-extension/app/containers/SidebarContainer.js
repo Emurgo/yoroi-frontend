@@ -8,8 +8,8 @@ import type { InjectedOrGenerated } from '../types/injectedPropsType';
 import { allCategories, allCategoriesRevamp } from '../stores/stateless/sidebarCategories';
 import { PublicDeriver } from '../api/ada/lib/storage/models/PublicDeriver';
 import SidebarRevamp from '../components/topbar/SidebarRevamp';
-import { withLayout } from '../themes/context/layout';
-import type { LayoutComponentMap } from '../themes/context/layout';
+import { withLayout } from '../styles/context/layout';
+import type { LayoutComponentMap } from '../styles/context/layout';
 
 export type GeneratedData = typeof SidebarContainer.prototype.generated;
 

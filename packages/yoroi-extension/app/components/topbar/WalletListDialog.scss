@@ -1,8 +1,6 @@
 .component {
-  font-family: var(--font-regular);
   font-size: 16px;
   min-width: 673px !important;
-  margin: 24px 4px 0 0 !important;
   padding-right: 0 !important;
 
   .header {
@@ -14,13 +12,12 @@
   }
   .amount {
     margin-right: 8px;
-    color: #6b7384;
+    color: var(--yoroi-palette-gray-600);
     .label {
       margin-bottom: 4px;
       font-size: 14px;
     }
     .value {
-      font-family: var(--font-semibold);
       font-weight: 500;
     }
   }
@@ -43,9 +40,9 @@
     display: flex;
     justify-content: center;
     button {
-      font-family: var(--font-medium);
+      font-weight: 500;
       text-transform: uppercase;
-      color: var(--theme-default-main-color);
+      color: var(--yoroi-palette-secondary-300);
     }
   }
 }

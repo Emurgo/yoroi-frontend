@@ -91,7 +91,7 @@ export default class URIDisplayDialog extends Component<Props> {
             elementId={uriNotificationId}
             onCopyAddress={() => onCopyAddressTooltip(uriNotificationId)}
             notification={notification}
-            tooltipOpensUpward
+            placementTooltip="bottom-start"
           >
             <span className={styles.uri}>{uri}</span>
           </CopyableAddress>

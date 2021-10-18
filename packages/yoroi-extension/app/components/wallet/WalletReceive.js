@@ -237,6 +237,7 @@ export default class WalletReceive extends Component<Props> {
                   () => onCopyAddressTooltip(address.address, notificationElementId)
                 }
                 notification={notification}
+                placementTooltip="bottom-start"
               >
                 <ExplorableHashContainer
                   selectedExplorer={this.props.selectedExplorer}

@@ -1,7 +1,7 @@
 .wrapper {
   padding: 20px 20px 20px 30px;
   display: flex;
-  background-color: var(--theme-wallet-dropdown-background-color);
+  background-color: var(--yoroi-palette-common-white);
 }
 
 .titleWrapper {
@@ -9,15 +9,15 @@
 }
 
 .title {
-  color: var(--theme-wallet-dropdown-secondary-text-color);
-  font-family: var(--font-medium);
+  color: var(--yoroi-palette-gray-600);
   font-size: 18px;
+  font-weight: 500;
   line-height: 22px;
   text-align: left;
 }
 
 .currentWrapper {
-  background-color: var(--theme-wallet-dropdown-selected-background-color);
+  background-color: var(--yoroi-palette-gray-50);
 }
 
 .head {
@@ -34,5 +34,5 @@ button {
 }
 
 .syncLabel {
-  color: var(--theme-wallet-dropdown-secondary-text-color);
+  color: var(--yoroi-palette-gray-600);
 }

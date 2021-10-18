@@ -4,7 +4,7 @@ import type { Node, ComponentType } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import styles from './TopBarLayout.scss';
-import { withLayout } from '../../themes/context/layout';
+import { withLayout } from '../../styles/context/layout';
 
 type Props = {|
   +banner?: Node,

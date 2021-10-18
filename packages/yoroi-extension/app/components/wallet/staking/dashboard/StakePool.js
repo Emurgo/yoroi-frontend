@@ -4,10 +4,8 @@ import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import { toSvg } from 'jdenticon';
-import classnames from 'classnames';
 
-import { Button } from 'react-polymorph/lib/components/Button';
-import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
+import { Button } from '@mui/material';
 
 import CardShadow from './CardShadow';
 // import ProgressCircle from './ProgressCircle';
@@ -189,6 +187,7 @@ export default class StakePool extends Component<Props> {
                 elementId={poolIdNotificationId}
                 onCopyAddress={() => this.props.onCopyAddressTooltip(hash, poolIdNotificationId)}
                 notification={this.props.notification}
+                placementTooltip="bottom-start"
               >
                 <ExplorableHashContainer
                   selectedExplorer={this.props.selectedExplorer}
@@ -237,44 +236,26 @@ export default class StakePool extends Component<Props> {
     );
   }
 
-  getMoreInfoButton: ?MoreInfoProp => Node = (info) => {
+  getMoreInfoButton: (?MoreInfoProp) => Node = info => {
     const { intl } = this.context;
 
-    const moreInfoButtonClasses = classnames([
-      'secondary',
-    ]);
-    const undelegateButtonClasses = classnames([
-      'secondary',
-    ]);
     return (
       <>
-        {info != null &&
-          <a
-            href={info.url}
-            onClick={info.openPoolPage}
-          >
+        {info != null && (
+          <a href={info.url} onClick={info.openPoolPage}>
             <div className={styles.data} />
-            <Button
-              type="button"
-              label={intl.formatMessage(messages.viewWebpage)}
-              className={moreInfoButtonClasses}
-              skin={ButtonSkin}
-            />
+            <Button variant="secondary">{intl.formatMessage(messages.viewWebpage)}</Button>
           </a>
-        }
-        {this.props.undelegate != null &&
+        )}
+        {this.props.undelegate != null && (
           <>
             <div className={styles.data} />
-            <Button
-              type="button"
-              label={intl.formatMessage(globalMessages.undelegateLabel)}
-              className={undelegateButtonClasses}
-              skin={ButtonSkin}
-              onClick={this.props.undelegate}
-            />
+            <Button variant="secondary" onClick={this.props.undelegate}>
+              {intl.formatMessage(globalMessages.undelegateLabel)}
+            </Button>
           </>
-        }
+        )}
       </>
     );
-  }
+  };
 }

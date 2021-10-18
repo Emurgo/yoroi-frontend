@@ -2,7 +2,7 @@
   position: relative;
   z-index: 100;
   background-color: #fff;
-  color: var(--theme-navbar-color);
+  color: var(--yoroi-palette-gray-800);
   box-shadow: 0 4px 6px 0 #dee2ea, 0 1px 2px 0 rgba(222, 226, 234, 0.82),
     0 2px 4px 0 rgba(222, 226, 234, 0.74);
   display: flex;
@@ -43,7 +43,7 @@
     max-width: 24px;
     max-height: 24px;
     path {
-      fill: #6b7384;
+      fill: var(--yoroi-palette-gray-600);
     }
   }
 }

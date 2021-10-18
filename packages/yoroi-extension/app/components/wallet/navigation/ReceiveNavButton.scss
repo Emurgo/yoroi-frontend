@@ -2,12 +2,12 @@
 
 .wrapper {
   display: flex;
-  font-family: var(--font-light);
-  color: var(--theme-wallet-plate-secondary-text-color);
+  font-weight: 300;
+  color: var(--yoroi-palette-gray-600);
   font-size: 1rem;
   &:hover {
     cursor: pointer;
-    background: #fff;
+    background: var(--yoroi-palette-common-white);
   }
 }
 
@@ -16,20 +16,21 @@
   padding: 7px;
   border-bottom: 3px solid transparent;
   width: 100%;
-  text-align:left;
+  text-align: left;
+  color: var(--yoroi-palette-gray-600);
 }
 
 .active {
-  background: var(--theme-settings-menu-item-background-color-active);
-  
+  background: var(--yoroi-palette-common-white);
+  color: var(--yoroi-palette-gray-600);
   .label {
-    font-family: var(--font-semibold);
+    font-weight: 500;
   }
   .notTopLevel {
-    color: var(--theme-wallet-navigation-tab-text-color);
+    color: var(--yoroi-palette-gray-600);
   }
   .topLevel {
-    color: var(--theme-transactions-priority-high-text-color);
+    color: var(--yoroi-palette-secondary-300);
   }
 }
 .notTopLevel {
@@ -38,7 +39,6 @@
 .topLevel {
   padding-left: 24px;
 }
-
 
 .icon {
   position: relative;
@@ -50,7 +50,7 @@
     max-width: 24px;
 
     & > g {
-      fill: var(--theme-wallet-navigation-tab-text-color);
+      fill: var(--yoroi-palette-gray-600);
     }
   }
 }
@@ -58,5 +58,5 @@
 .label {
   font-size: 1rem;
   line-height: 22px;
-  font-family: var(--font-regular);
+  font-weight: 400;
 }

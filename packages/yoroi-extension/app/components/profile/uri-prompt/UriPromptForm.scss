@@ -10,8 +10,8 @@
   }
 
   .explanation {
-    font-family: var(--font-regular);
-    color: var(--cmn-default-color-grey);
+    font-weight: 400;
+    color: var(--yoroi-palette-gray-800);
     line-height: 22px;
 
     h1 {
@@ -36,12 +36,6 @@
       height: 282.1px;
       width: 526px;
     }
-  }
-
-  .submitButton {
-    display: block !important;
-    margin: 0;
-    width: 240px !important;
   }
 
   .buttonsWrapper {

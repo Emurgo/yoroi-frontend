@@ -5,16 +5,16 @@
 }
 
 .title {
-    font-family: var(--font-medium);
+    font-weight: 500;
     font-size: 18px;
     line-height: 22px;
     margin-bottom: 16px;
 }
 
 .inner {
-    background-color: var(--theme-main-body-background-color);
+    background-color: var(--yoroi-palette-common-white);
     flex: 1;
     border-radius: 6px;
-    box-shadow: 0 3px 10px 2px var(--theme-dashboard-card-shadow-color);
-    border: 1px solid var(--theme-dashboard-card-border-color);
+    box-shadow: 0 3px 10px 2px var(--yoroi-dashboard-card-shadow-color);
+    border: 1px solid var(--yoroi-dashboard-card-border-color);
 }

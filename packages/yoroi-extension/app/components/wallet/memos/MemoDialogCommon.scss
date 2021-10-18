@@ -1,6 +1,6 @@
 .component {
   .content {
-    font-family: var(--font-regular);
+    font-weight: 400;
     font-size: 14px;
     line-height: 1.38;
     text-align: center;
@@ -15,11 +15,10 @@
 
 :global {
   .Dialog_actions {
-    margin-top: 14px!important;
+    margin-top: 14px !important;
   }
 }
 
 :global(.YoroiModern) .component {
-  min-width: var(--theme-modal-min-max-width-cmn);
-  max-width: var(--theme-modal-min-max-width-cmn); 
+  min-width: var(--yoroi-comp-dialog-min-width-md);
 }

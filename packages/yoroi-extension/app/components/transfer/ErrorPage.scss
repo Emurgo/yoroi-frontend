@@ -8,14 +8,14 @@
 }
 
 .body {
-  color: var(--theme-bordered-box-text-color);
-  font-family: var(--font-regular);
+  color: var(--yoroi-palette-gray-900);
+  font-weight: 400;
   font-size: 14px;
   line-height: 19px;
 
   .title {
     font-size: 19px;
-    font-family: var(--font-medium);
+    font-weight: 500;
     line-height: 23px;
     margin-bottom: 6px;
     word-break: break-all;
