@@ -148,6 +148,7 @@ export type ExportTransactionsRequest = {|
   ticker: string,
   rows: Array<TransactionExportRow>,
   nameSuffix: string,
+  shouldExportIds: boolean,
   format?: TransactionExportDataFormat,
   fileType?: TransactionExportFileType,
 |};

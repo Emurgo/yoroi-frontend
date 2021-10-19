@@ -397,7 +397,6 @@ export async function rawGetTransactions(
       defaultToken,
     })
   }));
-
   return {
     addressLookupMap,
     txs: result,

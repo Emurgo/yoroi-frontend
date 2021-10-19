@@ -215,6 +215,7 @@ export class CardanoShelleyAssociateTxWithIOs {
       ...getOrThrow(utxo.get(transaction)),
       accountingInputs: getOrThrow(accounting.get(transaction)).accountingInputs,
       tokens,
+      id: transaction.Hash,
     }));
     return fullTx;
   }
@@ -270,6 +271,7 @@ export class ErgoAssociateTxWithIOs {
             NetworkId: token.Token.NetworkId,
           },
         })),
+        id: transaction.Hash,
       };
     });
     return fullTx;

@@ -13,13 +13,15 @@ import type {
   ExportTransactionsRequest,
   ExportTransactionsResponse,
 } from '../common';
+import { string } from '../ada/lib/storage/database/walletTypes/bip44/api/utils';
 
 export type TransactionExportRow = {|
   type: 'in' | 'out',
   amount: string,
   fee: string,
   date: Date,
-  comment?: string
+  comment?: string,
+  id: string,
 |}
 
 export type CsvData = {|
@@ -66,9 +68,9 @@ export default class ExportApi {
     try {
       Logger.debug(`ExportApi::${nameof(this.exportTransactions)}: called`);
 
-      const { ticker, rows, format, fileType } = request;
+      const { ticker, rows, format, fileType, shouldExportIds } = request;
       const dlFileName = ExportApi.createDefaultFileName(request.nameSuffix);
-      const data = ExportApi.convertExportRowsToCsv(ticker, rows, format);
+      const data = ExportApi.convertExportRowsToCsv(ticker, rows, format, shouldExportIds);
       const fileResponse = ExportApi.convertCsvDataToFile(data, fileType);
 
       Logger.debug(`ExportApi::${nameof(this.exportTransactions)}: success`);
@@ -92,11 +94,12 @@ export default class ExportApi {
   static convertExportRowsToCsv(
     ticker: string,
     rows: Array<TransactionExportRow>,
-    format?: TransactionExportDataFormat = TRANSACTION_EXPORT_DATA_FORMAT.CoinTracking
+    format?: TransactionExportDataFormat = TRANSACTION_EXPORT_DATA_FORMAT.CoinTracking,
+    shouldExportIds: boolean,
   ): CsvData {
     switch (format) {
       case TRANSACTION_EXPORT_DATA_FORMAT.CoinTracking:
-        return _formatExportRowsIntoCoinTrackingFormat(ticker, rows);
+        return _formatExportRowsIntoCoinTrackingFormat(ticker, rows, shouldExportIds);
       default: throw new Error('Unexpected export data format: ' + format);
     }
   }
@@ -154,23 +157,37 @@ export const COIN_TRACKING_HEADERS = [
 
 function _formatExportRowsIntoCoinTrackingFormat(
   ticker: string,
-  rows: Array<TransactionExportRow>
+  rows: Array<TransactionExportRow>,
+  shouldExportIds: boolean,
 ): CsvData {
+  let headers = COIN_TRACKING_HEADERS
+
+  if (shouldExportIds) {
+    headers.push('ID')
+  }
   return {
-    headers: COIN_TRACKING_HEADERS,
-    rows: rows.map(r => [
-      _formatExportRowTypeForCoinTracking(r.type),
-      r.type === 'in' ? r.amount : '',
-      r.type === 'in' ? ticker : '',
-      r.type === 'out' ? r.amount : '',
-      r.type === 'out' ? ticker : '',
-      r.type === 'out' ? r.fee : '',
-      r.type === 'out' ? ticker : '',
-      '',
-      '',
-      r.comment != null ? r.comment : '',
-      moment(r.date).format('YYYY-MM-DD HH:mm:ss')
-    ])
+    headers,
+    rows: rows.map(r => {
+      const row = [
+        _formatExportRowTypeForCoinTracking(r.type),
+        r.type === 'in' ? r.amount : '',
+        r.type === 'in' ? ticker : '',
+        r.type === 'out' ? r.amount : '',
+        r.type === 'out' ? ticker : '',
+        r.type === 'out' ? r.fee : '',
+        r.type === 'out' ? ticker : '',
+        '',
+        '',
+        r.comment != null ? r.comment : '',
+        moment(r.date).format('YYYY-MM-DD HH:mm:ss'),
+      ]
+
+      if (shouldExportIds) {
+        row.push(Boolean(r.id) ? r.id : '')
+      }
+
+      return row
+    })
   };
 }
 

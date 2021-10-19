@@ -115,6 +115,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     = new LocalizedRequest<ExportTransactionsFunc>(this.api.export.exportTransactions);
   @observable isExporting: boolean = false;
   @observable exportError: ?LocalizableError;
+  @observable shouldExportIds: boolean = false;
 
   setup(): void {
     super.setup();
@@ -641,6 +642,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
         nameSuffix: plate == null
           ? tokenName
           : `${tokenName}-${plate}`,
+        shouldExportIds: this.shouldExportIds,
       }).promise;
     };
   }
