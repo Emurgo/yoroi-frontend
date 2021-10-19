@@ -148,7 +148,7 @@ export type ExportTransactionsRequest = {|
   ticker: string,
   rows: Array<TransactionExportRow>,
   nameSuffix: string,
-  shouldExportIds: boolean,
+  shouldIncludeTxIds: boolean,
   format?: TransactionExportDataFormat,
   fileType?: TransactionExportFileType,
 |};

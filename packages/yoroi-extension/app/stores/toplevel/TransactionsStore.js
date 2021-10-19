@@ -115,7 +115,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     = new LocalizedRequest<ExportTransactionsFunc>(this.api.export.exportTransactions);
   @observable isExporting: boolean = false;
   @observable exportError: ?LocalizableError;
-  @observable shouldExportIds: boolean = false;
+  @observable shouldIncludeTxIds: boolean = false;
 
   setup(): void {
     super.setup();
@@ -186,6 +186,10 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       await this.refreshLocal(publicDeriver);
     }
   };
+
+  @action toggleIncludeTxIds: void => void = () => {
+    this.shouldIncludeTxIds = !this.shouldIncludeTxIds
+  }
 
   @computed get recentTransactionsRequest(): CachedRequest<GetTransactionsFunc> {
     const publicDeriver = this.stores.wallets.selected;
@@ -521,6 +525,9 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
         await continuation();
         this._setExporting(false);
         this.actions.dialogs.closeActiveDialog.trigger();
+        runInAction(() => {
+          this.shouldIncludeTxIds = false
+        })
       }, EXPORT_START_DELAY);
 
     } catch (error) {
@@ -606,7 +613,8 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
               amount: defaultInfo.amount.div(divider).toString(),
               fee: '0',
               date: epochStartDate,
-              comment: `Staking Reward Epoch ${item[0]}`
+              comment: `Staking Reward Epoch ${item[0]}`,
+              id: '',
             };
           });
           respTxRows.push(...rewardRows);
@@ -642,7 +650,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
         nameSuffix: plate == null
           ? tokenName
           : `${tokenName}-${plate}`,
-        shouldExportIds: this.shouldExportIds,
+        shouldIncludeTxIds: this.shouldIncludeTxIds,
       }).promise;
     };
   }

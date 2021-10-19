@@ -13,6 +13,8 @@ import ErrorBlock from '../../widgets/ErrorBlock';
 import globalMessages from '../../../i18n/global-messages';
 
 import styles from './ExportTransactionDialog.scss';
+import { Checkbox } from '@mui/material';
+import CheckboxLabel from '../../common/CheckboxLabel';
 
 const messages = defineMessages({
   dialogTitle: {
@@ -23,12 +25,18 @@ const messages = defineMessages({
     id: 'wallet.transaction.export.dialog.infoText1',
     defaultMessage: '!!!The entire transaction history within your wallet will be exported to a file',
   },
+  includeTxIds: {
+    id: 'wallet.transaction.export.dialog.includeTxIds',
+    defaultMessage: '!!!Include Transaction IDs'
+  }
 });
 
 type Props = {|
   +isActionProcessing: ?boolean,
   +error: ?LocalizableError,
   +submit: void => PossiblyAsync<void>,
+  +toggleIncludeTxIds: void => void,
+  +shouldIncludeTxIds: boolean,
   +cancel: void => void,
 |};
 
@@ -45,7 +53,9 @@ export default class ExportTransactionDialog extends Component<Props> {
       isActionProcessing,
       error,
       submit,
-      cancel
+      cancel,
+      toggleIncludeTxIds,
+      shouldIncludeTxIds
     } = this.props;
 
     const infoBlock = (
@@ -70,6 +80,13 @@ export default class ExportTransactionDialog extends Component<Props> {
         onClose={cancel}
       >
         {infoBlock}
+        <div className={styles.includeTxIds}>
+          <CheckboxLabel 
+          label={intl.formatMessage(messages.includeTxIds)}
+          onChange={toggleIncludeTxIds}
+          checked={shouldIncludeTxIds}
+          /> 
+        </div>
         {error && <ErrorBlock error={error} />}
       </Dialog>);
   }

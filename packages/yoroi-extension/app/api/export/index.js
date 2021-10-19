@@ -68,9 +68,9 @@ export default class ExportApi {
     try {
       Logger.debug(`ExportApi::${nameof(this.exportTransactions)}: called`);
 
-      const { ticker, rows, format, fileType, shouldExportIds } = request;
+      const { ticker, rows, format, fileType, shouldIncludeTxIds } = request;
       const dlFileName = ExportApi.createDefaultFileName(request.nameSuffix);
-      const data = ExportApi.convertExportRowsToCsv(ticker, rows, format, shouldExportIds);
+      const data = ExportApi.convertExportRowsToCsv(ticker, rows, format, shouldIncludeTxIds);
       const fileResponse = ExportApi.convertCsvDataToFile(data, fileType);
 
       Logger.debug(`ExportApi::${nameof(this.exportTransactions)}: success`);
@@ -95,11 +95,11 @@ export default class ExportApi {
     ticker: string,
     rows: Array<TransactionExportRow>,
     format?: TransactionExportDataFormat = TRANSACTION_EXPORT_DATA_FORMAT.CoinTracking,
-    shouldExportIds: boolean,
+    shouldIncludeTxIds: boolean,
   ): CsvData {
     switch (format) {
       case TRANSACTION_EXPORT_DATA_FORMAT.CoinTracking:
-        return _formatExportRowsIntoCoinTrackingFormat(ticker, rows, shouldExportIds);
+        return _formatExportRowsIntoCoinTrackingFormat(ticker, rows, shouldIncludeTxIds);
       default: throw new Error('Unexpected export data format: ' + format);
     }
   }
@@ -158,11 +158,11 @@ export const COIN_TRACKING_HEADERS = [
 function _formatExportRowsIntoCoinTrackingFormat(
   ticker: string,
   rows: Array<TransactionExportRow>,
-  shouldExportIds: boolean,
+  shouldIncludeTxIds: boolean,
 ): CsvData {
-  let headers = COIN_TRACKING_HEADERS
+  let headers = [...COIN_TRACKING_HEADERS]
 
-  if (shouldExportIds) {
+  if (shouldIncludeTxIds) {
     headers.push('ID')
   }
   return {
@@ -182,7 +182,7 @@ function _formatExportRowsIntoCoinTrackingFormat(
         moment(r.date).format('YYYY-MM-DD HH:mm:ss'),
       ]
 
-      if (shouldExportIds) {
+      if (shouldIncludeTxIds) {
         row.push(Boolean(r.id) ? r.id : '')
       }
 
