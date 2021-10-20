@@ -26,6 +26,7 @@ export type UserAnnotation = {|
   +type: TransactionDirectionType,
   +amount: MultiToken,
   +fee: MultiToken,
+  // +id: string,
 |};
 
 export type CardanoAddressedUtxo = {|

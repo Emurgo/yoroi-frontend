@@ -141,28 +141,31 @@ test('convertAdaTransactionsToExportRows', () => {
       lists.map(list => tokenEntry(list)),
       new Set([4]),
       '2010-01-01 22:12:22',
+      'id001'
     ),
     _tx(
       [testInputs[1]],
       [testOutputs[2], testOutputs[3]],
       lists.map(list => tokenEntry(list)),
       new Set([6]),
-      '2012-05-12 11:22:33'
+      '2012-05-12 11:22:33',
+      'id002'
     ),
     _tx(
       [testInputs[2], testInputs[3]],
       [testOutputs[4], testOutputs[5]],
       lists.map(list => tokenEntry(list)),
       new Set([2, 3, 9]),
-      '2015-12-13 10:20:30'
+      '2015-12-13 10:20:30',
+      'id003'
     ),
   ],
   cardanoToken
   );
   _expectEqual(res, [
-    _expRow('1.0', '0.0', 'in', '2010-01-01 22:12:22'),
-    _expRow('2.0', '0.0', 'in', '2012-05-12 11:22:33'),
-    _expRow('2.1', `0.${900000 - 712345}`, 'out', '2015-12-13 10:20:30'),
+    _expRow('1.0', '0.0', 'in', '2010-01-01 22:12:22', 'id001'),
+    _expRow('2.0', '0.0', 'in', '2012-05-12 11:22:33', 'id002'),
+    _expRow('2.1', `0.${900000 - 712345}`, 'out', '2015-12-13 10:20:30', 'id003'),
   ]);
 });
 
@@ -172,7 +175,8 @@ test('self tx', () => {
     [testOutputs[0]],
     lists.map(list => tokenEntry(list)),
     new Set([0, 4]),
-    '2015-12-13 10:20:30'
+    '2015-12-13 10:20:30',
+    'id003',
   );
   expect(selfTx.type).toEqual(transactionTypes.SELF);
   expect(selfTx.amount.getDefault()).toEqual(new BigNumber(0));
@@ -185,7 +189,8 @@ test('multi tx', () => {
     [testOutputs[0], testOutputs[1]],
     lists.map(list => tokenEntry(list)),
     new Set([0, 4]),
-    '2015-12-13 10:20:30'
+    '2015-12-13 10:20:30',
+    'id003'
   );
   expect(selfTx.type).toEqual(transactionTypes.MULTI);
 });
@@ -230,10 +235,12 @@ const _tx = (
   tokens: $PropertyType<DbTokenInfo, 'tokens'>,
   ownedAddresses: Set<number>,
   date: string,
+  id: string,
 ): {|
   ...CardanoByronTxIO,
   ...WithNullableFields<DbBlock>,
   ...UserAnnotation,
+  id: string,
 |} => {
   const annotation = getFromUserPerspective({
     utxoInputs,
@@ -245,6 +252,7 @@ const _tx = (
 
   return {
     txType: TransactionType.CardanoByron,
+    id,
     transaction: {
       Type: TransactionType.CardanoByron,
       TransactionId: 0,
@@ -276,8 +284,9 @@ const _expRow = (
   amount: string,
   fee: string,
   type: 'in' | 'out',
-  date: string
-): TransactionExportRow => ({ type, amount, fee, date: new Date(date) });
+  date: string,
+  id: string,
+): TransactionExportRow => ({ type, amount, fee, date: new Date(date), id });
 
 function _expectEqual(a: any, b: any): void {
   expect(a).toEqual(b);

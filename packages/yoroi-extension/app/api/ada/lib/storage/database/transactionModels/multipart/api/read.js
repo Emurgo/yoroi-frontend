@@ -40,7 +40,7 @@ export class CardanoByronAssociateTxWithIOs {
       txs: $ReadOnlyArray<$ReadOnly<TransactionRow>>,
       networkId: number,
     |},
-  ): Promise<Array<CardanoByronTxIO>> {
+  ): Promise<Array<{| ...CardanoByronTxIO, id: string |}>> {
     const utxo = await CardanoByronAssociateTxWithIOs.depTables.AssociateTxWithUtxoIOs.getIOsForTx(
       db, tx, { txs: request.txs }
     );
@@ -71,6 +71,7 @@ export class CardanoByronAssociateTxWithIOs {
           NetworkId: token.Token.NetworkId,
         },
       })),
+      id: transaction.Hash,
     }));
     return fullTx;
   }
@@ -97,7 +98,7 @@ export class JormungandrAssociateTxWithIOs {
       txs: $ReadOnlyArray<$ReadOnly<TransactionRow>>,
       networkId: number,
     |},
-  ): Promise<Array<JormungandrTxIO>> {
+  ): Promise<Array<{| ...JormungandrTxIO, id: string |}>> {
     if (request.txs.length === 0) return [];
 
     const { depTables } = JormungandrAssociateTxWithIOs;
@@ -170,7 +171,7 @@ export class CardanoShelleyAssociateTxWithIOs {
       txs: $ReadOnlyArray<$ReadOnly<TransactionRow>>,
       networkId: number,
     |},
-  ): Promise<Array<CardanoShelleyTxIO>> {
+  ): Promise<Array<{| ...CardanoShelleyTxIO, id: string |}>> {
     const { depTables } = CardanoShelleyAssociateTxWithIOs;
     const utxo = await depTables.AssociateTxWithUtxoIOs.getIOsForTx(
       db, tx, { txs: request.txs }
@@ -239,7 +240,7 @@ export class ErgoAssociateTxWithIOs {
       txs: $ReadOnlyArray<$ReadOnly<TransactionRow>>,
       networkId: number,
     |},
-  ): Promise<Array<ErgoTxIO>> {
+  ): Promise<Array<{| ...ErgoTxIO, id: string |}>> {
     const utxo = await ErgoAssociateTxWithIOs.depTables.AssociateTxWithUtxoIOs.getIOsForTx(
       db, tx, { txs: request.txs }
     );

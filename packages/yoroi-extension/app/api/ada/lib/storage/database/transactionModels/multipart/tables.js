@@ -28,7 +28,7 @@ export type CardanoShelleyTxIO = {|
   ...DbAccountingInputs,
    ...DbTokenInfo,
   +certificates: Array<CertificatePart>,
-  id: string,
+  // id: string,
 |};
 export type ErgoTxIO = {|
   +txType: $PropertyType<typeof TransactionType, "Ergo">,
@@ -38,7 +38,7 @@ export type ErgoTxIO = {|
   |}>,
   ...DbUtxoInputs, ...DbUtxoOutputs,
   ...DbTokenInfo,
-  id: string,
+  // id: string,
 |};
 export type JormungandrTxIO = {|
   +txType: $PropertyType<typeof TransactionType, "Jormungandr">,
@@ -50,7 +50,7 @@ export type JormungandrTxIO = {|
   ...DbUtxoInputs, ...DbUtxoOutputs,
   ...DbAccountingInputs, ...DbAccountingOutputs,
   ...DbTokenInfo,
-  id: string,
+  // id: string,
 |}
 
 export const populateMultipartTransactionsDb = (_schemaBuilder: lf$schema$Builder) => {

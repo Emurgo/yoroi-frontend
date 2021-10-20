@@ -23,6 +23,7 @@ export default class ErgoTransaction extends WalletTransaction {
       ...ErgoTxIO,
       ...WithNullableFields<DbBlock>,
       ...UserAnnotation,
+      id: string,
     |},
     addressLookupMap: Map<number, string>,
     network: $ReadOnly<NetworkRow>,

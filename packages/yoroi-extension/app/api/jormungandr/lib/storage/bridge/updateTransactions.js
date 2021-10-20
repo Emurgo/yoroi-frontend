@@ -386,6 +386,7 @@ export async function getPendingTransactions(
   ...JormungandrTxIO,
   ...WithNullableFields<DbBlock>,
   ...UserAnnotation,
+  id: string,
 |}>,
 |}> {
   const derivationTables = request.publicDeriver.getParent().getDerivationTables();
@@ -1257,11 +1258,12 @@ async function updateTransactionBatch(
   |}
 ): Promise<Array<{|
   ...JormungandrTxIO,
+  id: string,
   ...DbBlock,
 |}>> {
   const { TransactionSeed, BlockSeed } = await deps.GetEncryptionMeta.get(db, dbTx);
 
-  const matchesInDb = new Map<string, JormungandrTxIO>();
+  const matchesInDb = new Map<string, {| ...JormungandrTxIO, id: string|}>();
   {
     const digestsForNew = request.txsFromNetwork.map(tx => digestForHash(tx.hash, TransactionSeed));
     const matchByDigest = await deps.GetTransaction.byDigest(db, dbTx, {
@@ -1284,6 +1286,7 @@ async function updateTransactionBatch(
   const unseenNewTxs: Array<RemoteTransaction> = [];
   const txsAddedToBlock: Array<{|
     ...JormungandrTxIO,
+    id: string,
     ...DbBlock,
   |}> = [];
   const modifiedTxIds = new Set<number>();
@@ -1389,6 +1392,7 @@ async function updateTransactionBatch(
         accountingInputs: result.accountingInputs,
         accountingOutputs: result.accountingOutputs,
         tokens: result.tokens,
+        id: result.transaction.Hash,
       });
     }
   }

@@ -159,6 +159,8 @@ key: string,
 metadata: any
 |}
 
+type ByronOrShelleyIOwithId = {| ...CardanoByronTxIO, id: string |} | {| ...CardanoShelleyTxIO, id: string|}
+
 async function rawGetAllTxIds(
   db: lf$Database,
   dbTx: lf$Transaction,
@@ -251,6 +253,7 @@ export async function rawGetTransactions(
   ...(CardanoByronTxIO | CardanoShelleyTxIO),
   ...WithNullableFields<DbBlock>,
   ...UserAnnotation,
+  id: string,
 |}>,
 |}> {
   const {
@@ -328,7 +331,7 @@ export async function rawGetTransactions(
 
   const defaultToken = request.publicDeriver.getParent().getDefaultToken();
 
-  const result = txsWithIOs.map((tx: CardanoByronTxIO | CardanoShelleyTxIO) => ({
+  const result = txsWithIOs.map((tx: {|...CardanoByronTxIO, id: string|} | {|...CardanoShelleyTxIO, id: string|}) => ({
     ...tx,
     block: blockMap.get(tx.transaction.TransactionId) || null,
     ...getFromUserPerspective({
@@ -415,6 +418,7 @@ export async function getAllTransactions(
   ...(CardanoByronTxIO | CardanoShelleyTxIO),
   ...WithNullableFields<DbBlock>,
   ...UserAnnotation,
+  id: string,
 |}>,
 |}> {
   const derivationTables = request.publicDeriver.getParent().getDerivationTables();
@@ -479,6 +483,7 @@ export async function getPendingTransactions(
   ...(CardanoByronTxIO | CardanoShelleyTxIO),
   ...WithNullableFields<DbBlock>,
   ...UserAnnotation,
+  id: string,
 |}>,
 |}> {
   const derivationTables = request.publicDeriver.getParent().getDerivationTables();
@@ -1428,12 +1433,12 @@ async function updateTransactionBatch(
     getMultiAssetMetadata: MultiAssetMintMetadataFunc,
   |}
 ): Promise<Array<{|
-  ...(CardanoByronTxIO | CardanoShelleyTxIO),
+  ...ByronOrShelleyIOwithId,
   ...DbBlock,
 |}>> {
   const { TransactionSeed, BlockSeed } = await deps.GetEncryptionMeta.get(db, dbTx);
 
-  const matchesInDb = new Map<string, CardanoByronTxIO | CardanoShelleyTxIO>();
+  const matchesInDb = new Map<string, ByronOrShelleyIOwithId>();
   {
     const digestsForNew = request.txsFromNetwork.map(tx => digestForHash(tx.hash, TransactionSeed));
     const matchByDigest = await deps.GetTransaction.byDigest(db, dbTx, {
@@ -1466,7 +1471,7 @@ async function updateTransactionBatch(
 
   const unseenNewTxs: Array<RemoteTransaction> = [];
   const txsAddedToBlock: Array<{|
-    ...(CardanoByronTxIO | CardanoShelleyTxIO),
+    ...ByronOrShelleyIOwithId,
     ...DbBlock,
   |}> = [];
   const modifiedTxIds = new Set<number>();
@@ -1514,7 +1519,7 @@ async function updateTransactionBatch(
     }
     if (result.block !== null) {
       txsAddedToBlock.push({
-        ...(matchInDb: (CardanoByronTxIO | CardanoShelleyTxIO)),
+        ...(matchInDb: ByronOrShelleyIOwithId),
         // override with updated
         transaction: result.transaction,
         block: result.block,
@@ -1581,6 +1586,7 @@ async function updateTransactionBatch(
         utxoInputs: result.utxoInputs,
         utxoOutputs: result.utxoOutputs,
         tokens: result.tokens,
+        id: result.transaction.Hash,
       });
     }
   }
@@ -1601,6 +1607,7 @@ async function updateTransactionBatch(
         utxoOutputs: result.utxoOutputs,
         accountingInputs: result.accountingInputs,
         tokens: result.tokens,
+        id: result.transaction.Hash,
       });
     }
   }

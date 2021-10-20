@@ -23,6 +23,7 @@ export default class CardanoByronTransaction extends WalletTransaction {
       ...CardanoByronTxIO,
       ...WithNullableFields<DbBlock>,
       ...UserAnnotation,
+      id: string,
     |},
     addressLookupMap: Map<number, string>,
     network: $ReadOnly<NetworkRow>,
