@@ -28,6 +28,7 @@ export type CardanoShelleyTxIO = {|
   ...DbAccountingInputs,
    ...DbTokenInfo,
   +certificates: Array<CertificatePart>,
+  id: string,
 |};
 export type ErgoTxIO = {|
   +txType: $PropertyType<typeof TransactionType, "Ergo">,
@@ -49,6 +50,7 @@ export type JormungandrTxIO = {|
   ...DbUtxoInputs, ...DbUtxoOutputs,
   ...DbAccountingInputs, ...DbAccountingOutputs,
   ...DbTokenInfo,
+  id: string,
 |}
 
 export const populateMultipartTransactionsDb = (_schemaBuilder: lf$schema$Builder) => {

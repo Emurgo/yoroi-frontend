@@ -276,6 +276,7 @@ export function convertAdaTransactionsToExportRows(
     ...DbTransaction,
     ...WithNullableFields<DbBlock>,
     ...UserAnnotation,
+    id: string,
     ...,
   }>>,
   defaultAssetRow: $ReadOnly<TokenRow>,

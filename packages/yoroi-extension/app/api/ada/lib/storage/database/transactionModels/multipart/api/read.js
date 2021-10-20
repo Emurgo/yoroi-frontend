@@ -143,6 +143,7 @@ export class JormungandrAssociateTxWithIOs {
           NetworkId: token.Token.NetworkId,
         },
       })),
+      id: transaction.Hash,
     }));
     return fullTx;
   }

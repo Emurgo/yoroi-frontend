@@ -236,6 +236,7 @@ export async function rawGetTransactions(
   ...JormungandrTxIO,
   ...WithNullableFields<DbBlock>,
   ...UserAnnotation,
+  id: string,
 |}>,
 |}> {
   const {
@@ -324,6 +325,7 @@ export async function getAllTransactions(
   ...JormungandrTxIO,
   ...WithNullableFields<DbBlock>,
   ...UserAnnotation,
+  id: string,
 |}>,
 |}> {
   const derivationTables = request.publicDeriver.getParent().getDerivationTables();

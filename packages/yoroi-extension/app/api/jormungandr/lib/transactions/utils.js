@@ -75,6 +75,7 @@ export function convertJormungandrTransactionsToExportRows(
     ...DbTransaction,
     ...WithNullableFields<DbBlock>,
     ...UserAnnotation,
+    id: string,
     ...,
   }>>,
   defaultAssetRow: $ReadOnly<TokenRow>,
@@ -97,6 +98,7 @@ export function convertJormungandrTransactionsToExportRows(
             .shiftedBy(-defaultAssetRow.Metadata.numberOfDecimals)
             ?? new BigNumber(0)
         ),
+        id: tx.id,
       });
     }
   }
