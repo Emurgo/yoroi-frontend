@@ -28,27 +28,12 @@ import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tab
 import DragIcon from '../../assets/images/add-wallet/wallet-list/drag.inline.svg';
 import StarIcon from '../../assets/images/add-wallet/wallet-list/star.inline.svg';
 import { Draggable } from 'react-beautiful-dnd';
+import { walletTypesMessages } from './NavPlate';
 
 const messages = defineMessages({
   tokenTypes: {
     id: 'wallet.topbar.dialog.tokenTypes',
     defaultMessage: '!!!Token types',
-  },
-  standardWallet: {
-    id: 'wallet.nav.type.standard',
-    defaultMessage: '!!!Standard wallet',
-  },
-  paperWallet: {
-    id: 'wallet.nav.type.paper',
-    defaultMessage: '!!!Paper wallet',
-  },
-  trezorWallet: {
-    id: 'wallet.nav.type.trezor',
-    defaultMessage: '!!!Trezor wallet',
-  },
-  ledgerWallet: {
-    id: 'wallet.nav.type.ledger',
-    defaultMessage: '!!!Ledger wallet',
   },
 });
 
@@ -117,12 +102,12 @@ export default class WalletCard extends Component<Props, State> {
 
   getType: ConceptualWallet => $Exact<$npm$ReactIntl$MessageDescriptor> = wallet => {
     if (isLedgerNanoWallet(wallet)) {
-      return messages.ledgerWallet;
+      return walletTypesMessages.ledgerWallet;
     }
     if (isTrezorTWallet(wallet)) {
-      return messages.trezorWallet;
+      return walletTypesMessages.trezorWallet;
     }
-    return messages.standardWallet;
+    return walletTypesMessages.standardWallet;
   };
 
   getIcon: ConceptualWallet => string = wallet => {

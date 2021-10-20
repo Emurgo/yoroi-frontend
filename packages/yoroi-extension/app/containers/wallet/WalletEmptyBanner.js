@@ -21,11 +21,11 @@ type Intl = {|
 const messages = defineMessages({
   walletEmpty: {
     id: 'wallet.transaction.empty',
-    defaultMessage: 'Your wallet is empty',
+    defaultMessage: '!!!Your wallet is empty',
   },
   walletEmptySubtitle: {
     id: 'wallet.transaction.emptySubtitle',
-    defaultMessage: 'Top up your wallet safely using our trusted partners',
+    defaultMessage: '!!!Top up your wallet safely using our trusted partners',
   },
 });
 
