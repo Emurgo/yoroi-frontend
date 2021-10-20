@@ -13,7 +13,6 @@ import ErrorBlock from '../../widgets/ErrorBlock';
 import globalMessages from '../../../i18n/global-messages';
 
 import styles from './ExportTransactionDialog.scss';
-import { Checkbox } from '@mui/material';
 import CheckboxLabel from '../../common/CheckboxLabel';
 
 const messages = defineMessages({
@@ -82,9 +81,9 @@ export default class ExportTransactionDialog extends Component<Props> {
         {infoBlock}
         <div className={styles.includeTxIds}>
           <CheckboxLabel 
-          label={intl.formatMessage(messages.includeTxIds)}
-          onChange={toggleIncludeTxIds}
-          checked={shouldIncludeTxIds}
+            label={intl.formatMessage(messages.includeTxIds)}
+            onChange={toggleIncludeTxIds}
+            checked={shouldIncludeTxIds}
           /> 
         </div>
         {error && <ErrorBlock error={error} />}

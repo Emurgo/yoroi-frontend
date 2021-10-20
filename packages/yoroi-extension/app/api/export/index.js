@@ -159,7 +159,7 @@ function _formatExportRowsIntoCoinTrackingFormat(
   rows: Array<TransactionExportRow>,
   shouldIncludeTxIds: boolean,
 ): CsvData {
-  let headers = [...COIN_TRACKING_HEADERS]
+  const headers = [...COIN_TRACKING_HEADERS]
 
   if (shouldIncludeTxIds) {
     headers.push('ID')
@@ -182,7 +182,7 @@ function _formatExportRowsIntoCoinTrackingFormat(
       ]
 
       if (shouldIncludeTxIds) {
-        row.push(Boolean(r.id) ? r.id : '')
+        row.push(r.id ? r.id : '')
       }
 
       return row
