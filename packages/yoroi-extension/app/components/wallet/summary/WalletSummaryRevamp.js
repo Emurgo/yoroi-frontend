@@ -2,10 +2,8 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import classnames from 'classnames';
 import { defineMessages, intlShape } from 'react-intl';
-import ExportTxToFileSvg from '../../../assets/images/transaction/export-tx-to-file.inline.svg';
-import BorderedBox from '../../widgets/BorderedBox';
+import ExportTxToFileSvg from '../../../assets/images/transaction/export.inline.svg';
 import type { UnconfirmedAmount } from '../../../types/unconfirmedAmountType';
 import globalMessages from '../../../i18n/global-messages';
 import styles from './WalletSummary.scss';
@@ -18,6 +16,8 @@ import { hiddenAmount } from '../../../utils/strings';
 import type { TokenLookupKey } from '../../../api/common/lib/MultiToken';
 import { getTokenName } from '../../../stores/stateless/tokenHelpers';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
+import { Button, Typography } from '@mui/material';
+import { Box, styled } from '@mui/system';
 
 const messages = defineMessages({
   pendingOutgoingConfirmationLabel: {
@@ -109,101 +109,126 @@ export default class WalletSummaryRevamp extends Component<Props> {
     const { intl } = this.context;
 
     const content = (
-      <div className={styles.content}>
-        <div className={styles.leftBlock} />
-        <div className={styles.middleBlock}>
-          <BorderedBox>
-            {!isLoadingTransactions && (
-              <>
-                <div className={styles.numberOfTransactions}>
-                  {intl.formatMessage(messages.numOfTxsLabel)}: <span>{numberOfTransactions}</span>
-                </div>
-                {(!pendingAmount.incoming.isEmpty() || !pendingAmount.outgoing.isEmpty()) && (
-                  <div className={styles.pendingSection}>
-                    {!pendingAmount.incoming.isEmpty() && (
-                      <div className={styles.pendingConfirmation}>
-                        {`${intl.formatMessage(messages.pendingIncomingConfirmationLabel)}`}
-                        :&nbsp;
-                        {pendingAmount.incomingInSelectedCurrency &&
-                        unitOfAccountSetting.enabled ? (
-                          <span className={styles.amount}>
-                            {formatValue(pendingAmount.incomingInSelectedCurrency)}
-                            {' ' + unitOfAccountSetting.currency}
-                          </span>
-                        ) : (
-                          <>
-                            <span className={styles.amount}>
-                              {this.renderAmountDisplay({
-                                shouldHideBalance: this.props.shouldHideBalance,
-                                amount: pendingAmount.incoming,
-                              })}
-                            </span>
-                          </>
-                        )}
-                      </div>
-                    )}
-                    {!pendingAmount.outgoing.isEmpty() && (
-                      <div className={styles.pendingConfirmation}>
-                        {`${intl.formatMessage(messages.pendingOutgoingConfirmationLabel)}`}
-                        :&nbsp;
-                        {pendingAmount.outgoingInSelectedCurrency &&
-                        unitOfAccountSetting.enabled ? (
-                          <span className={styles.amount}>
-                            {formatValue(pendingAmount.outgoingInSelectedCurrency)}
-                            {' ' + unitOfAccountSetting.currency}
-                          </span>
-                        ) : (
-                          <>
-                            <span className={styles.amount}>
-                              {this.renderAmountDisplay({
-                                shouldHideBalance: this.props.shouldHideBalance,
-                                amount: pendingAmount.outgoing,
-                              })}
-                            </span>
-                          </>
-                        )}
-                      </div>
+      <Box
+        sx={{
+          background: 'var(--yoroi-palette-common-white)',
+          boxShadow:
+            '0 4px 6px 0 #dee2ea, 0 1px 2px 0 rgb(222 226 234 / 82%), 0 2px 4px 0 rgb(222 226 234 / 74%)',
+        }}
+      >
+        {!isLoadingTransactions && (
+          <>
+            <Box
+              sx={{
+                padding: '24px 30px',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}
+            >
+              <Typography
+                variant="h2"
+                as="p"
+                sx={{ fontWeight: 400, color: 'var(--yoroi-palette-gray-600)' }}
+              >
+                {intl.formatMessage(messages.numOfTxsLabel)}:{' '}
+                <Typography
+                  variant="h2"
+                  as="span"
+                  sx={{ fontWeight: 400, color: 'var(--yoroi-palette-gray-900)' }}
+                >
+                  {numberOfTransactions}
+                </Typography>
+              </Typography>
+              <Button
+                variant="ternary"
+                sx={{
+                  textTransform: 'capitalize',
+                  svg: {
+                    marginRight: '16px',
+                  },
+                }}
+                onClick={openExportTxToFileDialog}
+                onKeyPress={openExportTxToFileDialog}
+              >
+                <ExportTxToFileSvg />
+                {intl.formatMessage(messages.exportIconTooltip)}
+              </Button>
+            </Box>
+            {(!pendingAmount.incoming.isEmpty() || !pendingAmount.outgoing.isEmpty()) && (
+              <Box sx={{ padding: '16px 30px' }}>
+                {!pendingAmount.incoming.isEmpty() && (
+                  <div className={styles.pendingConfirmation}>
+                    {`${intl.formatMessage(messages.pendingIncomingConfirmationLabel)}`}
+                    :&nbsp;
+                    {pendingAmount.incomingInSelectedCurrency && unitOfAccountSetting.enabled ? (
+                      <span className={styles.amount}>
+                        {formatValue(pendingAmount.incomingInSelectedCurrency)}
+                        {' ' + unitOfAccountSetting.currency}
+                      </span>
+                    ) : (
+                      <>
+                        <span className={styles.amount}>
+                          {this.renderAmountDisplay({
+                            shouldHideBalance: this.props.shouldHideBalance,
+                            amount: pendingAmount.incoming,
+                          })}
+                        </span>
+                      </>
                     )}
                   </div>
                 )}
-              </>
+                {!pendingAmount.outgoing.isEmpty() && (
+                  <div className={styles.pendingConfirmation}>
+                    {`${intl.formatMessage(messages.pendingOutgoingConfirmationLabel)}`}
+                    :&nbsp;
+                    {pendingAmount.outgoingInSelectedCurrency && unitOfAccountSetting.enabled ? (
+                      <span className={styles.amount}>
+                        {formatValue(pendingAmount.outgoingInSelectedCurrency)}
+                        {' ' + unitOfAccountSetting.currency}
+                      </span>
+                    ) : (
+                      <>
+                        <span className={styles.amount}>
+                          {this.renderAmountDisplay({
+                            shouldHideBalance: this.props.shouldHideBalance,
+                            amount: pendingAmount.outgoing,
+                          })}
+                        </span>
+                      </>
+                    )}
+                  </div>
+                )}
+              </Box>
             )}
-          </BorderedBox>
-        </div>
-        <div className={styles.rightBlock}>
-          {!isLoadingTransactions ? (
-            <span
-              className={styles.exportTxToFileSvg}
-              title={intl.formatMessage(messages.exportIconTooltip)}
-              onClick={openExportTxToFileDialog}
-              onKeyPress={openExportTxToFileDialog}
-              role="button"
-              tabIndex="0"
-            >
-              <ExportTxToFileSvg />
-            </span>
-          ) : null}
-        </div>
-        <div className={styles.sectionList}>
-          <div className={classnames([styles.sectionTitle, styles.time])}>
-            {intl.formatMessage(messages.dateSection)}
-          </div>
-          <div className={classnames([styles.sectionTitle, styles.type])}>
+          </>
+        )}
+        <Box
+          sx={{
+            display: 'flex',
+            padding: '20px 30px 10px',
+          }}
+        >
+          <Label variant="body2" flex="1 1 40%">
             {intl.formatMessage(messages.typeSection)}
-          </div>
-          <div className={classnames([styles.sectionTitle, styles.status])}>
+          </Label>
+          <Label variant="body2" flex="1 1 30%" align="center">
             {intl.formatMessage(messages.statusSection)}
-          </div>
-          <div className={classnames([styles.sectionTitle, styles.fee])}>
+          </Label>
+          <Label variant="body2" flex="1 1 30%" align="center">
             {intl.formatMessage(globalMessages.feeLabel)}
-          </div>
-          <div className={classnames([styles.sectionTitle, styles.amount])}>
+          </Label>
+          <Label variant="body2" flex="1 1 30%" align="center">
             {intl.formatMessage(globalMessages.amountLabel)}
-          </div>
-        </div>
-      </div>
+          </Label>
+        </Box>
+      </Box>
     );
 
-    return <div className={styles.component}>{content}</div>;
+    return content;
   }
 }
+
+const Label = styled(Typography)({
+  color: 'var(--yoroi-palette-gray-600)',
+});

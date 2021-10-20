@@ -13,8 +13,10 @@ import globalMessages from '../../i18n/global-messages';
 import successIcon from '../../assets/images/success-small.inline.svg';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import WalletTransactionsList from '../../components/wallet/transactions/WalletTransactionsList';
+import WalletTransactionsListRevamp from '../../components/wallet/transactions/WalletTransactionsListRevamp';
 import WalletSummary from '../../components/wallet/summary/WalletSummary';
 import WalletNoTransactions from '../../components/wallet/transactions/WalletNoTransactions';
+import WalletNoTransactionsRevamp from '../../components/wallet/transactions/WalletNoTransactionsRevamp';
 import VerticalFlexContainer from '../../components/layout/VerticalFlexContainer';
 import ExportTransactionDialog from '../../components/wallet/export/ExportTransactionDialog';
 import AddMemoDialog from '../../components/wallet/memos/AddMemoDialog';
@@ -50,11 +52,14 @@ import type { ComplexityLevelType } from '../../types/complexityLevelType';
 import { withLayout } from '../../styles/context/layout';
 import type { LayoutComponentMap } from '../../styles/context/layout';
 import WalletSummaryRevamp from '../../components/wallet/summary/WalletSummaryRevamp';
+import BuySellDialog from '../../components/buySell/BuySellDialog';
+import WalletEmptyBanner from './WalletEmptyBanner';
 
 export type GeneratedData = typeof WalletSummaryPage.prototype.generated;
 type Props = InjectedOrGenerated<GeneratedData>;
 type InjectedProps = {|
   +renderLayoutComponent: LayoutComponentMap => Node,
+  +selectedLayout: string,
 |};
 type AllProps = {| ...Props, ...InjectedProps |};
 
@@ -127,12 +132,25 @@ class WalletSummaryPage extends Component<AllProps> {
     if (searchOptions) {
       const { limit } = searchOptions;
       const noTransactionsFoundLabel = intl.formatMessage(globalMessages.noTransactionsFound);
+
+      const mapWalletTransactionLayout = {
+        CLASSIC: WalletTransactionsList,
+        REVAMP: WalletTransactionsListRevamp,
+      };
+      const mapWalletNoTransactionsLayout = {
+        CLASSIC: WalletNoTransactions,
+        REVAMP: WalletNoTransactionsRevamp,
+      };
+      const WalletTransactionsListComp = mapWalletTransactionLayout[this.props.selectedLayout];
+      const WalletNoTransactionsComp = mapWalletNoTransactionsLayout[this.props.selectedLayout];
+
       if (!recentTransactionsRequest.wasExecuted || hasAny) {
         const {
           assuranceMode,
         } = this.generated.stores.walletSettings.getPublicDeriverSettingsCache(publicDeriver);
+
         walletTransactions = (
-          <WalletTransactionsList
+          <WalletTransactionsListComp
             transactions={recent}
             lastSyncBlock={lastSyncInfo.Height}
             memoMap={this.generated.stores.memos.txMemoMap.get(walletId) || new Map()}
@@ -186,7 +204,7 @@ class WalletSummaryPage extends Component<AllProps> {
         );
       } else {
         walletTransactions = (
-          <WalletNoTransactions
+          <WalletNoTransactionsComp
             label={noTransactionsFoundLabel}
             classicTheme={profile.isClassicTheme}
           />
@@ -238,7 +256,6 @@ class WalletSummaryPage extends Component<AllProps> {
             />
           )}
         </NotificationMessage>
-
         <WalletSummary
           numberOfTransactions={totalAvailable}
           pendingAmount={unconfirmedAmount}
@@ -343,7 +360,15 @@ class WalletSummaryPage extends Component<AllProps> {
             />
           )}
         </NotificationMessage>
-
+        {!recentTransactionsRequest.wasExecuted || hasAny ? null : (
+          <WalletEmptyBanner
+            isOpen={this.generated.stores.transactions.showWalletEmptyBanner}
+            onClose={this.generated.actions.transactions.closeWalletEmptyBanner.trigger}
+            onBuySellClick={() =>
+              this.generated.actions.dialogs.open.trigger({ dialog: BuySellDialog })
+            }
+          />
+        )}
         <WalletSummaryRevamp
           numberOfTransactions={totalAvailable}
           pendingAmount={unconfirmedAmount}
@@ -508,6 +533,12 @@ class WalletSummaryPage extends Component<AllProps> {
             params?: any,
           |}) => void,
         |},
+        open: {|
+          trigger: (params: {|
+            dialog: any,
+            params?: any,
+          |}) => void,
+        |},
       |},
       memos: {|
         closeMemoDialog: {|
@@ -541,6 +572,9 @@ class WalletSummaryPage extends Component<AllProps> {
         |},
       |},
       transactions: {|
+        closeWalletEmptyBanner: {|
+          trigger: (params: void) => void,
+        |},
         closeExportTransactionDialog: {|
           trigger: (params: void) => void,
         |},
@@ -583,6 +617,7 @@ class WalletSummaryPage extends Component<AllProps> {
       |},
       transactions: {|
         exportError: ?LocalizableError,
+        showWalletEmptyBanner: boolean,
         hasAny: boolean,
         isExporting: boolean,
         lastSyncInfo: IGetLastSyncInfoResponse,
@@ -657,6 +692,7 @@ class WalletSummaryPage extends Component<AllProps> {
           txMemoMap: stores.memos.txMemoMap,
         },
         transactions: {
+          showWalletEmptyBanner: stores.transactions.showWalletEmptyBanner,
           hasAny: stores.transactions.hasAny,
           totalAvailable: stores.transactions.totalAvailable,
           recent: stores.transactions.recent,
@@ -690,6 +726,9 @@ class WalletSummaryPage extends Component<AllProps> {
           push: {
             trigger: actions.dialogs.push.trigger,
           },
+          open: {
+            trigger: actions.dialogs.open.trigger,
+          },
         },
         router: {
           goToRoute: { trigger: actions.router.goToRoute.trigger },
@@ -704,6 +743,9 @@ class WalletSummaryPage extends Component<AllProps> {
           selectTransaction: { trigger: actions.memos.selectTransaction.trigger },
         },
         transactions: {
+          closeWalletEmptyBanner: {
+            trigger: actions.transactions.closeWalletEmptyBanner.trigger,
+          },
           exportTransactionsToFile: {
             trigger: actions.transactions.exportTransactionsToFile.trigger,
           },
