@@ -40,3 +40,10 @@ test('Rremove zero from amount', () => {
     const amount3 = amountWithoutZeros('0.0000')
     expect(amount3).toBe('0')
 })
+
+test('splitAmount with 0 decimal place', () => {
+    const amount = new BigNumber('1')
+    const [before, after] = splitAmount(amount, 0)
+    expect(before).toBe('1')
+    expect(after).toBe('')
+})

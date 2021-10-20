@@ -6,6 +6,9 @@ export function splitAmount(
   amount: BigNumber,
   decimalPlaces: number,
 ): [string, string] {
+  if (decimalPlaces === 0) {
+    return [amount.toFormat(0), '']
+  }
   const valString = amount.toFormat(decimalPlaces);
   const startIndex = valString.length - decimalPlaces;
   let beforeDecimal = valString.substring(0, startIndex)
