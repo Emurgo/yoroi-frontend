@@ -34,11 +34,13 @@ export function convertErgoTransactionsToExportRows(
     ...DbTransaction,
     ...WithNullableFields<DbBlock>,
     ...UserAnnotation,
+    id: string,
     ...,
   }>>,
   defaultAssetRow: $ReadOnly<TokenRow>,
 ): Array<TransactionExportRow> {
   const result = [];
+  console.log({transactions})
   for (const tx of transactions) {
     if (tx.block != null) {
       result.push({
@@ -56,6 +58,7 @@ export function convertErgoTransactionsToExportRows(
             .shiftedBy(-defaultAssetRow.Metadata.numberOfDecimals)
             ?? new BigNumber(0)
         ),
+        id: tx.id,
       });
     }
   }

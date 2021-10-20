@@ -37,6 +37,7 @@ export type ErgoTxIO = {|
   |}>,
   ...DbUtxoInputs, ...DbUtxoOutputs,
   ...DbTokenInfo,
+  id: string,
 |};
 export type JormungandrTxIO = {|
   +txType: $PropertyType<typeof TransactionType, "Jormungandr">,

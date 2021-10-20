@@ -13,7 +13,6 @@ import type {
   ExportTransactionsRequest,
   ExportTransactionsResponse,
 } from '../common';
-import { string } from '../ada/lib/storage/database/walletTypes/bip44/api/utils';
 
 export type TransactionExportRow = {|
   type: 'in' | 'out',
