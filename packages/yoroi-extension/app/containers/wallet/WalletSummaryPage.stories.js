@@ -123,6 +123,7 @@ export const Loading = (): Node => {
       selected: wallet.publicDeriver,
       ...lookup,
     }),
+    // $FlowFixMe[incompatible-type]: Revamp props
     (<WalletSummaryPage
       generated={{
         stores: {
@@ -496,6 +497,7 @@ export const Transaction = (): Node => {
       selected: wallet.publicDeriver,
       ...lookup,
     }),
+    // $FlowFixMe[incompatible-type]: Revamp props
     (<WalletSummaryPage
       generated={{
         stores: genPropsForTransactions({
@@ -598,6 +600,7 @@ export const TransactionWithMemo = (): Node => {
       selected: wallet.publicDeriver,
       ...lookup,
     }),
+    // $FlowFixMe[incompatible-type]: Revamp props
     (<WalletSummaryPage
       generated={{
         stores: genPropsForTransactions({
@@ -723,6 +726,7 @@ export const MemoDialog = (): Node => {
       selected: wallet.publicDeriver,
       ...lookup,
     }),
+    // $FlowFixMe[incompatible-type]: Revamp props
     (<WalletSummaryPage
       generated={{
         stores: genPropsForTransactions({
@@ -772,6 +776,7 @@ export const NoTransactions = (): Node => {
       selected: wallet.publicDeriver,
       ...lookup,
     }),
+    // $FlowFixMe[incompatible-type]: Revamp props
     (<WalletSummaryPage
       generated={{
         stores: genPropsForTransactions({
@@ -871,6 +876,7 @@ export const ManyTransactions = (): Node => {
       selected: wallet.publicDeriver,
       ...lookup,
     }),
+    // $FlowFixMe[incompatible-type]: Revamp props
     (<WalletSummaryPage
       generated={{
         stores: genPropsForTransactions({
@@ -971,6 +977,7 @@ export const TxHistoryExport = (): Node => {
       selected: wallet.publicDeriver,
       ...lookup,
     }),
+    // $FlowFixMe[incompatible-type]: Revamp props
     (<WalletSummaryPage
       generated={{
         stores: genPropsForTransactions({
@@ -1029,6 +1036,7 @@ export const DebugWalletWarning = (): Node => {
       }),
       ...lookup,
     }),
+    // $FlowFixMe[incompatible-type]: Revamp props
     (<WalletSummaryPage
       generated={{
         stores: genPropsForTransactions({
