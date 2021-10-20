@@ -5,7 +5,8 @@ import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import styles from './NavBarRevamp.scss';
 import { withLayout } from '../../styles/context/layout';
-import NoticeBoardIcon from '../../assets/images/notice-board/notice-board.inline.svg';
+import NoticeBoardIcon from '../../assets/images/top-bar/notification.inline.svg';
+import { Box, IconButton } from '@mui/material';
 
 type Props = {|
   +children?: ?Node,
@@ -44,15 +45,19 @@ class NavBarRevamp extends Component<Props & InjectProps> {
           <div className={styles.content}>
             {children}
             {this.props.walletDetails != null && (
-              <div className={styles.details}>{walletDetails}</div>
+              <Box sx={{ flex: '0 0 auto', marginLeft: '32px', minWidth: '280px' }}>
+                {walletDetails}
+              </Box>
             )}
-            <div className={styles.notifications}>
-              <button type="button" onClick={this.props.goToNotifications}>
-                <NoticeBoardIcon />
-              </button>
-            </div>
+            <IconButton
+              sx={{ color: 'var(--yoroi-palette-gray-600)', marginLeft: '11.5px' }}
+              type="button"
+              onClick={this.props.goToNotifications}
+            >
+              <NoticeBoardIcon />
+            </IconButton>
             {this.props.buyButton != null && (
-              <div className={styles.buyButton}>{this.props.buyButton}</div>
+              <Box sx={{ marginLeft: '24px' }}>{this.props.buyButton}</Box>
             )}
           </div>
         </div>

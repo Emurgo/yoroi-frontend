@@ -36,25 +36,3 @@
   align-items: center;
   justify-content: flex-end;
 }
-
-.notifications {
-  margin-left: 11.5px;
-  svg {
-    max-width: 24px;
-    max-height: 24px;
-    path {
-      fill: var(--yoroi-palette-gray-600);
-    }
-  }
-}
-
-.details {
-  flex: 0 0 auto;
-  margin-left: 32px;
-  min-width: 280px;
-}
-
-.buyButton {
-  align-self: center;
-  margin-left: 24px;
-}
