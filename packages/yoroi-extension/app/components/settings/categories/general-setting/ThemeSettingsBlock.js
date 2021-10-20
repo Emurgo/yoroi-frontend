@@ -13,6 +13,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import globalMessages from '../../../../i18n/global-messages';
 import { withLayout } from '../../../../styles/context/layout';
 import type { LayoutComponentMap } from '../../../../styles/context/layout';
+import environment from '../../../../environment';
 
 const messages = defineMessages({
   themeLabel: {
@@ -46,6 +47,14 @@ const messages = defineMessages({
   blogLinkUrl: {
     id: 'settings.support.faq.blogLinkUrl',
     defaultMessage: '!!!https://emurgo.io/en/blog/yoroi-custom-themes',
+  },
+  tryYoroiRevamp: {
+    id: 'settings.tryYoroiRevamp',
+    defaultMessage: '!!!Try new Yoroi Revamp',
+  },
+  backYoroiClassic: {
+    id: 'settings.backYoroiClassic',
+    defaultMessage: '!!!Back to Yoroi Classic',
   },
 });
 
@@ -152,39 +161,40 @@ class ThemeSettingsBlock extends Component<AllProps> {
             {intl.formatMessage(messages.themeExportButton)}
           </Button>
         </div>
-        <div className={styles.revampWrapper}>
-          {/* TODO: MUI: fix css variables */}
-          <Button
-            sx={{
-              width: '400px',
-              background: 'white',
-              color: '#6b7384',
-              border: '1px solid #6b7384',
-              '&:hover': {
-                color: '#383838',
+        {(environment.isNightly() || environment.isTest()) && (
+          <div className={styles.revampWrapper}>
+            <Button
+              sx={{
+                width: '400px',
                 background: 'white',
-              },
-              position: 'relative',
-              '&::after': {
-                content: '"new"',
-                top: '50%',
-                right: '30px',
-                transform: 'translateY(-50%)',
-                position: 'absolute',
-                color: 'var(--yoroi-comp-button-primary-text)',
-                backgroundColor: 'var(--yoroi-comp-button-primary-background)',
-                padding: '4px 10px',
-                borderRadius: '777px',
-              },
-            }}
-            onClick={() => {
-              changeLayout();
-              selectTheme({ theme: THEMES.YOROI_REVAMP });
-            }}
-          >
-            Try new Yoroi Revamp
-          </Button>
-        </div>
+                color: '#6b7384',
+                border: '1px solid #6b7384',
+                '&:hover': {
+                  color: '#383838',
+                  background: 'white',
+                },
+                position: 'relative',
+                '&::after': {
+                  content: '"new"',
+                  top: '50%',
+                  right: '30px',
+                  transform: 'translateY(-50%)',
+                  position: 'absolute',
+                  color: 'var(--yoroi-comp-button-primary-text)',
+                  backgroundColor: 'var(--yoroi-comp-button-primary-background)',
+                  padding: '4px 10px',
+                  borderRadius: '777px',
+                },
+              }}
+              onClick={() => {
+                changeLayout();
+                selectTheme({ theme: THEMES.YOROI_REVAMP });
+              }}
+            >
+              {intl.formatMessage(messages.tryYoroiRevamp)}
+            </Button>
+          </div>
+        )}
       </div>
     );
 
@@ -196,26 +206,23 @@ class ThemeSettingsBlock extends Component<AllProps> {
             {intl.formatMessage(messages.themeExportButton)}
           </Button>
         </div>
-        <div className={styles.revampWrapper}>
-          <Button
-            onClick={() => {
-              changeLayout();
-              selectTheme({ theme: THEMES.YOROI_MODERN });
-            }}
-            sx={{
-              width: '400px',
-              background: 'white',
-              color: '#6b7384',
-              border: '1px solid #6b7384',
-              '&:hover': {
-                color: '#383838',
-                background: 'white',
-              },
-            }}
-          >
-            Back to Yoroi Classic
-          </Button>
-        </div>
+        {(environment.isNightly() || environment.isTest()) && (
+          <div className={styles.revampWrapper}>
+            <Button
+              variant="ternary"
+              onClick={() => {
+                changeLayout();
+                selectTheme({ theme: THEMES.YOROI_MODERN });
+              }}
+              sx={{
+                width: '400px',
+                minHeight: '52px',
+              }}
+            >
+              {intl.formatMessage(messages.backYoroiClassic)}
+            </Button>
+          </div>
+        )}
       </div>
     );
     return this.props.renderLayoutComponent({
