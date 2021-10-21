@@ -66,7 +66,6 @@ type Props = {|
   +onExternalLinkClick: MouseEvent => void,
 |};
 type InjectedProps = {|
-  +changeLayout: void => void,
   +renderLayoutComponent: LayoutComponentMap => Node,
 |};
 type AllProps = {| ...Props, ...InjectedProps |};
@@ -84,7 +83,6 @@ class ThemeSettingsBlock extends Component<AllProps> {
       exportTheme,
       hasCustomTheme,
       onExternalLinkClick,
-      changeLayout,
     } = this.props;
     const { intl } = this.context;
 
@@ -187,7 +185,6 @@ class ThemeSettingsBlock extends Component<AllProps> {
                 },
               }}
               onClick={() => {
-                changeLayout();
                 selectTheme({ theme: THEMES.YOROI_REVAMP });
               }}
             >
@@ -211,7 +208,6 @@ class ThemeSettingsBlock extends Component<AllProps> {
             <Button
               variant="ternary"
               onClick={() => {
-                changeLayout();
                 selectTheme({ theme: THEMES.YOROI_MODERN });
               }}
               sx={{
