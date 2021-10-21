@@ -180,18 +180,21 @@ export default class WalletSummaryRevamp extends Component<Props> {
           sx={{
             display: 'flex',
             padding: '20px 30px 10px',
+            paddingRight: '68px',
+            width: '100%',
+            justifyContent: 'space-between',
           }}
         >
-          <Label variant="body2" flex="1 1 40%">
+          <Label variant="body2" sx={columnTXStyles.transactionType}>
             {intl.formatMessage({ id: 'wallet.summary.page.type' })}
           </Label>
-          <Label variant="body2" flex="1 1 30%" align="center">
+          <Label variant="body2" sx={columnTXStyles.status}>
             {intl.formatMessage({ id: 'wallet.summary.page.status' })}
           </Label>
-          <Label variant="body2" flex="1 1 30%" align="center">
+          <Label variant="body2" sx={columnTXStyles.fee}>
             {intl.formatMessage(globalMessages.feeLabel)}
           </Label>
-          <Label variant="body2" flex="1 1 30%" align="center">
+          <Label variant="body2" sx={columnTXStyles.amount}>
             {intl.formatMessage(globalMessages.amountLabel)}
           </Label>
         </Box>
@@ -205,3 +208,10 @@ export default class WalletSummaryRevamp extends Component<Props> {
 const Label = styled(Typography)({
   color: 'var(--yoroi-palette-gray-600)',
 });
+
+export const columnTXStyles = {
+  transactionType: { flex: '1 1 30%', maxWidth: '30%', textAlign: 'left' },
+  status: { flex: '1 1 16%', maxWidth: '16%', textAlign: 'left' },
+  fee: { flex: '1 1 16%', maxWidth: '16%', textAlign: 'center' },
+  amount: { flex: '1 1 25%', maxWidth: '25%', textAlign: 'right' },
+};

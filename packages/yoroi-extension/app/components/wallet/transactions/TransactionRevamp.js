@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 // @flow
 import React, { Component } from 'react';
 import type { Node } from 'react';
@@ -55,6 +56,7 @@ import {
   stateTranslations,
   messages,
 } from './Transaction';
+import { columnTXStyles } from '../summary/WalletSummaryRevamp';
 
 type Props = {|
   +data: WalletTransaction,
@@ -398,12 +400,6 @@ export default class TransactionRevamp extends Component<Props, State> {
     const isFailedTransaction = state < 0;
     const isPendingTransaction = state === TxStatusCodes.PENDING;
 
-    const componentStyles = classnames([
-      styles.component,
-      isFailedTransaction ? styles.failed : null,
-      isPendingTransaction ? styles.pending : null,
-    ]);
-
     const contentStyles = classnames([styles.content, isExpanded ? styles.shadow : null]);
 
     const detailsStyles = classnames([
@@ -411,20 +407,12 @@ export default class TransactionRevamp extends Component<Props, State> {
       isExpanded ? styles.expanded : styles.closed,
     ]);
 
-    const labelOkClasses = classnames([styles.status, styles[assuranceLevel]]);
-
-    const labelClasses = classnames([
-      styles.status,
-      isFailedTransaction ? styles.failedLabel : '',
-      isPendingTransaction ? styles.pendingLabel : '',
-    ]);
-
     const arrowClasses = isExpanded ? styles.collapseArrow : styles.expandArrow;
 
     const status = this.getStatusString(intl, state, assuranceLevel);
 
     return (
-      <Box className={componentStyles}>
+      <Box className={styles.component}>
         {/* ==== Clickable Header -> toggles details ==== */}
         <Box
           sx={{ padding: '20px 0', borderBottom: '1px solid var(--yoroi-palette-gray-200)' }}
@@ -433,27 +421,74 @@ export default class TransactionRevamp extends Component<Props, State> {
           aria-hidden
         >
           <Box sx={{ display: 'flex' }}>
-            <div className={styles.header}>
-              <Box className={styles.type}>
-                <Typography variant="body1" color="var(--yoroi-palette-gray-900)">
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                width: '100%',
+                alignItems: 'center',
+              }}
+            >
+              <Box sx={columnTXStyles.transactionType}>
+                <Typography
+                  variant="body1"
+                  color={
+                    isPendingTransaction
+                      ? 'var(--yoroi-palette-gray-400)'
+                      : 'var(--yoroi-palette-gray-900)'
+                  }
+                >
                   {this.getTxTypeMsg(intl, this.getTicker(data.amount.getDefaultEntry()), data)}
                 </Typography>
-                <Typography variant="body3" color="var(--yoroi-palette-gray-600)">
+                <Typography
+                  variant="body3"
+                  color={
+                    isPendingTransaction
+                      ? 'var(--yoroi-palette-gray-400)'
+                      : 'var(--yoroi-palette-gray-600)'
+                  }
+                >
                   {moment(data.date).format('hh:mm A')}
                 </Typography>
               </Box>
-              {state === TxStatusCodes.IN_BLOCK ? (
-                <div className={labelOkClasses}>{status}</div>
-              ) : (
-                <div className={labelClasses}>{status}</div>
-              )}
-              <Typography variant="body1" color="var(--yoroi-palette-gray-900)">
+              <Box sx={columnTXStyles.status}>
+                {state === TxStatusCodes.IN_BLOCK ? (
+                  <Typography
+                    sx={{
+                      color: isPendingTransaction
+                        ? 'var(--yoroi-palette-gray-400)'
+                        : 'var(--yoroi-palette-gray-900)',
+                      textTransform: 'capitalize',
+                    }}
+                  >
+                    {status}
+                  </Typography>
+                ) : (
+                  <Typography
+                    sx={{
+                      color: isFailedTransaction
+                        ? 'var(--yoroi-palette-error-100)'
+                        : isPendingTransaction
+                        ? 'var(--yoroi-palette-gray-400)'
+                        : 'var(--yoroi-palette-gray-900)',
+                      textTransform: 'capitalize',
+                    }}
+                  >
+                    {status}
+                  </Typography>
+                )}
+              </Box>
+              <Typography
+                variant="body1"
+                color="var(--yoroi-palette-gray-900)"
+                sx={columnTXStyles.fee}
+              >
                 {this.renderFeeDisplay({
                   amount: data.fee,
                   type: data.type,
                 })}
               </Typography>
-              <div>
+              <Box sx={columnTXStyles.amount}>
                 <Typography variant="body1" fontWeight="500" color="var(--yoroi-palette-gray-900)">
                   {this.renderAmountDisplay({
                     entry: data.amount.getDefaultEntry(),
@@ -461,8 +496,8 @@ export default class TransactionRevamp extends Component<Props, State> {
                   {this.getTicker(data.amount.getDefaultEntry())}
                 </Typography>
                 {this.renderAssets({ assets: data.amount.nonDefaultEntries() })}
-              </div>
-            </div>
+              </Box>
+            </Box>
             <div className={styles.expandArrowBox}>
               <span className={arrowClasses}>
                 <ExpandArrow />
