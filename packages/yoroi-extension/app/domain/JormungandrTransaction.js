@@ -36,7 +36,6 @@ export default class JormungandrTransaction extends WalletTransaction {
       ...JormungandrTxIO,
       ...WithNullableFields<DbBlock>,
       ...UserAnnotation,
-      id: string,
     |},
     addressLookupMap: Map<number, string>,
     network: $ReadOnly<NetworkRow>,

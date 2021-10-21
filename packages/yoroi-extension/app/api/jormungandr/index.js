@@ -266,13 +266,7 @@ export type GetTransactionRowsToExportRequest = {|
   publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels>,
   getDefaultToken: number => $ReadOnly<TokenRow>,
 |};
-export type GetTransactionRowsToExportResponse = Array<{|
-  amount: string,
-  comment?: string,
-  date: Date,
-  fee: string,
-  type: "in" | "out"
-|}>;
+export type GetTransactionRowsToExportResponse = Array<TransactionExportRow>;
 export type GetTransactionRowsToExportFunc = (
   request: GetTransactionRowsToExportRequest
 ) => Promise<GetTransactionRowsToExportResponse>;

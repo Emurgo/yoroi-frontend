@@ -78,13 +78,7 @@ export function convertJormungandrTransactionsToExportRows(
     ...,
   }>>,
   defaultAssetRow: $ReadOnly<TokenRow>,
-): Array<{|   
-  type: 'in' | 'out',
-  amount: string,
-  fee: string,
-  date: Date,
-  comment?: string 
-|}> {
+): Array<TransactionExportRow> {
   const result = [];
   for (const tx of transactions) {
     if (tx.block != null) {
@@ -103,6 +97,7 @@ export function convertJormungandrTransactionsToExportRows(
             .shiftedBy(-defaultAssetRow.Metadata.numberOfDecimals)
             ?? new BigNumber(0)
         ),
+        id: tx.transaction.Hash,
       });
     }
   }

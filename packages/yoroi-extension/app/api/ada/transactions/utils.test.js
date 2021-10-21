@@ -141,7 +141,7 @@ test('convertAdaTransactionsToExportRows', () => {
       lists.map(list => tokenEntry(list)),
       new Set([4]),
       '2010-01-01 22:12:22',
-      'id001'
+      'a'
     ),
     _tx(
       [testInputs[1]],
@@ -149,7 +149,7 @@ test('convertAdaTransactionsToExportRows', () => {
       lists.map(list => tokenEntry(list)),
       new Set([6]),
       '2012-05-12 11:22:33',
-      'id002'
+      'a'
     ),
     _tx(
       [testInputs[2], testInputs[3]],
@@ -157,15 +157,15 @@ test('convertAdaTransactionsToExportRows', () => {
       lists.map(list => tokenEntry(list)),
       new Set([2, 3, 9]),
       '2015-12-13 10:20:30',
-      'id003'
+      'a'
     ),
   ],
   cardanoToken
   );
   _expectEqual(res, [
-    _expRow('1.0', '0.0', 'in', '2010-01-01 22:12:22', 'id001'),
-    _expRow('2.0', '0.0', 'in', '2012-05-12 11:22:33', 'id002'),
-    _expRow('2.1', `0.${900000 - 712345}`, 'out', '2015-12-13 10:20:30', 'id003'),
+    _expRow('1.0', '0.0', 'in', '2010-01-01 22:12:22', 'a'),
+    _expRow('2.0', '0.0', 'in', '2012-05-12 11:22:33', 'a'),
+    _expRow('2.1', `0.${900000 - 712345}`, 'out', '2015-12-13 10:20:30', 'a'),
   ]);
 });
 

@@ -614,7 +614,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
               fee: '0',
               date: epochStartDate,
               comment: `Staking Reward Epoch ${item[0]}`,
-              id: '',
+              id: ''
             };
           });
           respTxRows.push(...rewardRows);

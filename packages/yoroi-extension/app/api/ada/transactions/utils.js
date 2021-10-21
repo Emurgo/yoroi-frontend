@@ -276,7 +276,6 @@ export function convertAdaTransactionsToExportRows(
     ...DbTransaction,
     ...WithNullableFields<DbBlock>,
     ...UserAnnotation,
-    id: string,
     ...,
   }>>,
   defaultAssetRow: $ReadOnly<TokenRow>,
@@ -299,7 +298,7 @@ export function convertAdaTransactionsToExportRows(
             .shiftedBy(-defaultAssetRow.Metadata.numberOfDecimals)
             ?? new BigNumber(0)
         ),
-        id: tx.id,
+        id: tx.transaction.Hash,
       });
     }
   }

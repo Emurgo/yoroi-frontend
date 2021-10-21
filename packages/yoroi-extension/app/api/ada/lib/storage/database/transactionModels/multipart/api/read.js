@@ -40,7 +40,7 @@ export class CardanoByronAssociateTxWithIOs {
       txs: $ReadOnlyArray<$ReadOnly<TransactionRow>>,
       networkId: number,
     |},
-  ): Promise<Array<{| ...CardanoByronTxIO, id: string |}>> {
+  ): Promise<Array<CardanoByronTxIO>> {
     const utxo = await CardanoByronAssociateTxWithIOs.depTables.AssociateTxWithUtxoIOs.getIOsForTx(
       db, tx, { txs: request.txs }
     );
@@ -71,7 +71,6 @@ export class CardanoByronAssociateTxWithIOs {
           NetworkId: token.Token.NetworkId,
         },
       })),
-      id: transaction.Hash,
     }));
     return fullTx;
   }
@@ -170,7 +169,7 @@ export class CardanoShelleyAssociateTxWithIOs {
       txs: $ReadOnlyArray<$ReadOnly<TransactionRow>>,
       networkId: number,
     |},
-  ): Promise<Array<{| ...CardanoShelleyTxIO, id: string |}>> {
+  ): Promise<Array<CardanoShelleyTxIO>> {
     const { depTables } = CardanoShelleyAssociateTxWithIOs;
     const utxo = await depTables.AssociateTxWithUtxoIOs.getIOsForTx(
       db, tx, { txs: request.txs }
@@ -216,7 +215,6 @@ export class CardanoShelleyAssociateTxWithIOs {
       ...getOrThrow(utxo.get(transaction)),
       accountingInputs: getOrThrow(accounting.get(transaction)).accountingInputs,
       tokens,
-      id: transaction.Hash,
     }));
     return fullTx;
   }
@@ -239,7 +237,7 @@ export class ErgoAssociateTxWithIOs {
       txs: $ReadOnlyArray<$ReadOnly<TransactionRow>>,
       networkId: number,
     |},
-  ): Promise<Array<{| ...ErgoTxIO, id: string |}>> {
+  ): Promise<Array<ErgoTxIO>> {
     const utxo = await ErgoAssociateTxWithIOs.depTables.AssociateTxWithUtxoIOs.getIOsForTx(
       db, tx, { txs: request.txs }
     );
@@ -272,7 +270,6 @@ export class ErgoAssociateTxWithIOs {
             NetworkId: token.Token.NetworkId,
           },
         })),
-        id: transaction.Hash,
       };
     });
     return fullTx;

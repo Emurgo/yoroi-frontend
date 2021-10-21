@@ -189,7 +189,6 @@ export async function rawGetTransactions(
   ...ErgoTxIO,
   ...WithNullableFields<DbBlock>,
   ...UserAnnotation,
-  id: string,
 |}>,
 |}> {
   const {
@@ -247,7 +246,7 @@ export async function rawGetTransactions(
   const feeErgoTree = Buffer.from(RustModule.SigmaRust.Address.from_bytes(
     Buffer.from(config.FeeAddress, 'hex')
   ).to_ergo_tree().to_bytes()).toString('hex');
-  const result = txsWithIOs.map((tx: {| ...ErgoTxIO, id: string|}) => ({
+  const result = txsWithIOs.map((tx: ErgoTxIO) => ({
     ...tx,
     block: blockMap.get(tx.transaction.TransactionId) || null,
     ...getFromUserPerspective({
@@ -285,7 +284,6 @@ export async function getAllTransactions(
   ...ErgoTxIO,
   ...WithNullableFields<DbBlock>,
   ...UserAnnotation,
-  id: string,
 |}>,
 |}> {
   const derivationTables = request.publicDeriver.getParent().getDerivationTables();
@@ -344,7 +342,6 @@ export async function getPendingTransactions(
   ...ErgoTxIO,
   ...WithNullableFields<DbBlock>,
   ...UserAnnotation,
-  id: string,
 |}>,
 |}> {
   const derivationTables = request.publicDeriver.getParent().getDerivationTables();
@@ -1173,12 +1170,11 @@ async function updateTransactionBatch(
   |}
 ): Promise<Array<{|
   ...ErgoTxIO,
-  id: string,
   ...DbBlock,
 |}>> {
   const { TransactionSeed, BlockSeed } = await deps.GetEncryptionMeta.get(db, dbTx);
 
-  const matchesInDb = new Map<string, {|...ErgoTxIO, id: string|}>();
+  const matchesInDb = new Map<string, ErgoTxIO>();
   {
     const digestsForNew = request.txsFromNetwork.map(tx => digestForHash(tx.hash, TransactionSeed));
     const matchByDigest = await deps.GetTransaction.byDigest(db, dbTx, {
@@ -1201,7 +1197,6 @@ async function updateTransactionBatch(
   const unseenNewTxs: Array<RemoteErgoTransaction> = [];
   const txsAddedToBlock: Array<{|
     ...ErgoTxIO,
-    id: string,
     ...DbBlock,
   |}> = [];
   const modifiedTxIds = new Set<number>();
@@ -1248,7 +1243,7 @@ async function updateTransactionBatch(
     }
     if (result.block !== null) {
       txsAddedToBlock.push({
-        ...(matchInDb: ({| ...ErgoTxIO, id: string |})),
+        ...(matchInDb: (ErgoTxIO)),
         // override with updated
         transaction: result.transaction,
         block: result.block,
@@ -1302,7 +1297,6 @@ async function updateTransactionBatch(
         utxoInputs: result.utxoInputs,
         utxoOutputs: result.utxoOutputs,
         tokens: result.tokens,
-        id: result.transaction.Hash,
       });
     }
   }
