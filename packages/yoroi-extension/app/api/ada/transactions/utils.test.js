@@ -147,14 +147,14 @@ test('convertAdaTransactionsToExportRows', () => {
       [testOutputs[2], testOutputs[3]],
       lists.map(list => tokenEntry(list)),
       new Set([6]),
-      '2012-05-12 11:22:33',
+      '2012-05-12 11:22:33'
     ),
     _tx(
       [testInputs[2], testInputs[3]],
       [testOutputs[4], testOutputs[5]],
       lists.map(list => tokenEntry(list)),
       new Set([2, 3, 9]),
-      '2015-12-13 10:20:30',
+      '2015-12-13 10:20:30'
     ),
   ],
   cardanoToken
