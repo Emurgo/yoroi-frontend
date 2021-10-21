@@ -98,7 +98,7 @@ export class JormungandrAssociateTxWithIOs {
       txs: $ReadOnlyArray<$ReadOnly<TransactionRow>>,
       networkId: number,
     |},
-  ): Promise<Array<{| ...JormungandrTxIO, id: string |}>> {
+  ): Promise<Array<JormungandrTxIO>> {
     if (request.txs.length === 0) return [];
 
     const { depTables } = JormungandrAssociateTxWithIOs;
@@ -144,7 +144,6 @@ export class JormungandrAssociateTxWithIOs {
           NetworkId: token.Token.NetworkId,
         },
       })),
-      id: transaction.Hash,
     }));
     return fullTx;
   }

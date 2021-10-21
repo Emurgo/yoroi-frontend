@@ -75,11 +75,16 @@ export function convertJormungandrTransactionsToExportRows(
     ...DbTransaction,
     ...WithNullableFields<DbBlock>,
     ...UserAnnotation,
-    id: string,
     ...,
   }>>,
   defaultAssetRow: $ReadOnly<TokenRow>,
-): Array<TransactionExportRow> {
+): Array<{|   
+  type: 'in' | 'out',
+  amount: string,
+  fee: string,
+  date: Date,
+  comment?: string 
+|}> {
   const result = [];
   for (const tx of transactions) {
     if (tx.block != null) {
@@ -98,7 +103,6 @@ export function convertJormungandrTransactionsToExportRows(
             .shiftedBy(-defaultAssetRow.Metadata.numberOfDecimals)
             ?? new BigNumber(0)
         ),
-        id: tx.id,
       });
     }
   }
