@@ -1,11 +1,10 @@
 // @flow
 import { Component } from 'react';
 import type { Node, ComponentType } from 'react';
-import classnames from 'classnames';
 import { observer } from 'mobx-react';
-import { Button } from '@mui/material';
+import { Button, IconButton, Typography } from '@mui/material';
+import { Box, styled } from '@mui/system';
 import { defineMessages, intlShape, FormattedMessage, FormattedHTMLMessage } from 'react-intl';
-import styles from './ThemeSettingsBlock.scss';
 import { THEMES } from '../../../../styles/utils';
 import type { Theme } from '../../../../styles/utils';
 import ThemeThumbnail from '../display/ThemeThumbnail';
@@ -86,81 +85,95 @@ class ThemeSettingsBlock extends Component<AllProps> {
     } = this.props;
     const { intl } = this.context;
 
-    const themeYoroiClassicClasses = classnames([
-      currentTheme === THEMES.YOROI_CLASSIC ? styles.active : styles.inactive,
-      styles.themeImageWrapper,
-    ]);
-
-    const themeYoroiModernClasses = classnames([
-      currentTheme === THEMES.YOROI_MODERN || currentTheme === THEMES.YOROI_REVAMP
-        ? styles.active
-        : styles.inactive,
-      styles.themeImageWrapper,
-    ]);
-
     const blogLink = (
-      <a
-        className={styles.link}
+      <Typography
+        as="a"
+        variant="body2"
         href={intl.formatMessage(messages.blogLinkUrl)}
         onClick={event => onExternalLinkClick(event)}
+        sx={{
+          textDecoration: 'none',
+          borderBottom: '1px solid var(--yoroi-palette-gray-800)',
+          color: 'var(--yoroi-support-settings-text)',
+        }}
       >
         {intl.formatMessage(globalMessages.blogLinkWrapper)}
-      </a>
+      </Typography>
     );
 
     const commonHeader = (
       <>
-        <h2 className={styles.title}>{intl.formatMessage(messages.themeLabel)}</h2>
-        <p>
+        <Typography
+          variant="h5"
+          sx={{
+            fontWeight: 500,
+            marginBottom: '12px',
+            color: 'var(--yoroi-support-settings-text)',
+          }}
+        >
+          {intl.formatMessage(messages.themeLabel)}
+        </Typography>
+        <Typography
+          variant="body2"
+          color="var(--yoroi-support-settings-text)"
+          sx={{ marginBottom: '2px' }}
+        >
           <FormattedHTMLMessage {...messages.themeNote} />
-        </p>
-        <p>
+        </Typography>
+        <Typography variant="body2" color="var(--yoroi-support-settings-text)">
           <FormattedMessage {...messages.blog} values={{ blogLink }} />
-        </p>
+        </Typography>
       </>
     );
 
     const themeBlockClassicComponent = (
-      <div className={styles.component}>
+      <Box sx={{ borderTop: '1px solid var(--yoroi-palette-gray-200)', paddingTop: '30px' }}>
         {commonHeader}
-        <div className={styles.main}>
-          <div className={styles.themesWrapper}>
+        <Box sx={{ maxWidth: '1300px', textAlign: 'center', marginTop: '20px' }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-evenly' }}>
             {/* Modern Theme */}
-            <button
-              type="button"
-              className={themeYoroiModernClasses}
+            <ThemeButton
+              variant={null}
               onClick={selectTheme.bind(this, { theme: THEMES.YOROI_MODERN })}
+              isActive={currentTheme === THEMES.YOROI_MODERN}
             >
               {currentTheme === THEMES.YOROI_MODERN && hasCustomTheme() && (
-                <div className={styles.themeWarning}>
+                <WarningMessage variant="body2">
                   {intl.formatMessage(messages.themeWarning)}
-                </div>
+                </WarningMessage>
               )}
               <ThemeThumbnail theme={THEMES.YOROI_MODERN} themeKey="modern" />
-              <h3 className={styles.subTitle}>{intl.formatMessage(messages.themeYoroiModern)}</h3>
-            </button>
+              <Typography
+                variant="body2"
+                sx={{ textalign: 'center', color: 'var(--yoroi-support-settings-text)' }}
+              >
+                {intl.formatMessage(messages.themeYoroiModern)}
+              </Typography>
+            </ThemeButton>
             {/* Classic Theme */}
-            <button
-              type="button"
-              className={themeYoroiClassicClasses}
+            <ThemeButton
+              variant={null}
+              isActive={currentTheme === THEMES.YOROI_CLASSIC}
               onClick={selectTheme.bind(this, { theme: THEMES.YOROI_CLASSIC })}
             >
               {currentTheme === THEMES.YOROI_CLASSIC && hasCustomTheme() && (
-                <div className={styles.themeWarning}>
+                <WarningMessage variant="body2">
                   {intl.formatMessage(messages.themeWarning)}
-                </div>
+                </WarningMessage>
               )}
               <ThemeThumbnail theme={THEMES.YOROI_CLASSIC} themeKey="classic" />
-              <h3 className={styles.subTitle}>{intl.formatMessage(messages.themeYoroiClassic)}</h3>
-            </button>
-          </div>
+              <Typography sx={{ textalign: 'center', color: 'var(--yoroi-support-settings-text)' }}>
+                {intl.formatMessage(messages.themeYoroiClassic)}
+              </Typography>
+            </ThemeButton>
+          </Box>
 
           <Button variant="primary" onClick={exportTheme.bind(this)} sx={{ width: '400px' }}>
             {intl.formatMessage(messages.themeExportButton)}
           </Button>
-        </div>
+        </Box>
         {(environment.isNightly() || environment.isTest()) && (
-          <div className={styles.revampWrapper}>
+          <Box sx={{ margin: '20px 0', display: 'flex', justifyContent: 'center' }}>
             <Button
               sx={{
                 width: '400px',
@@ -190,21 +203,21 @@ class ThemeSettingsBlock extends Component<AllProps> {
             >
               {intl.formatMessage(messages.tryYoroiRevamp)}
             </Button>
-          </div>
+          </Box>
         )}
-      </div>
+      </Box>
     );
 
     const themeBlockRevampComponent = (
-      <div className={styles.component}>
+      <Box sx={{ borderTop: '1px solid var(--yoroi-palette-gray-200)', paddingTop: '30px' }}>
         {commonHeader}
-        <div className={styles.main}>
+        <Box sx={{ maxWidth: '1300px', textAlign: 'center', marginTop: '20px' }}>
           <Button variant="primary" onClick={exportTheme.bind(this)} sx={{ width: '400px' }}>
             {intl.formatMessage(messages.themeExportButton)}
           </Button>
-        </div>
+        </Box>
         {(environment.isNightly() || environment.isTest()) && (
-          <div className={styles.revampWrapper}>
+          <Box sx={{ margin: '20px 0', display: 'flex', justifyContent: 'center' }}>
             <Button
               variant="ternary"
               onClick={() => {
@@ -217,9 +230,9 @@ class ThemeSettingsBlock extends Component<AllProps> {
             >
               {intl.formatMessage(messages.backYoroiClassic)}
             </Button>
-          </div>
+          </Box>
         )}
-      </div>
+      </Box>
     );
     return this.props.renderLayoutComponent({
       CLASSIC: themeBlockClassicComponent,
@@ -228,3 +241,25 @@ class ThemeSettingsBlock extends Component<AllProps> {
   }
 }
 export default (withLayout(ThemeSettingsBlock): ComponentType<Props>);
+
+const WarningMessage = styled(Typography)({
+  position: 'absolute',
+  top: 'calc(50% - 37px)',
+  left: 0,
+  backgroundColor: 'var(--yoroi-palette-background-banner-warning)',
+  color: 'var(--yoroi-palette-common-white)',
+  padding: '10px',
+});
+
+const ThemeButton = styled(IconButton)(({ isActive }) => ({
+  borderRadius: 0,
+  display: 'flex',
+  flexDirection: 'column',
+  opacity: isActive ? 1 : 0.5,
+  svg: {
+    width: '300px',
+    boxShadow: '0 5px 30px 0px rgba(24, 26, 30, 0.12)',
+  },
+  marginBottom: '32px',
+  ':hover': { background: 'transparent' },
+}));
