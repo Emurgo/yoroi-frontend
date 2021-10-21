@@ -39,7 +39,6 @@ export function convertErgoTransactionsToExportRows(
   defaultAssetRow: $ReadOnly<TokenRow>,
 ): Array<TransactionExportRow> {
   const result = [];
-  console.log({transactions})
   for (const tx of transactions) {
     if (tx.block != null) {
       result.push({

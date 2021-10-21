@@ -141,7 +141,6 @@ test('convertAdaTransactionsToExportRows', () => {
       lists.map(list => tokenEntry(list)),
       new Set([4]),
       '2010-01-01 22:12:22',
-      'a'
     ),
     _tx(
       [testInputs[1]],
@@ -149,7 +148,6 @@ test('convertAdaTransactionsToExportRows', () => {
       lists.map(list => tokenEntry(list)),
       new Set([6]),
       '2012-05-12 11:22:33',
-      'a'
     ),
     _tx(
       [testInputs[2], testInputs[3]],
@@ -157,7 +155,6 @@ test('convertAdaTransactionsToExportRows', () => {
       lists.map(list => tokenEntry(list)),
       new Set([2, 3, 9]),
       '2015-12-13 10:20:30',
-      'a'
     ),
   ],
   cardanoToken
@@ -175,8 +172,7 @@ test('self tx', () => {
     [testOutputs[0]],
     lists.map(list => tokenEntry(list)),
     new Set([0, 4]),
-    '2015-12-13 10:20:30',
-    'id003',
+    '2015-12-13 10:20:30'
   );
   expect(selfTx.type).toEqual(transactionTypes.SELF);
   expect(selfTx.amount.getDefault()).toEqual(new BigNumber(0));
@@ -189,8 +185,7 @@ test('multi tx', () => {
     [testOutputs[0], testOutputs[1]],
     lists.map(list => tokenEntry(list)),
     new Set([0, 4]),
-    '2015-12-13 10:20:30',
-    'id003'
+    '2015-12-13 10:20:30'
   );
   expect(selfTx.type).toEqual(transactionTypes.MULTI);
 });
@@ -235,12 +230,10 @@ const _tx = (
   tokens: $PropertyType<DbTokenInfo, 'tokens'>,
   ownedAddresses: Set<number>,
   date: string,
-  id: string,
 ): {|
   ...CardanoByronTxIO,
   ...WithNullableFields<DbBlock>,
   ...UserAnnotation,
-  id: string,
 |} => {
   const annotation = getFromUserPerspective({
     utxoInputs,
@@ -252,7 +245,6 @@ const _tx = (
 
   return {
     txType: TransactionType.CardanoByron,
-    id,
     transaction: {
       Type: TransactionType.CardanoByron,
       TransactionId: 0,

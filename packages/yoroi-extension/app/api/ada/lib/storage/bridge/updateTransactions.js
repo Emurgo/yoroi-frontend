@@ -397,6 +397,7 @@ export async function rawGetTransactions(
       defaultToken,
     })
   }));
+
   return {
     addressLookupMap,
     txs: result,
@@ -1433,7 +1434,7 @@ async function updateTransactionBatch(
 |}>> {
   const { TransactionSeed, BlockSeed } = await deps.GetEncryptionMeta.get(db, dbTx);
 
-  const matchesInDb = new Map<string, CardanoByronTxIO | CardanoShelleyTxIO >();
+  const matchesInDb = new Map<string, CardanoByronTxIO | CardanoShelleyTxIO>();
   {
     const digestsForNew = request.txsFromNetwork.map(tx => digestForHash(tx.hash, TransactionSeed));
     const matchByDigest = await deps.GetTransaction.byDigest(db, dbTx, {
