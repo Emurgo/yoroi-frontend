@@ -151,6 +151,7 @@
   "global.language.russian": "Pусский",
   "global.language.spanish": "Español",
   "global.language.turkish": "Turc",
+  "global.language.polish": "Polski",
   "global.passwordInstructionsPaperWallet": "Remarque : le mot de passe du Wallet Papier doit contenir au moins <strong>10 caractères</strong>.",
   "global.publicKey.explanation": "Les clés publiques permettent de voir l'historique du wallet, mais <strong>ne permettent pas</strong> de dépenser ou de déplacer les fonds d'aucune manière (la clé privée <strong>n'est pas</strong> incluse)",
   "global.selectAsset.labael": "Sélectionner un actif",

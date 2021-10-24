@@ -151,6 +151,7 @@
   "global.language.russian": "Pусский",
   "global.language.spanish": "Español",
   "global.language.turkish": "Turkish",
+  "global.language.polish": "Polski",
   "global.passwordInstructionsPaperWallet": "Примечание: Пароль бумажного кошелька должен содержать не менее <strong>10 символов</strong>.",
   "global.publicKey.explanation": "Public keys allow seeing the wallet history for the wallet, but does <strong>not</strong> allow to spend or move the funds in any way (private key is <strong>not</strong> included)",
   "global.selectAsset.labael": "Select asset",

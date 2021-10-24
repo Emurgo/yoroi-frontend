@@ -151,6 +151,7 @@
   "global.language.russian": "Pусский",
   "global.language.spanish": "Español",
   "global.language.turkish": "Turks",
+  "global.language.polish": "Polski",
   "global.passwordInstructionsPaperWallet": "Opmerking: Het wachtwoord van een \"Papieren\" Portemonnee moet uit minstens <strong>10 karakters</strong> bestaan.",
   "global.publicKey.explanation": "Met openbare sleutels kan de portefeuillegeschiedenis van de portemonnee worden bekeken, maar het is <strong> niet </strong> mogelijk om het geld op enigerlei wijze uit te geven of te verplaatsen (De privésleutel is <strong> niet </strong> inbegrepen)",
   "global.selectAsset.labael": "Kies een bedrijfsmiddel",

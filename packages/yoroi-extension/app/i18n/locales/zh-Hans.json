@@ -151,6 +151,7 @@
   "global.language.russian": "Pусский",
   "global.language.spanish": "Español",
   "global.language.turkish": "Turkish",
+  "global.language.polish": "Polski",
   "global.passwordInstructionsPaperWallet": "注意: 纸钱包密码长度至少为<strong>10个字符</strong>。",
   "global.publicKey.explanation": "公钥可以用于显示钱包的历史交易，但<strong>无法</strong>用于支付或转移其中的资金。",
   "global.selectAsset.labael": "选择资产",

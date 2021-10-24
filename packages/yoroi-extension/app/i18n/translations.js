@@ -14,6 +14,7 @@ import SpanishFlag from '../assets/images/flags/spanish.inline.svg';
 import ItalianFlag from '../assets/images/flags/italian.inline.svg';
 import IndonesianFlag from '../assets/images/flags/indonesian.inline.svg';
 import TurkishFlag from '../assets/images/flags/turkish.inline.svg';
+import PolishFlag from '../assets/images/flags/polish.inline.svg';
 
 // This is essentially bulk require
 
@@ -107,5 +108,9 @@ export const LANGUAGES: Array<LanguageType> = [
 
 // add any languages that're mid-translation here. They won't be added to production build.
 export const LANGUAGES_IN_TRANSLATION: Array<LanguageType> = [
-
+  {
+    value: 'pl-PL',
+    label: globalMessages.languagePolish,
+    svg: PolishFlag
+  },
 ];

@@ -18,6 +18,7 @@ import id from 'react-intl/locale-data/id';
 import es from 'react-intl/locale-data/es';
 import it from 'react-intl/locale-data/it';
 import tr from 'react-intl/locale-data/tr';
+import pl from 'react-intl/locale-data/pl';
 import { Routes } from './Routes';
 import { translations } from './i18n/translations';
 import type { StoresMap } from './stores';
@@ -48,6 +49,7 @@ addLocaleData([
   ...es,
   ...it,
   ...tr,
+  ...pl,
 ]);
 
 type Props = {|

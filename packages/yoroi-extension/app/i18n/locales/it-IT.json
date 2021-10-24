@@ -151,6 +151,7 @@
   "global.language.russian": "Pусский",
   "global.language.spanish": "Español",
   "global.language.turkish": "Turkish",
+  "global.language.polish": "Polski",
   "global.passwordInstructionsPaperWallet": "Nota: la password del portafoglio cartaceo deve essere lunga almeno <strong>10 caratteri</strong>.",
   "global.publicKey.explanation": "Le chiavi pubbliche permettono di vedere la storia del portafoglio per il portafoglio, ma <strong>non</strong> permettono di spendere o spostare i fondi in qualsiasi modo (la chiave privata non è <strong>inclusa</strong>)",
   "global.selectAsset.labael": "Selezionare l'asset",

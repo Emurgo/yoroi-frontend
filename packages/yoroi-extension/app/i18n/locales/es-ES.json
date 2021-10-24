@@ -151,6 +151,7 @@
   "global.language.russian": "Pусский",
   "global.language.spanish": "Español",
   "global.language.turkish": "Turkish",
+  "global.language.polish": "Polski",
   "global.passwordInstructionsPaperWallet": "Nota: La contraseña de la Billetera de Papel debe ser de al menos <strong>10 caracteres</strong> de longitud.",
   "global.publicKey.explanation": "Las llaves públicas permiten ver el historial de la billetera, pero <strong>no</strong> permite gastar o mover los fondos de ninguna manera (la llave privada <strong>no está</strong> incluida)",
   "global.selectAsset.labael": "Seleccionar activo",

@@ -151,6 +151,7 @@
   "global.language.russian": "Pусский",
   "global.language.spanish": "Español",
   "global.language.turkish": "Turkish",
+  "global.language.polish": "Polski",
   "global.passwordInstructionsPaperWallet": "Achtung: Das Paper Wallet-Passwort muss mindestens <strong>10 Zeichen</strong> lang sein.",
   "global.publicKey.explanation": "Öffentliche Schlüssel erlauben es, die Wallet-Historie für die Wallet zu sehen, erlauben aber <strong>nicht</strong>, die Gelder in irgendeiner Weise auszugeben oder zu bewegen (der private Schlüssel ist <strong>nicht</strong> enthalten)",
   "global.selectAsset.labael": "Asset auswählen",
