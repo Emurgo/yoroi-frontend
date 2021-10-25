@@ -1,6 +1,5 @@
 // @flow
 
-import React from 'react';
 import { render } from 'react-dom';
 import { action, configure } from 'mobx';
 import { RouterStore, syncHistoryWithStore } from 'mobx-react-router';
@@ -11,7 +10,6 @@ import { translations } from '../../app/i18n/translations';
 import actions from '../../app/actions/index';
 import { Action } from '../../app/actions/lib/Action';
 import App from '../../app/App';
-import '../../app/themes/index.global.scss';
 import BigNumber from 'bignumber.js';
 import { addCloseListener, TabIdKeys } from '../../app/utils/tabManager';
 

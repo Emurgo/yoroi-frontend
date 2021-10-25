@@ -18,6 +18,8 @@ import type {
   TxBodiesFunc,
   UtxoSumFunc,
   RemoteTransaction,
+  MultiAssetMintMetadataRequest,
+  MultiAssetMintMetadataResponse
 } from './types';
 import type {
   FilterFunc, FilterUsedRequest, FilterUsedResponse,
@@ -95,6 +97,11 @@ export class BatchedFetcher implements IFetcher {
     // We don't batch transaction sending (it's just a single request)
     // TODO: Should we support batching a list of transactions?
     this.baseFetcher.sendTx(body)
+  )
+
+  getMultiAssetMintMetadata: MultiAssetMintMetadataRequest
+    => Promise<MultiAssetMintMetadataResponse> = (body) => (
+    this.baseFetcher.getMultiAssetMintMetadata(body)
   )
 
   getAccountState: AccountStateRequest => Promise<AccountStateResponse> = (body) => (

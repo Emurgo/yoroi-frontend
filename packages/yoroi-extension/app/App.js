@@ -1,8 +1,7 @@
 // @flow
-import React, { Component } from 'react';
+import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { ThemeProvider } from 'react-polymorph/lib/components/ThemeProvider';
 import { Router } from 'react-router-dom';
 import type { RouterHistory } from 'react-router-dom';
 import { addLocaleData, IntlProvider } from 'react-intl';
@@ -20,19 +19,19 @@ import es from 'react-intl/locale-data/es';
 import it from 'react-intl/locale-data/it';
 import tr from 'react-intl/locale-data/tr';
 import { Routes } from './Routes';
-import { yoroiPolymorphTheme } from './themes/PolymorphThemes';
-import { themeOverrides } from './themes/overrides';
 import { translations } from './i18n/translations';
 import type { StoresMap } from './stores';
 import type { ActionsMap } from './actions';
-import { changeToplevelTheme } from './themes';
+import { changeToplevelTheme, MuiThemes } from './styles/utils';
 import ThemeManager from './ThemeManager';
 import environment from './environment';
 import MaintenancePage from './containers/MaintenancePage';
 import CrashPage from './containers/CrashPage';
-import { Logger, } from './utils/logging';
-import { SimpleSkins } from 'react-polymorph/lib/skins/simple';
-import { SimpleDefaults } from 'react-polymorph/lib/themes/simple';
+import { Logger } from './utils/logging';
+import { LayoutProvider } from './styles/context/layout';
+import { ThemeProvider } from '@mui/material/styles';
+import { CssBaseline } from '@mui/material';
+import { globalStyles } from './styles/globalStyles';
 
 // https://github.com/yahoo/react-intl/wiki#loading-locale-data
 addLocaleData([
@@ -62,7 +61,6 @@ type State = {|
 
 @observer
 class App extends Component<Props, State> {
-
   state: State = {
     crashed: false,
   };
@@ -77,7 +75,7 @@ class App extends Component<Props, State> {
   }
 
   render(): Node {
-    const { stores, } = this.props;
+    const { stores } = this.props;
     const locale = stores.profile.currentLocale;
 
     // Merged english messages with selected by user locale messages
@@ -90,35 +88,31 @@ class App extends Component<Props, State> {
       translations[locale]
     );
 
-    const themeVars = Object.assign(
-      stores.profile.currentThemeVars,
-      {
-        // show wingdings on dev builds when no font is set to easily find
-        // missing font bugs. However, on production, we use Times New Roman
-        // which looks ugly but at least it's readable.
-        '--default-font': !environment.isProduction() ? 'wingdings' : 'Times New Roman',
-      }
-    );
+    const themeVars = Object.assign(stores.profile.currentThemeVars, {
+      // show wingdings on dev builds when no font is set to easily find
+      // missing font bugs. However, on production, we use Times New Roman
+      // which looks ugly but at least it's readable.
+      '--default-font': !environment.isProduction() ? 'wingdings' : 'Times New Roman',
+    });
     const currentTheme = stores.profile.currentTheme;
 
     changeToplevelTheme(currentTheme);
 
+    const muiTheme = MuiThemes[currentTheme];
+
     return (
       <div style={{ height: '100%' }}>
-        <ThemeManager variables={themeVars} />
-
-        {/* Automatically pass a theme prop to all components in this subtree. */}
-        <ThemeProvider
-          key={currentTheme}
-          theme={yoroiPolymorphTheme}
-          skins={SimpleSkins}
-          variables={SimpleDefaults}
-          themeOverrides={themeOverrides(currentTheme)}
-        >
-          <IntlProvider {...{ locale, key: locale, messages: mergedMessages }}>
-            {this.getContent()}
-          </IntlProvider>
-        </ThemeProvider>
+        <LayoutProvider>
+          <ThemeProvider theme={muiTheme}>
+            <CssBaseline />
+            {globalStyles(muiTheme)}
+            <ThemeManager cssVariables={themeVars} />
+            {/* Automatically pass a theme prop to all components in this subtree. */}
+            <IntlProvider {...{ locale, key: locale, messages: mergedMessages }}>
+              {this.getContent()}
+            </IntlProvider>
+          </ThemeProvider>
+        </LayoutProvider>
       </div>
     );
   }
@@ -126,17 +120,13 @@ class App extends Component<Props, State> {
   getContent: void => ?Node = () => {
     const { stores, actions, history } = this.props;
     if (this.state.crashed === true) {
-      return (<CrashPage stores={stores} actions={actions} />);
+      return <CrashPage stores={stores} actions={actions} />;
     }
     if (stores.serverConnectionStore.isMaintenance) {
-      return (<MaintenancePage stores={stores} actions={actions} />);
+      return <MaintenancePage stores={stores} actions={actions} />;
     }
-    return (
-      <Router history={history}>
-        {Routes(stores, actions)}
-      </Router>
-    );
-  }
+    return <Router history={history}>{Routes(stores, actions)}</Router>;
+  };
 }
 
 export default App;

@@ -3,7 +3,7 @@
 @import '../../../../themes/mixins/unordered-list';
 
 .dialog {
-  font-family: var(--font-medium);
+  font-weight: 500;
   @include unordered-list;
 
   .explanation {
@@ -11,8 +11,8 @@
   }
 
   .rewardAmount {
-    font-family: var(--font-medium);
-    color: var(--theme-send-confirmation-dialog-send-values-color);
+    font-weight: 500;
+    color: var(--yoroi-send-confirmation-dialog-send-values-color);
     line-height: 1.38;
     font-size: 16px;
   }
@@ -28,8 +28,8 @@
   }
 
   .submitButtonSpinning {
-    @include loading-spinner("../../../../assets/images/spinner-light.svg");
-  }  
+    @include loading-spinner('../../../../assets/images/spinner-light.svg');
+  }
 
   .walletPassword {
     margin-top: 20px;
@@ -42,9 +42,9 @@
 }
 
 :global(.YoroiModern) .dialog {
-  min-width: var(--theme-modal-min-max-width-lg);
-  max-width: var(--theme-modal-min-max-width-lg);  
-  font-family: var(--font-regular);
+  min-width: var(--yoroi-comp-dialog-min-width-lg);
+  max-width: var(--yoroi-comp-dialog-min-width-lg);
+  font-weight: 400;
 
   .walletPassword {
     margin-top: 0;

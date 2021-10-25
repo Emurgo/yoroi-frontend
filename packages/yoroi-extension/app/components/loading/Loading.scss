@@ -1,4 +1,4 @@
-@import "../../themes/mixins/animations";
+@import '../../themes/mixins/animations';
 @import '../../themes/mixins/error-message';
 @import '../../themes/mixins/underline';
 
@@ -16,10 +16,10 @@
   height: 100%;
 }
 
-.loading {	
-  top: 50%;	
-  position: absolute;	
-  text-align: center;	
+.loading {
+  top: 50%;
+  position: absolute;
+  text-align: center;
   width: 100%;
   transform: translateY(-50%);
 
@@ -33,7 +33,7 @@
     width: 100px;
     margin: 0 114px;
     & > path {
-      fill: var(--theme-button-primary-background-color);
+      fill: var(--yoroi-palette-secondary-300);
     }
   }
 }
@@ -41,30 +41,33 @@
 .hide {
   & > svg {
     & > path {
-      fill: var(--cmn-invisible);
+      fill: rgba(0, 0, 0, 0);
     }
   }
 }
 
 .headline {
-  font-family: var(--font-light);
+  font-weight: 300;
   font-size: 16px;
   margin-bottom: 24px;
 }
 
-.component, .headline, .logo, .error {
+.component,
+.headline,
+.logo,
+.error {
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
 }
 
 .link {
-  color: var(--theme-warning-color);
-  @include underline(var(--theme-warning-color));
+  color: var(--yoroi-palette-error-200);
+  @include underline(var(--yoroi-palette-error-200));
 }
 
 .error {
   @include error-message;
-  font-family: var(--font-light);
+  font-weight: 300;
   font-size: 16px;
   line-height: 22px;
   word-break: break-word;

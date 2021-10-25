@@ -1,5 +1,5 @@
 // @flow
-import React, { Component } from 'react';
+import { Component } from 'react';
 import type { Node } from 'react';
 import SupportImg from '../assets/images/support.inline.svg';
 import styles from './SupportPage.scss';

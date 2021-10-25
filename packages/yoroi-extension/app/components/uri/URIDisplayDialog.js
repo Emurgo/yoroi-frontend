@@ -1,6 +1,6 @@
 // @flow
 import type { Node } from 'react';
-import React, { Component } from 'react';
+import { Component } from 'react';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { intlShape, defineMessages } from 'react-intl';
@@ -91,7 +91,7 @@ export default class URIDisplayDialog extends Component<Props> {
             elementId={uriNotificationId}
             onCopyAddress={() => onCopyAddressTooltip(uriNotificationId)}
             notification={notification}
-            tooltipOpensUpward
+            placementTooltip="bottom-start"
           >
             <span className={styles.uri}>{uri}</span>
           </CopyableAddress>

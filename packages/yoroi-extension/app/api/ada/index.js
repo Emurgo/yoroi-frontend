@@ -142,6 +142,7 @@ import type {
   AccountStateFunc,
   AddressUtxoFunc,
   TokenInfoFunc,
+  MultiAssetMintMetadataFunc
 } from './lib/state-fetch/types';
 import type {
   FilterFunc,
@@ -252,6 +253,7 @@ export type AdaGetTransactionsRequest = {|
   checkAddressesInUse: FilterFunc,
   getBestBlock: BestBlockFunc,
   getTokenInfo: TokenInfoFunc,
+  getMultiAssetMetadata: MultiAssetMintMetadataFunc,
 |};
 
 // notices
@@ -658,6 +660,7 @@ export default class AdaApi {
           request.getTransactionsHistoryForAddresses,
           request.getBestBlock,
           request.getTokenInfo,
+          request.getMultiAssetMetadata
         );
       }
       const fetchedTxs = await getAllTransactions({

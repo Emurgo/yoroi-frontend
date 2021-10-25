@@ -2,7 +2,6 @@
 // @flow
 
 import type { Node } from 'react';
-import React from 'react';
 import BigNumber from 'bignumber.js';
 
 import { select, boolean, } from '@storybook/addon-knobs';
@@ -22,7 +21,7 @@ import {
   getValidationMnemonicCases,
   mockLedgerMeta,
 } from '../../../stories/helpers/StoryWrapper';
-import { THEMES } from '../../themes';
+import { THEMES } from '../../styles/utils';
 import AdaApi from '../../api/ada/index';
 import { NoInputsError, GenericApiError, } from '../../api/common/errors';
 import { withScreenshot } from 'storycap';

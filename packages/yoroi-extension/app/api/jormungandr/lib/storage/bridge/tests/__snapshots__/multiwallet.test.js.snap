@@ -582,6 +582,7 @@ Array [
         "Digest": 6.262633522161549e-167,
         "Identifier": "",
         "IsDefault": true,
+        "IsNFT": false,
         "Metadata": Object {
           "assetName": "",
           "longName": null,
@@ -597,6 +598,7 @@ Array [
         "Digest": 6.262633522161549e-167,
         "Identifier": "",
         "IsDefault": true,
+        "IsNFT": false,
         "Metadata": Object {
           "assetName": "",
           "longName": null,
@@ -612,6 +614,7 @@ Array [
         "Digest": 6.262633522161549e-167,
         "Identifier": "",
         "IsDefault": true,
+        "IsNFT": false,
         "Metadata": Object {
           "boxId": "",
           "description": null,
@@ -628,6 +631,7 @@ Array [
         "Digest": 6.262633522161549e-167,
         "Identifier": "",
         "IsDefault": true,
+        "IsNFT": false,
         "Metadata": Object {
           "assetName": "",
           "longName": null,
@@ -643,6 +647,7 @@ Array [
         "Digest": 6.262633522161549e-167,
         "Identifier": "",
         "IsDefault": true,
+        "IsNFT": false,
         "Metadata": Object {
           "assetName": "",
           "longName": null,
@@ -1911,6 +1916,7 @@ Array [
         "Digest": 6.262633522161549e-167,
         "Identifier": "",
         "IsDefault": true,
+        "IsNFT": false,
         "Metadata": Object {
           "assetName": "",
           "longName": null,
@@ -1926,6 +1932,7 @@ Array [
         "Digest": 6.262633522161549e-167,
         "Identifier": "",
         "IsDefault": true,
+        "IsNFT": false,
         "Metadata": Object {
           "assetName": "",
           "longName": null,
@@ -1941,6 +1948,7 @@ Array [
         "Digest": 6.262633522161549e-167,
         "Identifier": "",
         "IsDefault": true,
+        "IsNFT": false,
         "Metadata": Object {
           "boxId": "",
           "description": null,
@@ -1957,6 +1965,7 @@ Array [
         "Digest": 6.262633522161549e-167,
         "Identifier": "",
         "IsDefault": true,
+        "IsNFT": false,
         "Metadata": Object {
           "assetName": "",
           "longName": null,
@@ -1972,6 +1981,7 @@ Array [
         "Digest": 6.262633522161549e-167,
         "Identifier": "",
         "IsDefault": true,
+        "IsNFT": false,
         "Metadata": Object {
           "assetName": "",
           "longName": null,
