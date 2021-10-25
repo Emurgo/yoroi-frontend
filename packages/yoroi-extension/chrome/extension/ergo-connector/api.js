@@ -51,7 +51,12 @@ import type { RemoteUnspentOutput } from '../../../app/api/ada/lib/state-fetch/t
 import {
   signTransaction as shelleySignTransaction
 } from '../../../app/api/ada/transactions/shelley/transactions';
-
+import {
+  getCardanoHaskellBaseConfig,
+} from '../../../app/api/ada/lib/storage/database/prepackaged/networks';
+import { genTimeToSlot } from '../../../app/api/ada/lib/storage/bridge/timeUtils';
+import AdaApi from '../../../app/api/ada';
+import type CardanoTxRequest from '../../../app/api/ada';
 
 function paginateResults<T>(results: T[], paginate: ?Paginate): T[] {
   if (paginate != null) {
@@ -518,6 +523,63 @@ export async function connectorSignCardanoTx(
   );
 
   return Buffer.from(signedTx.witness_set().to_bytes()).toString('hex');
+}
+
+export async function connectorCreateCardanoTx(
+  publicDeriver: IPublicDeriver<ConceptualWallet>,
+  password: string,
+  cardanoTxRequest: CardanoTxRequest,
+): Promise<string> {
+  const withUtxos = asGetAllUtxos(publicDeriver);
+  if (withUtxos == null) {
+    throw new Error(`missing utxo functionality`);
+  }
+
+  const withHasUtxoChains = asHasUtxoChains(withUtxos);
+  if (withHasUtxoChains == null) {
+    throw new Error(`missing chains functionality`);
+  }
+
+  const network = publicDeriver.getParent().getNetworkInfo();
+  const fullConfig = getCardanoHaskellBaseConfig(network);
+  const timeToSlot = await genTimeToSlot(fullConfig);
+  const absSlotNumber = new BigNumber(timeToSlot({
+    time: new Date(),
+  }).slot);
+
+  const adaApi = new AdaApi();
+  const signRequest = await adaApi.createUnsignedTxForConnector(({
+    publicDeriver: withHasUtxoChains,
+    absSlotNumber,
+    cardanoTxRequest,
+  }: any));
+
+  const withSigningKey = asGetSigningKey(publicDeriver);
+  if (!withSigningKey) {
+    throw new Error('expect to be able to get signing key');
+  }
+  const signingKey = await withSigningKey.getSigningKey();
+  const normalizedKey = await withSigningKey.normalizeKey({
+    ...signingKey,
+    password,
+  });
+
+  const withLevels = asHasLevels<ConceptualWallet>(publicDeriver);
+  if (!withLevels) {
+    throw new Error(`can't get level`);
+  }
+
+  const signedTx = shelleySignTransaction(
+    signRequest.senderUtxos,
+    signRequest.unsignedTx,
+    withLevels.getParent().getPublicDeriverLevel(),
+    RustModule.WalletV4.Bip32PrivateKey.from_bytes(
+      Buffer.from(normalizedKey.prvKeyHex, 'hex')
+    ),
+    signRequest.neededStakingKeyHashes.wits,
+    signRequest.metadata,
+  );
+  return Buffer.from(signedTx.to_bytes()).toString('hex');
 }
 
 export async function connectorSendTx(
