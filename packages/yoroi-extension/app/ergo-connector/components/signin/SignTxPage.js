@@ -2,7 +2,7 @@
 // @flow
 import React, { Component } from 'react';
 import type { Node } from 'react';
-import { intlShape } from 'react-intl';
+import { intlShape, defineMessages } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import styles from './SignTxPage.scss';
 import { Button } from '@mui/material';
@@ -37,6 +37,17 @@ import { mintedTokenInfo } from '../../../../chrome/extension/ergo-connector/uti
 import type { Tx } from '../../../../chrome/extension/ergo-connector/types';
 import { Logger } from '../../../utils/logging';
 
+const messages = defineMessages({
+  showMore: {
+    id: 'connector.singTxPage.showMore',
+    defaultMessage: '!!!Show More',
+  },
+  showLess: {
+    id: 'connector.singTxPage.showLess',
+    defaultMessage: '!!!Show Less',
+  },
+});
+
 type Props = {|
   +tx: Tx,
   +txData: ISignRequest<any>,
@@ -53,11 +64,18 @@ type Props = {|
   +getCurrentPrice: (from: string, to: string) => ?number,
 |};
 
+type State = {|
+    showTxData: boolean
+|}
 @observer
-class SignTxPage extends Component<Props> {
+class SignTxPage extends Component<Props, State> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
+
+  state: State = {
+    showTxData: false,
+  }
 
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm(
     {
@@ -260,63 +278,74 @@ class SignTxPage extends Component<Props> {
     );
   }
 
+  renderTxData(): Node {
+    const { intl } = this.context;
+    const { txData } = this.props;
+
+    return (
+      <div>
+        <div className={styles.addressHeader}>
+          <div className={styles.addressFrom}>
+            <p className={styles.label}>
+              {intl.formatMessage(globalMessages.fromAddresses)}:{' '}
+              <span>{txData.inputs().length}</span>
+            </p>
+          </div>
+          <div className={styles.addressFrom}>
+            <p className={styles.label}>
+              {intl.formatMessage(globalMessages.amount)}
+            </p>
+          </div>
+        </div>
+        <div className={styles.addressFromList}>
+          {txData.inputs().map((address, addressIndex) => {
+              return this.renderRow({
+            kind: 'in',
+            address,
+            addressIndex,
+            transform: amount => amount.abs().negated(),
+          });
+        })}
+        </div>
+        <div className={styles.addressHeader}>
+          <div className={styles.addressTo}>
+            <p className={styles.label}>
+              {intl.formatMessage(globalMessages.toAddresses)}:{' '}
+              <span>{txData.outputs().length}</span>
+            </p>
+          </div>
+          <div className={styles.addressTo}>
+            <p className={styles.label}>
+              {intl.formatMessage(globalMessages.amount)}
+            </p>
+          </div>
+        </div>
+        <div className={styles.addressToList}>
+          {txData.outputs().map((address, addressIndex) => {
+          return this.renderRow({
+            kind: 'in',
+            address,
+            addressIndex,
+            transform: amount => amount.abs(),
+          });
+        })}
+        </div>
+      </div>
+    )
+  }
+
   render(): Node {
     const { form } = this;
     const walletPasswordField = form.$('walletPassword');
 
     const { intl } = this.context;
-    const { txData, onCancel, } = this.props;
+    const { txData ,onCancel } = this.props;
+    const { showTxData } = this.state
     return (
       <>
         <ProgressBar step={2} />
         <div className={styles.component}>
           <div>
-            <div className={styles.addressHeader}>
-              <div className={styles.addressFrom}>
-                <p className={styles.label}>
-                  {intl.formatMessage(globalMessages.fromAddresses)}:{' '}
-                  <span>{txData.inputs().length}</span>
-                </p>
-              </div>
-              <div className={styles.addressFrom}>
-                <p className={styles.label}>
-                  {intl.formatMessage(globalMessages.amount)}
-                </p>
-              </div>
-            </div>
-            <div className={styles.addressFromList}>
-              {txData.inputs().map((address, addressIndex) => {
-                return this.renderRow({
-                  kind: 'in',
-                  address,
-                  addressIndex,
-                  transform: amount => amount.abs().negated(),
-                });
-              })}
-            </div>
-            <div className={styles.addressHeader}>
-              <div className={styles.addressTo}>
-                <p className={styles.label}>
-                  {intl.formatMessage(globalMessages.toAddresses)}:{' '}
-                  <span>{txData.outputs().length}</span>
-                </p>
-              </div>
-              <div className={styles.addressTo}>
-                <p className={styles.label}>
-                  {intl.formatMessage(globalMessages.amount)}
-                </p>
-              </div>
-            </div>
-            <div className={styles.addressToList}>
-              {txData.outputs().map((address, addressIndex) => {
-                return this.renderRow({
-                  kind: 'in',
-                  address,
-                  addressIndex,
-                  transform: amount => amount.abs(),
-                });
-              })}
-            </div>
             <div className={styles.addressHeader}>
               <div className={styles.addressTo}>
                 <p className={styles.label}>
@@ -333,6 +362,12 @@ class SignTxPage extends Component<Props> {
                   },
                 })}
               </div>
+            </div>
+            <div>
+              {showTxData && this.renderTxData()}
+              <button className={styles.show} type='button' onClick={() => this.setState({ showTxData: !showTxData })}>
+                {intl.formatMessage(this.state.showTxData ? messages.showLess : messages.showMore)}
+              </button>
             </div>
           </div>
           <div className={styles.passwordInput}>

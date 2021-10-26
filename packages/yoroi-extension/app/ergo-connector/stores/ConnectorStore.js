@@ -264,7 +264,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     try {
       const wallets = await getWallets({ db: persistentDb });
       const protocol = await getProtocol().then(res => res)
-      const protocolFilter = (wallet) => protocol.type === 'ergo'
+      const protocolFilter = (wallet) => protocol.type !== 'ergo'
         ? isErgo(wallet.getParent().getNetworkInfo())
         : !isErgo(wallet.getParent().getNetworkInfo())
       const filteredWallets = wallets

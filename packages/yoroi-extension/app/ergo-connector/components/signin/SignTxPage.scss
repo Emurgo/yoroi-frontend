@@ -22,6 +22,16 @@
   }
 }
 
+.show {
+  cursor: pointer;
+  padding: 5px 10px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  font-weight: 500;
+  color: #4B5563;
+  background-color: #E5E7EB;
+}
+
 .label {
   color: var(--yoroi-palette-gray-900);
   font-size: 14px;
