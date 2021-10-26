@@ -19,36 +19,36 @@ const ClassicChip = {
     {
       props: { variant: 'pending' },
       style: {
-        background: 'var(--mui-transactions-state-pending-background-color)',
-        color: 'var(--mui-transactions-state-pending-text-color)',
+        background: 'var(--yoroi-palette-tx-status-pending-background)',
+        color: 'var(--yoroi-palette-tx-status-pending-text)',
       },
     },
     {
       props: { variant: 'high' },
       style: {
-        background: 'var(--mui-transactions-state-high-background-color)',
-        color: 'var(--mui-transactions-state-high-text-color)',
+        background: 'var(--yoroi-palette-tx-status-high-background)',
+        color: 'var(--yoroi-palette-tx-status-high-text)',
       },
     },
     {
       props: { variant: 'failed' },
       style: {
-        background: 'var(--mui-transactions-state-failed-background-color)',
-        color: 'var(--mui-transactions-state-failed-text-color)',
+        background: 'var(--yoroi-palette-tx-status-failed-background)',
+        color: 'var(--yoroi-palette-tx-status-failed-text)',
       },
     },
     {
       props: { variant: 'medium' },
       style: {
-        background: 'var(--mui-transactions-state-medium-background-color)',
-        color: 'var(--mui-transactions-state-medium-text-color)',
+        background: 'var(--yoroi-palette-tx-status-medium-background)',
+        color: 'var(--yoroi-palette-tx-status-medium-text)',
       },
     },
     {
       props: { variant: 'low' },
       style: {
-        background: 'var(--mui-transactions-state-low-background-color)',
-        color: 'var(--mui-transactions-state-low-text-color)',
+        background: 'var(--yoroi-palette-tx-status-low-background)',
+        color: 'var(--yoroi-palette-tx-status-low-text)',
       },
     },
     {
@@ -59,11 +59,11 @@ const ClassicChip = {
         margin: '5px 3px 0 3px',
         textTransform: 'lowercase',
         padding: '3px 0 3px 6px',
-        background: 'hsl(9deg 46% 73%)',
+        background: '#daa49a',
         height: '28px',
         display: 'flex',
         alignItems: 'center',
-        color: 'hsl(210deg 25% 98%)',
+        color: '#f9fafb',
         fontSize: '0.9rem',
         fontWeight: 300,
         span: {
@@ -75,7 +75,7 @@ const ClassicChip = {
           color: 'inherit',
         },
         '&:hover': {
-          background: 'hsl(9deg 46% 73%)',
+          background: '#daa49a',
         },
       },
     },
@@ -102,36 +102,36 @@ const ModernChip = {
     {
       props: { variant: 'pending' },
       style: {
-        background: 'var(--mui-transactions-state-pending-background-color)',
-        color: 'var(--mui-transactions-state-pending-text-color)',
+        background: 'var(--yoroi-palette-tx-status-pending-background)',
+        color: 'var(--yoroi-palette-tx-status-pending-text)',
       },
     },
     {
       props: { variant: 'high' },
       style: {
-        background: 'var(--mui-transactions-state-high-background-color)',
-        color: 'var(--mui-transactions-state-high-text-color)',
+        background: 'var(--yoroi-palette-tx-status-high-background)',
+        color: 'var(--yoroi-palette-tx-status-high-text)',
       },
     },
     {
       props: { variant: 'failed' },
       style: {
-        background: 'var(--mui-transactions-state-failed-background-color)',
-        color: 'var(--mui-transactions-state-failed-text-color)',
+        background: 'var(--yoroi-palette-tx-status-failed-background)',
+        color: 'var(--yoroi-palette-tx-status-failed-text)',
       },
     },
     {
       props: { variant: 'medium' },
       style: {
-        background: 'var(--mui-transactions-state-medium-background-color)',
-        color: 'var(--mui-transactions-state-medium-text-color)',
+        background: 'var(--yoroi-palette-tx-status-medium-background)',
+        color: 'var(--yoroi-palette-tx-status-medium-text)',
       },
     },
     {
       props: { variant: 'low' },
       style: {
-        background: 'var(--mui-transactions-state-low-background-color)',
-        color: 'var(--mui-transactions-state-low-text-color)',
+        background: 'var(--yoroi-palette-tx-status-low-background)',
+        color: 'var(--yoroi-palette-tx-status-low-text)',
       },
     },
     {
@@ -140,15 +140,14 @@ const ModernChip = {
         minWidth: 'auto',
         borderRadius: '8px',
         textTransform: 'lowercase',
-        margin: '5px 3px 0 3px',
+        margin: '5px 4px 0 4px',
         padding: '3px 0 4px 3px',
-        background: 'hsl(204deg 20% 95%)',
-        height: '28px',
+        background: 'var(--yoroi-palette-gray-50)',
+        height: '30px',
         display: 'flex',
         alignItems: 'center',
         fontSize: '0.875rem',
-        fontWeight: 300,
-        color: 'hsl(0deg 0% 21%)',
+        color: 'var(--yoroi-palette-gray-900)',
         letterSpacing: 0,
         span: {
           padding: 0,
@@ -159,7 +158,7 @@ const ModernChip = {
           color: 'inherit',
         },
         '&:hover': {
-          background: 'hsl(204deg 20% 95%)',
+          background: 'var(--yoroi-palette-gray-50)',
         },
       },
     },

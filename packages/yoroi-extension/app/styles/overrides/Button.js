@@ -1,5 +1,4 @@
 // @flow
-
 const ClassicButton = {
   styleOverrides: {
     root: {
@@ -9,8 +8,8 @@ const ClassicButton = {
       fontWeight: 500,
       minHeight: 44,
       minWidth: 230,
-      lineHeight: '21px',
       padding: '12px 20px',
+      textTransform: 'none',
     },
   },
   defaultProps: { disableRipple: true },
@@ -18,35 +17,62 @@ const ClassicButton = {
     {
       props: { variant: 'primary' },
       style: {
-        backgroundColor: 'var(--mui-button-primary-background-color)',
-        color: 'var(--mui-button-primary-text)',
+        backgroundColor: 'var(--yoroi-comp-button-primary-background)',
+        color: 'var(--yoroi-comp-button-primary-text)',
         ':hover': {
-          backgroundColor: 'var(--mui-button-primary-background-color-hover)',
+          backgroundColor: 'var(--yoroi-comp-button-primary-background-hover)',
         },
         '&.Mui-active': {
-          backgroundColor: 'var(--mui-button-primary-background-color-active)',
+          backgroundColor: 'var(--yoroi-comp-button-primary-background-active)',
         },
         '&.Mui-disabled': {
-          backgroundColor: 'var(--mui-button-primary-background-color-disabled)',
-          color: 'var(--mui-button-primary-text-disabled)',
+          opacity: 0.4,
+          color: 'var(--yoroi-comp-button-primary-text)',
+        },
+        '& .MuiLoadingButton-loadingIndicator': {
+          color: 'var(--yoroi-comp-button-primary-text)',
         },
       },
     },
     {
       props: { variant: 'secondary' },
       style: {
-        backgroundColor: 'var(--mui-button-flat-background-color)',
-        color: 'var(--mui-button-flat-text-color)',
+        backgroundColor: 'var(--yoroi-comp-button-flat-background)',
+        color: 'var(--yoroi-comp-button-flat-text)',
         border: 0,
         ':hover': {
-          backgroundColor: 'var(--mui-button-flat-background-color-hover)',
+          backgroundColor: 'var(--yoroi-comp-button-flat-background-hover)',
         },
         '&.Mui-active': {
-          backgroundColor: 'var(--mui-button-flat-background-color-active)',
+          backgroundColor: 'var(--yoroi-comp-button-flat-background-active)',
         },
         '&.Mui-disabled': {
-          backgroundColor: 'var(--mui-button-flat-background-color-disabled)',
-          color: 'var(--mui-button-flat-text-color-disabled)',
+          color: 'var(--yoroi-comp-button-flat-text)',
+          opacity: 0.4,
+        },
+        '& .MuiLoadingButton-loadingIndicator': {
+          color: 'var(--yoroi-comp-button-flat-text)',
+        },
+      },
+    },
+    {
+      props: { variant: 'danger' },
+      style: {
+        backgroundColor: 'var(--yoroi-comp-button-danger-background)',
+        color: 'var(--yoroi-comp-button-danger-text)',
+        border: 0,
+        ':hover': {
+          backgroundColor: 'var(--yoroi-comp-button-danger-background-hover)',
+        },
+        '&.Mui-active': {
+          backgroundColor: 'var(--yoroi-comp-button-danger-background-active)',
+        },
+        '&.Mui-disabled': {
+          opacity: 0.4,
+          color: 'var(--yoroi-comp-button-danger-text)',
+        },
+        '& .MuiLoadingButton-loadingIndicator': {
+          color: 'var(--yoroi-comp-button-danger-background)',
         },
       },
     },
@@ -61,9 +87,10 @@ const ModernButton = {
       fontWeight: 500,
       minHeight: 52,
       minWidth: 230,
-      lineHeight: '21px',
+      lineHeight: '18px',
       textTransform: 'uppercase',
       padding: '16px',
+      height: 52,
     },
   },
   defaultProps: { disableRipple: true },
@@ -71,40 +98,67 @@ const ModernButton = {
     {
       props: { variant: 'primary' },
       style: {
-        backgroundColor: 'var(--mui-button-primary-background-color)',
-        color: 'var(--mui-button-primary-text)',
+        backgroundColor: 'var(--yoroi-comp-button-primary-background)',
+        color: 'var(--yoroi-comp-button-primary-text)',
         ':hover': {
-          backgroundColor: 'var(--mui-button-primary-background-color-hover)',
+          backgroundColor: 'var(--yoroi-comp-button-primary-background-hover)',
         },
         '&.Mui-active': {
-          backgroundColor: 'var(--mui-button-primary-background-color-active)',
+          backgroundColor: 'var(--yoroi-comp-button-primary-background-active)',
         },
         '&.Mui-disabled': {
-          backgroundColor: 'var(--mui-button-primary-background-color-disabled)',
-          color: 'var(--mui-button-primary-text-disabled)',
+          opacity: 0.4,
+          color: 'var(--yoroi-comp-button-primary-text)',
+        },
+        '& .MuiLoadingButton-loadingIndicator': {
+          color: 'var(--yoroi-comp-button-primary-text)',
         },
       },
     },
     {
       props: { variant: 'secondary' },
       style: {
-        backgroundColor: 'var(--mui-button-outlined-background-color)',
-        color: 'var(--mui-button-outlined-text-color)',
+        backgroundColor: 'var(--yoroi-comp-button-secondary-background)',
+        color: 'var(--yoroi-comp-button-secondary-text)',
         border: '2px solid',
-        borderColor: 'var(--mui-button-outlined-border-color)',
+        borderColor: 'var(--yoroi-comp-button-secondary-border)',
         ':hover': {
-          color: 'var(--mui-button-outlined-text-color)',
-          borderColor: 'var(--mui-button-outlined-border-color-hover)',
-          backgroundColor: 'var(--mui-button-outlined-background-color-active)',
+          color: 'var(--yoroi-comp-button-secondary-text)',
+          borderColor: 'var(--yoroi-comp-button-secondary-border-hover)',
+          backgroundColor: 'var(--yoroi-comp-button-secondary-background-hover)',
         },
         '&.Mui-active': {
-          backgroundColor: 'var(--mui-button-outlined-background-color-active)',
+          backgroundColor: 'var(--yoroi-comp-button-secondary-background-active)',
         },
         '&.Mui-disabled': {
           border: '2px solid',
-          backgroundColor: 'var(--mui-button-outlined-background-color-disabled)',
-          color: 'var(--mui-button-outlined-text-color-disabled)',
-          borderColor: 'var(--mui-button-outlined-border-color-disabled)',
+          opacity: 0.4,
+          borderColor: 'var(--yoroi-comp-button-secondary-border)',
+          color: 'var(--yoroi-comp-button-secondary-text)',
+        },
+        '& .MuiLoadingButton-loadingIndicator': {
+          color: 'var(--yoroi-comp-button-secondary-text)',
+        },
+      },
+    },
+    {
+      props: { variant: 'danger' },
+      style: {
+        backgroundColor: 'var(--yoroi-comp-button-danger-background)',
+        color: 'var(--yoroi-comp-button-danger-text)',
+        border: 0,
+        ':hover': {
+          backgroundColor: 'var(--yoroi-comp-button-danger-background-hover)',
+        },
+        '&.Mui-active': {
+          backgroundColor: 'var(--yoroi-comp-button-danger-background-active)',
+        },
+        '&.Mui-disabled': {
+          color: 'var(--yoroi-comp-button-danger-text)',
+          opacity: 0.4,
+        },
+        '& .MuiLoadingButton-loadingIndicator': {
+          color: 'var(--yoroi-comp-button-danger-background)',
         },
       },
     },

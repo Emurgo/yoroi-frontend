@@ -19,8 +19,7 @@ import LocalizableError from '../../../i18n/LocalizableError';
 import styles from './VotingRegTxDialog.scss';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import SpendingPasswordInput from '../../widgets/forms/SpendingPasswordInput';
-import AmountInputSkin from '../skins/AmountInputSkin';
-import { NumericInput } from 'react-polymorph/lib/components/NumericInput';
+import { AmountInput } from '../../common/NumericInputRP';
 import { ProgressInfo } from '../../../stores/ada/VotingStore';
 import ProgressStepBlock from './ProgressStepBlock';
 import WarningBox from '../../widgets/WarningBox';
@@ -190,12 +189,11 @@ export default class VotingRegTxDialog extends Component<Props> {
         {this.renderInfoBlock()}
 
         <div className={styles.amountInput}>
-          <NumericInput
+          <AmountInput
             className="amount"
             label={intl.formatMessage(globalMessages.amountLabel)}
             decimalPlaces={tokenInfo.Metadata.numberOfDecimals}
             disabled
-            // AmountInputSkin props
             currency={truncateToken(getTokenName(tokenInfo))}
             fees={formatValue(this.props.transactionFee.getDefaultEntry())}
             // note: we purposely don't put "total" since it doesn't really make sense here
@@ -203,8 +201,6 @@ export default class VotingRegTxDialog extends Component<Props> {
             total=""
             value={new BigNumber(0)}
             allowSigns={false}
-            skin={AmountInputSkin}
-            classicTheme={this.props.classicTheme}
           />
         </div>
         {spendingPasswordForm}

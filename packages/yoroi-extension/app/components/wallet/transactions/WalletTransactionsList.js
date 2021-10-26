@@ -3,9 +3,7 @@ import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
-import classnames from 'classnames';
-import { Button } from 'react-polymorph/lib/components/Button';
-import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
+import { Button } from '@mui/material';
 import moment from 'moment';
 import styles from './WalletTransactionsList.scss';
 import Transaction from './Transaction';
@@ -136,11 +134,6 @@ export default class WalletTransactionsList extends Component<Props> {
       onCopyAddressTooltip
     } = this.props;
 
-    const buttonClasses = classnames([
-      'primary',
-      styles.showMoreTransactionsButton,
-    ]);
-
     const transactionsGroups = this.groupTransactionsByDay(transactions);
 
     const loadingSpinner = isLoadingTransactions ? (
@@ -194,12 +187,13 @@ export default class WalletTransactionsList extends Component<Props> {
         {loadingSpinner}
         {!isLoadingTransactions && hasMoreToLoad &&
           <Button
+            variant="primary"
             disabled={isLoadingTransactions}
-            className={buttonClasses}
-            label={intl.formatMessage(messages.showMoreTransactionsButtonLabel)}
             onClick={onLoadMore}
-            skin={ButtonSkin}
-          />
+            sx={{ margin: '30px auto', width: '400px', display: 'block' }}
+          >
+            {intl.formatMessage(messages.showMoreTransactionsButtonLabel)}
+          </Button>
         }
       </div>
     );

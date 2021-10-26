@@ -37,13 +37,13 @@
         width: 32px;
         height: 32px;
         border-radius: 20px;
-        background-color: #DCE0E9;
-        color: #242838;
+        background-color: var(--yoroi-palette-gray-200);
+        color: var(--yoroi-palette-gray-900);
         font-size: 16px;
         line-height: 22px;
         display: flex;
         align-items: center;
-        justify-content: center;        
+        justify-content: center;
       }
 
       .appBadges {
@@ -72,22 +72,22 @@
   .lineTitle {
     line-height: 30px;
     font-size: 24px;
-    color: #242838;
+    color: var(--yoroi-palette-gray-900);
     text-align: center;
     font-weight: 800;
     margin-bottom: 12px;
     max-width: 714px;
   }
-  
+
   .lineText {
-    color: #6B7384;
+    color: var(--yoroi-palette-gray-600);
     text-align: center;
   }
 
   .step2Text {
     margin-bottom: 24px;
   }
-  
+
   .registerButton {
     text-align: center;
     margin-bottom: 32px;

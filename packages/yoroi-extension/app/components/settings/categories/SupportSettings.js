@@ -3,9 +3,7 @@ import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
-import classnames from 'classnames';
-import { Button } from 'react-polymorph/lib/components/Button';
-import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
+import { Button } from '@mui/material';
 import globalMessages from '../../../i18n/global-messages';
 import styles from './SupportSettings.scss';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
@@ -57,11 +55,6 @@ export default class SupportSettings extends Component<Props> {
     const { onExternalLinkClick, onDownloadLogs } = this.props;
     const { intl } = this.context;
 
-    const buttonClasses = classnames([
-      'primary',
-      styles.downloadButton
-    ]);
-
     const faqLink = (
       <a
         className={styles.link}
@@ -111,11 +104,12 @@ export default class SupportSettings extends Component<Props> {
         <p><FormattedMessage {...globalMessages.logsContent} values={{ downloadLogsLink }} /></p>
 
         <Button
-          className={buttonClasses}
-          label={intl.formatMessage(globalMessages.downloadLogsButtonLabel)}
+          variant="primary"
           onClick={onDownloadLogs}
-          skin={ButtonSkin}
-        />
+          sx={{ marginTop: '20px' }}
+        >
+          {intl.formatMessage(globalMessages.downloadLogsButtonLabel)}
+        </Button>
 
       </div>
     );

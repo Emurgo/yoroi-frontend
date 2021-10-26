@@ -4,8 +4,7 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  color: var(--theme-wallet-dropdown-main-text-color);
-  font-family: var(--font-regular);
+  color: var(--yoroi-palette-gray-900);
 }
 
 .outerWrapper {
@@ -43,8 +42,7 @@
 }
 
 .amount {
-  font-family: var(--font-medium);
-
+  font-weight: 500;
   .isLoading {
     margin-left: 9px;
     margin-bottom: 6px;
@@ -53,7 +51,7 @@
 }
 
 .highlightAmount {
-  color: var(--theme-wallet-dropdown-accent-text-color);
+  color: var(--yoroi-palette-secondary-300);
 }
 
 .toggleButton {
@@ -64,5 +62,5 @@
 }
 
 .fixedAmount {
-  color: #6b7384;
+  color: var(--yoroi-palette-gray-600);
 }

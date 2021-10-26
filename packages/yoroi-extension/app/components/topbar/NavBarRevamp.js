@@ -4,7 +4,7 @@ import type { Node, ComponentType } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import styles from './NavBarRevamp.scss';
-import { withLayout } from '../../themes/context/layout';
+import { withLayout } from '../../styles/context/layout';
 import NoticeBoardIcon from '../../assets/images/notice-board/notice-board.inline.svg';
 
 type Props = {|

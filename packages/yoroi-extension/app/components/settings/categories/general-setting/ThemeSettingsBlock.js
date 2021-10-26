@@ -3,17 +3,16 @@ import { Component } from 'react';
 import type { Node, ComponentType } from 'react';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
-import { Button } from 'react-polymorph/lib/components/Button';
-import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
+import { Button } from '@mui/material';
 import { defineMessages, intlShape, FormattedMessage, FormattedHTMLMessage } from 'react-intl';
 import styles from './ThemeSettingsBlock.scss';
-import { THEMES } from '../../../../themes';
-import type { Theme } from '../../../../themes';
+import { THEMES } from '../../../../styles/utils';
+import type { Theme } from '../../../../styles/utils';
 import ThemeThumbnail from '../display/ThemeThumbnail';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import globalMessages from '../../../../i18n/global-messages';
-import { withLayout } from '../../../../themes/context/layout';
-import type { LayoutComponentMap } from '../../../../themes/context/layout';
+import { withLayout } from '../../../../styles/context/layout';
+import type { LayoutComponentMap } from '../../../../styles/context/layout';
 
 const messages = defineMessages({
   themeLabel: {
@@ -54,7 +53,6 @@ type Props = {|
   +currentTheme: Theme,
   +selectTheme: ({| theme: string |}) => PossiblyAsync<void>,
   +exportTheme: void => PossiblyAsync<void>,
-  +getThemeVars: ({| theme: string |}) => { [key: string]: string, ... },
   +hasCustomTheme: void => boolean,
   +onExternalLinkClick: MouseEvent => void,
 |};
@@ -74,7 +72,6 @@ class ThemeSettingsBlock extends Component<AllProps> {
     const {
       currentTheme,
       selectTheme,
-      getThemeVars,
       exportTheme,
       hasCustomTheme,
       onExternalLinkClick,
@@ -88,11 +85,11 @@ class ThemeSettingsBlock extends Component<AllProps> {
     ]);
 
     const themeYoroiModernClasses = classnames([
-      currentTheme === THEMES.YOROI_MODERN ? styles.active : styles.inactive,
+      currentTheme === THEMES.YOROI_MODERN || currentTheme === THEMES.YOROI_REVAMP
+        ? styles.active
+        : styles.inactive,
       styles.themeImageWrapper,
     ]);
-
-    const exportButtonClasses = classnames(['primary', styles.button]);
 
     const blogLink = (
       <a
@@ -132,10 +129,7 @@ class ThemeSettingsBlock extends Component<AllProps> {
                   {intl.formatMessage(messages.themeWarning)}
                 </div>
               )}
-              <ThemeThumbnail
-                themeVars={getThemeVars({ theme: THEMES.YOROI_MODERN })}
-                themeKey="modern"
-              />
+              <ThemeThumbnail theme={THEMES.YOROI_MODERN} themeKey="modern" />
               <h3 className={styles.subTitle}>{intl.formatMessage(messages.themeYoroiModern)}</h3>
             </button>
             {/* Classic Theme */}
@@ -149,30 +143,47 @@ class ThemeSettingsBlock extends Component<AllProps> {
                   {intl.formatMessage(messages.themeWarning)}
                 </div>
               )}
-              <ThemeThumbnail
-                themeVars={getThemeVars({ theme: THEMES.YOROI_CLASSIC })}
-                themeKey="classic"
-              />
+              <ThemeThumbnail theme={THEMES.YOROI_CLASSIC} themeKey="classic" />
               <h3 className={styles.subTitle}>{intl.formatMessage(messages.themeYoroiClassic)}</h3>
             </button>
           </div>
-          <Button
-            className={exportButtonClasses}
-            label={intl.formatMessage(messages.themeExportButton)}
-            skin={ButtonSkin}
-            onClick={exportTheme.bind(this)}
-          />
+
+          <Button variant="primary" onClick={exportTheme.bind(this)} sx={{ width: '400px' }}>
+            {intl.formatMessage(messages.themeExportButton)}
+          </Button>
         </div>
         <div className={styles.revampWrapper}>
+          {/* TODO: MUI: fix css variables */}
           <Button
-            className={styles.revamp}
-            label="Try new Yoroi Revamp"
-            skin={ButtonSkin}
+            sx={{
+              width: '400px',
+              background: 'white',
+              color: '#6b7384',
+              border: '1px solid #6b7384',
+              '&:hover': {
+                color: '#383838',
+                background: 'white',
+              },
+              position: 'relative',
+              '&::after': {
+                content: '"new"',
+                top: '50%',
+                right: '30px',
+                transform: 'translateY(-50%)',
+                position: 'absolute',
+                color: 'var(--yoroi-comp-button-primary-text)',
+                backgroundColor: 'var(--yoroi-comp-button-primary-background)',
+                padding: '4px 10px',
+                borderRadius: '777px',
+              },
+            }}
             onClick={() => {
               changeLayout();
               selectTheme({ theme: THEMES.YOROI_REVAMP });
             }}
-          />
+          >
+            Try new Yoroi Revamp
+          </Button>
         </div>
       </div>
     );
@@ -181,23 +192,29 @@ class ThemeSettingsBlock extends Component<AllProps> {
       <div className={styles.component}>
         {commonHeader}
         <div className={styles.main}>
-          <Button
-            className={exportButtonClasses}
-            label={intl.formatMessage(messages.themeExportButton)}
-            skin={ButtonSkin}
-            onClick={exportTheme.bind(this)}
-          />
+          <Button variant="primary" onClick={exportTheme.bind(this)} sx={{ width: '400px' }}>
+            {intl.formatMessage(messages.themeExportButton)}
+          </Button>
         </div>
         <div className={styles.revampWrapper}>
           <Button
-            className={styles.classic}
-            label="Back to Yoroi Classic"
-            skin={ButtonSkin}
             onClick={() => {
               changeLayout();
               selectTheme({ theme: THEMES.YOROI_MODERN });
             }}
-          />
+            sx={{
+              width: '400px',
+              background: 'white',
+              color: '#6b7384',
+              border: '1px solid #6b7384',
+              '&:hover': {
+                color: '#383838',
+                background: 'white',
+              },
+            }}
+          >
+            Back to Yoroi Classic
+          </Button>
         </div>
       </div>
     );

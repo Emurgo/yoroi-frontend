@@ -15,21 +15,17 @@
 
     :global {
       .SimpleInput_input {
-        font-family: var(--font-mono-light);
+        font-family: 'RobotoMono';
+        font-weight: 300;
         letter-spacing: 0;
       }
     }
   }
-  
-  .nextButton {
-    display: block !important;
-    margin: 30px auto 0;
-  }
 
   .actionLabel {
-    color: var(--theme-label-button-color);
-    font-family: var(--rp-checkbox-label-font-family, var(--rp-theme-font-light, "NotoSans-Light, NotoSansCJKjp-Light"), sans-serif);
-    font-size: var(--rp-checkbox-label-font-size, 16px);
+    color: var(--yoroi-palette-gray-800);
+    font-weight: 300;
+    font-size: 16px;
     padding-left: 17px;
   }
 }
@@ -45,19 +41,9 @@
 
   .poolIdInput {
     letter-spacing: 0;
-
-    :global {
-      .SimpleInput_input {
-        font-family: var(--font-mono-regular);
-      }
-    }
   }
 
   .nextButton {
     margin: 20px auto 0;
-  }
-
-  fieldset {
-    background: var(--theme-settings-pane-background-color);
   }
 }

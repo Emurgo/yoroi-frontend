@@ -2,18 +2,14 @@
 const ClassicCheckbox = {
   styleOverrides: {
     root: {
-      border: 1,
-      borderRadius: 0,
-      color: 'var(--mui-checkbox-check-bg-color)',
+      padding: 0,
+      marginRight: '18px',
+      color: 'var(--yoroi-comp-checkbox-background-active)',
       '&.Mui-checked': {
-        color: 'var(--mui-checkbox-check-bg-color)',
+        color: 'var(--yoroi-comp-checkbox-background-active)',
       },
       '&.Mui-disabled': {
-        color: 'var(--mui-checkbox-border-color-disabled)',
-      },
-      '& svg': {
-        width: '1.15em',
-        height: '1.15em',
+        color: 'var(--yoroi-comp-checkbox-border-disabled)',
       },
     },
   },
@@ -21,17 +17,14 @@ const ClassicCheckbox = {
 const ModernCheckbox = {
   styleOverrides: {
     root: {
-      border: 2,
-      color: 'var(--mui-checkbox-border-color)',
+      padding: 0,
+      marginRight: '18px',
+      color: 'var(--yoroi-comp-checkbox-border)',
       '&.Mui-checked': {
-        color: 'var(--mui-checkbox-check-bg-color)',
+        color: 'var(--yoroi-comp-checkbox-background-active)',
       },
       '&.Mui-disabled	': {
-        color: 'var(--mui-checkbox-border-color-disabled)',
-      },
-      '& svg': {
-        width: '1.15em',
-        height: '1.15em',
+        color: 'var(--yoroi-comp-checkbox-border-disabled)',
       },
     },
   },

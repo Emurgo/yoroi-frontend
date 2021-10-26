@@ -1,7 +1,7 @@
 @import '../../../themes/mixins/underline';
 
 .tabsHeader {
-  font-family: var(--font-regular);
+  font-weight: 400;
   display: flex;
   justify-content: center;
   margin-bottom: 5px;
@@ -13,25 +13,25 @@
   cursor: pointer;
   margin: 0 20px;
   font-size: var(--tab-link-text-size);
-  font-family: var(--font-regular);
+  font-weight: 400;
   line-height: var(--tab-link-line-height);
-  
+
   &.active {
-    color: var(--theme-wallet-navigation-tab-text-color-active);
-    font-family: var(--font-medium);
+    color: var(--yoroi-palette-secondary-300);
+    font-weight: 500;
   }
 
   &:hover {
-    color: var(--theme-wallet-navigation-tab-text-color-hover);
+    color: var(--yoroi-palette-secondary-300);
   }
 
   &:disabled {
-    color: var(--theme-wallet-navigation-tab-text-color-disabled);
+    color: var(--yoroi-palette-gray-300);
   }
 
   &.active::after {
     background-color: var(--tab-link-border-color);
-  }  
+  }
 
   &::after {
     content: '';

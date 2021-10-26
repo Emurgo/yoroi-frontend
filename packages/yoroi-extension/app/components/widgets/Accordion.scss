@@ -1,7 +1,7 @@
 @import '../../themes/mixins/loading-spinner';
 
 .accordionSection {
-  display:flex;
+  display: flex;
   flex-direction: column;
 
   .accordionTitle {
@@ -12,34 +12,34 @@
     border: none;
     outline: none;
     font-size: 1rem;
-    font-family: var(--font-regular);
-    color: var(--theme-transactions-list-detail-row-text-color);
+    font-weight: 400;
+    color: var(--yoroi-palette-gray-600);
     padding: 10px;
     padding-left: 24px;
     padding-right: 24px;
 
     svg {
       path {
-        fill: #8A92A3;
+        fill: #8a92a3;
       }
       transition: transform 300ms;
     }
-  
+
     &.arrowUp {
       .arrowDownIcon svg {
         transform: rotate(180deg);
       }
     }
     &.activeHead {
-      font-family: var(--font-medium);
-      color: var(--theme-transactions-priority-high-text-color);
+      font-weight: 500;
+      color: var(--yoroi-palette-secondary-300);
     }
     .arrowDownIcon {
       display: flex;
     }
   }
   .accordionContent {
-    overflow : hidden;
+    overflow: hidden;
     max-height: 0;
     will-change: height;
     transition: max-height 0.3s linear;
@@ -53,5 +53,5 @@
   position: relative;
   margin-right: 124px;
   height: 40px;
-  @include loading-spinner("../../assets/images/spinner-dark.svg", 14);
+  @include loading-spinner('../../assets/images/spinner-dark.svg', 14);
 }

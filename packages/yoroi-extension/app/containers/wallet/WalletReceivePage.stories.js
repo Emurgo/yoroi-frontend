@@ -6,7 +6,7 @@ import BigNumber from 'bignumber.js';
 import { boolean, select } from '@storybook/addon-knobs';
 import { action } from '@storybook/addon-actions';
 import WalletReceivePage from './WalletReceivePage';
-import { THEMES } from '../../themes';
+import { THEMES } from '../../styles/utils';
 import { withScreenshot } from 'storycap';
 import {
   globalKnobs,

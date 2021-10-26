@@ -3,8 +3,9 @@ import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import classNames from 'classnames';
-import { Select } from 'react-polymorph/lib/components/Select';
-import { SelectSkin } from 'react-polymorph/lib/skins/simple/SelectSkin';
+import Select from '../../../common/Select';
+import { MenuItem, Typography } from '@mui/material';
+import { Box } from '@mui/system';
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import ReactToolboxMobxForm from '../../../../utils/ReactToolboxMobxForm';
 import LocalizableError from '../../../../i18n/LocalizableError';
@@ -22,7 +23,8 @@ const messages = defineMessages({
   },
   note: {
     id: 'settings.unitOfAccount.note',
-    defaultMessage: '!!!<strong>Note:</strong> coin price is approximate and may not match the price of any given trading platform. Any transactions based on these price approximates are done at your own risk.',
+    defaultMessage:
+      '!!!<strong>Note:</strong> coin price is approximate and may not match the price of any given trading platform. Any transactions based on these price approximates are done at your own risk.',
   },
   lastUpdated: {
     id: 'settings.unitOfAccount.lastUpdated',
@@ -72,28 +74,35 @@ export default class UnitOfAccountSettings extends Component<Props> {
     const { form } = this;
     const coinPriceCurrencyId = form.$('coinPriceCurrencyId');
     const componentClassNames = classNames([styles.component, 'currency']);
-    const coinPriceCurrencySelectClassNames = classNames([
-      styles.currency,
-    ]);
 
     const optionRenderer = option => {
       const SvgElem = option.svg;
       return (
-        <div className={styles.optionRow}>
-          <div>
-            <SvgElem className={styles.flag} width="38px" height="38px" />
-          </div>
-          <div className={styles.optionLabel}>
-            <div><strong>{option.value}</strong> - {option.name}</div>
-            {option.native ? (
-              <div className={styles.optionSmallNative}>native</div>
-            ) : (
-              <div className={styles.optionSmall}>1 ADA =&nbsp;
-                {option.price ? option.price : '-'} {option.value}
+        <MenuItem key={option.value} value={option.value} sx={{ height: '80px' }}>
+          <Box sx={{ display: 'flex' }}>
+            <Box>
+              <SvgElem className={styles.flag} width="38px" height="38px" />
+            </Box>
+            <Box sx={{ marginLeft: '8px' }}>
+              <div>
+                {/* $FlowFixMe[prop-missing] */}
+                <strong>{option.value}</strong> - {option.name}
               </div>
-            )}
-          </div>
-        </div>
+              {/* $FlowFixMe[prop-missing] */}
+              {option.native !== null ? (
+                <Typography variant="body2" className={styles.optionSmallNative}>
+                  native
+                </Typography>
+              ) : (
+                <Typography variant="body2" color="var(--yoroi-widgets-hash-light)">
+                  1 ADA =&nbsp;
+                  {/* $FlowFixMe[prop-missing] */}
+                  {option.price !== null ? option.price : '-'} {option.value}
+                </Typography>
+              )}
+            </Box>
+          </Box>
+        </MenuItem>
       );
     };
 
@@ -126,20 +135,27 @@ export default class UnitOfAccountSettings extends Component<Props> {
         <p><FormattedHTMLMessage {...messages.lastUpdated} values={{ lastUpdated }} /></p>
 
         <Select
-          className={coinPriceCurrencySelectClassNames}
-          options={currencies}
+          formControlProps={{ sx: { marginTop: '40px' } }}
           {...coinPriceCurrencyId.bind()}
           onChange={this.props.onSelect}
-          skin={SelectSkin}
           value={currentValue}
-          optionRenderer={optionRenderer}
-        />
-
-        {error && (
-          <p className={styles.error}>
-            {intl.formatMessage(error, error.values)}
-          </p>
-        )}
+          menuProps={{
+            sx: {
+              '& .MuiMenu-paper': {
+                maxHeight: '280px',
+              },
+            },
+          }}
+          renderValue={value => (
+            <Typography variant="body2" fontWeight="300">
+              {/* $FlowFixMe[prop-missing] */}
+              {value} - {currencies.filter(item => item.value === value)[0].name}
+            </Typography>
+          )}
+        >
+          {currencies.map(option => optionRenderer(option))}
+        </Select>
+        {error && <p className={styles.error}>{intl.formatMessage(error, error.values)}</p>}
       </div>
     );
   }

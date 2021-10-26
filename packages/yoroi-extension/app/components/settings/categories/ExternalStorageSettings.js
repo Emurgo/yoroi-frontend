@@ -3,9 +3,7 @@ import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
-import classnames from 'classnames';
-import { Button } from 'react-polymorph/lib/components/Button';
-import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
+import { Button } from '@mui/material';
 import type { SelectedExternalStorageProvider } from '../../../domain/ExternalStorage';
 import type { ProvidersType } from '../../../api/externalStorage/index';
 import styles from './ExternalStorageSettings.scss';
@@ -53,11 +51,6 @@ export default class ExternalStorageSettings extends Component<Props> {
     } = this.props;
     const { intl } = this.context;
 
-    const buttonClasses = classnames([
-      'primary',
-      styles.button
-    ]);
-
     const providersButtons = [];
     for (const provider of Object.keys(externalStorageProviders)) {
       const authorizeUrl = externalStorageProviders[provider].authorizeUrl;
@@ -72,18 +65,19 @@ export default class ExternalStorageSettings extends Component<Props> {
       providersButtons.push(
         <Button
           key={provider}
-          className={buttonClasses}
-          label={showDisconnect === true
-            ? intl.formatMessage(messages.buttonDisconnect)
-            : intl.formatMessage(
-              messages.provider,
-              { provider: externalStorageProviders[provider].getDisplayName() }
-            )
-          }
-          skin={ButtonSkin}
+          variant="primary"
           onClick={() => (showDisconnect === true ? onDisconnect() : onConnect(authorizeUrl))}
           disabled={disabledCondition}
-        />
+          sx={{
+            marginTop: '20px',
+          }}
+        >
+          {showDisconnect === true
+            ? intl.formatMessage(messages.buttonDisconnect)
+            : intl.formatMessage(messages.provider, {
+                provider: externalStorageProviders[provider].getDisplayName(),
+              })}
+        </Button>
       );
     }
 

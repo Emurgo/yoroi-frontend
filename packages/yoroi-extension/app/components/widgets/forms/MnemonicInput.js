@@ -3,14 +3,12 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import { join } from 'lodash';
 import { observer } from 'mobx-react';
-import { Autocomplete } from 'react-polymorph/lib/components/Autocomplete';
 import { intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
 import globalMessages from '../../../i18n/global-messages';
-import styles from './MnemonicInput.scss';
 import config from '../../../config';
-import { AutocompleteOwnSkin } from '../../../themes/skins/AutocompleteOwnSkin';
+import Autocomplete from '../../common/Autocomplete';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 type Props = {|
@@ -34,7 +32,7 @@ export default class MnemonicInput extends Component<Props> {
         label: this.context.intl.formatMessage(globalMessages.recoveryPhraseInputLabel),
         placeholder: this.props.classicTheme ?
           this.context.intl.formatMessage(globalMessages.recoveryPhraseInputHint) : '',
-        value: '',
+        value: [],
         validators: [({ field }) => {
           const value = join(field.value, ' ');
           if (value === '') return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
@@ -81,7 +79,6 @@ export default class MnemonicInput extends Component<Props> {
 
     return (
       <Autocomplete
-        className={styles.inputWrapper}
         options={validWords}
         maxSelections={mnemonicLength ?? config.wallets.MAX_RECOVERY_PHRASE_WORD_COUNT}
         {...recoveryPhraseField.bind()}
@@ -89,7 +86,7 @@ export default class MnemonicInput extends Component<Props> {
         error={recoveryPhraseField.error}
         maxVisibleOptions={5}
         noResultsMessage={intl.formatMessage(globalMessages.recoveryPhraseNoResults)}
-        skin={AutocompleteOwnSkin}
+        chipProps={{ sx: { bgcolor: ' #f0f3f5' } }}
       />
     );
   }

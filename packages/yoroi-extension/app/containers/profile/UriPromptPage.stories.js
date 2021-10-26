@@ -7,7 +7,7 @@ import { action } from '@storybook/addon-actions';
 import { ServerStatusErrors } from '../../types/serverStatusErrorType';
 import { globalKnobs } from '../../../stories/helpers/StoryWrapper';
 import UriPromptPage from './UriPromptPage';
-import { THEMES } from '../../themes';
+import { THEMES } from '../../styles/utils';
 import { withScreenshot } from 'storycap';
 
 export default {

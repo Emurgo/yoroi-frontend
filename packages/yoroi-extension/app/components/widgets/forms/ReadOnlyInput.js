@@ -4,9 +4,8 @@ import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { intlShape } from 'react-intl';
-import { Input } from 'react-polymorph/lib/components/Input';
+import TextField from '../../common/TextField';
 import globalMessages from '../../../i18n/global-messages';
-import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
 import EditSvg from '../../../assets/images/edit.inline.svg';
 import styles from './ReadOnlyInput.scss';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
@@ -45,13 +44,11 @@ export default class ReadOnlyInput extends Component<Props> {
     return (
       <div className={mainClasses}>
 
-        <Input
-          themeOverrides={styles}
+        <TextField
           type="text"
           label={label}
           value={value}
           disabled
-          skin={InputOwnSkin}
         />
 
         <button
