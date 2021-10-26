@@ -12,25 +12,20 @@ const alertEl = document.querySelector('#alert')
 const spinner = document.querySelector('#spinner')
 
 let accessGranted = false
+let cardanoApi
 let utxos
 let changeAddress
 let transactionHex
 
-function initDapp(){
-    toggleSpinner('show')
-    cardano_request_read_access().then(function(access_granted){
-        toggleSpinner('hide')
-        if(!access_granted){
-            alertError('Access Denied')
-        }else {
-            alertSuccess( 'You have access now')
-            accessGranted = true
-        }
-    });
-}
 
 cardanoAccessBtn.addEventListener('click', () => {
-    initDapp()
+    toggleSpinner('show')
+    cardano.yoroi.enable().then(function(api){
+        toggleSpinner('hide')
+        alertSuccess( 'You have access now')
+        accessGranted = true
+        cardanoApi = api
+    });
 })
 
 getAccountBalance.addEventListener('click', () => {
@@ -38,7 +33,7 @@ getAccountBalance.addEventListener('click', () => {
         alertError('Should request access first')
     } else {
         toggleSpinner('show')
-        cardano.get_balance().then(function(balance) {
+        cardanoApi.get_balance().then(function(balance) {
             toggleSpinner('hide')
             alertSuccess(`Account Balance: ${balance}`)
         });
@@ -50,7 +45,7 @@ getUnUsedAddresses.addEventListener('click', () => {
        alertError('Should request access first')
     } else {
         toggleSpinner('show')
-        cardano.get_unused_addresses().then(function(addresses) {
+        cardanoApi.get_unused_addresses().then(function(addresses) {
             toggleSpinner('hide')
             if(addresses.length === 0){
                 alertWarrning('No unused addresses')
@@ -67,7 +62,7 @@ getUsedAddresses.addEventListener('click', () => {
        alertError('Should request access first')
     } else {
         toggleSpinner('show')
-        cardano.get_used_addresses().then(function(addresses) {
+        cardanoApi.get_used_addresses().then(function(addresses) {
             toggleSpinner('hide')
            if(addresses.length === 0){
                alertWarrning('No used addresses')
@@ -84,7 +79,7 @@ getChangeAddress.addEventListener('click', () => {
         alertError('Should request access first')
     } else {
         toggleSpinner('show')
-        cardano.get_change_address().then(function(address) {
+        cardanoApi.get_change_address().then(function(address) {
             toggleSpinner('hide')
             if(address.length === 0){
                 alertWarrning('No change addresses')
@@ -103,7 +98,7 @@ getUtxos.addEventListener('click', () => {
         return
     }
     toggleSpinner('show')
-    cardano.get_utxos().then(utxosResponse => {
+    cardanoApi.get_utxos().then(utxosResponse => {
         toggleSpinner('hide')
         if(utxosResponse.length === 0){
             alertWarrning('NO UTXOS')
@@ -126,7 +121,7 @@ submitTx.addEventListener('click', () => {
   }
 
   toggleSpinner('show')
-  cardano.submit_tx(transactionHex).then(txId => {
+  cardanoApi.submit_tx(transactionHex).then(txId => {
     toggleSpinner('hide')
     alertSuccess(`Transaction ${txId} submitted`);
   }).catch(error => {
@@ -209,7 +204,7 @@ signTx.addEventListener('click', () => {
   const txBody = txBuilder.build()
   const txHex = Buffer.from(txBody.to_bytes()).toString('hex')
 
-  cardano.sign_tx(txHex, true).then(witnessSetHex => {
+  cardanoApi.sign_tx(txHex, true).then(witnessSetHex => {
     toggleSpinner('hide')
     alertSuccess('Signing tx succeeds: ')
     const witnessSet = CardanoWasm.TransactionWitnessSet.from_bytes(
@@ -228,11 +223,11 @@ signTx.addEventListener('click', () => {
   })
 })
 
-if (typeof cardano_request_read_access === "undefined") {
+if (typeof cardano === "undefined") {
     alert("Cardano not found");
 } else {
     console.log("Cardano found");
-    window.addEventListener("ergo_wallet_disconnected", function(event) {
+    window.addEventListener("cardano_wallet_disconnected", function(event) {
         console.log("Wallet Disconnect")
     });
 }
