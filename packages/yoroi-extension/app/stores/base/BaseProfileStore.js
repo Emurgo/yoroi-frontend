@@ -7,7 +7,7 @@ import Request from '../lib/LocalizedRequest';
 import environment from '../../environment';
 import { THEMES } from '../../styles/utils';
 import type { Theme } from '../../styles/utils';
-import { LANGUAGES } from '../../i18n/translations';
+import { LANGUAGES, LANGUAGES_IN_TRANSLATION } from '../../i18n/translations';
 import type { LanguageType } from '../../i18n/translations';
 import type { SetCustomUserThemeRequest } from '../../api/localStorage/index';
 import { unitOfAccountDisabledValue } from '../../types/unitOfAccountType';
@@ -31,9 +31,7 @@ export default class BaseProfileStore
   LANGUAGE_OPTIONS: Array<LanguageType> = [
     ...LANGUAGES,
     ...(!environment.isProduction()
-      ? [
-          // add any language that's mid-translation here
-        ]
+      ? LANGUAGES_IN_TRANSLATION
       : []),
   ];
 

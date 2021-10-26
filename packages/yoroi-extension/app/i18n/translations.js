@@ -104,3 +104,8 @@ export const LANGUAGES: Array<LanguageType> = [
     svg: TurkishFlag
   },
 ];
+
+// add any languages that're mid-translation here. They won't be added to production build.
+export const LANGUAGES_IN_TRANSLATION: Array<LanguageType> = [
+
+];
