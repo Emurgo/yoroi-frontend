@@ -707,17 +707,20 @@ function _newAdaUnsignedTxFromUtxo(
               packCandidate.assets.length >= 1 &&
                 packCandidate.assets.every(({ assetId }) => changeTokenIdSet.has(assetId))
             ) {
-              addUtxoInput(
-                txBuilder,
-                undefined,
-                packCandidate,
-                false,
-                { networkId: protocolParams.networkId }
-              );
-              usedUtxos.push(packCandidate);
+              if (
+                addUtxoInput(
+                  txBuilder,
+                  undefined,
+                  packCandidate,
+                  false,
+                  { networkId: protocolParams.networkId }
+                ) === AddInputResult.VALID
+              ) {
+                usedUtxos.push(packCandidate);
 
-              packed = true;
-              break;
+                packed = true;
+                break;
+              }
             }
           }
           if (oneExtraInput && !packed) {
