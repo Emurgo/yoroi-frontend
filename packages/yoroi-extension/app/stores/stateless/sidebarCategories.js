@@ -10,6 +10,7 @@ import noticeBoardIcon from '../../assets/images/notice-board/notice-board.inlin
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import { matchRoute } from '../../utils/routing';
 import environment from '../../environment';
+import { asGetStakingKey } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 
 import walletIcon from '../../assets/images/sidebar/revamp/wallet.inline.svg';
 import stakingIcon from '../../assets/images/sidebar/revamp/staking.inline.svg';
@@ -134,10 +135,11 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
   },
   {
     className: 'voting',
-    route: '/voting',
+    route: ROUTES.WALLETS.CATALYST_VOTING,
     icon: votingIcon,
     label: globalMessages.sidebarVoting,
-    isVisible: _request => true,
+    // $FlowFixMe[prop-missing]
+    isVisible: request => asGetStakingKey(request.selected) != null,
   },
   // {
   //   className: 'swap',
