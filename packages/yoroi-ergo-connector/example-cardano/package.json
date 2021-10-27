@@ -18,6 +18,7 @@
     "copy-webpack-plugin": "^5.0.0"
   },
   "dependencies": {
-    "bignumber.js": "^9.0.1"
+    "bignumber.js": "^9.0.1",
+    "blakejs": "^1.1.1"
   }
 }
