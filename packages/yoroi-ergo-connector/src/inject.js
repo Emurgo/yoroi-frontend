@@ -16,22 +16,22 @@ const initialInject = `
     }
   });
 
-  function ergo_request_read_access() {
+  window.ergo_request_read_access = function() {
     return new Promise(function(resolve, reject) {
       window.postMessage({
         type: "connector_connect_request/ergo",
       }, location.origin);
       connectRequests.push({ resolve: resolve, reject: reject });
     });
-  }
+  };
 
-  function ergo_check_read_access() {
+  window.ergo_check_read_access = function() {
     if (typeof ergo !== "undefined") {
       return ergo._ergo_rpc_call("ping", []);
     } else {
       return Promise.resolve(false);
     }
-  }
+  };
 
   // RPC setup
   var cardanoRpcUid = 0;
