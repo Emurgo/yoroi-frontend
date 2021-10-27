@@ -58,7 +58,7 @@ function TopBarLayout({
               display: 'flex',
               flexDirection: 'column',
               flex: '0 1 auto',
-              height: 'initial',
+              height: '100%',
             }),
           }}
         >
@@ -90,7 +90,7 @@ function TopBarLayout({
             margin: 0,
             display: 'flex',
             flexDirection: 'column',
-            maxHeight: 'calc(100% - 110px)',
+            height: 'calc(100vh - 100px)',
           }}
         >
           {content}
@@ -109,7 +109,7 @@ function TopBarLayout({
               marginRight: 'auto',
               display: 'flex',
               flexDirection: 'column',
-              maxHeight: 'calc(100% - 110px)',
+              maxHeight: 'calc(100vh - 110px)',
             }),
           }}
         >

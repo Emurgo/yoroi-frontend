@@ -120,7 +120,7 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
   },
   {
     className: 'staking',
-    route: '/staking',
+    route: ROUTES.STAKING,
     icon: stakingIcon,
     label: globalMessages.sidebarStaking,
     isVisible: _request => true,
