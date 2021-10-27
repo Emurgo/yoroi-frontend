@@ -3,6 +3,8 @@
 import type { Tx } from './types';
 import type { TokenRow } from '../../../app/api/ada/lib/storage/database/primitives/tables';
 
+import JSONBigInt from 'json-bigint';
+
 export function parseEIP0004Data(
   input: any,
   log: string => void,
@@ -68,7 +70,7 @@ export function mintedTokenInfo(
     }
   }
   if (tokens.length > 1) {
-    log(`tx ${JSON.stringify(tx)} had multiple EIP-0004-looking outputs`);
+    log(`tx ${JSONBigInt.stringify(tx)} had multiple EIP-0004-looking outputs`);
   }
   return tokens;
 }

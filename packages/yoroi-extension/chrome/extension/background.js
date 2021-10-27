@@ -69,6 +69,8 @@ import { Mutex, } from 'async-mutex';
 import { isCardanoHaskell } from '../../app/api/ada/lib/storage/database/prepackaged/networks';
 
 
+import JSONBigInt from 'json-bigint';
+
 /*::
 declare var chrome;
 */
@@ -462,7 +464,7 @@ chrome.runtime.onMessage.addListener(async (
       connection.pendingSigns.delete(request.uid);
     } else {
       // eslint-disable-next-line no-console
-      console.error(`couldn't find tabId: ${request.tabId} in ${JSON.stringify(connectedSites.entries())}`);
+      console.error(`couldn't find tabId: ${request.tabId} in ${JSONBigInt.stringify(connectedSites.entries())}`);
     }
   } else if (request.type === 'tx_sign_window_retrieve_data') {
     for (const [tabId, connection] of connectedSites) {
@@ -566,7 +568,7 @@ async function confirmConnect(
   const bounds = await getBoundsForTabWindow(tabId);
   const whitelist = await localStorageApi.getWhitelist() ?? [];
   return new Promise(resolve => {
-    Logger.info(`whitelist: ${JSON.stringify(whitelist)}`);
+    Logger.info(`whitelist: ${JSONBigInt.stringify(whitelist)}`);
     const whitelistEntry = whitelist.find(entry => entry.url === url);
     if (whitelistEntry !== undefined) {
       // we already whitelisted this website, so no need to re-ask the user to confirm
@@ -650,7 +652,7 @@ chrome.runtime.onConnectExternal.addListener(port => {
           });
         } else {
           const func = message.function;
-          const args = message.params.map(JSON.stringify).join(', ');
+          const args = message.params.map(JSONBigInt.stringify).join(', ');
           if (e?.stack != null) {
             Logger.error(`RPC call ergo.${func}(${args}) failed due to internal error: ${e}\n${e.stack}`);
           } else {
