@@ -50,9 +50,9 @@ function Autocomplete({
 }: Props): Node {
   const [inputValue, setInputValue] = useState<string>('');
   const inputRef = useRef();
-  const filteredList = options.filter(
-    item => !inputValue || item.toLowerCase().includes(inputValue.toLowerCase())
-  );
+  const lowerInput = inputValue?.toLowerCase() ?? '';
+  const filteredList = lowerInput.length === 0 ? options
+    : options.filter(w => w.toLowerCase().startsWith(lowerInput));
   const sliceArrayItems = slice(filteredList, 0, maxVisibleOptions);
 
   const {
