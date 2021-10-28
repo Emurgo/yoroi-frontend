@@ -470,6 +470,9 @@ export type GetConnectedSitesData = {|
   type: 'get_connected_sites',
 |}
 
+export type GetConnectionProtocol = {|
+  type: 'get_protocol'
+|}
 // when a tx is submitted we mark those as potentially spent and filter
 // utxo/balance/etc calls for them until they can be confirmed as spent or not
 export type PendingTransaction = {|

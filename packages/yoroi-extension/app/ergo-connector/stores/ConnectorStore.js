@@ -216,7 +216,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   };
 
   @action
-  _getProtocol: () => void = async () => {
+  _getProtocol: () => Promise<void> = async () => {
     await getProtocol().then(res => runInAction(() => {
       this.protocol = res.type;
     }))

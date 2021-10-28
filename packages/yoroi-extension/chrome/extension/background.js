@@ -24,6 +24,7 @@ import type {
   ConnectRetrieveData,
   RemoveWalletFromWhitelistData,
   GetConnectedSitesData,
+  GetConnectionProtocol,
   Tx,
   CardanoTx,
 } from './ergo-connector/types';
@@ -326,7 +327,8 @@ chrome.runtime.onMessage.addListener(async (
     TxSignWindowRetrieveData |
     ConnectRetrieveData |
     RemoveWalletFromWhitelistData |
-    GetConnectedSitesData
+    GetConnectedSitesData |
+    GetConnectionProtocol
   ),
   sender,
   sendResponse
