@@ -26,6 +26,7 @@ import type {
   GetConnectedSitesData,
   Tx,
   CardanoTx,
+  GetConnectionProtocolData,
 } from './ergo-connector/types';
 import {
   APIErrorCodes,
@@ -320,13 +321,14 @@ async function withSelectedWallet<T>(
 // messages from other parts of Yoroi (i.e. the UI for the connector)
 chrome.runtime.onMessage.addListener(async (
   request: (
-    ConnectResponseData |
-    ConfirmedSignData |
-    FailedSignData |
-    TxSignWindowRetrieveData |
-    ConnectRetrieveData |
-    RemoveWalletFromWhitelistData |
-    GetConnectedSitesData
+    ConnectResponseData
+    | ConfirmedSignData
+    | FailedSignData
+    | TxSignWindowRetrieveData
+    | ConnectRetrieveData
+    | RemoveWalletFromWhitelistData
+    | GetConnectedSitesData
+    | GetConnectionProtocolData
   ),
   sender,
   sendResponse
