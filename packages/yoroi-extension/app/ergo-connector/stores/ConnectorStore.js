@@ -103,7 +103,6 @@ function getProtocol(): Promise<Protocol> {
             // eslint-disable-next-line prefer-promise-reject-errors
             reject('Could not establish connection: get_protocol ');
           }
-
           resolve(response);
         }
       );
@@ -139,7 +138,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   @observable loadingWallets: $Values<typeof LoadingWalletStates> = LoadingWalletStates.IDLE;
   @observable errorWallets: string = '';
   @observable wallets: Array<PublicDeriverCache> = [];
-
+  @observable protocol: string;
   @observable getConnectorWhitelist: Request<
     GetWhitelistFunc
   > = new Request<GetWhitelistFunc>(
@@ -174,6 +173,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     this._getConnectorWhitelist();
     this._getConnectingMsg();
     this._getSigningMsg();
+    this._getProtocol()
     this.currentConnectorWhitelist;
   }
 
@@ -214,6 +214,13 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       // eslint-disable-next-line no-console
       .catch(err => console.error(err));
   };
+
+  @action
+  _getProtocol: () => void = async () => {
+    await getProtocol().then(res => runInAction(() => {
+      this.protocol = res.type;
+    }))
+  }
 
   @action
   _confirmSignInTx: string => void = password => {
@@ -263,12 +270,14 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     }
     try {
       const wallets = await getWallets({ db: persistentDb });
-      const protocol = await getProtocol().then(res => res)
-      const protocolFilter = (wallet) => protocol.type !== 'ergo'
+      if (!this.protocol) {
+        throw new Error(`${nameof(this._getWallets)} no procol found. Should never happen`);
+      }
+      const filterByProtocol = (wallet) => this.protocol === 'ergo'
         ? isErgo(wallet.getParent().getNetworkInfo())
         : !isErgo(wallet.getParent().getNetworkInfo())
       const filteredWallets = wallets
-      .filter(wallet => protocolFilter(wallet));
+      .filter(wallet => filterByProtocol(wallet));
 
       if (this.signingMessage?.sign.type !== 'tx/cardano') {
         await this._getTxAssets(filteredWallets);
