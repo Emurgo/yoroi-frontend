@@ -36,6 +36,7 @@ import {
   cardanoValueFromRemoteFormat,
   multiTokenFromCardanoValue,
   cardanoValueFromMultiToken,
+  parseTokenList,
 } from '../utils';
 
 /**
@@ -661,7 +662,8 @@ function _newAdaUnsignedTxFromUtxo(
     // this flag is set when one extra input is added
     let oneExtraAdded = false;
     // add utxos until we have enough to send the transaction
-    for (const utxo of utxos) {
+    for (let i = 0; i < utxos.length; i++) {
+      const utxo = utxos[i];
       if (oneExtraAdded) {
         break;
       }
@@ -695,7 +697,33 @@ function _newAdaUnsignedTxFromUtxo(
         const isRemainingNeededCoinZero = isBigNumZero(remainingNeeded.coin());
         const isRemainingNeededAssetZero = (remainingAssets?.len() ?? 0) === 0;
         if (isRemainingNeededCoinZero && isRemainingNeededAssetZero && isNonEmptyInputs) {
-          if (oneExtraInput) {
+          const changeTokenIdSet = new Set(
+            parseTokenList(excessiveInputAssets).map(r => r.assetId)
+          );
+          let packed = false;
+          for (let j = i; j < utxos.length; j++) {
+            const packCandidate = utxos[j];
+            if (
+              packCandidate.assets.length >= 1 &&
+                packCandidate.assets.every(({ assetId }) => changeTokenIdSet.has(assetId))
+            ) {
+              if (
+                addUtxoInput(
+                  txBuilder,
+                  undefined,
+                  packCandidate,
+                  false,
+                  { networkId: protocolParams.networkId }
+                ) === AddInputResult.VALID
+              ) {
+                usedUtxos.push(packCandidate);
+
+                packed = true;
+                break;
+              }
+            }
+          }
+          if (oneExtraInput && !packed) {
             // We've added all the assets we need, but we add one extra.
             // Set the flag so that the adding loop stops after this extra one is added.
             oneExtraAdded = true;
