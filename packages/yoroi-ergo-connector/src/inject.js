@@ -373,15 +373,16 @@ if (shouldInject()) {
                 }
                 // note: content scripts are subject to the same CORS policy as the website they are embedded in
                 // but since we are querying the website this script is injected into, it should be fine
-                const protocol = dataType.split('/')[1]
+                const protocol = dataType.split('/')[1];
                 convertImgToBase64(getFavicon(location.origin))
                     .then(imgBase64Url => {
-                        yoroiPort.postMessage({
+                        const message = {
                             imgBase64Url,
                             type: `yoroi_connect_request/${protocol}`,
                             url: location.hostname,
                             protocol,
-                        });
+                        };
+                        yoroiPort.postMessage(message);
                     });
             }
         }
