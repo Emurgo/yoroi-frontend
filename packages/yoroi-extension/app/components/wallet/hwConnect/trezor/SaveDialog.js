@@ -1,11 +1,10 @@
 // @flow
 import type { Node } from 'react';
-import React, { Component } from 'react';
+import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import classnames from 'classnames';
-import { Input } from 'react-polymorph/lib/components/Input';
-import { InputOwnSkin } from '../../../../themes/skins/InputOwnSkin';
+import TextField from '../../../common/TextField';
 
 import globalMessages from '../../../../i18n/global-messages';
 import LocalizableError from '../../../../i18n/LocalizableError';
@@ -128,11 +127,10 @@ export default class SaveDialog extends Component<Props> {
             {intl.formatMessage(messages.saveWalletNameInputBottomInfo)}
           </div>
         </div>
-        <Input
+        <TextField
           className={walletNameFieldClasses}
           {...walletNameField.bind()}
           error={walletNameField.error}
-          skin={InputOwnSkin}
           done={walletNameField.isValid}
         />
       </div>);

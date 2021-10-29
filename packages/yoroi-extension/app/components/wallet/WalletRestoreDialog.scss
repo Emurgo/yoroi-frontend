@@ -7,16 +7,6 @@
       display: flex;
       flex-wrap: wrap;
       justify-content: space-between;
-      max-height: 0;
-      opacity: 0;
-      overflow: hidden;
-      transition: all 400ms ease;
-
-      &.show {
-        max-height: 250px;
-        opacity: 1;
-        overflow: visible;
-      }
 
       & > div {
         margin-top: 30px;
@@ -32,7 +22,7 @@
   }
 
   .isSubmitting {
-    @include loading-spinner("../../assets/images/spinner-light.svg");
+    @include loading-spinner('../../assets/images/spinner-light.svg');
   }
 }
 
@@ -49,7 +39,7 @@
           opacity: 1;
           overflow: visible;
         }
-    
+
         & > div {
           margin-top: 0;
           width: 350px;
@@ -62,7 +52,7 @@
           margin-right: 25px;
         }
       }
-    
+
       .paperPassword {
         margin-top: 0;
       }
@@ -78,12 +68,11 @@
 
     .walletPassword {
       .walletPasswordFields {
-    
         &.show {
           max-height: 600px;
           opacity: 1;
         }
-    
+
         & > div {
           margin-top: 0;
           width: 100%;
@@ -92,7 +81,7 @@
     }
 
     :global(.Dialog_actions) {
-      margin-top: var(--theme-dialog-password-input-actions-margin-top);
+      margin-top: 10px;
     }
   }
 }

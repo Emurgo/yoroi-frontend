@@ -1,6 +1,6 @@
 // @flow
 import { observer } from 'mobx-react';
-import React, { Component } from 'react';
+import { Component } from 'react';
 import type { Node } from 'react';
 import styles from './WalletCurrency.scss';
 

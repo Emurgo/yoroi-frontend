@@ -1,10 +1,8 @@
 // @flow
-import React, { Component } from 'react';
+import { Component } from 'react';
 import type { Node } from 'react';
-import classnames from 'classnames';
 import { observer } from 'mobx-react';
-import { Button } from 'react-polymorph/lib/components/Button';
-import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
+import { Button } from '@mui/material';
 import { intlShape } from 'react-intl';
 import styles from './UriSettingsBlock.scss';
 import globalMessages from '../../../../i18n/global-messages';
@@ -28,12 +26,6 @@ export default class UriSettingsBlock extends Component<Props> {
   render(): Node {
     const { intl } = this.context;
 
-    const allowButtonClasses = classnames([
-      'allowButton',
-      'primary',
-      styles.submitButton,
-    ]);
-
     // On firefox since there is no prompt,
     // We need to give the user feedback that they pressed the button
     const isDisabled = this.props.isFirefox && this.hasPressed;
@@ -50,17 +42,22 @@ export default class UriSettingsBlock extends Component<Props> {
         </p>
 
         <Button
-          className={allowButtonClasses}
-          label={intl.formatMessage(globalMessages.allowLabel)}
-          onMouseUp={() => {
+          className='allowButton'
+          variant="primary"
+          onClick={() => {
             this.props.registerUriScheme();
             runInAction(() => {
               this.hasPressed = true;
             });
           }}
           disabled={isDisabled}
-          skin={ButtonSkin}
-        />
+          sx={{
+            width: '287px',
+            marginTop: '20px',
+          }}
+        >
+          {intl.formatMessage(globalMessages.allowLabel)}
+        </Button>
       </div>
     );
   }

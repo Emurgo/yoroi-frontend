@@ -1,10 +1,9 @@
 // @flow
 import type { Node } from 'react';
-import React, { Component } from 'react';
+import { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
-import { Input } from 'react-polymorph/lib/components/Input';
-import { InputOwnSkin } from '../../../../themes/skins/InputOwnSkin';
+import TextField from '../../../common/TextField'
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import ReactToolboxMobxForm from '../../../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
@@ -180,7 +179,7 @@ export default class UserPasswordDialog extends Component<Props> {
         </div>
 
         <div className={styles.paperPassword}>
-          <Input
+          <TextField
             type="password"
             className={styles.paperPassword}
             value={dialogData.passwordValue}
@@ -188,11 +187,10 @@ export default class UserPasswordDialog extends Component<Props> {
             {...paperPasswordField.bind()}
             done={paperPasswordField.isValid}
             error={paperPasswordField.error}
-            skin={InputOwnSkin}
           />
         </div>
         <div className={styles.repeatedPassword}>
-          <Input
+          <TextField
             type="password"
             className={styles.repeatedPassword}
             value={dialogData.repeatedPasswordValue}
@@ -200,7 +198,6 @@ export default class UserPasswordDialog extends Component<Props> {
             done={repeatPassword && repeatedPasswordField.isValid}
             {...repeatedPasswordField.bind()}
             error={repeatedPasswordField.error}
-            skin={InputOwnSkin}
           />
         </div>
       </Dialog>

@@ -1,5 +1,5 @@
 .component {
-  background-color: var(--theme-notification-message-background-color);
+  background-color: var(--yoroi-notification-message-background);
   height: 0;
   overflow: hidden;
   position: absolute;
@@ -23,9 +23,9 @@
 }
 
 .message {
-  color: var(--theme-notification-message-text-color);
+  color: var(--yoroi-palette-gray-50);
   display: inline-block;
-  font-family: var(--font-regular);
+  font-weight: 400;
   font-size: 14px;
   font-weight: 500;
   letter-spacing: normal;

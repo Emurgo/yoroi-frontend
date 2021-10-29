@@ -5,7 +5,7 @@
   border-radius: 2px;
   background-color: #f0f3f5;
   box-shadow: 0 2px 5px 3px rgba(0, 0, 0, 0.06);
-  font-family: var(--font-regular);
+  font-weight: 400;
 }
 
 .header {
@@ -47,7 +47,7 @@
   }
   .label {
     font-size: 16px;
-    color: #242838;
+    color: var(--yoroi-palette-gray-900);
   }
 }
 
@@ -60,16 +60,5 @@
   }
   & div {
     flex: 1;
-  }
-}
-
-.language {
-  margin-top: -20px;
-  & input {
-    cursor: pointer;
-    font-family: var(--font-regular);
-    color: #242838 !important;
-    border: none !important;
-    text-transform: capitalize !important;
   }
 }

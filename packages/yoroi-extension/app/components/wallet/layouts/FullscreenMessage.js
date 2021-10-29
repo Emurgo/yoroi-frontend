@@ -1,6 +1,6 @@
 // @flow
 import type { Node } from 'react';
-import React, { Component } from 'react';
+import { Component } from 'react';
 import styles from './FullscreenMessage.scss';
 import VerticallyCenteredLayout from '../../layout/VerticallyCenteredLayout';
 import FullscreenLayout from '../../layout/FullscreenLayout';

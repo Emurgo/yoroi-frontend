@@ -1,7 +1,6 @@
 // @flow
 
 import type { Node } from 'react';
-import React from 'react';
 
 import { select, boolean } from '@storybook/addon-knobs';
 import { action } from '@storybook/addon-actions';
@@ -10,7 +9,7 @@ import {
   genShelleyCIP1852SigningWalletWithCache,
   genVotingShelleyTx,
 } from '../../../../stories/helpers/cardano/ShelleyCip1852Mocks';
-import { THEMES } from '../../../themes';
+import { THEMES } from '../../../styles/utils';
 import { mockWalletProps } from '../Wallet.mock';
 import {
   globalKnobs,

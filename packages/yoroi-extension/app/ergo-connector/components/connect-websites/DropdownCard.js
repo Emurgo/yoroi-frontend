@@ -1,5 +1,5 @@
 // @flow
-import React, { Component } from 'react';
+import { Component } from 'react';
 import type { Node } from 'react';
 import styles from './DropdownCard.scss';
 import ExpandArrow from '../../assets/images/arrow-expand.inline.svg';

@@ -1,7 +1,6 @@
 // @flow
 
 import type { Node } from 'react';
-import React from 'react';
 
 import { boolean } from '@storybook/addon-knobs';
 import { action } from '@storybook/addon-actions';
@@ -10,7 +9,6 @@ import GeneralSettingsPage from './GeneralSettingsPage';
 import { withScreenshot } from 'storycap';
 import { globalKnobs, } from '../../../../stories/helpers/StoryWrapper';
 import { walletLookup } from '../../../../stories/helpers/WalletCache';
-import { getVarsForTheme } from '../../../stores/base/BaseProfileStore';
 import { wrapSettings } from '../../../Routes';
 import { mockSettingsProps } from '../Settings.mock';
 import { ROUTES } from '../../../routes-config';
@@ -41,7 +39,6 @@ export const Generic = (): Node => {
             LANGUAGE_OPTIONS: LANGUAGES,
             currentLocale: globalKnobs.locale(),
             currentTheme: globalKnobs.currentTheme(),
-            getThemeVars: getVarsForTheme,
             hasCustomTheme: () => boolean('hasCustomTheme', false),
           },
         },

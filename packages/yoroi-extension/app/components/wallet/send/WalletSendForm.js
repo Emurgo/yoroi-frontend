@@ -1,18 +1,15 @@
 // @flow
-import React, { Component } from 'react';
+import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { reaction } from 'mobx';
-import classnames from 'classnames';
-import { Button } from 'react-polymorph/lib/components/Button';
-import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
-import { Input } from 'react-polymorph/lib/components/Input';
-import { NumericInput } from 'react-polymorph/lib/components/NumericInput';
+import { Button, MenuItem, Typography } from '@mui/material';
+import TextField from '../../common/TextField'
 import { defineMessages, intlShape } from 'react-intl';
 import { isValidMemoOptional, isValidMemo, } from '../../../utils/validations';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
-import AmountInputSkin from '../skins/AmountInputSkin';
+import { AmountInput } from '../../common/NumericInputRP';
 import AddMemoSvg from '../../../assets/images/add-memo.inline.svg';
 import BorderedBox from '../../widgets/BorderedBox';
 import styles from './WalletSendForm.scss';
@@ -22,15 +19,15 @@ import { getAddressPayload, isValidReceiveAddress } from '../../../api/ada/lib/s
 import { MAX_MEMO_SIZE } from '../../../config/externalStorageConfig';
 import type { TokenRow, NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import {
+  amountWithoutZeros,
   formattedAmountToBigNumber,
   formattedAmountToNaturalUnits,
   truncateToken,
 } from '../../../utils/formatters';
 import config from '../../../config';
-import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
 import LocalizableError from '../../../i18n/LocalizableError';
 import WarningBox from '../../widgets/WarningBox';
-import type { $npm$ReactIntl$IntlFormat, } from 'react-intl';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { getTokenName, genFormatTokenAmount, getTokenStrictName, getTokenIdentifierIfExists, } from '../../../stores/stateless/tokenHelpers';
 import {
   MultiToken,
@@ -39,10 +36,11 @@ import type {
   TokenEntry,
   TokenLookupKey,
 } from '../../../api/common/lib/MultiToken';
-import { Select } from 'react-polymorph/lib/components/Select';
-import { SelectTokenSkin } from '../../../themes/skins/SelectTokenSkin';
+import Select from '../../common/Select';
+import { Box } from '@mui/system';
 import TokenOptionRow from '../../widgets/tokenOption/TokenOptionRow';
 import BigNumber from 'bignumber.js';
+import classnames from 'classnames';
 
 const messages = defineMessages({
   receiverLabel: {
@@ -318,7 +316,6 @@ export default class WalletSendForm extends Component<Props> {
     const { memo } = this.form.values();
     const {
       hasAnyPending,
-      classicTheme,
       showMemo,
       onAddMemo
     } = this.props;
@@ -363,7 +360,6 @@ export default class WalletSendForm extends Component<Props> {
     }
 
     const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
-
     const tokenOptions = (() => {
       if (this.props.spendableBalance == null) return [];
       const { spendableBalance } = this.props;
@@ -374,13 +370,16 @@ export default class WalletSendForm extends Component<Props> {
       ].map(entry => ({
         entry,
         info: this.props.getTokenInfo(entry),
-      })).map(token => ({
-        value: token.info.TokenId,
-        info: token.info,
-        label: truncateToken(getTokenStrictName(token.info) ?? getTokenIdentifierIfExists(token.info) ?? '-'),
-        id: (getTokenIdentifierIfExists(token.info) ?? '-'),
-        amount: genFormatTokenAmount(this.props.getTokenInfo)(token.entry)
-      }));
+      })).map(token => {
+        const amount = genFormatTokenAmount(this.props.getTokenInfo)(token.entry)
+        return {
+          value: token.info.TokenId,
+          info: token.info,
+          label: truncateToken(getTokenStrictName(token.info) ?? getTokenIdentifierIfExists(token.info) ?? '-'),
+          id: (getTokenIdentifierIfExists(token.info) ?? '-'),
+          amount: amountWithoutZeros(amount),
+        }
+      });
     })();
 
 
@@ -417,15 +416,13 @@ export default class WalletSendForm extends Component<Props> {
     ])
     return (
       <div className={styles.component}>
-
         {hasAnyPending && pendingTxWarningComponent}
 
         <BorderedBox>
-
           {tokenOptions.length > 1 && (
             <Select
-              className={styles.currencySelect}
-              options={tokenOptions}
+              formControlProps={{ sx: { marginBottom: '10px' } }}
+              labelId="token-assets-select"
               {...form.$('selectedToken').bind()}
               onChange={value => {
                 this.props.onAddToken(tokenOptions.find(
@@ -439,36 +436,57 @@ export default class WalletSendForm extends Component<Props> {
                 // clear amount field when switching currencies
                 this.form.$('amount').clear();
                 // reset the amout dropdown to coustom amount
-                this.form.$('selectedAmount').value = CUSTOM_AMOUNT
+                this.form.$('selectedAmount').value = CUSTOM_AMOUNT;
                 this.props.updateAmount();
               }}
-              skin={SelectTokenSkin}
-              value={this.props.selectedToken?.TokenId ?? this.props.getTokenInfo({
-                identifier: this.props.defaultToken.Identifier,
-                networkId: this.props.defaultToken.NetworkId,
-              }).TokenId}
-              optionRenderer={option => (
-                <TokenOptionRow
-                  displayName={option.label}
-                  id={option.id}
-                  amount={option.amount}
-                />
+              value={
+                this.props.selectedToken?.TokenId ??
+                this.props.getTokenInfo({
+                  identifier: this.props.defaultToken.Identifier,
+                  networkId: this.props.defaultToken.NetworkId,
+                }).TokenId
+              }
+              renderValue={value => (
+                <Box>{tokenOptions.filter(option => option.value === value)[0].label}</Box>
               )}
-            />
+            >
+              <MenuItem
+                sx={{ height: '50px', '&.Mui-disabled': { opacity: 0.8 } }}
+                value=""
+                disabled
+              >
+                <Box width="100%" display="flex">
+                  <Typography variant="body2" flex="1">
+                    {intl.formatMessage(globalMessages.name)}
+                  </Typography>
+                  <Typography variant="body2" flex="1">
+                    {intl.formatMessage(globalMessages.amount)}
+                  </Typography>
+                </Box>
+              </MenuItem>
+              {tokenOptions.map(option => (
+                <MenuItem sx={{ height: '70px' }} key={option.value} value={option.value}>
+                  <TokenOptionRow
+                    displayName={option.label}
+                    id={option.id}
+                    amount={option.amount}
+                  />
+                </MenuItem>
+              ))}
+            </Select>
           )}
 
           <div className={styles.receiverInput}>
-            <Input
+            <TextField
               className="receiver"
               {...receiverField.bind()}
               error={receiverField.error}
-              skin={InputOwnSkin}
               done={receiverField.isValid}
             />
           </div>
 
           <div className={styles.amountInput}>
-            <NumericInput
+            <AmountInput
               {...amountFieldProps}
               value={amountFieldProps.value === ''
                 ? null
@@ -479,21 +497,23 @@ export default class WalletSendForm extends Component<Props> {
               decimalPlaces={this.getNumDecimals()}
               disabled={this.props.shouldSendAll}
               error={(transactionFeeError || amountField.error)}
-              // AmountInputSkin props
               currency={truncateToken(
                 getTokenName(this.props.selectedToken ?? this.props.defaultToken)
               )}
               fees={formatValue(transactionFee.getDefaultEntry())}
               total={formatValue(this.getTokenEntry(totalAmount))}
               allowSigns={false}
-              skin={AmountInputSkin}
-              classicTheme={classicTheme}
             />
           </div>
 
           <Select
-            options={sendAmountOptions}
             {...form.$('selectedAmount').bind()}
+            labelId="amount-options-select"
+            renderValue={value => (
+              <Typography sx={{ textTransform: 'uppercase' }}>
+                {sendAmountOptions.filter(item => item.value === value)[0].label}
+              </Typography>
+            )}
             onChange={value => {
               // Do nothing if we select the same option twice
               if (this.form.$('selectedAmount').value === value) return
@@ -517,13 +537,13 @@ export default class WalletSendForm extends Component<Props> {
 
               this.form.$('selectedAmount').value = value;
             }}
-            optionRenderer={option => (
-              <TokenOptionRow
-                displayName={option.label}
-                nameOnly
-              />
-            )}
-          />
+          >
+            {sendAmountOptions.map(option => (
+              <MenuItem key={option.value} value={option.value}>
+                <TokenOptionRow displayName={option.label} nameOnly />
+              </MenuItem>
+            ))}
+          </Select>
 
           <div className={tokenListClasses}>
             <h1>{intl.formatMessage(messages.willSendAll)}</h1>
@@ -535,11 +555,10 @@ export default class WalletSendForm extends Component<Props> {
 
           {showMemo ? (
             <div className={styles.memoInput}>
-              <Input
+              <TextField
                 className="memo"
                 {...memoField.bind()}
                 error={memoField.error}
-                skin={InputOwnSkin}
                 done={isValidMemo(memo)}
               />
             </div>
@@ -563,9 +582,7 @@ export default class WalletSendForm extends Component<Props> {
           )}
 
           {this._makeInvokeConfirmationButton()}
-
         </BorderedBox>
-
       </div>
     );
   }
@@ -573,11 +590,6 @@ export default class WalletSendForm extends Component<Props> {
   _makeInvokeConfirmationButton(): Node {
     const { intl } = this.context;
     const { memo } = this.form.values();
-
-    const buttonClasses = classnames([
-      'primary',
-      styles.nextButton,
-    ]);
 
     const {
       hasAnyPending,
@@ -591,13 +603,14 @@ export default class WalletSendForm extends Component<Props> {
 
     return (
       <Button
-        className={buttonClasses}
-        label={intl.formatMessage(globalMessages.nextButtonLabel)}
-        onMouseUp={this.props.onSubmit}
+        variant="primary"
+        onClick={this.props.onSubmit}
         /** Next Action can't be performed in case transaction fees are not calculated
           * or there's a transaction waiting to be confirmed (pending) */
         disabled={disabledCondition}
-        skin={ButtonSkin}
-      />);
+        sx={{ margin: '30px auto 0', display: 'block' }}
+      >
+        {intl.formatMessage(globalMessages.nextButtonLabel)}
+      </Button>);
   }
 }

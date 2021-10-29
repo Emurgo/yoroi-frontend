@@ -1,15 +1,15 @@
 .component {
   text-align: center;
   line-height: 22px;
-  color: var(--theme-wallet-nowallet-text-color);
+  color: var(--yoroi-palette-gray-900);
 
   .title {
-    font-family: var(--font-medium);
+    font-weight: 500;
     font-size: 18px;
   }
 
   .subtitle {
-    font-family: var(--font-regular);
+    font-weight: 400;
     font-size: 14px;
   }
 }

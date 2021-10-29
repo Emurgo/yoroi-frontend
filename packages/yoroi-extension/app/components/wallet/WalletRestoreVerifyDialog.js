@@ -1,6 +1,6 @@
 // @flow
 import type { Node } from 'react';
-import React, { Component } from 'react';
+import { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { defineMessages, FormattedHTMLMessage, intlShape } from 'react-intl';
@@ -105,14 +105,14 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
               elementId={notificationElementId}
               onCopyAddress={() => onCopyAddressTooltip(address, notificationElementId)}
               notification={notification}
-              tooltipOpensUpward
+              placementTooltip="top-start"
               key={address}
             >
               <ExplorableHashContainer
                 selectedExplorer={this.props.selectedExplorer}
                 hash={address}
                 light
-                tooltipOpensUpward
+                placementTooltip="top-start"
                 linkType="address"
               >
                 <RawHash light>

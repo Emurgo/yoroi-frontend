@@ -41,7 +41,7 @@ The text we want to add is `I am testing i18n`
 2. Next you have to register the definitions using `defineMessages` method of `react-intl` module. If this text is going to be used in multiple components then you have to define it in [global-messages.js](https://github.com/Emurgo/yoroi-frontend/blob/develop/app/i18n/global-messages.js) otherwise define it in the target component. Let's assume that our target component is `TestText.js`. We have to modify `TestText.js` like below.
 ```
 // @flow
-import React, { Component } from 'react';
+import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 

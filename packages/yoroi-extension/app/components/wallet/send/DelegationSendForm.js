@@ -1,18 +1,15 @@
 // @flow
-import React, { Component } from 'react';
+import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import classnames from 'classnames';
-import { Button } from 'react-polymorph/lib/components/Button';
-import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
-import { Input } from 'react-polymorph/lib/components/Input';
+import { Button } from '@mui/material';
+import TextField from '../../common/TextField';
 import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
 import BorderedBox from '../../widgets/BorderedBox';
 import styles from './DelegationSendForm.scss';
 import globalMessages from '../../../i18n/global-messages';
-import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
 import WarningBox from '../../widgets/WarningBox';
 import type { $npm$ReactIntl$IntlFormat, } from 'react-intl';
 import isHexadecimal from 'validator/lib/isHexadecimal';
@@ -128,11 +125,10 @@ export default class DelegationSendForm extends Component<Props> {
         <BorderedBox>
 
           <div className={styles.poolInput}>
-            <Input
+            <TextField
               className="poolId"
               {...poolIdField.bind()}
               error={poolIdField.error || poolQueryError}
-              skin={InputOwnSkin}
               done={poolIdField.isValid}
             />
           </div>
@@ -147,22 +143,18 @@ export default class DelegationSendForm extends Component<Props> {
   _makeInvokeConfirmationButton(): Node {
     const { intl } = this.context;
 
-    const buttonClasses = classnames([
-      'primary',
-      styles.nextButton,
-    ]);
-
     return (
       <Button
-        className={buttonClasses}
-        label={intl.formatMessage(globalMessages.nextButtonLabel)}
-        onMouseUp={this.props.onNext}
+        variant="primary"
+        onClick={this.props.onNext}
         disabled={
           this.props.hasAnyPending ||
           this.props.isProcessing ||
           this.props.poolQueryError != null
         }
-        skin={ButtonSkin}
-      />);
+        sx={{ margin: '30px auto 0', display: 'block' }}
+      >
+        {intl.formatMessage(globalMessages.nextButtonLabel)}
+      </Button>);
   }
 }

@@ -1,10 +1,9 @@
 // @flow
 import type { Node } from 'react';
-import React, { Component } from 'react';
+import { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
-import { Checkbox } from 'react-polymorph/lib/components/Checkbox';
-import { CheckboxSkin } from 'react-polymorph/lib/skins/simple/CheckboxSkin';
+import CheckboxLabel from '../../common/CheckboxLabel'
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import WalletRecoveryPhraseMnemonic from './WalletRecoveryPhraseMnemonic';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
@@ -187,19 +186,27 @@ export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
         {isValid && (
           <div>
             <div className={styles.checkbox}>
-              <Checkbox
+              <CheckboxLabel
                 label={<FormattedHTMLMessage {...messages.termDevice} />}
                 onChange={onAcceptTermDevice}
                 checked={isTermDeviceAccepted}
-                skin={CheckboxSkin}
+                labelProps={{
+                  sx: {
+                    fontSize: '0.875rem',
+                  },
+                }}
               />
             </div>
             <div className={styles.checkbox}>
-              <Checkbox
+              <CheckboxLabel
                 label={intl.formatMessage(messages.termRecovery)}
                 onChange={onAcceptTermRecovery}
+                labelProps={{
+                  sx: {
+                    fontSize: '0.875rem',
+                  },
+                }}
                 checked={isTermRecoveryAccepted}
-                skin={CheckboxSkin}
               />
             </div>
           </div>
