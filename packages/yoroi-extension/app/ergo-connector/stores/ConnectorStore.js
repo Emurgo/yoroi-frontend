@@ -263,12 +263,18 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     }
     try {
       const wallets = await getWallets({ db: persistentDb });
-      const protocol = await getProtocol().then(res => res)
-      const protocolFilter = (wallet) => protocol.type === 'ergo'
-        ? isErgo(wallet.getParent().getNetworkInfo())
-        : !isErgo(wallet.getParent().getNetworkInfo())
-      const filteredWallets = wallets
-      .filter(wallet => protocolFilter(wallet));
+
+      const protocol = await getProtocol().then(res => res);
+      const isProtocolErgo = protocol?.type === 'ergo';
+      const isProtocolCardano = protocol?.type === 'cardano';
+      const isProtocolDefined = isProtocolErgo || isProtocolCardano;
+      const protocolFilter = wallet => {
+        const isWalletErgo = isErgo(wallet.getParent().getNetworkInfo());
+        return isProtocolErgo === isWalletErgo;
+      };
+      const filteredWallets = isProtocolDefined
+        ? wallets.filter(protocolFilter)
+        : wallets;
 
       if (this.signingMessage?.sign.type !== 'tx/cardano') {
         await this._getTxAssets(filteredWallets);
