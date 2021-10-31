@@ -1,23 +1,36 @@
 // @flow
-import React, { Component } from 'react';
+import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import BackArrow from '../../assets/images/back-arrow-ic.inline.svg';
-import styles from './DialogBackButton.scss';
+import { IconButton } from '@mui/material';
 
 type Props = {|
-  +onBack: void => PossiblyAsync<void>
+  +onBack: void => PossiblyAsync<void>,
 |};
 
 @observer
 export default class DialogBackButton extends Component<Props> {
-
   render(): Node {
     const { onBack } = this.props;
     return (
-      <button tabIndex="-1" type="button" onClick={onBack} className={styles.component}>
+      <IconButton
+        onClick={onBack}
+        sx={{
+          position: 'absolute',
+          top: '19px',
+          left: '30px',
+          svg: {
+            width: '20px',
+            height: '16px',
+            path: {
+              fill: 'hsl(220deg 2% 28%)',
+            },
+          },
+        }}
+      >
         <BackArrow />
-      </button>
+      </IconButton>
     );
   }
 }

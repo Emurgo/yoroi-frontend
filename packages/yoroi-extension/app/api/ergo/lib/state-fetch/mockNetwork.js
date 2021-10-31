@@ -209,9 +209,11 @@ export function decodeErgoTokenInfo(
   desc: string | null,
   numDecimals: number | null,
 |} {
-  const name = parseEIP0004Data(registers.R4) || null
-  const desc = parseEIP0004Data(registers.R5) || null;
-  const numDecimals = parseInt(parseEIP0004Data(registers.R6) ?? '', 10);
+  // eslint-disable-next-line no-console
+  const log = console.log;
+  const name = parseEIP0004Data(registers.R4, log) || null
+  const desc = parseEIP0004Data(registers.R5, log) || null;
+  const numDecimals = parseInt(parseEIP0004Data(registers.R6, log) ?? '', 10);
 
   return {
     name,

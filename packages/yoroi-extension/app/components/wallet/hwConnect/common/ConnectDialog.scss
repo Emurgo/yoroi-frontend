@@ -8,7 +8,7 @@
       max-height: 100%;
     }
   }
-  
+
   .middleConnectProcessBlock {
     padding: 0px;
     img {
@@ -21,7 +21,7 @@
 :global(.YoroiClassic) {
   .component {
     .middleBlock {
-      background-color: var(--theme-hw-connect-dialog-middle-block-common-error-background-color);
+      background-color: var(--yoroi-hw-connect-dialog-middle-block-common-error-background-color);
       padding: 0px;
       text-align: center;
     }

@@ -1,13 +1,12 @@
 // @flow
-import React, { Component } from 'react';
+import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { intlShape, } from 'react-intl';
+import { intlShape } from 'react-intl';
 import styles from './DeprecatedCurrencyBanner.scss';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
-import { Button } from 'react-polymorph/lib/components/Button';
-import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
+import { Button } from '@mui/material';
 
 type Props = {|
   +children: Node,
@@ -16,8 +15,7 @@ type Props = {|
 
 @observer
 export default class DeprecatedCurrencyBanner extends Component<Props> {
-
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
@@ -40,11 +38,9 @@ export default class DeprecatedCurrencyBanner extends Component<Props> {
             </div>
             {onSubmit != null && (
               <div className={styles.action}>
-                <Button
-                  onClick={() => onSubmit()}
-                  label={intl.formatMessage(globalMessages.upgradeLabel)}
-                  skin={ButtonSkin}
-                />
+                <Button variant="primary" onClick={() => onSubmit()} sx={{ width: '230px' }}>
+                  {intl.formatMessage(globalMessages.upgradeLabel)}
+                </Button>
               </div>
             )}
           </div>

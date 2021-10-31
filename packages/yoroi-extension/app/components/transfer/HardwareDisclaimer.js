@@ -1,9 +1,8 @@
 // @flow
 import type { Node } from 'react';
-import React, { Component } from 'react';
+import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { Checkbox } from 'react-polymorph/lib/components/Checkbox';
-import { CheckboxSkin } from 'react-polymorph/lib/skins/simple/CheckboxSkin';
+import CheckboxLabel from '../common/CheckboxLabel';
 import { defineMessages, intlShape } from 'react-intl';
 import DialogBackButton from '../widgets/DialogBackButton';
 import Dialog from '../widgets/Dialog';
@@ -75,11 +74,10 @@ export default class HardwareDisclaimer extends Component<Props> {
               </p>
 
               <div className={styles.checkbox}>
-                <Checkbox
+                <CheckboxLabel
                   label={intl.formatMessage(messages.hardwareDisclaimer)}
                   onChange={this.props.toggleCheck}
                   checked={this.props.isChecked}
-                  skin={CheckboxSkin}
                 />
               </div>
             </div>

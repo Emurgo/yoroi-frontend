@@ -21,6 +21,7 @@ export default class AdaTransactionsStore extends Store<StoresMap, ActionsMap> {
       checkAddressesInUse: stateFetcher.checkAddressesInUse,
       getBestBlock: stateFetcher.getBestBlock,
       getTokenInfo: stateFetcher.getTokenInfo,
+      getMultiAssetMetadata: stateFetcher.getMultiAssetMintMetadata
     });
 
     return txs;

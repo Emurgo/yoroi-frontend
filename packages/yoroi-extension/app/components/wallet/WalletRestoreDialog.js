@@ -1,11 +1,11 @@
 // @flow
 import type { Node } from 'react';
-import React, { Component } from 'react';
+import { Component } from 'react';
 import { join } from 'lodash';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
-import { Input } from 'react-polymorph/lib/components/Input';
-import { Autocomplete } from 'react-polymorph/lib/components/Autocomplete';
+import TextField from '../common/TextField';
+import Autocomplete from '../common/Autocomplete';
 import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
@@ -23,8 +23,6 @@ import styles from './WalletRestoreDialog.scss';
 import headerMixin from '../mixins/HeaderBlock.scss';
 import config from '../../config';
 import DialogBackButton from '../widgets/DialogBackButton';
-import { InputOwnSkin } from '../../themes/skins/InputOwnSkin';
-import { AutocompleteOwnSkin } from '../../themes/skins/AutocompleteOwnSkin';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
@@ -263,7 +261,7 @@ export default class WalletRestoreDialog extends Component<Props> {
   }
 
   // $FlowFixMe[value-as-type]
-  walletNameInput: Input;
+  walletNameInput: TextField;
   // Refer: https://github.com/Emurgo/yoroi-frontend/pull/1009
   // recoveryPhraseInput: Autocomplete;
 
@@ -379,13 +377,12 @@ export default class WalletRestoreDialog extends Component<Props> {
         {isVerificationMode === true
           ? introMessageBlock
           : (
-            <Input
+            <TextField
               className={styles.walletName}
               inputRef={(input) => { this.walletNameInput = input; }}
               {...walletNameField.bind()}
               done={walletNameField.isValid}
               error={walletNameField.error}
-              skin={InputOwnSkin}
             />
           )
         }
@@ -393,15 +390,11 @@ export default class WalletRestoreDialog extends Component<Props> {
         <Autocomplete
           options={validWords}
           maxSelections={this.props.numberOfMnemonics}
-          // Refer: https://github.com/Emurgo/yoroi-frontend/pull/1009
-          // inputRef={(input) => { this.recoveryPhraseInput = input; }}
-          {...recoveryPhraseField.bind()}
-          done={recoveryPhraseField.isValid}
-          error={recoveryPhraseField.error}
           maxVisibleOptions={5}
           noResultsMessage={intl.formatMessage(globalMessages.recoveryPhraseNoResults)}
-          skin={AutocompleteOwnSkin}
-          preselectedOptions={recoveryPhraseField.value}
+          done={recoveryPhraseField.isValid}
+          error={recoveryPhraseField.error}
+          {...recoveryPhraseField.bind()}
         />
 
         {showPaperPassword === true ? (
@@ -412,12 +405,11 @@ export default class WalletRestoreDialog extends Component<Props> {
                   {intl.formatMessage(globalMessages.passwordDisclaimer)}
                 </div>
               )}
-              <Input
+              <TextField
                 className="paperPassword"
                 {...paperPasswordField.bind()}
                 done={validatePaperPassword()}
                 error={paperPasswordField.error}
-                skin={InputOwnSkin}
               />
             </div>
           </div>
@@ -426,19 +418,17 @@ export default class WalletRestoreDialog extends Component<Props> {
         {isVerificationMode === true ? '' : (
           <div className={styles.walletPassword}>
             <div className={walletPasswordFieldsClasses}>
-              <Input
+              <TextField
                 className="walletPassword"
                 {...walletPasswordField.bind()}
                 done={walletPasswordField.isValid}
                 error={walletPasswordField.error}
-                skin={InputOwnSkin}
               />
-              <Input
+              <TextField
                 className="repeatedPassword"
                 {...repeatedPasswordField.bind()}
                 done={repeatPassword && repeatedPasswordField.isValid}
                 error={repeatedPasswordField.error}
-                skin={InputOwnSkin}
               />
             </div>
           </div>

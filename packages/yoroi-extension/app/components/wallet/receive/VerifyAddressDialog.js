@@ -3,7 +3,7 @@
 /* eslint react/jsx-one-expression-per-line: 0 */  // the &nbsp; in the html breaks this
 
 import type { Node } from 'react';
-import React, { Component } from 'react';
+import { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { defineMessages, intlShape } from 'react-intl';
@@ -123,6 +123,7 @@ export default class VerifyAddressDialog extends Component<Props> {
               () => this.props.onCopyAddressTooltip(notificationId)
             }
             notification={this.props.notification}
+            placementTooltip="bottom-start"
           >
             <ExplorableHashContainer
               light={false}

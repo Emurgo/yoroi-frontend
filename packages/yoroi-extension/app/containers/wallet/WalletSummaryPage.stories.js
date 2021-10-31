@@ -1,7 +1,6 @@
 // @flow
 
 import type { Node } from 'react';
-import React from 'react';
 import BigNumber from 'bignumber.js';
 import { boolean, select, } from '@storybook/addon-knobs';
 import { action } from '@storybook/addon-actions';
@@ -23,7 +22,7 @@ import LocalizableError from '../../i18n/LocalizableError';
 import { GenericApiError, } from '../../api/common/errors';
 import WalletSummaryPage from './WalletSummaryPage';
 import { defaultToSelectedExplorer } from '../../domain/SelectedExplorer';
-import { THEMES } from '../../themes';
+import { THEMES } from '../../styles/utils';
 import { mockWalletProps } from './Wallet.mock';
 import { ROUTES } from '../../routes-config';
 import AddMemoDialog from '../../components/wallet/memos/AddMemoDialog';

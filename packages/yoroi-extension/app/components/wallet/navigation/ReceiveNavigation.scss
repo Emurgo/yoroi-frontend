@@ -2,7 +2,7 @@
   padding-top: 37px;
   box-shadow: 0 2px 4px 0 rgba(56, 57, 61, 0.2);
   height: 100%;
-  background-color: var(--theme-transactions-list-detail-background-color);
+  background-color: var(--yoroi-palette-gray-50);
 }
 
 .content {
@@ -21,7 +21,7 @@
   display: flex;
   flex-direction: column;
   justify-content: start;
-  overflow-y: auto;
+  overflow-y: overlay;
   min-height: 80px; // always show at least ~2 elements
   flex: 1;
   padding-bottom: 10px;
@@ -32,8 +32,8 @@
 .filterSection {
   padding-top: 20px;
   padding-bottom: 40px;
-  height: 240px; 
-  box-shadow: inset 0 -1px 12px 0 rgba(255,255,255,0.5), inset 0 2px 4px 0 rgba(56,57,61,0.2);
+  height: 240px;
+  box-shadow: inset 0 -1px 12px 0 rgba(255, 255, 255, 0.5), inset 0 2px 4px 0 rgba(56, 57, 61, 0.2);
   overflow: overlay;
 }
 .infoIcon {
@@ -42,21 +42,7 @@
     max-width: 12px;
     max-height: 12px;
     path {
-      fill: #8A92A3;
+      fill: #8a92a3;
     }
-  }
-}
-.hidden {
-  visibility: hidden;
-}
-.Tooltip {
-  :global(.SimpleBubble_root.SimpleBubble_openUpward)  {
-    margin-bottom: -5px !important;
-    margin-left: 5px;
-  }
-  div[data-bubble-container] {
-    font-size: 14px;
-    transform: translateX(-50px);
-    margin-left: 10px;
   }
 }

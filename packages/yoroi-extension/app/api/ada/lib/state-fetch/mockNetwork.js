@@ -13,6 +13,7 @@ import type {
   SignedRequestInternal,
   RemoteTransactionInput,
   TokenInfoFunc,
+  MultiAssetMintMetadataFunc
 } from './types';
 import type {
   FilterUsedRequest, FilterUsedResponse, FilterFunc,
@@ -670,5 +671,10 @@ export function genGetPoolInfo(
 
 export function genGetTokenInfo(
 ): TokenInfoFunc {
+  return async (_) => ({});
+}
+
+export function genGetMultiAssetMetadata(
+): MultiAssetMintMetadataFunc {
   return async (_) => ({});
 }

@@ -2,23 +2,23 @@
 @import '../../../themes/mixins/error-message';
 
 .dialog {
-  font-family: var(--font-medium);
+  font-weight: 500;
 
   .explanation {
     li::before {
-      content: "●";
-      margin-right:0.4em;
-      font-size:0.8em;
-      color: var(--theme-bullet-point-color);
+      content: '●';
+      margin-right: 0.4em;
+      font-size: 0.8em;
+      color: var(--yoroi-palette-gray-400);
     }
-    
+
     li {
       display: list-item;
       margin-left: 12px;
       margin-top: 8px;
       line-height: 1.38;
       font-size: 14px;
-      color: var(--cmn-default-color-grey);
+      color: var(--yoroi-palette-gray-800);
     }
 
     margin-bottom: 40px;
@@ -26,15 +26,15 @@
 
   .headerBlock {
     .header {
-      font-family: var(--font-regular);
-      color: var(--cmn-default-color-grey);
+      font-weight: 400;
+      color: var(--yoroi-palette-gray-800);
       font-size: 16px;
       line-height: 1.38;
       margin-bottom: 4px;
     }
     .content {
-      font-family: var(--font-regular);
-      color: var(--cmn-default-color-grey-3);
+      font-weight: 400;
+      color: var(--yoroi-palette-gray-400);
       font-size: 14px;
       line-height: 1.38;
       margin-bottom: 4px;
@@ -44,8 +44,8 @@
   }
 
   .rewardAmount {
-    font-family: var(--font-medium);
-    color: var(--theme-send-confirmation-dialog-send-values-color);
+    font-weight: 500;
+    color: var(--yoroi-send-confirmation-dialog-send-values-color);
     line-height: 1.38;
     font-size: 16px;
   }
@@ -61,8 +61,8 @@
   }
 
   .submitButtonSpinning {
-    @include loading-spinner("../../../assets/images/spinner-light.svg");
-  }  
+    @include loading-spinner('../../../assets/images/spinner-light.svg');
+  }
 
   .walletPassword {
     margin-top: 20px;
@@ -75,9 +75,9 @@
 }
 
 :global(.YoroiModern) .dialog {
-  min-width: var(--theme-modal-min-max-width-lg);
-  max-width: var(--theme-modal-min-max-width-lg);  
-  font-family: var(--font-regular);
+  min-width: var(--yoroi-comp-dialog-min-width-lg);
+  max-width: var(--yoroi-comp-dialog-min-width-lg);
+  font-weight: 400;
 
   .walletPassword {
     margin-top: 0;

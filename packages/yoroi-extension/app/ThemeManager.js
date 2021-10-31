@@ -1,41 +1,29 @@
 // @flow
-import React, { Component } from 'react';
 import type { Node } from 'react';
-import { map } from 'lodash';
+import React from 'react';
+import { writeCssVar } from './styles/utils';
 
 type Props = {|
-  +variables: { [key: string]: string, ... },
+  +cssVariables: { [key: string]: string, ... },
   +children?: Node,
 |};
 
 /** Allow to swap the CSS used at runtime to allow user-defined themes */
-export default class ThemeManager extends Component<Props> {
-  static defaultProps: {|children: void|} = {
-    children: undefined
-  };
-
-  componentDidMount() {
-    this.updateCSSVariables(this.props.variables);
-  }
-
-  componentDidUpdate(prevProps: Props) {
-    if (this.props.variables !== prevProps.variables) {
-      this.updateCSSVariables(this.props.variables);
+function ThemeManager({ cssVariables, children }: Props): Node {
+  React.useEffect(() => {
+    const hasCSSVars = Object.keys(cssVariables || {}).length;
+    if (hasCSSVars) {
+      Object.entries(cssVariables || {}).forEach(([varName, cssValue]) => {
+        writeCssVar(varName, cssValue);
+      });
     }
-  }
+  }, [cssVariables]);
 
-  updateCSSVariables(variables: { [key: string]: string, ... }) {
-    map(variables, (value, prop) => {
-      if (document.documentElement) {
-        document.documentElement.style.setProperty(prop, value);
-      }
-    });
-  }
-  render(): Node {
-    return (
-      <div>
-        {this.props.children}
-      </div>
-    );
-  }
+  return <div>{children}</div>;
 }
+
+export default ThemeManager;
+
+ThemeManager.defaultProps = {
+  children: null,
+};

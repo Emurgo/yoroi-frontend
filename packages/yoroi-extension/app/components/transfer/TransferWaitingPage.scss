@@ -1,7 +1,7 @@
 $margin: 20px;
 
 .component {
-  height: calc(100% - var(--theme-wallet-navigation-tab-height));
+  height: calc(100% - var(--yoroi-navigation-tab-height));
 
   .annotatedLoaderWrapper {
     :global(.LoadingSpinner_component) {
@@ -10,18 +10,18 @@ $margin: 20px;
       background-size: 60px;
       margin-bottom: 40px;
     }
-    
+
     display: flex;
     flex-flow: column;
     margin: $margin;
-    height: calc(100% - #{#{$margin}*2} - var(--theme-wallet-navigation-tab-height));
+    height: calc(100% - #{#{$margin}* 2} - var(--yoroi-navigation-tab-height));
   }
 }
 
 :global(.YoroiClassic) {
   .component {
     .annotatedLoaderWrapper {
-      height: calc(100% - #{#{$margin}*3} - var(--theme-wallet-navigation-tab-height));
+      height: calc(100% - #{#{$margin}* 3} - var(--yoroi-navigation-tab-height));
     }
   }
 }

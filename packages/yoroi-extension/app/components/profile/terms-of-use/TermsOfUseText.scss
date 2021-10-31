@@ -8,7 +8,7 @@
   }
 
   h1, h2 {
-    font-family: var(--rp-theme-font-medium);
+    font-weight: 500;
     font-size: 17px;
     margin-bottom: 11px;
   }
@@ -18,7 +18,7 @@
   }
 
   strong {
-    font-family: var(--rp-theme-font-regular);
+    font-weight: 400;
     font-size: 17px;
   }
 
@@ -28,7 +28,7 @@
   }
 
   p, li {
-    font-family: var(--rp-theme-font-regular);
+    font-weight: 400;
     font-size: 14px;
     letter-spacing: 0.5px;
     line-height: 1.38;
@@ -38,7 +38,7 @@
 }
 
 :global(.YoroiClassic) .terms {
-  color: var(--theme-terms-of-use-text-color);
+  color: var(--yoroi-terms-of-use-text-color);
 }
 
 :global(.YoroiModern) .terms {
@@ -55,8 +55,8 @@
   }
 
   p, li {
-    color: var(--theme-terms-of-use-text-color);
+    color: var(--yoroi-terms-of-use-text-color);
     font-size: 13px;
     line-height: 1.54;
-  }  
+  }
 }

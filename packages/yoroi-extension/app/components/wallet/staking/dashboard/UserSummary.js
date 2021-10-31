@@ -1,12 +1,11 @@
 // @flow
-import React, { Component } from 'react';
+import { Component } from 'react';
 import type { Node } from 'react';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
 import type { $npm$ReactIntl$MessageDescriptor, $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { Button } from 'react-polymorph/lib/components/Button';
-import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
+import { Button } from '@mui/material';
 import Card from './Card';
 import styles from './UserSummary.scss';
 import IconAda from '../../../../assets/images/dashboard/grey-total-ada.inline.svg';
@@ -145,19 +144,18 @@ export default class UserSummary extends Component<Props, State> {
             <h3 className={styles.label}>
               {intl.formatMessage(globalMessages.totalRewardsLabel)}:
             </h3>
-            {/* <TODO:RWRD2109> */}
-            Due to protocol update, the rewards are being recalculated.
-            {/* {this.renderAmount(this.props.totalRewards)} */}
+            {this.renderAmount(this.props.totalRewards)}
           </div>
           <div className={styles.footer}>
             {this.props.withdrawRewards != null && (
               <Button
-                className={classnames(styles.actionButton, 'secondary', 'withdrawButton')}
-                label={intl.formatMessage(globalMessages.withdrawLabel)}
+                className="withdrawButton"
+                variant="secondary"
                 onClick={this.props.withdrawRewards}
-                skin={ButtonSkin}
-                disabled // <TODO:RWRD2109>
-              />
+                sx={{ height: '46px', width: '144px' }}
+              >
+                {intl.formatMessage(globalMessages.withdrawLabel)}
+              </Button>
             )}
             <div
               className={styles.note}

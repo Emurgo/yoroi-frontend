@@ -1,7 +1,6 @@
 // @flow
 
 import type { Node } from 'react';
-import React from 'react';
 import BigNumber from 'bignumber.js';
 import { boolean, select, } from '@storybook/addon-knobs';
 import { action } from '@storybook/addon-actions';
@@ -29,11 +28,10 @@ import CachedRequest from '../../../stores/lib/LocalizedCachedRequest';
 import type { GetBalanceFunc } from '../../../api/common/types';
 import StakingDashboardPage from './StakingDashboardPage';
 import { mockWalletProps } from '../Wallet.mock';
-import { getVarsForTheme } from '../../../stores/base/BaseProfileStore';
 import { defaultToSelectedExplorer } from '../../../domain/SelectedExplorer';
 import { buildRoute } from '../../../utils/routing';
 import { ROUTES } from '../../../routes-config';
-import { THEMES } from '../../../themes';
+import { THEMES } from '../../../styles/utils';
 import { wrapWallet } from '../../../Routes';
 import type {
   GetDelegatedBalanceFunc,
@@ -138,7 +136,6 @@ const genBaseProps: {|
         shouldHideBalance: request.allowToggleHidden
           ? boolean('hideBalance', false)
           : false,
-        getThemeVars: getVarsForTheme,
         unitOfAccount: genUnitOfAccount(),
       },
       wallets: {
