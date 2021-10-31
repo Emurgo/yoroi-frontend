@@ -16,22 +16,22 @@ const initialInject = `
     }
   });
 
-  function ergo_request_read_access() {
+  window.ergo_request_read_access = function() {
     return new Promise(function(resolve, reject) {
       window.postMessage({
         type: "connector_connect_request/ergo",
       }, location.origin);
       connectRequests.push({ resolve: resolve, reject: reject });
     });
-  }
+  };
 
-  function ergo_check_read_access() {
+  window.ergo_check_read_access = function() {
     if (typeof ergo !== "undefined") {
       return ergo._ergo_rpc_call("ping", []);
     } else {
       return Promise.resolve(false);
     }
-  }
+  };
 
   // RPC setup
   var cardanoRpcUid = 0;
@@ -373,13 +373,16 @@ if (shouldInject()) {
                 }
                 // note: content scripts are subject to the same CORS policy as the website they are embedded in
                 // but since we are querying the website this script is injected into, it should be fine
+                const protocol = dataType.split('/')[1];
                 convertImgToBase64(getFavicon(location.origin))
                     .then(imgBase64Url => {
-                        yoroiPort.postMessage({
+                        const message = {
                             imgBase64Url,
-                            type: `yoroi_connect_request/${dataType.split('/')[1]}`,
-                            url: location.hostname
-                        });
+                            type: `yoroi_connect_request/${protocol}`,
+                            url: location.hostname,
+                            protocol,
+                        };
+                        yoroiPort.postMessage(message);
                     });
             }
         }

@@ -26,6 +26,7 @@ import type {
   GetConnectedSitesData,
   Tx,
   CardanoTx,
+  GetConnectionProtocolData,
 } from './ergo-connector/types';
 import {
   APIErrorCodes,
@@ -107,6 +108,7 @@ type PendingSign = {|
 |}
 
 let imgBase64Url: string = '';
+let connectionProtocol: string = '';
 
 type ConnectedSite = {|
   url: string,
@@ -319,13 +321,14 @@ async function withSelectedWallet<T>(
 // messages from other parts of Yoroi (i.e. the UI for the connector)
 chrome.runtime.onMessage.addListener(async (
   request: (
-    ConnectResponseData |
-    ConfirmedSignData |
-    FailedSignData |
-    TxSignWindowRetrieveData |
-    ConnectRetrieveData |
-    RemoveWalletFromWhitelistData |
-    GetConnectedSitesData
+    ConnectResponseData
+    | ConfirmedSignData
+    | FailedSignData
+    | TxSignWindowRetrieveData
+    | ConnectRetrieveData
+    | RemoveWalletFromWhitelistData
+    | GetConnectedSitesData
+    | GetConnectionProtocolData
   ),
   sender,
   sendResponse
@@ -516,10 +519,9 @@ chrome.runtime.onMessage.addListener(async (
     sendResponse(({
       sites: activeSites.map(site => site.url),
     }: ConnectedSites));
+  } else if (request.type === 'get_protocol') {
+    sendResponse({ type: connectionProtocol })
   }
-  // else if (request.type === 'get_protocol') {
-  //   sendResponse({pro: 'ergo'})
-  // }
 });
 
 async function removeWallet(
@@ -622,12 +624,8 @@ chrome.runtime.onConnectExternal.addListener(port => {
     const tabId = port.sender.tab.id;
     ports.set(tabId, port);
     port.onMessage.addListener(async message => {
-      chrome.runtime.onMessage.addListener((request,sender, sendResponse) => {
-        if(request.type === 'get_protocol') {
-          sendResponse({ type: message.protocol })
-        }
-      })
 
+      connectionProtocol = message.protocol;
       imgBase64Url = message.imgBase64Url;
       function rpcResponse(response) {
         port.postMessage({
