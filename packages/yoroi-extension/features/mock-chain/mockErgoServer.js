@@ -35,6 +35,7 @@ function _defaultSignedTransaction(
   req: { body: SignedRequest, ... },
   res: { send(arg: SignedResponse): any, ... }
 ): void {
+  req.body.id = 'b713cc0d63106c3806b5a7077cc37a294fcca0e479f26aac64e51e04ae808d75';
   const response = mockImporter.sendTx(req.body);
   res.send(response);
 }
