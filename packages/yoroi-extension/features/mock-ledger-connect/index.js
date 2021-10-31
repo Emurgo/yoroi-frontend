@@ -69,7 +69,7 @@ async function genWalletInfo(serial: string): Promise<WalletInfo> {
             supportsNativeScriptHashDerivation: true,
             supportsPoolRegistrationAsOperator: true,
             supportsPoolRetirement: true,
-            supportsScriptTransaction: true,
+            supportsMultisigTransaction: true,
           },
         },
       };
