@@ -1,5 +1,5 @@
 // @flow
-import React, { Component } from 'react';
+import { Component } from 'react';
 import type { Node } from 'react';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
@@ -196,7 +196,7 @@ export default class UpcomingRewards extends Component<Props> {
       <CustomTooltip
         key={pool.id[0] + pool.id[1]}
         toolTip={<div className={styles.poolInfoToolTip}>{tooltip}</div>}
-        isOpeningUpward={false}
+        placementTooltip="bottom"
         isPoolAvatar
       >
         <div className={styles.poolBox} key={pool.id[0] + pool.id[1]}>

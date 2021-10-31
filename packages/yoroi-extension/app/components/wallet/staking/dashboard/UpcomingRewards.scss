@@ -15,14 +15,14 @@
 .column {
   padding: 24px 24px;
   flex: 1;
-  border-right: 1px solid var(--theme-dashboard-card-vertical-separator-color);
+  border-right: 1px solid var(--yoroi-dashboard-card-vertical-separator-color);
 }
 
 .card {
   padding: 20px 20px;
   flex: 1;
   border-radius: 6px;
-  background-color: #f8f8f8;
+  background-color: var(--yoroi-palette-gray-50);
   min-width: 234px;
   max-width: 278px;
   margin-bottom: 10px;
@@ -51,8 +51,8 @@
 
 .label {
   margin-right: auto;
-  color: var(--theme-dashboard-label-color);
-  font-family: var(--font-regular);
+  color: var(--yoroi-palette-gray-600);
+  font-weight: 400;
   font-size: 14px;
   line-height: 27px;
   height: 23px;
@@ -65,7 +65,6 @@
   margin-top: 8px;
 
   .broad {
-
     .monthDay {
       margin-right: 4px;
       width: max-content;
@@ -89,12 +88,12 @@
 }
 
 .noDelegation {
-  background-color: var(--theme-dashboard-card-nodelegation-background-color);
+  background-color: var(--yoroi-dashboard-card-nodelegation-background-color);
 
   .message {
     height: 53px;
-    color: var(--cmn-default-color-grey-6);
-    font-family: var(--font-regular);
+    color: var(--yoroi-palette-gray-600);
+    font-weight: 400;
     font-size: 12px;
     line-height: 18px;
 
@@ -125,12 +124,12 @@
 
 .poolInfoToolTip {
   padding: 4px 0px;
-  color: var(--theme-dashboard-tooltip-text-color);
+  color: var(--yoroi-palette-common-white);
   font-size: 11px;
   line-height: 14px;
 
   span {
-    font-family: var(--font-light);
+    font-weight: 300;
   }
 }
 
@@ -146,5 +145,5 @@
 }
 
 .mt20 {
-    margin-top: 20px;
+  margin-top: 20px;
 }

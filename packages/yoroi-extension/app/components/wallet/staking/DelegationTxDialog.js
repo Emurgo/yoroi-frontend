@@ -4,12 +4,11 @@
 
 import type { Node } from 'react';
 import BigNumber from 'bignumber.js';
-import React, { Component } from 'react';
+import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { action, observable } from 'mobx';
 import classnames from 'classnames';
-import AmountInputSkin from '../skins/AmountInputSkin';
-import { NumericInput } from 'react-polymorph/lib/components/NumericInput';
+import { AmountInput } from '../../common/NumericInputRP';
 import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import Dialog from '../../widgets/Dialog';
@@ -22,7 +21,6 @@ import RawHash from '../../widgets/hashWrappers/RawHash';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import SpendingPasswordInput from '../../widgets/forms/SpendingPasswordInput';
-import { calcMaxBeforeDot } from '../../../utils/validations';
 import { truncateToken } from '../../../utils/formatters';
 import {
   MultiToken,
@@ -189,7 +187,7 @@ export default class DelegationTxDialog extends Component<Props> {
               hash={this.props.poolHash}
               light
               linkType="pool"
-              tooltipOpensUpward // otherwise it overlaps with amount field
+              placementTooltip="top-start"
             >
               <RawHash light>
                 {this.props.poolHash}
@@ -199,21 +197,15 @@ export default class DelegationTxDialog extends Component<Props> {
         </div>
 
         <div className={styles.amountInput}>
-          <NumericInput
+          <AmountInput
             className="amount"
             label={intl.formatMessage(globalMessages.amountLabel)}
-            maxBeforeDot={calcMaxBeforeDot(
-              this.props.getTokenInfo(
-                this.props.amountToDelegate.getDefaultEntry()
-              ).Metadata.numberOfDecimals
-            )}
-            maxAfterDot={
+            decimalPlaces={
               this.props.getTokenInfo(
                 this.props.amountToDelegate.getDefaultEntry()
               ).Metadata.numberOfDecimals
             }
             disabled
-            // AmountInputSkin props
             currency={getTokenName(
               this.props.getTokenInfo(
                 this.props.amountToDelegate.getDefaultEntry()
@@ -224,8 +216,6 @@ export default class DelegationTxDialog extends Component<Props> {
             // since the fee is unrelated to the amount you're about to stake
             total=""
             value={this.props.amountToDelegate.getDefaultEntry().amount}
-            skin={AmountInputSkin}
-            classicTheme={this.props.classicTheme}
           />
         </div>
         <div className={styles.walletPasswordFields}>

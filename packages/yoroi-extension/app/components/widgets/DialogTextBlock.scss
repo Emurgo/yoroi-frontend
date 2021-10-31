@@ -1,17 +1,19 @@
-.component, .component-bottom, .component-input {
-  color: var(--theme-bordered-box-text-color);
+.component,
+.component-bottom,
+.component-input {
+  color: var(--yoroi-palette-gray-900);
   text-align: justify;
   padding: 10px 0 24px 0;
 
   h1 {
-    color: var(--theme-dialog-title-color);
-    font-family: var(--font-medium);
+    color: var(--yoroi-palette-gray-900);
+    font-weight: 500;
     font-size: 14px;
     margin-bottom: 11px;
   }
 
   p {
-    font-family: var(--font-regular);
+    font-weight: 400;
     font-size: 12px;
     letter-spacing: 0.5px;
     line-height: 1.38;
@@ -19,7 +21,7 @@
   }
 
   p em {
-  	font-weight: bold;
+    font-weight: bold;
   }
 }
 

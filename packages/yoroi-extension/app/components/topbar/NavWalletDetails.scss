@@ -1,48 +1,48 @@
 @import '../../themes/mixins/loading-spinner';
 
 .wrapper {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    height: 100%;
-    min-height: var(--theme-navbar-height);
-    color: var(--theme-wallet-dropdown-main-text-color);
-    font-family: var(--font-regular);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+  min-height: 60px;
+  color: var(--yoroi-palette-gray-900);
+  font-weight: 400;
 }
 
 .outerWrapper {
-    display: flex;
+  display: flex;
 }
 
 .currency {
-    box-sizing: border-box;
-    height: fit-content;
-    width: fit-content;
-    border: 1px solid var(--theme-border-gray);
-    border-radius: 8px;
-    background-color: var(--cmn-default-color-grey-5);
-    margin-right: 11.5px;
+  box-sizing: border-box;
+  height: fit-content;
+  width: fit-content;
+  border: 1px solid var(--yoroi-palette-gray-200);
+  border-radius: 8px;
+  background-color: var(--yoroi-palette-gray-50);
+  margin-right: 11.5px;
 }
 .currencyAlign {
-    margin-top: 10px;
+  margin-top: 10px;
 }
 
 .content {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: space-between;
-    flex: 1;
-    width: max-content;
-    max-width: max-content;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex: 1;
+  width: max-content;
+  max-width: max-content;
 }
 
 .isLoading {
-    position: relative;
-    display: inline-block;
-    margin-left: 15px;
-    margin-bottom: 4px;
+  position: relative;
+  display: inline-block;
+  margin-left: 15px;
+  margin-bottom: 4px;
 }
 
 .amount {
@@ -54,52 +54,47 @@
     font-family: var(--font-medium);
     font-size: 16px;
     line-height: 20px;
-
-    .afterDecimal {
-        font-family: var(--font-regular);
-        font-size: 12px;
-    }
 }
 
 .highlightAmount {
-    color: var(--theme-wallet-dropdown-accent-text-color);
+  color: var(--yoroi-palette-secondary-300);
 }
 
 .toggleButton {
-    align-self: flex-start;
-    margin-left: 12px;
-    &:hover {
-        cursor: pointer;
-    }
+  align-self: flex-start;
+  margin-left: 12px;
+  &:hover {
+    cursor: pointer;
+  }
 }
 
 .text {
-    font-size: 14px;
-    line-height: 22px;
-    margin-top: 2px;
+  font-size: 14px;
+  line-height: 22px;
+  margin-top: 2px;
 }
 
 .details {
     .isLoading {
-        @include loading-spinner("../../assets/images/spinner-dark.svg", 8);
+      @include loading-spinner("../../assets/images/spinner-dark.svg", 8);
     }
     font-size: 10px;
     line-height: 14px;
     margin-top: -2px;
 
-    .afterDecimal {
-        font-size: 10px;
-        font-family: var(--font-light);
-    }
+  .afterDecimal {
+    font-size: 10px;
+    font-weight: 300;
+  }
 }
 
 .label {
-    display: inline-block;
-    color: var(--theme-wallet-dropdown-secondary-text-color);
+  display: inline-block;
+  color: var(--yoroi-palette-gray-600);
 }
 
 .info {
-    font-size: 12px;
-    line-height: 20px;
-    color: var(--theme-wallet-dropdown-secondary-text-color);
+  font-size: 12px;
+  line-height: 20px;
+  color: var(--yoroi-palette-gray-600);
 }

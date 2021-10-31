@@ -5,10 +5,8 @@ import type { Node } from 'react';
 import { intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import styles from './SignTxPage.scss';
-import { Button } from 'react-polymorph/lib/components/Button';
-import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
-import { Input } from 'react-polymorph/lib/components/Input';
-import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
+import { Button } from '@mui/material';
+import TextField from '../../../components/common/TextField';
 import globalMessages from '../../../i18n/global-messages';
 import { observer } from 'mobx-react';
 import CopyableAddress from '../../../components/widgets/CopyableAddress';
@@ -143,7 +141,7 @@ class SignTxPage extends Component<Props> {
       <>
         <span className={styles.amountRegular}>{'+'}{tokenEntry.amount.toString()}</span>
         {' '}
-        <span>   
+        <span>
           {truncateAddressShort(
            tokenEntry.identifier
           )}
@@ -338,27 +336,24 @@ class SignTxPage extends Component<Props> {
             </div>
           </div>
           <div className={styles.passwordInput}>
-            <Input
+            <TextField
               type="password"
               className={styles.walletPassword}
               {...walletPasswordField.bind()}
               error={walletPasswordField.error}
-              skin={InputOwnSkin}
             />
           </div>
           <div className={styles.wrapperBtn}>
+            <Button variant="secondary" onClick={onCancel}>
+              {intl.formatMessage(globalMessages.cancel)}
+            </Button>
             <Button
-              className="secondary"
-              label={intl.formatMessage(globalMessages.cancel)}
-              skin={ButtonSkin}
-              onClick={onCancel}
-            />
-            <Button
-              label={intl.formatMessage(globalMessages.confirm)}
-              skin={ButtonSkin}
+              variant="primary"
               disabled={!walletPasswordField.isValid}
               onClick={this.submit.bind(this)}
-            />
+            >
+              {intl.formatMessage(globalMessages.confirm)}
+            </Button>
           </div>
         </div>
       </>

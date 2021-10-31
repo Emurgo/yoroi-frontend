@@ -2,7 +2,7 @@ $opacityCommon: 0.7;
 
 .dialog {
   max-width: 635px !important;
-  font-family: var(--font-regular);
+  font-weight: 400;
 }
 
 .firstItem {
@@ -10,7 +10,7 @@ $opacityCommon: 0.7;
 }
 
 .lineText {
-  color: #242838;
+  color: var(--yoroi-palette-gray-900);
   line-height: 22px;
   font-size: 14px;
 }

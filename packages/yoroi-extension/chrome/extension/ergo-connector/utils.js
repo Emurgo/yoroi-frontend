@@ -52,6 +52,7 @@ export function mintedTokenInfo(
         TokenId: 0,
         NetworkId: 0,
         IsDefault: false,
+        IsNFT: false,
         Digest: 0,
         Identifier: tx.inputs[0].boxId,
         Metadata: {

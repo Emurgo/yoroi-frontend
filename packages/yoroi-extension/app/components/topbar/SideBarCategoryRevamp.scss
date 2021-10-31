@@ -5,10 +5,9 @@
   align-items: center;
   opacity: 0.5;
   text-decoration: none;
-  font-size: 12px;
-  font-family: var(--font-regular);
-  line-height: var(--theme-sidebar-text-line-height);
-  color: var(--theme-sidebar-text-color);
+  font-size: 0.75rem;
+  color: #FFF;
+  transition: 0.3s opacity;
 
   & + & {
     margin-top: 18px;

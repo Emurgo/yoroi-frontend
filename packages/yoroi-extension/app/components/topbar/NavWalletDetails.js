@@ -1,10 +1,10 @@
 // @flow
-import React, { Component } from 'react';
+import { Component } from 'react';
 import { observer } from 'mobx-react';
 import type { Node } from 'react';
 import classnames from 'classnames';
 import { intlShape, } from 'react-intl';
-import { splitAmount, truncateToken } from '../../utils/formatters';
+import { amountWithoutZeros, truncateToken } from '../../utils/formatters';
 
 import globalMessages from '../../i18n/global-messages';
 import styles from './NavWalletDetails.scss';
@@ -32,7 +32,6 @@ type Props = {|
   */
   +rewards: null | void | MultiToken,
   +walletAmount: null | MultiToken,
-  +assetDeposit: null | MultiToken,
   +infoText?: string,
   +showDetails?: boolean,
   +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
@@ -65,7 +64,6 @@ export default class NavWalletDetails extends Component<Props> {
       highlightTitle,
       rewards,
       walletAmount,
-      assetDeposit,
       infoText,
       showDetails,
       showEyeIcon,
@@ -74,7 +72,6 @@ export default class NavWalletDetails extends Component<Props> {
     const { intl } = this.context;
 
     const totalAmount = this.getTotalAmount();
-    const isNonZeroDeposit = !assetDeposit?.isEmpty();
 
     const showsRewards = (
       this.props.rewards !== undefined &&
@@ -106,28 +103,20 @@ export default class NavWalletDetails extends Component<Props> {
               })}
             </div>
             {showsRewards &&
-            <div className={styles.details}>
-              <div>
-                <p className={styles.label}>
-                  {intl.formatMessage(globalMessages.walletLabel)}&nbsp;
-                </p>
-                {this.renderAmountDisplay({ shouldHideBalance, amount: walletAmount })}
-              </div>
-              <div>
-                <p className={styles.label}>
-                  {intl.formatMessage(globalMessages.rewardsLabel)}&nbsp;
-                </p>
-                {this.renderAmountDisplay({ shouldHideBalance, amount: rewards })}
-              </div>
-              {isNonZeroDeposit ? (
+              <div className={styles.details}>
                 <div>
                   <p className={styles.label}>
-                    {intl.formatMessage(globalMessages.assetDepositLabel)}&nbsp;
+                    {intl.formatMessage(globalMessages.walletLabel)}&nbsp;
                   </p>
-                  {this.renderAmountDisplay({ shouldHideBalance, amount: assetDeposit })}
+                  {this.renderAmountDisplay({ shouldHideBalance, amount: walletAmount })}
                 </div>
-              ) : null}
-            </div>
+                <div>
+                  <p className={styles.label}>
+                    {intl.formatMessage(globalMessages.rewardsLabel)}&nbsp;
+                  </p>
+                  {this.renderAmountDisplay({ shouldHideBalance, amount: rewards })}
+                </div>
+              </div>
             }
             {this.props.rewards === undefined && (
               <div className={styles.info}>
@@ -181,15 +170,9 @@ export default class NavWalletDetails extends Component<Props> {
     if (request.shouldHideBalance) {
       balanceDisplay = (<span>{hiddenAmount}</span>);
     } else {
-      const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
-        shiftedAmount,
-        tokenInfo.Metadata.numberOfDecimals,
-      );
-
       balanceDisplay = (
         <>
-          {beforeDecimalRewards}
-          <span className={styles.afterDecimal}>{afterDecimalRewards}</span>
+          {amountWithoutZeros(shiftedAmount.toFormat(tokenInfo.Metadata.numberOfDecimals))}
         </>
       );
     }

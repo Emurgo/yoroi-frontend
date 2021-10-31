@@ -534,6 +534,7 @@ export default class Transaction extends Component<Props, State> {
             () => this.props.onCopyAddressTooltip(request.address.address, notificationElementId)
           }
           notification={this.props.notification}
+          placementTooltip="bottom-start"
         >
           <ExplorableHashContainer
             selectedExplorer={this.props.selectedExplorer}

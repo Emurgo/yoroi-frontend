@@ -1,6 +1,5 @@
 // @flow
 
-import React from 'react';
 import type { Node } from 'react';
 import SettingsContainer from './SettingsContainer';
 import { withScreenshot } from 'storycap';

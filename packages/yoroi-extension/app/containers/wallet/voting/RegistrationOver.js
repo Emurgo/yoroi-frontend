@@ -1,6 +1,6 @@
 // @flow
 import type { Node } from 'react';
-import React, { Component } from 'react';
+import { Component } from 'react';
 import FullscreenMessage from '../../../components/wallet/layouts/FullscreenMessage';
 import { observer } from 'mobx-react';
 

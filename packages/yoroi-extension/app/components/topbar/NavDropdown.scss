@@ -20,7 +20,7 @@
   transition: background-color .4s ;
   &:hover {
     cursor: pointer;
-    background-color: #EDEDED;
+    background-color: var(--yoroi-palette-gray-100);
   }
 }
 

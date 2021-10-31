@@ -1,12 +1,12 @@
 .content {
   overflow: auto;
-  border-radius: 0 0 var(--theme-wallet-dropdown-border-radius) var(--theme-wallet-dropdown-border-radius);
-  background-color: var(--theme-wallet-dropdown-background-color);
-  box-shadow: var(--theme-wallet-dropdown-box-shadow);
-  min-width: var(--theme-wallet-dropdown-min-width);
+  border-radius: 0 0 8px 8px;
+  background-color: var(--yoroi-palette-common-white);
+  box-shadow: 0 10px 12px 0 rgba(0, 0, 0, 0.16);
+  min-width: 700px;
   position: absolute;
-  top: calc(var(--theme-navbar-height) + 5px);
-  right: calc(-1 * var(--theme-page-container-side-padding));
+  top: 65px;
+  right: 0;
 }
 
 .buttonWrapper {

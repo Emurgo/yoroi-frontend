@@ -24,7 +24,7 @@
     transform: scale(0.9);
   }
   & svg > path {
-    fill: var(--theme-sidebar-icon-color);
+    fill: white;
   }
 }
 
@@ -32,12 +32,12 @@
   display: flex;
   flex-direction: column;
   flex: 1;
-  & > *:nth-child(5) {
-    position: relative;
-    padding-bottom: 20px;
-    margin-bottom: 20px;
-  }
-  & > *:nth-child(5)::after {
+  // & > *:nth-child(5) {
+  //   position: relative;
+  //   padding-bottom: 20px;
+  //   margin-bottom: 20px;
+  // }
+  & > *:nth-child(4)::after {
     content: '';
     position: absolute;
     width: 24px;

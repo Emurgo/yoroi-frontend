@@ -17,11 +17,11 @@
 
   progress[value]::-webkit-progress-bar {
     height: 4px;
-    background-color: #dce0e9;
+    background-color: var(--yoroi-palette-gray-200);
   }
 
   progress[value]::-webkit-progress-value {
     height: 4px;
-    background-color: #17d1aa;
+    background-color: var(--yoroi-palette-secondary-300);
   }
 }

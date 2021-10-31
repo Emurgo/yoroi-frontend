@@ -1,15 +1,14 @@
 // @flow
-import React, { Component, } from 'react';
+import { Component, } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import classnames from 'classnames';
-import { Input } from 'react-polymorph/lib/components/Input';
+import TextField from '../../common/TextField';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
 import styles from './InlineEditingInput.scss';
 import config from '../../../config';
-import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
@@ -131,7 +130,7 @@ export default class InlineEditingInput extends Component<Props, State> {
   }
 
   // $FlowFixMe[value-as-type]
-  inputField: Input;
+  inputField: TextField;
 
   render(): Node {
     const { validator } = this;
@@ -163,20 +162,16 @@ export default class InlineEditingInput extends Component<Props, State> {
         aria-hidden
       >
 
-        <Input
+        <TextField
           className={inputStyles}
-          themeOverrides={styles}
           type="text"
+          {...inputField.bind()}
           label={inputFieldLabel}
           value={isActive ? inputField.value : inputFieldValue}
           onChange={inputField.onChange}
-          onFocus={inputField.onFocus}
-          onBlur={inputField.onBlur}
           onKeyDown={event => this.handleInputKeyDown(event)}
-          error={isActive ? inputField.error : null}
-          disabled={!isActive}
+          error={isActive ? inputField.error : ''}
           inputRef={(input) => { this.inputField = input; }}
-          skin={InputOwnSkin}
         />
 
         {isActive && (

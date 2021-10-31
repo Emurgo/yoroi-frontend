@@ -1,5 +1,5 @@
 // @flow
-import React, { Component } from 'react';
+import { Component } from 'react';
 import type { Node } from 'react';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
@@ -58,7 +58,6 @@ export type GraphData = {|
 |};
 
 type Props = {|
-  +themeVars: Object,
   +graphData: GraphData,
   +stakePools: {| error: LocalizableError, |} | {| pools: null | Array<Node | void> |},
   +userSummary: Node,
@@ -161,7 +160,6 @@ export default class StakingDashboard extends Component<Props> {
     const items = graphData.items;
     return (
       <GraphWrapper
-        themeVars={this.props.themeVars}
         tabs={[
           {
             tabName: intl.formatMessage(globalMessages.rewardsLabel),

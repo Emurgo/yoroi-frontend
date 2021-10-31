@@ -1,13 +1,10 @@
 // @flow
-import React, { Component } from 'react';
+import { Component } from 'react';
 import type { Node } from 'react';
 import { intlShape } from 'react-intl';
 import moment from 'moment';
 import { observer } from 'mobx-react';
-import classnames from 'classnames';
-import { Button } from 'react-polymorph/lib/components/Button';
-import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
-
+import { LoadingButton } from '@mui/lab';
 import Notice from '../../domain/Notice';
 import NoticeBlock from './NoticeBlock';
 import globalMessages from '../../i18n/global-messages';
@@ -19,7 +16,7 @@ type Props = {|
   +loadedNotices: Array<Notice>,
   +onLoadMore: void => Promise<void>,
   +isLoading: boolean,
-  +hasMoreToLoad: boolean
+  +hasMoreToLoad: boolean,
 |};
 
 const DATE_FORMAT = 'YYYY-MM-DD';
@@ -33,7 +30,7 @@ type NoticesByDate = {|
 
 @observer
 export default class NoticeBoard extends Component<Props> {
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = { intl: intlShape.isRequired };
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = { intl: intlShape.isRequired };
   localizedDateFormat: string = 'MM/DD/YYYY';
 
   // eslint-disable-next-line camelcase
@@ -94,11 +91,6 @@ export default class NoticeBoard extends Component<Props> {
     } = this.props;
     const noticeGroup = this.groupNoticesByDay(loadedNotices);
 
-    const buttonClasses = classnames([
-      'primary',
-      styles.loadMoreNoticesButton,
-    ]);
-
     return (
       <div className={styles.component}>
         <div className={styles.notices}>
@@ -106,7 +98,7 @@ export default class NoticeBoard extends Component<Props> {
             <div className={styles.group} key={group.strDate}>
               <div className={styles.groupDate}>{this.localizedDate(group)}</div>
               <div>
-                {group.notices.map((notice) => (
+                {group.notices.map(notice => (
                   <NoticeBlock
                     key={`${group.strDate}-${notice.id}`}
                     notice={notice}
@@ -117,15 +109,16 @@ export default class NoticeBoard extends Component<Props> {
             </div>
           ))}
         </div>
-        {hasMoreToLoad &&
-          <Button
-            disabled={isLoading}
-            className={buttonClasses}
-            label={intl.formatMessage(globalMessages.loadMoreButtonLabel)}
+        {hasMoreToLoad && (
+          <LoadingButton
+            sx={{ width: '287px' }}
+            variant="primary"
             onClick={onLoadMore}
-            skin={ButtonSkin}
-          />
-        }
+            disabled={isLoading}
+          >
+            {intl.formatMessage(globalMessages.loadMoreButtonLabel)}
+          </LoadingButton>
+        )}
       </div>
     );
   }
