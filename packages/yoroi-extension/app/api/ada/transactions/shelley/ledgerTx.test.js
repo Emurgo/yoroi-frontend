@@ -86,7 +86,9 @@ test('Generate address parameters', async () => {
       networkId: Number.parseInt(ChainNetworkId, 10),
       path,
       addressingMap: () => undefined,
-    })).toEqual(({
+    }))
+    // $FlowFixMe
+    .toEqual(({
       type: AddressType.BASE_PAYMENT_KEY_STAKE_KEY,
       params: {
         spendingPath: path,
