@@ -4,7 +4,7 @@
   border-radius: 2px;
   background-color: #f0f3f5;
   box-shadow: 0 2px 5px 3px rgba(0, 0, 0, 0.06);
-  font-family: var(--font-regular);
+  font-weight: 400;
 }
 
 .header {
@@ -38,7 +38,7 @@
       h3 {
         margin-top: 0;
         margin-bottom: 2px;
-        font-family: var(--font-medium);
+        font-weight: 500;
         line-height: 19px;
         letter-spacing: 0;
       }

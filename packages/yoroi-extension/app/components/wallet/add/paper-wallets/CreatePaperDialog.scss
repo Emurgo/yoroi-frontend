@@ -3,7 +3,7 @@
 
 .component {
   text-align: center;
-  font-family: var(--font-regular);
+  font-weight: 400;
   line-height: 22px;
 
   .downloadIcon {
@@ -21,27 +21,27 @@
   .downloadIcon:focus {
     outline: none;
   }
-  
+
   .labelDownload {
     font-size: 16px;
     margin-bottom: 6px;
   }
-  
+
   .labelDownloadSize {
     font-size: 14px;
-    color: var(--cmn-default-color-grey-3);
+    color: var(--yoroi-palette-gray-400);
   }
-  
-  .walletLoaderWrapper { 
+
+  .walletLoaderWrapper {
     .walletLoaderTitle {
       word-break: break-all;
       font-size: 16px;
       margin-bottom: 6px;
     }
-  
+
     .walletLoaderProgressInfo {
       font-size: 14px;
-      color: var(--cmn-default-color-grey-3);
+      color: var(--yoroi-palette-gray-400);
       word-break: break-word;
     }
   }
@@ -50,7 +50,7 @@
 :global(.YoroiClassic) {
   .component {
     .downloadIcon {
-      background-image: url("../../../../assets/images/paper-wallet/download-certificate-classic.inline.svg");
+      background-image: url('../../../../assets/images/paper-wallet/download-certificate-classic.inline.svg');
     }
   }
 }
@@ -58,7 +58,7 @@
 :global(.YoroiModern) {
   .component {
     .downloadIcon {
-      background-image: url("../../../../assets/images/paper-wallet/download-certificate-modern.inline.svg");
-    }    
+      background-image: url('../../../../assets/images/paper-wallet/download-certificate-modern.inline.svg');
+    }
   }
 }

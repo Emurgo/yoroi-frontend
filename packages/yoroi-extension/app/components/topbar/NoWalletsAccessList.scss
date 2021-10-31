@@ -7,7 +7,6 @@
   justify-content: center;
   padding: 40px 36px;
   text-align: center;
-  font-family: var(--font-regular);
 }
 .header {
   display: flex;
@@ -17,7 +16,7 @@
   }
   h3 {
     font-size: 24px;
-    color: var(--theme-wallet-dropdown-main-text-color);
+    color: var(--yoroi-palette-gray-900);
     line-height: 30px;
   }
 }
@@ -26,14 +25,14 @@
 }
 
 .noWallets {
-  color: var(--theme-nav-color);
-  font-size: 16px;
+  color: var(--yoroi-palette-gray-600);
+  font-size: 1rem;
   margin-bottom: 4px;
   color: inherit;
   line-height: 22px;
 }
 .goToWallets {
-  color: var(--theme-nav-color);
+  color: var(--yoroi-palette-gray-600);
   font-size: 12px;
   line-height: 20px;
   color: inherit;

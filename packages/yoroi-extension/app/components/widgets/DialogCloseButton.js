@@ -4,7 +4,7 @@ import type { Node } from 'react';
 import { observer } from 'mobx-react';
 
 import CloseCross from '../../assets/images/cross-dark.inline.svg';
-import styles from './DialogCloseButton.scss';
+import { IconButton } from '@mui/material';
 
 type Props = {|
   +onClose?: void => PossiblyAsync<void>,
@@ -13,20 +13,26 @@ type Props = {|
 
 @observer
 export default class DialogCloseButton extends Component<Props> {
-  static defaultProps: {|icon: null, onClose: void|} = {
+  static defaultProps: {| icon: null, onClose: void |} = {
     onClose: undefined,
-    icon: null
+    icon: null,
   };
 
   render(): Node {
     const { onClose, icon } = this.props;
-    const Svg = (icon != null && icon !== '')
-      ? icon
-      : CloseCross;
+    const Svg = icon != null && icon !== '' ? icon : CloseCross;
     return (
-      <button tabIndex="-1" type="button" onClick={onClose} className={styles.component}>
+      <IconButton
+        onClick={onClose}
+        sx={{
+          position: 'absolute',
+          top: '18px',
+          right: '30px',
+          marginLeft: '5px',
+        }}
+      >
         <Svg />
-      </button>
+      </IconButton>
     );
   }
 }

@@ -24,6 +24,7 @@ import {
   TransactionSigningMode,
   TxOutputDestinationType,
   TxAuxiliaryDataType,
+  StakeCredentialParamsType,
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 import { toHexOrBase58 } from '../../lib/storage/bridge/utils';
@@ -93,7 +94,7 @@ export async function createLedgerSignTxPayload(request: {|
         votingPublicKeyHex: votingPublicKey.replace(/^0x/, ''),
         stakingPath: stakingKeyPath,
         rewardsDestination: {
-          type: AddressType.REWARD,
+          type: AddressType.REWARD_KEY,
           params: {
             stakingPath: stakingKeyPath,
           },
@@ -118,7 +119,8 @@ export async function createLedgerSignTxPayload(request: {|
       certificates: ledgerCertificates.length === 0 ? null : ledgerCertificates,
       auxiliaryData,
       validityIntervalStart: undefined,
-    }
+    },
+    additionalWitnessPaths: [],
   };
 }
 
@@ -233,7 +235,10 @@ function formatLedgerWithdrawals(
     }
     result.push({
       amount: withdrawalAmount.to_str(),
-      path: addressing.path,
+      stakeCredential: {
+        type: StakeCredentialParamsType.KEY_PATH,
+        keyPath: addressing.path,
+      },
     });
   }
   return result;
@@ -267,7 +272,10 @@ function formatLedgerCertificates(
       result.push({
         type: CertificateType.STAKE_REGISTRATION,
         params: {
-          path: getPath(registrationCert.stake_credential()),
+          stakeCredential: {
+            type: StakeCredentialParamsType.KEY_PATH,
+            keyPath: getPath(registrationCert.stake_credential()),
+          },
         }
       });
       continue;
@@ -277,7 +285,10 @@ function formatLedgerCertificates(
       result.push({
         type: CertificateType.STAKE_DEREGISTRATION,
         params: {
-          path: getPath(deregistrationCert.stake_credential()),
+          stakeCredential: {
+            type: StakeCredentialParamsType.KEY_PATH,
+            keyPath: getPath(deregistrationCert.stake_credential()),
+          },
         },
       });
       continue;
@@ -287,7 +298,10 @@ function formatLedgerCertificates(
       result.push({
         type: CertificateType.STAKE_DELEGATION,
         params: {
-          path: getPath(delegationCert.stake_credential()),
+          stakeCredential: {
+            type: StakeCredentialParamsType.KEY_PATH,
+            keyPath: getPath(delegationCert.stake_credential()),
+          },
           poolKeyHashHex: Buffer.from(delegationCert.pool_keyhash().to_bytes()).toString('hex'),
         },
       });
@@ -333,10 +347,11 @@ export function toLedgerAddressParameters(request: {|
         }
         const hashInAddress = Buffer.from(wasmHash.to_bytes()).toString('hex');
 
+        // $FlowFixMe
         return {
           // can't always know staking key path since address may not belong to the wallet
           // (mangled address)
-          type: AddressType.BASE,
+          type: AddressType.BASE_PAYMENT_KEY_STAKE_KEY,
           params: {
             spendingPath: request.path,
             stakingKeyHashHex: hashInAddress,
@@ -344,7 +359,7 @@ export function toLedgerAddressParameters(request: {|
         };
       }
       return {
-        type: AddressType.BASE,
+        type: AddressType.BASE_PAYMENT_KEY_STAKE_KEY,
         params: {
           spendingPath: request.path,
           stakingPath: addressing.path,
@@ -357,7 +372,7 @@ export function toLedgerAddressParameters(request: {|
     if (ptrAddr) {
       const pointer = ptrAddr.stake_pointer();
       return {
-        type: AddressType.POINTER,
+        type: AddressType.POINTER_KEY,
         params: {
           spendingPath: request.path,
           stakingBlockchainPointer: {
@@ -373,7 +388,7 @@ export function toLedgerAddressParameters(request: {|
     const enterpriseAddr = RustModule.WalletV4.EnterpriseAddress.from_address(request.address);
     if (enterpriseAddr) {
       return {
-        type: AddressType.ENTERPRISE,
+        type: AddressType.ENTERPRISE_KEY,
         params: {
           spendingPath: request.path,
         },
@@ -384,7 +399,7 @@ export function toLedgerAddressParameters(request: {|
     const rewardAddr = RustModule.WalletV4.RewardAddress.from_address(request.address);
     if (rewardAddr) {
       return {
-        type: AddressType.REWARD,
+        type: AddressType.REWARD_KEY,
         params: {
           stakingPath: request.path, // reward addresses use spending path
         },

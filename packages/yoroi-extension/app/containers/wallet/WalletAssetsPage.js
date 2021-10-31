@@ -11,8 +11,10 @@ import {
 import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import { genFormatTokenAmount, genLookupOrFail, getTokenIdentifierIfExists, getTokenStrictName } from '../../stores/stateless/tokenHelpers';
-import { truncateToken } from '../../utils/formatters';
+import { amountWithoutZeros, truncateToken } from '../../utils/formatters';
 import AssetsPage from '../../components/wallet/assets/AssetsPage';
+import type { TxRequests } from '../../stores/toplevel/TransactionsStore';
+
 
 export type GeneratedData = typeof WalletAssetsPage.prototype.generated;
 
@@ -36,11 +38,23 @@ export default class WalletAssetsPage extends Component<InjectedOrGenerated<Gene
         })).map(token => ({
           name: truncateToken(getTokenStrictName(token.info) ?? '-'),
           id: (getTokenIdentifierIfExists(token.info) ?? '-'),
-          amount: genFormatTokenAmount(getTokenInfo)(token.entry)
+          amount: amountWithoutZeros(genFormatTokenAmount(getTokenInfo)(token.entry)),
         }));
       })();
 
-    return <AssetsPage assetsList={assetsList} />
+    const txRequests = this.generated.stores.transactions.getTxRequests(publicDeriver);
+    const assetDeposit = txRequests.requests.getAssetDepositRequest.result || null;
+    const { stores } = this.generated;
+    const { profile } = stores;
+    const isNonZeroDeposit = !assetDeposit?.isEmpty();
+    return (
+      <AssetsPage
+        assetsList={assetsList}
+        getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)} 
+        assetDeposit={isNonZeroDeposit ? assetDeposit : null}
+        shouldHideBalance={profile.shouldHideBalance}
+      />
+    )
   }
 
   @computed get generated(): {|
@@ -53,8 +67,12 @@ export default class WalletAssetsPage extends Component<InjectedOrGenerated<Gene
         getBalanceRequest: {|
           result: ?MultiToken,
         |},
+        getTxRequests: (PublicDeriver<>) => TxRequests
       |},
-      wallets: {| selected: null | PublicDeriver<> |}
+      wallets: {| selected: null | PublicDeriver<> |},
+      profile: {|
+        shouldHideBalance: boolean,
+      |},
     |}
     |} {
     if (this.props.generated !== undefined) {
@@ -84,7 +102,11 @@ export default class WalletAssetsPage extends Component<InjectedOrGenerated<Gene
               result: requests.getBalanceRequest.result,
             };
           })(),
-        }
+          getTxRequests: stores.transactions.getTxRequests,
+        },
+        profile: {
+          shouldHideBalance: stores.profile.shouldHideBalance,
+        },
     } })
   }
 };

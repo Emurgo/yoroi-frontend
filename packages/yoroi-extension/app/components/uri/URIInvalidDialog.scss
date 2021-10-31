@@ -1,6 +1,6 @@
 .component {
 
-  font-family: var(--font-regular);
+  font-weight: 400;
   font-size: 16px;
 
   .warningText {
@@ -11,7 +11,8 @@
 
   .address {
     letter-spacing: 0px;
-    font-family: var(--font-mono-regular);
+    font-family: 'RobotoMono';
+    font-weight: 400;
     word-break: break-all;
     font-size: 16px;
     line-height: 23px;

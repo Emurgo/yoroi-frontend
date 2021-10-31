@@ -103,7 +103,7 @@ export default class TransferSummaryPage extends Component<Props> {
     ];
     return (
       <Dialog
-        styleOverride={{ '--theme-modal-min-max-width-cmn': '680px' }}
+        styleOverride={{ '--yoroi-comp-dialog-min-width-md': '680px' }}
         title={this.props.dialogTitle}
         actions={actions}
         closeButton={<DialogCloseButton />}

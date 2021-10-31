@@ -214,6 +214,8 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
         return this.stores.wallets.refreshWalletFromRemote(request.publicDeriver);
       }
     }).promise;
+
+    this.stores.transactions.clearSubmittedTransactions(request.publicDeriver);
   };
 
   @action _removeWallet: {|

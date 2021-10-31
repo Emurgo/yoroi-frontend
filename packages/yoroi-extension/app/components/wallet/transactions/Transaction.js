@@ -199,6 +199,10 @@ const stateTranslations = defineMessages({
     id: 'wallet.transaction.state.failed',
     defaultMessage: '!!!failed',
   },
+  submitted: {
+    id: 'wallet.transaction.state.submitted',
+    defaultMessage: '!!!submitted',
+  },
 });
 
 type Props = {|
@@ -319,6 +323,9 @@ export default class Transaction extends Component<Props, State> {
     }
     if (state === TxStatusCodes.PENDING) {
       return intl.formatMessage(stateTranslations.pending);
+    }
+    if (state === TxStatusCodes.SUBMITTED) {
+      return intl.formatMessage(stateTranslations.submitted);
     }
     if (state < 0) {
       return intl.formatMessage(stateTranslations.failed);
@@ -527,6 +534,7 @@ export default class Transaction extends Component<Props, State> {
             () => this.props.onCopyAddressTooltip(request.address.address, notificationElementId)
           }
           notification={this.props.notification}
+          placementTooltip="bottom-start"
         >
           <ExplorableHashContainer
             selectedExplorer={this.props.selectedExplorer}
@@ -566,7 +574,7 @@ export default class Transaction extends Component<Props, State> {
     const { isExpanded } = this.state;
     const { intl } = this.context;
     const isFailedTransaction = state < 0;
-    const isPendingTransaction = state === TxStatusCodes.PENDING;
+    const isPendingTransaction = state === TxStatusCodes.PENDING || state === TxStatusCodes.SUBMITTED;
 
     const componentStyles = classnames([
       styles.component,

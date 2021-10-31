@@ -65,8 +65,8 @@ import {
   networks, isJormungandr, isCardanoHaskell, isErgo,
 } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import NavBarRevamp from '../../components/topbar/NavBarRevamp';
-import { withLayout } from '../../themes/context/layout'
-import type { LayoutComponentMap } from '../../themes/context/layout'
+import { withLayout } from '../../styles/context/layout'
+import type { LayoutComponentMap } from '../../styles/context/layout'
 
 export type GeneratedData = typeof WalletAddPage.prototype.generated;
 

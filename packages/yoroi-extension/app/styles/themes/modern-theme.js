@@ -1,10 +1,13 @@
 // @flow
 import { createTheme } from '@mui/material/styles';
-import { RubikFonts } from '../fonts';
+import { RubikFonts, RobotoMonoFonts } from '../fonts';
 import {
   ModernButton,
   ModernCheckbox,
   ModernTextField,
+  ModernOutlinedInput,
+  ModernFormHelperText,
+  ModernFormControl,
   ModernMenu,
   ModernMenuItem,
   ModernTabs,
@@ -12,61 +15,127 @@ import {
   ModernChip,
   ModernTooltip,
   ModernInputLabel,
+  ModernSelect,
 } from '../overrides';
+import { commonTheme } from './common-theme';
+import { deepmerge } from '@mui/utils';
 
-export const modernTheme: Object = createTheme({
+const fontFamily = ['Rubik', 'sans-serif'].join(',');
+
+const theme = {
   name: 'modern',
   components: {
     MuiCssBaseline: {
       styleOverrides: `
-        ${RubikFonts}
-      `,
+      ${RubikFonts}
+      ${RobotoMonoFonts}
+    `,
     },
     MuiButton: ModernButton,
     MuiCheckbox: ModernCheckbox,
     MuiTextField: ModernTextField,
+    MuiOutlinedInput: ModernOutlinedInput,
+    MuiFormHelperText: ModernFormHelperText,
+    MuiFormControl: ModernFormControl,
+    MuiSelect: ModernSelect,
     MuiInputLabel: ModernInputLabel,
-    MuiMenuItem: ModernMenuItem,
     MuiMenu: ModernMenu,
+    MuiMenuItem: ModernMenuItem,
     MuiTabs: ModernTabs,
     MuiTabPanel: ModernTabPanel,
     MuiChip: ModernChip,
     MuiTooltip: ModernTooltip,
   },
   palette: {
+    /* `main` is added since MUI required it but we don't use it at all */
     primary: {
-      main: 'hsl(232, 100%, 64%)',
+      main: '#3154CB',
+      '50': '#F0F2FB',
+      '100': '#164FD6',
+      '200': '#3154CB',
+      '300': '#1A44B7',
+      contrastText: '#FFF',
     },
     secondary: {
-      main: 'hsl(167, 80%, 45%)',
-      light: 'hsl(168 48% 86%)',
-      dark: 'hsl(168 82% 49%)',
-      contrastText: 'hsl(0deg 0% 100%)',
+      main: '#16E3BA',
+      '50': '#F4FDFA', // ?
+      '100': '#C9ECE5', // light
+      '200': '#16E3BA', // main - hover btn color -
+      '300': '#17D1AA', // dark
+      contrastText: '#FFF',
     },
-    error: {
-      main: 'hsl(345, 100%, 54%)',
+    background: {
+      sidebar: {
+        start: '#1e46bd',
+        end: '#4760ff',
+        text: '#FFFFFF',
+      },
+      banner: {
+        warning: '#f5a623',
+      },
+      walletAdd: {
+        title: '#ffffff',
+        subtitle: '#ffffff',
+      },
     },
-    warning: {
-      main: 'hsl(38, 92%, 55%)',
-    },
-    input: {
-      main: 'hsl(38, 92%, 55%)',
-    },
-
-    grey: {
-      '50': 'hsl(201, 22%, 95%)',
-      '100': 'hsl(216, 26%, 93%)',
-      '200': 'hsl(219, 23%, 89%)',
-      '300': 'hsl(222, 19%, 81%)',
-      '400': 'hsl(221, 17%, 70%)',
-      '500': 'hsl(221, 12%, 59%)',
-      '600': 'hsl(221, 10%, 47%)',
-      '700': 'hsl(228, 15%, 34%)',
-      '800': 'hsl(229, 20%, 28%)',
-      '900': 'hsl(228, 22%, 18%)',
-    },
+  },
+  shape: {
+    borderRadius: 8,
   },
   typography: {
-    fontFamily: '"Rubik", sans-serif',
+    fontFamily,
+    h1: {
+      fontWeight: 500,
+      fontSize: '1.875rem',
+      fontFamily,
+    },
+    h2: {
+      fontWeight: 500,
+      fontSize: '1.75rem',
+      fontFamily,
+    },
+    h3: {
+      fontWeight: 500,
+      fontSize: '1.5rem',
+      fontFamily,
+    },
+    h4: {
+      fontWeight: 500,
+      fontSize: '1.25rem',
+      fontFamily,
+    },
+    h5: {
+      fontWeight: 500,
+      fontSize: '1.125rem',
+      fontFamily,
+    },
+    h6: {
+      fontWeight: 500,
+      fontSize: '1rem',
+      fontFamily,
+      textTransform: 'uppercase',
+    },
+    h7: {
+      fontWeight: 500,
+      fontSize: '0.875rem',
+      fontFamily,
+      textTransform: 'uppercase',
+    },
+    body1: {
+      fontWeight: 400,
+      fontSize: '1rem',
+      fontFamily,
+    },
+    body2: {
+      fontWeight: 400,
+      fontSize: '0.875rem',
+      fontFamily,
+    },
+    body3: {
+      fontWeight: 400,
+      fontSize: '0.75rem',
+      fontFamily,
+    },
   },
-});
+};
+export const modernTheme: Object = createTheme(deepmerge(commonTheme, theme));

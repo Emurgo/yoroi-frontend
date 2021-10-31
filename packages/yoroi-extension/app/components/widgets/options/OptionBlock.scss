@@ -10,16 +10,16 @@
   }
 
   .optionBlockWrapper {
-    font-family: var(--font-regular);
+    font-weight: 400;
     letter-spacing: 0;
 
     // TITLE BLOCK
     .optionSubmitButton {
-      font-family: var(--font-regular);
+      font-weight: 400;
       display: flex;
       align-items: center;
       padding: 11px 30px;
-      background-color: var(--cmn-color-white);
+      background-color: var(--yoroi-palette-common-white);
       width: 100%;
       cursor: pointer;
       transition: 100ms;
@@ -28,10 +28,9 @@
       .optionTitle {
         font-size: 18px;
         line-height: 22px;
-        color: var(--theme-wallet-add-option-dialog-item-title-color);
+        color: var(--yoroi-wallet-add-option-dialog-item-title-color);
         text-align: left;
-        font-family: var(--font-medium);
-        font-weight: var(--font-semibold);
+        font-weight: 500;
         transition: 100ms;
       }
 
@@ -53,15 +52,15 @@
     // LEARN MORE TEXT BLOCK
     .learnMoreTextBlock {
       a {
-        @include underline(var(--theme-underline-dark-color));
-        color: var(--theme-wallet-add-option-dialog-item-title-color);
+        @include underline(var(--yoroi-palette-gray-800));
+        color: var(--yoroi-wallet-add-option-dialog-item-title-color);
       }
 
       overflow: hidden;
       max-height: 0;
       transition: 300ms linear;
       will-change: height;
-      background-color: var(--theme-wallet-add-option-dialog-item-learn-more-block-bg-color);
+      background-color: var(--yoroi-palette-gray-50);
 
       .learnMoreTextWrapper {
         padding: 20px 40px 15px;
@@ -80,8 +79,8 @@
 
     // LEARN MORE BUTTON
     .learnMoreButton {
-      color: var(--theme-wallet-add-option-dialog-item-learn-more-button-color);
-      background-color: var(--theme-wallet-add-option-dialog-item-learn-more-button-bg-color);
+      color: var(--yoroi-palette-gray-400);
+      background-color: var(--yoroi-wallet-add-option-dialog-item-learn-more-button-bg-color);
       display: block;
       font-size: 14px;
       text-align: center;
@@ -93,11 +92,11 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-family: var(--font-regular);
+      font-weight: 400;
       transition: 100ms;
 
       &:hover {
-        box-shadow: 0 8px 10px 0px rgba(24,26,30, .06);
+        box-shadow: 0 8px 10px 0px rgba(24, 26, 30, 0.06);
       }
 
       svg {
@@ -125,7 +124,7 @@
       .optionSubmitButton {
         &:hover {
           .optionTitle {
-            color: var(--theme-default-main-color);
+            color: var(--yoroi-palette-secondary-300);
           }
         }
 
@@ -134,7 +133,7 @@
             background-image: url(../../../assets/images/my-wallets/symbol_ada.inline.svg);
           }
           &.cardanoTestnet {
-             background-image: url(../../../assets/images/my-wallets/symbol_adaTestnet.inline.svg);
+            background-image: url(../../../assets/images/my-wallets/symbol_adaTestnet.inline.svg);
           }
           &.ergo {
             background-image: url(../../../assets/images/my-wallets/symbol_ergo.inline.svg);
@@ -148,7 +147,7 @@
             background-size: 50px;
           }
           &.alonzoWhiteTestnet {
-             background-image: url(../../../assets/images/my-wallets/symbol_adaTestnet.inline.svg);
+            background-image: url(../../../assets/images/my-wallets/symbol_adaTestnet.inline.svg);
           }
           // CONNECT HARDWARE WALLET
           &.connectLedger {
@@ -194,7 +193,7 @@
       .optionSubmitButton {
         &:hover {
           .optionTitle {
-            color: var(--theme-default-color-blue);
+            color: var(--yoroi-palette-primary-300);
           }
         }
 
@@ -217,7 +216,7 @@
             background-size: 50px;
           }
           &.alonzoWhiteTestnet {
-             background-image: url(../../../assets/images/my-wallets/symbol_adaTestnet.inline.svg);
+            background-image: url(../../../assets/images/my-wallets/symbol_adaTestnet.inline.svg);
           }
           // CONNECT HARDWARE WALLET
           &.connectLedger {
@@ -263,7 +262,7 @@
       .optionSubmitButton {
         &:hover {
           .optionTitle {
-            color: var(--theme-default-color-blue);
+            color: var(--yoroi-palette-primary-300);
           }
         }
 
