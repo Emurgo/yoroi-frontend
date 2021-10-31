@@ -1,6 +1,6 @@
 // @flow
 import type { Node } from 'react';
-import React, { Component } from 'react';
+import { Component } from 'react';
 import ConnectPage from '../components/connect/ConnectPage';
 import { observer } from 'mobx-react';
 import { computed } from 'mobx';

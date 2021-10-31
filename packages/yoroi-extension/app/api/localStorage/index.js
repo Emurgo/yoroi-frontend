@@ -30,13 +30,13 @@ const storageKeys = {
   COIN_PRICE_PUB_KEY_DATA: networkForLocalStorage + '-COIN-PRICE-PUB-KEY-DATA',
   EXTERNAL_STORAGE: networkForLocalStorage + '-EXTERNAL-STORAGE',
   TOGGLE_SIDEBAR: networkForLocalStorage + '-TOGGLE-SIDEBAR',
+  SORTED_WALLETS: networkForLocalStorage + '-SORTED-WALLET',
   // ========== CONNECTOR   ========== //
   ERGO_CONNECTOR_WHITELIST: 'connector_whitelist',
 };
 
 export type SetCustomUserThemeRequest = {|
-  customThemeVars: string,
-  currentThemeVars: Object,
+  cssCustomPropObject: Object,
 |};
 
 /**
@@ -113,27 +113,14 @@ export default class LocalStorageApi {
 
   getCustomUserTheme: void => Promise<?string> = () => getLocalItem(storageKeys.CUSTOM_THEME);
 
-  setCustomUserTheme: SetCustomUserThemeRequest => Promise<void> = (
-    request
-  ) => new Promise((resolve, reject) => {
-    try {
-      // Convert CSS String into Javascript Object
-      const vars = request.customThemeVars.split(';');
-      const themeObject = {};
-      vars.forEach(v => {
-        const varData = v.split(':');
-        const key = varData[0];
-        const value = varData[1];
-        if (key && value && request.currentThemeVars[key.trim()] !== value.trim()) {
-          themeObject[key.trim()] = value.trim();
-        }
-      });
-      // Save Theme Object
-      return setLocalItem(storageKeys.CUSTOM_THEME, JSON.stringify(themeObject));
-    } catch (error) {
-      return reject(error);
-    }
-  });
+  setCustomUserTheme: SetCustomUserThemeRequest => Promise<void> = ({ cssCustomPropObject }) =>
+    new Promise((resolve, reject) => {
+      try {
+        return setLocalItem(storageKeys.CUSTOM_THEME, JSON.stringify(cssCustomPropObject));
+      } catch (error) {
+        return reject(error);
+      }
+    });
 
   unsetCustomUserTheme: void => Promise<void> = () => removeLocalItem(storageKeys.CUSTOM_THEME);
 
@@ -276,6 +263,17 @@ export default class LocalStorageApi {
       // ignore the error
     }
   }
+
+
+  // ========== Sort wallets - Revamp ========== //
+  getSortedWallets: void => Promise<?Array<number>> = async () => {
+    const result = await getLocalItem(storageKeys.SORTED_WALLETS);
+    if (result === undefined || result === null) return undefined;
+    return JSON.parse(result);
+  };
+
+  setSortedWallets: (Array<number>) => Promise<void> = value =>
+    setLocalItem(storageKeys.SORTED_WALLETS, JSON.stringify(value ?? []));
 
   async reset(): Promise<void> {
     await this.unsetUserLocale();

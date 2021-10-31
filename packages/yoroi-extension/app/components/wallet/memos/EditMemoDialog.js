@@ -1,7 +1,7 @@
 // @flow
 
 import type { Node } from 'react';
-import React, { Component } from 'react';
+import { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { intlShape } from 'react-intl';
@@ -10,8 +10,7 @@ import DialogCloseButton from '../../widgets/DialogCloseButton';
 import ErrorBlock from '../../widgets/ErrorBlock';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
-import { Input } from 'react-polymorph/lib/components/Input';
-import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
+import TextField from '../../common/TextField';
 import type { TxMemoTableUpsert } from '../../../api/ada/lib/storage/bridge/memos';
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 import { isValidMemo } from '../../../utils/validations';
@@ -22,6 +21,8 @@ import { MAX_MEMO_SIZE } from '../../../config/externalStorageConfig';
 import config from '../../../config';
 import styles from './MemoDialogCommon.scss';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { IconButton, InputAdornment } from '@mui/material';
+import CloseIcon from '../../../assets/images/forms/close.inline.svg'
 
 type Props = {|
   selectedWallet: PublicDeriver<>,
@@ -49,7 +50,7 @@ export default class EditMemoDialog extends Component<Props, State> {
   };
 
   // $FlowFixMe[value-as-type]
-  memoContentInput: Input;
+  memoContentInput: TextField;
 
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
     fields: {
@@ -136,13 +137,20 @@ export default class EditMemoDialog extends Component<Props, State> {
         closeButton={<DialogCloseButton />}
         onClose={onCancel}
       >
-        <Input
+        <TextField
           className={styles.memoContent}
           inputRef={(input) => { this.memoContentInput = input; }}
           {...memoContentField.bind()}
           error={memoContentField.error}
-          onDelete={onClickDelete}
-          skin={InputOwnSkin}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton aria-label="delete memo" onClick={onClickDelete}>
+                  <CloseIcon />
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
         />
         { error ? (<ErrorBlock error={error} />) : null }
       </Dialog>);

@@ -4,19 +4,12 @@
   margin-bottom: 20px;
 
   h1 {
-    color: var(--cmn-default-color-grey);
-    font-family: var(--font-semibold);
+    color: var(--yoroi-palette-gray-800);
+    font-weight: 500;
     font-size: 16px;
     line-height: 1.38;
     margin-bottom: 10px;
     padding-top: 10px;
-  }
-}
-
-.numAddressesSelect {
-  margin: 34px 0 14px 0;
-  label {
-    background-color: var(--theme-settings-pane-background-color);
   }
 }
 
@@ -30,12 +23,13 @@
 }
 
 .intro {
-  color: var(--cmn-default-color-grey);
-  font-family: var(--font-regular);
+  color: var(--yoroi-palette-gray-800);
+  font-weight: 400;
   text-align: justify;
 
-  h1, h2 {
-    font-family: var(--font-medium);
+  h1,
+  h2 {
+    font-weight: 500;
     font-size: 17px;
     margin-bottom: 11px;
   }
@@ -49,9 +43,10 @@
     margin-left: 20px;
   }
 
-  p, li {
-    color: var(--cmn-default-color-grey);
-    font-family: var(--font-regular);
+  p,
+  li {
+    color: var(--yoroi-palette-gray-800);
+    font-weight: 400;
     font-size: 14px;
     letter-spacing: 0.5px;
     line-height: 1.38;
@@ -67,6 +62,6 @@
   .component {
     :global(.SimpleOptions_options.SimpleOptions_openUpward) {
       margin-bottom: 10px;
-    }    
+    }
   }
 }

@@ -1,6 +1,5 @@
 // @flow
 
-import React from 'react';
 import type { Node, ComponentType } from 'react';
 import ConnectWebsitesContainer from './ConnectWebsitesContainer';
 import { withScreenshot } from 'storycap';

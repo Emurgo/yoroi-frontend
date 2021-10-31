@@ -1,19 +1,18 @@
 @import '../../themes/mixins/error-message';
 
 .component {
-  
   .body {
-    color: var(--theme-bordered-box-text-color);
-    font-family: var(--font-regular);
+    color: var(--yoroi-palette-gray-900);
+    font-weight: 400;
     font-size: 14px;
     line-height: 19px;
-  
+
     .text {
       font-size: 15px;
       margin-bottom: 0.3%;
       word-break: break-word;
     }
-  
+
     .instructionsList {
       list-style-type: disc;
       list-style-position: inside;
@@ -28,17 +27,5 @@
     margin-bottom: 12px;
     word-break: break-word;
     text-align: center;
-  }
-}
-
-:global(.YoroiModern) {
-  .inputWrapper span[class*='selectedWordBox'] {
-    background-color: var(--rp-autocomplete-selected-word-box-bg-color-secondary);
-  }
-
-  .dialog {
-    :global(.Dialog_actions) {
-      margin-top: 0px;
-    }
   }
 }

@@ -4,8 +4,8 @@
   margin-bottom: 20px;
 
   h1 {
-    color: var(--theme-support-settings-text-color);
-    font-family: var(--font-semibold);
+    color: var(--yoroi-support-settings-text);
+    font-weight: 500;
     font-size: 16px;
     line-height: 1.38;
     margin-bottom: 10px;
@@ -18,33 +18,23 @@
   text-align: center;
 }
 
-.language {
-  label {
-    background-color: var(--theme-settings-pane-background-color);
-  }
-}
-
 .info {
-  color: var(--theme-terms-of-use-text-color);
+  color: var(--yoroi-terms-of-use-text-color);
   text-align: justify;
   margin-top: 10px;
 
   h1 {
-    color: var(--rp-formfield-label-text-color);
-    font-family: var(--font-medium);
+    color: var(--yoroi-palette-gray-800);
+    font-weight: 500;
     font-size: 14px;
     margin-bottom: 11px;
   }
 
   p {
-    font-family: var(--font-regular);
+    font-weight: 400;
     font-size: 12px;
     letter-spacing: 0.5px;
     line-height: 1.38;
     margin-bottom: 11px;
   }
-}
-
-:global(.YoroiClassic) .component {
-  margin-bottom: 0;
 }

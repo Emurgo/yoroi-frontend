@@ -1,10 +1,10 @@
 // @flow
-import React, { Component } from 'react';
+import { Component } from 'react';
 import { observer } from 'mobx-react';
 import type { Node } from 'react';
 import classnames from 'classnames';
 import { intlShape, } from 'react-intl';
-import { splitAmount, truncateToken } from '../../utils/formatters';
+import { amountWithoutZeros, truncateToken } from '../../utils/formatters';
 
 import globalMessages from '../../i18n/global-messages';
 import styles from './NavWalletDetails.scss';
@@ -103,20 +103,20 @@ export default class NavWalletDetails extends Component<Props> {
               })}
             </div>
             {showsRewards &&
-            <div className={styles.details}>
-              <div>
-                <p className={styles.label}>
-                  {intl.formatMessage(globalMessages.walletLabel)}&nbsp;
-                </p>
-                {this.renderAmountDisplay({ shouldHideBalance, amount: walletAmount })}
+              <div className={styles.details}>
+                <div>
+                  <p className={styles.label}>
+                    {intl.formatMessage(globalMessages.walletLabel)}&nbsp;
+                  </p>
+                  {this.renderAmountDisplay({ shouldHideBalance, amount: walletAmount })}
+                </div>
+                <div>
+                  <p className={styles.label}>
+                    {intl.formatMessage(globalMessages.rewardsLabel)}&nbsp;
+                  </p>
+                  {this.renderAmountDisplay({ shouldHideBalance, amount: rewards })}
+                </div>
               </div>
-              <div>
-                <p className={styles.label}>
-                  {intl.formatMessage(globalMessages.rewardsLabel)}&nbsp;
-                </p>
-                {this.renderAmountDisplay({ shouldHideBalance, amount: rewards })}
-              </div>
-            </div>
             }
             {this.props.rewards === undefined && (
               <div className={styles.info}>
@@ -150,7 +150,7 @@ export default class NavWalletDetails extends Component<Props> {
     if (this.props.rewards === null || this.props.walletAmount === null) {
       return null;
     }
-    return this.props.rewards.joinAddCopy(this.props.walletAmount);
+    return this.props.walletAmount.joinAddCopy(this.props.rewards);
   }
 
   renderAmountDisplay: {|
@@ -170,15 +170,9 @@ export default class NavWalletDetails extends Component<Props> {
     if (request.shouldHideBalance) {
       balanceDisplay = (<span>{hiddenAmount}</span>);
     } else {
-      const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
-        shiftedAmount,
-        tokenInfo.Metadata.numberOfDecimals,
-      );
-
       balanceDisplay = (
         <>
-          {beforeDecimalRewards}
-          <span className={styles.afterDecimal}>{afterDecimalRewards}</span>
+          {amountWithoutZeros(shiftedAmount.toFormat(tokenInfo.Metadata.numberOfDecimals))}
         </>
       );
     }

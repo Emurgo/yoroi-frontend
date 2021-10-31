@@ -1,14 +1,11 @@
 // @flow
-import React, { Component } from 'react';
+import { Component } from 'react';
 import type { Node } from 'react';
-import classNames from 'classnames';
 import { defineMessages, intlShape } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 import styles from './RemoveWallet.scss';
-import dangerousButtonStyles from '../../../themes/overrides/DangerousButton.scss';
 import { observer } from 'mobx-react';
-import { Button } from 'react-polymorph/lib/components/Button';
-import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
+import { Button } from '@mui/material';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 export const messages: * = defineMessages({
@@ -18,7 +15,8 @@ export const messages: * = defineMessages({
   },
   removeExplanation: {
     id: 'wallet.settings.remove.explanation',
-    defaultMessage: '!!!Removing a wallet does not affect the wallet balance. Your wallet can be restored again at any time.',
+    defaultMessage:
+      '!!!Removing a wallet does not affect the wallet balance. Your wallet can be restored again at any time.',
   },
 });
 
@@ -29,33 +27,27 @@ type Props = {|
 
 @observer
 export default class RemoveWallet extends Component<Props> {
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
   render(): Node {
     const { intl } = this.context;
 
-    const buttonClassNames = classNames([
-      'primary',
-      styles.submitButton,
-      'removeWallet' // classname for UI tests
-    ]);
     return (
       <div className={styles.component}>
         <h2>{intl.formatMessage(messages.titleLabel)}</h2>
 
-        <p>
-          {intl.formatMessage(messages.removeExplanation)}
-        </p>
+        <p>{intl.formatMessage(messages.removeExplanation)}</p>
 
         <Button
-          themeOverrides={dangerousButtonStyles}
-          className={buttonClassNames}
-          label={`${this.context.intl.formatMessage(globalMessages.remove)} ${this.props.walletName}`}
-          skin={ButtonSkin}
+          variant="danger"
+          className="removeWallet"
           onClick={this.props.openDialog}
-        />
+          sx={{ marginTop: '20px', width: '400px' }}
+        >
+          {`${this.context.intl.formatMessage(globalMessages.remove)} ${this.props.walletName}`}
+        </Button>
       </div>
     );
   }

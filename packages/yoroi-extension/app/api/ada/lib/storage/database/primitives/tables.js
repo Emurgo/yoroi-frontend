@@ -513,6 +513,7 @@ export type TokenInsert = {|
    * As some blockchains have multiple primary tokens
   */
   Identifier: string,
+  IsNFT?: boolean,
   Metadata: TokenMetadata,
 |};
 export type TokenUpsertWithDigest = TokenInsert | {|
@@ -531,6 +532,7 @@ export const TokenSchema: {|
   name: 'Token',
   properties: {
     TokenId: 'TokenId',
+    IsNFT: 'IsNFT',
     IsDefault: 'IsDefault',
     NetworkId: 'NetworkId',
     Digest: 'Digest',
@@ -832,6 +834,7 @@ export const populatePrimitivesDb = (schemaBuilder: lf$schema$Builder) => {
     .addColumn(TokenSchema.properties.TokenId, Type.INTEGER)
     .addColumn(TokenSchema.properties.NetworkId, Type.INTEGER)
     .addColumn(TokenSchema.properties.IsDefault, Type.BOOLEAN)
+    .addColumn('IsNFT', Type.BOOLEAN)
     .addColumn(TokenSchema.properties.Identifier, Type.STRING)
     .addColumn(TokenSchema.properties.Digest, Type.NUMBER)
     .addColumn(TokenSchema.properties.Metadata, Type.OBJECT)

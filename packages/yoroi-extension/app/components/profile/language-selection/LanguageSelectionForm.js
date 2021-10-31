@@ -1,12 +1,10 @@
 // @flow
-import React, { Component } from 'react';
+import { Component } from 'react';
 import type { Node } from 'react';
-import classnames from 'classnames';
 import { observer } from 'mobx-react';
-import { Select } from 'react-polymorph/lib/components/Select';
-import { Button } from 'react-polymorph/lib/components/Button';
-import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
-import { SelectSkin } from 'react-polymorph/lib/skins/simple/SelectSkin';
+import { LoadingButton } from '@mui/lab';
+import { MenuItem } from '@mui/material';
+import Select from '../../common/Select';
 import { intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import LocalizableError from '../../../i18n/LocalizableError';
@@ -69,26 +67,36 @@ export default class LanguageSelectionForm extends Component<Props> {
       label: intl.formatMessage(language.label),
       svg: language.svg
     }));
-    const buttonClasses = classnames([
-      'primary',
-      isSubmitting ? styles.submitButtonSpinning : styles.submitButton,
-    ]);
 
     return (
       <div className={styles.component}>
         <div className={styles.centeredBox}>
-
           <Select
-            className={styles.languageSelect}
-            options={languageOptions}
+            formControlProps={{ sx: { marginBottom: '25px' } }}
+            labelProps={{
+              sx: {
+                width: '100%',
+                left: '0',
+                top: '-55px',
+                textAlign: 'center',
+                fontSize: '1rem',
+                fontWeight: '500',
+                textTransform: 'uppercase',
+              },
+            }}
+            labelId="languages-select"
             value={currentLocale}
             {...languageId.bind()}
-            skin={SelectSkin}
             onChange={this.selectLanguage}
-            optionRenderer={option => (
-              <FlagLabel svg={option.svg} label={option.label} />
-            )}
-          />
+            notched={false}
+            shrink={false}
+          >
+            {languageOptions.map(option => (
+              <MenuItem key={option.value} value={option.value}>
+                <FlagLabel svg={option.svg} label={option.label} />
+              </MenuItem>
+            ))}
+          </Select>
 
           {error && (
             <p className={styles.error}>
@@ -96,12 +104,14 @@ export default class LanguageSelectionForm extends Component<Props> {
             </p>
           )}
 
-          <Button
-            className={buttonClasses}
-            label={intl.formatMessage(globalMessages.continue)}
-            onMouseUp={this.submit}
-            skin={ButtonSkin}
-          />
+          <LoadingButton
+            variant="primary"
+            fullWidth
+            loading={isSubmitting}
+            onClick={this.submit}
+          >
+            {intl.formatMessage(globalMessages.continue)}
+          </LoadingButton>
 
           {!tier1Languages.includes(currentLocale) &&
             <div className={styles.info}>
@@ -119,5 +129,4 @@ export default class LanguageSelectionForm extends Component<Props> {
       </div>
     );
   }
-
 }

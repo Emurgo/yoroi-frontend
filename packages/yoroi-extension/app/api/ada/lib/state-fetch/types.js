@@ -367,3 +367,27 @@ export type CatalystRoundInfoResponse = {|
 
 export type CatalystRoundInfoFunc = (body: CatalystRoundInfoRequest)
                                       => Promise<CatalystRoundInfoResponse>;
+
+// Multi Asset Mint Metadata
+
+export type MultiAssetMintMetadataFunc = (body: MultiAssetMintMetadataRequest)
+  => Promise<MultiAssetMintMetadataResponse>;
+
+export type MultiAssetMintMetadataRequest = {|
+  ...BackendNetworkInfo,
+  assets: MultiAssetMintMetadataRequestAsset[]
+|};
+
+export type MultiAssetMintMetadataRequestAsset = {|
+  name: string,
+  policy: string
+|}
+
+export type MultiAssetMintMetadataResponse = {|
+  ...{[key: string]: MultiAssetMintMetadataResponseAsset[]}
+|}
+
+export type MultiAssetMintMetadataResponseAsset = {|
+  key: string,
+  metadata: {[key: string]: any}
+|}

@@ -5,10 +5,8 @@ import type { Node } from 'react';
 import { intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import styles from './SignTxPage.scss';
-import { Button } from 'react-polymorph/lib/components/Button';
-import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
-import { Input } from 'react-polymorph/lib/components/Input';
-import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
+import { Button } from '@mui/material';
+import TextField from '../../../components/common/TextField';
 import globalMessages from '../../../i18n/global-messages';
 import { observer } from 'mobx-react';
 import CopyableAddress from '../../../components/widgets/CopyableAddress';
@@ -37,6 +35,7 @@ import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 import classnames from 'classnames';
 import { mintedTokenInfo } from '../../../../chrome/extension/ergo-connector/utils';
 import type { Tx } from '../../../../chrome/extension/ergo-connector/types';
+import { Logger } from '../../../utils/logging';
 
 type Props = {|
   +tx: Tx,
@@ -45,7 +44,7 @@ type Props = {|
   +onCancel: () => void,
   +onConfirm: string => void,
   +notification: ?Notification,
-  +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
+  +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow> | null,
   +defaultToken: DefaultTokenEntry,
   +network: $ReadOnly<NetworkRow>,
   +unitOfAccountSetting: UnitOfAccountSettingType,
@@ -126,20 +125,37 @@ class SignTxPage extends Component<Props> {
   }
 
   // Tokens can be minted inside the transaction so we have to look it up there first
-  _resolveTokenInfo: TokenEntry => $ReadOnly<TokenRow> = tokenEntry => {
+  _resolveTokenInfo: TokenEntry => $ReadOnly<TokenRow> | null  = tokenEntry => {
     const { tx } = this.props;
-    const mintedTokens = mintedTokenInfo(tx);
+    const mintedTokens = mintedTokenInfo(tx, Logger.info);
     const mintedToken = mintedTokens.find(t => tokenEntry.identifier === t.Identifier);
     if (mintedToken != null) {
       return mintedToken;
     }
+
     return this.props.getTokenInfo(tokenEntry);
+  }
+
+  displayUnAvailableToken: TokenEntry => Node = (tokenEntry) => {
+    return (
+      <>
+        <span className={styles.amountRegular}>{'+'}{tokenEntry.amount.toString()}</span>
+        {' '}
+        <span>
+          {truncateAddressShort(
+           tokenEntry.identifier
+          )}
+        </span>
+      </>
+    )
   }
 
   renderAmountDisplay: {|
     entry: TokenEntry,
   |} => Node = (request) => {
     const tokenInfo = this._resolveTokenInfo(request.entry);
+
+    if (tokenInfo == null) return this.displayUnAvailableToken(request.entry)
     const shiftedAmount = request.entry.amount
       .shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
 
@@ -320,27 +336,24 @@ class SignTxPage extends Component<Props> {
             </div>
           </div>
           <div className={styles.passwordInput}>
-            <Input
+            <TextField
               type="password"
               className={styles.walletPassword}
               {...walletPasswordField.bind()}
               error={walletPasswordField.error}
-              skin={InputOwnSkin}
             />
           </div>
           <div className={styles.wrapperBtn}>
+            <Button variant="secondary" onClick={onCancel}>
+              {intl.formatMessage(globalMessages.cancel)}
+            </Button>
             <Button
-              className="secondary"
-              label={intl.formatMessage(globalMessages.cancel)}
-              skin={ButtonSkin}
-              onClick={onCancel}
-            />
-            <Button
-              label={intl.formatMessage(globalMessages.confirm)}
-              skin={ButtonSkin}
+              variant="primary"
               disabled={!walletPasswordField.isValid}
               onClick={this.submit.bind(this)}
-            />
+            >
+              {intl.formatMessage(globalMessages.confirm)}
+            </Button>
           </div>
         </div>
       </>

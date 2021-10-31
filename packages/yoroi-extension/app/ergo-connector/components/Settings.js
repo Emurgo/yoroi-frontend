@@ -1,10 +1,10 @@
 // @flow
-import React, { Component } from 'react';
+import { Component } from 'react';
 import type { Node } from 'react';
 import { Link } from 'react-router-dom';
-import classNames from 'classnames';
-import { Select } from 'react-polymorph/lib/components/Select';
-import { SelectSkin } from 'react-polymorph/lib/skins/simple/SelectSkin';
+import Select from '../../components/common/Select';
+import { MenuItem } from '@mui/material';
+import { Box } from '@mui/system';
 import { intlShape } from 'react-intl';
 
 import styles from './Settings.scss';
@@ -84,10 +84,6 @@ export default class Settings extends Component<Props> {
       label: intl.formatMessage(language.label),
       svg: language.svg,
     }));
-    const languageSelectClassNames = classNames([
-      styles.language,
-      isSubmitting ? styles.submitLanguageSpinner : null,
-    ]);
 
     return (
       <ul className={styles.list}>
@@ -102,13 +98,34 @@ export default class Settings extends Component<Props> {
         <li className={styles.listItemLanguage}>
           <LanguageIcon />
           <Select
-            className={languageSelectClassNames}
-            options={languageOptions}
             {...languageId.bind()}
             onChange={this.selectLanguage}
-            skin={SelectSkin}
-            optionRenderer={option => <FlagLabel svg={option.svg} label={option.label} />}
-          />
+            disabled={isSubmitting}
+            renderValue={value => (
+              <Box>{languageOptions.filter(option => option.value === value)[0].label}</Box>
+            )}
+            formControlProps={{
+              sx: {
+                marginTop: '-9px',
+                '& .MuiOutlinedInput-root fieldset': {
+                  border: 'transparent',
+                },
+              },
+            }}
+            menuProps={{
+              sx: {
+                '& .MuiMenu-paper': {
+                  maxHeight: '280px',
+                },
+              },
+            }}
+          >
+            {languageOptions.map(option => (
+              <MenuItem key={option.value} value={option.value}>
+                <FlagLabel svg={option.svg} label={option.label} />
+              </MenuItem>
+            ))}
+          </Select>
           {error && <p className={styles.error}>{intl.formatMessage(error, error.values)}</p>}
         </li>
       </ul>

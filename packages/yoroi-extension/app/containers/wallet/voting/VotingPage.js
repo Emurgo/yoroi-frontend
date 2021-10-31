@@ -1,6 +1,6 @@
 // @flow
 import type { Node } from 'react';
-import React, { Component } from 'react';
+import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { computed } from 'mobx';
 import { defineMessages, intlShape } from 'react-intl';
@@ -136,7 +136,8 @@ export default class VotingPage extends Component<Props> {
       );
     }
     // keep enabled on the testnet
-    const { catalystRoundInfo, loadingCatalystRoundInfo } = this.generated.stores.substores.ada.votingStore;
+    const { catalystRoundInfo, loadingCatalystRoundInfo } =
+      this.generated.stores.substores.ada.votingStore;
     if (loadingCatalystRoundInfo) {
       return (
         <VerticallyCenteredLayout>

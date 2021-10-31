@@ -6,8 +6,7 @@ import type { Node } from 'react';
 import React, { Component, } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
-import { Input } from 'react-polymorph/lib/components/Input';
-import { InputOwnSkin } from '../../../themes/skins/InputOwnSkin';
+import TextField from '../../common/TextField';
 import { intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
@@ -43,6 +42,7 @@ type Props = {|
   +receivers: Array<string>,
   +totalAmount: MultiToken,
   +transactionFee: MultiToken,
+  +transactionSize: ?string,
   +onSubmit: ({| password: string |}) => PossiblyAsync<void>,
   +addressToDisplayString: string => string,
   +onCancel: void => void,
@@ -304,6 +304,17 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
             ))}
           </div>
 
+          {this.props.transactionSize != null ? (
+            <div className={styles.addressToLabelWrapper}>
+              <div className={styles.addressToLabel}>
+                {intl.formatMessage(globalMessages.walletSendConfirmationTxSizeLabel)}
+              </div>
+              <span className={styles.txSize}>
+                {this.props.transactionSize}
+              </span>
+            </div>
+          ) : null}
+
           <div className={styles.amountFeesWrapper}>
             <div className={styles.amountWrapper}>
               <div className={styles.amountLabel}>
@@ -336,13 +347,12 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
             })}
           </div>
 
-          <Input
+          <TextField
             type="password"
             className={styles.walletPassword}
             {...walletPasswordField.bind()}
             disabled={isSubmitting}
             error={walletPasswordField.error}
-            skin={InputOwnSkin}
           />
         </div>
 

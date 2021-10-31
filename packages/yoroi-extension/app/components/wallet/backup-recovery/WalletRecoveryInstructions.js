@@ -1,5 +1,5 @@
 // @flow
-import React, { Component } from 'react';
+import { Component } from 'react';
 import type { Element, Node } from 'react';
 import { observer } from 'mobx-react';
 import styles from './WalletRecoveryInstructions.scss';

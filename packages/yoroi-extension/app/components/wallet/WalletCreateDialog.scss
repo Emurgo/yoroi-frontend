@@ -6,34 +6,22 @@
       display: flex;
       flex-wrap: wrap;
       justify-content: space-between;
-      max-height: 0;
-      opacity: 0;
-      overflow: hidden;
-      transition: all 400ms ease;
-  
-      &.show {
-        max-height: 250px;
-        opacity: 1;
-      }
-  
       & > div {
         width: 350px;
       }
     }
   }
-
   .isSubmitting {
-    @include loading-spinner("../../assets/images/spinner-light.svg");
+    @include loading-spinner('../../assets/images/spinner-light.svg');
   }
 }
-
 :global(.YoroiClassic) .component {
   .walletPassword {
     .walletPasswordFields {
       &.show {
         overflow: visible;
       }
-  
+
       & > div {
         margin-top: 0;
       }
@@ -45,7 +33,7 @@
         margin-right: 25px;
       }
     }
-  }  
+  }
 }
 
 :global(.YoroiModern) .component {
@@ -62,6 +50,6 @@
   }
 
   :global(.Dialog_actions) {
-    margin-top: var(--theme-dialog-password-input-actions-margin-top);
+    margin-top: 10px;
   }
 }
