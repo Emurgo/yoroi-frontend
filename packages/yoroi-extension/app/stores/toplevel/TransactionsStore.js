@@ -44,6 +44,7 @@ import type { DefaultTokenEntry, TokenEntry, } from '../../api/common/lib/MultiT
 import { genLookupOrFail, getTokenName } from '../stateless/tokenHelpers';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
+import type { WalletTransactionCtorData } from '../../domain/WalletTransaction';
 import { asAddressedUtxo, cardanoValueFromRemoteFormat } from '../../api/ada/transactions/utils';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { PRIMARY_ASSET_CONSTANTS } from '../../api/ada/lib/storage/database/primitives/enums';
@@ -83,6 +84,11 @@ export const INITIAL_SEARCH_LIMIT: number = 5;
 /** Skip first n transactions from api */
 export const SEARCH_SKIP: number = 0;
 
+type SubmittedTransactionEntry = {|
+  publicDeriverId: number,
+  transaction: WalletTransaction,
+|};
+
 function getMinUtxoValue(network: $ReadOnly<NetworkRow>): RustModule.WalletV4.BigNum {
   const config = getCardanoHaskellBaseConfig(network)
     .reduce((acc, next) => Object.assign(acc, next), {});
@@ -96,6 +102,8 @@ function newMultiToken(
   return new MultiToken(values, defaultTokenInfo)
 }
 
+const SUBMITTED_TRANSACTIONS_KEY = 'submittedTransactions';
+
 export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
 
   /** How many additional transactions to display when user wants to show more */
@@ -108,6 +116,8 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     publicDeriver: PublicDeriver<>,
     options: GetTransactionsRequestOptions,
   |}> = [];
+
+  @observable _submittedTransactions: Array<SubmittedTransactionEntry> = [];
 
   getTransactionRowsToExportRequest: LocalizedRequest<(void => Promise<void>) => Promise<void>>
     = new LocalizedRequest<(void => Promise<void>) => Promise<void>>(func => func());
@@ -123,6 +133,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     actions.loadMoreTransactions.listen(this._increaseSearchLimit);
     actions.exportTransactionsToFile.listen(this._exportTransactionsToFile);
     actions.closeExportTransactionDialog.listen(this._closeExportTransactionDialog);
+    this._loadSubmittedTransactions();
   }
 
   /** Calculate information about transactions that are still realistically reversible */
@@ -240,7 +251,10 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) return [];
     const result = this.getTxRequests(publicDeriver).requests.recentRequest.result;
-    return result ? result.transactions : [];
+    return  [
+      ...this.getSubmittedTransactions(publicDeriver),
+      ...(result ? result.transactions : [])
+    ];
   }
 
   @computed get hasAny(): boolean {
@@ -320,6 +334,25 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       db: publicDeriver.getDb(),
       transactions: result.transactions,
     });
+
+    const remoteTransactionIds = new Set(
+      result.transactions.map(tx => tx.txid)
+    );
+
+    let submittedTransactionsChanged = false;
+    runInAction(() => {
+      for (let i = 0; i < this._submittedTransactions.length;) {
+        if (remoteTransactionIds.has(this._submittedTransactions[i].transaction.txid)) {
+          this._submittedTransactions.splice(i, 1);
+          submittedTransactionsChanged = true;
+        } else {
+          i++;
+        }
+      }
+    });
+    if (submittedTransactionsChanged) {
+      this._persistSubmittedTransactions();
+    }
   };
 
   @action reactToTxHistoryUpdate: {|
@@ -653,6 +686,100 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
         shouldIncludeTxIds: this.shouldIncludeTxIds,
       }).promise;
     };
+  }
+
+  @action
+  recordSubmittedTransaction: (
+    PublicDeriver<>,
+    WalletTransactionCtorData,
+  ) => void = (
+    publicDeriver,
+    transaction,
+  ) => {
+    this._submittedTransactions.push({
+      publicDeriverId: publicDeriver.publicDeriverId,
+      transaction: new WalletTransaction(transaction),
+    });
+    this._persistSubmittedTransactions();
+  }
+
+  getSubmittedTransactions: (
+    PublicDeriver<>,
+  ) => Array<WalletTransaction> = (
+    publicDeriver
+  ) => {
+    return this._submittedTransactions.filter(({ publicDeriverId }) =>
+      publicDeriverId === publicDeriver.publicDeriverId
+    ).map(tx => tx.transaction);
+  }
+
+  @action
+  clearSubmittedTransactions: (
+    PublicDeriver<>,
+  ) => void = (
+    publicDeriver
+  ) => {
+    for (let i = 0; i < this._submittedTransactions.length;) {
+      if (
+        this._submittedTransactions[i].publicDeriverId ===
+          publicDeriver.publicDeriverId
+      ) {
+        this._submittedTransactions.splice(i, 1);
+      } else {
+        i++;
+      }
+    }
+    this._persistSubmittedTransactions();
+  }
+
+  _persistSubmittedTransactions: () => void = () => {
+    localStorage.setItem(
+      SUBMITTED_TRANSACTIONS_KEY,
+      JSON.stringify(this._submittedTransactions)
+    );
+  }
+
+  _loadSubmittedTransactions: () => void = () => {
+    try {
+      const dataStr = localStorage.getItem(SUBMITTED_TRANSACTIONS_KEY);
+      if (dataStr == null) {
+        return;
+      }
+      const data = JSON.parse(dataStr);
+
+      const txs = data.map(({ publicDeriverId, transaction }) => {
+        if (transaction.block) {
+          throw new Error('submitted transaction should not have block data');
+        }
+        const tx =  new WalletTransaction({
+          txid: transaction.txid,
+          block: null,
+          type: transaction.type,
+          amount: MultiToken.from(transaction.amount),
+          fee: MultiToken.from(transaction.fee),
+          date: new Date(transaction.date),
+          addresses: {
+            from: transaction.addresses.from.map(({ address, value }) => ({
+              address,
+              value: MultiToken.from(value)
+            })),
+            to: transaction.addresses.to.map(({ address, value }) => ({
+              address,
+              value: MultiToken.from(value)
+            })),
+          },
+          state: transaction.state,
+          errorMsg: transaction.errorMsg,
+        });
+        return {
+          publicDeriverId,
+          transaction: tx,
+        };
+      });
+      this._submittedTransactions.splice(0, 0, ...txs);
+    } catch (error) {
+      console.error(error);
+    }
   }
 }
 

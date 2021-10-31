@@ -772,6 +772,7 @@
   "wallet.transaction.sent": "{currency} sent",
   "wallet.transaction.state.failed": "failed",
   "wallet.transaction.state.pending": "pending",
+  "wallet.transaction.state.submitted": "submitted",
   "wallet.transaction.success.button.label": "Transaction page",
   "wallet.transaction.success.explanation": "Track the status of the transaction from the Transactions page",
   "wallet.transaction.success.title": "Successfully sent",
