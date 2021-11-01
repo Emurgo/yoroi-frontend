@@ -73,7 +73,7 @@
     "@babel/preset-flow": "7.12.13",
     "@babel/preset-react": "7.12.13",
     "@babel/register": "7.12.13",
-    "@babel/runtime": "7.12.18",
+    "@babel/runtime": "7.16.0",
     "@babel/runtime-corejs3": "7.12.18",
     "@emurgo/cardano-serialization-lib-nodejs": "9.1.0",
     "@emurgo/js-chain-libs-node": "0.7.1",
