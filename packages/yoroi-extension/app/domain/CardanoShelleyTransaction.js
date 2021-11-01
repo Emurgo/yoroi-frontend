@@ -47,6 +47,7 @@ export default class CardanoShelleyTransaction extends WalletTransaction {
   |}>;
   @observable ttl: void | BigNumber;
   @observable metadata: null | string;
+  @observable isValid: boolean;
 
   constructor(data: {|
     ...WalletTransactionCtorData,
@@ -56,14 +57,16 @@ export default class CardanoShelleyTransaction extends WalletTransaction {
     withdrawals: Array<{|
       address: string,
       value: MultiToken,
-    |}>
+    |}>,
+    isValid: boolean,
   |}) {
-    const { certificates, ttl, metadata, withdrawals, ...rest } = data;
+    const { certificates, ttl, metadata, withdrawals, isValid, ...rest } = data;
     super(rest);
     this.certificates = certificates;
     this.ttl = ttl;
     this.metadata = metadata;
     this.withdrawals = withdrawals;
+    this.isValid = isValid;
   }
 
   @action
@@ -85,7 +88,6 @@ export default class CardanoShelleyTransaction extends WalletTransaction {
     if (Extra == null) {
       throw new Error(`${nameof(CardanoShelleyTransaction)}::${this.constructor.fromAnnotatedTx} missing extra data`);
     }
-
     return new CardanoShelleyTransaction({
       txid: tx.transaction.Hash,
       block: tx.block,
@@ -119,6 +121,7 @@ export default class CardanoShelleyTransaction extends WalletTransaction {
       certificates: tx.certificates,
       state: tx.transaction.Status,
       errorMsg: tx.transaction.ErrorMessage,
+      isValid: !!Extra.IsValid,
     });
   }
 

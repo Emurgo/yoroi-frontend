@@ -317,7 +317,11 @@ export default class Transaction extends Component<Props, State> {
     intl: $npm$ReactIntl$IntlFormat,
     state: number,
     assuranceLevel: AssuranceLevel,
+    isValid: boolean,
   ): string {
+    if (!isValid) {
+      return intl.formatMessage(stateTranslations.failed);
+    }
     if (state === TxStatusCodes.IN_BLOCK) {
       return intl.formatMessage(assuranceLevelTranslations[assuranceLevel]);
     }
@@ -575,6 +579,9 @@ export default class Transaction extends Component<Props, State> {
     const { intl } = this.context;
     const isFailedTransaction = state < 0;
     const isPendingTransaction = state === TxStatusCodes.PENDING || state === TxStatusCodes.SUBMITTED;
+    const isValidTransaction = (data instanceof CardanoShelleyTransaction) ?
+      data.isValid :
+      true;
 
     const componentStyles = classnames([
       styles.component,
@@ -600,13 +607,18 @@ export default class Transaction extends Component<Props, State> {
 
     const labelClasses = classnames([
       styles.status,
-      isFailedTransaction ? styles.failedLabel : '',
+      (isFailedTransaction || !isValidTransaction) ? styles.failedLabel : '',
       isPendingTransaction ? styles.pendingLabel : '',
     ]);
 
     const arrowClasses = isExpanded ? styles.collapseArrow : styles.expandArrow;
 
-    const status = this.getStatusString(intl, state, assuranceLevel);
+    const status = this.getStatusString(
+      intl,
+      state,
+      assuranceLevel,
+      isValidTransaction,
+    );
 
     return (
       <div className={componentStyles}>
@@ -625,7 +637,7 @@ export default class Transaction extends Component<Props, State> {
                   data,
                 )}
               </div>
-              {state === TxStatusCodes.IN_BLOCK ? (
+              {state === TxStatusCodes.IN_BLOCK && isValidTransaction ? (
                 <div className={labelOkClasses}>{status}</div>
               ) : (
                 <div className={labelClasses}>
