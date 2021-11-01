@@ -69,7 +69,7 @@ export default class ExportApi {
 
       const { ticker, rows, format, fileType, shouldIncludeTxIds } = request;
       const dlFileName = ExportApi.createDefaultFileName(request.nameSuffix);
-      const data = ExportApi.convertExportRowsToCsv(ticker, rows, format, shouldIncludeTxIds);
+      const data = ExportApi.convertExportRowsToCsv(ticker, rows, shouldIncludeTxIds, format);
       const fileResponse = ExportApi.convertCsvDataToFile(data, fileType);
 
       Logger.debug(`ExportApi::${nameof(this.exportTransactions)}: success`);
@@ -93,8 +93,8 @@ export default class ExportApi {
   static convertExportRowsToCsv(
     ticker: string,
     rows: Array<TransactionExportRow>,
-    format?: TransactionExportDataFormat = TRANSACTION_EXPORT_DATA_FORMAT.CoinTracking,
     shouldIncludeTxIds: boolean,
+    format: TransactionExportDataFormat = TRANSACTION_EXPORT_DATA_FORMAT.CoinTracking,
   ): CsvData {
     switch (format) {
       case TRANSACTION_EXPORT_DATA_FORMAT.CoinTracking:
@@ -108,7 +108,7 @@ export default class ExportApi {
    */
   static convertCsvDataToFile(
     data: CsvData,
-    fileType?: TransactionExportFileType = TRANSACTION_EXPORT_FILE_TYPE.csv
+    fileType: TransactionExportFileType = TRANSACTION_EXPORT_FILE_TYPE.csv
   ): ExportFileResponse {
     switch (fileType) {
       case TRANSACTION_EXPORT_FILE_TYPE.csv:
