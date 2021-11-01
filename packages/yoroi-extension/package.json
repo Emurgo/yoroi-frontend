@@ -123,7 +123,7 @@
     "geckodriver": "1.22.1",
     "html-loader": "2.0.0",
     "html-webpack-harddisk-plugin": "2.0.0",
-    "html-webpack-plugin": "5.1.0",
+    "html-webpack-plugin": "5.5.0",
     "jest": "26.6.3",
     "jest-canvas-mock": "2.3.1",
     "json-server": "0.16.3",
