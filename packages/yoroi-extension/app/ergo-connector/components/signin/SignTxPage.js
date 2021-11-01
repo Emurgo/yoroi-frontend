@@ -2,7 +2,7 @@
 // @flow
 import React, { Component } from 'react';
 import type { Node } from 'react';
-import { intlShape } from 'react-intl';
+import { intlShape, defineMessages } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import styles from './SignTxPage.scss';
 import { Button } from '@mui/material';
@@ -53,6 +53,20 @@ type Props = {|
   +getCurrentPrice: (from: string, to: string) => ?number,
 |};
 
+const messages = defineMessages({
+  title: {
+    id: 'connector.signin.title',
+    defaultMessage: '!!!Sign the transaction',
+  },
+  transactionId: {
+    id: 'connector.signin.transactionId',
+    defaultMessage: '!!!Transaction id',
+  },
+  utxoDetails: {
+    id: 'connector.signin.utxoDetails',
+    defaultMessage: '!!!Utxo Details',
+  }
+});
 @observer
 class SignTxPage extends Component<Props> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
@@ -266,11 +280,14 @@ class SignTxPage extends Component<Props> {
 
     const { intl } = this.context;
     const { txData, onCancel, } = this.props;
+    const totalInput = txData.totalInput();
+    // const amount = totalInput.joinSubtractCopy(fee)
+
     return (
       <>
         <ProgressBar step={2} />
         <div className={styles.component}>
-          <div>
+          {/* <div>
             <div className={styles.addressHeader}>
               <div className={styles.addressFrom}>
                 <p className={styles.label}>
@@ -333,6 +350,73 @@ class SignTxPage extends Component<Props> {
                   },
                 })}
               </div>
+            </div>
+          </div> */}
+
+
+            <div className={styles.addressHeader}>
+              <div className={styles.addressTo}>
+                <p className={styles.label}>
+                  {intl.formatMessage(globalMessages.feeLabel)}
+                </p>
+              </div>
+            </div>
+            <div className={styles.addressToList}>
+              <div className={styles.amount}>
+                {this.renderAmountDisplay({
+                  entry: {
+                    ...txData.fee().getDefaultEntry(),
+                    amount: txData.fee().getDefaultEntry().amount.abs().negated(),
+                  },
+                })}
+              </div>
+            </div>
+
+          <div>
+            <h1 className={styles.title}>{intl.formatMessage(messages.title)}</h1>
+          </div>
+          <div className={styles.transactionWrapper}>
+            <p className={styles.transactionId}>{intl.formatMessage(messages.transactionId)}</p>
+            <p className={styles.hash}>some hash should go here</p>
+            <div className={styles.utxoWrapper}>
+              <button type='button' className={styles.utxo}>{intl.formatMessage(messages.utxoDetails)}</button>
+            </div>
+          </div>
+          <div className={styles.info}>
+            <div className={styles.infoRaw}>
+              <p className={styles.label}>{intl.formatMessage(globalMessages.amount)}</p>
+              <p className={styles.labelValue}>
+                {this.renderAmountDisplay({
+                  entry: {
+                    ...txData.fee().getDefaultEntry(),
+                    amount: txData.fee().getDefaultEntry().amount.abs().negated(),
+                  },
+                })}
+              </p>
+            </div>
+            <div className={styles.infoRaw}>
+              <p className={styles.label}>{intl.formatMessage(globalMessages.feeLabel)}</p>
+              <p className={styles.labelValue}>
+                {this.renderAmountDisplay({
+                  entry: {
+                    ...txData.fee().getDefaultEntry(),
+                    amount: txData.fee().getDefaultEntry().amount.abs().negated(),
+                  },
+                })}
+              </p>
+            </div>
+            <div className={styles.infoRaw}>
+              <p className={styles.label}>
+                {intl.formatMessage(globalMessages.walletSendConfirmationTotalLabel)}
+              </p>
+              <p className={styles.labelValue}>
+                {this.renderAmountDisplay({
+                  entry: {
+                    ...txData.fee().getDefaultEntry(),
+                    amount: txData.fee().getDefaultEntry().amount.abs().negated(),
+                  },
+                })}
+              </p>
             </div>
           </div>
           <div className={styles.passwordInput}>

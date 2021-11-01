@@ -1,8 +1,70 @@
 .component {
   padding-right: 32px;
   padding-left: 32px;
-  padding-top: 48px;
+  padding-top: 30px;
   overflow-wrap: break-word;
+
+  .title {
+    font-size: 24px;
+    line-height: 32px;
+    margin-bottom: 20px;
+  }
+
+  .transactionWrapper {
+    margin-top: 20px;
+    margin-bottom: 30px;
+    padding: 0px 4px;
+
+    .transactionId {
+      font-size: 16px;
+      line-height: 24px;
+      margin-bottom: 4px;
+    }
+
+    .hash {
+      margin-top: 4px;
+      margin-bottom: 8px;
+      color: #6B7384;
+      font-size: 14px;
+      line-height: 22px;
+    }
+    .utxoWrapper {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      margin-top: 8px;
+      .utxo {
+        font-size: 16px;
+        line-height: 24px
+      }
+    }    
+  }
+
+  .info {
+    margin-bottom: 60px;
+    .infoRaw {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 3px solid #EAEDF2;
+      padding: 10px 4px;
+      .label {
+        font-size: 16px;
+        line-height: 24px;
+      }
+
+      .labelValue {
+        font-size: 16px;
+        font-weight: 500;
+        letter-spacing: 0;
+        line-height: 24px;
+      }
+    }
+
+    .infoRaw:last-child {
+      border: none;
+    }
+  }
 
   .amountSmall {
     font-size: 12px;
