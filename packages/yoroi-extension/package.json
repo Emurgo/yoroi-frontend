@@ -23,6 +23,7 @@
     "flow-typed": "flow codemod annotate-exports --write --repeat ./app",
     "flow:install": "flow-typed create-stub insert-pkg-here --typescript",
     "test": "NODE_ENV=jest jest",
+    "test-win": "SET NODE_ENV=jest && jest",
     "eslint": "eslint app features chrome scripts webpack/*.js",
     "test:build": "npm run prod:build -- --env 'test' && npm run prod:compress -- --env 'test' --app-id 'yoroi' --codebase 'https://yoroiwallet.com/dw/yoroi-test-extension.crx' --key ./e2etest-key.pem",
     "test:run:base": "NODE_ENV=cucumber cucumber-js --require-module '@babel/register' --compiler es6:@babel/register",
