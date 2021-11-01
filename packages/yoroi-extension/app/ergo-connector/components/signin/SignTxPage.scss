@@ -143,11 +143,8 @@
 
 .wrapperBtn {
   padding-top: 16px;
-  display: flex;
-  button {
-    font-size: 14px;
-  }
-  button + button {
-    margin-left: 22px;
-  }
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 10px;
+ 
 }
