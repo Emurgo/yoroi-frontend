@@ -98,7 +98,7 @@
     "babel-plugin-react-intl": "5.1.18",
     "babel-preset-react-optimize": "1.0.1",
     "cardano-wallet": "1.2.2",
-    "chai": "4.3.0",
+    "chai": "4.3.4",
     "chai-as-promised": "7.1.1",
     "chromedriver": "92.0.0",
     "config": "1.31.0",
