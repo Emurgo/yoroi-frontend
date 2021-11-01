@@ -165,6 +165,8 @@ export const Loading = (): Node => {
           },
           transactions: {
             hasAny: false,
+            shouldIncludeTxIds: false,
+            toggleIncludeTxIds: () => {},
             totalAvailable: 0,
             recent: [],
             searchOptions: {
@@ -316,6 +318,8 @@ const genPropsForTransactions: {|
     ),
     isExporting: request.txExport != null ? request.txExport.isExporting : false,
     exportError: request.txExport?.exportError,
+    toggleIncludeTxIds: () => {},
+    shouldIncludeTxIds: false,
   },
   addresses: {
     addressSubgroupMap: (() => {
