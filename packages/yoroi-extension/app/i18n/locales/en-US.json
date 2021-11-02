@@ -58,7 +58,6 @@
   "connector.connect.connectedWallets": "Connected Wallets",
   "connector.connect.noWebsitesConnected": "You don't have any websites connected yet",
   "connector.signin.title": "Sign transaction",
-  "connector.signin.transactionId": "Transaction id",
   "connector.signin.utxoDetails": "Utxo Details",
   "connector.settings.about": "About",
   "connector.settings.about.dAppDescription": "The dApp connector allows dApps (decentralized applications) in the form of web pages to interact in a secure manner with the user's Yoroi Ergo wallets to enable smart contract functionality.",

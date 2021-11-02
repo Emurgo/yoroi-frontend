@@ -9,7 +9,6 @@ import { Button } from '@mui/material';
 import TextField from '../../../components/common/TextField';
 import globalMessages from '../../../i18n/global-messages';
 import { observer } from 'mobx-react';
-import CopyableAddress from '../../../components/widgets/CopyableAddress';
 import config from '../../../config';
 import vjf from 'mobx-react-form/lib/validators/VJF';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
@@ -22,17 +21,12 @@ import type {
   TokenEntry,
 } from '../../../api/common/lib/MultiToken';
 import type { NetworkRow, TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
-import { getTokenName, getTokenIdentifierIfExists, genFormatTokenAmount } from '../../../stores/stateless/tokenHelpers';
-import BigNumber from 'bignumber.js';
+import { getTokenName, getTokenIdentifierIfExists } from '../../../stores/stateless/tokenHelpers';
 import type { ISignRequest } from '../../../api/common/lib/transactions/ISignRequest';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
-import {
-  MultiToken,
-} from '../../../api/common/lib/MultiToken';
 import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
-import classnames from 'classnames';
 import { mintedTokenInfo } from '../../../../chrome/extension/ergo-connector/utils';
 import type { Tx } from '../../../../chrome/extension/ergo-connector/types';
 import { Logger } from '../../../utils/logging';
@@ -60,10 +54,6 @@ const messages = defineMessages({
     id: 'connector.signin.title',
     defaultMessage: '!!!Sign transaction',
   },
-  transactionId: {
-    id: 'connector.signin.transactionId',
-    defaultMessage: '!!!Transaction id',
-  },
   utxoDetails: {
     id: 'connector.signin.utxoDetails',
     defaultMessage: '!!!Utxo Details',
@@ -71,7 +61,7 @@ const messages = defineMessages({
 });
 
 type State = {|
-  showUtxoDetails: boolean, 
+  showUtxoDetails: boolean,
 |}
 @observer
 class SignTxPage extends Component<Props, State> {
@@ -251,9 +241,9 @@ class SignTxPage extends Component<Props, State> {
                </div>
                <div className={styles.transactionWrapper}>
                  <p className={styles.transactionId}>
-                   {intl.formatMessage(messages.transactionId)}
+                   {intl.formatMessage(globalMessages.transactionId)}
                  </p>
-                 <p className={styles.hash}>some hash should go here</p>
+                 <p className={styles.hash}>{txData.self.txid}</p>
                  <button onClick={() => this.toggleUtxoDetails(true)} type='button' className={styles.utxo}>
                    <p>{intl.formatMessage(messages.utxoDetails)}</p>
                    <ArrowRight />
