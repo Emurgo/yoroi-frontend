@@ -22,7 +22,7 @@ import type {
   TokenEntry,
 } from '../../../api/common/lib/MultiToken';
 import type { NetworkRow, TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
-import { getTokenName, getTokenIdentifierIfExists } from '../../../stores/stateless/tokenHelpers';
+import { getTokenName, getTokenIdentifierIfExists, genFormatTokenAmount } from '../../../stores/stateless/tokenHelpers';
 import BigNumber from 'bignumber.js';
 import type { ISignRequest } from '../../../api/common/lib/transactions/ISignRequest';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
@@ -210,7 +210,7 @@ class SignTxPage extends Component<Props, State> {
 
     // we may need to explicitly add + for positive values
     const adjustedBefore = beforeDecimalRewards.startsWith('-')
-      ? beforeDecimalRewards
+      ? beforeDecimalRewards.slice(1)
       : '+' + beforeDecimalRewards;
 
     return (
@@ -222,71 +222,11 @@ class SignTxPage extends Component<Props, State> {
     );
   }
 
-  renderRow: {|
-    kind: string,
-    address: {| address: string, value: MultiToken |},
-    addressIndex: number,
-    transform?: BigNumber => BigNumber,
-  |} => Node = (request) => {
-    const notificationElementId = `${request.kind}-address-${request.addressIndex}-copyNotification`;
-    const divKey = (identifier) => `${request.kind}-${request.address.address}-${request.addressIndex}-${identifier}`;
-    const renderAmount = (entry) => {
-      return (
-        <div className={styles.amount}>
-          {this.renderAmountDisplay({
-            entry: {
-              ...entry,
-              amount: request.transform
-                ? request.transform(entry.amount)
-                : entry.amount,
-            },
-          })}
-        </div>
-      );
-    };
 
-    return (
-      // eslint-disable-next-line react/no-array-index-key
-      <div
-        key={divKey(request.address.value.getDefaultEntry().identifier)}
-        className={styles.addressItem}
-      >
-        <CopyableAddress
-          hash={this.props.addressToDisplayString(request.address.address)}
-          elementId={notificationElementId}
-          onCopyAddress={
-            () => this.props.onCopyAddressTooltip(request.address.address, notificationElementId)
-          }
-          notification={this.props.notification}
-        >
-          <ExplorableHashContainer
-            selectedExplorer={this.props.selectedExplorer}
-            hash={this.props.addressToDisplayString(request.address.address)}
-            light
-            linkType="address"
-          >
-            <span className={classnames([styles.rowData, styles.hash])}>
-              {truncateAddressShort(
-                this.props.addressToDisplayString(request.address.address)
-              )}
-            </span>
-          </ExplorableHashContainer>
-        </CopyableAddress>
-        {renderAmount(request.address.value.getDefaultEntry())}
-        {request.address.value.nonDefaultEntries().map(entry => (
-          <React.Fragment key={divKey(entry.identifier)}>
-            <div />
-            <div />
-            {renderAmount(entry)}
-          </React.Fragment>
-        ))}
-      </div>
-    );
-  }
 
   toggleUtxoDetails: boolean => void = (newState) => {
     this.setState({ showUtxoDetails: newState })
-  } 
+  }
 
   render(): Node {
     const { form } = this;
@@ -295,8 +235,9 @@ class SignTxPage extends Component<Props, State> {
     const { intl } = this.context;
     const { txData, onCancel, } = this.props;
     const { showUtxoDetails } = this.state
-    // const totalInput = txData.totalInput();
-    // const amount = totalInput.joinSubtractCopy(fee)
+    const totalInput = txData.totalInput();
+    const fee = txData.fee()
+    const amount = totalInput.joinSubtractCopy(fee)
 
     return (
       <>
@@ -324,10 +265,11 @@ class SignTxPage extends Component<Props, State> {
                    <p className={styles.labelValue}>
                      {this.renderAmountDisplay({
                         entry: {
-                          ...txData.fee().getDefaultEntry(),
-                          amount: txData.fee().getDefaultEntry().amount.abs().negated(),
+                          ...amount.getDefaultEntry(),
+                          amount: amount.getDefaultEntry().amount.abs().negated(),
                         },
-                      })}
+                      }
+                    )}
                    </p>
                  </div>
                  <div className={styles.infoRaw}>
@@ -348,10 +290,11 @@ class SignTxPage extends Component<Props, State> {
                    <p className={styles.labelValue}>
                      {this.renderAmountDisplay({
                         entry: {
-                          ...txData.fee().getDefaultEntry(),
-                          amount: txData.fee().getDefaultEntry().amount.abs().negated(),
+                          ...totalInput.getDefaultEntry(),
+                          amount: totalInput.getDefaultEntry().amount.abs().negated(),
                         },
-                      })}
+                      }
+                     )}
                    </p>
                  </div>
                </div>
