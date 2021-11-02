@@ -243,7 +243,7 @@ class SignTxPage extends Component<Props, State> {
                  <p className={styles.transactionId}>
                    {intl.formatMessage(globalMessages.transactionId)}
                  </p>
-                 <p className={styles.hash}>{txData.self.txid}</p>
+                 <p className={styles.hash}>Some hash should go here</p>
                  <button onClick={() => this.toggleUtxoDetails(true)} type='button' className={styles.utxo}>
                    <p>{intl.formatMessage(messages.utxoDetails)}</p>
                    <ArrowRight />
