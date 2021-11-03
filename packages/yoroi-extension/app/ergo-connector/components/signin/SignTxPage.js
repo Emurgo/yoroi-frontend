@@ -57,6 +57,10 @@ const messages = defineMessages({
   utxoDetails: {
     id: 'connector.signin.utxoDetails',
     defaultMessage: '!!!Utxo Details',
+  },
+  more: {
+    id: 'connector.signin.more',
+    defaultMessage: '!!!more'
   }
 });
 
@@ -186,7 +190,7 @@ class SignTxPage extends Component<Props, State> {
               {calculateAndFormatValue(shiftedAmount, price)}
             </span>
             {' '}{currency}
-            <div className={styles.amountSmall}>
+            <div className={styles.amountRegular}>
               {shiftedAmount.toString()} {this.getTicker(tokenInfo)}
             </div>
           </>
@@ -212,7 +216,22 @@ class SignTxPage extends Component<Props, State> {
     );
   }
 
+  renderAddresses(): Node {
+    const addresses = this.props.txData.outputs().map(({ address }) =>  address )
 
+    return (
+      <div className={styles.toAddresses}>
+        {addresses.map((address, idx) => {
+          if (idx >= 1) return (
+            <button className={styles.more} type='button' onClick={this.toggleUtxoDetails}>
+              {addresses.length - 1} <span>{this.context.intl.formatMessage(messages.more)}</span>
+            </button>
+          )
+          return <p>{address}</p>
+        })}
+      </div>
+    )
+  }
 
   toggleUtxoDetails: boolean => void = (newState) => {
     this.setState({ showUtxoDetails: newState })
@@ -241,9 +260,9 @@ class SignTxPage extends Component<Props, State> {
                </div>
                <div className={styles.transactionWrapper}>
                  <p className={styles.transactionId}>
-                   {intl.formatMessage(globalMessages.transactionId)}
+                   {intl.formatMessage(globalMessages.toAddresses)}
                  </p>
-                 <p className={styles.hash}>Some hash should go here</p>
+                 <p className={styles.hash}>{this.renderAddresses()}</p>
                  <button onClick={() => this.toggleUtxoDetails(true)} type='button' className={styles.utxo}>
                    <p>{intl.formatMessage(messages.utxoDetails)}</p>
                    <ArrowRight />
