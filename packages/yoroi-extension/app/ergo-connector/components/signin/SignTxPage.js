@@ -205,9 +205,9 @@ class SignTxPage extends Component<Props, State> {
 
     return (
       <>
-        <span className={styles.amountRegular}>{adjustedBefore}</span>
-        <span className={styles.afterDecimal}>{afterDecimalRewards}</span>
-        {' '}{this.getTicker(tokenInfo)}
+        <span className={styles.amountRegular}>
+          {adjustedBefore}{afterDecimalRewards}
+        </span> {this.getTicker(tokenInfo)}
       </>
     );
   }
