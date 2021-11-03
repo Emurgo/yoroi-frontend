@@ -231,10 +231,10 @@ class SignTxPage extends Component<Props, State> {
 
     return (
       <>
+        <ProgressBar step={2} />
         {
          !showUtxoDetails ? (
            <div>
-             <ProgressBar step={2} />
              <div className={styles.component}>
                <div>
                  <h1 className={styles.title}>{intl.formatMessage(messages.title)}</h1>
@@ -273,11 +273,11 @@ class SignTxPage extends Component<Props, State> {
                       })}
                    </p>
                  </div>
-                 <div className={styles.infoRaw}>
-                   <p className={styles.label}>
+                 <div className={styles.totalAmoundCard}>
+                   <p className={styles.totalAmoundLable}>
                      {intl.formatMessage(globalMessages.walletSendConfirmationTotalLabel)}
                    </p>
-                   <p className={styles.labelValue}>
+                   <p className={styles.totalAmound}>
                      {this.renderAmountDisplay({
                         entry: {
                           ...totalInput.getDefaultEntry(),

@@ -1,6 +1,6 @@
 .component {
-  padding-right: 32px;
-  padding-left: 32px;
+  padding-right: 15px;
+  padding-left: 15px;
   padding-top: 30px;
   overflow-wrap: break-word;
 
@@ -8,12 +8,13 @@
     font-size: 24px;
     line-height: 32px;
     margin-bottom: 20px;
+    padding: 0px 20px;
   }
 
   .transactionWrapper {
     margin-top: 20px;
     margin-bottom: 30px;
-    padding: 0px 4px;
+    padding: 0px 20px;
 
     .transactionId {
       font-size: 16px;
@@ -49,7 +50,7 @@
       align-items: center;
       justify-content: space-between;
       border-bottom: 3px solid #EAEDF2;
-      padding: 10px 4px;
+      padding: 10px 20px;
       .label {
         font-size: 16px;
         line-height: 24px;
@@ -63,7 +64,7 @@
       }
     }
 
-    .infoRaw:last-child {
+    .infoRaw:nth-child(2) {
       border: none;
     }
   }
@@ -100,4 +101,17 @@
   grid-template-columns: 1fr 1fr;
   grid-gap: 10px;
  
+}
+
+.totalAmoundCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 30px 20px;
+  background-color: var(--yoroi-palette-secondary-300);
+  color: #FFFFFF;
+  margin-top: 20px;
+  border-radius: 9px;
+  font-size: 17px;
+  font-weight: 500;
 }
