@@ -87,7 +87,6 @@ test('Generate address parameters', async () => {
       path,
       addressingMap: () => undefined,
     }))
-    // $FlowFixMe
     .toEqual(({
       type: AddressType.BASE_PAYMENT_KEY_STAKE_KEY,
       params: {
