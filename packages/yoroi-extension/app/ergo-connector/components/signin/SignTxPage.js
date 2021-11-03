@@ -1,5 +1,6 @@
 /* eslint-disable no-nested-ternary */
 // @flow
+// eslint-disable-next-line no-unused-vars
 import React, { Component } from 'react';
 import type { Node } from 'react';
 import { intlShape, defineMessages } from 'react-intl';
@@ -223,7 +224,7 @@ class SignTxPage extends Component<Props, State> {
       <div className={styles.toAddresses}>
         {addresses.map((address, idx) => {
           if (idx >= 1) return (
-            <button className={styles.more} type='button' onClick={this.toggleUtxoDetails}>
+            <button className={styles.more} type='button' onClick={() => this.toggleUtxoDetails(true)}>
               {addresses.length - 1} <span>{this.context.intl.formatMessage(messages.more)}</span>
             </button>
           )
