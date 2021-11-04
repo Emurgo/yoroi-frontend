@@ -19,7 +19,7 @@
 .addressItem {
   display: grid;
   grid-gap: 15px;
-  grid-template-columns: minmax(232px, 550px) 150px 1fr;
+  grid-template-columns: 150px 1fr 10px;
   align-items: center;
 }
 * + h2,
@@ -46,7 +46,7 @@
   border-top: 1px solid #dce0e9;
   display: grid;
   grid-gap: 15px;
-  grid-template-columns: minmax(232px, 550px) 150px 1fr;
+  grid-template-columns: 150px 1fr 10px;
 }
   
 .addressHeader:first-child {
@@ -72,5 +72,15 @@
 
   & > p {
     margin-left: 5px;
+  }
+}
+
+@media (min-width: 500px) {
+  .addressHeader {
+    grid-template-columns: 250px 1fr 10px;
+  }
+
+  .addressItem {
+    grid-template-columns: 250px 1fr 10px;
   }
 }

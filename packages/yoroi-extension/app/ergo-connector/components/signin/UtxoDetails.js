@@ -201,7 +201,7 @@ class UtxoDetails extends Component<Props> {
           >
             <span className={classnames([styles.rowData, styles.hash])}>
               {truncateAddressShort(
-                this.props.addressToDisplayString(request.address.address)
+                this.props.addressToDisplayString(request.address.address), 10
               )}
             </span>
           </ExplorableHashContainer>
