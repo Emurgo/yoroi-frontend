@@ -57,6 +57,7 @@ class StakingPage extends Component<AllProps> {
     if (publicDeriver == null) {
       throw new Error(`${nameof(StakingPage)} no public deriver. Should never happen`);
     }
+    const isWalletWithFunds = !recentTransactionsRequest.wasExecuted || hasAny
     return (
       <TopBarLayout
         banner={<BannerContainer {...this.generated.BannerContainerProps} />}
@@ -85,7 +86,7 @@ class StakingPage extends Component<AllProps> {
             },
           }}
         >
-          {!recentTransactionsRequest.wasExecuted || hasAny ? null : (
+          {isWalletWithFunds ? null : (
             <WalletEmptyBanner
               isOpen={this.generated.stores.transactions.showWalletEmptyBanner}
               onClose={this.generated.actions.transactions.closeWalletEmptyBanner.trigger}
@@ -98,6 +99,7 @@ class StakingPage extends Component<AllProps> {
             isOpen={this.generated.stores.transactions.showDelegationBanner}
             onClose={this.generated.actions.transactions.closeDelegationBanner.trigger}
             onDelegateClick={() => console.log('delegating')}
+            isWalletWithFunds={isWalletWithFunds}
             ticker={truncateToken(
               getTokenName(
                 this.generated.stores.tokenInfoStore.getDefaultTokenInfo(
