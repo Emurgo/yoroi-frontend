@@ -321,11 +321,12 @@ class SignTxPage extends Component<Props, State> {
                  />
                </div>
                <div className={styles.wrapperBtn}>
-                 <Button variant="secondary" onClick={onCancel}>
+                 <Button fullWidth variant="secondary" onClick={onCancel}>
                    {intl.formatMessage(globalMessages.cancel)}
                  </Button>
                  <Button
                    variant="primary"
+                   fullWidth
                    disabled={!walletPasswordField.isValid}
                    onClick={this.submit.bind(this)}
                  >
