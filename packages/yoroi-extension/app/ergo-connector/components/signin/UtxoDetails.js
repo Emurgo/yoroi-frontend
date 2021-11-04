@@ -47,8 +47,8 @@ type Props = {|
 
 const messages = defineMessages({
   utxoDetails: {
-    id: 'connector.signin.utxoDetails',
-    defaultMessage: '!!!Utxo Details',
+    id: 'connector.signin.txDetails',
+    defaultMessage: '!!!Transaction Details',
   }
 });
 

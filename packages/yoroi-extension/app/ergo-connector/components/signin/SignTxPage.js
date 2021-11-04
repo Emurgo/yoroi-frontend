@@ -55,9 +55,13 @@ const messages = defineMessages({
     id: 'connector.signin.title',
     defaultMessage: '!!!Sign transaction',
   },
-  utxoDetails: {
-    id: 'connector.signin.utxoDetails',
-    defaultMessage: '!!!Utxo Details',
+  txDetails: {
+    id: 'connector.signin.txDetails',
+    defaultMessage: '!!!Transaction Details',
+  },
+  receiver: {
+    id: 'connector.signin.receiver',
+    defaultMessage: '!!!Receiver',
   },
   more: {
     id: 'connector.signin.more',
@@ -261,11 +265,11 @@ class SignTxPage extends Component<Props, State> {
                </div>
                <div className={styles.transactionWrapper}>
                  <p className={styles.transactionId}>
-                   {intl.formatMessage(globalMessages.toAddresses)}
+                   {intl.formatMessage(messages.receiver)}
                  </p>
                  <p className={styles.hash}>{this.renderAddresses()}</p>
                  <button onClick={() => this.toggleUtxoDetails(true)} type='button' className={styles.utxo}>
-                   <p>{intl.formatMessage(messages.utxoDetails)}</p>
+                   <p>{intl.formatMessage(messages.txDetails)}</p>
                    <ArrowRight />
                  </button>
                </div>
