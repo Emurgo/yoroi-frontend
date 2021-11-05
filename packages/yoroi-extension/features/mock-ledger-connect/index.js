@@ -31,7 +31,8 @@ import {
   AddressType,
   CertificateType,
   TxOutputDestinationType,
-  TxAuxiliaryDataType
+  TxAuxiliaryDataType,
+  StakeCredentialParamsType,
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 
 type WalletInfo = {|
@@ -64,6 +65,11 @@ async function genWalletInfo(serial: string): Promise<WalletInfo> {
             supportsMary: true,
             supportsCatalystRegistration: true,
             supportsZeroTtl: true,
+            supportsMint: true,
+            supportsNativeScriptHashDerivation: true,
+            supportsPoolRegistrationAsOperator: true,
+            supportsPoolRetirement: true,
+            supportsMultisigTransaction: true,
           },
         },
       };
@@ -91,11 +97,18 @@ function deriveAddress(
   },
 ): RustModule.WalletV4.Address {
   let keyPath;
-  if (request.address.type === AddressType.REWARD) {
-    keyPath = request.address.params.stakingPath;
-  } else {
+  if (request.address.type === AddressType.REWARD_KEY) {
+    if (request.address.params.stakingPath) {
+      keyPath = request.address.params.stakingPath;
+    } else { // request.address.params.stakingScriptHash
+      throw new Error('not implemented for this address type');
+    }
+  } else if (request.address.params.spendingPath) {
     keyPath = request.address.params.spendingPath;
+  } else {
+    throw new Error('not implemented for this address type');
   }
+
   const spendingKey = derivePath(rootKey, keyPath);
 
   if (request.address.type === AddressType.BYRON) {
@@ -104,7 +117,7 @@ function deriveAddress(
       request.network.protocolMagic
     ).to_address();
   }
-  if (request.address.type === AddressType.ENTERPRISE) {
+  if (request.address.type === AddressType.ENTERPRISE_KEY) {
     return RustModule.WalletV4.EnterpriseAddress.new(
       request.network.networkId,
       RustModule.WalletV4.StakeCredential.from_keyhash(
@@ -112,7 +125,7 @@ function deriveAddress(
       ),
     ).to_address();
   }
-  if (request.address.type === AddressType.POINTER) {
+  if (request.address.type === AddressType.POINTER_KEY) {
     const pointer = RustModule.WalletV4.Pointer.new(
       request.address.params.stakingBlockchainPointer.blockIndex,
       request.address.params.stakingBlockchainPointer.txIndex,
@@ -126,7 +139,7 @@ function deriveAddress(
       pointer,
     ).to_address();
   }
-  if (request.address.type === AddressType.REWARD) {
+  if (request.address.type === AddressType.REWARD_KEY) {
     return RustModule.WalletV4.RewardAddress.new(
       request.network.networkId,
       RustModule.WalletV4.StakeCredential.from_keyhash(
@@ -134,7 +147,7 @@ function deriveAddress(
       ),
     ).to_address();
   }
-  if (request.address.type === AddressType.BASE) {
+  if (request.address.type === AddressType.BASE_PAYMENT_KEY_STAKE_KEY) {
     let stakingKeyHash;
     if (request.address.params.stakingKeyHashHex != null) {
       stakingKeyHash = RustModule.WalletV4.Ed25519KeyHash.from_bytes(
@@ -324,11 +337,18 @@ class MockLedgerConnect {
     if (request.params.tx.certificates && request.params.tx.certificates.length > 0) {
       const certs = RustModule.WalletV4.Certificates.new();
       for (const cert of request.params.tx.certificates ?? []) {
-        if (cert.type === CertificateType.STAKE_POOL_REGISTRATION) {
+        if (
+          cert.type === CertificateType.STAKE_POOL_REGISTRATION ||
+            cert.type === CertificateType.STAKE_POOL_RETIREMENT
+        ) {
           // TODO
           continue;
         }
-        const stakingKey = derivePath(selectedWallet.rootKey, cert.params.path).to_raw_key();
+        if (cert.params.stakeCredential.type !== StakeCredentialParamsType.KEY_PATH) {
+          throw new Error('unsupported stake credential type');
+        }
+        const { keyPath } = cert.params.stakeCredential;
+        const stakingKey = derivePath(selectedWallet.rootKey, keyPath).to_raw_key();
         const stakeCredential = RustModule.WalletV4.StakeCredential.from_keyhash(
           stakingKey.to_public().hash()
         );
@@ -340,7 +360,7 @@ class MockLedgerConnect {
         if (cert.type === CertificateType.STAKE_DEREGISTRATION) {
           keys.push({
             witGen: (hash) => stakingKey.sign(hash.to_bytes()),
-            path: cert.params.path
+            path: keyPath,
           });
           certs.add(RustModule.WalletV4.Certificate.new_stake_deregistration(
             RustModule.WalletV4.StakeDeregistration.new(stakeCredential)
@@ -349,7 +369,7 @@ class MockLedgerConnect {
         if (cert.type === CertificateType.STAKE_DELEGATION) {
           keys.push({
             witGen: (hash) => stakingKey.sign(hash.to_bytes()),
-            path: cert.params.path
+            path: keyPath,
           });
 
           if (cert.params.poolKeyHashHex == null) throw new Error('Missing pool key hash');
@@ -383,10 +403,14 @@ class MockLedgerConnect {
     if (request.params.tx.withdrawals && request.params.tx.withdrawals.length > 0) {
       const withdrawals = RustModule.WalletV4.Withdrawals.new();
       for (const withdrawal of request.params.tx.withdrawals ?? []) {
-        const stakingKey = derivePath(selectedWallet.rootKey, withdrawal.path).to_raw_key();
+        if (withdrawal.stakeCredential.type !== StakeCredentialParamsType.KEY_PATH) {
+          throw new Error('unsupported withdrawal stake credential type');
+        }
+        const { keyPath } = withdrawal.stakeCredential;
+        const stakingKey = derivePath(selectedWallet.rootKey, keyPath).to_raw_key();
         keys.push({
           witGen: (hash) => stakingKey.sign(hash.to_bytes()),
-          path: withdrawal.path
+          path: keyPath,
         });
 
         const rewardAddress = RustModule.WalletV4.RewardAddress.new(

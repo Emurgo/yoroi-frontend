@@ -505,9 +505,19 @@ export async function connectorSignCardanoTx(
     ...signingKey,
     password,
   });
-
+  const utxoIdSet: Set<string> = new Set();
+  for (let i = 0; i < txBody.inputs().len(); i++) {
+    const input = txBody.inputs().get(i);
+    utxoIdSet.add(
+      Buffer.from(input.transaction_id().to_bytes()).toString('hex') +
+      String(input.index())
+    );
+  }
+  const usedUtxos = addressedUtxos.filter(utxo =>
+    utxoIdSet.has(utxo.utxo_id)
+  );
   const signedTx = shelleySignTransaction(
-    addressedUtxos,
+    usedUtxos,
     txBody,
     withLevels.getParent().getPublicDeriverLevel(),
     RustModule.WalletV4.Bip32PrivateKey.from_bytes(

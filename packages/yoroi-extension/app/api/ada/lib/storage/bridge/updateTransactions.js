@@ -2325,6 +2325,8 @@ export function networkTxHeaderToDb(
         Extra: {
           Fee: tx.fee,
           Metadata: tx.metadata,
+          // for backward compatiblity, if the field is not present, we take the tx as valid
+          IsValid: tx.valid_transaction ?? true,
         },
         BlockId: blockId,
         ...baseTx,

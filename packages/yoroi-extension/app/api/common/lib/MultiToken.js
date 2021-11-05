@@ -28,6 +28,18 @@ export class MultiToken {
   values: Array<TokenEntry>
   defaults: DefaultTokenEntry;
 
+  static from(multiTokenData: {|
+    values: Array<{| identifier: string, networkId: number, amount: string |}>,
+    defaults: DefaultTokenEntry,
+  |}): MultiToken {
+    return new MultiToken(
+      multiTokenData.values.map(({ identifier, networkId, amount }) => ({
+        identifier, networkId, amount: new BigNumber(amount),
+      })),
+      multiTokenData.defaults
+    );
+  }
+  
   constructor(
     values: Array<TokenEntry>,
     defaults: DefaultTokenEntry
