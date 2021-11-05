@@ -207,7 +207,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         runInAction(() => {
           this.signingMessage = response;
         });
-        if (response.sign.type === 'tx/cardano') {
+        if (response && response.sign.type === 'tx/cardano') {
           this.createAdaTransaction();
         }
       })
