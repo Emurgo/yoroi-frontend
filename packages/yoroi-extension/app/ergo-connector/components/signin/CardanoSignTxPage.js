@@ -39,7 +39,6 @@ import type {
 } from '../../../../chrome/extension/ergo-connector/types';
 import { isErgo } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import type { CardanoConnectorSignRequest } from '../../types';
-import UtxoDetails from './UtxoDetails';
 import ArrowRight from '../../../assets/images/arrow-right.inline.svg';
 import CardanoUtxoDetails from './CardanoUtxoDetails';
 
@@ -327,6 +326,46 @@ state: State = {
                     <p>{intl.formatMessage(messages.txDetails)}</p>
                     <ArrowRight />
                   </button>
+                </div>
+                <div className={styles.info}>
+                  <div className={styles.infoRaw}>
+                    <p className={styles.label}>{intl.formatMessage(globalMessages.amount)}</p>
+                    <p className={styles.labelValue}>
+                      {this.renderAmountDisplay({
+                        entry: {
+                          identifier: txData.fee.tokenId,
+                          networkId: txData.fee.networkId,
+                          amount: (new BigNumber(txData.fee.amount)).negated(),
+                        },
+                    })}
+                    </p>
+                  </div>
+                  <div className={styles.infoRaw}>
+                    <p className={styles.label}>{intl.formatMessage(globalMessages.feeLabel)}</p>
+                    <p className={styles.labelValue}>
+                      {this.renderAmountDisplay({
+                  entry: {
+                    identifier: txData.fee.tokenId,
+                    networkId: txData.fee.networkId,
+                    amount: (new BigNumber(txData.fee.amount)).negated(),
+                  },
+                })}
+                    </p>
+                  </div>
+                  <div className={styles.totalAmoundCard}>
+                    <p className={styles.totalAmoundLable}>
+                      {intl.formatMessage(globalMessages.walletSendConfirmationTotalLabel)}
+                    </p>
+                    <p className={styles.totalAmound}>
+                      {this.renderAmountDisplay({
+                  entry: {
+                    identifier: txData.fee.tokenId,
+                    networkId: txData.fee.networkId,
+                    amount: (new BigNumber(txData.fee.amount)).negated(),
+                  },
+                })}
+                    </p>
+                  </div>
                 </div>
                 <div className={styles.passwordInput}>
                   <TextField

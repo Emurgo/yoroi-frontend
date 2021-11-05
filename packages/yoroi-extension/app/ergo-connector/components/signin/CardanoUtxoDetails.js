@@ -27,11 +27,8 @@ import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashC
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 import classnames from 'classnames';
-import { mintedTokenInfo } from '../../../../chrome/extension/ergo-connector/utils';
 import type { Tx } from '../../../../chrome/extension/ergo-connector/types';
-import { Logger } from '../../../utils/logging';
 import ArrowLeft from '../../../assets/images/arrow-left.inline.svg'
-import { isErgo } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 
 type Props = {|
   +tx: Tx,
