@@ -277,7 +277,9 @@ export default class WalletCard extends Component<Props, State> {
   };
 
   countTokenTypes: void => {|tokenTypes: number, nfts: number|} = () => {
-    if (this.props.walletAmount.values && Array.isArray(this.props.walletAmount.values)) {
+    if (this.props.walletAmount
+      && this.props.walletAmount.values
+      && Array.isArray(this.props.walletAmount.values)) {
       const count = this.props.walletAmount.values.reduce((prev, curr) => {
         const tokenInfo = this.props.getTokenInfo(curr);
         if (tokenInfo.Identifier !== '' && !tokenInfo.IsDefault) {
