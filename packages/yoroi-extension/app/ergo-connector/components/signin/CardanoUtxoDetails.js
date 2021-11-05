@@ -4,26 +4,21 @@ import React, { Component } from 'react';
 import type { Node } from 'react';
 import { intlShape, defineMessages } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import styles from './SignTxPage.scss';
-import { Button } from '@mui/material';
-import TextField from '../../../components/common/TextField';
+import styles from './UtxoDetails.scss';
 import globalMessages from '../../../i18n/global-messages';
 import { observer } from 'mobx-react';
 import CopyableAddress from '../../../components/widgets/CopyableAddress';
-import config from '../../../config';
-import vjf from 'mobx-react-form/lib/validators/VJF';
-import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import type { Notification } from '../../../types/notificationType';
 import { splitAmount, truncateAddressShort, truncateToken } from '../../../utils/formatters';
 import ProgressBar from '../ProgressBar';
 import type {
-  DefaultTokenEntry,
   TokenLookupKey,
   TokenEntry,
 } from '../../../api/common/lib/MultiToken';
-import type { NetworkRow, TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
+import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import { getTokenName, getTokenIdentifierIfExists } from '../../../stores/stateless/tokenHelpers';
 import BigNumber from 'bignumber.js';
+import type { ISignRequest } from '../../../api/common/lib/transactions/ISignRequest';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import {
   MultiToken,
@@ -33,110 +28,37 @@ import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 import classnames from 'classnames';
 import { mintedTokenInfo } from '../../../../chrome/extension/ergo-connector/utils';
-import type {
-  Tx,
-  CardanoTx,
-} from '../../../../chrome/extension/ergo-connector/types';
+import type { Tx } from '../../../../chrome/extension/ergo-connector/types';
+import { Logger } from '../../../utils/logging';
+import ArrowLeft from '../../../assets/images/arrow-left.inline.svg'
 import { isErgo } from '../../../api/ada/lib/storage/database/prepackaged/networks';
-import type { CardanoConnectorSignRequest } from '../../types';
-import UtxoDetails from './UtxoDetails';
-import ArrowRight from '../../../assets/images/arrow-right.inline.svg';
-import CardanoUtxoDetails from './CardanoUtxoDetails';
 
 type Props = {|
-  +tx: Tx | CardanoTx,
-  +txData: CardanoConnectorSignRequest,
+  +tx: Tx,
+  +txData: ISignRequest<any>,
   +onCopyAddressTooltip: (string, string) => void,
-  +onCancel: () => void,
-  +onConfirm: string => void,
   +notification: ?Notification,
-  +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
-  +defaultToken: DefaultTokenEntry,
-  +network: $ReadOnly<NetworkRow>,
+  +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow> | null,
   +unitOfAccountSetting: UnitOfAccountSettingType,
   +addressToDisplayString: string => string,
   +selectedExplorer: SelectedExplorer,
   +getCurrentPrice: (from: string, to: string) => ?number,
+  +toggleUtxoDetails: (newState: boolean) => void
 |};
 
-type State = {|
-  showUtxoDetails: boolean,
-|}
-
 const messages = defineMessages({
-  title: {
-    id: 'connector.signin.title',
-    defaultMessage: '!!!Sign transaction',
-  },
-  txDetails: {
+  utxoDetails: {
     id: 'connector.signin.txDetails',
     defaultMessage: '!!!Transaction Details',
-  },
-  receiver: {
-    id: 'connector.signin.receiver',
-    defaultMessage: '!!!Receiver',
-  },
-  more: {
-    id: 'connector.signin.more',
-    defaultMessage: '!!!more'
   }
 });
 
 @observer
-class SignTxPage extends Component<Props, State> {
+class CardanoUtxoDetails extends Component<Props> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
-state: State = {
-  showUtxoDetails: true,
-}
-
-  form: ReactToolboxMobxForm = new ReactToolboxMobxForm(
-    {
-      fields: {
-        walletPassword: {
-          type: 'password',
-          label: this.context.intl.formatMessage(globalMessages.walletPasswordLabel),
-          placeholder: this.context.intl.formatMessage(
-            globalMessages.walletPasswordFieldPlaceholder
-          ),
-          value: '',
-          validators: [
-            ({ field }) => {
-              if (field.value === '') {
-                return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
-              }
-              return [true];
-            },
-          ],
-        },
-      },
-    },
-    {
-      options: {
-        validateOnChange: true,
-        validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
-      },
-      plugins: {
-        vjf: vjf(),
-      },
-    }
-  );
-
-  submit(): void {
-    this.form.submit({
-      onSuccess: form => {
-        const { walletPassword } = form.values();
-        this.props.onConfirm(walletPassword);
-      },
-      onError: () => {},
-    });
-  }
-
-  toggleUtxoDetails: boolean => void = (newState) => {
-    this.setState({ showUtxoDetails: newState })
-  }
 
   getTicker: $ReadOnly<TokenRow> => Node = tokenInfo => {
     const fingerprint = this.getFingerprint(tokenInfo);
@@ -163,17 +85,21 @@ state: State = {
 
   // Tokens can be minted inside the transaction so we have to look it up there first
   _resolveTokenInfo: TokenEntry => $ReadOnly<TokenRow> = tokenEntry => {
-    if (isErgo(this.props.network)) {
-      // Because this is a Ergo wallet, we know the type of `tx` must be `Tx`
-      // $FlowFixMe[prop-missing]
-      const tx: Tx = this.props.tx;
-      const mintedTokens = mintedTokenInfo(tx, () => {});
-      const mintedToken = mintedTokens.find(t => tokenEntry.identifier === t.Identifier);
-      if (mintedToken != null) {
-        return mintedToken;
-      }
-    }
     return this.props.getTokenInfo(tokenEntry);
+  }
+
+  displayUnAvailableToken: TokenEntry => Node = (tokenEntry) => {
+    return (
+      <>
+        <span className={styles.amountRegular}>{'+'}{tokenEntry.amount.toString()}</span>
+        {' '}
+        <span>
+          {truncateAddressShort(
+           tokenEntry.identifier
+          )}
+        </span>
+      </>
+    )
   }
 
   renderAmountDisplay: {|
@@ -222,6 +148,7 @@ state: State = {
     );
   }
 
+
   renderRow: {|
     kind: string,
     address: {| address: string, value: MultiToken |},
@@ -267,7 +194,7 @@ state: State = {
           >
             <span className={classnames([styles.rowData, styles.hash])}>
               {truncateAddressShort(
-                this.props.addressToDisplayString(request.address.address)
+                this.props.addressToDisplayString(request.address.address), 10
               )}
             </span>
           </ExplorableHashContainer>
@@ -284,95 +211,21 @@ state: State = {
     );
   }
 
-  renderAddresses(): Node {
-    const addresses = this.props.txData.outputs.map(({ address }) =>  address )
-    return (
-      <div className={styles.toAddresses}>
-        {addresses.map((address, idx) => {
-          if (idx >= 1) return (
-            <button className={styles.more} type='button' onClick={() => this.toggleUtxoDetails(true)}>
-              {addresses.length - 1} <span>{this.context.intl.formatMessage(messages.more)}</span>
-            </button>
-          )
-          return <p>{address}</p>
-        })}
-      </div>
-    )
-  }
-
-
   render(): Node {
-    const { form } = this;
-    const walletPasswordField = form.$('walletPassword');
-
     const { intl } = this.context;
-    const { txData, onCancel, } = this.props;
-    const { showUtxoDetails } = this.state
+    const { txData } = this.props;
+
     return (
       <>
         <ProgressBar step={2} />
         <div className={styles.component}>
-          {
-            !showUtxoDetails ?(
-              <div>
-                <div>
-                  <h1 className={styles.title}>{intl.formatMessage(messages.title)}</h1>
-                </div>
-                <div className={styles.transactionWrapper}>
-                  <p className={styles.transactionId}>
-                    {intl.formatMessage(messages.receiver)}
-                  </p>
-                  <p className={styles.hash}>{this.renderAddresses()}</p>
-                  <button onClick={() => this.toggleUtxoDetails(true)} type='button' className={styles.utxo}>
-                    <p>{intl.formatMessage(messages.txDetails)}</p>
-                    <ArrowRight />
-                  </button>
-                </div>
-                <div className={styles.passwordInput}>
-                  <TextField
-                    type="password"
-                    className={styles.walletPassword}
-                    {...walletPasswordField.bind()}
-                    error={walletPasswordField.error}
-                  />
-                </div>
-                <div className={styles.wrapperBtn}>
-                  <Button variant="secondary" className="secondary" onClick={onCancel}>
-                    {intl.formatMessage(globalMessages.cancel)}
-                  </Button>
-                  <Button
-                    variant="primary"
-                    disabled={!walletPasswordField.isValid}
-                    onClick={this.submit.bind(this)}
-                  >
-                    {intl.formatMessage(globalMessages.confirm)}
-                  </Button>
-                </div>
-              </div>
-            ) : <CardanoUtxoDetails
-              txData={txData}
-              onCopyAddressTooltip={this.props.onCopyAddressTooltip}
-              addressToDisplayString={this.props.addressToDisplayString}
-              getCurrentPrice={this.props.getCurrentPrice}
-              getTokenInfo={this.props.getTokenInfo}
-              notification={this.props.notification}
-              selectedExplorer={this.props.selectedExplorer}
-              tx={this.props.tx}
-              unitOfAccountSetting={this.props.unitOfAccountSetting}
-              toggleUtxoDetails={this.toggleUtxoDetails}
-            />
-          }
-        </div>
-      </>
-    );
-  }
-}
-
-export default SignTxPage;
-
-
-/**
- *  <div>
+          <div>
+            <button onClick={() => this.props.toggleUtxoDetails(false)} className={styles.back} type='button'>
+              <ArrowLeft />
+              <p>{intl.formatMessage(messages.utxoDetails)}</p>
+            </button>
+          </div>
+          <div>
             <div className={styles.addressHeader}>
               <div className={styles.addressFrom}>
                 <p className={styles.label}>
@@ -419,23 +272,11 @@ export default SignTxPage;
                 });
               })}
             </div>
-            <div className={styles.addressHeader}>
-              <div className={styles.addressTo}>
-                <p className={styles.label}>
-                  {intl.formatMessage(globalMessages.feeLabel)}
-                </p>
-              </div>
-            </div>
-            <div className={styles.addressToList}>
-              <div className={styles.amount}>
-                {this.renderAmountDisplay({
-                  entry: {
-                    identifier: txData.fee.tokenId,
-                    networkId: txData.fee.networkId,
-                    amount: (new BigNumber(txData.fee.amount)).negated(),
-                  },
-                })}
-              </div>
-            </div>
           </div>
- */
+        </div>
+      </>
+    );
+  }
+}
+
+export default CardanoUtxoDetails;
