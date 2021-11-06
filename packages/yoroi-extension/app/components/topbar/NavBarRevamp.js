@@ -65,7 +65,7 @@ class NavBarRevamp extends Component<Props> {
               </Box>
             )}
             <IconButton
-              sx={{ color: 'var(--yoroi-palette-gray-600)', marginLeft: '11.5px' }}
+              sx={{ color: 'var(--yoroi-palette-gray-600)', marginLeft: '15px' }}
               type="button"
               onClick={this.props.goToNotifications}
             >

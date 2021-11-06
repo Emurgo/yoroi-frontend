@@ -66,7 +66,9 @@ class StakingPage extends Component<AllProps> {
           <NavBarContainerRevamp
             {...this.generated.NavBarContainerRevampProps}
             title={
-              <NavBarTitle title={this.context.intl.formatMessage(globalMessages.sidebarStaking)} />
+              <NavBarTitle
+                title={this.context.intl.formatMessage(globalMessages.stakingDashboard)}
+              />
             }
           />
         }

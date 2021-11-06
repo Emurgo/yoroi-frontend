@@ -582,6 +582,10 @@ const globalMessages: * = defineMessages({
     defaultMessage: '!!!Claim or transfer wallet',
   },
   // Revamp labels for sidebar
+  stakingDashboard: {
+    id: 'sidebar.stakingDashboard',
+    defaultMessage: '!!!Staking Dashboard',
+  },
   sidebarStaking: {
     id: 'sidebar.staking',
     defaultMessage: '!!!Staking',
