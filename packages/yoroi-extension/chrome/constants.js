@@ -41,6 +41,7 @@ export function genCSP(request: {|
     imgSrc.push(portToPermission(Ports.WebpackDev));
   }
 
+  imgSrc.push('https://static.adapools.org/');
   // connectSrc.push('https://api.dropboxapi.com');
   // connectSrc.push('https://content.dropboxapi.com');
 

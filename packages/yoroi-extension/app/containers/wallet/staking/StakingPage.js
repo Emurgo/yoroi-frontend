@@ -57,7 +57,29 @@ class StakingPage extends Component<AllProps> {
     if (publicDeriver == null) {
       throw new Error(`${nameof(StakingPage)} no public deriver. Should never happen`);
     }
-    const isWalletWithFunds = !recentTransactionsRequest.wasExecuted || hasAny
+    const isWalletWithFunds = !recentTransactionsRequest.wasExecuted || hasAny;
+
+    // TODO: Show first pool from from adapools api
+    const firstPool = {
+      id: '7f6c103302f96390d478a170fe80938b76fccd8a23490e3b6ddebcf7',
+      name: '[GOAT] Goat Stake',
+      roa: '5.08%',
+      socialLinks: {
+        tw: 'GoatStake',
+        tg: 'GoatStakeGroup',
+        fb: 'GoatStake',
+        yt: null,
+        tc: null,
+        di: '24GzMYgwwU',
+        gh: null,
+        icon:
+          'https://static.adapools.org/pool_logo/7f6c103302f96390d478a170fe80938b76fccd8a23490e3b6ddebcf7.png',
+      },
+      websiteUrl: 'https://goatstake.com?utm_source=adapools.org',
+      avatar:
+        'https://static.adapools.org/pool_logo/7f6c103302f96390d478a170fe80938b76fccd8a23490e3b6ddebcf7.png',
+    };
+
     return (
       <TopBarLayout
         banner={<BannerContainer {...this.generated.BannerContainerProps} />}
@@ -101,6 +123,7 @@ class StakingPage extends Component<AllProps> {
             isOpen={this.generated.stores.transactions.showDelegationBanner}
             onClose={this.generated.actions.transactions.closeDelegationBanner.trigger}
             onDelegateClick={() => console.log('delegating')}
+            poolInfo={firstPool}
             isWalletWithFunds={isWalletWithFunds}
             ticker={truncateToken(
               getTokenName(
