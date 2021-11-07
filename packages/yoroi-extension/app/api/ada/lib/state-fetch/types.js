@@ -91,6 +91,12 @@ export type RemoteTransactionShelley = {|
   +certificates: $ReadOnlyArray<RemoteCertificate>,
   +withdrawals: Array<RemoteWithdrawal>,
   +metadata: null | string,
+  // The updated backend will always return this field, but we allow it to be
+  // missing which is treated as `true` for backward compatiblity.
+  // This way we don't have to update the frontend and backend in lockstep.
+  // When the backend update is deployed, we can change this field to mandatory
+  // for strictness.
+  +valid_transaction?: boolean,
 |};
 export type RemoteTransactionBase = {|
   ...WithNullableFields<RemoteTxBlockMeta>,
