@@ -204,7 +204,9 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   @action
   _getProtocol: () => Promise<void> = async () => {
     const protocol = await getProtocol()
-    this.protocol = protocol.type
+    runInAction(() => {
+      this.protocol = protocol.type
+    })
   }
 
   @action
@@ -271,7 +273,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     try {
       const wallets = await getWallets({ db: persistentDb });
 
-      const protocol = this.protocol
+      const protocol = this.protocol;
       const isProtocolErgo = protocol === 'ergo';
       const isProtocolCardano = protocol === 'cardano';
       const isProtocolDefined = isProtocolErgo || isProtocolCardano;
