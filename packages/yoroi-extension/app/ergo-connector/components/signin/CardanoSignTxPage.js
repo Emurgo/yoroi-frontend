@@ -88,7 +88,7 @@ class SignTxPage extends Component<Props, State> {
   };
 
 state: State = {
-  showUtxoDetails: true,
+  showUtxoDetails: false,
 }
 
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm(
@@ -285,6 +285,7 @@ state: State = {
 
   renderAddresses(): Node {
     const addresses = this.props.txData.outputs.map(({ address }) =>  address )
+    const amount = this.props.txData.outputs.map(o => console.log(o.value))
     return (
       <div className={styles.toAddresses}>
         {addresses.map((address, idx) => {
