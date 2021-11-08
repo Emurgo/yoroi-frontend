@@ -32,11 +32,11 @@ ergoAccessBtn.addEventListener('click', () => {
     })
 })
 
-if (typeof cardano === "undefined") {
-    alertError("Cardano not found");
+if (typeof ergo_request_read_access === "undefined") {
+    alertError("Ergo not found");
 } else {
-    console.log("Cardano found");
-    window.addEventListener("cardano_wallet_disconnected", function(event) {
+    console.log("Ergo found");
+    window.addEventListener("ergo_wallet_disconnected", function(event) {
         alertError("Wallet Disconnect")
     });
 }
