@@ -72,6 +72,7 @@ export const Generic = (): Node => {
             errorWallets,
             loadingWallets: walletsState,
             currentConnectorWhitelist: [],
+            protocol: '',
           },
           tokenInfoStore: {
             tokenInfo: mockFromDefaults(defaultAssets),
