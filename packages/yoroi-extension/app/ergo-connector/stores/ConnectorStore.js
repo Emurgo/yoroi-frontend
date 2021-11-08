@@ -52,6 +52,7 @@ import type { CardanoConnectorSignRequest } from '../types';
 import {
   asAddressedUtxo,
 } from '../../api/ada/transactions/utils';
+import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 
 
 // Need to run only once - Connecting wallets
@@ -460,6 +461,27 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       networkId: defaultToken.NetworkId,
       amount: txBody.fee().to_str(),
     };
+ // @todo need to get all the data required to make a HaskellShelleyTxSignRequest
+  //   const config = getCardanoHaskellBaseConfig(
+  //     selectedWallet.publicDeriver.getParent().getNetworkInfo()
+  //   ).reduce((acc, next) => Object.assign(acc, next), {});
+
+  //  const newTx =  new HaskellShelleyTxSignRequest({
+  //     senderUtxos: utxos,
+  //     unsignedTx: ,
+  //     changeAddr: [],
+  //     metadata: undefined,
+  //     networkSettingSnapshot: {
+  //       ChainNetworkId: Number.parseInt(config.ChainNetworkId, 10),
+  //       KeyDeposit: new BigNumber(config.KeyDeposit),
+  //       PoolDeposit: new BigNumber(config.PoolDeposit),
+  //       NetworkId: network.NetworkId,
+  //     },
+  //     neededStakingKeyHashes: {
+  //       neededHashes: new Set(),
+  //       wits: new Set(),
+  //     },
+  //   });
 
     runInAction(() => {
       this.adaTransaction = { inputs, outputs, fee };

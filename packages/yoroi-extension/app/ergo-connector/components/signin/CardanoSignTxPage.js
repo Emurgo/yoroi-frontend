@@ -175,6 +175,22 @@ state: State = {
     return this.props.getTokenInfo(tokenEntry);
   }
 
+  renderBundle: {|
+    amount: MultiToken,
+    render: TokenEntry => Node,
+  |} => Node = (request) => {
+    return (
+      <>
+        {request.render(request.amount.getDefaultEntry())}
+        {request.amount.nonDefaultEntries().map(entry => (
+          <React.Fragment key={entry.identifier}>
+            {request.render(entry)}
+          </React.Fragment>
+        ))}
+      </>
+    );
+  }
+
   renderAmountDisplay: {|
     entry: TokenEntry,
   |} => Node = (request) => {
@@ -285,7 +301,6 @@ state: State = {
 
   renderAddresses(): Node {
     const addresses = this.props.txData.outputs.map(({ address }) =>  address )
-    const amount = this.props.txData.outputs.map(o => console.log(o.value))
     return (
       <div className={styles.toAddresses}>
         {addresses.map((address, idx) => {

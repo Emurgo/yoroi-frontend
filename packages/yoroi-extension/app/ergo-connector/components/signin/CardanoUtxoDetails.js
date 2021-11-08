@@ -18,7 +18,6 @@ import type {
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import { getTokenName, getTokenIdentifierIfExists } from '../../../stores/stateless/tokenHelpers';
 import BigNumber from 'bignumber.js';
-import type { ISignRequest } from '../../../api/common/lib/transactions/ISignRequest';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import {
   MultiToken,
@@ -27,15 +26,19 @@ import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashC
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 import classnames from 'classnames';
-import type { Tx } from '../../../../chrome/extension/ergo-connector/types';
+import type {
+  Tx,
+  CardanoTx,
+} from '../../../../chrome/extension/ergo-connector/types';
 import ArrowLeft from '../../../assets/images/arrow-left.inline.svg'
+import type { CardanoConnectorSignRequest } from '../../types';
 
 type Props = {|
-  +tx: Tx,
-  +txData: ISignRequest<any>,
+  +tx: Tx | CardanoTx,
+  +txData: CardanoConnectorSignRequest,
   +onCopyAddressTooltip: (string, string) => void,
   +notification: ?Notification,
-  +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow> | null,
+  +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
   +unitOfAccountSetting: UnitOfAccountSettingType,
   +addressToDisplayString: string => string,
   +selectedExplorer: SelectedExplorer,
