@@ -1,5 +1,70 @@
 import * as wasm from "ergo-lib-wasm-browser";
 import JSONBigInt from 'json-bigint';
+const ergoAccessBtn = document.querySelector('#request-access')
+const getUnUsedAddresses = document.querySelector('#get-unused-addresses')
+const getUsedAddresses = document.querySelector('#get-used-addresses')
+const getChangeAddress = document.querySelector('#get-change-address')
+const getAccountBalance = document.querySelector('#get-balance')
+const getUtxos = document.querySelector('#get-utxos')
+const submitTx = document.querySelector('#submit-tx')
+const signTx = document.querySelector('#sign-tx')
+const alertEl = document.querySelector('#alert')
+const spinner = document.querySelector('#spinner')
+
+let accessGranted = false
+let cardanoApi
+let utxos
+let changeAddress
+let transactionHex
+
+
+ergoAccessBtn.addEventListener('click', () => {
+    toggleSpinner(true)
+    ergo_request_read_access().then(access_granted => {
+        if (access_granted) {
+            accessGranted = true
+            alertSuccess('You have access now')
+        } else {
+            accessGranted = false
+            alertError('Wallet access denied')
+        }
+        toggleSpinner(false)
+    })
+})
+
+if (typeof cardano === "undefined") {
+    alertError("Cardano not found");
+} else {
+    console.log("Cardano found");
+    window.addEventListener("cardano_wallet_disconnected", function(event) {
+        alertError("Wallet Disconnect")
+    });
+}
+
+function alertError (text) {
+    alertEl.className = 'alert alert-danger'
+    alertEl.innerHTML = text
+}
+
+function alertSuccess(text) {
+    alertEl.className = 'alert alert-success'
+    alertEl.innerHTML = text
+}
+
+function alertWarrning(text) {
+    alertEl.className = 'alert alert-warning'
+    alertEl.innerHTML = text
+}
+
+function toggleSpinner(status){
+    if(status) {
+        spinner.className = 'spinner-border'
+        alertEl.className = 'd-none'
+    } else {
+        spinner.className = 'd-none'
+    }
+}
+
 
 function initDapp() {
     ergo_request_read_access().then(function(access_granted) {
