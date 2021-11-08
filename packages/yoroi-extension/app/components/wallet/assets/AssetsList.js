@@ -243,7 +243,9 @@ export default class AssetsList extends Component<Props, State> {
                     <div className={styles.logo}>
                       <NoAssetLogo />
                     </div>
-                    <p>{token.name}</p>
+                    <a href={`https://cardanoscan.io/token/${token.id}`} rel="noreferrer" target='_blank'>
+                      {token.name}
+                    </a>
                   </li>
                   <li>{truncateAddressShort(token.id)}</li>
                   <li className={styles.amount}>{token.amount}</li>

@@ -26,7 +26,7 @@ export default class AssetsPage extends Component<Props> {
     const { assetDeposit } = this.props
     return (
       <div className={styles.component}>
-        <AssetsList 
+        <AssetsList
           assetsList={this.props.assetsList}
           assetDeposit={assetDeposit}
           getTokenInfo={this.props.getTokenInfo}
