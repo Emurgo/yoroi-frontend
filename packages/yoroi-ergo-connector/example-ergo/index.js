@@ -4,7 +4,7 @@ const ergoAccessBtn = document.querySelector('#request-access')
 const getUnUsedAddresses = document.querySelector('#get-unused-addresses')
 const getUsedAddresses = document.querySelector('#get-used-addresses')
 const getChangeAddress = document.querySelector('#get-change-address')
-const getAccountBalance = document.querySelector('#get-balance')
+const getBalance = document.querySelector('#get-balance')
 const getUtxos = document.querySelector('#get-utxos')
 const submitTx = document.querySelector('#submit-tx')
 const signTx = document.querySelector('#sign-tx')
@@ -12,13 +12,12 @@ const alertEl = document.querySelector('#alert')
 const spinner = document.querySelector('#spinner')
 
 let accessGranted = false
-let cardanoApi
 let utxos
 let changeAddress
 let transactionHex
 
 
-ergoAccessBtn.addEventListener('click', () => {
+ergoAccessBtn.addEventListener('click', (e) => {
     toggleSpinner(true)
     ergo_request_read_access().then(access_granted => {
         if (access_granted) {
@@ -31,6 +30,90 @@ ergoAccessBtn.addEventListener('click', () => {
         toggleSpinner(false)
     })
 })
+
+getBalance.addEventListener('click', () => {
+    if(!accessGranted) {
+        alertError('Should request access first')
+    } else {
+        toggleSpinner(true)
+        ergo.get_balance().then(function(balance) {
+            toggleSpinner(false)
+            alertSuccess(`Account Balance: ${balance}`)
+        });
+    }
+})
+
+getUnUsedAddresses.addEventListener('click', () => {
+    if(!accessGranted) {
+       alertError('Should request access first')
+    } else {
+        toggleSpinner(true)
+        ergo.get_unused_addresses().then(function(addresses) {
+            toggleSpinner(false)
+            if(addresses.length === 0){
+                alertWarrning('No unused addresses')
+            } else {
+                alertSuccess(`Address: `)
+                alertEl.innerHTML = '<pre>' + JSON.stringify(addresses, undefined, 2) + '</pre>'
+            }
+        });
+    }
+})
+
+getUsedAddresses.addEventListener('click', () => {
+    if(!accessGranted) {
+       alertError('Should request access first')
+    } else {
+        toggleSpinner(true)
+        ergo.get_used_addresses().then(function(addresses) {
+            toggleSpinner(false)
+           if(addresses.length === 0){
+               alertWarrning('No used addresses')
+           } else {
+               alertSuccess(`Address: ${addresses.concat(',')}`)
+               alertEl.innerHTML = '<pre>' + JSON.stringify(addresses, undefined, 2) + '</pre>'
+           }
+        });
+    }
+})
+
+getChangeAddress.addEventListener('click', () => {
+    if(!accessGranted) {
+        alertError('Should request access first')
+    } else {
+        toggleSpinner(true)
+        ergo.get_change_address().then(function(address) {
+            toggleSpinner(false)
+            if(address.length === 0){
+                alertWarrning('No change addresses')
+            } else {
+                changeAddress = address
+                alertSuccess(`Address: `)
+                alertEl.innerHTML = '<pre>' + JSON.stringify(address, undefined, 2) + '</pre>'
+            }
+        });
+    }
+})
+
+getUtxos.addEventListener('click', () => {
+    if(!accessGranted) {
+        alertError('Should request access first')
+        return
+    }
+    toggleSpinner(true)
+    ergo.get_utxos().then(utxosResponse => {
+        toggleSpinner(false)
+        if(utxosResponse.length === 0){
+            alertWarrning('NO UTXOS')
+        } else {
+            utxos = utxosResponse
+            alertSuccess(`Check the console`)
+            alertEl.innerHTML = '<pre>' + JSON.stringify(utxosResponse, undefined, 2) + '</pre>'
+        }
+    })
+})
+
+
 
 if (typeof ergo_request_read_access === "undefined") {
     alertError("Ergo not found");
@@ -299,19 +382,19 @@ function parseJson(str) {
       };
 }
 
-if (typeof ergo_request_read_access === "undefined") {
-    alert("ergo not found");
-} else {
-    console.log("ergo found");
-    window.addEventListener("ergo_wallet_disconnected", function(event) {
-        const status = document.getElementById("status");
-        status.innerText = "";
-        const div = document.getElementById("balance");
-        div.innerText = "Wallet disconnected.";
-        const button = document.createElement("button");
-        button.textContent = "Reconnect";
-        button.onclick = initDapp;
-        div.appendChild(button);
-    });
-    initDapp();
-}
+// if (typeof ergo_request_read_access === "undefined") {
+//     alert("ergo not found");
+// } else {
+//     console.log("ergo found");
+//     window.addEventListener("ergo_wallet_disconnected", function(event) {
+//         const status = document.getElementById("status");
+//         status.innerText = "";
+//         const div = document.getElementById("balance");
+//         div.innerText = "Wallet disconnected.";
+//         const button = document.createElement("button");
+//         button.textContent = "Reconnect";
+//         button.onclick = initDapp;
+//         div.appendChild(button);
+//     });
+//     initDapp();
+// }
