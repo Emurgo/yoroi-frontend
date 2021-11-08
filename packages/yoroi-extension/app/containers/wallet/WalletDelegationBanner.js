@@ -24,9 +24,9 @@ import YoutubeIcon from '../../assets/images/social/revamp/youtube.inline.svg';
 type Props = {|
   +isOpen: boolean,
   +onClose: void => void,
-  +isWalletWithFunds: boolean,
+  +isWalletWithNoFunds: boolean,
   +poolInfo: Object,
-  +onDelegateClick: () => void,
+  +onDelegateClick: (string) => Promise<void>,
   +ticker: string,
 |};
 type Intl = {|
@@ -71,7 +71,7 @@ function HelperTooltip({ message }: HelperTooltipProps): Node {
 function WalletDelegationBanner({
   isOpen,
   onClose,
-  isWalletWithFunds,
+  isWalletWithNoFunds,
   onDelegateClick,
   intl,
   ticker,
@@ -208,8 +208,8 @@ function WalletDelegationBanner({
         <Button
           variant="primary"
           sx={{ width: '220px' }}
-          onClick={onDelegateClick}
-          disabled={isWalletWithFunds}
+          onClick={() => onDelegateClick(id)}
+          disabled={isWalletWithNoFunds}
         >
           {intl.formatMessage(globalMessages.delegateLabel)}
         </Button>
@@ -231,6 +231,7 @@ const WrapperBanner = styled(Box)({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
+  padding: '32px',
   paddingLeft: '40px',
   borderRadius: '8px',
   paddingRight: '110px',

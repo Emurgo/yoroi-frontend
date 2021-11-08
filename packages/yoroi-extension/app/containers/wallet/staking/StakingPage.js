@@ -10,8 +10,6 @@ import type { GeneratedData as BannerContainerData } from '../../banners/BannerC
 import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 import type { GeneratedData as SidebarContainerData } from '../../SidebarContainer';
 import type { GeneratedData as NavBarContainerRevampData } from '../../NavBarContainerRevamp';
-import type { TokenInfoMap } from '../../../stores/toplevel/TokenInfoStore';
-import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 
 import TopBarLayout from '../../../components/layout/TopBarLayout';
 import SidebarContainer from '../../SidebarContainer';
@@ -23,12 +21,10 @@ import type { LayoutComponentMap } from '../../../styles/context/layout';
 import NavBarContainerRevamp from '../../NavBarContainerRevamp';
 import WalletEmptyBanner from '../WalletEmptyBanner';
 import BuySellDialog from '../../../components/buySell/BuySellDialog';
-import WalletDelegationBanner from '../WalletDelegationBanner';
 import CardanoStakingPage from './CardanoStakingPage';
 import type { ConfigType } from '../../../../config/config-types';
-import { truncateToken } from '../../../utils/formatters';
-import { getTokenName } from '../../../stores/stateless/tokenHelpers';
 import { Box } from '@mui/system';
+import type { TxRequests } from '../../../stores/toplevel/TransactionsStore';
 
 export type GeneratedData = typeof StakingPage.prototype.generated;
 
@@ -52,33 +48,13 @@ class StakingPage extends Component<AllProps> {
 
   render(): Node {
     const sidebarContainer = <SidebarContainer {...this.generated.SidebarContainerProps} />;
-    const { hasAny, recentTransactionsRequest } = this.generated.stores.transactions;
     const publicDeriver = this.generated.stores.wallets.selected;
     if (publicDeriver == null) {
       throw new Error(`${nameof(StakingPage)} no public deriver. Should never happen`);
     }
-    const isWalletWithFunds = !recentTransactionsRequest.wasExecuted || hasAny;
-
-    // TODO: Show first pool from from adapools api
-    const firstPool = {
-      id: '7f6c103302f96390d478a170fe80938b76fccd8a23490e3b6ddebcf7',
-      name: '[GOAT] Goat Stake',
-      roa: '5.08%',
-      socialLinks: {
-        tw: 'GoatStake',
-        tg: 'GoatStakeGroup',
-        fb: 'GoatStake',
-        yt: null,
-        tc: null,
-        di: '24GzMYgwwU',
-        gh: null,
-        icon:
-          'https://static.adapools.org/pool_logo/7f6c103302f96390d478a170fe80938b76fccd8a23490e3b6ddebcf7.png',
-      },
-      websiteUrl: 'https://goatstake.com?utm_source=adapools.org',
-      avatar:
-        'https://static.adapools.org/pool_logo/7f6c103302f96390d478a170fe80938b76fccd8a23490e3b6ddebcf7.png',
-    };
+    const txRequests = this.generated.stores.transactions.getTxRequests(publicDeriver);
+    const balance = txRequests.requests.getBalanceRequest.result;
+    const isWalletWithNoFunds = balance != null && balance.getDefaultEntry().amount.isZero();
 
     return (
       <TopBarLayout
@@ -110,7 +86,7 @@ class StakingPage extends Component<AllProps> {
             },
           }}
         >
-          {isWalletWithFunds ? null : (
+          {isWalletWithNoFunds ? (
             <WalletEmptyBanner
               isOpen={this.generated.stores.transactions.showWalletEmptyBanner}
               onClose={this.generated.actions.transactions.closeWalletEmptyBanner.trigger}
@@ -118,22 +94,9 @@ class StakingPage extends Component<AllProps> {
                 this.generated.actions.dialogs.open.trigger({ dialog: BuySellDialog })
               }
             />
-          )}
-          <WalletDelegationBanner
-            isOpen={this.generated.stores.transactions.showDelegationBanner}
-            onClose={this.generated.actions.transactions.closeDelegationBanner.trigger}
-            onDelegateClick={() => console.log('delegating')}
-            poolInfo={firstPool}
-            isWalletWithFunds={isWalletWithFunds}
-            ticker={truncateToken(
-              getTokenName(
-                this.generated.stores.tokenInfoStore.getDefaultTokenInfo(
-                  publicDeriver.getParent().getNetworkInfo().NetworkId
-                )
-              )
-            )}
-          />
-          <Box sx={{ '& > div': { height: '100%' }, iframe: { height: '100%' } }}>
+          ) : null}
+
+          <Box sx={{ display: 'flex', flexDirection: 'column' }}>
             <CardanoStakingPage
               stores={this.props.stores}
               actions={this.props.actions}
@@ -169,18 +132,10 @@ class StakingPage extends Component<AllProps> {
     |},
     stores: {|
       wallets: {| selected: null | PublicDeriver<> |},
-      tokenInfoStore: {|
-        tokenInfo: TokenInfoMap,
-        getDefaultTokenInfo: number => $ReadOnly<TokenRow>,
-      |},
       transactions: {|
         showWalletEmptyBanner: boolean,
         showDelegationBanner: boolean,
-        hasAny: boolean,
-        recentTransactionsRequest: {|
-          isExecuting: boolean,
-          wasExecuted: boolean,
-        |},
+        getTxRequests: (PublicDeriver<>) => TxRequests,
       |},
     |},
   |} {
@@ -196,18 +151,10 @@ class StakingPage extends Component<AllProps> {
         wallets: {
           selected: stores.wallets.selected,
         },
-        tokenInfoStore: {
-          tokenInfo: stores.tokenInfoStore.tokenInfo,
-          getDefaultTokenInfo: stores.tokenInfoStore.getDefaultTokenInfo,
-        },
         transactions: {
           showWalletEmptyBanner: stores.transactions.showWalletEmptyBanner,
           showDelegationBanner: stores.transactions.showDelegationBanner,
-          hasAny: stores.transactions.hasAny,
-          recentTransactionsRequest: {
-            isExecuting: stores.transactions.recentTransactionsRequest.isExecuting,
-            wasExecuted: stores.transactions.recentTransactionsRequest.wasExecuted,
-          },
+          getTxRequests: stores.transactions.getTxRequests,
         },
       },
       actions: {
