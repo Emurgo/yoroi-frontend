@@ -139,7 +139,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   @observable loadingWallets: $Values<typeof LoadingWalletStates> = LoadingWalletStates.IDLE;
   @observable errorWallets: string = '';
   @observable wallets: Array<PublicDeriverCache> = [];
-
+  @observable protocol: string = ''
   @observable getConnectorWhitelist: Request<
     GetWhitelistFunc
   > = new Request<GetWhitelistFunc>(
@@ -174,6 +174,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     this._getConnectorWhitelist();
     this._getConnectingMsg();
     this._getSigningMsg();
+    this._getProtocol()
     this.currentConnectorWhitelist;
   }
 
@@ -199,6 +200,12 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       // eslint-disable-next-line no-console
       .catch(err => console.error(err));
   };
+
+  @action
+  _getProtocol: () => Promise<void> = async () => {
+    const protocol = await getProtocol()
+    this.protocol = protocol.type
+  }
 
   @action
   _getSigningMsg: () => Promise<void> = async () => {
@@ -264,9 +271,9 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     try {
       const wallets = await getWallets({ db: persistentDb });
 
-      const protocol = await getProtocol().then(res => res);
-      const isProtocolErgo = protocol?.type === 'ergo';
-      const isProtocolCardano = protocol?.type === 'cardano';
+      const protocol = this.protocol
+      const isProtocolErgo = protocol === 'ergo';
+      const isProtocolCardano = protocol === 'cardano';
       const isProtocolDefined = isProtocolErgo || isProtocolCardano;
       const protocolFilter = wallet => {
         const isWalletErgo = isErgo(wallet.getParent().getNetworkInfo());
