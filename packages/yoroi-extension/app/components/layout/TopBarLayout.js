@@ -63,16 +63,27 @@ function TopBarLayout({
           }}
         >
           {isRevampLayout ? (
-            <Box
-              sx={{
-                height: '100%',
-                minHeight: '200px',
-                padding: '40px',
-                backgroundColor: '#f0f3f5',
-                overflow: 'overlay',
-              }}
-            >
-              {children}
+            <Box sx={{ background: 'var(--yoroi-palette-gray-50)', height: '100%' }}>
+              <Box
+                sx={{
+                  maxWidth: 'calc(1366px - 90px)',
+                  height: '100%',
+                  width: '100%',
+                  margin: 'auto',
+                }}
+              >
+                <Box
+                  sx={{
+                    height: '100%',
+                    minHeight: '200px',
+                    padding: '40px',
+                    backgroundColor: 'var(--yoroi-palette-gray-50)',
+                    overflow: 'overlay',
+                  }}
+                >
+                  {children}
+                </Box>
+              </Box>
             </Box>
           ) : (
             <Box sx={{ height: '100%', minHeight: '200px' }}>{children}</Box>

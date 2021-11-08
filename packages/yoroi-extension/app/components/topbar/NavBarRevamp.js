@@ -34,59 +34,74 @@ class NavBarRevamp extends Component<Props> {
     const { title, children, walletDetails, menu } = this.props;
     return (
       <Box
-        as="header"
         sx={{
-          position: 'relative',
-          zIndex: 100,
           backgroundColor: 'var(--yoroi-palette-common-white)',
-          color: 'var(--yoroi-palette-gray-800)',
           boxShadow:
             '0 4px 6px 0 #dee2ea, 0 1px 2px 0 rgba(222, 226, 234, 0.82), 0 2px 4px 0 rgba(222, 226, 234, 0.74)',
-          display: 'flex',
-          alignItems: 'center',
-          padding: menu != null ? '34px 40px 50px' : '32px 40px',
-          height: menu != null ? '115px' : '90px',
         }}
       >
         <Box
           sx={{
-            display: 'flex',
-            alignItems: 'center',
-            width: '100%',
-            justifyContent: 'space-between',
+            maxWidth: 'calc(1366px - 90px)',
+            position: 'relative',
+            zIndex: 100,
+            height: menu != null ? '115px' : '90px',
+            margin: 'auto',
           }}
         >
-          <Box flex="0 0 auto">{title}</Box>
-          <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-            {children}
-            {this.props.walletDetails != null && (
-              <Box sx={{ flex: '0 0 auto', marginLeft: '32px', minWidth: '280px' }}>
-                {walletDetails}
-              </Box>
-            )}
-            <IconButton
-              sx={{ color: 'var(--yoroi-palette-gray-600)', marginLeft: '15px' }}
-              type="button"
-              onClick={this.props.goToNotifications}
-            >
-              <NoticeBoardIcon />
-            </IconButton>
-            {this.props.buyButton != null && (
-              <Box sx={{ marginLeft: '24px' }}>{this.props.buyButton}</Box>
-            )}
-          </Box>
-        </Box>
-        {menu != null ? (
           <Box
+            as="header"
             sx={{
-              position: 'absolute',
-              bottom: 0,
-              left: 0,
+              color: 'var(--yoroi-palette-gray-800)',
+              display: 'flex',
+              alignItems: 'center',
+              height: 'inherit',
+              padding: menu != null ? '34px 40px 50px' : '32px 40px',
             }}
           >
-            {menu}
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                width: '100%',
+                justifyContent: 'space-between',
+              }}
+            >
+              <Box flex="0 0 auto">{title}</Box>
+              <Box
+                sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}
+              >
+                {children}
+                {this.props.walletDetails != null && (
+                  <Box sx={{ flex: '0 0 auto', marginLeft: '32px', minWidth: '280px' }}>
+                    {walletDetails}
+                  </Box>
+                )}
+                <IconButton
+                  sx={{ color: 'var(--yoroi-palette-gray-600)', marginLeft: '15px' }}
+                  type="button"
+                  onClick={this.props.goToNotifications}
+                >
+                  <NoticeBoardIcon />
+                </IconButton>
+                {this.props.buyButton != null && (
+                  <Box sx={{ marginLeft: '24px' }}>{this.props.buyButton}</Box>
+                )}
+              </Box>
+            </Box>
+            {menu != null ? (
+              <Box
+                sx={{
+                  position: 'absolute',
+                  bottom: 0,
+                  left: 0,
+                }}
+              >
+                {menu}
+              </Box>
+            ) : null}
           </Box>
-        ) : null}
+        </Box>
       </Box>
     );
   }
