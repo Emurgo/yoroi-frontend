@@ -10,6 +10,23 @@ import VerticallyCenteredLayout from '../../../components/layout/VerticallyCente
 import LoadingSpinner from '../../../components/widgets/LoadingSpinner';
 import { observer } from 'mobx-react';
 
+type AdaPool = {|
+  +id: string,
+  +name: string,
+  +avatar: string,
+  +roa: string,
+  +socialLinks: {|
+    di: string,
+    fb: string,
+    gh: string,
+    tc: string,
+    tg: string,
+    tw: string,
+    yt: string,
+    icon: string,
+  |},
+|}
+
 type Props = {|
   +children?: Node,
   +urlTemplate: string,
@@ -48,20 +65,15 @@ export default class SeizaFetcher extends Component<Props> {
     )) {
       return;
     }
-    const response = JSON.parse(decodeURI(event.data));
-    if (!Array.isArray(response)) {
-      throw new Error(`${nameof(SeizaFetcher)} Server response is not an array`);
+    const pool: AdaPool = JSON.parse(decodeURI(event.data));
+    if (!pool) {
+      throw new Error(`${nameof(SeizaFetcher)} Server response is undefined`);
     }
-    const pool = response[0];
-    if (typeof pool !== 'string') {
-      throw new Error(`${nameof(SeizaFetcher)} Server response is not a string`);
-    }
-    const poolId: string = pool;
-    if (poolId.length !== 56) {
-      throw new Error(`${nameof(SeizaFetcher)} Server response has incorrect pool length. Expected 56, got ${poolId.length}`);
+    if (pool.id.length !== 56) {
+      throw new Error(`${nameof(SeizaFetcher)} Server response has incorrect pool length. Expected 56, got ${pool.id.length}`);
     }
 
-    await this.props.stakepoolSelectedAction(pool);
+    await this.props.stakepoolSelectedAction(pool.id);
   }
 
   @action setFrame: (null | HTMLIFrameElement) => void = (frame) => {
