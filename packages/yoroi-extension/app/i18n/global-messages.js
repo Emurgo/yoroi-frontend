@@ -626,6 +626,16 @@ const globalMessages: * = defineMessages({
     id: 'global.labael.undelegate',
     defaultMessage: '!!!Undelegate',
   },
+  roa30d: {
+    id: 'wallet.staking.banner.roa30d',
+    defaultMessage:
+      '!!!ROA 30d',
+  },
+  roaHelperMessage: {
+    id: 'wallet.staking.banner.roaHelperMessage',
+    defaultMessage:
+      '!!!Estimated ROA (Return of ADA) based on staking result from the last 30 days',
+  },
   auditAddressWarning: {
     id: 'wallet.receive.page.internalWarning2',
     defaultMessage: '!!!addresses are shown here for personal auditing purposes and should <strong>never</strong> be used.'

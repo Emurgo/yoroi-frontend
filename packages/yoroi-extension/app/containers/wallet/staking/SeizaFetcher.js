@@ -12,23 +12,25 @@ import { observer } from 'mobx-react';
 import { withLayout } from '../../../styles/context/layout';
 import type { Layouts } from '../../../styles/context/layout';
 
+export type SocialLinks = {|
+  tw?: string,
+  fb?: string,
+  gh?: string,
+  tc?: string,
+  tg?: string,
+  di?: string,
+  yt?: string,
+  icon?: string,
+|};
 export type PoolData = {|
   +id: string,
   +name: string,
   +avatar?: string,
   +roa: string,
   +websiteUrl?: string,
-  +socialLinks: {|
-    tw?: string,
-    fb?: string,
-    gh?: string,
-    tc?: string,
-    tg?: string,
-    di?: string,
-    yt?: string,
-    icon?: string,
-  |},
+  +socialLinks: SocialLinks
 |};
+
 
 type Props = {|
   +children?: Node,
