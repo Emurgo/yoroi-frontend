@@ -184,6 +184,9 @@ class StakingPage extends Component<AllProps> {
       delegationRequests.getDelegatedBalance.wasExecuted &&
       errorIfPresent == null;
 
+    const delegationHistory = delegationRequests.getCurrentDelegation.result?.fullHistory;
+    const hasNeverDelegated = delegationHistory != null && delegationHistory.length === 0;
+
     return (
       <TopBarLayout
         banner={<BannerContainer {...this.generated.BannerContainerProps} />}
@@ -210,7 +213,8 @@ class StakingPage extends Component<AllProps> {
                 this.generated.actions.dialogs.open.trigger({ dialog: BuySellDialog })
               }
             />
-          ) : (
+          ) : null}
+          {hasNeverDelegated ? null : (
             <WrapperCards>
               {this._generateUserSummary({ delegationRequests, publicDeriver, errorIfPresent })}
               <StakingTabs
