@@ -9,7 +9,7 @@ import InfoIconSVG from '../../../../assets/images/info-icon.inline.svg';
 import CloseIcon from '../../../../assets/images/forms/close.inline.svg';
 import DelegatedStakePoolCard from './DelegatedStakePoolCard';
 import type { DelegatedPoolType } from './DelegatedStakePoolCard';
-import { injectIntl } from 'react-intl';
+import { defineMessages, injectIntl } from 'react-intl';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import globalMessages from '../../../../i18n/global-messages';
 
@@ -19,6 +19,14 @@ type Props = {|
 type Intl = {|
   intl: $npm$ReactIntl$IntlShape,
 |};
+
+const messages = defineMessages({
+  alertInfo: {
+    id: 'wallet.staking.alertInfo',
+    defaultMessage: '!!!The first reward to receive takes 3-4 epochs which is equal to 15-20 days, learn more.',
+  },
+});
+
 function StakingTabs({ delegatedPool, intl }: Props & Intl): Node {
   const [value, setValue] = useState(0);
 
@@ -33,7 +41,7 @@ function StakingTabs({ delegatedPool, intl }: Props & Intl): Node {
       disabled: false,
       component: (
         <Box>
-          <StakePoolAlert />
+          <StakePoolAlert message={intl.formatMessage(messages.alertInfo)} />
           <Box py="10px" borderBottom="1px solid var(--yoroi-palette-gray-200)">
             <DelegatedStakePoolCard delegatedPool={delegatedPool} />
           </Box>
@@ -92,12 +100,12 @@ const StyledTab = styled(Tab)({
   },
 });
 
-function StakePoolAlert() {
+function StakePoolAlert({ message }: {| message: string |}): Node {
   return (
     <StyledBox>
       <InfoIconSVG />
       <Typography variant="body2" color="var(--yoroi-palette-gray-600)" marginLeft="8px">
-        The first reward to receive takes 3-4 epochs which is equal to 15-20 days, learn more.
+        {message}
       </Typography>
       <IconButton>
         <CloseIcon />
