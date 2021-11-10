@@ -46,6 +46,7 @@ import { truncateToken } from '../../../utils/formatters';
 import { withLayout } from '../../../styles/context/layout';
 import type { LayoutComponentMap } from '../../../styles/context/layout';
 import { Box } from '@mui/system';
+import type { PoolData } from './SeizaFetcher';
 
 export type GeneratedData = typeof CardanoStakingPage.prototype.generated;
 
@@ -56,36 +57,17 @@ type Props = {|
 type InjectedProps = {|
   +renderLayoutComponent: LayoutComponentMap => Node,
 |};
-
+type State = {| firstPool: PoolData | void |};
 type AllProps = {| ...Props, ...InjectedProps |};
 
-// TODO: Show first pool from from adapools api
-const firstPool = {
-  id: '7f6c103302f96390d478a170fe80938b76fccd8a23490e3b6ddebcf7',
-  name: '[GOAT] Goat Stake',
-  roa: '5.08%',
-  socialLinks: {
-    tw: 'GoatStake',
-    tg: 'GoatStakeGroup',
-    fb: 'GoatStake',
-    yt: null,
-    tc: null,
-    di: '24GzMYgwwU',
-    gh: null,
-    icon:
-      'https://static.adapools.org/pool_logo/7f6c103302f96390d478a170fe80938b76fccd8a23490e3b6ddebcf7.png',
-  },
-  websiteUrl: 'https://goatstake.com?utm_source=adapools.org',
-  avatar:
-    'https://static.adapools.org/pool_logo/7f6c103302f96390d478a170fe80938b76fccd8a23490e3b6ddebcf7.png',
-};
-
 @observer
-class CardanoStakingPage extends Component<AllProps> {
+class CardanoStakingPage extends Component<AllProps, State> {
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
-
+  state: State = {
+    firstPool: undefined,
+  };
   @observable notificationElementId: string = '';
 
   cancel: void => void = () => {
@@ -150,7 +132,7 @@ class CardanoStakingPage extends Component<AllProps> {
               await this._updatePool(poolId);
               await this._next();
             }}
-            poolInfo={firstPool}
+            poolInfo={this.state.firstPool}
             isWalletWithNoFunds={isWalletWithNoFunds}
             ticker={truncateToken(
               getTokenName(
@@ -171,6 +153,9 @@ class CardanoStakingPage extends Component<AllProps> {
                   tuple => tuple[0]
                 ) ?? []
               }
+              setFirstPool={pool => {
+                this.setState({ firstPool: pool });
+              }}
               stakepoolSelectedAction={async poolId => {
                 await this._updatePool(poolId);
                 await this._next();

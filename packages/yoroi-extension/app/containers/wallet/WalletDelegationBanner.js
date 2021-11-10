@@ -20,13 +20,15 @@ import TelegramIcon from '../../assets/images/social/revamp/telegram.inline.svg'
 import TwitchIcon from '../../assets/images/social/revamp/twitch.inline.svg';
 import TwitterIcon from '../../assets/images/social/revamp/twitter.inline.svg';
 import YoutubeIcon from '../../assets/images/social/revamp/youtube.inline.svg';
+import LoadingSpinner from '../../components/widgets/LoadingSpinner';
+import type { PoolData } from './staking/SeizaFetcher';
 
 type Props = {|
   +isOpen: boolean,
   +onClose: void => void,
   +isWalletWithNoFunds: boolean,
-  +poolInfo: Object,
-  +onDelegateClick: (string) => Promise<void>,
+  +poolInfo: PoolData | void,
+  +onDelegateClick: string => Promise<void>,
   +ticker: string,
 |};
 type Intl = {|
@@ -75,8 +77,15 @@ function WalletDelegationBanner({
   onDelegateClick,
   intl,
   ticker,
-  poolInfo = {},
+  poolInfo,
 }: Props & Intl): Node {
+  if (poolInfo == null) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" py="40px">
+        <LoadingSpinner />
+      </Box>
+    );
+  }
   const {
     id,
     name,
@@ -118,7 +127,7 @@ function WalletDelegationBanner({
         >
           <Box sx={{ display: 'flex' }}>
             <AvatarWrapper>
-              {avatar ? (
+              {avatar != null ? (
                 <AvatarImg src={avatar} alt={name} />
               ) : (
                 <AvatarImg src={avatarGenerated} alt={name} />
@@ -145,7 +154,7 @@ function WalletDelegationBanner({
           <Box display="flex">
             <Typography variant="body1">Stake pool social media</Typography>
             <SocialList>
-              {twitter ? (
+              {twitter != null ? (
                 <a
                   href={`https://twitter.com/${twitter}`}
                   target="_blank"
@@ -154,17 +163,17 @@ function WalletDelegationBanner({
                   <TwitterIcon />
                 </a>
               ) : null}
-              {telegram ? (
+              {telegram != null ? (
                 <a href={`https://t.me/${telegram}`} target="_blank" rel="noreferrer noopener">
                   <TelegramIcon />{' '}
                 </a>
               ) : null}
-              {facebook ? (
+              {facebook != null ? (
                 <a href={`https://fb.me/${facebook}`} target="_blank" rel="noreferrer noopener">
                   <FbIcon />
                 </a>
               ) : null}
-              {youtube ? (
+              {youtube != null ? (
                 <a
                   href={`https://youtube.com/${youtube}`}
                   target="_blank"
@@ -173,22 +182,22 @@ function WalletDelegationBanner({
                   <YoutubeIcon />
                 </a>
               ) : null}
-              {twitch ? (
+              {twitch != null ? (
                 <a href={`https://twitch.com/${twitch}`} target="_blank" rel="noreferrer noopener">
                   <TwitchIcon />
                 </a>
               ) : null}
-              {discord ? (
+              {discord != null ? (
                 <a href={`https://discord.gg/${discord}`} target="_blank" rel="noreferrer noopener">
                   <DiscordIcon />
                 </a>
               ) : null}
-              {github ? (
+              {github != null ? (
                 <a href={`https://github.com/${github}`} target="_blank" rel="noreferrer noopener">
                   <GithubIcon />
                 </a>
               ) : null}
-              {websiteUrl ? (
+              {websiteUrl != null ? (
                 <a href={websiteUrl} target="_blank" rel="noreferrer noopener">
                   <PersonalIcon />
                 </a>
