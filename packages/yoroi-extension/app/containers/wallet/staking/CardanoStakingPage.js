@@ -142,7 +142,7 @@ class CardanoStakingPage extends Component<AllProps, State> {
               )
             )}
           />
-          <Box sx={{ flex: 1, iframe: { height: '100%' } }}>
+          <Box sx={{ iframe: { minHeight: '60vh' } }}>
             {this.getDialog()}
             <SeizaFetcher
               urlTemplate={urlTemplate}

@@ -636,6 +636,18 @@ const globalMessages: * = defineMessages({
     defaultMessage:
       '!!!Estimated ROA (Return of ADA) based on staking result from the last 30 days',
   },
+  stakePoolDelegated: {
+    id: 'wallet.dashboard.upcomingRewards.stakePoolDelegated',
+    defaultMessage: '!!!Stake Pool Delegated',
+  },
+  totalDelegated: {
+    id: 'wallet.dashboard.summary.totalDelegated',
+    defaultMessage: '!!!Total Delegated',
+  },
+  overview: {
+    id: 'wallet.staking.overview',
+    defaultMessage: '!!!Overview',
+  },
   auditAddressWarning: {
     id: 'wallet.receive.page.internalWarning2',
     defaultMessage: '!!!addresses are shown here for personal auditing purposes and should <strong>never</strong> be used.'
