@@ -134,7 +134,11 @@ function WalletDelegationBanner({
             <Label variant="body1" mr="8px">
               {intl.formatMessage(messages.socialMedia)}
             </Label>
-            <SocialMediaStakePool socialLinks={socialLinks} websiteUrl={websiteUrl} />
+            <SocialMediaStakePool
+              color="#8A99D1"
+              socialLinks={socialLinks}
+              websiteUrl={websiteUrl}
+            />
           </Box>
         </Stack>
       </Box>

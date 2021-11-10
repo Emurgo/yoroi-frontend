@@ -8,10 +8,6 @@ export const List: any = styled(Box)({
 });
 
 export const StyledLink: any = styled(Link)({
-  color: 'white',
-  opacity: 0.5,
   marginRight: '5px',
-  '&:hover': {
-    opacity: 1,
-  },
+  color: 'inherit',
 });
