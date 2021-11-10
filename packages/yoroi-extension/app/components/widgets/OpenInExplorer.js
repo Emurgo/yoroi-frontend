@@ -2,7 +2,6 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import styles from './OpenInExplorer.scss';
 import { isCardanoHaskell, isErgo, isTestnet } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 type Props = {|
