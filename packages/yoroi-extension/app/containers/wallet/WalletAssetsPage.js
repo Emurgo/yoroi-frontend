@@ -25,6 +25,7 @@ export default class WalletAssetsPage extends Component<InjectedOrGenerated<Gene
     const publicDeriver = this.generated.stores.wallets.selected;
     // Guard against potential null values
     if (!publicDeriver) throw new Error(`Active wallet required for ${nameof(WalletAssetsPage)}.`);
+    const network = publicDeriver.getParent().getNetworkInfo()
     const spendableBalance = this.generated.stores.transactions.getBalanceRequest.result
     const getTokenInfo= genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)
 
@@ -53,6 +54,7 @@ export default class WalletAssetsPage extends Component<InjectedOrGenerated<Gene
         getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)} 
         assetDeposit={isNonZeroDeposit ? assetDeposit : null}
         shouldHideBalance={profile.shouldHideBalance}
+        network={network}
       />
     )
   }

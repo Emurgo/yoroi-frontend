@@ -18,9 +18,10 @@ import { getTokenName } from '../../../stores/stateless/tokenHelpers';
 import type {
   TokenLookupKey,
 } from '../../../api/common/lib/MultiToken';
-import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
+import type { TokenRow, NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import globalMessages from '../../../i18n/global-messages';
 import { hiddenAmount } from '../../../utils/strings';
+import OpenInExplorer from '../../widgets/OpenInExplorer';
 
 const SORTING_DIRECTIONS = {
   UP: 'UP',
@@ -42,6 +43,7 @@ type Props = {|
   +assetDeposit:? null | MultiToken,
   +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
   +shouldHideBalance: boolean,
+  +network: $ReadOnly<NetworkRow>
 |};
 
 type State = {|
@@ -181,7 +183,7 @@ export default class AssetsList extends Component<Props, State> {
 
     const { intl } = this.context;
     const { assetsList } = this.state
-    const { assetDeposit } = this.props
+    const { assetDeposit, network } = this.props
 
     return (
       <div className={styles.component}>
@@ -243,9 +245,12 @@ export default class AssetsList extends Component<Props, State> {
                     <div className={styles.logo}>
                       <NoAssetLogo />
                     </div>
-                    <a href={`https://cardanoscan.io/token/${token.id}`} rel="noreferrer" target='_blank'>
+                    {/* <a href={`https://cardanoscan.io/token/${token.id}`} rel="noreferrer" target='_blank'>
                       {token.name}
-                    </a>
+                    </a> */}
+                    <OpenInExplorer network={network} address={token.id}>
+                      {token.name}
+                    </OpenInExplorer>
                   </li>
                   <li>{truncateAddressShort(token.id)}</li>
                   <li className={styles.amount}>{token.amount}</li>
