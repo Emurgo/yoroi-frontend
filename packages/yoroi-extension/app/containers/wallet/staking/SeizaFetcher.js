@@ -26,9 +26,9 @@ export type PoolData = {|
   +id: string,
   +name: string,
   +avatar?: string,
-  +roa: string,
+  +roa?: string,
   +websiteUrl?: string,
-  +socialLinks: SocialLinks
+  +socialLinks?: SocialLinks,
 |};
 
 

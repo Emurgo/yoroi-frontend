@@ -8,13 +8,14 @@ import { observer } from 'mobx-react';
 import InfoIconSVG from '../../../../assets/images/info-icon.inline.svg';
 import CloseIcon from '../../../../assets/images/forms/close.inline.svg';
 import DelegatedStakePoolCard from './DelegatedStakePoolCard';
-import type { DelegatedPoolType } from './DelegatedStakePoolCard';
 import { defineMessages, injectIntl } from 'react-intl';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import globalMessages from '../../../../i18n/global-messages';
+import type { PoolData } from '../../../../containers/wallet/staking/SeizaFetcher';
 
 type Props = {|
-  delegatedPool: DelegatedPoolType,
+  delegatedPool: PoolData,
+  +undelegate: void | (void => Promise<void>),
 |};
 type Intl = {|
   intl: $npm$ReactIntl$IntlShape,
@@ -23,11 +24,12 @@ type Intl = {|
 const messages = defineMessages({
   alertInfo: {
     id: 'wallet.staking.alertInfo',
-    defaultMessage: '!!!The first reward to receive takes 3-4 epochs which is equal to 15-20 days, learn more.',
+    defaultMessage:
+      '!!!The first reward to receive takes 3-4 epochs which is equal to 15-20 days, learn more.',
   },
 });
 
-function StakingTabs({ delegatedPool, intl }: Props & Intl): Node {
+function StakingTabs({ delegatedPool, undelegate, intl }: Props & Intl): Node {
   const [value, setValue] = useState(0);
 
   const handleChange = (event, newValue) => {
@@ -43,7 +45,7 @@ function StakingTabs({ delegatedPool, intl }: Props & Intl): Node {
         <Box>
           <StakePoolAlert message={intl.formatMessage(messages.alertInfo)} />
           <Box py="10px" borderBottom="1px solid var(--yoroi-palette-gray-200)">
-            <DelegatedStakePoolCard delegatedPool={delegatedPool} />
+            <DelegatedStakePoolCard delegatedPool={delegatedPool} undelegate={undelegate} />
           </Box>
         </Box>
       ),

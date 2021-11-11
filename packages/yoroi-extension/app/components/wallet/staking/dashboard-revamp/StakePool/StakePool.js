@@ -15,7 +15,7 @@ import QuestionMarkIcon from '../../../../../assets/images/question-mark.inline.
 import type { SocialLinks } from '../../../../../containers/wallet/staking/SeizaFetcher';
 
 // eslint-disable-next-line react/require-default-props
-type Props = {| socialLinks: SocialLinks, websiteUrl?: string, +color: string, |};
+type Props = {| socialLinks?: SocialLinks, websiteUrl?: string, +color: string |};
 
 const SocialExternalLink = ({ href, children }: {| href: string, children: Node |}): Node => (
   <StyledLink href={href} target="_blank" rel="noreferrer noopener">
@@ -24,13 +24,13 @@ const SocialExternalLink = ({ href, children }: {| href: string, children: Node 
 );
 
 export const SocialMediaStakePool = ({ socialLinks, websiteUrl, color }: Props): Node => {
-  const twitter = socialLinks.tw;
-  const telegram = socialLinks.tg;
-  const facebook = socialLinks.fb;
-  const youtube = socialLinks.yt;
-  const twitch = socialLinks.tc;
-  const discord = socialLinks.di;
-  const github = socialLinks.gh;
+  const twitter = socialLinks?.tw;
+  const telegram = socialLinks?.tg;
+  const facebook = socialLinks?.fb;
+  const youtube = socialLinks?.yt;
+  const twitch = socialLinks?.tc;
+  const discord = socialLinks?.di;
+  const github = socialLinks?.gh;
 
   return (
     <List color={color}>

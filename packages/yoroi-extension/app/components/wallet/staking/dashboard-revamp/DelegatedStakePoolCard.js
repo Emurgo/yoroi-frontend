@@ -8,31 +8,26 @@ import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import globalMessages from '../../../../i18n/global-messages';
 import { HelperTooltip, SocialMediaStakePool } from './StakePool/StakePool';
-
-export type DelegatedPoolType = {|
-  avatar: string,
-  name: string,
-  roa30d: string,
-  id: number,
-|};
+import type { PoolData } from '../../../../containers/wallet/staking/SeizaFetcher';
 
 type Props = {|
-  delegatedPool: DelegatedPoolType,
+  delegatedPool: PoolData,
+  +undelegate: void | (void => Promise<void>),
 |};
 
 type Intl = {|
   intl: $npm$ReactIntl$IntlShape,
 |};
 
-function DelegatedStakePoolCard({ delegatedPool, intl }: Props & Intl): Node {
-  const { id, name, avatar, roa30d } = delegatedPool;
+function DelegatedStakePoolCard({ delegatedPool, undelegate, intl }: Props & Intl): Node {
+  const { id, name, avatar, roa, socialLinks, websiteUrl } = delegatedPool || {};
   const avatarSource = toSvg(id, 36, { padding: 0 });
   const avatarGenerated = `data:image/svg+xml;utf8,${encodeURIComponent(avatarSource)}`;
 
   return (
     <Wrapper>
       <AvatarWrapper>
-        {avatar ? (
+        {avatar != null ? (
           <AvatarImg src={avatar} alt="stake pool logo" />
         ) : (
           <AvatarImg src={avatarGenerated} alt="stake pool logo" />
@@ -44,23 +39,20 @@ function DelegatedStakePoolCard({ delegatedPool, intl }: Props & Intl): Node {
         </Typography>
         <SocialMediaStakePool
           color="var(--yoroi-palette-gray-600)"
-          websiteUrl="qwerqwe"
-          socialLinks={{
-            fb: 'qeqew',
-            tw: 'qwerwqe',
-          }}
+          websiteUrl={websiteUrl}
+          socialLinks={socialLinks}
         />
       </Box>
       <Box display="flex" alignItems="center" flex="1">
         <Typography variant="body1" color="var(--yoroi-palette-gray-600)">
           {intl.formatMessage(globalMessages.roa30d)}
           <Typography ml="8px" as="span" color="var(--yoroi-palette-gray-900)">
-            {roa30d}
+            {roa}
           </Typography>
         </Typography>
         <HelperTooltip message={intl.formatMessage(globalMessages.roaHelperMessage)} />
       </Box>
-      <UndelegateButton color="secondary">
+      <UndelegateButton color="secondary" onClick={undelegate}>
         {intl.formatMessage(globalMessages.undelegateLabel)}
       </UndelegateButton>
     </Wrapper>

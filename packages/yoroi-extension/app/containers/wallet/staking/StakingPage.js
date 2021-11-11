@@ -38,13 +38,18 @@ import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 import type { TokenInfoMap } from '../../../stores/toplevel/TokenInfoStore';
 import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
-import { isCardanoHaskell } from '../../../api/ada/lib/storage/database/prepackaged/networks';
+import {
+  isCardanoHaskell,
+  isJormungandr,
+} from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import type { AdaDelegationRequests } from '../../../stores/ada/AdaDelegationStore';
 import EpochProgressContainer from './EpochProgressContainer';
 import type { GeneratedData as UnmangleTxDialogContainerData } from '../../transfer/UnmangleTxDialogContainer';
 import WithdrawalTxDialogContainer from '../../transfer/WithdrawalTxDialogContainer';
 import type { GeneratedData as WithdrawalTxDialogContainerData } from '../../transfer/WithdrawalTxDialogContainer';
 import type { GeneratedData as DeregisterDialogContainerData } from '../../transfer/DeregisterDialogContainer';
+import UndelegateDialog from '../../../components/wallet/staking/dashboard/UndelegateDialog';
+import type { PoolRequest } from '../../../api/jormungandr/lib/storage/bridge/delegationUtils';
 
 export type GeneratedData = typeof StakingPage.prototype.generated;
 // populated by ConfigWebpackPlugin
@@ -161,6 +166,73 @@ class StakingPage extends Component<AllProps> {
     return undefined;
   };
 
+  getStakePools: (PublicDeriver<>) => Node | void = publicDeriver => {
+    const delegationStore = this.generated.stores.delegation;
+    const delegationRequests = delegationStore.getDelegationRequests(publicDeriver);
+    if (delegationRequests == null) {
+      throw new Error(`${nameof(StakingPage)} opened for non-reward wallet`);
+    }
+    if (
+      !delegationRequests.getCurrentDelegation.wasExecuted ||
+      delegationRequests.getCurrentDelegation.isExecuting ||
+      delegationRequests.getCurrentDelegation.result == null
+    ) {
+      return null;
+    }
+    if (delegationRequests.getCurrentDelegation.result.currEpoch == null) {
+      return null;
+    }
+    const currentPools = delegationRequests.getCurrentDelegation.result.currEpoch.pools;
+    const { intl } = this.context;
+    const currentPage = this.generated.stores.delegation.selectedPage;
+
+    const currentPool = currentPools[0][currentPage];
+    const meta = this.generated.stores.delegation.getLocalPoolInfo(
+      publicDeriver.getParent().getNetworkInfo(),
+      String(currentPool)
+    );
+    if (meta == null) {
+      // server hasn't returned information about the stake pool yet
+      return undefined;
+    }
+    const name = meta.info?.name ?? intl.formatMessage(globalMessages.unknownPoolLabel);
+    const delegatedPool = {
+      id: String(currentPool),
+      name,
+    };
+
+    // TODO: implement this eventually
+    // const stakePoolMeta = {
+    // avatar: '',
+    // websiteUrl: '',
+    // roa: ' 5.08%',
+    // socialLinks: {
+    //   fb: '',
+    //   tw: '',
+    // },
+    // };
+
+    return (
+      <StakingTabs
+        delegatedPool={delegatedPool}
+        undelegate={
+          // don't support undelegation for ratio stake since it's a less intuitive UX
+          currentPools.length === 1 && isJormungandr(publicDeriver.getParent().getNetworkInfo())
+            ? async () => {
+                this.generated.actions.dialogs.open.trigger({ dialog: UndelegateDialog });
+                await this.generated.actions.jormungandr.delegationTransaction.createTransaction.trigger(
+                  {
+                    publicDeriver,
+                    poolRequest: undefined,
+                  }
+                );
+              }
+            : undefined
+        }
+      />
+    );
+  };
+
   render(): Node {
     const sidebarContainer = <SidebarContainer {...this.generated.SidebarContainerProps} />;
     const publicDeriver = this.generated.stores.wallets.selected;
@@ -186,6 +258,9 @@ class StakingPage extends Component<AllProps> {
 
     const delegationHistory = delegationRequests.getCurrentDelegation.result?.fullHistory;
     const hasNeverDelegated = delegationHistory != null && delegationHistory.length === 0;
+
+    const showStakePoolTabs =
+      errorIfPresent == null ? this.getStakePools(publicDeriver) : errorIfPresent;
 
     return (
       <TopBarLayout
@@ -217,16 +292,7 @@ class StakingPage extends Component<AllProps> {
           {hasNeverDelegated ? null : (
             <WrapperCards>
               {this._generateUserSummary({ delegationRequests, publicDeriver, errorIfPresent })}
-              <StakingTabs
-                // TODO: get delegated pool
-                delegatedPool={{
-                  id: 111,
-                  name: '[EMUR1] Emurgo #1',
-                  avatar:
-                    'https://static.adapools.org/pool_logo/7f6c103302f96390d478a170fe80938b76fccd8a23490e3b6ddebcf7.png',
-                  roa30d: ' 5.08%',
-                }}
-              />
+              {showStakePoolTabs}
             </WrapperCards>
           )}
           <CardanoStakingPage
@@ -328,6 +394,16 @@ class StakingPage extends Component<AllProps> {
           reset: {| trigger: (params: {| justTransaction: boolean |}) => void |},
           createWithdrawalTxForWallet: {|
             trigger: (params: {| publicDeriver: PublicDeriver<> |}) => Promise<void>,
+          |},
+        |},
+      |},
+      jormungandr: {|
+        delegationTransaction: {|
+          createTransaction: {|
+            trigger: (params: {|
+              poolRequest: PoolRequest,
+              publicDeriver: PublicDeriver<>,
+            |}) => Promise<void>,
           |},
         |},
       |},
@@ -444,6 +520,13 @@ class StakingPage extends Component<AllProps> {
             },
             createWithdrawalTxForWallet: {
               trigger: actions.ada.delegationTransaction.createWithdrawalTxForWallet.trigger,
+            },
+          },
+        },
+        jormungandr: {
+          delegationTransaction: {
+            createTransaction: {
+              trigger: actions.jormungandr.delegationTransaction.createTransaction.trigger,
             },
           },
         },
