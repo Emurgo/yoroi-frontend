@@ -19,7 +19,7 @@ export default class OpenInExplorer extends Component<Props> {
   render(): Node {
     const { children, network, address } = this.props;
     if (isErgo(network)) {
-        return <a href={`https://explorer.ergoplatform.com/en/addresses/${address}`} rel="noreferrer" target='_blank'>{children}</a>
+        return <p>{children}</p>
     }
     if (isCardanoHaskell(network) && !isTestnet(network)) {
         return <a href={`https://cardanoscan.io/${address}`} rel="noreferrer" target='_blank'>{children}</a>
