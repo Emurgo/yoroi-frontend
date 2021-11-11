@@ -74,12 +74,19 @@ export default class ErgoMnemonicSendStore extends Store<StoresMap, ActionsMap> 
         throw new Error(`${nameof(this.signAndBroadcast)} public deriver missing signing functionality.`);
       }
 
-      return await this.api.ergo.signAndBroadcast({
+      const txId = await this.api.ergo.signAndBroadcast({
         publicDeriver: withSigning,
         password: request.password,
         signRequest: request.signRequest,
         sendTx: this.stores.substores.ergo.stateFetchStore.fetcher.sendTx,
       });
+
+      await this.stores.substores.ergo.transactions.recordSubmittedTransaction(
+        request.publicDeriver,
+        request.signRequest,
+        txId.txId,
+      );
+      return txId;
     } catch (error) {
       Logger.error(`${nameof(ErgoMnemonicSendStore)}::${nameof(this.signAndBroadcast)} error: ` + stringifyError(error));
       throw error;

@@ -178,7 +178,7 @@ export default class LedgerConnectStore
     try {
       const ledgerConnect = new LedgerConnect({
         locale: this.stores.profile.currentLocale,
-        connectorUrl: 'https://emurgo.github.io/yoroi-extension-ledger-connect-vnext/catalyst/#/v3.1',
+        connectorUrl: 'https://emurgo.github.io/yoroi-extension-ledger-connect-vnext/multisig/#/v4.1',
       });
       this.ledgerConnect = ledgerConnect;
       await prepareLedgerConnect(ledgerConnect);

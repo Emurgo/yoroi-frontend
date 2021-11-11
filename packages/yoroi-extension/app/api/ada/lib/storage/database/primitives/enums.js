@@ -34,6 +34,7 @@ export const CoreAddressTypes = Object.freeze({
 export type CoreAddressT = $Values<typeof CoreAddressTypes>;
 
 export const TxStatusCodes = Object.freeze({
+  SUBMITTED: -4,
   NOT_IN_REMOTE: -3,
   ROLLBACK_FAIL: -2,
   FAIL_RESPONSE: -1,
