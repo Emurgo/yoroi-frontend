@@ -22,9 +22,9 @@ export default class OpenInExplorer extends Component<Props> {
         return <p>{children}</p>
     }
     if (isCardanoHaskell(network) && !isTestnet(network)) {
-        return <a href={`https://cardanoscan.io/${address}`} rel="noreferrer" target='_blank'>{children}</a>
+        return <a href={`https://cardanoscan.io/token/${address}`} rel="noreferrer" target='_blank'>{children}</a>
     }
     // Cardano testnet
-    return <a href={`https://testnet.cardanoscan.io/${address}`} rel="noreferrer" target='_blank'>{children}</a>
+    return <a href={`https://testnet.cardanoscan.io/token/${address}`} rel="noreferrer" target='_blank'>{children}</a>
   }
 }
