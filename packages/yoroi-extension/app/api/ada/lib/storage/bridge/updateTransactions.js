@@ -371,10 +371,13 @@ export async function rawGetTransactions(
                     ?.get(rewardAddr.payment_cred());
                   // happens if the MIR is to another pot
                   if (rewardAmount == null) continue;
+                  const rewardAmountStr = rewardAmount.is_positive()
+                    ? rewardAmount.as_positive().to_str()
+                    : ('-' + rewardAmount.as_negative().to_str());
                   implicitOutputSum.add({
                     identifier: defaultToken.defaultIdentifier,
                     networkId: defaultToken.defaultNetworkId,
-                    amount: new BigNumber(String(rewardAmount.as_i32())),
+                    amount: new BigNumber(rewardAmountStr),
                   });
                 }
               }
