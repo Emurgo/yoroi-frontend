@@ -42,6 +42,7 @@ import { defineMessages, } from 'react-intl';
 import type { $npm$ReactIntl$MessageDescriptor } from 'react-intl';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
+import { isWalletExist } from '../../api/ada/lib/cardanoCrypto/utils';
 
 const messages = defineMessages({
   walletRestoreVerifyAccountIdLabel: {
@@ -134,9 +135,8 @@ export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> 
   }
 
   @action
-  _processRestoreMeta: (WalletRestoreMeta) => void = (restoreMeta) => {
+  _processRestoreMeta: (WalletRestoreMeta) => Promise<void> = async (restoreMeta) => {
     this.walletRestoreMeta = restoreMeta;
-    this.step = RestoreSteps.VERIFY_MNEMONIC;
 
     let resolvedRecoveryPhrase = restoreMeta.recoveryPhrase;
 
@@ -179,6 +179,19 @@ export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> 
         plates,
       };
     });
+    console.log({mode})
+    // Check for wallet duplication.
+    const wallets = this.stores.wallets.publicDerivers
+    const accountIndex = this.stores.walletRestore.selectedAccount;
+    const exist = await isWalletExist(wallets, mode.type, resolvedRecoveryPhrase, accountIndex)
+
+    if (exist) {
+      alert('Walelt exist!!')
+    } else {
+      runInAction(() => {
+        this.step = RestoreSteps.VERIFY_MNEMONIC;
+      })
+    }
   }
 
   teardown(): void {

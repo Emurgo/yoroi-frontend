@@ -4,6 +4,9 @@ import { RustModule } from './rustLoader';
 import type {
   Addressing,
 } from '../storage/models/PublicDeriver/interfaces';
+import { PublicDeriver } from '../storage/models/PublicDeriver';
+import { generateWalletRootKey } from './cryptoWallet';
+import { CoinTypes, WalletTypePurpose } from '../../../../config/numbersConfig';
 
 export function v4SecretToV2(
   v4Key: RustModule.WalletV4.Bip32PrivateKey,
@@ -63,4 +66,24 @@ export function derivePrivateByAddressing(request: {|
     );
   }
   return derivedKey;
+}
+
+export async function isWalletExist(publickDerivers: Array<PublicDeriver<>>, mode: 'bip44' | 'cip1852', recoveryPhrase: string, accountIndex: any): Promise<boolean> {
+  const rootPk = generateWalletRootKey(recoveryPhrase);
+  if ((mode !== 'bip44') && (mode !== 'cip1852')) {
+    throw new Error(`${nameof(isWalletExist)} unknown restoration mode`);
+  }
+  const purpose = mode === 'cip1852' ? WalletTypePurpose.CIP1852 : WalletTypePurpose.BIP44
+
+  const accountPublicKey = rootPk
+  .derive(purpose)
+  .derive(CoinTypes.CARDANO)
+  .derive(accountIndex)
+  .to_public();
+  const publicKey = Buffer.from(accountPublicKey.as_bytes()).toString('hex')
+  for (const deriver of publickDerivers) {
+    const existedPublicKey = await deriver.getPublicKey()
+    if (publicKey === existedPublicKey.Hash) return true
+  }
+  return false
 }

@@ -14,6 +14,8 @@ import type {
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
+import { asGetSigningKey, asGetPublicKey } from '../../api/ada/lib/storage/models/PublicDeriver'
+import { isWalletExist } from '../../api/ada/lib/cardanoCrypto/utils';
 
 export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> {
 
@@ -116,6 +118,7 @@ export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> 
 
     const { mode } = this.stores.walletRestore;
     if (mode == null) throw new Error(`${nameof(this._restoreToDb)} Unknown restoration type`);
+    const accountIndex = this.stores.walletRestore.selectedAccount;
     await this.stores.wallets.restoreRequest.execute(async () => {
       const wallet = await this.api.ada.restoreWallet({
         mode: mode.type,
@@ -124,7 +127,7 @@ export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> 
         walletName,
         walletPassword,
         network: selectedNetwork,
-        accountIndex: this.stores.walletRestore.selectedAccount,
+        accountIndex,
       });
       return wallet;
     }).promise;
