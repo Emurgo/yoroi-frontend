@@ -1,7 +1,6 @@
 // @flow
 
 import Store from '../../base/Store';
-import { HaskellShelleyTxSignRequest } from '../../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 import {
   Logger,
   stringifyError,
@@ -19,6 +18,7 @@ import { genOwnStakingKey } from '../../../api/ada/index';
 import { RustModule } from '../../../api/ada/lib/cardanoCrypto/rustLoader';
 import type { ActionsMap } from '../../../actions/index';
 import type { StoresMap } from '../../index';
+import { YoroiLibSignRequest } from '../../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 
 export default class AdaMnemonicSendStore extends Store<StoresMap, ActionsMap> {
 
@@ -42,7 +42,7 @@ export default class AdaMnemonicSendStore extends Store<StoresMap, ActionsMap> {
     publicDeriver: PublicDeriver<>,
     onSuccess?: void => void,
   |} => Promise<void> = async (request) => {
-    if (!(request.signRequest instanceof HaskellShelleyTxSignRequest)) {
+    if (!(request.signRequest instanceof YoroiLibSignRequest)) {
       throw new Error(`${nameof(this._sendMoney)} wrong tx sign request`);
     }
 
@@ -67,7 +67,7 @@ export default class AdaMnemonicSendStore extends Store<StoresMap, ActionsMap> {
   };
 
   signAndBroadcast: {|
-    signRequest: HaskellShelleyTxSignRequest,
+    signRequest: ISignRequest<any>,
     password: string,
     publicDeriver: PublicDeriver<>,
   |} => Promise<{| txId: string |}> = async (request) => {
@@ -75,6 +75,10 @@ export default class AdaMnemonicSendStore extends Store<StoresMap, ActionsMap> {
       const withSigning = (asGetSigningKey(request.publicDeriver));
       if (withSigning == null) {
         throw new Error(`${nameof(this.signAndBroadcast)} public deriver missing signing functionality.`);
+      }
+
+      if (!request.signRequest.neededStakingKeyHashes) {
+        throw new Error('missing the neededStakingKeyHashes');
       }
 
       const { neededStakingKeyHashes } = request.signRequest;
@@ -90,21 +94,25 @@ export default class AdaMnemonicSendStore extends Store<StoresMap, ActionsMap> {
           publicDeriver: withStakingKey,
           password: request.password,
         });
-        if (request.signRequest.neededStakingKeyHashes.neededHashes.has(
+        if (neededStakingKeyHashes.neededHashes.has(
           Buffer.from(
             RustModule.WalletV4.StakeCredential.from_keyhash(
               stakingKey.to_public().hash()
             ).to_bytes()
           ).toString('hex')
         )) {
-          neededStakingKeyHashes.wits.add(
-            Buffer.from(RustModule.WalletV4.make_vkey_witness(
-              RustModule.WalletV4.hash_transaction(
-                request.signRequest.unsignedTx.build()
-              ),
-              stakingKey
-            ).to_bytes()).toString('hex')
-          );
+          const signRequest: any = request.signRequest;
+          const unsignedTx = signRequest.unsignedTx;
+          if (unsignedTx) {
+            neededStakingKeyHashes.wits.add(
+              Buffer.from(RustModule.WalletV4.make_vkey_witness(
+                RustModule.WalletV4.hash_transaction(
+                  unsignedTx.build()
+                ),
+                stakingKey
+              ).to_bytes()).toString('hex')
+            );
+          }
         } else {
           throw new Error(`${nameof(this.signAndBroadcast)} Missing witness but it was not ours`);
         }

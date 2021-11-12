@@ -85,7 +85,6 @@ import type {
 import {
   sendAllUnsignedTx as shelleySendAllUnsignedTx,
   newAdaUnsignedTx as shelleyNewAdaUnsignedTx,
-  signTransaction as shelleySignTransaction,
 } from './transactions/shelley/transactions';
 import {
   generateWalletRootKey,
@@ -129,7 +128,7 @@ import type {
   V4UnsignedTxAddressedUtxoResponse,
   CardanoAddressedUtxo,
 } from './transactions/types';
-import { HaskellShelleyTxSignRequest, } from './transactions/shelley/HaskellShelleyTxSignRequest';
+import { HaskellShelleyTxSignRequest, YoroiLibSignRequest } from './transactions/shelley/HaskellShelleyTxSignRequest';
 import type { SignTransactionRequest } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { WrongPassphraseError } from './lib/cardanoCrypto/cryptoErrors';
 
@@ -186,6 +185,7 @@ import type { DefaultTokenEntry } from '../common/lib/MultiToken';
 import { hasSendAllDefault, builtSendTokenList } from '../common/index';
 import { getReceiveAddress } from '../../stores/stateless/addressStores';
 import { generateRegistrationMetadata } from './lib/cardanoCrypto/catalyst';
+import { ISignRequest } from '../common/lib/transactions/ISignRequest';
 
 // ADA specific Request / Response params
 
@@ -272,7 +272,7 @@ export type GetNoticesFunc = (
 
 export type SignAndBroadcastRequest = {|
   publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetSigningKey,
-  signRequest: HaskellShelleyTxSignRequest,
+  signRequest: ISignRequest<any>,
   password: string,
   sendTx: SendFunc,
 |};
@@ -830,24 +830,57 @@ export default class AdaApi {
         ...signingKey,
         password,
       });
-      const signedTx = shelleySignTransaction(
-        request.signRequest.senderUtxos,
-        request.signRequest.unsignedTx,
-        request.publicDeriver.getParent().getPublicDeriverLevel(),
-        RustModule.WalletV4.Bip32PrivateKey.from_bytes(
-          Buffer.from(normalizedKey.prvKeyHex, 'hex')
-        ),
-        request.signRequest.neededStakingKeyHashes.wits,
-        request.signRequest.metadata,
+
+      const keyLevel = request.publicDeriver.getParent().getPublicDeriverLevel()
+
+      if (!request.signRequest.sign) {
+        throw new Error('should never happen');
+      }
+      const signedTx = await request.signRequest.sign(
+        keyLevel,
+        normalizedKey.prvKeyHex,
+        request.signRequest.neededStakingKeyHashes
+          ? request.signRequest.neededStakingKeyHashes.wits
+          : new Set<string>(),
+        // we pass an empty metadata array here.
+        // previously we used to send the exact same metadata we used to construct the
+        // unsigned TX again when signing the TX, but it should be the responsibility of
+        // each particular implementation of ISignRequest to keep the metadata and
+        // use it appropriately at the `sign` function
+        []
       );
 
       const response = request.sendTx({
         network: request.publicDeriver.getParent().getNetworkInfo(),
-        id: Buffer.from(
-          RustModule.WalletV4.hash_transaction(signedTx.body()).to_bytes()
-        ).toString('hex'),
-        encodedTx: signedTx.to_bytes(),
+        id: signedTx.id,
+        encodedTx: signedTx.encodedTx,
       });
+
+      // ===== OLD CODE USING serilib directly =====
+      // ===========================================
+      // ===========================================
+      // ToDo: This should be removed before merging
+      // const signedTx = shelleySignTransaction(
+      //   request.signRequest.senderUtxos,
+      //   request.signRequest.unsignedTx,
+      //   request.publicDeriver.getParent().getPublicDeriverLevel(),
+      //   RustModule.WalletV4.Bip32PrivateKey.from_bytes(
+      //     Buffer.from(normalizedKey.prvKeyHex, 'hex')
+      //   ),
+      //   request.signRequest.neededStakingKeyHashes.wits,
+      //   request.signRequest.metadata,
+      // );
+
+      // const response = request.sendTx({
+      //   network: request.publicDeriver.getParent().getNetworkInfo(),
+      //   id: Buffer.from(
+      //     RustModule.WalletV4.hash_transaction(signedTx.body()).to_bytes()
+      //   ).toString('hex'),
+      //   encodedTx: signedTx.to_bytes(),
+      // });
+      // ===========================================
+      // ===========================================
+
       Logger.debug(
         `${nameof(AdaApi)}::${nameof(this.signAndBroadcast)} success: ` + stringifyData(response)
       );
@@ -1085,38 +1118,125 @@ export default class AdaApi {
     }
   }
 
-  async createUnsignedTx(
+  async createUnsignedTxUsingYoroiLib(
     request: CreateUnsignedTxRequest
-  ): Promise<CreateUnsignedTxResponse> {
+  ): Promise<YoroiLibSignRequest> {
     const utxos = await request.publicDeriver.getAllUtxos();
     const filteredUtxos = utxos.filter(utxo => request.filter(utxo));
 
-    const addressedUtxo = asAddressedUtxo(filteredUtxos);
-
-    const receivers = [{
-      address: request.receiver
-    }];
-
-    // note: we need to create a change address IFF we're not sending all of the default asset
-    if (!hasSendAllDefault(request.tokens)) {
-      const internal = await getReceiveAddress(request.publicDeriver);
-      if (internal == null) {
-        throw new Error(`${nameof(this.createUnsignedTx)} no internal addresses left. Should never happen`);
-      }
-      receivers.push({
-        address: internal.addr.Hash,
-        addressing: internal.addressing,
-      });
+    const sender = await getReceiveAddress(request.publicDeriver);
+    if (sender == null) {
+      throw new Error(`${nameof(this.createUnsignedTxUsingYoroiLib)} no internal addresses left. Should never happen`);
     }
-    return this.createUnsignedTxForUtxos({
-      absSlotNumber: request.absSlotNumber,
-      receivers,
-      network: request.publicDeriver.getParent().getNetworkInfo(),
-      defaultToken: request.publicDeriver.getParent().getDefaultToken(),
-      utxos: addressedUtxo,
-      tokens: request.tokens,
-      metadata: request.metadata,
+
+    const yoroiLibUtxos = filteredUtxos.map(u => {
+      // $FlowFixMe: nothing to be fixed here, flow is just being annoying
+      const aUtxo: YoroiLibModels.AddressingUtxo = {
+        address: u.address,
+        addressing: {
+          path: u.addressing.path,
+          startLevel: u.addressing.startLevel
+        },
+        output: {
+          transaction: {
+            hash: u.output.Transaction.Hash
+          },
+          utxoTransactionOutput: {
+            outputIndex: u.output.UtxoTransactionOutput.OutputIndex
+          },
+          tokens: u.output.tokens.map(t => {
+            // $FlowFixMe
+            const utxoToken: {
+              // $FlowFixMe
+              tokenList: YoroiLibModels.TokenList;
+              // $FlowFixMe
+              token: YoroiLibModels.Token;
+            } = {
+              token: {
+                identifier: t.Token.Identifier,
+                isDefault: t.Token.IsDefault,
+                networkId: t.Token.NetworkId
+              },
+              tokenList: {
+                amount: t.TokenList.Amount
+              }
+            }
+            return utxoToken
+          })
+        }
+      }
+      return aUtxo
     });
+
+    const yoroiLibTokens = request.tokens.map(t => {
+      // $FlowFixMe
+      const x: YoroiLibModels.SendToken = {
+        token: {
+          identifier: t.token.Identifier,
+          isDefault: t.token.IsDefault,
+          networkId: t.token.NetworkId
+        },
+        // $FlowFixMe
+        amount: t.amount,
+        // $FlowFixMe
+        shouldSendAll: t.shouldSendAll
+      }
+      return x;
+    });
+
+    const network = request.publicDeriver.getParent().getNetworkInfo();
+    const config = getCardanoHaskellBaseConfig(
+      network
+    ).reduce((acc, next) => Object.assign(acc, next), {});
+
+    const chc = {
+      keyDeposit: config.KeyDeposit,
+      linearFee: {
+        coefficient: config.LinearFee.coefficient,
+        constant: config.LinearFee.constant
+      },
+      minimumUtxoVal: config.MinimumUtxoVal,
+      poolDeposit: config.PoolDeposit,
+      networkId: network.NetworkId
+    };
+
+    const defaultToken = request.publicDeriver.getParent().getDefaultToken();
+    const yoroiLibDefaultToken = {
+      defaultNetworkId: defaultToken.defaultNetworkId,
+      defaultIdentifier: defaultToken.defaultIdentifier,
+    };
+
+    const yoroiLibBrowser = await import('@emurgo/yoroi-lib-browser/dist');
+    const init = yoroiLibBrowser.init;
+    const yoroiLib = init();
+
+    const unsignedTx = await yoroiLib.createUnsignedTx(
+      request.absSlotNumber,
+      yoroiLibUtxos,
+      request.receiver,
+      {
+        address: sender.addr.Hash,
+        addressing: sender.addressing,
+      },
+      yoroiLibTokens,
+      chc,
+      yoroiLibDefaultToken,
+      {}
+    );
+
+    return new YoroiLibSignRequest(
+      unsignedTx,
+      {
+        neededHashes: new Set(),
+        wits: new Set(),
+      },
+      {
+        ChainNetworkId: Number.parseInt(config.ChainNetworkId, 10),
+        KeyDeposit: new BigNumber(config.KeyDeposit),
+        PoolDeposit: new BigNumber(config.PoolDeposit),
+        NetworkId: network.NetworkId,
+      }
+    )
   }
 
   async createDelegationTx(
@@ -1245,7 +1365,7 @@ export default class AdaApi {
   async createWithdrawalTx(
     request: CreateWithdrawalTxRequest
   ): Promise<CreateWithdrawalTxResponse> {
-    Logger.debug(`${nameof(AdaApi)}::${nameof(this.createUnsignedTx)} called`);
+    Logger.debug(`${nameof(AdaApi)}::${nameof(this.createWithdrawalTx)} called`);
     try {
       const config = getCardanoHaskellBaseConfig(
         request.publicDeriver.getParent().getNetworkInfo()
@@ -1283,7 +1403,7 @@ export default class AdaApi {
             Buffer.from(withdrawal.rewardAddress, 'hex')
           )
         );
-        if (wasmAddr == null) throw new Error(`${nameof(AdaApi)}::${nameof(this.createUnsignedTx)} withdrawal not a reward address`);
+        if (wasmAddr == null) throw new Error(`${nameof(AdaApi)}::${nameof(this.createWithdrawalTx)} withdrawal not a reward address`);
         const paymentCred = wasmAddr.payment_cred();
 
         const keyHash = paymentCred.to_keyhash();
@@ -1325,7 +1445,7 @@ export default class AdaApi {
             )
           );
           if (rewardAddress == null) {
-            throw new Error(`${nameof(AdaApi)}::${nameof(this.createUnsignedTx)} withdrawal not a reward address`);
+            throw new Error(`${nameof(AdaApi)}::${nameof(this.createWithdrawalTx)} withdrawal not a reward address`);
           }
           {
             const stakeCredential = rewardAddress.payment_cred();

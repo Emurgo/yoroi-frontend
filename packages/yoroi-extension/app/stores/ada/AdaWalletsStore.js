@@ -7,6 +7,7 @@ import type {
   GenerateWalletRecoveryPhraseFunc
 } from '../../api/ada/index';
 import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
+import type { ISignRequest } from '../../api/common/lib/transactions/ISignRequest';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import { buildCheckAndCall } from '../lib/check';
 import { getApiForNetwork, ApiOptions } from '../../api/common/utils';
@@ -40,7 +41,7 @@ export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
     broadcastRequest: {|
       normal: {|
         publicDeriver: PublicDeriver<>,
-        signRequest: HaskellShelleyTxSignRequest,
+        signRequest: ISignRequest<any>,
         password: string,
       |}
     |} | {|

@@ -257,7 +257,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
       }
 
       if (amount == null && shouldSendAll === true) {
-        await this.createUnsignedTx.execute(() => this.api.ada.createUnsignedTx({
+        await this.createUnsignedTx.execute(() => this.api.ada.createUnsignedTxUsingYoroiLib({
           publicDeriver: withHasUtxoChains,
           receiver,
           tokens: genTokenList({
@@ -270,7 +270,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
           metadata: this.metadata,
         }));
       } else if (amount != null) {
-        await this.createUnsignedTx.execute(() => this.api.ada.createUnsignedTx({
+        await this.createUnsignedTx.execute(() => this.api.ada.createUnsignedTxUsingYoroiLib({
           publicDeriver: withHasUtxoChains,
           receiver,
           tokens: genTokenList({

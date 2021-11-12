@@ -2,6 +2,7 @@
 
 import BigNumber from 'bignumber.js';
 import { ISignRequest } from '../../../common/lib/transactions/ISignRequest';
+import type { SignedTx, TxMetadata } from '../../../common/lib/transactions/ISignRequest';
 import type { CardanoAddressedUtxo } from '../types';
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 import { toHexOrBase58 } from '../../lib/storage/bridge/utils';
@@ -9,6 +10,9 @@ import { MultiToken, } from '../../../common/lib/MultiToken';
 import { PRIMARY_ASSET_CONSTANTS } from '../../lib/storage/database/primitives/enums';
 import { multiTokenFromCardanoValue, multiTokenFromRemote } from '../utils';
 import type { Address, Addressing, Value, } from '../../lib/storage/models/PublicDeriver/interfaces';
+
+import { UnsignedTx } from '@emurgo/yoroi-lib-core/dist/index';
+import * as YoroiLibModels from '@emurgo/yoroi-lib-core/dist';
 
 /**
  * We take a copy of these parameters instead of re-evaluating them from the network
@@ -38,6 +42,134 @@ type LedgerNanoCatalystRegistrationTxSignData = {|
 
 type TrezorTCatalystRegistrationTxSignData =
   LedgerNanoCatalystRegistrationTxSignData;
+
+export class YoroiLibSignRequest implements ISignRequest<UnsignedTx> {
+  _unsignedTx: UnsignedTx;
+  _networkSettingSnapshot: NetworkSettingSnapshot;
+
+  neededStakingKeyHashes: {|
+    neededHashes: Set<string>, // StakeCredential
+    wits: Set<string>, // Vkeywitness
+  |};
+
+  metadata: any
+
+  constructor(
+    unsignedTx: UnsignedTx,
+    neededStakingKeyHashes: {|
+      neededHashes: Set<string>, // StakeCredential
+      wits: Set<string>, // Vkeywitness
+    |},
+    networkSettingSnapshot: NetworkSettingSnapshot) {
+    this._unsignedTx = unsignedTx;
+    this.neededStakingKeyHashes = neededStakingKeyHashes;
+    this._networkSettingSnapshot = networkSettingSnapshot;
+    this.metadata = unsignedTx.metadata;
+  }
+
+  toMultiToken(ma: YoroiLibModels.MultiTokenConstruct): MultiToken {
+    return new MultiToken(
+      ma.values.map(v => {
+        return {
+          amount: v.amount,
+          identifier: v.identifier,
+          networkId: v.networkId
+        }
+      }),
+      {
+        defaultIdentifier: ma.defaults.defaultIdentifier,
+        defaultNetworkId: ma.defaults.defaultNetworkId,
+      }
+    )
+  }
+
+  inputs(): Array<{|
+    address: string,
+    value: MultiToken,
+  |}> {
+    return this._unsignedTx.inputs.map(i => {
+      return {
+        address: i.address,
+        value: this.toMultiToken(i.value)
+      }
+    });
+  }
+
+  totalInput(): MultiToken {
+    return this.toMultiToken(this._unsignedTx.totalInput);
+  }
+
+  outputs(): Array<{|
+    address: string,
+    value: MultiToken,
+  |}> {
+    return this._unsignedTx.outputs.map(i => {
+      return {
+        address: i.address,
+        value: this.toMultiToken(i.value)
+      }
+    })
+  }
+
+  totalOutput(): MultiToken {
+    return this.toMultiToken(this._unsignedTx.totalOutput);
+  }
+
+  fee(): MultiToken {
+    return this.toMultiToken(this._unsignedTx.fee);
+  }
+
+  uniqueSenderAddresses(): Array<string> {
+    return Array.from(new Set(this._unsignedTx.senderUtxos.map(utxo => utxo.receiver)));
+  }
+
+  receivers(includeChange: boolean): Array<string> {
+    const outputs = this._unsignedTx.outputs;
+
+    const outputStrings = [];
+    for (let i = 0; i < outputs.length; i++) {
+      const output = outputs[i];
+      outputStrings.push(output.address);
+    }
+
+    if (!includeChange) {
+      const changeAddrs = this._unsignedTx.change.map(change => change.address);
+      return outputStrings.filter(addr => !changeAddrs.includes(addr));
+    }
+    return outputStrings;
+  }
+
+  isEqual(tx: any): boolean {
+    if (tx.encodedTx) {
+      return this._unsignedTx.encodedTx === tx.encodedTx;
+    }
+    return false;
+  }
+
+  self(): UnsignedTx {
+    return this._unsignedTx;
+  }
+
+  async sign(keyLevel: number,
+    privateKey: string,
+    stakingKeyWits: Set<string>,
+    metadata: TxMetadata[]
+  ): Promise<SignedTx> {
+    const signedTx = await this._unsignedTx.sign(
+      keyLevel,
+      privateKey,
+      stakingKeyWits,
+      metadata.map(m => {
+        return {
+          data: m.data,
+          label: m.label
+        }
+      })
+    );
+
+    return signedTx;
+  }
+}
 
 export class HaskellShelleyTxSignRequest
 implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
@@ -300,6 +432,15 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
 
   self(): RustModule.WalletV4.TransactionBuilder {
     return this.unsignedTx;
+  }
+
+  /* eslint-disable no-unused-vars */
+  async sign(keyLevel: number,
+    privateKey: string,
+    stakingKeyWits: Set<string>,
+    metadata: TxMetadata[]
+  ): Promise<SignedTx> {
+    throw new Error('Signing not implemented on HaskellShelleyTxSignRequest');
   }
 }
 
