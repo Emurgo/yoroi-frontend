@@ -8,6 +8,9 @@
 <PROJECT_ROOT>/dev/.*
 <PROJECT_ROOT>/build/.*
 
+[declarations]
+.*/node_modules/@emurgo/yoroi-lib-core/.*
+
 [include]
 ../node_modules/eslint-plugin-jsx-a11y
 
