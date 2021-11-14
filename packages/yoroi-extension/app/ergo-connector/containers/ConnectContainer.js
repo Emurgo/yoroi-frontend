@@ -15,12 +15,14 @@ import { LoadingWalletStates } from '../types';
 import { networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { genLookupOrFail, } from '../../stores/stateless/tokenHelpers';
 import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
+import { WalletChecksum } from '@emurgo/cip4-js';
 
 type GeneratedData = typeof ConnectContainer.prototype.generated;
 declare var chrome;
 
 type State = {|
   selected: number,
+  checksum: ?WalletChecksum,
 |};
 
 @observer
@@ -30,6 +32,7 @@ export default class ConnectContainer extends Component<
 > {
   state: State = {
     selected: -1,
+    checksum: null,
   };
 
   onUnload: (SyntheticEvent<>) => void = ev => {
@@ -51,27 +54,45 @@ export default class ConnectContainer extends Component<
   componentWillUnmount() {
     window.removeEventListener('unload', this.onUnload);
   }
-  onToggleCheckbox: (index: number) => void = index => {
+  onToggleCheckbox: (index: number, checksum: ?WalletChecksum) => void = (index, checksum) => {
     this.setState((prevState) => prevState.selected === index
-      ? { selected: -1 }
-      : { selected: index }
+      ? { selected: -1, checksum: null }
+      : { selected: index, checksum }
     );
   };
 
-  async onConnect(publicDeriverId: number) {
+  async onConnect(publicDeriverId: number, checksum: ?WalletChecksum) {
     const chromeMessage = this.generated.stores.connector.connectingMessage;
     if(chromeMessage == null) {
       throw new Error(`${nameof(chromeMessage)} connecting to a wallet but no connect message found`);
     }
+
+    const isAuthRequested = chromeMessage.appAuthID != null;
+    if (isAuthRequested && checksum == null) {
+      throw new Error(`${nameof(chromeMessage)} app auth is requested but wallet-checksum does not exist`)
+    }
+
+    // <TODO:AUTH> create auth data entry
+    const authEntry = isAuthRequested ? {
+      walletId: checksum.ImagePart,
+    } : undefined;
+
+
     const result = this.generated.stores.connector.currentConnectorWhitelist;
     const whitelist = result.length ? [...result] : [];
-    whitelist.push({ url: chromeMessage.url, publicDeriverId });
+    whitelist.push({
+      url: chromeMessage.url,
+      publicDeriverId,
+      appAuthID: chromeMessage.appAuthID,
+      auth: authEntry,
+    });
     await this.generated.actions.connector.updateConnectorWhitelist.trigger({ whitelist });
 
     chrome.runtime.sendMessage(({
       type: 'connect_response',
       accepted: true,
       publicDeriverId,
+      auth: authEntry,
       tabId: chromeMessage.tabId,
     }: ConnectResponseData));
 
@@ -92,9 +113,9 @@ export default class ConnectContainer extends Component<
   handleSubmit: () => void = () => {
     const wallets = this.generated.stores.connector.wallets;
     if (wallets) {
-      const { selected } = this.state;
+      const { selected, checksum } = this.state;
       if (selected >= 0) {
-        this.onConnect(selected);
+        this.onConnect(selected, checksum);
       }
     }
   };

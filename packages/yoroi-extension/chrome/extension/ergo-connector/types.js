@@ -393,9 +393,24 @@ export type PublicDeriverCache = {|
   checksum: void | WalletChecksum,
 |}
 
-export type WhitelistEntry = {| url: string, publicDeriverId: number |};
+export type WalletAuthEntry = {|
+  walletId: string,
+  // <TODO:AUTH> pubkey
+|};
 
-export type ConnectingMessage = {| tabId: number, url: string, imgBase64Url: string |};
+export type WhitelistEntry = {|
+  url: string,
+  publicDeriverId: number,
+  appAuthID?: string,
+  auth?: WalletAuthEntry,
+|};
+
+export type ConnectingMessage = {|
+  tabId: number,
+  url: string,
+  appAuthID?: string,
+  imgBase64Url: string,
+|};
 export type SigningMessage = {|
   publicDeriverId: number,
   sign: PendingSignData,

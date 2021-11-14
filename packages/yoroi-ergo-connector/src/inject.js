@@ -11,7 +11,7 @@ const initialInject = `
       if (event.data.err !== undefined) {
         connectRequests.forEach(promise => promise.reject(event.data.err));
       } else {
-        connectRequests.forEach(promise => promise.resolve(event.data.success));
+        connectRequests.forEach(promise => promise.resolve(event.data.success, event.data.auth));
       }
     }
   });
@@ -111,13 +111,21 @@ const initialInject = `
 
   const cardano = Object.freeze(new CardanoAPI())
 
-  function cardano_request_read_access() {
+  function cardano_request_read_access(cardanoAccessRequest) {
+    const { appAuthID } = (cardanoAccessRequest || {});
     return new Promise(function(resolve, reject) {
       window.postMessage({
         type: "connector_connect_request/cardano",
+        appAuthID,
       }, location.origin);
       connectRequests.push({
-        resolve: () => { resolve(cardano); },
+        resolve: (success, auth) => {
+            if (success) {
+                resolve(cardano, auth);
+            } else {
+                reject('Connect request resolved with no errors but connection status is "false"')
+            }
+        },
         reject: reject
       });
     });
@@ -132,6 +140,7 @@ const initialInject = `
   }
   
   window.cardano = {
+    ...(window.cardano||{}),
     '${WALLET_NAME}': {
       enable: cardano_request_read_access,
       isEnabled: cardano_check_read_access,
@@ -315,7 +324,8 @@ function createYoroiPort() {
             }
             window.postMessage({
                 type: "connector_connected",
-                success: message.success
+                success: message.success,
+                auth: message.auth,
             }, location.origin);
         }
     });
@@ -383,7 +393,10 @@ if (shouldInject()) {
                         const message = {
                             imgBase64Url,
                             type: `yoroi_connect_request/${protocol}`,
-                            url: location.hostname,
+                            connectParameters: {
+                                url: location.hostname,
+                                appAuthID: event.data.appAuthID,
+                            },
                             protocol,
                         };
                         yoroiPort.postMessage(message);

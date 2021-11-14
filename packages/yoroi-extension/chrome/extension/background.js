@@ -27,6 +27,8 @@ import type {
   Tx,
   CardanoTx,
   GetConnectionProtocolData,
+  WhitelistEntry,
+  WalletAuthEntry,
 } from './ergo-connector/types';
 import {
   APIErrorCodes,
@@ -114,6 +116,7 @@ let connectionProtocol: string = '';
 
 type ConnectedSite = {|
   url: string,
+  appAuthID?: string,
   status: ConnectedStatus,
   pendingSigns: Map<RpcUid, PendingSign>
 |};
@@ -408,9 +411,12 @@ chrome.runtime.onMessage.addListener(async (
     if (request.tabId == null) return;
     const { tabId } = request;
     const connection = connectedSites.get(tabId);
-    if (connection && connection.status != null && connection.status.resolve != null) {
+    if (connection?.status?.resolve != null) {
       if (request.accepted === true) {
-        connection.status.resolve(request.publicDeriverId);
+        connection.status.resolve({
+          connectedWallet: request.publicDeriverId,
+          auth: request.auth,
+        });
         connection.status = {
           publicDeriverId: request.publicDeriverId,
         };
@@ -523,6 +529,7 @@ chrome.runtime.onMessage.addListener(async (
           connection.status.openedWindow = true;
           sendResponse(({
             url: connection.url,
+            appAuthID: connection.appAuthID,
             imgBase64Url,
             tabId,
           }: ConnectingMessage));
@@ -592,14 +599,28 @@ async function confirmSign(
 
 async function confirmConnect(
   tabId: number,
-  url: string,
+  connectParameters: {
+    url: string,
+    appAuthID?: string,
+  },
   localStorageApi: LocalStorageApi,
-): Promise<?PublicDeriverId> {
+): Promise<{
+  connectedWallet: ?PublicDeriverId,
+  auth: ?WalletAuthEntry,
+}> {
+  const { url, appAuthID } = connectParameters;
+  const isAuthRequested = appAuthID != null;
   const bounds = await getBoundsForTabWindow(tabId);
   const whitelist = await localStorageApi.getWhitelist() ?? [];
   return new Promise(resolve => {
     Logger.info(`whitelist: ${JSON.stringify(whitelist)}`);
-    const whitelistEntry = whitelist.find(entry => entry.url === url);
+    const whitelistEntry = whitelist.find((entry: WhitelistEntry) => {
+      const matchingUrl = entry.url === url;
+      const matchingAuthId = entry.appAuthID === appAuthID;
+      const isAuthWhitelisted = entry.appAuthID != null;
+      const isAuthPermitted = isAuthWhitelisted && matchingAuthId;
+      return matchingUrl && (!isAuthRequested || isAuthPermitted);
+    });
     if (whitelistEntry !== undefined) {
       // we already whitelisted this website, so no need to re-ask the user to confirm
       connectedSites.set(tabId, {
@@ -609,11 +630,15 @@ async function confirmConnect(
         },
         pendingSigns: new Map()
       });
-      resolve(whitelistEntry.publicDeriverId);
+      resolve({
+        connectedWallet: whitelistEntry.publicDeriverId,
+        auth: isAuthRequested ? whitelistEntry.auth : undefined,
+      });
     } else {
       // website not on whitelist, so need to ask user to confirm connection
       connectedSites.set(tabId, {
         url,
+        appAuthID,
         status: {
           resolve,
           openedWindow: false,
@@ -695,8 +720,9 @@ chrome.runtime.onConnectExternal.addListener(port => {
       if (message.type === 'yoroi_connect_request/ergo') {
         await withDb(
           async (_db, localStorageApi) => {
-            const publicDeriverId = await confirmConnect(tabId, message.url, localStorageApi);
-            const accepted = publicDeriverId !== null;
+            const { connectedWallet } =
+              await confirmConnect(tabId, message.connectParameters, localStorageApi);
+            const accepted = connectedWallet !== null;
             port.postMessage({
               type: 'yoroi_connect_response/ergo',
               success: accepted
@@ -706,11 +732,13 @@ chrome.runtime.onConnectExternal.addListener(port => {
       } else if (message.type === 'yoroi_connect_request/cardano') {
         await withDb(
           async (_db, localStorageApi) => {
-            const publicDeriverId = await confirmConnect(tabId, message.url, localStorageApi);
-            const accepted = publicDeriverId !== null;
+            const { connectedWallet, auth } =
+              await confirmConnect(tabId, message.connectParameters, localStorageApi);
+            const accepted = connectedWallet !== null;
             port.postMessage({
               type: 'yoroi_connect_response/cardano',
-              success: accepted
+              success: accepted,
+              auth,
             });
           }
         );
