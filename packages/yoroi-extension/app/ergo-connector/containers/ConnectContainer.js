@@ -16,12 +16,14 @@ import { networks } from '../../api/ada/lib/storage/database/prepackaged/network
 import { genLookupOrFail, } from '../../stores/stateless/tokenHelpers';
 import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
 import { WalletChecksum } from '@emurgo/cip4-js';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 
 type GeneratedData = typeof ConnectContainer.prototype.generated;
 declare var chrome;
 
 type State = {|
   selected: number,
+  deriver: ?PublicDeriver<>,
   checksum: ?WalletChecksum,
 |};
 
@@ -32,6 +34,7 @@ export default class ConnectContainer extends Component<
 > {
   state: State = {
     selected: -1,
+    deriver: null,
     checksum: null,
   };
 
@@ -54,14 +57,15 @@ export default class ConnectContainer extends Component<
   componentWillUnmount() {
     window.removeEventListener('unload', this.onUnload);
   }
-  onToggleCheckbox: (index: number, checksum: ?WalletChecksum) => void = (index, checksum) => {
+  onToggleCheckbox: (deriver: PublicDeriver<>, checksum: ?WalletChecksum) => void = (deriver, checksum) => {
+    const index = deriver.getPublicDeriverId();
     this.setState((prevState) => prevState.selected === index
-      ? { selected: -1, checksum: null }
-      : { selected: index, checksum }
+      ? { selected: -1, deriver: null, checksum: null }
+      : { selected: index, deriver, checksum }
     );
   };
 
-  async onConnect(publicDeriverId: number, checksum: ?WalletChecksum) {
+  async onConnect(deriver: PublicDeriver<>, checksum: ?WalletChecksum) {
     const chromeMessage = this.generated.stores.connector.connectingMessage;
     if(chromeMessage == null) {
       throw new Error(`${nameof(chromeMessage)} connecting to a wallet but no connect message found`);
@@ -73,11 +77,14 @@ export default class ConnectContainer extends Component<
     }
 
     // <TODO:AUTH> create auth data entry
+    const pubKey = (await deriver.getPublicKey()).Hash;
+
+    // <TODO:AUTH> create auth data entry
     const authEntry = isAuthRequested ? {
       walletId: checksum.ImagePart,
     } : undefined;
 
-
+    const publicDeriverId = deriver.getPublicDeriverId();
     const result = this.generated.stores.connector.currentConnectorWhitelist;
     const whitelist = result.length ? [...result] : [];
     whitelist.push({
@@ -113,9 +120,9 @@ export default class ConnectContainer extends Component<
   handleSubmit: () => void = () => {
     const wallets = this.generated.stores.connector.wallets;
     if (wallets) {
-      const { selected, checksum } = this.state;
+      const { selected, deriver, checksum } = this.state;
       if (selected >= 0) {
-        this.onConnect(selected, checksum);
+        this.onConnect(deriver, checksum);
       }
     }
   };
