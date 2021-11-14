@@ -1,6 +1,13 @@
 import * as CardanoWasm from "@emurgo/cardano-serialization-lib-browser"
-import { getTtl} from './utils'
+import { textPartFromWalletChecksumImagePart } from "@emurgo/cip4-js"
+import { createIcon } from "@download/blockies"
+import { getTtl } from './utils'
+
+const cardanoAccessBtnRow = document.querySelector('#request-button-row')
 const cardanoAccessBtn = document.querySelector('#request-access')
+const connectionStatus = document.querySelector('#connection-status')
+const walletPlateSpan = document.querySelector('#wallet-plate')
+const walletIconSpan = document.querySelector('#wallet-icon')
 const getUnUsedAddresses = document.querySelector('#get-unused-addresses')
 const getUsedAddresses = document.querySelector('#get-used-addresses')
 const getChangeAddress = document.querySelector('#get-change-address')
@@ -18,14 +25,58 @@ let utxos
 let changeAddress
 let transactionHex
 
+const mkcolor = (primary, secondary, spots) => ({ primary, secondary, spots });
+const COLORS = [
+  mkcolor('#E1F2FF', '#17D1AA', '#A80B32'),
+  mkcolor('#E1F2FF', '#FA5380', '#0833B2'),
+  mkcolor('#E1F2FF', '#F06EF5', '#0804F7'),
+  mkcolor('#E1F2FF', '#EBB687', '#852D62'),
+  mkcolor('#E1F2FF', '#F59F9A', '#085F48'),
+];
+
+function createBlockiesIcon(seed) {
+  const colorIdx = Buffer.from(seed, 'hex')[0] % COLORS.length;
+  const color = COLORS[colorIdx];
+  return createIcon({
+    seed,
+    size: 7,
+    scale: 5,
+    bgcolor: color.primary,
+    color: color.secondary,
+    spotcolor: color.spots,
+  })
+}
+
+function hide(el) {
+  el.style.display = 'none';
+}
+function show(el) {
+  el.style.display = 'block';
+}
 
 cardanoAccessBtn.addEventListener('click', () => {
-    toggleSpinner('show')
-    cardano.yoroi.enable().then(function(api){
-        toggleSpinner('hide')
-        alertSuccess( 'You have access now')
-        accessGranted = true
-        cardanoApi = api
+    toggleSpinner('show');
+    cardano.yoroi.enable({ appAuthID: 'cardano-dapp-example' }).then(function(api){
+        toggleSpinner('hide');
+        const walletId = api.auth_getWalletId();
+        const walletPlate = textPartFromWalletChecksumImagePart(walletId);
+        alertSuccess( `You have access to ${walletPlate} now`);
+        walletPlateSpan.innerHTML = walletPlate;
+        walletIconSpan.appendChild(createBlockiesIcon(walletId));
+        hide(cardanoAccessBtnRow);
+        show(connectionStatus);
+        accessGranted = true;
+        cardanoApi = api;
+        api.on_disconnect(() => {
+          alertWarrning(`Disconnected from ${walletPlate}`);
+          show(cardanoAccessBtnRow);
+          hide(connectionStatus);
+          walletPlateSpan.innerHTML = '';
+          walletIconSpan.innerHTML = '';
+        });
+    }, function (err) {
+      toggleSpinner('hide');
+      alertError(`Error: ${err}`);
     });
 })
 

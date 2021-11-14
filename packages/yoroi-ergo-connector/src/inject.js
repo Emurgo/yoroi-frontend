@@ -11,7 +11,7 @@ const initialInject = `
       if (event.data.err !== undefined) {
         connectRequests.forEach(promise => promise.reject(event.data.err));
       } else {
-        connectRequests.forEach(promise => promise.resolve(event.data.success, event.data.auth));
+        connectRequests.forEach(promise => promise.resolve(event.data.auth));
       }
     }
   });
@@ -53,12 +53,29 @@ const initialInject = `
   });
 
   class CardanoAPI {
-    constructor(){
-      this.initTimestamp = Date.now()
+  
+    constructor(auth) {
+      this._initTimestamp = Date.now()
+      this._auth = auth;
+      this._disconnection = [false];
+      const self = this;
+      window.addEventListener('yoroi_wallet_disconnected', function() {
+          if (!self._disconnection[0]) {
+              self._disconnection[0] = true;
+              self._disconnection.slice(1).forEach(f => f());
+          }
+      });
+    }
+    
+    auth_getWalletId() {
+        if (!this._auth) {
+            throw new Error('This connection does not have auth enabled!');
+        }
+        return this._auth.walletId;
     }
 
     getInitTimestamp(){
-      return this.initTimestamp
+      return this._initTimestamp;
     }
 
     get_balance(token_id = 'ADA') {
@@ -92,6 +109,13 @@ const initialInject = `
     create_tx(req) {
         return this._cardano_rpc_call("create_tx/cardano", [req]);
     }
+    
+    on_disconnect(callback) {
+        if (this._disconnection[0]) {
+            throw new Error('Cardano API instance is already disconnected!');
+        }
+        this._disconnection.push(callback);
+    }
 
     _cardano_rpc_call(func, params) {
       return new Promise(function(resolve, reject) {
@@ -109,8 +133,6 @@ const initialInject = `
     }
   }
 
-  const cardano = Object.freeze(new CardanoAPI())
-
   function cardano_request_read_access(cardanoAccessRequest) {
     const { appAuthID } = (cardanoAccessRequest || {});
     return new Promise(function(resolve, reject) {
@@ -119,12 +141,9 @@ const initialInject = `
         appAuthID,
       }, location.origin);
       connectRequests.push({
-        resolve: (success, auth) => {
-            if (success) {
-                resolve(cardano, auth);
-            } else {
-                reject('Connect request resolved with no errors but connection status is "false"')
-            }
+        resolve: (auth) => {
+            console.log(JSON.stringify(auth));
+            resolve(Object.freeze(new CardanoAPI(auth)));
         },
         reject: reject
       });
@@ -284,12 +303,17 @@ let yoroiPort = null;
 let ergoApiInjected = false;
 let cardanoApiInjected = false;
 
-function disconnectWallet() {
+function disconnectWallet(protocol) {
     yoroiPort = null;
-    window.dispatchEvent(new Event("ergo_wallet_disconnected"));
+    if (protocol === 'ergo') {
+        window.dispatchEvent(new Event("ergo_wallet_disconnected"));
+    } else {
+        window.dispatchEvent(new Event("yoroi_wallet_disconnected"));
+    }
 }
 
 function createYoroiPort() {
+    const connectedProtocolHolder = [];
     // events from Yoroi
     yoroiPort = chrome.runtime.connect(extensionId);
     yoroiPort.onMessage.addListener(message => {
@@ -298,6 +322,7 @@ function createYoroiPort() {
             window.postMessage(message, location.origin);
         } else if (message.type === "yoroi_connect_response/ergo") {
             if (message.success) {
+                connectedProtocolHolder[0] = 'ergo';
                 if (!ergoApiInjected) {
                     // inject full API here
                     if (injectIntoPage(ergoApiInject)) {
@@ -320,6 +345,7 @@ function createYoroiPort() {
             }, location.origin);
         } else if (message.type === "yoroi_connect_response/cardano") {
             if (message.success) {
+                connectedProtocolHolder[0] = 'cardano';
                 cardanoApiInjected = true;
             }
             window.postMessage({
@@ -331,7 +357,7 @@ function createYoroiPort() {
     });
 
     yoroiPort.onDisconnect.addListener(event => {
-        disconnectWallet();
+        disconnectWallet(connectedProtocolHolder[0]);
     });
 }
 

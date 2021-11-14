@@ -11,8 +11,14 @@
         <h1 class="display-4 text-center">Cardano dApp Example</h1>
       </div>
       <div class="row">
-        <div class="col-12 text-center my-3">
+        <div id="request-button-row" class="col-12 text-center my-3">
           <button id="request-access" class="btn btn-primary">Request access to yoroi</button>
+        </div>
+        <div id="connection-status" style="display: none" class="col-12 text-center my-3">
+          <span style="display: block">Connected to: <b id="wallet-plate">ABCD-1234</b></span>
+          <span style="display: block" id="wallet-icon"></span>
+        </div>
+        <div class="col-12 text-center my-3" id="connected-row" role="alert">
         </div>
         <div class="col-6 mb-4">
           <button id="get-balance"  class="btn btn-light w-100" >Get Account Balance</button>
