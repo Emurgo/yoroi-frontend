@@ -347,7 +347,6 @@ export function toLedgerAddressParameters(request: {|
         }
         const hashInAddress = Buffer.from(wasmHash.to_bytes()).toString('hex');
 
-        // $FlowFixMe
         return {
           // can't always know staking key path since address may not belong to the wallet
           // (mangled address)

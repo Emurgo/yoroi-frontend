@@ -151,7 +151,7 @@ signTx.addEventListener('click', () => {
     alertError('Should request change address first')
   }
   
-  const txBuilder = CardanoWasm.WalletV4TxBuilder(
+  const txBuilder = CardanoWasm.TransactionBuilder.new(
     // all of these are taken from the mainnet genesis settings
     // linear fee parameters (a*size + b)
     CardanoWasm.LinearFee.new(CardanoWasm.BigNum.from_str('44'), CardanoWasm.BigNum.from_str('155381')),
@@ -160,7 +160,11 @@ signTx.addEventListener('click', () => {
     // pool deposit
     CardanoWasm.BigNum.from_str('500000000'),
     // key deposit
-    CardanoWasm.BigNum.from_str('2000000')
+    CardanoWasm.BigNum.from_str('2000000'),
+    // maxValueBytes
+    5000,
+    // maxTxBytes
+    16384,
   )
 
   // add a keyhash input - for ADA held in a Shelley-era normal address (Base, Enterprise, Pointer)
@@ -207,7 +211,7 @@ signTx.addEventListener('click', () => {
 
   cardanoApi.sign_tx(txHex, true).then(witnessSetHex => {
     toggleSpinner('hide')
-    alertSuccess('Signing tx succeeds: ')
+
     const witnessSet = CardanoWasm.TransactionWitnessSet.from_bytes(
       Buffer.from(witnessSetHex, 'hex')
     )
@@ -217,6 +221,8 @@ signTx.addEventListener('click', () => {
       undefined,
     )
     transactionHex = Buffer.from(transaction.to_bytes()).toString('hex')
+    alertSuccess('Signing tx succeeds: ' + transactionHex)
+
   }).catch(error => {
     console.error(error)
     toggleSpinner('hide')
