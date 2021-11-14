@@ -1140,33 +1140,39 @@ export default class AdaApi {
   async createUnsignedTxForConnector(
     request: CreateUnsignedTxForConnectorRequest
   ): Promise<CreateUnsignedTxResponse> {
-    if (
-      !request.cardanoTxRequest.includeInputs &&
-        !request.cardanoTxRequest.includeOutputs &&
-        !request.cardanoTxRequest.includeTargets
-    ) {
-      throw new Error('Invalid tx-build request, must specify inputs, outputs, or targets');
+    const {
+      includeInputs,
+      includeOutputs,
+      includeTargets,
+      onlyInputsIntended,
+    } = request.cardanoTxRequest;
+    const noneOrEmpty = a => {
+      if (a != null && !Array.isArray(a)) {
+        throw new Error(`Array is expected, got: ${JSON.stringify(a)}`);
+      }
+      return a == null || a.length === 0;
     }
-
-    if (
-      !request.cardanoTxRequest.includeOutputs &&
-        !request.cardanoTxRequest.includeTargets &&
-        !request.cardanoTxRequest.onlyInputsIntended
-    ) {
-      throw new Error('No outputs is specified and intended inputs flag is false');
+    const noInputs = !noneOrEmpty(includeInputs);
+    const noOutputs = noneOrEmpty(includeOutputs) && noneOrEmpty(includeTargets);
+    if (noOutputs) {
+      if (noInputs) {
+        throw new Error('Invalid tx-build request, must specify inputs, outputs, or targets');
+      }
+      if (!onlyInputsIntended) {
+        throw new Error('No outputs is specified and intended inputs flag is false');
+      }
     }
 
     const utxos = asAddressedUtxo(
       await request.publicDeriver.getAllUtxos()
     );
     const allUtxoIds = new Set(utxos.map(utxo => utxo.utxo_id));
-    const includeInputs = request.cardanoTxRequest.includeInputs ?? [];
-    for (const utxoId of includeInputs) {
+    const utxoIdSet = new Set((includeInputs||[]).filter(utxoId => {
       if (!allUtxoIds.has(utxoId)) {
-        throw new Error(`invalid input id ${utxoId}`);
+        throw new Error(`No UTxO found for input id ${utxoId}`);
       }
-    }
-    const utxoIdSet = new Set(includeInputs);
+      return true;
+    }));
 
     const mustIncludeUtxos = [];
     const coinSelectUtxos = [];
@@ -1207,7 +1213,7 @@ export default class AdaApi {
     const defaultToken = request.publicDeriver.getParent().getDefaultToken();
 
     const outputs = [];
-    for (const outputHex of request.cardanoTxRequest.includeOutputs ?? []) {
+    for (const outputHex of (includeOutputs ?? [])) {
       const output = RustModule.WalletV4.TransactionOutput.from_bytes(
           Buffer.from(outputHex, 'hex')
       )
@@ -1219,7 +1225,7 @@ export default class AdaApi {
       );
     }
 
-    for (const target of request.cardanoTxRequest.includeTargets ?? []) {
+    for (const target of (includeTargets ?? [])) {
       const makeMultiToken = (adaValue: string) => {
         const values = [
           {
