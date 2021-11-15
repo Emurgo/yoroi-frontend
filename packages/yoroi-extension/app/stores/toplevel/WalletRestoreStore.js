@@ -208,7 +208,9 @@ export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> 
 
   @action
   _back: void => void = () => {
-    if (this.step === RestoreSteps.VERIFY_MNEMONIC) {
+    if (
+      (this.step === RestoreSteps.VERIFY_MNEMONIC) ||
+      (this.step === RestoreSteps.WALLET_EXIST)) {
       this.recoveryResult = undefined;
       this.step = RestoreSteps.START;
       return;

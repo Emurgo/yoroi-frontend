@@ -41,6 +41,11 @@ import WalletAlreadyExistDialog from '../../../components/wallet/WalletAlreadyEx
 import type { PublicKeyCache } from '../../../stores/toplevel/WalletStore'
 import { asGetPublicKey, } from '../../../api/ada/lib/storage/models/PublicDeriver/traits'
 import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver';
+import NavPlate from '../../../components/topbar/NavPlate';
+import type { TxRequests } from '../../../stores/toplevel/TransactionsStore'
+import WalletDetails from '../../../components/wallet/my-wallets/WalletDetails';
+import { MultiToken } from '../../../api/common/lib/MultiToken';
+import { ROUTES } from '../../../routes-config';
 
 const messages = defineMessages({
   walletUpgradeNoop: {
@@ -99,6 +104,38 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
     if (!restoreRequest.isExecuting) restoreRequest.reset();
   };
 
+  updateHideBalance: void => Promise<void> = async () => {
+    await this.generated.actions.profile.updateHideBalance.trigger();
+  }
+
+  getRewardBalance: PublicDeriver<> => null | void | MultiToken = (
+    publicDeriver
+  ) => {
+    const delegationRequest = this.generated.stores
+      .delegation
+      .getDelegationRequests(
+        publicDeriver
+      );
+    if (delegationRequest == null) return undefined;
+
+    const balanceResult = delegationRequest.getDelegatedBalance.result;
+    if (balanceResult == null) {
+      return null;
+    }
+    return balanceResult.accountPart;
+  }
+
+  openToTransactions: PublicDeriver<> => void = (
+    publicDeriver
+  ) => {
+    this.generated.actions.wallets.setActiveWallet.trigger({
+      wallet: publicDeriver
+    });
+    this.generated.actions.router.goToRoute.trigger({
+      route: ROUTES.WALLETS.TRANSACTIONS,
+    });
+  };
+
   render(): null | Node {
     const walletRestoreActions = this.generated.actions.walletRestore;
     const actions = this.generated.actions;
@@ -153,11 +190,26 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
         const plate = withPubKey == null
           ? null
           : this.generated.stores.wallets.getPublicKeyCache(withPubKey).plate;
+          const txRequests: TxRequests = this.generated.stores.transactions
+          .getTxRequests(publicDeriver);
+          const balance = txRequests.requests.getBalanceRequest.result ?? null;
 
         return (
           <WalletAlreadyExistDialog
-            plates={plate}
-            onNext={actions.walletRestore.verifyMnemonic.trigger}
+            walletPlate={
+              <NavPlate
+                plate={plate}
+                wallet={settingsCache}
+              />
+            }
+            walletSumDetails={<WalletDetails
+              walletAmount={balance}
+              rewards={this.getRewardBalance(publicDeriver)}
+              onUpdateHideBalance={this.updateHideBalance}
+              shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
+              getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
+            />}
+            openWallet={() => { this.openToTransactions(publicDeriver) }}
             onCancel={walletRestoreActions.back.trigger}
             settingsCache={settingsCache}
           />
@@ -315,6 +367,20 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
 
   @computed get generated(): {|
     actions: {|
+      profile: {|
+        updateHideBalance: {|
+          trigger: (params: void) => Promise<void>
+        |}
+      |},
+      router: {|
+        goToRoute: {|
+          trigger: (params: {|
+            publicDeriver?: null | PublicDeriver<>,
+            params?: ?any,
+            route: string
+          |}) => void
+        |}
+      |},
       walletRestore: {|
         back: {| trigger: (params: void) => void |},
         reset: {| trigger: (params: void) => void |},
@@ -343,6 +409,13 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
       |},
       notifications: {|
         open: {| trigger: (params: Notification) => void |}
+      |},
+      wallets: {|
+        setActiveWallet: {|
+          trigger: (params: {|
+            wallet: PublicDeriver<>
+          |}) => void
+        |}
       |}
     |},
     stores: {|
@@ -355,13 +428,22 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
       profile: {|
         isClassicTheme: boolean,
         selectedNetwork: void | $ReadOnly<NetworkRow>,
-        unitOfAccount: UnitOfAccountSettingType
+        unitOfAccount: UnitOfAccountSettingType,
+        shouldHideBalance: boolean,
+      |},
+      transactions: {|
+        getTxRequests: (PublicDeriver<>) => TxRequests
       |},
       tokenInfoStore: {|
         tokenInfo: TokenInfoMap,
       |},
       walletSettings: {|
         getConceptualWalletSettingsCache: ConceptualWallet => ConceptualWalletSettingsCache
+      |},
+      delegation: {|
+        getDelegationRequests: (
+          PublicDeriver<>
+        ) => void | DelegationRequests
       |},
       walletRestore: {|
         recoveryResult: void | {|
@@ -412,6 +494,10 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
           selectedNetwork: stores.profile.selectedNetwork,
           isClassicTheme: stores.profile.isClassicTheme,
           unitOfAccount: stores.profile.unitOfAccount,
+          shouldHideBalance: stores.profile.shouldHideBalance,
+        },
+        transactions: {
+          getTxRequests: stores.transactions.getTxRequests,
         },
         uiNotifications: {
           isOpen: stores.uiNotifications.isOpen,
@@ -420,6 +506,9 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
         walletSettings: {
           getConceptualWalletSettingsCache:
             stores.walletSettings.getConceptualWalletSettingsCache,
+        },
+        delegation: {
+          getDelegationRequests: stores.delegation.getDelegationRequests,
         },
         wallets: {
           restoreRequest: {
@@ -456,6 +545,15 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
           open: {
             trigger: actions.notifications.open.trigger,
           },
+        },
+        router: {
+          goToRoute: { trigger: actions.router.goToRoute.trigger },
+        },
+        wallets: {
+          setActiveWallet: { trigger: actions.wallets.setActiveWallet.trigger },
+        },
+        profile: {
+          updateHideBalance: { trigger: actions.profile.updateHideBalance.trigger },
         },
         walletRestore: {
           reset: {

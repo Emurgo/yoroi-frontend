@@ -8,42 +8,28 @@ import globalMessages from '../../i18n/global-messages';
 import styles from './WalletAlreadyExistDialog.scss';
 import DialogBackButton from '../widgets/DialogBackButton';
 import Dialog from '../widgets/Dialog';
-import LocalizableError from '../../i18n/LocalizableError';
-import { SelectedExplorer } from '../../domain/SelectedExplorer';
-import type { Notification } from '../../types/notificationType';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import type { PlateWithMeta } from '../../stores/toplevel/WalletRestoreStore';
-import NavPlate from '../topbar/NavPlate';
 
 const messages = defineMessages({
   walletAlreadyExist: {
-    id: 'wallet.restore.dialog.checkExistence.title',
-    defaultMessage: '!!!Wallet Already Exist',
+    id: 'wallet.restore.dialog.walletExist.title',
+    defaultMessage: '!!!Wallet already exist',
   },
   openWallet: {
-    id: 'wallet.restore.dialog.checkExistence.openWallet',
-    defaultMessage: '!!!Open Wallet:',
+    id: 'wallet.restore.dialog.walletExist.openWallet',
+    defaultMessage: '!!!Open Wallet',
   },
-  walletRestoreVerifyIntroLine2: {
-    id: 'wallet.restore.dialog.verify.intro.line2',
-    defaultMessage: '!!!Make sure account checksum and icon match what you remember.',
-  },
-  walletRestoreVerifyIntroLine3: {
-    id: 'wallet.restore.dialog.verify.intro.line3',
-    defaultMessage: '!!!Make sure addresses match what you remember',
-  },
-  walletRestoreVerifyIntroLine4: {
-    id: 'wallet.restore.dialog.verify.intro.line4',
-    defaultMessage: '!!!If you\'ve entered wrong mnemonics or a wrong paper wallet password -' +
-      ' you will just open another empty wallet with wrong account checksum and wrong addresses!',
-  },
+  explanation: {
+    id: 'wallet.restore.dialog.walletExist.explanation',
+    defaultMessage: '!!!You are trying to restore existing wallet.',
+  }
 });
 
 type Props = {|
-  +plates: PlateWithMeta,
+  +walletPlate: Node,
+  +walletSumDetails: Node,
   +onNext: void => PossiblyAsync<void>,
   +onCancel: void => void,
-  +settingsCache: any
 |};
 
 @observer
@@ -57,12 +43,12 @@ export default class WalletAlreadyExistDialog extends Component<Props> {
     const { intl } = this.context;
     const {
       onCancel,
-      onNext,
-      plate,
-      settingsCache
+      openWallet,
+      walletPlate,
+      walletSumDetails
     } = this.props;
 
-    const dialogClasses = classnames(['walletRestoreVerifyDialog', styles.dialog]);
+    const dialogClasses = classnames([styles.component, styles.dialog]);
 
     const actions = [
       {
@@ -70,8 +56,8 @@ export default class WalletAlreadyExistDialog extends Component<Props> {
         onClick: onCancel,
       },
       {
-        label: intl.formatMessage(globalMessages.confirm),
-        onClick: onNext,
+        label: intl.formatMessage(messages.openWallet),
+        onClick: openWallet,
         primary: true,
         className: classnames(['confirmButton']),
       },
@@ -85,11 +71,11 @@ export default class WalletAlreadyExistDialog extends Component<Props> {
         className={dialogClasses}
         backButton={<DialogBackButton onBack={onCancel} />}
       >
-
-        <NavPlate
-          plate={plate}
-          wallet={settingsCache}
-        />
+        <div className={styles.wrapper}>
+          <div> {walletPlate}</div>
+          <div>{walletSumDetails}</div>
+        </div>
+        <p className={styles.explanation}>{intl.formatMessage(messages.explanation)}</p>
       </Dialog>
     );
   }
