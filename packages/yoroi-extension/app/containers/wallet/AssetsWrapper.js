@@ -66,7 +66,7 @@ export default class AssetsWrapper extends Component<Props> {
         navbar={
           <NavBarContainerRevamp
             {...this.generated.NavBarContainerRevampProps}
-            title={<NavBarTitle title={intl.formatMessage(globalMessages.walletLabel)} />}
+            title={<NavBarTitle title={intl.formatMessage(globalMessages.sidebarAssets)} />}
             menu={menu}
           />
         }
