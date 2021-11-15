@@ -114,7 +114,7 @@ export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> 
     plates: Array<PlateWithMeta>,
   |};
 
-  @observable duplicatedWallet: void | PublicDeriver<>
+  @observable duplicatedWallet: null | void | PublicDeriver<>
 
   setup(): void {
     super.setup();
@@ -139,7 +139,7 @@ export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> 
   }
 
   @action
-  _processRestoreMeta: (WalletRestoreMeta) => void = async (restoreMeta) => {
+  _processRestoreMeta: (WalletRestoreMeta) => Promise<void> = async (restoreMeta) => {
     this.walletRestoreMeta = restoreMeta;
 
     let resolvedRecoveryPhrase = restoreMeta.recoveryPhrase;

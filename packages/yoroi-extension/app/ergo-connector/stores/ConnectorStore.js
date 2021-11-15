@@ -265,8 +265,8 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       const wallets = await getWallets({ db: persistentDb });
 
       const protocol = await getProtocol().then(res => res);
-      const isProtocolErgo = protocol?.type === 'ergo';
-      const isProtocolCardano = protocol?.type === 'cardano';
+      const isProtocolErgo = protocol.type === 'ergo';
+      const isProtocolCardano = protocol.type === 'cardano';
       const isProtocolDefined = isProtocolErgo || isProtocolCardano;
       const protocolFilter = wallet => {
         const isWalletErgo = isErgo(wallet.getParent().getNetworkInfo());

@@ -11,6 +11,7 @@ import { ChainDerivations, CoinTypes, WalletTypePurpose } from '../../../../conf
 import type { NetworkRow } from '../storage/database/primitives/tables'
 import { isErgo } from '../storage/database/prepackaged/networks';
 import { asPrivateKeyInstance, derivePath } from '../../../common/lib/crypto/keys/keyRepository';
+import { asGetPublicKey } from '../storage/models/PublicDeriver/traits'
 
 export function v4SecretToV2(
   v4Key: RustModule.WalletV4.Bip32PrivateKey,
@@ -96,6 +97,9 @@ export async function isWalletExist(
       ]
     )
     const privateKey = asPrivateKeyInstance(chainKey);
+    if (!privateKey) {
+      throw new Error(`${nameof(isWalletExist)} No private key found.`);
+    }
     publicKey =privateKey.toPublic().toBuffer().toString('hex')
   } else {
     const rootPk = cardanoGenerateWalletRootKey(recoveryPhrase);
@@ -109,7 +113,9 @@ export async function isWalletExist(
   }
 
   for (const deriver of publickDerivers) {
-    const existedPublicKey = await deriver.getPublicKey()
+    const withPubKey = asGetPublicKey(deriver);
+    if (withPubKey == null) return
+    const existedPublicKey = await withPubKey.getPublicKey()
     const walletNetwork = deriver.getParent().getNetworkInfo()
     /**
      * We will still allow to restore the wallet on a different networks even they are

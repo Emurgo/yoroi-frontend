@@ -46,6 +46,10 @@ import type { TxRequests } from '../../../stores/toplevel/TransactionsStore'
 import WalletDetails from '../../../components/wallet/my-wallets/WalletDetails';
 import { MultiToken } from '../../../api/common/lib/MultiToken';
 import { ROUTES } from '../../../routes-config';
+import type { IGetPublic } from '../../../api/ada/lib/storage/models/PublicDeriver/interfaces'
+import type { DelegationRequests } from '../../../stores/toplevel/DelegationStore';
+import type { ConceptualWalletSettingsCache } from '../../../stores/toplevel/WalletSettingsStore';
+import type { ConceptualWallet } from '../../../api/ada/lib/storage/models/ConceptualWallet';
 
 const messages = defineMessages({
   walletUpgradeNoop: {
@@ -211,7 +215,6 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
             />}
             openWallet={() => { this.openToTransactions(publicDeriver) }}
             onCancel={walletRestoreActions.back.trigger}
-            settingsCache={settingsCache}
           />
         );
       }
@@ -394,7 +397,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
           trigger: (params: void) => Promise<void>
         |},
         submitFields: {|
-          trigger: (params: WalletRestoreMeta) => void
+          trigger: (params: WalletRestoreMeta) => Promise<void>
         |},
         verifyMnemonic: {|
           trigger: (params: void) => Promise<void>
@@ -451,7 +454,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
           phrase: string,
         |},
         step: RestoreStepsType,
-        duplicatedWallet: void | PublicDeriver<>,
+        duplicatedWallet: null | void | PublicDeriver<>,
         walletRestoreMeta: void | WalletRestoreMeta,
         isValidMnemonic: ({|
           mnemonic: string,

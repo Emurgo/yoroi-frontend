@@ -28,8 +28,8 @@ const messages = defineMessages({
 type Props = {|
   +walletPlate: Node,
   +walletSumDetails: Node,
-  +onNext: void => PossiblyAsync<void>,
   +onCancel: void => void,
+  +openWallet: void => void,
 |};
 
 @observer
