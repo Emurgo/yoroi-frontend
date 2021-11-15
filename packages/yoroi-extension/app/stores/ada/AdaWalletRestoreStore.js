@@ -14,8 +14,6 @@ import type {
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
-import { asGetSigningKey, asGetPublicKey } from '../../api/ada/lib/storage/models/PublicDeriver'
-import { isWalletExist } from '../../api/ada/lib/cardanoCrypto/utils';
 
 export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> {
 

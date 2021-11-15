@@ -7,6 +7,7 @@ import type {
 import { PublicDeriver } from '../storage/models/PublicDeriver';
 import { generateWalletRootKey } from './cryptoWallet';
 import { CoinTypes, WalletTypePurpose } from '../../../../config/numbersConfig';
+import type { NetworkRow } from '../storage/database/primitives/tables'
 
 export function v4SecretToV2(
   v4Key: RustModule.WalletV4.Bip32PrivateKey,
@@ -68,7 +69,13 @@ export function derivePrivateByAddressing(request: {|
   return derivedKey;
 }
 
-export async function isWalletExist(publickDerivers: Array<PublicDeriver<>>, mode: 'bip44' | 'cip1852', recoveryPhrase: string, accountIndex: any): Promise<boolean> {
+export async function isWalletExist(
+  publickDerivers: Array<PublicDeriver<>>,
+  mode: 'bip44' | 'cip1852',
+  recoveryPhrase: string,
+  accountIndex: number,
+  selectedNetwork: $ReadOnly<NetworkRow> 
+  ): Promise<boolean> {
   const rootPk = generateWalletRootKey(recoveryPhrase);
   if ((mode !== 'bip44') && (mode !== 'cip1852')) {
     throw new Error(`${nameof(isWalletExist)} unknown restoration mode`);
@@ -83,7 +90,14 @@ export async function isWalletExist(publickDerivers: Array<PublicDeriver<>>, mod
   const publicKey = Buffer.from(accountPublicKey.as_bytes()).toString('hex')
   for (const deriver of publickDerivers) {
     const existedPublicKey = await deriver.getPublicKey()
-    if (publicKey === existedPublicKey.Hash) return true
+    const walletNetwork = deriver.getParent().getNetworkInfo()
+    /**
+     * We will still allow to restore the wallet on a different networks even they are
+     * sharing the same recovery phrase but we are treating them differently
+     */
+    if (
+      (publicKey === existedPublicKey.Hash) &&
+      (walletNetwork.NetworkId === selectedNetwork.NetworkId)) return true
   }
   return false
 }

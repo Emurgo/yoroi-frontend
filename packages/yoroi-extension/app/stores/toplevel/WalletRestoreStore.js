@@ -179,11 +179,17 @@ export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> 
         plates,
       };
     });
-    console.log({mode})
+
     // Check for wallet duplication.
     const wallets = this.stores.wallets.publicDerivers
     const accountIndex = this.stores.walletRestore.selectedAccount;
-    const exist = await isWalletExist(wallets, mode.type, resolvedRecoveryPhrase, accountIndex)
+    const exist = await isWalletExist(
+      wallets,
+      mode.type,
+      resolvedRecoveryPhrase,
+      accountIndex,
+      selectedNetwork
+      )
 
     if (exist) {
       alert('Walelt exist!!')
