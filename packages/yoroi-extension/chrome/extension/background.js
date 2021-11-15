@@ -621,334 +621,343 @@ chrome.runtime.onMessageExternal.addListener((message, sender) => {
 // per-page connection to injected code in the connector
 chrome.runtime.onConnectExternal.addListener(port => {
   if (port.sender.id === environment.ergoConnectorExtensionId) {
-    const tabId = port.sender.tab.id;
-    ports.set(tabId, port);
-    port.onMessage.addListener(async message => {
-
-      connectionProtocol = message.protocol;
-      imgBase64Url = message.imgBase64Url;
-      function rpcResponse(response) {
-        port.postMessage({
-          type: 'connector_rpc_response',
-          protocol: message.protocol,
-          uid: message.uid,
-          return: response
-        });
-      }
-      function checkParamCount(expected: number) {
-        const found = message?.params?.length;
-        if (found !== expected) {
-          throw ConnectorError.invalidRequest(`RPC call has ${found} arguments, expected ${expected}`);
-        }
-      }
-      function handleError(e: any) {
-        if (e instanceof ConnectorError) {
-          rpcResponse({
-            err: e.toAPIError()
-          });
-        } else {
-          const func = message.function;
-          const args = message.params.map(JSON.stringify).join(', ');
-          if (e?.stack != null) {
-            Logger.error(`RPC call ergo.${func}(${args}) failed due to internal error: ${e}\n${e.stack}`);
-          } else {
-            Logger.error(`RPC call ergo.${func}(${args}) failed due to internal error: ${e}`);
-          }
-          rpcResponse({
-            err: {
-              code: APIErrorCodes.API_INTERNAL_ERROR,
-              info: 'Yoroi has encountered an internal error - please see logs'
-            }
-          });
-        }
-      }
-      if (message.type === 'yoroi_connect_request/ergo') {
-        await withDb(
-          async (_db, localStorageApi) => {
-            const publicDeriverId = await confirmConnect(tabId, message.url, localStorageApi);
-            const accepted = publicDeriverId !== null;
-            port.postMessage({
-              type: 'yoroi_connect_response/ergo',
-              success: accepted
-            });
-          }
-        );
-      } else if (message.type === 'yoroi_connect_request/cardano') {
-        await withDb(
-          async (_db, localStorageApi) => {
-            const publicDeriverId = await confirmConnect(tabId, message.url, localStorageApi);
-            const accepted = publicDeriverId !== null;
-            port.postMessage({
-              type: 'yoroi_connect_response/cardano',
-              success: accepted
-            });
-          }
-        );
-      } else if (message.type === 'connector_rpc_request') {
-        switch (message.function) {
-          case 'sign_tx':
-            try {
-              checkParamCount(1);
-              await RustModule.load();
-              const tx = asTx(message.params[0], RustModule.SigmaRust);
-              const connection = connectedSites.get(tabId);
-              if (connection == null) {
-                Logger.error(`ERR - sign_tx could not find connection with tabId = ${tabId}`);
-                rpcResponse(undefined); // shouldn't happen
-              } else {
-                const resp = await confirmSign(tabId,
-                  {
-                    type: 'tx',
-                    tx,
-                    uid: message.uid
-                  },
-                  connection
-                );
-                rpcResponse(resp);
-              }
-            } catch (e) {
-              handleError(e);
-            }
-          break;
-          case 'sign_tx/cardano':
-            try {
-              checkParamCount(1);
-              await RustModule.load();
-              const connection = connectedSites.get(tabId);
-              if (connection == null) {
-                Logger.error(`ERR - sign_tx could not find connection with tabId = ${tabId}`);
-                rpcResponse(undefined); // shouldn't happen
-              } else {
-                const resp = await confirmSign(tabId,
-                  {
-                    type: 'tx/cardano',
-                    tx: {
-                      tx: message.params[0],
-                      partialSign: message.params[1],
-                    },
-                    uid: message.uid
-                  },
-                  connection
-                );
-                rpcResponse(resp);
-              }
-            } catch (e) {
-              handleError(e);
-            }
-          break;
-          case 'sign_tx_input':
-            try {
-              checkParamCount(2);
-              await RustModule.load();
-              const tx = asTx(message.params[0], RustModule.SigmaRust);
-              const txIndex = message.params[1];
-              if (typeof txIndex !== 'number') {
-                throw ConnectorError.invalidRequest(`invalid tx input: ${txIndex}`);
-              }
-              const connection = connectedSites.get(tabId);
-              if (connection == null) {
-                Logger.error(`ERR - sign_tx could not find connection with tabId = ${tabId}`);
-                rpcResponse(undefined); // shouldn't happen
-              } else {
-                const resp = await confirmSign(tabId,
-                  {
-                    type: 'tx_input',
-                    tx,
-                    index: txIndex,
-                    uid: message.uid
-                  },
-                  connection
-                );
-                rpcResponse(resp);
-              }
-            } catch (e) {
-              handleError(e);
-            }
-            break;
-          // unsupported until EIP-0012's definition is finalized
-          // case 'sign_data':
-          //   {
-          //     const resp = await confirmSign(tabId, {
-          //       type: 'data',
-          //       address: message.params[0],
-          //       bytes: message.params[1],
-          //       uid: message.uid
-          //     });
-          //     rpcResponse(resp);
-          //   }
-          //   break;
-          case 'get_balance':
-            try {
-              checkParamCount(1);
-              const tokenId = asTokenId(message.params[0]);
-              await withDb(async (db, localStorageApi) => {
-                await withSelectedWallet(
-                  tabId,
-                  async (wallet) => {
-                    const balance = await connectorGetBalance(wallet, pendingTxs, tokenId);
-                    rpcResponse({ ok: balance });
-                  },
-                  db,
-                  localStorageApi,
-                )
-              });
-            } catch(e) {
-              handleError(e);
-            }
-            break;
-          case 'get_utxos':
-            try {
-              checkParamCount(3);
-              const valueExpected = message.params[0] == null ? null : asValue(message.params[0]);
-              const tokenId = asTokenId(message.params[1]);
-              const paginate = message.params[2] == null ? null : asPaginate(message.params[2]);
-              await withDb(async (db, localStorageApi) => {
-                await withSelectedWallet(
-                  tabId,
-                  async (wallet) => {
-                    const walletType = wallet.parent.defaultToken.Metadata.type
-                    let utxos;
-                    if(walletType === 'Cardano') {
-                      utxos = await connectorGetUtxosCardano(
-                        wallet,
-                        pendingTxs,
-                        valueExpected,
-                        tokenId,
-                        paginate
-                      );
-                    } else {
-                      utxos = await connectorGetUtxosErgo(
-                        wallet,
-                        pendingTxs,
-                        valueExpected,
-                        tokenId,
-                        paginate
-                        );
-                    }
-                    rpcResponse({
-                      ok: utxos
-                    });
-                  },
-                  db,
-                  localStorageApi,
-                )
-              });
-            } catch (e) {
-              handleError(e);
-            }
-            break;
-          case 'get_used_addresses':
-            try {
-              const paginate = message.params[0] == null ? null : asPaginate(message.params[0]);
-
-              await withDb(async (db, localStorageApi) => {
-                await withSelectedWallet(
-                  tabId,
-                  async (wallet) => {
-                    const addresses = await connectorGetUsedAddresses(wallet, paginate);
-                    rpcResponse({
-                      ok: addresses
-                    });
-                  },
-                  db,
-                  localStorageApi,
-                )
-              });
-            } catch (e) {
-              handleError(e);
-            }
-            break;
-          case 'get_unused_addresses':
-            try {
-              await withDb(async (db, localStorageApi) => {
-                await withSelectedWallet(
-                  tabId,
-                  async (wallet) => {
-                    const addresses = await connectorGetUnusedAddresses(wallet);
-                    rpcResponse({
-                      ok: addresses
-                    });
-                  },
-                  db,
-                  localStorageApi,
-                )
-              });
-            } catch (e) {
-              handleError(e);
-            }
-            break;
-          case `get_change_address`:
-            try {
-              await withDb(async (db, localStorageApi) => {
-                await withSelectedWallet(
-                  tabId,
-                  async (wallet) => {
-                    const change = await connectorGetChangeAddress(wallet);
-                    rpcResponse({
-                      ok: change
-                    });
-                  },
-                  db,
-                  localStorageApi,
-                )
-              });
-            } catch (e) {
-              handleError(e);
-            }
-            break;
-          case 'submit_tx':
-            try {
-              await RustModule.load();
-              await withDb(async (db, localStorageApi) => {
-                await withSelectedWallet(
-                  tabId,
-                  async (wallet) => {
-                    let id;
-                    if (isCardanoHaskell(wallet.getParent().getNetworkInfo())) {
-                      const tx = RustModule.WalletV4.Transaction.from_bytes(
-                        Buffer.from(message.params[0], 'hex'),
-                      );
-                      await connectorSendTxCardano(
-                        wallet,
-                        tx.to_bytes(),
-                        localStorageApi,
-                      );
-                      id = Buffer.from(
-                        RustModule.WalletV4.hash_transaction(tx.body()).to_bytes()
-                      ).toString('hex');
-                    } else { // is Ergo
-                      const tx = asSignedTx(message.params[0], RustModule.SigmaRust);
-                      id = await connectorSendTx(wallet, pendingTxs, tx, localStorageApi);
-                    }
-                    rpcResponse({
-                      ok: id
-                    });
-                  },
-                  db,
-                  localStorageApi,
-                )
-              });
-            } catch (e) {
-              handleError(e);
-            }
-            break;
-          case 'ping':
-            rpcResponse({
-              ok: true,
-            });
-            break;
-          default:
-            rpcResponse({
-              err: {
-                code: APIErrorCodes.API_INVALID_REQUEST,
-                info: `unknown API function: ${message.function}`
-              }
-            })
-            break;
-        }
-      }
-    });
+    handleInjectorConnect(port);
   } else {
     // disconnect?
   }
 });
+
+// per-page connection to injected code by Yoroi with connector
+chrome.runtime.onConnect.addListener(port => {
+  handleInjectorConnect(port);
+});
+
+function handleInjectorConnect(port) {
+  const tabId = port.sender.tab.id;
+  ports.set(tabId, port);
+  port.onMessage.addListener(async message => {
+
+    connectionProtocol = message.protocol;
+    imgBase64Url = message.imgBase64Url;
+    function rpcResponse(response) {
+      port.postMessage({
+        type: 'connector_rpc_response',
+        protocol: message.protocol,
+        uid: message.uid,
+        return: response
+      });
+    }
+    function checkParamCount(expected: number) {
+      const found = message?.params?.length;
+      if (found !== expected) {
+        throw ConnectorError.invalidRequest(`RPC call has ${found} arguments, expected ${expected}`);
+      }
+    }
+    function handleError(e: any) {
+      if (e instanceof ConnectorError) {
+        rpcResponse({
+          err: e.toAPIError()
+        });
+      } else {
+        const func = message.function;
+        const args = message.params.map(JSON.stringify).join(', ');
+        if (e?.stack != null) {
+          Logger.error(`RPC call ergo.${func}(${args}) failed due to internal error: ${e}\n${e.stack}`);
+        } else {
+          Logger.error(`RPC call ergo.${func}(${args}) failed due to internal error: ${e}`);
+        }
+        rpcResponse({
+          err: {
+            code: APIErrorCodes.API_INTERNAL_ERROR,
+            info: 'Yoroi has encountered an internal error - please see logs'
+          }
+        });
+      }
+    }
+    if (message.type === 'yoroi_connect_request/ergo') {
+      await withDb(
+        async (_db, localStorageApi) => {
+          const publicDeriverId = await confirmConnect(tabId, message.url, localStorageApi);
+          const accepted = publicDeriverId !== null;
+          port.postMessage({
+            type: 'yoroi_connect_response/ergo',
+            success: accepted
+          });
+        }
+      );
+    } else if (message.type === 'yoroi_connect_request/cardano') {
+      await withDb(
+        async (_db, localStorageApi) => {
+          const publicDeriverId = await confirmConnect(tabId, message.url, localStorageApi);
+          const accepted = publicDeriverId !== null;
+          port.postMessage({
+            type: 'yoroi_connect_response/cardano',
+            success: accepted
+          });
+        }
+      );
+    } else if (message.type === 'connector_rpc_request') {
+      switch (message.function) {
+      case 'sign_tx':
+        try {
+          checkParamCount(1);
+          await RustModule.load();
+          const tx = asTx(message.params[0], RustModule.SigmaRust);
+          const connection = connectedSites.get(tabId);
+          if (connection == null) {
+            Logger.error(`ERR - sign_tx could not find connection with tabId = ${tabId}`);
+            rpcResponse(undefined); // shouldn't happen
+          } else {
+            const resp = await confirmSign(tabId,
+                                           {
+                                             type: 'tx',
+                                             tx,
+                                             uid: message.uid
+                                           },
+                                           connection
+                                          );
+            rpcResponse(resp);
+          }
+        } catch (e) {
+          handleError(e);
+        }
+        break;
+      case 'sign_tx/cardano':
+        try {
+          checkParamCount(1);
+          await RustModule.load();
+          const connection = connectedSites.get(tabId);
+          if (connection == null) {
+            Logger.error(`ERR - sign_tx could not find connection with tabId = ${tabId}`);
+            rpcResponse(undefined); // shouldn't happen
+          } else {
+            const resp = await confirmSign(tabId,
+                                           {
+                                             type: 'tx/cardano',
+                                             tx: {
+                                               tx: message.params[0],
+                                               partialSign: message.params[1],
+                                             },
+                                             uid: message.uid
+                                           },
+                                           connection
+                                          );
+            rpcResponse(resp);
+          }
+        } catch (e) {
+          handleError(e);
+        }
+        break;
+      case 'sign_tx_input':
+        try {
+          checkParamCount(2);
+          await RustModule.load();
+          const tx = asTx(message.params[0], RustModule.SigmaRust);
+          const txIndex = message.params[1];
+          if (typeof txIndex !== 'number') {
+            throw ConnectorError.invalidRequest(`invalid tx input: ${txIndex}`);
+          }
+          const connection = connectedSites.get(tabId);
+          if (connection == null) {
+            Logger.error(`ERR - sign_tx could not find connection with tabId = ${tabId}`);
+            rpcResponse(undefined); // shouldn't happen
+          } else {
+            const resp = await confirmSign(tabId,
+                                           {
+                                             type: 'tx_input',
+                                             tx,
+                                             index: txIndex,
+                                             uid: message.uid
+                                           },
+                                           connection
+                                          );
+            rpcResponse(resp);
+          }
+        } catch (e) {
+          handleError(e);
+        }
+        break;
+        // unsupported until EIP-0012's definition is finalized
+        // case 'sign_data':
+        //   {
+        //     const resp = await confirmSign(tabId, {
+        //       type: 'data',
+        //       address: message.params[0],
+        //       bytes: message.params[1],
+        //       uid: message.uid
+        //     });
+        //     rpcResponse(resp);
+        //   }
+        //   break;
+      case 'get_balance':
+        try {
+          checkParamCount(1);
+          const tokenId = asTokenId(message.params[0]);
+          await withDb(async (db, localStorageApi) => {
+            await withSelectedWallet(
+              tabId,
+              async (wallet) => {
+                const balance = await connectorGetBalance(wallet, pendingTxs, tokenId);
+                rpcResponse({ ok: balance });
+              },
+              db,
+              localStorageApi,
+            )
+          });
+        } catch(e) {
+          handleError(e);
+        }
+        break;
+      case 'get_utxos':
+        try {
+          checkParamCount(3);
+          const valueExpected = message.params[0] == null ? null : asValue(message.params[0]);
+          const tokenId = asTokenId(message.params[1]);
+          const paginate = message.params[2] == null ? null : asPaginate(message.params[2]);
+          await withDb(async (db, localStorageApi) => {
+            await withSelectedWallet(
+              tabId,
+              async (wallet) => {
+                const walletType = wallet.parent.defaultToken.Metadata.type
+                let utxos;
+                if(walletType === 'Cardano') {
+                  utxos = await connectorGetUtxosCardano(
+                    wallet,
+                    pendingTxs,
+                    valueExpected,
+                    tokenId,
+                    paginate
+                  );
+                } else {
+                  utxos = await connectorGetUtxosErgo(
+                    wallet,
+                    pendingTxs,
+                    valueExpected,
+                    tokenId,
+                    paginate
+                  );
+                }
+                rpcResponse({
+                  ok: utxos
+                });
+              },
+              db,
+              localStorageApi,
+            )
+          });
+        } catch (e) {
+          handleError(e);
+        }
+        break;
+      case 'get_used_addresses':
+        try {
+          const paginate = message.params[0] == null ? null : asPaginate(message.params[0]);
+
+          await withDb(async (db, localStorageApi) => {
+            await withSelectedWallet(
+              tabId,
+              async (wallet) => {
+                const addresses = await connectorGetUsedAddresses(wallet, paginate);
+                rpcResponse({
+                  ok: addresses
+                });
+              },
+              db,
+              localStorageApi,
+            )
+          });
+        } catch (e) {
+          handleError(e);
+        }
+        break;
+      case 'get_unused_addresses':
+        try {
+          await withDb(async (db, localStorageApi) => {
+            await withSelectedWallet(
+              tabId,
+              async (wallet) => {
+                const addresses = await connectorGetUnusedAddresses(wallet);
+                rpcResponse({
+                  ok: addresses
+                });
+              },
+              db,
+              localStorageApi,
+            )
+          });
+        } catch (e) {
+          handleError(e);
+        }
+        break;
+      case `get_change_address`:
+        try {
+          await withDb(async (db, localStorageApi) => {
+            await withSelectedWallet(
+              tabId,
+              async (wallet) => {
+                const change = await connectorGetChangeAddress(wallet);
+                rpcResponse({
+                  ok: change
+                });
+              },
+              db,
+              localStorageApi,
+            )
+          });
+        } catch (e) {
+          handleError(e);
+        }
+        break;
+      case 'submit_tx':
+        try {
+          await RustModule.load();
+          await withDb(async (db, localStorageApi) => {
+            await withSelectedWallet(
+              tabId,
+              async (wallet) => {
+                let id;
+                if (isCardanoHaskell(wallet.getParent().getNetworkInfo())) {
+                  const tx = RustModule.WalletV4.Transaction.from_bytes(
+                    Buffer.from(message.params[0], 'hex'),
+                  );
+                  await connectorSendTxCardano(
+                    wallet,
+                    tx.to_bytes(),
+                    localStorageApi,
+                  );
+                  id = Buffer.from(
+                    RustModule.WalletV4.hash_transaction(tx.body()).to_bytes()
+                  ).toString('hex');
+                } else { // is Ergo
+                  const tx = asSignedTx(message.params[0], RustModule.SigmaRust);
+                  id = await connectorSendTx(wallet, pendingTxs, tx, localStorageApi);
+                }
+                rpcResponse({
+                  ok: id
+                });
+              },
+              db,
+              localStorageApi,
+            )
+          });
+        } catch (e) {
+          handleError(e);
+        }
+        break;
+      case 'ping':
+        rpcResponse({
+          ok: true,
+        });
+        break;
+      default:
+        rpcResponse({
+          err: {
+            code: APIErrorCodes.API_INVALID_REQUEST,
+            info: `unknown API function: ${message.function}`
+          }
+        })
+        break;
+      }
+    }
+  });
+}
