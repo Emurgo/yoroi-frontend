@@ -3,7 +3,7 @@ import type { Node, ComponentType } from 'react';
 import { Box, styled } from '@mui/system';
 import { Avatar, Collapse, Grid, IconButton, Typography } from '@mui/material';
 import globalMessages from '../../../i18n/global-messages';
-import { injectIntl } from 'react-intl';
+import { defineMessages, injectIntl } from 'react-intl';
 import NoAssetLogo from '../../../assets/images/assets-page/asset-no.inline.svg';
 import { useState } from 'react';
 import ArrowDownSVG from '../../../assets/images/expand-arrow-grey.inline.svg';
@@ -27,6 +27,33 @@ type Props = {|
 type Intl = {|
   intl: $npm$ReactIntl$IntlShape,
 |};
+
+const messages = defineMessages({
+  ticker: {
+    id: 'wallet.assets.ticker',
+    defaultMessage: '!!!Ticker',
+  },
+  created: {
+    id: 'wallet.assets.created',
+    defaultMessage: '!!!Created',
+  },
+  details: {
+    id: 'wallet.assets.details',
+    defaultMessage: '!!!Details',
+  },
+  detailsOn: {
+    id: 'wallet.assets.detailsOn',
+    defaultMessage: '!!!Details on',
+  },
+  policyId: {
+    id: 'wallet.assets.policyId',
+    defaultMessage: '!!!Policy ID',
+  },
+  identifier: {
+    id: 'wallet.assets.identifier',
+    defaultMessage: '!!!Identifier',
+  },
+});
 function TokenDetails({ tokenInfo, tokensCount, intl }: Props & Intl): Node {
   const [expanded, setExpanded] = useState(true);
   const handleExpandClick = () => {
@@ -78,7 +105,7 @@ function TokenDetails({ tokenInfo, tokensCount, intl }: Props & Intl): Node {
           borderBottom="1px solid var(--yoroi-palette-gray-50)"
         >
           <Typography variant="h5" color="var(--yoroi-palette-gray-900)">
-            Details
+            {intl.formatMessage(messages.details)}
           </Typography>
           <ExpandMore
             expand={expanded}
@@ -97,23 +124,32 @@ function TokenDetails({ tokenInfo, tokensCount, intl }: Props & Intl): Node {
             borderBottom="1px solid var(--yoroi-palette-gray-50)"
           >
             <Grid item xs={4}>
-              <LabelWithValue label="Ticker" value={tokenInfo.ticker} />
+              <LabelWithValue
+                label={intl.formatMessage(messages.ticker)}
+                value={tokenInfo.ticker}
+              />
             </Grid>
             <Grid item xs={4}>
               <LabelWithValue
-                label="Created"
+                label={intl.formatMessage(messages.created)}
                 value={tokenInfo.lastUpdatedAt ? moment(tokenInfo.lastUpdatedAt).format('LL') : '-'}
               />
             </Grid>
             <Grid item xs={4}>
-              <LabelWithValue label="Details on" value={tokenInfo.type} />
+              <LabelWithValue
+                label={intl.formatMessage(messages.detailsOn)}
+                value={tokenInfo.type}
+              />
             </Grid>
           </Grid>
           <Box marginTop="22px">
-            <LabelWithValue label="Identifier" value={tokenInfo.id} />
+            <LabelWithValue label={intl.formatMessage(messages.identifier)} value={tokenInfo.id} />
           </Box>
           <Box marginTop="22px">
-            <LabelWithValue label="Policy ID" value={tokenInfo.policyId} />
+            <LabelWithValue
+              label={intl.formatMessage(messages.policyId)}
+              value={tokenInfo.policyId}
+            />
           </Box>
           {/* TODO: add description */}
           {/* <Box marginTop="22px"> */}
