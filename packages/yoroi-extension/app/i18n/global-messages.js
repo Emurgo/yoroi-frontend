@@ -648,6 +648,10 @@ const globalMessages: * = defineMessages({
     id: 'wallet.staking.overview',
     defaultMessage: '!!!Overview',
   },
+  tokens: {
+    id: 'wallet.assets.tokens',
+    defaultMessage: '!!!Tokens',
+  },
   auditAddressWarning: {
     id: 'wallet.receive.page.internalWarning2',
     defaultMessage: '!!!addresses are shown here for personal auditing purposes and should <strong>never</strong> be used.'
