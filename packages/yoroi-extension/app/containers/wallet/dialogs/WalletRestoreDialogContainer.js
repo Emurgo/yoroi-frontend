@@ -37,6 +37,10 @@ import { isJormungandr } from '../../../api/ada/lib/storage/database/prepackaged
 import { addressToDisplayString, } from '../../../api/ada/lib/storage/bridge/utils';
 import type { TokenInfoMap } from '../../../stores/toplevel/TokenInfoStore';
 import { genLookupOrFail } from '../../../stores/stateless/tokenHelpers';
+import WalletAlreadyExistDialog from '../../../components/wallet/WalletAlreadyExistDialog';
+import type { PublicKeyCache } from '../../../stores/toplevel/WalletStore'
+import { asGetPublicKey, } from '../../../api/ada/lib/storage/models/PublicDeriver/traits'
+import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver';
 
 const messages = defineMessages({
   walletUpgradeNoop: {
@@ -136,6 +140,28 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
           initValues={walletRestore.walletRestoreMeta}
           introMessage={this.props.introMessage || ''}
         />);
+      }
+      case RestoreSteps.WALLET_EXIST: {
+        const publicDeriver = walletRestore.duplicatedWallet
+        if (!publicDeriver) {
+          throw new Error(`${nameof(WalletRestoreDialogContainer)} no duplicated wallet`);
+        }
+        const parent = publicDeriver.getParent();
+        const settingsCache = this.generated.stores.walletSettings
+          .getConceptualWalletSettingsCache(parent);
+        const withPubKey = asGetPublicKey(publicDeriver);
+        const plate = withPubKey == null
+          ? null
+          : this.generated.stores.wallets.getPublicKeyCache(withPubKey).plate;
+
+        return (
+          <WalletAlreadyExistDialog
+            plates={plate}
+            onNext={actions.walletRestore.verifyMnemonic.trigger}
+            onCancel={walletRestoreActions.back.trigger}
+            settingsCache={settingsCache}
+          />
+        );
       }
       case RestoreSteps.VERIFY_MNEMONIC: {
         // Refer: https://github.com/Emurgo/yoroi-frontend/pull/1055
@@ -334,12 +360,16 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
       tokenInfoStore: {|
         tokenInfo: TokenInfoMap,
       |},
+      walletSettings: {|
+        getConceptualWalletSettingsCache: ConceptualWallet => ConceptualWalletSettingsCache
+      |},
       walletRestore: {|
         recoveryResult: void | {|
           plates: Array<PlateWithMeta>,
           phrase: string,
         |},
         step: RestoreStepsType,
+        duplicatedWallet: void | PublicDeriver<>,
         walletRestoreMeta: void | WalletRestoreMeta,
         isValidMnemonic: ({|
           mnemonic: string,
@@ -362,6 +392,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
           isExecuting: boolean,
           reset: () => void
         |},
+        getPublicKeyCache: IGetPublic => PublicKeyCache,
       |}
     |}
     |} {
@@ -386,6 +417,10 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
           isOpen: stores.uiNotifications.isOpen,
           getTooltipActiveNotification: stores.uiNotifications.getTooltipActiveNotification,
         },
+        walletSettings: {
+          getConceptualWalletSettingsCache:
+            stores.walletSettings.getConceptualWalletSettingsCache,
+        },
         wallets: {
           restoreRequest: {
             isExecuting: stores.wallets.restoreRequest.isExecuting,
@@ -395,6 +430,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
           sendMoneyRequest: {
             isExecuting: stores.wallets.sendMoneyRequest.isExecuting,
           },
+          getPublicKeyCache: stores.wallets.getPublicKeyCache,
         },
         tokenInfoStore: {
           tokenInfo: stores.tokenInfoStore.tokenInfo,
@@ -404,6 +440,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
         },
         walletRestore: {
           step: stores.walletRestore.step,
+          duplicatedWallet: stores.walletRestore.duplicatedWallet,
           recoveryResult: stores.walletRestore.recoveryResult,
           walletRestoreMeta: stores.walletRestore.walletRestoreMeta,
           isValidMnemonic: stores.walletRestore.isValidMnemonic,

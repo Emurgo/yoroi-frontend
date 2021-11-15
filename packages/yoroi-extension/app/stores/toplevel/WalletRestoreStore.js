@@ -43,6 +43,7 @@ import type { $npm$ReactIntl$MessageDescriptor } from 'react-intl';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import { isWalletExist } from '../../api/ada/lib/cardanoCrypto/utils';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 
 const messages = defineMessages({
   walletRestoreVerifyAccountIdLabel: {
@@ -85,9 +86,10 @@ export const NUMBER_OF_VERIFIED_ADDRESSES_PAPER = 5;
 
 export const RestoreSteps = Object.freeze({
   START: 0,
-  VERIFY_MNEMONIC: 1,
-  LEGACY_EXPLANATION: 2,
-  TRANSFER_TX_GEN: 3,
+  WALLET_EXIST: 1,
+  VERIFY_MNEMONIC: 2,
+  LEGACY_EXPLANATION: 3,
+  TRANSFER_TX_GEN: 4,
 });
 export type RestoreStepsType = $Values<typeof RestoreSteps>;
 export type PlateWithMeta = {|
@@ -112,6 +114,8 @@ export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> 
     plates: Array<PlateWithMeta>,
   |};
 
+  @observable duplicatedWallet: void | PublicDeriver<>
+
   setup(): void {
     super.setup();
     this.reset();
@@ -135,7 +139,7 @@ export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> 
   }
 
   @action
-  _processRestoreMeta: (WalletRestoreMeta) => Promise<void> = async (restoreMeta) => {
+  _processRestoreMeta: (WalletRestoreMeta) => void = async (restoreMeta) => {
     this.walletRestoreMeta = restoreMeta;
 
     let resolvedRecoveryPhrase = restoreMeta.recoveryPhrase;
@@ -183,7 +187,7 @@ export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> 
     // Check for wallet duplication.
     const wallets = this.stores.wallets.publicDerivers
     const accountIndex = this.stores.walletRestore.selectedAccount;
-    const exist = await isWalletExist(
+    const duplicatedWallet = await isWalletExist(
       wallets,
       mode.type,
       resolvedRecoveryPhrase,
@@ -191,13 +195,10 @@ export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> 
       selectedNetwork
       )
 
-    if (exist) {
-      alert('Walelt exist!!')
-    } else {
-      runInAction(() => {
-        this.step = RestoreSteps.VERIFY_MNEMONIC;
-      })
-    }
+    runInAction(() => {
+      this.step = duplicatedWallet ? RestoreSteps.WALLET_EXIST : RestoreSteps.VERIFY_MNEMONIC
+      this.duplicatedWallet = duplicatedWallet
+    })
   }
 
   teardown(): void {
