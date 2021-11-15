@@ -108,7 +108,7 @@ export default ({
       }
     );
   }
-  
+
   const verName /*: {| version_name?: string |} */ = versionName != null
     ? { version_name: versionName }
     : Object.freeze({});
