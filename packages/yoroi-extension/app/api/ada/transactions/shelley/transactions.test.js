@@ -179,7 +179,7 @@ beforeAll(async () => {
 
 function getProtocolParams(): {|
   linearFee: RustModule.WalletV4.LinearFee,
-  minimumUtxoVal: RustModule.WalletV4.BigNum,
+  coinsPerUtxoWord: RustModule.WalletV4.BigNum,
   poolDeposit: RustModule.WalletV4.BigNum,
   keyDeposit: RustModule.WalletV4.BigNum,
   networkId: number,
@@ -189,7 +189,7 @@ function getProtocolParams(): {|
       RustModule.WalletV4.BigNum.from_str('2'),
       RustModule.WalletV4.BigNum.from_str('500'),
     ),
-    minimumUtxoVal: RustModule.WalletV4.BigNum.from_str('1'),
+    coinsPerUtxoWord: RustModule.WalletV4.BigNum.from_str('1'),
     poolDeposit: RustModule.WalletV4.BigNum.from_str('500'),
     keyDeposit: RustModule.WalletV4.BigNum.from_str('500'),
     networkId: network.NetworkId,
@@ -302,7 +302,7 @@ describe('Create unsigned TX from UTXO', () => {
       {
         ...getProtocolParams(),
         // high enough that we can't send the remaining amount as change
-        minimumUtxoVal: RustModule.WalletV4.BigNum.from_str('999100'),
+        coinsPerUtxoWord: RustModule.WalletV4.BigNum.from_str('32000'),
       },
       [],
       [],
@@ -316,7 +316,7 @@ describe('Create unsigned TX from UTXO', () => {
       new BigNumber(0),
       {
         ...getProtocolParams(),
-        minimumUtxoVal: RustModule.WalletV4.BigNum.from_str('999000'),
+        coinsPerUtxoWord: RustModule.WalletV4.BigNum.from_str('31000'),
       },
       [],
       [],
@@ -330,7 +330,7 @@ describe('Create unsigned TX from UTXO', () => {
       new BigNumber(0),
       {
         ...getProtocolParams(),
-        minimumUtxoVal: RustModule.WalletV4.BigNum.from_str('998500'),
+        coinsPerUtxoWord: RustModule.WalletV4.BigNum.from_str('30000'),
       },
       [],
       [],
@@ -459,7 +459,7 @@ describe('Create unsigned TX from UTXO', () => {
           ),
           RustModule.WalletV4.BigNum.from_str('500'),
         ),
-        minimumUtxoVal: RustModule.WalletV4.BigNum.from_str('1'),
+        coinsPerUtxoWord: RustModule.WalletV4.BigNum.from_str('1'),
         poolDeposit: RustModule.WalletV4.BigNum.from_str('500'),
         keyDeposit: RustModule.WalletV4.BigNum.from_str('500'),
         networkId: network.NetworkId,
@@ -566,7 +566,7 @@ describe('Create unsigned TX from UTXO', () => {
       {
         ...getProtocolParams(),
         // high enough that we can't send the remaining amount as change
-        minimumUtxoVal: RustModule.WalletV4.BigNum.from_str('500000'),
+        coinsPerUtxoWord: RustModule.WalletV4.BigNum.from_str('34482'),
       },
       [],
       [],
@@ -585,7 +585,7 @@ describe('Create unsigned TX from UTXO', () => {
       {
         ...getProtocolParams(),
         // high enough that we can't send the remaining amount as change
-        minimumUtxoVal: RustModule.WalletV4.BigNum.from_str('500000'),
+        coinsPerUtxoWord: RustModule.WalletV4.BigNum.from_str('34482'),
       },
       undefined,
     )).not.toThrow(NotEnoughMoneyToSendError);
@@ -710,7 +710,7 @@ describe('Create unsigned TX from UTXO', () => {
       new BigNumber(0),
       {
         ...getProtocolParams(),
-        minimumUtxoVal: RustModule.WalletV4.BigNum.from_str('1000000'),
+        coinsPerUtxoWord: RustModule.WalletV4.BigNum.from_str('34482'),
       },
       [],
       [],

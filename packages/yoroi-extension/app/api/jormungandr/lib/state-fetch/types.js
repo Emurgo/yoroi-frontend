@@ -46,7 +46,7 @@ export type RewardTuple = [
   number, /* amount in lovelaces */
   string, /* poolHash */
 ];
-export type RewardHistoryResponse = { [address: string]: Array<RewardTuple>, ... };
+export type RewardHistoryResponse = { [address: string]: ?Array<RewardTuple>, ... };
 export type RewardHistoryFunc = (body: RewardHistoryRequest) => Promise<RewardHistoryResponse>;
 
 // getBestBlock

@@ -599,7 +599,7 @@ export function genGetAccountState(
       withdrawals: BigNumber,
     |}>();
     for (const key of Object.keys(rewardHistory)) {
-      for (const reward of rewardHistory[key]) {
+      for (const reward of (rewardHistory[key] ?? [])) {
         const currVal = resultMap.get(key) ?? {
           rewards: new BigNumber(0),
           withdrawals: new BigNumber(0),

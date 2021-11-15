@@ -56,7 +56,7 @@ export function sendAllUnsignedTx(
   absSlotNumber: BigNumber,
   protocolParams: {|
     linearFee: RustModule.WalletV4.LinearFee,
-    minimumUtxoVal: RustModule.WalletV4.BigNum,
+    coinsPerUtxoWord: RustModule.WalletV4.BigNum,
     poolDeposit: RustModule.WalletV4.BigNum,
     keyDeposit: RustModule.WalletV4.BigNum,
     networkId: number,
@@ -217,7 +217,7 @@ export function sendAllUnsignedTxFromUtxo(
   absSlotNumber: BigNumber,
   protocolParams: {|
     linearFee: RustModule.WalletV4.LinearFee,
-    minimumUtxoVal: RustModule.WalletV4.BigNum,
+    coinsPerUtxoWord: RustModule.WalletV4.BigNum,
     poolDeposit: RustModule.WalletV4.BigNum,
     keyDeposit: RustModule.WalletV4.BigNum,
     networkId: number,
@@ -234,12 +234,7 @@ export function sendAllUnsignedTxFromUtxo(
     throw new NotEnoughMoneyToSendError();
   }
 
-  const txBuilder = RustModule.WalletV4TxBuilder(
-    protocolParams.linearFee,
-    protocolParams.minimumUtxoVal,
-    protocolParams.poolDeposit,
-    protocolParams.keyDeposit,
-  );
+  const txBuilder = RustModule.WalletV4TxBuilder(protocolParams);
   txBuilder.set_ttl(absSlotNumber.plus(defaultTtlOffset).toNumber());
 
   for (const input of allUtxos) {
@@ -326,7 +321,7 @@ export function newAdaUnsignedTx(
   absSlotNumber: BigNumber,
   protocolParams: {|
     linearFee: RustModule.WalletV4.LinearFee,
-    minimumUtxoVal: RustModule.WalletV4.BigNum,
+    coinsPerUtxoWord: RustModule.WalletV4.BigNum,
     poolDeposit: RustModule.WalletV4.BigNum,
     keyDeposit: RustModule.WalletV4.BigNum,
     networkId: number,
@@ -388,7 +383,7 @@ export function newAdaUnsignedTxForConnector(
   absSlotNumber: BigNumber,
   protocolParams: {|
     linearFee: RustModule.WalletV4.LinearFee,
-    minimumUtxoVal: RustModule.WalletV4.BigNum,
+    coinsPerUtxoWord: RustModule.WalletV4.BigNum,
     poolDeposit: RustModule.WalletV4.BigNum,
     keyDeposit: RustModule.WalletV4.BigNum,
     networkId: number,
@@ -444,7 +439,7 @@ function minRequiredForChange(
   value: RustModule.WalletV4.Value,
   protocolParams: {
     linearFee: RustModule.WalletV4.LinearFee,
-    minimumUtxoVal: RustModule.WalletV4.BigNum,
+    coinsPerUtxoWord: RustModule.WalletV4.BigNum,
     ...,
   },
 ): RustModule.WalletV4.BigNum {
@@ -452,9 +447,14 @@ function minRequiredForChange(
   if (wasmChange == null) {
     throw new Error(`${nameof(minRequiredForChange)} change not a valid Shelley address`);
   }
+
+  // <TODO:PLUTUS_SUPPORT>
+  const utxoHasDataHash = false;
+
   const minimumAda = RustModule.WalletV4.min_ada_required(
     value,
-    protocolParams.minimumUtxoVal
+    utxoHasDataHash,
+    protocolParams.coinsPerUtxoWord
   );
 
   // we may have to increase the value used up to the minimum ADA required
@@ -491,7 +491,7 @@ export function newAdaUnsignedTxFromUtxo(
   absSlotNumber: BigNumber,
   protocolParams: {|
     linearFee: RustModule.WalletV4.LinearFee,
-    minimumUtxoVal: RustModule.WalletV4.BigNum,
+    coinsPerUtxoWord: RustModule.WalletV4.BigNum,
     poolDeposit: RustModule.WalletV4.BigNum,
     keyDeposit: RustModule.WalletV4.BigNum,
     networkId: number,
@@ -522,9 +522,14 @@ export function newAdaUnsignedTxFromUtxo(
       const hasRequiredAsset = isAssetsRequired
         && u.assets.some(a => outputAssets.has(a.assetId));
       const amount = RustModule.WalletV4.BigNum.from_str(u.amount);
+
+      // <TODO:PLUTUS_SUPPORT>
+      const utxoHasDataHash = false;
+
       const minRequired = RustModule.WalletV4.min_ada_required(
         cardanoValueFromRemoteFormat(u),
-        protocolParams.minimumUtxoVal,
+        utxoHasDataHash,
+        protocolParams.coinsPerUtxoWord,
       );
       const spendable = parseInt(amount.clamped_sub(minRequired).to_str(), 10);
       // Round down the spendable value to the nearest full ADA for safer deposit
@@ -611,7 +616,7 @@ function _newAdaUnsignedTxFromUtxo(
   absSlotNumber: BigNumber,
   protocolParams: {|
     linearFee: RustModule.WalletV4.LinearFee,
-    minimumUtxoVal: RustModule.WalletV4.BigNum,
+    coinsPerUtxoWord: RustModule.WalletV4.BigNum,
     poolDeposit: RustModule.WalletV4.BigNum,
     keyDeposit: RustModule.WalletV4.BigNum,
     networkId: number,
@@ -654,12 +659,7 @@ function _newAdaUnsignedTxFromUtxo(
   const emptyAsset = RustModule.WalletV4.MultiAsset.new();
   shouldForceChange(undefined);
 
-  const txBuilder = RustModule.WalletV4TxBuilder(
-    protocolParams.linearFee,
-    protocolParams.minimumUtxoVal,
-    protocolParams.poolDeposit,
-    protocolParams.keyDeposit,
-  );
+  const txBuilder = RustModule.WalletV4TxBuilder(protocolParams);
   if (certificates.length > 0) {
     const certsWasm = certificates.reduce(
       (certs, cert) => { certs.add(cert); return certs; },
@@ -917,7 +917,7 @@ function newAdaUnsignedTxFromUtxoForConnector(
   absSlotNumber: BigNumber,
   protocolParams: {|
     linearFee: RustModule.WalletV4.LinearFee,
-    minimumUtxoVal: RustModule.WalletV4.BigNum,
+    coinsPerUtxoWord: RustModule.WalletV4.BigNum,
     poolDeposit: RustModule.WalletV4.BigNum,
     keyDeposit: RustModule.WalletV4.BigNum,
     networkId: number,
@@ -953,12 +953,7 @@ function newAdaUnsignedTxFromUtxoForConnector(
   const emptyAsset = RustModule.WalletV4.MultiAsset.new();
   shouldForceChange(undefined);
 
-  const txBuilder = RustModule.WalletV4TxBuilder(
-    protocolParams.linearFee,
-    protocolParams.minimumUtxoVal,
-    protocolParams.poolDeposit,
-    protocolParams.keyDeposit,
-  );
+  const txBuilder = RustModule.WalletV4TxBuilder(protocolParams);
   txBuilder.set_ttl(absSlotNumber.plus(defaultTtlOffset).toNumber());
   {
     for (const output of outputs) {
@@ -1303,13 +1298,13 @@ export function genFilterSmallUtxo(request: {|
 |}): (
   RemoteUnspentOutput => boolean
 ) {
-  const txBuilder = RustModule.WalletV4TxBuilder(
-    request.protocolParams.linearFee,
-    // no need for the following parameters just to calculate the fee of adding a UTXO
-    RustModule.WalletV4.BigNum.from_str('0'),
-    RustModule.WalletV4.BigNum.from_str('0'),
-    RustModule.WalletV4.BigNum.from_str('0'),
-  );
+  const txBuilder = RustModule.WalletV4TxBuilder({
+      linearFee: request.protocolParams.linearFee,
+      // no need for the following parameters just to calculate the fee of adding a UTXO
+      coinsPerUtxoWord: RustModule.WalletV4.BigNum.zero(),
+      poolDeposit: RustModule.WalletV4.BigNum.zero(),
+      keyDeposit: RustModule.WalletV4.BigNum.zero(),
+  });
 
   return (utxo) => {
     const wasmAddr = normalizeToAddress(utxo.receiver);

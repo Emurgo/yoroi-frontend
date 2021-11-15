@@ -95,7 +95,7 @@ function sendMsgSigningTx(): Promise<SigningMessage> {
   });
 }
 
-function getProtocol(): Promise<Protocol> {
+function getProtocol(): Promise<?Protocol> {
   return new Promise((resolve, reject) => {
       window.chrome.runtime.sendMessage(
         ({ type: 'get_protocol' }),
