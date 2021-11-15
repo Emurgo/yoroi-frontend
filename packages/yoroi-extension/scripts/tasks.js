@@ -48,7 +48,7 @@ exports.buildManifests = (
   isNightly: boolean,
   shouldInjectConnector: boolean
 ) => {
-  manifestTypes.map((type) => {
+  manifestTypes.forEach((type) => {
     buildManifest(type, isDebug, isNightly, shouldInjectConnector);
   });
 };

@@ -83,7 +83,7 @@ export default class Sidebar extends Component<Props> {
             key="connected-websites"
             icon={connectedWebsitesIcon}
             active={false}
-            label={messages.connectedWebsites }
+            label={messages.connectedWebsites}
             showLabel={isSidebarExpanded}
             onClick={() => {
               window.location = window.location.origin +
