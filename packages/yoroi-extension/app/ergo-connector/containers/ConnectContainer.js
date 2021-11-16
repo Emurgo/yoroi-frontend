@@ -10,6 +10,7 @@ import type {
   ConnectingMessage,
   WhitelistEntry,
   ConnectResponseData,
+  WalletAuthEntry,
 } from '../../../chrome/extension/ergo-connector/types';
 import { LoadingWalletStates } from '../types';
 import { networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
@@ -71,18 +72,11 @@ export default class ConnectContainer extends Component<
       throw new Error(`${nameof(chromeMessage)} connecting to a wallet but no connect message found`);
     }
 
-    const isAuthRequested = chromeMessage.appAuthID != null;
-    if (isAuthRequested && checksum == null) {
-      throw new Error(`${nameof(chromeMessage)} app auth is requested but wallet-checksum does not exist`)
-    }
+    const connector = this.generated.actions.connector;
 
-    // <TODO:AUTH> create auth data entry
-    const pubKey = (await deriver.getPublicKey()).Hash;
-
-    // <TODO:AUTH> create auth data entry
-    const authEntry = isAuthRequested ? {
-      walletId: checksum.ImagePart,
-    } : undefined;
+    const appAuthID = chromeMessage.appAuthID;
+    const authEntry = await connector.createAuthEntry
+      .trigger({ appAuthID, deriver, checksum });
 
     const publicDeriverId = deriver.getPublicDeriverId();
     const result = this.generated.stores.connector.currentConnectorWhitelist;
@@ -90,10 +84,10 @@ export default class ConnectContainer extends Component<
     whitelist.push({
       url: chromeMessage.url,
       publicDeriverId,
-      appAuthID: chromeMessage.appAuthID,
+      appAuthID,
       auth: authEntry,
     });
-    await this.generated.actions.connector.updateConnectorWhitelist.trigger({ whitelist });
+    await connector.updateConnectorWhitelist.trigger({ whitelist });
 
     chrome.runtime.sendMessage(({
       type: 'connect_response',
@@ -103,7 +97,7 @@ export default class ConnectContainer extends Component<
       tabId: chromeMessage.tabId,
     }: ConnectResponseData));
 
-    this.generated.actions.connector.closeWindow.trigger();
+    connector.closeWindow.trigger();
   }
 
   onCancel: void => void = () => {
@@ -172,6 +166,13 @@ export default class ConnectContainer extends Component<
             whitelist: Array<WhitelistEntry>,
           |}) => Promise<void>,
         |},
+        createAuthEntry: {|
+          trigger: ({|
+            appAuthID: ?string,
+            deriver: PublicDeriver<>,
+            checksum: ?WalletChecksum,
+          |}) => Promise<?WalletAuthEntry>,
+        |},
       |},
     |},
     stores: {|
@@ -220,6 +221,7 @@ export default class ConnectContainer extends Component<
           closeWindow: { trigger: actions.connector.closeWindow.trigger },
           getConnectorWhitelist: { trigger: actions.connector.getConnectorWhitelist.trigger },
           updateConnectorWhitelist: { trigger: actions.connector.updateConnectorWhitelist.trigger },
+          createAuthEntry: { trigger: actions.connector.createAuthEntry.trigger },
         },
       },
     });

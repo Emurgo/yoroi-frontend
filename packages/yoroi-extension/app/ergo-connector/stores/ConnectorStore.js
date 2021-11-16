@@ -1,45 +1,46 @@
 /* eslint-disable promise/always-return */
 // @flow
 import BigNumber from 'bignumber.js';
-import { observable, action, runInAction, computed } from 'mobx';
+import blake2b from 'blake2b';
+import { action, computed, observable, runInAction } from 'mobx';
 import Request from '../../stores/lib/LocalizedRequest';
 import Store from '../../stores/base/Store';
 import type {
-  PublicDeriverCache,
   ConfirmedSignData,
-  ConnectingMessage,
-  FailedSignData,
-  SigningMessage,
-  WhitelistEntry,
   ConnectedSites,
+  ConnectingMessage,
   ConnectRetrieveData,
-  TxSignWindowRetrieveData,
-  RemoveWalletFromWhitelistData,
+  FailedSignData,
   GetConnectedSitesData,
   Protocol,
+  PublicDeriverCache,
+  RemoveWalletFromWhitelistData,
+  SigningMessage,
   Tx,
+  TxSignWindowRetrieveData,
+  WalletAuthEntry,
+  WhitelistEntry,
 } from '../../../chrome/extension/ergo-connector/types';
 import type { ActionsMap } from '../actions/index';
 import type { StoresMap } from './index';
+import type { CardanoConnectorSignRequest } from '../types';
 import { LoadingWalletStates } from '../types';
+import { getWallets } from '../../api/common/index';
 import {
-  getWallets
-} from '../../api/common/index';
-import {
+  getCardanoHaskellBaseConfig,
+  getErgoBaseConfig,
   isCardanoHaskell,
   isErgo,
-  getErgoBaseConfig,
-  getCardanoHaskellBaseConfig,
 } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import {
+  asGetAllUtxos,
   asGetBalance,
   asGetPublicKey,
-  asGetAllUtxos,
   asHasUtxoChains,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import { Bip44Wallet } from '../../api/ada/lib/storage/models/Bip44Wallet/wrapper';
-import { walletChecksum, legacyWalletChecksum } from '@emurgo/cip4-js';
 import type { WalletChecksum } from '@emurgo/cip4-js';
+import { legacyWalletChecksum, walletChecksum } from '@emurgo/cip4-js';
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import { addErgoAssets } from '../../api/ergo/lib/storage/bridge/updateTransactions';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
@@ -49,10 +50,7 @@ import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { toRemoteUtxo } from '../../api/ergo/lib/transactions/utils';
 import { mintedTokenInfo } from '../../../chrome/extension/ergo-connector/utils';
 import { Logger } from '../../utils/logging';
-import type { CardanoConnectorSignRequest } from '../types';
-import {
-  asAddressedUtxo,
-} from '../../api/ada/transactions/utils';
+import { asAddressedUtxo, } from '../../api/ada/transactions/utils';
 import { genTimeToSlot, } from '../../api/ada/lib/storage/bridge/timeUtils';
 
 // Need to run only once - Connecting wallets
@@ -165,6 +163,8 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     this.actions.connector.getResponse.listen(this._getConnectingMsg);
     this.actions.connector.getConnectorWhitelist.listen(this._getConnectorWhitelist);
     this.actions.connector.updateConnectorWhitelist.listen(this._updateConnectorWhitelist);
+    this.actions.connector.createAuthEntry.listen(this._createAuthEntry);
+    this.actions.connector.createAuthEntry.listen(this._updateConnectorWhitelist);
     this.actions.connector.removeWalletFromWhitelist.listen(this._removeWalletFromWhitelist);
     this.actions.connector.confirmSignInTx.listen(this._confirmSignInTx);
     this.actions.connector.cancelSignInTx.listen(this._cancelSignInTx);
@@ -573,6 +573,32 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     }
     return result ?? [];
   }
+  _createAuthEntry: ({|
+    appAuthID: ?string,
+    deriver: PublicDeriver<>,
+    checksum: ?WalletChecksum,
+  |}) => Promise<?WalletAuthEntry> = async ({ appAuthID, deriver, checksum }) => {
+    if (appAuthID == null) {
+      return null;
+    }
+    if (checksum == null) {
+      throw new Error(`[_createAuthEntry] app auth is requested but wallet-checksum does not exist`)
+    }
+    // <TODO:AUTH> this is a temporary insecure dev stub using the deriver public key
+    const walletPubKey = (await deriver.getPublicKey()).Hash;
+    const appPubKey = RustModule.WalletV4.Bip32PrivateKey.from_bip39_entropy(
+      Buffer.from(walletPubKey, 'hex'),
+      Buffer.from(
+        blake2b(64)
+          .update(Buffer.from(appAuthID))
+          .digest('binary'),
+      ),
+    ).to_raw_key().to_public();
+    return {
+      walletId: checksum.ImagePart,
+      pubkey: Buffer.from(appPubKey.as_bytes()).toString('hex'),
+    };
+  };
   _getConnectorWhitelist: void => Promise<void> = async () => {
     await this.getConnectorWhitelist.execute();
   };

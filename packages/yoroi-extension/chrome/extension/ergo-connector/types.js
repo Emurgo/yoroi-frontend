@@ -395,7 +395,7 @@ export type PublicDeriverCache = {|
 
 export type WalletAuthEntry = {|
   walletId: string,
-  // <TODO:AUTH> pubkey
+  pubkey: string,
 |};
 
 export type WhitelistEntry = {|
