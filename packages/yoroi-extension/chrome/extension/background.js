@@ -45,6 +45,7 @@ import {
   connectorSendTxCardano,
   connectorSignTx,
   connectorSignCardanoTx,
+  connectorCreateCardanoTx,
   connectorGetUsedAddresses,
   connectorGetUnusedAddresses,
   connectorGetUtxosCardano
@@ -68,6 +69,7 @@ import {
 import { migrateNoRefresh } from '../../app/api/common/migration';
 import { Mutex, } from 'async-mutex';
 import { isCardanoHaskell } from '../../app/api/ada/lib/storage/database/prepackaged/networks';
+import type CardanoTxRequest from '../../app/api/ada';
 
 
 /*::
@@ -380,6 +382,26 @@ chrome.runtime.onMessage.addListener(async (
       );
     });
   }
+  async function createCardanoTx(
+    tx: CardanoTxRequest,
+    password: string,
+    tabId: number
+  ): Promise<string> {
+    return await withDb(async (db, localStorageApi) => {
+      return await withSelectedWallet(
+        tabId,
+        async (wallet) => {
+          return await connectorCreateCardanoTx(
+            wallet,
+            password,
+            tx,
+          );
+        },
+        db,
+        localStorageApi
+      );
+    });
+  }
 
   // alert(`received event: ${JSON.stringify(request)}`);
   if (request.type === 'connect_response') {
@@ -406,8 +428,7 @@ chrome.runtime.onMessage.addListener(async (
         case 'tx':
           {
             // We know `tx` is a `Tx` here
-            // $FlowFixMe[prop-missing]
-            const txToSign: Tx = request.tx;
+            const txToSign: Tx = (request.tx: any);
             const allIndices = [];
             for (let i = 0; i < txToSign.inputs.length; i += 1) {
               allIndices.push(i);
@@ -419,8 +440,7 @@ chrome.runtime.onMessage.addListener(async (
         case 'tx_input':
           {
             const data = responseData.request;
-            // $FlowFixMe[prop-missing]
-            const txToSign: Tx = request.tx;
+            const txToSign: Tx = (request.tx: any);
             const signedTx = await signTxInputs(
               txToSign,
               [data.index],
@@ -436,6 +456,16 @@ chrome.runtime.onMessage.addListener(async (
               // $FlowFixMe[prop-missing]
               // $FlowFixMe[incompatible-cast]
               (request.tx.tx: CardanoTx),
+              password,
+              request.tabId
+            );
+            responseData.resolve({ ok: signedTx });
+          }
+        break;
+        case 'tx-create-req/cardano':
+          {
+            const signedTx = await createCardanoTx(
+              (request.tx: any),
               password,
               request.tabId
             );
@@ -937,6 +967,29 @@ chrome.runtime.onConnectExternal.addListener(port => {
               ok: true,
             });
             break;
+          case 'create_tx/cardano':
+            try {
+              checkParamCount(1);
+              await RustModule.load();
+              const connection = connectedSites.get(tabId);
+              if (connection == null) {
+                Logger.error(`ERR - sign_tx could not find connection with tabId = ${tabId}`);
+                rpcResponse(undefined); // shouldn't happen
+              } else {
+                const resp = await confirmSign(tabId,
+                  {
+                    type: 'tx-create-req/cardano',
+                    tx: message.params[0],
+                    uid: message.uid
+                  },
+                  connection
+                );
+                rpcResponse(resp);
+              }
+            } catch (e) {
+              handleError(e);
+            }
+          break;
           default:
             rpcResponse({
               err: {
