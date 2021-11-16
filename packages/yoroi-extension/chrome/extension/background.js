@@ -601,15 +601,16 @@ async function confirmConnect(
   tabId: number,
   connectParameters: {
     url: string,
-    appAuthID?: string,
+    requestIdentification?: boolean,
   },
   localStorageApi: LocalStorageApi,
 ): Promise<{
   connectedWallet: ?PublicDeriverId,
   auth: ?WalletAuthEntry,
 }> {
-  const { url, appAuthID } = connectParameters;
-  const isAuthRequested = appAuthID != null;
+  const { url, requestIdentification } = connectParameters;
+  const isAuthRequested = Boolean(requestIdentification);
+  const appAuthID = isAuthRequested ? url : undefined;
   const bounds = await getBoundsForTabWindow(tabId);
   const whitelist = await localStorageApi.getWhitelist() ?? [];
   return new Promise(resolve => {

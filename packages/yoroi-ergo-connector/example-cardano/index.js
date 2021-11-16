@@ -4,6 +4,7 @@ import { createIcon } from "@download/blockies"
 import { getTtl } from './utils'
 
 const cardanoAccessBtnRow = document.querySelector('#request-button-row')
+const cardanoAuthCheck = document.querySelector('#check-identification')
 const cardanoAccessBtn = document.querySelector('#request-access')
 const connectionStatus = document.querySelector('#connection-status')
 const walletPlateSpan = document.querySelector('#wallet-plate')
@@ -56,19 +57,24 @@ function show(el) {
 
 cardanoAccessBtn.addEventListener('click', () => {
     toggleSpinner('show');
-    cardano.yoroi.enable({ appAuthID: 'cardano-dapp-example' }).then(function(api){
+    const requestIdentification = cardanoAuthCheck.checked;
+    cardano.yoroi.enable({ requestIdentification }).then(function(api){
         toggleSpinner('hide');
-        const walletId = api.auth_getWalletId();
-        const walletPlate = textPartFromWalletChecksumImagePart(walletId);
-        alertSuccess( `You have access to ${walletPlate} now`);
-        walletPlateSpan.innerHTML = walletPlate;
-        walletIconSpan.appendChild(createBlockiesIcon(walletId));
+        var walletDisplay = 'an anonymous Yoroi Wallet';
+        if (requestIdentification) {
+          const walletId = api.auth_getWalletId();
+          const walletPlate = textPartFromWalletChecksumImagePart(walletId);
+          walletDisplay = `Yoroi Wallet ${walletPlate}`;
+          walletIconSpan.appendChild(createBlockiesIcon(walletId));
+        }
+        alertSuccess(`You have access to ${walletDisplay} now`);
+        walletPlateSpan.innerHTML = walletDisplay;
         hide(cardanoAccessBtnRow);
         show(connectionStatus);
         accessGranted = true;
         cardanoApi = api;
         api.on_disconnect(() => {
-          alertWarrning(`Disconnected from ${walletPlate}`);
+          alertWarrning(`Disconnected from ${walletDisplay}`);
           show(cardanoAccessBtnRow);
           hide(connectionStatus);
           walletPlateSpan.innerHTML = '';

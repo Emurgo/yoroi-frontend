@@ -134,11 +134,11 @@ const initialInject = `
   }
 
   function cardano_request_read_access(cardanoAccessRequest) {
-    const { appAuthID } = (cardanoAccessRequest || {});
+    const { requestIdentification } = (cardanoAccessRequest || {});
     return new Promise(function(resolve, reject) {
       window.postMessage({
         type: "connector_connect_request/cardano",
-        appAuthID,
+        requestIdentification,
       }, location.origin);
       connectRequests.push({
         resolve: (auth) => {
@@ -421,7 +421,7 @@ if (shouldInject()) {
                             type: `yoroi_connect_request/${protocol}`,
                             connectParameters: {
                                 url: location.hostname,
-                                appAuthID: event.data.appAuthID,
+                                requestIdentification: event.data.requestIdentification,
                             },
                             protocol,
                         };
