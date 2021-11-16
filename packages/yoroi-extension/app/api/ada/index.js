@@ -1566,24 +1566,6 @@ export default class AdaApi {
     try {
       // Note: we only restore for 0th account
       const rootPk = generateWalletRootKey(recoveryPhrase);
-      // const accountPublicKey = RustModule.WalletV2.Bip44RootPrivateKey.new(
-      //   RustModule.WalletV2.PrivateKey.from_hex(
-      //     Buffer.from(rootPk.as_bytes()).toString('hex')
-      //   ),
-      //   RustModule.WalletV2.DerivationScheme.v2()
-      // ).bip44_account(
-      //   RustModule.WalletV2.AccountIndex.new(request.accountIndex)
-      // ).public();
-      // const accountPublicKey = rootPk.bip44_account(
-      //   RustModule.WalletV2.AccountIndex.new(request.accountIndex)
-      // ).public();
-      const accountPublicKey = rootPk
-      .derive(WalletTypePurpose.CIP1852)
-      .derive(CoinTypes.CARDANO)
-      .derive(request.accountIndex)
-      .to_public();
-
-      console.log({ accountPublicKey: accountPublicKey.to_raw_key().hash(), apk: Buffer.from(accountPublicKey.as_bytes()).toString('hex') })
       const newPubDerivers = [];
       if (request.mode === 'bip44') {
         const wallet = await createStandardBip44Wallet({
