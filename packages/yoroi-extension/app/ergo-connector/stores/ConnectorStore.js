@@ -163,8 +163,6 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     this.actions.connector.getResponse.listen(this._getConnectingMsg);
     this.actions.connector.getConnectorWhitelist.listen(this._getConnectorWhitelist);
     this.actions.connector.updateConnectorWhitelist.listen(this._updateConnectorWhitelist);
-    this.actions.connector.createAuthEntry.listen(this._createAuthEntry);
-    this.actions.connector.createAuthEntry.listen(this._updateConnectorWhitelist);
     this.actions.connector.removeWalletFromWhitelist.listen(this._removeWalletFromWhitelist);
     this.actions.connector.confirmSignInTx.listen(this._confirmSignInTx);
     this.actions.connector.cancelSignInTx.listen(this._cancelSignInTx);
@@ -573,7 +571,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     }
     return result ?? [];
   }
-  _createAuthEntry: ({|
+  static createAuthEntry: ({|
     appAuthID: ?string,
     deriver: PublicDeriver<>,
     checksum: ?WalletChecksum,

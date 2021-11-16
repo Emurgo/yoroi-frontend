@@ -10,7 +10,6 @@ import type {
   ConnectingMessage,
   WhitelistEntry,
   ConnectResponseData,
-  WalletAuthEntry,
 } from '../../../chrome/extension/ergo-connector/types';
 import { LoadingWalletStates } from '../types';
 import { networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
@@ -18,6 +17,7 @@ import { genLookupOrFail, } from '../../stores/stateless/tokenHelpers';
 import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
 import { WalletChecksum } from '@emurgo/cip4-js';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
+import ConnectorStore from '../stores/ConnectorStore';
 
 type GeneratedData = typeof ConnectContainer.prototype.generated;
 declare var chrome;
@@ -58,6 +58,7 @@ export default class ConnectContainer extends Component<
   componentWillUnmount() {
     window.removeEventListener('unload', this.onUnload);
   }
+
   onToggleCheckbox: (deriver: PublicDeriver<>, checksum: ?WalletChecksum) => void = (deriver, checksum) => {
     const index = deriver.getPublicDeriverId();
     this.setState((prevState) => prevState.selected === index
@@ -75,8 +76,8 @@ export default class ConnectContainer extends Component<
     const connector = this.generated.actions.connector;
 
     const appAuthID = chromeMessage.appAuthID;
-    const authEntry = await connector.createAuthEntry
-      .trigger({ appAuthID, deriver, checksum });
+    const authEntry = await ConnectorStore
+      .createAuthEntry({ appAuthID, deriver, checksum });
 
     const publicDeriverId = deriver.getPublicDeriverId();
     const result = this.generated.stores.connector.currentConnectorWhitelist;
@@ -166,13 +167,6 @@ export default class ConnectContainer extends Component<
             whitelist: Array<WhitelistEntry>,
           |}) => Promise<void>,
         |},
-        createAuthEntry: {|
-          trigger: ({|
-            appAuthID: ?string,
-            deriver: PublicDeriver<>,
-            checksum: ?WalletChecksum,
-          |}) => Promise<?WalletAuthEntry>,
-        |},
       |},
     |},
     stores: {|
@@ -221,7 +215,6 @@ export default class ConnectContainer extends Component<
           closeWindow: { trigger: actions.connector.closeWindow.trigger },
           getConnectorWhitelist: { trigger: actions.connector.getConnectorWhitelist.trigger },
           updateConnectorWhitelist: { trigger: actions.connector.updateConnectorWhitelist.trigger },
-          createAuthEntry: { trigger: actions.connector.createAuthEntry.trigger },
         },
       },
     });
