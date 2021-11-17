@@ -18,7 +18,7 @@ type Props = {|
     policyId: string,
     lastUpdatedAt: any,
     ticker: string,
-    type: string,
+    assetName: string,
     name: string,
     id: string,
     amount: string,
@@ -187,7 +187,7 @@ function TokenDetails({ tokenInfo, tokensCount, intl }: Props & Intl): Node {
 
 export default (injectIntl(TokenDetails): ComponentType<Props>);
 
-function LabelWithValue({ label, value }: {| label: string, value: string |}): Node {
+function LabelWithValue({ label, value }: {| label: string | Node, value: string | Node |}): Node {
   return (
     <Box>
       <Typography color="var(--yoroi-palette-gray-600)">{label}</Typography>

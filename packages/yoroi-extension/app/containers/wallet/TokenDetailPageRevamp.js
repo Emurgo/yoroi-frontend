@@ -54,7 +54,7 @@ class TokenDetailsPageRevamp extends Component<AllProps> {
               policyId: token.entry.identifier.split('.')[0],
               lastUpdatedAt: token.info.Metadata.lastUpdatedAt,
               ticker: token.info.Metadata.ticker ?? '-',
-              assetName: token.info.Metadata.assetName,
+              assetName: token.entry.identifier.split('.')[1] ?? '',
               name: truncateToken(getTokenStrictName(token.info) ?? '-'),
               id: getTokenIdentifierIfExists(token.info) ?? '-',
               amount: genFormatTokenAmount(getTokenInfo)(token.entry),
