@@ -1,8 +1,8 @@
 // @flow
+import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { computed } from 'mobx';
-import type { Node } from 'react';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import { MultiToken } from '../../api/common/lib/MultiToken';
@@ -22,6 +22,7 @@ import type { GeneratedData as SidebarContainerData } from '../SidebarContainer'
 import type { GeneratedData as NavBarContainerRevampData } from '../NavBarContainerRevamp';
 import { buildRoute } from '../../utils/routing';
 import AssetsMenu from '../../components/wallet/assets/AssetsMenu';
+import { matchPath } from 'react-router';
 
 export type GeneratedData = typeof AssetsWrapper.prototype.generated;
 type Props = {|
@@ -39,7 +40,10 @@ export default class AssetsWrapper extends Component<Props> {
   isActivePage: string => boolean = route => {
     const { location } = this.generated.stores.router;
     if (location) {
-      return location.pathname === buildRoute(route);
+      return !!matchPath(location.pathname, {
+        path: buildRoute(route),
+        exact: false,
+      });
     }
     return false;
   };
