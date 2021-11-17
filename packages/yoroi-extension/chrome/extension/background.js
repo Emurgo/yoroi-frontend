@@ -72,6 +72,7 @@ import { migrateNoRefresh } from '../../app/api/common/migration';
 import { Mutex, } from 'async-mutex';
 import { isCardanoHaskell } from '../../app/api/ada/lib/storage/database/prepackaged/networks';
 import type CardanoTxRequest from '../../app/api/ada';
+import ConnectorStore from '../../app/ergo-connector/stores/ConnectorStore';
 
 
 /*::
@@ -94,7 +95,8 @@ type PublicDeriverId = number;
 // PublicDeriverId = successfully connected - which public deriver the user selected
 // null = refused by user
 type ConnectedStatus = null | {|
-  publicDeriverId: PublicDeriverId
+  publicDeriverId: PublicDeriverId,
+  auth?: WalletAuthEntry,
 |} | {|
   // response (?PublicDeriverId) - null means the user refused, otherwise the account they selected
   resolve: ?PublicDeriverId => void,
@@ -293,34 +295,43 @@ async function syncWallet(
   }
 }
 
-async function withSelectedWallet<T>(
+async function withSelectedSiteConnection<T>(
   tabId: number,
-  continuation: PublicDeriver<> => Promise<T>,
-  db: lf$Database,
-  localStorageApi: LocalStorageApi,
+  continuation: ?ConnectedSite => Promise<T>,
 ): Promise<T> {
-  const wallets = await getWallets({ db });
   const connected = connectedSites.get(tabId);
   if (connected) {
     if (typeof connected.status?.publicDeriverId === 'number') {
-      const { publicDeriverId } = connected.status;
-      const selectedWallet = wallets.find(
-        cache => cache.getPublicDeriverId() === publicDeriverId
-      );
-      if (selectedWallet == null) {
-        connectedSites.delete(tabId);
-        await removeWallet(tabId, publicDeriverId, localStorageApi);
-        return Promise.reject(new Error(`Public deriver index not found: ${publicDeriverId}`));
-      }
-      await syncWallet(selectedWallet, localStorageApi);
-
-      // we need to make sure this runs within the withDb call
-      // since the publicDeriver contains a DB reference inside it
-      return await continuation(selectedWallet);
+      return await continuation(Object.freeze(connected));
     }
     return Promise.reject(new Error('site not connected yet'));
   }
   return Promise.reject(new Error(`could not find tabId ${tabId} in connected sites`));
+}
+
+async function withSelectedWallet<T>(
+  tabId: number,
+  continuation: (PublicDeriver<>, ?ConnectedSite) => Promise<T>,
+  db: lf$Database,
+  localStorageApi: LocalStorageApi,
+): Promise<T> {
+  const wallets = await getWallets({ db });
+  return await withSelectedSiteConnection(tabId, async connected => {
+    const { publicDeriverId } = connected.status;
+    const selectedWallet = wallets.find(
+      cache => cache.getPublicDeriverId() === publicDeriverId
+    );
+    if (selectedWallet == null) {
+      connectedSites.delete(tabId);
+      await removeWallet(tabId, publicDeriverId, localStorageApi);
+      return Promise.reject(new Error(`Public deriver index not found: ${publicDeriverId}`));
+    }
+    await syncWallet(selectedWallet, localStorageApi);
+
+    // we need to make sure this runs within the withDb call
+    // since the publicDeriver contains a DB reference inside it
+    return await continuation(selectedWallet, connected);
+  });
 }
 
 // messages from other parts of Yoroi (i.e. the UI for the connector)
@@ -419,6 +430,7 @@ chrome.runtime.onMessage.addListener(async (
         });
         connection.status = {
           publicDeriverId: request.publicDeriverId,
+          auth: request.auth,
         };
       } else {
         connection.status.resolve(null);
@@ -626,8 +638,10 @@ async function confirmConnect(
       // we already whitelisted this website, so no need to re-ask the user to confirm
       connectedSites.set(tabId, {
         url,
+        appAuthID,
         status: {
           publicDeriverId: whitelistEntry.publicDeriverId,
+          auth: isAuthRequested ? whitelistEntry.auth : undefined,
         },
         pendingSigns: new Map()
       });
@@ -1015,6 +1029,55 @@ chrome.runtime.onConnectExternal.addListener(port => {
                 );
                 rpcResponse(resp);
               }
+            } catch (e) {
+              handleError(e);
+            }
+          break;
+          case 'auth_sign_hex_payload/cardano':
+            try {
+              checkParamCount(1);
+              await withDb(async (db, localStorageApi) => {
+                await withSelectedWallet(
+                  tabId,
+                  async (wallet, connection) => {
+                    await RustModule.load();
+                    const signatureHex = await ConnectorStore.authSignHexPayload({
+                      appAuthID: connection.appAuthID,
+                      deriver: wallet,
+                      payloadHex: message.params[0],
+                    });
+                    rpcResponse({
+                      ok: signatureHex
+                    });
+                  },
+                  db,
+                  localStorageApi,
+                )
+              });
+            } catch (e) {
+              handleError(e);
+            }
+          break;
+          case 'auth_check_hex_payload/cardano':
+            try {
+              checkParamCount(2);
+              await withSelectedSiteConnection(tabId, async connection => {
+                if (connection.status.auth) {
+                  await RustModule.load();
+                  const [payloadHex, signatureHex] = message.params;
+                  const pk = RustModule.WalletV4.PublicKey
+                    .from_bytes(Buffer.from(connection.status.auth.pubkey, 'hex'));
+                  const sig = RustModule.WalletV4.Ed25519Signature.from_hex(signatureHex);
+                  const res = pk.verify(Buffer.from(payloadHex, 'hex'), sig);
+                  rpcResponse({
+                    ok: res
+                  });
+                } else {
+                  rpcResponse({
+                    err: 'auth_check_hex_payload is requested but no auth is present in the connection!',
+                  });
+                }
+              });
             } catch (e) {
               handleError(e);
             }

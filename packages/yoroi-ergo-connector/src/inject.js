@@ -67,11 +67,25 @@ const initialInject = `
       });
     }
     
-    auth_getWalletId() {
+    auth_get_wallet_id() {
         if (!this._auth) {
             throw new Error('This connection does not have auth enabled!');
         }
         return this._auth.walletId;
+    }
+    
+    auth_sign_hex_payload(payload_hex_string) {
+        if (!this._auth) {
+            throw new Error('This connection does not have auth enabled!');
+        }
+        return this._cardano_rpc_call("auth_sign_hex_payload/cardano", [payload_hex_string]);
+    }
+
+    auth_check_hex_payload(payload_hex_string, signature_hex_string) {
+        if (!this._auth) {
+            throw new Error('This connection does not have auth enabled!');
+        }
+        return this._cardano_rpc_call("auth_check_hex_payload/cardano", [payload_hex_string, signature_hex_string]);
     }
 
     getInitTimestamp(){

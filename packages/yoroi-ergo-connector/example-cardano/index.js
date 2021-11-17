@@ -61,18 +61,21 @@ cardanoAccessBtn.addEventListener('click', () => {
     cardano.yoroi.enable({ requestIdentification }).then(function(api){
         toggleSpinner('hide');
         var walletDisplay = 'an anonymous Yoroi Wallet';
+
         if (requestIdentification) {
-          const walletId = api.auth_getWalletId();
+          const walletId = api.auth_get_wallet_id();
           const walletPlate = textPartFromWalletChecksumImagePart(walletId);
           walletDisplay = `Yoroi Wallet ${walletPlate}`;
           walletIconSpan.appendChild(createBlockiesIcon(walletId));
         }
+
         alertSuccess(`You have access to ${walletDisplay} now`);
         walletPlateSpan.innerHTML = walletDisplay;
         hide(cardanoAccessBtnRow);
         show(connectionStatus);
         accessGranted = true;
         cardanoApi = api;
+
         api.on_disconnect(() => {
           alertWarrning(`Disconnected from ${walletDisplay}`);
           show(cardanoAccessBtnRow);
@@ -80,6 +83,31 @@ cardanoAccessBtn.addEventListener('click', () => {
           walletPlateSpan.innerHTML = '';
           walletIconSpan.innerHTML = '';
         });
+
+        if (requestIdentification) {
+          console.log('Testing auth signatures')
+          const messageJson = JSON.stringify({
+            type: 'this is a random test message object',
+            rndValue: Math.random(),
+          });
+          const messageHex = Buffer.from(messageJson).toString('hex');
+          console.log('Signing randomized message: ', JSON.stringify({
+            messageJson,
+            messageHex,
+          }))
+          api.auth_sign_hex_payload(messageHex).then(sig => {
+            console.log('Signature received: ', sig);
+            console.log('Verifying signature against the message');
+            api.auth_check_hex_payload(messageHex, sig).then(r => {
+              console.log('Signature matches message: ', r);
+            }, e => {
+              console.error('Sig check failed', e);
+            });
+          }, err => {
+            console.error('Sig failed', err);
+          });
+        }
+
     }, function (err) {
       toggleSpinner('hide');
       alertError(`Error: ${err}`);
