@@ -40,6 +40,10 @@ const messages = defineMessages({
     id: 'wallet.backup.recovery.phrase.entry.dialog.terms.and.condition.recovery',
     defaultMessage: `!!!I understand that if this application is moved to another device or deleted, my money can
     be only recovered with the backup phrase which were written down in a secure place`,
+  },
+  phraseDoesNotMatch: {
+    id: 'wallet.backup.recovery.phrase.entry.dialog.error.phraseDoesNotMatch',
+    defaultMessage: '!!!Recovery phrase does not match.'
   }
 });
 
@@ -142,6 +146,11 @@ export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
       </p>
     );
 
+    const phraseDoesNotMatchError =!isValid && (
+      enteredPhrase.length === recoveryPhraseSorted.length
+      ) && intl.formatMessage(messages.phraseDoesNotMatch)
+
+
     return (
       <Dialog
         className={dialogClasses}
@@ -162,6 +171,7 @@ export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
           filled={!classicTheme && Boolean(enteredPhrase.length)}
           phrase={classicTheme ? phraseOld : phrase}
           classicTheme={classicTheme}
+          phraseDoesNotMatch={phraseDoesNotMatchError}
         />}
 
         {!isValid && (
