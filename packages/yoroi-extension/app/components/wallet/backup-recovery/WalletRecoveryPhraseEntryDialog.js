@@ -148,7 +148,7 @@ export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
 
     const phraseDoesNotMatchError =!isValid && (
       enteredPhrase.length === recoveryPhraseSorted.length
-      ) && intl.formatMessage(messages.phraseDoesNotMatch)
+      ) ? intl.formatMessage(messages.phraseDoesNotMatch): ''
 
 
     return (

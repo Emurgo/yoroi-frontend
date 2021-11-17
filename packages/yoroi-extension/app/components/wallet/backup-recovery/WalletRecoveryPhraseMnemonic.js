@@ -14,7 +14,7 @@ type Props = {|
 
 @observer
 export default class WalletRecoveryPhraseMnemonic extends Component<Props> {
-  static defaultProps: {|filled: void|} = {
+  static defaultProps: {|filled: void, phraseDoesNotMatch: string |} = {
     filled: undefined,
     phraseDoesNotMatch: ''
   }
