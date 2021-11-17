@@ -58,7 +58,7 @@ function show(el) {
 cardanoAccessBtn.addEventListener('click', () => {
     toggleSpinner('show');
     const requestIdentification = cardanoAuthCheck.checked;
-    cardano.yoroi.enable({ requestIdentification }).then(function(api){
+    cardano.yoroi.enable({ requestIdentification, onlySilent: true }).then(function(api, err){
         toggleSpinner('hide');
         var walletDisplay = 'an anonymous Yoroi Wallet';
 

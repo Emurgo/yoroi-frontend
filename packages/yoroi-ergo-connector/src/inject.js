@@ -148,11 +148,12 @@ const initialInject = `
   }
 
   function cardano_request_read_access(cardanoAccessRequest) {
-    const { requestIdentification } = (cardanoAccessRequest || {});
+    const { requestIdentification, onlySilent } = (cardanoAccessRequest || {});
     return new Promise(function(resolve, reject) {
       window.postMessage({
         type: "connector_connect_request/cardano",
         requestIdentification,
+        onlySilent,
       }, location.origin);
       connectRequests.push({
         resolve: (auth) => {
@@ -366,6 +367,7 @@ function createYoroiPort() {
                 type: "connector_connected",
                 success: message.success,
                 auth: message.auth,
+                err: message.err,
             }, location.origin);
         }
     });
@@ -436,6 +438,7 @@ if (shouldInject()) {
                             connectParameters: {
                                 url: location.hostname,
                                 requestIdentification: event.data.requestIdentification,
+                                onlySilent: event.data.onlySilent,
                             },
                             protocol,
                         };
