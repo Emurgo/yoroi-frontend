@@ -652,6 +652,10 @@ const globalMessages: * = defineMessages({
     id: 'wallet.assets.tokens',
     defaultMessage: '!!!Tokens',
   },
+  fingerprint: {
+    id: 'wallet.assets.fingerprint',
+    defaultMessage: '!!!Fingerprint',
+  },
   auditAddressWarning: {
     id: 'wallet.receive.page.internalWarning2',
     defaultMessage: '!!!addresses are shown here for personal auditing purposes and should <strong>never</strong> be used.'

@@ -12,10 +12,14 @@ import { Tooltip, Typography } from '@mui/material';
 import type { Notification } from '../../types/notificationType';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
-const messages = defineMessages({
+export const copyableMessages: Object = defineMessages({
   copyTooltipMessage: {
     id: 'widgets.copyableaddress.addressCopyTooltipMessage',
     defaultMessage: '!!!Copy to clipboard',
+  },
+  copied: {
+    id: 'widgets.copyableaddress.copied',
+    defaultMessage: '!!!Copied',
   },
 });
 
@@ -60,7 +64,7 @@ export default class CopyableAddress extends Component<Props> {
           <Typography variant="body3">
             {notification && notification.id === elementId
               ? intl.formatMessage(notification.message)
-              : intl.formatMessage(messages.copyTooltipMessage)}
+              : intl.formatMessage(copyableMessages.copyTooltipMessage)}
           </Typography>
         }
         placement={this.props.placementTooltip}

@@ -29,9 +29,10 @@ import {
   ListItemText,
   Typography,
 } from '@mui/material';
-import { Box } from '@mui/system';
+import { Box, styled } from '@mui/system';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../../../routes-config';
+import CopyToClipboardText from '../../widgets/CopyToClipboardLabel';
 
 const SORTING_DIRECTIONS = {
   UP: 'UP',
@@ -192,14 +193,7 @@ function TokenList({
         <Typography variant="h5" color="var(--yoroi-palette-gray-900)">
           {intl.formatMessage(globalMessages.tokens)} ({list.length})
         </Typography>
-        <Input
-          sx={{
-            backgroundColor: 'var(--yoroi-palette-gray-50)',
-            borderRadius: '8px',
-            width: '370px',
-            height: '40px',
-            padding: '10px 12px',
-          }}
+        <SearchInput
           disableUnderline
           onChange={search}
           placeholder={intl.formatMessage(assetsMessage.search)}
@@ -229,7 +223,7 @@ function TokenList({
           <List>
             <ListItemLayout
               firstColumn={
-                <ButtonBase onClick={() => sortAssets(SORTING_COLUMNS.NAME)}>
+                <ButtonBase disableRipple onClick={() => sortAssets(SORTING_COLUMNS.NAME)}>
                   <Typography variant="body2" color="var(--yoroi-palette-gray-400)" mr="4px">
                     {intl.formatMessage(assetsMessage.nameAndTicker)}
                   </Typography>
@@ -238,11 +232,11 @@ function TokenList({
               }
               secondColumn={
                 <Typography variant="body2" color="var(--yoroi-palette-gray-400)">
-                  {intl.formatMessage(assetsMessage.identifier)}
+                  {intl.formatMessage(globalMessages.fingerprint)}
                 </Typography>
               }
               thirdColumn={
-                <ButtonBase onClick={() => sortAssets(SORTING_COLUMNS.AMOUNT)}>
+                <ButtonBase disableRipple onClick={() => sortAssets(SORTING_COLUMNS.AMOUNT)}>
                   <Typography variant="body2" color="var(--yoroi-palette-gray-400)" mr="4px">
                     {intl.formatMessage(assetsMessage.quantity)}
                   </Typography>
@@ -275,6 +269,14 @@ function TokenList({
   );
 }
 export default (injectIntl(observer(TokenList)): ComponentType<Props>);
+
+const SearchInput = styled(Input)({
+  backgroundColor: 'var(--yoroi-palette-gray-50)',
+  borderRadius: '8px',
+  width: '370px',
+  height: '40px',
+  padding: '10px 12px',
+});
 
 function ListItemLayout({ firstColumn, secondColumn, thirdColumn }) {
   const layoutColumns = [
@@ -338,7 +340,7 @@ function TokenItemRow({ avatar, name, id, amount, isTotalAmount }: TokenItemRowP
       }
       secondColumn={
         <Typography variant="body1" color="var(--yoroi-palette-gray-900)">
-          {truncateAddressShort(id)}
+          <CopyToClipboardText text={id}>{truncateAddressShort(id)}</CopyToClipboardText>
         </Typography>
       }
       thirdColumn={<Typography fontWeight="500">{amount}</Typography>}

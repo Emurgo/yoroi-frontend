@@ -1,15 +1,17 @@
 // @flow
 import type { Node, ComponentType } from 'react';
-import { Box, styled } from '@mui/system';
-import { Avatar, Collapse, Grid, IconButton, Typography } from '@mui/material';
+import { Box } from '@mui/system';
+import { Avatar, Link as LinkMui, Grid, Typography } from '@mui/material';
 import globalMessages from '../../../i18n/global-messages';
 import { defineMessages, injectIntl } from 'react-intl';
 import NoAssetLogo from '../../../assets/images/assets-page/asset-no.inline.svg';
-import { useState } from 'react';
-import ArrowDownSVG from '../../../assets/images/expand-arrow-grey.inline.svg';
+import LinkSvg from '../../../assets/images/link.inline.svg';
 import moment from 'moment';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { assetsMessage } from './AssetsList';
+import { Link } from 'react-router-dom';
+import { ROUTES } from '../../../routes-config';
+import CopyToClipboardText from '../../widgets/CopyToClipboardLabel';
 
 type Props = {|
   tokenInfo: void | {|
@@ -55,10 +57,6 @@ const messages = defineMessages({
   },
 });
 function TokenDetails({ tokenInfo, tokensCount, intl }: Props & Intl): Node {
-  const [expanded, setExpanded] = useState(true);
-  const handleExpandClick = () => {
-    setExpanded(!expanded);
-  };
   if (tokenInfo == null) return null;
   return (
     <Box>
@@ -69,7 +67,18 @@ function TokenDetails({ tokenInfo, tokensCount, intl }: Props & Intl): Node {
       >
         <Typography variant="h5" color="var(--yoroi-palette-gray-600)">
           {/* eslint-disable-next-line react/no-unescaped-entities */}
-          {intl.formatMessage(globalMessages.tokens)} ({tokensCount}) ->{' '}
+          <Typography
+            as={Link}
+            replace
+            to={ROUTES.ASSETS.TOKENS}
+            variant="h5"
+            sx={{
+              color: 'var(--yoroi-palette-gray-600)',
+              textDecoration: 'none',
+            }}
+          >
+            {intl.formatMessage(globalMessages.tokens)}({tokensCount}) -&gt;{' '}
+          </Typography>
           <Typography as="span" variant="h5" color="var(--yoroi-palette-gray-900)" ml="4px">
             {tokenInfo.name}
           </Typography>
@@ -107,73 +116,76 @@ function TokenDetails({ tokenInfo, tokensCount, intl }: Props & Intl): Node {
           <Typography variant="h5" color="var(--yoroi-palette-gray-900)">
             {intl.formatMessage(messages.details)}
           </Typography>
-          <ExpandMore
-            expand={expanded}
-            onClick={handleExpandClick}
-            aria-expanded={expanded}
-            aria-label="show more"
-          >
-            <ArrowDownSVG />
-          </ExpandMore>
         </Box>
-        <Collapse in={expanded} timeout="auto" unmountOnExit>
-          <Grid
-            container
-            paddingTop="32px"
-            paddingBottom="24px"
-            borderBottom="1px solid var(--yoroi-palette-gray-50)"
-          >
-            <Grid item xs={4}>
-              <LabelWithValue
-                label={intl.formatMessage(messages.ticker)}
-                value={tokenInfo.ticker}
-              />
-            </Grid>
-            <Grid item xs={4}>
-              <LabelWithValue
-                label={intl.formatMessage(messages.created)}
-                value={tokenInfo.lastUpdatedAt ? moment(tokenInfo.lastUpdatedAt).format('LL') : '-'}
-              />
-            </Grid>
-            <Grid item xs={4}>
-              <LabelWithValue
-                label={intl.formatMessage(messages.detailsOn)}
-                value={tokenInfo.type}
-              />
-            </Grid>
+        <Grid
+          container
+          paddingTop="32px"
+          paddingBottom="24px"
+          borderBottom="1px solid var(--yoroi-palette-gray-50)"
+        >
+          <Grid item xs={4}>
+            <LabelWithValue label={intl.formatMessage(messages.ticker)} value={tokenInfo.ticker} />
           </Grid>
-          <Box marginTop="22px">
-            <LabelWithValue label={intl.formatMessage(messages.identifier)} value={tokenInfo.id} />
-          </Box>
-          <Box marginTop="22px">
+          <Grid item xs={4}>
+            {/* TODO: replace with created date */}
             <LabelWithValue
-              label={intl.formatMessage(messages.policyId)}
-              value={tokenInfo.policyId}
+              label={intl.formatMessage(messages.created)}
+              value={tokenInfo.lastUpdatedAt ? moment(tokenInfo.lastUpdatedAt).format('LL') : '-'}
             />
-          </Box>
-          {/* TODO: add description */}
-          {/* <Box marginTop="22px"> */}
-          {/*  <LabelWithValue label="Description" value={'lorem ips'} /> */}
-          {/* </Box> */}
-        </Collapse>
+          </Grid>
+          <Grid item xs={4}>
+            <LabelWithValue
+              label={
+                <>
+                  <Typography as="span" display="flex">
+                    {intl.formatMessage(messages.detailsOn)}
+                    <Typography as="span" ml="4px">
+                      <LinkSvg />
+                    </Typography>
+                  </Typography>
+                </>
+              }
+              value={
+                <LinkMui
+                  target="_blank"
+                  href={`https://cardanoscan.io/token/${tokenInfo.policyId}${tokenInfo.assetName}`}
+                  rel="noopener noreferrer"
+                  sx={{ textDecoration: 'none' }}
+                >
+                  Cardanoscan
+                </LinkMui>
+              }
+            />
+          </Grid>
+        </Grid>
+        <Box marginTop="22px">
+          <LabelWithValue
+            label={intl.formatMessage(globalMessages.fingerprint)}
+            value={
+              <CopyToClipboardText text={tokenInfo.policyId}>{tokenInfo.id}</CopyToClipboardText>
+            }
+          />
+        </Box>
+        <Box marginTop="22px">
+          <LabelWithValue
+            label={intl.formatMessage(messages.policyId)}
+            value={
+              <CopyToClipboardText text={tokenInfo.policyId}>
+                {tokenInfo.policyId}
+              </CopyToClipboardText>
+            }
+          />
+        </Box>
+        {/* TODO: add description */}
+        {/* <Box marginTop="22px"> */}
+        {/*  <LabelWithValue label="Description" value={'lorem ips'} /> */}
+        {/* </Box> */}
       </Box>
     </Box>
   );
 }
 
 export default (injectIntl(TokenDetails): ComponentType<Props>);
-
-const ExpandMore = styled(props => {
-  // eslint-disable-next-line no-unused-vars
-  const { expand, ...other } = props;
-  return <IconButton {...other} />;
-})(({ theme, expand }) => ({
-  transform: expand ? 'rotate(0deg)' : 'rotate(180deg)',
-  marginLeft: 'auto',
-  transition: theme.transitions.create('transform', {
-    duration: theme.transitions.duration.shortest,
-  }),
-}));
 
 function LabelWithValue({ label, value }: {| label: string, value: string |}): Node {
   return (
