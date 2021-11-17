@@ -155,8 +155,6 @@ signTx.addEventListener('click', () => {
     // all of these are taken from the mainnet genesis settings
     // linear fee parameters (a*size + b)
     CardanoWasm.LinearFee.new(CardanoWasm.BigNum.from_str('44'), CardanoWasm.BigNum.from_str('155381')),
-    // minimum utxo value
-    CardanoWasm.BigNum.from_str('1000000'),
     // pool deposit
     CardanoWasm.BigNum.from_str('500000000'),
     // key deposit
@@ -165,6 +163,8 @@ signTx.addEventListener('click', () => {
     5000,
     // maxTxBytes
     16384,
+    // coinsPerUtxoWord
+    CardanoWasm.BigNum.from_str('34482'),
   )
 
   // add a keyhash input - for ADA held in a Shelley-era normal address (Base, Enterprise, Pointer)
