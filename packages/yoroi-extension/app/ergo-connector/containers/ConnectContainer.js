@@ -134,6 +134,17 @@ export default class ConnectContainer extends Component<
     const wallets = this.generated.stores.connector.wallets;
     const error = this.generated.stores.connector.errorWallets;
     const loadingWallets = this.generated.stores.connector.loadingWallets;
+    const protocol = this.generated.stores.connector.protocol;
+    let network = ''
+    if (protocol === 'ergo') {
+      network = networks.ErgoMainnet.NetworkName
+    } else if (protocol === 'cardano') {
+      /**
+       * For Cardano we are displaying all type of wallet main and test net wallets
+       * So will name the network "Cardano" for now until we apply the filter.
+       */
+      network = 'Cardano'
+    }
 
     return (
       <ConnectPage
@@ -146,7 +157,7 @@ export default class ConnectContainer extends Component<
         onCancel={this.onCancel}
         handleSubmit={this.handleSubmit}
         selected={selected}
-        network={networks.ErgoMainnet.NetworkName}
+        network={network}
         getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
         shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
       />
@@ -185,6 +196,7 @@ export default class ConnectContainer extends Component<
         currentConnectorWhitelist: Array<WhitelistEntry>,
         errorWallets: string,
         loadingWallets: $Values<typeof LoadingWalletStates>,
+        protocol: string,
       |},
       tokenInfoStore: {|
         tokenInfo: TokenInfoMap,
@@ -209,6 +221,7 @@ export default class ConnectContainer extends Component<
           wallets: stores.connector.wallets,
           errorWallets: stores.connector.errorWallets,
           loadingWallets: stores.connector.loadingWallets,
+          protocol: stores.connector.protocol,
         },
         tokenInfoStore: {
           tokenInfo: stores.tokenInfoStore.tokenInfo,

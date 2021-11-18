@@ -21,6 +21,7 @@ import type {
   AddressRow,
   TokenRow,
   TokenListInsert,
+  CardanoAssetMintMetadata,
 } from '../database/primitives/tables';
 import {
   TransactionType,
@@ -2048,8 +2049,18 @@ export async function genCardanoAssetMap(
       const tokenMetadata = metadata[identifierInMetadata];
 
       let isNft = false;
-      if (tokenMetadata && tokenMetadata.filter(m => m.key === '721').length > 0) {
-        isNft = true;
+
+      let assetMintMetadata: CardanoAssetMintMetadata[] = [];
+      if (tokenMetadata) {
+        if (tokenMetadata.filter(m => m.key === '721').length > 0) {
+          isNft = true;
+        }
+
+        assetMintMetadata = tokenMetadata.map(m => {
+          const metaObj: CardanoAssetMintMetadata = {};
+          metaObj[m.key] = m.metadata;
+          return metaObj;
+        });
       }
 
       return {
@@ -2069,7 +2080,8 @@ export async function genCardanoAssetMap(
           assetName,
           policyId,
           lastUpdatedAt,
-        }
+          assetMintMetadata
+        },
       };
     });
 
