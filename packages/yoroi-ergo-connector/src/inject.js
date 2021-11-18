@@ -74,6 +74,10 @@ const initialInject = `
         return this._auth.walletId;
     }
     
+    is_auth_enabled() {
+      return this._auth != null;
+    }
+    
     auth_sign_hex_payload(payload_hex_string) {
         if (!this._auth) {
             throw new Error('This connection does not have auth enabled!');

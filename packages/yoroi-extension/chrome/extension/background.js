@@ -654,7 +654,7 @@ async function confirmConnect(
         return;
       }
       if (onlySilent) {
-        reject(new Error('[onlySilent] No active connection'));
+        reject(new Error('[onlySilent:fail] No active connection'));
         return;
       }
       // website not on whitelist, so need to ask user to confirm connection

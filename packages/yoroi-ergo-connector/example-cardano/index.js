@@ -48,70 +48,69 @@ function createBlockiesIcon(seed) {
   })
 }
 
-function hide(el) {
-  el.style.display = 'none';
-}
-function show(el) {
-  el.style.display = 'block';
+toggleSpinner('show');
+
+function onApiConnectied(api) {
+  toggleSpinner('hide');
+  let walletDisplay = 'an anonymous Yoroi Wallet';
+
+  const authEnabled = api.is_auth_enabled();
+  if (authEnabled) {
+    const walletId = api.auth_get_wallet_id();
+    const walletPlate = textPartFromWalletChecksumImagePart(walletId);
+    walletDisplay = `Yoroi Wallet ${walletPlate}`;
+    walletIconSpan.appendChild(createBlockiesIcon(walletId));
+  }
+
+  alertSuccess(`You have access to ${walletDisplay} now`);
+  walletPlateSpan.innerHTML = walletDisplay;
+  toggleConnectionUI('status');
+  accessGranted = true;
+  cardanoApi = api;
+
+  api.on_disconnect(() => {
+    alertWarrning(`Disconnected from ${walletDisplay}`);
+    toggleConnectionUI('button');
+    walletPlateSpan.innerHTML = '';
+    walletIconSpan.innerHTML = '';
+  });
+
+  if (authEnabled) {
+    console.log('Testing auth signatures')
+    const messageJson = JSON.stringify({
+      type: 'this is a random test message object',
+      rndValue: Math.random(),
+    });
+    const messageHex = Buffer.from(messageJson).toString('hex');
+    console.log('Signing randomized message: ', JSON.stringify({
+      messageJson,
+      messageHex,
+    }))
+    api.auth_sign_hex_payload(messageHex).then(sig => {
+      console.log('Signature received: ', sig);
+      console.log('Verifying signature against the message');
+      api.auth_check_hex_payload(messageHex, sig).then(r => {
+        console.log('Signature matches message: ', r);
+      }, e => {
+        console.error('Sig check failed', e);
+      });
+    }, err => {
+      console.error('Sig failed', err);
+    });
+  }
 }
 
 cardanoAccessBtn.addEventListener('click', () => {
     toggleSpinner('show');
     const requestIdentification = cardanoAuthCheck.checked;
-    cardano.yoroi.enable({ requestIdentification, onlySilent: true }).then(function(api, err){
-        toggleSpinner('hide');
-        var walletDisplay = 'an anonymous Yoroi Wallet';
-
-        if (requestIdentification) {
-          const walletId = api.auth_get_wallet_id();
-          const walletPlate = textPartFromWalletChecksumImagePart(walletId);
-          walletDisplay = `Yoroi Wallet ${walletPlate}`;
-          walletIconSpan.appendChild(createBlockiesIcon(walletId));
-        }
-
-        alertSuccess(`You have access to ${walletDisplay} now`);
-        walletPlateSpan.innerHTML = walletDisplay;
-        hide(cardanoAccessBtnRow);
-        show(connectionStatus);
-        accessGranted = true;
-        cardanoApi = api;
-
-        api.on_disconnect(() => {
-          alertWarrning(`Disconnected from ${walletDisplay}`);
-          show(cardanoAccessBtnRow);
-          hide(connectionStatus);
-          walletPlateSpan.innerHTML = '';
-          walletIconSpan.innerHTML = '';
-        });
-
-        if (requestIdentification) {
-          console.log('Testing auth signatures')
-          const messageJson = JSON.stringify({
-            type: 'this is a random test message object',
-            rndValue: Math.random(),
-          });
-          const messageHex = Buffer.from(messageJson).toString('hex');
-          console.log('Signing randomized message: ', JSON.stringify({
-            messageJson,
-            messageHex,
-          }))
-          api.auth_sign_hex_payload(messageHex).then(sig => {
-            console.log('Signature received: ', sig);
-            console.log('Verifying signature against the message');
-            api.auth_check_hex_payload(messageHex, sig).then(r => {
-              console.log('Signature matches message: ', r);
-            }, e => {
-              console.error('Sig check failed', e);
-            });
-          }, err => {
-            console.error('Sig failed', err);
-          });
-        }
-
-    }, function (err) {
-      toggleSpinner('hide');
-      alertError(`Error: ${err}`);
-    });
+    cardano.yoroi.enable({ requestIdentification }).then(
+      function(api){
+          onApiConnectied(api);
+      },
+      function (err) {
+        alertError(`Error: ${err}`);
+      },
+    );
 })
 
 getAccountBalance.addEventListener('click', () => {
@@ -357,15 +356,6 @@ createTx.addEventListener('click', () => {
   })
 })
 
-if (typeof cardano === "undefined") {
-    alert("Cardano not found");
-} else {
-    console.log("Cardano found");
-    window.addEventListener("cardano_wallet_disconnected", function(event) {
-        console.log("Wallet Disconnect")
-    });
-}
-
 function alertError (text) {
     alertEl.className = 'alert alert-danger'
     alertEl.innerHTML = text
@@ -388,4 +378,41 @@ function toggleSpinner(status){
     } else {
         spinner.className = 'd-none'
     }
+}
+
+function toggleConnectionUI(status) {
+  if (status === 'button') {
+    connectionStatus.classList.add('d-none');
+    cardanoAccessBtnRow.classList.remove('d-none');
+  } else {
+    cardanoAccessBtnRow.classList.add('d-none');
+    connectionStatus.classList.remove('d-none');
+  }
+}
+
+const onload = window.onload;
+window.onload = function() {
+  if (onload) {
+    onload();
+  }
+  if (typeof window.cardano === "undefined") {
+    alertError("Cardano API not found");
+  } else {
+    console.log("Cardano API detected, checking connection status");
+    cardano.yoroi.enable({ requestIdentification: true, onlySilent: true }).then(
+      api => {
+        console.log('successful silent reconnection')
+        onApiConnectied(api);
+      },
+      err => {
+        if (String(err).includes('onlySilent:fail')) {
+          console.log('no silent re-connection available');
+        } else {
+          console.error('Silent reconnection failed for unknown reason!', err);
+        }
+        toggleSpinner('hide');
+        toggleConnectionUI('button');
+      }
+    );
+  }
 }
