@@ -630,6 +630,7 @@ async function confirmConnect(
     try {
       Logger.info(`whitelist: ${JSON.stringify(whitelist)}`);
       const whitelistEntry = whitelist.find((entry: WhitelistEntry) => {
+        // Whitelist is only matching if same auth or auth is not requested
         const matchingUrl = entry.url === url;
         const matchingAuthId = entry.appAuthID === appAuthID;
         const isAuthWhitelisted = entry.appAuthID != null;
@@ -745,8 +746,8 @@ chrome.runtime.onConnectExternal.addListener(port => {
         await withDb(
           async (_db, localStorageApi) => {
             const { connectedWallet } =
-              await confirmConnect(tabId, message.connectParameters, localStorageApi);
-            const accepted = connectedWallet !== null;
+              (await confirmConnect(tabId, message.connectParameters, localStorageApi)) ?? {};
+            const accepted = connectedWallet != null;
             port.postMessage({
               type: 'yoroi_connect_response/ergo',
               success: accepted
@@ -758,8 +759,8 @@ chrome.runtime.onConnectExternal.addListener(port => {
           await withDb(
             async (_db, localStorageApi) => {
               const { connectedWallet, auth } =
-                await confirmConnect(tabId, message.connectParameters, localStorageApi);
-              const accepted = connectedWallet !== null;
+                (await confirmConnect(tabId, message.connectParameters, localStorageApi)) ?? {};
+              const accepted = connectedWallet != null;
               port.postMessage({
                 type: 'yoroi_connect_response/cardano',
                 success: accepted,

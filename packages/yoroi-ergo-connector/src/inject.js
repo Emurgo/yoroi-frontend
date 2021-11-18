@@ -10,6 +10,8 @@ const initialInject = `
     if (event.data.type == "connector_connected") {
       if (event.data.err !== undefined) {
         connectRequests.forEach(promise => promise.reject(event.data.err));
+      } else if (!event.data.success) { 
+        connectRequests.forEach(promise => promise.reject(new Error('user reject')));
       } else {
         connectRequests.forEach(promise => promise.resolve(event.data.auth));
       }
@@ -67,6 +69,10 @@ const initialInject = `
       });
     }
     
+    is_auth_enabled() {
+      return this._auth != null;
+    }
+    
     auth_get_wallet_id() {
         if (!this._auth) {
             throw new Error('This connection does not have auth enabled!');
@@ -74,8 +80,11 @@ const initialInject = `
         return this._auth.walletId;
     }
     
-    is_auth_enabled() {
-      return this._auth != null;
+    auth_get_wallet_pubkey() {
+        if (!this._auth) {
+            throw new Error('This connection does not have auth enabled!');
+        }
+        return this._auth.pubkey;
     }
     
     auth_sign_hex_payload(payload_hex_string) {

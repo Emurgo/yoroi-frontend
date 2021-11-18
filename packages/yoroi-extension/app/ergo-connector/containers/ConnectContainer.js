@@ -75,15 +75,21 @@ export default class ConnectContainer extends Component<
 
     const connector = this.generated.actions.connector;
 
+    const url = chromeMessage.url;
     const appAuthID = chromeMessage.appAuthID;
+
     const authEntry = await ConnectorStore
       .createAuthEntry({ appAuthID, deriver, checksum });
 
     const publicDeriverId = deriver.getPublicDeriverId();
     const result = this.generated.stores.connector.currentConnectorWhitelist;
-    const whitelist = result.length ? [...result] : [];
+
+    // Removing any previous whitelisted connections for the same url
+    const whitelist = (result.length ? [...result] : [])
+      .filter(e => e.url !== url);
+
     whitelist.push({
-      url: chromeMessage.url,
+      url,
       publicDeriverId,
       appAuthID,
       auth: authEntry,

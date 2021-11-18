@@ -57,6 +57,9 @@ function onApiConnectied(api) {
   const authEnabled = api.is_auth_enabled();
   if (authEnabled) {
     const walletId = api.auth_get_wallet_id();
+    const pubkey = api.auth_get_wallet_pubkey();
+    console.log('Auth acquired successfully: ',
+      JSON.stringify({ walletId, pubkey }));
     const walletPlate = textPartFromWalletChecksumImagePart(walletId);
     walletDisplay = `Yoroi Wallet ${walletPlate}`;
     walletIconSpan.appendChild(createBlockiesIcon(walletId));
