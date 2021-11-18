@@ -57,7 +57,6 @@ const initialInject = `
   class CardanoAPI {
   
     constructor(auth) {
-      this._initTimestamp = Date.now()
       this._auth = auth;
       this._disconnection = [false];
       const self = this;
@@ -69,79 +68,90 @@ const initialInject = `
       });
     }
     
-    is_auth_enabled() {
+    getNetworkId() {
+      // TODO
+      throw new Error('Not implemented yet');
+    }
+    
+    isAuthEnabled() {
       return this._auth != null;
     }
     
-    auth_get_wallet_id() {
-        if (!this._auth) {
-            throw new Error('This connection does not have auth enabled!');
-        }
-        return this._auth.walletId;
+    authGetWalletId() {
+      if (!this._auth) {
+        throw new Error('This connection does not have auth enabled!');
+      }
+      return this._auth.walletId;
     }
     
-    auth_get_wallet_pubkey() {
-        if (!this._auth) {
-            throw new Error('This connection does not have auth enabled!');
-        }
-        return this._auth.pubkey;
+    authGetWalletPubkey() {
+      if (!this._auth) {
+        throw new Error('This connection does not have auth enabled!');
+      }
+      return this._auth.pubkey;
     }
     
-    auth_sign_hex_payload(payload_hex_string) {
-        if (!this._auth) {
-            throw new Error('This connection does not have auth enabled!');
-        }
-        return this._cardano_rpc_call("auth_sign_hex_payload/cardano", [payload_hex_string]);
+    authSignHexPayload(payload_hex_string) {
+      if (!this._auth) {
+        throw new Error('This connection does not have auth enabled!');
+      }
+      return this._cardano_rpc_call("auth_sign_hex_payload/cardano", [payload_hex_string]);
     }
 
-    auth_check_hex_payload(payload_hex_string, signature_hex_string) {
-        if (!this._auth) {
-            throw new Error('This connection does not have auth enabled!');
-        }
-        return this._cardano_rpc_call("auth_check_hex_payload/cardano", [payload_hex_string, signature_hex_string]);
+    authCheckHexPayload(payload_hex_string, signature_hex_string) {
+      if (!this._auth) {
+        throw new Error('This connection does not have auth enabled!');
+      }
+      return this._cardano_rpc_call("auth_check_hex_payload/cardano", [payload_hex_string, signature_hex_string]);
     }
 
-    getInitTimestamp(){
-      return this._initTimestamp;
-    }
-
-    get_balance(token_id = 'ADA') {
+    getBalance(token_id = 'ADA') {
       return this._cardano_rpc_call("get_balance", [token_id]);
     }
 
-    get_used_addresses(paginate = undefined) {
+    getUsedAddresses(paginate = undefined) {
       return this._cardano_rpc_call("get_used_addresses", [paginate]);
     }
 
-    get_unused_addresses() {
+    getUnusedAddresses() {
       return this._cardano_rpc_call("get_unused_addresses", []);
     }
 
-    get_change_address() {
+    getRewardAddresses() {
+      // TODO
+      throw new Error('Not implemented yet');
+    }
+
+    getChangeAddress() {
       return this._cardano_rpc_call("get_change_address", []);
     }
 
-    get_utxos(amount = undefined, token_id = 'ADA', paginate = undefined) {
+    getUtxos(amount = undefined, token_id = 'ADA', paginate = undefined) {
       return this._cardano_rpc_call("get_utxos", [amount, token_id, paginate]);
     }
 
-    submit_tx(tx) {
+    submitTx(tx) {
       return this._cardano_rpc_call('submit_tx', [tx]);
     }
 
-    sign_tx(tx, partialSign = false) {
+    signTx(tx, partialSign = false) {
       return this._cardano_rpc_call('sign_tx/cardano', [{ tx, partialSign }]);
     }
 
-    create_tx(req) {
-        return this._cardano_rpc_call("create_tx/cardano", [req]);
+    signData(address, sigStructure) {
+      // TODO
+      throw new Error('Not implemented yet');
+    }
+
+    createTx(req) {
+      return this._cardano_rpc_call("create_tx/cardano", [req]);
     }
     
-    on_disconnect(callback) {
-        if (this._disconnection[0]) {
-            throw new Error('Cardano API instance is already disconnected!');
-        }
-        this._disconnection.push(callback);
+    onDisconnect(callback) {
+      if (this._disconnection[0]) {
+        throw new Error('Cardano API instance is already disconnected!');
+      }
+      this._disconnection.push(callback);
     }
 
     _cardano_rpc_call(func, params) {
@@ -191,7 +201,7 @@ const initialInject = `
     '${WALLET_NAME}': {
       enable: cardano_request_read_access,
       isEnabled: cardano_check_read_access,
-      version: '${API_VERSION}',
+      apiVersion: '${API_VERSION}',
       name: '${WALLET_NAME}',
     }
   };

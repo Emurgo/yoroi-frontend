@@ -54,10 +54,10 @@ function onApiConnectied(api) {
   toggleSpinner('hide');
   let walletDisplay = 'an anonymous Yoroi Wallet';
 
-  const authEnabled = api.is_auth_enabled();
+  const authEnabled = api.isAuthEnabled();
   if (authEnabled) {
-    const walletId = api.auth_get_wallet_id();
-    const pubkey = api.auth_get_wallet_pubkey();
+    const walletId = api.authGetWalletId();
+    const pubkey = api.authGetWalletPubkey();
     console.log('Auth acquired successfully: ',
       JSON.stringify({ walletId, pubkey }));
     const walletPlate = textPartFromWalletChecksumImagePart(walletId);
@@ -71,7 +71,7 @@ function onApiConnectied(api) {
   accessGranted = true;
   cardanoApi = api;
 
-  api.on_disconnect(() => {
+  api.onDisconnect(() => {
     alertWarrning(`Disconnected from ${walletDisplay}`);
     toggleConnectionUI('button');
     walletPlateSpan.innerHTML = '';
@@ -89,10 +89,10 @@ function onApiConnectied(api) {
       messageJson,
       messageHex,
     }))
-    api.auth_sign_hex_payload(messageHex).then(sig => {
+    api.authSignHexPayload(messageHex).then(sig => {
       console.log('Signature received: ', sig);
       console.log('Verifying signature against the message');
-      api.auth_check_hex_payload(messageHex, sig).then(r => {
+      api.authCheckHexPayload(messageHex, sig).then(r => {
         console.log('Signature matches message: ', r);
       }, e => {
         console.error('Sig check failed', e);
@@ -121,7 +121,7 @@ getAccountBalance.addEventListener('click', () => {
         alertError('Should request access first')
     } else {
         toggleSpinner('show')
-        cardanoApi.get_balance().then(function(balance) {
+        cardanoApi.getBalance().then(function(balance) {
             toggleSpinner('hide')
             alertSuccess(`Account Balance: ${balance}`)
         });
@@ -133,7 +133,7 @@ getUnUsedAddresses.addEventListener('click', () => {
        alertError('Should request access first')
     } else {
         toggleSpinner('show')
-        cardanoApi.get_unused_addresses().then(function(addresses) {
+        cardanoApi.getUnusedAddresses().then(function(addresses) {
             toggleSpinner('hide')
             if(addresses.length === 0){
                 alertWarrning('No unused addresses')
@@ -150,7 +150,7 @@ getUsedAddresses.addEventListener('click', () => {
        alertError('Should request access first')
     } else {
         toggleSpinner('show')
-        cardanoApi.get_used_addresses().then(function(addresses) {
+        cardanoApi.getUsedAddresses().then(function(addresses) {
             toggleSpinner('hide')
            if(addresses.length === 0){
                alertWarrning('No used addresses')
@@ -167,7 +167,7 @@ getChangeAddress.addEventListener('click', () => {
         alertError('Should request access first')
     } else {
         toggleSpinner('show')
-        cardanoApi.get_change_address().then(function(address) {
+        cardanoApi.getChangeAddress().then(function(address) {
             toggleSpinner('hide')
             if(address.length === 0){
                 alertWarrning('No change addresses')
@@ -186,7 +186,7 @@ getUtxos.addEventListener('click', () => {
         return
     }
     toggleSpinner('show')
-    cardanoApi.get_utxos().then(utxosResponse => {
+    cardanoApi.getUtxos().then(utxosResponse => {
         toggleSpinner('hide')
         if(utxosResponse.length === 0){
             alertWarrning('NO UTXOS')
@@ -209,7 +209,7 @@ submitTx.addEventListener('click', () => {
   }
 
   toggleSpinner('show')
-  cardanoApi.submit_tx(transactionHex).then(txId => {
+  cardanoApi.submitTx(transactionHex).then(txId => {
     toggleSpinner('hide')
     alertSuccess(`Transaction ${txId} submitted`);
   }).catch(error => {
@@ -296,7 +296,7 @@ signTx.addEventListener('click', () => {
   const txBody = txBuilder.build()
   const txHex = Buffer.from(txBody.to_bytes()).toString('hex')
 
-  cardanoApi.sign_tx(txHex, true).then(witnessSetHex => {
+  cardanoApi.signTx(txHex, true).then(witnessSetHex => {
     toggleSpinner('hide')
 
     const witnessSet = CardanoWasm.TransactionWitnessSet.from_bytes(
@@ -348,7 +348,7 @@ createTx.addEventListener('click', () => {
     ]
   }
   
-  cardanoApi.create_tx(txReq, true).then(txHex => {
+  cardanoApi.createTx(txReq, true).then(txHex => {
     toggleSpinner('hide')
     alertSuccess('Creating tx succeeds: ' + txHex)
     transactionHex = txHex
