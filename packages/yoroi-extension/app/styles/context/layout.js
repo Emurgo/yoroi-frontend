@@ -2,7 +2,7 @@
 import React from 'react';
 import type { Node } from 'react';
 
-type Layouts = 'CLASSIC' | 'REVAMP';
+export type Layouts = 'CLASSIC' | 'REVAMP';
 export type LayoutComponentMap = {|
   [key: Layouts]: Node,
 |};
