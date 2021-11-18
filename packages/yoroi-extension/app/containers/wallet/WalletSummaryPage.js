@@ -215,6 +215,8 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
               publicDeriver,
             })
           }
+          toggleIncludeTxIds={this.generated.stores.transactions.toggleIncludeTxIds}
+          shouldIncludeTxIds={this.generated.stores.transactions.shouldIncludeTxIds}
           cancel={closeExportTransactionDialog.trigger}
         />
       );
@@ -467,6 +469,8 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
         exportError: ?LocalizableError,
         hasAny: boolean,
         isExporting: boolean,
+        shouldIncludeTxIds: boolean,
+        toggleIncludeTxIds: void => void,
         lastSyncInfo: IGetLastSyncInfoResponse,
         recent: Array<WalletTransaction>,
         recentTransactionsRequest: {|
@@ -551,6 +555,8 @@ export default class WalletSummaryPage extends Component<InjectedOrGenerated<Gen
           unconfirmedAmount: stores.transactions.unconfirmedAmount,
           isExporting: stores.transactions.isExporting,
           exportError: stores.transactions.exportError,
+          shouldIncludeTxIds: stores.transactions.shouldIncludeTxIds,
+          toggleIncludeTxIds: stores.transactions.toggleIncludeTxIds,
         },
         addresses: {
           addressSubgroupMap: stores.addresses.addressSubgroupMap,
