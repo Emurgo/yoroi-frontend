@@ -1,6 +1,6 @@
 // sets up RPC communication with the connector + access check/request functions
 const WALLET_NAME = 'yoroi';
-const API_VERSION = '0.1.0';
+const API_VERSION = '0.2.0';
 
 const initialInject = `
 (() => {
@@ -53,11 +53,67 @@ const initialInject = `
       }
     }
   });
-
-  class CardanoAPI {
   
-    constructor(auth) {
+  
+  function cardano_rpc_call(func, params) {
+    return new Promise(function(resolve, reject) {
+      window.postMessage({
+        type: "connector_rpc_request",
+        protocol: "cardano",
+        uid: cardanoRpcUid,
+        function: func,
+        params: params
+      }, location.origin);
+      console.log("cardanoRpcUid = " + cardanoRpcUid);
+      cardanoRpcResolver.set(cardanoRpcUid, { resolve: resolve, reject: reject });
+      cardanoRpcUid += 1;
+    });
+  }
+
+  function cardano_request_read_access(cardanoAccessRequest) {
+    const { requestIdentification, onlySilent } = (cardanoAccessRequest || {});
+    return new Promise(function(resolve, reject) {
+      window.postMessage({
+        type: "connector_connect_request/cardano",
+        requestIdentification,
+        onlySilent,
+      }, location.origin);
+      connectRequests.push({
+        resolve: (auth) => {
+            console.log(JSON.stringify(auth));
+            resolve(Object.freeze(new CardanoAPI(auth, cardano_rpc_call)));
+        },
+        reject: reject
+      });
+    });
+  }
+
+  function cardano_check_read_access() {
+    if (typeof cardano !== "undefined") {
+      return cardano._cardano_rpc_call("ping", []);
+    } else {
+      return Promise.resolve(false);
+    }
+  }
+  
+  window.cardano = {
+    ...(window.cardano||{}),
+    '${WALLET_NAME}': {
+      enable: cardano_request_read_access,
+      isEnabled: cardano_check_read_access,
+      apiVersion: '${API_VERSION}',
+      name: '${WALLET_NAME}',
+    }
+  };
+})();
+`
+
+const cardanoApiInject = `
+class CardanoAPI {
+  
+    constructor(auth, rpc) {
       this._auth = auth;
+      this._cardano_rpc_call = rpc;
       this._disconnection = [false];
       const self = this;
       window.addEventListener('yoroi_wallet_disconnected', function() {
@@ -97,52 +153,52 @@ const initialInject = `
       }
       return this._cardano_rpc_call("auth_sign_hex_payload/cardano", [payload_hex_string]);
     }
-
+    
     authCheckHexPayload(payload_hex_string, signature_hex_string) {
       if (!this._auth) {
         throw new Error('This connection does not have auth enabled!');
       }
       return this._cardano_rpc_call("auth_check_hex_payload/cardano", [payload_hex_string, signature_hex_string]);
     }
-
+    
     getBalance(token_id = 'ADA') {
       return this._cardano_rpc_call("get_balance", [token_id]);
     }
-
+    
     getUsedAddresses(paginate = undefined) {
       return this._cardano_rpc_call("get_used_addresses", [paginate]);
     }
-
+    
     getUnusedAddresses() {
       return this._cardano_rpc_call("get_unused_addresses", []);
     }
-
+    
     getRewardAddresses() {
       // TODO
       throw new Error('Not implemented yet');
     }
-
+    
     getChangeAddress() {
       return this._cardano_rpc_call("get_change_address", []);
     }
-
+    
     getUtxos(amount = undefined, token_id = 'ADA', paginate = undefined) {
       return this._cardano_rpc_call("get_utxos", [amount, token_id, paginate]);
     }
-
+    
     submitTx(tx) {
       return this._cardano_rpc_call('submit_tx', [tx]);
     }
-
+    
     signTx(tx, partialSign = false) {
       return this._cardano_rpc_call('sign_tx/cardano', [{ tx, partialSign }]);
     }
-
+    
     signData(address, sigStructure) {
       // TODO
       throw new Error('Not implemented yet');
     }
-
+    
     createTx(req) {
       return this._cardano_rpc_call("create_tx/cardano", [req]);
     }
@@ -153,62 +209,9 @@ const initialInject = `
       }
       this._disconnection.push(callback);
     }
-
-    _cardano_rpc_call(func, params) {
-      return new Promise(function(resolve, reject) {
-        window.postMessage({
-          type: "connector_rpc_request",
-          protocol: "cardano",
-          uid: cardanoRpcUid,
-          function: func,
-          params: params
-        }, location.origin);
-        console.log("cardanoRpcUid = " + cardanoRpcUid);
-        cardanoRpcResolver.set(cardanoRpcUid, { resolve: resolve, reject: reject });
-        cardanoRpcUid += 1;
-      });
-    }
-  }
-
-  function cardano_request_read_access(cardanoAccessRequest) {
-    const { requestIdentification, onlySilent } = (cardanoAccessRequest || {});
-    return new Promise(function(resolve, reject) {
-      window.postMessage({
-        type: "connector_connect_request/cardano",
-        requestIdentification,
-        onlySilent,
-      }, location.origin);
-      connectRequests.push({
-        resolve: (auth) => {
-            console.log(JSON.stringify(auth));
-            resolve(Object.freeze(new CardanoAPI(auth)));
-        },
-        reject: reject
-      });
-    });
-  }
-
-  function cardano_check_read_access() {
-    if (typeof cardano !== "undefined") {
-      return cardano._cardano_rpc_call("ping", []);
-    } else {
-      return Promise.resolve(false);
-    }
-  }
-  
-  window.cardano = {
-    ...(window.cardano||{}),
-    '${WALLET_NAME}': {
-      enable: cardano_request_read_access,
-      isEnabled: cardano_check_read_access,
-      apiVersion: '${API_VERSION}',
-      name: '${WALLET_NAME}',
-    }
-  };
-})();
+}
 `
 
-// client-facing ergo object API
 const ergoApiInject = `
 // RPC set-up
 var ergoRpcUid = 0;
@@ -286,10 +289,6 @@ class ErgoAPI {
 }
 
 const ergo = Object.freeze(new ErgoAPI());
-`
-
-const cardanoApiInject = `
-
 `
 
 const API_INTERNAL_ERROR = -2;
@@ -384,7 +383,21 @@ function createYoroiPort() {
         } else if (message.type === "yoroi_connect_response/cardano") {
             if (message.success) {
                 connectedProtocolHolder[0] = 'cardano';
-                cardanoApiInjected = true;
+                if (!cardanoApiInjected) {
+                    // inject full API here
+                    if (injectIntoPage(cardanoApiInject)) {
+                        cardanoApiInjected = true;
+                    } else {
+                        console.error()
+                        window.postMessage({
+                            type: "connector_connected",
+                            err: {
+                                code: API_INTERNAL_ERROR,
+                                info: "failed to inject Cardano API"
+                            }
+                        }, location.origin);
+                    }
+                }
             }
             window.postMessage({
                 type: "connector_connected",
