@@ -33,6 +33,7 @@ import { Box, styled } from '@mui/system';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../../../routes-config';
 import CopyToClipboardText from '../../widgets/CopyToClipboardLabel';
+import { ListEmpty } from './ListEmpty';
 
 const SORTING_DIRECTIONS = {
   UP: 'UP',
@@ -206,18 +207,7 @@ function TokenList({
       </Box>
 
       {!assetsList.length ? (
-        <Box
-          sx={{
-            height: '30vh',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <Typography variant="h1" color="var(--yoroi-palette-gray-900)">
-            {intl.formatMessage(assetsMessage.noAssetFound)}
-          </Typography>
-        </Box>
+        <ListEmpty message={intl.formatMessage(assetsMessage.noAssetFound)} />
       ) : (
         <>
           <List>
