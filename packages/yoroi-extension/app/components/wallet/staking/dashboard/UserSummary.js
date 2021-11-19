@@ -24,7 +24,7 @@ import type {
 import { getTokenName } from '../../../../stores/stateless/tokenHelpers';
 import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
 import { hiddenAmount } from '../../../../utils/strings';
-import { truncateToken } from '../../../../utils/formatters';
+import { amountWithoutZeros, truncateToken } from '../../../../utils/formatters';
 
 const messages = defineMessages({
   title: {
@@ -324,17 +324,16 @@ export default class UserSummary extends Component<Props, State> {
 
   formatTokenEntry: TokenEntry => Node = tokenEntry => {
     const tokenInfo = this.props.getTokenInfo(tokenEntry);
-    const splitAmount = tokenEntry.amount
+    const tokenAmount = tokenEntry.amount
       .shiftedBy(-tokenInfo.Metadata.numberOfDecimals)
       .toFormat(tokenInfo.Metadata.numberOfDecimals)
-      .split('.');
-
+    const splitAmount = amountWithoutZeros(tokenAmount).split('.')
     const amountNode = this.props.shouldHideBalance
       ? <>{hiddenAmount}</>
       : (
         <>
           {splitAmount[0]}
-          <span className={styles.decimal}>.{splitAmount[1]} </span>
+          <span className={styles.decimal}>{splitAmount[1] ? '.' + splitAmount[1] : null} </span>
         </>
       );
     return (

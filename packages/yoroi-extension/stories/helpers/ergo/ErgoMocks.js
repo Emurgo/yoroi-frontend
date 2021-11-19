@@ -245,7 +245,7 @@ export const genTentativeErgoTx = (
       creationHeight: 327878,
       ergoTree: Buffer.from(RustModule.SigmaRust.Address.from_base58(
         '9ew5xgVKW8u6f1qV6AbpVn1DrPT1zfNraGy6H9aTYTmXspBhxRs'
-      ).to_ergo_tree().to_bytes()).toString('hex'),
+      ).to_ergo_tree().sigma_serialize_bytes()).toString('hex'),
       boxId: 'dc18a160f90e139f4813759d86db87b7f80db228de8f6b8c493da954042881ef',
       tx_hash: '953ea849258ea1cb1d5ad79876f4f6294f091c034c2069d7f351b90fb7e1ccf1',
       tx_index: 0,

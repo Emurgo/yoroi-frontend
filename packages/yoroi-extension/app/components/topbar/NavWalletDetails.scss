@@ -46,19 +46,14 @@
 }
 
 .amount {
-  .isLoading {
-    margin-left: 9px;
-    margin-bottom: 6px;
-    @include loading-spinner('../../assets/images/spinner-dark.svg', 16);
-  }
-  font-size: 1rem;
-  font-weight: 500;
-  line-height: 20px;
-
-  .afterDecimal {
-    font-weight: 400;
-    font-size: 12px;
-  }
+    .isLoading {
+        margin-left: 9px;
+        margin-bottom: 6px;
+        @include loading-spinner("../../assets/images/spinner-dark.svg", 16);
+    }
+    font-family: var(--font-medium);
+    font-size: 16px;
+    line-height: 20px;
 }
 
 .highlightAmount {

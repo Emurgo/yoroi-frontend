@@ -590,6 +590,7 @@ Array [
         "ErrorMessage": null,
         "Extra": Object {
           "Fee": "100000",
+          "IsValid": true,
           "Metadata": null,
         },
         "Hash": "29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546",

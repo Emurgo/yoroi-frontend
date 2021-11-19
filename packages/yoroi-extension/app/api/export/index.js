@@ -19,7 +19,8 @@ export type TransactionExportRow = {|
   amount: string,
   fee: string,
   date: Date,
-  comment?: string
+  comment?: string,
+  id: string,
 |}
 
 export type CsvData = {|
@@ -66,9 +67,9 @@ export default class ExportApi {
     try {
       Logger.debug(`ExportApi::${nameof(this.exportTransactions)}: called`);
 
-      const { ticker, rows, format, fileType } = request;
+      const { ticker, rows, format, fileType, shouldIncludeTxIds } = request;
       const dlFileName = ExportApi.createDefaultFileName(request.nameSuffix);
-      const data = ExportApi.convertExportRowsToCsv(ticker, rows, format);
+      const data = ExportApi.convertExportRowsToCsv(ticker, rows, shouldIncludeTxIds, format);
       const fileResponse = ExportApi.convertCsvDataToFile(data, fileType);
 
       Logger.debug(`ExportApi::${nameof(this.exportTransactions)}: success`);
@@ -92,11 +93,12 @@ export default class ExportApi {
   static convertExportRowsToCsv(
     ticker: string,
     rows: Array<TransactionExportRow>,
-    format?: TransactionExportDataFormat = TRANSACTION_EXPORT_DATA_FORMAT.CoinTracking
+    shouldIncludeTxIds: boolean,
+    format: TransactionExportDataFormat = TRANSACTION_EXPORT_DATA_FORMAT.CoinTracking,
   ): CsvData {
     switch (format) {
       case TRANSACTION_EXPORT_DATA_FORMAT.CoinTracking:
-        return _formatExportRowsIntoCoinTrackingFormat(ticker, rows);
+        return _formatExportRowsIntoCoinTrackingFormat(ticker, rows, shouldIncludeTxIds);
       default: throw new Error('Unexpected export data format: ' + format);
     }
   }
@@ -106,7 +108,7 @@ export default class ExportApi {
    */
   static convertCsvDataToFile(
     data: CsvData,
-    fileType?: TransactionExportFileType = TRANSACTION_EXPORT_FILE_TYPE.csv
+    fileType: TransactionExportFileType = TRANSACTION_EXPORT_FILE_TYPE.csv
   ): ExportFileResponse {
     switch (fileType) {
       case TRANSACTION_EXPORT_FILE_TYPE.csv:
@@ -154,23 +156,37 @@ export const COIN_TRACKING_HEADERS = [
 
 function _formatExportRowsIntoCoinTrackingFormat(
   ticker: string,
-  rows: Array<TransactionExportRow>
+  rows: Array<TransactionExportRow>,
+  shouldIncludeTxIds: boolean,
 ): CsvData {
+  const headers = [...COIN_TRACKING_HEADERS]
+
+  if (shouldIncludeTxIds) {
+    headers.push('ID')
+  }
   return {
-    headers: COIN_TRACKING_HEADERS,
-    rows: rows.map(r => [
-      _formatExportRowTypeForCoinTracking(r.type),
-      r.type === 'in' ? r.amount : '',
-      r.type === 'in' ? ticker : '',
-      r.type === 'out' ? r.amount : '',
-      r.type === 'out' ? ticker : '',
-      r.type === 'out' ? r.fee : '',
-      r.type === 'out' ? ticker : '',
-      '',
-      '',
-      r.comment != null ? r.comment : '',
-      moment(r.date).format('YYYY-MM-DD HH:mm:ss')
-    ])
+    headers,
+    rows: rows.map(r => {
+      const row = [
+        _formatExportRowTypeForCoinTracking(r.type),
+        r.type === 'in' ? r.amount : '',
+        r.type === 'in' ? ticker : '',
+        r.type === 'out' ? r.amount : '',
+        r.type === 'out' ? ticker : '',
+        r.type === 'out' ? r.fee : '',
+        r.type === 'out' ? ticker : '',
+        '',
+        '',
+        r.comment != null ? r.comment : '',
+        moment(r.date).format('YYYY-MM-DD HH:mm:ss'),
+      ]
+
+      if (shouldIncludeTxIds) {
+        row.push(r.id ? r.id : '')
+      }
+
+      return row
+    })
   };
 }
 

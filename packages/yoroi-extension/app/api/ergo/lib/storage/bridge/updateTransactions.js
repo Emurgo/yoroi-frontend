@@ -245,7 +245,7 @@ export async function rawGetTransactions(
 
   const feeErgoTree = Buffer.from(RustModule.SigmaRust.Address.from_bytes(
     Buffer.from(config.FeeAddress, 'hex')
-  ).to_ergo_tree().to_bytes()).toString('hex');
+  ).to_ergo_tree().sigma_serialize_bytes()).toString('hex');
   const result = txsWithIOs.map((tx: ErgoTxIO) => ({
     ...tx,
     block: blockMap.get(tx.transaction.TransactionId) || null,

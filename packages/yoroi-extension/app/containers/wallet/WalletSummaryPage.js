@@ -241,6 +241,8 @@ class WalletSummaryPage extends Component<AllProps> {
               publicDeriver,
             })
           }
+          toggleIncludeTxIds={this.generated.stores.transactions.toggleIncludeTxIds}
+          shouldIncludeTxIds={this.generated.stores.transactions.shouldIncludeTxIds}
           cancel={closeExportTransactionDialog.trigger}
         />
       );
@@ -620,6 +622,8 @@ class WalletSummaryPage extends Component<AllProps> {
         showWalletEmptyBanner: boolean,
         hasAny: boolean,
         isExporting: boolean,
+        shouldIncludeTxIds: boolean,
+        toggleIncludeTxIds: void => void,
         lastSyncInfo: IGetLastSyncInfoResponse,
         recent: Array<WalletTransaction>,
         recentTransactionsRequest: {|
@@ -705,6 +709,8 @@ class WalletSummaryPage extends Component<AllProps> {
           unconfirmedAmount: stores.transactions.unconfirmedAmount,
           isExporting: stores.transactions.isExporting,
           exportError: stores.transactions.exportError,
+          shouldIncludeTxIds: stores.transactions.shouldIncludeTxIds,
+          toggleIncludeTxIds: stores.transactions.toggleIncludeTxIds,
         },
         addresses: {
           addressSubgroupMap: stores.addresses.addressSubgroupMap,
