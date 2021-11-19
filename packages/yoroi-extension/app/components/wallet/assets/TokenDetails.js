@@ -30,7 +30,7 @@ type Intl = {|
   intl: $npm$ReactIntl$IntlShape,
 |};
 
-const messages = defineMessages({
+export const tokenMessages: Object = defineMessages({
   ticker: {
     id: 'wallet.assets.ticker',
     defaultMessage: '!!!Ticker',
@@ -114,7 +114,7 @@ function TokenDetails({ tokenInfo, tokensCount, intl }: Props & Intl): Node {
           borderBottom="1px solid var(--yoroi-palette-gray-50)"
         >
           <Typography variant="h5" color="var(--yoroi-palette-gray-900)">
-            {intl.formatMessage(messages.details)}
+            {intl.formatMessage(tokenMessages.details)}
           </Typography>
         </Box>
         <Grid
@@ -124,12 +124,12 @@ function TokenDetails({ tokenInfo, tokensCount, intl }: Props & Intl): Node {
           borderBottom="1px solid var(--yoroi-palette-gray-50)"
         >
           <Grid item xs={4}>
-            <LabelWithValue label={intl.formatMessage(messages.ticker)} value={tokenInfo.ticker} />
+            <LabelWithValue label={intl.formatMessage(tokenMessages.ticker)} value={tokenInfo.ticker} />
           </Grid>
           <Grid item xs={4}>
             {/* TODO: replace with created date */}
             <LabelWithValue
-              label={intl.formatMessage(messages.created)}
+              label={intl.formatMessage(tokenMessages.created)}
               value={tokenInfo.lastUpdatedAt ? moment(tokenInfo.lastUpdatedAt).format('LL') : '-'}
             />
           </Grid>
@@ -138,7 +138,7 @@ function TokenDetails({ tokenInfo, tokensCount, intl }: Props & Intl): Node {
               label={
                 <>
                   <Typography as="span" display="flex">
-                    {intl.formatMessage(messages.detailsOn)}
+                    {intl.formatMessage(tokenMessages.detailsOn)}
                     <Typography as="span" ml="4px">
                       <LinkSvg />
                     </Typography>
@@ -168,7 +168,7 @@ function TokenDetails({ tokenInfo, tokensCount, intl }: Props & Intl): Node {
         </Box>
         <Box marginTop="22px">
           <LabelWithValue
-            label={intl.formatMessage(messages.policyId)}
+            label={intl.formatMessage(tokenMessages.policyId)}
             value={
               <CopyToClipboardText text={tokenInfo.policyId}>
                 {tokenInfo.policyId}
