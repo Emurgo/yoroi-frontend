@@ -40,6 +40,7 @@ class TokenDetailsPageRevamp extends Component<AllProps> {
       throw new Error(`Active wallet requiTokenDetails)}d for ${nameof(TokenDetailsPageRevamp)}.`);
     const spendableBalance = this.generated.stores.transactions.getBalanceRequest.result;
     const getTokenInfo = genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo);
+    const network = publicDeriver.getParent().getNetworkInfo();
 
     const assetsList =
       spendableBalance == null
@@ -50,8 +51,8 @@ class TokenDetailsPageRevamp extends Component<AllProps> {
               entry,
               info: getTokenInfo(entry),
             }))
-          .filter(item => item.info.IsNFT === false)
-          .map(token => ({
+            .filter(item => item.info.IsNFT === false)
+            .map(token => ({
               policyId: token.entry.identifier.split('.')[0],
               lastUpdatedAt: token.info.Metadata.lastUpdatedAt,
               ticker: token.info.Metadata.ticker ?? '-',
@@ -71,7 +72,7 @@ class TokenDetailsPageRevamp extends Component<AllProps> {
         height="100%"
         overflow="overlay"
       >
-        <TokenDetails tokenInfo={tokenInfo} tokensCount={assetsList.length} />
+        <TokenDetails tokenInfo={tokenInfo} tokensCount={assetsList.length} network={network} />
       </Box>
     );
   }

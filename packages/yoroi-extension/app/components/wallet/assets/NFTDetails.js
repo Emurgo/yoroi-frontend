@@ -10,7 +10,8 @@ import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../../../routes-config';
 import CopyToClipboardText from '../../widgets/CopyToClipboardLabel';
-import { tokenMessages } from './TokenDetails';
+import { getNetworkUrl, tokenMessages } from './TokenDetails';
+import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 
 type Props = {|
   nftInfo: void | {|
@@ -23,16 +24,18 @@ type Props = {|
     amount: string,
     image?: string,
   |},
-  nftsCount: number,
+  network: $ReadOnly<NetworkRow>,
+  nftsCount: number
 |};
 
 type Intl = {|
   intl: $npm$ReactIntl$IntlShape,
 |};
 
-function NFTDetails({ nftInfo, nftsCount, intl }: Props & Intl): Node {
+function NFTDetails({ nftInfo, nftsCount, network, intl }: Props & Intl): Node {
   if (nftInfo == null) return null;
   const ipfsHash = nftInfo.image != null ? nftInfo.image.replace('ipfs://', '') : '';
+  const networkUrl = getNetworkUrl(network);
 
   return (
     <Box>
@@ -110,7 +113,10 @@ function NFTDetails({ nftInfo, nftsCount, intl }: Props & Intl): Node {
                 value={
                   <LinkMui
                     target="_blank"
-                    href={`https://cardanoscan.io/token/${nftInfo.policyId}${nftInfo.assetName}`}
+                    href={
+                      networkUrl != null && `${networkUrl}/${nftInfo.policyId}${nftInfo.assetName}`
+                    }
+                    disabled={networkUrl === null}
                     rel="noopener noreferrer"
                     sx={{ textDecoration: 'none' }}
                   >

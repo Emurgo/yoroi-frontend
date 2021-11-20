@@ -12,6 +12,12 @@ import { assetsMessage } from './AssetsList';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../../../routes-config';
 import CopyToClipboardText from '../../widgets/CopyToClipboardLabel';
+import {
+  isCardanoHaskell,
+  isErgo,
+  isTestnet,
+} from '../../../api/ada/lib/storage/database/prepackaged/networks';
+import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 
 type Props = {|
   tokenInfo: void | {|
@@ -24,6 +30,7 @@ type Props = {|
     amount: string,
   |},
   tokensCount: number,
+  network: $ReadOnly<NetworkRow>,
 |};
 
 type Intl = {|
@@ -56,8 +63,21 @@ export const tokenMessages: Object = defineMessages({
     defaultMessage: '!!!Identifier',
   },
 });
-function TokenDetails({ tokenInfo, tokensCount, intl }: Props & Intl): Node {
+
+export const getNetworkUrl: ($ReadOnly<NetworkRow>) => string | void = network => {
+  if (isErgo(network)) {
+    return;
+  }
+  if (isCardanoHaskell(network) && !isTestnet(network)) {
+    return 'https://cardanoscan.io/token';
+  }
+  return 'https://testnet.cardanoscan.io/token';
+};
+
+function TokenDetails({ tokenInfo, tokensCount, network, intl }: Props & Intl): Node {
   if (tokenInfo == null) return null;
+  const networkUrl = getNetworkUrl(network);
+
   return (
     <Box>
       <Box
@@ -124,7 +144,10 @@ function TokenDetails({ tokenInfo, tokensCount, intl }: Props & Intl): Node {
           borderBottom="1px solid var(--yoroi-palette-gray-50)"
         >
           <Grid item xs={4}>
-            <LabelWithValue label={intl.formatMessage(tokenMessages.ticker)} value={tokenInfo.ticker} />
+            <LabelWithValue
+              label={intl.formatMessage(tokenMessages.ticker)}
+              value={tokenInfo.ticker}
+            />
           </Grid>
           <Grid item xs={4}>
             {/* TODO: replace with created date */}
@@ -148,7 +171,12 @@ function TokenDetails({ tokenInfo, tokensCount, intl }: Props & Intl): Node {
               value={
                 <LinkMui
                   target="_blank"
-                  href={`https://cardanoscan.io/token/${tokenInfo.policyId}${tokenInfo.assetName}`}
+                  href={
+                    networkUrl != null
+                      ? `${networkUrl}/${tokenInfo.policyId}${tokenInfo.assetName}`
+                      : ''
+                  }
+                  disabled={networkUrl === null}
                   rel="noopener noreferrer"
                   sx={{ textDecoration: 'none' }}
                 >
