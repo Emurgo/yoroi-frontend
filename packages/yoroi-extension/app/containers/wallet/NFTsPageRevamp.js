@@ -37,28 +37,21 @@ export default class NFTsPageRevamp extends Component<InjectedOrGenerated<Genera
           info: getTokenInfo(entry),
         }))
         .filter(item => item.info.IsNFT)
-        .map(token => ({
-          name: truncateToken(getTokenStrictName(token.info) ?? '-'),
-          id: getTokenIdentifierIfExists(token.info) ?? '-',
-          amount: genFormatTokenAmount(getTokenInfo)(token.entry),
-          policyId: token.entry.identifier.split('.')[0],
-          assetMintMetadata: token.info.Metadata.assetMintMetadata,
-        }))
-        .map(({ policyId, assetMintMetadata }) => ({
-          policyId,
-          assetMintMetadata: assetMintMetadata.map(item => Object.values(item)[0]),
-        }))
-        .map(item => item.assetMintMetadata[0][item.policyId])
-        .map(
-          item =>
-            Object.entries(item).map(([name, data]) => ({
-              name,
-              data,
-            }))[0]
-        )
+        .map(token => {
+          const policyId = token.entry.identifier.split('.')[0];
+          const name = truncateToken(getTokenStrictName(token.info) ?? '-');
+          return {
+            name,
+            id: getTokenIdentifierIfExists(token.info) ?? '-',
+            amount: genFormatTokenAmount(getTokenInfo)(token.entry),
+            policyId,
+            // $FlowFixMe[prop-missing]
+            nftMetadata: token.info.Metadata.assetMintMetadata?.[0]['721'][policyId][name],
+          };
+        })
         .map(item => ({
           name: item.name,
-          image: item.data.image,
+          image: item.nftMetadata?.image,
         }));
     })();
 

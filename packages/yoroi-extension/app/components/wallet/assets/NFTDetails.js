@@ -18,21 +18,21 @@ type Props = {|
     lastUpdatedAt: any,
     ticker: string,
     assetName: string,
-    name: string,
+    name: string | void,
     id: string,
     amount: string,
-    image: string,
+    image?: string,
   |},
-  tokensCount: number,
+  nftsCount: number,
 |};
 
 type Intl = {|
   intl: $npm$ReactIntl$IntlShape,
 |};
 
-function NFTDetails({ nftInfo, tokensCount, intl }: Props & Intl): Node {
+function NFTDetails({ nftInfo, nftsCount, intl }: Props & Intl): Node {
   if (nftInfo == null) return null;
-  const ipfsHash = nftInfo.image.replace('ipfs://', '');
+  const ipfsHash = nftInfo.image != null ? nftInfo.image.replace('ipfs://', '') : '';
 
   return (
     <Box>
@@ -49,7 +49,7 @@ function NFTDetails({ nftInfo, tokensCount, intl }: Props & Intl): Node {
               textDecoration: 'none',
             }}
           >
-            NFTs ({tokensCount}) -&gt;{' '}
+            NFTs ({nftsCount}) -&gt;{' '}
           </Typography>
           <Typography as="span" variant="h5" color="var(--yoroi-palette-gray-900)" ml="4px">
             {nftInfo.name}
@@ -124,9 +124,7 @@ function NFTDetails({ nftInfo, tokensCount, intl }: Props & Intl): Node {
             <LabelWithValue
               label={intl.formatMessage(globalMessages.fingerprint)}
               value={
-                <CopyToClipboardText text={nftInfo.policyId}>
-                  {nftInfo.id}
-                </CopyToClipboardText>
+                <CopyToClipboardText text={nftInfo.policyId}>{nftInfo.id}</CopyToClipboardText>
               }
             />
             <Box marginTop="22px">

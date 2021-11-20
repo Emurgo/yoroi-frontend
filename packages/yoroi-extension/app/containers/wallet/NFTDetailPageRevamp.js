@@ -50,36 +50,39 @@ class NFTDetailPageRevamp extends Component<AllProps> {
               entry,
               info: getTokenInfo(entry),
             }))
-            .map(token => ({
-              policyId: token.entry.identifier.split('.')[0],
-              lastUpdatedAt: token.info.Metadata.lastUpdatedAt,
-              ticker: token.info.Metadata.ticker ?? '-',
-              assetName: token.entry.identifier.split('.')[1] ?? '',
-              name: truncateToken(getTokenStrictName(token.info) ?? '-'),
-              id: getTokenIdentifierIfExists(token.info) ?? '-',
-              amount: genFormatTokenAmount(getTokenInfo)(token.entry),
-              assetMintMetadata: token.info.Metadata.assetMintMetadata?.[0],
-            }))
-            .map(({ assetMintMetadata, ...item }) => ({
-              ...item,
-              data: Object.values(assetMintMetadata || {})?.[0]?.[item.policyId],
-            }))
-            .map(item => ({
-              ...item,
-              data: Object.entries(item.data || {}).map(([name, data]) => ({
+            .filter(item => item.info.IsNFT)
+            .map(token => {
+              const policyId = token.entry.identifier.split('.')[0];
+              const name = truncateToken(getTokenStrictName(token.info) ?? '-');
+              return {
+                policyId,
                 name,
-                data,
-              }))?.[0],
-            }))
-            .map(({ data, ...item }) => ({ ...item, name: data?.name, image: data?.data?.image }));
-
+                lastUpdatedAt: token.info.Metadata.lastUpdatedAt,
+                ticker: token.info.Metadata.ticker ?? '-',
+                assetName: token.entry.identifier.split('.')[1] ?? '',
+                id: getTokenIdentifierIfExists(token.info) ?? '-',
+                amount: genFormatTokenAmount(getTokenInfo)(token.entry),
+                // $FlowFixMe[prop-missing]
+                nftMetadata: token.info.Metadata.assetMintMetadata?.[0]['721'][policyId][name],
+              };
+            })
+            .map(item => ({
+              policyId: item.policyId,
+              lastUpdatedAt: item.lastUpdatedAt,
+              ticker: item.ticker,
+              assetName: item.assetName,
+              id: item.id,
+              amount: item.amount,
+              name: item.name,
+              image: item.nftMetadata?.image ?? '',
+            }));
 
     const { nftId } = this.props.match.params;
     const nftInfo = nftsList.find(nft => nft.name === nftId);
 
     return (
       <Box height="100%" overflow="overlay">
-        <NFTDetails nftInfo={nftInfo} tokensCount={nftsList.length} />
+        <NFTDetails nftInfo={nftInfo} nftsCount={nftsList.length} />
       </Box>
     );
   }

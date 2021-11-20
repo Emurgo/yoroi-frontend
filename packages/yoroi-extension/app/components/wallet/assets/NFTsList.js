@@ -20,7 +20,7 @@ import { useState } from 'react';
 import { ListEmpty } from './ListEmpty';
 
 type Props = {|
-  list: Array<{| name: string, image: string |}>,
+  list: Array<{| name: string, image: string | void |}> | void,
 |};
 type Intl = {|
   intl: $npm$ReactIntl$IntlShape,
@@ -41,6 +41,7 @@ const listColumnViews = [
 
 const getDefaultColumnsView = () => listColumnViews[1];
 function NfTsList({ list, intl }: Props & Intl): Node {
+  if (list == null) return null;
   const [columns, setColumns] = useState(getDefaultColumnsView());
   const [nftList, setNftList] = useState(list);
 
@@ -108,7 +109,8 @@ function NfTsList({ list, intl }: Props & Intl): Node {
 export default (injectIntl(NfTsList): ComponentType<Props>);
 
 function NftCardImage({ ipfsUrl, name }) {
-  const ipfsHash = ipfsUrl.replace('ipfs://', '');
+  const ipfsHash = ipfsUrl != null ? ipfsUrl.replace('ipfs://', '') : '';
+
   return (
     <ImageItem sx={{ height: '100%' }}>
       <img src={`https://ipfs.io/ipfs/${ipfsHash}`} alt={name} loading="lazy" />

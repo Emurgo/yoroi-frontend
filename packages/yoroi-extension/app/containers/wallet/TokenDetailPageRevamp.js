@@ -50,7 +50,8 @@ class TokenDetailsPageRevamp extends Component<AllProps> {
               entry,
               info: getTokenInfo(entry),
             }))
-            .map(token => ({
+          .filter(item => item.info.IsNFT === false)
+          .map(token => ({
               policyId: token.entry.identifier.split('.')[0],
               lastUpdatedAt: token.info.Metadata.lastUpdatedAt,
               ticker: token.info.Metadata.ticker ?? '-',
