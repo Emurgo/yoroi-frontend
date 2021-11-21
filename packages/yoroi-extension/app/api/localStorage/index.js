@@ -202,7 +202,9 @@ export default class LocalStorageApi {
   getWhitelist: void => Promise<?Array<WhitelistEntry>> = async () => {
     const result = await getLocalItem(storageKeys.ERGO_CONNECTOR_WHITELIST);
     if (result === undefined || result === null) return undefined;
-    return JSON.parse(result);
+    const filteredWhitelist = JSON.parse(result).filter(e => e.protocol != null);
+    this.setWhitelist(filteredWhitelist);
+    return filteredWhitelist;
   }
 
   setWhitelist: (Array<WhitelistEntry> | void) => Promise<void> = value =>
