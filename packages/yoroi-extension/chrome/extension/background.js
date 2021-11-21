@@ -120,6 +120,7 @@ let connectionProtocol: string = '';
 
 type ConnectedSite = {|
   url: string,
+  protocol: string,
   appAuthID?: string,
   status: ConnectedStatus,
   pendingSigns: Map<RpcUid, PendingSign>
@@ -543,6 +544,7 @@ chrome.runtime.onMessage.addListener(async (
           connection.status.openedWindow = true;
           sendResponse(({
             url: connection.url,
+            protocol: connection.protocol,
             appAuthID: connection.appAuthID,
             imgBase64Url,
             tabId,
@@ -617,13 +619,14 @@ async function confirmConnect(
     url: string,
     requestIdentification?: boolean,
     onlySilent?: boolean,
+    protocol?: string,
   },
   localStorageApi: LocalStorageApi,
 ): Promise<{
   connectedWallet: ?PublicDeriverId,
   auth: ?WalletAuthEntry,
 }> {
-  const { url, requestIdentification, onlySilent } = connectParameters;
+  const { url, requestIdentification, onlySilent, protocol } = connectParameters;
   const isAuthRequested = Boolean(requestIdentification);
   const appAuthID = isAuthRequested ? url : undefined;
   const bounds = await getBoundsForTabWindow(tabId);
@@ -634,15 +637,17 @@ async function confirmConnect(
       const whitelistEntry = whitelist.find((entry: WhitelistEntry) => {
         // Whitelist is only matching if same auth or auth is not requested
         const matchingUrl = entry.url === url;
+        const matchingProtocol = entry.protocol === protocol;
         const matchingAuthId = entry.appAuthID === appAuthID;
         const isAuthWhitelisted = entry.appAuthID != null;
         const isAuthPermitted = isAuthWhitelisted && matchingAuthId;
-        return matchingUrl && (!isAuthRequested || isAuthPermitted);
+        return matchingUrl && matchingProtocol && (!isAuthRequested || isAuthPermitted);
       });
       if (whitelistEntry !== undefined) {
         // we already whitelisted this website, so no need to re-ask the user to confirm
         connectedSites.set(tabId, {
           url,
+          protocol,
           appAuthID,
           status: {
             publicDeriverId: whitelistEntry.publicDeriverId,
@@ -663,6 +668,7 @@ async function confirmConnect(
       // website not on whitelist, so need to ask user to confirm connection
       connectedSites.set(tabId, {
         url,
+        protocol,
         appAuthID,
         status: {
           resolve,

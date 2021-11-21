@@ -10,10 +10,19 @@ const initialInject = `
     if (event.data.type == "connector_connected") {
       if (event.data.err !== undefined) {
         connectRequests.forEach(promise => promise.reject(event.data.err));
-      } else if (!event.data.success) { 
-        connectRequests.forEach(promise => promise.reject(new Error('user reject')));
       } else {
-        connectRequests.forEach(promise => promise.resolve(event.data.auth));
+        const isSuccess = event.data.success;
+        connectRequests.forEach(promise => {
+            if (promise.protocol === 'cardano') {
+                if (isSuccess) {
+                    promise.resolve(event.data.auth);
+                } else {
+                    promise.reject(new Error('user reject'));
+                }
+            } else {
+                promise.resolve(isSuccess);
+            }
+        });
       }
     }
   });
@@ -78,6 +87,7 @@ const initialInject = `
         onlySilent,
       }, location.origin);
       connectRequests.push({
+        protocol: 'cardano',
         resolve: (auth) => {
             resolve(Object.freeze(new CardanoAPI(auth, cardano_rpc_call)));
         },
@@ -473,6 +483,7 @@ if (shouldInject()) {
                                 url: location.hostname,
                                 requestIdentification: event.data.requestIdentification,
                                 onlySilent: event.data.onlySilent,
+                                protocol,
                             },
                             protocol,
                         };

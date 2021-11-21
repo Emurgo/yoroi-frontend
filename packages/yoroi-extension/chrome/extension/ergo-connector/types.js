@@ -400,6 +400,7 @@ export type WalletAuthEntry = {|
 
 export type WhitelistEntry = {|
   url: string,
+  protocol: string,
   publicDeriverId: number,
   appAuthID?: string,
   auth?: WalletAuthEntry,
