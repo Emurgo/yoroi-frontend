@@ -72,7 +72,7 @@ class MyWalletsPage extends Component<AllProps> {
     if (isSuccess) {
       componentToRender =  (
         <ConnectedWebsitesPage
-          whitelistEntries={this.generated.stores.connector.currentConnectorWhitelist}
+          whitelistEntries={[] || this.generated.stores.connector.currentConnectorWhitelist}
           wallets={wallets}
           onRemoveWallet={this.onRemoveWallet}
           activeSites={this.generated.stores.connector.activeSites.sites}
