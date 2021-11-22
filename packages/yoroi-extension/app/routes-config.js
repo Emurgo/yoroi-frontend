@@ -55,4 +55,7 @@ export const ROUTES = {
   NOTICE_BOARD: {
     ROOT: '/notice-board',
   },
+  DAPP_CONNECTOR: {
+    CONNECTED_WEBSITES: '/connector/connected-websites'
+  }
 };

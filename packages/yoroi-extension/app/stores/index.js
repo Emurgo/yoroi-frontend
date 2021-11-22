@@ -33,7 +33,7 @@ import CoinPriceStore from './toplevel/CoinPriceStore';
 import TokenInfoStore from './toplevel/TokenInfoStore';
 import ExplorerStore from './toplevel/ExplorerStore';
 import ServerConnectionStore from './toplevel/ServerConnectionStore';
-
+import ConnectorStore from '../ergo-connector/stores/ConnectorStore'
 /** Map of var name to class. Allows dynamic lookup of class so we can init all stores one loop */
 const storeClasses = Object.freeze({
   stateFetchStore: StateFetchStore,
@@ -59,6 +59,7 @@ const storeClasses = Object.freeze({
   daedalusTransfer: DaedalusTransferStore,
   yoroiTransfer: YoroiTransferStore,
   explorers: ExplorerStore,
+  connector: ConnectorStore,
   // note: purposely exclude substores and router
 });
 
@@ -86,6 +87,7 @@ export type StoresMap = {|
   delegation: DelegationStore,
   yoroiTransfer: YoroiTransferStore,
   explorers: ExplorerStore,
+  connector: ConnectorStore,
   substores: {|
     ada: AdaStoresMap,
     jormungandr: JormungandrStoresMap,
@@ -126,6 +128,7 @@ const stores: StoresMap = (observable({
   explorers: null,
   substores: null,
   router: null,
+  connector: null,
 }): any);
 
 function initializeSubstore<T: {...}>(
