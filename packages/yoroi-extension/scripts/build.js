@@ -37,7 +37,7 @@ export function buildProd(env: string) {
   console.log('[Webpack Build]');
   console.log('-'.repeat(80));
 
-  exec(`./node_modules/.bin/webpack --config webpack/prodConfig.js --progress --profile --color --env networkName=${argv.env} --env nightly=${isNightly.toString()}`);
+  exec(`npx webpack --config webpack/prodConfig.js --progress --profile --color --env networkName=${argv.env} --env nightly=${isNightly.toString()}`);
 
   if (shouldInjectConnector) {
     buildAndCopyInjector('build/js');
