@@ -11,7 +11,7 @@ import yoroiLogo from '../../assets/images/sidebar/yoroi_logo.inline.svg';
 import yoroiLogoExpanded from '../../assets/images/sidebar/yoroi_logo_expanded.inline.svg';
 import toggleIcon from '../../assets/images/sidebar/open_sidebar.inline.svg';
 import { defineMessages } from 'react-intl';
-import connectedWebsitesIcon from '../../assets/images/sidebar/wallet-settings-2-ic.inline.svg';
+import connectedWebsitesIcon from '../../assets/images/sidebar/dapp_connector.inline.svg';
 
 const messages = defineMessages({
   connectedWebsites: {
