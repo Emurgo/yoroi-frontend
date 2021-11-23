@@ -76,6 +76,7 @@ class NFTDetailPageRevamp extends Component<AllProps> {
               amount: item.amount,
               name: item.name,
               image: item.nftMetadata?.image ?? '',
+              description: item.nftMetadata?.description ?? '',
             }));
 
     const { nftId } = this.props.match.params;

@@ -23,6 +23,7 @@ type Props = {|
     id: string,
     amount: string,
     image?: string,
+    description?: string
   |},
   network: $ReadOnly<NetworkRow>,
   nftsCount: number
@@ -143,11 +144,10 @@ function NFTDetails({ nftInfo, nftsCount, network, intl }: Props & Intl): Node {
                 }
               />
             </Box>
+            <Box marginTop="22px">
+              <LabelWithValue label="Description" value={nftInfo.description ?? ''} />
+            </Box>
           </Box>
-          {/* TODO: add description */}
-          {/* <Box marginTop="22px"> */}
-          {/*  <LabelWithValue label="Description" value={'lorem ips'} /> */}
-          {/* </Box> */}
         </Box>
       </Stack>
     </Box>
