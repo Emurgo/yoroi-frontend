@@ -930,7 +930,7 @@ declare export class ErgoStateContext {
     * Encode Ergo tree as serialized bytes
     * @returns {Uint8Array}
     */
-    to_bytes(): Uint8Array;
+    sigma_serialize_bytes(): Uint8Array;
 
     /**
      * Returns Base16-encoded serialized bytes
