@@ -42,6 +42,10 @@ class MyWalletsPage extends Component<AllProps> {
     await this.generated.actions.connector.getConnectorWhitelist.trigger();
   }
 
+  onRemoveWallet () {
+    alert('removing')
+  }
+
   render (): Node {
     const { intl } = this.context;
     const { stores } = this.generated;
@@ -68,11 +72,10 @@ class MyWalletsPage extends Component<AllProps> {
     if (isError) {
       componentToRender = <p>{error}</p>;
     }
-
     if (isSuccess) {
       componentToRender =  (
         <ConnectedWebsitesPage
-          whitelistEntries={[] || this.generated.stores.connector.currentConnectorWhitelist}
+          whitelistEntries={this.generated.stores.connector.currentConnectorWhitelist}
           wallets={wallets}
           onRemoveWallet={this.onRemoveWallet}
           activeSites={this.generated.stores.connector.activeSites.sites}
@@ -106,7 +109,7 @@ class MyWalletsPage extends Component<AllProps> {
       return this.props.generated;
     }
     if (this.props.stores == null || this.props.actions == null) {
-      throw new Error(`${nameof(MyWalletsPage)} no way to generated props`);
+      throw new Error(`${nameof(ConnectedWebsitesPage)} no way to generated props`);
     }
     const { stores, actions } = this.props;
     return Object.freeze({

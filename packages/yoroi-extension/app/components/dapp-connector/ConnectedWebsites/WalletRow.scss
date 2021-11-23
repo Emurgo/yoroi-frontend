@@ -1,0 +1,48 @@
+.component {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 5px;
+    align-items: center;
+    padding: 12px;
+    border: 1px solid #ffff;
+
+    &:hover {
+        border: 1px solid #EAEDF2;
+    }
+
+    .name {
+        color: #242838;
+        font-family: Rubik;
+        font-size: 14px;
+        letter-spacing: 0;
+        line-height: 22px;
+        margin-bottom: 6px;
+
+    }
+
+    .card {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        width: 100%;
+      
+        letter-spacing: 0;
+        line-height: 22px;
+        & .avatar {
+            margin-right: 12px;
+            img {
+                width: 32px;
+                height: 32px;
+                object-fit: cover;
+            }
+        }
+
+        & .balance {
+          font-weight: 500;
+        }
+    }
+
+
+}
+
+  

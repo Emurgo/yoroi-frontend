@@ -8,6 +8,9 @@ import NoItemsFoundImg from '../../../assets/images/dapp-connector/no-websites-c
 import { intlShape, defineMessages } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { connectorMessages } from '../../../i18n/global-messages';
+import { isErgo } from '../../../api/ada/lib/storage/database/prepackaged/networks';
+import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver';
+import WalletRow from './WalletRow';
 
 type Props = {|
     +whitelistEntries: ?Array<WhitelistEntry>,
@@ -53,8 +56,48 @@ export default class ConnectedWebsitesPage extends Component<Props> {
           return genNoResult();
         }
         return (
-          <div>
-            <div className={styles.walletList}>
+          <div className={styles.component}>
+            <div className={styles.container}>
+              <div className={styles.header}>
+                <p>Wallets</p>
+                <p>Dapps</p>
+              </div>
+              <div>
+                <div className={styles.chain}>
+                  <h1>Cardano, ADA</h1>
+                  {
+                    whitelistEntries.map(({ url, publicDeriverId }) => {
+                      const wallet = wallets.find( cacheEntry =>
+                        cacheEntry.publicDeriver.getPublicDeriverId() === publicDeriverId
+                      )
+                      if (wallet == null) {
+                        return null
+                      }
+                      if (!isErgo(wallet.publicDeriver.getParent().getNetworkInfo())) {
+                        return (
+                          <WalletRow
+                            key={url}
+                            url={url}
+                            wallet={wallet}
+                            isActiveSite
+                            onRemoveWallet={this.props.onRemoveWallet}
+                            shouldHideBalance={this.props.shouldHideBalance}
+                            getTokenInfo={this.props.getTokenInfo}
+                          />
+                        )
+                      }
+                    })
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+        )
+    }
+}
+
+/**
+<div className={styles.walletList}>
               {whitelistEntries.map(({ url, publicDeriverId }) => {
                 const wallet = wallets.find(
                 cacheEntry => cacheEntry.publicDeriver.getPublicDeriverId() === publicDeriverId
@@ -67,7 +110,4 @@ export default class ConnectedWebsitesPage extends Component<Props> {
                 );
               })}
             </div>
-          </div>
-        )
-    }
-}
+ */
