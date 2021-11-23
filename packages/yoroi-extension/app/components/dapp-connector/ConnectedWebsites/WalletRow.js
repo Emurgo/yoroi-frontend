@@ -70,7 +70,7 @@ export default class WalletRow extends Component<Props> {
               </div>
             </div>
             <div>
-              The dapp
+              <p>{url}</p>
             </div>
           </div>
         )

@@ -32,6 +32,33 @@ const messages = defineMessages({
     },
 });
 
+function checkForNetworks(wallets: Array<PublicDeriverCache>) {
+  /**
+   * Form a list of cached wallets. will look if the list has ergo wallets or cardano wallts 
+   * or both.
+   */
+  let isErgoExist = false
+  let isCardanoExist = false
+
+  for (const wallet of wallets) {
+    if (isErgo(wallet.publicDeriver.getParent().getNetworkInfo())) {
+      isErgoExist = true
+    } else {
+      isCardanoExist = true
+    }
+    // if both networks exists in the set of wallet we don't need to continue searching
+    if (isErgoExist && isCardanoExist ) return {
+      isErgoExist,
+      isCardanoExist
+    }
+  }
+
+  return {
+    isErgoExist,
+    isCardanoExist
+  }
+}
+
 @observer
 export default class ConnectedWebsitesPage extends Component<Props> {
     static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
@@ -55,6 +82,7 @@ export default class ConnectedWebsitesPage extends Component<Props> {
         if (whitelistEntries.length === 0) {
           return genNoResult();
         }
+        const { isCardanoExist, isErgoExist } = checkForNetworks(wallets)
         return (
           <div className={styles.component}>
             <div className={styles.container}>
@@ -63,6 +91,7 @@ export default class ConnectedWebsitesPage extends Component<Props> {
                 <p>Dapps</p>
               </div>
               <div>
+                {isCardanoExist &&
                 <div className={styles.chain}>
                   <h1>Cardano, ADA</h1>
                   {
@@ -86,9 +115,39 @@ export default class ConnectedWebsitesPage extends Component<Props> {
                           />
                         )
                       }
+                      return ''
                     })
                   }
                 </div>
+                }
+                {isErgoExist &&
+                <div className={styles.chain}>
+                  <h1>Ergo, ERG</h1>
+                  {
+                    whitelistEntries.map(({ url, publicDeriverId }) => {
+                      const wallet = wallets.find( cacheEntry =>
+                        cacheEntry.publicDeriver.getPublicDeriverId() === publicDeriverId
+                      )
+                      if (wallet == null) {
+                        return null
+                      }
+                      if (isErgo(wallet.publicDeriver.getParent().getNetworkInfo())) {
+                        return (
+                          <WalletRow
+                            key={url}
+                            url={url}
+                            wallet={wallet}
+                            isActiveSite
+                            onRemoveWallet={this.props.onRemoveWallet}
+                            shouldHideBalance={this.props.shouldHideBalance}
+                            getTokenInfo={this.props.getTokenInfo}
+                          />
+                        )
+                      }
+                      return ''
+                    })
+                  }
+                </div>}
               </div>
             </div>
           </div>
