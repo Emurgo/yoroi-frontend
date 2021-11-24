@@ -108,7 +108,7 @@ export default class ConnectedWebsitesPage extends Component<Props> {
                             key={url}
                             url={url}
                             wallet={wallet}
-                            isActiveSite
+                            isActiveSite={this.props.isActiveSite}
                             onRemoveWallet={this.props.onRemoveWallet}
                             shouldHideBalance={this.props.shouldHideBalance}
                             getTokenInfo={this.props.getTokenInfo}
@@ -137,7 +137,7 @@ export default class ConnectedWebsitesPage extends Component<Props> {
                             key={url}
                             url={url}
                             wallet={wallet}
-                            isActiveSite
+                            isActiveSite={this.props.activeSites.includes(url)}
                             onRemoveWallet={this.props.onRemoveWallet}
                             shouldHideBalance={this.props.shouldHideBalance}
                             getTokenInfo={this.props.getTokenInfo}
@@ -154,19 +154,3 @@ export default class ConnectedWebsitesPage extends Component<Props> {
         )
     }
 }
-
-/**
-<div className={styles.walletList}>
-              {whitelistEntries.map(({ url, publicDeriverId }) => {
-                const wallet = wallets.find(
-                cacheEntry => cacheEntry.publicDeriver.getPublicDeriverId() === publicDeriverId
-                );
-                // note: store should make sure that deleted wallets got removed from the whitelist
-                // but this is just a precaution
-                if (wallet == null) return null;
-                return (
-                  <h1>{url}.{publicDeriverId}</h1>
-                );
-              })}
-            </div>
- */

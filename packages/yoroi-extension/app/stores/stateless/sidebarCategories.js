@@ -6,6 +6,7 @@ import walletsIcon from '../../assets/images/sidebar/my_wallets.inline.svg';
 import transferIcon from '../../assets/images/sidebar/transfer_wallets.inline.svg';
 import settingsIcon from '../../assets/images/sidebar/wallet-settings-2-ic.inline.svg';
 import goBackIcon from '../../assets/images/top-bar/back-arrow-white.inline.svg';
+import dappConnectorIcon from '../../assets/images/dapp-connector/dapp-connector.inline.svg';
 import noticeBoardIcon from '../../assets/images/notice-board/notice-board.inline.svg';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import { matchRoute } from '../../utils/routing';
@@ -89,6 +90,15 @@ export const TRANSFER_PAGE: SidebarCategory = registerCategory({
   route: ROUTES.TRANSFER.ROOT,
   icon: transferIcon,
   label: globalMessages.sidebarTransfer,
+  isVisible: _request => true,
+});
+
+
+export const DAPP_CONNECTOR: SidebarCategory = registerCategory({
+  className: 'dapp-connector',
+  route: ROUTES.DAPP_CONNECTOR.CONNECTED_WEBSITES,
+  icon: dappConnectorIcon,
+  label: globalMessages.sidebarSettings,
   isVisible: _request => true,
 });
 

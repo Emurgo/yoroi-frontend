@@ -1,6 +1,6 @@
 .component {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 5fr 5fr 2fr; 
     grid-gap: 5px;
     align-items: center;
     padding: 12px;
@@ -42,7 +42,37 @@
         }
     }
 
+    .delete {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        padding-right: 25px;
+    }
 
+    .dapp {
+        & > div {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+
+            .url {
+                color: #242838;
+                font-family: Rubik;
+                font-size: 16px;
+                font-weight: 500;
+                letter-spacing: 0;
+                line-height: 24px;
+            }
+
+            .status {
+                color: #17D1AA;
+                font-family: Rubik;
+                font-size: 14px;
+                letter-spacing: 0;
+                line-height: 22px;
+            }
+        }
+    }
 }
 
   

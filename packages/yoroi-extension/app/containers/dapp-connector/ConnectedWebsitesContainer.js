@@ -30,7 +30,7 @@ type InjectedProps = {| +renderLayoutComponent: LayoutComponentMap => Node |};
 type AllProps = {| ...Props, ...InjectedProps |};
 
 @observer
-class MyWalletsPage extends Component<AllProps> {
+class ConnectedWebsitesPageContainer extends Component<AllProps> {
 
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
@@ -42,14 +42,17 @@ class MyWalletsPage extends Component<AllProps> {
     await this.generated.actions.connector.getConnectorWhitelist.trigger();
   }
 
-  onRemoveWallet () {
-    alert('removing')
-  }
+  onRemoveWallet: ?string => void = url => {
+    if (url == null) {
+      throw new Error(`Removing a wallet from whitelist but there's no url`);
+    }
+    this.generated.actions.connector.removeWalletFromWhitelist.trigger(url);
+  };
 
   render (): Node {
     const { intl } = this.context;
     const { stores } = this.generated;
-    const sidebarContainer = <SidebarContainer {...SidebarContainerProps} />
+    const sidebarContainer = <SidebarContainer {...this.generated.SidebarContainerProps} />
     const wallets = stores.connector.wallets;
     const loadingWallets = stores.connector.loadingWallets;
     const error = stores.connector.errorWallets;
@@ -174,4 +177,4 @@ class MyWalletsPage extends Component<AllProps> {
     });
   }
 }
-export default (withLayout(MyWalletsPage): ComponentType<Props>);
+export default (withLayout(ConnectedWebsitesPageContainer): ComponentType<Props>);
