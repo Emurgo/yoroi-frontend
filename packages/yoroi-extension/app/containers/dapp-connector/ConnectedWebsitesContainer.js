@@ -49,10 +49,10 @@ class MyWalletsPage extends Component<AllProps> {
   render (): Node {
     const { intl } = this.context;
     const { stores } = this.generated;
-    const sidebarContainer = <SidebarContainer {...this.generated.SidebarContainerProps} />
-    const wallets = this.generated.stores.connector.wallets;
-    const loadingWallets = this.generated.stores.connector.loadingWallets;
-    const error = this.generated.stores.connector.errorWallets;
+    const sidebarContainer = <SidebarContainer {...SidebarContainerProps} />
+    const wallets = stores.connector.wallets;
+    const loadingWallets = stores.connector.loadingWallets;
+    const error = stores.connector.errorWallets;
     const isLoading = (
       loadingWallets === LoadingWalletStates.IDLE || loadingWallets === LoadingWalletStates.PENDING
     );
@@ -100,8 +100,35 @@ class MyWalletsPage extends Component<AllProps> {
     BannerContainerProps: InjectedOrGenerated<BannerContainerData>,
     SidebarContainerProps: InjectedOrGenerated<SidebarContainerData>,
     actions: {|
+      connector: {|
+        refreshWallets: {|
+          trigger: (params: void) => Promise<void>,
+        |},
+        refreshActiveSites: {|
+          trigger: (params: void) => Promise<void>,
+        |},
+        removeWalletFromWhitelist: {|
+          trigger: (params: string) => Promise<void>,
+        |},
+        getConnectorWhitelist: {|
+          trigger: (params: void) => Promise<void>,
+        |},
+      |},
     |},
     stores: {|
+      profile: {|
+        shouldHideBalance: boolean,
+      |},
+      connector: {|
+        connectingMessage: ?ConnectingMessag,
+        wallets: Array<PublicDeriverCache>,
+        currentConnectorWhitelist: Array<WhitelistEntry>,
+        errorWallets: string,
+        loadingWallets: $Values<typeof LoadingWalletStates>,
+      |},
+      tokenInfoStore: {|
+        tokenInfo: TokenInfoMap,
+      |},
     |},
     getReceiveAddress: typeof getReceiveAddress,
     |} {

@@ -46,7 +46,9 @@ export default class WalletRow extends Component<Props> {
         onRemoveWallet,
         shouldHideBalance,
         getTokenInfo,
+        message
         } = this.props;
+
         // eslint-disable-next-line no-unused-vars
         const [_, iconComponent] = wallet.checksum
         ? constructPlate(wallet.checksum, 0, styles.icon)
@@ -57,6 +59,7 @@ export default class WalletRow extends Component<Props> {
         const shiftedAmount = defaultEntry.amount
         .shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
 
+        const faviconUrl = message?.imgBase64Url;
         return (
           <div className={styles.component}>
             <div>
@@ -70,6 +73,7 @@ export default class WalletRow extends Component<Props> {
               </div>
             </div>
             <div>
+              {faviconUrl}
               <p>{url}</p>
             </div>
           </div>
