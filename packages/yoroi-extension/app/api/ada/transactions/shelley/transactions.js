@@ -438,7 +438,6 @@ function minRequiredForChange(
   changeAdaAddr: {| ...Address, ...Addressing |},
   value: RustModule.WalletV4.Value,
   protocolParams: {
-    linearFee: RustModule.WalletV4.LinearFee,
     coinsPerUtxoWord: RustModule.WalletV4.BigNum,
     ...,
   },
@@ -740,7 +739,7 @@ function _newAdaUnsignedTxFromUtxo(
           txBuilder,
           changeAdaAddr,
           difference,
-          protocolParams
+          protocolParams,
         );
         const adaNeededLeftForChange = minimumNeededForChange.clamped_sub(difference.coin());
         if (remainingNeeded.coin().compare(adaNeededLeftForChange) < 0) {
@@ -834,7 +833,7 @@ function _newAdaUnsignedTxFromUtxo(
           txBuilder,
           changeAdaAddr,
           difference,
-          protocolParams
+          protocolParams,
         );
         if (difference.coin().compare(minimumNeededForChange) < 0) {
           throw new NotEnoughMoneyToSendError();

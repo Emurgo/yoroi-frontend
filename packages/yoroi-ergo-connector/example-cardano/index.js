@@ -152,19 +152,21 @@ signTx.addEventListener('click', () => {
   }
   
   const txBuilder = CardanoWasm.TransactionBuilder.new(
-    // all of these are taken from the mainnet genesis settings
-    // linear fee parameters (a*size + b)
-    CardanoWasm.LinearFee.new(CardanoWasm.BigNum.from_str('44'), CardanoWasm.BigNum.from_str('155381')),
-    // pool deposit
-    CardanoWasm.BigNum.from_str('500000000'),
-    // key deposit
-    CardanoWasm.BigNum.from_str('2000000'),
-    // maxValueBytes
-    5000,
-    // maxTxBytes
-    16384,
-    // coinsPerUtxoWord
-    CardanoWasm.BigNum.from_str('34482'),
+      CardanoWasm.TransactionBuilderConfigBuilder.new()
+        // all of these are taken from the mainnet genesis settings
+        // linear fee parameters (a*size + b)
+        .fee_algo(
+          CardanoWasm.LinearFee.new(
+            CardanoWasm.BigNum.from_str('44'),
+            CardanoWasm.BigNum.from_str('155381'),
+          )
+        )
+        .coins_per_utxo_word(CardanoWasm.BigNum.from_str('34482'))
+        .pool_deposit(CardanoWasm.BigNum.from_str('500000000'))
+        .key_deposit(CardanoWasm.BigNum.from_str('2000000'))
+        .max_value_size(5000)
+        .max_tx_size(16384)
+        .build()
   )
 
   // add a keyhash input - for ADA held in a Shelley-era normal address (Base, Enterprise, Pointer)

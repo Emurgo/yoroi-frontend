@@ -83,12 +83,15 @@ class Module {
       maxTxBytes,
     } = params;
     return this.WalletV4.TransactionBuilder.new(
-      linearFee,
-      poolDeposit,
-      keyDeposit,
-      maxValueBytes ?? MAX_VALUE_BYTES,
-      maxTxBytes ?? MAX_TX_BYTES,
-      coinsPerUtxoWord,
+      this.WalletV4.TransactionBuilderConfigBuilder.new()
+        .fee_algo(linearFee)
+        .pool_deposit(poolDeposit)
+        .key_deposit(keyDeposit)
+        .coins_per_utxo_word(coinsPerUtxoWord)
+        .max_value_size(maxValueBytes ?? MAX_VALUE_BYTES)
+        .max_tx_size(maxTxBytes ?? MAX_TX_BYTES)
+        .prefer_pure_change(true)
+        .build()
     );
   }
   // Need to expose through a getter to get Flow to detect the type correctly
