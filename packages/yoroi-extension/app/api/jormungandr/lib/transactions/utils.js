@@ -97,6 +97,7 @@ export function convertJormungandrTransactionsToExportRows(
             .shiftedBy(-defaultAssetRow.Metadata.numberOfDecimals)
             ?? new BigNumber(0)
         ),
+        id: tx.transaction.Hash,
       });
     }
   }
