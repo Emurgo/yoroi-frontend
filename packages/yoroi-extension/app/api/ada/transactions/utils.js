@@ -298,6 +298,7 @@ export function convertAdaTransactionsToExportRows(
             .shiftedBy(-defaultAssetRow.Metadata.numberOfDecimals)
             ?? new BigNumber(0)
         ),
+        id: tx.transaction.Hash,
       });
     }
   }
