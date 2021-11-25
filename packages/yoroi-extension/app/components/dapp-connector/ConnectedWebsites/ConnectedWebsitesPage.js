@@ -156,6 +156,9 @@ export default class ConnectedWebsitesPage extends Component<Props> {
                             onRemoveWallet={this.props.onRemoveWallet}
                             shouldHideBalance={this.props.shouldHideBalance}
                             getTokenInfo={this.props.getTokenInfo}
+                            // settingCach={
+                            //   this.props.getConceptualWallet(wallet.publicDeriver.getParent())
+                            // }
                           />
                         )
                       }

@@ -10,6 +10,7 @@ import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/
 import { getTokenName } from '../../../stores/stateless/tokenHelpers';
 import { hiddenAmount } from '../../../utils/strings';
 import DeleteIcon from '../../../assets/images/dapp-connector/delete.inline.svg';
+import WalletType from '../../topbar/WalletType';
 
 type Props = {|
     +url: ?string,
@@ -83,7 +84,7 @@ export default class WalletRow extends Component<Props, State> {
           className={styles.component}
         >
           <div>
-            <p className={styles.name}>{wallet.name} &#xb7; Paper Wallet</p>
+            <p className={styles.name}>{wallet.name}</p>
             <div className={styles.card}>
               <div className={styles.avatar}>{iconComponent}</div>
               <p className={styles.balance}>

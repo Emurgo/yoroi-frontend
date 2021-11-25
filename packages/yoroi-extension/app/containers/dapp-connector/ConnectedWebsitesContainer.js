@@ -49,6 +49,13 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
     this.generated.actions.connector.removeWalletFromWhitelist.trigger(url);
   };
 
+  getConceptualWallet(parent) {
+    const settingsCache = this.generated.stores.walletSettings
+    .getConceptualWalletSettingsCache(parent);
+
+    return settingsCache
+  }
+
   render (): Node {
     const { intl } = this.context;
     const { stores } = this.generated;
@@ -73,7 +80,7 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
       );
     }
     if (isError) {
-      componentToRender = <p>{error}</p>;
+      componentToRender = <p>{error}</p>
     }
     if (isSuccess) {
       componentToRender =  (
@@ -148,6 +155,10 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
       stores: {
         profile: {
           shouldHideBalance: stores.profile.shouldHideBalance,
+        },
+        walletSettings: {
+          getConceptualWalletSettingsCache: stores.walletSettings
+            .getConceptualWalletSettingsCache,
         },
         connector: {
           wallets: stores.connector.wallets,
