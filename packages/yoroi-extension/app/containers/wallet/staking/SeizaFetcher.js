@@ -1,7 +1,7 @@
 // @flow
 
 import { Component } from 'react';
-import type { Node } from 'react';
+import type { Node, ComponentType } from 'react';
 import { action, observable } from 'mobx';
 import { intlShape, } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
@@ -9,18 +9,26 @@ import environment from '../../../environment';
 import VerticallyCenteredLayout from '../../../components/layout/VerticallyCenteredLayout';
 import LoadingSpinner from '../../../components/widgets/LoadingSpinner';
 import { observer } from 'mobx-react';
+import { withLayout } from '../../../styles/context/layout';
+import type { Layouts } from '../../../styles/context/layout';
 
 type Props = {|
   +children?: Node,
   +urlTemplate: string,
   +locale: string,
   +totalAda: ?number,
-  +stakepoolSelectedAction: (string) => Promise<void>,
+  +stakepoolSelectedAction: string => Promise<void>,
   +poolList: Array<string>,
 |};
 
+type InjectedProps = {|
+  +selectedLayout: Layouts,
+|};
+
+type AllProps = {| ...Props, ...InjectedProps |};
+
 @observer
-export default class SeizaFetcher extends Component<Props> {
+class SeizaFetcher extends Component<AllProps> {
   static defaultProps: {|children: void|} = {
     children: undefined
   };
@@ -68,7 +76,7 @@ export default class SeizaFetcher extends Component<Props> {
     this.iframe = frame;
   }
 
-  constructor(props: Props) {
+  constructor(props: AllProps) {
     super(props);
     window.addEventListener('message', this.messageHandler, false);
   }
@@ -177,7 +185,8 @@ export default class SeizaFetcher extends Component<Props> {
     finalURL += `&delegated=${encodeURIComponent(JSON.stringify(this.props.poolList))}`;
 
     finalURL += totalAda == null ? '' : `&totalAda=${totalAda}`;
-
+    // adds selected layout to customize revamp design
+    finalURL += `&layout=${this.props.selectedLayout}`;
     return finalURL;
   }
 
@@ -193,3 +202,4 @@ export default class SeizaFetcher extends Component<Props> {
     );
   }
 }
+export default (withLayout(SeizaFetcher): ComponentType<Props>)
