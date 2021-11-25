@@ -12,6 +12,7 @@ import { getTokenName } from '../../../stores/stateless/tokenHelpers';
 import { hiddenAmount } from '../../../utils/strings';
 import DeleteIcon from '../../../assets/images/dapp-connector/delete.inline.svg';
 import WalletType from '../../widgets/WalletType';
+import type { ConceptualWalletSettingsCache } from '../../../stores/toplevel/WalletSettingsStore';
 
 type Props = {|
     +url: ?string,
@@ -20,6 +21,7 @@ type Props = {|
     +shouldHideBalance: boolean,
     +onRemoveWallet: ?string => void,
     +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
+    +settingsCache: ConceptualWalletSettingsCache | null,
 |};
 
 type State = {|
@@ -87,7 +89,8 @@ export default class WalletRow extends Component<Props, State> {
           >
             <div>
               <p className={styles.name}>
-                {wallet.name} &#xb7; <WalletType wallet={settingsCache} />
+                {wallet.name}
+                {settingsCache && <span> &#183; <WalletType wallet={settingsCache} /></span>}
               </p>
               <div className={styles.card}>
                 <div className={styles.avatar}>{iconComponent}</div>

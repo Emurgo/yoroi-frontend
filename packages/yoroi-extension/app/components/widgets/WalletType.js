@@ -5,8 +5,10 @@ import type { Node } from 'react'
 import { isCardanoHaskell } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { Bip44Wallet } from '../../api/ada/lib/storage/models/Bip44Wallet/wrapper';
 import globalMessages from '../../i18n/global-messages';
-import { isLedgerNanoWallet, isTrezorTWallet } from '../../api/ada/lib/storage/models/ConceptualWallet';
+import { ConceptualWallet, isLedgerNanoWallet, isTrezorTWallet } from '../../api/ada/lib/storage/models/ConceptualWallet';
 import { defineMessages, intlShape } from 'react-intl';
+import type { $npm$ReactIntl$MessageDescriptor, $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type { ConceptualWalletSettingsCache } from '../../stores/toplevel/WalletSettingsStore';
 
 const messages = defineMessages({
     standardWallet: {
@@ -26,6 +28,10 @@ const messages = defineMessages({
       defaultMessage: '!!!Ledger wallet',
     },
 });
+
+type Props = {|
+    wallet: ConceptualWalletSettingsCache,
+|}
 export default class WalletType extends Component<Props> {
     static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
         intl: intlShape.isRequired,

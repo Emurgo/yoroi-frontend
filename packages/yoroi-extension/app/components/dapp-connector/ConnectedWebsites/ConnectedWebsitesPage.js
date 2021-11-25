@@ -14,6 +14,7 @@ import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/
 import type {
   TokenLookupKey,
 } from '../../../api/common/lib/MultiToken';
+import type { ConceptualWalletSettingsCache } from '../../../stores/toplevel/WalletSettingsStore';
 
 type Props = {|
     +whitelistEntries: ?Array<WhitelistEntry>,
@@ -22,7 +23,7 @@ type Props = {|
     +onRemoveWallet: ?string => void,
     +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
     +shouldHideBalance: boolean,
-    +getConceptualWallet: number => ?void
+    +getConceptualWallet: number => ConceptualWalletSettingsCache | null
 |};
 
 const messages = defineMessages({

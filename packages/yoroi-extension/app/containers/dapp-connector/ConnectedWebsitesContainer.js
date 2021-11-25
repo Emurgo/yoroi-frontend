@@ -53,14 +53,13 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
     }
     this.generated.actions.connector.removeWalletFromWhitelist.trigger(url);
   };
-
-  getConceptualWallet(publicDeriverId: number): ?ConceptualWalletSettingsCache {
+  getConceptualWallet(publicDeriverId: number): ConceptualWalletSettingsCache | null {
     const wallets = this.generated.stores.wallets.publicDerivers;
     const wallet = wallets.find(
       publicDeriver => publicDeriver.getPublicDeriverId() === publicDeriverId
     )
 
-    if(!wallet) return
+    if(!wallet) return null
     const settingsCache = this.generated.stores.walletSettings
     .getConceptualWalletSettingsCache(wallet.getParent());
 
