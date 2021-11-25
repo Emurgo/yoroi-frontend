@@ -37,7 +37,7 @@ export function buildProd(env: string) {
   console.log('[Webpack Build]');
   console.log('-'.repeat(80));
 
-  exec(`./node_modules/.bin/webpack --config webpack/prodConfig.js --progress --profile --color --env networkName=${argv.env} --env nightly=${isNightly.toString()}`);
+  exec(`./node_modules/.bin/webpack --config webpack/prodConfig.js --progress --profile --color --env networkName=${argv.env} --env nightly=${isNightly.toString()} --env isLight=${!shouldInjectConnector}`);
 
   if (shouldInjectConnector) {
     buildAndCopyInjector('build/js');
@@ -92,7 +92,8 @@ export function buildDev(env: string) {
     config.baseDevConfig(
       argv.env,
       isNightly,
-      argv.ergoConnectorExtensionId
+      argv.ergoConnectorExtensionId,
+      !shouldInjectConnector
     ),
     webpack,
     webpackDevMiddleware,

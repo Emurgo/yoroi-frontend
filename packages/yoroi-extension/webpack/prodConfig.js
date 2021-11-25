@@ -49,6 +49,7 @@ const baseProdConfig = (env /*: EnvParams */) /*: * */ => ({
       true,
       JSON.parse(env.nightly),
       env.ergoConnectorExtensionId,
+      env.isLight
     )),
     new webpack.IgnorePlugin(/[^/]+\/[\S]+.dev$/),
   ],

@@ -196,6 +196,7 @@ const definePlugin = (
   isProd /*: boolean */,
   isNightly /*: boolean */,
   ergoConnectorExtensionId /*: ?string */,
+  isLight = false /** ?: boolean */
 ) /*: * */ => {
   const ERGO_CONNECTOR_EXTENSION_ID = (() => {
     if (ergoConnectorExtensionId != null) return ergoConnectorExtensionId;
@@ -203,10 +204,10 @@ const definePlugin = (
     if (isNightly) return 'chifollcalpmjdiokipacefnpmbgjnle';
     if (isProd) return 'ebnncddeiookdmpglbhiamljhpdgbjcm'; // TODO: real value for this
 
-    console.warn('Build has no ergo connector ID set and so the connector will not work');
+    console.warn('Build has no connector ID set and so the connector will not work');
     return '';
   })();
-  console.log(`Ergo connector ID set to ${ERGO_CONNECTOR_EXTENSION_ID}`);
+  console.log(`dapp connector ID set to ${ERGO_CONNECTOR_EXTENSION_ID}`);
 
   return {
     'process.env': {
@@ -216,6 +217,7 @@ const definePlugin = (
       NIGHTLY: isNightly,
       POOLS_UI_URL_FOR_YOROI: JSON.stringify(manifestEnvs.POOLS_UI_URL_FOR_YOROI),
       ERGO_CONNECTOR_EXTENSION_ID: JSON.stringify(ERGO_CONNECTOR_EXTENSION_ID),
+      IS_LIGHT: isLight ,
     }
   };
 };

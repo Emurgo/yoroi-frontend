@@ -27,6 +27,7 @@ export const environment = ((
     isJest: () => process.env.NODE_ENV === 'jest' || process.env.NODE_ENV === 'test',
     branch: process.env.BRANCH || '',
     isNightly: () => (process.env.NIGHTLY == null ? false : JSON.parse(process.env.NIGHTLY)),
+    isLight: process.env.IS_LIGHT,
     isTest: () => {
       if (typeof CONFIG === 'undefined') {
         return true;
