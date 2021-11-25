@@ -32,7 +32,19 @@ const messages = defineMessages({
     },
 });
 
-function checkForNetworks(wallets: Array<PublicDeriverCache>) {
+function walletExistInWebsitsList(
+  whitelistEntries: Array<WhitelistEntry>,
+  publicDeriverId: number) {
+  for(const website of whitelistEntries) {
+    if (website.publicDeriverId === publicDeriverId) return true
+  }
+  return false
+}
+
+function checkForNetworks(
+  wallets: Array<PublicDeriverCache>,
+  whitelistEntries: Array<WhitelistEntry>
+  ) {
   /**
    * Form a list of cached wallets. will look if the list has ergo wallets or cardano wallts 
    * or both.
@@ -41,6 +53,9 @@ function checkForNetworks(wallets: Array<PublicDeriverCache>) {
   let isCardanoExist = false
 
   for (const wallet of wallets) {
+    if(!walletExistInWebsitsList(whitelistEntries, wallet.publicDeriver.getPublicDeriverId())) {
+      continue
+    }
     if (isErgo(wallet.publicDeriver.getParent().getNetworkInfo())) {
       isErgoExist = true
     } else {
@@ -82,7 +97,7 @@ export default class ConnectedWebsitesPage extends Component<Props> {
         if (whitelistEntries.length === 0) {
           return genNoResult();
         }
-        const { isCardanoExist, isErgoExist } = checkForNetworks(wallets)
+        const { isCardanoExist, isErgoExist } = checkForNetworks(wallets, whitelistEntries)
         return (
           <div className={styles.component}>
             <div className={styles.container}>

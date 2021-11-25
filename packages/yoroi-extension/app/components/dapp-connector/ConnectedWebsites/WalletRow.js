@@ -95,7 +95,7 @@ export default class WalletRow extends Component<Props, State> {
           <div className={styles.dapp}>
             <div>
               <p className={styles.url}>{url}</p>
-              {true && <p className={styles.status}>Active</p>}
+              {isActiveSite && <p className={styles.status}>Active</p>}
             </div>
           </div>
           <div className={styles.delete}>

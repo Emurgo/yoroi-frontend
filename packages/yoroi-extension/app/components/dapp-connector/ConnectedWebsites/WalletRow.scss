@@ -2,6 +2,7 @@
     display: grid;
     grid-template-columns: 5fr 5fr 2fr; 
     grid-gap: 5px;
+    margin-bottom: 10px;
     align-items: center;
     padding: 12px;
     border: 1px solid #ffff;
@@ -30,9 +31,12 @@
         line-height: 22px;
         & .avatar {
             margin-right: 12px;
+            background-color: greenyellow;
+            overflow: hidden;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
             img {
-                width: 32px;
-                height: 32px;
                 object-fit: cover;
             }
         }
