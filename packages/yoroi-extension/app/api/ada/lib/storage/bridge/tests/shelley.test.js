@@ -397,6 +397,7 @@ async function syncingSimpleTransaction(
             TransactionId: 2,
             Extra: {
               Fee: '100000',
+              IsValid: true,
               Metadata: null,
             },
           },
@@ -461,6 +462,7 @@ async function syncingSimpleTransaction(
             TransactionId: 2,
             Extra: {
               Fee: '100000',
+              IsValid: true,
               Metadata: null,
             },
           },
