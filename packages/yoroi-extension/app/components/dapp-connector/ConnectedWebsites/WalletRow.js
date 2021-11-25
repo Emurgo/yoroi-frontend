@@ -11,6 +11,7 @@ import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/
 import { getTokenName } from '../../../stores/stateless/tokenHelpers';
 import { hiddenAmount } from '../../../utils/strings';
 import DeleteIcon from '../../../assets/images/dapp-connector/delete.inline.svg';
+import WalletType from '../../widgets/WalletType';
 
 type Props = {|
     +url: ?string,
@@ -64,6 +65,7 @@ export default class WalletRow extends Component<Props, State> {
       onRemoveWallet,
       shouldHideBalance,
       getTokenInfo,
+      settingsCache
       } = this.props;
       const { showDeleteIcon } = this.state
       // eslint-disable-next-line no-unused-vars
@@ -84,7 +86,9 @@ export default class WalletRow extends Component<Props, State> {
             className={styles.component}
           >
             <div>
-              <p className={styles.name}>{wallet.name}</p>
+              <p className={styles.name}>
+                {wallet.name} &#xb7; <WalletType wallet={settingsCache} />
+              </p>
               <div className={styles.card}>
                 <div className={styles.avatar}>{iconComponent}</div>
                 <p className={styles.balance}>

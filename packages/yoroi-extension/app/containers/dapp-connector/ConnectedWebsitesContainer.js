@@ -25,6 +25,7 @@ import { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWal
 import type { ConceptualWalletSettingsCache } from '../../stores/toplevel/WalletSettingsStore';
 import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
 import type { WhitelistEntry , PublicDeriverCache } from '../../../chrome/extension/ergo-connector/types'
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver'
 
 export type GeneratedData = typeof ConnectedWebsitesPageContainer.prototype.generated;
 
@@ -53,9 +54,15 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
     this.generated.actions.connector.removeWalletFromWhitelist.trigger(url);
   };
 
-  getConceptualWallet(parent: ConceptualWallet): ConceptualWalletSettingsCache {
+  getConceptualWallet(publicDeriverId: number): ?ConceptualWalletSettingsCache {
+    const wallets = this.generated.stores.wallets.publicDerivers;
+    const wallet = wallets.find(
+      publicDeriver => publicDeriver.getPublicDeriverId() === publicDeriverId
+    )
+
+    if(!wallet) return
     const settingsCache = this.generated.stores.walletSettings
-    .getConceptualWalletSettingsCache(parent);
+    .getConceptualWalletSettingsCache(wallet.getParent());
 
     return settingsCache
   }
@@ -94,6 +101,7 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
           activeSites={this.generated.stores.connector.activeSites.sites}
           getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
           shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
+          getConceptualWallet={this.getConceptualWallet.bind(this)}
         />)
     }
 
@@ -145,6 +153,9 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
       tokenInfoStore: {|
         tokenInfo: TokenInfoMap,
       |},
+      wallets: {|
+        publicDerivers: Array<PublicDeriver<>>,
+      |}
     |},
     getReceiveAddress: typeof getReceiveAddress,
     |} {
@@ -165,6 +176,9 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
         walletSettings: {
           getConceptualWalletSettingsCache: stores.walletSettings
             .getConceptualWalletSettingsCache,
+        },
+        wallets: {
+          publicDerivers: stores.wallets.publicDerivers,
         },
         connector: {
           wallets: stores.connector.wallets,

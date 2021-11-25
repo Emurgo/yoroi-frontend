@@ -22,6 +22,7 @@ type Props = {|
     +onRemoveWallet: ?string => void,
     +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
     +shouldHideBalance: boolean,
+    +getConceptualWallet: number => ?void
 |};
 
 const messages = defineMessages({
@@ -130,6 +131,7 @@ export default class ConnectedWebsitesPage extends Component<Props> {
                             onRemoveWallet={this.props.onRemoveWallet}
                             shouldHideBalance={this.props.shouldHideBalance}
                             getTokenInfo={this.props.getTokenInfo}
+                            settingsCache={this.props.getConceptualWallet(publicDeriverId)}
                           />
                         )
                       }
@@ -159,9 +161,7 @@ export default class ConnectedWebsitesPage extends Component<Props> {
                             onRemoveWallet={this.props.onRemoveWallet}
                             shouldHideBalance={this.props.shouldHideBalance}
                             getTokenInfo={this.props.getTokenInfo}
-                            // settingCach={
-                            //   this.props.getConceptualWallet(wallet.publicDeriver.getParent())
-                            // }
+                            settingsCache={this.props.getConceptualWallet(publicDeriverId)}
                           />
                         )
                       }
