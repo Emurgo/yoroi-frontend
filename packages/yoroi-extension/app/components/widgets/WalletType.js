@@ -6,28 +6,9 @@ import { isCardanoHaskell } from '../../api/ada/lib/storage/database/prepackaged
 import { Bip44Wallet } from '../../api/ada/lib/storage/models/Bip44Wallet/wrapper';
 import globalMessages from '../../i18n/global-messages';
 import { ConceptualWallet, isLedgerNanoWallet, isTrezorTWallet } from '../../api/ada/lib/storage/models/ConceptualWallet';
-import { defineMessages, intlShape } from 'react-intl';
+import { intlShape } from 'react-intl';
 import type { $npm$ReactIntl$MessageDescriptor, $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { ConceptualWalletSettingsCache } from '../../stores/toplevel/WalletSettingsStore';
-
-const messages = defineMessages({
-    standardWallet: {
-      id: 'wallet.nav.type.standard',
-      defaultMessage: '!!!Standard wallet',
-    },
-    paperWallet: {
-      id: 'wallet.nav.type.paper',
-      defaultMessage: '!!!Paper wallet',
-    },
-    trezorWallet: {
-      id: 'wallet.nav.type.trezor',
-      defaultMessage: '!!!Trezor wallet',
-    },
-    ledgerWallet: {
-      id: 'wallet.nav.type.ledger',
-      defaultMessage: '!!!Ledger wallet',
-    },
-});
 
 type Props = {|
     wallet: ConceptualWalletSettingsCache,
@@ -49,12 +30,12 @@ export default class WalletType extends Component<Props> {
 
     getType: ConceptualWallet => $Exact<$npm$ReactIntl$MessageDescriptor> = (wallet) => {
         if (isLedgerNanoWallet(wallet)) {
-          return messages.ledgerWallet;
+          return globalMessages.ledgerWallet;
         }
         if (isTrezorTWallet(wallet)) {
-          return messages.trezorWallet;
+          return globalMessages.trezorWallet;
         }
-        return messages.standardWallet;
+        return globalMessages.standardWallet;
     }
 
     render(): Node {

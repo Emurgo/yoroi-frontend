@@ -98,6 +98,9 @@ export const DAPP_CONNECTOR: SidebarCategory = registerCategory({
   className: 'dapp-connector',
   route: ROUTES.DAPP_CONNECTOR.CONNECTED_WEBSITES,
   icon: dappConnectorIcon,
+  // the name `Dapp Connector` name should not be translated
+  // We only added it as all these labels of the sidebar are passed
+  // to intl.formatMessage(...) -> we have to pass valid label.
   label: connectorMessages.dappConnector,
   isVisible: _request => true,
 });

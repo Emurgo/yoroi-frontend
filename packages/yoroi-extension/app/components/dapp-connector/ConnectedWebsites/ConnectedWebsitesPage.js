@@ -51,7 +51,7 @@ function checkForNetworks(
   whitelistEntries: Array<WhitelistEntry>
   ) {
   /**
-   * Form a list of cached wallets. will look if the list has ergo wallets or cardano wallts 
+   * Form a list of cached wallets. will look if the list has ergo wallets or cardano wallts
    * or both.
    */
   let isErgoExist = false
