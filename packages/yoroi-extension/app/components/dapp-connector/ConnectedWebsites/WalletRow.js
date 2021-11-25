@@ -101,6 +101,9 @@ export default class WalletRow extends Component<Props, State> {
               </div>
             </div>
             <div className={styles.dapp}>
+              <div className={styles.websiteIcon}>
+                <img src={this.props.websiteIcon} alt={url} />
+              </div>
               <div>
                 <p className={styles.url}>{url}</p>
                 {isActiveSite && <p className={styles.status}>Active</p>}

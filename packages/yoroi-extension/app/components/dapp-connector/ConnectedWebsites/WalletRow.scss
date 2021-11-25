@@ -54,6 +54,9 @@
     }
 
     .dapp {
+        display: flex;
+        align-items: center;
+
         & > div {
             display: flex;
             flex-direction: column;
@@ -75,6 +78,14 @@
                 letter-spacing: 0;
                 line-height: 22px;
             }
+        }
+
+        .websiteIcon {
+            margin-right: 10px;
+           img {
+                width: 32px;
+                height: 32px;
+           }
         }
     }
 }

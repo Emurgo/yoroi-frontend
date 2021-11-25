@@ -115,7 +115,7 @@ export default class ConnectedWebsitesPage extends Component<Props> {
                 <div className={styles.chain}>
                   <h1>Cardano, ADA</h1>
                   {
-                    whitelistEntries.map(({ url, publicDeriverId }) => {
+                    whitelistEntries.map(({ url, publicDeriverId, image }) => {
                       const wallet = wallets.find( cacheEntry =>
                         cacheEntry.publicDeriver.getPublicDeriverId() === publicDeriverId
                       )
@@ -128,6 +128,7 @@ export default class ConnectedWebsitesPage extends Component<Props> {
                             key={url}
                             url={url}
                             wallet={wallet}
+                            websiteIcon={image}
                             isActiveSite={this.props.activeSites.includes(url)}
                             onRemoveWallet={this.props.onRemoveWallet}
                             shouldHideBalance={this.props.shouldHideBalance}
@@ -145,7 +146,7 @@ export default class ConnectedWebsitesPage extends Component<Props> {
                 <div className={styles.chain}>
                   <h1>Ergo, ERG</h1>
                   {
-                    whitelistEntries.map(({ url, publicDeriverId }) => {
+                    whitelistEntries.map(({ url, publicDeriverId, image }) => {
                       const wallet = wallets.find( cacheEntry =>
                         cacheEntry.publicDeriver.getPublicDeriverId() === publicDeriverId
                       )
@@ -158,6 +159,7 @@ export default class ConnectedWebsitesPage extends Component<Props> {
                             key={url}
                             url={url}
                             wallet={wallet}
+                            websiteIcon={image}
                             isActiveSite={this.props.activeSites.includes(url)}
                             onRemoveWallet={this.props.onRemoveWallet}
                             shouldHideBalance={this.props.shouldHideBalance}

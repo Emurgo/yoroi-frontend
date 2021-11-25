@@ -63,9 +63,14 @@ export default class ConnectContainer extends Component<
     if(chromeMessage == null) {
       throw new Error(`${nameof(chromeMessage)} connecting to a wallet but no connect message found`);
     }
+    const responseMessage = this.generated.stores.connector.connectingMessage
     const result = this.generated.stores.connector.currentConnectorWhitelist;
     const whitelist = result.length ? [...result] : [];
-    whitelist.push({ url: chromeMessage.url, publicDeriverId });
+    whitelist.push({
+      url: chromeMessage.url,
+      publicDeriverId,
+      image: responseMessage?.imgBase64Url
+    });
     await this.generated.actions.connector.updateConnectorWhitelist.trigger({ whitelist });
 
     chrome.runtime.sendMessage(({
