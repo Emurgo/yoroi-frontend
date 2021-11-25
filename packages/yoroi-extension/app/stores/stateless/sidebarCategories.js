@@ -1,7 +1,7 @@
 // @flow
 import { ROUTES } from '../../routes-config';
 import type { MessageDescriptor } from 'react-intl';
-import globalMessages from '../../i18n/global-messages';
+import globalMessages, { connectorMessages } from '../../i18n/global-messages';
 import walletsIcon from '../../assets/images/sidebar/my_wallets.inline.svg';
 import transferIcon from '../../assets/images/sidebar/transfer_wallets.inline.svg';
 import settingsIcon from '../../assets/images/sidebar/wallet-settings-2-ic.inline.svg';
@@ -98,7 +98,7 @@ export const DAPP_CONNECTOR: SidebarCategory = registerCategory({
   className: 'dapp-connector',
   route: ROUTES.DAPP_CONNECTOR.CONNECTED_WEBSITES,
   icon: dappConnectorIcon,
-  label: globalMessages.sidebarSettings,
+  label: connectorMessages.dappConnector,
   isVisible: _request => true,
 });
 

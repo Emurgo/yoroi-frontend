@@ -852,6 +852,10 @@ export const connectorMessages: * = defineMessages({
     id: 'connector.settings.about',
     defaultMessage: '!!!About',
   },
+  dappConnector: {
+    id: 'connector.appName',
+    defaultMessage: 'Dapp Connector',
+  }
 });
 
 
