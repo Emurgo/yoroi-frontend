@@ -26,6 +26,8 @@ import type { ConceptualWalletSettingsCache } from '../../stores/toplevel/Wallet
 import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
 import type { WhitelistEntry , PublicDeriverCache } from '../../../chrome/extension/ergo-connector/types'
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver'
+import environment from '../../environment'
+import { ROUTES } from '../../routes-config'
 
 export type GeneratedData = typeof ConnectedWebsitesPageContainer.prototype.generated;
 
@@ -42,6 +44,12 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
   };
 
   async componentDidMount() {
+    // User should not be able to access the route when using Yoroi Light
+    if(environment.isLight) {
+      this.generated.actions.router.goToRoute.trigger({
+        route: ROUTES.WALLETS.DELEGATION_DASHBOARD
+      })
+    }
     this.generated.actions.connector.refreshWallets.trigger();
     this.generated.actions.connector.refreshActiveSites.trigger();
     await this.generated.actions.connector.getConnectorWhitelist.trigger();
@@ -134,6 +142,15 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
           trigger: (params: void) => Promise<void>,
         |},
       |},
+      router: {|
+        goToRoute: {|
+          trigger: (params: {|
+            publicDeriver?: null | PublicDeriver<>,
+            params?: ?any,
+            route: string,
+          |}) => void,
+        |},
+      |},
     |},
     stores: {|
       profile: {|
@@ -191,6 +208,9 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
         },
       },
       actions: {
+        router: {
+          goToRoute: { trigger: actions.router.goToRoute.trigger },
+        },
         connector: {
           refreshWallets: { trigger: actions.connector.refreshWallets.trigger },
           refreshActiveSites: { trigger: actions.connector.refreshActiveSites.trigger },
