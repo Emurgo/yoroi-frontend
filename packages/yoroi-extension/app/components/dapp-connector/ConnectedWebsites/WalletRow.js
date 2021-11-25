@@ -67,7 +67,8 @@ export default class WalletRow extends Component<Props, State> {
       onRemoveWallet,
       shouldHideBalance,
       getTokenInfo,
-      settingsCache
+      settingsCache,
+      websiteIcon
       } = this.props;
       const { showDeleteIcon } = this.state
       // eslint-disable-next-line no-unused-vars
@@ -87,33 +88,36 @@ export default class WalletRow extends Component<Props, State> {
             onMouseLeave={this.hideDeleteIcon}
             className={styles.component}
           >
-            <div>
-              <p className={styles.name}>
-                {wallet.name}
-                {settingsCache && <span> &#183; <WalletType wallet={settingsCache} /></span>}
-              </p>
-              <div className={styles.card}>
-                <div className={styles.avatar}>{iconComponent}</div>
-                <p className={styles.balance}>
-                  {shouldHideBalance ? hiddenAmount : shiftedAmount.toString()}{' '}
-                  <span>{getTokenName(tokenInfo)}</span>
-                </p>
-              </div>
-            </div>
-            <div className={styles.dapp}>
-              <div className={styles.websiteIcon}>
-                <img src={this.props.websiteIcon} alt={url} />
-              </div>
+            <p className={styles.name}>
+              {wallet.name}
+              {settingsCache && <span> &#183; <WalletType wallet={settingsCache} /></span>}
+            </p>
+            <div className={styles.rowWrapper}>
               <div>
-                <p className={styles.url}>{url}</p>
-                {isActiveSite && <p className={styles.status}>Active</p>}
+                <div className={styles.card}>
+                  <div className={styles.avatar}>{iconComponent}</div>
+                  <p className={styles.balance}>
+                    {shouldHideBalance ? hiddenAmount : shiftedAmount.toString()}{' '}
+                    <span>{getTokenName(tokenInfo)}</span>
+                  </p>
+                </div>
               </div>
-            </div>
-            <div className={styles.delete}>
-              {showDeleteIcon &&
+              <div className={styles.dapp}>
+                {websiteIcon &&
+                <div className={styles.websiteIcon}>
+                  <img src={websiteIcon} alt={url} />
+                </div>}
+                <div>
+                  <p className={styles.url}>{url}</p>
+                  {isActiveSite && <p className={styles.status}>Active</p>}
+                </div>
+              </div>
+              <div className={styles.delete}>
+                {showDeleteIcon &&
                 <button onClick={() => onRemoveWallet(url)} type='button'>
                   <DeleteIcon />
                 </button>}
+              </div>
             </div>
           </div>
         </div>

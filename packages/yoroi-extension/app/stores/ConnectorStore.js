@@ -127,6 +127,29 @@ function getConnectedSites(): Promise<ConnectedSites> {
   });
 }
 
+async function parseWalletsList(
+  wallets: Array<PublicDeriver<>>
+  ): Promise<Array<PublicDeriverCache>> {
+  const result = [];
+  for (const currentWallet of wallets) {
+    const conceptualInfo = await currentWallet.getParent().getFullConceptualWalletInfo();
+    const withPubKey = asGetPublicKey(currentWallet);
+
+    const canGetBalance = asGetBalance(currentWallet);
+    const balance = canGetBalance == null
+      ? new MultiToken([], currentWallet.getParent().getDefaultToken())
+      : await canGetBalance.getBalance();
+    result.push({
+      publicDeriver: currentWallet,
+      name: conceptualInfo.Name,
+      balance,
+      checksum: await getChecksum(withPubKey)
+    });
+  }
+
+  return result
+}
+
 type GetWhitelistFunc = void => Promise<?Array<WhitelistEntry>>;
 type SetWhitelistFunc = {|
   whitelist: Array<WhitelistEntry> | void,
@@ -138,7 +161,15 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
 
   @observable loadingWallets: $Values<typeof LoadingWalletStates> = LoadingWalletStates.IDLE;
   @observable errorWallets: string = '';
-  @observable wallets: Array<PublicDeriverCache> = [];
+  /**
+   * - `filteredWallets`: includes only cardano or ergo wallets according to the `protocol`
+   *   it will be displyed fo the user at the `connect` screen for the user to choose 
+   *   which wallet to connect
+   * - `allWallets`: list of all wallets the user have in yoroi
+   *    We need it to display walelts-websits on the `connected webists screen`
+   */
+  @observable filteredWallets: Array<PublicDeriverCache> = [];
+  @observable allWallets: Array<PublicDeriverCache> = [];
 
   @observable getConnectorWhitelist: Request<
     GetWhitelistFunc
@@ -280,28 +311,15 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         await this._getTxAssets(filteredWallets);
       }
 
-      const result = [];
-      for (const currentWallet of filteredWallets) {
-        const conceptualInfo = await currentWallet.getParent().getFullConceptualWalletInfo();
-        const withPubKey = asGetPublicKey(currentWallet);
-
-        const canGetBalance = asGetBalance(currentWallet);
-        const balance = canGetBalance == null
-          ? new MultiToken([], currentWallet.getParent().getDefaultToken())
-          : await canGetBalance.getBalance();
-        result.push({
-          publicDeriver: currentWallet,
-          name: conceptualInfo.Name,
-          balance,
-          checksum: await getChecksum(withPubKey)
-        });
-      }
+      const filteredWalletsResult = await parseWalletsList(filteredWallets)
+      const allWallets = await parseWalletsList(wallets)
 
       runInAction(() => {
         this.loadingWallets = LoadingWalletStates.SUCCESS;
 
         // note: "replace" is a mobx-specific function
-        (this.wallets: any).replace(result);
+        (this.filteredWallets: any).replace(filteredWalletsResult);
+        (this.allWallets: any).replace(allWallets);
       });
       if (this.signingMessage?.sign.type === 'tx/cardano') {
         this.createAdaTransaction();

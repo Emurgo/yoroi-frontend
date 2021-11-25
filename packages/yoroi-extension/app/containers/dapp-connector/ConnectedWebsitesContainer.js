@@ -69,7 +69,7 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
   render (): Node {
     const { stores } = this.generated;
     const sidebarContainer = <SidebarContainer {...this.generated.SidebarContainerProps} />
-    const wallets = stores.connector.wallets;
+    const wallets = stores.connector.allWallets;
     const loadingWallets = stores.connector.loadingWallets;
     const error = stores.connector.errorWallets;
     const isLoading = (
@@ -140,7 +140,7 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
         shouldHideBalance: boolean,
       |},
       connector: {|
-        wallets: Array<PublicDeriverCache>,
+        allWallets: Array<PublicDeriverCache>,
         currentConnectorWhitelist: Array<WhitelistEntry>,
         errorWallets: string,
         loadingWallets: $Values<typeof LoadingWalletStates>,
@@ -180,7 +180,7 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
           publicDerivers: stores.wallets.publicDerivers,
         },
         connector: {
-          wallets: stores.connector.wallets,
+          allWallets: stores.connector.allWallets,
           currentConnectorWhitelist: stores.connector.currentConnectorWhitelist,
           loadingWallets: stores.connector.loadingWallets,
           errorWallets: stores.connector.errorWallets,
