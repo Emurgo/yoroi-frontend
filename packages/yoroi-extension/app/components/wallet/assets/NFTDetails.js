@@ -131,7 +131,7 @@ function NFTDetails({ nftInfo, nftsCount, network, intl }: Props & Intl): Node {
             <LabelWithValue
               label={intl.formatMessage(globalMessages.fingerprint)}
               value={
-                <CopyToClipboardText text={nftInfo.policyId}>{nftInfo.id}</CopyToClipboardText>
+                <CopyToClipboardText text={nftInfo.id}>{nftInfo.id}</CopyToClipboardText>
               }
             />
             <Box marginTop="22px">
