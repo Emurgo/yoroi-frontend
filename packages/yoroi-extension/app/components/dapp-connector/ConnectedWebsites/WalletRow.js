@@ -1,6 +1,7 @@
 // @flow
 
 import { Component } from 'react'
+import type { Node } from 'react';
 import styles from './WalletRow.scss'
 import WalletAccountIcon from '../../topbar/WalletAccountIcon';
 import type { WalletChecksum } from '@emurgo/cip4-js';
@@ -10,7 +11,6 @@ import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/
 import { getTokenName } from '../../../stores/stateless/tokenHelpers';
 import { hiddenAmount } from '../../../utils/strings';
 import DeleteIcon from '../../../assets/images/dapp-connector/delete.inline.svg';
-import WalletType from '../../topbar/WalletType';
 
 type Props = {|
     +url: ?string,
@@ -56,7 +56,7 @@ export default class WalletRow extends Component<Props, State> {
     this.setState({ showDeleteIcon: false })
   }
 
-  render(){
+  render(): Node {
       const {
       isActiveSite,
       url,
@@ -64,7 +64,6 @@ export default class WalletRow extends Component<Props, State> {
       onRemoveWallet,
       shouldHideBalance,
       getTokenInfo,
-      message
       } = this.props;
       const { showDeleteIcon } = this.state
       // eslint-disable-next-line no-unused-vars
@@ -78,32 +77,34 @@ export default class WalletRow extends Component<Props, State> {
       .shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
 
       return (
-        <div
-          onMouseEnter={this.showDeleteIcon}
-          onMouseLeave={this.hideDeleteIcon}
-          className={styles.component}
-        >
-          <div>
-            <p className={styles.name}>{wallet.name}</p>
-            <div className={styles.card}>
-              <div className={styles.avatar}>{iconComponent}</div>
-              <p className={styles.balance}>
-                {shouldHideBalance ? hiddenAmount : shiftedAmount.toString()}{' '}
-                <span>{getTokenName(tokenInfo)}</span>
-              </p>
-            </div>
-          </div>
-          <div className={styles.dapp}>
+        <div>
+          <div
+            onMouseEnter={this.showDeleteIcon}
+            onMouseLeave={this.hideDeleteIcon}
+            className={styles.component}
+          >
             <div>
-              <p className={styles.url}>{url}</p>
-              {isActiveSite && <p className={styles.status}>Active</p>}
+              <p className={styles.name}>{wallet.name}</p>
+              <div className={styles.card}>
+                <div className={styles.avatar}>{iconComponent}</div>
+                <p className={styles.balance}>
+                  {shouldHideBalance ? hiddenAmount : shiftedAmount.toString()}{' '}
+                  <span>{getTokenName(tokenInfo)}</span>
+                </p>
+              </div>
             </div>
-          </div>
-          <div className={styles.delete}>
-            {showDeleteIcon &&
-            <button onClick={() => onRemoveWallet(url)} type='button'>
-              <DeleteIcon />
-            </button>}
+            <div className={styles.dapp}>
+              <div>
+                <p className={styles.url}>{url}</p>
+                {isActiveSite && <p className={styles.status}>Active</p>}
+              </div>
+            </div>
+            <div className={styles.delete}>
+              {showDeleteIcon &&
+                <button onClick={() => onRemoveWallet(url)} type='button'>
+                  <DeleteIcon />
+                </button>}
+            </div>
           </div>
         </div>
       )

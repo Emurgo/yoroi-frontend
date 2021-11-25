@@ -21,8 +21,12 @@ import LoadingSpinner from '../../components/widgets/LoadingSpinner'
 import { LoadingWalletStates } from '../../ergo-connector/types'
 import FullscreenLayout from '../../components/layout/FullscreenLayout'
 import VerticallyCenteredLayout from '../../components/layout/VerticallyCenteredLayout'
+import { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet'
+import type { ConceptualWalletSettingsCache } from '../../stores/toplevel/WalletSettingsStore';
+import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
+import type { WhitelistEntry , PublicDeriverCache } from '../../../chrome/extension/ergo-connector/types'
 
-export type GeneratedData = typeof MyWalletsPage.prototype.generated;
+export type GeneratedData = typeof ConnectedWebsitesPageContainer.prototype.generated;
 
 type Props = InjectedOrGenerated<GeneratedData>
 
@@ -49,7 +53,7 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
     this.generated.actions.connector.removeWalletFromWhitelist.trigger(url);
   };
 
-  getConceptualWallet(parent) {
+  getConceptualWallet(parent: ConceptualWallet): ConceptualWalletSettingsCache {
     const settingsCache = this.generated.stores.walletSettings
     .getConceptualWalletSettingsCache(parent);
 
@@ -57,7 +61,6 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
   }
 
   render (): Node {
-    const { intl } = this.context;
     const { stores } = this.generated;
     const sidebarContainer = <SidebarContainer {...this.generated.SidebarContainerProps} />
     const wallets = stores.connector.wallets;
@@ -130,11 +133,14 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
         shouldHideBalance: boolean,
       |},
       connector: {|
-        connectingMessage: ?ConnectingMessag,
         wallets: Array<PublicDeriverCache>,
         currentConnectorWhitelist: Array<WhitelistEntry>,
         errorWallets: string,
         loadingWallets: $Values<typeof LoadingWalletStates>,
+        activeSites: {| sites: Array<string> |},
+      |},
+      walletSettings: {|
+        getConceptualWalletSettingsCache: ConceptualWallet => ConceptualWalletSettingsCache
       |},
       tokenInfoStore: {|
         tokenInfo: TokenInfoMap,

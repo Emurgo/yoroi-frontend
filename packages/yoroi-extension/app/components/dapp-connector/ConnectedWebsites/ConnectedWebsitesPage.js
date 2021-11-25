@@ -9,8 +9,11 @@ import { intlShape, defineMessages } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { connectorMessages } from '../../../i18n/global-messages';
 import { isErgo } from '../../../api/ada/lib/storage/database/prepackaged/networks';
-import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver';
 import WalletRow from './WalletRow';
+import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
+import type {
+  TokenLookupKey,
+} from '../../../api/common/lib/MultiToken';
 
 type Props = {|
     +whitelistEntries: ?Array<WhitelistEntry>,
@@ -123,7 +126,7 @@ export default class ConnectedWebsitesPage extends Component<Props> {
                             key={url}
                             url={url}
                             wallet={wallet}
-                            isActiveSite={this.props.isActiveSite}
+                            isActiveSite={this.props.activeSites.includes(url)}
                             onRemoveWallet={this.props.onRemoveWallet}
                             shouldHideBalance={this.props.shouldHideBalance}
                             getTokenInfo={this.props.getTokenInfo}
