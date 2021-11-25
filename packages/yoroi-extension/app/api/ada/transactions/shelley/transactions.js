@@ -1180,7 +1180,10 @@ export function signTransaction(
       continue;
     }
     if (keyHash === undefined) {
-      throw new Error(`${nameof(signTransaction)} cannot sign script inputs`);
+      // Ignoring inputs with no key-hash for now
+      // <TODO:SCRIPT_INPUTS>
+      continue;
+      // throw new Error(`${nameof(signTransaction)} cannot sign script inputs`);
     }
     {
       const keyHex = Buffer.from(keyHash.to_bytes()).toString('hex');
