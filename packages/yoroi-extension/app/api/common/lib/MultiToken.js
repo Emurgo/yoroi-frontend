@@ -39,7 +39,7 @@ export class MultiToken {
       multiTokenData.defaults
     );
   }
-  
+
   constructor(
     values: Array<TokenEntry>,
     defaults: DefaultTokenEntry

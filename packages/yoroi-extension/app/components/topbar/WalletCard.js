@@ -156,6 +156,7 @@ export default class WalletCard extends Component<Props, State> {
       .map(text => intl.formatMessage(text))
       .join(' - ');
     const totalAmount = this.getTotalAmount();
+    const { tokenTypes, nfts } = this.countTokenTypes();
 
     return (
       <Draggable draggableId={walletId.toString()} index={idx}>
@@ -202,10 +203,10 @@ export default class WalletCard extends Component<Props, State> {
                 <div className={styles.extraInfo}>
                   <p className={styles.label}>
                     {intl.formatMessage(messages.tokenTypes)}{' '}
-                    <span className={styles.value}>20</span>
+                    <span className={styles.value}>{tokenTypes}</span>
                   </p>
                   <p className={styles.label}>
-                    NFTs <span className={styles.value}>2</span>
+                    NFTs <span className={styles.value}>{nfts}</span>
                   </p>
                 </div>
               </div>
@@ -273,5 +274,30 @@ export default class WalletCard extends Component<Props, State> {
       return null;
     }
     return this.props.rewards.joinAddCopy(this.props.walletAmount);
+  };
+
+  countTokenTypes: void => {|tokenTypes: number, nfts: number|} = () => {
+    if (this.props.walletAmount
+      && this.props.walletAmount.values
+      && Array.isArray(this.props.walletAmount.values)) {
+      const count = this.props.walletAmount.values.reduce((prev, curr) => {
+        const tokenInfo = this.props.getTokenInfo(curr);
+        if (tokenInfo.Identifier !== '' && !tokenInfo.IsDefault) {
+          if (tokenInfo.IsNFT === true) {
+            prev.nfts++;
+          } else {
+            prev.tokenTypes++;
+          }
+        }
+        return prev;
+      }, { tokenTypes: 0, nfts: 0 });
+
+      return count;
+    }
+
+    return {
+      tokenTypes: 0,
+      nfts: 0
+    };
   };
 }
