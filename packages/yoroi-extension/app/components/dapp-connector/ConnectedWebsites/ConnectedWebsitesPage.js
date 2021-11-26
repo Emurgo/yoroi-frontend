@@ -140,6 +140,9 @@ export default class ConnectedWebsitesPage extends Component<Props> {
                       return ''
                     })
                   }
+                  <div className={styles.line}>
+                    <div/>
+                  </div>
                 </div>
                 }
                 {isErgoExist &&
