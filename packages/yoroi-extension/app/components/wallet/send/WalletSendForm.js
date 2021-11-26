@@ -19,6 +19,7 @@ import { getAddressPayload, isValidReceiveAddress } from '../../../api/ada/lib/s
 import { MAX_MEMO_SIZE } from '../../../config/externalStorageConfig';
 import type { TokenRow, NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import {
+  amountWithoutZeros,
   formattedAmountToBigNumber,
   formattedAmountToNaturalUnits,
   truncateToken,
@@ -359,7 +360,6 @@ export default class WalletSendForm extends Component<Props> {
     }
 
     const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
-
     const tokenOptions = (() => {
       if (this.props.spendableBalance == null) return [];
       const { spendableBalance } = this.props;
@@ -370,13 +370,16 @@ export default class WalletSendForm extends Component<Props> {
       ].map(entry => ({
         entry,
         info: this.props.getTokenInfo(entry),
-      })).map(token => ({
-        value: token.info.TokenId,
-        info: token.info,
-        label: truncateToken(getTokenStrictName(token.info) ?? getTokenIdentifierIfExists(token.info) ?? '-'),
-        id: (getTokenIdentifierIfExists(token.info) ?? '-'),
-        amount: genFormatTokenAmount(this.props.getTokenInfo)(token.entry)
-      }));
+      })).map(token => {
+        const amount = genFormatTokenAmount(this.props.getTokenInfo)(token.entry)
+        return {
+          value: token.info.TokenId,
+          info: token.info,
+          label: truncateToken(getTokenStrictName(token.info) ?? getTokenIdentifierIfExists(token.info) ?? '-'),
+          id: (getTokenIdentifierIfExists(token.info) ?? '-'),
+          amount: amountWithoutZeros(amount),
+        }
+      });
     })();
 
 

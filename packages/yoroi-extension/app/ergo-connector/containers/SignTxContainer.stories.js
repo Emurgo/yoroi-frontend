@@ -60,7 +60,7 @@ const message = (id: number) => ({
         creationHeight: 1,
         ergoTree: Buffer.from(RustModule.SigmaRust.Address.from_base58(
           '9egNKTzQDH658qcdiPEoQfVM1SBxQNxnyF8BCw57aNWerRhhHBQ'
-        ).to_ergo_tree().to_bytes()).toString('hex'),
+        ).to_ergo_tree().sigma_serialize_bytes()).toString('hex'),
         assets: [],
         additionalRegisters: Object.freeze({}),
       }],
@@ -71,7 +71,7 @@ const message = (id: number) => ({
         value: '1234567',
         ergoTree: Buffer.from(RustModule.SigmaRust.Address.from_base58(
           '9egNKTzQDH658qcdiPEoQfVM1SBxQNxnyF8BCw57aNWerRhhHBQ'
-        ).to_ergo_tree().to_bytes()).toString('hex'),
+        ).to_ergo_tree().sigma_serialize_bytes()).toString('hex'),
         assets: [{
           amount: '12340',
           tokenId: tokenInfo.tokenId,
