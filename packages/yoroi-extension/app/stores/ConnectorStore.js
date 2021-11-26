@@ -389,7 +389,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   createAdaTransaction: void => Promise<void> = async () => {
     if (this.signingMessage == null) return;
     const { signingMessage } = this;
-    const selectedWallet = this.wallets.find(
+    const selectedWallet = this.filteredWallets.find(
       wallet => wallet.publicDeriver.getPublicDeriverId() === signingMessage.publicDeriverId
     );
     if (selectedWallet == null) return undefined;
@@ -487,7 +487,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   @computed get signingRequest(): ?ISignRequest<any> {
     if (this.signingMessage == null) return;
     const { signingMessage } = this;
-    const selectedWallet = this.wallets.find(
+    const selectedWallet = this.filteredWallets.find(
       wallet => wallet.publicDeriver.getPublicDeriverId() === signingMessage.publicDeriverId
     );
     if (selectedWallet == null) return undefined;

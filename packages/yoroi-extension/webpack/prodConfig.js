@@ -15,6 +15,7 @@ type EnvParams = {|
   nightly: "true" | "false",
   publicPath?: string,
   ergoConnectorExtensionId?: ?string,
+  isLight: "true" | "false"
 |};
 */
 const baseProdConfig = (env /*: EnvParams */) /*: * */ => ({
@@ -49,7 +50,7 @@ const baseProdConfig = (env /*: EnvParams */) /*: * */ => ({
       true,
       JSON.parse(env.nightly),
       env.ergoConnectorExtensionId,
-      env.isLight === 'true'
+      JSON.parse(env.isLight)
     )),
     new webpack.IgnorePlugin(/[^/]+\/[\S]+.dev$/),
   ],

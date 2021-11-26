@@ -22,6 +22,7 @@ type Props = {|
     +onRemoveWallet: ?string => void,
     +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
     +settingsCache: ConceptualWalletSettingsCache | null,
+    +websiteIcon: string,
 |};
 
 type State = {|

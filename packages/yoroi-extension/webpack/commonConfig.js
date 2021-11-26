@@ -196,7 +196,7 @@ const definePlugin = (
   isProd /*: boolean */,
   isNightly /*: boolean */,
   ergoConnectorExtensionId /*: ?string */,
-  isLight = false /** ?: boolean */
+  isLight /*: boolean */ = false
 ) /*: * */ => {
   const ERGO_CONNECTOR_EXTENSION_ID = (() => {
     if (ergoConnectorExtensionId != null) return ergoConnectorExtensionId;

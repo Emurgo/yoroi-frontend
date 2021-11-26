@@ -47,7 +47,7 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
     // User should not be able to access the route when using Yoroi Light
     if(environment.isLight) {
       this.generated.actions.router.goToRoute.trigger({
-        route: ROUTES.WALLETS.DELEGATION_DASHBOARD
+        route: ROUTES.MY_WALLETS,
       })
     }
     this.generated.actions.connector.refreshWallets.trigger();

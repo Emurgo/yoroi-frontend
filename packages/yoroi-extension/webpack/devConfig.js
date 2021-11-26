@@ -16,7 +16,7 @@ const baseDevConfig = (
   networkName /*: string */,
   isNightly /*: boolean */,
   ergoConnectorExtensionId /*: ?string */,
-  isLight = false /* ?: boolean */
+  isLight /* : ?boolean */ = false
 ) /*: * */ => ({
   mode: 'development',
   optimization: commonConfig.optimization,
@@ -64,7 +64,7 @@ const baseDevConfig = (
       false,
       isNightly,
       ergoConnectorExtensionId,
-      isLight
+      Boolean(isLight)
     )),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.IgnorePlugin({
