@@ -13,7 +13,6 @@ function getVersion(): string {
   const content = genManifest.default !== undefined
     ? genManifest.default(true)
     : genManifest();
-    console.log({content, name: CONFIG.network.name})
   return content.version;
 }
 
