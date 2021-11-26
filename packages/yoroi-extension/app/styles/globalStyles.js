@@ -282,6 +282,9 @@ const globalStyles = (theme: Object): Node => (
           letterSpacing: '1px',
         },
       },
+      html: {
+        overflow: 'hidden'
+      },
       body: {
         /* To remove background color for Chrome Inputs */
         'input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus,input:-webkit-autofill:active': {

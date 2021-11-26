@@ -7,9 +7,6 @@ export type Layouts = 'CLASSIC' | 'REVAMP';
 export type LayoutComponentMap = {|
   [key: Layouts]: Node,
 |};
-type LayoutInitialState = {|
-  selected: Layouts,
-|};
 
 const LayoutContext = React.createContext();
 
@@ -32,7 +29,7 @@ const LayoutProvider = (props: Object): Node => {
   );
 };
 
-function useLayout(): LayoutInitialState {
+function useLayout(): Object {
   const context = React.useContext(LayoutContext);
   if (!context) {
     throw new Error('useLayout must be used within a LayoutProvider');
