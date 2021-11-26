@@ -12,6 +12,18 @@
     border: 2px solid var(--yoroi-palette-gray-700);
     min-height: 132px;
   }
+
+  &.phraseDoesNotMatch {
+    border: 1px solid var(--yoroi-palette-error-100);
+  }
+}
+
+.errorText {
+  color: var(--yoroi-comp-input-error);
+  font-family: "Roboto","Helvetica","Arial",sans-serif;
+  margin-top: 6px;
+  font-size: 0.75rem;
+  margin-left: 4px;
 }
 
 :global(.YoroiClassic) {

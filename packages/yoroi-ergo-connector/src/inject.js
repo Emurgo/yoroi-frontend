@@ -89,6 +89,10 @@ const initialInject = `
       return this._cardano_rpc_call('sign_tx/cardano', [{ tx, partialSign }]);
     }
 
+    create_tx(req) {
+        return this._cardano_rpc_call("create_tx/cardano", [req]);
+    }
+
     _cardano_rpc_call(func, params) {
       return new Promise(function(resolve, reject) {
         window.postMessage({

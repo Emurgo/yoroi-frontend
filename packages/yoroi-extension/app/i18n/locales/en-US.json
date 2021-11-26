@@ -424,6 +424,7 @@
   "wallet.backup.recovery.phrase.display.dialog.button.label.iHaveWrittenItDown": "Yes, I’ve written it down.",
   "wallet.backup.recovery.phrase.entry.dialog.terms.and.condition.device": "I understand that my secret keys are held securely on this device only, not on the company's servers.",
   "wallet.backup.recovery.phrase.entry.dialog.terms.and.condition.recovery": "I understand that if this application is moved to another device or deleted, my money can\n    be only recovered with the backup phrase that I have written down and saved in a secure place.",
+  "wallet.backup.recovery.phrase.entry.dialog.error.phraseDoesNotMatch": "Recovery phrase does not match.",
   "wallet.backup.recovery.phrase.entry.dialog.verification.instructions": "Tap each word in the correct order to verify your recovery phrase",
   "wallet.connect.hw.dialog.connect.button.label": "Connect",
   "wallet.connect.hw.dialog.save.button.label": "Save",
