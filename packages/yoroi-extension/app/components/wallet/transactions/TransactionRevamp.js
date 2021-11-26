@@ -1,8 +1,9 @@
+/* eslint-disable no-nested-ternary */
 // @flow
 import React, { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
+import { intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import moment from 'moment';
 import classnames from 'classnames';
@@ -48,159 +49,14 @@ import { ComplexityLevels } from '../../../types/complexityLevelType';
 import type { ComplexityLevelType } from '../../../types/complexityLevelType';
 import { Typography } from '@mui/material';
 import { Box } from '@mui/system';
-
-const messages = defineMessages({
-  type: {
-    id: 'wallet.transaction.type',
-    defaultMessage: '!!!{currency} transaction',
-  },
-  exchange: {
-    id: 'wallet.transaction.type.exchange',
-    defaultMessage: '!!!Exchange',
-  },
-  assuranceLevel: {
-    id: 'wallet.transaction.assuranceLevel',
-    defaultMessage: '!!!Transaction assurance level',
-  },
-  confirmations: {
-    id: 'wallet.transaction.confirmations',
-    defaultMessage: '!!!confirmations',
-  },
-  conversionRate: {
-    id: 'wallet.transaction.conversion.rate',
-    defaultMessage: '!!!Conversion rate',
-  },
-  sent: {
-    id: 'wallet.transaction.sent',
-    defaultMessage: '!!!{currency} sent',
-  },
-  received: {
-    id: 'wallet.transaction.received',
-    defaultMessage: '!!!{currency} received',
-  },
-  intrawallet: {
-    id: 'wallet.transaction.type.intrawallet',
-    defaultMessage: '!!!{currency} intrawallet transaction',
-  },
-  multiparty: {
-    id: 'wallet.transaction.type.multiparty',
-    defaultMessage: '!!!{currency} multiparty transaction',
-  },
-  rewardWithdrawn: {
-    id: 'wallet.transaction.type.rewardWithdrawn',
-    defaultMessage: '!!!Reward withdrawn',
-  },
-  catalystVotingRegistered: {
-    id: 'wallet.transaction.type.catalystVotingRegistered',
-    defaultMessage: '!!!Catalyst voting registered',
-  },
-  stakeDelegated: {
-    id: 'wallet.transaction.type.stakeDelegated',
-    defaultMessage: '!!!Stake delegated',
-  },
-  stakeKeyRegistered: {
-    id: 'wallet.transaction.type.stakeKeyRegistered',
-    defaultMessage: '!!!Staking key registered',
-  },
-  fromAddress: {
-    id: 'wallet.transaction.address.from',
-    defaultMessage: '!!!From address',
-  },
-  toAddress: {
-    id: 'wallet.transaction.address.to',
-    defaultMessage: '!!!To address',
-  },
-  addressType: {
-    id: 'wallet.transaction.address.type',
-    defaultMessage: '!!!Address Type',
-  },
-  certificateLabel: {
-    id: 'wallet.transaction.certificateLabel',
-    defaultMessage: '!!!Certificate',
-  },
-  certificatesLabel: {
-    id: 'wallet.transaction.certificatesLabel',
-    defaultMessage: '!!!Certificates',
-  },
-  transactionAmount: {
-    id: 'wallet.transaction.transactionAmount',
-    defaultMessage: '!!!Transaction amount',
-  },
-  transactionMetadata: {
-    id: 'wallet.transaction.transactionMetadata',
-    defaultMessage: '!!!Transaction Metadata',
-  },
-});
-
-const jormungandrCertificateKinds = defineMessages({
-  PoolRegistration: {
-    id: 'wallet.transaction.certificate.PoolRegistration',
-    defaultMessage: '!!!Pool registration',
-  },
-  PoolUpdate: {
-    id: 'wallet.transaction.certificate.PoolUpdate',
-    defaultMessage: '!!!Pool update',
-  },
-  PoolRetirement: {
-    id: 'wallet.transaction.certificate.PoolRetirement',
-    defaultMessage: '!!!Pool retirement',
-  },
-  StakeDelegation: {
-    id: 'wallet.transaction.certificate.StakeDelegation',
-    defaultMessage: '!!!Stake delegation',
-  },
-  OwnerStakeDelegation: {
-    id: 'wallet.transaction.certificate.OwnerStakeDelegation',
-    defaultMessage: '!!!Owner stake delegation',
-  },
-});
-
-const shelleyCertificateKinds = {
-  PoolRegistration: jormungandrCertificateKinds.PoolRegistration,
-  PoolRetirement: jormungandrCertificateKinds.PoolRetirement,
-  StakeDelegation: jormungandrCertificateKinds.StakeDelegation,
-  StakeDeregistration: globalMessages.StakeDeregistration,
-  ...defineMessages({
-    StakeRegistration: {
-      id: 'wallet.transaction.certificate.StakeRegistration',
-      defaultMessage: '!!!Staking key registration',
-    },
-    GenesisKeyDelegation: {
-      id: 'wallet.transaction.certificate.GenesisKeyDelegation',
-      defaultMessage: '!!!Genesis key delegation',
-    },
-    MoveInstantaneousRewardsCert: {
-      id: 'wallet.transaction.certificate.MoveInstantaneousRewardsCert',
-      defaultMessage: '!!!Manually-initiated reward payout',
-    },
-  }),
-};
-
-const assuranceLevelTranslations = defineMessages({
-  low: {
-    id: 'wallet.transaction.assuranceLevel.low',
-    defaultMessage: '!!!low',
-  },
-  medium: {
-    id: 'wallet.transaction.assuranceLevel.medium',
-    defaultMessage: '!!!medium',
-  },
-  high: {
-    id: 'wallet.transaction.assuranceLevel.high',
-    defaultMessage: '!!!high',
-  },
-});
-
-const stateTranslations = defineMessages({
-  pending: {
-    id: 'wallet.transaction.state.pending',
-    defaultMessage: '!!!pending',
-  },
-  failed: {
-    id: 'wallet.transaction.state.failed',
-    defaultMessage: '!!!failed',
-  },
-});
+import {
+  assuranceLevelTranslations,
+  jormungandrCertificateKinds,
+  shelleyCertificateKinds,
+  stateTranslations,
+  messages,
+} from './Transaction';
+import { columnTXStyles } from '../summary/WalletSummaryRevamp';
 
 type Props = {|
   +data: WalletTransaction,
@@ -258,7 +114,7 @@ export default class TransactionRevamp extends Component<Props, State> {
             features.includes('StakeDeregistration') &&
             features.length === 2)
         ) {
-          return intl.formatMessage(messages.rewardWithdrawn);
+          return intl.formatMessage({ id: 'wallet.transaction.type.rewardWithdrawn' });
         }
         if (features.includes('CatalystVotingRegistration') && features.length === 1) {
           return intl.formatMessage(messages.catalystVotingRegistered);
@@ -544,12 +400,6 @@ export default class TransactionRevamp extends Component<Props, State> {
     const isFailedTransaction = state < 0;
     const isPendingTransaction = state === TxStatusCodes.PENDING;
 
-    const componentStyles = classnames([
-      styles.component,
-      isFailedTransaction ? styles.failed : null,
-      isPendingTransaction ? styles.pending : null,
-    ]);
-
     const contentStyles = classnames([styles.content, isExpanded ? styles.shadow : null]);
 
     const detailsStyles = classnames([
@@ -557,20 +407,12 @@ export default class TransactionRevamp extends Component<Props, State> {
       isExpanded ? styles.expanded : styles.closed,
     ]);
 
-    const labelOkClasses = classnames([styles.status, styles[assuranceLevel]]);
-
-    const labelClasses = classnames([
-      styles.status,
-      isFailedTransaction ? styles.failedLabel : '',
-      isPendingTransaction ? styles.pendingLabel : '',
-    ]);
-
     const arrowClasses = isExpanded ? styles.collapseArrow : styles.expandArrow;
 
     const status = this.getStatusString(intl, state, assuranceLevel);
 
     return (
-      <Box className={componentStyles}>
+      <Box className={styles.component}>
         {/* ==== Clickable Header -> toggles details ==== */}
         <Box
           sx={{ padding: '20px 0', borderBottom: '1px solid var(--yoroi-palette-gray-200)' }}
@@ -579,27 +421,74 @@ export default class TransactionRevamp extends Component<Props, State> {
           aria-hidden
         >
           <Box sx={{ display: 'flex' }}>
-            <div className={styles.header}>
-              <Box className={styles.type}>
-                <Typography variant="body1" color="var(--yoroi-palette-gray-900)">
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                width: '100%',
+                alignItems: 'center',
+              }}
+            >
+              <Box sx={columnTXStyles.transactionType}>
+                <Typography
+                  variant="body1"
+                  color={
+                    isPendingTransaction
+                      ? 'var(--yoroi-palette-gray-400)'
+                      : 'var(--yoroi-palette-gray-900)'
+                  }
+                >
                   {this.getTxTypeMsg(intl, this.getTicker(data.amount.getDefaultEntry()), data)}
                 </Typography>
-                <Typography variant="body3" color="var(--yoroi-palette-gray-600)">
+                <Typography
+                  variant="body3"
+                  color={
+                    isPendingTransaction
+                      ? 'var(--yoroi-palette-gray-400)'
+                      : 'var(--yoroi-palette-gray-600)'
+                  }
+                >
                   {moment(data.date).format('hh:mm A')}
                 </Typography>
               </Box>
-              {state === TxStatusCodes.IN_BLOCK ? (
-                <div className={labelOkClasses}>{status}</div>
-              ) : (
-                <div className={labelClasses}>{status}</div>
-              )}
-              <Typography variant="body1" color="var(--yoroi-palette-gray-900)">
+              <Box sx={columnTXStyles.status}>
+                {state === TxStatusCodes.IN_BLOCK ? (
+                  <Typography
+                    sx={{
+                      color: isPendingTransaction
+                        ? 'var(--yoroi-palette-gray-400)'
+                        : 'var(--yoroi-palette-gray-900)',
+                      textTransform: 'capitalize',
+                    }}
+                  >
+                    {status}
+                  </Typography>
+                ) : (
+                  <Typography
+                    sx={{
+                      color: isFailedTransaction
+                        ? 'var(--yoroi-palette-error-100)'
+                        : isPendingTransaction
+                        ? 'var(--yoroi-palette-gray-400)'
+                        : 'var(--yoroi-palette-gray-900)',
+                      textTransform: 'capitalize',
+                    }}
+                  >
+                    {status}
+                  </Typography>
+                )}
+              </Box>
+              <Typography
+                variant="body1"
+                color="var(--yoroi-palette-gray-900)"
+                sx={columnTXStyles.fee}
+              >
                 {this.renderFeeDisplay({
                   amount: data.fee,
                   type: data.type,
                 })}
               </Typography>
-              <div>
+              <Box sx={columnTXStyles.amount}>
                 <Typography variant="body1" fontWeight="500" color="var(--yoroi-palette-gray-900)">
                   {this.renderAmountDisplay({
                     entry: data.amount.getDefaultEntry(),
@@ -607,8 +496,8 @@ export default class TransactionRevamp extends Component<Props, State> {
                   {this.getTicker(data.amount.getDefaultEntry())}
                 </Typography>
                 {this.renderAssets({ assets: data.amount.nonDefaultEntries() })}
-              </div>
-            </div>
+              </Box>
+            </Box>
             <div className={styles.expandArrowBox}>
               <span className={arrowClasses}>
                 <ExpandArrow />

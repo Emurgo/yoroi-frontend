@@ -2,7 +2,7 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
+import { intlShape } from 'react-intl';
 import ExportTxToFileSvg from '../../../assets/images/transaction/export.inline.svg';
 import type { UnconfirmedAmount } from '../../../types/unconfirmedAmountType';
 import globalMessages from '../../../i18n/global-messages';
@@ -18,37 +18,6 @@ import { getTokenName } from '../../../stores/stateless/tokenHelpers';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import { Button, Typography } from '@mui/material';
 import { Box, styled } from '@mui/system';
-
-const messages = defineMessages({
-  pendingOutgoingConfirmationLabel: {
-    id: 'wallet.summary.page.pendingOutgoingConfirmationLabel',
-    defaultMessage: '!!!Outgoing pending confirmation',
-  },
-  pendingIncomingConfirmationLabel: {
-    id: 'wallet.summary.page.pendingIncomingConfirmationLabel',
-    defaultMessage: '!!!Incoming pending confirmation',
-  },
-  numOfTxsLabel: {
-    id: 'wallet.summary.page.transactionsLabel',
-    defaultMessage: '!!!Number of transactions',
-  },
-  exportIconTooltip: {
-    id: 'wallet.transaction.export.exportIcon.tooltip',
-    defaultMessage: '!!!Export to file',
-  },
-  dateSection: {
-    id: 'wallet.summary.page.dateTime',
-    defaultMessage: '!!!Date/time',
-  },
-  typeSection: {
-    id: 'wallet.summary.page.type',
-    defaultMessage: '!!!Transaction type',
-  },
-  statusSection: {
-    id: 'wallet.summary.page.status',
-    defaultMessage: '!!!Status',
-  },
-});
 
 type Props = {|
   +numberOfTransactions: number,
@@ -131,7 +100,7 @@ export default class WalletSummaryRevamp extends Component<Props> {
                 as="p"
                 sx={{ fontWeight: 400, color: 'var(--yoroi-palette-gray-600)' }}
               >
-                {intl.formatMessage(messages.numOfTxsLabel)}:{' '}
+                {intl.formatMessage({ id: 'wallet.summary.page.transactionsLabel' })}:{' '}
                 <Typography
                   variant="h2"
                   as="span"
@@ -152,14 +121,16 @@ export default class WalletSummaryRevamp extends Component<Props> {
                 onKeyPress={openExportTxToFileDialog}
               >
                 <ExportTxToFileSvg />
-                {intl.formatMessage(messages.exportIconTooltip)}
+                {intl.formatMessage({ id: 'wallet.transaction.export.exportIcon.tooltip' })}
               </Button>
             </Box>
             {(!pendingAmount.incoming.isEmpty() || !pendingAmount.outgoing.isEmpty()) && (
               <Box sx={{ padding: '16px 30px' }}>
                 {!pendingAmount.incoming.isEmpty() && (
                   <div className={styles.pendingConfirmation}>
-                    {`${intl.formatMessage(messages.pendingIncomingConfirmationLabel)}`}
+                    {`${intl.formatMessage({
+                      id: 'wallet.summary.page.pendingIncomingConfirmationLabel',
+                    })}`}
                     :&nbsp;
                     {pendingAmount.incomingInSelectedCurrency && unitOfAccountSetting.enabled ? (
                       <span className={styles.amount}>
@@ -180,7 +151,9 @@ export default class WalletSummaryRevamp extends Component<Props> {
                 )}
                 {!pendingAmount.outgoing.isEmpty() && (
                   <div className={styles.pendingConfirmation}>
-                    {`${intl.formatMessage(messages.pendingOutgoingConfirmationLabel)}`}
+                    {`${intl.formatMessage({
+                      id: 'wallet.summary.page.pendingOutgoingConfirmationLabel',
+                    })}`}
                     :&nbsp;
                     {pendingAmount.outgoingInSelectedCurrency && unitOfAccountSetting.enabled ? (
                       <span className={styles.amount}>
@@ -207,18 +180,21 @@ export default class WalletSummaryRevamp extends Component<Props> {
           sx={{
             display: 'flex',
             padding: '20px 30px 10px',
+            paddingRight: '68px',
+            width: '100%',
+            justifyContent: 'space-between',
           }}
         >
-          <Label variant="body2" flex="1 1 40%">
-            {intl.formatMessage(messages.typeSection)}
+          <Label variant="body2" sx={columnTXStyles.transactionType}>
+            {intl.formatMessage({ id: 'wallet.summary.page.type' })}
           </Label>
-          <Label variant="body2" flex="1 1 30%" align="center">
-            {intl.formatMessage(messages.statusSection)}
+          <Label variant="body2" sx={columnTXStyles.status}>
+            {intl.formatMessage({ id: 'wallet.summary.page.status' })}
           </Label>
-          <Label variant="body2" flex="1 1 30%" align="center">
+          <Label variant="body2" sx={columnTXStyles.fee}>
             {intl.formatMessage(globalMessages.feeLabel)}
           </Label>
-          <Label variant="body2" flex="1 1 30%" align="center">
+          <Label variant="body2" sx={columnTXStyles.amount}>
             {intl.formatMessage(globalMessages.amountLabel)}
           </Label>
         </Box>
@@ -232,3 +208,10 @@ export default class WalletSummaryRevamp extends Component<Props> {
 const Label = styled(Typography)({
   color: 'var(--yoroi-palette-gray-600)',
 });
+
+export const columnTXStyles = {
+  transactionType: { flex: '1 1 30%', maxWidth: '30%', textAlign: 'left' },
+  status: { flex: '1 1 16%', maxWidth: '16%', textAlign: 'left' },
+  fee: { flex: '1 1 16%', maxWidth: '16%', textAlign: 'center' },
+  amount: { flex: '1 1 25%', maxWidth: '25%', textAlign: 'right' },
+};

@@ -3,9 +3,7 @@ import React, { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
-import type {
-  $npm$ReactIntl$IntlFormat,
-} from 'react-intl';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import moment from 'moment';
 import classnames from 'classnames';
 import styles from './Transaction.scss';
@@ -14,8 +12,8 @@ import EditSvg from '../../../assets/images/edit.inline.svg';
 import WalletTransaction from '../../../domain/WalletTransaction';
 import JormungandrTransaction from '../../../domain/JormungandrTransaction';
 import CardanoShelleyTransaction from '../../../domain/CardanoShelleyTransaction';
-import globalMessages, { memoMessages, } from '../../../i18n/global-messages';
-import type { TransactionDirectionType, } from '../../../api/ada/transactions/types';
+import globalMessages, { memoMessages } from '../../../i18n/global-messages';
+import type { TransactionDirectionType } from '../../../api/ada/transactions/types';
 import { transactionTypes } from '../../../api/ada/transactions/types';
 import type { AssuranceLevel } from '../../../types/transactionAssuranceTypes';
 import { Logger } from '../../../utils/logging';
@@ -23,31 +21,33 @@ import ExpandArrow from '../../../assets/images/expand-arrow-grey.inline.svg';
 import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
-import { TxStatusCodes, } from '../../../api/ada/lib/storage/database/primitives/enums';
-import type { TxStatusCodesType, } from '../../../api/ada/lib/storage/database/primitives/enums';
-import type { CertificateRow, TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
+import { TxStatusCodes } from '../../../api/ada/lib/storage/database/primitives/enums';
+import type { TxStatusCodesType } from '../../../api/ada/lib/storage/database/primitives/enums';
+import type {
+  CertificateRow,
+  TokenRow,
+} from '../../../api/ada/lib/storage/database/primitives/tables';
 import { RustModule } from '../../../api/ada/lib/cardanoCrypto/rustLoader';
 import { splitAmount, truncateAddressShort, truncateToken } from '../../../utils/formatters';
 import type { TxMemoTableRow } from '../../../api/ada/lib/storage/database/memos/tables';
 import CopyableAddress from '../../widgets/CopyableAddress';
 import type { Notification } from '../../../types/notificationType';
 import { genAddressLookup } from '../../../stores/stateless/addressStores';
-import {
-  MultiToken,
-} from '../../../api/common/lib/MultiToken';
+import { MultiToken } from '../../../api/common/lib/MultiToken';
 import { hiddenAmount } from '../../../utils/strings';
-import type {
-  TokenLookupKey, TokenEntry,
-} from '../../../api/common/lib/MultiToken';
+import type { TokenLookupKey, TokenEntry } from '../../../api/common/lib/MultiToken';
 import { getTokenName, getTokenIdentifierIfExists } from '../../../stores/stateless/tokenHelpers';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
-import { parseMetadata, parseMetadataDetailed } from '../../../api/ada/lib/storage/bridge/metadataUtils';
+import {
+  parseMetadata,
+  parseMetadataDetailed,
+} from '../../../api/ada/lib/storage/bridge/metadataUtils';
 import CodeBlock from '../../widgets/CodeBlock';
 import BigNumber from 'bignumber.js';
 import { ComplexityLevels } from '../../../types/complexityLevelType';
 import type { ComplexityLevelType } from '../../../types/complexityLevelType';
 
-const messages = defineMessages({
+export const messages: Object = defineMessages({
   type: {
     id: 'wallet.transaction.type',
     defaultMessage: '!!!{currency} transaction',
@@ -130,7 +130,7 @@ const messages = defineMessages({
   },
 });
 
-const jormungandrCertificateKinds = defineMessages({
+export const jormungandrCertificateKinds: Object = defineMessages({
   PoolRegistration: {
     id: 'wallet.transaction.certificate.PoolRegistration',
     defaultMessage: '!!!Pool registration',
@@ -153,7 +153,7 @@ const jormungandrCertificateKinds = defineMessages({
   },
 });
 
-const shelleyCertificateKinds = {
+export const shelleyCertificateKinds: Object = {
   PoolRegistration: jormungandrCertificateKinds.PoolRegistration,
   PoolRetirement: jormungandrCertificateKinds.PoolRetirement,
   StakeDelegation: jormungandrCertificateKinds.StakeDelegation,
@@ -174,8 +174,7 @@ const shelleyCertificateKinds = {
   }),
 };
 
-
-const assuranceLevelTranslations = defineMessages({
+export const assuranceLevelTranslations: Object = defineMessages({
   low: {
     id: 'wallet.transaction.assuranceLevel.low',
     defaultMessage: '!!!low',
@@ -190,7 +189,7 @@ const assuranceLevelTranslations = defineMessages({
   },
 });
 
-const stateTranslations = defineMessages({
+export const stateTranslations: Object = defineMessages({
   pending: {
     id: 'wallet.transaction.state.pending',
     defaultMessage: '!!!pending',
@@ -222,7 +221,7 @@ type Props = {|
   +onCopyAddressTooltip: (string, string) => void,
   +notification: ?Notification,
   +addressToDisplayString: string => string,
-  +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
+  +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
   +complexityLevel: ?ComplexityLevelType,
 |};
 
@@ -232,24 +231,19 @@ type State = {|
 
 @observer
 export default class Transaction extends Component<Props, State> {
-
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
   state: State = {
-    isExpanded: false
+    isExpanded: false,
   };
 
   toggleDetails: void => void = () => {
     this.setState(prevState => ({ isExpanded: !prevState.isExpanded }));
-  }
+  };
 
-  getTxTypeMsg(
-    intl: $npm$ReactIntl$IntlFormat,
-    currency: string,
-    data: WalletTransaction,
-  ): string {
+  getTxTypeMsg(intl: $npm$ReactIntl$IntlFormat, currency: string, data: WalletTransaction): string {
     const { type } = data;
     if (type === transactionTypes.EXPEND) {
       return intl.formatMessage(messages.sent, { currency });
@@ -261,36 +255,25 @@ export default class Transaction extends Component<Props, State> {
       if (data instanceof CardanoShelleyTransaction) {
         const features = data.getFeatures();
         if (
-          (
-            features.includes('Withdrawal') && features.length === 1
-          ) || (
-            features.includes('Withdrawal')
-            && features.includes('StakeDeregistration')
-            && features.length === 2
-          )
+          (features.includes('Withdrawal') && features.length === 1) ||
+          (features.includes('Withdrawal') &&
+            features.includes('StakeDeregistration') &&
+            features.length === 2)
         ) {
           return intl.formatMessage(messages.rewardWithdrawn);
         }
-        if (
-          features.includes('CatalystVotingRegistration')
-          && features.length === 1
-        ) {
+        if (features.includes('CatalystVotingRegistration') && features.length === 1) {
           return intl.formatMessage(messages.catalystVotingRegistered);
         }
         if (
-          (
-            features.includes('StakeDelegation') && features.length === 1
-          ) || (
-            features.includes('StakeDelegation')
-            && features.includes('StakeRegistration')
-            && features.length === 2
-          )
+          (features.includes('StakeDelegation') && features.length === 1) ||
+          (features.includes('StakeDelegation') &&
+            features.includes('StakeRegistration') &&
+            features.length === 2)
         ) {
           return intl.formatMessage(messages.stakeDelegated);
         }
-        if (
-          (features.includes('StakeRegistration') && features.length === 1)
-        ) {
+        if (features.includes('StakeRegistration') && features.length === 1) {
           return intl.formatMessage(messages.stakeKeyRegistered);
         }
       }
@@ -337,26 +320,22 @@ export default class Transaction extends Component<Props, State> {
     throw new Error(`${nameof(this.getStatusString)} unexpected state ` + state);
   }
 
-  renderAmountDisplay: {|
+  renderAmountDisplay: ({|
     entry: TokenEntry,
-  |} => Node = (request) => {
+  |}) => Node = request => {
     if (this.props.shouldHideBalance) {
-      return (<span>{hiddenAmount}</span>);
+      return <span>{hiddenAmount}</span>;
     }
     const tokenInfo = this.props.getTokenInfo(request.entry);
-    const shiftedAmount = request.entry.amount
-      .shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
+    const shiftedAmount = request.entry.amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
 
     if (this.props.unitOfAccountSetting.enabled === true) {
       const { currency } = this.props.unitOfAccountSetting;
-      const price = this.props.getCurrentPrice(
-        request.entry.identifier,
-        currency
-      );
+      const price = this.props.getCurrentPrice(request.entry.identifier, currency);
       if (price != null) {
         return (
           <>
-            { calculateAndFormatValue(shiftedAmount, price) + ' ' + currency }
+            {calculateAndFormatValue(shiftedAmount, price) + ' ' + currency}
             <div className={styles.amountSmall}>
               {shiftedAmount.toString()} {getTokenName(tokenInfo)}
             </div>
@@ -380,30 +359,26 @@ export default class Transaction extends Component<Props, State> {
         <span className={styles.afterDecimal}>{afterDecimalRewards}</span>
       </>
     );
-  }
+  };
 
-  renderFeeDisplay: {|
+  renderFeeDisplay: ({|
     amount: MultiToken,
     type: TransactionDirectionType,
-  |} => Node = (request) => {
+  |}) => Node = request => {
     if (this.props.shouldHideBalance) {
-      return (<span>{hiddenAmount}</span>);
+      return <span>{hiddenAmount}</span>;
     }
     const defaultEntry = request.amount.getDefaultEntry();
     const tokenInfo = this.props.getTokenInfo(defaultEntry);
-    const shiftedAmount = defaultEntry.amount
-      .shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
+    const shiftedAmount = defaultEntry.amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
 
     if (this.props.unitOfAccountSetting.enabled === true) {
       const { currency } = this.props.unitOfAccountSetting;
-      const price = this.props.getCurrentPrice(
-        defaultEntry.identifier,
-        currency
-      );
+      const price = this.props.getCurrentPrice(defaultEntry.identifier, currency);
       if (price != null) {
         return (
           <>
-            { calculateAndFormatValue(shiftedAmount.abs(), price) + ' ' + currency }
+            {calculateAndFormatValue(shiftedAmount.abs(), price) + ' ' + currency}
             <div className={styles.amountSmall}>
               {shiftedAmount.abs().toString()} {getTokenName(tokenInfo)}
             </div>
@@ -412,7 +387,7 @@ export default class Transaction extends Component<Props, State> {
       }
     }
     if (request.type === transactionTypes.INCOME) {
-      return (<span>-</span>);
+      return <span>-</span>;
     }
     const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
       shiftedAmount.abs(),
@@ -425,7 +400,7 @@ export default class Transaction extends Component<Props, State> {
         <span className={styles.afterDecimal}>{afterDecimalRewards}</span>
       </>
     );
-  }
+  };
 
   getTicker: TokenEntry => string = tokenEntry => {
     if (this.props.unitOfAccountSetting.enabled === true) {
@@ -441,11 +416,11 @@ export default class Transaction extends Component<Props, State> {
       return getTokenIdentifierIfExists(tokenInfo);
     }
     return undefined;
-  }
+  };
 
-  renderAssets: {|
+  renderAssets: ({|
     assets: Array<TokenEntry>,
-  |} => Node = (request) => {
+  |}) => Node = request => {
     if (request.assets.length === 0) {
       return null;
     }
@@ -453,9 +428,7 @@ export default class Transaction extends Component<Props, State> {
       const entry = request.assets[0];
       return (
         <div className={classnames([styles.asset])}>
-          {this.renderAmountDisplay({ entry })}
-          {' '}
-          {this.getTicker(entry)}
+          {this.renderAmountDisplay({ entry })} {this.getTicker(entry)}
         </div>
       );
     }
@@ -482,36 +455,32 @@ export default class Transaction extends Component<Props, State> {
     return (
       <div className={classnames([styles.asset])}>
         {sign}
-        {request.assets.length}
-        {' '}
-        {this.context.intl.formatMessage(globalMessages.assets)}
+        {request.assets.length} {this.context.intl.formatMessage(globalMessages.assets)}
       </div>
     );
-  }
+  };
 
-  renderRow: {|
+  renderRow: ({|
     kind: string,
     data: WalletTransaction,
     address: {| address: string, value: MultiToken |},
     addressIndex: number,
     transform?: BigNumber => BigNumber,
-  |} => Node = (request) => {
+  |}) => Node = request => {
     const notificationElementId = `${request.kind}-address-${request.addressIndex}-${request.data.txid}-copyNotification`;
-    const divKey = (identifier) => `${request.data.txid}-${request.kind}-${request.address.address}-${request.addressIndex}-${identifier}`;
-    const renderAmount = (entry) => {
+    const divKey = identifier =>
+      `${request.data.txid}-${request.kind}-${request.address.address}-${request.addressIndex}-${identifier}`;
+    const renderAmount = entry => {
       const fingerprint = this.getFingerprint(entry);
       return (
         <div className={styles.fee}>
           {this.renderAmountDisplay({
             entry: {
               ...entry,
-              amount: request.transform
-                ? request.transform(entry.amount)
-                : entry.amount,
+              amount: request.transform ? request.transform(entry.amount) : entry.amount,
             },
-          })}
-          {' '}
-          { fingerprint !== undefined ? (
+          })}{' '}
+          {fingerprint !== undefined ? (
             <ExplorableHashContainer
               selectedExplorer={this.props.selectedExplorer}
               hash={fingerprint}
@@ -520,7 +489,9 @@ export default class Transaction extends Component<Props, State> {
             >
               <span className={styles.rowData}>{this.getTicker(entry)}</span>
             </ExplorableHashContainer>
-          ): this.getTicker(entry)}
+          ) : (
+            this.getTicker(entry)
+          )}
         </div>
       );
     };
@@ -534,8 +505,8 @@ export default class Transaction extends Component<Props, State> {
         <CopyableAddress
           hash={this.props.addressToDisplayString(request.address.address)}
           elementId={notificationElementId}
-          onCopyAddress={
-            () => this.props.onCopyAddressTooltip(request.address.address, notificationElementId)
+          onCopyAddress={() =>
+            this.props.onCopyAddressTooltip(request.address.address, notificationElementId)
           }
           notification={this.props.notification}
           placementTooltip="bottom-start"
@@ -547,9 +518,7 @@ export default class Transaction extends Component<Props, State> {
             linkType="address"
           >
             <span className={classnames([styles.rowData, styles.hash])}>
-              {truncateAddressShort(
-                this.props.addressToDisplayString(request.address.address)
-              )}
+              {truncateAddressShort(this.props.addressToDisplayString(request.address.address))}
             </span>
           </ExplorableHashContainer>
         </CopyableAddress>
@@ -564,17 +533,11 @@ export default class Transaction extends Component<Props, State> {
         ))}
       </div>
     );
-  }
+  };
 
   render(): Node {
     const data = this.props.data;
-    const {
-      isLastInList,
-      state,
-      assuranceLevel,
-      onAddMemo,
-      onEditMemo,
-    } = this.props;
+    const { isLastInList, state, assuranceLevel, onAddMemo, onEditMemo } = this.props;
     const { isExpanded } = this.state;
     const { intl } = this.context;
     const isFailedTransaction = state < 0;
@@ -597,13 +560,10 @@ export default class Transaction extends Component<Props, State> {
 
     const detailsStyles = classnames([
       styles.details,
-      isExpanded ? styles.expanded : styles.closed
+      isExpanded ? styles.expanded : styles.closed,
     ]);
 
-    const labelOkClasses = classnames([
-      styles.status,
-      styles[assuranceLevel]
-    ]);
+    const labelOkClasses = classnames([styles.status, styles[assuranceLevel]]);
 
     const labelClasses = classnames([
       styles.status,
@@ -622,27 +582,23 @@ export default class Transaction extends Component<Props, State> {
 
     return (
       <div className={componentStyles}>
-
         {/* ==== Clickable Header -> toggles details ==== */}
-        <div className={styles.toggler} onClick={this.toggleDetails.bind(this)} role="presentation" aria-hidden>
+        <div
+          className={styles.toggler}
+          onClick={this.toggleDetails.bind(this)}
+          role="presentation"
+          aria-hidden
+        >
           <div className={styles.togglerContent}>
             <div className={styles.header}>
-              <div className={styles.time}>
-                {moment(data.date).format('hh:mm:ss A')}
-              </div>
+              <div className={styles.time}>{moment(data.date).format('hh:mm:ss A')}</div>
               <div className={styles.type}>
-                {this.getTxTypeMsg(
-                  intl,
-                  this.getTicker(data.amount.getDefaultEntry()),
-                  data,
-                )}
+                {this.getTxTypeMsg(intl, this.getTicker(data.amount.getDefaultEntry()), data)}
               </div>
               {state === TxStatusCodes.IN_BLOCK && isValidTransaction ? (
                 <div className={labelOkClasses}>{status}</div>
               ) : (
-                <div className={labelClasses}>
-                  {status}
-                </div>
+                <div className={labelClasses}>{status}</div>
               )}
               <div className={classnames([styles.currency, styles.fee])}>
                 {this.renderFeeDisplay({
@@ -654,15 +610,16 @@ export default class Transaction extends Component<Props, State> {
                 <div className={classnames([styles.currency])}>
                   {this.renderAmountDisplay({
                     entry: data.amount.getDefaultEntry(),
-                  })}
-                  {' '}
+                  })}{' '}
                   {this.getTicker(data.amount.getDefaultEntry())}
                 </div>
                 {this.renderAssets({ assets: data.amount.nonDefaultEntries() })}
               </div>
             </div>
             <div className={styles.expandArrowBox}>
-              <span className={arrowClasses}><ExpandArrow /></span>
+              <span className={arrowClasses}>
+                <ExpandArrow />
+              </span>
             </div>
           </div>
         </div>
@@ -670,7 +627,7 @@ export default class Transaction extends Component<Props, State> {
         {/* ==== Toggleable Transaction Details ==== */}
         <div className={contentStyles}>
           <div className={detailsStyles}>
-            { /* converting assets is not implemented but we may use it in the future for tokens */}
+            {/* converting assets is not implemented but we may use it in the future for tokens */}
             {data.type === transactionTypes.EXCHANGE && (
               <div className={styles.conversion}>
                 <div>
@@ -687,14 +644,10 @@ export default class Transaction extends Component<Props, State> {
                   <div className={styles.addressHeader}>
                     <h2>
                       {intl.formatMessage(globalMessages.fromAddresses)}:
-                      <span className={styles.addressCount}>
-                        {data.addresses.from.length}
-                      </span>
+                      <span className={styles.addressCount}>{data.addresses.from.length}</span>
                     </h2>
                     <h2>{intl.formatMessage(messages.addressType)}</h2>
-                    <h2 className={styles.fee}>
-                      {intl.formatMessage(globalMessages.amountLabel)}
-                    </h2>
+                    <h2 className={styles.fee}>{intl.formatMessage(globalMessages.amountLabel)}</h2>
                   </div>
                   <div className={styles.addressList}>
                     {data.addresses.from.map((address, addressIndex) => {
@@ -705,8 +658,7 @@ export default class Transaction extends Component<Props, State> {
                         addressIndex,
                         transform: amount => amount.abs().negated(), // ensure it shows as negative
                       });
-                    })
-                    }
+                    })}
                   </div>
                 </div>
                 <div>
@@ -716,9 +668,7 @@ export default class Transaction extends Component<Props, State> {
                       <span className={styles.addressCount}>{data.addresses.to.length}</span>
                     </h2>
                     <h2>{intl.formatMessage(messages.addressType)}</h2>
-                    <h2 className={styles.fee}>
-                      {intl.formatMessage(globalMessages.amountLabel)}
-                    </h2>
+                    <h2 className={styles.fee}>{intl.formatMessage(globalMessages.amountLabel)}</h2>
                   </div>
                   <div className={styles.addressList}>
                     {data.addresses.to.map((address, addressIndex) => {
@@ -735,15 +685,13 @@ export default class Transaction extends Component<Props, State> {
               {this.getWithdrawals(data)}
               {this.getCertificate(data)}
 
-              {(
-                state === TxStatusCodes.IN_BLOCK &&
-                this.props.numberOfConfirmations != null
-              ) && (
+              {state === TxStatusCodes.IN_BLOCK && this.props.numberOfConfirmations != null && (
                 <div className={styles.row}>
                   <h2>{intl.formatMessage(messages.assuranceLevel)}</h2>
                   <span className={styles.rowData}>
-                    <span className={styles.assuranceLevel}>{status}</span>
-                    . <span className="confirmationCount">{this.props.numberOfConfirmations}</span> {intl.formatMessage(messages.confirmations)}.
+                    <span className={styles.assuranceLevel}>{status}</span>.{' '}
+                    <span className="confirmationCount">{this.props.numberOfConfirmations}</span>{' '}
+                    {intl.formatMessage(messages.confirmations)}.
                   </span>
                 </div>
               )}
@@ -755,7 +703,7 @@ export default class Transaction extends Component<Props, State> {
                 light
                 linkType="transaction"
               >
-                <span className={classnames([styles.rowData, styles.hash, 'txid'/* for tests */])}>
+                <span className={classnames([styles.rowData, styles.hash, 'txid' /* for tests */])}>
                   {data.txid}
                 </span>
               </ExplorableHashContainer>
@@ -779,10 +727,11 @@ export default class Transaction extends Component<Props, State> {
                       </div>
                     </button>
                   </h2>
-                  <span className={classnames(
-                    styles.rowData,
-                    'memoContent', // for tests
-                  )}
+                  <span
+                    className={classnames(
+                      styles.rowData,
+                      'memoContent' // for tests
+                    )}
                   >
                     {this.props.memo?.Content}
                   </span>
@@ -808,12 +757,11 @@ export default class Transaction extends Component<Props, State> {
             </div>
           </div>
         </div>
-
       </div>
     );
   }
 
-  generateAddressButton: string => ?Node = (address) => {
+  generateAddressButton: string => ?Node = address => {
     const { intl } = this.context;
     const addressInfo = this.props.addressLookup(address);
     if (addressInfo == null) {
@@ -824,13 +772,17 @@ export default class Transaction extends Component<Props, State> {
       );
     }
     return (
-      <button type="button" className={classnames([styles.status, styles.typeAddress])} onClick={addressInfo.goToRoute}>
+      <button
+        type="button"
+        className={classnames([styles.status, styles.typeAddress])}
+        onClick={addressInfo.goToRoute}
+      >
         {addressInfo.name}
       </button>
     );
-  }
+  };
 
-  jormungandrCertificateToText: $ReadOnly<CertificateRow> => string = (certificate) => {
+  jormungandrCertificateToText: ($ReadOnly<CertificateRow>) => string = certificate => {
     const { intl } = this.context;
     const kind = certificate.Kind;
     switch (kind) {
@@ -848,9 +800,9 @@ export default class Transaction extends Component<Props, State> {
         throw new Error(`${nameof(this.jormungandrCertificateToText)} unexpected kind ${kind}`);
       }
     }
-  }
+  };
 
-  shelleyCertificateToText: $ReadOnly<CertificateRow> => string = (certificate) => {
+  shelleyCertificateToText: ($ReadOnly<CertificateRow>) => string = certificate => {
     const { intl } = this.context;
     const kind = certificate.Kind;
     switch (kind) {
@@ -872,9 +824,9 @@ export default class Transaction extends Component<Props, State> {
         throw new Error(`${nameof(this.shelleyCertificateToText)} unexpected kind ${kind}`);
       }
     }
-  }
+  };
 
-  getWithdrawals: WalletTransaction => ?Node = (data) => {
+  getWithdrawals: WalletTransaction => ?Node = data => {
     const { intl } = this.context;
     if (!(data instanceof CardanoShelleyTransaction)) {
       return null;
@@ -888,14 +840,10 @@ export default class Transaction extends Component<Props, State> {
           <div className={styles.addressHeader}>
             <h2>
               {intl.formatMessage(globalMessages.withdrawalsLabel)}:
-              <span className={styles.addressCount}>
-                {data.withdrawals.length}
-              </span>
+              <span className={styles.addressCount}>{data.withdrawals.length}</span>
             </h2>
             <h2>{intl.formatMessage(messages.addressType)}</h2>
-            <h2 className={styles.fee}>
-              {intl.formatMessage(globalMessages.amountLabel)}
-            </h2>
+            <h2 className={styles.fee}>{intl.formatMessage(globalMessages.amountLabel)}</h2>
           </div>
           <div className={styles.addressList}>
             {data.withdrawals.map((address, addressIndex) => {
@@ -905,16 +853,15 @@ export default class Transaction extends Component<Props, State> {
                 address,
                 addressIndex,
               });
-            })
-            }
+            })}
           </div>
         </div>
         <div />
       </div>
     );
-  }
+  };
 
-  getCertificate: WalletTransaction => ?Node = (data) => {
+  getCertificate: WalletTransaction => ?Node = data => {
     const { intl } = this.context;
 
     const wrapCertificateText = (node, manyCerts) => (
@@ -922,12 +869,9 @@ export default class Transaction extends Component<Props, State> {
         <h2>
           {manyCerts
             ? intl.formatMessage(messages.certificatesLabel)
-            : intl.formatMessage(messages.certificateLabel)
-          }
+            : intl.formatMessage(messages.certificateLabel)}
         </h2>
-        <span className={styles.rowData}>
-          {node}
-        </span>
+        <span className={styles.rowData}>{node}</span>
       </>
     );
     if (data instanceof JormungandrTransaction) {
@@ -943,28 +887,22 @@ export default class Transaction extends Component<Props, State> {
       if (data.certificates.length === 0) {
         return null;
       }
-      const certBlock = data.certificates.reduce(
-        (acc, curr, idx) => {
-          const newElem = (
-            // eslint-disable-next-line react/no-array-index-key
-            <span key={idx}>
-              {acc.length !== 0 ? (<br />) : undefined}
-              {this.shelleyCertificateToText(curr.certificate)}
-            </span>
-          );
-          acc.push(newElem);
-          return acc;
-        },
-        ([]: Array<Node>)
-      );
-      return wrapCertificateText(
-        certBlock,
-        data.certificates.length > 1
-      );
+      const certBlock = data.certificates.reduce((acc, curr, idx) => {
+        const newElem = (
+          // eslint-disable-next-line react/no-array-index-key
+          <span key={idx}>
+            {acc.length !== 0 ? <br /> : undefined}
+            {this.shelleyCertificateToText(curr.certificate)}
+          </span>
+        );
+        acc.push(newElem);
+        return acc;
+      }, ([]: Array<Node>));
+      return wrapCertificateText(certBlock, data.certificates.length > 1);
     }
-  }
+  };
 
-  getMetadata: WalletTransaction => ? Node = (data) => {
+  getMetadata: WalletTransaction => ?Node = data => {
     const { intl } = this.context;
 
     if (data instanceof CardanoShelleyTransaction && data.metadata !== null) {
@@ -974,9 +912,9 @@ export default class Transaction extends Component<Props, State> {
         jsonData = parseMetadata(data.metadata);
       } catch (error) {
         // try to parse schema using detailed conversion if advanced user
-        if(this.props.complexityLevel === ComplexityLevels.Advanced){
+        if (this.props.complexityLevel === ComplexityLevels.Advanced) {
           try {
-            jsonData = parseMetadataDetailed(data.metadata)
+            jsonData = parseMetadataDetailed(data.metadata);
           } catch (errDetailed) {
             // discard error
             // can not parse metadata as json
@@ -990,14 +928,11 @@ export default class Transaction extends Component<Props, State> {
         <div className={styles.row}>
           <h2>{intl.formatMessage(messages.transactionMetadata)}</h2>
           <span className={styles.rowData}>
-            {jsonData !== null ? (
-              <CodeBlock code={jsonData} />)
-              : (<span>0x{data.metadata}</span>)
-            }
+            {jsonData !== null ? <CodeBlock code={jsonData} /> : <span>0x{data.metadata}</span>}
           </span>
         </div>
-      )
+      );
     }
     return null;
-  }
+  };
 }
