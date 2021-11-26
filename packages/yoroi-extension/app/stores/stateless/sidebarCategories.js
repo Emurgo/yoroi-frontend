@@ -125,14 +125,14 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     route: ROUTES.STAKING,
     icon: stakingIcon,
     label: globalMessages.sidebarStaking,
-    isVisible: _request => true,
+    isVisible: _request => _request.selected !== null,
   },
   {
     className: 'assets',
     route: ROUTES.ASSETS.ROOT,
     icon: assetsIcon,
     label: globalMessages.sidebarAssets,
-    isVisible: _request => true,
+    isVisible: _request => _request.selected !== null,
   },
   {
     className: 'voting',
