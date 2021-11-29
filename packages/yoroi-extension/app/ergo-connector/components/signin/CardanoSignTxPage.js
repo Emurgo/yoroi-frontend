@@ -329,7 +329,7 @@ class SignTxPage extends Component<Props> {
                   <p className={styles.transactionId}>
                     {intl.formatMessage(messages.receiver)}
                   </p>
-                  <p className={styles.hash}>{this.renderAddresses()}</p>
+                  <div className={styles.hash}>{this.renderAddresses()}</div>
                   <button onClick={() => this.toggleUtxoDetails(true)} type='button' className={styles.utxo}>
                     <p>{intl.formatMessage(messages.txDetails)}</p>
                     <ArrowRight />
@@ -338,7 +338,7 @@ class SignTxPage extends Component<Props> {
                 <div className={styles.info}>
                   <div className={styles.infoRaw}>
                     <p className={styles.label}>{intl.formatMessage(globalMessages.amount)}</p>
-                    <p className={styles.labelValue}>
+                    <div className={styles.labelValue}>
                       {this.renderAmountDisplay({
                         entry: {
                           identifier: txData.amount.defaults.defaultIdentifier,
@@ -348,11 +348,11 @@ class SignTxPage extends Component<Props> {
                           ) ?? (new BigNumber('0'))
                         },
                       })}
-                    </p>
+                    </div>
                   </div>
                   <div className={styles.infoRaw}>
                     <p className={styles.label}>{intl.formatMessage(globalMessages.feeLabel)}</p>
-                    <p className={styles.labelValue}>
+                    <div className={styles.labelValue}>
                       {this.renderAmountDisplay({
                   entry: {
                     identifier: txData.fee.tokenId,
@@ -360,13 +360,13 @@ class SignTxPage extends Component<Props> {
                     amount: (new BigNumber(txData.fee.amount)).negated(),
                   },
                 })}
-                    </p>
+                    </div>
                   </div>
                   <div className={styles.totalAmoundCard}>
                     <p className={styles.totalAmoundLable}>
                       {intl.formatMessage(globalMessages.walletSendConfirmationTotalLabel)}
                     </p>
-                    <p className={styles.totalAmound}>
+                    <div className={styles.totalAmound}>
                       {this.renderAmountDisplay({
                         entry: {
                           identifier: txData.total.defaults.defaultIdentifier,
@@ -376,7 +376,7 @@ class SignTxPage extends Component<Props> {
                           ) ?? (new BigNumber('0')),
                         },
                       })}
-                    </p>
+                    </div>
                   </div>
                 </div>
                 <div className={styles.passwordInput}>
