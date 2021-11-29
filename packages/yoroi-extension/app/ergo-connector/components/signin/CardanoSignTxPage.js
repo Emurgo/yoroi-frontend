@@ -337,11 +337,13 @@ state: State = {
                     <p className={styles.labelValue}>
                       {this.renderAmountDisplay({
                         entry: {
-                          identifier: txData.fee.tokenId,
-                          networkId: txData.fee.networkId,
-                          amount: (new BigNumber(txData.fee.amount)).negated(),
+                          identifier: txData.amount.defaults.defaultIdentifier,
+                          networkId: txData.amount.defaults.defaultNetworkId,
+                          amount: txData.amount.get(
+                            txData.amount.defaults.defaultIdentifier
+                          ) ?? (new BigNumber('0'))
                         },
-                    })}
+                      })}
                     </p>
                   </div>
                   <div className={styles.infoRaw}>
@@ -362,12 +364,14 @@ state: State = {
                     </p>
                     <p className={styles.totalAmound}>
                       {this.renderAmountDisplay({
-                  entry: {
-                    identifier: txData.fee.tokenId,
-                    networkId: txData.fee.networkId,
-                    amount: (new BigNumber(txData.fee.amount)).negated(),
-                  },
-                })}
+                        entry: {
+                          identifier: txData.total.defaults.defaultIdentifier,
+                          networkId: txData.total.defaults.defaultNetworkId,
+                          amount: txData.total.get(
+                            txData.amount.defaults.defaultIdentifier
+                          ) ?? (new BigNumber('0')),
+                        },
+                      })}
                     </p>
                   </div>
                 </div>

@@ -53,8 +53,12 @@ import type { CardanoConnectorSignRequest } from '../types';
 import {
   asAddressedUtxo,
 } from '../../api/ada/transactions/utils';
-import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 import { genTimeToSlot, } from '../../api/ada/lib/storage/bridge/timeUtils';
+import {
+  connectorGetUsedAddresses,
+  connectorGetUnusedAddresses,
+  connectorGetChangeAddress,
+} from '../../../chrome/extension/ergo-connector/api';
 
 // Need to run only once - Connecting wallets
 let initedConnecting = false;
@@ -449,7 +453,8 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
                 networkId: defaultToken.NetworkId
               }
             ],
-            selectedWallet.publicDeriver.getParent().getDefaultToken())
+            selectedWallet.publicDeriver.getParent().getDefaultToken()
+          )
         }
       );
     }
@@ -470,7 +475,8 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
                 networkId: defaultToken.NetworkId
               }
             ],
-            selectedWallet.publicDeriver.getParent().getDefaultToken())
+            selectedWallet.publicDeriver.getParent().getDefaultToken()
+          )
         }
       );
     }
@@ -479,30 +485,16 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       networkId: defaultToken.NetworkId,
       amount: txBody.fee().to_str(),
     };
- // @todo need to get all the data required to make a HaskellShelleyTxSignRequest
-  //   const config = getCardanoHaskellBaseConfig(
-  //     selectedWallet.publicDeriver.getParent().getNetworkInfo()
-  //   ).reduce((acc, next) => Object.assign(acc, next), {});
 
-  //  const newTx =  new HaskellShelleyTxSignRequest({
-  //     senderUtxos: utxos,
-  //     unsignedTx: ,
-  //     changeAddr: [],
-  //     metadata: undefined,
-  //     networkSettingSnapshot: {
-  //       ChainNetworkId: Number.parseInt(config.ChainNetworkId, 10),
-  //       KeyDeposit: new BigNumber(config.KeyDeposit),
-  //       PoolDeposit: new BigNumber(config.PoolDeposit),
-  //       NetworkId: network.NetworkId,
-  //     },
-  //     neededStakingKeyHashes: {
-  //       neededHashes: new Set(),
-  //       wits: new Set(),
-  //     },
-  //   });
+    const { amount, total } = await this._calculateAmountAndTotal(
+      selectedWallet.publicDeriver,
+      inputs,
+      outputs,
+      fee,
+    );
 
     runInAction(() => {
-      this.adaTransaction = { inputs, outputs, fee };
+      this.adaTransaction = { inputs, outputs, fee, total, amount };
     });
   }
 
@@ -535,28 +527,89 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         time: new Date(),
       }).slot);
 
-      this.api.ada.createUnsignedTxForConnector({
+      const result = await this.api.ada.createUnsignedTxForConnector({
         publicDeriver: withHasUtxoChains,
         absSlotNumber,
         cardanoTxRequest: (signingMessage.sign: any).tx,
-      }).then(result => {
-        runInAction(() => {
-          this.adaTransaction = {
-            inputs: result.inputs(),
-            outputs: result.outputs(),
-            fee: {
-              tokenId: result.fee().getDefaultEntry().identifier,
-              networkId: result.fee().getDefaultEntry().networkId,
-              amount: result.fee().getDefaultEntry().amount.abs().negated().toString(),
-            },
-          };
-        });
-      }).catch(error => {
-        console.error('createUnsignedTx failed:', error);
+      });
+      const fee = {
+        tokenId: result.fee().getDefaultEntry().identifier,
+        networkId: result.fee().getDefaultEntry().networkId,
+        amount: result.fee().getDefaultEntry().amount.toString(),
+      };
+      const { amount, total } = await this._calculateAmountAndTotal(
+        selectedWallet.publicDeriver,
+        result.inputs(),
+        result.outputs(),
+        fee,
+      );
+      runInAction(() => {
+        this.adaTransaction = {
+          inputs: result.inputs(),
+          outputs: result.outputs(),
+          fee,
+          amount,
+          total,
+        };
       });
     } else {
       throw new Error(`${nameof(ConnectorStore)}::${nameof(this.createAdaTransaction)} unexpected wallet type`);
     }
+  }
+
+  async _calculateAmountAndTotal(
+    publicDeriver: PublicDeriver<>,
+    inputs: Array<{| address: string, value: MultiToken |}>,
+    outputs: Array<{| address: string, value: MultiToken |}>,
+    fee: {| tokenId: string, networkId: number, amount: string |},
+  ): Promise<{| amount: MultiToken, total: MultiToken |}> {
+    const withUtxos = asGetAllUtxos(publicDeriver);
+    if (withUtxos == null) {
+      throw new Error('wallet doesn\'t support IGetAllUtxos');
+    }
+    const utxos = await withUtxos.getAllUtxos();
+    const ownAddresses = new Set([
+      ...utxos.map(utxo => utxo.address),
+      ...await connectorGetUsedAddresses(publicDeriver, null),
+      ...await connectorGetUnusedAddresses(publicDeriver),
+      await connectorGetChangeAddress(publicDeriver),
+    ]);
+    const { defaultNetworkId, defaultIdentifier } =
+          publicDeriver.getParent().getDefaultToken();
+
+    const total = new MultiToken(
+      [
+        {
+          amount: new BigNumber('0'),
+          identifier: defaultIdentifier,
+          networkId: defaultNetworkId,
+        }
+      ],
+      { defaultNetworkId, defaultIdentifier }
+    );
+    for (const input of inputs) {
+      if (ownAddresses.has(input.address)) {
+        total.joinSubtractMutable(input.value);
+      }
+    }
+    for (const output of outputs) {
+      if (ownAddresses.has(output.address)) {
+        total.joinAddMutable(output.value);
+      }
+    }
+    const amount = total.joinAddCopy(
+      new MultiToken(
+        [
+          {
+            identifier: fee.tokenId,
+            networkId: fee.networkId,
+            amount: new BigNumber(fee.amount),
+          }
+        ],
+        { defaultNetworkId, defaultIdentifier }
+      )
+    );
+    return { total, amount };
   }
 
   @computed get signingRequest(): ?ISignRequest<any> {
