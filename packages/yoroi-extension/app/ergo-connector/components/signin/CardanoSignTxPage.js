@@ -330,14 +330,20 @@ class SignTxPage extends Component<Props> {
                     {intl.formatMessage(messages.receiver)}
                   </p>
                   <div className={styles.hash}>{this.renderAddresses()}</div>
-                  <button onClick={() => this.toggleUtxoDetails(true)} type='button' className={styles.utxo}>
+                  <button
+                    onClick={() => this.toggleUtxoDetails(true)}
+                    type='button'
+                    className={styles.utxo}
+                  >
                     <p>{intl.formatMessage(messages.txDetails)}</p>
                     <ArrowRight />
                   </button>
                 </div>
                 <div className={styles.info}>
                   <div className={styles.infoRaw}>
-                    <p className={styles.label}>{intl.formatMessage(globalMessages.amount)}</p>
+                    <p className={styles.label}>
+                      {intl.formatMessage(globalMessages.amount)}
+                    </p>
                     <div className={styles.labelValue}>
                       {this.renderAmountDisplay({
                         entry: {
@@ -351,15 +357,17 @@ class SignTxPage extends Component<Props> {
                     </div>
                   </div>
                   <div className={styles.infoRaw}>
-                    <p className={styles.label}>{intl.formatMessage(globalMessages.feeLabel)}</p>
+                    <p className={styles.label}>
+                      {intl.formatMessage(globalMessages.feeLabel)}
+                    </p>
                     <div className={styles.labelValue}>
                       {this.renderAmountDisplay({
-                  entry: {
-                    identifier: txData.fee.tokenId,
-                    networkId: txData.fee.networkId,
-                    amount: (new BigNumber(txData.fee.amount)).negated(),
-                  },
-                })}
+                        entry: {
+                          identifier: txData.fee.tokenId,
+                          networkId: txData.fee.networkId,
+                          amount: (new BigNumber(txData.fee.amount)).negated(),
+                        },
+                      })}
                     </div>
                   </div>
                   <div className={styles.totalAmoundCard}>
@@ -388,7 +396,11 @@ class SignTxPage extends Component<Props> {
                   />
                 </div>
                 <div className={styles.wrapperBtn}>
-                  <Button variant="secondary" className="secondary" onClick={onCancel}>
+                <Button
+                  variant="secondary"
+                  className="secondary"
+                  onClick={onCancel}
+                 >
                     {intl.formatMessage(globalMessages.cancel)}
                   </Button>
                   <Button
@@ -400,17 +412,19 @@ class SignTxPage extends Component<Props> {
                   </Button>
                 </div>
               </div>
-            ) : <CardanoUtxoDetails
-              txData={txData}
-              onCopyAddressTooltip={this.props.onCopyAddressTooltip}
-              addressToDisplayString={this.props.addressToDisplayString}
-              getCurrentPrice={this.props.getCurrentPrice}
-              getTokenInfo={this.props.getTokenInfo}
-              notification={this.props.notification}
-              selectedExplorer={this.props.selectedExplorer}
-              unitOfAccountSetting={this.props.unitOfAccountSetting}
-              toggleUtxoDetails={this.toggleUtxoDetails}
-            />
+            ) : (
+              <CardanoUtxoDetails
+                txData={txData}
+                onCopyAddressTooltip={this.props.onCopyAddressTooltip}
+                addressToDisplayString={this.props.addressToDisplayString}
+                getCurrentPrice={this.props.getCurrentPrice}
+                getTokenInfo={this.props.getTokenInfo}
+                notification={this.props.notification}
+                selectedExplorer={this.props.selectedExplorer}
+                unitOfAccountSetting={this.props.unitOfAccountSetting}
+                toggleUtxoDetails={this.toggleUtxoDetails}
+              />
+            )
           }
         </div>
       </>
