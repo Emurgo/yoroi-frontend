@@ -57,10 +57,6 @@ type Props = {|
   +getCurrentPrice: (from: string, to: string) => ?number,
 |};
 
-type State = {|
-  showUtxoDetails: boolean,
-|}
-
 const messages = defineMessages({
   title: {
     id: 'connector.signin.title',
@@ -81,18 +77,18 @@ const messages = defineMessages({
 });
 
 @observer
-class SignTxPage extends Component<Props, State> {
+class SignTxPage extends Component<Props> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
-state: State = {
-  showUtxoDetails: false,
-}
-
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm(
     {
       fields: {
+        showUtxoDetails: {
+          type: 'boolean',
+          value: false,
+        },
         walletPassword: {
           type: 'password',
           label: this.context.intl.formatMessage(globalMessages.walletPasswordLabel),
@@ -133,7 +129,7 @@ state: State = {
   }
 
   toggleUtxoDetails: boolean => void = (newState) => {
-    this.setState({ showUtxoDetails: newState })
+    this.form.$('showUtxoDetails').set(newState);
   }
 
   getTicker: $ReadOnly<TokenRow> => Node = tokenInfo => {
@@ -310,7 +306,7 @@ state: State = {
 
     const { intl } = this.context;
     const { txData, onCancel, } = this.props;
-    const { showUtxoDetails } = this.state
+    const { showUtxoDetails } = form.values();
     return (
       <>
         <ProgressBar step={2} />
