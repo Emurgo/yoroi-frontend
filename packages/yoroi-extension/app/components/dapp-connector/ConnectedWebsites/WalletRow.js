@@ -11,6 +11,7 @@ import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/
 import { getTokenName } from '../../../stores/stateless/tokenHelpers';
 import { hiddenAmount } from '../../../utils/strings';
 import DeleteIcon from '../../../assets/images/dapp-connector/delete.inline.svg';
+import NoDappImage from '../../../assets/images/dapp-connector/no-dapp.inline.svg';
 import WalletType from '../../widgets/WalletType';
 import type { ConceptualWalletSettingsCache } from '../../../stores/toplevel/WalletSettingsStore';
 
@@ -104,10 +105,12 @@ export default class WalletRow extends Component<Props, State> {
                 </div>
               </div>
               <div className={styles.dapp}>
-                {websiteIcon &&
                 <div className={styles.websiteIcon}>
-                  <img src={websiteIcon} alt={url} />
-                </div>}
+                  {websiteIcon ?
+                    <img src={websiteIcon} alt={url} />:
+                    <NoDappImage />
+                  }
+                </div>
                 <div>
                   <p className={styles.url}>{url}</p>
                   {isActiveSite && <p className={styles.status}>Active</p>}
