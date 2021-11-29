@@ -51,9 +51,15 @@
     .delete {
         display: flex;
         align-items: center;
-        justify-content: flex-end;
-        padding-right: 25px;
-        // margin-top: -10px;
+        justify-content: center;
+        margin-right: 25px;
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+    }
+
+    .delete:hover {
+       background-color: var(--yoroi-palette-gray-50);
     }
 
     .dapp {
