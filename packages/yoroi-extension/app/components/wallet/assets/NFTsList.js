@@ -4,7 +4,6 @@ import { Box, styled } from '@mui/system';
 import {
   IconButton,
   ImageList,
-  ImageListItem,
   Input,
   InputAdornment,
   Stack,
@@ -18,6 +17,7 @@ import { Link } from 'react-router-dom';
 import { ROUTES } from '../../../routes-config';
 import { useState } from 'react';
 import { ListEmpty } from './ListEmpty';
+import { NftCardImage } from './NftCardImage';
 
 type Props = {|
   list: Array<{| name: string, image: string | void |}> | void,
@@ -96,7 +96,7 @@ function NfTsList({ list, intl }: Props & Intl): Node {
           {nftList.map(nft => {
             return (
               <SLink key={nft.name} to={ROUTES.ASSETS.NFT_DETAILS.replace(':nftId', nft.name)}>
-                <NftCardImage ipfsUrl={nft.image} name={nft.name} />
+                <NftCardImage type='list' ipfsUrl={nft.image} name={nft.name} />
               </SLink>
             );
           })}
@@ -108,19 +108,6 @@ function NfTsList({ list, intl }: Props & Intl): Node {
 
 export default (injectIntl(NfTsList): ComponentType<Props>);
 
-function NftCardImage({ ipfsUrl, name }) {
-  const ipfsHash = ipfsUrl != null ? ipfsUrl.replace('ipfs://', '') : '';
-
-  return (
-    <ImageItem sx={{ height: '100%' }}>
-      <img src={`https://ipfs.io/ipfs/${ipfsHash}`} alt={name} loading="lazy" />
-      <Typography mt="16px" minHeight="48px" color="var(--yoroi-palette-gray-900)">
-        {name}
-      </Typography>
-    </ImageItem>
-  );
-}
-
 const SearchInput = styled(Input)({
   border: '1px solid var(--yoroi-palette-gray-300)',
   borderRadius: '8px',
@@ -130,13 +117,4 @@ const SearchInput = styled(Input)({
 });
 const SLink = styled(Link)({
   textDecoration: 'none',
-});
-const ImageItem = styled(ImageListItem)({
-  padding: '16px',
-  paddingBottom: '12px',
-  backgroundColor: 'var(--yoroi-palette-common-white)',
-  borderRadius: '8px',
-  img: {
-    borderRadius: '8px',
-  },
 });

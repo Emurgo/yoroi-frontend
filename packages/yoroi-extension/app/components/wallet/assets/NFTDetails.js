@@ -1,6 +1,6 @@
 // @flow
 import type { Node, ComponentType } from 'react';
-import { Box, styled } from '@mui/system';
+import { Box } from '@mui/system';
 import { Link as LinkMui, Grid, Typography, Stack } from '@mui/material';
 import globalMessages from '../../../i18n/global-messages';
 import { injectIntl } from 'react-intl';
@@ -12,6 +12,7 @@ import { ROUTES } from '../../../routes-config';
 import CopyToClipboardText from '../../widgets/CopyToClipboardLabel';
 import { getNetworkUrl, tokenMessages } from './TokenDetails';
 import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
+import { NftCardImage } from './NftCardImage';
 
 type Props = {|
   nftInfo: void | {|
@@ -35,7 +36,6 @@ type Intl = {|
 
 function NFTDetails({ nftInfo, nftsCount, network, intl }: Props & Intl): Node {
   if (nftInfo == null) return null;
-  const ipfsHash = nftInfo.image != null ? nftInfo.image.replace('ipfs://', '') : '';
   const networkUrl = getNetworkUrl(network);
 
   return (
@@ -70,9 +70,7 @@ function NFTDetails({ nftInfo, nftsCount, network, intl }: Props & Intl): Node {
           paddingTop: '57px',
         }}
       >
-        <ImageItem flex="1">
-          <img src={`https://ipfs.io/ipfs/${ipfsHash}`} alt={nftInfo.name} loading="lazy" />
-        </ImageItem>
+        <NftCardImage type='single' ipfsUrl={nftInfo.image} name={nftInfo.name} />
         <Box flex="1" backgroundColor="var(--yoroi-palette-common-white)" borderRadius="8px">
           <Box borderBottom="1px solid var(--yoroi-palette-gray-50)" px="24px" py="22px">
             <Typography variant="h5" color="var(--yoroi-palette-gray-900)">
@@ -155,21 +153,6 @@ function NFTDetails({ nftInfo, nftsCount, network, intl }: Props & Intl): Node {
 }
 
 export default (injectIntl(NFTDetails): ComponentType<Props>);
-
-const ImageItem = styled(Box)({
-  padding: '40px',
-  backgroundColor: 'var(--yoroi-palette-common-white)',
-  borderRadius: '8px',
-  img: {
-    margin: '0 auto',
-    overflow: 'hidden',
-    display: 'block',
-    maxWidth: '365px',
-    height: '100%',
-    objectFit: 'cover',
-    borderRadius: '8px',
-  },
-});
 
 function LabelWithValue({ label, value }: {| label: string | Node, value: string | Node |}): Node {
   return (
