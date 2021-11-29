@@ -296,7 +296,7 @@ class SignTxPage extends Component<Props> {
                 onClick={() => this.toggleUtxoDetails(true)}
                 key={address}
               >
-                {addresses.length - 1}
+                {addresses.length - 1}&nbsp;
                 <span>{this.context.intl.formatMessage(messages.more)}</span>
               </button>
             );
