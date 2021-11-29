@@ -1,9 +1,10 @@
 // @flow
-import { Component } from 'react';
-import type { Node } from 'react';
+import type { Node, ComponentType } from 'react';
 import { observer } from 'mobx-react';
+import { useLayout } from '../../../styles/context/layout';
+import type { LayoutComponentMap } from '../../../styles/context/layout';
 import ReceiveNavigation from '../navigation/ReceiveNavigation';
-import styles from './ReceiveWithNavigation.scss';
+import { Box } from '@mui/material';
 import type { AddressTypeName, AddressFilterKind } from '../../../types/AddressFilterTypes';
 
 export type Props = {|
@@ -16,30 +17,67 @@ export type Props = {|
     +name: AddressTypeName,
     +validFilters: $ReadOnlyArray<AddressFilterKind>,
     +wasExecuted: boolean,
-    ...,
-  }>;
+    ...
+  }>,
 |};
+type InjectedProps = {|
+  +renderLayoutComponent: LayoutComponentMap => Node,
+|};
+function ReceiveWithNavigation({
+  addressStores,
+  setFilter,
+  activeFilter,
+  children,
+}: Props & InjectedProps): Node {
+  const { renderLayoutComponent } = useLayout();
 
-@observer
-export default class ReceiveWithNavigation extends Component<Props> {
-  static defaultProps: {|children: void|} = {
-    children: undefined
-  };
+  const classicReceiveNav = (
+    <Box sx={{ display: 'flex', overflow: 'hidden', height: '100%' }}>
+      <Box sx={{ flexShrink: 0, height: '100%' }}>
+        <ReceiveNavigation
+          addressStores={addressStores}
+          setFilter={setFilter}
+          activeFilter={activeFilter}
+        />
+      </Box>
+      <Box sx={{ height: '100%', minHeight: '200px', overflow: 'overlay', flex: 1 }}>
+        {children}
+      </Box>
+    </Box>
+  );
 
-  render(): Node {
-    return (
-      <div className={styles.component}>
-        <div className={styles.navigation}>
-          <ReceiveNavigation
-            addressStores={this.props.addressStores}
-            setFilter={this.props.setFilter}
-            activeFilter={this.props.activeFilter}
-          />
-        </div>
-        <div className={styles.page}>
-          {this.props.children}
-        </div>
-      </div>
-    );
-  }
+  const revampReceiveNav = (
+    <Box
+      sx={{
+        display: 'flex',
+        overflow: 'hidden',
+        height: '100%',
+        backgroundColor: 'var(--yoroi-palette-common-white)',
+        borderRadius: '8px',
+      }}
+    >
+      <Box
+        sx={{
+          flexShrink: 0,
+          height: '100%',
+          '& > div': { backgroundColor: 'var(--yoroi-palette-common-white)' },
+        }}
+      >
+        <ReceiveNavigation
+          addressStores={addressStores}
+          setFilter={setFilter}
+          activeFilter={activeFilter}
+        />
+      </Box>
+      <Box sx={{ height: '100%', minHeight: '200px', overflow: 'overlay', flex: 1 }}>
+        {children}
+      </Box>
+    </Box>
+  );
+  return renderLayoutComponent({ CLASSIC: classicReceiveNav, REVAMP: revampReceiveNav });
 }
+export default (observer(ReceiveWithNavigation): ComponentType<Props>);
+
+ReceiveWithNavigation.defaultProps = {
+  children: null,
+};

@@ -1,8 +1,9 @@
+/* eslint-disable no-nested-ternary */
 // @flow
 import React, { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
+import { intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import moment from 'moment';
 import classnames from 'classnames';
@@ -46,163 +47,16 @@ import CodeBlock from '../../widgets/CodeBlock';
 import BigNumber from 'bignumber.js';
 import { ComplexityLevels } from '../../../types/complexityLevelType';
 import type { ComplexityLevelType } from '../../../types/complexityLevelType';
-
-export const messages: Object = defineMessages({
-  type: {
-    id: 'wallet.transaction.type',
-    defaultMessage: '!!!{currency} transaction',
-  },
-  exchange: {
-    id: 'wallet.transaction.type.exchange',
-    defaultMessage: '!!!Exchange',
-  },
-  assuranceLevel: {
-    id: 'wallet.transaction.assuranceLevel',
-    defaultMessage: '!!!Transaction assurance level',
-  },
-  confirmations: {
-    id: 'wallet.transaction.confirmations',
-    defaultMessage: '!!!confirmations',
-  },
-  conversionRate: {
-    id: 'wallet.transaction.conversion.rate',
-    defaultMessage: '!!!Conversion rate',
-  },
-  sent: {
-    id: 'wallet.transaction.sent',
-    defaultMessage: '!!!{currency} sent',
-  },
-  received: {
-    id: 'wallet.transaction.received',
-    defaultMessage: '!!!{currency} received',
-  },
-  intrawallet: {
-    id: 'wallet.transaction.type.intrawallet',
-    defaultMessage: '!!!{currency} intrawallet transaction',
-  },
-  multiparty: {
-    id: 'wallet.transaction.type.multiparty',
-    defaultMessage: '!!!{currency} multiparty transaction',
-  },
-  rewardWithdrawn: {
-    id: 'wallet.transaction.type.rewardWithdrawn',
-    defaultMessage: '!!!Reward withdrawn',
-  },
-  catalystVotingRegistered: {
-    id: 'wallet.transaction.type.catalystVotingRegistered',
-    defaultMessage: '!!!Catalyst voting registered',
-  },
-  stakeDelegated: {
-    id: 'wallet.transaction.type.stakeDelegated',
-    defaultMessage: '!!!Stake delegated',
-  },
-  stakeKeyRegistered: {
-    id: 'wallet.transaction.type.stakeKeyRegistered',
-    defaultMessage: '!!!Staking key registered',
-  },
-  fromAddress: {
-    id: 'wallet.transaction.address.from',
-    defaultMessage: '!!!From address',
-  },
-  toAddress: {
-    id: 'wallet.transaction.address.to',
-    defaultMessage: '!!!To address',
-  },
-  addressType: {
-    id: 'wallet.transaction.address.type',
-    defaultMessage: '!!!Address Type',
-  },
-  certificateLabel: {
-    id: 'wallet.transaction.certificateLabel',
-    defaultMessage: '!!!Certificate',
-  },
-  certificatesLabel: {
-    id: 'wallet.transaction.certificatesLabel',
-    defaultMessage: '!!!Certificates',
-  },
-  transactionAmount: {
-    id: 'wallet.transaction.transactionAmount',
-    defaultMessage: '!!!Transaction amount',
-  },
-  transactionMetadata: {
-    id: 'wallet.transaction.transactionMetadata',
-    defaultMessage: '!!!Transaction Metadata',
-  },
-});
-
-export const jormungandrCertificateKinds: Object = defineMessages({
-  PoolRegistration: {
-    id: 'wallet.transaction.certificate.PoolRegistration',
-    defaultMessage: '!!!Pool registration',
-  },
-  PoolUpdate: {
-    id: 'wallet.transaction.certificate.PoolUpdate',
-    defaultMessage: '!!!Pool update',
-  },
-  PoolRetirement: {
-    id: 'wallet.transaction.certificate.PoolRetirement',
-    defaultMessage: '!!!Pool retirement',
-  },
-  StakeDelegation: {
-    id: 'wallet.transaction.certificate.StakeDelegation',
-    defaultMessage: '!!!Stake delegation',
-  },
-  OwnerStakeDelegation: {
-    id: 'wallet.transaction.certificate.OwnerStakeDelegation',
-    defaultMessage: '!!!Owner stake delegation',
-  },
-});
-
-export const shelleyCertificateKinds: Object = {
-  PoolRegistration: jormungandrCertificateKinds.PoolRegistration,
-  PoolRetirement: jormungandrCertificateKinds.PoolRetirement,
-  StakeDelegation: jormungandrCertificateKinds.StakeDelegation,
-  StakeDeregistration: globalMessages.StakeDeregistration,
-  ...defineMessages({
-    StakeRegistration: {
-      id: 'wallet.transaction.certificate.StakeRegistration',
-      defaultMessage: '!!!Staking key registration',
-    },
-    GenesisKeyDelegation: {
-      id: 'wallet.transaction.certificate.GenesisKeyDelegation',
-      defaultMessage: '!!!Genesis key delegation',
-    },
-    MoveInstantaneousRewardsCert: {
-      id: 'wallet.transaction.certificate.MoveInstantaneousRewardsCert',
-      defaultMessage: '!!!Manually-initiated reward payout',
-    },
-  }),
-};
-
-export const assuranceLevelTranslations: Object = defineMessages({
-  low: {
-    id: 'wallet.transaction.assuranceLevel.low',
-    defaultMessage: '!!!low',
-  },
-  medium: {
-    id: 'wallet.transaction.assuranceLevel.medium',
-    defaultMessage: '!!!medium',
-  },
-  high: {
-    id: 'wallet.transaction.assuranceLevel.high',
-    defaultMessage: '!!!high',
-  },
-});
-
-export const stateTranslations: Object = defineMessages({
-  pending: {
-    id: 'wallet.transaction.state.pending',
-    defaultMessage: '!!!pending',
-  },
-  failed: {
-    id: 'wallet.transaction.state.failed',
-    defaultMessage: '!!!failed',
-  },
-  submitted: {
-    id: 'wallet.transaction.state.submitted',
-    defaultMessage: '!!!submitted',
-  },
-});
+import { Typography } from '@mui/material';
+import { Box } from '@mui/system';
+import {
+  assuranceLevelTranslations,
+  jormungandrCertificateKinds,
+  shelleyCertificateKinds,
+  stateTranslations,
+  messages,
+} from './Transaction';
+import { columnTXStyles } from '../summary/WalletSummaryRevamp';
 
 type Props = {|
   +data: WalletTransaction,
@@ -230,7 +84,7 @@ type State = {|
 |};
 
 @observer
-export default class Transaction extends Component<Props, State> {
+export default class TransactionRevamp extends Component<Props, State> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
@@ -260,7 +114,7 @@ export default class Transaction extends Component<Props, State> {
             features.includes('StakeDeregistration') &&
             features.length === 2)
         ) {
-          return intl.formatMessage(messages.rewardWithdrawn);
+          return intl.formatMessage({ id: 'wallet.transaction.type.rewardWithdrawn' });
         }
         if (features.includes('CatalystVotingRegistration') && features.length === 1) {
           return intl.formatMessage(messages.catalystVotingRegistered);
@@ -299,20 +153,13 @@ export default class Transaction extends Component<Props, State> {
   getStatusString(
     intl: $npm$ReactIntl$IntlFormat,
     state: number,
-    assuranceLevel: AssuranceLevel,
-    isValid: boolean,
+    assuranceLevel: AssuranceLevel
   ): string {
-    if (!isValid) {
-      return intl.formatMessage(stateTranslations.failed);
-    }
     if (state === TxStatusCodes.IN_BLOCK) {
       return intl.formatMessage(assuranceLevelTranslations[assuranceLevel]);
     }
     if (state === TxStatusCodes.PENDING) {
       return intl.formatMessage(stateTranslations.pending);
-    }
-    if (state === TxStatusCodes.SUBMITTED) {
-      return intl.formatMessage(stateTranslations.submitted);
     }
     if (state < 0) {
       return intl.formatMessage(stateTranslations.failed);
@@ -336,9 +183,9 @@ export default class Transaction extends Component<Props, State> {
         return (
           <>
             {calculateAndFormatValue(shiftedAmount, price) + ' ' + currency}
-            <div className={styles.amountSmall}>
+            <Typography as="span" fontWeight="inherit" fontSize="inherit">
               {shiftedAmount.toString()} {getTokenName(tokenInfo)}
-            </div>
+            </Typography>
           </>
         );
       }
@@ -356,7 +203,9 @@ export default class Transaction extends Component<Props, State> {
     return (
       <>
         {adjustedBefore}
-        <span className={styles.afterDecimal}>{afterDecimalRewards}</span>
+        <Typography as="span" fontWeight="inherit" fontSize="inherit">
+          {afterDecimalRewards}
+        </Typography>
       </>
     );
   };
@@ -379,15 +228,19 @@ export default class Transaction extends Component<Props, State> {
         return (
           <>
             {calculateAndFormatValue(shiftedAmount.abs(), price) + ' ' + currency}
-            <div className={styles.amountSmall}>
+            <Typography variant="body1" as="span">
               {shiftedAmount.abs().toString()} {getTokenName(tokenInfo)}
-            </div>
+            </Typography>
           </>
         );
       }
     }
     if (request.type === transactionTypes.INCOME) {
-      return <span>-</span>;
+      return (
+        <Typography as="span" fontSize="inherit">
+          -
+        </Typography>
+      );
     }
     const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
       shiftedAmount.abs(),
@@ -397,7 +250,9 @@ export default class Transaction extends Component<Props, State> {
     return (
       <>
         {beforeDecimalRewards}
-        <span className={styles.afterDecimal}>{afterDecimalRewards}</span>
+        <Typography as="span" fontSize="inherit">
+          {afterDecimalRewards}
+        </Typography>
       </>
     );
   };
@@ -523,7 +378,9 @@ export default class Transaction extends Component<Props, State> {
           </ExplorableHashContainer>
         </CopyableAddress>
         {this.generateAddressButton(request.address.address)}
-        {renderAmount(request.address.value.getDefaultEntry())}
+        <Typography variant="body2" color="var(--yoroi-palette-gray-900)">
+          {renderAmount(request.address.value.getDefaultEntry())}
+        </Typography>
         {request.address.value.nonDefaultEntries().map(entry => (
           <React.Fragment key={divKey(entry.identifier)}>
             <div />
@@ -537,95 +394,120 @@ export default class Transaction extends Component<Props, State> {
 
   render(): Node {
     const data = this.props.data;
-    const { isLastInList, state, assuranceLevel, onAddMemo, onEditMemo } = this.props;
+    const { state, assuranceLevel, onAddMemo, onEditMemo } = this.props;
     const { isExpanded } = this.state;
     const { intl } = this.context;
     const isFailedTransaction = state < 0;
-    const isPendingTransaction = state === TxStatusCodes.PENDING || state === TxStatusCodes.SUBMITTED;
-    const isValidTransaction = (data instanceof CardanoShelleyTransaction) ?
-      data.isValid :
-      true;
+    const isPendingTransaction = state === TxStatusCodes.PENDING;
 
-    const componentStyles = classnames([
-      styles.component,
-      isFailedTransaction ? styles.failed : null,
-      isPendingTransaction ? styles.pending : null,
-    ]);
-
-    const contentStyles = classnames([
-      styles.content,
-      isLastInList ? styles.last : styles.notLast,
-      isExpanded ? styles.shadow : null,
-    ]);
+    const contentStyles = classnames([styles.content, isExpanded ? styles.shadow : null]);
 
     const detailsStyles = classnames([
       styles.details,
       isExpanded ? styles.expanded : styles.closed,
     ]);
 
-    const labelOkClasses = classnames([styles.status, styles[assuranceLevel]]);
-
-    const labelClasses = classnames([
-      styles.status,
-      (isFailedTransaction || !isValidTransaction) ? styles.failedLabel : '',
-      isPendingTransaction ? styles.pendingLabel : '',
-    ]);
-
     const arrowClasses = isExpanded ? styles.collapseArrow : styles.expandArrow;
 
-    const status = this.getStatusString(
-      intl,
-      state,
-      assuranceLevel,
-      isValidTransaction,
-    );
+    const status = this.getStatusString(intl, state, assuranceLevel);
 
     return (
-      <div className={componentStyles}>
+      <Box className={styles.component}>
         {/* ==== Clickable Header -> toggles details ==== */}
-        <div
-          className={styles.toggler}
+        <Box
+          sx={{ padding: '20px 0', borderBottom: '1px solid var(--yoroi-palette-gray-200)' }}
           onClick={this.toggleDetails.bind(this)}
           role="presentation"
           aria-hidden
         >
-          <div className={styles.togglerContent}>
-            <div className={styles.header}>
-              <div className={styles.time}>{moment(data.date).format('hh:mm:ss A')}</div>
-              <div className={styles.type}>
-                {this.getTxTypeMsg(intl, this.getTicker(data.amount.getDefaultEntry()), data)}
-              </div>
-              {state === TxStatusCodes.IN_BLOCK && isValidTransaction ? (
-                <div className={labelOkClasses}>{status}</div>
-              ) : (
-                <div className={labelClasses}>{status}</div>
-              )}
-              <div className={classnames([styles.currency, styles.fee])}>
+          <Box sx={{ display: 'flex' }}>
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                width: '100%',
+                alignItems: 'center',
+              }}
+            >
+              <Box sx={columnTXStyles.transactionType}>
+                <Typography
+                  variant="body1"
+                  color={
+                    isPendingTransaction
+                      ? 'var(--yoroi-palette-gray-400)'
+                      : 'var(--yoroi-palette-gray-900)'
+                  }
+                >
+                  {this.getTxTypeMsg(intl, this.getTicker(data.amount.getDefaultEntry()), data)}
+                </Typography>
+                <Typography
+                  variant="body3"
+                  color={
+                    isPendingTransaction
+                      ? 'var(--yoroi-palette-gray-400)'
+                      : 'var(--yoroi-palette-gray-600)'
+                  }
+                >
+                  {moment(data.date).format('hh:mm A')}
+                </Typography>
+              </Box>
+              <Box sx={columnTXStyles.status}>
+                {state === TxStatusCodes.IN_BLOCK ? (
+                  <Typography
+                    sx={{
+                      color: isPendingTransaction
+                        ? 'var(--yoroi-palette-gray-400)'
+                        : 'var(--yoroi-palette-gray-900)',
+                      textTransform: 'capitalize',
+                    }}
+                  >
+                    {status}
+                  </Typography>
+                ) : (
+                  <Typography
+                    sx={{
+                      color: isFailedTransaction
+                        ? 'var(--yoroi-palette-error-100)'
+                        : isPendingTransaction
+                        ? 'var(--yoroi-palette-gray-400)'
+                        : 'var(--yoroi-palette-gray-900)',
+                      textTransform: 'capitalize',
+                    }}
+                  >
+                    {status}
+                  </Typography>
+                )}
+              </Box>
+              <Typography
+                variant="body1"
+                color="var(--yoroi-palette-gray-900)"
+                sx={columnTXStyles.fee}
+              >
                 {this.renderFeeDisplay({
                   amount: data.fee,
                   type: data.type,
                 })}
-              </div>
-              <div className={classnames([styles.amount])}>
-                <div className={classnames([styles.currency])}>
+              </Typography>
+              <Box sx={columnTXStyles.amount}>
+                <Typography variant="body1" fontWeight="500" color="var(--yoroi-palette-gray-900)">
                   {this.renderAmountDisplay({
                     entry: data.amount.getDefaultEntry(),
                   })}{' '}
                   {this.getTicker(data.amount.getDefaultEntry())}
-                </div>
+                </Typography>
                 {this.renderAssets({ assets: data.amount.nonDefaultEntries() })}
-              </div>
-            </div>
+              </Box>
+            </Box>
             <div className={styles.expandArrowBox}>
               <span className={arrowClasses}>
                 <ExpandArrow />
               </span>
             </div>
-          </div>
-        </div>
+          </Box>
+        </Box>
 
         {/* ==== Toggleable Transaction Details ==== */}
-        <div className={contentStyles}>
+        <Box className={contentStyles} sx={{ overflowX: 'overlay' }}>
           <div className={detailsStyles}>
             {/* converting assets is not implemented but we may use it in the future for tokens */}
             {data.type === transactionTypes.EXCHANGE && (
@@ -756,8 +638,8 @@ export default class Transaction extends Component<Props, State> {
               )}
             </div>
           </div>
-        </div>
-      </div>
+        </Box>
+      </Box>
     );
   }
 

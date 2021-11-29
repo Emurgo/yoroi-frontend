@@ -13,4 +13,5 @@ export default class TransactionsActions {
     exportRequest: TransactionRowsToExportRequest,
   |}> = new AsyncAction();
   closeExportTransactionDialog: Action<void> = new Action();
+  closeWalletEmptyBanner: Action<void> = new Action();
 }
