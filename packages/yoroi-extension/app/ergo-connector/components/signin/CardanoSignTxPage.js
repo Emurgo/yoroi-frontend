@@ -396,11 +396,11 @@ class SignTxPage extends Component<Props> {
                   />
                 </div>
                 <div className={styles.wrapperBtn}>
-                <Button
-                  variant="secondary"
-                  className="secondary"
-                  onClick={onCancel}
-                 >
+                  <Button
+                    variant="secondary"
+                    className="secondary"
+                    onClick={onCancel}
+                  >
                     {intl.formatMessage(globalMessages.cancel)}
                   </Button>
                   <Button
