@@ -295,7 +295,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       }
 
       const result = [];
-      for (const currentWallet of filteredWallets) {
+      for (const currentWallet of wallets) {
         const conceptualInfo = await currentWallet.getParent().getFullConceptualWalletInfo();
         const withPubKey = asGetPublicKey(currentWallet);
 
@@ -634,8 +634,15 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     await this.setConnectorWhitelist.execute({ whitelist });
     await this.getConnectorWhitelist.execute();
   };
-  _removeWalletFromWhitelist: (url: string) => Promise<void> = async url => {
-    const filter = this.currentConnectorWhitelist.filter(e => e.url !== url);
+  _removeWalletFromWhitelist: (
+    request: {url: string, protocol: string}
+    ) => Promise<void> = async (request) => {
+      console.log({
+        request
+      })
+    const filter = this.currentConnectorWhitelist.filter(
+      e => !(e.url === request.url && e.protocol === request.protocol)
+    );
     await this.setConnectorWhitelist.execute({
       whitelist: filter,
     });
