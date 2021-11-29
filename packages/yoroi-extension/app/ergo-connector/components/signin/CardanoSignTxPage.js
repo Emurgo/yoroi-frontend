@@ -287,7 +287,7 @@ class SignTxPage extends Component<Props> {
     const addresses = this.props.txData.outputs.map(({ address }) =>  address);
     return (
       <div className={styles.toAddresses}>
-        {addresses.map((address, idx) => {
+        {addresses.slice(0, 2).map((address, idx) => {
           if (idx >= 1) {
             return (
               <button
