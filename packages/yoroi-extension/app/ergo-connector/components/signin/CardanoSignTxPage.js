@@ -294,14 +294,14 @@ class SignTxPage extends Component<Props> {
                 className={styles.more}
                 type="button"
                 onClick={() => this.toggleUtxoDetails(true)}
-                key={idx}
+                key={address}
               >
                 {addresses.length - 1}
                 <span>{this.context.intl.formatMessage(messages.more)}</span>
               </button>
             );
           }
-          return (<p key={idx}>{address}</p>);
+          return (<p key={address}>{address}</p>);
         })}
       </div>
     )
