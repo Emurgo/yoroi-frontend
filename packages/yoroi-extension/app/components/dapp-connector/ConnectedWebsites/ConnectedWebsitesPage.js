@@ -141,7 +141,7 @@ export default class ConnectedWebsitesPage extends Component<Props> {
                     })
                   }
                   <div className={styles.line}>
-                    <div/>
+                    <div />
                   </div>
                 </div>
                 }
