@@ -26,15 +26,10 @@ import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashC
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 import classnames from 'classnames';
-import type {
-  Tx,
-  CardanoTx,
-} from '../../../../chrome/extension/ergo-connector/types';
 import ArrowLeft from '../../../assets/images/arrow-left.inline.svg'
 import type { CardanoConnectorSignRequest } from '../../types';
 
 type Props = {|
-  +tx: Tx | CardanoTx,
   +txData: CardanoConnectorSignRequest,
   +onCopyAddressTooltip: (string, string) => void,
   +notification: ?Notification,

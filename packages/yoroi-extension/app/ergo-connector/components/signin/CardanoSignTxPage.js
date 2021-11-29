@@ -404,7 +404,6 @@ state: State = {
               getTokenInfo={this.props.getTokenInfo}
               notification={this.props.notification}
               selectedExplorer={this.props.selectedExplorer}
-              tx={this.props.tx}
               unitOfAccountSetting={this.props.unitOfAccountSetting}
               toggleUtxoDetails={this.toggleUtxoDetails}
             />
