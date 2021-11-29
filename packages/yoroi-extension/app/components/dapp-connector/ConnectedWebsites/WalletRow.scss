@@ -10,7 +10,7 @@
 
     .rowWrapper {
         display: grid;
-        grid-template-columns: 5fr 5fr 2fr; 
+        grid-template-columns: 6fr 5fr 1fr; 
         grid-gap: 5px;
         align-items: center;
     }
@@ -53,12 +53,13 @@
         align-items: center;
         justify-content: flex-end;
         padding-right: 25px;
-        margin-top: -10px;
+        // margin-top: -10px;
     }
 
     .dapp {
         display: flex;
         align-items: center;
+        padding-left: 40px;
 
         & > div {
             display: flex;
