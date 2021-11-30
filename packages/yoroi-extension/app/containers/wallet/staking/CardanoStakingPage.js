@@ -41,6 +41,7 @@ import { genLookupOrFail } from '../../../stores/stateless/tokenHelpers';
 import {
   MultiToken,
 } from '../../../api/common/lib/MultiToken';
+import type { WalletChecksum } from '@emurgo/cip4-js';
 
 export type GeneratedData = typeof CardanoStakingPage.prototype.generated;
 
@@ -73,6 +74,10 @@ export default class CardanoStakingPage extends Component<Props> {
     if (selectedWallet == null) {
       return null;
     }
+
+    const selectedPlate = this.generated.stores.wallets.activeWalletPlate;
+    const stakingListBias = selectedPlate?.TextPart || 'bias';
+
     const delegationRequests = this.generated.stores.delegation.getDelegationRequests(
       selectedWallet
     );
@@ -89,6 +94,7 @@ export default class CardanoStakingPage extends Component<Props> {
           <SeizaFetcher
             urlTemplate={urlTemplate}
             locale={locale}
+            bias={stakingListBias}
             totalAda={totalAda}
             poolList={delegationRequests.getCurrentDelegation.result?.currEpoch?.pools.map(
               tuple => tuple[0]
@@ -494,7 +500,8 @@ export default class CardanoStakingPage extends Component<Props> {
           isExecuting: boolean,
           wasExecuted: boolean
         |},
-        selected: null | PublicDeriver<>
+        selected: null | PublicDeriver<>,
+        activeWalletPlate: void | WalletChecksum,
       |}
     |}
     |} {
@@ -513,6 +520,7 @@ export default class CardanoStakingPage extends Component<Props> {
         },
         wallets: {
           selected: stores.wallets.selected,
+          activeWalletPlate: stores.wallets.activeWalletPlate,
           sendMoneyRequest: {
             error: stores.wallets.sendMoneyRequest.error,
             isExecuting: stores.wallets.sendMoneyRequest.isExecuting,

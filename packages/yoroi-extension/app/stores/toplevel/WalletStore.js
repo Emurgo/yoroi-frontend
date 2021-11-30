@@ -18,7 +18,6 @@ import {
   asGetPublicKey,
   asGetStakingKey,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
-import { isCardanoHaskell } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import type {
   IGetLastSyncInfoResponse,
   IGetSigningKey,
@@ -28,13 +27,12 @@ import { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWal
 import { Logger, stringifyError } from '../../utils/logging';
 import { assuranceModes } from '../../config/transactionAssuranceConfig';
 import type { WalletChecksum } from '@emurgo/cip4-js';
-import { walletChecksum, legacyWalletChecksum } from '@emurgo/cip4-js';
 import { createDebugWalletDialog } from '../../containers/wallet/dialogs/DebugWalletDialogContainer';
 import { createProblematicWalletDialog } from '../../containers/wallet/dialogs/ProblematicWalletDialogContainer';
 import { getApiForNetwork } from '../../api/common/utils';
-import { Bip44Wallet } from '../../api/ada/lib/storage/models/Bip44Wallet/wrapper';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
+import { getWalletChecksum } from '../../api/export/utils';
 
 type GroupedWallets = {|
   publicDerivers: Array<PublicDeriver<>>,
@@ -195,6 +193,15 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
 
   @computed get hasActiveWallet(): boolean {
     return this.selected != null;
+  }
+
+  @computed get activeWalletPlate(): void | WalletChecksum {
+    if (this.selected == null) {
+      return null;
+    }
+    const selectedCache: ?PublicKeyCache = this.publicKeyCache
+      .find(c => c.publicDeriver.publicDeriverId === this.selected.publicDeriverId);
+    return selectedCache == null ? null : selectedCache.plate;
   }
 
   @computed get hasLoadedWallets(): boolean {
@@ -396,12 +403,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
       if (publicKey.IsEncrypted) {
         throw new Error(`${nameof(this.populateCacheForWallet)} unexpected encrypted public key`);
       }
-      const isLegacyWallet =
-        isCardanoHaskell(publicDeriver.getParent().getNetworkInfo()) &&
-        publicDeriver.getParent() instanceof Bip44Wallet;
-      const checksum = isLegacyWallet
-        ? legacyWalletChecksum(publicKey.Hash)
-        : walletChecksum(publicKey.Hash);
+      const checksum = await getWalletChecksum(withPubKey);
       runInAction(() => {
         this.publicKeyCache.push({
           publicDeriver: withPubKey,
