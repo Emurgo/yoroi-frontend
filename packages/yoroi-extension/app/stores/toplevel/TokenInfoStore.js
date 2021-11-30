@@ -15,6 +15,7 @@ import {
 import type {
   DefaultTokenEntry,
 } from '../../api/common/lib/MultiToken';
+import type { GetNftImageInfoResponse } from '../../api/ada/lib/state-fetch/types';
 import {
   getAllSchemaTables,
   raii,
@@ -128,6 +129,28 @@ export default class TokenInfoStore<
     );
     runInAction(() => { this._updateTokenInfo([...assetMap.values()]) });
   };
+
+  getNftImageInfo: {|
+    fingerprint: string,
+    networkId: number
+  |} => Promise<GetNftImageInfoResponse> = async (body: {|
+    fingerprint: string,
+    networkId: number
+  |}) => {
+    const network: ?NetworkRow = (Object.values(networks): Array<any>).find(
+      ({ NetworkId }) => NetworkId === body.networkId
+    );
+    if (!network || !isCardanoHaskell(network)) {
+      throw new Error('invalid network');
+    }
+
+    const nftImageInfo = await this.stores.substores.ada.stateFetchStore.fetcher.getNftImageInfo({
+      network,
+      fingerprint: body.fingerprint
+    });
+
+    return nftImageInfo;
+  }
 
   refreshTokenInfo: void => Promise<void> = async () => {
     const db = this.stores.loading.getDatabase();

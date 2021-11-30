@@ -391,3 +391,18 @@ export type MultiAssetMintMetadataResponseAsset = {|
   key: string,
   metadata: {[key: string]: any}
 |}
+
+export type GetNftImageInfoRequest = {|
+  ...BackendNetworkInfo,
+  fingerprint: string
+|}
+
+export type GetNftImageInfoResponse = {|
+  status: 'validating' | 'validated' | 'error',
+  info?: {|
+    smallVariantFile: string,
+    largeVariantFile: string,
+    contentsOnImage: string[],
+    category: 'GREEN' | 'YELLOW' | 'RED'
+  |}
+|}

@@ -19,7 +19,9 @@ import type {
   UtxoSumFunc,
   RemoteTransaction,
   MultiAssetMintMetadataRequest,
-  MultiAssetMintMetadataResponse
+  MultiAssetMintMetadataResponse,
+  GetNftImageInfoRequest,
+  GetNftImageInfoResponse,
 } from './types';
 import type {
   FilterFunc, FilterUsedRequest, FilterUsedResponse,
@@ -102,6 +104,11 @@ export class BatchedFetcher implements IFetcher {
   getMultiAssetMintMetadata: MultiAssetMintMetadataRequest
     => Promise<MultiAssetMintMetadataResponse> = (body) => (
     this.baseFetcher.getMultiAssetMintMetadata(body)
+  )
+
+  getNftImageInfo: GetNftImageInfoRequest
+    => Promise<GetNftImageInfoResponse> = (body) => (
+    this.baseFetcher.getNftImageInfo(body)
   )
 
   getAccountState: AccountStateRequest => Promise<AccountStateResponse> = (body) => (

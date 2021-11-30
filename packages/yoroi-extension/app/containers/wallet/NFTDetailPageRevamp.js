@@ -20,6 +20,7 @@ import type { Match } from 'react-router-dom';
 import { withRouter } from 'react-router-dom';
 import { Box } from '@mui/system';
 import NFTDetails from '../../components/wallet/assets/NFTDetails';
+import type { GetNftImageInfoResponse } from '../../api/ada/lib/state-fetch/types';
 
 export type GeneratedData = typeof NFTDetailPageRevamp.prototype.generated;
 type Props = {|
@@ -88,9 +89,18 @@ class NFTDetailPageRevamp extends Component<AllProps> {
     const { nftId } = this.props.match.params;
     const nftInfo = nftsList.find(nft => nft.name === nftId);
 
+    const injectedTokenInfoStore = {
+      getNftImageInfo: this.generated.stores.tokenInfoStore.getNftImageInfo
+    }
     return (
       <Box height="100%" overflow="overlay">
-        <NFTDetails nftInfo={nftInfo} nftsCount={nftsList.length} network={network} />
+        <NFTDetails
+          nftInfo={nftInfo}
+          nftsCount={nftsList.length}
+          network={network}
+          tokenInfoStore={injectedTokenInfoStore}
+          wallets={this.generated.stores.wallets}
+        />
       </Box>
     );
   }
@@ -100,6 +110,10 @@ class NFTDetailPageRevamp extends Component<AllProps> {
       tokenInfoStore: {|
         tokenInfo: TokenInfoMap,
         getDefaultTokenInfo: number => $ReadOnly<TokenRow>,
+        getNftImageInfo: {|
+          fingerprint: string,
+          networkId: number
+        |} => Promise<GetNftImageInfoResponse>
       |},
       transactions: {|
         getBalanceRequest: {|
@@ -125,6 +139,7 @@ class NFTDetailPageRevamp extends Component<AllProps> {
         tokenInfoStore: {
           tokenInfo: stores.tokenInfoStore.tokenInfo,
           getDefaultTokenInfo: stores.tokenInfoStore.getDefaultTokenInfo,
+          getNftImageInfo: stores.tokenInfoStore.getNftImageInfo
         },
         transactions: {
           getBalanceRequest: (() => {

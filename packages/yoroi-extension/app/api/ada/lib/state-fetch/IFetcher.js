@@ -13,6 +13,7 @@ import type {
   BestBlockRequest, BestBlockResponse,
   TokenInfoRequest, TokenInfoResponse,
   MultiAssetMintMetadataRequest, MultiAssetMintMetadataResponse,
+  GetNftImageInfoRequest, GetNftImageInfoResponse,
 } from './types';
 import type {
   FilterUsedRequest, FilterUsedResponse,
@@ -33,4 +34,5 @@ export interface IFetcher {
   checkAddressesInUse(body: FilterUsedRequest): Promise<FilterUsedResponse>;
   getMultiAssetMintMetadata(body: MultiAssetMintMetadataRequest)
     : Promise<MultiAssetMintMetadataResponse>;
+  getNftImageInfo(body: GetNftImageInfoRequest): Promise<GetNftImageInfoResponse>;
 }

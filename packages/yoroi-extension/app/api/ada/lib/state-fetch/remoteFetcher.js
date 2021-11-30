@@ -27,6 +27,8 @@ import type {
   CatalystRoundInfoResponse,
   MultiAssetMintMetadataRequest,
   MultiAssetMintMetadataResponse,
+  GetNftImageInfoRequest,
+  GetNftImageInfoResponse,
 } from './types';
 import type { FilterUsedRequest, FilterUsedResponse, } from '../../../common/lib/state-fetch/currencySpecificTypes';
 
@@ -446,6 +448,39 @@ export class RemoteFetcher implements IFetcher {
       .catch((error) => {
         Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getMultiAssetMintMetadata)} error: ` + stringifyError(error));
         return {};
+      });
+  }
+
+  getNftImageInfo: GetNftImageInfoRequest
+    => Promise<GetNftImageInfoResponse> = async (body) => {
+      const { BackendService } = body.network.Backend;
+      if (BackendService == null) throw new Error(`${nameof(this.getNftImageInfo)} missing backend url`);
+      return await axios(
+        `${BackendService}/api/multiAsset/validateNFT/${body.fingerprint}`,
+        {
+          method: 'get'
+        }
+      ).then(response => {
+        if (response.status === 200) {
+          return {
+            status: 'validated',
+            info: response.data
+          }
+        }
+        if (response.status === 202 || response.status === 204) {
+          return {
+            status: 'validating'
+          }
+        }
+        return {
+          status: 'error'
+        };
+      })
+      .catch((error) => {
+        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getNftImageInfo)} error: ` + stringifyError(error));
+        return {
+          status: 'error'
+        };
       });
   }
 }

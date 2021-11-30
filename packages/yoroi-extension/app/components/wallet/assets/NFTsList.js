@@ -18,9 +18,18 @@ import { ROUTES } from '../../../routes-config';
 import { useState } from 'react';
 import { ListEmpty } from './ListEmpty';
 import { NftCardImage } from './NftCardImage';
+import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver';
+import type { GetNftImageInfoResponse } from '../../../api/ada/lib/state-fetch/types';
 
 type Props = {|
-  list: Array<{| name: string, image: string | void |}> | void,
+  list: Array<{| name: string, id: string, image: string | void |}> | void,
+  tokenInfoStore: {|
+    getNftImageInfo: {|
+      fingerprint: string,
+      networkId: number
+    |} => Promise<GetNftImageInfoResponse>
+  |},
+  wallets: {| selected: null | PublicDeriver<> |}
 |};
 type Intl = {|
   intl: $npm$ReactIntl$IntlShape,
@@ -40,7 +49,7 @@ const listColumnViews = [
 ];
 
 const getDefaultColumnsView = () => listColumnViews[1];
-function NfTsList({ list, intl }: Props & Intl): Node {
+function NfTsList({ list, intl, tokenInfoStore, wallets }: Props & Intl): Node {
   if (list == null) return null;
   const [columns, setColumns] = useState(getDefaultColumnsView());
   const [nftList, setNftList] = useState(list);
@@ -96,7 +105,14 @@ function NfTsList({ list, intl }: Props & Intl): Node {
           {nftList.map(nft => {
             return (
               <SLink key={nft.name} to={ROUTES.ASSETS.NFT_DETAILS.replace(':nftId', nft.name)}>
-                <NftCardImage type='list' ipfsUrl={nft.image} name={nft.name} />
+                <NftCardImage
+                  type='list'
+                  ipfsUrl={nft.image}
+                  name={nft.name}
+                  fingerprint={nft.id}
+                  tokenInfoStore={tokenInfoStore}
+                  wallets={wallets}
+                />
               </SLink>
             );
           })}

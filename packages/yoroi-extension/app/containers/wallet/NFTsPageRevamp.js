@@ -17,6 +17,7 @@ import { MultiToken } from '../../api/common/lib/MultiToken';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 import type { TxRequests } from '../../stores/toplevel/TransactionsStore';
 import NfTsList from '../../components/wallet/assets/NFTsList';
+import type { GetNftImageInfoResponse } from '../../api/ada/lib/state-fetch/types';
 
 export type GeneratedData = typeof NFTsPageRevamp.prototype.generated;
 
@@ -51,11 +52,19 @@ export default class NFTsPageRevamp extends Component<InjectedOrGenerated<Genera
         })
         .map(item => ({
           name: item.name,
+          id: item.id,
           image: item.nftMetadata?.image,
         }));
     })();
 
-    return <NfTsList list={nftsList} />;
+    const injectedTokenInfoStore = {
+      getNftImageInfo: this.generated.stores.tokenInfoStore.getNftImageInfo
+    }
+    return <NfTsList
+      list={nftsList}
+      tokenInfoStore={injectedTokenInfoStore}
+      wallets={this.generated.stores.wallets}
+    />;
   }
 
   @computed get generated(): {|
@@ -63,6 +72,10 @@ export default class NFTsPageRevamp extends Component<InjectedOrGenerated<Genera
       tokenInfoStore: {|
         tokenInfo: TokenInfoMap,
         getDefaultTokenInfo: number => $ReadOnly<TokenRow>,
+        getNftImageInfo: {|
+          fingerprint: string,
+          networkId: number
+        |} => Promise<GetNftImageInfoResponse>
       |},
       transactions: {|
         getBalanceRequest: {|
@@ -88,6 +101,7 @@ export default class NFTsPageRevamp extends Component<InjectedOrGenerated<Genera
         tokenInfoStore: {
           tokenInfo: stores.tokenInfoStore.tokenInfo,
           getDefaultTokenInfo: stores.tokenInfoStore.getDefaultTokenInfo,
+          getNftImageInfo: stores.tokenInfoStore.getNftImageInfo
         },
         transactions: {
           getBalanceRequest: (() => {

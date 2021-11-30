@@ -43,6 +43,7 @@ export function genCSP(request: {|
 
   imgSrc.push('https://static.adapools.org/');
   imgSrc.push('https://ipfs.io/ipfs/');
+  imgSrc.push('https://emurgo-validated-nfts.s3.eu-central-1.amazonaws.com/');
   // connectSrc.push('https://api.dropboxapi.com');
   // connectSrc.push('https://content.dropboxapi.com');
 

@@ -13,6 +13,8 @@ import CopyToClipboardText from '../../widgets/CopyToClipboardLabel';
 import { getNetworkUrl, tokenMessages } from './TokenDetails';
 import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import { NftCardImage } from './NftCardImage';
+import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver';
+import type { GetNftImageInfoResponse } from '../../../api/ada/lib/state-fetch/types';
 
 type Props = {|
   nftInfo: void | {|
@@ -27,14 +29,28 @@ type Props = {|
     description?: string
   |},
   network: $ReadOnly<NetworkRow>,
-  nftsCount: number
+  nftsCount: number,
+  tokenInfoStore: {|
+    getNftImageInfo: {|
+      fingerprint: string,
+      networkId: number
+    |} => Promise<GetNftImageInfoResponse>
+  |},
+  wallets: {| selected: null | PublicDeriver<> |}
 |};
 
 type Intl = {|
   intl: $npm$ReactIntl$IntlShape,
 |};
 
-function NFTDetails({ nftInfo, nftsCount, network, intl }: Props & Intl): Node {
+function NFTDetails({
+  nftInfo,
+  nftsCount,
+  network,
+  intl,
+  tokenInfoStore,
+  wallets
+}: Props & Intl): Node {
   if (nftInfo == null) return null;
   const networkUrl = getNetworkUrl(network);
 
@@ -70,7 +86,14 @@ function NFTDetails({ nftInfo, nftsCount, network, intl }: Props & Intl): Node {
           paddingTop: '57px',
         }}
       >
-        <NftCardImage type='single' ipfsUrl={nftInfo.image} name={nftInfo.name} />
+        <NftCardImage
+          type='single'
+          ipfsUrl={nftInfo.image}
+          name={nftInfo.name}
+          fingerprint={nftInfo.id}
+          tokenInfoStore={tokenInfoStore}
+          wallets={wallets}
+        />
         <Box flex="1" backgroundColor="var(--yoroi-palette-common-white)" borderRadius="8px">
           <Box borderBottom="1px solid var(--yoroi-palette-gray-50)" px="24px" py="22px">
             <Typography variant="h5" color="var(--yoroi-palette-gray-900)">
