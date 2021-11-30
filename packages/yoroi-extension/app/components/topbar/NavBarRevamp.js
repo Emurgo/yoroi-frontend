@@ -1,11 +1,9 @@
 // @flow
 import { Component } from 'react';
-import type { Node, ComponentType } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import classnames from 'classnames';
-import styles from './NavBarRevamp.scss';
-import { withLayout } from '../../styles/context/layout';
-import NoticeBoardIcon from '../../assets/images/notice-board/notice-board.inline.svg';
+import NoticeBoardIcon from '../../assets/images/top-bar/notification.inline.svg';
+import { Box, IconButton } from '@mui/material';
 
 type Props = {|
   +children?: ?Node,
@@ -15,10 +13,9 @@ type Props = {|
   +buyButton?: Node,
   +menu?: ?Node,
 |};
-type InjectProps = {| isRevampLayout: boolean |};
 
 @observer
-class NavBarRevamp extends Component<Props & InjectProps> {
+class NavBarRevamp extends Component<Props> {
   static defaultProps: {|
     children: void,
     walletDetails: void,
@@ -36,29 +33,62 @@ class NavBarRevamp extends Component<Props & InjectProps> {
   render(): Node {
     const { title, children, walletDetails, menu } = this.props;
     return (
-      <header
-        className={classnames([styles.navbarRevamp, menu != null && styles.navbarRevampWithMenu])}
+      <Box
+        as="header"
+        sx={{
+          position: 'relative',
+          zIndex: 100,
+          backgroundColor: 'var(--yoroi-palette-common-white)',
+          color: 'var(--yoroi-palette-gray-800)',
+          boxShadow:
+            '0 4px 6px 0 #dee2ea, 0 1px 2px 0 rgba(222, 226, 234, 0.82), 0 2px 4px 0 rgba(222, 226, 234, 0.74)',
+          display: 'flex',
+          alignItems: 'center',
+          padding: menu != null ? '34px 40px 50px' : '32px 40px',
+          height: menu != null ? '115px' : '90px',
+        }}
       >
-        <div className={styles.mainRevamp}>
-          <div className={styles.title}>{title}</div>
-          <div className={styles.content}>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            width: '100%',
+            justifyContent: 'space-between',
+          }}
+        >
+          <Box flex="0 0 auto">{title}</Box>
+          <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
             {children}
             {this.props.walletDetails != null && (
-              <div className={styles.details}>{walletDetails}</div>
+              <Box sx={{ flex: '0 0 auto', marginLeft: '32px', minWidth: '280px' }}>
+                {walletDetails}
+              </Box>
             )}
-            <div className={styles.notifications}>
-              <button type="button" onClick={this.props.goToNotifications}>
-                <NoticeBoardIcon />
-              </button>
-            </div>
+            <IconButton
+              sx={{ color: 'var(--yoroi-palette-gray-600)', marginLeft: '11.5px' }}
+              type="button"
+              onClick={this.props.goToNotifications}
+            >
+              <NoticeBoardIcon />
+            </IconButton>
             {this.props.buyButton != null && (
-              <div className={styles.buyButton}>{this.props.buyButton}</div>
+              <Box sx={{ marginLeft: '24px' }}>{this.props.buyButton}</Box>
             )}
-          </div>
-        </div>
-        {menu != null ? <div className={styles.menu}>{menu}</div> : null}
-      </header>
+          </Box>
+        </Box>
+        {menu != null ? (
+          <Box
+            sx={{
+              position: 'absolute',
+              bottom: 0,
+              left: 0,
+            }}
+          >
+            {menu}
+          </Box>
+        ) : null}
+      </Box>
     );
   }
 }
-export default (withLayout(NavBarRevamp): ComponentType<Props>);
+export default NavBarRevamp;

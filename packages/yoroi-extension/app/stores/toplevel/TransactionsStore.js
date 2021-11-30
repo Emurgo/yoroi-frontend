@@ -111,6 +111,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
 
   /** Track transactions for a set of wallets */
   @observable transactionsRequests: Array<TxRequests> = [];
+  @observable showWalletEmptyBanner: boolean = true;
 
   @observable _searchOptionsForWallets: Array<{|
     publicDeriver: PublicDeriver<>,
@@ -134,6 +135,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     actions.exportTransactionsToFile.listen(this._exportTransactionsToFile);
     actions.closeExportTransactionDialog.listen(this._closeExportTransactionDialog);
     this._loadSubmittedTransactions();
+    actions.closeWalletEmptyBanner.listen(this._closeWalletEmptyBanner);
   }
 
   /** Calculate information about transactions that are still realistically reversible */
@@ -596,6 +598,10 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       this._setExporting(false);
       this._setExportError(null);
     }
+  }
+
+  @action _closeWalletEmptyBanner: void => void = () => {
+    this.showWalletEmptyBanner = false
   }
 
   exportTransactionsToFile: {|

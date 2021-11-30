@@ -1,26 +1,25 @@
 // @flow
-import { Component } from 'react';
-import type { Node } from 'react';
+import type { Node, ComponentType } from 'react';
 import { observer } from 'mobx-react';
-import styles from './CenteredLayout.scss';
+import { Box } from '@mui/material';
 
 type Props = {|
-  +children?: Node,
+  +children: Node,
 |};
 
-@observer
-export default class CenteredLayout extends Component<Props> {
-
-  static defaultProps: {|children: void|} = {
-    children: undefined
-  };
-
-  render(): Node {
-    const { children } = this.props;
-    return (
-      <div className={styles.component}>
-        {children}
-      </div>
-    );
-  }
+function CenteredLayout({ children }: Props): Node {
+  return (
+    <Box
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        backgroundColor: 'var(--yoroi-loading-background-color)',
+        height: '100%',
+      }}
+    >
+      {children}
+    </Box>
+  );
 }
+export default (observer(CenteredLayout): ComponentType<Props>);
