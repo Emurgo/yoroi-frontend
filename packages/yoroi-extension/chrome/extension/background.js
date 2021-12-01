@@ -96,7 +96,7 @@ type PublicDeriverId = number;
 // null = refused by user
 type ConnectedStatus = null | {|
   publicDeriverId: PublicDeriverId,
-  auth?: WalletAuthEntry,
+  auth: ?WalletAuthEntry,
 |} | {|
   // response (?PublicDeriverId) - null means the user refused, otherwise the account they selected
   resolve: ?PublicDeriverId => void,
@@ -119,7 +119,7 @@ let connectionProtocol: string = '';
 type ConnectedSite = {|
   url: string,
   protocol: string,
-  appAuthID?: string,
+  appAuthID: ?string,
   status: ConnectedStatus,
   pendingSigns: Map<RpcUid, PendingSign>
 |};
@@ -613,17 +613,17 @@ async function confirmSign(
 
 async function confirmConnect(
   tabId: number,
-  connectParameters: {
+  connectParameters: {|
     url: string,
     requestIdentification?: boolean,
     onlySilent?: boolean,
-    protocol?: string,
-  },
+    protocol: string,
+  |},
   localStorageApi: LocalStorageApi,
-): Promise<{
+): Promise<{|
   connectedWallet: ?PublicDeriverId,
   auth: ?WalletAuthEntry,
-}> {
+|}> {
   const { url, requestIdentification, onlySilent, protocol } = connectParameters;
   const isAuthRequested = Boolean(requestIdentification);
   const appAuthID = isAuthRequested ? url : undefined;
@@ -1066,7 +1066,7 @@ chrome.runtime.onConnectExternal.addListener(port => {
                   async (wallet, connection) => {
                     await RustModule.load();
                     const signatureHex = await ConnectorStore.authSignHexPayload({
-                      appAuthID: connection.appAuthID,
+                      appAuthID: connection?.appAuthID,
                       deriver: wallet,
                       payloadHex: message.params[0],
                     });
@@ -1086,11 +1086,11 @@ chrome.runtime.onConnectExternal.addListener(port => {
             try {
               checkParamCount(2);
               await withSelectedSiteConnection(tabId, async connection => {
-                if (connection.status.auth) {
+                if (connection?.status?.auth) {
                   await RustModule.load();
                   const [payloadHex, signatureHex] = message.params;
                   const pk = RustModule.WalletV4.PublicKey
-                    .from_bytes(Buffer.from(connection.status.auth.pubkey, 'hex'));
+                    .from_bytes(Buffer.from(String(connection.status.auth?.pubkey), 'hex'));
                   const sig = RustModule.WalletV4.Ed25519Signature.from_hex(signatureHex);
                   const res = pk.verify(Buffer.from(payloadHex, 'hex'), sig);
                   rpcResponse({

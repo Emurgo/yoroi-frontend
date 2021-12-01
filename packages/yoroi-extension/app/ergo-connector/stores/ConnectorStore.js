@@ -635,11 +635,8 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     await this.getConnectorWhitelist.execute();
   };
   _removeWalletFromWhitelist: (
-    request: {url: string, protocol: string}
+    request: {| url: string, protocol: string |}
     ) => Promise<void> = async (request) => {
-      console.log({
-        request
-      })
     const filter = this.currentConnectorWhitelist.filter(
       e => !(e.url === request.url && e.protocol === request.protocol)
     );
@@ -649,7 +646,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     await this.getConnectorWhitelist.execute();
     window.chrome.runtime.sendMessage(({
       type: 'remove_wallet_from_whitelist',
-      url,
+      url: request.url,
     }: RemoveWalletFromWhitelistData));
   };
 

@@ -400,10 +400,10 @@ export type WalletAuthEntry = {|
 
 export type WhitelistEntry = {|
   url: string,
-  protocol: string,
+  protocol: 'ergo' | 'cardano',
   publicDeriverId: number,
-  appAuthID?: string,
-  auth?: WalletAuthEntry,
+  appAuthID: ?string,
+  auth: ?WalletAuthEntry,
 |};
 
 export type ConnectingMessage = {|
@@ -411,6 +411,7 @@ export type ConnectingMessage = {|
   url: string,
   appAuthID?: string,
   imgBase64Url: string,
+  protocol: 'ergo' | 'cardano',
 |};
 export type SigningMessage = {|
   publicDeriverId: number,
@@ -468,6 +469,7 @@ export type ConnectResponseData = {|
   type: 'connect_response',
   accepted: true,
   publicDeriverId: number,
+  auth: ?WalletAuthEntry,
   tabId: ?number,
 |} | {|
   type: 'connect_response',

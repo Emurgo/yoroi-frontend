@@ -85,7 +85,7 @@ export default class ConnectWebsitesContainer extends Component<
           trigger: (params: void) => Promise<void>,
         |},
         removeWalletFromWhitelist: {|
-          trigger: (params: { url: string, protocol: string }) => Promise<void>,
+          trigger: (params: {| url: string, protocol: string |}) => Promise<void>,
         |},
         getConnectorWhitelist: {|
           trigger: (params: void) => Promise<void>,

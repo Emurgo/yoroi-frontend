@@ -20,7 +20,7 @@ type Props = {|
   +whitelistEntries: ?Array<WhitelistEntry>,
   +activeSites: Array<string>,
   +wallets: ?Array<PublicDeriverCache>,
-  +onRemoveWallet: ?string => void,
+  +onRemoveWallet: (url: string, protocol: string) => void,
   +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
   +shouldHideBalance: boolean,
 |};

@@ -15,7 +15,7 @@ import { LoadingWalletStates } from '../types';
 import { networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { genLookupOrFail, } from '../../stores/stateless/tokenHelpers';
 import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
-import { WalletChecksum } from '@emurgo/cip4-js';
+import type { WalletChecksum } from '@emurgo/cip4-js';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 import ConnectorStore from '../stores/ConnectorStore';
 
@@ -124,7 +124,7 @@ export default class ConnectContainer extends Component<
     const wallets = this.generated.stores.connector.wallets;
     if (wallets) {
       const { selected, deriver, checksum } = this.state;
-      if (selected >= 0) {
+      if (selected >= 0 && deriver) {
         this.onConnect(deriver, checksum);
       }
     }
@@ -154,7 +154,6 @@ export default class ConnectContainer extends Component<
         error={error}
         message={responseMessage}
         publicDerivers={wallets}
-        onConnect={this.onConnect}
         onToggleCheckbox={this.onToggleCheckbox}
         onCancel={this.onCancel}
         handleSubmit={this.handleSubmit}
