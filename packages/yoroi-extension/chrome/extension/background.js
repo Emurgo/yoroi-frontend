@@ -321,7 +321,7 @@ async function withSelectedWallet<T>(
 }
 
 // messages from other parts of Yoroi (i.e. the UI for the connector)
-chrome.runtime.onMessage.addListener(async (
+const yoroiMessageHandler = async (
   request: (
     ConnectResponseData
     | ConfirmedSignData
@@ -552,7 +552,16 @@ chrome.runtime.onMessage.addListener(async (
   } else if (request.type === 'get_protocol') {
     sendResponse({ type: connectionProtocol })
   }
-});
+};
+
+chrome.runtime.onMessage.addListener(
+  // Returning `true` is required by Firefox, see:
+  // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/runtime/onMessage
+  (message, sender, sendResponse) => {
+    yoroiMessageHandler(message, sender, sendResponse);
+    return true;
+  }
+);
 
 async function removeWallet(
   tabId: number,
