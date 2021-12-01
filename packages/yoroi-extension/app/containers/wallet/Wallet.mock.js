@@ -34,9 +34,14 @@ export const mockWalletProps: {
     stores: {
       app: {
         currentRoute: request.location,
+      
+      },
+      profile: {
+        isClassicTheme: true
       },
       wallets: {
         selected: request.selected,
+        firstSync: false,
       },
       transactions: {
         getBalanceRequest: {

@@ -35,6 +35,7 @@ import { getApiForNetwork } from '../../api/common/utils';
 import { Bip44Wallet } from '../../api/ada/lib/storage/models/Bip44Wallet/wrapper';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
+import { getCurrentWalletFromLS, markExistingWalletsAsSynced, updateSyncedWallets } from '../../utils/localStorage';
 
 type GroupedWallets = {|
   publicDerivers: Array<PublicDeriver<>>,
@@ -94,6 +95,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
   WALLET_REFRESH_INTERVAL: number = environment.getWalletRefreshInterval();
   ON_VISIBLE_DEBOUNCE_WAIT: number = 1000;
 
+  @observable firstSync: boolean = false
   @observable publicDerivers: Array<PublicDeriver<>>;
   @observable selected: null | PublicDeriver<>;
   @observable getInitialWallets: Request<GetWalletsFunc> = new Request<GetWalletsFunc>(getWallets);
@@ -213,11 +215,27 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
 
   refreshWalletFromRemote: (PublicDeriver<>) => Promise<void> = async publicDeriver => {
     try {
+      await markExistingWalletsAsSynced(this.stores.wallets.publicDerivers)
+      const wallet = await getCurrentWalletFromLS(publicDeriver);
+      if (!wallet || !wallet.isSynced) {
+        runInAction(() => {
+          this.firstSync = true
+        })
+      }
+
       await this.stores.transactions.refreshTransactionData({
         publicDeriver,
         localRequest: false,
       });
       await this.stores.addresses.refreshAddressesFromDb(publicDeriver);
+
+      await updateSyncedWallets(publicDeriver)
+       if (this.firstSync) {
+        runInAction(() => {
+          this.firstSync = false
+        })
+      }
+      
     } catch (error) {
       Logger.error(
         `${nameof(WalletStore)}::${nameof(this.refreshWalletFromRemote)} ` + stringifyError(error)
