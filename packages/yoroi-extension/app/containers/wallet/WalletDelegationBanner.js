@@ -1,25 +1,20 @@
 // @flow
 import type { Node, ComponentType } from 'react';
 import { Box, styled } from '@mui/system';
-import { Stack, Button, IconButton, Typography, Tooltip } from '@mui/material';
+import { Stack, Button, IconButton, Typography, Link } from '@mui/material';
 
 import { injectIntl, defineMessages } from 'react-intl';
 import CloseIcon from '../../assets/images/close.inline.svg';
-import QuestionMarkIcon from '../../assets/images/question-mark.inline.svg';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import globalMessages from '../../i18n/global-messages';
 import { observer } from 'mobx-react';
 import { emptyDashboardMessages } from '../../components/wallet/staking/dashboard/StakingDashboard';
 import { toSvg } from 'jdenticon';
 
-import DiscordIcon from '../../assets/images/social/revamp/discord.inline.svg';
-import FbIcon from '../../assets/images/social/revamp/facebook.inline.svg';
-import GithubIcon from '../../assets/images/social/revamp/github.inline.svg';
-import PersonalIcon from '../../assets/images/social/revamp/personal.inline.svg';
-import TelegramIcon from '../../assets/images/social/revamp/telegram.inline.svg';
-import TwitchIcon from '../../assets/images/social/revamp/twitch.inline.svg';
-import TwitterIcon from '../../assets/images/social/revamp/twitter.inline.svg';
-import YoutubeIcon from '../../assets/images/social/revamp/youtube.inline.svg';
+import {
+  HelperTooltip,
+  SocialMediaStakePool,
+} from '../../components/wallet/staking/dashboard-revamp/StakePool/StakePool';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import type { PoolData } from './staking/SeizaFetcher';
 
@@ -44,31 +39,24 @@ const messages = defineMessages({
     id: 'wallet.staking.banner.delegateNow',
     defaultMessage: '!!!Delegate now with our stake pool and start earning rewards',
   },
-  roaHelperMessage: {
-    id: 'wallet.staking.banner.roaHelperMessage',
-    defaultMessage:
-      '!!!Estimated ROA (Return of ADA) based on staking result from the last 30 days',
-  },
   firstRewardHelperMessage: {
     id: 'wallet.staking.banner.firstRewardHelperMessage',
     defaultMessage:
       '!!!1 epoch = 5 days. This means you will receive the first reward after 15-20 days from the delegation moment. All next rewards you will receive rewards every epoch (5 days).',
   },
+  firstReward: {
+    id: 'wallet.staking.banner.firstReward',
+    defaultMessage: '!!!First reward',
+  },
+  firstRewardDetails: {
+    id: 'wallet.staking.banner.firstRewardDetails',
+    defaultMessage: '!!!in 3-4 epochs',
+  },
+  socialMedia: {
+    id: 'wallet.staking.banner.socialMedia',
+    defaultMessage: '!!!Stake pool social media',
+  },
 });
-
-type HelperTooltipProps = {|
-  +message: string,
-|};
-
-function HelperTooltip({ message }: HelperTooltipProps): Node {
-  return (
-    <Tooltip title={<Typography variant="body2">{message}</Typography>} arrow placement="right">
-      <Box display="inline-flex">
-        <QuestionMarkIcon />
-      </Box>
-    </Tooltip>
-  );
-}
 
 function WalletDelegationBanner({
   isOpen,
@@ -92,19 +80,11 @@ function WalletDelegationBanner({
     avatar,
     websiteUrl,
     roa: estimatedRoa30d,
-    firstReward = 'in 3-4 epochs',
-    socialLinks = {},
+    socialLinks
   } = poolInfo || {};
 
   const avatarSource = toSvg(id, 36, { padding: 0 });
   const avatarGenerated = `data:image/svg+xml;utf8,${encodeURIComponent(avatarSource)}`;
-  const twitter = socialLinks.tw;
-  const telegram = socialLinks.tg;
-  const facebook = socialLinks.fb;
-  const youtube = socialLinks.yt;
-  const twitch = socialLinks.tc;
-  const discord = socialLinks.di;
-  const github = socialLinks.gh;
 
   return isOpen ? (
     <WrapperBanner>
@@ -119,7 +99,6 @@ function WalletDelegationBanner({
           spacing="8px"
           sx={{
             marginTop: '33px',
-            color: '#889CDF',
             span: {
               marginLeft: '8px',
             },
@@ -137,83 +116,43 @@ function WalletDelegationBanner({
               {name}
             </Typography>
           </Box>
-          <Typography display="flex" variant="body1" alignItems="center">
-            ROA 30d
+          <Label variant="body1">
+            {intl.formatMessage(globalMessages.roa30d)}
             <Typography as="span" color="var(--yoroi-palette-common-white)" marginRight="10px">
               {estimatedRoa30d}
             </Typography>
-            <HelperTooltip message={intl.formatMessage(messages.roaHelperMessage)} />
-          </Typography>
-          <Typography display="flex" variant="body1" alignItems="center">
-            First reward
+            <HelperTooltip message={intl.formatMessage(globalMessages.roaHelperMessage)} />
+          </Label>
+          <Label variant="body1">
+            {intl.formatMessage(messages.firstReward)}
             <Typography as="span" color="var(--yoroi-palette-common-white)" marginRight="10px">
-              {firstReward}
+              {intl.formatMessage(messages.firstRewardDetails)}
             </Typography>
             <HelperTooltip message={intl.formatMessage(messages.firstRewardHelperMessage)} />
-          </Typography>
+          </Label>
           <Box display="flex">
-            <Typography variant="body1">Stake pool social media</Typography>
-            <SocialList>
-              {twitter != null ? (
-                <a
-                  href={`https://twitter.com/${twitter}`}
-                  target="_blank"
-                  rel="noreferrer noopener"
-                >
-                  <TwitterIcon />
-                </a>
-              ) : null}
-              {telegram != null ? (
-                <a href={`https://t.me/${telegram}`} target="_blank" rel="noreferrer noopener">
-                  <TelegramIcon />{' '}
-                </a>
-              ) : null}
-              {facebook != null ? (
-                <a href={`https://fb.me/${facebook}`} target="_blank" rel="noreferrer noopener">
-                  <FbIcon />
-                </a>
-              ) : null}
-              {youtube != null ? (
-                <a
-                  href={`https://youtube.com/${youtube}`}
-                  target="_blank"
-                  rel="noreferrer noopener"
-                >
-                  <YoutubeIcon />
-                </a>
-              ) : null}
-              {twitch != null ? (
-                <a href={`https://twitch.com/${twitch}`} target="_blank" rel="noreferrer noopener">
-                  <TwitchIcon />
-                </a>
-              ) : null}
-              {discord != null ? (
-                <a href={`https://discord.gg/${discord}`} target="_blank" rel="noreferrer noopener">
-                  <DiscordIcon />
-                </a>
-              ) : null}
-              {github != null ? (
-                <a href={`https://github.com/${github}`} target="_blank" rel="noreferrer noopener">
-                  <GithubIcon />
-                </a>
-              ) : null}
-              {websiteUrl != null ? (
-                <a href={websiteUrl} target="_blank" rel="noreferrer noopener">
-                  <PersonalIcon />
-                </a>
-              ) : null}
-            </SocialList>
+            <Label variant="body1" mr="8px">
+              {intl.formatMessage(messages.socialMedia)}
+            </Label>
+            <SocialMediaStakePool
+              color="#8A99D1"
+              socialLinks={socialLinks}
+              websiteUrl={websiteUrl}
+            />
           </Box>
         </Stack>
       </Box>
       <Stack direction="row" spacing="24px">
-        <Button
+        <Link
+          as={Button}
           variant="secondary"
-          sx={{ width: '220px' }}
-          onClick={() => console.log('learn more')}
+          sx={{ width: '220px', textDecoration: 'none' }}
+          href="https://www.fixlink.com"
+          target="_blank"
+          rel="noreferrer noopener"
         >
           {intl.formatMessage(globalMessages.learnMore)}
-        </Button>
+        </Link>
         <Button
           variant="primary"
           sx={{ width: '220px' }}
@@ -271,16 +210,9 @@ const AvatarImg = styled('img')({
   objectFit: 'scale-down',
 });
 
-const SocialList = styled(Box)({
+const Label = styled(Typography)({
   display: 'flex',
-  marginLeft: '8px',
-  a: {
-    color: 'white',
-    opacity: 0.5,
-    marginRight: '3px',
-    width: '24px',
-    svg: {
-      transform: 'scale(0.8)',
-    },
-  },
+  alignItems: 'center',
+  color: 'var(--yoroi-palette-common-white)',
+  opacity: 0.5,
 });

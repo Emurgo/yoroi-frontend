@@ -93,6 +93,9 @@ class CardanoStakingPage extends Component<AllProps, State> {
       throw new Error(`${nameof(SeizaFetcher)} opened for non-reward wallet`);
     }
 
+    const delegationHistory = delegationRequests.getCurrentDelegation.result?.fullHistory;
+    const hasNeverDelegated = delegationHistory != null && delegationHistory.length === 0;
+
     if (urlTemplate != null) {
       const totalAda = this._getTotalAda();
       const locale = this.generated.stores.profile.currentLocale;
@@ -125,24 +128,26 @@ class CardanoStakingPage extends Component<AllProps, State> {
 
       const revampCardanoStakingPage = (
         <>
-          <WalletDelegationBanner
-            isOpen={this.generated.stores.transactions.showDelegationBanner}
-            onClose={this.generated.actions.transactions.closeDelegationBanner.trigger}
-            onDelegateClick={async poolId => {
-              await this._updatePool(poolId);
-              await this._next();
-            }}
-            poolInfo={this.state.firstPool}
-            isWalletWithNoFunds={isWalletWithNoFunds}
-            ticker={truncateToken(
-              getTokenName(
-                this.generated.stores.tokenInfoStore.getDefaultTokenInfo(
-                  publicDeriver.getParent().getNetworkInfo().NetworkId
+          {hasNeverDelegated ? (
+            <WalletDelegationBanner
+              isOpen={this.generated.stores.transactions.showDelegationBanner}
+              onClose={this.generated.actions.transactions.closeDelegationBanner.trigger}
+              onDelegateClick={async poolId => {
+                await this._updatePool(poolId);
+                await this._next();
+              }}
+              poolInfo={this.state.firstPool}
+              isWalletWithNoFunds={isWalletWithNoFunds}
+              ticker={truncateToken(
+                getTokenName(
+                  this.generated.stores.tokenInfoStore.getDefaultTokenInfo(
+                    publicDeriver.getParent().getNetworkInfo().NetworkId
+                  )
                 )
-              )
-            )}
-          />
-          <Box sx={{ flex: 1, iframe: { height: '100%' } }}>
+              )}
+            />
+          ) : null}
+          <Box sx={{ iframe: { minHeight: '60vh' } }}>
             {this.getDialog()}
             <SeizaFetcher
               urlTemplate={urlTemplate}
