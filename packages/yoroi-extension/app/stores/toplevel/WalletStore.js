@@ -197,13 +197,14 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     return this.selected != null;
   }
 
-  @computed get activeWalletPlate(): void | WalletChecksum {
-    if (this.selected == null) {
-      return null;
+  @computed get activeWalletPlate(): ?WalletChecksum {
+    const selectedPublicDeriverId = this.selected?.publicDeriverId;
+    if (selectedPublicDeriverId != null) {
+      const selectedCache: ?PublicKeyCache = this.publicKeyCache
+        // $FlowFixMe
+        .find(c => c.publicDeriver.publicDeriverId === selectedPublicDeriverId);
+      return selectedCache == null ? null : selectedCache.plate;
     }
-    const selectedCache: ?PublicKeyCache = this.publicKeyCache
-      .find(c => c.publicDeriver.publicDeriverId === this.selected.publicDeriverId);
-    return selectedCache == null ? null : selectedCache.plate;
   }
 
   @computed get hasLoadedWallets(): boolean {
@@ -414,6 +415,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
 
   // TODO: maybe delete this function and turn it into another "addObservedWallet"
   populateCacheForWallet: (PublicDeriver<>) => Promise<PublicDeriver<>> = async publicDeriver => {
+    // $FlowFixMe[incompatible-call]
     const withPubKey = asGetPublicKey(publicDeriver);
 
     if (withPubKey != null) {
@@ -422,13 +424,15 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
         throw new Error(`${nameof(this.populateCacheForWallet)} unexpected encrypted public key`);
       }
       const checksum = await getWalletChecksum(withPubKey);
-      runInAction(() => {
-        this.publicKeyCache.push({
-          publicDeriver: withPubKey,
-          plate: checksum,
-          publicKey: publicKey.Hash,
+      if (checksum != null) {
+        runInAction(() => {
+          this.publicKeyCache.push({
+            publicDeriver: withPubKey,
+            plate: checksum,
+            publicKey: publicKey.Hash,
+          });
         });
-      });
+      }
     }
 
     const publicDeriverInfo = await publicDeriver.getFullPublicDeriverInfo();

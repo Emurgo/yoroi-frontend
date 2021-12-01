@@ -584,7 +584,7 @@ class CardanoStakingPage extends Component<AllProps, State> {
           wasExecuted: boolean
         |},
         selected: null | PublicDeriver<>,
-        activeWalletPlate: void | WalletChecksum,
+        activeWalletPlate: ?WalletChecksum,
       |}
     |}
     |} {
