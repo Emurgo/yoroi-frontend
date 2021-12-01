@@ -132,7 +132,7 @@ export function overrideForNightly(manifest: any): any {
     /* eslint-enable quote-props */
   };
 
-  manifest.browser_specific_settings.gecko.id = '6abdeba8-579b-11ea-8e2d-0242ac130003';
+  manifest.browser_specific_settings.gecko.id = '{6abdeba8-579b-11ea-8e2d-0242ac130003}';
 
   manifest.name = nightlyTitle;
   manifest.browser_action.default_title = nightlyTitle;
