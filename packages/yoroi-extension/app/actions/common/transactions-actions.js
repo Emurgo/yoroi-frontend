@@ -1,5 +1,5 @@
 // @flow
-import { AsyncAction, Action, } from '../lib/Action';
+import { AsyncAction, Action } from '../lib/Action';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 
 // ======= TRANSACTIONS ACTIONS =======
@@ -13,4 +13,6 @@ export default class TransactionsActions {
     exportRequest: TransactionRowsToExportRequest,
   |}> = new AsyncAction();
   closeExportTransactionDialog: Action<void> = new Action();
+  closeWalletEmptyBanner: Action<void> = new Action();
+  closeDelegationBanner: Action<void> = new Action();
 }

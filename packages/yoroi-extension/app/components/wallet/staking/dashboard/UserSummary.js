@@ -31,10 +31,6 @@ const messages = defineMessages({
     id: 'wallet.dashboard.summary.title',
     defaultMessage: '!!!Your Summary',
   },
-  delegatedLabel: {
-    id: 'wallet.dashboard.summary.delegatedTitle',
-    defaultMessage: '!!!Total Delegated',
-  },
   note: {
     id: 'wallet.dashboard.summary.note',
     defaultMessage: '!!!Less than you expected?',
@@ -256,7 +252,7 @@ export default class UserSummary extends Component<Props, State> {
           <div className={styles.cardContent}>
             <div>
               <div className={styles.delegatedHeader}>
-                <h3 className={styles.label}>{intl.formatMessage(messages.delegatedLabel)}:</h3>
+                <h3 className={styles.label}>{intl.formatMessage(globalMessages.totalDelegated)}:</h3>
                 <div className={styles.mangledSection}>
                   {mangledWarningIcon}
                 </div>
