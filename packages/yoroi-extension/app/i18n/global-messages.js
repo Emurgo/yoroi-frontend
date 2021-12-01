@@ -582,6 +582,10 @@ const globalMessages: * = defineMessages({
     defaultMessage: '!!!Claim or transfer wallet',
   },
   // Revamp labels for sidebar
+  stakingDashboard: {
+    id: 'sidebar.stakingDashboard',
+    defaultMessage: '!!!Staking Dashboard',
+  },
   sidebarStaking: {
     id: 'sidebar.staking',
     defaultMessage: '!!!Staking',
@@ -621,6 +625,28 @@ const globalMessages: * = defineMessages({
   undelegateLabel: {
     id: 'global.labael.undelegate',
     defaultMessage: '!!!Undelegate',
+  },
+  roa30d: {
+    id: 'wallet.staking.banner.roa30d',
+    defaultMessage:
+      '!!!ROA 30d',
+  },
+  roaHelperMessage: {
+    id: 'wallet.staking.banner.roaHelperMessage',
+    defaultMessage:
+      '!!!Estimated ROA (Return of ADA) based on staking result from the last 30 days',
+  },
+  stakePoolDelegated: {
+    id: 'wallet.dashboard.upcomingRewards.stakePoolDelegated',
+    defaultMessage: '!!!Stake Pool Delegated',
+  },
+  totalDelegated: {
+    id: 'wallet.dashboard.summary.totalDelegated',
+    defaultMessage: '!!!Total Delegated',
+  },
+  overview: {
+    id: 'wallet.staking.overview',
+    defaultMessage: '!!!Overview',
   },
   auditAddressWarning: {
     id: 'wallet.receive.page.internalWarning2',

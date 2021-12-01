@@ -85,6 +85,7 @@ const ModernButton = {
       fontSize: '1rem',
       borderRadius: 8,
       fontWeight: 500,
+      fontFamily: 'Rubik',
       minHeight: 52,
       minWidth: 230,
       lineHeight: '18px',

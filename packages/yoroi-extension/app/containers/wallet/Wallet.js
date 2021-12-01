@@ -20,7 +20,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import type { WarningList } from '../../stores/toplevel/WalletSettingsStore';
-import { allCategories } from '../../stores/stateless/topbarCategories';
+import { allCategories, allSubcategoriesRevamp } from '../../stores/stateless/topbarCategories';
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import { withLayout } from '../../styles/context/layout';
 import type { LayoutComponentMap } from '../../styles/context/layout';
@@ -126,7 +126,7 @@ class Wallet extends Component<AllProps> {
 
     const menu = (
       <SubMenu
-        options={allCategories
+        options={allSubcategoriesRevamp
           .filter(category => category.isVisible(visibilityContext))
           .map(category => ({
             className: category.className,
