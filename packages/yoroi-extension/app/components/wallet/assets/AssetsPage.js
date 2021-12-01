@@ -10,27 +10,29 @@ import { MultiToken } from '../../../api/common/lib/MultiToken';
 import type {
   TokenLookupKey,
 } from '../../../api/common/lib/MultiToken';
-import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
+import type { TokenRow, NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 
 type Props = {|
   +assetsList: Asset[],
   +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
   +assetDeposit: null | MultiToken,
   +shouldHideBalance: boolean,
+  +network: $ReadOnly<NetworkRow>
 |};
 
 @observer
 export default class AssetsPage extends Component<Props> {
 
   render(): Node {
-    const { assetDeposit } = this.props
+    const { assetDeposit, network } = this.props
     return (
       <div className={styles.component}>
-        <AssetsList 
+        <AssetsList
           assetsList={this.props.assetsList}
           assetDeposit={assetDeposit}
           getTokenInfo={this.props.getTokenInfo}
           shouldHideBalance={this.props.shouldHideBalance}
+          network={network}
         />
       </div>
     );
