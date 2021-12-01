@@ -29,6 +29,7 @@ import globalMessages from '../../i18n/global-messages';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
 import SubMenu from '../../components/topbar/SubMenu';
 import type { GeneratedData as NavBarContainerRevampData } from '../NavBarContainerRevamp';
+import WalletSyncingOverlay from '../../components/wallet/syncingOverlay/WalletSyncingOverlay';
 
 export type GeneratedData = typeof Wallet.prototype.generated;
 
@@ -93,6 +94,18 @@ class Wallet extends Component<AllProps> {
   navigateToWallets: string => void = destination => {
     this.generated.actions.router.goToRoute.trigger({ route: destination });
   };
+
+  renderOverlay(): null | React$Element<typeof WalletSyncingOverlay> {
+    if (this.generated.stores.wallets.firstSync) {
+      return (
+        <WalletSyncingOverlay 
+          classicTheme={this.generated.stores.profile.isClassicTheme} 
+          onClose={() => this.navigateToWallets(ROUTES.MY_WALLETS)} 
+        />
+      )
+    }
+    return null
+  }
 
   render(): Node {
     // abort rendering if the page isn't valid for this wallet
@@ -174,6 +187,7 @@ class Wallet extends Component<AllProps> {
             }))}
         >
           {this.props.children}
+          {this.renderOverlay()}
         </WalletWithNavigation>
       </TopBarLayout>
     );
@@ -193,6 +207,7 @@ class Wallet extends Component<AllProps> {
         showAsCard
       >
         {warning}
+        {this.renderOverlay()}
         {this.props.children}
       </TopBarLayout>
     );
@@ -235,12 +250,18 @@ class Wallet extends Component<AllProps> {
       walletSettings: {|
         getWalletWarnings: (PublicDeriver<>) => WarningList,
       |},
-      wallets: {| selected: null | PublicDeriver<> |},
+      wallets: {| 
+        selected: null | PublicDeriver<>, 
+        firstSync: boolean,
+      |},
       router: {| location: any |},
       transactions: {|
         getBalanceRequest: {|
           result: ?MultiToken,
         |},
+      |},
+      profile: {|
+        isClassicTheme: boolean,
       |},
     |}
     |} {
@@ -259,6 +280,7 @@ class Wallet extends Component<AllProps> {
         },
         wallets: {
           selected: stores.wallets.selected,
+          firstSync: stores.wallets.firstSync
         },
         walletSettings: {
           getWalletWarnings: settingStore.getWalletWarnings,
@@ -278,6 +300,9 @@ class Wallet extends Component<AllProps> {
             };
           })(),
         },
+        profile: {
+          isClassicTheme: stores.profile.isClassicTheme
+        }
       },
       actions: {
         router: {
