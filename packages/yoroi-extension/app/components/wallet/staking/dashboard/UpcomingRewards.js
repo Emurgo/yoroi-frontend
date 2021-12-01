@@ -21,12 +21,6 @@ const messages = defineMessages({
     id: 'wallet.dashboard.upcomingRewards.title',
     defaultMessage: '!!!Upcoming Rewards',
   },
-
-  delegatedTitle: {
-    id: 'wallet.dashboard.upcomingRewards.delegatedTitle',
-    defaultMessage: '!!!Stake Pool Delegated',
-  },
-
   at: {
     id: 'wallet.dashboard.upcomingRewards.at',
     defaultMessage: '!!!at',
@@ -158,7 +152,7 @@ export default class UpcomingRewards extends Component<Props> {
         </div>
 
         <h3 className={classnames([styles.label, styles.mt20])}>
-          {intl.formatMessage(messages.delegatedTitle)}:
+          {intl.formatMessage(globalMessages.stakePoolDelegated)}:
         </h3>
         { (info.pools.length === 0) ?
           <div>—</div>

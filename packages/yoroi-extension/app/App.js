@@ -102,7 +102,7 @@ class App extends Component<Props, State> {
 
     return (
       <div style={{ height: '100%' }}>
-        <LayoutProvider>
+        <LayoutProvider layout={currentTheme}>
           <ThemeProvider theme={muiTheme}>
             <CssBaseline />
             {globalStyles(muiTheme)}

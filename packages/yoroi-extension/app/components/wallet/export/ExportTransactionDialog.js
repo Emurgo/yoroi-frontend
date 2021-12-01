@@ -80,11 +80,11 @@ export default class ExportTransactionDialog extends Component<Props> {
       >
         {infoBlock}
         <div className={styles.includeTxIds}>
-          <CheckboxLabel 
+          <CheckboxLabel
             label={intl.formatMessage(messages.includeTxIds)}
             onChange={toggleIncludeTxIds}
             checked={shouldIncludeTxIds}
-          /> 
+          />
         </div>
         {error && <ErrorBlock error={error} />}
       </Dialog>);

@@ -1,10 +1,10 @@
 // @flow
-import type { Node } from 'react';
+import type { Node, ComponentType } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { computed, observable, runInAction, } from 'mobx';
 import { intlShape } from 'react-intl';
-import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
+import type { NetworkRow, TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 
 import type { InjectedOrGenerated } from '../../../types/injectedPropsType';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
@@ -37,10 +37,16 @@ import config from '../../../config';
 import { handleExternalLinkClick } from '../../../utils/routing';
 import type { TxRequests } from '../../../stores/toplevel/TransactionsStore'
 import type { TokenInfoMap } from '../../../stores/toplevel/TokenInfoStore';
-import { genLookupOrFail } from '../../../stores/stateless/tokenHelpers';
+import { genLookupOrFail, getTokenName } from '../../../stores/stateless/tokenHelpers';
 import {
   MultiToken,
 } from '../../../api/common/lib/MultiToken';
+import WalletDelegationBanner from '../WalletDelegationBanner';
+import { truncateToken } from '../../../utils/formatters';
+import { withLayout } from '../../../styles/context/layout';
+import type { LayoutComponentMap } from '../../../styles/context/layout';
+import { Box } from '@mui/system';
+import type { PoolData } from './SeizaFetcher';
 
 export type GeneratedData = typeof CardanoStakingPage.prototype.generated;
 
@@ -48,13 +54,20 @@ type Props = {|
   ...InjectedOrGenerated<GeneratedData>,
   urlTemplate: ?string,
 |};
+type InjectedProps = {|
+  +renderLayoutComponent: LayoutComponentMap => Node,
+|};
+type State = {| firstPool: PoolData | void |};
+type AllProps = {| ...Props, ...InjectedProps |};
 
 @observer
-export default class CardanoStakingPage extends Component<Props> {
+class CardanoStakingPage extends Component<AllProps, State> {
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
-
+  state: State = {
+    firstPool: undefined,
+  };
   @observable notificationElementId: string = '';
 
   cancel: void => void = () => {
@@ -80,10 +93,22 @@ export default class CardanoStakingPage extends Component<Props> {
       throw new Error(`${nameof(SeizaFetcher)} opened for non-reward wallet`);
     }
 
+    const delegationHistory = delegationRequests.getCurrentDelegation.result?.fullHistory;
+    const hasNeverDelegated = delegationHistory != null && delegationHistory.length === 0;
+
     if (urlTemplate != null) {
       const totalAda = this._getTotalAda();
       const locale = this.generated.stores.profile.currentLocale;
-      return (
+
+      const publicDeriver = this.generated.stores.wallets.selected;
+      if (publicDeriver == null) {
+        throw new Error(`${nameof(CardanoStakingPage)} no public deriver. Should never happen`);
+      }
+      const txRequests = this.generated.stores.transactions.getTxRequests(publicDeriver);
+      const balance = txRequests.requests.getBalanceRequest.result;
+      const isWalletWithNoFunds = balance != null && balance.getDefaultEntry().amount.isZero();
+
+      const classicCardanoStakingPage = (
         <div>
           {this.getDialog()}
           <SeizaFetcher
@@ -100,6 +125,56 @@ export default class CardanoStakingPage extends Component<Props> {
           />
         </div>
       );
+
+      const revampCardanoStakingPage = (
+        <>
+          {hasNeverDelegated ? (
+            <WalletDelegationBanner
+              isOpen={this.generated.stores.transactions.showDelegationBanner}
+              onClose={this.generated.actions.transactions.closeDelegationBanner.trigger}
+              onDelegateClick={async poolId => {
+                await this._updatePool(poolId);
+                await this._next();
+              }}
+              poolInfo={this.state.firstPool}
+              isWalletWithNoFunds={isWalletWithNoFunds}
+              ticker={truncateToken(
+                getTokenName(
+                  this.generated.stores.tokenInfoStore.getDefaultTokenInfo(
+                    publicDeriver.getParent().getNetworkInfo().NetworkId
+                  )
+                )
+              )}
+            />
+          ) : null}
+          <Box sx={{ iframe: { minHeight: '60vh' } }}>
+            {this.getDialog()}
+            <SeizaFetcher
+              urlTemplate={urlTemplate}
+              locale={locale}
+              totalAda={totalAda}
+              poolList={
+                delegationRequests.getCurrentDelegation.result?.currEpoch?.pools.map(
+                  tuple => tuple[0]
+                ) ?? []
+              }
+              setFirstPool={pool => {
+                this.setState({ firstPool: pool });
+              }}
+              stakepoolSelectedAction={async poolId => {
+                await this._updatePool(poolId);
+                await this._next();
+              }}
+            />
+          </Box>
+        </>
+      );
+
+      return this.props.renderLayoutComponent({
+        CLASSIC: classicCardanoStakingPage,
+        REVAMP: revampCardanoStakingPage,
+      })
+
     }
     return (
       <div>
@@ -403,6 +478,11 @@ export default class CardanoStakingPage extends Component<Props> {
 
   @computed get generated(): {|
     actions: {|
+      transactions: {|
+        closeDelegationBanner: {|
+          trigger: (params: void) => void,
+        |},
+      |},
       ada: {|
         delegationTransaction: {|
           complete: {|
@@ -445,6 +525,7 @@ export default class CardanoStakingPage extends Component<Props> {
       transactions: {|
         hasAnyPending: boolean,
         getTxRequests: (PublicDeriver<>) => TxRequests,
+        showDelegationBanner: boolean,
       |},
       delegation: {|
         getDelegationRequests: (
@@ -466,6 +547,7 @@ export default class CardanoStakingPage extends Component<Props> {
       |},
       tokenInfoStore: {|
         tokenInfo: TokenInfoMap,
+        getDefaultTokenInfo: number => $ReadOnly<TokenRow>,
       |},
       substores: {|
         ada: {|
@@ -526,9 +608,11 @@ export default class CardanoStakingPage extends Component<Props> {
         transactions: {
           hasAnyPending: stores.transactions.hasAnyPending,
           getTxRequests: stores.transactions.getTxRequests,
+          showDelegationBanner: stores.transactions.showDelegationBanner,
         },
         tokenInfoStore: {
           tokenInfo: stores.tokenInfoStore.tokenInfo,
+          getDefaultTokenInfo: stores.tokenInfoStore.getDefaultTokenInfo,
         },
         delegation: {
           getDelegationRequests: stores.delegation.getDelegationRequests,
@@ -562,6 +646,11 @@ export default class CardanoStakingPage extends Component<Props> {
         },
       },
       actions: {
+        transactions: {
+          closeDelegationBanner: {
+            trigger: actions.transactions.closeDelegationBanner.trigger,
+          },
+        },
         notifications: {
           open: {
             trigger: actions.notifications.open.trigger,
@@ -598,3 +687,4 @@ export default class CardanoStakingPage extends Component<Props> {
     });
   }
 }
+export default (withLayout(CardanoStakingPage): ComponentType<Props>)

@@ -62,7 +62,7 @@ const genSampleUtxos: void => Array<RemoteUnspentOutput> = () => [
     boxId: '05ec4a4a7f4645fa66886cef2e34706907a3a7f9d88e0d48b313ad2cdf76fb5f',
     ergoTree: Buffer.from(RustModule.SigmaRust.Address.from_base58(
       '9egNKTzQDH658qcdiPEoQfVM1SBxQNxnyF8BCw57aNWerRhhHBQ'
-    ).to_ergo_tree().to_bytes()).toString('hex'),
+    ).to_ergo_tree().sigma_serialize_bytes()).toString('hex'),
   }),
   replaceMockBoxId({
     amount: '1000001',
@@ -73,7 +73,7 @@ const genSampleUtxos: void => Array<RemoteUnspentOutput> = () => [
     boxId: '6930f123df83e4178b0324ae617b2028c0b38c6ff4660583a2abf1f7b08195fe',
     ergoTree: Buffer.from(RustModule.SigmaRust.Address.from_base58(
       '9egNKTzQDH658qcdiPEoQfVM1SBxQNxnyF8BCw57aNWerRhhHBQ'
-    ).to_ergo_tree().to_bytes()).toString('hex'),
+    ).to_ergo_tree().sigma_serialize_bytes()).toString('hex'),
   }),
   replaceMockBoxId({
     amount: '10000001',
@@ -84,7 +84,7 @@ const genSampleUtxos: void => Array<RemoteUnspentOutput> = () => [
     boxId: '0df0273e382739f8b4ae3783d81168093e78e0b48ec2c5430ff03d444806a173',
     ergoTree: Buffer.from(RustModule.SigmaRust.Address.from_base58(
       '9iEqML45XncjkVtkrMFysY6qdKWhJs6fd3BNy7ExAVhTsaZemdF'
-    ).to_ergo_tree().to_bytes()).toString('hex'),
+    ).to_ergo_tree().sigma_serialize_bytes()).toString('hex'),
   }),
   replaceMockBoxId({
     amount: '20000000',
@@ -95,7 +95,7 @@ const genSampleUtxos: void => Array<RemoteUnspentOutput> = () => [
     boxId: '0df0273e382739f8b4ae3783d81168093e78e0b48ec2c5430ff04d444806a173',
     ergoTree: Buffer.from(RustModule.SigmaRust.Address.from_base58(
       '9hkTdcLcWqQxYQ3qexRb7MpZniDusrUr6R2Hp48cJU6H4Npq6jC'
-    ).to_ergo_tree().to_bytes()).toString('hex'),
+    ).to_ergo_tree().sigma_serialize_bytes()).toString('hex'),
     assets: [{
       tokenId: '13d24a67432d447e53118d920100c747abb52da8da646bc193f03b47b64a8ac5',
       amount: '10000',
@@ -530,12 +530,12 @@ describe('Create sendAll unsigned TX from UTXO', () => {
         unsignedTx
           .output_candidates()
           .get(0)
-          .ergo_tree().to_bytes()
+          .ergo_tree().sigma_serialize_bytes()
       ).toString('hex')).toEqual(
         Buffer.from(
           RustModule.SigmaRust.NetworkAddress.from_bytes(
             Buffer.from(receiver, 'hex')
-          ).address().to_ergo_tree().to_bytes()
+          ).address().to_ergo_tree().sigma_serialize_bytes()
         ).toString('hex')
       ); // output
       expect(
@@ -549,12 +549,12 @@ describe('Create sendAll unsigned TX from UTXO', () => {
         unsignedTx
           .output_candidates()
           .get(1)
-          .ergo_tree().to_bytes()
+          .ergo_tree().sigma_serialize_bytes()
       ).toString('hex')).toEqual(
         Buffer.from(
           RustModule.SigmaRust.NetworkAddress.from_bytes(
             Buffer.from(parameterSubset.FeeAddress, 'hex')
-          ).address().to_ergo_tree().to_bytes()
+          ).address().to_ergo_tree().sigma_serialize_bytes()
         ).toString('hex')
       ); // fee
       // make sure the assets are also sent
