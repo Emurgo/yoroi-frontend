@@ -51,7 +51,7 @@ export default class WalletAssetsPage extends Component<InjectedOrGenerated<Gene
     return (
       <AssetsPage
         assetsList={assetsList}
-        getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)} 
+        getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
         assetDeposit={isNonZeroDeposit ? assetDeposit : null}
         shouldHideBalance={profile.shouldHideBalance}
         network={network}
