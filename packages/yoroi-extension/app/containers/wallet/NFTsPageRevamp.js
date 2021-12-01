@@ -74,7 +74,8 @@ export default class NFTsPageRevamp extends Component<InjectedOrGenerated<Genera
         getDefaultTokenInfo: number => $ReadOnly<TokenRow>,
         getNftImageInfo: {|
           fingerprint: string,
-          networkId: number
+          networkId: number,
+          skipValidation: boolean,
         |} => Promise<GetNftImageInfoResponse>
       |},
       transactions: {|

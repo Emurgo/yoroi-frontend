@@ -33,7 +33,8 @@ type Props = {|
   tokenInfoStore: {|
     getNftImageInfo: {|
       fingerprint: string,
-      networkId: number
+      networkId: number,
+      skipValidation: boolean,
     |} => Promise<GetNftImageInfoResponse>
   |},
   wallets: {| selected: null | PublicDeriver<> |}

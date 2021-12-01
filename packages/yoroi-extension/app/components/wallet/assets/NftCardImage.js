@@ -1,5 +1,7 @@
 // @flow
-// import axios from 'axios';
+import styles from './NftCardImage.scss'
+
+import IconEyeClosed from '../../../assets/images/my-wallets/icon_eye_closed.inline.svg';
 
 import type { Node } from 'react';
 import { useEffect, useState } from 'react';
@@ -20,55 +22,119 @@ export function NftCardImage(props: {|
   tokenInfoStore: {|
     getNftImageInfo: {|
       fingerprint: string,
-      networkId: number
+      networkId: number,
+      skipValidation: boolean,
     |} => Promise<GetNftImageInfoResponse>
   |},
   wallets: {| selected: null | PublicDeriver<> |}
 |}): Node {
   const [validated, setValidated] = useState(false);
-  const [smallImageUrl, setSmallImageUrl] = useState('');
-  const [largeImageUrl, setLargeImageUrl] = useState('');
+  const [category, setCategory] = useState('');
+  const [imageUrl, setImageUrl] = useState('');
+  const [blurImage, setBlurImage] = useState(false);
+
+  const setImage = (imgSrc: string) => {
+    const img = new Image();
+    img.onload = () => {
+      setImageUrl(imgSrc);
+      setValidated(true);
+    };
+    img.src = imgSrc;
+  };
 
   useEffect(() => {
+    let skipValidation = false;
+    let interval: any;
     const load = async () => {
       if (props.wallets.selected) {
         const network = props.wallets.selected.getParent().getNetworkInfo();
         const info = await props.tokenInfoStore.getNftImageInfo({
           fingerprint: props.fingerprint,
-          networkId: network.NetworkId
+          networkId: network.NetworkId,
+          skipValidation
         });
         if (info.status === 'validated') {
+          clearInterval(interval)
           if (info.info) {
-            if (props.type === 'list') {
-              const smallImg = new Image();
-              smallImg.onload = () => {
-                setSmallImageUrl(info.info?.smallVariantFile);
-                setValidated(true);
-              };
-              smallImg.src = info.info.smallVariantFile;
+            if (info.info.category !== 'RED') {
+              if (props.type === 'list') {
+                setImage(info.info.smallVariantFile);
+              } else {
+                setImage(info.info.largeVariantFile);
+              }
+              if (info.info.category === 'YELLOW') {
+                setBlurImage(true);
+              }
             } else {
-              const largeImg = new Image();
-              largeImg.onload = () => {
-                setLargeImageUrl(info.info?.largeVariantFile);
-                setValidated(true);
-              };
-              largeImg.src = info.info.largeVariantFile;
+              setValidated(true);
             }
+            setCategory(info.info.category);
           }
         } else {
+          skipValidation = true;
           setValidated(false);
         }
       }
     }
-    load()
-  }, [])
+    interval = setInterval(async () => {
+      await load();
+    }, 10000);
+  }, []);
+
+  const toggleImageDisplay = () => {
+    setBlurImage(!blurImage);
+  };
+
+  let overlay: Node;
+  if (blurImage) {
+    overlay =
+      <Box className={styles.overlayText}>
+        <Typography mt="16px" minHeight="48px" align="center">
+          <IconEyeClosed />
+        </Typography>
+        {
+          props.type === 'single'
+            ?
+              <Typography mt="16px" minHeight="48px" align="center">
+                Possibly sensitive content found. Click on the image to toggle the display.
+              </Typography>
+            : <></>
+        }
+      </Box>
+  }
+
+  let display: Node;
+  if (category !== 'RED') {
+    display =
+      <div className={styles.imgContainer}>
+        {
+          category !== 'RED'
+            ?
+              <img
+                className={blurImage ? styles.blurredImg : ''}
+                src={imageUrl}
+                alt={props.name}
+                loading="lazy"
+              />
+            : <></>
+        }
+        {overlay}
+      </div>
+  } else {
+    display =
+      <Box>
+        <Typography mt="16px" minHeight="48px" align="center">
+          The image cannot be displayed on Yoroi.
+        </Typography>
+      </Box>
+  }
 
   if (props.type === 'list') {
     return (
       <ListImageItem sx={{ height: '100%' }}>
         {
           validated
-            ? <img src={smallImageUrl} alt={props.name} loading="lazy" />
+            ? display
             : <LoadingSpinner />
         }
         <Typography mt="16px" minHeight="48px" color="var(--yoroi-palette-gray-900)">
@@ -79,10 +145,10 @@ export function NftCardImage(props: {|
   }
 
   return (
-    <ImageItem flex="1">
+    <ImageItem flex="1" onClick={category === 'YELLOW' ? toggleImageDisplay : () => {}}>
       {
         validated
-          ? <img src={largeImageUrl} alt={props.name} loading="lazy" />
+          ? display
           : <LoadingSpinner />
       }
     </ImageItem>
@@ -90,16 +156,15 @@ export function NftCardImage(props: {|
 }
 
 const ListImageItem = styled(ImageListItem)({
+  overflow: 'hidden',
   padding: '16px',
   paddingBottom: '12px',
   backgroundColor: 'var(--yoroi-palette-common-white)',
   borderRadius: '8px',
-  img: {
-    borderRadius: '8px',
-  },
 });
 
 const ImageItem = styled(Box)({
+  overflow: 'hidden',
   padding: '40px',
   backgroundColor: 'var(--yoroi-palette-common-white)',
   borderRadius: '8px',
@@ -110,6 +175,5 @@ const ImageItem = styled(Box)({
     maxWidth: '365px',
     height: '100%',
     objectFit: 'cover',
-    borderRadius: '8px',
   },
 });

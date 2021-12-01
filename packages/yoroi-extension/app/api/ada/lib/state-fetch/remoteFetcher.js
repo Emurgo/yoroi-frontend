@@ -455,8 +455,12 @@ export class RemoteFetcher implements IFetcher {
     => Promise<GetNftImageInfoResponse> = async (body) => {
       const { BackendService } = body.network.Backend;
       if (BackendService == null) throw new Error(`${nameof(this.getNftImageInfo)} missing backend url`);
+      let requestUrl = `${BackendService}/api/multiAsset/validateNFT/${body.fingerprint}`;
+      if (body.skipValidation) {
+        requestUrl += '?skipValidation=true';
+      }
       return await axios(
-        `${BackendService}/api/multiAsset/validateNFT/${body.fingerprint}`,
+        requestUrl,
         {
           method: 'get'
         }

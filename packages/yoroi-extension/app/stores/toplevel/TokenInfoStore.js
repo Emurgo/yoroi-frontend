@@ -132,10 +132,12 @@ export default class TokenInfoStore<
 
   getNftImageInfo: {|
     fingerprint: string,
-    networkId: number
+    networkId: number,
+    skipValidation: boolean,
   |} => Promise<GetNftImageInfoResponse> = async (body: {|
     fingerprint: string,
-    networkId: number
+    networkId: number,
+    skipValidation: boolean,
   |}) => {
     const network: ?NetworkRow = (Object.values(networks): Array<any>).find(
       ({ NetworkId }) => NetworkId === body.networkId
@@ -146,7 +148,8 @@ export default class TokenInfoStore<
 
     const nftImageInfo = await this.stores.substores.ada.stateFetchStore.fetcher.getNftImageInfo({
       network,
-      fingerprint: body.fingerprint
+      fingerprint: body.fingerprint,
+      skipValidation: body.skipValidation
     });
 
     return nftImageInfo;

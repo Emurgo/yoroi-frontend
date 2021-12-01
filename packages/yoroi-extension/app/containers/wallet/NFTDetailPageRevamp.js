@@ -112,7 +112,8 @@ class NFTDetailPageRevamp extends Component<AllProps> {
         getDefaultTokenInfo: number => $ReadOnly<TokenRow>,
         getNftImageInfo: {|
           fingerprint: string,
-          networkId: number
+          networkId: number,
+          skipValidation: boolean,
         |} => Promise<GetNftImageInfoResponse>
       |},
       transactions: {|

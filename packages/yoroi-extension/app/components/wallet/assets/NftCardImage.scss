@@ -1,0 +1,22 @@
+.blurredImg {
+  filter: blur(30px);
+  -webkit-filter: blur(30px);
+}
+
+.imgContainer {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 8px;
+  img {
+    width: 100%;
+  }
+}
+
+.overlayText {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+}

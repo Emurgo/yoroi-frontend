@@ -394,7 +394,8 @@ export type MultiAssetMintMetadataResponseAsset = {|
 
 export type GetNftImageInfoRequest = {|
   ...BackendNetworkInfo,
-  fingerprint: string
+  fingerprint: string,
+  skipValidation: boolean,
 |}
 
 export type GetNftImageInfoResponse = {|
