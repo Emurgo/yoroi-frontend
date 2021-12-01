@@ -158,6 +158,7 @@ class CardanoStakingPage extends Component<AllProps, State> {
             <SeizaFetcher
               urlTemplate={urlTemplate}
               locale={locale}
+              bias={stakingListBias}
               totalAda={totalAda}
               poolList={
                 delegationRequests.getCurrentDelegation.result?.currEpoch?.pools.map(
