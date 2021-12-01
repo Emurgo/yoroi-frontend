@@ -52,7 +52,7 @@ type State = {|
   sortingColumn: string
 |}
 
-const messages = defineMessages({
+export const assetsMessage: Object = defineMessages({
   assets: {
     id: 'wallet.assets.assets',
     defaultMessage: '!!!Assets ({number})',
@@ -190,11 +190,11 @@ export default class AssetsList extends Component<Props, State> {
         <BorderedBox>
           <div className={styles.header}>
             <h1 className={styles.assets}>
-              {intl.formatMessage(messages.assets, { number: this.props.assetsList.length })}
+              {intl.formatMessage(assetsMessage.assets, { number: this.props.assetsList.length })}
             </h1>
             <div className={styles.search}>
               <Search />
-              <input onChange={this.search} type='text' placeholder={intl.formatMessage(messages.search)} />
+              <input onChange={this.search} type='text' placeholder={intl.formatMessage(assetsMessage.search)} />
             </div>
           </div>
           {assetDeposit && (
@@ -211,7 +211,7 @@ export default class AssetsList extends Component<Props, State> {
         {
           assetsList.length === 0 ? (
             <div className={styles.noAssetFound}>
-              <h1>{intl.formatMessage(messages.noAssetFound)}</h1>
+              <h1>{intl.formatMessage(assetsMessage.noAssetFound)}</h1>
             </div>
           ): (
             <>
@@ -219,21 +219,21 @@ export default class AssetsList extends Component<Props, State> {
                 <li>
                   <button type='button' onClick={() => this.sortAssets(SORTING_COLUMNS.NAME)}>
                     <p className={styles.headerText}>
-                      {intl.formatMessage(messages.nameAndTicker)}
+                      {intl.formatMessage(assetsMessage.nameAndTicker)}
                     </p>
                     {this.displayColumnLogo(SORTING_COLUMNS.NAME)}
                   </button>
                 </li>
                 <li>
                   <p className={styles.headerText}>
-                    {intl.formatMessage(messages.identifier)}
+                    {intl.formatMessage(assetsMessage.identifier)}
                   </p>
                   {/* <Info /> TODO: identifier info? */}
                 </li>
                 <li>
                   <button type='button' onClick={() => this.sortAssets(SORTING_COLUMNS.AMOUNT)}>
                     <p className={styles.headerText}>
-                      {intl.formatMessage(messages.quantity)}
+                      {intl.formatMessage(assetsMessage.quantity)}
                     </p>
                     {this.displayColumnLogo(SORTING_COLUMNS.AMOUNT)}
                   </button>
