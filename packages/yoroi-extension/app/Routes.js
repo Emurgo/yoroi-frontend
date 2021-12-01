@@ -46,6 +46,7 @@ import ComplexityLevelSettingsPage from './containers/settings/categories/Comple
 import ComplexityLevelPage from './containers/profile/ComplexityLevelPage';
 import BlockchainSettingsPage from './containers/settings/categories/BlockchainSettingsPage';
 import WalletSwitch from './containers/WalletSwitch';
+import StakingPage from './containers/wallet/staking/StakingPage';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
@@ -91,6 +92,11 @@ export const Routes = (
         exact
         path={ROUTES.MY_WALLETS}
         component={(props) => <MyWalletsPage {...props} stores={stores} actions={actions} />}
+      />
+      <Route
+        exact
+        path={ROUTES.STAKING}
+        component={(props) => <StakingPage {...props} stores={stores} actions={actions} />}
       />
       <Route
         exact

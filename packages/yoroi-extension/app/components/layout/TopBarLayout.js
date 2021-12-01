@@ -58,21 +58,32 @@ function TopBarLayout({
               display: 'flex',
               flexDirection: 'column',
               flex: '0 1 auto',
-              height: 'initial',
+              height: '100%',
             }),
           }}
         >
           {isRevampLayout ? (
-            <Box
-              sx={{
-                height: '100%',
-                minHeight: '200px',
-                padding: '40px',
-                backgroundColor: '#f0f3f5',
-                overflow: 'overlay',
-              }}
-            >
-              {children}
+            <Box sx={{ background: 'var(--yoroi-palette-gray-50)', height: '100%' }}>
+              <Box
+                sx={{
+                  maxWidth: 'calc(1366px - 90px)',
+                  height: '100%',
+                  width: '100%',
+                  margin: 'auto',
+                }}
+              >
+                <Box
+                  sx={{
+                    height: '100%',
+                    minHeight: '200px',
+                    padding: '40px',
+                    backgroundColor: 'var(--yoroi-palette-gray-50)',
+                    overflow: 'overlay',
+                  }}
+                >
+                  {children}
+                </Box>
+              </Box>
             </Box>
           ) : (
             <Box sx={{ height: '100%', minHeight: '200px' }}>{children}</Box>
@@ -90,7 +101,7 @@ function TopBarLayout({
             margin: 0,
             display: 'flex',
             flexDirection: 'column',
-            maxHeight: 'calc(100% - 110px)',
+            height: 'calc(100vh - 100px)',
           }}
         >
           {content}
@@ -109,7 +120,7 @@ function TopBarLayout({
               marginRight: 'auto',
               display: 'flex',
               flexDirection: 'column',
-              maxHeight: 'calc(100% - 110px)',
+              maxHeight: 'calc(100vh - 110px)',
             }),
           }}
         >

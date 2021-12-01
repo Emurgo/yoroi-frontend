@@ -12,6 +12,24 @@ import { observer } from 'mobx-react';
 import { withLayout } from '../../../styles/context/layout';
 import type { Layouts } from '../../../styles/context/layout';
 
+export type PoolData = {|
+  +id: string,
+  +name: string,
+  +avatar?: string,
+  +roa: string,
+  +websiteUrl?: string,
+  +socialLinks: {|
+    tw?: string,
+    fb?: string,
+    gh?: string,
+    tc?: string,
+    tg?: string,
+    di?: string,
+    yt?: string,
+    icon?: string,
+  |},
+|};
+
 type Props = {|
   +children?: Node,
   +urlTemplate: string,
@@ -19,6 +37,8 @@ type Props = {|
   +totalAda: ?number,
   +stakepoolSelectedAction: string => Promise<void>,
   +poolList: Array<string>,
+  // eslint-disable-next-line react/require-default-props
+  setFirstPool?: PoolData => void,
 |};
 
 type InjectedProps = {|
@@ -57,6 +77,14 @@ class SeizaFetcher extends Component<AllProps> {
       return;
     }
     const response = JSON.parse(decodeURI(event.data));
+
+    // if it's the pool info object
+    if (typeof response === 'object' && !Array.isArray(response) && response !== null && response.id) {
+      // $FlowFixMe[not-a-function] only added for banner
+      this.props.setFirstPool(response);
+      return;
+    }
+
     if (!Array.isArray(response)) {
       throw new Error(`${nameof(SeizaFetcher)} Server response is not an array`);
     }
