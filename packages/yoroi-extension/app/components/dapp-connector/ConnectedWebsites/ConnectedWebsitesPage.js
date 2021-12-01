@@ -82,7 +82,7 @@ function checkForNetworks(
 @observer
 export default class ConnectedWebsitesPage extends Component<Props> {
     static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-        intl: intlShape.isRequired,
+      intl: intlShape.isRequired,
     };
 
     render(): Node {

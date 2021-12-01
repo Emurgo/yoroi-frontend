@@ -56,6 +56,7 @@
   "buysell.dialog.selectAddress": "Please select the receiving address. This will be shared with the third party provider called Changelly for the buy / sell of ADA. ",
   "buy.dialog.title": "Buy ADA",
   "connector.connect.connectedWallets": "Connected Wallets",
+  "connector.connect.connectedWallets.active": "Active",
   "connector.connect.noWebsitesConnected": "You don't have any websites connected yet",
   "connector.settings.about": "About",
   "connector.settings.about.dAppDescription": "The dApp connector allows dApps (decentralized applications) in the form of web pages to interact in a secure manner with the user's Yoroi Ergo wallets to enable smart contract functionality.",
