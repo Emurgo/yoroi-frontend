@@ -21,6 +21,7 @@ import type {
   AddressRow,
   TokenRow,
   TokenListInsert,
+  CardanoAssetMintMetadata,
 } from '../database/primitives/tables';
 import {
   TransactionType,
@@ -381,10 +382,17 @@ export async function rawGetTransactions(
                     ?.get(rewardAddr.payment_cred());
                   // happens if the MIR is to another pot
                   if (rewardAmount == null) continue;
+                  const isPositive = rewardAmount.is_positive();
+                  const rewardAmountBigInt = isPositive
+                    ? rewardAmount.as_positive()
+                    : rewardAmount.as_negative();
+                  if (rewardAmountBigInt == null) continue;
+                  const rewardAmountStr =
+                    (isPositive ? '' : '-') + rewardAmountBigInt.to_str();
                   implicitOutputSum.add({
                     identifier: defaultToken.defaultIdentifier,
                     networkId: defaultToken.defaultNetworkId,
-                    amount: new BigNumber(String(rewardAmount.as_i32())),
+                    amount: new BigNumber(rewardAmountStr),
                   });
                 }
               }
@@ -2041,8 +2049,18 @@ export async function genCardanoAssetMap(
       const tokenMetadata = metadata[identifierInMetadata];
 
       let isNft = false;
-      if (tokenMetadata && tokenMetadata.filter(m => m.key === '721').length > 0) {
-        isNft = true;
+
+      let assetMintMetadata: CardanoAssetMintMetadata[] = [];
+      if (tokenMetadata) {
+        if (tokenMetadata.filter(m => m.key === '721').length > 0) {
+          isNft = true;
+        }
+
+        assetMintMetadata = tokenMetadata.map(m => {
+          const metaObj: CardanoAssetMintMetadata = {};
+          metaObj[m.key] = m.metadata;
+          return metaObj;
+        });
       }
 
       return {
@@ -2062,7 +2080,8 @@ export async function genCardanoAssetMap(
           assetName,
           policyId,
           lastUpdatedAt,
-        }
+          assetMintMetadata
+        },
       };
     });
 
@@ -2325,6 +2344,8 @@ export function networkTxHeaderToDb(
         Extra: {
           Fee: tx.fee,
           Metadata: tx.metadata,
+          // for backward compatiblity, if the field is not present, we take the tx as valid
+          IsValid: tx.valid_transaction ?? true,
         },
         BlockId: blockId,
         ...baseTx,
