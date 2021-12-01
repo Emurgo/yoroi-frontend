@@ -1,7 +1,7 @@
 /* eslint-disable promise/always-return */
 // @flow
 import BigNumber from 'bignumber.js';
-import { observable, action, runInAction, computed } from 'mobx';
+import { observable, action, runInAction, computed, toJS } from 'mobx';
 import Request from '../../stores/lib/LocalizedRequest';
 import Store from '../../stores/base/Store';
 import type {
@@ -239,7 +239,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     }
     const sendData: ConfirmedSignData = {
       type: 'sign_confirmed',
-      tx: signingMessage.sign.tx,
+      tx: toJS(signingMessage.sign.tx),
       uid: signingMessage.sign.uid,
       tabId: signingMessage.tabId,
       pw: password,
