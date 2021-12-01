@@ -51,6 +51,8 @@ import type { GeneratedData as AssetsData } from './containers/wallet/AssetsWrap
 import AssetsWrapper from './containers/wallet/AssetsWrapper';
 import TokensPageRevamp from './containers/wallet/TokensPageRevamp';
 import TokensDetailPageRevamp from './containers/wallet/TokenDetailPageRevamp';
+import NFTsPageRevamp from './containers/wallet/NFTsPageRevamp';
+import NFTDetailPageRevamp from './containers/wallet/NFTDetailPageRevamp';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
@@ -267,7 +269,12 @@ const AssetsSubpages = (stores, actions) => (
     <Route
       exact
       path={ROUTES.ASSETS.NFTS}
-      component={(props) => <TokensPageRevamp {...props} stores={stores} actions={actions} />}
+      component={(props) => <NFTsPageRevamp {...props} stores={stores} actions={actions} />}
+    />
+    <Route
+      exact
+      path={ROUTES.ASSETS.NFT_DETAILS}
+      component={(props) => <NFTDetailPageRevamp {...props} stores={stores} actions={actions} />}
     />
     <Redirect to={ROUTES.ASSETS.TOKENS} />
   </Switch>
