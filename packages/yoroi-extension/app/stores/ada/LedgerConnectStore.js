@@ -65,6 +65,8 @@ import type {
   GetExtendedPublicKeyResponse,
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 
+const CONNECTOR_URL = 'https://emurgo.github.io/yoroi-extension-ledger-connect-vnext/multisig/#/v4.1';
+
 export default class LedgerConnectStore
   extends Store<StoresMap, ActionsMap>
   implements HWConnectStoreTypes<ExtendedPublicKeyResp<GetExtendedPublicKeyResponse>> {
@@ -178,7 +180,7 @@ export default class LedgerConnectStore
     try {
       const ledgerConnect = new LedgerConnect({
         locale: this.stores.profile.currentLocale,
-        connectorUrl: 'https://emurgo.github.io/yoroi-extension-ledger-connect-vnext/multisig/#/v4.1',
+        connectorUrl: CONNECTOR_URL,
       });
       this.ledgerConnect = ledgerConnect;
       await prepareLedgerConnect(ledgerConnect);
@@ -193,6 +195,40 @@ export default class LedgerConnectStore
       });
 
       return this._normalizeHWResponse(extendedPublicKeyResp);
+    } finally {
+      this.ledgerConnect && this.ledgerConnect.dispose();
+      this.ledgerConnect = undefined;
+    }
+  }
+
+  _getMultiplePublicKeys: {|
+    paths: Array<Array<number>>
+  |} => Promise<Array<HWDeviceInfo>> = async (request) => {
+    Logger.debug(stringifyData(request));
+    try {
+      const ledgerConnect = new LedgerConnect({
+        locale: this.stores.profile.currentLocale,
+        connectorUrl: CONNECTOR_URL,
+      });
+      this.ledgerConnect = ledgerConnect;
+      await prepareLedgerConnect(ledgerConnect);
+
+      const extendedPublicKeysResp = await ledgerConnect.getExtendedPublicKeys({
+        params: {
+          paths: request.paths,
+        },
+        // don't pass serial
+        // since we use the request to fetch the public key to get the serial # in the first place
+        serial: undefined,
+      });
+
+      return extendedPublicKeysResp.response.map(response => (
+        {
+          response,
+          deviceVersion: extendedPublicKeysResp.deviceVersion,
+          deriveSerial: extendedPublicKeysResp.deriveSerial,
+        }
+      )).map(this._normalizeHWResponse);
     } finally {
       this.ledgerConnect && this.ledgerConnect.dispose();
       this.ledgerConnect = undefined;
@@ -243,19 +279,26 @@ export default class LedgerConnectStore
     this.stores.substores.ada.yoroiTransfer.transferRequest.reset();
     const accountPath = this.getPath();
     try {
-      const pubKeyResponse = await this._getPublicKey({ path: accountPath });
-      this.hwDeviceInfo = pubKeyResponse;
-
       // if restoring a Shelley wallet, check if there is any Byron balance
       if (accountPath[0] === WalletTypePurpose.CIP1852) {
         const bip44Path = [...accountPath];
         bip44Path[0] = WalletTypePurpose.BIP44;
 
-        const bip44Response = await this._getPublicKey({ path: bip44Path });
+        const [ pubKeyResponse, bip44Response ] = await this._getMultiplePublicKeys(
+          {
+            paths: [accountPath, bip44Path],
+          }
+        );
+
+        this.hwDeviceInfo = pubKeyResponse;
+
         await this._generateTransferTx(
           bip44Response.publicMasterKey,
           pubKeyResponse.publicMasterKey, // cip1852
         );
+      } else {
+        const pubKeyResponse = await this._getPublicKey({ path: accountPath });
+        this.hwDeviceInfo = pubKeyResponse;
       }
       this._goToSaveLoad();
       Logger.info('Ledger device OK');

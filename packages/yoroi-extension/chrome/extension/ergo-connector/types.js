@@ -4,6 +4,7 @@ import type { WalletChecksum } from '@emurgo/cip4-js';
 import { PublicDeriver } from '../../../app/api/ada/lib/storage/models/PublicDeriver/index';
 import { MultiToken } from '../../../app/api/common/lib/MultiToken';
 import { RustModule } from '../../../app/api/ada/lib/cardanoCrypto/rustLoader';
+import type CardanoTxRequest from '../../../app/api/ada';
 
 // ----- Types used in the dApp <-> Yoroi connection bridge ----- //
 
@@ -427,11 +428,15 @@ export type PendingSignData = {|
   type: 'tx/cardano',
   uid: RpcUid,
   tx: CardanoTx,
+|} | {|
+  type: 'tx-create-req/cardano',
+  uid: RpcUid,
+  tx: CardanoTxRequest,
 |};
 
 export type ConfirmedSignData = {|
   type: 'sign_confirmed',
-  tx: Tx | CardanoTx,
+  tx: Tx | CardanoTx | CardanoTxRequest,
   uid: RpcUid,
   tabId: number,
   pw: string,
