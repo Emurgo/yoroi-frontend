@@ -162,6 +162,8 @@ export default class NavBarContainerRevamp extends Component<Props> {
     const balance = txRequests.requests.getBalanceRequest.result || null;
 
     const walletsMap = wallets.map(wallet => {
+      const walletTxRequests = this.generated.stores.transactions.getTxRequests(wallet);
+      const walletBalance = walletTxRequests.requests.getBalanceRequest.result || null;
       const parent = wallet.getParent();
       const settingsCache = this.generated.stores.walletSettings.getConceptualWalletSettingsCache(
         parent
@@ -176,7 +178,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
       return {
         walletId: wallet.getPublicDeriverId(),
         rewards: this.getRewardBalance(publicDeriver),
-        walletAmount: balance,
+        walletAmount: walletBalance,
         getTokenInfo: genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo),
         plate,
         wallet: settingsCache,

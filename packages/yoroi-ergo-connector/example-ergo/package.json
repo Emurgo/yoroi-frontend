@@ -11,11 +11,11 @@
     "start": "webpack-dev-server"
   },
   "devDependencies": {
-    "ergo-lib-wasm-browser": "0.14.0-alpha-a3940fc",
+    "copy-webpack-plugin": "^5.0.0",
+    "ergo-lib-wasm-browser": "^0.14.0",
     "json-bigint": "^1.0.0",
     "webpack": "^4.29.3",
     "webpack-cli": "^3.1.0",
-    "webpack-dev-server": "^3.1.5",
-    "copy-webpack-plugin": "^5.0.0"
+    "webpack-dev-server": "^3.1.5"
   }
 }

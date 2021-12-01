@@ -23,4 +23,6 @@ export type CardanoConnectorSignRequest = {|
     networkId: number,
     amount: string,
   |},
+  amount: MultiToken,
+  total: MultiToken,
 |};

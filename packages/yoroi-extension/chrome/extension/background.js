@@ -26,6 +26,7 @@ import type {
   GetConnectedSitesData,
   Tx,
   CardanoTx,
+  GetConnectionProtocolData,
 } from './ergo-connector/types';
 import {
   APIErrorCodes,
@@ -44,6 +45,7 @@ import {
   connectorSendTxCardano,
   connectorSignTx,
   connectorSignCardanoTx,
+  connectorCreateCardanoTx,
   connectorGetUsedAddresses,
   connectorGetUnusedAddresses,
   connectorGetUtxosCardano
@@ -67,6 +69,7 @@ import {
 import { migrateNoRefresh } from '../../app/api/common/migration';
 import { Mutex, } from 'async-mutex';
 import { isCardanoHaskell } from '../../app/api/ada/lib/storage/database/prepackaged/networks';
+import type CardanoTxRequest from '../../app/api/ada';
 
 
 /*::
@@ -107,6 +110,7 @@ type PendingSign = {|
 |}
 
 let imgBase64Url: string = '';
+let connectionProtocol: string = '';
 
 type ConnectedSite = {|
   url: string,
@@ -319,13 +323,14 @@ async function withSelectedWallet<T>(
 // messages from other parts of Yoroi (i.e. the UI for the connector)
 chrome.runtime.onMessage.addListener(async (
   request: (
-    ConnectResponseData |
-    ConfirmedSignData |
-    FailedSignData |
-    TxSignWindowRetrieveData |
-    ConnectRetrieveData |
-    RemoveWalletFromWhitelistData |
-    GetConnectedSitesData
+    ConnectResponseData
+    | ConfirmedSignData
+    | FailedSignData
+    | TxSignWindowRetrieveData
+    | ConnectRetrieveData
+    | RemoveWalletFromWhitelistData
+    | GetConnectedSitesData
+    | GetConnectionProtocolData
   ),
   sender,
   sendResponse
@@ -377,6 +382,26 @@ chrome.runtime.onMessage.addListener(async (
       );
     });
   }
+  async function createCardanoTx(
+    tx: CardanoTxRequest,
+    password: string,
+    tabId: number
+  ): Promise<string> {
+    return await withDb(async (db, localStorageApi) => {
+      return await withSelectedWallet(
+        tabId,
+        async (wallet) => {
+          return await connectorCreateCardanoTx(
+            wallet,
+            password,
+            tx,
+          );
+        },
+        db,
+        localStorageApi
+      );
+    });
+  }
 
   // alert(`received event: ${JSON.stringify(request)}`);
   if (request.type === 'connect_response') {
@@ -403,8 +428,7 @@ chrome.runtime.onMessage.addListener(async (
         case 'tx':
           {
             // We know `tx` is a `Tx` here
-            // $FlowFixMe[prop-missing]
-            const txToSign: Tx = request.tx;
+            const txToSign: Tx = (request.tx: any);
             const allIndices = [];
             for (let i = 0; i < txToSign.inputs.length; i += 1) {
               allIndices.push(i);
@@ -416,8 +440,7 @@ chrome.runtime.onMessage.addListener(async (
         case 'tx_input':
           {
             const data = responseData.request;
-            // $FlowFixMe[prop-missing]
-            const txToSign: Tx = request.tx;
+            const txToSign: Tx = (request.tx: any);
             const signedTx = await signTxInputs(
               txToSign,
               [data.index],
@@ -433,6 +456,16 @@ chrome.runtime.onMessage.addListener(async (
               // $FlowFixMe[prop-missing]
               // $FlowFixMe[incompatible-cast]
               (request.tx.tx: CardanoTx),
+              password,
+              request.tabId
+            );
+            responseData.resolve({ ok: signedTx });
+          }
+        break;
+        case 'tx-create-req/cardano':
+          {
+            const signedTx = await createCardanoTx(
+              (request.tx: any),
               password,
               request.tabId
             );
@@ -516,10 +549,9 @@ chrome.runtime.onMessage.addListener(async (
     sendResponse(({
       sites: activeSites.map(site => site.url),
     }: ConnectedSites));
+  } else if (request.type === 'get_protocol') {
+    sendResponse({ type: connectionProtocol })
   }
-  // else if (request.type === 'get_protocol') {
-  //   sendResponse({pro: 'ergo'})
-  // }
 });
 
 async function removeWallet(
@@ -622,12 +654,8 @@ chrome.runtime.onConnectExternal.addListener(port => {
     const tabId = port.sender.tab.id;
     ports.set(tabId, port);
     port.onMessage.addListener(async message => {
-      chrome.runtime.onMessage.addListener((request,sender, sendResponse) => {
-        if(request.type === 'get_protocol') {
-          sendResponse({ type: message.protocol })
-        }
-      })
 
+      connectionProtocol = message.protocol;
       imgBase64Url = message.imgBase64Url;
       function rpcResponse(response) {
         port.postMessage({
@@ -939,6 +967,29 @@ chrome.runtime.onConnectExternal.addListener(port => {
               ok: true,
             });
             break;
+          case 'create_tx/cardano':
+            try {
+              checkParamCount(1);
+              await RustModule.load();
+              const connection = connectedSites.get(tabId);
+              if (connection == null) {
+                Logger.error(`ERR - sign_tx could not find connection with tabId = ${tabId}`);
+                rpcResponse(undefined); // shouldn't happen
+              } else {
+                const resp = await confirmSign(tabId,
+                  {
+                    type: 'tx-create-req/cardano',
+                    tx: message.params[0],
+                    uid: message.uid
+                  },
+                  connection
+                );
+                rpcResponse(resp);
+              }
+            } catch (e) {
+              handleError(e);
+            }
+          break;
           default:
             rpcResponse({
               err: {
