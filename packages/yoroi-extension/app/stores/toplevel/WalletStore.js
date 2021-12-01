@@ -205,6 +205,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
         .find(c => c.publicDeriver.publicDeriverId === selectedPublicDeriverId);
       return selectedCache == null ? null : selectedCache.plate;
     }
+    return null;
   }
 
   @computed get hasLoadedWallets(): boolean {
