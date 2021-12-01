@@ -541,7 +541,9 @@ export default class Transaction extends Component<Props, State> {
     const { isExpanded } = this.state;
     const { intl } = this.context;
     const isFailedTransaction = state < 0;
-    const isPendingTransaction = state === TxStatusCodes.PENDING || state === TxStatusCodes.SUBMITTED;
+    const isPendingTransaction = (
+      state === TxStatusCodes.PENDING || state === TxStatusCodes.SUBMITTED
+    );
     const isValidTransaction = (data instanceof CardanoShelleyTransaction) ?
       data.isValid :
       true;

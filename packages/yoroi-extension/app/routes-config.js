@@ -54,4 +54,11 @@ export const ROUTES = {
   },
   // revamp
   STAKING: '/staking',
+  ASSETS: {
+    ROOT: '/assets',
+    TOKENS: '/assets/tokens',
+    TOKEN_DETAILS: '/assets/tokens/:tokenId',
+    NFTS: '/assets/nfts',
+    NFT_DETAILS: '/assets/nfts/:nftId'
+  },
 };

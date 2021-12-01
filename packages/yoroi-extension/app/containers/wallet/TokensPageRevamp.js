@@ -1,62 +1,63 @@
 // @flow
-import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { computed } from 'mobx';
-import type { Node } from 'react';
+import { Component } from 'react';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import type { Node } from 'react';
 import {
-  MultiToken,
-} from '../../api/common/lib/MultiToken';
+  genFormatTokenAmount,
+  genLookupOrFail,
+  getTokenIdentifierIfExists,
+  getTokenStrictName,
+} from '../../stores/stateless/tokenHelpers';
+import { truncateToken } from '../../utils/formatters';
+import { computed } from 'mobx';
 import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
-import { genFormatTokenAmount, genLookupOrFail, getTokenIdentifierIfExists, getTokenStrictName } from '../../stores/stateless/tokenHelpers';
-import { amountWithoutZeros, truncateToken } from '../../utils/formatters';
-import AssetsPage from '../../components/wallet/assets/AssetsPage';
+import { MultiToken } from '../../api/common/lib/MultiToken';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 import type { TxRequests } from '../../stores/toplevel/TransactionsStore';
+import TokensPage from '../../components/wallet/assets/Tokens';
 
-
-export type GeneratedData = typeof WalletAssetsPage.prototype.generated;
+export type GeneratedData = typeof TokensPageRevamp.prototype.generated;
 
 @observer
-export default class WalletAssetsPage extends Component<InjectedOrGenerated<GeneratedData>> {
-
+export default class TokensPageRevamp extends Component<InjectedOrGenerated<GeneratedData>> {
   render(): Node {
     const publicDeriver = this.generated.stores.wallets.selected;
     // Guard against potential null values
-    if (!publicDeriver) throw new Error(`Active wallet required for ${nameof(WalletAssetsPage)}.`);
-    const network = publicDeriver.getParent().getNetworkInfo()
-    const spendableBalance = this.generated.stores.transactions.getBalanceRequest.result
-    const getTokenInfo= genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)
+    if (!publicDeriver) throw new Error(`Active wallet required for ${nameof(TokensPageRevamp)}.`);
+    const spendableBalance = this.generated.stores.transactions.getBalanceRequest.result;
+    const getTokenInfo = genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo);
 
     const assetsList = (() => {
-        if (spendableBalance == null) return [];
-        return [
-          ...spendableBalance.nonDefaultEntries(),
-        ].map(entry => ({
+      if (spendableBalance == null) return [];
+      return [...spendableBalance.nonDefaultEntries()]
+        .map(entry => ({
           entry,
           info: getTokenInfo(entry),
-        })).map(token => ({
+        }))
+        .filter(item => item.info.IsNFT === false)
+        .map(token => ({
           name: truncateToken(getTokenStrictName(token.info) ?? '-'),
-          id: (getTokenIdentifierIfExists(token.info) ?? '-'),
-          amount: amountWithoutZeros(genFormatTokenAmount(getTokenInfo)(token.entry)),
+          id: getTokenIdentifierIfExists(token.info) ?? '-',
+          amount: genFormatTokenAmount(getTokenInfo)(token.entry),
         }));
-      })();
+    })();
 
     const txRequests = this.generated.stores.transactions.getTxRequests(publicDeriver);
     const assetDeposit = txRequests.requests.getAssetDepositRequest.result || null;
+
     const { stores } = this.generated;
     const { profile } = stores;
     const isNonZeroDeposit = !assetDeposit?.isEmpty();
     return (
-      <AssetsPage
+      <TokensPage
         assetsList={assetsList}
         getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
         assetDeposit={isNonZeroDeposit ? assetDeposit : null}
         shouldHideBalance={profile.shouldHideBalance}
-        network={network}
       />
-    )
+    );
   }
 
   @computed get generated(): {|
@@ -69,19 +70,19 @@ export default class WalletAssetsPage extends Component<InjectedOrGenerated<Gene
         getBalanceRequest: {|
           result: ?MultiToken,
         |},
-        getTxRequests: (PublicDeriver<>) => TxRequests
+        getTxRequests: (PublicDeriver<>) => TxRequests,
       |},
       wallets: {| selected: null | PublicDeriver<> |},
       profile: {|
         shouldHideBalance: boolean,
       |},
-    |}
-    |} {
+    |},
+  |} {
     if (this.props.generated !== undefined) {
       return this.props.generated;
     }
     if (this.props.stores == null) {
-      throw new Error(`${nameof(WalletAssetsPage)} no way to generated props`);
+      throw new Error(`${nameof(TokensPageRevamp)} no way to generated props`);
     }
     const { stores } = this.props;
     return Object.freeze({
@@ -95,9 +96,10 @@ export default class WalletAssetsPage extends Component<InjectedOrGenerated<Gene
         },
         transactions: {
           getBalanceRequest: (() => {
-            if (stores.wallets.selected == null) return {
-              result: undefined,
-            };
+            if (stores.wallets.selected == null)
+              return {
+                result: undefined,
+              };
             const { requests } = stores.transactions.getTxRequests(stores.wallets.selected);
 
             return {
@@ -109,6 +111,7 @@ export default class WalletAssetsPage extends Component<InjectedOrGenerated<Gene
         profile: {
           shouldHideBalance: stores.profile.shouldHideBalance,
         },
-    } })
+      },
+    });
   }
-};
+}

@@ -47,6 +47,12 @@ import ComplexityLevelPage from './containers/profile/ComplexityLevelPage';
 import BlockchainSettingsPage from './containers/settings/categories/BlockchainSettingsPage';
 import WalletSwitch from './containers/WalletSwitch';
 import StakingPage from './containers/wallet/staking/StakingPage';
+import type { GeneratedData as AssetsData } from './containers/wallet/AssetsWrapper';
+import AssetsWrapper from './containers/wallet/AssetsWrapper';
+import TokensPageRevamp from './containers/wallet/TokensPageRevamp';
+import TokensDetailPageRevamp from './containers/wallet/TokenDetailPageRevamp';
+import NFTsPageRevamp from './containers/wallet/NFTsPageRevamp';
+import NFTDetailPageRevamp from './containers/wallet/NFTDetailPageRevamp';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
@@ -97,6 +103,15 @@ export const Routes = (
         exact
         path={ROUTES.STAKING}
         component={(props) => <StakingPage {...props} stores={stores} actions={actions} />}
+      />
+      <Route
+        path={ROUTES.ASSETS.ROOT}
+        component={(props) => (
+          wrapAssets(
+            { ...props, stores, actions },
+            AssetsSubpages(stores, actions)
+          )
+        )}
       />
       <Route
         exact
@@ -239,6 +254,31 @@ const SettingsSubpages = (stores, actions) => (
   </Switch>
 );
 
+const AssetsSubpages = (stores, actions) => (
+  <Switch>
+    <Route
+      exact
+      path={ROUTES.ASSETS.TOKENS}
+      component={(props) => <TokensPageRevamp {...props} stores={stores} actions={actions} />}
+    />
+    <Route
+      exact
+      path={ROUTES.ASSETS.TOKEN_DETAILS}
+      component={(props) => <TokensDetailPageRevamp {...props} stores={stores} actions={actions} />}
+    />
+    <Route
+      exact
+      path={ROUTES.ASSETS.NFTS}
+      component={(props) => <NFTsPageRevamp {...props} stores={stores} actions={actions} />}
+    />
+    <Route
+      exact
+      path={ROUTES.ASSETS.NFT_DETAILS}
+      component={(props) => <NFTDetailPageRevamp {...props} stores={stores} actions={actions} />}
+    />
+    <Redirect to={ROUTES.ASSETS.TOKENS} />
+  </Switch>
+);
 /* eslint-enable max-len */
 
 export function wrapSettings(
@@ -251,6 +291,19 @@ export function wrapSettings(
     >
       {children}
     </Settings>
+  );
+}
+
+export function wrapAssets(
+  assetsProps: InjectedOrGenerated<AssetsData>,
+  children: Node,
+): Node {
+  return (
+    <AssetsWrapper
+      {...assetsProps}
+    >
+      {children}
+    </AssetsWrapper>
   );
 }
 

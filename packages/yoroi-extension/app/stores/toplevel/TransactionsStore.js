@@ -137,9 +137,9 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     actions.loadMoreTransactions.listen(this._increaseSearchLimit);
     actions.exportTransactionsToFile.listen(this._exportTransactionsToFile);
     actions.closeExportTransactionDialog.listen(this._closeExportTransactionDialog);
-    this._loadSubmittedTransactions();
     actions.closeWalletEmptyBanner.listen(this._closeWalletEmptyBanner);
     actions.closeDelegationBanner.listen(this._closeDelegationBanner);
+    this._loadSubmittedTransactions();
   }
 
   /** Calculate information about transactions that are still realistically reversible */

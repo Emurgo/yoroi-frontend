@@ -42,6 +42,7 @@ export function genCSP(request: {|
   }
 
   imgSrc.push('https://static.adapools.org/');
+  imgSrc.push('https://ipfs.io/ipfs/');
   // connectSrc.push('https://api.dropboxapi.com');
   // connectSrc.push('https://content.dropboxapi.com');
 
