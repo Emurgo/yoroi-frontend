@@ -82,6 +82,7 @@ class SeizaFetcher extends Component<AllProps> {
     if (typeof response === 'object' && !Array.isArray(response) && response !== null && response.id) {
       // $FlowFixMe[not-a-function] only added for banner
       this.props.setFirstPool(response);
+      return;
     }
 
     if (!Array.isArray(response)) {
