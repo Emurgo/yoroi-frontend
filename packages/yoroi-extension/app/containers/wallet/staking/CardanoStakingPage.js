@@ -47,6 +47,7 @@ import { withLayout } from '../../../styles/context/layout';
 import type { LayoutComponentMap } from '../../../styles/context/layout';
 import { Box } from '@mui/system';
 import type { PoolData } from './SeizaFetcher';
+import type { WalletChecksum } from '@emurgo/cip4-js';
 
 export type GeneratedData = typeof CardanoStakingPage.prototype.generated;
 
@@ -86,6 +87,10 @@ class CardanoStakingPage extends Component<AllProps, State> {
     if (selectedWallet == null) {
       return null;
     }
+
+    const selectedPlate = this.generated.stores.wallets.activeWalletPlate;
+    const stakingListBias = selectedPlate?.TextPart || 'bias';
+
     const delegationRequests = this.generated.stores.delegation.getDelegationRequests(
       selectedWallet
     );
@@ -114,6 +119,7 @@ class CardanoStakingPage extends Component<AllProps, State> {
           <SeizaFetcher
             urlTemplate={urlTemplate}
             locale={locale}
+            bias={stakingListBias}
             totalAda={totalAda}
             poolList={delegationRequests.getCurrentDelegation.result?.currEpoch?.pools.map(
               tuple => tuple[0]
@@ -152,6 +158,7 @@ class CardanoStakingPage extends Component<AllProps, State> {
             <SeizaFetcher
               urlTemplate={urlTemplate}
               locale={locale}
+              bias={stakingListBias}
               totalAda={totalAda}
               poolList={
                 delegationRequests.getCurrentDelegation.result?.currEpoch?.pools.map(
@@ -576,7 +583,8 @@ class CardanoStakingPage extends Component<AllProps, State> {
           isExecuting: boolean,
           wasExecuted: boolean
         |},
-        selected: null | PublicDeriver<>
+        selected: null | PublicDeriver<>,
+        activeWalletPlate: ?WalletChecksum,
       |}
     |}
     |} {
@@ -595,6 +603,7 @@ class CardanoStakingPage extends Component<AllProps, State> {
         },
         wallets: {
           selected: stores.wallets.selected,
+          activeWalletPlate: stores.wallets.activeWalletPlate,
           sendMoneyRequest: {
             error: stores.wallets.sendMoneyRequest.error,
             isExecuting: stores.wallets.sendMoneyRequest.isExecuting,

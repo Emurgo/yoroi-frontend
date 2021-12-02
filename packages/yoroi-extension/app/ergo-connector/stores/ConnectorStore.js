@@ -37,9 +37,6 @@ import {
   asGetAllUtxos,
   asHasUtxoChains,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
-import { Bip44Wallet } from '../../api/ada/lib/storage/models/Bip44Wallet/wrapper';
-import { walletChecksum, legacyWalletChecksum } from '@emurgo/cip4-js';
-import type { WalletChecksum } from '@emurgo/cip4-js';
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import { addErgoAssets } from '../../api/ergo/lib/storage/bridge/updateTransactions';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
@@ -59,6 +56,7 @@ import {
   connectorGetUnusedAddresses,
   connectorGetChangeAddress,
 } from '../../../chrome/extension/ergo-connector/api';
+import { getWalletChecksum } from '../../api/export/utils';
 
 // Need to run only once - Connecting wallets
 let initedConnecting = false;
@@ -314,7 +312,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
           publicDeriver: currentWallet,
           name: conceptualInfo.Name,
           balance,
-          checksum: await getChecksum(withPubKey)
+          checksum: await getWalletChecksum(withPubKey)
         });
       }
 
@@ -690,22 +688,4 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     }
     return result ?? { sites: [] };
   }
-}
-
-// TODO: do something better than duplicating the logic here
-async function getChecksum(
-  publicDeriver: ReturnType<typeof asGetPublicKey>,
-): Promise<void | WalletChecksum> {
-  if (publicDeriver == null) return undefined;
-
-  const hash = (await publicDeriver.getPublicKey()).Hash;
-
-  const isLegacyWallet =
-    isCardanoHaskell(publicDeriver.getParent().getNetworkInfo()) &&
-    publicDeriver.getParent() instanceof Bip44Wallet;
-  const checksum = isLegacyWallet
-    ? legacyWalletChecksum(hash)
-    : walletChecksum(hash);
-
-  return checksum;
 }

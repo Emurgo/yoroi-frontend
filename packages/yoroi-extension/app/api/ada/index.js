@@ -1749,7 +1749,6 @@ export default class AdaApi {
       // Note: we only restore for 0th account
       const rootPk = generateWalletRootKey(recoveryPhrase);
       const newPubDerivers = [];
-
       if (request.mode === 'bip44') {
         const wallet = await createStandardBip44Wallet({
           db: request.db,
@@ -1770,6 +1769,7 @@ export default class AdaApi {
           request.db,
           wallet.bip44WrapperRow,
         );
+        console.log({mode: request.mode, request, wallet, bip44Wallet})
         for (const pubDeriver of wallet.publicDeriver) {
           newPubDerivers.push(await PublicDeriver.createPublicDeriver(
             pubDeriver.publicDeriverResult,
