@@ -126,6 +126,11 @@ class ThemeSettingsBlock extends Component<AllProps> {
       </>
     );
 
+    // <TODO:REVAMP_BUTTON> need to enable nightly
+    const shouldDisplayRevampButton = environment.isDev()
+      // || environment.isNightly()
+      || environment.isTest();
+
     const themeBlockClassicComponent = (
       <Box sx={{ borderTop: '1px solid var(--yoroi-palette-gray-200)', paddingTop: '30px' }}>
         {commonHeader}
@@ -172,40 +177,40 @@ class ThemeSettingsBlock extends Component<AllProps> {
             {intl.formatMessage(messages.themeExportButton)}
           </Button>
         </Box>
-        {/* <TODO:REVAMP_BUTTON> */}
-        {/*{(environment.isNightly() || environment.isTest() || environment.isDev()) && (*/}
-        {/*  <Box sx={{ margin: '20px 0', display: 'flex', justifyContent: 'center' }}>*/}
-        {/*    <Button*/}
-        {/*      sx={{*/}
-        {/*        width: '400px',*/}
-        {/*        background: 'white',*/}
-        {/*        color: '#6b7384',*/}
-        {/*        border: '1px solid #6b7384',*/}
-        {/*        '&:hover': {*/}
-        {/*          color: '#383838',*/}
-        {/*          background: 'white',*/}
-        {/*        },*/}
-        {/*        position: 'relative',*/}
-        {/*        '&::after': {*/}
-        {/*          content: '"new"',*/}
-        {/*          top: '50%',*/}
-        {/*          right: '30px',*/}
-        {/*          transform: 'translateY(-50%)',*/}
-        {/*          position: 'absolute',*/}
-        {/*          color: 'var(--yoroi-comp-button-primary-text)',*/}
-        {/*          backgroundColor: 'var(--yoroi-comp-button-primary-background)',*/}
-        {/*          padding: '4px 10px',*/}
-        {/*          borderRadius: '777px',*/}
-        {/*        },*/}
-        {/*      }}*/}
-        {/*      onClick={() => {*/}
-        {/*        selectTheme({ theme: THEMES.YOROI_REVAMP });*/}
-        {/*      }}*/}
-        {/*    >*/}
-        {/*      {intl.formatMessage(messages.tryYoroiRevamp)}*/}
-        {/*    </Button>*/}
-        {/*  </Box>*/}
-        {/*)}*/}
+
+        {shouldDisplayRevampButton && (
+          <Box sx={{ margin: '20px 0', display: 'flex', justifyContent: 'center' }}>
+            <Button
+              sx={{
+                width: '400px',
+                background: 'white',
+                color: '#6b7384',
+                border: '1px solid #6b7384',
+                '&:hover': {
+                  color: '#383838',
+                  background: 'white',
+                },
+                position: 'relative',
+                '&::after': {
+                  content: '"new"',
+                  top: '50%',
+                  right: '30px',
+                  transform: 'translateY(-50%)',
+                  position: 'absolute',
+                  color: 'var(--yoroi-comp-button-primary-text)',
+                  backgroundColor: 'var(--yoroi-comp-button-primary-background)',
+                  padding: '4px 10px',
+                  borderRadius: '777px',
+                },
+              }}
+              onClick={() => {
+                selectTheme({ theme: THEMES.YOROI_REVAMP });
+              }}
+            >
+              {intl.formatMessage(messages.tryYoroiRevamp)}
+            </Button>
+          </Box>
+        )}
       </Box>
     );
 
