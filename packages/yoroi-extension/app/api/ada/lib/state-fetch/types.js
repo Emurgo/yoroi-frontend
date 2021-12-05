@@ -91,6 +91,12 @@ export type RemoteTransactionShelley = {|
   +certificates: $ReadOnlyArray<RemoteCertificate>,
   +withdrawals: Array<RemoteWithdrawal>,
   +metadata: null | string,
+  // The updated backend will always return this field, but we allow it to be
+  // missing which is treated as `true` for backward compatiblity.
+  // This way we don't have to update the frontend and backend in lockstep.
+  // When the backend update is deployed, we can change this field to mandatory
+  // for strictness.
+  +valid_transaction?: boolean,
 |};
 export type RemoteTransactionBase = {|
   ...WithNullableFields<RemoteTxBlockMeta>,
@@ -361,3 +367,27 @@ export type CatalystRoundInfoResponse = {|
 
 export type CatalystRoundInfoFunc = (body: CatalystRoundInfoRequest)
                                       => Promise<CatalystRoundInfoResponse>;
+
+// Multi Asset Mint Metadata
+
+export type MultiAssetMintMetadataFunc = (body: MultiAssetMintMetadataRequest)
+  => Promise<MultiAssetMintMetadataResponse>;
+
+export type MultiAssetMintMetadataRequest = {|
+  ...BackendNetworkInfo,
+  assets: MultiAssetMintMetadataRequestAsset[]
+|};
+
+export type MultiAssetMintMetadataRequestAsset = {|
+  name: string,
+  policy: string
+|}
+
+export type MultiAssetMintMetadataResponse = {|
+  ...{[key: string]: MultiAssetMintMetadataResponseAsset[]}
+|}
+
+export type MultiAssetMintMetadataResponseAsset = {|
+  key: string,
+  metadata: {[key: string]: any}
+|}

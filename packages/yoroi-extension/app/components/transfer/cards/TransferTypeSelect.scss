@@ -13,19 +13,19 @@
     flex-direction: column;
     align-items: center;
     margin-bottom: 40px;
-    font-family: var(--font-regular);
+    font-weight: 400;
     font-size: 14px;
     line-height: 30px;
-    color: var(--cmn-default-color-grey);
+    color: var(--yoroi-palette-gray-800);
 
     span {
-      color: #6B7384;
+      color: var(--yoroi-palette-gray-600);
       a {
         text-decoration: none;
-        color: #3154CB;
+        color: #3154cb;
       }
-    } 
-    
+    }
+
     .headerText {
       max-width: 421px;
       font-size: 24px;

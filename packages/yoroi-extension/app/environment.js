@@ -26,6 +26,7 @@ export const environment = ((
     commit: process.env.COMMIT || '',
     isJest: () => process.env.NODE_ENV === 'jest' || process.env.NODE_ENV === 'test',
     branch: process.env.BRANCH || '',
+    isDev: () => (process.env.NODE_ENV === 'development'),
     isNightly: () => (process.env.NIGHTLY == null ? false : JSON.parse(process.env.NIGHTLY)),
     isTest: () => {
       if (typeof CONFIG === 'undefined') {
@@ -48,6 +49,7 @@ export const environment = ((
     commit: string,
     branch: string,
     isJest: void => boolean,
+    isDev: void => boolean,
     isNightly: void => boolean,
     isTest: void => boolean,
     isMainnet: void => boolean,

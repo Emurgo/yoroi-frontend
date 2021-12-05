@@ -36,6 +36,7 @@ import {
   cardanoValueFromRemoteFormat,
   multiTokenFromCardanoValue,
   cardanoValueFromMultiToken,
+  parseTokenList,
 } from '../utils';
 
 /**
@@ -379,6 +380,64 @@ export function newAdaUnsignedTx(
   };
 }
 
+export function newAdaUnsignedTxForConnector(
+  outputs: Array<TxOutput>,
+  changeAdaAddr: void | {| ...Address, ...Addressing |},
+  mustIncludeUtxos: Array<CardanoAddressedUtxo>,
+  coinSelectUtxos: Array<CardanoAddressedUtxo>,
+  absSlotNumber: BigNumber,
+  protocolParams: {|
+    linearFee: RustModule.WalletV4.LinearFee,
+    minimumUtxoVal: RustModule.WalletV4.BigNum,
+    poolDeposit: RustModule.WalletV4.BigNum,
+    keyDeposit: RustModule.WalletV4.BigNum,
+    networkId: number,
+  |},
+): V4UnsignedTxAddressedUtxoResponse {
+  const removeAddressing = (utxo: CardanoAddressedUtxo): RemoteUnspentOutput => ({
+    amount: utxo.amount,
+    receiver: utxo.receiver,
+    tx_hash: utxo.tx_hash,
+    tx_index: utxo.tx_index,
+    utxo_id: utxo.utxo_id,
+    assets: utxo.assets,
+  });
+  const addressingMapForMustIncludeUtxos = new Map<RemoteUnspentOutput, CardanoAddressedUtxo>();
+  const addressingMapForCoinSelectUtxos = new Map<RemoteUnspentOutput, CardanoAddressedUtxo>();
+  for (const utxo of mustIncludeUtxos) {
+    addressingMapForMustIncludeUtxos.set(removeAddressing(utxo), utxo);
+  }
+  for (const utxo of coinSelectUtxos) {
+    addressingMapForCoinSelectUtxos.set(removeAddressing(utxo), utxo);
+  }
+  const unsignedTxResponse = newAdaUnsignedTxFromUtxoForConnector(
+    outputs,
+    changeAdaAddr,
+    Array.from(addressingMapForMustIncludeUtxos.keys()),
+    Array.from(addressingMapForCoinSelectUtxos.keys()),
+    absSlotNumber,
+    protocolParams,
+  );
+
+  const addressedUtxos = unsignedTxResponse.senderUtxos.map(
+    utxo => {
+      const addressedUtxo = addressingMapForMustIncludeUtxos.get(utxo) ||
+        addressingMapForCoinSelectUtxos.get(utxo);
+      if (addressedUtxo == null) {
+        throw new Error(`${nameof(newAdaUnsignedTx)} utxo reference was changed. Should not happen`);
+      }
+      return addressedUtxo;
+    }
+  );
+
+  return {
+    senderUtxos: addressedUtxos,
+    txBuilder: unsignedTxResponse.txBuilder,
+    changeAddr: unsignedTxResponse.changeAddr,
+    certificates: [],
+  };
+}
+
 function minRequiredForChange(
   txBuilder: RustModule.WalletV4.TransactionBuilder,
   changeAdaAddr: {| ...Address, ...Addressing |},
@@ -661,7 +720,8 @@ function _newAdaUnsignedTxFromUtxo(
     // this flag is set when one extra input is added
     let oneExtraAdded = false;
     // add utxos until we have enough to send the transaction
-    for (const utxo of utxos) {
+    for (let i = 0; i < utxos.length; i++) {
+      const utxo = utxos[i];
       if (oneExtraAdded) {
         break;
       }
@@ -695,7 +755,33 @@ function _newAdaUnsignedTxFromUtxo(
         const isRemainingNeededCoinZero = isBigNumZero(remainingNeeded.coin());
         const isRemainingNeededAssetZero = (remainingAssets?.len() ?? 0) === 0;
         if (isRemainingNeededCoinZero && isRemainingNeededAssetZero && isNonEmptyInputs) {
-          if (oneExtraInput) {
+          const changeTokenIdSet = new Set(
+            parseTokenList(excessiveInputAssets).map(r => r.assetId)
+          );
+          let packed = false;
+          for (let j = i; j < utxos.length; j++) {
+            const packCandidate = utxos[j];
+            if (
+              packCandidate.assets.length >= 1 &&
+                packCandidate.assets.every(({ assetId }) => changeTokenIdSet.has(assetId))
+            ) {
+              if (
+                addUtxoInput(
+                  txBuilder,
+                  undefined,
+                  packCandidate,
+                  false,
+                  { networkId: protocolParams.networkId }
+                ) === AddInputResult.VALID
+              ) {
+                usedUtxos.push(packCandidate);
+
+                packed = true;
+                break;
+              }
+            }
+          }
+          if (oneExtraInput && !packed) {
             // We've added all the assets we need, but we add one extra.
             // Set the flag so that the adding loop stops after this extra one is added.
             oneExtraAdded = true;
@@ -713,6 +799,257 @@ function _newAdaUnsignedTxFromUtxo(
             value: remainingNeeded,
             hasInput: isNonEmptyInputs,
           },
+        utxo,
+        true,
+        { networkId: protocolParams.networkId },
+      );
+      if (added !== AddInputResult.VALID) continue;
+
+      usedUtxos.push(utxo);
+    }
+    if (usedUtxos.length === 0) {
+      throw new NotEnoughMoneyToSendError();
+    }
+    // check to see if we have enough balance in the wallet to cover the transaction
+    {
+       const currentInputSum = txBuilder.get_explicit_input().checked_add(implicitSum);
+
+      // need to recalculate each time because fee changes
+      const output = targetOutput
+          .checked_add(RustModule.WalletV4.Value.new(txBuilder.min_fee()));
+
+      const compare = currentInputSum.compare(output);
+      const enoughInput = compare != null && compare >= 0;
+
+      const forceChange = shouldForceChange(
+        currentInputSum.multiasset()?.sub(output.multiasset() ?? emptyAsset)
+      );
+      if (forceChange) {
+        if (changeAdaAddr == null) throw new NoOutputsError();
+        if (!enoughInput) {
+          throw new NotEnoughMoneyToSendError();
+        }
+        const difference = currentInputSum.checked_sub(output);
+        const minimumNeededForChange = minRequiredForChange(
+          txBuilder,
+          changeAdaAddr,
+          difference,
+          protocolParams
+        );
+        if (difference.coin().compare(minimumNeededForChange) < 0) {
+          throw new NotEnoughMoneyToSendError();
+        }
+      }
+      if (!forceChange && !enoughInput) {
+        throw new NotEnoughMoneyToSendError();
+      }
+    }
+  }
+
+  const changeAddr = (() => {
+    const totalInput = txBuilder.get_explicit_input().checked_add(txBuilder.get_implicit_input());
+    const difference = totalInput.checked_sub(targetOutput);
+
+    const forceChange = shouldForceChange(difference.multiasset() ?? emptyAsset);
+    if (changeAdaAddr == null) {
+      if (forceChange) {
+        throw new NoOutputsError();
+      }
+      const minFee = txBuilder.min_fee();
+      if (difference.coin().compare(minFee) < 0) {
+        throw new NotEnoughMoneyToSendError();
+      }
+      // recall: min fee assumes the largest fee possible
+      // so no worries of cbor issue by including larger fee
+      txBuilder.set_fee(RustModule.WalletV4.BigNum.from_str(difference.coin().to_str()));
+      return [];
+    }
+    const outputBeforeChange = txBuilder.get_explicit_output();
+
+    const wasmChange = normalizeToAddress(changeAdaAddr.address);
+    if (wasmChange == null) {
+      throw new Error(`${nameof(newAdaUnsignedTxFromUtxo)} change not a valid Shelley address`);
+    }
+    let changeWasAdded: boolean;
+    try {
+      changeWasAdded = txBuilder.add_change_if_needed(wasmChange);
+    } catch (e) {
+      if (String(e).includes('Not enough ADA')) {
+        throw new NotEnoughMoneyToSendError();
+      }
+      // eslint-disable-next-line no-console
+      console.error('Failed to construct tx change!', e);
+      throw e;
+    }
+    if (forceChange && !changeWasAdded) {
+      // note: this should never happened since it should have been handled by earlier code
+      throw new Error(`No change added even though it should be forced`);
+    }
+    const output = multiTokenFromCardanoValue(
+      // since the change is added as an output
+      // the amount of change is the new output minus what the output was before we added the change
+      txBuilder.get_explicit_output().checked_sub(outputBeforeChange),
+      {
+        defaultNetworkId: protocolParams.networkId,
+        defaultIdentifier: PRIMARY_ASSET_CONSTANTS.Cardano,
+      }
+    );
+    return changeWasAdded
+      ? [{
+        ...changeAdaAddr,
+        values: output,
+      }]
+      : [];
+  })();
+
+  return {
+    senderUtxos: usedUtxos,
+    txBuilder,
+    changeAddr,
+  };
+}
+
+function newAdaUnsignedTxFromUtxoForConnector(
+  outputs: Array<TxOutput>,
+  changeAdaAddr: void | {| ...Address, ...Addressing |},
+  mustIncludeUtxos: Array<RemoteUnspentOutput>,
+  coinSelectUtxos: Array<RemoteUnspentOutput>,
+  absSlotNumber: BigNumber,
+  protocolParams: {|
+    linearFee: RustModule.WalletV4.LinearFee,
+    minimumUtxoVal: RustModule.WalletV4.BigNum,
+    poolDeposit: RustModule.WalletV4.BigNum,
+    keyDeposit: RustModule.WalletV4.BigNum,
+    networkId: number,
+  |},
+): V4UnsignedTxUtxoResponse {
+  const allowNoOutputs = true;
+  /**
+   * Shelley supports transactions with no outputs by simply burning any leftover ADA as fee
+   * This is can happen in the following:
+   * - if you have a 3ADA UTXO and you register a staking key, there will be 0 outputs
+   * However, if there is no output, there is no way to tell the network of the transaction
+   * This allows for replay attacks of 0-output transactions on testnets that use a mainnet snapshot
+   * To protect against this, we can choose to force that there is always even one output
+   * by simply enforcing a change address if no outputs are specified for the transaction
+   * This is use to be enforced by hardware wallets (will error on 0 outputs) but may no longer be
+   *
+   * Additionally, it's not possible to burn tokens as fees at the moment
+   * but this functionality may come at a later date
+   */
+  const shouldForceChange = (
+    assetsForChange: RustModule.WalletV4.MultiAsset | void
+  ): boolean => {
+    const noOutputDisallowed = !allowNoOutputs && outputs.length === 0;
+    if (noOutputDisallowed && changeAdaAddr == null) {
+      throw new NoOutputsError();
+    }
+    if (assetsForChange != null && assetsForChange.len() > 0) {
+      return true;
+    }
+    return noOutputDisallowed;
+
+  };
+  const emptyAsset = RustModule.WalletV4.MultiAsset.new();
+  shouldForceChange(undefined);
+
+  const txBuilder = RustModule.WalletV4TxBuilder(
+    protocolParams.linearFee,
+    protocolParams.minimumUtxoVal,
+    protocolParams.poolDeposit,
+    protocolParams.keyDeposit,
+  );
+  txBuilder.set_ttl(absSlotNumber.plus(defaultTtlOffset).toNumber());
+  {
+    for (const output of outputs) {
+      const wasmReceiver = normalizeToAddress(output.address);
+      if (wasmReceiver == null) {
+        throw new Error(`${nameof(newAdaUnsignedTxFromUtxo)} receiver not a valid Shelley address`);
+      }
+      try {
+        txBuilder.add_output(
+          RustModule.WalletV4.TransactionOutput.new(
+            wasmReceiver,
+            cardanoValueFromMultiToken(output.amount),
+          )
+        );
+      } catch (e) {
+        if (String(e).includes('less than the minimum UTXO value')) {
+          throw new CannotSendBelowMinimumValueError();
+        }
+        throw e;
+      }
+    }
+  }
+
+  // output excluding fee
+  const targetOutput = txBuilder
+    .get_explicit_output()
+    .checked_add(RustModule.WalletV4.Value.new(txBuilder.get_deposit()));
+
+  // pick inputs
+  const usedUtxos: Array<RemoteUnspentOutput> = [];
+  {
+    for (const utxo of mustIncludeUtxos) {
+      const added = addUtxoInput(
+        txBuilder,
+        undefined,
+        utxo,
+        true,
+        { networkId: protocolParams.networkId },
+      );
+      if (added !== AddInputResult.VALID) {
+        throw new Error('could not add designated UTXO');
+      }
+
+      usedUtxos.push(utxo);
+    }
+
+    // recall: we might have some implicit input to start with from deposit refunds
+    const implicitSum = txBuilder.get_implicit_input();
+
+    // add utxos until we have enough to send the transaction
+    for (const utxo of coinSelectUtxos) {
+      const currentInputSum = txBuilder.get_explicit_input().checked_add(implicitSum);
+      const neededInput = targetOutput
+        .checked_add(RustModule.WalletV4.Value.new(txBuilder.min_fee()));
+      const excessiveInputAssets = currentInputSum.multiasset()
+        ?.sub(neededInput.multiasset() ?? emptyAsset);
+
+      const remainingNeeded = neededInput.clamped_sub(currentInputSum);
+      // update amount required to make sure we have ADA required for change UTXO entry
+      if (shouldForceChange(excessiveInputAssets)) {
+        if (changeAdaAddr == null) throw new NoOutputsError();
+        const difference = currentInputSum.clamped_sub(neededInput);
+        const minimumNeededForChange = minRequiredForChange(
+          txBuilder,
+          changeAdaAddr,
+          difference,
+          protocolParams
+        );
+        const adaNeededLeftForChange = minimumNeededForChange.clamped_sub(difference.coin());
+        if (remainingNeeded.coin().compare(adaNeededLeftForChange) < 0) {
+          remainingNeeded.set_coin(adaNeededLeftForChange);
+        }
+      }
+
+      // stop if we've added all the assets we needed
+      const isNonEmptyInputs = usedUtxos.length > 0;
+      {
+        const remainingAssets = remainingNeeded.multiasset();
+        const isRemainingNeededCoinZero = isBigNumZero(remainingNeeded.coin());
+        const isRemainingNeededAssetZero = (remainingAssets?.len() ?? 0) === 0;
+        if (isRemainingNeededCoinZero && isRemainingNeededAssetZero && isNonEmptyInputs) {
+          break;
+        }
+      }
+
+      const added = addUtxoInput(
+        txBuilder,
+        {
+          value: remainingNeeded,
+          hasInput: isNonEmptyInputs,
+        },
         utxo,
         true,
         { networkId: protocolParams.networkId },

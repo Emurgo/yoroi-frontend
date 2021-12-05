@@ -1,6 +1,5 @@
 // @flow
 
-import React from 'react';
 import type { Node, ComponentType } from 'react';
 import ConnectContainer from './ConnectContainer';
 import { withScreenshot } from 'storycap';
@@ -73,6 +72,7 @@ export const Generic = (): Node => {
             errorWallets,
             loadingWallets: walletsState,
             currentConnectorWhitelist: [],
+            protocol: '',
           },
           tokenInfoStore: {
             tokenInfo: mockFromDefaults(defaultAssets),

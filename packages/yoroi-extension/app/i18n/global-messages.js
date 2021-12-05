@@ -196,6 +196,10 @@ const globalMessages: * = defineMessages({
     id: 'wallet.nav.addButton',
     defaultMessage: '!!!Add new wallet',
   },
+  allWalletsLabel: {
+    id: 'wallet.nav.allWalletsLabel',
+    defaultMessage: '!!!All wallets',
+  },
   attentionHeaderText: {
     id: 'widgets.warningBox.headerText',
     defaultMessage: '!!!ATTENTION:',
@@ -577,6 +581,39 @@ const globalMessages: * = defineMessages({
     id: 'sidebar.transfer',
     defaultMessage: '!!!Claim or transfer wallet',
   },
+  // Revamp labels for sidebar
+  stakingDashboard: {
+    id: 'sidebar.stakingDashboard',
+    defaultMessage: '!!!Staking Dashboard',
+  },
+  sidebarStaking: {
+    id: 'sidebar.staking',
+    defaultMessage: '!!!Staking',
+  },
+  sidebarAssets: {
+    id: 'sidebar.assets',
+    defaultMessage: '!!!Assets',
+  },
+  sidebarVoting: {
+    id: 'sidebar.voting',
+    defaultMessage: '!!!Voting',
+  },
+  sidebarSwap: {
+    id: 'sidebar.swap',
+    defaultMessage: '!!!Swap',
+  },
+  sidebarFaq: {
+    id: 'sidebar.faq',
+    defaultMessage: '!!!Faq',
+  },
+  sidebarNewUpdates: {
+    id: 'sidebar.newUpdates',
+    defaultMessage: '!!!New updates',
+  },
+  sidebarFeedback: {
+    id: 'sidebar.feedback',
+    defaultMessage: '!!!Feedback',
+  },
   ledgerTitle: {
     id: 'wallet.add.optionDialog.connect.hw.ledger.title',
     defaultMessage: '!!!Ledger Hardware Wallet',
@@ -588,6 +625,36 @@ const globalMessages: * = defineMessages({
   undelegateLabel: {
     id: 'global.labael.undelegate',
     defaultMessage: '!!!Undelegate',
+  },
+  roa30d: {
+    id: 'wallet.staking.banner.roa30d',
+    defaultMessage:
+      '!!!ROA 30d',
+  },
+  roaHelperMessage: {
+    id: 'wallet.staking.banner.roaHelperMessage',
+    defaultMessage:
+      '!!!Estimated ROA (Return of ADA) based on staking result from the last 30 days',
+  },
+  stakePoolDelegated: {
+    id: 'wallet.dashboard.upcomingRewards.stakePoolDelegated',
+    defaultMessage: '!!!Stake Pool Delegated',
+  },
+  totalDelegated: {
+    id: 'wallet.dashboard.summary.totalDelegated',
+    defaultMessage: '!!!Total Delegated',
+  },
+  overview: {
+    id: 'wallet.staking.overview',
+    defaultMessage: '!!!Overview',
+  },
+  tokens: {
+    id: 'wallet.assets.tokens',
+    defaultMessage: '!!!Tokens',
+  },
+  fingerprint: {
+    id: 'wallet.assets.fingerprint',
+    defaultMessage: '!!!Fingerprint',
   },
   auditAddressWarning: {
     id: 'wallet.receive.page.internalWarning2',

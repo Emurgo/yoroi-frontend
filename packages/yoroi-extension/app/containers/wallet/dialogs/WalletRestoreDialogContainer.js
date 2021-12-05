@@ -1,6 +1,6 @@
 // @flow
 import type { Node } from 'react';
-import React, { Component } from 'react';
+import { Component } from 'react';
 import { computed, observable, runInAction } from 'mobx';
 import { observer } from 'mobx-react';
 import config from '../../../config';
@@ -37,6 +37,19 @@ import { isJormungandr } from '../../../api/ada/lib/storage/database/prepackaged
 import { addressToDisplayString, } from '../../../api/ada/lib/storage/bridge/utils';
 import type { TokenInfoMap } from '../../../stores/toplevel/TokenInfoStore';
 import { genLookupOrFail } from '../../../stores/stateless/tokenHelpers';
+import WalletAlreadyExistDialog from '../../../components/wallet/WalletAlreadyExistDialog';
+import type { PublicKeyCache } from '../../../stores/toplevel/WalletStore'
+import { asGetPublicKey, } from '../../../api/ada/lib/storage/models/PublicDeriver/traits'
+import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver';
+import NavPlate from '../../../components/topbar/NavPlate';
+import type { TxRequests } from '../../../stores/toplevel/TransactionsStore'
+import WalletDetails from '../../../components/wallet/my-wallets/WalletDetails';
+import { MultiToken } from '../../../api/common/lib/MultiToken';
+import { ROUTES } from '../../../routes-config';
+import type { IGetPublic } from '../../../api/ada/lib/storage/models/PublicDeriver/interfaces'
+import type { DelegationRequests } from '../../../stores/toplevel/DelegationStore';
+import type { ConceptualWalletSettingsCache } from '../../../stores/toplevel/WalletSettingsStore';
+import type { ConceptualWallet } from '../../../api/ada/lib/storage/models/ConceptualWallet';
 
 const messages = defineMessages({
   walletUpgradeNoop: {
@@ -95,6 +108,38 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
     if (!restoreRequest.isExecuting) restoreRequest.reset();
   };
 
+  updateHideBalance: void => Promise<void> = async () => {
+    await this.generated.actions.profile.updateHideBalance.trigger();
+  }
+
+  getRewardBalance: PublicDeriver<> => null | void | MultiToken = (
+    publicDeriver
+  ) => {
+    const delegationRequest = this.generated.stores
+      .delegation
+      .getDelegationRequests(
+        publicDeriver
+      );
+    if (delegationRequest == null) return undefined;
+
+    const balanceResult = delegationRequest.getDelegatedBalance.result;
+    if (balanceResult == null) {
+      return null;
+    }
+    return balanceResult.accountPart;
+  }
+
+  openToTransactions: PublicDeriver<> => void = (
+    publicDeriver
+  ) => {
+    this.generated.actions.wallets.setActiveWallet.trigger({
+      wallet: publicDeriver
+    });
+    this.generated.actions.router.goToRoute.trigger({
+      route: ROUTES.WALLETS.TRANSACTIONS,
+    });
+  };
+
   render(): null | Node {
     const walletRestoreActions = this.generated.actions.walletRestore;
     const actions = this.generated.actions;
@@ -136,6 +181,42 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
           initValues={walletRestore.walletRestoreMeta}
           introMessage={this.props.introMessage || ''}
         />);
+      }
+      case RestoreSteps.WALLET_EXIST: {
+        const publicDeriver = walletRestore.duplicatedWallet
+        if (!publicDeriver) {
+          throw new Error(`${nameof(WalletRestoreDialogContainer)} no duplicated wallet`);
+        }
+        const parent = publicDeriver.getParent();
+        const settingsCache = this.generated.stores.walletSettings
+          .getConceptualWalletSettingsCache(parent);
+        const withPubKey = asGetPublicKey(publicDeriver);
+        const plate = withPubKey == null
+          ? null
+          : this.generated.stores.wallets.getPublicKeyCache(withPubKey).plate;
+          const txRequests: TxRequests = this.generated.stores.transactions
+          .getTxRequests(publicDeriver);
+          const balance = txRequests.requests.getBalanceRequest.result ?? null;
+
+        return (
+          <WalletAlreadyExistDialog
+            walletPlate={
+              <NavPlate
+                plate={plate}
+                wallet={settingsCache}
+              />
+            }
+            walletSumDetails={<WalletDetails
+              walletAmount={balance}
+              rewards={this.getRewardBalance(publicDeriver)}
+              onUpdateHideBalance={this.updateHideBalance}
+              shouldHideBalance={this.generated.stores.profile.shouldHideBalance}
+              getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
+            />}
+            openWallet={() => { this.openToTransactions(publicDeriver) }}
+            onCancel={walletRestoreActions.back.trigger}
+          />
+        );
       }
       case RestoreSteps.VERIFY_MNEMONIC: {
         // Refer: https://github.com/Emurgo/yoroi-frontend/pull/1055
@@ -289,6 +370,20 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
 
   @computed get generated(): {|
     actions: {|
+      profile: {|
+        updateHideBalance: {|
+          trigger: (params: void) => Promise<void>
+        |}
+      |},
+      router: {|
+        goToRoute: {|
+          trigger: (params: {|
+            publicDeriver?: null | PublicDeriver<>,
+            params?: ?any,
+            route: string
+          |}) => void
+        |}
+      |},
       walletRestore: {|
         back: {| trigger: (params: void) => void |},
         reset: {| trigger: (params: void) => void |},
@@ -302,7 +397,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
           trigger: (params: void) => Promise<void>
         |},
         submitFields: {|
-          trigger: (params: WalletRestoreMeta) => void
+          trigger: (params: WalletRestoreMeta) => Promise<void>
         |},
         verifyMnemonic: {|
           trigger: (params: void) => Promise<void>
@@ -317,6 +412,13 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
       |},
       notifications: {|
         open: {| trigger: (params: Notification) => void |}
+      |},
+      wallets: {|
+        setActiveWallet: {|
+          trigger: (params: {|
+            wallet: PublicDeriver<>
+          |}) => void
+        |}
       |}
     |},
     stores: {|
@@ -329,10 +431,22 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
       profile: {|
         isClassicTheme: boolean,
         selectedNetwork: void | $ReadOnly<NetworkRow>,
-        unitOfAccount: UnitOfAccountSettingType
+        unitOfAccount: UnitOfAccountSettingType,
+        shouldHideBalance: boolean,
+      |},
+      transactions: {|
+        getTxRequests: (PublicDeriver<>) => TxRequests
       |},
       tokenInfoStore: {|
         tokenInfo: TokenInfoMap,
+      |},
+      walletSettings: {|
+        getConceptualWalletSettingsCache: ConceptualWallet => ConceptualWalletSettingsCache
+      |},
+      delegation: {|
+        getDelegationRequests: (
+          PublicDeriver<>
+        ) => void | DelegationRequests
       |},
       walletRestore: {|
         recoveryResult: void | {|
@@ -340,6 +454,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
           phrase: string,
         |},
         step: RestoreStepsType,
+        duplicatedWallet: null | void | PublicDeriver<>,
         walletRestoreMeta: void | WalletRestoreMeta,
         isValidMnemonic: ({|
           mnemonic: string,
@@ -362,6 +477,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
           isExecuting: boolean,
           reset: () => void
         |},
+        getPublicKeyCache: IGetPublic => PublicKeyCache,
       |}
     |}
     |} {
@@ -381,10 +497,21 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
           selectedNetwork: stores.profile.selectedNetwork,
           isClassicTheme: stores.profile.isClassicTheme,
           unitOfAccount: stores.profile.unitOfAccount,
+          shouldHideBalance: stores.profile.shouldHideBalance,
+        },
+        transactions: {
+          getTxRequests: stores.transactions.getTxRequests,
         },
         uiNotifications: {
           isOpen: stores.uiNotifications.isOpen,
           getTooltipActiveNotification: stores.uiNotifications.getTooltipActiveNotification,
+        },
+        walletSettings: {
+          getConceptualWalletSettingsCache:
+            stores.walletSettings.getConceptualWalletSettingsCache,
+        },
+        delegation: {
+          getDelegationRequests: stores.delegation.getDelegationRequests,
         },
         wallets: {
           restoreRequest: {
@@ -395,6 +522,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
           sendMoneyRequest: {
             isExecuting: stores.wallets.sendMoneyRequest.isExecuting,
           },
+          getPublicKeyCache: stores.wallets.getPublicKeyCache,
         },
         tokenInfoStore: {
           tokenInfo: stores.tokenInfoStore.tokenInfo,
@@ -404,6 +532,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
         },
         walletRestore: {
           step: stores.walletRestore.step,
+          duplicatedWallet: stores.walletRestore.duplicatedWallet,
           recoveryResult: stores.walletRestore.recoveryResult,
           walletRestoreMeta: stores.walletRestore.walletRestoreMeta,
           isValidMnemonic: stores.walletRestore.isValidMnemonic,
@@ -419,6 +548,15 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
           open: {
             trigger: actions.notifications.open.trigger,
           },
+        },
+        router: {
+          goToRoute: { trigger: actions.router.goToRoute.trigger },
+        },
+        wallets: {
+          setActiveWallet: { trigger: actions.wallets.setActiveWallet.trigger },
+        },
+        profile: {
+          updateHideBalance: { trigger: actions.profile.updateHideBalance.trigger },
         },
         walletRestore: {
           reset: {

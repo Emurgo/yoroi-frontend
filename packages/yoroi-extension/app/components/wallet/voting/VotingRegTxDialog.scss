@@ -3,7 +3,7 @@
 @import '../../../themes/mixins/error-message';
 
 .dialog {
-  font-family: var(--font-medium);
+  font-weight: 500;
 
   .amountInput {
     margin-top: 23px;
@@ -20,8 +20,8 @@
   }
 
   .submitButtonSpinning {
-    @include loading-spinner("../../../assets/images/spinner-light.svg");
-  }  
+    @include loading-spinner('../../../assets/images/spinner-light.svg');
+  }
 
   .error {
     @include error-message;
@@ -29,8 +29,8 @@
   }
 
   .infoBlock {
-    background-color: var(--theme-hw-send-confirmation-info-block-background-color);
-    font-family: var(--font-regular);
+    background-color: var(--yoroi-palette-gray-50);
+    font-weight: 400;
     padding: 10px;
     margin-bottom: 30px;
     line-height: 1.38;
@@ -46,9 +46,9 @@
 }
 
 :global(.YoroiModern) .dialog {
-  min-width: var(--theme-modal-min-max-width-lg);
-  max-width: var(--theme-modal-min-max-width-lg);  
-  font-family: var(--font-regular);
+  min-width: var(--yoroi-comp-dialog-min-width-lg);
+  max-width: var(--yoroi-comp-dialog-min-width-lg);
+  font-weight: 400;
 
   .walletPassword {
     margin-top: 0;

@@ -1,6 +1,6 @@
 // @flow
 import type { Node } from 'react';
-import React, { Component } from 'react';
+import { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
@@ -136,14 +136,14 @@ export default class FinalizeDialog extends Component<Props> {
                 elementId={notificationElementId}
                 onCopyAddress={() => onCopyAddressTooltip(address, notificationElementId)}
                 notification={notification}
-                tooltipOpensUpward
+                placementTooltip="top-start"
                 key={address}
               >
                 <ExplorableHashContainer
                   hash={address}
                   selectedExplorer={this.props.selectedExplorer}
                   light
-                  tooltipOpensUpward
+                  placementTooltip="top-start"
                   linkType="address"
                 >
                   <RawHash light>

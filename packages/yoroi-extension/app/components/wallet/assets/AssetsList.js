@@ -1,5 +1,5 @@
 // @flow
-import React, { Component } from 'react';
+import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 
@@ -11,8 +11,17 @@ import ArrowsListFromBottom from '../../../assets/images/assets-page/arrows-list
 import ArrowsListFromTop from '../../../assets/images/assets-page/arrows-list-from-top.inline.svg';
 import ArrowsList from '../../../assets/images/assets-page/arrows-list.inline.svg';
 import Search from '../../../assets/images/assets-page/search.inline.svg';
-import { truncateAddressShort } from '../../../utils/formatters';
+import { splitAmount, truncateAddressShort, truncateToken } from '../../../utils/formatters';
 import BorderedBox from '../../widgets/BorderedBox';
+import { MultiToken } from '../../../api/common/lib/MultiToken';
+import { getTokenName } from '../../../stores/stateless/tokenHelpers';
+import type {
+  TokenLookupKey,
+} from '../../../api/common/lib/MultiToken';
+import type { TokenRow, NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
+import globalMessages from '../../../i18n/global-messages';
+import { hiddenAmount } from '../../../utils/strings';
+import OpenInExplorer from '../../widgets/OpenInExplorer';
 
 const SORTING_DIRECTIONS = {
   UP: 'UP',
@@ -31,6 +40,10 @@ const SORTING_COLUMNS = {
 |}
 type Props = {|
   +assetsList: Asset[],
+  +assetDeposit:? null | MultiToken,
+  +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
+  +shouldHideBalance: boolean,
+  +network: $ReadOnly<NetworkRow>
 |};
 
 type State = {|
@@ -39,7 +52,7 @@ type State = {|
   sortingColumn: string
 |}
 
-const messages = defineMessages({
+export const assetsMessage: Object = defineMessages({
   assets: {
     id: 'wallet.assets.assets',
     defaultMessage: '!!!Assets ({number})',
@@ -131,27 +144,74 @@ export default class AssetsList extends Component<Props, State> {
     return <ArrowsList />;
   }
 
+  renderAmountDisplay: () => Node = () => {
+    if (this.props.assetDeposit == null) {
+      return <div className={styles.isLoading} />;
+    }
+
+    const defaultEntry = this.props.assetDeposit.getDefaultEntry();
+    const tokenInfo = this.props.getTokenInfo(defaultEntry);
+    const shiftedAmount = defaultEntry.amount
+      .shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
+
+    let balanceDisplay;
+    if (this.props.shouldHideBalance) {
+      balanceDisplay = (<span>{hiddenAmount}</span>);
+    } else {
+      const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
+        shiftedAmount,
+        tokenInfo.Metadata.numberOfDecimals,
+      );
+
+      balanceDisplay = (
+        <>
+          <span className={styles.beforeDecimal}>{beforeDecimalRewards}</span>
+          <span className={styles.afterDecimal}>{afterDecimalRewards}</span>
+        </>
+      );
+    }
+
+    return (
+      <>
+        {balanceDisplay}
+        <span className={styles.tokenName}>{truncateToken(getTokenName(tokenInfo))}</span>
+      </>
+    );
+  }
+
   render(): Node {
 
     const { intl } = this.context;
     const { assetsList } = this.state
+    const { assetDeposit, network } = this.props
+
     return (
       <div className={styles.component}>
         <BorderedBox>
           <div className={styles.header}>
             <h1 className={styles.assets}>
-              {intl.formatMessage(messages.assets, { number: this.props.assetsList.length })}
+              {intl.formatMessage(assetsMessage.assets, { number: this.props.assetsList.length })}
             </h1>
             <div className={styles.search}>
               <Search />
-              <input onChange={this.search} type='text' placeholder={intl.formatMessage(messages.search)} />
+              <input onChange={this.search} type='text' placeholder={intl.formatMessage(assetsMessage.search)} />
             </div>
           </div>
+          {assetDeposit && (
+          <div className={styles.lockedAssets}>
+            <div className={styles.lockedAssetsAmount}>
+              <p className={styles.label}>
+                {intl.formatMessage(globalMessages.assetDepositLabel)} &nbsp;
+              </p>
+              {this.renderAmountDisplay()}
+            </div>
+          </div>
+          )}
         </BorderedBox>
         {
           assetsList.length === 0 ? (
             <div className={styles.noAssetFound}>
-              <h1>{intl.formatMessage(messages.noAssetFound)}</h1>
+              <h1>{intl.formatMessage(assetsMessage.noAssetFound)}</h1>
             </div>
           ): (
             <>
@@ -159,21 +219,21 @@ export default class AssetsList extends Component<Props, State> {
                 <li>
                   <button type='button' onClick={() => this.sortAssets(SORTING_COLUMNS.NAME)}>
                     <p className={styles.headerText}>
-                      {intl.formatMessage(messages.nameAndTicker)}
+                      {intl.formatMessage(assetsMessage.nameAndTicker)}
                     </p>
                     {this.displayColumnLogo(SORTING_COLUMNS.NAME)}
                   </button>
                 </li>
                 <li>
                   <p className={styles.headerText}>
-                    {intl.formatMessage(messages.identifier)}
+                    {intl.formatMessage(assetsMessage.identifier)}
                   </p>
                   {/* <Info /> TODO: identifier info? */}
                 </li>
                 <li>
                   <button type='button' onClick={() => this.sortAssets(SORTING_COLUMNS.AMOUNT)}>
                     <p className={styles.headerText}>
-                      {intl.formatMessage(messages.quantity)}
+                      {intl.formatMessage(assetsMessage.quantity)}
                     </p>
                     {this.displayColumnLogo(SORTING_COLUMNS.AMOUNT)}
                   </button>
@@ -185,7 +245,9 @@ export default class AssetsList extends Component<Props, State> {
                     <div className={styles.logo}>
                       <NoAssetLogo />
                     </div>
-                    <p>{token.name}</p>
+                    <OpenInExplorer network={network} address={token.id}>
+                      {token.name}
+                    </OpenInExplorer>
                   </li>
                   <li>{truncateAddressShort(token.id)}</li>
                   <li className={styles.amount}>{token.amount}</li>

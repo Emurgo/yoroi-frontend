@@ -13,33 +13,21 @@
 
     :global {
       .SimpleInput_input {
-        font-family: var(--font-mono-light);
+        font-family: 'RobotoMono';
+        font-weight: 300;
         letter-spacing: 0;
       }
     }
   }
-  
+
   .amountInput {
     position: relative;
     margin-bottom: 10px;
   }
-  
-  .adaLabel {
-    bottom: 16px;
-    color: var(--theme-input-right-floating-text-color);
-    font-family: var(--font-light);
-    position: absolute;
-    right: 20px;
-    text-transform: uppercase;
-  }
-  
-  .nextButton {
-    display: block !important;
-    margin: 30px auto 0;
-  }
 
   .checkbox {
-    font-family: var(--font-mono-light);
+    font-family: 'RobotoMono';
+    font-weight: 300;
     width: fit-content;
   }
 
@@ -75,9 +63,9 @@
   }
 
   .actionLabel {
-    color: var(--theme-label-button-color);
-    font-family: var(--rp-checkbox-label-font-family, var(--rp-theme-font-light, "NotoSans-Light, NotoSansCJKjp-Light"), sans-serif);
-    font-size: var(--rp-checkbox-label-font-size, 16px);
+    color: var(--yoroi-palette-gray-800);
+    font-weight: 300;
+    font-size: 16px;
     padding-left: 17px;
   }
 
@@ -95,8 +83,8 @@
     }
 
     p {
-      color: var(--theme-send-confirmation-dialog-send-values-color);
-      font-family: var(--font-medium);
+      color: var(--yoroi-palette-secondary-200);
+      font-weight: 500;
     }
   }
 
@@ -108,10 +96,9 @@
 
 }
 
-:global(.YoroiClassic) .component {
-  .receiverInput {
-    margin-bottom: 10px;
-  }
+:global(.YoroiRevamp) .component {
+  background: var(--yoroi-palette-common-white);
+  border-radius: 8px;
 }
 
 :global(.YoroiModern) .component {
@@ -119,19 +106,5 @@
 
   .receiverInput {
     letter-spacing: 0;
-
-    :global {
-      .SimpleInput_input {
-        font-family: var(--font-mono-regular);
-      }
-    }
-  }
-
-  .nextButton {
-    margin: 20px auto 0;
-  }
-
-  fieldset {
-    background: var(--theme-settings-pane-background-color);
   }
 }

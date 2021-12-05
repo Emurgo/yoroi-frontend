@@ -9,15 +9,11 @@
     .group {
       margin-bottom: 30px;
       .groupDate {
-        font-family: var(--font-regular);
+        font-weight: 400;
         font-size: 16px;
         line-height: 21px;
-        color: var(--theme-main-body-messages-color);
+        color: var(--yoroi-palette-gray-900);
       }
     }
-  }
-  .loadMoreNoticesButton {
-    display: block !important;
-    width: 287px;
   }
 }

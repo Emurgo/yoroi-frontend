@@ -1,21 +1,25 @@
 // @flow
-import React, { Component } from 'react';
-import type { Node } from 'react';
+import type { Node, ComponentType } from 'react';
 import { observer } from 'mobx-react';
-import styles from './BackgroundColoredLayout.scss';
+import { Box } from '@mui/system';
 
 type Props = {|
-  +children: Node
+  +children: Node,
 |};
 
-@observer
-export default class BackgroundColoredLayout extends Component<Props> {
-  render(): Node {
-    const { children } = this.props;
-    return (
-      <div className={styles.component}>
-        {children}
-      </div>
-    );
-  }
+function BackgroundColoredLayout({ children }: Props): Node {
+  return (
+    <Box
+      sx={{
+        overflow: 'overlay',
+        height: '100%',
+        padding: '30px',
+        background: 'var(--yoroi-palette-gray-50)',
+      }}
+    >
+      {children}
+    </Box>
+  );
 }
+
+export default (observer(BackgroundColoredLayout): ComponentType<Props>);

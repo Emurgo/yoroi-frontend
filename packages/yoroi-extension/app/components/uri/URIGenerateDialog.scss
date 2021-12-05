@@ -1,6 +1,6 @@
 .component {
-  min-width: var(--theme-modal-min-max-width-lg) !important;
-  max-width: var(--theme-modal-min-max-width-lg) !important;
+  min-width: var(--yoroi-comp-dialog-min-width-lg) !important;
+  max-width: var(--yoroi-comp-dialog-min-width-lg) !important;
 
   :global {
     .Dialog_title {
@@ -9,35 +9,13 @@
   }
 
   .receiverLabel {
-    font-family: var(--font-regular);
+    font-weight: 400;
     margin-bottom: 10px;
   }
-
-  .receiverInput {
-    position: relative;
-
-    :global {
-      .SimpleInput_input {
-        font-family: var(--font-mono-light);
-        letter-spacing: 0;
-      }
-    }
-  }  
 
   .amountField {
     margin-bottom: 15px;
   }
-
-  .generateButton {
-    display: block !important;
-    margin: 30px auto 0;
-  }
-}
-
-:global(.YoroiClassic) .component {
-  .receiverInput {
-    margin-bottom: 10px;
-  }  
 }
 
 :global(.YoroiModern) .component {
@@ -49,19 +27,9 @@
 
   .receiverInput {
     letter-spacing: 0;
-
-    :global {
-      .SimpleInput_input {
-        font-family: var(--font-mono-regular);
-      }
-    }
   }
 
   .amountField {
     margin-bottom: 10px;
-  }
-
-  .generateButton {
-    margin: 0 auto;
   }
 }

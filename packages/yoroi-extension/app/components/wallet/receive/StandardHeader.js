@@ -1,11 +1,10 @@
 // @flow
-import React, { Component } from 'react';
+import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import classnames from 'classnames';
-import { Button } from 'react-polymorph/lib/components/Button';
-import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
+import { LoadingButton } from '@mui/lab';
 import LocalizableError from '../../../i18n/LocalizableError';
 import styles from './StandardHeader.scss';
 import CopyableAddress from '../../widgets/CopyableAddress';
@@ -67,21 +66,16 @@ export default class StandardHeader extends Component<Props> {
     const { intl } = this.context;
     const mainAddressNotificationId = 'mainAddress-copyNotification';
 
-    const generateAddressButtonClasses = classnames([
-      'primary',
-      'generateAddressButton',
-      styles.submitButton,
-      isSubmitting ? styles.spinning : null,
-    ]);
-
     const generateAddressForm = (
-      <Button
-        className={generateAddressButtonClasses}
-        label={intl.formatMessage(messages.generateNewAddressButtonLabel)}
-        onMouseUp={this.submit}
-        skin={ButtonSkin}
+      <LoadingButton
+        variant="primary"
+        loading={isSubmitting}
+        className="generateAddressButton"
+        onClick={this.submit}
         disabled={this.props.isFilterActive}
-      />
+      >
+        {intl.formatMessage(messages.generateNewAddressButtonLabel)}
+      </LoadingButton>
     );
 
     const copyableHashClass = classnames([
@@ -100,6 +94,7 @@ export default class StandardHeader extends Component<Props> {
             elementId={mainAddressNotificationId}
             onCopyAddress={() => onCopyAddressTooltip(walletAddress, mainAddressNotificationId)}
             notification={notification}
+            placementTooltip="bottom-start"
           >
             <ExplorableHashContainer
               selectedExplorer={this.props.selectedExplorer}

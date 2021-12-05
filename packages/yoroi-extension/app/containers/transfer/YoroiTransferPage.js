@@ -4,7 +4,7 @@ import {
   validateMnemonic,
 } from 'bip39';
 import { computed, } from 'mobx';
-import React, { Component } from 'react';
+import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape, } from 'react-intl';
 import validWords from 'bip39/src/wordlists/english.json';

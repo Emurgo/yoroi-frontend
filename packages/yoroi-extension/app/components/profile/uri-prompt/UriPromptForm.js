@@ -1,10 +1,8 @@
 // @flow
 import type { Node } from 'react';
-import React, { Component } from 'react';
-import classnames from 'classnames';
+import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { Button } from 'react-polymorph/lib/components/Button';
-import { ButtonSkin } from 'react-polymorph/lib/skins/simple/ButtonSkin';
+import { Button } from '@mui/material';
 import { defineMessages, intlShape } from 'react-intl';
 import styles from './UriPromptForm.scss';
 import AboutUri from '../../../assets/images/uri/about-url.inline.svg';
@@ -37,25 +35,12 @@ export default class UriPromptForm extends Component<Props> {
 
   render(): Node {
     const { intl } = this.context;
-    const allowButtonClasses = classnames([
-      'allowButton',
-      'primary',
-      styles.submitButton,
-    ]);
-    const skipButtonClasses = classnames([
-      'secondary',
-      styles.submitButton,
-    ]);
 
     return (
       <div className={styles.component}>
         <div className={styles.centeredBox}>
-
           <span className={styles.aboutSvg}>
-            {this.props.classicTheme
-              ? <AboutUriClassic />
-              : <AboutUri />
-            }
+            {this.props.classicTheme ? <AboutUriClassic /> : <AboutUri />}
           </span>
 
           <div className={styles.explanation}>
@@ -65,18 +50,21 @@ export default class UriPromptForm extends Component<Props> {
 
           <div className={styles.buttonsWrapper}>
             <Button
-              className={skipButtonClasses}
-              label={intl.formatMessage(globalMessages.skipLabel)}
-              onMouseUp={this.props.onSkip}
-              skin={ButtonSkin}
-            />
+              variant="secondary"
+              onClick={this.props.onSkip}
+              sx={{ width: '240px' }}
+            >
+              {intl.formatMessage(globalMessages.skipLabel)}
+            </Button>
 
             <Button
-              className={allowButtonClasses}
-              label={intl.formatMessage(globalMessages.allowLabel)}
-              onMouseUp={this.props.onAccept}
-              skin={ButtonSkin}
-            />
+              className="allowButton"
+              variant="primary"
+              onClick={this.props.onAccept}
+              sx={{ width: '240px' }}
+            >
+              {intl.formatMessage(globalMessages.allowLabel)}
+            </Button>
           </div>
         </div>
       </div>

@@ -1,7 +1,6 @@
 // @flow
 
 import type { Node } from 'react';
-import React from 'react';
 import BigNumber from 'bignumber.js';
 import { boolean, select, } from '@storybook/addon-knobs';
 import { action } from '@storybook/addon-actions';
@@ -23,7 +22,7 @@ import LocalizableError from '../../i18n/LocalizableError';
 import { GenericApiError, } from '../../api/common/errors';
 import WalletSummaryPage from './WalletSummaryPage';
 import { defaultToSelectedExplorer } from '../../domain/SelectedExplorer';
-import { THEMES } from '../../themes';
+import { THEMES } from '../../styles/utils';
 import { mockWalletProps } from './Wallet.mock';
 import { ROUTES } from '../../routes-config';
 import AddMemoDialog from '../../components/wallet/memos/AddMemoDialog';
@@ -124,6 +123,7 @@ export const Loading = (): Node => {
       selected: wallet.publicDeriver,
       ...lookup,
     }),
+    // $FlowFixMe[incompatible-type]: Revamp props
     (<WalletSummaryPage
       generated={{
         stores: {
@@ -166,6 +166,8 @@ export const Loading = (): Node => {
           },
           transactions: {
             hasAny: false,
+            shouldIncludeTxIds: false,
+            toggleIncludeTxIds: () => {},
             totalAvailable: 0,
             recent: [],
             searchOptions: {
@@ -317,6 +319,8 @@ const genPropsForTransactions: {|
     ),
     isExporting: request.txExport != null ? request.txExport.isExporting : false,
     exportError: request.txExport?.exportError,
+    toggleIncludeTxIds: () => {},
+    shouldIncludeTxIds: false,
   },
   addresses: {
     addressSubgroupMap: (() => {
@@ -497,6 +501,7 @@ export const Transaction = (): Node => {
       selected: wallet.publicDeriver,
       ...lookup,
     }),
+    // $FlowFixMe[incompatible-type]: Revamp props
     (<WalletSummaryPage
       generated={{
         stores: genPropsForTransactions({
@@ -599,6 +604,7 @@ export const TransactionWithMemo = (): Node => {
       selected: wallet.publicDeriver,
       ...lookup,
     }),
+    // $FlowFixMe[incompatible-type]: Revamp props
     (<WalletSummaryPage
       generated={{
         stores: genPropsForTransactions({
@@ -724,6 +730,7 @@ export const MemoDialog = (): Node => {
       selected: wallet.publicDeriver,
       ...lookup,
     }),
+    // $FlowFixMe[incompatible-type]: Revamp props
     (<WalletSummaryPage
       generated={{
         stores: genPropsForTransactions({
@@ -773,6 +780,7 @@ export const NoTransactions = (): Node => {
       selected: wallet.publicDeriver,
       ...lookup,
     }),
+    // $FlowFixMe[incompatible-type]: Revamp props
     (<WalletSummaryPage
       generated={{
         stores: genPropsForTransactions({
@@ -872,6 +880,7 @@ export const ManyTransactions = (): Node => {
       selected: wallet.publicDeriver,
       ...lookup,
     }),
+    // $FlowFixMe[incompatible-type]: Revamp props
     (<WalletSummaryPage
       generated={{
         stores: genPropsForTransactions({
@@ -972,6 +981,7 @@ export const TxHistoryExport = (): Node => {
       selected: wallet.publicDeriver,
       ...lookup,
     }),
+    // $FlowFixMe[incompatible-type]: Revamp props
     (<WalletSummaryPage
       generated={{
         stores: genPropsForTransactions({
@@ -1030,6 +1040,7 @@ export const DebugWalletWarning = (): Node => {
       }),
       ...lookup,
     }),
+    // $FlowFixMe[incompatible-type]: Revamp props
     (<WalletSummaryPage
       generated={{
         stores: genPropsForTransactions({

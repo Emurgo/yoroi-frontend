@@ -4,6 +4,7 @@ import type { WalletChecksum } from '@emurgo/cip4-js';
 import { PublicDeriver } from '../../../app/api/ada/lib/storage/models/PublicDeriver/index';
 import { MultiToken } from '../../../app/api/common/lib/MultiToken';
 import { RustModule } from '../../../app/api/ada/lib/cardanoCrypto/rustLoader';
+import type CardanoTxRequest from '../../../app/api/ada';
 
 // ----- Types used in the dApp <-> Yoroi connection bridge ----- //
 
@@ -290,6 +291,11 @@ export type Tx = {|
   outputs: ErgoBoxCandidateJson[],
 |};
 
+export type CardanoTx = {|
+  tx: string,
+  partialSign: boolean,
+|};
+
 export function asTx(
   tx: any,
   wasmInstance: typeof RustModule.SigmaRust
@@ -399,6 +405,9 @@ export type ConnectedSites = {|
   sites: Array<string>,
 |};
 
+export type Protocol = {|
+  type: 'ergo' | 'cardano'
+|}
 export type RpcUid = number;
 
 export type PendingSignData = {|
@@ -415,11 +424,19 @@ export type PendingSignData = {|
   uid: RpcUid,
   address: Address,
   bytes: string
-|}
+|} | {|
+  type: 'tx/cardano',
+  uid: RpcUid,
+  tx: CardanoTx,
+|} | {|
+  type: 'tx-create-req/cardano',
+  uid: RpcUid,
+  tx: CardanoTxRequest,
+|};
 
 export type ConfirmedSignData = {|
   type: 'sign_confirmed',
-  tx: Tx,
+  tx: Tx | CardanoTx | CardanoTxRequest,
   uid: RpcUid,
   tabId: number,
   pw: string,
@@ -456,6 +473,10 @@ export type RemoveWalletFromWhitelistData = {|
 
 export type GetConnectedSitesData = {|
   type: 'get_connected_sites',
+|}
+
+export type GetConnectionProtocolData = {|
+  type: 'get_protocol',
 |}
 
 // when a tx is submitted we mark those as potentially spent and filter

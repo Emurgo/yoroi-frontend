@@ -1,6 +1,6 @@
 // @flow
 
-import React, { Component } from 'react';
+import { Component } from 'react';
 import { intlShape } from 'react-intl';
 import { observer } from 'mobx-react';
 import globalMessages from '../../../i18n/global-messages';

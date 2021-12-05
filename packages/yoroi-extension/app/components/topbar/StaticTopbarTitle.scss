@@ -1,6 +1,6 @@
 .topbarTitleContainer {
-  color: var(--theme-topbar-wallet-info-color);
-  font-family: var(--font-regular);
+  color: var(--yoroi-palette-common-white);
+  font-weight: 400;
   letter-spacing: 0.5px;
   line-height: 23px;
   text-align: center;
@@ -8,8 +8,8 @@
 
   .topbarTitleText {
     font-size: 17px;
-    font-weight: 600;
-    color: var(--theme-topbar-wallet-name-color);
+    font-weight: 500;
+    color: var(--yoroi-palette-common-white);
   }
 
 }

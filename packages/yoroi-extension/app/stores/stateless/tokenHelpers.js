@@ -12,6 +12,7 @@ export function getTokenName(
   tokenRow: $ReadOnly<{
     Identifier: string,
     IsDefault: boolean,
+    IsNFT?: boolean,
     Metadata: TokenMetadata,
     ...,
   }>,
@@ -63,6 +64,7 @@ export function getTokenIdentifierIfExists(
   tokenRow: $ReadOnly<{
     Identifier: string,
     IsDefault: boolean,
+    IsNFT?: boolean,
     Metadata: TokenMetadata,
     ...,
   }>
@@ -92,6 +94,17 @@ export function genLookupOrFail(
   };
 }
 
+export function genLookupOrNull(
+  map: TokenInfoMap,
+): ($ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow> | null) {
+  return (lookup: $ReadOnly<Inexact<TokenLookupKey>>): $ReadOnly<TokenRow> | null => {
+    const tokenRow = map
+      .get(lookup.networkId.toString())
+      ?.get(lookup.identifier);
+    if (tokenRow == null) return null
+    return tokenRow;
+  };
+}
 export function genFormatTokenAmount(
   getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>
 ): (TokenEntry => string) {

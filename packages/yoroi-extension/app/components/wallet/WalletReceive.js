@@ -1,5 +1,5 @@
 // @flow
-import React, { Component } from 'react';
+import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape, } from 'react-intl';
@@ -237,6 +237,7 @@ export default class WalletReceive extends Component<Props> {
                   () => onCopyAddressTooltip(address.address, notificationElementId)
                 }
                 notification={notification}
+                placementTooltip="bottom-start"
               >
                 <ExplorableHashContainer
                   selectedExplorer={this.props.selectedExplorer}
