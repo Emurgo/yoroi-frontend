@@ -96,6 +96,11 @@
 
 }
 
+:global(.YoroiRevamp) .component {
+  background: var(--yoroi-palette-common-white);
+  border-radius: 8px;
+}
+
 :global(.YoroiModern) .component {
   padding: 30px;
 

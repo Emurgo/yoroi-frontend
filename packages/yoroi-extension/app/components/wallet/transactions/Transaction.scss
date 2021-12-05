@@ -62,7 +62,7 @@
     min-width: fit-content;
     height: fit-content;
     width: 105px;
-    background: var(--yoroi-palette-gray-50);
+    background: var(--yoroi-palette-gray-200);
     font-size: 10px;
     letter-spacing: 0;
   }
@@ -114,7 +114,7 @@
       var(--yoroi-palette-tx-status-pending-stripes) 83.4%,
       var(--yoroi-palette-tx-status-pending-stripes)
     );
-    animation: pending-label-animation 1s linear infinite;
+    animation: pending-label-animation 3s linear infinite;
     :global {
       @keyframes pending-label-animation {
         0% {

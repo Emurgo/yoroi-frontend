@@ -18,7 +18,7 @@ import { Bip44Wallet, } from '../../api/ada/lib/storage/models/Bip44Wallet/wrapp
 import globalMessages from '../../i18n/global-messages';
 import { isLedgerNanoWallet, isTrezorTWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 
-const messages = defineMessages({
+export const walletTypesMessages: Object = defineMessages({
   standardWallet: {
     id: 'wallet.nav.type.standard',
     defaultMessage: '!!!Standard wallet',
@@ -80,12 +80,12 @@ export default class NavPlate extends Component<Props> {
 
   getType: ConceptualWallet => $Exact<$npm$ReactIntl$MessageDescriptor> = (wallet) => {
     if (isLedgerNanoWallet(wallet)) {
-      return messages.ledgerWallet;
+      return walletTypesMessages.ledgerWallet;
     }
     if (isTrezorTWallet(wallet)) {
-      return messages.trezorWallet;
+      return walletTypesMessages.trezorWallet;
     }
-    return messages.standardWallet;
+    return walletTypesMessages.standardWallet;
   }
 
   getIcon: ConceptualWallet => string = (wallet) => {

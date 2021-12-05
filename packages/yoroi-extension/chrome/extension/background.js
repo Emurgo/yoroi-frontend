@@ -336,7 +336,7 @@ async function withSelectedWallet<T>(
 }
 
 // messages from other parts of Yoroi (i.e. the UI for the connector)
-chrome.runtime.onMessage.addListener(async (
+const yoroiMessageHandler = async (
   request: (
     ConnectResponseData
     | ConfirmedSignData
@@ -573,7 +573,16 @@ chrome.runtime.onMessage.addListener(async (
   } else if (request.type === 'get_protocol') {
     sendResponse({ type: connectionProtocol })
   }
-});
+};
+
+chrome.runtime.onMessage.addListener(
+  // Returning `true` is required by Firefox, see:
+  // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/runtime/onMessage
+  (message, sender, sendResponse) => {
+    yoroiMessageHandler(message, sender, sendResponse);
+    return true;
+  }
+);
 
 async function removeWallet(
   tabId: number,
@@ -707,9 +716,21 @@ chrome.runtime.onMessageExternal.addListener((message, sender) => {
 // per-page connection to injected code in the connector
 chrome.runtime.onConnectExternal.addListener(port => {
   if (port.sender.id === environment.ergoConnectorExtensionId) {
-    const tabId = port.sender.tab.id;
-    ports.set(tabId, port);
-    port.onMessage.addListener(async message => {
+    handleInjectorConnect(port);
+  } else {
+    // disconnect?
+  }
+});
+
+// per-page connection to injected code by Yoroi with connector
+chrome.runtime.onConnect.addListener(port => {
+  handleInjectorConnect(port);
+});
+
+function handleInjectorConnect(port) {
+  const tabId = port.sender.tab.id;
+  ports.set(tabId, port);
+  port.onMessage.addListener(async message => {
 
       connectionProtocol = message.protocol;
       imgBase64Url = message.imgBase64Url;
@@ -1114,10 +1135,7 @@ chrome.runtime.onConnectExternal.addListener(port => {
               }
             })
             break;
-        }
       }
-    });
-  } else {
-    // disconnect?
-  }
-});
+    }
+  });
+}

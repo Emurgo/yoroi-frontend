@@ -2,7 +2,7 @@
 // @flow
 import React, { Component } from 'react';
 import type { Node } from 'react';
-import { intlShape } from 'react-intl';
+import { intlShape, defineMessages } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import styles from './SignTxPage.scss';
 import { Button } from '@mui/material';
@@ -37,6 +37,8 @@ import type {
   CardanoTx,
 } from '../../../../chrome/extension/ergo-connector/types';
 import type { CardanoConnectorSignRequest } from '../../types';
+import ArrowRight from '../../../assets/images/arrow-right.inline.svg';
+import CardanoUtxoDetails from './CardanoUtxoDetails';
 import type CardanoTxRequest from '../../../api/ada';
 
 type Props = {|
@@ -55,6 +57,25 @@ type Props = {|
   +getCurrentPrice: (from: string, to: string) => ?number,
 |};
 
+const messages = defineMessages({
+  title: {
+    id: 'connector.signin.title',
+    defaultMessage: '!!!Sign transaction',
+  },
+  txDetails: {
+    id: 'connector.signin.txDetails',
+    defaultMessage: '!!!Transaction Details',
+  },
+  receiver: {
+    id: 'connector.signin.receiver',
+    defaultMessage: '!!!Receiver',
+  },
+  more: {
+    id: 'connector.signin.more',
+    defaultMessage: '!!!more'
+  }
+});
+
 @observer
 class SignTxPage extends Component<Props> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
@@ -64,6 +85,10 @@ class SignTxPage extends Component<Props> {
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm(
     {
       fields: {
+        showUtxoDetails: {
+          type: 'boolean',
+          value: false,
+        },
         walletPassword: {
           type: 'password',
           label: this.context.intl.formatMessage(globalMessages.walletPasswordLabel),
@@ -103,6 +128,10 @@ class SignTxPage extends Component<Props> {
     });
   }
 
+  toggleUtxoDetails: boolean => void = (newState) => {
+    this.form.$('showUtxoDetails').set(newState);
+  }
+
   getTicker: $ReadOnly<TokenRow> => Node = tokenInfo => {
     const fingerprint = this.getFingerprint(tokenInfo);
     return fingerprint !== undefined
@@ -128,6 +157,22 @@ class SignTxPage extends Component<Props> {
 
   _resolveTokenInfo: TokenEntry => $ReadOnly<TokenRow> = tokenEntry => {
     return this.props.getTokenInfo(tokenEntry);
+  }
+
+  renderBundle: {|
+    amount: MultiToken,
+    render: TokenEntry => Node,
+  |} => Node = (request) => {
+    return (
+      <>
+        {request.render(request.amount.getDefaultEntry())}
+        {request.amount.nonDefaultEntries().map(entry => (
+          <React.Fragment key={entry.identifier}>
+            {request.render(entry)}
+          </React.Fragment>
+        ))}
+      </>
+    );
   }
 
   renderAmountDisplay: {|
@@ -238,102 +283,149 @@ class SignTxPage extends Component<Props> {
     );
   }
 
+  renderAddresses(): Node {
+    const addresses = this.props.txData.outputs.map(({ address }) =>  address);
+    return (
+      <div className={styles.toAddresses}>
+        {addresses.slice(0, 2).map((address, idx) => {
+          if (idx >= 1) {
+            return (
+              <button
+                className={styles.more}
+                type="button"
+                onClick={() => this.toggleUtxoDetails(true)}
+                key={address}
+              >
+                {addresses.length - 1}&nbsp;
+                <span>{this.context.intl.formatMessage(messages.more)}</span>
+              </button>
+            );
+          }
+          return (<p key={address}>{address}</p>);
+        })}
+      </div>
+    )
+  }
+
+
   render(): Node {
     const { form } = this;
     const walletPasswordField = form.$('walletPassword');
 
     const { intl } = this.context;
     const { txData, onCancel, } = this.props;
+    const { showUtxoDetails } = form.values();
     return (
       <>
         <ProgressBar step={2} />
         <div className={styles.component}>
-          <div>
-            <div className={styles.addressHeader}>
-              <div className={styles.addressFrom}>
-                <p className={styles.label}>
-                  {intl.formatMessage(globalMessages.fromAddresses)}:{' '}
-                  <span>{txData.inputs.length}</span>
-                </p>
+          {
+            !showUtxoDetails ?(
+              <div>
+                <div>
+                  <h1 className={styles.title}>{intl.formatMessage(messages.title)}</h1>
+                </div>
+                <div className={styles.transactionWrapper}>
+                  <p className={styles.transactionId}>
+                    {intl.formatMessage(messages.receiver)}
+                  </p>
+                  <div className={styles.hash}>{this.renderAddresses()}</div>
+                  <button
+                    onClick={() => this.toggleUtxoDetails(true)}
+                    type='button'
+                    className={styles.utxo}
+                  >
+                    <p>{intl.formatMessage(messages.txDetails)}</p>
+                    <ArrowRight />
+                  </button>
+                </div>
+                <div className={styles.info}>
+                  <div className={styles.infoRaw}>
+                    <p className={styles.label}>
+                      {intl.formatMessage(globalMessages.amount)}
+                    </p>
+                    <div className={styles.labelValue}>
+                      {this.renderAmountDisplay({
+                        entry: {
+                          identifier: txData.amount.defaults.defaultIdentifier,
+                          networkId: txData.amount.defaults.defaultNetworkId,
+                          amount: txData.amount.get(
+                            txData.amount.defaults.defaultIdentifier
+                          ) ?? (new BigNumber('0'))
+                        },
+                      })}
+                    </div>
+                  </div>
+                  <div className={styles.infoRaw}>
+                    <p className={styles.label}>
+                      {intl.formatMessage(globalMessages.feeLabel)}
+                    </p>
+                    <div className={styles.labelValue}>
+                      {this.renderAmountDisplay({
+                        entry: {
+                          identifier: txData.fee.tokenId,
+                          networkId: txData.fee.networkId,
+                          amount: (new BigNumber(txData.fee.amount)).negated(),
+                        },
+                      })}
+                    </div>
+                  </div>
+                  <div className={styles.totalAmoundCard}>
+                    <p className={styles.totalAmoundLable}>
+                      {intl.formatMessage(globalMessages.walletSendConfirmationTotalLabel)}
+                    </p>
+                    <div className={styles.totalAmound}>
+                      {this.renderAmountDisplay({
+                        entry: {
+                          identifier: txData.total.defaults.defaultIdentifier,
+                          networkId: txData.total.defaults.defaultNetworkId,
+                          amount: txData.total.get(
+                            txData.amount.defaults.defaultIdentifier
+                          ) ?? (new BigNumber('0')),
+                        },
+                      })}
+                    </div>
+                  </div>
+                </div>
+                <div className={styles.passwordInput}>
+                  <TextField
+                    type="password"
+                    className={styles.walletPassword}
+                    {...walletPasswordField.bind()}
+                    error={walletPasswordField.error}
+                  />
+                </div>
+                <div className={styles.wrapperBtn}>
+                  <Button
+                    variant="secondary"
+                    className="secondary"
+                    onClick={onCancel}
+                  >
+                    {intl.formatMessage(globalMessages.cancel)}
+                  </Button>
+                  <Button
+                    variant="primary"
+                    disabled={!walletPasswordField.isValid}
+                    onClick={this.submit.bind(this)}
+                  >
+                    {intl.formatMessage(globalMessages.confirm)}
+                  </Button>
+                </div>
               </div>
-              <div className={styles.addressFrom}>
-                <p className={styles.label}>
-                  {intl.formatMessage(globalMessages.amount)}
-                </p>
-              </div>
-            </div>
-            <div className={styles.addressFromList}>
-              {txData.inputs.map((address, addressIndex) => {
-                return this.renderRow({
-                  kind: 'in',
-                  address,
-                  addressIndex,
-                  transform: amount => amount.abs().negated(),
-                });
-              })}
-            </div>
-            <div className={styles.addressHeader}>
-              <div className={styles.addressTo}>
-                <p className={styles.label}>
-                  {intl.formatMessage(globalMessages.toAddresses)}:{' '}
-                  <span>{txData.outputs.length}</span>
-                </p>
-              </div>
-              <div className={styles.addressTo}>
-                <p className={styles.label}>
-                  {intl.formatMessage(globalMessages.amount)}
-                </p>
-              </div>
-            </div>
-            <div className={styles.addressToList}>
-              {txData.outputs.map((address, addressIndex) => {
-                return this.renderRow({
-                  kind: 'in',
-                  address,
-                  addressIndex,
-                  transform: amount => amount.abs(),
-                });
-              })}
-            </div>
-            <div className={styles.addressHeader}>
-              <div className={styles.addressTo}>
-                <p className={styles.label}>
-                  {intl.formatMessage(globalMessages.feeLabel)}
-                </p>
-              </div>
-            </div>
-            <div className={styles.addressToList}>
-              <div className={styles.amount}>
-                {this.renderAmountDisplay({
-                  entry: {
-                    identifier: txData.fee.tokenId,
-                    networkId: txData.fee.networkId,
-                    amount: (new BigNumber(txData.fee.amount)).negated(),
-                  },
-                })}
-              </div>
-            </div>
-          </div>
-          <div className={styles.passwordInput}>
-            <TextField
-              type="password"
-              className={styles.walletPassword}
-              {...walletPasswordField.bind()}
-              error={walletPasswordField.error}
-            />
-          </div>
-          <div className={styles.wrapperBtn}>
-            <Button variant="secondary" className="secondary" onClick={onCancel}>
-              {intl.formatMessage(globalMessages.cancel)}
-            </Button>
-            <Button
-              variant="primary"
-              disabled={!walletPasswordField.isValid}
-              onClick={this.submit.bind(this)}
-            >
-              {intl.formatMessage(globalMessages.confirm)}
-            </Button>
-          </div>
+            ) : (
+              <CardanoUtxoDetails
+                txData={txData}
+                onCopyAddressTooltip={this.props.onCopyAddressTooltip}
+                addressToDisplayString={this.props.addressToDisplayString}
+                getCurrentPrice={this.props.getCurrentPrice}
+                getTokenInfo={this.props.getTokenInfo}
+                notification={this.props.notification}
+                selectedExplorer={this.props.selectedExplorer}
+                unitOfAccountSetting={this.props.unitOfAccountSetting}
+                toggleUtxoDetails={this.toggleUtxoDetails}
+              />
+            )
+          }
         </div>
       </>
     );
