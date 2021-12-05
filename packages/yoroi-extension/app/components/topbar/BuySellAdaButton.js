@@ -38,27 +38,7 @@ class BuySellAdaButton extends Component<Props & InjectedProps> {
     );
 
     const BuyAdaButtonRevamp = (
-      <Button
-        // TODO: Add new button variant for revamp
-        variant="secondary"
-        sx={{
-          borderColor: 'var(--yoroi-palette-gray-400)',
-          background: 'white',
-          width: '160px',
-          padding: '11px 0',
-          color: 'var(--yoroi-palette-gray-600)',
-          fontSize: '14px',
-          fontWeight: 500,
-          letterSpacing: '0.5px',
-          lineHeight: '22px',
-          '&:hover': {
-            background: 'transparent',
-            borderColor: 'var(--yoroi-palette-gray-400)',
-            color: 'var(--yoroi-palette-gray-600)',
-          },
-        }}
-        onClick={() => this.props.onBuySellClick()}
-      >
+      <Button variant="ternary" onClick={() => this.props.onBuySellClick()}>
         {intl.formatMessage(globalMessages.buyAda)}
       </Button>
     );

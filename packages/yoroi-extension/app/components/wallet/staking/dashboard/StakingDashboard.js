@@ -34,7 +34,7 @@ const messages = defineMessages({
   },
 });
 
-const emptyDashboardMessages = defineMessages({
+export const emptyDashboardMessages: Object = defineMessages({
   title: {
     id: 'wallet.dashboard.empty.title',
     defaultMessage: '!!!You have not delegated your {ticker} yet',

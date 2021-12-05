@@ -10,7 +10,6 @@ import type { InjectedOrGenerated } from '../../types/injectedPropsType'
 import MyWallets from '../../components/wallet/my-wallets/MyWallets'
 import TopBarLayout from '../../components/layout/TopBarLayout'
 
-import WalletsList from '../../components/wallet/my-wallets/WalletsList'
 import WalletRow from '../../components/wallet/my-wallets/WalletRow'
 import WalletDetails from '../../components/wallet/my-wallets/WalletDetails'
 import WalletCurrency from '../../components/wallet/my-wallets/WalletCurrency'
@@ -48,6 +47,7 @@ import { networks } from '../../api/ada/lib/storage/database/prepackaged/network
 import NavBarRevamp from '../../components/topbar/NavBarRevamp'
 import { withLayout } from '../../styles/context/layout'
 import type { LayoutComponentMap } from '../../styles/context/layout'
+import { Box } from '@mui/system'
 
 export type GeneratedData = typeof MyWalletsPage.prototype.generated;
 
@@ -143,9 +143,9 @@ class MyWalletsPage extends Component<AllProps> {
     });
 
     const walletsList = (
-      <WalletsList>
+      <Box flex={1}>
         {wallets.map(wallet => this.generateRow(wallet))}
-      </WalletsList>
+      </Box>
     );
 
     let activeDialog = null;

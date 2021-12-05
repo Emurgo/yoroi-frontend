@@ -18,7 +18,6 @@ import {
   asGetPublicKey,
   asGetStakingKey,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
-import { isCardanoHaskell } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import type {
   IGetLastSyncInfoResponse,
   IGetSigningKey,
@@ -28,13 +27,13 @@ import { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWal
 import { Logger, stringifyError } from '../../utils/logging';
 import { assuranceModes } from '../../config/transactionAssuranceConfig';
 import type { WalletChecksum } from '@emurgo/cip4-js';
-import { walletChecksum, legacyWalletChecksum } from '@emurgo/cip4-js';
 import { createDebugWalletDialog } from '../../containers/wallet/dialogs/DebugWalletDialogContainer';
 import { createProblematicWalletDialog } from '../../containers/wallet/dialogs/ProblematicWalletDialogContainer';
 import { getApiForNetwork } from '../../api/common/utils';
-import { Bip44Wallet } from '../../api/ada/lib/storage/models/Bip44Wallet/wrapper';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
+import { getCurrentWalletFromLS, markExistingWalletsAsSynced, updateSyncedWallets } from '../../utils/localStorage';
+import { getWalletChecksum } from '../../api/export/utils';
 
 type GroupedWallets = {|
   publicDerivers: Array<PublicDeriver<>>,
@@ -94,6 +93,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
   WALLET_REFRESH_INTERVAL: number = environment.getWalletRefreshInterval();
   ON_VISIBLE_DEBOUNCE_WAIT: number = 1000;
 
+  @observable firstSync: boolean = false
   @observable publicDerivers: Array<PublicDeriver<>>;
   @observable selected: null | PublicDeriver<>;
   @observable getInitialWallets: Request<GetWalletsFunc> = new Request<GetWalletsFunc>(getWallets);
@@ -197,6 +197,17 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     return this.selected != null;
   }
 
+  @computed get activeWalletPlate(): ?WalletChecksum {
+    const selectedPublicDeriverId = this.selected?.publicDeriverId;
+    if (selectedPublicDeriverId != null) {
+      const selectedCache: ?PublicKeyCache = this.publicKeyCache
+        // $FlowFixMe
+        .find(c => c.publicDeriver.publicDeriverId === selectedPublicDeriverId);
+      return selectedCache == null ? null : selectedCache.plate;
+    }
+    return null;
+  }
+
   @computed get hasLoadedWallets(): boolean {
     return this.getInitialWallets.wasExecuted;
   }
@@ -213,11 +224,27 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
 
   refreshWalletFromRemote: (PublicDeriver<>) => Promise<void> = async publicDeriver => {
     try {
+      await markExistingWalletsAsSynced(this.stores.wallets.publicDerivers)
+      const wallet = await getCurrentWalletFromLS(publicDeriver);
+      if (!wallet || !wallet.isSynced) {
+        runInAction(() => {
+          this.firstSync = true
+        })
+      }
+
       await this.stores.transactions.refreshTransactionData({
         publicDeriver,
         localRequest: false,
       });
       await this.stores.addresses.refreshAddressesFromDb(publicDeriver);
+
+      await updateSyncedWallets(publicDeriver)
+       if (this.firstSync) {
+        runInAction(() => {
+          this.firstSync = false
+        })
+      }
+
     } catch (error) {
       Logger.error(
         `${nameof(WalletStore)}::${nameof(this.refreshWalletFromRemote)} ` + stringifyError(error)
@@ -389,6 +416,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
 
   // TODO: maybe delete this function and turn it into another "addObservedWallet"
   populateCacheForWallet: (PublicDeriver<>) => Promise<PublicDeriver<>> = async publicDeriver => {
+    // $FlowFixMe[incompatible-call]
     const withPubKey = asGetPublicKey(publicDeriver);
 
     if (withPubKey != null) {
@@ -396,19 +424,16 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
       if (publicKey.IsEncrypted) {
         throw new Error(`${nameof(this.populateCacheForWallet)} unexpected encrypted public key`);
       }
-      const isLegacyWallet =
-        isCardanoHaskell(publicDeriver.getParent().getNetworkInfo()) &&
-        publicDeriver.getParent() instanceof Bip44Wallet;
-      const checksum = isLegacyWallet
-        ? legacyWalletChecksum(publicKey.Hash)
-        : walletChecksum(publicKey.Hash);
-      runInAction(() => {
-        this.publicKeyCache.push({
-          publicDeriver: withPubKey,
-          plate: checksum,
-          publicKey: publicKey.Hash,
+      const checksum = await getWalletChecksum(withPubKey);
+      if (checksum != null) {
+        runInAction(() => {
+          this.publicKeyCache.push({
+            publicDeriver: withPubKey,
+            plate: checksum,
+            publicKey: publicKey.Hash,
+          });
         });
-      });
+      }
     }
 
     const publicDeriverInfo = await publicDeriver.getFullPublicDeriverInfo();

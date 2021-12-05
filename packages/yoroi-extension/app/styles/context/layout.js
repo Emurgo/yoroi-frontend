@@ -1,42 +1,26 @@
 // @flow
 import React from 'react';
 import type { Node } from 'react';
+import { THEMES } from '../utils';
 
 export type Layouts = 'CLASSIC' | 'REVAMP';
 export type LayoutComponentMap = {|
   [key: Layouts]: Node,
 |};
-type LayoutInitialState = {|
-  selected: Layouts,
-|};
-
-const initialState: LayoutInitialState = {
-  selected: 'CLASSIC',
-};
 
 const LayoutContext = React.createContext();
 
-function layoutReducer(state, action) {
-  switch (action.type) {
-    case 'CHANGE_LAYOUT': {
-      return { ...state, selected: state.selected === 'CLASSIC' ? 'REVAMP' : 'CLASSIC' };
-    }
-    default:
-      return state;
-  }
-}
-
 const LayoutProvider = (props: Object): Node => {
-  const [state, dispatch] = React.useReducer(layoutReducer, initialState);
+  const { layout } = props;
+  const localLayout: Layouts = layout === THEMES.YOROI_REVAMP ? 'REVAMP' : 'CLASSIC';
 
   return (
     <LayoutContext.Provider
       value={{
-        selectedLayout: state.selected,
-        isRevampLayout: state.selected === 'REVAMP',
-        changeLayout: () => dispatch({ type: 'CHANGE_LAYOUT' }),
+        selectedLayout: localLayout,
+        isRevampLayout: localLayout === 'REVAMP',
         renderLayoutComponent: (layoutMap: LayoutComponentMap = {}) => {
-          const selectedComponent = layoutMap[state.selected];
+          const selectedComponent = layoutMap[localLayout];
           return selectedComponent;
         },
       }}
@@ -45,7 +29,7 @@ const LayoutProvider = (props: Object): Node => {
   );
 };
 
-function useLayout(): LayoutInitialState {
+function useLayout(): Object {
   const context = React.useContext(LayoutContext);
   if (!context) {
     throw new Error('useLayout must be used within a LayoutProvider');

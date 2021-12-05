@@ -21,14 +21,14 @@ import type { GeneratedData as SidebarContainerData } from '../SidebarContainer'
 import type { GeneratedData as NavBarContainerData } from '../NavBarContainer';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import {
-  CoinTypes,
-} from '../../config/numbersConfig';
+import { CoinTypes } from '../../config/numbersConfig';
 import HorizontalLine from '../../components/widgets/HorizontalLine';
 import NavBarContainerRevamp from '../NavBarContainerRevamp';
 import { withLayout } from '../../styles/context/layout';
 import type { LayoutComponentMap } from '../../styles/context/layout';
 import type { GeneratedData as NavBarContainerRevampData } from '../NavBarContainerRevamp';
+import SubMenu from '../../components/topbar/SubMenu';
+import { allSubcategoriesRevamp } from '../../stores/stateless/topbarCategories';
 
 export type GeneratedData = typeof Transfer.prototype.generated;
 
@@ -42,18 +42,28 @@ type AllProps = {| ...Props, ...InjectedProps |};
 
 @observer
 class Transfer extends Component<AllProps> {
-
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
-  static defaultProps: {|children: void|} = {
+  static defaultProps: {| children: void |} = {
     children: undefined,
   };
 
   render(): Node {
-    const sidebarContainer = (<SidebarContainer {...this.generated.SidebarContainerProps} />);
+    const sidebarContainer = <SidebarContainer {...this.generated.SidebarContainerProps} />;
 
+    const menu = (
+      <SubMenu
+        options={allSubcategoriesRevamp.map(category => ({
+          className: category.className,
+          label: this.context.intl.formatMessage(category.label),
+          route: category.route,
+        }))}
+        onItemClick={route => this.generated.actions.router.goToRoute.trigger({ route })}
+        isActiveItem={route => this.generated.stores.app.currentRoute.startsWith(route)}
+      />
+    );
     const navbarClassic = (
       <NavBarContainer
         {...this.generated.NavBarContainerProps}
@@ -69,6 +79,7 @@ class Transfer extends Component<AllProps> {
         title={
           <NavBarTitle title={this.context.intl.formatMessage(globalMessages.sidebarSettings)} />
         }
+        menu={menu}
       />
     );
 
@@ -79,7 +90,7 @@ class Transfer extends Component<AllProps> {
 
     return (
       <TopBarLayout
-        banner={(<BannerContainer {...this.generated.BannerContainerProps} />)}
+        banner={<BannerContainer {...this.generated.BannerContainerProps} />}
         navbar={navbar}
         sidebar={sidebarContainer}
         showInContainer
