@@ -126,6 +126,11 @@ class ThemeSettingsBlock extends Component<AllProps> {
       </>
     );
 
+    // <TODO:REVAMP_BUTTON> need to enable nightly
+    const shouldDisplayRevampButton = environment.isDev()
+      // || environment.isNightly()
+      || environment.isTest();
+
     const themeBlockClassicComponent = (
       <Box sx={{ borderTop: '1px solid var(--yoroi-palette-gray-200)', paddingTop: '30px' }}>
         {commonHeader}
@@ -172,7 +177,8 @@ class ThemeSettingsBlock extends Component<AllProps> {
             {intl.formatMessage(messages.themeExportButton)}
           </Button>
         </Box>
-        {(environment.isNightly() || environment.isTest()) && (
+
+        {shouldDisplayRevampButton && (
           <Box sx={{ margin: '20px 0', display: 'flex', justifyContent: 'center' }}>
             <Button
               sx={{
@@ -216,7 +222,7 @@ class ThemeSettingsBlock extends Component<AllProps> {
             {intl.formatMessage(messages.themeExportButton)}
           </Button>
         </Box>
-        {(environment.isNightly() || environment.isTest()) && (
+        {(environment.isNightly() || environment.isTest() || environment.isDev()) && (
           <Box sx={{ margin: '20px 0', display: 'flex', justifyContent: 'center' }}>
             <Button
               variant="ternary"

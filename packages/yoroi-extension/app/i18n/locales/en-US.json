@@ -874,7 +874,7 @@
   "wallet.voting.trezorTRequirement": "<a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://wiki.trezor.io/User_manual:Updating_the_Trezor_device_firmware\">Update</a> your Trezor Model T firmware version to 2.4.1 or above.",
   "wallet.withdrawal.transaction.unregister": "This transaction will unregister one or more staking keys, giving you back your {refundAmount} {ticker} from your deposit",
   "wallet.syncingOverlay.title": "Wallet Syncing",
-  "wallet.syncingOverlay.explanation": "We are proccessing you wallet data. This is may take time. Please wait...",
+  "wallet.syncingOverlay.explanation": "We are processing your wallet data. This may take time. Please wait...",
   "wallet.syncingOverlay.return": "Return to my wallets",
   "widgets.copyableaddress.addressCopyTooltipMessage": "Copy to clipboard",
   "widgets.copyableaddress.copied": "Copied",
