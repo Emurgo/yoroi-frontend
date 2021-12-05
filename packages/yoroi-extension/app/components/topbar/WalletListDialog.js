@@ -18,14 +18,11 @@ import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tab
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import WalletCard from './WalletCard';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
+import globalMessages from '../../i18n/global-messages';
 
 const messages = defineMessages({
-  allWalletsLabel: {
-    id: 'wallet.nav.allWalletsLabel',
-    defaultMessage: '!!!All wallets',
-  },
   addWallet: {
-    id: 'wallet.nav.addButton',
+    id: 'wallet.nav.addWallet',
     defaultMessage: '!!!Add Wallet',
   },
   totalBalance: {
@@ -166,7 +163,7 @@ export default class WalletListDialog extends Component<Props, State> {
     return (
       <Dialog
         className={styles.component}
-        title={`${intl.formatMessage(messages.allWalletsLabel)} (${wallets.length})`}
+        title={`${intl.formatMessage(globalMessages.allWalletsLabel)} (${wallets.length})`}
         closeOnOverlayClick
         closeButton={<DialogCloseButton />}
         onClose={this.props.close}

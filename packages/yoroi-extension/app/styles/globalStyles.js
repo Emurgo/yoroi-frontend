@@ -55,7 +55,7 @@ const globalStyles = (theme: Object): Node => (
 
         '--yoroi-palette-tx-status-pending-background': theme.palette.txStatus.pending.background,
         '--yoroi-palette-tx-status-pending-text': theme.palette.txStatus.pending.text,
-        '--yoroi-palette-tx-status-pending-stripes': theme.palette.txStatus.pending.text,
+        '--yoroi-palette-tx-status-pending-stripes': theme.palette.txStatus.pending.stripes,
         '--yoroi-palette-tx-status-high-background': theme.palette.txStatus.high.background,
         '--yoroi-palette-tx-status-high-text': theme.palette.txStatus.high.text,
         '--yoroi-palette-tx-status-failed-background': theme.palette.txStatus.failed.background,
@@ -281,6 +281,9 @@ const globalStyles = (theme: Object): Node => (
         ':global(.YoroiClassic)': {
           letterSpacing: '1px',
         },
+      },
+      html: {
+        overflow: 'hidden'
       },
       body: {
         /* To remove background color for Chrome Inputs */
