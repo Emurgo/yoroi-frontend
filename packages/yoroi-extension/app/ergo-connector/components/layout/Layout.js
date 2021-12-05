@@ -20,10 +20,6 @@ const messages = defineMessages({
     id: 'global.connector.yoroiDappConnector',
     defaultMessage: '!!!Yoroi Dapp Connector',
   },
-  poweredBy: {
-    id: 'global.connector.poweredByErgo',
-    defaultMessage: '!!!Powered by Ergo',
-  },
 });
 @observer
 export default class Layout extends Component<Props> {
