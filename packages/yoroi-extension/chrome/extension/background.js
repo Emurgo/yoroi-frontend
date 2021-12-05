@@ -321,7 +321,7 @@ async function withSelectedWallet<T>(
 }
 
 // messages from other parts of Yoroi (i.e. the UI for the connector)
-chrome.runtime.onMessage.addListener(async (
+const yoroiMessageHandler = async (
   request: (
     ConnectResponseData
     | ConfirmedSignData
@@ -552,7 +552,16 @@ chrome.runtime.onMessage.addListener(async (
   } else if (request.type === 'get_protocol') {
     sendResponse({ type: connectionProtocol })
   }
-});
+};
+
+chrome.runtime.onMessage.addListener(
+  // Returning `true` is required by Firefox, see:
+  // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/runtime/onMessage
+  (message, sender, sendResponse) => {
+    yoroiMessageHandler(message, sender, sendResponse);
+    return true;
+  }
+);
 
 async function removeWallet(
   tabId: number,
@@ -651,71 +660,83 @@ chrome.runtime.onMessageExternal.addListener((message, sender) => {
 // per-page connection to injected code in the connector
 chrome.runtime.onConnectExternal.addListener(port => {
   if (port.sender.id === environment.ergoConnectorExtensionId) {
-    const tabId = port.sender.tab.id;
-    ports.set(tabId, port);
-    port.onMessage.addListener(async message => {
+    handleInjectorConnect(port);
+  } else {
+    // disconnect?
+  }
+});
 
-      connectionProtocol = message.protocol;
-      imgBase64Url = message.imgBase64Url;
-      function rpcResponse(response) {
-        port.postMessage({
-          type: 'connector_rpc_response',
-          protocol: message.protocol,
-          uid: message.uid,
-          return: response
+// per-page connection to injected code by Yoroi with connector
+chrome.runtime.onConnect.addListener(port => {
+  handleInjectorConnect(port);
+});
+
+function handleInjectorConnect(port) {
+  const tabId = port.sender.tab.id;
+  ports.set(tabId, port);
+  port.onMessage.addListener(async message => {
+
+    connectionProtocol = message.protocol;
+    imgBase64Url = message.imgBase64Url;
+    function rpcResponse(response) {
+      port.postMessage({
+        type: 'connector_rpc_response',
+        protocol: message.protocol,
+        uid: message.uid,
+        return: response
+      });
+    }
+    function checkParamCount(expected: number) {
+      const found = message?.params?.length;
+      if (found !== expected) {
+        throw ConnectorError.invalidRequest(`RPC call has ${found} arguments, expected ${expected}`);
+      }
+    }
+    function handleError(e: any) {
+      if (e instanceof ConnectorError) {
+        rpcResponse({
+          err: e.toAPIError()
+        });
+      } else {
+        const func = message.function;
+        const args = message.params.map(JSON.stringify).join(', ');
+        if (e?.stack != null) {
+          Logger.error(`RPC call ergo.${func}(${args}) failed due to internal error: ${e}\n${e.stack}`);
+        } else {
+          Logger.error(`RPC call ergo.${func}(${args}) failed due to internal error: ${e}`);
+        }
+        rpcResponse({
+          err: {
+            code: APIErrorCodes.API_INTERNAL_ERROR,
+            info: 'Yoroi has encountered an internal error - please see logs'
+          }
         });
       }
-      function checkParamCount(expected: number) {
-        const found = message?.params?.length;
-        if (found !== expected) {
-          throw ConnectorError.invalidRequest(`RPC call has ${found} arguments, expected ${expected}`);
-        }
-      }
-      function handleError(e: any) {
-        if (e instanceof ConnectorError) {
-          rpcResponse({
-            err: e.toAPIError()
-          });
-        } else {
-          const func = message.function;
-          const args = message.params.map(JSON.stringify).join(', ');
-          if (e?.stack != null) {
-            Logger.error(`RPC call ergo.${func}(${args}) failed due to internal error: ${e}\n${e.stack}`);
-          } else {
-            Logger.error(`RPC call ergo.${func}(${args}) failed due to internal error: ${e}`);
-          }
-          rpcResponse({
-            err: {
-              code: APIErrorCodes.API_INTERNAL_ERROR,
-              info: 'Yoroi has encountered an internal error - please see logs'
-            }
+    }
+    if (message.type === 'yoroi_connect_request/ergo') {
+      await withDb(
+        async (_db, localStorageApi) => {
+          const publicDeriverId = await confirmConnect(tabId, message.url, localStorageApi);
+          const accepted = publicDeriverId !== null;
+          port.postMessage({
+            type: 'yoroi_connect_response/ergo',
+            success: accepted
           });
         }
-      }
-      if (message.type === 'yoroi_connect_request/ergo') {
-        await withDb(
-          async (_db, localStorageApi) => {
-            const publicDeriverId = await confirmConnect(tabId, message.url, localStorageApi);
-            const accepted = publicDeriverId !== null;
-            port.postMessage({
-              type: 'yoroi_connect_response/ergo',
-              success: accepted
-            });
-          }
-        );
-      } else if (message.type === 'yoroi_connect_request/cardano') {
-        await withDb(
-          async (_db, localStorageApi) => {
-            const publicDeriverId = await confirmConnect(tabId, message.url, localStorageApi);
-            const accepted = publicDeriverId !== null;
-            port.postMessage({
-              type: 'yoroi_connect_response/cardano',
-              success: accepted
-            });
-          }
-        );
-      } else if (message.type === 'connector_rpc_request') {
-        switch (message.function) {
+      );
+    } else if (message.type === 'yoroi_connect_request/cardano') {
+      await withDb(
+        async (_db, localStorageApi) => {
+          const publicDeriverId = await confirmConnect(tabId, message.url, localStorageApi);
+          const accepted = publicDeriverId !== null;
+          port.postMessage({
+            type: 'yoroi_connect_response/cardano',
+            success: accepted
+          });
+        }
+      );
+    } else if (message.type === 'connector_rpc_request') {
+      switch (message.function) {
           case 'sign_tx':
             try {
               checkParamCount(1);
@@ -998,10 +1019,7 @@ chrome.runtime.onConnectExternal.addListener(port => {
               }
             })
             break;
-        }
       }
-    });
-  } else {
-    // disconnect?
-  }
-});
+    }
+  });
+}

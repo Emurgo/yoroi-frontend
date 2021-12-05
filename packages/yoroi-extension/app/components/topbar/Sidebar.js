@@ -10,6 +10,15 @@ import classnames from 'classnames';
 import yoroiLogo from '../../assets/images/sidebar/yoroi_logo.inline.svg';
 import yoroiLogoExpanded from '../../assets/images/sidebar/yoroi_logo_expanded.inline.svg';
 import toggleIcon from '../../assets/images/sidebar/open_sidebar.inline.svg';
+import { defineMessages } from 'react-intl';
+import connectedWebsitesIcon from '../../assets/images/sidebar/dapp_connector.inline.svg';
+
+const messages = defineMessages({
+  connectedWebsites: {
+    id: 'sidebar.connectedWebsites',
+    defaultMessage: '!!!Connected websites',
+  },
+});
 
 type Props = {|
   +children?: ?Node,
@@ -70,6 +79,17 @@ export default class Sidebar extends Component<Props> {
               />
             );
           }) : null}
+          <SideBarCategory
+            key="connected-websites"
+            icon={connectedWebsitesIcon}
+            active={false}
+            label={messages.connectedWebsites}
+            showLabel={isSidebarExpanded}
+            onClick={() => {
+              window.location = window.location.origin +
+                '/main_window_ergo.html#/connected-websites';
+            }}
+          />
         </div>
         <button
           type="button"
