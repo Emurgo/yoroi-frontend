@@ -1,7 +1,6 @@
 /* eslint-disable promise/always-return */
 // @flow
 import BigNumber from 'bignumber.js';
-import blake2b from 'blake2b';
 import { observable, action, runInAction, computed, toJS } from 'mobx';
 import Request from '../../stores/lib/LocalizedRequest';
 import Store from '../../stores/base/Store';
@@ -18,7 +17,6 @@ import type {
   SigningMessage,
   Tx,
   TxSignWindowRetrieveData,
-  WalletAuthEntry,
   WhitelistEntry,
 } from '../../../chrome/extension/ergo-connector/types';
 import type { ActionsMap } from '../actions/index';
@@ -38,9 +36,6 @@ import {
   asGetPublicKey,
   asHasUtxoChains,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
-import { Bip44Wallet } from '../../api/ada/lib/storage/models/Bip44Wallet/wrapper';
-import type { WalletChecksum } from '@emurgo/cip4-js';
-import { legacyWalletChecksum, walletChecksum } from '@emurgo/cip4-js';
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import { addErgoAssets } from '../../api/ergo/lib/storage/bridge/updateTransactions';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
@@ -655,51 +650,6 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       result = this.getConnectorWhitelist.execute().result;
     }
     return result ?? [];
-  }
-  static createAuthEntry: ({|
-    appAuthID: ?string,
-    deriver: PublicDeriver<>,
-    checksum: ?WalletChecksum,
-  |}) => Promise<?WalletAuthEntry> = async ({ appAuthID, deriver, checksum }) => {
-    if (appAuthID == null) {
-      return null;
-    }
-    if (checksum == null) {
-      throw new Error(`[createAuthEntry] app auth is requested but wallet-checksum does not exist`)
-    }
-    // <TODO:AUTH> this is a temporary insecure dev stub using the deriver public key
-    const walletPubKey = (await deriver.getPublicKey()).Hash;
-    const appPubKey = RustModule.WalletV4.Bip32PrivateKey.from_bip39_entropy(
-      Buffer.from(walletPubKey, 'hex'),
-      Buffer.from(
-        blake2b(64)
-          .update(Buffer.from(appAuthID))
-          .digest('binary'),
-      ),
-    ).to_raw_key().to_public();
-    return {
-      walletId: checksum.ImagePart,
-      pubkey: Buffer.from(appPubKey.as_bytes()).toString('hex'),
-    };
-  };
-  static authSignHexPayload: ({|
-    appAuthID: ?string,
-    deriver: PublicDeriver<>,
-    payloadHex: string,
-  |}) => Promise<string> = async ({ appAuthID, deriver, payloadHex }) => {
-    if (appAuthID == null) {
-      throw new Error(`[authSignHexPayload] app auth sign is requested but no auth is present in connection`)
-    }
-    const walletPubKey = (await deriver.getPublicKey()).Hash;
-    const appPrivKey = RustModule.WalletV4.Bip32PrivateKey.from_bip39_entropy(
-      Buffer.from(walletPubKey, 'hex'),
-      Buffer.from(
-        blake2b(64)
-          .update(Buffer.from(appAuthID))
-          .digest('binary'),
-      ),
-    ).to_raw_key();
-    return appPrivKey.sign(Buffer.from(payloadHex, 'hex')).to_hex();
   }
   _getConnectorWhitelist: void => Promise<void> = async () => {
     await this.getConnectorWhitelist.execute();

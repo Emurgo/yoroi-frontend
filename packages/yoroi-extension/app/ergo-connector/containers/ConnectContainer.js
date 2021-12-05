@@ -17,7 +17,7 @@ import { genLookupOrFail, } from '../../stores/stateless/tokenHelpers';
 import type { TokenInfoMap } from '../../stores/toplevel/TokenInfoStore';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
-import ConnectorStore from '../stores/ConnectorStore';
+import { createAuthEntry } from '../api';
 
 type GeneratedData = typeof ConnectContainer.prototype.generated;
 declare var chrome;
@@ -79,8 +79,7 @@ export default class ConnectContainer extends Component<
     const protocol = chromeMessage.protocol;
     const appAuthID = chromeMessage.appAuthID;
 
-    const authEntry = await ConnectorStore
-      .createAuthEntry({ appAuthID, deriver, checksum });
+    const authEntry = await createAuthEntry({ appAuthID, deriver, checksum });
 
     const publicDeriverId = deriver.getPublicDeriverId();
     const result = this.generated.stores.connector.currentConnectorWhitelist;

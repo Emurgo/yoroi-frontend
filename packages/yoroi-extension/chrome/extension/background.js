@@ -72,7 +72,7 @@ import { migrateNoRefresh } from '../../app/api/common/migration';
 import { Mutex, } from 'async-mutex';
 import { isCardanoHaskell } from '../../app/api/ada/lib/storage/database/prepackaged/networks';
 import type CardanoTxRequest from '../../app/api/ada';
-import ConnectorStore from '../../app/ergo-connector/stores/ConnectorStore';
+import { authSignHexPayload } from '../../app/ergo-connector/api';
 
 
 /*::
@@ -99,9 +99,14 @@ type ConnectedStatus = null | {|
   auth: ?WalletAuthEntry,
 |} | {|
   // response (?PublicDeriverId) - null means the user refused, otherwise the account they selected
-  resolve: ?PublicDeriverId => void,
+  resolve: ({|
+    connectedWallet: ?PublicDeriverId,
+    auth: ?WalletAuthEntry,
+  |}) => void,
   // if a window has fetched this to show to the user yet
   openedWindow: boolean,
+  publicDeriverId: null,
+  auth: null,
 |};
 
 type PendingSign = {|
@@ -118,8 +123,8 @@ let connectionProtocol: string = '';
 
 type ConnectedSite = {|
   url: string,
-  protocol: string,
-  appAuthID: ?string,
+  protocol: 'cardano' | 'ergo',
+  appAuthID?: string,
   status: ConnectedStatus,
   pendingSigns: Map<RpcUid, PendingSign>
 |};
@@ -318,14 +323,15 @@ async function withSelectedWallet<T>(
 ): Promise<T> {
   const wallets = await getWallets({ db });
   return await withSelectedSiteConnection(tabId, async connected => {
-    const { publicDeriverId } = connected.status;
+    const { publicDeriverId } = connected?.status ?? {};
     const selectedWallet = wallets.find(
       cache => cache.getPublicDeriverId() === publicDeriverId
     );
     if (selectedWallet == null) {
       connectedSites.delete(tabId);
+      // $FlowFixMe
       await removeWallet(tabId, publicDeriverId, localStorageApi);
-      return Promise.reject(new Error(`Public deriver index not found: ${publicDeriverId}`));
+      return Promise.reject(new Error(`Public deriver index not found: ${String(publicDeriverId)}`));
     }
     await syncWallet(selectedWallet, localStorageApi);
 
@@ -434,7 +440,7 @@ const yoroiMessageHandler = async (
           auth: request.auth,
         };
       } else {
-        connection.status.resolve(null);
+        connection.status.resolve({ connectedWallet: null, auth: null });
         connectedSites.delete(tabId);
       }
     }
@@ -626,7 +632,7 @@ async function confirmConnect(
     url: string,
     requestIdentification?: boolean,
     onlySilent?: boolean,
-    protocol: string,
+    protocol: 'cardano' | 'ergo',
   |},
   localStorageApi: LocalStorageApi,
 ): Promise<{|
@@ -668,7 +674,7 @@ async function confirmConnect(
         });
         return;
       }
-      if (onlySilent) {
+      if (Boolean(onlySilent)) {
         reject(new Error('[onlySilent:fail] No active connection'));
         return;
       }
@@ -680,6 +686,8 @@ async function confirmConnect(
         status: {
           resolve,
           openedWindow: false,
+          publicDeriverId: null,
+          auth: null,
         },
         pendingSigns: new Map()
       });
@@ -1086,7 +1094,7 @@ function handleInjectorConnect(port) {
                   tabId,
                   async (wallet, connection) => {
                     await RustModule.load();
-                    const signatureHex = await ConnectorStore.authSignHexPayload({
+                    const signatureHex = await authSignHexPayload({
                       appAuthID: connection?.appAuthID,
                       deriver: wallet,
                       payloadHex: message.params[0],
@@ -1111,7 +1119,7 @@ function handleInjectorConnect(port) {
                   await RustModule.load();
                   const [payloadHex, signatureHex] = message.params;
                   const pk = RustModule.WalletV4.PublicKey
-                    .from_bytes(Buffer.from(String(connection.status.auth?.pubkey), 'hex'));
+                    .from_bytes(Buffer.from(String(connection.status?.auth?.pubkey), 'hex'));
                   const sig = RustModule.WalletV4.Ed25519Signature.from_hex(signatureHex);
                   const res = pk.verify(Buffer.from(payloadHex, 'hex'), sig);
                   rpcResponse({
