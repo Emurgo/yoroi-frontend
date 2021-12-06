@@ -49,7 +49,8 @@ export default class ConnectContainer extends Component<
     });
   };
 
-  componentDidMount() {
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillMount() {
     this.generated.actions.connector.refreshWallets.trigger();
     this.generated.actions.connector.getConnectorWhitelist.trigger();
     window.addEventListener('unload', this.onUnload);

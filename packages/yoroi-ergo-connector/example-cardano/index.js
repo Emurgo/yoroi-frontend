@@ -111,6 +111,7 @@ cardanoAccessBtn.addEventListener('click', () => {
           onApiConnectied(api);
       },
       function (err) {
+        toggleSpinner('hide');
         alertError(`Error: ${err}`);
       },
     );
