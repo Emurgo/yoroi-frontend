@@ -489,7 +489,6 @@ if (shouldInject()) {
                                 url: location.hostname,
                                 requestIdentification: event.data.requestIdentification,
                                 onlySilent: event.data.onlySilent,
-                                protocol,
                             },
                             protocol,
                         };

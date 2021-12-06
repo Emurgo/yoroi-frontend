@@ -777,11 +777,15 @@ function handleInjectorConnect(port) {
           });
         }
       }
+      const connectParameters = () => ({
+        protocol: message.protocol,
+        ...message.connectParameters,
+      });
       if (message.type === 'yoroi_connect_request/ergo') {
         await withDb(
           async (_db, localStorageApi) => {
             const { connectedWallet } =
-              (await confirmConnect(tabId, message.connectParameters, localStorageApi)) ?? {};
+              (await confirmConnect(tabId, connectParameters(), localStorageApi)) ?? {};
             const accepted = connectedWallet != null;
             port.postMessage({
               type: 'yoroi_connect_response/ergo',
@@ -794,7 +798,7 @@ function handleInjectorConnect(port) {
           await withDb(
             async (_db, localStorageApi) => {
               const { connectedWallet, auth } =
-                (await confirmConnect(tabId, message.connectParameters, localStorageApi)) ?? {};
+                (await confirmConnect(tabId, connectParameters(), localStorageApi)) ?? {};
               const accepted = connectedWallet != null;
               port.postMessage({
                 type: 'yoroi_connect_response/cardano',
