@@ -125,6 +125,7 @@ export const Whitelisted = (): Node => {
             appAuthID: '1',
             auth: null,
             protocol: 'ergo'
+            image: '',
           },
           {
             url: 'yoroi.com',
@@ -132,6 +133,7 @@ export const Whitelisted = (): Node => {
             appAuthID: '2',
             auth: null,
             protocol: 'cardano'
+            image: '',
           },
         ],
         wallet,
