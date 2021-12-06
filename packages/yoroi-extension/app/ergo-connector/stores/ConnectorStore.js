@@ -216,11 +216,13 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         runInAction(() => {
           this.signingMessage = response;
         });
-        if (response && response.sign.type === 'tx/cardano') {
-          this.createAdaTransaction();
-        }
-        if (response.sign.type === 'tx-create-req/cardano') {
-          this.generateAdaTransaction();
+        if (response) {
+          if (response.sign.type === 'tx/cardano') {
+            this.createAdaTransaction();
+          }
+          if (response.sign.type === 'tx-create-req/cardano') {
+            this.generateAdaTransaction();
+          }
         }
       })
       // eslint-disable-next-line no-console
@@ -296,7 +298,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       }
 
       const result = [];
-      for (const currentWallet of wallets) {
+      for (const currentWallet of filteredWallets) {
         const conceptualInfo = await currentWallet.getParent().getFullConceptualWalletInfo();
         const withPubKey = asGetPublicKey(currentWallet);
 
