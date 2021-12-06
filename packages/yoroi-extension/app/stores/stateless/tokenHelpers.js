@@ -113,6 +113,7 @@ export function genFormatTokenAmount(
 
     return tokenEntry.amount
       .shiftedBy(-tokenInfo.Metadata.numberOfDecimals)
-      .toFormat(tokenInfo.Metadata.numberOfDecimals);
+      .decimalPlaces(tokenInfo.Metadata.numberOfDecimals)
+      .toString();
   };
 }
