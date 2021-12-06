@@ -88,10 +88,12 @@ export default class ConnectedWebsitesPage extends Component<Props> {
     render(): Node {
         const { intl } = this.context;
         const genNoResult = () => (
-          <div className={styles.noItems}>
-            <NoItemsFoundImg />
-            <h3>{intl.formatMessage(messages.noWebsitesConnected)} </h3>
-            <p>{intl.formatMessage(connectorMessages.messageReadOnly)}</p>
+          <div className={styles.component}>
+            <div className={styles.noItems}>
+              <NoItemsFoundImg />
+              <h3>{intl.formatMessage(messages.noWebsitesConnected)} </h3>
+              <p>{intl.formatMessage(connectorMessages.messageReadOnly)}</p>
+            </div>
           </div>
           );
 

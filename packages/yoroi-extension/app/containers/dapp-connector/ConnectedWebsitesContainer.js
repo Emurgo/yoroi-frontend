@@ -118,7 +118,10 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
         sidebar={sidebarContainer}
         navbar={<DappConnectorNavbar />}
       >
-        {componentToRender}
+        {/* {componentToRender} */}
+        <FullscreenLayout bottomPadding={0}>
+          {componentToRender}
+        </FullscreenLayout>
       </TopBarLayout>
     );
   }
