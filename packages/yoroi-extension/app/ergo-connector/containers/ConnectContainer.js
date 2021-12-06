@@ -65,7 +65,11 @@ export default class ConnectContainer extends Component<
     }
     const result = this.generated.stores.connector.currentConnectorWhitelist;
     const whitelist = result.length ? [...result] : [];
-    whitelist.push({ url: chromeMessage.url, publicDeriverId });
+    whitelist.push({
+      url: chromeMessage.url,
+      publicDeriverId,
+      image: chromeMessage.imgBase64Url
+    });
     await this.generated.actions.connector.updateConnectorWhitelist.trigger({ whitelist });
 
     chrome.runtime.sendMessage(({

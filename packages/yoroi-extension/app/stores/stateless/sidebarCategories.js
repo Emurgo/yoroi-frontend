@@ -1,11 +1,12 @@
 // @flow
 import { ROUTES } from '../../routes-config';
 import type { MessageDescriptor } from 'react-intl';
-import globalMessages from '../../i18n/global-messages';
+import globalMessages, { connectorMessages } from '../../i18n/global-messages';
 import walletsIcon from '../../assets/images/sidebar/my_wallets.inline.svg';
 import transferIcon from '../../assets/images/sidebar/transfer_wallets.inline.svg';
 import settingsIcon from '../../assets/images/sidebar/wallet-settings-2-ic.inline.svg';
 import goBackIcon from '../../assets/images/top-bar/back-arrow-white.inline.svg';
+import dappConnectorIcon from '../../assets/images/dapp-connector/dapp-connector.inline.svg';
 import noticeBoardIcon from '../../assets/images/notice-board/notice-board.inline.svg';
 import { matchRoute } from '../../utils/routing';
 import environment from '../../environment';
@@ -92,6 +93,18 @@ export const TRANSFER_PAGE: SidebarCategory = registerCategory({
   icon: transferIcon,
   label: globalMessages.sidebarTransfer,
   isVisible: _request => true,
+});
+
+
+export const DAPP_CONNECTOR: SidebarCategory = registerCategory({
+  className: 'dapp-connector',
+  route: ROUTES.DAPP_CONNECTOR.CONNECTED_WEBSITES,
+  icon: dappConnectorIcon,
+  // the name `Dapp Connector` name should not be translated
+  // We only added it as all these labels of the sidebar are passed
+  // to intl.formatMessage(...) -> we have to pass valid label.
+  label: connectorMessages.dappConnector,
+  isVisible: _request =>  !environment.isLight
 });
 
 export const NOTICE_BOARD: SidebarCategory = registerCategory({
