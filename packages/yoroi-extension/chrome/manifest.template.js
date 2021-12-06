@@ -20,6 +20,7 @@ export default ({
   version,
   enableProtocolHandlers,
   ledgerScript,
+  shouldInjectConnector,
 } /*: {|
   description: string,
   defaultTitle: string,
@@ -32,6 +33,7 @@ export default ({
   version: string,
   enableProtocolHandlers: boolean,
   ledgerScript?: string,
+  shouldInjectConnector: boolean,
 |} */
 )/* : * */ => { // eslint-disable-line function-paren-newline
   const icons = iconOverride == null
@@ -76,7 +78,7 @@ export default ({
       {
         matches: ['https://emurgo.github.io/yoroi-extension-ledger-connect-vnext/*'],
         js: [ledgerScript != null ? ledgerScript : 'js/ledger-content-script.js']
-      }
+      },
     ],
     content_security_policy: contentSecurityPolicy,
     protocol_handlers: !enableProtocolHandlers
@@ -89,6 +91,23 @@ export default ({
         },
       ],
   };
+
+  if (shouldInjectConnector) {
+    base.content_scripts.push(
+      {
+        matches: [
+          'file://*/*',
+          'http://*/*',
+          'https://*/*',
+        ],
+        js: [
+          'js/inject.js',
+        ],
+        run_at: 'document_start',
+        all_frames: true,
+      }
+    );
+  }
 
   const verName /*: {| version_name?: string |} */ = versionName != null
     ? { version_name: versionName }
@@ -113,7 +132,7 @@ export function overrideForNightly(manifest: any): any {
     /* eslint-enable quote-props */
   };
 
-  manifest.browser_specific_settings.gecko.id = '6abdeba8-579b-11ea-8e2d-0242ac130003';
+  manifest.browser_specific_settings.gecko.id = '{6abdeba8-579b-11ea-8e2d-0242ac130003}';
 
   manifest.name = nightlyTitle;
   manifest.browser_action.default_title = nightlyTitle;

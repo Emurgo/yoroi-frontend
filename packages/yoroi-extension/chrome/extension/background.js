@@ -72,7 +72,7 @@ import { migrateNoRefresh } from '../../app/api/common/migration';
 import { Mutex, } from 'async-mutex';
 import { isCardanoHaskell } from '../../app/api/ada/lib/storage/database/prepackaged/networks';
 import type CardanoTxRequest from '../../app/api/ada';
-import ConnectorStore from '../../app/ergo-connector/stores/ConnectorStore';
+import { authSignHexPayload } from '../../app/ergo-connector/api';
 
 
 import JSONBigInt from 'json-bigint';
@@ -98,12 +98,17 @@ type PublicDeriverId = number;
 // null = refused by user
 type ConnectedStatus = null | {|
   publicDeriverId: PublicDeriverId,
-  auth?: WalletAuthEntry,
+  auth: ?WalletAuthEntry,
 |} | {|
   // response (?PublicDeriverId) - null means the user refused, otherwise the account they selected
-  resolve: ?PublicDeriverId => void,
+  resolve: ({|
+    connectedWallet: ?PublicDeriverId,
+    auth: ?WalletAuthEntry,
+  |}) => void,
   // if a window has fetched this to show to the user yet
   openedWindow: boolean,
+  publicDeriverId: null,
+  auth: null,
 |};
 
 type PendingSign = {|
@@ -120,7 +125,7 @@ let connectionProtocol: string = '';
 
 type ConnectedSite = {|
   url: string,
-  protocol: string,
+  protocol: 'cardano' | 'ergo',
   appAuthID?: string,
   status: ConnectedStatus,
   pendingSigns: Map<RpcUid, PendingSign>
@@ -320,14 +325,15 @@ async function withSelectedWallet<T>(
 ): Promise<T> {
   const wallets = await getWallets({ db });
   return await withSelectedSiteConnection(tabId, async connected => {
-    const { publicDeriverId } = connected.status;
+    const { publicDeriverId } = connected?.status ?? {};
     const selectedWallet = wallets.find(
       cache => cache.getPublicDeriverId() === publicDeriverId
     );
     if (selectedWallet == null) {
       connectedSites.delete(tabId);
+      // $FlowFixMe
       await removeWallet(tabId, publicDeriverId, localStorageApi);
-      return Promise.reject(new Error(`Public deriver index not found: ${publicDeriverId}`));
+      return Promise.reject(new Error(`Public deriver index not found: ${String(publicDeriverId)}`));
     }
     await syncWallet(selectedWallet, localStorageApi);
 
@@ -338,7 +344,7 @@ async function withSelectedWallet<T>(
 }
 
 // messages from other parts of Yoroi (i.e. the UI for the connector)
-chrome.runtime.onMessage.addListener(async (
+const yoroiMessageHandler = async (
   request: (
     ConnectResponseData
     | ConfirmedSignData
@@ -436,7 +442,7 @@ chrome.runtime.onMessage.addListener(async (
           auth: request.auth,
         };
       } else {
-        connection.status.resolve(null);
+        connection.status.resolve({ connectedWallet: null, auth: null });
         connectedSites.delete(tabId);
       }
     }
@@ -575,7 +581,16 @@ chrome.runtime.onMessage.addListener(async (
   } else if (request.type === 'get_protocol') {
     sendResponse({ type: connectionProtocol })
   }
-});
+};
+
+chrome.runtime.onMessage.addListener(
+  // Returning `true` is required by Firefox, see:
+  // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/runtime/onMessage
+  (message, sender, sendResponse) => {
+    yoroiMessageHandler(message, sender, sendResponse);
+    return true;
+  }
+);
 
 async function removeWallet(
   tabId: number,
@@ -615,17 +630,17 @@ async function confirmSign(
 
 async function confirmConnect(
   tabId: number,
-  connectParameters: {
+  connectParameters: {|
     url: string,
     requestIdentification?: boolean,
     onlySilent?: boolean,
-    protocol?: string,
-  },
+    protocol: 'cardano' | 'ergo',
+  |},
   localStorageApi: LocalStorageApi,
-): Promise<{
+): Promise<{|
   connectedWallet: ?PublicDeriverId,
   auth: ?WalletAuthEntry,
-}> {
+|}> {
   const { url, requestIdentification, onlySilent, protocol } = connectParameters;
   const isAuthRequested = Boolean(requestIdentification);
   const appAuthID = isAuthRequested ? url : undefined;
@@ -661,7 +676,7 @@ async function confirmConnect(
         });
         return;
       }
-      if (onlySilent) {
+      if (Boolean(onlySilent)) {
         reject(new Error('[onlySilent:fail] No active connection'));
         return;
       }
@@ -673,6 +688,8 @@ async function confirmConnect(
         status: {
           resolve,
           openedWindow: false,
+          publicDeriverId: null,
+          auth: null,
         },
         pendingSigns: new Map()
       });
@@ -709,9 +726,21 @@ chrome.runtime.onMessageExternal.addListener((message, sender) => {
 // per-page connection to injected code in the connector
 chrome.runtime.onConnectExternal.addListener(port => {
   if (port.sender.id === environment.ergoConnectorExtensionId) {
-    const tabId = port.sender.tab.id;
-    ports.set(tabId, port);
-    port.onMessage.addListener(async message => {
+    handleInjectorConnect(port);
+  } else {
+    // disconnect?
+  }
+});
+
+// per-page connection to injected code by Yoroi with connector
+chrome.runtime.onConnect.addListener(port => {
+  handleInjectorConnect(port);
+});
+
+function handleInjectorConnect(port) {
+  const tabId = port.sender.tab.id;
+  ports.set(tabId, port);
+  port.onMessage.addListener(async message => {
 
       connectionProtocol = message.protocol;
       imgBase64Url = message.imgBase64Url;
@@ -750,11 +779,15 @@ chrome.runtime.onConnectExternal.addListener(port => {
           });
         }
       }
+      const connectParameters = () => ({
+        protocol: message.protocol,
+        ...message.connectParameters,
+      });
       if (message.type === 'yoroi_connect_request/ergo') {
         await withDb(
           async (_db, localStorageApi) => {
             const { connectedWallet } =
-              (await confirmConnect(tabId, message.connectParameters, localStorageApi)) ?? {};
+              (await confirmConnect(tabId, connectParameters(), localStorageApi)) ?? {};
             const accepted = connectedWallet != null;
             port.postMessage({
               type: 'yoroi_connect_response/ergo',
@@ -767,7 +800,7 @@ chrome.runtime.onConnectExternal.addListener(port => {
           await withDb(
             async (_db, localStorageApi) => {
               const { connectedWallet, auth } =
-                (await confirmConnect(tabId, message.connectParameters, localStorageApi)) ?? {};
+                (await confirmConnect(tabId, connectParameters(), localStorageApi)) ?? {};
               const accepted = connectedWallet != null;
               port.postMessage({
                 type: 'yoroi_connect_response/cardano',
@@ -1067,8 +1100,8 @@ chrome.runtime.onConnectExternal.addListener(port => {
                   tabId,
                   async (wallet, connection) => {
                     await RustModule.load();
-                    const signatureHex = await ConnectorStore.authSignHexPayload({
-                      appAuthID: connection.appAuthID,
+                    const signatureHex = await authSignHexPayload({
+                      appAuthID: connection?.appAuthID,
                       deriver: wallet,
                       payloadHex: message.params[0],
                     });
@@ -1088,11 +1121,11 @@ chrome.runtime.onConnectExternal.addListener(port => {
             try {
               checkParamCount(2);
               await withSelectedSiteConnection(tabId, async connection => {
-                if (connection.status.auth) {
+                if (connection?.status?.auth) {
                   await RustModule.load();
                   const [payloadHex, signatureHex] = message.params;
                   const pk = RustModule.WalletV4.PublicKey
-                    .from_bytes(Buffer.from(connection.status.auth.pubkey, 'hex'));
+                    .from_bytes(Buffer.from(String(connection.status?.auth?.pubkey), 'hex'));
                   const sig = RustModule.WalletV4.Ed25519Signature.from_hex(signatureHex);
                   const res = pk.verify(Buffer.from(payloadHex, 'hex'), sig);
                   rpcResponse({
@@ -1116,10 +1149,7 @@ chrome.runtime.onConnectExternal.addListener(port => {
               }
             })
             break;
-        }
       }
-    });
-  } else {
-    // disconnect?
-  }
-});
+    }
+  });
+}

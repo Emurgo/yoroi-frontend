@@ -360,7 +360,13 @@ function disconnectWallet(protocol) {
 function createYoroiPort() {
     const connectedProtocolHolder = [];
     // events from Yoroi
-    yoroiPort = chrome.runtime.connect(extensionId);
+    if (extensionId === 'self') {
+      // this is part of Yoroi extension
+      yoroiPort = chrome.runtime.connect();    
+    } else {
+      // this is the seperate connector extension
+      yoroiPort = chrome.runtime.connect(extensionId);
+    }
     yoroiPort.onMessage.addListener(message => {
         // alert("content script message: " + JSON.stringify(message));
         if (message.type === "connector_rpc_response") {
@@ -483,7 +489,6 @@ if (shouldInject()) {
                                 url: location.hostname,
                                 requestIdentification: event.data.requestIdentification,
                                 onlySilent: event.data.onlySilent,
-                                protocol,
                             },
                             protocol,
                         };

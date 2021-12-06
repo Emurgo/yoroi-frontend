@@ -100,8 +100,9 @@ export function truncateAddress(addr: string): string {
  * Avoid using this when possible
  * Since the length is too small for some bech32 prefixes
  */
-export function truncateAddressShort(addr: string): string {
-  return truncateFormatter(addr, 20);
+export function truncateAddressShort(addr: string, by: ?number): string {
+  if (!by) by = 20
+  return truncateFormatter(addr, by);
 }
 
 /**

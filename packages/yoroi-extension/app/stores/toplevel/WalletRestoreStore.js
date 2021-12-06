@@ -42,6 +42,8 @@ import { defineMessages, } from 'react-intl';
 import type { $npm$ReactIntl$MessageDescriptor } from 'react-intl';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
+import { isWalletExist } from '../../api/ada/lib/cardanoCrypto/utils';
+import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 
 const messages = defineMessages({
   walletRestoreVerifyAccountIdLabel: {
@@ -84,9 +86,10 @@ export const NUMBER_OF_VERIFIED_ADDRESSES_PAPER = 5;
 
 export const RestoreSteps = Object.freeze({
   START: 0,
-  VERIFY_MNEMONIC: 1,
-  LEGACY_EXPLANATION: 2,
-  TRANSFER_TX_GEN: 3,
+  WALLET_EXIST: 1,
+  VERIFY_MNEMONIC: 2,
+  LEGACY_EXPLANATION: 3,
+  TRANSFER_TX_GEN: 4,
 });
 export type RestoreStepsType = $Values<typeof RestoreSteps>;
 export type PlateWithMeta = {|
@@ -111,6 +114,8 @@ export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> 
     plates: Array<PlateWithMeta>,
   |};
 
+  @observable duplicatedWallet: null | void | PublicDeriver<>
+
   setup(): void {
     super.setup();
     this.reset();
@@ -134,9 +139,8 @@ export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> 
   }
 
   @action
-  _processRestoreMeta: (WalletRestoreMeta) => void = (restoreMeta) => {
+  _processRestoreMeta: (WalletRestoreMeta) => Promise<void> = async (restoreMeta) => {
     this.walletRestoreMeta = restoreMeta;
-    this.step = RestoreSteps.VERIFY_MNEMONIC;
 
     let resolvedRecoveryPhrase = restoreMeta.recoveryPhrase;
 
@@ -179,6 +183,22 @@ export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> 
         plates,
       };
     });
+
+    // Check for wallet duplication.
+    const wallets = this.stores.wallets.publicDerivers
+    const accountIndex = this.stores.walletRestore.selectedAccount;
+    const duplicatedWallet = await isWalletExist(
+      wallets,
+      mode.type,
+      resolvedRecoveryPhrase,
+      accountIndex,
+      selectedNetwork
+      )
+
+    runInAction(() => {
+      this.step = duplicatedWallet ? RestoreSteps.WALLET_EXIST : RestoreSteps.VERIFY_MNEMONIC
+      this.duplicatedWallet = duplicatedWallet
+    })
   }
 
   teardown(): void {
@@ -188,7 +208,9 @@ export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> 
 
   @action
   _back: void => void = () => {
-    if (this.step === RestoreSteps.VERIFY_MNEMONIC) {
+    if (
+      (this.step === RestoreSteps.VERIFY_MNEMONIC) ||
+      (this.step === RestoreSteps.WALLET_EXIST)) {
       this.recoveryResult = undefined;
       this.step = RestoreSteps.START;
       return;

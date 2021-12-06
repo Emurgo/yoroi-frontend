@@ -1,26 +1,24 @@
 // @flow
-import { Component } from 'react';
-import type { Node } from 'react';
+import type { Node, ComponentType } from 'react';
 import { observer } from 'mobx-react';
-import styles from './VerticallyCenteredLayout.scss';
+import { Box } from '@mui/system';
 
 type Props = {|
-  +children?: Node,
+  +children: Node,
 |};
 
-@observer
-export default class VerticallyCenteredLayout extends Component<Props> {
-
-  static defaultProps: {|children: void|} = {
-    children: undefined
-  };
-
-  render(): Node {
-    const { children } = this.props;
-    return (
-      <div className={styles.component}>
-        {children}
-      </div>
-    );
-  }
+function VerticallyCenteredLayout({ children }: Props): Node {
+  return (
+    <Box
+      sx={{
+        position: 'relative',
+        top: '50%',
+        transform: 'translateY(-50%)',
+        margin: 'auto',
+      }}
+    >
+      {children}
+    </Box>
+  );
 }
+export default (observer(VerticallyCenteredLayout): ComponentType<Props>);

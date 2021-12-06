@@ -50,7 +50,7 @@ function Autocomplete({
 }: Props): Node {
   const [inputValue, setInputValue] = useState<string>('');
   const inputRef = useRef();
-  const isInputPresent = inputValue?.length > 0;
+  const isInputPresent = inputValue.length > 0;
   const filteredList = isInputPresent
     ? options.filter(w => w.toLowerCase().startsWith(inputValue.toLowerCase()))
     : options;

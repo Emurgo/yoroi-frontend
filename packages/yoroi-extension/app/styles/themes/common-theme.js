@@ -36,7 +36,7 @@ export const commonTheme: Object = createTheme({
       pending: {
         background: '#F0F3F5',
         text: '#ADAEB6',
-        stripes: 'rgba(217, 221, 224, 0.2)',
+        stripes: 'rgba(217, 221, 224, 0.6)',
       },
       high: {
         background: '#c9ede5',
