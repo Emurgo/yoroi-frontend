@@ -176,7 +176,7 @@ export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
 
         {!isValid && (
           <div className={styles.words}>
-            {recoveryPhraseSorted.map(({ word, isActive }, index) => (
+            {recoveryPhraseSorted.map(({ word, isActive }, index) => isActive ? (
               <MnemonicWord
                 key={word + index} // eslint-disable-line react/no-array-index-key
                 word={word}
@@ -189,7 +189,7 @@ export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
                 }}
                 classicTheme={classicTheme}
               />
-            ))}
+            ) : null)}
           </div>
         )}
 

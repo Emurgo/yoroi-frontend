@@ -18,11 +18,17 @@ exports.copyAssets = (type: string, env: string) => {
   cp('chrome/content-scripts/ledger/*.js', `${type}/js/`);
 };
 
-const buildManifest = (type: Network, isDebug: boolean, isNightly: boolean) => {
+const buildManifest = (
+  type: Network,
+  isDebug: boolean,
+  isNightly: boolean,
+  shouldInjectConnector: boolean,
+) => {
   const genManifestContent = require(`../chrome/manifest.${type}`);
-  const manifestContent = isNightly
-    ? overrideForNightly(genManifestContent(isDebug))
-    : genManifestContent(isDebug);
+  let manifestContent = genManifestContent(isDebug, shouldInjectConnector);
+  if (isNightly) {
+    manifestContent = overrideForNightly(manifestContent);
+  }
   const manifestContentJSON = JSON.stringify(manifestContent, null, 4);
 
   const OUTPUT_FILE_NAME = `manifest.${type}.json`;
@@ -37,6 +43,12 @@ const buildManifest = (type: Network, isDebug: boolean, isNightly: boolean) => {
 };
 
 const manifestTypes = values(NetworkType);
-exports.buildManifests = (isDebug: boolean, isNightly: boolean) => {
-  manifestTypes.map((type) => buildManifest(type, isDebug, isNightly));
+exports.buildManifests = (
+  isDebug: boolean,
+  isNightly: boolean,
+  shouldInjectConnector: boolean
+) => {
+  manifestTypes.forEach((type) => {
+    buildManifest(type, isDebug, isNightly, shouldInjectConnector);
+  });
 };
