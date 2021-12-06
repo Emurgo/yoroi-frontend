@@ -404,6 +404,7 @@ export type WhitelistEntry = {|
   publicDeriverId: number,
   appAuthID: ?string,
   auth: ?WalletAuthEntry,
+  image: string,
 |};
 
 export type ConnectingMessage = {|

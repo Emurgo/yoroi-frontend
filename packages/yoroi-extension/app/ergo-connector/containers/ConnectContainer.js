@@ -94,6 +94,7 @@ export default class ConnectContainer extends Component<
       publicDeriverId,
       appAuthID,
       auth: authEntry,
+      image: chromeMessage.imgBase64Url,
     });
     await connector.updateConnectorWhitelist.trigger({ whitelist });
 
