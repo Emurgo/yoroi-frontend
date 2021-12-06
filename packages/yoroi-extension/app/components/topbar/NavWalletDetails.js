@@ -4,7 +4,7 @@ import { observer } from 'mobx-react';
 import type { Node } from 'react';
 import classnames from 'classnames';
 import { intlShape, } from 'react-intl';
-import { amountWithoutZeros, truncateToken } from '../../utils/formatters';
+import { truncateToken } from '../../utils/formatters';
 
 import globalMessages from '../../i18n/global-messages';
 import styles from './NavWalletDetails.scss';
@@ -164,7 +164,9 @@ export default class NavWalletDetails extends Component<Props> {
     const defaultEntry = request.amount.getDefaultEntry();
     const tokenInfo = this.props.getTokenInfo(defaultEntry);
     const shiftedAmount = defaultEntry.amount
-      .shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
+      .shiftedBy(-tokenInfo.Metadata.numberOfDecimals)
+      .decimalPlaces(tokenInfo.Metadata.numberOfDecimals)
+      .toString();
 
     let balanceDisplay;
     if (request.shouldHideBalance) {
@@ -172,7 +174,7 @@ export default class NavWalletDetails extends Component<Props> {
     } else {
       balanceDisplay = (
         <>
-          {amountWithoutZeros(shiftedAmount.toFormat(tokenInfo.Metadata.numberOfDecimals))}
+          {shiftedAmount}
         </>
       );
     }
