@@ -1,6 +1,5 @@
 /* eslint-disable promise/always-return */
 // @flow
-import BigNumber from 'bignumber.js';
 import { observable, action, runInAction, computed } from 'mobx';
 import Request from './lib/LocalizedRequest';
 import Store from './base/Store';
@@ -17,7 +16,6 @@ import type {
   RemoveWalletFromWhitelistData,
   GetConnectedSitesData,
   Protocol,
-  Tx,
 } from '../../chrome/extension/ergo-connector/types';
 import type { ActionsMap } from '../actions/index';
 import type { StoresMap } from './index';
@@ -28,7 +26,6 @@ import {
 import {
   isCardanoHaskell,
   isErgo,
-  getErgoBaseConfig,
 } from '../api/ada/lib/storage/database/prepackaged/networks';
 import {
   asGetBalance,
@@ -38,15 +35,7 @@ import { Bip44Wallet } from '../api/ada/lib/storage/models/Bip44Wallet/wrapper';
 import { walletChecksum, legacyWalletChecksum } from '@emurgo/cip4-js';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import { MultiToken } from '../api/common/lib/MultiToken';
-import { addErgoAssets } from '../api/ergo/lib/storage/bridge/updateTransactions';
 import { PublicDeriver } from '../api/ada/lib/storage/models/PublicDeriver/index';
-import type { ISignRequest } from '../api/common/lib/transactions/ISignRequest';
-import { ErgoExternalTxSignRequest } from '../api/ergo/lib/transactions/ErgoExternalTxSignRequest';
-import { RustModule } from '../api/ada/lib/cardanoCrypto/rustLoader';
-import { toRemoteUtxo } from '../api/ergo/lib/transactions/utils';
-import { mintedTokenInfo } from '../../chrome/extension/ergo-connector/utils';
-import { Logger } from '../utils/logging';
-import type { CardanoConnectorSignRequest } from '../ergo-connector/types';
 
 // Need to run only once - Connecting wallets
 let initedConnecting = false;
