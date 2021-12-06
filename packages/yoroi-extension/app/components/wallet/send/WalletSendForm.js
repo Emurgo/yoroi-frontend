@@ -19,7 +19,6 @@ import { getAddressPayload, isValidReceiveAddress } from '../../../api/ada/lib/s
 import { MAX_MEMO_SIZE } from '../../../config/externalStorageConfig';
 import type { TokenRow, NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import {
-  amountWithoutZeros,
   formattedAmountToBigNumber,
   formattedAmountToNaturalUnits,
   truncateToken,
@@ -377,7 +376,7 @@ export default class WalletSendForm extends Component<Props> {
           info: token.info,
           label: truncateToken(getTokenStrictName(token.info) ?? getTokenIdentifierIfExists(token.info) ?? '-'),
           id: (getTokenIdentifierIfExists(token.info) ?? '-'),
-          amount: amountWithoutZeros(amount),
+          amount,
         }
       });
     })();
