@@ -1,0 +1,52 @@
+.component {
+    .header {
+        display: grid;
+        grid-template-columns: repeat(3, 3fr);
+        text-align: center;
+
+        & .tab {
+            padding: 30px 0px;
+            font-family: Rubik;
+            letter-spacing: 0;
+            line-height: 24px;
+            text-align: center;
+        }
+
+        & .tabActive {
+            font-size: 16px;
+            font-weight: 500;
+            color: #242838;
+        }
+
+        & .tabInActive {
+            font-size: 16px;
+            font-weight: 400;
+            color: #6B7384;
+        }
+
+    }
+
+    & .fullBar {
+        height: 2px;
+        width: 100%;
+        background-color: #242838;
+    }
+
+    & .halfBar {
+        height: 2px;
+        width: 50%;
+        background-color: #242838;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+    }
+
+    & .halfBar .dot {
+        height: 8px;
+        width: 8px;
+        background-color: inherit;
+        border-radius: 50%;
+       display: inline-block;
+    }
+
+}

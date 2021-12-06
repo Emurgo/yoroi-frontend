@@ -1,0 +1,24 @@
+.component {
+    display: flex;
+    justify-content: center;
+    .wrapper {
+        width: 756px;
+        height: 600px;
+    }
+}
+  
+:global(.YoroiRevamp) .component {
+    .wrapper {
+        background: var(--yoroi-palette-common-white);
+        border-radius: 8px;
+    }
+}
+
+:global(.YoroiModern) .component {
+    padding: 30px;
+
+    .receiverInput {
+        letter-spacing: 0;
+    }
+}
+  

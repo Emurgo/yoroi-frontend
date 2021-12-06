@@ -7,7 +7,9 @@ import { defineMessages, intlShape } from 'react-intl';
 import { ROUTES } from '../../routes-config';
 import type { InjectedOrGenerated } from '../../types/injectedPropsType';
 
-import WalletSendForm from '../../components/wallet/send/WalletSendForm';
+import WalletSendFormClassic from '../../components/wallet/send/WalletSendForm';
+import WalletSentFormRevamp from '../../components/wallet/send/WalletSendFormRevamp';
+
 // Web Wallet Confirmation
 import WalletSendConfirmationDialogContainer from './dialogs/WalletSendConfirmationDialogContainer';
 import type {
@@ -42,6 +44,7 @@ import TransactionSuccessDialog from '../../components/wallet/send/TransactionSu
 // Hardware Wallet Confirmation
 import HWSendConfirmationDialog from '../../components/wallet/send/HWSendConfirmationDialog';
 import globalMessages from '../../i18n/global-messages';
+import { withLayout } from '../../styles/context/layout';
 
 const messages = defineMessages({
   txConfirmationLedgerNanoLine1: {
@@ -64,8 +67,17 @@ const messages = defineMessages({
 
 export type GeneratedData = typeof WalletSendPage.prototype.generated;
 
+type Props = {|
+  ...InjectedOrGenerated<GeneratedData>,
+|};
+type InjectedProps = {|
+  +renderLayoutComponent: LayoutComponentMap => Node,
+  +selectedLayout: string,
+|};
+type AllProps = {| ...Props, ...InjectedProps |};
+
 @observer
-export default class WalletSendPage extends Component<InjectedOrGenerated<GeneratedData>> {
+class WalletSendPage extends Component<AllProps> {
 
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
@@ -135,6 +147,12 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
       publicDeriver.getParent().getNetworkInfo().NetworkId
     );
 
+    const layoutComponents = {
+      CLASSIC: WalletSendFormClassic,
+      REVAMP: WalletSentFormRevamp
+    }
+    const WalletSendForm = layoutComponents[this.props.selectedLayout]
+    console.log({p: this.props.selectedLayout})
     return (
       <>
         <WalletSendForm
@@ -618,3 +636,5 @@ export default class WalletSendPage extends Component<InjectedOrGenerated<Genera
     });
   }
 }
+
+export default (withLayout(WalletSendPage): ComponentType<Props>);

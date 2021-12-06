@@ -176,7 +176,10 @@ const WalletsSubpages = (stores, actions) => (
     <Route
       exact
       path={ROUTES.WALLETS.TRANSACTIONS}
-      component={(props) => <WalletSummaryPage {...props} stores={stores} actions={actions} />}
+      component={(props) => {
+        console.log({props})
+        return <WalletSummaryPage {...props} stores={stores} actions={actions} />
+      }}
     />
     <Route
       exact
