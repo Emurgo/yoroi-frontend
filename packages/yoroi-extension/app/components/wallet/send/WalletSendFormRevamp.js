@@ -423,6 +423,10 @@ export default class WalletSendForm extends Component<Props> {
       <div className={styles.component}>
         <div className={styles.wrapper}>
           <SendFromHeader step={SEND_FORM_STEP.AMOUNT} />
+
+          <div className={styles.formBody}>
+            kk
+          </div>
         </div>
       </div>
     );

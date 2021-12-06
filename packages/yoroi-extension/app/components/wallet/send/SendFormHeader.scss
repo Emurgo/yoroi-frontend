@@ -32,21 +32,38 @@
         background-color: #242838;
     }
 
+
+    & .noBar {
+        height: 2px;
+        width: 100%;
+        background-color: #DCE0E9;
+    }
+
     & .halfBar {
         height: 2px;
-        width: 50%;
-        background-color: #242838;
+        width: 100%;
         display: flex;
         align-items: center;
-        justify-content: flex-end;
-    }
 
-    & .halfBar .dot {
-        height: 8px;
-        width: 8px;
-        background-color: inherit;
-        border-radius: 50%;
-       display: inline-block;
-    }
+        .right {
+            height: 100%;
+            width: 50%;
+            display: inline-block;
+            background-color: #242838;
+        }
 
+        .left {
+            height: 100%;
+            width: 50%;
+            background-color: #DCE0E9;
+        }
+
+        .dot {
+            height: 8px;
+            width: 8px;
+            background-color: #242838;
+            border-radius: 50%;
+            display: inline-block;
+        }
+    }
 }

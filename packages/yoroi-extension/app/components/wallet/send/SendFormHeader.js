@@ -29,6 +29,17 @@ const TABS = [
  * add intl
  */
 export default class SendFromHeader extends Component<Props> {
+
+    getBarClassnames = (tabStep: number, currentStep: number) => {
+      /**
+       * @Note
+       * `eslint` doesn't allow ternary expressions
+       */
+      if (tabStep === currentStep ) return styles.halfBar
+      if (tabStep < currentStep) return styles.fullBar
+      return styles.noBar
+    }
+
     render() :Node {
       const { step: currentStep } = this.props
 
@@ -42,14 +53,13 @@ export default class SendFromHeader extends Component<Props> {
                     [styles.tab, currentStep === tab.step ? styles.tabActive : styles.tabInActive ]
                   )
                 }
-                >{tab.title}
-                </p>
-                <div className={
-                  tab.step === currentStep ?
-                  styles.halfBar : tab.step < currentStep && styles.fullBar
-                }
                 >
+                  {tab.title}
+                </p>
+                <div className={this.getBarClassnames(tab.step, currentStep)}>
+                  <span className={styles.right} />
                   <span className={styles.dot} />
+                  <span className={styles.left} />
                 </div>
               </li>
               ))
