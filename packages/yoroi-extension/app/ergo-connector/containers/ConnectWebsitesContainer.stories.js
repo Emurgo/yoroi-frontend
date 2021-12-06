@@ -122,10 +122,12 @@ export const Whitelisted = (): Node => {
           {
             url: 'google.com',
             publicDeriverId: 0,
+            image: '',
           },
           {
             url: 'yoroi.com',
             publicDeriverId: 1,
+            image: '',
           },
         ],
         wallet,

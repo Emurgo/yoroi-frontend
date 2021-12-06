@@ -17,14 +17,16 @@ module.exports = async ({ config, mode } /*: {|
   config: any,
 |}*/) /*: * */ => {
   const isNightly = "false";
+  const isLight = "false";
   const isProduction = mode === 'PRODUCTION';
   const customConfig = isProduction
     ? baseProdConfig({
       networkName: ENV,
       nightly: isNightly,
       publicPath: './',
+      isLight
     })
-    : devConfig.baseDevConfig(ENV, isNightly === 'true');
+    : devConfig.baseDevConfig(ENV, isNightly === 'true',);
 
   const finalConfig = {
     ...config,
