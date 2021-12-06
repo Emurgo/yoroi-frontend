@@ -20,8 +20,6 @@ export function splitAmount(
   return [beforeDecimal, afterDecimal]
 }
 
-export const amountWithoutZeros: (string => string) = (amount: string): string => amount.replace(/0+$/, '').replace(/\.$/, '')
-
 export const maxNameLengthBeforeTruncation = 15;
 export const truncateLongName: string => string = (walletName) => {
   return walletName.length > maxNameLengthBeforeTruncation
