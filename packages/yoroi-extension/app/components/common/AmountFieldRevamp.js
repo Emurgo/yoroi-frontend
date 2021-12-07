@@ -25,7 +25,6 @@ export type NumericInputProps = {|
   onBlur?: Function,
   autoFocus?: any,
   error?: string,
-  amountFieldRevamp?: boolean,
   allowSigns?: boolean,
   allowOnlyIntegers?: boolean,
   bigNumberFormat?: BigNumber,
@@ -412,7 +411,6 @@ class NumericInputRP extends Component<NumericInputProps, State> {
       onChange,
       value,
       error,
-      amountFieldRevamp,
       ...rest
     } = this.props;
 
@@ -420,16 +418,6 @@ class NumericInputRP extends Component<NumericInputProps, State> {
       this.state.fallbackInputValue != null
         ? this.state.fallbackInputValue
         : this.valueToFormattedString(value);
-
-    if (amountFieldRevamp) {
-      return (
-        <input
-          onChange={this.onChange}
-          onBlur={this.onBlur}
-          value={inputValue}
-        />
-      )
-    }
 
     return (
       <TextField
@@ -463,7 +451,6 @@ type AmountInputProps = {
   +inputRef?: Ref<'input'>,
   +value: any,
   +type?: string,
-  +amountFieldRevamp?: boolean,
   ...
 };
 

@@ -1,11 +1,13 @@
 // @flow
 
-import { Component, Node } from 'react';
+import { Component } from 'react';
+import type { Node } from 'react'
 import styles from './SendFormHeader.scss'
 import classnames from 'classnames'
 
 type Props = {|
     step: number,
+    onUpdateStep: number => void
 |}
 
 const TABS = [
@@ -25,12 +27,12 @@ const TABS = [
 
 /**
  * @todos
- * Add layout
- * add intl
+ * [x] Add layout
+ * [] add intl
  */
 export default class SendFromHeader extends Component<Props> {
 
-    getBarClassnames = (tabStep: number, currentStep: number) => {
+    getBarClassnames = (tabStep: number, currentStep: number): string => {
       /**
        * @Note
        * `eslint` doesn't allow ternary expressions
@@ -40,14 +42,18 @@ export default class SendFromHeader extends Component<Props> {
       return styles.noBar
     }
 
-    render() :Node {
-      const { step: currentStep } = this.props
+    render(): Node {
+      const { step: currentStep, onUpdateStep } = this.props
 
       return (
         <div className={styles.component}>
           <ul className={styles.header}>
             {TABS.map(tab => (
-              <li key={tab.step}>
+              <button
+                type='button'
+                key={tab.step}
+                onClick={() => (tab.step < currentStep) && onUpdateStep(tab.step)}
+              >
                 <p className={
                   classnames(
                     [styles.tab, currentStep === tab.step ? styles.tabActive : styles.tabInActive ]
@@ -61,7 +67,7 @@ export default class SendFromHeader extends Component<Props> {
                   <span className={styles.dot} />
                   <span className={styles.left} />
                 </div>
-              </li>
+              </button>
               ))
             }
           </ul>

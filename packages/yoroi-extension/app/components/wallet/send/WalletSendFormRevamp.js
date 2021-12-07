@@ -40,7 +40,7 @@ import { Box, style } from '@mui/system';
 import TokenOptionRow from '../../widgets/tokenOption/TokenOptionRow';
 import BigNumber from 'bignumber.js';
 import classnames from 'classnames';
-import SendFromHeader from './SendFormHeader';
+import SendFormHeader from './SendFormHeader';
 import { SEND_FORM_STEP } from '../../../types/WalletSendTypes';
 
 const messages = defineMessages({
@@ -120,6 +120,7 @@ type State = {|
   showMemoWarrning: boolean,
   invalidMemo: boolean,
   memo: string,
+  currentStep: number,
 |}
 
 const CUSTOM_AMOUNT = 'CUSTOM_AMOUNT'
@@ -135,6 +136,7 @@ export default class WalletSendForm extends Component<Props, State> {
     showMemoWarrning: false,
     invalidMemo: false,
     memo: '',
+    currentStep: SEND_FORM_STEP.RECIVER
   }
 
   amountFieldReactionDisposer: null | (() => mixed) = null;
@@ -328,9 +330,36 @@ export default class WalletSendForm extends Component<Props, State> {
     const { form } = this
     const { intl } = this.context;
     const { showMemoWarrning, invalidMemo, memo } = this.state
-
+    const amountField = form.$('amount');
     const receiverField = form.$('receiver');
+    const amountFieldProps = amountField.bind();
+    const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
 
+    let transactionFeeError = null;
+    if (this.props.isCalculatingFee) {
+      transactionFeeError = this.context.intl.formatMessage(messages.calculatingFee);
+    }
+    if (this.props.error) {
+      transactionFeeError = this.context.intl.formatMessage(
+        this.props.error,
+        this.props.error.values
+      );
+    }
+
+    const transactionFee = this.props.fee ?? new MultiToken([], {
+      defaultIdentifier: this.props.defaultToken.Identifier,
+      defaultNetworkId: this.props.defaultToken.NetworkId,
+    });
+
+    const totalAmount = this.props.totalInput ?? new MultiToken([{
+      identifier: (this.props.selectedToken ?? this.props.defaultToken).Identifier,
+      networkId: (this.props.selectedToken ?? this.props.defaultToken).NetworkId,
+      amount: formattedAmountToBigNumber(amountFieldProps.value)
+        .shiftedBy((this.props.selectedToken ?? this.props.defaultToken).Metadata.numberOfDecimals),
+    }], {
+      defaultIdentifier: this.props.defaultToken.Identifier,
+      defaultNetworkId: this.props.defaultToken.NetworkId,
+    });
 
 
     switch (step) {
@@ -373,6 +402,33 @@ export default class WalletSendForm extends Component<Props, State> {
             </div>
           </div>
         )
+        case SEND_FORM_STEP.AMOUNT:
+          return (
+            <div className={styles.amountInput}>
+              <AmountInput
+                {...amountFieldProps}
+                value={amountFieldProps.value === ''
+                ? null
+                : formattedAmountToBigNumber(amountFieldProps.value)
+              }
+                className="amount"
+                label={intl.formatMessage(globalMessages.amountLabel)}
+                decimalPlaces={this.getNumDecimals()}
+                disabled={this.props.shouldSendAll}
+                error={(transactionFeeError || amountField.error)}
+                currency={truncateToken(
+                getTokenName(this.props.selectedToken ?? this.props.defaultToken)
+              )}
+                fees={formatValue(transactionFee.getDefaultEntry())}
+                total={formatValue(this.getTokenEntry(totalAmount))}
+                allowSigns={false}
+                amountFieldRevamp
+              />
+            </div>
+
+          )
+        case SEND_FORM_STEP.PREVIEW:
+          return 'Preview'
         default:
           throw Error(`${step} is not a valid step number`)
     }
@@ -381,7 +437,7 @@ export default class WalletSendForm extends Component<Props, State> {
   render(): Node {
     const { form } = this;
     const { intl } = this.context;
-    const { memo } = this.form.values();
+    const { currentStep } = this.state
     const {
       hasAnyPending,
       showMemo,
@@ -487,14 +543,22 @@ export default class WalletSendForm extends Component<Props, State> {
     return (
       <div className={styles.component}>
         <div className={styles.wrapper}>
-          <SendFromHeader step={SEND_FORM_STEP.AMOUNT} />
+          <SendFormHeader
+            step={currentStep}
+            onUpdateStep={this.onUpdateStep.bind(this)}
+          />
 
           <div className={styles.formBody}>
-            {this.renderCurrentStep(1)}
+            {this.renderCurrentStep(currentStep)}
           </div>
         </div>
       </div>
     );
+  }
+
+  onUpdateStep(step: number) {
+    if(step > 3) throw new Error('Invalid Step number.')
+    this.setState({ currentStep: step })
   }
 
   onUpdateMemo(memo: string) {
@@ -516,7 +580,7 @@ export default class WalletSendForm extends Component<Props, State> {
     return (
       <Button
         variant="primary"
-        onClick={() => {}}
+        onClick={() => this.onUpdateStep(SEND_FORM_STEP.AMOUNT)}
         /** Next Action can't be performed in case transaction fees are not calculated
           * or there's a transaction waiting to be confirmed (pending) */
         disabled={disabledCondition}
