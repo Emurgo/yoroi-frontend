@@ -402,13 +402,13 @@ export default class WalletSendForm extends Component<Props, State> {
               }
             </div>
             <div>
-              {this._isValidReceiverAndMemo()}
+              {this._nextStepButton(invalidMemo || !receiverField.isValid, SEND_FORM_STEP.AMOUNT)}
             </div>
           </div>
         )
         case SEND_FORM_STEP.AMOUNT:
           return (
-            <div>
+            <div className={styles.amountStep}>
               <div className={classnames(
                 [
                   styles.amountInput,
@@ -458,6 +458,10 @@ export default class WalletSendForm extends Component<Props, State> {
               <p className={styles.amountError}>
                 {amountInputError}
               </p>
+
+              {this._nextStepButton(
+                amountInputError, SEND_FORM_STEP.PREVIEW
+              )}
             </div>
           )
         case SEND_FORM_STEP.PREVIEW:
@@ -614,6 +618,25 @@ export default class WalletSendForm extends Component<Props, State> {
       <Button
         variant="primary"
         onClick={() => this.onUpdateStep(SEND_FORM_STEP.AMOUNT)}
+        /** Next Action can't be performed in case transaction fees are not calculated
+          * or there's a transaction waiting to be confirmed (pending) */
+        disabled={disabledCondition}
+        sx={{ margin: '125px 0px 0px 0px', display: 'block' }}
+      >
+        {intl.formatMessage(globalMessages.nextButtonLabel)}
+      </Button>);
+  }
+
+  _nextStepButton(
+    disabledCondition: boolean,
+    nextStep: number
+  ): Node {
+    const { intl } = this.context;
+
+    return (
+      <Button
+        variant="primary"
+        onClick={() => this.onUpdateStep(nextStep)}
         /** Next Action can't be performed in case transaction fees are not calculated
           * or there's a transaction waiting to be confirmed (pending) */
         disabled={disabledCondition}
