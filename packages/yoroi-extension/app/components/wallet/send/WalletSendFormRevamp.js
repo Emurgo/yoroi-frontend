@@ -9,7 +9,7 @@ import { defineMessages, intlShape } from 'react-intl';
 import { isValidMemoOptional, isValidMemo, } from '../../../utils/validations';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
-import { AmountInput } from '../../common/NumericInputRP';
+import { AmountInput, AmountInputRevamp } from '../../common/NumericInputRP';
 import AddMemoSvg from '../../../assets/images/add-memo.inline.svg';
 import BorderedBox from '../../widgets/BorderedBox';
 import styles from './WalletSendFormRevamp.scss';
@@ -330,6 +330,7 @@ export default class WalletSendForm extends Component<Props, State> {
     const { form } = this
     const { intl } = this.context;
     const { showMemoWarrning, invalidMemo, memo } = this.state
+    const { shouldSendAll } = this.props
     const amountField = form.$('amount');
     const receiverField = form.$('receiver');
     const amountFieldProps = amountField.bind();
@@ -360,6 +361,9 @@ export default class WalletSendForm extends Component<Props, State> {
       defaultIdentifier: this.props.defaultToken.Identifier,
       defaultNetworkId: this.props.defaultToken.NetworkId,
     });
+
+    const amountInputError = transactionFeeError || amountField.error
+
 
 
     switch (step) {
@@ -404,28 +408,57 @@ export default class WalletSendForm extends Component<Props, State> {
         )
         case SEND_FORM_STEP.AMOUNT:
           return (
-            <div className={styles.amountInput}>
-              <AmountInput
-                {...amountFieldProps}
-                value={amountFieldProps.value === ''
-                ? null
-                : formattedAmountToBigNumber(amountFieldProps.value)
-              }
-                className="amount"
-                label={intl.formatMessage(globalMessages.amountLabel)}
-                decimalPlaces={this.getNumDecimals()}
-                disabled={this.props.shouldSendAll}
-                error={(transactionFeeError || amountField.error)}
-                currency={truncateToken(
-                getTokenName(this.props.selectedToken ?? this.props.defaultToken)
-              )}
-                fees={formatValue(transactionFee.getDefaultEntry())}
-                total={formatValue(this.getTokenEntry(totalAmount))}
-                allowSigns={false}
-                amountFieldRevamp
-              />
-            </div>
+            <div>
+              <div className={classnames(
+                [
+                  styles.amountInput,
+                  amountInputError && styles.amountInputError,
+                  shouldSendAll && styles.disabled
+                ]
+                )}
+              >
+                <span className={classnames([styles.label, shouldSendAll && styles.labelDisabled])}>
+                  {intl.formatMessage(globalMessages.amountLabel)}
+                </span>
+                <div className={styles.amountInputGrid}>
+                  <AmountInputRevamp
+                    {...amountFieldProps}
+                    value={amountFieldProps.value === ''
+                    ? null
+                    : formattedAmountToBigNumber(amountFieldProps.value)
+                    }
+                    className="amount"
+                    label={intl.formatMessage(globalMessages.amountLabel)}
+                    decimalPlaces={this.getNumDecimals()}
+                    disabled={shouldSendAll}
+                    error={amountInputError}
+                    currency={truncateToken(
+                    getTokenName(this.props.selectedToken ?? this.props.defaultToken)
+                    )}
+                    fees={formatValue(transactionFee.getDefaultEntry())}
+                    total={formatValue(this.getTokenEntry(totalAmount))}
+                    allowSigns={false}
+                    amountFieldRevamp
+                  />
+                  <p className={styles.ada}>ADA</p>
+                  <button
+                    className={styles.max}
+                    type='button'
+                    onClick={() => this.props.updateSendAllStatus(!shouldSendAll)}
+                  >
+                    MAX
+                  </button>
+                </div>
 
+                <div className={styles.usd}>
+                  <p>$ 10</p>
+                </div>
+              </div>
+
+              <p className={styles.amountError}>
+                {amountInputError}
+              </p>
+            </div>
           )
         case SEND_FORM_STEP.PREVIEW:
           return 'Preview'

@@ -1,0 +1,26 @@
+.component {
+  display: block;
+  width: 100%;
+  input {
+    border: none;
+    outline: none;
+    width: 100%;
+    color: #242838;
+    font-family: Rubik;
+    font-size: 24px;
+    letter-spacing: 0;
+    line-height: 32px;
+    background-color: #ffffff;
+    &:focus {
+        outline: none;
+    }
+
+    &::placeholder {
+        color: #A7AFC0;
+        font-family: Rubik;
+        font-size: 24px;
+        letter-spacing: 0;
+        line-height: 32px;
+    }
+  }
+}

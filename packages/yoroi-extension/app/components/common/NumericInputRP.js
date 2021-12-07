@@ -14,6 +14,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import TextField from './TextField';
 import { Box } from '@mui/system';
 import { Typography } from '@mui/material';
+import styles from './AmountInput.scss'
 
 type NumericInputValue = null | number | string | BigNumber;
 
@@ -427,6 +428,8 @@ class NumericInputRP extends Component<NumericInputProps, State> {
           onChange={this.onChange}
           onBlur={this.onBlur}
           value={inputValue}
+          placeholder='0'
+          disabled={rest.disabled}
         />
       )
     }
@@ -523,4 +526,26 @@ class AmountInput extends Component<AmountInputProps> {
     );
   }
 }
-export { AmountInput };
+
+class AmountInputRevamp extends Component<AmountInputProps> {
+  static defaultProps: {| error: void |} = {
+    error: undefined,
+  };
+
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
+    intl: intlShape.isRequired,
+  };
+
+  render(): Node {
+    const { error, fees, total, currency } = this.props;
+    const { intl } = this.context;
+
+    return (
+      <div className={styles.component}>
+        <NumericInputRP {...this.props} />
+      </div>
+    );
+  }
+}
+
+export { AmountInput, AmountInputRevamp };
