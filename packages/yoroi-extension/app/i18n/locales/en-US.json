@@ -139,6 +139,7 @@
   "global.labels.next": "Next",
   "global.labels.note": "Note:",
   "global.labels.optionalMemo": "Memo (optional)",
+  "wallet.send.form.memoWarning": "Memos are stored localy only",
   "global.labels.processing": "Processing...",
   "global.labels.remove": "Remove",
   "global.labels.rewardsLabel": "Rewards",

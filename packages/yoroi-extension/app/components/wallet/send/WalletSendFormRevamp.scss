@@ -5,6 +5,74 @@
         width: 756px;
         height: 600px;
     }
+
+    .formBody {
+        padding-top: 40px;
+        padding-right: 40px;
+        padding-bottom: 20px;
+        padding-left: 40px;
+
+        .receiverInput {
+            position: relative;
+            margin-top: 20px;
+        
+            :global {
+              .SimpleInput_input {
+                font-family: 'RobotoMono';
+                font-weight: 300;
+                letter-spacing: 0;
+              }
+            }
+        }
+        .memo {
+            margin-top: 20px;
+            .memoInput {
+                border-bottom: 1px solid #A7AFC0;
+                input {
+                    outline: none;
+                    border: none;
+                    padding: 10px 0px;
+                    padding-bottom: 8px;
+                    color: #242838;
+                    font-family: Rubik;
+                    font-size: 16px;
+                    letter-spacing: 0;
+                    line-height: 24px;
+                    width: 100%;
+                }
+
+                input::placeholder {
+                    color: #A7AFC0;
+                    font-family: Rubik;
+                    font-size: 16px;
+                    letter-spacing: 0;
+                    line-height: 24px;
+                }
+            }
+
+            .memoWarning {
+                margin-top: 8px;
+                color: #6B7384;
+                font-family: Rubik;
+                font-size: 12px;
+                letter-spacing: 0;
+                line-height: 18px;
+            }
+
+            .hide {
+                visibility: hidden;
+            }
+
+            .memoError {
+                margin-top: 8px;
+                color: var(--yoroi-palette-error-100);
+                font-family: Rubik;
+                font-size: 12px;
+                letter-spacing: 0;
+                line-height: 18px;
+            }
+        }
+    }
 }
   
 :global(.YoroiRevamp) .component {

@@ -36,11 +36,12 @@ import type {
   TokenLookupKey,
 } from '../../../api/common/lib/MultiToken';
 import Select from '../../common/Select';
-import { Box } from '@mui/system';
+import { Box, style } from '@mui/system';
 import TokenOptionRow from '../../widgets/tokenOption/TokenOptionRow';
 import BigNumber from 'bignumber.js';
 import classnames from 'classnames';
 import SendFromHeader from './SendFormHeader';
+import { SEND_FORM_STEP } from '../../../types/WalletSendTypes';
 
 const messages = defineMessages({
   receiverLabel: {
@@ -114,19 +115,27 @@ type Props = {|
   +spendableBalance: ?MultiToken,
   +selectedToken: void | $ReadOnly<TokenRow>,
 |};
+
+type State = {|
+  showMemoWarrning: boolean,
+  invalidMemo: boolean,
+  memo: string,
+|}
+
 const CUSTOM_AMOUNT = 'CUSTOM_AMOUNT'
-const SEND_FORM_STEP = {
-    RECIVER: 1,
-    AMOUNT: 2,
-    PREVIEW: 3,
-}
 
 @observer
-export default class WalletSendForm extends Component<Props> {
+export default class WalletSendForm extends Component<Props, State> {
 
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
+
+  state: State = {
+    showMemoWarrning: false,
+    invalidMemo: false,
+    memo: '',
+  }
 
   amountFieldReactionDisposer: null | (() => mixed) = null;
 
@@ -315,6 +324,60 @@ export default class WalletSendForm extends Component<Props> {
     return info.Metadata.numberOfDecimals;
   }
 
+  renderCurrentStep(step: number): Node {
+    const { form } = this
+    const { intl } = this.context;
+    const { showMemoWarrning, invalidMemo, memo } = this.state
+
+    const receiverField = form.$('receiver');
+
+
+
+    switch (step) {
+      case SEND_FORM_STEP.RECIVER:
+        return (
+          <div>
+            <div className={styles.receiverInput}>
+              <TextField
+                className="receiver"
+                {...receiverField.bind()}
+                error={receiverField.error}
+                done={receiverField.isValid}
+              />
+            </div>
+            <div className={styles.memo}>
+              <div className={styles.memoInput}>
+                <input
+                  type="text"
+                  onFocus={() => this.setState({ showMemoWarrning: true })}
+                  placeholder={intl.formatMessage(memoMessages.addMemo)}
+                  onChange={(e) => this.onUpdateMemo(e.target.value)}
+                  value={memo}
+                />
+              </div>
+              {invalidMemo ? (
+                <p className={styles.memoError}>
+                  {intl.formatMessage(messages.memoInvalidOptional,{ maxMemo: MAX_MEMO_SIZE, })}
+                </p>
+              ):
+                <p className={classnames(
+                [ styles.memoWarning, !showMemoWarrning && styles.hide]
+                )}
+                >
+                  {intl.formatMessage(memoMessages.memoWarning)}
+                </p>
+              }
+            </div>
+            <div>
+              {this._isValidReceiverAndMemo()}
+            </div>
+          </div>
+        )
+        default:
+          throw Error(`${step} is not a valid step number`)
+    }
+  }
+
   render(): Node {
     const { form } = this;
     const { intl } = this.context;
@@ -412,6 +475,7 @@ export default class WalletSendForm extends Component<Props> {
         })
       ]
     })()
+
     const tokenListClasses = classnames([
       styles.tokenList,
       {
@@ -419,17 +483,47 @@ export default class WalletSendForm extends Component<Props> {
            this.form.$('selectedToken').value === tokenId
       }
     ])
+
     return (
       <div className={styles.component}>
         <div className={styles.wrapper}>
           <SendFromHeader step={SEND_FORM_STEP.AMOUNT} />
 
           <div className={styles.formBody}>
-            kk
+            {this.renderCurrentStep(1)}
           </div>
         </div>
       </div>
     );
+  }
+
+  onUpdateMemo(memo: string) {
+    const isValid = isValidMemoOptional(memo);
+    if (isValid) {
+      this.props.updateMemo(memo);
+      this.setState({ memo, invalidMemo: false })
+    } else {
+      this.setState({ invalidMemo: true })
+    }
+  }
+
+  _isValidReceiverAndMemo(): Node {
+    const { intl } = this.context;
+    const { invalidMemo } = this.state
+    const receiverField = this.form.$('receiver');
+    const disabledCondition =  invalidMemo || !receiverField.isValid
+
+    return (
+      <Button
+        variant="primary"
+        onClick={() => {}}
+        /** Next Action can't be performed in case transaction fees are not calculated
+          * or there's a transaction waiting to be confirmed (pending) */
+        disabled={disabledCondition}
+        sx={{ margin: '125px 0px 0px 0px', display: 'block' }}
+      >
+        {intl.formatMessage(globalMessages.nextButtonLabel)}
+      </Button>);
   }
 
   _makeInvokeConfirmationButton(): Node {

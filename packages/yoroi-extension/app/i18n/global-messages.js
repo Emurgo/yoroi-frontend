@@ -891,6 +891,10 @@ export const memoMessages: * = defineMessages({
   optionalMemo: {
     id: 'global.labels.optionalMemo',
     defaultMessage: '!!!Memo (optional)',
+  },
+  memoWarning: {
+    id: 'wallet.send.form.memoWarning',
+    defaultMessage: '!!!Memos are stored localy only'
   }
 });
 export const connectorMessages: * = defineMessages({
