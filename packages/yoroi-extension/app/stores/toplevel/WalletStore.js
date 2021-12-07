@@ -267,7 +267,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
       const { result } = txRequests.requests.allRequest;
       if (result == null)
         throw new Error(`${nameof(this.refreshWalletFromLocalOnLaunch)} should never happen`);
-      if (result.transactions.length === 0) {
+      if (result.totalAvailable === 0) {
         for (const txRequest of Object.keys(txRequests.requests)) {
           txRequests.requests[txRequest].reset();
         }
