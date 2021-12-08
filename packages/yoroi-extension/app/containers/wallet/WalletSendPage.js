@@ -147,15 +147,60 @@ class WalletSendPage extends Component<AllProps> {
       publicDeriver.getParent().getNetworkInfo().NetworkId
     );
 
-    const layoutComponents = {
-      CLASSIC: WalletSendFormClassic,
-      REVAMP: WalletSentFormRevamp
+    // const layoutComponents = {
+    //   CLASSIC: WalletSendFormClassic,
+    //   REVAMP: WalletSentFormRevamp
+    // }
+    // const WalletSendForm = layoutComponents[this.props.selectedLayout]
+
+    if (this.props.selectedLayout === 'REVAMP') {
+      return (
+        <>
+          <WalletSentFormRevamp
+            selectedNetwork={publicDeriver.getParent().getNetworkInfo()}
+            validateAmount={(amount) => validateAmount(
+              amount,
+              transactionBuilderStore.selectedToken ?? defaultToken,
+              getMinimumValue(
+                publicDeriver.getParent().getNetworkInfo(),
+                transactionBuilderStore.selectedToken?.IsDefault ?? true
+              ),
+              this.context.intl,
+            )}
+            defaultToken={defaultToken}
+            getTokenInfo={genLookupOrFail(this.generated.stores.tokenInfoStore.tokenInfo)}
+            onSubmit={txBuilderActions.updateTentativeTx.trigger}
+            totalInput={transactionBuilderStore.totalInput}
+            hasAnyPending={hasAnyPending}
+            classicTheme={profile.isClassicTheme}
+            updateReceiver={(addr: void | string) => txBuilderActions.updateReceiver.trigger(addr)}
+            updateAmount={(value: ?BigNumber) => txBuilderActions.updateAmount.trigger(value)}
+            updateMemo={(content: void | string) => txBuilderActions.updateMemo.trigger(content)}
+            shouldSendAll={transactionBuilderStore.shouldSendAll}
+            updateSendAllStatus={txBuilderActions.updateSendAllStatus.trigger}
+            fee={transactionBuilderStore.fee}
+            isCalculatingFee={transactionBuilderStore.createUnsignedTx.isExecuting}
+            reset={txBuilderActions.reset.trigger}
+            error={transactionBuilderStore.createUnsignedTx.error}
+            uriParams={this.generated.stores.loading.uriParams}
+            resetUriParams={this.generated.stores.loading.resetUriParams}
+            showMemo={this.showMemo}
+            onAddMemo={() => this.showMemoDialog({
+              dialog: MemoNoExternalStorageDialog,
+              continuation: this.toggleShowMemo,
+            })}
+            spendableBalance={this.generated.stores.transactions.getBalanceRequest.result}
+            onAddToken={txBuilderActions.updateToken.trigger}
+            selectedToken={transactionBuilderStore.selectedToken}
+            previewStepsProps={this.generated.WalletSendConfirmationDialogContainerProps}
+          />
+          {this.renderDialog()}
+        </>
+      );
     }
-    const WalletSendForm = layoutComponents[this.props.selectedLayout]
-    console.log({p: this.props.selectedLayout})
     return (
       <>
-        <WalletSendForm
+        <WalletSendFormClassic
           selectedNetwork={publicDeriver.getParent().getNetworkInfo()}
           validateAmount={(amount) => validateAmount(
             amount,
@@ -225,6 +270,9 @@ class WalletSendPage extends Component<AllProps> {
     if (!publicDeriver) throw new Error(`Active wallet required for ${nameof(this.webWalletDoConfirmation)}.`);
 
     const { transactionBuilderStore } = this.generated.stores;
+    console.log({
+      classicYoroi: transactionBuilderStore.tentativeTx
+    })
     if (!transactionBuilderStore.tentativeTx) {
       throw new Error(`${nameof(this.webWalletDoConfirmation)}::should never happen`);
     }

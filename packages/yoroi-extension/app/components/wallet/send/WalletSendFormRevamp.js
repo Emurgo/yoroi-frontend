@@ -42,6 +42,8 @@ import BigNumber from 'bignumber.js';
 import classnames from 'classnames';
 import SendFormHeader from './SendFormHeader';
 import { SEND_FORM_STEP } from '../../../types/WalletSendTypes';
+import WalletSendPreviewStep from './WalletSendFromSteps/WalletSendPreviewStep'
+import WalletSendPreviewStepContainer from './WalletSendFromSteps/WalletSendPreviewStepContainer';
 
 const messages = defineMessages({
   receiverLabel: {
@@ -261,6 +263,9 @@ export default class WalletSendForm extends Component<Props, State> {
             : null
         })(),
         validators: [async ({ field }) => {
+          console.log({
+            validation: true, field
+          })
           if (this.props.shouldSendAll) {
             // sendall doesn't depend on the amount so always succeed
             return true;
@@ -342,6 +347,28 @@ export default class WalletSendForm extends Component<Props, State> {
     return info.Metadata.numberOfDecimals;
   }
 
+  renderPreviewStep(): Node {
+    const publicDeriver = this.props.previewStepsProps.stores.wallets.selected
+    if (!publicDeriver) throw new Error(`Active wallet is required.`);
+    
+    const { transactionBuilderStore } =  this.props.previewStepsProps.stores;
+    console.log({
+      prop: this.props.previewStepsProps.stores.wallets.selected,
+      transactionBuilderStore: transactionBuilderStore.tentativeTx
+    })
+    if (!transactionBuilderStore.tentativeTx) {
+      throw new Error(`${nameof(this.webWalletDoConfirmation)}::should never happen`);
+    }
+    const signRequest = transactionBuilderStore.tentativeTx;
+    return (
+      <WalletSendPreviewStepContainer
+        {...this.props.previewStepsProps}
+        signRequest={signRequest}
+        staleTx={transactionBuilderStore.txMismatch}
+        unitOfAccountSetting={this.props.previewStepsProps.stores.profile.unitOfAccount}
+      />)
+  }
+
   renderCurrentStep(step: number): Node {
     const { form } = this
     const { intl } = this.context;
@@ -418,7 +445,10 @@ export default class WalletSendForm extends Component<Props, State> {
               }
             </div>
             <div>
-              {this._nextStepButton(invalidMemo || !receiverField.isValid, SEND_FORM_STEP.AMOUNT)}
+              {this._nextStepButton(
+                invalidMemo || !receiverField.isValid,
+                () => this.onUpdateStep(SEND_FORM_STEP.AMOUNT)
+              )}
             </div>
           </div>
         )
@@ -476,50 +506,55 @@ export default class WalletSendForm extends Component<Props, State> {
               </p>
 
               {this._nextStepButton(
-                amountInputError, SEND_FORM_STEP.PREVIEW
+               !this.props.fee || this.props.hasAnyPending || !isValidMemoOptional(memo),
+               () => {
+                this.props.onSubmit()
+                this.onUpdateStep(SEND_FORM_STEP.PREVIEW)
+               }
               )}
             </div>
           )
         case SEND_FORM_STEP.PREVIEW:
-          return (
-            <div>
-              <div className={styles.receiver}>
-                <p className={styles.receiverLabel}>{intl.formatMessage(messages.receiverLabel)}</p>
-                <p className={styles.receiverAddress}>
-                  addr_test1qrnu64f004hr9nvc6wv0ac6zelca94lv6h9ctqfr3z8yk77r3y3kdut55a40jff00
-                  qmg74686vz44v6k363md06qkq0qs98pf5
-                </p>
-              </div>
-              <div className={styles.infoWrapper}>
-                <div className={styles.infoBlock}>
-                  <p className={styles.infoLabel}>
-                    {intl.formatMessage(messages.amountMinAdaIncluded)}
-                  </p>
-                  <p className={styles.infoAmount}>2000 ADA</p>
-                </div>
-                <div className={styles.infoBlock}>
-                  <p className={styles.infoLabel}>{intl.formatMessage(messages.transactionFee)}</p>
-                  <p className={styles.infoAmount}>2 ADA</p>
-                </div>
+                return this.renderPreviewStep()
+          // return (
+          //   <div>
+          //     <div className={styles.receiver}>
+          //       <p className={styles.receiverLabel}>{intl.formatMessage(messages.receiverLabel)}</p>
+          //       <p className={styles.receiverAddress}>
+          //         addr_test1qrnu64f004hr9nvc6wv0ac6zelca94lv6h9ctqfr3z8yk77r3y3kdut55a40jff00
+          //         qmg74686vz44v6k363md06qkq0qs98pf5
+          //       </p>
+          //     </div>
+          //     <div className={styles.infoWrapper}>
+          //       <div className={styles.infoBlock}>
+          //         <p className={styles.infoLabel}>
+          //           {intl.formatMessage(messages.amountMinAdaIncluded)}
+          //         </p>
+          //         <p className={styles.infoAmount}>2000 ADA</p>
+          //       </div>
+          //       <div className={styles.infoBlock}>
+          //         <p className={styles.infoLabel}>{intl.formatMessage(messages.transactionFee)}</p>
+          //         <p className={styles.infoAmount}>2 ADA</p>
+          //       </div>
 
-                <div className={styles.totalCard}>
-                  <div className={styles.label}>{intl.formatMessage(messages.total)}</div>
-                  <div className={styles.totalValues}>
-                    <p>{intl.formatMessage(messages.nAssets, { number: 3 })}</p>
-                    <p>111,111 ADA</p>
-                    <p className={styles.usd}>22 USD</p>
-                  </div>
-                </div>
-                {/* <TextField
-                  type="password"
-                  className={styles.walletPassword}
-                  {...walletPasswordField.bind()}
-                  disabled={isSubmitting}
-                  error={walletPasswordField.error}
-                /> */}
-              </div>
-            </div>
-          )
+          //       <div className={styles.totalCard}>
+          //         <div className={styles.label}>{intl.formatMessage(messages.total)}</div>
+          //         <div className={styles.totalValues}>
+          //           <p>{intl.formatMessage(messages.nAssets, { number: 3 })}</p>
+          //           <p>111,111 ADA</p>
+          //           <p className={styles.usd}>22 USD</p>
+          //         </div>
+          //       </div>
+          //       {/* <TextField
+          //         type="password"
+          //         className={styles.walletPassword}
+          //         {...walletPasswordField.bind()}
+          //         disabled={isSubmitting}
+          //         error={walletPasswordField.error}
+          //       /> */}
+          //     </div>
+          //   </div>
+          // )
         default:
           throw Error(`${step} is not a valid step number`)
     }
@@ -640,7 +675,7 @@ export default class WalletSendForm extends Component<Props, State> {
           />
 
           <div className={styles.formBody}>
-            {this.renderCurrentStep(SEND_FORM_STEP.PREVIEW)}
+            {this.renderCurrentStep(currentStep)}
           </div>
         </div>
       </div>
@@ -662,25 +697,6 @@ export default class WalletSendForm extends Component<Props, State> {
     }
   }
 
-  _isValidReceiverAndMemo(): Node {
-    const { intl } = this.context;
-    const { invalidMemo } = this.state
-    const receiverField = this.form.$('receiver');
-    const disabledCondition =  invalidMemo || !receiverField.isValid
-
-    return (
-      <Button
-        variant="primary"
-        onClick={() => this.onUpdateStep(SEND_FORM_STEP.AMOUNT)}
-        /** Next Action can't be performed in case transaction fees are not calculated
-          * or there's a transaction waiting to be confirmed (pending) */
-        disabled={disabledCondition}
-        sx={{ margin: '125px 0px 0px 0px', display: 'block' }}
-      >
-        {intl.formatMessage(globalMessages.nextButtonLabel)}
-      </Button>);
-  }
-
   _nextStepButton(
     disabledCondition: boolean,
     nextStep: number
@@ -690,7 +706,7 @@ export default class WalletSendForm extends Component<Props, State> {
     return (
       <Button
         variant="primary"
-        onClick={() => this.onUpdateStep(nextStep)}
+        onClick={nextStep}
         /** Next Action can't be performed in case transaction fees are not calculated
           * or there's a transaction waiting to be confirmed (pending) */
         disabled={disabledCondition}
