@@ -166,6 +166,78 @@
             margin-left: 16px;
             margin-top: 2px;
         }
+
+        // Preview Step Styles 
+        .receiver {
+            padding-top: 10px;
+            font-family: Rubik;
+            font-size: 16px;
+            letter-spacing: 0;
+            line-height: 24px;
+            .receiverLabel {
+                color: #6B7384;
+            }
+            .receiverAddress {
+                color: #242838;
+            }
+        }
+
+        .infoWrapper {
+            padding: 40px 0px;
+            width: 60%;
+            .infoBlock {
+                margin-bottom: 12px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                font-family: Rubik;
+                font-size: 16px;
+                letter-spacing: 0;
+                line-height: 24px;
+
+                .infoLabel {
+                    color: #6B7384;
+                }
+
+                .infoAmount {
+                    color: #242838;
+                }
+            }
+
+            .totalCard {
+                margin-top: 23px;
+                border-radius: 8px;
+                background-color: #3154CB;
+                padding: 29px 24px;
+                display: flex;
+                justify-content: space-between;
+                color: #FFFFFF;
+
+                .totalValues {
+                    font-size: 20px;
+                    font-weight: 500;
+                    letter-spacing: 0;
+                    line-height: 28px;
+                    text-align: right;
+                }
+
+                .label {
+                    font-size: 16px;
+                    letter-spacing: 0;
+                    line-height: 22px;
+                }
+
+                .usd {
+                    color: #FFFFFF;
+                    font-family: Rubik;
+                    font-size: 16px;
+                    letter-spacing: 0;
+                    line-height: 22px;
+                    text-align: right;
+                }
+            }
+        }
+
     }
 }
   
