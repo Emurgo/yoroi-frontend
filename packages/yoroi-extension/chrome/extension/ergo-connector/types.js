@@ -393,7 +393,7 @@ export type PublicDeriverCache = {|
   checksum: void | WalletChecksum,
 |}
 
-export type WhitelistEntry = {| url: string, publicDeriverId: number |};
+export type WhitelistEntry = {| url: string, publicDeriverId: number, image: string |};
 
 export type ConnectingMessage = {| tabId: number, url: string, imgBase64Url: string |};
 export type SigningMessage = {|
