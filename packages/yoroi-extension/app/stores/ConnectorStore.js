@@ -57,25 +57,6 @@ function sendMsgConnect(): Promise<ConnectingMessage> {
   });
 }
 
-// Need to run only once - Sign Tx Confirmation
-let initedSigning = false;
-function sendMsgSigningTx(): Promise<SigningMessage> {
-  return new Promise((resolve, reject) => {
-    if (!initedSigning)
-      window.chrome.runtime.sendMessage(
-        ({ type: 'tx_sign_window_retrieve_data' }: TxSignWindowRetrieveData),
-        response => {
-          if (window.chrome.runtime.lastError) {
-            // eslint-disable-next-line prefer-promise-reject-errors
-            reject('Could not establish connection: connect_retrieve_data ');
-          }
-
-          resolve(response);
-          initedSigning = true;
-        }
-      );
-  });
-}
 
 function getProtocol(): Promise<Protocol> {
   return new Promise((resolve, reject) => {
@@ -95,18 +76,17 @@ function getProtocol(): Promise<Protocol> {
 
 function getConnectedSites(): Promise<ConnectedSites> {
   return new Promise((resolve, reject) => {
-    if (!initedSigning)
-      window.chrome.runtime.sendMessage(
-        ({ type: 'get_connected_sites' }: GetConnectedSitesData),
-        response => {
-          if (window.chrome.runtime.lastError) {
-            // eslint-disable-next-line prefer-promise-reject-errors
-            reject('Could not establish connection: get_connected_sites ');
-          }
-
-          resolve(response);
+    window.chrome.runtime.sendMessage(
+      ({ type: 'get_connected_sites' }: GetConnectedSitesData),
+      response => {
+        if (window.chrome.runtime.lastError) {
+          // eslint-disable-next-line prefer-promise-reject-errors
+          reject('Could not establish connection: get_connected_sites ');
         }
-      );
+
+        resolve(response);
+      }
+    );
   });
 }
 
