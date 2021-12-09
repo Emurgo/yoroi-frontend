@@ -143,6 +143,15 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   @observable loadingWallets: $Values<typeof LoadingWalletStates> = LoadingWalletStates.IDLE;
   @observable errorWallets: string = '';
   @observable wallets: Array<PublicDeriverCache> = [];
+  /**
+   * - `filteredWallets`: includes only cardano or ergo wallets according to the `protocol`
+   *   it will be displyed to the user at the `connect` screen for the user to choose
+   *   which wallet to connect
+   * - `allWallets`: list of all wallets the user have in yoroi
+   *    We need it to display walelts-websits on the `connected webists screen`
+   */
+  @observable filteredWallets: Array<PublicDeriverCache> = [];
+  @observable allWallets: Array<PublicDeriverCache> = [];
   @observable protocol: string = ''
   @observable getConnectorWhitelist: Request<
     GetWhitelistFunc

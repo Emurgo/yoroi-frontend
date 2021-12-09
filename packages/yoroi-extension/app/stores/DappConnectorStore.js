@@ -122,7 +122,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   @observable errorWallets: string = '';
   /**
    * - `filteredWallets`: includes only cardano or ergo wallets according to the `protocol`
-   *   it will be displyed fo the user at the `connect` screen for the user to choose
+   *   it will be displyed to the user at the `connect` screen for the user to choose
    *   which wallet to connect
    * - `allWallets`: list of all wallets the user have in yoroi
    *    We need it to display walelts-websits on the `connected webists screen`
