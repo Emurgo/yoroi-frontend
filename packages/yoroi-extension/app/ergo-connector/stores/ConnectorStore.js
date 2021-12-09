@@ -98,7 +98,7 @@ function sendMsgSigningTx(): Promise<SigningMessage> {
   });
 }
 
-function getProtocol(): Promise<Protocol> {
+export function getProtocol(): Promise<Protocol> {
   return new Promise((resolve, reject) => {
       window.chrome.runtime.sendMessage(
         ({ type: 'get_protocol' }),
@@ -114,7 +114,7 @@ function getProtocol(): Promise<Protocol> {
   });
 }
 
-function getConnectedSites(): Promise<ConnectedSites> {
+export function getConnectedSites(): Promise<ConnectedSites> {
   return new Promise((resolve, reject) => {
     if (!initedSigning)
       window.chrome.runtime.sendMessage(
@@ -131,7 +131,7 @@ function getConnectedSites(): Promise<ConnectedSites> {
   });
 }
 
-async function parseWalletsList(
+export async function parseWalletsList(
   wallets: Array<PublicDeriver<>>
   ): Promise<Array<PublicDeriverCache>> {
   const result = [];

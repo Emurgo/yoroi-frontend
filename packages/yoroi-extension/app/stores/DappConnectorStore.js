@@ -10,8 +10,6 @@ import type {
   ConnectedSites,
   ConnectRetrieveData,
   RemoveWalletFromWhitelistData,
-  GetConnectedSitesData,
-  Protocol,
 } from '../../chrome/extension/ergo-connector/types';
 import type { ActionsMap } from '../actions/index';
 import type { StoresMap } from './index';
@@ -20,18 +18,9 @@ import {
   getWallets
 } from '../api/common/index';
 import {
-  isCardanoHaskell,
   isErgo,
 } from '../api/ada/lib/storage/database/prepackaged/networks';
-import {
-  asGetBalance,
-  asGetPublicKey,
-} from '../api/ada/lib/storage/models/PublicDeriver/traits';
-import { Bip44Wallet } from '../api/ada/lib/storage/models/Bip44Wallet/wrapper';
-import { walletChecksum, legacyWalletChecksum } from '@emurgo/cip4-js';
-import type { WalletChecksum } from '@emurgo/cip4-js';
-import { MultiToken } from '../api/common/lib/MultiToken';
-import { PublicDeriver } from '../api/ada/lib/storage/models/PublicDeriver/index';
+import { getConnectedSites, getProtocol, parseWalletsList } from '../ergo-connector/stores/ConnectorStore';
 
 // Need to run only once - Connecting wallets
 let initedConnecting = false;
@@ -53,61 +42,22 @@ function sendMsgConnect(): Promise<ConnectingMessage> {
   });
 }
 
+// function getConnectedSites(): Promise<ConnectedSites> {
+//   return new Promise((resolve, reject) => {
+//     window.chrome.runtime.sendMessage(
+//       ({ type: 'get_connected_sites' }: GetConnectedSitesData),
+//       response => {
+//         if (window.chrome.runtime.lastError) {
+//           // eslint-disable-next-line prefer-promise-reject-errors
+//           reject('Could not establish connection: get_connected_sites ');
+//         }
 
-function getProtocol(): Promise<Protocol> {
-  return new Promise((resolve, reject) => {
-      window.chrome.runtime.sendMessage(
-        ({ type: 'get_protocol' }),
-        response => {
-          if (window.chrome.runtime.lastError) {
-            // eslint-disable-next-line prefer-promise-reject-errors
-            reject('Could not establish connection: get_protocol ');
-          }
+//         resolve(response);
+//       }
+//     );
+//   });
+// }
 
-          resolve(response);
-        }
-      );
-  });
-}
-
-function getConnectedSites(): Promise<ConnectedSites> {
-  return new Promise((resolve, reject) => {
-    window.chrome.runtime.sendMessage(
-      ({ type: 'get_connected_sites' }: GetConnectedSitesData),
-      response => {
-        if (window.chrome.runtime.lastError) {
-          // eslint-disable-next-line prefer-promise-reject-errors
-          reject('Could not establish connection: get_connected_sites ');
-        }
-
-        resolve(response);
-      }
-    );
-  });
-}
-
-async function parseWalletsList(
-  wallets: Array<PublicDeriver<>>
-  ): Promise<Array<PublicDeriverCache>> {
-  const result = [];
-  for (const currentWallet of wallets) {
-    const conceptualInfo = await currentWallet.getParent().getFullConceptualWalletInfo();
-    const withPubKey = asGetPublicKey(currentWallet);
-
-    const canGetBalance = asGetBalance(currentWallet);
-    const balance = canGetBalance == null
-      ? new MultiToken([], currentWallet.getParent().getDefaultToken())
-      : await canGetBalance.getBalance();
-    result.push({
-      publicDeriver: currentWallet,
-      name: conceptualInfo.Name,
-      balance,
-      checksum: await getChecksum(withPubKey)
-    });
-  }
-
-  return result
-}
 
 type GetWhitelistFunc = void => Promise<?Array<WhitelistEntry>>;
 type SetWhitelistFunc = {|
@@ -261,22 +211,4 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     }
     return result ?? { sites: [] };
   }
-}
-
-// TODO: do something better than duplicating the logic here
-async function getChecksum(
-  publicDeriver: ReturnType<typeof asGetPublicKey>,
-): Promise<void | WalletChecksum> {
-  if (publicDeriver == null) return undefined;
-
-  const hash = (await publicDeriver.getPublicKey()).Hash;
-
-  const isLegacyWallet =
-    isCardanoHaskell(publicDeriver.getParent().getNetworkInfo()) &&
-    publicDeriver.getParent() instanceof Bip44Wallet;
-  const checksum = isLegacyWallet
-    ? legacyWalletChecksum(hash)
-    : walletChecksum(hash);
-
-  return checksum;
 }
