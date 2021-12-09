@@ -147,7 +147,7 @@ async function parseWalletsList(
       publicDeriver: currentWallet,
       name: conceptualInfo.Name,
       balance,
-      checksum: await getChecksum(withPubKey)
+      checksum: await getWalletChecksum(withPubKey)
     });
   }
 
@@ -332,28 +332,15 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         await this._getTxAssets(filteredWallets);
       }
 
-      const result = [];
-      for (const currentWallet of filteredWallets) {
-        const conceptualInfo = await currentWallet.getParent().getFullConceptualWalletInfo();
-        const withPubKey = asGetPublicKey(currentWallet);
-
-        const canGetBalance = asGetBalance(currentWallet);
-        const balance = canGetBalance == null
-          ? new MultiToken([], currentWallet.getParent().getDefaultToken())
-          : await canGetBalance.getBalance();
-        result.push({
-          publicDeriver: currentWallet,
-          name: conceptualInfo.Name,
-          balance,
-          checksum: await getWalletChecksum(withPubKey)
-        });
-      }
+      const filteredWalletsResult = await parseWalletsList(filteredWallets)
+      const allWallets = await parseWalletsList(wallets)
 
       runInAction(() => {
         this.loadingWallets = LoadingWalletStates.SUCCESS;
 
         // note: "replace" is a mobx-specific function
-        (this.wallets: any).replace(result);
+        (this.wallets: any).replace(filteredWalletsResult);
+        (this.allWallets: any).replace(allWallets)
       });
       if (this.signingMessage?.sign.type === 'tx/cardano') {
         this.createAdaTransaction();
