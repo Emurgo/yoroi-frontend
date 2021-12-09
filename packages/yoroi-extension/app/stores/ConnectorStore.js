@@ -146,7 +146,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   @observable errorWallets: string = '';
   /**
    * - `filteredWallets`: includes only cardano or ergo wallets according to the `protocol`
-   *   it will be displyed fo the user at the `connect` screen for the user to choose 
+   *   it will be displyed fo the user at the `connect` screen for the user to choose
    *   which wallet to connect
    * - `allWallets`: list of all wallets the user have in yoroi
    *    We need it to display walelts-websits on the `connected webists screen`
@@ -223,40 +223,6 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       })
       // eslint-disable-next-line no-console
       .catch(err => console.error(err));
-  };
-
-  @action
-  _confirmSignInTx: string => void = password => {
-    if (this.signingMessage == null) {
-      throw new Error(`${nameof(this._confirmSignInTx)} confirming a tx but no signing message set`);
-    }
-    const { signingMessage } = this;
-    if (signingMessage.sign.tx == null) {
-      throw new Error(`${nameof(this._confirmSignInTx)} signing non-tx is not supported`);
-    }
-    const sendData: ConfirmedSignData = {
-      type: 'sign_confirmed',
-      tx: signingMessage.sign.tx,
-      uid: signingMessage.sign.uid,
-      tabId: signingMessage.tabId,
-      pw: password,
-    };
-    window.chrome.runtime.sendMessage(sendData);
-    this._closeWindow();
-  };
-  @action
-  _cancelSignInTx: void => void = () => {
-    if (this.signingMessage == null) {
-      throw new Error(`${nameof(this._confirmSignInTx)} confirming a tx but no signing message set`);
-    }
-    const { signingMessage } = this;
-    const sendData: FailedSignData = {
-      type: 'sign_rejected',
-      uid: signingMessage.sign.uid,
-      tabId: signingMessage.tabId,
-    };
-    window.chrome.runtime.sendMessage(sendData);
-    this._closeWindow();
   };
 
   // ========== wallets info ========== //
