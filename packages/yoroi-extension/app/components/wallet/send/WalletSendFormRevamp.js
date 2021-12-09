@@ -350,12 +350,7 @@ export default class WalletSendForm extends Component<Props, State> {
   renderPreviewStep(): Node {
     const publicDeriver = this.props.previewStepsProps.stores.wallets.selected
     if (!publicDeriver) throw new Error(`Active wallet is required.`);
-    
     const { transactionBuilderStore } =  this.props.previewStepsProps.stores;
-    console.log({
-      prop: this.props.previewStepsProps.stores.wallets.selected,
-      transactionBuilderStore: transactionBuilderStore.tentativeTx
-    })
     if (!transactionBuilderStore.tentativeTx) {
       throw new Error(`${nameof(this.webWalletDoConfirmation)}::should never happen`);
     }
