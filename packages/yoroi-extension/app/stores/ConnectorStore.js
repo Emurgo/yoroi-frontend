@@ -174,30 +174,17 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
 
   setup(): void {
     super.setup();
-    this.actions.connector.getResponse.listen(this._getConnectingMsg);
     this.actions.connector.getConnectorWhitelist.listen(this._getConnectorWhitelist);
     this.actions.connector.updateConnectorWhitelist.listen(this._updateConnectorWhitelist);
     this.actions.connector.removeWalletFromWhitelist.listen(this._removeWalletFromWhitelist);
-    this.actions.connector.confirmSignInTx.listen(this._confirmSignInTx);
-    this.actions.connector.cancelSignInTx.listen(this._cancelSignInTx);
-    this.actions.connector.getSigningMsg.listen(this._getSigningMsg);
     this.actions.connector.refreshActiveSites.listen(this._refreshActiveSites);
     this.actions.connector.refreshWallets.listen(this._getWallets);
-    this.actions.connector.closeWindow.listen(this._closeWindow);
     this._getConnectorWhitelist();
-    this._getConnectingMsg();
-    this._getSigningMsg();
     this.currentConnectorWhitelist;
   }
 
   teardown(): void {
     super.teardown();
-  }
-
-  // ========== general ========== //
-  @action
-  _closeWindow(): void {
-    window.close();
   }
 
   // ========== connecting wallets ========== //
@@ -207,18 +194,6 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       .then(response => {
         runInAction(() => {
           this.connectingMessage = response;
-        });
-      })
-      // eslint-disable-next-line no-console
-      .catch(err => console.error(err));
-  };
-
-  @action
-  _getSigningMsg: () => Promise<void> = async () => {
-    await sendMsgSigningTx()
-      .then(response => {
-        runInAction(() => {
-          this.signingMessage = response;
         });
       })
       // eslint-disable-next-line no-console
