@@ -340,6 +340,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
 
         // note: "replace" is a mobx-specific function
         (this.wallets: any).replace(filteredWalletsResult);
+        (this.filteredWallets: any).replace(filteredWalletsResult);
         (this.allWallets: any).replace(allWallets)
       });
       if (this.signingMessage?.sign.type === 'tx/cardano') {
