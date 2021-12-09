@@ -83,7 +83,7 @@ const genBaseProps: {|
       },
       connector: {
         currentConnectorWhitelist: request.whitelist,
-        wallets,
+        allWallets: wallets,
         errorWallets,
         loadingWallets: walletsState,
         activeSites,
