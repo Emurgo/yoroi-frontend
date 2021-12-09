@@ -94,7 +94,7 @@ export default class ConnectContainer extends Component<
   };
 
   handleSubmit: () => void = () => {
-    const wallets = this.generated.stores.connector.wallets;
+    const wallets = this.generated.stores.connector.filteredWallets;
     if (wallets) {
       const { selected } = this.state;
       if (selected >= 0) {
