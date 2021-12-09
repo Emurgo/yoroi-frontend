@@ -5,14 +5,10 @@ import Request from './lib/LocalizedRequest';
 import Store from './base/Store';
 import type {
   PublicDeriverCache,
-  ConfirmedSignData,
   ConnectingMessage,
-  FailedSignData,
-  SigningMessage,
   WhitelistEntry,
   ConnectedSites,
   ConnectRetrieveData,
-  TxSignWindowRetrieveData,
   RemoveWalletFromWhitelistData,
   GetConnectedSitesData,
   Protocol,
