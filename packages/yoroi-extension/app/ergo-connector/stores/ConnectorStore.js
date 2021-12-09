@@ -131,6 +131,29 @@ function getConnectedSites(): Promise<ConnectedSites> {
   });
 }
 
+async function parseWalletsList(
+  wallets: Array<PublicDeriver<>>
+  ): Promise<Array<PublicDeriverCache>> {
+  const result = [];
+  for (const currentWallet of wallets) {
+    const conceptualInfo = await currentWallet.getParent().getFullConceptualWalletInfo();
+    const withPubKey = asGetPublicKey(currentWallet);
+
+    const canGetBalance = asGetBalance(currentWallet);
+    const balance = canGetBalance == null
+      ? new MultiToken([], currentWallet.getParent().getDefaultToken())
+      : await canGetBalance.getBalance();
+    result.push({
+      publicDeriver: currentWallet,
+      name: conceptualInfo.Name,
+      balance,
+      checksum: await getChecksum(withPubKey)
+    });
+  }
+
+  return result
+}
+
 type GetWhitelistFunc = void => Promise<?Array<WhitelistEntry>>;
 type SetWhitelistFunc = {|
   whitelist: Array<WhitelistEntry> | void,
@@ -148,7 +171,8 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
    *   it will be displyed to the user at the `connect` screen for the user to choose
    *   which wallet to connect
    * - `allWallets`: list of all wallets the user have in yoroi
-   *    We need it to display walelts-websits on the `connected webists screen`
+   *    Will be displayed in the on the `connected webists screen` as we need all wallets
+   *    not only ergo or cardano ones
    */
   @observable filteredWallets: Array<PublicDeriverCache> = [];
   @observable allWallets: Array<PublicDeriverCache> = [];
