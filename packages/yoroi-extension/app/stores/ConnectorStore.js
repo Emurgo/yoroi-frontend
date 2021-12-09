@@ -169,8 +169,6 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     getConnectedSites
   );
 
-  @observable signingMessage: ?SigningMessage = null;
-
 
   setup(): void {
     super.setup();
