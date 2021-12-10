@@ -223,17 +223,12 @@ class SignTxPage extends Component<Props, State> {
 
   renderAddresses(): Node {
     const addresses = this.props.txData.outputs().map(({ address }) =>  address )
-
     return (
       <div className={styles.toAddresses}>
-        {addresses.map((address, idx) => {
-          if (idx >= 1) return (
-            <button className={styles.more} type='button' onClick={() => this.toggleUtxoDetails(true)}>
-              {addresses.length - 1} <span>{this.context.intl.formatMessage(messages.more)}</span>
-            </button>
-          )
-          return <p>{address}</p>
-        })}
+        <p className={styles.address}>{addresses[0]}</p>
+        <button className={styles.more} type='button' onClick={() => this.toggleUtxoDetails(true)}>
+          {addresses.length - 1} <span>{this.context.intl.formatMessage(messages.more)}</span>
+        </button>
       </div>
     )
   }
