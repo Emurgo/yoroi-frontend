@@ -89,7 +89,7 @@ class SignTxPage extends Component<Props> {
           type: 'boolean',
           value: false,
         },
-        currentWindowHieght: {
+        currentWindowHeight: {
           type: 'integer',
           value: window.innerHeight
         },
@@ -318,14 +318,15 @@ class SignTxPage extends Component<Props> {
 
     const { intl } = this.context;
     const { txData, onCancel, } = this.props;
-    const { showUtxoDetails, currentWindowHieght } = form.values();
+    const { showUtxoDetails, currentWindowHeight } = form.values();
+
     return (
       <>
         <ProgressBar step={2} />
         <div
           className={styles.component}
           style={{
-            height: currentWindowHieght + 'px',
+            height: currentWindowHeight + 'px',
           }}
         >
           {

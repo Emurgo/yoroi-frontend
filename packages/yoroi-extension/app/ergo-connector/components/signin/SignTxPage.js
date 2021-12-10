@@ -33,6 +33,7 @@ import type { Tx } from '../../../../chrome/extension/ergo-connector/types';
 import { Logger } from '../../../utils/logging';
 import UtxoDetails from './UtxoDetails';
 import ArrowRight from '../../../assets/images/arrow-right.inline.svg';
+import { number } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 
 type Props = {|
   +tx: Tx,
@@ -71,6 +72,7 @@ const messages = defineMessages({
 
 type State = {|
   showUtxoDetails: boolean,
+  currentWindowHeight: number,
 |}
 
 @observer
@@ -81,7 +83,7 @@ class SignTxPage extends Component<Props, State> {
 
   state: State = {
     showUtxoDetails: false,
-    currentWindowHieght: window.innerHeight
+    currentWindowHeight: window.innerHeight
   }
 
   componentDidMount() {
@@ -244,7 +246,7 @@ class SignTxPage extends Component<Props, State> {
   }
 
   updateWindowHieght: void => void = () => {
-    this.setState({ currentWindowHieght: window.innerHeight })
+    this.setState({ currentWindowHeight: window.innerHeight })
   }
 
   render(): Node {
@@ -253,7 +255,7 @@ class SignTxPage extends Component<Props, State> {
 
     const { intl } = this.context;
     const { txData, onCancel, } = this.props;
-    const { showUtxoDetails, currentWindowHieght } = this.state
+    const { showUtxoDetails, currentWindowHeight } = this.state
     const totalInput = txData.totalInput();
     const fee = txData.fee()
     const amount = totalInput.joinSubtractCopy(fee)
@@ -262,7 +264,7 @@ class SignTxPage extends Component<Props, State> {
         <ProgressBar step={2} />
         <div
           style={{
-            height: currentWindowHieght + 'px',
+            height: currentWindowHeight + 'px',
           }}
         >
           {
