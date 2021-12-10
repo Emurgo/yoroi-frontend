@@ -11,6 +11,7 @@ import type {
   BaseGetTransactionsRequest,
   ExportTransactionsFunc,
   GetTransactionsFunc,
+  GetTransactionsDataFunc,
   GetTransactionsRequestOptions,
   RefreshPendingTransactionsFunc,
 } from '../../api/common/index';
@@ -61,9 +62,12 @@ export type TxRequests = {|
     */
     recentRequest: CachedRequest<GetTransactionsFunc>,
     /**
-    * Should ONLY be executed to cache query WITHOUT search options
+    * Should ONLY be executed to cache query WITHOUT search options.
+    * To reduce memory footprint, this request does not store the whole transaction
+    *  list, but instead only derived data from it.
+    *
     */
-    allRequest: CachedRequest<GetTransactionsFunc>,
+    allRequest: CachedRequest<GetTransactionsDataFunc>,
     /**
      * in lovelaces
      */
@@ -168,30 +172,9 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     // Get current transactions for public deriver
     const txRequests = this.getTxRequests(publicDeriver);
     const result = txRequests.requests.allRequest.result;
-    if (!result || !result.transactions) return defaultUnconfirmedAmount;
+    if (!result || !result.unconfirmedAmount) return defaultUnconfirmedAmount;
 
-    const unitOfAccount = this.stores.profile.unitOfAccount;
-
-    const { assuranceMode } = this.stores.walletSettings
-      .getPublicDeriverSettingsCache(publicDeriver);
-
-
-    const getUnitOfAccount = (timestamp: Date) => (!unitOfAccount.enabled
-      ? undefined
-      : this.stores.coinPriceStore.priceMap.get(getPriceKey(
-        getTokenName(this.stores.tokenInfoStore.getDefaultTokenInfo(
-          publicDeriver.getParent().getNetworkInfo().NetworkId
-        )),
-        unitOfAccount.currency,
-        timestamp
-      )));
-    return calculateUnconfirmedAmount(
-      result.transactions,
-      txRequests.lastSyncInfo.Height,
-      assuranceMode,
-      getUnitOfAccount,
-      defaultTokenInfo,
-    );
+    return result.unconfirmedAmount;
   }
 
 
@@ -250,7 +233,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     const result = this.getTxRequests(publicDeriver).requests.allRequest.result;
     if (result == null) return 0;
 
-    return hashTransactions(result.transactions);
+    return result.hash;
   }
 
   @computed get recent(): Array<WalletTransaction> {
@@ -281,7 +264,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) return 0;
     const result = this.getTxRequests(publicDeriver).requests.allRequest.result;
-    return result ? result.transactions.length : 0;
+    return result ? result.totalAvailable : 0;
   }
 
   /** Refresh transaction data for all wallets and update wallet balance */
@@ -300,7 +283,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     // All Request
     const allRequest = this.getTxRequests(request.publicDeriver).requests.allRequest;
 
-    const oldHash = hashTransactions(allRequest.result?.transactions);
+    const oldHash = allRequest.result ? allRequest.result.hash : 0;
     allRequest.invalidate({ immediately: false });
     allRequest.execute({
       publicDeriver,
@@ -312,7 +295,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     const result = await allRequest.promise;
 
     const recentRequest = this.getTxRequests(request.publicDeriver).requests.recentRequest;
-    const newHash = hashTransactions(result.transactions);
+    const newHash = result.hash;
 
     // update last sync (note: changes even if no new transaction is found)
     {
@@ -338,12 +321,10 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     // note: possible we failed to get the historical price for something in the past
     await this.stores.coinPriceStore.updateTransactionPriceData({
       db: publicDeriver.getDb(),
-      transactions: result.transactions,
+      timestamps: result.timestamps,
     });
 
-    const remoteTransactionIds = new Set(
-      result.transactions.map(tx => tx.txid)
-    );
+    const remoteTransactionIds = result.remoteTransactionIds;
 
     let submittedTransactionsChanged = false;
     runInAction(() => {
@@ -513,8 +494,8 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
         recentRequest: new CachedRequest<GetTransactionsFunc>(
           this.stores.substores[apiType].transactions.refreshTransactions
         ),
-        allRequest: new CachedRequest<GetTransactionsFunc>(
-          this.stores.substores[apiType].transactions.refreshTransactions
+        allRequest: new CachedRequest<GetTransactionsDataFunc>(
+          this.genComputeOnAllTransactions(apiType),
         ),
         getBalanceRequest: new CachedRequest<GetBalanceFunc>(this.api.common.getBalance),
         getAssetDepositRequest: new CachedRequest<GetBalanceFunc>(this.api.common.getAssetDeposit),
@@ -530,6 +511,59 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
         skip: SEARCH_SKIP
       }
     });
+  }
+
+  genComputeOnAllTransactions: string => GetTransactionsDataFunc = (apiType) => {
+    return async (...args) => {
+      const publicDeriver = args[0].publicDeriver;
+      const NetworkId = publicDeriver.getParent().getNetworkInfo().NetworkId
+
+      const defaultToken = this.stores.tokenInfoStore.getDefaultTokenInfo(NetworkId);
+      const defaultTokenInfo = {
+        defaultNetworkId: defaultToken.NetworkId,
+        defaultIdentifier: defaultToken.Identifier,
+      };
+
+
+      // Get current transactions for public deriver
+      const txRequests = this.getTxRequests((publicDeriver: any));
+
+      const unitOfAccount = this.stores.profile.unitOfAccount;
+
+      const { assuranceMode } = this.stores.walletSettings
+            .getPublicDeriverSettingsCache((publicDeriver: any));
+      const getUnitOfAccount = (timestamp: Date) =>
+            (!unitOfAccount.enabled
+             ? undefined
+             : this.stores.coinPriceStore.priceMap.get(getPriceKey(
+               getTokenName(this.stores.tokenInfoStore.getDefaultTokenInfo(
+                 publicDeriver.getParent().getNetworkInfo().NetworkId
+               )),
+               unitOfAccount.currency,
+               timestamp
+             )));
+
+      const result = await this.stores.substores[apiType].transactions.refreshTransactions(...args);
+      const hash = hashTransactions(result.transactions);
+
+      const unconfirmedAmount = calculateUnconfirmedAmount(
+        result.transactions,
+        txRequests.lastSyncInfo.Height,
+        assuranceMode,
+        getUnitOfAccount,
+        defaultTokenInfo,
+      );
+
+      return {
+        hash,
+        totalAvailable: result.transactions.length,
+        unconfirmedAmount,
+        remoteTransactionIds: new Set(
+          result.transactions.map(tx => tx.txid)
+        ),
+        timestamps: Array.from(new Set(result.transactions.map(tx => tx.date.valueOf())))
+      };
+    }
   }
 
   getTxRequests: (
