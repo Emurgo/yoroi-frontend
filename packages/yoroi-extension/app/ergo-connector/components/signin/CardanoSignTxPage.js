@@ -89,6 +89,10 @@ class SignTxPage extends Component<Props> {
           type: 'boolean',
           value: false,
         },
+        currentWindowHieght: {
+          type: 'integer',
+          value: window.innerHeight
+        },
         walletPassword: {
           type: 'password',
           label: this.context.intl.formatMessage(globalMessages.walletPasswordLabel),
@@ -314,11 +318,16 @@ class SignTxPage extends Component<Props> {
 
     const { intl } = this.context;
     const { txData, onCancel, } = this.props;
-    const { showUtxoDetails } = form.values();
+    const { showUtxoDetails, currentWindowHieght } = form.values();
     return (
       <>
         <ProgressBar step={2} />
-        <div className={styles.component}>
+        <div
+          className={styles.component}
+          style={{
+            height: currentWindowHieght + 'px',
+          }}
+        >
           {
             !showUtxoDetails ?(
               <div>
