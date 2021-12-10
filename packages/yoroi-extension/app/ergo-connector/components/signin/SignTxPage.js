@@ -86,7 +86,7 @@ class SignTxPage extends Component<Props, State> {
   }
 
   componentDidMount() {
-    window.onresize = this.updateWindowHieght
+    window.onresize = () => this.setState({ currentWindowHeight: window.innerHeight })
   }
 
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm(
@@ -242,10 +242,6 @@ class SignTxPage extends Component<Props, State> {
 
   toggleUtxoDetails: boolean => void = (newState) => {
     this.setState({ showUtxoDetails: newState })
-  }
-
-  updateWindowHieght: void => void = () => {
-    this.setState({ currentWindowHeight: window.innerHeight })
   }
 
   render(): Node {
