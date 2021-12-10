@@ -33,7 +33,6 @@ import type { Tx } from '../../../../chrome/extension/ergo-connector/types';
 import { Logger } from '../../../utils/logging';
 import UtxoDetails from './UtxoDetails';
 import ArrowRight from '../../../assets/images/arrow-right.inline.svg';
-import { number } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 
 type Props = {|
   +tx: Tx,
@@ -358,7 +357,7 @@ class SignTxPage extends Component<Props, State> {
            unitOfAccountSetting={this.props.unitOfAccountSetting}
            toggleUtxoDetails={this.toggleUtxoDetails}
          />
-       }
+        }
         </div>
       </>
     );

@@ -122,6 +122,10 @@ class SignTxPage extends Component<Props> {
     }
   );
 
+  componentDidMount() {
+    window.onresize = () => this.form.$('currentWindowHeight').set(window.innerHeight);
+  }
+
   submit(): void {
     this.form.submit({
       onSuccess: form => {
@@ -291,22 +295,10 @@ class SignTxPage extends Component<Props> {
     const addresses = this.props.txData.outputs.map(({ address }) =>  address);
     return (
       <div className={styles.toAddresses}>
-        {addresses.slice(0, 2).map((address, idx) => {
-          if (idx >= 1) {
-            return (
-              <button
-                className={styles.more}
-                type="button"
-                onClick={() => this.toggleUtxoDetails(true)}
-                key={address}
-              >
-                {addresses.length - 1}&nbsp;
-                <span>{this.context.intl.formatMessage(messages.more)}</span>
-              </button>
-            );
-          }
-          return (<p key={address}>{address}</p>);
-        })}
+        <p className={styles.address}>{addresses[0]}</p>
+        <button className={styles.more} type='button' onClick={() => this.toggleUtxoDetails(true)}>
+          {addresses.length - 1} <span>{this.context.intl.formatMessage(messages.more)}</span>
+        </button>
       </div>
     )
   }
@@ -324,14 +316,13 @@ class SignTxPage extends Component<Props> {
       <>
         <ProgressBar step={2} />
         <div
-          className={styles.component}
           style={{
             height: currentWindowHeight + 'px',
           }}
         >
           {
             !showUtxoDetails ?(
-              <div>
+              <div className={styles.component}>
                 <div>
                   <h1 className={styles.title}>{intl.formatMessage(messages.title)}</h1>
                 </div>
