@@ -260,13 +260,15 @@ class SignTxPage extends Component<Props, State> {
     return (
       <>
         <ProgressBar step={2} />
-        {
+        <div
+          style={{
+            height: currentWindowHieght + 'px',
+          }}
+        >
+          {
          !showUtxoDetails ? (
            <div
              className={styles.component}
-             style={{
-             height: currentWindowHieght + 'px',
-           }}
            >
              <div>
                <h1 className={styles.title}>{intl.formatMessage(messages.title)}</h1>
@@ -355,6 +357,7 @@ class SignTxPage extends Component<Props, State> {
            toggleUtxoDetails={this.toggleUtxoDetails}
          />
        }
+        </div>
       </>
     );
   }
