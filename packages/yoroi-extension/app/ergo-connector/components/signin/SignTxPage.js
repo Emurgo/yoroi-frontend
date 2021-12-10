@@ -72,6 +72,7 @@ const messages = defineMessages({
 type State = {|
   showUtxoDetails: boolean,
 |}
+
 @observer
 class SignTxPage extends Component<Props, State> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
@@ -80,6 +81,11 @@ class SignTxPage extends Component<Props, State> {
 
   state: State = {
     showUtxoDetails: false,
+    currentWindowHieght: window.innerHeight
+  }
+
+  componentDidMount() {
+    window.onresize = this.updateWindowHieght
   }
 
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm(
@@ -237,97 +243,103 @@ class SignTxPage extends Component<Props, State> {
     this.setState({ showUtxoDetails: newState })
   }
 
+  updateWindowHieght: void => void = () => {
+    this.setState({ currentWindowHieght: window.innerHeight })
+  }
+
   render(): Node {
     const { form } = this;
     const walletPasswordField = form.$('walletPassword');
 
     const { intl } = this.context;
     const { txData, onCancel, } = this.props;
-    const { showUtxoDetails } = this.state
+    const { showUtxoDetails, currentWindowHieght } = this.state
     const totalInput = txData.totalInput();
     const fee = txData.fee()
     const amount = totalInput.joinSubtractCopy(fee)
-
     return (
       <>
         <ProgressBar step={2} />
         {
          !showUtxoDetails ? (
-           <div>
-             <div className={styles.component}>
-               <div>
-                 <h1 className={styles.title}>{intl.formatMessage(messages.title)}</h1>
-               </div>
-               <div className={styles.transactionWrapper}>
-                 <p className={styles.transactionId}>
-                   {intl.formatMessage(messages.receiver)}
-                 </p>
-                 <p className={styles.hash}>{this.renderAddresses()}</p>
-                 <button onClick={() => this.toggleUtxoDetails(true)} type='button' className={styles.utxo}>
-                   <p>{intl.formatMessage(messages.txDetails)}</p>
-                   <ArrowRight />
-                 </button>
-               </div>
-               <div className={styles.info}>
-                 <div className={styles.infoRaw}>
-                   <p className={styles.label}>{intl.formatMessage(globalMessages.amount)}</p>
-                   <p className={styles.labelValue}>
-                     {this.renderAmountDisplay({
+           <div
+             className={styles.component}
+             style={{
+             height: currentWindowHieght + 'px',
+           }}
+           >
+             <div>
+               <h1 className={styles.title}>{intl.formatMessage(messages.title)}</h1>
+             </div>
+             <div className={styles.transactionWrapper}>
+               <p className={styles.transactionId}>
+                 {intl.formatMessage(messages.receiver)}
+               </p>
+               <p className={styles.hash}>{this.renderAddresses()}</p>
+               <button onClick={() => this.toggleUtxoDetails(true)} type='button' className={styles.utxo}>
+                 <p>{intl.formatMessage(messages.txDetails)}</p>
+                 <ArrowRight />
+               </button>
+             </div>
+             <div className={styles.info}>
+               <div className={styles.infoRaw}>
+                 <p className={styles.label}>{intl.formatMessage(globalMessages.amount)}</p>
+                 <p className={styles.labelValue}>
+                   {this.renderAmountDisplay({
                         entry: {
                           ...amount.getDefaultEntry(),
                           amount: amount.getDefaultEntry().amount.abs().negated(),
                         },
                       }
                     )}
-                   </p>
-                 </div>
-                 <div className={styles.infoRaw}>
-                   <p className={styles.label}>{intl.formatMessage(globalMessages.feeLabel)}</p>
-                   <p className={styles.labelValue}>
-                     {this.renderAmountDisplay({
+                 </p>
+               </div>
+               <div className={styles.infoRaw}>
+                 <p className={styles.label}>{intl.formatMessage(globalMessages.feeLabel)}</p>
+                 <p className={styles.labelValue}>
+                   {this.renderAmountDisplay({
                         entry: {
                           ...txData.fee().getDefaultEntry(),
                           amount: txData.fee().getDefaultEntry().amount.abs().negated(),
                         },
                       })}
-                   </p>
-                 </div>
-                 <div className={styles.totalAmoundCard}>
-                   <p className={styles.totalAmoundLable}>
-                     {intl.formatMessage(globalMessages.walletSendConfirmationTotalLabel)}
-                   </p>
-                   <p className={styles.totalAmound}>
-                     {this.renderAmountDisplay({
+                 </p>
+               </div>
+               <div className={styles.totalAmoundCard}>
+                 <p className={styles.totalAmoundLable}>
+                   {intl.formatMessage(globalMessages.walletSendConfirmationTotalLabel)}
+                 </p>
+                 <p className={styles.totalAmound}>
+                   {this.renderAmountDisplay({
                         entry: {
                           ...totalInput.getDefaultEntry(),
                           amount: totalInput.getDefaultEntry().amount.abs().negated(),
                         },
                       }
                      )}
-                   </p>
-                 </div>
+                 </p>
                </div>
-               <div className={styles.passwordInput}>
-                 <TextField
-                   type="password"
-                   className={styles.walletPassword}
-                   {...walletPasswordField.bind()}
-                   error={walletPasswordField.error}
-                 />
-               </div>
-               <div className={styles.wrapperBtn}>
-                 <Button fullWidth variant="secondary" onClick={onCancel}>
-                   {intl.formatMessage(globalMessages.cancel)}
-                 </Button>
-                 <Button
-                   variant="primary"
-                   fullWidth
-                   disabled={!walletPasswordField.isValid}
-                   onClick={this.submit.bind(this)}
-                 >
-                   {intl.formatMessage(globalMessages.confirm)}
-                 </Button>
-               </div>
+             </div>
+             <div className={styles.passwordInput}>
+               <TextField
+                 type="password"
+                 className={styles.walletPassword}
+                 {...walletPasswordField.bind()}
+                 error={walletPasswordField.error}
+               />
+             </div>
+             <div className={styles.wrapperBtn}>
+               <Button fullWidth variant="secondary" onClick={onCancel}>
+                 {intl.formatMessage(globalMessages.cancel)}
+               </Button>
+               <Button
+                 variant="primary"
+                 fullWidth
+                 disabled={!walletPasswordField.isValid}
+                 onClick={this.submit.bind(this)}
+               >
+                 {intl.formatMessage(globalMessages.confirm)}
+               </Button>
              </div>
            </div>
          ): <UtxoDetails
