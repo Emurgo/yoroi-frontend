@@ -7,4 +7,23 @@
         color: #6B7384;
         margin-bottom: 4px;
     }
+
+    .amountWrapper {
+        padding: 12px 0px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-family: Rubik;
+        font-size: 16px;
+        letter-spacing: 0;
+        line-height: 24px;
+
+        .amountLabel {
+            color: #6B7384;
+        }
+
+        .amountValue {
+            color: #242838;
+        }
+    }
 }

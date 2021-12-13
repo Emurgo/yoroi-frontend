@@ -10,7 +10,6 @@ import TextField from '../../../common/TextField';
 import { intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
-import DialogCloseButton from '../../../widgets/DialogCloseButton';
 import globalMessages from '../../../../i18n/global-messages';
 import LocalizableError from '../../../../i18n/LocalizableError';
 import styles from './WalletSendPreviewStep.scss';
@@ -252,7 +251,6 @@ export default class WalletSendPreviewStep extends Component<Props> {
       isSubmitting,
       error,
     } = this.props;
-    console.log({assets: this.getAssetsList()})
     const staleTxWarning = (
       <div className={styles.warningBox}>
         <WarningBox>
@@ -320,15 +318,17 @@ export default class WalletSendPreviewStep extends Component<Props> {
           ) : null}
 
           <div className={styles.amountFeesWrapper}>
-            <AssetsDropdown assets={this.getAssetsList()} />
+            {(amount.nonDefaultEntries().length > 0) &&
+            (
+              <AssetsDropdown assets={this.getAssetsList()} />
+            )}
             <div className={styles.amountWrapper}>
               <div className={styles.amountLabel}>
-                {intl.formatMessage(globalMessages.amountLabel)}
+                {intl.formatMessage(globalMessages.amountWithMinADA)}
               </div>
-              {this.renderBundle({
-                amount,
-                render: this.renderSingleAmount,
-              })}
+              <div className={styles.amountValue}>
+                {this.renderSingleAmount(amount.getDefaultEntry())}
+              </div>
             </div>
 
             <div className={styles.feesWrapper}>

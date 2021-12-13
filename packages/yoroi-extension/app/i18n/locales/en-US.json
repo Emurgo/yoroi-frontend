@@ -93,6 +93,7 @@
   "ergo-connector.label.connect": "Connect to",
   "ergo-connector.label.selectAllWallets": "Select all wallets",
   "global.blog.learnMore": "You can read our {blogLink} to learn more.",
+  "global.labels.amountWithMinADA": "Amount (includes min-ADA)",
   "global.connector.connectedWebsites": "Connected Websites",
   "global.connector.messageReadOnly": "We are granting read-only to view utxos/addresses.",
   "global.connector.yoroiDappConnector": "Yoroi dApp Connector",

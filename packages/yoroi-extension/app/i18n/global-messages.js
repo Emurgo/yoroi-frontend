@@ -88,6 +88,10 @@ const globalMessages: * = defineMessages({
     id: 'global.labels.amount',
     defaultMessage: '!!!Amount',
   },
+  amountWithMinADA: {
+    id: 'global.labels.amountWithMinADA',
+    defaultMessage: '!!!Amount (includes min-ADA)',
+  },
   id: {
     id: 'global.labels.id',
     defaultMessage: '!!!ID',
