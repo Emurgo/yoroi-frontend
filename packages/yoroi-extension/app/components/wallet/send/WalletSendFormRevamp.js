@@ -506,46 +506,7 @@ export default class WalletSendForm extends Component<Props, State> {
             </div>
           )
         case SEND_FORM_STEP.PREVIEW:
-                return this.renderPreviewStep()
-          // return (
-          //   <div>
-          //     <div className={styles.receiver}>
-          //       <p className={styles.receiverLabel}>{intl.formatMessage(messages.receiverLabel)}</p>
-          //       <p className={styles.receiverAddress}>
-          //         addr_test1qrnu64f004hr9nvc6wv0ac6zelca94lv6h9ctqfr3z8yk77r3y3kdut55a40jff00
-          //         qmg74686vz44v6k363md06qkq0qs98pf5
-          //       </p>
-          //     </div>
-          //     <div className={styles.infoWrapper}>
-          //       <div className={styles.infoBlock}>
-          //         <p className={styles.infoLabel}>
-          //           {intl.formatMessage(messages.amountMinAdaIncluded)}
-          //         </p>
-          //         <p className={styles.infoAmount}>2000 ADA</p>
-          //       </div>
-          //       <div className={styles.infoBlock}>
-          //         <p className={styles.infoLabel}>{intl.formatMessage(messages.transactionFee)}</p>
-          //         <p className={styles.infoAmount}>2 ADA</p>
-          //       </div>
-
-          //       <div className={styles.totalCard}>
-          //         <div className={styles.label}>{intl.formatMessage(messages.total)}</div>
-          //         <div className={styles.totalValues}>
-          //           <p>{intl.formatMessage(messages.nAssets, { number: 3 })}</p>
-          //           <p>111,111 ADA</p>
-          //           <p className={styles.usd}>22 USD</p>
-          //         </div>
-          //       </div>
-          //       {/* <TextField
-          //         type="password"
-          //         className={styles.walletPassword}
-          //         {...walletPasswordField.bind()}
-          //         disabled={isSubmitting}
-          //         error={walletPasswordField.error}
-          //       /> */}
-          //     </div>
-          //   </div>
-          // )
+            return this.renderPreviewStep()
         default:
           throw Error(`${step} is not a valid step number`)
     }

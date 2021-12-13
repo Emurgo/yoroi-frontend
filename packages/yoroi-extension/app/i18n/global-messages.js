@@ -16,6 +16,10 @@ const globalMessages: * = defineMessages({
     id: 'wallet.nav.type.standard',
     defaultMessage: '!!!Standard wallet',
   },
+  transactionFee: {
+    id: 'wallet.send.preview.transactionFee',
+    defaultMessage: '!!!Transaction Fee',
+  },
   paperWallet: {
     id: 'wallet.nav.type.paper',
     defaultMessage: '!!!Paper wallet',

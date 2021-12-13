@@ -340,7 +340,7 @@ export default class WalletSendPreviewStep extends Component<Props> {
 
             <div className={styles.feesWrapper}>
               <div className={styles.feesLabel}>
-                {intl.formatMessage(globalMessages.walletSendConfirmationFeesLabel)}
+                {intl.formatMessage(globalMessages.transactionFee)}
               </div>
               <div className={styles.feesValue}>
                 {this.renderBundle({
@@ -357,14 +357,16 @@ export default class WalletSendPreviewStep extends Component<Props> {
             </div>
             <div>
               {amount.nonDefaultEntries().length > 0 && (
-                <div>
+                <div className={styles.assetsCount}>
                   {intl.formatMessage(messages.nAssets, {
                     number: amount.nonDefaultEntries().length
                   })}
                 </div>
               )}
 
-              <p>{this.renderTotalAmount(this.props.totalAmount.getDefaultEntry())}</p>
+              <p className={styles.totalAmountValue}>
+                {this.renderTotalAmount(this.props.totalAmount.getDefaultEntry())}
+              </p>
             </div>
           </div>
 
