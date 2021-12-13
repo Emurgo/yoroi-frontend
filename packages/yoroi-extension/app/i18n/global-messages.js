@@ -8,6 +8,10 @@ import { defineMessages } from 'react-intl';
 */
 
 const globalMessages: * = defineMessages({
+  receiverLabel: {
+    id: 'wallet.send.form.receiver.label',
+    defaultMessage: '!!!Receiver',
+  },
   standardWallet: {
     id: 'wallet.nav.type.standard',
     defaultMessage: '!!!Standard wallet',

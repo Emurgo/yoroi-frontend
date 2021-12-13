@@ -13,7 +13,7 @@ import vjf from 'mobx-react-form/lib/validators/VJF';
 import DialogCloseButton from '../../../widgets/DialogCloseButton';
 import globalMessages from '../../../../i18n/global-messages';
 import LocalizableError from '../../../../i18n/LocalizableError';
-import styles from '../WalletSendConfirmationDialog.scss';
+import styles from './WalletSendPreviewStep.scss';
 import config from '../../../../config';
 import ExplorableHashContainer from '../../../../containers/widgets/ExplorableHashContainer';
 import RawHash from '../../../widgets/hashWrappers/RawHash';
@@ -33,6 +33,7 @@ import type {
 } from '../../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
 import { getTokenName, genFormatTokenAmount } from '../../../../stores/stateless/tokenHelpers';
+import AssetsDropdown from './AssetsDropdown';
 
 type Props = {|
   +staleTx: boolean,
@@ -271,20 +272,12 @@ export default class WalletSendPreviewStep extends Component<Props> {
     ];
 
     return (
-      <div
-        title={intl.formatMessage(globalMessages.walletSendConfirmationDialogTitle)}
-        actions={actions}
-        closeOnOverlayClick={false}
-        onClose={!isSubmitting ? onCancel : null}
-        className={styles.dialog}
-        closeButton={<DialogCloseButton />}
-      >
+      <div className={styles.component}>
         {this.props.staleTx && staleTxWarning}
-
-        <div className={styles.walletPasswordFields}>
-          <div className={styles.addressToLabelWrapper}>
+        <div>
+          <div>
             <div className={styles.addressToLabel}>
-              {intl.formatMessage(globalMessages.walletSendConfirmationAddressToLabel)}
+              {intl.formatMessage(globalMessages.receiverLabel)}
             </div>
             {receivers.map((receiver, i) => (
               <ExplorableHashContainer
@@ -315,6 +308,7 @@ export default class WalletSendPreviewStep extends Component<Props> {
           ) : null}
 
           <div className={styles.amountFeesWrapper}>
+            <AssetsDropdown assets={amount.nonDefaultEntries()} />
             <div className={styles.amountWrapper}>
               <div className={styles.amountLabel}>
                 {intl.formatMessage(globalMessages.amountLabel)}
