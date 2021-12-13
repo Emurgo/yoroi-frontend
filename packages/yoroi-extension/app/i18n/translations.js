@@ -109,7 +109,7 @@ export const LANGUAGES: Array<LanguageType> = [
     value: 'cs-CZ',
     label: globalMessages.languageCzech,
     svg: CzechFlag
-  }
+  },
   {
     value: 'sk-SK',
     label: globalMessages.languageSlovak,
