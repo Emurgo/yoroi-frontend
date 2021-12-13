@@ -32,7 +32,7 @@ import type {
   TokenLookupKey, TokenEntry,
 } from '../../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
-import { getTokenName, genFormatTokenAmount } from '../../../../stores/stateless/tokenHelpers';
+import { getTokenName, genFormatTokenAmount, getTokenStrictName, getTokenIdentifierIfExists } from '../../../../stores/stateless/tokenHelpers';
 import AssetsDropdown from './AssetsDropdown';
 
 type Props = {|
@@ -229,6 +229,18 @@ export default class WalletSendPreviewStep extends Component<Props> {
     );
   }
 
+  getAssetsList = () => {
+    const { getTokenInfo } = this.props
+    return this.props.amount.nonDefaultEntries().map(entry => ({
+      entry,
+      info: getTokenInfo(entry)
+    })).map(token => ({
+      name: truncateToken(getTokenStrictName(token.info) ?? '-'),
+      id: (getTokenIdentifierIfExists(token.info) ?? '-'),
+      amount: genFormatTokenAmount(getTokenInfo)(token.entry),
+    }))
+  }
+
   render(): Node {
     const { form } = this;
     const { intl } = this.context;
@@ -240,7 +252,7 @@ export default class WalletSendPreviewStep extends Component<Props> {
       isSubmitting,
       error,
     } = this.props;
-
+    console.log({assets: this.getAssetsList()})
     const staleTxWarning = (
       <div className={styles.warningBox}>
         <WarningBox>
@@ -308,7 +320,7 @@ export default class WalletSendPreviewStep extends Component<Props> {
           ) : null}
 
           <div className={styles.amountFeesWrapper}>
-            <AssetsDropdown assets={amount.nonDefaultEntries()} />
+            <AssetsDropdown assets={this.getAssetsList()} />
             <div className={styles.amountWrapper}>
               <div className={styles.amountLabel}>
                 {intl.formatMessage(globalMessages.amountLabel)}
