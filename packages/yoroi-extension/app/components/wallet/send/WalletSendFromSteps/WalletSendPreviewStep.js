@@ -7,7 +7,7 @@ import React, { Component, } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import TextField from '../../../common/TextField';
-import { intlShape } from 'react-intl';
+import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
 import globalMessages from '../../../../i18n/global-messages';
@@ -52,6 +52,13 @@ type Props = {|
   +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
   +getCurrentPrice: (from: string, to: string) => ?number,
 |};
+
+const messages = defineMessages({
+  nAssets: {
+    id: 'wallet.send.form.revamp.nAssets',
+    defaultMessage: '!!!{number} assets',
+  }
+});
 
 @observer
 export default class WalletSendPreviewStep extends Component<Props> {
@@ -335,10 +342,12 @@ export default class WalletSendPreviewStep extends Component<Props> {
               <div className={styles.feesLabel}>
                 {intl.formatMessage(globalMessages.walletSendConfirmationFeesLabel)}
               </div>
-              {this.renderBundle({
-                amount: this.props.transactionFee,
-                render: this.renderSingleFee,
-              })}
+              <div className={styles.feesValue}>
+                {this.renderBundle({
+                  amount: this.props.transactionFee,
+                  render: this.renderSingleFee,
+                })}
+              </div>
             </div>
           </div>
 
@@ -346,10 +355,17 @@ export default class WalletSendPreviewStep extends Component<Props> {
             <div className={styles.totalAmountLabel}>
               {intl.formatMessage(globalMessages.walletSendConfirmationTotalLabel)}
             </div>
-            {this.renderBundle({
-              amount: this.props.totalAmount,
-              render: this.renderTotalAmount,
-            })}
+            <div>
+              {amount.nonDefaultEntries().length > 0 && (
+                <div>
+                  {intl.formatMessage(messages.nAssets, {
+                    number: amount.nonDefaultEntries().length
+                  })}
+                </div>
+              )}
+
+              <p>{this.renderTotalAmount(this.props.totalAmount.getDefaultEntry())}</p>
+            </div>
           </div>
 
           <TextField

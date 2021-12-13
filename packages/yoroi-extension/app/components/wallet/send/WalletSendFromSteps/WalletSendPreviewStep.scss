@@ -26,4 +26,23 @@
             color: #242838;
         }
     }
+    
+    .feesWrapper {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-family: Rubik;
+        font-size: 16px;
+        letter-spacing: 0;
+        line-height: 24px;
+
+        .feesLabel {
+            color: #6B7384;
+        }
+
+        .feesValue {
+            color: #242838;
+        }
+    }
+    
 }

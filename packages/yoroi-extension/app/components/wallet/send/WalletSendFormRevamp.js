@@ -35,14 +35,10 @@ import type {
   TokenEntry,
   TokenLookupKey,
 } from '../../../api/common/lib/MultiToken';
-import Select from '../../common/Select';
-import { Box, style } from '@mui/system';
-import TokenOptionRow from '../../widgets/tokenOption/TokenOptionRow';
 import BigNumber from 'bignumber.js';
 import classnames from 'classnames';
 import SendFormHeader from './SendFormHeader';
 import { SEND_FORM_STEP } from '../../../types/WalletSendTypes';
-import WalletSendPreviewStep from './WalletSendFromSteps/WalletSendPreviewStep'
 import WalletSendPreviewStepContainer from './WalletSendFromSteps/WalletSendPreviewStepContainer';
 
 const messages = defineMessages({
