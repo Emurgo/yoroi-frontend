@@ -402,7 +402,7 @@ export default class WalletSendForm extends Component<Props, State> {
     });
 
     const amountInputError = transactionFeeError || amountField.error
-    console.log({error: amountInputError})
+
     switch (step) {
       case SEND_FORM_STEP.RECEIVER:
         return (
